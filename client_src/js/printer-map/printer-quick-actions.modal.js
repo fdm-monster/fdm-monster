@@ -11,7 +11,7 @@ import {
   actionProgressSucceededClass,
   oldFileCriteriumDays
 } from "./printer-map.options";
-import { printerWebBtn } from "../lib/modules/Printers/actionButtons";
+import { printerWebBtn } from "../common/quick-action.elements";
 import {
   calculatePrinterSystemStorageBadges,
   calculatePrinterSystemStorageStats,

@@ -77,12 +77,9 @@ export default class UI {
     return alert;
   }
 
-  static doesElementNeedUpdating(value, element, meta) {
-    //Quick check to see if the UI value differs, if so update.
+  static updateElem(value, element, meta) {
     if (element) {
-      if (JSON.stringify(value) !== JSON.stringify(element[meta])) {
-        element[meta] = value;
-      }
+      element[meta] = value;
     }
   }
 

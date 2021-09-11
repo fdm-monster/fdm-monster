@@ -3,26 +3,26 @@ import PrinterManager from "../lib/modules/printerManager.js";
 import PowerButton from "../lib/modules/powerButton.js";
 import UI from "../lib/functions/ui.js";
 import Calc from "../lib/functions/calc.js";
-import {
-  checkQuickConnectState,
-  init as actionButtonInit
-} from "../lib/modules/Printers/actionButtons.js";
+import { updateQuickConnectBtn } from "../common/quick-action.updater.js";
 import OctoPrintClient from "../lib/octoprint.js";
 import { checkTemps } from "../lib/modules/temperatureCheck.js";
 import { checkFilamentManager } from "../services/filament-manager-plugin.service";
 import doubleClickFullScreen from "../lib/functions/fullscreen.js";
 import OctoFarmClient from "../services/octofarm-client.service";
 import { getControlList, getPrinterInfo } from "./monitoring-view.state";
+import { CONTAINERS } from "../common/quick-action.constants";
+import { initQuickActionButtons } from "../common/quick-actions.manager";
+import { elem } from "../common/element.utils";
 
 const elems = [];
 let powerTimer = 20000;
 let printerManagerModal = document.getElementById("printerManagerModal");
 let printerArea = document.getElementById("printerArea");
 
-document.getElementById("filterStates").addEventListener("change", async (e) => {
+elem("filterStates").addEventListener("change", async (e) => {
   await OctoFarmClient.updateClientFilter(e.target.value);
 });
-document.getElementById("sortStates").addEventListener("change", async (e) => {
+elem("sortStates").addEventListener("change", async (e) => {
   await OctoFarmClient.updateClientSorting(e.target.value);
 });
 
@@ -85,7 +85,7 @@ function checkPrinterRows(clientSettings) {
   ) {
     return clientSettings.panelView.printerRows;
   } else {
-    return 2;
+    return 2; // ???
   }
 }
 
@@ -249,7 +249,7 @@ function drawListView(printer, clientSettings) {
 function drawPanelView(printer, clientSettings) {
   const hidden = isHidden(printer, clientSettings);
   const name = cleanName(printer.printerName);
-  const printerRows = checkPrinterRows(clientSettings);
+  checkPrinterRows(clientSettings);
   let cameraElement = imageOrCamera(printer);
   let toolList = "";
   let environment = "";
@@ -652,14 +652,9 @@ function grabElements(printer) {
 }
 
 async function updateState(printer, clientSettings, view) {
-  //Grab elements on page
   const elements = grabElements(printer);
-  if (typeof elements.row === "undefined") return; //Doesn't exist can skip updating
+  if (!elements.row) return;
 
-  //Check sorting order and update if required...
-  //elements.row.style.order = printer.order;
-
-  //Check display and skip if not displayed...
   if (printer.display) {
     if (elements.row.style.display === "none") {
       switch (view) {
@@ -681,30 +676,27 @@ async function updateState(printer, clientSettings, view) {
     return;
   }
 
-  //Printer
-  checkQuickConnectState(printer);
+  updateQuickConnectBtn(printer);
+
   elements.control.disabled = printer.printerState.colour.category === "Offline";
-  UI.doesElementNeedUpdating(printer.printerState.state, elements.state, "innerHTML");
+  UI.updateElem(printer.printerState.state, elements.state, "innerHTML");
 
   let stateCategory = printer.printerState.colour.category;
+  // TODO ??? remove ... or if required move this server-side
   if (stateCategory === "Error!") {
     stateCategory = "Offline";
   }
-  UI.doesElementNeedUpdating(cleanName(printer.printerName), elements.name, "innerHTML");
+  UI.updateElem(cleanName(printer.printerName), elements.name, "innerHTML");
 
   switch (view) {
     case "list":
-      UI.doesElementNeedUpdating(stateCategory, elements.row, "classList");
+      UI.updateElem(stateCategory, elements.row, "classList");
       break;
     case "panel":
-      UI.doesElementNeedUpdating(
-        `btn btn-block ${stateCategory} mb-1 mt-1`,
-        elements.state,
-        "classList"
-      );
+      UI.updateElem(`btn btn-block ${stateCategory} mb-1 mt-1`, elements.state, "classList");
       break;
     case "camera":
-      UI.doesElementNeedUpdating(
+      UI.updateElem(
         `card-body cameraContain text-truncate noBlue ${stateCategory}`,
         elements.cameraContain,
         "classList"
@@ -712,8 +704,7 @@ async function updateState(printer, clientSettings, view) {
       break;
   }
 
-  //Progress
-  UI.doesElementNeedUpdating(
+  UI.updateElem(
     `progress-bar progress-bar-striped bg-${printer.printerState.colour.name}`,
     elements.progress,
     "classList"
@@ -723,7 +714,7 @@ async function updateState(printer, clientSettings, view) {
     if (typeof printer.currentJob.progress === "number") {
       progress = printer.currentJob.progress;
     }
-    UI.doesElementNeedUpdating(progress + "%", elements.progress, "innerHTML");
+    UI.updateElem(progress + "%", elements.progress, "innerHTML");
     elements.progress.style.width = progress + "%";
     elements.currentFile.setAttribute("title", printer.currentJob.filePath);
     elements.currentFile.innerHTML =
@@ -752,12 +743,8 @@ async function updateState(printer, clientSettings, view) {
         <i class="fas fa-calendar-alt"></i> ${printer.currentJob.expectedCompletionDate}
         </small>
       `;
-      UI.doesElementNeedUpdating(printTimeElapsedFormat, elements.printTimeElapsed, "innerHTML");
-      UI.doesElementNeedUpdating(
-        remainingPrintTimeFormat,
-        elements.remainingPrintTime,
-        "innerHTML"
-      );
+      UI.updateElem(printTimeElapsedFormat, elements.printTimeElapsed, "innerHTML");
+      UI.updateElem(remainingPrintTimeFormat, elements.remainingPrintTime, "innerHTML");
     } else if (printer.printerState.colour.category === "Complete") {
       let printTimeElapsedFormat = `
         <small title="Print Time Elapsed">
@@ -779,12 +766,8 @@ async function updateState(printer, clientSettings, view) {
         <i class="fas fa-calendar-alt"></i> Complete!
         </small>
       `;
-      UI.doesElementNeedUpdating(printTimeElapsedFormat, elements.printTimeElapsed, "innerHTML");
-      UI.doesElementNeedUpdating(
-        remainingPrintTimeFormat,
-        elements.remainingPrintTime,
-        "innerHTML"
-      );
+      UI.updateElem(printTimeElapsedFormat, elements.printTimeElapsed, "innerHTML");
+      UI.updateElem(remainingPrintTimeFormat, elements.remainingPrintTime, "innerHTML");
     } else {
       let printTimeElapsedFormat = `
         <small title="Print Time Elapsed">
@@ -804,12 +787,8 @@ async function updateState(printer, clientSettings, view) {
         <i class="fas fa-calendar-alt"></i> No Active Print
         </small>
       `;
-      UI.doesElementNeedUpdating(printTimeElapsedFormat, elements.printTimeElapsed, "innerHTML");
-      UI.doesElementNeedUpdating(
-        remainingPrintTimeFormat,
-        elements.remainingPrintTime,
-        "innerHTML"
-      );
+      UI.updateElem(printTimeElapsedFormat, elements.printTimeElapsed, "innerHTML");
+      UI.updateElem(remainingPrintTimeFormat, elements.remainingPrintTime, "innerHTML");
     }
   } else {
     let printTimeElapsedFormat = `
@@ -831,10 +810,10 @@ async function updateState(printer, clientSettings, view) {
         </small>
       `;
     //No Job reset
-    UI.doesElementNeedUpdating(0 + "%", elements.progress, "innerHTML");
+    UI.updateElem(0 + "%", elements.progress, "innerHTML");
     elements.progress.style.width = 0 + "%";
-    UI.doesElementNeedUpdating(printTimeElapsedFormat, elements.printTimeElapsed, "innerHTML");
-    UI.doesElementNeedUpdating(remainingPrintTimeFormat, elements.remainingPrintTime, "innerHTML");
+    UI.updateElem(printTimeElapsedFormat, elements.printTimeElapsed, "innerHTML");
+    UI.updateElem(remainingPrintTimeFormat, elements.remainingPrintTime, "innerHTML");
     elements.currentFile.setAttribute("title", "No File Selected");
     elements.currentFile.innerHTML = '<i class="fas fa-file-code"></i> ' + "No File Selected";
   }
@@ -1155,27 +1134,27 @@ export async function initMonitoring(printers, clientSettings, view) {
         let printerPanel = document.getElementById("panel-" + printers[p]._id);
         if (!printerPanel) {
           if (view === "panel") {
-            let printerHTML = await drawPanelView(printers[p], clientSettings, view);
+            let printerHTML = drawPanelView(printers[p], clientSettings, view);
             printerArea.insertAdjacentHTML("beforeend", printerHTML);
           } else if (view === "list") {
-            let printerHTML = await drawListView(printers[p], clientSettings, view);
+            let printerHTML = drawListView(printers[p], clientSettings, view);
             printerArea.insertAdjacentHTML("beforeend", printerHTML);
           } else if (view === "camera") {
-            let printerHTML = await drawCameraView(printers[p], clientSettings, view);
+            let printerHTML = drawCameraView(printers[p], clientSettings, view);
             printerArea.insertAdjacentHTML("beforeend", printerHTML);
           } else {
             console.error("printerPanel could not determine view type to update", view);
           }
 
-          //Update the printer panel to the actual one
+          // Update the printer panel to the actual one
           printerPanel = document.getElementById("panel-" + printers[p]._id);
-          //Setup Action Buttons
-          await actionButtonInit(printers[p], `printerActionBtns-${printers[p]._id}`);
-          //Add page listeners
+          // Setup Action Buttons
+          initQuickActionButtons(printers[p], `${CONTAINERS.printerActionBtns}-${printers[p]._id}`);
+          // Add page listeners
           addListeners(printers[p]);
-          //Grab elements
-          await grabElements(printers[p]);
-          //Initialise Drag and Drop
+          // Grab elements
+          grabElements(printers[p]);
+          // Initialise Drag and Drop
           await dragAndDropEnable(printerPanel, printers[p]);
         } else {
           if (!printerManagerModal.classList.contains("show")) {
