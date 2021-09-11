@@ -201,6 +201,10 @@ export default class OctoFarmClient {
     return this.put(`${this.historyRoute}/${historyId}`, data);
   }
 
+  static async updateCostSettings(historyId, data) {
+    return this.patch(`${this.historyRoute}/${historyId}/cost-settings`, data);
+  }
+
   static async getHistoryStatistics() {
     return this.get(this.historyStatsRoute);
   }
