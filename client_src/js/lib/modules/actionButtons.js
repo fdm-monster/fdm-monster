@@ -1,75 +1,28 @@
-import PowerButton from "../powerButton.js";
-import UI from "../../functions/ui";
-import OctoPrintClient from "../../octoprint";
-import OctoFarmClient from "../../../services/octofarm-client.service";
-
-function printerControlBtn(id) {
-  return `
-    <button  
-         title="Control Your Printer"
-         id="printerButton-${id}"
-         type="button"
-         class="tag btn btn-primary btn-sm"
-         data-toggle="modal"
-         data-target="#printerManagerModal" disabled
-         >
-            <i class="fas fa-print"></i>
-    </button>
-    `;
-}
-export function printerWebBtn(id, webURL) {
-  return `
-            <a title="Open OctoPrint"
-               id="printerWeb-${id}"
-               type="button"
-               class="tag btn btn-info btn-sm"
-               target="_blank"
-               href="${webURL}" role="button"><i class="fas fa-globe-europe"></i></a>
-    `;
-}
-function printerReSyncBtn(id) {
-  return `
-            <button  
-                     title="Re-Sync your printer"
-                     id="printerSyncButton-${id}"
-                     type="button"
-                     class="tag btn btn-success btn-sm"
-            >
-                <i class="fas fa-sync"></i>
-            </button>
-    `;
-}
-
-function printerQuickConnect(id) {
-  return `
-    <button  
-         title="Quickly connect/disconnect your printer"
-         id="printerQuickConnect-${id}"
-         type="button"
-         class="tag btn btn-danger btn-sm"
-         >
-            <i class="fas fa-toggle-off"></i>
-    </button>
-    `;
-}
-function powerBtnHolder(id) {
-  return `
-      <div class="btn-group" id="powerBtn-${id}">
-      
-      </div>
-  `;
-}
+import PowerButton from "./powerButton.js";
+import UI from "../functions/ui";
+import OctoPrintClient from "../octoprint";
+import OctoFarmClient from "../../services/octofarm-client.service";
+import { ACTIONS } from "../../common/quick-action.constants";
+import {
+  powerBtnHolder,
+  printerControlBtn,
+  printerEnableToggle,
+  printerQuickConnect,
+  printerReSyncBtn,
+  printerWebBtn
+} from "../../common/quick-action.elements";
 
 function printerQuickConnected(id) {
-  let connectBtn = document.getElementById("printerQuickConnect-" + id);
-  connectBtn.innerHTML = '<i class="fas fa-toggle-on"></i>';
-  connectBtn.classList.remove("btn-danger");
+  let connectBtn = document.getElementById(`${ACTIONS.printerQuickConnect}-${id}`);
+  connectBtn.innerHTML = '<i class="fas fa-plug"></i>';
+  connectBtn.classList.remove("btn-success");
   connectBtn.classList.add("btn-success");
   connectBtn.title = "Press to connect your printer!";
 }
+
 function printerQuickDisconnected(id) {
-  let connectBtn = document.getElementById("printerQuickConnect-" + id);
-  connectBtn.innerHTML = '<i class="fas fa-toggle-off"></i>';
+  let connectBtn = document.getElementById(`${ACTIONS.printerQuickConnect}-${id}`);
+  connectBtn.innerHTML = '<i class="fas fa-plug"></i>';
   connectBtn.classList.remove("btn-success");
   connectBtn.classList.add("btn-danger");
   connectBtn.title = "Press to connect your printer!";
@@ -78,6 +31,7 @@ function printerQuickDisconnected(id) {
 function init(printer, element) {
   document.getElementById(element).innerHTML = `
     ${printerControlBtn(printer._id)}  
+    ${printerEnableToggle(printer._id)}
     ${printerQuickConnect(printer._id)} 
     ${printerReSyncBtn(printer._id)}  
     ${printerWebBtn(printer._id, printer.printerURL)}    
@@ -94,23 +48,42 @@ function init(printer, element) {
     printerQuickDisconnected(printer._id);
   }
   if (printer.printerState.colour.category === "Offline") {
-    document.getElementById("printerQuickConnect-" + printer._id).disabled = true;
+    document.getElementById(`${ACTIONS.printerQuickConnect}-${printer._id}`).disabled = true;
   } else {
-    document.getElementById("printerQuickConnect-" + printer._id).disabled = false;
+    document.getElementById(`${ACTIONS.printerQuickConnect}-${printer._id}`).disabled = false;
   }
   addEventListeners(printer);
   return true;
 }
 
+/**
+ * Add listener to printer row to enable or disable a printer in OctoFarm (websocket, API)
+ * @param printer
+ */
+function addEnableToggleListener(printer) {
+  // Toggle enable
+  document
+    .getElementById(`${ACTIONS.printerEnableToggle}-${printer._id}`)
+    .addEventListener("click", async (e) => {
+      e.disabled = true;
+
+      printer.enabled = !printer.enabled;
+
+      await OctoFarmClient.updatePrinterEnabled(printer._id, printer.enabled);
+    });
+}
+
 function addEventListeners(printer) {
+  addEnableToggleListener(printer);
+
   //Quick Connect
   document
-    .getElementById(`printerQuickConnect-${printer._id}`)
+    .getElementById(`${ACTIONS.printerEnableToggle}-${printer._id}`)
     .addEventListener("click", async (e) => {
       e.disabled = true;
       if (
         document
-          .getElementById("printerQuickConnect-" + printer._id)
+          .getElementById(`${ACTIONS.printerEnableToggle}-${printer._id}`)
           .classList.contains("btn-danger")
       ) {
         let data = {};
@@ -208,7 +181,7 @@ function addEventListeners(printer) {
     });
   //Re-Sync printer
   document
-    .getElementById(`printerSyncButton-${printer._id}`)
+    .getElementById(`${ACTIONS.printerSyncButton}-${printer._id}`)
     .addEventListener("click", async (e) => {
       e.target.innerHTML = "<i class='fas fa-sync fa-spin'></i>";
       e.target.disabled = true;
@@ -226,7 +199,7 @@ function addEventListeners(printer) {
 }
 
 function checkQuickConnectState(printer) {
-  document.getElementById("printerQuickConnect-" + printer._id).disabled =
+  document.getElementById(`${ACTIONS.printerQuickConnect}-${printer._id}`).disabled =
     printer.printerState.colour.category === "Offline";
   if (typeof printer.connectionOptions !== "undefined") {
     if (

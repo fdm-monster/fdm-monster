@@ -203,7 +203,7 @@ class PrintersStore {
 
     const doc = await this.#printerService.updateEnabled(printerId, enabled);
 
-    printer.updateEntityData(doc, doc.enabled);
+    printer.updateEntityData(doc, true);
   }
 
   /**

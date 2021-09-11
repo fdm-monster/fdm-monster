@@ -3,10 +3,7 @@ import PrinterManager from "../lib/modules/printerManager.js";
 import PowerButton from "../lib/modules/powerButton.js";
 import UI from "../lib/functions/ui.js";
 import Calc from "../lib/functions/calc.js";
-import {
-  checkQuickConnectState,
-  init as actionButtonInit
-} from "../lib/modules/Printers/actionButtons.js";
+import { checkQuickConnectState, init as actionButtonInit } from "../lib/modules/actionButtons.js";
 import OctoPrintClient from "../lib/octoprint.js";
 import { checkTemps } from "../lib/modules/temperatureCheck.js";
 import { checkFilamentManager } from "../services/filament-manager-plugin.service";
