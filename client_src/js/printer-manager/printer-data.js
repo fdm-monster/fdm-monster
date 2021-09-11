@@ -1,5 +1,5 @@
 import { returnPrinterTableRow } from "./templates/printer-table-row.templates.js";
-import { checkQuickConnectState, init as actionButtonInit } from "../lib/modules/actionButtons";
+import { updateQuickConnectBtn, init as actionButtonInit } from "../lib/modules/actionButtons";
 import { setupUpdateOctoPrintClientBtn } from "../octoprint/octoprint-client-commands";
 import { setupUpdateOctoPrintPluginsBtn } from "../octoprint/octoprint-plugin-commands";
 import UI from "../lib/functions/ui.js";
@@ -179,7 +179,7 @@ function updatePrinterRow(printer) {
   if (printerCard) {
     updateButtonState(printer);
 
-    checkQuickConnectState(printer);
+    updateQuickConnectBtn(printer);
 
     updatePrinterInfoAndState(printer);
 
@@ -207,7 +207,7 @@ export function createOrUpdatePrinterTableRow(printers, printerControlList) {
       // Insert actions buttons
       actionButtonInit(printer, withId(CONTAINERS.printerActionBtns, printer._id));
       // Check quick connect state and apply
-      checkQuickConnectState(printer);
+      updateQuickConnectBtn(printer);
       // Initialise data
       updatePrinterRow(printer);
       // Setup listeners

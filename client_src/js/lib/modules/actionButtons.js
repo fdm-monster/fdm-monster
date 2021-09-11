@@ -11,23 +11,21 @@ import {
   printerReSyncBtn,
   printerWebBtn
 } from "../../common/quick-action.elements";
-import { elem } from "../../common/element.utils";
+import { addClick, elem, withId } from "../../common/element.utils";
 import { addEnableToggleListener } from "../../common/quick-action.listeners";
 
-function printerQuickConnected(id) {
+function togglePrinterQuickConnect(id, connect = true) {
   let connectBtn = elem(`${ACTIONS.printerQuickConnect}-${id}`);
   connectBtn.innerHTML = '<i class="fas fa-plug"></i>';
-  connectBtn.classList.remove("btn-success");
-  connectBtn.classList.add("btn-success");
-  connectBtn.title = "Press to connect your printer!";
-}
-
-function printerQuickDisconnected(id) {
-  let connectBtn = elem(`${ACTIONS.printerQuickConnect}-${id}`);
-  connectBtn.innerHTML = '<i class="fas fa-plug"></i>';
-  connectBtn.classList.remove("btn-success");
-  connectBtn.classList.add("btn-danger");
-  connectBtn.title = "Press to connect your printer!";
+  if (connect) {
+    connectBtn.classList.remove("btn-danger");
+    connectBtn.classList.add("btn-success");
+    connectBtn.title = "Press to disconnect your printer!";
+  } else {
+    connectBtn.classList.remove("btn-success");
+    connectBtn.classList.add("btn-danger");
+    connectBtn.title = "Press to connect your printer!";
+  }
 }
 
 function init(printer, element) {
@@ -40,15 +38,13 @@ function init(printer, element) {
     ${powerBtnHolder(printer._id)}  
   `;
   PowerButton.applyBtn(printer, "powerBtn-");
-  if (
+
+  const connectPossible =
     printer.currentConnection != null &&
     printer.currentConnection.port != null &&
-    printer.printerState.colour.category != "Offline"
-  ) {
-    printerQuickConnected(printer._id);
-  } else {
-    printerQuickDisconnected(printer._id);
-  }
+    printer.printerState.colour.category != "Offline";
+  togglePrinterQuickConnect(printer._id, connectPossible);
+
   if (printer.printerState.colour.category === "Offline") {
     elem(`${ACTIONS.printerQuickConnect}-${printer._id}`).disabled = true;
   } else {
@@ -61,10 +57,12 @@ function init(printer, element) {
 function addEventListeners(printer) {
   addEnableToggleListener(printer);
 
+  const printerId = printer._id;
+
   // Quick Connect
-  elem(`${ACTIONS.printerEnableToggle}-${printer._id}`).addEventListener("click", async (e) => {
+  addClick(withId(ACTIONS.printerEnableToggle, printerId), async (e) => {
     e.disabled = true;
-    if (elem(`${ACTIONS.printerEnableToggle}-${printer._id}`).classList.contains("btn-danger")) {
+    if (elem(withId(ACTIONS.printerEnableToggle, printerId)).classList.contains("btn-danger")) {
       let data = {
         command: "connect",
         port: "AUTO",
@@ -161,7 +159,7 @@ function addEventListeners(printer) {
   });
 
   //Re-Sync printer
-  elem(`${ACTIONS.printerSyncButton}-${printer._id}`).addEventListener("click", async (e) => {
+  addClick(withId(ACTIONS.printerSyncButton, printerId), async (e) => {
     e.target.innerHTML = "<i class='fas fa-sync fa-spin'></i>";
     e.target.disabled = true;
     let post = await OctoFarmClient.reconnectOctoPrintCommand(printer._id);
@@ -177,33 +175,26 @@ function addEventListeners(printer) {
   });
 }
 
-function checkQuickConnectState(printer) {
-  const quickConnectBtn = elem(`${ACTIONS.printerQuickConnect}-${printer._id}`);
-  quickConnectBtn.disabled = printer.printerState.colour.category === "Offline";
-  if (!!printer.connectionOptions) {
-    if (
-      printer.connectionOptions.portPreference === null ||
-      printer.connectionOptions.baudratePreference === null ||
-      printer.connectionOptions.printerProfilePreference === null
-    ) {
-      quickConnectBtn.disabled = true;
-    }
-  } else {
+function updateQuickConnectBtn(printer) {
+  const printerId = printer._id;
+  const connOptions = printer.connectionOptions;
+  const colCategory = printer.printerState.colour.category;
+  const quickConnectBtn = elem(withId(ACTIONS.printerQuickConnect, printerId));
+
+  if (
+    !!connOptions &&
+    (connOptions.portPreference === null ||
+      connOptions.baudratePreference === null ||
+      connOptions.printerProfilePreference === null)
+  ) {
     quickConnectBtn.disabled = true;
+  } else {
+    quickConnectBtn.disabled = colCategory === "Offline";
   }
 
-  const colCategory = printer.printerState.colour.category;
-  if ((colCategory !== "Offline" && colCategory === "Disconnected") || colCategory === "Error!") {
-    printerQuickDisconnected(printer._id);
-  } else if (
-    colCategory !== "Offline" &&
-    colCategory !== "Disconnected" &&
-    !colCategory !== "Error!"
-  ) {
-    printerQuickConnected(printer._id);
-  } else {
-    printerQuickDisconnected(printer._id);
-  }
+  const connectPossible =
+    colCategory !== "Offline" && colCategory !== "Disconnected" && !colCategory !== "Error!";
+  togglePrinterQuickConnect(printerId, connectPossible);
 }
 
-export { init, printerQuickConnected, printerQuickDisconnected, checkQuickConnectState };
+export { init, togglePrinterQuickConnect, updateQuickConnectBtn };

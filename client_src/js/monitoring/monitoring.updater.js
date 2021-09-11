@@ -3,7 +3,7 @@ import PrinterManager from "../lib/modules/printerManager.js";
 import PowerButton from "../lib/modules/powerButton.js";
 import UI from "../lib/functions/ui.js";
 import Calc from "../lib/functions/calc.js";
-import { checkQuickConnectState, init as actionButtonInit } from "../lib/modules/actionButtons.js";
+import { updateQuickConnectBtn, init as actionButtonInit } from "../lib/modules/actionButtons.js";
 import OctoPrintClient from "../lib/octoprint.js";
 import { checkTemps } from "../lib/modules/temperatureCheck.js";
 import { checkFilamentManager } from "../services/filament-manager-plugin.service";
@@ -679,7 +679,7 @@ async function updateState(printer, clientSettings, view) {
   }
 
   //Printer
-  checkQuickConnectState(printer);
+  updateQuickConnectBtn(printer);
   elements.control.disabled = printer.printerState.colour.category === "Offline";
   UI.doesElementNeedUpdating(printer.printerState.state, elements.state, "innerHTML");
 
@@ -1167,11 +1167,11 @@ export async function initMonitoring(printers, clientSettings, view) {
           //Update the printer panel to the actual one
           printerPanel = document.getElementById("panel-" + printers[p]._id);
           //Setup Action Buttons
-          await actionButtonInit(printers[p], `printerActionBtns-${printers[p]._id}`);
+          actionButtonInit(printers[p], `printerActionBtns-${printers[p]._id}`);
           //Add page listeners
           addListeners(printers[p]);
           //Grab elements
-          await grabElements(printers[p]);
+          grabElements(printers[p]);
           //Initialise Drag and Drop
           await dragAndDropEnable(printerPanel, printers[p]);
         } else {
