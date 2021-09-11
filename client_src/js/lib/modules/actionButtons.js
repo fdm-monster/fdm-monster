@@ -1,7 +1,6 @@
 import PowerButton from "./powerButton.js";
 import UI from "../functions/ui";
 import OctoPrintClient from "../octoprint";
-import OctoFarmClient from "../../services/octofarm-client.service";
 import { ACTIONS } from "../../common/quick-action.constants";
 import {
   powerBtnHolder,
@@ -12,7 +11,7 @@ import {
   printerWebBtn
 } from "../../common/quick-action.elements";
 import { addClick, elem, withId } from "../../common/element.utils";
-import { addEnableToggleListener } from "../../common/quick-action.listeners";
+import { addEnableToggleListener, addSyncListener } from "../../common/quick-action.listeners";
 
 function togglePrinterQuickConnect(id, connect = true) {
   let connectBtn = elem(`${ACTIONS.printerQuickConnect}-${id}`);
@@ -29,13 +28,14 @@ function togglePrinterQuickConnect(id, connect = true) {
 }
 
 function init(printer, element) {
+  const printerId = printer._id;
   elem(element).innerHTML = `
-    ${printerControlBtn(printer._id)}  
-    ${printerEnableToggle(printer._id)}
-    ${printerQuickConnect(printer._id)} 
-    ${printerReSyncBtn(printer._id)}  
-    ${printerWebBtn(printer._id, printer.printerURL)}    
-    ${powerBtnHolder(printer._id)}  
+    ${printerControlBtn(printerId)}  
+    ${printerEnableToggle(printerId)}
+    ${printerQuickConnect(printerId)} 
+    ${printerReSyncBtn(printerId)}  
+    ${printerWebBtn(printerId, printer.printerURL)}    
+    ${powerBtnHolder(printerId)}  
   `;
   PowerButton.applyBtn(printer, "powerBtn-");
 
@@ -43,12 +43,12 @@ function init(printer, element) {
     printer.currentConnection != null &&
     printer.currentConnection.port != null &&
     printer.printerState.colour.category != "Offline";
-  togglePrinterQuickConnect(printer._id, connectPossible);
+  togglePrinterQuickConnect(printerId, connectPossible);
 
   if (printer.printerState.colour.category === "Offline") {
-    elem(`${ACTIONS.printerQuickConnect}-${printer._id}`).disabled = true;
+    elem(`${ACTIONS.printerQuickConnect}-${printerId}`).disabled = true;
   } else {
-    elem(`${ACTIONS.printerQuickConnect}-${printer._id}`).disabled = false;
+    elem(`${ACTIONS.printerQuickConnect}-${printerId}`).disabled = false;
   }
   addEventListeners(printer);
   return true;
@@ -56,13 +56,14 @@ function init(printer, element) {
 
 function addEventListeners(printer) {
   addEnableToggleListener(printer);
+  addSyncListener(printer);
 
   const printerId = printer._id;
 
   // Quick Connect
-  addClick(withId(ACTIONS.printerEnableToggle, printerId), async (e) => {
+  addClick(withId(ACTIONS.printerQuickConnect, printerId), async (e) => {
     e.disabled = true;
-    if (elem(withId(ACTIONS.printerEnableToggle, printerId)).classList.contains("btn-danger")) {
+    if (elem(withId(ACTIONS.printerQuickConnect, printerId)).classList.contains("btn-danger")) {
       let data = {
         command: "connect",
         port: "AUTO",
@@ -156,22 +157,6 @@ function addEventListeners(printer) {
         }
       });
     }
-  });
-
-  //Re-Sync printer
-  addClick(withId(ACTIONS.printerSyncButton, printerId), async (e) => {
-    e.target.innerHTML = "<i class='fas fa-sync fa-spin'></i>";
-    e.target.disabled = true;
-    let post = await OctoFarmClient.reconnectOctoPrintCommand(printer._id);
-    if (post.success) {
-      UI.createAlert("success", post.message, 3000, "clicked");
-    } else {
-      // TODO this .message property is not provided by backend
-      UI.createAlert("error", post.message, 3000, "clicked");
-    }
-
-    e.target.innerHTML = "<i class='fas fa-sync'></i>";
-    e.target.disabled = false;
   });
 }
 
