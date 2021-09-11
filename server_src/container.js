@@ -1,4 +1,5 @@
 const awilix = require("awilix");
+const axios = require("axios");
 const DITokens = require("./container.tokens");
 const PrinterService = require("./services/printer.service");
 const PrinterGroupService = require("./services/printer-group.service");
@@ -8,14 +9,13 @@ const ServerSettingsService = require("./services/server-settings.service");
 const ClientSettingsService = require("./services/client-settings.service");
 const OctofarmUpdateService = require("./services/octofarm-update.service");
 const InfluxDbSetupService = require("./services/influx/influx-db-setup.service");
-const ScriptCheckService = require("./services/script-check.service");
-const ScriptsService = require("./services/scripts.service");
+const ScriptService = require("./services/script.service");
 const TaskManagerService = require("./services/task-manager.service");
 const SystemInfoStore = require("./state/system-info.store");
 const SystemCommandsService = require("./services/system-commands.service");
 const ServerLogsService = require("./services/server-logs.service");
 const SystemInfoBundleService = require("./services/system-info-bundle.service");
-const GithubClientService = require("./services/github-client.service");
+const GithubApiService = require("./services/github-api.service");
 const HistoryService = require("./services/history.service");
 const FarmStatisticsService = require("./services/farm-statistics.service");
 const FileCache = require("./state/data/file.cache");
@@ -32,7 +32,7 @@ const SortingFilteringCache = require("./state/data/sorting-filtering.cache");
 const DashboardSseTask = require("./tasks/dashboard-sse.task");
 const CurrentOperationsCache = require("./state/data/current-operations.cache");
 const PrinterSystemTask = require("./tasks/printer-system.task");
-const OctoPrintApiClientService = require("./services/octoprint/octoprint-api-client.service");
+const OctoPrintApiService = require("./services/octoprint/octoprint-api.service");
 const FilamentManagerPluginService = require("./services/octoprint/filament-manager-plugin.service");
 const FilamentCache = require("./state/data/filament.cache");
 const PrinterState = require("./state/printer.state");
@@ -50,6 +50,7 @@ const SoftwareUpdateTask = require("./tasks/software-update.task");
 const AutoDiscoveryService = require("./services/auto-discovery.service");
 const ConnectionLogsCache = require("./state/data/connection-logs.cache");
 const DashboardStatisticsCache = require("./state/data/dashboard-statistics.cache");
+const AlertService = require("./services/alert.service");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -99,17 +100,18 @@ function configureContainer() {
     eventEmitter2: awilix.asFunction(configureEventEmitter).singleton(),
     [DITokens.octofarmUpdateService]: awilix.asClass(OctofarmUpdateService).singleton(),
     [DITokens.systemInfoStore]: awilix.asClass(SystemInfoStore).singleton(),
-    githubClientService: awilix.asClass(GithubClientService),
+    [DITokens.githubApiService]: awilix.asClass(GithubApiService),
     [DITokens.autoDiscoveryService]: awilix.asClass(AutoDiscoveryService),
     [DITokens.systemCommandsService]: awilix.asClass(SystemCommandsService),
     serverLogsService: awilix.asClass(ServerLogsService),
     systemInfoBundleService: awilix.asClass(SystemInfoBundleService),
+    [DITokens.httpClient]: awilix.asValue(axios),
 
     [DITokens.printerService]: awilix.asClass(PrinterService),
     [DITokens.printerFilesService]: awilix.asClass(PrinterFilesService),
     [DITokens.printerGroupService]: awilix.asClass(PrinterGroupService),
-    [DITokens.octoPrintApiClientService]: awilix.asClass(OctoPrintApiClientService).singleton(),
-    filamentManagerPluginService: awilix.asClass(FilamentManagerPluginService),
+    [DITokens.octoPrintApiService]: awilix.asClass(OctoPrintApiService).singleton(),
+    [DITokens.filamentManagerPluginService]: awilix.asClass(FilamentManagerPluginService),
     [DITokens.historyService]: awilix.asClass(HistoryService),
     [DITokens.farmStatisticsService]: awilix.asClass(FarmStatisticsService),
     [DITokens.dashboardStatisticsCache]: awilix.asClass(DashboardStatisticsCache),
@@ -128,8 +130,8 @@ function configureContainer() {
     [DITokens.printersStore]: awilix.asClass(PrintersStore).singleton(),
 
     // Extensibility and export
-    [DITokens.scriptCheckService]: awilix.asClass(ScriptCheckService),
-    scriptsService: awilix.asClass(ScriptsService),
+    [DITokens.alertService]: awilix.asClass(AlertService),
+    [DITokens.scriptService]: awilix.asClass(ScriptService),
     [DITokens.influxDbSetupService]: awilix.asClass(InfluxDbSetupService).singleton(),
     [DITokens.influxDbFilamentService]: awilix.asClass(InfluxDbFilamentService),
     [DITokens.influxDbHistoryService]: awilix.asClass(InfluxDbHistoryService),
