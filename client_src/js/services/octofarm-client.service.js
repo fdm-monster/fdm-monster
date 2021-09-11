@@ -136,6 +136,10 @@ export default class OctoFarmClient {
     return this.patch(`${this.printerRoute}/sort-index`, { sortList: idList });
   }
 
+  static async updatePrinterEnabled(printerId, enabled) {
+    return await this.patch(`${this.printerRoute}/${printerId}/enabled`, { enabled });
+  }
+
   static async setStepSize(printerId, stepSize) {
     return this.patch(`${this.printerRoute}/${printerId}/step-size`, { stepSize });
   }
