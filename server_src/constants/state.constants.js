@@ -6,6 +6,13 @@ const getFilterDefaults = () => [
   "State: Disconnected"
 ];
 
+const ERR_COUNT = {
+  offline: "offline",
+  apiKeyNotAccepted: "apiKeyNotAccepted",
+  apiKeyIsGlobal: "apiKeyIsGlobal",
+  missingSessionKey: "missingSessionKey"
+};
+
 const SYSTEM_CHECKS = {
   api: "api",
   files: "files",
@@ -21,27 +28,27 @@ const SYSTEM_CHECKS = {
 const getSystemChecksDefault = () => {
   return {
     [SYSTEM_CHECKS.api]: {
-      status: "danger",
+      status: "success", //"danger",
       date: null
     },
     [SYSTEM_CHECKS.files]: {
-      status: "danger",
+      status: "success", //"danger",
       date: null
     },
     [SYSTEM_CHECKS.state]: {
-      status: "danger",
+      status: "success", //"danger",
       date: null
     },
     [SYSTEM_CHECKS.profile]: {
-      status: "danger",
+      status: "success", //"danger",
       date: null
     },
     [SYSTEM_CHECKS.settings]: {
-      status: "danger",
+      status: "success", //"danger",
       date: null
     },
     [SYSTEM_CHECKS.system]: {
-      status: "danger",
+      status: "success", //"danger",
       date: null
     },
     // TODO Hmm
@@ -55,7 +62,7 @@ const getSystemChecksDefault = () => {
       file: {
         date: null
       },
-      status: "danger",
+      status: "success", // "danger",
       date: null
     }
   };
@@ -114,6 +121,7 @@ const OP_STATE_FLAGS = {
 const PSTATE = {
   Offline: "Offline",
   GlobalAPIKey: "Global API Key Issue",
+  ApiKeyRejected: "API Key rejected",
   Searching: "Searching...",
   Error: "Error!",
   NoAPI: "No-API",
@@ -243,7 +251,7 @@ const mapStateToColor = (state) => {
     return { name: "warning", hex: "#583c0e", category: CATEGORY.Idle };
   }
   if (state === PSTATE.Printing) {
-    return { name: "warning", hex: "#583c0e", category: CATEGORY.Active };
+    return { name: "success", hex: "#583c0e", category: CATEGORY.Active };
   }
   if (state === PSTATE.Pausing) {
     return { name: "warning", hex: "#583c0e", category: CATEGORY.Active };
@@ -272,6 +280,9 @@ const mapStateToColor = (state) => {
   if (state === PSTATE.Complete) {
     return { name: "success", hex: "#00330e", category: CATEGORY.Complete };
   }
+  if (state === PSTATE.ApiKeyRejected) {
+    return { name: "danger", hex: "#2e0905", category: CATEGORY.Error };
+  }
   if (state === PSTATE.GlobalAPIKey) {
     return { name: "danger", hex: "#2e0905", category: CATEGORY.Error };
   }
@@ -291,6 +302,7 @@ module.exports = {
   getFilterDefaults,
   mapStateToColor,
   remapOctoPrintState,
+  ERR_COUNT,
   PSTATE,
   OP_STATE,
   CATEGORY,

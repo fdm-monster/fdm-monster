@@ -8,15 +8,14 @@ let server;
 async function setupDatabaseIssueApp() {
   setupEnvConfig(true);
 
-  server = setupExpressServer();
+  let { app, container } = setupExpressServer();
+  server = app;
   await serveDatabaseIssueFallbackRoutes(server);
 }
 
-jest.mock("../../server_src/services/github-client.service");
-
 describe("DatabaseIssue server", () => {
   it("should return database issue page when no database is connected", async () => {
-    app = await setupDatabaseIssueApp();
+    await setupDatabaseIssueApp();
 
     const res = await supertest(server).get("/").send();
     expect(res.statusCode).toEqual(200);

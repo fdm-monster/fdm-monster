@@ -20,6 +20,7 @@ jobs:
       - run: npm run webpack:prod
         working-directory: ./client_src
       - uses: JS-DevTools/npm-publish@v1
+        if: ${{ github.repository.name == 'octofarm-experiments' }}
         with:
           dry-run: false
           token: ${{ secrets.NPM_TOKEN }}
