@@ -164,23 +164,19 @@ async function updateState(printer, clientSettings, view) {
   if (stateCategory === "Error!") {
     stateCategory = "Offline";
   }
-  UI.doesElementNeedUpdating(cleanPrinterName(printer), elements.name, "innerHTML");
+  UI.updateElem(cleanPrinterName(printer), elements.name, "innerHTML");
 
   switch (view) {
     case "list":
-      UI.doesElementNeedUpdating(stateCategory, elements.row, "classList");
+      UI.updateElem(stateCategory, elements.row, "classList");
       break;
     case "panel":
-      UI.doesElementNeedUpdating(
-        `btn btn-block ${stateCategory} mb-1 mt-1`,
-        elements.state,
-        "classList"
-      );
+      UI.updateElem(`btn btn-block ${stateCategory} mb-1 mt-1`, elements.state, "classList");
       break;
   }
 
   //Progress
-  UI.doesElementNeedUpdating(
+  UI.updateElem(
     `progress-bar progress-bar-striped bg-${printer.printerState.colour.name}`,
     elements.progress,
     "classList"
@@ -190,16 +186,16 @@ async function updateState(printer, clientSettings, view) {
     if (typeof printer.currentJob.progress === "number") {
       progress = printer.currentJob.progress.toFixed(0);
     }
-    UI.doesElementNeedUpdating(progress + "%", elements.progress, "innerHTML");
+    UI.updateElem(progress + "%", elements.progress, "innerHTML");
     elements.progress.style.width = progress + "%";
   } else {
     let printTimeElapsedFormat = "";
     let remainingPrintTimeFormat = "";
     //No Job reset
-    UI.doesElementNeedUpdating("", elements.progress, "innerHTML");
+    UI.updateElem("", elements.progress, "innerHTML");
     elements.progress.style.width = 0 + "%";
-    UI.doesElementNeedUpdating(printTimeElapsedFormat, elements.printTimeElapsed, "innerHTML");
-    UI.doesElementNeedUpdating(remainingPrintTimeFormat, elements.remainingPrintTime, "innerHTML");
+    UI.updateElem(printTimeElapsedFormat, elements.printTimeElapsed, "innerHTML");
+    UI.updateElem(remainingPrintTimeFormat, elements.remainingPrintTime, "innerHTML");
   }
 }
 

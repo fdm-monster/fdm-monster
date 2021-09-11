@@ -3,7 +3,7 @@ import PrinterManager from "../lib/modules/printerManager.js";
 import PowerButton from "../lib/modules/powerButton.js";
 import UI from "../lib/functions/ui.js";
 import Calc from "../lib/functions/calc.js";
-import { updateQuickConnectBtn, init as actionButtonInit } from "../lib/modules/actionButtons.js";
+import { init as actionButtonInit, updateQuickConnectBtn } from "../lib/modules/actionButtons.js";
 import OctoPrintClient from "../lib/octoprint.js";
 import { checkTemps } from "../lib/modules/temperatureCheck.js";
 import { checkFilamentManager } from "../services/filament-manager-plugin.service";
@@ -682,27 +682,23 @@ async function updateState(printer, clientSettings, view) {
   //Printer
   updateQuickConnectBtn(printer);
   elements.control.disabled = printer.printerState.colour.category === "Offline";
-  UI.doesElementNeedUpdating(printer.printerState.state, elements.state, "innerHTML");
+  UI.updateElem(printer.printerState.state, elements.state, "innerHTML");
 
   let stateCategory = printer.printerState.colour.category;
   if (stateCategory === "Error!") {
     stateCategory = "Offline";
   }
-  UI.doesElementNeedUpdating(cleanName(printer.printerName), elements.name, "innerHTML");
+  UI.updateElem(cleanName(printer.printerName), elements.name, "innerHTML");
 
   switch (view) {
     case "list":
-      UI.doesElementNeedUpdating(stateCategory, elements.row, "classList");
+      UI.updateElem(stateCategory, elements.row, "classList");
       break;
     case "panel":
-      UI.doesElementNeedUpdating(
-        `btn btn-block ${stateCategory} mb-1 mt-1`,
-        elements.state,
-        "classList"
-      );
+      UI.updateElem(`btn btn-block ${stateCategory} mb-1 mt-1`, elements.state, "classList");
       break;
     case "camera":
-      UI.doesElementNeedUpdating(
+      UI.updateElem(
         `card-body cameraContain text-truncate noBlue ${stateCategory}`,
         elements.cameraContain,
         "classList"
@@ -711,7 +707,7 @@ async function updateState(printer, clientSettings, view) {
   }
 
   //Progress
-  UI.doesElementNeedUpdating(
+  UI.updateElem(
     `progress-bar progress-bar-striped bg-${printer.printerState.colour.name}`,
     elements.progress,
     "classList"
@@ -721,7 +717,7 @@ async function updateState(printer, clientSettings, view) {
     if (typeof printer.currentJob.progress === "number") {
       progress = printer.currentJob.progress;
     }
-    UI.doesElementNeedUpdating(progress + "%", elements.progress, "innerHTML");
+    UI.updateElem(progress + "%", elements.progress, "innerHTML");
     elements.progress.style.width = progress + "%";
     elements.currentFile.setAttribute("title", printer.currentJob.filePath);
     elements.currentFile.innerHTML =
@@ -750,12 +746,8 @@ async function updateState(printer, clientSettings, view) {
         <i class="fas fa-calendar-alt"></i> ${printer.currentJob.expectedCompletionDate}
         </small>
       `;
-      UI.doesElementNeedUpdating(printTimeElapsedFormat, elements.printTimeElapsed, "innerHTML");
-      UI.doesElementNeedUpdating(
-        remainingPrintTimeFormat,
-        elements.remainingPrintTime,
-        "innerHTML"
-      );
+      UI.updateElem(printTimeElapsedFormat, elements.printTimeElapsed, "innerHTML");
+      UI.updateElem(remainingPrintTimeFormat, elements.remainingPrintTime, "innerHTML");
     } else if (printer.printerState.colour.category === "Complete") {
       let printTimeElapsedFormat = `
         <small title="Print Time Elapsed">
@@ -777,12 +769,8 @@ async function updateState(printer, clientSettings, view) {
         <i class="fas fa-calendar-alt"></i> Complete!
         </small>
       `;
-      UI.doesElementNeedUpdating(printTimeElapsedFormat, elements.printTimeElapsed, "innerHTML");
-      UI.doesElementNeedUpdating(
-        remainingPrintTimeFormat,
-        elements.remainingPrintTime,
-        "innerHTML"
-      );
+      UI.updateElem(printTimeElapsedFormat, elements.printTimeElapsed, "innerHTML");
+      UI.updateElem(remainingPrintTimeFormat, elements.remainingPrintTime, "innerHTML");
     } else {
       let printTimeElapsedFormat = `
         <small title="Print Time Elapsed">
@@ -802,12 +790,8 @@ async function updateState(printer, clientSettings, view) {
         <i class="fas fa-calendar-alt"></i> No Active Print
         </small>
       `;
-      UI.doesElementNeedUpdating(printTimeElapsedFormat, elements.printTimeElapsed, "innerHTML");
-      UI.doesElementNeedUpdating(
-        remainingPrintTimeFormat,
-        elements.remainingPrintTime,
-        "innerHTML"
-      );
+      UI.updateElem(printTimeElapsedFormat, elements.printTimeElapsed, "innerHTML");
+      UI.updateElem(remainingPrintTimeFormat, elements.remainingPrintTime, "innerHTML");
     }
   } else {
     let printTimeElapsedFormat = `
@@ -829,10 +813,10 @@ async function updateState(printer, clientSettings, view) {
         </small>
       `;
     //No Job reset
-    UI.doesElementNeedUpdating(0 + "%", elements.progress, "innerHTML");
+    UI.updateElem(0 + "%", elements.progress, "innerHTML");
     elements.progress.style.width = 0 + "%";
-    UI.doesElementNeedUpdating(printTimeElapsedFormat, elements.printTimeElapsed, "innerHTML");
-    UI.doesElementNeedUpdating(remainingPrintTimeFormat, elements.remainingPrintTime, "innerHTML");
+    UI.updateElem(printTimeElapsedFormat, elements.printTimeElapsed, "innerHTML");
+    UI.updateElem(remainingPrintTimeFormat, elements.remainingPrintTime, "innerHTML");
     elements.currentFile.setAttribute("title", "No File Selected");
     elements.currentFile.innerHTML = '<i class="fas fa-file-code"></i> ' + "No File Selected";
   }

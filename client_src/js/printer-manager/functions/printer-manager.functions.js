@@ -1,7 +1,7 @@
 import UI from "../../lib/functions/ui";
 import OctoFarmClient from "../../services/octofarm-client.service.js";
 import { checkIfLoaderExistsAndRemove, updateConnectionLog } from "../connection-log";
-import { createOrUpdatePrinterTableRow } from "../printer-data";
+import { createOrUpdatePrinterTableRow } from "../printer-rows";
 import PowerButton from "../../lib/modules/powerButton";
 import PrinterManager from "../../lib/modules/printerManager";
 import { updatePrinterSettingsModal } from "../../lib/modules/printerSettings";

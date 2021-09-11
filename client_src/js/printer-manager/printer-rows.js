@@ -1,5 +1,5 @@
 import { returnPrinterTableRow } from "./templates/printer-table-row.templates.js";
-import { updateQuickConnectBtn, init as actionButtonInit } from "../lib/modules/actionButtons";
+import { init as actionButtonInit, updateQuickConnectBtn } from "../lib/modules/actionButtons";
 import { setupUpdateOctoPrintClientBtn } from "../octoprint/octoprint-client-commands";
 import { setupUpdateOctoPrintPluginsBtn } from "../octoprint/octoprint-plugin-commands";
 import UI from "../lib/functions/ui.js";
@@ -23,32 +23,32 @@ function updatePrinterInfoAndState(printer) {
   const printerSortIndex = elem(withId(LABELS.printerSortIndex, printer._id));
   const printerGroup = elem(withId(LABELS.printerGroup, printer._id));
 
-  UI.doesElementNeedUpdating(printer.sortIndex, printerSortIndex, "innerHTML");
-  UI.doesElementNeedUpdating(printer.printerName, printName, "innerHTML");
-  UI.doesElementNeedUpdating(printer.group, printerGroup, "innerHTML");
-  UI.doesElementNeedUpdating(printer.printerURL, webButton, "href");
+  UI.updateElem(printer.sortIndex, printerSortIndex, "innerHTML");
+  UI.updateElem(printer.printerName, printName, "innerHTML");
+  UI.updateElem(printer.group, printerGroup, "innerHTML");
+  UI.updateElem(printer.printerURL, webButton, "href");
 
   printerGroup.innerHTML = printer.groups.map((g) => g.name).join() || printer.group;
 
-  UI.doesElementNeedUpdating(
+  UI.updateElem(
     `tag badge badge-${printer.printerState.colour.name} badge-pill`,
     printerBadge,
     "className"
   );
-  UI.doesElementNeedUpdating(printer.printerState.state, printerBadge, "innerHTML");
+  UI.updateElem(printer.printerState.state, printerBadge, "innerHTML");
   printerBadge.setAttribute("title", printer.printerState.desc);
 
-  UI.doesElementNeedUpdating(printer.hostState.state, hostBadge, "innerHTML");
+  UI.updateElem(printer.hostState.state, hostBadge, "innerHTML");
   hostBadge.setAttribute("title", printer.hostState.desc);
 
-  UI.doesElementNeedUpdating(
+  UI.updateElem(
     `tag badge badge-${printer.hostState.colour.name} badge-pill`,
     hostBadge,
     "className"
   );
 
   socketBadge.setAttribute("title", printer.webSocketState.desc);
-  UI.doesElementNeedUpdating(
+  UI.updateElem(
     `tag badge badge-${printer.webSocketState.colour} badge-pill`,
     socketBadge,
     "className"
@@ -59,13 +59,13 @@ function updatePrinterColumn(printer) {
   const printerInfo = elem(withId(LABELS.printerPrinterInformation, printer._id));
   if (!!printer.octoPrintSystemInfo) {
     if (typeof printer.octoPrintSystemInfo["printer.firmware"] === "undefined") {
-      UI.doesElementNeedUpdating(
+      UI.updateElem(
         '<small title="Please connect and resync to display printer firmware">Unknown</small>',
         printerInfo,
         "innerHTML"
       );
     } else {
-      UI.doesElementNeedUpdating(
+      UI.updateElem(
         `<small>${printer.octoPrintSystemInfo["printer.firmware"]}</small>`,
         printerInfo,
         "innerHTML"
@@ -77,7 +77,7 @@ function updatePrinterColumn(printer) {
 function updateOctoPiColumn(printer) {
   const octoPrintInfo = elem(withId(LABELS.printerOctoPrintInformation, printer._id));
   if (!!printer.octoPi) {
-    UI.doesElementNeedUpdating(
+    UI.updateElem(
       `<small>${printer.octoPrintVersion}</small><br>` +
         (printer.octoPi?.version ? `<small>${printer.octoPi.version}</small><br>` : "") +
         `<small>${printer.octoPi.model}</small>`,
@@ -85,18 +85,14 @@ function updateOctoPiColumn(printer) {
       "innerHTML"
     );
   } else {
-    UI.doesElementNeedUpdating(
-      `<small>${printer.octoPrintVersion}</small>`,
-      octoPrintInfo,
-      "innerHTML"
-    );
+    UI.updateElem(`<small>${printer.octoPrintVersion}</small>`, octoPrintInfo, "innerHTML");
   }
 }
 
 function corsWarningCheck(printer) {
   const printerBadge = elem(withId(LABELS.printerBadge, printer._id));
   if (!printer.corsCheck && !ignoredHostStatesForAPIErrors.includes(printer.hostState.state)) {
-    UI.doesElementNeedUpdating("CORS NOT ENABLED!", printerBadge, "innerHTML");
+    UI.updateElem("CORS NOT ENABLED!", printerBadge, "innerHTML");
   }
 }
 
@@ -105,7 +101,7 @@ function checkForOctoPrintUpdate(printer) {
   let bulkOctoPrintUpdateButton = elem(ACTIONS.blkUpdatePluginsBtn);
   if (printer?.octoPrintUpdate?.updateAvailable) {
     if (updateButton.disabled) {
-      UI.doesElementNeedUpdating(false, updateButton, "disabled");
+      UI.updateElem(false, updateButton, "disabled");
       updateButton.setAttribute("title", "You have an OctoPrint Update to install!");
     }
     if (bulkOctoPrintUpdateButton.disabled) {
@@ -113,7 +109,7 @@ function checkForOctoPrintUpdate(printer) {
     }
   } else {
     if (!updateButton.disabled) {
-      UI.doesElementNeedUpdating(true, updateButton, "disabled");
+      UI.updateElem(true, updateButton, "disabled");
       updateButton.setAttribute("title", "No OctoPrint updates available!");
     }
     if (!bulkOctoPrintUpdateButton.disabled) {
