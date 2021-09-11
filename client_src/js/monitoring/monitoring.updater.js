@@ -10,6 +10,7 @@ import { checkFilamentManager } from "../services/filament-manager-plugin.servic
 import doubleClickFullScreen from "../lib/functions/fullscreen.js";
 import OctoFarmClient from "../services/octofarm-client.service";
 import { getControlList, getPrinterInfo } from "./monitoring-view.state";
+import { CONTAINERS } from "../common/quick-action.constants";
 
 const elems = [];
 let powerTimer = 20000;
@@ -82,7 +83,7 @@ function checkPrinterRows(clientSettings) {
   ) {
     return clientSettings.panelView.printerRows;
   } else {
-    return 2;
+    return 2; // ???
   }
 }
 
@@ -246,7 +247,7 @@ function drawListView(printer, clientSettings) {
 function drawPanelView(printer, clientSettings) {
   const hidden = isHidden(printer, clientSettings);
   const name = cleanName(printer.printerName);
-  const printerRows = checkPrinterRows(clientSettings);
+  checkPrinterRows(clientSettings);
   let cameraElement = imageOrCamera(printer);
   let toolList = "";
   let environment = "";
@@ -1152,13 +1153,13 @@ export async function initMonitoring(printers, clientSettings, view) {
         let printerPanel = document.getElementById("panel-" + printers[p]._id);
         if (!printerPanel) {
           if (view === "panel") {
-            let printerHTML = await drawPanelView(printers[p], clientSettings, view);
+            let printerHTML = drawPanelView(printers[p], clientSettings, view);
             printerArea.insertAdjacentHTML("beforeend", printerHTML);
           } else if (view === "list") {
-            let printerHTML = await drawListView(printers[p], clientSettings, view);
+            let printerHTML = drawListView(printers[p], clientSettings, view);
             printerArea.insertAdjacentHTML("beforeend", printerHTML);
           } else if (view === "camera") {
-            let printerHTML = await drawCameraView(printers[p], clientSettings, view);
+            let printerHTML = drawCameraView(printers[p], clientSettings, view);
             printerArea.insertAdjacentHTML("beforeend", printerHTML);
           } else {
             console.error("printerPanel could not determine view type to update", view);
@@ -1167,7 +1168,7 @@ export async function initMonitoring(printers, clientSettings, view) {
           //Update the printer panel to the actual one
           printerPanel = document.getElementById("panel-" + printers[p]._id);
           //Setup Action Buttons
-          actionButtonInit(printers[p], `printerActionBtns-${printers[p]._id}`);
+          actionButtonInit(printers[p], `${CONTAINERS.printerActionBtns}-${printers[p]._id}`);
           //Add page listeners
           addListeners(printers[p]);
           //Grab elements
