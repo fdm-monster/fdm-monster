@@ -655,7 +655,6 @@ async function updateState(printer, clientSettings, view) {
   const elements = grabElements(printer);
   if (!elements.row) return;
 
-  //Check display and skip if not displayed...
   if (printer.display) {
     if (elements.row.style.display === "none") {
       switch (view) {
@@ -677,13 +676,13 @@ async function updateState(printer, clientSettings, view) {
     return;
   }
 
-  //Printer
   updateQuickConnectBtn(printer);
 
   elements.control.disabled = printer.printerState.colour.category === "Offline";
   UI.updateElem(printer.printerState.state, elements.state, "innerHTML");
 
   let stateCategory = printer.printerState.colour.category;
+  // TODO ??? remove ... or if required move this server-side
   if (stateCategory === "Error!") {
     stateCategory = "Offline";
   }
@@ -705,7 +704,6 @@ async function updateState(printer, clientSettings, view) {
       break;
   }
 
-  //Progress
   UI.updateElem(
     `progress-bar progress-bar-striped bg-${printer.printerState.colour.name}`,
     elements.progress,
