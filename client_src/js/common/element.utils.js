@@ -1,5 +1,5 @@
-export function elem(selector) {
-  return document.getElementById(selector);
+export function elem(id) {
+  return document.getElementById(id);
 }
 
 export function withId(label, id) {

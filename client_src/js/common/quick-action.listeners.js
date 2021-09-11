@@ -2,6 +2,7 @@ import { addClick, withId } from "./element.utils";
 import { ACTIONS } from "./quick-action.constants";
 import OctoFarmClient from "../services/octofarm-client.service";
 import UI from "../lib/functions/ui";
+import { togglePrinterEnabled } from "./quick-action.updater";
 
 /**
  * Add listener to printer row to enable or disable a printer in OctoFarm (websocket, API)
@@ -14,6 +15,8 @@ export function addEnableToggleListener(printer) {
     e.disabled = true;
 
     printer.enabled = !printer.enabled;
+
+    togglePrinterEnabled(printerId, printer.enabled);
 
     await OctoFarmClient.updatePrinterEnabled(printerId, printer.enabled);
   });

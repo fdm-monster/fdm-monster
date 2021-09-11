@@ -3,7 +3,7 @@ import PrinterManager from "../lib/modules/printerManager.js";
 import PowerButton from "../lib/modules/powerButton.js";
 import UI from "../lib/functions/ui.js";
 import Calc from "../lib/functions/calc.js";
-import { init as actionButtonInit, updateQuickConnectBtn } from "../lib/modules/actionButtons.js";
+import { updateQuickConnectBtn } from "../common/quick-action.updater.js";
 import OctoPrintClient from "../lib/octoprint.js";
 import { checkTemps } from "../lib/modules/temperatureCheck.js";
 import { checkFilamentManager } from "../services/filament-manager-plugin.service";
@@ -11,16 +11,18 @@ import doubleClickFullScreen from "../lib/functions/fullscreen.js";
 import OctoFarmClient from "../services/octofarm-client.service";
 import { getControlList, getPrinterInfo } from "./monitoring-view.state";
 import { CONTAINERS } from "../common/quick-action.constants";
+import { initQuickActionButtons } from "../common/quick-actions.manager";
+import { elem } from "../common/element.utils";
 
 const elems = [];
 let powerTimer = 20000;
 let printerManagerModal = document.getElementById("printerManagerModal");
 let printerArea = document.getElementById("printerArea");
 
-document.getElementById("filterStates").addEventListener("change", async (e) => {
+elem("filterStates").addEventListener("change", async (e) => {
   await OctoFarmClient.updateClientFilter(e.target.value);
 });
-document.getElementById("sortStates").addEventListener("change", async (e) => {
+elem("sortStates").addEventListener("change", async (e) => {
   await OctoFarmClient.updateClientSorting(e.target.value);
 });
 
@@ -1149,15 +1151,15 @@ export async function initMonitoring(printers, clientSettings, view) {
             console.error("printerPanel could not determine view type to update", view);
           }
 
-          //Update the printer panel to the actual one
+          // Update the printer panel to the actual one
           printerPanel = document.getElementById("panel-" + printers[p]._id);
-          //Setup Action Buttons
-          actionButtonInit(printers[p], `${CONTAINERS.printerActionBtns}-${printers[p]._id}`);
-          //Add page listeners
+          // Setup Action Buttons
+          initQuickActionButtons(printers[p], `${CONTAINERS.printerActionBtns}-${printers[p]._id}`);
+          // Add page listeners
           addListeners(printers[p]);
-          //Grab elements
+          // Grab elements
           grabElements(printers[p]);
-          //Initialise Drag and Drop
+          // Initialise Drag and Drop
           await dragAndDropEnable(printerPanel, printers[p]);
         } else {
           if (!printerManagerModal.classList.contains("show")) {

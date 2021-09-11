@@ -1,5 +1,5 @@
 import { returnPrinterTableRow } from "./templates/printer-table-row.templates.js";
-import { init as actionButtonInit, updateQuickConnectBtn } from "../lib/modules/actionButtons";
+import { updateQuickConnectBtn } from "../common/quick-action.updater";
 import { setupUpdateOctoPrintClientBtn } from "../octoprint/octoprint-client-commands";
 import { setupUpdateOctoPrintPluginsBtn } from "../octoprint/octoprint-plugin-commands";
 import UI from "../lib/functions/ui.js";
@@ -9,6 +9,7 @@ import OctoFarmClient from "../services/octofarm-client.service";
 import { updatePrinterSettingsModal } from "../lib/modules/printerSettings";
 import { addClick, elem, withId } from "../common/element.utils";
 import { ACTIONS, CONTAINERS, LABELS } from "../common/quick-action.constants";
+import { initQuickActionButtons } from "../common/quick-actions.manager";
 
 const printerList = elem("printerList");
 const ignoredHostStatesForAPIErrors = ["Setting Up", "Searching...", "Shutdown"];
@@ -201,7 +202,7 @@ export function createOrUpdatePrinterTableRow(printers, printerControlList) {
     } else {
       printerList.insertAdjacentHTML("beforeend", returnPrinterTableRow(printer));
       // Insert actions buttons
-      actionButtonInit(printer, withId(CONTAINERS.printerActionBtns, printer._id));
+      initQuickActionButtons(printer, withId(CONTAINERS.printerActionBtns, printer._id));
       // Check quick connect state and apply
       updateQuickConnectBtn(printer);
       // Initialise data

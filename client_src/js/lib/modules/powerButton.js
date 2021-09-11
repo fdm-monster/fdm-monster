@@ -186,7 +186,7 @@ export default class PowerButton {
     }
   }
 
-  static async applyBtn(printer, element) {
+  static applyBtn(printer, element) {
     if (
       typeof printer.otherSettings.system !== "undefined" &&
       !document.getElementById("printerPower-" + printer._id)

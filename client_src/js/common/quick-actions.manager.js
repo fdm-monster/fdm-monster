@@ -1,7 +1,4 @@
-import PowerButton from "./powerButton.js";
-import UI from "../functions/ui";
-import OctoPrintClient from "../octoprint";
-import { ACTIONS } from "../../common/quick-action.constants";
+import { addClick, elem, withId } from "./element.utils";
 import {
   powerBtnHolder,
   printerControlBtn,
@@ -9,50 +6,13 @@ import {
   printerQuickConnect,
   printerReSyncBtn,
   printerWebBtn
-} from "../../common/quick-action.elements";
-import { addClick, elem, withId } from "../../common/element.utils";
-import { addEnableToggleListener, addSyncListener } from "../../common/quick-action.listeners";
-
-function togglePrinterQuickConnect(id, connect = true) {
-  let connectBtn = elem(`${ACTIONS.printerQuickConnect}-${id}`);
-  connectBtn.innerHTML = '<i class="fas fa-plug"></i>';
-  if (connect) {
-    connectBtn.classList.remove("btn-danger");
-    connectBtn.classList.add("btn-success");
-    connectBtn.title = "Press to disconnect your printer!";
-  } else {
-    connectBtn.classList.remove("btn-success");
-    connectBtn.classList.add("btn-danger");
-    connectBtn.title = "Press to connect your printer!";
-  }
-}
-
-function init(printer, element) {
-  const printerId = printer._id;
-  elem(element).innerHTML = `
-    ${printerControlBtn(printerId)}  
-    ${printerEnableToggle(printerId)}
-    ${printerQuickConnect(printerId)} 
-    ${printerReSyncBtn(printerId)}  
-    ${printerWebBtn(printerId, printer.printerURL)}    
-    ${powerBtnHolder(printerId)}  
-  `;
-  PowerButton.applyBtn(printer, "powerBtn-");
-
-  const connectPossible =
-    printer.currentConnection != null &&
-    printer.currentConnection.port != null &&
-    printer.printerState.colour.category != "Offline";
-  togglePrinterQuickConnect(printerId, connectPossible);
-
-  if (printer.printerState.colour.category === "Offline") {
-    elem(`${ACTIONS.printerQuickConnect}-${printerId}`).disabled = true;
-  } else {
-    elem(`${ACTIONS.printerQuickConnect}-${printerId}`).disabled = false;
-  }
-  addEventListeners(printer);
-  return true;
-}
+} from "./quick-action.elements";
+import PowerButton from "../lib/modules/powerButton";
+import { ACTIONS } from "./quick-action.constants";
+import { togglePrinterQuickConnect } from "./quick-action.updater";
+import { addEnableToggleListener, addSyncListener } from "./quick-action.listeners";
+import UI from "../lib/functions/ui";
+import OctoPrintClient from "../lib/octoprint";
 
 function addEventListeners(printer) {
   addEnableToggleListener(printer);
@@ -60,7 +20,6 @@ function addEventListeners(printer) {
 
   const printerId = printer._id;
 
-  // Quick Connect
   addClick(withId(ACTIONS.printerQuickConnect, printerId), async (e) => {
     e.disabled = true;
     if (elem(withId(ACTIONS.printerQuickConnect, printerId)).classList.contains("btn-danger")) {
@@ -160,26 +119,29 @@ function addEventListeners(printer) {
   });
 }
 
-function updateQuickConnectBtn(printer) {
+export function initQuickActionButtons(printer, element) {
   const printerId = printer._id;
-  const connOptions = printer.connectionOptions;
-  const colCategory = printer.printerState.colour.category;
-  const quickConnectBtn = elem(withId(ACTIONS.printerQuickConnect, printerId));
+  elem(element).innerHTML = `
+    ${printerControlBtn(printerId)}  
+    ${printerEnableToggle(printerId)}
+    ${printerQuickConnect(printerId)} 
+    ${printerReSyncBtn(printerId)}  
+    ${printerWebBtn(printerId, printer.printerURL)}    
+    ${powerBtnHolder(printerId)}`;
 
-  if (
-    !!connOptions &&
-    (connOptions.portPreference === null ||
-      connOptions.baudratePreference === null ||
-      connOptions.printerProfilePreference === null)
-  ) {
-    quickConnectBtn.disabled = true;
-  } else {
-    quickConnectBtn.disabled = colCategory === "Offline";
-  }
+  PowerButton.applyBtn(printer, "powerBtn-");
 
   const connectPossible =
-    colCategory !== "Offline" && colCategory !== "Disconnected" && !colCategory !== "Error!";
+    printer.currentConnection != null &&
+    printer.currentConnection.port != null &&
+    printer.printerState.colour.category != "Offline";
   togglePrinterQuickConnect(printerId, connectPossible);
-}
 
-export { init, togglePrinterQuickConnect, updateQuickConnectBtn };
+  if (printer.printerState.colour.category === "Offline") {
+    elem(`${ACTIONS.printerQuickConnect}-${printerId}`).disabled = true;
+  } else {
+    elem(`${ACTIONS.printerQuickConnect}-${printerId}`).disabled = false;
+  }
+
+  addEventListeners(printer);
+}
