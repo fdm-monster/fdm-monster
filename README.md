@@ -1,8 +1,8 @@
-[comment]: <> ([![Latest Release]&#40;https://img.shields.io/github/release/davidzwa/octofarm-experiments?style=for-the-badge&#41;]&#40;https://img.shields.io/github/v/tag/octofarm/octofarm?sort=date&#41;)
+[comment]: <> ([![Latest Release]&#40;https://img.shields.io/github/release/davidzwa/octofarm-experiments?style=for-the-badge&#41;]&#40;https://img.shields.io/github/v/tag/davidzwa/octofarm-experiments?sort=date&#41;)
 ![Docker Pulls](https://img.shields.io/docker/pulls/davidzwa/octofarm-experiments?style=for-the-badge)
 ![GitHub release (latest by date)](https://img.shields.io/github/downloads/davidzwa/octofarm-experiments/latest/total?style=for-the-badge)
-[![GitHub stars](https://img.shields.io/github/stars/octofarm/octofarm?style=for-the-badge)](https://github.com/davidzwa/octofarm-experiments/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/octofarm/octofarm?style=for-the-badge)](https://github.com/davidzwa/octofarm-experiments/network)
+[![GitHub stars](https://img.shields.io/github/stars/davidzwa/octofarm-experiments?style=for-the-badge)](https://github.com/davidzwa/octofarm-experiments/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/davidzwa/octofarm-experiments?style=for-the-badge)](https://github.com/davidzwa/octofarm-experiments/network)
 
 [![GitHub license](https://img.shields.io/github/license/davidzwa/octofarm-experiments?style=for-the-badge)](https://github.com/davidzwa/octofarm-experiments/blob/master/LICENSE.txt)
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/davidzwa/octofarm-experiments/ci?style=for-the-badge)
