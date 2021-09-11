@@ -7,7 +7,7 @@ import PrinterManager from "../lib/modules/printerManager.js";
 import PrinterLogs from "../lib/modules/printerLogs.js";
 import OctoFarmClient from "../services/octofarm-client.service";
 import { updatePrinterSettingsModal } from "../lib/modules/printerSettings";
-import { elem } from "../common/element.utils";
+import { addClick, elem } from "../common/element.utils";
 import { ACTIONS, CONTAINERS, LABELS } from "../common/quick-action.constants";
 
 const printerList = elem("printerList");
@@ -102,7 +102,7 @@ function corsWarningCheck(printer) {
 
 function checkForOctoPrintUpdate(printer) {
   let updateButton = elem(`${ACTIONS.octoprintUpdate}-${printer._id}`);
-  let bulkOctoPrintUpdateButton = elem("blkOctoPrintUpdate");
+  let bulkOctoPrintUpdateButton = elem(ACTIONS.blkUpdatePluginsBtn);
   if (printer?.octoPrintUpdate?.updateAvailable) {
     if (updateButton.disabled) {
       UI.doesElementNeedUpdating(false, updateButton, "disabled");
@@ -205,7 +205,7 @@ export function createOrUpdatePrinterTableRow(printers, printerControlList) {
     } else {
       printerList.insertAdjacentHTML("beforeend", returnPrinterTableRow(printer));
       // Insert actions buttons
-      actionButtonInit(printer, `printerActionBtns-${printer._id}`);
+      actionButtonInit(printer, `${CONTAINERS.printerActionBtns}-${printer._id}`);
       // Check quick connect state and apply
       checkQuickConnectState(printer);
       // Initialise data
@@ -214,36 +214,26 @@ export function createOrUpdatePrinterTableRow(printers, printerControlList) {
       setupUpdateOctoPrintClientBtn(printer);
       setupUpdateOctoPrintPluginsBtn(printer);
 
-      // TODO move to function on printer manager cleanup
-      document
-        .getElementById(`printerButton-${printer._id}`)
-        .addEventListener("click", async () => {
-          const printers = await OctoFarmClient.listPrinters();
-          await PrinterManager.init(printer._id, printers, printerControlList);
-        });
-      document
-        .getElementById(`printerSettings-${printer._id}`)
-        .addEventListener("click", async (e) => {
-          const printersInfo = await OctoFarmClient.listPrinters();
-          await updatePrinterSettingsModal(printersInfo, printer._id);
-        });
-      document
-        .getElementById(`scanningIssues-${printer._id}`)
-        .addEventListener("click", async (e) => {
-          const printersInfo = await OctoFarmClient.listPrinters();
-          await updatePrinterSettingsModal(printersInfo, printer._id);
-        });
-      elem(`printerLog-${printer._id}`).addEventListener("click", async (e) => {
+      addClick(`${ACTIONS.printerButton}-${printer._id}`, async () => {
+        const printers = await OctoFarmClient.listPrinters();
+        await PrinterManager.init(printer._id, printers, printerControlList);
+      });
+      addClick(`${ACTIONS.printerSettings}-${printer._id}`, async (e) => {
+        const printersInfo = await OctoFarmClient.listPrinters();
+        await updatePrinterSettingsModal(printersInfo, printer._id);
+      });
+      addClick(`${LABELS.scanningIssues}-${printer._id}`, async (e) => {
+        const printersInfo = await OctoFarmClient.listPrinters();
+        await updatePrinterSettingsModal(printersInfo, printer._id);
+      });
+      addClick(`${ACTIONS.printerLog}-${printer._id}`, async (e) => {
         const printerInfo = await OctoFarmClient.getPrinter(printer._id);
         let connectionLogs = await OctoFarmClient.getPrinterConnectionLogs(printer._id);
         PrinterLogs.loadLogs(printerInfo, connectionLogs);
       });
-
-      document
-        .getElementById(`printerStatistics-${printer._id}`)
-        .addEventListener("click", async (e) => {
-          await PrinterLogs.loadStatistics(printer._id);
-        });
+      addClick(`${ACTIONS.printerStatistics}-${printer._id}`, async (e) => {
+        await PrinterLogs.loadStatistics(printer._id);
+      });
     }
   });
 }

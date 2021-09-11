@@ -3,11 +3,15 @@ export const ACTIONS = {
   printerQuickConnect: "printerQuickConnect",
   printerSyncButton: "printerSyncButton",
   printerButton: "printerButton",
+  printerSettings: "printerSettings",
   printerWeb: "printerWeb",
   powerBtn: "powerBtn",
+  printerLog: "printerLog",
+  printerStatistics: "printerStatistics",
   octoprintUpdate: "octoprintUpdate",
   octoprintPluginUpdate: "octoprintPluginUpdate",
-  blkUpdatePluginsBtn: "blkUpdatePluginsBtn"
+  blkUpdatePluginsBtn: "blkUpdatePluginsBtn",
+  blkOctoPrintUpdate: "blkOctoPrintUpdate"
 };
 
 export const LABELS = {
@@ -23,5 +27,6 @@ export const LABELS = {
 };
 
 export const CONTAINERS = {
-  printerCard: "printerCard"
+  printerCard: "printerCard",
+  printerActionBtns: "printerActionBtns"
 };
