@@ -9,7 +9,7 @@ import {
 } from "./quick-action.elements";
 import PowerButton from "../lib/modules/powerButton";
 import { ACTIONS } from "./quick-action.constants";
-import { togglePrinterQuickConnect } from "./quick-action.updater";
+import { togglePrinterEnabled, togglePrinterQuickConnect } from "./quick-action.updater";
 import { addEnableToggleListener, addSyncListener } from "./quick-action.listeners";
 import UI from "../lib/functions/ui";
 import OctoPrintClient from "../lib/octoprint";
@@ -135,7 +135,10 @@ export function initQuickActionButtons(printer, element) {
     printer.currentConnection != null &&
     printer.currentConnection.port != null &&
     printer.printerState.colour.category != "Offline";
+
   togglePrinterQuickConnect(printerId, connectPossible);
+
+  togglePrinterEnabled(printerId, printer.enabled);
 
   if (printer.printerState.colour.category === "Offline") {
     elem(`${ACTIONS.printerQuickConnect}-${printerId}`).disabled = true;

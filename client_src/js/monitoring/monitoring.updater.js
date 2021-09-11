@@ -652,12 +652,8 @@ function grabElements(printer) {
 }
 
 async function updateState(printer, clientSettings, view) {
-  //Grab elements on page
   const elements = grabElements(printer);
-  if (typeof elements.row === "undefined") return; //Doesn't exist can skip updating
-
-  //Check sorting order and update if required...
-  //elements.row.style.order = printer.order;
+  if (!elements.row) return;
 
   //Check display and skip if not displayed...
   if (printer.display) {
@@ -683,6 +679,7 @@ async function updateState(printer, clientSettings, view) {
 
   //Printer
   updateQuickConnectBtn(printer);
+
   elements.control.disabled = printer.printerState.colour.category === "Offline";
   UI.updateElem(printer.printerState.state, elements.state, "innerHTML");
 
