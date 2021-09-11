@@ -7,21 +7,21 @@ import PrinterManager from "../lib/modules/printerManager.js";
 import PrinterLogs from "../lib/modules/printerLogs.js";
 import OctoFarmClient from "../services/octofarm-client.service";
 import { updatePrinterSettingsModal } from "../lib/modules/printerSettings";
-import { addClick, elem } from "../common/element.utils";
+import { addClick, elem, withId } from "../common/element.utils";
 import { ACTIONS, CONTAINERS, LABELS } from "../common/quick-action.constants";
 
 const printerList = elem("printerList");
 const ignoredHostStatesForAPIErrors = ["Setting Up", "Searching...", "Shutdown"];
 
 function updatePrinterInfoAndState(printer) {
-  const printName = elem(`${LABELS.printerName}-${printer._id}`);
-  const webButton = elem(`${ACTIONS.printerWeb}-${printer._id}`);
-  const hostBadge = elem(`${LABELS.hostBadge}-${printer._id}`);
-  const printerBadge = elem(`${LABELS.printerBadge}-${printer._id}`);
-  const socketBadge = elem(`${LABELS.webSocketIcon}-${printer._id}`);
+  const printName = elem(withId(LABELS.printerName, printer._id));
+  const webButton = elem(withId(ACTIONS.printerWeb, printer._id));
+  const hostBadge = elem(withId(LABELS.hostBadge, printer._id));
+  const printerBadge = elem(withId(LABELS.printerBadge, printer._id));
+  const socketBadge = elem(withId(LABELS.webSocketIcon, printer._id));
 
-  const printerSortIndex = elem(`${LABELS.printerSortIndex}-${printer._id}`);
-  const printerGroup = elem(`${LABELS.printerGroup}-${printer._id}`);
+  const printerSortIndex = elem(withId(LABELS.printerSortIndex, printer._id));
+  const printerGroup = elem(withId(LABELS.printerGroup, printer._id));
 
   UI.doesElementNeedUpdating(printer.sortIndex, printerSortIndex, "innerHTML");
   UI.doesElementNeedUpdating(printer.printerName, printName, "innerHTML");
@@ -56,18 +56,18 @@ function updatePrinterInfoAndState(printer) {
 }
 
 function updatePrinterColumn(printer) {
-  const printerPrinterInformation = elem(`${LABELS.printerPrinterInformation}-${printer._id}`);
+  const printerInfo = elem(withId(LABELS.printerPrinterInformation, printer._id));
   if (!!printer.octoPrintSystemInfo) {
     if (typeof printer.octoPrintSystemInfo["printer.firmware"] === "undefined") {
       UI.doesElementNeedUpdating(
         '<small title="Please connect and resync to display printer firmware">Unknown</small>',
-        printerPrinterInformation,
+        printerInfo,
         "innerHTML"
       );
     } else {
       UI.doesElementNeedUpdating(
         `<small>${printer.octoPrintSystemInfo["printer.firmware"]}</small>`,
-        printerPrinterInformation,
+        printerInfo,
         "innerHTML"
       );
     }
@@ -75,33 +75,33 @@ function updatePrinterColumn(printer) {
 }
 
 function updateOctoPiColumn(printer) {
-  const printerOctoPrintInformation = elem(`${LABELS.printerOctoPrintInformation}-${printer._id}`);
+  const octoPrintInfo = elem(withId(LABELS.printerOctoPrintInformation, printer._id));
   if (!!printer.octoPi) {
     UI.doesElementNeedUpdating(
       `<small>${printer.octoPrintVersion}</small><br>` +
         (printer.octoPi?.version ? `<small>${printer.octoPi.version}</small><br>` : "") +
         `<small>${printer.octoPi.model}</small>`,
-      printerOctoPrintInformation,
+      octoPrintInfo,
       "innerHTML"
     );
   } else {
     UI.doesElementNeedUpdating(
       `<small>${printer.octoPrintVersion}</small>`,
-      printerOctoPrintInformation,
+      octoPrintInfo,
       "innerHTML"
     );
   }
 }
 
 function corsWarningCheck(printer) {
-  const printerBadge = elem(`${LABELS.printerBadge}-${printer._id}`);
+  const printerBadge = elem(withId(LABELS.printerBadge, printer._id));
   if (!printer.corsCheck && !ignoredHostStatesForAPIErrors.includes(printer.hostState.state)) {
     UI.doesElementNeedUpdating("CORS NOT ENABLED!", printerBadge, "innerHTML");
   }
 }
 
 function checkForOctoPrintUpdate(printer) {
-  let updateButton = elem(`${ACTIONS.octoprintUpdate}-${printer._id}`);
+  let updateButton = elem(withId(ACTIONS.octoprintUpdate, printer._id));
   let bulkOctoPrintUpdateButton = elem(ACTIONS.blkUpdatePluginsBtn);
   if (printer?.octoPrintUpdate?.updateAvailable) {
     if (updateButton.disabled) {
@@ -123,7 +123,7 @@ function checkForOctoPrintUpdate(printer) {
 }
 
 function checkForOctoPrintPluginUpdates(printer) {
-  let updatePluginButton = elem(`${ACTIONS.octoprintPluginUpdate}-${printer._id}`);
+  let updatePluginButton = elem(withId(ACTIONS.octoprintPluginUpdate, printer._id));
   let bulkPluginUpdateButton = elem(ACTIONS.blkUpdatePluginsBtn);
   if (printer.octoPrintPluginUpdates && printer.octoPrintPluginUpdates.length > 0) {
     if (updatePluginButton.disabled) {
@@ -145,7 +145,7 @@ function checkForOctoPrintPluginUpdates(printer) {
 }
 
 function checkForApiErrors(printer) {
-  const apiErrorTag = elem(`${LABELS.scanningIssues}-${printer._id}`);
+  const apiErrorTag = elem(withId(LABELS.scanningIssues, printer._id));
 
   if (!ignoredHostStatesForAPIErrors.includes(printer.hostState.state)) {
     let apiErrors = 0;
@@ -169,7 +169,7 @@ function checkForApiErrors(printer) {
 }
 
 function updateButtonState(printer) {
-  const printButton = elem(`${ACTIONS.printerButton}-${printer._id}`);
+  const printButton = elem(withId(ACTIONS.printerButton, printer._id));
 
   printButton.disabled = printer.printerState.colour.category === "Offline";
 }
@@ -199,13 +199,13 @@ function updatePrinterRow(printer) {
 
 export function createOrUpdatePrinterTableRow(printers, printerControlList) {
   printers.forEach((printer) => {
-    const printerCard = elem(`${CONTAINERS.printerCard}-${printer._id}`);
+    const printerCard = elem(withId(CONTAINERS.printerCard, printer._id));
     if (printerCard) {
       updatePrinterRow(printer);
     } else {
       printerList.insertAdjacentHTML("beforeend", returnPrinterTableRow(printer));
       // Insert actions buttons
-      actionButtonInit(printer, `${CONTAINERS.printerActionBtns}-${printer._id}`);
+      actionButtonInit(printer, withId(CONTAINERS.printerActionBtns, printer._id));
       // Check quick connect state and apply
       checkQuickConnectState(printer);
       // Initialise data
@@ -214,24 +214,24 @@ export function createOrUpdatePrinterTableRow(printers, printerControlList) {
       setupUpdateOctoPrintClientBtn(printer);
       setupUpdateOctoPrintPluginsBtn(printer);
 
-      addClick(`${ACTIONS.printerButton}-${printer._id}`, async () => {
+      addClick(withId(ACTIONS.printerButton, printer._id), async () => {
         const printers = await OctoFarmClient.listPrinters();
         await PrinterManager.init(printer._id, printers, printerControlList);
       });
-      addClick(`${ACTIONS.printerSettings}-${printer._id}`, async (e) => {
+      addClick(withId(ACTIONS.printerSettings, printer._id), async (e) => {
         const printersInfo = await OctoFarmClient.listPrinters();
         await updatePrinterSettingsModal(printersInfo, printer._id);
       });
-      addClick(`${LABELS.scanningIssues}-${printer._id}`, async (e) => {
+      addClick(withId(LABELS.scanningIssues, printer._id), async (e) => {
         const printersInfo = await OctoFarmClient.listPrinters();
         await updatePrinterSettingsModal(printersInfo, printer._id);
       });
-      addClick(`${ACTIONS.printerLog}-${printer._id}`, async (e) => {
+      addClick(withId(ACTIONS.printerLog, printer._id), async (e) => {
         const printerInfo = await OctoFarmClient.getPrinter(printer._id);
         let connectionLogs = await OctoFarmClient.getPrinterConnectionLogs(printer._id);
         PrinterLogs.loadLogs(printerInfo, connectionLogs);
       });
-      addClick(`${ACTIONS.printerStatistics}-${printer._id}`, async (e) => {
+      addClick(withId(ACTIONS.printerStatistics, printer._id), async (e) => {
         await PrinterLogs.loadStatistics(printer._id);
       });
     }
