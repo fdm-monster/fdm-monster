@@ -113,23 +113,16 @@ export async function bulkEditPrinters() {
       const editedPrinters = await OctoFarmClient.post("/printers/update", editedPrinters);
       const printersAdded = editedPrinters.printersAdded;
       printersAdded.forEach((printer) => {
-        UI.createAlert(
-          "success",
-          `Printer: ${printer.printerURL} information has been updated on the farm...`,
-          1000,
-          "Clicked"
-        );
+        notyService.showSuccess(ALERTS.UPDATED_PRINTERS);
       });
     } catch (e) {
-      console.error(e);
-      UI.createAlert("error", "Something went wrong updating the Server...", 3000, "Clicked");
+      notyService.showError(ALERTS.ERROR_UPDATING_PRINTERS);
     }
   }
 }
 
 export async function bulkDeletePrinters() {
   const deletedPrinters = [];
-  //Grab all check boxes
   const selectedPrinters = PrinterSelect.getSelected();
   selectedPrinters.forEach((element) => {
     const ca = element.id.split("-");
@@ -154,8 +147,7 @@ export async function exportPrintersToJson() {
     }
     FileOperations.download("printers.json", JSON.stringify(printersExport));
   } catch (e) {
-    console.error(e);
-    UI.createAlert("error", `Error exporting printers, please check logs: ${e}`, 3000, "clicked");
+    notyService.showError(ALERTS.ERROR_EXPORTING_PRINTERS);
   }
 }
 
@@ -167,8 +159,7 @@ export async function importPrintersFromJsonFile() {
     reader.onload = await PrintersManagement.importPrinters(files);
     reader.readAsText(files);
   } else {
-    // File not json
-    UI.createAlert("error", "File type not .json!", 3000);
+    notyService.showError(ALERTS.ERROR_IMPORT_NOT_JSON);
   }
 }
 
@@ -205,17 +196,17 @@ export async function saveAllOnAddPrinterTable() {
   for (const btn of onScreenDelete) {
     btn.disabled = true;
   }
-  UI.createAlert(
-    "warning",
-    "Starting to save all your instances... this may take some time...",
-    onScreenButtons.length * 1500
-  );
+
+  notyService.showWarning(ALERTS.WARNING_SAVING_PRINTERS_SLOW);
+
   for (const btn of onScreenButtons) {
     btn.disabled = false;
     btn.click();
     await delay(1500);
   }
-  UI.createAlert("success", "Successfully saved all your instances", 4000);
+
+  notyService.showSuccess(ALERTS.SUCCESS_SAVED_PRINTERS);
+
   saveAllBtn.disabled = false;
   deleteAllBtn.disabled = true;
 }

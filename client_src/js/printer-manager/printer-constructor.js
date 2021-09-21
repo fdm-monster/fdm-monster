@@ -118,13 +118,9 @@ export class PrintersManagement {
 
   static async importPrinters() {
     return function (e) {
-      const theBytes = e.target.result; // .split('base64,')[1];
-      // Initial JSON validation
-      if (Validate.JSON(theBytes)) {
-        // If we can parse the file.
-
-        // Grab uploaded file contents into an object
-        const importPrinters = JSON.parse(theBytes);
+      const byteData = e.target.result; // .split('base64,')[1];
+      if (Validate.JSON(byteData)) {
+        const importPrinters = JSON.parse(byteData);
         // Loop over import only importing printers with correct fields.
         for (let index = 0; index < importPrinters.length; index++) {
           const printer = {

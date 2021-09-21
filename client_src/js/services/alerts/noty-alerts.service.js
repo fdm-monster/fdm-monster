@@ -36,6 +36,14 @@ export class NotyAlertsService {
     return this.#showNoty({ message, delay, type: "success" });
   }
 
+  showError({ message, delay }) {
+    return this.#showNoty({ message, delay, type: "error" });
+  }
+
+  showWarning({ message, delay }) {
+    return this.#showNoty({ message, delay, type: "warning" });
+  }
+
   #showNoty({ message, type = "info", delay = 3000, click = "Clicked" }) {
     let alert = new Noty({
       type: "info",

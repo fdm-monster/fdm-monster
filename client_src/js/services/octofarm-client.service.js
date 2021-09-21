@@ -4,7 +4,6 @@ import HttpStatusCode from "../../../server_src/constants/http-status-codes.cons
 
 axios.interceptors.request.use(
   function (config) {
-    OctoFarmClient.validatePath(config.url);
     return config;
   },
   function (error) {
@@ -68,13 +67,6 @@ export default class OctoFarmClient {
   static testAlertScriptRoute = this.alertRoute + "/test-alert-script";
   static roomDataRoute = this.base + "/room-data";
 
-  static validatePath(pathname) {
-    if (!pathname) {
-      new URL(path, window.location.origin);
-      throw new ApplicationError(ClientErrors.FAILED_VALIDATION_PATH);
-    }
-  }
-
   static validateRequiredProps(input, keys) {
     const unsetRequiredProps = keys.filter((prop) => {
       return !input[prop];
@@ -84,8 +76,7 @@ export default class OctoFarmClient {
         "The following properties were empty/missing in the request",
         unsetRequiredProps
       );
-      // TODO unsetRequiredProps are not processed yet
-      throw new ApplicationError(ClientErrors.FAILED_VALIDATION_PATH, unsetRequiredProps);
+      throw new ApplicationError(unsetRequiredProps);
     }
   }
 

@@ -21,13 +21,9 @@ $("#connectionModal").on("hidden.bs.modal", function (e) {
 export async function updatePrinterSettingsModal(printersInformation, printerID) {
   // Make sure we have page elements
   PrinterSettings.grabPageElements();
-  // Check if printer ID is provided
   if (!printerID) {
-    // No printer ID we are updating the state...
     // The SSE Event doesn't stop on an error, so we need to make sure the update event skips an error occurring...
-
     if (!ApplicationError.hasErrorNotificationBeenTriggered) {
-      // Make sure online state is latest...
       printerOnline =
         printersInformation[currentPrinterIndex].printerState.colour.category !== "Offline";
       PrinterSettings.updateStateElements(printersInformation[currentPrinterIndex]);
