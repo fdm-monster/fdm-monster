@@ -9,7 +9,7 @@
     tile:{
     id:"printerManagementBtns",i:"fa-print",title:"Managment",class:"col-12 col-sm-12 col-md-4 col-lg-3 col-xl-2",
     },
-    bodyFile:'./PrinterManager/printerManagementContent.ejs'
+    bodyFile:'./printer-manager/printerManagementContent.ejs'
     })
 %>
 <% } %>
@@ -54,35 +54,35 @@
     modal:{
     id:"printerSelect", title:"Printer Select: "
     },
-    bodyFile:'./PrinterManager/printerSelect.modal.ejs'
+    bodyFile:'./printer-manager/printerSelect.modal.ejs'
     })
 %>
 <%- include(modal, {
     modal:{
     id:"printerLogs", title:"Printer Logs: "
     },
-    bodyFile:'./PrinterManager/printerLogs.modal.ejs'
+    bodyFile:'./printer-manager/printerLogs.modal.ejs'
 })
 %>
 <%- include(modal, {
     modal:{
     id:"printerSettings", title:"Printer Settings: "
     },
-    bodyFile:'./PrinterManager/printerSettings.modal.ejs'
+    bodyFile:'./printer-manager/printerSettings.modal.ejs'
 })
 %>
 <%- include(modal, {
     modal:{
     id:"printerCustomGcodeScripts", title:"Custom Gcode Scripts"
     },
-    bodyFile:'./PrinterManager/printerCustomGcodeScripts.modal.ejs'
+    bodyFile:'./printer-manager/printerCustomGcodeScripts.modal.ejs'
 })
 %>
 <%- include(modal, {
     modal:{
         id:"printerStatistics", title:"Printer Statistics"
     },
-    bodyFile:'./PrinterManager/printerStatistics.modal.ejs'
+    bodyFile:'./printer-manager/printerStatistics.modal.ejs'
 })
 %>
 

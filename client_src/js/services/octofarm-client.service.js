@@ -3,11 +3,11 @@ import { ApplicationError } from "../exceptions/application-error.handler";
 import HttpStatusCode from "../../../server_src/constants/http-status-codes.constants";
 
 axios.interceptors.request.use(
-  function(config) {
+  function (config) {
     OctoFarmClient.validatePath(config.url);
     return config;
   },
-  function(error) {
+  function (error) {
     // Do something with request error
     return Promise.reject(error);
   }
@@ -15,12 +15,12 @@ axios.interceptors.request.use(
 
 // axios response interceptor
 axios.interceptors.response.use(
-  function(response) {
+  function (response) {
     // Any status code that lie within the range of 2xx cause this function to trigger
     // Do something with response data
     return response;
   },
-  function(error) {
+  function (error) {
     // Any status codes that falls outside the range of 2xx cause this function to trigger
     // Do something with response error
     switch (error.response.status) {
@@ -43,8 +43,8 @@ export default class OctoFarmClient {
   static printerRoute = this.base + "/printer";
   static settingsRoute = this.base + "/settings";
   static serverSettingsRoute = this.settingsRoute + "/server";
-  static logsRoute = `${this.serverSettingsRoute}/logs`;
-  static generateLogsDumpRoute = `${this.logsRoute}/generate-log-dump`;
+  static serverLogsRoute = `${this.serverSettingsRoute}/logs`;
+  static generateLogsDumpRoute = `${this.serverLogsRoute}/generate-log-dump`;
   static serverRestartRoute = `${this.serverSettingsRoute}/restart`;
   static clientSettingsRoute = this.settingsRoute + "/client";
   static customGCodeSettingsRoutes = this.settingsRoute + "/custom-gcode";
@@ -202,8 +202,12 @@ export default class OctoFarmClient {
     return this.get(this.serverSettingsRoute);
   }
 
+  static async getServerLogs() {
+    return []; // Not implemented
+    // return this.get(this.serverLogsRoute);
+  }
+
   static async updateServerSettings(settingsObject) {
-    //TODO: should be patch not post
     return this.put(this.serverSettingsRoute, settingsObject);
   }
 

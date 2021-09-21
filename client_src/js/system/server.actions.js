@@ -3,6 +3,7 @@ import UI from "../lib/functions/ui";
 import Calc from "../lib/functions/calc";
 import { setupOctoPrintForTimelapses } from "../octoprint/octoprint-settings.actions";
 import {
+  checkFilamentManager,
   setupFilamentManagerDisableBtn,
   setupFilamentManagerReSyncBtn,
   setupFilamentManagerSyncBtn
@@ -111,15 +112,14 @@ async function restartOctoFarmServer() {
 }
 
 async function checkFilamentManagerPluginState() {
-  if (await isFilamentManagerPluginSyncEnabled()) {
-    setupFilamentManagerReSyncBtn();
+  if (await checkFilamentManager()) {
+    await setupFilamentManagerReSyncBtn();
     setupFilamentManagerDisableBtn();
   } else {
     setupFilamentManagerSyncBtn();
   }
 }
 
-//TODO: Also needs cleaning up more, ie only sending changed values rather than everything. Add to a listener and grabbed changed values.
 async function updateServerSettings() {
   //TODO: Reboot flag should come from server endpoint.
   let reboot = true;
@@ -274,7 +274,8 @@ async function checkForOctoFarmUpdates() {
 }
 
 async function grabOctoFarmLogList() {
-  let logList = await OctoFarmClient.get(OctoFarmClient.logsRoute);
+  let logList = await OctoFarmClient.getServerLogs();
+
   const logTable = document.getElementById("serverLogs");
   logList.forEach((logs) => {
     logTable.insertAdjacentHTML(
@@ -291,7 +292,7 @@ async function grabOctoFarmLogList() {
         `
     );
     document.getElementById(logs.name).addEventListener("click", async (event) => {
-      window.open(`${OctoFarmClient.logsRoute}/${logs.name}`);
+      window.open(`${OctoFarmClient.serverLogsRoute}/${logs.name}`);
     });
   });
 }
