@@ -41,6 +41,8 @@ export default class OctoFarmClient {
   static base = "/api";
   static amIAliveRoute = this.base + "/amialive";
   static printerRoute = this.base + "/printer";
+  static printerNetworkRoute = this.base + "/printer-network";
+  static scanSsdp = this.printerNetworkRoute + "/scan-ssdp";
   static settingsRoute = this.base + "/settings";
   static serverSettingsRoute = this.settingsRoute + "/server";
   static serverLogsRoute = `${this.serverSettingsRoute}/logs`;
@@ -109,6 +111,10 @@ export default class OctoFarmClient {
       // "webSocketURL" // TODO generate client-side
     ]);
     return this.post(`${this.printerRoute}/`, newPrinter);
+  }
+
+  static async printerNetworkScanSsdp() {
+    return this.get(`${this.scanSsdp}/`);
   }
 
   static async updatePrinterConnectionSettings(settings) {

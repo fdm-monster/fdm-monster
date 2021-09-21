@@ -10,7 +10,7 @@ import {
   bulkOctoPrintControlCommand,
   bulkOctoPrintGcodeCommand,
   bulkOctoPrintPluginAction
-} from "./printer-manager/functions/bulk-commands-functions";
+} from "./printer-manager/actions/bulk-commands-functions";
 import {
   addBlankPrinterToTable,
   bulkDeletePrinters,
@@ -22,9 +22,9 @@ import {
   saveAllOnAddPrinterTable,
   scanNetworkForDevices,
   workerEventFunction
-} from "./printer-manager/functions/printer-manager.functions";
-import { loadCustomGcodeScriptsModel } from "./printer-manager/functions/custom-gcode-scripts.functions";
-import { setupSortablePrintersTable } from "./printer-manager/functions/sortable-table";
+} from "./printer-manager/actions/printer-manager.functions";
+import { loadCustomGcodeScriptsModel } from "./printer-manager/actions/custom-gcode-scripts.functions";
+import { setupSortablePrintersTable } from "./printer-manager/actions/sortable-table";
 
 const workerURL = "/printers/sse/";
 

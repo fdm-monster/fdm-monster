@@ -10,11 +10,15 @@ import { PrintersManagement } from "../printer-constructor";
 import PrinterSelect from "../../lib/modules/printerSelect";
 import FileOperations from "../../lib/functions/file";
 import { createPrinterAddInstructions } from "../templates/printer-add-instructions.template";
+import { NotyAlertsService } from "../../services/alerts/noty-alerts.service";
+import { ALERTS } from "../constants/alerts.constants";
+import { defaultPrinter } from "../constants/printer.constants";
 
 let powerTimer = 5000;
+let notyService = new NotyAlertsService();
 
 export function workerEventFunction(data) {
-  if (data != false) {
+  if (!!data) {
     const modalVisibility = UI.checkIfAnyModalShown();
 
     if (!modalVisibility) {
@@ -44,71 +48,36 @@ export function workerEventFunction(data) {
         updatePrinterSettingsModal(data.printersInformation);
       }
     }
-  } else {
-    UI.createAlert(
-      "warning",
-      "Server Events closed unexpectedly... Retying in 10 seconds",
-      10000,
-      "Clicked"
-    );
   }
 }
 
 export async function scanNetworkForDevices() {
-  e.target.disabled = true;
-  UI.createAlert("info", "Scanning your network for new devices now... Please wait!", 20000);
-  try {
-    const scannedPrinters = await OctoFarmClient.get("/printers/scanNetwork");
-    for (let index = 0; index < scannedPrinters.length; index++) {
-      const printer = {
-        printerURL: "",
-        camURL: "",
-        name: "",
-        group: "",
-        apiKey: ""
-      };
+  notyService.showInfo(ALERTS.SCANNING_NETWORK);
 
-      if (typeof scannedPrinters[index].name !== "undefined") {
-        printer.name = scannedPrinters[index].name;
-      }
-      if (typeof scannedPrinters[index].url !== "undefined") {
-        printer.printerURL = scannedPrinters[index].url;
-      }
-      PrintersManagement.addPrinter(printer);
-    }
-    UI.createAlert(
-      "success",
-      "Devices on your network have been scanned, any successful matches should now be visible to add to OctoFarm.",
-      3000,
-      "Clicked"
-    );
-  } catch (e) {
-    console.error(e);
-    UI.createAlert(
-      "error",
-      "There we're issues scanning your network for devices... please check the logs",
-      0,
-      "clicked"
-    );
+  const scannedPrinters = await OctoFarmClient.printerNetworkScanSsdp();
+  for (const ssdpPrinter in scannedPrinters) {
+    const printer = defaultPrinter();
+
+    printer.name = ssdpPrinter.name || "";
+    printer.printerURL = ssdpPrinter.url || "";
+
+    PrintersManagement.addPrinter(printer);
   }
-  e.target.disabled = false;
+
+  notyService.showInfo(ALERTS.SCANNED_NETWORK);
 }
 
 export async function reSyncPrinters() {
   const searchOffline = document.getElementById("searchOfflineBtn");
-  let alert = UI.createAlert(
-    "success",
-    "Started a background re-sync of all printers connected to OctoFarm. You may navigate away from this screen."
-  );
+  const initialAlert = notyService.showSuccess(ALERTS.STARTED_BG_RESYNC);
+
   searchOffline.innerHTML = '<i class="fas fa-redo fa-sm fa-spin"></i> Syncing...';
-  try {
-    // Will throw error as it is disabled
-    const post = await OctoFarmClient.reconnectFarmCommand();
-  } catch (e) {
-    console.error(e);
-    UI.createAlert("error", "There was an issue re-syncing your printers, please check the logs");
-  }
-  alert.close();
+
+  // Will throw not-implemented error
+  await OctoFarmClient.reconnectFarmCommand();
+
+  notyService.closeAlert(initialAlert);
+
   searchOffline.innerHTML = '<i class="fas fa-redo fa-sm"></i> Re-Sync';
 }
 
