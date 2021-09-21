@@ -1,6 +1,5 @@
 import UI from "../../lib/functions/ui";
 import OctoFarmClient from "../../services/octofarm-client.service.js";
-import { checkIfLoaderExistsAndRemove, updateConnectionLog } from "../connection-log";
 import { createOrUpdatePrinterTableRow } from "../printer-rows";
 import PowerButton from "../../lib/modules/powerButton";
 import PrinterManager from "../../lib/modules/printerManager";
@@ -22,11 +21,6 @@ export function workerEventFunction(data) {
     const modalVisibility = UI.checkIfAnyModalShown();
 
     if (!modalVisibility) {
-      if (data.currentTickerList.length > 0) {
-        updateConnectionLog(data.currentTickerList);
-      } else {
-        checkIfLoaderExistsAndRemove(true);
-      }
       if (data.printersInformation.length > 0) {
         createOrUpdatePrinterTableRow(data.printersInformation, data.printerControlList);
       }
@@ -95,7 +89,7 @@ export async function bulkEditPrinters() {
       const printerAPIKEY = document.getElementById(`editInputApikey-${printerID}`);
       const printerGroup = document.getElementById(`editInputGroup-${printerID}`);
       const printerName = document.getElementById(`editInputName-${printerID}`);
-      //Check if value updated, if not fill in the old value from placeholder
+      // Check if value updated, if not fill in the old value from placeholder
       if (
         printerURL.value.length !== 0 ||
         printerCamURL.value.length !== 0 ||
