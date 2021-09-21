@@ -20,11 +20,22 @@ export const ACTIONS = {
   deletePrintersBtn: "deletePrintersBtn",
   addPrinterBtn: "addPrinterBtn",
   delAllBtn: "delAllBtn",
-  saveAllBtn: "saveAllBtn"
+  saveAllBtn: "saveAllBtn",
+  saveButton: "saveButton",
+  delButton: "delButton"
 };
 
-export const LABELS = {};
+export const LABELS = {
+  newPrinterName: "newPrinterName",
+  newPrinterGroup: "newPrinterGroup",
+  newPrinterURL: "newPrinterURL",
+  newPrinterCamURL: "newPrinterCamURL",
+  newPrinterAPIKEY: "newPrinterAPIKEY"
+};
 
 export const CONTAINERS = {
-  multiPrintersSection: "multiPrintersSection"
+  multiPrintersSection: "multiPrintersSection",
+  printerNewTable: "printerNewTable",
+  printerNewList: "printerNewList",
+  newPrinterCard: "newPrinterCard"
 };

@@ -5,7 +5,7 @@ import PowerButton from "../../lib/modules/powerButton";
 import PrinterManager from "../../lib/modules/printerManager";
 import { updatePrinterSettingsModal } from "../../lib/modules/printerSettings";
 import Validate from "../../lib/functions/validate";
-import { PrintersManagement } from "../printer-constructor";
+import { PrintersManagement } from "../printer-manager.runner";
 import PrinterSelect from "../../lib/modules/printerSelect";
 import FileOperations from "../../lib/functions/file";
 import { createPrinterAddInstructions } from "../templates/printer-add-instructions.template";

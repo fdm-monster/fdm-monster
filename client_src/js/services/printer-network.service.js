@@ -1,7 +1,7 @@
 import { ALERTS } from "../printer-manager/constants/alerts.constants";
 import OctoFarmClient from "./octofarm-client.service";
 import { defaultPrinter } from "../printer-manager/constants/printer.constants";
-import { PrintersManagement } from "../printer-manager/printer-constructor";
+import { PrintersManagement } from "../printer-manager/printer-manager.runner";
 import { NotyAlertsService } from "./alerts/noty-alerts.service";
 
 let notyService = new NotyAlertsService();
