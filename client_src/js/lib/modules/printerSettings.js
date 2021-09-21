@@ -3,7 +3,6 @@ import UI from "../functions/ui.js";
 import Calc from "../functions/calc.js";
 import Script from "../../services/gcode-scripts.service.js";
 import { ApplicationError } from "../../exceptions/application-error.handler";
-import { ClientErrors } from "../../exceptions/octofarm-client.exceptions";
 import { replaceHttpProtocolWith } from "../../utils/url.utils";
 
 let currentPrinterIndex;
@@ -83,14 +82,15 @@ export async function updatePrinterSettingsModal(printersInformation, printerID)
 class PrinterSettings {
   static updateCurrentPrinterIndex(printersInformation, printerID) {
     currentPrintersInformation = printersInformation;
+
     // Printer ID we need to initialise the page.
-    const printersIndex = _.findIndex(printersInformation, function (o) {
+    const printerIndex = _.findIndex(printersInformation, function (o) {
       return o._id == printerID;
     });
-    if (printersIndex !== -1) {
-      currentPrinterIndex = printersIndex;
+    if (printerIndex !== -1) {
+      currentPrinterIndex = printerIndex;
     } else {
-      throw new ApplicationError(ClientErrors.FAILED_STATE_UPDATE);
+      throw new ApplicationError("PrinterId was not found in printers.");
     }
   }
 

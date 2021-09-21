@@ -1,15 +1,13 @@
 import axios from "axios";
 import { ApplicationError } from "../exceptions/application-error.handler";
-import { HTTPError } from "../exceptions/octofarm-api.exceptions";
-import { ClientErrors } from "../exceptions/octofarm-client.exceptions";
+import HttpStatusCode from "../../../server_src/constants/http-status-codes.constants";
 
-// axios request interceptor
 axios.interceptors.request.use(
-  function (config) {
+  function(config) {
     OctoFarmClient.validatePath(config.url);
     return config;
   },
-  function (error) {
+  function(error) {
     // Do something with request error
     return Promise.reject(error);
   }
@@ -17,41 +15,28 @@ axios.interceptors.request.use(
 
 // axios response interceptor
 axios.interceptors.response.use(
-  function (response) {
+  function(response) {
     // Any status code that lie within the range of 2xx cause this function to trigger
     // Do something with response data
     return response;
   },
-  function (error) {
+  function(error) {
     // Any status codes that falls outside the range of 2xx cause this function to trigger
     // Do something with response error
     switch (error.response.status) {
       case 0:
-        throw new ApplicationError(HTTPError.NO_CONNECTION);
-      case 400:
-        throw new ApplicationError(HTTPError.BAD_REQUEST);
-      case 401:
-        throw new ApplicationError(HTTPError.UNAUTHORIZED);
-      case 403:
-        throw new ApplicationError(HTTPError.FORBIDDEN);
-      case 404:
-        throw new ApplicationError(HTTPError.RESOURCE_NOT_FOUND);
-      case 500:
-        throw new ApplicationError(HTTPError.INTERNAL_SERVER_ERROR);
-      case 502:
-        throw new ApplicationError(HTTPError.BAD_GATEWAY);
-      case 503:
-        throw new ApplicationError(HTTPError.SERVICE_UNAVAILABLE);
-      case 504:
-        throw new ApplicationError(HTTPError.GATEWAY_TIMEOUT);
+      case HttpStatusCode.BAD_REQUEST:
+      case HttpStatusCode.UNAUTHORIZED:
+      case HttpStatusCode.FORBIDDEN:
+      case HttpStatusCode.NOT_FOUND:
+      case HttpStatusCode.INTERNAL_SERVER_ERROR:
+        throw new ApplicationError(error.response.status);
       default:
-        throw new ApplicationError(HTTPError.UNKNOWN);
+        throw new ApplicationError("Unprocessed error type");
     }
   }
 );
 
-// TODO: this could end up getting big, consider splitting it.
-// Would go by page, each page could get it's own extends class for pre-defined routes building on the CRUD actions available.
 export default class OctoFarmClient {
   static base = "/api";
   static amIAliveRoute = this.base + "/amialive";

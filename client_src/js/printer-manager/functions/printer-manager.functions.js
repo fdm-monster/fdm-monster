@@ -212,6 +212,7 @@ export async function exportPrintersToJson() {
     UI.createAlert("error", `Error exporting printers, please check logs: ${e}`, 3000, "clicked");
   }
 }
+
 export async function importPrintersFromJsonFile() {
   const Afile = this.files;
   if (Afile[0].name.includes(".json")) {
@@ -244,6 +245,7 @@ export function deleteAllOnAddPrinterTable() {
     btn.click();
   }
 }
+
 export async function saveAllOnAddPrinterTable() {
   const deleteAllBtn = document.getElementById("delAllBtn");
   const saveAllBtn = document.getElementById("saveAllBtn");
