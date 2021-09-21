@@ -11,7 +11,6 @@ import FileOperations from "../../lib/functions/file";
 import { createPrinterAddInstructions } from "../templates/printer-add-instructions.template";
 import { NotyAlertsService } from "../../services/alerts/noty-alerts.service";
 import { ALERTS } from "../constants/alerts.constants";
-import { defaultPrinter } from "../constants/printer.constants";
 
 let powerTimer = 5000;
 let notyService = new NotyAlertsService();
@@ -24,7 +23,7 @@ export function workerEventFunction(data) {
       if (data.printersInformation.length > 0) {
         createOrUpdatePrinterTableRow(data.printersInformation, data.printerControlList);
       }
-      // TODO clean up power buttons wants to be in printer-data.js
+
       if (powerTimer >= 5000) {
         data.printersInformation.forEach((printer) => {
           PowerButton.applyBtn(printer, "powerBtn-");
@@ -43,22 +42,6 @@ export function workerEventFunction(data) {
       }
     }
   }
-}
-
-export async function scanNetworkForDevices() {
-  notyService.showInfo(ALERTS.SCANNING_NETWORK);
-
-  const scannedPrinters = await OctoFarmClient.printerNetworkScanSsdp();
-  for (const ssdpPrinter in scannedPrinters) {
-    const printer = defaultPrinter();
-
-    printer.name = ssdpPrinter.name || "";
-    printer.printerURL = ssdpPrinter.url || "";
-
-    PrintersManagement.addPrinter(printer);
-  }
-
-  notyService.showInfo(ALERTS.SCANNED_NETWORK);
 }
 
 export async function reSyncPrinters() {

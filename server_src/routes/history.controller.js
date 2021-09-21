@@ -4,6 +4,7 @@ const { AppConstants } = require("../app.constants");
 const { validateInput } = require("../handlers/validators");
 const { idRules } = require("./validation/generic.validation");
 const { getCostSettingsDefault } = require("../constants/service.constants");
+const { NotImplementedException } = require("../exceptions/runtime.exceptions");
 
 class HistoryController {
   #serverVersion;
@@ -130,8 +131,11 @@ class HistoryController {
   async getPrinterStats(req, res) {
     const params = await validateInput(req.params, idRules);
 
-    let stats = await PrinterClean.generatePrinterStatistics(params.id);
-    res.send(stats);
+    // let stats = await PrinterClean.generatePrinterStatistics(params.id);
+    // res.send(stats);
+
+    // TODO implement or delete
+    throw new NotImplementedException();
   }
 
   async updateCostSettings(req, res) {
@@ -180,4 +184,4 @@ module.exports = createController(HistoryController)
   .put("/:id", "update")
   .get("/stats", "stats")
   .patch("/:id/cost-settings", "updateCostMatch")
-  .get("/:id/printer-stats/", "getPrinterStats");
+  .get("/:id/printer-stats", "getPrinterStats");

@@ -184,6 +184,10 @@ export default class OctoFarmClient {
     return this.get(this.historyRoute);
   }
 
+  static async getPrinterStatsHistory(printerId) {
+    return this.get(`${this.historyRoute}/${printerId}/printer-stats`);
+  }
+
   static async deleteHistory(historyId) {
     return this.delete(`${this.historyRoute}/${historyId}`);
   }
