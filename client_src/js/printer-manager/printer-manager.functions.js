@@ -1,16 +1,18 @@
-import UI from "../../lib/functions/ui";
-import OctoFarmClient from "../../services/octofarm-client.service.js";
-import { createOrUpdatePrinterTableRow } from "../printer-rows";
-import PowerButton from "../../lib/modules/powerButton";
-import PrinterManager from "../../lib/modules/printerManager";
-import { updatePrinterSettingsModal } from "../../lib/modules/printerSettings";
-import Validate from "../../lib/functions/validate";
-import { PrintersManagement } from "../printer-manager.runner";
-import PrinterSelect from "../../lib/modules/printerSelect";
-import FileOperations from "../../lib/functions/file";
-import { createPrinterAddInstructions } from "../templates/printer-add-instructions.template";
-import { NotyAlertsService } from "../../services/alerts/noty-alerts.service";
-import { ALERTS } from "../constants/alerts.constants";
+import UI from "../lib/functions/ui";
+import OctoFarmClient from "../services/octofarm-client.service.js";
+import { createOrUpdatePrinterTableRow } from "./printer-rows";
+import PowerButton from "../lib/modules/powerButton";
+import PrinterManager from "../lib/modules/printerManager";
+import { updatePrinterSettingsModal } from "../lib/modules/printerSettings";
+import Validate from "../lib/functions/validate";
+import { PrintersManagement } from "./printer-manager.runner";
+import PrinterSelect from "../lib/modules/printerSelect";
+import FileOperations from "../lib/functions/file";
+import { createPrinterAddInstructions } from "./templates/printer-add-instructions.template";
+import { NotyAlertsService } from "../services/alerts/noty-alerts.service";
+import { ALERTS } from "./constants/alerts.constants";
+import { CONTAINERS } from "./printer-manager.constants";
+import { elem } from "../common/element.utils";
 
 let powerTimer = 5000;
 let notyService = new NotyAlertsService();
@@ -164,15 +166,18 @@ export async function importPrintersFromJsonFile() {
 }
 
 export function addBlankPrinterToTable() {
-  const currentPrinterCount = document.getElementById("printerTable").rows.length;
-  const newPrinterCount = document.getElementById("printerNewTable").rows.length;
-  if (currentPrinterCount === 1 && newPrinterCount === 1) {
-    bootbox.alert({
-      message: createPrinterAddInstructions(),
-      size: "large",
-      scrollable: false
-    });
-  }
+  // const currentPrinterCount = elem("printerTable").rows.length;
+  // const newPrinterTable = elem(CONTAINERS.printerNewTable);
+
+  // const newPrinterCount = newPrinterTable.rows.length;
+  // if (currentPrinterCount === 1 && newPrinterCount === 1) {
+  //   bootbox.alert({
+  //     message: createPrinterAddInstructions(),
+  //     size: "large",
+  //     scrollable: false
+  //   });
+  // }
+
   PrintersManagement.addPrinter();
 }
 

@@ -21,7 +21,7 @@ import {
   reSyncPrinters,
   saveAllOnAddPrinterTable,
   workerEventFunction
-} from "./printer-manager/actions/printer-manager.functions";
+} from "./printer-manager/printer-manager.functions";
 import { loadCustomGcodeScriptsModel } from "./printer-manager/actions/custom-gcode-scripts.functions";
 import { setupSortablePrintersTable } from "./printer-manager/actions/sortable-table";
 import { configureContainer } from "./container/container";

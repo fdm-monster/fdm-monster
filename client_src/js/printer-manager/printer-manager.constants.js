@@ -36,6 +36,6 @@ export const LABELS = {
 export const CONTAINERS = {
   multiPrintersSection: "multiPrintersSection",
   printerNewTable: "printerNewTable",
-  printerNewList: "printerNewList",
+  newPrinterList: "newPrinterList",
   newPrinterCard: "newPrinterCard"
 };

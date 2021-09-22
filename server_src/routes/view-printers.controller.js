@@ -31,7 +31,7 @@ class ViewPrinters {
   async index(req, res) {
     const printers = await this.#printersStore.listPrintersFlat();
 
-    res.render("printerManagement", {
+    res.render("printer-management", {
       name: req.user.name,
       userGroup: req.user.group,
       version: this.#serverVersion,

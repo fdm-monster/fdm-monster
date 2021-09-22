@@ -6,10 +6,7 @@ import { defaultPrinter } from "./constants/printer.constants";
 import { addClick, elem, withId } from "../common/element.utils";
 import { ACTIONS, CONTAINERS } from "./printer-manager.constants";
 import { litTo, unlitTo } from "../utils/lit.utils";
-import { Directive, directive } from "lit/directive.js";
-import { html } from "lit";
-import { render } from "lit-html";
-import { NewPrinterRowElement } from "./templates/new-printer.element";
+import { NewPrinterTableElement } from "./templates/new-printer-table.element";
 
 let newPrintersIndex = 0;
 
@@ -32,17 +29,17 @@ export class PrintersManagement {
   }
 
   static addPrinter(printer) {
-    const newPrinterTable = elem(CONTAINERS.printerNewTable);
-    const newPrinterList = elem(CONTAINERS.printerNewList);
+    // const newPrinterTable = elem(CONTAINERS.printerNewTable);
+    const newPrinterList = elem(CONTAINERS.newPrinterList);
     const showExample = !!printer;
     let currentIndex = newPrintersIndex;
 
-    if (newPrinterTable.classList.contains("d-none")) {
-      newPrinterTable.classList.remove("d-none");
-    }
+    // if (newPrinterTable.classList.contains("d-none")) {
+    //   newPrinterTable.classList.remove("d-none");
+    // }
 
     // Loses this context
-    litTo(new NewPrinterRowElement({ showExample, printer, index: currentIndex }), newPrinterList);
+    litTo(new NewPrinterTableElement().render(), newPrinterList);
     const newPrinterCard = elem(withId(CONTAINERS.newPrinterCard, currentIndex));
 
     if (!newPrinterCard) {
@@ -52,14 +49,13 @@ export class PrintersManagement {
     //   await PrintersManagement.savePrinter(event.target);
     // });
     addClick(withId(ACTIONS.delButton, currentIndex), (_) => {
-      console.log("delete");
       unlitTo(newPrinterList);
 
-      if (newPrinterTable.rows.length === 1) {
-        if (!newPrinterTable.classList.contains("d-none")) {
-          newPrinterTable.classList.add("d-none");
-        }
-      }
+      // if (newPrinterTable.rows.length === 1) {
+      //   if (!newPrinterTable.classList.contains("d-none")) {
+      //     newPrinterTable.classList.add("d-none");
+      //   }
+      // }
     });
 
     newPrintersIndex++;
