@@ -5,8 +5,11 @@ import { ApplicationError } from "../exceptions/application-error.handler";
 import { defaultPrinter } from "./constants/printer.constants";
 import { addClick, elem, withId } from "../common/element.utils";
 import { ACTIONS, CONTAINERS } from "./printer-manager.constants";
+import { litTo, unlitTo } from "../utils/lit.utils";
+import { Directive, directive } from "lit/directive.js";
+import { html } from "lit";
 import { render } from "lit-html";
-import { newPrinterTemplate } from "./templates/new-printer.html";
+import { NewPrinterRowElement } from "./templates/new-printer.element";
 
 let newPrintersIndex = 0;
 
@@ -29,29 +32,36 @@ export class PrintersManagement {
   }
 
   static addPrinter(printer) {
-    const emptyRow = elem(CONTAINERS.printerNewTable);
-    if (emptyRow.classList.contains("d-none")) {
-      emptyRow.classList.remove("d-none");
-    }
-
+    const newPrinterTable = elem(CONTAINERS.printerNewTable);
     const newPrinterList = elem(CONTAINERS.printerNewList);
     const showExample = !!printer;
-
-    render(newPrinterTemplate({ showExample, printer, index: newPrintersIndex }), newPrinterList);
-
     let currentIndex = newPrintersIndex;
-    addClick(withId(ACTIONS.delButton, newPrintersIndex), (_) => {
-      UI.removeLine(document.getElementById(`newPrinterCard-${currentIndex}`));
-      const table = document.getElementById("printerNewTable");
-      if (table.rows.length === 1) {
-        if (!table.classList.contains("d-none")) {
-          table.classList.add("d-none");
+
+    if (newPrinterTable.classList.contains("d-none")) {
+      newPrinterTable.classList.remove("d-none");
+    }
+
+    // Loses this context
+    litTo(new NewPrinterRowElement({ showExample, printer, index: currentIndex }), newPrinterList);
+    const newPrinterCard = elem(withId(CONTAINERS.newPrinterCard, currentIndex));
+
+    if (!newPrinterCard) {
+      return console.error("Could not load 'newPrinterCard' ", currentIndex);
+    }
+    // addClick(withId(ACTIONS.saveButton, currentIndex), async (event) => {
+    //   await PrintersManagement.savePrinter(event.target);
+    // });
+    addClick(withId(ACTIONS.delButton, currentIndex), (_) => {
+      console.log("delete");
+      unlitTo(newPrinterList);
+
+      if (newPrinterTable.rows.length === 1) {
+        if (!newPrinterTable.classList.contains("d-none")) {
+          newPrinterTable.classList.add("d-none");
         }
       }
     });
-    addClick(`${ACTIONS.saveButton}-${newPrintersIndex}`, async (event) => {
-      await PrintersManagement.savePrinter(event.target);
-    });
+
     newPrintersIndex++;
   }
 
@@ -63,10 +73,10 @@ export class PrintersManagement {
         for (let importedPrinter of importedPrinters) {
           const printer = defaultPrinter();
           printer.name = importedPrinter.name || "";
-          printer.printerURL = importedPrinter.printerURL;
-          printer.camURL = importedPrinter.camURL;
-          printer.group = importedPrinter.group;
-          printer.apiKey = importedPrinter.apiKey;
+          printer.printerURL = importedPrinter.printerURL || "";
+          printer.camURL = importedPrinter.camURL || "";
+          printer.group = importedPrinter.group || "";
+          printer.apiKey = importedPrinter.apiKey || "";
 
           PrintersManagement.addPrinter(printer);
         }
