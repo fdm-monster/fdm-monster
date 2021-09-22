@@ -109,7 +109,8 @@
     "ignore": [
       "views/assets/*",
       "logs/*",
-      "client_src/*"
+      "client_src/*",
+      "client-octofarm/*"
     ],
     "delay": 2500
   }
