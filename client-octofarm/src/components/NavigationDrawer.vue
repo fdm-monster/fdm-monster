@@ -5,7 +5,7 @@
         <v-list-item-title class="text-h5">
           <div class="d-flex align-center">
             <v-img
-                :src="require('@/assets/logo2.png')"
+                :src="require('@/assets/logo.png')"
                 alt="Vuetify Logo"
                 class="shrink mr-2 pt-3"
                 contain
