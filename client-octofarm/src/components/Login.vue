@@ -9,17 +9,17 @@
           <v-card-text>
             <v-form>
               <v-text-field
-                  label="Login"
-                  name="login"
-                  prepend-icon="person"
-                  type="text"
+                label="Login"
+                name="login"
+                prepend-icon="person"
+                type="text"
               ></v-text-field>
               <v-text-field
-                  id="password"
-                  label="Password"
-                  name="password"
-                  prepend-icon="lock"
-                  type="password"
+                id="password"
+                label="Password"
+                name="password"
+                prepend-icon="lock"
+                type="password"
               ></v-text-field>
             </v-form>
           </v-card-text>
@@ -35,12 +35,15 @@
 </template>
 
 <script>
-export default {
-  name: 'Login',
+import { Component } from "vue-property-decorator";
+import Vue from "vue";
+
+@Component({
   props: {
-    source: String,
-  },
-};
+    source: String
+  }
+})
+export default class Login extends Vue {}
 </script>
 
 <style></style>

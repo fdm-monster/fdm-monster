@@ -24,13 +24,10 @@ import { ServerSettings } from "@/models/server-settings";
 })
 export default class App extends Vue {
   @Getter serverSettings: ServerSettings;
-  @Action getServerSettings;
+  @Action getServerSettings: () => Promise<ServerSettings>;
 
   async created() {
     const settings = await this.getServerSettings();
-    console.log(settings);
-
-    console.log(this.serverSettings.server.loginRequired);
   }
 }
 </script>

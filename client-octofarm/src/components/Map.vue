@@ -1,16 +1,16 @@
 <template>
   <v-container>
-    <Login></Login>
+    <Login />
   </v-container>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import Login from "@/components/Login.vue";
+import { Component } from "vue-property-decorator";
 
-export default Vue.extend({
-  name: "HelloWorld",
-  components: {Login},
-  data: () => ({})
-});
+@Component({
+  components: { Login }
+})
+export default class Map extends Vue {}
 </script>

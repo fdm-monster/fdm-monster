@@ -5,12 +5,12 @@
         <v-list-item-title class="text-h5">
           <div class="d-flex align-center">
             <v-img
-                :src="require('@/assets/logo.png')"
-                alt="Vuetify Logo"
-                class="shrink mr-2 pt-3"
-                contain
-                transition="scale-transition"
-                width="40"
+              :src="require('@/assets/logo.png')"
+              alt="Vuetify Logo"
+              class="shrink mr-2 pt-3"
+              contain
+              transition="scale-transition"
+              width="40"
             />
           </div>
         </v-list-item-title>
