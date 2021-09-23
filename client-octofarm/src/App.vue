@@ -1,30 +1,36 @@
 <template>
   <v-app>
-    <NavigationDrawer/>
-    <TopBar/>
+    <NavigationDrawer />
+    <TopBar />
 
     <v-main>
-      <router-view/>
+      <router-view />
     </v-main>
 
-    <v-footer app>
-      <!-- -->
-    </v-footer>
+    <v-footer app></v-footer>
   </v-app>
 </template>
 
 <script lang="ts">
-// https://vuetifyjs.com/en/components/application/#default-application-markup
 import Vue from "vue";
 import NavigationDrawer from "@/components/NavigationDrawer.vue";
 import TopBar from "@/components/TopBar.vue";
+import { Component } from "vue-property-decorator";
+import { Action, Getter } from "vuex-class";
+import { ServerSettings } from "@/models/server-settings";
 
-export default Vue.extend({
-  components: {TopBar, NavigationDrawer},
-  name: "App",
+@Component({
+  components: { TopBar, NavigationDrawer }
+})
+export default class App extends Vue {
+  @Getter serverSettings: ServerSettings;
+  @Action getServerSettings;
 
-  data: () => ({
-    //
-  })
-});
+  async created() {
+    const settings = await this.getServerSettings();
+    console.log(settings);
+
+    console.log(this.serverSettings.server.loginRequired);
+  }
+}
 </script>

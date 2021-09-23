@@ -1,3 +1,5 @@
+const isProduction = process.env.NODE_ENV === "production";
+
 module.exports = {
   root: true,
   env: {
@@ -14,8 +16,10 @@ module.exports = {
     ecmaVersion: 2020
   },
   rules: {
-    "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
-    "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off"
+    "no-console": isProduction ? "warn" : "off",
+    "no-debugger": isProduction ? "warn" : "off",
+    "@typescript-eslint/no-explicit-any": isProduction ? "warn" : "off",
+    "@typescript-eslint/explicit-module-boundary-types": isProduction ? "warn" : "off",
   },
   overrides: [
     {

@@ -11,6 +11,7 @@ const { configureContainer } = require("./container");
 const { scopePerRequest, loadControllers } = require("awilix-express");
 const { OctoFarmTasks } = require("./tasks");
 const { getViewsPath } = require("./app-env");
+const cors = require("cors");
 
 function setupExpressServer() {
   let app = express();
@@ -19,6 +20,11 @@ function setupExpressServer() {
   const userTokenService = container.resolve("userTokenService");
   require("./middleware/passport.js")(passport, userTokenService);
 
+  app.use(
+    cors({
+      origin: "http://localhost:8080"
+    })
+  );
   app.use(express.json());
 
   const viewsPath = getViewsPath();
