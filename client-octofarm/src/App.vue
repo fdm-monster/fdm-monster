@@ -27,7 +27,7 @@ export default class App extends Vue {
   @Action getServerSettings: () => Promise<ServerSettings>;
 
   async created() {
-    const settings = await this.getServerSettings();
+    await this.getServerSettings();
   }
 }
 </script>

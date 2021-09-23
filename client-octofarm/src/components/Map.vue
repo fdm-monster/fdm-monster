@@ -1,6 +1,7 @@
 <template>
   <v-container>
     <Login />
+    <PrinterGrid />
   </v-container>
 </template>
 
@@ -8,9 +9,14 @@
 import Vue from "vue";
 import Login from "@/components/Login.vue";
 import { Component } from "vue-property-decorator";
+import PrinterGrid from "@/components/PrinterGrid.vue";
 
 @Component({
-  components: { Login }
+  components: { Login, PrinterGrid }
 })
-export default class Map extends Vue {}
+export default class Map extends Vue {
+  /*
+  Work in progress
+   */
+}
 </script>

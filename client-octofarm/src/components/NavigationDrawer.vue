@@ -39,9 +39,10 @@ export default {
     return {
       drawer: true,
       items: [
-        ["cable", "Devices", "/"],
-        ["science", "Device Commands", "/device-commands"],
-        ["timeline", "Timeline", "/timeline"]
+        ["home", "Devices", "/"],
+        ["printer", "Printers", "/printers"],
+        ["settings", "Settings", "/settings"],
+        ["history", "History", "/history"]
       ]
     };
   },

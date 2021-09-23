@@ -1,6 +1,5 @@
 <template>
   <v-app-bar app color="primary" dark>
-
     <v-toolbar-title class="text-uppercase white--text">
       <span class="font-weight-light">MTB3D </span>
       <span>Printer Manager</span>
@@ -21,15 +20,13 @@
       <v-icon right>location_on</v-icon>
     </v-btn>
 
-<!--    <v-btn color="grey" dark>-->
-<!--      <span>Disconnect UART</span>-->
-<!--      <v-icon right>usb_off</v-icon>-->
-<!--    </v-btn>-->
+    <!--    <v-btn color="grey" dark>-->
+    <!--      <span>Disconnect UART</span>-->
+    <!--      <v-icon right>usb_off</v-icon>-->
+    <!--    </v-btn>-->
   </v-app-bar>
 </template>
 
 <script>
-export default {
-
-}
+export default {};
 </script>

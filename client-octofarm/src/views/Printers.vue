@@ -1,7 +1,5 @@
 <template>
-  <v-container>
-    <Map />
-  </v-container>
+  <v-container> Printers </v-container>
 </template>
 
 <script lang="ts">
@@ -12,5 +10,5 @@ import { Component } from "vue-property-decorator";
 @Component({
   components: { Map }
 })
-export default class HomePage extends Vue {}
+export default class Printers extends Vue {}
 </script>

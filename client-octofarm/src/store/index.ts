@@ -15,7 +15,7 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    async getServerSettings({ dispatch, commit }) {
+    async getServerSettings({ commit }) {
       const response = await SettingsService.getServerSettings();
 
       commit("saveServerSettings", response);
