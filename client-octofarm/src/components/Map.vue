@@ -9,7 +9,7 @@
 import Vue from "vue";
 import Login from "@/components/Login.vue";
 import { Component } from "vue-property-decorator";
-import PrinterGrid from "@/components/PrinterGrid.vue";
+import PrinterGrid from "@/components/PrinterGrid/PrinterGrid.vue";
 
 @Component({
   components: { Login, PrinterGrid }

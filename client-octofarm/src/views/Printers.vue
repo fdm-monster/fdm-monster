@@ -1,5 +1,9 @@
 <template>
-  <v-container> Printers </v-container>
+  <v-container> Printers
+  <v-data-table>
+
+  </v-data-table>
+  </v-container>
 </template>
 
 <script lang="ts">
