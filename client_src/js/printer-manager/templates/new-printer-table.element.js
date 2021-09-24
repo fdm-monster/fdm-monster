@@ -2,7 +2,6 @@ import { CONTAINERS } from "../printer-manager.constants";
 import "./new-printer.element";
 import { newPrinterRowTemplate } from "./new-printer.element";
 import { html } from "lit-html";
-import { unsafeHTML } from "lit-html/directives/unsafe-html";
 
 export class NewPrinterTableElement {
   constructor() {
@@ -31,7 +30,6 @@ export class NewPrinterTableElement {
   }
 
   render() {
-    console.log(this.headers);
     return html`
       <div class="col-lg-12 mt-2 table-responsive-sm table-responsive-md">
         <table
@@ -42,7 +40,7 @@ export class NewPrinterTableElement {
             <tr>
               ${this.headers.map(
                 (h) =>
-                  unsafeHTML` <th scope="col" class="sticky-table table-dark" style="${h.style}">
+                  html` <th scope="col" class="sticky-table table-dark" style="${h.style}">
                     ${h.title}
                   </th>`
               )}
