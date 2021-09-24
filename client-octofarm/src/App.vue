@@ -6,8 +6,6 @@
     <v-main>
       <router-view />
     </v-main>
-
-    <v-footer app></v-footer>
   </v-app>
 </template>
 
@@ -31,3 +29,7 @@ export default class App extends Vue {
   }
 }
 </script>
+
+<style>
+html { overflow-y: auto }
+</style>
