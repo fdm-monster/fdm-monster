@@ -53,7 +53,8 @@ export default class PrinterGrid extends Vue {
       cellHeight: "140px",
       resizable: {
         handles: "se"
-      }
+      },
+      column: 6
     });
 
     await this.loadPrinters();
