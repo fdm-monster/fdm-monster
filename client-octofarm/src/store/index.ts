@@ -20,14 +20,14 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    async getServerSettings({ commit }) {
+    async loadServerSettings({ commit }) {
       const data = await SettingsService.getServerSettings();
 
       commit("saveServerSettings", data);
 
       return data;
     },
-    async getPrinters({ commit }) {
+    async loadPrinters({ commit }) {
       const data = await PrintersService.getPrinters();
 
       commit("savePrinters", data);
