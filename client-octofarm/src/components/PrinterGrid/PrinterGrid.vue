@@ -4,10 +4,10 @@
     {{ info }}
     <div :id="gridId" class="grid-stack d-flex">
       <GridItem
-        v-for="(item, index) in items"
-        :key="item.message"
-        :data-item="item"
-        :index="index"
+          v-for="(item, index) in items"
+          :key="index"
+          :data-item="item"
+          :index="index"
       />
     </div>
   </div>
@@ -16,13 +16,13 @@
 <script lang="ts">
 import Vue from "vue";
 import Login from "@/components/Login.vue";
-import { Component } from "vue-property-decorator";
-import { GridItemHTMLElement, GridStack } from "gridstack";
+import {Component} from "vue-property-decorator";
+import {GridItemHTMLElement, GridStack} from "gridstack";
 import GridItem from "@/components/PrinterGrid/GridItem.vue";
-import {Getter} from "vuex-class";
+import {Action, Getter} from "vuex-class";
 
 @Component({
-  components: { GridItem, Login }
+  components: {GridItem, Login}
 })
 export default class PrinterGrid extends Vue {
   gridId = "default-grid";
@@ -31,17 +31,13 @@ export default class PrinterGrid extends Vue {
   count = 0;
   info = "";
 
-  items: any[] = [
-    {
-      message: "text",
-      x: 1,
-      y: 2
-    }
-  ];
+  items: any[] = [];
+  newItems: any[] = [];
 
+  @Action getPrinters;
   @Getter printers;
 
-  mounted() {
+  async mounted() {
     this.grid = GridStack.init({
       float: false,
       cellHeight: "100px",
@@ -49,6 +45,13 @@ export default class PrinterGrid extends Vue {
         handles: "se"
       }
     });
+
+    await this.getPrinters();
+
+    for (let [index, printer] of this.printers.entries()) {
+      this.items.push(printer);
+      this.newItems.push({printer, index});
+    }
 
     // Use an arrow function so that `this` is bound to the Vue instance. Alternatively, use a custom Vue directive on the `.grid-stack` container element: https://vuejs.org/v2/guide/custom-directive.html
     this.grid.on("dragstop", (event, element) => {
@@ -59,13 +62,26 @@ export default class PrinterGrid extends Vue {
     });
   }
 
+  updated() {
+    for (let item of this.newItems) {
+      const selector = "printer-" + item.index;
+      if (!document.getElementById(selector)) {
+        // Render failed
+        console.warn(`Grid item meant for rerender not found: ${selector}`);
+      } else {
+        this.grid.makeWidget("#printer-" + item.index);
+      }
+    }
+    this.newItems = [];
+  }
+
   addNewWidget() {
-    this.items.push({
-      x: Math.round(12 * Math.random()),
-      y: Math.round(5 * Math.random()),
-      w: Math.round(1 + 3 * Math.random()),
-      h: Math.round(1 + 3 * Math.random())
-    });
+    const newItem = {
+      message: "text",
+      index: this.items.length
+    };
+    this.items.push(newItem);
+    this.newItems.push(newItem);
   }
 }
 </script>

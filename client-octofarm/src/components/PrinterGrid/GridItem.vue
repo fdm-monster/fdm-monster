@@ -1,6 +1,6 @@
 <template>
   <div
-    :id="this.dataItem.id"
+    :id="'printer-'+this.index"
     :gs-h="this.dataItem.h"
     :gs-id="this.dataItem.id"
     :gs-max-h="this.dataItem.maxH"
@@ -15,7 +15,6 @@
     <div class="grid-stack-item-content" draggable="true" style="border: 1px solid orange">
       <p>text</p>
     </div>
-    <div class="ui-resizable-handle ui-resizable-se" style="z-index: 100; user-select: none"></div>
   </div>
 </template>
 <script>
