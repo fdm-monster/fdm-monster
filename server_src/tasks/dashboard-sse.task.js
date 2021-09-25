@@ -44,7 +44,7 @@ class DashboardSseTask {
     const sseData = {
       printersInformation: serializablePrinterStates,
       currentOperations,
-      dashStatistics: [],
+      dashStatistics: null,
       dashboardSettings
     };
 

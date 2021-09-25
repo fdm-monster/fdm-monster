@@ -1,10 +1,23 @@
 <template>
-  <div class="grid-stack-item" :gs-w="this.dataItem.w" :gs-x="this.dataItem.x" :gs-y="this.dataItem.y">
-    <div class="grid-stack-item-content">
+  <div :id="this.dataItem.id"
+       :gs-h="this.dataItem.h"
+       :gs-id="this.dataItem.id"
+       :gs-min-h="this.dataItem.minH"
+       :gs-max-h="this.dataItem.maxH"
+       :gs-min-w="this.dataItem.minW"
+       :gs-max-w="this.dataItem.maxW"
+       :gs-w="this.dataItem.w"
+       :gs-x="this.dataItem.x"
+       :gs-y="this.dataItem.y"
+       class="grid-stack-item"
+  >
+    <div class="grid-stack-item-content"
+         draggable="true">
       <p>
         text
       </p>
     </div>
+    <div class="ui-resizable-handle ui-resizable-se" style="z-index: 100; user-select: none;"></div>
   </div>
 </template>
 <script>

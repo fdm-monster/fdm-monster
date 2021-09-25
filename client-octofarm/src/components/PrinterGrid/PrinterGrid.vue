@@ -3,6 +3,16 @@
     <v-btn color="primary" type="button" @click="addNewWidget()">Add Widget</v-btn>
     {{ info }}
     <div :id="gridId" class="grid-stack d-flex">
+      <div class="grid-stack-item">
+        <div class="grid-stack-item-content">
+          asd
+        </div>
+      </div>
+      <div class="grid-stack-item" :gs-y="2">
+        <div class="grid-stack-item-content">
+          asd
+        </div>
+      </div>
       <GridItem v-for="(item, index) in items" :key="item.message" :data-item="item" :index="index"
       >
         text2
@@ -35,7 +45,7 @@ export default class PrinterGrid extends Vue {
   count = 0;
   info = "";
 
-  items = [
+  items:any[] = [
   ];
 
   mounted() {
@@ -55,6 +65,7 @@ export default class PrinterGrid extends Vue {
       // this.info = `you just dragged node #${node.id} to ${node.x},${node.y} – good job!`;
     });
     this.grid.batchUpdate();
+
     // this.grid.engine.nodes.forEach(function (node) {
     //   const item = items.find(function (e) {
     //     return e.id === node.id;
