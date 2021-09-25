@@ -1,13 +1,13 @@
 <template>
   <div>
-    <v-btn color="primary" type="button" @click="addNewWidget()">Add Widget</v-btn>
+    <v-btn color="primary" type="button" @click="addNewPrinter()">Add Widget</v-btn>
     {{ info }}
     <div :id="gridId" class="grid-stack d-flex">
       <GridItem
           v-for="(item, index) in items"
           :key="index"
           :data-item="item"
-          :index="index"
+          :selector="'printer-'+index"
       />
     </div>
   </div>
@@ -40,7 +40,7 @@ export default class PrinterGrid extends Vue {
   async mounted() {
     this.grid = GridStack.init({
       float: false,
-      cellHeight: "100px",
+      cellHeight: "120px",
       resizable: {
         handles: "se"
       }
@@ -48,17 +48,14 @@ export default class PrinterGrid extends Vue {
 
     await this.getPrinters();
 
-    for (let [index, printer] of this.printers.entries()) {
-      this.items.push(printer);
-      this.newItems.push({printer, index});
+    for (let printer of this.printers) {
+      this.addNewPrinter(printer);
     }
 
-    // Use an arrow function so that `this` is bound to the Vue instance. Alternatively, use a custom Vue directive on the `.grid-stack` container element: https://vuejs.org/v2/guide/custom-directive.html
     this.grid.on("dragstop", (event, element) => {
       if (!element) return;
       const node = (element as GridItemHTMLElement)?.gridstackNode;
       if (!node) return;
-      // this.info = `you just dragged node #${node.id} to ${node.x},${node.y} – good job!`;
     });
   }
 
@@ -75,13 +72,17 @@ export default class PrinterGrid extends Vue {
     this.newItems = [];
   }
 
-  addNewWidget() {
-    const newItem = {
-      message: "text",
-      index: this.items.length
-    };
-    this.items.push(newItem);
-    this.newItems.push(newItem);
+  addNewPrinter(printer) {
+    // We add a placeholder
+    if (!printer) {
+      printer = {
+        message: "text",
+        index: this.items.length,
+      };
+    }
+
+    this.items.push(printer);
+    this.newItems.push({printer, index:this.items.length});
   }
 }
 </script>
