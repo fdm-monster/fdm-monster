@@ -18,8 +18,9 @@ module.exports = {
   rules: {
     "no-console": isProduction ? "warn" : "off",
     "no-debugger": isProduction ? "warn" : "off",
+    "no-unreachable": isProduction ? "warn" : "off",
     "@typescript-eslint/no-explicit-any": isProduction ? "warn" : "off",
-    "@typescript-eslint/explicit-module-boundary-types": isProduction ? "warn" : "off",
+    "@typescript-eslint/explicit-module-boundary-types": isProduction ? "warn" : "off"
   },
   overrides: [
     {

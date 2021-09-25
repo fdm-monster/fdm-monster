@@ -1,60 +1,78 @@
 <template>
-  <div
-    :id="this.selector"
-    :gs-h="this.dataItem.h"
-    :gs-id="this.dataItem._id"
-    :gs-max-h="this.dataItem.maxH"
-    :gs-max-w="this.dataItem.maxW"
-    :gs-min-h="this.dataItem.minH"
-    :gs-min-w="this.dataItem.minW || 2"
-    :gs-w="this.dataItem.w"
-    :gs-x="this.dataItem.x"
-    :gs-y="this.dataItem.y"
-    class="grid-stack-item"
+  <v-card
+      :id="this.selector"
+      :class="`grid-stack-item ${this.dataItem.skeleton ? '' : 'elevation-12'}`"
+      :gs-h="this.dataItem.h"
+      :gs-id="this.dataItem._id"
+      :gs-max-h="this.dataItem.maxH"
+      :gs-max-w="this.dataItem.maxW"
+      :gs-min-h="this.dataItem.minH"
+      :gs-min-w="this.dataItem.minW"
+      :gs-w="this.dataItem.w"
+      :gs-x="this.dataItem.x"
+      :gs-y="this.dataItem.y"
   >
-    <v-btn
-        style="margin-top:14px; margin-right:15px"
-        color="pink"
-        dark
-        absolute
-        top
-        right
-        fab
-    >
-      <v-icon>location_on</v-icon>
-    </v-btn>
-    <div class="grid-stack-item-content" draggable="true">
-      <v-container>
-        <p>{{ this.getPrinterName() }}</p>
-      </v-container>
-    </div>
-  </div>
+    <v-speed-dial v-model="fab" direction="right" hidden right>
+      <template v-slot:activator>
+        <v-btn absolute color="secondary" dark fab right top x-small>
+          <v-icon v-if="fab">close</v-icon>
+          <v-icon v-else>more_vert</v-icon>
+        </v-btn>
+      </template>
+      <v-btn color="primary" fab x-small>
+        <v-icon>upload</v-icon>
+      </v-btn>
+      <v-btn color="indigo" fab x-small>
+        <v-icon>settings</v-icon>
+      </v-btn>
+    </v-speed-dial>
+
+    <v-toolbar :color="dataItem.skeleton ? 'secondary' : 'primary'" dark dense>{{ this.getPrinterName() }}</v-toolbar>
+    <v-card-text class="grid-stack-item-content">
+      {{ dataItem.skeleton ? 'not set up' : 'Printing' }}
+    </v-card-text>
+    <v-card-actions>
+      0%
+    </v-card-actions>
+  </v-card>
 </template>
 <script>
 import Vue from "vue";
 import Component from "vue-class-component";
-import { Prop } from "vue-property-decorator";
-import "gridstack/dist/gridstack.min.css";
-import "gridstack/dist/h5/gridstack-dd-native";
+import {Prop} from "vue-property-decorator";
 
 @Component
 export default class GridItem extends Vue {
   @Prop() dataItem;
   @Prop() selector;
+  @Prop() grid;
 
-  // created() {}
+  skeleton = this.dataItem?.skeleton;
+  fab = false;
+
+  created() {
+    console.log(this.skeleton);
+  }
+
+  updated() {
+    // The grid item is dereferenced on every update
+    this.grid.removeWidget(`#${this.selector}`, false);
+    this.grid.makeWidget(`#${this.selector}`);
+  }
 
   getPrinterName() {
-    return this.dataItem.printerName || this.dataItem.printerURL;
+    return this.dataItem.printerName || this.dataItem.printerURL?.replace("http://", "");
   }
 }
 </script>
 
 <style>
 .grid-stack-item-content {
-  border-radius: 10px;
-  border: 2px solid darkred;
-  box-shadow: -1px 1px #590b0b, -2px 2px #590b0b, -3px 3px #590b0b, -4px 4px #590b0b,
-  -5px 5px #590b0b;
+  border: 0 solid red;
+  transition: border 0.6s;
+}
+
+.grid-stack-item-content:hover {
+  border-color: #ffa9a9;
 }
 </style>

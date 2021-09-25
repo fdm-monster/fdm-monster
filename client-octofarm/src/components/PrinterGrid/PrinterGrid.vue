@@ -1,13 +1,14 @@
 <template>
   <div>
-    <v-btn color="primary" type="button" @click="addNewPrinter()">Add Widget</v-btn>
+    <v-btn color="primary" type="button" @click="addNewPrinter()" class="mb-3">Add Widget</v-btn>
     <div :id="gridId" class="grid-stack d-flex">
       <GridItem
-          v-for="(item, index) in items"
+          v-for="(item, index,skeleton) in items"
           :key="index"
           :data-item="item"
-          :selector="'printer-tile-' + index.toString()"
-          @hook:updated="childMounted"
+          :grid="grid"
+          :selector="itemPrefix + index.toString()"
+          :skeleton="skeleton"
       />
     </div>
   </div>
@@ -21,6 +22,10 @@ import {GridItemHTMLElement, GridStack} from "gridstack";
 import GridItem from "@/components/PrinterGrid/GridItem.vue";
 import {Action, Getter} from "vuex-class";
 import {Printer} from "@/models/printers/printer.model";
+import "gridstack/dist/gridstack.min.css";
+// Required for custom columns
+import "gridstack/dist/gridstack-extra.min.css";
+import "gridstack/dist/h5/gridstack-dd-native";
 
 @Component({
   components: {GridItem, Login}
@@ -44,7 +49,7 @@ export default class PrinterGrid extends Vue {
 
     this.items = [];
     this.grid = GridStack.init({
-      float: false,
+      float: true,
       cellHeight: "140px",
       resizable: {
         handles: "se"
@@ -62,17 +67,12 @@ export default class PrinterGrid extends Vue {
       const node = (element as GridItemHTMLElement)?.gridstackNode;
       if (!node) return;
     });
-    console.log("Mounted");
-    // if (this.grid.engine.nodes.length !== this.printers.length) {
-    //   console.log("grid not updated", this.grid.engine.nodes.length, this.items.length);
-    //   this.items.forEach(i => this.addNewPrinter(i))
-    // }
   }
 
   childMounted() {
     // Fix the hot-reload issue
     if (Vue.config.devtools) {
-      location.reload();
+      // location.reload();
     }
   }
 
@@ -86,12 +86,12 @@ export default class PrinterGrid extends Vue {
         this.grid.makeWidget(`#${this.itemPrefix}${item.index}`);
       }
     }
-    this.newItems = [];
+    if (this.newItems.length !== 0) this.newItems = [];
   }
 
   addNewPrinter(printer?: Printer) {
     // We can add a placeholder in case of undef printer
-    if (!printer) printer = {};
+    if (!printer) printer = {skeleton:true};
     this.newItems.push({printer, index: this.items.length});
     this.items.push(printer);
   }
