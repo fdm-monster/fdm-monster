@@ -150,6 +150,7 @@ class PrinterState {
 
     flatJob = JobsCache.postProcessJob(flatJob, costSettings);
     const fileList = this.#fileCache.getPrinterFiles(this.#id);
+
     // TODO call files store for thumb
     // const foundFile = _.find(printerState.getFileList().files, (o) => {
     //   return o.name === printerJob.file.name;

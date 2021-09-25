@@ -19,6 +19,7 @@ import Login from "@/components/Login.vue";
 import { Component } from "vue-property-decorator";
 import { GridItemHTMLElement, GridStack } from "gridstack";
 import GridItem from "@/components/PrinterGrid/GridItem.vue";
+import {Getter} from "vuex-class";
 
 @Component({
   components: { GridItem, Login }
@@ -37,6 +38,8 @@ export default class PrinterGrid extends Vue {
       y: 2
     }
   ];
+
+  @Getter printers;
 
   mounted() {
     this.grid = GridStack.init({
@@ -62,14 +65,6 @@ export default class PrinterGrid extends Vue {
       y: Math.round(5 * Math.random()),
       w: Math.round(1 + 3 * Math.random()),
       h: Math.round(1 + 3 * Math.random())
-    });
-    this.$forceUpdate();
-    this.grid = GridStack.init({
-      float: false,
-      cellHeight: "100px",
-      resizable: {
-        handles: "se"
-      }
     });
   }
 }

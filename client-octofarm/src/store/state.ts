@@ -5,9 +5,11 @@ import { serverSettingsState } from "@/store/server-settings/server-settings.sta
 type StateGetter = GetterTree<State, any>;
 
 export const state: State = {
-  serverSettings: serverSettingsState
+  serverSettings: serverSettingsState,
+  printers: []
 };
 
 export const getters: StateGetter = {
-  serverSettings: (state) => state.serverSettings
+  serverSettings: (state) => state.serverSettings,
+  printers: (state) => state.printers
 };

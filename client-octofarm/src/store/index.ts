@@ -2,7 +2,9 @@ import Vue from "vue";
 import Vuex from "vuex";
 import { getters, state } from "@/store/state";
 import { SettingsService } from "@/backend/settings.service";
-import { ServerSettings } from "@/models/server-settings";
+import { ServerSettings } from "@/models/server-settings.model";
+import { PrintersService } from "@/backend/printers.service";
+import { Printer } from "@/models/printers/printer.model";
 
 Vue.use(Vuex);
 
@@ -12,15 +14,25 @@ export default new Vuex.Store({
   mutations: {
     saveServerSettings: (state, settings: ServerSettings) => {
       state.serverSettings = settings;
+    },
+    savePrinters: (state, printers: Printer[]) => {
+      state.printers = printers;
     }
   },
   actions: {
     async getServerSettings({ commit }) {
-      const response = await SettingsService.getServerSettings();
+      const data = await SettingsService.getServerSettings();
 
-      commit("saveServerSettings", response);
+      commit("saveServerSettings", data);
 
-      return response;
+      return data;
+    },
+    async getPrinters({ commit }) {
+      const data = await PrintersService.getPrinters();
+
+      commit("savePrinters", data);
+
+      return data;
     }
   },
   modules: {}

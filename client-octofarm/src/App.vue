@@ -15,7 +15,8 @@ import NavigationDrawer from "@/components/NavigationDrawer.vue";
 import TopBar from "@/components/TopBar.vue";
 import { Component } from "vue-property-decorator";
 import { Action, Getter } from "vuex-class";
-import { ServerSettings } from "@/models/server-settings";
+import { ServerSettings } from "@/models/server-settings.model";
+import {Printer} from "@/models/printers/printer.model";
 
 @Component({
   components: { TopBar, NavigationDrawer }
@@ -23,9 +24,11 @@ import { ServerSettings } from "@/models/server-settings";
 export default class App extends Vue {
   @Getter serverSettings: ServerSettings;
   @Action getServerSettings: () => Promise<ServerSettings>;
+  @Action getPrinters: () => Promise<Printer[]>;
 
   async created() {
     await this.getServerSettings();
+    await this.getPrinters();
   }
 }
 </script>

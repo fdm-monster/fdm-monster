@@ -31,7 +31,7 @@ export default class GridItem extends Vue {
   @Prop() index;
 
   created() {
-    console.log("tes");
+    return;
   }
 }
 </script>
