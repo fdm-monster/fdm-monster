@@ -1,23 +1,18 @@
-[comment]: <> ([![Latest Release]&#40;https://img.shields.io/github/release/davidzwa/octofarm-experiments?style=for-the-badge&#41;]&#40;https://img.shields.io/github/v/tag/davidzwa/octofarm-experiments?sort=date&#41;)
-![Docker Pulls](https://img.shields.io/docker/pulls/davidzwa/octofarm-experiments?style=for-the-badge)
-![GitHub release (latest by date)](https://img.shields.io/github/downloads/davidzwa/octofarm-experiments/latest/total?style=for-the-badge)
-[![GitHub stars](https://img.shields.io/github/stars/davidzwa/octofarm-experiments?style=for-the-badge)](https://github.com/davidzwa/octofarm-experiments/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/davidzwa/octofarm-experiments?style=for-the-badge)](https://github.com/davidzwa/octofarm-experiments/network)
+[comment]: <> ([![Latest Release]&#40;https://img.shields.io/github/release/davidzwa/octofarm-experiments?style=for-the-badge&#41;]&#40;https://img.shields.io/github/v/tag/davidzwa/3d-print-farm?sort=date&#41;)
+![Docker Pulls](https://img.shields.io/docker/pulls/davidzwa/3d-print-farm?style=for-the-badge)
+![GitHub release (latest by date)](https://img.shields.io/github/downloads/davidzwa/3d-print-farm/latest/total?style=for-the-badge)
+[![GitHub stars](https://img.shields.io/github/stars/davidzwa/3d-print-farm?style=for-the-badge)](https://github.com/davidzwa/3d-print-farm/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/davidzwa/3d-print-farm?style=for-the-badge)](https://github.com/davidzwa/3d-print-farm/network)
 
-[![GitHub license](https://img.shields.io/github/license/davidzwa/octofarm-experiments?style=for-the-badge)](https://github.com/davidzwa/octofarm-experiments/blob/master/LICENSE.txt)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/davidzwa/octofarm-experiments/ci?style=for-the-badge)
-![GitHub issues](https://img.shields.io/github/issues/davidzwa/octofarm-experiments?color=green&style=for-the-badge)
-[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg?style=for-the-badge)](https://GitHub.com/davidzwa/octofarm-experiments/graphs/commit-activity)
-[![Download Dockerhub](https://img.shields.io/badge/DOCKERHUB-OCTOFARM-<COLOR>.svg?style=for-the-badge)](https://hub.docker.com/r/davidzwa/octofarm-experiments)
+[![GitHub license](https://img.shields.io/github/license/davidzwa/3d-print-farm?style=for-the-badge)](https://github.com/davidzwa/3d-print-farm/blob/master/LICENSE.txt)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/davidzwa/3d-print-farm/ci?style=for-the-badge)
+![GitHub issues](https://img.shields.io/github/issues/davidzwa/3d-print-farm?color=green&style=for-the-badge)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg?style=for-the-badge)](https://GitHub.com/davidzwa/3d-print-farm/graphs/commit-activity)
 
-# OctoFarm [![Latest Release](https://img.shields.io/github/release/davidzwa/octofarm-experiments)](https://img.shields.io/github/v/tag/davidzwa/octofarm-experiments?sort=date)
+# 3D Print Farm [![Latest Release](https://img.shields.io/github/release/davidzwa/3d-print-farm)](https://img.shields.io/github/v/tag/davidzwa/3d-print-farm?sort=date)
 <div align="center">
-  <a href="https://github.com/davidzwa/octofarm-experiments">
-    <img src="https://github.com/davidzwa/octofarm-experiments/blob/main/views/images/logo.png?raw=true" alt="Logo" width="400px">
-  </a>
-
   <p align="center">
-    OctoFarm experimentation repository. Not a hard fork, use at your own risk.
+    An OctoPrint printer manager and dasbhoard written in Vue with Typescript. Originally based on code written for OctoFarm, now boosted for higher code quality and robustness.
   </p>
 </div>
 
@@ -25,5 +20,5 @@
 Distributed under GNU Affero General Public License v3.0. See `LICENSE` for more information.
 
 ## Contact
-- Main repository: [https://github.com/octofarm/octofarm](https://github.com/octofarm/OctoFarm)
-- Discord: [Discord](https://discord.gg/vjabMUn)
+- Main repository: [https://github.com/davidzwa/3d-print-farm](https://github.com/davidzwa/3d-print-farm)
+- Discord: T.B.A.
