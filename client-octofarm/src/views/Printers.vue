@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-card-title>
-      Nutrition
+      Printers
       <v-spacer></v-spacer>
     <v-text-field
         class="p-2"
