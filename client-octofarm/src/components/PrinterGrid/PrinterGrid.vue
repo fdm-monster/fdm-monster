@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-btn color="primary" type="button" @click="addNewPrinter()" class="mb-3">Add Widget</v-btn>
+    <v-btn class="mb-3" color="primary" type="button" @click="addNewPrinter()">Add Widget</v-btn>
     <div :id="gridId" class="grid-stack d-flex">
       <GridItem
           v-for="(item, index,skeleton) in items"
@@ -45,7 +45,7 @@ export default class PrinterGrid extends Vue {
   @Getter printers: Printer[];
 
   async mounted() {
-    if (this.items.length) return;
+    // if (this.items.length) return;
 
     this.items = [];
     this.grid = GridStack.init({
@@ -90,11 +90,19 @@ export default class PrinterGrid extends Vue {
     if (this.newItems.length !== 0) this.newItems = [];
   }
 
-  addNewPrinter(printer?: Printer) {
+  addNewPrinter(printer?: Printer | { skeleton: boolean }) {
     // We can add a placeholder in case of undef printer
-    if (!printer) printer = {skeleton:true};
+    if (!printer) printer = {skeleton: true};
     this.newItems.push({printer, index: this.items.length});
     this.items.push(printer);
   }
 }
 </script>
+
+<style>
+.grid-stack {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  padding: 10px;
+}
+</style>

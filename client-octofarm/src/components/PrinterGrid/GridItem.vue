@@ -75,4 +75,5 @@ export default class GridItem extends Vue {
 .grid-stack-item-content:hover {
   border-color: #ffa9a9;
 }
+
 </style>
