@@ -59,7 +59,7 @@ describe("SSE-dashboard", () => {
               farmProgressColour: expect.any(String)
             }
           },
-          dashStatistics: [], // Work in progress
+          dashStatistics: null, // Work in progress, should be {} type
           dashboardSettings: getDefaultDashboardSettings()
         });
 
