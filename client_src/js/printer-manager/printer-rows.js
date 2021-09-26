@@ -9,6 +9,7 @@ import OctoFarmClient from "../services/octofarm-client.service";
 import { updatePrinterSettingsModal } from "../lib/modules/printerSettings";
 import { addClick, elem, withId } from "../common/element.utils";
 import { ACTIONS, CONTAINERS, LABELS } from "../common/quick-action.constants";
+import { ACTIONS as PARENT_ACTIONS } from "./printer-manager.constants";
 import { initQuickActionButtons } from "../common/quick-actions.manager";
 
 const printerList = elem("printerList");
@@ -99,7 +100,7 @@ function corsWarningCheck(printer) {
 
 function checkForOctoPrintUpdate(printer) {
   let updateButton = elem(withId(ACTIONS.octoprintUpdate, printer._id));
-  let bulkOctoPrintUpdateButton = elem(ACTIONS.blkUpdatePluginsBtn);
+  let bulkOctoPrintUpdateButton = elem(PARENT_ACTIONS.blkUpdatePluginsBtn);
   if (printer?.octoPrintUpdate?.updateAvailable) {
     if (updateButton.disabled) {
       UI.updateElem(false, updateButton, "disabled");
@@ -121,7 +122,7 @@ function checkForOctoPrintUpdate(printer) {
 
 function checkForOctoPrintPluginUpdates(printer) {
   let updatePluginButton = elem(withId(ACTIONS.octoprintPluginUpdate, printer._id));
-  let bulkPluginUpdateButton = elem(ACTIONS.blkUpdatePluginsBtn);
+  let bulkPluginUpdateButton = elem(PARENT_ACTIONS.blkUpdatePluginsBtn);
   if (printer.octoPrintPluginUpdates && printer.octoPrintPluginUpdates.length > 0) {
     if (updatePluginButton.disabled) {
       updatePluginButton.disabled = false;

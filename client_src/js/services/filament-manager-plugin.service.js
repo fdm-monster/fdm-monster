@@ -72,25 +72,6 @@ export async function setupFilamentManagerReSyncBtn() {
   }
 }
 
-// TODO: re-enable at some point
-// export async function returnSelected(id, profiles) {
-//   console.log("Return Selected");
-//   let profileId = null;
-//   const filamentManager = await checkFilamentManager();
-//   if (filamentManager) {
-//     profileId = _.findIndex(profiles, function (o) {
-//       return o.profile.index == id.spools.profile;
-//     });
-//   } else {
-//     profileId = _.findIndex(profiles, function (o) {
-//       return o._id == id.spools.profile;
-//     });
-//   }
-//   return `${id.spools.name} (${(id.spools.weight - id.spools.used).toFixed(
-//     0
-//   )}g) - ${profiles[profileId].profile.material}`;
-// }
-
 export async function returnDropDown(history) {
   try {
     let dropDownLists = await OctoFarmClient.getFilamentDropDownList();

@@ -4,6 +4,7 @@ const { AppConstants } = require("../app.constants");
 const { validateInput } = require("../handlers/validators");
 const { idRules } = require("./validation/generic.validation");
 const { getCostSettingsDefault } = require("../constants/service.constants");
+const { NotImplementedException } = require("../exceptions/runtime.exceptions");
 
 class HistoryController {
   #serverVersion;
@@ -23,6 +24,11 @@ class HistoryController {
     res.send({ history });
   }
 
+  async stats(req, res) {
+    const stats = this.#historyCache.generateStatistics();
+    res.send({ history: stats });
+  }
+
   async delete(req, res) {
     const data = await validateInput(req.params, idRules);
     const historyId = data.id;
@@ -30,7 +36,7 @@ class HistoryController {
     await History.findOneAndDelete({ _id: historyId }).then(() => {
       this.#historyCache.initCache();
     });
-    res.send("success");
+    res.send();
   }
 
   async update(req, res) {
@@ -44,7 +50,7 @@ class HistoryController {
     const latest = req.body;
     const { note } = latest;
     const { filamentId } = latest;
-    const history = await History.findOne({ _id: latest.id });
+    const history = await History.findOne({ _id: historyId });
     if (history.printHistory.notes != note) {
       history.printHistory.notes = note;
     }
@@ -116,28 +122,28 @@ class HistoryController {
     res.send("success");
   }
 
-  async stats(req, res) {
-    const stats = this.#historyCache.generateStatistics();
-    res.send({ history: stats });
-  }
-
   /**
    * Get specific printer statistics, although I have no idea why that's related to history
    * @param req
    * @param res
    * @returns {Promise<void>}
    */
-  async printerStats(req, res) {
-    const printerID = req.params.id;
-    let stats = await PrinterClean.generatePrinterStatistics(printerID);
-    res.send(stats);
+  async getPrinterStats(req, res) {
+    const params = await validateInput(req.params, idRules);
+
+    // let stats = await PrinterClean.generatePrinterStatistics(params.id);
+    // res.send(stats);
+
+    // TODO implement or delete
+    throw new NotImplementedException();
   }
 
-  async updateCostMatch(req, res) {
-    const latest = req.body;
+  async updateCostSettings(req, res) {
+    const params = await validateInput(req.params, idRules);
+    const latestHistoryId = params.id;
 
     // Find history and matching printer ID
-    const historyEntity = await History.findOne({ _id: latest.id });
+    const historyEntity = await History.findOne({ _id: latestHistoryId });
     const printers = await Printers.find({});
     const printer = _.findIndex(printers, function (o) {
       return o.settingsAppearance.name === historyEntity.printHistory.printerName;
@@ -177,5 +183,5 @@ module.exports = createController(HistoryController)
   .delete("/:id", "delete")
   .put("/:id", "update")
   .get("/stats", "stats")
-  .get("/printer-stats/:id", "printerStats")
-  .patch("/update-cost-match", "updateCostMatch");
+  .patch("/:id/cost-settings", "updateCostMatch")
+  .get("/:id/printer-stats", "getPrinterStats");

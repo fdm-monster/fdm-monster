@@ -196,139 +196,141 @@ export default class PrinterSelect {
   }
 
   static async create(element, editable, action, callback) {
-    let saveEditsBtn = document.getElementById("saveEditsBtn");
-    if (saveEditsBtn) {
-      saveEditsBtn.remove();
-    }
-    if (action) {
-      document.getElementById("printerSelectTitle").innerHTML = action;
-    }
-    //Setup elements
-    element.innerHTML = "";
-    element.innerHTML = printersTable;
-    let messageBox = document.getElementById("selectMessageBox");
-    messageBox.innerHTML = "";
-    let override = false;
-    if (action === "Printer Deletion") {
-      override = true;
-      messageBox.innerHTML = deleteMessage;
-    } else if (action === "Edit Printers") {
-      messageBox.innerHTML = editMessage;
-    } else if (action === "Disconnect Printers") {
-      messageBox.innerHTML = disconnectMessage;
-    } else if (action === "Connect Printers") {
-      messageBox.innerHTML = connectMessage;
-    } else if (action === "Install Plugins") {
-      messageBox.innerHTML = pluginInstallMessage;
-    } else if (action === "Power On/Off Printers") {
-      messageBox.innerHTML = powerOnOffMessage;
-    } else if (action === "Pre-Heat Printers") {
-      messageBox.innerHTML = preHeatMessage;
-    } else if (action === "Control Printers") {
-      messageBox.innerHTML = controlPrintersMessage;
-    } else if (action === "Send Gcode to Printers") {
-      messageBox.innerHTML = gcodePrintersMessage;
-    }
+    return async () => {
+      let saveEditsBtn = document.getElementById("saveEditsBtn");
+      if (saveEditsBtn) {
+        saveEditsBtn.remove();
+      }
+      if (action) {
+        document.getElementById("printerSelectTitle").innerHTML = action;
+      }
+      //Setup elements
+      element.innerHTML = "";
+      element.innerHTML = printersTable;
+      let messageBox = document.getElementById("selectMessageBox");
+      messageBox.innerHTML = "";
+      let override = false;
+      if (action === "Printer Deletion") {
+        override = true;
+        messageBox.innerHTML = deleteMessage;
+      } else if (action === "Edit Printers") {
+        messageBox.innerHTML = editMessage;
+      } else if (action === "Disconnect Printers") {
+        messageBox.innerHTML = disconnectMessage;
+      } else if (action === "Connect Printers") {
+        messageBox.innerHTML = connectMessage;
+      } else if (action === "Install Plugins") {
+        messageBox.innerHTML = pluginInstallMessage;
+      } else if (action === "Power On/Off Printers") {
+        messageBox.innerHTML = powerOnOffMessage;
+      } else if (action === "Pre-Heat Printers") {
+        messageBox.innerHTML = preHeatMessage;
+      } else if (action === "Control Printers") {
+        messageBox.innerHTML = controlPrintersMessage;
+      } else if (action === "Send Gcode to Printers") {
+        messageBox.innerHTML = gcodePrintersMessage;
+      }
 
-    const groupList = [];
-    const printerList = [];
+      const groupList = [];
+      const printerList = [];
 
-    const printers = await OctoFarmClient.listPrinters();
-    printers.forEach((printer) => {
-      if (
-        typeof printer.printerState !== "undefined" &&
-        this.isOffline(printer.printerState.colour.category, editable, override)
-      ) {
-        let spoolName = "";
-        if (printer.selectedFilament && printer.selectedFilament.length !== 0) {
-          printer.selectedFilament.forEach((spool, index) => {
-            if (spool !== null) {
-              spoolName += `Tool ${index}: ${spool.spools.name} - ${spool.spools.material} <br>`;
-            } else {
-              spoolName += `Tool ${index}: No Spool Selected <br>`;
-            }
-          });
-        } else {
-          spoolName = "No Spool Selected";
+      const printers = await OctoFarmClient.listPrinters();
+      printers.forEach((printer) => {
+        if (
+          typeof printer.printerState !== "undefined" &&
+          this.isOffline(printer.printerState.colour.category, editable, override)
+        ) {
+          let spoolName = "";
+          if (printer.selectedFilament && printer.selectedFilament.length !== 0) {
+            printer.selectedFilament.forEach((spool, index) => {
+              if (spool !== null) {
+                spoolName += `Tool ${index}: ${spool.spools.name} - ${spool.spools.material} <br>`;
+              } else {
+                spoolName += `Tool ${index}: No Spool Selected <br>`;
+              }
+            });
+          } else {
+            spoolName = "No Spool Selected";
+          }
+          const forList = {
+            id: printer._id,
+            index: printer.sortIndex,
+            name: printer.printerName,
+            printerURL: printer.printerURL,
+            state: printer.printerState.colour.category,
+            group: printer.group,
+            spool: spoolName,
+            camURL: printer.camURL,
+            apiKey: printer.apiKey
+          };
+          printerList.push(forList);
         }
-        const forList = {
-          id: printer._id,
-          index: printer.sortIndex,
-          name: printer.printerName,
-          printerURL: printer.printerURL,
-          state: printer.printerState.colour.category,
-          group: printer.group,
-          spool: spoolName,
-          camURL: printer.camURL,
-          apiKey: printer.apiKey
-        };
-        printerList.push(forList);
-      }
-      if (printer.group !== "") {
-        const group = {
-          display: printer.group,
-          tag: printer.group.replace(/\s/g, "_")
-        };
-        groupList.push(group);
-      }
-    });
-
-    const groupListUnique = _.uniq(groupList, "tag");
-    if (printerList.length !== 0) {
-      //Create printers table
-
-      const tableBody = document.getElementById("printerSelectBody");
-      if (editable) {
-        document.getElementById("spoolColumn").classList.add("d-none");
-        document.getElementById("stateColumn").classList.add("d-none");
-        document.getElementById("cameraColumn").classList.remove("d-none");
-        document.getElementById("apiColumn").classList.remove("d-none");
-        document.getElementById("selectColumn").classList.add("d-none");
-        document.getElementById("urlColumn").classList.remove("d-none");
-
-        printerList.forEach((printer) => {
-          tableBody.insertAdjacentHTML("beforeend", this.getEditableList(printer));
-        });
-      } else {
-        printerList.forEach((printer) => {
-          tableBody.insertAdjacentHTML("beforeend", this.getSelectableList(printer));
-        });
-      }
-
-      const printerGroupList = document.getElementById("printerGroupList");
-      printerGroupList.innerHTML = "";
-      printerGroupList.insertAdjacentHTML(
-        "beforeend",
-        '<option selected value="all" data-path="default">Filter</option>'
-      );
-      groupListUnique.forEach((group, index) => {
-        printerGroupList.insertAdjacentHTML(
-          "beforeend",
-          `<option value="${group.tag.toLowerCase()}" data-path=".${group.tag}">${
-            group.display
-          }</option>`
-        );
+        if (printer.group !== "") {
+          const group = {
+            display: printer.group,
+            tag: printer.group.replace(/\s/g, "_")
+          };
+          groupList.push(group);
+        }
       });
 
-      // Printer group dropdown
-      printers.forEach((printer) => {
-        const printerGroupAssignSelect = document.getElementById(`editInputGroup-${printer._id}`);
-        if (!printerGroupAssignSelect) return;
+      const groupListUnique = _.uniq(groupList, "tag");
+      if (printerList.length !== 0) {
+        //Create printers table
 
+        const tableBody = document.getElementById("printerSelectBody");
+        if (editable) {
+          document.getElementById("spoolColumn").classList.add("d-none");
+          document.getElementById("stateColumn").classList.add("d-none");
+          document.getElementById("cameraColumn").classList.remove("d-none");
+          document.getElementById("apiColumn").classList.remove("d-none");
+          document.getElementById("selectColumn").classList.add("d-none");
+          document.getElementById("urlColumn").classList.remove("d-none");
+
+          printerList.forEach((printer) => {
+            tableBody.insertAdjacentHTML("beforeend", this.getEditableList(printer));
+          });
+        } else {
+          printerList.forEach((printer) => {
+            tableBody.insertAdjacentHTML("beforeend", this.getSelectableList(printer));
+          });
+        }
+
+        const printerGroupList = document.getElementById("printerGroupList");
+        printerGroupList.innerHTML = "";
+        printerGroupList.insertAdjacentHTML(
+          "beforeend",
+          '<option selected value="all" data-path="default">Filter</option>'
+        );
         groupListUnique.forEach((group, index) => {
-          printerGroupAssignSelect.insertAdjacentHTML(
+          printerGroupList.insertAdjacentHTML(
             "beforeend",
             `<option value="${group.tag.toLowerCase()}" data-path=".${group.tag}">${
               group.display
             }</option>`
           );
         });
-      });
-    } else {
-      const tableBody = document.getElementById("printerSelectBody");
-      tableBody.insertAdjacentHTML("beforeend", "<tr><td>No Online Printers</td></tr>");
-    }
-    PrinterSelect.addListeners(editable, callback);
+
+        // Printer group dropdown
+        printers.forEach((printer) => {
+          const printerGroupAssignSelect = document.getElementById(`editInputGroup-${printer._id}`);
+          if (!printerGroupAssignSelect) return;
+
+          groupListUnique.forEach((group, index) => {
+            printerGroupAssignSelect.insertAdjacentHTML(
+              "beforeend",
+              `<option value="${group.tag.toLowerCase()}" data-path=".${group.tag}">${
+                group.display
+              }</option>`
+            );
+          });
+        });
+      } else {
+        const tableBody = document.getElementById("printerSelectBody");
+        tableBody.insertAdjacentHTML("beforeend", "<tr><td>No Online Printers</td></tr>");
+      }
+      PrinterSelect.addListeners(editable, callback);
+    };
   }
 
   static addListeners(editable, callback) {

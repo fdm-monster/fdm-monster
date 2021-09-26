@@ -61,12 +61,12 @@ async function initNewGraphs() {
 
 createClientSSEWorker(workerURL, dashboardSSEventHandler);
 
-loadGrid()
-  .then(async () => {
-    await initNewGraphs();
-  })
-  .then(() => {
-    bindGraphChangeUpdate(async function (event, items) {
-      await updateHistoryGraphs();
-    });
-  });
+// loadGrid()
+//   .then(async () => {
+//     await initNewGraphs();
+//   })
+//   .then(() => {
+//     bindGraphChangeUpdate(async function (event, items) {
+//       await updateHistoryGraphs();
+//     });
+//   });

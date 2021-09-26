@@ -7,5 +7,7 @@ export function withId(label, id) {
 }
 
 export function addClick(selector, cb) {
-  return elem(selector).addEventListener("click", cb);
+  const element = elem(selector);
+  if (!element) return;
+  return element.addEventListener("click", cb);
 }

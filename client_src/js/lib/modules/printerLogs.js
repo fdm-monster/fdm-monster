@@ -585,15 +585,15 @@ export default class PrinterLogs {
             </div>
     `;
   }
-  static async loadStatistics(id) {
-    let get = await OctoFarmClient.get("/history/statistics/" + id);
-    //Setup page
+  static async loadStatistics(printerId) {
+    let get = await OctoFarmClient.getPrinterStatsHistory(printerId);
+
     let printerStatsWrapper = document.getElementById("printerStatistics");
-    printerStatsWrapper.innerHTML = "";
     printerStatsWrapper.innerHTML = await this.returnPrinterStatsTemplate(get);
+
     document.getElementById("printerStatisticsTitle").innerHTML =
       "Printer Statistics: " + get.printerName;
-    //Check if graph is on DOM...
+
     const printerHistoryOptions = {
       chart: {
         type: "bar",

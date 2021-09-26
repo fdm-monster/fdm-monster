@@ -9,31 +9,22 @@ export default class Validate {
     elm.value = u;
     return elm.validity.valid;
   }
+
   static IP(ipaddress) {
-    if (
-      /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(
-        ipaddress
-      )
-    ) {
-      return true;
-    } else {
-      return false;
-    }
+    return /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(
+      ipaddress
+    );
   }
+
   static JSON(file) {
-    if (
-      /^[\],:{}\s]*$/.test(
-        file
-          .replace(/\\["\\\/bfnrtu]/g, "@")
-          .replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, "]")
-          .replace(/(?:^|:|,)(?:\s*\[)+/g, "")
-      )
-    ) {
-      return true;
-    } else {
-      return false;
-    }
+    return /^[\],:{}\s]*$/.test(
+      file
+        .replace(/\\["\\\/bfnrtu]/g, "@")
+        .replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, "]")
+        .replace(/(?:^|:|,)(?:\s*\[)+/g, "")
+    );
   }
+
   static getName(printer) {
     if (typeof printer.settingsAppearance != "undefined") {
       if (printer.settingsAppearance.name === "" || printer.settingsAppearance.name === null) {
@@ -45,6 +36,7 @@ export default class Validate {
       return printer.printerURL;
     }
   }
+
   static stripHTML(text) {
     var tmp = document.createElement("DIV");
     tmp.innerHTML = text;

@@ -1,12 +1,9 @@
 import axios from "axios";
 import { ApplicationError } from "../exceptions/application-error.handler";
-import { HTTPError } from "../exceptions/octofarm-api.exceptions";
-import { ClientErrors } from "../exceptions/octofarm-client.exceptions";
+import HttpStatusCode from "../../../server_src/constants/http-status-codes.constants";
 
-// axios request interceptor
 axios.interceptors.request.use(
   function (config) {
-    OctoFarmClient.validatePath(config.url);
     return config;
   },
   function (error) {
@@ -27,39 +24,28 @@ axios.interceptors.response.use(
     // Do something with response error
     switch (error.response.status) {
       case 0:
-        throw new ApplicationError(HTTPError.NO_CONNECTION);
-      case 400:
-        throw new ApplicationError(HTTPError.BAD_REQUEST);
-      case 401:
-        throw new ApplicationError(HTTPError.UNAUTHORIZED);
-      case 403:
-        throw new ApplicationError(HTTPError.FORBIDDEN);
-      case 404:
-        throw new ApplicationError(HTTPError.RESOURCE_NOT_FOUND);
-      case 500:
-        throw new ApplicationError(HTTPError.INTERNAL_SERVER_ERROR);
-      case 502:
-        throw new ApplicationError(HTTPError.BAD_GATEWAY);
-      case 503:
-        throw new ApplicationError(HTTPError.SERVICE_UNAVAILABLE);
-      case 504:
-        throw new ApplicationError(HTTPError.GATEWAY_TIMEOUT);
+      case HttpStatusCode.BAD_REQUEST:
+      case HttpStatusCode.UNAUTHORIZED:
+      case HttpStatusCode.FORBIDDEN:
+      case HttpStatusCode.NOT_FOUND:
+      case HttpStatusCode.INTERNAL_SERVER_ERROR:
+        throw new ApplicationError(error.response.status);
       default:
-        throw new ApplicationError(HTTPError.UNKNOWN);
+        throw new ApplicationError("Unprocessed error type");
     }
   }
 );
 
-// TODO: this could end up getting big, consider splitting it.
-// Would go by page, each page could get it's own extends class for pre-defined routes building on the CRUD actions available.
 export default class OctoFarmClient {
   static base = "/api";
   static amIAliveRoute = this.base + "/amialive";
   static printerRoute = this.base + "/printer";
+  static printerNetworkRoute = this.base + "/printer-network";
+  static scanSsdp = this.printerNetworkRoute + "/scan-ssdp";
   static settingsRoute = this.base + "/settings";
   static serverSettingsRoute = this.settingsRoute + "/server";
-  static logsRoute = `${this.serverSettingsRoute}/logs`;
-  static generateLogsDumpRoute = `${this.logsRoute}/generate-log-dump`;
+  static serverLogsRoute = `${this.serverSettingsRoute}/logs`;
+  static generateLogsDumpRoute = `${this.serverLogsRoute}/generate-log-dump`;
   static serverRestartRoute = `${this.serverSettingsRoute}/restart`;
   static clientSettingsRoute = this.settingsRoute + "/client";
   static customGCodeSettingsRoutes = this.settingsRoute + "/custom-gcode";
@@ -81,13 +67,6 @@ export default class OctoFarmClient {
   static testAlertScriptRoute = this.alertRoute + "/test-alert-script";
   static roomDataRoute = this.base + "/room-data";
 
-  static validatePath(pathname) {
-    if (!pathname) {
-      new URL(path, window.location.origin);
-      throw new ApplicationError(ClientErrors.FAILED_VALIDATION_PATH);
-    }
-  }
-
   static validateRequiredProps(input, keys) {
     const unsetRequiredProps = keys.filter((prop) => {
       return !input[prop];
@@ -97,8 +76,7 @@ export default class OctoFarmClient {
         "The following properties were empty/missing in the request",
         unsetRequiredProps
       );
-      // TODO unsetRequiredProps are not processed yet
-      throw new ApplicationError(ClientErrors.FAILED_VALIDATION_PATH, unsetRequiredProps);
+      throw new ApplicationError(unsetRequiredProps);
     }
   }
 
@@ -124,6 +102,10 @@ export default class OctoFarmClient {
       // "webSocketURL" // TODO generate client-side
     ]);
     return this.post(`${this.printerRoute}/`, newPrinter);
+  }
+
+  static async printerNetworkScanSsdp() {
+    return this.get(`${this.scanSsdp}/`);
   }
 
   static async updatePrinterConnectionSettings(settings) {
@@ -193,12 +175,20 @@ export default class OctoFarmClient {
     return this.get(this.historyRoute);
   }
 
+  static async getPrinterStatsHistory(printerId) {
+    return this.get(`${this.historyRoute}/${printerId}/printer-stats`);
+  }
+
   static async deleteHistory(historyId) {
     return this.delete(`${this.historyRoute}/${historyId}`);
   }
 
   static async updateHistory(historyId, data) {
     return this.put(`${this.historyRoute}/${historyId}`, data);
+  }
+
+  static async updateCostSettings(historyId, data) {
+    return this.patch(`${this.historyRoute}/${historyId}/cost-settings`, data);
   }
 
   static async getHistoryStatistics() {
@@ -213,8 +203,12 @@ export default class OctoFarmClient {
     return this.get(this.serverSettingsRoute);
   }
 
+  static async getServerLogs() {
+    return []; // Not implemented
+    // return this.get(this.serverLogsRoute);
+  }
+
   static async updateServerSettings(settingsObject) {
-    //TODO: should be patch not post
     return this.put(this.serverSettingsRoute, settingsObject);
   }
 

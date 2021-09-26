@@ -42,7 +42,7 @@ export default class UI {
       return { name: "danger", hex: "#2e0905", category: "Offline" };
     }
   }
-  //Create message
+
   static createMessage(options, element) {
     const message = document.getElementById(element);
     const row = `
@@ -56,14 +56,13 @@ export default class UI {
     message.insertAdjacentHTML("beforeend", row);
   }
 
-  //Create toast notification
   static createAlert(type, message, delay, click) {
-    if (click != undefined) {
+    if (!!click) {
       click = ["click"];
     } else {
       click = [];
     }
-    //This needs a more elegant solution, I think Noty is keeping the elements I remove with remove() from the DOM in memory somewhere...
+    // This needs a more elegant solution, I think Noty is keeping the elements I remove with remove() from the DOM in memory somewhere...
     Noty.setMaxVisible(50);
     let alert = new Noty({
       type: type,
@@ -105,6 +104,7 @@ export default class UI {
       });
     });
   }
+
   //TODO: Move to a templates folder
   static returnSpinnerTemplate() {
     return '<i class="fas fa-spinner fa-spin"></i>';
@@ -115,17 +115,20 @@ export default class UI {
       element.innerHTML = element.innerHTML.replace(UI.returnSpinnerTemplate(), "");
     }
   }
+
   static addLoaderToElementsInnerHTML(element) {
     if (!element.innerHTML.includes("spinner")) {
       element.innerHTML += UI.returnSpinnerTemplate();
     }
   }
+
   static checkIfAnyModalShown() {
     const modalArray = currentModals.map((modal) => {
       return modal.classList.contains("show");
     });
     return modalArray.includes(true);
   }
+
   static checkIfSpecificModalShown(modalToCheck) {
     const currentModal = currentModals.filter((modal) => modal.id === modalToCheck);
     if (currentModal[0]) {
@@ -134,11 +137,13 @@ export default class UI {
       return false;
     }
   }
+
   static async delay(ms) {
     return new Promise((resolve) => {
       setTimeout(resolve, ms);
     });
   }
+
   static removeLine(element) {
     element.remove();
   }

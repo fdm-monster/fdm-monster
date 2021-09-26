@@ -1,5 +1,6 @@
 export class ApplicationError extends Error {
   static hasErrorNotificationBeenTriggered = false;
+
   constructor(options, overrides) {
     super();
     Object.assign(options, overrides);
@@ -12,12 +13,7 @@ export class ApplicationError extends Error {
     this.meta = options.meta;
     this.statusCode = options.statusCode;
     this.color = options.color;
-    // {
-    //   analytics:  {},
-    //   context: {}
-    // }
 
-    // Trigger Error Notification
     ApplicationError.hasErrorNotificationBeenTriggered = true;
   }
 }

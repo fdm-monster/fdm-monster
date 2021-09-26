@@ -5,20 +5,22 @@ const { AppConstants } = require("../app.constants");
 
 class PrinterNetworkController {
   #printerService;
+  #autoDiscoveryService;
 
   #logger = new Logger("OctoFarm-API");
 
-  constructor({ printerService }) {
+  constructor({ printerService, autoDiscoveryService }) {
     this.#printerService = printerService;
+    this.#autoDiscoveryService = autoDiscoveryService;
   }
 
   async scanSsdp(req, res) {
-    const { searchForDevicesOnNetwork } = require("../services/autoDiscovery.js");
-    let devices = await searchForDevicesOnNetwork();
+    let devices = await this.#autoDiscoveryService.searchForDevicesOnNetwork();
     res.json(devices);
   }
 
   async wakeHost(req, res) {
+    // TODO Will be removed
     const data = req.body;
     this.#logger.info("Action wake host: ", data);
     Script.wol(data);

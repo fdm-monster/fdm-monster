@@ -14,39 +14,40 @@ export async function dashboardSSEventHandler(data) {
       currentOperations(currentOperationsData.operations, currentOperationsData.count, printerInfo);
     }
 
-    DashUpdate.farmInformation(
-      dashboard.timeEstimates,
-      dashboard.utilisationGraph,
-      dashboard.temperatureGraph,
-      dashboardSettings
-    );
-    if (dashboardSettings.farmUtilisation.farmUtilisation) {
-      DashUpdate.farmUtilisation(dashboard.farmUtilisation);
-    }
+    if (!!dashboard) {
+      DashUpdate.farmInformation(
+        dashboard.timeEstimates,
+        dashboard.utilisationGraph,
+        dashboard.temperatureGraph,
+        dashboardSettings
+      );
+      if (dashboardSettings.farmUtilisation.farmUtilisation) {
+        DashUpdate.farmUtilisation(dashboard.farmUtilisation);
+      }
+      DashUpdate.currentStatusAndUtilisation(
+        dashboard.currentStatus,
+        dashboard.currentUtilisation,
+        dashboardSettings.printerStates.currentStatus,
+        dashboardSettings.farmUtilisation.currentUtilisation
+      );
 
-    DashUpdate.currentStatusAndUtilisation(
-      dashboard.currentStatus,
-      dashboard.currentUtilisation,
-      dashboardSettings.printerStates.currentStatus,
-      dashboardSettings.farmUtilisation.currentUtilisation
-    );
+      if (dashboardSettings.printerStates.printerState) {
+        DashUpdate.printerStatus(dashboard.printerHeatMaps.heatStatus);
+      }
 
-    if (dashboardSettings.printerStates.printerState) {
-      DashUpdate.printerStatus(dashboard.printerHeatMaps.heatStatus);
-    }
+      if (dashboardSettings.printerStates.printerProgress) {
+        DashUpdate.printerProgress(dashboard.printerHeatMaps.heatProgress);
+      }
+      if (dashboardSettings.printerStates.printerTemps) {
+        DashUpdate.printerTemps(dashboard.printerHeatMaps.heatTemps);
+      }
+      if (dashboardSettings.printerStates.printerUtilisation) {
+        DashUpdate.printerUptime(dashboard.printerHeatMaps.heatUtilisation);
+      }
 
-    if (dashboardSettings.printerStates.printerProgress) {
-      DashUpdate.printerProgress(dashboard.printerHeatMaps.heatProgress);
-    }
-    if (dashboardSettings.printerStates.printerTemps) {
-      DashUpdate.printerTemps(dashboard.printerHeatMaps.heatTemps);
-    }
-    if (dashboardSettings.printerStates.printerUtilisation) {
-      DashUpdate.printerUptime(dashboard.printerHeatMaps.heatUtilisation);
-    }
-
-    if (dashboardSettings.historical.environmentalHistory) {
-      await DashUpdate.environmentalData(dashboard.enviromentalData);
+      if (dashboardSettings.historical.environmentalHistory) {
+        await DashUpdate.environmentalData(dashboard.enviromentalData);
+      }
     }
   } else {
     UI.createAlert(

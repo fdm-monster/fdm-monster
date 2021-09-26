@@ -3,7 +3,6 @@ import UI from "../functions/ui.js";
 import Calc from "../functions/calc.js";
 import Script from "../../services/gcode-scripts.service.js";
 import { ApplicationError } from "../../exceptions/application-error.handler";
-import { ClientErrors } from "../../exceptions/octofarm-client.exceptions";
 import { replaceHttpProtocolWith } from "../../utils/url.utils";
 
 let currentPrinterIndex;
@@ -22,13 +21,9 @@ $("#connectionModal").on("hidden.bs.modal", function (e) {
 export async function updatePrinterSettingsModal(printersInformation, printerID) {
   // Make sure we have page elements
   PrinterSettings.grabPageElements();
-  // Check if printer ID is provided
   if (!printerID) {
-    // No printer ID we are updating the state...
     // The SSE Event doesn't stop on an error, so we need to make sure the update event skips an error occurring...
-
     if (!ApplicationError.hasErrorNotificationBeenTriggered) {
-      // Make sure online state is latest...
       printerOnline =
         printersInformation[currentPrinterIndex].printerState.colour.category !== "Offline";
       PrinterSettings.updateStateElements(printersInformation[currentPrinterIndex]);
@@ -83,14 +78,15 @@ export async function updatePrinterSettingsModal(printersInformation, printerID)
 class PrinterSettings {
   static updateCurrentPrinterIndex(printersInformation, printerID) {
     currentPrintersInformation = printersInformation;
+
     // Printer ID we need to initialise the page.
-    const printersIndex = _.findIndex(printersInformation, function (o) {
+    const printerIndex = _.findIndex(printersInformation, function (o) {
       return o._id == printerID;
     });
-    if (printersIndex !== -1) {
-      currentPrinterIndex = printersIndex;
+    if (printerIndex !== -1) {
+      currentPrinterIndex = printerIndex;
     } else {
-      throw new ApplicationError(ClientErrors.FAILED_STATE_UPDATE);
+      throw new ApplicationError("PrinterId was not found in printers.");
     }
   }
 

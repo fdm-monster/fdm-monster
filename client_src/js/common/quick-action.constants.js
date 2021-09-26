@@ -9,9 +9,7 @@ export const ACTIONS = {
   printerLog: "printerLog",
   printerStatistics: "printerStatistics",
   octoprintUpdate: "octoprintUpdate",
-  octoprintPluginUpdate: "octoprintPluginUpdate",
-  blkUpdatePluginsBtn: "blkUpdatePluginsBtn",
-  blkOctoPrintUpdate: "blkOctoPrintUpdate"
+  octoprintPluginUpdate: "octoprintPluginUpdate"
 };
 
 export const LABELS = {
