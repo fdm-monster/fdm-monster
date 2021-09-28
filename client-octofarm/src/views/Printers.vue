@@ -23,7 +23,7 @@
       item-key="_id"
       show-expand
     >
-      <template v-slot:body="props" v-if="reorder">
+      <template v-if="reorder" v-slot:body="props">
         <draggable :list="props.items" tag="tbody">
           <slot></slot>
           <tr v-for="(printer, index) in props.items" :key="index">
@@ -42,7 +42,9 @@
           <v-toolbar-title>Expandable Table</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-switch v-model="singleExpand" class="mt-5 mr-3" label="Single expand"></v-switch>
-          <v-switch v-model="reorder" class="mt-5" :label="`Reorder: ${reorder.toString()}`">Reorder</v-switch>
+          <v-switch v-model="reorder" :label="`Reorder: ${reorder.toString()}`" class="mt-5"
+            >Reorder
+          </v-switch>
         </v-toolbar>
       </template>
       <template v-slot:item.printerName="{ item }">
@@ -54,6 +56,11 @@
         <v-chip v-if="item.group" color="primary" dark>
           {{ item.group }}
         </v-chip>
+      </template>
+      <template v-slot:item.enabled="{ item }">
+        <v-switch v-model="item.enabled" color="primary" dark inset @change="toggleEnabled(item)">
+          {{ item.enabled }}
+        </v-switch>
       </template>
       <template v-slot:expanded-item="{ headers, item }">
         <td :colspan="headers.length">
@@ -73,6 +80,7 @@ import { Component } from "vue-property-decorator";
 import { Action, Getter } from "vuex-class";
 import { Printer } from "@/models/printers/printer.model";
 import draggable from "vuedraggable";
+import { PrintersService } from "@/backend/printers.service";
 
 @Component({
   components: { draggable }
@@ -81,7 +89,7 @@ export default class Printers extends Vue {
   @Action loadPrinters: () => Promise<Printer[]>;
   @Getter printers: Printer[];
 
-  reorder=false;
+  reorder = false;
   search = "";
   expanded = [];
   singleExpand = true;
@@ -98,10 +106,20 @@ export default class Printers extends Vue {
       sortable: true,
       value: "printerName"
     },
-    { text: "Group", value: "group" },
+    { text: "Group", value: "group", align: "start" },
     { text: "Enabled", value: "enabled" },
     { text: "", value: "data-table-expand" }
   ];
+
+  async toggleEnabled(printer: Printer) {
+    if (!printer._id) {
+      throw new Error("Printer ID not set, cant toggle enabled");
+    }
+    const answer = confirm("Are you sure?");
+    if (answer) {
+      await PrintersService.toggleEnabled(printer._id, !printer.enabled);
+    }
+  }
 
   async mounted() {
     await this.loadPrinters();
@@ -110,7 +128,7 @@ export default class Printers extends Vue {
 </script>
 
 <style>
-.reorder-row-icon{
+.reorder-row-icon {
   cursor: move;
 }
 </style>

@@ -10,10 +10,6 @@
     "webpack:prod": "webpack --mode=production",
     "webpack:watch": "webpack --watch"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/OctoFarm/OctoFarm"
-  },
   "bin": {
     "octofarm": "./index.js"
   },
@@ -25,7 +21,7 @@
     "javascript",
     "3d-printing"
   ],
-  "author": "David Zwart (davidzwa) & James Mackay (NotExpectedYet)",
+  "author": "David Zwart (davidzwa)",
   "license": "ISC",
   "devDependencies": {
     "@babel/cli": "^7.13.0",
