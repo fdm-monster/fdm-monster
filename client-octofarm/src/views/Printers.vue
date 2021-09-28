@@ -3,31 +3,46 @@
     <v-card-title>
       Printers
       <v-spacer></v-spacer>
-    <v-text-field
+      <v-text-field
+        v-model="search"
+        append-icon="mdi-magnify"
         class="p-2"
-      v-model="search"
-      append-icon="mdi-magnify"
-      label="Search"
-      single-line
-      hide-details
-    ></v-text-field>
+        hide-details
+        label="Search"
+        single-line
+      ></v-text-field>
     </v-card-title>
 
     <v-data-table
+      :expanded.sync="expanded"
       :headers="dessertHeaders"
       :items="printers"
-      :single-expand="true"
-      :expanded.sync="expanded"
       :search="search"
+      :single-expand="true"
       class="elevation-1"
       item-key="_id"
       show-expand
     >
+      <template v-slot:body="props" v-if="reorder">
+        <draggable :list="props.items" tag="tbody">
+          <slot></slot>
+          <tr v-for="(printer, index) in props.items" :key="index">
+            <td>
+              <v-icon class="reorder-row-icon">reorder</v-icon>
+              {{ printer.sortIndex }}
+            </td>
+            <td>{{ printer.printerName }}</td>
+            <td>{{ printer.group }}</td>
+            <td>{{ printer.enabled }}</td>
+          </tr>
+        </draggable>
+      </template>
       <template v-slot:top>
         <v-toolbar flat>
           <v-toolbar-title>Expandable Table</v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-switch v-model="singleExpand" class="mt-2" label="Single expand"></v-switch>
+          <v-switch v-model="singleExpand" class="mt-5 mr-3" label="Single expand"></v-switch>
+          <v-switch v-model="reorder" class="mt-5" :label="`Reorder: ${reorder.toString()}`">Reorder</v-switch>
         </v-toolbar>
       </template>
       <template v-slot:item.printerName="{ item }">
@@ -57,18 +72,26 @@ import Vue from "vue";
 import { Component } from "vue-property-decorator";
 import { Action, Getter } from "vuex-class";
 import { Printer } from "@/models/printers/printer.model";
+import draggable from "vuedraggable";
 
 @Component({
-  components: {}
+  components: { draggable }
 })
 export default class Printers extends Vue {
   @Action loadPrinters: () => Promise<Printer[]>;
   @Getter printers: Printer[];
 
+  reorder=false;
   search = "";
   expanded = [];
   singleExpand = true;
   dessertHeaders = [
+    {
+      text: "Order",
+      align: "start",
+      sortable: true,
+      value: "sortIndex"
+    },
     {
       text: "Printer Name",
       align: "start",
@@ -82,8 +105,12 @@ export default class Printers extends Vue {
 
   async mounted() {
     await this.loadPrinters();
-
-    console.log(this.printers);
   }
 }
 </script>
+
+<style>
+.reorder-row-icon{
+  cursor: move;
+}
+</style>
