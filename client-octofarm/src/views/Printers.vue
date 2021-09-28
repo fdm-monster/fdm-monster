@@ -57,6 +57,25 @@
           {{ item.group }}
         </v-chip>
       </template>
+      <template v-slot:item.actions="{ item }">
+        <v-btn-toggle background-color="primary" dark dense multiple>
+          <v-btn v-if="item.enabled">
+            <v-icon>directions</v-icon>
+          </v-btn>
+
+          <v-btn>
+            <v-icon>settings</v-icon>
+          </v-btn>
+
+          <v-btn>
+            <v-icon>format_underline</v-icon>
+          </v-btn>
+
+          <v-btn>
+            <v-icon>format_color_fill</v-icon>
+          </v-btn>
+        </v-btn-toggle>
+      </template>
       <template v-slot:item.enabled="{ item }">
         <v-switch v-model="item.enabled" color="primary" dark inset @change="toggleEnabled(item)">
           {{ item.enabled }}
@@ -106,7 +125,8 @@ export default class Printers extends Vue {
       sortable: true,
       value: "printerName"
     },
-    { text: "Group", value: "group", align: "start" },
+    { text: "Group", value: "group" },
+    { text: "Actions", value: "actions", sortable: false },
     { text: "Enabled", value: "enabled" },
     { text: "", value: "data-table-expand" }
   ];
