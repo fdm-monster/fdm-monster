@@ -59,25 +59,27 @@
       </template>
       <template v-slot:item.actions="{ item }">
         <v-btn-toggle background-color="primary" dark dense multiple>
-          <v-btn v-if="item.enabled">
+          <v-btn>
             <v-icon>directions</v-icon>
+          </v-btn>
+
+          <v-btn>
+            <v-icon v-if="item.enabled">settings</v-icon>
           </v-btn>
 
           <v-btn>
             <v-icon>settings</v-icon>
           </v-btn>
-
-          <v-btn>
-            <v-icon>format_underline</v-icon>
-          </v-btn>
-
-          <v-btn>
-            <v-icon>format_color_fill</v-icon>
-          </v-btn>
         </v-btn-toggle>
       </template>
       <template v-slot:item.enabled="{ item }">
-        <v-switch v-model="item.enabled" color="primary" dark inset @change="toggleEnabled(item)">
+        <v-switch
+          v-model="item.enabled"
+          color="primary"
+          dark
+          inset
+          @click.native.capture.stop="toggleEnabled($event, item)"
+        >
           {{ item.enabled }}
         </v-switch>
       </template>
@@ -131,13 +133,14 @@ export default class Printers extends Vue {
     { text: "", value: "data-table-expand" }
   ];
 
-  async toggleEnabled(printer: Printer) {
+  async toggleEnabled(event: any, printer: Printer) {
     if (!printer._id) {
       throw new Error("Printer ID not set, cant toggle enabled");
     }
-    const answer = confirm("Are you sure?");
-    if (answer) {
-      await PrintersService.toggleEnabled(printer._id, !printer.enabled);
+    const isPrinterEnabled = printer.enabled;
+    if (!isPrinterEnabled || confirm("Are you sure?")) {
+      printer.enabled = !printer.enabled;
+      await PrintersService.toggleEnabled(printer._id, printer.enabled);
     }
   }
 

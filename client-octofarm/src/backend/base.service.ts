@@ -3,11 +3,6 @@ import axios, { AxiosResponse } from "axios";
 const base = "http://localhost:4000";
 
 export class BaseService {
-  private static handleResponse(response: AxiosResponse, options = { unwrap: true }) {
-    if (options?.unwrap) return response.data;
-    return response;
-  }
-
   protected static async getApi(path: string, options = { unwrap: true }) {
     const response = await axios.get(`${base}/${path}`);
 
@@ -33,5 +28,10 @@ export class BaseService {
     // ...
 
     return this.handleResponse(response);
+  }
+
+  private static handleResponse(response: AxiosResponse, options = { unwrap: true }) {
+    if (options?.unwrap) return response.data;
+    return response;
   }
 }
