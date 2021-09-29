@@ -10,6 +10,7 @@ const DITokens = require("../../server_src/container.tokens");
 const {
   getDefaultDashboardSettings
 } = require("../../server_src/constants/client-settings.constants");
+const { AppConstants } = require("../../server_src/app.constants");
 
 let request;
 let sseTask;
@@ -43,7 +44,14 @@ describe("SSE-dashboard", () => {
       const es = new EventSource(url);
       es.onmessage = (e) => {
         firedEvent = true;
-        const parsedMsg = parse(e.data);
+
+        let parsedMsg;
+        if (AppConstants.jsonStringify) {
+          parsedMsg = JSON.parse(e.data);
+        } else {
+          parsedMsg = parse(e.data);
+        }
+
         expect(parsedMsg).toMatchObject({
           printersInformation: expect.any(Array),
           currentOperations: {
