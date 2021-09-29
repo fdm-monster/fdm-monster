@@ -7,6 +7,7 @@ const supertest = require("supertest");
 const getEndpoints = require("express-list-endpoints");
 const { setupTestApp } = require("../../server_src/app-test");
 const DITokens = require("../../server_src/container.tokens");
+const { AppConstants } = require("../../server_src/app.constants");
 
 let request;
 let sseTask;
@@ -41,7 +42,14 @@ describe("SSE-printersInfo", () => {
 
       es.onmessage = (e) => {
         firedEvent = true;
-        expect(parse(e.data)).toEqual({
+
+        let parsedMsg;
+        if (AppConstants.jsonStringify) {
+          parsedMsg = JSON.parse(e.data);
+        } else {
+          parsedMsg = parse(e.data);
+        }
+        expect(parsedMsg).toEqual({
           printersInformation: [],
           printerControlList: [],
           currentTickerList: []

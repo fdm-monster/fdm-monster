@@ -1,14 +1,36 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 
-const base = "http://localhost:4000";
+export const apiBase = "http://localhost:4000";
 
 export class BaseService {
   protected static async getApi(path: string, options = { unwrap: true }) {
-    const response = await axios.get(`${base}/${path}`);
+    const response = await axios.get(`${apiBase}/${path}`);
 
     // Do interception or global handling here
     // ...
 
+    return this.handleResponse(response);
+  }
+
+  protected static async postApi<T>(path: string, body: T, options = { unwrap: true }) {
+    const response = await axios.post(`${apiBase}/${path}`, body);
+
+    // Do interception or global handling here
+    // ...
+
+    return this.handleResponse(response);
+  }
+
+  protected static async patchApi<T>(path: string, body: T, options = { unwrap: true }) {
+    const response = await axios.patch(`${apiBase}/${path}`, body);
+
+    // Do interception or global handling here
+    // ...
+
+    return this.handleResponse(response);
+  }
+
+  private static handleResponse(response: AxiosResponse, options = { unwrap: true }) {
     if (options?.unwrap) return response.data;
     return response;
   }

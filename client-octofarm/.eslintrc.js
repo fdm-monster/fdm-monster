@@ -20,7 +20,8 @@ module.exports = {
     "no-debugger": isProduction ? "warn" : "off",
     "no-unreachable": isProduction ? "warn" : "off",
     "@typescript-eslint/no-explicit-any": isProduction ? "warn" : "off",
-    "@typescript-eslint/explicit-module-boundary-types": isProduction ? "warn" : "off"
+    "@typescript-eslint/explicit-module-boundary-types": isProduction ? "warn" : "off",
+    "@typescript-eslint/no-empty-function": isProduction ? "warn" : "off"
   },
   overrides: [
     {

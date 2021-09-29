@@ -14,7 +14,7 @@ const defaultTestEnv = "test";
 const knownEnvNames = ["development", "production", "test"];
 
 // Make sure the client is up to date with this
-const jsonStringify = false;
+const jsonStringify = true;
 
 const apiRoute = "/api";
 

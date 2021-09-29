@@ -2,6 +2,8 @@ export class ServerApi {
   public static readonly base = "api";
   public static readonly amIAliveRoute = ServerApi.base + "/amialive";
   public static readonly printerRoute = ServerApi.base + "/printer";
+  public static readonly printerEnabledRoute = (id: string) =>
+    ServerApi.printerRoute + `/${id}/enabled`;
   public static readonly printerNetworkRoute = ServerApi.base + "/printer-network";
   public static readonly scanSsdp = ServerApi.printerNetworkRoute + "/scan-ssdp";
   public static readonly settingsRoute = ServerApi.base + "/settings";
