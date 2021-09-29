@@ -101,6 +101,7 @@ import { Action, Getter } from "vuex-class";
 import { Printer } from "@/models/printers/printer.model";
 import draggable from "vuedraggable";
 import { PrintersService } from "@/backend/printers.service";
+import { SSEClient } from "vue-sse";
 
 @Component({
   components: { draggable }
@@ -108,6 +109,8 @@ import { PrintersService } from "@/backend/printers.service";
 export default class Printers extends Vue {
   @Action loadPrinters: () => Promise<Printer[]>;
   @Getter printers: Printer[];
+
+  sseClient: SSEClient = null;
 
   reorder = false;
   search = "";
@@ -146,10 +149,18 @@ export default class Printers extends Vue {
   async mounted() {
     await this.loadPrinters();
 
-    const sseClient = await this.$sse.create(this.$sse.$defaultConfig);
-    sseClient.on("message", (msg) => console.info("Message:", msg));
-    sseClient.on("error", (err: any) => console.error("Failed to parse or lost connection:", err));
-    sseClient.connect().catch((err: any) => console.error("Failed make initial connection:", err));
+    this.sseClient = await this.$sse.create(this.$sse.$defaultConfig);
+    this.sseClient.on("message", (msg) => this.onMessage(msg));
+    this.sseClient.on("error", (err: any) => console.error("Failed to parse or lost connection:", err));
+    this.sseClient.connect().catch((err: any) => console.error("Failed make initial connection:", err));
+  }
+
+  onMessage(message: any) {
+    console.log(message);
+  }
+
+  beforeDestroy() {
+    this.sseClient.disconnect();
   }
 
   openPrinterURL(printer: Printer) {
