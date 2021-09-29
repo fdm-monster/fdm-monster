@@ -41,7 +41,7 @@
         <v-toolbar flat>
           <v-toolbar-title>Showing printers</v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-switch v-model="reorder" label="Sort mode" class="mt-5" dark>Reorder </v-switch>
+          <v-switch v-model="reorder" class="mt-5" dark label="Sort mode">Reorder</v-switch>
         </v-toolbar>
       </template>
       <template v-slot:item.printerName="{ item }">
@@ -57,17 +57,17 @@
       <template v-slot:item.actions="{ item }">
         <v-btn
           class="ma-2"
+          color="primary"
           fab
           small
-          color="primary"
           @click.c.capture.native.stop="openPrinterURL(item)"
         >
           <v-icon>directions</v-icon>
         </v-btn>
-        <v-btn class="ma-2" fab small color="primary" v-if="item.enabled">
+        <v-btn v-if="item.enabled" class="ma-2" color="primary" fab small>
           <v-icon>usb</v-icon>
         </v-btn>
-        <v-btn class="ma-2" fab small color="primary">
+        <v-btn class="ma-2" color="primary" fab small>
           <v-icon>settings</v-icon>
         </v-btn>
       </template>
@@ -145,6 +145,11 @@ export default class Printers extends Vue {
 
   async mounted() {
     await this.loadPrinters();
+
+    const sseClient = await this.$sse.create(this.$sse.$defaultConfig);
+    sseClient.on("message", (msg) => console.info("Message:", msg));
+    sseClient.on("error", (err: any) => console.error("Failed to parse or lost connection:", err));
+    sseClient.connect().catch((err: any) => console.error("Failed make initial connection:", err));
   }
 
   openPrinterURL(printer: Printer) {

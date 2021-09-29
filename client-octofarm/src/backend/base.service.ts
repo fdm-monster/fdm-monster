@@ -1,10 +1,10 @@
 import axios, { AxiosResponse } from "axios";
 
-const base = "http://localhost:4000";
+export const apiBase = "http://localhost:4000";
 
 export class BaseService {
   protected static async getApi(path: string, options = { unwrap: true }) {
-    const response = await axios.get(`${base}/${path}`);
+    const response = await axios.get(`${apiBase}/${path}`);
 
     // Do interception or global handling here
     // ...
@@ -13,7 +13,7 @@ export class BaseService {
   }
 
   protected static async postApi<T>(path: string, body: T, options = { unwrap: true }) {
-    const response = await axios.post(`${base}/${path}`, body);
+    const response = await axios.post(`${apiBase}/${path}`, body);
 
     // Do interception or global handling here
     // ...
@@ -22,7 +22,7 @@ export class BaseService {
   }
 
   protected static async patchApi<T>(path: string, body: T, options = { unwrap: true }) {
-    const response = await axios.patch(`${base}/${path}`, body);
+    const response = await axios.patch(`${apiBase}/${path}`, body);
 
     // Do interception or global handling here
     // ...
