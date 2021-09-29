@@ -39,11 +39,9 @@
       </template>
       <template v-slot:top>
         <v-toolbar flat>
-          <v-toolbar-title>Expandable Table</v-toolbar-title>
+          <v-toolbar-title>Showing printers</v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-switch v-model="reorder" label="Sort mode" class="mt-5"
-            >Reorder
-          </v-switch>
+          <v-switch v-model="reorder" label="Sort mode" class="mt-5" dark>Reorder </v-switch>
         </v-toolbar>
       </template>
       <template v-slot:item.printerName="{ item }">
