@@ -110,7 +110,7 @@ export default class Printers extends Vue {
   @Action loadPrinters: () => Promise<Printer[]>;
   @Getter printers: Printer[];
 
-  sseClient: SSEClient = null;
+  sseClient?: SSEClient;
 
   reorder = false;
   search = "";
@@ -151,16 +151,18 @@ export default class Printers extends Vue {
 
     this.sseClient = await this.$sse.create(this.$sse.$defaultConfig);
     this.sseClient.on("message", (msg) => this.onMessage(msg));
-    this.sseClient.on("error", (err: any) => console.error("Failed to parse or lost connection:", err));
-    this.sseClient.connect().catch((err: any) => console.error("Failed make initial connection:", err));
+    this.sseClient.on("error", (err: any) =>
+      console.error("Failed to parse or lost connection:", err)
+    );
+    this.sseClient
+      .connect()
+      .catch((err: any) => console.error("Failed make initial connection:", err));
   }
 
-  onMessage(message: any) {
-    console.log(message);
-  }
+  onMessage(message: any) {}
 
   beforeDestroy() {
-    this.sseClient.disconnect();
+    this.sseClient?.disconnect();
   }
 
   openPrinterURL(printer: Printer) {
