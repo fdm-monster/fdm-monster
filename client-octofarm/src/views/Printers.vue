@@ -41,8 +41,7 @@
         <v-toolbar flat>
           <v-toolbar-title>Expandable Table</v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-switch v-model="singleExpand" class="mt-5 mr-3" label="Single expand"></v-switch>
-          <v-switch v-model="reorder" :label="`Reorder: ${reorder.toString()}`" class="mt-5"
+          <v-switch v-model="reorder" label="Sort mode" class="mt-5"
             >Reorder
           </v-switch>
         </v-toolbar>
@@ -58,19 +57,21 @@
         </v-chip>
       </template>
       <template v-slot:item.actions="{ item }">
-        <v-btn-toggle background-color="primary" dark dense multiple>
-          <v-btn>
-            <v-icon>directions</v-icon>
-          </v-btn>
-
-          <v-btn>
-            <v-icon v-if="item.enabled">settings</v-icon>
-          </v-btn>
-
-          <v-btn>
-            <v-icon>settings</v-icon>
-          </v-btn>
-        </v-btn-toggle>
+        <v-btn
+          class="ma-2"
+          fab
+          small
+          color="primary"
+          @click.c.capture.native.stop="openPrinterURL(item)"
+        >
+          <v-icon>directions</v-icon>
+        </v-btn>
+        <v-btn class="ma-2" fab small color="primary" v-if="item.enabled">
+          <v-icon>usb</v-icon>
+        </v-btn>
+        <v-btn class="ma-2" fab small color="primary">
+          <v-icon>settings</v-icon>
+        </v-btn>
       </template>
       <template v-slot:item.enabled="{ item }">
         <v-switch
@@ -146,6 +147,14 @@ export default class Printers extends Vue {
 
   async mounted() {
     await this.loadPrinters();
+  }
+
+  openPrinterURL(printer: Printer) {
+    const printerURL = printer.printerURL;
+    if (!printerURL) {
+      return;
+    }
+    window.open(printerURL);
   }
 }
 </script>
