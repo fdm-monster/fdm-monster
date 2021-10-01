@@ -6,19 +6,23 @@ import { ACTIONS } from "@/store/printers/printers.actions";
 
 export interface PrintersStateInterface {
   printers: Printer[];
+  lastUpdated?: number;
 }
 
 export const printersState: StoreOptions<StateInterface> = {
   state: {
-    printers: []
+    printers: [],
+    lastUpdated: undefined
   },
   mutations: {
     savePrinters: (state, printers: Printer[]) => {
       state.printers = printers;
+      state.lastUpdated = Date.now();
     }
   },
   getters: {
-    printers: (state: any) => state.printers
+    printers: (state) => state.printers,
+    lastUpdated: (state) => state.lastUpdated
   },
   actions: {
     [ACTIONS.savePrinters]: ({ commit }, newPrinters) => {
