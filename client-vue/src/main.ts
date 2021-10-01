@@ -22,7 +22,7 @@ Vue.use(VueSSE, {
   url: apiBase + "/printers/sse"
 });
 
-export const EventBus = new Vue({
+new Vue({
   router,
   store,
   vuetify,

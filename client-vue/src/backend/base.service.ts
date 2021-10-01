@@ -30,7 +30,7 @@ export class BaseService {
     return this.handleResponse(response, options);
   }
 
-  private static handleResponse(response: AxiosResponse, options = { unwrap: true }) {
+  private static handleResponse<T>(response: AxiosResponse<T>, options = { unwrap: true }) {
     if (options?.unwrap) return response.data;
     return response;
   }

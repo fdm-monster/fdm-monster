@@ -19,11 +19,10 @@ import FooterList from "@/components/QuickActions/FooterList.vue";
 import { Component } from "vue-property-decorator";
 import { Action, Getter } from "vuex-class";
 import { ServerSettings } from "@/models/server-settings.model";
-import { Printer } from "@/models/printers/printer.model";
 import { SSEClient } from "vue-sse";
-import { PrinterSse } from "@/models/printer-sse.model";
+import { PrinterSseMessage } from "@/models/sse-messages/printer-sse-message.model";
 import { sseMessageEventGlobal } from "@/event-bus/sse.events";
-import {EventBus} from "@/main";
+import { ACTIONS } from "@/store/printers/printers.actions";
 
 @Component({
   components: { TopBar, NavigationDrawer, FooterList }
@@ -31,7 +30,6 @@ import {EventBus} from "@/main";
 export default class App extends Vue {
   @Getter serverSettings: ServerSettings;
   @Action loadServerSettings: () => Promise<ServerSettings>;
-  @Action loadPrinters: () => Promise<Printer[]>;
 
   /**
    * Listens to events - replaced with socket io client later
@@ -40,9 +38,12 @@ export default class App extends Vue {
 
   async created() {
     await this.loadServerSettings();
+    await this.connectSseClient();
+  }
 
+  async connectSseClient() {
     this.sseClient = await this.$sse.create(this.$sse.$defaultConfig);
-    this.sseClient.on("message", (msg) => this.onMessage(msg));
+    this.sseClient.on("message", (msg) => this.onSseMessage(msg));
     this.sseClient.on("error", (err: any) =>
       console.error("Failed to parse or lost connection:", err)
     );
@@ -51,7 +52,8 @@ export default class App extends Vue {
       .catch((err: any) => console.error("Failed make initial connection:", err));
   }
 
-  onMessage(message: PrinterSse) {
+  async onSseMessage(message: PrinterSseMessage) {
+    await this.$store.dispatch(ACTIONS.savePrinters, message);
     this.$bus.emit(sseMessageEventGlobal, message);
   }
 

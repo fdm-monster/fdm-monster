@@ -106,9 +106,8 @@ import { Action, Getter } from "vuex-class";
 import { Printer } from "@/models/printers/printer.model";
 import draggable from "vuedraggable";
 import { PrintersService } from "@/backend/printers.service";
-import { PrinterSse } from "@/models/printer-sse.model";
+import { PrinterSseMessage } from "@/models/sse-messages/printer-sse-message.model";
 import { sseMessageEventGlobal } from "@/event-bus/sse.events";
-import {EventBus} from "@/main";
 
 @Component({
   components: { draggable }
@@ -154,19 +153,24 @@ export default class Printers extends Vue {
   async mounted() {
     await this.loadPrinters();
 
-    console.log("Bound to", sseMessageEventGlobal);
-    this.$bus.on(sseMessageEventGlobal, (data: PrinterSse) => {
-      console.log("asd");
-      this.onMessage(data);
+    this.$bus.on(sseMessageEventGlobal, (data: PrinterSseMessage) => {
+      this.onSseMessage(data);
     });
   }
 
-  onMessage(message: PrinterSse) {
-    console.log(
-      "SSE update",
-      Object.keys(message.printersInformation[0]),
-      message.printersInformation[0].printerState
-    );
+  onSseMessage(printers: PrinterSseMessage) {
+    if (!printers) return;
+
+    let existingPrinters = this.printers.map((p) => p._id);
+
+    printers.forEach((p) => {
+      const printerIndex = this.printers.findIndex((pr) => pr._id == p._id);
+      existingPrinters = existingPrinters.splice(printerIndex, 1);
+    });
+
+    if (existingPrinters.length > 0) {
+      console.warn("Superfluous printers detected. Out of sync?", existingPrinters);
+    }
   }
 
   openPrinterURL(printer: Printer) {
