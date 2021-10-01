@@ -64,9 +64,14 @@
         >
           <v-icon>directions</v-icon>
         </v-btn>
-        <v-btn v-if="item.enabled" class="ma-2" color="primary" fab small>
-          <v-icon>usb</v-icon>
-        </v-btn>
+        <v-badge bordered class="ma-2" color="red" overlap>
+          <template v-slot:badge>
+            <v-icon> close</v-icon>
+          </template>
+          <v-btn v-if="item.enabled" color="secondary" fab small>
+            <v-icon>usb</v-icon>
+          </v-btn>
+        </v-badge>
         <v-btn class="ma-2" color="primary" fab small>
           <v-icon>settings</v-icon>
         </v-btn>
@@ -101,7 +106,9 @@ import { Action, Getter } from "vuex-class";
 import { Printer } from "@/models/printers/printer.model";
 import draggable from "vuedraggable";
 import { PrintersService } from "@/backend/printers.service";
-import { SSEClient } from "vue-sse";
+import { PrinterSse } from "@/models/printer-sse.model";
+import { sseMessageEventGlobal } from "@/event-bus/sse.events";
+import {EventBus} from "@/main";
 
 @Component({
   components: { draggable }
@@ -109,8 +116,6 @@ import { SSEClient } from "vue-sse";
 export default class Printers extends Vue {
   @Action loadPrinters: () => Promise<Printer[]>;
   @Getter printers: Printer[];
-
-  sseClient?: SSEClient;
 
   reorder = false;
   search = "";
@@ -149,20 +154,19 @@ export default class Printers extends Vue {
   async mounted() {
     await this.loadPrinters();
 
-    this.sseClient = await this.$sse.create(this.$sse.$defaultConfig);
-    this.sseClient.on("message", (msg) => this.onMessage(msg));
-    this.sseClient.on("error", (err: any) =>
-      console.error("Failed to parse or lost connection:", err)
-    );
-    this.sseClient
-      .connect()
-      .catch((err: any) => console.error("Failed make initial connection:", err));
+    console.log("Bound to", sseMessageEventGlobal);
+    this.$bus.on(sseMessageEventGlobal, (data: PrinterSse) => {
+      console.log("asd");
+      this.onMessage(data);
+    });
   }
 
-  onMessage(message: any) {}
-
-  beforeDestroy() {
-    this.sseClient?.disconnect();
+  onMessage(message: PrinterSse) {
+    console.log(
+      "SSE update",
+      Object.keys(message.printersInformation[0]),
+      message.printersInformation[0].printerState
+    );
   }
 
   openPrinterURL(printer: Printer) {

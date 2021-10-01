@@ -10,10 +10,9 @@ import Vue from "vue";
 import Login from "@/components/Login.vue";
 import { Component } from "vue-property-decorator";
 import PrinterGrid from "@/components/PrinterGrid/PrinterGrid.vue";
-// import OldGrid from "@/components/Grid/OldGrid.vue";
 
 @Component({
-  components: { Login, PrinterGrid}
+  components: { Login, PrinterGrid }
 })
 export default class Map extends Vue {
   /*

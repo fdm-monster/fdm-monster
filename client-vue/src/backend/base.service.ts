@@ -9,7 +9,7 @@ export class BaseService {
     // Do interception or global handling here
     // ...
 
-    return this.handleResponse(response);
+    return this.handleResponse(response, options);
   }
 
   protected static async postApi<T>(path: string, body: T, options = { unwrap: true }) {
@@ -18,7 +18,7 @@ export class BaseService {
     // Do interception or global handling here
     // ...
 
-    return this.handleResponse(response);
+    return this.handleResponse(response, options);
   }
 
   protected static async patchApi<T>(path: string, body: T, options = { unwrap: true }) {
@@ -27,7 +27,7 @@ export class BaseService {
     // Do interception or global handling here
     // ...
 
-    return this.handleResponse(response);
+    return this.handleResponse(response, options);
   }
 
   private static handleResponse(response: AxiosResponse, options = { unwrap: true }) {
