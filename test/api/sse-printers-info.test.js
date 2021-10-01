@@ -49,11 +49,7 @@ describe("SSE-printersInfo", () => {
         } else {
           parsedMsg = parse(e.data);
         }
-        expect(parsedMsg).toEqual({
-          printersInformation: [],
-          printerControlList: [],
-          currentTickerList: []
-        });
+        expect(parsedMsg).toEqual([]);
         es.close();
         resolve();
       };

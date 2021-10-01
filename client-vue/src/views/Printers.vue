@@ -64,9 +64,14 @@
         >
           <v-icon>directions</v-icon>
         </v-btn>
-        <v-btn v-if="item.enabled" class="ma-2" color="primary" fab small>
-          <v-icon>usb</v-icon>
-        </v-btn>
+        <v-badge bordered class="ma-2" color="red" overlap>
+          <template v-slot:badge>
+            <v-icon> close</v-icon>
+          </template>
+          <v-btn v-if="item.enabled" color="secondary" fab small>
+            <v-icon>usb</v-icon>
+          </v-btn>
+        </v-badge>
         <v-btn class="ma-2" color="primary" fab small>
           <v-icon>settings</v-icon>
         </v-btn>
@@ -101,7 +106,8 @@ import { Action, Getter } from "vuex-class";
 import { Printer } from "@/models/printers/printer.model";
 import draggable from "vuedraggable";
 import { PrintersService } from "@/backend/printers.service";
-import { SSEClient } from "vue-sse";
+import { PrinterSseMessage } from "@/models/sse-messages/printer-sse-message.model";
+import { sseMessageEventGlobal } from "@/event-bus/sse.events";
 
 @Component({
   components: { draggable }
@@ -109,8 +115,6 @@ import { SSEClient } from "vue-sse";
 export default class Printers extends Vue {
   @Action loadPrinters: () => Promise<Printer[]>;
   @Getter printers: Printer[];
-
-  sseClient?: SSEClient;
 
   reorder = false;
   search = "";
@@ -149,20 +153,24 @@ export default class Printers extends Vue {
   async mounted() {
     await this.loadPrinters();
 
-    this.sseClient = await this.$sse.create(this.$sse.$defaultConfig);
-    this.sseClient.on("message", (msg) => this.onMessage(msg));
-    this.sseClient.on("error", (err: any) =>
-      console.error("Failed to parse or lost connection:", err)
-    );
-    this.sseClient
-      .connect()
-      .catch((err: any) => console.error("Failed make initial connection:", err));
+    this.$bus.on(sseMessageEventGlobal, (data: PrinterSseMessage) => {
+      this.onSseMessage(data);
+    });
   }
 
-  onMessage(message: any) {}
+  onSseMessage(printers: PrinterSseMessage) {
+    if (!printers) return;
 
-  beforeDestroy() {
-    this.sseClient?.disconnect();
+    let existingPrinters = this.printers.map((p) => p._id);
+
+    printers.forEach((p) => {
+      const printerIndex = this.printers.findIndex((pr) => pr._id == p._id);
+      existingPrinters = existingPrinters.splice(printerIndex, 1);
+    });
+
+    if (existingPrinters.length > 0) {
+      console.warn("Superfluous printers detected. Out of sync?", existingPrinters);
+    }
   }
 
   openPrinterURL(printer: Printer) {

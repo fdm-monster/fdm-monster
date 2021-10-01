@@ -3,12 +3,12 @@
     <v-btn class="mb-3" color="primary" type="button" @click="addNewPrinter()">Add Widget</v-btn>
     <div :id="gridId" class="grid-stack d-flex">
       <GridItem
-          v-for="(item, index,skeleton) in items"
-          :key="index"
-          :data-item="item"
-          :grid="grid"
-          :selector="itemPrefix + index.toString()"
-          :skeleton="skeleton"
+        v-for="(item, index, skeleton) in items"
+        :key="index"
+        :data-item="item"
+        :grid="grid"
+        :selector="itemPrefix + index.toString()"
+        :skeleton="skeleton"
       />
     </div>
   </div>
@@ -17,18 +17,18 @@
 <script lang="ts">
 import Vue from "vue";
 import Login from "@/components/Login.vue";
-import {Component} from "vue-property-decorator";
-import {GridItemHTMLElement, GridStack} from "gridstack";
+import { Component } from "vue-property-decorator";
+import { GridItemHTMLElement, GridStack } from "gridstack";
 import GridItem from "@/components/PrinterGrid/GridItem.vue";
-import {Action, Getter} from "vuex-class";
-import {Printer} from "@/models/printers/printer.model";
+import { Action, Getter } from "vuex-class";
+import { Printer } from "@/models/printers/printer.model";
 import "gridstack/dist/gridstack.min.css";
 // Required for custom columns
 import "gridstack/dist/gridstack-extra.min.css";
 import "gridstack/dist/h5/gridstack-dd-native";
 
 @Component({
-  components: {GridItem, Login}
+  components: { GridItem, Login }
 })
 export default class PrinterGrid extends Vue {
   readonly itemPrefix = "printer-tile-";
@@ -92,8 +92,8 @@ export default class PrinterGrid extends Vue {
 
   addNewPrinter(printer?: Printer | { skeleton: boolean }) {
     // We can add a placeholder in case of undef printer
-    if (!printer) printer = {skeleton: true};
-    this.newItems.push({printer, index: this.items.length});
+    if (!printer) printer = { skeleton: true };
+    this.newItems.push({ printer, index: this.items.length });
     this.items.push(printer);
   }
 }

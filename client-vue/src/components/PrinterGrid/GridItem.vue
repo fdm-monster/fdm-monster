@@ -1,16 +1,16 @@
 <template>
   <v-card
-      :id="this.selector"
-      :class="`grid-stack-item ${this.dataItem.skeleton ? '' : 'elevation-12'}`"
-      :gs-h="this.dataItem.h"
-      :gs-id="this.dataItem._id"
-      :gs-max-h="this.dataItem.maxH"
-      :gs-max-w="this.dataItem.maxW"
-      :gs-min-h="this.dataItem.minH"
-      :gs-min-w="this.dataItem.minW"
-      :gs-w="this.dataItem.w"
-      :gs-x="this.dataItem.x"
-      :gs-y="this.dataItem.y"
+    :id="this.selector"
+    :class="`grid-stack-item ${this.dataItem.skeleton ? '' : 'elevation-12'}`"
+    :gs-h="this.dataItem.h"
+    :gs-id="this.dataItem._id"
+    :gs-max-h="this.dataItem.maxH"
+    :gs-max-w="this.dataItem.maxW"
+    :gs-min-h="this.dataItem.minH"
+    :gs-min-w="this.dataItem.minW"
+    :gs-w="this.dataItem.w"
+    :gs-x="this.dataItem.x"
+    :gs-y="this.dataItem.y"
   >
     <v-speed-dial v-model="fab" direction="right" hidden right>
       <template v-slot:activator>
@@ -27,19 +27,19 @@
       </v-btn>
     </v-speed-dial>
 
-    <v-toolbar :color="dataItem.skeleton ? 'secondary' : 'primary'" dark dense>{{ this.getPrinterName() }}</v-toolbar>
+    <v-toolbar :color="dataItem.skeleton ? 'secondary' : 'primary'" dark dense>{{
+      this.getPrinterName()
+    }}</v-toolbar>
     <v-card-text class="grid-stack-item-content">
-      {{ dataItem.skeleton ? 'not set up' : 'Printing' }}
+      {{ dataItem.skeleton ? "not set up" : "Printing" }}
     </v-card-text>
-    <v-card-actions>
-      0%
-    </v-card-actions>
+    <v-card-actions> 0% </v-card-actions>
   </v-card>
 </template>
 <script>
 import Vue from "vue";
 import Component from "vue-class-component";
-import {Prop} from "vue-property-decorator";
+import { Prop } from "vue-property-decorator";
 
 @Component
 export default class GridItem extends Vue {
@@ -75,5 +75,4 @@ export default class GridItem extends Vue {
 .grid-stack-item-content:hover {
   border-color: #ffa9a9;
 }
-
 </style>
