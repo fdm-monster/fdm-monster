@@ -13,8 +13,6 @@ describe("PrintersController (e2e)", () => {
     }).compile();
 
     app = moduleFixture.createNestApplication<NestExpressApplication>();
-    app.setViewEngine("ejs");
-    app.setBaseViewsDir("./views");
     await app.init();
   });
 
@@ -23,6 +21,6 @@ describe("PrintersController (e2e)", () => {
   });
 
   it("/printers (GET)", () => {
-    return request(app.getHttpServer()).get("/printers").expect(200);
+    return request(app.getHttpServer()).get("/api/printer").expect(200);
   });
 });

@@ -3,7 +3,7 @@ import { PrintersService } from "../services/printers.service";
 import { ApiTags } from "@nestjs/swagger";
 import { Printer } from "../entities/printer.entity";
 
-@Controller("api/printers")
+@Controller("api/printer")
 @ApiTags(PrintersController.name)
 export class PrintersController {
   constructor(private readonly printersService: PrintersService) {}
