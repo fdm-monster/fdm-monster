@@ -64,11 +64,11 @@
         >
           <v-icon>directions</v-icon>
         </v-btn>
-        <v-badge bordered class="ma-2" color="red" overlap>
+        <v-badge v-if="item.enabled" bordered class="ma-2" color="red" overlap>
           <template v-slot:badge>
             <v-icon> close</v-icon>
           </template>
-          <v-btn v-if="item.enabled" color="secondary" fab small>
+          <v-btn color="secondary" fab small>
             <v-icon>usb</v-icon>
           </v-btn>
         </v-badge>
