@@ -53,11 +53,11 @@ class FileCache {
       throw new Error("File Cache cant get a null/undefined printer id");
     }
 
-    const fileStorage = this.#printerFileStorage[printerId];
+    let fileStorage = this.#printerFileStorage[printerId];
 
     if (!fileStorage) {
       // A runtime thing only, repository handles it differently
-      this.#printerFileStorage[printerId] = getFileCacheDefault();
+      fileStorage = this.#printerFileStorage[printerId] = getFileCacheDefault();
     }
 
     return fileStorage;
