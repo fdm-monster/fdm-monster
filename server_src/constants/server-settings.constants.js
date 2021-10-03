@@ -6,7 +6,7 @@ const onlinePolling = {
 };
 
 const server = {
-  port: AppConstants.defaultOctoFarmPort,
+  port: AppConstants.defaultServerPort,
   registration: true,
   loginRequired: true
 };
@@ -47,7 +47,7 @@ const influxExport = {
   active: false,
   host: null,
   port: 8086,
-  database: "OctoFarmExport",
+  database: "3DPrintExport",
   username: null,
   password: null,
   retentionPolicy: {

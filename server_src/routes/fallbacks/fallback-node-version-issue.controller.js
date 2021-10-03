@@ -16,7 +16,7 @@ class FallbackIssueController {
     res.render("nodeVersionIssue", {
       page: "Node Version Issue",
       octoFarmPageTitle:
-        process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY] || AppConstants.defaultOctoFarmPageTitle,
+        process.env[AppConstants.SERVER_SITE_TITLE_KEY] || AppConstants.defaultServerPageTitle,
       isDocker: isDocker(),
       isPm2: isPm2Safe,
       os: process.env.OS,

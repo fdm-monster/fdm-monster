@@ -125,28 +125,28 @@ function fetchMongoDBConnectionString(persistToEnv = false) {
   return process.env[AppConstants.MONGO_KEY];
 }
 
-function fetchOctoFarmPort() {
-  let port = process.env[AppConstants.OCTOFARM_PORT_KEY];
+function fetchServerPort() {
+  let port = process.env[AppConstants.SERVER_PORT_KEY];
   if (Number.isNaN(parseInt(port))) {
     logger.warning(
-      `~ The ${AppConstants.OCTOFARM_PORT_KEY} setting was not a correct port number: >= 0 and < 65536. Actual value: ${port}.`
+      `~ The ${AppConstants.SERVER_PORT_KEY} setting was not a correct port number: >= 0 and < 65536. Actual value: ${port}.`
     );
 
     // is not isDocker just to be sure, also checked in writeVariableToEnvFile
     if (!isDocker()) {
       envUtils.writeVariableToEnvFile(
         path.resolve(dotEnvPath),
-        AppConstants.OCTOFARM_PORT_KEY,
-        AppConstants.defaultOctoFarmPort
+        AppConstants.SERVER_PORT_KEY,
+        AppConstants.defaultServerPort
       );
       logger.info(
-        `~ Written ${AppConstants.OCTOFARM_PORT_KEY}=${AppConstants.defaultOctoFarmPort} setting to .env file.`
+        `~ Written ${AppConstants.SERVER_PORT_KEY}=${AppConstants.defaultServerPort} setting to .env file.`
       );
     }
 
     // Update config immediately
-    process.env[AppConstants.OCTOFARM_PORT_KEY] = AppConstants.defaultOctoFarmPort.toString();
-    port = process.env[AppConstants.OCTOFARM_PORT_KEY];
+    process.env[AppConstants.SERVER_PORT_KEY] = AppConstants.defaultServerPort.toString();
+    port = process.env[AppConstants.SERVER_PORT_KEY];
   }
   return port;
 }
@@ -204,19 +204,19 @@ function ensureMongoDBConnectionStringSet() {
 }
 
 function ensurePortSet() {
-  fetchOctoFarmPort();
+  fetchServerPort();
 
-  if (!process.env[AppConstants.OCTOFARM_PORT_KEY]) {
+  if (!process.env[AppConstants.SERVER_PORT_KEY]) {
     logger.info(
-      `~ ${AppConstants.OCTOFARM_PORT_KEY} environment variable is not set. Assuming default: ${AppConstants.OCTOFARM_PORT_KEY}=${AppConstants.defaultOctoFarmPort}.`
+      `~ ${AppConstants.SERVER_PORT_KEY} environment variable is not set. Assuming default: ${AppConstants.SERVER_PORT_KEY}=${AppConstants.defaultServerPort}.`
     );
     printInstructionsURL();
-    process.env[AppConstants.OCTOFARM_PORT_KEY] = AppConstants.defaultOctoFarmPort.toString();
+    process.env[AppConstants.SERVER_PORT_KEY] = AppConstants.defaultServerPort.toString();
   }
 }
 
 /**
- * Parse and consume the .env file. Validate everything before starting OctoFarm.
+ * Parse and consume the .env file. Validate everything before starting the server.
  * Later this will switch to parsing a `config.yaml` file.
  */
 function setupEnvConfig(skipDotEnv = false) {
@@ -288,9 +288,9 @@ async function runMigrations(db, client) {
 }
 
 function ensurePageTitle() {
-  if (!process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY]) {
-    process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY] =
-      AppConstants.defaultOctoFarmPageTitle?.toString();
+  if (!process.env[AppConstants.SERVER_SITE_TITLE_KEY]) {
+    process.env[AppConstants.SERVER_SITE_TITLE_KEY] =
+      AppConstants.defaultServerPageTitle?.toString();
   }
 }
 
@@ -303,6 +303,6 @@ module.exports = {
   setupEnvConfig,
   runMigrations,
   fetchMongoDBConnectionString,
-  fetchOctoFarmPort,
+  fetchOctoFarmPort: fetchServerPort,
   getViewsPath
 };

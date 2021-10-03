@@ -62,10 +62,10 @@ function configureContainer() {
     // -- asValue --
     // Here we are telling awilix that the dependency is a value, pretty neat way to solidify data
     serverVersion: awilix.asValue(
-      process.env[AppConstants.VERSION_KEY] || AppConstants.defaultOctoFarmPageTitle
+      process.env[AppConstants.VERSION_KEY] || AppConstants.defaultServerPageTitle
     ),
     appConstants: awilix.asClass(AppConstants).singleton(),
-    octoFarmPageTitle: awilix.asValue(process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY]),
+    octoFarmPageTitle: awilix.asValue(process.env[AppConstants.SERVER_SITE_TITLE_KEY]),
 
     // -- asFunction --
     // Resolve dependencies by calling a function (synchronous or asynchronous)

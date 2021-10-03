@@ -1,14 +1,14 @@
 const MONGO_KEY = "MONGO";
-const OCTOFARM_PORT_KEY = "OCTOFARM_PORT";
+const SERVER_PORT_KEY = "SERVER_PORT";
 const NON_NPM_MODE_KEY = "NON_NPM_MODE";
-const OCTOFARM_SITE_TITLE_KEY = "OCTOFARM_SITE_TITLE";
+const SERVER_SITE_TITLE_KEY = "SERVER_SITE_TITLE";
 const NODE_ENV_KEY = "NODE_ENV";
 
 const VERSION_KEY = "npm_package_version";
 
 const defaultMongoStringUnauthenticated = "mongodb://127.0.0.1:27017/octofarm";
-const defaultOctoFarmPort = 4000;
-const defaultOctoFarmPageTitle = "OctoFarm";
+const defaultServerPort = 4000;
+const defaultServerPageTitle = "OctoFarm";
 const defaultProductionEnv = "production";
 const defaultTestEnv = "test";
 const knownEnvNames = ["development", "production", "test"];
@@ -31,12 +31,12 @@ class AppConstants {
     return defaultMongoStringUnauthenticated;
   }
 
-  static get defaultOctoFarmPort() {
-    return defaultOctoFarmPort;
+  static get defaultServerPort() {
+    return defaultServerPort;
   }
 
-  static get defaultOctoFarmPageTitle() {
-    return defaultOctoFarmPageTitle;
+  static get defaultServerPageTitle() {
+    return defaultServerPageTitle;
   }
 
   static get knownEnvNames() {
@@ -63,16 +63,16 @@ class AppConstants {
     return MONGO_KEY;
   }
 
-  static get OCTOFARM_PORT_KEY() {
-    return OCTOFARM_PORT_KEY;
+  static get SERVER_PORT_KEY() {
+    return SERVER_PORT_KEY;
   }
 
   static get NON_NPM_MODE_KEY() {
     return NON_NPM_MODE_KEY;
   }
 
-  static get OCTOFARM_SITE_TITLE_KEY() {
-    return OCTOFARM_SITE_TITLE_KEY;
+  static get SERVER_SITE_TITLE_KEY() {
+    return SERVER_SITE_TITLE_KEY;
   }
 }
 

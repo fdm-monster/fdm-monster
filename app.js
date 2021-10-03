@@ -12,8 +12,8 @@ if (!!majorVersion && majorVersion < 14) {
     setupFallbackExpressServer
   } = require("./server_src/app-fallbacks");
 
-  const octoFarmServer = setupFallbackExpressServer();
-  serveNodeVersionFallback(octoFarmServer);
+  const server = setupFallbackExpressServer();
+  serveNodeVersionFallback(server);
 } else {
   const {
     setupEnvConfig,
@@ -32,12 +32,11 @@ if (!!majorVersion && majorVersion < 14) {
   } = require("./server_src/app-core");
 
   const DITokens = require("./server_src/container.tokens");
-
   const mongoose = require("mongoose");
   const Logger = require("./server_src/handlers/logger.js");
   const logger = new Logger("OctoFarm-Server");
 
-  const { app: octoFarmServer, container } = setupExpressServer();
+  const { app: server, container } = setupExpressServer();
 
   mongoose
     .connect(fetchMongoDBConnectionString(), {
@@ -59,7 +58,7 @@ if (!!majorVersion && majorVersion < 14) {
         throw new Error("The OctoFarm server requires a numeric port input argument to run");
       }
 
-      const app = await serveOctoFarmNormally(octoFarmServer, container);
+      const app = await serveOctoFarmNormally(server, container);
       app.listen(port, "0.0.0.0", () => {
         logger.info(`Server started... open it at http://127.0.0.1:${port}`);
       });
@@ -67,6 +66,6 @@ if (!!majorVersion && majorVersion < 14) {
     .catch(async (err) => {
       logger.error(err.stack);
       const { serveDatabaseIssueFallback } = require("./server_src/app-fallbacks");
-      serveDatabaseIssueFallback(octoFarmServer, fetchOctoFarmPort());
+      serveDatabaseIssueFallback(server, fetchOctoFarmPort());
     });
 }

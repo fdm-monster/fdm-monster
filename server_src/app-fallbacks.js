@@ -44,24 +44,24 @@ function setupFallbackExpressServer() {
   return app;
 }
 
-function fetchOctoFarmPort() {
+function fetchServerPort() {
   dotenv.config({ path: path.join(__dirname, ".env") });
 
-  let port = process.env[AppConstants.OCTOFARM_PORT_KEY];
+  let port = process.env[AppConstants.SERVER_PORT_KEY];
   if (Number.isNaN(parseInt(port))) {
     logger.warning(
-      `~ The ${AppConstants.OCTOFARM_PORT_KEY} setting was not a correct port number: >= 0 and < 65536. Actual value: ${port}.`
+      `~ The ${AppConstants.SERVER_PORT_KEY} setting was not a correct port number: >= 0 and < 65536. Actual value: ${port}.`
     );
 
     // Update config immediately
-    process.env[AppConstants.OCTOFARM_PORT_KEY] = AppConstants.defaultOctoFarmPort.toString();
-    port = process.env[AppConstants.OCTOFARM_PORT_KEY];
+    process.env[AppConstants.SERVER_PORT_KEY] = AppConstants.defaultServerPort.toString();
+    port = process.env[AppConstants.SERVER_PORT_KEY];
   }
   return port;
 }
 
 function serveNodeVersionFallback(app) {
-  const port = fetchOctoFarmPort();
+  const port = fetchServerPort();
   let listenerHttpServer = app.listen(port, "0.0.0.0", () => {
     const msg = `You have an old Node version: ${process.version}. This needs to be version 14.x or higher... open our webpage at http://127.0.0.1:${port} for tips`;
     logger.info(msg);
