@@ -3,7 +3,6 @@ import { PrintersController } from "./controllers/printers.controller";
 import { PrintersService } from "./services/printers.service";
 import { Printer } from "./entities/printer.entity";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { PrintersMvcController } from "./controllers/printers-mvc.controller";
 import { SettingsModule } from "../settings/settings.module";
 import { PrinterGroupsController } from "./controllers/printer-groups.controller";
 import { PrinterGroupsService } from "./services/printer-groups.service";
@@ -41,6 +40,6 @@ import { JobStatisticsService } from "./services/job-statistics.service";
     PrinterQueryTask
   ],
   exports: [PrintersService, JobStatisticsService],
-  controllers: [PrintersController, PrintersMvcController, PrinterGroupsController]
+  controllers: [PrintersController, PrinterGroupsController]
 })
 export class PrintersModule {}
