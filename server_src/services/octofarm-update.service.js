@@ -72,7 +72,7 @@ class OctofarmUpdateService {
               this.#lastReleaseCheckFailed = true;
             }
           } else {
-            console.log("Latest release check failed because releases from gitty empty");
+            console.log("Latest release check failed because releases from github empty");
             this.#lastReleaseCheckFailed = true;
           }
         }

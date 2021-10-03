@@ -8,10 +8,10 @@ const { AppConstants } = require("./app.constants");
 
 const Logger = require("./handlers/logger.js");
 const { status, up } = require("migrate-mongo");
-const logger = new Logger("OctoFarm-Environment", false);
+const logger = new Logger("3DPF-Environment", false);
 
 // Constants and definition
-const instructionsReferralURL = "https://github.com/OctoFarm/OctoFarm/blob/master/README.md"; // TODO replace with environment setup markdown
+const instructionsReferralURL = "https://github.com/davidzwa/3d-print-farm/blob/master/README.md";
 const deprecatedConfigFolder = "./config";
 const deprecatedConfigFilePath = deprecatedConfigFolder + "/db.js";
 const packageJsonPath = path.join(__dirname, "../package.json");
@@ -51,26 +51,22 @@ function ensureEnvNpmVersionSet() {
   if (!process.env[AppConstants.VERSION_KEY]) {
     process.env[AppConstants.VERSION_KEY] = packageJsonVersion;
     process.env[AppConstants.NON_NPM_MODE_KEY] = "true";
-    logger.info(
-      `✓ Running OctoFarm version ${process.env[AppConstants.VERSION_KEY]} in non-NPM mode!`
-    );
+    logger.info(`✓ Running 3DPF version ${process.env[AppConstants.VERSION_KEY]} in non-NPM mode!`);
   } else {
-    logger.debug(
-      `✓ Running OctoFarm version ${process.env[AppConstants.VERSION_KEY]} in NPM mode!`
-    );
+    logger.debug(`✓ Running 3DPF version ${process.env[AppConstants.VERSION_KEY]} in NPM mode!`);
   }
 
   if (process.env[AppConstants.VERSION_KEY] !== packageJsonVersion) {
     process.env[AppConstants.VERSION_KEY] = packageJsonVersion;
     logger.warning(
-      `~ Had to synchronize OctoFarm version to '${packageJsonVersion}' as it was outdated.`
+      `~ Had to synchronize 3DPF version to '${packageJsonVersion}' as it was outdated.`
     );
   }
 }
 
 function removePm2Service(reason) {
   logger.error(`Removing PM2 service as OctoFarm failed to start: ${reason}`);
-  execSync("pm2 delete OctoFarm");
+  execSync("pm2 delete 3DPF");
 }
 
 function removeFolderIfEmpty(folder) {
@@ -90,7 +86,7 @@ function setupPackageJsonVersionOrThrow() {
       // TODO test this works under docker as well
       removePm2Service("didnt pass startup validation (package.json)");
     }
-    throw new Error("Aborting OctoFarm server.");
+    throw new Error("Aborting 3DPF server.");
   }
 }
 

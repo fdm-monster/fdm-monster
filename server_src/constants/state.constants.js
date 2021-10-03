@@ -59,20 +59,6 @@ const getSystemChecksDefault = () => {
     [SYSTEM_CHECKS.system]: {
       status: "success", //"danger",
       date: null
-    },
-    // TODO Hmm
-    cleaning: {
-      information: {
-        date: null
-      },
-      job: {
-        date: null
-      },
-      file: {
-        date: null
-      },
-      status: "success", // "danger",
-      date: null
     }
   };
 };

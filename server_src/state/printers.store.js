@@ -112,6 +112,12 @@ class PrintersStore {
     return state.toFlat();
   }
 
+  getPrinterLogin(id) {
+    const state = this.getPrinterState(id);
+
+    return state.getLoginDetails();
+  }
+
   async updatePrinterConnectionSettings(printerId, { printerURL, camURL, webSocketURL, apiKey }) {
     const printerState = this.getPrinterState(printerId);
 

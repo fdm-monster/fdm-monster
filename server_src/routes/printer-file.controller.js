@@ -1,16 +1,40 @@
 const { ensureAuthenticated } = require("../middleware/auth");
 const { createController } = require("awilix-express");
 const Logger = require("../handlers/logger.js");
-const { validateMiddleware } = require("../handlers/validators");
+const { validateMiddleware, validateInput } = require("../handlers/validators");
 const { AppConstants } = require("../app.constants");
+const { idRules } = require("./validation/generic.validation");
+const {
+  crudFileRules,
+  getFilesRules
+} = require("./validation/printer-files-controller.validation");
 
 class PrinterFileController {
   #filesStore;
 
+  #octoPrintApiService;
+  #printersStore;
+
   #logger = new Logger("OctoFarm-API");
 
-  constructor({ filesStore }) {
+  constructor({ filesStore, octoPrintApiService, printersStore }) {
     this.#filesStore = filesStore;
+    this.#octoPrintApiService = octoPrintApiService;
+    this.#printersStore = printersStore;
+  }
+
+  async getFiles(req, res) {
+    const { id: printerId } = await validateInput(req.params, idRules);
+    const { recursive } = await validateInput(req.query, getFilesRules);
+
+    const printer = this.#printersStore.getPrinterLogin(printerId);
+
+    const response = await this.#octoPrintApiService.getFiles(printer, recursive, {
+      unwrap: false
+    });
+
+    res.statusCode = response.status;
+    res.send(response.data);
   }
 
   async removeFile(req, res) {
@@ -83,6 +107,7 @@ class PrinterFileController {
 module.exports = createController(PrinterFileController)
   .prefix(AppConstants.apiRoute + "/printer-files")
   .before([ensureAuthenticated])
+  .get("/:id", "getFiles")
   .delete("/file", "removeFile")
   .post("/file/resync", "resyncFile")
   .post("/file/move", "moveFile")

@@ -4,6 +4,7 @@ export class ServerApi {
   public static readonly printerRoute = ServerApi.base + "/printer";
   public static readonly printerEnabledRoute = (id: string) =>
     ServerApi.printerRoute + `/${id}/enabled`;
+  static printerFilesRoute = ServerApi.base + "/printer-files";
   public static readonly printerNetworkRoute = ServerApi.base + "/printer-network";
   public static readonly scanSsdp = ServerApi.printerNetworkRoute + "/scan-ssdp";
   public static readonly settingsRoute = ServerApi.base + "/settings";
