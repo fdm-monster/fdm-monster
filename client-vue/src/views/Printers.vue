@@ -108,7 +108,7 @@ import { sseMessageEventGlobal } from "@/event-bus/sse.events";
 import PrinterDetails from "@/components/PrinterDetails.vue";
 
 @Component({
-  components: {PrinterDetails, draggable }
+  components: { PrinterDetails, draggable }
 })
 export default class Printers extends Vue {
   @Action loadPrinters: () => Promise<Printer[]>;
