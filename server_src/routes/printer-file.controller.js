@@ -33,6 +33,8 @@ class PrinterFileController {
       unwrap: false
     });
 
+    await this.#filesStore.updatePrinterFiles(printerId, response.data);
+
     res.statusCode = response.status;
     res.send(response.data);
   }

@@ -19,11 +19,6 @@
       <span>Settings</span>
       <v-icon right>location_on</v-icon>
     </v-btn>
-
-    <!--    <v-btn color="grey" dark>-->
-    <!--      <span>Disconnect UART</span>-->
-    <!--      <v-icon right>usb_off</v-icon>-->
-    <!--    </v-btn>-->
   </v-app-bar>
 </template>
 

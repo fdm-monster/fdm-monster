@@ -41,7 +41,7 @@ class FilesStore {
     const printer = this.#printersStore.getPrinterState(printedId);
 
     // Check printer in database and modify
-    const printerFileList = await this.#printerFilesService.updatePrinterFiles(printer.id, files);
+    const printerFileList = await this.#printerFilesService.updateFiles(printer.id, files);
 
     // Update cache with data from storage
     await this.#fileCache.cachePrinterFiles(printer.id, printerFileList);
