@@ -27,9 +27,9 @@ class PrinterFileController {
     const { id: printerId } = await validateInput(req.params, idRules);
     const { recursive } = await validateInput(req.query, getFilesRules);
 
-    const printer = this.#printersStore.getPrinterLogin(printerId);
+    const printerLogin = this.#printersStore.getPrinterLogin(printerId);
 
-    const response = await this.#octoPrintApiService.getFiles(printer, recursive, {
+    const response = await this.#octoPrintApiService.getFiles(printerLogin, recursive, {
       unwrap: false
     });
 
