@@ -1,4 +1,4 @@
-name: Frontend Webpack and NPM Publish
+name: Vue publish
 on:
   pull_request:
   push:
