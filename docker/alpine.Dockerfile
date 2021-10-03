@@ -9,9 +9,9 @@ RUN apk add --no-cache --virtual .base-deps \
 
 RUN npm install -g pm2
 
-RUN adduser -D octofarm --home /app && \
+RUN adduser -D 3dpf --home /app && \
     mkdir -p /scripts && \
-    chown -R octofarm:octofarm /scripts/
+    chown -R 3dpf:3dpf /scripts/
 
 FROM base as compiler
 
@@ -30,11 +30,11 @@ RUN apk del .build-deps
 
 FROM base as runtime
 
-COPY --chown=octofarm:octofarm --from=compiler /tmp/app/node_modules /app/node_modules
-COPY --chown=octofarm:octofarm . /app
+COPY --chown=3dpf:3dpf --from=compiler /tmp/app/node_modules /app/node_modules
+COPY --chown=3dpf:3dpf . /app
 RUN rm -rf /tmp/app
 
-USER octofarm
+USER 3dpf
 WORKDIR /app
 
 ENTRYPOINT [ "/sbin/tini", "--" ]
