@@ -470,7 +470,9 @@ class PrinterState {
     };
   }
 
-  // Tracking for API failures like GlobalAPIKey, ApiKey rejected which can only be fixed by OctoFarm
+  /**
+   * Tracking for API failures like GlobalAPIKey, ApiKey rejected which can only be fixed by OctoFarm
+   */
   setApiAccessibility(accessible, retryable, reason) {
     if (!accessible) {
       if (!retryable) {

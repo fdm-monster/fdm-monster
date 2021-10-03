@@ -24,7 +24,7 @@ class GithubApiService {
     }
 
     return await this.#httpClient
-      .get("https://api.github.com/repos/octofarm/octofarm/releases", {
+      .get("https://api.github.com/repos/davidzwa/3d-print-farm/releases", {
         headers: {
           [contentTypeHeaderKey]: jsonContentType
         }

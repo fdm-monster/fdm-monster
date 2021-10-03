@@ -23,17 +23,17 @@ describe("generate", function () {
     const fileStorageEntryNoStorage = {
       fileList: [1]
     };
-    fileCache.savePrinterFileStorage(testPrinterId, fileStorageEntryNoStorage);
+    fileCache.cachePrinterFileStorage(testPrinterId, fileStorageEntryNoStorage);
     expect(fileCache.getPrinterFiles(testPrinterId)).toEqual([1]);
     expect(fileCache.getPrinterStorage(testPrinterId)).toBeUndefined();
 
-    fileCache.savePrinterFileStorage(testPrinterId, fileStorageEntry);
+    fileCache.cachePrinterFileStorage(testPrinterId, fileStorageEntry);
     expect(fileCache.getPrinterFiles(testPrinterId)).toEqual([1]);
     expect(fileCache.getPrinterStorage(testPrinterId)).toEqual({});
   });
 
   it("should generate file statistics for badly formatted fileList", function () {
-    fileCache.savePrinterFileStorage(testPrinterId, fileStorageEntry);
+    fileCache.cachePrinterFileStorage(testPrinterId, fileStorageEntry);
 
     const fileList = fileCache.getPrinterFiles(testPrinterId);
     expect(fileList).toBeTruthy();

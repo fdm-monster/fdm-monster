@@ -50,10 +50,6 @@ export default class GridItem extends Vue {
   skeleton = this.dataItem?.skeleton;
   fab = false;
 
-  created() {
-    console.log(this.skeleton);
-  }
-
   updated() {
     // The grid item is dereferenced on every update
     this.grid.removeWidget(`#${this.selector}`, false);

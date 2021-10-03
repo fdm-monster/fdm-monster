@@ -6,7 +6,7 @@ const Logger = require("../handlers/logger.js");
 class FilesStore {
   #printersStore;
   #printerFilesService;
-  #filesCache;
+  #fileCache;
   #octoPrintApiService;
 
   #logger = new Logger("OctoFarm-FilesStore");
@@ -14,7 +14,7 @@ class FilesStore {
   constructor({ printersStore, printerFilesService, fileCache, octoPrintApiService }) {
     this.#printersStore = printersStore;
     this.#printerFilesService = printerFilesService;
-    this.#filesCache = fileCache;
+    this.#fileCache = fileCache;
     this.#octoPrintApiService = octoPrintApiService;
   }
 
@@ -29,11 +29,22 @@ class FilesStore {
         const printerFileStorage = await this.#printerFilesService.getPrinterFilesStorage(
           printer.id
         );
-        this.#filesCache.savePrinterFileStorage(printer.id, printerFileStorage);
+        this.#fileCache.cachePrinterFileStorage(printer.id, printerFileStorage);
       } catch (e) {
         this.#logger.error("Files store failed to reconstruct files from database.", e.stack);
       }
     }
+  }
+
+  async updatePrinterFiles(printedId, files) {
+    // Check cache existence
+    const printer = this.#printersStore.getPrinterState(printedId);
+
+    // Check printer in database and modify
+    const printerFileList = await this.#printerFilesService.updateFiles(printer.id, files);
+
+    // Update cache with data from storage
+    await this.#fileCache.cachePrinterFiles(printer.id, printerFileList);
   }
 
   /**
@@ -46,7 +57,7 @@ class FilesStore {
     // This will throw if not found
     await this.#printerFilesService.deleteFile(printerId, filePath);
     // The next call will never throw - just logs a warning
-    this.#filesCache.purgeFile(printerId, filePath);
+    this.#fileCache.purgeFile(printerId, filePath);
 
     // Old code
     // const currentFilament = await Runner.compileSelectedFilament(fprinter.selectedFilament, i);

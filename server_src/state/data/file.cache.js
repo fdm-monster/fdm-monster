@@ -22,18 +22,30 @@ class FileCache {
 
   /**
    * Save a printer storage reference to cache
-   * @param printerID
+   * @param printerId
    * @param fileList
    * @param storage
    */
-  savePrinterFileStorage(printerID, { fileList, storage }) {
-    this.#printerFileStorage[printerID] = { fileList, storage };
+  cachePrinterFileStorage(printerId, { fileList, storage }) {
+    this.cachePrinterStorage(printerId, storage);
 
-    let fileCount = this.getFileCount();
-    if (fileCount !== this.#totalFileCount) {
-      this.#totalFileCount = fileCount;
-      this.#logger.info(`Cached ${this.#totalFileCount} file storage references.`);
-    }
+    this.cachePrinterFiles(printerId, fileList);
+  }
+
+  cachePrinterFiles(printerID, fileList) {
+    const printerFileStorage = this.#getPrinterFileStorage(printerID);
+
+    printerFileStorage.fileList = fileList;
+
+    this.updateCacheFileRefCount();
+  }
+
+  cachePrinterStorage(printerId, storage) {
+    const printerFileStorage = this.#getPrinterFileStorage(printerId);
+
+    printerFileStorage.storage = storage;
+
+    this.updateCacheFileRefCount();
   }
 
   #getPrinterFileStorage(printerId) {
@@ -41,11 +53,11 @@ class FileCache {
       throw new Error("File Cache cant get a null/undefined printer id");
     }
 
-    const fileStorage = this.#printerFileStorage[printerId];
+    let fileStorage = this.#printerFileStorage[printerId];
 
     if (!fileStorage) {
       // A runtime thing only, repository handles it differently
-      this.#printerFileStorage[printerId] = getFileCacheDefault();
+      fileStorage = this.#printerFileStorage[printerId] = getFileCacheDefault();
     }
 
     return fileStorage;
@@ -65,11 +77,17 @@ class FileCache {
     return fileStorage?.storage;
   }
 
-  getFileCount() {
+  updateCacheFileRefCount() {
     let totalFiles = 0;
     for (const storage of Object.values(this.#printerFileStorage)) {
       totalFiles += storage.fileList.fileCount;
     }
+
+    if (totalFiles !== this.#totalFileCount) {
+      this.#totalFileCount = totalFiles;
+      this.#logger.info(`Cache updated. ${this.#totalFileCount} file storage references cached.`);
+    }
+
     return totalFiles;
   }
 

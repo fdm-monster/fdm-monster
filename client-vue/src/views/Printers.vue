@@ -64,11 +64,11 @@
         >
           <v-icon>directions</v-icon>
         </v-btn>
-        <v-badge bordered class="ma-2" color="red" overlap>
+        <v-badge v-if="item.enabled" bordered class="ma-2" color="red" overlap>
           <template v-slot:badge>
             <v-icon> close</v-icon>
           </template>
-          <v-btn v-if="item.enabled" color="secondary" fab small>
+          <v-btn color="secondary" fab small>
             <v-icon>usb</v-icon>
           </v-btn>
         </v-badge>
@@ -89,10 +89,7 @@
       </template>
       <template v-slot:expanded-item="{ headers, item }">
         <td :colspan="headers.length">
-          More info about
-          {{
-            JSON.stringify({ _id: item._id, name: item.printerName, printerURL: item.printerURL })
-          }}
+          <PrinterDetails :printer="item"></PrinterDetails>
         </td>
       </template>
     </v-data-table>
@@ -108,9 +105,10 @@ import draggable from "vuedraggable";
 import { PrintersService } from "@/backend/printers.service";
 import { PrinterSseMessage } from "@/models/sse-messages/printer-sse-message.model";
 import { sseMessageEventGlobal } from "@/event-bus/sse.events";
+import PrinterDetails from "@/components/PrinterDetails.vue";
 
 @Component({
-  components: { draggable }
+  components: { PrinterDetails, draggable }
 })
 export default class Printers extends Vue {
   @Action loadPrinters: () => Promise<Printer[]>;

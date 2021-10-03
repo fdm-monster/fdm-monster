@@ -22,7 +22,8 @@ function setupExpressServer() {
 
   app.use(
     cors({
-      origin: "http://localhost:8080"
+      origin: "*",
+      methods: "GET,HEAD,PUT,PATCH,POST,DELETE"
     })
   );
   app.use(express.json());
@@ -71,7 +72,6 @@ function setupExpressServer() {
 
 async function ensureSystemSettingsInitiated(container) {
   logger.info("Loading Server Settings.");
-
   const serverSettingsService = container.resolve(DITokens.serverSettingsService);
   await serverSettingsService.probeDatabase();
 
