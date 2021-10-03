@@ -1,6 +1,6 @@
-const RoomData = require("../../../server_src/models/RoomData");
-const DITokens = require("../../../server_src/container.tokens");
-const { configureContainer } = require("../../../server_src/container");
+const RoomData = require("../../../server/models/RoomData");
+const DITokens = require("../../../server/container.tokens");
+const { configureContainer } = require("../../../server/container");
 
 let container;
 let dashboardStatisticsCache;

@@ -1,7 +1,7 @@
 const dbHandler = require("../../db-handler");
-const { configureContainer } = require("../../../server_src/container");
-const DITokens = require("../../../server_src/container.tokens");
-const { getEmptyOperationsObject } = require("../../../server_src/constants/cleaner.constants");
+const { configureContainer } = require("../../../server/container");
+const DITokens = require("../../../server/container.tokens");
+const { getEmptyOperationsObject } = require("../../../server/constants/cleaner.constants");
 
 let container;
 let jobsCache;

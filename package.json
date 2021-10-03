@@ -14,7 +14,7 @@
     "stop": "pm2 stop OctoFarm",
     "stop:delete": "pm2 delete OctoFarm",
     "release": "git archive -o octofarm.zip HEAD",
-    "prettier": "prettier --write \"./server_src/**/*.js\" \"./test/**/*.js\" \"./client_src/**/*.js\"",
+    "prettier": "prettier --write \\\"server/**/*.js\\\" \\\"./test/**/*.js\\\" \\\"./client_src/**/*.js\\\"",
     "dev": "nodemon ./app.js",
     "test": "jest --forceExit"
   },
@@ -35,7 +35,6 @@
   "author": "David Zwart (davidzwa)",
   "license": "ISC",
   "dependencies": {
-    "@octofarm/client": "^0.1.0-rc2-build6",
     "archiver": "^5.3.0",
     "awilix": "^4.3.4",
     "awilix-express": "^4.0.0",
@@ -45,10 +44,8 @@
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "dotenv": "^9.0.1",
-    "ejs": "^3.1.6",
     "eventemitter2": "^6.4.4",
     "express": "^4.17.1",
-    "express-ejs-layouts": "^2.5.0",
     "express-session": "^1.17.1",
     "flatted": "^3.1.1",
     "influx": "^5.9.0",

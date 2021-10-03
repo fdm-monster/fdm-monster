@@ -1,4 +1,4 @@
-const envUtils = require("../../server_src/utils/env.utils");
+const envUtils = require("../../server/utils/env.utils");
 const path = require("path");
 
 describe("NODE_ENV", () => {

@@ -1,10 +1,10 @@
 const dbHandler = require("../../db-handler");
-jest.mock("../../../server_src/services/farm-statistics.service");
-jest.mock("../../../server_src/models/ErrorLog");
-jest.mock("../../../server_src/models/TempHistory");
-jest.mock("../../../server_src/models/RoomData");
-const { configureContainer } = require("../../../server_src/container");
-const DITokens = require("../../../server_src/container.tokens");
+jest.mock("../../../server/services/farm-statistics.service");
+jest.mock("../../../server/models/ErrorLog");
+jest.mock("../../../server/models/TempHistory");
+jest.mock("../../../server/models/RoomData");
+const { configureContainer } = require("../../../server/container");
+const DITokens = require("../../../server/container.tokens");
 
 let container;
 let heatMapCache;

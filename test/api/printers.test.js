@@ -1,11 +1,11 @@
-jest.mock("../../server_src/middleware/auth");
+jest.mock("../../server/middleware/auth");
 
 const dbHandler = require("../db-handler");
 const supertest = require("supertest");
-const { AppConstants } = require("../../server_src/app.constants");
-const { setupTestApp } = require("../../server_src/app-test");
+const { AppConstants } = require("../../server/app.constants");
+const { setupTestApp } = require("../../server/app-test");
 const { expectInvalidResponse, expectOkResponse } = require("../extensions");
-const Printer = require("../../server_src/models/Printer");
+const Printer = require("../../server/models/Printer");
 
 let request;
 

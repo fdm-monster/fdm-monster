@@ -1,10 +1,10 @@
-jest.mock("../../../server_src/services/octoprint/octoprint-api.service");
+jest.mock("../../../server/services/octoprint/octoprint-api.service");
 const dbHandler = require("../../db-handler");
-const DITokens = require("../../../server_src/container.tokens");
-const { configureContainer } = require("../../../server_src/container");
-const { getSystemChecksDefault } = require("../../../server_src/constants/state.constants");
-const { ensureSystemSettingsInitiated } = require("../../../server_src/app-core");
-const { ValidationException } = require("../../../server_src/exceptions/runtime.exceptions");
+const DITokens = require("../../../server/container.tokens");
+const { configureContainer } = require("../../../server/container");
+const { getSystemChecksDefault } = require("../../../server/constants/state.constants");
+const { ensureSystemSettingsInitiated } = require("../../../server/app-core");
+const { ValidationException } = require("../../../server/exceptions/runtime.exceptions");
 
 let container;
 let printersStore;

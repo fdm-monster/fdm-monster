@@ -1,5 +1,5 @@
 // In this file you can configure migrate-mongo
-const { setupEnvConfig, fetchMongoDBConnectionString } = require("./server_src/app-env");
+const { setupEnvConfig, fetchMongoDBConnectionString } = require("./server/app-env");
 
 if (!process.env.MONGO) {
   setupEnvConfig();

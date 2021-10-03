@@ -1,4 +1,4 @@
-const { checkTempRange, mapProgressToColor } = require("../../server_src/utils/mapping.utils");
+const { checkTempRange, mapProgressToColor } = require("../../server/utils/mapping.utils");
 
 describe("mapping-utils", () => {
   it("should run checkTempRange util with expected temperature state", async () => {

@@ -1,7 +1,7 @@
-const { getCompletionDate } = require("../../../server_src/utils/time.util");
-const { configureContainer } = require("../../../server_src/container");
-const DITokens = require("../../../server_src/container.tokens");
-const { getJobCacheDefault } = require("../../../server_src/constants/cache.constants");
+const { getCompletionDate } = require("../../../server/utils/time.util");
+const { configureContainer } = require("../../../server/container");
+const DITokens = require("../../../server/container.tokens");
+const { getJobCacheDefault } = require("../../../server/constants/cache.constants");
 
 // Before luxon
 function legacyUUTGetCompletionDate(printTimeLeft, completion) {

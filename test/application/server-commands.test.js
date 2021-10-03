@@ -3,19 +3,19 @@ jest.mock("child_process", () => {
     exec: () => Promise.resolve()
   };
 });
-jest.mock("../../server_src/utils/npm.utils");
+jest.mock("../../server/utils/npm.utils");
 jest.mock("simple-git");
 const SimpleGit = require("simple-git");
 const mockedSimpleGit = SimpleGit();
-const npmUtils = require("../../server_src/utils/npm.utils");
+const npmUtils = require("../../server/utils/npm.utils");
 jest.mock("lookpath", () => {
   return {
     lookpath: () => Promise.resolve("/usr/random/path")
   };
 });
 const { lookpath } = require("lookpath");
-const { configureContainer } = require("../../server_src/container");
-const DITokens = require("../../server_src/container.tokens");
+const { configureContainer } = require("../../server/container");
+const DITokens = require("../../server/container.tokens");
 
 describe("ServerCommands", () => {
   let container;
@@ -28,19 +28,19 @@ describe("ServerCommands", () => {
 
   describe("package updates, modifications and pull", () => {
     const scenarioModifiedOutput = {
-      modified: ["package-lock.json", "package.json", "server_src/lib/serverCommands.js"],
+      modified: ["package-lock.json", "package.json", "server/lib/serverCommands.js"],
       ahead: 0,
       behind: 0
     };
 
     const scenarioModifiedBehindOutput = {
-      modified: ["package-lock.json", "package.json", "server_src/lib/serverCommands.js"],
+      modified: ["package-lock.json", "package.json", "server/lib/serverCommands.js"],
       ahead: 0,
       behind: 1
     };
 
     const scenarioModifiedAheadOutput = {
-      modified: ["package-lock.json", "package.json", "server_src/lib/serverCommands.js"],
+      modified: ["package-lock.json", "package.json", "server/lib/serverCommands.js"],
       ahead: 1,
       behind: 0
     };

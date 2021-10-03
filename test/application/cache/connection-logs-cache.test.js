@@ -1,5 +1,5 @@
-const { configureContainer } = require("../../../server_src/container");
-const DITokens = require("../../../server_src/container.tokens");
+const { configureContainer } = require("../../../server/container");
+const DITokens = require("../../../server/container.tokens");
 const dbHandler = require("../../db-handler");
 
 let container;

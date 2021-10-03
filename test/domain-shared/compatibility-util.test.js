@@ -1,4 +1,4 @@
-const { checkPluginManagerAPIDeprecation } = require("../../server_src/utils/compatibility.utils");
+const { checkPluginManagerAPIDeprecation } = require("../../server/utils/compatibility.utils");
 
 describe("CompatibilityUtil", () => {
   it("new PluginManager API should be compatible with versions >= 1.6.0", () => {

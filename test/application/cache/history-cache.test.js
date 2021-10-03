@@ -1,17 +1,17 @@
-jest.mock("../../../server_src/services/history.service");
-const { noCostSettingsMessage } = require("../../../server_src/utils/print-cost.util");
+jest.mock("../../../server/services/history.service");
+const { noCostSettingsMessage } = require("../../../server/utils/print-cost.util");
 const { isPromise } = require("jest-util");
 
 const illegalHistoryCache = [{ printHistory2: null }];
 const emptyLegalHistoryCache = [{ printHistory: {} }];
 const realisticHistoryCache = require("./mock-data/Histories.json");
-const { configureContainer } = require("../../../server_src/container");
-const DITokens = require("../../../server_src/container.tokens");
-const { assignYCumSum } = require("../../../server_src/utils/graph-point.utils");
+const { configureContainer } = require("../../../server/container");
+const DITokens = require("../../../server/container.tokens");
+const { assignYCumSum } = require("../../../server/utils/graph-point.utils");
 const {
   processHistorySpools,
   calcSpoolWeightAsString
-} = require("../../../server_src/utils/spool.utils");
+} = require("../../../server/utils/spool.utils");
 const { legacyGetFile } = require("./history-cache-legacy");
 const interestingButWeirdHistoryCache = [
   {

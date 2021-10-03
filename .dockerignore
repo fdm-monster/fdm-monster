@@ -14,7 +14,7 @@ Makefile
 /**/node_modules
 
 /client_2x
-/server_2x
+/server-nest
 /screenshots
 /test
 
