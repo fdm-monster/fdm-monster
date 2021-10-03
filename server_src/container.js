@@ -27,9 +27,7 @@ const PrinterFilesTask = require("./tasks/printer-files.task");
 const PrinterTickerStore = require("./state/printer-ticker.store");
 const PrinterWebsocketTask = require("./tasks/printer-websocket.task");
 const PrinterSseTask = require("./tasks/printer-sse.task");
-const MonitoringSseTask = require("./tasks/monitoring-sse.task");
 const SortingFilteringCache = require("./state/data/sorting-filtering.cache");
-const DashboardSseTask = require("./tasks/dashboard-sse.task");
 const CurrentOperationsCache = require("./state/data/current-operations.cache");
 const PrinterSystemTask = require("./tasks/printer-system.task");
 const OctoPrintApiService = require("./services/octoprint/octoprint-api.service");
@@ -65,7 +63,7 @@ function configureContainer() {
       process.env[AppConstants.VERSION_KEY] || AppConstants.defaultServerPageTitle
     ),
     appConstants: awilix.asClass(AppConstants).singleton(),
-    octoFarmPageTitle: awilix.asValue(process.env[AppConstants.SERVER_SITE_TITLE_KEY]),
+    serverPageTitle: awilix.asValue(process.env[AppConstants.SERVER_SITE_TITLE_KEY]),
 
     // -- asFunction --
     // Resolve dependencies by calling a function (synchronous or asynchronous)
@@ -139,13 +137,9 @@ function configureContainer() {
 
     softwareUpdateTask: awilix.asClass(SoftwareUpdateTask),
     // Provided SSE handlers (couplers) shared with controllers
-    printerViewSSEHandler: awilix.asClass(ServerSentEventsHandler).singleton(),
-    monitoringViewSSEHandler: awilix.asClass(ServerSentEventsHandler).singleton(),
-    dashboardViewSSEHandler: awilix.asClass(ServerSentEventsHandler).singleton(),
+    printerSseHandler: awilix.asClass(ServerSentEventsHandler).singleton(),
     // Task bound to send on SSE Handler
     [DITokens.printerSseTask]: awilix.asClass(PrinterSseTask).singleton(),
-    [DITokens.monitoringSseTask]: awilix.asClass(MonitoringSseTask).singleton(),
-    [DITokens.dashboardSseTask]: awilix.asClass(DashboardSseTask).singleton(),
     // Normal post-analysis operations (previously called cleaners)
     printerFilesTask: awilix.asClass(PrinterFilesTask).singleton(),
     // This task is a quick task (~100ms per printer)

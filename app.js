@@ -19,7 +19,7 @@ if (!!majorVersion && majorVersion < 14) {
     setupEnvConfig,
     fetchMongoDBConnectionString,
     runMigrations,
-    fetchOctoFarmPort
+    fetchServerPort
   } = require("./server_src/app-env");
 
   // Set environment/.env file and NODE_ENV if not set. Will call startup checks.
@@ -51,7 +51,7 @@ if (!!majorVersion && majorVersion < 14) {
       await ensureSystemSettingsInitiated(container);
     })
     .then(async () => {
-      const port = fetchOctoFarmPort();
+      const port = fetchServerPort();
 
       // Shit hit the fan
       if (!port || Number.isNaN(parseInt(port))) {
@@ -66,6 +66,6 @@ if (!!majorVersion && majorVersion < 14) {
     .catch(async (err) => {
       logger.error(err.stack);
       const { serveDatabaseIssueFallback } = require("./server_src/app-fallbacks");
-      serveDatabaseIssueFallback(server, fetchOctoFarmPort());
+      serveDatabaseIssueFallback(server, fetchServerPort());
     });
 }

@@ -3,7 +3,6 @@ const flash = require("connect-flash");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const passport = require("passport");
-const expressLayouts = require("express-ejs-layouts");
 const Logger = require("./handlers/logger.js");
 const DITokens = require("./container.tokens");
 const exceptionHandler = require("./exceptions/exception.handler");
@@ -36,9 +35,6 @@ function setupExpressServer() {
     app.use("/assets/dist", express.static(bundlePath));
   }
 
-  app.set("views", viewsPath);
-  app.set("view engine", "ejs");
-  app.use(expressLayouts);
   app.use(express.static(viewsPath));
 
   app.use("/images", express.static("./images"));
@@ -80,7 +76,7 @@ async function ensureSystemSettingsInitiated(container) {
 }
 
 function serveOctoFarmRoutes(app) {
-  const routePath = "./routes";
+  const routePath = "./controllers";
 
   app.use(loadControllers(`${routePath}/settings/*.controller.js`, { cwd: __dirname }));
   app.use(loadControllers(`${routePath}/*.controller.js`, { cwd: __dirname }));

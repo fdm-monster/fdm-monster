@@ -303,6 +303,6 @@ module.exports = {
   setupEnvConfig,
   runMigrations,
   fetchMongoDBConnectionString,
-  fetchOctoFarmPort: fetchServerPort,
+  fetchServerPort,
   getViewsPath
 };

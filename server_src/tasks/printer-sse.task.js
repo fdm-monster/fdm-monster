@@ -4,7 +4,7 @@ const { AppConstants } = require("../app.constants");
 const { byteCount } = require("../utils/benchmark.util");
 
 class PrinterSseTask {
-  #printerViewSSEHandler;
+  #printerSseHandler;
   #printersStore;
 
   #aggregateSizeCounter = 0;
@@ -13,8 +13,8 @@ class PrinterSseTask {
   #rounding = 2;
   #logger = new Logger("Printer-SSE-task");
 
-  constructor({ printerViewSSEHandler, printersStore }) {
-    this.#printerViewSSEHandler = printerViewSSEHandler;
+  constructor({ printerSseHandler, printersStore }) {
+    this.#printerSseHandler = printerSseHandler;
     this.#printersStore = printersStore;
   }
 
@@ -26,7 +26,7 @@ class PrinterSseTask {
       : stringify(sseData);
     const transportDataSize = byteCount(serializedData);
     this.updateAggregator(transportDataSize);
-    this.#printerViewSSEHandler.send(serializedData);
+    this.#printerSseHandler.send(serializedData);
   }
 
   updateAggregator(transportDataLength) {

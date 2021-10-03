@@ -6,9 +6,9 @@ const NODE_ENV_KEY = "NODE_ENV";
 
 const VERSION_KEY = "npm_package_version";
 
-const defaultMongoStringUnauthenticated = "mongodb://127.0.0.1:27017/octofarm";
+const defaultMongoStringUnauthenticated = "mongodb://127.0.0.1:27017/3dpf";
 const defaultServerPort = 4000;
-const defaultServerPageTitle = "OctoFarm";
+const defaultServerPageTitle = "3D-Print-Farm";
 const defaultProductionEnv = "production";
 const defaultTestEnv = "test";
 const knownEnvNames = ["development", "production", "test"];
