@@ -14,14 +14,14 @@ jobs:
         with:
           node-version: 14.x
       - run: npm ci --no-optional
-        working-directory: ./client_src
-      - run: npm test
-        working-directory: ./client_src
-      - run: npm run webpack:prod
-        working-directory: ./client_src
+        working-directory: client-vue
+      - run: npm build
+        working-directory: client-vue
+      - run: npm run build
+        working-directory: client-vue
       - uses: JS-DevTools/npm-publish@v1
-        if: ${{ github.repository.name == 'octofarm-experiments' }}
+        if: ${{ github.repository.name == '3d-print-farm' }}
         with:
           dry-run: false
           token: ${{ secrets.NPM_TOKEN }}
-          package: ./client_src/package.json
+          package: client-vue/package.json

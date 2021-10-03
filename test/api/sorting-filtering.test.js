@@ -1,14 +1,14 @@
-jest.mock("../../server_src/middleware/auth");
+jest.mock("../../server/middleware/auth");
 
 const dbHandler = require("../db-handler");
 const supertest = require("supertest");
 const getEndpoints = require("express-list-endpoints");
-const DITokens = require("../../server_src/container.tokens");
+const DITokens = require("../../server/container.tokens");
 const {
   defaultFilterBy,
   defaultSortBy
-} = require("../../server_src/constants/filter-sorting.constants");
-const { setupTestApp } = require("../../server_src/app-test");
+} = require("../../server/constants/filter-sorting.constants");
+const { setupTestApp } = require("../../server/app-test");
 
 let request;
 let container;

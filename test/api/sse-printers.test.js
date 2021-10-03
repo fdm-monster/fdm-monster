@@ -1,13 +1,13 @@
-jest.mock("../../server_src/middleware/auth");
+jest.mock("../../server/middleware/auth");
 
 const EventSource = require("eventsource");
 const { parse } = require("flatted/cjs");
 const dbHandler = require("../db-handler");
 const supertest = require("supertest");
 const getEndpoints = require("express-list-endpoints");
-const { setupTestApp } = require("../../server_src/app-test");
-const DITokens = require("../../server_src/container.tokens");
-const { AppConstants } = require("../../server_src/app.constants");
+const { setupTestApp } = require("../../server/app-test");
+const DITokens = require("../../server/container.tokens");
+const { AppConstants } = require("../../server/app.constants");
 
 let request;
 let sseTask;

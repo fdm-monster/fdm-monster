@@ -1,4 +1,4 @@
-const PrinterGroup = require("../../server_src/models/PrinterGroup");
+const PrinterGroup = require("../../server/models/PrinterGroup");
 
 describe("printer group", function () {
   it("should be invalid if name is empty", () => {

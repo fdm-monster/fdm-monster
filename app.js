@@ -10,7 +10,7 @@ if (!!majorVersion && majorVersion < 14) {
   const {
     serveNodeVersionFallback,
     setupFallbackExpressServer
-  } = require("./server_src/app-fallbacks");
+  } = require("./server/app-fallbacks");
 
   const server = setupFallbackExpressServer();
   serveNodeVersionFallback(server);
@@ -20,7 +20,7 @@ if (!!majorVersion && majorVersion < 14) {
     fetchMongoDBConnectionString,
     runMigrations,
     fetchServerPort
-  } = require("./server_src/app-env");
+  } = require("./server/app-env");
 
   // Set environment/.env file and NODE_ENV if not set. Will call startup checks.
   setupEnvConfig();
@@ -29,11 +29,11 @@ if (!!majorVersion && majorVersion < 14) {
     setupExpressServer,
     serveOctoFarmNormally,
     ensureSystemSettingsInitiated
-  } = require("./server_src/app-core");
+  } = require("./server/app-core");
 
-  const DITokens = require("./server_src/container.tokens");
+  const DITokens = require("./server/container.tokens");
   const mongoose = require("mongoose");
-  const Logger = require("./server_src/handlers/logger.js");
+  const Logger = require("./server/handlers/logger.js");
   const logger = new Logger("OctoFarm-Server");
 
   const { app: server, container } = setupExpressServer();
@@ -65,7 +65,7 @@ if (!!majorVersion && majorVersion < 14) {
     })
     .catch(async (err) => {
       logger.error(err.stack);
-      const { serveDatabaseIssueFallback } = require("./server_src/app-fallbacks");
+      const { serveDatabaseIssueFallback } = require("./server/app-fallbacks");
       serveDatabaseIssueFallback(server, fetchServerPort());
     });
 }

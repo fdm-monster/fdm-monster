@@ -1,8 +1,8 @@
 const testPath = "../../";
 const dbHandler = require(testPath + "db-handler");
-const { configureContainer } = require("../../../server_src/container");
-const { ensureSystemSettingsInitiated } = require("../../../server_src/app-core");
-const DITokens = require("../../../server_src/container.tokens");
+const { configureContainer } = require("../../../server/container");
+const { ensureSystemSettingsInitiated } = require("../../../server/app-core");
+const DITokens = require("../../../server/container.tokens");
 const AxiosMock = require("../../provisioning/axios.mock");
 const awilix = require("awilix");
 

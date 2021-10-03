@@ -1,4 +1,4 @@
-const { sumValuesGroupByDate } = require("../../server_src/utils/graph-point.utils");
+const { sumValuesGroupByDate } = require("../../server/utils/graph-point.utils");
 
 describe("graph-utils", () => {
   it("should be able to call sumValuesGroupByDate", () => {

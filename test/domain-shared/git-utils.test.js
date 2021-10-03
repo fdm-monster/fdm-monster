@@ -1,6 +1,6 @@
 describe("GitUtils", () => {
   const scenarioModifiedOutput = {
-    modified: ["package-lock.json", "package.json", "server_src/lib/serverCommands.js"],
+    modified: ["package-lock.json", "package.json", "server/lib/serverCommands.js"],
     ahead: 0,
     behind: 0
   };
@@ -26,7 +26,7 @@ describe("GitUtils", () => {
     isBranchInfront,
     getListOfModifiedFiles,
     pullLatestRepository
-  } = require("../../server_src/utils/git.utils");
+  } = require("../../server/utils/git.utils");
 
   it("should be able to see no commits to be pulled in", async () => {
     const isUpToDate = await isBranchUpToDate(scenarioModifiedOutput);

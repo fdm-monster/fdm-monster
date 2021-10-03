@@ -1,4 +1,4 @@
-const { getPrintCostNumeric } = require("../../server_src/utils/print-cost.util");
+const { getPrintCostNumeric } = require("../../server/utils/print-cost.util");
 
 const defaultCostSettings = {
   powerConsumption: 0.05,

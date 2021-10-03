@@ -1,4 +1,4 @@
-const { AppConstants } = require("../../server_src/app.constants");
+const { AppConstants } = require("../../server/app.constants");
 
 class GithubApiServiceMock {
   /**

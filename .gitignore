@@ -1,6 +1,5 @@
 **/.idea/
 **/node_modules/
-server_src/middleware/db.js
 **/logs/
 **/.clinic/
 **/dist/
@@ -11,17 +10,8 @@ server_src/middleware/db.js
 **/coverage
 /images
 
-# Ignore any local release zips
-octofarm.zip
-/dist/
-/views/assets/dist/
-package/
-
-# Client
-/web-client/
-client_2x/build/
 
 # V2 Server
-server_2x/assets/public/assets/
+server-nest/assets/public/assets/
 
 *.tgz

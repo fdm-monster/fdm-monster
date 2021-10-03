@@ -186,7 +186,7 @@ class PrinterState {
       currentProfile: this.#currentProfile,
       octoPrintSystemInfo: this.#octoPrintSystemInfo,
       corsCheck: true,
-      // Placeholder? https://github.com/OctoFarm/OctoFarm/blob/7fed18b1b3036cfb77f1a0d8d51be1e14fbcb541/server_src/lib/dataFunctions/printerClean.js#L374
+      // Placeholder? https://github.com/OctoFarm/OctoFarm/blob/7fed18b1b3036cfb77f1a0d8d51be1e14fbcb541/server/lib/dataFunctions/printerClean.js#L374
       display: true, // TODO causes monitoring to show it. But it is not a proper place
       stepSize: this.#stepSize,
       systemChecks: this.#systemChecks, // TODO remove

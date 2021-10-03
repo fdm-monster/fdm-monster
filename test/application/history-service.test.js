@@ -1,9 +1,9 @@
 jest.mock("mjpeg-decoder");
 const decoderMock = require("mjpeg-decoder");
-jest.mock("../../server_src/services/octoprint/octoprint-api.service");
-const { configureContainer } = require("../../server_src/container");
-const Spool = require("../../server_src/models/Spool.js");
-const DITokens = require("../../server_src/container.tokens");
+jest.mock("../../server/services/octoprint/octoprint-api.service");
+const { configureContainer } = require("../../server/container");
+const Spool = require("../../server/models/Spool.js");
+const DITokens = require("../../server/container.tokens");
 
 const dbHandler = require("../db-handler");
 let container;

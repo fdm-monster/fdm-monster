@@ -1,6 +1,6 @@
 const dbHandler = require("../db-handler");
 const supertest = require("supertest");
-const { setupTestApp } = require("../../server_src/app-test");
+const { setupTestApp } = require("../../server/app-test");
 
 let request;
 
