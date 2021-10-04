@@ -50,7 +50,7 @@ class PrinterFilesService {
       );
     }
 
-    printer.fileList.files.splice(index, 1);
+    printer.fileList.files.splice(fileIndex, 1);
     printer.fileList.fileCount = printer.fileList.files.length;
     printer.markModified("fileList");
     printer.save();
