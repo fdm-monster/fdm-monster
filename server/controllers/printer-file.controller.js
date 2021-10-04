@@ -43,7 +43,7 @@ class PrinterFileController {
 
   async deleteFile(req, res) {
     const { id: printerId } = await validateInput(req.params, idRules);
-    const { fullPath } = await validateMiddleware(req, deleteFileRules, res);
+    const { fullPath } = await validateInput(req.query, deleteFileRules, res);
 
     const printerLogin = this.#printersStore.getPrinterLogin(printerId);
 
@@ -59,7 +59,7 @@ class PrinterFileController {
       throw new ExternalServiceError(response.data);
     }
 
-    // NOT FOUND or OK - both should cause file to be dereferenced
+    // NOT FOUND or NO_CONTENT - both should cause file to be dereferenced
     await this.#filesStore.removeFile(printerId, fullPath);
     this.#logger.info(`File reference removed for printerId ${printerId}`, fullPath);
 
@@ -129,7 +129,7 @@ module.exports = createController(PrinterFileController)
   .prefix(AppConstants.apiRoute + "/printer-files")
   .before([ensureAuthenticated])
   .get("/:id", "getFiles")
-  .delete("/file", "deleteFile")
+  .delete("/:id", "deleteFile")
   // TODO below
   .post("/file/resync", "resyncFile")
   .post("/file/move", "moveFile")

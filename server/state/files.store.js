@@ -48,21 +48,16 @@ class FilesStore {
   }
 
   /**
-   * Remove file reference from database and then cache. This assumes the OctoPrint action completed.
+   * Remove file reference from database and then cache.
    * @param printerId
    * @param filePath
    * @returns {Promise<void>}
    */
   async removeFile(printerId, filePath) {
-    // This will throw if not found
     await this.#printerFilesService.deleteFile(printerId, filePath);
-    // The next call will never throw - just logs a warning
-    this.#fileCache.purgeFile(printerId, filePath);
 
-    // Old code
-    // const currentFilament = await Runner.compileSelectedFilament(fprinter.selectedFilament, i);
-    // FileClean.generate(fprinter, currentFilament);
-    // FileClean.statistics(farmPrinters);
+    // Warning only
+    this.#fileCache.purgeFile(printerId, filePath);
   }
 
   // === TODO BELOW ===

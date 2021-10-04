@@ -3,7 +3,7 @@ const getFilesRules = {
 };
 
 const deleteFileRules = {
-  path: "optional|in:local,sdcard",
+  path: "in:local,sdcard",
   fullPath: "required"
 };
 
