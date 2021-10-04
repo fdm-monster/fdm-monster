@@ -36,7 +36,7 @@ So, you understand the variables to configure 3DPF now. How do I set this up for
 
 ### NodeJS with pm2 (or nodemon)
 Create a `.env` file in the folder you cloned (or downloaded and extracted) 3DPF with the **required** and/or _optional_ variables!
-OctoFarm will automatically create this file for you, and if anything is not working a webpage will help you through the basics.
+3DPF will automatically create this file for you, and if anything is not working a webpage will help you through the basics.
 
 Feel adventurous? Customize the file to your liking, but again ALWAYS make sure the **required** variables are correctly set.
 
