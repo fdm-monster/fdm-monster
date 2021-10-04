@@ -22,7 +22,7 @@ Vue.use(VueSSE, {
   url: apiBase + "/api/printer/sse"
 });
 Vue.config.errorHandler = (err: Error, vm: Vue, info: string) => {
-  console.log("err", vm);
+  console.log("Global Error captured", err, vm, info);
 };
 new Vue({
   router,

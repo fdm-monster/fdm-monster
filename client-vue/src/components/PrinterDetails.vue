@@ -5,10 +5,10 @@
       JSON.stringify({
         _id: printer._id,
         name: printer.printerName,
-        printerURL: printer.printerURL,
+        printerURL: printer.printerURL
       })
     }}
-    <br/>
+    <br />
     Files:
     <v-btn @click="getFiles">Refresh</v-btn>
     <v-list>
@@ -23,9 +23,9 @@
 <script>
 import Component from "vue-class-component";
 import Vue from "vue";
-import {Prop} from "vue-property-decorator";
-import {Printer} from "@/models/printers/printer.model";
-import {OctoPrintService} from "@/backend";
+import { Prop } from "vue-property-decorator";
+import { Printer } from "@/models/printers/printer.model";
+import { OctoPrintService } from "@/backend";
 
 @Component({
   data: () => ({})

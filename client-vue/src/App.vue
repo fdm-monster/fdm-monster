@@ -1,10 +1,13 @@
 <template>
   <v-app>
-    <NavigationDrawer />
-    <TopBar />
+
+    <NavigationDrawer/>
+    <TopBar/>
 
     <v-main>
-      <router-view />
+      <ErrorAlert>
+        <router-view/>
+      </ErrorAlert>
     </v-main>
 
     <FooterList></FooterList>
@@ -15,17 +18,18 @@
 import Vue from "vue";
 import NavigationDrawer from "@/components/NavigationDrawer.vue";
 import TopBar from "@/components/TopBar.vue";
+import ErrorAlert from "@/components/ErrorAlert.vue";
 import FooterList from "@/components/QuickActions/FooterList.vue";
-import { Component } from "vue-property-decorator";
-import { Action, Getter } from "vuex-class";
-import { ServerSettings } from "@/models/server-settings.model";
-import { SSEClient } from "vue-sse";
-import { PrinterSseMessage } from "@/models/sse-messages/printer-sse-message.model";
-import { sseMessageEventGlobal } from "@/event-bus/sse.events";
-import { ACTIONS } from "@/store/printers/printers.actions";
+import {Component} from "vue-property-decorator";
+import {Action, Getter} from "vuex-class";
+import {ServerSettings} from "@/models/server-settings.model";
+import {SSEClient} from "vue-sse";
+import {PrinterSseMessage} from "@/models/sse-messages/printer-sse-message.model";
+import {sseMessageEventGlobal} from "@/event-bus/sse.events";
+import {ACTIONS} from "@/store/printers/printers.actions";
 
 @Component({
-  components: { TopBar, NavigationDrawer, FooterList }
+  components: {TopBar, NavigationDrawer, FooterList, ErrorAlert}
 })
 export default class App extends Vue {
   @Getter serverSettings: ServerSettings;
@@ -45,11 +49,11 @@ export default class App extends Vue {
     this.sseClient = await this.$sse.create(this.$sse.$defaultConfig);
     this.sseClient.on("message", (msg) => this.onSseMessage(msg));
     this.sseClient.on("error", (err: any) =>
-      console.error("Failed to parse or lost connection:", err)
+        console.error("Failed to parse or lost connection:", err)
     );
     this.sseClient
-      .connect()
-      .catch((err: any) => console.error("Failed make initial connection:", err));
+        .connect()
+        .catch((err: any) => console.error("Failed make initial connection:", err));
   }
 
   async onSseMessage(message: PrinterSseMessage) {
