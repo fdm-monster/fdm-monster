@@ -38,8 +38,7 @@ export default class PrinterDetails extends Vue {
   }
 
   async getFiles() {
-    const files = await OctoPrintService.getFiles(this.printerId, false);
-    console.log(files);
+    this.printer.fileList.files = await OctoPrintService.getFiles(this.printerId, false);
   }
 
   async deleteFile(file) {

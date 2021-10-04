@@ -162,8 +162,8 @@ export default class Printers extends Vue {
     let existingPrinters = this.printers.map((p) => p._id);
 
     printers.forEach((p) => {
-      const printerIndex = this.printers.findIndex((pr) => pr._id == p._id);
-      existingPrinters = existingPrinters.splice(printerIndex, 1);
+      const printerIndex = this.printers.findIndex((pr) => pr._id === p._id);
+      existingPrinters.splice(printerIndex, 1);
     });
 
     if (existingPrinters.length > 0) {

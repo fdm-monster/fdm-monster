@@ -21,7 +21,9 @@ Vue.use(VueSSE, {
   polyfill: true,
   url: apiBase + "/api/printer/sse"
 });
-
+Vue.config.errorHandler = (err: Error, vm: Vue, info: string) => {
+  console.log("err", vm);
+};
 new Vue({
   router,
   store,
