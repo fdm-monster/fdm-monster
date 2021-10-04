@@ -6,9 +6,10 @@ class NotImplementedException extends Error {
 }
 
 class NotFoundException extends Error {
-  constructor(message) {
+  constructor(message, path) {
     super(message);
     this.name = NotFoundException.name;
+    this.path = path;
   }
 }
 
@@ -28,9 +29,18 @@ class ExternalServiceError extends Error {
   }
 }
 
+class InternalServerException extends Error {
+  constructor(message, stack) {
+    super(message);
+    this.name = InternalServerException.name;
+    this.stack = stack;
+  }
+}
+
 module.exports = {
   NotImplementedException,
   NotFoundException,
+  InternalServerException,
   ExternalServiceError,
   ValidationException
 };

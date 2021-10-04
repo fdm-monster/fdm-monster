@@ -15,19 +15,13 @@ class AppController {
 
   welcome(req, res) {
     const serverSettings = this.#settingsStore.getServerSettings();
-    if (serverSettings.server.loginRequired === false) {
-      res.redirect("/dashboard");
+
+    if (serverSettings.server.loginRequired === false || req.isAuthenticated()) {
+      res.send({ message: "Login not required. Please load UI instead." });
     } else {
-      if (req.isAuthenticated()) {
-        res.redirect("/dashboard");
-      } else {
-        res.render("welcome", {
-          page: "Welcome",
-          serverPageTitle: this.#serverPageTitle,
-          registration: serverSettings.server.registration,
-          serverSettings
-        });
-      }
+      res.send({
+        message: "Please load the welcome API as this server is not instantiated properly."
+      });
     }
   }
 }

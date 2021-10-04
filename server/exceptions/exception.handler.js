@@ -1,4 +1,8 @@
-const { ValidationException, NotFoundException } = require("./runtime.exceptions");
+const {
+  ValidationException,
+  NotFoundException,
+  InternalServerException
+} = require("./runtime.exceptions");
 const { AppConstants } = require("../app.constants");
 
 // https://dev.to/rajajaganathan/express-scalable-way-to-handle-errors-1kd6
@@ -9,7 +13,7 @@ function exceptionHandler(err, req, res, next) {
   }
   if (err instanceof NotFoundException) {
     const code = err.statusCode || 404;
-    return res.status(code).send();
+    return res.status(code).send({ error: err.message });
   }
   if (err instanceof ValidationException) {
     const code = err.statusCode || 400;
@@ -17,6 +21,14 @@ function exceptionHandler(err, req, res, next) {
       error: "API could not accept this input",
       type: err.name,
       errors: err.errors
+    });
+  }
+  if (err instanceof InternalServerException) {
+    const code = err.statusCode || 500;
+    return res.status(code).send({
+      error: err.message,
+      type: err.name,
+      stack: err.stack
     });
   }
   if (!!err) {

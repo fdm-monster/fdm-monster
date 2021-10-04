@@ -15,7 +15,7 @@ const defaultResponseOptions = { unwrap: true };
 const octoPrintBase = "/";
 const apiBase = octoPrintBase + "api";
 const apiSettingsPart = apiBase + "/settings";
-const apiFile = (path) => apiBase + "/files/local/" + path;
+const apiLocalFile = (path) => apiBase + "/files/local/" + path;
 const apiFiles = (recursive = true) => apiBase + "/files?recursive=" + recursive;
 const apiConnection = apiBase + "/connection";
 const apiPrinterProfiles = apiBase + "/printerprofiles";
@@ -138,9 +138,17 @@ class OctoprintApiService {
   }
 
   async getFile(printer, path, responseOptions = defaultResponseOptions) {
-    const { url, options } = this.#prepareRequest(printer, apiFile(path));
+    const { url, options } = this.#prepareRequest(printer, apiLocalFile(path));
 
     const response = await this.#httpClient.get(url, options);
+
+    return processResponse(response, responseOptions);
+  }
+
+  async deleteFile(printer, path, responseOptions = defaultResponseOptions) {
+    const { url, options } = this.#prepareRequest(printer, apiLocalFile(path));
+
+    const response = await this.#httpClient.delete(url, options);
 
     return processResponse(response, responseOptions);
   }

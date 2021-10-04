@@ -5,9 +5,11 @@ const { validateMiddleware, validateInput } = require("../handlers/validators");
 const { AppConstants } = require("../app.constants");
 const { idRules } = require("./validation/generic.validation");
 const {
-  crudFileRules,
-  getFilesRules
+  getFilesRules,
+  deleteFileRules
 } = require("./validation/printer-files-controller.validation");
+const { ExternalServiceError } = require("../exceptions/runtime.exceptions");
+const HttpStatusCode = require("../constants/http-status-codes.constants");
 
 class PrinterFileController {
   #filesStore;
@@ -39,13 +41,30 @@ class PrinterFileController {
     res.send(response.data);
   }
 
-  async removeFile(req, res) {
-    const input = await validateMiddleware(req, crudFileRules, res);
+  async deleteFile(req, res) {
+    const { id: printerId } = await validateInput(req.params, idRules);
+    const { fullPath } = await validateMiddleware(req, deleteFileRules, res);
 
-    await this.#filesStore.removeFile(input.id, input.fullPath);
-    this.#logger.info(`File reference removed for printerId ${input.id}`, input.fullPath);
+    const printerLogin = this.#printersStore.getPrinterLogin(printerId);
 
-    res.send();
+    const response = await this.#octoPrintApiService.deleteFile(printerLogin, fullPath, {
+      unwrap: false
+    });
+
+    const status = response.status;
+
+    // Possibilities: CONFLICT, NOT FOUND or OK
+    if (status === HttpStatusCode.CONFLICT) {
+      // File was probably busy or printing
+      throw new ExternalServiceError(response.data);
+    }
+
+    // NOT FOUND or OK - both should cause file to be dereferenced
+    await this.#filesStore.removeFile(printerId, fullPath);
+    this.#logger.info(`File reference removed for printerId ${printerId}`, fullPath);
+
+    res.statusCode = status;
+    res.send(response.data);
   }
 
   // === TODO BELOW ===
@@ -110,7 +129,8 @@ module.exports = createController(PrinterFileController)
   .prefix(AppConstants.apiRoute + "/printer-files")
   .before([ensureAuthenticated])
   .get("/:id", "getFiles")
-  .delete("/file", "removeFile")
+  .delete("/file", "deleteFile")
+  // TODO below
   .post("/file/resync", "resyncFile")
   .post("/file/move", "moveFile")
   .post("/file/create", "createFile")

@@ -19,7 +19,7 @@ Vue.use(VueBus);
 Vue.use(VueSSE, {
   format: "json",
   polyfill: true,
-  url: apiBase + "/printers/sse"
+  url: apiBase + "/api/printer/sse"
 });
 
 new Vue({

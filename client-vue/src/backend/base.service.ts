@@ -21,6 +21,15 @@ export class BaseService {
     return this.handleResponse(response, options);
   }
 
+  protected static async deleteApi(path: string, options = { unwrap: true }) {
+    const response = await axios.delete(`${apiBase}/${path}`);
+
+    // Do interception or global handling here
+    // ...
+
+    return this.handleResponse(response, options);
+  }
+
   protected static async patchApi<T>(path: string, body: T, options = { unwrap: true }) {
     const response = await axios.patch(`${apiBase}/${path}`, body);
 
