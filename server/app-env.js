@@ -12,8 +12,6 @@ const logger = new Logger("3DPF-Environment", false);
 
 // Constants and definition
 const instructionsReferralURL = "https://github.com/davidzwa/3d-print-farm/blob/master/README.md";
-const deprecatedConfigFolder = "./config";
-const deprecatedConfigFilePath = deprecatedConfigFolder + "/db.js";
 const packageJsonPath = path.join(__dirname, "../package.json");
 const dotEnvPath = path.join(__dirname, "../.env");
 
@@ -69,16 +67,6 @@ function removePm2Service(reason) {
   execSync("pm2 delete 3DPF");
 }
 
-function removeFolderIfEmpty(folder) {
-  return fs.rmdir(folder, function (err) {
-    if (err) {
-      logger.error(`~ Could not clear up the folder ${folder} as it was not empty`);
-    } else {
-      logger.info(`✓ Successfully removed the empty directory ${folder}`);
-    }
-  });
-}
-
 function setupPackageJsonVersionOrThrow() {
   const result = envUtils.verifyPackageJsonRequirements(path.join(__dirname, "../"));
   if (!result) {
@@ -97,12 +85,6 @@ function printInstructionsURL() {
   logger.info(
     `Please make sure to read ${instructionsReferralURL} on how to configure your environment correctly.`
   );
-}
-
-function removeDeprecatedMongoURIConfigFile() {
-  logger.info("~ Removing deprecated config file 'config/db.js'.");
-  fs.rmSync(deprecatedConfigFilePath);
-  removeFolderIfEmpty(deprecatedConfigFolder);
 }
 
 function fetchMongoDBConnectionString(persistToEnv = false) {
@@ -157,48 +139,11 @@ function fetchServerPort() {
 function ensureMongoDBConnectionStringSet() {
   let dbConnectionString = process.env[AppConstants.MONGO_KEY];
   if (!dbConnectionString) {
-    if (isDocker()) {
-      // This will not trigger often, as docker entrypoint catches this.
-      fetchMongoDBConnectionString(false);
-      return;
-    }
+    // In docker we better not write to .env
+    const persistDbString = !isDocker();
 
-    if (!fs.existsSync(deprecatedConfigFilePath)) {
-      fetchMongoDBConnectionString(true);
-      return;
-    }
-
-    const mongoFallbackURI = require(deprecatedConfigFilePath).MongoURI;
-    if (!mongoFallbackURI) {
-      logger.info(
-        "~ Found deprecated config file 'config/db.js', but the MongoURI variable was not set (or possibly invalid)."
-      );
-      removeDeprecatedMongoURIConfigFile();
-      logger.info(
-        `~ ${AppConstants.MONGO_KEY} environment variable is not set. Assuming default: ${AppConstants.MONGO_KEY}=${AppConstants.defaultMongoStringUnauthenticated}`
-      );
-      printInstructionsURL();
-      process.env[AppConstants.MONGO_KEY] = AppConstants.defaultMongoStringUnauthenticated;
-    } else {
-      // We're not in docker, so we have some patch-work to do.
-      removeDeprecatedMongoURIConfigFile();
-      logger.info(
-        "~ Found deprecated config file 'config/db.js', performing small migration task to '.env'."
-      );
-      envUtils.writeVariableToEnvFile(
-        path.resolve(dotEnvPath),
-        AppConstants.MONGO_KEY,
-        mongoFallbackURI
-      );
-      process.env[AppConstants.MONGO_KEY] = mongoFallbackURI;
-    }
+    fetchMongoDBConnectionString(persistDbString);
   } else {
-    if (fs.existsSync(deprecatedConfigFilePath)) {
-      logger.info(
-        "~ Found deprecated config file 'config/db.js', but it is redundant. Clearing this up for you."
-      );
-      removeDeprecatedMongoURIConfigFile();
-    }
     logger.info(`✓ ${AppConstants.MONGO_KEY} environment variable set!`);
   }
 }
