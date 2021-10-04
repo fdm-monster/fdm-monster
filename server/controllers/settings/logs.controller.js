@@ -4,7 +4,7 @@ const Logger = require("../../handlers/logger.js");
 const { AppConstants } = require("../../app.constants");
 
 class LogsController {
-  #logger = new Logger("OctoFarm-API");
+  #logger = new Logger("Server-API");
 
   #serverLogsService;
 
@@ -28,7 +28,7 @@ class LogsController {
 
     let zipDumpResponse = {
       status: "error",
-      msg: "Unable to generate zip file, please check 'OctoFarm-API.log' file for more information.",
+      msg: "Unable to generate zip file, please check 'Server-API.log' file for more information.",
       zipDumpPath: ""
     };
 

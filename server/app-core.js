@@ -8,7 +8,7 @@ const DITokens = require("./container.tokens");
 const exceptionHandler = require("./exceptions/exception.handler");
 const { configureContainer } = require("./container");
 const { scopePerRequest, loadControllers } = require("awilix-express");
-const { OctoFarmTasks } = require("./tasks");
+const { ServerTasks } = require("./tasks");
 const { getViewsPath } = require("./app-env");
 const cors = require("cors");
 
@@ -139,7 +139,7 @@ async function serveOctoFarmNormally(app, container, quick_boot = false) {
 
     const taskManagerService = container.resolve(DITokens.taskManagerService);
     if (process.env.SAFEMODE_ENABLED !== "true") {
-      OctoFarmTasks.BOOT_TASKS.forEach((task) => taskManagerService.registerJobOrTask(task));
+      ServerTasks.BOOT_TASKS.forEach((task) => taskManagerService.registerJobOrTask(task));
     } else {
       logger.warning("Starting in safe mode due to SAFEMODE_ENABLED");
     }
@@ -158,6 +158,6 @@ const logger = new Logger("OctoFarm-Server");
 module.exports = {
   setupExpressServer,
   ensureSystemSettingsInitiated,
-  serveOctoFarmRoutes,
-  serveOctoFarmNormally
+  serveControllerRoutes: serveOctoFarmRoutes,
+  serveApiNormally: serveOctoFarmNormally
 };

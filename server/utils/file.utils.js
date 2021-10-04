@@ -1,15 +1,11 @@
 const { existsSync, unlinkSync } = require("fs");
 
-async function checkIfFileFileExistsAndDeleteIfSo(fileName) {
+function deleteExistingFile(fileName) {
   let fileExists = false;
-  if (existsSync(fileName)) await deleteExistingZipFile(fileName);
+  if (existsSync(fileName)) unlinkSync(fileName);
   return fileExists;
 }
 
-function deleteExistingZipFile(fileName) {
-  return unlinkSync(fileName);
-}
-
 module.exports = {
-  checkIfFileFileExistsAndDeleteIfSo
+  deleteExistingFile
 };

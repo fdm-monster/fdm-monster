@@ -1,11 +1,8 @@
 const { createController } = require("awilix-express");
 const { ensureAuthenticated } = require("../../middleware/auth");
-const Logger = require("../../handlers/logger.js");
 const { AppConstants } = require("../../app.constants");
 
 class DatabaseController {
-  #logger = new Logger("OctoFarm-API");
-
   constructor({}) {}
 
   async deleteSchema(req, res) {
@@ -26,19 +23,19 @@ class DatabaseController {
         message: "Successfully deleted databases, server will restart..."
       });
       logger.info("Database completely wiped.... Restarting server...");
-      SystemCommands.rebootOctoFarm();
+      SystemCommands.rebootServer();
     } else if (databaseName === "FilamentDB") {
       await SpoolsDB.deleteMany({});
       await ProfilesDB.deleteMany({});
       logger.info("Successfully deleted Filament database.... Restarting server...");
-      SystemCommands.rebootOctoFarm();
+      SystemCommands.rebootServer();
     } else {
       await eval(databaseName).deleteMany({});
       res.send({
         message: "Successfully deleted " + databaseName + ", server will restart..."
       });
       logger.info(databaseName + " successfully deleted.... Restarting server...");
-      SystemCommands.rebootOctoFarm();
+      SystemCommands.rebootServer();
     }
   }
 

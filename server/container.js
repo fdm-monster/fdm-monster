@@ -7,7 +7,7 @@ const PrintersStore = require("./state/printers.store");
 const SettingsStore = require("./state/settings.store");
 const ServerSettingsService = require("./services/server-settings.service");
 const ClientSettingsService = require("./services/client-settings.service");
-const OctofarmUpdateService = require("./services/octofarm-update.service");
+const ServerUpdateService = require("./services/server-update.service");
 const InfluxDbSetupService = require("./services/influx/influx-db-setup.service");
 const ScriptService = require("./services/script.service");
 const TaskManagerService = require("./services/task-manager.service");
@@ -96,7 +96,7 @@ function configureContainer() {
 
     taskManagerService: awilix.asClass(TaskManagerService).singleton(),
     eventEmitter2: awilix.asFunction(configureEventEmitter).singleton(),
-    [DITokens.octofarmUpdateService]: awilix.asClass(OctofarmUpdateService).singleton(),
+    [DITokens.serverUpdateService]: awilix.asClass(ServerUpdateService).singleton(),
     [DITokens.systemInfoStore]: awilix.asClass(SystemInfoStore).singleton(),
     [DITokens.githubApiService]: awilix.asClass(GithubApiService),
     [DITokens.autoDiscoveryService]: awilix.asClass(AutoDiscoveryService),

@@ -9,7 +9,7 @@ class FilesStore {
   #fileCache;
   #octoPrintApiService;
 
-  #logger = new Logger("OctoFarm-FilesStore");
+  #logger = new Logger("Server-FilesStore");
 
   constructor({ printersStore, printerFilesService, fileCache, octoPrintApiService }) {
     this.#printersStore = printersStore;

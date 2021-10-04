@@ -12,7 +12,7 @@ dateFormat = () => {
 };
 
 class LoggerService {
-  constructor(route, enableFileLogs = true, logFilterLevel) {
+  constructor(name, enableFileLogs = true, logFilterLevel) {
     const isProd = process.env.NODE_ENV === AppConstants.defaultProductionEnv;
     const isTest = process.env.NODE_ENV === AppConstants.defaultTestEnv;
 
@@ -20,8 +20,7 @@ class LoggerService {
       logFilterLevel = isProd || isTest ? "warn" : "info";
     }
 
-    this.log_data = null;
-    this.route = route;
+    this.name = name;
     this.logger = winston.createLogger({
       transports: [
         new winston.transports.Console({
@@ -31,7 +30,7 @@ class LoggerService {
           ? [
               new winston.transports.File({
                 level: isTest ? "warn" : "info", // Irrespective of environment
-                filename: `./logs/${route}.log`,
+                filename: `./logs/${name}.log`,
                 maxsize: "5000000",
                 maxFiles: 5
               })
@@ -41,7 +40,7 @@ class LoggerService {
       format: winston.format.printf((info) => {
         const level = info.level.toUpperCase();
         const date = dateFormat();
-        let message = `${date} | ${level} | ${route} | ${info.message}`;
+        let message = `${date} | ${level} | ${name} | ${info.message}`;
         message = info.meta ? message + ` data: ${info.meta} | ` : message;
         return message;
       })

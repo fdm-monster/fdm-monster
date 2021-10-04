@@ -1,8 +1,7 @@
 const Logger = require("../handlers/logger.js");
-const logger = new Logger("OctoFarm-Scripts");
+const logger = new Logger("Server-Scripts");
 const util = require("util");
 const exec = util.promisify(require("child_process").exec);
-const wol = require("wake_on_lan");
 
 class ScriptService {
   async execute(scriptLocation, message) {

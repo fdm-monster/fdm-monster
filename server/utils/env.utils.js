@@ -77,14 +77,14 @@ function verifyPackageJsonRequirements(rootPath) {
     if (!packageName) {
       logger.error("X Could not find 'name' property in package.json file. Aborting OctoFarm.");
       return false;
-    } else if (packageName.toLowerCase() !== "octofarm") {
+    } else if (packageName.toLowerCase() !== "3d-print-farm") {
       logger.error(
-        `X property 'name' in package.json file didnt equal 'octofarm' (found: ${packageName.toLowerCase()}). Aborting OctoFarm.`
+        `X property 'name' in package.json file didnt equal '3d-print-farm' (found: ${packageName.toLowerCase()}). Aborting 3DPF.`
       );
       return false;
     }
   }
-  logger.debug("✓ Correctly validated octofarm package.json file!");
+  logger.debug("✓ Correctly validated 3DPF package.json file!");
   return true;
 }
 

@@ -1,10 +1,11 @@
 const Logger = require("../handlers/logger.js");
-const logger = new Logger("OctoFarm-Scripts");
 const Alert = require("../models/Alerts.js");
 const { NotFoundException } = require("../exceptions/runtime.exceptions");
 
 class AlertService {
   #scriptService;
+
+  #logger = new Logger("Server-Scripts");
 
   constructor({ scriptService }) {
     this.#scriptService = scriptService;
@@ -40,7 +41,7 @@ class AlertService {
   async executeAlertScript(alertId, messagePayload) {
     const alert = await this.get(alertId);
 
-    logger.info("Testing Alerts: " + alert.scriptLocation + " " + messagePayload);
+    this.#logger.info("Testing Alerts: " + alert.scriptLocation + " " + messagePayload);
     return await this.#scriptService.execute(alert.scriptLocation, JSON.stringify(messagePayload));
   }
 
@@ -64,7 +65,7 @@ class AlertService {
 
     await newAlert.save();
 
-    logger.info("Saved: " + trigger + " " + scriptLocation + " " + message);
+    this.#logger.info("Saved: " + trigger + " " + scriptLocation + " " + message);
 
     return newAlert;
   }

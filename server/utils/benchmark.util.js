@@ -1,6 +1,6 @@
 const Logger = require("../handlers/logger.js");
 
-const logger = new Logger("OctoFarm-Server");
+const logger = new Logger("Server");
 
 /**
  * Timing benchmark function, DO NOT USE IN PRODUCTION - just use it once and remove after.

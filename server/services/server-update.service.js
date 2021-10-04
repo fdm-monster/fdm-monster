@@ -1,8 +1,6 @@
 const Logger = require("../handlers/logger.js");
 
-const logger = new Logger("OctoFarm-SoftwareUpdateChecker");
-
-class OctofarmUpdateService {
+class ServerUpdateService {
   #lastSuccessfulReleaseCheckMoment = null;
   #latestReleaseKnown = null;
   #lastReleaseCheckFailed = null;
@@ -11,6 +9,8 @@ class OctofarmUpdateService {
   #loadedWithPrereleases = null;
   #installedReleaseFound = null;
   #notificationReady = false;
+
+  #logger = new Logger("Server-SoftwareUpdateChecker");
 
   // Resolved
   #serverVersion;
@@ -31,11 +31,11 @@ class OctofarmUpdateService {
   }
 
   /**
-   * Connection-safe acquire data about the installed and latest released OctoFarm versions.
+   * Connection-safe acquire data about the installed and latest released 3DPF versions.
    * @param includePre
    * @returns {Promise<*|null>}
    */
-  async syncLatestOctoFarmRelease(includePre = false) {
+  async syncLatestRelease(includePre = false) {
     await this.#githubApiService
       .getGithubReleasesPromise()
       .then((githubReleases) => {
@@ -44,12 +44,9 @@ class OctofarmUpdateService {
           return Promise.resolve(null);
         } else {
           if (!!githubReleases && githubReleases.length > 0) {
-            const latestRelease = OctofarmUpdateService.findGithubRelease(
-              githubReleases,
-              includePre
-            );
+            const latestRelease = ServerUpdateService.findGithubRelease(githubReleases, includePre);
             // Whether the package version exists at all - developer at work if not!
-            this.#installedReleaseFound = !!OctofarmUpdateService.findGithubRelease(
+            this.#installedReleaseFound = !!ServerUpdateService.findGithubRelease(
               githubReleases,
               includePre,
               this.#serverVersion
@@ -78,7 +75,7 @@ class OctofarmUpdateService {
         }
       })
       .catch((e) => {
-        logger.error(e);
+        this.#logger.error(e);
         this.#lastReleaseCheckError = e;
         this.#lastReleaseCheckFailed = true;
       });
@@ -134,8 +131,8 @@ class OctofarmUpdateService {
    */
   checkReleaseAndLogUpdate() {
     if (!!this.#lastReleaseCheckFailed) {
-      logger.error(
-        "Cant check release as it was not fetched yet or the last fetch failed. Call and await 'syncLatestOctoFarmRelease' first."
+      this.#logger.error(
+        "Cant check release as it was not fetched yet or the last fetch failed. Call and await 'syncLatestRelease' first."
       );
       return;
     }
@@ -149,7 +146,7 @@ class OctofarmUpdateService {
 
     const latestReleaseTag = latestRelease.tag_name;
     if (!this.#installedReleaseFound) {
-      logger.info(
+      this.#logger.info(
         `\x1b[36mAre you a god? A new release ey? Bloody terrific mate!\x1b[0m
     Here's github's latest released: \x1b[32m${latestReleaseTag}\x1b[0m
     Here's your release tag: \x1b[32m${packageVersion}\x1b[0m
@@ -160,22 +157,22 @@ class OctofarmUpdateService {
 
     if (!!packageVersion && packageVersion !== latestReleaseTag) {
       if (!!this.#airGapped) {
-        logger.warning(
+        this.#logger.warning(
           `Installed release: ${packageVersion}. Skipping update check (air-gapped/disconnected from internet)`
         );
       } else {
-        logger.info(
+        this.#logger.info(
           `Update available! New version: ${latestReleaseTag} (prerelease: ${latestRelease.prerelease})`
         );
       }
     } else if (!packageVersion) {
-      return logger.error(
+      return this.#logger.error(
         "Cant check release as package.json version environment variable is not set. Make sure OctoFarm is run from a 'package.json' or NPM context."
       );
     } else {
-      return logger.debug(`Installed release: ${packageVersion}. You are up to date!`);
+      return this.#logger.debug(`Installed release: ${packageVersion}. You are up to date!`);
     }
   }
 }
 
-module.exports = OctofarmUpdateService;
+module.exports = ServerUpdateService;

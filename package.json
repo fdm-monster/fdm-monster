@@ -1,39 +1,40 @@
 {
-  "name": "octofarm",
-  "version": "1.2.0-rc2",
-  "description": "OctoFarm is a easy to setup and install web interface that unifies your Octoprint instances for easy monitoring of all your printers. OctoFarm allows you to connect to multiple octoprint instances on your network allowing creating a farm management system. You can control, manage, upload files to any of your instances without ever leaving the tab it's open in.",
+  "name": "3d-print-farm",
+  "version": "0.0.1",
+  "description": "3DPF is a 3D printer manager to set up, configure and monitor FDM and resin printers. Our aim is to provide extremely optimized performance and reliability.",
   "main": "app.js",
   "scripts": {
     "prestart": "npm ci --production",
-    "start": "pm2 flush && pm2 start app.js --name OctoFarm -e ./logs/pm2.error.log -o ./logs/pm2.out.log --time --restart-delay=1000 --update-env --exp-backoff-restart-delay=1500",
-    "restart": "pm2 restart OctoFarm",
+    "start": "pm2 flush && pm2 start app.js --name 3DPF -e ./logs/pm2.error.log -o ./logs/pm2.out.log --time --restart-delay=1000 --update-env --exp-backoff-restart-delay=1500",
+    "restart": "pm2 restart 3DPF",
     "migration:up": "migrate-mongo up",
     "migration:down": "migrate-mongo down",
     "migration:status": "migrate-mongo status",
     "pupdate": "pm2 update",
-    "stop": "pm2 stop OctoFarm",
-    "stop:delete": "pm2 delete OctoFarm",
-    "release": "git archive -o octofarm.zip HEAD",
-    "prettier": "prettier --write \\\"server/**/*.js\\\" \\\"./test/**/*.js\\\" \\\"./client_src/**/*.js\\\"",
+    "stop": "pm2 stop 3DPF",
+    "stop:delete": "pm2 delete 3DPF",
+    "prettier": "prettier --write \\\"server/**/*.js\\\" \\\"./test/**/*.js\\\" \\\"./client-vue/**/*.js\\\"",
     "dev": "nodemon ./app.js",
     "test": "jest --forceExit"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/OctoFarm/OctoFarm"
+    "url": "https://github.com/davidzwa/3d-print-farm"
   },
   "bin": {
-    "octofarm": "./app.js"
+    "3d-print-farm": "./app.js"
   },
   "keywords": [
-    "octofarm",
-    "octo",
+    "3dprintfarm",
+    "3d-print-farm",
+    "3d-printer",
     "octoprint",
     "pi",
-    "node"
+    "node",
+    "vue"
   ],
   "author": "David Zwart (davidzwa)",
-  "license": "ISC",
+  "license": "AGPLv3",
   "dependencies": {
     "archiver": "^5.3.0",
     "awilix": "^4.3.4",
@@ -105,11 +106,9 @@
   "nodemonConfig": {
     "verbose": false,
     "ignore": [
-      "views/assets/*",
       "logs/*",
-      "client_src/*",
-      "client-octofarm/*"
+      "client-vue/*"
     ],
-    "delay": 2500
+    "delay": 2000
   }
 }

@@ -13,7 +13,7 @@ class PrintersStore {
 
   #printerStates;
   #farmPrintersGroups;
-  #logger = new Logger("OctoFarm-PrintersStore");
+  #logger = new Logger("Server-PrintersStore");
 
   constructor({
     settingsStore,

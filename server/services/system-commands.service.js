@@ -17,7 +17,7 @@ const {
 class SystemCommandsService {
   constructor() {}
 
-  async restartOctoFarm() {
+  async restartServer() {
     let checkForNamedService = false;
 
     // If we're on pm2, then restart buddy!
@@ -27,7 +27,7 @@ class SystemCommandsService {
 
         if (doesFunctionExist) {
           setTimeout(async () => {
-            await exec("pm2 restart OctoFarm");
+            await exec("pm2 restart 3DPF");
           }, 5000);
 
           checkForNamedService = true;
@@ -57,13 +57,13 @@ class SystemCommandsService {
   }
 
   // This will need changing when .deb / installation script becomes a thing. It's built to deal with the current implementation.
-  async checkIfOctoFarmNeedsUpdatingAndUpdate(clientResponse, force) {
+  async checkServerUpdate(clientResponse, force) {
     // Check to see if current dir contains a git folder... hard fail otherwise.
     let isThisAGitRepo = await checkIfWereInAGitRepo();
     if (!isThisAGitRepo) {
       clientResponse.statusTypeForUser = "warning";
       clientResponse.message =
-        "Not a git repository, user intervention required! You will have to re-download OctoFarm and re-unpack it over this directory. Make sure to backup your images folder!";
+        "Not a git repository, user intervention required! You will have to clone 3DPF again and re-unpack it over this directory. Make sure to backup your images folder!";
       return clientResponse;
     }
 
@@ -76,7 +76,7 @@ class SystemCommandsService {
       // Check if branch is already up to date. Nothing to do, return response to user.
       const gitBranchUpToDate = isBranchUpToDate(gitCurrentStatus);
       if (gitBranchUpToDate) {
-        clientResponse.haveWeSuccessfullyUpdatedOctoFarm = false;
+        clientResponse.updateSuccess = false;
         clientResponse.message = "OctoFarm is already up to date! Your good to go!";
         clientResponse.statusTypeForUser = "success";
         return clientResponse;
@@ -135,7 +135,7 @@ class SystemCommandsService {
     }
 
     // Everything went well, enjoy the tasty updates!
-    clientResponse.haveWeSuccessfullyUpdatedOctoFarm = true;
+    clientResponse.updateSuccess = true;
     clientResponse.statusTypeForUser = "success";
     clientResponse.message = "Update command has run successfully, OctoFarm will restart.";
     // Local changes

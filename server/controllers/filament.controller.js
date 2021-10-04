@@ -14,7 +14,7 @@ class FilamentController {
   #filamentManagerPluginService;
   #serverPageTitle;
 
-  #logger = new Logger("OctoFarm-FilamentManager");
+  #logger = new Logger("Server-FilamentManager");
 
   constructor({
     settingsStore,

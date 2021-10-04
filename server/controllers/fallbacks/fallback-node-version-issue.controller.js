@@ -7,7 +7,7 @@ const isPm2Safe =
   "PM2_HOME" in process.env || "PM2_JSON_PROCESSING" in process.env || "PM2_CLI" in process.env;
 
 class FallbackIssueController {
-  logger = new Logger("OctoFarm-Fallback-Server");
+  logger = new Logger("Fallback-Server");
 
   /**
    * A Node 12 compatible route

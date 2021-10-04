@@ -8,7 +8,7 @@ class InfluxDbSetupService {
   #db = null;
   #settingsStore;
 
-  #logger = new Logger("OctoFarm-Influx");
+  #logger = new Logger("Influx");
 
   constructor({ settingsStore }) {
     this.#settingsStore = settingsStore;

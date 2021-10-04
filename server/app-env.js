@@ -65,7 +65,7 @@ function ensureEnvNpmVersionSet() {
 }
 
 function removePm2Service(reason) {
-  logger.error(`Removing PM2 service as OctoFarm failed to start: ${reason}`);
+  logger.error(`Removing PM2 service as Server failed to start: ${reason}`);
   execSync("pm2 delete 3DPF");
 }
 

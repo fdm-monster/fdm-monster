@@ -1,5 +1,5 @@
 const DITokens = require("./container.tokens");
-const { setupExpressServer, serveOctoFarmRoutes } = require("./app-core");
+const { setupExpressServer, serveControllerRoutes } = require("./app-core");
 const { setupEnvConfig } = require("./app-env");
 const { ensureSystemSettingsInitiated } = require("./app-core");
 
@@ -13,7 +13,7 @@ async function setupTestApp(loadPrinterStore = false) {
 
   const { app: server, container } = setupExpressServer();
   await ensureSystemSettingsInitiated(container);
-  serveOctoFarmRoutes(server);
+  serveControllerRoutes(server);
 
   if (loadPrinterStore) {
     // Testing setup explicitly requested the store to be loaded, assuming a database is setup.

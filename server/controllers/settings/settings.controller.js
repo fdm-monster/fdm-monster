@@ -4,7 +4,7 @@ const Logger = require("../../handlers/logger.js");
 const { AppConstants } = require("../../app.constants");
 
 class SettingsController {
-  #logger = new Logger("OctoFarm-API");
+  #logger = new Logger("Server-API");
   #settingsStore;
   constructor({ settingsStore }) {
     this.#settingsStore = settingsStore;

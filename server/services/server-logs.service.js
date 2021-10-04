@@ -4,7 +4,7 @@ const { join } = require("path");
 const { createZipFile } = require("../utils/zip.utils.js");
 const { getLogsPath } = require("../utils/system-paths.utils.js");
 
-const dumpFileName = "octofarm_dump.zip";
+const dumpFileName = "3dpf_dump.zip";
 
 class ServerLogsService {
   #systemInfoBundleService;
@@ -13,13 +13,13 @@ class ServerLogsService {
     this.#systemInfoBundleService = systemInfoBundleService;
   }
 
-  async grabLogs() {
+  collectLogFiles() {
     const fileArray = [];
     const testFolder = getLogsPath();
     const folderContents = readdirSync(testFolder);
     for (let i = 0; i < folderContents.length; i++) {
       const logFilePath = join(testFolder, folderContents[i]);
-      const stats = await statSync(logFilePath);
+      const stats = statSync(logFilePath);
       const logFile = {
         name: folderContents[i],
         path: logFilePath,
@@ -36,14 +36,13 @@ class ServerLogsService {
     const fileList = [];
 
     // Generate nice text file of system information
-    let octofarmInformationTxt =
-      await this.#systemInfoBundleService.generateOctoFarmSystemInformationTxt();
-    if (!octofarmInformationTxt) throw "Couldn't generate octofarms_information.txt file...";
+    let infoText = this.#systemInfoBundleService.generateInfoText();
+    if (!infoText) throw "Couldn't generate system_information.txt file...";
 
-    fileList.push(octofarmInformationTxt);
+    fileList.push(infoText);
 
     // Collect all latest log files
-    let currentLogFiles = await this.grabLogs();
+    let currentLogFiles = this.collectLogFiles();
 
     // Let me know if there's a better way here. Just always used forEach.
     currentLogFiles.forEach((logPath) => {
@@ -56,7 +55,7 @@ class ServerLogsService {
       }
     });
     // Create the zip file and return the path.
-    return createZipFile(dumpFileName, fileList);
+    return await createZipFile(dumpFileName, fileList);
   }
 }
 

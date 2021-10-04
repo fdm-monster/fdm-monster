@@ -3,8 +3,6 @@ const { AwilixResolutionError } = require("awilix");
 const { JobValidationException } = require("../exceptions/job.exceptions");
 const { ToadScheduler, SimpleIntervalJob, AsyncTask } = require("toad-scheduler");
 
-const logger = new Logger("OctoFarm-TaskManager");
-
 /**
  * Manage immediate or delayed tasks and recurring jobs.
  */
@@ -13,6 +11,8 @@ class TaskManagerService {
   taskStates = {};
 
   #container;
+
+  #logger = new Logger("Server-TaskManager");
 
   constructor(container) {
     this.#container = container;
@@ -118,7 +118,7 @@ class TaskManagerService {
     try {
       this.validateInput(taskID, asyncTaskCallbackOrToken, schedulerOptions);
     } catch (e) {
-      logger.error(e.stack, schedulerOptions);
+      this.#logger.error(e.stack, schedulerOptions);
       return;
     }
 
@@ -176,13 +176,13 @@ class TaskManagerService {
       );
     }
     if (!schedulerOptions.disabled) {
-      logger.info(
+      this.#logger.info(
         `Task '${taskID}' was scheduled (runImmediately: ${!!schedulerOptions.runImmediately}).`
       );
       const job = new SimpleIntervalJob(schedulerOptions, timedTask);
       this.jobScheduler.addSimpleIntervalJob(job);
     } else {
-      logger.info(`Task '${taskID}' was marked as disabled (deferred execution).`);
+      this.#logger.info(`Task '${taskID}' was marked as disabled (deferred execution).`);
     }
   }
 
@@ -196,7 +196,7 @@ class TaskManagerService {
 
   runTimeoutTaskInstance(taskID, timeoutMs) {
     const taskState = this.#getTaskState(taskID);
-    logger.info(`Running delayed task ${taskID} in ${timeoutMs}ms`);
+    this.#logger.info(`Running delayed task ${taskID} in ${timeoutMs}ms`);
     setTimeout(() => taskState.timedTask.execute(), timeoutMs, taskID);
   }
 
@@ -220,7 +220,7 @@ class TaskManagerService {
     taskState.duration = Date.now() - taskState.started;
 
     if (taskState.options?.logFirstCompletion !== false && !taskState?.firstCompletion) {
-      logger.info(`Task '${taskId}' first completion. Duration ${taskState.duration}ms`);
+      this.#logger.info(`Task '${taskId}' first completion. Duration ${taskState.duration}ms`);
       taskState.firstCompletion = Date.now();
     }
   }
@@ -239,7 +239,7 @@ class TaskManagerService {
           error
         };
 
-      logger.error(`Task '${taskId}' threw an exception:` + error.stack);
+      this.#logger.error(`Task '${taskId}' threw an exception:` + error.stack);
     };
   }
 

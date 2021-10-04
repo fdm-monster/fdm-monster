@@ -15,7 +15,7 @@ class PrinterFileController {
   #octoPrintApiService;
   #printersStore;
 
-  #logger = new Logger("OctoFarm-API");
+  #logger = new Logger("Server-API");
 
   constructor({ filesStore, octoPrintApiService, printersStore }) {
     this.#filesStore = filesStore;

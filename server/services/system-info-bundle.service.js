@@ -6,7 +6,7 @@ const isDocker = require("is-docker");
 const { AppConstants } = require("../app.constants");
 const currentVersion = process?.env[AppConstants.VERSION_KEY];
 
-const { checkIfFileFileExistsAndDeleteIfSo } = require("../utils/file.utils.js");
+const { deleteExistingFile } = require("../utils/file.utils.js");
 const { prettyPrintArray } = require("../utils/pretty-print.utils.js");
 
 class SystemInfoBundleService {
@@ -14,12 +14,12 @@ class SystemInfoBundleService {
 
   #systemInfoStore;
   #printersStore;
-  #octofarmUpdateService;
+  #serverUpdateService;
 
-  constructor({ systemInfoStore, printersStore, octofarmUpdateService }) {
+  constructor({ systemInfoStore, printersStore, serverUpdateService }) {
     this.#systemInfoStore = systemInfoStore;
     this.#printersStore = printersStore;
-    this.#octofarmUpdateService = octofarmUpdateService;
+    this.#serverUpdateService = serverUpdateService;
   }
 
   /**
@@ -27,7 +27,7 @@ class SystemInfoBundleService {
    * @throws {String} If the SystemInformation object doesn't return
    */
   generateSystemInformationContents() {
-    let systemInformationContents = "--- OctoFarm System Information ---\n\n";
+    let systemInformationContents = "--- 3DPF System Information ---\n\n";
     systemInformationContents += `OctoFarm Version\n ${currentVersion} \n`;
     const airGapped = "Are we connected to the internet?\n";
     const pm2 = "Are we running under pm2?\n";
@@ -37,7 +37,7 @@ class SystemInfoBundleService {
     const yes = " ✓  \n";
     const no = " ✘ \n";
 
-    const isAirGapped = this.#octofarmUpdateService.getAirGapped();
+    const isAirGapped = this.#serverUpdateService.getAirGapped();
     systemInformationContents += `${airGapped} ${isAirGapped ? no : yes}`;
     systemInformationContents += `${node} ${isNode() ? yes : no}`;
     systemInformationContents += `${pm2} ${isPm2() ? yes : no}`;
@@ -65,23 +65,24 @@ class SystemInfoBundleService {
   }
 
   /**
-   * Generates a txt file containing the current system and octofarm information
+   * Generates a txt file containing the current system and server information
    * @throws {Object} If the systemInformationContents doesn't return anything
    */
-  async generateOctoFarmSystemInformationTxt() {
+  generateInfoText() {
     let systemInformation = {
       name: this.#systemInformationFileName,
       path: join(getLogsPath(), this.#systemInformationFileName)
     };
 
     // Make sure existing zip files have been cleared from the system before continuing.
-    await checkIfFileFileExistsAndDeleteIfSo(systemInformation?.path);
+    deleteExistingFile(systemInformation?.path);
 
     let systemInformationContents = this.generateSystemInformationContents();
 
     if (!systemInformationContents)
       throw { status: "error", msg: `Couldn't generate ${this.#systemInformationFileName}` };
-    await writeFileSync(systemInformation?.path, systemInformationContents);
+
+    writeFileSync(systemInformation?.path, systemInformationContents);
 
     return systemInformation;
   }

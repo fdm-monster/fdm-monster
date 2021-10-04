@@ -4,9 +4,9 @@ const { AppConstants } = require("../app.constants");
 const { isPm2, isNodemon, isNode } = require("../utils/env.utils");
 const { ensureCurrentUserAndGroup } = require("../middleware/users");
 
-const amIAliveAPI = ({ octofarmUpdateService }) => ({
+const amIAliveAPI = ({ serverUpdateService }) => ({
   index: async (req, res) => {
-    let softwareUpdateNotification = octofarmUpdateService.getUpdateNotificationIfAny();
+    let softwareUpdateNotification = serverUpdateService.getUpdateNotificationIfAny();
 
     // ensure update_available can only be true when Administrator group found
     if (req?.user?.group !== "Administrator") {

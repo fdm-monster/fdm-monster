@@ -15,7 +15,7 @@ class HistoryCache {
   #historyClean = [];
 
   #enableLogging = false;
-  #logger = new Logger("OctoFarm-InformationCleaning", this.#enableLogging, "warn");
+  #logger = new Logger("Server-History", this.#enableLogging, "warn");
 
   #historyService;
   #settingsStore;

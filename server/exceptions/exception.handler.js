@@ -14,7 +14,7 @@ function exceptionHandler(err, req, res, next) {
   if (err instanceof ValidationException) {
     const code = err.statusCode || 400;
     return res.status(code).send({
-      error: "OctoFarm API did not accept this input",
+      error: "API could not accept this input",
       type: err.name,
       errors: err.errors
     });
@@ -22,7 +22,7 @@ function exceptionHandler(err, req, res, next) {
   if (!!err) {
     const code = err.statusCode || 500;
     return res.status(code).send({
-      error: "OctoFarm server experienced an internal error",
+      error: "Server experienced an internal error",
       type: err.name,
       stack: err.stack
     });

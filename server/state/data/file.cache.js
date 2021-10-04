@@ -16,7 +16,7 @@ class FileCache {
   #totalFileCount = 0;
   #fileStatistics = getDefaultFileCleanStatistics();
 
-  #logger = new Logger("OctoFarm-FileCache");
+  #logger = new Logger("Server-FileCache");
 
   constructor({}) {}
 
