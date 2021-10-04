@@ -1,81 +1,64 @@
-const MONGO_KEY = "MONGO";
-const SERVER_PORT_KEY = "SERVER_PORT";
-const NON_NPM_MODE_KEY = "NON_NPM_MODE";
-const SERVER_SITE_TITLE_KEY = "SERVER_SITE_TITLE";
-const NODE_ENV_KEY = "NODE_ENV";
-
-const VERSION_KEY = "npm_package_version";
-
-const defaultMongoStringUnauthenticated = "mongodb://127.0.0.1:27017/3dpf";
-const defaultServerPort = 4000;
-const defaultServerPageTitle = "3D-Print-Farm";
-const defaultProductionEnv = "production";
-const defaultTestEnv = "test";
-const knownEnvNames = ["development", "production", "test"];
-
-// Make sure the client is up to date with this
-const jsonStringify = true;
-
-const apiRoute = "/api";
-
 class AppConstants {
+  /**
+   * Change the SSE serialization to JSON or flatten
+   */
   static get jsonStringify() {
-    return jsonStringify;
+    return true;
   }
 
   static get apiRoute() {
-    return apiRoute;
+    return "/api";
   }
 
   static get defaultMongoStringUnauthenticated() {
-    return defaultMongoStringUnauthenticated;
+    return "mongodb://127.0.0.1:27017/3dpf";
   }
 
   static get defaultServerPort() {
-    return defaultServerPort;
+    return 4000;
   }
 
   static get defaultServerPageTitle() {
-    return defaultServerPageTitle;
+    return "3D-Print-Farm";
   }
 
   static get knownEnvNames() {
-    return knownEnvNames;
+    return ["development", "production", "test"];
   }
 
   static get defaultProductionEnv() {
-    return defaultProductionEnv;
+    return "production";
   }
 
   static get defaultTestEnv() {
-    return defaultTestEnv;
+    return "test";
   }
 
   static get VERSION_KEY() {
-    return VERSION_KEY;
+    return "npm_package_version";
   }
 
   static get NODE_ENV_KEY() {
-    return NODE_ENV_KEY;
+    return "NODE_ENV";
   }
 
   static get MONGO_KEY() {
-    return MONGO_KEY;
+    return "MONGO";
   }
 
   static get SERVER_PORT_KEY() {
-    return SERVER_PORT_KEY;
+    return "SERVER_PORT";
   }
 
   static get NON_NPM_MODE_KEY() {
-    return NON_NPM_MODE_KEY;
+    return "NON_NPM_MODE";
   }
 
   static get SERVER_SITE_TITLE_KEY() {
-    return SERVER_SITE_TITLE_KEY;
+    return "SERVER_SITE_TITLE";
   }
 }
 
 module.exports = {
-  AppConstants
+  AppConstants: Object.freeze(AppConstants)
 };
