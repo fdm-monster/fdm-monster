@@ -72,7 +72,7 @@ export class DashboardMvcController {
     }
 
     res.render("dashboard", {
-      octoFarmPageTitle: "Taitel",
+      serverPageTitle: "Taitel",
       name: user,
       userGroup: group,
       version: process.env.npm_package_version,

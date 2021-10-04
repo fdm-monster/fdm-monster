@@ -34,7 +34,7 @@ function AddSwagger(app: INestApplication): INestApplication {
 }
 
 function printPreBootMessage(error = null) {
-  logger.log(`OctoFarm2 ${Y}v${process.env.npm_package_version}${D}`);
+  logger.log(`3DPF ${Y}v${process.env.npm_package_version}${D}`);
   logger.log(`NodeJS ${Y}${process.version}${D}`);
   const startDate = new Date().toDateString();
   const startTime = new Date().toLocaleTimeString();
@@ -93,7 +93,7 @@ function legacyMiddleware(app: NestExpressApplication) {
     next();
   });
   app.use(expressLayouts);
-  process.env.OCTOFARM_VERSION = `${process.env.NPM_PACKAGE_VERSION}`;
+  process.env.SERVER_VERSION = `${process.env.NPM_PACKAGE_VERSION}`;
 
   const assetsPath = join(__dirname, "../..", "assets", "public");
   app.useStaticAssets(assetsPath);

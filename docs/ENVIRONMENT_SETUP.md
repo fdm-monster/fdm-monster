@@ -25,7 +25,7 @@ The following variables are read and used by 3DPF at startup. Always restart you
 - SAFEMODE_ENABLED **Safely start 3DPF: without any task being run to avoid crashes.**
 > SAFEMODE_ENABLED=true
 ## The `.env` file
-A very simple text file with a variable per line. The following `.env` is often already enough to make sure OctoFarm works as you like:
+A very simple text file with a variable per line. The following `.env` is often already enough to make sure 3DPF works as you like:
 ```
 MONGO=mongodb://127.0.0.1:27017/3dpf
 SERVER_PORT=4000
@@ -35,7 +35,7 @@ SERVER_PORT=4000
 So, you understand the variables to configure 3DPF now. How do I set this up for my environment? Read below for your specific scenario.
 
 ### NodeJS with pm2 (or nodemon)
-Create a `.env` file in the folder you cloned (or downloaded and extracted) OctoFarm with the **required** and/or _optional_ variables!
+Create a `.env` file in the folder you cloned (or downloaded and extracted) 3DPF with the **required** and/or _optional_ variables!
 OctoFarm will automatically create this file for you, and if anything is not working a webpage will help you through the basics.
 
 Feel adventurous? Customize the file to your liking, but again ALWAYS make sure the **required** variables are correctly set.
@@ -43,7 +43,7 @@ Feel adventurous? Customize the file to your liking, but again ALWAYS make sure 
 ### Docker-compose 
 With docker-compose you have a great tool to pass environment variables use the `environment` section.
 Be aware of the following notes:
-- the `.env` file for docker-compose is not applied to OctoFarm unless you use the variables in your `environment` section (more on that below)
+- the `.env` file for docker-compose is not applied to 3DPF unless you use the variables in your `environment` section (more on that below)
 
 Entirely up to you!
 
@@ -61,7 +61,7 @@ services:
     # ... alternative (watch for whitespace!!) 
     environment:
       MONGO=mongodb://127.0.0.1:27017/3dpf
-      OCTOFARM_PORT=4000
+      SERVER_PORT=4000
 ```
 ### Docker 
 Please add each environment variable in a file named `.env` in the folder where you run you docker command.

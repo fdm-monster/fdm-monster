@@ -1,6 +1,6 @@
 {
-    "name": "OctoFarm",
-    "short_name": "OctoFarm",
+    "name": "3D-Print-Farm",
+    "short_name": "3DPF",
     "icons": [
         {
             "src": "/android-chrome-192x192.png",

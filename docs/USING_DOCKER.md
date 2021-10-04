@@ -4,16 +4,16 @@ Docker is a great tool! Using `docker-compose` is better and `portainer` is most
 1) NOTE we assume you are familiar with `docker` and `docker-compose`. These are great tools for isolating your software deployment (+), but it be quite new to some users (-).
     - We cannot support each custom scenario or setup!
     - Take good care of checking your device's memory limits, architecture and CPU power (`docker stats` and for example `mem_limit: 400m` for 400MB limit in docker-compose)
-    - If your device's CPU hits high percentages a lot or memory usage is high, please check your OctoFarm network timeout settings and inspect your OctoPrint/network latencies. 
-2) NOTE we provide `octofarm/octofarm:latest`, `octofarm/octofarm:alpine-latest` and `octofarm/octofarm:monolithic-latest`
+    - If your device's CPU hits high percentages a lot or memory usage is high, please check your 3DPF network timeout settings and inspect your 3DPF <-> network latency. 
+2) NOTE we provide `davidzwa/3d-print-farm:latest`, `davidzwa/3d-print-farm:alpine-latest` and `davidzwa/3d-print-farm:monolithic-latest`
     - `latest` and `alpine-latest` require you to run MongoDB or a MongoDB container (see compose below)
-    - `monolithic` does not require a separate MongoDB, but we at OctoFarm personally like MongoDB to be separate (docker = isolation remember?).
+    - `monolithic` does not require a separate MongoDB, but we at 3DPF personally like MongoDB to be separate (docker = isolation remember?).
 
 ### Docker images 'latest' or ':'alpine-latest' with separate MongoDb
-**Pay good attention that you have to configure your root-user's username and password for MongoDB and that OctoFarm needs it to work!**
+**Pay good attention that you have to configure your root-user's username and password for MongoDB and that 3DPF needs it to work!**
 
 Replace the values for `MONGO_ROOTUSER_HERE`, `MONGO_PASSWORD_HERE` below!
-We don't advise using MongoDB without username/password, although you can do so by removing the environment variables for MongoDB and OctoFarm. IF and ONLY IF you dont want a username/password, make sure that the URL makes sense in that **special** case: `MONGO= mongodb://mongo:27017/octofarm`.
+We don't advise using MongoDB without username/password, although you can do so by removing the environment variables for MongoDB and 3DPF. IF and ONLY IF you dont want a username/password, make sure that the URL makes sense in that **special** case: `MONGO= mongodb://mongo:27017/3dpf`.
 
 Why the MongoDB `?authSource=admin` addition, you might ask? Just to make sure the right table is checked for the username you setup, if that's the case. This table is named `admin` by default. Glad you asked!
 
