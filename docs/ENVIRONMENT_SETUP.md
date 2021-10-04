@@ -1,5 +1,5 @@
-# OctoFarm Server Environment Variables
-OctoFarm Server can be configured with environment variables. There's different ways to do this **for each setup**:
+# 3DPF Server Environment Variables
+3DPF Server can be configured with environment variables. There's different ways to do this **for each setup**:
 - specify a `.env` file. This works for these setups:
     - NodeJS with `pm2` 
     - NodeJS with `nodemon`
@@ -13,26 +13,26 @@ OctoFarm Server can be configured with environment variables. There's different 
     
 
 ## Required and optional variables
-The following variables are read and used by OctoFarm at startup. Always restart your server after a change.
+The following variables are read and used by 3DPF at startup. Always restart your server after a change.
 
 - MONGO (Required) **the connection to mongodb**. For example:
-> MONGO=mongodb://127.0.0.1:27017/octofarm
-- OCTOFARM_PORT (Optional, default=4000) **the port of the local OctoFarm website**. For example:
+> MONGO=mongodb://127.0.0.1:27017/3dpf
+- SERVER_PORT (Optional, default=4000) **the port of the local 3DPF website**. For example:
 > 
-> OCTOFARM_PORT=4000
-- OCTOFARM_SITE_TITLE **Custom site title for OctoFarm**
-> OCTOFARM_SITE_TITLE=OctoFarm
-- SAFEMODE_ENABLED **Safely start OctoFarm: without any task being run to avoid crashes.**
+> SERVER_PORT=4000
+- SERVER_SITE_TITLE **Custom site title for 3DPF**
+> SERVER_SITE_TITLE=3DPF
+- SAFEMODE_ENABLED **Safely start 3DPF: without any task being run to avoid crashes.**
 > SAFEMODE_ENABLED=true
 ## The `.env` file
 A very simple text file with a variable per line. The following `.env` is often already enough to make sure OctoFarm works as you like:
 ```
-MONGO=mongodb://127.0.0.1:27017/octofarm
-OCTOFARM_PORT=4000
+MONGO=mongodb://127.0.0.1:27017/3dpf
+SERVER_PORT=4000
 ```
 
 ## Applying it to your setup
-So, you understand the variables to configure OctoFarm now. How do I set this up for my environment? Read below for your specific scenario.
+So, you understand the variables to configure 3DPF now. How do I set this up for my environment? Read below for your specific scenario.
 
 ### NodeJS with pm2 (or nodemon)
 Create a `.env` file in the folder you cloned (or downloaded and extracted) OctoFarm with the **required** and/or _optional_ variables!
@@ -50,17 +50,17 @@ Entirely up to you!
 Here is how the environment section in docker would look.
 ```
 services:
-  octofarm:
+  3d-print-farm:
     # ... other sections here
     
     # environment using colon syntax
     environment:
-      - MONGO: mongodb://127.0.0.1:27017/octofarm
-      - OCTOFARM_PORT: 4000
+      - MONGO: mongodb://127.0.0.1:27017/3dpf
+      - SERVER_PORT: 4000
     
     # ... alternative (watch for whitespace!!) 
     environment:
-      MONGO=mongodb://127.0.0.1:27017/octofarm
+      MONGO=mongodb://127.0.0.1:27017/3dpf
       OCTOFARM_PORT=4000
 ```
 ### Docker 

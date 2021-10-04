@@ -972,11 +972,6 @@
     consola "^2.15.0"
     node-fetch "^2.6.1"
 
-"@octofarm/client@^0.1.0-rc2-build5":
-  version "0.1.0-rc2-build5"
-  resolved "https://registry.yarnpkg.com/@octofarm/client/-/client-0.1.0-rc2-build5.tgz#79fe24f8d5bebace7ee2e46db5bc9e5eaf3c08bf"
-  integrity sha512-DD9KkW9hEF9ebgc0zY++dzaWMSw2x7ZNgL7pSXFgK3wEvMQoPOiCNPhvpqyPIez8R2yjO0xx55ViMNqnhj0cIw==
-
 "@sinonjs/commons@^1.7.0":
   version "1.8.2"
   resolved "https://registry.yarnpkg.com/@sinonjs/commons/-/commons-1.8.2.tgz#858f5c4b48d80778fde4b9d541f27edc0d56488b"

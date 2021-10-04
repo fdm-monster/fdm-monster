@@ -18,13 +18,13 @@ import { WsAdapter } from "@nestjs/platform-ws";
 const db = require("../ormconfig");
 
 const APP_HOST = "127.0.0.1";
-const APP_PORT = process.env.OCTOFARM_PORT || 3000;
+const APP_PORT = process.env.SERVER_PORT || 3000;
 const logger = new Logger("Main");
 
 function AddSwagger(app: INestApplication): INestApplication {
   const config = new DocumentBuilder()
-    .setTitle("OctoFarm2 API docs")
-    .setDescription("OctoFarm public API description")
+    .setTitle("3DPF V2 API docs")
+    .setDescription("3DPF public API description")
     .setVersion(process.env.npm_package_version)
     .build();
   const document = SwaggerModule.createDocument(app, config);

@@ -31,7 +31,7 @@ export class UsersMvcController {
     if (serverSettings?.server?.registration === true) {
       const userCount = await this.usersService.getUserCount();
       res.render("register", {
-        octoFarmPageTitle: "Taitel",
+        serverPageTitle: "Taitel",
         page: "Register",
         serverSettings,
         userCount

@@ -6,7 +6,7 @@ https://www.npmjs.com/package/migrate-mongo
 #### Apply all pending migrations
     npm run migration:up
 
-OctoFarm will do this automatically for you. The output should look similar to this:
+3DPF will do this automatically for you. The output should look similar to this:
 ```
 $ npm run migration:up
 27/07/2021, 18:54:35 | INFO | OctoFarm-Environment | ✓ Parsed environment and (optional) .env file

@@ -1,4 +1,4 @@
-## Running OctoFarm with docker-compose.yml
+## Running 3DPF with docker-compose.yml
 
 Docker is a great tool! Using `docker-compose` is better and `portainer` is most awesome! Please read the following before continuing:
 1) NOTE we assume you are familiar with `docker` and `docker-compose`. These are great tools for isolating your software deployment (+), but it be quite new to some users (-).
@@ -32,7 +32,7 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: MONGO_ROOTUSER_HERE
       MONGO_INITDB_ROOT_PASSWORD: MONGO_PASSWORD_HERE
-      MONGO_INITDB_DATABASE: octofarm
+      MONGO_INITDB_DATABASE: 3dpf
     ports:
      # HOST:CONTAINER
     - 27017:27017
@@ -41,44 +41,40 @@ services:
     - ./mongodb-data:/data/db
     restart: unless_stopped
 
-  octofarm:
-    container_name: octofarm
-    # choose octofarm/octofarm:latest or octofarm/octofarm:alpine-latest    
-    image: octofarm/octofarm:latest
+  3d-print-farm:
+    container_name: 3d-print-farm
+    # choose davidzwa/3d-print-farm:latest or davidzwa/3d-print-farm:alpine-latest    
+    image: davidzwa/3d-print-farm:latest
     restart: always
     mem_limit: 400m # Feel free to adjust! 400 MB is quite high and a safety limit.
     ports:
     - 4000:4000 # port of SYSTEM : port of CONTAINER
     environment:
-    - MONGO=mongodb://MONGO_ROOTUSER_HERE:MONGO_PASSWORD_HERE@mongodb:27017/octofarm?authSource=admin
+    - MONGO=mongodb://MONGO_ROOTUSER_HERE:MONGO_PASSWORD_HERE@mongodb:27017/3dpf2?authSource=admin
     volumes:
     # Volumes as local relative folders (validate with 'docker-compose config')
-    - ./OctoFarm/logs:/app/logs
-    - ./OctoFarm/scripts:/app/scripts
-    - ./OctoFarm/images:/app/images
+    - ./3DPF/logs:/app/logs
+    - ./3DPF/scripts:/app/scripts
+    - ./3DPF/images:/app/images
 ```
 ### Docker image 'monolithic-latest'
 The monolithic image does not require MongoDB externally, but it also has less control over MongoDB setup:
 ```
- octofarm-monolithic:
-    container_name: octofarm-monolithic
-    image: octofarm/octofarm:monolithic-latest
+ 3d-print-farm-monolithic:
+    container_name: 3d-print-farm-monolithic
+    image: davidzwa/3d-print-farm:monolithic-latest
     restart: always
     volumes:
     # Local volumes, can be made named
-    - ./OctoFarm/logs:/app/logs   
-    - ./OctoFarm/scripts:/app/scripts
-    - ./OctoFarm/images:/app/images
+    - ./3DPF/logs:/app/logs   
+    - ./3DPF/scripts:/app/scripts
+    - ./3DPF/images:/app/images
     - ./mongodb-data:/data/db 
     ports:
     # SYSTEM:CONTAINER
     - 4000:4000
 ```
-### Directly use Docker without those magic compose files! 
-https://octofarm.net/installation (head to the Docker section) is your friend as we covered it there already.
 
 ### Docker or docker-compose for version 2.0 (not released yet!)
-In version 2.0 we will stop using MongoDB and move to a much simpler database called SQLite. This means that you won't have to do anything and you can remove your MongoDB database!
+In version 2.0 we will stop using MongoDB and move to a much simpler database MySQL. This means that you won't have to do anything and you can remove your MongoDB database!
 Of course we will provide the tools to hop on to the 2.0 train, when the time comes. The only change is that the `monolithic-latest` will become the same as the `latest` image. Less setup, nice ey?
-
-Enjoy using OctoFarm with docker and do share your big-flex juicy pics on [Our Discord](https://discord.gg/vjabMUn).

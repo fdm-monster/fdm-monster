@@ -2,13 +2,10 @@
 .idea
 .git
 logs
-OctoFarm
-package
 coverage
 
 # Ignore unuseful folders
 node_modules
-views/assets
 assets
 dist
 
