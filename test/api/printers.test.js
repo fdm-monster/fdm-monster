@@ -13,7 +13,7 @@ const printerRoute = AppConstants.apiRoute + "/printer";
 const getRoute = printerRoute;
 const deleteRoute = printerRoute;
 const createRoute = printerRoute;
-const refreshSettingsPath = "/query-settings";
+const refreshSettingsPath = "query-settings";
 const updateRoute = printerRoute;
 
 beforeAll(async () => {
@@ -83,26 +83,32 @@ describe("PrintersController", () => {
   }, 10000);
 
   it("should return no printer Info entry when Id is provided but doesnt exist", async function () {
-    const res = await request.get(getRoute + "/asd").send();
+    const printerId = "asd";
+    const res = await request.get(`${getRoute}/${printerId}`).send();
 
     expect(res.statusCode).toEqual(404);
-    expect(res.body).toEqual({});
+    expect(res.body).toEqual({
+      error: `The printer ID '${printerId}' was not found in the PrintersStore.`
+    });
   }, 10000);
 
   it("should return 400 error when wrong input is provided", async function () {
-    const path = printerRoute + "/undefined" + refreshSettingsPath;
+    const path = printerRoute + "/undefined/" + refreshSettingsPath;
     const response = await request.post(path).send();
 
     expectInvalidResponse(response, ["id"], true);
   }, 10000);
 
   it("should return 404 if server fails to find the printer", async function () {
-    const path = printerRoute + "/60ae2b760bca4f5930be3d88" + refreshSettingsPath;
+    const printerId = "60ae2b760bca4f5930be3d88";
+    const path = `${printerRoute}/${printerId}/${refreshSettingsPath}`;
     const res = await request.post(path).send(path);
 
     // Assert server failed
     expect(res.statusCode).toEqual(404);
-    expect(res.body).toEqual({});
+    expect(res.body).toEqual({
+      error: `The printer ID '${printerId}' was not found in the PrintersStore.`
+    });
     expect(res.res.statusMessage).toContain("Not Found");
   }, 10000);
 });
