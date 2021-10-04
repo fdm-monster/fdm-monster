@@ -11,6 +11,7 @@ const { scopePerRequest, loadControllers } = require("awilix-express");
 const { ServerTasks } = require("./tasks");
 const { getViewsPath } = require("./app-env");
 const cors = require("cors");
+const { NotFoundException } = require("./exceptions/runtime.exceptions");
 
 function setupExpressServer() {
   let app = express();
@@ -85,20 +86,17 @@ function serveControllerRoutes(app) {
 
   app.get("*", function (req, res) {
     const path = req.originalUrl;
+
+    let resource = "MVC";
     if (path.startsWith("/api") || path.startsWith("/plugins")) {
-      logger.error("API resource was not found " + path);
-      res.status(404);
-      res.send({ error: "API endpoint or method was not found" });
-      return;
-    } else if (req.originalUrl.endsWith(".min.js")) {
-      logger.error("Javascript resource was not found " + path);
-      res.status(404);
-      res.send("Resource not found " + path);
-      return;
+      resource = "API";
+    } else if (path.endsWith(".min.js")) {
+      resource = "client-bundle";
     }
 
-    logger.error("MVC resource was not found " + path);
-    res.redirect("/");
+    logger.error(`${resource} resource at '${path}' was not found`);
+
+    throw new NotFoundException(`${resource} resource was not found`, path);
   });
   app.use(exceptionHandler);
 }

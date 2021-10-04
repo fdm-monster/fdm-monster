@@ -4,7 +4,9 @@
     <TopBar />
 
     <v-main>
-      <router-view />
+      <ErrorAlert>
+        <router-view />
+      </ErrorAlert>
     </v-main>
 
     <FooterList></FooterList>
@@ -15,6 +17,7 @@
 import Vue from "vue";
 import NavigationDrawer from "@/components/NavigationDrawer.vue";
 import TopBar from "@/components/TopBar.vue";
+import ErrorAlert from "@/components/ErrorAlert.vue";
 import FooterList from "@/components/QuickActions/FooterList.vue";
 import { Component } from "vue-property-decorator";
 import { Action, Getter } from "vuex-class";
@@ -25,7 +28,7 @@ import { sseMessageEventGlobal } from "@/event-bus/sse.events";
 import { ACTIONS } from "@/store/printers/printers.actions";
 
 @Component({
-  components: { TopBar, NavigationDrawer, FooterList }
+  components: { TopBar, NavigationDrawer, FooterList, ErrorAlert }
 })
 export default class App extends Vue {
   @Getter serverSettings: ServerSettings;

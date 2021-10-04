@@ -19,9 +19,11 @@ Vue.use(VueBus);
 Vue.use(VueSSE, {
   format: "json",
   polyfill: true,
-  url: apiBase + "/printers/sse"
+  url: apiBase + "/api/printer/sse"
 });
-
+Vue.config.errorHandler = (err: Error, vm: Vue, info: string) => {
+  console.log("Global Error captured", err, vm, info);
+};
 new Vue({
   router,
   store,

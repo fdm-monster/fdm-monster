@@ -1,13 +1,13 @@
-const crudFileRules = {
-  id: "required|mongoId",
-  fullPath: "required"
-};
-
 const getFilesRules = {
   recursive: "required|boolean"
 };
 
+const deleteFileRules = {
+  path: "in:local,sdcard",
+  fullPath: "required"
+};
+
 module.exports = {
   getFilesRules,
-  crudFileRules
+  deleteFileRules
 };

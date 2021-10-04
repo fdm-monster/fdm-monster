@@ -7,4 +7,10 @@ export class OctoPrintService extends BaseService {
 
     return this.getApi(path);
   }
+
+  static async deleteFile(printerId: string, fullPath: string) {
+    const path = `${ServerApi.printerFilesRoute}/${printerId}/?path=local&fullPath=${fullPath}`;
+
+    return this.deleteApi(path);
+  }
 }

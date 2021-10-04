@@ -71,7 +71,7 @@ export default class PrinterGrid extends Vue {
   }
 
   childMounted() {
-    // Fix the hot-reload issue
+    // Fix the hot-reload issue - doesnt fix the core issue
     if (Vue.config.devtools) {
       // location.reload();
     }
