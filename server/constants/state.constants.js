@@ -11,7 +11,7 @@ const MESSAGE = {
   retryingApiConnection: "OctoPrint is offline. Retry is scheduled",
   badRequest: "OctoPrint login responded with bad request. This is a bug",
   apiKeyNotAccepted: "OctoPrint apiKey was rejected.",
-  disabled: "Printer was disabled in OctoFarm",
+  disabled: "Printer was disabled explicitly",
   globalAPIKeyDetected: "Global API Key was detected (username/name was '_api')",
   missingSessionKey: "Missing session key in login response"
 };

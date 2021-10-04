@@ -42,7 +42,7 @@ describe("PrintersController", () => {
   it(`should be able to POST ${createRoute}`, async () => {
     const response = await request.post(createRoute).send({
       printerURL: "http://url.com",
-      apiKey: "octofarmoctofarmoctofarmoctofarm",
+      apiKey: "3dpf3dpf3dpf3dpf3dpf3dpf3dpf3dpf",
       tempTriggers: { heatingVariation: null }
     });
     expectOkResponse(response, {
@@ -67,7 +67,7 @@ describe("PrintersController", () => {
   it(`should be able to DELETE ${deleteRoute} - existing id`, async () => {
     const createResponse = await request.post(createRoute).send({
       printerURL: "http://url.com",
-      apiKey: "octofarmoctofarmoctofarmoctofarm",
+      apiKey: "3dpf3dpf3dpf3dpf3dpf3dpf3dpf3dpf",
       tempTriggers: { heatingVariation: null }
     });
     const body = expectOkResponse(createResponse, { printerState: expect.anything() });

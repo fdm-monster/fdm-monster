@@ -15,7 +15,7 @@ const Storage = multer.diskStorage({
 const upload = multer({ storage: Storage });
 
 class StorageController {
-  #logger = new Logger("OctoFarm-API");
+  #logger = new Logger("Server-API");
 
   constructor({}) {}
 

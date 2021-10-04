@@ -7,7 +7,7 @@ class PrinterGroupsController {
   #printerService;
   #printerGroupService;
 
-  #logger = new Logger("OctoFarm-API");
+  #logger = new Logger("Server-API");
 
   constructor({ printerService, printerGroupService }) {
     this.#printerService = printerService;

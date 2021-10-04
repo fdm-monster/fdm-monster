@@ -17,7 +17,7 @@ const {
 class SystemCommandsService {
   constructor() {}
 
-  async restartOctoFarm() {
+  async restartServer() {
     let checkForNamedService = false;
 
     // If we're on pm2, then restart buddy!
@@ -27,7 +27,7 @@ class SystemCommandsService {
 
         if (doesFunctionExist) {
           setTimeout(async () => {
-            await exec("pm2 restart OctoFarm");
+            await exec("pm2 restart 3DPF");
           }, 5000);
 
           checkForNamedService = true;
@@ -57,13 +57,13 @@ class SystemCommandsService {
   }
 
   // This will need changing when .deb / installation script becomes a thing. It's built to deal with the current implementation.
-  async checkIfOctoFarmNeedsUpdatingAndUpdate(clientResponse, force) {
+  async checkServerUpdate(clientResponse, force) {
     // Check to see if current dir contains a git folder... hard fail otherwise.
     let isThisAGitRepo = await checkIfWereInAGitRepo();
     if (!isThisAGitRepo) {
       clientResponse.statusTypeForUser = "warning";
       clientResponse.message =
-        "Not a git repository, user intervention required! You will have to re-download OctoFarm and re-unpack it over this directory. Make sure to backup your images folder!";
+        "Not a git repository, user intervention required! You will have to clone 3DPF again and re-unpack it over this directory. Make sure to backup your images folder!";
       return clientResponse;
     }
 
@@ -76,8 +76,8 @@ class SystemCommandsService {
       // Check if branch is already up to date. Nothing to do, return response to user.
       const gitBranchUpToDate = isBranchUpToDate(gitCurrentStatus);
       if (gitBranchUpToDate) {
-        clientResponse.haveWeSuccessfullyUpdatedOctoFarm = false;
-        clientResponse.message = "OctoFarm is already up to date! Your good to go!";
+        clientResponse.updateSuccess = false;
+        clientResponse.message = "3DPF Server is already up to date! Your good to go!";
         clientResponse.statusTypeForUser = "success";
         return clientResponse;
       }
@@ -92,7 +92,7 @@ class SystemCommandsService {
         if (gitBranchInFront) {
           //If the branch is not front of current branch, then we need to relay the developer message.
           clientResponse.message =
-            "<span class='text-warning'>The update is failing due to local changes been detected. Seems you've committed your files, Thanks for making OctoFarm great! <br><br>" +
+            "<span class='text-warning'>The update is failing due to local changes been detected. <br><br>" +
             "<b class='text-success'>Override:</b> Will just run a <code>git pull</code> command if you continue.<br><br>" +
             "<b class='text-danger'>Cancel:</b> This option will cancel the update process.<br><br>";
           return clientResponse;
@@ -100,7 +100,7 @@ class SystemCommandsService {
           // If the branch has no commits then we can relay the user message.
           clientResponse.message =
             "<span class='text-warning'>The update is failing due to local changes been detected. Please check the file list below for what has been modified. </span><br><br>" +
-            "<b class='text-success'>Override:</b> This option will ignore the local changes and run the OctoFarm Update process. (You will lose your changes with this option)<br><br>" +
+            "<b class='text-success'>Override:</b> This option will ignore the local changes and run the Server Update process. (You will lose your changes with this option)<br><br>" +
             "<b class='text-danger'>Cancel:</b> This option will cancel the update process keeping your local changes. No update will run and manual intervention by the user is required. <br><br>";
           modifiedFilesList.forEach((line) => {
             clientResponse.message += `<div class="alert alert-secondary m-1 p-2" role="alert"><i class="fas fa-file"></i> ${line.replace(
@@ -135,9 +135,9 @@ class SystemCommandsService {
     }
 
     // Everything went well, enjoy the tasty updates!
-    clientResponse.haveWeSuccessfullyUpdatedOctoFarm = true;
+    clientResponse.updateSuccess = true;
     clientResponse.statusTypeForUser = "success";
-    clientResponse.message = "Update command has run successfully, OctoFarm will restart.";
+    clientResponse.message = "Update command has run successfully, 3DPF Server will restart.";
     // Local changes
     return clientResponse;
   }

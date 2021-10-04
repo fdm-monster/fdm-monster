@@ -7,7 +7,7 @@ class PrinterNetworkController {
   #printerService;
   #autoDiscoveryService;
 
-  #logger = new Logger("OctoFarm-API");
+  #logger = new Logger("Server-API");
 
   constructor({ printerService, autoDiscoveryService }) {
     this.#printerService = printerService;

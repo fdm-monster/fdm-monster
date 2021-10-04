@@ -44,7 +44,7 @@ describe("Filter", () => {
   });
 
   // TODO this test shows that this API endpoint is weakly constrained
-  it("should be able to update filter with route child as param", async () => {
+  it("should be able to update filter with name child as param", async () => {
     const response = await request.patch(updateFilterRoute + "/filterstring").send();
     expect(response.statusCode).toEqual(200);
 
@@ -64,7 +64,7 @@ describe("Sorting", () => {
   });
 
   // TODO this test shows that this API endpoint is weakly constrained
-  it("should be able to update sorting with route child as param", async () => {
+  it("should be able to update sorting with name child as param", async () => {
     const response = await request.patch(updateSortingGetRoute).send();
     expect(response.statusCode).toEqual(200);
 

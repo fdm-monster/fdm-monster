@@ -17,7 +17,7 @@ class AlertController {
   #alertService;
   #scriptService;
 
-  logger = new Logger("OctoFarm-API");
+  logger = new Logger("Server-API");
 
   constructor({ settingsStore, serverVersion, alertService, scriptService, serverPageTitle }) {
     this.#settingsStore = settingsStore;

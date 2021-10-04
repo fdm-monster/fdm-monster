@@ -27,14 +27,13 @@ if (!!majorVersion && majorVersion < 14) {
 
   const {
     setupExpressServer,
-    serveOctoFarmNormally,
+    serveApiNormally,
     ensureSystemSettingsInitiated
   } = require("./server/app-core");
 
-  const DITokens = require("./server/container.tokens");
   const mongoose = require("mongoose");
   const Logger = require("./server/handlers/logger.js");
-  const logger = new Logger("OctoFarm-Server");
+  const logger = new Logger("Server");
 
   const { app: server, container } = setupExpressServer();
 
@@ -55,10 +54,10 @@ if (!!majorVersion && majorVersion < 14) {
 
       // Shit hit the fan
       if (!port || Number.isNaN(parseInt(port))) {
-        throw new Error("The OctoFarm server requires a numeric port input argument to run");
+        throw new Error("The 3DPF Server requires a numeric port input argument to run");
       }
 
-      const app = await serveOctoFarmNormally(server, container);
+      const app = await serveApiNormally(server, container);
       app.listen(port, "0.0.0.0", () => {
         logger.info(`Server started... open it at http://127.0.0.1:${port}`);
       });

@@ -65,7 +65,7 @@ function ensureEnvNpmVersionSet() {
 }
 
 function removePm2Service(reason) {
-  logger.error(`Removing PM2 service as OctoFarm failed to start: ${reason}`);
+  logger.error(`Removing PM2 service as Server failed to start: ${reason}`);
   execSync("pm2 delete 3DPF");
 }
 
@@ -253,7 +253,7 @@ function getViewsPath() {
       );
     } else {
       throw new Error(
-        `Could not find views folder at ${viewsPath} within the OctoFarm path or binary PKG. Please report this as a bug to the developers.`
+        `Could not find views folder at ${viewsPath} within the 3DPF path or binary PKG. Please report this as a bug to the developers.`
       );
     }
   } else {

@@ -58,7 +58,7 @@ class ConnectionLogsCache {
     const printerName = printerState.getName();
 
     let currentErrorLogs = [];
-    let currentOctoFarmLogs = [];
+    let currentServerLogs = [];
     let currentTempLogs = [];
     let currentOctoPrintLogs = [];
     for (let e = 0; e < printerErrorLogs.length; e++) {
@@ -83,7 +83,7 @@ class ConnectionLogsCache {
           printer: currentIssues[i].printer,
           state: currentIssues[i].state
         };
-        currentOctoFarmLogs.push(errorFormat);
+        currentServerLogs.push(errorFormat);
       }
     }
 
@@ -174,13 +174,13 @@ class ConnectionLogsCache {
     }
 
     currentErrorLogs = _.orderBy(currentErrorLogs, ["date"], ["desc"]);
-    currentOctoFarmLogs = _.orderBy(currentOctoFarmLogs, ["date"], ["desc"]);
+    currentServerLogs = _.orderBy(currentServerLogs, ["date"], ["desc"]);
     currentTempLogs = _.orderBy(currentTempLogs, ["date"], ["desc"]);
     currentOctoPrintLogs = _.orderBy(currentOctoPrintLogs, ["date"], ["desc"]);
 
     return {
       currentErrorLogs,
-      currentOctoFarmLogs,
+      currentServerLogs,
       currentTempLogs,
       currentOctoPrintLogs
     };

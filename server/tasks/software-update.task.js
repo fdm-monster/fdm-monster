@@ -1,13 +1,13 @@
 class SoftwareUpdateTask {
-  #octofarmUpdateService;
+  #serverUpdateService;
 
-  constructor({ octofarmUpdateService }) {
-    this.#octofarmUpdateService = octofarmUpdateService;
+  constructor({ serverUpdateService }) {
+    this.#serverUpdateService = serverUpdateService;
   }
 
   async run() {
-    await this.#octofarmUpdateService.syncLatestOctoFarmRelease(false).then(() => {
-      this.#octofarmUpdateService.checkReleaseAndLogUpdate();
+    await this.#serverUpdateService.syncLatestRelease(false).then(() => {
+      this.#serverUpdateService.checkReleaseAndLogUpdate();
     });
   }
 }

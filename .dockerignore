@@ -13,10 +13,8 @@
 Makefile
 /**/node_modules
 
-/client_2x
+/client-vue
 /server-nest
-/screenshots
 /test
 
-/OctoFarm
 /logs

@@ -24,7 +24,7 @@ class PrinterController {
   #sseHandler;
   #sseTask;
 
-  #logger = new Logger("OctoFarm-API");
+  #logger = new Logger("Server-API");
 
   constructor({
     printersStore,

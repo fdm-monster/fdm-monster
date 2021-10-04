@@ -20,12 +20,12 @@ function validateMongoURL(mongoURL) {
   const hasMongoPrefix =
     mongoString.toLowerCase().includes("mongodb://") ||
     mongoString.toLowerCase().includes("mongodb+srv://");
-  const hasOctoFarmTable = mongoString.includes("/octofarm");
+  const isKnownDatabase = mongoString.includes("/3dpf");
 
   return {
     hasMongoPrefix,
-    hasOctoFarmTable,
-    isValid: hasOctoFarmTable || hasMongoPrefix
+    isKnownDatabase,
+    isValid: isKnownDatabase || hasMongoPrefix
   };
 }
 

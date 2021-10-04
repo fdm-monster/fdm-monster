@@ -4,7 +4,7 @@ const DITokens = {
   printerGroupService: "printerGroupService",
   farmStatisticsService: "farmStatisticsService",
   serverSettingsService: "serverSettingsService",
-  octofarmUpdateService: "octofarmUpdateService",
+  serverUpdateService: "serverUpdateService",
   githubApiService: "githubApiService",
   octoPrintApiService: "octoPrintApiService",
   filamentManagerPluginService: "filamentManagerPluginService",

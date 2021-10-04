@@ -4,24 +4,24 @@ const Logger = require("../../handlers/logger.js");
 const { AppConstants } = require("../../app.constants");
 
 class ServerCommandsController {
-  #logger = new Logger("OctoFarm-API");
+  #logger = new Logger("Server-API");
   #systemCommandsService;
-  #octofarmUpdateService;
+  #serverUpdateService;
 
-  constructor({ systemCommandsService, octofarmUpdateService }) {
+  constructor({ systemCommandsService, serverUpdateService }) {
     this.#systemCommandsService = systemCommandsService;
-    this.#octofarmUpdateService = octofarmUpdateService;
+    this.#serverUpdateService = serverUpdateService;
   }
 
   async checkUpdate(req, res) {
-    await this.#octofarmUpdateService.checkReleaseAndLogUpdate();
-    const softwareUpdateNotification = this.#octofarmUpdateService.getUpdateNotificationIfAny();
+    await this.#serverUpdateService.checkReleaseAndLogUpdate();
+    const softwareUpdateNotification = this.#serverUpdateService.getUpdateNotificationIfAny();
     res.send(softwareUpdateNotification);
   }
 
-  async updateOctoFarm(req, res) {
+  async updateServer(req, res) {
     let clientResponse = {
-      haveWeSuccessfullyUpdatedOctoFarm: false,
+      success: false,
       statusTypeForUser: "error",
       message: ""
     };
@@ -36,10 +36,7 @@ class ServerCommandsController {
     }
 
     try {
-      clientResponse = await this.#systemCommandsService.checkIfOctoFarmNeedsUpdatingAndUpdate(
-        clientResponse,
-        force
-      );
+      clientResponse = await this.#systemCommandsService.checkServerUpdate(clientResponse, force);
     } catch (e) {
       clientResponse.message = "Issue with updating | " + e?.message.replace(/(<([^>]+)>)/gi, "");
       // Log error with html tags removed if contained in response message
@@ -52,7 +49,7 @@ class ServerCommandsController {
   async restartServer(req, res) {
     let serviceRestarted = false;
     try {
-      serviceRestarted = await this.#systemCommandsService.restartOctoFarm();
+      serviceRestarted = await this.#systemCommandsService.restartServer();
     } catch (e) {
       this.#logger.error(e);
     }
@@ -65,5 +62,5 @@ module.exports = createController(ServerCommandsController)
   .prefix(AppConstants.apiRoute + "/settings/server")
   .before([ensureAuthenticated])
   .get("/update/check", "checkUpdate")
-  .post("/update/octofarm", "updateOctoFarm")
+  .post("/update/server", "updateServer")
   .patch("/restart", "restartServer");

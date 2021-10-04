@@ -6,7 +6,7 @@ class FilamentManagerPluginService {
   #printersStore;
   #octoPrintApiService;
 
-  #logger = new Logger("OctoFarm-FilamentManager");
+  #logger = new Logger("Server-FilamentManager");
 
   constructor({ printersStore, octoPrintApiService }) {
     this.#printersStore = printersStore;
@@ -167,7 +167,7 @@ class FilamentManagerPluginService {
       }
     }
 
-    this.#logger.info("Successfully synced filament manager with octofarm.");
+    this.#logger.info("Successfully synced filament manager with 3DPF.");
     if (addSpool) {
       return {
         success: true,

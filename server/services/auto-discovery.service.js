@@ -11,7 +11,7 @@ class AutoDiscoveryService {
 
   #ssdpClient;
   #httpClient;
-  #logger = new Logger("OctoFarm-Server");
+  #logger = new Logger("Server");
 
   constructor({ httpClient }) {
     this.#httpClient = httpClient;

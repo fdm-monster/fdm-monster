@@ -1,16 +1,14 @@
 const si = require("systeminformation");
 const os = require("os");
 const process = require("process");
-const Logger = require("../handlers/logger.js");
 const { bench } = require("../utils/benchmark.util");
-const logger = new Logger("OctoFarm-Server");
 
 const diskVeryFullWarning =
   "Warning your disk is getting full... Please clean up some space or move to a larger hard drive.";
 const diskAlmostFullWarning =
   "Warning your disk is over 95% full... Please clean up some space or move to a larger hard drive.";
 const diskRisk =
-  "Danger! Your disk is over 99% full... OctoFarms operations could be effected if you don't clean up some space or move to a larger hard drive.";
+  "Danger! Your disk is over 99% full... file operations will slow down if you don't clean up some space or move to a larger hard drive.";
 const queryRunner = {
   cpuCurrentSpeed: si.cpuCurrentSpeed,
   cpuLoad: si.currentLoad,
@@ -131,7 +129,7 @@ class SystemInfoStore {
 // === Memory chart
 // ✓ memoryInfo.used ==> systemUsedRAM
 // ✓ memoryInfo.free ==> freeRAM
-// ... just accepted it 300ms is ok-ish X currentProc?.memRss || currentProc?.mem ==> octoFarmRAM
+// ... just accepted it 300ms is ok-ish X currentProc?.memRss || currentProc?.mem ==> serverRAM
 
 // View
 // ✓ warnings.status

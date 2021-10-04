@@ -186,7 +186,6 @@ class PrinterState {
       currentProfile: this.#currentProfile,
       octoPrintSystemInfo: this.#octoPrintSystemInfo,
       corsCheck: true,
-      // Placeholder? https://github.com/OctoFarm/OctoFarm/blob/7fed18b1b3036cfb77f1a0d8d51be1e14fbcb541/server/lib/dataFunctions/printerClean.js#L374
       display: true, // TODO causes monitoring to show it. But it is not a proper place
       stepSize: this.#stepSize,
       systemChecks: this.#systemChecks, // TODO remove
@@ -240,7 +239,7 @@ class PrinterState {
       this.setHostState(PSTATE.Searching, "Attempting to connect to OctoPrint");
       this.resetApiAccessibility();
     } else {
-      this.setHostState(PSTATE.Disabled, "Printer was disabled in OctoFarm");
+      this.setHostState(PSTATE.Disabled, "Printer was disabled explicitly");
       this.setApiAccessibility(false, false, MESSAGE.disabled);
     }
     this.resetWebSocketAdapter();
@@ -471,7 +470,7 @@ class PrinterState {
   }
 
   /**
-   * Tracking for API failures like GlobalAPIKey, ApiKey rejected which can only be fixed by OctoFarm
+   * Tracking for API failures like GlobalAPIKey, ApiKey rejected which can only be fixed manually
    */
   setApiAccessibility(accessible, retryable, reason) {
     if (!accessible) {

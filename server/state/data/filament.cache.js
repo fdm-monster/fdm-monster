@@ -4,8 +4,6 @@ const Spools = require("../../models/Spool.js");
 const Profiles = require("../../models/Profiles.js");
 const { noSpoolOptionTemplate } = require("../../constants/template.constants");
 
-const logger = new Logger("OctoFarm-InformationCleaning");
-
 class FilamentCache {
   #spoolsClean = [];
   #profilesClean = [];
@@ -15,6 +13,8 @@ class FilamentCache {
     normalDropDown: [],
     historyDropDown: []
   };
+
+  #logger = new Logger("Server-Filament");
 
   #settingsStore;
   #printersStore;
@@ -91,7 +91,7 @@ class FilamentCache {
     this.#selectedFilamentList = await this.selectedFilament(printers);
     this.#statisticsClean = this.createStatistics(spoolsArray, profilesArray);
     await this.dropDownList(spools, profiles);
-    logger.info("Filament information cleaned and ready for consumption...");
+    this.#logger.info("Filament information cleaned and ready for consumption...");
   }
 
   dropDownList(spools, profiles) {

@@ -65,9 +65,9 @@ describe("ServerCommands", () => {
 
     const successType = "success";
     const warningType = "warning";
-    const upToDateMessage = "OctoFarm is already up to date! Your good to go!";
+    const upToDateMessage = "3DPF Server is already up to date! Your good to go!";
     const notAGitRepoStart = "Not a git repository";
-    const upDateCompletedMessage = "Update command has run successfully, OctoFarm will restart.";
+    const upDateCompletedMessage = "Update command has run successfully, 3DPF Server will restart.";
     const missingPackagesMessage =
       "You have missing dependencies that are required, Do you want to update these?";
     const modificationsDetectedMessage =
@@ -114,22 +114,16 @@ describe("ServerCommands", () => {
 
     it("should be able to detect no updates", async () => {
       mockedSimpleGit.setTestScenario(scenarioUpToDate);
-      const serverResponse = await systemCommandsService.checkIfOctoFarmNeedsUpdatingAndUpdate(
-        {},
-        true
-      );
+      const serverResponse = await systemCommandsService.checkServerUpdate({}, true);
       expect(serverResponse.message).toBe(upToDateMessage);
-      expect(serverResponse.haveWeSuccessfullyUpdatedOctoFarm).toBe(false);
+      expect(serverResponse.updateSuccess).toBe(false);
       expect(serverResponse.statusTypeForUser).toBe(successType);
     });
 
     it("should be able to complete when no uninstalled packages and behind in commits", async () => {
       mockedSimpleGit.setTestScenario(scenarioBehindOutput);
       npmUtils.setHasMissingPackages([]);
-      const serverResponse2 = await systemCommandsService.checkIfOctoFarmNeedsUpdatingAndUpdate(
-        {},
-        true
-      );
+      const serverResponse2 = await systemCommandsService.checkServerUpdate({}, true);
       expect(serverResponse2.message).toContain(upDateCompletedMessage);
       expect(serverResponse2.statusTypeForUser).toBe(successType);
     });
@@ -137,10 +131,7 @@ describe("ServerCommands", () => {
     it("should be able to detect but not fix missing npm packages without force.doWeInstallPackages", async () => {
       mockedSimpleGit.setTestScenario(scenarioBehindOutput);
       npmUtils.setHasMissingPackages(["random"]);
-      const serverResponse = await systemCommandsService.checkIfOctoFarmNeedsUpdatingAndUpdate(
-        {},
-        true
-      );
+      const serverResponse = await systemCommandsService.checkServerUpdate({}, true);
       expect(serverResponse.message).toContain(missingPackagesMessage);
       expect(serverResponse.statusTypeForUser).toBe(warningType);
     });
@@ -148,7 +139,7 @@ describe("ServerCommands", () => {
     it("should be able to detect and fix missing npm packages", async () => {
       mockedSimpleGit.setTestScenario(scenarioBehindOutput);
       npmUtils.setHasMissingPackages(["random"]);
-      const serverResponse = await systemCommandsService.checkIfOctoFarmNeedsUpdatingAndUpdate(
+      const serverResponse = await systemCommandsService.checkServerUpdate(
         {},
         { doWeInstallPackages: true }
       );
@@ -164,10 +155,7 @@ describe("ServerCommands", () => {
 
     it("should fail on not being a git repo", async () => {
       mockedSimpleGit.setIsRepo(false);
-      const serverResponse = await systemCommandsService.checkIfOctoFarmNeedsUpdatingAndUpdate(
-        {},
-        true
-      );
+      const serverResponse = await systemCommandsService.checkServerUpdate({}, true);
       expect(serverResponse.message).toContain(notAGitRepoStart);
       expect(serverResponse.statusTypeForUser).toBe(warningType);
     });
@@ -175,10 +163,7 @@ describe("ServerCommands", () => {
     for (const spec of scenarioOutcomes) {
       it(spec.name, async () => {
         mockedSimpleGit.setTestScenario(spec.scenario);
-        const serverResponse = await systemCommandsService.checkIfOctoFarmNeedsUpdatingAndUpdate(
-          {},
-          true
-        );
+        const serverResponse = await systemCommandsService.checkServerUpdate({}, true);
         expect(serverResponse.message).toContain(spec.containsMessage);
         expect(serverResponse.statusTypeForUser).toBe(spec.type);
       });
@@ -186,24 +171,24 @@ describe("ServerCommands", () => {
   });
 
   describe("Reboot command", () => {
-    it("should not reboot octofarm in unknown mode", async () => {
+    it("should not reboot 3pdf in unknown mode", async () => {
       // Output indicates that we are neither in pm2 or nodemon mode
-      const output = await systemCommandsService.restartOctoFarm();
+      const output = await systemCommandsService.restartServer();
       expect(output).toBe(false);
     });
 
-    it("should be able to attempt rebooting octofarm - pm2 mode", async () => {
+    it("should be able to attempt rebooting 3pdf - pm2 mode", async () => {
       // Output indicates that we are in pm2 mode
       process.env.PM2_HOME = "true";
-      const outputPm2 = await systemCommandsService.restartOctoFarm();
+      const outputPm2 = await systemCommandsService.restartServer();
       expect(outputPm2).toBe(true);
       delete process.env.PM2_HOME;
     });
 
-    it("should be able to attempt rebooting octofarm - nodemon mode", async () => {
+    it("should be able to attempt rebooting 3pdf - nodemon mode", async () => {
       // Output indicates that we are in nodemon mode
       process.env.npm_lifecycle_script = "something something nodemon";
-      const outputNodemon = await systemCommandsService.restartOctoFarm();
+      const outputNodemon = await systemCommandsService.restartServer();
       expect(outputNodemon).toBe(true);
       delete process.env.npm_lifecycle_script;
     });

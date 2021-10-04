@@ -7,9 +7,6 @@ const Profiles = require("../models/Profiles.js");
 const { HISTORY_SETTINGS } = require("../constants/server-settings.constants");
 const { durationToDates } = require("../utils/time.util");
 
-const logger = new Logger("OctoFarm-HistoryCollection");
-let counter = 0;
-
 const routeBase = "./images/historyCollection";
 const PATHS = {
   base: routeBase,
@@ -40,6 +37,10 @@ class HistoryService {
   #influxDbHistoryService;
   #settingsStore;
 
+  #counter = 0;
+
+  #logger = new Logger("Server-HistoryCollection");
+
   constructor({
     octoPrintApiService,
     influxDbHistoryService,
@@ -61,7 +62,7 @@ class HistoryService {
     const thumbParts = thumbnailPath.split("/");
     const result = thumbParts[thumbParts.length - 1];
     const splitAgain = result.split("?");
-    const octoFarmTargetFilePath = `${PATHS.thumbnails}/${historyId}-${splitAgain[0]}`;
+    const targetFilePath = `${PATHS.thumbnails}/${historyId}-${splitAgain[0]}`;
 
     ensureBaseFolderExists();
     ensureFolderExists(PATHS.thumbnails);
@@ -71,16 +72,16 @@ class HistoryService {
     await this.#octoPrintApiService.downloadImage(
       printerConnectionParams,
       thumbnailPath,
-      octoFarmTargetFilePath,
+      targetFilePath,
       () => {
-        logger.info(
+        this.#logger.info(
           `Downloaded image '${thumbnailPath}' from printer '${printerConnectionParams.printerURL}'`,
-          octoFarmTargetFilePath
+          targetFilePath
         );
       }
     );
 
-    return octoFarmTargetFilePath;
+    return targetFilePath;
   }
 
   // TODO move out of this service => camera or file service
@@ -93,8 +94,8 @@ class HistoryService {
     const filePath = `${PATHS.snapshots}/${historyId}-${fileDisplay}.jpg`;
 
     await fs.writeFileSync(filePath, frame);
-    logger.info("Downloaded: ", url);
-    logger.info("Saved as: ", filePath);
+    this.#logger.info("Downloaded: ", url);
+    this.#logger.info("Saved as: ", filePath);
     return filePath;
   }
 
@@ -135,7 +136,7 @@ class HistoryService {
   // TODO this function is so vague. Needs a complete redo and move out of history...
   // TODO I broke it completely so we have to start again
   async timelapseCheck(printer, historyId, fileName, printTime) {
-    logger.info("Acquiring timelapse", fileName);
+    this.#logger.info("Acquiring timelapse", fileName);
 
     let timelapseResponse = await this.#octoPrintApiService.listUnrenderedTimeLapses(
       printer.getLoginDetails()
@@ -172,7 +173,7 @@ class HistoryService {
       saveHistory.markModified("printHistory");
       await saveHistory.save();
 
-      logger.info("Successfully grabbed timelapse!");
+      this.#logger.info("Successfully grabbed timelapse!");
     } else {
       if (unrenderedFileName === null) {
         let unRenderedGrab = [...timelapseResponse.unrendered].filter(function (lapse) {
@@ -185,15 +186,15 @@ class HistoryService {
         });
         if (unRenderedGrab.length === 1) {
           unrenderedFileName = unRenderedGrab[0].name;
-          logger.info("File is still rendering... awaiting completion:", unrenderedFileName);
+          this.#logger.info("File is still rendering... awaiting completion:", unrenderedFileName);
         } else {
-          logger.info(
+          this.#logger.info(
             "No un-rendered files... must be complete, attempting download.",
             unRenderedGrab
           );
         }
       } else {
-        logger.info(`Awaiting ${unrenderedFileName} to finish rendering`);
+        this.#logger.info(`Awaiting ${unrenderedFileName} to finish rendering`);
       }
     }
   }
@@ -217,12 +218,12 @@ class HistoryService {
       fileName,
       filePath,
       async () => {
-        logger.info(`Downloaded '${fileName}' to  '${filePath}'`);
+        this.#logger.info(`Downloaded '${fileName}' to  '${filePath}'`);
 
         const historySetting = this.#settingsStore.getHistorySetting();
         if (historySetting?.timelapse?.deleteAfter) {
           await this.#octoPrintApiService.deleteTimeLapse(printerConnectionParams, fileName);
-          logger.info("Purged " + fileName + " timelapse from OctoPrint after it was saved.");
+          this.#logger.info("Purged " + fileName + " timelapse from OctoPrint after it was saved.");
         }
       }
     );
@@ -238,9 +239,9 @@ class HistoryService {
     const eventName = jobSuccess ? "onComplete" : "onFailure";
 
     if (jobSuccess) {
-      logger.info(`Completed print event triggered for printer ${printerName}`, payload);
+      this.#logger.info(`Completed print event triggered for printer ${printerName}`, payload);
     } else if (status === "failed") {
-      logger.info(`Failed print event triggered for printer ${printerName}`, payload);
+      this.#logger.info(`Failed print event triggered for printer ${printerName}`, payload);
     }
 
     // TODO filamentCache instead
@@ -272,14 +273,14 @@ class HistoryService {
       });
     }
     if (historyCollection.length === 0) {
-      counter = 0;
+      this.#counter = 0;
     } else {
-      counter = historyCollection[historyCollection.length - 1].printHistory.historyIndex + 1;
+      this.#counter = historyCollection[historyCollection.length - 1].printHistory.historyIndex + 1;
     }
 
     const printHistory = {
       success: jobSuccess,
-      historyIndex: counter,
+      historyIndex: this.#counter,
       printerName: name,
       printerID: printer._id,
       costSettings: printer.costSettings,

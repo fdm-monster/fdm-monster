@@ -12,7 +12,7 @@ function clientCPUCalc(systemInfo) {
     const octoLoad = !!currentProc?.cpuu ? currentProc.cpuu : 0;
     const remain = systemLoad + octoLoad + userLoad;
 
-    // labels: ['System', 'OctoFarm', 'User', 'Free'],
+    // labels: ['System', 'Server', 'User', 'Free'],
     return [systemLoad, octoLoad, userLoad, 100 - remain];
   }
 }
@@ -25,16 +25,16 @@ function clientMemCalc(systemInfo) {
     const freeRAM = memoryInfo.free;
 
     if (!!(currentProc?.memRss || currentProc?.mem)) {
-      let octoFarmRAM = currentProc?.memRss * 1000;
-      if (!currentProc.memRss || Number.isNaN(octoFarmRAM)) {
-        octoFarmRAM = (memoryInfo.total / 100) * currentProc?.mem;
+      let serverRAM = currentProc?.memRss * 1000;
+      if (!currentProc.memRss || Number.isNaN(serverRAM)) {
+        serverRAM = (memoryInfo.total / 100) * currentProc?.mem;
       }
 
-      if (Number.isNaN(octoFarmRAM)) {
-        // labels: ['System', 'OctoFarm', 'Free'],
+      if (Number.isNaN(serverRAM)) {
+        // labels: ['System', 'Server', 'Free'],
         return [systemUsedRAM, 0, freeRAM];
       } else {
-        return [systemUsedRAM, octoFarmRAM, freeRAM];
+        return [systemUsedRAM, serverRAM, freeRAM];
       }
     } else {
       return [systemUsedRAM, 0, freeRAM];
