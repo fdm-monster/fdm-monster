@@ -2,7 +2,7 @@ const { AppConstants } = require("../../server/app.constants");
 
 class GithubApiServiceMock {
   /**
-   * Test version of: connection-safe acquire data about the installed and latest released OctoFarm versions.
+   * Test version of: connection-safe acquire data about the installed and latest released server version.
    * @param includePrereleases
    * @returns {Promise<*|null>}
    */

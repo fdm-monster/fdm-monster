@@ -28,7 +28,7 @@ class SystemInfoBundleService {
    */
   generateSystemInformationContents() {
     let systemInformationContents = "--- 3DPF System Information ---\n\n";
-    systemInformationContents += `OctoFarm Version\n ${currentVersion} \n`;
+    systemInformationContents += `3D Print Farm Version\n ${currentVersion} \n`;
     const airGapped = "Are we connected to the internet?\n";
     const pm2 = "Are we running under pm2?\n";
     const nodemon = "Are we running under nodemon?\n";
@@ -52,7 +52,7 @@ class SystemInfoBundleService {
     systemInformationContents += `Platform\n ${systemInformation?.osInfo?.platform} \n`;
     systemInformationContents += `Processor Arch\n ${systemInformation?.osInfo?.arch} \n`;
     systemInformationContents += `System Uptime\n ${systemInformation?.sysUptime?.uptime} \n`;
-    systemInformationContents += `OctoFarm Uptime\n ${systemInformation?.processUptime} \n`;
+    systemInformationContents += `Server Uptime\n ${systemInformation?.processUptime} \n`;
 
     const printerVersions = this.#printersStore.getOctoPrintVersions();
 

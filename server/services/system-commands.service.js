@@ -77,7 +77,7 @@ class SystemCommandsService {
       const gitBranchUpToDate = isBranchUpToDate(gitCurrentStatus);
       if (gitBranchUpToDate) {
         clientResponse.updateSuccess = false;
-        clientResponse.message = "OctoFarm is already up to date! Your good to go!";
+        clientResponse.message = "3DPF Server is already up to date! Your good to go!";
         clientResponse.statusTypeForUser = "success";
         return clientResponse;
       }
@@ -92,7 +92,7 @@ class SystemCommandsService {
         if (gitBranchInFront) {
           //If the branch is not front of current branch, then we need to relay the developer message.
           clientResponse.message =
-            "<span class='text-warning'>The update is failing due to local changes been detected. Seems you've committed your files, Thanks for making OctoFarm great! <br><br>" +
+            "<span class='text-warning'>The update is failing due to local changes been detected. <br><br>" +
             "<b class='text-success'>Override:</b> Will just run a <code>git pull</code> command if you continue.<br><br>" +
             "<b class='text-danger'>Cancel:</b> This option will cancel the update process.<br><br>";
           return clientResponse;
@@ -100,7 +100,7 @@ class SystemCommandsService {
           // If the branch has no commits then we can relay the user message.
           clientResponse.message =
             "<span class='text-warning'>The update is failing due to local changes been detected. Please check the file list below for what has been modified. </span><br><br>" +
-            "<b class='text-success'>Override:</b> This option will ignore the local changes and run the OctoFarm Update process. (You will lose your changes with this option)<br><br>" +
+            "<b class='text-success'>Override:</b> This option will ignore the local changes and run the Server Update process. (You will lose your changes with this option)<br><br>" +
             "<b class='text-danger'>Cancel:</b> This option will cancel the update process keeping your local changes. No update will run and manual intervention by the user is required. <br><br>";
           modifiedFilesList.forEach((line) => {
             clientResponse.message += `<div class="alert alert-secondary m-1 p-2" role="alert"><i class="fas fa-file"></i> ${line.replace(
@@ -137,7 +137,7 @@ class SystemCommandsService {
     // Everything went well, enjoy the tasty updates!
     clientResponse.updateSuccess = true;
     clientResponse.statusTypeForUser = "success";
-    clientResponse.message = "Update command has run successfully, OctoFarm will restart.";
+    clientResponse.message = "Update command has run successfully, 3DPF Server will restart.";
     // Local changes
     return clientResponse;
   }

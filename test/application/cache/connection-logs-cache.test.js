@@ -29,7 +29,7 @@ describe(DITokens.connectionLogsCache, () => {
     const printerState = await printersStore.addPrinter({
       printerURL: "http://url.com",
       webSocketURL: "ws://url.com",
-      apiKey: "octofarmoctofarmoctofarmoctofarm",
+      apiKey: "3dpf3dpf3dpf3dpf3dpf3dpf3dpf3dpf",
       tempTriggers: { heatingVariation: null }
     });
     await connectionLogsCache.generateConnectionLogs(printerState.id);

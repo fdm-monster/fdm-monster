@@ -52,7 +52,7 @@ function writeVariableToEnvFile(absoluteEnvPath, variableKey, jsonObject) {
   } else if (!!latestDotEnvConfig.error) {
     logger.error(JSON.stringify(latestDotEnvConfig.error));
     throw new Error(
-      "Could not parse current .env file. Please ensure the file contains lines with each looking like 'MONGO=http://mongo/octofarm' and 'OCTOFARM_PORT=4000' and so on."
+      "Could not parse current .env file. Please ensure the file contains lines with each looking like 'MONGO=http://mongo/3pdf' and 'SERVER_PORT=4000' and so on."
     );
   }
 
@@ -75,11 +75,11 @@ function verifyPackageJsonRequirements(rootPath) {
     logger.debug("✓ found 'package.json'");
     const packageName = require("../../package.json").name;
     if (!packageName) {
-      logger.error("X Could not find 'name' property in package.json file. Aborting OctoFarm.");
+      logger.error("X Could not find 'name' property in package.json file. Aborting 3DPF Server.");
       return false;
     } else if (packageName.toLowerCase() !== "3d-print-farm") {
       logger.error(
-        `X property 'name' in package.json file didnt equal '3d-print-farm' (found: ${packageName.toLowerCase()}). Aborting 3DPF.`
+        `X property 'name' in package.json file didnt equal '3d-print-farm' (found: ${packageName.toLowerCase()}). Aborting 3DPF Server.`
       );
       return false;
     }
@@ -111,8 +111,8 @@ function ensureBackgroundImageExists(rootPath) {
     const fileBuffer = fs.readFileSync(path.resolve(__dirname, defaultBgPath));
     fs.writeFileSync(targetBgPath, fileBuffer);
 
-    // Bug in PKG
-    // fs.copyFileSync(defaultBgPath, "C:\\Users\\USER_HERE\\Projects\\NodeJS\\OctoFarm\\package\\images\\roll.jpg");
+    // TODO Bug in PKG - revert for normal usage
+    // fs.copyFileSync(defaultBgPath, "PATH.jpg");
 
     logger.info(`✓ Copyied default background image to ${targetBgPath} as it was not found.`);
   }

@@ -62,7 +62,7 @@ class HistoryService {
     const thumbParts = thumbnailPath.split("/");
     const result = thumbParts[thumbParts.length - 1];
     const splitAgain = result.split("?");
-    const octoFarmTargetFilePath = `${PATHS.thumbnails}/${historyId}-${splitAgain[0]}`;
+    const targetFilePath = `${PATHS.thumbnails}/${historyId}-${splitAgain[0]}`;
 
     ensureBaseFolderExists();
     ensureFolderExists(PATHS.thumbnails);
@@ -72,16 +72,16 @@ class HistoryService {
     await this.#octoPrintApiService.downloadImage(
       printerConnectionParams,
       thumbnailPath,
-      octoFarmTargetFilePath,
+      targetFilePath,
       () => {
         this.#logger.info(
           `Downloaded image '${thumbnailPath}' from printer '${printerConnectionParams.printerURL}'`,
-          octoFarmTargetFilePath
+          targetFilePath
         );
       }
     );
 
-    return octoFarmTargetFilePath;
+    return targetFilePath;
   }
 
   // TODO move out of this service => camera or file service

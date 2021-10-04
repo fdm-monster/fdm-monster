@@ -65,9 +65,9 @@ describe("ServerCommands", () => {
 
     const successType = "success";
     const warningType = "warning";
-    const upToDateMessage = "OctoFarm is already up to date! Your good to go!";
+    const upToDateMessage = "3DPF Server is already up to date! Your good to go!";
     const notAGitRepoStart = "Not a git repository";
-    const upDateCompletedMessage = "Update command has run successfully, OctoFarm will restart.";
+    const upDateCompletedMessage = "Update command has run successfully, 3DPF Server will restart.";
     const missingPackagesMessage =
       "You have missing dependencies that are required, Do you want to update these?";
     const modificationsDetectedMessage =
@@ -171,13 +171,13 @@ describe("ServerCommands", () => {
   });
 
   describe("Reboot command", () => {
-    it("should not reboot octofarm in unknown mode", async () => {
+    it("should not reboot 3pdf in unknown mode", async () => {
       // Output indicates that we are neither in pm2 or nodemon mode
       const output = await systemCommandsService.restartServer();
       expect(output).toBe(false);
     });
 
-    it("should be able to attempt rebooting octofarm - pm2 mode", async () => {
+    it("should be able to attempt rebooting 3pdf - pm2 mode", async () => {
       // Output indicates that we are in pm2 mode
       process.env.PM2_HOME = "true";
       const outputPm2 = await systemCommandsService.restartServer();
@@ -185,7 +185,7 @@ describe("ServerCommands", () => {
       delete process.env.PM2_HOME;
     });
 
-    it("should be able to attempt rebooting octofarm - nodemon mode", async () => {
+    it("should be able to attempt rebooting 3pdf - nodemon mode", async () => {
       // Output indicates that we are in nodemon mode
       process.env.npm_lifecycle_script = "something something nodemon";
       const outputNodemon = await systemCommandsService.restartServer();

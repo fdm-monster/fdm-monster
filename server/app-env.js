@@ -253,7 +253,7 @@ function getViewsPath() {
       );
     } else {
       throw new Error(
-        `Could not find views folder at ${viewsPath} within the OctoFarm path or binary PKG. Please report this as a bug to the developers.`
+        `Could not find views folder at ${viewsPath} within the 3DPF path or binary PKG. Please report this as a bug to the developers.`
       );
     }
   } else {

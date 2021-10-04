@@ -24,25 +24,10 @@ class FallbackIssueController {
     this.#systemCommandsService = systemCommandsService;
   }
 
-  index(req, res) {
-    res.render("databaseIssue", {
-      page: "Database Warning",
-      serverPageTitle: this.#serverPageTitle,
-      isDocker: isDocker(),
-      isPm2: envUtils.isPm2(),
-      defaultMongoConnectionString: AppConstants.defaultMongoStringUnauthenticated,
-      isNodemon: envUtils.isNodemon(),
-      os: process.env.OS,
-      npmPackageJson: this.#serverVersion,
-      nodeVersion: process.version,
-      mongoURL: fetchMongoDBConnectionString()
-    });
-  }
-
-  async restartOctoFarm(req, res) {
+  async restartServer(req, res) {
     let serviceRestarted = false;
     try {
-      serviceRestarted = await this.#systemCommandsService.restartOctoFarm();
+      serviceRestarted = await this.#systemCommandsService.restartServer();
     } catch (e) {
       this.#logger.error(e);
     }
@@ -118,7 +103,7 @@ class FallbackIssueController {
     if (isDocker()) {
       res.statusCode = 500;
       return res.send({
-        reason: `The OctoFarm docker container cannot change this setting. Change the ${AppConstants.MONGO_KEY} variable yourself.`,
+        reason: `The 3DPF docker container cannot change this setting. Change the ${AppConstants.MONGO_KEY} variable yourself.`,
         succeeded: false
       });
     }
@@ -152,12 +137,12 @@ class FallbackIssueController {
 
     if (envUtils.isNodemon()) {
       res.send({
-        reason: `Succesfully saved ${AppConstants.MONGO_KEY} environment variable to .env file. Please restart OctoFarm manually!`,
+        reason: `Succesfully saved ${AppConstants.MONGO_KEY} environment variable to .env file. Please restart 3DPF Server manually!`,
         succeeded: true
       });
     } else {
       res.send({
-        reason: `Succesfully saved ${AppConstants.MONGO_KEY} environment variable to .env file. Restarting OctoFarm service, please start it again if that fails!`,
+        reason: `Succesfully saved ${AppConstants.MONGO_KEY} environment variable to .env file. Restarting 3DPF Server, please start it again if that fails!`,
         succeeded: true
       });
     }
@@ -168,6 +153,6 @@ class FallbackIssueController {
 module.exports = createController(FallbackIssueController)
   .prefix("/")
   .get("", "index")
-  .post("restart-octofarm", "restartOctoFarm")
+  .post("restart-server", "restartServer")
   .post("save-connection-env", "saveConnectionEnv")
   .post("test-connection", "testConnection");

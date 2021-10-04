@@ -33,7 +33,7 @@ if (!!majorVersion && majorVersion < 14) {
 
   const mongoose = require("mongoose");
   const Logger = require("./server/handlers/logger.js");
-  const logger = new Logger("OctoFarm-Server");
+  const logger = new Logger("Server");
 
   const { app: server, container } = setupExpressServer();
 
@@ -54,7 +54,7 @@ if (!!majorVersion && majorVersion < 14) {
 
       // Shit hit the fan
       if (!port || Number.isNaN(parseInt(port))) {
-        throw new Error("The OctoFarm server requires a numeric port input argument to run");
+        throw new Error("The 3DPF Server requires a numeric port input argument to run");
       }
 
       const app = await serveApiNormally(server, container);

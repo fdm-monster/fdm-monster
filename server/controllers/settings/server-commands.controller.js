@@ -49,7 +49,7 @@ class ServerCommandsController {
   async restartServer(req, res) {
     let serviceRestarted = false;
     try {
-      serviceRestarted = await this.#systemCommandsService.restartOctoFarm();
+      serviceRestarted = await this.#systemCommandsService.restartServer();
     } catch (e) {
       this.#logger.error(e);
     }
@@ -62,5 +62,5 @@ module.exports = createController(ServerCommandsController)
   .prefix(AppConstants.apiRoute + "/settings/server")
   .before([ensureAuthenticated])
   .get("/update/check", "checkUpdate")
-  .post("/update/server", "updateOctoFarm")
+  .post("/update/server", "updateServer")
   .patch("/restart", "restartServer");

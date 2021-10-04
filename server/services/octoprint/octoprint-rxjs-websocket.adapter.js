@@ -110,7 +110,7 @@ module.exports = class OctoprintRxjsWebsocketAdapter extends GenericWebsocketAda
     }
 
     // This is a initial setup for an event bus implementation
-    const octoFarmEvents = [];
+    const serverEvents = [];
 
     const { header, data } = parsedMessage;
     switch (header) {
@@ -124,20 +124,20 @@ module.exports = class OctoprintRxjsWebsocketAdapter extends GenericWebsocketAda
         break;
       case OP_WS_MSG.history:
         this.#handleCurrentStateData(data);
-        octoFarmEvents.push({ type: PEVENTS.init, data });
+        serverEvents.push({ type: PEVENTS.init, data });
         break;
       case OP_WS_MSG.current:
         this.#handleCurrentStateData(data);
-        octoFarmEvents.push({ type: PEVENTS.current, data });
+        serverEvents.push({ type: PEVENTS.current, data });
         break;
       case OP_WS_MSG.event:
-        octoFarmEvents.push({ type: PEVENTS.event, data });
+        serverEvents.push({ type: PEVENTS.event, data });
         break;
       default:
         console.log("unhandled message", header);
     }
 
-    return octoFarmEvents;
+    return serverEvents;
   }
 
   #handleCurrentStateData(data) {
@@ -147,8 +147,8 @@ module.exports = class OctoprintRxjsWebsocketAdapter extends GenericWebsocketAda
     this.#saveSubStateData("job", data);
     this.#saveSubStateData("currentZ", data);
 
-    const octoFarmMappedState = remapOctoPrintState(data.state);
-    this.#setPrinterState(octoFarmMappedState);
+    const octoPrintRemappedState = remapOctoPrintState(data.state);
+    this.#setPrinterState(octoPrintRemappedState);
   }
 
   #saveSubStateData(subState, data) {

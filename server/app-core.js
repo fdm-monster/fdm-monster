@@ -30,8 +30,9 @@ function setupExpressServer() {
   const viewsPath = getViewsPath();
 
   if (process.env.NODE_ENV === "production") {
-    const { getOctoFarmUiPath } = require("@octofarm/client");
-    const bundlePath = getOctoFarmUiPath();
+    // TODO fix this
+    const { getVueDistPath } = require("@3d-print-farm/client");
+    const bundlePath = getVueDistPath();
     app.use("/assets/dist", express.static(bundlePath));
   }
 
@@ -75,7 +76,7 @@ async function ensureSystemSettingsInitiated(container) {
   return await settingsStore.loadSettings();
 }
 
-function serveOctoFarmRoutes(app) {
+function serveControllerRoutes(app) {
   const routePath = "./controllers";
 
   app.use(loadControllers(`${routePath}/settings/*.controller.js`, { cwd: __dirname }));
@@ -102,7 +103,7 @@ function serveOctoFarmRoutes(app) {
   app.use(exceptionHandler);
 }
 
-async function serveOctoFarmNormally(app, container, quick_boot = false) {
+async function serveApiNormally(app, container, quick_boot = false) {
   if (!quick_boot) {
     logger.info("Initialising FarmInformation...");
 
@@ -148,16 +149,16 @@ async function serveOctoFarmNormally(app, container, quick_boot = false) {
     await influxSetupService.optionalInfluxDatabaseSetup();
   }
 
-  serveOctoFarmRoutes(app);
+  serveControllerRoutes(app);
 
   return app;
 }
 
-const logger = new Logger("OctoFarm-Server");
+const logger = new Logger("Server");
 
 module.exports = {
   setupExpressServer,
   ensureSystemSettingsInitiated,
-  serveControllerRoutes: serveOctoFarmRoutes,
-  serveApiNormally: serveOctoFarmNormally
+  serveControllerRoutes,
+  serveApiNormally
 };
