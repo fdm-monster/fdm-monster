@@ -9,26 +9,22 @@
       })
     }}
     <br />
-    Files:
-    <v-btn @click="getFiles">Refresh</v-btn>
-    <v-list>
-      <v-list-item v-for="file in printer.fileList.files" :key="file.name">
-        {{ file.name }} - {{ file.path }} - {{ file.date }}
-        <v-btn @click="deleteFile(file)">Delete</v-btn>
-      </v-list-item>
-    </v-list>
+
+    <FileList :printer-id="printerId" :file-list="printer.fileList" />
   </div>
 </template>
 
 <script>
 import Component from "vue-class-component";
 import Vue from "vue";
+import FileList from "@/components/FileList.vue";
 import { Prop } from "vue-property-decorator";
 import { Printer } from "@/models/printers/printer.model";
 import { OctoPrintService } from "@/backend";
 
 @Component({
-  data: () => ({})
+  data: () => ({}),
+  components: { FileList }
 })
 export default class PrinterDetails extends Vue {
   @Prop(Printer) printer;
