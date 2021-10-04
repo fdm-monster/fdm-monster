@@ -20,9 +20,9 @@ This work is under active development with cutting edge tech and standards. Feel
 ## Roadmap
 
 - Client for basic management of OctoPrint printers (file storage, print upload and printer management)
-- Full API and client test coverage
-- OctoFarm references removed
-- OctoPrint Plugin released
+- Better authentication and user management
+- Full API and client test coverage >80% (now at 40%)
+- OctoPrint Plugin release
 - Raspberry Pi image and prebuilt customized OctoPi image
 - First core release with documentation
 
