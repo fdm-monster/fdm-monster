@@ -6,13 +6,13 @@ https://www.npmjs.com/package/migrate-mongo
 #### Apply all pending migrations
     npm run migration:up
 
-OctoFarm will do this automatically for you. The output should look similar to this:
+3DPF will do this automatically for you. The output should look similar to this:
 ```
 $ npm run migration:up
-27/07/2021, 18:54:35 | INFO | OctoFarm-Environment | ✓ Parsed environment and (optional) .env file
-27/07/2021, 18:54:35 | INFO | OctoFarm-Environment | ✓ NODE_ENV variable correctly set (development)!
-27/07/2021, 18:54:35 | INFO | OctoFarm-Environment | ✓ Running OctoFarm version 1.2.0 in non-NPM mode!
-27/07/2021, 18:54:35 | INFO | OctoFarm-Environment | ✓ MONGO environment variable set!
+27/07/2021, 18:54:35 | INFO | Server-Environment | ✓ Parsed environment and (optional) .env file
+27/07/2021, 18:54:35 | INFO | Server-Environment | ✓ NODE_ENV variable correctly set (development)!
+27/07/2021, 18:54:35 | INFO | Server-Environment | ✓ Running 3DPF version 1.2.0 in non-NPM mode!
+27/07/2021, 18:54:35 | INFO | Server-Environment | ✓ MONGO environment variable set!
 MIGRATED UP: 20210713120034-printers-settingsapperance-apikey.js
 ```
 This command here is a `package.json` script equivalent to `migrate-mongo up` 
@@ -23,10 +23,10 @@ This command here is a `package.json` script equivalent to `migrate-mongo up`
 The output should look like the following:
 ```
 $ npm run migration:status
-27/07/2021, 19:08:40 | INFO | OctoFarm-Environment | ✓ Parsed environment and (optional) .env file
-27/07/2021, 19:08:40 | INFO | OctoFarm-Environment | ✓ NODE_ENV variable correctly set (development)!
-27/07/2021, 19:08:40 | INFO | OctoFarm-Environment | ✓ Running OctoFarm version 1.2.0 in non-NPM mode!
-27/07/2021, 19:08:40 | INFO | OctoFarm-Environment | ✓ MONGO environment variable set!
+27/07/2021, 19:08:40 | INFO | Server-Environment | ✓ Parsed environment and (optional) .env file
+27/07/2021, 19:08:40 | INFO | Server-Environment | ✓ NODE_ENV variable correctly set (development)!
+27/07/2021, 19:08:40 | INFO | Server-Environment | ✓ Running 3DPF version 1.2.0 in non-NPM mode!
+27/07/2021, 19:08:40 | INFO | Server-Environment | ✓ MONGO environment variable set!
 ┌─────────────────────────────────────────────────────┬──────────────────────────┐
 │ Filename                                            │ Applied At               │
 ├─────────────────────────────────────────────────────┼──────────────────────────┤
@@ -116,5 +116,5 @@ This is why we need `down(...)`. You never need it ... until you do. We mostly u
 - Making collection backups before a migration can be a good idea, but be careful with large size collection (10MB) and consider your actions carefully.
 
 ### Initiate a migration configuration
-You dont need this as a developer for an existing OctoFarm setup.
+You dont need this as a developer for an existing 3DPF setup.
 > migrate-mongo init

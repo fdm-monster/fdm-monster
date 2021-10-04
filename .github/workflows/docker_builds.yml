@@ -26,7 +26,7 @@ jobs:
         id: docker_meta
         uses: crazy-max/ghaction-docker-meta@v1
         with:
-          images: octofarm/octofarm
+          images: davidzwa/3d-print-farm
           # x.y.z versioning (not strictly 'vx.y.z' semver)
           tag-match: ^(\d+\.)?(\d+\.)?(\*|\d+)$
           tag-custom: |

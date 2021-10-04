@@ -18,13 +18,13 @@ import { WsAdapter } from "@nestjs/platform-ws";
 const db = require("../ormconfig");
 
 const APP_HOST = "127.0.0.1";
-const APP_PORT = process.env.OCTOFARM_PORT || 3000;
+const APP_PORT = process.env.SERVER_PORT || 3000;
 const logger = new Logger("Main");
 
 function AddSwagger(app: INestApplication): INestApplication {
   const config = new DocumentBuilder()
-    .setTitle("OctoFarm2 API docs")
-    .setDescription("OctoFarm public API description")
+    .setTitle("3DPF V2 API docs")
+    .setDescription("3DPF public API description")
     .setVersion(process.env.npm_package_version)
     .build();
   const document = SwaggerModule.createDocument(app, config);
@@ -34,7 +34,7 @@ function AddSwagger(app: INestApplication): INestApplication {
 }
 
 function printPreBootMessage(error = null) {
-  logger.log(`OctoFarm2 ${Y}v${process.env.npm_package_version}${D}`);
+  logger.log(`3DPF ${Y}v${process.env.npm_package_version}${D}`);
   logger.log(`NodeJS ${Y}${process.version}${D}`);
   const startDate = new Date().toDateString();
   const startTime = new Date().toLocaleTimeString();
@@ -93,7 +93,7 @@ function legacyMiddleware(app: NestExpressApplication) {
     next();
   });
   app.use(expressLayouts);
-  process.env.OCTOFARM_VERSION = `${process.env.NPM_PACKAGE_VERSION}`;
+  process.env.SERVER_VERSION = `${process.env.NPM_PACKAGE_VERSION}`;
 
   const assetsPath = join(__dirname, "../..", "assets", "public");
   app.useStaticAssets(assetsPath);

@@ -2,7 +2,7 @@
 
 **_The server for managing 3D printers with great overview_**
 
-3DPF is an 3D printer manager and dashboard written in Vue with Typescript. The work and effort which was invested into OctoFarm by these authors of 3DPF are now boosted 🚀 for higher code quality 😎 and robustness 💪. The goals are to deliver a smooth initial setup and 100% clear user experience to ensure you can smash those printing records 🖨️!
+3DPF is an 3D printer manager and dashboard written in Vue with Typescript meant to be accessed local, remote, offline or online. The work and effort - which was fully invested into OctoFarm by the authors of 3DPF - is now boosted 🚀 for higher code quality 😎 and robustness 💪. The goals are to deliver a much smoother initial setup and 100% clear user experience to ensure you can smash those printing records 🖨️!
 
 Note: our aim is to support all kinds of 3D Printer (FDM, resin) API's with a plugin system and documentation for extensibility. Read more about this in the roadmap section below.
 

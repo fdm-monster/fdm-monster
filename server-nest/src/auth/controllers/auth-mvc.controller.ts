@@ -22,7 +22,7 @@ export class AuthMvcController {
     const settings = await this.serverSettingsService.findFirstOrAdd();
     /* OLD FILE server_src/routes/users.js*/
     res.render("login", {
-      octoFarmPageTitle: "Taitel",
+      serverPageTitle: "Taitel",
       page: "Login",
       registration: settings.server.registration,
       serverSettings: settings
@@ -38,7 +38,7 @@ export class AuthMvcController {
 
     /* OLD FILE server_src/routes/users.js*/
     res.render("login", {
-      octoFarmPageTitle: "Taitel",
+      serverPageTitle: "Taitel",
       page: "Login",
       registration: settings.server.registration,
       serverSettings: settings

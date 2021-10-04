@@ -1,4 +1,4 @@
-# client-octofarm
+# client-3dpf
 
 ## Project setup
 ```

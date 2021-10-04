@@ -1,5 +1,5 @@
 {
-  "name": "octofarm2",
+  "name": "3d-print-farm-v2",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -36,7 +36,6 @@
     "@nestjs/terminus": "8.0.0-next.0",
     "@nestjs/typeorm": "^8.0.1",
     "@nestjs/websockets": "^8.0.5",
-    "@octofarm/client": "^0.1.0-rc2-build5",
     "bcrypt": "^5.0.0",
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.1",

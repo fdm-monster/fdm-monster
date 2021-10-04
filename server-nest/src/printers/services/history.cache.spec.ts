@@ -217,12 +217,6 @@ describe(HistoryCache.name, () => {
     expect(stats.highestSpoolCost).not.toBe("NaN");
   });
 
-  /**
-   * @James look at this. We could skip those entries, or remove them immediately.
-   * I do think unhandled rejection is not an option though (I removed try-catch on purpose to reveal errors)
-   * We should consider try-catching on top level, not directly on method,
-   *  as problem like this then never gets discovered.
-   */
   it("should reject when history entities contain illegal entry key", async () => {
     repoMock.setHistory(illegalHistoryCache);
     await expect(service.initCache()).rejects.toBeTruthy();
