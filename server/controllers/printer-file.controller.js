@@ -60,7 +60,7 @@ class PrinterFileController {
     }
 
     // NOT FOUND or NO_CONTENT - both should cause file to be dereferenced
-    await this.#filesStore.removeFile(printerId, fullPath);
+    await this.#filesStore.removeFile(printerId, fullPath, false);
     this.#logger.info(`File reference removed for printerId ${printerId}`, fullPath);
 
     res.statusCode = status;
