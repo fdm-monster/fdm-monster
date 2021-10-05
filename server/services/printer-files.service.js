@@ -1,6 +1,7 @@
 const { NotFoundException } = require("../exceptions/runtime.exceptions");
 const { findFileIndex } = require("./utils/find-predicate.utils");
 const Logger = require("../handlers/logger.js");
+const { Status } = require("../constants/service.constants");
 
 /**
  * An extension repository for managing printer files in database
@@ -8,7 +9,7 @@ const Logger = require("../handlers/logger.js");
 class PrinterFilesService {
   #printerService;
 
-  #logger = new Logger(PrinterFilesService);
+  #logger = new Logger(PrinterFilesService.name);
 
   constructor({ printerService }) {
     this.#printerService = printerService;
@@ -54,9 +55,7 @@ class PrinterFilesService {
           filePath
         );
       } else {
-        this.#logger.warning(
-          `A file removal was ordered but file '${filePath}' was not found in database for printer Id ${printerId}`
-        );
+        return Status.failure("File was not found in printer fileList");
       }
     }
 
@@ -65,7 +64,7 @@ class PrinterFilesService {
     printer.markModified("fileList");
     printer.save();
 
-    return printer.fileList;
+    return Status.success("File was removed");
   }
 }
 

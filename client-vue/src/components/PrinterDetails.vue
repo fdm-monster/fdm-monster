@@ -1,14 +1,7 @@
 <template>
   <div v-if="printer">
-    More info about
-    {{
-      JSON.stringify({
-        _id: printer._id,
-        name: printer.printerName,
-        printerURL: printer.printerURL
-      })
-    }}
-    <br />
+    Name: {{ printer.printerName }} <br/>
+    URL: {{ printer.printerURL }}
 
     <FileList :printer-id="printerId" :file-list="printer.fileList" />
   </div>
@@ -20,7 +13,7 @@ import Vue from "vue";
 import FileList from "@/components/FileList.vue";
 import { Prop } from "vue-property-decorator";
 import { Printer } from "@/models/printers/printer.model";
-import { OctoPrintService } from "@/backend";
+import { PrinterFilesService } from "@/backend";
 
 @Component({
   data: () => ({}),
@@ -31,14 +24,6 @@ export default class PrinterDetails extends Vue {
 
   get printerId() {
     return this.printer._id;
-  }
-
-  async getFiles() {
-    this.printer.fileList.files = await OctoPrintService.getFiles(this.printerId, false);
-  }
-
-  async deleteFile(file) {
-    await OctoPrintService.deleteFile(this.printerId, file.path);
   }
 }
 </script>

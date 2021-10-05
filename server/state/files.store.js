@@ -54,11 +54,17 @@ class FilesStore {
    * @param throwError silence any missing file error if false
    * @returns {Promise<void>}
    */
-  async removeFile(printerId, filePath, throwError) {
-    await this.#printerFilesService.deleteFile(printerId, filePath, throwError);
+  async deleteFile(printerId, filePath, throwError) {
+    const serviceActionResult = await this.#printerFilesService.deleteFile(
+      printerId,
+      filePath,
+      throwError
+    );
 
     // Warning only
-    this.#fileCache.purgeFile(printerId, filePath);
+    const cacheActionResult = this.#fileCache.purgeFile(printerId, filePath);
+
+    return { service: serviceActionResult, cache: cacheActionResult };
   }
 
   // === TODO BELOW ===

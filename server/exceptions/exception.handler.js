@@ -11,6 +11,14 @@ function exceptionHandler(err, req, res, next) {
   if (!isTest) {
     console.error("[API Exception Handler]", err.stack);
   }
+  if (err.isAxiosError) {
+    const code = err.response.status;
+    return res.status(code).send({
+      error: "External API call failed",
+      type: "axios-error",
+      data: err.response.data
+    });
+  }
   if (err instanceof NotFoundException) {
     const code = err.statusCode || 404;
     return res.status(code).send({ error: err.message });

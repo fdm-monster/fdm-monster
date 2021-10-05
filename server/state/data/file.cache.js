@@ -6,6 +6,7 @@ const { getDefaultFileCleanStatistics } = require("../../constants/cleaner.const
 const { findFileIndex } = require("../../services/utils/find-predicate.utils");
 const { getFileCacheDefault } = require("../../constants/cache.constants");
 const { ValidationException } = require("../../exceptions/runtime.exceptions");
+const { Status } = require("../../constants/service.constants");
 
 /**
  * A generic cache for file references, which will be abstracted in future to allow for proxy files and local files.
@@ -111,9 +112,9 @@ class FileCache {
   }
 
   purgeFile(printerId, filePath) {
-    const fileStorage = this.#getPrinterFileStorage(printerId);
+    const { fileList } = this.#getPrinterFileStorage(printerId);
 
-    const fileIndex = findFileIndex(fileStorage.fileList, filePath);
+    const fileIndex = findFileIndex(fileList, filePath);
     if (fileIndex === -1) {
       // We can always choose to throw - if we trust the cache consistency
       this.#logger.warning(
@@ -121,11 +122,13 @@ class FileCache {
         filePath
       );
 
-      return;
+      return Status.failure("File was not found in cached printer fileList");
     }
 
-    delete fileStorage.fileList.files[fileIndex];
-    fileStorage.fileList.fileCount--;
+    fileList.files.splice(fileIndex, 1);
+    fileList.fileCount = fileList.files.length;
+
+    return Status.success("File was removed");
   }
 
   // TODO convert this to a toFlat() implementation

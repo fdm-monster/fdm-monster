@@ -3,7 +3,8 @@ const request = require("request");
 const {
   OPClientErrors,
   contentTypeHeaderKey,
-  apiKeyHeaderKey
+  apiKeyHeaderKey,
+  FileLocation
 } = require("./constants/octoprint-service.constants");
 const { checkPluginManagerAPIDeprecation } = require("../../utils/compatibility.utils");
 const Logger = require("../../handlers/logger.js");
@@ -16,9 +17,9 @@ const octoPrintBase = "/";
 const apiBase = octoPrintBase + "api";
 const apiSettingsPart = apiBase + "/settings";
 const apiFiles = apiBase + "/files";
-const apiLocalFile = (path) => apiFiles + "/local/" + path;
-const apiSdCardFile = (path) => apiFiles + "/sdcard/" + path;
-const apiGetFiles = (recursive = true) => apiFiles + "?recursive=" + recursive;
+const apiFile = (path, location) => `${apiFiles}/${location}/${path}`;
+const apiGetFiles = (recursive = true, location) =>
+  `${apiFiles}/${location}?recursive=${recursive}`;
 const apiConnection = apiBase + "/connection";
 const apiPrinterProfiles = apiBase + "/printerprofiles";
 const apiSystem = apiBase + "/system";
@@ -131,24 +132,39 @@ class OctoprintApiService {
     return processResponse(response, responseOptions);
   }
 
-  async getFiles(printer, recursive = false, responseOptions = defaultResponseOptions) {
-    const { url, options } = this.#prepareRequest(printer, apiGetFiles(recursive));
+  async getFiles(
+    printer,
+    recursive = false,
+    location = FileLocation.local,
+    responseOptions = defaultResponseOptions
+  ) {
+    const { url, options } = this.#prepareRequest(printer, apiGetFiles(recursive, location));
 
     const response = await this.#httpClient.get(url, options);
 
     return processResponse(response, responseOptions);
   }
 
-  async getFile(printer, path, responseOptions = defaultResponseOptions) {
-    const { url, options } = this.#prepareRequest(printer, apiLocalFile(path));
+  async getFile(
+    printer,
+    path,
+    location = FileLocation.local,
+    responseOptions = defaultResponseOptions
+  ) {
+    const { url, options } = this.#prepareRequest(printer, apiFile(path, location));
 
     const response = await this.#httpClient.get(url, options);
 
     return processResponse(response, responseOptions);
   }
 
-  async deleteFile(printer, path, responseOptions = defaultResponseOptions) {
-    const { url, options } = this.#prepareRequest(printer, apiLocalFile(path));
+  async deleteFile(
+    printer,
+    path,
+    location = FileLocation.local,
+    responseOptions = defaultResponseOptions
+  ) {
+    const { url, options } = this.#prepareRequest(printer, apiFile(path, location));
 
     const response = await this.#httpClient.delete(url, options);
 

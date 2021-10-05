@@ -25,7 +25,12 @@ function constructHeaders(apiKey) {
 }
 
 function processResponse(response, options = { unwrap: true }) {
-  if (options.unwrap) return response.data;
+  if (options.unwrap) {
+    return response.data;
+  }
+  if (options.simple) {
+    return { status: response.status, data: response.data };
+  }
   return response;
 }
 
