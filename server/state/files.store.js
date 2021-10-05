@@ -51,13 +51,20 @@ class FilesStore {
    * Remove file reference from database and then cache.
    * @param printerId
    * @param filePath
+   * @param throwError silence any missing file error if false
    * @returns {Promise<void>}
    */
-  async removeFile(printerId, filePath) {
-    await this.#printerFilesService.deleteFile(printerId, filePath);
+  async deleteFile(printerId, filePath, throwError) {
+    const serviceActionResult = await this.#printerFilesService.deleteFile(
+      printerId,
+      filePath,
+      throwError
+    );
 
     // Warning only
-    this.#fileCache.purgeFile(printerId, filePath);
+    const cacheActionResult = this.#fileCache.purgeFile(printerId, filePath);
+
+    return { service: serviceActionResult, cache: cacheActionResult };
   }
 
   // === TODO BELOW ===
@@ -391,7 +398,7 @@ class FilesStore {
   async updateFile(file, i) {
     const printer = farmPrinters[i];
     if (fileTimeout <= 20000) {
-      logger.info(
+      this.#logger.info(
         `Updating new file ${
           printer.fileList.files[printer.fileList.files.length - 1].name
         } for Printer:${printer.printerURL}`
@@ -431,7 +438,7 @@ class FilesStore {
       //   }
       // }, 5000);
     } else {
-      logger.info("File information took too long to generate, awaiting manual scan...");
+      this.#logger.info("File information took too long to generate, awaiting manual scan...");
     }
   }
 }

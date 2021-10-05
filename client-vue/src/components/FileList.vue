@@ -6,8 +6,8 @@
       Refresh files
     </v-btn>
     <v-list color="primary">
-      <v-list-item v-for="file in fileList.files" :key="file.name">
-        {{ file.name }} - {{ file.path }} - {{ file.date }}
+      <v-list-item v-for="file in fileList.files" :key="file.path">
+        {{ file.path }} - {{ file.date }}
         <v-btn @click="deleteFile(file)">
           <v-icon>delete</v-icon>
           Delete
@@ -21,7 +21,8 @@
 import Component from "vue-class-component";
 import Vue from "vue";
 import { Prop } from "vue-property-decorator";
-import { OctoPrintService } from "@/backend";
+import { PrinterFilesService } from "@/backend";
+import { ACTIONS } from "@/store/printers/printers.actions";
 
 @Component({
   data: () => ({})
@@ -31,11 +32,17 @@ export default class FileList extends Vue {
   @Prop() printerId;
 
   async getFiles() {
-    this.printer.fileList.files = await OctoPrintService.getFiles(this.printerId, false);
+    this.fileList.files = await this.$store.dispatch(ACTIONS.getPrinterFiles, {
+      printerId: this.printerId,
+      recursive: false
+    });
   }
 
   async deleteFile(file) {
-    await OctoPrintService.deleteFile(this.printerId, file.path);
+    this.fileList.files = await this.$store.dispatch(ACTIONS.deletePrinterFile, {
+      printerId: this.printerId,
+      fullPath: file.path
+    });
   }
 }
 </script>

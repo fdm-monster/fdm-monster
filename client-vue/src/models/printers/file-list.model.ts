@@ -1,6 +1,8 @@
+import { PrinterFile } from "@/models/printers/printer-file.model";
+
 export interface FileList {
-  files: any[];
+  files: PrinterFile[];
   fileCount: number;
-  folders: any[];
+  folders: string[];
   folderCount: number;
 }

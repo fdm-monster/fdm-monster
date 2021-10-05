@@ -1,11 +1,15 @@
 const { NotFoundException } = require("../exceptions/runtime.exceptions");
 const { findFileIndex } = require("./utils/find-predicate.utils");
+const Logger = require("../handlers/logger.js");
+const { Status } = require("../constants/service.constants");
 
 /**
  * An extension repository for managing printer files in database
  */
 class PrinterFilesService {
   #printerService;
+
+  #logger = new Logger(PrinterFilesService.name);
 
   constructor({ printerService }) {
     this.#printerService = printerService;
@@ -36,18 +40,23 @@ class PrinterFilesService {
    * Perform delete action on database
    * @param printerId
    * @param filePath
+   * @param throwError when false no error will be thrown for a missing file
    * @returns {Promise<*>}
    */
-  async deleteFile(printerId, filePath) {
+  async deleteFile(printerId, filePath, throwError = true) {
     const printer = await this.#printerService.get(printerId);
 
     const fileIndex = findFileIndex(printer.fileList, filePath);
 
     if (fileIndex === -1) {
-      throw new NotFoundException(
-        `A file removal was ordered but this file was not found in database for printer Id ${printerId}`,
-        filePath
-      );
+      if (throwError) {
+        throw new NotFoundException(
+          `A file removal was ordered but this file was not found in database for printer Id ${printerId}`,
+          filePath
+        );
+      } else {
+        return Status.failure("File was not found in printer fileList");
+      }
     }
 
     printer.fileList.files.splice(fileIndex, 1);
@@ -55,7 +64,7 @@ class PrinterFilesService {
     printer.markModified("fileList");
     printer.save();
 
-    return printer.fileList;
+    return Status.success("File was removed");
   }
 }
 

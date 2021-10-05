@@ -35,7 +35,7 @@ export default class App extends Vue {
   @Action loadServerSettings: () => Promise<ServerSettings>;
 
   /**
-   * Listens to events - replaced with socket io client later
+   * Listens to events - replaced with socketIO client later
    */
   sseClient?: SSEClient;
 

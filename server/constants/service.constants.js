@@ -82,6 +82,24 @@ function getDefaultPrinterEntry() {
 
 const UUID_LENGTH = 32;
 
+class Status {
+  static failure(message = "", args) {
+    return {
+      success: false,
+      message: message || "",
+      ...args
+    };
+  }
+
+  static success(message = "", args) {
+    return {
+      success: true,
+      message: message || "",
+      ...args
+    };
+  }
+}
+
 module.exports = {
   getCostSettingsDefault,
   getPowerSettingsDefault,
@@ -89,5 +107,6 @@ module.exports = {
   getFileListDefault,
   getDefaultHistoryEntry,
   getDefaultPrinterEntry,
-  UUID_LENGTH
+  UUID_LENGTH,
+  Status
 };

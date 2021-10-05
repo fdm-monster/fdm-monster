@@ -4,12 +4,10 @@ const Logger = require("../handlers/logger.js");
 const { validateMiddleware, validateInput } = require("../handlers/validators");
 const { AppConstants } = require("../app.constants");
 const { idRules } = require("./validation/generic.validation");
-const {
-  getFilesRules,
-  deleteFileRules
-} = require("./validation/printer-files-controller.validation");
+const { getFilesRules, getFileRules } = require("./validation/printer-files-controller.validation");
 const { ExternalServiceError } = require("../exceptions/runtime.exceptions");
 const HttpStatusCode = require("../constants/http-status-codes.constants");
+const { Status } = require("../constants/service.constants");
 
 class PrinterFileController {
   #filesStore;
@@ -25,64 +23,78 @@ class PrinterFileController {
     this.#printersStore = printersStore;
   }
 
-  async getFiles(req, res) {
-    const { id: printerId } = await validateInput(req.params, idRules);
-    const { recursive } = await validateInput(req.query, getFilesRules);
-
-    const printerLogin = this.#printersStore.getPrinterLogin(printerId);
-
-    const response = await this.#octoPrintApiService.getFiles(printerLogin, recursive, {
-      unwrap: false
-    });
-
-    await this.#filesStore.updatePrinterFiles(printerId, response.data);
-
+  #statusResponse(res, response) {
     res.statusCode = response.status;
     res.send(response.data);
   }
 
-  async deleteFile(req, res) {
+  #multiActionResponse(res, status, actionResults) {
+    res.statusCode = status;
+    res.send(actionResults);
+  }
+
+  async getFiles(req, res) {
     const { id: printerId } = await validateInput(req.params, idRules);
-    const { fullPath } = await validateInput(req.query, deleteFileRules, res);
+    const { recursive, location } = await validateInput(req.query, getFilesRules);
 
     const printerLogin = this.#printersStore.getPrinterLogin(printerId);
 
-    const response = await this.#octoPrintApiService.deleteFile(printerLogin, fullPath, {
-      unwrap: false
+    const response = await this.#octoPrintApiService.getFiles(printerLogin, recursive, location, {
+      unwrap: false,
+      simple: true
     });
 
-    const status = response.status;
+    await this.#filesStore.updatePrinterFiles(printerId, response.data);
 
-    // Possibilities: CONFLICT, NOT FOUND or OK
-    if (status === HttpStatusCode.CONFLICT) {
-      // File was probably busy or printing
-      throw new ExternalServiceError(response.data);
+    this.#statusResponse(res, response);
+  }
+
+  async getFile(req, res) {
+    const { id: printerId } = await validateInput(req.params, idRules);
+    const { fullPath } = await validateInput(req.query, getFileRules, res);
+
+    const printerLogin = this.#printersStore.getPrinterLogin(printerId);
+
+    const response = await this.#octoPrintApiService.getFile(printerLogin, fullPath, {
+      unwrap: false,
+      simple: true
+    });
+
+    await this.#filesStore.updatePrinterFiles(printerId, response.data);
+
+    this.#statusResponse(res, response);
+  }
+
+  async deleteFile(req, res) {
+    const { id: printerId } = await validateInput(req.params, idRules);
+    const { fullPath, location } = await validateInput(req.query, getFileRules, res);
+
+    const printerLogin = this.#printersStore.getPrinterLogin(printerId);
+
+    let response;
+    try {
+      response = await this.#octoPrintApiService.deleteFile(printerLogin, fullPath, location, {
+        unwrap: false,
+        simple: true // Keeps only status and data props
+      });
+    } catch (e) {
+      // NOT_FOUND or NO_CONTENT fall through
+      if (e.response?.status === HttpStatusCode.CONFLICT) {
+        // File was probably busy or printing
+        throw new ExternalServiceError(e.response.data);
+      } else if (e.response?.status === HttpStatusCode.NOT_FOUND) {
+        response = Status.failure("OctoPrint indicated file was not found");
+      }
     }
 
-    // NOT FOUND or NO_CONTENT - both should cause file to be dereferenced
-    await this.#filesStore.removeFile(printerId, fullPath);
-    this.#logger.info(`File reference removed for printerId ${printerId}`, fullPath);
+    const combinedResult = await this.#filesStore.deleteFile(printerId, fullPath, false);
+    this.#logger.info(`File reference removal completed for printerId ${printerId}`, fullPath);
 
-    res.statusCode = status;
-    res.send(response.data);
+    const totalResult = { octoPrint: response, ...combinedResult };
+    this.#multiActionResponse(res, 200, totalResult);
   }
 
   // === TODO BELOW ===
-  async resyncFile(req, res) {
-    const file = req.body;
-    logger.info("Files Re-sync request for: ", file);
-    let ret = null;
-
-    // TODO no!
-    // if (typeof file.fullPath !== "undefined") {
-    //   ret = await Runner.reSyncFile(file.i, file.fullPath);
-    // } else {
-    //   ret = await Runner.getFiles(file.i, true);
-    // }
-    // Removed timeout... there's absolutely no reason for it.
-    res.send(ret);
-  }
-
   async moveFile(req, res) {
     const data = req.body;
     if (data.newPath === "/") {
