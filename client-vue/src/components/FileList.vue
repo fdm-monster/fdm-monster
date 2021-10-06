@@ -5,6 +5,12 @@
       <v-icon>refresh</v-icon>
       Refresh files
     </v-btn>
+    <v-file-input
+        chips
+        counter
+        show-size
+        truncate-length="15"
+    ></v-file-input>
     <v-list color="primary">
       <v-list-item v-for="file in fileList.files" :key="file.path">
         {{ file.path }} - {{ file.date }}
