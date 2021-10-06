@@ -24,6 +24,7 @@ function getDefaultJobState() {
 function getDefaultPrinterState() {
   return {
     state: PSTATE.Offline,
+    flags: { operational: false },
     desc: "Printer needs WebSocket connection first",
     colour: mapStateToColor(PSTATE.Offline)
   };

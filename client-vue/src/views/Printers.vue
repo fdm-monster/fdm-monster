@@ -64,11 +64,12 @@
         >
           <v-icon>directions</v-icon>
         </v-btn>
-        <v-badge v-if="item.enabled" bordered class="ma-2" color="red" overlap>
+        <v-badge v-if="item.enabled" bordered class="ma-2" :color="isPrinterOperational(item) ? 'green' : 'red'" overlap>
           <template v-slot:badge>
-            <v-icon> close</v-icon>
+            <v-icon v-if="isPrinterOperational(item)">check</v-icon>
+            <v-icon v-else>close</v-icon>
           </template>
-          <v-btn color="secondary" fab small>
+          <v-btn :color="item.printerState.color" fab small>
             <v-icon>usb</v-icon>
           </v-btn>
         </v-badge>
@@ -137,6 +138,10 @@ export default class Printers extends Vue {
     { text: "", value: "data-table-expand" }
   ];
 
+  isPrinterOperational(printer: Printer) {
+    return printer?.printerState?.flags.operational;
+  }
+
   async toggleEnabled(event: any, printer: Printer) {
     if (!printer._id) {
       throw new Error("Printer ID not set, cant toggle enabled");
@@ -150,6 +155,8 @@ export default class Printers extends Vue {
 
   async mounted() {
     await this.loadPrinters();
+
+    console.log(this.printers[0].printerState);
 
     this.$bus.on(sseMessageEventGlobal, (data: PrinterSseMessage) => {
       this.onSseMessage(data);
