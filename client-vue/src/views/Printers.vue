@@ -156,8 +156,6 @@ export default class Printers extends Vue {
   async mounted() {
     await this.loadPrinters();
 
-    console.log(this.printers[0].printerState);
-
     this.$bus.on(sseMessageEventGlobal, (data: PrinterSseMessage) => {
       this.onSseMessage(data);
     });
