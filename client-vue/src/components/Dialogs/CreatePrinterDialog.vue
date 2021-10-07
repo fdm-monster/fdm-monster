@@ -137,12 +137,12 @@ export default class CreatePrinterDialog extends Vue {
   }
 
   submit() {
-    this.$refs.observer.validate();
+    // this.$refs.observer.validate();
   }
 
   clear() {
     this.formData = { ...defaultCreatePrinter };
-    this.$refs.observer.reset();
+    // this.$refs.observer.reset();
   }
 }
 </script>
