@@ -17,9 +17,9 @@ function validatePrinter(printer) {
   };
 }
 
-function constructHeaders(apiKey) {
+function constructHeaders(apiKey, contentType = jsonContentType) {
   return {
-    [contentTypeHeaderKey]: jsonContentType, // Can be overwritten without problem
+    [contentTypeHeaderKey]: contentType, // Can be overwritten without problem
     [apiKeyHeaderKey]: apiKey
   };
 }

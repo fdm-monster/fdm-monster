@@ -7,8 +7,9 @@ const onlinePolling = {
 
 const server = {
   port: AppConstants.defaultServerPort,
+  uploadFolder: AppConstants.defaultFileStorageFolder,
   registration: true,
-  loginRequired: true
+  loginRequired: false
 };
 
 const getDefaultTimeout = () => ({

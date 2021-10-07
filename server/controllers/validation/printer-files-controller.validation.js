@@ -3,6 +3,10 @@ const getFilesRules = {
   recursive: "required|boolean"
 };
 
+const uploadFilesRules = {
+  location: "required|in:local,sdcard"
+};
+
 const getFileRules = {
   location: "required|in:local,sdcard",
   fullPath: "required|string"
@@ -10,5 +14,6 @@ const getFileRules = {
 
 module.exports = {
   getFilesRules,
+  uploadFilesRules,
   getFileRules
 };

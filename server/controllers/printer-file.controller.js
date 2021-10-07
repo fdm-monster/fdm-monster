@@ -4,10 +4,15 @@ const Logger = require("../handlers/logger.js");
 const { validateMiddleware, validateInput } = require("../handlers/validators");
 const { AppConstants } = require("../app.constants");
 const { idRules } = require("./validation/generic.validation");
-const { getFilesRules, getFileRules } = require("./validation/printer-files-controller.validation");
+const {
+  getFilesRules,
+  getFileRules,
+  uploadFilesRules
+} = require("./validation/printer-files-controller.validation");
 const { ExternalServiceError } = require("../exceptions/runtime.exceptions");
 const HttpStatusCode = require("../constants/http-status-codes.constants");
 const { Status } = require("../constants/service.constants");
+const multer = require("multer");
 
 class PrinterFileController {
   #filesStore;
@@ -65,6 +70,25 @@ class PrinterFileController {
     this.#statusResponse(res, response);
   }
 
+  async uploadFile(req, res) {
+    const { id: printerId } = await validateInput(req.params, idRules);
+    const { location } = await validateInput(req.query, uploadFilesRules, res);
+
+    const printerLogin = this.#printersStore.getPrinterLogin(printerId);
+
+    const uploadAny = multer({ storage: multer.memoryStorage() }).any();
+
+    return await uploadAny(req, res, async () => {
+      const response = await this.#octoPrintApiService.uploadFilesAsMultiPart(
+        printerLogin,
+        req.files,
+        location
+      );
+
+      res.send(response);
+    });
+  }
+
   async deleteFile(req, res) {
     const { id: printerId } = await validateInput(req.params, idRules);
     const { fullPath, location } = await validateInput(req.query, getFileRules, res);
@@ -106,13 +130,6 @@ class PrinterFileController {
     res.send({ msg: "success" });
   }
 
-  async createFile(req, res) {
-    const data = req.body;
-    logger.info("Adding a new file to server: ", data);
-    Runner.newFile(data);
-    res.send({ msg: "success" });
-  }
-
   // Folder actions below
   async removeFolder(req, res) {
     const folder = req.body;
@@ -142,6 +159,7 @@ module.exports = createController(PrinterFileController)
   .before([ensureAuthenticated])
   .get("/:id", "getFiles")
   .delete("/:id", "deleteFile")
+  .post("/:id/upload", "uploadFile")
   // TODO below
   .post("/file/resync", "resyncFile")
   .post("/file/move", "moveFile")

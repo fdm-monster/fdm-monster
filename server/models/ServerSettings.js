@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { AppConstants } = require("../app.constants");
 
 const ServerSettingsSchema = new mongoose.Schema({
   onlinePolling: {
@@ -9,14 +10,18 @@ const ServerSettingsSchema = new mongoose.Schema({
     }
   },
   server: {
+    uploadFolder: {
+      type: String,
+      default: AppConstants.defaultFileStorageFolder
+    },
     port: {
       type: Number,
-      default: 4000,
+      default: AppConstants.defaultServerPort,
       required: true
     },
     loginRequired: {
       type: Boolean,
-      default: true,
+      default: false,
       required: true
     },
     registration: {

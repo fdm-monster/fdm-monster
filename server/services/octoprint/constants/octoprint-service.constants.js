@@ -12,6 +12,7 @@ class FileLocation {
 const contentTypeHeaderKey = "Content-Type";
 const apiKeyHeaderKey = "X-Api-Key";
 const jsonContentType = "application/json";
+const multiPartContentType = "multipart/form-data";
 
 // TODO ofc this is lazy - but I'd rather have working code and optimize later
 function getCurrentProfileDefault() {
@@ -62,6 +63,7 @@ module.exports = {
   contentTypeHeaderKey,
   apiKeyHeaderKey,
   jsonContentType,
+  multiPartContentType,
   getCurrentProfileDefault,
   FileLocation
 };
