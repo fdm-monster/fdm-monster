@@ -6,7 +6,7 @@ const TempHistorySchema = new mongoose.Schema(
       type: Object,
       required: true
     },
-    printer_id: {
+    printerId: {
       type: String,
       required: true
     }

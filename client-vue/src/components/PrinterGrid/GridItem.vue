@@ -3,7 +3,7 @@
     :id="this.selector"
     :class="`grid-stack-item ${this.dataItem.skeleton ? '' : 'elevation-12'}`"
     :gs-h="this.dataItem.h"
-    :gs-id="this.dataItem._id"
+    :gs-id="this.dataItem.id"
     :gs-max-h="this.dataItem.maxH"
     :gs-max-w="this.dataItem.maxW"
     :gs-min-h="this.dataItem.minH"
@@ -27,9 +27,9 @@
       </v-btn>
     </v-speed-dial>
 
-    <v-toolbar :color="dataItem.skeleton ? 'secondary' : 'primary'" dark dense>{{
-      this.getPrinterName()
-    }}</v-toolbar>
+    <v-toolbar :color="dataItem.skeleton ? 'secondary' : 'primary'" dark dense>
+      {{ this.getPrinterName() }}
+    </v-toolbar>
     <v-card-text class="grid-stack-item-content">
       {{ dataItem.skeleton ? "not set up" : "Printing" }}
     </v-card-text>

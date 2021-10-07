@@ -23,7 +23,7 @@ beforeAll(async () => {
   const endpoints = getEndpoints(server);
   expect(endpoints).toContainEqual({
     methods: ["GET"],
-    middleware: ["anonymous", "memberInvoker"],
+    middlewares: ["anonymous", "memberInvoker"],
     path: routeBase + ssePath
   });
   request = supertest(server);

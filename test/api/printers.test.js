@@ -72,32 +72,32 @@ describe("PrintersController", () => {
     });
     const body = expectOkResponse(createResponse, { printerState: expect.anything() });
 
-    const deletionResponse = await request.delete(`${deleteRoute}/${body.printerState._id}`).send();
-    expectOkResponse(deletionResponse, { printerRemoved: expect.anything() });
+    const deletionResponse = await request.delete(`${deleteRoute}/${body.printerState.id}`).send();
+    expectOkResponse(deletionResponse, expect.anything());
   });
 
   it("should return printer list when no Id is provided", async function () {
     const response = await request.get(getRoute).send();
 
     expectOkResponse(response);
-  }, 10000);
+  });
 
   it("should return no printer Info entry when Id is provided but doesnt exist", async function () {
-    const printerId = "asd";
+    const printerId = "615f4fa37081fa06f428df90";
     const res = await request.get(`${getRoute}/${printerId}`).send();
 
     expect(res.statusCode).toEqual(404);
     expect(res.body).toEqual({
       error: `The printer ID '${printerId}' was not found in the PrintersStore.`
     });
-  }, 10000);
+  });
 
   it("should return 400 error when wrong input is provided", async function () {
     const path = printerRoute + "/undefined/" + refreshSettingsPath;
     const response = await request.post(path).send();
 
     expectInvalidResponse(response, ["id"], true);
-  }, 10000);
+  });
 
   it("should return 404 if server fails to find the printer", async function () {
     const printerId = "60ae2b760bca4f5930be3d88";
@@ -110,5 +110,5 @@ describe("PrintersController", () => {
       error: `The printer ID '${printerId}' was not found in the PrintersStore.`
     });
     expect(res.res.statusMessage).toContain("Not Found");
-  }, 10000);
+  });
 });

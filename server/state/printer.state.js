@@ -160,7 +160,7 @@ class PrinterState {
     // }
 
     return Object.freeze({
-      _id: this.#id, //! yup were going back
+      id: this.#id,
       printerState: this.getPrinterState(),
       hostState: this.#hostState,
       webSocketState: convertedWSState,

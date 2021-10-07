@@ -34,7 +34,7 @@
   </v-container>
 </template>
 
-<script>
+<script lang="ts">
 import { Component } from "vue-property-decorator";
 import Vue from "vue";
 

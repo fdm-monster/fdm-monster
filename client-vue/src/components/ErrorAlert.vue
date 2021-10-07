@@ -19,23 +19,24 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import Component from "vue-class-component";
 import Vue from "vue";
 import { Prop } from "vue-property-decorator";
 
 @Component({
   data: () => ({
-    snackbarOpened: false,
-    err: false,
-    vm: null,
-    info: null
+    err: undefined
   })
 })
 export default class ErrorAlert extends Vue {
-  @Prop(Boolean) stopPropagation;
+  @Prop() stopPropagation: boolean;
+  snackbarOpened = false;
+  err?: Error;
+  vm?: Vue;
+  info?: any;
 
-  errorCaptured(err, vm, info) {
+  errorCaptured(err: Error, vm: Vue, info: any) {
     this.snackbarOpened = true;
     this.err = err;
     this.vm = vm;
@@ -44,7 +45,7 @@ export default class ErrorAlert extends Vue {
   }
 
   cancelError() {
-    this.err = false;
+    this.err = undefined;
   }
 }
 </script>

@@ -5,30 +5,45 @@ import { StateInterface } from "@/store/state.interface";
 import { ACTIONS } from "@/store/printers/printers.actions";
 import { PrinterFilesService } from "@/backend";
 import { MultiResponse } from "@/models/api/status-response.model";
+import { PrinterGroup } from "@/models/printers/printer-group.model";
+import { PrinterGroupsService } from "@/backend/printer-groups.service";
 
 export interface PrintersStateInterface {
   printers: Printer[];
+  printerGroups: PrinterGroup[];
   lastUpdated?: number;
 }
 
 export const MUTATIONS = {
+  createPrinter: "createPrinter",
   savePrinters: "savePrinters",
+  loadPrinterGroups: "loadPrinterGroups",
   savePrinterFiles: "savePrinterFiles",
-  deletePrinterFile: "deletePrinterFile"
+  deletePrinterFile: "deletePrinterFile",
+  savePrinterGroups: "savePrinterGroups"
 };
 
 export const printersState: StoreOptions<StateInterface> = {
   state: {
     printers: [],
+    printerGroups: [],
     lastUpdated: undefined
   },
   mutations: {
+    [MUTATIONS.createPrinter]: (state, printer: Printer) => {
+      state.printers.push(printer);
+      state.printers.sort((a, b) => (a.sortIndex > b.sortIndex ? 1 : -1));
+    },
     [MUTATIONS.savePrinters]: (state, printers: Printer[]) => {
       state.printers = printers;
       state.lastUpdated = Date.now();
     },
+    [MUTATIONS.savePrinterGroups]: (state, groups: PrinterGroup[]) => {
+      state.printerGroups = groups;
+      state.lastUpdated = Date.now();
+    },
     [MUTATIONS.savePrinterFiles]: (state: StateInterface, { printerId, files }) => {
-      const printer = state.printers.find((p: Printer) => p._id === printerId);
+      const printer = state.printers.find((p: Printer) => p.id === printerId);
 
       if (!printer?.fileList) return;
 
@@ -36,7 +51,7 @@ export const printersState: StoreOptions<StateInterface> = {
       printer.fileList.fileCount = files.length;
     },
     [MUTATIONS.deletePrinterFile]: (state: StateInterface, { printerId, fullPath }) => {
-      const printer = state.printers.find((p: Printer) => p._id === printerId);
+      const printer = state.printers.find((p: Printer) => p.id === printerId);
 
       if (!printer?.fileList) {
         console.warn("Printer file list was falsy", printerId);
@@ -55,12 +70,19 @@ export const printersState: StoreOptions<StateInterface> = {
   },
   getters: {
     printers: (state) => state.printers,
-    printer: (state) => (printerId: string) => state.printers.find((p) => p._id === printerId),
+    printer: (state) => (printerId: string) => state.printers.find((p) => p.id === printerId),
     printerFiles: (state) => (printerId: string) =>
-      state.printers.find((p) => p._id === printerId)?.fileList.files,
+      state.printers.find((p) => p.id === printerId)?.fileList.files,
     lastUpdated: (state) => state.lastUpdated
   },
   actions: {
+    [ACTIONS.createPrinter]: async ({ commit }, newPrinter) => {
+      const data = await PrintersService.createPrinter(newPrinter);
+
+      commit(MUTATIONS.createPrinter, data);
+
+      return newPrinter;
+    },
     [ACTIONS.savePrinters]: ({ commit }, newPrinters) => {
       commit(MUTATIONS.savePrinters, newPrinters);
 
@@ -73,7 +95,14 @@ export const printersState: StoreOptions<StateInterface> = {
 
       return data;
     },
-    [ACTIONS.getPrinterFiles]: async ({ commit }, { printerId, recursive }) => {
+    [ACTIONS.loadPrinterGroups]: async ({ commit }) => {
+      const data = await PrinterGroupsService.getGroups();
+
+      commit(MUTATIONS.savePrinterGroups, data);
+
+      return data;
+    },
+    [ACTIONS.loadPrinterFiles]: async ({ commit }, { printerId, recursive }) => {
       const data = await PrinterFilesService.getFiles(printerId, recursive);
 
       commit(MUTATIONS.savePrinterFiles, { printerId, files: data });

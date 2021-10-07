@@ -14,7 +14,7 @@ const PrinterGroupSchema = new mongoose.Schema({
         required: true
       }
     ],
-    validate: [arrayValidator(0), "{PATH} not within constrained lengths."]
+    validate: [arrayValidator(0), "{PATH} not of length >=0."]
   }
 });
 

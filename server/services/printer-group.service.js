@@ -1,11 +1,15 @@
 const PrinterGroupModel = require("../models/PrinterGroup");
 const _ = require("lodash");
+const { validateInput } = require("../handlers/validators");
+const { createPrinterGroupRules } = require("./validators/printer-group-service.validators");
 
 class PrinterGroupService {
   #printerService;
+  #logger;
 
-  constructor({ printerService }) {
+  constructor({ printerService, loggerFactory }) {
     this.#printerService = printerService;
+    this.#logger = loggerFactory(PrinterGroupService.name);
   }
 
   /**
@@ -16,7 +20,9 @@ class PrinterGroupService {
   async create(printerGroup) {
     if (!printerGroup) throw new Error("Missing printer-group");
 
-    return PrinterGroupModel.create(printerGroup);
+    const validatedInput = await validateInput(printerGroup, createPrinterGroupRules);
+
+    return PrinterGroupModel.create(validatedInput);
   }
 
   /**
@@ -32,6 +38,14 @@ class PrinterGroupService {
    */
   async list() {
     return PrinterGroupModel.find({});
+  }
+
+  async get(groupId) {
+    return PrinterGroupModel.findOne({ _id: groupId });
+  }
+
+  async delete(groupId) {
+    return PrinterGroupModel.deleteOne({ _id: groupId });
   }
 
   /**
@@ -51,7 +65,7 @@ class PrinterGroupService {
       if (typeof groupName !== "string" || !groupName) continue;
 
       // Check if group already exists by this name
-      const printerIds = printers.map((p) => p._id);
+      const printerIds = printers.map((p) => p.id);
       const matchingGroup = existingGroups.find((g) => g.name === groupName);
       if (!!matchingGroup) {
         matchingGroup.printers = printerIds;

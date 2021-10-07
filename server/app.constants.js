@@ -18,6 +18,10 @@ class AppConstants {
     return 4000;
   }
 
+  static get defaultFileStorageFolder() {
+    return "file-storage";
+  }
+
   static get defaultServerPageTitle() {
     return "3D-Print-Farm";
   }

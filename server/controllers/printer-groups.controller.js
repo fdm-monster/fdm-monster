@@ -1,35 +1,53 @@
-const Logger = require("nodemon");
 const { ensureAuthenticated } = require("../middleware/auth");
 const { createController } = require("awilix-express");
 const { AppConstants } = require("../app.constants");
+const { validateInput } = require("../handlers/validators");
+const { idRules } = require("./validation/generic.validation");
 
 class PrinterGroupsController {
   #printerService;
   #printerGroupService;
 
-  #logger = new Logger("Server-API");
+  #logger;
 
-  constructor({ printerService, printerGroupService }) {
+  constructor({ printerService, printerGroupService, loggerFactory }) {
     this.#printerService = printerService;
     this.#printerGroupService = printerGroupService;
+    this.#logger = loggerFactory(PrinterGroupsController.name);
   }
 
-  async listGroups(req, res) {
-    const printers = await Runner.returnFarmPrinters();
-    const groups = [];
-    for (let i = 0; i < printers.length; i++) {
-      await groups.push({
-        _id: printers[i]._id,
-        group: printers[i].group
-      });
-    }
+  async create(req, res) {
+    // Has internal validation
+    const printerGroup = await this.#printerGroupService.create(req.body);
+
+    res.send(printerGroup);
+  }
+
+  async list(req, res) {
+    const groups = await this.#printerGroupService.list();
 
     res.send(groups);
   }
 
-  async listNewGroups(req, res) {
+  async get(req, res) {
+    const { id: groupId } = await validateInput(req.params, idRules);
+
+    const groups = await this.#printerGroupService.get(groupId);
+
+    res.send(groups);
+  }
+
+  async delete(req, res) {
+    const { id: groupId } = await validateInput(req.params, idRules);
+
+    const result = await this.#printerGroupService.delete(groupId);
+
+    res.json(result);
+  }
+
+  async syncLegacyGroups(req, res) {
     const groups = await this.#printerGroupService.syncPrinterGroups();
-    res.json(groups);
+    res.send(groups);
   }
 }
 
@@ -37,5 +55,8 @@ class PrinterGroupsController {
 module.exports = createController(PrinterGroupsController)
   .prefix(AppConstants.apiRoute + "/printer-groups")
   .before([ensureAuthenticated])
-  .get("/list", "listGroups")
-  .get("/list-new", "listNewGroups")
+  .get("/", "list")
+  .get("/:id", "get")
+  .delete("/:id", "delete")
+  .post("/", "create")
+  .put("/sync-legacy", "syncLegacyGroups")

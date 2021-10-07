@@ -7,9 +7,24 @@ export interface WebsocketState {
   desc: string;
 }
 
+export interface StateFlags {
+  operational: boolean;
+  printing?: boolean;
+  cancelling?: boolean;
+  pausing?: boolean;
+  resuming?: boolean;
+  finishing?: boolean;
+  closedOrError?: boolean;
+  error?: boolean;
+  paused?: boolean;
+  ready?: boolean;
+  sdReady?: boolean;
+}
+
 export interface VisualState {
   state: PSTATE;
   desc: string;
+  flags: StateFlags;
   colour: {
     name: ColourLabel;
     hex: string;

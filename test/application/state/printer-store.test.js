@@ -88,7 +88,7 @@ describe("PrintersStore", () => {
     expect(Object.isFrozen(flatState)).toBeTruthy();
 
     expect(flatState).toMatchObject({
-      _id: expect.any(String),
+      id: expect.any(String),
       printerState: {
         state: expect.any(String),
         desc: expect.any(String),

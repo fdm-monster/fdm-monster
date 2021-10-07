@@ -5,12 +5,7 @@ const GenericWebsocketAdapter = require("../../handlers/generic-websocket.adapte
 const QueueingSubject = require("../../handlers/queued-subject");
 const { PEVENTS } = require("../../constants/event.constants");
 const { parseOctoPrintWebsocketMessage } = require("./utils/websocket.utils");
-const {
-  PSTATE,
-  OP_STATE,
-  mapStateToColor,
-  remapOctoPrintState
-} = require("../../constants/state.constants");
+const { PSTATE, mapStateToColor, remapOctoPrintState } = require("../../constants/state.constants");
 const {
   OP_WS_SKIP,
   OP_WS_MSG,

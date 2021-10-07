@@ -42,7 +42,8 @@ export default {
         ["home", "Devices", "/"],
         ["printer", "Printers", "/printers"],
         ["settings", "Settings", "/settings"],
-        ["history", "History", "/history"]
+        ["history", "Scheduling", "/scheduling"],
+        ["contact_support", "About", "/about"],
       ]
     };
   },

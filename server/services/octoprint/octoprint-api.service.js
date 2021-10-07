@@ -4,20 +4,23 @@ const {
   OPClientErrors,
   contentTypeHeaderKey,
   apiKeyHeaderKey,
-  FileLocation
+  FileLocation,
+  multiPartContentType
 } = require("./constants/octoprint-service.constants");
 const { checkPluginManagerAPIDeprecation } = require("../../utils/compatibility.utils");
 const Logger = require("../../handlers/logger.js");
 const { processResponse, validatePrinter, constructHeaders } = require("./utils/api.utils");
 const { jsonContentType } = require("./constants/octoprint-service.constants");
 const { getDefaultTimeout } = require("../../constants/server-settings.constants");
+const FormData = require("form-data");
 
 const defaultResponseOptions = { unwrap: true };
 const octoPrintBase = "/";
 const apiBase = octoPrintBase + "api";
 const apiSettingsPart = apiBase + "/settings";
 const apiFiles = apiBase + "/files";
-const apiFile = (path, location) => `${apiFiles}/${location}/${path}`;
+const apiFilesLocation = (location) => `${apiFiles}/${location}`;
+const apiFile = (path, location) => `${apiFilesLocation(location)}/${path}`;
 const apiGetFiles = (recursive = true, location) =>
   `${apiFiles}/${location}?recursive=${recursive}`;
 const apiConnection = apiBase + "/connection";
@@ -60,12 +63,12 @@ class OctoprintApiService {
     }
   }
 
-  #prepareRequest(printer, path, timeoutOverride) {
+  #prepareRequest(printer, path, timeoutOverride, contentType = jsonContentType) {
     this.#ensureTimeoutSettingsLoaded();
 
     const { apiKey, printerURL } = validatePrinter(printer);
 
-    let headers = constructHeaders(apiKey);
+    let headers = constructHeaders(apiKey, contentType);
 
     let timeout = timeoutOverride || this.#timeouts.apiTimeout;
     if (timeout <= 0) {
@@ -156,6 +159,41 @@ class OctoprintApiService {
     const response = await this.#httpClient.get(url, options);
 
     return processResponse(response, responseOptions);
+  }
+
+  async uploadFilesAsMultiPart(
+    printer,
+    fileBuffers,
+    location = FileLocation.local,
+    responseOptions = defaultResponseOptions
+  ) {
+    const { url, options } = this.#prepareRequest(
+      printer,
+      apiFilesLocation(location),
+      null,
+      multiPartContentType
+    );
+
+    const formData = new FormData();
+
+    fileBuffers.forEach((b) => {
+      formData.append("file", b.buffer, { filename: b.originalname });
+    });
+
+    try {
+      const headers = {
+        ...options.headers,
+        ...formData.getHeaders(),
+        "Content-Length": formData.getLengthSync()
+      };
+      const response = await this.#httpClient.post(url, formData, {
+        headers
+      });
+
+      return processResponse(response, responseOptions);
+    } catch (e) {
+      return { error: true, success: false };
+    }
   }
 
   async deleteFile(
@@ -295,7 +333,7 @@ class OctoprintApiService {
     // https://stackoverflow.com/questions/55374755/node-js-axios-download-file-stream-and-writefile
 
     // TODO
-    const res = await this.getWithOptionalRetry(printerConnection, fetchPath, false);
+    const res = await this.#httpClient.get(printerConnection, fetchPath, false);
 
     return await new Promise((resolve, reject) => {
       res.body.pipe(fileStream);
