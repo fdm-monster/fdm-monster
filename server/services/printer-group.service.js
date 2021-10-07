@@ -1,5 +1,7 @@
 const PrinterGroupModel = require("../models/PrinterGroup");
 const _ = require("lodash");
+const { validateInput } = require("../handlers/validators");
+const { createPrinterGroupRules } = require("./validators/printer-group-service.validators");
 
 class PrinterGroupService {
   #printerService;
@@ -18,7 +20,9 @@ class PrinterGroupService {
   async create(printerGroup) {
     if (!printerGroup) throw new Error("Missing printer-group");
 
-    return PrinterGroupModel.create(printerGroup);
+    const validatedInput = await validateInput(printerGroup, createPrinterGroupRules);
+
+    return PrinterGroupModel.create(validatedInput);
   }
 
   /**
@@ -34,6 +38,14 @@ class PrinterGroupService {
    */
   async list() {
     return PrinterGroupModel.find({});
+  }
+
+  async get(groupId) {
+    return PrinterGroupModel.findOne({ _id: groupId });
+  }
+
+  async delete(groupId) {
+    return PrinterGroupModel.deleteOne({ _id: groupId });
   }
 
   /**

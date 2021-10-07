@@ -41,7 +41,7 @@ class PrinterService {
   async delete(printerId) {
     const filter = { _id: printerId };
 
-    await Printers.findOneAndDelete(filter);
+    return Printers.findOneAndDelete(filter);
   }
 
   /**

@@ -56,8 +56,10 @@ class PrinterController {
    * @returns {Promise<void>}
    */
   async get(req, res) {
-    const id = req.params.id;
-    const foundPrinter = this.#printersStore.getPrinterFlat(id);
+    const { id: printerId } = await validateInput(req.params, idRules);
+
+    const foundPrinter = this.#printersStore.getPrinterFlat(printerId);
+
     res.send(foundPrinter);
   }
 
@@ -69,12 +71,13 @@ class PrinterController {
     this.#logger.info("Add printer", newPrinter);
 
     // Has internal validation, but might add some here above as well
-    const printerState = await this.#printersStore.addPrinter(req.body);
+    const printerState = await this.#printersStore.addPrinter(newPrinter);
     res.send({ printerState: printerState.toFlat() });
   }
 
   async list(req, res) {
     const listedPrinters = this.#printersStore.listPrintersFlat();
+
     res.send(listedPrinters);
   }
 
@@ -83,9 +86,9 @@ class PrinterController {
     const printerId = data.id;
     this.#logger.info("Deleting printer with id", printerId);
 
-    const entityRemoved = await this.#printersStore.deletePrinter(printerId);
+    const result = await this.#printersStore.deletePrinter(printerId);
 
-    res.send({ printerRemoved: entityRemoved });
+    res.send(result);
   }
 
   /**
