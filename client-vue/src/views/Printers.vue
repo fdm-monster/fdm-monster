@@ -64,7 +64,13 @@
         >
           <v-icon>directions</v-icon>
         </v-btn>
-        <v-badge v-if="item.enabled" bordered class="ma-2" :color="isPrinterOperational(item) ? 'green' : 'red'" overlap>
+        <v-badge
+          v-if="item.enabled"
+          bordered
+          class="ma-2"
+          :color="isPrinterOperational(item) ? 'green' : 'red'"
+          overlap
+        >
           <template v-slot:badge>
             <v-icon v-if="isPrinterOperational(item)">check</v-icon>
             <v-icon v-else>close</v-icon>

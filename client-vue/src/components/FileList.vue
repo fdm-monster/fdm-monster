@@ -5,12 +5,7 @@
       <v-icon>refresh</v-icon>
       Refresh files
     </v-btn>
-    <v-file-input
-        chips
-        counter
-        show-size
-        truncate-length="15"
-    ></v-file-input>
+    <v-file-input chips counter show-size truncate-length="15"></v-file-input>
     <v-list color="primary">
       <v-list-item v-for="file in fileList.files" :key="file.path">
         {{ file.path }} - {{ file.date }}
@@ -27,7 +22,6 @@
 import Component from "vue-class-component";
 import Vue from "vue";
 import { Prop } from "vue-property-decorator";
-import { PrinterFilesService } from "@/backend";
 import { ACTIONS } from "@/store/printers/printers.actions";
 
 @Component({
