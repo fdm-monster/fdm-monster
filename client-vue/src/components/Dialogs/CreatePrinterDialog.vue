@@ -45,15 +45,26 @@
                   </validation-provider>
                 </v-col>
                 <v-col cols="12" md="6">
-                  <v-text-field
-                    hint="Global API Keys will be rejected!"
-                    label="API Key*"
-                    persistent-hint
-                    required
-                  ></v-text-field>
+                  <validation-provider v-slot="{ errors }" name="ApiKey">
+                    <v-text-field
+                      v-model="formData.apiKey"
+                      :error-messages="errors"
+                      hint="Global API Keys will be rejected!"
+                      label="API Key*"
+                      persistent-hint
+                      required
+                    ></v-text-field>
+                  </validation-provider>
                 </v-col>
                 <v-col cols="12" md="6">
-                  <v-checkbox :value="true" label="Enabled*" required></v-checkbox>
+                  <validation-provider v-slot="{ errors }" name="Enabled">
+                    <v-checkbox
+                      v-model="formData.enabled"
+                      :error-messages="errors"
+                      label="Enabled*"
+                      required
+                    ></v-checkbox>
+                  </validation-provider>
                 </v-col>
               </v-row>
 
@@ -61,21 +72,49 @@
                 <v-expansion-panel>
                   <v-expansion-panel-header>Advanced settings</v-expansion-panel-header>
                   <v-expansion-panel-content>
-                    <v-col cols="12" md="6">
-                      <v-select
-                        :items="['http', 'https']"
-                        label="Insecure/Secure HTTP"
+                    <validation-provider v-slot="{ errors }" name="Display">
+                      <v-checkbox
+                        v-model="formData.display"
+                        :error-messages="errors"
+                        label="Display*"
                         required
-                        value="http"
-                      ></v-select>
+                      ></v-checkbox>
+                    </validation-provider>
+                    <v-col cols="12" md="6">
+                      <validation-provider v-slot="{ errors }" name="StepSize">
+                        <v-select
+                          v-model="formData.stepSize"
+                          :error-messages="errors"
+                          :items="[0.1, 1, 10, 100]"
+                          label="Step-size for manual control"
+                          required
+                          value="http"
+                        ></v-select>
+                      </validation-provider>
                     </v-col>
                     <v-col cols="12" md="6">
-                      <v-select
-                        :items="['ws', 'wss']"
-                        label="Insecure/Secure Websocket"
-                        required
-                        value="ws"
-                      ></v-select>
+                      <validation-provider v-slot="{ errors }" name="PrinterHostPrefix">
+                        <v-select
+                          v-model="formData.printerHostPrefix"
+                          :error-messages="errors"
+                          :items="['http', 'https']"
+                          label="Insecure/Secure HTTP"
+                          required
+                          value="http"
+                        ></v-select>
+                      </validation-provider>
+                    </v-col>
+                    <v-col cols="12" md="6">
+                      <validation-provider v-slot="{ errors }" name="WebsocketPrefix">
+                        <v-select
+                          v-model="formData.websocketPrefix"
+                          :error-messages="errors"
+                          :items="['ws', 'wss']"
+                          label="Insecure/Secure Websocket"
+                          required
+                          value="ws"
+                        ></v-select>
+                      </validation-provider>
                     </v-col>
                   </v-expansion-panel-content>
                 </v-expansion-panel>
@@ -133,14 +172,6 @@ export default class CreatePrinterDialog extends Vue {
     validationObserver: InstanceType<typeof ValidationObserver>;
   };
 
-  created() {
-    window.addEventListener("keydown", (e) => {
-      if (e.key == "Escape") {
-        this.closeDialog();
-      }
-    });
-  }
-
   get mutableShow() {
     // https://forum.vuejs.org/t/update-data-when-prop-changes-data-derived-from-prop/1517/27
     return this.show;
@@ -148,6 +179,14 @@ export default class CreatePrinterDialog extends Vue {
 
   set mutableShow(newValue: boolean) {
     this.$emit("update:show", newValue);
+  }
+
+  created() {
+    window.addEventListener("keydown", (e) => {
+      if (e.key == "Escape") {
+        this.closeDialog();
+      }
+    });
   }
 
   testPrinter() {

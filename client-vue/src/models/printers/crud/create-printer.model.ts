@@ -8,7 +8,7 @@ export const defaultCreatePrinter: CreatePrinter = {
   sortIndex: 0,
   apiKey: "",
   display: true,
-  enabled: false,
+  enabled: true,
   groups: [],
   stepSize: 1
 };
