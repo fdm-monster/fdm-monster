@@ -73,9 +73,10 @@ class PrintersStore {
 
   /**
    * Return a mutable copy of all frozen printers states mapped to flat JSON
+   * @param {boolean} filterDisconnected printers marked by tearDown (disconnected) are be filtered
    */
-  listPrintersFlat() {
-    return this.listPrinterStates()
+  listPrintersFlat(filterDisconnected = true) {
+    return this.listPrinterStates(filterDisconnected)
       .filter((s) => s.toFlat)
       .map((s) => s.toFlat());
   }
@@ -84,11 +85,12 @@ class PrintersStore {
    * List the prefetched printer states without mapping
    * We check and throw instead of loading proactively: more predictable and not async
    * @returns {*}
+   * @param {boolean} filterDisconnected printers marked by tearDown (disconnected) are be filtered
    */
-  listPrinterStates() {
+  listPrinterStates(filterDisconnected = true) {
     this._validateState();
 
-    return this.#printerStates.filter((p) => p.markForRemoval === false);
+    return this.#printerStates.filter((p) => filterDisconnected || p.markForRemoval === false);
   }
 
   getPrinterCount() {

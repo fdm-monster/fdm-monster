@@ -6,7 +6,7 @@ import { ConnectionOptions } from "@/models/printers/connection-options.model";
 import { PrinterProfile } from "@/models/printers/printer-profile.model";
 
 export interface Printer {
-  _id: string;
+  id: string;
   printerState: VisualState;
   hostState: VisualState;
   webSocketState: WebsocketState;

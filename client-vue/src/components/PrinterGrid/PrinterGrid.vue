@@ -45,8 +45,6 @@ export default class PrinterGrid extends Vue {
   @Getter printers: Printer[];
 
   async mounted() {
-    // if (this.items.length) return;
-
     this.items = [];
     this.grid = GridStack.init({
       float: true,

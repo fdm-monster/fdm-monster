@@ -21,7 +21,7 @@ export default class PrinterDetails extends Vue {
   @Prop() printer: Printer;
 
   get printerId() {
-    return this.printer._id;
+    return this.printer.id;
   }
 }
 </script>

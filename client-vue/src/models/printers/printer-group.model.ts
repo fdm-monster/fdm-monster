@@ -1,4 +1,4 @@
 export interface PrinterGroup {
-  _id?: string;
+  id?: string;
   name: string;
 }

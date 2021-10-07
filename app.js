@@ -52,7 +52,6 @@ if (!!majorVersion && majorVersion < 14) {
     .then(async () => {
       const port = fetchServerPort();
 
-      // Shit hit the fan
       if (!port || Number.isNaN(parseInt(port))) {
         throw new Error("The 3DPF Server requires a numeric port input argument to run");
       }

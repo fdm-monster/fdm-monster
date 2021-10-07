@@ -1,13 +1,13 @@
 const fs = require("fs");
 const path = require("path");
 const { execSync } = require("child_process");
-const isDocker = require("is-docker");
 const envUtils = require("./utils/env.utils");
 const dotenv = require("dotenv");
 const { AppConstants } = require("./app.constants");
 
 const Logger = require("./handlers/logger.js");
 const { status, up } = require("migrate-mongo");
+const isDocker = require("is-docker");
 const logger = new Logger("3DPF-Environment", false);
 
 // Constants and definition

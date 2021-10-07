@@ -20,7 +20,7 @@
       :search="search"
       :single-expand="true"
       class="elevation-1"
-      item-key="_id"
+      item-key="id"
       show-expand
     >
       <template v-if="reorder" v-slot:body="props">
@@ -149,13 +149,13 @@ export default class Printers extends Vue {
   }
 
   async toggleEnabled(event: any, printer: Printer) {
-    if (!printer._id) {
+    if (!printer.id) {
       throw new Error("Printer ID not set, cant toggle enabled");
     }
     const isPrinterEnabled = printer.enabled;
     if (!isPrinterEnabled || confirm("Are you sure?")) {
       printer.enabled = !printer.enabled;
-      await PrintersService.toggleEnabled(printer._id, printer.enabled);
+      await PrintersService.toggleEnabled(printer.id, printer.enabled);
     }
   }
 
@@ -170,10 +170,10 @@ export default class Printers extends Vue {
   onSseMessage(printers: PrinterSseMessage) {
     if (!printers) return;
 
-    let existingPrinters = this.printers.map((p) => p._id);
+    let existingPrinters = this.printers.map((p) => p.id);
 
     printers.forEach((p) => {
-      const printerIndex = this.printers.findIndex((pr) => pr._id === p._id);
+      const printerIndex = this.printers.findIndex((pr) => pr.id === p.id);
       existingPrinters.splice(printerIndex, 1);
     });
 

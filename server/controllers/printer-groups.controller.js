@@ -14,7 +14,8 @@ class PrinterGroupsController {
     this.#printerGroupService = printerGroupService;
   }
 
-  async listGroups(req, res) {
+  async list(req, res) {
+    const printerGroups = await this.#printerGroupService.list();
     const printers = await Runner.returnFarmPrinters();
     const groups = [];
     for (let i = 0; i < printers.length; i++) {
@@ -27,9 +28,9 @@ class PrinterGroupsController {
     res.send(groups);
   }
 
-  async listNewGroups(req, res) {
+  async syncLegacyGroups(req, res) {
     const groups = await this.#printerGroupService.syncPrinterGroups();
-    res.json(groups);
+    res.send(groups);
   }
 }
 
@@ -37,5 +38,5 @@ class PrinterGroupsController {
 module.exports = createController(PrinterGroupsController)
   .prefix(AppConstants.apiRoute + "/printer-groups")
   .before([ensureAuthenticated])
-  .get("/list", "listGroups")
-  .get("/list-new", "listNewGroups")
+  .get("/", "list")
+  .put("/sync-legacy", "syncLegacyGroups")

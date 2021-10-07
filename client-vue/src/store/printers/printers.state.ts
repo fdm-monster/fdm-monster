@@ -28,7 +28,7 @@ export const printersState: StoreOptions<StateInterface> = {
       state.lastUpdated = Date.now();
     },
     [MUTATIONS.savePrinterFiles]: (state: StateInterface, { printerId, files }) => {
-      const printer = state.printers.find((p: Printer) => p._id === printerId);
+      const printer = state.printers.find((p: Printer) => p.id === printerId);
 
       if (!printer?.fileList) return;
 
@@ -36,7 +36,7 @@ export const printersState: StoreOptions<StateInterface> = {
       printer.fileList.fileCount = files.length;
     },
     [MUTATIONS.deletePrinterFile]: (state: StateInterface, { printerId, fullPath }) => {
-      const printer = state.printers.find((p: Printer) => p._id === printerId);
+      const printer = state.printers.find((p: Printer) => p.id === printerId);
 
       if (!printer?.fileList) {
         console.warn("Printer file list was falsy", printerId);
@@ -55,9 +55,9 @@ export const printersState: StoreOptions<StateInterface> = {
   },
   getters: {
     printers: (state) => state.printers,
-    printer: (state) => (printerId: string) => state.printers.find((p) => p._id === printerId),
+    printer: (state) => (printerId: string) => state.printers.find((p) => p.id === printerId),
     printerFiles: (state) => (printerId: string) =>
-      state.printers.find((p) => p._id === printerId)?.fileList.files,
+      state.printers.find((p) => p.id === printerId)?.fileList.files,
     lastUpdated: (state) => state.lastUpdated
   },
   actions: {
