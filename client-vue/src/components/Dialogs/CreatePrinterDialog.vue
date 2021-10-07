@@ -35,7 +35,11 @@
                   </validation-provider>
                 </v-col>
                 <v-col cols="12" md="6">
-                  <validation-provider v-slot="{ errors }" name="PrinterHostName">
+                  <validation-provider
+                    v-slot="{ errors }"
+                    name="Printer IP or HostName"
+                    rules="required|ip_or_fqdn"
+                  >
                     <v-text-field
                       v-model="formData.printerHostName"
                       :error-messages="errors"
@@ -139,7 +143,8 @@
 import Vue from "vue";
 import { Component, Prop } from "vue-property-decorator";
 import { ValidationObserver, ValidationProvider } from "vee-validate";
-import { CreatePrinter, defaultCreatePrinter } from "@/models/printers/crud/create-printer.model";
+import { CreatePrinter, defaultCreatePrinter, PreCreatePrinter } from "@/models/printers/crud/create-printer.model";
+import { ACTIONS } from "@/store/printers/printers.actions";
 
 @Component({
   components: {
@@ -149,7 +154,7 @@ import { CreatePrinter, defaultCreatePrinter } from "@/models/printers/crud/crea
 })
 export default class CreatePrinterDialog extends Vue {
   @Prop(Boolean) show: boolean;
-  formData: CreatePrinter = { ...defaultCreatePrinter };
+  formData: PreCreatePrinter = { ...defaultCreatePrinter };
   $refs!: {
     validationObserver: InstanceType<typeof ValidationObserver>;
   };
@@ -180,13 +185,31 @@ export default class CreatePrinterDialog extends Vue {
 
     if (!result) return;
 
-    console.log(this.formData);
-    // await this.$store.dispatch(ACTIONS.createPrinter, this.formData)
+    const newPrinterData = this.transformFormData();
+
+    console.log(newPrinterData);
+    await this.$store.dispatch(ACTIONS.createPrinter, newPrinterData);
   }
 
   clear() {
     this.formData = { ...defaultCreatePrinter };
     // this.$refs.observer.reset();
+  }
+
+  private transformFormData(): CreatePrinter {
+    let modifiedData = { ...this.formData };
+
+    const { printerHostPrefix, websocketPrefix, printerHostName } = modifiedData;
+    const printerURL = new URL(`${printerHostPrefix}://${printerHostName}`);
+    const webSocketURL = new URL(`${websocketPrefix}://${printerHostName}`);
+
+    delete modifiedData.printerHostName;
+    delete modifiedData.printerHostPrefix;
+    delete modifiedData.websocketPrefix;
+    modifiedData.printerURL = printerURL;
+    modifiedData.webSocketURL = webSocketURL;
+
+    return modifiedData as CreatePrinter;
   }
 
   private closeDialog() {

@@ -1,5 +1,6 @@
 import { extend, setInteractionMode } from "vee-validate";
 import { digits, max, required } from "vee-validate/dist/rules";
+import validator from "validator";
 
 export function configureVeeValidate() {
   setInteractionMode("eager");
@@ -12,6 +13,10 @@ export function configureVeeValidate() {
   extend("required", {
     ...required,
     message: "{_field_} can not be empty"
+  });
+
+  extend("ip_or_fqdn", (value) => {
+    return validator.isFQDN(value) || validator.isIP(value) || value === "localhost";
   });
 
   extend("max", {
