@@ -25,12 +25,12 @@ beforeAll(async () => {
   const endpoints = getEndpoints(server);
   expect(endpoints).toContainEqual({
     methods: ["PATCH"],
-    middleware: ["anonymous", "memberInvoker"],
+    middlewares: ["anonymous", "memberInvoker"],
     path: `${updateFilterRoute}/:filter`
   });
   expect(endpoints).toContainEqual({
     methods: ["PATCH"],
-    middleware: ["anonymous", "memberInvoker"],
+    middlewares: ["anonymous", "memberInvoker"],
     path: `${updateSortingRoute}/:sorting`
   });
   request = supertest(server);

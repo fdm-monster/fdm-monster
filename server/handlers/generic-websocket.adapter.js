@@ -33,7 +33,7 @@ module.exports = class GenericWebsocketAdapter {
     // this.#client = new WebSocket({ followRedirects: true });
   }
 
-  get _id() {
+  get id() {
     return this.#id;
   }
 

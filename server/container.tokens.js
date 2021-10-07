@@ -40,7 +40,8 @@ const DITokens = {
   printerSseTask: "printerSseTask",
   dashboardSseTask: "dashboardSseTask",
   monitoringSseTask: "monitoringSseTask",
-  systemCommandsService: "systemCommandsService"
+  systemCommandsService: "systemCommandsService",
+  loggerFactory: "loggerFactory"
 };
 
 module.exports = DITokens;

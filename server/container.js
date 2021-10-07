@@ -49,21 +49,23 @@ const AutoDiscoveryService = require("./services/auto-discovery.service");
 const ConnectionLogsCache = require("./state/data/connection-logs.cache");
 const DashboardStatisticsCache = require("./state/data/dashboard-statistics.cache");
 const AlertService = require("./services/alert.service");
+const { asFunction, asClass, asValue, createContainer, InjectionMode } = require("awilix");
+const LoggerFactory = require("./handlers/logger-factory");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
-  const container = awilix.createContainer({
-    injectionMode: awilix.InjectionMode.PROXY
+  const container = createContainer({
+    injectionMode: InjectionMode.PROXY
   });
 
   container.register({
     // -- asValue --
     // Here we are telling awilix that the dependency is a value, pretty neat way to solidify data
-    serverVersion: awilix.asValue(
+    serverVersion: asValue(
       process.env[AppConstants.VERSION_KEY] || AppConstants.defaultServerPageTitle
     ),
-    appConstants: awilix.asClass(AppConstants).singleton(),
-    serverPageTitle: awilix.asValue(process.env[AppConstants.SERVER_SITE_TITLE_KEY]),
+    appConstants: asClass(AppConstants).singleton(),
+    serverPageTitle: asValue(process.env[AppConstants.SERVER_SITE_TITLE_KEY]),
 
     // -- asFunction --
     // Resolve dependencies by calling a function (synchronous or asynchronous)
@@ -76,7 +78,7 @@ function configureContainer() {
     // We just need something to manage it afterwards, otherwise we might lose reference to it.
     // In this case we save it to PrintersStore:
     // TL;DR we can dynamically create injectable dependencies just fine using awilix.
-    [DITokens.printerStateFactory]: awilix.asFunction(PrinterStateFactory).transient(), // Factory function, transient on purpose!
+    [DITokens.printerStateFactory]: asFunction(PrinterStateFactory).transient(), // Factory function, transient on purpose!
 
     // -- asClass --
     // Below we are telling Awilix how to resolve a dependency class:
@@ -89,63 +91,64 @@ function configureContainer() {
     // Other flavours are: .transient() (default, volatile instance) and .scoped() (conditionally volatile)
     // scoping is usually done for request API middleware to ensure f.e. that current user is set or group/tenant/roles/etc
     // Therefore scoping can influence how many requests per sec the API can handle... in case you're interested to know.
-    [DITokens.settingsStore]: awilix.asClass(SettingsStore).singleton(),
-    [DITokens.serverSettingsService]: awilix.asClass(ServerSettingsService),
-    clientSettingsService: awilix.asClass(ClientSettingsService),
-    userTokenService: awilix.asClass(UserTokenService).singleton(),
+    [DITokens.settingsStore]: asClass(SettingsStore).singleton(),
+    [DITokens.serverSettingsService]: asClass(ServerSettingsService),
+    clientSettingsService: asClass(ClientSettingsService),
+    userTokenService: asClass(UserTokenService).singleton(),
 
-    taskManagerService: awilix.asClass(TaskManagerService).singleton(),
+    [DITokens.loggerFactory]: asFunction(LoggerFactory).transient(),
+    taskManagerService: asClass(TaskManagerService).singleton(),
     eventEmitter2: awilix.asFunction(configureEventEmitter).singleton(),
-    [DITokens.serverUpdateService]: awilix.asClass(ServerUpdateService).singleton(),
-    [DITokens.systemInfoStore]: awilix.asClass(SystemInfoStore).singleton(),
-    [DITokens.githubApiService]: awilix.asClass(GithubApiService),
-    [DITokens.autoDiscoveryService]: awilix.asClass(AutoDiscoveryService),
-    [DITokens.systemCommandsService]: awilix.asClass(SystemCommandsService),
-    serverLogsService: awilix.asClass(ServerLogsService),
-    systemInfoBundleService: awilix.asClass(SystemInfoBundleService),
+    [DITokens.serverUpdateService]: asClass(ServerUpdateService).singleton(),
+    [DITokens.systemInfoStore]: asClass(SystemInfoStore).singleton(),
+    [DITokens.githubApiService]: asClass(GithubApiService),
+    [DITokens.autoDiscoveryService]: asClass(AutoDiscoveryService),
+    [DITokens.systemCommandsService]: asClass(SystemCommandsService),
+    serverLogsService: asClass(ServerLogsService),
+    systemInfoBundleService: asClass(SystemInfoBundleService),
     [DITokens.httpClient]: awilix.asValue(axios),
 
-    [DITokens.printerService]: awilix.asClass(PrinterService),
-    [DITokens.printerFilesService]: awilix.asClass(PrinterFilesService),
-    [DITokens.printerGroupService]: awilix.asClass(PrinterGroupService),
-    [DITokens.octoPrintApiService]: awilix.asClass(OctoPrintApiService).singleton(),
-    [DITokens.filamentManagerPluginService]: awilix.asClass(FilamentManagerPluginService),
-    [DITokens.historyService]: awilix.asClass(HistoryService),
-    [DITokens.farmStatisticsService]: awilix.asClass(FarmStatisticsService),
-    [DITokens.dashboardStatisticsCache]: awilix.asClass(DashboardStatisticsCache),
-    [DITokens.filamentCache]: awilix.asClass(FilamentCache).singleton(),
-    [DITokens.sortingFilteringCache]: awilix.asClass(SortingFilteringCache).singleton(),
-    [DITokens.currentOperationsCache]: awilix.asClass(CurrentOperationsCache).singleton(),
-    [DITokens.printerState]: awilix.asClass(PrinterState).transient(), // Transient on purpose!
-    [DITokens.historyCache]: awilix.asClass(HistoryCache).singleton(),
-    [DITokens.jobsCache]: awilix.asClass(JobsCache).singleton(),
-    [DITokens.heatMapCache]: awilix.asClass(HeatMapCache).singleton(),
-    [DITokens.connectionLogsCache]: awilix.asClass(ConnectionLogsCache).singleton(),
-    printerTickerStore: awilix.asClass(PrinterTickerStore).singleton(),
-    [DITokens.fileCache]: awilix.asClass(FileCache).singleton(),
-    filamentStore: awilix.asClass(FilamentStore), // No need for singleton as its now based on filamentCache
-    [DITokens.filesStore]: awilix.asClass(FilesStore).singleton(),
-    [DITokens.printersStore]: awilix.asClass(PrintersStore).singleton(),
+    [DITokens.printerService]: asClass(PrinterService),
+    [DITokens.printerFilesService]: asClass(PrinterFilesService),
+    [DITokens.printerGroupService]: asClass(PrinterGroupService),
+    [DITokens.octoPrintApiService]: asClass(OctoPrintApiService).singleton(),
+    [DITokens.filamentManagerPluginService]: asClass(FilamentManagerPluginService),
+    [DITokens.historyService]: asClass(HistoryService),
+    [DITokens.farmStatisticsService]: asClass(FarmStatisticsService),
+    [DITokens.dashboardStatisticsCache]: asClass(DashboardStatisticsCache),
+    [DITokens.filamentCache]: asClass(FilamentCache).singleton(),
+    [DITokens.sortingFilteringCache]: asClass(SortingFilteringCache).singleton(),
+    [DITokens.currentOperationsCache]: asClass(CurrentOperationsCache).singleton(),
+    [DITokens.printerState]: asClass(PrinterState).transient(), // Transient on purpose!
+    [DITokens.historyCache]: asClass(HistoryCache).singleton(),
+    [DITokens.jobsCache]: asClass(JobsCache).singleton(),
+    [DITokens.heatMapCache]: asClass(HeatMapCache).singleton(),
+    [DITokens.connectionLogsCache]: asClass(ConnectionLogsCache).singleton(),
+    printerTickerStore: asClass(PrinterTickerStore).singleton(),
+    [DITokens.fileCache]: asClass(FileCache).singleton(),
+    filamentStore: asClass(FilamentStore), // No need for singleton as its now based on filamentCache
+    [DITokens.filesStore]: asClass(FilesStore).singleton(),
+    [DITokens.printersStore]: asClass(PrintersStore).singleton(),
 
     // Extensibility and export
-    [DITokens.alertService]: awilix.asClass(AlertService),
-    [DITokens.scriptService]: awilix.asClass(ScriptService),
-    [DITokens.influxDbSetupService]: awilix.asClass(InfluxDbSetupService).singleton(),
-    [DITokens.influxDbFilamentService]: awilix.asClass(InfluxDbFilamentService),
-    [DITokens.influxDbHistoryService]: awilix.asClass(InfluxDbHistoryService),
-    [DITokens.influxDbPrinterStateService]: awilix.asClass(InfluxDbPrinterStateService),
+    [DITokens.alertService]: asClass(AlertService),
+    [DITokens.scriptService]: asClass(ScriptService),
+    [DITokens.influxDbSetupService]: asClass(InfluxDbSetupService).singleton(),
+    [DITokens.influxDbFilamentService]: asClass(InfluxDbFilamentService),
+    [DITokens.influxDbHistoryService]: asClass(InfluxDbHistoryService),
+    [DITokens.influxDbPrinterStateService]: asClass(InfluxDbPrinterStateService),
 
-    softwareUpdateTask: awilix.asClass(SoftwareUpdateTask),
+    softwareUpdateTask: asClass(SoftwareUpdateTask),
     // Provided SSE handlers (couplers) shared with controllers
-    printerSseHandler: awilix.asClass(ServerSentEventsHandler).singleton(),
+    printerSseHandler: asClass(ServerSentEventsHandler).singleton(),
     // Task bound to send on SSE Handler
-    [DITokens.printerSseTask]: awilix.asClass(PrinterSseTask).singleton(),
+    [DITokens.printerSseTask]: asClass(PrinterSseTask).singleton(),
     // Normal post-analysis operations (previously called cleaners)
-    printerFilesTask: awilix.asClass(PrinterFilesTask).singleton(),
+    printerFilesTask: asClass(PrinterFilesTask).singleton(),
     // This task is a quick task (~100ms per printer)
-    printerWebsocketTask: awilix.asClass(PrinterWebsocketTask).singleton(),
+    printerWebsocketTask: asClass(PrinterWebsocketTask).singleton(),
     // Task dependent on WS to fire - disabled at boot
-    [DITokens.printerSystemTask]: awilix.asClass(PrinterSystemTask).singleton()
+    [DITokens.printerSystemTask]: asClass(PrinterSystemTask).singleton()
   });
 
   return container;

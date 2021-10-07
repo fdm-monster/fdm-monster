@@ -3,9 +3,11 @@ const _ = require("lodash");
 
 class PrinterGroupService {
   #printerService;
+  #logger;
 
-  constructor({ printerService }) {
+  constructor({ printerService, loggerFactory }) {
     this.#printerService = printerService;
+    this.#logger = loggerFactory(PrinterGroupService.name);
   }
 
   /**
@@ -51,7 +53,7 @@ class PrinterGroupService {
       if (typeof groupName !== "string" || !groupName) continue;
 
       // Check if group already exists by this name
-      const printerIds = printers.map((p) => p._id);
+      const printerIds = printers.map((p) => p.id);
       const matchingGroup = existingGroups.find((g) => g.name === groupName);
       if (!!matchingGroup) {
         matchingGroup.printers = printerIds;

@@ -1,4 +1,3 @@
-const Logger = require("nodemon");
 const { ensureAuthenticated } = require("../middleware/auth");
 const { createController } = require("awilix-express");
 const { AppConstants } = require("../app.constants");
@@ -7,20 +6,22 @@ class PrinterGroupsController {
   #printerService;
   #printerGroupService;
 
-  #logger = new Logger("Server-API");
+  #logger;
 
-  constructor({ printerService, printerGroupService }) {
+  constructor({ printerService, printerGroupService, loggerF }) {
     this.#printerService = printerService;
     this.#printerGroupService = printerGroupService;
+    this.#logger = loggerF(PrinterGroupsController.name);
   }
 
   async list(req, res) {
     const printerGroups = await this.#printerGroupService.list();
-    const printers = await Runner.returnFarmPrinters();
+    // const printers = await Runner.returnFarmPrinters();
+
     const groups = [];
-    for (let i = 0; i < printers.length; i++) {
+    for (let i = 0; i < printerGroups.length; i++) {
       await groups.push({
-        _id: printers[i]._id,
+        id: printers[i].id,
         group: printers[i].group
       });
     }

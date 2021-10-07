@@ -72,7 +72,7 @@ describe("PrintersController", () => {
     });
     const body = expectOkResponse(createResponse, { printerState: expect.anything() });
 
-    const deletionResponse = await request.delete(`${deleteRoute}/${body.printerState._id}`).send();
+    const deletionResponse = await request.delete(`${deleteRoute}/${body.printerState.id}`).send();
     expectOkResponse(deletionResponse, { printerRemoved: expect.anything() });
   });
 
