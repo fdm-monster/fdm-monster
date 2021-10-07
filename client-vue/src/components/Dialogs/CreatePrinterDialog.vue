@@ -1,9 +1,9 @@
 <template>
   <v-row justify="center">
-    <v-dialog v-model="mutableShow" max-width="600px" persistent>
-      <template v-slot:activator="{ on, attrs }">
-        <v-btn v-bind="attrs" v-on="on" color="primary" dark> Open Dialog</v-btn>
-      </template>
+    <v-dialog v-model="mutableShow" max-width="600px" persistent @keydown.esc="closeDialog()">
+<!--      <template v-slot:activator="{ on, attrs }">-->
+<!--        <v-btn v-bind="attrs" v-on="on" color="primary" dark> Open Dialog</v-btn>-->
+<!--      </template>-->
       <v-card>
         <v-card-title>
           <span class="text-h5">New Printer</span>
@@ -64,8 +64,8 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="closeModal()"> Close</v-btn>
-          <v-btn color="blue darken-1" text @click="closeModal()"> Save</v-btn>
+          <v-btn color="blue darken-1" text @click="closeDialog()"> Close</v-btn>
+          <v-btn color="blue darken-1" text @click="closeDialog()"> Save</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -90,7 +90,7 @@ export default class CreatePrinterDialog extends Vue {
     this.$emit("update:show", newValue);
   }
 
-  closeModal() {
+  closeDialog() {
     this.mutableShow = false;
   }
 }

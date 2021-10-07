@@ -26,7 +26,7 @@ export default class Map extends Vue {
   }
 
   onChangeShowDialog(event: any) {
-    console.log("Dialog closed", event);
+    console.debug("Dialog closed", event);
   }
 }
 </script>
