@@ -138,26 +138,8 @@
 // https://www.digitalocean.com/community/tutorials/vuejs-typescript-class-components
 import Vue from "vue";
 import { Component, Prop } from "vue-property-decorator";
-import { extend, setInteractionMode, ValidationObserver, ValidationProvider } from "vee-validate";
+import { ValidationObserver, ValidationProvider } from "vee-validate";
 import { CreatePrinter, defaultCreatePrinter } from "@/models/printers/crud/create-printer.model";
-import { digits, max, required } from "vee-validate/dist/rules";
-
-setInteractionMode("eager");
-
-extend("digits", {
-  ...digits,
-  message: "{_field_} needs to be {length} digits. ({_value_})"
-});
-
-extend("required", {
-  ...required,
-  message: "{_field_} can not be empty"
-});
-
-extend("max", {
-  ...max,
-  message: "{_field_} may not be greater than {length} characters"
-});
 
 @Component({
   components: {

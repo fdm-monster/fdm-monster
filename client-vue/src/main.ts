@@ -9,6 +9,7 @@ import VueAxios from "vue-axios";
 import VueSSE from "vue-sse";
 import VueBus from "vue-bus";
 import { apiBase } from "@/backend/base.service";
+import { configureVeeValidate } from "@/plugins/veevalidate";
 
 Vue.config.productionTip = false;
 // Http Client
@@ -21,6 +22,9 @@ Vue.use(VueSSE, {
   polyfill: true,
   url: apiBase + "/api/printer/sse"
 });
+
+configureVeeValidate();
+
 Vue.config.errorHandler = (err: Error, vm: Vue, info: string) => {
   console.log("Global Error captured", err, vm, info);
 };
