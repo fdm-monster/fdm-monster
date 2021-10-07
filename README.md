@@ -13,8 +13,8 @@ Note: our aim is to support all kinds of 3D Printer (FDM, resin) API's with a pl
 
 This server is currently not yet released, so give it a star ⭐and be the first to experience it! 
 
-#### Last finished: server and UI error handling improvement
-#### Current work: implementing printer actions and file management
+#### Last finished: file upload API, group management API and printer creation UI
+#### Current work: printer file management UI, printer setting management
 
 ## Development [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/davidzwa/3d-print-farm/graphs/commit-activity) ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/davidzwa/3d-print-farm/Node.js%20CI/development) [![GitHub license](https://img.shields.io/github/license/davidzwa/3d-print-farm)](https://github.com/davidzwa/3d-print-farm/blob/master/LICENSE.txt)
 
