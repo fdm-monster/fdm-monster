@@ -1,6 +1,6 @@
 <template>
   <v-row justify="center">
-    <v-dialog v-model="mutableShow" max-width="600px" persistent @keydown.esc="closeDialog()">
+    <v-dialog v-model="mutableShow" max-width="600px" persistent>
       <!--      <template v-slot:activator="{ on, attrs }">-->
       <!--        <v-btn v-bind="attrs" v-on="on" color="primary" dark> Open Dialog</v-btn>-->
       <!--      </template>-->
@@ -133,6 +133,14 @@ export default class CreatePrinterDialog extends Vue {
     validationObserver: InstanceType<typeof ValidationObserver>;
   };
 
+  created() {
+    window.addEventListener("keydown", (e) => {
+      if (e.key == "Escape") {
+        this.closeDialog();
+      }
+    });
+  }
+
   get mutableShow() {
     // https://forum.vuejs.org/t/update-data-when-prop-changes-data-derived-from-prop/1517/27
     return this.show;
@@ -150,6 +158,9 @@ export default class CreatePrinterDialog extends Vue {
     const result = await this.$refs.validationObserver.validate();
 
     if (!result) return;
+
+    console.log(this.formData);
+    // await this.$store.dispatch(ACTIONS.createPrinter, this.formData)
   }
 
   clear() {

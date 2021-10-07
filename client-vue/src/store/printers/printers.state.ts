@@ -12,6 +12,7 @@ export interface PrintersStateInterface {
 }
 
 export const MUTATIONS = {
+  createPrinter: "createPrinter",
   savePrinters: "savePrinters",
   savePrinterFiles: "savePrinterFiles",
   deletePrinterFile: "deletePrinterFile"
@@ -23,6 +24,10 @@ export const printersState: StoreOptions<StateInterface> = {
     lastUpdated: undefined
   },
   mutations: {
+    [MUTATIONS.createPrinter]: (state, printer: Printer) => {
+      state.printers.push(printer);
+      state.printers.sort((a, b) => (a.sortIndex > b.sortIndex ? 1 : -1));
+    },
     [MUTATIONS.savePrinters]: (state, printers: Printer[]) => {
       state.printers = printers;
       state.lastUpdated = Date.now();
@@ -61,6 +66,13 @@ export const printersState: StoreOptions<StateInterface> = {
     lastUpdated: (state) => state.lastUpdated
   },
   actions: {
+    [ACTIONS.createPrinter]: async ({ commit }, newPrinter) => {
+      const data = await PrintersService.createPrinter(newPrinter);
+
+      commit(MUTATIONS.createPrinter, data);
+
+      return newPrinter;
+    },
     [ACTIONS.savePrinters]: ({ commit }, newPrinters) => {
       commit(MUTATIONS.savePrinters, newPrinters);
 
