@@ -5,22 +5,28 @@ import { StateInterface } from "@/store/state.interface";
 import { ACTIONS } from "@/store/printers/printers.actions";
 import { PrinterFilesService } from "@/backend";
 import { MultiResponse } from "@/models/api/status-response.model";
+import { PrinterGroup } from "@/models/printers/printer-group.model";
+import { PrinterGroupsService } from "@/backend/printer-groups.service";
 
 export interface PrintersStateInterface {
   printers: Printer[];
+  printerGroups: PrinterGroup[];
   lastUpdated?: number;
 }
 
 export const MUTATIONS = {
   createPrinter: "createPrinter",
   savePrinters: "savePrinters",
+  loadPrinterGroups: "loadPrinterGroups",
   savePrinterFiles: "savePrinterFiles",
-  deletePrinterFile: "deletePrinterFile"
+  deletePrinterFile: "deletePrinterFile",
+  savePrinterGroups: "savePrinterGroups"
 };
 
 export const printersState: StoreOptions<StateInterface> = {
   state: {
     printers: [],
+    printerGroups: [],
     lastUpdated: undefined
   },
   mutations: {
@@ -30,6 +36,10 @@ export const printersState: StoreOptions<StateInterface> = {
     },
     [MUTATIONS.savePrinters]: (state, printers: Printer[]) => {
       state.printers = printers;
+      state.lastUpdated = Date.now();
+    },
+    [MUTATIONS.savePrinterGroups]: (state, groups: PrinterGroup[]) => {
+      state.printerGroups = groups;
       state.lastUpdated = Date.now();
     },
     [MUTATIONS.savePrinterFiles]: (state: StateInterface, { printerId, files }) => {
@@ -85,7 +95,14 @@ export const printersState: StoreOptions<StateInterface> = {
 
       return data;
     },
-    [ACTIONS.getPrinterFiles]: async ({ commit }, { printerId, recursive }) => {
+    [ACTIONS.loadPrinterGroups]: async ({ commit }) => {
+      const data = await PrinterGroupsService.getGroups();
+
+      commit(MUTATIONS.savePrinterGroups, data);
+
+      return data;
+    },
+    [ACTIONS.loadPrinterFiles]: async ({ commit }, { printerId, recursive }) => {
       const data = await PrinterFilesService.getFiles(printerId, recursive);
 
       commit(MUTATIONS.savePrinterFiles, { printerId, files: data });

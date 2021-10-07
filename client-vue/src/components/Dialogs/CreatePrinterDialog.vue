@@ -43,8 +43,22 @@
                     <v-text-field
                       v-model="formData.printerHostName"
                       :error-messages="errors"
-                      hint="Examples: 'my.printer.com' or '192.x.x.x'"
+                      hint="Examples: 'my.printer.com', 'localhost' or '192.x.x.x'"
                       label="IP/Host*"
+                    ></v-text-field>
+                  </validation-provider>
+                </v-col>
+                <v-col cols="12" md="6">
+                  <validation-provider
+                    v-slot="{ errors }"
+                    name="Host Port"
+                    rules="required|integer|max:65535"
+                  >
+                    <v-text-field
+                      v-model="formData.printerHostPort"
+                      :error-messages="errors"
+                      hint="Examples: '80', '443' or '5050'"
+                      label="Host Port*"
                     ></v-text-field>
                   </validation-provider>
                 </v-col>
@@ -54,6 +68,8 @@
                       v-model="formData.enabled"
                       :error-messages="errors"
                       label="Enabled*"
+                      hint="Disabling makes the printer passive"
+                      persistent-hint
                       required
                     ></v-checkbox>
                   </validation-provider>
@@ -62,8 +78,9 @@
                   <validation-provider v-slot="{ errors }" :rules="apiKeyRules" name="ApiKey">
                     <v-text-field
                       v-model="formData.apiKey"
+                      :counter="apiKeyRules.length"
                       :error-messages="errors"
-                      hint="Global API Keys will be rejected"
+                      hint="User or Application Key only (Global API key fails)"
                       label="API Key*"
                       persistent-hint
                       required
@@ -146,6 +163,8 @@ import { ValidationObserver, ValidationProvider } from "vee-validate";
 import { CreatePrinter, defaultCreatePrinter, PreCreatePrinter } from "@/models/printers/crud/create-printer.model";
 import { ACTIONS } from "@/store/printers/printers.actions";
 import { apiKeyLength } from "@/constants/validation.constants";
+import { Action } from "vuex-class";
+import { PrinterGroup } from "@/models/printers/printer-group.model";
 
 @Component({
   components: {
@@ -155,6 +174,8 @@ import { apiKeyLength } from "@/constants/validation.constants";
 })
 export default class CreatePrinterDialog extends Vue {
   @Prop(Boolean) show: boolean;
+  @Action loadPrinterGroups: () => Promise<PrinterGroup[]>;
+
   formData: PreCreatePrinter = { ...defaultCreatePrinter };
   $refs!: {
     validationObserver: InstanceType<typeof ValidationObserver>;
@@ -171,12 +192,14 @@ export default class CreatePrinterDialog extends Vue {
     this.$emit("update:show", newValue);
   }
 
-  created() {
+  async created() {
     window.addEventListener("keydown", (e) => {
       if (e.key == "Escape") {
         this.closeDialog();
       }
     });
+
+    await this.loadPrinterGroups();
   }
 
   testPrinter() {
@@ -202,9 +225,9 @@ export default class CreatePrinterDialog extends Vue {
   private transformFormData() {
     let modifiedData: any = { ...this.formData };
 
-    const { printerHostPrefix, websocketPrefix, printerHostName } = this.formData;
-    const printerURL = new URL(`${printerHostPrefix}://${printerHostName}`);
-    const webSocketURL = new URL(`${websocketPrefix}://${printerHostName}`);
+    const { printerHostPrefix, websocketPrefix, printerHostName, printerHostPort } = this.formData;
+    const printerURL = new URL(`${printerHostPrefix}://${printerHostName}:${printerHostPort}`);
+    const webSocketURL = new URL(`${websocketPrefix}://${printerHostName}:${printerHostPort}`);
 
     delete modifiedData.printerHostName;
     delete modifiedData.printerHostPrefix;

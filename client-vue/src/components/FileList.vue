@@ -32,7 +32,7 @@ export default class FileList extends Vue {
   @Prop() printerId;
 
   async getFiles() {
-    this.fileList.files = await this.$store.dispatch(ACTIONS.getPrinterFiles, {
+    this.fileList.files = await this.$store.dispatch(ACTIONS.loadPrinterFiles, {
       printerId: this.printerId,
       recursive: false
     });

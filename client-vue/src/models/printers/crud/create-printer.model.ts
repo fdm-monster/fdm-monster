@@ -3,6 +3,7 @@ import { PrinterGroup } from "@/models/printers/printer-group.model";
 export const defaultCreatePrinter: PreCreatePrinter = {
   printerName: "",
   printerHostPrefix: "http",
+  printerHostPort: 80,
   websocketPrefix: "ws",
   printerHostName: "",
   sortIndex: 0,
@@ -22,6 +23,7 @@ export interface PreCreatePrinter {
   websocketPrefix: "ws" | "wss";
   printerHostPrefix: "http" | "https";
   printerHostName: string;
+  printerHostPort: number;
 
   apiKey: string;
   groups: PrinterGroup[];
