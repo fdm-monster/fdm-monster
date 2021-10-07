@@ -49,18 +49,6 @@
                   </validation-provider>
                 </v-col>
                 <v-col cols="12" md="6">
-                  <validation-provider v-slot="{ errors }" name="ApiKey">
-                    <v-text-field
-                      v-model="formData.apiKey"
-                      :error-messages="errors"
-                      hint="Global API Keys will be rejected!"
-                      label="API Key*"
-                      persistent-hint
-                      required
-                    ></v-text-field>
-                  </validation-provider>
-                </v-col>
-                <v-col cols="12" md="6">
                   <validation-provider v-slot="{ errors }" name="Enabled">
                     <v-checkbox
                       v-model="formData.enabled"
@@ -68,6 +56,18 @@
                       label="Enabled*"
                       required
                     ></v-checkbox>
+                  </validation-provider>
+                </v-col>
+                <v-col cols="12" md="12">
+                  <validation-provider v-slot="{ errors }" :rules="apiKeyRules" name="ApiKey">
+                    <v-text-field
+                      v-model="formData.apiKey"
+                      :error-messages="errors"
+                      hint="Global API Keys will be rejected"
+                      label="API Key*"
+                      persistent-hint
+                      required
+                    ></v-text-field>
                   </validation-provider>
                 </v-col>
               </v-row>
@@ -145,6 +145,7 @@ import { Component, Prop } from "vue-property-decorator";
 import { ValidationObserver, ValidationProvider } from "vee-validate";
 import { CreatePrinter, defaultCreatePrinter, PreCreatePrinter } from "@/models/printers/crud/create-printer.model";
 import { ACTIONS } from "@/store/printers/printers.actions";
+import { apiKeyLength } from "@/constants/validation.constants";
 
 @Component({
   components: {
@@ -158,6 +159,8 @@ export default class CreatePrinterDialog extends Vue {
   $refs!: {
     validationObserver: InstanceType<typeof ValidationObserver>;
   };
+
+  apiKeyRules = { required: true, length: apiKeyLength };
 
   get mutableShow() {
     // https://forum.vuejs.org/t/update-data-when-prop-changes-data-derived-from-prop/1517/27
@@ -196,10 +199,10 @@ export default class CreatePrinterDialog extends Vue {
     // this.$refs.observer.reset();
   }
 
-  private transformFormData(): CreatePrinter {
-    let modifiedData = { ...this.formData };
+  private transformFormData() {
+    let modifiedData: any = { ...this.formData };
 
-    const { printerHostPrefix, websocketPrefix, printerHostName } = modifiedData;
+    const { printerHostPrefix, websocketPrefix, printerHostName } = this.formData;
     const printerURL = new URL(`${printerHostPrefix}://${printerHostName}`);
     const webSocketURL = new URL(`${websocketPrefix}://${printerHostName}`);
 
