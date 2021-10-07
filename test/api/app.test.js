@@ -5,15 +5,12 @@ const supertest = require("supertest");
 const { AppConstants } = require("../../server/app.constants");
 const { setupTestApp } = require("../../server/app-test");
 const { expectInvalidResponse, expectOkResponse } = require("../extensions");
-const PrinterGroup = require("../../server/models/PrinterGroup");
+const Alert = require("../../server/models/Alerts");
 
 let request;
 
-const printerGroupsRoute = AppConstants.apiRoute + "/printer-groups";
-const getRoute = printerGroupsRoute;
-const deleteRoute = printerGroupsRoute;
-const createRoute = printerGroupsRoute;
-const updateRoute = printerGroupsRoute;
+const welcomeRoute = "/";
+const getRoute = welcomeRoute;
 
 beforeAll(async () => {
   await dbHandler.connect();
@@ -23,14 +20,14 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  PrinterGroup.deleteMany({});
+  Alert.deleteMany({});
 });
 
-describe("PrinterGroupsController", () => {
-  it("should return empty printer group list", async function () {
+describe("AppController", () => {
+  it("should return welcome", async function () {
     const response = await request.get(getRoute).send();
 
-    expect(response.body).toMatchObject([]);
+    expect(response.body).toMatchObject({ message: "Login not required. Please load UI instead." });
 
     expectOkResponse(response);
   });
