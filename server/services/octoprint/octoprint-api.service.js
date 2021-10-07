@@ -177,8 +177,7 @@ class OctoprintApiService {
     const formData = new FormData();
 
     fileBuffers.forEach((b) => {
-      formData.append("file", b.buffer);
-      formData.append("filename", b.originalname);
+      formData.append("file", b.buffer, { filename: b.originalname });
     });
 
     try {
@@ -193,9 +192,7 @@ class OctoprintApiService {
 
       return processResponse(response, responseOptions);
     } catch (e) {
-      console.log(e);
-
-      return {};
+      return { error: true, success: false };
     }
   }
 
