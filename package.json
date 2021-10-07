@@ -105,7 +105,14 @@
   "nodemonConfig": {
     "verbose": false,
     "ignore": [
+      ".github/*",
+      ".docs/*",
+      "./coverage/*",
       "logs/*",
+      "test/*",
+      "images/*",
+      "views/*",
+      "docker/*",
       "client-vue/*"
     ],
     "delay": 2000

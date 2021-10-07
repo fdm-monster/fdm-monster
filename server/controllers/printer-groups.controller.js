@@ -8,10 +8,10 @@ class PrinterGroupsController {
 
   #logger;
 
-  constructor({ printerService, printerGroupService, loggerF }) {
+  constructor({ printerService, printerGroupService, loggerFactory }) {
     this.#printerService = printerService;
     this.#printerGroupService = printerGroupService;
-    this.#logger = loggerF(PrinterGroupsController.name);
+    this.#logger = loggerFactory(PrinterGroupsController.name);
   }
 
   async list(req, res) {
