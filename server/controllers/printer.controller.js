@@ -1,6 +1,5 @@
 const { ensureAuthenticated } = require("../middleware/auth");
 const { createController } = require("awilix-express");
-const Logger = require("../handlers/logger.js");
 const { validateMiddleware, validateInput } = require("../handlers/validators");
 const {
   updateSortIndexRules,
@@ -24,17 +23,20 @@ class PrinterController {
   #sseHandler;
   #sseTask;
 
-  #logger = new Logger("Server-API");
+  #logger;
 
   constructor({
     printersStore,
     connectionLogsCache,
     printerSseHandler,
     printerSseTask,
+    loggerFactory,
     octoPrintApiService,
     jobsCache,
     fileCache
   }) {
+    this.#logger = loggerFactory("Server-API");
+
     this.#printersStore = printersStore;
     this.#jobsCache = jobsCache;
     this.#connectionLogsCache = connectionLogsCache;
