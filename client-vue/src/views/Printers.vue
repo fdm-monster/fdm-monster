@@ -15,7 +15,7 @@
 
     <v-data-table
       :expanded.sync="expanded"
-      :headers="dessertHeaders"
+      :headers="tableHeaders"
       :items="printers"
       :search="search"
       :single-expand="true"
@@ -125,7 +125,7 @@ export default class Printers extends Vue {
   search = "";
   expanded = [];
   singleExpand = true;
-  dessertHeaders = [
+  tableHeaders = [
     {
       text: "Order",
       align: "start",

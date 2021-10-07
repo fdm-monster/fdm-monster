@@ -4,7 +4,7 @@
       Create Printer
     </v-btn>
     <PrinterGrid />
-    {{ showDialog }}
+
     <CreatePrinterDialog :show.sync="showDialog" v-on:update:show="onChangeShowDialog($event)" />
   </v-container>
 </template>
