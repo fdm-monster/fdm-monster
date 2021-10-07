@@ -4,7 +4,7 @@
       <!--      <template v-slot:activator="{ on, attrs }">-->
       <!--        <v-btn v-bind="attrs" v-on="on" color="primary" dark> Open Dialog</v-btn>-->
       <!--      </template>-->
-      <validation-observer ref="observer" v-slot="{ invalid }">
+      <validation-observer ref="validationObserver" v-slot="{ invalid }">
         <v-card>
           <v-card-title>
             <span class="text-h5">New Printer</span>
@@ -23,13 +23,26 @@
                   </validation-provider>
                 </v-col>
                 <v-col cols="12" md="6">
-                  <v-select :items="['asd', '123']" label="Group(s)" multiple required></v-select>
+                  <validation-provider v-slot="{ errors }" name="Groups">
+                    <v-select
+                      v-model="formData.groups"
+                      :error-messages="errors"
+                      :items="['asd', '123']"
+                      label="Group(s)"
+                      multiple
+                      required
+                    ></v-select>
+                  </validation-provider>
                 </v-col>
                 <v-col cols="12" md="6">
-                  <v-text-field
-                    hint="Examples: 'my.printer.com' or '192.x.x.x'"
-                    label="IP/Host*"
-                  ></v-text-field>
+                  <validation-provider v-slot="{ errors }" name="PrinterHostName">
+                    <v-text-field
+                      v-model="formData.printerHostName"
+                      :error-messages="errors"
+                      hint="Examples: 'my.printer.com' or '192.x.x.x'"
+                      label="IP/Host*"
+                    ></v-text-field>
+                  </validation-provider>
                 </v-col>
                 <v-col cols="12" md="6">
                   <v-text-field
@@ -68,15 +81,13 @@
                 </v-expansion-panel>
               </v-expansion-panels>
             </v-container>
-            <em class="red--text">* indicates required field</em>
           </v-card-text>
           <v-card-actions>
+            <em class="red--text">* indicates required field</em>
             <v-spacer></v-spacer>
             <v-btn text @click="closeDialog()"> Close</v-btn>
             <v-btn color="warning" text @click="testPrinter()">Test</v-btn>
-            <v-btn :disabled="invalid" color="blue darken-1" text @click="closeDialog()"
-              >Save
-            </v-btn>
+            <v-btn :disabled="invalid" color="blue darken-1" text @click="submit()">Save</v-btn>
           </v-card-actions>
         </v-card>
       </validation-observer>
@@ -118,6 +129,9 @@ extend("max", {
 export default class CreatePrinterDialog extends Vue {
   @Prop(Boolean) show: boolean;
   formData: CreatePrinter = { ...defaultCreatePrinter };
+  $refs!: {
+    validationObserver: InstanceType<typeof ValidationObserver>;
+  };
 
   get mutableShow() {
     // https://forum.vuejs.org/t/update-data-when-prop-changes-data-derived-from-prop/1517/27
@@ -128,21 +142,23 @@ export default class CreatePrinterDialog extends Vue {
     this.$emit("update:show", newValue);
   }
 
-  closeDialog() {
-    this.mutableShow = false;
-  }
-
   testPrinter() {
     // console.log(this.$refs.printerCreateForm.validate());
   }
 
-  submit() {
-    // this.$refs.observer.validate();
+  async submit() {
+    const result = await this.$refs.validationObserver.validate();
+
+    if (!result) return;
   }
 
   clear() {
     this.formData = { ...defaultCreatePrinter };
     // this.$refs.observer.reset();
+  }
+
+  private closeDialog() {
+    this.mutableShow = false;
   }
 }
 </script>

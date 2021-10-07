@@ -1,15 +1,16 @@
 import { PrinterGroup } from "@/models/printers/printer-group.model";
 
 export const defaultCreatePrinter: CreatePrinter = {
+  printerName: "",
+  printerHostPrefix: "http",
+  websocketPrefix: "ws",
+  printerHostName: "",
+  sortIndex: 0,
   apiKey: "",
   display: true,
   enabled: false,
   groups: [],
-  printerName: "",
-  printerURL: "",
-  sortIndex: 0,
-  stepSize: 1,
-  webSocketURL: ""
+  stepSize: 1
 };
 
 export interface CreatePrinter {
@@ -17,9 +18,12 @@ export interface CreatePrinter {
   display: boolean;
   sortIndex: number;
   printerName: string;
-  webSocketURL: string;
+
+  websocketPrefix: "ws" | "wss";
+  printerHostPrefix: "http" | "https";
+  printerHostName: string;
+
   apiKey: string;
-  printerURL: string;
   groups: PrinterGroup[];
 
   // Baby-stepping
