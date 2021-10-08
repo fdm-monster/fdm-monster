@@ -19,12 +19,12 @@ class PrintersStore {
   #logger = new Logger("Server-PrintersStore");
 
   constructor({
-                settingsStore,
-                printerTickerStore,
-                printerStateFactory,
-                eventEmitter2,
-                printerService
-              }) {
+    settingsStore,
+    printerTickerStore,
+    printerStateFactory,
+    eventEmitter2,
+    printerService
+  }) {
     this.#settingsStore = settingsStore;
     this.#printerService = printerService;
     this.#printerTickerStore = printerTickerStore;
@@ -277,7 +277,7 @@ class PrintersStore {
 
     const newPrinterDoc = { _doc: validatedData };
     this.#logger.info(
-      `Stored test Printer: ${newPrinterDoc.printerURL} with ID ${newPrinterDoc.correlationToken}`
+      `Stored test Printer: ${validatedData.printerURL} with ID ${validatedData.correlationToken}`
     );
 
     const newPrinterState = await this.#printerStateFactory.create(newPrinterDoc, true);

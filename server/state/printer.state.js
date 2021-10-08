@@ -93,6 +93,9 @@ class PrinterState {
   async tearDown() {
     this.resetWebSocketAdapter();
     this.#markedForRemoval = true;
+
+    if (this.isTest) return;
+
     this.#fileCache.purgePrinterId(this.#id);
     this.#jobsCache.purgePrinterId(this.#id);
   }

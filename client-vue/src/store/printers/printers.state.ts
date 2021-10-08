@@ -22,7 +22,8 @@ export const MUTATIONS = {
   savePrinterFiles: "savePrinterFiles",
   deletePrinterFile: "deletePrinterFile",
   savePrinterGroups: "savePrinterGroups",
-  createTestPrinter: "createTestPrinter"
+  createTestPrinter: "createTestPrinter",
+  deletePrinter: "deletePrinter"
 };
 
 export const printersState: StoreOptions<StateInterface> = {
@@ -40,6 +41,15 @@ export const printersState: StoreOptions<StateInterface> = {
     [MUTATIONS.createTestPrinter]: (state, printer: Printer) => {
       state.testPrinters.push(printer);
       state.lastUpdated = Date.now();
+    },
+    [MUTATIONS.deletePrinter]: (state: StateInterface, printerId) => {
+      const printerIndex = state.printers.findIndex((p: Printer) => p.id === printerId);
+
+      if (printerIndex !== -1) {
+        state.printers.splice(printerIndex, 1);
+      } else {
+        console.warn("Printer was not purged as it did not occur in state", printerId);
+      }
     },
     [MUTATIONS.savePrinters]: (state, printers: Printer[]) => {
       state.printers = printers;
@@ -106,6 +116,13 @@ export const printersState: StoreOptions<StateInterface> = {
       const data = await PrintersService.getPrinters();
 
       commit(MUTATIONS.savePrinters, data);
+
+      return data;
+    },
+    [ACTIONS.deletePrinter]: async ({ commit }, printerId) => {
+      const data = await PrintersService.deletePrinter(printerId);
+
+      commit(MUTATIONS.deletePrinter, printerId);
 
       return data;
     },

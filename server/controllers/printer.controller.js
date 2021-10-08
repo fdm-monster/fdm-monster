@@ -78,7 +78,7 @@ class PrinterController {
     // As we dont generate a _id we generate a correlation token
     newPrinter.correlationToken = Math.random().toString(36).slice(2);
 
-    this.#logger.info("Testing printer", newPrinter);
+    this.#logger.info(`Testing printer with correlation token ${newPrinter.correlationToken}`);
 
     // Add printer with test=true
     const printerState = await this.#printersStore.setupTestPrinter(newPrinter);

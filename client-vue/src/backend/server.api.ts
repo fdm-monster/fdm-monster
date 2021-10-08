@@ -32,5 +32,6 @@ export class ServerApi {
   static testAlertScriptRoute = ServerApi.alertRoute + "/test-alert-script";
   static roomDataRoute = ServerApi.base + "/room-data";
 
-  static printerEnabledRoute = (id: string) => ServerApi.printerRoute + `/${id}/enabled`;
+  static getPrinterRoute = (id: string) => `${ServerApi.printerRoute}/${id}`;
+  static printerEnabledRoute = (id: string) => `${ServerApi.getPrinterRoute(id)}/enabled`;
 }

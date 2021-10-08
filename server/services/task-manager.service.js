@@ -145,7 +145,7 @@ class TaskManagerService {
    * @param taskID
    */
   scheduleDisabledJob(taskID) {
-    const taskState = this.#getTaskState(taskID);
+    const taskState = this.getTaskState(taskID);
     const schedulerOptions = taskState?.options;
     if (schedulerOptions?.disabled !== true) {
       throw new JobValidationException(
@@ -162,15 +162,17 @@ class TaskManagerService {
       throw new JobValidationException("Cant disable a job which is already disabled");
     }
 
-    this.#getTaskState(taskID).options.disabled = true;
+    const taskState = this.getTaskState(taskID);
+    taskState.options.disabled = true;
+    taskState.job.stop();
   }
 
   isTaskDisabled(taskID) {
-    return !!this.#getTaskState(taskID).options.disabled;
+    return !!this.getTaskState(taskID).options.disabled;
   }
 
   #scheduleEnabledPeriodicJob(taskID) {
-    const taskState = this.#getTaskState(taskID);
+    const taskState = this.getTaskState(taskID);
     if (!taskState?.timedTask || !taskState?.options) {
       throw new JobValidationException(
         `The requested task with ID ${taskID} was not registered properly ('timedTask' or 'options' missing).`
@@ -189,12 +191,13 @@ class TaskManagerService {
       );
       const job = new SimpleIntervalJob(schedulerOptions, timedTask);
       this.jobScheduler.addSimpleIntervalJob(job);
+      taskState.job = job;
     } else {
       this.#logger.info(`Task '${taskID}' was marked as disabled (deferred execution).`);
     }
   }
 
-  #getTaskState(taskID) {
+  getTaskState(taskID) {
     const taskState = this.taskStates[taskID];
     if (!taskState) {
       throw new JobValidationException(`The requested task with ID ${taskID} was not registered`);
@@ -203,7 +206,7 @@ class TaskManagerService {
   }
 
   runTimeoutTaskInstance(taskID, timeoutMs) {
-    const taskState = this.#getTaskState(taskID);
+    const taskState = this.getTaskState(taskID);
     this.#logger.info(`Running delayed task ${taskID} in ${timeoutMs}ms`);
     setTimeout(() => taskState.timedTask.execute(), timeoutMs, taskID);
   }
@@ -231,10 +234,6 @@ class TaskManagerService {
       this.#logger.info(`Task '${taskId}' first completion. Duration ${taskState.duration}ms`);
       taskState.firstCompletion = Date.now();
     }
-  }
-
-  getTaskState(taskId) {
-    return this.taskStates[taskId];
   }
 
   getErrorHandler(taskId) {
