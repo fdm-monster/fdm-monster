@@ -18,12 +18,12 @@ class PrintersStore {
   #logger = new Logger("Server-PrintersStore");
 
   constructor({
-                settingsStore,
-                printerTickerStore,
-                printerStateFactory,
-                eventEmitter2,
-                printerService
-              }) {
+    settingsStore,
+    printerTickerStore,
+    printerStateFactory,
+    eventEmitter2,
+    printerService
+  }) {
     this.#settingsStore = settingsStore;
     this.#printerService = printerService;
     this.#printerTickerStore = printerTickerStore;
@@ -75,10 +75,11 @@ class PrintersStore {
 
   /**
    * Return a mutable copy of all frozen printers states mapped to flat JSON
-   * @param {boolean} filterDisconnected printers marked by tearDown (disconnected) are be filtered
+   * @param {boolean} includeDisconnected printers marked by tearDown (disconnected) are be filtered
+   * @param isTest
    */
-  listPrintersFlat(filterDisconnected = true) {
-    return this.listPrinterStates(filterDisconnected)
+  listPrintersFlat(isTest = false, includeDisconnected = false) {
+    return this.listPrinterStates(isTest, includeDisconnected)
       .filter((s) => s.toFlat)
       .map((s) => s.toFlat());
   }
@@ -87,12 +88,15 @@ class PrintersStore {
    * List the prefetched printer states without mapping
    * We check and throw instead of loading proactively: more predictable and not async
    * @returns {*}
-   * @param {boolean} filterDisconnected printers marked by tearDown (disconnected) are be filtered
+   * @param includeDisconnected
+   * @param isTest takes complete preference over 'includeDisconnected'
    */
-  listPrinterStates(filterDisconnected = true) {
+  listPrinterStates(isTest = false, includeDisconnected = false) {
     this._validateState();
 
-    return this.#printerStates.filter((p) => (filterDisconnected || p.markForRemoval === false) && !p.isTest);
+    return this.#printerStates.filter(
+      (p) => !isTest ? (includeDisconnected || p.markForRemoval === false) : !!p.isTest
+    );
   }
 
   getPrinterCount() {

@@ -19,7 +19,12 @@ class PrinterSseTask {
   }
 
   async run() {
-    const sseData = this.#printersStore.listPrintersFlat();
+    const printerStates = this.#printersStore.listPrintersFlat();
+    const testPrinterStates = this.#printersStore.listPrintersFlat(true);
+    const sseData = {
+      printers: printerStates,
+      testPrinters: testPrinterStates
+    };
 
     const serializedData = AppConstants.jsonStringify
       ? JSON.stringify(sseData)

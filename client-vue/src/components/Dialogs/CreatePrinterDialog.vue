@@ -67,8 +67,8 @@
                     <v-checkbox
                       v-model="formData.enabled"
                       :error-messages="errors"
-                      label="Enabled*"
                       hint="Disabling makes the printer passive"
+                      label="Enabled*"
                       persistent-hint
                       required
                     ></v-checkbox>
@@ -146,7 +146,9 @@
             <em class="red--text">* indicates required field</em>
             <v-spacer></v-spacer>
             <v-btn text @click="closeDialog()"> Close</v-btn>
-            <v-btn color="warning" text @click="testPrinter()">Test connection</v-btn>
+            <v-btn :disabled="invalid" color="warning" text @click="testPrinter()"
+              >Test connection
+            </v-btn>
             <v-btn :disabled="invalid" color="blue darken-1" text @click="submit()">Save</v-btn>
           </v-card-actions>
         </v-card>
@@ -169,6 +171,8 @@ import { ACTIONS } from "@/store/printers/printers.actions";
 import { apiKeyLength } from "@/constants/validation.constants";
 import { Action } from "vuex-class";
 import { PrinterGroup } from "@/models/printers/printer-group.model";
+import { Printer } from "@/models/printers/printer.model";
+import { sseTestPrinterUpdate } from "@/event-bus/sse.events";
 
 @Component({
   components: {
@@ -207,13 +211,20 @@ export default class CreatePrinterDialog extends Vue {
   }
 
   async testPrinter() {
-    const result = await this.$refs.validationObserver.validate();
+    const validationResult = await this.$refs.validationObserver.validate();
 
-    if (!result) return;
+    if (!validationResult) return;
 
-    const newPrinterData = this.transformFormData();
+    const testPrinter = this.transformFormData();
 
-    await this.$store.dispatch(ACTIONS.createTestPrinter, newPrinterData);
+    const result: Printer = await this.$store.dispatch(ACTIONS.createTestPrinter, testPrinter);
+    if (!result.correlationToken) throw new Error("Test Printer CorrelationToken was empty.");
+
+    this.$bus.on(sseTestPrinterUpdate(result.correlationToken), this.onTestPrinterUpdate);
+  }
+
+  async onTestPrinterUpdate(payload: Printer) {
+    console.log(payload);
   }
 
   async submit() {

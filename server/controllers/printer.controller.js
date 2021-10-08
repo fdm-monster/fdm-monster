@@ -78,7 +78,7 @@ class PrinterController {
 
     // Add printer with test=true
     const printerState = await this.#printersStore.addPrinter(newPrinter, true);
-    res.send({ printerState: printerState.toFlat() });
+    res.send(printerState.toFlat());
   }
 
   async create(req, res) {
@@ -91,7 +91,7 @@ class PrinterController {
 
     // Has internal validation, but might add some here above as well
     const printerState = await this.#printersStore.addPrinter(newPrinter);
-    res.send({ printerState: printerState.toFlat() });
+    res.send(printerState.toFlat());
   }
 
   async list(req, res) {
