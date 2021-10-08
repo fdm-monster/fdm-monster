@@ -13,10 +13,12 @@ const { AppConstants } = require("../app.constants");
 const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
 const { NotImplementedException } = require("../exceptions/runtime.exceptions");
 const { idRules } = require("./validation/generic.validation");
+const DITokens = require("../container.tokens");
 
 class PrinterController {
   #printersStore;
   #jobsCache;
+  #taskManagerService;
   #connectionLogsCache;
   #octoPrintApiService;
   #fileCache;
@@ -29,6 +31,7 @@ class PrinterController {
     printersStore,
     connectionLogsCache,
     printerSseHandler,
+    taskManagerService,
     printerSseTask,
     loggerFactory,
     octoPrintApiService,
@@ -40,6 +43,7 @@ class PrinterController {
     this.#printersStore = printersStore;
     this.#jobsCache = jobsCache;
     this.#connectionLogsCache = connectionLogsCache;
+    this.#taskManagerService = taskManagerService;
     this.#octoPrintApiService = octoPrintApiService;
     this.#fileCache = fileCache;
     this.#sseHandler = printerSseHandler;
@@ -78,6 +82,8 @@ class PrinterController {
 
     // Add printer with test=true
     const printerState = await this.#printersStore.setupTestPrinter(newPrinter);
+
+    this.#taskManagerService.scheduleDisabledJob(DITokens.printerTestTask);
     res.send(printerState.toFlat());
   }
 
