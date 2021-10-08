@@ -95,7 +95,7 @@ class PrintersStore {
     this._validateState();
 
     return this.#printerStates.filter(
-      (p) => !isTest ? (includeDisconnected || p.markForRemoval === false) : !!p.isTest
+      (p) => !isTest ? (includeDisconnected || p.markForRemoval === false) && !p.isTest : p.isTest
     );
   }
 
