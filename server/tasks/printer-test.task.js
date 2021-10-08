@@ -1,4 +1,3 @@
-const { byteCount } = require("../utils/benchmark.util");
 const { PSTATE, MESSAGE } = require("../constants/state.constants");
 const HttpStatusCode = require("../constants/http-status-codes.constants");
 const OctoprintRxjsWebsocketAdapter = require("../services/octoprint/octoprint-rxjs-websocket.adapter");
@@ -19,13 +18,13 @@ class PrinterTestTask {
   #logger;
 
   constructor({
-    printersStore,
-    octoPrintApiService,
-    settingsStore,
-    taskManagerService,
-    loggerFactory,
-    printerSseHandler
-  }) {
+                printersStore,
+                octoPrintApiService,
+                settingsStore,
+                taskManagerService,
+                loggerFactory,
+                printerSseHandler
+              }) {
     this.#printersStore = printersStore;
     this.#settingsStore = settingsStore;
     this.#octoPrintService = octoPrintApiService;
@@ -60,15 +59,22 @@ class PrinterTestTask {
   /**
    * Update the UI with test status
    * @param testPrinterState
+   * @param progress
    * @returns {Promise<void>}
    */
-  async #sendStateProgress(testPrinterState) {
+  async #sendStateProgress(testPrinterState, progress) {
+    const { correlationToken, hostState, printerState, webSocketState } = testPrinterState?.toFlat();
     const sseData = {
-      testPrinter: testPrinterState?.toFlat()
+      testPrinter: {
+        correlationToken,
+        hostState,
+        printerState,
+        webSocketState
+      },
+      progress
     };
-    const serializedData = JSON.stringify(sseData);
-    const transportDataSize = byteCount(serializedData);
 
+    const serializedData = JSON.stringify(sseData);
     this.#printerSseHandler.send(serializedData);
   }
 
@@ -95,16 +101,19 @@ class PrinterTestTask {
       printerState.setHostState(PSTATE.Offline, MESSAGE.offline);
       printerState.setApiAccessibility(false, true, MESSAGE.retryingApiConnection);
 
-      return;
+      return await this.#sendStateProgress(printerState, { connected: false });
     }
+    return await this.#sendStateProgress(printerState, { connected: true });
 
     // API related errors
     if (errorCode === HttpStatusCode.BAD_REQUEST) {
       // Bug
       printerState.setHostState(PSTATE.NoAPI, MESSAGE.badRequest);
       printerState.setApiAccessibility(false, false, MESSAGE.badRequest);
-      return;
+
+      return await this.#sendStateProgress(printerState, { connected: true, api_ok: false });
     }
+    await this.#sendStateProgress(printerState, { connected: true, apiOk: true });
 
     // Response related errors
     const loginResponse = response.data;
@@ -112,15 +121,19 @@ class PrinterTestTask {
     if (isLoginResponseGlobal(loginResponse)) {
       printerState.setHostState(PSTATE.GlobalAPIKey, MESSAGE.globalAPIKeyDetected);
       printerState.setApiAccessibility(false, false, MESSAGE.globalAPIKeyDetected);
-      return;
+
+      return await this.#sendStateProgress(printerState, { connected: true, apiOk: true, apiKeyNotGlobal: false });
     }
+    await this.#sendStateProgress(printerState, { connected: true, apiOk: true, apiKeyNotGlobal: true });
 
     // Check for an name (defines connection state NoAPI) - undefined when apikey is wrong
     if (!loginResponse?.name) {
       printerState.setHostState(PSTATE.ApiKeyRejected, MESSAGE.apiKeyNotAccepted);
       printerState.setApiAccessibility(false, false, MESSAGE.apiKeyNotAccepted);
-      return;
+
+      return await this.#sendStateProgress(printerState, { connected: true, apiOk: true, apiKeyNotGlobal: true, apiKeyOk: false });
     }
+    await this.#sendStateProgress(printerState, { connected: true, apiOk: true, apiKeyNotGlobal: true, apiKeyOk: true });
 
     // Sanity check for login success (alt: could also check status code) - quite rare
     if (!loginResponse?.session) {
@@ -133,6 +146,8 @@ class PrinterTestTask {
     printerState.setApiAccessibility(true, true, null);
     printerState.resetWebSocketAdapter();
     printerState.bindWebSocketAdapter(OctoprintRxjsWebsocketAdapter);
+
+    await this.#sendStateProgress(printerState, { connected: true, apiOk: true, apiKeyNotGlobal: true, apiKeyOk: true, websocketBound: true });
 
     // Delaying or staggering this will speed up startup tasks - ~90 to 150ms per printer on non-congested (W)LAN
     printerState.connectAdapter();

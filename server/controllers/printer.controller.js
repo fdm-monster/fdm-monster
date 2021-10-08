@@ -26,15 +26,15 @@ class PrinterController {
   #logger;
 
   constructor({
-                printersStore,
-                connectionLogsCache,
-                printerSseHandler,
-                printerSseTask,
-                loggerFactory,
-                octoPrintApiService,
-                jobsCache,
-                fileCache
-              }) {
+    printersStore,
+    connectionLogsCache,
+    printerSseHandler,
+    printerSseTask,
+    loggerFactory,
+    octoPrintApiService,
+    jobsCache,
+    fileCache
+  }) {
     this.#logger = loggerFactory("Server-API");
 
     this.#printersStore = printersStore;
