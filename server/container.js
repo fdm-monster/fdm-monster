@@ -51,6 +51,7 @@ const DashboardStatisticsCache = require("./state/data/dashboard-statistics.cach
 const AlertService = require("./services/alert.service");
 const { asFunction, asClass, asValue, createContainer, InjectionMode } = require("awilix");
 const LoggerFactory = require("./handlers/logger-factory");
+const PrinterTestTask = require("./tasks/printer-test.task");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -64,7 +65,6 @@ function configureContainer() {
     serverVersion: asValue(
       process.env[AppConstants.VERSION_KEY] || AppConstants.defaultServerPageTitle
     ),
-    appConstants: asClass(AppConstants).singleton(),
     serverPageTitle: asValue(process.env[AppConstants.SERVER_SITE_TITLE_KEY]),
 
     // -- asFunction --
@@ -144,11 +144,13 @@ function configureContainer() {
     // Task bound to send on SSE Handler
     [DITokens.printerSseTask]: asClass(PrinterSseTask).singleton(),
     // Normal post-analysis operations (previously called cleaners)
-    printerFilesTask: asClass(PrinterFilesTask).singleton(),
+    [DITokens.printerFilesTask]: asClass(PrinterFilesTask).singleton(),
     // This task is a quick task (~100ms per printer)
-    printerWebsocketTask: asClass(PrinterWebsocketTask).singleton(),
+    [DITokens.printerWebsocketTask]: asClass(PrinterWebsocketTask).singleton(),
     // Task dependent on WS to fire - disabled at boot
-    [DITokens.printerSystemTask]: asClass(PrinterSystemTask).singleton()
+    [DITokens.printerSystemTask]: asClass(PrinterSystemTask).singleton(),
+    // Task dependent on test printer in store - disabled at boot
+    [DITokens.printerTestTask]: asClass(PrinterTestTask).singleton()
   });
 
   return container;

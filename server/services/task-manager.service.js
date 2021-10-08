@@ -157,6 +157,14 @@ class TaskManagerService {
     this.#scheduleEnabledPeriodicJob(taskID);
   }
 
+  disableJob(taskID) {
+    if (this.isTaskDisabled(taskID)) {
+      throw new JobValidationException("Cant disable a job which is already disabled");
+    }
+
+    this.#getTaskState(taskID).options.disabled = true;
+  }
+
   isTaskDisabled(taskID) {
     return !!this.#getTaskState(taskID).options.disabled;
   }

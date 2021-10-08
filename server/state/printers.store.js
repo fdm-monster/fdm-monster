@@ -85,8 +85,8 @@ class PrintersStore {
       .map((s) => s.toFlat());
   }
 
-  getTestPrinterFlat() {
-    return this.#testPrinterState?.toFlat();
+  getTestPrinter() {
+    return this.#testPrinterState;
   }
 
   /**
@@ -163,6 +163,12 @@ class PrintersStore {
 
     this.#logger.info(`Loaded ${this.#printerStates.length} printer states`);
     this.generatePrinterGroups();
+  }
+
+  async deleteTestPrinter() {
+    await this.#testPrinterState.tearDown();
+
+    this.#testPrinterState = undefined;
   }
 
   async deletePrinter(printerId) {
@@ -276,7 +282,7 @@ class PrintersStore {
 
     const newPrinterState = await this.#printerStateFactory.create(newPrinterDoc, true);
     if (this.#testPrinterState) {
-      await this.#testPrinterState.tearDown();
+      await this.deleteTestPrinter();
     }
 
     this.#testPrinterState = newPrinterState;

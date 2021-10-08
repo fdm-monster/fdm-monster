@@ -1,5 +1,3 @@
-const { stringify } = require("flatted");
-const { AppConstants } = require("../app.constants");
 const { byteCount } = require("../utils/benchmark.util");
 
 class PrinterSseTask {
@@ -20,15 +18,12 @@ class PrinterSseTask {
 
   async run() {
     const printerStates = this.#printersStore.listPrintersFlat();
-    const testPrinterState = this.#printersStore.getTestPrinterFlat();
+
     const sseData = {
       printers: printerStates,
-      testPrinter: testPrinterState
     };
 
-    const serializedData = AppConstants.jsonStringify
-      ? JSON.stringify(sseData)
-      : stringify(sseData);
+    const serializedData = JSON.stringify(sseData);
     const transportDataSize = byteCount(serializedData);
     this.updateAggregator(transportDataSize);
     this.#printerSseHandler.send(serializedData);
