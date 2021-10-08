@@ -10,6 +10,7 @@ import { PrinterGroupsService } from "@/backend/printer-groups.service";
 
 export interface PrintersStateInterface {
   printers: Printer[];
+  testPrinters: Printer[];
   printerGroups: PrinterGroup[];
   lastUpdated?: number;
 }
@@ -20,12 +21,14 @@ export const MUTATIONS = {
   loadPrinterGroups: "loadPrinterGroups",
   savePrinterFiles: "savePrinterFiles",
   deletePrinterFile: "deletePrinterFile",
-  savePrinterGroups: "savePrinterGroups"
+  savePrinterGroups: "savePrinterGroups",
+  createTestPrinter: "createTestPrinter"
 };
 
 export const printersState: StoreOptions<StateInterface> = {
   state: {
     printers: [],
+    testPrinters: [],
     printerGroups: [],
     lastUpdated: undefined
   },
@@ -33,6 +36,10 @@ export const printersState: StoreOptions<StateInterface> = {
     [MUTATIONS.createPrinter]: (state, printer: Printer) => {
       state.printers.push(printer);
       state.printers.sort((a, b) => (a.sortIndex > b.sortIndex ? 1 : -1));
+    },
+    [MUTATIONS.createTestPrinter]: (state, printer: Printer) => {
+      state.testPrinters.push(printer);
+      state.lastUpdated = Date.now();
     },
     [MUTATIONS.savePrinters]: (state, printers: Printer[]) => {
       state.printers = printers;
@@ -82,6 +89,13 @@ export const printersState: StoreOptions<StateInterface> = {
       commit(MUTATIONS.createPrinter, data);
 
       return newPrinter;
+    },
+    [ACTIONS.createTestPrinter]: async ({ commit }, newPrinter) => {
+      const data = await PrintersService.testConnection(newPrinter);
+
+      commit(MUTATIONS.createTestPrinter, data);
+
+      return data;
     },
     [ACTIONS.savePrinters]: ({ commit }, newPrinters) => {
       commit(MUTATIONS.savePrinters, newPrinters);

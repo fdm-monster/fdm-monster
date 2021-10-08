@@ -2,6 +2,7 @@ export class ServerApi {
   static base = "api";
   static amIAliveRoute = ServerApi.base + "/amialive";
   static printerRoute = ServerApi.base + "/printer";
+  static printerTestConnectionRoute = ServerApi.printerRoute + "/test-connection";
   static printerGroupsRoute = ServerApi.base + "/printer-groups";
   static printerFilesRoute = ServerApi.base + "/printer-files";
   static printerNetworkRoute = ServerApi.base + "/printer-network";

@@ -1,5 +1,5 @@
 import { extend, setInteractionMode } from "vee-validate";
-import { digits, length, max, required } from "vee-validate/dist/rules";
+import { digits, integer, length, max, required } from "vee-validate/dist/rules";
 import validator from "validator";
 
 export function configureVeeValidate() {
@@ -18,6 +18,11 @@ export function configureVeeValidate() {
   extend("length", {
     ...length,
     message: "{_field_} must be of length {length}"
+  });
+
+  extend("integer", {
+    ...integer,
+    message: "{_field_} must be an integer"
   });
 
   extend("ip_or_fqdn", (value) => {

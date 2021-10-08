@@ -3,6 +3,8 @@ const { getFilterDefaults } = require("../constants/state.constants");
 const Logger = require("../handlers/logger.js");
 const { NotImplementedException } = require("../exceptions/runtime.exceptions");
 const { NotFoundException } = require("../exceptions/runtime.exceptions");
+const { validateInput } = require("../handlers/validators");
+const { createTestPrinterRules } = require("./validation/create-test-printer.validation");
 
 class PrintersStore {
   #settingsStore;
@@ -16,12 +18,12 @@ class PrintersStore {
   #logger = new Logger("Server-PrintersStore");
 
   constructor({
-    settingsStore,
-    printerTickerStore,
-    printerStateFactory,
-    eventEmitter2,
-    printerService
-  }) {
+                settingsStore,
+                printerTickerStore,
+                printerStateFactory,
+                eventEmitter2,
+                printerService
+              }) {
     this.#settingsStore = settingsStore;
     this.#printerService = printerService;
     this.#printerTickerStore = printerTickerStore;
@@ -90,7 +92,7 @@ class PrintersStore {
   listPrinterStates(filterDisconnected = true) {
     this._validateState();
 
-    return this.#printerStates.filter((p) => filterDisconnected || p.markForRemoval === false);
+    return this.#printerStates.filter((p) => (filterDisconnected || p.markForRemoval === false) && !p.isTest);
   }
 
   getPrinterCount() {
@@ -236,17 +238,27 @@ class PrintersStore {
     this.#printerTickerStore.addIssue(printer, message, state);
   }
 
-  async addPrinter(printer) {
+  async addPrinter(printer, isTest = false) {
     this._validateState();
 
-    this.#logger.info("Saving new printer to database");
-    const newPrinterDoc = await this.#printerService.create(printer);
+    let newPrinterDoc;
+    if (!isTest) {
+      this.#logger.info("Saving new printer to database");
+      newPrinterDoc = await this.#printerService.create(printer);
+      this.#logger.info(
+        `Saved new Printer: ${newPrinterDoc.printerURL} with ID ${newPrinterDoc._id}`
+      );
+    } else {
+      const validatedData = await validateInput(printer, createTestPrinterRules);
+      validatedData.enabled = true;
+      newPrinterDoc = { _doc: validatedData };
 
-    this.#logger.info(
-      `Saved new Printer: ${newPrinterDoc.printerURL} with ID ${newPrinterDoc._id}`
-    );
+      this.#logger.info(
+        `Stored test Printer: ${newPrinterDoc.printerURL} with ID ${newPrinterDoc.correlationToken}`
+      );
+    }
 
-    const newPrinterState = await this.#printerStateFactory.create(newPrinterDoc);
+    const newPrinterState = await this.#printerStateFactory.create(newPrinterDoc, isTest);
     this.#printerStates.push(newPrinterState);
 
     // The next 'round' will involve setting up a websocket for this printer

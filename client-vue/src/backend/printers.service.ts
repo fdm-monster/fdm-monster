@@ -15,6 +15,12 @@ export class PrintersService extends BaseService {
     return await this.postApi(path, printer);
   }
 
+  static async testConnection(printer: Printer) {
+    const path = ServerApi.printerTestConnectionRoute;
+
+    return await this.postApi(path, printer);
+  }
+
   static async toggleEnabled(printerId: string, enabled: boolean) {
     const path = ServerApi.printerEnabledRoute(printerId);
 

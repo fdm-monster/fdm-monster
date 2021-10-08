@@ -146,7 +146,7 @@
             <em class="red--text">* indicates required field</em>
             <v-spacer></v-spacer>
             <v-btn text @click="closeDialog()"> Close</v-btn>
-            <v-btn color="warning" text @click="testPrinter()">Test</v-btn>
+            <v-btn color="warning" text @click="testPrinter()">Test connection</v-btn>
             <v-btn :disabled="invalid" color="blue darken-1" text @click="submit()">Save</v-btn>
           </v-card-actions>
         </v-card>
@@ -160,7 +160,11 @@
 import Vue from "vue";
 import { Component, Prop } from "vue-property-decorator";
 import { ValidationObserver, ValidationProvider } from "vee-validate";
-import { CreatePrinter, defaultCreatePrinter, PreCreatePrinter } from "@/models/printers/crud/create-printer.model";
+import {
+  CreatePrinter,
+  defaultCreatePrinter,
+  PreCreatePrinter
+} from "@/models/printers/crud/create-printer.model";
 import { ACTIONS } from "@/store/printers/printers.actions";
 import { apiKeyLength } from "@/constants/validation.constants";
 import { Action } from "vuex-class";
@@ -202,8 +206,14 @@ export default class CreatePrinterDialog extends Vue {
     await this.loadPrinterGroups();
   }
 
-  testPrinter() {
-    // console.log(this.$refs.printerCreateForm.validate());
+  async testPrinter() {
+    const result = await this.$refs.validationObserver.validate();
+
+    if (!result) return;
+
+    const newPrinterData = this.transformFormData();
+
+    await this.$store.dispatch(ACTIONS.createTestPrinter, newPrinterData);
   }
 
   async submit() {
@@ -213,7 +223,6 @@ export default class CreatePrinterDialog extends Vue {
 
     const newPrinterData = this.transformFormData();
 
-    console.log(newPrinterData);
     await this.$store.dispatch(ACTIONS.createPrinter, newPrinterData);
   }
 

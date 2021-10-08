@@ -26,15 +26,15 @@ class PrinterController {
   #logger;
 
   constructor({
-    printersStore,
-    connectionLogsCache,
-    printerSseHandler,
-    printerSseTask,
-    loggerFactory,
-    octoPrintApiService,
-    jobsCache,
-    fileCache
-  }) {
+                printersStore,
+                connectionLogsCache,
+                printerSseHandler,
+                printerSseTask,
+                loggerFactory,
+                octoPrintApiService,
+                jobsCache,
+                fileCache
+              }) {
     this.#logger = loggerFactory("Server-API");
 
     this.#printersStore = printersStore;
@@ -65,11 +65,28 @@ class PrinterController {
     res.send(foundPrinter);
   }
 
+  async testConnection(req, res) {
+    const newPrinter = req.body;
+    if (!newPrinter.webSocketURL) {
+      newPrinter.webSocketURL = convertHttpUrlToWebsocket(newPrinter.printerURL);
+    }
+
+    // As we dont generate a _id we generate a correlation token
+    newPrinter.correlationToken = Math.random().toString(36).slice(2);
+
+    this.#logger.info("Testing printer", newPrinter);
+
+    // Add printer with test=true
+    const printerState = await this.#printersStore.addPrinter(newPrinter, true);
+    res.send({ printerState: printerState.toFlat() });
+  }
+
   async create(req, res) {
     const newPrinter = req.body;
     if (!newPrinter.webSocketURL) {
       newPrinter.webSocketURL = convertHttpUrlToWebsocket(newPrinter.printerURL);
     }
+
     this.#logger.info("Add printer", newPrinter);
 
     // Has internal validation, but might add some here above as well
@@ -239,6 +256,7 @@ module.exports = createController(PrinterController)
   .get("/", "list")
   .get("/sse", "sse")
   .post("/", "create")
+  .post("/test-connection", "testConnection")
   .get("/:id", "get")
   .delete("/:id", "delete")
   .patch("/sort-index", "updateSortIndex")
