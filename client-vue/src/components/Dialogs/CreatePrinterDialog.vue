@@ -224,7 +224,7 @@ export default class CreatePrinterDialog extends Vue {
   }
 
   async onTestPrinterUpdate(payload: Printer) {
-    console.log(payload);
+    console.log("received update", payload.correlationToken, payload.hostState);
   }
 
   async submit() {

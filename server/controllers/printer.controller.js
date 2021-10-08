@@ -77,7 +77,7 @@ class PrinterController {
     this.#logger.info("Testing printer", newPrinter);
 
     // Add printer with test=true
-    const printerState = await this.#printersStore.addPrinter(newPrinter, true);
+    const printerState = await this.#printersStore.setupTestPrinter(newPrinter);
     res.send(printerState.toFlat());
   }
 
