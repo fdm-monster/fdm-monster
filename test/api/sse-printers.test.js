@@ -49,7 +49,7 @@ describe("SSE-printers", () => {
         } else {
           parsedMsg = parse(e.data);
         }
-        expect(parsedMsg).toEqual([]);
+        expect(parsedMsg).toEqual({ printers: [] });
         es.close();
         resolve();
       };

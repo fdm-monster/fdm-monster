@@ -253,7 +253,7 @@ class PrintersStore {
       `Saved new Printer: ${newPrinterDoc.printerURL} with ID ${newPrinterDoc._id}`
     );
 
-    const newPrinterState = await this.#printerStateFactory.create(newPrinterDoc, isTest);
+    const newPrinterState = await this.#printerStateFactory.create(newPrinterDoc);
     this.#printerStates.push(newPrinterState);
 
     // The next 'round' will involve setting up a websocket for this printer
