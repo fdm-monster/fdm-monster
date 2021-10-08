@@ -63,16 +63,26 @@ class PrinterTestTask {
    * @returns {Promise<void>}
    */
   async #sendStateProgress(testPrinterState, progress) {
-    const { correlationToken, hostState, printerState, webSocketState } =
-      testPrinterState?.toFlat();
+    const {
+      printerURL,
+      printerName,
+      apiKey,
+      correlationToken,
+      hostState,
+      printerState,
+      webSocketState
+    } = testPrinterState?.toFlat();
     const sseData = {
       testPrinter: {
+        printerURL,
+        printerName,
+        apiKey,
         correlationToken,
         hostState,
         printerState,
-        webSocketState
-      },
-      progress
+        webSocketState,
+        progress
+      }
     };
 
     const serializedData = JSON.stringify(sseData);
