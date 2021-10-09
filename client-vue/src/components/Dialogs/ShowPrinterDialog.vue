@@ -274,7 +274,6 @@ export default class ShowPrinterDialog extends Vue {
     newFormData.apiKey = printer.apiKey;
     newFormData.groups = printer.groups;
     newFormData.stepSize = printer.stepSize;
-    console.log(newFormData);
 
     this.formData = newFormData;
   }

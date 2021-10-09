@@ -11,9 +11,28 @@
     :gs-w="this.dataItem.w"
     :gs-x="this.dataItem.x"
     :gs-y="this.dataItem.y"
-    @click.prevent="clickPrinter()"
   >
-    <v-speed-dial v-model="fab" direction="right" hidden right>
+    <v-toolbar :color="dataItem.skeleton ? 'secondary' : 'primary'" dark dense>
+      <v-card-subtitle>{{ this.getPrinterName() }}</v-card-subtitle>
+    </v-toolbar>
+
+    <v-card-subtitle class="grid-stack-item-content">
+      {{ dataItem.skeleton ? "New Printer" : "Printing" }}
+    </v-card-subtitle>
+
+    <v-card-actions v-if="dataItem.skeleton">
+      <v-btn> Create </v-btn>
+    </v-card-actions>
+    <v-card-actions v-else>
+      <v-btn fab x-small color="primary" @click="doSomething()">
+        <v-icon>stop</v-icon>
+      </v-btn>
+      <v-btn fab x-small color="primary" @click="doSomething()">
+        <v-icon>info</v-icon>
+      </v-btn>
+    </v-card-actions>
+
+    <v-speed-dial v-model="fab" hidden direction="right" left @click.native.stop>
       <template v-slot:activator>
         <v-btn absolute color="secondary" dark fab right top x-small>
           <v-icon v-if="fab">close</v-icon>
@@ -27,17 +46,6 @@
         <v-icon>settings</v-icon>
       </v-btn>
     </v-speed-dial>
-
-    <v-toolbar :color="dataItem.skeleton ? 'secondary' : 'primary'" dark dense>
-      {{ this.getPrinterName() }}
-    </v-toolbar>
-    <v-card-text class="grid-stack-item-content">
-      {{ dataItem.skeleton ? "New Printer" : "Printing" }}
-    </v-card-text>
-    <v-card-actions v-if="dataItem.skeleton">
-      <v-btn> Create </v-btn>
-    </v-card-actions>
-    <v-card-actions v-else> 0%</v-card-actions>
   </v-card>
 </template>
 
@@ -63,6 +71,10 @@ export default class GridItem extends Vue {
 
   created() {
     this.skeleton = (this.dataItem as SkeletonPrinter)?.skeleton;
+  }
+
+  doSomething() {
+    console.log("Something done");
   }
 
   clickPrinter() {
