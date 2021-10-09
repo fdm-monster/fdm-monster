@@ -35,6 +35,8 @@ import "gridstack/dist/gridstack-extra.min.css";
 import "gridstack/dist/h5/gridstack-dd-native";
 import ShowPrinterDialog from "@/components/Dialogs/ShowPrinterDialog.vue";
 import { sseMessageGlobal } from "@/event-bus/sse.events";
+import { SkeletonPrinter } from "@/models/printers/crud/skeleton-printer.model";
+import { newRandomNamePair } from "@/constants/noun-adjectives.data";
 
 @Component({
   components: { ShowPrinterDialog, GridItem, Login }
@@ -125,17 +127,17 @@ export default class PrinterGrid extends Vue {
       const selector = this.itemPrefix + item.index;
       if (!document.getElementById(selector)) {
         // Render failed
-        console.warn(`Grid item meant for rerender not found: ${selector}`);
+        console.warn(`Grid item meant for rerender not found: ${ selector }`);
       } else {
-        this.grid.makeWidget(`#${this.itemPrefix}${item.index}`);
+        this.grid.makeWidget(`#${ this.itemPrefix }${ item.index }`);
       }
     }
     if (this.newItems.length !== 0) this.newItems = [];
   }
 
-  addNewPrinter(printer?: Printer | { skeleton: boolean }) {
+  addNewPrinter(printer?: Printer | SkeletonPrinter) {
     // We can add a placeholder in case of undef printer
-    if (!printer) printer = { skeleton: true };
+    if (!printer) printer = { skeleton: true, printerName: newRandomNamePair(), x: 0, y: 0 };
 
     // Let the Vue update trigger first, and then attach a logical gridstack widget
     this.newItems.push({ printer, index: this.items.length });
@@ -143,7 +145,7 @@ export default class PrinterGrid extends Vue {
   }
 
   removePrinterAtIndex(index: number) {
-    this.grid.removeWidget(`#${this.itemPrefix}${index}`, true);
+    this.grid.removeWidget(`#${ this.itemPrefix }${ index }`, true);
 
     this.items.splice(index, 1);
 
