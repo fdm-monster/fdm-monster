@@ -14,6 +14,7 @@ const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
 const { NotImplementedException } = require("../exceptions/runtime.exceptions");
 const { idRules } = require("./validation/generic.validation");
 const DITokens = require("../container.tokens");
+const { Status } = require("../constants/service.constants");
 
 class PrinterController {
   #printersStore;
@@ -71,10 +72,24 @@ class PrinterController {
 
   async sendSerialConnectCommand(req, res) {
     const { id: printerId } = await validateInput(req.params, idRules);
+
+    const printerLogin = this.#printersStore.getPrinterLogin(printerId);
+
+    const command = this.#octoPrintApiService.connectCommand;
+    await this.#octoPrintApiService.sendConnectionCommand(printerLogin, command);
+
+    return Status.success("Connect command sent");
   }
 
   async sendSerialDisconnectCommand(req, res) {
     const { id: printerId } = await validateInput(req.params, idRules);
+
+    const printerLogin = this.#printersStore.getPrinterLogin(printerId);
+
+    const command = this.#octoPrintApiService.disconnectCommand;
+    await this.#octoPrintApiService.sendConnectionCommand(printerLogin, { command });
+
+    return Status.success("Disconnect command sent");
   }
 
   async testConnection(req, res) {
@@ -118,8 +133,8 @@ class PrinterController {
   }
 
   async delete(req, res) {
-    const data = await validateInput(req.params, idRules);
-    const printerId = data.id;
+    const { id: printerId } = await validateInput(req.params, idRules);
+
     this.#logger.info("Deleting printer with id", printerId);
 
     const result = await this.#printersStore.deletePrinter(printerId);
@@ -134,13 +149,10 @@ class PrinterController {
    * @returns {Promise<void>}
    */
   async updateConnectionSettings(req, res) {
-    const data = await validateMiddleware(req, updatePrinterConnectionSettingRules, res);
+    const { printer } = await validateMiddleware(req, updatePrinterConnectionSettingRules, res);
+    const printerId = printer.id;
 
-    const printerId = data.printer.id;
-    const newEntity = await this.#printersStore.updatePrinterConnectionSettings(
-      printerId,
-      data.printer
-    );
+    const newEntity = await this.#printersStore.updatePrinterConnectionSettings(printerId, printer);
 
     res.send({
       printerURL: newEntity.printerURL,
@@ -157,56 +169,57 @@ class PrinterController {
 
     await this.#printersStore.updateSortIndex(data.sortList);
 
-    // TODO return order
+    // TODO return array with printerID ordering
     res.send({});
   }
 
   async updateEnabled(req, res) {
-    const params = await validateInput(req.params, idRules);
+    const { id: printerId } = await validateInput(req.params, idRules);
     const data = await validateMiddleware(req, updatePrinterEnabledRule, res);
 
     this.#logger.info("Changing printer enabled setting", JSON.stringify(data));
 
-    await this.#printersStore.updateEnabled(params.id, data.enabled);
+    await this.#printersStore.updateEnabled(printerId, data.enabled);
     res.send({});
   }
 
   async reconnectOctoPrint(req, res) {
-    const printerID = req.params.id;
-    this.#logger.info("Reconnecting OctoPrint instance: ", printerID);
-    this.#printersStore.reconnectOctoPrint(printerID, true);
+    const { id: printerId } = await validateInput(req.params, idRules);
+
+    this.#logger.info("Reconnecting OctoPrint API connection", printerId);
+    this.#printersStore.reconnectOctoPrint(printerId, true);
 
     res.send({ success: true, message: "Printer will reconnect soon" });
   }
 
   async setStepSize(req, res) {
-    const params = await validateInput(req.params, idRules);
+    const { id: printerId } = await validateInput(req.params, idRules);
     const data = await validateMiddleware(req, stepSizeRules, res);
 
-    this.#printersStore.setPrinterStepSize(params.id, data.stepSize);
+    this.#printersStore.setPrinterStepSize(printerId, data.stepSize);
     res.send();
   }
 
   async setFeedRate(req, res) {
-    const params = await validateInput(req.params, idRules);
+    const { id: printerId } = await validateInput(req.params, idRules);
     const data = await validateMiddleware(req, feedRateRules, res);
 
-    await this.#printersStore.setPrinterFeedRate(params.id, data.feedRate);
+    await this.#printersStore.setPrinterFeedRate(printerId, data.feedRate);
     res.send();
   }
 
   async setFlowRate(req, res) {
-    const params = await validateInput(req.params, idRules);
+    const { id: printerId } = await validateInput(req.params, idRules);
     const data = await validateMiddleware(req, flowRateRules, res);
 
-    await this.#printersStore.setPrinterFlowRate(params.id, data.flowRate);
+    await this.#printersStore.setPrinterFlowRate(printerId, data.flowRate);
     res.send();
   }
 
   async resetPowerSettings(req, res) {
-    const params = await validateInput(req.params, idRules);
+    const { id: printerId } = await validateInput(req.params, idRules);
 
-    const defaultPowerSettings = await this.#printersStore.resetPrinterPowerSettings(params.id);
+    const defaultPowerSettings = await this.#printersStore.resetPrinterPowerSettings(printerId);
 
     res.send({ powerSettings: defaultPowerSettings });
   }
@@ -218,9 +231,9 @@ class PrinterController {
    * @returns {Promise<void>}
    */
   async querySettings(req, res) {
-    const params = await validateInput(req.params, idRules);
+    const { id: printerId } = await validateInput(req.params, idRules);
 
-    const printerState = this.#printersStore.getPrinterState(params.id);
+    const printerState = this.#printersStore.getPrinterState(printerId);
     const printerLogin = printerState.getLoginDetails();
 
     // TODO We dont process these yet
@@ -270,26 +283,26 @@ class PrinterController {
 
 // prettier-ignore
 module.exports = createController(PrinterController)
-  .prefix(AppConstants.apiRoute + "/printer")
-  .before([ensureAuthenticated])
-  .get("/", "list")
-  .get("/sse", "sse")
-  .post("/", "create")
-  .post("/test-connection", "testConnection")
-  .get("/:id", "get")
+    .prefix(AppConstants.apiRoute + "/printer")
+    .before([ensureAuthenticated])
+    .get("/", "list")
+    .get("/sse", "sse")
+    .post("/", "create")
+    .post("/test-connection", "testConnection")
+    .get("/:id", "get")
     .post("/:id/serial-connect", "sendSerialConnectCommand")
     .post("/:id/serial-disconnect", "sendSerialDisconnectCommand")
-  .delete("/:id", "delete")
-  .patch("/sort-index", "updateSortIndex")
-  .patch("/:id/enabled", "updateEnabled")
-  .put("/:id/reconnect", "reconnectOctoPrint")
-  .patch("/:id/connection", "updateConnectionSettings")
-  .patch("/:id/step-size", "setStepSize")
-  .patch("/:id/flow-rate", "setFlowRate")
-  .patch("/:id/feed-rate", "setFeedRate")
-  .patch("/:id/reset-power-settings", "resetPowerSettings")
-  // WIP line
-  .post("/:id/query-settings", "querySettings")
-  .patch("/:id/update-settings", "updateSettings")
-  .get("/:id/connection-logs/", "getConnectionLogs")
-  .get("/:id/plugin-list", "getPluginList");
+    .delete("/:id", "delete")
+    .patch("/sort-index", "updateSortIndex")
+    .patch("/:id/enabled", "updateEnabled")
+    .put("/:id/reconnect", "reconnectOctoPrint")
+    .patch("/:id/connection", "updateConnectionSettings")
+    .patch("/:id/step-size", "setStepSize")
+    .patch("/:id/flow-rate", "setFlowRate")
+    .patch("/:id/feed-rate", "setFeedRate")
+    .patch("/:id/reset-power-settings", "resetPowerSettings")
+    // WIP line
+    .post("/:id/query-settings", "querySettings")
+    .patch("/:id/update-settings", "updateSettings")
+    .get("/:id/connection-logs/", "getConnectionLogs")
+    .get("/:id/plugin-list", "getPluginList");
