@@ -44,6 +44,14 @@ const getPowerSettingsDefault = () => {
   };
 };
 
+const getSettingsApperearanceDefault = () => ({
+  color: "default",
+  colorTransparent: false,
+  defaultLanguage: "_default",
+  name: "",
+  showFahrenheitAlso: false
+});
+
 const getCostSettingsDefault = () => {
   return {
     powerConsumption: 0.5,
@@ -73,6 +81,7 @@ function getFileListDefault() {
 
 function getDefaultPrinterEntry() {
   return {
+    settingsAppearance: getSettingsApperearanceDefault(),
     costSettings: getCostSettingsDefault(),
     powerSettings: getPowerSettingsDefault(),
     tempTriggers: getTempTriggersDefault(),
@@ -102,6 +111,7 @@ class Status {
 }
 
 module.exports = {
+  getSettingsApperearanceDefault,
   getCostSettingsDefault,
   getPowerSettingsDefault,
   getWolPowerSubSettingsDefault,

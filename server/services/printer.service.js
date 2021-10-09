@@ -51,6 +51,7 @@ class PrinterService {
    */
   async create(newPrinter) {
     if (!newPrinter) throw new Error("Missing printer");
+
     const mergedPrinter = {
       ...getDefaultPrinterEntry(),
       ...newPrinter

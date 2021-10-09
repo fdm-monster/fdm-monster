@@ -14,7 +14,7 @@ const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
 const { NotImplementedException } = require("../exceptions/runtime.exceptions");
 const { idRules } = require("./validation/generic.validation");
 const DITokens = require("../container.tokens");
-const { Status } = require("../constants/service.constants");
+const { Status, getSettingsApperearanceDefault } = require("../constants/service.constants");
 
 class PrinterController {
   #printersStore;
@@ -114,6 +114,11 @@ class PrinterController {
     const newPrinter = req.body;
     if (!newPrinter.webSocketURL) {
       newPrinter.webSocketURL = convertHttpUrlToWebsocket(newPrinter.printerURL);
+    }
+    newPrinter.settingsAppearance = getSettingsApperearanceDefault();
+    if (newPrinter.printerName) {
+      newPrinter.settingsAppearance.name = newPrinter.printerName;
+      delete newPrinter.printerName;
     }
 
     // Has internal validation, but might add some here above as well
