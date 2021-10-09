@@ -86,7 +86,7 @@ export default class PrinterGrid extends Vue {
    * Required to update the grid with skeletons without gridstack breaking and without losing state
    * @param _
    */
-  onSseMessage(_: any) {
+  onSseMessage() {
     // Any old items are left over
     let superfluousItems: string[] = this.items.filter((i) => !i.skeleton).map((p) => p.id);
 

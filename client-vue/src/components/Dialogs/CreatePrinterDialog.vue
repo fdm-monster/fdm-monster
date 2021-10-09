@@ -211,7 +211,7 @@
 import Vue from "vue";
 import { Component, Prop } from "vue-property-decorator";
 import { ValidationObserver, ValidationProvider } from "vee-validate";
-import { CreatePrinter, defaultCreatePrinter, PreCreatePrinter } from "@/models/printers/crud/create-printer.model";
+import { defaultCreatePrinter, PreCreatePrinter } from "@/models/printers/crud/create-printer.model";
 import { ACTIONS } from "@/store/printers/printers.actions";
 import { apiKeyLength } from "@/constants/validation.constants";
 import { Action } from "vuex-class";
@@ -219,6 +219,7 @@ import { PrinterGroup } from "@/models/printers/printer-group.model";
 import { Printer } from "@/models/printers/printer.model";
 import { sseTestPrinterUpdate } from "@/event-bus/sse.events";
 import { PrinterSseMessage, TestProgressDetails } from "@/models/sse-messages/printer-sse-message.model";
+import { PrintersService } from "@/backend";
 
 @Component({
   components: {
@@ -273,7 +274,7 @@ export default class CreatePrinterDialog extends Vue {
     this.showChecksPanel = true;
     this.testProgress = undefined;
 
-    const testPrinter = this.transformFormData();
+    const testPrinter = PrintersService.convertCreateFormToPrinter(this.formData);
 
     const result: Printer = await this.$store.dispatch(ACTIONS.createTestPrinter, testPrinter);
     if (!result.correlationToken) throw new Error("Test Printer CorrelationToken was empty.");
@@ -290,7 +291,7 @@ export default class CreatePrinterDialog extends Vue {
 
     if (!result) return;
 
-    const newPrinterData = this.transformFormData();
+    const newPrinterData = PrintersService.convertCreateFormToPrinter(this.formData);
 
     await this.$store.dispatch(ACTIONS.createPrinter, newPrinterData);
   }
@@ -298,26 +299,6 @@ export default class CreatePrinterDialog extends Vue {
   clear() {
     this.formData = { ...defaultCreatePrinter };
     this.$refs.validationObserver.reset();
-  }
-
-  /**
-   * Modify the printer to fit it in the model of a normal Printer
-   * TODO move to store
-   */
-  private transformFormData() {
-    let modifiedData: any = { ...this.formData };
-
-    const { printerHostPrefix, websocketPrefix, printerHostName, printerHostPort } = this.formData;
-    const printerURL = new URL(`${printerHostPrefix}://${printerHostName}:${printerHostPort}`);
-    const webSocketURL = new URL(`${websocketPrefix}://${printerHostName}:${printerHostPort}`);
-
-    delete modifiedData.printerHostName;
-    delete modifiedData.printerHostPrefix;
-    delete modifiedData.websocketPrefix;
-    modifiedData.printerURL = printerURL;
-    modifiedData.webSocketURL = webSocketURL;
-
-    return modifiedData as CreatePrinter;
   }
 
   private closeDialog() {
