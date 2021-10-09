@@ -1,13 +1,10 @@
 <template>
   <v-row justify="center">
     <v-dialog v-model="mutableShow" :max-width="showChecksPanel ? '700px' : '600px'" persistent>
-      <!--      <template v-slot:activator="{ on, attrs }">-->
-      <!--        <v-btn v-bind="attrs" v-on="on" color="primary" dark> Open Dialog</v-btn>-->
-      <!--      </template>-->
       <validation-observer ref="validationObserver" v-slot="{ invalid }">
         <v-card>
           <v-card-title>
-            <span class="text-h5">New Printer</span>
+            <span class="text-h5">Showing Printer</span>
           </v-card-title>
           <v-card-text>
             <v-row>
@@ -209,7 +206,7 @@
 <script lang="ts">
 // https://www.digitalocean.com/community/tutorials/vuejs-typescript-class-components
 import Vue from "vue";
-import { Component, Prop } from "vue-property-decorator";
+import { Component, Prop, Watch } from "vue-property-decorator";
 import { ValidationObserver, ValidationProvider } from "vee-validate";
 import { CreatePrinter, defaultCreatePrinter, PreCreatePrinter } from "@/models/printers/crud/create-printer.model";
 import { ACTIONS } from "@/store/printers/printers.actions";
@@ -219,6 +216,8 @@ import { PrinterGroup } from "@/models/printers/printer-group.model";
 import { Printer } from "@/models/printers/printer.model";
 import { sseTestPrinterUpdate } from "@/event-bus/sse.events";
 import { PrinterSseMessage, TestProgressDetails } from "@/models/sse-messages/printer-sse-message.model";
+
+const watchedId = "printerId";
 
 @Component({
   components: {
@@ -230,7 +229,8 @@ import { PrinterSseMessage, TestProgressDetails } from "@/models/sse-messages/pr
   })
 })
 export default class ShowPrinterDialog extends Vue {
-  @Prop(Boolean) show: boolean;
+  @Prop() show: boolean;
+  @Prop() [watchedId]: string; // printerId key
   @Action loadPrinterGroups: () => Promise<PrinterGroup[]>;
 
   apiKeyRules = { required: true, length: apiKeyLength };
@@ -249,6 +249,28 @@ export default class ShowPrinterDialog extends Vue {
 
   set mutableShow(newValue: boolean) {
     this.$emit("update:show", newValue);
+  }
+
+  @Watch(watchedId)
+  onChildChanged(val?: string, oldVal: string) {
+    if (!val) return;
+
+    const printer = this.$store.getters.printer(val) as Printer;
+
+    // Inverse transformation
+    let newFormData = defaultCreatePrinter;
+    const printerURL = new URL(printer.printerURL);
+    const webSocketURL = new URL(printer.webSocketURL);
+    newFormData.printerHostPort = printerURL.port;
+    newFormData.printerHostName = printerURL.hostname;
+    newFormData.printerHostPrefix = printerURL.protocol.replace(":","");
+    newFormData.websocketPrefix = webSocketURL.protocol.replace(":","");
+    newFormData.apiKey = printer.apiKey;
+    newFormData.groups = printer.groups;
+    newFormData.stepSize = printer.stepSize;
+    console.log(newFormData);
+
+    this.formData = newFormData;
   }
 
   isSet(value: boolean) {
@@ -304,8 +326,8 @@ export default class ShowPrinterDialog extends Vue {
     let modifiedData: any = { ...this.formData };
 
     const { printerHostPrefix, websocketPrefix, printerHostName, printerHostPort } = this.formData;
-    const printerURL = new URL(`${ printerHostPrefix }://${ printerHostName }:${ printerHostPort }`);
-    const webSocketURL = new URL(`${ websocketPrefix }://${ printerHostName }:${ printerHostPort }`);
+    const printerURL = new URL(`${printerHostPrefix}://${printerHostName}:${printerHostPort}`);
+    const webSocketURL = new URL(`${websocketPrefix}://${printerHostName}:${printerHostPort}`);
 
     delete modifiedData.printerHostName;
     delete modifiedData.printerHostPrefix;

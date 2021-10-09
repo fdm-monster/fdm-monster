@@ -47,7 +47,7 @@ import { GridStack } from "gridstack";
 import { SkeletonPrinter } from "@/models/printers/crud/skeleton-printer.model";
 
 export const EVENTS = {
-  itemClicked: "griditem-clicked"
+  itemClicked: "griditem:clicked"
 };
 @Component
 export default class GridItem extends Vue {

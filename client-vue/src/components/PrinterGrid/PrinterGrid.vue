@@ -83,8 +83,10 @@ export default class PrinterGrid extends Vue {
     });
   }
 
-  onChangeShowDialog(event: any) {
-    console.log("Dialog event, return value:", event);
+  onChangeShowDialog(event: boolean) {
+    if (!event) {
+      this.selectedPrinterId = undefined;
+    }
   }
 
   updated() {
@@ -92,9 +94,9 @@ export default class PrinterGrid extends Vue {
       const selector = this.itemPrefix + item.index;
       if (!document.getElementById(selector)) {
         // Render failed
-        console.warn(`Grid item meant for rerender not found: ${selector}`);
+        console.warn(`Grid item meant for rerender not found: ${ selector }`);
       } else {
-        this.grid.makeWidget(`#${this.itemPrefix}${item.index}`);
+        this.grid.makeWidget(`#${ this.itemPrefix }${ item.index }`);
       }
     }
     if (this.newItems.length !== 0) this.newItems = [];
