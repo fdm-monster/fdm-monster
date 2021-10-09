@@ -34,6 +34,8 @@ import "gridstack/dist/gridstack-extra.min.css";
 // Required for drag and drop
 import "gridstack/dist/h5/gridstack-dd-native";
 import ShowPrinterDialog from "@/components/Dialogs/ShowPrinterDialog.vue";
+import { sseMessageGlobal } from "@/event-bus/sse.events";
+import { PrinterSseMessage } from "@/models/sse-messages/printer-sse-message.model";
 
 @Component({
   components: { ShowPrinterDialog, GridItem, Login }
@@ -81,6 +83,25 @@ export default class PrinterGrid extends Vue {
       this.selectedPrinterId = printer.id;
       this.showDialog = true;
     });
+    this.$bus.on(sseMessageGlobal, (data: PrinterSseMessage) => {
+      this.onSseMessage(data);
+    });
+  }
+
+  onSseMessage(message: PrinterSseMessage) {
+    if (!message) return;
+    const updatedPrinters = message.printers;
+
+    let existingPrinters = this.printers.map((p) => p.id);
+
+    updatedPrinters.forEach((p) => {
+      const printerIndex = existingPrinters.findIndex((printerId) => printerId === p.id);
+      existingPrinters.splice(printerIndex, 1);
+    });
+
+    if (existingPrinters.length > 0) {
+      console.warn("Superfluous printers detected. Out of sync?");
+    }
   }
 
   onChangeShowDialog(event: boolean) {

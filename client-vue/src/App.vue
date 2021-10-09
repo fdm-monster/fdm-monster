@@ -58,12 +58,12 @@ export default class App extends Vue {
   async onSseMessage(message: PrinterSseMessage) {
     if (message.printers) {
       await this.$store.dispatch(ACTIONS.savePrinters, message.printers);
+
+      // Emit the global update
+      this.$bus.emit(sseMessageGlobal, message);
     }
 
     if (message.testPrinter) {
-      // Emit the global update
-      this.$bus.emit(sseMessageGlobal, message);
-
       // Emit a specific testing session update
       const { testPrinter, testProgress } = message;
       if (!testPrinter?.correlationToken) return;

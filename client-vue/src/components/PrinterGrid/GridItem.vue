@@ -11,6 +11,7 @@
     :gs-w="this.dataItem.w"
     :gs-x="this.dataItem.x"
     :gs-y="this.dataItem.y"
+    @click="clickPrinter()"
   >
     <v-toolbar :color="dataItem.skeleton ? 'secondary' : 'primary'" dark dense>
       <v-card-subtitle>{{ this.getPrinterName() }}</v-card-subtitle>
@@ -24,10 +25,10 @@
       <v-btn> Create </v-btn>
     </v-card-actions>
     <v-card-actions v-else>
-      <v-btn fab x-small color="primary" @click="doSomething()">
+      <v-btn fab x-small color="primary" @click.stop="doSomething()">
         <v-icon>stop</v-icon>
       </v-btn>
-      <v-btn fab x-small color="primary" @click="doSomething()">
+      <v-btn fab x-small color="primary" @click.stop="doSomething()">
         <v-icon>info</v-icon>
       </v-btn>
     </v-card-actions>
