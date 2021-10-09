@@ -44,7 +44,8 @@ class PrinterTestTask {
       : false;
 
     if (!testPrinterState?.toFlat || taskExpired) {
-      this.#logger.info("Printer test task has expired or testPrinterState was not created.");
+      this.#lastTestRunTime = undefined;
+      this.#logger.info("Printer test task has completed and is disabled.");
       if (testPrinterState?.toFlat) {
         await this.#printersStore.deleteTestPrinter();
       }
@@ -103,7 +104,7 @@ class PrinterTestTask {
 
     // API related errors
     if (errorCode === HttpStatusCode.BAD_REQUEST) {
-      return await this.#sendStateProgress(printerState, { connected: true, api_ok: false });
+      return await this.#sendStateProgress(printerState, { connected: true, apiOk: false });
     }
     await this.#sendStateProgress(printerState, { connected: true, apiOk: true });
 
