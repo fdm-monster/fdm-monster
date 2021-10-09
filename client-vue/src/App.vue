@@ -65,12 +65,13 @@ export default class App extends Vue {
       this.$bus.emit(sseMessageGlobal, message);
 
       // Emit a specific testing session update
-      const testPrinter = message.testPrinter;
+      const { testPrinter, testProgress } = message;
       if (!testPrinter?.correlationToken) return;
 
-      console.log(testPrinter);
-
-      this.$bus.emit(sseTestPrinterUpdate(testPrinter.correlationToken), testPrinter);
+      this.$bus.emit(sseTestPrinterUpdate(testPrinter.correlationToken), {
+        testPrinter,
+        testProgress
+      });
     }
   }
 

@@ -36,7 +36,7 @@ module.exports = class OctoprintRxjsWebsocketAdapter extends GenericWebsocketAda
   #webSocketState = WS_STATE.unopened;
 
   constructor({ id, webSocketURL, currentUser, sessionKey, throttle, debug = false }) {
-    super({ id: id.toString(), webSocketURL });
+    super({ id: id?.toString(), webSocketURL });
 
     this.#currentUser = currentUser;
     this.#sessionKey = sessionKey;

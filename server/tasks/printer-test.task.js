@@ -63,26 +63,15 @@ class PrinterTestTask {
    * @returns {Promise<void>}
    */
   async #sendStateProgress(testPrinterState, progress) {
-    const {
-      printerURL,
-      printerName,
-      apiKey,
-      correlationToken,
-      hostState,
-      printerState,
-      webSocketState
-    } = testPrinterState?.toFlat();
+    const { printerURL, printerName, apiKey, correlationToken } = testPrinterState?.toFlat();
     const sseData = {
       testPrinter: {
         printerURL,
         printerName,
         apiKey,
-        correlationToken,
-        hostState,
-        printerState,
-        webSocketState,
-        progress
-      }
+        correlationToken
+      },
+      testProgress: progress
     };
 
     const serializedData = JSON.stringify(sseData);
@@ -108,20 +97,12 @@ class PrinterTestTask {
     // Transport related error
     let errorCode = localError?.response?.status;
     if (errorThrown && !localError.response) {
-      // Not connected or DNS issue - abort flow
-      printerState.setHostState(PSTATE.Offline, MESSAGE.offline);
-      printerState.setApiAccessibility(false, true, MESSAGE.retryingApiConnection);
-
       return await this.#sendStateProgress(printerState, { connected: false });
     }
     await this.#sendStateProgress(printerState, { connected: true });
 
     // API related errors
     if (errorCode === HttpStatusCode.BAD_REQUEST) {
-      // Bug
-      printerState.setHostState(PSTATE.NoAPI, MESSAGE.badRequest);
-      printerState.setApiAccessibility(false, false, MESSAGE.badRequest);
-
       return await this.#sendStateProgress(printerState, { connected: true, api_ok: false });
     }
     await this.#sendStateProgress(printerState, { connected: true, apiOk: true });
@@ -130,9 +111,6 @@ class PrinterTestTask {
     const loginResponse = responseObject.data;
     // This is a check which is best done after checking 400 code (GlobalAPIKey or pass-thru) - possible
     if (isLoginResponseGlobal(loginResponse)) {
-      printerState.setHostState(PSTATE.GlobalAPIKey, MESSAGE.globalAPIKeyDetected);
-      printerState.setApiAccessibility(false, false, MESSAGE.globalAPIKeyDetected);
-
       return await this.#sendStateProgress(printerState, {
         connected: true,
         apiOk: true,
@@ -147,9 +125,6 @@ class PrinterTestTask {
 
     // Check for an name (defines connection state NoAPI) - undefined when apikey is wrong
     if (!loginResponse?.name) {
-      printerState.setHostState(PSTATE.ApiKeyRejected, MESSAGE.apiKeyNotAccepted);
-      printerState.setApiAccessibility(false, false, MESSAGE.apiKeyNotAccepted);
-
       return await this.#sendStateProgress(printerState, {
         connected: true,
         apiOk: true,
@@ -166,15 +141,22 @@ class PrinterTestTask {
 
     // Sanity check for login success (alt: could also check status code) - quite rare
     if (!loginResponse?.session) {
-      printerState.setHostState(PSTATE.NoAPI, MESSAGE.missingSessionKey);
-      printerState.setApiAccessibility(false, false, MESSAGE.missingSessionKey);
-      return;
+      return await this.#sendStateProgress(printerState, {
+        connected: true,
+        apiOk: true,
+        apiKeyNotGlobal: true,
+        apiKeyOk: true,
+        websocketBound: false
+      });
     }
 
     printerState.setApiLoginSuccessState(loginResponse.name, loginResponse?.session);
     printerState.setApiAccessibility(true, true, null);
     printerState.resetWebSocketAdapter();
     printerState.bindWebSocketAdapter(OctoprintRxjsWebsocketAdapter);
+
+    // Delaying or staggering this will speed up startup tasks - ~90 to 150ms per printer on non-congested (W)LAN
+    printerState.connectAdapter();
 
     await this.#sendStateProgress(printerState, {
       connected: true,
@@ -183,9 +165,6 @@ class PrinterTestTask {
       apiKeyOk: true,
       websocketBound: true
     });
-
-    // Delaying or staggering this will speed up startup tasks - ~90 to 150ms per printer on non-congested (W)LAN
-    printerState.connectAdapter();
   }
 }
 

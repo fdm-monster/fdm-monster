@@ -162,11 +162,7 @@
 import Vue from "vue";
 import { Component, Prop } from "vue-property-decorator";
 import { ValidationObserver, ValidationProvider } from "vee-validate";
-import {
-  CreatePrinter,
-  defaultCreatePrinter,
-  PreCreatePrinter
-} from "@/models/printers/crud/create-printer.model";
+import { CreatePrinter, defaultCreatePrinter, PreCreatePrinter } from "@/models/printers/crud/create-printer.model";
 import { ACTIONS } from "@/store/printers/printers.actions";
 import { apiKeyLength } from "@/constants/validation.constants";
 import { Action } from "vuex-class";
@@ -224,7 +220,7 @@ export default class CreatePrinterDialog extends Vue {
   }
 
   async onTestPrinterUpdate(payload: Printer) {
-    console.log("received update", payload.correlationToken, payload.hostState);
+    console.log("received update", payload.testProgress);
   }
 
   async submit() {
