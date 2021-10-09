@@ -1,19 +1,24 @@
 const DITokens = {
   loggerFactory: "loggerFactory",
   httpClient: "httpClient",
+  taskManagerService: "taskManagerService",
+  eventEmitter2: "eventEmitter2",
   printerService: "printerService",
   printerGroupService: "printerGroupService",
   farmStatisticsService: "farmStatisticsService",
   serverSettingsService: "serverSettingsService",
   serverUpdateService: "serverUpdateService",
+  serverLogsService: "serverLogsService",
+  clientSettingsService: "clientSettingsService",
   githubApiService: "githubApiService",
+  userTokenService: "userTokenService",
   octoPrintApiService: "octoPrintApiService",
   filamentManagerPluginService: "filamentManagerPluginService",
   influxDbSetupService: "influxDbSetupService",
   influxDbFilamentService: "influxDbFilamentService",
   influxDbHistoryService: "influxDbHistoryService",
   influxDbPrinterStateService: "InfluxDbPrinterStateService",
-  taskManagerService: "taskManagerService",
+  systemInfoBundleService: "systemInfoBundleService",
   printerFilesService: "printerFilesService",
   alertService: "alertService",
   scriptService: "scriptService",
@@ -22,8 +27,10 @@ const DITokens = {
   // Stores/states
   settingsStore: "settingsStore",
   printersStore: "printersStore",
+  printerTickerStore: "printerTickerStore",
   systemInfoStore: "systemInfoStore",
   filesStore: "filesStore",
+  filamentStore: "filamentStore",
   printerStateFactory: "printerStateFactory",
   printerState: "printerState",
   // Caches
@@ -40,11 +47,11 @@ const DITokens = {
   printerSystemTask: "printerSystemTask",
   softwareUpdateTask: "softwareUpdateTask",
   printerSseTask: "printerSseTask",
+  printerSseHandler: "printerSseHandler",
   printerTestTask: "printerTestTask",
   systemCommandsService: "systemCommandsService",
   printerWebsocketTask: "printerWebsocketTask",
   printerFilesTask: "printerFilesTask"
-
 };
 
 module.exports = DITokens;

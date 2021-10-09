@@ -117,9 +117,9 @@ class OctoprintApiService {
   }
 
   async sendConnectionCommand(printer, commandData, responseOptions = defaultResponseOptions) {
-    const { url, options } = this.#prepareJSONRequest(printer, apiConnection, commandData);
+    const { url, options, data } = this.#prepareJSONRequest(printer, apiConnection, commandData);
 
-    const response = await this.#httpClient.post(url, {}, options);
+    const response = await this.#httpClient.post(url, data, options);
 
     return processResponse(response, responseOptions);
   }
