@@ -303,7 +303,7 @@ class PrintersStore {
       );
     }
     const printer = this.getPrinterState(id);
-    printer.resetConnectionState(true);
+    printer.resetConnectionState();
   }
 
   getOctoPrintVersions() {

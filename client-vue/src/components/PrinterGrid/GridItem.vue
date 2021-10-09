@@ -35,9 +35,7 @@
       {{ dataItem.skeleton ? "New Printer" : "Printing" }}
     </v-card-text>
     <v-card-actions v-if="dataItem.skeleton">
-      <v-btn>
-        Create
-      </v-btn>
+      <v-btn> Create </v-btn>
     </v-card-actions>
     <v-card-actions v-else> 0%</v-card-actions>
   </v-card>

@@ -10,7 +10,7 @@
       <v-icon v-if="isPrinterOperational(printer)">check</v-icon>
       <v-icon v-else>close</v-icon>
     </template>
-    <v-btn :color="printer.printerState.colour.name" fab small>
+    <v-btn :color="printer.printerState.colour.name" @click="togglePrinterConnection()" fab small>
       <v-icon>usb</v-icon>
     </v-btn>
   </v-badge>
@@ -37,12 +37,8 @@ export default class PrinterConnectionAction extends Vue {
     return this.printer?.printerState?.flags.operational;
   }
 
-  openPrinterURL(printer: Printer) {
-    const printerURL = printer.printerURL;
-    if (!printerURL) {
-      return;
-    }
-    window.open(printerURL);
+  togglePrinterConnection() {
+    console.log("click", this.printer?.printerState);
   }
 }
 </script>

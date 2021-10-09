@@ -8,7 +8,6 @@
     <v-spacer></v-spacer>
 
     <PrintJobsMenu />
-
   </v-app-bar>
 </template>
 

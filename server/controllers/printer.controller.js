@@ -69,6 +69,14 @@ class PrinterController {
     res.send(foundPrinter);
   }
 
+  async sendSerialConnectCommand(req, res) {
+    const { id: printerId } = await validateInput(req.params, idRules);
+  }
+
+  async sendSerialDisconnectCommand(req, res) {
+    const { id: printerId } = await validateInput(req.params, idRules);
+  }
+
   async testConnection(req, res) {
     const newPrinter = req.body;
     if (!newPrinter.webSocketURL) {
@@ -147,7 +155,9 @@ class PrinterController {
 
     this.#logger.info("Sorting printers according to provided order", JSON.stringify(data));
 
-    this.#printersStore.updateSortIndex(data.sortList);
+    await this.#printersStore.updateSortIndex(data.sortList);
+
+    // TODO return order
     res.send({});
   }
 
@@ -161,7 +171,7 @@ class PrinterController {
     res.send({});
   }
 
-  async reconnect(req, res) {
+  async reconnectOctoPrint(req, res) {
     const printerID = req.params.id;
     this.#logger.info("Reconnecting OctoPrint instance: ", printerID);
     this.#printersStore.reconnectOctoPrint(printerID, true);
@@ -267,10 +277,12 @@ module.exports = createController(PrinterController)
   .post("/", "create")
   .post("/test-connection", "testConnection")
   .get("/:id", "get")
+    .post("/:id/serial-connect", "sendSerialConnectCommand")
+    .post("/:id/serial-disconnect", "sendSerialDisconnectCommand")
   .delete("/:id", "delete")
   .patch("/sort-index", "updateSortIndex")
   .patch("/:id/enabled", "updateEnabled")
-  .put("/:id/reconnect", "reconnect")
+  .put("/:id/reconnect", "reconnectOctoPrint")
   .patch("/:id/connection", "updateConnectionSettings")
   .patch("/:id/step-size", "setStepSize")
   .patch("/:id/flow-rate", "setFlowRate")

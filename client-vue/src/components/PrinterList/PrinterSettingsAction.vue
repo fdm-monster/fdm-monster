@@ -1,5 +1,5 @@
 <template>
-  <v-btn class="ma-2" color="primary" fab small>
+  <v-btn class="ma-2" color="primary" fab small disabled>
     <v-icon>settings</v-icon>
   </v-btn>
 </template>
@@ -19,14 +19,6 @@ export default class PrinterSettingsAction extends Vue {
 
   get printerId() {
     return this.printer.id;
-  }
-
-  openPrinterURL(printer: Printer) {
-    const printerURL = printer.printerURL;
-    if (!printerURL) {
-      return;
-    }
-    window.open(printerURL);
   }
 }
 </script>

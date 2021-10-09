@@ -41,7 +41,30 @@
         <v-toolbar flat>
           <v-toolbar-title>Showing printers</v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-switch v-model="reorder" class="mt-5" dark label="Sort mode">Reorder</v-switch>
+          <v-switch v-model="reorder" class="mt-5 mr-3" dark label="Sort mode" />
+          <v-switch
+            v-show="false"
+            v-model="deleteMany"
+            class="mt-5 mr-3"
+            dark
+            label="Delete printers"
+          />
+          <v-switch
+            v-show="false"
+            v-model="bulkFileClean"
+            class="mt-5 mr-3"
+            dark
+            disabled
+            label="Bulk file clean"
+          />
+          <v-switch
+            v-show="false"
+            v-model="bulkUpdate"
+            class="mt-5"
+            dark
+            disabled
+            label="Bulk file clean"
+          />
         </v-toolbar>
       </template>
       <template v-slot:item.enabled="{ item }">
@@ -110,6 +133,10 @@ export default class Printers extends Vue {
   @Getter printerGroups: PrinterGroup[];
 
   reorder = false;
+  deleteMany = false;
+  bulkFileClean = false;
+  bulkUpdate = false;
+
   search = "";
   expanded = [];
   tableHeaders = [
