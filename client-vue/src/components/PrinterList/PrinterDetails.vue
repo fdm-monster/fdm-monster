@@ -1,6 +1,6 @@
 <template>
   <v-container v-if="printer">
-    <v-btn @click="deletePrinter()">Delete printer</v-btn>
+    <PrinterDeleteAction :printer="printer" />
     Name: {{ printer.printerName }} <br />
     URL: {{ printer.printerURL }}
 
@@ -14,20 +14,16 @@ import Vue from "vue";
 import FileList from "@/components/PrinterList/FileList.vue";
 import { Prop } from "vue-property-decorator";
 import { Printer } from "@/models/printers/printer.model";
-import { ACTIONS } from "@/store/printers/printers.actions";
+import PrinterDeleteAction from "@/components/PrinterList/PrinterDeleteAction.vue";
 
 @Component({
-  components: { FileList }
+  components: { FileList, PrinterDeleteAction }
 })
 export default class PrinterDetails extends Vue {
   @Prop() printer: Printer;
 
   get printerId() {
     return this.printer.id;
-  }
-
-  async deletePrinter() {
-    await this.$store.dispatch(ACTIONS.deletePrinter, this.printerId);
   }
 }
 </script>
