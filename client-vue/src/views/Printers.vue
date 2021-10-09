@@ -44,6 +44,17 @@
           <v-switch v-model="reorder" class="mt-5" dark label="Sort mode">Reorder</v-switch>
         </v-toolbar>
       </template>
+      <template v-slot:item.enabled="{ item }">
+        <v-switch
+          v-model="item.enabled"
+          color="primary"
+          dark
+          inset
+          @click.native.capture.stop="toggleEnabled($event, item)"
+        >
+          {{ item.enabled }}
+        </v-switch>
+      </template>
       <template v-slot:item.printerName="{ item }">
         <v-chip color="primary" dark>
           {{ item.printerName || item.printerURL }}
@@ -83,17 +94,6 @@
           <v-icon>settings</v-icon>
         </v-btn>
       </template>
-      <template v-slot:item.enabled="{ item }">
-        <v-switch
-          v-model="item.enabled"
-          color="primary"
-          dark
-          inset
-          @click.native.capture.stop="toggleEnabled($event, item)"
-        >
-          {{ item.enabled }}
-        </v-switch>
-      </template>
       <template v-slot:expanded-item="{ headers, item }">
         <td :colspan="headers.length">
           <PrinterDetails :printer="item"></PrinterDetails>
@@ -124,7 +124,6 @@ export default class Printers extends Vue {
   reorder = false;
   search = "";
   expanded = [];
-  singleExpand = true;
   tableHeaders = [
     {
       text: "Order",
@@ -132,6 +131,7 @@ export default class Printers extends Vue {
       sortable: true,
       value: "sortIndex"
     },
+    { text: "Enabled", value: "enabled" },
     {
       text: "Printer Name",
       align: "start",
@@ -140,7 +140,6 @@ export default class Printers extends Vue {
     },
     { text: "Group", value: "group" },
     { text: "Actions", value: "actions", sortable: false },
-    { text: "Enabled", value: "enabled" },
     { text: "", value: "data-table-expand" }
   ];
 

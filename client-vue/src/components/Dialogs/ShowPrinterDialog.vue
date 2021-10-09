@@ -208,7 +208,13 @@
 import Vue from "vue";
 import { Component, Prop, Watch } from "vue-property-decorator";
 import { ValidationObserver, ValidationProvider } from "vee-validate";
-import { CreatePrinter, defaultCreatePrinter, PreCreatePrinter } from "@/models/printers/crud/create-printer.model";
+import {
+  CreatePrinter,
+  defaultCreatePrinter,
+  HttpProtocol,
+  PreCreatePrinter,
+  WebSocketProtocol
+} from "@/models/printers/crud/create-printer.model";
 import { ACTIONS } from "@/store/printers/printers.actions";
 import { apiKeyLength } from "@/constants/validation.constants";
 import { Action } from "vuex-class";
@@ -252,7 +258,7 @@ export default class ShowPrinterDialog extends Vue {
   }
 
   @Watch(watchedId)
-  onChildChanged(val?: string, oldVal: string) {
+  onChildChanged(val?: string, oldVal?: string) {
     if (!val) return;
 
     const printer = this.$store.getters.printer(val) as Printer;
@@ -261,10 +267,10 @@ export default class ShowPrinterDialog extends Vue {
     let newFormData = defaultCreatePrinter;
     const printerURL = new URL(printer.printerURL);
     const webSocketURL = new URL(printer.webSocketURL);
-    newFormData.printerHostPort = printerURL.port;
+    newFormData.printerHostPort = parseInt(printerURL.port);
     newFormData.printerHostName = printerURL.hostname;
-    newFormData.printerHostPrefix = printerURL.protocol.replace(":","");
-    newFormData.websocketPrefix = webSocketURL.protocol.replace(":","");
+    newFormData.printerHostPrefix = printerURL.protocol.replace(":", "") as HttpProtocol;
+    newFormData.websocketPrefix = webSocketURL.protocol.replace(":", "") as WebSocketProtocol;
     newFormData.apiKey = printer.apiKey;
     newFormData.groups = printer.groups;
     newFormData.stepSize = printer.stepSize;

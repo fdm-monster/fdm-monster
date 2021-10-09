@@ -14,14 +14,17 @@ export const defaultCreatePrinter: PreCreatePrinter = {
   stepSize: 1
 };
 
+export type WebSocketProtocol = "ws" | "wss";
+export type HttpProtocol = "http" | "https";
+
 export interface PreCreatePrinter {
   enabled: boolean;
   display: boolean;
   sortIndex: number;
   printerName: string;
 
-  websocketPrefix: "ws" | "wss";
-  printerHostPrefix: "http" | "https";
+  websocketPrefix: WebSocketProtocol;
+  printerHostPrefix: HttpProtocol;
   printerHostName: string;
   printerHostPort: number;
 
