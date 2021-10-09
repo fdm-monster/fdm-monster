@@ -3,7 +3,7 @@ import { BaseService } from "@/backend/base.service";
 import { Printer } from "@/models/printers/printer.model";
 import {
   CreatePrinter,
-  defaultCreatePrinter,
+  getDefaultCreatePrinter,
   HttpProtocol,
   PreCreatePrinter,
   WebSocketProtocol
@@ -13,11 +13,11 @@ import { newRandomNamePair } from "@/constants/noun-adjectives.data";
 export class PrintersService extends BaseService {
   static convertPrinterToCreateForm(printer: Printer) {
     // Inverse transformation
-    const newFormData = defaultCreatePrinter;
+    const newFormData = getDefaultCreatePrinter();
 
     const printerURL = new URL(printer.printerURL);
     const webSocketURL = new URL(printer.webSocketURL);
-    newFormData.printerHostPort = parseInt(printerURL.port);
+    newFormData.printerHostPort = parseInt(printerURL.port) || 80;
     newFormData.printerHostName = printerURL.hostname;
     newFormData.printerHostPrefix = printerURL.protocol.replace(":", "") as HttpProtocol;
     newFormData.websocketPrefix = webSocketURL.protocol.replace(":", "") as WebSocketProtocol;

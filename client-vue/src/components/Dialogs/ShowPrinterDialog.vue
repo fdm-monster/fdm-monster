@@ -4,7 +4,12 @@
       <validation-observer ref="validationObserver" v-slot="{ invalid }">
         <v-card>
           <v-card-title>
-            <span class="text-h5">Showing Printer</span>
+            <span class="text-h5">
+              <v-avatar color="primary" size="56">
+                {{ avatarInitials() }}
+              </v-avatar>
+              Showing Printer
+            </span>
           </v-card-title>
           <v-card-text>
             <v-row>
@@ -14,13 +19,13 @@
                     <v-col cols="12" md="6">
                       <validation-provider
                         v-slot="{ errors }"
-                        name="Name"
                         :rules="printerNameRules"
+                        name="Name"
                       >
                         <v-text-field
                           v-model="formData.printerName"
-                          :error-messages="errors"
                           :counter="printerNameRules.max"
+                          :error-messages="errors"
                           label="Printer name*"
                           required
                         />
@@ -213,7 +218,7 @@
 import Vue from "vue";
 import { Component, Inject, Prop, Watch } from "vue-property-decorator";
 import { ValidationObserver, ValidationProvider } from "vee-validate";
-import { defaultCreatePrinter, PreCreatePrinter } from "@/models/printers/crud/create-printer.model";
+import { getDefaultCreatePrinter, PreCreatePrinter } from "@/models/printers/crud/create-printer.model";
 import { ACTIONS } from "@/store/printers/printers.actions";
 import { Action } from "vuex-class";
 import { PrinterGroup } from "@/models/printers/printer-group.model";
@@ -222,6 +227,7 @@ import { sseTestPrinterUpdate } from "@/event-bus/sse.events";
 import { PrinterSseMessage, TestProgressDetails } from "@/models/sse-messages/printer-sse-message.model";
 import { PrintersService } from "@/backend";
 import { AppConstants } from "@/constants/app.constants";
+import { generateInitials } from "@/constants/noun-adjectives.data";
 
 const watchedId = "printerId";
 
@@ -242,7 +248,7 @@ export default class ShowPrinterDialog extends Vue {
 
   apiKeyRules = { required: true, length: this.appConstants.apiKeyLength };
   printerNameRules = { required: true, max: this.appConstants.maxPrinterNameLength };
-  formData: PreCreatePrinter = { ...defaultCreatePrinter };
+  formData: PreCreatePrinter = getDefaultCreatePrinter();
   $refs!: {
     validationObserver: InstanceType<typeof ValidationObserver>;
   };
@@ -257,6 +263,10 @@ export default class ShowPrinterDialog extends Vue {
 
   set mutableShow(newValue: boolean) {
     this.$emit("update:show", newValue);
+  }
+
+  avatarInitials() {
+    return generateInitials(this.formData.printerName);
   }
 
   @Watch(watchedId)
@@ -314,7 +324,7 @@ export default class ShowPrinterDialog extends Vue {
   }
 
   clear() {
-    this.formData = { ...defaultCreatePrinter };
+    this.formData = { ...getDefaultCreatePrinter };
     this.$refs.validationObserver.reset();
   }
 

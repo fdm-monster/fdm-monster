@@ -11,3 +11,7 @@ export function newRandomNamePair() {
 
   return `${capitalize(adjectives[randomAdjective])} ${capitalize(nouns[randomNoun])}`;
 }
+
+export function generateInitials(name: string) {
+  return name.split(" ").reduce((acc, subname) => acc + subname[0], "");
+}

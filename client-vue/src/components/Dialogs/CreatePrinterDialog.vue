@@ -7,7 +7,12 @@
       <validation-observer ref="validationObserver" v-slot="{ invalid }">
         <v-card>
           <v-card-title>
-            <span class="text-h5">New Printer</span>
+            <span class="text-h5">
+              <v-avatar color="primary" size="56">
+                {{avatarInitials()}}
+              </v-avatar>
+              New Printer
+            </span>
           </v-card-title>
           <v-card-text>
             <v-row>
@@ -53,8 +58,8 @@
                     <v-col cols="12" md="6">
                       <validation-provider
                         v-slot="{ errors }"
-                        name="Host Port"
                         :rules="`required|integer|max:${appConstants.maxPort}`"
+                        name="Host Port"
                       >
                         <v-text-field
                           v-model="formData.printerHostPort"
@@ -198,7 +203,7 @@
             <v-btn :disabled="invalid" color="warning" text @click="testPrinter()">
               Test connection
             </v-btn>
-            <v-btn :disabled="invalid" color="blue darken-1" text @click="submit()">Save</v-btn>
+            <v-btn :disabled="invalid" color="blue darken-1" text @click="submit()">Create</v-btn>
           </v-card-actions>
         </v-card>
       </validation-observer>
@@ -211,7 +216,7 @@
 import Vue from "vue";
 import { Component, Inject, Prop } from "vue-property-decorator";
 import { ValidationObserver, ValidationProvider } from "vee-validate";
-import { defaultCreatePrinter, PreCreatePrinter } from "@/models/printers/crud/create-printer.model";
+import { getDefaultCreatePrinter, PreCreatePrinter } from "@/models/printers/crud/create-printer.model";
 import { ACTIONS } from "@/store/printers/printers.actions";
 import { Action } from "vuex-class";
 import { PrinterGroup } from "@/models/printers/printer-group.model";
@@ -219,6 +224,7 @@ import { Printer } from "@/models/printers/printer.model";
 import { sseTestPrinterUpdate } from "@/event-bus/sse.events";
 import { PrinterSseMessage, TestProgressDetails } from "@/models/sse-messages/printer-sse-message.model";
 import { PrintersService } from "@/backend";
+import { generateInitials } from "@/constants/noun-adjectives.data";
 
 @Component({
   components: {
@@ -235,13 +241,17 @@ export default class CreatePrinterDialog extends Vue {
   @Inject() readonly appConstants!: any;
 
   apiKeyRules = { required: true, length: this.appConstants.apiKeyLength };
-  formData: PreCreatePrinter = { ...defaultCreatePrinter };
+  formData: PreCreatePrinter = getDefaultCreatePrinter();
   $refs!: {
     validationObserver: InstanceType<typeof ValidationObserver>;
   };
 
   showChecksPanel = false;
   testProgress?: TestProgressDetails = undefined;
+
+  avatarInitials() {
+    return generateInitials(this.formData.printerName);
+  }
 
   get mutableShow() {
     // https://forum.vuejs.org/t/update-data-when-prop-changes-data-derived-from-prop/1517/27
@@ -297,7 +307,7 @@ export default class CreatePrinterDialog extends Vue {
   }
 
   clear() {
-    this.formData = { ...defaultCreatePrinter };
+    this.formData = { ...getDefaultCreatePrinter };
     this.$refs.validationObserver.reset();
   }
 

@@ -1,7 +1,8 @@
 import { PrinterGroup } from "@/models/printers/printer-group.model";
+import { newRandomNamePair } from "@/constants/noun-adjectives.data";
 
-export const defaultCreatePrinter: PreCreatePrinter = {
-  printerName: "",
+export const getDefaultCreatePrinter = (): PreCreatePrinter => ({
+  printerName: newRandomNamePair(),
   printerHostPrefix: "http",
   printerHostPort: 80,
   websocketPrefix: "ws",
@@ -12,7 +13,7 @@ export const defaultCreatePrinter: PreCreatePrinter = {
   enabled: true,
   groups: [],
   stepSize: 1
-};
+});
 
 export type WebSocketProtocol = "ws" | "wss";
 export type HttpProtocol = "http" | "https";
