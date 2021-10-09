@@ -24,7 +24,7 @@ import { Action, Getter } from "vuex-class";
 import { ServerSettings } from "@/models/server-settings.model";
 import { SSEClient } from "vue-sse";
 import { PrinterSseMessage } from "@/models/sse-messages/printer-sse-message.model";
-import { sseMessageEventGlobal } from "@/event-bus/sse.events";
+import { sseMessageGlobal, sseTestPrinterUpdate } from "@/event-bus/sse.events";
 import { ACTIONS } from "@/store/printers/printers.actions";
 
 @Component({
@@ -56,8 +56,23 @@ export default class App extends Vue {
   }
 
   async onSseMessage(message: PrinterSseMessage) {
-    await this.$store.dispatch(ACTIONS.savePrinters, message);
-    this.$bus.emit(sseMessageEventGlobal, message);
+    if (message.printers) {
+      await this.$store.dispatch(ACTIONS.savePrinters, message.printers);
+    }
+
+    if (message.testPrinter) {
+      // Emit the global update
+      this.$bus.emit(sseMessageGlobal, message);
+
+      // Emit a specific testing session update
+      const { testPrinter, testProgress } = message;
+      if (!testPrinter?.correlationToken) return;
+
+      this.$bus.emit(sseTestPrinterUpdate(testPrinter.correlationToken), {
+        testPrinter,
+        testProgress
+      });
+    }
   }
 
   beforeDestroy() {

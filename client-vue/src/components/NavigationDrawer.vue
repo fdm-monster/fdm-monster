@@ -43,7 +43,7 @@ export default {
         ["printer", "Printers", "/printers"],
         ["settings", "Settings", "/settings"],
         ["history", "Scheduling", "/scheduling"],
-        ["contact_support", "About", "/about"],
+        ["contact_support", "About", "/about"]
       ]
     };
   },

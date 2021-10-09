@@ -1,13 +1,11 @@
 jest.mock("../../server/middleware/auth");
 
 const EventSource = require("eventsource");
-const { parse } = require("flatted/cjs");
 const dbHandler = require("../db-handler");
 const supertest = require("supertest");
 const getEndpoints = require("express-list-endpoints");
 const { setupTestApp } = require("../../server/app-test");
 const DITokens = require("../../server/container.tokens");
-const { AppConstants } = require("../../server/app.constants");
 
 let request;
 let sseTask;
@@ -43,13 +41,8 @@ describe("SSE-printers", () => {
       es.onmessage = (e) => {
         firedEvent = true;
 
-        let parsedMsg;
-        if (AppConstants.jsonStringify) {
-          parsedMsg = JSON.parse(e.data);
-        } else {
-          parsedMsg = parse(e.data);
-        }
-        expect(parsedMsg).toEqual([]);
+        let parsedMsg = JSON.parse(e.data);
+        expect(parsedMsg).toEqual({ printers: [] });
         es.close();
         resolve();
       };

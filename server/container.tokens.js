@@ -1,4 +1,5 @@
 const DITokens = {
+  loggerFactory: "loggerFactory",
   httpClient: "httpClient",
   printerService: "printerService",
   printerGroupService: "printerGroupService",
@@ -37,11 +38,13 @@ const DITokens = {
   filamentCache: "filamentCache",
   // Tasks
   printerSystemTask: "printerSystemTask",
+  softwareUpdateTask: "softwareUpdateTask",
   printerSseTask: "printerSseTask",
-  dashboardSseTask: "dashboardSseTask",
-  monitoringSseTask: "monitoringSseTask",
+  printerTestTask: "printerTestTask",
   systemCommandsService: "systemCommandsService",
-  loggerFactory: "loggerFactory"
+  printerWebsocketTask: "printerWebsocketTask",
+  printerFilesTask: "printerFilesTask"
+
 };
 
 module.exports = DITokens;

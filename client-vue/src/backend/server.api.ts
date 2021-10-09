@@ -2,6 +2,7 @@ export class ServerApi {
   static base = "api";
   static amIAliveRoute = ServerApi.base + "/amialive";
   static printerRoute = ServerApi.base + "/printer";
+  static printerTestConnectionRoute = ServerApi.printerRoute + "/test-connection";
   static printerGroupsRoute = ServerApi.base + "/printer-groups";
   static printerFilesRoute = ServerApi.base + "/printer-files";
   static printerNetworkRoute = ServerApi.base + "/printer-network";
@@ -31,5 +32,6 @@ export class ServerApi {
   static testAlertScriptRoute = ServerApi.alertRoute + "/test-alert-script";
   static roomDataRoute = ServerApi.base + "/room-data";
 
-  static printerEnabledRoute = (id: string) => ServerApi.printerRoute + `/${id}/enabled`;
+  static getPrinterRoute = (id: string) => `${ServerApi.printerRoute}/${id}`;
+  static printerEnabledRoute = (id: string) => `${ServerApi.getPrinterRoute(id)}/enabled`;
 }

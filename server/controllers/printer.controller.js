@@ -13,10 +13,12 @@ const { AppConstants } = require("../app.constants");
 const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
 const { NotImplementedException } = require("../exceptions/runtime.exceptions");
 const { idRules } = require("./validation/generic.validation");
+const DITokens = require("../container.tokens");
 
 class PrinterController {
   #printersStore;
   #jobsCache;
+  #taskManagerService;
   #connectionLogsCache;
   #octoPrintApiService;
   #fileCache;
@@ -29,6 +31,7 @@ class PrinterController {
     printersStore,
     connectionLogsCache,
     printerSseHandler,
+    taskManagerService,
     printerSseTask,
     loggerFactory,
     octoPrintApiService,
@@ -40,6 +43,7 @@ class PrinterController {
     this.#printersStore = printersStore;
     this.#jobsCache = jobsCache;
     this.#connectionLogsCache = connectionLogsCache;
+    this.#taskManagerService = taskManagerService;
     this.#octoPrintApiService = octoPrintApiService;
     this.#fileCache = fileCache;
     this.#sseHandler = printerSseHandler;
@@ -65,16 +69,38 @@ class PrinterController {
     res.send(foundPrinter);
   }
 
+  async testConnection(req, res) {
+    const newPrinter = req.body;
+    if (!newPrinter.webSocketURL) {
+      newPrinter.webSocketURL = convertHttpUrlToWebsocket(newPrinter.printerURL);
+    }
+
+    // As we dont generate a _id we generate a correlation token
+    newPrinter.correlationToken = Math.random().toString(36).slice(2);
+
+    this.#logger.info(`Testing printer with correlation token ${newPrinter.correlationToken}`);
+
+    // Add printer with test=true
+    const printerState = await this.#printersStore.setupTestPrinter(newPrinter);
+
+    this.#taskManagerService.scheduleDisabledJob(DITokens.printerTestTask);
+    res.send(printerState.toFlat());
+  }
+
   async create(req, res) {
     const newPrinter = req.body;
     if (!newPrinter.webSocketURL) {
       newPrinter.webSocketURL = convertHttpUrlToWebsocket(newPrinter.printerURL);
     }
-    this.#logger.info("Add printer", newPrinter);
 
     // Has internal validation, but might add some here above as well
     const printerState = await this.#printersStore.addPrinter(newPrinter);
-    res.send({ printerState: printerState.toFlat() });
+
+    this.#logger.info(
+      `Created printer with ID ${printerState.id || printerState.correlationToken}`
+    );
+
+    res.send(printerState.toFlat());
   }
 
   async list(req, res) {
@@ -239,6 +265,7 @@ module.exports = createController(PrinterController)
   .get("/", "list")
   .get("/sse", "sse")
   .post("/", "create")
+  .post("/test-connection", "testConnection")
   .get("/:id", "get")
   .delete("/:id", "delete")
   .patch("/sort-index", "updateSortIndex")

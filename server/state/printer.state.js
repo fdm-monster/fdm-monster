@@ -23,6 +23,7 @@ const Logger = require("../handlers/logger.js");
  */
 class PrinterState {
   #id;
+  #isTest;
 
   #hostState = {
     state: PSTATE.Offline,
@@ -74,18 +75,31 @@ class PrinterState {
     return this.#id;
   }
 
+  get isTest() {
+    return this.#isTest;
+  }
+
+  get correlationToken() {
+    if (this.isTest) return this.#entityData.correlationToken;
+  }
+
   get markForRemoval() {
     return this.#markedForRemoval;
   }
 
-  async setup(printerDocument) {
-    this.#id = printerDocument._id.toString();
+  async setup(printerDocument, isTest = false) {
+    if (!isTest) this.#id = printerDocument._id.toString();
+    this.#isTest = isTest;
+
     this.updateEntityData(printerDocument, true);
   }
 
   async tearDown() {
     this.resetWebSocketAdapter();
     this.#markedForRemoval = true;
+
+    if (this.isTest) return;
+
     this.#fileCache.purgePrinterId(this.#id);
     this.#jobsCache.purgePrinterId(this.#id);
   }
@@ -149,7 +163,10 @@ class PrinterState {
     // );
 
     flatJob = JobsCache.postProcessJob(flatJob, costSettings);
-    const fileList = this.#fileCache.getPrinterFiles(this.#id);
+    let fileList = [];
+    if (!this.isTest) {
+      fileList = this.#fileCache.getPrinterFiles(this.#id);
+    }
 
     // TODO call files store for thumb
     // const foundFile = _.find(printerState.getFileList().files, (o) => {
@@ -159,8 +176,12 @@ class PrinterState {
     //   currentJob.thumbnail = foundFile.thumbnail;
     // }
 
+    const identification = this.isTest
+      ? { correlationToken: this.#entityData.correlationToken, isTest: this.isTest }
+      : { id: this.#id };
+
     return Object.freeze({
-      id: this.#id,
+      ...identification,
       printerState: this.getPrinterState(),
       hostState: this.#hostState,
       webSocketState: convertedWSState,

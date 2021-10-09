@@ -25,8 +25,9 @@ export default class Map extends Vue {
     this.showDialog = true;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onChangeShowDialog(event: any) {
-    console.debug("Dialog closed", event);
+    // Placeholder
   }
 }
 </script>

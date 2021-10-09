@@ -21,7 +21,7 @@ class PrinterService {
     });
   }
 
-  async count() {
+  async #printerCount() {
     return Printers.countDocuments();
   }
 
@@ -58,7 +58,7 @@ class PrinterService {
     // We should not to this now: Regenerate sort index on printer add...
     // await this.reGenerateSortIndex();
     mergedPrinter.dateAdded = Date.now();
-    mergedPrinter.sortIndex = await this.count(); // 0-based index so no +1 needed
+    mergedPrinter.sortIndex = await this.#printerCount(); // 0-based index so no +1 needed
 
     await validateInput(mergedPrinter, createPrinterRules);
 

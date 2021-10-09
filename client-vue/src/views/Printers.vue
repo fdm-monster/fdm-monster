@@ -66,9 +66,9 @@
         </v-btn>
         <v-badge
           v-if="item.enabled"
+          :color="isPrinterOperational(item) ? 'green' : 'red'"
           bordered
           class="ma-2"
-          :color="isPrinterOperational(item) ? 'green' : 'red'"
           overlap
         >
           <template v-slot:badge>
@@ -111,7 +111,7 @@ import { Printer } from "@/models/printers/printer.model";
 import draggable from "vuedraggable";
 import { PrintersService } from "@/backend/printers.service";
 import { PrinterSseMessage } from "@/models/sse-messages/printer-sse-message.model";
-import { sseMessageEventGlobal } from "@/event-bus/sse.events";
+import { sseMessageGlobal } from "@/event-bus/sse.events";
 import PrinterDetails from "@/components/PrinterDetails.vue";
 
 @Component({
@@ -162,17 +162,18 @@ export default class Printers extends Vue {
   async mounted() {
     await this.loadPrinters();
 
-    this.$bus.on(sseMessageEventGlobal, (data: PrinterSseMessage) => {
+    this.$bus.on(sseMessageGlobal, (data: PrinterSseMessage) => {
       this.onSseMessage(data);
     });
   }
 
-  onSseMessage(printers: PrinterSseMessage) {
-    if (!printers) return;
+  onSseMessage(message: PrinterSseMessage) {
+    if (!message) return;
+    const updatedPrinters = message.printers;
 
     let existingPrinters = this.printers.map((p) => p.id);
 
-    printers.forEach((p) => {
+    updatedPrinters.forEach((p) => {
       const printerIndex = this.printers.findIndex((pr) => pr.id === p.id);
       existingPrinters.splice(printerIndex, 1);
     });

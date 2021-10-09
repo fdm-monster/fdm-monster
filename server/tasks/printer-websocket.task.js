@@ -1,9 +1,9 @@
-const Logger = require("../handlers/logger");
 const OctoprintRxjsWebsocketAdapter = require("../services/octoprint/octoprint-rxjs-websocket.adapter");
 const DITokens = require("../container.tokens");
 const { PSTATE, ERR_COUNT, MESSAGE } = require("../constants/state.constants");
 const HttpStatusCode = require("../constants/http-status-codes.constants");
 const { ExternalServiceError } = require("../exceptions/runtime.exceptions");
+const { isLoginResponseGlobal } = require("../services/octoprint/constants/octoprint-service.constants");
 
 class PrinterWebsocketTask {
   #printersStore;
@@ -11,7 +11,7 @@ class PrinterWebsocketTask {
   #octoPrintService;
   #taskManagerService;
 
-  #logger = new Logger("Printer-Websocket-Task");
+  #logger;
 
   #errorMaxThrows = 3;
   #errorModulus = 50; // After max throws, log it every x failures
@@ -23,16 +23,18 @@ class PrinterWebsocketTask {
   };
 
   constructor({
-    printersStore,
-    octoPrintApiService,
-    settingsStore,
-    taskManagerService,
-    printerSystemTask // Just to make sure it can resolve
-  }) {
+                printersStore,
+                octoPrintApiService,
+                settingsStore,
+                taskManagerService,
+                loggerFactory,
+                printerSystemTask // Just to make sure it can resolve
+              }) {
     this.#printersStore = printersStore;
     this.#settingsStore = settingsStore;
     this.#octoPrintService = octoPrintApiService;
     this.#taskManagerService = taskManagerService;
+    this.#logger = loggerFactory("Printer-Websocket-Task");
   }
 
   getRetriedPrinters() {
@@ -109,7 +111,7 @@ class PrinterWebsocketTask {
     // Response related errors
     const loginResponse = response.data;
     // This is a check which is best done after checking 400 code (GlobalAPIKey or pass-thru) - possible
-    if (this.#checkLoginGlobal(loginResponse)) {
+    if (isLoginResponseGlobal(loginResponse)) {
       const errorCount = this.#incrementErrorCount(ERR_COUNT.apiKeyIsGlobal, printerId);
       printerState.setHostState(PSTATE.GlobalAPIKey, MESSAGE.globalAPIKeyDetected);
       printerState.setApiAccessibility(false, false, MESSAGE.globalAPIKeyDetected);
@@ -163,12 +165,6 @@ class PrinterWebsocketTask {
 
   #getPrinterErrorCount(key, printerId) {
     return this.#errorCounts[key][printerId] || 0;
-  }
-
-  #checkLoginGlobal(octoPrintResponse) {
-    // Explicit nullability check serves to let an unconnected printer fall through as well as incorrect apiKey
-    // Note: 'apikey' property is conform OctoPrint response (and not 3DPF printer model's 'apiKey')
-    return !!octoPrintResponse && octoPrintResponse.name === "_api";
   }
 
   handleSilencedError(errorCount, taskMessage, printerName, willRetry = false) {

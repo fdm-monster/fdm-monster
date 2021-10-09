@@ -7,6 +7,7 @@ import { PrinterProfile } from "@/models/printers/printer-profile.model";
 
 export interface Printer {
   id: string;
+  correlationToken?: string;
   printerState: VisualState;
   hostState: VisualState;
   webSocketState: WebsocketState;

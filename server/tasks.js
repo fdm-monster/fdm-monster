@@ -1,4 +1,5 @@
 const { TaskPresets } = require("./task.presets");
+const DITokens = require("./container.tokens");
 
 /**
  * Register a task with a preset and timing (run immediate does not retry in case of failure)
@@ -22,11 +23,12 @@ const HOUR_MS = 3600 * 1000;
 
 class ServerTasks {
   static BOOT_TASKS = [
-    registerTask("softwareUpdateTask", TaskPresets.RUNDELAYED, 1500),
-    registerTask("printerSseTask", TaskPresets.PERIODIC, 500),
-    registerTask("printerSystemTask", TaskPresets.PERIODIC_DISABLED, 6 * HOUR_MS, true),
-    registerTask("printerWebsocketTask", TaskPresets.PERIODIC, 5000, true),
-    registerTask("printerFilesTask", TaskPresets.RUNONCE, 15000) // We dont need more than this
+    registerTask(DITokens.softwareUpdateTask, TaskPresets.RUNDELAYED, 1500),
+    registerTask(DITokens.printerSseTask, TaskPresets.PERIODIC, 500),
+    registerTask(DITokens.printerTestTask, TaskPresets.PERIODIC_DISABLED, 2000, true),
+    registerTask(DITokens.printerSystemTask, TaskPresets.PERIODIC_DISABLED, 6 * HOUR_MS, true),
+    registerTask(DITokens.printerWebsocketTask, TaskPresets.PERIODIC, 5000, true),
+    registerTask(DITokens.printerFilesTask, TaskPresets.RUNONCE, 15000) // We dont need more than this
   ];
 }
 

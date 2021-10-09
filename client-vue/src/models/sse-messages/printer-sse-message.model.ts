@@ -1,4 +1,15 @@
 import { Printer } from "@/models/printers/printer.model";
 
-// Extensibility options for future use
-export type PrinterSseMessage = Printer[];
+export interface TestProgressDetails {
+  connected: boolean;
+  apiOk?: boolean;
+  apiKeyNotGlobal?: boolean;
+  apiKeyOk?: boolean;
+  websocketBound?: boolean;
+}
+
+export interface PrinterSseMessage {
+  printers: Printer[];
+  testPrinter: Printer;
+  testProgress: TestProgressDetails;
+}

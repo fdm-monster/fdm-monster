@@ -3,6 +3,8 @@ const { getFilterDefaults } = require("../constants/state.constants");
 const Logger = require("../handlers/logger.js");
 const { NotImplementedException } = require("../exceptions/runtime.exceptions");
 const { NotFoundException } = require("../exceptions/runtime.exceptions");
+const { validateInput } = require("../handlers/validators");
+const { createTestPrinterRules } = require("./validation/create-test-printer.validation");
 
 class PrintersStore {
   #settingsStore;
@@ -12,6 +14,7 @@ class PrintersStore {
   #eventEmitter2;
 
   #printerStates;
+  #testPrinterState;
   #farmPrintersGroups;
   #logger = new Logger("Server-PrintersStore");
 
@@ -73,24 +76,30 @@ class PrintersStore {
 
   /**
    * Return a mutable copy of all frozen printers states mapped to flat JSON
-   * @param {boolean} filterDisconnected printers marked by tearDown (disconnected) are be filtered
+   * @param {boolean} includeDisconnected printers marked by tearDown (disconnected) are be filtered
+   * @param isTest
    */
-  listPrintersFlat(filterDisconnected = true) {
-    return this.listPrinterStates(filterDisconnected)
+  listPrintersFlat(includeDisconnected = false) {
+    return this.listPrinterStates(includeDisconnected)
       .filter((s) => s.toFlat)
       .map((s) => s.toFlat());
+  }
+
+  getTestPrinter() {
+    return this.#testPrinterState;
   }
 
   /**
    * List the prefetched printer states without mapping
    * We check and throw instead of loading proactively: more predictable and not async
    * @returns {*}
-   * @param {boolean} filterDisconnected printers marked by tearDown (disconnected) are be filtered
+   * @param includeDisconnected
+   * @param isTest takes complete preference over 'includeDisconnected'
    */
-  listPrinterStates(filterDisconnected = true) {
+  listPrinterStates(includeDisconnected = false) {
     this._validateState();
 
-    return this.#printerStates.filter((p) => filterDisconnected || p.markForRemoval === false);
+    return this.#printerStates.filter((p) => includeDisconnected || p.markForRemoval === false);
   }
 
   getPrinterCount() {
@@ -154,6 +163,12 @@ class PrintersStore {
 
     this.#logger.info(`Loaded ${this.#printerStates.length} printer states`);
     this.generatePrinterGroups();
+  }
+
+  async deleteTestPrinter() {
+    await this.#testPrinterState.tearDown();
+
+    this.#testPrinterState = undefined;
   }
 
   async deletePrinter(printerId) {
@@ -239,9 +254,7 @@ class PrintersStore {
   async addPrinter(printer) {
     this._validateState();
 
-    this.#logger.info("Saving new printer to database");
     const newPrinterDoc = await this.#printerService.create(printer);
-
     this.#logger.info(
       `Saved new Printer: ${newPrinterDoc.printerURL} with ID ${newPrinterDoc._id}`
     );
@@ -251,6 +264,30 @@ class PrintersStore {
 
     // The next 'round' will involve setting up a websocket for this printer
     return newPrinterState;
+  }
+
+  /**
+   * Sets up/recreates a printer to be tested quickly by running the standard checks
+   * @param printer
+   * @returns {Promise<*>}
+   */
+  async setupTestPrinter(printer) {
+    const validatedData = await validateInput(printer, createTestPrinterRules);
+    validatedData.enabled = true;
+
+    const newPrinterDoc = { _doc: validatedData };
+    this.#logger.info(
+      `Stored test Printer: ${validatedData.printerURL} with ID ${validatedData.correlationToken}`
+    );
+
+    const newPrinterState = await this.#printerStateFactory.create(newPrinterDoc, true);
+    if (this.#testPrinterState) {
+      await this.deleteTestPrinter();
+    }
+
+    this.#testPrinterState = newPrinterState;
+
+    return this.#testPrinterState;
   }
 
   /**

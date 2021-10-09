@@ -46,9 +46,7 @@ describe("PrintersController", () => {
       tempTriggers: { heatingVariation: null }
     });
     expectOkResponse(response, {
-      printerState: {
-        printerURL: expect.any(String)
-      }
+      printerURL: expect.any(String)
     });
   });
 
@@ -70,9 +68,9 @@ describe("PrintersController", () => {
       apiKey: "3dpf3dpf3dpf3dpf3dpf3dpf3dpf3dpf",
       tempTriggers: { heatingVariation: null }
     });
-    const body = expectOkResponse(createResponse, { printerState: expect.anything() });
+    const body = expectOkResponse(createResponse, expect.anything());
 
-    const deletionResponse = await request.delete(`${deleteRoute}/${body.printerState.id}`).send();
+    const deletionResponse = await request.delete(`${deleteRoute}/${body.id}`).send();
     expectOkResponse(deletionResponse, expect.anything());
   });
 

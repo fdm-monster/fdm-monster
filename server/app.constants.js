@@ -1,11 +1,4 @@
 class AppConstants {
-  /**
-   * Change the SSE serialization to JSON or flatten
-   */
-  static get jsonStringify() {
-    return true;
-  }
-
   static get apiRoute() {
     return "/api";
   }

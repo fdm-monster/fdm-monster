@@ -1,6 +1,3 @@
-const { stringify } = require("flatted");
-const Logger = require("../handlers/logger");
-const { AppConstants } = require("../app.constants");
 const { byteCount } = require("../utils/benchmark.util");
 
 class PrinterSseTask {
@@ -11,19 +8,22 @@ class PrinterSseTask {
   #aggregateWindowLength = 100;
   #aggregateSizes = [];
   #rounding = 2;
-  #logger = new Logger("Printer-SSE-task");
+  #logger;
 
-  constructor({ printerSseHandler, printersStore }) {
+  constructor({ printerSseHandler, printersStore, loggerFactory }) {
     this.#printerSseHandler = printerSseHandler;
     this.#printersStore = printersStore;
+    this.#logger = loggerFactory("Printer-SSE-task");
   }
 
   async run() {
-    const sseData = this.#printersStore.listPrintersFlat();
+    const printerStates = this.#printersStore.listPrintersFlat();
 
-    const serializedData = AppConstants.jsonStringify
-      ? JSON.stringify(sseData)
-      : stringify(sseData);
+    const sseData = {
+      printers: printerStates,
+    };
+
+    const serializedData = JSON.stringify(sseData);
     const transportDataSize = byteCount(serializedData);
     this.updateAggregator(transportDataSize);
     this.#printerSseHandler.send(serializedData);

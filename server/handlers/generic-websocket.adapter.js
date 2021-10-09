@@ -15,7 +15,7 @@ module.exports = class GenericWebsocketAdapter {
   // #client;
 
   constructor({ id, webSocketURL /*, currentUser, sessionkey, throttle */ }) {
-    this.#id = id.toString();
+    this.#id = id?.toString();
     this.#webSocketURL = new URL(webSocketURL).href;
 
     // Add your own properties when extending

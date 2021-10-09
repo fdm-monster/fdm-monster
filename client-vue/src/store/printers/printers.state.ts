@@ -10,6 +10,7 @@ import { PrinterGroupsService } from "@/backend/printer-groups.service";
 
 export interface PrintersStateInterface {
   printers: Printer[];
+  testPrinters: Printer[];
   printerGroups: PrinterGroup[];
   lastUpdated?: number;
 }
@@ -20,12 +21,15 @@ export const MUTATIONS = {
   loadPrinterGroups: "loadPrinterGroups",
   savePrinterFiles: "savePrinterFiles",
   deletePrinterFile: "deletePrinterFile",
-  savePrinterGroups: "savePrinterGroups"
+  savePrinterGroups: "savePrinterGroups",
+  createTestPrinter: "createTestPrinter",
+  deletePrinter: "deletePrinter"
 };
 
 export const printersState: StoreOptions<StateInterface> = {
   state: {
     printers: [],
+    testPrinters: [],
     printerGroups: [],
     lastUpdated: undefined
   },
@@ -33,6 +37,19 @@ export const printersState: StoreOptions<StateInterface> = {
     [MUTATIONS.createPrinter]: (state, printer: Printer) => {
       state.printers.push(printer);
       state.printers.sort((a, b) => (a.sortIndex > b.sortIndex ? 1 : -1));
+    },
+    [MUTATIONS.createTestPrinter]: (state, printer: Printer) => {
+      state.testPrinters.push(printer);
+      state.lastUpdated = Date.now();
+    },
+    [MUTATIONS.deletePrinter]: (state: StateInterface, printerId) => {
+      const printerIndex = state.printers.findIndex((p: Printer) => p.id === printerId);
+
+      if (printerIndex !== -1) {
+        state.printers.splice(printerIndex, 1);
+      } else {
+        console.warn("Printer was not purged as it did not occur in state", printerId);
+      }
     },
     [MUTATIONS.savePrinters]: (state, printers: Printer[]) => {
       state.printers = printers;
@@ -83,6 +100,13 @@ export const printersState: StoreOptions<StateInterface> = {
 
       return newPrinter;
     },
+    [ACTIONS.createTestPrinter]: async ({ commit }, newPrinter) => {
+      const data = await PrintersService.testConnection(newPrinter);
+
+      commit(MUTATIONS.createTestPrinter, data);
+
+      return data;
+    },
     [ACTIONS.savePrinters]: ({ commit }, newPrinters) => {
       commit(MUTATIONS.savePrinters, newPrinters);
 
@@ -92,6 +116,13 @@ export const printersState: StoreOptions<StateInterface> = {
       const data = await PrintersService.getPrinters();
 
       commit(MUTATIONS.savePrinters, data);
+
+      return data;
+    },
+    [ACTIONS.deletePrinter]: async ({ commit }, printerId) => {
+      const data = await PrintersService.deletePrinter(printerId);
+
+      commit(MUTATIONS.deletePrinter, printerId);
 
       return data;
     },
