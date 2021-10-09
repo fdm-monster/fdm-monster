@@ -329,7 +329,7 @@ export default class ShowPrinterDialog extends Vue {
       updatedPrinter: updatePrinter
     });
 
-    this.$bus.emit(updatedPrinterEvent(printerId), updatedData);
+    this.$bus.emit(updatedPrinterEvent(printerId as string), updatedData);
   }
 
   clear() {
