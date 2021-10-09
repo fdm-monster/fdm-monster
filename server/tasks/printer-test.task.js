@@ -114,7 +114,7 @@ class PrinterTestTask {
 
       return await this.#sendStateProgress(printerState, { connected: false });
     }
-    return await this.#sendStateProgress(printerState, { connected: true });
+    await this.#sendStateProgress(printerState, { connected: true });
 
     // API related errors
     if (errorCode === HttpStatusCode.BAD_REQUEST) {
