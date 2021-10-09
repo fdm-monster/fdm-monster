@@ -12,10 +12,15 @@
                 <v-container>
                   <v-row>
                     <v-col cols="12" md="6">
-                      <validation-provider v-slot="{ errors }" name="Name" rules="required|max:10">
+                      <validation-provider
+                        v-slot="{ errors }"
+                        name="Name"
+                        :rules="printerNameRules"
+                      >
                         <v-text-field
                           v-model="formData.printerName"
                           :error-messages="errors"
+                          :counter="printerNameRules.max"
                           label="Printer name*"
                           required
                         />
@@ -236,6 +241,7 @@ export default class ShowPrinterDialog extends Vue {
   @Inject() readonly appConstants!: AppConstants;
 
   apiKeyRules = { required: true, length: this.appConstants.apiKeyLength };
+  printerNameRules = { required: true, max: this.appConstants.maxPrinterNameLength };
   formData: PreCreatePrinter = { ...defaultCreatePrinter };
   $refs!: {
     validationObserver: InstanceType<typeof ValidationObserver>;
