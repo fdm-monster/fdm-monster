@@ -47,7 +47,6 @@ export default class PrinterConnectionAction extends Vue {
       return PrintersService.sendPrinterDisconnectCommand(this.printerId);
     }
 
-    console.log("connecting");
     await PrintersService.sendPrinterConnectCommand(this.printerId);
   }
 }

@@ -9,16 +9,16 @@ export class PrintersService extends BaseService {
     return await this.getApi(path);
   }
 
-  static async sendPrinterConnectCommand(printerId: string, connected: boolean) {
+  static async sendPrinterConnectCommand(printerId: string) {
     const path = ServerApi.printerSerialConnectRoute(printerId);
 
-    return await this.postApi(path, { connected });
+    return await this.postApi(path);
   }
 
-  static async sendPrinterDisconnectCommand(printerId: string, connected: boolean) {
+  static async sendPrinterDisconnectCommand(printerId: string) {
     const path = ServerApi.printerSerialDisconnectRoute(printerId);
 
-    return await this.postApi(path, { connected });
+    return await this.postApi(path);
   }
 
   static async createPrinter(printer: Printer) {
