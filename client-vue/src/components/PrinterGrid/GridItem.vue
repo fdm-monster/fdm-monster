@@ -14,26 +14,32 @@
     @click="clickPrinter()"
   >
     <v-toolbar :color="dataItem.skeleton ? 'secondary' : 'primary'" dark dense>
-      <v-card-subtitle>{{ this.getPrinterName() }}</v-card-subtitle>
+      <v-avatar color="secondary" size="54">
+        {{ avatarInitials() }}
+      </v-avatar>
+
+      <v-card-text class="ml-0">
+        <span class="mt-5">{{ this.getPrinterName() }}</span>
+          <br />
+        <small class="secondary--text font-weight-10">{{ dataItem.skeleton ? "New Printer" : "Printing" }}</small>
+      </v-card-text>
     </v-toolbar>
 
-    <v-card-subtitle class="grid-stack-item-content">
-      {{ dataItem.skeleton ? "New Printer" : "Printing" }}
-    </v-card-subtitle>
+    <v-card-subtitle class="grid-stack-item-content"></v-card-subtitle>
 
     <v-card-actions v-if="dataItem.skeleton">
-      <v-btn> Create </v-btn>
+      <v-btn> Create</v-btn>
     </v-card-actions>
     <v-card-actions v-else>
-      <v-btn fab x-small color="primary" @click.stop="doSomething()">
+      <v-btn color="primary" fab x-small @click.stop="doSomething()">
         <v-icon>stop</v-icon>
       </v-btn>
-      <v-btn fab x-small color="primary" @click.stop="doSomething()">
+      <v-btn color="primary" fab x-small @click.stop="doSomething()">
         <v-icon>info</v-icon>
       </v-btn>
     </v-card-actions>
 
-    <v-speed-dial v-model="fab" hidden direction="right" left @click.native.stop>
+    <v-speed-dial v-model="fab" direction="right" hidden left @click.native.stop>
       <template v-slot:activator>
         <v-btn absolute color="secondary" dark fab right top x-small>
           <v-icon v-if="fab">close</v-icon>
@@ -57,6 +63,7 @@ import { Prop } from "vue-property-decorator";
 import { Printer } from "@/models/printers/printer.model";
 import { GridStack } from "gridstack";
 import { SkeletonPrinter } from "@/models/printers/crud/skeleton-printer.model";
+import { generateInitials } from "@/constants/noun-adjectives.data";
 
 export const EVENTS = {
   itemClicked: "griditem:clicked"
@@ -72,6 +79,10 @@ export default class GridItem extends Vue {
 
   created() {
     this.skeleton = (this.dataItem as SkeletonPrinter)?.skeleton;
+  }
+
+  avatarInitials() {
+    return generateInitials(this.dataItem.printerName);
   }
 
   doSomething() {
