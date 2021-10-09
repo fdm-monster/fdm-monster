@@ -113,13 +113,16 @@ import { PrintersService } from "@/backend/printers.service";
 import { PrinterSseMessage } from "@/models/sse-messages/printer-sse-message.model";
 import { sseMessageGlobal } from "@/event-bus/sse.events";
 import PrinterDetails from "@/components/PrinterList/PrinterDetails.vue";
+import { PrinterGroup } from "@/models/printers/printer-group.model";
 
 @Component({
   components: { PrinterDetails, draggable }
 })
 export default class Printers extends Vue {
   @Action loadPrinters: () => Promise<Printer[]>;
+  @Action loadPrinterGroups: () => Promise<PrinterGroup[]>;
   @Getter printers: Printer[];
+  @Getter printerGroups: PrinterGroup[];
 
   reorder = false;
   search = "";
@@ -138,7 +141,7 @@ export default class Printers extends Vue {
       sortable: true,
       value: "printerName"
     },
-    { text: "Group", value: "group" },
+    { text: "Groups", value: "group" },
     { text: "Actions", value: "actions", sortable: false },
     { text: "", value: "data-table-expand" }
   ];
@@ -160,6 +163,7 @@ export default class Printers extends Vue {
 
   async mounted() {
     await this.loadPrinters();
+    await this.loadPrinterGroups();
 
     this.$bus.on(sseMessageGlobal, (data: PrinterSseMessage) => {
       this.onSseMessage(data);
