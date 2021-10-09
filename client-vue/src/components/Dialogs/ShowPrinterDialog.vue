@@ -324,7 +324,7 @@ export default class ShowPrinterDialog extends Vue {
   }
 
   clear() {
-    this.formData = { ...getDefaultCreatePrinter };
+    this.formData = getDefaultCreatePrinter();
     this.$refs.validationObserver.reset();
   }
 
