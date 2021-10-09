@@ -272,6 +272,8 @@ export default class CreatePrinterDialog extends Vue {
     if (!validationResult) return;
 
     this.showChecksPanel = true;
+    this.testProgress = undefined;
+    
     const testPrinter = this.transformFormData();
 
     const result: Printer = await this.$store.dispatch(ACTIONS.createTestPrinter, testPrinter);

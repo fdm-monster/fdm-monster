@@ -93,10 +93,13 @@ class PrinterController {
       newPrinter.webSocketURL = convertHttpUrlToWebsocket(newPrinter.printerURL);
     }
 
-    this.#logger.info("Add printer", newPrinter);
-
     // Has internal validation, but might add some here above as well
     const printerState = await this.#printersStore.addPrinter(newPrinter);
+
+    this.#logger.info(
+      `Created printer with ID ${printerState.id || printerState.correlationToken}`
+    );
+
     res.send(printerState.toFlat());
   }
 

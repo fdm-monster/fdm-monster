@@ -57,7 +57,7 @@ export default class App extends Vue {
 
   async onSseMessage(message: PrinterSseMessage) {
     if (message.printers) {
-      await this.$store.dispatch(ACTIONS.savePrinters, message);
+      await this.$store.dispatch(ACTIONS.savePrinters, message.printers);
     }
 
     if (message.testPrinter) {

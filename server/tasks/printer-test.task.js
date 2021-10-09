@@ -44,8 +44,8 @@ class PrinterTestTask {
       : false;
 
     if (!testPrinterState?.toFlat || taskExpired) {
-      this.#lastTestRunTime = undefined;
-      this.#logger.info("Printer test task has completed and is disabled.");
+      this.#stopRunning();
+
       if (testPrinterState?.toFlat) {
         await this.#printersStore.deleteTestPrinter();
       }
@@ -55,6 +55,13 @@ class PrinterTestTask {
     }
 
     await this.#testPrinterConnection(testPrinterState);
+    this.#stopRunning();
+  }
+
+  #stopRunning() {
+    this.#lastTestRunTime = undefined;
+    this.#taskManagerService.disableJob(DITokens.printerTestTask);
+    this.#logger.info("Printer test task has stopped running and is disabled.");
   }
 
   /**

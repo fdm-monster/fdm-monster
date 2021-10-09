@@ -79,6 +79,10 @@ class PrinterState {
     return this.#isTest;
   }
 
+  get correlationToken() {
+    if (this.isTest) return this.#entityData.correlationToken;
+  }
+
   get markForRemoval() {
     return this.#markedForRemoval;
   }
