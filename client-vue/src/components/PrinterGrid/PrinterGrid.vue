@@ -35,14 +35,13 @@ import "gridstack/dist/gridstack-extra.min.css";
 import "gridstack/dist/h5/gridstack-dd-native";
 import ShowPrinterDialog from "@/components/Dialogs/ShowPrinterDialog.vue";
 import { sseMessageGlobal } from "@/event-bus/sse.events";
-import { PrinterSseMessage } from "@/models/sse-messages/printer-sse-message.model";
 
 @Component({
   components: { ShowPrinterDialog, GridItem, Login }
 })
 export default class PrinterGrid extends Vue {
   readonly itemPrefix = "printer-tile-";
-  gridId = "default-grid";
+  readonly gridId = "default-grid";
   showDialog = false;
   selectedPrinterId?: string = "";
 
@@ -79,29 +78,40 @@ export default class PrinterGrid extends Vue {
       if (!node) return;
     });
 
-    this.$bus.on(EVENTS.itemClicked, (printer: Printer) => {
-      this.selectedPrinterId = printer.id;
-      this.showDialog = true;
-    });
-    this.$bus.on(sseMessageGlobal, (data: PrinterSseMessage) => {
-      this.onSseMessage(data);
-    });
+    this.$bus.on(EVENTS.itemClicked, this.openCreateDialog);
+    this.$bus.on(sseMessageGlobal, this.onSseMessage);
   }
 
-  onSseMessage(message: PrinterSseMessage) {
-    if (!message) return;
-    const updatedPrinters = message.printers;
+  /**
+   * Required to update the grid with skeletons without gridstack breaking and without losing state
+   * @param _
+   */
+  onSseMessage(_: any) {
+    // Any old items are left over
+    let superfluousItems: string[] = this.items.filter((i) => !i.skeleton).map((p) => p.id);
 
-    let existingPrinters = this.printers.map((p) => p.id);
-
-    updatedPrinters.forEach((p) => {
-      const printerIndex = existingPrinters.findIndex((printerId) => printerId === p.id);
-      existingPrinters.splice(printerIndex, 1);
+    this.printers.forEach((p) => {
+      // Visual items get checked for Id equality
+      const printerIndex = this.items.findIndex((item) => item.id === p.id);
+      if (printerIndex === -1) {
+        this.addNewPrinter(p);
+      } else {
+        const foundItemIndex = superfluousItems.findIndex((sfI) => sfI === p.id);
+        superfluousItems.splice(foundItemIndex, 1);
+      }
     });
 
-    if (existingPrinters.length > 0) {
-      console.warn("Superfluous printers detected. Out of sync?");
+    if (superfluousItems.length > 0) {
+      superfluousItems.forEach((printerId) => {
+        const itemIndex = this.items.findIndex((i) => i.id === printerId);
+        this.removePrinterAtIndex(itemIndex);
+      });
     }
+  }
+
+  openCreateDialog(printer: Printer) {
+    this.selectedPrinterId = printer.id;
+    this.showDialog = true;
   }
 
   onChangeShowDialog(event: boolean) {
@@ -126,8 +136,23 @@ export default class PrinterGrid extends Vue {
   addNewPrinter(printer?: Printer | { skeleton: boolean }) {
     // We can add a placeholder in case of undef printer
     if (!printer) printer = { skeleton: true };
+
+    // Let the Vue update trigger first, and then attach a logical gridstack widget
     this.newItems.push({ printer, index: this.items.length });
     this.items.push(printer);
+  }
+
+  removePrinterAtIndex(index: number) {
+    this.grid.removeWidget(`#${this.itemPrefix}${index}`, true);
+
+    this.items.splice(index, 1);
+
+    this.$forceUpdate();
+  }
+
+  beforeDestroy() {
+    this.$bus.off(sseMessageGlobal, this.onSseMessage);
+    this.$bus.off(EVENTS.itemClicked, this.openCreateDialog);
   }
 }
 </script>

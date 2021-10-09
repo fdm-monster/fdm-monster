@@ -71,6 +71,7 @@ export default class GridItem extends Vue {
   fab = false;
 
   created() {
+    console.log("created item");
     this.skeleton = (this.dataItem as SkeletonPrinter)?.skeleton;
   }
 

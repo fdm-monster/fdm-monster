@@ -188,10 +188,6 @@ export default class Printers extends Vue {
       const printerIndex = existingPrinters.findIndex((printerId) => printerId === p.id);
       existingPrinters.splice(printerIndex, 1);
     });
-
-    if (existingPrinters.length > 0) {
-      console.warn("Superfluous printers detected. Out of sync?", existingPrinters, updatedPrinters.length);
-    }
   }
 }
 </script>
