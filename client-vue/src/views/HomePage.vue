@@ -1,16 +1,16 @@
 <template>
   <v-container>
-    <Map />
+    <LocationMap />
   </v-container>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import Map from "../components/Map.vue";
+import LocationMap from "../components/PrinterGrid/LocationMap.vue";
 import { Component } from "vue-property-decorator";
 
 @Component({
-  components: { Map }
+  components: { LocationMap }
 })
 export default class HomePage extends Vue {}
 </script>

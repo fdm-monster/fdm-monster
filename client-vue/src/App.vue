@@ -15,9 +15,9 @@
 
 <script lang="ts">
 import Vue from "vue";
-import NavigationDrawer from "@/components/NavigationDrawer.vue";
-import TopBar from "@/components/TopBar.vue";
-import ErrorAlert from "@/components/ErrorAlert.vue";
+import NavigationDrawer from "@/components/Generic/NavigationDrawer.vue";
+import TopBar from "@/components/Generic/TopBar.vue";
+import ErrorAlert from "@/components/Generic/ErrorAlert.vue";
 import FooterList from "@/components/QuickActions/FooterList.vue";
 import { Component } from "vue-property-decorator";
 import { Action, Getter } from "vuex-class";

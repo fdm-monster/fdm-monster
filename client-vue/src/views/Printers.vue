@@ -112,7 +112,7 @@ import draggable from "vuedraggable";
 import { PrintersService } from "@/backend/printers.service";
 import { PrinterSseMessage } from "@/models/sse-messages/printer-sse-message.model";
 import { sseMessageGlobal } from "@/event-bus/sse.events";
-import PrinterDetails from "@/components/PrinterDetails.vue";
+import PrinterDetails from "@/components/PrinterList/PrinterDetails.vue";
 
 @Component({
   components: { PrinterDetails, draggable }

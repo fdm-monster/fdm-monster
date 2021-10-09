@@ -10,29 +10,39 @@
         :selector="itemPrefix + index.toString()"
         :skeleton="skeleton"
       />
+
+      <ShowPrinterDialog
+        :printer-id="selectedPrinterId"
+        :show.sync="showDialog"
+        v-on:update:show="onChangeShowDialog($event)"
+      />
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import Login from "@/components/Login.vue";
+import Login from "@/components/Generic/Login.vue";
 import { Component } from "vue-property-decorator";
 import { GridItemHTMLElement, GridStack } from "gridstack";
-import GridItem from "@/components/PrinterGrid/GridItem.vue";
+import GridItem, { EVENTS } from "@/components/PrinterGrid/GridItem.vue";
 import { Action, Getter } from "vuex-class";
 import { Printer } from "@/models/printers/printer.model";
 import "gridstack/dist/gridstack.min.css";
 // Required for custom columns
 import "gridstack/dist/gridstack-extra.min.css";
+// Required for drag and drop
 import "gridstack/dist/h5/gridstack-dd-native";
+import ShowPrinterDialog from "@/components/Dialogs/ShowPrinterDialog.vue";
 
 @Component({
-  components: { GridItem, Login }
+  components: { ShowPrinterDialog, GridItem, Login }
 })
 export default class PrinterGrid extends Vue {
   readonly itemPrefix = "printer-tile-";
   gridId = "default-grid";
+  showDialog = false;
+  selectedPrinterId?: string = "";
 
   grid: GridStack;
   count = 0;
@@ -66,6 +76,12 @@ export default class PrinterGrid extends Vue {
       const node = (element as GridItemHTMLElement)?.gridstackNode;
       if (!node) return;
     });
+
+    this.$bus.on(EVENTS.itemClicked, (printer: Printer) => {
+      console.log(printer.id);
+      this.selectedPrinterId = printer.id;
+      this.showDialog = true;
+    });
   }
 
   childMounted() {
@@ -73,6 +89,10 @@ export default class PrinterGrid extends Vue {
     if (Vue.config.devtools) {
       // location.reload();
     }
+  }
+
+  onChangeShowDialog(event: any) {
+    console.log(event);
   }
 
   updated() {

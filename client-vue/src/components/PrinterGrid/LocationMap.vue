@@ -18,7 +18,7 @@ import PrinterGrid from "@/components/PrinterGrid/PrinterGrid.vue";
 @Component({
   components: { PrinterGrid, CreatePrinterDialog }
 })
-export default class Map extends Vue {
+export default class LocationMap extends Vue {
   showDialog = false;
 
   async createPrinterModal() {

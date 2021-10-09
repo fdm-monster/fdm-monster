@@ -11,6 +11,7 @@
     :gs-w="this.dataItem.w"
     :gs-x="this.dataItem.x"
     :gs-y="this.dataItem.y"
+    @click.prevent="clickPrinter()"
   >
     <v-speed-dial v-model="fab" direction="right" hidden right>
       <template v-slot:activator>
@@ -33,22 +34,38 @@
     <v-card-text class="grid-stack-item-content">
       {{ dataItem.skeleton ? "not set up" : "Printing" }}
     </v-card-text>
-    <v-card-actions> 0% </v-card-actions>
+    <v-card-actions> 0%</v-card-actions>
   </v-card>
 </template>
-<script>
+
+<script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop } from "vue-property-decorator";
+import { Printer } from "@/models/printers/printer.model";
+import { GridStack } from "gridstack";
+import { SkeletonPrinter } from "@/models/printers/crud/skeleton-printer.model";
 
+export const EVENTS = {
+  itemClicked: "griditem-clicked"
+};
 @Component
 export default class GridItem extends Vue {
-  @Prop() dataItem;
-  @Prop() selector;
-  @Prop() grid;
+  @Prop() dataItem: Printer | SkeletonPrinter;
+  @Prop() selector: string;
+  @Prop() grid: GridStack;
 
-  skeleton = this.dataItem?.skeleton;
+  skeleton: boolean;
   fab = false;
+
+  created() {
+    this.skeleton = (this.dataItem as SkeletonPrinter)?.skeleton;
+  }
+
+  clickPrinter() {
+    this.$bus.emit(EVENTS.itemClicked, this.dataItem);
+    console.log("Emitted");
+  }
 
   updated() {
     // The grid item is dereferenced on every update
@@ -57,7 +74,10 @@ export default class GridItem extends Vue {
   }
 
   getPrinterName() {
-    return this.dataItem.printerName || this.dataItem.printerURL?.replace("http://", "");
+    if ((this.dataItem as SkeletonPrinter).skeleton) return;
+
+    let data = this.dataItem as Printer;
+    return data.printerName || data.printerURL?.replace("http://", "");
   }
 }
 </script>

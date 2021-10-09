@@ -229,7 +229,7 @@ import { PrinterSseMessage, TestProgressDetails } from "@/models/sse-messages/pr
     testProgress: undefined
   })
 })
-export default class CreatePrinterDialog extends Vue {
+export default class ShowPrinterDialog extends Vue {
   @Prop(Boolean) show: boolean;
   @Action loadPrinterGroups: () => Promise<PrinterGroup[]>;
 
@@ -284,6 +284,15 @@ export default class CreatePrinterDialog extends Vue {
   async onTestPrinterUpdate(payload: PrinterSseMessage) {
     this.testProgress = payload.testProgress;
   }
+
+  // Might be nice for future or for duplication of printers
+  // fillTemplate() {
+  //   this.formData = {
+  //     ...defaultCreatePrinter,
+  //     printerHostPort: 80,
+  //     printerName: "template"
+  //   };
+  // }
 
   async submit() {
     const result = await this.$refs.validationObserver.validate();
