@@ -12,7 +12,7 @@ export class BaseService {
     return this.handleResponse(response, options);
   }
 
-  protected static async postApi<T>(path: string, body: T, options = { unwrap: true }) {
+  protected static async postApi<T>(path: string, body?: T, options = { unwrap: true }) {
     const response = await axios.post(`${apiBase}/${path}`, body);
 
     // Do interception or global handling here
