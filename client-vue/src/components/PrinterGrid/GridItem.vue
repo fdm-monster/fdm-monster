@@ -64,7 +64,6 @@ export default class GridItem extends Vue {
 
   clickPrinter() {
     this.$bus.emit(EVENTS.itemClicked, this.dataItem);
-    console.log("Emitted");
   }
 
   updated() {

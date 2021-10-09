@@ -285,15 +285,6 @@ export default class ShowPrinterDialog extends Vue {
     this.testProgress = payload.testProgress;
   }
 
-  // Might be nice for future or for duplication of printers
-  // fillTemplate() {
-  //   this.formData = {
-  //     ...defaultCreatePrinter,
-  //     printerHostPort: 80,
-  //     printerName: "template"
-  //   };
-  // }
-
   async submit() {
     const result = await this.$refs.validationObserver.validate();
 
@@ -306,7 +297,7 @@ export default class ShowPrinterDialog extends Vue {
 
   clear() {
     this.formData = { ...defaultCreatePrinter };
-    // this.$refs.observer.reset();
+    this.$refs.validationObserver.reset();
   }
 
   private transformFormData() {

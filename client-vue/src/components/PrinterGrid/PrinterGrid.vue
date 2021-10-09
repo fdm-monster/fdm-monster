@@ -78,21 +78,13 @@ export default class PrinterGrid extends Vue {
     });
 
     this.$bus.on(EVENTS.itemClicked, (printer: Printer) => {
-      console.log(printer.id);
       this.selectedPrinterId = printer.id;
       this.showDialog = true;
     });
   }
 
-  childMounted() {
-    // Fix the hot-reload issue - doesnt fix the core issue
-    if (Vue.config.devtools) {
-      // location.reload();
-    }
-  }
-
   onChangeShowDialog(event: any) {
-    console.log(event);
+    console.log("Dialog event, return value:", event);
   }
 
   updated() {

@@ -297,15 +297,19 @@ export default class CreatePrinterDialog extends Vue {
 
   clear() {
     this.formData = { ...defaultCreatePrinter };
-    // this.$refs.observer.reset();
+    this.$refs.validationObserver.reset();
   }
 
+  /**
+   * Modify the printer to fit it in the model of a normal Printer
+   * TODO move to store
+   */
   private transformFormData() {
     let modifiedData: any = { ...this.formData };
 
     const { printerHostPrefix, websocketPrefix, printerHostName, printerHostPort } = this.formData;
-    const printerURL = new URL(`${ printerHostPrefix }://${ printerHostName }:${ printerHostPort }`);
-    const webSocketURL = new URL(`${ websocketPrefix }://${ printerHostName }:${ printerHostPort }`);
+    const printerURL = new URL(`${printerHostPrefix}://${printerHostName}:${printerHostPort}`);
+    const webSocketURL = new URL(`${websocketPrefix}://${printerHostName}:${printerHostPort}`);
 
     delete modifiedData.printerHostName;
     delete modifiedData.printerHostPrefix;
