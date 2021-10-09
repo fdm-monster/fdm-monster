@@ -9,7 +9,7 @@
           <v-card-title>
             <span class="text-h5">
               <v-avatar color="primary" size="56">
-                {{avatarInitials()}}
+                {{ avatarInitials() }}
               </v-avatar>
               New Printer
             </span>
@@ -34,7 +34,7 @@
                         <v-select
                           v-model="formData.groups"
                           :error-messages="errors"
-                          :items="['asd', '123']"
+                          :items="groupNames"
                           label="Group(s)"
                           multiple
                           required
@@ -218,7 +218,7 @@ import { Component, Inject, Prop } from "vue-property-decorator";
 import { ValidationObserver, ValidationProvider } from "vee-validate";
 import { getDefaultCreatePrinter, PreCreatePrinter } from "@/models/printers/crud/create-printer.model";
 import { ACTIONS } from "@/store/printers/printers.actions";
-import { Action } from "vuex-class";
+import { Action, Getter } from "vuex-class";
 import { PrinterGroup } from "@/models/printers/printer-group.model";
 import { Printer } from "@/models/printers/printer.model";
 import { sseTestPrinterUpdate } from "@/event-bus/sse.events";
@@ -237,7 +237,10 @@ import { generateInitials } from "@/constants/noun-adjectives.data";
 })
 export default class CreatePrinterDialog extends Vue {
   @Prop(Boolean) show: boolean;
+
   @Action loadPrinterGroups: () => Promise<PrinterGroup[]>;
+  @Getter printerGroupNames: string[];
+
   @Inject() readonly appConstants!: any;
 
   apiKeyRules = { required: true, length: this.appConstants.apiKeyLength };
@@ -249,10 +252,6 @@ export default class CreatePrinterDialog extends Vue {
   showChecksPanel = false;
   testProgress?: TestProgressDetails = undefined;
 
-  avatarInitials() {
-    return generateInitials(this.formData.printerName);
-  }
-
   get mutableShow() {
     // https://forum.vuejs.org/t/update-data-when-prop-changes-data-derived-from-prop/1517/27
     return this.show;
@@ -260,6 +259,10 @@ export default class CreatePrinterDialog extends Vue {
 
   set mutableShow(newValue: boolean) {
     this.$emit("update:show", newValue);
+  }
+
+  avatarInitials() {
+    return generateInitials(this.formData.printerName);
   }
 
   isSet(value: boolean) {

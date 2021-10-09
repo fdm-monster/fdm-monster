@@ -56,14 +56,53 @@ class PrinterService {
       ...getDefaultPrinterEntry(),
       ...newPrinter
     };
+
     // We should not to this now: Regenerate sort index on printer add...
     // await this.reGenerateSortIndex();
+
     mergedPrinter.dateAdded = Date.now();
     mergedPrinter.sortIndex = await this.#printerCount(); // 0-based index so no +1 needed
 
     await validateInput(mergedPrinter, createPrinterRules);
 
     return Printers.create(mergedPrinter);
+  }
+
+  /**
+   * Explicit patching of printer document
+   * @param printerId
+   * @param updateData
+   * @returns {Promise<Query<Document<any, any, unknown> | null, Document<any, any, unknown>, {}, unknown>>}
+   */
+  async update(printerId, updateData) {
+    await validateInput(updateData, createPrinterRules);
+
+    const { printerURL, webSocketURL, apiKey, enabled, settingsAppearance } = updateData;
+    const filter = { _id: printerId };
+    const update = {
+      printerURL,
+      webSocketURL,
+      apiKey,
+      enabled
+    };
+
+    const doc = await Printers.findOneAndUpdate(filter, update, {
+      returnOriginal: false
+    });
+    let appearance = {
+      ...doc.settingsAppearance,
+      name: settingsAppearance.name
+    };
+
+    return Printers.findOneAndUpdate(
+      filter,
+      {
+        settingsAppearance: appearance
+      },
+      {
+        returnOriginal: false
+      }
+    );
   }
 
   /**

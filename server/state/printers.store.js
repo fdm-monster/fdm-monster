@@ -267,6 +267,25 @@ class PrintersStore {
   }
 
   /**
+   * Update properties available to 'addPrinter'
+   * @param printerId
+   * @param printer
+   * @returns {Promise<*>}
+   */
+  async updatePrinter(printerId, printer) {
+    this._validateState();
+
+    const updatedDoc = await this.#printerService.update(printerId, printer);
+    this.#logger.info(`Updated Printer: ${updatedDoc.printerURL} with ID ${updatedDoc._id}`);
+
+    const updatedPrinterState = await this.getPrinterState(printerId);
+    updatedPrinterState.updateEntityData(updatedDoc, true);
+
+    // The next 'round' will involve setting up a websocket for this printer
+    return updatedPrinterState.toFlat();
+  }
+
+  /**
    * Sets up/recreates a printer to be tested quickly by running the standard checks
    * @param printer
    * @returns {Promise<*>}

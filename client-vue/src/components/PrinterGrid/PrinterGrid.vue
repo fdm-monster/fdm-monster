@@ -33,7 +33,7 @@ import "gridstack/dist/gridstack.min.css";
 import "gridstack/dist/gridstack-extra.min.css";
 // Required for drag and drop
 import "gridstack/dist/h5/gridstack-dd-native";
-import ShowPrinterDialog from "@/components/Dialogs/ShowPrinterDialog.vue";
+import ShowPrinterDialog from "@/components/Dialogs/UpdatePrinterDialog.vue";
 import { sseMessageGlobal } from "@/event-bus/sse.events";
 import { SkeletonPrinter } from "@/models/printers/crud/skeleton-printer.model";
 import { newRandomNamePair } from "@/constants/noun-adjectives.data";

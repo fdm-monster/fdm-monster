@@ -11,12 +11,13 @@ import {
 import { newRandomNamePair } from "@/constants/noun-adjectives.data";
 
 export class PrintersService extends BaseService {
-  static convertPrinterToCreateForm(printer: Printer) {
+  static convertPrinterToCreateForm(printer: CreatePrinter) {
     // Inverse transformation
     const newFormData = getDefaultCreatePrinter();
 
     const printerURL = new URL(printer.printerURL);
     const webSocketURL = new URL(printer.webSocketURL);
+    newFormData.id = printer.id;
     newFormData.printerHostPort = parseInt(printerURL.port) || 80;
     newFormData.printerHostName = printerURL.hostname;
     newFormData.printerHostPrefix = printerURL.protocol.replace(":", "") as HttpProtocol;
@@ -63,7 +64,7 @@ export class PrintersService extends BaseService {
     return await this.postApi(path);
   }
 
-  static async createPrinter(printer: Printer) {
+  static async createPrinter(printer: CreatePrinter) {
     const path = ServerApi.printerRoute;
 
     return await this.postApi(path, printer);
@@ -73,6 +74,12 @@ export class PrintersService extends BaseService {
     const path = ServerApi.getPrinterRoute(printerId);
 
     return await this.deleteApi(path);
+  }
+
+  static async updatePrinter(printerId: string, printer: CreatePrinter) {
+    const path = ServerApi.getPrinterRoute(printerId);
+
+    return await this.patchApi(path, printer);
   }
 
   static async testConnection(printer: Printer) {

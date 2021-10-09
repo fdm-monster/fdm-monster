@@ -15,13 +15,15 @@
   >
     <v-toolbar :color="dataItem.skeleton ? 'secondary' : 'primary'" dark dense>
       <v-avatar color="secondary" size="54">
-        {{ avatarInitials() }}
+        {{ avatarInitials }}
       </v-avatar>
 
       <v-card-text class="ml-0">
-        <span class="mt-5">{{ this.getPrinterName() }}</span>
-          <br />
-        <small class="secondary--text font-weight-10">{{ dataItem.skeleton ? "New Printer" : "Printing" }}</small>
+        <span class="mt-5">{{ this.printerName() }}</span>
+        <br />
+        <small class="secondary--text font-weight-10">{{
+          dataItem.skeleton ? "New Printer" : "Printing"
+        }}</small>
       </v-card-text>
     </v-toolbar>
 
@@ -64,6 +66,7 @@ import { Printer } from "@/models/printers/printer.model";
 import { GridStack } from "gridstack";
 import { SkeletonPrinter } from "@/models/printers/crud/skeleton-printer.model";
 import { generateInitials } from "@/constants/noun-adjectives.data";
+import { updatedPrinterEvent } from "@/event-bus/printer.events";
 
 export const EVENTS = {
   itemClicked: "griditem:clicked"
@@ -71,18 +74,39 @@ export const EVENTS = {
 @Component
 export default class GridItem extends Vue {
   @Prop() dataItem: Printer | SkeletonPrinter;
+  printer?: Printer = undefined;
+  avatarInitials = "";
   @Prop() selector: string;
   @Prop() grid: GridStack;
 
   skeleton: boolean;
   fab = false;
 
-  created() {
-    this.skeleton = (this.dataItem as SkeletonPrinter)?.skeleton;
+  get printerId() {
+    return this.dataItem?.id;
   }
 
-  avatarInitials() {
-    return generateInitials(this.dataItem.printerName);
+  printerName() {
+    if ((this.dataItem as SkeletonPrinter).skeleton) return "";
+
+    let data = this.printer as Printer;
+    this.avatarInitials = generateInitials(this.printer.printerName);
+    return data.printerName || data.printerURL?.replace("http://", "");
+  }
+
+  created() {
+    this.skeleton = (this.dataItem as SkeletonPrinter)?.skeleton;
+    this.printer = this.$store.getters.printer(this.dataItem.id);
+
+    if (!this.skeleton) {
+      this.$bus.on(updatedPrinterEvent(this.printerId), this.updateItem);
+    }
+  }
+
+  updateItem(data: Printer) {
+    console.log("Update triggered", data);
+    this.printer = data;
+    this.avatarInitials = generateInitials(this.printer.printerName);
   }
 
   doSomething() {
@@ -100,11 +124,8 @@ export default class GridItem extends Vue {
     this.grid.makeWidget(`#${this.selector}`);
   }
 
-  getPrinterName() {
-    if ((this.dataItem as SkeletonPrinter).skeleton) return;
-
-    let data = this.dataItem as Printer;
-    return data.printerName || data.printerURL?.replace("http://", "");
+  beforeDestroy() {
+    this.$bus.off(updatedPrinterEvent(this.printerId), this.updateItem);
   }
 }
 </script>

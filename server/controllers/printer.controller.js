@@ -110,16 +110,22 @@ class PrinterController {
     res.send(printerState.toFlat());
   }
 
+  #adjustPrinterObject(printer) {
+    if (!printer.webSocketURL) {
+      printer.webSocketURL = convertHttpUrlToWebsocket(printer.printerURL);
+    }
+    printer.settingsAppearance = getSettingsApperearanceDefault();
+    if (printer.printerName) {
+      printer.settingsAppearance.name = printer.printerName;
+      delete printer.printerName;
+    }
+
+    return printer;
+  }
+
   async create(req, res) {
-    const newPrinter = req.body;
-    if (!newPrinter.webSocketURL) {
-      newPrinter.webSocketURL = convertHttpUrlToWebsocket(newPrinter.printerURL);
-    }
-    newPrinter.settingsAppearance = getSettingsApperearanceDefault();
-    if (newPrinter.printerName) {
-      newPrinter.settingsAppearance.name = newPrinter.printerName;
-      delete newPrinter.printerName;
-    }
+    let newPrinter = req.body;
+    newPrinter = this.#adjustPrinterObject(newPrinter);
 
     // Has internal validation, but might add some here above as well
     const printerState = await this.#printersStore.addPrinter(newPrinter);
@@ -143,6 +149,22 @@ class PrinterController {
     this.#logger.info("Deleting printer with id", printerId);
 
     const result = await this.#printersStore.deletePrinter(printerId);
+
+    res.send(result);
+  }
+
+  /**
+   * Update the 3DPF printer entity, does not adjust everything
+   * @param req
+   * @param res
+   * @returns {Promise<void>}
+   */
+  async update(req, res) {
+    const { id: printerId } = await validateInput(req.params, idRules);
+    let updatedPrinter = req.body;
+    updatedPrinter = this.#adjustPrinterObject(updatedPrinter);
+
+    const result = await this.#printersStore.updatePrinter(printerId, updatedPrinter);
 
     res.send(result);
   }
@@ -251,18 +273,6 @@ class PrinterController {
   }
 
   // TODO === The big todo line ===
-  async updateSettings(req, res) {
-    const params = await validateInput(req.params, idRules);
-
-    throw new NotImplementedException("Update settings is being split up.");
-
-    // TODO implement as partials (broken right now)
-    const settings = req.body;
-    this.#logger.info("Update printers request: ", settings);
-    const updateSettings = await Runner.updateSettings(settings);
-    res.send({ status: updateSettings.status, printer: updateSettings.printer });
-  }
-
   async getConnectionLogs(req, res) {
     const params = await validateInput(req.params, idRules);
 
@@ -294,11 +304,12 @@ module.exports = createController(PrinterController)
     .get("/sse", "sse")
     .post("/", "create")
     .post("/test-connection", "testConnection")
+    .post("/sort-index", "updateSortIndex")
     .get("/:id", "get")
+    .patch("/:id", "update")
+    .delete("/:id", "delete")
     .post("/:id/serial-connect", "sendSerialConnectCommand")
     .post("/:id/serial-disconnect", "sendSerialDisconnectCommand")
-    .delete("/:id", "delete")
-    .patch("/sort-index", "updateSortIndex")
     .patch("/:id/enabled", "updateEnabled")
     .put("/:id/reconnect", "reconnectOctoPrint")
     .patch("/:id/connection", "updateConnectionSettings")
@@ -308,6 +319,5 @@ module.exports = createController(PrinterController)
     .patch("/:id/reset-power-settings", "resetPowerSettings")
     // WIP line
     .post("/:id/query-settings", "querySettings")
-    .patch("/:id/update-settings", "updateSettings")
     .get("/:id/connection-logs/", "getConnectionLogs")
     .get("/:id/plugin-list", "getPluginList");

@@ -36,7 +36,7 @@
                         <v-select
                           v-model="formData.groups"
                           :error-messages="errors"
-                          :items="['asd', '123']"
+                          :items="printerGroupNames"
                           label="Group(s)"
                           multiple
                           required
@@ -220,7 +220,7 @@ import { Component, Inject, Prop, Watch } from "vue-property-decorator";
 import { ValidationObserver, ValidationProvider } from "vee-validate";
 import { getDefaultCreatePrinter, PreCreatePrinter } from "@/models/printers/crud/create-printer.model";
 import { ACTIONS } from "@/store/printers/printers.actions";
-import { Action } from "vuex-class";
+import { Action, Getter } from "vuex-class";
 import { PrinterGroup } from "@/models/printers/printer-group.model";
 import { Printer } from "@/models/printers/printer.model";
 import { sseTestPrinterUpdate } from "@/event-bus/sse.events";
@@ -228,6 +228,7 @@ import { PrinterSseMessage, TestProgressDetails } from "@/models/sse-messages/pr
 import { PrintersService } from "@/backend";
 import { AppConstants } from "@/constants/app.constants";
 import { generateInitials } from "@/constants/noun-adjectives.data";
+import { updatedPrinterEvent } from "@/event-bus/printer.events";
 
 const watchedId = "printerId";
 
@@ -244,6 +245,8 @@ export default class ShowPrinterDialog extends Vue {
   @Prop() show: boolean;
   @Prop() [watchedId]: string; // printerId key
   @Action loadPrinterGroups: () => Promise<PrinterGroup[]>;
+  @Getter printerGroupNames: string[];
+
   @Inject() readonly appConstants!: AppConstants;
 
   apiKeyRules = { required: true, length: this.appConstants.apiKeyLength };
@@ -318,9 +321,15 @@ export default class ShowPrinterDialog extends Vue {
 
     if (!result) return;
 
-    const newPrinterData = PrintersService.convertCreateFormToPrinter(this.formData);
+    const updatePrinter = PrintersService.convertCreateFormToPrinter(this.formData);
+    const printerId = updatePrinter.id;
 
-    await this.$store.dispatch(ACTIONS.createPrinter, newPrinterData);
+    const updatedData = await this.$store.dispatch(ACTIONS.updatePrinter, {
+      printerId,
+      updatedPrinter: updatePrinter
+    });
+
+    this.$bus.emit(updatedPrinterEvent(printerId), updatedData);
   }
 
   clear() {

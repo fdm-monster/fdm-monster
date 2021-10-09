@@ -18,6 +18,7 @@ export interface PrintersStateInterface {
 export const MUTATIONS = {
   createPrinter: "createPrinter",
   savePrinters: "savePrinters",
+  updatePrinter: "updatePrinter",
   loadPrinterGroups: "loadPrinterGroups",
   savePrinterFiles: "savePrinterFiles",
   deletePrinterFile: "deletePrinterFile",
@@ -41,6 +42,15 @@ export const printersState: StoreOptions<StateInterface> = {
     [MUTATIONS.createTestPrinter]: (state, printer: Printer) => {
       state.testPrinters.push(printer);
       state.lastUpdated = Date.now();
+    },
+    [MUTATIONS.updatePrinter]: (state: StateInterface, { printerId, printer }) => {
+      const printerIndex = state.printers.findIndex((p: Printer) => p.id === printerId);
+
+      if (printerIndex !== -1) {
+        state.printers[printerIndex] = printer;
+      } else {
+        console.warn("Printer was not purged as it did not occur in state", printerId);
+      }
     },
     [MUTATIONS.deletePrinter]: (state: StateInterface, printerId) => {
       const printerIndex = state.printers.findIndex((p: Printer) => p.id === printerId);
@@ -90,6 +100,7 @@ export const printersState: StoreOptions<StateInterface> = {
     printer: (state) => (printerId: string) => state.printers.find((p) => p.id === printerId),
     printerFiles: (state) => (printerId: string) =>
       state.printers.find((p) => p.id === printerId)?.fileList.files,
+    printerGroupNames: (state) => state.printerGroups.map((pg) => pg.name),
     lastUpdated: (state) => state.lastUpdated
   },
   actions: {
@@ -104,6 +115,13 @@ export const printersState: StoreOptions<StateInterface> = {
       const data = await PrintersService.testConnection(newPrinter);
 
       commit(MUTATIONS.createTestPrinter, data);
+
+      return data;
+    },
+    [ACTIONS.updatePrinter]: async ({ commit }, { printerId, updatedPrinter }) => {
+      const data = await PrintersService.updatePrinter(printerId, updatedPrinter);
+
+      commit(MUTATIONS.updatePrinter, { printerId, printer: data });
 
       return data;
     },
