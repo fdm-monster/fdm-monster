@@ -74,7 +74,7 @@ export const EVENTS = {
 @Component
 export default class GridItem extends Vue {
   @Prop() dataItem: Printer | SkeletonPrinter;
-  printer?: Printer = undefined;
+  printer: Printer;
   avatarInitials = "";
   @Prop() selector: string;
   @Prop() grid: GridStack;
@@ -83,7 +83,9 @@ export default class GridItem extends Vue {
   fab = false;
 
   get printerId() {
-    return this.dataItem?.id;
+    if ((this.dataItem as SkeletonPrinter).skeleton) return "";
+
+    return (this.dataItem as Printer).id;
   }
 
   printerName() {
@@ -96,15 +98,14 @@ export default class GridItem extends Vue {
 
   created() {
     this.skeleton = (this.dataItem as SkeletonPrinter)?.skeleton;
-    this.printer = this.$store.getters.printer(this.dataItem.id);
 
     if (!this.skeleton) {
+      this.printer = this.$store.getters.printer((this.dataItem as Printer).id);
       this.$bus.on(updatedPrinterEvent(this.printerId), this.updateItem);
     }
   }
 
   updateItem(data: Printer) {
-    console.log("Update triggered", data);
     this.printer = data;
     this.avatarInitials = generateInitials(this.printer.printerName);
   }
