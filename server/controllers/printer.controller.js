@@ -87,7 +87,7 @@ class PrinterController {
     const printerLogin = this.#printersStore.getPrinterLogin(printerId);
 
     const command = this.#octoPrintApiService.disconnectCommand;
-    await this.#octoPrintApiService.sendConnectionCommand(printerLogin, { command });
+    await this.#octoPrintApiService.sendConnectionCommand(printerLogin, command);
 
     res.send(Status.success("Disconnect command sent"));
   }
