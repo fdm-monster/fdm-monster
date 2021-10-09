@@ -10,6 +10,7 @@ import VueSSE from "vue-sse";
 import VueBus from "vue-bus";
 import { apiBase } from "@/backend/base.service";
 import { configureVeeValidate } from "@/plugins/veevalidate";
+import { generateAppConstants } from "@/constants/app.constants";
 
 Vue.config.productionTip = false;
 // Http Client
@@ -32,5 +33,8 @@ new Vue({
   router,
   store,
   vuetify,
+  provide: {
+    appConstants: generateAppConstants()
+  },
   render: (h) => h(App)
 }).$mount("#app");

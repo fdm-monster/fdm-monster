@@ -54,7 +54,7 @@
                       <validation-provider
                         v-slot="{ errors }"
                         name="Host Port"
-                        rules="required|integer|max:65535"
+                        :rules="`required|integer|max:${appConstants.maxPort}`"
                       >
                         <v-text-field
                           v-model="formData.printerHostPort"
@@ -209,11 +209,10 @@
 <script lang="ts">
 // https://www.digitalocean.com/community/tutorials/vuejs-typescript-class-components
 import Vue from "vue";
-import { Component, Prop } from "vue-property-decorator";
+import { Component, Inject, Prop } from "vue-property-decorator";
 import { ValidationObserver, ValidationProvider } from "vee-validate";
 import { defaultCreatePrinter, PreCreatePrinter } from "@/models/printers/crud/create-printer.model";
 import { ACTIONS } from "@/store/printers/printers.actions";
-import { apiKeyLength } from "@/constants/validation.constants";
 import { Action } from "vuex-class";
 import { PrinterGroup } from "@/models/printers/printer-group.model";
 import { Printer } from "@/models/printers/printer.model";
@@ -233,8 +232,9 @@ import { PrintersService } from "@/backend";
 export default class CreatePrinterDialog extends Vue {
   @Prop(Boolean) show: boolean;
   @Action loadPrinterGroups: () => Promise<PrinterGroup[]>;
+  @Inject() readonly appConstants!: any;
 
-  apiKeyRules = { required: true, length: apiKeyLength };
+  apiKeyRules = { required: true, length: this.appConstants.apiKeyLength };
   formData: PreCreatePrinter = { ...defaultCreatePrinter };
   $refs!: {
     validationObserver: InstanceType<typeof ValidationObserver>;

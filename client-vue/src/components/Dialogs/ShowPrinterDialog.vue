@@ -206,23 +206,17 @@
 <script lang="ts">
 // https://www.digitalocean.com/community/tutorials/vuejs-typescript-class-components
 import Vue from "vue";
-import { Component, Prop, Watch } from "vue-property-decorator";
+import { Component, Inject, Prop, Watch } from "vue-property-decorator";
 import { ValidationObserver, ValidationProvider } from "vee-validate";
-import {
-  defaultCreatePrinter,
-  HttpProtocol,
-  PreCreatePrinter,
-  WebSocketProtocol
-} from "@/models/printers/crud/create-printer.model";
+import { defaultCreatePrinter, PreCreatePrinter } from "@/models/printers/crud/create-printer.model";
 import { ACTIONS } from "@/store/printers/printers.actions";
-import { apiKeyLength } from "@/constants/validation.constants";
 import { Action } from "vuex-class";
 import { PrinterGroup } from "@/models/printers/printer-group.model";
 import { Printer } from "@/models/printers/printer.model";
 import { sseTestPrinterUpdate } from "@/event-bus/sse.events";
 import { PrinterSseMessage, TestProgressDetails } from "@/models/sse-messages/printer-sse-message.model";
-import { newRandomNamePair } from "@/constants/noun-adjectives.data";
 import { PrintersService } from "@/backend";
+import { AppConstants } from "@/constants/app.constants";
 
 const watchedId = "printerId";
 
@@ -239,8 +233,9 @@ export default class ShowPrinterDialog extends Vue {
   @Prop() show: boolean;
   @Prop() [watchedId]: string; // printerId key
   @Action loadPrinterGroups: () => Promise<PrinterGroup[]>;
+  @Inject() readonly appConstants!: AppConstants;
 
-  apiKeyRules = { required: true, length: apiKeyLength };
+  apiKeyRules = { required: true, length: this.appConstants.apiKeyLength };
   formData: PreCreatePrinter = { ...defaultCreatePrinter };
   $refs!: {
     validationObserver: InstanceType<typeof ValidationObserver>;
@@ -265,19 +260,7 @@ export default class ShowPrinterDialog extends Vue {
     const printer = this.$store.getters.printer(val) as Printer;
 
     // Inverse transformation
-    let newFormData = defaultCreatePrinter;
-    const printerURL = new URL(printer.printerURL);
-    const webSocketURL = new URL(printer.webSocketURL);
-    newFormData.printerHostPort = parseInt(printerURL.port);
-    newFormData.printerHostName = printerURL.hostname;
-    newFormData.printerHostPrefix = printerURL.protocol.replace(":", "") as HttpProtocol;
-    newFormData.websocketPrefix = webSocketURL.protocol.replace(":", "") as WebSocketProtocol;
-    newFormData.printerName = printer.printerName || newRandomNamePair();
-    newFormData.apiKey = printer.apiKey;
-    newFormData.groups = printer.groups;
-    newFormData.stepSize = printer.stepSize;
-
-    this.formData = newFormData;
+    this.formData = PrintersService.convertPrinterToCreateForm(printer);
   }
 
   isSet(value: boolean) {
