@@ -41,8 +41,42 @@
         <v-toolbar flat>
           <v-toolbar-title>Showing printers</v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-switch v-model="reorder" class="mt-5" dark label="Sort mode">Reorder</v-switch>
+          <v-switch v-model="reorder" class="mt-5 mr-3" dark label="Sort mode" />
+          <v-switch
+            v-show="false"
+            v-model="deleteMany"
+            class="mt-5 mr-3"
+            dark
+            label="Delete printers"
+          />
+          <v-switch
+            v-show="false"
+            v-model="bulkFileClean"
+            class="mt-5 mr-3"
+            dark
+            disabled
+            label="Bulk file clean"
+          />
+          <v-switch
+            v-show="false"
+            v-model="bulkUpdate"
+            class="mt-5"
+            dark
+            disabled
+            label="Bulk file clean"
+          />
         </v-toolbar>
+      </template>
+      <template v-slot:item.enabled="{ item }">
+        <v-switch
+          v-model="item.enabled"
+          color="primary"
+          dark
+          inset
+          @click.native.capture.stop="toggleEnabled($event, item)"
+        >
+          {{ item.enabled }}
+        </v-switch>
       </template>
       <template v-slot:item.printerName="{ item }">
         <v-chip color="primary" dark>
@@ -55,44 +89,9 @@
         </v-chip>
       </template>
       <template v-slot:item.actions="{ item }">
-        <v-btn
-          class="ma-2"
-          color="primary"
-          fab
-          small
-          @click.c.capture.native.stop="openPrinterURL(item)"
-        >
-          <v-icon>directions</v-icon>
-        </v-btn>
-        <v-badge
-          v-if="item.enabled"
-          :color="isPrinterOperational(item) ? 'green' : 'red'"
-          bordered
-          class="ma-2"
-          overlap
-        >
-          <template v-slot:badge>
-            <v-icon v-if="isPrinterOperational(item)">check</v-icon>
-            <v-icon v-else>close</v-icon>
-          </template>
-          <v-btn :color="item.printerState.color" fab small>
-            <v-icon>usb</v-icon>
-          </v-btn>
-        </v-badge>
-        <v-btn class="ma-2" color="primary" fab small>
-          <v-icon>settings</v-icon>
-        </v-btn>
-      </template>
-      <template v-slot:item.enabled="{ item }">
-        <v-switch
-          v-model="item.enabled"
-          color="primary"
-          dark
-          inset
-          @click.native.capture.stop="toggleEnabled($event, item)"
-        >
-          {{ item.enabled }}
-        </v-switch>
+        <PrinterUrlAction :printer="item" />
+        <PrinterConnectionAction :printer="item" />
+        <PrinterSettingsAction :printer="item" />
       </template>
       <template v-slot:expanded-item="{ headers, item }">
         <td :colspan="headers.length">
@@ -112,19 +111,34 @@ import draggable from "vuedraggable";
 import { PrintersService } from "@/backend/printers.service";
 import { PrinterSseMessage } from "@/models/sse-messages/printer-sse-message.model";
 import { sseMessageGlobal } from "@/event-bus/sse.events";
-import PrinterDetails from "@/components/PrinterDetails.vue";
+import PrinterDetails from "@/components/PrinterList/PrinterDetails.vue";
+import { PrinterGroup } from "@/models/printers/printer-group.model";
+import PrinterUrlAction from "@/components/PrinterList/PrinterUrlAction.vue";
+import PrinterSettingsAction from "@/components/PrinterList/PrinterSettingsAction.vue";
+import PrinterConnectionAction from "@/components/PrinterList/PrinterConnectionAction.vue";
 
 @Component({
-  components: { PrinterDetails, draggable }
+  components: {
+    PrinterDetails,
+    draggable,
+    PrinterUrlAction,
+    PrinterSettingsAction,
+    PrinterConnectionAction
+  }
 })
 export default class Printers extends Vue {
   @Action loadPrinters: () => Promise<Printer[]>;
+  @Action loadPrinterGroups: () => Promise<PrinterGroup[]>;
   @Getter printers: Printer[];
+  @Getter printerGroups: PrinterGroup[];
 
   reorder = false;
+  deleteMany = false;
+  bulkFileClean = false;
+  bulkUpdate = false;
+
   search = "";
   expanded = [];
-  singleExpand = true;
   tableHeaders = [
     {
       text: "Order",
@@ -132,21 +146,17 @@ export default class Printers extends Vue {
       sortable: true,
       value: "sortIndex"
     },
+    { text: "Enabled", value: "enabled" },
     {
       text: "Printer Name",
       align: "start",
       sortable: true,
       value: "printerName"
     },
-    { text: "Group", value: "group" },
+    { text: "Groups", value: "group" },
     { text: "Actions", value: "actions", sortable: false },
-    { text: "Enabled", value: "enabled" },
     { text: "", value: "data-table-expand" }
   ];
-
-  isPrinterOperational(printer: Printer) {
-    return printer?.printerState?.flags.operational;
-  }
 
   async toggleEnabled(event: any, printer: Printer) {
     if (!printer.id) {
@@ -161,6 +171,7 @@ export default class Printers extends Vue {
 
   async mounted() {
     await this.loadPrinters();
+    await this.loadPrinterGroups();
 
     this.$bus.on(sseMessageGlobal, (data: PrinterSseMessage) => {
       this.onSseMessage(data);
@@ -174,21 +185,9 @@ export default class Printers extends Vue {
     let existingPrinters = this.printers.map((p) => p.id);
 
     updatedPrinters.forEach((p) => {
-      const printerIndex = this.printers.findIndex((pr) => pr.id === p.id);
+      const printerIndex = existingPrinters.findIndex((printerId) => printerId === p.id);
       existingPrinters.splice(printerIndex, 1);
     });
-
-    if (existingPrinters.length > 0) {
-      console.warn("Superfluous printers detected. Out of sync?", existingPrinters);
-    }
-  }
-
-  openPrinterURL(printer: Printer) {
-    const printerURL = printer.printerURL;
-    if (!printerURL) {
-      return;
-    }
-    window.open(printerURL);
   }
 }
 </script>

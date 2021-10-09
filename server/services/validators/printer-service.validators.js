@@ -4,6 +4,9 @@ const createPrinterRules = {
   apiKey: `required|length:${UUID_LENGTH},${UUID_LENGTH}|alphaNumeric`,
   printerURL: "required|httpurl",
   webSocketURL: "required|wsurl",
+  enabled: "boolean",
+  settingsAppearance: "object",
+  "settingsAppearance.name": "string",
   camURL: "httpurl"
 };
 

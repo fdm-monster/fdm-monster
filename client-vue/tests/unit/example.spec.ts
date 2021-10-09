@@ -1,5 +1,5 @@
 import { shallowMount } from "@vue/test-utils";
-import HelloWorld from "@/components/Map.vue";
+import HelloWorld from "@/components/PrinterGrid/LocationMap.vue";
 
 describe("Map.vue", () => {
   it("renders props.msg when passed", () => {

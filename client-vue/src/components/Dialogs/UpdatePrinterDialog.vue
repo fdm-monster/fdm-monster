@@ -1,9 +1,6 @@
 <template>
   <v-row justify="center">
     <v-dialog v-model="mutableShow" :max-width="showChecksPanel ? '700px' : '600px'" persistent>
-      <!--      <template v-slot:activator="{ on, attrs }">-->
-      <!--        <v-btn v-bind="attrs" v-on="on" color="primary" dark> Open Dialog</v-btn>-->
-      <!--      </template>-->
       <validation-observer ref="validationObserver" v-slot="{ invalid }">
         <v-card>
           <v-card-title>
@@ -11,7 +8,7 @@
               <v-avatar color="primary" size="56">
                 {{ avatarInitials() }}
               </v-avatar>
-              New Printer
+              Showing Printer
             </span>
           </v-card-title>
           <v-card-text>
@@ -20,9 +17,14 @@
                 <v-container>
                   <v-row>
                     <v-col cols="12" md="6">
-                      <validation-provider v-slot="{ errors }" name="Name" rules="required|max:10">
+                      <validation-provider
+                        v-slot="{ errors }"
+                        :rules="printerNameRules"
+                        name="Name"
+                      >
                         <v-text-field
                           v-model="formData.printerName"
+                          :counter="printerNameRules.max"
                           :error-messages="errors"
                           label="Printer name*"
                           required
@@ -34,7 +36,7 @@
                         <v-select
                           v-model="formData.groups"
                           :error-messages="errors"
-                          :items="groupNames"
+                          :items="printerGroupNames"
                           label="Group(s)"
                           multiple
                           required
@@ -58,8 +60,8 @@
                     <v-col cols="12" md="6">
                       <validation-provider
                         v-slot="{ errors }"
-                        :rules="`required|integer|max:${appConstants.maxPort}`"
                         name="Host Port"
+                        rules="required|integer|max:65535"
                       >
                         <v-text-field
                           v-model="formData.printerHostPort"
@@ -203,7 +205,7 @@
             <v-btn :disabled="invalid" color="warning" text @click="testPrinter()">
               Test connection
             </v-btn>
-            <v-btn :disabled="invalid" color="blue darken-1" text @click="submit()">Create</v-btn>
+            <v-btn :disabled="invalid" color="blue darken-1" text @click="submit()">Save</v-btn>
           </v-card-actions>
         </v-card>
       </validation-observer>
@@ -214,7 +216,7 @@
 <script lang="ts">
 // https://www.digitalocean.com/community/tutorials/vuejs-typescript-class-components
 import Vue from "vue";
-import { Component, Inject, Prop } from "vue-property-decorator";
+import { Component, Inject, Prop, Watch } from "vue-property-decorator";
 import { ValidationObserver, ValidationProvider } from "vee-validate";
 import { getDefaultCreatePrinter, PreCreatePrinter } from "@/models/printers/crud/create-printer.model";
 import { ACTIONS } from "@/store/printers/printers.actions";
@@ -224,7 +226,11 @@ import { Printer } from "@/models/printers/printer.model";
 import { sseTestPrinterUpdate } from "@/event-bus/sse.events";
 import { PrinterSseMessage, TestProgressDetails } from "@/models/sse-messages/printer-sse-message.model";
 import { PrintersService } from "@/backend";
+import { AppConstants } from "@/constants/app.constants";
 import { generateInitials } from "@/constants/noun-adjectives.data";
+import { updatedPrinterEvent } from "@/event-bus/printer.events";
+
+const watchedId = "printerId";
 
 @Component({
   components: {
@@ -235,15 +241,16 @@ import { generateInitials } from "@/constants/noun-adjectives.data";
     testProgress: undefined
   })
 })
-export default class CreatePrinterDialog extends Vue {
-  @Prop(Boolean) show: boolean;
-
+export default class ShowPrinterDialog extends Vue {
+  @Prop() show: boolean;
+  @Prop() [watchedId]: string; // printerId key
   @Action loadPrinterGroups: () => Promise<PrinterGroup[]>;
   @Getter printerGroupNames: string[];
 
-  @Inject() readonly appConstants!: any;
+  @Inject() readonly appConstants!: AppConstants;
 
   apiKeyRules = { required: true, length: this.appConstants.apiKeyLength };
+  printerNameRules = { required: true, max: this.appConstants.maxPrinterNameLength };
   formData: PreCreatePrinter = getDefaultCreatePrinter();
   $refs!: {
     validationObserver: InstanceType<typeof ValidationObserver>;
@@ -263,6 +270,16 @@ export default class CreatePrinterDialog extends Vue {
 
   avatarInitials() {
     return generateInitials(this.formData.printerName);
+  }
+
+  @Watch(watchedId)
+  onChildChanged(val?: string, oldVal?: string) {
+    if (!val) return;
+
+    const printer = this.$store.getters.printer(val) as Printer;
+
+    // Inverse transformation
+    this.formData = PrintersService.convertPrinterToCreateForm(printer);
   }
 
   isSet(value: boolean) {
@@ -304,9 +321,15 @@ export default class CreatePrinterDialog extends Vue {
 
     if (!result) return;
 
-    const newPrinterData = PrintersService.convertCreateFormToPrinter(this.formData);
+    const updatePrinter = PrintersService.convertCreateFormToPrinter(this.formData);
+    const printerId = updatePrinter.id;
 
-    await this.$store.dispatch(ACTIONS.createPrinter, newPrinterData);
+    const updatedData = await this.$store.dispatch(ACTIONS.updatePrinter, {
+      printerId,
+      updatedPrinter: updatePrinter
+    });
+
+    this.$bus.emit(updatedPrinterEvent(printerId as string), updatedData);
   }
 
   clear() {

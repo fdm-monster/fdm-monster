@@ -34,4 +34,8 @@ export class ServerApi {
 
   static getPrinterRoute = (id: string) => `${ServerApi.printerRoute}/${id}`;
   static printerEnabledRoute = (id: string) => `${ServerApi.getPrinterRoute(id)}/enabled`;
+  static printerSerialConnectRoute = (id: string) =>
+    `${ServerApi.getPrinterRoute(id)}/serial-connect`;
+  static printerSerialDisconnectRoute = (id: string) =>
+    `${ServerApi.getPrinterRoute(id)}/serial-disconnect`;
 }

@@ -15,10 +15,10 @@
 
 <script lang="ts">
 import Vue from "vue";
-import NavigationDrawer from "@/components/NavigationDrawer.vue";
-import TopBar from "@/components/TopBar.vue";
-import ErrorAlert from "@/components/ErrorAlert.vue";
-import FooterList from "@/components/QuickActions/FooterList.vue";
+import NavigationDrawer from "@/components/Generic/NavigationDrawer.vue";
+import TopBar from "@/components/Generic/TopBar.vue";
+import ErrorAlert from "@/components/Generic/ErrorAlert.vue";
+import FooterList from "@/components/Generic/FooterList.vue";
 import { Component } from "vue-property-decorator";
 import { Action, Getter } from "vuex-class";
 import { ServerSettings } from "@/models/server-settings.model";
@@ -58,12 +58,12 @@ export default class App extends Vue {
   async onSseMessage(message: PrinterSseMessage) {
     if (message.printers) {
       await this.$store.dispatch(ACTIONS.savePrinters, message.printers);
+
+      // Emit the global update
+      this.$bus.emit(sseMessageGlobal, message);
     }
 
     if (message.testPrinter) {
-      // Emit the global update
-      this.$bus.emit(sseMessageGlobal, message);
-
       // Emit a specific testing session update
       const { testPrinter, testProgress } = message;
       if (!testPrinter?.correlationToken) return;

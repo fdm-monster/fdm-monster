@@ -93,19 +93,19 @@ function configureContainer() {
     // Therefore scoping can influence how many requests per sec the API can handle... in case you're interested to know.
     [DITokens.settingsStore]: asClass(SettingsStore).singleton(),
     [DITokens.serverSettingsService]: asClass(ServerSettingsService),
-    clientSettingsService: asClass(ClientSettingsService),
-    userTokenService: asClass(UserTokenService).singleton(),
+    [DITokens.clientSettingsService]: asClass(ClientSettingsService),
+    [DITokens.userTokenService]: asClass(UserTokenService).singleton(),
 
     [DITokens.loggerFactory]: asFunction(LoggerFactory).transient(),
-    taskManagerService: asClass(TaskManagerService).singleton(),
-    eventEmitter2: awilix.asFunction(configureEventEmitter).singleton(),
+    [DITokens.taskManagerService]: asClass(TaskManagerService).singleton(),
+    [DITokens.eventEmitter2]: awilix.asFunction(configureEventEmitter).singleton(),
     [DITokens.serverUpdateService]: asClass(ServerUpdateService).singleton(),
     [DITokens.systemInfoStore]: asClass(SystemInfoStore).singleton(),
     [DITokens.githubApiService]: asClass(GithubApiService),
     [DITokens.autoDiscoveryService]: asClass(AutoDiscoveryService),
     [DITokens.systemCommandsService]: asClass(SystemCommandsService),
-    serverLogsService: asClass(ServerLogsService),
-    systemInfoBundleService: asClass(SystemInfoBundleService),
+    [DITokens.serverLogsService]: asClass(ServerLogsService),
+    [DITokens.systemInfoBundleService]: asClass(SystemInfoBundleService),
     [DITokens.httpClient]: awilix.asValue(axios),
 
     [DITokens.printerService]: asClass(PrinterService),
@@ -124,9 +124,9 @@ function configureContainer() {
     [DITokens.jobsCache]: asClass(JobsCache).singleton(),
     [DITokens.heatMapCache]: asClass(HeatMapCache).singleton(),
     [DITokens.connectionLogsCache]: asClass(ConnectionLogsCache).singleton(),
-    printerTickerStore: asClass(PrinterTickerStore).singleton(),
+    [DITokens.printerTickerStore]: asClass(PrinterTickerStore).singleton(),
     [DITokens.fileCache]: asClass(FileCache).singleton(),
-    filamentStore: asClass(FilamentStore), // No need for singleton as its now based on filamentCache
+    [DITokens.filamentStore]: asClass(FilamentStore), // No need for singleton as its now based on filamentCache
     [DITokens.filesStore]: asClass(FilesStore).singleton(),
     [DITokens.printersStore]: asClass(PrintersStore).singleton(),
 
@@ -138,9 +138,9 @@ function configureContainer() {
     [DITokens.influxDbHistoryService]: asClass(InfluxDbHistoryService),
     [DITokens.influxDbPrinterStateService]: asClass(InfluxDbPrinterStateService),
 
-    softwareUpdateTask: asClass(SoftwareUpdateTask),
+    [DITokens.softwareUpdateTask]: asClass(SoftwareUpdateTask),
     // Provided SSE handlers (couplers) shared with controllers
-    printerSseHandler: asClass(ServerSentEventsHandler).singleton(),
+    [DITokens.printerSseHandler]: asClass(ServerSentEventsHandler).singleton(),
     // Task bound to send on SSE Handler
     [DITokens.printerSseTask]: asClass(PrinterSseTask).singleton(),
     // Normal post-analysis operations (previously called cleaners)

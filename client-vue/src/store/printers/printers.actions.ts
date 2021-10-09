@@ -1,6 +1,7 @@
 export const ACTIONS = {
   createPrinter: "createPrinter",
   createTestPrinter: "createTestPrinter",
+  updatePrinter: "updatePrinter",
   savePrinters: "savePrinters",
   loadPrinters: "loadPrinters",
   loadPrinterGroups: "loadPrinterGroups",

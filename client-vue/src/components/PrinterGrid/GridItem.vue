@@ -11,8 +11,37 @@
     :gs-w="this.dataItem.w"
     :gs-x="this.dataItem.x"
     :gs-y="this.dataItem.y"
+    @click="clickPrinter()"
   >
-    <v-speed-dial v-model="fab" direction="right" hidden right>
+    <v-toolbar :color="dataItem.skeleton ? 'secondary' : 'primary'" dark dense>
+      <v-avatar color="secondary" size="54">
+        {{ avatarInitials }}
+      </v-avatar>
+
+      <v-card-text class="ml-0">
+        <span class="mt-5">{{ this.printerName() }}</span>
+        <br />
+        <small class="secondary--text font-weight-10">{{
+          dataItem.skeleton ? "New Printer" : "Printing"
+        }}</small>
+      </v-card-text>
+    </v-toolbar>
+
+    <v-card-subtitle class="grid-stack-item-content"></v-card-subtitle>
+
+    <v-card-actions v-if="dataItem.skeleton">
+      <v-btn> Create</v-btn>
+    </v-card-actions>
+    <v-card-actions v-else>
+      <v-btn color="primary" fab x-small @click.stop="doSomething()">
+        <v-icon>stop</v-icon>
+      </v-btn>
+      <v-btn color="primary" fab x-small @click.stop="doSomething()">
+        <v-icon>info</v-icon>
+      </v-btn>
+    </v-card-actions>
+
+    <v-speed-dial v-model="fab" direction="right" hidden left @click.native.stop>
       <template v-slot:activator>
         <v-btn absolute color="secondary" dark fab right top x-small>
           <v-icon v-if="fab">close</v-icon>
@@ -26,29 +55,69 @@
         <v-icon>settings</v-icon>
       </v-btn>
     </v-speed-dial>
-
-    <v-toolbar :color="dataItem.skeleton ? 'secondary' : 'primary'" dark dense>
-      {{ this.getPrinterName() }}
-    </v-toolbar>
-    <v-card-text class="grid-stack-item-content">
-      {{ dataItem.skeleton ? "not set up" : "Printing" }}
-    </v-card-text>
-    <v-card-actions> 0% </v-card-actions>
   </v-card>
 </template>
-<script>
+
+<script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop } from "vue-property-decorator";
+import { Printer } from "@/models/printers/printer.model";
+import { GridStack } from "gridstack";
+import { SkeletonPrinter } from "@/models/printers/crud/skeleton-printer.model";
+import { generateInitials } from "@/constants/noun-adjectives.data";
+import { updatedPrinterEvent } from "@/event-bus/printer.events";
 
+export const EVENTS = {
+  itemClicked: "griditem:clicked"
+};
 @Component
 export default class GridItem extends Vue {
-  @Prop() dataItem;
-  @Prop() selector;
-  @Prop() grid;
+  @Prop() dataItem: Printer | SkeletonPrinter;
+  printer: Printer;
+  avatarInitials = "";
+  @Prop() selector: string;
+  @Prop() grid: GridStack;
 
-  skeleton = this.dataItem?.skeleton;
+  skeleton: boolean;
   fab = false;
+
+  get printerId() {
+    if ((this.dataItem as SkeletonPrinter).skeleton) return "";
+
+    return (this.dataItem as Printer).id;
+  }
+
+  printerName() {
+    if ((this.dataItem as SkeletonPrinter).skeleton) return "";
+
+    let data = this.printer as Printer;
+    this.avatarInitials = generateInitials(this.printer.printerName);
+    return data.printerName || data.printerURL?.replace("http://", "");
+  }
+
+  created() {
+    this.skeleton = (this.dataItem as SkeletonPrinter)?.skeleton;
+
+    if (!this.skeleton) {
+      this.printer = this.$store.getters.printer((this.dataItem as Printer).id);
+      this.$bus.on(updatedPrinterEvent(this.printerId), this.updateItem);
+    }
+  }
+
+  updateItem(data: Printer) {
+    this.printer = data;
+    this.avatarInitials = generateInitials(this.printer.printerName);
+  }
+
+  doSomething() {
+    // TODO
+    console.log("Something done");
+  }
+
+  clickPrinter() {
+    this.$bus.emit(EVENTS.itemClicked, this.dataItem);
+  }
 
   updated() {
     // The grid item is dereferenced on every update
@@ -56,8 +125,8 @@ export default class GridItem extends Vue {
     this.grid.makeWidget(`#${this.selector}`);
   }
 
-  getPrinterName() {
-    return this.dataItem.printerName || this.dataItem.printerURL?.replace("http://", "");
+  beforeDestroy() {
+    this.$bus.off(updatedPrinterEvent(this.printerId), this.updateItem);
   }
 }
 </script>

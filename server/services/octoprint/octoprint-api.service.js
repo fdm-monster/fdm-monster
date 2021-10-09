@@ -45,11 +45,20 @@ class OctoprintApiService {
   #httpClient;
   #timeouts; // TODO apply apiTimeout, but apply apiRetry, apiRetryCutoff elsewhere (and webSocketRetry)
 
-  #logger = new Logger("OctoPrint-API-Service");
+  #logger;
 
-  constructor({ settingsStore, httpClient }) {
+  constructor({ settingsStore, httpClient, loggerFactory }) {
     this.#settingsStore = settingsStore;
     this.#httpClient = httpClient;
+    this.#logger = loggerFactory("OctoPrint-API-Service");
+  }
+
+  get disconnectCommand() {
+    return { command: "disconnect" };
+  }
+
+  get connectCommand() {
+    return { command: "connect" };
   }
 
   #ensureTimeoutSettingsLoaded() {
@@ -103,6 +112,14 @@ class OctoprintApiService {
     const { url, options } = this.#prepareRequest(printer, apiLogin);
 
     const response = await this.#httpClient.post(url, {}, options);
+
+    return processResponse(response, responseOptions);
+  }
+
+  async sendConnectionCommand(printer, commandData, responseOptions = defaultResponseOptions) {
+    const { url, options, data } = this.#prepareJSONRequest(printer, apiConnection, commandData);
+
+    const response = await this.#httpClient.post(url, data, options);
 
     return processResponse(response, responseOptions);
   }
