@@ -78,7 +78,7 @@ class PrinterController {
     const command = this.#octoPrintApiService.connectCommand;
     await this.#octoPrintApiService.sendConnectionCommand(printerLogin, command);
 
-    return Status.success("Connect command sent");
+    res.send(Status.success("Connect command sent"));
   }
 
   async sendSerialDisconnectCommand(req, res) {
@@ -89,7 +89,7 @@ class PrinterController {
     const command = this.#octoPrintApiService.disconnectCommand;
     await this.#octoPrintApiService.sendConnectionCommand(printerLogin, { command });
 
-    return Status.success("Disconnect command sent");
+    res.send(Status.success("Disconnect command sent"));
   }
 
   async testConnection(req, res) {

@@ -10,7 +10,7 @@
       <v-icon v-if="isPrinterOperational(printer)">check</v-icon>
       <v-icon v-else>close</v-icon>
     </template>
-    <v-btn :color="printer.printerState.colour.name" @click="togglePrinterConnection()" fab small>
+    <v-btn :color="printer.printerState.colour.name" fab small @click="togglePrinterConnection()" :disabled="isPrinterPrinting()">
       <v-icon>usb</v-icon>
     </v-btn>
   </v-badge>
@@ -22,6 +22,7 @@ import Vue from "vue";
 import FileList from "@/components/PrinterList/FileList.vue";
 import { Prop } from "vue-property-decorator";
 import { Printer } from "@/models/printers/printer.model";
+import { PrintersService } from "@/backend";
 
 @Component({
   components: { FileList }
@@ -37,8 +38,17 @@ export default class PrinterConnectionAction extends Vue {
     return this.printer?.printerState?.flags.operational;
   }
 
-  togglePrinterConnection() {
-    console.log("click", this.printer?.printerState);
+  isPrinterPrinting() {
+    return this.printer?.printerState?.flags.printing;
+  }
+
+  async togglePrinterConnection() {
+    if (this.isPrinterOperational()) {
+      return PrintersService.sendPrinterDisconnectCommand(this.printerId);
+    }
+
+    console.log("connecting");
+    await PrintersService.sendPrinterConnectCommand(this.printerId);
   }
 }
 </script>
