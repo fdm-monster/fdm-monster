@@ -168,7 +168,9 @@ class PrintersModule extends VuexModule {
 
   @Action
   async dropUploadPrinterFile({ printerId, files }: { printerId: string; files: FileList }) {
-    await PrinterFilesService.uploadFiles(printerId, files);
+    const uploadedFiles = [...files].filter((f) => f.name) as File[];
+
+    await PrinterFilesService.uploadFiles(printerId, uploadedFiles);
 
     console.log("Drop triggered", printerId, files.length);
     // this.setPrinterFiles({ printerId, files: [] });

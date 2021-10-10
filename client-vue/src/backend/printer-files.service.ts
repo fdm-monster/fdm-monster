@@ -10,7 +10,7 @@ export class PrinterFilesService extends BaseService {
     return (await this.getApi(path)) as PrinterFile[];
   }
 
-  static async uploadFiles(printerId: string, files: FileList, location: FileLocation = "local") {
+  static async uploadFiles(printerId: string, files: File[], location: FileLocation = "local") {
     const path = ServerApi.printerFilesUploadRoute(printerId, location);
 
     const formData = new FormData();
