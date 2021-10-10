@@ -33,9 +33,10 @@ class HistoryController {
     const data = await validateInput(req.params, idRules);
     const historyId = data.id;
 
-    await History.findOneAndDelete({ _id: historyId }).then(() => {
-      this.#historyCache.initCache();
-    });
+    await History.findOneAndDelete({ _id: historyId });
+
+    await this.#historyCache.initCache();
+
     res.send();
   }
 
