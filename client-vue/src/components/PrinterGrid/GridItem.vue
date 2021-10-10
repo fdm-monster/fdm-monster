@@ -30,7 +30,7 @@
     <v-card-subtitle class="grid-stack-item-content"></v-card-subtitle>
 
     <v-card-actions v-if="this.skeleton">
-      <v-btn>Create</v-btn>
+      <v-btn disabled>Create</v-btn>
     </v-card-actions>
     <v-card-actions v-else>
       <v-btn color="primary" disabled fab x-small @click.stop="stopClicked()">
