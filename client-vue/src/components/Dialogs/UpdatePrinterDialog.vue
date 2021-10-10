@@ -151,51 +151,10 @@
                   </v-expansion-panels>
                 </v-container>
               </v-col>
-              <v-col v-if="showChecksPanel" cols="4">
-                <strong>Checks:</strong>
-                <v-alert
-                  v-if="testProgress && isSet(testProgress.connected)"
-                  :type="testProgress.connected ? 'success' : 'error'"
-                  dense
-                  text
-                >
-                  <small>Connected</small>
-                </v-alert>
-                <v-alert
-                  v-if="testProgress && isSet(testProgress.apiOk)"
-                  :type="testProgress.apiOk ? 'success' : 'error'"
-                  dense
-                  text
-                >
-                  <small>API ok</small>
-                </v-alert>
-                <v-alert
-                  v-if="testProgress && isSet(testProgress.apiKeyNotGlobal)"
-                  :type="testProgress.apiKeyNotGlobal ? 'success' : 'error'"
-                  dense
-                  text
-                >
-                  <small>Key not Global API Key</small>
-                </v-alert>
-                <v-alert
-                  v-if="testProgress && isSet(testProgress.apiKeyOk)"
-                  :type="testProgress.apiKeyOk ? 'success' : 'error'"
-                  dense
-                  text
-                >
-                  <small>Key accepted</small>
-                </v-alert>
-                <v-alert
-                  v-if="testProgress && isSet(testProgress.websocketBound)"
-                  :type="testProgress.websocketBound ? 'success' : 'error'"
-                  dense
-                  text
-                >
-                  <small>WebSocket bound</small>
-                </v-alert>
 
+              <PrinterChecksPanel v-if="showChecksPanel" :cols="4" :test-progress="testProgress">
                 <v-btn @click="showChecksPanel = false">Hide checks</v-btn>
-              </v-col>
+              </PrinterChecksPanel>
             </v-row>
           </v-card-text>
           <v-card-actions>
@@ -229,13 +188,15 @@ import { PrintersService } from "@/backend";
 import { AppConstants } from "@/constants/app.constants";
 import { generateInitials } from "@/constants/noun-adjectives.data";
 import { updatedPrinterEvent } from "@/event-bus/printer.events";
+import PrinterChecksPanel from "@/components/Dialogs/PrinterChecksPanel.vue";
 
 const watchedId = "printerId";
 
 @Component({
   components: {
     ValidationProvider,
-    ValidationObserver
+    ValidationObserver,
+    PrinterChecksPanel
   },
   data: () => ({
     testProgress: undefined

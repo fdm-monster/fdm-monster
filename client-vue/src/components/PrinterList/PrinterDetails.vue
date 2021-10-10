@@ -31,12 +31,12 @@ import { ACTIONS } from "@/store/printers/printers.actions";
 })
 export default class PrinterDetails extends Vue {
   @Prop() printer: Printer;
-  dragging = false;
 
   get printerId() {
     return this.printer.id;
   }
 
+  dragging = false;
   addFile(e: DragEvent) {
     if (!e.dataTransfer) return;
     this.dragging = false;

@@ -1,9 +1,6 @@
 <template>
   <v-row justify="center">
     <v-dialog v-model="mutableShow" :max-width="showChecksPanel ? '700px' : '600px'" persistent>
-      <!--      <template v-slot:activator="{ on, attrs }">-->
-      <!--        <v-btn v-bind="attrs" v-on="on" color="primary" dark> Open Dialog</v-btn>-->
-      <!--      </template>-->
       <validation-observer ref="validationObserver" v-slot="{ invalid }">
         <v-card>
           <v-card-title>
@@ -23,6 +20,7 @@
                       <validation-provider v-slot="{ errors }" name="Name" rules="required|max:10">
                         <v-text-field
                           v-model="formData.printerName"
+                          :counter="printerNameRules.max"
                           :error-messages="errors"
                           label="Printer name*"
                           required
@@ -34,7 +32,7 @@
                         <v-select
                           v-model="formData.groups"
                           :error-messages="errors"
-                          :items="groupNames"
+                          :items="printerGroupNames"
                           label="Group(s)"
                           multiple
                           required
@@ -149,51 +147,10 @@
                   </v-expansion-panels>
                 </v-container>
               </v-col>
-              <v-col v-if="showChecksPanel" cols="4">
-                <strong>Checks:</strong>
-                <v-alert
-                  v-if="testProgress && isSet(testProgress.connected)"
-                  :type="testProgress.connected ? 'success' : 'error'"
-                  dense
-                  text
-                >
-                  <small>Connected</small>
-                </v-alert>
-                <v-alert
-                  v-if="testProgress && isSet(testProgress.apiOk)"
-                  :type="testProgress.apiOk ? 'success' : 'error'"
-                  dense
-                  text
-                >
-                  <small>API ok</small>
-                </v-alert>
-                <v-alert
-                  v-if="testProgress && isSet(testProgress.apiKeyNotGlobal)"
-                  :type="testProgress.apiKeyNotGlobal ? 'success' : 'error'"
-                  dense
-                  text
-                >
-                  <small>Key not Global API Key</small>
-                </v-alert>
-                <v-alert
-                  v-if="testProgress && isSet(testProgress.apiKeyOk)"
-                  :type="testProgress.apiKeyOk ? 'success' : 'error'"
-                  dense
-                  text
-                >
-                  <small>Key accepted</small>
-                </v-alert>
-                <v-alert
-                  v-if="testProgress && isSet(testProgress.websocketBound)"
-                  :type="testProgress.websocketBound ? 'success' : 'error'"
-                  dense
-                  text
-                >
-                  <small>WebSocket bound</small>
-                </v-alert>
 
+              <PrinterChecksPanel v-if="showChecksPanel" :cols="4" :test-progress="testProgress">
                 <v-btn @click="showChecksPanel = false">Hide checks</v-btn>
-              </v-col>
+              </PrinterChecksPanel>
             </v-row>
           </v-card-text>
           <v-card-actions>
@@ -225,11 +182,14 @@ import { sseTestPrinterUpdate } from "@/event-bus/sse.events";
 import { PrinterSseMessage, TestProgressDetails } from "@/models/sse-messages/printer-sse-message.model";
 import { PrintersService } from "@/backend";
 import { generateInitials } from "@/constants/noun-adjectives.data";
+import PrinterChecksPanel from "@/components/Dialogs/PrinterChecksPanel.vue";
+import { AppConstants } from "@/constants/app.constants";
 
 @Component({
   components: {
     ValidationProvider,
-    ValidationObserver
+    ValidationObserver,
+    PrinterChecksPanel
   },
   data: () => ({
     testProgress: undefined
@@ -241,9 +201,10 @@ export default class CreatePrinterDialog extends Vue {
   @Action loadPrinterGroups: () => Promise<PrinterGroup[]>;
   @Getter printerGroupNames: string[];
 
-  @Inject() readonly appConstants!: any;
+  @Inject() readonly appConstants!: AppConstants;
 
   apiKeyRules = { required: true, length: this.appConstants.apiKeyLength, alpha_num: true };
+  printerNameRules = { required: true, max: this.appConstants.maxPrinterNameLength };
   formData: PreCreatePrinter = getDefaultCreatePrinter();
   $refs!: {
     validationObserver: InstanceType<typeof ValidationObserver>;
@@ -263,10 +224,6 @@ export default class CreatePrinterDialog extends Vue {
 
   avatarInitials() {
     return generateInitials(this.formData.printerName);
-  }
-
-  isSet(value: boolean) {
-    return value === false || value === true;
   }
 
   async created() {
