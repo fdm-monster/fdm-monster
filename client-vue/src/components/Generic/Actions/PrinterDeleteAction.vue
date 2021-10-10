@@ -5,13 +5,13 @@
 <script lang="ts">
 import Component from "vue-class-component";
 import Vue from "vue";
-import FileList from "@/components/PrinterList/FileList.vue";
+import FileControlList from "@/components/PrinterList/FileControlList.vue";
 import { Prop } from "vue-property-decorator";
 import { Printer } from "@/models/printers/printer.model";
 import { ACTIONS } from "@/store/printers/printers.actions";
 
 @Component({
-  components: { FileList }
+  components: { FileList: FileControlList }
 })
 export default class PrinterDeleteAction extends Vue {
   @Prop() printer: Printer;

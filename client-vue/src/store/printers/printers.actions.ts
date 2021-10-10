@@ -7,5 +7,6 @@ export const ACTIONS = {
   loadPrinterGroups: "loadPrinterGroups",
   loadPrinterFiles: "getPrinterFiles",
   deletePrinterFile: "deletePrinterFile",
-  deletePrinter: "deletePrinter"
+  deletePrinter: "deletePrinter",
+  dropUploadPrinterFile: "dropUploadPrinterFile"
 };

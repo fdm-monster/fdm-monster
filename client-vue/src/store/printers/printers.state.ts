@@ -151,6 +151,14 @@ export const printersState: StoreOptions<StateInterface> = {
 
       return data;
     },
+    [ACTIONS.dropUploadPrinterFile]: async ({ commit }, { printerId, domfiles }) => {
+      // const data = await PrinterFilesService.getFiles(printerId, recursive);
+
+      console.log("Drop triggered", printerId);
+      // commit(MUTATIONS.savePrinterFiles, { printerId, files: data });
+
+      return "data";
+    },
     [ACTIONS.loadPrinterFiles]: async ({ commit }, { printerId, recursive }) => {
       const data = await PrinterFilesService.getFiles(printerId, recursive);
 
