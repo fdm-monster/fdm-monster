@@ -49,7 +49,7 @@ export class PrintersService extends BaseService {
   static async getPrinters() {
     const path = ServerApi.printerRoute;
 
-    return await this.getApi(path);
+    return (await this.getApi<Printer[]>(path)) as Printer[];
   }
 
   static async sendPrinterConnectCommand(printerId: string) {
@@ -67,7 +67,7 @@ export class PrintersService extends BaseService {
   static async createPrinter(printer: CreatePrinter) {
     const path = ServerApi.printerRoute;
 
-    return await this.postApi(path, printer);
+    return (await this.postApi(path, printer)) as Printer;
   }
 
   static async deletePrinter(printerId: string) {
@@ -79,13 +79,13 @@ export class PrintersService extends BaseService {
   static async updatePrinter(printerId: string, printer: CreatePrinter) {
     const path = ServerApi.getPrinterRoute(printerId);
 
-    return await this.patchApi(path, printer);
+    return (await this.patchApi(path, printer)) as Printer;
   }
 
-  static async testConnection(printer: Printer) {
+  static async testConnection(printer: CreatePrinter) {
     const path = ServerApi.printerTestConnectionRoute;
 
-    return await this.postApi(path, printer);
+    return (await this.postApi(path, printer)) as Printer;
   }
 
   static async toggleEnabled(printerId: string, enabled: boolean) {

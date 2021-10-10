@@ -17,7 +17,11 @@
                 <v-container>
                   <v-row>
                     <v-col cols="12" md="6">
-                      <validation-provider v-slot="{ errors }" name="Name" rules="required|max:10">
+                      <validation-provider
+                        v-slot="{ errors }"
+                        :rules="printerNameRules"
+                        name="Name"
+                      >
                         <v-text-field
                           v-model="formData.printerName"
                           :counter="printerNameRules.max"
@@ -174,9 +178,6 @@ import Vue from "vue";
 import { Component, Inject, Prop } from "vue-property-decorator";
 import { ValidationObserver, ValidationProvider } from "vee-validate";
 import { getDefaultCreatePrinter, PreCreatePrinter } from "@/models/printers/crud/create-printer.model";
-import { ACTIONS } from "@/store/printers/printers.actions";
-import { Action, Getter } from "vuex-class";
-import { PrinterGroup } from "@/models/printers/printer-group.model";
 import { Printer } from "@/models/printers/printer.model";
 import { sseTestPrinterUpdate } from "@/event-bus/sse.events";
 import { PrinterSseMessage, TestProgressDetails } from "@/models/sse-messages/printer-sse-message.model";
@@ -184,6 +185,7 @@ import { PrintersService } from "@/backend";
 import { generateInitials } from "@/constants/noun-adjectives.data";
 import PrinterChecksPanel from "@/components/Dialogs/PrinterChecksPanel.vue";
 import { AppConstants } from "@/constants/app.constants";
+import { printersState } from "@/store/printers/printers";
 
 @Component({
   components: {
@@ -197,9 +199,6 @@ import { AppConstants } from "@/constants/app.constants";
 })
 export default class CreatePrinterDialog extends Vue {
   @Prop(Boolean) show: boolean;
-
-  @Action loadPrinterGroups: () => Promise<PrinterGroup[]>;
-  @Getter printerGroupNames: string[];
 
   @Inject() readonly appConstants!: AppConstants;
 
@@ -233,7 +232,7 @@ export default class CreatePrinterDialog extends Vue {
       }
     });
 
-    await this.loadPrinterGroups();
+    await printersState.loadPrinterGroups();
   }
 
   async testPrinter() {
@@ -246,7 +245,7 @@ export default class CreatePrinterDialog extends Vue {
 
     const testPrinter = PrintersService.convertCreateFormToPrinter(this.formData);
 
-    const result: Printer = await this.$store.dispatch(ACTIONS.createTestPrinter, testPrinter);
+    const result: Printer = await printersState.createTestPrinter(testPrinter);
     if (!result.correlationToken) throw new Error("Test Printer CorrelationToken was empty.");
 
     this.$bus.on(sseTestPrinterUpdate(result.correlationToken), this.onTestPrinterUpdate);
@@ -263,7 +262,7 @@ export default class CreatePrinterDialog extends Vue {
 
     const newPrinterData = PrintersService.convertCreateFormToPrinter(this.formData);
 
-    await this.$store.dispatch(ACTIONS.createPrinter, newPrinterData);
+    await printersState.createPrinter(newPrinterData);
   }
 
   clear() {

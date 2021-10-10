@@ -20,27 +20,23 @@ import TopBar from "@/components/Generic/TopBar.vue";
 import ErrorAlert from "@/components/Generic/ErrorAlert.vue";
 import FooterList from "@/components/Generic/FooterList.vue";
 import { Component } from "vue-property-decorator";
-import { Action, Getter } from "vuex-class";
-import { ServerSettings } from "@/models/server-settings.model";
 import { SSEClient } from "vue-sse";
 import { PrinterSseMessage } from "@/models/sse-messages/printer-sse-message.model";
 import { sseMessageGlobal, sseTestPrinterUpdate } from "@/event-bus/sse.events";
-import { ACTIONS } from "@/store/printers/printers.actions";
+import { serverSettingsState } from "@/store/server-settings.module";
+import { printersState } from "@/store/printers/printers";
 
 @Component({
   components: { TopBar, NavigationDrawer, FooterList, ErrorAlert }
 })
 export default class App extends Vue {
-  @Getter serverSettings: ServerSettings;
-  @Action loadServerSettings: () => Promise<ServerSettings>;
-
   /**
    * Listens to events - replaced with socketIO client later
    */
   sseClient?: SSEClient;
 
   async created() {
-    await this.loadServerSettings();
+    await serverSettingsState.loadServerSettings();
     await this.connectSseClient();
   }
 
@@ -57,7 +53,7 @@ export default class App extends Vue {
 
   async onSseMessage(message: PrinterSseMessage) {
     if (message.printers) {
-      await this.$store.dispatch(ACTIONS.savePrinters, message.printers);
+      printersState.savePrinters(message.printers);
 
       // Emit the global update
       this.$bus.emit(sseMessageGlobal, message);

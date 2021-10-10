@@ -24,26 +24,26 @@ import FileControlList from "@/components/PrinterList/FileControlList.vue";
 import { Prop } from "vue-property-decorator";
 import { Printer } from "@/models/printers/printer.model";
 import PrinterDeleteAction from "@/components/Generic/Actions/PrinterDeleteAction.vue";
-import { ACTIONS } from "@/store/printers/printers.actions";
+import { printersState } from "@/store/printers/printers";
 
 @Component({
   components: { FileList: FileControlList, PrinterDeleteAction }
 })
 export default class PrinterDetails extends Vue {
   @Prop() printer: Printer;
+  dragging = false;
 
   get printerId() {
     return this.printer.id;
   }
 
-  dragging = false;
-  addFile(e: DragEvent) {
+  async addFile(e: DragEvent) {
     if (!e.dataTransfer) return;
     this.dragging = false;
 
-    this.$store.dispatch(ACTIONS.dropUploadPrinterFile, {
+    await printersState.dropUploadPrinterFile({
       printerId: this.printerId,
-      domFiles: e.dataTransfer.files
+      files: e.dataTransfer.files
     });
   }
 }

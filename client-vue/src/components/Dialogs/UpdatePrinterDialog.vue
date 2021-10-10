@@ -178,9 +178,6 @@ import Vue from "vue";
 import { Component, Inject, Prop, Watch } from "vue-property-decorator";
 import { ValidationObserver, ValidationProvider } from "vee-validate";
 import { getDefaultCreatePrinter, PreCreatePrinter } from "@/models/printers/crud/create-printer.model";
-import { ACTIONS } from "@/store/printers/printers.actions";
-import { Action, Getter } from "vuex-class";
-import { PrinterGroup } from "@/models/printers/printer-group.model";
 import { Printer } from "@/models/printers/printer.model";
 import { sseTestPrinterUpdate } from "@/event-bus/sse.events";
 import { PrinterSseMessage, TestProgressDetails } from "@/models/sse-messages/printer-sse-message.model";
@@ -189,6 +186,7 @@ import { AppConstants } from "@/constants/app.constants";
 import { generateInitials } from "@/constants/noun-adjectives.data";
 import { updatedPrinterEvent } from "@/event-bus/printer.events";
 import PrinterChecksPanel from "@/components/Dialogs/PrinterChecksPanel.vue";
+import { printersState } from "@/store/printers/printers";
 
 const watchedId = "printerId";
 
@@ -205,9 +203,6 @@ const watchedId = "printerId";
 export default class ShowPrinterDialog extends Vue {
   @Prop() show: boolean;
   @Prop() [watchedId]: string; // printerId key
-  @Action loadPrinterGroups: () => Promise<PrinterGroup[]>;
-  @Getter printerGroupNames: string[];
-
   @Inject() readonly appConstants!: AppConstants;
 
   apiKeyRules = { required: true, length: this.appConstants.apiKeyLength, alpha_num: true };
@@ -254,7 +249,7 @@ export default class ShowPrinterDialog extends Vue {
       }
     });
 
-    await this.loadPrinterGroups();
+    await printersState.loadPrinterGroups();
   }
 
   async testPrinter() {
@@ -267,7 +262,7 @@ export default class ShowPrinterDialog extends Vue {
 
     const testPrinter = PrintersService.convertCreateFormToPrinter(this.formData);
 
-    const result: Printer = await this.$store.dispatch(ACTIONS.createTestPrinter, testPrinter);
+    const result: Printer = await printersState.createTestPrinter(testPrinter);
     if (!result.correlationToken) throw new Error("Test Printer CorrelationToken was empty.");
 
     this.$bus.on(sseTestPrinterUpdate(result.correlationToken), this.onTestPrinterUpdate);
@@ -282,12 +277,12 @@ export default class ShowPrinterDialog extends Vue {
 
     if (!result) return;
 
-    const updatePrinter = PrintersService.convertCreateFormToPrinter(this.formData);
-    const printerId = updatePrinter.id;
+    const updatedPrinter = PrintersService.convertCreateFormToPrinter(this.formData);
+    const printerId = updatedPrinter.id;
 
-    const updatedData = await this.$store.dispatch(ACTIONS.updatePrinter, {
-      printerId,
-      updatedPrinter: updatePrinter
+    const updatedData = await printersState.updatePrinter({
+      printerId: printerId as string,
+      updatedPrinter
     });
 
     this.$bus.emit(updatedPrinterEvent(printerId as string), updatedData);

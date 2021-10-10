@@ -5,6 +5,7 @@
       <GridItem
         v-for="(item, index, skeleton) in items"
         :key="index"
+        v-focus
         :data-item="item"
         :grid="grid"
         :selector="itemPrefix + index.toString()"
@@ -26,7 +27,6 @@ import Login from "@/components/Generic/Login.vue";
 import { Component } from "vue-property-decorator";
 import { GridItemHTMLElement, GridStack } from "gridstack";
 import GridItem, { EVENTS } from "@/components/PrinterGrid/GridItem.vue";
-import { Action, Getter } from "vuex-class";
 import { Printer } from "@/models/printers/printer.model";
 import "gridstack/dist/gridstack.min.css";
 // Required for custom columns
@@ -37,6 +37,7 @@ import ShowPrinterDialog from "@/components/Dialogs/UpdatePrinterDialog.vue";
 import { sseMessageGlobal } from "@/event-bus/sse.events";
 import { SkeletonPrinter } from "@/models/printers/crud/skeleton-printer.model";
 import { newRandomNamePair } from "@/constants/noun-adjectives.data";
+import { printersState } from "@/store/printers/printers";
 
 @Component({
   components: { ShowPrinterDialog, GridItem, Login }
@@ -54,9 +55,10 @@ export default class PrinterGrid extends Vue {
   items: any[] = [];
   newItems: any[] = [];
 
-  @Action loadPrinters: () => Promise<Printer[]>;
-  @Getter printers: Printer[];
-
+  get printers() {
+    return printersState.printers;
+  }
+  
   async mounted() {
     this.items = [];
     this.grid = GridStack.init({
@@ -68,7 +70,9 @@ export default class PrinterGrid extends Vue {
       column: 6
     });
 
-    await this.loadPrinters();
+    const result = await printersState.loadPrinters();
+    console.log(result);
+
 
     for (let printer of this.printers) {
       this.addNewPrinter(printer);
@@ -86,11 +90,12 @@ export default class PrinterGrid extends Vue {
 
   /**
    * Required to update the grid with skeletons without gridstack breaking and without losing state
-   * @param _
    */
   onSseMessage() {
     // Any old items are left over
     let superfluousItems: string[] = this.items.filter((i) => !i.skeleton).map((p) => p.id);
+
+    if (!this.printers) return;
 
     this.printers.forEach((p) => {
       // Visual items get checked for Id equality

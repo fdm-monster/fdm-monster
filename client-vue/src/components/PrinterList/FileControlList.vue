@@ -23,9 +23,9 @@
 import Component from "vue-class-component";
 import Vue from "vue";
 import { Prop } from "vue-property-decorator";
-import { ACTIONS } from "@/store/printers/printers.actions";
 import { PrinterFile } from "@/models/printers/printer-file.model";
 import { FileList } from "@/models/printers/file-list.model";
+import { printersState } from "@/store/printers/printers";
 
 @Component({
   data: () => ({})
@@ -35,14 +35,14 @@ export default class FileControlList extends Vue {
   @Prop() printerId: string;
 
   async getFiles() {
-    this.fileList.files = await this.$store.dispatch(ACTIONS.loadPrinterFiles, {
+    this.fileList.files = await printersState.loadPrinterFiles({
       printerId: this.printerId,
       recursive: false
     });
   }
 
   async deleteFile(file: PrinterFile) {
-    this.fileList.files = await this.$store.dispatch(ACTIONS.deletePrinterFile, {
+    this.fileList.files = await printersState.deletePrinterFile({
       printerId: this.printerId,
       fullPath: file.path
     });

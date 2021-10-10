@@ -19,7 +19,7 @@
       </v-avatar>
 
       <v-card-text class="ml-0">
-        <span class="mt-5">{{ this.printerName() }}</span>
+        <span class="mt-5 d-none d-lg-inline">{{ this.printerName() }}</span>
         <br />
         <small class="secondary--text font-weight-10">{{
           dataItem.skeleton ? "New Printer" : "Printing"

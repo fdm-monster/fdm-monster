@@ -8,7 +8,7 @@ import Vue from "vue";
 import FileControlList from "@/components/PrinterList/FileControlList.vue";
 import { Prop } from "vue-property-decorator";
 import { Printer } from "@/models/printers/printer.model";
-import { ACTIONS } from "@/store/printers/printers.actions";
+import { printersState } from "@/store/printers/printers";
 
 @Component({
   components: { FileList: FileControlList }
@@ -21,7 +21,7 @@ export default class PrinterDeleteAction extends Vue {
   }
 
   async deletePrinter() {
-    await this.$store.dispatch(ACTIONS.deletePrinter, this.printerId);
+    await printersState.deletePrinter(this.printerId);
   }
 }
 </script>
