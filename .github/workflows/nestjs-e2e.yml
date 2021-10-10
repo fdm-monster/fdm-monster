@@ -2,7 +2,7 @@ name: NestJS CI
 
 on:
   push:
-    branches: [ develop, master ]
+    branches: [ development, master ]
   pull_request:
 jobs:
   nestjs-e2e:
