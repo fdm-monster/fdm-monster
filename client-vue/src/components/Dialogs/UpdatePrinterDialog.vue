@@ -14,128 +14,7 @@
           <v-card-text>
             <v-row>
               <v-col :cols="showChecksPanel ? 8 : 12">
-                <v-container>
-                  <v-row>
-                    <v-col cols="12" md="6">
-                      <validation-provider
-                        v-slot="{ errors }"
-                        :rules="printerNameRules"
-                        name="Name"
-                      >
-                        <v-text-field
-                          v-model="formData.printerName"
-                          :counter="printerNameRules.max"
-                          :error-messages="errors"
-                          label="Printer name*"
-                          required
-                        />
-                      </validation-provider>
-
-                      <validation-provider
-                        v-slot="{ errors }"
-                        name="Printer IP or HostName"
-                        rules="required|ip_or_fqdn"
-                      >
-                        <v-text-field
-                          v-model="formData.printerHostName"
-                          :error-messages="errors"
-                          hint="Examples: 'my.printer.com', 'localhost' or '192.x.x.x'"
-                          label="IP/Host*"
-                        ></v-text-field>
-                      </validation-provider>
-
-                      <validation-provider v-slot="{ errors }" name="Groups">
-                        <v-select
-                          v-model="formData.groups"
-                          :error-messages="errors"
-                          :items="printerGroupNames"
-                          label="Groups"
-                          multiple
-                          required
-                        ></v-select>
-                      </validation-provider>
-                    </v-col>
-                    <v-col cols="12" md="6">
-                      <validation-provider v-slot="{ errors }" name="Enabled">
-                        <v-checkbox
-                          v-model="formData.enabled"
-                          :error-messages="errors"
-                          hint="Disabling makes the printer passive"
-                          label="Enabled*"
-                          persistent-hint
-                          required
-                        ></v-checkbox>
-                      </validation-provider>
-
-                      <validation-provider
-                        v-slot="{ errors }"
-                        name="Host Port"
-                        rules="required|integer|max:65535"
-                      >
-                        <v-text-field
-                          v-model="formData.printerHostPort"
-                          :error-messages="errors"
-                          hint="Examples: '80', '443' or '5050'"
-                          label="Host Port*"
-                        ></v-text-field>
-                      </validation-provider>
-                    </v-col>
-                    <v-col cols="12" md="12" class="pb-5 pt-0">
-                      <validation-provider v-slot="{ errors }" :rules="apiKeyRules" name="ApiKey">
-                        <v-text-field
-                          v-model="formData.apiKey"
-                          :counter="apiKeyRules.length"
-                          :error-messages="errors"
-                          hint="User or Application Key only (Global API key fails)"
-                          label="API Key*"
-                          persistent-hint
-                          required
-                        ></v-text-field>
-                      </validation-provider>
-                    </v-col>
-                  </v-row>
-
-                  <v-expansion-panels>
-                    <v-expansion-panel>
-                      <v-expansion-panel-header>Advanced settings</v-expansion-panel-header>
-                      <v-expansion-panel-content>
-                        <v-col cols="12" md="12">
-                          <validation-provider v-slot="{ errors }" name="PrinterHostPrefix">
-                            <v-select
-                              v-model="formData.printerHostPrefix"
-                              :error-messages="errors"
-                              :items="['http', 'https']"
-                              label="Insecure/Secure HTTP"
-                              required
-                              value="http"
-                            ></v-select>
-                          </validation-provider>
-
-                          <validation-provider v-slot="{ errors }" name="WebsocketPrefix">
-                            <v-select
-                              v-model="formData.websocketPrefix"
-                              :error-messages="errors"
-                              :items="['ws', 'wss']"
-                              label="Insecure/Secure Websocket"
-                              required
-                              value="ws"
-                            ></v-select>
-                          </validation-provider>
-                          <validation-provider v-slot="{ errors }" name="Display">
-                            <v-checkbox
-                              v-model="formData.display"
-                              :error-messages="errors"
-                              disabled
-                              label="Display*"
-                              required
-                            ></v-checkbox>
-                          </validation-provider>
-                        </v-col>
-
-                      </v-expansion-panel-content>
-                    </v-expansion-panel>
-                  </v-expansion-panels>
-                </v-container>
+                <PrinterCrudForm ref="printerUpdateForm" :printer-id="printerId" />
               </v-col>
 
               <PrinterChecksPanel v-if="showChecksPanel" :cols="4" :test-progress="testProgress">
@@ -161,25 +40,23 @@
 <script lang="ts">
 // https://www.digitalocean.com/community/tutorials/vuejs-typescript-class-components
 import Vue from "vue";
-import { Component, Inject, Prop, Watch } from "vue-property-decorator";
-import { ValidationObserver, ValidationProvider } from "vee-validate";
-import { getDefaultCreatePrinter, PreCreatePrinter } from "@/models/printers/crud/create-printer.model";
+import { Component, Prop } from "vue-property-decorator";
+import { ValidationObserver } from "vee-validate";
 import { Printer } from "@/models/printers/printer.model";
 import { sseTestPrinterUpdate } from "@/event-bus/sse.events";
 import { PrinterSseMessage, TestProgressDetails } from "@/models/sse-messages/printer-sse-message.model";
 import { PrintersService } from "@/backend";
-import { AppConstants } from "@/constants/app.constants";
 import { generateInitials } from "@/constants/noun-adjectives.data";
 import { updatedPrinterEvent } from "@/event-bus/printer.events";
 import PrinterChecksPanel from "@/components/Dialogs/PrinterChecksPanel.vue";
 import { printersState } from "@/store/printers.state";
-
-const watchedId = "printerId";
+import PrinterCrudForm from "@/components/Forms/PrinterCrudForm.vue";
+import { infoMessageEvent } from "@/event-bus/alert.events";
 
 @Component({
   components: {
-    ValidationProvider,
     ValidationObserver,
+    PrinterCrudForm,
     PrinterChecksPanel
   },
   data: () => ({
@@ -187,22 +64,18 @@ const watchedId = "printerId";
   })
 })
 export default class ShowPrinterDialog extends Vue {
+  @Prop() printerId: string; // Watched
   @Prop() show: boolean;
-  @Prop() [watchedId]: string; // printerId key
-  @Inject() readonly appConstants!: AppConstants;
-
-  apiKeyRules = { required: true, length: this.appConstants.apiKeyLength, alpha_num: true };
-  printerNameRules = { required: true, max: this.appConstants.maxPrinterNameLength };
-  formData: PreCreatePrinter = getDefaultCreatePrinter();
-  $refs!: {
-    validationObserver: InstanceType<typeof ValidationObserver>;
-  };
 
   showChecksPanel = false;
   testProgress?: TestProgressDetails = undefined;
+  $refs!: {
+    validationObserver: InstanceType<typeof ValidationObserver>;
+    printerUpdateForm: InstanceType<typeof PrinterCrudForm>;
+  };
 
-  get printerGroupNames() {
-    return printersState.printerGroupNames;
+  formData() {
+    return this.$refs.printerUpdateForm?.formData;
   }
 
   get mutableShow() {
@@ -212,24 +85,6 @@ export default class ShowPrinterDialog extends Vue {
 
   set mutableShow(newValue: boolean) {
     this.$emit("update:show", newValue);
-  }
-
-  avatarInitials() {
-    return generateInitials(this.formData.printerName);
-  }
-
-  @Watch(watchedId)
-  onChildChanged(val?: string, oldVal?: string) {
-    if (!val) return;
-
-    const printer = this.$store.getters.printer(val) as Printer;
-
-    // Inverse transformation
-    this.formData = PrintersService.convertPrinterToCreateForm(printer);
-  }
-
-  isSet(value: boolean) {
-    return value === false || value === true;
   }
 
   async created() {
@@ -242,15 +97,31 @@ export default class ShowPrinterDialog extends Vue {
     await printersState.loadPrinterGroups();
   }
 
-  async testPrinter() {
-    const validationResult = await this.$refs.validationObserver.validate();
+  avatarInitials() {
+    const formData = this.formData();
+    if (formData && this.show) {
+      return generateInitials(formData.printerName);
+    }
+  }
 
-    if (!validationResult) return;
-
+  openTestPanel() {
     this.showChecksPanel = true;
     this.testProgress = undefined;
+  }
 
-    const testPrinter = PrintersService.convertCreateFormToPrinter(this.formData);
+  async onTestPrinterUpdate(payload: PrinterSseMessage) {
+    this.testProgress = payload.testProgress;
+  }
+
+  async isValid() {
+    return await this.$refs.validationObserver.validate();
+  }
+
+  async testPrinter() {
+    if (!(await this.isValid())) return;
+
+    const testPrinter = PrintersService.convertCreateFormToPrinter(this.formData());
+    this.openTestPanel();
 
     const result: Printer = await printersState.createTestPrinter(testPrinter);
     if (!result.correlationToken) throw new Error("Test Printer CorrelationToken was empty.");
@@ -258,16 +129,10 @@ export default class ShowPrinterDialog extends Vue {
     this.$bus.on(sseTestPrinterUpdate(result.correlationToken), this.onTestPrinterUpdate);
   }
 
-  async onTestPrinterUpdate(payload: PrinterSseMessage) {
-    this.testProgress = payload.testProgress;
-  }
-
   async submit() {
-    const result = await this.$refs.validationObserver.validate();
+    if (!(await this.isValid())) return;
 
-    if (!result) return;
-
-    const updatedPrinter = PrintersService.convertCreateFormToPrinter(this.formData);
+    const updatedPrinter = PrintersService.convertCreateFormToPrinter(this.formData());
     const printerId = updatedPrinter.id;
 
     const updatedData = await printersState.updatePrinter({
@@ -276,14 +141,10 @@ export default class ShowPrinterDialog extends Vue {
     });
 
     this.$bus.emit(updatedPrinterEvent(printerId as string), updatedData);
+    this.$bus.emit(infoMessageEvent, `Printer ${updatedPrinter.printerName} updated`);
   }
 
-  clear() {
-    this.formData = getDefaultCreatePrinter();
-    this.$refs.validationObserver.reset();
-  }
-
-  private closeDialog() {
+  closeDialog() {
     this.mutableShow = false;
   }
 }

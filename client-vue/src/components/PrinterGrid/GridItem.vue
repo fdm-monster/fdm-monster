@@ -2,17 +2,17 @@
   <v-card
     :id="this.selector"
     :class="`grid-stack-item ${this.skeleton ? '' : 'elevation-12'}`"
-    :gs-h="this.printer.h"
     :gs-id="this.printer.id"
+    :gs-h="this.printer.h"
     :gs-max-h="this.printer.maxH"
     :gs-max-w="this.printer.maxW"
     :gs-min-h="this.printer.minH"
     :gs-min-w="this.printer.minW"
-    :gs-w="this.printer.w"
-    :gs-x="this.printer.x"
-    :gs-y="this.printer.y"
     @click="clickPrinter()"
   >
+<!--    :gs-w="this.printer.w"-->
+<!--    :gs-x="this.printer.x"-->
+<!--    :gs-y="this.printer.y"-->
     <v-toolbar :color="this.skeleton ? 'secondary' : 'primary'" dark dense>
       <v-avatar color="secondary" size="54">
         {{ this.avatarInitials() }}
