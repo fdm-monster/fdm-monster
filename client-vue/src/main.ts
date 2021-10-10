@@ -12,6 +12,7 @@ import { configureVeeValidate } from "@/plugins/veevalidate";
 import { generateAppConstants } from "@/constants/app.constants";
 import { registerFileDropDirective } from "@/directives/file-upload.directive";
 import store from "@/store";
+import { vuexErrorEvent } from "@/event-bus/alert.events";
 
 Vue.config.productionTip = false;
 // Http Client
@@ -27,6 +28,15 @@ Vue.use(VueSSE, {
 
 configureVeeValidate();
 registerFileDropDirective();
+
+window.addEventListener("unhandledrejection", (event) => {
+  if (event.reason?.isAxiosError) {
+    console.warn(`Handled error through alert`, event.reason);
+
+    Vue.bus.emit(vuexErrorEvent, event);
+    event.preventDefault();
+  }
+});
 
 Vue.config.errorHandler = (err: Error, vm: Vue, info: string) => {
   console.log("Global Error captured", err, vm, info);

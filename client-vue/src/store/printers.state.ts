@@ -7,6 +7,7 @@ import { CreatePrinter } from "@/models/printers/crud/create-printer.model";
 import { PrinterGroupsService } from "@/backend/printer-groups.service";
 import { MultiResponse } from "@/models/api/status-response.model";
 import store from "@/store/index";
+import { FileUploadCommands } from "@/models/printers/file-upload-commands.model";
 
 @Module({
   dynamic: true,
@@ -167,12 +168,20 @@ class PrintersModule extends VuexModule {
   }
 
   @Action
-  async dropUploadPrinterFile({ printerId, files }: { printerId: string; files: FileList }) {
+  async dropUploadPrinterFile({
+    printerId,
+    files,
+    commands
+  }: {
+    printerId: string;
+    files: FileList;
+    commands?: FileUploadCommands;
+  }) {
     const uploadedFiles = [...files].filter((f) => f.name) as File[];
 
-    await PrinterFilesService.uploadFiles(printerId, uploadedFiles);
+    await PrinterFilesService.uploadFiles(printerId, uploadedFiles, commands);
 
-    console.log("Drop triggered", printerId, files.length);
+    console.log("Drop triggered", printerId, files.length, commands);
     // this.setPrinterFiles({ printerId, files: [] });
 
     return "data";

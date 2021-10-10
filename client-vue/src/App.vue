@@ -1,11 +1,11 @@
 <template>
   <v-app>
-    <NavigationDrawer />
-    <TopBar />
+    <NavigationDrawer/>
+    <TopBar/>
 
     <v-main>
       <ErrorAlert>
-        <router-view />
+        <router-view/>
       </ErrorAlert>
     </v-main>
 
@@ -17,7 +17,7 @@
 import Vue from "vue";
 import NavigationDrawer from "@/components/Generic/NavigationDrawer.vue";
 import TopBar from "@/components/Generic/TopBar.vue";
-import ErrorAlert from "@/components/Generic/ErrorAlert.vue";
+import ErrorAlert from "@/components/Generic/AlertStack.vue";
 import FooterList from "@/components/Generic/FooterList.vue";
 import { Component } from "vue-property-decorator";
 import { SSEClient } from "vue-sse";

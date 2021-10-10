@@ -1,18 +1,30 @@
 import Vue from "vue";
 import { printersState } from "@/store/printers.state";
 import { DirectiveBinding } from "vue/types/options";
-
-const dropHandler = async (e: DragEvent, printerId: string) => {
-  e.preventDefault();
-  console.debug("File(s) dropped", e.dataTransfer?.files);
-  if (!e.dataTransfer?.files) return;
-
-  await printersState.dropUploadPrinterFile({ printerId, files: e.dataTransfer.files });
-};
+import { infoMessageEvent } from "@/event-bus/alert.events";
 
 function getPrinterId(binding: DirectiveBinding) {
   return binding.value?.item.id;
 }
+
+const dropHandler = async (e: DragEvent, binding: DirectiveBinding, context?: Vue) => {
+  e.preventDefault();
+  const files = e.dataTransfer?.files;
+  if (!files) return;
+
+  const printerId = getPrinterId(binding);
+
+  if (files.length === 1) context?.$bus.emit(infoMessageEvent, "Uploading file");
+  else context?.$bus.emit(infoMessageEvent, `Uploading ${files.length} files`);
+
+  const uploadInput = {
+    printerId,
+    files
+  };
+  await printersState.dropUploadPrinterFile(uploadInput);
+
+  context?.$bus.emit(infoMessageEvent, `Upload done`);
+};
 
 const defaultBorder = "1px solid #2b2a27";
 const hoverBorder = "1px solid red";
@@ -35,7 +47,7 @@ export function registerFileDropDirective() {
       };
       el.ondrop = async (e) => {
         el.style.border = defaultBorder;
-        await dropHandler(e, getPrinterId(binding));
+        await dropHandler(e, binding, vnode.context);
       };
     }
   });

@@ -104,9 +104,12 @@ class PrinterFileController {
         error: "No files were available for upload. Did you upload files with extension '.gcode'?"
       });
 
+    const commands = req.body;
+
     const response = await this.#octoPrintApiService.uploadFilesAsMultiPart(
       printerLogin,
       req.files,
+      commands,
       location
     );
 
