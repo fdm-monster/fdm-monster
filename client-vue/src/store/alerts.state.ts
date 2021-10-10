@@ -1,6 +1,6 @@
 import { getModule, Module, VuexModule } from "vuex-module-decorators";
 import { VuetifyAlert } from "@/models/ui/vuetify-alert.model";
-import store from "@/store/index";
+import store from "@/store";
 
 @Module({
   name: AlertsModule.name,

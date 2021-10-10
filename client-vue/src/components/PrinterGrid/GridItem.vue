@@ -19,11 +19,11 @@
       </v-avatar>
 
       <v-card-text class="ml-0">
-        <span class="mt-5 d-none d-lg-inline">{{ this.printerName() }}</span>
-        <br />
+        <span class="mt-5 d-none d-lg-inline">{{ this.printerName }}</span>
+        <br/>
         <small class="secondary--text font-weight-10">{{
-          dataItem.skeleton ? "New Printer" : "Printing"
-        }}</small>
+            dataItem.skeleton ? "New Printer" : "Printing"
+          }}</small>
       </v-card-text>
     </v-toolbar>
 
@@ -78,7 +78,6 @@ export default class GridItem extends Vue {
   @Prop() selector: string;
   @Prop() grid: GridStack;
 
-  skeleton: boolean;
   fab = false;
 
   get printerId() {
@@ -92,7 +91,7 @@ export default class GridItem extends Vue {
     return generateInitials(this.printer.printerName);
   }
 
-  printerName() {
+  get printerName() {
     if ((this.dataItem as SkeletonPrinter).skeleton) return "";
 
     let data = this.printer as Printer;
@@ -100,9 +99,9 @@ export default class GridItem extends Vue {
   }
 
   created() {
-    this.skeleton = (this.dataItem as SkeletonPrinter)?.skeleton;
+    const skeleton = (this.dataItem as SkeletonPrinter)?.skeleton;
 
-    if (!this.skeleton) {
+    if (!skeleton) {
       this.printer = this.$store.getters.printer((this.dataItem as Printer).id);
       this.$bus.on(updatedPrinterEvent(this.printerId), this.updateItem);
     }
@@ -123,8 +122,8 @@ export default class GridItem extends Vue {
 
   updated() {
     // The grid item is dereferenced on every update
-    this.grid.removeWidget(`#${this.selector}`, false);
-    this.grid.makeWidget(`#${this.selector}`);
+    this.grid.removeWidget(`#${ this.selector }`, false);
+    this.grid.makeWidget(`#${ this.selector }`);
   }
 
   beforeDestroy() {

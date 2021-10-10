@@ -3,13 +3,12 @@
     <v-btn class="mb-3" color="primary" type="button" @click="addNewPrinter()">Add Grid Item</v-btn>
     <div :id="gridId" class="grid-stack d-flex">
       <GridItem
-        v-for="(item, index, skeleton) in items"
+        v-for="(item, index) in items"
         :key="index"
-        v-focus
+        v-focus="{item, index}"
         :data-item="item"
         :grid="grid"
         :selector="itemPrefix + index.toString()"
-        :skeleton="skeleton"
       />
 
       <ShowPrinterDialog

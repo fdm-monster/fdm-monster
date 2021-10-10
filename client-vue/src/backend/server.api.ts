@@ -1,3 +1,5 @@
+import { FileLocation } from "@/models/api/octoprint.definition";
+
 export class ServerApi {
   static base = "api";
   static amIAliveRoute = ServerApi.base + "/amialive";
@@ -33,6 +35,8 @@ export class ServerApi {
   static roomDataRoute = ServerApi.base + "/room-data";
 
   static getPrinterRoute = (id: string) => `${ServerApi.printerRoute}/${id}`;
+  static printerFilesUploadRoute = (id: string, location: FileLocation) =>
+    `${ServerApi.printerFilesRoute}/${id}/upload?location=${location}`;
   static printerEnabledRoute = (id: string) => `${ServerApi.getPrinterRoute(id)}/enabled`;
   static printerSerialConnectRoute = (id: string) =>
     `${ServerApi.getPrinterRoute(id)}/serial-connect`;
