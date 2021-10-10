@@ -1,5 +1,5 @@
 import Vue from "vue";
-import { printersState } from "@/store/printers/printers";
+import { printersState } from "@/store/printers.state";
 
 const dropHandler = async (e: DragEvent) => {
   e.preventDefault();

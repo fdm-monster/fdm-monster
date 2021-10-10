@@ -25,7 +25,7 @@ import Vue from "vue";
 import { Prop } from "vue-property-decorator";
 import { PrinterFile } from "@/models/printers/printer-file.model";
 import { FileList } from "@/models/printers/file-list.model";
-import { printersState } from "@/store/printers/printers";
+import { printersState } from "@/store/printers.state";
 
 @Component({
   data: () => ({})

@@ -114,7 +114,7 @@ import PrinterDetails from "@/components/PrinterList/PrinterDetails.vue";
 import PrinterUrlAction from "@/components/Generic/Actions/PrinterUrlAction.vue";
 import PrinterSettingsAction from "@/components/Generic/Actions/PrinterSettingsAction.vue";
 import PrinterConnectionAction from "@/components/Generic/Actions/PrinterConnectionAction.vue";
-import { printersState } from "@/store/printers/printers";
+import { printersState } from "@/store/printers.state";
 
 @Component({
   components: {

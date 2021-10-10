@@ -24,7 +24,7 @@ import FileControlList from "@/components/PrinterList/FileControlList.vue";
 import { Prop } from "vue-property-decorator";
 import { Printer } from "@/models/printers/printer.model";
 import PrinterDeleteAction from "@/components/Generic/Actions/PrinterDeleteAction.vue";
-import { printersState } from "@/store/printers/printers";
+import { printersState } from "@/store/printers.state";
 
 @Component({
   components: { FileList: FileControlList, PrinterDeleteAction }

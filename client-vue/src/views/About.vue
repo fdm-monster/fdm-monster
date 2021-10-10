@@ -24,7 +24,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { Component } from "vue-property-decorator";
-import { printersState } from "@/store/printers/printers";
+import { printersState } from "@/store/printers.state";
 
 @Component({
   components: {}

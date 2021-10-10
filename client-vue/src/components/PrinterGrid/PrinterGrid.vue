@@ -37,7 +37,7 @@ import ShowPrinterDialog from "@/components/Dialogs/UpdatePrinterDialog.vue";
 import { sseMessageGlobal } from "@/event-bus/sse.events";
 import { SkeletonPrinter } from "@/models/printers/crud/skeleton-printer.model";
 import { newRandomNamePair } from "@/constants/noun-adjectives.data";
-import { printersState } from "@/store/printers/printers";
+import { printersState } from "@/store/printers.state";
 
 @Component({
   components: { ShowPrinterDialog, GridItem, Login }
@@ -58,7 +58,7 @@ export default class PrinterGrid extends Vue {
   get printers() {
     return printersState.printers;
   }
-  
+
   async mounted() {
     this.items = [];
     this.grid = GridStack.init({
@@ -70,9 +70,7 @@ export default class PrinterGrid extends Vue {
       column: 6
     });
 
-    const result = await printersState.loadPrinters();
-    console.log(result);
-
+    await printersState.loadPrinters();
 
     for (let printer of this.printers) {
       this.addNewPrinter(printer);

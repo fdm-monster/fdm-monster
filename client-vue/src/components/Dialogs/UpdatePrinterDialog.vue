@@ -186,7 +186,7 @@ import { AppConstants } from "@/constants/app.constants";
 import { generateInitials } from "@/constants/noun-adjectives.data";
 import { updatedPrinterEvent } from "@/event-bus/printer.events";
 import PrinterChecksPanel from "@/components/Dialogs/PrinterChecksPanel.vue";
-import { printersState } from "@/store/printers/printers";
+import { printersState } from "@/store/printers.state";
 
 const watchedId = "printerId";
 

@@ -23,8 +23,8 @@ import { Component } from "vue-property-decorator";
 import { SSEClient } from "vue-sse";
 import { PrinterSseMessage } from "@/models/sse-messages/printer-sse-message.model";
 import { sseMessageGlobal, sseTestPrinterUpdate } from "@/event-bus/sse.events";
-import { serverSettingsState } from "@/store/server-settings.module";
-import { printersState } from "@/store/printers/printers";
+import { serverSettingsState } from "@/store/server-settings.state";
+import { printersState } from "@/store/printers.state";
 
 @Component({
   components: { TopBar, NavigationDrawer, FooterList, ErrorAlert }

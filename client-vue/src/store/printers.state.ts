@@ -6,7 +6,7 @@ import { PrinterFilesService, PrintersService } from "@/backend";
 import { CreatePrinter } from "@/models/printers/crud/create-printer.model";
 import { PrinterGroupsService } from "@/backend/printer-groups.service";
 import { MultiResponse } from "@/models/api/status-response.model";
-import store from "@/store";
+import store from "@/store/index";
 
 @Module({
   dynamic: true,

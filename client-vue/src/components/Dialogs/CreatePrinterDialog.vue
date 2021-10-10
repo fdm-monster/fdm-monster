@@ -185,7 +185,7 @@ import { PrintersService } from "@/backend";
 import { generateInitials } from "@/constants/noun-adjectives.data";
 import PrinterChecksPanel from "@/components/Dialogs/PrinterChecksPanel.vue";
 import { AppConstants } from "@/constants/app.constants";
-import { printersState } from "@/store/printers/printers";
+import { printersState } from "@/store/printers.state";
 
 @Component({
   components: {
