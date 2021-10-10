@@ -249,7 +249,7 @@ export default class ShowPrinterDialog extends Vue {
 
   @Inject() readonly appConstants!: AppConstants;
 
-  apiKeyRules = { required: true, length: this.appConstants.apiKeyLength };
+  apiKeyRules = { required: true, length: this.appConstants.apiKeyLength, alpha_num: true };
   printerNameRules = { required: true, max: this.appConstants.maxPrinterNameLength };
   formData: PreCreatePrinter = getDefaultCreatePrinter();
   $refs!: {

@@ -1,5 +1,5 @@
 import { extend, setInteractionMode } from "vee-validate";
-import { digits, integer, length, max, required } from "vee-validate/dist/rules";
+import { alpha_num, digits, integer, length, max, required } from "vee-validate/dist/rules";
 import validator from "validator";
 
 export function configureVeeValidate() {
@@ -23,6 +23,11 @@ export function configureVeeValidate() {
   extend("integer", {
     ...integer,
     message: "{_field_} must be an integer"
+  });
+
+  extend("alpha_num", {
+    ...alpha_num,
+    message: "{_field_} must be alphanumeric"
   });
 
   extend("ip_or_fqdn", (value) => {
