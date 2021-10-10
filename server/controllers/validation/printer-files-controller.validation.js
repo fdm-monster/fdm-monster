@@ -12,8 +12,14 @@ const getFileRules = {
   fullPath: "required|string"
 };
 
+const fileUploadCommandsRules = {
+  select: "required|boolean",
+  print: "required|boolean"
+};
+
 module.exports = {
   getFilesRules,
   uploadFilesRules,
+  fileUploadCommandsRules,
   getFileRules
 };
