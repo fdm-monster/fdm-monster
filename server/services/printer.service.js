@@ -75,9 +75,11 @@ class PrinterService {
    * @returns {Promise<Query<Document<any, any, unknown> | null, Document<any, any, unknown>, {}, unknown>>}
    */
   async update(printerId, updateData) {
-    await validateInput(updateData, createPrinterRules);
+    const { printerURL, webSocketURL, apiKey, enabled, settingsAppearance } = await validateInput(
+      updateData,
+      createPrinterRules
+    );
 
-    const { printerURL, webSocketURL, apiKey, enabled, settingsAppearance } = updateData;
     const filter = { _id: printerId };
     const update = {
       printerURL,

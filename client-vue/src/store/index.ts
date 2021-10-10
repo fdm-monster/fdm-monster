@@ -1,13 +1,12 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import { printersState } from "@/store/printers/printers.state";
-import { serverSettingsState } from "@/store/server-settings/server-settings.state";
+import { config } from "vuex-module-decorators";
+
+config.rawError = true;
 
 Vue.use(Vuex);
 
-export default new Vuex.Store({
-  modules: {
-    printers: printersState,
-    serverSettings: serverSettingsState
-  }
-});
+// https://betterprogramming.pub/the-state-of-typed-vuex-the-cleanest-approach-2358ee05d230
+const store = new Vuex.Store({});
+
+export default store;

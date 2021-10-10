@@ -105,17 +105,16 @@
 <script lang="ts">
 import Vue from "vue";
 import { Component } from "vue-property-decorator";
-import { Action, Getter } from "vuex-class";
 import { Printer } from "@/models/printers/printer.model";
 import draggable from "vuedraggable";
 import { PrintersService } from "@/backend/printers.service";
 import { PrinterSseMessage } from "@/models/sse-messages/printer-sse-message.model";
 import { sseMessageGlobal } from "@/event-bus/sse.events";
 import PrinterDetails from "@/components/PrinterList/PrinterDetails.vue";
-import { PrinterGroup } from "@/models/printers/printer-group.model";
-import PrinterUrlAction from "@/components/PrinterList/PrinterUrlAction.vue";
-import PrinterSettingsAction from "@/components/PrinterList/PrinterSettingsAction.vue";
-import PrinterConnectionAction from "@/components/PrinterList/PrinterConnectionAction.vue";
+import PrinterUrlAction from "@/components/Generic/Actions/PrinterUrlAction.vue";
+import PrinterSettingsAction from "@/components/Generic/Actions/PrinterSettingsAction.vue";
+import PrinterConnectionAction from "@/components/Generic/Actions/PrinterConnectionAction.vue";
+import { printersState } from "@/store/printers.state";
 
 @Component({
   components: {
@@ -127,15 +126,14 @@ import PrinterConnectionAction from "@/components/PrinterList/PrinterConnectionA
   }
 })
 export default class Printers extends Vue {
-  @Action loadPrinters: () => Promise<Printer[]>;
-  @Action loadPrinterGroups: () => Promise<PrinterGroup[]>;
-  @Getter printers: Printer[];
-  @Getter printerGroups: PrinterGroup[];
-
   reorder = false;
   deleteMany = false;
   bulkFileClean = false;
   bulkUpdate = false;
+
+  get printers() {
+    return printersState.printers;
+  }
 
   search = "";
   expanded = [];
@@ -170,8 +168,8 @@ export default class Printers extends Vue {
   }
 
   async mounted() {
-    await this.loadPrinters();
-    await this.loadPrinterGroups();
+    await printersState.loadPrinters();
+    await printersState.loadPrinterGroups();
 
     this.$bus.on(sseMessageGlobal, (data: PrinterSseMessage) => {
       this.onSseMessage(data);

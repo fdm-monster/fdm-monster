@@ -181,6 +181,7 @@ class OctoprintApiService {
   async uploadFilesAsMultiPart(
     printer,
     fileBuffers,
+    commands,
     location = FileLocation.local,
     responseOptions = defaultResponseOptions
   ) {
@@ -197,6 +198,15 @@ class OctoprintApiService {
       formData.append("file", b.buffer, { filename: b.originalname });
     });
 
+    if (fileBuffers.length === 1) {
+      if (commands.select) {
+        formData.append("select", "true");
+      }
+      if (commands.print) {
+        formData.append("print", "true");
+      }
+    }
+
     try {
       const headers = {
         ...options.headers,
@@ -209,7 +219,7 @@ class OctoprintApiService {
 
       return processResponse(response, responseOptions);
     } catch (e) {
-      return { error: true, success: false };
+      return { error: e.message, success: false, stack: e.stack };
     }
   }
 

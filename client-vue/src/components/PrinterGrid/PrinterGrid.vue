@@ -3,12 +3,13 @@
     <v-btn class="mb-3" color="primary" type="button" @click="addNewPrinter()">Add Grid Item</v-btn>
     <div :id="gridId" class="grid-stack d-flex">
       <GridItem
-        v-for="(item, index, skeleton) in items"
+        v-for="(item, index) in items"
         :key="index"
-        :data-item="item"
+        v-focus="{item, index}"
+        :printer-id="item.id"
+        :skeleton="item.skeleton"
         :grid="grid"
         :selector="itemPrefix + index.toString()"
-        :skeleton="skeleton"
       />
 
       <ShowPrinterDialog
@@ -26,7 +27,6 @@ import Login from "@/components/Generic/Login.vue";
 import { Component } from "vue-property-decorator";
 import { GridItemHTMLElement, GridStack } from "gridstack";
 import GridItem, { EVENTS } from "@/components/PrinterGrid/GridItem.vue";
-import { Action, Getter } from "vuex-class";
 import { Printer } from "@/models/printers/printer.model";
 import "gridstack/dist/gridstack.min.css";
 // Required for custom columns
@@ -37,6 +37,7 @@ import ShowPrinterDialog from "@/components/Dialogs/UpdatePrinterDialog.vue";
 import { sseMessageGlobal } from "@/event-bus/sse.events";
 import { SkeletonPrinter } from "@/models/printers/crud/skeleton-printer.model";
 import { newRandomNamePair } from "@/constants/noun-adjectives.data";
+import { printersState } from "@/store/printers.state";
 
 @Component({
   components: { ShowPrinterDialog, GridItem, Login }
@@ -54,13 +55,15 @@ export default class PrinterGrid extends Vue {
   items: any[] = [];
   newItems: any[] = [];
 
-  @Action loadPrinters: () => Promise<Printer[]>;
-  @Getter printers: Printer[];
+  get printers() {
+    return printersState.printers;
+  }
 
   async mounted() {
     this.items = [];
     this.grid = GridStack.init({
       float: true,
+      maxRow: 7,
       cellHeight: "140px",
       resizable: {
         handles: "se"
@@ -68,7 +71,7 @@ export default class PrinterGrid extends Vue {
       column: 6
     });
 
-    await this.loadPrinters();
+    await printersState.loadPrinters();
 
     for (let printer of this.printers) {
       this.addNewPrinter(printer);
@@ -86,18 +89,21 @@ export default class PrinterGrid extends Vue {
 
   /**
    * Required to update the grid with skeletons without gridstack breaking and without losing state
-   * @param _
    */
   onSseMessage() {
     // Any old items are left over
     let superfluousItems: string[] = this.items.filter((i) => !i.skeleton).map((p) => p.id);
 
+    if (!this.printers) return;
+
     this.printers.forEach((p) => {
       // Visual items get checked for Id equality
-      const printerIndex = this.items.findIndex((item) => item.id === p.id);
-      if (printerIndex === -1) {
+      const itemIndex = this.items.findIndex((item) => item.id === p.id);
+      if (itemIndex === -1) {
         this.addNewPrinter(p);
       } else {
+        this.items[itemIndex] = p;
+
         const foundItemIndex = superfluousItems.findIndex((sfI) => sfI === p.id);
         superfluousItems.splice(foundItemIndex, 1);
       }
@@ -137,7 +143,7 @@ export default class PrinterGrid extends Vue {
 
   addNewPrinter(printer?: Printer | SkeletonPrinter) {
     // We can add a placeholder in case of undef printer
-    if (!printer) printer = { skeleton: true, printerName: newRandomNamePair(), x: 0, y: 0 };
+    if (!printer) printer = { skeleton: true, printerName: newRandomNamePair() };
 
     // Let the Vue update trigger first, and then attach a logical gridstack widget
     this.newItems.push({ printer, index: this.items.length });
@@ -155,6 +161,7 @@ export default class PrinterGrid extends Vue {
   beforeDestroy() {
     this.$bus.off(sseMessageGlobal, this.onSseMessage);
     this.$bus.off(EVENTS.itemClicked, this.openCreateDialog);
+    this.grid.removeAll(true);
   }
 }
 </script>

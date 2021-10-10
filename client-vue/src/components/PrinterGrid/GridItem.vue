@@ -1,60 +1,45 @@
 <template>
   <v-card
     :id="this.selector"
-    :class="`grid-stack-item ${this.dataItem.skeleton ? '' : 'elevation-12'}`"
-    :gs-h="this.dataItem.h"
-    :gs-id="this.dataItem.id"
-    :gs-max-h="this.dataItem.maxH"
-    :gs-max-w="this.dataItem.maxW"
-    :gs-min-h="this.dataItem.minH"
-    :gs-min-w="this.dataItem.minW"
-    :gs-w="this.dataItem.w"
-    :gs-x="this.dataItem.x"
-    :gs-y="this.dataItem.y"
+    :class="`grid-stack-item ${this.skeleton ? '' : 'elevation-12'}`"
+    :gs-id="this.printer.id"
+    :gs-h="this.printer.h"
+    :gs-max-h="this.printer.maxH"
+    :gs-max-w="this.printer.maxW"
+    :gs-min-h="this.printer.minH"
+    :gs-min-w="this.printer.minW"
     @click="clickPrinter()"
   >
-    <v-toolbar :color="dataItem.skeleton ? 'secondary' : 'primary'" dark dense>
+<!--    :gs-w="this.printer.w"-->
+<!--    :gs-x="this.printer.x"-->
+<!--    :gs-y="this.printer.y"-->
+    <v-toolbar :color="this.skeleton ? 'secondary' : 'primary'" dark dense>
       <v-avatar color="secondary" size="54">
-        {{ avatarInitials }}
+        {{ this.avatarInitials() }}
       </v-avatar>
 
       <v-card-text class="ml-0">
-        <span class="mt-5">{{ this.printerName() }}</span>
-        <br />
+        <span class="mt-5 d-none d-lg-inline">{{ this.printerName() }}</span>
+        <br/>
         <small class="secondary--text font-weight-10">{{
-          dataItem.skeleton ? "New Printer" : "Printing"
-        }}</small>
+            this.skeleton ? "New Printer" : "Printing"
+          }}</small>
       </v-card-text>
     </v-toolbar>
 
     <v-card-subtitle class="grid-stack-item-content"></v-card-subtitle>
 
-    <v-card-actions v-if="dataItem.skeleton">
-      <v-btn> Create</v-btn>
+    <v-card-actions v-if="this.skeleton">
+      <v-btn>Create</v-btn>
     </v-card-actions>
     <v-card-actions v-else>
-      <v-btn color="primary" fab x-small @click.stop="doSomething()">
+      <v-btn color="primary" disabled fab x-small @click.stop="stopClicked()">
         <v-icon>stop</v-icon>
       </v-btn>
-      <v-btn color="primary" fab x-small @click.stop="doSomething()">
+      <v-btn color="primary" disabled fab x-small @click.stop="infoClicked()">
         <v-icon>info</v-icon>
       </v-btn>
     </v-card-actions>
-
-    <v-speed-dial v-model="fab" direction="right" hidden left @click.native.stop>
-      <template v-slot:activator>
-        <v-btn absolute color="secondary" dark fab right top x-small>
-          <v-icon v-if="fab">close</v-icon>
-          <v-icon v-else>more_vert</v-icon>
-        </v-btn>
-      </template>
-      <v-btn color="primary" fab x-small>
-        <v-icon>upload</v-icon>
-      </v-btn>
-      <v-btn color="indigo" fab x-small>
-        <v-icon>settings</v-icon>
-      </v-btn>
-    </v-speed-dial>
   </v-card>
 </template>
 
@@ -64,69 +49,72 @@ import Component from "vue-class-component";
 import { Prop } from "vue-property-decorator";
 import { Printer } from "@/models/printers/printer.model";
 import { GridStack } from "gridstack";
-import { SkeletonPrinter } from "@/models/printers/crud/skeleton-printer.model";
 import { generateInitials } from "@/constants/noun-adjectives.data";
 import { updatedPrinterEvent } from "@/event-bus/printer.events";
 
 export const EVENTS = {
   itemClicked: "griditem:clicked"
 };
-@Component
+@Component({
+  data: () => ({ printer: {} })
+})
 export default class GridItem extends Vue {
-  @Prop() dataItem: Printer | SkeletonPrinter;
-  printer: Printer;
-  avatarInitials = "";
+  @Prop() printerId: string;
+  @Prop() skeleton: boolean;
   @Prop() selector: string;
   @Prop() grid: GridStack;
 
-  skeleton: boolean;
-  fab = false;
+  printer: Printer;
+  initiated = false;
 
-  get printerId() {
-    if ((this.dataItem as SkeletonPrinter).skeleton) return "";
-
-    return (this.dataItem as Printer).id;
+  avatarInitials() {
+    if (this.skeleton) return "?";
+    return generateInitials(this.printer.printerName);
   }
 
   printerName() {
-    if ((this.dataItem as SkeletonPrinter).skeleton) return "";
+    if (this.skeleton) return "";
 
-    let data = this.printer as Printer;
-    this.avatarInitials = generateInitials(this.printer.printerName);
-    return data.printerName || data.printerURL?.replace("http://", "");
+    return this.printer.printerName || this.printer.printerURL?.replace("http://", "");
   }
 
   created() {
-    this.skeleton = (this.dataItem as SkeletonPrinter)?.skeleton;
-
     if (!this.skeleton) {
-      this.printer = this.$store.getters.printer((this.dataItem as Printer).id);
+      this.printer = this.$store.getters.printer(this.printerId);
       this.$bus.on(updatedPrinterEvent(this.printerId), this.updateItem);
     }
   }
 
   updateItem(data: Printer) {
     this.printer = data;
-    this.avatarInitials = generateInitials(this.printer.printerName);
   }
 
-  doSomething() {
-    // TODO
-    console.log("Something done");
+  stopClicked() {
+    console.warn("Stop command has not been implemented yet.");
+  }
+
+  infoClicked() {
+    console.warn("Info dialog has not been implemented yet.");
   }
 
   clickPrinter() {
-    this.$bus.emit(EVENTS.itemClicked, this.dataItem);
+    this.$bus.emit(EVENTS.itemClicked, this.printer);
   }
 
   updated() {
-    // The grid item is dereferenced on every update
-    this.grid.removeWidget(`#${this.selector}`, false);
-    this.grid.makeWidget(`#${this.selector}`);
+    // The grid item is not dereferenced on every update
+    if (!this.initiated) {
+      this.initiated = true;
+      this.grid.removeWidget(`#${ this.selector }`, false);
+      this.grid.makeWidget(`#${ this.selector }`);
+    }
   }
 
   beforeDestroy() {
     this.$bus.off(updatedPrinterEvent(this.printerId), this.updateItem);
+
+    // Dev mode hot-reload fix
+    this.grid.removeAll(true);
   }
 }
 </script>

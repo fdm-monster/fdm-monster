@@ -1,5 +1,14 @@
 <template>
-  <v-container v-if="printer">
+  <v-container
+    v-if="printer"
+    :style="dragging ? 'background-color:red' : ''"
+    class="slow-background"
+    transition="scale-transition"
+    @dragenter="dragging = true"
+    @dragleave="dragging = false"
+    @drop.prevent="addFile"
+    @dragover.prevent="dragging = true"
+  >
     <PrinterDeleteAction :printer="printer" />
     Name: {{ printer.printerName }} <br />
     URL: {{ printer.printerURL }}
@@ -11,19 +20,37 @@
 <script lang="ts">
 import Component from "vue-class-component";
 import Vue from "vue";
-import FileList from "@/components/PrinterList/FileList.vue";
+import FileControlList from "@/components/PrinterList/FileControlList.vue";
 import { Prop } from "vue-property-decorator";
 import { Printer } from "@/models/printers/printer.model";
-import PrinterDeleteAction from "@/components/PrinterList/PrinterDeleteAction.vue";
+import PrinterDeleteAction from "@/components/Generic/Actions/PrinterDeleteAction.vue";
+import { printersState } from "@/store/printers.state";
 
 @Component({
-  components: { FileList, PrinterDeleteAction }
+  components: { FileList: FileControlList, PrinterDeleteAction }
 })
 export default class PrinterDetails extends Vue {
   @Prop() printer: Printer;
+  dragging = false;
 
   get printerId() {
     return this.printer.id;
   }
+
+  async addFile(e: DragEvent) {
+    if (!e.dataTransfer) return;
+    this.dragging = false;
+
+    await printersState.dropUploadPrinterFile({
+      printerId: this.printerId,
+      files: e.dataTransfer.files
+    });
+  }
 }
 </script>
+
+<style>
+.slow-background {
+  transition: background-color 0.5s ease;
+}
+</style>
