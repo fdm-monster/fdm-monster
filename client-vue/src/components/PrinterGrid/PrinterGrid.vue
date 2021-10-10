@@ -140,7 +140,7 @@ export default class PrinterGrid extends Vue {
 
   addNewPrinter(printer?: Printer | SkeletonPrinter) {
     // We can add a placeholder in case of undef printer
-    if (!printer) printer = { skeleton: true, printerName: newRandomNamePair(), x: 0, y: 0 };
+    if (!printer) printer = { skeleton: true, printerName: newRandomNamePair() };
 
     // Let the Vue update trigger first, and then attach a logical gridstack widget
     this.newItems.push({ printer, index: this.items.length });

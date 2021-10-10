@@ -8,7 +8,7 @@
               <v-avatar color="primary" size="56">
                 {{ avatarInitials() }}
               </v-avatar>
-              Showing Printer
+              Updating Printer
             </span>
           </v-card-title>
           <v-card-text>
@@ -214,6 +214,10 @@ export default class ShowPrinterDialog extends Vue {
 
   showChecksPanel = false;
   testProgress?: TestProgressDetails = undefined;
+
+  get printerGroupNames() {
+    return printersState.printerGroupNames;
+  }
 
   get mutableShow() {
     // https://forum.vuejs.org/t/update-data-when-prop-changes-data-derived-from-prop/1517/27
