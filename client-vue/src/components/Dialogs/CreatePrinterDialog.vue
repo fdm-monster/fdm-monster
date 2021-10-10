@@ -243,7 +243,7 @@ export default class CreatePrinterDialog extends Vue {
 
   @Inject() readonly appConstants!: any;
 
-  apiKeyRules = { required: true, length: this.appConstants.apiKeyLength };
+  apiKeyRules = { required: true, length: this.appConstants.apiKeyLength, alpha_num: true };
   formData: PreCreatePrinter = getDefaultCreatePrinter();
   $refs!: {
     validationObserver: InstanceType<typeof ValidationObserver>;
