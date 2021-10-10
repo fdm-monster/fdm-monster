@@ -63,6 +63,7 @@ export default class PrinterGrid extends Vue {
     this.items = [];
     this.grid = GridStack.init({
       float: true,
+      maxRow: 7,
       cellHeight: "140px",
       resizable: {
         handles: "se"

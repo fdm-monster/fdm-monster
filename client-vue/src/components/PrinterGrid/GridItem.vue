@@ -75,7 +75,6 @@ export const EVENTS = {
 export default class GridItem extends Vue {
   @Prop() dataItem: Printer | SkeletonPrinter;
   printer: Printer;
-  avatarInitials = "";
   @Prop() selector: string;
   @Prop() grid: GridStack;
 
@@ -88,11 +87,15 @@ export default class GridItem extends Vue {
     return (this.dataItem as Printer).id;
   }
 
+  get avatarInitials() {
+    if (!this.printer) return "";
+    return generateInitials(this.printer.printerName);
+  }
+
   printerName() {
     if ((this.dataItem as SkeletonPrinter).skeleton) return "";
 
     let data = this.printer as Printer;
-    this.avatarInitials = generateInitials(this.printer.printerName);
     return data.printerName || data.printerURL?.replace("http://", "");
   }
 
@@ -107,7 +110,6 @@ export default class GridItem extends Vue {
 
   updateItem(data: Printer) {
     this.printer = data;
-    this.avatarInitials = generateInitials(this.printer.printerName);
   }
 
   doSomething() {
