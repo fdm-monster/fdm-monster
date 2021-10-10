@@ -30,20 +30,7 @@
                           required
                         />
                       </validation-provider>
-                    </v-col>
-                    <v-col cols="12" md="6">
-                      <validation-provider v-slot="{ errors }" name="Groups">
-                        <v-select
-                          v-model="formData.groups"
-                          :error-messages="errors"
-                          :items="printerGroupNames"
-                          label="Group(s)"
-                          multiple
-                          required
-                        ></v-select>
-                      </validation-provider>
-                    </v-col>
-                    <v-col cols="12" md="6">
+
                       <validation-provider
                         v-slot="{ errors }"
                         name="Printer IP or HostName"
@@ -56,19 +43,16 @@
                           label="IP/Host*"
                         ></v-text-field>
                       </validation-provider>
-                    </v-col>
-                    <v-col cols="12" md="6">
-                      <validation-provider
-                        v-slot="{ errors }"
-                        :rules="`required|integer|max:${appConstants.maxPort}`"
-                        name="Host Port"
-                      >
-                        <v-text-field
-                          v-model="formData.printerHostPort"
+
+                      <validation-provider v-slot="{ errors }" name="Groups">
+                        <v-select
+                          v-model="formData.groups"
                           :error-messages="errors"
-                          hint="Examples: '80', '443' or '5050'"
-                          label="Host Port*"
-                        ></v-text-field>
+                          :items="printerGroupNames"
+                          label="Groups"
+                          multiple
+                          required
+                        ></v-select>
                       </validation-provider>
                     </v-col>
                     <v-col cols="12" md="6">
@@ -82,8 +66,21 @@
                           required
                         ></v-checkbox>
                       </validation-provider>
+
+                      <validation-provider
+                        v-slot="{ errors }"
+                        name="Host Port"
+                        rules="required|integer|max:65535"
+                      >
+                        <v-text-field
+                          v-model="formData.printerHostPort"
+                          :error-messages="errors"
+                          hint="Examples: '80', '443' or '5050'"
+                          label="Host Port*"
+                        ></v-text-field>
+                      </validation-provider>
                     </v-col>
-                    <v-col cols="12" md="12">
+                    <v-col cols="12" md="12" class="pb-5 pt-0">
                       <validation-provider v-slot="{ errors }" :rules="apiKeyRules" name="ApiKey">
                         <v-text-field
                           v-model="formData.apiKey"
@@ -102,27 +99,7 @@
                     <v-expansion-panel>
                       <v-expansion-panel-header>Advanced settings</v-expansion-panel-header>
                       <v-expansion-panel-content>
-                        <validation-provider v-slot="{ errors }" name="Display">
-                          <v-checkbox
-                            v-model="formData.display"
-                            :error-messages="errors"
-                            label="Display*"
-                            required
-                          ></v-checkbox>
-                        </validation-provider>
-                        <v-col cols="12" md="6">
-                          <validation-provider v-slot="{ errors }" name="StepSize">
-                            <v-select
-                              v-model="formData.stepSize"
-                              :error-messages="errors"
-                              :items="[0.1, 1, 10, 100]"
-                              label="Step-size for manual control"
-                              required
-                              value="http"
-                            ></v-select>
-                          </validation-provider>
-                        </v-col>
-                        <v-col cols="12" md="6">
+                        <v-col cols="12" md="12">
                           <validation-provider v-slot="{ errors }" name="PrinterHostPrefix">
                             <v-select
                               v-model="formData.printerHostPrefix"
@@ -133,8 +110,7 @@
                               value="http"
                             ></v-select>
                           </validation-provider>
-                        </v-col>
-                        <v-col cols="12" md="6">
+
                           <validation-provider v-slot="{ errors }" name="WebsocketPrefix">
                             <v-select
                               v-model="formData.websocketPrefix"
@@ -145,7 +121,17 @@
                               value="ws"
                             ></v-select>
                           </validation-provider>
+                          <validation-provider v-slot="{ errors }" name="Display">
+                            <v-checkbox
+                              v-model="formData.display"
+                              :error-messages="errors"
+                              disabled
+                              label="Display*"
+                              required
+                            ></v-checkbox>
+                          </validation-provider>
                         </v-col>
+
                       </v-expansion-panel-content>
                     </v-expansion-panel>
                   </v-expansion-panels>
@@ -215,7 +201,7 @@ export default class CreatePrinterDialog extends Vue {
   get printerGroupNames() {
     return printersState.printerGroupNames;
   }
-  
+
   get mutableShow() {
     // https://forum.vuejs.org/t/update-data-when-prop-changes-data-derived-from-prop/1517/27
     return this.show;

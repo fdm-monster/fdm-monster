@@ -6,7 +6,8 @@
         v-for="(item, index) in items"
         :key="index"
         v-focus="{item, index}"
-        :data-item="item"
+        :printer-id="item.id"
+        :skeleton="item.skeleton"
         :grid="grid"
         :selector="itemPrefix + index.toString()"
       />
@@ -97,10 +98,12 @@ export default class PrinterGrid extends Vue {
 
     this.printers.forEach((p) => {
       // Visual items get checked for Id equality
-      const printerIndex = this.items.findIndex((item) => item.id === p.id);
-      if (printerIndex === -1) {
+      const itemIndex = this.items.findIndex((item) => item.id === p.id);
+      if (itemIndex === -1) {
         this.addNewPrinter(p);
       } else {
+        this.items[itemIndex] = p;
+
         const foundItemIndex = superfluousItems.findIndex((sfI) => sfI === p.id);
         superfluousItems.splice(foundItemIndex, 1);
       }
@@ -158,6 +161,7 @@ export default class PrinterGrid extends Vue {
   beforeDestroy() {
     this.$bus.off(sseMessageGlobal, this.onSseMessage);
     this.$bus.off(EVENTS.itemClicked, this.openCreateDialog);
+    this.grid.removeAll(true);
   }
 }
 </script>

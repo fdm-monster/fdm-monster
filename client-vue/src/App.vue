@@ -25,6 +25,7 @@ import { PrinterSseMessage } from "@/models/sse-messages/printer-sse-message.mod
 import { sseMessageGlobal, sseTestPrinterUpdate } from "@/event-bus/sse.events";
 import { serverSettingsState } from "@/store/server-settings.state";
 import { printersState } from "@/store/printers.state";
+import { updatedPrinterEvent } from "@/event-bus/printer.events";
 
 @Component({
   components: { TopBar, NavigationDrawer, FooterList, ErrorAlert }
@@ -57,6 +58,11 @@ export default class App extends Vue {
 
       // Emit the global update
       this.$bus.emit(sseMessageGlobal, message);
+
+      message.printers.forEach(p => {
+        if (!p.id) return;
+        this.$bus.emit(updatedPrinterEvent(p.id), p);
+      })
     }
 
     if (message.testPrinter) {
