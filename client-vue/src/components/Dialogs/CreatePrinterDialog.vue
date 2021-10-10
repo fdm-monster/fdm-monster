@@ -212,6 +212,10 @@ export default class CreatePrinterDialog extends Vue {
   showChecksPanel = false;
   testProgress?: TestProgressDetails = undefined;
 
+  get printerGroupNames() {
+    return printersState.printerGroupNames;
+  }
+  
   get mutableShow() {
     // https://forum.vuejs.org/t/update-data-when-prop-changes-data-derived-from-prop/1517/27
     return this.show;
