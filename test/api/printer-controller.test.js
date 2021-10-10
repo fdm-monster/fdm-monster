@@ -28,7 +28,6 @@ beforeEach(async () => {
 });
 
 describe("PrintersController", () => {
-  // TODO this API endpoint is doing unexpected stuff
   it(`should not be able to POST ${createRoute} - invalid apiKey`, async () => {
     const response = await request.post(createRoute).send({
       settingsAppearance: null,

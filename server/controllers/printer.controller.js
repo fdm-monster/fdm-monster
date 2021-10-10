@@ -11,7 +11,6 @@ const {
 } = require("./validation/printer-controller.validation");
 const { AppConstants } = require("../app.constants");
 const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
-const { NotImplementedException } = require("../exceptions/runtime.exceptions");
 const { idRules } = require("./validation/generic.validation");
 const DITokens = require("../container.tokens");
 const { Status, getSettingsApperearanceDefault } = require("../constants/service.constants");
