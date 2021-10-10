@@ -9,10 +9,11 @@ const {
   getFileRules,
   uploadFilesRules
 } = require("./validation/printer-files-controller.validation");
-const { ExternalServiceError } = require("../exceptions/runtime.exceptions");
+const { ExternalServiceError, ValidationException } = require("../exceptions/runtime.exceptions");
 const HttpStatusCode = require("../constants/http-status-codes.constants");
 const { Status } = require("../constants/service.constants");
 const multer = require("multer");
+const path = require("path");
 
 class PrinterFileController {
   #filesStore;
@@ -26,6 +27,14 @@ class PrinterFileController {
     this.#filesStore = filesStore;
     this.#octoPrintApiService = octoPrintApiService;
     this.#printersStore = printersStore;
+  }
+
+  #fileFilter(req, file, callback) {
+    const ext = path.extname(file.originalname);
+    if (ext !== ".gcode") {
+      return callback(new Error("Only .gcode files are allowed"));
+    }
+    callback(null, true);
   }
 
   #statusResponse(res, response) {
@@ -70,23 +79,38 @@ class PrinterFileController {
     this.#statusResponse(res, response);
   }
 
-  async uploadFile(req, res) {
+  async uploadFiles(req, res) {
     const { id: printerId } = await validateInput(req.params, idRules);
     const { location } = await validateInput(req.query, uploadFilesRules, res);
 
     const printerLogin = this.#printersStore.getPrinterLogin(printerId);
 
-    const uploadAny = multer({ storage: multer.memoryStorage() }).any();
+    const uploadAny = multer({
+      storage: multer.memoryStorage(),
+      fileFilter: this.#fileFilter
+    }).any();
 
-    return await uploadAny(req, res, async () => {
-      const response = await this.#octoPrintApiService.uploadFilesAsMultiPart(
-        printerLogin,
-        req.files,
-        location
-      );
+    await new Promise((resolve, reject) =>
+      uploadAny(req, res, (err) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve();
+      })
+    );
 
-      res.send(response);
-    });
+    if (req.files.length === 0)
+      throw new ValidationException({
+        error: "No files were available for upload. Did you upload files with extension '.gcode'?"
+      });
+
+    const response = await this.#octoPrintApiService.uploadFilesAsMultiPart(
+      printerLogin,
+      req.files,
+      location
+    );
+
+    res.send(response);
   }
 
   async deleteFile(req, res) {
@@ -155,15 +179,15 @@ class PrinterFileController {
 
 // prettier-ignore
 module.exports = createController(PrinterFileController)
-  .prefix(AppConstants.apiRoute + "/printer-files")
-  .before([ensureAuthenticated])
-  .get("/:id", "getFiles")
-  .delete("/:id", "deleteFile")
-  .post("/:id/upload", "uploadFile")
-  // TODO below
-  .post("/file/resync", "resyncFile")
-  .post("/file/move", "moveFile")
-  .post("/file/create", "createFile")
-  .delete("/folder", "removeFolder")
-  .delete("/folder/move", "moveFolder")
-  .post("/folder/create", "createFolder");
+    .prefix(AppConstants.apiRoute + "/printer-files")
+    .before([ensureAuthenticated])
+    .get("/:id", "getFiles")
+    .delete("/:id", "deleteFile")
+    .post("/:id/upload", "uploadFiles")
+    // TODO below
+    .post("/file/resync", "resyncFile")
+    .post("/file/move", "moveFile")
+    .post("/file/create", "createFile")
+    .delete("/folder", "removeFolder")
+    .delete("/folder/move", "moveFolder")
+    .post("/folder/create", "createFolder");
