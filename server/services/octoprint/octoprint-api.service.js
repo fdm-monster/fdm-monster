@@ -8,7 +8,6 @@ const {
   multiPartContentType
 } = require("./constants/octoprint-service.constants");
 const { checkPluginManagerAPIDeprecation } = require("../../utils/compatibility.utils");
-const Logger = require("../../handlers/logger.js");
 const { processResponse, validatePrinter, constructHeaders } = require("./utils/api.utils");
 const { jsonContentType } = require("./constants/octoprint-service.constants");
 const { getDefaultTimeout } = require("../../constants/server-settings.constants");

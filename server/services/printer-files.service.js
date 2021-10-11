@@ -36,6 +36,23 @@ class PrinterFilesService {
     return printer.fileList;
   }
 
+  async appendOrReplaceFile(printerId, addedFile) {
+    const printer = await this.#printerService.get(printerId);
+
+    const foundFileIndex = printer.fileList.files.findIndex((f) => f.path === addedFile.path);
+    if (foundFileIndex === -1) {
+      printer.fileList.files.push(addedFile);
+    } else {
+      printer.fileList.files[foundFileIndex] = addedFile;
+    }
+    printer.fileList.fileCount = printer.fileList.files.length;
+
+    printer.markModified("fileList");
+    printer.save();
+
+    return printer.fileList;
+  }
+
   /**
    * Perform delete action on database
    * @param printerId

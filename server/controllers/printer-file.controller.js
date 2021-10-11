@@ -15,6 +15,7 @@ const HttpStatusCode = require("../constants/http-status-codes.constants");
 const { Status } = require("../constants/service.constants");
 const multer = require("multer");
 const path = require("path");
+const { FileLocation } = require("../services/octoprint/constants/octoprint-service.constants");
 
 class PrinterFileController {
   #filesStore;
@@ -113,6 +114,12 @@ class PrinterFileController {
       commands,
       location
     );
+
+    // TODO update file cache with files store
+    if (location === FileLocation.local && response.success !== false) {
+      const newOrUpdatedFile = response.files.local;
+      await this.#filesStore.appendOrSetPrinterFile(printerId, newOrUpdatedFile);
+    }
 
     res.send(response);
   }

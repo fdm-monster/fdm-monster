@@ -4,7 +4,7 @@
       <v-toolbar-title>Location Map</v-toolbar-title>
       <v-spacer></v-spacer>
       <div>
-        <v-switch v-model="autoPrint" hide-details label="Auto-select and print"></v-switch>
+        <v-switch disabled v-model="autoPrint" hide-details label="Auto-select and print"></v-switch>
       </div>
       <v-btn class="ml-3" color="primary" type="button" @click="createPrinterModal()">
         Create Printer

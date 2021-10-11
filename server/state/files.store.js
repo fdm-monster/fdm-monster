@@ -36,12 +36,24 @@ class FilesStore {
     }
   }
 
-  async updatePrinterFiles(printedId, files) {
-    // Check cache existence
-    const printer = this.#printersStore.getPrinterState(printedId);
+  async updatePrinterFiles(printerId, files) {
+    const printer = this.#printersStore.getPrinterState(printerId);
 
     // Check printer in database and modify
     const printerFileList = await this.#printerFilesService.updateFiles(printer.id, files);
+
+    // Update cache with data from storage
+    await this.#fileCache.cachePrinterFiles(printer.id, printerFileList);
+  }
+
+  async appendOrSetPrinterFile(printerId, addedFile) {
+    const printer = this.#printersStore.getPrinterState(printerId);
+
+    // Check printer in database and modify
+    const printerFileList = await this.#printerFilesService.appendOrReplaceFile(
+      printer.id,
+      addedFile
+    );
 
     // Update cache with data from storage
     await this.#fileCache.cachePrinterFiles(printer.id, printerFileList);
