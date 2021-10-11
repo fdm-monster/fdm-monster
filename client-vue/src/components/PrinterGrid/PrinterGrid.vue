@@ -12,7 +12,7 @@
         :selector="itemPrefix + index.toString()"
       />
 
-      <ShowPrinterDialog
+      <UpdatePrinterDialog
         :printer-id="selectedPrinterId"
         :show.sync="showDialog"
         v-on:update:show="onChangeShowDialog($event)"
@@ -33,14 +33,14 @@ import "gridstack/dist/gridstack.min.css";
 import "gridstack/dist/gridstack-extra.min.css";
 // Required for drag and drop
 import "gridstack/dist/h5/gridstack-dd-native";
-import ShowPrinterDialog from "@/components/Dialogs/UpdatePrinterDialog.vue";
+import UpdatePrinterDialog from "@/components/Dialogs/UpdatePrinterDialog.vue";
 import { sseMessageGlobal } from "@/event-bus/sse.events";
 import { SkeletonPrinter } from "@/models/printers/crud/skeleton-printer.model";
 import { newRandomNamePair } from "@/constants/noun-adjectives.data";
 import { printersState } from "@/store/printers.state";
 
 @Component({
-  components: { ShowPrinterDialog, GridItem, Login }
+  components: { UpdatePrinterDialog, GridItem, Login }
 })
 export default class PrinterGrid extends Vue {
   readonly itemPrefix = "printer-tile-";
