@@ -33,7 +33,7 @@
       <v-btn disabled>Create</v-btn>
     </v-card-actions>
     <v-card-actions v-else>
-      <v-btn color="primary" :disabled="isPrinting()" fab x-small @click.stop="stopClicked()">
+      <v-btn :color="isCancelling() ? 'warning' : 'primary'" :disabled="hasNoStoppableJob()" fab x-small @click.stop="stopClicked()">
         <v-icon>stop</v-icon>
       </v-btn>
       <v-btn color="primary" fab x-small @click.stop="infoClicked()">
@@ -52,6 +52,7 @@ import { GridStack } from "gridstack";
 import { generateInitials } from "@/constants/noun-adjectives.data";
 import { updatedPrinterEvent } from "@/event-bus/printer.events";
 import { PrintersService } from "@/backend";
+import { infoMessageEvent } from "@/event-bus/alert.events";
 
 export const EVENTS = {
   itemClicked: "griditem:clicked"
@@ -84,8 +85,14 @@ export default class GridItem extends Vue {
     return this.printer.printerState.state;
   }
 
-  isPrinting() {
-    return this.printer?.printerState?.flags.printing;
+  isCancelling() {
+    const printerState = this.printer.printerState;
+    return printerState.flags.cancelling;
+  }
+
+  hasNoStoppableJob() {
+    const printerState = this.printer.printerState;
+    return !printerState.flags.printing && !printerState.flags.paused;
   }
 
   printerName() {
@@ -99,10 +106,12 @@ export default class GridItem extends Vue {
   }
 
   async stopClicked() {
-    const printerState = this.printer.printerState;
-    if (!printerState.flags.printing && !printerState.flags.printing) {
+    if (this.isCancelling()) {
+      return this.$bus.emit(infoMessageEvent, "Printer is cancelling. Please wait.");
+    }
+    if (this.hasNoStoppableJob()) {
       if (
-        !confirm("The printer is not printing nor paused. Are you sure to send a Stop Job commnad?")
+        !confirm("The printer is not printing nor paused. Are you sure to send a Stop Job command?")
       ) {
         return;
       }
