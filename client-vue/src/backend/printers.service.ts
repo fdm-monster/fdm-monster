@@ -30,6 +30,12 @@ export class PrintersService extends BaseService {
     return newFormData;
   }
 
+  static openPrinterURL(printerURL: string) {
+    if (!printerURL) return;
+
+    window.open(printerURL);
+  }
+
   static convertCreateFormToPrinter(formData: PreCreatePrinter) {
     const modifiedData: any = { ...formData };
 

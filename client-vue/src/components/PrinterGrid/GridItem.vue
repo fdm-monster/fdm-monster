@@ -10,9 +10,9 @@
     :gs-min-w="this.printer.minW"
     @click="clickPrinter()"
   >
-<!--    :gs-w="this.printer.w"-->
-<!--    :gs-x="this.printer.x"-->
-<!--    :gs-y="this.printer.y"-->
+    <!--    :gs-w="this.printer.w"-->
+    <!--    :gs-x="this.printer.x"-->
+    <!--    :gs-y="this.printer.y"-->
     <v-toolbar :color="this.skeleton ? 'secondary' : 'primary'" dark dense>
       <v-avatar color="secondary" size="54">
         {{ this.avatarInitials() }}
@@ -20,11 +20,9 @@
 
       <v-card-text class="ml-0">
         <span class="mt-5 d-none d-lg-inline">{{ this.printerName() }}</span>
-        <br/>
+        <br />
         <small class="secondary--text font-weight-10">
-          {{
-            this.skeleton ? "New Printer" : this.currentPrinterState()
-          }}
+          {{ this.skeleton ? "New Printer" : this.currentPrinterState() }}
         </small>
       </v-card-text>
     </v-toolbar>
@@ -103,7 +101,9 @@ export default class GridItem extends Vue {
   async stopClicked() {
     const printerState = this.printer.printerState;
     if (!printerState.flags.printing && !printerState.flags.printing) {
-      if (!confirm("The printer is not printing nor paused. Are you sure to send a Stop Job commnad?")){
+      if (
+        !confirm("The printer is not printing nor paused. Are you sure to send a Stop Job commnad?")
+      ) {
         return;
       }
     }
@@ -111,7 +111,7 @@ export default class GridItem extends Vue {
   }
 
   infoClicked() {
-    console.warn("Info dialog has not been implemented yet.");
+    PrintersService.openPrinterURL(this.printer.printerURL);
   }
 
   clickPrinter() {
@@ -122,8 +122,8 @@ export default class GridItem extends Vue {
     // The grid item is not dereferenced on every update
     if (!this.initiated) {
       this.initiated = true;
-      this.grid.removeWidget(`#${ this.selector }`, false);
-      this.grid.makeWidget(`#${ this.selector }`);
+      this.grid.removeWidget(`#${this.selector}`, false);
+      this.grid.makeWidget(`#${this.selector}`);
     }
   }
 
