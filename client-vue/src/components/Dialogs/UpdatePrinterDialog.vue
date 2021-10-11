@@ -63,7 +63,7 @@ import { infoMessageEvent } from "@/event-bus/alert.events";
     testProgress: undefined
   })
 })
-export default class ShowPrinterDialog extends Vue {
+export default class UpdatePrinterDialog extends Vue {
   @Prop() printerId: string; // Watched
   @Prop() show: boolean;
 

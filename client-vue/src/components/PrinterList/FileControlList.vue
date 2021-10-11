@@ -1,11 +1,6 @@
 <template>
   <div v-if="fileList && printerId">
-    Files:
-    <v-btn color="secondary" @click="getFiles">
-      <v-icon>refresh</v-icon>
-      Refresh files
-    </v-btn>
-    <!--    <v-file-input chips counter show-size truncate-length="15" clearable></v-file-input>-->
+    <strong>Files:</strong>
     <v-list color="primary">
       <v-list-item v-for="file in fileList.files" :key="file.path">
         {{ file.path }} - {{ file.date }}
@@ -33,13 +28,6 @@ import { printersState } from "@/store/printers.state";
 export default class FileControlList extends Vue {
   @Prop() fileList: FileList;
   @Prop() printerId: string;
-
-  async getFiles() {
-    this.fileList.files = await printersState.loadPrinterFiles({
-      printerId: this.printerId,
-      recursive: false
-    });
-  }
 
   async deleteFile(file: PrinterFile) {
     this.fileList.files = await printersState.deletePrinterFile({

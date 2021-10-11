@@ -30,6 +30,12 @@ export class PrintersService extends BaseService {
     return newFormData;
   }
 
+  static openPrinterURL(printerURL: string) {
+    if (!printerURL) return;
+
+    window.open(printerURL);
+  }
+
   static convertCreateFormToPrinter(formData: PreCreatePrinter) {
     const modifiedData: any = { ...formData };
 
@@ -92,5 +98,11 @@ export class PrintersService extends BaseService {
     const path = ServerApi.printerEnabledRoute(printerId);
 
     return await this.patchApi(path, { enabled });
+  }
+
+  static async stopPrintJob(printerId: string) {
+    const path = ServerApi.printerStopJobRoute(printerId);
+
+    return await this.postApi(path);
   }
 }

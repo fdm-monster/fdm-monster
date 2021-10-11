@@ -7,13 +7,15 @@ const { idRules } = require("./validation/generic.validation");
 const {
   getFilesRules,
   getFileRules,
-  uploadFilesRules
+  uploadFilesRules,
+  fileUploadCommandsRules
 } = require("./validation/printer-files-controller.validation");
 const { ExternalServiceError, ValidationException } = require("../exceptions/runtime.exceptions");
 const HttpStatusCode = require("../constants/http-status-codes.constants");
 const { Status } = require("../constants/service.constants");
 const multer = require("multer");
 const path = require("path");
+const { FileLocation } = require("../services/octoprint/constants/octoprint-service.constants");
 
 class PrinterFileController {
   #filesStore;
@@ -81,7 +83,7 @@ class PrinterFileController {
 
   async uploadFiles(req, res) {
     const { id: printerId } = await validateInput(req.params, idRules);
-    const { location } = await validateInput(req.query, uploadFilesRules, res);
+    const { location } = await validateInput(req.query, uploadFilesRules);
 
     const printerLogin = this.#printersStore.getPrinterLogin(printerId);
 
@@ -104,14 +106,20 @@ class PrinterFileController {
         error: "No files were available for upload. Did you upload files with extension '.gcode'?"
       });
 
-    const commands = req.body;
-
+    // Multer has processed the remaining multipart data into the body as json
+    const commands = await validateInput(req.body, fileUploadCommandsRules);
     const response = await this.#octoPrintApiService.uploadFilesAsMultiPart(
       printerLogin,
       req.files,
       commands,
       location
     );
+
+    // TODO update file cache with files store
+    if (location === FileLocation.local && response.success !== false) {
+      const newOrUpdatedFile = response.files.local;
+      await this.#filesStore.appendOrSetPrinterFile(printerId, newOrUpdatedFile);
+    }
 
     res.send(response);
   }

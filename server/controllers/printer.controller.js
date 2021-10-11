@@ -91,6 +91,17 @@ class PrinterController {
     res.send(Status.success("Disconnect command sent"));
   }
 
+  async stopPrintJob(req, res) {
+    const { id: printerId } = await validateInput(req.params, idRules);
+
+    const printerLogin = this.#printersStore.getPrinterLogin(printerId);
+
+    const command = this.#octoPrintApiService.cancelJobCommand;
+    await this.#octoPrintApiService.sendJobCommand(printerLogin, command);
+
+    res.send(Status.success("Cancel command sent"));
+  }
+
   async testConnection(req, res) {
     const newPrinter = req.body;
     if (!newPrinter.webSocketURL) {
@@ -309,6 +320,7 @@ module.exports = createController(PrinterController)
     .delete("/:id", "delete")
     .post("/:id/serial-connect", "sendSerialConnectCommand")
     .post("/:id/serial-disconnect", "sendSerialDisconnectCommand")
+    .post("/:id/job/stop", "stopPrintJob")
     .patch("/:id/enabled", "updateEnabled")
     .put("/:id/reconnect", "reconnectOctoPrint")
     .patch("/:id/connection", "updateConnectionSettings")

@@ -9,11 +9,23 @@
     @drop.prevent="addFile"
     @dragover.prevent="dragging = true"
   >
-    <PrinterDeleteAction :printer="printer" />
-    Name: {{ printer.printerName }} <br />
-    URL: {{ printer.printerURL }}
+    <v-row>
+      <v-col>
+        Name: {{ printer.printerName }} <br/>
+        URL: {{ printer.printerURL }} <br/>
+        Host: {{ printer.hostState.state }} - <small><strong>{{ printer.hostState.desc }}</strong></small> <br/>
+        WebSocket: {{ printer.webSocketState.colour }} <br/>
+        Printer: {{ printer.printerState.state }} <br/>
+        Files: {{ printer.fileList.fileCount }} <br/>
+        Sort Index: {{ printer.sortIndex }}
+      </v-col>
+      <v-col>
+        <RefreshFilesAction :printer="printer" class="d-flex justify-end"/>
+        <PrinterDeleteAction :printer="printer" class="d-flex justify-end"/>
+      </v-col>
+    </v-row>
 
-    <FileList :file-list="printer.fileList" :printer-id="printerId" />
+    <FileList :file-list="printer.fileList" :printer-id="printerId"/>
   </v-container>
 </template>
 
@@ -25,9 +37,10 @@ import { Prop } from "vue-property-decorator";
 import { Printer } from "@/models/printers/printer.model";
 import PrinterDeleteAction from "@/components/Generic/Actions/PrinterDeleteAction.vue";
 import { printersState } from "@/store/printers.state";
+import RefreshFilesAction from "@/components/Generic/Actions/RefreshFilesAction.vue";
 
 @Component({
-  components: { FileList: FileControlList, PrinterDeleteAction }
+  components: { FileList: FileControlList, PrinterDeleteAction, RefreshFilesAction }
 })
 export default class PrinterDetails extends Vue {
   @Prop() printer: Printer;

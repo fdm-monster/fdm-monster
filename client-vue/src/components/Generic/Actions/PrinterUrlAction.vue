@@ -16,6 +16,7 @@ import Vue from "vue";
 import FileControlList from "@/components/PrinterList/FileControlList.vue";
 import { Prop } from "vue-property-decorator";
 import { Printer } from "@/models/printers/printer.model";
+import { PrintersService } from "@/backend";
 
 @Component({
   components: { FileList: FileControlList }
@@ -28,11 +29,7 @@ export default class PrinterUrlAction extends Vue {
   }
 
   openPrinterURL(printer: Printer) {
-    const printerURL = printer.printerURL;
-    if (!printerURL) {
-      return;
-    }
-    window.open(printerURL);
+    PrintersService.openPrinterURL(printer.printerURL);
   }
 }
 </script>

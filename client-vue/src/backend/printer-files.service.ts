@@ -38,7 +38,7 @@ export class PrinterFilesService extends BaseService {
   }
 
   static async deleteFile(printerId: string, fullPath: string, location = "local") {
-    const path = `${ServerApi.printerFilesRoute} /${printerId}/?location=${location}&fullPath=${fullPath}`;
+    const path = `${ServerApi.printerFilesRoute}/${printerId}/?location=${location}&fullPath=${fullPath}`;
 
     return this.deleteApi(path);
   }

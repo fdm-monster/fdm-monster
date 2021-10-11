@@ -1,5 +1,5 @@
 <template>
-  <v-btn class="ma-2" color="primary" fab small disabled>
+  <v-btn class="ma-2" color="primary" @click="openSettings()" fab small>
     <v-icon>settings</v-icon>
   </v-btn>
 </template>
@@ -19,6 +19,10 @@ export default class PrinterSettingsAction extends Vue {
 
   get printerId() {
     return this.printer.id;
+  }
+
+  openSettings() {
+    this.$emit("update:show", this.printer.id);
   }
 }
 </script>

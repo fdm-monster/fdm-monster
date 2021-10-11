@@ -1,5 +1,8 @@
 <template>
-  <v-btn @click="deletePrinter()">Delete printer</v-btn>
+  <v-btn @click="deletePrinter()" color="warning" outlined>
+    <v-icon>delete</v-icon>
+    <span class="d-none d-lg-inline">Delete printer</span>
+  </v-btn>
 </template>
 
 <script lang="ts">
