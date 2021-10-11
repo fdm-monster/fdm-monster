@@ -13,6 +13,8 @@
       ></v-text-field>
     </v-card-title>
 
+    <BatchJsonCreateDialog :show.sync="showDialog" v-on:update:show="onChangeShowDialog($event)" />
+
     <v-data-table
       :expanded.sync="expanded"
       :headers="tableHeaders"
@@ -42,6 +44,11 @@
           <v-toolbar-title>Showing printers</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-switch v-model="reorder" class="mt-5 mr-3" dark label="Sort mode" />
+
+          <v-btn class="ml-3" color="primary" type="button" disabled @click="createPrinterModal()">
+            Import JSON Printers
+          </v-btn>
+
           <v-switch
             v-show="false"
             v-model="deleteMany"
@@ -115,11 +122,13 @@ import PrinterUrlAction from "@/components/Generic/Actions/PrinterUrlAction.vue"
 import PrinterSettingsAction from "@/components/Generic/Actions/PrinterSettingsAction.vue";
 import PrinterConnectionAction from "@/components/Generic/Actions/PrinterConnectionAction.vue";
 import { printersState } from "@/store/printers.state";
+import BatchJsonCreateDialog from "@/components/Dialogs/BatchJsonCreateDialog.vue";
 
 @Component({
   components: {
     PrinterDetails,
     draggable,
+    BatchJsonCreateDialog,
     PrinterUrlAction,
     PrinterSettingsAction,
     PrinterConnectionAction
@@ -130,6 +139,18 @@ export default class Printers extends Vue {
   deleteMany = false;
   bulkFileClean = false;
   bulkUpdate = false;
+
+  autoPrint = true;
+  showDialog = false;
+
+  async createPrinterModal() {
+    this.showDialog = true;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onChangeShowDialog(event: any) {
+    // Placeholder
+  }
 
   get printers() {
     return printersState.printers;

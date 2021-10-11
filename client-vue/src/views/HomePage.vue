@@ -27,12 +27,10 @@ import PrinterGrid from "@/components/PrinterGrid/PrinterGrid.vue";
 
 @Component({
   data: () => ({
-    sticky: false
   }),
   components: { PrinterGrid, CreatePrinterDialog }
 })
 export default class HomePage extends Vue {
-  sticky: false;
   autoPrint = true;
   showDialog = false;
 
