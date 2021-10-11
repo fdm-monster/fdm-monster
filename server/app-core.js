@@ -1,5 +1,6 @@
 const express = require("express");
 const flash = require("connect-flash");
+const path = require("path");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const passport = require("passport");
@@ -9,9 +10,10 @@ const exceptionHandler = require("./exceptions/exception.handler");
 const { configureContainer } = require("./container");
 const { scopePerRequest, loadControllers } = require("awilix-express");
 const { ServerTasks } = require("./tasks");
-const { getViewsPath } = require("./app-env");
+const { getDevViewsPath } = require("./app-env");
 const cors = require("cors");
 const { NotFoundException } = require("./exceptions/runtime.exceptions");
+const { getAppDistPath } = require("@3d-print-farm/client");
 
 function setupExpressServer() {
   let app = express();
@@ -28,16 +30,22 @@ function setupExpressServer() {
   );
   app.use(express.json());
 
-  const viewsPath = getViewsPath();
+  // TODO fix this
+  // const bundlePath = getVueDistPath();
+  // app.use("/assets/dist", express.static(viewsPath));
 
+  let appPath;
   if (process.env.NODE_ENV === "production") {
-    // TODO fix this
-    const { getVueDistPath } = require("@3d-print-farm/client");
-    const bundlePath = getVueDistPath();
-    app.use("/assets/dist", express.static(bundlePath));
+    const { getAppDistPath } = require("@3d-print-farm/client");
+    appPath = getAppDistPath();
+  } else {
+    appPath = getDevViewsPath();
   }
 
-  app.use(express.static(viewsPath));
+  app.use(express.static(appPath));
+  app.get("/", function (req, res) {
+    res.sendFile("index.html", { root: appPath });
+  });
 
   app.use("/images", express.static("./images"));
   app.use(cookieParser());

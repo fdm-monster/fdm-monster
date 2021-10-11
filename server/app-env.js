@@ -180,9 +180,9 @@ function setupEnvConfig(skipDotEnv = false) {
   ensurePageTitle();
 }
 
-function getViewsPath() {
+function getDevViewsPath() {
   logger.debug("Running in directory:", __dirname);
-  const viewsPath = path.join(__dirname, "../views");
+  const viewsPath = path.join(__dirname, "../views/dist");
   if (!fs.existsSync(viewsPath)) {
     if (isDocker()) {
       throw new Error(
@@ -249,5 +249,5 @@ module.exports = {
   runMigrations,
   fetchMongoDBConnectionString,
   fetchServerPort,
-  getViewsPath
+  getDevViewsPath
 };
