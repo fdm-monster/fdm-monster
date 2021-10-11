@@ -9,7 +9,7 @@
       </ErrorAlert>
     </v-main>
 
-    <FooterList></FooterList>
+<!--    <FooterList></FooterList>-->
   </v-app>
 </template>
 

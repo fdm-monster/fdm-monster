@@ -6,10 +6,10 @@
         v-for="(item, index) in items"
         :key="index"
         v-focus="{item, index}"
-        :printer-id="item.id"
-        :skeleton="item.skeleton"
         :grid="grid"
+        :printer-id="item.id"
         :selector="itemPrefix + index.toString()"
+        :skeleton="item.skeleton"
       />
 
       <UpdatePrinterDialog
@@ -63,8 +63,9 @@ export default class PrinterGrid extends Vue {
     this.items = [];
     this.grid = GridStack.init({
       float: true,
+      disableDrag: true,
       maxRow: 7,
-      cellHeight: "140px",
+      cellHeight: "130px",
       resizable: {
         handles: "se"
       },
@@ -133,9 +134,9 @@ export default class PrinterGrid extends Vue {
       const selector = this.itemPrefix + item.index;
       if (!document.getElementById(selector)) {
         // Render failed
-        console.warn(`Grid item meant for rerender not found: ${ selector }`);
+        console.warn(`Grid item meant for rerender not found: ${selector}`);
       } else {
-        this.grid.makeWidget(`#${ this.itemPrefix }${ item.index }`);
+        this.grid.makeWidget(`#${this.itemPrefix}${item.index}`);
       }
     }
     if (this.newItems.length !== 0) this.newItems = [];
@@ -151,7 +152,7 @@ export default class PrinterGrid extends Vue {
   }
 
   removePrinterAtIndex(index: number) {
-    this.grid.removeWidget(`#${ this.itemPrefix }${ index }`, true);
+    this.grid.removeWidget(`#${this.itemPrefix}${index}`, true);
 
     this.items.splice(index, 1);
 
