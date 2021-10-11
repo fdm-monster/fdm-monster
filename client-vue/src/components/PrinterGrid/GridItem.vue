@@ -21,9 +21,11 @@
       <v-card-text class="ml-0">
         <span class="mt-5 d-none d-lg-inline">{{ this.printerName() }}</span>
         <br/>
-        <small class="secondary--text font-weight-10">{{
-            this.skeleton ? "New Printer" : "Printing"
-          }}</small>
+        <small class="secondary--text font-weight-10">
+          {{
+            this.skeleton ? "New Printer" : this.currentPrinterState()
+          }}
+        </small>
       </v-card-text>
     </v-toolbar>
 
@@ -33,10 +35,10 @@
       <v-btn disabled>Create</v-btn>
     </v-card-actions>
     <v-card-actions v-else>
-      <v-btn color="primary" disabled fab x-small @click.stop="stopClicked()">
+      <v-btn color="primary" :disabled="isPrinting()" fab x-small @click.stop="stopClicked()">
         <v-icon>stop</v-icon>
       </v-btn>
-      <v-btn color="primary" disabled fab x-small @click.stop="infoClicked()">
+      <v-btn color="primary" fab x-small @click.stop="infoClicked()">
         <v-icon>info</v-icon>
       </v-btn>
     </v-card-actions>
@@ -51,6 +53,7 @@ import { Printer } from "@/models/printers/printer.model";
 import { GridStack } from "gridstack";
 import { generateInitials } from "@/constants/noun-adjectives.data";
 import { updatedPrinterEvent } from "@/event-bus/printer.events";
+import { PrintersService } from "@/backend";
 
 export const EVENTS = {
   itemClicked: "griditem:clicked"
@@ -67,9 +70,24 @@ export default class GridItem extends Vue {
   printer: Printer;
   initiated = false;
 
+  created() {
+    if (!this.skeleton) {
+      this.printer = this.$store.getters.printer(this.printerId);
+      this.$bus.on(updatedPrinterEvent(this.printerId), this.updateItem);
+    }
+  }
+
   avatarInitials() {
     if (this.skeleton) return "?";
     return generateInitials(this.printer.printerName);
+  }
+
+  currentPrinterState() {
+    return this.printer.printerState.state;
+  }
+
+  isPrinting() {
+    return this.printer?.printerState?.flags.printing;
   }
 
   printerName() {
@@ -78,19 +96,18 @@ export default class GridItem extends Vue {
     return this.printer.printerName || this.printer.printerURL?.replace("http://", "");
   }
 
-  created() {
-    if (!this.skeleton) {
-      this.printer = this.$store.getters.printer(this.printerId);
-      this.$bus.on(updatedPrinterEvent(this.printerId), this.updateItem);
-    }
-  }
-
   updateItem(data: Printer) {
     this.printer = data;
   }
 
-  stopClicked() {
-    console.warn("Stop command has not been implemented yet.");
+  async stopClicked() {
+    const printerState = this.printer.printerState;
+    if (!printerState.flags.printing && !printerState.flags.printing) {
+      if (!confirm("The printer is not printing nor paused. Are you sure to send a Stop Job commnad?")){
+        return;
+      }
+    }
+    await PrintersService.stopPrintJob(this.printerId);
   }
 
   infoClicked() {

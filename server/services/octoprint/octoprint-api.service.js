@@ -23,6 +23,7 @@ const apiFile = (path, location) => `${apiFilesLocation(location)}/${path}`;
 const apiGetFiles = (recursive = true, location) =>
   `${apiFiles}/${location}?recursive=${recursive}`;
 const apiConnection = apiBase + "/connection";
+const apiJob = apiBase + "/job";
 const apiPrinterProfiles = apiBase + "/printerprofiles";
 const apiSystem = apiBase + "/system";
 const apiSystemInfo = apiSystem + "/info";
@@ -54,6 +55,10 @@ class OctoprintApiService {
 
   get disconnectCommand() {
     return { command: "disconnect" };
+  }
+
+  get cancelJobCommand() {
+    return { command: "cancel" };
   }
 
   get connectCommand() {
@@ -117,6 +122,21 @@ class OctoprintApiService {
 
   async sendConnectionCommand(printer, commandData, responseOptions = defaultResponseOptions) {
     const { url, options, data } = this.#prepareJSONRequest(printer, apiConnection, commandData);
+
+    const response = await this.#httpClient.post(url, data, options);
+
+    return processResponse(response, responseOptions);
+  }
+
+  /**
+   * Ability to start, cancel, restart, or pause a job
+   * @param printer
+   * @param commandData command: start, cancel, restart
+   * @param responseOptions
+   * @returns {Promise<*|{data: *, status: *}>}
+   */
+  async sendJobCommand(printer, commandData, responseOptions = defaultResponseOptions) {
+    const { url, options, data } = this.#prepareJSONRequest(printer, apiJob, commandData);
 
     const response = await this.#httpClient.post(url, data, options);
 

@@ -93,4 +93,10 @@ export class PrintersService extends BaseService {
 
     return await this.patchApi(path, { enabled });
   }
+
+  static async stopPrintJob(printerId: string) {
+    const path = ServerApi.printerStopJobRoute(printerId);
+
+    return await this.postApi(path);
+  }
 }
