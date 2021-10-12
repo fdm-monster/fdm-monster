@@ -9,7 +9,7 @@ const Alert = require("../../server/models/Alerts");
 
 let request;
 
-const welcomeRoute = "/";
+const welcomeRoute = AppConstants.apiRoute + "/";
 const getRoute = welcomeRoute;
 
 beforeAll(async () => {

@@ -1,6 +1,5 @@
 const express = require("express");
 const flash = require("connect-flash");
-const path = require("path");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const passport = require("passport");
@@ -13,7 +12,7 @@ const { ServerTasks } = require("./tasks");
 const { getDevViewsPath } = require("./app-env");
 const cors = require("cors");
 const { NotFoundException } = require("./exceptions/runtime.exceptions");
-const { getAppDistPath } = require("@3d-print-farm/client");
+const history = require("connect-history-api-fallback");
 
 function setupExpressServer() {
   let app = express();
@@ -29,23 +28,6 @@ function setupExpressServer() {
     })
   );
   app.use(express.json());
-
-  // TODO fix this
-  // const bundlePath = getVueDistPath();
-  // app.use("/assets/dist", express.static(viewsPath));
-
-  let appPath;
-  if (process.env.NODE_ENV === "production") {
-    const { getAppDistPath } = require("@3d-print-farm/client");
-    appPath = getAppDistPath();
-  } else {
-    appPath = getDevViewsPath();
-  }
-
-  app.use(express.static(appPath));
-  app.get("/", function (req, res) {
-    res.sendFile("index.html", { root: appPath });
-  });
 
   app.use("/images", express.static("./images"));
   app.use(cookieParser());
@@ -88,10 +70,27 @@ async function ensureSystemSettingsInitiated(container) {
 function serveControllerRoutes(app) {
   const routePath = "./controllers";
 
+  // Catches any HTML request to paths like / or file/ as long as its text/html
+  app.use(history());
+
+  // Serve the API
   app.use(loadControllers(`${routePath}/settings/*.controller.js`, { cwd: __dirname }));
   app.use(loadControllers(`${routePath}/*.controller.js`, { cwd: __dirname }));
   app.use(exceptionHandler);
 
+  let appPath;
+  if (process.env.NODE_ENV === "production") {
+    const { getAppDistPath } = require("@3d-print-farm/client");
+    appPath = getAppDistPath();
+  } else {
+    appPath = getDevViewsPath();
+  }
+
+  // Serve the files for our frontend
+  app.use(express.static(appPath));
+  app.get("/", function (req, res) {
+    res.sendFile("index.html", { root: appPath });
+  });
   app.get("*", function (req, res) {
     const path = req.originalUrl;
 
