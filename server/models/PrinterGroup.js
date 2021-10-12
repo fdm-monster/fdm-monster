@@ -7,6 +7,18 @@ const PrinterGroupSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  location: {
+    required: true,
+    default: { x: 0, y: 0 },
+    x: {
+      type: Number,
+      required: false
+    },
+    y: {
+      type: Number,
+      required: false
+    }
+  },
   printers: {
     type: [
       {

@@ -20,6 +20,8 @@ class PrintersModule extends VuexModule {
   printerGroups: PrinterGroup[] = [];
   lastUpdated?: number = undefined;
 
+  selectedPrinters: Printer[] = [];
+
   get printer() {
     return (printerId: string) => this.printers.find((p: Printer) => p.id === printerId);
   }
@@ -45,6 +47,15 @@ class PrintersModule extends VuexModule {
   @Mutation setTestPrinter(printer: Printer) {
     this.testPrinters = printer;
     this.lastUpdated = Date.now();
+  }
+
+  @Mutation toggleSelectedPrinter(printer: Printer) {
+    const selectedPrinterIndex = this.selectedPrinters.findIndex((sp) => sp.id == printer.id);
+    if (selectedPrinterIndex === -1) {
+      this.selectedPrinters.push(printer);
+    } else {
+      this.selectedPrinters.splice(selectedPrinterIndex, 1);
+    }
   }
 
   @Mutation replacePrinter({ printerId, printer }: { printerId: string; printer: Printer }) {
@@ -189,6 +200,11 @@ class PrintersModule extends VuexModule {
     // this.setPrinterFiles({ printerId, files: [] });
 
     return "data";
+  }
+
+  @Action
+  selectPrinter(printer: Printer) {
+    this.toggleSelectedPrinter(printer);
   }
 
   @Action

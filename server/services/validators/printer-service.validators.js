@@ -5,6 +5,7 @@ const createPrinterRules = {
   printerURL: "required|httpurl",
   webSocketURL: "required|wsurl",
   enabled: "boolean",
+  groups: "required|array",
   settingsAppearance: "object",
   "settingsAppearance.name": "string",
   camURL: "httpurl"
