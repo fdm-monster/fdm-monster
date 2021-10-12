@@ -4,18 +4,18 @@
       <v-col v-for="x in columns" :key="x" :cols="4" :sm="4">
         <v-row class="test-top" no-gutters>
           <v-col cols="6">
-            <PrinterGridTile :printer="getPrinter(x - 1, y - 1, 0)" index="1" />
+            <PrinterGridTile :printer="getPrinter(x - 1, y - 1, 0)" index="1"/>
           </v-col>
           <v-col cols="6">
-            <PrinterGridTile :printer="getPrinter(x - 1, y - 1, 1)" index="2" />
+            <PrinterGridTile :printer="getPrinter(x - 1, y - 1, 1)" index="2"/>
           </v-col>
         </v-row>
         <v-row class="test-bottom" no-gutters>
           <v-col cols="6">
-            <PrinterGridTile :printer="getPrinter(x - 1, y - 1, 2)" index="3" />
+            <PrinterGridTile :printer="getPrinter(x - 1, y - 1, 2)" index="3"/>
           </v-col>
           <v-col cols="6">
-            <PrinterGridTile :printer="getPrinter(x - 1, y - 1, 3)" index="4" />
+            <PrinterGridTile :printer="getPrinter(x - 1, y - 1, 3)" index="4"/>
           </v-col>
         </v-row>
       </v-col>
@@ -36,7 +36,7 @@ import { Component } from "vue-property-decorator";
 import { EVENTS } from "@/components/PrinterGrid/GridStack/GridStackItem.vue";
 import { Printer } from "@/models/printers/printer.model";
 import UpdatePrinterDialog from "@/components/Dialogs/UpdatePrinterDialog.vue";
-import { sseMessageGlobal } from "@/event-bus/sse.events";
+import { sseGroups, sseMessageGlobal } from "@/event-bus/sse.events";
 import { printersState } from "@/store/printers.state";
 import PrinterGridTile from "@/components/PrinterGrid/PrinterTile.vue";
 import { PrinterGroup } from "@/models/printers/printer-group.model";
@@ -57,12 +57,12 @@ export default class PrinterGrid extends Vue {
   readonly columns = columnCount; // x-value choice
   readonly rows = rowCount; // y-value choice
 
-  calculateGrid() {
-    this.columnWidth = this.maxColumnUnits / this.columns;
-  }
-
   get printers() {
     return printersState.printers;
+  }
+
+  calculateGrid() {
+    this.columnWidth = this.maxColumnUnits / this.columns;
   }
 
   async created() {
@@ -70,7 +70,7 @@ export default class PrinterGrid extends Vue {
     await printersState.loadPrinters();
     await printersState.loadPrinterGroups();
 
-    this.groupMatrix = printersState.gridSortedPrinterGroups(4, 4);
+    this.updateGridMatrix();
   }
 
   getPrinter(x: number, y: number, index: number) {
@@ -78,7 +78,9 @@ export default class PrinterGrid extends Vue {
     const group = this.groupMatrix[x][y];
     if (!group) return;
 
-    const printerInGroup = this.groupMatrix[x][y].printers?.find((p) => p.location === index.toString());
+    const printerInGroup = this.groupMatrix[x][y].printers?.find(
+      (p) => p.location === index.toString()
+    );
 
     if (!printerInGroup) return;
 
@@ -86,16 +88,20 @@ export default class PrinterGrid extends Vue {
   }
 
   async mounted() {
-    await printersState.loadPrinters();
-
     this.$bus.on(EVENTS.itemClicked, this.openCreateDialog);
-    this.$bus.on(sseMessageGlobal, this.onSseMessage);
+    this.$bus.on(sseGroups, this.onSseMessage);
   }
 
   /**
    * Required to update the grid with skeletons without gridstack breaking and without losing state
    */
-  onSseMessage() {}
+  onSseMessage(groups: PrinterGroup[]) {
+    this.updateGridMatrix();
+  }
+
+  updateGridMatrix() {
+    this.groupMatrix = printersState.gridSortedPrinterGroups(4, 4);
+  }
 
   openCreateDialog(printer: Printer) {
     this.selectedPrinterId = printer.id;

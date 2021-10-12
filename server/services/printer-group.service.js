@@ -6,11 +6,7 @@ const {
   printerInGroupRules,
   printerIdRules
 } = require("./validators/printer-group-service.validators");
-const {
-  NotFoundException,
-  InternalServerException,
-  ValidationException
-} = require("../exceptions/runtime.exceptions");
+const { NotFoundException } = require("../exceptions/runtime.exceptions");
 
 class PrinterGroupService {
   #printerService;
@@ -70,7 +66,7 @@ class PrinterGroupService {
     if (!group) throw new NotFoundException("This group does not exist", "printerGroupId");
 
     const foundPrinterInGroupIndex = group.printers.findIndex(
-      (pig) => pig.printerId === validInput.printerId
+      (pig) => pig.printerId.toString() === validInput.printerId
     );
     if (foundPrinterInGroupIndex === -1) return group;
 

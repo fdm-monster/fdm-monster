@@ -118,6 +118,8 @@ async function serveApiNormally(app, container, quick_boot = false) {
     await printersStore.loadPrintersStore();
     const filesStore = container.resolve(DITokens.filesStore);
     await filesStore.loadFilesStore();
+    const printerGroupsCache = container.resolve(DITokens.printerGroupsCache);
+    await printerGroupsCache.loadCache();
     const currOpsCache = container.resolve(DITokens.currentOperationsCache);
     currOpsCache.generateCurrentOperations();
     const historyCache = container.resolve(DITokens.historyCache);

@@ -7,18 +7,22 @@ const { idRules } = require("./validation/generic.validation");
 class PrinterGroupController {
   #printerService;
   #printerGroupService;
+  #printerGroupsCache;
 
   #logger;
 
-  constructor({ printerService, printerGroupService, loggerFactory }) {
+  constructor({ printerService, printerGroupsCache, printerGroupService, loggerFactory }) {
     this.#printerService = printerService;
     this.#printerGroupService = printerGroupService;
+    this.#printerGroupsCache = printerGroupsCache;
     this.#logger = loggerFactory(PrinterGroupController.name);
   }
 
   async create(req, res) {
     // Has internal validation
     const printerGroup = await this.#printerGroupService.create(req.body);
+
+    await this.#printerGroupsCache.loadCache();
 
     res.send(printerGroup);
   }
@@ -29,6 +33,8 @@ class PrinterGroupController {
     // Has internal validation
     const printerGroup = await this.#printerGroupService.addOrUpdatePrinter(groupId, req.body);
 
+    await this.#printerGroupsCache.loadCache();
+
     res.send(printerGroup);
   }
 
@@ -38,11 +44,13 @@ class PrinterGroupController {
     // Has internal validation
     const printerGroup = await this.#printerGroupService.removePrinter(groupId, req.body);
 
+    await this.#printerGroupsCache.loadCache();
+
     res.send(printerGroup);
   }
 
   async list(req, res) {
-    const groups = await this.#printerGroupService.list();
+    const groups = await this.#printerGroupsCache.getCache();
 
     res.send(groups);
   }
@@ -50,7 +58,7 @@ class PrinterGroupController {
   async get(req, res) {
     const { id: groupId } = await validateInput(req.params, idRules);
 
-    const groups = await this.#printerGroupService.get(groupId);
+    const groups = await this.#printerGroupsCache.getGroupId(groupId);
 
     res.send(groups);
   }
@@ -60,11 +68,16 @@ class PrinterGroupController {
 
     const result = await this.#printerGroupService.delete(groupId);
 
+    await this.#printerGroupsCache.loadCache();
+
     res.json(result);
   }
 
   async syncLegacyGroups(req, res) {
     const groups = await this.#printerGroupService.syncPrinterGroups();
+
+    await this.#printerGroupsCache.loadCache();
+
     res.send(groups);
   }
 }

@@ -9,7 +9,7 @@
       </ErrorAlert>
     </v-main>
 
-<!--    <FooterList></FooterList>-->
+    <!--    <FooterList></FooterList>-->
   </v-app>
 </template>
 
@@ -22,7 +22,7 @@ import FooterList from "@/components/Generic/FooterList.vue";
 import { Component } from "vue-property-decorator";
 import { SSEClient } from "vue-sse";
 import { PrinterSseMessage } from "@/models/sse-messages/printer-sse-message.model";
-import { sseMessageGlobal, sseTestPrinterUpdate } from "@/event-bus/sse.events";
+import { sseGroups, sseMessageGlobal, sseTestPrinterUpdate } from "@/event-bus/sse.events";
 import { serverSettingsState } from "@/store/server-settings.state";
 import { printersState } from "@/store/printers.state";
 import { updatedPrinterEvent } from "@/event-bus/printer.events";
@@ -53,6 +53,10 @@ export default class App extends Vue {
   }
 
   async onSseMessage(message: PrinterSseMessage) {
+    if (message.printerGroups) {
+      await printersState.savePrinterGroups(message.printerGroups);
+      this.$bus.emit(sseGroups, message.printerGroups);
+    }
     if (message.printers) {
       printersState.savePrinters(message.printers);
 

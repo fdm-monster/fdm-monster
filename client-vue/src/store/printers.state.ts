@@ -189,6 +189,13 @@ class PrintersModule extends VuexModule {
   }
 
   @Action
+  async savePrinterGroups(printerGroups: PrinterGroup[]) {
+    this.setPrinterGroups(printerGroups);
+
+    return printerGroups;
+  }
+
+  @Action
   async loadPrinterGroups() {
     const data = await PrinterGroupService.getGroups();
 

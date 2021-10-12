@@ -1,4 +1,5 @@
 import { Printer } from "@/models/printers/printer.model";
+import { PrinterGroup } from "@/models/printers/printer-group.model";
 
 export interface TestProgressDetails {
   connected: boolean;
@@ -10,6 +11,7 @@ export interface TestProgressDetails {
 
 export interface PrinterSseMessage {
   printers: Printer[];
+  printerGroups: PrinterGroup[];
   testPrinter: Printer;
   testProgress: TestProgressDetails;
 }
