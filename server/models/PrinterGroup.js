@@ -2,12 +2,22 @@ const mongoose = require("mongoose");
 const Schema = require("mongoose/lib/schema");
 const { arrayValidator } = require("../handlers/validators");
 
-const PrinterGroupSchema = new mongoose.Schema({
+const PrinterInGroupSchema = new mongoose.Schema({
+  printerId: Schema.Types.ObjectId,
+  location: {
+    // Top|Bottom Left|Right, or whatever the UI needs
+    type: String
+  },
+  _id: false
+});
+
+const PrinterGroupSchema = new Schema({
   name: {
     type: String,
     required: true
   },
   location: {
+    type: Object,
     required: true,
     default: { x: 0, y: 0 },
     x: {
@@ -20,13 +30,8 @@ const PrinterGroupSchema = new mongoose.Schema({
     }
   },
   printers: {
-    type: [
-      {
-        type: Schema.Types.ObjectId,
-        required: true
-      }
-    ],
-    validate: [arrayValidator(0), "{PATH} not of length >=0."]
+    type: [PrinterInGroupSchema],
+    required: true
   }
 });
 

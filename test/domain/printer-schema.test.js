@@ -7,7 +7,8 @@ describe("printer-schema", function () {
       apiKey: "asd",
       printerURL: "myawesomeprinter/",
       webSocketURL: "myawesomeprinter/",
-      sortIndex: "a"
+      sortIndex: "a",
+      settingsAppearance: {}
     });
 
     m.validate(function (err) {
@@ -21,6 +22,7 @@ describe("printer-schema", function () {
       apiKey: "asd",
       printerURL: "myawesomeprinter/",
       webSocketURL: "myawesomeprinter/",
+      settingsAppearance: {},
       sortIndex: "1"
     });
 
@@ -34,7 +36,11 @@ describe("printer-schema", function () {
     const m = new Printer({});
 
     m.validate(function (err) {
-      expectValidationError(err, ["sortIndex", "webSocketURL", "printerURL", "apiKey"], true);
+      expectValidationError(
+        err,
+        ["settingsAppearance", "sortIndex", "webSocketURL", "printerURL", "apiKey"],
+        true
+      );
       done();
     });
   });
@@ -42,7 +48,8 @@ describe("printer-schema", function () {
   it("should be invalid if printer misses sortIndex and webSocketURL", function (done) {
     const m = new Printer({
       printerURL: "myawesomeprinter/",
-      apiKey: "asd"
+      apiKey: "asd",
+      settingsAppearance: {}
     });
 
     m.validate(function (err) {

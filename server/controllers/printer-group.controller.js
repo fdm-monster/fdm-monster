@@ -4,7 +4,7 @@ const { AppConstants } = require("../app.constants");
 const { validateInput } = require("../handlers/validators");
 const { idRules } = require("./validation/generic.validation");
 
-class PrinterGroupsController {
+class PrinterGroupController {
   #printerService;
   #printerGroupService;
 
@@ -13,7 +13,7 @@ class PrinterGroupsController {
   constructor({ printerService, printerGroupService, loggerFactory }) {
     this.#printerService = printerService;
     this.#printerGroupService = printerGroupService;
-    this.#logger = loggerFactory(PrinterGroupsController.name);
+    this.#logger = loggerFactory(PrinterGroupController.name);
   }
 
   async create(req, res) {
@@ -52,11 +52,11 @@ class PrinterGroupsController {
 }
 
 // prettier-ignore
-module.exports = createController(PrinterGroupsController)
-  .prefix(AppConstants.apiRoute + "/printer-groups")
+module.exports = createController(PrinterGroupController)
+  .prefix(AppConstants.apiRoute + "/printer-group")
   .before([ensureAuthenticated])
   .get("/", "list")
   .get("/:id", "get")
   .delete("/:id", "delete")
   .post("/", "create")
-  .put("/sync-legacy", "syncLegacyGroups")
+  .post("/sync-legacy", "syncLegacyGroups")

@@ -21,11 +21,6 @@ const PrinterSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  groupLocation: {
-    required: true,
-    x: { type: Number },
-    y: { type: Number }
-  },
   enabled: {
     type: Boolean,
     required: true,

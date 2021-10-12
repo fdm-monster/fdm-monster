@@ -53,7 +53,7 @@ class PrinterGroupService {
    */
   async syncPrinterGroups() {
     const existingGroups = await this.list();
-    const printers = await this.#printerService.list();
+    const printers = (await this.#printerService.list()).filter((p) => !!p.group?.length);
     const printersGrouped = _.groupBy(printers, "group");
 
     // Early quit
@@ -65,8 +65,13 @@ class PrinterGroupService {
       if (typeof groupName !== "string" || !groupName) continue;
 
       // Check if group already exists by this name
-      const printerIds = printers.map((p) => p.id);
-      const matchingGroup = existingGroups.find((g) => g.name === groupName);
+      const printerIds = printers.map((p) => ({
+        printerId: p._id,
+        location: "?"
+      }));
+      const matchingGroup = existingGroups.find(
+        (g) => g.name.toUpperCase() === groupName.toUpperCase()
+      );
       if (!!matchingGroup) {
         matchingGroup.printers = printerIds;
         await PrinterGroupModel.update(matchingGroup);

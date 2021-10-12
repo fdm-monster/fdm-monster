@@ -4,7 +4,7 @@ import { Printer } from "@/models/printers/printer.model";
 import { PrinterFile } from "@/models/printers/printer-file.model";
 import { PrinterFilesService, PrintersService } from "@/backend";
 import { CreatePrinter } from "@/models/printers/crud/create-printer.model";
-import { PrinterGroupsService } from "@/backend/printer-groups.service";
+import { PrinterGroupService } from "@/backend/printer-group.service";
 import { MultiResponse } from "@/models/api/status-response.model";
 import store from "@/store/index";
 import { FileUploadCommands } from "@/models/printers/file-upload-commands.model";
@@ -175,7 +175,7 @@ class PrintersModule extends VuexModule {
 
   @Action
   async loadPrinterGroups() {
-    const data = await PrinterGroupsService.getGroups();
+    const data = await PrinterGroupService.getGroups();
 
     this.setPrinterGroups(data);
 

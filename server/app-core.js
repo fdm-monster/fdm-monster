@@ -71,7 +71,11 @@ function serveControllerRoutes(app) {
   const routePath = "./controllers";
 
   // Catches any HTML request to paths like / or file/ as long as its text/html
-  app.use(history());
+  app.use(
+    history({
+      htmlAcceptHeaders: ["html/text"] // Postman */* is ignored
+    })
+  );
 
   // Serve the API
   app.use(loadControllers(`${routePath}/settings/*.controller.js`, { cwd: __dirname }));
