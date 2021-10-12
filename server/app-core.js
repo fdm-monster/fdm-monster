@@ -78,12 +78,17 @@ function serveControllerRoutes(app) {
   app.use(loadControllers(`${routePath}/*.controller.js`, { cwd: __dirname }));
   app.use(exceptionHandler);
 
-  // Serve the files for our frontend
+  // Serve the files for our frontend - do this later than the controllers
   const appDistPath = getAppDistPath();
-  app.use(express.static(appDistPath));
-  app.get("/", function (req, res) {
-    res.sendFile("index.html", { root: appDistPath });
-  });
+  if (appDistPath) {
+    app.use(express.static(appDistPath));
+    app.get("/", function (req, res) {
+      res.sendFile("index.html", { root: appDistPath });
+    });
+  } else {
+    logger.warning("~ Skipped loading Vue frontend as no path was returned");
+  }
+
   app.get("*", function (req, res) {
     const path = req.originalUrl;
 
