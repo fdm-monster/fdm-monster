@@ -4,18 +4,18 @@
       <v-col v-for="x in columns" :key="x" :cols="4" :sm="4">
         <v-row class="test-top" no-gutters>
           <v-col cols="6">
-            <PrinterGridTile :printer="getPrinter(x - 1, y - 1, 0)" index="1"/>
+            <PrinterGridTile :printer="getPrinter(x - 1, y - 1, 0)" index="1" />
           </v-col>
           <v-col cols="6">
-            <PrinterGridTile :printer="getPrinter(x - 1, y - 1, 1)" index="2"/>
+            <PrinterGridTile :printer="getPrinter(x - 1, y - 1, 1)" index="2" />
           </v-col>
         </v-row>
         <v-row class="test-bottom" no-gutters>
           <v-col cols="6">
-            <PrinterGridTile :printer="getPrinter(x - 1, y - 1, 2)" index="3"/>
+            <PrinterGridTile :printer="getPrinter(x - 1, y - 1, 2)" index="3" />
           </v-col>
           <v-col cols="6">
-            <PrinterGridTile :printer="getPrinter(x - 1, y - 1, 3)" index="4"/>
+            <PrinterGridTile :printer="getPrinter(x - 1, y - 1, 3)" index="4" />
           </v-col>
         </v-row>
       </v-col>

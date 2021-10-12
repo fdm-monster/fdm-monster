@@ -1,5 +1,11 @@
 <template>
-  <v-card class="tile" outlined tile @click="selectPrinter()">
+  <v-card
+    class="tile"
+    :class="{ 'tile-selected': selected }"
+    outlined
+    tile
+    @click="selectPrinter()"
+  >
     <v-container v-if="printer">
       {{ printer.printerName }}
       <v-btn class="float-right" icon @click.prevent.stop="clickInfo()">
@@ -25,12 +31,20 @@ export default class PrinterGridTile extends Vue {
   @Prop() index: number;
   @Prop() printer: Printer;
 
+  get selected() {
+    return printersState.isSelectedPrinter(this.printer?.id);
+  }
+
   get printers() {
     return printersState.printers;
   }
 
   id() {
     return this.printer?.printerName || this.index;
+  }
+
+  getTileClass() {
+    return this.selected ? "tile tile-selected" : "tile";
   }
 
   clickInfo() {
@@ -50,15 +64,19 @@ export default class PrinterGridTile extends Vue {
 </script>
 
 <style>
-.tile:hover {
-  border: 1px solid red;
-}
-
 .tile {
   min-height: 80px;
   -webkit-user-select: none; /* Safari */
   -moz-user-select: none; /* Firefox */
   -ms-user-select: none; /* IE10+/Edge */
   user-select: none; /* Standard */
+}
+
+.tile-selected {
+  border: 1px solid green !important;
+}
+
+.tile:hover {
+  border: 1px solid red;
 }
 </style>

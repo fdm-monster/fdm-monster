@@ -16,16 +16,25 @@
       </v-btn>
     </v-toolbar>
 
-    <v-banner>
+    <v-banner v-focus>
       <strong class="mr-2">Drop one or more files to upload</strong>
+      <small class="ml-2">{{ selectedPrinters.length }} printers selected</small>
       <v-chip-group>
-        <v-chip>0 printers selected</v-chip>
+        <v-chip v-if="selectedPrinters.length === 0">No printers selected</v-chip>
+        <v-chip
+          v-for="selectedPrinter in selectedPrinters"
+          :key="selectedPrinter.id"
+          close
+          @click:close="deselectPrinter(selectedPrinter)"
+        >
+          {{ selectedPrinter.printerName }}
+        </v-chip>
       </v-chip-group>
     </v-banner>
 
-    <PrinterGrid class="ma-2" />
+    <PrinterGrid class="ma-2"/>
 
-    <CreatePrinterDialog :show.sync="showDialog" v-on:update:show="onChangeShowDialog($event)" />
+    <CreatePrinterDialog :show.sync="showDialog" v-on:update:show="onChangeShowDialog($event)"/>
   </div>
 </template>
 
@@ -34,6 +43,10 @@ import Vue from "vue";
 import { Component } from "vue-property-decorator";
 import CreatePrinterDialog from "@/components/Dialogs/CreatePrinterDialog.vue";
 import PrinterGrid from "@/components/PrinterGrid/PrinterGrid.vue";
+import { printersState } from "@/store/printers.state";
+import { Printer } from "@/models/printers/printer.model";
+
+const watchedState = "selectedPrinterCount";
 
 @Component({
   data: () => ({}),
@@ -42,6 +55,14 @@ import PrinterGrid from "@/components/PrinterGrid/PrinterGrid.vue";
 export default class HomePage extends Vue {
   autoPrint = true;
   showDialog = false;
+
+  get selectedPrinters() {
+    return printersState.selectedPrinters;
+  }
+
+  deselectPrinter(printer: Printer) {
+    printersState.toggleSelectedPrinter(printer);
+  }
 
   async createPrinterModal() {
     this.showDialog = true;
