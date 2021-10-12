@@ -27,7 +27,10 @@ describe("AppController", () => {
   it("should return welcome", async function () {
     const response = await request.get(getRoute).send();
 
-    expect(response.body).toMatchObject({ message: "Login not required. Please load UI instead." });
+    expect(response.body).toMatchObject({
+      message:
+        "Login not required. Please load UI instead by requesting any route with text/html Content-Type"
+    });
 
     expectOkResponse(response);
   });
