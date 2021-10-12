@@ -23,6 +23,24 @@ class PrinterGroupController {
     res.send(printerGroup);
   }
 
+  async addPrinterToGroup(req, res) {
+    const { id: groupId } = await validateInput(req.params, idRules);
+
+    // Has internal validation
+    const printerGroup = await this.#printerGroupService.addOrUpdatePrinter(groupId, req.body);
+
+    res.send(printerGroup);
+  }
+
+  async removePrinterFromGroup(req, res) {
+    const { id: groupId } = await validateInput(req.params, idRules);
+
+    // Has internal validation
+    const printerGroup = await this.#printerGroupService.removePrinter(groupId, req.body);
+
+    res.send(printerGroup);
+  }
+
   async list(req, res) {
     const groups = await this.#printerGroupService.list();
 
@@ -53,10 +71,12 @@ class PrinterGroupController {
 
 // prettier-ignore
 module.exports = createController(PrinterGroupController)
-  .prefix(AppConstants.apiRoute + "/printer-group")
-  .before([ensureAuthenticated])
-  .get("/", "list")
-  .get("/:id", "get")
-  .delete("/:id", "delete")
-  .post("/", "create")
-  .post("/sync-legacy", "syncLegacyGroups")
+    .prefix(AppConstants.apiRoute + "/printer-group")
+    .before([ensureAuthenticated])
+    .get("/", "list")
+    .get("/:id", "get")
+    .post("/:id/printer", "addPrinterToGroup")
+    .delete("/:id/printer", "removePrinterFromGroup")
+    .delete("/:id", "delete")
+    .post("/", "create")
+    .post("/sync-legacy", "syncLegacyGroups");

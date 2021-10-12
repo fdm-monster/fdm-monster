@@ -5,8 +5,8 @@
       <v-spacer></v-spacer>
       <div>
         <v-switch
-          disabled
           v-model="autoPrint"
+          disabled
           hide-details
           label="Auto-select and print"
         ></v-switch>
@@ -22,9 +22,8 @@
         <v-chip>0 printers selected</v-chip>
       </v-chip-group>
     </v-banner>
-    <v-container>
-      <PrinterGrid />
-    </v-container>
+
+    <PrinterGrid class="ma-2" />
 
     <CreatePrinterDialog :show.sync="showDialog" v-on:update:show="onChangeShowDialog($event)" />
   </div>

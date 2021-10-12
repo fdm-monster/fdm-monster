@@ -25,7 +25,7 @@ import Vue from "vue";
 import Login from "@/components/Generic/Login.vue";
 import { Component } from "vue-property-decorator";
 import { GridItemHTMLElement, GridStack } from "gridstack";
-import GridStackItem, { EVENTS } from "@/components/PrinterGrid/GridStackItem.vue";
+import GridStackItem, { EVENTS } from "@/components/PrinterGrid/GridStack/GridStackItem.vue";
 import { Printer } from "@/models/printers/printer.model";
 import "gridstack/dist/gridstack.min.css";
 // Required for custom columns

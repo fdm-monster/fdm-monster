@@ -1,7 +1,7 @@
 <template>
   <v-card class="tile" outlined tile @click="selectPrinter()">
-    <v-container>
-      {{ name }}
+    <v-container v-if="printer">
+      {{ printer.printerName }}
       <v-btn class="float-right" icon @click.prevent.stop="clickInfo()">
         <v-icon>info</v-icon>
       </v-btn>
@@ -16,15 +16,21 @@
 import Vue from "vue";
 import { Component, Prop } from "vue-property-decorator";
 import { printersState } from "@/store/printers.state";
+import { Printer } from "@/models/printers/printer.model";
 
 @Component({
   components: {}
 })
 export default class PrinterGridTile extends Vue {
-  @Prop() name: string;
+  @Prop() index: number;
+  @Prop() printer: Printer;
 
   get printers() {
     return printersState.printers;
+  }
+
+  id() {
+    return this.printer?.printerName || this.index;
   }
 
   clickInfo() {
@@ -36,7 +42,9 @@ export default class PrinterGridTile extends Vue {
   }
 
   selectPrinter() {
-    console.log("asd");
+    if (!this.printer) return;
+
+    printersState.toggleSelectedPrinter(this.printer);
   }
 }
 </script>

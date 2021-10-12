@@ -26,8 +26,23 @@ class PrintersModule extends VuexModule {
     return (printerId: string) => this.printers.find((p: Printer) => p.id === printerId);
   }
 
-  get gridSortedPrinters() {
-    return this.printers;
+  get gridSortedPrinterGroups() {
+    if (!this.printerGroups) return () => [];
+
+    return (cols: number, rows: number) => {
+      const groupMatrix: any[] = [];
+
+      for (let i = 0; i < cols; i++) {
+        groupMatrix[i] = [];
+        for (let j = 0; j < rows; j++) {
+          groupMatrix[i][j] = this.printerGroups.find(
+            (pg) => pg.location.x === i && pg.location.y === j
+          );
+        }
+      }
+
+      return groupMatrix;
+    };
   }
 
   get printerFiles() {

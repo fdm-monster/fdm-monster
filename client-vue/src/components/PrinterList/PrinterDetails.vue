@@ -16,7 +16,7 @@
         Host: {{ printer.hostState.state }} - <small><strong>{{ printer.hostState.desc }}</strong></small> <br/>
         WebSocket: {{ printer.webSocketState.colour }} <br/>
         Printer: {{ printer.printerState.state }} <br/>
-        Files: {{ printer.fileList.fileCount }} <br/>
+        Files: {{ getPrinterFileCount() }} <br/>
         Sort Index: {{ printer.sortIndex }}
       </v-col>
       <v-col>
@@ -48,6 +48,10 @@ export default class PrinterDetails extends Vue {
 
   get printerId() {
     return this.printer.id;
+  }
+
+  getPrinterFileCount() {
+    return this.printer.fileList?.fileCount || 0;
   }
 
   async addFile(e: DragEvent) {
