@@ -60,7 +60,7 @@ export const EVENTS = {
 @Component({
   data: () => ({ printer: {} })
 })
-export default class GridItem extends Vue {
+export default class GridStackItem extends Vue {
   @Prop() printerId: string;
   @Prop() skeleton: boolean;
   @Prop() selector: string;

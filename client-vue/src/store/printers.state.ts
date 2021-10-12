@@ -24,6 +24,10 @@ class PrintersModule extends VuexModule {
     return (printerId: string) => this.printers.find((p: Printer) => p.id === printerId);
   }
 
+  get gridSortedPrinters() {
+    return this.printers;
+  }
+
   get printerFiles() {
     return (printerId: string) =>
       this.printers.find((p: Printer) => p.id === printerId)?.fileList.files;

@@ -4,13 +4,24 @@
       <v-toolbar-title>Location Map</v-toolbar-title>
       <v-spacer></v-spacer>
       <div>
-        <v-switch disabled v-model="autoPrint" hide-details label="Auto-select and print"></v-switch>
+        <v-switch
+          disabled
+          v-model="autoPrint"
+          hide-details
+          label="Auto-select and print"
+        ></v-switch>
       </div>
       <v-btn class="ml-3" color="primary" type="button" @click="createPrinterModal()">
         Create Printer
       </v-btn>
     </v-toolbar>
 
+    <v-banner>
+      <strong class="mr-2">Drop one or more files to upload</strong>
+      <v-chip-group>
+        <v-chip>0 printers selected</v-chip>
+      </v-chip-group>
+    </v-banner>
     <v-container>
       <PrinterGrid />
     </v-container>
@@ -26,8 +37,7 @@ import CreatePrinterDialog from "@/components/Dialogs/CreatePrinterDialog.vue";
 import PrinterGrid from "@/components/PrinterGrid/PrinterGrid.vue";
 
 @Component({
-  data: () => ({
-  }),
+  data: () => ({}),
   components: { PrinterGrid, CreatePrinterDialog }
 })
 export default class HomePage extends Vue {

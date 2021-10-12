@@ -4,18 +4,18 @@
       <v-col v-for="y in 4" :key="y" :cols="columnCount" :sm="columnCount">
         <v-row class="test-top" no-gutters>
           <v-col cols="6">
-            <v-card class="pa-2 tile" outlined tile> Text1 Text1</v-card>
+            <PrinterGridTile name="1" />
           </v-col>
           <v-col cols="6">
-            <v-card class="pa-2 tile" outlined tile> Text2 Text2</v-card>
+            <PrinterGridTile name="2" />
           </v-col>
         </v-row>
         <v-row class="test-bottom" no-gutters>
           <v-col cols="6">
-            <v-card class="pa-2 tile" outlined tile> Text3 Text3</v-card>
+            <PrinterGridTile name="3" />
           </v-col>
           <v-col cols="6">
-            <v-card class="pa-2 tile" outlined tile> Text4 Text4</v-card>
+            <PrinterGridTile name="4" />
           </v-col>
         </v-row>
       </v-col>
@@ -33,14 +33,15 @@
 import Vue from "vue";
 import Login from "@/components/Generic/Login.vue";
 import { Component } from "vue-property-decorator";
-import GridItem, { EVENTS } from "@/components/PrinterGrid/GridItem.vue";
+import { EVENTS } from "@/components/PrinterGrid/GridStackItem.vue";
 import { Printer } from "@/models/printers/printer.model";
 import UpdatePrinterDialog from "@/components/Dialogs/UpdatePrinterDialog.vue";
 import { sseMessageGlobal } from "@/event-bus/sse.events";
 import { printersState } from "@/store/printers.state";
+import PrinterGridTile from "@/components/PrinterGrid/PrinterGridTile.vue";
 
 @Component({
-  components: { UpdatePrinterDialog, GridItem, Login }
+  components: { UpdatePrinterDialog, PrinterGridTile, Login }
 })
 export default class PrinterGrid extends Vue {
   showDialog = false;
@@ -49,6 +50,10 @@ export default class PrinterGrid extends Vue {
   readonly maxColumns = 12;
   readonly galleries = 4;
   columnCount = 4;
+
+  selectPrinter(printer: Printer) {
+    console.log("asd", printer);
+  }
 
   get printers() {
     return printersState.printers;
@@ -110,5 +115,9 @@ export default class PrinterGrid extends Vue {
 }
 .tile {
   min-height: 80px;
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+/Edge */
+  user-select: none; /* Standard */
 }
 </style>
