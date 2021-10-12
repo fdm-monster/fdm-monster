@@ -9,9 +9,10 @@ const exceptionHandler = require("./exceptions/exception.handler");
 const { configureContainer } = require("./container");
 const { scopePerRequest, loadControllers } = require("awilix-express");
 const { ServerTasks } = require("./tasks");
-const { getViewsPath } = require("./app-env");
+const { getAppDistPath } = require("./app-env");
 const cors = require("cors");
 const { NotFoundException } = require("./exceptions/runtime.exceptions");
+const history = require("connect-history-api-fallback");
 
 function setupExpressServer() {
   let app = express();
@@ -27,17 +28,6 @@ function setupExpressServer() {
     })
   );
   app.use(express.json());
-
-  const viewsPath = getViewsPath();
-
-  if (process.env.NODE_ENV === "production") {
-    // TODO fix this
-    const { getVueDistPath } = require("@3d-print-farm/client");
-    const bundlePath = getVueDistPath();
-    app.use("/assets/dist", express.static(bundlePath));
-  }
-
-  app.use(express.static(viewsPath));
 
   app.use("/images", express.static("./images"));
   app.use(cookieParser());
@@ -80,9 +70,24 @@ async function ensureSystemSettingsInitiated(container) {
 function serveControllerRoutes(app) {
   const routePath = "./controllers";
 
+  // Catches any HTML request to paths like / or file/ as long as its text/html
+  app.use(history());
+
+  // Serve the API
   app.use(loadControllers(`${routePath}/settings/*.controller.js`, { cwd: __dirname }));
   app.use(loadControllers(`${routePath}/*.controller.js`, { cwd: __dirname }));
   app.use(exceptionHandler);
+
+  // Serve the files for our frontend - do this later than the controllers
+  const appDistPath = getAppDistPath();
+  if (appDistPath) {
+    app.use(express.static(appDistPath));
+    app.get("/", function (req, res) {
+      res.sendFile("index.html", { root: appDistPath });
+    });
+  } else {
+    logger.warning("~ Skipped loading Vue frontend as no path was returned");
+  }
 
   app.get("*", function (req, res) {
     const path = req.originalUrl;

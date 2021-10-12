@@ -180,31 +180,34 @@ function setupEnvConfig(skipDotEnv = false) {
   ensurePageTitle();
 }
 
-function getViewsPath() {
-  logger.debug("Running in directory:", __dirname);
-  const viewsPath = path.join(__dirname, "../views");
-  if (!fs.existsSync(viewsPath)) {
-    if (isDocker()) {
-      throw new Error(
-        `Could not find views folder at ${viewsPath} within this docker container. Please report this as a bug to the developers.`
-      );
-    } else if (envUtils.isPm2()) {
-      removePm2Service(
-        `Could not find views folder at ${viewsPath} within the folder being run by Pm2. Please check your path or repository.`
-      );
-    } else if (envUtils.isNodemon()) {
-      throw new Error(
-        `Could not find views folder at ${viewsPath} within the folder being run by Nodemon. Please check your path or repository.`
-      );
+function getAppDistPath(isProduction) {
+  const clientPackage = "@3d-print-farm/client";
+  let appDistPath;
+  try {
+    appDistPath = require(clientPackage).getAppDistPath();
+  } catch (e) {
+    logger.error(
+      `~ The client package for 3DPF '${clientPackage}' was not installed. Can not load frontend app`
+    );
+    return;
+  }
+
+  if (!fs.existsSync(appDistPath)) {
+    const errorMessagePrefix = `Could not find Vue app path at ${appDistPath}`;
+
+    if (isProduction && envUtils.isPm2() && !isDocker()) {
+      const message = `${errorMessagePrefix} when running in non-dockerized PM2 mode. Removing pm2 3DPF service.`;
+      removePm2Service(message);
     } else {
       throw new Error(
-        `Could not find views folder at ${viewsPath} within the 3DPF path or binary PKG. Please report this as a bug to the developers.`
+        `${errorMessagePrefix}. 3DPF server aborting in docker|nodemon or other mode.`
       );
     }
-  } else {
-    logger.debug("✓ Views folder found:", viewsPath);
   }
-  return viewsPath;
+
+  logger.info(`✓ Vue dist folder found: ${appDistPath}`);
+
+  return appDistPath;
 }
 
 /**
@@ -249,5 +252,5 @@ module.exports = {
   runMigrations,
   fetchMongoDBConnectionString,
   fetchServerPort,
-  getViewsPath
+  getAppDistPath
 };

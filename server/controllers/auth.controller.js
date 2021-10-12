@@ -2,6 +2,7 @@ const { createController } = require("awilix-express");
 const passport = require("passport");
 const Logger = require("../handlers/logger.js");
 const { NotImplementedException } = require("../exceptions/runtime.exceptions");
+const { AppConstants } = require("../app.constants");
 
 class AuthController {
   #settingsStore;
@@ -47,7 +48,7 @@ class AuthController {
 }
 
 module.exports = createController(AuthController)
-  .prefix("/users")
+  .prefix(AppConstants.apiRoute + "/users")
   .before([])
   .post("/login", "login", {
     before: [

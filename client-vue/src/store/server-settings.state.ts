@@ -4,8 +4,8 @@ import { SettingsService } from "@/backend";
 import store from "@/store/index";
 
 @Module({
-  store,
   dynamic: true,
+  store,
   name: ServerSettingsModule.name
 })
 export class ServerSettingsModule extends VuexModule {

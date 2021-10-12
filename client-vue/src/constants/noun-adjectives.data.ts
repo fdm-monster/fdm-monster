@@ -2,6 +2,7 @@ import adjectives from "@/assets/adjectives.json";
 import nouns from "@/assets/nouns.json";
 
 function capitalize(val: string) {
+  if (!val) return "";
   return val.charAt(0).toUpperCase() + val.slice(1);
 }
 
@@ -15,5 +16,5 @@ export function newRandomNamePair() {
 export function generateInitials(name: string) {
   if (name === null) return "?";
   const initials = name?.split(" ").reduce((acc, subname) => acc + subname[0], "");
-  return initials.replace("undefined", "");
+  return initials?.replace("undefined", "");
 }
