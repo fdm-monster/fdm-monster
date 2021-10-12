@@ -2,6 +2,7 @@ const { byteCount } = require("../utils/benchmark.util");
 
 class PrinterSseTask {
   #printerSseHandler;
+  #printerGroupsCache;
   #printersStore;
 
   #aggregateSizeCounter = 0;
@@ -10,17 +11,20 @@ class PrinterSseTask {
   #rounding = 2;
   #logger;
 
-  constructor({ printerSseHandler, printersStore, loggerFactory }) {
+  constructor({ printerSseHandler, printerGroupsCache, printersStore, loggerFactory }) {
     this.#printerSseHandler = printerSseHandler;
     this.#printersStore = printersStore;
+    this.#printerGroupsCache = printerGroupsCache;
     this.#logger = loggerFactory("Printer-SSE-task");
   }
 
   async run() {
     const printerStates = this.#printersStore.listPrintersFlat();
+    const printerGroups = this.#printerGroupsCache.getCache();
 
     const sseData = {
       printers: printerStates,
+      printerGroups
     };
 
     const serializedData = JSON.stringify(sseData);

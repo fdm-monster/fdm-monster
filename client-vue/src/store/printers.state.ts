@@ -4,7 +4,7 @@ import { Printer } from "@/models/printers/printer.model";
 import { PrinterFile } from "@/models/printers/printer-file.model";
 import { PrinterFilesService, PrintersService } from "@/backend";
 import { CreatePrinter } from "@/models/printers/crud/create-printer.model";
-import { PrinterGroupsService } from "@/backend/printer-groups.service";
+import { PrinterGroupService } from "@/backend/printer-group.service";
 import { MultiResponse } from "@/models/api/status-response.model";
 import store from "@/store/index";
 import { FileUploadCommands } from "@/models/printers/file-upload-commands.model";
@@ -20,8 +20,33 @@ class PrintersModule extends VuexModule {
   printerGroups: PrinterGroup[] = [];
   lastUpdated?: number = undefined;
 
+  selectedPrinters: Printer[] = [];
+
   get printer() {
     return (printerId: string) => this.printers.find((p: Printer) => p.id === printerId);
+  }
+
+  get isSelectedPrinter() {
+    return (printerId: string) => !!this.selectedPrinters.find((p: Printer) => p.id === printerId);
+  }
+
+  get gridSortedPrinterGroups() {
+    if (!this.printerGroups) return () => [];
+
+    return (cols: number, rows: number) => {
+      const groupMatrix: any[] = [];
+
+      for (let i = 0; i < cols; i++) {
+        groupMatrix[i] = [];
+        for (let j = 0; j < rows; j++) {
+          groupMatrix[i][j] = this.printerGroups.find(
+            (pg) => pg.location.x === i && pg.location.y === j
+          );
+        }
+      }
+
+      return groupMatrix;
+    };
   }
 
   get printerFiles() {
@@ -41,6 +66,15 @@ class PrintersModule extends VuexModule {
   @Mutation setTestPrinter(printer: Printer) {
     this.testPrinters = printer;
     this.lastUpdated = Date.now();
+  }
+
+  @Mutation toggleSelectedPrinter(printer: Printer) {
+    const selectedPrinterIndex = this.selectedPrinters.findIndex((sp) => sp.id == printer.id);
+    if (selectedPrinterIndex === -1) {
+      this.selectedPrinters.push(printer);
+    } else {
+      this.selectedPrinters.splice(selectedPrinterIndex, 1);
+    }
   }
 
   @Mutation replacePrinter({ printerId, printer }: { printerId: string; printer: Printer }) {
@@ -159,8 +193,15 @@ class PrintersModule extends VuexModule {
   }
 
   @Action
+  async savePrinterGroups(printerGroups: PrinterGroup[]) {
+    this.setPrinterGroups(printerGroups);
+
+    return printerGroups;
+  }
+
+  @Action
   async loadPrinterGroups() {
-    const data = await PrinterGroupsService.getGroups();
+    const data = await PrinterGroupService.getGroups();
 
     this.setPrinterGroups(data);
 
@@ -185,6 +226,11 @@ class PrintersModule extends VuexModule {
     // this.setPrinterFiles({ printerId, files: [] });
 
     return "data";
+  }
+
+  @Action
+  selectPrinter(printer: Printer) {
+    this.toggleSelectedPrinter(printer);
   }
 
   @Action

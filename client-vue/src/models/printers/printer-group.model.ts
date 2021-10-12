@@ -1,5 +1,11 @@
+export interface PrinterInGroup {
+  printerId: string;
+  location: string;
+}
+
 export interface PrinterGroup {
-  id?: string;
+  _id?: string;
   name: string;
-  printers: string[];
+  location: { x: number; y: number };
+  printers: PrinterInGroup[];
 }

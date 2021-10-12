@@ -4,18 +4,37 @@
       <v-toolbar-title>Location Map</v-toolbar-title>
       <v-spacer></v-spacer>
       <div>
-        <v-switch disabled v-model="autoPrint" hide-details label="Auto-select and print"></v-switch>
+        <v-switch
+          v-model="autoPrint"
+          disabled
+          hide-details
+          label="Auto-select and print"
+        ></v-switch>
       </div>
       <v-btn class="ml-3" color="primary" type="button" @click="createPrinterModal()">
         Create Printer
       </v-btn>
     </v-toolbar>
 
-    <v-container>
-      <PrinterGrid />
-    </v-container>
+    <v-banner v-focus>
+      <strong class="mr-2">Drop one or more files to upload</strong>
+      <small class="ml-2">{{ selectedPrinters.length }} printers selected</small>
+      <v-chip-group>
+        <v-chip v-if="selectedPrinters.length === 0">No printers selected</v-chip>
+        <v-chip
+          v-for="selectedPrinter in selectedPrinters"
+          :key="selectedPrinter.id"
+          close
+          @click:close="deselectPrinter(selectedPrinter)"
+        >
+          {{ selectedPrinter.printerName }}
+        </v-chip>
+      </v-chip-group>
+    </v-banner>
 
-    <CreatePrinterDialog :show.sync="showDialog" v-on:update:show="onChangeShowDialog($event)" />
+    <PrinterGrid class="ma-2"/>
+
+    <CreatePrinterDialog :show.sync="showDialog" v-on:update:show="onChangeShowDialog($event)"/>
   </div>
 </template>
 
@@ -24,15 +43,26 @@ import Vue from "vue";
 import { Component } from "vue-property-decorator";
 import CreatePrinterDialog from "@/components/Dialogs/CreatePrinterDialog.vue";
 import PrinterGrid from "@/components/PrinterGrid/PrinterGrid.vue";
+import { printersState } from "@/store/printers.state";
+import { Printer } from "@/models/printers/printer.model";
+
+const watchedState = "selectedPrinterCount";
 
 @Component({
-  data: () => ({
-  }),
+  data: () => ({}),
   components: { PrinterGrid, CreatePrinterDialog }
 })
 export default class HomePage extends Vue {
   autoPrint = true;
   showDialog = false;
+
+  get selectedPrinters() {
+    return printersState.selectedPrinters;
+  }
+
+  deselectPrinter(printer: Printer) {
+    printersState.toggleSelectedPrinter(printer);
+  }
 
   async createPrinterModal() {
     this.showDialog = true;

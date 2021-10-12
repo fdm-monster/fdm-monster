@@ -48,7 +48,7 @@ class PrinterFilesService {
     printer.fileList.fileCount = printer.fileList.files.length;
 
     printer.markModified("fileList");
-    printer.save();
+    await printer.save();
 
     return printer.fileList;
   }
@@ -79,7 +79,7 @@ class PrinterFilesService {
     printer.fileList.files.splice(fileIndex, 1);
     printer.fileList.fileCount = printer.fileList.files.length;
     printer.markModified("fileList");
-    printer.save();
+    await printer.save();
 
     return Status.success("File was removed");
   }

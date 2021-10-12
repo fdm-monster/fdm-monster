@@ -1,7 +1,12 @@
 const PrinterGroupModel = require("../models/PrinterGroup");
 const _ = require("lodash");
 const { validateInput } = require("../handlers/validators");
-const { createPrinterGroupRules } = require("./validators/printer-group-service.validators");
+const {
+  createPrinterGroupRules,
+  printerInGroupRules,
+  printerIdRules
+} = require("./validators/printer-group-service.validators");
+const { NotFoundException } = require("../exceptions/runtime.exceptions");
 
 class PrinterGroupService {
   #printerService;
@@ -14,13 +19,13 @@ class PrinterGroupService {
 
   /**
    * Stores a new printer group into the database.
-   * @param {Object} printerGroup object to create.
+   * @param {Object} group object to create.
    * @throws {Error} If the printer group is not correctly provided.
    */
-  async create(printerGroup) {
-    if (!printerGroup) throw new Error("Missing printer-group");
+  async create(group) {
+    if (!group) throw new Error("Missing printer-group");
 
-    const validatedInput = await validateInput(printerGroup, createPrinterGroupRules);
+    const validatedInput = await validateInput(group, createPrinterGroupRules);
 
     return PrinterGroupModel.create(validatedInput);
   }
@@ -30,7 +35,46 @@ class PrinterGroupService {
    * @param {Object} printerGroup object to create.
    */
   async update(printerGroup) {
-    return PrinterGroupModel.update(printerGroup);
+    return PrinterGroupModel.updateOne(printerGroup.id, printerGroup);
+  }
+
+  async addOrUpdatePrinter(printerGroupId, printerInGroup) {
+    const group = await this.get(printerGroupId);
+    if (!group) throw new NotFoundException("This group does not exist", "printerGroupId");
+
+    const validInput = await validateInput(printerInGroup, printerInGroupRules);
+
+    const foundPrinterInGroupIndex = group.printers.findIndex(
+      (pig) => pig.printerId.toString() === validInput.printerId
+    );
+    if (foundPrinterInGroupIndex !== -1) {
+      group.printers[foundPrinterInGroupIndex] = validInput;
+      return group;
+    } else {
+      group.printers.push(validInput);
+    }
+
+    group.markModified("printers");
+    await group.save();
+
+    return group;
+  }
+
+  async removePrinter(printerGroupId, input) {
+    const validInput = await validateInput(input, printerIdRules);
+    const group = await this.get(printerGroupId);
+    if (!group) throw new NotFoundException("This group does not exist", "printerGroupId");
+
+    const foundPrinterInGroupIndex = group.printers.findIndex(
+      (pig) => pig.printerId.toString() === validInput.printerId
+    );
+    if (foundPrinterInGroupIndex === -1) return group;
+
+    group.printers.splice(foundPrinterInGroupIndex, 1);
+    group.markModified("printers");
+    group.updateOne();
+
+    return group;
   }
 
   /**
@@ -41,7 +85,11 @@ class PrinterGroupService {
   }
 
   async get(groupId) {
-    return PrinterGroupModel.findOne({ _id: groupId });
+    const printerGroup = await PrinterGroupModel.findOne({ _id: groupId });
+    if (printerGroup === null)
+      throw new NotFoundException(`Printer group with id ${groupId} does not exist.`);
+
+    return printerGroup;
   }
 
   async delete(groupId) {
@@ -53,7 +101,7 @@ class PrinterGroupService {
    */
   async syncPrinterGroups() {
     const existingGroups = await this.list();
-    const printers = await this.#printerService.list();
+    const printers = (await this.#printerService.list()).filter((p) => !!p.group?.length);
     const printersGrouped = _.groupBy(printers, "group");
 
     // Early quit
@@ -65,8 +113,13 @@ class PrinterGroupService {
       if (typeof groupName !== "string" || !groupName) continue;
 
       // Check if group already exists by this name
-      const printerIds = printers.map((p) => p.id);
-      const matchingGroup = existingGroups.find((g) => g.name === groupName);
+      const printerIds = printers.map((p) => ({
+        printerId: p._id,
+        location: "?"
+      }));
+      const matchingGroup = existingGroups.find(
+        (g) => g.name.toUpperCase() === groupName.toUpperCase()
+      );
       if (!!matchingGroup) {
         matchingGroup.printers = printerIds;
         await PrinterGroupModel.update(matchingGroup);

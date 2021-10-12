@@ -9,7 +9,7 @@ const PrinterGroup = require("../../server/models/PrinterGroup");
 
 let request;
 
-const printerGroupsRoute = AppConstants.apiRoute + "/printer-groups";
+const printerGroupsRoute = AppConstants.apiRoute + "/printer-group";
 const getRoute = printerGroupsRoute;
 const deleteRoute = printerGroupsRoute;
 const createRoute = printerGroupsRoute;

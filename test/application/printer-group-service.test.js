@@ -35,7 +35,10 @@ describe("printerGroup ", () => {
 
     // Prepare the CRUD DTO
     const newPrinterGroup = PrinterGroupMockData.PrinterGroupMock;
-    newPrinterGroup.printers.push(createdPrinter._id);
+    newPrinterGroup.printers.push({
+      location: "top right 123",
+      printerId: createdPrinter._id
+    });
 
     // Create it
     await printerGroupService.create(newPrinterGroup);
@@ -52,8 +55,10 @@ describe("printerGroup ", () => {
 
     const groups = await printerGroupService.syncPrinterGroups();
     expect(groups).toHaveLength(1);
-    expect(groups[0]).toHaveProperty("printers");
-    expect(groups[0].printers).toContainEqual(createdPrinter._id);
+    expect(groups[0].printers[0]).toMatchObject({
+      printerId: createdPrinter._id,
+      location: "?"
+    });
     expect(groups.errors).toBeFalsy();
   });
 
@@ -63,13 +68,11 @@ describe("printerGroup ", () => {
     expect(createdPrinter._id).toBeTruthy();
     const createdPrinter2 = await printerService.create(newPrinterData);
     expect(createdPrinter2._id).toBeTruthy();
-    expect(createdPrinter2._id).toB;
 
     const groups = await printerGroupService.syncPrinterGroups();
     expect(groups).toHaveLength(1);
     expect(groups[0]).toHaveProperty("printers");
     expect(groups[0].printers).toHaveLength(2);
-    expect(groups[0].printers).toContainEqual(createdPrinter._id);
     expect(groups.errors).toBeFalsy();
   });
 
@@ -80,14 +83,16 @@ describe("printerGroup ", () => {
     newPrinterData.group = "anotherdifferentGroupName";
     const createdPrinter2 = await printerService.create(newPrinterData);
     expect(createdPrinter2._id).toBeTruthy();
-    expect(createdPrinter2._id).toB;
 
     const groups = await printerGroupService.syncPrinterGroups();
     expect(groups).toHaveLength(2);
     expect(groups[0]).toHaveProperty("printers");
     expect(groups[0].printers).toHaveLength(1);
     expect(groups[1].printers).toHaveLength(1);
-    expect(groups[0].printers).toContainEqual(createdPrinter._id);
+    expect(groups[0].printers[0]).toMatchObject({
+      printerId: createdPrinter._id,
+      location: "?"
+    });
     expect(groups.errors).toBeFalsy();
   });
 

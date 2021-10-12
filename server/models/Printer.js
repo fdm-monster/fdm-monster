@@ -26,11 +26,11 @@ const PrinterSchema = new mongoose.Schema({
     required: true,
     default: true
   },
-  // Auto-generated below
   settingsAppearance: {
     type: Object,
-    required: false
+    required: true
   },
+  // Auto-generated below
   currentUser: {
     type: String,
     required: false

@@ -41,7 +41,7 @@
         <v-toolbar flat>
           <v-toolbar-title>Showing printers</v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-switch v-model="reorder" class="mt-5 mr-3" dark label="Sort mode" />
+          <v-switch v-model="reorder" class="mt-5 mr-3" dark label="Sort mode"/>
 
           <v-btn class="ml-3" color="primary" disabled type="button" @click="createPrinterModal()">
             Import JSON Printers
@@ -97,9 +97,9 @@
         </v-chip>
       </template>
       <template v-slot:item.actions="{ item }">
-        <PrinterUrlAction :printer="item" />
-        <PrinterConnectionAction :printer="item" />
-        <PrinterSettingsAction :printer="item" v-on:update:show="openEditDialog" />
+        <PrinterUrlAction :printer="item"/>
+        <PrinterConnectionAction :printer="item"/>
+        <PrinterSettingsAction :printer="item" v-on:update:show="openEditDialog"/>
       </template>
       <template v-slot:expanded-item="{ headers, item }">
         <td :colspan="headers.length">
@@ -112,7 +112,7 @@
       :show.sync="showJsonImportDialog"
       v-on:update:show="onChangeShowDialog($event)"
     />
-    <CreatePrinterDialog :show.sync="showCreateDialog" />
+    <CreatePrinterDialog :show.sync="showCreateDialog"/>
     <UpdatePrinterDialog
       :printer-id="selectedPrinterId"
       :show.sync="showEditDialog"
@@ -127,8 +127,6 @@ import { Component } from "vue-property-decorator";
 import { Printer } from "@/models/printers/printer.model";
 import draggable from "vuedraggable";
 import { PrintersService } from "@/backend/printers.service";
-import { PrinterSseMessage } from "@/models/sse-messages/printer-sse-message.model";
-import { sseMessageGlobal } from "@/event-bus/sse.events";
 import PrinterDetails from "@/components/PrinterList/PrinterDetails.vue";
 import PrinterUrlAction from "@/components/Generic/Actions/PrinterUrlAction.vue";
 import PrinterSettingsAction from "@/components/Generic/Actions/PrinterSettingsAction.vue";
@@ -215,29 +213,6 @@ export default class Printers extends Vue {
       printer.enabled = !printer.enabled;
       await PrintersService.toggleEnabled(printer.id, printer.enabled);
     }
-  }
-
-  async mounted() {
-    await printersState.loadPrinters();
-    await printersState.loadPrinterGroups();
-
-    this.$bus.on(sseMessageGlobal, (data: PrinterSseMessage) => {
-      this.onSseMessage(data);
-    });
-  }
-
-  onSseMessage(message: PrinterSseMessage) {
-    if (!message) return;
-    const updatedPrinters = message.printers;
-
-    let existingPrinters = this.printers.map((p) => p.id);
-
-    updatedPrinters.forEach((p) => {
-      const printerIndex = existingPrinters.findIndex((printerId) => printerId === p.id);
-      existingPrinters.splice(printerIndex, 1);
-    });
-
-    // TODO superfluence is ignored, is it needed tho?
   }
 }
 </script>

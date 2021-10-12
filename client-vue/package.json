@@ -10,6 +10,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "build:dev": "vue-cli-service build --mode development",
     "test:unit": "vue-cli-service test:unit",
     "test:e2e": "vue-cli-service test:e2e",
     "lint": "vue-cli-service lint"
@@ -31,6 +32,7 @@
     "vuedraggable": "^2.24.3",
     "vuetify": "^2.5.9",
     "vuex": "^3.6.2",
+    "vuex-class-modules": "^1.3.0",
     "vuex-module-decorators": "^1.0.1"
   },
   "devDependencies": {

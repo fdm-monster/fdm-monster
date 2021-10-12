@@ -52,6 +52,7 @@ const AlertService = require("./services/alert.service");
 const { asFunction, asClass, asValue, createContainer, InjectionMode } = require("awilix");
 const LoggerFactory = require("./handlers/logger-factory");
 const PrinterTestTask = require("./tasks/printer-test.task");
+const PrinterGroupsCache = require("./state/data/printer-groups.cache");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -120,6 +121,7 @@ function configureContainer() {
     [DITokens.sortingFilteringCache]: asClass(SortingFilteringCache).singleton(),
     [DITokens.currentOperationsCache]: asClass(CurrentOperationsCache).singleton(),
     [DITokens.printerState]: asClass(PrinterState).transient(), // Transient on purpose!
+    [DITokens.printerGroupsCache]: asClass(PrinterGroupsCache).singleton(),
     [DITokens.historyCache]: asClass(HistoryCache).singleton(),
     [DITokens.jobsCache]: asClass(JobsCache).singleton(),
     [DITokens.heatMapCache]: asClass(HeatMapCache).singleton(),
