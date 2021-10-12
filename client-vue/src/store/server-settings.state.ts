@@ -1,13 +1,9 @@
 import { ServerSettings } from "@/models/server-settings.model";
-import { Action, getModule, Module, Mutation, VuexModule } from "vuex-module-decorators";
+import { VuexModule, Module, Mutation, Action } from "vuex-class-modules";
 import { SettingsService } from "@/backend";
 import store from "@/store/index";
 
-@Module({
-  dynamic: true,
-  store,
-  name: ServerSettingsModule.name
-})
+@Module
 export class ServerSettingsModule extends VuexModule {
   serverSettings?: ServerSettings = undefined;
 
@@ -26,4 +22,7 @@ export class ServerSettingsModule extends VuexModule {
   }
 }
 
-export const serverSettingsState = getModule(ServerSettingsModule, store);
+export const serverSettingsState = new ServerSettingsModule({
+  store,
+  name: ServerSettingsModule.name
+});

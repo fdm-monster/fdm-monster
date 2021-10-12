@@ -15,6 +15,10 @@ const instructionsReferralURL = "https://github.com/davidzwa/3d-print-farm/blob/
 const packageJsonPath = path.join(__dirname, "../package.json");
 const dotEnvPath = path.join(__dirname, "../.env");
 
+function isEnvProd() {
+  return process.env[AppConstants.NODE_ENV_KEY] === AppConstants.defaultProductionEnv;
+}
+
 /**
  * Set and write the environment name to file, if applicable
  * @returns {*}
@@ -180,7 +184,7 @@ function setupEnvConfig(skipDotEnv = false) {
   ensurePageTitle();
 }
 
-function getAppDistPath(isProduction) {
+function getAppDistPath() {
   const clientPackage = "@3d-print-farm/client";
   let appDistPath;
   try {
@@ -192,10 +196,14 @@ function getAppDistPath(isProduction) {
     return;
   }
 
+  if (AppConstants.OVERRIDE_VUE_DIST) {
+    appDistPath = AppConstants.OVERRIDE_VUE_DIST;
+  }
+
   if (!fs.existsSync(appDistPath)) {
     const errorMessagePrefix = `Could not find Vue app path at ${appDistPath}`;
 
-    if (isProduction && envUtils.isPm2() && !isDocker()) {
+    if (isEnvProd() && envUtils.isPm2() && !isDocker()) {
       const message = `${errorMessagePrefix} when running in non-dockerized PM2 mode. Removing pm2 3DPF service.`;
       removePm2Service(message);
     } else {
@@ -240,10 +248,6 @@ function ensurePageTitle() {
     process.env[AppConstants.SERVER_SITE_TITLE_KEY] =
       AppConstants.defaultServerPageTitle?.toString();
   }
-}
-
-function isEnvProd() {
-  return process.env[AppConstants.NODE_ENV_KEY] === AppConstants.defaultProductionEnv;
 }
 
 module.exports = {

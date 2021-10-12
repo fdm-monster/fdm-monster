@@ -35,6 +35,10 @@ class AppConstants {
     return "npm_package_version";
   }
 
+  static get OVERRIDE_VUE_DIST() {
+    return process.env["OVERRIDE_VUE_DIST"];
+  }
+
   static get NODE_ENV_KEY() {
     return "NODE_ENV";
   }
