@@ -180,31 +180,44 @@ function setupEnvConfig(skipDotEnv = false) {
   ensurePageTitle();
 }
 
-function getDevViewsPath() {
-  logger.debug("Running in directory:", __dirname);
-  const viewsPath = path.join(__dirname, "../views/dist");
-  if (!fs.existsSync(viewsPath)) {
+function getAppDistPath() {
+  let appDistPath;
+  if (process.env.NODE_ENV === "production") {
+    const { getAppDistPath } = require("@3d-print-farm/client");
+    appDistPath = getAppDistPath();
+    logger.debug(
+      `Running PROD in directory: ${__dirname}\n\t Retrieving Vue app path from ${appDistPath}`
+    );
+  } else {
+    appDistPath = getAppDistPath();
+    logger.debug(
+      `Running DEV in directory: ${__dirname}\n\t Retrieving Vue app path from ${appDistPath}`
+    );
+  }
+
+  if (!fs.existsSync(appDistPath)) {
     if (isDocker()) {
       throw new Error(
-        `Could not find views folder at ${viewsPath} within this docker container. Please report this as a bug to the developers.`
+        `Could not find views folder at ${appDistPath} within this docker container. Please report this as a bug to the developers.`
       );
     } else if (envUtils.isPm2()) {
       removePm2Service(
-        `Could not find views folder at ${viewsPath} within the folder being run by Pm2. Please check your path or repository.`
+        `Could not find views folder at ${appDistPath} within the folder being run by Pm2. Please check your path or repository.`
       );
     } else if (envUtils.isNodemon()) {
       throw new Error(
-        `Could not find views folder at ${viewsPath} within the folder being run by Nodemon. Please check your path or repository.`
+        `Could not find views folder at ${appDistPath} within the folder being run by Nodemon. Please check your path or repository.`
       );
     } else {
       throw new Error(
-        `Could not find views folder at ${viewsPath} within the 3DPF path or binary PKG. Please report this as a bug to the developers.`
+        `Could not find views folder at ${appDistPath} within the 3DPF path or binary PKG. Please report this as a bug to the developers.`
       );
     }
   } else {
-    logger.debug("✓ Views folder found:", viewsPath);
+    logger.debug("✓ Views folder found:", appDistPath);
   }
-  return viewsPath;
+
+  return appDistPath;
 }
 
 /**
@@ -249,5 +262,5 @@ module.exports = {
   runMigrations,
   fetchMongoDBConnectionString,
   fetchServerPort,
-  getDevViewsPath
+  getAppDistPath
 };

@@ -9,7 +9,7 @@ const exceptionHandler = require("./exceptions/exception.handler");
 const { configureContainer } = require("./container");
 const { scopePerRequest, loadControllers } = require("awilix-express");
 const { ServerTasks } = require("./tasks");
-const { getDevViewsPath } = require("./app-env");
+const { getAppDistPath } = require("./app-env");
 const cors = require("cors");
 const { NotFoundException } = require("./exceptions/runtime.exceptions");
 const history = require("connect-history-api-fallback");
@@ -78,18 +78,11 @@ function serveControllerRoutes(app) {
   app.use(loadControllers(`${routePath}/*.controller.js`, { cwd: __dirname }));
   app.use(exceptionHandler);
 
-  let appPath;
-  if (process.env.NODE_ENV === "production") {
-    const { getAppDistPath } = require("@3d-print-farm/client");
-    appPath = getAppDistPath();
-  } else {
-    appPath = getDevViewsPath();
-  }
-
   // Serve the files for our frontend
-  app.use(express.static(appPath));
+  const appDistPath = getAppDistPath();
+  app.use(express.static(appDistPath));
   app.get("/", function (req, res) {
-    res.sendFile("index.html", { root: appPath });
+    res.sendFile("index.html", { root: appDistPath });
   });
   app.get("*", function (req, res) {
     const path = req.originalUrl;
