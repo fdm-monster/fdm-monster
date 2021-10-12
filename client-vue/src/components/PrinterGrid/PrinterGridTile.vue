@@ -1,19 +1,20 @@
 <template>
-  <v-card class="pa-2 tile" outlined tile @click="selectPrinter()">
-    Printer {{ name }}
-    <v-btn icon ripple>
-      <v-icon>stop</v-icon>
-    </v-btn>
-    <v-btn icon ripple>
-      <v-icon>info</v-icon>
-    </v-btn>
+  <v-card class="tile" outlined tile @click="selectPrinter()">
+    <v-container>
+      {{ name }}
+      <v-btn class="float-right" icon @click.prevent.stop="clickInfo()">
+        <v-icon>info</v-icon>
+      </v-btn>
+      <v-btn class="float-right" icon @click.prevent.stop="clickStop()">
+        <v-icon>stop</v-icon>
+      </v-btn>
+    </v-container>
   </v-card>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { Component, Prop } from "vue-property-decorator";
-import { Printer } from "@/models/printers/printer.model";
 import { printersState } from "@/store/printers.state";
 
 @Component({
@@ -26,8 +27,16 @@ export default class PrinterGridTile extends Vue {
     return printersState.printers;
   }
 
-  selectPrinter(printer: Printer) {
-    console.log("asd", printer);
+  clickInfo() {
+    console.log("info");
+  }
+
+  clickStop() {
+    console.log("stop");
+  }
+
+  selectPrinter() {
+    console.log("asd");
   }
 }
 </script>
