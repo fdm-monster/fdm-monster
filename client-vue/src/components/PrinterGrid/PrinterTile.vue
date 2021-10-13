@@ -13,10 +13,10 @@
       <small class="small-resized-font ml-2">
         {{ printer.printerName }}
       </small>
-      <v-btn class="float-right d-none d-lg-inline" icon @click.prevent.stop="clickInfo()">
+      <v-btn class="float-right" icon @click.prevent.stop="clickInfo()">
         <v-icon>info</v-icon>
       </v-btn>
-      <v-btn class="float-right" icon @click.prevent.stop="clickStop()">
+      <v-btn class="float-right d-none d-lg-inline" icon @click.prevent.stop="clickStop()">
         <v-icon>stop</v-icon>
       </v-btn>
     </v-container>

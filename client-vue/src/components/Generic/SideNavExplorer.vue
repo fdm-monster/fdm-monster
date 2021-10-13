@@ -9,8 +9,10 @@
     @close="closeDrawer()"
   >
     <v-list-item>
-      <v-list-item-avatar color="primary">
-        {{ avatarInitials() }}
+      <v-list-item-avatar>
+        <v-btn color="primary" fab @click="openPrinterURL()">
+          {{ avatarInitials() }}
+        </v-btn>
       </v-list-item-avatar>
       <v-list-item-content v-if="storedViewedPrinter">
         <v-list-item-title>
@@ -30,16 +32,26 @@
 
     <v-divider></v-divider>
 
-    <v-list dense subheader two-line>
+    <v-list v-drop-upload="{ printer: storedViewedPrinter }" dense subheader two-line>
       <v-subheader inset>Commands</v-subheader>
-      <v-list-item :disabled="isStoppable" link @click.prevent.stop="clickStop()">
+
+      <v-list-item :disabled="!isStoppable" link @click.prevent.stop="clickStop()">
         <v-list-item-avatar>
-          <v-icon> stop</v-icon>
+          <v-icon>stop</v-icon>
         </v-list-item-avatar>
-        <v-list-item-content> STOP</v-list-item-content>
+        <v-list-item-content> STOP {{ isStoppable ? "" : "- No job" }}</v-list-item-content>
       </v-list-item>
 
-      <v-subheader inset>Files</v-subheader>
+      <v-list-item :disabled="!canBeCleared" link @click.prevent.stop="clickClearFiles()">
+        <v-list-item-avatar>
+          <v-icon>delete</v-icon>
+        </v-list-item-avatar>
+        <v-list-item-content>
+          CLEAR FILES {{ canBeCleared ? "" : "- Nothing to do" }}
+        </v-list-item-content>
+      </v-list-item>
+
+      <v-subheader inset>Files (drop a file!)</v-subheader>
 
       <v-list-item v-if="!shownFiles">
         <v-list-item-avatar>
@@ -97,7 +109,7 @@ import { Watch } from "vue-property-decorator";
 import { printersState } from "@/store/printers.state";
 import { Printer } from "@/models/printers/printer.model";
 import { generateInitials } from "@/constants/noun-adjectives.data";
-import { PrinterFileService } from "@/backend";
+import { PrinterFileService, PrintersService } from "@/backend";
 import { PrinterFile } from "@/models/printers/printer-file.model";
 import { PrinterFileBucket } from "@/models/printers/printer-file-bucket.model";
 import { isPrinterStoppable } from "@/utils/printer-state.utils";
@@ -129,6 +141,10 @@ export default class SideNavExplorer extends Vue {
     return isPrinterStoppable(this.storedViewedPrinter);
   }
 
+  get canBeCleared() {
+    return this.shownFiles?.files?.length && this.storedViewedPrinter?.apiAccessibility.accessible;
+  }
+
   @Watch("storedViewedPrinter")
   async inputUpdate(viewedPrinter?: Printer, oldVal?: Printer) {
     this.drawerOpened = !!viewedPrinter;
@@ -137,13 +153,13 @@ export default class SideNavExplorer extends Vue {
     if (!viewedPrinter || !printerId) return;
 
     // TODO Triggers twice - race condition?
-    if (!this.shownFiles || viewedPrinter.id !== this.shownFiles.printerId) {
+    if (!this.shownFiles || viewedPrinter.id !== this.shownFiles.printerId || !oldVal) {
       if (viewedPrinter.apiAccessibility.accessible) {
         let fileCache = await printersState.loadPrinterFiles({ printerId, recursive: false });
         this.shownFiles = {
           printerId,
           ...fileCache
-        }
+        };
       } else {
         const fileCache = await PrinterFileService.getFileCache(printerId);
         this.shownFiles = {
@@ -169,6 +185,20 @@ export default class SideNavExplorer extends Vue {
 
   clickStop() {
     printersState.sendStopJobCommand(this.printerId);
+  }
+
+  clickClearFiles() {
+    printersState.clearPrinterFiles(this.printerId);
+
+    if (this.shownFiles) {
+      this.shownFiles.files = [];
+    }
+  }
+
+  openPrinterURL() {
+    if (!this.storedViewedPrinter) return;
+
+    PrintersService.openPrinterURL(this.storedViewedPrinter.printerURL);
   }
 
   async printFile(file: PrinterFile) {

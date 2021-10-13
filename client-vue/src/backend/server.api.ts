@@ -38,6 +38,7 @@ export class ServerApi {
   static roomDataRoute = `${ServerApi.base}/room-data`;
 
   static getPrinterRoute = (id: string) => `${ServerApi.printerRoute}/${id}`;
+  static printerFilesClearRoute = (id: string) => `${ServerApi.printerFilesRoute}/${id}/clear`;
   static printerFilesSelectAndPrintRoute = (id: string) =>
     `${ServerApi.printerFilesRoute}/${id}/select`;
   static printerFilesUploadRoute = (id: string, location: FileLocation) =>
@@ -49,7 +50,6 @@ export class ServerApi {
   static printerSerialDisconnectRoute = (id: string) =>
     `${ServerApi.getPrinterRoute(id)}/serial-disconnect`;
 
-  static printerJobRoute = (printerId: string) => `${ServerApi.getPrinterRoute(printerId)}/job`;
-  static printerStopJobRoute = (printerId: string) =>
-    `${ServerApi.printerJobRoute(printerId)}/stop`;
+  static printerJobRoute = (id: string) => `${ServerApi.getPrinterRoute(id)}/job`;
+  static printerStopJobRoute = (id: string) => `${ServerApi.printerJobRoute(id)}/stop`;
 }

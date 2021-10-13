@@ -33,7 +33,13 @@
       <v-btn disabled>Create</v-btn>
     </v-card-actions>
     <v-card-actions v-else>
-      <v-btn :color="isCancelling() ? 'warning' : 'primary'" :disabled="hasNoStoppableJob()" fab x-small @click.stop="stopClicked()">
+      <v-btn
+        :color="isCancelling() ? 'warning' : 'primary'"
+        :disabled="hasNoStoppableJob()"
+        fab
+        x-small
+        @click.stop="stopClicked()"
+      >
         <v-icon>stop</v-icon>
       </v-btn>
       <v-btn color="primary" fab x-small @click.stop="infoClicked()">

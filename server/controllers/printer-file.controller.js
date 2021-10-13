@@ -96,6 +96,32 @@ class PrinterFileController {
     this.#statusResponse(res, response);
   }
 
+  async clearPrinterFiles(req, res) {
+    const { id: printerId } = await validateInput(req.params, idRules);
+    const printerLogin = this.#printersStore.getPrinterLogin(printerId);
+
+    const nonRecursiveFiles = await this.#octoPrintApiService.getFiles(printerLogin, false);
+
+    const failedFiles = [];
+    const succeededFiles = [];
+
+    for (let file of nonRecursiveFiles.files) {
+      try {
+        await this.#octoPrintApiService.deleteFile(printerLogin, file.path);
+        succeededFiles.push(file);
+      } catch (e) {
+        failedFiles.push(file);
+      }
+    }
+
+    await this.#filesStore.purgePrinterFiles(printerId);
+
+    res.send({
+      failedFiles,
+      succeededFiles
+    });
+  }
+
   async purgeIndexedFiles(req, res) {
     await this.#filesStore.purgeFiles();
 
@@ -231,6 +257,7 @@ module.exports = createController(PrinterFileController)
     .delete("/:id", "deleteFile")
     .post("/:id/upload", "uploadFiles")
     .post("/:id/select", "selectPrintFile")
+    .post("/:id/clear", "clearPrinterFiles")
     // TODO below
     .post("/file/resync", "resyncFile")
     .post("/file/move", "moveFile")

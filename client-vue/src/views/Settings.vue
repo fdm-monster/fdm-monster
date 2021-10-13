@@ -25,7 +25,8 @@
         <v-list-item-content>
           <v-list-item-title>Password</v-list-item-title>
           <v-list-item-subtitle>
-            Clear out the file references for all printers - this does not remove them from OctoPrint!
+            Clear out the file references for all printers - this does not remove them from
+            OctoPrint!
             <v-btn @click="purgeFiles()">Purge file references</v-btn>
           </v-list-item-subtitle>
         </v-list-item-content>

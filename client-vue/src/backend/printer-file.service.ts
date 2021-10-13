@@ -55,8 +55,15 @@ export class PrinterFileService extends BaseService {
         formData.append("print", "true");
       }
     }
+    // TODO more than 1 will now fail due to API validation
 
     return this.postApi(path, formData, { unwrap: false });
+  }
+
+  static async clearFiles(printerId: string) {
+    const path = `${ServerApi.printerFilesClearRoute(printerId)}`;
+
+    return this.postApi(path);
   }
 
   static async purgeFiles() {

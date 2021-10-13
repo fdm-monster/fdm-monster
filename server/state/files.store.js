@@ -41,6 +41,18 @@ class FilesStore {
     return this.#fileCache.getPrinterFiles(printerId);
   }
 
+  async purgePrinterFiles(printerId) {
+    const printerState = this.#printersStore.getPrinterState(printerId);
+
+    this.#logger.info(`Purging files from printer ${printerId}`);
+    await this.#printerFilesService.clearFiles(printerState.id);
+
+    this.#logger.info(`Purging file cache from printer ${printerId}`);
+    this.#fileCache.purgePrinterId(printerState.id);
+
+    this.#logger.info(`Clearing printer files successful.`);
+  }
+
   async purgeFiles() {
     const allPrinters = this.#printersStore.listPrinterStates(true);
 
@@ -53,7 +65,7 @@ class FilesStore {
     for (let printer of allPrinters) {
       this.#fileCache.purgePrinterId(printer.id);
     }
-    this.#logger.info(`Clearing caches succesful.`);
+    this.#logger.info(`Clearing caches successful.`);
   }
 
   async updatePrinterFiles(printerId, files) {

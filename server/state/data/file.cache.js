@@ -81,7 +81,7 @@ class FileCache {
   updateCacheFileRefCount() {
     let totalFiles = 0;
     for (const storage of Object.values(this.#printerFileStorage)) {
-      totalFiles += storage.fileList.fileCount;
+      totalFiles += storage.fileList.files?.length || 0;
     }
 
     if (totalFiles !== this.#totalFileCount) {

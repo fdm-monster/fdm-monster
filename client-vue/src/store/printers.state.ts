@@ -131,6 +131,12 @@ class PrintersModule extends VuexModule {
     this.lastUpdated = Date.now();
   }
 
+  @Mutation _clearPrinterFiles(printerId: string) {
+    const index = this.printerFileBuckets.findIndex((b) => b.printerId === printerId);
+
+    this.printerFileBuckets[index].files = [];
+  }
+
   @Mutation setPrinterFiles({
     printerId,
     fileList
@@ -259,6 +265,8 @@ class PrintersModule extends VuexModule {
     await PrinterFileService.uploadFiles(printerId, uploadedFiles, commands);
 
     console.log("Drop triggered", printerId, files.length, commands);
+
+    // TODO update
     // this.setPrinterFiles({ printerId, files: [] });
 
     return "data";
@@ -314,6 +322,14 @@ class PrintersModule extends VuexModule {
     this.setPrinterFiles({ printerId, fileList: data });
 
     return data;
+  }
+
+  @Action
+  async clearPrinterFiles(printerId?: string) {
+    if (!printerId) return;
+    await PrinterFileService.clearFiles(printerId);
+
+    this._clearPrinterFiles(printerId);
   }
 
   @Action
