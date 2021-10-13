@@ -4,18 +4,18 @@
       <v-col v-for="x in columns" :key="x" :cols="4" :sm="4">
         <v-row class="test-top" no-gutters>
           <v-col cols="6">
-            <PrinterGridTile :printer="getPrinter(x, y, 3)" />
+            <PrinterGridTile :printer="getPrinter(x, y, 3)" :loading="loading" />
           </v-col>
           <v-col cols="6">
-            <PrinterGridTile :printer="getPrinter(x, y, 1)" />
+            <PrinterGridTile :printer="getPrinter(x, y, 1)" :loading="loading" />
           </v-col>
         </v-row>
         <v-row class="test-bottom" no-gutters>
           <v-col cols="6">
-            <PrinterGridTile :printer="getPrinter(x, y, 2)" />
+            <PrinterGridTile :printer="getPrinter(x, y, 2)" :loading="loading" />
           </v-col>
           <v-col cols="6">
-            <PrinterGridTile :printer="getPrinter(x, y, 0)" />
+            <PrinterGridTile :printer="getPrinter(x, y, 0)" :loading="loading" />
           </v-col>
         </v-row>
       </v-col>
@@ -48,6 +48,7 @@ import { columnCount, rowCount } from "@/constants/printer-grid.constants";
 export default class PrinterGrid extends Vue {
   showDialog = false;
   selectedPrinterId?: string = "";
+  loading = true;
 
   // Translation value from 12 cols => 12/x
   columnWidth = 4;
@@ -69,6 +70,7 @@ export default class PrinterGrid extends Vue {
     this.calculateGrid();
     await printersState.loadPrinters();
     await printersState.loadPrinterGroups();
+    this.loading = false;
 
     this.updateGridMatrix();
   }

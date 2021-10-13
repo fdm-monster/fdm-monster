@@ -1,19 +1,22 @@
 <template>
   <v-card
-    class="tile"
     :class="{ 'tile-selected': selected }"
+    class="tile"
     outlined
     tile
     @click="selectPrinter()"
   >
     <v-container v-if="printer">
-      {{ printer.printerName }}
+      <small><strong>{{ printer.printerName }}</strong></small>
       <v-btn class="float-right" icon @click.prevent.stop="clickInfo()">
         <v-icon>info</v-icon>
       </v-btn>
       <v-btn class="float-right" icon @click.prevent.stop="clickStop()">
         <v-icon>stop</v-icon>
       </v-btn>
+    </v-container>
+    <v-container v-else-if="!loading">
+      <small class="ml-5 mt-5 text--secondary">Not set up</small>
     </v-container>
   </v-card>
 </template>
@@ -28,8 +31,8 @@ import { Printer } from "@/models/printers/printer.model";
   components: {}
 })
 export default class PrinterGridTile extends Vue {
-  @Prop() index: number;
   @Prop() printer: Printer;
+  @Prop() loading: boolean;
 
   get selected() {
     return printersState.isSelectedPrinter(this.printer?.id);
@@ -40,7 +43,7 @@ export default class PrinterGridTile extends Vue {
   }
 
   id() {
-    return this.printer?.printerName || this.index;
+    return this.printer?.printerName;
   }
 
   getTileClass() {
