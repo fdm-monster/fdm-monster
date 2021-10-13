@@ -64,7 +64,7 @@ export default class PrinterGridTile extends Vue {
   }
 
   clickStop() {
-    console.log("stop");
+    printersState.sendStopJobCommand(this.printer.id);
   }
 
   selectPrinter() {

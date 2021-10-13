@@ -235,6 +235,19 @@ class PrintersModule extends VuexModule {
   }
 
   @Action
+  async sendStopJobCommand(printerId: string) {
+    const printer = this.printer(printerId);
+    if (!printer) return;
+
+    if (printer.printerState.flags.printing) {
+      const answer = confirm("The printer is still printing - are you sure to stop it?");
+      if (answer) {
+        await PrintersService.stopPrintJob(printer.id);
+      }
+    }
+  }
+  
+  @Action
   selectPrinter(printer: Printer) {
     this.toggleSelectedPrinter(printer);
   }
