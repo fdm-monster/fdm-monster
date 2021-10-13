@@ -72,7 +72,7 @@
 <script>
 import Vue from "vue";
 import { Component } from "vue-property-decorator";
-import { PrinterGroupService, PrinterFilesService } from "@/backend";
+import { PrinterGroupService, PrinterFileService } from "@/backend";
 import { infoMessageEvent } from "@/event-bus/alert.events";
 
 @Component({
@@ -94,7 +94,7 @@ export default class Settings extends Vue {
   }
 
   async purgeFiles() {
-    await PrinterFilesService.purgeFiles();
+    await PrinterFileService.purgeFiles();
 
     this.$bus.emit(infoMessageEvent, `Succesfully purged all references to printer files!`);
   }

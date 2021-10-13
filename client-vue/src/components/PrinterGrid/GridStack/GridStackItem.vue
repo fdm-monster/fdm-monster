@@ -53,6 +53,7 @@ import { generateInitials } from "@/constants/noun-adjectives.data";
 import { updatedPrinterEvent } from "@/event-bus/printer.events";
 import { PrintersService } from "@/backend";
 import { infoMessageEvent } from "@/event-bus/alert.events";
+import { PrinterJobService } from "@/backend/printer-job.service";
 
 export const EVENTS = {
   itemClicked: "griditem:clicked"
@@ -116,7 +117,7 @@ export default class GridStackItem extends Vue {
         return;
       }
     }
-    await PrintersService.stopPrintJob(this.printerId);
+    await PrinterJobService.stopPrintJob(this.printerId);
   }
 
   infoClicked() {

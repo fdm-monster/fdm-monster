@@ -38,6 +38,8 @@ export class ServerApi {
   static roomDataRoute = `${ServerApi.base}/room-data`;
 
   static getPrinterRoute = (id: string) => `${ServerApi.printerRoute}/${id}`;
+  static printerFilesSelectAndPrintRoute = (id: string) =>
+    `${ServerApi.printerFilesRoute}/${id}/select`;
   static printerFilesUploadRoute = (id: string, location: FileLocation) =>
     `${ServerApi.printerFilesRoute}/${id}/upload?location=${location}`;
   static printerFilesCacheRoute = (id: string) => `${ServerApi.printerFilesRoute}/${id}/cache`;

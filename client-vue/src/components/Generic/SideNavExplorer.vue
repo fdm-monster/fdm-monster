@@ -25,9 +25,6 @@
         <v-list-item-subtitle v-if="storedViewedPrinter.currentJob">
           Printer progress: {{ storedViewedPrinter.currentJob.progress }}%
         </v-list-item-subtitle>
-        <v-list-item-subtitle>
-          Nozzle Temp: {{ storedViewedPrinter.tools[0].chamber }}%
-        </v-list-item-subtitle>
       </v-list-item-content>
     </v-list-item>
 
@@ -35,7 +32,7 @@
 
     <v-list dense subheader two-line>
       <v-subheader inset>Commands</v-subheader>
-      <v-list-item link>
+      <v-list-item link @click.prevent.stop="clickStop()">
         <v-list-item-avatar>
           <v-icon> stop</v-icon>
         </v-list-item-avatar>
@@ -44,20 +41,35 @@
 
       <v-subheader inset>Files</v-subheader>
 
-      <v-list-item v-for="(item, index) in shownFiles.files" :key="index" link>
+      <v-list-item v-if="!shownFiles">
         <v-list-item-avatar>
-          <v-icon> download</v-icon>
+          <v-icon>clear</v-icon>
         </v-list-item-avatar>
+        <v-list-item-content>
+          <v-list-item-title>No files to show</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+
+      <v-list-item v-for="(file, index) in filesListed" :key="index" link>
+        <v-list-item-avatar>
+          <v-icon>download</v-icon>
+        </v-list-item-avatar>
+        <v-list-item-action>
+          <v-btn icon @click="printFile(file)">
+            <v-icon color="grey darken-1">play_arrow</v-icon>
+          </v-btn>
+        </v-list-item-action>
+
         <v-list-item-icon>
-          <v-icon>{{ item.icon }}</v-icon>
+          <v-icon>{{ file.icon }}</v-icon>
         </v-list-item-icon>
 
         <v-list-item-content>
-          <v-list-item-title>{{ item.name }}</v-list-item-title>
+          <v-list-item-title>{{ file.name }}</v-list-item-title>
         </v-list-item-content>
 
         <v-list-item-action>
-          <v-btn icon @click="deleteFile(item)">
+          <v-btn icon @click="deleteFile(file)">
             <v-icon color="grey lighten-1">delete</v-icon>
           </v-btn>
         </v-list-item-action>
@@ -73,22 +85,26 @@ import { Watch } from "vue-property-decorator";
 import { printersState } from "@/store/printers.state";
 import { Printer } from "@/models/printers/printer.model";
 import { generateInitials } from "@/constants/noun-adjectives.data";
-import { PrinterFilesService } from "@/backend";
-import { PrinterFileCache } from "@/models/printers/printer-file-cache.model";
+import { PrinterFileService } from "@/backend";
 import { PrinterFile } from "@/models/printers/printer-file.model";
+import { PrinterFileBucket } from "@/models/printers/printer-file-bucket.model";
 
 @Component({
   data: () => ({
-    shownFiles: []
+    shownFiles: {}
   })
 })
 export default class SideNavExplorer extends Vue {
   drawerOpened = false;
   loading = true;
-  shownFiles?: PrinterFileCache = undefined;
+  shownFiles?: PrinterFileBucket;
 
   get printerId() {
     return this.storedViewedPrinter?.id;
+  }
+
+  get filesListed() {
+    return this.shownFiles?.files || [];
   }
 
   get storedViewedPrinter() {
@@ -102,10 +118,20 @@ export default class SideNavExplorer extends Vue {
 
     if (!viewedPrinter || !printerId) return;
 
-    if (viewedPrinter.apiAccessibility.accessible) {
-      this.shownFiles = await printersState.loadPrinterFiles({ printerId, recursive: false });
-    } else {
-      this.shownFiles = await PrinterFilesService.getFileCache(printerId);
+    if (!this.shownFiles || viewedPrinter.id !== this.shownFiles.printerId) {
+      if (viewedPrinter.apiAccessibility.accessible) {
+        let fileCache = await printersState.loadPrinterFiles({ printerId, recursive: false });
+        this.shownFiles = {
+          printerId,
+          ...fileCache
+        }
+      } else {
+        const fileCache = await PrinterFileService.getFileCache(printerId);
+        this.shownFiles = {
+          printerId,
+          ...fileCache
+        };
+      }
     }
   }
 
@@ -120,6 +146,16 @@ export default class SideNavExplorer extends Vue {
     if (!this.printerId) return;
 
     await printersState.deletePrinterFile({ printerId: this.printerId, fullPath: file.path });
+  }
+
+  clickStop() {
+    printersState.sendStopJobCommand(this.printerId);
+  }
+
+  async printFile(file: PrinterFile) {
+    if (!this.printerId) return;
+
+    await printersState.selectAndPrintFile({ printerId: this.printerId, fullPath: file.path });
   }
 
   @Watch("drawerOpened")

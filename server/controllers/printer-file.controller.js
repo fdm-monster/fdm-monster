@@ -8,7 +8,8 @@ const {
   getFilesRules,
   getFileRules,
   uploadFilesRules,
-  fileUploadCommandsRules
+  fileUploadCommandsRules,
+  selectPrintFile
 } = require("./validation/printer-files-controller.validation");
 const { ExternalServiceError, ValidationException } = require("../exceptions/runtime.exceptions");
 const HttpStatusCode = require("../constants/http-status-codes.constants");
@@ -99,6 +100,18 @@ class PrinterFileController {
     await this.#filesStore.purgeFiles();
 
     res.send();
+  }
+
+  async selectPrintFile(req, res) {
+    const { id: printerId } = await validateInput(req.params, idRules);
+    const printerLogin = this.#printersStore.getPrinterLogin(printerId);
+
+    const { fullPath: path, location, print } = await validateInput(req.body, selectPrintFile);
+
+    const command = this.#octoPrintApiService.selectCommand(print);
+    await this.#octoPrintApiService.selectPrintFile(printerLogin, path, location, command);
+
+    res.send(Status.success(`Select file (print=${print}) command sent`));
   }
 
   async uploadFiles(req, res) {
@@ -212,11 +225,12 @@ class PrinterFileController {
 module.exports = createController(PrinterFileController)
     .prefix(AppConstants.apiRoute + "/printer-files")
     .before([ensureAuthenticated])
+    .post("/purge", "purgeIndexedFiles")
     .get("/:id", "getFiles")
     .get("/:id/cache", "getFilesCache")
-    .post("/purge", "purgeIndexedFiles")
     .delete("/:id", "deleteFile")
     .post("/:id/upload", "uploadFiles")
+    .post("/:id/select", "selectPrintFile")
     // TODO below
     .post("/file/resync", "resyncFile")
     .post("/file/move", "moveFile")

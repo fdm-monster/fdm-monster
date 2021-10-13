@@ -3,6 +3,12 @@ const getFilesRules = {
   recursive: "required|boolean"
 };
 
+const selectPrintFile = {
+  location: "required|in:local,sdcard",
+  fullPath: "required|string",
+  print: "required|boolean"
+};
+
 const uploadFilesRules = {
   location: "required|in:local,sdcard"
 };
@@ -19,6 +25,7 @@ const fileUploadCommandsRules = {
 
 module.exports = {
   getFilesRules,
+  selectPrintFile,
   uploadFilesRules,
   fileUploadCommandsRules,
   getFileRules

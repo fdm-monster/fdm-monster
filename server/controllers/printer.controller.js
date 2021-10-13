@@ -91,6 +91,12 @@ class PrinterController {
     res.send(Status.success("Disconnect command sent"));
   }
 
+  /**
+   * Cancels the current job irrespective of file
+   * @param req
+   * @param res
+   * @returns {Promise<void>}
+   */
   async stopPrintJob(req, res) {
     const { id: printerId } = await validateInput(req.params, idRules);
 
