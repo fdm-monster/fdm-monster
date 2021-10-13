@@ -77,6 +77,10 @@ class PrintersModule extends VuexModule {
     }
   }
 
+  @Mutation resetSelectedPrinters() {
+    this.selectedPrinters = [];
+  }
+
   @Mutation replacePrinter({ printerId, printer }: { printerId: string; printer: Printer }) {
     const printerIndex = this.printers.findIndex((p: Printer) => p.id === printerId);
 
@@ -231,6 +235,11 @@ class PrintersModule extends VuexModule {
   @Action
   selectPrinter(printer: Printer) {
     this.toggleSelectedPrinter(printer);
+  }
+
+  @Action
+  clearSelectedPrinters() {
+    this.resetSelectedPrinters();
   }
 
   @Action

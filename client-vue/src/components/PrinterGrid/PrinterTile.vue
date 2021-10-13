@@ -1,9 +1,10 @@
 <template>
   <v-card
-    :class="{ 'tile-selected': selected }"
+    :class="{ 'tile-selected': selected, 'tile-setup': printer }"
     class="tile"
     outlined
     tile
+    :disabled="!printer"
     @click="selectPrinter()"
   >
     <v-container v-if="printer">
@@ -35,6 +36,7 @@ export default class PrinterGridTile extends Vue {
   @Prop() loading: boolean;
 
   get selected() {
+    if (!this.printer) return false;
     return printersState.isSelectedPrinter(this.printer?.id);
   }
 
@@ -79,7 +81,7 @@ export default class PrinterGridTile extends Vue {
   border: 1px solid green !important;
 }
 
-.tile:hover {
+.tile-setup:hover{
   border: 1px solid red;
 }
 </style>

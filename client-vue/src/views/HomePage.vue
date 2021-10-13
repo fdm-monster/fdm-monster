@@ -19,6 +19,7 @@
     <v-banner v-focus>
       <strong class="mr-2">Drop one or more files to upload</strong>
       <small class="ml-2">{{ selectedPrinters.length }} printers selected</small>
+      <v-btn small color="primary" class="ml-2" @click="clearSelectedPrinters()">Clear selection</v-btn>
       <v-chip-group>
         <v-chip v-if="selectedPrinters.length === 0">No printers selected</v-chip>
         <v-chip
@@ -32,9 +33,9 @@
       </v-chip-group>
     </v-banner>
 
-    <PrinterGrid class="ma-2"/>
+    <PrinterGrid class="ma-2" />
 
-    <CreatePrinterDialog :show.sync="showDialog" v-on:update:show="onChangeShowDialog($event)"/>
+    <CreatePrinterDialog :show.sync="showDialog" v-on:update:show="onChangeShowDialog($event)" />
   </div>
 </template>
 
@@ -62,6 +63,10 @@ export default class HomePage extends Vue {
 
   deselectPrinter(printer: Printer) {
     printersState.toggleSelectedPrinter(printer);
+  }
+
+  clearSelectedPrinters() {
+    printersState.clearSelectedPrinters();
   }
 
   async createPrinterModal() {
