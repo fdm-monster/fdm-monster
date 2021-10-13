@@ -113,10 +113,14 @@ class PrinterGroupService {
       if (typeof groupName !== "string" || !groupName) continue;
 
       // Check if group already exists by this name
-      const printerIds = printers.map((p) => ({
-        printerId: p._id,
-        location: "?"
-      }));
+      const printerIds = printers.map((p) => {
+          const index = (new URL(p.printerURL).port || 80) - 80;
+          return {
+            printerId: p._id,
+            location: index
+          };
+        }
+      );
       const matchingGroup = existingGroups.find(
         (g) => g.name.toUpperCase() === groupName.toUpperCase()
       );
@@ -124,8 +128,17 @@ class PrinterGroupService {
         matchingGroup.printers = printerIds;
         await PrinterGroupModel.update(matchingGroup);
       } else {
+        let location = { x: -1, y: -1 };
+        if (groupName.includes("_")) {
+          const lastThree = groupName.substr(groupName.length - 3);
+          const y = parseInt(lastThree[2]);
+          const x = parseInt(lastThree[0]);
+          location = { x, y };
+        }
+
         await PrinterGroupModel.create({
           name: groupName,
+          location,
           printers: printerIds
         });
       }
