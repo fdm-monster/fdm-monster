@@ -36,12 +36,27 @@
         <v-col align="right">
           <strong class="mr-2">Drop or select GCODE to print</strong>
           <br />
-          <input ref="fileUpload" accept=".gcode" style="display: none" type="file" />
+          <input
+            ref="fileUpload"
+            :multiple="false"
+            accept=".gcode"
+            style="display: none"
+            type="file"
+            @change="filesSelected()"
+          />
+          <v-chip-group v-if="selectedFile" class="float-end">
+            <v-chip close @click:close="deselectFile()">
+              {{ selectedFile.name }}
+              <strong class="pl-1">{{ formatBytes(selectedFile.size) }}</strong>
+            </v-chip>
+          </v-chip-group>
+          <br />
           <v-btn class="ml-2" color="primary" small @click="$refs.fileUpload.click()">
             Select gcode file
           </v-btn>
-          <br />
-          selected :none
+          <v-btn :disabled="!selectedFile" class="ml-2" color="green" small @click="uploadFile()">
+            Upload gcode file
+          </v-btn>
         </v-col>
       </v-row>
     </v-banner>
@@ -60,24 +75,41 @@ import PrinterGrid from "@/components/PrinterGrid/PrinterGrid.vue";
 import { printersState } from "@/store/printers.state";
 import { Printer } from "@/models/printers/printer.model";
 import { PrintersService } from "@/backend";
+import { formatBytes } from "@/utils/file-size.util";
 
 @Component({
-  data: () => ({}),
-  components: { PrinterGrid, CreatePrinterDialog }
+  components: { PrinterGrid, CreatePrinterDialog },
+  data: () => ({
+    selectedFile: undefined
+  })
 })
 export default class HomePage extends Vue {
   autoPrint = true;
   showDialog = false;
+  formatBytes = formatBytes;
   $refs!: {
     fileUpload: InstanceType<typeof HTMLInputElement>;
   };
+  selectedFile?: File;
 
   get selectedPrinters() {
     return printersState.selectedPrinters;
   }
 
-  created() {
-    setTimeout(() => console.log(this.$refs.fileUpload), 400);
+  uploadFile() {
+    console.log("aplood");
+    // this.
+  }
+
+  deselectFile() {
+    this.$refs.fileUpload.value = "";
+    this.selectedFile = undefined;
+  }
+
+  filesSelected() {
+    if (!this.$refs.fileUpload.files) return (this.selectedFile = undefined);
+
+    this.selectedFile = this.$refs.fileUpload.files[0];
   }
 
   deselectPrinter(printer: Printer) {
