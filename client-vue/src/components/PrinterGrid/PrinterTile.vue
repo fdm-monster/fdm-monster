@@ -10,10 +10,8 @@
     @click="selectPrinter()"
   >
     <v-container v-if="printer">
-      <small>
-        <strong class="small-resized-font">
-          {{ printer.printerName }}
-        </strong>
+      <small class="small-resized-font ml-2">
+        {{ printer.printerName }}
       </small>
       <v-btn class="float-right d-none d-lg-inline" icon @click.prevent.stop="clickInfo()">
         <v-icon>info</v-icon>
@@ -93,6 +91,6 @@ export default class PrinterGridTile extends Vue {
 }
 
 .small-resized-font {
-  font-size: 1.05vw;
+  font-size: clamp(10px, 1vw, 18px);
 }
 </style>
