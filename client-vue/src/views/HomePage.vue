@@ -64,23 +64,27 @@
     <PrinterGrid class="ma-2" />
 
     <CreatePrinterDialog :show.sync="showDialog" v-on:update:show="onChangeShowDialog($event)" />
+
+    <SideNavExplorer :printer="viewedPrinter" />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { Component } from "vue-property-decorator";
+import { Component, Watch } from "vue-property-decorator";
 import CreatePrinterDialog from "@/components/Dialogs/CreatePrinterDialog.vue";
 import PrinterGrid from "@/components/PrinterGrid/PrinterGrid.vue";
 import { printersState } from "@/store/printers.state";
 import { Printer } from "@/models/printers/printer.model";
 import { PrintersService } from "@/backend";
 import { formatBytes } from "@/utils/file-size.util";
+import SideNavExplorer from "@/components/Generic/SideNavExplorer.vue";
 
 @Component({
-  components: { PrinterGrid, CreatePrinterDialog },
+  components: { PrinterGrid, SideNavExplorer, CreatePrinterDialog },
   data: () => ({
-    selectedFile: undefined
+    selectedFile: undefined,
+    viewedPrinter: undefined
   })
 })
 export default class HomePage extends Vue {
@@ -97,8 +101,8 @@ export default class HomePage extends Vue {
   }
 
   uploadFile() {
+    // TODO upload file from banner
     console.log("aplood");
-    // this.
   }
 
   deselectFile() {

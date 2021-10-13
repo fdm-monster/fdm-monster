@@ -11,7 +11,7 @@
   >
     <v-container v-if="printer">
       <small>
-        <strong style="font-size: 0.8vw">
+        <strong class="small-resized-font">
           {{ printer.printerName }}
         </strong>
       </small>
@@ -60,7 +60,7 @@ export default class PrinterGridTile extends Vue {
   }
 
   clickInfo() {
-    console.log("info");
+    printersState.setViewedPrinter(this.printer);
   }
 
   clickStop() {
@@ -90,5 +90,9 @@ export default class PrinterGridTile extends Vue {
 
 .tile-selected {
   border: 1px solid green !important;
+}
+
+.small-resized-font {
+  font-size: 1.05vw;
 }
 </style>

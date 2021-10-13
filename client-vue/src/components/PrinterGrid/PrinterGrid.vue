@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-row v-for="y in rows" :key="y" class="m-0" no-gutters>
+    <v-row v-for="y in rows" :key="y" class="ma-1" no-gutters>
       <v-col v-for="x in columns" :key="x" :cols="4" :sm="4">
         <v-row class="test-top" no-gutters>
           <v-col cols="6">
@@ -129,11 +129,11 @@ export default class PrinterGrid extends Vue {
 <style>
 .test-bottom {
   border: 1px solid transparent;
-  margin: 0 10px 10px 10px !important;
+  margin: 0 20px 10px 20px !important;
 }
 
 .test-top {
   border: 1px solid transparent;
-  margin: 0 10px 0 10px !important;
+  margin: 0 20px 0 20px !important;
 }
 </style>

@@ -20,7 +20,12 @@ class PrintersModule extends VuexModule {
   printerGroups: PrinterGroup[] = [];
   lastUpdated?: number = undefined;
 
+  viewedPrinter?: Printer = undefined;
   selectedPrinters: Printer[] = [];
+
+  get currentViewedPrinter() {
+    return this.viewedPrinter;
+  }
 
   get printer() {
     return (printerId: string) => this.printers.find((p: Printer) => p.id === printerId);
@@ -79,6 +84,10 @@ class PrintersModule extends VuexModule {
 
   @Mutation resetSelectedPrinters() {
     this.selectedPrinters = [];
+  }
+
+  @Mutation _setViewedPrinter(printer?: Printer) {
+    this.viewedPrinter = printer;
   }
 
   @Mutation replacePrinter({ printerId, printer }: { printerId: string; printer: Printer }) {
@@ -158,9 +167,9 @@ class PrintersModule extends VuexModule {
 
   @Action
   async updatePrinter({
-    printerId,
-    updatedPrinter
-  }: {
+                        printerId,
+                        updatedPrinter
+                      }: {
     printerId: string;
     updatedPrinter: CreatePrinter;
   }) {
@@ -214,10 +223,10 @@ class PrintersModule extends VuexModule {
 
   @Action
   async dropUploadPrinterFile({
-    printerId,
-    files,
-    commands
-  }: {
+                                printerId,
+                                files,
+                                commands
+                              }: {
     printerId: string;
     files: FileList;
     commands?: FileUploadCommands;
@@ -246,7 +255,12 @@ class PrintersModule extends VuexModule {
       }
     }
   }
-  
+
+  @Action
+  setViewedPrinter(printer?: Printer) {
+    this._setViewedPrinter(printer);
+  }
+
   @Action
   selectPrinter(printer: Printer) {
     this.toggleSelectedPrinter(printer);
