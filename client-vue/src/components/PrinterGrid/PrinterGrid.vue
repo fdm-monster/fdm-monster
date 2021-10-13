@@ -4,18 +4,18 @@
       <v-col v-for="x in columns" :key="x" :cols="4" :sm="4">
         <v-row class="test-top" no-gutters>
           <v-col cols="6">
-            <PrinterGridTile :printer="getPrinter(x - 1, y - 1, 0)" index="1" />
+            <PrinterGridTile :printer="getPrinter(x, y, 3)" />
           </v-col>
           <v-col cols="6">
-            <PrinterGridTile :printer="getPrinter(x - 1, y - 1, 1)" index="2" />
+            <PrinterGridTile :printer="getPrinter(x, y, 1)" />
           </v-col>
         </v-row>
         <v-row class="test-bottom" no-gutters>
           <v-col cols="6">
-            <PrinterGridTile :printer="getPrinter(x - 1, y - 1, 2)" index="3" />
+            <PrinterGridTile :printer="getPrinter(x, y, 2)" />
           </v-col>
           <v-col cols="6">
-            <PrinterGridTile :printer="getPrinter(x - 1, y - 1, 3)" index="4" />
+            <PrinterGridTile :printer="getPrinter(x, y, 0)" />
           </v-col>
         </v-row>
       </v-col>
@@ -73,7 +73,10 @@ export default class PrinterGrid extends Vue {
     this.updateGridMatrix();
   }
 
-  getPrinter(x: number, y: number, index: number) {
+  getPrinter(col: number, row: number, index: number) {
+    const x = col - 1;
+    const y = this.rows - row;
+
     if (!this.groupMatrix?.length || !this.groupMatrix[x]) return;
     const group = this.groupMatrix[x][y];
     if (!group) return;
