@@ -5,6 +5,7 @@
     loading="true"
     right
     temporary
+    width="500"
     @close="closeDrawer()"
   >
     <v-icon>loading</v-icon>
@@ -13,15 +14,24 @@
         {{ avatarInitials() }}
       </v-list-item-avatar>
       <v-list-item-content v-if="storedViewedPrinter">
-        <v-list-item-title>{{ storedViewedPrinter.printerName }}</v-list-item-title>
-        <v-list-item-subtitle>Viewing printer files</v-list-item-subtitle>
+        <v-list-item-title>{{ storedViewedPrinter.printerName }} PRINTER ONLINE</v-list-item-title>
+        <v-list-item-subtitle>Viewing printer files (LIVE)</v-list-item-subtitle>
       </v-list-item-content>
     </v-list-item>
 
     <v-divider></v-divider>
 
-    <v-list dense>
+    <v-list dense
+            subheader
+            two-line>
+      <v-subheader inset>Files</v-subheader>
+
       <v-list-item v-for="(item, index) in shownFiles.files" :key="index" link>
+        <v-list-item-avatar>
+          <v-icon>
+            download
+          </v-icon>
+        </v-list-item-avatar>
         <v-list-item-icon>
           <v-icon>{{ item.icon }}</v-icon>
         </v-list-item-icon>
@@ -29,6 +39,12 @@
         <v-list-item-content>
           <v-list-item-title>{{ item.name }}</v-list-item-title>
         </v-list-item-content>
+
+        <v-list-item-action>
+          <v-btn icon @click="deleteFile(item)">
+            <v-icon color="grey lighten-1">delete</v-icon>
+          </v-btn>
+        </v-list-item-action>
       </v-list-item>
     </v-list>
   </v-navigation-drawer>
@@ -43,6 +59,7 @@ import { Printer } from "@/models/printers/printer.model";
 import { generateInitials } from "@/constants/noun-adjectives.data";
 import { PrinterFilesService } from "@/backend";
 import { PrinterFileCache } from "@/models/printers/printer-file-cache.model";
+import { PrinterFile } from "@/models/printers/printer-file.model";
 
 @Component({
   data: () => ({
@@ -54,6 +71,10 @@ export default class SideNavExplorer extends Vue {
   drawerOpened = false;
   loading = true;
   shownFiles?: PrinterFileCache = undefined;
+
+  get printerId() {
+    return this.storedViewedPrinter?.id;
+  }
 
   get storedViewedPrinter() {
     return printersState.currentViewedPrinter;
@@ -78,6 +99,12 @@ export default class SideNavExplorer extends Vue {
     if (viewedPrinter && this.drawerOpened) {
       return generateInitials(viewedPrinter.printerName);
     }
+  }
+
+  async deleteFile(file: PrinterFile) {
+    if (!this.printerId) return;
+
+    await printersState.deletePrinterFile({ printerId: this.printerId, fullPath: file.path });
   }
 
   closeDrawer() {
