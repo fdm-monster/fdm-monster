@@ -2,7 +2,6 @@ jest.mock("../../../server/services/octoprint/octoprint-api.service");
 const dbHandler = require("../../db-handler");
 const DITokens = require("../../../server/container.tokens");
 const { configureContainer } = require("../../../server/container");
-const { getSystemChecksDefault } = require("../../../server/constants/state.constants");
 const { ensureSystemSettingsInitiated } = require("../../../server/app-core");
 const { ValidationException } = require("../../../server/exceptions/runtime.exceptions");
 
@@ -112,7 +111,6 @@ describe("PrintersStore", () => {
         colour: expect.any(String) // ?
       },
       stepSize: expect.any(Number),
-      systemChecks: getSystemChecksDefault(),
       alerts: null
     });
   });

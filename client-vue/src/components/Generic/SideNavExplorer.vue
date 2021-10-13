@@ -9,12 +9,12 @@
   >
     <v-icon>loading</v-icon>
     <v-list-item>
-      <v-list-item-avatar>
-        <v-img src="https://randomuser.me/api/portraits/men/78.jpg"></v-img>
+      <v-list-item-avatar color="primary">
+        {{ avatarInitials() }}
       </v-list-item-avatar>
-
       <v-list-item-content v-if="storedViewedPrinter">
         <v-list-item-title>{{ storedViewedPrinter.printerName }}</v-list-item-title>
+        <v-list-item-subtitle>Viewing printer files</v-list-item-subtitle>
       </v-list-item-content>
     </v-list-item>
 
@@ -40,6 +40,7 @@ import Component from "vue-class-component";
 import { Watch } from "vue-property-decorator";
 import { printersState } from "@/store/printers.state";
 import { Printer } from "@/models/printers/printer.model";
+import { generateInitials } from "@/constants/noun-adjectives.data";
 
 @Component({
   data() {
@@ -54,7 +55,7 @@ import { Printer } from "@/models/printers/printer.model";
 })
 export default class SideNavExplorer extends Vue {
   drawerOpened = false;
-  loading=true;
+  loading = true;
 
   get storedViewedPrinter() {
     return printersState.currentViewedPrinter;
@@ -68,7 +69,14 @@ export default class SideNavExplorer extends Vue {
 
     const printerId = newVal.id;
     console.log(newVal.hostState);
-    await printersState.loadPrinterFiles({ printerId, recursive: false });
+    // await printersState.loadPrinterFiles({ printerId, recursive: false });
+  }
+
+  avatarInitials() {
+    const viewedPrinter = this.storedViewedPrinter;
+    if (viewedPrinter && this.drawerOpened) {
+      return generateInitials(viewedPrinter.printerName);
+    }
   }
 
   closeDrawer() {

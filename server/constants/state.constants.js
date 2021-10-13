@@ -22,47 +22,6 @@ const ERR_COUNT = {
   missingSessionKey: "missingSessionKey"
 };
 
-const SYSTEM_CHECKS = {
-  api: "api",
-  files: "files",
-  state: "state",
-  profile: "profile",
-  settings: "settings",
-  system: "system"
-
-  //Special
-  // cleaning: "cleaning"
-};
-
-const getSystemChecksDefault = () => {
-  return {
-    [SYSTEM_CHECKS.api]: {
-      status: "success", //"danger",
-      date: null
-    },
-    [SYSTEM_CHECKS.files]: {
-      status: "success", //"danger",
-      date: null
-    },
-    [SYSTEM_CHECKS.state]: {
-      status: "success", //"danger",
-      date: null
-    },
-    [SYSTEM_CHECKS.profile]: {
-      status: "success", //"danger",
-      date: null
-    },
-    [SYSTEM_CHECKS.settings]: {
-      status: "success", //"danger",
-      date: null
-    },
-    [SYSTEM_CHECKS.system]: {
-      status: "success", //"danger",
-      date: null
-    }
-  };
-};
-
 // State category
 const CATEGORY = {
   Idle: "Idle",
@@ -297,7 +256,6 @@ const mapStateToColor = (state) => {
 };
 
 module.exports = {
-  getSystemChecksDefault,
   getFilterDefaults,
   mapStateToColor,
   remapOctoPrintState,
@@ -305,6 +263,5 @@ module.exports = {
   MESSAGE,
   PSTATE,
   OP_STATE,
-  CATEGORY,
-  SYSTEM_CHECKS
+  CATEGORY
 };

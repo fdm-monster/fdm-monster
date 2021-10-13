@@ -15,7 +15,6 @@ class PrintersStore {
 
   #printerStates;
   #testPrinterState;
-  #farmPrintersGroups;
   #logger = new Logger("Server-PrintersStore");
 
   constructor({
@@ -30,9 +29,6 @@ class PrintersStore {
     this.#printerTickerStore = printerTickerStore;
     this.#printerStateFactory = printerStateFactory;
     this.#eventEmitter2 = eventEmitter2;
-
-    // Store collections
-    this.#farmPrintersGroups = [];
   }
 
   _validateState() {
@@ -162,7 +158,6 @@ class PrintersStore {
     }
 
     this.#logger.info(`Loaded ${this.#printerStates.length} printer states`);
-    this.generatePrinterGroups();
   }
 
   async deleteTestPrinter() {
@@ -188,24 +183,6 @@ class PrintersStore {
     await this.#printerService.delete(printerId);
 
     return printerEntity;
-  }
-
-  generatePrinterGroups() {
-    this._validateState();
-
-    this.#farmPrintersGroups = getFilterDefaults();
-
-    this.#printerStates.forEach((printer) => {
-      if (!this.#farmPrintersGroups.includes(`Group: ${printer.group}`)) {
-        if (!_.isEmpty(printer.group)) {
-          this.#farmPrintersGroups.push(`Group: ${printer.group}`);
-        }
-      }
-    });
-  }
-
-  getPrinterGroups() {
-    return Object.freeze([...this.#farmPrintersGroups]);
   }
 
   async updateSortIndex(identifierList) {

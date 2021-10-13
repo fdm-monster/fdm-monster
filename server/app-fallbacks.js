@@ -1,6 +1,5 @@
 const express = require("express");
 const session = require("express-session");
-const flash = require("connect-flash");
 const { AppConstants } = require("./app.constants");
 const dotenv = require("dotenv");
 const path = require("path");
@@ -21,7 +20,6 @@ function setupFallbackExpressServer() {
   const viewsPath = path.join(__dirname, "./views");
   app.set("views", viewsPath);
   app.set("view engine", "ejs");
-  app.use(expressLayouts);
   app.use(express.static(viewsPath));
   app.use("/images", express.static("./images"));
   app.use(express.urlencoded({ extended: false }));
@@ -32,13 +30,6 @@ function setupFallbackExpressServer() {
       saveUninitialized: true
     })
   );
-  app.use(flash());
-  app.use((req, res, next) => {
-    res.locals.success_msg = req.flash("success_msg");
-    res.locals.error_msg = req.flash("error_msg");
-    res.locals.error = req.flash("error");
-    next();
-  });
 
   return app;
 }
