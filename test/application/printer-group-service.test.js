@@ -57,7 +57,7 @@ describe("printerGroup ", () => {
     expect(groups).toHaveLength(1);
     expect(groups[0].printers[0]).toMatchObject({
       printerId: createdPrinter._id,
-      location: "?"
+      location: "0"
     });
     expect(groups.errors).toBeFalsy();
   });
@@ -91,7 +91,7 @@ describe("printerGroup ", () => {
     expect(groups[1].printers).toHaveLength(1);
     expect(groups[0].printers[0]).toMatchObject({
       printerId: createdPrinter._id,
-      location: "?"
+      location: "0"
     });
     expect(groups.errors).toBeFalsy();
   });

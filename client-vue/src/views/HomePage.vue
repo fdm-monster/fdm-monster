@@ -19,9 +19,7 @@
     <v-banner v-drop-upload>
       <v-row>
         <v-col>
-          <v-btn class="ml-2" color="secondary" small @click="clearSelectedPrinters()">
-            Clear selection
-          </v-btn>
+          <v-btn color="secondary" small @click="clearSelectedPrinters()"> Clear selection</v-btn>
           <v-chip-group>
             <v-chip v-if="selectedPrinters.length === 0">No printers selected</v-chip>
             <v-chip
@@ -36,11 +34,14 @@
           </v-chip-group>
         </v-col>
         <v-col align="right">
-          <strong class="mr-2">Drop a file to upload</strong>
-          <input ref="file" accept=".gcode" style="display: none" type="file" />
-          <v-btn class="ml-2" color="primary" small @click="$refs.file.click()">
+          <strong class="mr-2">Drop or select GCODE to print</strong>
+          <br />
+          <input ref="fileUpload" accept=".gcode" style="display: none" type="file" />
+          <v-btn class="ml-2" color="primary" small @click="$refs.fileUpload.click()">
             Select gcode file
           </v-btn>
+          <br />
+          selected :none
         </v-col>
       </v-row>
     </v-banner>
@@ -67,9 +68,16 @@ import { PrintersService } from "@/backend";
 export default class HomePage extends Vue {
   autoPrint = true;
   showDialog = false;
+  $refs!: {
+    fileUpload: InstanceType<typeof HTMLInputElement>;
+  };
 
   get selectedPrinters() {
     return printersState.selectedPrinters;
+  }
+
+  created() {
+    setTimeout(() => console.log(this.$refs.fileUpload), 400);
   }
 
   deselectPrinter(printer: Printer) {
