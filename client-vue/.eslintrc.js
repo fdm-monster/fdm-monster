@@ -21,7 +21,8 @@ module.exports = {
     "no-unreachable": isProduction ? "warn" : "off",
     "@typescript-eslint/no-explicit-any": isProduction ? "warn" : "off",
     "@typescript-eslint/explicit-module-boundary-types": isProduction ? "warn" : "off",
-    "@typescript-eslint/no-empty-function": isProduction ? "warn" : "off"
+    "@typescript-eslint/no-empty-function": isProduction ? "warn" : "off",
+    "@typescript-eslint/no-inferrable-types": "off"
   },
   overrides: [
     {

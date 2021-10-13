@@ -1,21 +1,21 @@
 <template>
   <div>
-    <v-row v-for="y in rows" :key="y" class="m-0" no-gutters>
+    <v-row v-for="y in rows" :key="y" class="ma-1" no-gutters>
       <v-col v-for="x in columns" :key="x" :cols="4" :sm="4">
         <v-row class="test-top" no-gutters>
           <v-col cols="6">
-            <PrinterGridTile :printer="getPrinter(x - 1, y - 1, 0)" index="1" />
+            <PrinterGridTile :printer="getPrinter(x, y, 3)" :loading="loading" />
           </v-col>
           <v-col cols="6">
-            <PrinterGridTile :printer="getPrinter(x - 1, y - 1, 1)" index="2" />
+            <PrinterGridTile :printer="getPrinter(x, y, 1)" :loading="loading" />
           </v-col>
         </v-row>
         <v-row class="test-bottom" no-gutters>
           <v-col cols="6">
-            <PrinterGridTile :printer="getPrinter(x - 1, y - 1, 2)" index="3" />
+            <PrinterGridTile :printer="getPrinter(x, y, 2)" :loading="loading" />
           </v-col>
           <v-col cols="6">
-            <PrinterGridTile :printer="getPrinter(x - 1, y - 1, 3)" index="4" />
+            <PrinterGridTile :printer="getPrinter(x, y, 0)" :loading="loading" />
           </v-col>
         </v-row>
       </v-col>
@@ -48,6 +48,7 @@ import { columnCount, rowCount } from "@/constants/printer-grid.constants";
 export default class PrinterGrid extends Vue {
   showDialog = false;
   selectedPrinterId?: string = "";
+  loading = true;
 
   // Translation value from 12 cols => 12/x
   columnWidth = 4;
@@ -69,11 +70,15 @@ export default class PrinterGrid extends Vue {
     this.calculateGrid();
     await printersState.loadPrinters();
     await printersState.loadPrinterGroups();
+    this.loading = false;
 
     this.updateGridMatrix();
   }
 
-  getPrinter(x: number, y: number, index: number) {
+  getPrinter(col: number, row: number, index: number) {
+    const x = col - 1;
+    const y = this.rows - row;
+
     if (!this.groupMatrix?.length || !this.groupMatrix[x]) return;
     const group = this.groupMatrix[x][y];
     if (!group) return;
@@ -124,11 +129,11 @@ export default class PrinterGrid extends Vue {
 <style>
 .test-bottom {
   border: 1px solid transparent;
-  margin: 0 10px 10px 10px !important;
+  margin: 0 20px 10px 20px !important;
 }
 
 .test-top {
   border: 1px solid transparent;
-  margin: 0 10px 0 10px !important;
+  margin: 0 20px 0 20px !important;
 }
 </style>

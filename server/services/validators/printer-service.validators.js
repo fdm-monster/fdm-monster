@@ -1,6 +1,7 @@
 const { UUID_LENGTH } = require("../../constants/service.constants");
 
 const createPrinterRules = {
+  _id: "not",
   apiKey: `required|length:${UUID_LENGTH},${UUID_LENGTH}|alphaNumeric`,
   printerURL: "required|httpurl",
   webSocketURL: "required|wsurl",

@@ -1,4 +1,3 @@
-const JobsCache = require("./data/jobs.cache");
 const {
   getCurrentProfileDefault
 } = require("../services/octoprint/constants/octoprint-service.constants");
@@ -8,13 +7,7 @@ const {
   WS_STATE,
   EVENT_TYPES
 } = require("../services/octoprint/constants/octoprint-websocket.constants");
-const {
-  getSystemChecksDefault,
-  mapStateToColor,
-  PSTATE,
-  SYSTEM_CHECKS,
-  MESSAGE
-} = require("../constants/state.constants");
+const { mapStateToColor, PSTATE, MESSAGE } = require("../constants/state.constants");
 const Logger = require("../handlers/logger.js");
 
 /**
@@ -27,6 +20,7 @@ class PrinterState {
 
   #hostState = {
     state: PSTATE.Offline,
+    flags: {},
     colour: mapStateToColor(PSTATE.Offline),
     desc: "Setting up your Printer"
   };
@@ -39,7 +33,6 @@ class PrinterState {
   #sessionKey;
 
   #stepSize = 10; // 0.1, 1, 10 or 100
-  #systemChecks = getSystemChecksDefault();
   #alerts = null;
 
   #entityData;
@@ -110,9 +103,6 @@ class PrinterState {
    * @param reconnect if true this will reconnect the client and WebSocket connection
    */
   updateEntityData(printerDocument, reconnect = false) {
-    // TODO compare old and new for checking if a reconnect is in order
-    // const { printerURL, webSocketURL } = this?.#entityData;
-
     this.#entityData = Object.freeze({
       ...printerDocument._doc
     });
@@ -129,56 +119,18 @@ class PrinterState {
 
     // This fetches the job saved by this instance
     let flatJob = this.#jobsCache.getPrinterJobFlat(this.#id);
-    // This is formed this way to move this calculation client side
-    const costSettings = this.#entityData.costSettings;
-    if (flatJob) {
-      flatJob.expectedFilamentCosts = [
-        {
-          toolName: "Tool ABC",
-          spoolName: null,
-          spoolId: null,
-          volume: null,
-          length: null,
-          weight: null,
-          cost: null,
-          type: null
-        }
-      ];
-      flatJob.expectedTotals = {
-        totalCost: 0,
-        totalVolume: 0,
-        totalLength: 0,
-        totalWeight: 0,
-        spoolCost: 0
-      };
-    }
-
-    // SelectedFilament => go to filament store or filament cache
-    // TODO selectedFilament should not be passed, instead the result of getSpool should be passed to this function as argument
-    // flatJob.expectedFilamentCosts = getSpool(
-    //   selectedFilament,
-    //   printerJob,
-    //   true,
-    //   printerJob.estimatedPrintTime
-    // );
-
-    flatJob = JobsCache.postProcessJob(flatJob, costSettings);
-
-    // TODO call files store for thumb
-    // const foundFile = _.find(printerState.getFileList().files, (o) => {
-    //   return o.name === printerJob.file.name;
-    // });
-    // if (!!foundFile) {
-    //   currentJob.thumbnail = foundFile.thumbnail;
-    // }
 
     const identification = this.isTest
-      ? { correlationToken: this.#entityData.correlationToken, isTest: this.isTest }
+      ? {
+          correlationToken: this.#entityData.correlationToken,
+          isTest: this.isTest
+        }
       : { id: this.#id };
 
     return Object.freeze({
       ...identification,
       printerState: this.getPrinterState(),
+      apiAccessibility: this.#apiAccessibility,
       hostState: this.#hostState,
       webSocketState: convertedWSState,
 
@@ -197,14 +149,11 @@ class PrinterState {
         printerProfiles: [],
         printerProfilePreference: "_default"
       },
-      // TODO this should not decide client 'Printer' column (octoPrintSystemInfo)
-      // TODO this crashes mon
       currentProfile: this.#currentProfile,
       octoPrintSystemInfo: this.#octoPrintSystemInfo,
       corsCheck: true,
       display: true, // TODO causes monitoring to show it. But it is not a proper place
       stepSize: this.#stepSize,
-      systemChecks: this.#systemChecks, // TODO remove
       alerts: this.#alerts,
       otherSettings: {
         temperatureTriggers: this.#entityData.tempTriggers,
@@ -212,7 +161,7 @@ class PrinterState {
           commands: {}
         },
         webCamSettings: {}
-      }, //? temperatureTriggers + webcamSettings
+      },
       octoPi: {
         version: "sure",
         model: "American Pi"
@@ -228,10 +177,6 @@ class PrinterState {
           }
         }
       ],
-
-      // Related document query - cached from db
-      groups: [],
-
       // Unmapped data - comes from database model so would be nicer to make a child object
       gcodeScripts: {},
       octoPrintVersion: this.getOctoPrintVersion(),
@@ -457,19 +402,6 @@ class PrinterState {
     }
   }
 
-  getSystemChecks() {
-    // Rare case
-    if (!this.#systemChecks)
-      throw new Error("systemChecks property was undefined, something which is unexpected.");
-
-    return this.#systemChecks;
-  }
-
-  resetSystemChecksState() {
-    // TODO this also resets cleaner state... we should move that state elsewhere
-    this.#systemChecks = getSystemChecksDefault();
-  }
-
   setApiLoginSuccessState(sessionUser, sessionKey) {
     this.#sessionUser = sessionUser;
     this.#sessionKey = sessionKey;
@@ -522,105 +454,6 @@ class PrinterState {
   resetApiAccessibility() {
     this.setApiAccessibility(true, true, null);
   }
-
-  setApiSuccessState(success = true) {
-    this.setSystemCheck(SYSTEM_CHECKS.api, success);
-  }
-
-  setFilesSuccessState(success = true) {
-    this.setSystemCheck(SYSTEM_CHECKS.files, success);
-  }
-
-  setSystemSuccessState(success = true) {
-    this.setSystemCheck(SYSTEM_CHECKS.system, success);
-  }
-
-  resetSystemCheck(name) {
-    this.#systemChecks[name].status = "warning";
-    this.#systemChecks[name].date = null;
-  }
-
-  setSystemCheck(name, success) {
-    this.#systemChecks[name].status = success ? "success" : "danger";
-    this.#systemChecks[name].date = new Date();
-  }
 }
 
 module.exports = PrinterState;
-
-// From printerclean
-//       groups: [], // TODO unfinished feature
-//       systemChecks: farmPrinter.systemChecks,
-//       corsCheck: farmPrinter.corsCheck,
-//       octoPrintUpdate: farmPrinter.octoPrintUpdate,
-//       octoPrintPluginUpdates: farmPrinter.octoPrintPluginUpdates,
-//       display: true,
-//       order: farmPrinter.sortIndex,
-//     if (!farmPrinter.resends) {
-//       sortedPrinter.resends = farmPrinter.resends;
-//     }
-//     sortedPrinter.tools = PrinterClean.sortTemps(farmPrinter.temps);
-//     sortedPrinter.currentJob = JobClean.getCleanJobAtIndex(farmPrinter.sortIndex);
-//     sortedPrinter.selectedFilament = farmPrinter.selectedFilament;
-//
-//     sortedPrinter.fileList = FileClean.returnFiles(farmPrinter.sortIndex);
-//     sortedPrinter.currentProfile = PrinterClean.sortProfile(
-//       farmPrinter.profiles,
-//       farmPrinter.current
-//     );
-//     sortedPrinter.currentConnection = PrinterClean.sortConnection(farmPrinter.current);
-//     sortedPrinter.connectionOptions = farmPrinter.options;
-//     if (
-//       !!sortedPrinter?.connectionOptions?.ports &&
-//       !sortedPrinter.connectionOptions.ports.includes("AUTO")
-//     ) {
-//       sortedPrinter.connectionOptions.baudrates.unshift(0);
-//       sortedPrinter.connectionOptions.ports.unshift("AUTO");
-//     }
-//     sortedPrinter.terminal = PrinterClean.sortTerminal(farmPrinter.sortIndex, farmPrinter.logs);
-//     sortedPrinter.costSettings = farmPrinter.costSettings;
-//     sortedPrinter.powerSettings = farmPrinter.powerSettings;
-//     sortedPrinter.gcodeScripts = PrinterClean.sortGCODE(farmPrinter.settingsScripts);
-//     sortedPrinter.otherSettings = PrinterClean.sortOtherSettings(
-//       farmPrinter.tempTriggers,
-//       farmPrinter.settingsWebcam,
-//       farmPrinter.settingsServer
-//     );
-//     sortedPrinter.printerName = PrinterClean.grabPrinterName(farmPrinter);
-//     sortedPrinter.storage = farmPrinter.storage;
-//     sortedPrinter.tempHistory = farmPrinter.tempHistory;
-//
-//     if (typeof farmPrinter.octoPi !== "undefined") {
-//       sortedPrinter.octoPi = farmPrinter.octoPi;
-//     }
-//     sortedPrinter.connectionLog = this.#printerConnectionLogs[farmPrinter.sortIndex];
-//     if (typeof farmPrinter.klipperFirmwareVersion !== "undefined") {
-//       sortedPrinter.klipperFirmwareVersion = farmPrinter.klipperFirmwareVersion.substring(0, 6);
-//     }
-
-// async sortConnection(current) {
-//   if (!current) return null;
-//   return {
-//     baudrate: current.baudrate,
-//     port: current.port,
-//     printerProfile: current.printerProfile
-//   };
-// }
-
-// static sortOtherSettings(temp, webcam, system) {
-//   const otherSettings = {
-//     temperatureTriggers: null,
-//     webCamSettings: null
-//   };
-//   if (typeof temp !== "undefined") {
-//     otherSettings.temperatureTriggers = temp;
-//   }
-//   if (typeof webcam !== "undefined") {
-//     otherSettings.webCamSettings = webcam;
-//   }
-//   if (typeof system !== "undefined") {
-//     otherSettings.system = system;
-//   }
-//
-//   return otherSettings;
-// }

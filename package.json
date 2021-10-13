@@ -42,7 +42,6 @@
     "awilix-express": "^5.0.0",
     "axios": "^0.22.0",
     "bcryptjs": "^2.4.3",
-    "connect-flash": "^0.1.1",
     "connect-history-api-fallback": "^1.6.0",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
@@ -74,7 +73,6 @@
     "simple-git": "^2.46.0",
     "systeminformation": "^5.9.4",
     "toad-scheduler": "^1.5.0",
-    "wake_on_lan": "^1.0.0",
     "winston": "^3.3.3",
     "ws": "^8.2.3",
     "xml2js": "^0.4.23"

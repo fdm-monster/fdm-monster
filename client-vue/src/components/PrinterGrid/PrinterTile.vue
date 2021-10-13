@@ -1,17 +1,22 @@
 <template>
   <v-card
+    v-drop-upload="{ printer }"
+    :class="{ 'tile-selected': selected, 'tile-setup': printer }"
+    :disabled="!printer"
+    :style="{ 'background-color': printerStateColor }"
     class="tile"
-    :class="{ 'tile-selected': selected }"
     outlined
     tile
     @click="selectPrinter()"
   >
     <v-container v-if="printer">
-      {{ printer.printerName }}
+      <small class="small-resized-font ml-2">
+        {{ printer.printerName }}
+      </small>
       <v-btn class="float-right" icon @click.prevent.stop="clickInfo()">
         <v-icon>info</v-icon>
       </v-btn>
-      <v-btn class="float-right" icon @click.prevent.stop="clickStop()">
+      <v-btn class="float-right d-none d-lg-inline" icon @click.prevent.stop="clickStop()">
         <v-icon>stop</v-icon>
       </v-btn>
     </v-container>
@@ -28,10 +33,11 @@ import { Printer } from "@/models/printers/printer.model";
   components: {}
 })
 export default class PrinterGridTile extends Vue {
-  @Prop() index: number;
   @Prop() printer: Printer;
+  @Prop() loading: boolean;
 
   get selected() {
+    if (!this.printer) return false;
     return printersState.isSelectedPrinter(this.printer?.id);
   }
 
@@ -39,8 +45,12 @@ export default class PrinterGridTile extends Vue {
     return printersState.printers;
   }
 
+  get printerStateColor() {
+    return this.printer?.printerState.colour.hex || "rgba(0,0,0,0)";
+  }
+
   id() {
-    return this.printer?.printerName || this.index;
+    return this.printer?.printerName;
   }
 
   getTileClass() {
@@ -48,11 +58,11 @@ export default class PrinterGridTile extends Vue {
   }
 
   clickInfo() {
-    console.log("info");
+    printersState.setViewedPrinter(this.printer);
   }
 
   clickStop() {
-    console.log("stop");
+    printersState.sendStopJobCommand(this.printer.id);
   }
 
   selectPrinter() {
@@ -65,18 +75,22 @@ export default class PrinterGridTile extends Vue {
 
 <style>
 .tile {
-  min-height: 80px;
+  min-height: 75px;
   -webkit-user-select: none; /* Safari */
   -moz-user-select: none; /* Firefox */
   -ms-user-select: none; /* IE10+/Edge */
   user-select: none; /* Standard */
 }
 
+.tile-setup:hover {
+  border: 1px solid red !important;
+}
+
 .tile-selected {
   border: 1px solid green !important;
 }
 
-.tile:hover {
-  border: 1px solid red;
+.small-resized-font {
+  font-size: clamp(10px, 1vw, 18px);
 }
 </style>

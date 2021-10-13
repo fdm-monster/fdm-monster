@@ -21,42 +21,6 @@ class JobsCache {
     this.#eventEmitter2 = eventEmitter2;
   }
 
-  /**
-   * Apply patch to flattened job to provide legacy client with known model
-   * @param flatJob
-   * @param costSettings
-   * @returns {*}
-   */
-  static postProcessJob(flatJob, costSettings) {
-    if (!flatJob) return;
-
-    flatJob.expectedPrinterCosts = getPrintCostNumeric(
-      flatJob.estimatedPrintTime,
-      costSettings
-    )?.toFixed(2);
-
-    // Job should match this shape now
-    // return {
-    //   progress: 0,
-    //   fileName: "No File Selected",
-    //   fileDisplay: "No File Selected",
-    //   filePath: "No File Selected",
-    //   averagePrintTime: null,
-    //   lastPrintTime: null,
-    //   expectedPrintTime: null,
-    //   currentZ: null, // Optional
-    //   printTimeRemaining: null,
-    //   printTimeElapsed: null, // Progress
-    //   expectedCompletionDate: null,
-    //   expectedPrinterCosts: null,
-    // TODO:
-    //   expectedFilamentCosts: null,
-    //   expectedTotals: null,
-    //   thumbnail: null
-    // };
-    return flatJob;
-  }
-
   getPrinterJob(printerId) {
     if (!printerId) {
       throw new Error("Job Cache cant get a null/undefined printer id");

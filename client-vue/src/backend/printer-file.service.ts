@@ -1,14 +1,36 @@
 import { BaseService } from "@/backend/base.service";
 import { ServerApi } from "@/backend/server.api";
-import { PrinterFile } from "@/models/printers/printer-file.model";
 import { FileLocation } from "@/models/api/octoprint.definition";
 import { FileUploadCommands } from "@/models/printers/file-upload-commands.model";
+import { PrinterFileCache } from "@/models/printers/printer-file-cache.model";
+import { PrinterFile } from "@/models/printers/printer-file.model";
 
-export class PrinterFilesService extends BaseService {
+export class PrinterFileService extends BaseService {
   static async getFiles(printerId: string, recursive = false, location: FileLocation = "local") {
     const path = `${ServerApi.printerFilesRoute}/${printerId}/?location=${location}&recursive=${recursive}`;
 
-    return (await this.getApi(path)) as PrinterFile[];
+    return (await this.getApi(path)) as PrinterFileCache;
+  }
+
+  /**
+   * A nice alternative for offline or disabled printers
+   * @param printerId
+   */
+  static async getFileCache(printerId: any) {
+    const path = `${ServerApi.printerFilesCacheRoute(printerId)}`;
+
+    return (await this.getApi(path)) as PrinterFileCache;
+  }
+
+  static async selectAndPrintFile(
+    printerId: string,
+    fullPath: string,
+    location: FileLocation = "local",
+    print = true
+  ) {
+    const path = ServerApi.printerFilesSelectAndPrintRoute(printerId);
+
+    return await this.postApi(path, { fullPath, location, print });
   }
 
   static async uploadFiles(
@@ -33,13 +55,30 @@ export class PrinterFilesService extends BaseService {
         formData.append("print", "true");
       }
     }
+    // TODO more than 1 will now fail due to API validation
 
     return this.postApi(path, formData, { unwrap: false });
+  }
+
+  static async clearFiles(printerId: string) {
+    const path = `${ServerApi.printerFilesClearRoute(printerId)}`;
+
+    return this.postApi(path);
+  }
+
+  static async purgeFiles() {
+    const path = `${ServerApi.printerFilesPurgeRoute}`;
+
+    return this.postApi(path);
   }
 
   static async deleteFile(printerId: string, fullPath: string, location = "local") {
     const path = `${ServerApi.printerFilesRoute}/${printerId}/?location=${location}&fullPath=${fullPath}`;
 
     return this.deleteApi(path);
+  }
+
+  static downloadFile(file: PrinterFile) {
+    window.location.href = file.refs.download;
   }
 }

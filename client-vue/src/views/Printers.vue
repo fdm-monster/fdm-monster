@@ -43,9 +43,10 @@
           <v-spacer></v-spacer>
           <v-switch v-model="reorder" class="mt-5 mr-3" dark label="Sort mode"/>
 
-          <v-btn class="ml-3" color="primary" disabled type="button" @click="createPrinterModal()">
+          <v-btn class="ml-3" color="primary" type="button" @click="createPrinterModal()">
             Import JSON Printers
           </v-btn>
+
           <v-btn class="ml-3" color="primary" type="button" @click="showCreateDialog = true">
             Create Printer
           </v-btn>

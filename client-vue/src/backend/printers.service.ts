@@ -24,7 +24,6 @@ export class PrintersService extends BaseService {
     newFormData.websocketPrefix = webSocketURL.protocol.replace(":", "") as WebSocketProtocol;
     newFormData.printerName = printer.printerName || newRandomNamePair();
     newFormData.apiKey = printer.apiKey;
-    newFormData.groups = printer.groups;
     newFormData.stepSize = printer.stepSize;
 
     return newFormData;
@@ -76,6 +75,12 @@ export class PrintersService extends BaseService {
     return (await this.postApi(path, printer)) as Printer;
   }
 
+  static async batchImportPrinters(printers: CreatePrinter[]) {
+    const path = ServerApi.printerBatchRoute;
+
+    return (await this.postApi(path, printers)) as Printer[];
+  }
+
   static async deletePrinter(printerId: string) {
     const path = ServerApi.getPrinterRoute(printerId);
 
@@ -98,11 +103,5 @@ export class PrintersService extends BaseService {
     const path = ServerApi.printerEnabledRoute(printerId);
 
     return await this.patchApi(path, { enabled });
-  }
-
-  static async stopPrintJob(printerId: string) {
-    const path = ServerApi.printerStopJobRoute(printerId);
-
-    return await this.postApi(path);
   }
 }

@@ -1,6 +1,4 @@
 const _ = require("lodash");
-const { getFilterDefaults } = require("../constants/state.constants");
-const Logger = require("../handlers/logger.js");
 const { NotImplementedException } = require("../exceptions/runtime.exceptions");
 const { NotFoundException } = require("../exceptions/runtime.exceptions");
 const { validateInput } = require("../handlers/validators");
@@ -15,24 +13,22 @@ class PrintersStore {
 
   #printerStates;
   #testPrinterState;
-  #farmPrintersGroups;
-  #logger = new Logger("Server-PrintersStore");
+  #logger;
 
   constructor({
     settingsStore,
     printerTickerStore,
     printerStateFactory,
     eventEmitter2,
-    printerService
+    printerService,
+    loggerFactory
   }) {
     this.#settingsStore = settingsStore;
     this.#printerService = printerService;
     this.#printerTickerStore = printerTickerStore;
     this.#printerStateFactory = printerStateFactory;
     this.#eventEmitter2 = eventEmitter2;
-
-    // Store collections
-    this.#farmPrintersGroups = [];
+    this.#logger = loggerFactory("Server-PrintersStore");
   }
 
   _validateState() {
@@ -162,7 +158,6 @@ class PrintersStore {
     }
 
     this.#logger.info(`Loaded ${this.#printerStates.length} printer states`);
-    this.generatePrinterGroups();
   }
 
   async deleteTestPrinter() {
@@ -188,24 +183,6 @@ class PrintersStore {
     await this.#printerService.delete(printerId);
 
     return printerEntity;
-  }
-
-  generatePrinterGroups() {
-    this._validateState();
-
-    this.#farmPrintersGroups = getFilterDefaults();
-
-    this.#printerStates.forEach((printer) => {
-      if (!this.#farmPrintersGroups.includes(`Group: ${printer.group}`)) {
-        if (!_.isEmpty(printer.group)) {
-          this.#farmPrintersGroups.push(`Group: ${printer.group}`);
-        }
-      }
-    });
-  }
-
-  getPrinterGroups() {
-    return Object.freeze([...this.#farmPrintersGroups]);
   }
 
   async updateSortIndex(identifierList) {
@@ -249,6 +226,25 @@ class PrintersStore {
   addLoggedTicker(printer, message, state) {
     this.#logger.info(message);
     this.#printerTickerStore.addIssue(printer, message, state);
+  }
+
+  async batchImport(printers) {
+    this.#logger.info(`Validating ${printers.length} printer objects`);
+    for (let printer of printers) {
+      await this.#printerService.validateAndDefault(printer);
+    }
+
+    this.#logger.info(`Validation passed. Adding ${printers.length} printers`);
+
+    // We've passed validation completely - creation will likely succeed
+    const states = [];
+    for (let printer of printers) {
+      const newState = await this.addPrinter(printer);
+      states.push(newState.toFlat());
+    }
+
+    this.#logger.info(`Creation succeeded. Added ${printers.length} printers`);
+    return states;
   }
 
   async addPrinter(printer) {

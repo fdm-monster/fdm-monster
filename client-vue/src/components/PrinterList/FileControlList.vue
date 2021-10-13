@@ -19,14 +19,14 @@ import Component from "vue-class-component";
 import Vue from "vue";
 import { Prop } from "vue-property-decorator";
 import { PrinterFile } from "@/models/printers/printer-file.model";
-import { FileList } from "@/models/printers/file-list.model";
+import { PrinterFileCache } from "@/models/printers/printer-file-cache.model";
 import { printersState } from "@/store/printers.state";
 
 @Component({
   data: () => ({})
 })
 export default class FileControlList extends Vue {
-  @Prop() fileList: FileList;
+  @Prop() fileList: PrinterFileCache;
   @Prop() printerId: string;
 
   async deleteFile(file: PrinterFile) {

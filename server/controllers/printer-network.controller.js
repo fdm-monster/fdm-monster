@@ -18,13 +18,6 @@ class PrinterNetworkController {
     let devices = await this.#autoDiscoveryService.searchForDevicesOnNetwork();
     res.json(devices);
   }
-
-  async wakeHost(req, res) {
-    // TODO Will be removed
-    const data = req.body;
-    this.#logger.info("Action wake host: ", data);
-    Script.wol(data);
-  }
 }
 
 // prettier-ignore

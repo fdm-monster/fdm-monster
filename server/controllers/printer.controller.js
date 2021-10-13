@@ -91,6 +91,12 @@ class PrinterController {
     res.send(Status.success("Disconnect command sent"));
   }
 
+  /**
+   * Cancels the current job irrespective of file
+   * @param req
+   * @param res
+   * @returns {Promise<void>}
+   */
   async stopPrintJob(req, res) {
     const { id: printerId } = await validateInput(req.params, idRules);
 
@@ -145,6 +151,12 @@ class PrinterController {
     );
 
     res.send(printerState.toFlat());
+  }
+
+  async importBatch(req, res) {
+    const flattenedPrinters = await this.#printersStore.batchImport(req.body);
+
+    res.send(flattenedPrinters);
   }
 
   async list(req, res) {
@@ -313,6 +325,7 @@ module.exports = createController(PrinterController)
     .get("/", "list")
     .get("/sse", "sse")
     .post("/", "create")
+    .post("/batch", "importBatch")
     .post("/test-connection", "testConnection")
     .post("/sort-index", "updateSortIndex")
     .get("/:id", "get")

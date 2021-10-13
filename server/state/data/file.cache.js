@@ -81,7 +81,7 @@ class FileCache {
   updateCacheFileRefCount() {
     let totalFiles = 0;
     for (const storage of Object.values(this.#printerFileStorage)) {
-      totalFiles += storage.fileList.fileCount;
+      totalFiles += storage.fileList.files?.length || 0;
     }
 
     if (totalFiles !== this.#totalFileCount) {
@@ -104,9 +104,7 @@ class FileCache {
       return;
     }
 
-    // console.log(Object.keys(this.#printerFileStorage), "before");
     delete this.#printerFileStorage[printerId];
-    // console.log(Object.keys(this.#printerFileStorage), "after");
 
     this.#logger.info(`Purged printerId '${printerId}' file cache`);
   }
@@ -126,7 +124,6 @@ class FileCache {
     }
 
     fileList.files.splice(fileIndex, 1);
-    fileList.fileCount = fileList.files.length;
 
     return Status.success("File was removed");
   }
@@ -166,7 +163,6 @@ class FileCache {
 
     printerFileStorage.fileList = {
       fileList: sortedFileList,
-      fileCount: fileList.fileCount || 0,
       folderList: fileList.folders || [],
       folderCount: fileList.folderCount || 0
     };

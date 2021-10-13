@@ -2,13 +2,13 @@
   <div>
     <div :id="gridId" class="grid-stack d-flex">
       <GridItem
-        v-for="(item, index) in items"
+        v-for="(printer, index) in items"
         :key="index"
-        v-focus="{ item, index }"
+        v-drop-upload="{ printer, index }"
         :grid="grid"
-        :printer-id="item.id"
+        :printer-id="printer.id"
         :selector="itemPrefix + index.toString()"
-        :skeleton="item.skeleton"
+        :skeleton="printer.skeleton"
       />
 
       <UpdatePrinterDialog

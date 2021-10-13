@@ -8,4 +8,10 @@ export class PrinterGroupService extends BaseService {
 
     return (await this.getApi<PrinterGroup[]>(path)) as PrinterGroup[];
   }
+
+  static async syncLegacyGroups() {
+    const path = `${ServerApi.printerGroupSyncLegacyRoute}/`;
+
+    return await this.postApi(path);
+  }
 }

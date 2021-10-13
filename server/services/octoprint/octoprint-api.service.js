@@ -65,6 +65,10 @@ class OctoprintApiService {
     return { command: "connect" };
   }
 
+  selectCommand(print = false) {
+    return { command: "select", print };
+  }
+
   #ensureTimeoutSettingsLoaded() {
     const serverSettings = this.#settingsStore.getServerSettings();
     this.#timeouts = { ...serverSettings.timeout };
@@ -193,6 +197,20 @@ class OctoprintApiService {
     const { url, options } = this.#prepareRequest(printer, apiFile(path, location));
 
     const response = await this.#httpClient.get(url, options);
+
+    return processResponse(response, responseOptions);
+  }
+
+  async selectPrintFile(
+    printer,
+    path,
+    location = FileLocation.local,
+    command,
+    responseOptions = defaultResponseOptions
+  ) {
+    const { url, options } = this.#prepareRequest(printer, apiFile(path, location));
+
+    const response = await this.#httpClient.post(url, command, options);
 
     return processResponse(response, responseOptions);
   }

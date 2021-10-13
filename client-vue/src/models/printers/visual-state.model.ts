@@ -21,7 +21,17 @@ export interface StateFlags {
   sdReady?: boolean;
 }
 
-export interface VisualState {
+export interface HostState {
+  state: PSTATE;
+  desc: string;
+  colour: {
+    name: ColourLabel;
+    hex: string;
+    category: CATEGORY;
+  };
+}
+
+export interface PrinterState {
   state: PSTATE;
   desc: string;
   flags: StateFlags;

@@ -7,24 +7,27 @@
       <v-toolbar-title>Settings (prototype)</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-toolbar-items>
-        <v-btn dark text @click="dialog = false"> Save </v-btn>
+        <v-btn dark text @click="dialog = false"> Save</v-btn>
       </v-toolbar-items>
     </v-toolbar>
     <v-list subheader three-line>
       <v-subheader>User Controls</v-subheader>
       <v-list-item>
         <v-list-item-content>
-          <v-list-item-title>Content filtering</v-list-item-title>
-          <v-list-item-subtitle
-            >Set the content filtering level to restrict apps that can be downloaded
+          <v-list-item-title>Legacy Groups</v-list-item-title>
+          <v-list-item-subtitle>
+            Synchronise the legacy printer groups to the new separate PrinterGroup data.
+            <v-btn @click="syncLegacyGroups()">Sync legacy</v-btn>
           </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
       <v-list-item>
         <v-list-item-content>
           <v-list-item-title>Password</v-list-item-title>
-          <v-list-item-subtitle
-            >Require password for purchase or use password to restrict purchase
+          <v-list-item-subtitle>
+            Clear out the file references for all printers - this does not remove them from
+            OctoPrint!
+            <v-btn @click="purgeFiles()">Purge file references</v-btn>
           </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
@@ -39,8 +42,8 @@
         <v-list-item-content>
           <v-list-item-title>Notifications</v-list-item-title>
           <v-list-item-subtitle
-            >Notify me about updates to apps or games that I downloaded</v-list-item-subtitle
-          >
+            >Notify me about updates to apps or games that I downloaded
+          </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
       <v-list-item>
@@ -50,8 +53,8 @@
         <v-list-item-content>
           <v-list-item-title>Sound</v-list-item-title>
           <v-list-item-subtitle
-            >Auto-update apps at any time. Data charges may apply</v-list-item-subtitle
-          >
+            >Auto-update apps at any time. Data charges may apply
+          </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
       <v-list-item>
@@ -70,6 +73,8 @@
 <script>
 import Vue from "vue";
 import { Component } from "vue-property-decorator";
+import { PrinterGroupService, PrinterFileService } from "@/backend";
+import { infoMessageEvent } from "@/event-bus/alert.events";
 
 @Component({
   components: {},
@@ -82,5 +87,17 @@ import { Component } from "vue-property-decorator";
     };
   }
 })
-export default class Settings extends Vue {}
+export default class Settings extends Vue {
+  async syncLegacyGroups() {
+    const groups = await PrinterGroupService.syncLegacyGroups();
+
+    this.$bus.emit(infoMessageEvent, `Succesfully synced ${groups.length} groups!`);
+  }
+
+  async purgeFiles() {
+    await PrinterFileService.purgeFiles();
+
+    this.$bus.emit(infoMessageEvent, `Succesfully purged all references to printer files!`);
+  }
+}
 </script>

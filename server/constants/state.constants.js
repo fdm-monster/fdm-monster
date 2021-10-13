@@ -1,11 +1,3 @@
-const getFilterDefaults = () => [
-  "All Printers",
-  "State: Idle",
-  "State: Active",
-  "State: Complete",
-  "State: Disconnected"
-];
-
 const MESSAGE = {
   offline: "OctoPrint instance seems to be offline",
   retryingApiConnection: "OctoPrint is offline. Retry is scheduled",
@@ -20,47 +12,6 @@ const ERR_COUNT = {
   apiKeyNotAccepted: "apiKeyNotAccepted",
   apiKeyIsGlobal: "apiKeyIsGlobal",
   missingSessionKey: "missingSessionKey"
-};
-
-const SYSTEM_CHECKS = {
-  api: "api",
-  files: "files",
-  state: "state",
-  profile: "profile",
-  settings: "settings",
-  system: "system"
-
-  //Special
-  // cleaning: "cleaning"
-};
-
-const getSystemChecksDefault = () => {
-  return {
-    [SYSTEM_CHECKS.api]: {
-      status: "success", //"danger",
-      date: null
-    },
-    [SYSTEM_CHECKS.files]: {
-      status: "success", //"danger",
-      date: null
-    },
-    [SYSTEM_CHECKS.state]: {
-      status: "success", //"danger",
-      date: null
-    },
-    [SYSTEM_CHECKS.profile]: {
-      status: "success", //"danger",
-      date: null
-    },
-    [SYSTEM_CHECKS.settings]: {
-      status: "success", //"danger",
-      date: null
-    },
-    [SYSTEM_CHECKS.system]: {
-      status: "success", //"danger",
-      date: null
-    }
-  };
 };
 
 // State category
@@ -297,14 +248,11 @@ const mapStateToColor = (state) => {
 };
 
 module.exports = {
-  getSystemChecksDefault,
-  getFilterDefaults,
   mapStateToColor,
   remapOctoPrintState,
   ERR_COUNT,
   MESSAGE,
   PSTATE,
   OP_STATE,
-  CATEGORY,
-  SYSTEM_CHECKS
+  CATEGORY
 };

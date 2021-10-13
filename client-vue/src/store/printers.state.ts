@@ -1,13 +1,16 @@
 import { Action, getModule, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import { PrinterGroup } from "@/models/printers/printer-group.model";
 import { Printer } from "@/models/printers/printer.model";
-import { PrinterFile } from "@/models/printers/printer-file.model";
-import { PrinterFilesService, PrintersService } from "@/backend";
+import { PrinterFileService, PrintersService } from "@/backend";
 import { CreatePrinter } from "@/models/printers/crud/create-printer.model";
 import { PrinterGroupService } from "@/backend/printer-group.service";
-import { MultiResponse } from "@/models/api/status-response.model";
 import store from "@/store/index";
 import { FileUploadCommands } from "@/models/printers/file-upload-commands.model";
+import { PrinterFile } from "@/models/printers/printer-file.model";
+import { MultiResponse } from "@/models/api/status-response.model";
+import { PrinterFileBucket } from "@/models/printers/printer-file-bucket.model";
+import { PrinterFileCache } from "@/models/printers/printer-file-cache.model";
+import { PrinterJobService } from "@/backend/printer-job.service";
 
 @Module({
   dynamic: true,
@@ -17,10 +20,16 @@ import { FileUploadCommands } from "@/models/printers/file-upload-commands.model
 class PrintersModule extends VuexModule {
   printers: Printer[] = [];
   testPrinters?: Printer = undefined;
+  printerFileBuckets: PrinterFileBucket[] = [];
   printerGroups: PrinterGroup[] = [];
   lastUpdated?: number = undefined;
 
+  viewedPrinter?: Printer = undefined;
   selectedPrinters: Printer[] = [];
+
+  get currentViewedPrinter() {
+    return this.viewedPrinter;
+  }
 
   get printer() {
     return (printerId: string) => this.printers.find((p: Printer) => p.id === printerId);
@@ -49,9 +58,12 @@ class PrintersModule extends VuexModule {
     };
   }
 
+  get printerFileBucket() {
+    return (printerId: string) => this.printerFileBuckets.find((p) => p.printerId === printerId);
+  }
+
   get printerFiles() {
-    return (printerId: string) =>
-      this.printers.find((p: Printer) => p.id === printerId)?.fileList.files;
+    return (printerId: string) => this.printerFileBucket(printerId)?.files;
   }
 
   get printerGroupNames() {
@@ -77,6 +89,14 @@ class PrintersModule extends VuexModule {
     }
   }
 
+  @Mutation resetSelectedPrinters() {
+    this.selectedPrinters = [];
+  }
+
+  @Mutation _setViewedPrinter(printer?: Printer) {
+    this.viewedPrinter = printer;
+  }
+
   @Mutation replacePrinter({ printerId, printer }: { printerId: string; printer: Printer }) {
     const printerIndex = this.printers.findIndex((p: Printer) => p.id === printerId);
 
@@ -98,6 +118,10 @@ class PrintersModule extends VuexModule {
   }
 
   @Mutation setPrinters(printers: Printer[]) {
+    const viewedPrinterId = this.viewedPrinter?.id;
+    if (viewedPrinterId) {
+      this.viewedPrinter = printers.find((p) => p.id === viewedPrinterId);
+    }
     this.printers = printers;
     this.lastUpdated = Date.now();
   }
@@ -107,28 +131,44 @@ class PrintersModule extends VuexModule {
     this.lastUpdated = Date.now();
   }
 
-  @Mutation setPrinterFiles({ printerId, files }: { printerId: string; files: PrinterFile[] }) {
-    const printer = this.printers.find((p: Printer) => p.id === printerId);
+  @Mutation _clearPrinterFiles(printerId: string) {
+    const index = this.printerFileBuckets.findIndex((b) => b.printerId === printerId);
 
-    if (!printer?.fileList) return;
+    this.printerFileBuckets[index].files = [];
+  }
 
-    printer.fileList.files = files;
-    printer.fileList.fileCount = files.length;
+  @Mutation setPrinterFiles({
+    printerId,
+    fileList
+  }: {
+    printerId: string;
+    fileList: PrinterFileCache;
+  }) {
+    let fileBucket = this.printerFileBuckets.find((p) => p.printerId === printerId);
+
+    if (!fileBucket) {
+      fileBucket = {
+        printerId,
+        ...fileList
+      };
+      this.printerFileBuckets.push(fileBucket);
+    } else {
+      fileBucket.files = fileList.files;
+    }
   }
 
   @Mutation popPrinterFile({ printerId, fullPath }: { printerId: string; fullPath: string }) {
-    const printer = this.printers.find((p: Printer) => p.id === printerId);
+    const fileBucket = this.printerFileBuckets.find((p) => p.printerId === printerId);
 
-    if (!printer?.fileList) {
-      console.warn("Printer file list was falsy", printerId);
+    if (!fileBucket?.files) {
+      console.warn("Printer file list was nonexistent", printerId);
       return;
     }
 
-    const deletedFileIndex = printer.fileList.files.findIndex((f) => f.path === fullPath);
+    const deletedFileIndex = fileBucket.files.findIndex((f) => f.path === fullPath);
 
     if (deletedFileIndex !== -1) {
-      printer.fileList.files.splice(deletedFileIndex, 1);
-      printer.fileList.fileCount = printer.fileList.files.length;
+      fileBucket.files.splice(deletedFileIndex, 1);
     } else {
       console.warn("File was not purged as it did not occur in state", fullPath);
     }
@@ -215,17 +255,54 @@ class PrintersModule extends VuexModule {
     commands
   }: {
     printerId: string;
-    files: FileList;
+    files: File[];
     commands?: FileUploadCommands;
   }) {
-    const uploadedFiles = [...files].filter((f) => f.name) as File[];
+    if (!printerId) throw new Error("Printer ID was not provided for file upload");
 
-    await PrinterFilesService.uploadFiles(printerId, uploadedFiles, commands);
+    const uploadedFiles = files.filter((f) => f.name) as File[];
+
+    await PrinterFileService.uploadFiles(printerId, uploadedFiles, commands);
 
     console.log("Drop triggered", printerId, files.length, commands);
+
+    // TODO update
     // this.setPrinterFiles({ printerId, files: [] });
 
     return "data";
+  }
+
+  @Action
+  async sendStopJobCommand(printerId?: string) {
+    if (!printerId) return;
+    const printer = this.printer(printerId);
+    if (!printer) return;
+
+    if (printer.printerState.flags.printing) {
+      const answer = confirm("The printer is still printing - are you sure to stop it?");
+      if (answer) {
+        await PrinterJobService.stopPrintJob(printer.id);
+      }
+    }
+  }
+
+  @Action
+  async selectAndPrintFile({ printerId, fullPath }: { printerId: string; fullPath: string }) {
+    if (!printerId) return;
+    const printer = this.printer(printerId);
+    if (!printer) return;
+
+    if (printer.printerState.flags.printing || !printer.apiAccessibility.accessible) {
+      alert("This printer is printing or not connected! Either way printing is not an option.");
+      return;
+    }
+
+    await PrinterFileService.selectAndPrintFile(printerId, fullPath);
+  }
+
+  @Action
+  setViewedPrinter(printer?: Printer) {
+    this._setViewedPrinter(printer);
   }
 
   @Action
@@ -234,17 +311,30 @@ class PrintersModule extends VuexModule {
   }
 
   @Action
-  async loadPrinterFiles({ printerId, recursive }: { printerId: string; recursive: boolean }) {
-    const data = await PrinterFilesService.getFiles(printerId, recursive);
+  clearSelectedPrinters() {
+    this.resetSelectedPrinters();
+  }
 
-    this.setPrinterFiles({ printerId, files: data });
+  @Action
+  async loadPrinterFiles({ printerId, recursive }: { printerId: string; recursive: boolean }) {
+    const data = await PrinterFileService.getFiles(printerId, recursive);
+
+    this.setPrinterFiles({ printerId, fileList: data });
 
     return data;
   }
 
   @Action
+  async clearPrinterFiles(printerId?: string) {
+    if (!printerId) return;
+    await PrinterFileService.clearFiles(printerId);
+
+    this._clearPrinterFiles(printerId);
+  }
+
+  @Action
   async deletePrinterFile({ printerId, fullPath }: { printerId: string; fullPath: string }) {
-    const response = (await PrinterFilesService.deleteFile(printerId, fullPath)) as MultiResponse;
+    const response = (await PrinterFileService.deleteFile(printerId, fullPath)) as MultiResponse;
 
     if (response.cache?.success) {
       this.popPrinterFile({ printerId, fullPath });

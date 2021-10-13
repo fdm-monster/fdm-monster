@@ -40,6 +40,9 @@ function getExtendedValidator() {
     const url = new URL(value).href;
     return url.includes("http://") || url.includes("https://");
   });
+  nodeInputValidator.extend("not", ({ value, args }, validator) => {
+    return !value && value !== false;
+  });
   return nodeInputValidator;
 }
 
