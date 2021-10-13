@@ -17,9 +17,15 @@
     </v-toolbar>
 
     <v-banner v-focus>
-      <strong class="mr-2">Drop one or more files to upload</strong>
-      <small class="ml-2">{{ selectedPrinters.length }} printers selected</small>
-      <v-btn small color="primary" class="ml-2" @click="clearSelectedPrinters()">Clear selection</v-btn>
+      <strong class="mr-2">Drop a file to upload</strong>
+      <input accept=".gcode" ref="file" style="display: none" type="file" />
+      <v-btn class="ml-2" color="primary" small @click="$refs.file.click()">
+        Select gcode file
+      </v-btn>
+
+      <v-btn class="ml-2" color="secondary" small @click="clearSelectedPrinters()">
+        Clear selection
+      </v-btn>
       <v-chip-group>
         <v-chip v-if="selectedPrinters.length === 0">No printers selected</v-chip>
         <v-chip
@@ -46,8 +52,6 @@ import CreatePrinterDialog from "@/components/Dialogs/CreatePrinterDialog.vue";
 import PrinterGrid from "@/components/PrinterGrid/PrinterGrid.vue";
 import { printersState } from "@/store/printers.state";
 import { Printer } from "@/models/printers/printer.model";
-
-const watchedState = "selectedPrinterCount";
 
 @Component({
   data: () => ({}),
