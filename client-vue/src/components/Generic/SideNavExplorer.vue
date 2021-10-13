@@ -41,6 +41,7 @@ import { Watch } from "vue-property-decorator";
 import { printersState } from "@/store/printers.state";
 import { Printer } from "@/models/printers/printer.model";
 import { generateInitials } from "@/constants/noun-adjectives.data";
+import { PrinterFilesService } from "@/backend";
 
 @Component({
   data() {
@@ -62,14 +63,18 @@ export default class SideNavExplorer extends Vue {
   }
 
   @Watch("storedViewedPrinter")
-  async inputUpdate(newVal?: Printer, oldVal?: Printer) {
-    this.drawerOpened = !!newVal;
+  async inputUpdate(viewedPrinter?: Printer, oldVal?: Printer) {
+    this.drawerOpened = !!viewedPrinter;
+    const printerId = viewedPrinter?.id;
 
-    if (!newVal) return;
+    if (!viewedPrinter || !printerId) return;
 
-    const printerId = newVal.id;
-    console.log(newVal.hostState);
-    // await printersState.loadPrinterFiles({ printerId, recursive: false });
+    if (viewedPrinter.apiAccessibility.accessible) {
+      await printersState.loadPrinterFiles({ printerId, recursive: false });
+    }
+    else {
+      await PrinterFilesService.getFileCache(printerId);
+    }
   }
 
   avatarInitials() {

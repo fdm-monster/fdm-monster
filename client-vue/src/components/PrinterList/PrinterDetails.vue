@@ -51,7 +51,7 @@ export default class PrinterDetails extends Vue {
   }
 
   getPrinterFileCount() {
-    return this.printer.fileList?.fileCount || 0;
+    return printersState.printerFileBucket(this.printer.id)?.fileCount || 0;
   }
 
   async addFile(e: DragEvent) {

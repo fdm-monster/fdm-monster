@@ -36,6 +36,11 @@ class FilesStore {
     }
   }
 
+  async getFiles(printerId) {
+    // Might introduce a filter like folder later
+    return this.#fileCache.getPrinterFiles(printerId);
+  }
+
   async updatePrinterFiles(printerId, files) {
     const printer = this.#printersStore.getPrinterState(printerId);
 
@@ -80,7 +85,7 @@ class FilesStore {
   }
 
   // === TODO BELOW ===
-  async getFile(id, fullPath) {
+  async getFileLegacy(id, fullPath) {
     const printer = this.#printersStore.getPrinter(id);
     const response = await this.#octoPrintApiService.getFile(printer.getLoginDetails(), fullPath);
 
@@ -132,7 +137,7 @@ class FilesStore {
     };
   }
 
-  async getFiles(id, recursive) {
+  async getFilesLegacy(id, recursive) {
     const printer = this.getPrinter(id);
     printer.systemChecks.files.status = "warning";
     // Shim to fix undefined on upload files/folders

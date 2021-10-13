@@ -11,6 +11,16 @@ export class PrinterFilesService extends BaseService {
     return (await this.getApi(path)) as PrinterFile[];
   }
 
+  /**
+   * A nice alternative for offline or disabled printers
+   * @param printerId
+   */
+  static async getFileCache(printerId: any) {
+    const path = `${ServerApi.printerFilesCacheRoute(printerId)}`;
+
+    return (await this.getApi(path)) as PrinterFile[];
+  }
+
   static async uploadFiles(
     printerId: string,
     files: File[],

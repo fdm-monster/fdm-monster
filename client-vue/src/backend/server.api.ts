@@ -39,6 +39,7 @@ export class ServerApi {
   static getPrinterRoute = (id: string) => `${ServerApi.printerRoute}/${id}`;
   static printerFilesUploadRoute = (id: string, location: FileLocation) =>
     `${ServerApi.printerFilesRoute}/${id}/upload?location=${location}`;
+  static printerFilesCacheRoute = (id: string) => `${ServerApi.printerFilesRoute}/${id}/cache`;
   static printerEnabledRoute = (id: string) => `${ServerApi.getPrinterRoute(id)}/enabled`;
   static printerSerialConnectRoute = (id: string) =>
     `${ServerApi.getPrinterRoute(id)}/serial-connect`;

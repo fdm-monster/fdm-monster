@@ -1,4 +1,3 @@
-import { PrinterGroup } from "@/models/printers/printer-group.model";
 import { newRandomNamePair } from "@/constants/noun-adjectives.data";
 
 export const getDefaultCreatePrinter = (): PreCreatePrinter => ({
@@ -12,7 +11,6 @@ export const getDefaultCreatePrinter = (): PreCreatePrinter => ({
   apiKey: "",
   display: true,
   enabled: true,
-  groups: [],
   stepSize: 1
 });
 
@@ -33,7 +31,6 @@ export interface PreCreatePrinter {
   printerHostPort: number;
 
   apiKey: string;
-  groups: PrinterGroup[];
 
   // Baby-stepping
   stepSize: 0.1 | 1 | 10 | 100;
@@ -50,7 +47,6 @@ export interface CreatePrinter {
   printerURL: string;
 
   apiKey: string;
-  groups: PrinterGroup[];
 
   // Baby-stepping
   stepSize: 0.1 | 1 | 10 | 100;

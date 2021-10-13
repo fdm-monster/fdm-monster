@@ -130,6 +130,7 @@ class PrinterState {
     return Object.freeze({
       ...identification,
       printerState: this.getPrinterState(),
+      apiAccessibility: this.#apiAccessibility,
       hostState: this.#hostState,
       webSocketState: convertedWSState,
 

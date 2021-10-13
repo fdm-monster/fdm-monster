@@ -65,6 +65,20 @@ class PrinterFileController {
     this.#statusResponse(res, response);
   }
 
+  /**
+   * When the printer host is not reachable or is disabled the cache is still accessible
+   * @param req
+   * @param res
+   * @returns {Promise<void>}
+   */
+  async getFilesCache(req, res) {
+    const { id: printerId } = await validateInput(req.params, idRules);
+
+    const filesCache = await this.#filesStore.getFiles(printerId);
+
+    res.send(filesCache);
+  }
+
   async getFile(req, res) {
     const { id: printerId } = await validateInput(req.params, idRules);
     const { fullPath } = await validateInput(req.query, getFileRules, res);
@@ -193,6 +207,7 @@ module.exports = createController(PrinterFileController)
     .prefix(AppConstants.apiRoute + "/printer-files")
     .before([ensureAuthenticated])
     .get("/:id", "getFiles")
+    .get("/:id/cache", "getFilesCache")
     .delete("/:id", "deleteFile")
     .post("/:id/upload", "uploadFiles")
     // TODO below

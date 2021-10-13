@@ -1,13 +1,14 @@
 import { Action, getModule, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import { PrinterGroup } from "@/models/printers/printer-group.model";
 import { Printer } from "@/models/printers/printer.model";
-import { PrinterFile } from "@/models/printers/printer-file.model";
 import { PrinterFilesService, PrintersService } from "@/backend";
 import { CreatePrinter } from "@/models/printers/crud/create-printer.model";
 import { PrinterGroupService } from "@/backend/printer-group.service";
-import { MultiResponse } from "@/models/api/status-response.model";
 import store from "@/store/index";
 import { FileUploadCommands } from "@/models/printers/file-upload-commands.model";
+import { PrinterFile } from "@/models/printers/printer-file.model";
+import { MultiResponse } from "@/models/api/status-response.model";
+import { PrinterFileBucket } from "@/models/printers/printer-file-bucket.model";
 
 @Module({
   dynamic: true,
@@ -17,6 +18,7 @@ import { FileUploadCommands } from "@/models/printers/file-upload-commands.model
 class PrintersModule extends VuexModule {
   printers: Printer[] = [];
   testPrinters?: Printer = undefined;
+  printerFileBuckets: PrinterFileBucket[] = [];
   printerGroups: PrinterGroup[] = [];
   lastUpdated?: number = undefined;
 
@@ -54,9 +56,12 @@ class PrintersModule extends VuexModule {
     };
   }
 
+  get printerFileBucket() {
+    return (printerId: string) => this.printerFileBuckets.find((p) => p.printerId === printerId);
+  }
+
   get printerFiles() {
-    return (printerId: string) =>
-      this.printers.find((p: Printer) => p.id === printerId)?.fileList.files;
+    return (printerId: string) => this.printerFileBucket(printerId)?.files;
   }
 
   get printerGroupNames() {
@@ -121,27 +126,40 @@ class PrintersModule extends VuexModule {
   }
 
   @Mutation setPrinterFiles({ printerId, files }: { printerId: string; files: PrinterFile[] }) {
-    const printer = this.printers.find((p: Printer) => p.id === printerId);
+    let fileBucket = this.printerFileBuckets.find((p) => p.printerId === printerId);
 
-    if (!printer?.fileList) return;
+    if (!fileBucket) {
+      fileBucket = {
+        printerId,
+        files,
+        fileCount: files.length,
+        total: -1,
+        free: -1
+      };
+      this.printerFileBuckets.push(fileBucket);
 
-    printer.fileList.files = files;
-    printer.fileList.fileCount = files.length;
+      return;
+    } else {
+      fileBucket.files = files;
+      fileBucket.fileCount = files.length;
+    }
+
+    return fileBucket;
   }
 
   @Mutation popPrinterFile({ printerId, fullPath }: { printerId: string; fullPath: string }) {
-    const printer = this.printers.find((p: Printer) => p.id === printerId);
+    const fileBucket = this.printerFileBuckets.find((p) => p.printerId === printerId);
 
-    if (!printer?.fileList) {
-      console.warn("Printer file list was falsy", printerId);
+    if (!fileBucket?.files) {
+      console.warn("Printer file list was nonexistent", printerId);
       return;
     }
 
-    const deletedFileIndex = printer.fileList.files.findIndex((f) => f.path === fullPath);
+    const deletedFileIndex = fileBucket.files.findIndex((f) => f.path === fullPath);
 
     if (deletedFileIndex !== -1) {
-      printer.fileList.files.splice(deletedFileIndex, 1);
-      printer.fileList.fileCount = printer.fileList.files.length;
+      fileBucket.files.splice(deletedFileIndex, 1);
+      fileBucket.fileCount = fileBucket.files.length;
     } else {
       console.warn("File was not purged as it did not occur in state", fullPath);
     }
@@ -167,9 +185,9 @@ class PrintersModule extends VuexModule {
 
   @Action
   async updatePrinter({
-                        printerId,
-                        updatedPrinter
-                      }: {
+    printerId,
+    updatedPrinter
+  }: {
     printerId: string;
     updatedPrinter: CreatePrinter;
   }) {
@@ -223,10 +241,10 @@ class PrintersModule extends VuexModule {
 
   @Action
   async dropUploadPrinterFile({
-                                printerId,
-                                files,
-                                commands
-                              }: {
+    printerId,
+    files,
+    commands
+  }: {
     printerId: string;
     files: FileList;
     commands?: FileUploadCommands;
