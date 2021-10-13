@@ -18,7 +18,7 @@
 
     <v-banner v-focus>
       <strong class="mr-2">Drop a file to upload</strong>
-      <input accept=".gcode" ref="file" style="display: none" type="file" />
+      <input ref="file" accept=".gcode" style="display: none" type="file" />
       <v-btn class="ml-2" color="primary" small @click="$refs.file.click()">
         Select gcode file
       </v-btn>
@@ -32,6 +32,7 @@
           v-for="selectedPrinter in selectedPrinters"
           :key="selectedPrinter.id"
           close
+          @click="openPrinter(selectedPrinter)"
           @click:close="deselectPrinter(selectedPrinter)"
         >
           {{ selectedPrinter.printerName }}
@@ -52,6 +53,7 @@ import CreatePrinterDialog from "@/components/Dialogs/CreatePrinterDialog.vue";
 import PrinterGrid from "@/components/PrinterGrid/PrinterGrid.vue";
 import { printersState } from "@/store/printers.state";
 import { Printer } from "@/models/printers/printer.model";
+import { PrintersService } from "@/backend";
 
 @Component({
   data: () => ({}),
@@ -71,6 +73,10 @@ export default class HomePage extends Vue {
 
   clearSelectedPrinters() {
     printersState.clearSelectedPrinters();
+  }
+
+  openPrinter(printer: Printer) {
+    PrintersService.openPrinterURL(printer.printerURL);
   }
 
   async createPrinterModal() {
