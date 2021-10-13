@@ -222,6 +222,8 @@ class PrintersModule extends VuexModule {
     files: FileList;
     commands?: FileUploadCommands;
   }) {
+    if (!printerId) throw new Error("Printer ID was not provided for file upload");
+
     const uploadedFiles = [...files].filter((f) => f.name) as File[];
 
     await PrinterFilesService.uploadFiles(printerId, uploadedFiles, commands);

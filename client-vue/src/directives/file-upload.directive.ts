@@ -1,18 +1,30 @@
 import Vue from "vue";
 import { printersState } from "@/store/printers.state";
-import { DirectiveBinding } from "vue/types/options";
 import { infoMessageEvent } from "@/event-bus/alert.events";
+import { Printer } from "@/models/printers/printer.model";
 
-function getPrinterId(binding: DirectiveBinding) {
-  return binding.value?.item.id;
-}
+const bindDropConditionally = (el: HTMLElement, printer: Printer, context?: Vue) => {
+  if (printer) {
+    el.ondrop = async (e) => {
+      el.style.border = defaultBorder;
 
-const dropHandler = async (e: DragEvent, binding: DirectiveBinding, context?: Vue) => {
+      await dropHandler(e, printer, context);
+    };
+  } else {
+    el.ondrop = async (e) => {
+      e.preventDefault();
+      el.style.border = defaultBorder;
+      alert("The printer was not correctly bound to be able to do file upload!");
+    };
+  }
+};
+
+const dropHandler = async (e: DragEvent, printer: Printer, context?: Vue) => {
   e.preventDefault();
   const files = e.dataTransfer?.files;
   if (!files) return;
 
-  const printerId = getPrinterId(binding);
+  const printerId = printer.id;
 
   if (files.length === 1) context?.$bus.emit(infoMessageEvent, "Uploading file");
   else context?.$bus.emit(infoMessageEvent, `Uploading ${files.length} files`);
@@ -30,7 +42,7 @@ const defaultBorder = "1px solid #2b2a27";
 const hoverBorder = "1px solid red";
 
 export function registerFileDropDirective() {
-  Vue.directive("focus", {
+  Vue.directive("drop-upload", {
     // When the bound element is inserted into the DOM...
     inserted: (el, binding, vnode) => {
       el.style.border = defaultBorder;
@@ -45,10 +57,12 @@ export function registerFileDropDirective() {
       el.ondragleave = () => {
         el.style.border = defaultBorder;
       };
-      el.ondrop = async (e) => {
-        el.style.border = defaultBorder;
-        await dropHandler(e, binding, vnode.context);
-      };
+
+      // The bound printer is not set
+      bindDropConditionally(el, binding.value?.printer, vnode.context);
+    },
+    update: (el, binding, vnode) => {
+      bindDropConditionally(el, binding.value?.printer, vnode.context);
     }
   });
 }

@@ -32,10 +32,9 @@ registerFileDropDirective();
 window.addEventListener("unhandledrejection", (event) => {
   if (event.reason?.isAxiosError) {
     console.warn(`Handled error through alert`, event.reason);
-
-    Vue.bus.emit(vuexErrorEvent, event);
-    event.preventDefault();
   }
+  Vue.bus.emit(vuexErrorEvent, event);
+  event.preventDefault();
 });
 
 Vue.config.errorHandler = (err: Error, vm: Vue, info: string) => {

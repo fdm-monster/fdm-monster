@@ -1,11 +1,12 @@
 <template>
   <v-card
+    v-drop-upload="{ printer }"
     :class="{ 'tile-selected': selected, 'tile-setup': printer }"
     :disabled="!printer"
+    :style="{ 'background-color': printerStateColor }"
     class="tile"
     outlined
     tile
-    :style="{ 'background-color': printerStateColor }"
     @click="selectPrinter()"
   >
     <v-container v-if="printer">
@@ -20,9 +21,6 @@
       <v-btn class="float-right" icon @click.prevent.stop="clickStop()">
         <v-icon>stop</v-icon>
       </v-btn>
-    </v-container>
-    <v-container v-else-if="!loading">
-      <small class="ml-5 mt-5 text--secondary">Not set up</small>
     </v-container>
   </v-card>
 </template>
@@ -50,7 +48,7 @@ export default class PrinterGridTile extends Vue {
   }
 
   get printerStateColor() {
-    return this.printer?.printerState.colour.hex || "none";
+    return this.printer?.printerState.colour.hex || "rgba(0,0,0,0)";
   }
 
   id() {
@@ -86,11 +84,11 @@ export default class PrinterGridTile extends Vue {
   user-select: none; /* Standard */
 }
 
-.tile-selected {
-  border: 1px solid green !important;
+.tile-setup:hover {
+  border: 1px solid red !important;
 }
 
-.tile-setup:hover {
-  border: 1px solid red;
+.tile-selected {
+  border: 1px solid green !important;
 }
 </style>

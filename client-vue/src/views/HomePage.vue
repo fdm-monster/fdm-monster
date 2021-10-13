@@ -16,28 +16,33 @@
       </v-btn>
     </v-toolbar>
 
-    <v-banner v-focus>
-      <strong class="mr-2">Drop a file to upload</strong>
-      <input ref="file" accept=".gcode" style="display: none" type="file" />
-      <v-btn class="ml-2" color="primary" small @click="$refs.file.click()">
-        Select gcode file
-      </v-btn>
-
-      <v-btn class="ml-2" color="secondary" small @click="clearSelectedPrinters()">
-        Clear selection
-      </v-btn>
-      <v-chip-group>
-        <v-chip v-if="selectedPrinters.length === 0">No printers selected</v-chip>
-        <v-chip
-          v-for="selectedPrinter in selectedPrinters"
-          :key="selectedPrinter.id"
-          close
-          @click="openPrinter(selectedPrinter)"
-          @click:close="deselectPrinter(selectedPrinter)"
-        >
-          {{ selectedPrinter.printerName }}
-        </v-chip>
-      </v-chip-group>
+    <v-banner v-drop-upload>
+      <v-row>
+        <v-col>
+          <v-btn class="ml-2" color="secondary" small @click="clearSelectedPrinters()">
+            Clear selection
+          </v-btn>
+          <v-chip-group>
+            <v-chip v-if="selectedPrinters.length === 0">No printers selected</v-chip>
+            <v-chip
+              v-for="selectedPrinter in selectedPrinters"
+              :key="selectedPrinter.id"
+              close
+              @click="openPrinter(selectedPrinter)"
+              @click:close="deselectPrinter(selectedPrinter)"
+            >
+              {{ selectedPrinter.printerName }}
+            </v-chip>
+          </v-chip-group>
+        </v-col>
+        <v-col align="right">
+          <strong class="mr-2">Drop a file to upload</strong>
+          <input ref="file" accept=".gcode" style="display: none" type="file" />
+          <v-btn class="ml-2" color="primary" small @click="$refs.file.click()">
+            Select gcode file
+          </v-btn>
+        </v-col>
+      </v-row>
     </v-banner>
 
     <PrinterGrid class="ma-2" />
