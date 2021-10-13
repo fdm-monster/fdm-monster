@@ -1,5 +1,13 @@
 <template>
-  <v-navigation-drawer v-model="drawerOpened" absolute loading="true" right temporary @close="closeDrawer()">
+  <v-navigation-drawer
+    v-model="drawerOpened"
+    absolute
+    loading="true"
+    right
+    temporary
+    @close="closeDrawer()"
+  >
+    <v-icon>loading</v-icon>
     <v-list-item>
       <v-list-item-avatar>
         <v-img src="https://randomuser.me/api/portraits/men/78.jpg"></v-img>
@@ -29,7 +37,7 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import { Prop, Watch } from "vue-property-decorator";
+import { Watch } from "vue-property-decorator";
 import { printersState } from "@/store/printers.state";
 import { Printer } from "@/models/printers/printer.model";
 
@@ -45,20 +53,22 @@ import { Printer } from "@/models/printers/printer.model";
   }
 })
 export default class SideNavExplorer extends Vue {
-  @Prop() printer: Printer;
   drawerOpened = false;
+  loading=true;
 
   get storedViewedPrinter() {
     return printersState.currentViewedPrinter;
   }
 
-  async created() {
-    // await printersState.loadPrinterFiles({ printerId: this.printerId, recursive: false });
-  }
-
   @Watch("storedViewedPrinter")
-  inputUpdate(newVal?: Printer, oldVal?: Printer) {
+  async inputUpdate(newVal?: Printer, oldVal?: Printer) {
     this.drawerOpened = !!newVal;
+
+    if (!newVal) return;
+
+    const printerId = newVal.id;
+    console.log(newVal.hostState);
+    await printersState.loadPrinterFiles({ printerId, recursive: false });
   }
 
   closeDrawer() {

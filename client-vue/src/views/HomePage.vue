@@ -65,7 +65,7 @@
 
     <CreatePrinterDialog :show.sync="showDialog" v-on:update:show="onChangeShowDialog($event)" />
 
-    <SideNavExplorer :printer="viewedPrinter" />
+    <SideNavExplorer />
   </div>
 </template>
 
