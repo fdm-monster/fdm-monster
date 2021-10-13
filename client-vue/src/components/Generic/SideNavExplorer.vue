@@ -21,13 +21,13 @@
     <v-divider></v-divider>
 
     <v-list dense>
-      <v-list-item v-for="item in items" :key="item.title" link>
+      <v-list-item v-for="(item,index) in shownFiles" :key="index" link>
         <v-list-item-icon>
           <v-icon>{{ item.icon }}</v-icon>
         </v-list-item-icon>
 
         <v-list-item-content>
-          <v-list-item-title>{{ item.title }}</v-list-item-title>
+          <v-list-item-title>{{ item.name }}</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
     </v-list>
@@ -42,21 +42,18 @@ import { printersState } from "@/store/printers.state";
 import { Printer } from "@/models/printers/printer.model";
 import { generateInitials } from "@/constants/noun-adjectives.data";
 import { PrinterFilesService } from "@/backend";
+import { PrinterFile } from "@/models/printers/printer-file.model";
 
 @Component({
-  data() {
-    return {
-      drawer: true,
-      items: [
-        { title: "Home", icon: "mdi-view-dashboard" },
-        { title: "About", icon: "mdi-forum" }
-      ]
-    };
-  }
+  data: () => ({
+    drawer: true,
+    shownFiles: []
+  })
 })
 export default class SideNavExplorer extends Vue {
   drawerOpened = false;
   loading = true;
+  shownFiles: PrinterFile[] = [];
 
   get storedViewedPrinter() {
     return printersState.currentViewedPrinter;
@@ -70,10 +67,10 @@ export default class SideNavExplorer extends Vue {
     if (!viewedPrinter || !printerId) return;
 
     if (viewedPrinter.apiAccessibility.accessible) {
-      await printersState.loadPrinterFiles({ printerId, recursive: false });
-    }
-    else {
-      await PrinterFilesService.getFileCache(printerId);
+      this.shownFiles = await printersState.loadPrinterFiles({ printerId, recursive: false });
+    } else {
+      const fileCache = await PrinterFilesService.getFileCache(printerId);
+      this.shownFiles = fileCache.files;
     }
   }
 
