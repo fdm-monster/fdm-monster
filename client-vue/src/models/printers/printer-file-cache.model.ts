@@ -1,8 +1,7 @@
 import { PrinterFile } from "@/models/printers/printer-file.model";
 
-export interface FileList {
+export interface PrinterFileCache {
   files: PrinterFile[];
-  fileCount: number;
-  folders: string[];
-  folderCount: number;
+  free: number;
+  total: number;
 }

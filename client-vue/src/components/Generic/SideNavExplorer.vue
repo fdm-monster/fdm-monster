@@ -21,7 +21,7 @@
     <v-divider></v-divider>
 
     <v-list dense>
-      <v-list-item v-for="(item,index) in shownFiles" :key="index" link>
+      <v-list-item v-for="(item, index) in shownFiles.files" :key="index" link>
         <v-list-item-icon>
           <v-icon>{{ item.icon }}</v-icon>
         </v-list-item-icon>
@@ -42,7 +42,7 @@ import { printersState } from "@/store/printers.state";
 import { Printer } from "@/models/printers/printer.model";
 import { generateInitials } from "@/constants/noun-adjectives.data";
 import { PrinterFilesService } from "@/backend";
-import { PrinterFile } from "@/models/printers/printer-file.model";
+import { PrinterFileCache } from "@/models/printers/printer-file-cache.model";
 
 @Component({
   data: () => ({
@@ -53,7 +53,7 @@ import { PrinterFile } from "@/models/printers/printer-file.model";
 export default class SideNavExplorer extends Vue {
   drawerOpened = false;
   loading = true;
-  shownFiles: PrinterFile[] = [];
+  shownFiles?: PrinterFileCache = undefined;
 
   get storedViewedPrinter() {
     return printersState.currentViewedPrinter;
@@ -69,8 +69,7 @@ export default class SideNavExplorer extends Vue {
     if (viewedPrinter.apiAccessibility.accessible) {
       this.shownFiles = await printersState.loadPrinterFiles({ printerId, recursive: false });
     } else {
-      const fileCache = await PrinterFilesService.getFileCache(printerId);
-      this.shownFiles = fileCache.files;
+      this.shownFiles = await PrinterFilesService.getFileCache(printerId);
     }
   }
 

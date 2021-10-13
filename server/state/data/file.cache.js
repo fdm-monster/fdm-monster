@@ -124,7 +124,6 @@ class FileCache {
     }
 
     fileList.files.splice(fileIndex, 1);
-    fileList.fileCount = fileList.files.length;
 
     return Status.success("File was removed");
   }
@@ -164,7 +163,6 @@ class FileCache {
 
     printerFileStorage.fileList = {
       fileList: sortedFileList,
-      fileCount: fileList.fileCount || 0,
       folderList: fileList.folders || [],
       folderCount: fileList.folderCount || 0
     };

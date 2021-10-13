@@ -1,15 +1,14 @@
 import { BaseService } from "@/backend/base.service";
 import { ServerApi } from "@/backend/server.api";
-import { PrinterFile } from "@/models/printers/printer-file.model";
 import { FileLocation } from "@/models/api/octoprint.definition";
 import { FileUploadCommands } from "@/models/printers/file-upload-commands.model";
-import { PrinterFileCache } from "@/models/printers/printer-file-bucket.model";
+import { PrinterFileCache } from "@/models/printers/printer-file-cache.model";
 
 export class PrinterFilesService extends BaseService {
   static async getFiles(printerId: string, recursive = false, location: FileLocation = "local") {
     const path = `${ServerApi.printerFilesRoute}/${printerId}/?location=${location}&recursive=${recursive}`;
 
-    return (await this.getApi(path)) as PrinterFile[];
+    return (await this.getApi(path)) as PrinterFileCache;
   }
 
   /**

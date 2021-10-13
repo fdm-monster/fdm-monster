@@ -48,8 +48,7 @@ describe("generate", function () {
             fileSize: 100,
             name: "test"
           }
-        ],
-        fileCount: 150120310230 // absurdism
+        ]
       },
       sortIndex: 0
     };

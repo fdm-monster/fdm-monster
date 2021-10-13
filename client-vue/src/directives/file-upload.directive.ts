@@ -31,7 +31,7 @@ const dropHandler = async (e: DragEvent, printer: Printer, context?: Vue) => {
 
   const uploadInput = {
     printerId,
-    files
+    files: Array.from(files)
   };
   await printersState.dropUploadPrinterFile(uploadInput);
 

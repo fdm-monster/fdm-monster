@@ -158,7 +158,6 @@ class FilesStore {
     // Shim to fix undefined on upload files/folders
     printer.fileList = {
       files: [],
-      fileCount: 0,
       folders: [],
       folderCount: 0
     };

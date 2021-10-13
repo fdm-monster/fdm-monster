@@ -28,7 +28,6 @@ class PrinterFilesService {
     const printer = await this.#printerService.get(printerId);
 
     printer.fileList = fileList;
-    printer.fileList.fileCount = printer.fileList.files.length;
 
     printer.markModified("fileList");
     printer.save();
@@ -45,7 +44,6 @@ class PrinterFilesService {
     } else {
       printer.fileList.files[foundFileIndex] = addedFile;
     }
-    printer.fileList.fileCount = printer.fileList.files.length;
 
     printer.markModified("fileList");
     await printer.save();
@@ -56,7 +54,6 @@ class PrinterFilesService {
   async clearFiles(printerId) {
     const printer = await this.#printerService.get(printerId);
     printer.fileList.files = [];
-    printer.fileList.fileCount = 0;
     printer.markModified("fileList");
     await printer.save();
   }
@@ -85,7 +82,6 @@ class PrinterFilesService {
     }
 
     printer.fileList.files.splice(fileIndex, 1);
-    printer.fileList.fileCount = printer.fileList.files.length;
     printer.markModified("fileList");
     await printer.save();
 

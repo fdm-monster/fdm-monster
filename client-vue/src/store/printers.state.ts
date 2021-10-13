@@ -9,6 +9,7 @@ import { FileUploadCommands } from "@/models/printers/file-upload-commands.model
 import { PrinterFile } from "@/models/printers/printer-file.model";
 import { MultiResponse } from "@/models/api/status-response.model";
 import { PrinterFileBucket } from "@/models/printers/printer-file-bucket.model";
+import { PrinterFileCache } from "@/models/printers/printer-file-cache.model";
 
 @Module({
   dynamic: true,
@@ -125,23 +126,25 @@ class PrintersModule extends VuexModule {
     this.lastUpdated = Date.now();
   }
 
-  @Mutation setPrinterFiles({ printerId, files }: { printerId: string; files: PrinterFile[] }) {
+  @Mutation setPrinterFiles({
+    printerId,
+    fileList
+  }: {
+    printerId: string;
+    fileList: PrinterFileCache;
+  }) {
     let fileBucket = this.printerFileBuckets.find((p) => p.printerId === printerId);
 
     if (!fileBucket) {
       fileBucket = {
         printerId,
-        files,
-        fileCount: files.length,
-        total: -1,
-        free: -1
+        ...fileList
       };
       this.printerFileBuckets.push(fileBucket);
 
       return;
     } else {
-      fileBucket.files = files;
-      fileBucket.fileCount = files.length;
+      fileBucket.files = fileList.files;
     }
 
     return fileBucket;
@@ -159,7 +162,6 @@ class PrintersModule extends VuexModule {
 
     if (deletedFileIndex !== -1) {
       fileBucket.files.splice(deletedFileIndex, 1);
-      fileBucket.fileCount = fileBucket.files.length;
     } else {
       console.warn("File was not purged as it did not occur in state", fullPath);
     }
@@ -246,12 +248,12 @@ class PrintersModule extends VuexModule {
     commands
   }: {
     printerId: string;
-    files: FileList;
+    files: File[];
     commands?: FileUploadCommands;
   }) {
     if (!printerId) throw new Error("Printer ID was not provided for file upload");
 
-    const uploadedFiles = [...files].filter((f) => f.name) as File[];
+    const uploadedFiles = files.filter((f) => f.name) as File[];
 
     await PrinterFilesService.uploadFiles(printerId, uploadedFiles, commands);
 
@@ -293,7 +295,7 @@ class PrintersModule extends VuexModule {
   async loadPrinterFiles({ printerId, recursive }: { printerId: string; recursive: boolean }) {
     const data = await PrinterFilesService.getFiles(printerId, recursive);
 
-    this.setPrinterFiles({ printerId, files: data });
+    this.setPrinterFiles({ printerId, fileList: data });
 
     return data;
   }
