@@ -117,6 +117,10 @@ class PrintersModule extends VuexModule {
   }
 
   @Mutation setPrinters(printers: Printer[]) {
+    const viewedPrinterId = this.viewedPrinter?.id;
+    if (viewedPrinterId) {
+      this.viewedPrinter = printers.find((p) => p.id === viewedPrinterId);
+    }
     this.printers = printers;
     this.lastUpdated = Date.now();
   }

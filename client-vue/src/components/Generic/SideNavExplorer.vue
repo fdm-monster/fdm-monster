@@ -8,29 +8,45 @@
     width="500"
     @close="closeDrawer()"
   >
-    <v-icon>loading</v-icon>
     <v-list-item>
       <v-list-item-avatar color="primary">
         {{ avatarInitials() }}
       </v-list-item-avatar>
       <v-list-item-content v-if="storedViewedPrinter">
-        <v-list-item-title>{{ storedViewedPrinter.printerName }} PRINTER ONLINE</v-list-item-title>
-        <v-list-item-subtitle>Viewing printer files (LIVE)</v-list-item-subtitle>
+        <v-list-item-title>
+          {{ storedViewedPrinter.printerName }}
+          {{
+            storedViewedPrinter.enabled && storedViewedPrinter.apiAccessibility.accessible
+              ? "PRINTER ONLINE"
+              : "OFFLINE/DISABLED"
+          }}
+        </v-list-item-title>
+        <v-list-item-subtitle>Viewing printer files</v-list-item-subtitle>
+        <v-list-item-subtitle v-if="storedViewedPrinter.currentJob">
+          Printer progress: {{ storedViewedPrinter.currentJob.progress }}%
+        </v-list-item-subtitle>
+        <v-list-item-subtitle>
+          Nozzle Temp: {{ storedViewedPrinter.tools[0].chamber }}%
+        </v-list-item-subtitle>
       </v-list-item-content>
     </v-list-item>
 
     <v-divider></v-divider>
 
-    <v-list dense
-            subheader
-            two-line>
+    <v-list dense subheader two-line>
+      <v-subheader inset>Commands</v-subheader>
+      <v-list-item link>
+        <v-list-item-avatar>
+          <v-icon> stop</v-icon>
+        </v-list-item-avatar>
+        <v-list-item-content> STOP</v-list-item-content>
+      </v-list-item>
+
       <v-subheader inset>Files</v-subheader>
 
       <v-list-item v-for="(item, index) in shownFiles.files" :key="index" link>
         <v-list-item-avatar>
-          <v-icon>
-            download
-          </v-icon>
+          <v-icon> download</v-icon>
         </v-list-item-avatar>
         <v-list-item-icon>
           <v-icon>{{ item.icon }}</v-icon>
@@ -63,7 +79,6 @@ import { PrinterFile } from "@/models/printers/printer-file.model";
 
 @Component({
   data: () => ({
-    drawer: true,
     shownFiles: []
   })
 })
@@ -105,6 +120,14 @@ export default class SideNavExplorer extends Vue {
     if (!this.printerId) return;
 
     await printersState.deletePrinterFile({ printerId: this.printerId, fullPath: file.path });
+  }
+
+  @Watch("drawerOpened")
+  updateStore(newVal: boolean, oldVal: boolean) {
+    // Due to the animation delay the nav model lags behind enough for SSE to pick up and override
+    if (!newVal) {
+      printersState.setViewedPrinter(undefined);
+    }
   }
 
   closeDrawer() {
