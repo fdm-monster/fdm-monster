@@ -5,11 +5,12 @@
     class="tile"
     outlined
     tile
+    :style="{ 'background-color': printerStateColor }"
     @click="selectPrinter()"
   >
     <v-container v-if="printer">
       <small>
-        <strong style="font-size:0.8vw">
+        <strong style="font-size: 0.8vw">
           {{ printer.printerName }}
         </strong>
       </small>
@@ -46,6 +47,10 @@ export default class PrinterGridTile extends Vue {
 
   get printers() {
     return printersState.printers;
+  }
+
+  get printerStateColor() {
+    return this.printer?.printerState.colour.hex || "none";
   }
 
   id() {
