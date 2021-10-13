@@ -1,4 +1,4 @@
-import { VisualState, WebsocketState } from "@/models/printers/visual-state.model";
+import { HostState, PrinterState, WebsocketState } from "@/models/printers/visual-state.model";
 import { CostSettings } from "@/models/printers/cost-settings.model";
 import { PrinterCurrentJob, PrinterJob } from "@/models/printers/printer-current-job.model";
 import { ConnectionOptions } from "@/models/printers/connection-options.model";
@@ -13,8 +13,8 @@ export interface ApiAccessibility {
 export interface Printer {
   id: string;
   correlationToken?: string;
-  printerState: VisualState;
-  hostState: VisualState;
+  printerState: PrinterState;
+  hostState: HostState;
   apiAccessibility: ApiAccessibility;
   webSocketState: WebsocketState;
   costSettings: CostSettings;

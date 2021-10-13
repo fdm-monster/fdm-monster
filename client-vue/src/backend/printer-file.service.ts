@@ -3,6 +3,7 @@ import { ServerApi } from "@/backend/server.api";
 import { FileLocation } from "@/models/api/octoprint.definition";
 import { FileUploadCommands } from "@/models/printers/file-upload-commands.model";
 import { PrinterFileCache } from "@/models/printers/printer-file-cache.model";
+import { PrinterFile } from "@/models/printers/printer-file.model";
 
 export class PrinterFileService extends BaseService {
   static async getFiles(printerId: string, recursive = false, location: FileLocation = "local") {
@@ -68,5 +69,9 @@ export class PrinterFileService extends BaseService {
     const path = `${ServerApi.printerFilesRoute}/${printerId}/?location=${location}&fullPath=${fullPath}`;
 
     return this.deleteApi(path);
+  }
+
+  static downloadFile(file: PrinterFile) {
+    window.location.href = file.refs.download;
   }
 }

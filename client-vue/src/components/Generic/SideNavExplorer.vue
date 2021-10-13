@@ -32,7 +32,7 @@
 
     <v-list dense subheader two-line>
       <v-subheader inset>Commands</v-subheader>
-      <v-list-item link @click.prevent.stop="clickStop()">
+      <v-list-item :disabled="isStoppable" link @click.prevent.stop="clickStop()">
         <v-list-item-avatar>
           <v-icon> stop</v-icon>
         </v-list-item-avatar>
@@ -52,12 +52,24 @@
 
       <v-list-item v-for="(file, index) in filesListed" :key="index" link>
         <v-list-item-avatar>
-          <v-icon>download</v-icon>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn v-bind="attrs" v-on="on" icon @click="downloadFile(file)">
+                <v-icon>download</v-icon>
+              </v-btn>
+            </template>
+            <span>Download GCode</span>
+          </v-tooltip>
         </v-list-item-avatar>
         <v-list-item-action>
-          <v-btn icon @click="printFile(file)">
-            <v-icon color="grey darken-1">play_arrow</v-icon>
-          </v-btn>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn v-bind="attrs" v-on="on" icon @click="printFile(file)">
+                <v-icon>play_arrow</v-icon>
+              </v-btn>
+            </template>
+            <span>Select & Print</span>
+          </v-tooltip>
         </v-list-item-action>
 
         <v-list-item-icon>
@@ -88,6 +100,7 @@ import { generateInitials } from "@/constants/noun-adjectives.data";
 import { PrinterFileService } from "@/backend";
 import { PrinterFile } from "@/models/printers/printer-file.model";
 import { PrinterFileBucket } from "@/models/printers/printer-file-bucket.model";
+import { isPrinterStoppable } from "@/utils/printer-state.utils";
 
 @Component({
   data: () => ({
@@ -111,6 +124,11 @@ export default class SideNavExplorer extends Vue {
     return printersState.currentViewedPrinter;
   }
 
+  get isStoppable() {
+    if (!this.storedViewedPrinter) return false;
+    return isPrinterStoppable(this.storedViewedPrinter);
+  }
+
   @Watch("storedViewedPrinter")
   async inputUpdate(viewedPrinter?: Printer, oldVal?: Printer) {
     this.drawerOpened = !!viewedPrinter;
@@ -118,6 +136,7 @@ export default class SideNavExplorer extends Vue {
 
     if (!viewedPrinter || !printerId) return;
 
+    // TODO Triggers twice - race condition?
     if (!this.shownFiles || viewedPrinter.id !== this.shownFiles.printerId) {
       if (viewedPrinter.apiAccessibility.accessible) {
         let fileCache = await printersState.loadPrinterFiles({ printerId, recursive: false });
@@ -156,6 +175,10 @@ export default class SideNavExplorer extends Vue {
     if (!this.printerId) return;
 
     await printersState.selectAndPrintFile({ printerId: this.printerId, fullPath: file.path });
+  }
+
+  async downloadFile(file: PrinterFile) {
+    PrinterFileService.downloadFile(file);
   }
 
   @Watch("drawerOpened")
