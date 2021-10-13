@@ -76,6 +76,12 @@ export class PrintersService extends BaseService {
     return (await this.postApi(path, printer)) as Printer;
   }
 
+  static async batchImportPrinters(printers: CreatePrinter[]) {
+    const path = ServerApi.printerBatchRoute;
+
+    return (await this.postApi(path, printers)) as Printer[];
+  }
+
   static async deletePrinter(printerId: string) {
     const path = ServerApi.getPrinterRoute(printerId);
 

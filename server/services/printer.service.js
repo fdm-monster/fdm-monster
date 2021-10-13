@@ -44,6 +44,14 @@ class PrinterService {
     return Printers.findOneAndDelete(filter);
   }
 
+  async validateAndDefault(printer) {
+    const mergedPrinter = {
+      ...getDefaultPrinterEntry(),
+      ...printer
+    };
+    return await validateInput(mergedPrinter, createPrinterRules);
+  }
+
   /**
    * Stores a new printer into the database.
    * @param {Object} newPrinter object to create.
@@ -52,18 +60,13 @@ class PrinterService {
   async create(newPrinter) {
     if (!newPrinter) throw new Error("Missing printer");
 
-    const mergedPrinter = {
-      ...getDefaultPrinterEntry(),
-      ...newPrinter
-    };
+    const mergedPrinter = await this.validateAndDefault(newPrinter);
 
     // We should not to this now: Regenerate sort index on printer add...
     // await this.reGenerateSortIndex();
 
     mergedPrinter.dateAdded = Date.now();
     mergedPrinter.sortIndex = await this.#printerCount(); // 0-based index so no +1 needed
-
-    await validateInput(mergedPrinter, createPrinterRules);
 
     return Printers.create(mergedPrinter);
   }

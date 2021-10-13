@@ -251,6 +251,25 @@ class PrintersStore {
     this.#printerTickerStore.addIssue(printer, message, state);
   }
 
+  async batchImport(printers) {
+    this.#logger.info(`Validating ${printers.length} printer objects`);
+    for (let printer of printers) {
+      await this.#printerService.validateAndDefault(printer);
+    }
+
+    this.#logger.info(`Validation passed. Adding ${printers.length} printers`);
+
+    // We've passed validation completely - creation will likely succeed
+    const states = [];
+    for (let printer of printers) {
+      const newState = await this.addPrinter(printer);
+      states.push(newState.toFlat());
+    }
+
+    this.#logger.info(`Creation succeeded. Added ${printers.length} printers`);
+    return states;
+  }
+
   async addPrinter(printer) {
     this._validateState();
 

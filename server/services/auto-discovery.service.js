@@ -1,4 +1,3 @@
-const fetch = require("node-fetch");
 const { parseString } = require("xml2js");
 const Logger = require("../handlers/logger.js");
 const {

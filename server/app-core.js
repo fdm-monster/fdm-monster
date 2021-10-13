@@ -1,5 +1,4 @@
 const express = require("express");
-const flash = require("connect-flash");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const passport = require("passport");
@@ -27,7 +26,7 @@ function setupExpressServer() {
       methods: "GET,HEAD,PUT,PATCH,POST,DELETE"
     })
   );
-  app.use(express.json());
+  app.use(express.json({ limit: "1mb" }));
 
   app.use("/images", express.static("./images"));
   app.use(cookieParser());
@@ -42,13 +41,6 @@ function setupExpressServer() {
   app.use(passport.initialize());
   app.use(passport.session());
   app.use(passport.authenticate("remember-me")); // Remember Me!
-  app.use(flash());
-  app.use((req, res, next) => {
-    res.locals.success_msg = req.flash("success_msg");
-    res.locals.error_msg = req.flash("error_msg");
-    res.locals.error = req.flash("error");
-    next();
-  });
 
   app.use(scopePerRequest(container));
 
