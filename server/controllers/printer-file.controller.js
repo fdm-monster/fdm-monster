@@ -95,6 +95,12 @@ class PrinterFileController {
     this.#statusResponse(res, response);
   }
 
+  async purgeIndexedFiles(req, res) {
+    await this.#filesStore.purgeFiles();
+
+    res.send();
+  }
+
   async uploadFiles(req, res) {
     const { id: printerId } = await validateInput(req.params, idRules);
     const { location } = await validateInput(req.query, uploadFilesRules);
@@ -208,6 +214,7 @@ module.exports = createController(PrinterFileController)
     .before([ensureAuthenticated])
     .get("/:id", "getFiles")
     .get("/:id/cache", "getFilesCache")
+    .post("/purge", "purgeIndexedFiles")
     .delete("/:id", "deleteFile")
     .post("/:id/upload", "uploadFiles")
     // TODO below

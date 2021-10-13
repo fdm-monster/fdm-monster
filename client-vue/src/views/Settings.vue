@@ -24,8 +24,9 @@
       <v-list-item>
         <v-list-item-content>
           <v-list-item-title>Password</v-list-item-title>
-          <v-list-item-subtitle
-            >Require password for purchase or use password to restrict purchase
+          <v-list-item-subtitle>
+            Clear out the file references for all printers - this does not remove them from OctoPrint!
+            <v-btn @click="purgeFiles()">Purge file references</v-btn>
           </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
@@ -71,7 +72,7 @@
 <script>
 import Vue from "vue";
 import { Component } from "vue-property-decorator";
-import { PrinterGroupService, PrintersService } from "@/backend";
+import { PrinterGroupService, PrinterFilesService } from "@/backend";
 import { infoMessageEvent } from "@/event-bus/alert.events";
 
 @Component({
@@ -90,6 +91,12 @@ export default class Settings extends Vue {
     const groups = await PrinterGroupService.syncLegacyGroups();
 
     this.$bus.emit(infoMessageEvent, `Succesfully synced ${groups.length} groups!`);
+  }
+
+  async purgeFiles() {
+    await PrinterFilesService.purgeFiles();
+
+    this.$bus.emit(infoMessageEvent, `Succesfully purged all references to printer files!`);
   }
 }
 </script>

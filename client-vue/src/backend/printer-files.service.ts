@@ -48,6 +48,12 @@ export class PrinterFilesService extends BaseService {
     return this.postApi(path, formData, { unwrap: false });
   }
 
+  static async purgeFiles() {
+    const path = `${ServerApi.printerFilesPurgeRoute}`;
+
+    return this.postApi(path);
+  }
+
   static async deleteFile(printerId: string, fullPath: string, location = "local") {
     const path = `${ServerApi.printerFilesRoute}/${printerId}/?location=${location}&fullPath=${fullPath}`;
 

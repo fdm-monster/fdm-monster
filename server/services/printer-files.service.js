@@ -53,6 +53,14 @@ class PrinterFilesService {
     return printer.fileList;
   }
 
+  async clearFiles(printerId) {
+    const printer = await this.#printerService.get(printerId);
+    printer.fileList.files = [];
+    printer.fileList.fileCount = 0;
+    printer.markModified("fileList");
+    await printer.save();
+  }
+
   /**
    * Perform delete action on database
    * @param printerId

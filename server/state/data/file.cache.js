@@ -104,9 +104,7 @@ class FileCache {
       return;
     }
 
-    // console.log(Object.keys(this.#printerFileStorage), "before");
     delete this.#printerFileStorage[printerId];
-    // console.log(Object.keys(this.#printerFileStorage), "after");
 
     this.#logger.info(`Purged printerId '${printerId}' file cache`);
   }

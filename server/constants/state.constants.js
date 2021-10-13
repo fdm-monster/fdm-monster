@@ -1,11 +1,3 @@
-const getFilterDefaults = () => [
-  "All Printers",
-  "State: Idle",
-  "State: Active",
-  "State: Complete",
-  "State: Disconnected"
-];
-
 const MESSAGE = {
   offline: "OctoPrint instance seems to be offline",
   retryingApiConnection: "OctoPrint is offline. Retry is scheduled",
@@ -256,7 +248,6 @@ const mapStateToColor = (state) => {
 };
 
 module.exports = {
-  getFilterDefaults,
   mapStateToColor,
   remapOctoPrintState,
   ERR_COUNT,

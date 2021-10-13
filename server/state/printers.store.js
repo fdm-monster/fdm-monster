@@ -1,6 +1,4 @@
 const _ = require("lodash");
-const { getFilterDefaults } = require("../constants/state.constants");
-const Logger = require("../handlers/logger.js");
 const { NotImplementedException } = require("../exceptions/runtime.exceptions");
 const { NotFoundException } = require("../exceptions/runtime.exceptions");
 const { validateInput } = require("../handlers/validators");
@@ -15,20 +13,22 @@ class PrintersStore {
 
   #printerStates;
   #testPrinterState;
-  #logger = new Logger("Server-PrintersStore");
+  #logger;
 
   constructor({
     settingsStore,
     printerTickerStore,
     printerStateFactory,
     eventEmitter2,
-    printerService
+    printerService,
+    loggerFactory
   }) {
     this.#settingsStore = settingsStore;
     this.#printerService = printerService;
     this.#printerTickerStore = printerTickerStore;
     this.#printerStateFactory = printerStateFactory;
     this.#eventEmitter2 = eventEmitter2;
+    this.#logger = loggerFactory("Server-PrintersStore");
   }
 
   _validateState() {
