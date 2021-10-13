@@ -1,15 +1,19 @@
 <template>
   <v-card
     :class="{ 'tile-selected': selected, 'tile-setup': printer }"
+    :disabled="!printer"
     class="tile"
     outlined
     tile
-    :disabled="!printer"
     @click="selectPrinter()"
   >
     <v-container v-if="printer">
-      <small><strong>{{ printer.printerName }}</strong></small>
-      <v-btn class="float-right" icon @click.prevent.stop="clickInfo()">
+      <small>
+        <strong style="font-size:0.8vw">
+          {{ printer.printerName }}
+        </strong>
+      </small>
+      <v-btn class="float-right d-none d-lg-inline" icon @click.prevent.stop="clickInfo()">
         <v-icon>info</v-icon>
       </v-btn>
       <v-btn class="float-right" icon @click.prevent.stop="clickStop()">
@@ -70,7 +74,7 @@ export default class PrinterGridTile extends Vue {
 
 <style>
 .tile {
-  min-height: 80px;
+  min-height: 75px;
   -webkit-user-select: none; /* Safari */
   -moz-user-select: none; /* Firefox */
   -ms-user-select: none; /* IE10+/Edge */
@@ -81,7 +85,7 @@ export default class PrinterGridTile extends Vue {
   border: 1px solid green !important;
 }
 
-.tile-setup:hover{
+.tile-setup:hover {
   border: 1px solid red;
 }
 </style>
