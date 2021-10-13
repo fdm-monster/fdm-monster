@@ -13,8 +13,8 @@ Note: our aim is to support all kinds of 3D Printer (FDM, resin) API's with a pl
 
 This server is currently not yet released, so give it a star ⭐and be the first to experience it! 
 
-#### Last finished: printer creation and testing UI
-#### Current work: printer location grid and group management
+#### Last finished: printer location grid
+#### Current work: printer file commands and group management
 
 ## Development [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/davidzwa/3d-print-farm/graphs/commit-activity) ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/davidzwa/3d-print-farm/Node.js%20CI/development) [![GitHub license](https://img.shields.io/github/license/davidzwa/3d-print-farm)](https://github.com/davidzwa/3d-print-farm/blob/master/LICENSE.txt)
 
@@ -22,12 +22,14 @@ This work is under active development with cutting edge tech and standards. Feel
 
 ## Roadmap
 
-- Client for basic management of OctoPrint printers (file storage, print upload and printer management)
-- Better authentication and user management
-- Full API and client test coverage >80% (now at 40%)
-- OctoPrint Plugin release
-- Raspberry Pi image and prebuilt customized OctoPi image
-- First core release with documentation
+- [x] Vue app core and distribution setup on NPM completed
+- [x] Client for basic management of OctoPrint printers (file storage, print upload and printer management)
+- [ ] NodeJS Server legacy-free
+- [ ] Better authentication and user management
+- [ ] Full API and client test coverage >80% (now at 40%)
+- [ ] OctoPrint Plugin release
+- [ ] Raspberry Pi image and prebuilt customized OctoPi image
+- [ ] First core release with documentation
 
 There are a lot of plans in the making (f.e. tunneling, auto-discovery, plugin system,  etc.), which will be announced as we go!
 
