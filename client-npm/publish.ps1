@@ -1,0 +1,1 @@
+npm public --access public

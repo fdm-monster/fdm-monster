@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from "axios";
 
-export const apiBase = "http://localhost:4000";
+export const apiBase = ""; // Same-origin policy
 
 export class BaseService {
   static readonly UNWRAP = { unwrap: true };
