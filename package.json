@@ -36,7 +36,7 @@
     "vue"
   ],
   "dependencies": {
-    "@3d-print-farm/client": "^0.1.0-build0004",
+    "@3d-print-farm/client": "^0.1.0-build0006",
     "archiver": "^5.3.0",
     "awilix": "^5.0.1",
     "awilix-express": "^5.0.0",
