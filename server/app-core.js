@@ -65,7 +65,7 @@ function serveControllerRoutes(app) {
   // Catches any HTML request to paths like / or file/ as long as its text/html
   app.use(
     history({
-      htmlAcceptHeaders: ["html/text"] // Postman */* is ignored
+      // htmlAcceptHeaders: ["html/text"] // Postman */* is ignored
     })
   );
 
