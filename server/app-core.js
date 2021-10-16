@@ -26,7 +26,7 @@ function setupExpressServer() {
       methods: "GET,HEAD,PUT,PATCH,POST,DELETE"
     })
   );
-  app.use(express.json({ limit: "1mb" }));
+  app.use(express.json({ limit: "10mb" }));
 
   app.use("/images", express.static("./images"));
   app.use(cookieParser());
@@ -65,7 +65,7 @@ function serveControllerRoutes(app) {
   // Catches any HTML request to paths like / or file/ as long as its text/html
   app.use(
     history({
-      htmlAcceptHeaders: ["html/text"] // Postman */* is ignored
+      // htmlAcceptHeaders: ["html/text"] // Postman */* is ignored
     })
   );
 

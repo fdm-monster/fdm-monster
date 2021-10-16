@@ -1,6 +1,7 @@
 import axios, { AxiosResponse } from "axios";
+import Vue from "vue";
 
-export const apiBase = "http://localhost:4000";
+export const apiBase = Vue.config.devtools ? "http://localhost:4000" : ""; // Same-origin policy
 
 export class BaseService {
   static readonly UNWRAP = { unwrap: true };

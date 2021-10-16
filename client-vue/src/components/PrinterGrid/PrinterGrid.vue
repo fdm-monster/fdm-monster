@@ -7,7 +7,7 @@
             <PrinterGridTile :printer="getPrinter(x, y, 3)" :loading="loading" />
           </v-col>
           <v-col cols="6">
-            <PrinterGridTile :printer="getPrinter(x, y, 1)" :loading="loading" />
+            <PrinterGridTile :printer="getPrinter(x, y, 0)" :loading="loading" />
           </v-col>
         </v-row>
         <v-row class="test-bottom" no-gutters>
@@ -15,7 +15,7 @@
             <PrinterGridTile :printer="getPrinter(x, y, 2)" :loading="loading" />
           </v-col>
           <v-col cols="6">
-            <PrinterGridTile :printer="getPrinter(x, y, 0)" :loading="loading" />
+            <PrinterGridTile :printer="getPrinter(x, y, 1)" :loading="loading" />
           </v-col>
         </v-row>
       </v-col>

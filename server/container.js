@@ -71,27 +71,10 @@ function configureContainer() {
     // -- asFunction --
     // Resolve dependencies by calling a function (synchronous or asynchronous)
     // Use cases: factories, or dynamic configuration from external sources
-    //
-    // Factory:
-    // We tell awilix that this will create "something" during runtime in this case it will create instances of PrinterState
-    // A name tells a lot (PrinterStateFactory => PrinterState)
-    // The resulting instances are not globally available per se. That's up to us.
-    // We just need something to manage it afterwards, otherwise we might lose reference to it.
-    // In this case we save it to PrintersStore:
-    // TL;DR we can dynamically create injectable dependencies just fine using awilix.
     [DITokens.printerStateFactory]: asFunction(PrinterStateFactory).transient(), // Factory function, transient on purpose!
 
     // -- asClass --
-    // Below we are telling Awilix how to resolve a dependency class:
-    // This means "constructing on demand", so during code runtime. THIS HAS A RISK you need to be aware of.
-    // When a dependency is not known this causes an awilix Resolution Error. Testing this is easy peasy though.
-    // A good way is validating some at startup by hand or automatically (increasing boot time uselessly).
-    // Or trust you did the right thing. All options are fine.
-    //
-    // Register a class by instantiating a class using asClass and caching it with .singleton()
-    // Other flavours are: .transient() (default, volatile instance) and .scoped() (conditionally volatile)
-    // scoping is usually done for request API middleware to ensure f.e. that current user is set or group/tenant/roles/etc
-    // Therefore scoping can influence how many requests per sec the API can handle... in case you're interested to know.
+    // Below we are telling Awilix how to resolve a dependency class which is constructed on demand
     [DITokens.settingsStore]: asClass(SettingsStore).singleton(),
     [DITokens.serverSettingsService]: asClass(ServerSettingsService),
     [DITokens.clientSettingsService]: asClass(ClientSettingsService),
@@ -107,7 +90,12 @@ function configureContainer() {
     [DITokens.systemCommandsService]: asClass(SystemCommandsService),
     [DITokens.serverLogsService]: asClass(ServerLogsService),
     [DITokens.systemInfoBundleService]: asClass(SystemInfoBundleService),
-    [DITokens.httpClient]: awilix.asValue(axios),
+    [DITokens.httpClient]: awilix.asValue(
+      axios.create({
+        maxBodyLength: 10 * 1000 * 1000, // 10MB
+        maxContentLength: 1000 * 1000 * 1000 // 1GB
+      })
+    ),
 
     [DITokens.printerService]: asClass(PrinterService),
     [DITokens.printerFilesService]: asClass(PrinterFilesService),
