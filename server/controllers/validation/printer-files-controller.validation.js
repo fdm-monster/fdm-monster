@@ -23,9 +23,17 @@ const fileUploadCommandsRules = {
   print: "boolean"
 };
 
+const localFileUploadRules = {
+  localLocation: "required",
+  location: "required|in:local,sdcard",
+  select: "boolean",
+  print: "boolean"
+};
+
 module.exports = {
   getFilesRules,
   selectPrintFile,
+  localFileUploadRules,
   uploadFilesRules,
   fileUploadCommandsRules,
   getFileRules

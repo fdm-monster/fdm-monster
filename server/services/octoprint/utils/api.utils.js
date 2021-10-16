@@ -24,6 +24,12 @@ function constructHeaders(apiKey, contentType = jsonContentType) {
   };
 }
 
+/**
+ * Process an Axios response (default)
+ * @param response
+ * @param options
+ * @returns {{data, status}|*}
+ */
 function processResponse(response, options = { unwrap: true }) {
   if (options.unwrap) {
     return response.data;
@@ -34,8 +40,26 @@ function processResponse(response, options = { unwrap: true }) {
   return response;
 }
 
+/**
+ * Process a Got based request
+ * @param response
+ * @param options
+ * @returns {{data, status}|*}
+ */
+async function processGotResponse(response, options = { unwrap: true }) {
+  if (options.unwrap) {
+    return JSON.parse(response.body);
+  }
+  if (options.simple) {
+    const data = JSON.parse(response.body);
+    return { status: response.statusCode, data };
+  }
+  return response;
+}
+
 module.exports = {
   validatePrinter,
   constructHeaders,
-  processResponse
+  processResponse,
+  processGotResponse
 };

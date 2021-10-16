@@ -9,7 +9,8 @@ const {
   getFileRules,
   uploadFilesRules,
   fileUploadCommandsRules,
-  selectPrintFile
+  selectPrintFile,
+  localFileUploadRules
 } = require("./validation/printer-files-controller.validation");
 const { ExternalServiceError, ValidationException } = require("../exceptions/runtime.exceptions");
 const HttpStatusCode = require("../constants/http-status-codes.constants");
@@ -17,6 +18,7 @@ const { Status } = require("../constants/service.constants");
 const multer = require("multer");
 const path = require("path");
 const { FileLocation } = require("../services/octoprint/constants/octoprint-service.constants");
+const fs = require("fs");
 
 class PrinterFileController {
   #filesStore;
@@ -183,6 +185,35 @@ class PrinterFileController {
     res.send(response);
   }
 
+  async localUploadFile(req, res) {
+    const { id: printerId } = await validateInput(req.params, idRules);
+
+    const printerLogin = this.#printersStore.getPrinterLogin(printerId);
+
+    // Multer has processed the remaining multipart data into the body as json
+    const { select, print, location, localLocation } = await validateInput(
+      req.body,
+      localFileUploadRules
+    );
+
+    const stream = fs.createReadStream(localLocation);
+
+    const response = await this.#octoPrintApiService.uploadFilesAsMultiPart(
+      printerLogin,
+      [stream],
+      { select, print },
+      location
+    );
+
+    // TODO update file cache with files store
+    if (location === FileLocation.local && response.success !== false) {
+      const newOrUpdatedFile = response.files.local;
+      await this.#filesStore.appendOrSetPrinterFile(printerId, newOrUpdatedFile);
+    }
+
+    res.send(response);
+  }
+
   async stubUploadFiles(req, res) {
     const uploadAnyDisk = multer({
       storage: multer.diskStorage({
@@ -278,6 +309,7 @@ module.exports = createController(PrinterFileController)
     .get("/:id", "getFiles")
     .get("/:id/cache", "getFilesCache")
     .delete("/:id", "deleteFile")
+    .post("/:id/local-upload", "localUploadFile")
     .post("/:id/upload", "uploadFiles")
     .post("/:id/select", "selectPrintFile")
     .post("/:id/clear", "clearPrinterFiles")

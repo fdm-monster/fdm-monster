@@ -67,10 +67,6 @@ class PrinterSettingsController {
     res.send(settings);
   }
 
-  // async bulkSetGCodeAnalysis(req, res) {
-  //   const { enabled } = await validateInput(req.body, setGcodeAnalysis);
-  // }
-
   async setGCodeAnalysis(req, res) {
     const { id: printerId } = await validateInput(req.params, idRules);
     const input = await validateInput(req.body, setGcodeAnalysis);
@@ -87,6 +83,5 @@ class PrinterSettingsController {
 module.exports = createController(PrinterSettingsController)
     .prefix(AppConstants.apiRoute + "/printer-settings")
     .before([ensureAuthenticated])
-    // .patch("/bulk-gcode-analysis", "bulkSetGCodeAnalysis")
     .get("/:id", "get")
     .patch("/:id/gcode-analysis", "setGCodeAnalysis");

@@ -8,10 +8,16 @@ const {
   multiPartContentType
 } = require("./constants/octoprint-service.constants");
 const { checkPluginManagerAPIDeprecation } = require("../../utils/compatibility.utils");
-const { processResponse, validatePrinter, constructHeaders } = require("./utils/api.utils");
+const {
+  processResponse,
+  validatePrinter,
+  constructHeaders,
+  processGotResponse
+} = require("./utils/api.utils");
 const { jsonContentType } = require("./constants/octoprint-service.constants");
 const { getDefaultTimeout } = require("../../constants/server-settings.constants");
 const FormData = require("form-data");
+const got = require("got");
 
 const defaultResponseOptions = { unwrap: true };
 const octoPrintBase = "/";
@@ -245,7 +251,11 @@ class OctoprintApiService {
     const formData = new FormData();
 
     fileBuffers.forEach((b) => {
-      formData.append("file", b.buffer, { filename: b.originalname });
+      if (typeof b?.pipe === "function") {
+        formData.append("file", b);
+      } else {
+        formData.append("file", b.buffer, { filename: b.originalname });
+      }
     });
 
     if (fileBuffers.length === 1) {
@@ -260,17 +270,20 @@ class OctoprintApiService {
     try {
       const headers = {
         ...options.headers,
-        ...formData.getHeaders(),
-        "Content-Length": formData.getLengthSync()
+        ...formData.getHeaders()
       };
-      const response = await this.#httpClient.post(url, formData, {
-        headers,
-        onUploadProgress: (progress) => {
-          console.log(progress);
-        }
-      });
 
-      return processResponse(response, responseOptions);
+      // Not awaited to maintain promise calls like .json()/.text() etc
+      const response = await got
+        .post(url, {
+          body: formData,
+          headers
+        })
+        .on("uploadProgress", (p) => {
+          console.log(p.percent);
+        });
+
+      return await processGotResponse(response, responseOptions);
     } catch (e) {
       return { error: e.message, success: false, stack: e.stack };
     }
