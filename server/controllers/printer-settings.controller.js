@@ -89,4 +89,4 @@ module.exports = createController(PrinterSettingsController)
     .before([ensureAuthenticated])
     // .patch("/bulk-gcode-analysis", "bulkSetGCodeAnalysis")
     .get("/:id", "get")
-    .patch("/:id/gcode-analysis", "setGcodeAnalysis");
+    .patch("/:id/gcode-analysis", "setGCodeAnalysis");
