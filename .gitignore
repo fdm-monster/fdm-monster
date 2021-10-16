@@ -8,10 +8,14 @@
 **/.build
 **/.cache
 **/coverage
-/images
-
 
 # V2 Server
 server-nest/assets/public/assets/
 
+# NPM publish
 *.tgz
+
+# Runtime folders
+/images
+/3DPF
+/file-uploads

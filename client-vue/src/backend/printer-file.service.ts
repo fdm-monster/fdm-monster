@@ -33,6 +33,28 @@ export class PrinterFileService extends BaseService {
     return await this.postApi(path, { fullPath, location, print });
   }
 
+  static async uploadStubFile(printerId: string, files: File[]) {
+    const path = ServerApi.printerFilesUploadStubRoute;
+
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+      formData.append("files[" + i + "]", files[i]);
+    }
+
+    return this.postUploadApi(
+      path,
+      formData,
+      {
+        onUploadProgress: this.uploadUpdateProgress
+      },
+      { unwrap: false }
+    );
+  }
+
+  static uploadUpdateProgress(progress: any) {
+    console.log(progress);
+  }
+
   static async uploadFiles(
     printerId: string,
     files: File[],
@@ -57,7 +79,14 @@ export class PrinterFileService extends BaseService {
     }
     // TODO more than 1 will now fail due to API validation
 
-    return this.postApi(path, formData, { unwrap: false });
+    return this.postUploadApi(
+      path,
+      formData,
+      {
+        onUploadProgress: this.uploadUpdateProgress
+      },
+      { unwrap: false }
+    );
   }
 
   static async clearFiles(printerId: string) {

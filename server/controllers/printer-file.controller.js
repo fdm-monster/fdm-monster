@@ -183,6 +183,28 @@ class PrinterFileController {
     res.send(response);
   }
 
+  async stubUploadFiles(req, res) {
+    const uploadAnyDisk = multer({
+      storage: multer.diskStorage({
+        destination: "./file-uploads"
+      }),
+
+      fileFilter: this.#fileFilter
+    }).any();
+
+    await new Promise((resolve, reject) =>
+      uploadAnyDisk(req, res, (err) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve();
+      })
+    );
+
+    this.#logger.info("Stub file upload complete.");
+    res.send();
+  }
+
   async deleteFile(req, res) {
     const { id: printerId } = await validateInput(req.params, idRules);
     const { fullPath, location } = await validateInput(req.query, getFileRules, res);
@@ -252,6 +274,7 @@ module.exports = createController(PrinterFileController)
     .prefix(AppConstants.apiRoute + "/printer-files")
     .before([ensureAuthenticated])
     .post("/purge", "purgeIndexedFiles")
+    .post("/stub-upload", "stubUploadFiles")
     .get("/:id", "getFiles")
     .get("/:id/cache", "getFilesCache")
     .delete("/:id", "deleteFile")

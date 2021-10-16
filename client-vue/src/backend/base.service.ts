@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from "axios";
+import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import Vue from "vue";
 
 export const apiBase = Vue.config.devtools ? "http://localhost:4000" : ""; // Same-origin policy
@@ -21,6 +21,19 @@ export class BaseService {
     // Do interception or global handling here
     // ...
     return this.handleResponse<T>(response, options);
+  }
+
+  protected static async postUploadApi<FormData>(
+    path: string,
+    formData: FormData,
+    config: AxiosRequestConfig,
+    options = this.UNWRAP
+  ) {
+    const response = await axios.post(`${apiBase}/${path}`, formData, config);
+
+    // Do interception or global handling here
+    // ...
+    return this.handleResponse(response, options);
   }
 
   protected static async deleteApi(path: string, options = this.UNWRAP) {

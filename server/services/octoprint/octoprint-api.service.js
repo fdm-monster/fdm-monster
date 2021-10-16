@@ -155,6 +155,19 @@ class OctoprintApiService {
     return processResponse(response, responseOptions);
   }
 
+  async setGCodeAnalysis(printer, { enabled }, responseOptions = defaultResponseOptions) {
+    const { url, options } = this.#prepareRequest(printer, apiSettingsPart);
+
+    const settingPatch = {
+      gcodeAnalysis: {
+        runAt: enabled ? "idle" : "never"
+      }
+    };
+    const response = await this.#httpClient.post(url, settingPatch, options);
+
+    return processResponse(response, responseOptions);
+  }
+
   async getAdminUserOrDefault(printer) {
     const data = await this.getUsers(printer, defaultResponseOptions);
 
@@ -251,7 +264,10 @@ class OctoprintApiService {
         "Content-Length": formData.getLengthSync()
       };
       const response = await this.#httpClient.post(url, formData, {
-        headers
+        headers,
+        onUploadProgress: (progress) => {
+          console.log(progress);
+        }
       });
 
       return processResponse(response, responseOptions);

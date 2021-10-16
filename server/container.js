@@ -92,7 +92,7 @@ function configureContainer() {
     [DITokens.systemInfoBundleService]: asClass(SystemInfoBundleService),
     [DITokens.httpClient]: awilix.asValue(
       axios.create({
-        maxBodyLength: 10 * 1000 * 1000, // 10MB
+        maxBodyLength: 1000 * 1000 * 1000, // 1GB
         maxContentLength: 1000 * 1000 * 1000 // 1GB
       })
     ),

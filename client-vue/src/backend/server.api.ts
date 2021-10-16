@@ -9,6 +9,7 @@ export class ServerApi {
   static printerGroupRoute = ServerApi.base + "/printer-group";
   static printerGroupSyncLegacyRoute = `${ServerApi.printerGroupRoute}/sync-legacy`;
   static printerFilesRoute = `${ServerApi.base}/printer-files`;
+  static printerFilesUploadStubRoute = `${ServerApi.base}/printer-files/upload-stub`;
   static printerFilesPurgeRoute = `${ServerApi.printerFilesRoute}/purge`;
   static printerNetworkRoute = `${ServerApi.base}/printer-network`;
   static scanSsdp = `${ServerApi.printerNetworkRoute}/scan-ssdp`;

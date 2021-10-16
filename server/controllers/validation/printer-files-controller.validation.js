@@ -19,8 +19,8 @@ const getFileRules = {
 };
 
 const fileUploadCommandsRules = {
-  select: "required|boolean",
-  print: "required|boolean"
+  select: "boolean",
+  print: "boolean"
 };
 
 module.exports = {
