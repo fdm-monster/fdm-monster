@@ -1,5 +1,3 @@
-import { FileLocation } from "@/models/api/octoprint.definition";
-
 export class ServerApi {
   static base = "api";
   static amIAliveRoute = ServerApi.base + "/amialive";
@@ -9,6 +7,7 @@ export class ServerApi {
   static printerGroupRoute = ServerApi.base + "/printer-group";
   static printerGroupSyncLegacyRoute = `${ServerApi.printerGroupRoute}/sync-legacy`;
   static printerFilesRoute = `${ServerApi.base}/printer-files`;
+  static printerFilesUploadStubRoute = `${ServerApi.base}/printer-files/upload-stub`;
   static printerFilesPurgeRoute = `${ServerApi.printerFilesRoute}/purge`;
   static printerNetworkRoute = `${ServerApi.base}/printer-network`;
   static scanSsdp = `${ServerApi.printerNetworkRoute}/scan-ssdp`;
@@ -41,8 +40,7 @@ export class ServerApi {
   static printerFilesClearRoute = (id: string) => `${ServerApi.printerFilesRoute}/${id}/clear`;
   static printerFilesSelectAndPrintRoute = (id: string) =>
     `${ServerApi.printerFilesRoute}/${id}/select`;
-  static printerFilesUploadRoute = (id: string, location: FileLocation) =>
-    `${ServerApi.printerFilesRoute}/${id}/upload?location=${location}`;
+  static printerFilesUploadRoute = (id: string) => `${ServerApi.printerFilesRoute}/${id}/upload`;
   static printerFilesCacheRoute = (id: string) => `${ServerApi.printerFilesRoute}/${id}/cache`;
   static printerEnabledRoute = (id: string) => `${ServerApi.getPrinterRoute(id)}/enabled`;
   static printerSerialConnectRoute = (id: string) =>

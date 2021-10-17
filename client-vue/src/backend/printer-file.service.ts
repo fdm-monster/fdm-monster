@@ -1,13 +1,12 @@
 import { BaseService } from "@/backend/base.service";
 import { ServerApi } from "@/backend/server.api";
-import { FileLocation } from "@/models/api/octoprint.definition";
 import { FileUploadCommands } from "@/models/printers/file-upload-commands.model";
 import { PrinterFileCache } from "@/models/printers/printer-file-cache.model";
 import { PrinterFile } from "@/models/printers/printer-file.model";
 
 export class PrinterFileService extends BaseService {
-  static async getFiles(printerId: string, recursive = false, location: FileLocation = "local") {
-    const path = `${ServerApi.printerFilesRoute}/${printerId}/?location=${location}&recursive=${recursive}`;
+  static async getFiles(printerId: string, recursive = false) {
+    const path = `${ServerApi.printerFilesRoute}/${printerId}/?recursive=${recursive}`;
 
     return (await this.getApi(path)) as PrinterFileCache;
   }
@@ -22,24 +21,40 @@ export class PrinterFileService extends BaseService {
     return (await this.getApi(path)) as PrinterFileCache;
   }
 
-  static async selectAndPrintFile(
-    printerId: string,
-    fullPath: string,
-    location: FileLocation = "local",
-    print = true
-  ) {
+  static async selectAndPrintFile(printerId: string, filePath: string, print = true) {
     const path = ServerApi.printerFilesSelectAndPrintRoute(printerId);
 
-    return await this.postApi(path, { fullPath, location, print });
+    return await this.postApi(path, { filePath, print });
+  }
+
+  static async uploadStubFile(printerId: string, files: File[]) {
+    const path = ServerApi.printerFilesUploadStubRoute;
+
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+      formData.append("files[" + i + "]", files[i]);
+    }
+
+    return this.postUploadApi(
+      path,
+      formData,
+      {
+        onUploadProgress: this.uploadUpdateProgress
+      },
+      { unwrap: false }
+    );
+  }
+
+  static uploadUpdateProgress(progress: any) {
+    console.log(progress);
   }
 
   static async uploadFiles(
     printerId: string,
     files: File[],
-    commands: FileUploadCommands = { select: true, print: true },
-    location: FileLocation = "local"
+    commands: FileUploadCommands = { select: true, print: true }
   ) {
-    const path = ServerApi.printerFilesUploadRoute(printerId, location);
+    const path = ServerApi.printerFilesUploadRoute(printerId);
 
     const formData = new FormData();
     for (let i = 0; i < files.length; i++) {
@@ -57,13 +72,20 @@ export class PrinterFileService extends BaseService {
     }
     // TODO more than 1 will now fail due to API validation
 
-    return this.postApi(path, formData, { unwrap: false });
+    return this.postUploadApi(
+      path,
+      formData,
+      {
+        onUploadProgress: this.uploadUpdateProgress
+      },
+      { unwrap: false }
+    );
   }
 
   static async clearFiles(printerId: string) {
     const path = `${ServerApi.printerFilesClearRoute(printerId)}`;
 
-    return this.postApi(path);
+    return this.deleteApi(path);
   }
 
   static async purgeFiles() {
@@ -72,8 +94,8 @@ export class PrinterFileService extends BaseService {
     return this.postApi(path);
   }
 
-  static async deleteFile(printerId: string, fullPath: string, location = "local") {
-    const path = `${ServerApi.printerFilesRoute}/${printerId}/?location=${location}&fullPath=${fullPath}`;
+  static async deleteFile(printerId: string, filePath: string) {
+    const path = `${ServerApi.printerFilesRoute}/${printerId}/?filePath=${filePath}`;
 
     return this.deleteApi(path);
   }

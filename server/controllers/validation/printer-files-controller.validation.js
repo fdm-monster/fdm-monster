@@ -1,32 +1,46 @@
 const getFilesRules = {
-  location: "required|in:local,sdcard",
   recursive: "required|boolean"
 };
 
-const selectPrintFile = {
-  location: "required|in:local,sdcard",
-  fullPath: "required|string",
+const selectAndPrintFileRules = {
+  filePath: "required|string",
   print: "required|boolean"
 };
 
-const uploadFilesRules = {
-  location: "required|in:local,sdcard"
-};
+const uploadFilesRules = {};
 
 const getFileRules = {
-  location: "required|in:local,sdcard",
-  fullPath: "required|string"
+  filePath: "required|string"
+};
+
+const createFolderRules = {
+  foldername: "required|string",
+  path: "required|string"
+};
+
+const moveFileOrFolderRules = {
+  filePath: "required|string",
+  destination: "required|string"
 };
 
 const fileUploadCommandsRules = {
-  select: "required|boolean",
-  print: "required|boolean"
+  select: "boolean",
+  print: "boolean"
+};
+
+const localFileUploadRules = {
+  localLocation: "required",
+  select: "boolean",
+  print: "boolean"
 };
 
 module.exports = {
   getFilesRules,
-  selectPrintFile,
+  selectAndPrintFileRules,
+  localFileUploadRules,
   uploadFilesRules,
+  createFolderRules,
+  moveFileOrFolderRules,
   fileUploadCommandsRules,
   getFileRules
 };

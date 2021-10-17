@@ -13,7 +13,7 @@ const { AppConstants } = require("../app.constants");
 const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
 const { idRules } = require("./validation/generic.validation");
 const DITokens = require("../container.tokens");
-const { Status, getSettingsApperearanceDefault } = require("../constants/service.constants");
+const { Status, getSettingsAppearanceDefault } = require("../constants/service.constants");
 
 class PrinterController {
   #printersStore;
@@ -130,7 +130,7 @@ class PrinterController {
     if (!printer.webSocketURL) {
       printer.webSocketURL = convertHttpUrlToWebsocket(printer.printerURL);
     }
-    printer.settingsAppearance = getSettingsApperearanceDefault();
+    printer.settingsAppearance = getSettingsAppearanceDefault();
     if (printer.printerName) {
       printer.settingsAppearance.name = printer.printerName;
       delete printer.printerName;

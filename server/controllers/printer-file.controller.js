@@ -1,7 +1,7 @@
 const { ensureAuthenticated } = require("../middleware/auth");
 const { createController } = require("awilix-express");
 const Logger = require("../handlers/logger.js");
-const { validateMiddleware, validateInput } = require("../handlers/validators");
+const { validateInput, getScopedPrinter, validateMiddleware } = require("../handlers/validators");
 const { AppConstants } = require("../app.constants");
 const { idRules } = require("./validation/generic.validation");
 const {
@@ -9,14 +9,22 @@ const {
   getFileRules,
   uploadFilesRules,
   fileUploadCommandsRules,
-  selectPrintFile
+  selectAndPrintFileRules,
+  localFileUploadRules,
+  moveFileOrFolderRules,
+  createFolderRules
 } = require("./validation/printer-files-controller.validation");
 const { ExternalServiceError, ValidationException } = require("../exceptions/runtime.exceptions");
 const HttpStatusCode = require("../constants/http-status-codes.constants");
 const { Status } = require("../constants/service.constants");
 const multer = require("multer");
 const path = require("path");
-const { FileLocation } = require("../services/octoprint/constants/octoprint-service.constants");
+const fs = require("fs");
+const {
+  currentPrinterToken,
+  printerLoginToken,
+  printerResolveMiddleware
+} = require("../middleware/printer");
 
 class PrinterFileController {
   #filesStore;
@@ -24,15 +32,21 @@ class PrinterFileController {
   #octoPrintApiService;
   #printersStore;
 
+  // Scoped middleware
+  #currentPrinter;
+  #printerLogin;
+
   #logger = new Logger("Server-API");
 
-  constructor({ filesStore, octoPrintApiService, printersStore }) {
+  constructor({ filesStore, octoPrintApiService, printersStore, currentPrinter, printerLogin }) {
     this.#filesStore = filesStore;
     this.#octoPrintApiService = octoPrintApiService;
     this.#printersStore = printersStore;
+    this.#currentPrinter = currentPrinter;
+    this.#printerLogin = printerLogin;
   }
 
-  #fileFilter(req, file, callback) {
+  #gcodeFileFilter(req, file, callback) {
     const ext = path.extname(file.originalname);
     if (ext !== ".gcode") {
       return callback(new Error("Only .gcode files are allowed"));
@@ -45,23 +59,16 @@ class PrinterFileController {
     res.send(response.data);
   }
 
-  #multiActionResponse(res, status, actionResults) {
-    res.statusCode = status;
-    res.send(actionResults);
-  }
-
   async getFiles(req, res) {
-    const { id: printerId } = await validateInput(req.params, idRules);
-    const { recursive, location } = await validateInput(req.query, getFilesRules);
+    const { printerLogin, currentPrinterId } = getScopedPrinter(req);
+    const { recursive } = await validateInput(req.query, getFilesRules);
 
-    const printerLogin = this.#printersStore.getPrinterLogin(printerId);
-
-    const response = await this.#octoPrintApiService.getFiles(printerLogin, recursive, location, {
+    const response = await this.#octoPrintApiService.getFiles(printerLogin, recursive, {
       unwrap: false,
       simple: true
     });
 
-    await this.#filesStore.updatePrinterFiles(printerId, response.data);
+    await this.#filesStore.updatePrinterFiles(currentPrinterId, response.data);
 
     this.#statusResponse(res, response);
   }
@@ -73,32 +80,29 @@ class PrinterFileController {
    * @returns {Promise<void>}
    */
   async getFilesCache(req, res) {
-    const { id: printerId } = await validateInput(req.params, idRules);
+    const { currentPrinter } = getScopedPrinter(req);
 
-    const filesCache = await this.#filesStore.getFiles(printerId);
+    const filesCache = await this.#filesStore.getFiles(currentPrinter.id);
 
     res.send(filesCache);
   }
 
   async getFile(req, res) {
-    const { id: printerId } = await validateInput(req.params, idRules);
-    const { fullPath } = await validateInput(req.query, getFileRules, res);
+    const { currentPrinter, printerLogin } = getScopedPrinter(req);
+    const { filePath } = await validateInput(req.query, getFileRules, res);
 
-    const printerLogin = this.#printersStore.getPrinterLogin(printerId);
-
-    const response = await this.#octoPrintApiService.getFile(printerLogin, fullPath, {
+    const response = await this.#octoPrintApiService.getFile(printerLogin, filePath, {
       unwrap: false,
       simple: true
     });
 
-    await this.#filesStore.updatePrinterFiles(printerId, response.data);
+    await this.#filesStore.appendOrSetPrinterFile(currentPrinter.id, response.data);
 
     this.#statusResponse(res, response);
   }
 
   async clearPrinterFiles(req, res) {
-    const { id: printerId } = await validateInput(req.params, idRules);
-    const printerLogin = this.#printersStore.getPrinterLogin(printerId);
+    const { currentPrinterId, printerLogin } = getScopedPrinter(req);
 
     const nonRecursiveFiles = await this.#octoPrintApiService.getFiles(printerLogin, false);
 
@@ -114,7 +118,7 @@ class PrinterFileController {
       }
     }
 
-    await this.#filesStore.purgePrinterFiles(printerId);
+    await this.#filesStore.purgePrinterFiles(currentPrinterId);
 
     res.send({
       failedFiles,
@@ -128,27 +132,60 @@ class PrinterFileController {
     res.send();
   }
 
-  async selectPrintFile(req, res) {
-    const { id: printerId } = await validateInput(req.params, idRules);
-    const printerLogin = this.#printersStore.getPrinterLogin(printerId);
+  async moveFileOrFolder(req, res) {
+    const { printerLogin } = getScopedPrinter(req);
+    const { filePath: path, destination } = await validateMiddleware(req, moveFileOrFolderRules);
 
-    const { fullPath: path, location, print } = await validateInput(req.body, selectPrintFile);
+    const result = await this.#octoPrintApiService.moveFileOrFolder(
+      printerLogin,
+      path,
+      destination
+    );
 
-    const command = this.#octoPrintApiService.selectCommand(print);
-    await this.#octoPrintApiService.selectPrintFile(printerLogin, path, location, command);
+    // TODO Update file storage
 
-    res.send(Status.success(`Select file (print=${print}) command sent`));
+    res.send(result);
+  }
+
+  async createFolder(req, res) {
+    const { printerLogin } = getScopedPrinter(req);
+    const { path, foldername } = await validateMiddleware(req, createFolderRules);
+
+    const result = await this.#octoPrintApiService.createFolder(printerLogin, path, foldername);
+
+    // TODO Update file storage
+
+    res.send(result);
+  }
+
+  async deleteFileOrFolder(req, res) {
+    const { currentPrinterId, printerLogin } = getScopedPrinter(req);
+    const { filePath } = await validateInput(req.body, moveFileOrFolderRules);
+
+    const result = await this.#octoPrintApiService.deleteFileOrFolder(printerLogin, filePath);
+
+    await this.#filesStore.deleteFile(currentPrinterId, filePath, false);
+    this.#logger.info(`File reference removed, printerId ${currentPrinterId}`, filePath);
+
+    res.send(result);
+  }
+
+  async selectAndPrintFile(req, res) {
+    const { printerLogin } = getScopedPrinter(req, [printerLoginToken]);
+    const { filePath: path, print } = await validateInput(req.body, selectAndPrintFileRules);
+
+    const result = await this.#octoPrintApiService.selectPrintFile(printerLogin, path, print);
+
+    res.send(result);
   }
 
   async uploadFiles(req, res) {
-    const { id: printerId } = await validateInput(req.params, idRules);
-    const { location } = await validateInput(req.query, uploadFilesRules);
-
-    const printerLogin = this.#printersStore.getPrinterLogin(printerId);
+    const { currentPrinterId, printerLogin } = getScopedPrinter(req);
+    const {} = await validateInput(req.query, uploadFilesRules);
 
     const uploadAny = multer({
       storage: multer.memoryStorage(),
-      fileFilter: this.#fileFilter
+      fileFilter: this.#gcodeFileFilter
     }).any();
 
     await new Promise((resolve, reject) =>
@@ -170,98 +207,75 @@ class PrinterFileController {
     const response = await this.#octoPrintApiService.uploadFilesAsMultiPart(
       printerLogin,
       req.files,
-      commands,
-      location
+      commands
     );
 
-    // TODO update file cache with files store
-    if (location === FileLocation.local && response.success !== false) {
+    if (response.success !== false) {
       const newOrUpdatedFile = response.files.local;
-      await this.#filesStore.appendOrSetPrinterFile(printerId, newOrUpdatedFile);
+      await this.#filesStore.appendOrSetPrinterFile(currentPrinterId, newOrUpdatedFile);
     }
 
     res.send(response);
   }
 
-  async deleteFile(req, res) {
-    const { id: printerId } = await validateInput(req.params, idRules);
-    const { fullPath, location } = await validateInput(req.query, getFileRules, res);
+  async localUploadFile(req, res) {
+    const { currentPrinterId, printerLogin } = getScopedPrinter(req);
 
-    const printerLogin = this.#printersStore.getPrinterLogin(printerId);
+    // Multer has processed the remaining multipart data into the body as json
+    const { select, print, localLocation } = await validateInput(req.body, localFileUploadRules);
 
-    let response;
-    try {
-      response = await this.#octoPrintApiService.deleteFile(printerLogin, fullPath, location, {
-        unwrap: false,
-        simple: true // Keeps only status and data props
-      });
-    } catch (e) {
-      // NOT_FOUND or NO_CONTENT fall through
-      if (e.response?.status === HttpStatusCode.CONFLICT) {
-        // File was probably busy or printing
-        throw new ExternalServiceError(e.response.data);
-      } else if (e.response?.status === HttpStatusCode.NOT_FOUND) {
-        response = Status.failure("OctoPrint indicated file was not found");
-      }
+    const stream = fs.createReadStream(localLocation);
+
+    const response = await this.#octoPrintApiService.uploadFilesAsMultiPart(
+      printerLogin,
+      [stream],
+      { select, print }
+    );
+
+    // TODO update file cache with files store
+    if (response.success !== false) {
+      const newOrUpdatedFile = response.files.local;
+      await this.#filesStore.appendOrSetPrinterFile(currentPrinterId, newOrUpdatedFile);
     }
 
-    const combinedResult = await this.#filesStore.deleteFile(printerId, fullPath, false);
-    this.#logger.info(`File reference removal completed for printerId ${printerId}`, fullPath);
-
-    const totalResult = { octoPrint: response, ...combinedResult };
-    this.#multiActionResponse(res, 200, totalResult);
+    res.send(response);
   }
 
-  // === TODO BELOW ===
-  async moveFile(req, res) {
-    const data = req.body;
-    if (data.newPath === "/") {
-      data.newPath = "local";
-      data.newFullPath = data.newFullPath.replace("//", "");
-    }
-    logger.info("Move file request: ", data);
-    Runner.moveFile(data.index, data.newPath, data.newFullPath, data.fileName);
-    res.send({ msg: "success" });
-  }
+  async stubUploadFiles(req, res) {
+    const uploadAnyDisk = multer({
+      storage: multer.diskStorage({
+        destination: "./file-uploads"
+      }),
 
-  // Folder actions below
-  async removeFolder(req, res) {
-    const folder = req.body;
-    logger.info("Folder deletion request: ", folder.fullPath);
-    await Runner.deleteFolder(folder.index, folder.fullPath);
-    res.send(true);
-  }
+      fileFilter: this.#gcodeFileFilter
+    }).any();
 
-  async moveFolder(req, res) {
-    const data = req.body;
-    logger.info("Move folder request: ", data);
-    Runner.moveFolder(data.index, data.oldFolder, data.newFullPath, data.folderName);
-    res.send({ msg: "success" });
-  }
+    await new Promise((resolve, reject) =>
+      uploadAnyDisk(req, res, (err) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve();
+      })
+    );
 
-  async createFolder(req, res) {
-    const data = req.body;
-    logger.info("New folder request: ", data);
-    Runner.newFolder(data);
-    res.send({ msg: "success" });
+    this.#logger.info("Stub file upload complete.");
+    res.send();
   }
 }
 
 // prettier-ignore
 module.exports = createController(PrinterFileController)
     .prefix(AppConstants.apiRoute + "/printer-files")
-    .before([ensureAuthenticated])
+    .before([ensureAuthenticated, printerResolveMiddleware()])
     .post("/purge", "purgeIndexedFiles")
+    .post("/stub-upload", "stubUploadFiles")
     .get("/:id", "getFiles")
     .get("/:id/cache", "getFilesCache")
-    .delete("/:id", "deleteFile")
+    .delete("/:id", "deleteFileOrFolder")
+    .post("/:id/local-upload", "localUploadFile")
     .post("/:id/upload", "uploadFiles")
-    .post("/:id/select", "selectPrintFile")
-    .post("/:id/clear", "clearPrinterFiles")
-    // TODO below
-    .post("/file/resync", "resyncFile")
-    .post("/file/move", "moveFile")
-    .post("/file/create", "createFile")
-    .delete("/folder", "removeFolder")
-    .delete("/folder/move", "moveFolder")
-    .post("/folder/create", "createFolder");
+    .post("/:id/create-folder", "createFolder")
+    .post("/:id/select", "selectAndPrintFile")
+    .post("/:id/move", "moveFileOrFolder")
+    .delete("/:id/clear", "clearPrinterFiles");

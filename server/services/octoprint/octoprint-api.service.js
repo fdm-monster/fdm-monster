@@ -4,24 +4,28 @@ const {
   OPClientErrors,
   contentTypeHeaderKey,
   apiKeyHeaderKey,
-  FileLocation,
   multiPartContentType
 } = require("./constants/octoprint-service.constants");
 const { checkPluginManagerAPIDeprecation } = require("../../utils/compatibility.utils");
-const { processResponse, validatePrinter, constructHeaders } = require("./utils/api.utils");
+const {
+  processResponse,
+  validatePrinter,
+  constructHeaders,
+  processGotResponse
+} = require("./utils/api.utils");
 const { jsonContentType } = require("./constants/octoprint-service.constants");
 const { getDefaultTimeout } = require("../../constants/server-settings.constants");
 const FormData = require("form-data");
+const got = require("got");
 
 const defaultResponseOptions = { unwrap: true };
 const octoPrintBase = "/";
 const apiBase = octoPrintBase + "api";
 const apiSettingsPart = apiBase + "/settings";
 const apiFiles = apiBase + "/files";
-const apiFilesLocation = (location) => `${apiFiles}/${location}`;
-const apiFile = (path, location) => `${apiFilesLocation(location)}/${path}`;
-const apiGetFiles = (recursive = true, location) =>
-  `${apiFiles}/${location}?recursive=${recursive}`;
+const apiFilesLocation = `${apiFiles}/local`;
+const apiFile = (path) => `${apiFilesLocation}/${path}`;
+const apiGetFiles = (recursive = false) => `${apiFiles}/local?recursive=${recursive}`;
 const apiConnection = apiBase + "/connection";
 const apiJob = apiBase + "/job";
 const apiPrinterProfiles = apiBase + "/printerprofiles";
@@ -67,6 +71,10 @@ class OctoprintApiService {
 
   selectCommand(print = false) {
     return { command: "select", print };
+  }
+
+  moveFileCommand(destination) {
+    return { command: "move", destination };
   }
 
   #ensureTimeoutSettingsLoaded() {
@@ -155,6 +163,19 @@ class OctoprintApiService {
     return processResponse(response, responseOptions);
   }
 
+  async setGCodeAnalysis(printer, { enabled }, responseOptions = defaultResponseOptions) {
+    const { url, options } = this.#prepareRequest(printer, apiSettingsPart);
+
+    const settingPatch = {
+      gcodeAnalysis: {
+        runAt: enabled ? "idle" : "never"
+      }
+    };
+    const response = await this.#httpClient.post(url, settingPatch, options);
+
+    return processResponse(response, responseOptions);
+  }
+
   async getAdminUserOrDefault(printer) {
     const data = await this.getUsers(printer, defaultResponseOptions);
 
@@ -175,41 +196,55 @@ class OctoprintApiService {
     return processResponse(response, responseOptions);
   }
 
-  async getFiles(
-    printer,
-    recursive = false,
-    location = FileLocation.local,
-    responseOptions = defaultResponseOptions
-  ) {
-    const { url, options } = this.#prepareRequest(printer, apiGetFiles(recursive, location));
+  async getFiles(printer, recursive = false, responseOptions = defaultResponseOptions) {
+    const { url, options } = this.#prepareRequest(printer, apiGetFiles(recursive));
 
     const response = await this.#httpClient.get(url, options);
 
     return processResponse(response, responseOptions);
   }
 
-  async getFile(
-    printer,
-    path,
-    location = FileLocation.local,
-    responseOptions = defaultResponseOptions
-  ) {
-    const { url, options } = this.#prepareRequest(printer, apiFile(path, location));
+  async getFile(printer, path, responseOptions = defaultResponseOptions) {
+    const { url, options } = this.#prepareRequest(printer, apiFile(path));
 
     const response = await this.#httpClient.get(url, options);
 
     return processResponse(response, responseOptions);
   }
 
-  async selectPrintFile(
-    printer,
-    path,
-    location = FileLocation.local,
-    command,
-    responseOptions = defaultResponseOptions
-  ) {
-    const { url, options } = this.#prepareRequest(printer, apiFile(path, location));
+  async createFolder(printer, path, foldername, responseOptions = defaultResponseOptions) {
+    const { url, options } = this.#prepareRequest(printer, apiFilesLocation);
 
+    const formData = new FormData();
+    formData.append("path", path);
+    formData.append("foldername", foldername);
+
+    const headers = {
+      ...options.headers,
+      ...formData.getHeaders(),
+      "Content-Length": formData.getLengthSync()
+    };
+
+    const response = await this.#httpClient.post(url, formData, {
+      headers
+    });
+
+    return processResponse(response, responseOptions);
+  }
+
+  async moveFileOrFolder(printer, path, destination, responseOptions = defaultResponseOptions) {
+    const { url, options } = this.#prepareRequest(printer, apiFile(path));
+
+    const command = this.moveFileCommand(destination);
+    const response = await this.#httpClient.post(url, command, options);
+
+    return processResponse(response, responseOptions);
+  }
+
+  async selectPrintFile(printer, path, print, responseOptions = defaultResponseOptions) {
+    const { url, options } = this.#prepareRequest(printer, apiFile(path));
+
+    const command = this.selectCommand(print);
     const response = await this.#httpClient.post(url, command, options);
 
     return processResponse(response, responseOptions);
@@ -219,12 +254,11 @@ class OctoprintApiService {
     printer,
     fileBuffers,
     commands,
-    location = FileLocation.local,
     responseOptions = defaultResponseOptions
   ) {
     const { url, options } = this.#prepareRequest(
       printer,
-      apiFilesLocation(location),
+      apiFilesLocation,
       null,
       multiPartContentType
     );
@@ -232,7 +266,11 @@ class OctoprintApiService {
     const formData = new FormData();
 
     fileBuffers.forEach((b) => {
-      formData.append("file", b.buffer, { filename: b.originalname });
+      if (typeof b?.pipe === "function") {
+        formData.append("file", b);
+      } else {
+        formData.append("file", b.buffer, { filename: b.originalname });
+      }
     });
 
     if (fileBuffers.length === 1) {
@@ -247,26 +285,27 @@ class OctoprintApiService {
     try {
       const headers = {
         ...options.headers,
-        ...formData.getHeaders(),
-        "Content-Length": formData.getLengthSync()
+        ...formData.getHeaders()
       };
-      const response = await this.#httpClient.post(url, formData, {
-        headers
-      });
 
-      return processResponse(response, responseOptions);
+      // Not awaited to maintain promise calls like .json()/.text() etc
+      const response = await got
+        .post(url, {
+          body: formData,
+          headers
+        })
+        .on("uploadProgress", (p) => {
+          console.log(p.percent);
+        });
+
+      return await processGotResponse(response, responseOptions);
     } catch (e) {
       return { error: e.message, success: false, stack: e.stack };
     }
   }
 
-  async deleteFile(
-    printer,
-    path,
-    location = FileLocation.local,
-    responseOptions = defaultResponseOptions
-  ) {
-    const { url, options } = this.#prepareRequest(printer, apiFile(path, location));
+  async deleteFileOrFolder(printer, path, responseOptions = defaultResponseOptions) {
+    const { url, options } = this.#prepareRequest(printer, apiFile(path));
 
     const response = await this.#httpClient.delete(url, options);
 

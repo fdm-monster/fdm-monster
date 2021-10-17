@@ -4,11 +4,6 @@ class OPClientErrors {
   static printerValidationErrorMessage = "printer apiKey or URL undefined";
 }
 
-class FileLocation {
-  static local = "local";
-  static sdcard = "sdcard";
-}
-
 const contentTypeHeaderKey = "Content-Type";
 const apiKeyHeaderKey = "X-Api-Key";
 const jsonContentType = "application/json";
@@ -76,6 +71,5 @@ module.exports = {
   jsonContentType,
   multiPartContentType,
   isLoginResponseGlobal,
-  getCurrentProfileDefault,
-  FileLocation
+  getCurrentProfileDefault
 };
