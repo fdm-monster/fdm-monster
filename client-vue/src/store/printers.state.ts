@@ -334,7 +334,10 @@ class PrintersModule extends VuexModule {
 
   @Action
   async deletePrinterFile({ printerId, fullPath }: { printerId: string; fullPath: string }) {
-    const response = (await PrinterFileService.deleteFile(printerId, fullPath)) as MultiResponse;
+    const response = (await PrinterFileService.deleteFileOrFolder(
+      printerId,
+      fullPath
+    )) as MultiResponse;
 
     if (response.cache?.success) {
       this.popPrinterFile({ printerId, fullPath });
