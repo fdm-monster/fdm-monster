@@ -46,7 +46,7 @@ class PrinterFileController {
     this.#printerLogin = printerLogin;
   }
 
-  #fileFilter(req, file, callback) {
+  #gcodeFileFilter(req, file, callback) {
     const ext = path.extname(file.originalname);
     if (ext !== ".gcode") {
       return callback(new Error("Only .gcode files are allowed"));
@@ -94,14 +94,14 @@ class PrinterFileController {
       currentPrinterToken,
       printerLoginToken
     ]);
-    const { fullPath } = await validateInput(req.query, getFileRules, res);
+    const { filePath } = await validateInput(req.query, getFileRules, res);
 
     const response = await this.#octoPrintApiService.getFile(printerLogin, fullPath, {
       unwrap: false,
       simple: true
     });
 
-    await this.#filesStore.updatePrinterFiles(currentPrinter.id, response.data);
+    await this.#filesStore.appendOrSetPrinterFile(currentPrinter.id, response.data);
 
     this.#statusResponse(res, response);
   }
@@ -193,7 +193,7 @@ class PrinterFileController {
 
     const uploadAny = multer({
       storage: multer.memoryStorage(),
-      fileFilter: this.#fileFilter
+      fileFilter: this.#gcodeFileFilter
     }).any();
 
     await new Promise((resolve, reject) =>
@@ -258,7 +258,7 @@ class PrinterFileController {
         destination: "./file-uploads"
       }),
 
-      fileFilter: this.#fileFilter
+      fileFilter: this.#gcodeFileFilter
     }).any();
 
     await new Promise((resolve, reject) =>
