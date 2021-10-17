@@ -49,15 +49,7 @@ class AuthController {
 
 module.exports = createController(AuthController)
   .prefix(AppConstants.apiRoute + "/users")
-  .before([])
   .post("/login", "login", {
-    before: [
-      passport.authenticate("local", {
-        // Dont add or we wont reach remember_me cookie successRedirect: "/dashboard",
-        failureRedirect: "/users/login",
-        failureFlash: true
-      })
-    ],
-    after: [(req, res) => res.redirect("/dashboard")]
+    before: [passport.authenticate("local")]
   })
   .get("/logout", "logout");

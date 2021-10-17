@@ -4,8 +4,7 @@ const dbHandler = require("../db-handler");
 const supertest = require("supertest");
 const { AppConstants } = require("../../server/app.constants");
 const { setupTestApp } = require("../../server/app-test");
-const { expectInvalidResponse, expectOkResponse } = require("../extensions");
-const Alert = require("../../server/models/Alerts");
+const { expectOkResponse } = require("../extensions");
 
 let request;
 
@@ -17,10 +16,6 @@ beforeAll(async () => {
   const { server, container } = await setupTestApp(true);
 
   request = supertest(server);
-});
-
-beforeEach(async () => {
-  Alert.deleteMany({});
 });
 
 describe("AppController", () => {

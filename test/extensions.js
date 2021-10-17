@@ -35,14 +35,21 @@ function expectValidationError(object, keys, exact = false) {
   }
 }
 
+function expectRedirectResponse(response) {
+  expect(response.statusCode).toEqual(302);
+}
+
 function expectInvalidResponse(response, keys, exact = false) {
   expect(response.statusCode).toEqual(400);
+
+  if (!keys) return;
 
   expectValidationError(response.body, keys, exact);
 }
 
 module.exports = {
   expectEmptyResponse,
+  expectRedirectResponse,
   expectOkResponse,
   expectValidationError,
   expectInvalidResponse,
