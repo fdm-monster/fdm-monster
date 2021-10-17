@@ -21,10 +21,10 @@ export class PrinterFileService extends BaseService {
     return (await this.getApi(path)) as PrinterFileCache;
   }
 
-  static async selectAndPrintFile(printerId: string, fullPath: string, print = true) {
+  static async selectAndPrintFile(printerId: string, filePath: string, print = true) {
     const path = ServerApi.printerFilesSelectAndPrintRoute(printerId);
 
-    return await this.postApi(path, { fullPath, print });
+    return await this.postApi(path, { filePath, print });
   }
 
   static async uploadStubFile(printerId: string, files: File[]) {
@@ -85,7 +85,7 @@ export class PrinterFileService extends BaseService {
   static async clearFiles(printerId: string) {
     const path = `${ServerApi.printerFilesClearRoute(printerId)}`;
 
-    return this.postApi(path);
+    return this.deleteApi(path);
   }
 
   static async purgeFiles() {
@@ -94,8 +94,8 @@ export class PrinterFileService extends BaseService {
     return this.postApi(path);
   }
 
-  static async deleteFile(printerId: string, fullPath: string) {
-    const path = `${ServerApi.printerFilesRoute}/${printerId}/?fullPath=${fullPath}`;
+  static async deleteFile(printerId: string, filePath: string) {
+    const path = `${ServerApi.printerFilesRoute}/${printerId}/?filePath=${filePath}`;
 
     return this.deleteApi(path);
   }

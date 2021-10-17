@@ -4,7 +4,6 @@ const {
   OPClientErrors,
   contentTypeHeaderKey,
   apiKeyHeaderKey,
-  FileLocation,
   multiPartContentType
 } = require("./constants/octoprint-service.constants");
 const { checkPluginManagerAPIDeprecation } = require("../../utils/compatibility.utils");
@@ -72,6 +71,10 @@ class OctoprintApiService {
 
   selectCommand(print = false) {
     return { command: "select", print };
+  }
+
+  moveFileCommand(destination) {
+    return { command: "move", destination };
   }
 
   #ensureTimeoutSettingsLoaded() {
@@ -209,9 +212,19 @@ class OctoprintApiService {
     return processResponse(response, responseOptions);
   }
 
-  async selectPrintFile(printer, path, command, responseOptions = defaultResponseOptions) {
+  async moveFileOrFolder(printer, path, destination, responseOptions = defaultResponseOptions) {
     const { url, options } = this.#prepareRequest(printer, apiFile(path));
 
+    const command = this.moveFileCommand(destination);
+    const response = await this.#httpClient.post(url, command, options);
+
+    return processResponse(response, responseOptions);
+  }
+
+  async selectPrintFile(printer, path, print, responseOptions = defaultResponseOptions) {
+    const { url, options } = this.#prepareRequest(printer, apiFile(path));
+
+    const command = this.selectCommand(print);
     const response = await this.#httpClient.post(url, command, options);
 
     return processResponse(response, responseOptions);
@@ -271,8 +284,8 @@ class OctoprintApiService {
     }
   }
 
-  async deleteFile(printer, path, responseOptions = defaultResponseOptions) {
-    const { url, options } = this.#prepareRequest(printer, apiFile(path, location));
+  async deleteFileOrFolder(printer, path, responseOptions = defaultResponseOptions) {
+    const { url, options } = this.#prepareRequest(printer, apiFile(path));
 
     const response = await this.#httpClient.delete(url, options);
 

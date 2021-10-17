@@ -13,7 +13,7 @@ const { AppConstants } = require("../app.constants");
 const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
 const { idRules } = require("./validation/generic.validation");
 const DITokens = require("../container.tokens");
-const { Status, getSettingsApperearanceDefault } = require("../constants/service.constants");
+const { Status, getSettingsAppearanceDefault } = require("../constants/service.constants");
 const { setGcodeAnalysis } = require("./validation/printer-settings.validation");
 
 class PrinterSettingsController {

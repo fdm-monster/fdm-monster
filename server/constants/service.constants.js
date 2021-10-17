@@ -44,7 +44,7 @@ const getPowerSettingsDefault = () => {
   };
 };
 
-const getSettingsApperearanceDefault = () => ({
+const getSettingsAppearanceDefault = () => ({
   color: "default",
   colorTransparent: false,
   defaultLanguage: "_default",
@@ -81,7 +81,7 @@ function getFileListDefault() {
 
 function getDefaultPrinterEntry() {
   return {
-    settingsAppearance: getSettingsApperearanceDefault(),
+    settingsAppearance: getSettingsAppearanceDefault(),
     costSettings: getCostSettingsDefault(),
     powerSettings: getPowerSettingsDefault(),
     tempTriggers: getTempTriggersDefault(),
@@ -111,7 +111,7 @@ class Status {
 }
 
 module.exports = {
-  getSettingsApperearanceDefault,
+  getSettingsAppearanceDefault,
   getCostSettingsDefault,
   getPowerSettingsDefault,
   getWolPowerSubSettingsDefault,

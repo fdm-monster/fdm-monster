@@ -9,8 +9,9 @@ const {
   getFileRules,
   uploadFilesRules,
   fileUploadCommandsRules,
-  selectPrintFile,
-  localFileUploadRules
+  selectAndPrintFileRules,
+  localFileUploadRules,
+  moveFileRules
 } = require("./validation/printer-files-controller.validation");
 const { ExternalServiceError, ValidationException } = require("../exceptions/runtime.exceptions");
 const HttpStatusCode = require("../constants/http-status-codes.constants");
@@ -139,15 +140,42 @@ class PrinterFileController {
     res.send();
   }
 
-  async selectPrintFile(req, res) {
+  async moveFileOrFolder(req, res) {
     const { printerLogin } = validateScoped(req, [printerLoginToken]);
 
-    const { fullPath: path, print } = await validateInput(req.body, selectPrintFile);
+    const { filePath: path, destination } = await validateInput(req.body, moveFileRules);
 
-    const command = this.#octoPrintApiService.selectCommand(print);
-    await this.#octoPrintApiService.selectPrintFile(printerLogin, path, command);
+    const result = await this.#octoPrintApiService.moveFileOrFolder(
+      printerLogin,
+      path,
+      destination
+    );
 
-    res.send(Status.success(`Select file (print=${print}) command sent`));
+    // TODO Update file storage
+
+    res.send(result);
+  }
+
+  async deleteFileOrFolder(req, res) {
+    const { printerLogin } = validateScoped(req, [printerLoginToken]);
+
+    const { filePath: path } = await validateInput(req.body, moveFileRules);
+
+    const result = await this.#octoPrintApiService.deleteFileOrFolder(printerLogin, path);
+
+    // TODO Update file storage
+
+    res.send(result);
+  }
+
+  async selectAndPrintFile(req, res) {
+    const { printerLogin } = validateScoped(req, [printerLoginToken]);
+
+    const { filePath: path, print } = await validateInput(req.body, selectAndPrintFileRules);
+
+    const result = await this.#octoPrintApiService.selectPrintFile(printerLogin, path, print);
+
+    res.send(result);
   }
 
   async uploadFiles(req, res) {
@@ -238,14 +266,15 @@ class PrinterFileController {
   }
 
   async deleteFile(req, res) {
-    const { id: printerId } = await validateInput(req.params, idRules);
-    const { fullPath } = await validateInput(req.query, getFileRules, res);
-
-    const printerLogin = this.#printersStore.getPrinterLogin(printerId);
+    const { currentPrinter, printerLogin } = validateScoped(req, [
+      printerLoginToken,
+      currentPrinterToken
+    ]);
+    const { filePath } = await validateInput(req.query, getFileRules, res);
 
     let response;
     try {
-      response = await this.#octoPrintApiService.deleteFile(printerLogin, fullPath, {
+      response = await this.#octoPrintApiService.deleteFile(printerLogin, filePath, {
         unwrap: false,
         simple: true // Keeps only status and data props
       });
@@ -259,43 +288,17 @@ class PrinterFileController {
       }
     }
 
-    const combinedResult = await this.#filesStore.deleteFile(printerId, fullPath, false);
-    this.#logger.info(`File reference removal completed for printerId ${printerId}`, fullPath);
+    const combinedResult = await this.#filesStore.deleteFile(currentPrinter.id, filePath, false);
+    this.#logger.info(
+      `File reference removal completed for printerId ${currentPrinter.id}`,
+      filePath
+    );
 
     const totalResult = { octoPrint: response, ...combinedResult };
     this.#multiActionResponse(res, 200, totalResult);
   }
 
-  async moveFile(req, res) {
-    const { printerLogin } = validateScoped(req, [printerLoginToken]);
-    const { fullPath } = await validateInput(req.query, getFileRules, res);
-
-    const data = req.body;
-    if (data.newPath === "/") {
-      data.newPath = "local";
-      data.newFullPath = data.newFullPath.replace("//", "");
-    }
-    logger.info("Move file request: ", data);
-    Runner.moveFile(data.index, data.newPath, data.newFullPath, data.fileName);
-    res.send({ msg: "success" });
-  }
-
   // === TODO BELOW ===
-  // Folder actions below
-  async removeFolder(req, res) {
-    const folder = req.body;
-    logger.info("Folder deletion request: ", folder.fullPath);
-    await Runner.deleteFolder(folder.index, folder.fullPath);
-    res.send(true);
-  }
-
-  async moveFolder(req, res) {
-    const data = req.body;
-    logger.info("Move folder request: ", data);
-    Runner.moveFolder(data.index, data.oldFolder, data.newFullPath, data.folderName);
-    res.send({ msg: "success" });
-  }
-
   async createFolder(req, res) {
     const data = req.body;
     logger.info("New folder request: ", data);
@@ -312,15 +315,10 @@ module.exports = createController(PrinterFileController)
     .post("/stub-upload", "stubUploadFiles")
     .get("/:id", "getFiles")
     .get("/:id/cache", "getFilesCache")
-    .delete("/:id", "deleteFile")
+    .delete("/:id", "deleteFileOrFolder")
     .post("/:id/local-upload", "localUploadFile")
     .post("/:id/upload", "uploadFiles")
-    .post("/:id/select", "selectPrintFile")
-    .post("/:id/clear", "clearPrinterFiles")
-    // TODO below
-    .post("/file/resync", "resyncFile")
-    .post("/file/move", "moveFile")
-    .post("/file/create", "createFile")
-    .delete("/folder", "removeFolder")
-    .delete("/folder/move", "moveFolder")
-    .post("/folder/create", "createFolder");
+    .post("/:id/select", "selectAndPrintFile")
+    .post("/:id/move", "moveFileOrFolder")
+    .delete("/:id/clear", "clearPrinterFiles");
+// TODO below

@@ -2,15 +2,21 @@ const getFilesRules = {
   recursive: "required|boolean"
 };
 
-const selectPrintFile = {
-  fullPath: "required|string",
+const selectAndPrintFileRules = {
+  filePath: "required|string",
+  // select: "required|boolean",
   print: "required|boolean"
 };
 
 const uploadFilesRules = {};
 
 const getFileRules = {
-  fullPath: "required|string"
+  filePath: "required|string"
+};
+
+const moveFileRules = {
+  filePath: "required|string",
+  destination: "required|string"
 };
 
 const fileUploadCommandsRules = {
@@ -26,9 +32,10 @@ const localFileUploadRules = {
 
 module.exports = {
   getFilesRules,
-  selectPrintFile,
+  selectAndPrintFileRules,
   localFileUploadRules,
   uploadFilesRules,
+  moveFileRules,
   fileUploadCommandsRules,
   getFileRules
 };
