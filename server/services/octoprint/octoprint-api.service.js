@@ -24,10 +24,9 @@ const octoPrintBase = "/";
 const apiBase = octoPrintBase + "api";
 const apiSettingsPart = apiBase + "/settings";
 const apiFiles = apiBase + "/files";
-const apiFilesLocation = (location) => `${apiFiles}/${location}`;
-const apiFile = (path, location) => `${apiFilesLocation(location)}/${path}`;
-const apiGetFiles = (recursive = true, location) =>
-  `${apiFiles}/${location}?recursive=${recursive}`;
+const apiFilesLocation = `${apiFiles}/local`;
+const apiFile = (path) => `${apiFilesLocation}/${path}`;
+const apiGetFiles = (recursive = false) => `${apiFiles}/local?recursive=${recursive}`;
 const apiConnection = apiBase + "/connection";
 const apiJob = apiBase + "/job";
 const apiPrinterProfiles = apiBase + "/printerprofiles";
@@ -194,40 +193,24 @@ class OctoprintApiService {
     return processResponse(response, responseOptions);
   }
 
-  async getFiles(
-    printer,
-    recursive = false,
-    location = FileLocation.local,
-    responseOptions = defaultResponseOptions
-  ) {
-    const { url, options } = this.#prepareRequest(printer, apiGetFiles(recursive, location));
+  async getFiles(printer, recursive = false, responseOptions = defaultResponseOptions) {
+    const { url, options } = this.#prepareRequest(printer, apiGetFiles(recursive));
 
     const response = await this.#httpClient.get(url, options);
 
     return processResponse(response, responseOptions);
   }
 
-  async getFile(
-    printer,
-    path,
-    location = FileLocation.local,
-    responseOptions = defaultResponseOptions
-  ) {
-    const { url, options } = this.#prepareRequest(printer, apiFile(path, location));
+  async getFile(printer, path, responseOptions = defaultResponseOptions) {
+    const { url, options } = this.#prepareRequest(printer, apiFile(path));
 
     const response = await this.#httpClient.get(url, options);
 
     return processResponse(response, responseOptions);
   }
 
-  async selectPrintFile(
-    printer,
-    path,
-    location = FileLocation.local,
-    command,
-    responseOptions = defaultResponseOptions
-  ) {
-    const { url, options } = this.#prepareRequest(printer, apiFile(path, location));
+  async selectPrintFile(printer, path, command, responseOptions = defaultResponseOptions) {
+    const { url, options } = this.#prepareRequest(printer, apiFile(path));
 
     const response = await this.#httpClient.post(url, command, options);
 
@@ -238,12 +221,11 @@ class OctoprintApiService {
     printer,
     fileBuffers,
     commands,
-    location = FileLocation.local,
     responseOptions = defaultResponseOptions
   ) {
     const { url, options } = this.#prepareRequest(
       printer,
-      apiFilesLocation(location),
+      apiFilesLocation,
       null,
       multiPartContentType
     );
@@ -289,12 +271,7 @@ class OctoprintApiService {
     }
   }
 
-  async deleteFile(
-    printer,
-    path,
-    location = FileLocation.local,
-    responseOptions = defaultResponseOptions
-  ) {
+  async deleteFile(printer, path, responseOptions = defaultResponseOptions) {
     const { url, options } = this.#prepareRequest(printer, apiFile(path, location));
 
     const response = await this.#httpClient.delete(url, options);

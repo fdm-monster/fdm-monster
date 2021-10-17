@@ -1,7 +1,7 @@
 const { ensureAuthenticated } = require("../middleware/auth");
 const { createController } = require("awilix-express");
 const Logger = require("../handlers/logger.js");
-const { validateMiddleware, validateInput } = require("../handlers/validators");
+const { validateInput } = require("../handlers/validators");
 const { AppConstants } = require("../app.constants");
 const { idRules } = require("./validation/generic.validation");
 const {
@@ -17,7 +17,6 @@ const HttpStatusCode = require("../constants/http-status-codes.constants");
 const { Status } = require("../constants/service.constants");
 const multer = require("multer");
 const path = require("path");
-const { FileLocation } = require("../services/octoprint/constants/octoprint-service.constants");
 const fs = require("fs");
 
 class PrinterFileController {
@@ -54,11 +53,11 @@ class PrinterFileController {
 
   async getFiles(req, res) {
     const { id: printerId } = await validateInput(req.params, idRules);
-    const { recursive, location } = await validateInput(req.query, getFilesRules);
+    const { recursive } = await validateInput(req.query, getFilesRules);
 
     const printerLogin = this.#printersStore.getPrinterLogin(printerId);
 
-    const response = await this.#octoPrintApiService.getFiles(printerLogin, recursive, location, {
+    const response = await this.#octoPrintApiService.getFiles(printerLogin, recursive, {
       unwrap: false,
       simple: true
     });
@@ -134,17 +133,17 @@ class PrinterFileController {
     const { id: printerId } = await validateInput(req.params, idRules);
     const printerLogin = this.#printersStore.getPrinterLogin(printerId);
 
-    const { fullPath: path, location, print } = await validateInput(req.body, selectPrintFile);
+    const { fullPath: path, print } = await validateInput(req.body, selectPrintFile);
 
     const command = this.#octoPrintApiService.selectCommand(print);
-    await this.#octoPrintApiService.selectPrintFile(printerLogin, path, location, command);
+    await this.#octoPrintApiService.selectPrintFile(printerLogin, path, command);
 
     res.send(Status.success(`Select file (print=${print}) command sent`));
   }
 
   async uploadFiles(req, res) {
     const { id: printerId } = await validateInput(req.params, idRules);
-    const { location } = await validateInput(req.query, uploadFilesRules);
+    const {} = await validateInput(req.query, uploadFilesRules);
 
     const printerLogin = this.#printersStore.getPrinterLogin(printerId);
 
@@ -172,12 +171,10 @@ class PrinterFileController {
     const response = await this.#octoPrintApiService.uploadFilesAsMultiPart(
       printerLogin,
       req.files,
-      commands,
-      location
+      commands
     );
 
-    // TODO update file cache with files store
-    if (location === FileLocation.local && response.success !== false) {
+    if (response.success !== false) {
       const newOrUpdatedFile = response.files.local;
       await this.#filesStore.appendOrSetPrinterFile(printerId, newOrUpdatedFile);
     }
@@ -191,22 +188,18 @@ class PrinterFileController {
     const printerLogin = this.#printersStore.getPrinterLogin(printerId);
 
     // Multer has processed the remaining multipart data into the body as json
-    const { select, print, location, localLocation } = await validateInput(
-      req.body,
-      localFileUploadRules
-    );
+    const { select, print, localLocation } = await validateInput(req.body, localFileUploadRules);
 
     const stream = fs.createReadStream(localLocation);
 
     const response = await this.#octoPrintApiService.uploadFilesAsMultiPart(
       printerLogin,
       [stream],
-      { select, print },
-      location
+      { select, print }
     );
 
     // TODO update file cache with files store
-    if (location === FileLocation.local && response.success !== false) {
+    if (response.success !== false) {
       const newOrUpdatedFile = response.files.local;
       await this.#filesStore.appendOrSetPrinterFile(printerId, newOrUpdatedFile);
     }
@@ -238,13 +231,13 @@ class PrinterFileController {
 
   async deleteFile(req, res) {
     const { id: printerId } = await validateInput(req.params, idRules);
-    const { fullPath, location } = await validateInput(req.query, getFileRules, res);
+    const { fullPath } = await validateInput(req.query, getFileRules, res);
 
     const printerLogin = this.#printersStore.getPrinterLogin(printerId);
 
     let response;
     try {
-      response = await this.#octoPrintApiService.deleteFile(printerLogin, fullPath, location, {
+      response = await this.#octoPrintApiService.deleteFile(printerLogin, fullPath, {
         unwrap: false,
         simple: true // Keeps only status and data props
       });
