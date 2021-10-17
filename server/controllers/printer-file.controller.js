@@ -159,12 +159,13 @@ class PrinterFileController {
   }
 
   async deleteFileOrFolder(req, res) {
-    const { printerLogin } = getScopedPrinter(req);
-    const { filePath: path } = await validateInput(req.body, moveFileOrFolderRules);
+    const { currentPrinterId, printerLogin } = getScopedPrinter(req);
+    const { filePath } = await validateInput(req.body, moveFileOrFolderRules);
 
-    const result = await this.#octoPrintApiService.deleteFileOrFolder(printerLogin, path);
+    const result = await this.#octoPrintApiService.deleteFileOrFolder(printerLogin, filePath);
 
-    // TODO Update file storage
+    await this.#filesStore.deleteFile(currentPrinterId, filePath, false);
+    this.#logger.info(`File reference removed, printerId ${currentPrinterId}`, filePath);
 
     res.send(result);
   }
@@ -260,36 +261,6 @@ class PrinterFileController {
 
     this.#logger.info("Stub file upload complete.");
     res.send();
-  }
-
-  async deleteFile(req, res) {
-    const { currentPrinterId, printerLogin } = getScopedPrinter(req);
-    const { filePath } = await validateInput(req.query, getFileRules, res);
-
-    let response;
-    try {
-      response = await this.#octoPrintApiService.deleteFile(printerLogin, filePath, {
-        unwrap: false,
-        simple: true // Keeps only status and data props
-      });
-    } catch (e) {
-      // NOT_FOUND or NO_CONTENT fall through
-      if (e.response?.status === HttpStatusCode.CONFLICT) {
-        // File was probably busy or printing
-        throw new ExternalServiceError(e.response.data);
-      } else if (e.response?.status === HttpStatusCode.NOT_FOUND) {
-        response = Status.failure("OctoPrint indicated file was not found");
-      }
-    }
-
-    const combinedResult = await this.#filesStore.deleteFile(currentPrinterId, filePath, false);
-    this.#logger.info(
-      `File reference removal completed for printerId ${currentPrinterId}`,
-      filePath
-    );
-
-    const totalResult = { octoPrint: response, ...combinedResult };
-    res.send(totalResult);
   }
 }
 
