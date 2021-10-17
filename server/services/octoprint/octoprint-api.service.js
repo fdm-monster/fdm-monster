@@ -212,6 +212,26 @@ class OctoprintApiService {
     return processResponse(response, responseOptions);
   }
 
+  async createFolder(printer, path, foldername, responseOptions = defaultResponseOptions) {
+    const { url, options } = this.#prepareRequest(printer, apiFilesLocation);
+
+    const formData = new FormData();
+    formData.append("path", path);
+    formData.append("foldername", foldername);
+
+    const headers = {
+      ...options.headers,
+      ...formData.getHeaders(),
+      "Content-Length": formData.getLengthSync()
+    };
+
+    const response = await this.#httpClient.post(url, formData, {
+      headers
+    });
+
+    return processResponse(response, responseOptions);
+  }
+
   async moveFileOrFolder(printer, path, destination, responseOptions = defaultResponseOptions) {
     const { url, options } = this.#prepareRequest(printer, apiFile(path));
 

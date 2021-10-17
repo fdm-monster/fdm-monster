@@ -1,7 +1,7 @@
 const { ensureAuthenticated } = require("../middleware/auth");
 const { createController } = require("awilix-express");
 const Logger = require("../handlers/logger.js");
-const { validateInput, validateScoped } = require("../handlers/validators");
+const { validateInput, validateScoped, validateMiddleware } = require("../handlers/validators");
 const { AppConstants } = require("../app.constants");
 const { idRules } = require("./validation/generic.validation");
 const {
@@ -11,7 +11,8 @@ const {
   fileUploadCommandsRules,
   selectAndPrintFileRules,
   localFileUploadRules,
-  moveFileRules
+  moveFileOrFolderRules,
+  createFolderRules
 } = require("./validation/printer-files-controller.validation");
 const { ExternalServiceError, ValidationException } = require("../exceptions/runtime.exceptions");
 const HttpStatusCode = require("../constants/http-status-codes.constants");
@@ -19,7 +20,11 @@ const { Status } = require("../constants/service.constants");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
-const { currentPrinterToken, printerLoginToken } = require("../middleware/printer");
+const {
+  currentPrinterToken,
+  printerLoginToken,
+  printerResolveMiddleware
+} = require("../middleware/printer");
 
 class PrinterFileController {
   #filesStore;
@@ -52,11 +57,6 @@ class PrinterFileController {
   #statusResponse(res, response) {
     res.statusCode = response.status;
     res.send(response.data);
-  }
-
-  #multiActionResponse(res, status, actionResults) {
-    res.statusCode = status;
-    res.send(actionResults);
   }
 
   async getFiles(req, res) {
@@ -142,8 +142,7 @@ class PrinterFileController {
 
   async moveFileOrFolder(req, res) {
     const { printerLogin } = validateScoped(req, [printerLoginToken]);
-
-    const { filePath: path, destination } = await validateInput(req.body, moveFileRules);
+    const { filePath: path, destination } = await validateMiddleware(req, moveFileOrFolderRules);
 
     const result = await this.#octoPrintApiService.moveFileOrFolder(
       printerLogin,
@@ -156,10 +155,20 @@ class PrinterFileController {
     res.send(result);
   }
 
+  async createFolder(req, res) {
+    const { printerLogin } = validateScoped(req, [printerLoginToken]);
+    const { path, foldername } = await validateMiddleware(req, createFolderRules);
+
+    const result = await this.#octoPrintApiService.createFolder(printerLogin, path, foldername);
+
+    // TODO Update file storage
+
+    res.send(result);
+  }
+
   async deleteFileOrFolder(req, res) {
     const { printerLogin } = validateScoped(req, [printerLoginToken]);
-
-    const { filePath: path } = await validateInput(req.body, moveFileRules);
+    const { filePath: path } = await validateInput(req.body, moveFileOrFolderRules);
 
     const result = await this.#octoPrintApiService.deleteFileOrFolder(printerLogin, path);
 
@@ -295,22 +304,14 @@ class PrinterFileController {
     );
 
     const totalResult = { octoPrint: response, ...combinedResult };
-    this.#multiActionResponse(res, 200, totalResult);
-  }
-
-  // === TODO BELOW ===
-  async createFolder(req, res) {
-    const data = req.body;
-    logger.info("New folder request: ", data);
-    Runner.newFolder(data);
-    res.send({ msg: "success" });
+    res.send(totalResult);
   }
 }
 
 // prettier-ignore
 module.exports = createController(PrinterFileController)
     .prefix(AppConstants.apiRoute + "/printer-files")
-    .before([ensureAuthenticated])
+    .before([ensureAuthenticated, printerResolveMiddleware()])
     .post("/purge", "purgeIndexedFiles")
     .post("/stub-upload", "stubUploadFiles")
     .get("/:id", "getFiles")
@@ -318,7 +319,7 @@ module.exports = createController(PrinterFileController)
     .delete("/:id", "deleteFileOrFolder")
     .post("/:id/local-upload", "localUploadFile")
     .post("/:id/upload", "uploadFiles")
+    .post("/:id/create-folder", "createFolder")
     .post("/:id/select", "selectAndPrintFile")
     .post("/:id/move", "moveFileOrFolder")
     .delete("/:id/clear", "clearPrinterFiles");
-// TODO below

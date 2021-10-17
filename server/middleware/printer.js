@@ -10,10 +10,8 @@ const printerMiddleware = () => {
 
     let scopedPrinter = undefined;
 
-    if (req.query.printerId) {
-      scopedPrinter = printersStore.getPrinterState(req.query.printer);
-    } else if (req.headers.printerid) {
-      scopedPrinter = printersStore.getPrinterState(req.headers.printerid);
+    if (req.params.id) {
+      scopedPrinter = printersStore.getPrinterState(req.params.id);
     }
 
     req.container.register({
@@ -26,7 +24,7 @@ const printerMiddleware = () => {
 };
 
 module.exports = {
-  printerMiddleware,
+  printerResolveMiddleware: printerMiddleware,
   currentPrinterToken,
   printerLoginToken
 };

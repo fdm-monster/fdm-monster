@@ -4,7 +4,6 @@ const getFilesRules = {
 
 const selectAndPrintFileRules = {
   filePath: "required|string",
-  // select: "required|boolean",
   print: "required|boolean"
 };
 
@@ -14,7 +13,12 @@ const getFileRules = {
   filePath: "required|string"
 };
 
-const moveFileRules = {
+const createFolderRules = {
+  foldername: "required|string",
+  path: "required|string"
+};
+
+const moveFileOrFolderRules = {
   filePath: "required|string",
   destination: "required|string"
 };
@@ -35,7 +39,8 @@ module.exports = {
   selectAndPrintFileRules,
   localFileUploadRules,
   uploadFilesRules,
-  moveFileRules,
+  createFolderRules,
+  moveFileOrFolderRules,
   fileUploadCommandsRules,
   getFileRules
 };
