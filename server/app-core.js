@@ -12,6 +12,7 @@ const { getAppDistPath } = require("./app-env");
 const cors = require("cors");
 const { NotFoundException } = require("./exceptions/runtime.exceptions");
 const history = require("connect-history-api-fallback");
+const { printerMiddleware } = require("./middleware/printer");
 
 function setupExpressServer() {
   let app = express();
@@ -43,6 +44,8 @@ function setupExpressServer() {
   app.use(passport.authenticate("remember-me")); // Remember Me!
 
   app.use(scopePerRequest(container));
+
+  app.use(printerMiddleware());
 
   return {
     app,

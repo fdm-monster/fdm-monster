@@ -62,19 +62,15 @@ function configureContainer() {
 
   container.register({
     // -- asValue --
-    // Here we are telling awilix that the dependency is a value, pretty neat way to solidify data
     serverVersion: asValue(
       process.env[AppConstants.VERSION_KEY] || AppConstants.defaultServerPageTitle
     ),
     serverPageTitle: asValue(process.env[AppConstants.SERVER_SITE_TITLE_KEY]),
 
     // -- asFunction --
-    // Resolve dependencies by calling a function (synchronous or asynchronous)
-    // Use cases: factories, or dynamic configuration from external sources
     [DITokens.printerStateFactory]: asFunction(PrinterStateFactory).transient(), // Factory function, transient on purpose!
 
     // -- asClass --
-    // Below we are telling Awilix how to resolve a dependency class which is constructed on demand
     [DITokens.settingsStore]: asClass(SettingsStore).singleton(),
     [DITokens.serverSettingsService]: asClass(ServerSettingsService),
     [DITokens.clientSettingsService]: asClass(ClientSettingsService),
@@ -82,7 +78,7 @@ function configureContainer() {
 
     [DITokens.loggerFactory]: asFunction(LoggerFactory).transient(),
     [DITokens.taskManagerService]: asClass(TaskManagerService).singleton(),
-    [DITokens.eventEmitter2]: awilix.asFunction(configureEventEmitter).singleton(),
+    [DITokens.eventEmitter2]: asFunction(configureEventEmitter).singleton(),
     [DITokens.serverUpdateService]: asClass(ServerUpdateService).singleton(),
     [DITokens.systemInfoStore]: asClass(SystemInfoStore).singleton(),
     [DITokens.githubApiService]: asClass(GithubApiService),
@@ -90,7 +86,7 @@ function configureContainer() {
     [DITokens.systemCommandsService]: asClass(SystemCommandsService),
     [DITokens.serverLogsService]: asClass(ServerLogsService),
     [DITokens.systemInfoBundleService]: asClass(SystemInfoBundleService),
-    [DITokens.httpClient]: awilix.asValue(
+    [DITokens.httpClient]: asValue(
       axios.create({
         maxBodyLength: 1000 * 1000 * 1000, // 1GB
         maxContentLength: 1000 * 1000 * 1000 // 1GB

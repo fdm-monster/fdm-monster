@@ -1,7 +1,7 @@
 const { ensureAuthenticated } = require("../middleware/auth");
 const { createController } = require("awilix-express");
 const Logger = require("../handlers/logger.js");
-const { validateInput } = require("../handlers/validators");
+const { validateInput, validateScoped } = require("../handlers/validators");
 const { AppConstants } = require("../app.constants");
 const { idRules } = require("./validation/generic.validation");
 const {
@@ -18,6 +18,7 @@ const { Status } = require("../constants/service.constants");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const { currentPrinterToken, printerLoginToken } = require("../middleware/printer");
 
 class PrinterFileController {
   #filesStore;
@@ -25,12 +26,18 @@ class PrinterFileController {
   #octoPrintApiService;
   #printersStore;
 
+  // Scoped middleware
+  #currentPrinter;
+  #printerLogin;
+
   #logger = new Logger("Server-API");
 
-  constructor({ filesStore, octoPrintApiService, printersStore }) {
+  constructor({ filesStore, octoPrintApiService, printersStore, currentPrinter, printerLogin }) {
     this.#filesStore = filesStore;
     this.#octoPrintApiService = octoPrintApiService;
     this.#printersStore = printersStore;
+    this.#currentPrinter = currentPrinter;
+    this.#printerLogin = printerLogin;
   }
 
   #fileFilter(req, file, callback) {
@@ -74,32 +81,35 @@ class PrinterFileController {
    * @returns {Promise<void>}
    */
   async getFilesCache(req, res) {
-    const { id: printerId } = await validateInput(req.params, idRules);
+    const { currentPrinter } = validateScoped(req, [currentPrinterToken]);
 
-    const filesCache = await this.#filesStore.getFiles(printerId);
+    const filesCache = await this.#filesStore.getFiles(currentPrinter.id);
 
     res.send(filesCache);
   }
 
   async getFile(req, res) {
-    const { id: printerId } = await validateInput(req.params, idRules);
+    const { currentPrinter, printerLogin } = validateScoped(req, [
+      currentPrinterToken,
+      printerLoginToken
+    ]);
     const { fullPath } = await validateInput(req.query, getFileRules, res);
-
-    const printerLogin = this.#printersStore.getPrinterLogin(printerId);
 
     const response = await this.#octoPrintApiService.getFile(printerLogin, fullPath, {
       unwrap: false,
       simple: true
     });
 
-    await this.#filesStore.updatePrinterFiles(printerId, response.data);
+    await this.#filesStore.updatePrinterFiles(currentPrinter.id, response.data);
 
     this.#statusResponse(res, response);
   }
 
   async clearPrinterFiles(req, res) {
-    const { id: printerId } = await validateInput(req.params, idRules);
-    const printerLogin = this.#printersStore.getPrinterLogin(printerId);
+    const { currentPrinter, printerLogin } = validateScoped(req, [
+      currentPrinterToken,
+      printerLoginToken
+    ]);
 
     const nonRecursiveFiles = await this.#octoPrintApiService.getFiles(printerLogin, false);
 
@@ -115,7 +125,7 @@ class PrinterFileController {
       }
     }
 
-    await this.#filesStore.purgePrinterFiles(printerId);
+    await this.#filesStore.purgePrinterFiles(currentPrinter.id);
 
     res.send({
       failedFiles,
@@ -130,8 +140,7 @@ class PrinterFileController {
   }
 
   async selectPrintFile(req, res) {
-    const { id: printerId } = await validateInput(req.params, idRules);
-    const printerLogin = this.#printersStore.getPrinterLogin(printerId);
+    const { printerLogin } = validateScoped(req, [printerLoginToken]);
 
     const { fullPath: path, print } = await validateInput(req.body, selectPrintFile);
 
@@ -142,10 +151,8 @@ class PrinterFileController {
   }
 
   async uploadFiles(req, res) {
-    const { id: printerId } = await validateInput(req.params, idRules);
+    const { printerLogin } = validateScoped(req, [printerLoginToken]);
     const {} = await validateInput(req.query, uploadFilesRules);
-
-    const printerLogin = this.#printersStore.getPrinterLogin(printerId);
 
     const uploadAny = multer({
       storage: multer.memoryStorage(),
@@ -183,9 +190,10 @@ class PrinterFileController {
   }
 
   async localUploadFile(req, res) {
-    const { id: printerId } = await validateInput(req.params, idRules);
-
-    const printerLogin = this.#printersStore.getPrinterLogin(printerId);
+    const { currentPrinter, printerLogin } = validateScoped(req, [
+      printerLoginToken,
+      currentPrinterToken
+    ]);
 
     // Multer has processed the remaining multipart data into the body as json
     const { select, print, localLocation } = await validateInput(req.body, localFileUploadRules);
@@ -201,7 +209,7 @@ class PrinterFileController {
     // TODO update file cache with files store
     if (response.success !== false) {
       const newOrUpdatedFile = response.files.local;
-      await this.#filesStore.appendOrSetPrinterFile(printerId, newOrUpdatedFile);
+      await this.#filesStore.appendOrSetPrinterFile(currentPrinter.id, newOrUpdatedFile);
     }
 
     res.send(response);
@@ -258,8 +266,10 @@ class PrinterFileController {
     this.#multiActionResponse(res, 200, totalResult);
   }
 
-  // === TODO BELOW ===
   async moveFile(req, res) {
+    const { printerLogin } = validateScoped(req, [printerLoginToken]);
+    const { fullPath } = await validateInput(req.query, getFileRules, res);
+
     const data = req.body;
     if (data.newPath === "/") {
       data.newPath = "local";
@@ -270,6 +280,7 @@ class PrinterFileController {
     res.send({ msg: "success" });
   }
 
+  // === TODO BELOW ===
   // Folder actions below
   async removeFolder(req, res) {
     const folder = req.body;

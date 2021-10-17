@@ -1,5 +1,8 @@
 const nodeInputValidator = require("node-input-validator");
-const { ValidationException } = require("../exceptions/runtime.exceptions");
+const {
+  ValidationException,
+  InternalServerException
+} = require("../exceptions/runtime.exceptions");
 
 const arrayValidator = function arrayLengthValidator(minIncl = null, maxIncl = null) {
   return (arrayValue) => {
@@ -46,6 +49,30 @@ function getExtendedValidator() {
   return nodeInputValidator;
 }
 
+function validateScoped(req, tokens) {
+  let resolvedDependencies = {};
+  let errors = [];
+  tokens.forEach((t) => {
+    try {
+      const dependency = req.container.resolve(t);
+      if (!dependency) {
+        errors.push(
+          `Scoped Dependency '${t}' was not resolved. Please ensure the right headers or query parameters were provided.`
+        );
+      }
+      resolvedDependencies[t] = dependency;
+    } catch (e) {
+      throw new InternalServerException(`Dependency ${t} could not be resolved. Aborted request.`);
+    }
+  });
+
+  if (errors.length > 0) {
+    throw new ValidationException(errors);
+  }
+
+  return resolvedDependencies;
+}
+
 async function validateInput(data, rules) {
   const localNIV = getExtendedValidator();
 
@@ -73,5 +100,6 @@ module.exports = {
   arrayValidator,
   validateMiddleware,
   validateInput,
+  validateScoped,
   validateMongoURL
 };
