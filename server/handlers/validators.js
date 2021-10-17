@@ -3,6 +3,7 @@ const {
   ValidationException,
   InternalServerException
 } = require("../exceptions/runtime.exceptions");
+const { printerLoginToken, currentPrinterToken, printerIdToken } = require("../middleware/printer");
 
 const arrayValidator = function arrayLengthValidator(minIncl = null, maxIncl = null) {
   return (arrayValue) => {
@@ -49,7 +50,8 @@ function getExtendedValidator() {
   return nodeInputValidator;
 }
 
-function validateScoped(req, tokens) {
+function getScopedPrinter(req) {
+  const tokens = [printerLoginToken, currentPrinterToken, printerIdToken];
   let resolvedDependencies = {};
   let errors = [];
   tokens.forEach((t) => {
@@ -100,6 +102,6 @@ module.exports = {
   arrayValidator,
   validateMiddleware,
   validateInput,
-  validateScoped,
+  getScopedPrinter,
   validateMongoURL
 };

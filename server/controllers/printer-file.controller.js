@@ -1,7 +1,7 @@
 const { ensureAuthenticated } = require("../middleware/auth");
 const { createController } = require("awilix-express");
 const Logger = require("../handlers/logger.js");
-const { validateInput, validateScoped, validateMiddleware } = require("../handlers/validators");
+const { validateInput, getScopedPrinter, validateMiddleware } = require("../handlers/validators");
 const { AppConstants } = require("../app.constants");
 const { idRules } = require("./validation/generic.validation");
 const {
@@ -60,17 +60,15 @@ class PrinterFileController {
   }
 
   async getFiles(req, res) {
-    const { id: printerId } = await validateInput(req.params, idRules);
+    const { printerLogin, currentPrinterId } = getScopedPrinter(req);
     const { recursive } = await validateInput(req.query, getFilesRules);
-
-    const printerLogin = this.#printersStore.getPrinterLogin(printerId);
 
     const response = await this.#octoPrintApiService.getFiles(printerLogin, recursive, {
       unwrap: false,
       simple: true
     });
 
-    await this.#filesStore.updatePrinterFiles(printerId, response.data);
+    await this.#filesStore.updatePrinterFiles(currentPrinterId, response.data);
 
     this.#statusResponse(res, response);
   }
@@ -82,7 +80,7 @@ class PrinterFileController {
    * @returns {Promise<void>}
    */
   async getFilesCache(req, res) {
-    const { currentPrinter } = validateScoped(req, [currentPrinterToken]);
+    const { currentPrinter } = getScopedPrinter(req);
 
     const filesCache = await this.#filesStore.getFiles(currentPrinter.id);
 
@@ -90,13 +88,10 @@ class PrinterFileController {
   }
 
   async getFile(req, res) {
-    const { currentPrinter, printerLogin } = validateScoped(req, [
-      currentPrinterToken,
-      printerLoginToken
-    ]);
+    const { currentPrinter, printerLogin } = getScopedPrinter(req);
     const { filePath } = await validateInput(req.query, getFileRules, res);
 
-    const response = await this.#octoPrintApiService.getFile(printerLogin, fullPath, {
+    const response = await this.#octoPrintApiService.getFile(printerLogin, filePath, {
       unwrap: false,
       simple: true
     });
@@ -107,10 +102,7 @@ class PrinterFileController {
   }
 
   async clearPrinterFiles(req, res) {
-    const { currentPrinter, printerLogin } = validateScoped(req, [
-      currentPrinterToken,
-      printerLoginToken
-    ]);
+    const { currentPrinterId, printerLogin } = getScopedPrinter(req);
 
     const nonRecursiveFiles = await this.#octoPrintApiService.getFiles(printerLogin, false);
 
@@ -126,7 +118,7 @@ class PrinterFileController {
       }
     }
 
-    await this.#filesStore.purgePrinterFiles(currentPrinter.id);
+    await this.#filesStore.purgePrinterFiles(currentPrinterId);
 
     res.send({
       failedFiles,
@@ -141,7 +133,7 @@ class PrinterFileController {
   }
 
   async moveFileOrFolder(req, res) {
-    const { printerLogin } = validateScoped(req, [printerLoginToken]);
+    const { printerLogin } = getScopedPrinter(req);
     const { filePath: path, destination } = await validateMiddleware(req, moveFileOrFolderRules);
 
     const result = await this.#octoPrintApiService.moveFileOrFolder(
@@ -156,7 +148,7 @@ class PrinterFileController {
   }
 
   async createFolder(req, res) {
-    const { printerLogin } = validateScoped(req, [printerLoginToken]);
+    const { printerLogin } = getScopedPrinter(req);
     const { path, foldername } = await validateMiddleware(req, createFolderRules);
 
     const result = await this.#octoPrintApiService.createFolder(printerLogin, path, foldername);
@@ -167,7 +159,7 @@ class PrinterFileController {
   }
 
   async deleteFileOrFolder(req, res) {
-    const { printerLogin } = validateScoped(req, [printerLoginToken]);
+    const { printerLogin } = getScopedPrinter(req);
     const { filePath: path } = await validateInput(req.body, moveFileOrFolderRules);
 
     const result = await this.#octoPrintApiService.deleteFileOrFolder(printerLogin, path);
@@ -178,8 +170,7 @@ class PrinterFileController {
   }
 
   async selectAndPrintFile(req, res) {
-    const { printerLogin } = validateScoped(req, [printerLoginToken]);
-
+    const { printerLogin } = getScopedPrinter(req, [printerLoginToken]);
     const { filePath: path, print } = await validateInput(req.body, selectAndPrintFileRules);
 
     const result = await this.#octoPrintApiService.selectPrintFile(printerLogin, path, print);
@@ -188,7 +179,7 @@ class PrinterFileController {
   }
 
   async uploadFiles(req, res) {
-    const { printerLogin } = validateScoped(req, [printerLoginToken]);
+    const { currentPrinterId, printerLogin } = getScopedPrinter(req);
     const {} = await validateInput(req.query, uploadFilesRules);
 
     const uploadAny = multer({
@@ -220,17 +211,14 @@ class PrinterFileController {
 
     if (response.success !== false) {
       const newOrUpdatedFile = response.files.local;
-      await this.#filesStore.appendOrSetPrinterFile(printerId, newOrUpdatedFile);
+      await this.#filesStore.appendOrSetPrinterFile(currentPrinterId, newOrUpdatedFile);
     }
 
     res.send(response);
   }
 
   async localUploadFile(req, res) {
-    const { currentPrinter, printerLogin } = validateScoped(req, [
-      printerLoginToken,
-      currentPrinterToken
-    ]);
+    const { currentPrinterId, printerLogin } = getScopedPrinter(req);
 
     // Multer has processed the remaining multipart data into the body as json
     const { select, print, localLocation } = await validateInput(req.body, localFileUploadRules);
@@ -246,7 +234,7 @@ class PrinterFileController {
     // TODO update file cache with files store
     if (response.success !== false) {
       const newOrUpdatedFile = response.files.local;
-      await this.#filesStore.appendOrSetPrinterFile(currentPrinter.id, newOrUpdatedFile);
+      await this.#filesStore.appendOrSetPrinterFile(currentPrinterId, newOrUpdatedFile);
     }
 
     res.send(response);
@@ -275,10 +263,7 @@ class PrinterFileController {
   }
 
   async deleteFile(req, res) {
-    const { currentPrinter, printerLogin } = validateScoped(req, [
-      printerLoginToken,
-      currentPrinterToken
-    ]);
+    const { currentPrinterId, printerLogin } = getScopedPrinter(req);
     const { filePath } = await validateInput(req.query, getFileRules, res);
 
     let response;
@@ -297,9 +282,9 @@ class PrinterFileController {
       }
     }
 
-    const combinedResult = await this.#filesStore.deleteFile(currentPrinter.id, filePath, false);
+    const combinedResult = await this.#filesStore.deleteFile(currentPrinterId, filePath, false);
     this.#logger.info(
-      `File reference removal completed for printerId ${currentPrinter.id}`,
+      `File reference removal completed for printerId ${currentPrinterId}`,
       filePath
     );
 

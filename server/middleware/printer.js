@@ -1,6 +1,7 @@
 const DITokens = require("../container.tokens");
 const { asValue } = require("awilix");
 
+const printerIdToken = "currentPrinterId";
 const currentPrinterToken = "currentPrinter";
 const printerLoginToken = "printerLogin";
 
@@ -16,7 +17,8 @@ const printerMiddleware = () => {
 
     req.container.register({
       [currentPrinterToken]: asValue(scopedPrinter),
-      [printerLoginToken]: asValue(scopedPrinter?.getLoginDetails())
+      [printerLoginToken]: asValue(scopedPrinter?.getLoginDetails()),
+      [printerIdToken]: asValue(req.params.id)
     });
 
     next();
@@ -26,5 +28,6 @@ const printerMiddleware = () => {
 module.exports = {
   printerResolveMiddleware: printerMiddleware,
   currentPrinterToken,
-  printerLoginToken
+  printerLoginToken,
+  printerIdToken
 };
