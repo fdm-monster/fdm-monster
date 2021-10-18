@@ -15,6 +15,9 @@ const deleteRoute = printerRoute;
 const createRoute = printerRoute;
 const refreshSettingsPath = "query-settings";
 const updateRoute = printerRoute;
+const batchRoute = `${printerRoute}/batch`;
+
+const apiKey = "3dpf3dpf3dpf3dpf3dpf3dpf3dpf3dpf";
 
 beforeAll(async () => {
   await dbHandler.connect();
@@ -107,5 +110,35 @@ describe("PrintersController", () => {
       error: `The printer ID '${printerId}' was not found in the PrintersStore.`
     });
     expect(res.res.statusMessage).toContain("Not Found");
+  });
+
+  it("should be able to import empty printers json array", async function () {
+    const path = batchRoute;
+    const res = await request.post(path, []).send(path);
+
+    // Assert server failed
+    expect(res.statusCode).toEqual(200);
+  });
+
+  it("should invalidate to malformed singular printer json array", async function () {
+    const path = batchRoute;
+    const response = await request.post(path).send([{}]);
+
+    // Assert server failed
+    expectInvalidResponse(response, ["printerURL", "apiKey", "webSocketURL"]);
+  });
+
+  it("should import to singular printer json array", async function () {
+    const path = batchRoute;
+    const response = await request.post(path).send([
+      {
+        printerURL: "http://localhost/",
+        webSocketURL: "ws://localhost/",
+        apiKey
+      }
+    ]);
+
+    // Assert server succeeded
+    expectOkResponse(response);
   });
 });

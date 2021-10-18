@@ -229,6 +229,8 @@ class PrintersStore {
   }
 
   async batchImport(printers) {
+    if (!printers?.length) return [];
+
     this.#logger.info(`Validating ${printers.length} printer objects`);
     for (let printer of printers) {
       await this.#printerService.validateAndDefault(printer);
