@@ -224,7 +224,7 @@ class PrinterController {
     this.#logger.info("Changing printer enabled setting", JSON.stringify(data));
 
     await this.#printersStore.updateEnabled(currentPrinterId, data.enabled);
-    res.send({});
+    res.send();
   }
 
   async reconnectOctoPrint(req, res) {

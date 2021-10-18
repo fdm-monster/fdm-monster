@@ -1,7 +1,7 @@
 const { UUID_LENGTH } = require("../../constants/service.constants");
 
 const stepSizeRules = {
-  stepSize: "required|in:01,1,10,100|numeric"
+  stepSize: "required|in:0.1,1,10,100|numeric"
 };
 
 const flowRateRules = {

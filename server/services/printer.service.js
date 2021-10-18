@@ -104,37 +104,37 @@ class PrinterService {
    * @returns {Promise<Query<Document<any, any> | null, Document<any, any>, {}>>}
    */
   async updateSortIndex(printerId, sortIndex) {
-    const filter = { _id: printerId };
     const update = { sortIndex };
-    return Printers.findOneAndUpdate(filter, update, {
-      returnOriginal: false
+    return Printers.findByIdAndUpdate(printerId, update, {
+      new: true,
+      useFindAndModify: false
     });
   }
 
   async updateFlowRate(printerId, flowRate) {
-    const filter = { _id: printerId };
     const update = { flowRate };
-    return Printers.findOneAndUpdate(filter, update, {
-      returnOriginal: false
+    return Printers.findByIdAndUpdate(printerId, update, {
+      new: true,
+      useFindAndModify: false
     });
   }
 
   async updateFeedRate(printerId, feedRate) {
-    const filter = { _id: printerId };
     const update = { feedRate };
-    return Printers.findOneAndUpdate(filter, update, {
-      returnOriginal: false
+    return Printers.findByIdAndUpdate(printerId, update, {
+      new: true,
+      useFindAndModify: false
     });
   }
 
   async resetPowerSettings(printerId) {
-    const filter = { _id: printerId };
     const update = {
       powerSettings: getPowerSettingsDefault()
     };
 
-    return Printers.findOneAndUpdate(filter, update, {
-      returnOriginal: false
+    return Printers.findByIdAndUpdate(printerId, update, {
+      new: true,
+      useFindAndModify: false
     });
   }
 
