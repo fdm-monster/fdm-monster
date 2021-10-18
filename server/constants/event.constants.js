@@ -5,6 +5,9 @@ const PEVENTS = {
   event: "event"
 };
 
+const uploadProgressEvent = (token) => `upload.progress.${token}`;
+
 module.exports = {
-  PEVENTS
+  PEVENTS,
+  uploadProgressEvent
 };

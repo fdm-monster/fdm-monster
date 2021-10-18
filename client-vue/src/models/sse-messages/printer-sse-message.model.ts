@@ -9,9 +9,22 @@ export interface TestProgressDetails {
   websocketBound?: boolean;
 }
 
+export interface TrackedUpload {
+  correlationToken: string;
+  startedAt: number;
+  multerFile: {
+    [k: string]: number;
+  };
+  progress: {
+    percent: number;
+    [k: string]: number;
+  };
+}
+
 export interface PrinterSseMessage {
   printers: Printer[];
   printerGroups: PrinterGroup[];
   testPrinter: Printer;
+  trackedUploads: TrackedUpload[];
   testProgress: TestProgressDetails;
 }

@@ -1,7 +1,8 @@
 const {
   ValidationException,
   NotFoundException,
-  InternalServerException
+  InternalServerException,
+  ExternalServiceError
 } = require("./runtime.exceptions");
 const { AppConstants } = require("../app.constants");
 
@@ -12,11 +13,11 @@ function exceptionHandler(err, req, res, next) {
     console.error("[API Exception Handler]", err.stack);
   }
   if (err.isAxiosError) {
-    const code = err.response.status;
+    const code = err.response?.status;
     return res.status(code).send({
       error: "External API call failed",
       type: "axios-error",
-      data: err.response.data
+      data: err.response?.data
     });
   }
   if (err instanceof NotFoundException) {
@@ -38,6 +39,10 @@ function exceptionHandler(err, req, res, next) {
       type: err.name,
       stack: err.stack
     });
+  }
+  if (err instanceof ExternalServiceError) {
+    const code = err.error.statusCode || 500;
+    return res.status(code).send(err.error);
   }
   if (!!err) {
     const code = err.statusCode || 500;

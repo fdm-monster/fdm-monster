@@ -1,6 +1,7 @@
 const DITokens = {
   loggerFactory: "loggerFactory",
   httpClient: "httpClient",
+  multerService: "multerService",
   taskManagerService: "taskManagerService",
   eventEmitter2: "eventEmitter2",
   printerService: "printerService",
@@ -42,6 +43,7 @@ const DITokens = {
   dashboardStatisticsCache: "dashboardCache",
   currentOperationsCache: "currentOperationsCache",
   fileCache: "fileCache",
+  fileUploadTrackerCache: "fileUploadTrackerCache",
   historyCache: "historyCache",
   filamentCache: "filamentCache",
   // Tasks

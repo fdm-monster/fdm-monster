@@ -1,6 +1,5 @@
 const { ensureAuthenticated } = require("../middleware/auth");
 const { createController } = require("awilix-express");
-const Logger = require("../handlers/logger.js");
 const { validateInput, getScopedPrinter, validateMiddleware } = require("../handlers/validators");
 const { AppConstants } = require("../app.constants");
 const {
@@ -14,39 +13,50 @@ const {
   createFolderRules
 } = require("./validation/printer-files-controller.validation");
 const { ValidationException } = require("../exceptions/runtime.exceptions");
-const multer = require("multer");
-const path = require("path");
 const fs = require("fs");
-const {
-  printerLoginToken,
-  printerResolveMiddleware
-} = require("../middleware/printer");
+const { printerLoginToken, printerResolveMiddleware } = require("../middleware/printer");
 
 class PrinterFileController {
   #filesStore;
 
   #octoPrintApiService;
   #printersStore;
+  #multerService;
 
-  #logger = new Logger("Server-API");
+  #logger;
 
-  constructor({ filesStore, octoPrintApiService, printersStore }) {
+  constructor({ filesStore, octoPrintApiService, printersStore, loggerFactory, multerService }) {
     this.#filesStore = filesStore;
     this.#octoPrintApiService = octoPrintApiService;
     this.#printersStore = printersStore;
-  }
-
-  #gcodeFileFilter(req, file, callback) {
-    const ext = path.extname(file.originalname);
-    if (ext !== ".gcode") {
-      return callback(new Error("Only .gcode files are allowed"));
-    }
-    callback(null, true);
+    this.#multerService = multerService;
+    this.#logger = loggerFactory("Server-API");
   }
 
   #statusResponse(res, response) {
     res.statusCode = response.status;
     res.send(response.data);
+  }
+
+  getTrackedUploads(req, res) {
+    const sessions = this.#multerService.getSessions();
+
+    res.send(sessions);
+  }
+
+  async #getUploadedFile(req, res, storeAsTempFile = true) {
+    const multerMiddleware = this.#multerService.getMulterGCodeFileFilter(storeAsTempFile);
+
+    await new Promise((resolve, reject) =>
+      multerMiddleware(req, res, (err) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve();
+      })
+    );
+
+    return req.files;
   }
 
   async getFiles(req, res) {
@@ -170,34 +180,31 @@ class PrinterFileController {
   }
 
   async uploadFiles(req, res) {
-    const { currentPrinterId, printerLogin } = getScopedPrinter(req);
+    const { printerLogin, currentPrinterId } = getScopedPrinter(req);
     const {} = await validateInput(req.query, uploadFilesRules);
 
-    const uploadAny = multer({
-      storage: multer.memoryStorage(),
-      fileFilter: this.#gcodeFileFilter
-    }).any();
+    const files = await this.#getUploadedFile(req, res, true);
 
-    await new Promise((resolve, reject) =>
-      uploadAny(req, res, (err) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve();
-      })
-    );
-
-    if (req.files.length === 0)
+    if (!files.length) {
       throw new ValidationException({
-        error: "No files were available for upload. Did you upload files with extension '.gcode'?"
+        error: "No file was available for upload. Did you upload files with extension '.gcode'?"
       });
+    }
+    if (files.length > 1) {
+      throw new ValidationException({
+        error: "Only 1 .gcode file can be uploaded at a time due to bandwidth restrictions"
+      });
+    }
 
     // Multer has processed the remaining multipart data into the body as json
     const commands = await validateInput(req.body, fileUploadCommandsRules);
-    const response = await this.#octoPrintApiService.uploadFilesAsMultiPart(
+
+    const token = this.#multerService.startTrackingSession(files);
+    const response = await this.#octoPrintApiService.uploadFileAsMultiPart(
       printerLogin,
-      req.files,
-      commands
+      files[0],
+      commands,
+      token
     );
 
     if (response.success !== false) {
@@ -210,17 +217,13 @@ class PrinterFileController {
 
   async localUploadFile(req, res) {
     const { currentPrinterId, printerLogin } = getScopedPrinter(req);
-
-    // Multer has processed the remaining multipart data into the body as json
     const { select, print, localLocation } = await validateInput(req.body, localFileUploadRules);
 
     const stream = fs.createReadStream(localLocation);
-
-    const response = await this.#octoPrintApiService.uploadFilesAsMultiPart(
-      printerLogin,
-      [stream],
-      { select, print }
-    );
+    const response = await this.#octoPrintApiService.uploadFileAsMultiPart(printerLogin, stream, {
+      select,
+      print
+    });
 
     // TODO update file cache with files store
     if (response.success !== false) {
@@ -232,22 +235,7 @@ class PrinterFileController {
   }
 
   async stubUploadFiles(req, res) {
-    const uploadAnyDisk = multer({
-      storage: multer.diskStorage({
-        destination: "./file-uploads"
-      }),
-
-      fileFilter: this.#gcodeFileFilter
-    }).any();
-
-    await new Promise((resolve, reject) =>
-      uploadAnyDisk(req, res, (err) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve();
-      })
-    );
+    await this.#getUploadedFile(req, res);
 
     this.#logger.info("Stub file upload complete.");
     res.send();
@@ -260,6 +248,7 @@ module.exports = createController(PrinterFileController)
     .before([ensureAuthenticated, printerResolveMiddleware()])
     .post("/purge", "purgeIndexedFiles")
     .post("/stub-upload", "stubUploadFiles")
+    .get("/tracked-uploads", "getTrackedUploads")
     .get("/:id", "getFiles")
     .get("/:id/cache", "getFilesCache")
     .delete("/:id", "deleteFileOrFolder")

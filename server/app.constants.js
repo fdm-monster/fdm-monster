@@ -11,6 +11,10 @@ class AppConstants {
     return 4000;
   }
 
+  static get defaultFileUploadFolder() {
+    return "./file-uploads";
+  }
+
   static get defaultFileStorageFolder() {
     return "file-storage";
   }

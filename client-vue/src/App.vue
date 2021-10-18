@@ -26,6 +26,7 @@ import { sseGroups, sseMessageGlobal, sseTestPrinterUpdate } from "@/event-bus/s
 import { serverSettingsState } from "@/store/server-settings.state";
 import { printersState } from "@/store/printers.state";
 import { updatedPrinterEvent } from "@/event-bus/printer.events";
+import { infoMessageEvent } from "@/event-bus/alert.events";
 
 @Component({
   components: { TopBar, NavigationDrawer, FooterList, ErrorAlert }
@@ -56,6 +57,10 @@ export default class App extends Vue {
     if (message.printerGroups) {
       await printersState.savePrinterGroups(message.printerGroups);
       this.$bus.emit(sseGroups, message.printerGroups);
+    }
+
+    if (message.trackedUploads?.length > 0) {
+      this.$bus.emit(infoMessageEvent, "Server to OctoPrint (1/1) uploading", message.trackedUploads[0].progress?.percent);
     }
     if (message.printers) {
       printersState.savePrinters(message.printers);

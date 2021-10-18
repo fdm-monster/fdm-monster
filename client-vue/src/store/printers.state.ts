@@ -263,8 +263,6 @@ class PrintersModule extends VuexModule {
 
     await PrinterFileService.uploadFiles(printerId, uploadedFiles, commands);
 
-    console.log("Drop triggered", printerId, files.length, commands);
-
     // TODO update
     // this.setPrinterFiles({ printerId, files: [] });
 

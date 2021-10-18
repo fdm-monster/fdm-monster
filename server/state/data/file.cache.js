@@ -1,5 +1,3 @@
-const _ = require("lodash");
-const Logger = require("../../handlers/logger.js");
 const { getDefaultFileCleanStatistics } = require("../../constants/cleaner.constants");
 const { findFileIndex } = require("../../services/utils/find-predicate.utils");
 const { getFileCacheDefault } = require("../../constants/cache.constants");
@@ -15,9 +13,11 @@ class FileCache {
   #totalFileCount = 0;
   #fileStatistics = getDefaultFileCleanStatistics();
 
-  #logger = new Logger("Server-FileCache");
+  #logger;
 
-  constructor({}) {}
+  constructor({ loggerFactory }) {
+    this.#logger = loggerFactory("Server-FileCache");
+  }
 
   /**
    * Save a printer storage reference to cache

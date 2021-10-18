@@ -3,6 +3,8 @@ import { ServerApi } from "@/backend/server.api";
 import { FileUploadCommands } from "@/models/printers/file-upload-commands.model";
 import { PrinterFileCache } from "@/models/printers/printer-file-cache.model";
 import { PrinterFile } from "@/models/printers/printer-file.model";
+import Vue from "vue";
+import { infoMessageEvent } from "@/event-bus/alert.events";
 
 export class PrinterFileService extends BaseService {
   static async getFiles(printerId: string, recursive = false) {
@@ -45,8 +47,8 @@ export class PrinterFileService extends BaseService {
     );
   }
 
-  static uploadUpdateProgress(progress: any) {
-    console.log(progress);
+  static uploadUpdateProgress(progress: ProgressEvent) {
+    Vue.bus.emit(infoMessageEvent, "Browser to server uploading", progress.loaded / progress.total);
   }
 
   static async uploadFiles(

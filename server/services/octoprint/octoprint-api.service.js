@@ -17,6 +17,8 @@ const { jsonContentType } = require("./constants/octoprint-service.constants");
 const { getDefaultTimeout } = require("../../constants/server-settings.constants");
 const FormData = require("form-data");
 const got = require("got");
+const { uploadProgressEvent } = require("../../constants/event.constants");
+const { ExternalServiceError } = require("../../exceptions/runtime.exceptions");
 
 const defaultResponseOptions = { unwrap: true };
 const octoPrintBase = "/";
@@ -47,13 +49,15 @@ const apiTimelapse = apiBase + "/timelapse";
 class OctoprintApiService {
   #settingsStore;
   #httpClient;
+  #eventEmitter2;
   #timeouts; // TODO apply apiTimeout, but apply apiRetry, apiRetryCutoff elsewhere (and webSocketRetry)
 
   #logger;
 
-  constructor({ settingsStore, httpClient, loggerFactory }) {
+  constructor({ settingsStore, httpClient, loggerFactory, eventEmitter2 }) {
     this.#settingsStore = settingsStore;
     this.#httpClient = httpClient;
+    this.#eventEmitter2 = eventEmitter2;
     this.#logger = loggerFactory("OctoPrint-API-Service");
   }
 
@@ -250,10 +254,11 @@ class OctoprintApiService {
     return processResponse(response, responseOptions);
   }
 
-  async uploadFilesAsMultiPart(
+  async uploadFileAsMultiPart(
     printer,
-    fileBuffers,
+    fileStreamOrBuffer,
     commands,
+    token,
     responseOptions = defaultResponseOptions
   ) {
     const { url, options } = this.#prepareRequest(
@@ -264,23 +269,19 @@ class OctoprintApiService {
     );
 
     const formData = new FormData();
-
-    fileBuffers.forEach((b) => {
-      if (typeof b?.pipe === "function") {
-        formData.append("file", b);
-      } else {
-        formData.append("file", b.buffer, { filename: b.originalname });
-      }
-    });
-
-    if (fileBuffers.length === 1) {
-      if (commands.select) {
-        formData.append("select", "true");
-      }
-      if (commands.print) {
-        formData.append("print", "true");
-      }
+    if (commands.select) {
+      formData.append("select", "true");
     }
+    if (commands.print) {
+      formData.append("print", "true");
+    }
+
+    let source = fileStreamOrBuffer.buffer;
+    const isPhysicalFile = !source;
+    if (!source) {
+      source = fs.createReadStream(fileStreamOrBuffer.path);
+    }
+    formData.append("file", source, { filename: fileStreamOrBuffer.originalname });
 
     try {
       const headers = {
@@ -288,19 +289,32 @@ class OctoprintApiService {
         ...formData.getHeaders()
       };
 
-      // Not awaited to maintain promise calls like .json()/.text() etc
       const response = await got
         .post(url, {
           body: formData,
           headers
         })
         .on("uploadProgress", (p) => {
-          console.log(p.percent);
+          if (token) {
+            this.#eventEmitter2.emit(`${uploadProgressEvent(token)}`, token, p);
+          }
         });
+
+      // Cleanup
+      if (isPhysicalFile) {
+        fs.unlinkSync(fileStreamOrBuffer.path);
+      }
 
       return await processGotResponse(response, responseOptions);
     } catch (e) {
-      return { error: e.message, success: false, stack: e.stack };
+      this.#eventEmitter2.emit(`${uploadProgressEvent(token)}`, token, { failed: true }, e);
+      throw new ExternalServiceError({
+        error: e.message,
+        statusCode: e.response?.statusCode,
+        data: JSON.parse(e.response?.body),
+        success: false,
+        stack: e.stack
+      });
     }
   }
 
@@ -331,7 +345,10 @@ class OctoprintApiService {
   async getPluginManager(printer, responseOptions = defaultResponseOptions) {
     const printerManagerApiCompatible = checkPluginManagerAPIDeprecation(printer.octoPrintVersion);
 
-    const path = printerManagerApiCompatible || !printer.octoPrintVersion ? apiPluginManagerRepository1_6_0 : apiPluginManager;
+    const path =
+      printerManagerApiCompatible || !printer.octoPrintVersion
+        ? apiPluginManagerRepository1_6_0
+        : apiPluginManager;
     const { url, options } = this.#prepareRequest(printer, path);
 
     const response = await this.#httpClient.get(url, options);
