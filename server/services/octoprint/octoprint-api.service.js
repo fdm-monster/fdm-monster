@@ -17,6 +17,7 @@ const { jsonContentType } = require("./constants/octoprint-service.constants");
 const { getDefaultTimeout } = require("../../constants/server-settings.constants");
 const FormData = require("form-data");
 const got = require("got");
+const { uploadProgressEvent, uploadCancelHandler } = require("../../constants/event.constants");
 
 const defaultResponseOptions = { unwrap: true };
 const octoPrintBase = "/";
@@ -47,13 +48,15 @@ const apiTimelapse = apiBase + "/timelapse";
 class OctoprintApiService {
   #settingsStore;
   #httpClient;
+  #eventEmitter2;
   #timeouts; // TODO apply apiTimeout, but apply apiRetry, apiRetryCutoff elsewhere (and webSocketRetry)
 
   #logger;
 
-  constructor({ settingsStore, httpClient, loggerFactory }) {
+  constructor({ settingsStore, httpClient, loggerFactory, eventEmitter2 }) {
     this.#settingsStore = settingsStore;
     this.#httpClient = httpClient;
+    this.#eventEmitter2 = eventEmitter2;
     this.#logger = loggerFactory("OctoPrint-API-Service");
   }
 
@@ -254,6 +257,7 @@ class OctoprintApiService {
     printer,
     fileBuffers,
     commands,
+    correlationToken = null,
     responseOptions = defaultResponseOptions
   ) {
     const { url, options } = this.#prepareRequest(
@@ -266,10 +270,15 @@ class OctoprintApiService {
     const formData = new FormData();
 
     fileBuffers.forEach((b) => {
-      if (typeof b?.pipe === "function") {
-        formData.append("file", b);
-      } else {
+      if (b.buffer) {
         formData.append("file", b.buffer, { filename: b.originalname });
+      }
+      else if (b.path) {
+        formData.append("file", fs.createReadStream(b.path), { filename: b.originalname });
+      }
+      else if (typeof b?.pipe === "function") {
+        // Streams can fail if no filename is pushed
+        formData.append("file", b);
       }
     });
 
@@ -289,17 +298,24 @@ class OctoprintApiService {
       };
 
       // Not awaited to maintain promise calls like .json()/.text() etc
-      const response = await got
+      const request = got
         .post(url, {
           body: formData,
           headers
         })
         .on("uploadProgress", (p) => {
-          console.log(p.percent);
+          if (correlationToken) {
+            this.#eventEmitter2.emit(`${uploadProgressEvent(correlationToken)}`, correlationToken, p);
+          }
         });
+      this.#eventEmitter2.emit(`${uploadCancelHandler(correlationToken)}`, correlationToken, request.cancel);
+
+      const response = await request;
+      this.#eventEmitter2.emit(`${uploadProgressEvent(correlationToken)}`, correlationToken, { done: true });
 
       return await processGotResponse(response, responseOptions);
     } catch (e) {
+      this.#eventEmitter2.emit(`${uploadProgressEvent(correlationToken)}`, correlationToken, { failed: true }, e);
       return { error: e.message, success: false, stack: e.stack };
     }
   }

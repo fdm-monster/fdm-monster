@@ -106,6 +106,8 @@ async function serveApiNormally(app, container, quick_boot = false) {
   if (!quick_boot) {
     logger.info("Initialising FarmInformation...");
 
+    const multerService = container.resolve(DITokens.multerService);
+    await multerService.clearUploadsFolder();
     const printersStore = container.resolve(DITokens.printersStore);
     await printersStore.loadPrintersStore();
     const filesStore = container.resolve(DITokens.filesStore);

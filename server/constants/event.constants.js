@@ -5,6 +5,11 @@ const PEVENTS = {
   event: "event"
 };
 
+const uploadProgressEvent = (token) => `upload.progress.${token}`;
+const uploadCancelHandler = (token) => `upload.cancel.handler.${token}`;
+
 module.exports = {
-  PEVENTS
+  PEVENTS,
+  uploadProgressEvent,
+  uploadCancelHandler
 };

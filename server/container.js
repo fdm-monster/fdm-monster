@@ -53,6 +53,8 @@ const { asFunction, asClass, asValue, createContainer, InjectionMode } = require
 const LoggerFactory = require("./handlers/logger-factory");
 const PrinterTestTask = require("./tasks/printer-test.task");
 const PrinterGroupsCache = require("./state/data/printer-groups.cache");
+const MulterService = require("./services/multer.service");
+const FileUploadTrackerCache = require("./state/data/file-upload-tracker.cache");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -92,6 +94,7 @@ function configureContainer() {
         maxContentLength: 1000 * 1000 * 1000 // 1GB
       })
     ),
+    [DITokens.multerService]: asClass(MulterService).singleton(),
 
     [DITokens.printerService]: asClass(PrinterService),
     [DITokens.printerFilesService]: asClass(PrinterFilesService),
@@ -112,6 +115,7 @@ function configureContainer() {
     [DITokens.connectionLogsCache]: asClass(ConnectionLogsCache).singleton(),
     [DITokens.printerTickerStore]: asClass(PrinterTickerStore).singleton(),
     [DITokens.fileCache]: asClass(FileCache).singleton(),
+    [DITokens.fileUploadTrackerCache] : asClass(FileUploadTrackerCache).singleton(),
     [DITokens.filamentStore]: asClass(FilamentStore), // No need for singleton as its now based on filamentCache
     [DITokens.filesStore]: asClass(FilesStore).singleton(),
     [DITokens.printersStore]: asClass(PrintersStore).singleton(),

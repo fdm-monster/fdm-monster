@@ -15,6 +15,7 @@ const { idRules } = require("./validation/generic.validation");
 const DITokens = require("../container.tokens");
 const { Status, getSettingsAppearanceDefault } = require("../constants/service.constants");
 const { printerResolveMiddleware } = require("../middleware/printer");
+const { generateCorrelationToken } = require("../utils/correlation-token.util");
 
 class PrinterController {
   #printersStore;
@@ -110,7 +111,7 @@ class PrinterController {
     }
 
     // As we dont generate a _id we generate a correlation token
-    newPrinter.correlationToken = Math.random().toString(36).slice(2);
+    newPrinter.correlationToken = generateCorrelationToken();
 
     this.#logger.info(`Testing printer with correlation token ${newPrinter.correlationToken}`);
 

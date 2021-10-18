@@ -109,6 +109,7 @@
       ".github/*",
       ".docs/*",
       "./coverage/*",
+      "file-uploads",
       "logs/*",
       "test/*",
       "images/*",
