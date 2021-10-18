@@ -51,7 +51,7 @@ class ServerUpdateService {
               includePre,
               this.#serverVersion
             );
-            if (!!latestRelease && !!latestRelease.tag_name) {
+            if (!!latestRelease && !!latestRelease?.tag_name) {
               delete latestRelease.body;
               delete latestRelease.author;
               this.#loadedWithPrereleases = includePre;
@@ -60,7 +60,7 @@ class ServerUpdateService {
               this.#latestReleaseKnown = latestRelease;
               this.#notificationReady =
                 latestRelease.tag_name !== this.#serverVersion && !!this.#installedReleaseFound;
-            } else if (!latestRelease.tag_name) {
+            } else if (!latestRelease?.tag_name) {
               // Falsy tag_name is very unlikely - probably tests only
               this.#lastReleaseCheckFailed = false;
               this.#notificationReady = false;
