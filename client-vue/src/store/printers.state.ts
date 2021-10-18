@@ -7,7 +7,6 @@ import { PrinterGroupService } from "@/backend/printer-group.service";
 import store from "@/store/index";
 import { FileUploadCommands } from "@/models/printers/file-upload-commands.model";
 import { PrinterFile } from "@/models/printers/printer-file.model";
-import { MultiResponse } from "@/models/api/status-response.model";
 import { PrinterFileBucket } from "@/models/printers/printer-file-bucket.model";
 import { PrinterFileCache } from "@/models/printers/printer-file-cache.model";
 import { PrinterJobService } from "@/backend/printer-job.service";
@@ -334,19 +333,9 @@ class PrintersModule extends VuexModule {
 
   @Action
   async deletePrinterFile({ printerId, fullPath }: { printerId: string; fullPath: string }) {
-    const response = (await PrinterFileService.deleteFileOrFolder(
-      printerId,
-      fullPath
-    )) as MultiResponse;
+    await PrinterFileService.deleteFileOrFolder(printerId, fullPath);
 
-    if (response.cache?.success) {
-      this.popPrinterFile({ printerId, fullPath });
-    } else {
-      console.warn(
-        "File was not purged from state as cache.success was false",
-        response.cache?.success
-      );
-    }
+    this.popPrinterFile({ printerId, fullPath });
 
     return this.printerFiles(printerId) as PrinterFile[];
   }

@@ -282,6 +282,7 @@ class PrinterController {
 
     this.#logger.info("Grabbing plugin list for: ", currentPrinterId);
 
+    // TODO requires octoprint version for compatibility...
     let pluginList = await this.#octoPrintApiService.getPluginManager(printerLogin);
     res.send(pluginList);
   }
