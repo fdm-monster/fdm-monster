@@ -272,11 +272,9 @@ class OctoprintApiService {
     fileBuffers.forEach((b) => {
       if (b.buffer) {
         formData.append("file", b.buffer, { filename: b.originalname });
-      }
-      else if (b.path) {
+      } else if (b.path) {
         formData.append("file", fs.createReadStream(b.path), { filename: b.originalname });
-      }
-      else if (typeof b?.pipe === "function") {
+      } else if (typeof b?.pipe === "function") {
         // Streams can fail if no filename is pushed
         formData.append("file", b);
       }
@@ -310,10 +308,10 @@ class OctoprintApiService {
         });
       this.#eventEmitter2.emit(`${uploadCancelHandler(correlationToken)}`, correlationToken, request.cancel);
 
-      const response = await request;
-      this.#eventEmitter2.emit(`${uploadProgressEvent(correlationToken)}`, correlationToken, { done: true });
+      // const response = await request;
+      // this.#eventEmitter2.emit(`${uploadProgressEvent(correlationToken)}`, correlationToken, { done: true });
 
-      return await processGotResponse(response, responseOptions);
+      return { correlationToken }; // await processGotResponse(response, responseOptions);
     } catch (e) {
       this.#eventEmitter2.emit(`${uploadProgressEvent(correlationToken)}`, correlationToken, { failed: true }, e);
       return { error: e.message, success: false, stack: e.stack };

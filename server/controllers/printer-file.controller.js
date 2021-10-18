@@ -199,17 +199,19 @@ class PrinterFileController {
     // Multer has processed the remaining multipart data into the body as json
     const commands = await validateInput(req.body, fileUploadCommandsRules);
     const token = this.#multerService.startTrackingSession();
-    const response = await this.#octoPrintApiService.uploadFilesAsMultiPart(
+    const response = this.#octoPrintApiService.uploadFilesAsMultiPart(
       printerLogin,
       files,
       commands,
       token
     );
 
-    if (response.success !== false) {
-      const newOrUpdatedFile = response.files.local;
-      await this.#filesStore.appendOrSetPrinterFile(currentPrinterId, newOrUpdatedFile);
-    }
+    this.#multerService.cancelUpload(token);
+
+    // if (response.success !== false) {
+    //   const newOrUpdatedFile = response.files.local;
+    //   await this.#filesStore.appendOrSetPrinterFile(currentPrinterId, newOrUpdatedFile);
+    // }
 
     res.send(response);
   }

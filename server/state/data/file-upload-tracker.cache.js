@@ -60,7 +60,7 @@ class FileUploadTrackerCache {
   }
 
   updateUploadProgress(token, progress, reason) {
-    if (progress.done) {
+    if (progress.done || progress.percent === 1) {
       this.#logger.info("Upload tracker completed");
       this.markUploadDone(token, true);
       this.#eventEmitter2.off(uploadProgressEvent(token), this.progressCallback);

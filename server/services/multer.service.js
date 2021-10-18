@@ -2,6 +2,7 @@ const multer = require("multer");
 const { AppConstants } = require("../app.constants");
 const path = require("path");
 const fs = require("fs");
+const { NotFoundException } = require("../exceptions/runtime.exceptions");
 
 class MulterService {
   #fileUploadTrackerCache;
@@ -15,7 +16,7 @@ class MulterService {
       if (err) throw err;
 
       for (const file of files) {
-        fs.unlink(path.join(AppConstants.defaultFileUploadFolder, file), err => {
+        fs.unlink(path.join(AppConstants.defaultFileUploadFolder, file), (err) => {
           if (err) throw err;
         });
       }
@@ -34,8 +35,8 @@ class MulterService {
     return multer({
       storage: storeAsFile
         ? multer.diskStorage({
-          destination: AppConstants.defaultFileUploadFolder
-        })
+            destination: AppConstants.defaultFileUploadFolder
+          })
         : multer.memoryStorage(),
       fileFilter: this.gcodeFileFilter
     }).any();
@@ -50,7 +51,7 @@ class MulterService {
     if (typeof session?.cancel === "function") {
       session.cancel();
     } else {
-      return { error: "This session has no cancellation callback bound" };
+      throw new NotFoundException("This session has no cancellation callback bound");
     }
   }
 
