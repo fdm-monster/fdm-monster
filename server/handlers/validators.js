@@ -59,7 +59,7 @@ function getScopedPrinter(req) {
       const dependency = req.container.resolve(t);
       if (!dependency) {
         errors.push(
-          `Scoped Dependency '${t}' was not resolved. Please ensure the right headers or query parameters were provided.`
+          `Scoped Dependency '${t}' was not resolved. Please ensure the route requires a :id param and the printerId was provided.`
         );
       }
       resolvedDependencies[t] = dependency;

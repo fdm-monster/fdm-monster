@@ -32,18 +32,12 @@ class PrinterFileController {
   #octoPrintApiService;
   #printersStore;
 
-  // Scoped middleware
-  #currentPrinter;
-  #printerLogin;
-
   #logger = new Logger("Server-API");
 
-  constructor({ filesStore, octoPrintApiService, printersStore, currentPrinter, printerLogin }) {
+  constructor({ filesStore, octoPrintApiService, printersStore }) {
     this.#filesStore = filesStore;
     this.#octoPrintApiService = octoPrintApiService;
     this.#printersStore = printersStore;
-    this.#currentPrinter = currentPrinter;
-    this.#printerLogin = printerLogin;
   }
 
   #gcodeFileFilter(req, file, callback) {

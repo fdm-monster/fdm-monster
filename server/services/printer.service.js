@@ -78,36 +78,23 @@ class PrinterService {
    * @returns {Promise<Query<Document<any, any, unknown> | null, Document<any, any, unknown>, {}, unknown>>}
    */
   async update(printerId, updateData) {
+    const printer = await this.get(printerId);
+
     const { printerURL, webSocketURL, apiKey, enabled, settingsAppearance } = await validateInput(
       updateData,
       createPrinterRules
     );
 
-    const filter = { _id: printerId };
-    const update = {
-      printerURL,
-      webSocketURL,
-      apiKey,
-      enabled
-    };
+    printer.printerURL = printerURL;
+    printer.webSocketURL = webSocketURL;
+    printer.apiKey = apiKey;
+    if (enabled !== undefined) {
+      printer.enabled = enabled;
+    }
+    printer.settingsAppearance.name = settingsAppearance.name;
+    printer.save();
 
-    const doc = await Printers.findOneAndUpdate(filter, update, {
-      returnOriginal: false
-    });
-    let appearance = {
-      ...doc.settingsAppearance,
-      name: settingsAppearance.name
-    };
-
-    return Printers.findOneAndUpdate(
-      filter,
-      {
-        settingsAppearance: appearance
-      },
-      {
-        returnOriginal: false
-      }
-    );
+    return printer;
   }
 
   /**
@@ -152,7 +139,6 @@ class PrinterService {
   }
 
   async updateConnectionSettings(printerId, { printerURL, camURL, webSocketURL, apiKey }) {
-    const filter = { _id: printerId };
     const update = {
       printerURL: sanitizeURL(printerURL),
       camURL: sanitizeURL(camURL),
@@ -162,21 +148,22 @@ class PrinterService {
 
     await validateInput(update, createPrinterRules);
 
-    return Printers.findOneAndUpdate(filter, update, {
-      returnOriginal: false
+    return Printers.findByIdAndUpdate(printerId, update, {
+      new: true,
+      useFindAndModify: false
     });
   }
 
   async updateEnabled(printerId, enabled) {
-    const filter = { _id: printerId };
     const update = {
       enabled
     };
 
     await validateInput(update, updatePrinterEnabledRule);
 
-    return Printers.findOneAndUpdate(filter, update, {
-      returnOriginal: false
+    return Printers.findByIdAndUpdate(printerId, update, {
+      new: true,
+      useFindAndModify: false
     });
   }
 

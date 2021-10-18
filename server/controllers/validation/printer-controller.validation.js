@@ -18,16 +18,14 @@ const updateSortIndexRules = {
 };
 
 const updatePrinterEnabledRule = {
-  enabled: `required|boolean`
+  enabled: "required|boolean"
 };
 
 const updatePrinterConnectionSettingRules = {
-  printer: "required|object",
-  "printer.id": "required|mongoId", // Changed from index to id
-  "printer.printerURL": "required|httpurl",
-  "printer.webSocketURL": "required|wsurl", // Changed from protocol to url
-  "printer.camURL": "httpurl",
-  "printer.apiKey": `required|minLength:${UUID_LENGTH}|maxLength:${UUID_LENGTH}`
+  printerURL: "required|httpurl",
+  webSocketURL: "required|wsurl", // Changed from protocol to url
+  camURL: "httpurl",
+  apiKey: `required|minLength:${UUID_LENGTH}|maxLength:${UUID_LENGTH}`
 };
 
 module.exports = {

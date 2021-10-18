@@ -1,8 +1,9 @@
 const _ = require("lodash");
-const { NotImplementedException } = require("../exceptions/runtime.exceptions");
+const { NotImplementedException, ValidationException } = require("../exceptions/runtime.exceptions");
 const { NotFoundException } = require("../exceptions/runtime.exceptions");
 const { validateInput } = require("../handlers/validators");
 const { createTestPrinterRules } = require("./validation/create-test-printer.validation");
+const ObjectID = require("mongodb").ObjectID;
 
 class PrintersStore {
   #settingsStore;
@@ -16,13 +17,13 @@ class PrintersStore {
   #logger;
 
   constructor({
-    settingsStore,
-    printerTickerStore,
-    printerStateFactory,
-    eventEmitter2,
-    printerService,
-    loggerFactory
-  }) {
+                settingsStore,
+                printerTickerStore,
+                printerStateFactory,
+                eventEmitter2,
+                printerService,
+                loggerFactory
+              }) {
     this.#settingsStore = settingsStore;
     this.#printerService = printerService;
     this.#printerTickerStore = printerTickerStore;
@@ -104,6 +105,10 @@ class PrintersStore {
 
   getPrinterState(id) {
     this._validateState();
+    if (!ObjectID.isValid(id)) {
+      // Go for synchronous error
+      throw new ValidationException({ printerId: "Printer Id is not a valid Mongo ID" });
+    }
 
     const printerState = this.#printerStates.find((p) => p.id === id);
 
