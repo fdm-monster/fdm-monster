@@ -1,7 +1,7 @@
 import Vue from "vue";
-import { printersState } from "@/store/printers.state";
 import { infoMessageEvent } from "@/event-bus/alert.events";
 import { Printer } from "@/models/printers/printer.model";
+import { printersState } from "@/store/printers.state";
 
 const bindDropConditionally = (el: HTMLElement, printer: Printer, context?: Vue) => {
   if (printer) {

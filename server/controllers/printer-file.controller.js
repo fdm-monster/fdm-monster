@@ -44,14 +44,8 @@ class PrinterFileController {
     res.send(sessions);
   }
 
-  cancelTrackedUpload(req, res) {
-    this.#multerService.cancelUpload(req.body.cancellationToken);
-
-    res.send();
-  }
-
-  async #getUploadedFiles(req, res, storeAsTempFiles = true) {
-    const multerMiddleware = this.#multerService.getMulterGCodeFilesFilter(storeAsTempFiles);
+  async #getUploadedFile(req, res, storeAsTempFile = true) {
+    const multerMiddleware = this.#multerService.getMulterGCodeFileFilter(storeAsTempFile);
 
     await new Promise((resolve, reject) =>
       multerMiddleware(req, res, (err) => {
@@ -186,32 +180,37 @@ class PrinterFileController {
   }
 
   async uploadFiles(req, res) {
-    const { currentPrinterId, printerLogin } = getScopedPrinter(req);
+    const { printerLogin, currentPrinterId } = getScopedPrinter(req);
     const {} = await validateInput(req.query, uploadFilesRules);
 
-    const files = await this.#getUploadedFiles(req, res, true);
+    const files = await this.#getUploadedFile(req, res, true);
 
-    if (files.length === 0)
+    if (!files.length) {
       throw new ValidationException({
-        error: "No files were available for upload. Did you upload files with extension '.gcode'?"
+        error: "No file was available for upload. Did you upload files with extension '.gcode'?"
       });
+    }
+    if (files.length > 1) {
+      throw new ValidationException({
+        error: "Only 1 .gcode file can be uploaded at a time due to bandwidth restrictions"
+      });
+    }
 
     // Multer has processed the remaining multipart data into the body as json
     const commands = await validateInput(req.body, fileUploadCommandsRules);
-    const token = this.#multerService.startTrackingSession();
-    const response = this.#octoPrintApiService.uploadFilesAsMultiPart(
+
+    const token = this.#multerService.startTrackingSession(files);
+    const response = await this.#octoPrintApiService.uploadFileAsMultiPart(
       printerLogin,
-      files,
+      files[0],
       commands,
       token
     );
 
-    this.#multerService.cancelUpload(token);
-
-    // if (response.success !== false) {
-    //   const newOrUpdatedFile = response.files.local;
-    //   await this.#filesStore.appendOrSetPrinterFile(currentPrinterId, newOrUpdatedFile);
-    // }
+    if (response.success !== false) {
+      const newOrUpdatedFile = response.files.local;
+      await this.#filesStore.appendOrSetPrinterFile(currentPrinterId, newOrUpdatedFile);
+    }
 
     res.send(response);
   }
@@ -221,11 +220,10 @@ class PrinterFileController {
     const { select, print, localLocation } = await validateInput(req.body, localFileUploadRules);
 
     const stream = fs.createReadStream(localLocation);
-    const response = await this.#octoPrintApiService.uploadFilesAsMultiPart(
-      printerLogin,
-      [stream],
-      { select, print }
-    );
+    const response = await this.#octoPrintApiService.uploadFileAsMultiPart(printerLogin, stream, {
+      select,
+      print
+    });
 
     // TODO update file cache with files store
     if (response.success !== false) {
@@ -237,7 +235,7 @@ class PrinterFileController {
   }
 
   async stubUploadFiles(req, res) {
-    await this.#getUploadedFiles(req, res);
+    await this.#getUploadedFile(req, res);
 
     this.#logger.info("Stub file upload complete.");
     res.send();
@@ -246,18 +244,17 @@ class PrinterFileController {
 
 // prettier-ignore
 module.exports = createController(PrinterFileController)
-  .prefix(AppConstants.apiRoute + "/printer-files")
-  .before([ensureAuthenticated, printerResolveMiddleware()])
-  .post("/purge", "purgeIndexedFiles")
-  .post("/stub-upload", "stubUploadFiles")
-  .get("/tracked-uploads", "getTrackedUploads")
-  .post("/cancel-upload", "cancelTrackedUpload")
-  .get("/:id", "getFiles")
-  .get("/:id/cache", "getFilesCache")
-  .delete("/:id", "deleteFileOrFolder")
-  .post("/:id/local-upload", "localUploadFile")
-  .post("/:id/upload", "uploadFiles")
-  .post("/:id/create-folder", "createFolder")
-  .post("/:id/select", "selectAndPrintFile")
-  .post("/:id/move", "moveFileOrFolder")
-  .delete("/:id/clear", "clearPrinterFiles");
+    .prefix(AppConstants.apiRoute + "/printer-files")
+    .before([ensureAuthenticated, printerResolveMiddleware()])
+    .post("/purge", "purgeIndexedFiles")
+    .post("/stub-upload", "stubUploadFiles")
+    .get("/tracked-uploads", "getTrackedUploads")
+    .get("/:id", "getFiles")
+    .get("/:id/cache", "getFilesCache")
+    .delete("/:id", "deleteFileOrFolder")
+    .post("/:id/local-upload", "localUploadFile")
+    .post("/:id/upload", "uploadFiles")
+    .post("/:id/create-folder", "createFolder")
+    .post("/:id/select", "selectAndPrintFile")
+    .post("/:id/move", "moveFileOrFolder")
+    .delete("/:id/clear", "clearPrinterFiles");

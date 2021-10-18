@@ -31,7 +31,7 @@ class MulterService {
     callback(null, true);
   }
 
-  getMulterGCodeFilesFilter(storeAsFile = true) {
+  getMulterGCodeFileFilter(storeAsFile = true) {
     return multer({
       storage: storeAsFile
         ? multer.diskStorage({
@@ -44,15 +44,6 @@ class MulterService {
 
   startTrackingSession(multerFile) {
     return this.#fileUploadTrackerCache.addUploadTracker(multerFile);
-  }
-
-  cancelUpload(token) {
-    const session = this.#fileUploadTrackerCache.getUpload(token);
-    if (typeof session?.cancel === "function") {
-      session.cancel();
-    } else {
-      throw new NotFoundException("This session has no cancellation callback bound");
-    }
   }
 
   getSessions() {

@@ -2,7 +2,15 @@
   <div>
     <slot></slot>
     <div v-if="err || info">
-      <v-snackbar v-model="snackbarOpened" absolute bottom right rounded="pill">
+      <v-snackbar v-if="progress" v-model="snackbarOpened" absolute bottom centered rounded="pill">
+        {{ info }}
+
+        <v-progress-linear v-if="progress" :value="100 * progress"></v-progress-linear>
+        <template v-slot:action="{ attrs }">
+          <v-btn v-bind="attrs" color="error" text @click="snackbarOpened = false"> Close</v-btn>
+        </template>
+      </v-snackbar>
+      <v-snackbar v-if="!progress" v-model="snackbarOpened" absolute bottom right rounded="pill">
         <span v-if="err">{{ err.message }}</span>
         {{ info }}
 
@@ -23,6 +31,7 @@ import { infoMessageEvent, vuexErrorEvent } from "@/event-bus/alert.events";
 @Component({
   data: () => ({
     err: undefined,
+    progress: undefined,
     info: undefined
   })
 })
@@ -30,6 +39,7 @@ export default class ErrorAlert extends Vue {
   @Prop() stopPropagation: boolean;
   snackbarOpened = false;
   err?: Error;
+  progress?: number;
   vm?: Vue;
   info?: any;
 
@@ -43,8 +53,9 @@ export default class ErrorAlert extends Vue {
     this.$bus.off(infoMessageEvent, this.infoMessage);
   }
 
-  infoMessage(message: string) {
+  infoMessage(message: string, progress: number) {
     this.info = message;
+    this.progress = progress;
     this.err = undefined;
     this.snackbarOpened = true;
   }
@@ -64,6 +75,7 @@ export default class ErrorAlert extends Vue {
 
   cancelError() {
     this.err = undefined;
+    this.progress = undefined;
   }
 }
 </script>

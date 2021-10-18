@@ -9,7 +9,6 @@ class FileUploadTrackerCache {
   #currentUploads = [];
   #uploadsDone = [];
   #uploadsFailed = [];
-  #uploadsCancelled = [];
   #eventEmitter2;
   #logger;
 
@@ -22,12 +21,14 @@ class FileUploadTrackerCache {
     this.updateUploadProgress(token, p);
   };
 
-  getUploads() {
-    return {
-      current: this.#currentUploads,
-      done: this.#uploadsDone,
-      failed: this.#uploadsFailed
-    };
+  getUploads(filterCurrent = false) {
+    return filterCurrent
+      ? this.#currentUploads
+      : {
+          current: this.#currentUploads,
+          done: this.#uploadsDone,
+          failed: this.#uploadsFailed
+        };
   }
 
   getUpload(correlationToken) {
@@ -36,9 +37,9 @@ class FileUploadTrackerCache {
 
   addUploadTracker(multerFile) {
     const correlationToken = generateCorrelationToken();
+    this.#logger.info(`Starting upload session with token ${correlationToken}`);
 
     this.#eventEmitter2.on(uploadProgressEvent(correlationToken), this.progressCallback);
-    this.#eventEmitter2.once(uploadCancelHandler(correlationToken), (t, h) => this.setUploadCancelHandler(t,h));
 
     this.#currentUploads.push({
       correlationToken,
@@ -48,15 +49,6 @@ class FileUploadTrackerCache {
     });
 
     return correlationToken;
-  }
-
-  setUploadCancelHandler(token, handler) {
-    const uploadSession = this.getUpload(token);
-    if (!uploadSession) {
-      this.#logger.error("The upload session was not found, ignoring cancellation handler");
-    }
-
-    uploadSession.cancel = handler;
   }
 
   updateUploadProgress(token, progress, reason) {
