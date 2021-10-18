@@ -6,6 +6,7 @@ const { AppConstants } = require("../../server/app.constants");
 const { setupTestApp } = require("../../server/app-test");
 const { expectInvalidResponse, expectOkResponse } = require("../extensions");
 const Printer = require("../../server/models/Printer");
+const { testApiKey, createTestPrinter } = require("./test-data/create-printer");
 
 let request;
 
@@ -13,8 +14,10 @@ const printerRoute = AppConstants.apiRoute + "/printer";
 const getRoute = printerRoute;
 const deleteRoute = printerRoute;
 const createRoute = printerRoute;
-const refreshSettingsPath = "query-settings";
 const updateRoute = printerRoute;
+const batchRoute = `${printerRoute}/batch`;
+
+const apiKey = "3dpf3dpf3dpf3dpf3dpf3dpf3dpf3dpf";
 
 beforeAll(async () => {
   await dbHandler.connect();
@@ -41,35 +44,32 @@ describe("PrintersController", () => {
   it(`should be able to POST ${createRoute}`, async () => {
     const response = await request.post(createRoute).send({
       printerURL: "http://url.com",
-      apiKey: "3dpf3dpf3dpf3dpf3dpf3dpf3dpf3dpf",
+      apiKey: testApiKey,
+      printerName: "test123",
       tempTriggers: { heatingVariation: null }
     });
-    expectOkResponse(response, {
+    const body = expectOkResponse(response, {
       printerURL: expect.any(String)
     });
+
+    expect(body.printerName).toEqual("test123");
   });
 
-  // TODO this API endpoint is doing unexpected stuff, should throw not-found error and not result in 'printersAdded' prop as this is misleading
   it(`should not be able to POST ${updateRoute} - missing printer field`, async () => {
     const response = await request.patch(`${updateRoute}/asd/connection`).send({});
 
-    expectInvalidResponse(response, ["printer"], false);
+    expectInvalidResponse(response, ["printerId"], false);
   });
 
   it(`should not be able to DELETE ${deleteRoute} - nonexistent id`, async () => {
     const response = await request.delete(`${deleteRoute}/non-id`).send();
-    expectInvalidResponse(response, ["id"], true);
+    expectInvalidResponse(response, ["printerId"], true);
   });
 
   it(`should be able to DELETE ${deleteRoute} - existing id`, async () => {
-    const createResponse = await request.post(createRoute).send({
-      printerURL: "http://url.com",
-      apiKey: "3dpf3dpf3dpf3dpf3dpf3dpf3dpf3dpf",
-      tempTriggers: { heatingVariation: null }
-    });
-    const body = expectOkResponse(createResponse, expect.anything());
+    const printer = await createTestPrinter(request);
 
-    const deletionResponse = await request.delete(`${deleteRoute}/${body.id}`).send();
+    const deletionResponse = await request.delete(`${deleteRoute}/${printer.id}`).send();
     expectOkResponse(deletionResponse, expect.anything());
   });
 
@@ -89,23 +89,123 @@ describe("PrintersController", () => {
     });
   });
 
-  it("should return 400 error when wrong input is provided", async function () {
-    const path = printerRoute + "/undefined/" + refreshSettingsPath;
-    const response = await request.post(path).send();
+  it("should be able to import empty printers json array", async function () {
+    const path = batchRoute;
+    const res = await request.post(path).send([]);
 
-    expectInvalidResponse(response, ["id"], true);
+    // Assert server succeeded
+    expect(res.statusCode).toEqual(200);
   });
 
-  it("should return 404 if server fails to find the printer", async function () {
-    const printerId = "60ae2b760bca4f5930be3d88";
-    const path = `${printerRoute}/${printerId}/${refreshSettingsPath}`;
-    const res = await request.post(path).send(path);
+  it("should invalidate to malformed singular printer json array", async function () {
+    const path = batchRoute;
+    const response = await request.post(path).send([{}]);
 
     // Assert server failed
-    expect(res.statusCode).toEqual(404);
-    expect(res.body).toEqual({
-      error: `The printer ID '${printerId}' was not found in the PrintersStore.`
+    expectInvalidResponse(response, ["printerURL", "apiKey", "webSocketURL"]);
+  });
+
+  it("should import to singular printer json array", async function () {
+    const path = batchRoute;
+    const response = await request.post(path).send([
+      {
+        printerURL: "http://localhost/",
+        webSocketURL: "ws://localhost/",
+        apiKey
+      }
+    ]);
+
+    // Assert server succeeded
+    expectOkResponse(response);
+  });
+
+  it("should update printer correctly", async function () {
+    const createdPrinter = await createTestPrinter(request);
+    expect(createdPrinter.enabled).toBe(false);
+
+    const patch = {
+      webSocketURL: "ws://google.com",
+      printerURL: "https://test.com/",
+      apiKey,
+      enabled: false,
+      printerName: "asd124"
+    };
+    const updatePatch = await request.patch(`${updateRoute}/${createdPrinter.id}`).send(patch);
+    expectOkResponse(updatePatch, patch);
+  });
+
+  it("should update printer connection settings correctly", async function () {
+    const printer = await createTestPrinter(request);
+
+    const updatePatch = await request.patch(`${printerRoute}/${printer.id}/connection`).send({
+      webSocketURL: "ws://google.com",
+      printerURL: "https://test.com/",
+      apiKey
     });
-    expect(res.res.statusMessage).toContain("Not Found");
+    expectOkResponse(updatePatch, {
+      webSocketURL: "ws://google.com/", // Sanitized
+      printerURL: "https://test.com/",
+      apiKey
+    });
+  });
+
+  it("should update printer enabled setting correctly", async function () {
+    const printer = await createTestPrinter(request);
+
+    const updatePatch = await request.patch(`${printerRoute}/${printer.id}/enabled`).send({
+      enabled: false
+    });
+    expectOkResponse(updatePatch);
+  });
+
+  it("should update printer stepSize setting correctly", async function () {
+    const printer = await createTestPrinter(request);
+
+    const updatePatch = await request.patch(`${printerRoute}/${printer.id}/step-size`).send({
+      stepSize: 0.1
+    });
+    expectOkResponse(updatePatch);
+  });
+
+  it("should update printer feed rate setting correctly", async function () {
+    const printer = await createTestPrinter(request);
+
+    const updatePatch = await request.patch(`${printerRoute}/${printer.id}/feed-rate`).send({
+      feedRate: 10
+    });
+    expectOkResponse(updatePatch);
+  });
+
+  it("should update printer flow rate setting correctly", async function () {
+    const printer = await createTestPrinter(request);
+
+    const updatePatch = await request.patch(`${printerRoute}/${printer.id}/flow-rate`).send({
+      flowRate: 75
+    });
+    expectOkResponse(updatePatch);
+  });
+
+  it("should reset printer power settings correctly", async function () {
+    const printer = await createTestPrinter(request);
+
+    const updatePatch = await request.patch(`${printerRoute}/${printer.id}/reset-power-settings`).send();
+    expectOkResponse(updatePatch);
+  });
+
+  it("should get printer connection logs cache", async function () {
+    const printer = await createTestPrinter(request);
+
+    const updatePatch = await request.get(`${printerRoute}/${printer.id}/connection-logs`).send();
+    expectOkResponse(updatePatch);
+  });
+
+  it("should get printer plugin list", async function () {
+    const printer = await createTestPrinter(request);
+
+    // TODO mock op client
+    const data = await request.get(`${printerRoute}/${printer.id}/plugin-list`).send();
+
+    // Our google.com 'printer' indeed responds
+    expectOkResponse(data);
   });
 });

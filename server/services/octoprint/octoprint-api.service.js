@@ -331,7 +331,7 @@ class OctoprintApiService {
   async getPluginManager(printer, responseOptions = defaultResponseOptions) {
     const printerManagerApiCompatible = checkPluginManagerAPIDeprecation(printer.octoPrintVersion);
 
-    const path = printerManagerApiCompatible ? apiPluginManagerRepository1_6_0 : apiPluginManager;
+    const path = printerManagerApiCompatible || !printer.octoPrintVersion ? apiPluginManagerRepository1_6_0 : apiPluginManager;
     const { url, options } = this.#prepareRequest(printer, path);
 
     const response = await this.#httpClient.get(url, options);

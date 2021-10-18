@@ -12,7 +12,7 @@ const createPrinterRules = {
 };
 
 const updatePrinterEnabledRule = {
-  enabled: `required|boolean`
+  enabled: "required|boolean"
 };
 
 module.exports = {
