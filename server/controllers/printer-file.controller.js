@@ -3,7 +3,6 @@ const { createController } = require("awilix-express");
 const Logger = require("../handlers/logger.js");
 const { validateInput, getScopedPrinter, validateMiddleware } = require("../handlers/validators");
 const { AppConstants } = require("../app.constants");
-const { idRules } = require("./validation/generic.validation");
 const {
   getFilesRules,
   getFileRules,
@@ -14,14 +13,11 @@ const {
   moveFileOrFolderRules,
   createFolderRules
 } = require("./validation/printer-files-controller.validation");
-const { ExternalServiceError, ValidationException } = require("../exceptions/runtime.exceptions");
-const HttpStatusCode = require("../constants/http-status-codes.constants");
-const { Status } = require("../constants/service.constants");
+const { ValidationException } = require("../exceptions/runtime.exceptions");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const {
-  currentPrinterToken,
   printerLoginToken,
   printerResolveMiddleware
 } = require("../middleware/printer");

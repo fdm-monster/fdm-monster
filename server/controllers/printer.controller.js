@@ -282,7 +282,7 @@ class PrinterController {
 
     this.#logger.info("Grabbing plugin list for: ", currentPrinterId);
 
-    let pluginList = await this.#octoPrintApiService.getPluginManager(printerLogin, false);
+    let pluginList = await this.#octoPrintApiService.getPluginManager(printerLogin);
     res.send(pluginList);
   }
 }

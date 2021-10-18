@@ -191,4 +191,21 @@ describe("PrintersController", () => {
     const updatePatch = await request.patch(`${printerRoute}/${printer.id}/reset-power-settings`).send();
     expectOkResponse(updatePatch);
   });
+
+  it("should get printer connection logs cache", async function () {
+    const printer = await createTestPrinter(request);
+
+    const updatePatch = await request.get(`${printerRoute}/${printer.id}/connection-logs`).send();
+    expectOkResponse(updatePatch);
+  });
+
+  it("should get printer plugin list", async function () {
+    const printer = await createTestPrinter(request);
+
+    // TODO mock op client
+    const data = await request.get(`${printerRoute}/${printer.id}/plugin-list`).send();
+
+    // Our google.com 'printer' indeed responds
+    expectOkResponse(data);
+  });
 });
