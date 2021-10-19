@@ -31,11 +31,19 @@ class PrintersModule extends VuexModule {
   }
 
   get printer() {
-    return (printerId: string) => this.printers.find((p: Printer) => p.id === printerId);
+    return (printerId?: string) => this.printers.find((p: Printer) => p.id === printerId);
   }
 
   get isSelectedPrinter() {
-    return (printerId: string) => !!this.selectedPrinters.find((p: Printer) => p.id === printerId);
+    return (printerId?: string) => !!this.selectedPrinters.find((p: Printer) => p.id === printerId);
+  }
+
+  get isPrinterOperational() {
+    return (printerId?: string) => this.printer(printerId)?.printerState?.flags.operational;
+  }
+
+  get isPrinterPrinting() {
+    return (printerId?: string) => this.printer(printerId)?.printerState?.flags.printing;
   }
 
   get gridSortedPrinterGroups() {

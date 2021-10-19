@@ -38,7 +38,7 @@
         </v-list-item-title>
         <v-list-item-subtitle v-if="storedViewedPrinter.currentJob">
           <span class="d-flex justify-center"
-            >Progress: {{ storedViewedPrinter.currentJob.progress }}%</span
+          >Progress: {{ storedViewedPrinter.currentJob.progress }}%</span
           >
           <v-progress-linear
             v-if="storedViewedPrinter.currentJob"
@@ -54,14 +54,25 @@
     <v-list v-drop-upload="{ printer: storedViewedPrinter }" dense subheader>
       <v-subheader inset>Commands</v-subheader>
 
-      <v-list-item :disabled="!isStoppable" link @click.prevent.stop="clickStop()">
+      <v-list-item link :disabled="isStoppable" @click.prevent.stop="togglePrinterConnection()" class="extra-dense-list-item">
+        <v-list-item-avatar>
+          <v-icon>usb</v-icon>
+        </v-list-item-avatar>
+        <v-list-item-content>
+          <span v-if="isStoppable">DISCONNECT - stop print first</span>
+          <span v-else-if="isOperational">DISCONNECT</span>
+          <span v-else>CONNECT</span>
+        </v-list-item-content>
+      </v-list-item>
+
+      <v-list-item :disabled="!isStoppable" class="extra-dense-list-item" link @click.prevent.stop="clickStop()">
         <v-list-item-avatar>
           <v-icon>stop</v-icon>
         </v-list-item-avatar>
         <v-list-item-content> STOP {{ isStoppable ? "" : "- No job" }}</v-list-item-content>
       </v-list-item>
 
-      <v-list-item :disabled="!canBeCleared" link @click.prevent.stop="clickClearFiles()">
+      <v-list-item :disabled="!canBeCleared" class="extra-dense-list-item" link @click.prevent.stop="clickClearFiles()">
         <v-list-item-avatar>
           <v-icon>delete</v-icon>
         </v-list-item-avatar>
@@ -69,13 +80,12 @@
           CLEAR FILES {{ canBeCleared ? "" : "- Nothing to do" }}
         </v-list-item-content>
       </v-list-item>
-      <v-list-item link @click.prevent.stop="refreshFiles(storedViewedPrinter)">
+
+      <v-list-item link @click.prevent.stop="refreshFiles(storedViewedPrinter)" class="extra-dense-list-item">
         <v-list-item-avatar>
           <v-icon>refresh</v-icon>
         </v-list-item-avatar>
-        <v-list-item-content>
-          REFRESH FILES
-        </v-list-item-content>
+        <v-list-item-content> REFRESH FILES</v-list-item-content>
       </v-list-item>
     </v-list>
     <v-divider></v-divider>
@@ -109,7 +119,13 @@
         <v-list-item-action>
           <v-tooltip bottom>
             <template v-slot:activator="{ on, attrs }">
-              <v-btn v-bind="attrs" v-on="on" icon @click="printFile(file)">
+              <v-btn
+                v-bind="attrs"
+                v-on="on"
+                :disabled="isFileBeingPrinted(file)"
+                icon
+                @click="printFile(file)"
+              >
                 <v-icon>play_arrow</v-icon>
               </v-btn>
             </template>
@@ -122,11 +138,22 @@
         </v-list-item-icon>
 
         <v-list-item-content>
-          <v-list-item-title>{{ file.name }}</v-list-item-title>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <span v-bind="attrs" v-on="on">
+                {{ file.name }}
+              </span>
+            </template>
+            <span>
+              File: {{ file.name }} <br/>
+              Size: {{ formatBytes(file.size) }}
+            </span>
+          </v-tooltip>
+          <v-list-item-title></v-list-item-title>
         </v-list-item-content>
 
         <v-list-item-action>
-          <v-btn icon @click="deleteFile(file)">
+          <v-btn :disabled="isFileBeingPrinted(file)" icon @click="deleteFile(file)">
             <v-icon color="grey lighten-1">delete</v-icon>
           </v-btn>
         </v-list-item-action>
@@ -146,6 +173,7 @@ import { PrinterFileService, PrintersService } from "@/backend";
 import { PrinterFile } from "@/models/printers/printer-file.model";
 import { PrinterFileBucket } from "@/models/printers/printer-file-bucket.model";
 import { isPrinterStoppable } from "@/utils/printer-state.utils";
+import { formatBytes } from "@/utils/file-size.util";
 
 @Component({
   data: () => ({
@@ -156,9 +184,14 @@ export default class SideNavExplorer extends Vue {
   drawerOpened = false;
   loading = true;
   shownFileBucket?: PrinterFileBucket;
+  formatBytes = formatBytes;
 
   get printerId() {
     return this.storedViewedPrinter?.id;
+  }
+
+  get isOperational() {
+    return printersState.isPrinterOperational(this.printerId);
   }
 
   get filesListed() {
@@ -180,6 +213,13 @@ export default class SideNavExplorer extends Vue {
     );
   }
 
+  isFileBeingPrinted(file: PrinterFile) {
+    if (!this.storedViewedPrinter) return false;
+    // Completed job will not dissappear (yet)
+    if (this.storedViewedPrinter.printerState.state === 'Operational') return false;
+    return this.storedViewedPrinter.currentJob.fileName === file.name;
+  }
+
   avatarInitials() {
     const viewedPrinter = this.storedViewedPrinter;
     if (viewedPrinter && this.drawerOpened) {
@@ -193,7 +233,6 @@ export default class SideNavExplorer extends Vue {
     const printerId = viewedPrinter?.id;
     if (!viewedPrinter || !printerId) return;
 
-    // TODO Triggers twice - race condition?
     if (!this.shownFileBucket || viewedPrinter.id !== this.shownFileBucket.printerId || !oldVal) {
       await this.refreshFiles(viewedPrinter);
     }
@@ -203,6 +242,16 @@ export default class SideNavExplorer extends Vue {
     if (!this.storedViewedPrinter) return;
 
     PrintersService.openPrinterURL(this.storedViewedPrinter.printerURL);
+  }
+
+  async togglePrinterConnection() {
+    if (!this.printerId) return;
+
+    if (printersState.isPrinterOperational(this.printerId)) {
+      return await PrintersService.sendPrinterDisconnectCommand(this.printerId);
+    }
+
+    await PrintersService.sendPrinterConnectCommand(this.printerId);
   }
 
   async refreshFiles(viewedPrinter: Printer) {
@@ -268,6 +317,10 @@ export default class SideNavExplorer extends Vue {
 </script>
 
 <style>
+.extra-dense-list-item {
+  margin-top: -7px;
+}
+
 .pulsating-red {
   background: darkred;
   margin: 10px;
