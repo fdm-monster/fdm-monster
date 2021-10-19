@@ -2,7 +2,7 @@ import { BaseService } from "@/backend/base.service";
 import { ServerApi } from "@/backend/server.api";
 import { FileUploadCommands } from "@/models/printers/file-upload-commands.model";
 import { PrinterFileCache } from "@/models/printers/printer-file-cache.model";
-import { PrinterFile } from "@/models/printers/printer-file.model";
+import { ClearedFilesResult, PrinterFile } from "@/models/printers/printer-file.model";
 import Vue from "vue";
 import { infoMessageEvent } from "@/event-bus/alert.events";
 
@@ -87,7 +87,7 @@ export class PrinterFileService extends BaseService {
   static async clearFiles(printerId: string) {
     const path = `${ServerApi.printerFilesClearRoute(printerId)}`;
 
-    return this.deleteApi(path);
+    return this.deleteApi<ClearedFilesResult>(path);
   }
 
   static async purgeFiles() {

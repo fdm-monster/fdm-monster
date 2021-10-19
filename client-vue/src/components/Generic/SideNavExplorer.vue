@@ -17,22 +17,41 @@
       <v-list-item-content v-if="storedViewedPrinter">
         <v-list-item-title>
           {{ storedViewedPrinter.printerName }}
-          {{
-            storedViewedPrinter.enabled && storedViewedPrinter.apiAccessibility.accessible
-              ? "PRINTER ONLINE"
-              : "OFFLINE/DISABLED"
-          }}
+          <strong v-if="storedViewedPrinter.printerState.state === 'Operational'" class="float-end">
+            {{ storedViewedPrinter.printerState.state }}
+          </strong>
+          <strong
+            v-if="!storedViewedPrinter.enabled || !storedViewedPrinter.apiAccessibility.accessible"
+            class="float-end"
+          >
+            OFFLINE/DISABLED
+          </strong>
+          <strong
+            v-if="
+              storedViewedPrinter.printerState.state !== 'Operational' &&
+              storedViewedPrinter.apiAccessibility.accessible
+            "
+            class="float-end pulsating-red"
+          >
+            {{ storedViewedPrinter.printerState.state }}
+          </strong>
         </v-list-item-title>
-        <v-list-item-subtitle>Viewing printer files</v-list-item-subtitle>
         <v-list-item-subtitle v-if="storedViewedPrinter.currentJob">
-          Printer progress: {{ storedViewedPrinter.currentJob.progress }}%
+          <span class="d-flex justify-center"
+            >Progress: {{ storedViewedPrinter.currentJob.progress }}%</span
+          >
+          <v-progress-linear
+            v-if="storedViewedPrinter.currentJob"
+            :value="storedViewedPrinter.currentJob.progress"
+            class="mt-1"
+          ></v-progress-linear>
         </v-list-item-subtitle>
       </v-list-item-content>
     </v-list-item>
 
     <v-divider></v-divider>
 
-    <v-list v-drop-upload="{ printer: storedViewedPrinter }" dense subheader two-line>
+    <v-list v-drop-upload="{ printer: storedViewedPrinter }" dense subheader>
       <v-subheader inset>Commands</v-subheader>
 
       <v-list-item :disabled="!isStoppable" link @click.prevent.stop="clickStop()">
@@ -50,10 +69,21 @@
           CLEAR FILES {{ canBeCleared ? "" : "- Nothing to do" }}
         </v-list-item-content>
       </v-list-item>
+      <v-list-item link @click.prevent.stop="refreshFiles(storedViewedPrinter)">
+        <v-list-item-avatar>
+          <v-icon>refresh</v-icon>
+        </v-list-item-avatar>
+        <v-list-item-content>
+          REFRESH FILES
+        </v-list-item-content>
+      </v-list-item>
+    </v-list>
+    <v-divider></v-divider>
+    <v-list v-drop-upload="{ printer: storedViewedPrinter }" dense subheader>
+      <v-subheader inset>Files - drag 'n drop!</v-subheader>
 
-      <v-subheader inset>Files (drop a file!)</v-subheader>
-
-      <v-list-item v-if="!shownFiles">
+      <!-- Empty file list -->
+      <v-list-item v-if="!filesListed.length">
         <v-list-item-avatar>
           <v-icon>clear</v-icon>
         </v-list-item-avatar>
@@ -61,6 +91,9 @@
           <v-list-item-title>No files to show</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
+
+      <!-- Loading file list-->
+      <v-progress-linear v-if="loading" indeterminate></v-progress-linear>
 
       <v-list-item v-for="(file, index) in filesListed" :key="index" link>
         <v-list-item-avatar>
@@ -116,20 +149,20 @@ import { isPrinterStoppable } from "@/utils/printer-state.utils";
 
 @Component({
   data: () => ({
-    shownFiles: {}
+    shownFileBucket: {}
   })
 })
 export default class SideNavExplorer extends Vue {
   drawerOpened = false;
   loading = true;
-  shownFiles?: PrinterFileBucket;
+  shownFileBucket?: PrinterFileBucket;
 
   get printerId() {
     return this.storedViewedPrinter?.id;
   }
 
   get filesListed() {
-    return this.shownFiles?.files || [];
+    return this.shownFileBucket?.files || [];
   }
 
   get storedViewedPrinter() {
@@ -142,32 +175,9 @@ export default class SideNavExplorer extends Vue {
   }
 
   get canBeCleared() {
-    return this.shownFiles?.files?.length && this.storedViewedPrinter?.apiAccessibility.accessible;
-  }
-
-  @Watch("storedViewedPrinter")
-  async inputUpdate(viewedPrinter?: Printer, oldVal?: Printer) {
-    this.drawerOpened = !!viewedPrinter;
-    const printerId = viewedPrinter?.id;
-
-    if (!viewedPrinter || !printerId) return;
-
-    // TODO Triggers twice - race condition?
-    if (!this.shownFiles || viewedPrinter.id !== this.shownFiles.printerId || !oldVal) {
-      if (viewedPrinter.apiAccessibility.accessible) {
-        let fileCache = await printersState.loadPrinterFiles({ printerId, recursive: false });
-        this.shownFiles = {
-          printerId,
-          ...fileCache
-        };
-      } else {
-        const fileCache = await PrinterFileService.getFileCache(printerId);
-        this.shownFiles = {
-          printerId,
-          ...fileCache
-        };
-      }
-    }
+    return (
+      this.shownFileBucket?.files?.length && this.storedViewedPrinter?.apiAccessibility.accessible
+    );
   }
 
   avatarInitials() {
@@ -177,21 +187,15 @@ export default class SideNavExplorer extends Vue {
     }
   }
 
-  async deleteFile(file: PrinterFile) {
-    if (!this.printerId) return;
+  @Watch("storedViewedPrinter")
+  async inputUpdate(viewedPrinter?: Printer, oldVal?: Printer) {
+    this.drawerOpened = !!viewedPrinter;
+    const printerId = viewedPrinter?.id;
+    if (!viewedPrinter || !printerId) return;
 
-    await printersState.deletePrinterFile({ printerId: this.printerId, fullPath: file.path });
-  }
-
-  clickStop() {
-    printersState.sendStopJobCommand(this.printerId);
-  }
-
-  clickClearFiles() {
-    printersState.clearPrinterFiles(this.printerId);
-
-    if (this.shownFiles) {
-      this.shownFiles.files = [];
+    // TODO Triggers twice - race condition?
+    if (!this.shownFileBucket || viewedPrinter.id !== this.shownFileBucket.printerId || !oldVal) {
+      await this.refreshFiles(viewedPrinter);
     }
   }
 
@@ -199,6 +203,44 @@ export default class SideNavExplorer extends Vue {
     if (!this.storedViewedPrinter) return;
 
     PrintersService.openPrinterURL(this.storedViewedPrinter.printerURL);
+  }
+
+  async refreshFiles(viewedPrinter: Printer) {
+    this.loading = true;
+    const printerId = viewedPrinter.id;
+    // Offline printer fallback
+    if (viewedPrinter.apiAccessibility.accessible) {
+      let fileCache = await printersState.loadPrinterFiles({ printerId, recursive: false });
+      this.shownFileBucket = {
+        printerId,
+        ...fileCache
+      };
+    } else {
+      const fileCache = await PrinterFileService.getFileCache(printerId);
+      this.shownFileBucket = {
+        printerId,
+        ...fileCache
+      };
+    }
+    this.loading = false;
+  }
+
+  async deleteFile(file: PrinterFile) {
+    if (!this.printerId) return;
+
+    await printersState.deletePrinterFile({ printerId: this.printerId, fullPath: file.path });
+  }
+
+  async clickStop() {
+    await printersState.sendStopJobCommand(this.printerId);
+  }
+
+  async clickClearFiles() {
+    this.loading = true;
+    await printersState.clearPrinterFiles(this.printerId);
+
+    this.loading = false;
+    this.shownFileBucket = printersState.printerFileBucket(this.printerId);
   }
 
   async printFile(file: PrinterFile) {
@@ -224,3 +266,32 @@ export default class SideNavExplorer extends Vue {
   }
 }
 </script>
+
+<style>
+.pulsating-red {
+  background: darkred;
+  margin: 10px;
+  border-radius: 15px;
+
+  box-shadow: 0 0 0 0 rgba(0, 0, 0, 1);
+  transform: scale(1);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.7);
+  }
+
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 10px rgba(0, 0, 0, 0);
+  }
+
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+  }
+}
+</style>

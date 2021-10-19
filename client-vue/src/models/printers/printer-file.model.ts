@@ -41,3 +41,8 @@ export interface PrinterFile {
   type: string;
   typePath: string[]; // machinecode gcode
 }
+
+export interface ClearedFilesResult {
+  failedFiles: PrinterFile[];
+  succeededFiles: PrinterFile[];
+}

@@ -111,7 +111,7 @@ class PrinterFileController {
 
     for (let file of nonRecursiveFiles.files) {
       try {
-        await this.#octoPrintApiService.deleteFile(printerLogin, file.path);
+        await this.#octoPrintApiService.deleteFileOrFolder(printerLogin, file.path);
         succeededFiles.push(file);
       } catch (e) {
         failedFiles.push(file);
