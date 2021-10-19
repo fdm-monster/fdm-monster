@@ -332,6 +332,10 @@ class PrintersModule extends VuexModule {
   async loadPrinterFiles({ printerId, recursive }: { printerId: string; recursive: boolean }) {
     const data = await PrinterFileService.getFiles(printerId, recursive);
 
+    data.files.sort((f1, f2) => {
+      return f1.date > f2.date ? 1 : -1;
+    });
+
     this.setPrinterFiles({ printerId, fileList: data });
 
     return data;
