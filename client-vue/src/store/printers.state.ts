@@ -6,7 +6,7 @@ import { CreatePrinter } from "@/models/printers/crud/create-printer.model";
 import { PrinterGroupService } from "@/backend/printer-group.service";
 import store from "@/store/index";
 import { FileUploadCommands } from "@/models/printers/file-upload-commands.model";
-import { PrinterFile } from "@/models/printers/printer-file.model";
+import { ClearedFilesResult, PrinterFile } from "@/models/printers/printer-file.model";
 import { PrinterFileBucket } from "@/models/printers/printer-file-bucket.model";
 import { PrinterFileCache } from "@/models/printers/printer-file-cache.model";
 import { PrinterJobService } from "@/backend/printer-job.service";
@@ -31,11 +31,19 @@ class PrintersModule extends VuexModule {
   }
 
   get printer() {
-    return (printerId: string) => this.printers.find((p: Printer) => p.id === printerId);
+    return (printerId?: string) => this.printers.find((p: Printer) => p.id === printerId);
   }
 
   get isSelectedPrinter() {
-    return (printerId: string) => !!this.selectedPrinters.find((p: Printer) => p.id === printerId);
+    return (printerId?: string) => !!this.selectedPrinters.find((p: Printer) => p.id === printerId);
+  }
+
+  get isPrinterOperational() {
+    return (printerId?: string) => this.printer(printerId)?.printerState?.flags.operational;
+  }
+
+  get isPrinterPrinting() {
+    return (printerId?: string) => this.printer(printerId)?.printerState?.flags.printing;
   }
 
   get gridSortedPrinterGroups() {
@@ -58,11 +66,11 @@ class PrintersModule extends VuexModule {
   }
 
   get printerFileBucket() {
-    return (printerId: string) => this.printerFileBuckets.find((p) => p.printerId === printerId);
+    return (printerId?: string) => this.printerFileBuckets.find((p) => p.printerId === printerId);
   }
 
   get printerFiles() {
-    return (printerId: string) => this.printerFileBucket(printerId)?.files;
+    return (printerId?: string) => this.printerFileBucket(printerId)?.files;
   }
 
   get printerGroupNames() {
@@ -130,10 +138,18 @@ class PrintersModule extends VuexModule {
     this.lastUpdated = Date.now();
   }
 
-  @Mutation _clearPrinterFiles(printerId: string) {
-    const index = this.printerFileBuckets.findIndex((b) => b.printerId === printerId);
+  @Mutation _clearPrinterFiles({
+    printerId,
+    result
+  }: {
+    printerId: string;
+    result: ClearedFilesResult;
+  }) {
+    const bucket = this.printerFileBuckets.find((b) => b.printerId === printerId);
 
-    this.printerFileBuckets[index].files = [];
+    if (bucket) {
+      bucket.files = result.failedFiles;
+    }
   }
 
   @Mutation setPrinterFiles({
@@ -324,9 +340,12 @@ class PrintersModule extends VuexModule {
   @Action
   async clearPrinterFiles(printerId?: string) {
     if (!printerId) return;
-    await PrinterFileService.clearFiles(printerId);
+    const result = await PrinterFileService.clearFiles(printerId);
 
-    this._clearPrinterFiles(printerId);
+    this._clearPrinterFiles({
+      printerId,
+      result: result as ClearedFilesResult
+    });
   }
 
   @Action

@@ -23,6 +23,7 @@ import FileControlList from "@/components/PrinterList/FileControlList.vue";
 import { Prop } from "vue-property-decorator";
 import { Printer } from "@/models/printers/printer.model";
 import { PrintersService } from "@/backend";
+import { printersState } from "@/store/printers.state";
 
 @Component({
   components: { FileList: FileControlList }
@@ -35,11 +36,11 @@ export default class PrinterConnectionAction extends Vue {
   }
 
   isPrinterOperational() {
-    return this.printer?.printerState?.flags.operational;
+    return printersState.isPrinterOperational(this.printerId);
   }
 
   isPrinterPrinting() {
-    return this.printer?.printerState?.flags.printing;
+    return printersState.isPrinterPrinting(this.printerId);
   }
 
   async togglePrinterConnection() {

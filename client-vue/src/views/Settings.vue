@@ -2,38 +2,40 @@
   <v-container>
     <v-toolbar color="primary" dark>
       <v-btn dark icon @click="dialog = false">
-        <v-icon>mdi-close</v-icon>
+        <v-icon>close</v-icon>
       </v-btn>
-      <v-toolbar-title>Settings (prototype)</v-toolbar-title>
+      <v-toolbar-title>Server Settings</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-toolbar-items>
-        <v-btn dark text @click="dialog = false"> Save</v-btn>
+        <v-btn dark text @click="dialog = false" disabled> Save</v-btn>
       </v-toolbar-items>
     </v-toolbar>
     <v-list subheader three-line>
-      <v-subheader>User Controls</v-subheader>
+      <v-subheader>Groups and Files</v-subheader>
       <v-list-item>
         <v-list-item-content>
           <v-list-item-title>Legacy Groups</v-list-item-title>
           <v-list-item-subtitle>
             Synchronise the legacy printer groups to the new separate PrinterGroup data.
-            <v-btn @click="syncLegacyGroups()">Sync legacy</v-btn>
+            <br/>
+            <v-btn color="primary" @click="syncLegacyGroups()">Sync legacy</v-btn>
           </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
       <v-list-item>
         <v-list-item-content>
-          <v-list-item-title>Password</v-list-item-title>
+          <v-list-item-title>Clean file references</v-list-item-title>
           <v-list-item-subtitle>
             Clear out the file references for all printers - this does not remove them from
             OctoPrint!
-            <v-btn @click="purgeFiles()">Purge file references</v-btn>
+            <br/>
+            <v-btn color="primary" @click="purgeFiles()">Purge file references</v-btn>
           </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
     </v-list>
     <v-divider></v-divider>
-    <v-list subheader three-line>
+    <v-list subheader three-line v-show="false">
       <v-subheader>General</v-subheader>
       <v-list-item>
         <v-list-item-action>

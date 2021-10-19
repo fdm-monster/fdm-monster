@@ -12,8 +12,14 @@
 /.cache
 /**/node_modules
 
-/client-vue
-/server-nest
-/test
-
+# Runtime and non-production folders
+/3DPF
+/docs
+/images
 /logs
+/coverage
+/client-vue
+/client-npm
+/server-nest
+/views
+/test

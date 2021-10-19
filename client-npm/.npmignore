@@ -13,4 +13,5 @@ npm-debug.log
 *.tgz
 
 #Custom
-./build.ps1
+build.ps1
+publish.ps1
