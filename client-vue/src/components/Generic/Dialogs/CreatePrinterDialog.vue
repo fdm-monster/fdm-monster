@@ -1,40 +1,38 @@
 <template>
-  <v-row justify="center">
-    <v-dialog v-model="showingDialog" :max-width="showChecksPanel ? '700px' : '600px'" persistent>
-      <validation-observer ref="validationObserver" v-slot="{ invalid }">
-        <v-card>
-          <v-card-title>
+  <v-dialog v-model="showingDialog" :max-width="showChecksPanel ? '700px' : '600px'" persistent>
+    <validation-observer ref="validationObserver" v-slot="{ invalid }">
+      <v-card>
+        <v-card-title>
             <span class="text-h5">
               <v-avatar color="primary" size="56">
                 {{ avatarInitials() }}
               </v-avatar>
               New Printer
             </span>
-          </v-card-title>
-          <v-card-text>
-            <v-row>
-              <v-col :cols="showChecksPanel ? 8 : 12">
-                <PrinterCrudForm ref="printerCrudForm"/>
-              </v-col>
+        </v-card-title>
+        <v-card-text>
+          <v-row>
+            <v-col :cols="showChecksPanel ? 8 : 12">
+              <PrinterCrudForm ref="printerCrudForm"/>
+            </v-col>
 
-              <PrinterChecksPanel v-if="showChecksPanel" :cols="4" :test-progress="testProgress">
-                <v-btn @click="showChecksPanel = false">Hide checks</v-btn>
-              </PrinterChecksPanel>
-            </v-row>
-          </v-card-text>
-          <v-card-actions>
-            <em class="red--text">* indicates required field</em>
-            <v-spacer></v-spacer>
-            <v-btn text @click="closeDialog()">Close</v-btn>
-            <v-btn :disabled="invalid" color="warning" text @click="testPrinter()">
-              Test connection
-            </v-btn>
-            <v-btn :disabled="invalid" color="blue darken-1" text @click="submit()">Create</v-btn>
-          </v-card-actions>
-        </v-card>
-      </validation-observer>
-    </v-dialog>
-  </v-row>
+            <PrinterChecksPanel v-if="showChecksPanel" :cols="4" :test-progress="testProgress">
+              <v-btn @click="showChecksPanel = false">Hide checks</v-btn>
+            </PrinterChecksPanel>
+          </v-row>
+        </v-card-text>
+        <v-card-actions>
+          <em class="red--text">* indicates required field</em>
+          <v-spacer></v-spacer>
+          <v-btn text @click="closeDialog()">Close</v-btn>
+          <v-btn :disabled="invalid" color="warning" text @click="testPrinter()">
+            Test connection
+          </v-btn>
+          <v-btn :disabled="invalid" color="blue darken-1" text @click="submit()">Create</v-btn>
+        </v-card-actions>
+      </v-card>
+    </validation-observer>
+  </v-dialog>
 </template>
 
 <script lang="ts">

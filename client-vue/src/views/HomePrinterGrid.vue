@@ -16,10 +16,10 @@
       </v-btn>
     </v-toolbar>
 
-    <v-banner v-drop-upload>
+    <v-banner v-drop-upload="{printers: selectedPrinters}">
       <v-row>
         <v-col>
-          <v-btn color="secondary" small @click="clearSelectedPrinters()"> Clear selection</v-btn>
+          <v-btn color="secondary" small @click="clearSelectedPrinters()">Clear selection</v-btn>
           <v-chip-group>
             <v-chip v-if="selectedPrinters.length === 0">No printers selected</v-chip>
             <v-chip
@@ -36,7 +36,7 @@
         </v-col>
         <v-col align="right">
           <strong class="mr-2">Drop or select GCODE to print</strong>
-          <br />
+          <br/>
           <input
             ref="fileUpload"
             :multiple="false"
@@ -51,7 +51,7 @@
               <strong class="pl-1">{{ formatBytes(selectedFile.size) }}</strong>
             </v-chip>
           </v-chip-group>
-          <br />
+          <br/>
           <v-btn class="ml-2" color="primary" small @click="$refs.fileUpload.click()">
             Select gcode file
           </v-btn>
@@ -62,7 +62,7 @@
       </v-row>
     </v-banner>
 
-    <PrinterGrid class="ma-2" />
+    <PrinterGrid class="ma-2"/>
   </div>
 </template>
 
@@ -76,6 +76,7 @@ import { Printer } from "@/models/printers/printer.model";
 import { PrintersService } from "@/backend";
 import { formatBytes } from "@/utils/file-size.util";
 import SideNavExplorer from "@/components/Generic/SideNavs/FileExplorerSideNav.vue";
+import { infoMessageEvent } from "@/event-bus/alert.events";
 
 @Component({
   components: { PrinterGrid, SideNavExplorer, CreatePrinterDialog },
@@ -96,9 +97,24 @@ export default class HomePage extends Vue {
     return printersState.selectedPrinters;
   }
 
-  uploadFile() {
-    // TODO upload file from banner
-    console.log("aplood");
+  async uploadFile() {
+    const selectedPrinters = this.selectedPrinters;
+    const accessiblePrinters = selectedPrinters.filter(p => p.apiAccessibility.accessible);
+
+    if (!this.selectedFile) return;
+
+    // Checking and informing user
+    const incompleteListCount = selectedPrinters.length - accessiblePrinters.length;
+    if (incompleteListCount > 0) {
+      this.$bus.emit(infoMessageEvent, `${ incompleteListCount } printers were skipped as they are not accessible or disabled (now).`);
+    }
+
+    for (let printer of accessiblePrinters) {
+      await printersState.dropUploadPrinterFile({ printerId: printer.id, files: [this.selectedFile] });
+    }
+
+    this.$refs.fileUpload.value = "";
+    this.clearSelectedPrinters();
   }
 
   deselectFile() {

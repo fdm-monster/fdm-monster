@@ -51,14 +51,14 @@
 
     <v-divider></v-divider>
 
-    <v-list v-drop-upload="{ printer: storedSideNavPrinter }" dense subheader>
+    <v-list v-drop-upload="{ printers: [storedSideNavPrinter] }" dense subheader>
       <v-subheader inset>Commands</v-subheader>
 
       <v-list-item
-        link
         :disabled="isStoppable"
-        @click.prevent.stop="togglePrinterConnection()"
         class="extra-dense-list-item"
+        link
+        @click.prevent.stop="togglePrinterConnection()"
       >
         <v-list-item-avatar>
           <v-icon>usb</v-icon>
@@ -97,9 +97,9 @@
       </v-list-item>
 
       <v-list-item
+        class="extra-dense-list-item"
         link
         @click.prevent.stop="refreshFiles(storedSideNavPrinter)"
-        class="extra-dense-list-item"
       >
         <v-list-item-avatar>
           <v-icon>refresh</v-icon>
@@ -111,11 +111,11 @@
         <v-list-item-avatar>
           <v-icon>settings</v-icon>
         </v-list-item-avatar>
-        <v-list-item-content> Settings </v-list-item-content>
+        <v-list-item-content> Settings</v-list-item-content>
       </v-list-item>
     </v-list>
     <v-divider></v-divider>
-    <v-list v-drop-upload="{ printer: storedSideNavPrinter }" dense subheader>
+    <v-list v-drop-upload="{ printers: [storedSideNavPrinter] }" dense subheader>
       <v-subheader inset>Files - drag 'n drop!</v-subheader>
 
       <!-- Empty file list -->
@@ -172,7 +172,7 @@
               </span>
             </template>
             <span>
-              File: {{ file.name }} <br />
+              File: {{ file.name }} <br/>
               Size: {{ formatBytes(file.size) }}
             </span>
           </v-tooltip>
