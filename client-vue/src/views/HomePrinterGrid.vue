@@ -26,6 +26,7 @@
               v-for="selectedPrinter in selectedPrinters"
               :key="selectedPrinter.id"
               close
+              color="primary"
               @click="openPrinter(selectedPrinter)"
               @click:close="deselectPrinter(selectedPrinter)"
             >

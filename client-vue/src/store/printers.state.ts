@@ -99,7 +99,9 @@ class PrintersModule extends VuexModule {
   @Mutation toggleSelectedPrinter(printer: Printer) {
     const selectedPrinterIndex = this.selectedPrinters.findIndex((sp) => sp.id == printer.id);
     if (selectedPrinterIndex === -1) {
-      this.selectedPrinters.push(printer);
+      if (printer.apiAccessibility.accessible) {
+        this.selectedPrinters.push(printer);
+      }
     } else {
       this.selectedPrinters.splice(selectedPrinterIndex, 1);
     }
