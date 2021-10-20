@@ -11,21 +11,22 @@
           label="Auto-select and print"
         ></v-switch>
       </div>
-      <v-btn class="ml-3" color="primary" type="button" @click="createPrinterModal()">
+      <v-btn class="ml-3" color="primary" type="button" @click="openCreatePrinterDialog()">
         Create Printer
       </v-btn>
     </v-toolbar>
 
-    <v-banner v-drop-upload>
+    <v-banner v-drop-upload="{printers: selectedPrinters}">
       <v-row>
         <v-col>
-          <v-btn color="secondary" small @click="clearSelectedPrinters()"> Clear selection</v-btn>
+          <v-btn color="secondary" small @click="clearSelectedPrinters()">Clear selection</v-btn>
           <v-chip-group>
             <v-chip v-if="selectedPrinters.length === 0">No printers selected</v-chip>
             <v-chip
               v-for="selectedPrinter in selectedPrinters"
               :key="selectedPrinter.id"
               close
+              color="primary"
               @click="openPrinter(selectedPrinter)"
               @click:close="deselectPrinter(selectedPrinter)"
             >
@@ -35,7 +36,7 @@
         </v-col>
         <v-col align="right">
           <strong class="mr-2">Drop or select GCODE to print</strong>
-          <br />
+          <br/>
           <input
             ref="fileUpload"
             :multiple="false"
@@ -50,7 +51,7 @@
               <strong class="pl-1">{{ formatBytes(selectedFile.size) }}</strong>
             </v-chip>
           </v-chip-group>
-          <br />
+          <br/>
           <v-btn class="ml-2" color="primary" small @click="$refs.fileUpload.click()">
             Select gcode file
           </v-btn>
@@ -61,24 +62,23 @@
       </v-row>
     </v-banner>
 
-    <PrinterGrid class="ma-2" />
-
-    <CreatePrinterDialog :show.sync="showDialog" v-on:update:show="onChangeShowDialog($event)" />
-
-    <SideNavExplorer />
+    <PrinterGrid class="ma-2"/>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { Component, Watch } from "vue-property-decorator";
-import CreatePrinterDialog from "@/components/Dialogs/CreatePrinterDialog.vue";
+import { Component } from "vue-property-decorator";
+import CreatePrinterDialog from "@/components/Generic/Dialogs/CreatePrinterDialog.vue";
 import PrinterGrid from "@/components/PrinterGrid/PrinterGrid.vue";
 import { printersState } from "@/store/printers.state";
 import { Printer } from "@/models/printers/printer.model";
 import { PrintersService } from "@/backend";
 import { formatBytes } from "@/utils/file-size.util";
-import SideNavExplorer from "@/components/Generic/SideNavExplorer.vue";
+import SideNavExplorer from "@/components/Generic/SideNavs/FileExplorerSideNav.vue";
+import { infoMessageEvent } from "@/event-bus/alert.events";
+import { uploadsState } from "@/store/uploads.state";
+import { convertMultiPrinterFileToQueue } from "@/utils/uploads-state.utils";
 
 @Component({
   components: { PrinterGrid, SideNavExplorer, CreatePrinterDialog },
@@ -89,7 +89,6 @@ import SideNavExplorer from "@/components/Generic/SideNavExplorer.vue";
 })
 export default class HomePage extends Vue {
   autoPrint = true;
-  showDialog = false;
   formatBytes = formatBytes;
   $refs!: {
     fileUpload: InstanceType<typeof HTMLInputElement>;
@@ -100,9 +99,23 @@ export default class HomePage extends Vue {
     return printersState.selectedPrinters;
   }
 
-  uploadFile() {
-    // TODO upload file from banner
-    console.log("aplood");
+  async uploadFile() {
+    const selectedPrinters = this.selectedPrinters;
+    const accessiblePrinters = selectedPrinters.filter(p => p.apiAccessibility.accessible);
+
+    if (!this.selectedFile) return;
+
+    // Checking and informing user
+    const incompleteListCount = selectedPrinters.length - accessiblePrinters.length;
+    if (incompleteListCount > 0) {
+      this.$bus.emit(infoMessageEvent, `${ incompleteListCount } printers were skipped as they are not accessible or disabled (now).`);
+    }
+
+    const uploads = convertMultiPrinterFileToQueue(accessiblePrinters, this.selectedFile);
+    uploadsState.queueUploads(uploads);
+
+    this.$refs.fileUpload.value = "";
+    this.clearSelectedPrinters();
   }
 
   deselectFile() {
@@ -128,13 +141,8 @@ export default class HomePage extends Vue {
     PrintersService.openPrinterURL(printer.printerURL);
   }
 
-  async createPrinterModal() {
-    this.showDialog = true;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onChangeShowDialog(event: any) {
-    // Placeholder
+  openCreatePrinterDialog() {
+    printersState.setCreateDialogOpened(true);
   }
 }
 </script>

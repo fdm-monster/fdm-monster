@@ -5,6 +5,7 @@ import { PrinterFileCache } from "@/models/printers/printer-file-cache.model";
 import { ClearedFilesResult, PrinterFile } from "@/models/printers/printer-file.model";
 import Vue from "vue";
 import { infoMessageEvent } from "@/event-bus/alert.events";
+import { Printer } from "@/models/printers/printer.model";
 
 export class PrinterFileService extends BaseService {
   static async getFiles(printerId: string, recursive = false) {
@@ -51,20 +52,17 @@ export class PrinterFileService extends BaseService {
     Vue.bus.emit(infoMessageEvent, "Browser to server uploading", progress.loaded / progress.total);
   }
 
-  static async uploadFiles(
-    printerId: string,
-    files: File[],
+  static async uploadFile(
+    printer: Printer,
+    file: File,
     commands: FileUploadCommands = { select: true, print: true }
   ) {
-    const path = ServerApi.printerFilesUploadRoute(printerId);
+    const path = ServerApi.printerFilesUploadRoute(printer.id);
 
     const formData = new FormData();
-    for (let i = 0; i < files.length; i++) {
-      formData.append("files[" + i + "]", files[i]);
-    }
 
     // Cant print more than 1 file at a time
-    if (files.length === 1) {
+    if (!printer.printerState.flags.printing) {
       if (commands.select) {
         formData.append("select", "true");
       }
@@ -72,7 +70,7 @@ export class PrinterFileService extends BaseService {
         formData.append("print", "true");
       }
     }
-    // TODO more than 1 will now fail due to API validation
+    formData.append("files[0]", file);
 
     return this.postUploadApi(
       path,

@@ -3,7 +3,7 @@ import { VuetifyAlert } from "@/models/ui/vuetify-alert.model";
 import store from "@/store";
 
 @Module({
-  name: AlertsModule.name,
+  name: "alerts",
   store: store
 })
 export class AlertsModule extends VuexModule {

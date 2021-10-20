@@ -1,6 +1,6 @@
 const { ensureAuthenticated } = require("../middleware/auth");
 const { createController } = require("awilix-express");
-const { validateMiddleware, validateInput, getScopedPrinter } = require("../handlers/validators");
+const { validateMiddleware, getScopedPrinter } = require("../handlers/validators");
 const {
   updateSortIndexRules,
   updatePrinterConnectionSettingRules,
@@ -11,7 +11,6 @@ const {
 } = require("./validation/printer-controller.validation");
 const { AppConstants } = require("../app.constants");
 const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
-const { idRules } = require("./validation/generic.validation");
 const DITokens = require("../container.tokens");
 const { Status, getSettingsAppearanceDefault } = require("../constants/service.constants");
 const { printerResolveMiddleware } = require("../middleware/printer");
@@ -96,7 +95,7 @@ class PrinterController {
    * @returns {Promise<void>}
    */
   async stopPrintJob(req, res) {
-    const { currentPrinterId, printerLogin } = getScopedPrinter(req);
+    const { printerLogin } = getScopedPrinter(req);
 
     const command = this.#octoPrintApiService.cancelJobCommand;
     await this.#octoPrintApiService.sendJobCommand(printerLogin, command);
@@ -197,7 +196,10 @@ class PrinterController {
     const { currentPrinterId } = getScopedPrinter(req);
     const inputData = await validateMiddleware(req, updatePrinterConnectionSettingRules, res);
 
-    const newEntity = await this.#printersStore.updatePrinterConnectionSettings(currentPrinterId, inputData);
+    const newEntity = await this.#printersStore.updatePrinterConnectionSettings(
+      currentPrinterId,
+      inputData
+    );
 
     res.send({
       printerURL: newEntity.printerURL,
@@ -264,7 +266,9 @@ class PrinterController {
   async resetPowerSettings(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
 
-    const defaultPowerSettings = await this.#printersStore.resetPrinterPowerSettings(currentPrinterId);
+    const defaultPowerSettings = await this.#printersStore.resetPrinterPowerSettings(
+      currentPrinterId
+    );
 
     res.send({ powerSettings: defaultPowerSettings });
   }

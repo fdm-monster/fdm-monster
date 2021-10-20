@@ -1,14 +1,17 @@
 <template>
   <v-app>
-    <NavigationDrawer/>
-    <TopBar/>
+    <NavigationDrawer />
+    <TopBar />
 
     <v-main>
       <ErrorAlert>
-        <router-view/>
+        <router-view />
       </ErrorAlert>
     </v-main>
 
+    <UpdatePrinterDialog />
+    <CreatePrinterDialog />
+    <FileExplorerSideNav />
     <!--    <FooterList></FooterList>-->
   </v-app>
 </template>
@@ -19,7 +22,7 @@ import NavigationDrawer from "@/components/Generic/NavigationDrawer.vue";
 import TopBar from "@/components/Generic/TopBar.vue";
 import ErrorAlert from "@/components/Generic/AlertStack.vue";
 import FooterList from "@/components/Generic/FooterList.vue";
-import { Component } from "vue-property-decorator";
+import { Component, Watch } from "vue-property-decorator";
 import { SSEClient } from "vue-sse";
 import { PrinterSseMessage } from "@/models/sse-messages/printer-sse-message.model";
 import { sseGroups, sseMessageGlobal, sseTestPrinterUpdate } from "@/event-bus/sse.events";
@@ -27,14 +30,24 @@ import { serverSettingsState } from "@/store/server-settings.state";
 import { printersState } from "@/store/printers.state";
 import { updatedPrinterEvent } from "@/event-bus/printer.events";
 import { infoMessageEvent } from "@/event-bus/alert.events";
+import UpdatePrinterDialog from "@/components/Generic/Dialogs/UpdatePrinterDialog.vue";
+import FileExplorerSideNav from "@/components/Generic/SideNavs/FileExplorerSideNav.vue";
+import CreatePrinterDialog from "@/components/Generic/Dialogs/CreatePrinterDialog.vue";
+import { uploadsState } from "@/store/uploads.state";
+import { QueuedUpload } from "@/models/uploads/queued-upload.model";
 
 @Component({
-  components: { TopBar, NavigationDrawer, FooterList, ErrorAlert }
+  components: {
+    TopBar,
+    NavigationDrawer,
+    UpdatePrinterDialog,
+    CreatePrinterDialog,
+    FileExplorerSideNav,
+    FooterList,
+    ErrorAlert
+  }
 })
 export default class App extends Vue {
-  /**
-   * Listens to events - replaced with socketIO client later
-   */
   sseClient?: SSEClient;
 
   async created() {
@@ -53,6 +66,16 @@ export default class App extends Vue {
       .catch((err: any) => console.error("Failed make initial connection:", err));
   }
 
+  get queuedUploads() {
+    return uploadsState.queuedUploads;
+  }
+
+  @Watch("queuedUploads")
+  async changeInUploads(newValue: QueuedUpload[]) {
+
+    await uploadsState.handleNextUpload();
+  }
+
   async onSseMessage(message: PrinterSseMessage) {
     if (message.printerGroups) {
       await printersState.savePrinterGroups(message.printerGroups);
@@ -60,18 +83,23 @@ export default class App extends Vue {
     }
 
     if (message.trackedUploads?.length > 0) {
-      this.$bus.emit(infoMessageEvent, "Server to OctoPrint (1/1) uploading", message.trackedUploads[0].progress?.percent);
+      this.$bus.emit(
+        infoMessageEvent,
+        "Server to OctoPrint (1/1) uploading",
+        message.trackedUploads[0].progress?.percent
+      );
     }
+
     if (message.printers) {
       printersState.savePrinters(message.printers);
 
       // Emit the global update
       this.$bus.emit(sseMessageGlobal, message);
 
-      message.printers.forEach(p => {
+      message.printers.forEach((p) => {
         if (!p.id) return;
         this.$bus.emit(updatedPrinterEvent(p.id), p);
-      })
+      });
     }
 
     if (message.testPrinter) {

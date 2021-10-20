@@ -13,8 +13,8 @@ Note: our aim is to support all kinds of 3D Printer (FDM, resin) API's with a pl
 
 This server is currently not yet released, so give it a star ⭐and be the first to experience it! 
 
-#### Last finished: printer location grid
-#### Current work: printer file commands and group management
+#### Last finished: printer file commander and printer location map
+#### Current work: printer group, setting and location management
 
 ## Development [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/davidzwa/3d-print-farm/graphs/commit-activity) ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/davidzwa/3d-print-farm/Node.js%20CI/development) [![GitHub license](https://img.shields.io/github/license/davidzwa/3d-print-farm)](https://github.com/davidzwa/3d-print-farm/blob/master/LICENSE.txt)
 
@@ -24,6 +24,8 @@ This work is under active development with cutting edge tech and standards. Feel
 
 - [x] Vue app core and distribution setup on NPM completed
 - [x] Client for basic management of OctoPrint printers (file storage, print upload and printer management)
+- [x] Printer Location Map based on 2x2 groups
+- [ ] Printer Group management
 - [ ] NodeJS Server legacy-free
 - [ ] Better authentication and user management
 - [ ] Full API and client test coverage >80% (now at 40%)

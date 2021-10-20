@@ -5,7 +5,6 @@ import { PrinterFileService, PrintersService } from "@/backend";
 import { CreatePrinter } from "@/models/printers/crud/create-printer.model";
 import { PrinterGroupService } from "@/backend/printer-group.service";
 import store from "@/store/index";
-import { FileUploadCommands } from "@/models/printers/file-upload-commands.model";
 import { ClearedFilesResult, PrinterFile } from "@/models/printers/printer-file.model";
 import { PrinterFileBucket } from "@/models/printers/printer-file-bucket.model";
 import { PrinterFileCache } from "@/models/printers/printer-file-cache.model";
@@ -23,15 +22,25 @@ class PrintersModule extends VuexModule {
   printerGroups: PrinterGroup[] = [];
   lastUpdated?: number = undefined;
 
-  viewedPrinter?: Printer = undefined;
+  sideNavPrinter?: Printer = undefined;
+  updateDialogPrinter?: Printer = undefined;
+  createDialogOpened?: boolean = false;
   selectedPrinters: Printer[] = [];
 
-  get currentViewedPrinter() {
-    return this.viewedPrinter;
+  get currentSideNavPrinter() {
+    return this.sideNavPrinter;
+  }
+
+  get currentUpdateDialogPrinter() {
+    return this.updateDialogPrinter;
   }
 
   get printer() {
     return (printerId?: string) => this.printers.find((p: Printer) => p.id === printerId);
+  }
+
+  get onlinePrinters() {
+    return this.printers.filter((p) => p.apiAccessibility.accessible);
   }
 
   get isSelectedPrinter() {
@@ -39,11 +48,11 @@ class PrintersModule extends VuexModule {
   }
 
   get isPrinterOperational() {
-    return (printerId?: string) => this.printer(printerId)?.printerState?.flags.operational;
+    return (printerId?: string) => this.printer(printerId)?.printerState?.flags?.operational;
   }
 
   get isPrinterPrinting() {
-    return (printerId?: string) => this.printer(printerId)?.printerState?.flags.printing;
+    return (printerId?: string) => this.printer(printerId)?.printerState?.flags?.printing;
   }
 
   get gridSortedPrinterGroups() {
@@ -90,7 +99,9 @@ class PrintersModule extends VuexModule {
   @Mutation toggleSelectedPrinter(printer: Printer) {
     const selectedPrinterIndex = this.selectedPrinters.findIndex((sp) => sp.id == printer.id);
     if (selectedPrinterIndex === -1) {
-      this.selectedPrinters.push(printer);
+      if (printer.apiAccessibility.accessible) {
+        this.selectedPrinters.push(printer);
+      }
     } else {
       this.selectedPrinters.splice(selectedPrinterIndex, 1);
     }
@@ -100,8 +111,16 @@ class PrintersModule extends VuexModule {
     this.selectedPrinters = [];
   }
 
-  @Mutation _setViewedPrinter(printer?: Printer) {
-    this.viewedPrinter = printer;
+  @Mutation _setSideNavPrinter(printer?: Printer) {
+    this.sideNavPrinter = printer;
+  }
+
+  @Mutation _setUpdateDialogPrinter(printer?: Printer) {
+    this.updateDialogPrinter = printer;
+  }
+
+  @Mutation _setCreateDialogOpened(opened: boolean) {
+    this.createDialogOpened = opened;
   }
 
   @Mutation replacePrinter({ printerId, printer }: { printerId: string; printer: Printer }) {
@@ -125,9 +144,9 @@ class PrintersModule extends VuexModule {
   }
 
   @Mutation setPrinters(printers: Printer[]) {
-    const viewedPrinterId = this.viewedPrinter?.id;
+    const viewedPrinterId = this.sideNavPrinter?.id;
     if (viewedPrinterId) {
-      this.viewedPrinter = printers.find((p) => p.id === viewedPrinterId);
+      this.sideNavPrinter = printers.find((p) => p.id === viewedPrinterId);
     }
     this.printers = printers;
     this.lastUpdated = Date.now();
@@ -264,28 +283,6 @@ class PrintersModule extends VuexModule {
   }
 
   @Action
-  async dropUploadPrinterFile({
-    printerId,
-    files,
-    commands
-  }: {
-    printerId: string;
-    files: File[];
-    commands?: FileUploadCommands;
-  }) {
-    if (!printerId) throw new Error("Printer ID was not provided for file upload");
-
-    const uploadedFiles = files.filter((f) => f.name) as File[];
-
-    await PrinterFileService.uploadFiles(printerId, uploadedFiles, commands);
-
-    // TODO update
-    // this.setPrinterFiles({ printerId, files: [] });
-
-    return "data";
-  }
-
-  @Action
   async sendStopJobCommand(printerId?: string) {
     if (!printerId) return;
     const printer = this.printer(printerId);
@@ -314,8 +311,18 @@ class PrintersModule extends VuexModule {
   }
 
   @Action
-  setViewedPrinter(printer?: Printer) {
-    this._setViewedPrinter(printer);
+  setSideNavPrinter(printer?: Printer) {
+    this._setSideNavPrinter(printer);
+  }
+
+  @Action
+  setUpdateDialogPrinter(printer?: Printer) {
+    this._setUpdateDialogPrinter(printer);
+  }
+
+  @Action
+  setCreateDialogOpened(opened: boolean) {
+    this._setCreateDialogOpened(opened);
   }
 
   @Action

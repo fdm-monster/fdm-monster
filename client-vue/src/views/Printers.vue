@@ -41,13 +41,13 @@
         <v-toolbar flat>
           <v-toolbar-title>Showing printers</v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-switch v-model="reorder" class="mt-5 mr-3" dark label="Sort mode"/>
+          <v-switch v-model="reorder" class="mt-5 mr-3" dark label="Sort mode" />
 
-          <v-btn class="ml-3" color="primary" type="button" @click="createPrinterModal()">
+          <v-btn class="ml-3" color="primary" type="button" @click="openImportJsonPrintersDialog()">
             Import JSON Printers
           </v-btn>
 
-          <v-btn class="ml-3" color="primary" type="button" @click="showCreateDialog = true">
+          <v-btn class="ml-3" color="primary" type="button" @click="openCreatePrinterDialog()">
             Create Printer
           </v-btn>
 
@@ -98,9 +98,9 @@
         </v-chip>
       </template>
       <template v-slot:item.actions="{ item }">
-        <PrinterUrlAction :printer="item"/>
-        <PrinterConnectionAction :printer="item"/>
-        <PrinterSettingsAction :printer="item" v-on:update:show="openEditDialog"/>
+        <PrinterUrlAction :printer="item" />
+        <PrinterConnectionAction :printer="item" />
+        <PrinterSettingsAction :printer="item" v-on:update:show="openEditDialog(item)" />
       </template>
       <template v-slot:expanded-item="{ headers, item }">
         <td :colspan="headers.length">
@@ -109,16 +109,7 @@
       </template>
     </v-data-table>
 
-    <BatchJsonCreateDialog
-      :show.sync="showJsonImportDialog"
-      v-on:update:show="onChangeShowDialog($event)"
-    />
-    <CreatePrinterDialog :show.sync="showCreateDialog"/>
-    <UpdatePrinterDialog
-      :printer-id="selectedPrinterId"
-      :show.sync="showEditDialog"
-      v-on:update:show="onChangeShowEditDialog($event)"
-    />
+    <BatchJsonCreateDialog :show.sync="showJsonImportDialog" />
   </v-card>
 </template>
 
@@ -133,9 +124,9 @@ import PrinterUrlAction from "@/components/Generic/Actions/PrinterUrlAction.vue"
 import PrinterSettingsAction from "@/components/Generic/Actions/PrinterSettingsAction.vue";
 import PrinterConnectionAction from "@/components/Generic/Actions/PrinterConnectionAction.vue";
 import { printersState } from "@/store/printers.state";
-import BatchJsonCreateDialog from "@/components/Dialogs/BatchJsonCreateDialog.vue";
-import UpdatePrinterDialog from "@/components/Dialogs/UpdatePrinterDialog.vue";
-import CreatePrinterDialog from "@/components/Dialogs/CreatePrinterDialog.vue";
+import BatchJsonCreateDialog from "@/components/Generic/Dialogs/BatchJsonCreateDialog.vue";
+import UpdatePrinterDialog from "@/components/Generic/Dialogs/UpdatePrinterDialog.vue";
+import CreatePrinterDialog from "@/components/Generic/Dialogs/CreatePrinterDialog.vue";
 
 @Component({
   components: {
@@ -157,9 +148,6 @@ export default class Printers extends Vue {
 
   autoPrint = true;
   showJsonImportDialog = false;
-  showCreateDialog = false;
-  showEditDialog = false;
-  selectedPrinterId?: string = "";
   search = "";
   expanded = [];
   tableHeaders = [
@@ -185,24 +173,16 @@ export default class Printers extends Vue {
     return printersState.printers;
   }
 
-  openEditDialog(printerId: string) {
-    this.selectedPrinterId = printerId;
-    this.showEditDialog = true;
+  openEditDialog(printer: Printer) {
+    printersState.setUpdateDialogPrinter(printer);
   }
 
-  onChangeShowEditDialog(event: boolean) {
-    if (!event) {
-      this.selectedPrinterId = undefined;
-    }
+  openCreatePrinterDialog() {
+    printersState.setCreateDialogOpened(true);
   }
 
-  async createPrinterModal() {
+  async openImportJsonPrintersDialog() {
     this.showJsonImportDialog = true;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onChangeShowDialog(event: any) {
-    // Placeholder
   }
 
   async toggleEnabled(event: any, printer: Printer) {

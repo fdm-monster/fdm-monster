@@ -1,44 +1,34 @@
 import Vue from "vue";
-import { infoMessageEvent } from "@/event-bus/alert.events";
 import { Printer } from "@/models/printers/printer.model";
-import { printersState } from "@/store/printers.state";
+import { uploadsState } from "@/store/uploads.state";
+import { convertMultiPrinterFileToQueue } from "@/utils/uploads-state.utils";
+import { infoMessageEvent } from "@/event-bus/alert.events";
 
-const bindDropConditionally = (el: HTMLElement, printer: Printer, context?: Vue) => {
-  if (printer) {
+const bindDropConditionally = (el: HTMLElement, printers: Printer[], context?: Vue) => {
+  if (printers?.length) {
     el.ondrop = async (e) => {
+      e.preventDefault();
       el.style.border = defaultBorder;
 
-      await dropHandler(e, printer, context);
+      if (!e.dataTransfer?.files.length) return;
+
+      const files = [...e.dataTransfer?.files];
+      const file = files[0];
+
+      const uploads = convertMultiPrinterFileToQueue(printers, file);
+      uploadsState.queueUploads(uploads);
     };
   } else {
     el.ondrop = async (e) => {
       e.preventDefault();
       el.style.border = defaultBorder;
-      alert("The printer was not correctly bound to be able to do file upload!");
+      context?.$bus.emit(infoMessageEvent, "Please select a printer to upload to first.");
     };
   }
 };
 
-const dropHandler = async (e: DragEvent, printer: Printer, context?: Vue) => {
-  e.preventDefault();
-  const files = e.dataTransfer?.files;
-  if (!files) return;
-
-  const printerId = printer.id;
-
-  if (files.length === 1) context?.$bus.emit(infoMessageEvent, "Uploading file");
-  else context?.$bus.emit(infoMessageEvent, `Uploading ${files.length} files`);
-
-  const uploadInput = {
-    printerId,
-    files: Array.from(files)
-  };
-  await printersState.dropUploadPrinterFile(uploadInput);
-
-  context?.$bus.emit(infoMessageEvent, `Upload done`);
-};
-
 const defaultBorder = "1px solid #2b2a27";
+const defaultTransition = "background-color 0.5s ease";
 const hoverBorder = "1px solid red";
 
 export function registerFileDropDirective() {
@@ -46,6 +36,7 @@ export function registerFileDropDirective() {
     // When the bound element is inserted into the DOM...
     inserted: (el, binding, vnode) => {
       el.style.border = defaultBorder;
+      el.style.transition = defaultTransition;
 
       el.ondragenter = () => {
         el.style.border = hoverBorder;
@@ -59,10 +50,10 @@ export function registerFileDropDirective() {
       };
 
       // The bound printer is not set
-      bindDropConditionally(el, binding.value?.printer, vnode.context);
+      bindDropConditionally(el, binding.value?.printers, vnode.context);
     },
     update: (el, binding, vnode) => {
-      bindDropConditionally(el, binding.value?.printer, vnode.context);
+      bindDropConditionally(el, binding.value?.printers, vnode.context);
     }
   });
 }

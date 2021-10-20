@@ -1,6 +1,6 @@
 <template>
   <v-card
-    v-drop-upload="{ printer }"
+    v-drop-upload="{ printers: [printer] }"
     :class="{ 'tile-selected': selected, 'tile-setup': printer }"
     :disabled="!printer"
     :style="{ 'background-color': printerStateColor }"
@@ -19,6 +19,10 @@
       <v-btn class="float-right d-none d-lg-inline" icon @click.prevent.stop="clickStop()">
         <v-icon>stop</v-icon>
       </v-btn>
+      <br/>
+      <small class="xsmall-resized-font ml-2 text--secondary">
+        {{ printer.printerState.state }}
+      </small>
     </v-container>
   </v-card>
 </template>
@@ -58,7 +62,7 @@ export default class PrinterGridTile extends Vue {
   }
 
   clickInfo() {
-    printersState.setViewedPrinter(this.printer);
+    printersState.setSideNavPrinter(this.printer);
   }
 
   clickStop() {
@@ -92,5 +96,9 @@ export default class PrinterGridTile extends Vue {
 
 .small-resized-font {
   font-size: clamp(10px, 1vw, 18px);
+}
+
+.xsmall-resized-font {
+  font-size: clamp(8px, 1vw, 10px);
 }
 </style>
