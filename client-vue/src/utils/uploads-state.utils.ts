@@ -40,7 +40,7 @@ export function convertMultiPrinterFileToQueue(
   file: File,
   commands: FileUploadCommands = { select: true, print: true }
 ) {
-  if (!printers?.length || file) return [];
+  if (!printers?.length || !file) return [];
 
   return printers.map((p) => {
     return {
