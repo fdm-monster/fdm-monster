@@ -22,7 +22,7 @@ import NavigationDrawer from "@/components/Generic/NavigationDrawer.vue";
 import TopBar from "@/components/Generic/TopBar.vue";
 import ErrorAlert from "@/components/Generic/AlertStack.vue";
 import FooterList from "@/components/Generic/FooterList.vue";
-import { Component } from "vue-property-decorator";
+import { Component, Watch } from "vue-property-decorator";
 import { SSEClient } from "vue-sse";
 import { PrinterSseMessage } from "@/models/sse-messages/printer-sse-message.model";
 import { sseGroups, sseMessageGlobal, sseTestPrinterUpdate } from "@/event-bus/sse.events";
@@ -33,6 +33,8 @@ import { infoMessageEvent } from "@/event-bus/alert.events";
 import UpdatePrinterDialog from "@/components/Generic/Dialogs/UpdatePrinterDialog.vue";
 import FileExplorerSideNav from "@/components/Generic/SideNavs/FileExplorerSideNav.vue";
 import CreatePrinterDialog from "@/components/Generic/Dialogs/CreatePrinterDialog.vue";
+import { uploadsState } from "@/store/uploads.state";
+import { QueuedUpload } from "@/models/uploads/queued-upload.model";
 
 @Component({
   components: {
@@ -62,6 +64,16 @@ export default class App extends Vue {
     this.sseClient
       .connect()
       .catch((err: any) => console.error("Failed make initial connection:", err));
+  }
+
+  get queuedUploads() {
+    return uploadsState.queuedUploads;
+  }
+
+  @Watch("queuedUploads")
+  async changeInUploads(newValue: QueuedUpload[]) {
+
+    await uploadsState.handleNextUpload();
   }
 
   async onSseMessage(message: PrinterSseMessage) {

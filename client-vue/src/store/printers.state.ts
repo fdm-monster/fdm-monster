@@ -48,11 +48,11 @@ class PrintersModule extends VuexModule {
   }
 
   get isPrinterOperational() {
-    return (printerId?: string) => this.printer(printerId)?.printerState?.flags.operational;
+    return (printerId?: string) => this.printer(printerId)?.printerState?.flags?.operational;
   }
 
   get isPrinterPrinting() {
-    return (printerId?: string) => this.printer(printerId)?.printerState?.flags.printing;
+    return (printerId?: string) => this.printer(printerId)?.printerState?.flags?.printing;
   }
 
   get gridSortedPrinterGroups() {

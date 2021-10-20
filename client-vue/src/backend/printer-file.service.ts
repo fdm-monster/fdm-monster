@@ -5,6 +5,7 @@ import { PrinterFileCache } from "@/models/printers/printer-file-cache.model";
 import { ClearedFilesResult, PrinterFile } from "@/models/printers/printer-file.model";
 import Vue from "vue";
 import { infoMessageEvent } from "@/event-bus/alert.events";
+import { Printer } from "@/models/printers/printer.model";
 
 export class PrinterFileService extends BaseService {
   static async getFiles(printerId: string, recursive = false) {
@@ -52,19 +53,22 @@ export class PrinterFileService extends BaseService {
   }
 
   static async uploadFile(
-    printerId: string,
+    printer: Printer,
     file: File,
     commands: FileUploadCommands = { select: true, print: true }
   ) {
-    const path = ServerApi.printerFilesUploadRoute(printerId);
+    const path = ServerApi.printerFilesUploadRoute(printer.id);
 
     const formData = new FormData();
+
     // Cant print more than 1 file at a time
-    if (commands.select) {
-      formData.append("select", "true");
-    }
-    if (commands.print) {
-      formData.append("print", "true");
+    if (!printer.printerState.flags.printing) {
+      if (commands.select) {
+        formData.append("select", "true");
+      }
+      if (commands.print) {
+        formData.append("print", "true");
+      }
     }
     formData.append("files[0]", file);
 

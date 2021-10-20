@@ -2,6 +2,7 @@ import Vue from "vue";
 import { Printer } from "@/models/printers/printer.model";
 import { uploadsState } from "@/store/uploads.state";
 import { convertMultiPrinterFileToQueue } from "@/utils/uploads-state.utils";
+import { infoMessageEvent } from "@/event-bus/alert.events";
 
 const bindDropConditionally = (el: HTMLElement, printers: Printer[], context?: Vue) => {
   if (printers?.length) {
@@ -21,7 +22,7 @@ const bindDropConditionally = (el: HTMLElement, printers: Printer[], context?: V
     el.ondrop = async (e) => {
       e.preventDefault();
       el.style.border = defaultBorder;
-      alert("The printer(s) input was not correctly bound to be able to do file upload!");
+      context?.$bus.emit(infoMessageEvent, "Please select a printer to upload to first.");
     };
   }
 };

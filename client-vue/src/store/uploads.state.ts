@@ -29,14 +29,14 @@ class UploadsModule extends VuexModule {
 
   @Action
   async handleNextUpload() {
-    if (!this.queuedUploads.length) return;
+    if (!this.queuedUploads?.length) return;
 
     const { file, printer, commands } = this.nextUpload;
 
     // We'd rather fail fast and avoid the same upload failing many times
     this._spliceNextUpload();
 
-    await PrinterFileService.uploadFile(printer.id, file, commands);
+    await PrinterFileService.uploadFile(printer, file, commands);
   }
 
   @Action queueUploads(newQueuedUploads: QueuedUpload[]) {
