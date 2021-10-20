@@ -43,11 +43,11 @@
           <v-spacer></v-spacer>
           <v-switch v-model="reorder" class="mt-5 mr-3" dark label="Sort mode"/>
 
-          <v-btn class="ml-3" color="primary" type="button" @click="createPrinterModal()">
+          <v-btn class="ml-3" color="primary" type="button" @click="openImportJsonPrintersDialog()">
             Import JSON Printers
           </v-btn>
 
-          <v-btn class="ml-3" color="primary" type="button" @click="showCreateDialog = true">
+          <v-btn class="ml-3" color="primary" type="button" @click="openCreatePrinterDialog()">
             Create Printer
           </v-btn>
 
@@ -177,7 +177,11 @@ export default class Printers extends Vue {
     printersState.setUpdateDialogPrinter(printer);
   }
 
-  async createPrinterModal() {
+  openCreatePrinterDialog() {
+    printersState.setCreateDialogOpened(true);
+  }
+  
+  async openImportJsonPrintersDialog() {
     this.showJsonImportDialog = true;
   }
 
