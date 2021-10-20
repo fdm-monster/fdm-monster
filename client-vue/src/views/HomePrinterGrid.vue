@@ -71,13 +71,13 @@
 <script lang="ts">
 import Vue from "vue";
 import { Component } from "vue-property-decorator";
-import CreatePrinterDialog from "@/components/Dialogs/CreatePrinterDialog.vue";
+import CreatePrinterDialog from "@/components/Generic/Dialogs/CreatePrinterDialog.vue";
 import PrinterGrid from "@/components/PrinterGrid/PrinterGrid.vue";
 import { printersState } from "@/store/printers.state";
 import { Printer } from "@/models/printers/printer.model";
 import { PrintersService } from "@/backend";
 import { formatBytes } from "@/utils/file-size.util";
-import SideNavExplorer from "@/components/Generic/SideNavExplorer.vue";
+import SideNavExplorer from "@/components/Generic/SideNavs/FileExplorerSideNav.vue";
 
 @Component({
   components: { PrinterGrid, SideNavExplorer, CreatePrinterDialog },

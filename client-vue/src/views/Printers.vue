@@ -133,9 +133,9 @@ import PrinterUrlAction from "@/components/Generic/Actions/PrinterUrlAction.vue"
 import PrinterSettingsAction from "@/components/Generic/Actions/PrinterSettingsAction.vue";
 import PrinterConnectionAction from "@/components/Generic/Actions/PrinterConnectionAction.vue";
 import { printersState } from "@/store/printers.state";
-import BatchJsonCreateDialog from "@/components/Dialogs/BatchJsonCreateDialog.vue";
-import UpdatePrinterDialog from "@/components/Dialogs/UpdatePrinterDialog.vue";
-import CreatePrinterDialog from "@/components/Dialogs/CreatePrinterDialog.vue";
+import BatchJsonCreateDialog from "@/components/Generic/Dialogs/BatchJsonCreateDialog.vue";
+import UpdatePrinterDialog from "@/components/Generic/Dialogs/UpdatePrinterDialog.vue";
+import CreatePrinterDialog from "@/components/Generic/Dialogs/CreatePrinterDialog.vue";
 
 @Component({
   components: {

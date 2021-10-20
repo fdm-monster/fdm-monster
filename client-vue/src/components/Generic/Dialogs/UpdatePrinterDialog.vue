@@ -45,9 +45,9 @@ import { PrinterSseMessage, TestProgressDetails } from "@/models/sse-messages/pr
 import { PrintersService } from "@/backend";
 import { generateInitials } from "@/constants/noun-adjectives.data";
 import { updatedPrinterEvent } from "@/event-bus/printer.events";
-import PrinterChecksPanel from "@/components/Dialogs/PrinterChecksPanel.vue";
+import PrinterChecksPanel from "@/components/Generic/Dialogs/PrinterChecksPanel.vue";
 import { printersState } from "@/store/printers.state";
-import PrinterCrudForm from "@/components/Forms/PrinterCrudForm.vue";
+import PrinterCrudForm from "@/components/Generic/Forms/PrinterCrudForm.vue";
 import { infoMessageEvent } from "@/event-bus/alert.events";
 
 @Component({

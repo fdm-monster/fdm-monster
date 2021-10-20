@@ -10,7 +10,7 @@
     </v-main>
 
     <UpdatePrinterDialog />
-    <SideNavExplorer />
+    <FileExplorerSideNav />
     <!--    <FooterList></FooterList>-->
   </v-app>
 </template>
@@ -29,11 +29,11 @@ import { serverSettingsState } from "@/store/server-settings.state";
 import { printersState } from "@/store/printers.state";
 import { updatedPrinterEvent } from "@/event-bus/printer.events";
 import { infoMessageEvent } from "@/event-bus/alert.events";
-import SideNavExplorer from "@/components/Generic/SideNavExplorer.vue";
-import UpdatePrinterDialog from "@/components/Dialogs/UpdatePrinterDialog.vue";
+import UpdatePrinterDialog from "@/components/Generic/Dialogs/UpdatePrinterDialog.vue";
+import FileExplorerSideNav from "@/components/Generic/SideNavs/FileExplorerSideNav.vue";
 
 @Component({
-  components: { TopBar, NavigationDrawer, UpdatePrinterDialog, SideNavExplorer, FooterList, ErrorAlert }
+  components: { TopBar, NavigationDrawer, UpdatePrinterDialog, FileExplorerSideNav, FooterList, ErrorAlert }
 })
 export default class App extends Vue {
   sseClient?: SSEClient;
@@ -63,7 +63,7 @@ export default class App extends Vue {
     if (message.trackedUploads?.length > 0) {
       this.$bus.emit(infoMessageEvent, "Server to OctoPrint (1/1) uploading", message.trackedUploads[0].progress?.percent);
     }
-    
+
     if (message.printers) {
       printersState.savePrinters(message.printers);
 

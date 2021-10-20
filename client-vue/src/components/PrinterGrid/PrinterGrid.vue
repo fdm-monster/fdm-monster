@@ -27,7 +27,7 @@
 import Vue from "vue";
 import Login from "@/components/Generic/Login.vue";
 import { Component } from "vue-property-decorator";
-import UpdatePrinterDialog from "@/components/Dialogs/UpdatePrinterDialog.vue";
+import UpdatePrinterDialog from "@/components/Generic/Dialogs/UpdatePrinterDialog.vue";
 import { sseGroups, sseMessageGlobal } from "@/event-bus/sse.events";
 import { printersState } from "@/store/printers.state";
 import PrinterGridTile from "@/components/PrinterGrid/PrinterTile.vue";
