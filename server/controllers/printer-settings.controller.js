@@ -1,19 +1,8 @@
 const { ensureAuthenticated } = require("../middleware/auth");
 const { createController } = require("awilix-express");
-const { validateMiddleware, validateInput } = require("../handlers/validators");
-const {
-  updateSortIndexRules,
-  updatePrinterConnectionSettingRules,
-  stepSizeRules,
-  flowRateRules,
-  feedRateRules,
-  updatePrinterEnabledRule
-} = require("./validation/printer-controller.validation");
+const { validateInput } = require("../handlers/validators");
 const { AppConstants } = require("../app.constants");
-const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
 const { idRules } = require("./validation/generic.validation");
-const DITokens = require("../container.tokens");
-const { Status, getSettingsAppearanceDefault } = require("../constants/service.constants");
 const { setGcodeAnalysis } = require("./validation/printer-settings.validation");
 
 class PrinterSettingsController {
@@ -84,4 +73,4 @@ module.exports = createController(PrinterSettingsController)
     .prefix(AppConstants.apiRoute + "/printer-settings")
     .before([ensureAuthenticated])
     .get("/:id", "get")
-    .patch("/:id/gcode-analysis", "setGCodeAnalysis");
+    .post("/:id/gcode-analysis", "setGCodeAnalysis");

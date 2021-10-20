@@ -37,9 +37,9 @@
           </strong>
         </v-list-item-title>
         <v-list-item-subtitle v-if="storedViewedPrinter.currentJob">
-          <span class="d-flex justify-center"
-          >Progress: {{ storedViewedPrinter.currentJob.progress }}%</span
-          >
+          <span class="d-flex justify-center">
+            Progress: {{ storedViewedPrinter.currentJob.progress }}%
+          </span>
           <v-progress-linear
             v-if="storedViewedPrinter.currentJob"
             :value="storedViewedPrinter.currentJob.progress"
@@ -54,38 +54,64 @@
     <v-list v-drop-upload="{ printer: storedViewedPrinter }" dense subheader>
       <v-subheader inset>Commands</v-subheader>
 
-      <v-list-item link :disabled="isStoppable" @click.prevent.stop="togglePrinterConnection()" class="extra-dense-list-item">
+      <v-list-item
+        link
+        :disabled="isStoppable"
+        @click.prevent.stop="togglePrinterConnection()"
+        class="extra-dense-list-item"
+      >
         <v-list-item-avatar>
           <v-icon>usb</v-icon>
         </v-list-item-avatar>
         <v-list-item-content>
-          <span v-if="isStoppable">DISCONNECT - stop print first</span>
-          <span v-else-if="isOperational">DISCONNECT</span>
-          <span v-else>CONNECT</span>
+          <span v-if="isStoppable">Disconnect - stop print first</span>
+          <span v-else-if="isOperational">Disconnect</span>
+          <span v-else>Connect</span>
         </v-list-item-content>
       </v-list-item>
 
-      <v-list-item :disabled="!isStoppable" class="extra-dense-list-item" link @click.prevent.stop="clickStop()">
+      <v-list-item
+        :disabled="!isStoppable"
+        class="extra-dense-list-item"
+        link
+        @click.prevent.stop="clickStop()"
+      >
         <v-list-item-avatar>
           <v-icon>stop</v-icon>
         </v-list-item-avatar>
-        <v-list-item-content> STOP {{ isStoppable ? "" : "- No job" }}</v-list-item-content>
+        <v-list-item-content>Stop print {{ isStoppable ? "" : "- No job" }}</v-list-item-content>
       </v-list-item>
 
-      <v-list-item :disabled="!canBeCleared" class="extra-dense-list-item" link @click.prevent.stop="clickClearFiles()">
+      <v-list-item
+        :disabled="!canBeCleared"
+        class="extra-dense-list-item"
+        link
+        @click.prevent.stop="clickClearFiles()"
+      >
         <v-list-item-avatar>
           <v-icon>delete</v-icon>
         </v-list-item-avatar>
         <v-list-item-content>
-          CLEAR FILES {{ canBeCleared ? "" : "- Nothing to do" }}
+          Delete files {{ canBeCleared ? "" : "- Nothing to do" }}
         </v-list-item-content>
       </v-list-item>
 
-      <v-list-item link @click.prevent.stop="refreshFiles(storedViewedPrinter)" class="extra-dense-list-item">
+      <v-list-item
+        link
+        @click.prevent.stop="refreshFiles(storedViewedPrinter)"
+        class="extra-dense-list-item"
+      >
         <v-list-item-avatar>
           <v-icon>refresh</v-icon>
         </v-list-item-avatar>
-        <v-list-item-content> REFRESH FILES</v-list-item-content>
+        <v-list-item-content>Refresh files</v-list-item-content>
+      </v-list-item>
+
+      <v-list-item class="extra-dense-list-item" link @click.prevent.stop="clickSettings()">
+        <v-list-item-avatar>
+          <v-icon>settings</v-icon>
+        </v-list-item-avatar>
+        <v-list-item-content> Settings </v-list-item-content>
       </v-list-item>
     </v-list>
     <v-divider></v-divider>
@@ -145,7 +171,7 @@
               </span>
             </template>
             <span>
-              File: {{ file.name }} <br/>
+              File: {{ file.name }} <br />
               Size: {{ formatBytes(file.size) }}
             </span>
           </v-tooltip>
@@ -216,7 +242,7 @@ export default class SideNavExplorer extends Vue {
   isFileBeingPrinted(file: PrinterFile) {
     if (!this.storedViewedPrinter) return false;
     // Completed job will not dissappear (yet)
-    if (this.storedViewedPrinter.printerState.state === 'Operational') return false;
+    if (this.storedViewedPrinter.printerState.state === "Operational") return false;
     return this.storedViewedPrinter.currentJob.fileName === file.name;
   }
 
@@ -291,6 +317,8 @@ export default class SideNavExplorer extends Vue {
     this.loading = false;
     this.shownFileBucket = printersState.printerFileBucket(this.printerId);
   }
+
+  clickSettings() {}
 
   async printFile(file: PrinterFile) {
     if (!this.printerId) return;

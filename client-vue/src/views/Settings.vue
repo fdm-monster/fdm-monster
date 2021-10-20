@@ -7,11 +7,12 @@
       <v-toolbar-title>Server Settings</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-toolbar-items>
-        <v-btn dark text @click="dialog = false" disabled> Save</v-btn>
+        <v-btn dark disabled text @click="dialog = false"> Save</v-btn>
       </v-toolbar-items>
     </v-toolbar>
     <v-list subheader three-line>
       <v-subheader>Groups and Files</v-subheader>
+
       <v-list-item>
         <v-list-item-content>
           <v-list-item-title>Legacy Groups</v-list-item-title>
@@ -22,20 +23,31 @@
           </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
+
       <v-list-item>
         <v-list-item-content>
           <v-list-item-title>Clean file references</v-list-item-title>
           <v-list-item-subtitle>
-            Clear out the file references for all printers - this does not remove them from
-            OctoPrint!
+            Clear out the file references for all printers - this does not remove them from OctoPrint!
             <br/>
             <v-btn color="primary" @click="purgeFiles()">Purge file references</v-btn>
           </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
+
+      <v-list-item>
+        <v-list-item-content>
+          <v-list-item-title>Disable inefficient GCode analysis</v-list-item-title>
+          <v-list-item-subtitle>
+            Disable GCode analysis on all printers at once, preventing CPU intensive and inaccurate time/size estimates.
+            <br/>
+            <v-btn color="primary" @click="bulkDisableGCodeAnalysis()">Bulk disable GCode Analysis</v-btn>
+          </v-list-item-subtitle>
+        </v-list-item-content>
+      </v-list-item>
     </v-list>
     <v-divider></v-divider>
-    <v-list subheader three-line v-show="false">
+    <v-list v-show="false" subheader three-line>
       <v-subheader>General</v-subheader>
       <v-list-item>
         <v-list-item-action>
@@ -44,7 +56,7 @@
         <v-list-item-content>
           <v-list-item-title>Notifications</v-list-item-title>
           <v-list-item-subtitle
-            >Notify me about updates to apps or games that I downloaded
+          >Notify me about updates to apps or games that I downloaded
           </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
@@ -55,7 +67,7 @@
         <v-list-item-content>
           <v-list-item-title>Sound</v-list-item-title>
           <v-list-item-subtitle
-            >Auto-update apps at any time. Data charges may apply
+          >Auto-update apps at any time. Data charges may apply
           </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
@@ -75,8 +87,10 @@
 <script>
 import Vue from "vue";
 import { Component } from "vue-property-decorator";
-import { PrinterGroupService, PrinterFileService } from "@/backend";
+import { PrinterGroupService, PrinterFileService, PrintersService } from "@/backend";
 import { infoMessageEvent } from "@/event-bus/alert.events";
+import { printersState } from "@/store/printers.state";
+import { PrinterSettingsService } from "@/backend/printer-settings.service";
 
 @Component({
   components: {},
@@ -93,13 +107,22 @@ export default class Settings extends Vue {
   async syncLegacyGroups() {
     const groups = await PrinterGroupService.syncLegacyGroups();
 
-    this.$bus.emit(infoMessageEvent, `Succesfully synced ${groups.length} groups!`);
+    this.$bus.emit(infoMessageEvent, `Succesfully synced ${ groups.length } groups!`);
   }
 
   async purgeFiles() {
     await PrinterFileService.purgeFiles();
 
     this.$bus.emit(infoMessageEvent, `Succesfully purged all references to printer files!`);
+  }
+
+  async bulkDisableGCodeAnalysis() {
+    const printers = printersState.onlinePrinters;
+    this.$bus.emit(infoMessageEvent, `Trying to disable gcode analysis for ${printers.length} online printers.`);
+    for (let printer of printers) {
+      await PrinterSettingsService.setGCodeAnalysis(printer.id, false);
+    }
+    this.$bus.emit(infoMessageEvent, `Finished disabling gcode analysis for ${printers.length} online printers.`);
   }
 }
 </script>
