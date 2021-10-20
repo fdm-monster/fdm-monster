@@ -25,6 +25,7 @@ class PrintersModule extends VuexModule {
 
   sideNavPrinter?: Printer = undefined;
   updateDialogPrinter?: Printer = undefined;
+  createDialogOpened?: boolean = false;
   selectedPrinters: Printer[] = [];
 
   get currentSideNavPrinter() {
@@ -117,6 +118,10 @@ class PrintersModule extends VuexModule {
 
   @Mutation _setUpdateDialogPrinter(printer?: Printer) {
     this.updateDialogPrinter = printer;
+  }
+
+  @Mutation _setCreateDialogOpened(opened: boolean) {
+    this.createDialogOpened = opened;
   }
 
   @Mutation replacePrinter({ printerId, printer }: { printerId: string; printer: Printer }) {
@@ -336,6 +341,11 @@ class PrintersModule extends VuexModule {
   @Action
   setUpdateDialogPrinter(printer?: Printer) {
     this._setUpdateDialogPrinter(printer);
+  }
+
+  @Action
+  setCreateDialogOpened(opened: boolean) {
+    this._setCreateDialogOpened(opened);
   }
 
   @Action

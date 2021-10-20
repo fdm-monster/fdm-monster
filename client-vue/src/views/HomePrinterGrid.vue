@@ -11,7 +11,7 @@
           label="Auto-select and print"
         ></v-switch>
       </div>
-      <v-btn class="ml-3" color="primary" type="button" @click="createPrinterModal()">
+      <v-btn class="ml-3" color="primary" type="button" @click="openCreatePrinterDialog()">
         Create Printer
       </v-btn>
     </v-toolbar>
@@ -63,8 +63,6 @@
     </v-banner>
 
     <PrinterGrid class="ma-2" />
-
-    <CreatePrinterDialog :show.sync="showDialog" v-on:update:show="onChangeShowDialog($event)" />
   </div>
 </template>
 
@@ -88,7 +86,6 @@ import SideNavExplorer from "@/components/Generic/SideNavs/FileExplorerSideNav.v
 })
 export default class HomePage extends Vue {
   autoPrint = true;
-  showDialog = false;
   formatBytes = formatBytes;
   $refs!: {
     fileUpload: InstanceType<typeof HTMLInputElement>;
@@ -127,13 +124,8 @@ export default class HomePage extends Vue {
     PrintersService.openPrinterURL(printer.printerURL);
   }
 
-  async createPrinterModal() {
-    this.showDialog = true;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onChangeShowDialog(event: any) {
-    // Placeholder
+  openCreatePrinterDialog() {
+    printersState.setCreateDialogOpened(true);
   }
 }
 </script>

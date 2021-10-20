@@ -10,6 +10,7 @@
     </v-main>
 
     <UpdatePrinterDialog />
+    <CreatePrinterDialog />
     <FileExplorerSideNav />
     <!--    <FooterList></FooterList>-->
   </v-app>
@@ -31,9 +32,10 @@ import { updatedPrinterEvent } from "@/event-bus/printer.events";
 import { infoMessageEvent } from "@/event-bus/alert.events";
 import UpdatePrinterDialog from "@/components/Generic/Dialogs/UpdatePrinterDialog.vue";
 import FileExplorerSideNav from "@/components/Generic/SideNavs/FileExplorerSideNav.vue";
+import CreatePrinterDialog from "@/components/Generic/Dialogs/CreatePrinterDialog.vue";
 
 @Component({
-  components: { TopBar, NavigationDrawer, UpdatePrinterDialog, FileExplorerSideNav, FooterList, ErrorAlert }
+  components: { TopBar, NavigationDrawer, UpdatePrinterDialog, CreatePrinterDialog, FileExplorerSideNav, FooterList, ErrorAlert }
 })
 export default class App extends Vue {
   sseClient?: SSEClient;

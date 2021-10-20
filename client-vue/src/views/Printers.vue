@@ -100,7 +100,7 @@
       <template v-slot:item.actions="{ item }">
         <PrinterUrlAction :printer="item"/>
         <PrinterConnectionAction :printer="item"/>
-        <PrinterSettingsAction :printer="item" v-on:update:show="openEditDialog"/>
+        <PrinterSettingsAction :printer="item" v-on:update:show="openEditDialog(item)"/>
       </template>
       <template v-slot:expanded-item="{ headers, item }">
         <td :colspan="headers.length">
@@ -109,16 +109,7 @@
       </template>
     </v-data-table>
 
-    <BatchJsonCreateDialog
-      :show.sync="showJsonImportDialog"
-      v-on:update:show="onChangeShowDialog($event)"
-    />
-    <CreatePrinterDialog :show.sync="showCreateDialog"/>
-    <UpdatePrinterDialog
-      :printer-id="selectedPrinterId"
-      :show.sync="showEditDialog"
-      v-on:update:show="onChangeShowEditDialog($event)"
-    />
+    <BatchJsonCreateDialog :show.sync="showJsonImportDialog"/>
   </v-card>
 </template>
 
@@ -157,9 +148,6 @@ export default class Printers extends Vue {
 
   autoPrint = true;
   showJsonImportDialog = false;
-  showCreateDialog = false;
-  showEditDialog = false;
-  selectedPrinterId?: string = "";
   search = "";
   expanded = [];
   tableHeaders = [
@@ -185,24 +173,12 @@ export default class Printers extends Vue {
     return printersState.printers;
   }
 
-  openEditDialog(printerId: string) {
-    this.selectedPrinterId = printerId;
-    this.showEditDialog = true;
-  }
-
-  onChangeShowEditDialog(event: boolean) {
-    if (!event) {
-      this.selectedPrinterId = undefined;
-    }
+  openEditDialog(printer: Printer) {
+    printersState.setUpdateDialogPrinter(printer);
   }
 
   async createPrinterModal() {
     this.showJsonImportDialog = true;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onChangeShowDialog(event: any) {
-    // Placeholder
   }
 
   async toggleEnabled(event: any, printer: Printer) {
