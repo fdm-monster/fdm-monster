@@ -64,14 +64,12 @@
     <PrinterGrid class="ma-2" />
 
     <CreatePrinterDialog :show.sync="showDialog" v-on:update:show="onChangeShowDialog($event)" />
-
-    <SideNavExplorer />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { Component, Watch } from "vue-property-decorator";
+import { Component } from "vue-property-decorator";
 import CreatePrinterDialog from "@/components/Dialogs/CreatePrinterDialog.vue";
 import PrinterGrid from "@/components/PrinterGrid/PrinterGrid.vue";
 import { printersState } from "@/store/printers.state";

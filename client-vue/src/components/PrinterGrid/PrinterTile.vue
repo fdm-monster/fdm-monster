@@ -58,7 +58,7 @@ export default class PrinterGridTile extends Vue {
   }
 
   clickInfo() {
-    printersState.setViewedPrinter(this.printer);
+    printersState.setSideNavPrinter(this.printer);
   }
 
   clickStop() {

@@ -20,12 +20,6 @@
         </v-row>
       </v-col>
     </v-row>
-
-    <UpdatePrinterDialog
-      :printer-id="selectedPrinterId"
-      :show.sync="showDialog"
-      v-on:update:show="onChangeShowDialog($event)"
-    />
   </div>
 </template>
 
@@ -33,8 +27,6 @@
 import Vue from "vue";
 import Login from "@/components/Generic/Login.vue";
 import { Component } from "vue-property-decorator";
-import { EVENTS } from "@/components/PrinterGrid/GridStack/GridStackItem.vue";
-import { Printer } from "@/models/printers/printer.model";
 import UpdatePrinterDialog from "@/components/Dialogs/UpdatePrinterDialog.vue";
 import { sseGroups, sseMessageGlobal } from "@/event-bus/sse.events";
 import { printersState } from "@/store/printers.state";
@@ -46,8 +38,6 @@ import { columnCount, rowCount } from "@/constants/printer-grid.constants";
   components: { UpdatePrinterDialog, PrinterGridTile, Login }
 })
 export default class PrinterGrid extends Vue {
-  showDialog = false;
-  selectedPrinterId?: string = "";
   loading = true;
 
   // Translation value from 12 cols => 12/x
@@ -93,14 +83,10 @@ export default class PrinterGrid extends Vue {
   }
 
   async mounted() {
-    this.$bus.on(EVENTS.itemClicked, this.openCreateDialog);
     this.$bus.on(sseGroups, this.onSseMessage);
   }
 
-  /**
-   * Required to update the grid with skeletons without gridstack breaking and without losing state
-   */
-  onSseMessage(groups: PrinterGroup[]) {
+  onSseMessage() {
     this.updateGridMatrix();
   }
 
@@ -108,20 +94,8 @@ export default class PrinterGrid extends Vue {
     this.groupMatrix = printersState.gridSortedPrinterGroups(4, 4);
   }
 
-  openCreateDialog(printer: Printer) {
-    this.selectedPrinterId = printer.id;
-    this.showDialog = true;
-  }
-
-  onChangeShowDialog(event: boolean) {
-    if (!event) {
-      this.selectedPrinterId = undefined;
-    }
-  }
-
   beforeDestroy() {
     this.$bus.off(sseMessageGlobal, this.onSseMessage);
-    this.$bus.off(EVENTS.itemClicked, this.openCreateDialog);
   }
 }
 </script>

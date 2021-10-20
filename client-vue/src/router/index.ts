@@ -1,6 +1,6 @@
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
-import HomePage from "@/views/HomePage.vue";
+import HomePrinterGrid from "@/views/HomePrinterGrid.vue";
 import Printers from "@/views/Printers.vue";
 import Settings from "@/views/Settings.vue";
 import About from "@/views/About.vue";
@@ -12,7 +12,7 @@ const routes: Array<RouteConfig> = [
   {
     path: "/",
     name: "Home",
-    component: HomePage
+    component: HomePrinterGrid
   },
   {
     path: "/printers",

@@ -23,11 +23,16 @@ class PrintersModule extends VuexModule {
   printerGroups: PrinterGroup[] = [];
   lastUpdated?: number = undefined;
 
-  viewedPrinter?: Printer = undefined;
+  sideNavPrinter?: Printer = undefined;
+  updateDialogPrinter?: Printer = undefined;
   selectedPrinters: Printer[] = [];
 
-  get currentViewedPrinter() {
-    return this.viewedPrinter;
+  get currentSideNavPrinter() {
+    return this.sideNavPrinter;
+  }
+
+  get currentUpdateDialogPrinter() {
+    return this.updateDialogPrinter;
   }
 
   get printer() {
@@ -104,8 +109,12 @@ class PrintersModule extends VuexModule {
     this.selectedPrinters = [];
   }
 
-  @Mutation _setViewedPrinter(printer?: Printer) {
-    this.viewedPrinter = printer;
+  @Mutation _setSideNavPrinter(printer?: Printer) {
+    this.sideNavPrinter = printer;
+  }
+
+  @Mutation _setUpdateDialogPrinter(printer?: Printer) {
+    this.updateDialogPrinter = printer;
   }
 
   @Mutation replacePrinter({ printerId, printer }: { printerId: string; printer: Printer }) {
@@ -129,9 +138,9 @@ class PrintersModule extends VuexModule {
   }
 
   @Mutation setPrinters(printers: Printer[]) {
-    const viewedPrinterId = this.viewedPrinter?.id;
+    const viewedPrinterId = this.sideNavPrinter?.id;
     if (viewedPrinterId) {
-      this.viewedPrinter = printers.find((p) => p.id === viewedPrinterId);
+      this.sideNavPrinter = printers.find((p) => p.id === viewedPrinterId);
     }
     this.printers = printers;
     this.lastUpdated = Date.now();
@@ -318,8 +327,13 @@ class PrintersModule extends VuexModule {
   }
 
   @Action
-  setViewedPrinter(printer?: Printer) {
-    this._setViewedPrinter(printer);
+  setSideNavPrinter(printer?: Printer) {
+    this._setSideNavPrinter(printer);
+  }
+
+  @Action
+  setUpdateDialogPrinter(printer?: Printer) {
+    this._setUpdateDialogPrinter(printer);
   }
 
   @Action

@@ -9,6 +9,8 @@
       </ErrorAlert>
     </v-main>
 
+    <UpdatePrinterDialog />
+    <SideNavExplorer />
     <!--    <FooterList></FooterList>-->
   </v-app>
 </template>
@@ -27,14 +29,13 @@ import { serverSettingsState } from "@/store/server-settings.state";
 import { printersState } from "@/store/printers.state";
 import { updatedPrinterEvent } from "@/event-bus/printer.events";
 import { infoMessageEvent } from "@/event-bus/alert.events";
+import SideNavExplorer from "@/components/Generic/SideNavExplorer.vue";
+import UpdatePrinterDialog from "@/components/Dialogs/UpdatePrinterDialog.vue";
 
 @Component({
-  components: { TopBar, NavigationDrawer, FooterList, ErrorAlert }
+  components: { TopBar, NavigationDrawer, UpdatePrinterDialog, SideNavExplorer, FooterList, ErrorAlert }
 })
 export default class App extends Vue {
-  /**
-   * Listens to events - replaced with socketIO client later
-   */
   sseClient?: SSEClient;
 
   async created() {
@@ -62,6 +63,7 @@ export default class App extends Vue {
     if (message.trackedUploads?.length > 0) {
       this.$bus.emit(infoMessageEvent, "Server to OctoPrint (1/1) uploading", message.trackedUploads[0].progress?.percent);
     }
+    
     if (message.printers) {
       printersState.savePrinters(message.printers);
 
