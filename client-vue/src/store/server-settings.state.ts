@@ -24,5 +24,5 @@ export class ServerSettingsModule extends VuexModule {
 
 export const serverSettingsState = new ServerSettingsModule({
   store,
-  name: ServerSettingsModule.name
+  name: "server-settings"
 });

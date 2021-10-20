@@ -5,7 +5,6 @@ import { PrinterFileService, PrintersService } from "@/backend";
 import { CreatePrinter } from "@/models/printers/crud/create-printer.model";
 import { PrinterGroupService } from "@/backend/printer-group.service";
 import store from "@/store/index";
-import { FileUploadCommands } from "@/models/printers/file-upload-commands.model";
 import { ClearedFilesResult, PrinterFile } from "@/models/printers/printer-file.model";
 import { PrinterFileBucket } from "@/models/printers/printer-file-bucket.model";
 import { PrinterFileCache } from "@/models/printers/printer-file-cache.model";
@@ -281,28 +280,6 @@ class PrintersModule extends VuexModule {
     this.setPrinterGroups(data);
 
     return data;
-  }
-
-  @Action
-  async dropUploadPrinterFile({
-    printerId,
-    files,
-    commands
-  }: {
-    printerId: string;
-    files: File[];
-    commands?: FileUploadCommands;
-  }) {
-    if (!printerId) throw new Error("Printer ID was not provided for file upload");
-
-    const uploadedFiles = files.filter((f) => f.name) as File[];
-
-    await PrinterFileService.uploadFiles(printerId, uploadedFiles, commands);
-
-    // TODO update
-    // this.setPrinterFiles({ printerId, files: [] });
-
-    return "data";
   }
 
   @Action

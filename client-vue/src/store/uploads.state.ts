@@ -52,5 +52,5 @@ class UploadsModule extends VuexModule {
 
 export const uploadsState = new UploadsModule({
   store,
-  name: UploadsModule.name
+  name: "uploads"
 });
