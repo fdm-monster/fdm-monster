@@ -51,28 +51,22 @@ export class PrinterFileService extends BaseService {
     Vue.bus.emit(infoMessageEvent, "Browser to server uploading", progress.loaded / progress.total);
   }
 
-  static async uploadFiles(
+  static async uploadFile(
     printerId: string,
-    files: File[],
+    file: File,
     commands: FileUploadCommands = { select: true, print: true }
   ) {
     const path = ServerApi.printerFilesUploadRoute(printerId);
 
     const formData = new FormData();
-    for (let i = 0; i < files.length; i++) {
-      formData.append("files[" + i + "]", files[i]);
-    }
-
     // Cant print more than 1 file at a time
-    if (files.length === 1) {
-      if (commands.select) {
-        formData.append("select", "true");
-      }
-      if (commands.print) {
-        formData.append("print", "true");
-      }
+    if (commands.select) {
+      formData.append("select", "true");
     }
-    // TODO more than 1 will now fail due to API validation
+    if (commands.print) {
+      formData.append("print", "true");
+    }
+    formData.append("files[0]", file);
 
     return this.postUploadApi(
       path,

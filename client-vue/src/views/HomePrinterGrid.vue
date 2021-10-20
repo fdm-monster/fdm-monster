@@ -77,6 +77,8 @@ import { PrintersService } from "@/backend";
 import { formatBytes } from "@/utils/file-size.util";
 import SideNavExplorer from "@/components/Generic/SideNavs/FileExplorerSideNav.vue";
 import { infoMessageEvent } from "@/event-bus/alert.events";
+import { uploadsState } from "@/store/uploads.state";
+import { convertMultiPrinterFileToQueue } from "@/utils/uploads-state.utils";
 
 @Component({
   components: { PrinterGrid, SideNavExplorer, CreatePrinterDialog },
@@ -109,9 +111,8 @@ export default class HomePage extends Vue {
       this.$bus.emit(infoMessageEvent, `${ incompleteListCount } printers were skipped as they are not accessible or disabled (now).`);
     }
 
-    for (let printer of accessiblePrinters) {
-      await printersState.dropUploadPrinterFile({ printerId: printer.id, files: [this.selectedFile] });
-    }
+    const uploads = convertMultiPrinterFileToQueue(accessiblePrinters, this.selectedFile);
+    uploadsState.queueUploads(uploads);
 
     this.$refs.fileUpload.value = "";
     this.clearSelectedPrinters();

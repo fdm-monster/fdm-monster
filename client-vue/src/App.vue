@@ -1,11 +1,11 @@
 <template>
   <v-app>
-    <NavigationDrawer/>
-    <TopBar/>
+    <NavigationDrawer />
+    <TopBar />
 
     <v-main>
       <ErrorAlert>
-        <router-view/>
+        <router-view />
       </ErrorAlert>
     </v-main>
 
@@ -35,7 +35,15 @@ import FileExplorerSideNav from "@/components/Generic/SideNavs/FileExplorerSideN
 import CreatePrinterDialog from "@/components/Generic/Dialogs/CreatePrinterDialog.vue";
 
 @Component({
-  components: { TopBar, NavigationDrawer, UpdatePrinterDialog, CreatePrinterDialog, FileExplorerSideNav, FooterList, ErrorAlert }
+  components: {
+    TopBar,
+    NavigationDrawer,
+    UpdatePrinterDialog,
+    CreatePrinterDialog,
+    FileExplorerSideNav,
+    FooterList,
+    ErrorAlert
+  }
 })
 export default class App extends Vue {
   sseClient?: SSEClient;
@@ -63,7 +71,11 @@ export default class App extends Vue {
     }
 
     if (message.trackedUploads?.length > 0) {
-      this.$bus.emit(infoMessageEvent, "Server to OctoPrint (1/1) uploading", message.trackedUploads[0].progress?.percent);
+      this.$bus.emit(
+        infoMessageEvent,
+        "Server to OctoPrint (1/1) uploading",
+        message.trackedUploads[0].progress?.percent
+      );
     }
 
     if (message.printers) {
@@ -72,10 +84,10 @@ export default class App extends Vue {
       // Emit the global update
       this.$bus.emit(sseMessageGlobal, message);
 
-      message.printers.forEach(p => {
+      message.printers.forEach((p) => {
         if (!p.id) return;
         this.$bus.emit(updatedPrinterEvent(p.id), p);
-      })
+      });
     }
 
     if (message.testPrinter) {

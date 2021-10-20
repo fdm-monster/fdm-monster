@@ -17,11 +17,16 @@
       <v-list-item-content v-if="storedSideNavPrinter">
         <v-list-item-title>
           {{ storedSideNavPrinter.printerName }}
-          <strong v-if="storedSideNavPrinter.printerState.state === 'Operational'" class="float-end">
+          <strong
+            v-if="storedSideNavPrinter.printerState.state === 'Operational'"
+            class="float-end"
+          >
             {{ storedSideNavPrinter.printerState.state }}
           </strong>
           <strong
-            v-if="!storedSideNavPrinter.enabled || !storedSideNavPrinter.apiAccessibility.accessible"
+            v-if="
+              !storedSideNavPrinter.enabled || !storedSideNavPrinter.apiAccessibility.accessible
+            "
             class="float-end"
           >
             OFFLINE/DISABLED
@@ -172,7 +177,7 @@
               </span>
             </template>
             <span>
-              File: {{ file.name }} <br/>
+              File: {{ file.name }} <br />
               Size: {{ formatBytes(file.size) }}
             </span>
           </v-tooltip>

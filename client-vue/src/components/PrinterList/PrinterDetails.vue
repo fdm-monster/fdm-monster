@@ -1,31 +1,31 @@
 <template>
   <v-container
     v-if="printer"
+    v-drop-upload="{ printers: [printer] }"
     :style="dragging ? 'background-color:red' : ''"
-    class="slow-background"
     transition="scale-transition"
-    @dragenter="dragging = true"
-    @dragleave="dragging = false"
-    @drop.prevent="addFile"
-    @dragover.prevent="dragging = true"
   >
     <v-row>
       <v-col>
-        Name: {{ printer.printerName }} <br/>
-        URL: {{ printer.printerURL }} <br/>
-        Host: {{ printer.hostState.state }} - <small><strong>{{ printer.hostState.desc }}</strong></small> <br/>
-        WebSocket: {{ printer.webSocketState.colour }} <br/>
-        Printer: {{ printer.printerState.state }} <br/>
-        Files: {{ getPrinterFileCount() }} <br/>
+        Name: {{ printer.printerName }} <br />
+        URL: {{ printer.printerURL }} <br />
+        Host: {{ printer.hostState.state }} -
+        <small>
+          <strong>{{ printer.hostState.desc }}</strong>
+        </small>
+        <br />
+        WebSocket: {{ printer.webSocketState.colour }} <br />
+        Printer: {{ printer.printerState.state }} <br />
+        Files: {{ getPrinterFileCount() }} <br />
         Sort Index: {{ printer.sortIndex }}
       </v-col>
       <v-col>
-        <RefreshFilesAction :printer="printer" class="d-flex justify-end"/>
-        <PrinterDeleteAction :printer="printer" class="d-flex justify-end"/>
+        <RefreshFilesAction :printer="printer" class="d-flex justify-end" />
+        <PrinterDeleteAction :printer="printer" class="d-flex justify-end" />
       </v-col>
     </v-row>
 
-    <FileList :file-list="printer.fileList" :printer-id="printerId"/>
+    <FileList :file-list="printer.fileList" :printer-id="printerId" />
   </v-container>
 </template>
 
@@ -53,21 +53,5 @@ export default class PrinterDetails extends Vue {
   getPrinterFileCount() {
     return printersState.printerFileBucket(this.printer.id)?.files.length || 0;
   }
-
-  async addFile(e: DragEvent) {
-    if (!e.dataTransfer) return;
-    this.dragging = false;
-
-    await printersState.dropUploadPrinterFile({
-      printerId: this.printerId,
-      files: Array.from(e.dataTransfer.files)
-    });
-  }
 }
 </script>
-
-<style>
-.slow-background {
-  transition: background-color 0.5s ease;
-}
-</style>

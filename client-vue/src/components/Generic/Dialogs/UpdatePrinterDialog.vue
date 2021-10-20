@@ -3,17 +3,17 @@
     <validation-observer ref="validationObserver" v-slot="{ invalid }">
       <v-card v-if="storedUpdatedPrinter">
         <v-card-title>
-            <span class="text-h5">
-              <v-avatar color="primary" size="56">
-                {{ avatarInitials() }}
-              </v-avatar>
-              Updating Printer
-            </span>
+          <span class="text-h5">
+            <v-avatar color="primary" size="56">
+              {{ avatarInitials() }}
+            </v-avatar>
+            Updating Printer
+          </span>
         </v-card-title>
         <v-card-text>
           <v-row>
             <v-col :cols="showChecksPanel ? 8 : 12">
-              <PrinterCrudForm ref="printerUpdateForm" :printer-id="storedUpdatedPrinter.id"/>
+              <PrinterCrudForm ref="printerUpdateForm" :printer-id="storedUpdatedPrinter.id" />
             </v-col>
 
             <PrinterChecksPanel v-if="showChecksPanel" :cols="4" :test-progress="testProgress">
@@ -147,7 +147,7 @@ export default class UpdatePrinterDialog extends Vue {
     });
 
     this.$bus.emit(updatedPrinterEvent(printerId as string), updatedData);
-    this.$bus.emit(infoMessageEvent, `Printer ${ updatedPrinter.printerName } updated`);
+    this.$bus.emit(infoMessageEvent, `Printer ${updatedPrinter.printerName} updated`);
   }
 
   closeDialog() {

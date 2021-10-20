@@ -59,8 +59,8 @@
         </v-list-item-action>
         <v-list-item-content>
           <v-list-item-title>Notifications</v-list-item-title>
-          <v-list-item-subtitle
-            >Notify me about updates to apps or games that I downloaded
+          <v-list-item-subtitle>
+            Notify me about updates to apps or games that I downloaded
           </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
@@ -91,7 +91,7 @@
 <script>
 import Vue from "vue";
 import { Component } from "vue-property-decorator";
-import { PrinterGroupService, PrinterFileService, PrintersService } from "@/backend";
+import { PrinterGroupService, PrinterFileService } from "@/backend";
 import { infoMessageEvent } from "@/event-bus/alert.events";
 import { printersState } from "@/store/printers.state";
 import { PrinterSettingsService } from "@/backend/printer-settings.service";

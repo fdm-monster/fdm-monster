@@ -41,7 +41,7 @@
         <v-toolbar flat>
           <v-toolbar-title>Showing printers</v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-switch v-model="reorder" class="mt-5 mr-3" dark label="Sort mode"/>
+          <v-switch v-model="reorder" class="mt-5 mr-3" dark label="Sort mode" />
 
           <v-btn class="ml-3" color="primary" type="button" @click="openImportJsonPrintersDialog()">
             Import JSON Printers
@@ -98,9 +98,9 @@
         </v-chip>
       </template>
       <template v-slot:item.actions="{ item }">
-        <PrinterUrlAction :printer="item"/>
-        <PrinterConnectionAction :printer="item"/>
-        <PrinterSettingsAction :printer="item" v-on:update:show="openEditDialog(item)"/>
+        <PrinterUrlAction :printer="item" />
+        <PrinterConnectionAction :printer="item" />
+        <PrinterSettingsAction :printer="item" v-on:update:show="openEditDialog(item)" />
       </template>
       <template v-slot:expanded-item="{ headers, item }">
         <td :colspan="headers.length">
@@ -109,7 +109,7 @@
       </template>
     </v-data-table>
 
-    <BatchJsonCreateDialog :show.sync="showJsonImportDialog"/>
+    <BatchJsonCreateDialog :show.sync="showJsonImportDialog" />
   </v-card>
 </template>
 
@@ -180,7 +180,7 @@ export default class Printers extends Vue {
   openCreatePrinterDialog() {
     printersState.setCreateDialogOpened(true);
   }
-  
+
   async openImportJsonPrintersDialog() {
     this.showJsonImportDialog = true;
   }
