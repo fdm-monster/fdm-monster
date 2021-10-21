@@ -107,7 +107,7 @@ class PrintersModule extends VuexModule {
     }
   }
 
-  @Mutation resetSelectedPrinters() {
+  @Mutation _resetSelectedPrinters() {
     this.selectedPrinters = [];
   }
 
@@ -332,7 +332,7 @@ class PrintersModule extends VuexModule {
 
   @Action
   clearSelectedPrinters() {
-    this.resetSelectedPrinters();
+    this._resetSelectedPrinters();
   }
 
   @Action

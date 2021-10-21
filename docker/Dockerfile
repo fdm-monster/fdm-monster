@@ -3,7 +3,8 @@ WORKDIR /app
 
 RUN npm install -g pm2
 
-COPY . /app
+COPY . .
+RUN npm ci --production
 
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
