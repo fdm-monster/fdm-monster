@@ -1,7 +1,7 @@
 {
   "name": "@3d-print-farm/client",
   "author": "David Zwart",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "private": false,
   "repository": {
     "type": "git",
@@ -9,7 +9,7 @@
   },
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "build": "vue-cli-service build --skip-plugins pwa,workbox",
     "build:dev": "vue-cli-service build --mode development",
     "test:unit": "vue-cli-service test:unit",
     "test:e2e": "vue-cli-service test:e2e",
