@@ -1,8 +1,3 @@
 module.exports = {
-  transpileDependencies: ["vuetify"],
-  pwa: {
-    workboxOptions: {
-      ignoreURLParametersMatching: [/^api/]
-    }
-  }
+  transpileDependencies: ["vuetify"]
 };
