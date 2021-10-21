@@ -172,13 +172,14 @@
         <v-list-item-content>
           <v-tooltip bottom>
             <template v-slot:activator="{ on, attrs }">
-              <span v-bind="attrs" v-on="on">
+              <span v-bind="attrs" v-on="on" :class="{'current-file-print' : isFileBeingPrinted(file)}">
                 {{ file.name }}
               </span>
             </template>
             <span>
-              File: {{ file.name }} <br />
-              Size: {{ formatBytes(file.size) }}
+              File: {{ file.name }} <br/>
+              Size: {{ formatBytes(file.size) }} <br/>
+              <strong>{{ isFileBeingPrinted(file) ? "Printing" : "Unused" }}</strong>
             </span>
           </v-tooltip>
           <v-list-item-title></v-list-item-title>
@@ -368,6 +369,10 @@ export default class FileExplorerSideNav extends Vue {
 <style>
 .extra-dense-list-item {
   margin-top: -7px;
+}
+
+.current-file-print {
+  color: red;
 }
 
 .pulsating-red {
