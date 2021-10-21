@@ -3,6 +3,7 @@ import { Printer } from "@/models/printers/printer.model";
 import { uploadsState } from "@/store/uploads.state";
 import { convertMultiPrinterFileToQueue } from "@/utils/uploads-state.utils";
 import { infoMessageEvent } from "@/event-bus/alert.events";
+import { printersState } from "@/store/printers.state";
 
 const bindDropConditionally = (el: HTMLElement, printers: Printer[], context?: Vue) => {
   if (printers?.length) {
@@ -17,6 +18,8 @@ const bindDropConditionally = (el: HTMLElement, printers: Printer[], context?: V
 
       const uploads = convertMultiPrinterFileToQueue(printers, file);
       uploadsState.queueUploads(uploads);
+
+      printersState.clearSelectedPrinters();
     };
   } else {
     el.ondrop = async (e) => {
