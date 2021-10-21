@@ -3,8 +3,7 @@
     <v-toolbar-title class="text-uppercase white--text">
       <span class="font-weight-light">3D Print Far</span>
       <strong>MTB3D</strong>
-      <small class="ml-12"> {{ currentTimeDiff || getWorkTimeDiff() }} TODAY</small>
-      <small class="ml-6"> {{ currentWeekendCountDown }} WEEKEND</small>
+      <strong class="ml-12"> {{ currentTimeDiff || getWorkTimeDiff() }} to 18:00</strong>
     </v-toolbar-title>
     <v-spacer></v-spacer>
 
@@ -23,13 +22,17 @@ import { DateTime } from "luxon";
 })
 export default class TopBar extends Vue {
   currentTimeDiff = "";
-  currentWeekendCountDown = "";
 
   getWorkTimeDiff() {
+    this.setWorkTimeDiff();
+    
     setInterval(() => {
-      this.currentWeekendCountDown = DateTime.now().startOf("week").set({weekDay: 5, hour: 18}).diffNow().toFormat("dD h:mm:ss");
-      this.currentTimeDiff = DateTime.fromObject({hour: 18}).diffNow().toFormat("h:mm:ss");
-    }, 1000);
+      this.setWorkTimeDiff();
+    }, 15000);
+  }
+
+  setWorkTimeDiff() {
+    this.currentTimeDiff = DateTime.fromObject({hour: 18}).diffNow().toFormat("hh:mm");
   }
 }
 </script>
