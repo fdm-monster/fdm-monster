@@ -185,9 +185,18 @@
         </v-list-item-content>
 
         <v-list-item-action>
-          <v-btn :disabled="isFileBeingPrinted(file)" icon @click="deleteFile(file)">
-            <v-icon color="grey lighten-1">delete</v-icon>
-          </v-btn>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn v-bind="attrs"
+                     v-on="on"
+                     :disabled="isFileBeingPrinted(file)" icon @click="deleteFile(file)">
+                <v-icon color="grey lighten-1">delete</v-icon>
+              </v-btn>
+            </template>
+            <span>
+              Delete file
+            </span>
+          </v-tooltip>
         </v-list-item-action>
       </v-list-item>
     </v-list>

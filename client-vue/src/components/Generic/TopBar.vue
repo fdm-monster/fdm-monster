@@ -25,7 +25,7 @@ export default class TopBar extends Vue {
 
   getWorkTimeDiff() {
     this.setWorkTimeDiff();
-    
+
     setInterval(() => {
       this.setWorkTimeDiff();
     }, 15000);
