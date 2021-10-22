@@ -16,6 +16,9 @@ function expectEmptyResponse(response) {
 }
 
 function expectOkResponse(response, matchedBody) {
+  if (response.statusCode >= 400) {
+    console.warn(response.body);
+  }
   expect(response.statusCode).toEqual(200);
   if (!matchedBody) {
     return;

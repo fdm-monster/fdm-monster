@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const AlertsSchema = new mongoose.Schema({
+const AlertSchema = new mongoose.Schema({
   active: {
     type: Boolean,
     required: true
@@ -23,6 +23,6 @@ const AlertsSchema = new mongoose.Schema({
   }
 });
 
-const Alert = mongoose.model("Alerts", AlertsSchema);
+const Alert = mongoose.model("Alerts", AlertSchema);
 
 module.exports = Alert;

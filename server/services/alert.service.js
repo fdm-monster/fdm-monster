@@ -1,5 +1,5 @@
 const Logger = require("../handlers/logger.js");
-const Alert = require("../models/Alerts.js");
+const Alert = require("../models/Alert.js");
 const { NotFoundException } = require("../exceptions/runtime.exceptions");
 
 class AlertService {
