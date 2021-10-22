@@ -58,9 +58,9 @@ class AlertController {
   }
 
   async testAlertScript(req, res) {
-    const data = await validateInput(req.body, testAlertScriptRules);
+    const { scriptLocation, message } = await validateInput(req.body, testAlertScriptRules);
 
-    let testExecution = await this.#scriptService.execute(data.scriptLocation, data.message);
+    let testExecution = await this.#scriptService.execute(scriptLocation, message);
     res.send(testExecution);
   }
 }
