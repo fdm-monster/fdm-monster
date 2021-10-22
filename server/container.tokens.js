@@ -6,7 +6,6 @@ const DITokens = {
   eventEmitter2: "eventEmitter2",
   printerService: "printerService",
   printerGroupService: "printerGroupService",
-  farmStatisticsService: "farmStatisticsService",
   serverSettingsService: "serverSettingsService",
   serverUpdateService: "serverUpdateService",
   serverLogsService: "serverLogsService",
@@ -35,8 +34,6 @@ const DITokens = {
   printerStateFactory: "printerStateFactory",
   printerState: "printerState",
   // Caches
-  sortingFilteringCache: "sortingFilteringCache",
-  heatMapCache: "heatMapCache",
   printerGroupsCache: "printerGroupsCache",
   connectionLogsCache: "connectionLogsCache",
   jobsCache: "jobsCache",

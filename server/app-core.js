@@ -104,8 +104,6 @@ function serveControllerRoutes(app) {
 
 async function serveApiNormally(app, container, quick_boot = false) {
   if (!quick_boot) {
-    logger.info("Initialising FarmInformation...");
-
     const multerService = container.resolve(DITokens.multerService);
     await multerService.clearUploadsFolder();
     const printersStore = container.resolve(DITokens.printersStore);
@@ -123,8 +121,6 @@ async function serveApiNormally(app, container, quick_boot = false) {
 
     // Just validation, job cache is not seeded by database
     container.resolve(DITokens.jobsCache);
-    const heatMapCache = container.resolve(DITokens.heatMapCache);
-    await heatMapCache.initHeatMap();
 
     // const api = container.resolve(DITokens.octoPrintApiService);
     // await api
