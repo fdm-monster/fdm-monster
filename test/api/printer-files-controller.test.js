@@ -6,8 +6,10 @@ const { AppConstants } = require("../../server/app.constants");
 const { setupTestApp } = require("../../server/app-test");
 const Printer = require("../../server/models/Printer");
 const { createTestPrinter } = require("./test-data/create-printer");
+const { expectOkResponse, expectInvalidResponse } = require("../extensions");
 
 let request;
+let configuredContainer;
 
 const printerFilesRoute = AppConstants.apiRoute + "/printer-files";
 const getRoute = (id) => `${printerFilesRoute}/${id}`;
@@ -15,7 +17,8 @@ const getCacheRoute = (id) => `${printerFilesRoute}/${id}/cache`;
 
 beforeAll(async () => {
   await dbHandler.connect();
-  const { server, container } = await setupTestApp(true);
+  let { server, container } = await setupTestApp(true);
+  configuredContainer = container;
 
   request = supertest(server);
 });
@@ -25,29 +28,29 @@ beforeEach(async () => {
 });
 
 describe("PrinterFilesController", () => {
-  it(`should not allow GET on ${printerFilesRoute} for nonexisting printer`, async () => {
+  it(`should return 404 on ${printerFilesRoute} for nonexisting printer`, async () => {
     const printerId = "60ae2b760bca4f5930be3d88";
     const path = getRoute(printerId);
-    const res = await request.post(path).send();
+    const res = await request.get(path).send();
 
     // Assert server failed
     expect(res.statusCode).toEqual(404);
   });
 
-  it(`should not allow GET on ${printerFilesRoute}`, async () => {
-    const path = getRoute(printerFilesRoute);
-    const res = await request.post(path).send();
+  it(`should require 'recursive' on ${printerFilesRoute} for existing printer`, async () => {
+    const printer = await createTestPrinter(request);
+    const path = getRoute(printer.id);
+    const response = await request.get(path).send();
 
     // Assert server failed
-    expect(res.statusCode).toEqual(404);
+    expectInvalidResponse(response, ["recursive"]);
   });
 
   it("should allow GET on printer files cache", async () => {
     const printer = await createTestPrinter(request);
     const path = getCacheRoute(printer.id);
-    const res = await request.get(path).send();
+    const response = await request.get(path).send();
 
-    // Assert server failed
-    expect(res.statusCode).toEqual(200);
+    expectOkResponse(response);
   });
 });

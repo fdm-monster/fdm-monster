@@ -16,7 +16,7 @@ const { ValidationException } = require("../exceptions/runtime.exceptions");
 const fs = require("fs");
 const { printerLoginToken, printerResolveMiddleware } = require("../middleware/printer");
 
-class PrinterFileController {
+class PrinterFilesController {
   #filesStore;
 
   #octoPrintApiService;
@@ -243,7 +243,7 @@ class PrinterFileController {
 }
 
 // prettier-ignore
-module.exports = createController(PrinterFileController)
+module.exports = createController(PrinterFilesController)
     .prefix(AppConstants.apiRoute + "/printer-files")
     .before([ensureAuthenticated, printerResolveMiddleware()])
     .post("/purge", "purgeIndexedFiles")
