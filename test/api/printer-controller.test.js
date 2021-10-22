@@ -26,7 +26,7 @@ beforeAll(async () => {
   request = supertest(server);
 });
 
-beforeEach(async () => {
+afterAll(async () => {
   return Printer.deleteMany({});
 });
 
