@@ -84,35 +84,6 @@ function getDefaultHistoryStatistics() {
 }
 
 /**
- * Get an empty heatmap object (inflate to class when methods and meta is required!)
- * @returns {({data: [], name: string}|{data: [], name: string}|{data: [], name: string}|{data: [], name: string}|{data: [], name: string})[]}
- */
-function getEmptyHeatmap() {
-  return [
-    {
-      name: "Completed",
-      data: []
-    },
-    {
-      name: "Active",
-      data: []
-    },
-    {
-      name: "Idle",
-      data: []
-    },
-    {
-      name: "Offline",
-      data: []
-    },
-    {
-      name: "Disconnected",
-      data: []
-    }
-  ];
-}
-
-/**
  * Get an empty associative array with empty tool and bed temperature data objects
  * @returns {({data: [], name: string}|{data: [], name: string}|{data: [], name: string}|{data: [], name: string}|{data: [], name: string})[]}
  */
@@ -165,7 +136,6 @@ module.exports = {
   getDefaultFileCleanStatistics,
   getDefaultDashboardStatisticsObject,
   getDefaultHistoryStatistics,
-  getEmptyHeatmap,
   getEmptyToolTemperatureArray,
   getEmptyOperationsObject,
   DEFAULT_SPOOL_DENSITY,

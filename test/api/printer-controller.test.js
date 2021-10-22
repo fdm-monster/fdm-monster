@@ -26,8 +26,8 @@ beforeAll(async () => {
   request = supertest(server);
 });
 
-beforeEach(async () => {
-  Printer.deleteMany({});
+afterAll(async () => {
+  return Printer.deleteMany({});
 });
 
 describe("PrintersController", () => {
@@ -188,7 +188,9 @@ describe("PrintersController", () => {
   it("should reset printer power settings correctly", async function () {
     const printer = await createTestPrinter(request);
 
-    const updatePatch = await request.patch(`${printerRoute}/${printer.id}/reset-power-settings`).send();
+    const updatePatch = await request
+      .patch(`${printerRoute}/${printer.id}/reset-power-settings`)
+      .send();
     expectOkResponse(updatePatch);
   });
 

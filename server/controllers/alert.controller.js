@@ -50,28 +50,27 @@ class AlertController {
   }
 
   async delete(req, res) {
-    const data = await validateInput(req.params, idRules);
-    const alertId = data.id;
+    const { id } = await validateInput(req.params, idRules);
 
-    await this.#alertService.delete(alertId);
+    await this.#alertService.delete(id);
 
     res.send();
   }
 
   async testAlertScript(req, res) {
-    const data = await validateInput(req.body, testAlertScriptRules);
+    const { scriptLocation, message } = await validateInput(req.body, testAlertScriptRules);
 
-    let testExecution = await this.#scriptService.execute(data.scriptLocation, data.message);
+    let testExecution = await this.#scriptService.execute(scriptLocation, message);
     res.send(testExecution);
   }
 }
 
 // prettier-ignore
 module.exports = createController(AlertController)
-  .prefix(AppConstants.apiRoute + "/alert")
-  .before([ensureAuthenticated])
-  .get("/", "list")
-  .post("/", "create")
-  .put("/:id", "update")
-  .delete("/:id", "delete")
-  .post("/test-alert-script", "testAlertScript");
+    .prefix(AppConstants.apiRoute + "/alert")
+    .before([ensureAuthenticated])
+    .get("/", "list")
+    .post("/", "create")
+    .put("/:id", "update")
+    .delete("/:id", "delete")
+    .post("/test-alert-script", "testAlertScript");

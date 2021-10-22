@@ -1,4 +1,3 @@
-const awilix = require("awilix");
 const axios = require("axios");
 const DITokens = require("./container.tokens");
 const PrinterService = require("./services/printer.service");
@@ -17,7 +16,6 @@ const ServerLogsService = require("./services/server-logs.service");
 const SystemInfoBundleService = require("./services/system-info-bundle.service");
 const GithubApiService = require("./services/github-api.service");
 const HistoryService = require("./services/history.service");
-const FarmStatisticsService = require("./services/farm-statistics.service");
 const FileCache = require("./state/data/file.cache");
 const HistoryCache = require("./state/data/history.cache");
 const JobsCache = require("./state/data/jobs.cache");
@@ -27,7 +25,6 @@ const PrinterFilesTask = require("./tasks/printer-files.task");
 const PrinterTickerStore = require("./state/printer-ticker.store");
 const PrinterWebsocketTask = require("./tasks/printer-websocket.task");
 const PrinterSseTask = require("./tasks/printer-sse.task");
-const SortingFilteringCache = require("./state/data/sorting-filtering.cache");
 const CurrentOperationsCache = require("./state/data/current-operations.cache");
 const PrinterSystemTask = require("./tasks/printer-system.task");
 const OctoPrintApiService = require("./services/octoprint/octoprint-api.service");
@@ -37,7 +34,6 @@ const PrinterState = require("./state/printer.state");
 const PrinterStateFactory = require("./state/printer-state.factory");
 const FilesStore = require("./state/files.store");
 const FilamentStore = require("./state/filament.store");
-const HeatMapCache = require("./state/data/heatmap.cache");
 const InfluxDbHistoryService = require("./services/influx/influx-db-history.service");
 const InfluxDbFilamentService = require("./services/influx/influx-db-filament.service");
 const InfluxDbPrinterStateService = require("./services/influx/influx-db-printer-state.service");
@@ -102,20 +98,17 @@ function configureContainer() {
     [DITokens.octoPrintApiService]: asClass(OctoPrintApiService).singleton(),
     [DITokens.filamentManagerPluginService]: asClass(FilamentManagerPluginService),
     [DITokens.historyService]: asClass(HistoryService),
-    [DITokens.farmStatisticsService]: asClass(FarmStatisticsService),
     [DITokens.dashboardStatisticsCache]: asClass(DashboardStatisticsCache),
     [DITokens.filamentCache]: asClass(FilamentCache).singleton(),
-    [DITokens.sortingFilteringCache]: asClass(SortingFilteringCache).singleton(),
     [DITokens.currentOperationsCache]: asClass(CurrentOperationsCache).singleton(),
     [DITokens.printerState]: asClass(PrinterState).transient(), // Transient on purpose!
     [DITokens.printerGroupsCache]: asClass(PrinterGroupsCache).singleton(),
     [DITokens.historyCache]: asClass(HistoryCache).singleton(),
     [DITokens.jobsCache]: asClass(JobsCache).singleton(),
-    [DITokens.heatMapCache]: asClass(HeatMapCache).singleton(),
     [DITokens.connectionLogsCache]: asClass(ConnectionLogsCache).singleton(),
     [DITokens.printerTickerStore]: asClass(PrinterTickerStore).singleton(),
     [DITokens.fileCache]: asClass(FileCache).singleton(),
-    [DITokens.fileUploadTrackerCache] : asClass(FileUploadTrackerCache).singleton(),
+    [DITokens.fileUploadTrackerCache]: asClass(FileUploadTrackerCache).singleton(),
     [DITokens.filamentStore]: asClass(FilamentStore), // No need for singleton as its now based on filamentCache
     [DITokens.filesStore]: asClass(FilesStore).singleton(),
     [DITokens.printersStore]: asClass(PrintersStore).singleton(),

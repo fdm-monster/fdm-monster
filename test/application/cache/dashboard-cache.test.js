@@ -1,4 +1,3 @@
-const RoomData = require("../../../server/models/RoomData");
 const DITokens = require("../../../server/container.tokens");
 const { configureContainer } = require("../../../server/container");
 
@@ -16,7 +15,6 @@ describe(DITokens.dashboardStatisticsCache, function () {
   });
 
   test.skip("should call statisticsStart no problem", async () => {
-    await RoomData.create([]);
     await dashboardStatisticsCache.statisticsStart();
   });
 

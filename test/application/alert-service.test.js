@@ -1,5 +1,5 @@
 const dbHandler = require("../db-handler");
-const Alert = require("../../server/models/Alerts");
+const Alert = require("../../server/models/Alert");
 const { configureContainer } = require("../../server/container");
 const DITokens = require("../../server/container.tokens");
 

@@ -4,9 +4,15 @@ const { AppConstants } = require("../app.constants");
 const { isPm2, isNodemon, isNode } = require("../utils/env.utils");
 const { ensureCurrentUserAndGroup } = require("../middleware/users");
 
-const amIAliveAPI = ({ serverUpdateService }) => ({
-  index: async (req, res) => {
-    let softwareUpdateNotification = serverUpdateService.getUpdateNotificationIfAny();
+class AmIAliveController {
+  #serverUpdateService;
+
+  constructor({ serverUpdateService }) {
+    this.#serverUpdateService = serverUpdateService;
+  }
+
+  async index(req, res) {
+    let softwareUpdateNotification = this.#serverUpdateService.getUpdateNotificationIfAny();
 
     // ensure update_available can only be true when Administrator group found
     if (req?.user?.group !== "Administrator") {
@@ -23,10 +29,10 @@ const amIAliveAPI = ({ serverUpdateService }) => ({
       update: softwareUpdateNotification
     });
   }
-});
+}
 
 // prettier-ignore
-module.exports = createController(amIAliveAPI)
-  .prefix(AppConstants.apiRoute + "/amialive")
-  .before([ensureCurrentUserAndGroup])
-  .get("", "index");
+module.exports = createController(AmIAliveController)
+    .prefix(AppConstants.apiRoute + "/amialive")
+    .before([ensureCurrentUserAndGroup])
+    .get("", "index");
