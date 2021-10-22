@@ -12,7 +12,7 @@ class AmIAliveController {
   }
 
   async index(req, res) {
-    let softwareUpdateNotification = serverUpdateService.getUpdateNotificationIfAny();
+    let softwareUpdateNotification = this.#serverUpdateService.getUpdateNotificationIfAny();
 
     // ensure update_available can only be true when Administrator group found
     if (req?.user?.group !== "Administrator") {
