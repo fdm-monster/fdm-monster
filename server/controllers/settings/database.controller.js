@@ -14,7 +14,6 @@ class DatabaseController {
       await HistoryDB.deleteMany({});
       await SpoolsDB.deleteMany({});
       await ProfilesDB.deleteMany({});
-      await roomDataDB.deleteMany({});
       await UserDB.deleteMany({});
       await PrinterDB.deleteMany({});
       await AlertsDB.deleteMany({});

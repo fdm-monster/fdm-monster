@@ -35,7 +35,6 @@ export class ServerApi {
   static filamentManagerDisableRoute = `${ServerApi.filamentManagerRoute}/disable`;
   static alertRoute = `${ServerApi.base}/alert`;
   static testAlertScriptRoute = `${ServerApi.alertRoute}/test-alert-script`;
-  static roomDataRoute = `${ServerApi.base}/room-data`;
 
   static getPrinterRoute = (id: string) => `${ServerApi.printerRoute}/${id}`;
   static getPrinterSettingsRoute = (id: string) => `${ServerApi.printerSettingsRoute}/${id}`;
