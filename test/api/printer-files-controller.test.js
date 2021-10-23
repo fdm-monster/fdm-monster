@@ -7,9 +7,11 @@ const { setupTestApp } = require("../../server/app-test");
 const Printer = require("../../server/models/Printer");
 const { createTestPrinter } = require("./test-data/create-printer");
 const { expectOkResponse, expectInvalidResponse } = require("../extensions");
+const DITokens = require("../../server/container.tokens");
+const { asClass } = require("awilix");
+const OctoPrintApiMock = require("../provisioning/octoprint-api.mock");
 
 let request;
-let configuredContainer;
 
 const printerFilesRoute = AppConstants.apiRoute + "/printer-files";
 const getRoute = (id) => `${printerFilesRoute}/${id}`;
@@ -18,7 +20,9 @@ const getCacheRoute = (id) => `${printerFilesRoute}/${id}/cache`;
 beforeAll(async () => {
   await dbHandler.connect();
   let { server, container } = await setupTestApp(true);
-  configuredContainer = container;
+  container.register({
+    [DITokens.octoPrintApiService]: asClass(OctoPrintApiMock)
+  });
 
   request = supertest(server);
 });
