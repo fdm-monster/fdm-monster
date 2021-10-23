@@ -285,9 +285,8 @@ class PrinterController {
   async getPluginList(req, res) {
     const { printerLogin, currentPrinterId } = getScopedPrinter(req);
 
-    this.#logger.info("Grabbing plugin list for: ", currentPrinterId);
-
     // TODO requires octoprint version for compatibility...
+    this.#logger.info("Querying OctoPrint plugin list for: ", currentPrinterId);
     let pluginList = await this.#octoPrintApiService.getPluginManager(printerLogin);
     res.send(pluginList);
   }

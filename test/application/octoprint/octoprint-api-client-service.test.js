@@ -3,7 +3,7 @@ const dbHandler = require(testPath + "db-handler");
 const { configureContainer } = require("../../../server/container");
 const { ensureSystemSettingsInitiated } = require("../../../server/app-core");
 const DITokens = require("../../../server/container.tokens");
-const AxiosMock = require("../../provisioning/axios.mock");
+const AxiosMock = require("../../mocks/axios.mock");
 const awilix = require("awilix");
 
 let octoPrintApi;

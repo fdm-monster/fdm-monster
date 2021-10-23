@@ -11,8 +11,6 @@ const {
 const Printer = require("../../server/models/Printer");
 const { testApiKey, createTestPrinter } = require("./test-data/create-printer");
 
-let request;
-
 let Model = Printer;
 const listRoute = AppConstants.apiRoute + "/printer";
 const createRoute = listRoute;
@@ -29,11 +27,13 @@ const connectionLogsRoute = (id) => `${getRoute(id)}/connection-logs`;
 const pluginListRoute = (id) => `${getRoute(id)}/plugin-list`;
 const batchRoute = `${listRoute}/batch`;
 
+let request;
+let octoPrintApiService;
 const apiKey = "3dpf3dpf3dpf3dpf3dpf3dpf3dpf3dpf";
 
 beforeAll(async () => {
   await dbHandler.connect();
-  ({ request } = await setupTestApp(true));
+  ({ request, octoPrintApiService } = await setupTestApp(true));
 });
 
 afterAll(async () => {
@@ -194,7 +194,8 @@ describe("PrintersController", () => {
 
   it("should get printer plugin list", async function () {
     const printer = await createTestPrinter(request);
-    const data = await request.get(pluginListRoute(printer.id)).send();
-    expectOkResponse(data);
+    octoPrintApiService.storeResponse(["test"], 200);
+    const res = await request.get(pluginListRoute(printer.id)).send();
+    expectOkResponse(res, ["test"]);
   });
 });

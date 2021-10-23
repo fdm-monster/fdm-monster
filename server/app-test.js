@@ -4,7 +4,7 @@ const { setupEnvConfig } = require("./app-env");
 const { ensureSystemSettingsInitiated } = require("./app-core");
 const supertest = require("supertest");
 const { asClass } = require("awilix");
-const OctoPrintApiMock = require("../test/provisioning/octoprint-api.mock");
+const OctoPrintApiMock = require("../test/mocks/octoprint-api.mock");
 
 /**
  * Setup the application without hassle
@@ -26,10 +26,15 @@ async function setupTestApp(loadPrinterStore = false, mocks) {
 
   if (mocks) container.register(mocks);
   container.register({
-    [DITokens.octoPrintApiService]: asClass(OctoPrintApiMock)
+    [DITokens.octoPrintApiService]: asClass(OctoPrintApiMock).singleton()
   });
 
-  return { server, request: supertest(server), container };
+  return {
+    server,
+    request: supertest(server),
+    container,
+    [DITokens.octoPrintApiService]: container.resolve(DITokens.octoPrintApiService)
+  };
 }
 
 module.exports = {

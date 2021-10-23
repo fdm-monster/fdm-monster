@@ -1,5 +1,6 @@
 const OctoPrintRoutes = require("../../server/services/octoprint/octoprint-api.routes");
 const { processResponse } = require("../../server/services/octoprint/utils/api.utils");
+const { checkPluginManagerAPIDeprecation } = require("../../server/utils/compatibility.utils");
 
 class OctoPrintApiMock extends OctoPrintRoutes {
   #storedResponse;
@@ -24,7 +25,7 @@ class OctoPrintApiMock extends OctoPrintRoutes {
     new URL(url);
 
     // Return mock
-    return Promise.resolve({ data: this.#storedResponse, status: this.#storedStatusCode });
+    return { data: this.#storedResponse, status: this.#storedStatusCode };
   }
 
   async getFiles(printer, recursive = false, responseOptions) {
@@ -35,6 +36,18 @@ class OctoPrintApiMock extends OctoPrintRoutes {
 
   async getFile(printer, path, responseOptions) {
     const { url, options } = this._prepareRequest(printer, this.apiFile(path));
+    const response = await this.#handleResponse(url, options);
+    return processResponse(response, responseOptions);
+  }
+
+  async getPluginManager(printer, responseOptions) {
+    const printerManagerApiCompatible = checkPluginManagerAPIDeprecation(printer.octoPrintVersion);
+
+    const path =
+      printerManagerApiCompatible || !printer.octoPrintVersion
+        ? this.apiPluginManagerRepository1_6_0
+        : this.apiPluginManager;
+    const { url, options } = this._prepareRequest(printer, path);
     const response = await this.#handleResponse(url, options);
     return processResponse(response, responseOptions);
   }
