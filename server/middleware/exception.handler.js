@@ -4,7 +4,7 @@ const {
   InternalServerException,
   ExternalServiceError
 } = require("../exceptions/runtime.exceptions");
-const { AppConstants } = require("../app.constants");
+const { AppConstants } = require("../server.constants");
 
 // https://dev.to/rajajaganathan/express-scalable-way-to-handle-errors-1kd6
 function exceptionHandler(err, req, res, next) {

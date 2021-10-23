@@ -1,5 +1,5 @@
 const dbHandler = require("../db-handler");
-const { setupTestApp } = require("../app-test");
+const { setupTestApp } = require("../test-server");
 const { expectInvalidResponse } = require("../extensions");
 
 let request;

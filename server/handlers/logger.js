@@ -1,5 +1,5 @@
 const winston = require("winston");
-const { AppConstants } = require("../app.constants");
+const { AppConstants } = require("../server.constants");
 
 const dtFormat = new Intl.DateTimeFormat("en-GB", {
   timeStyle: "medium",

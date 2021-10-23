@@ -3,7 +3,7 @@ const { createController } = require("awilix-express");
 const { ensureAuthenticated } = require("../middleware/auth");
 const Spool = require("../models/Spool.js");
 const Profiles = require("../models/Profiles.js");
-const { AppConstants } = require("../app.constants");
+const { AppConstants } = require("../server.constants");
 const Logger = require("../handlers/logger.js");
 
 class FilamentController {

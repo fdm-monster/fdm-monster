@@ -11,7 +11,7 @@ let filesStore;
 beforeAll(async () => {
   await dbHandler.connect();
   container = configureContainer();
-  await container.resolve(DITokens.serverState).ensureSystemSettingsInitiated(container);
+  await container.resolve(DITokens.settingsStore).loadSettings();
 
   printersStore = container.resolve(DITokens.printersStore);
   filesStore = container.resolve(DITokens.filesStore);

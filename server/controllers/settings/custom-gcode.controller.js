@@ -2,7 +2,7 @@ const CustomGcode = require("../../models/CustomGcode");
 const { createController } = require("awilix-express");
 const { ensureAuthenticated } = require("../../middleware/auth");
 const Logger = require("../../handlers/logger.js");
-const { AppConstants } = require("../../app.constants");
+const { AppConstants } = require("../../server.constants");
 
 class CustomGcodeController {
   #logger = new Logger("Server-API");

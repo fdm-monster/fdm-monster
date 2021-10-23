@@ -19,7 +19,7 @@ class ServerHost {
     this.#taskManagerService = taskManagerService;
   }
 
-  async boot(httpServer, quick_boot) {
+  async boot(httpServer, quick_boot, listenRequests = true) {
     this.#httpServerInstance = httpServer;
     this.serveControllerRoutes(this.#httpServerInstance);
 
@@ -27,7 +27,7 @@ class ServerHost {
       await this.#bootTask.runOnce();
     }
 
-    return this.httpListen();
+    if (listenRequests) return this.httpListen();
   }
 
   hasConnected() {
@@ -39,10 +39,9 @@ class ServerHost {
 
     // Catches any HTML request to paths like / or file/ as long as its text/html
     app
-      .use(history())
+      .use((req, res, next) => history()(req, res, next))
       .use(loadControllers(`${routePath}/settings/*.controller.js`, { cwd: __dirname }))
       .use(loadControllers(`${routePath}/*.controller.js`, { cwd: __dirname }))
-
       .use(interceptDatabaseError)
       .use(exceptionHandler);
 

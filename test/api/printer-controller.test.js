@@ -1,8 +1,8 @@
 jest.mock("../../server/middleware/auth");
 
 const dbHandler = require("../db-handler");
-const { AppConstants } = require("../../server/app.constants");
-const { setupTestApp } = require("../app-test");
+const { AppConstants } = require("../../server/server.constants");
+const { setupTestApp } = require("../test-server");
 const {
   expectInvalidResponse,
   expectOkResponse,

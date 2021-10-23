@@ -1,4 +1,4 @@
-class AppConstants {
+class ServerConstants {
   static get apiRoute() {
     return "/api";
   }
@@ -65,5 +65,5 @@ class AppConstants {
 }
 
 module.exports = {
-  AppConstants: Object.freeze(AppConstants)
+  AppConstants: Object.freeze(ServerConstants)
 };

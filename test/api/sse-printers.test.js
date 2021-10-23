@@ -3,7 +3,7 @@ jest.mock("../../server/middleware/auth");
 const EventSource = require("eventsource");
 const dbHandler = require("../db-handler");
 const getEndpoints = require("express-list-endpoints");
-const { setupTestApp } = require("../app-test");
+const { setupTestApp } = require("../test-server");
 const DITokens = require("../../server/container.tokens");
 
 let request;
@@ -15,11 +15,11 @@ const ssePath = "sse";
 
 beforeAll(async () => {
   await dbHandler.connect();
-  ({ request, container, server } = await setupTestApp(true));
+  ({ request, container, httpServer } = await setupTestApp(true));
 
   sseTask = container.resolve(DITokens.printerSseTask);
 
-  const endpoints = getEndpoints(server);
+  const endpoints = getEndpoints(httpServer);
   expect(endpoints).toContainEqual({
     methods: ["GET"],
     middlewares: ["anonymous", "anonymous", "memberInvoker"],

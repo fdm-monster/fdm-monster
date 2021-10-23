@@ -10,7 +10,6 @@ const cors = require("cors");
 function setupNormalServer() {
   const httpServer = express();
   const container = configureContainer();
-  const serverHost = container.resolve(DITokens.serverHost);
 
   const userTokenService = container.resolve(DITokens.userTokenService);
   require("./middleware/passport.js")(passport, userTokenService);
@@ -40,8 +39,7 @@ function setupNormalServer() {
 
   return {
     httpServer,
-    container,
-    serverHost
+    container
   };
 }
 
