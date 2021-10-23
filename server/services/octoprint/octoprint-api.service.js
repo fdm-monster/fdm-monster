@@ -14,7 +14,7 @@ const { uploadProgressEvent } = require("../../constants/event.constants");
 const { ExternalServiceError } = require("../../exceptions/runtime.exceptions");
 const OctoPrintRoutes = require("./octoprint-api.routes");
 
-class OctoprintApiService extends OctoPrintRoutes {
+class OctoPrintApiService extends OctoPrintRoutes {
   #httpClient;
   #eventEmitter2;
 
@@ -311,4 +311,4 @@ class OctoprintApiService extends OctoPrintRoutes {
   }
 }
 
-module.exports = OctoprintApiService;
+module.exports = OctoPrintApiService;

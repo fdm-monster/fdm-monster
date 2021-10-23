@@ -1,8 +1,8 @@
-const OctoPrintRoutes = require("../../server/services/octoprint/octoprint-api.routes");
 const { processResponse } = require("../../server/services/octoprint/utils/api.utils");
 const { checkPluginManagerAPIDeprecation } = require("../../server/utils/compatibility.utils");
+const OctoPrintApiService = require("../../server/services/octoprint/octoprint-api.service");
 
-class OctoPrintApiMock extends OctoPrintRoutes {
+class OctoPrintApiMock extends OctoPrintApiService {
   #storedResponse;
   #storedStatusCode;
 
@@ -10,7 +10,7 @@ class OctoPrintApiMock extends OctoPrintRoutes {
   #logger;
 
   constructor({ settingsStore, httpClient, loggerFactory, eventEmitter2 }) {
-    super({ settingsStore });
+    super({ settingsStore, httpClient, loggerFactory, eventEmitter2 });
     this.#eventEmitter2 = eventEmitter2;
     this.#logger = loggerFactory("OctoPrint-API-Service", false);
   }

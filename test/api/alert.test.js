@@ -2,7 +2,7 @@ jest.mock("../../server/middleware/auth");
 
 const dbHandler = require("../db-handler");
 const { AppConstants } = require("../../server/app.constants");
-const { setupTestApp } = require("../../server/app-test");
+const { setupTestApp } = require("../app-test");
 const { expectOkResponse } = require("../extensions");
 const Alert = require("../../server/models/Alert");
 const { createTestPrinter } = require("./test-data/create-printer");

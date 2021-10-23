@@ -3,7 +3,7 @@ jest.mock("../../server/middleware/auth");
 const EventSource = require("eventsource");
 const dbHandler = require("../db-handler");
 const getEndpoints = require("express-list-endpoints");
-const { setupTestApp } = require("../../server/app-test");
+const { setupTestApp } = require("../app-test");
 const DITokens = require("../../server/container.tokens");
 
 let request;
