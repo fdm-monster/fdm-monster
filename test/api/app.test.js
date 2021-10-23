@@ -7,8 +7,9 @@ const { expectOkResponse } = require("../extensions");
 
 let request;
 
-const welcomeRoute = AppConstants.apiRoute + "/";
+const welcomeRoute = AppConstants.apiRoute;
 const getRoute = welcomeRoute;
+const versionRoute = `${welcomeRoute}/version`;
 
 beforeAll(async () => {
   await dbHandler.connect();
@@ -18,12 +19,23 @@ beforeAll(async () => {
 describe("AppController", () => {
   it("should return welcome", async function () {
     const response = await request.get(getRoute).send();
-
     expect(response.body).toMatchObject({
       message:
         "Login not required. Please load UI instead by requesting any route with text/html Content-Type"
     });
+    expectOkResponse(response);
+  });
 
+  it("should return version", async function () {
+    const response = await request.get(versionRoute).send();
+    expectOkResponse(response, {
+      isDockerContainer: false,
+      isNode: false,
+      isPm2: false,
+      update: {
+        air_gapped: null
+      }
+    });
     expectOkResponse(response);
   });
 });
