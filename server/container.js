@@ -103,6 +103,7 @@ function configureContainer() {
     [DITokens.dashboardStatisticsCache]: asClass(DashboardStatisticsCache),
 
     [DITokens.filamentCache]: asClass(FilamentCache).singleton(),
+    [DITokens.printerProfilesCache]: asClass(PrinterProfilesCache).singleton(),
     [DITokens.currentOperationsCache]: asClass(CurrentOperationsCache).singleton(),
     [DITokens.printerState]: asClass(PrinterState).transient(), // Transient on purpose!
     [DITokens.printerGroupsCache]: asClass(PrinterGroupsCache).singleton(),

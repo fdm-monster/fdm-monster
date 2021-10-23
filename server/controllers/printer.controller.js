@@ -10,7 +10,7 @@ const {
   updatePrinterEnabledRule
 } = require("./validation/printer-controller.validation");
 const { AppConstants } = require("../server.constants");
-const { convertHttpUrlToWebsocket, sanitizeURL } = require("../utils/url.utils");
+const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
 const DITokens = require("../container.tokens");
 const { Status, getSettingsAppearanceDefault } = require("../constants/service.constants");
 const { printerResolveMiddleware } = require("../middleware/printer");

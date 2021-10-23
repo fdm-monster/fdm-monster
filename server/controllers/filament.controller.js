@@ -4,47 +4,38 @@ const { ensureAuthenticated } = require("../middleware/auth");
 const Spool = require("../models/Spool.js");
 const Profiles = require("../models/Profiles.js");
 const { AppConstants } = require("../server.constants");
-const Logger = require("../handlers/logger.js");
 
 class FilamentController {
-  #serverVersion;
   #settingsStore;
   #printersStore;
   #filamentCache;
   #filamentManagerPluginService;
-  #serverPageTitle;
 
-  #logger = new Logger("Server-FilamentManager");
+  #logger;
 
   constructor({
     settingsStore,
     printersStore,
     filamentManagerPluginService,
     filamentCache,
-    serverVersion,
-    serverPageTitle
+    loggerFactory
   }) {
     this.#settingsStore = settingsStore;
-    this.#serverVersion = serverVersion;
     this.#printersStore = printersStore;
     this.#filamentCache = filamentCache;
     this.#filamentManagerPluginService = filamentManagerPluginService;
-    this.#serverPageTitle = serverPageTitle;
-  }
 
-  async listProfiles(req, res) {
-    const profiles = await this.#filamentCache.getProfiles();
-    res.send({ profiles });
+    this.#logger = loggerFactory("Server-FilamentManager");
   }
 
   async listSpools(req, res) {
     const spools = await this.#filamentCache.getSpools();
-    res.send({ Spool: spools });
+    res.send({ spools });
   }
 
   async dropDownList(req, res) {
     const selected = await this.#filamentCache.getDropDown();
-    res.send({ status: 200, selected });
+    res.send({ selected });
   }
 
   async filamentList(req, res) {
@@ -145,7 +136,11 @@ class FilamentController {
       updateFilamentManager = await updateFilamentManager.json();
       const reSync = await this.#filamentManagerPluginService.filamentManagerReSync("AddSpool");
 
-      res.send({ res: "success", spools: reSync.newSpools, filamentManager });
+      res.send({
+        res: "success",
+        spools: reSync.newSpools,
+        filamentManager
+      });
     } else {
       const spools = {
         name: filament.spoolsName,
@@ -163,7 +158,11 @@ class FilamentController {
         this.#logger.info("New Spool saved successfully: ", newFilament);
         await this.#filamentManagerPluginService.filamentManagerReSync();
         FilamentClean.start(filamentManager);
-        res.send({ res: "success", spools: newFilament, filamentManager });
+        res.send({
+          res: "success",
+          spools: newFilament,
+          filamentManager
+        });
       });
     }
   }
@@ -646,20 +645,16 @@ class FilamentController {
 
 // prettier-ignore
 module.exports = createController(FilamentController)
-  .prefix(AppConstants.apiRoute + "/filament")
-  .before([ensureAuthenticated])
-  .post("/:id", "create")
-  .patch("/:id", "update")
-  .delete("/:id", "delete")
-  .get("/dropdown-list", "dropDownList")
-  .get("/profile", "listProfiles")
-  .post("/profile/:id", "createProfile")
-  .patch("/profile/:id", "updateProfile")
-  .delete("/profile/:id", "deleteProfile")
-  .get("/spools", "listSpools")
-  .patch("/select", "selectFilament")
-  .get("/printer-list", "filamentList")
-  // WIP line
-  .put("/filament-manager/resync", "filamentManagerReSync")
-  .patch("/filament-manager/sync", "filamentManagerSync")
-  .patch("/filament-manager/disable", "disableFilamentManagerPlugin");
+    .prefix(AppConstants.apiRoute + "/filament")
+    .before([ensureAuthenticated])
+    .post("/:id", "create")
+    .patch("/:id", "update")
+    .delete("/:id", "delete")
+    .get("/dropdown-list", "dropDownList")
+    .get("/spools", "listSpools")
+    .patch("/select", "selectFilament")
+    .get("/printer-list", "filamentList")
+    // WIP line
+    .put("/filament-manager/resync", "filamentManagerReSync")
+    .patch("/filament-manager/sync", "filamentManagerSync")
+    .patch("/filament-manager/disable", "disableFilamentManagerPlugin");

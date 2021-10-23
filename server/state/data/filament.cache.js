@@ -1,12 +1,9 @@
 const _ = require("lodash");
-const Logger = require("../../handlers/logger.js");
 const Spools = require("../../models/Spool.js");
-const Profiles = require("../../models/Profiles.js");
 const { noSpoolOptionTemplate } = require("../../constants/template.constants");
 
 class FilamentCache {
   #spoolsClean = [];
-  #profilesClean = [];
   #statisticsClean = [];
   #selectedFilamentList = [];
   #dropDownList = {
@@ -14,22 +11,22 @@ class FilamentCache {
     historyDropDown: []
   };
 
-  #logger = new Logger("Server-Filament");
+  #logger;
 
   #settingsStore;
   #printersStore;
+  #printerProfilesCache;
 
-  constructor({ settingsStore, printersStore }) {
+  constructor({ settingsStore, printersStore, printerProfilesCache, loggerFactory }) {
     this.#settingsStore = settingsStore;
     this.#printersStore = printersStore;
+    this.#printerProfilesCache = printerProfilesCache;
+
+    this.#logger = loggerFactory("Server-Filament");
   }
 
   getSpools() {
     return this.#spoolsClean;
-  }
-
-  getProfiles() {
-    return this.#profilesClean;
   }
 
   getStatistics() {
@@ -47,26 +44,9 @@ class FilamentCache {
   async initCache() {
     const printers = this.#printersStore.listPrinterStates();
 
-    const profiles = await Profiles.find({});
     const spools = await Spools.find({});
     const spoolsArray = [];
     const profilesArray = [];
-
-    for (let pr = 0; pr < profiles.length; pr++) {
-      const profile = {
-        _id: null,
-        manufacturer: profiles[pr].profile.manufacturer,
-        material: profiles[pr].profile.material,
-        density: profiles[pr].profile.density,
-        diameter: profiles[pr].profile.diameter
-      };
-      if (this.#settingsStore.isFilamentEnabled()) {
-        profile._id = profiles[pr].profile.index;
-      } else {
-        profile._id = profiles[pr]._id;
-      }
-      profilesArray.push(profile);
-    }
 
     for (let sp = 0; sp < spools.length; sp++) {
       const spool = {
@@ -86,15 +66,14 @@ class FilamentCache {
     }
 
     this.#spoolsClean = spoolsArray;
-    this.#profilesClean = profilesArray;
 
     this.#selectedFilamentList = await this.selectedFilament(printers);
     this.#statisticsClean = this.createStatistics(spoolsArray, profilesArray);
-    await this.dropDownList(spools, profiles);
+    await this.dropDownList(spools);
     this.#logger.info("Filament information cleaned and ready for consumption...");
   }
 
-  dropDownList(spools, profiles) {
+  dropDownList(spools) {
     const normalDropObject = [noSpoolOptionTemplate];
     const historyDropObject = [noSpoolOptionTemplate];
 

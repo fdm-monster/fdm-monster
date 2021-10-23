@@ -259,6 +259,12 @@ class OctoPrintApiService extends OctoPrintRoutes {
     return processResponse(response, responseOptions);
   }
 
+  async listProfiles(printer, responseOptions) {
+    const { url, options } = this._prepareRequest(printer, this.apiProfiles);
+    const response = await this._httpClient.get(url, options);
+    return processResponse(response, responseOptions);
+  }
+
   async listPluginFilamentManagerProfiles(printer, responseOptions) {
     const { url, options } = this._prepareRequest(printer, this.apiPluginFilamentManagerProfiles);
     const response = await this._httpClient.get(url, options);

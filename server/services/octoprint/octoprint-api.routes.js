@@ -19,6 +19,7 @@ class OctoPrintRoutes {
   apiSystemCommands = `${this.apiSystem}/commands`;
   apiUsers = `${this.apiBase}/users`;
   apiLogin = `${this.apiBase}/login?passive=true`;
+  apiProfiles = `${this.apiBase}/plugin/printerprofiles`;
   apiPluginManager = `${this.apiBase}/plugin/pluginmanager`;
   apiPluginManagerRepository1_6_0 = `${this.octoPrintBase}plugin/pluginmanager/repository`;
   apiPluginPiSupport = `${this.apiBase}/plugin/pi_support`;
