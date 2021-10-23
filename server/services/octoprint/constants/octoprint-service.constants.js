@@ -1,5 +1,5 @@
 class OPClientErrors {
-  static filamentIDNotANumber = "FilamentID provided was not numeric";
+  static filamentIdNotANumber = "FilamentID provided was not numeric";
 
   static printerValidationErrorMessage = "printer apiKey or URL undefined";
 }

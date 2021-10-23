@@ -9,8 +9,10 @@ const _ = require("lodash");
 class PrinterProfilesController {
   #printerProfilesCache;
   #octoPrintApiService;
+  #settingsStore;
 
-  constructor({ printerProfilesCache, octoPrintApiService }) {
+  constructor({ settingsStore, printerProfilesCache, octoPrintApiService }) {
+    this.#settingsStore = settingsStore;
     this.#printerProfilesCache = printerProfilesCache;
     this.#octoPrintApiService = octoPrintApiService;
   }

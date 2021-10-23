@@ -278,16 +278,23 @@ class OctoPrintApiService extends OctoPrintRoutes {
   }
 
   async getPluginFilamentManagerFilament(printer, filamentID, responseOptions) {
-    // filamentID needs to be INT numeric
-    // https://github.com/malnvenshorn/OctoPrint-FilamentManager/blob/647af691d6081df2f16d400e834f12f11f6eea56/octoprint_filamentmanager/data/__init__.py#L84
-    const parsedFilamentID = Number.parseFloat(filamentID);
-    if (isNaN(filamentID)) {
-      throw OPClientErrors.filamentIDNotANumber;
-    }
-
-    const path = `${this.apiPluginFilamentManagerSpools}/${parsedFilamentID}`;
+    const path = `${this.apiPluginFilamentManagerSpools}/${filamentID}`;
     const { url, options } = this._prepareRequest(printer, path);
     const response = await this._httpClient.get(url, options);
+    return processResponse(response, responseOptions);
+  }
+
+  async createPluginFilamentManagerFilamentSpool(printer, spool, responseOptions) {
+    const path = `${this.apiPluginFilamentManagerSpools}/`;
+    const { url, options } = this._prepareRequest(printer, path);
+    const response = await this._httpClient.post(url, spool, options);
+    return processResponse(response, responseOptions);
+  }
+
+  async setPluginFilamentManagerSelection(printer, selection, responseOptions) {
+    const path = `${this.apiPluginFilamentManagerSelections}`;
+    const { url, options } = this._prepareRequest(printer, path);
+    const response = await this._httpClient.patch(url, selection, options);
     return processResponse(response, responseOptions);
   }
 

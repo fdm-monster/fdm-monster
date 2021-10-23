@@ -1,6 +1,7 @@
 const Logger = require("../../handlers/logger.js");
 const Filament = require("../../models/Filament.js");
 const Profile = require("../../models/Profiles.js");
+const { OPClientErrors } = require("./constants/octoprint-service.constants");
 
 class FilamentManagerPluginService {
   #printersStore;
@@ -13,17 +14,47 @@ class FilamentManagerPluginService {
     this.#octoPrintApiService = octoPrintApiService;
   }
 
+  #validateFilamentId(value) {
+    // filamentId needs to be INT numeric
+    // https://github.com/malnvenshorn/OctoPrint-FilamentManager/blob/647af691d6081df2f16d400e834f12f11f6eea56/octoprint_filamentmanager/data/__init__.py#L84
+    const parsedFilamentID = Number.parseFloat(value);
+    if (isNaN(parsedFilamentID)) {
+      throw OPClientErrors.filamentIdNotANumber;
+    }
+
+    return parsedFilamentID;
+  }
+
+  async createFilamentSpool(printer, spool) {
+    const printerLogin = printer.getLoginDetails();
+    return this.#octoPrintApiService.createPluginFilamentManagerFilamentSpool(printerLogin, spool);
+  }
+
+  async selectPrinterFilament(printer, filamentId, tool) {
+    const printerLogin = printer.getLoginDetails();
+    this.#validateFilamentId(filamentId);
+    const selection = {
+      tool,
+      spool: { id: filamentId }
+    };
+    return await this.#octoPrintApiService.setPluginFilamentManagerSelection(
+      printerLogin,
+      selection
+    );
+  }
+
   async updatePrinterSelectedFilament(printer) {
     const returnSpools = [];
     for (let i = 0; i < printer.selectedFilament.length; i++) {
       if (printer.selectedFilament[i] !== null) {
-        const filamentID = printer.selectedFilament[i].spools.fmID;
-        if (!filamentID) {
-          throw `Could not query OctoPrint FilamentManager for filament. FilamentID '${filamentID}' not found.`;
+        const filamentId = printer.selectedFilament[i].spools.fmID;
+        if (!filamentId) {
+          throw `Could not query OctoPrint FilamentManager for filament. FilamentID '${filamentId}' not found.`;
         }
+
         const response = await this.#octoPrintApiService.getPluginFilamentManagerFilament(
           printer.getLoginDetails(),
-          filamentID
+          this.#validateFilamentId(filamentId)
         );
 
         this.#logger.info(`${printer.printerURL}: spools fetched. Status: ${response.status}`);
@@ -37,7 +68,7 @@ class FilamentManagerPluginService {
         spoolEntity.spools = {
           name: sp.spool.name,
           profile: sp.spool.profile.id,
-          price: sp.spool.cost,
+          cost: sp.spool.cost,
           weight: sp.spool.weight,
           used: sp.spool.used,
           tempOffset: sp.spool.temp_offset,

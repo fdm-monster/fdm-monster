@@ -24,6 +24,7 @@ class OctoPrintRoutes {
   apiPluginManagerRepository1_6_0 = `${this.octoPrintBase}plugin/pluginmanager/repository`;
   apiPluginPiSupport = `${this.apiBase}/plugin/pi_support`;
   apiPluginFilamentManagerSpools = `${this.apiBase}/plugin/filamentmanager/spools`;
+  apiPluginFilamentManagerSelections = `${this.apiBase}/plugin/filamentmanager/selections/0`;
   apiPluginFilamentManagerProfiles = `${this.apiBase}/plugin/filamentmanager/profiles`;
   apiTimelapse = `${this.apiBase}/timelapse`;
   _settingsStore;

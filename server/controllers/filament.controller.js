@@ -4,6 +4,8 @@ const { ensureAuthenticated } = require("../middleware/auth");
 const Filament = require("../models/Filament");
 const Profiles = require("../models/Profiles.js");
 const { AppConstants } = require("../server.constants");
+const { validateMiddleware } = require("../handlers/validators");
+const { idRules } = require("./validation/generic.validation");
 
 class FilamentController {
   #settingsStore;
@@ -50,33 +52,14 @@ class FilamentController {
   async selectFilament(req, res) {
     const { filamentManager } = this.#settingsStore.getServerSettings();
 
-    this.#logger.info("Request to change:", req.body.printerId + "selected filament");
-    if (filamentManager && req.body.spoolId != 0) {
-      const printerList = Runner.returnFarmPrinters();
-      const i = _.findIndex(printerList, function (o) {
-        return o._id == req.body.printerId;
-      });
-      const printer = printerList[i];
-      const spool = await Filament.findById(req.body.spoolId);
-      const selection = {
-        tool: req.body.tool,
-        spool: { id: spool.spools.fmID }
-      };
+    if (!filamentManager) return res.send();
 
-      // TODO move to client service
-      const url = `${printer.printerURL}/plugin/filamentmanager/selections/0`;
-      const updateFilamentManager = await fetch(url, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Api-Key": printer.apiKey
-        },
-        body: JSON.stringify({ selection })
-      });
-    }
+    const { id } = await validateMiddleware(req, idRules);
+    const { tool, filamentId } = req.body;
+    const printer = this.#printersStore.getPrinterState(id);
 
-    await Runner.selectedFilament(req.body.printerId, req.body.spoolId, req.body.tool);
-    FilamentClean.start(filamentManager);
+    await this.#filamentManagerPluginService.selectPrinterFilament(printer, filamentId, tool);
+
     res.send();
   }
 
@@ -88,35 +71,25 @@ class FilamentController {
     const filamentManagerID = null;
 
     if (filamentManager) {
-      const printerList = Runner.returnFarmPrinters();
-      let printer = null;
+      const printerList = this.#printersStore.listPrinterStates();
+      // TODO replace this 'first-active' logic
+      let printer = printerList[0];
 
-      for (let i = 0; i < printerList.length; i += 1) {
-        if (
-          printerList[i].stateColour.category === "Disconnected" ||
-          printerList[i].stateColour.category === "Idle" ||
-          printerList[i].stateColour.category === "Active" ||
-          printerList[i].stateColour.category === "Complete"
-        ) {
-          printer = printerList[i];
-          break;
-        }
-      }
       const profiles = await Profiles.find({});
-      const findID = _.findIndex(profiles, function (o) {
-        return o.profile.index == filament.spoolsProfile;
+      const profile = _.find(profiles, function (o) {
+        return o.profile.index === filament.spoolsProfile;
       });
 
-      const profile = {
-        vendor: profiles[findID].profile.manufacturer,
-        material: profiles[findID].profile.material,
-        density: profiles[findID].profile.density,
-        diameter: profiles[findID].profile.diameter,
-        id: profiles[findID].profile.index
-      };
+      // TODO What a mess
       const spool = {
         name: filament.spoolsName,
-        profile,
+        profile: {
+          vendor: profile.manufacturer,
+          material: profile.material,
+          density: profile.density,
+          diameter: profile.diameter,
+          id: profile.index
+        },
         cost: filament.spoolsPrice,
         weight: filament.spoolsWeight,
         used: filament.spoolsUsed,
@@ -124,48 +97,37 @@ class FilamentController {
       };
       this.#logger.info("Updating OctoPrint: ", spool);
 
-      // TODO move to client service
-      const url = `${printer.printerURL}/plugin/filamentmanager/spools`;
-      let updateFilamentManager = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Api-Key": printer.apiKey
-        },
-        body: JSON.stringify({ spool })
-      });
-      updateFilamentManager = await updateFilamentManager.json();
-      const reSync = await this.#filamentManagerPluginService.filamentManagerReSync("AddSpool");
+      await this.#filamentManagerPluginService.createFilamentSpool(printer, spool);
 
-      res.send({
+      const result = await this.#filamentManagerPluginService.filamentManagerReSync("AddSpool");
+
+      return res.send({
         res: "success",
-        spools: reSync.newSpools,
+        spools: result.newSpools,
         filamentManager
       });
-    } else {
-      const spools = {
-        name: filament.spoolsName,
-        profile: filament.spoolsProfile,
-        price: filament.spoolsPrice,
-        weight: filament.spoolsWeight,
-        used: filament.spoolsUsed,
-        tempOffset: filament.spoolsTempOffset,
-        fmID: filamentManagerID
-      };
-      const newFilament = new Filament({
-        spools
-      });
-      newFilament.save().then(async (e) => {
-        this.#logger.info("New Filament saved successfully: ", newFilament);
-        await this.#filamentManagerPluginService.filamentManagerReSync();
-        FilamentClean.start(filamentManager);
-        res.send({
-          res: "success",
-          spools: newFilament,
-          filamentManager
-        });
-      });
     }
+
+    // TODO What a mess
+    const spool = {
+      name: filament.spoolsName,
+      profile: filament.spoolsProfile,
+      price: filament.spoolsPrice,
+      weight: filament.spoolsWeight,
+      used: filament.spoolsUsed,
+      tempOffset: filament.spoolsTempOffset,
+      filamentId: filamentManagerID
+    };
+    const newFilament = new Filament(spool);
+    await newFilament.save();
+
+    this.#logger.info("New Filament saved successfully: ", newFilament);
+    await this.#filamentManagerPluginService.filamentManagerReSync();
+
+    res.send({
+      res: "success",
+      spools: newFilament
+    });
   }
 
   async delete(req, res) {
@@ -428,10 +390,11 @@ module.exports = createController(FilamentController)
     .before([ensureAuthenticated])
     .get("/", "list")
     .post("/:id", "create")
+    .post("/:id/select-filament", "selectFilament")
     .patch("/:id", "update")
     .delete("/:id", "delete")
     .get("/dropdown-list", "dropDownList")
-    .patch("/select", "selectFilament")
+
     .get("/printer-list", "filamentList")
     // WIP line
     .put("/filament-manager/resync", "filamentManagerReSync")
