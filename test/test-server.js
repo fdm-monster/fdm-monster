@@ -27,7 +27,7 @@ async function setupTestApp(loadPrinterStore = false, mocks) {
   // Setup
   await container.resolve(DITokens.settingsStore).loadSettings();
   const serverHost = container.resolve(DITokens.serverHost);
-  await serverHost.boot(httpServer, false, true);
+  await serverHost.boot(httpServer, false, false);
 
   if (loadPrinterStore) {
     // Requires (in-memory) database connection, so its optional
