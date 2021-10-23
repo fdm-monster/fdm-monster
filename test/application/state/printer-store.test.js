@@ -2,7 +2,6 @@ jest.mock("../../../server/services/octoprint/octoprint-api.service");
 const dbHandler = require("../../db-handler");
 const DITokens = require("../../../server/container.tokens");
 const { configureContainer } = require("../../../server/container");
-const { ensureSystemSettingsInitiated } = require("../../../server/app-core");
 const { ValidationException } = require("../../../server/exceptions/runtime.exceptions");
 
 let container;
@@ -12,7 +11,7 @@ let filesStore;
 beforeAll(async () => {
   await dbHandler.connect();
   container = configureContainer();
-  await ensureSystemSettingsInitiated(container);
+  await container.resolve(DITokens.serverState).ensureSystemSettingsInitiated(container);
 
   printersStore = container.resolve(DITokens.printersStore);
   filesStore = container.resolve(DITokens.filesStore);

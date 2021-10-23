@@ -2,14 +2,14 @@ const supertest = require("supertest");
 const { setupEnvConfig } = require("../../server/app-env");
 const { serveDatabaseIssueFallbackRoutes } = require("../../server/app-fallbacks");
 const { expectOkResponse } = require("../extensions");
-const { setupExpressServer } = require("../../server/app-core");
+const { setupNormalServer } = require("../../server/app-core");
 
 let server;
 
 async function setupDatabaseIssueApp() {
   setupEnvConfig(true);
 
-  let { app } = setupExpressServer();
+  let { app } = setupNormalServer();
   await serveDatabaseIssueFallbackRoutes(app);
 }
 

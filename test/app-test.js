@@ -1,7 +1,7 @@
 const supertest = require("supertest");
 const { asClass } = require("awilix");
 const DITokens = require("../server/container.tokens");
-const { setupExpressServer, serveControllerRoutes } = require("../server/app-core");
+const { setupNormalServer, serveControllerRoutes } = require("../server/app-core");
 const { setupEnvConfig } = require("../server/app-env");
 const { ensureSystemSettingsInitiated } = require("../server/app-core");
 const OctoPrintApiMock = require("./mocks/octoprint-api.mock");
@@ -15,7 +15,7 @@ const AxiosMock = require("./mocks/axios.mock");
 async function setupTestApp(loadPrinterStore = false, mocks) {
   setupEnvConfig(true);
 
-  const { app: server, container } = setupExpressServer();
+  const { app: server, container } = setupNormalServer();
   await ensureSystemSettingsInitiated(container);
   serveControllerRoutes(server);
 

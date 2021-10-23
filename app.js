@@ -1,69 +1,30 @@
-let majorVersion = null;
-try {
-  majorVersion = parseInt(process.version.replace("v", "").split(".")[0]);
-} catch (e) {
-  // We dont abort on parsing failures
-}
-
+/**
+ * Safety check for Node 12
+ */
+let majorVersion = require("semver/functions/major")(process.version);
 if (!!majorVersion && majorVersion < 14) {
   // Dont require this in the normal flow (or NODE_ENV can not be fixed before start)
-  const {
-    serveNodeVersionFallback,
-    setupFallbackExpressServer
-  } = require("./server/app-fallbacks");
-
-  const server = setupFallbackExpressServer();
-  serveNodeVersionFallback(server);
-} else {
-  const {
-    setupEnvConfig,
-    fetchMongoDBConnectionString,
-    runMigrations,
-    fetchServerPort
-  } = require("./server/app-env");
-
-  // Set environment/.env file and NODE_ENV if not set. Will call startup checks.
-  setupEnvConfig();
-
-  const {
-    setupExpressServer,
-    serveApiNormally,
-    ensureSystemSettingsInitiated
-  } = require("./server/app-core");
-
-  const mongoose = require("mongoose");
-  const Logger = require("./server/handlers/logger.js");
-  const logger = new Logger("Server");
-
-  const { app: server, container } = setupExpressServer();
-
-  mongoose
-    .connect(fetchMongoDBConnectionString(), {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useFindAndModify: false,
-      useCreateIndex: true,
-      serverSelectionTimeoutMS: 2500
-    })
-    .then(async (mg) => {
-      await runMigrations(mg.connection.db, mg.connection.getClient());
-      await ensureSystemSettingsInitiated(container);
-    })
-    .then(async () => {
-      const port = fetchServerPort();
-
-      if (!port || Number.isNaN(parseInt(port))) {
-        throw new Error("The 3DPF Server requires a numeric port input argument to run");
-      }
-
-      const app = await serveApiNormally(server, container);
-      app.listen(port, "0.0.0.0", () => {
-        logger.info(`Server started... open it at http://127.0.0.1:${port}`);
-      });
-    })
-    .catch(async (err) => {
-      logger.error(err.stack);
-      const { serveDatabaseIssueFallback } = require("./server/app-fallbacks");
-      serveDatabaseIssueFallback(server, fetchServerPort());
-    });
+  const { serveNode12Fallback, setupFallbackServer } = require("./server/app-fallbacks");
+  const server = setupFallbackServer();
+  return serveNode12Fallback(server);
 }
+
+/**
+ * Intermediate server when booting
+ */
+const { setupEnvConfig } = require("./server/app-env");
+setupEnvConfig();
+// ... TODO
+
+/**
+ * Actual server operation
+ */ const { setupNormalServer } = require("./server/app-core");
+const DITokens = require("./server/container.tokens");
+
+const { httpServer, container } = setupNormalServer();
+container
+  .resolve(DITokens.serverHost)
+  .boot(httpServer)
+  .catch((e) => {
+    console.error("Server has crashed unintentionally", e);
+  });

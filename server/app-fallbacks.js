@@ -12,7 +12,7 @@ const routePath = "./routes";
 const fallbacksRoutePath = `${routePath}/fallbacks`;
 const opts = { cwd: __dirname };
 
-function setupFallbackExpressServer() {
+function setupFallbackServer() {
   let app = express();
 
   app.use(express.json());
@@ -50,7 +50,7 @@ function fetchServerPort() {
   return port;
 }
 
-function serveNodeVersionFallback(app) {
+function serveNode12Fallback(app) {
   const port = fetchServerPort();
   let listenerHttpServer = app.listen(port, "0.0.0.0", () => {
     const msg = `You have an old Node version: ${process.version}. This needs to be version 14.x or higher... open our webpage at http://127.0.0.1:${port} for tips`;
@@ -92,7 +92,7 @@ function serveDatabaseIssueFallback(app, port) {
 
 module.exports = {
   serveDatabaseIssueFallback,
-  serveNodeVersionFallback,
-  setupFallbackExpressServer,
+  serveNode12Fallback,
+  setupFallbackServer,
   serveDatabaseIssueFallbackRoutes
 };

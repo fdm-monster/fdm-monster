@@ -1,4 +1,5 @@
 const DITokens = {
+  serverHost: "serverHost",
   loggerFactory: "loggerFactory",
   httpClient: "httpClient",
   multerService: "multerService",
