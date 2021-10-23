@@ -69,7 +69,8 @@ describe("PrinterFilesController", () => {
 
   it("should allow DELETE to clear printer files - with status result", async () => {
     const printer = await createTestPrinter(request);
-    octoPrintApiService.storeResponse({ files: [] }, 200);
+    const jsonFile = require("./test-data/octoprint-file.data.json");
+    octoPrintApiService.storeResponse({ files: [jsonFile] }, 200);
     const response = await request.delete(clearFilesRoute(printer.id)).send();
     expectOkResponse(response, {
       succeededFiles: expect.any(Array),

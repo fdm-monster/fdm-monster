@@ -1,6 +1,7 @@
 class AxiosMock {
   mockStatus = undefined;
   mockResponse = undefined;
+  isStream = undefined;
   timeout = null;
   streamRejectPayload;
 
@@ -12,28 +13,29 @@ class AxiosMock {
     this.streamRejectPayload = rejectPayload;
   }
 
-  saveMockResponse(status, response) {
+  saveMockResponse(response, status, isStream = false) {
     this.mockStatus = status;
     this.mockResponse = response;
+    this.isStream = isStream;
   }
 
   async getMockResponse() {
     return Promise.resolve({
-      response: {
-        status: this.mockStatus,
-        data: {
-          pipe: (stream) => {},
-          on: (event, cb) => {
-            if (event === "error") {
-              if (this.streamRejectPayload) {
-                return cb(this.streamRejectPayload);
+      status: this.mockStatus,
+      data: this.isStream
+        ? {
+            pipe: (stream) => {},
+            on: (event, cb) => {
+              if (event === "error") {
+                if (this.streamRejectPayload) {
+                  return cb(this.streamRejectPayload);
+                }
+              } else {
+                return cb(this.mockResponse);
               }
-            } else {
-              return cb(this.mockResponse);
             }
           }
-        }
-      }
+        : this.mockResponse
     });
   }
 
