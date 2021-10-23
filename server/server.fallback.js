@@ -1,11 +1,10 @@
 const express = require("express");
-const session = require("express-session");
 const { AppConstants } = require("./app.constants");
 const dotenv = require("dotenv");
 const path = require("path");
 
 const Logger = require("./handlers/logger.js");
-const exceptionHandler = require("./exceptions/exception.handler");
+const exceptionHandler = require("./middleware/exception.handler");
 const { loadControllers } = require("awilix-express");
 const logger = new Logger("Fallback-Server");
 const routePath = "./routes";
@@ -14,22 +13,14 @@ const opts = { cwd: __dirname };
 
 function setupFallbackServer() {
   let app = express();
-
   app.use(express.json());
-  logger.debug("Running in directory:", __dirname);
-  const viewsPath = path.join(__dirname, "./views");
-  app.set("views", viewsPath);
-  app.set("view engine", "ejs");
-  app.use(express.static(viewsPath));
-  app.use("/images", express.static("./images"));
   app.use(express.urlencoded({ extended: false }));
-  app.use(
-    session({
-      secret: "supersecret",
-      resave: true,
-      saveUninitialized: true
-    })
-  );
+  app.use((req, res, next) => {
+    res.send({
+      error:
+        "You're running this server under Node 12 or older which is not supported. Please upgrade. Now."
+    });
+  });
 
   return app;
 }
@@ -67,32 +58,7 @@ function serveNode12Fallback(app) {
   return listenerHttpServer;
 }
 
-function serveDatabaseIssueFallbackRoutes(app) {
-  app.use(loadControllers(`${fallbacksRoutePath}/fallback-database-issue.controller.js`, opts));
-  app.use(loadControllers(`${fallbacksRoutePath}/amialive.controller.js`, opts));
-  app.get("*", function (req, res) {
-    res.redirect("/");
-  });
-  app.use(exceptionHandler);
-}
-
-function serveDatabaseIssueFallback(app, port) {
-  if (!port || Number.isNaN(parseInt(port))) {
-    throw new Error("The server database-issue mode requires a numeric port input argument");
-  }
-  let listenerHttpServer = app.listen(port, "0.0.0.0", () => {
-    const msg = `You have database connection issues... open our webpage at http://127.0.0.1:${port}`;
-    logger.info(msg);
-  });
-
-  serveDatabaseIssueFallbackRoutes(app);
-
-  return listenerHttpServer;
-}
-
 module.exports = {
-  serveDatabaseIssueFallback,
   serveNode12Fallback,
-  setupFallbackServer,
-  serveDatabaseIssueFallbackRoutes
+  setupFallbackServer
 };

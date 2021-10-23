@@ -143,23 +143,31 @@ class TaskManagerService {
   /**
    * Enable the job which must be disabled at boot. Handy for conditional, heavy or long-running non-critical tasks
    * @param taskID
+   * @param failIfEnabled throws when the job is already running
    */
-  scheduleDisabledJob(taskID) {
+  scheduleDisabledJob(taskID, failIfEnabled = true) {
     const taskState = this.getTaskState(taskID);
     const schedulerOptions = taskState?.options;
     if (schedulerOptions?.disabled !== true) {
-      throw new JobValidationException(
-        `The requested task with ID ${taskID} was not explicitly disabled and must be running already.`
-      );
+      if (failIfEnabled) {
+        throw new JobValidationException(
+          `The requested task with ID ${taskID} was not explicitly disabled and must be running already.`
+        );
+      }
+      return;
     }
+
     taskState.options.disabled = false;
 
     this.#scheduleEnabledPeriodicJob(taskID);
   }
 
-  disableJob(taskID) {
+  disableJob(taskID, failIfDisabled = true) {
     if (this.isTaskDisabled(taskID)) {
-      throw new JobValidationException("Cant disable a job which is already disabled");
+      if (failIfDisabled) {
+        throw new JobValidationException("Cant disable a job which is already disabled");
+      }
+      return;
     }
 
     const taskState = this.getTaskState(taskID);

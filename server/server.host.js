@@ -1,111 +1,37 @@
+const express = require("express");
 const mongoose = require("mongoose");
-const { fetchMongoDBConnectionString } = require("./app-env");
-const { runMigrations, fetchServerPort } = require("./app-env");
-const { ServerTasks } = require("./tasks");
 const history = require("connect-history-api-fallback");
 const { loadControllers } = require("awilix-express");
-const exceptionHandler = require("./exceptions/exception.handler");
-const { getAppDistPath } = require("./app-env");
-const express = require("express");
+const exceptionHandler = require("./middleware/exception.handler");
+const { getAppDistPath, fetchServerPort } = require("./server.env");
 const { NotFoundException } = require("./exceptions/runtime.exceptions");
+const { interceptDatabaseError } = require("./middleware/database");
 
 class ServerHost {
-  #serverSettingsService;
-  #settingsStore;
-
   #logger;
+  #bootTask;
+  #taskManagerService;
   #httpServerInstance = null;
-  #connection = null;
-  #isInitiated = false;
 
-  // Startup dependencies
-  multerService;
-  printersStore;
-  filesStore;
-  printerGroupsCache;
-  currOpsCache;
-  historyCache;
-  filamentCache;
-  taskManagerService;
-  influxDbSetupService;
-
-  constructor({
-    loggerFactory,
-    serverSettingsService,
-    settingsStore,
-    multerService,
-    printersStore,
-    filesStore,
-    printerGroupsCache,
-    currentOperationsCache,
-    historyCache,
-    filamentCache,
-    taskManagerService,
-    influxDbSetupService
-  }) {
+  constructor({ loggerFactory, bootTask, taskManagerService }) {
     this.#logger = loggerFactory("Server");
-
-    this.#serverSettingsService = serverSettingsService;
-    this.#settingsStore = settingsStore;
-    this.multerService = multerService;
-    this.printersStore = printersStore;
-    this.filesStore = filesStore;
-    this.printerGroupsCache = printerGroupsCache;
-    this.currOpsCache = currentOperationsCache;
-    this.historyCache = historyCache;
-    this.filamentCache = filamentCache;
-    this.taskManagerService = taskManagerService;
-    this.influxDbSetupService = influxDbSetupService;
+    this.#bootTask = bootTask;
+    this.#taskManagerService = taskManagerService;
   }
 
   async boot(httpServer, quick_boot) {
     this.#httpServerInstance = httpServer;
     this.serveControllerRoutes(this.#httpServerInstance);
 
-    try {
-      await this.createConnection();
-      await this.migrateDatabase();
-
-      if (!quick_boot) {
-        this.#logger.info("Loading Server Settings.");
-        await this.#settingsStore.loadSettings();
-
-        await this.multerService.clearUploadsFolder();
-        await this.printersStore.loadPrintersStore();
-        await this.filesStore.loadFilesStore();
-        await this.printerGroupsCache.loadCache();
-        this.currOpsCache.generateCurrentOperations();
-        await this.historyCache.initCache();
-        await this.filamentCache.initCache();
-
-        if (process.env.SAFEMODE_ENABLED !== "true") {
-          ServerTasks.BOOT_TASKS.forEach((task) => this.taskManagerService.registerJobOrTask(task));
-        } else {
-          this.#logger.warning("Starting in safe mode due to SAFEMODE_ENABLED");
-        }
-
-        await this.influxDbSetupService.optionalInfluxDatabaseSetup();
-      }
-    } catch (e) {
-      console.error(e);
+    if (!quick_boot) {
+      await this.#bootTask.runOnce();
     }
 
     return this.httpListen();
   }
 
-  async createConnection() {
-    this.#connection = await mongoose.connect(fetchMongoDBConnectionString(), {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useFindAndModify: false,
-      useCreateIndex: true,
-      serverSelectionTimeoutMS: 1500
-    });
-  }
-
-  async migrateDatabase() {
-    const mg = this.#connection;
-    await runMigrations(mg.connection.db, mg.connection.getClient());
+  hasConnected() {
+    return mongoose.connections[0].readyState;
   }
 
   serveControllerRoutes(app) {
@@ -116,6 +42,8 @@ class ServerHost {
       .use(history())
       .use(loadControllers(`${routePath}/settings/*.controller.js`, { cwd: __dirname }))
       .use(loadControllers(`${routePath}/*.controller.js`, { cwd: __dirname }))
+
+      .use(interceptDatabaseError)
       .use(exceptionHandler);
 
     // Serve the files for our frontend - do this later than the controllers

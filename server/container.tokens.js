@@ -45,6 +45,7 @@ const DITokens = {
   historyCache: "historyCache",
   filamentCache: "filamentCache",
   // Tasks
+  bootTask: "bootTask",
   printerSystemTask: "printerSystemTask",
   softwareUpdateTask: "softwareUpdateTask",
   printerSseTask: "printerSseTask",

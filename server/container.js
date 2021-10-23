@@ -52,6 +52,7 @@ const PrinterGroupsCache = require("./state/data/printer-groups.cache");
 const MulterService = require("./services/multer.service");
 const FileUploadTrackerCache = require("./state/data/file-upload-tracker.cache");
 const ServerHost = require("./server.host");
+const BootTask = require("./tasks/boot.task");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -123,6 +124,7 @@ function configureContainer() {
     [DITokens.influxDbHistoryService]: asClass(InfluxDbHistoryService),
     [DITokens.influxDbPrinterStateService]: asClass(InfluxDbPrinterStateService),
 
+    [DITokens.bootTask]: asClass(BootTask),
     [DITokens.softwareUpdateTask]: asClass(SoftwareUpdateTask),
     // Provided SSE handlers (couplers) shared with controllers
     [DITokens.printerSseHandler]: asClass(ServerSentEventsHandler).singleton(),

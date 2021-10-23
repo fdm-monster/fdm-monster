@@ -180,7 +180,6 @@ function setupEnvConfig(skipDotEnv = false) {
   ensureEnvNpmVersionSet();
   ensureMongoDBConnectionStringSet();
   ensurePortSet();
-  envUtils.ensureBackgroundImageExists(__dirname);
   ensurePageTitle();
 }
 

@@ -8,8 +8,9 @@ const { scopePerRequest } = require("awilix-express");
 const cors = require("cors");
 
 function setupNormalServer() {
-  let httpServer = express();
-  let container = configureContainer();
+  const httpServer = express();
+  const container = configureContainer();
+  const serverHost = container.resolve(DITokens.serverHost);
 
   const userTokenService = container.resolve(DITokens.userTokenService);
   require("./middleware/passport.js")(passport, userTokenService);
@@ -39,7 +40,8 @@ function setupNormalServer() {
 
   return {
     httpServer,
-    container
+    container,
+    serverHost
   };
 }
 

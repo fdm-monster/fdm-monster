@@ -1,4 +1,3 @@
-const path = require("path");
 const fs = require("fs");
 const Logger = require("../handlers/logger.js");
 const dotenv = require("dotenv");
@@ -88,41 +87,10 @@ function verifyPackageJsonRequirements(rootPath) {
   return true;
 }
 
-function ensureBackgroundImageExists(rootPath) {
-  // Explicit relative folder
-  const targetBgDir = "./images";
-  const targetBgPath = path.join(targetBgDir, "bg.jpg");
-  if (!fs.existsSync(targetBgDir)) {
-    fs.mkdirSync(targetBgDir);
-  }
-  const bgFileExists = fs.existsSync(targetBgPath);
-  if (!bgFileExists) {
-    const defaultBgPath = path.resolve(__dirname, "bg_default.jpg");
-    if (!fs.existsSync(defaultBgPath)) {
-      logger.error("cant find default bg file...", defaultBgPath);
-    } else if (!fs.existsSync("images")) {
-      logger.error("cant find target folder...", path.join(rootPath, "images"));
-    } else {
-      logger.info("everything good", defaultBgPath, targetBgPath);
-    }
-
-    // This is the reason why we dont copy under PKG
-    // https://github.com/vercel/pkg/issues/420#issuecomment-397392619
-    const fileBuffer = fs.readFileSync(path.resolve(__dirname, defaultBgPath));
-    fs.writeFileSync(targetBgPath, fileBuffer);
-
-    // TODO Bug in PKG - revert for normal usage
-    // fs.copyFileSync(defaultBgPath, "PATH.jpg");
-
-    logger.info(`✓ Copyied default background image to ${targetBgPath} as it was not found.`);
-  }
-}
-
 module.exports = {
   isPm2,
   isNodemon,
   isNode,
   writeVariableToEnvFile,
-  verifyPackageJsonRequirements,
-  ensureBackgroundImageExists
+  verifyPackageJsonRequirements
 };

@@ -4,10 +4,10 @@
   "license": "AGPLv3",
   "version": "0.0.3-pre1",
   "description": "3DPF is a 3D printer manager to set up, configure and monitor FDM and resin printers. Our aim is to provide extremely optimized performance and reliability.",
-  "main": "app.js",
+  "main": "index.js",
   "scripts": {
     "prestart": "npm ci --production",
-    "start": "pm2 flush && pm2 start app.js --name 3DPF -e ./logs/pm2.error.log -o ./logs/pm2.out.log --time --restart-delay=1000 --update-env --exp-backoff-restart-delay=1500",
+    "start": "pm2 flush && pm2 start index.js --name 3DPF -e ./logs/pm2.error.log -o ./logs/pm2.out.log --time --restart-delay=1000 --update-env --exp-backoff-restart-delay=1500",
     "restart": "pm2 restart 3DPF",
     "migration:up": "migrate-mongo up",
     "migration:down": "migrate-mongo down",
@@ -16,7 +16,7 @@
     "stop": "pm2 stop 3DPF",
     "stop:delete": "pm2 delete 3DPF",
     "prettier": "prettier --write \\\"server/**/*.js\\\" \\\"./test/**/*.js\\\" \\\"./client-vue/**/*.js\\\"",
-    "dev": "nodemon ./app.js",
+    "dev": "nodemon ./index.js",
     "test": "jest --forceExit"
   },
   "repository": {
