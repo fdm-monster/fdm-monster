@@ -1,4 +1,4 @@
-# 3D Print Farm [![GitHub stars](https://img.shields.io/github/stars/davidzwa/3d-print-farm)](https://github.com/davidzwa/3d-print-farm/stargazers) ![GitHub issues](https://img.shields.io/github/issues/davidzwa/3d-print-farm?color=green) [![GitHub forks](https://img.shields.io/github/forks/davidzwa/3d-print-farm)](https://github.com/davidzwa/3d-print-farm/network) [![Latest Release](https://img.shields.io/github/release/davidzwa/3d-print-farm)](https://img.shields.io/github/v/tag/davidzwa/3d-print-farm?sort=date) 
+# 3D Print Farm [![GitHub stars](https://img.shields.io/github/stars/davidzwa/3d-print-farm)](https://github.com/davidzwa/3d-print-farm/stargazers) ![GitHub issues](https://img.shields.io/github/issues/davidzwa/3d-print-farm?color=green) [![GitHub forks](https://img.shields.io/github/forks/davidzwa/3d-print-farm)](https://github.com/davidzwa/3d-print-farm/network) [![Latest Release](https://img.shields.io/github/release/davidzwa/3d-print-farm)](https://img.shields.io/github/v/tag/davidzwa/3d-print-farm?sort=date) ![Coverage](https://img.shields.io/codecov/c/github/davidzwa/3d-print-farm)
 
 **_The server for managing 3D printers with great overview_**
 
