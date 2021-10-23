@@ -2,7 +2,7 @@
   "name": "3d-print-farm",
   "author": "David Zwart",
   "license": "AGPLv3",
-  "version": "0.0.2-pre4",
+  "version": "0.0.3-pre1",
   "description": "3DPF is a 3D printer manager to set up, configure and monitor FDM and resin printers. Our aim is to provide extremely optimized performance and reliability.",
   "main": "app.js",
   "scripts": {
