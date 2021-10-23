@@ -50,11 +50,16 @@ function expectInvalidResponse(response, keys, exact = false) {
   expectValidationError(response.body, keys, exact);
 }
 
+function expectNotFoundResponse(response) {
+  expect(response.statusCode).toEqual(404);
+}
+
 module.exports = {
   expectEmptyResponse,
   expectRedirectResponse,
   expectOkResponse,
   expectValidationError,
   expectInvalidResponse,
+  expectNotFoundResponse,
   getExpectExtensions
 };

@@ -1,7 +1,6 @@
 jest.mock("../../server/middleware/auth");
 
 const dbHandler = require("../db-handler");
-const supertest = require("supertest");
 const { AppConstants } = require("../../server/app.constants");
 const { setupTestApp } = require("../../server/app-test");
 const { expectOkResponse } = require("../extensions");
@@ -13,9 +12,7 @@ const getRoute = welcomeRoute;
 
 beforeAll(async () => {
   await dbHandler.connect();
-  const { server, container } = await setupTestApp(true);
-
-  request = supertest(server);
+  ({ request } = await setupTestApp(true));
 });
 
 describe("AppController", () => {

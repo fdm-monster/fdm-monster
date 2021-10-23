@@ -1,14 +1,12 @@
 const dbHandler = require("../db-handler");
-const supertest = require("supertest");
 const { setupTestApp } = require("../../server/app-test");
+const { expectInvalidResponse } = require("../extensions");
 
 let request;
 
 beforeAll(async () => {
   await dbHandler.connect();
-  const { server } = await setupTestApp();
-
-  request = supertest(server);
+  ({ request } = await setupTestApp(true));
 });
 
 describe("ServerUpdate Endpoint", () => {
@@ -17,7 +15,6 @@ describe("ServerUpdate Endpoint", () => {
     process.env.testlatest_package_version = require("../../package.json").version;
 
     const res = await request.post("/api/settings/server/update/server").send();
-    expect(res.statusCode).toEqual(400);
-    // expect(res.text).toEqual("Found. Redirecting to /users/login");
+    expectInvalidResponse(res);
   }, 10000);
 });

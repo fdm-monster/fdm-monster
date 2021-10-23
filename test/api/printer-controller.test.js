@@ -1,7 +1,6 @@
 jest.mock("../../server/middleware/auth");
 
 const dbHandler = require("../db-handler");
-const supertest = require("supertest");
 const { AppConstants } = require("../../server/app.constants");
 const { setupTestApp } = require("../../server/app-test");
 const { expectInvalidResponse, expectOkResponse } = require("../extensions");
@@ -21,9 +20,7 @@ const apiKey = "3dpf3dpf3dpf3dpf3dpf3dpf3dpf3dpf";
 
 beforeAll(async () => {
   await dbHandler.connect();
-  const { server, container } = await setupTestApp(true);
-
-  request = supertest(server);
+  ({ request } = await setupTestApp(true));
 });
 
 afterAll(async () => {
