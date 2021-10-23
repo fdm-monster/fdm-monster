@@ -14,8 +14,13 @@ const {
 let Model = Printer;
 const printerFilesRoute = AppConstants.apiRoute + "/printer-files";
 const trackedUploadsRoute = `${printerFilesRoute}/tracked-uploads`;
+const purgeIndexedFilesRoute = `${printerFilesRoute}/purge`;
 const getRoute = (id) => `${printerFilesRoute}/${id}`;
 const clearFilesRoute = (id) => `${getRoute(id)}/clear`;
+const moveFileOrFolderRoute = (id) => `${getRoute(id)}/move`;
+const deleteFileOrFolderRoute = (id, path) => `${getRoute(id)}?path=${path}`;
+const selectAndPrintRoute = (id) => `${getRoute(id)}/select`;
+const createFolderRoute = (id) => `${getRoute(id)}/create-folder`;
 const getFilesRoute = (id, recursive) => `${getRoute(id)}?recursive=${recursive}`;
 const getCacheRoute = (id) => `${getRoute(id)}/cache`;
 
@@ -76,5 +81,47 @@ describe("PrinterFilesController", () => {
       succeededFiles: expect.any(Array),
       failedFiles: expect.any(Array)
     });
+    expect(response.body.succeededFiles).toHaveLength(1);
+    expect(response.body.failedFiles).toHaveLength(0);
+  });
+
+  it("should allow POST to purge all printer files", async () => {
+    await createTestPrinter(request);
+    await createTestPrinter(request);
+    const response = await request.post(purgeIndexedFilesRoute).send();
+    expectOkResponse(response);
+  });
+
+  it("should allow POST to move a printer folder", async () => {
+    const printer = await createTestPrinter(request);
+    const response = await request.post(moveFileOrFolderRoute(printer.id)).send({
+      filePath: "/test",
+      destination: "/test2"
+    });
+    expectOkResponse(response);
+  });
+
+  it("should allow POST to create a printer folder", async () => {
+    const printer = await createTestPrinter(request);
+    const response = await request.post(createFolderRoute(printer.id)).send({
+      foldername: "/test",
+      path: "local"
+    });
+    expectOkResponse(response);
+  });
+
+  it("should allow DELETE to remove a printer file or folder", async () => {
+    const printer = await createTestPrinter(request);
+    const response = await request.delete(deleteFileOrFolderRoute(printer.id, "test")).send();
+    expectOkResponse(response);
+  });
+
+  it("should allow POST to select and print a printer file", async () => {
+    const printer = await createTestPrinter(request);
+    const response = await request.post(selectAndPrintRoute(printer.id)).send({
+      filePath: "file.gcode",
+      print: false
+    });
+    expectOkResponse(response);
   });
 });

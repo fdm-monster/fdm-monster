@@ -146,12 +146,12 @@ class PrinterFilesController {
 
   async deleteFileOrFolder(req, res) {
     const { currentPrinterId, printerLogin } = getScopedPrinter(req);
-    const { filePath } = await validateInput(req.query, getFileRules);
+    const { path } = await validateInput(req.query, getFileRules);
 
-    const result = await this.#octoPrintApiService.deleteFileOrFolder(printerLogin, filePath);
+    const result = await this.#octoPrintApiService.deleteFileOrFolder(printerLogin, path);
 
-    await this.#filesStore.deleteFile(currentPrinterId, filePath, false);
-    this.#logger.info(`File reference removed, printerId ${currentPrinterId}`, filePath);
+    await this.#filesStore.deleteFile(currentPrinterId, path, false);
+    this.#logger.info(`File reference removed, printerId ${currentPrinterId}`, path);
 
     res.send(result);
   }

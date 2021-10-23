@@ -10,7 +10,7 @@ const selectAndPrintFileRules = {
 const uploadFilesRules = {};
 
 const getFileRules = {
-  filePath: "required|string"
+  path: "required|string"
 };
 
 const createFolderRules = {
