@@ -30,7 +30,6 @@ describe("AppController", () => {
     const response = await request.get(versionRoute).send();
     expectOkResponse(response, {
       isDockerContainer: false,
-      isNode: false,
       isPm2: false,
       update: {
         air_gapped: null

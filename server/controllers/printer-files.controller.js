@@ -87,20 +87,6 @@ class PrinterFilesController {
     res.send(filesCache);
   }
 
-  async getFile(req, res) {
-    const { currentPrinter, printerLogin } = getScopedPrinter(req);
-    const { filePath } = await validateInput(req.query, getFileRules, res);
-
-    const response = await this.#octoPrintApiService.getFile(printerLogin, filePath, {
-      unwrap: false,
-      simple: true
-    });
-
-    await this.#filesStore.appendOrSetPrinterFile(currentPrinter.id, response.data);
-
-    this.#statusResponse(res, response);
-  }
-
   async clearPrinterFiles(req, res) {
     const { currentPrinterId, printerLogin } = getScopedPrinter(req);
 
