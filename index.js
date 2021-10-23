@@ -19,7 +19,11 @@ setupEnvConfig();
 /**
  * Actual server operation
  */ const { setupNormalServer } = require("./server/server.core");
-const { httpServer, serverHost } = setupNormalServer();
-serverHost.boot(httpServer).catch((e) => {
-  console.error("Server has crashed unintentionally - please report this", e);
-});
+const { httpServer, container } = setupNormalServer();
+
+container
+  .resolve("serverHost")
+  .boot(httpServer)
+  .catch((e) => {
+    console.error("Server has crashed unintentionally - please report this", e);
+  });

@@ -19,7 +19,7 @@ class ServerHost {
     this.#taskManagerService = taskManagerService;
   }
 
-  async boot(httpServer, quick_boot, listenRequests = true) {
+  async boot(httpServer, quick_boot = false, listenRequests = true) {
     this.#httpServerInstance = httpServer;
     this.serveControllerRoutes(this.#httpServerInstance);
 
