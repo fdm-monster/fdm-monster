@@ -35,7 +35,15 @@ class ServerSettingsService {
     }
   }
 
-  static async update(obj) {
+  async setFilamentManagerPluginSetting(enabled) {
+    const settings = await this.getOrCreate();
+    settings.filamentManager = enabled;
+
+    await settings.save();
+    return settings;
+  }
+
+  async update(obj) {
     const checked = await ServerSettingsDB.find({});
 
     checked[0] = obj;
