@@ -1,7 +1,7 @@
 const _ = require("lodash");
 const { createController } = require("awilix-express");
 const { ensureAuthenticated } = require("../middleware/auth");
-const Spool = require("../models/Spool.js");
+const Filament = require("../models/Filament");
 const Profiles = require("../models/Profiles.js");
 const { AppConstants } = require("../server.constants");
 
@@ -43,7 +43,7 @@ class FilamentController {
         return o._id == req.body.printerId;
       });
       const printer = printerList[i];
-      const spool = await Spool.findById(req.body.spoolId);
+      const spool = await Filament.findById(req.body.spoolId);
       const selection = {
         tool: req.body.tool,
         spool: { id: spool.spools.fmID }
@@ -70,7 +70,7 @@ class FilamentController {
     const { filamentManager } = this.#settingsStore.getServerSettings();
 
     const filament = req.body;
-    this.#logger.info("Saving Filament Manager Spool: ", filament);
+    this.#logger.info("Saving Filament Manager Filament: ", filament);
     const filamentManagerID = null;
 
     if (filamentManager) {
@@ -138,11 +138,11 @@ class FilamentController {
         tempOffset: filament.spoolsTempOffset,
         fmID: filamentManagerID
       };
-      const newFilament = new Spool({
+      const newFilament = new Filament({
         spools
       });
       newFilament.save().then(async (e) => {
-        this.#logger.info("New Spool saved successfully: ", newFilament);
+        this.#logger.info("New Filament saved successfully: ", newFilament);
         await this.#filamentManagerPluginService.filamentManagerReSync();
         FilamentClean.start(filamentManager);
         res.send({
@@ -174,7 +174,7 @@ class FilamentController {
         }
       }
 
-      searchId = await Spool.findById(searchId);
+      searchId = await Filament.findById(searchId);
       this.#logger.info("Updating Octoprint to remove: ", searchId);
 
       // TODO move to client service
@@ -187,18 +187,18 @@ class FilamentController {
         }
       });
 
-      const rel = await Spool.deleteOne({ _id: searchId }).exec();
+      const rel = await Filament.deleteOne({ _id: searchId }).exec();
       this.#logger.info("Successfully deleted: ", searchId);
       rel.status = 200;
-      Spool.find({}).then((spools) => {
+      Filament.find({}).then((spools) => {
         FilamentClean.start(filamentManager);
         res.send({ spool: spools });
       });
     } else {
-      const rel = await Spool.deleteOne({ _id: searchId }).exec();
+      const rel = await Filament.deleteOne({ _id: searchId }).exec();
       this.#logger.info("Successfully deleted: ", searchId);
       rel.status = 200;
-      Spool.find({}).then((spools) => {
+      Filament.find({}).then((spools) => {
         FilamentClean.start(filamentManager);
         res.send({ spool: spools });
       });
@@ -212,7 +212,7 @@ class FilamentController {
     this.#logger.info("Request to update spool id: ", searchId);
     this.#logger.info("New details: ", req.body.spool);
     const newContent = req.body.spool;
-    const spools = await Spool.findById(searchId);
+    const spools = await Filament.findById(searchId);
 
     if (filamentManager) {
       const printerList = Runner.returnFarmPrinters();
@@ -289,7 +289,7 @@ class FilamentController {
     }
     await spools.save();
     Runner.updateFilament();
-    Spool.find({}).then((spools) => {
+    Filament.find({}).then((spools) => {
       this.#logger.info("New spool details saved: ", req.body.spool);
       FilamentClean.start(filamentManager);
       Runner.updateFilament();
@@ -560,12 +560,12 @@ class FilamentController {
       );
       res.send({ status: false });
     }
-    await Spool.deleteMany({});
+    await Filament.deleteMany({});
     await Profiles.deleteMany({});
     spools = await spools.json();
     profiles = await profiles.json();
     spools.spools.forEach((sp) => {
-      this.#logger.info("Saving Spool: ", sp);
+      this.#logger.info("Saving Filament: ", sp);
       const spools = {
         name: sp.name,
         profile: sp.profile.id,
@@ -575,7 +575,7 @@ class FilamentController {
         tempOffset: sp.temp_offset,
         fmID: sp.id
       };
-      const newS = new Spool({
+      const newS = new Filament({
         spools
       });
       newS.save();
@@ -609,7 +609,7 @@ class FilamentController {
 
   async disableFilamentManagerPlugin(req, res) {
     this.#logger.info("Request to disabled filament manager plugin");
-    await Spool.deleteMany({}).then((e) => {
+    await Filament.deleteMany({}).then((e) => {
       this.#logger.info("Spools deleted");
     });
 
