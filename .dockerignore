@@ -14,12 +14,13 @@
 
 # Runtime and non-production folders
 /3DPF
+/client-npm
+/client-vue
+/coverage
 /docs
+/file-uploads
 /images
 /logs
-/coverage
-/client-vue
-/client-npm
 /server-nest
-/views
 /test
+/views
