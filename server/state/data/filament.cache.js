@@ -1,5 +1,5 @@
 const _ = require("lodash");
-const Spools = require("../../models/Spool.js");
+const Filament = require("../../models/Filament");
 const { noSpoolOptionTemplate } = require("../../constants/template.constants");
 
 class FilamentCache {
@@ -36,7 +36,7 @@ class FilamentCache {
   async initCache() {
     const printers = this.#printersStore.listPrinterStates();
 
-    const spools = await Spools.find({});
+    const spools = await Filament.find({});
     const spoolsArray = [];
     const profilesArray = [];
 

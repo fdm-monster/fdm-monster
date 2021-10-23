@@ -1,5 +1,5 @@
 const Logger = require("../../handlers/logger.js");
-const Spool = require("../../models/Spool.js");
+const Filament = require("../../models/Filament.js");
 const Profile = require("../../models/Profiles.js");
 
 class FilamentManagerPluginService {
@@ -30,7 +30,7 @@ class FilamentManagerPluginService {
         const sp = await response.json();
 
         const spoolID = printer.selectedFilament[i]._id;
-        const spoolEntity = await Spool.findById(spoolID);
+        const spoolEntity = await Filament.findById(spoolID);
         if (!spoolEntity) {
           throw `Spool database entity by ID '${spoolID}' not found. Cant update filament.`;
         }
@@ -104,7 +104,7 @@ class FilamentManagerPluginService {
     const spoolsFM = await spools.json();
     const profilesFM = await profiles.json();
 
-    const S = "Spool";
+    const S = "Filament";
     const P = "Profile";
 
     for (let s = 0; s < spoolsFM.spools.length; s++) {
@@ -118,17 +118,17 @@ class FilamentManagerPluginService {
         tempOffset: sp.temp_offset,
         fmID: sp.id
       };
-      const oldSpool = await Spool.findOne({ "spools.fmID": sp.id });
+      const oldSpool = await Filament.findOne({ "spools.fmID": sp.id });
       if (oldSpool !== null) {
         updatedSpools.push(S);
-        this.#logger.info("Updating Spool: ", spools);
+        this.#logger.info("Updating Filament: ", spools);
         oldSpool.spools = spools;
         oldSpool.markModified("spools");
         oldSpool.save();
       } else {
-        // New Spool
-        this.#logger.info("Saving New Spool: ", spools);
-        const newSpool = await new Spool({ spools });
+        // New Filament
+        this.#logger.info("Saving New Filament: ", spools);
+        const newSpool = await new Filament({ spools });
         await newSpool.save();
         if (addSpool) {
           addSpools.push(newSpool);
