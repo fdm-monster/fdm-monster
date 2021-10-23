@@ -6,7 +6,7 @@ let request;
 
 beforeAll(async () => {
   await dbHandler.connect();
-  ({ request } = await setupTestApp(true));
+  ({ request } = await setupTestApp());
 });
 
 describe("ServerUpdate Endpoint", () => {
