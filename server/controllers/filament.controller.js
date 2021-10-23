@@ -60,13 +60,10 @@ class FilamentController {
         body: JSON.stringify({ selection })
       });
     }
-    const printerList = await Runner.selectedFilament(
-      req.body.printerId,
-      req.body.spoolId,
-      req.body.tool
-    );
+
+    await Runner.selectedFilament(req.body.printerId, req.body.spoolId, req.body.tool);
     FilamentClean.start(filamentManager);
-    res.send({ status: 200 });
+    res.send();
   }
 
   async create(req, res) {
