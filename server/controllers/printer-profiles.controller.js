@@ -9,12 +9,22 @@ const _ = require("lodash");
 class PrinterProfilesController {
   #printerProfilesCache;
   #octoPrintApiService;
+  #filamentManagerPluginService;
   #settingsStore;
+  #logger;
 
-  constructor({ settingsStore, printerProfilesCache, octoPrintApiService }) {
+  constructor({
+    settingsStore,
+    printerProfilesCache,
+    octoPrintApiService,
+    loggerFactory,
+    filamentManagerPluginService
+  }) {
     this.#settingsStore = settingsStore;
     this.#printerProfilesCache = printerProfilesCache;
     this.#octoPrintApiService = octoPrintApiService;
+    this.#logger = loggerFactory("Server-API");
+    this.#filamentManagerPluginService = filamentManagerPluginService;
   }
 
   async listProfiles(req, res) {
