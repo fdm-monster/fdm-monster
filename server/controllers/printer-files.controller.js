@@ -5,7 +5,7 @@ const { AppConstants } = require("../app.constants");
 const {
   getFilesRules,
   getFileRules,
-  uploadFilesRules,
+  uploadFileRules,
   fileUploadCommandsRules,
   selectAndPrintFileRules,
   localFileUploadRules,
@@ -165,13 +165,13 @@ class PrinterFilesController {
     res.send(result);
   }
 
-  async uploadFiles(req, res) {
+  async uploadFile(req, res) {
     const { printerLogin, currentPrinterId } = getScopedPrinter(req);
-    const {} = await validateInput(req.query, uploadFilesRules);
+    const {} = await validateInput(req.query, uploadFileRules);
 
     const files = await this.#getUploadedFile(req, res, true);
 
-    if (!files.length) {
+    if (!files?.length) {
       throw new ValidationException({
         error: "No file was available for upload. Did you upload files with extension '.gcode'?"
       });
@@ -239,7 +239,7 @@ module.exports = createController(PrinterFilesController)
     .get("/:id/cache", "getFilesCache")
     .delete("/:id", "deleteFileOrFolder")
     .post("/:id/local-upload", "localUploadFile")
-    .post("/:id/upload", "uploadFiles")
+    .post("/:id/upload", "uploadFile")
     .post("/:id/create-folder", "createFolder")
     .post("/:id/select", "selectAndPrintFile")
     .post("/:id/move", "moveFileOrFolder")

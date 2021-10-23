@@ -7,7 +7,7 @@ const selectAndPrintFileRules = {
   print: "required|boolean"
 };
 
-const uploadFilesRules = {};
+const uploadFileRules = {};
 
 const getFileRules = {
   path: "required|string"
@@ -38,7 +38,7 @@ module.exports = {
   getFilesRules,
   selectAndPrintFileRules,
   localFileUploadRules,
-  uploadFilesRules,
+  uploadFileRules,
   createFolderRules,
   moveFileOrFolderRules,
   fileUploadCommandsRules,

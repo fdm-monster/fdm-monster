@@ -20,6 +20,7 @@ const clearFilesRoute = (id) => `${getRoute(id)}/clear`;
 const moveFileOrFolderRoute = (id) => `${getRoute(id)}/move`;
 const deleteFileOrFolderRoute = (id, path) => `${getRoute(id)}?path=${path}`;
 const selectAndPrintRoute = (id) => `${getRoute(id)}/select`;
+const uploadFileRoute = (id) => `${getRoute(id)}/upload`;
 const createFolderRoute = (id) => `${getRoute(id)}/create-folder`;
 const getFilesRoute = (id, recursive) => `${getRoute(id)}?recursive=${recursive}`;
 const getCacheRoute = (id) => `${getRoute(id)}/cache`;
@@ -123,5 +124,11 @@ describe("PrinterFilesController", () => {
       print: false
     });
     expectOkResponse(response);
+  });
+
+  it("should deny POST to upload printer files when empty", async () => {
+    const printer = await createTestPrinter(request);
+    const response = await request.post(uploadFileRoute(printer.id)).send();
+    expectInvalidResponse(response);
   });
 });
