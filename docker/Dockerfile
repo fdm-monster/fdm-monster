@@ -1,4 +1,4 @@
-FROM node:14.17-stretch-slim
+FROM node:16-bullseye-slim
 WORKDIR /app
 
 RUN npm install -g pm2

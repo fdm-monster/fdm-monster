@@ -12,6 +12,8 @@ class MulterService {
   }
 
   clearUploadsFolder() {
+    if (!fs.existsSync(AppConstants.defaultFileUploadFolder)) return;
+
     fs.readdir(AppConstants.defaultFileUploadFolder, (err, files) => {
       if (err) throw err;
 

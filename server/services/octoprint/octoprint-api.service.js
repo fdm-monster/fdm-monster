@@ -1,5 +1,4 @@
 const fs = require("fs");
-const request = require("request");
 const {
   OPClientErrors,
   contentTypeHeaderKey,
