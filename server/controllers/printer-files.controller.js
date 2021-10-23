@@ -5,7 +5,7 @@ const { AppConstants } = require("../app.constants");
 const {
   getFilesRules,
   getFileRules,
-  uploadFilesRules,
+  uploadFileRules,
   fileUploadCommandsRules,
   selectAndPrintFileRules,
   localFileUploadRules,
@@ -16,7 +16,7 @@ const { ValidationException } = require("../exceptions/runtime.exceptions");
 const fs = require("fs");
 const { printerLoginToken, printerResolveMiddleware } = require("../middleware/printer");
 
-class PrinterFileController {
+class PrinterFilesController {
   #filesStore;
 
   #octoPrintApiService;
@@ -87,20 +87,6 @@ class PrinterFileController {
     res.send(filesCache);
   }
 
-  async getFile(req, res) {
-    const { currentPrinter, printerLogin } = getScopedPrinter(req);
-    const { filePath } = await validateInput(req.query, getFileRules, res);
-
-    const response = await this.#octoPrintApiService.getFile(printerLogin, filePath, {
-      unwrap: false,
-      simple: true
-    });
-
-    await this.#filesStore.appendOrSetPrinterFile(currentPrinter.id, response.data);
-
-    this.#statusResponse(res, response);
-  }
-
   async clearPrinterFiles(req, res) {
     const { currentPrinterId, printerLogin } = getScopedPrinter(req);
 
@@ -160,12 +146,12 @@ class PrinterFileController {
 
   async deleteFileOrFolder(req, res) {
     const { currentPrinterId, printerLogin } = getScopedPrinter(req);
-    const { filePath } = await validateInput(req.query, getFileRules);
+    const { path } = await validateInput(req.query, getFileRules);
 
-    const result = await this.#octoPrintApiService.deleteFileOrFolder(printerLogin, filePath);
+    const result = await this.#octoPrintApiService.deleteFileOrFolder(printerLogin, path);
 
-    await this.#filesStore.deleteFile(currentPrinterId, filePath, false);
-    this.#logger.info(`File reference removed, printerId ${currentPrinterId}`, filePath);
+    await this.#filesStore.deleteFile(currentPrinterId, path, false);
+    this.#logger.info(`File reference removed, printerId ${currentPrinterId}`, path);
 
     res.send(result);
   }
@@ -179,13 +165,13 @@ class PrinterFileController {
     res.send(result);
   }
 
-  async uploadFiles(req, res) {
+  async uploadFile(req, res) {
     const { printerLogin, currentPrinterId } = getScopedPrinter(req);
-    const {} = await validateInput(req.query, uploadFilesRules);
+    const {} = await validateInput(req.query, uploadFileRules);
 
     const files = await this.#getUploadedFile(req, res, true);
 
-    if (!files.length) {
+    if (!files?.length) {
       throw new ValidationException({
         error: "No file was available for upload. Did you upload files with extension '.gcode'?"
       });
@@ -243,7 +229,7 @@ class PrinterFileController {
 }
 
 // prettier-ignore
-module.exports = createController(PrinterFileController)
+module.exports = createController(PrinterFilesController)
     .prefix(AppConstants.apiRoute + "/printer-files")
     .before([ensureAuthenticated, printerResolveMiddleware()])
     .post("/purge", "purgeIndexedFiles")
@@ -253,7 +239,7 @@ module.exports = createController(PrinterFileController)
     .get("/:id/cache", "getFilesCache")
     .delete("/:id", "deleteFileOrFolder")
     .post("/:id/local-upload", "localUploadFile")
-    .post("/:id/upload", "uploadFiles")
+    .post("/:id/upload", "uploadFile")
     .post("/:id/create-folder", "createFolder")
     .post("/:id/select", "selectAndPrintFile")
     .post("/:id/move", "moveFileOrFolder")

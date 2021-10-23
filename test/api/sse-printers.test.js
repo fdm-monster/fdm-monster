@@ -2,19 +2,20 @@ jest.mock("../../server/middleware/auth");
 
 const EventSource = require("eventsource");
 const dbHandler = require("../db-handler");
-const supertest = require("supertest");
 const getEndpoints = require("express-list-endpoints");
-const { setupTestApp } = require("../../server/app-test");
+const { setupTestApp } = require("../app-test");
 const DITokens = require("../../server/container.tokens");
 
 let request;
+let container;
+let server;
 let sseTask;
 const routeBase = "/api/printer/";
 const ssePath = "sse";
 
 beforeAll(async () => {
   await dbHandler.connect();
-  const { server, container } = await setupTestApp(true);
+  ({ request, container, server } = await setupTestApp(true));
 
   sseTask = container.resolve(DITokens.printerSseTask);
 
@@ -24,7 +25,6 @@ beforeAll(async () => {
     middlewares: ["anonymous", "anonymous", "memberInvoker"],
     path: routeBase + ssePath
   });
-  request = supertest(server);
 });
 
 describe("SSE-printers", () => {

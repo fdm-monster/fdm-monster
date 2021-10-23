@@ -23,7 +23,7 @@ const updatePrinterEnabledRule = {
 
 const updatePrinterConnectionSettingRules = {
   printerURL: "required|httpurl",
-  webSocketURL: "required|wsurl", // Changed from protocol to url
+  webSocketURL: "required|wsurl",
   camURL: "httpurl",
   apiKey: `required|minLength:${UUID_LENGTH}|maxLength:${UUID_LENGTH}`
 };

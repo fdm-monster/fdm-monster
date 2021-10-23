@@ -1,14 +1,11 @@
 const dbHandler = require("../db-handler");
-const supertest = require("supertest");
-const { setupTestApp } = require("../../server/app-test");
+const { setupTestApp } = require("../app-test");
 
 let request;
 
 beforeAll(async () => {
   await dbHandler.connect();
-  const { server } = await setupTestApp(true);
-
-  request = supertest(server);
+  ({ request } = await setupTestApp(true));
 });
 
 function getCookies(response) {

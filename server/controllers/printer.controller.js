@@ -10,7 +10,7 @@ const {
   updatePrinterEnabledRule
 } = require("./validation/printer-controller.validation");
 const { AppConstants } = require("../app.constants");
-const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
+const { convertHttpUrlToWebsocket, sanitizeURL } = require("../utils/url.utils");
 const DITokens = require("../container.tokens");
 const { Status, getSettingsAppearanceDefault } = require("../constants/service.constants");
 const { printerResolveMiddleware } = require("../middleware/printer");
@@ -285,9 +285,8 @@ class PrinterController {
   async getPluginList(req, res) {
     const { printerLogin, currentPrinterId } = getScopedPrinter(req);
 
-    this.#logger.info("Grabbing plugin list for: ", currentPrinterId);
-
     // TODO requires octoprint version for compatibility...
+    this.#logger.info("Querying OctoPrint plugin list for: ", currentPrinterId);
     let pluginList = await this.#octoPrintApiService.getPluginManager(printerLogin);
     res.send(pluginList);
   }

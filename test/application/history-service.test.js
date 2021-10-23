@@ -167,7 +167,7 @@ describe("HistoryService", () => {
       ]
     };
 
-    octoPrintClientMock.saveMockResponse(200, { spool: { profile: {} } });
+    octoPrintClientMock.saveMockResponse({ spool: { profile: {} } }, 200);
 
     const spools = await historyService.resyncFilament(printer);
     expect(spools).toHaveLength(1);
