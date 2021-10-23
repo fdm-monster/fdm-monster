@@ -26,5 +26,5 @@ container
   .resolve(DITokens.serverHost)
   .boot(httpServer)
   .catch((e) => {
-    console.error("Server has crashed unintentionally", e);
+    console.error("Server has crashed unintentionally - please report this", e);
   });

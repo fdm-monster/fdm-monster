@@ -112,38 +112,38 @@ class ServerHost {
     const routePath = "./controllers";
 
     // Catches any HTML request to paths like / or file/ as long as its text/html
-    app.use(history());
-    // Serve the API
-    app.use(loadControllers(`${routePath}/settings/*.controller.js`, { cwd: __dirname }));
-    app.use(loadControllers(`${routePath}/*.controller.js`, { cwd: __dirname }));
-    app.use(exceptionHandler);
+    app
+      .use(history())
+      .use(loadControllers(`${routePath}/settings/*.controller.js`, { cwd: __dirname }))
+      .use(loadControllers(`${routePath}/*.controller.js`, { cwd: __dirname }))
+      .use(exceptionHandler);
 
     // Serve the files for our frontend - do this later than the controllers
     const appDistPath = getAppDistPath();
     if (appDistPath) {
-      app.use(express.static(appDistPath));
-      app.get("/", function (req, res) {
+      app.use(express.static(appDistPath)).get("/", function (req, res) {
         res.sendFile("index.html", { root: appDistPath });
       });
     } else {
       this.#logger.warning("~ Skipped loading Vue frontend as no path was returned");
     }
 
-    app.get("*", (req, res) => {
-      const path = req.originalUrl;
+    app
+      .get("*", (req, res) => {
+        const path = req.originalUrl;
 
-      let resource = "MVC";
-      if (path.startsWith("/api") || path.startsWith("/plugins")) {
-        resource = "API";
-      } else if (path.endsWith(".min.js")) {
-        resource = "client-bundle";
-      }
+        let resource = "MVC";
+        if (path.startsWith("/api") || path.startsWith("/plugins")) {
+          resource = "API";
+        } else if (path.endsWith(".min.js")) {
+          resource = "client-bundle";
+        }
 
-      this.#logger.error(`${resource} resource at '${path}' was not found`);
+        this.#logger.error(`${resource} resource at '${path}' was not found`);
 
-      throw new NotFoundException(`${resource} resource was not found`, path);
-    });
-    app.use(exceptionHandler);
+        throw new NotFoundException(`${resource} resource was not found`, path);
+      })
+      .use(exceptionHandler);
   }
 
   async httpListen() {
