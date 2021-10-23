@@ -21,7 +21,7 @@ class FilamentCache {
     this.#logger = loggerFactory("Server-Filament");
   }
 
-  getSpools() {
+  getFilamentSpools() {
     return this.#filamentSpools;
   }
 

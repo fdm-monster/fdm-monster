@@ -29,7 +29,7 @@ class FilamentController {
   }
 
   async list(req, res) {
-    const spools = await this.#filamentCache.getSpools();
+    const spools = await this.#filamentCache.getFilamentSpools();
     res.send({ spools });
   }
 
