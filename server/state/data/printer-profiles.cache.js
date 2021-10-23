@@ -1,4 +1,4 @@
-module.exports = class PrinterProfilesCache {
+class PrinterProfilesCache {
   // Data array
   #printerProfiles = [];
 
@@ -38,4 +38,6 @@ module.exports = class PrinterProfilesCache {
       printerProfiles.profiles = profiles;
     }
   }
-};
+}
+
+module.exports = PrinterProfilesCache;

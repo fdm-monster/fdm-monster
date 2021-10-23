@@ -239,8 +239,8 @@ class PrinterProfilesController {
 module.exports = createController(PrinterProfilesController)
   .prefix(AppConstants.apiRoute + "/printer-profiles")
   .before([ensureAuthenticated, printerResolveMiddleware()])
-  .get("/:id/cache", "listCache")
-  .get("/:id", "get")
+  .get("/:id", "listProfiles")
+  .get("/:id/cache", "listProfilesCache")
   .post("/:id", "create")
   .patch("/:id", "update")
   .delete("/:id", "delete");
