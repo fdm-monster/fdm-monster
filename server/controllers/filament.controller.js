@@ -28,14 +28,9 @@ class FilamentController {
     this.#logger = loggerFactory("Server-FilamentManager");
   }
 
-  async listSpools(req, res) {
+  async list(req, res) {
     const spools = await this.#filamentCache.getSpools();
     res.send({ spools });
-  }
-
-  async dropDownList(req, res) {
-    const selected = await this.#filamentCache.getDropDown();
-    res.send({ selected });
   }
 
   async selectFilament(req, res) {
@@ -642,11 +637,11 @@ class FilamentController {
 module.exports = createController(FilamentController)
     .prefix(AppConstants.apiRoute + "/filament")
     .before([ensureAuthenticated])
+    .get("/", "list")
     .post("/:id", "create")
     .patch("/:id", "update")
     .delete("/:id", "delete")
     .get("/dropdown-list", "dropDownList")
-    .get("/spools", "listSpools")
     .patch("/select", "selectFilament")
     .get("/printer-list", "filamentList")
     // WIP line
