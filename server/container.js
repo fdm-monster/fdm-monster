@@ -53,6 +53,7 @@ const MulterService = require("./services/multer.service");
 const FileUploadTrackerCache = require("./state/data/file-upload-tracker.cache");
 const ServerHost = require("./server.host");
 const BootTask = require("./tasks/boot.task");
+const PrinterProfilesCache = require("./state/data/printer-profiles.cache");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).

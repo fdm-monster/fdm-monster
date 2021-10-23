@@ -38,11 +38,6 @@ class FilamentController {
     res.send({ selected });
   }
 
-  async filamentList(req, res) {
-    const printerList = await PrinterClean.returnFilamentList();
-    res.send({ printerList });
-  }
-
   async selectFilament(req, res) {
     const { filamentManager } = this.#settingsStore.getServerSettings();
 
