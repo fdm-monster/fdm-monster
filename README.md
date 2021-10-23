@@ -25,6 +25,7 @@ This work is under active development with cutting edge tech and standards. Feel
 - [x] Vue app core and distribution setup on NPM completed
 - [x] Client for basic management of OctoPrint printers (file storage, print upload and printer management)
 - [x] Printer Location Map based on 2x2 groups
+- [x] Server resilient against database connection failures with automatic retry of 5 seconds
 - [ ] Printer Group management
 - [ ] NodeJS Server legacy-free
 - [ ] Better authentication and user management
