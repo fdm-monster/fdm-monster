@@ -1,5 +1,5 @@
 const { createController } = require("awilix-express");
-const { AppConstants } = require("../app.constants");
+const { AppConstants } = require("../server.constants");
 const isDocker = require("is-docker");
 const { isNodemon, isNode, isPm2 } = require("../utils/env.utils");
 const { ensureCurrentUserAndGroup } = require("../middleware/users");

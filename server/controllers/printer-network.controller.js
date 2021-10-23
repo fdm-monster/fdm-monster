@@ -1,7 +1,7 @@
 const { ensureAuthenticated } = require("../middleware/auth");
 const { createController } = require("awilix-express");
 const Logger = require("../handlers/logger.js");
-const { AppConstants } = require("../app.constants");
+const { AppConstants } = require("../server.constants");
 
 class PrinterNetworkController {
   #printerService;

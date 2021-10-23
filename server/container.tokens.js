@@ -1,4 +1,5 @@
 const DITokens = {
+  serverHost: "serverHost",
   loggerFactory: "loggerFactory",
   httpClient: "httpClient",
   multerService: "multerService",
@@ -44,6 +45,7 @@ const DITokens = {
   historyCache: "historyCache",
   filamentCache: "filamentCache",
   // Tasks
+  bootTask: "bootTask",
   printerSystemTask: "printerSystemTask",
   softwareUpdateTask: "softwareUpdateTask",
   printerSseTask: "printerSseTask",

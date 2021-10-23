@@ -5,9 +5,11 @@ const {
 
 class GithubApiService {
   #httpClient;
+  #logger;
 
-  constructor({ httpClient }) {
+  constructor({ httpClient, loggerFactory }) {
     this.#httpClient = httpClient;
+    this.#logger = loggerFactory("Github-API", false);
   }
 
   async getGithubReleasesPromise() {
@@ -29,7 +31,7 @@ class GithubApiService {
         }
       })
       .then((r) => {
-        console.log(`Received ${r.data.length} releases from github.`);
+        this.#logger.info(`Received ${r.data.length} releases from github.`);
         return r.data;
       });
   }

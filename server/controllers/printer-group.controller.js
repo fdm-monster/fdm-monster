@@ -1,6 +1,6 @@
 const { ensureAuthenticated } = require("../middleware/auth");
 const { createController } = require("awilix-express");
-const { AppConstants } = require("../app.constants");
+const { AppConstants } = require("../server.constants");
 const { validateInput } = require("../handlers/validators");
 const { idRules } = require("./validation/generic.validation");
 

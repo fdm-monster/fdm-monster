@@ -1,4 +1,4 @@
-const { AppConstants } = require("../app.constants");
+const { AppConstants } = require("../server.constants");
 
 // Default Settings
 const onlinePolling = {

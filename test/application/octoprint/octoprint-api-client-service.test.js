@@ -1,7 +1,7 @@
 const testPath = "../../";
 const dbHandler = require(testPath + "db-handler");
 const { configureContainer } = require("../../../server/container");
-const { ensureSystemSettingsInitiated } = require("../../../server/app-core");
+const { ensureSystemSettingsInitiated } = require("../../../server/server.core");
 const DITokens = require("../../../server/container.tokens");
 const AxiosMock = require("../../mocks/axios.mock");
 const awilix = require("awilix");
@@ -12,8 +12,7 @@ beforeAll(async () => {
   await dbHandler.connect();
   const container = configureContainer();
   container.register(DITokens.httpClient, awilix.asClass(AxiosMock));
-
-  await ensureSystemSettingsInitiated(container);
+  await container.resolve(DITokens.settingsStore).loadSettings();
 
   octoPrintApi = container.resolve(DITokens.octoPrintApiService);
 });

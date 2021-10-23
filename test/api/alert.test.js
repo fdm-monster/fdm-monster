@@ -1,13 +1,13 @@
 jest.mock("../../server/middleware/auth");
 
 const dbHandler = require("../db-handler");
-const { AppConstants } = require("../../server/app.constants");
-const { setupTestApp } = require("../app-test");
+const { asValue } = require("awilix");
+const DITokens = require("../../server/container.tokens");
+const { AppConstants } = require("../../server/server.constants");
+const { setupTestApp } = require("../test-server");
 const { expectOkResponse } = require("../extensions");
 const Alert = require("../../server/models/Alert");
 const { createTestPrinter } = require("./test-data/create-printer");
-const DITokens = require("../../server/container.tokens");
-const { asValue } = require("awilix");
 
 let Model = Alert;
 const listRoute = `${AppConstants.apiRoute}/alert`;

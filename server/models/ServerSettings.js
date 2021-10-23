@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { AppConstants } = require("../app.constants");
+const { AppConstants } = require("../server.constants");
 
 const ServerSettingsSchema = new mongoose.Schema({
   onlinePolling: {

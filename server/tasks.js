@@ -22,6 +22,12 @@ function registerTask(task, preset, milliseconds = 0, runImmediately) {
 const HOUR_MS = 3600 * 1000;
 
 class ServerTasks {
+  static SERVER_BOOT_TASK = registerTask(
+    DITokens.bootTask,
+    TaskPresets.PERIODIC_DISABLED,
+    5000,
+    false
+  );
   static BOOT_TASKS = [
     registerTask(DITokens.softwareUpdateTask, TaskPresets.RUNDELAYED, 1500),
     registerTask(DITokens.printerSseTask, TaskPresets.PERIODIC, 500),

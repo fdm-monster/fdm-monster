@@ -1,7 +1,7 @@
 const { ensureAuthenticated } = require("../middleware/auth");
 const { createController } = require("awilix-express");
 const { validateInput, getScopedPrinter, validateMiddleware } = require("../handlers/validators");
-const { AppConstants } = require("../app.constants");
+const { AppConstants } = require("../server.constants");
 const {
   getFilesRules,
   getFileRules,

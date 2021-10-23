@@ -38,7 +38,7 @@ const InfluxDbHistoryService = require("./services/influx/influx-db-history.serv
 const InfluxDbFilamentService = require("./services/influx/influx-db-filament.service");
 const InfluxDbPrinterStateService = require("./services/influx/influx-db-printer-state.service");
 const { configureEventEmitter } = require("./handlers/event-emitter");
-const { AppConstants } = require("./app.constants");
+const { AppConstants } = require("./server.constants");
 const PrinterFilesService = require("./services/printer-files.service");
 const SoftwareUpdateTask = require("./tasks/software-update.task");
 const AutoDiscoveryService = require("./services/auto-discovery.service");
@@ -51,6 +51,8 @@ const PrinterTestTask = require("./tasks/printer-test.task");
 const PrinterGroupsCache = require("./state/data/printer-groups.cache");
 const MulterService = require("./services/multer.service");
 const FileUploadTrackerCache = require("./state/data/file-upload-tracker.cache");
+const ServerHost = require("./server.host");
+const BootTask = require("./tasks/boot.task");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -69,6 +71,7 @@ function configureContainer() {
     [DITokens.printerStateFactory]: asFunction(PrinterStateFactory).transient(), // Factory function, transient on purpose!
 
     // -- asClass --
+    [DITokens.serverHost]: asClass(ServerHost).singleton(),
     [DITokens.settingsStore]: asClass(SettingsStore).singleton(),
     [DITokens.serverSettingsService]: asClass(ServerSettingsService),
     [DITokens.clientSettingsService]: asClass(ClientSettingsService),
@@ -91,7 +94,6 @@ function configureContainer() {
       })
     ),
     [DITokens.multerService]: asClass(MulterService).singleton(),
-
     [DITokens.printerService]: asClass(PrinterService),
     [DITokens.printerFilesService]: asClass(PrinterFilesService),
     [DITokens.printerGroupService]: asClass(PrinterGroupService),
@@ -99,6 +101,7 @@ function configureContainer() {
     [DITokens.filamentManagerPluginService]: asClass(FilamentManagerPluginService),
     [DITokens.historyService]: asClass(HistoryService),
     [DITokens.dashboardStatisticsCache]: asClass(DashboardStatisticsCache),
+
     [DITokens.filamentCache]: asClass(FilamentCache).singleton(),
     [DITokens.currentOperationsCache]: asClass(CurrentOperationsCache).singleton(),
     [DITokens.printerState]: asClass(PrinterState).transient(), // Transient on purpose!
@@ -121,6 +124,7 @@ function configureContainer() {
     [DITokens.influxDbHistoryService]: asClass(InfluxDbHistoryService),
     [DITokens.influxDbPrinterStateService]: asClass(InfluxDbPrinterStateService),
 
+    [DITokens.bootTask]: asClass(BootTask),
     [DITokens.softwareUpdateTask]: asClass(SoftwareUpdateTask),
     // Provided SSE handlers (couplers) shared with controllers
     [DITokens.printerSseHandler]: asClass(ServerSentEventsHandler).singleton(),

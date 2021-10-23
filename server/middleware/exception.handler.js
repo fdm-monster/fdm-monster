@@ -3,8 +3,8 @@ const {
   NotFoundException,
   InternalServerException,
   ExternalServiceError
-} = require("./runtime.exceptions");
-const { AppConstants } = require("../app.constants");
+} = require("../exceptions/runtime.exceptions");
+const { AppConstants } = require("../server.constants");
 
 // https://dev.to/rajajaganathan/express-scalable-way-to-handle-errors-1kd6
 function exceptionHandler(err, req, res, next) {

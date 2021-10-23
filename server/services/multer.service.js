@@ -1,5 +1,5 @@
 const multer = require("multer");
-const { AppConstants } = require("../app.constants");
+const { AppConstants } = require("../server.constants");
 const path = require("path");
 const fs = require("fs");
 const { NotFoundException } = require("../exceptions/runtime.exceptions");

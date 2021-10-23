@@ -9,7 +9,7 @@ const {
   feedRateRules,
   updatePrinterEnabledRule
 } = require("./validation/printer-controller.validation");
-const { AppConstants } = require("../app.constants");
+const { AppConstants } = require("../server.constants");
 const { convertHttpUrlToWebsocket, sanitizeURL } = require("../utils/url.utils");
 const DITokens = require("../container.tokens");
 const { Status, getSettingsAppearanceDefault } = require("../constants/service.constants");

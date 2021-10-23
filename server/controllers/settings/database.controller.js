@@ -1,6 +1,6 @@
 const { createController } = require("awilix-express");
 const { ensureAuthenticated } = require("../../middleware/auth");
-const { AppConstants } = require("../../app.constants");
+const { AppConstants } = require("../../server.constants");
 
 class DatabaseController {
   constructor({}) {}
