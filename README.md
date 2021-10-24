@@ -22,17 +22,20 @@ This work is under active development with cutting edge tech and standards. Feel
 
 ## Roadmap
 
-- [x] Vue app core and distribution setup on NPM completed
-- [x] Client for basic management of OctoPrint printers (file storage, print upload and printer management)
-- [x] Printer Location Map based on 2x2 groups
-- [x] Server resilient against database connection failures with automatic retry of 5 seconds
-- [!] Printer Group management
-- [!] Full API and client test coverage >80% (now at 50%+) 
-- [~] NodeJS Server legacy-free (history, alerts, custom gcode and filament)
-- [ ] OctoPrint Plugin release & Filament Tracker 
-- [ ] Better authentication and user management
-- [ ] Raspberry Pi image and prebuilt customized OctoPi image
-- [ ] First core release with documentation
+- [x] :rocket: Vue app core and distribution setup on NPM completed
+- [x] :rocket: Client for basic management of OctoPrint printers (file storage, print upload and printer management)
+- [x] 🌟 Printer Location Map based on 2x2 groups
+- [x] 🛡️ Server resilient against database connection failures with automatic retry of 5 seconds
+- [x] 🔌 3D Hub Connector (OctoPrint Plugin) prerelease 0.1.0 ([find it here](https://github.com/3d-hub/3d-hub-connector/releases))
+- [ ] :rocket: Printer Group management
+- [ ] 🛡️ Full API and client test coverage >80% (now at 50%+) 
+- [ ] 🛡️ NodeJS Server legacy-free (history, alerts, custom gcode and filament)
+- [ ] 🔌 Hub Connector - filament tracker 
+- [ ] 🛡️ Better authentication, user and basic role management
+- [ ] 🔌 Raspberry Pi image and prebuilt customized OctoPi image
+- [ ] :rocket: First core release with documentation
+- [ ] :rocket: Plugin system (preparation work is ready)
+- [ ] More to be found here https://github.com/3d-hub/3d-hub/discussions/48
 
 There are a lot of plans in the making (f.e. tunneling, auto-discovery, plugin system,  etc.), which will be announced as we go!
 
