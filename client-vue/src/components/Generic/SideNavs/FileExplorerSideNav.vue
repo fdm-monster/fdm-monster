@@ -289,7 +289,7 @@ export default class FileExplorerSideNav extends Vue {
     if (!this.storedSideNavPrinter) return false;
     // Completed job will not disappear (yet)
     if (this.storedSideNavPrinter.printerState.state === "Operational") return false;
-    return this.storedSideNavPrinter.currentJob.fileName === file.name;
+    return this.storedSideNavPrinter.currentJob?.fileName === file.name;
   }
 
   currentJob() {

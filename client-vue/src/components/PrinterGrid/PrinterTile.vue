@@ -24,6 +24,14 @@
         {{ printer.printerState.state }}
       </small>
     </v-container>
+    <v-progress-linear
+      bottom
+      absolute
+      v-if="printer && printer.currentJob"
+      :value="printer.currentJob.progress"
+      color="green"
+    >
+    </v-progress-linear>
   </v-card>
 </template>
 
