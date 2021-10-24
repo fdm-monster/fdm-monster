@@ -5,10 +5,9 @@ const FilamentSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  // Nested as profile.id in OP response
-  profileId: {
+  manufacturer: {
     type: String,
-    required: true
+    required: false
   },
   cost: {
     type: Number,
@@ -22,15 +21,13 @@ const FilamentSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  // temp_offset in OP response
-  tempOffset: {
+  printTemperature: {
     type: Number,
     required: true
   },
-  // id in OP response
-  filamentId: {
-    type: Number,
-    required: true
+  metaData: {
+    type: Object,
+    required: false
   }
 });
 

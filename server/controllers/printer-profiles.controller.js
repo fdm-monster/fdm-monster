@@ -3,7 +3,6 @@ const { AppConstants } = require("../server.constants");
 const { ensureAuthenticated } = require("../middleware/auth");
 const { printerResolveMiddleware } = require("../middleware/printer");
 const { getScopedPrinter } = require("../handlers/validators");
-const Profile = require("../models/Profile");
 
 class PrinterProfilesController {
   #printerProfilesCache;

@@ -41,7 +41,7 @@ const { AppConstants } = require("./server.constants");
 const PrinterFilesService = require("./services/printer-files.service");
 const SoftwareUpdateTask = require("./tasks/software-update.task");
 const AutoDiscoveryService = require("./services/auto-discovery.service");
-const ConnectionLogsCache = require("./state/data/connection-logs.cache");
+const TerminalLogsCache = require("./state/data/terminal-logs.cache");
 const DashboardStatisticsCache = require("./state/data/dashboard-statistics.cache");
 const AlertService = require("./services/alert.service");
 const { asFunction, asClass, asValue, createContainer, InjectionMode } = require("awilix");
@@ -108,7 +108,7 @@ function configureContainer() {
     [DITokens.printerGroupsCache]: asClass(PrinterGroupsCache).singleton(),
     [DITokens.historyCache]: asClass(HistoryCache).singleton(),
     [DITokens.jobsCache]: asClass(JobsCache).singleton(),
-    [DITokens.connectionLogsCache]: asClass(ConnectionLogsCache).singleton(),
+    [DITokens.terminalLogsCache]: asClass(TerminalLogsCache).singleton(),
     [DITokens.printerTickerStore]: asClass(PrinterTickerStore).singleton(),
     [DITokens.fileCache]: asClass(FileCache).singleton(),
     [DITokens.fileUploadTrackerCache]: asClass(FileUploadTrackerCache).singleton(),

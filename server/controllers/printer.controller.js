@@ -20,7 +20,7 @@ class PrinterController {
   #printersStore;
   #jobsCache;
   #taskManagerService;
-  #connectionLogsCache;
+  #terminalLogsCache;
   #octoPrintApiService;
   #fileCache;
   #sseHandler;
@@ -30,7 +30,7 @@ class PrinterController {
 
   constructor({
     printersStore,
-    connectionLogsCache,
+    terminalLogsCache,
     printerSseHandler,
     taskManagerService,
     printerSseTask,
@@ -43,7 +43,7 @@ class PrinterController {
 
     this.#printersStore = printersStore;
     this.#jobsCache = jobsCache;
-    this.#connectionLogsCache = connectionLogsCache;
+    this.#terminalLogsCache = terminalLogsCache;
     this.#taskManagerService = taskManagerService;
     this.#octoPrintApiService = octoPrintApiService;
     this.#fileCache = fileCache;
@@ -64,9 +64,7 @@ class PrinterController {
    */
   async get(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
-
     const foundPrinter = this.#printersStore.getPrinterFlat(currentPrinterId);
-
     res.send(foundPrinter);
   }
 
@@ -273,11 +271,11 @@ class PrinterController {
     res.send({ powerSettings: defaultPowerSettings });
   }
 
-  async getConnectionLogs(req, res) {
+  async getTerminalLogs(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
 
-    this.#logger.info("Grabbing connection logs for: ", currentPrinterId);
-    let connectionLogs = this.#connectionLogsCache.getPrinterConnectionLogs(currentPrinterId);
+    this.#logger.info("Querying terminal logs for: ", currentPrinterId);
+    let connectionLogs = this.#terminalLogsCache.getPrinterTerminalLogs(currentPrinterId);
 
     res.send(connectionLogs);
   }
@@ -315,5 +313,5 @@ module.exports = createController(PrinterController)
     .patch("/:id/flow-rate", "setFlowRate")
     .patch("/:id/feed-rate", "setFeedRate")
     .patch("/:id/reset-power-settings", "resetPowerSettings")
-    .get("/:id/connection-logs/", "getConnectionLogs")
+    .get("/:id/terminal-logs/", "getTerminalLogs")
     .get("/:id/plugin-list", "getPluginList");

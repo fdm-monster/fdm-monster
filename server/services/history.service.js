@@ -3,7 +3,6 @@ const fs = require("fs");
 const MjpegDecoder = require("mjpeg-decoder");
 const Logger = require("../handlers/logger");
 const History = require("../models/History");
-const Profile = require("../models/Profile");
 const { HISTORY_SETTINGS } = require("../constants/server-settings.constants");
 const { durationToDates } = require("../utils/time.util");
 

@@ -23,7 +23,7 @@ const stepSizeRoute = (id) => `${updateRoute(id)}/step-size`;
 const feedRateRoute = (id) => `${updateRoute(id)}/feed-rate`;
 const flowRateRoute = (id) => `${updateRoute(id)}/flow-rate`;
 const resetPowerSettingsRoute = (id) => `${updateRoute(id)}/reset-power-settings`;
-const connectionLogsRoute = (id) => `${getRoute(id)}/connection-logs`;
+const terminalLogsRoute = (id) => `${getRoute(id)}/terminal-logs`;
 const pluginListRoute = (id) => `${getRoute(id)}/plugin-list`;
 const batchRoute = `${listRoute}/batch`;
 
@@ -188,7 +188,7 @@ describe("PrintersController", () => {
 
   it("should get printer connection logs cache", async function () {
     const printer = await createTestPrinter(request);
-    const updatePatch = await request.get(connectionLogsRoute(printer.id)).send();
+    const updatePatch = await request.get(terminalLogsRoute(printer.id)).send();
     expectOkResponse(updatePatch);
   });
 

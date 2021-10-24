@@ -2,7 +2,6 @@ const _ = require("lodash");
 const { createController } = require("awilix-express");
 const { ensureAuthenticated } = require("../middleware/auth");
 const Filament = require("../models/Filament");
-const Profile = require("../models/Profile");
 const { AppConstants } = require("../server.constants");
 const { validateMiddleware } = require("../handlers/validators");
 const { idRules } = require("./validation/generic.validation");

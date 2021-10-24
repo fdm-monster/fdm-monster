@@ -36,7 +36,7 @@ const DITokens = {
   // Caches
   printerGroupsCache: "printerGroupsCache",
   printerProfilesCache: "printerProfilesCache",
-  connectionLogsCache: "connectionLogsCache",
+  terminalLogsCache: "terminalLogsCache",
   jobsCache: "jobsCache",
   dashboardStatisticsCache: "dashboardCache",
   currentOperationsCache: "currentOperationsCache",
