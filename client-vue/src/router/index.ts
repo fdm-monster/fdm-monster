@@ -6,7 +6,7 @@ import Settings from "@/views/Settings.vue";
 import PrinterGroupsSettings from "@/views/settings/PrinterGroupsSettings.vue";
 import About from "@/views/About.vue";
 import Scheduling from "@/views/Scheduling.vue";
-import SystemSettings from "@/views/settings/SystemSettings.vue";
+import HubSettings from "@/views/settings/HubSettings.vue";
 
 Vue.use(VueRouter);
 
@@ -23,7 +23,6 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: "/settings",
-    name: "Settings",
     component: Settings,
     children: [
       {
@@ -36,7 +35,7 @@ const routes: Array<RouteConfig> = [
       },
       {
         path: "system",
-        component: SystemSettings
+        component: HubSettings
       },
       {
         path: "logs",

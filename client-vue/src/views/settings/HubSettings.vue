@@ -7,18 +7,7 @@
       <v-toolbar-title>Hub Settings</v-toolbar-title>
     </v-toolbar>
     <v-list subheader three-line>
-      <v-subheader>Groups and Files</v-subheader>
-
-      <v-list-item>
-        <v-list-item-content>
-          <v-list-item-title>Legacy Groups</v-list-item-title>
-          <v-list-item-subtitle>
-            Synchronise the legacy printer groups to the new separate PrinterGroup data.
-            <br/>
-            <v-btn color="primary" @click="syncLegacyGroups()">Sync legacy</v-btn>
-          </v-list-item-subtitle>
-        </v-list-item-content>
-      </v-list-item>
+      <v-subheader>Files and GCode</v-subheader>
 
       <v-list-item>
         <v-list-item-content>
@@ -53,19 +42,13 @@
 <script lang="ts">
 import Component from "vue-class-component";
 import Vue from "vue";
-import { PrinterFileService, PrinterGroupService } from "@/backend";
+import { PrinterFileService } from "@/backend";
 import { PrinterSettingsService } from "@/backend/printer-settings.service";
 import { printersState } from "@/store/printers.state";
 import { infoMessageEvent } from "@/event-bus/alert.events";
 
 @Component()
 export default class HubSettings extends Vue {
-  async syncLegacyGroups() {
-    const groups = await PrinterGroupService.syncLegacyGroups();
-
-    this.$bus.emit(infoMessageEvent, `Succesfully synced ${ groups.length } groups!`);
-  }
-
   async purgeFiles() {
     await PrinterFileService.purgeFiles();
 
