@@ -47,50 +47,44 @@
         </v-list-item-content>
       </v-list-item>
     </v-list>
-    <v-divider></v-divider>
-    <v-list v-show="false" subheader three-line>
-      <v-subheader>General</v-subheader>
-      <v-list-item>
-        <v-list-item-action>
-          <v-checkbox v-model="notifications"></v-checkbox>
-        </v-list-item-action>
-        <v-list-item-content>
-          <v-list-item-title>Notifications</v-list-item-title>
-          <v-list-item-subtitle>
-            Notify me about updates to apps or games that I downloaded
-          </v-list-item-subtitle>
-        </v-list-item-content>
-      </v-list-item>
-      <v-list-item>
-        <v-list-item-action>
-          <v-checkbox v-model="sound"></v-checkbox>
-        </v-list-item-action>
-        <v-list-item-content>
-          <v-list-item-title>Sound</v-list-item-title>
-          <v-list-item-subtitle
-          >Auto-update apps at any time. Data charges may apply
-          </v-list-item-subtitle>
-        </v-list-item-content>
-      </v-list-item>
-      <v-list-item>
-        <v-list-item-action>
-          <v-checkbox v-model="widgets"></v-checkbox>
-        </v-list-item-action>
-        <v-list-item-content>
-          <v-list-item-title>Auto-add widgets</v-list-item-title>
-          <v-list-item-subtitle>Automatically add home screen widgets</v-list-item-subtitle>
-        </v-list-item-content>
-      </v-list-item>
-    </v-list>
   </v-container>
 </template>
 
 <script lang="ts">
 import Component from "vue-class-component";
 import Vue from "vue";
+import { PrinterFileService, PrinterGroupService } from "@/backend";
+import { PrinterSettingsService } from "@/backend/printer-settings.service";
+import { printersState } from "@/store/printers.state";
+import { infoMessageEvent } from "@/event-bus/alert.events";
 
 @Component()
-export default class SystemSettings extends Vue {
+export default class HubSettings extends Vue {
+  async syncLegacyGroups() {
+    const groups = await PrinterGroupService.syncLegacyGroups();
 
+    this.$bus.emit(infoMessageEvent, `Succesfully synced ${ groups.length } groups!`);
+  }
+
+  async purgeFiles() {
+    await PrinterFileService.purgeFiles();
+
+    this.$bus.emit(infoMessageEvent, `Succesfully purged all references to printer files!`);
+  }
+
+  async bulkDisableGCodeAnalysis() {
+    const printers = printersState.onlinePrinters;
+    this.$bus.emit(
+      infoMessageEvent,
+      `Trying to disable gcode analysis for ${ printers.length } online printers.`
+    );
+    for (let printer of printers) {
+      await PrinterSettingsService.setGCodeAnalysis(printer.id, false);
+    }
+    this.$bus.emit(
+      infoMessageEvent,
+      `Finished disabling gcode analysis for ${ printers.length } online printers.`
+    );
+  }
 }
 </script>

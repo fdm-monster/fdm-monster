@@ -2,29 +2,6 @@
   <span>
     <h1>
       3D HUB
-      3D HUB
-      3D HUB
-      3D HUB
-      3D HUB
-      3D HUB
-      3D HUB
-      3D HUB
-      3D HUB
-      3D HUB
-      3D HUB
-      3D HUB
-      3D HUB
-      3D HUB
-      3D HUB
-      3D HUB
-      3D HUB
-      3D HUB
-      3D HUB
-      3D HUB
-      3D HUB
-      3D HUB
-      3D HUB
-      3D HUB
     </h1>
   </span>
 </template>

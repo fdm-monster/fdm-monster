@@ -58,41 +58,10 @@ import { PrinterSettingsService } from "@/backend/printer-settings.service";
         {title: 'Printer groups', icon: 'dashboard', path: '/settings/printer-groups'},
         {title: 'Hub settings', icon: 'image', path: '/settings/system'},
         {title: 'Logs', icon: 'help', path: '/settings/logs'},
-      ],
-      right: null,
-      dialog: false,
-      notifications: false,
-      sound: true,
-      widgets: false
+      ]
     };
   }
 })
 export default class Settings extends Vue {
-  async syncLegacyGroups() {
-    const groups = await PrinterGroupService.syncLegacyGroups();
-
-    this.$bus.emit(infoMessageEvent, `Succesfully synced ${ groups.length } groups!`);
-  }
-
-  async purgeFiles() {
-    await PrinterFileService.purgeFiles();
-
-    this.$bus.emit(infoMessageEvent, `Succesfully purged all references to printer files!`);
-  }
-
-  async bulkDisableGCodeAnalysis() {
-    const printers = printersState.onlinePrinters;
-    this.$bus.emit(
-      infoMessageEvent,
-      `Trying to disable gcode analysis for ${ printers.length } online printers.`
-    );
-    for (let printer of printers) {
-      await PrinterSettingsService.setGCodeAnalysis(printer.id, false);
-    }
-    this.$bus.emit(
-      infoMessageEvent,
-      `Finished disabling gcode analysis for ${ printers.length } online printers.`
-    );
-  }
 }
 </script>
