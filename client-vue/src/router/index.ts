@@ -3,8 +3,10 @@ import VueRouter, { RouteConfig } from "vue-router";
 import HomePrinterGrid from "@/views/HomePrinterGrid.vue";
 import Printers from "@/views/Printers.vue";
 import Settings from "@/views/Settings.vue";
+import PrinterGroupsSettings from "@/views/settings/PrinterGroupsSettings.vue";
 import About from "@/views/About.vue";
 import Scheduling from "@/views/Scheduling.vue";
+import SystemSettings from "@/views/settings/SystemSettings.vue";
 
 Vue.use(VueRouter);
 
@@ -22,7 +24,25 @@ const routes: Array<RouteConfig> = [
   {
     path: "/settings",
     name: "Settings",
-    component: Settings
+    component: Settings,
+    children: [
+      {
+        path: "",
+        redirect: "printer-groups"
+      },
+      {
+        path: "printer-groups",
+        component: PrinterGroupsSettings
+      },
+      {
+        path: "system",
+        component: SystemSettings
+      },
+      {
+        path: "logs",
+        component: PrinterGroupsSettings
+      }
+    ]
   },
   {
     path: "/scheduling",
