@@ -26,11 +26,11 @@ This work is under active development with cutting edge tech and standards. Feel
 - [x] Client for basic management of OctoPrint printers (file storage, print upload and printer management)
 - [x] Printer Location Map based on 2x2 groups
 - [x] Server resilient against database connection failures with automatic retry of 5 seconds
-- [ ] Printer Group management
-- [ ] NodeJS Server legacy-free
+- [!] Printer Group management
+- [!] Full API and client test coverage >80% (now at 50%+) 
+- [~] NodeJS Server legacy-free (history, alerts, custom gcode and filament)
+- [ ] OctoPrint Plugin release & Filament Tracker 
 - [ ] Better authentication and user management
-- [ ] Full API and client test coverage >80% (now at 40%)
-- [ ] OctoPrint Plugin release
 - [ ] Raspberry Pi image and prebuilt customized OctoPi image
 - [ ] First core release with documentation
 
