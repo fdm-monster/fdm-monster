@@ -47,7 +47,9 @@ import { PrinterSettingsService } from "@/backend/printer-settings.service";
 import { printersState } from "@/store/printers.state";
 import { infoMessageEvent } from "@/event-bus/alert.events";
 
-@Component()
+@Component({
+  
+})
 export default class HubSettings extends Vue {
   async purgeFiles() {
     await PrinterFileService.purgeFiles();
