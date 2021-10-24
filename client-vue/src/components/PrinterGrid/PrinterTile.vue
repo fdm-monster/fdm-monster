@@ -25,9 +25,9 @@
       </small>
     </v-container>
     <v-progress-linear
+      v-if="printer && printer.currentJob"
       bottom
       absolute
-      v-if="printer && printer.currentJob"
       :value="printer.currentJob.progress"
       color="green"
     >
