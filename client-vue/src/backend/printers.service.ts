@@ -24,6 +24,7 @@ export class PrintersService extends BaseService {
     newFormData.websocketPrefix = webSocketURL.protocol.replace(":", "") as WebSocketProtocol;
     newFormData.printerName = printer.printerName || newRandomNamePair();
     newFormData.apiKey = printer.apiKey;
+    newFormData.enabled = printer.enabled;
     newFormData.stepSize = printer.stepSize;
 
     return newFormData;
