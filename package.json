@@ -1,42 +1,42 @@
 {
-  "name": "3d-print-farm",
+  "name": "3d-hub",
   "author": "David Zwart",
   "license": "AGPLv3",
   "version": "0.0.3-pre1",
-  "description": "3DPF is a 3D printer manager to set up, configure and monitor FDM and resin printers. Our aim is to provide extremely optimized performance and reliability.",
+  "description": "3D Hub is a bulk OctoPrint manager to set up, configure and monitor 3D printers. Our aim is to provide extremely optimized performance and reliability.",
   "main": "index.js",
   "scripts": {
     "prestart": "npm ci --production",
-    "start": "pm2 flush && pm2 start index.js --name 3DPF -e ./logs/pm2.error.log -o ./logs/pm2.out.log --time --restart-delay=1000 --update-env --exp-backoff-restart-delay=1500",
-    "restart": "pm2 restart 3DPF",
+    "start": "pm2 flush && pm2 start index.js --name 3DHub -e ./logs/pm2.error.log -o ./logs/pm2.out.log --time --restart-delay=1000 --update-env --exp-backoff-restart-delay=1500",
+    "restart": "pm2 restart 3DHub",
     "migration:up": "migrate-mongo up",
     "migration:down": "migrate-mongo down",
     "migration:status": "migrate-mongo status",
     "pupdate": "pm2 update",
-    "stop": "pm2 stop 3DPF",
-    "stop:delete": "pm2 delete 3DPF",
+    "stop": "pm2 stop 3DHub",
+    "stop:delete": "pm2 delete 3DHub",
     "prettier": "prettier --write \\\"server/**/*.js\\\" \\\"./test/**/*.js\\\" \\\"./client-vue/**/*.js\\\"",
     "dev": "nodemon ./index.js",
     "test": "jest --forceExit"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/davidzwa/3d-print-farm"
+    "url": "https://github.com/3d-hub/3d-hub"
   },
   "bin": {
-    "3d-print-farm": "./app.js"
+    "3d-hub": "./app.js"
   },
   "keywords": [
-    "3dprintfarm",
-    "3d-print-farm",
-    "3d-printer",
+    "3d-hub",
+    "3d-hub-connector",
     "octoprint",
+    "3d printing",
     "pi",
     "node",
     "vue"
   ],
   "dependencies": {
-    "@3d-print-farm/client": "0.1.8",
+    "@3d-hub/client": "0.1.9",
     "archiver": "^5.3.0",
     "awilix": "^5.0.1",
     "awilix-express": "^5.0.0",

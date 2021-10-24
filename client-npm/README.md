@@ -1,12 +1,12 @@
-# client-3dpf
+# 3D Hub Client
 
-The client UI for 3D Print Farm. Please see https://github.com/davidzwa/3d-print-farm for more information.
+The client UI for 3D Hub built with Vue. Please see https://github.com/3d-hub/3d-hub for more information.
 
 ## Project setup
 ```
-npm install @3d-print-farm/client
+npm install @3d-hub/client
 ```
-https://www.npmjs.com/package/@3d-print-farm/client
+https://www.npmjs.com/package/@3d-hub/client
 
 ### Compiled and minified for production
 This package is built for hosting only and does not contain references to vue CLI directly.

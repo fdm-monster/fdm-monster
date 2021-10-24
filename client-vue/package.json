@@ -1,11 +1,11 @@
 {
-  "name": "@3d-print-farm/client",
+  "name": "@3d-hub/client",
   "author": "David Zwart",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "private": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/davidzwa/3d-print-farm"
+    "url": "https://github.com/3d-hub/3d-hub"
   },
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "axios": "^0.22.0",
-    "core-js": "^3.6.5",
+    "core-js": "^3.18.3",
     "luxon": "^2.0.2",
     "register-service-worker": "^1.7.2",
     "validator": "^13.6.0",

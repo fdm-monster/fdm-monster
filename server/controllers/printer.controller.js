@@ -169,7 +169,7 @@ class PrinterController {
   }
 
   /**
-   * Update the 3DPF printer entity, does not adjust everything
+   * Update the 3DH printer entity, does not adjust everything
    * @param req
    * @param res
    * @returns {Promise<void>}

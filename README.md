@@ -1,13 +1,13 @@
-# 3D Print Farm [![GitHub stars](https://img.shields.io/github/stars/davidzwa/3d-print-farm)](https://github.com/davidzwa/3d-print-farm/stargazers) ![GitHub issues](https://img.shields.io/github/issues/davidzwa/3d-print-farm?color=green) [![GitHub forks](https://img.shields.io/github/forks/davidzwa/3d-print-farm)](https://github.com/davidzwa/3d-print-farm/network) [![Latest Release](https://img.shields.io/github/release/davidzwa/3d-print-farm)](https://img.shields.io/github/v/tag/davidzwa/3d-print-farm?sort=date) ![Coverage](https://img.shields.io/codecov/c/github/davidzwa/3d-print-farm)
+# 3D Hub [![GitHub stars](https://img.shields.io/github/stars/3d-hub/3d-hub)](https://github.com/3d-hub/3d-hub/stargazers) ![GitHub issues](https://img.shields.io/github/issues/3d-hub/3d-hub?color=green) [![GitHub forks](https://img.shields.io/github/forks/3d-hub/3d-hub)](https://github.com/3d-hub/3d-hub/network) [![Latest Release](https://img.shields.io/github/release/3d-hub/3d-hub)](https://img.shields.io/github/v/tag/3d-hub/3d-hub?sort=date) ![Coverage](https://img.shields.io/codecov/c/github/3d-hub/3d-hub)
 
 **_The server for managing 3D printers with great overview_**
 
-3DPF is an 3D printer manager and dashboard written in Vue with Typescript meant to be accessed local, remote, offline or online. The work and effort - which was fully invested into OctoFarm by the authors of 3DPF - is now boosted 🚀 for higher code quality 😎 and robustness 💪. The goals are to deliver a much smoother initial setup and 100% clear user experience to ensure you can smash those printing records 🖨️!
+3D Hub is a bulk OctoPrint manager and dashboard written in Vue with Typescript meant to be accessed local, remote, offline or online. The work and effort - which was fully invested into OctoFarm by the authors of 3D Hub - is now boosted 🚀 for higher code quality 😎 and robustness 💪. The goals are to deliver a much smoother initial setup and 100% clear user experience to ensure you can smash those printing records 🖨️!
 
 Note: our aim is to support all kinds of 3D Printer (FDM, resin) API's with a plugin system and documentation for extensibility. Read more about this in the roadmap section below.
 
-<!--  ![Docker Pulls](https://img.shields.io/docker/pulls/davidzwa/3d-print-farm) -->
-<!-- ![GitHub release (latest by date)](https://img.shields.io/github/downloads/davidzwa/3d-print-farm/latest/total) -->
+<!--  ![Docker Pulls](https://img.shields.io/docker/pulls/3d-hub/3d-hub) -->
+<!-- ![GitHub release (latest by date)](https://img.shields.io/github/downloads/3d-hub/3d-hub/latest/total) -->
 
 ## Stability
 
@@ -16,7 +16,7 @@ This server is currently not yet released, so give it a star ⭐and be the first
 #### Last finished: printer file commander and printer location map
 #### Current work: printer group, setting and location management
 
-## Development [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/davidzwa/3d-print-farm/graphs/commit-activity) ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/davidzwa/3d-print-farm/Node.js%20CI/development) [![GitHub license](https://img.shields.io/github/license/davidzwa/3d-print-farm)](https://github.com/davidzwa/3d-print-farm/blob/master/LICENSE.txt)
+## Development [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/3d-hub/3d-hub/graphs/commit-activity) ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/3d-hub/3d-hub/Node.js%20CI/development) [![GitHub license](https://img.shields.io/github/license/3d-hub/3d-hub)](https://github.com/3d-hub/3d-hub/blob/master/LICENSE.txt)
 
 This work is under active development with cutting edge tech and standards. Feel like joining in? Your options are to create a pull-request, send an email, or open a discussion!
 
@@ -40,5 +40,5 @@ There are a lot of plans in the making (f.e. tunneling, auto-discovery, plugin s
 Distributed under GNU Affero General Public License v3.0. See `LICENSE` for more information.
 
 ## Contact
-- Main repository: [https://github.com/davidzwa/3d-print-farm](https://github.com/davidzwa/3d-print-farm)
+- Main repository: [https://github.com/3d-hub/3d-hub](https://github.com/3d-hub/3d-hub)
 - Discord: T.B.A.

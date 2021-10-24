@@ -74,16 +74,16 @@ function verifyPackageJsonRequirements(rootPath) {
     logger.debug("✓ found 'package.json'");
     const packageName = require("../../package.json").name;
     if (!packageName) {
-      logger.error("X Could not find 'name' property in package.json file. Aborting 3DPF Server.");
+      logger.error("X Could not find 'name' property in package.json file. Aborting 3DH Server.");
       return false;
-    } else if (packageName.toLowerCase() !== "3d-print-farm") {
+    } else if (packageName.toLowerCase() !== "3d-hub") {
       logger.error(
-        `X property 'name' in package.json file didnt equal '3d-print-farm' (found: ${packageName.toLowerCase()}). Aborting 3DPF Server.`
+        `X property 'name' in package.json file didnt equal '3d-hub' (found: ${packageName.toLowerCase()}). Aborting 3DH Server.`
       );
       return false;
     }
   }
-  logger.debug("✓ Correctly validated 3DPF package.json file!");
+  logger.debug("✓ Correctly validated 3DH package.json file!");
   return true;
 }
 

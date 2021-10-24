@@ -2,7 +2,7 @@ const { AppConstants } = require("../../../server/server.constants");
 const { expectOkResponse } = require("../../extensions");
 
 const printerRoute = AppConstants.apiRoute + "/printer";
-const testApiKey = "3dpf3dpf3dpf3dpf3dpf3dpf3dpf3dpf";
+const testApiKey = "3dhub3dhub3dhub3dhub3dhub3dhub3d";
 
 async function createTestPrinter(request) {
   const createResponse = await request.post(printerRoute).send({

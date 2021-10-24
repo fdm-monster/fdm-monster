@@ -83,7 +83,7 @@ class ServerHost {
     const port = fetchServerPort();
 
     if (!port || Number.isNaN(parseInt(port))) {
-      throw new Error("The 3DPF Server requires a numeric port input argument to run");
+      throw new Error("The 3DH Server requires a numeric port input argument to run");
     }
 
     this.#httpServerInstance.listen(port, "0.0.0.0", () => {

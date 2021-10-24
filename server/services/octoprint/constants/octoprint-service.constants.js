@@ -16,7 +16,7 @@ const multiPartContentType = "multipart/form-data";
  */
 function isLoginResponseGlobal(octoPrintResponse) {
   // Explicit nullability check serves to let an unconnected printer fall through as well as incorrect apiKey
-  // Note: 'apikey' property is conform OctoPrint response (and not 3DPF printer model's 'apiKey')
+  // Note: 'apikey' property is conform OctoPrint response (and not 3DHUB printer model's 'apiKey')
   return !!octoPrintResponse && octoPrintResponse.name === "_api";
 }
 

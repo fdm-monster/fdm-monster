@@ -31,7 +31,7 @@ class ServerUpdateService {
   }
 
   /**
-   * Connection-safe acquire data about the installed and latest released 3DPF versions.
+   * Connection-safe acquire data about the installed and latest released 3DH versions.
    * @param includePre
    * @returns {Promise<*|null>}
    */
@@ -111,7 +111,7 @@ class ServerUpdateService {
         update_available: true,
         installed_release_found: this.#installedReleaseFound,
         message:
-          "You can update 3DPF Server to the latest version available: " +
+          "You can update 3DH Server to the latest version available: " +
           latestReleaseCheckState.latestReleaseKnown.tag_name,
         current_version: this.#serverVersion,
         ...latestReleaseCheckState
@@ -167,7 +167,7 @@ class ServerUpdateService {
       }
     } else if (!packageVersion) {
       return this.#logger.error(
-        "Cant check release as package.json version environment variable is not set. Make sure 3DPF Server is run from a 'package.json' or NPM context."
+        "Cant check release as package.json version environment variable is not set. Make sure 3DH Server is run from a 'package.json' or NPM context."
       );
     } else {
       return this.#logger.debug(`Installed release: ${packageVersion}. You are up to date!`);

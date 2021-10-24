@@ -28,14 +28,14 @@ Write-PackageJson -File $target_package_json -Target $target_package_json -Versi
 
 # Check version
 npm cache clear --force
-$versionArray = (npm view @3d-print-farm/client versions --json | ConvertFrom-Json)
+$versionArray = (npm view @3d-hub/client versions --json | ConvertFrom-Json)
 $lastVersion = $versionArray[$versionArray.Count - 1]
 if ($lastVersion -eq $client_version) {
     $v = [version]::New($client_version)
     $v2 = ([version]::New($v.Major,$v.Minor,$v.Build+1)).ToString();
 
     $title    = 'Package version not new'
-    $question = 'Increase version from ${v.ToString()} to ${v2}?'
+    $question = "Increase version from ${v.ToString()} to ${v2}?"
     $choices  = '&Yes', '&No'
 
     $decision = $Host.UI.PromptForChoice($title, $question, $choices, 1)

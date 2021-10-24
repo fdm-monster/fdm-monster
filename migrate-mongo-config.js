@@ -1,5 +1,5 @@
 // In this file you can configure migrate-mongo
-const { setupEnvConfig, fetchMongoDBConnectionString } = require("./server/app-env");
+const { setupEnvConfig, fetchMongoDBConnectionString } = require("./server/server.env");
 
 if (!process.env.MONGO) {
   setupEnvConfig();
@@ -16,7 +16,7 @@ const config = {
     url: mongoDbString,
 
     // Dont override this unless you know what you are doing
-    // databaseName: "3dpf",
+    // databaseName: "3dhub",
 
     options: {
       useNewUrlParser: true, // removes a deprecation warning when connecting

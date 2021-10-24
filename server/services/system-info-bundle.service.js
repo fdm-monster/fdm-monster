@@ -27,8 +27,8 @@ class SystemInfoBundleService {
    * @throws {String} If the SystemInformation object doesn't return
    */
   generateSystemInformationContents() {
-    let systemInformationContents = "--- 3DPF System Information ---\n\n";
-    systemInformationContents += `3D Print Farm Version\n ${currentVersion} \n`;
+    let systemInformationContents = "--- 3DH System Information ---\n\n";
+    systemInformationContents += `3D Hub Version\n ${currentVersion} \n`;
     const airGapped = "Are we connected to the internet?\n";
     const pm2 = "Are we running under pm2?\n";
     const nodemon = "Are we running under nodemon?\n";

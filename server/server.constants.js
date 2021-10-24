@@ -4,7 +4,7 @@ class ServerConstants {
   }
 
   static get defaultMongoStringUnauthenticated() {
-    return "mongodb://127.0.0.1:27017/3dpf";
+    return "mongodb://127.0.0.1:27017/3dhub";
   }
 
   static get defaultServerPort() {
@@ -20,7 +20,7 @@ class ServerConstants {
   }
 
   static get defaultServerPageTitle() {
-    return "3D-Print-Farm";
+    return "3D Hub";
   }
 
   static get knownEnvNames() {

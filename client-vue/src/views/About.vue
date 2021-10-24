@@ -1,12 +1,12 @@
 <template>
   <v-container>
-    3D Print Farm was created by D. Zwart (https://github.com/davidzwa) in collaboration with
-    <strong><a href="https://mtb3d.com">MTB3D</a></strong> as a spin-off of OctoFarm.
+    3D Hub was created by D. Zwart (https://github.com/davidzwa) in collaboration with
+    <strong><a href="https://mtb3d.com">MTB3D</a></strong>.
 
     <br />
     <br />
     Found a bug? Please report them here
-    <strong><a href="https://github.com/davidzwa/3d-print-farm/issues">Github Issues</a></strong>
+    <strong><a href="https://github.com/3d-hub/3d-hub/issues">Github Issues</a></strong>
 
     <br />
   </v-container>
@@ -27,7 +27,7 @@ export default class AboutPage extends Vue {
     const printers = await printersState.loadPrinters();
 
     if (printers.length === 0) return;
-    
+
     this.loaded = true;
   }
 }

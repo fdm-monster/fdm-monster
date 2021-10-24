@@ -4,7 +4,7 @@ const { join } = require("path");
 const { createZipFile } = require("../utils/zip.utils.js");
 const { getLogsPath } = require("../utils/system-paths.utils.js");
 
-const dumpFileName = "3dpf_dump.zip";
+const dumpFileName = "3dhub_dump.zip";
 
 class ServerLogsService {
   #systemInfoBundleService;
