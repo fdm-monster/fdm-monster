@@ -25,14 +25,9 @@ export class ServerApi {
   static historyRoute = `${ServerApi.base}/history`;
   static historyStatsRoute = `${ServerApi.historyRoute}/stats`;
   static filamentRoute = `${ServerApi.base}/filament`;
-  static filamentDropdownListRoute = `${ServerApi.filamentRoute}/dropDownList`;
   static filamentProfilesRoute = `${ServerApi.filamentRoute}/profiles`;
   static filamentSpoolsRoute = `${ServerApi.filamentRoute}/spools`;
   static filamentSelectRoute = `${ServerApi.filamentRoute}/select`;
-  static filamentManagerRoute = `${ServerApi.filamentRoute}/filament-manager`;
-  static filamentManagerReSyncRoute = `${ServerApi.filamentManagerRoute}/resync`;
-  static filamentManagerSyncRoute = `${ServerApi.filamentManagerRoute}/sync`;
-  static filamentManagerDisableRoute = `${ServerApi.filamentManagerRoute}/disable`;
   static alertRoute = `${ServerApi.base}/alert`;
   static testAlertScriptRoute = `${ServerApi.alertRoute}/test-alert-script`;
 

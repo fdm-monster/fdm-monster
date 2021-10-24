@@ -1,9 +1,8 @@
 const _ = require("lodash");
 const fs = require("fs");
 const MjpegDecoder = require("mjpeg-decoder");
-const Logger = require("../handlers/logger.js");
-const History = require("../models/History.js");
-const Profiles = require("../models/Profiles.js");
+const Logger = require("../handlers/logger");
+const History = require("../models/History");
 const { HISTORY_SETTINGS } = require("../constants/server-settings.constants");
 const { durationToDates } = require("../utils/time.util");
 
@@ -33,7 +32,6 @@ function ensureBaseFolderExists() {
 
 class HistoryService {
   #octoPrintApiService;
-  #filamentManagerPluginService;
   #influxDbHistoryService;
   #settingsStore;
 
@@ -41,16 +39,10 @@ class HistoryService {
 
   #logger = new Logger("Server-HistoryCollection");
 
-  constructor({
-    octoPrintApiService,
-    influxDbHistoryService,
-    filamentManagerPluginService,
-    settingsStore
-  }) {
+  constructor({ octoPrintApiService, influxDbHistoryService, settingsStore }) {
     this.#octoPrintApiService = octoPrintApiService;
     // TODO Better to decouple Influx using EventEmitter2
     this.#influxDbHistoryService = influxDbHistoryService;
-    this.#filamentManagerPluginService = filamentManagerPluginService;
     this.#settingsStore = settingsStore;
   }
 
@@ -234,7 +226,6 @@ class HistoryService {
   async saveJobCompletion(printer, job, status = "success", { payload, resends, files }) {
     let printerName = printer.getName();
     const { startDate, endDate } = durationToDates(payload.time);
-    const filamentPluginEnabled = this.#settingsStore.isFilamentEnabled();
     const jobSuccess = status === "success";
     const eventName = jobSuccess ? "onComplete" : "onFailure";
 
@@ -244,16 +235,8 @@ class HistoryService {
       this.#logger.info(`Failed print event triggered for printer ${printerName}`, payload);
     }
 
-    // TODO filamentCache instead
-    const previousFilament = JSON.parse(JSON.stringify(printer.selectedFilament));
-
-    if (filamentPluginEnabled && Array.isArray(printer?.selectedFilament)) {
-      printer.selectedFilament =
-        await this.#filamentManagerPluginService.updatePrinterSelectedFilament(printer);
-    }
-
     const historyCollection = await History.find({});
-    const profiles = await Profiles.find({});
+    const profiles = await Profile.find({});
 
     if (printer.selectedFilament !== null && Array.isArray(printer.selectedFilament)) {
       let profileId = [];

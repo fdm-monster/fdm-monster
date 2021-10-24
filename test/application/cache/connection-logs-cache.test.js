@@ -3,13 +3,13 @@ const DITokens = require("../../../server/container.tokens");
 const dbHandler = require("../../db-handler");
 
 let container;
-let connectionLogsCache;
+let terminalLogsCache;
 let printersStore;
 
 beforeAll(async () => {
   await dbHandler.connect();
   container = configureContainer();
-  connectionLogsCache = container.resolve(DITokens.connectionLogsCache);
+  terminalLogsCache = container.resolve(DITokens.terminalLogsCache);
   printersStore = container.resolve(DITokens.printersStore);
   await printersStore.loadPrintersStore();
 });
@@ -20,9 +20,9 @@ afterAll(async () => {
   await dbHandler.closeDatabase();
 });
 
-describe(DITokens.connectionLogsCache, () => {
+describe(DITokens.terminalLogsCache, () => {
   it("should resolve", async () => {
-    expect(connectionLogsCache).toBeDefined();
+    expect(terminalLogsCache).toBeDefined();
   });
 
   it("should run generateConnectionLogs just fine", async () => {
@@ -32,11 +32,6 @@ describe(DITokens.connectionLogsCache, () => {
       apiKey: "3dpf3dpf3dpf3dpf3dpf3dpf3dpf3dpf",
       tempTriggers: { heatingVariation: null }
     });
-    await connectionLogsCache.generateConnectionLogs(printerState.id);
-  });
-
-  test.skip("should be able to call returnPrinterLogs", () => {
-    expect(connectionLogsCache.generateConnectionLogs()).toEqual([]);
-    expect(connectionLogsCache.generateConnectionLogs(0)).toBeUndefined();
+    await terminalLogsCache.getPrinterTerminalLogs(printerState.id);
   });
 });

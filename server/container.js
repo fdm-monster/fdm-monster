@@ -28,7 +28,6 @@ const PrinterSseTask = require("./tasks/printer-sse.task");
 const CurrentOperationsCache = require("./state/data/current-operations.cache");
 const PrinterSystemTask = require("./tasks/printer-system.task");
 const OctoPrintApiService = require("./services/octoprint/octoprint-api.service");
-const FilamentManagerPluginService = require("./services/octoprint/filament-manager-plugin.service");
 const FilamentCache = require("./state/data/filament.cache");
 const PrinterState = require("./state/printer.state");
 const PrinterStateFactory = require("./state/printer-state.factory");
@@ -42,7 +41,7 @@ const { AppConstants } = require("./server.constants");
 const PrinterFilesService = require("./services/printer-files.service");
 const SoftwareUpdateTask = require("./tasks/software-update.task");
 const AutoDiscoveryService = require("./services/auto-discovery.service");
-const ConnectionLogsCache = require("./state/data/connection-logs.cache");
+const TerminalLogsCache = require("./state/data/terminal-logs.cache");
 const DashboardStatisticsCache = require("./state/data/dashboard-statistics.cache");
 const AlertService = require("./services/alert.service");
 const { asFunction, asClass, asValue, createContainer, InjectionMode } = require("awilix");
@@ -53,6 +52,7 @@ const MulterService = require("./services/multer.service");
 const FileUploadTrackerCache = require("./state/data/file-upload-tracker.cache");
 const ServerHost = require("./server.host");
 const BootTask = require("./tasks/boot.task");
+const PrinterProfilesCache = require("./state/data/printer-profiles.cache");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -98,17 +98,17 @@ function configureContainer() {
     [DITokens.printerFilesService]: asClass(PrinterFilesService),
     [DITokens.printerGroupService]: asClass(PrinterGroupService),
     [DITokens.octoPrintApiService]: asClass(OctoPrintApiService).singleton(),
-    [DITokens.filamentManagerPluginService]: asClass(FilamentManagerPluginService),
     [DITokens.historyService]: asClass(HistoryService),
     [DITokens.dashboardStatisticsCache]: asClass(DashboardStatisticsCache),
 
     [DITokens.filamentCache]: asClass(FilamentCache).singleton(),
+    [DITokens.printerProfilesCache]: asClass(PrinterProfilesCache).singleton(),
     [DITokens.currentOperationsCache]: asClass(CurrentOperationsCache).singleton(),
     [DITokens.printerState]: asClass(PrinterState).transient(), // Transient on purpose!
     [DITokens.printerGroupsCache]: asClass(PrinterGroupsCache).singleton(),
     [DITokens.historyCache]: asClass(HistoryCache).singleton(),
     [DITokens.jobsCache]: asClass(JobsCache).singleton(),
-    [DITokens.connectionLogsCache]: asClass(ConnectionLogsCache).singleton(),
+    [DITokens.terminalLogsCache]: asClass(TerminalLogsCache).singleton(),
     [DITokens.printerTickerStore]: asClass(PrinterTickerStore).singleton(),
     [DITokens.fileCache]: asClass(FileCache).singleton(),
     [DITokens.fileUploadTrackerCache]: asClass(FileUploadTrackerCache).singleton(),

@@ -2,7 +2,7 @@ jest.mock("mjpeg-decoder");
 const decoderMock = require("mjpeg-decoder");
 jest.mock("../../server/services/octoprint/octoprint-api.service");
 const { configureContainer } = require("../../server/container");
-const Spool = require("../../server/models/Spool.js");
+const Filament = require("../../server/models/Filament");
 const DITokens = require("../../server/container.tokens");
 
 const dbHandler = require("../db-handler");
@@ -152,7 +152,7 @@ describe("HistoryService", () => {
   });
 
   test.skip("should succeed updatePrinterSelectedFilament when every code weakness is overcome", async () => {
-    const obj = await Spool.create({ spools: {} });
+    const obj = await Filament.create({ spools: {} });
 
     const printer = {
       apiKey: goodAPIKey,

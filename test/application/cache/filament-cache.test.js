@@ -24,35 +24,13 @@ afterAll(async () => {
 
 describe("Filament-Cache", function () {
   it("should have default values", () => {
-    const spools = filamentCache.getSpools();
-    const profiles = filamentCache.getProfiles();
+    const spools = filamentCache.getFilamentSpools();
     const stats = filamentCache.getStatistics();
     const selectedFilamentList = filamentCache.getSelected();
-    const dropDownList = filamentCache.getDropDown();
 
     expect(spools).toHaveLength(0);
-    expect(profiles).toHaveLength(0);
     expect(stats).toHaveLength(0);
     expect(selectedFilamentList).toHaveLength(0);
-    expect(dropDownList).toMatchObject({
-      normalDropDown: [],
-      historyDropDown: []
-    });
-  });
-
-  it("should be able to construct dropdown list data", async () => {
-    expect(filamentCache.getDropDown()).toMatchObject({
-      normalDropDown: [],
-      historyDropDown: []
-    });
-
-    const result = await filamentCache.dropDownList([], [], true, []);
-    expect(result).toBeUndefined();
-
-    expect(filamentCache.getDropDown()).toMatchObject({
-      normalDropDown: [noSpoolOptionTemplate],
-      historyDropDown: [noSpoolOptionTemplate]
-    });
   });
 
   it("should be able to get printer assignment at start", async () => {

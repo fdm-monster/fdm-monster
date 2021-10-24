@@ -39,7 +39,13 @@ class ServerHost {
 
     // Catches any HTML request to paths like / or file/ as long as its text/html
     app
-      .use((req, res, next) => history()(req, res, next))
+      .use((req, res, next) => {
+        if (!req.originalUrl.startsWith("/api")) {
+          history()(req, res, next);
+        } else {
+          next();
+        }
+      })
       .use(loadControllers(`${routePath}/settings/*.controller.js`, { cwd: __dirname }))
       .use(loadControllers(`${routePath}/*.controller.js`, { cwd: __dirname }))
       .use(interceptDatabaseError)

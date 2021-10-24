@@ -14,7 +14,6 @@ const DITokens = {
   githubApiService: "githubApiService",
   userTokenService: "userTokenService",
   octoPrintApiService: "octoPrintApiService",
-  filamentManagerPluginService: "filamentManagerPluginService",
   influxDbSetupService: "influxDbSetupService",
   influxDbFilamentService: "influxDbFilamentService",
   influxDbHistoryService: "influxDbHistoryService",
@@ -36,7 +35,8 @@ const DITokens = {
   printerState: "printerState",
   // Caches
   printerGroupsCache: "printerGroupsCache",
-  connectionLogsCache: "connectionLogsCache",
+  printerProfilesCache: "printerProfilesCache",
+  terminalLogsCache: "terminalLogsCache",
   jobsCache: "jobsCache",
   dashboardStatisticsCache: "dashboardCache",
   currentOperationsCache: "currentOperationsCache",

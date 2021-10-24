@@ -12,8 +12,7 @@ class DatabaseController {
       await ServerSettingsDB.deleteMany({});
       await ClientSettingsDB.deleteMany({});
       await HistoryDB.deleteMany({});
-      await SpoolsDB.deleteMany({});
-      await ProfilesDB.deleteMany({});
+      await Filament.deleteMany({});
       await UserDB.deleteMany({});
       await PrinterDB.deleteMany({});
       await AlertsDB.deleteMany({});
@@ -24,8 +23,7 @@ class DatabaseController {
       logger.info("Database completely wiped.... Restarting server...");
       SystemCommands.rebootServer();
     } else if (databaseName === "FilamentDB") {
-      await SpoolsDB.deleteMany({});
-      await ProfilesDB.deleteMany({});
+      await Filament.deleteMany({});
       logger.info("Successfully deleted Filament database.... Restarting server...");
       SystemCommands.rebootServer();
     } else {

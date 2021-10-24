@@ -1,6 +1,6 @@
 class SettingsStore {
-  #server;
-  #client;
+  #serverSettings;
+  #clientSettings;
 
   #clientSettingsService;
   #serverSettingsService;
@@ -12,28 +12,24 @@ class SettingsStore {
 
   async loadSettings() {
     // Setup Settings as connection is established
-    this.#server = await this.#serverSettingsService.getOrCreate();
-    this.#client = await this.#clientSettingsService.getOrCreate();
+    this.#serverSettings = await this.#serverSettingsService.getOrCreate();
+    this.#clientSettings = await this.#clientSettingsService.getOrCreate();
   }
 
   getServerSettings() {
     return Object.freeze({
-      ...this.#server._doc
+      ...this.#serverSettings._doc
     });
   }
 
   getClientSettings() {
     return Object.freeze({
-      ...this.#client._doc
+      ...this.#clientSettings._doc
     });
   }
 
-  isFilamentEnabled() {
-    return this.#server.filamentManager;
-  }
-
   getHistorySetting() {
-    return this.#server.history;
+    return this.#serverSettings.history;
   }
 }
 

@@ -19,11 +19,7 @@ class OctoPrintRoutes {
   apiSystemCommands = `${this.apiSystem}/commands`;
   apiUsers = `${this.apiBase}/users`;
   apiLogin = `${this.apiBase}/login?passive=true`;
-  apiPluginManager = `${this.apiBase}/plugin/pluginmanager`;
-  apiPluginManagerRepository1_6_0 = `${this.octoPrintBase}plugin/pluginmanager/repository`;
-  apiPluginPiSupport = `${this.apiBase}/plugin/pi_support`;
-  apiPluginFilamentManagerSpools = `${this.apiBase}/plugin/filamentmanager/spools`;
-  apiPluginFilamentManagerProfiles = `${this.apiBase}/plugin/filamentmanager/profiles`;
+  apiProfiles = `${this.apiBase}/plugin/printerprofiles`;
   apiTimelapse = `${this.apiBase}/timelapse`;
   _settingsStore;
   _timeouts; // TODO apply apiTimeout, but apply apiRetry, apiRetryCutoff elsewhere (and webSocketRetry)

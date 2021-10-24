@@ -91,10 +91,9 @@ async function validateInput(data, rules) {
  * Handle API input validation
  * @param req
  * @param rules
- * @param res
  * @returns {Promise<boolean|any>}
  */
-async function validateMiddleware(req, rules, res) {
+async function validateMiddleware(req, rules) {
   return validateInput(req.body, rules);
 }
 

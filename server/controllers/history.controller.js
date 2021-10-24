@@ -44,9 +44,6 @@ class HistoryController {
     const data = await validateInput(req.params, idRules);
     const historyId = data.id;
 
-    const serverSettings = this.#settingsStore.getServerSettings();
-    const filamentManagerEnabled = serverSettings.filamentManager;
-
     // Check required fields
     const latest = req.body;
     const { note } = latest;
@@ -66,19 +63,9 @@ class HistoryController {
         } else {
           if (filamentId[f] != 0) {
             const spool = await Spools.findById(filamentId[f]);
-
-            if (filamentManagerEnabled) {
-              const profiles = await Profiles.find({});
-              const profileIndex = _.findIndex(profiles, function (o) {
-                return o.profile.index == spool.spools.profile;
-              });
-              spool.spools.profile = profiles[profileIndex].profile;
-              history.printHistory.filamentSelection[f] = spool;
-            } else {
-              const profile = await Profiles.findById(spool.spools.profile);
-              spool.spools.profile = profile.profile;
-              history.printHistory.filamentSelection[f] = spool;
-            }
+            const profile = await Profiles.findById(spool.spools.profile);
+            spool.spools.profile = profile.profile;
+            history.printHistory.filamentSelection[f] = spool;
           } else {
             filamentId.forEach((id, index) => {
               history.printHistory.filamentSelection[index] = null;
@@ -95,19 +82,9 @@ class HistoryController {
           history.printHistory.filamentSelection = [];
           if (filamentId[f] != 0) {
             const spool = await Spools.findById(filamentId[f]);
-
-            if (filamentManagerEnabled) {
-              const profiles = await Profiles.find({});
-              const profileIndex = _.findIndex(profiles, function (o) {
-                return o.profile.index == spool.spools.profile;
-              });
-              spool.spools.profile = profiles[profileIndex].profile;
-              history.printHistory.filamentSelection[f] = spool;
-            } else {
-              const profile = await Profiles.findById(spool.spools.profile);
-              spool.spools.profile = profile.profile;
-              history.printHistory.filamentSelection[f] = spool;
-            }
+            const profile = await Profiles.findById(spool.spools.profile);
+            spool.spools.profile = profile.profile;
+            history.printHistory.filamentSelection[f] = spool;
           } else {
             filamentId.forEach((id, index) => {
               history.printHistory.filamentSelection[index] = null;
@@ -178,11 +155,11 @@ class HistoryController {
 
 // prettier-ignore
 module.exports = createController(HistoryController)
-  .prefix(AppConstants.apiRoute + "/history")
-  .before([ensureAuthenticated])
-  .get("/", "getCache")
-  .delete("/:id", "delete")
-  .put("/:id", "update")
-  .get("/stats", "stats")
-  .patch("/:id/cost-settings", "updateCostMatch")
-  .get("/:id/printer-stats", "getPrinterStats");
+    .prefix(AppConstants.apiRoute + "/history")
+    .before([ensureAuthenticated])
+    .get("/", "getCache")
+    .delete("/:id", "delete")
+    .put("/:id", "update")
+    .get("/stats", "stats")
+    .patch("/:id/cost-settings", "updateCostMatch")
+    .get("/:id/printer-stats", "getPrinterStats");

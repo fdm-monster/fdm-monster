@@ -20,9 +20,6 @@ class ServerSettingsService {
       if (!primarySettings.server) {
         primarySettings.server = Constants.server;
       }
-      if (!Object.keys(primarySettings).includes(Constants.filamentManager.name)) {
-        primarySettings.filamentManager = Constants.filamentManager;
-      }
       if (!primarySettings.history) {
         primarySettings.history = Constants.history;
       }
@@ -35,7 +32,7 @@ class ServerSettingsService {
     }
   }
 
-  static async update(obj) {
+  async update(obj) {
     const checked = await ServerSettingsDB.find({});
 
     checked[0] = obj;

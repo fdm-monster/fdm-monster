@@ -1,72 +1,44 @@
 const _ = require("lodash");
-const Logger = require("../../handlers/logger.js");
-const Spools = require("../../models/Spool.js");
-const Profiles = require("../../models/Profiles.js");
+const Filament = require("../../models/Filament");
 const { noSpoolOptionTemplate } = require("../../constants/template.constants");
 
 class FilamentCache {
-  #spoolsClean = [];
-  #profilesClean = [];
-  #statisticsClean = [];
+  #filamentSpools = [];
+  #statistics = [];
   #selectedFilamentList = [];
-  #dropDownList = {
-    normalDropDown: [],
-    historyDropDown: []
-  };
 
-  #logger = new Logger("Server-Filament");
+  #logger;
 
   #settingsStore;
   #printersStore;
+  #printerProfilesCache;
 
-  constructor({ settingsStore, printersStore }) {
+  constructor({ settingsStore, printersStore, printerProfilesCache, loggerFactory }) {
     this.#settingsStore = settingsStore;
     this.#printersStore = printersStore;
+    this.#printerProfilesCache = printerProfilesCache;
+
+    this.#logger = loggerFactory("Server-Filament");
   }
 
-  getSpools() {
-    return this.#spoolsClean;
-  }
-
-  getProfiles() {
-    return this.#profilesClean;
+  getFilamentSpools() {
+    return this.#filamentSpools;
   }
 
   getStatistics() {
-    return this.#statisticsClean;
+    return this.#statistics;
   }
 
   getSelected() {
     return this.#selectedFilamentList;
   }
 
-  getDropDown() {
-    return this.#dropDownList;
-  }
-
   async initCache() {
     const printers = this.#printersStore.listPrinterStates();
 
-    const profiles = await Profiles.find({});
-    const spools = await Spools.find({});
+    const spools = await Filament.find({});
     const spoolsArray = [];
     const profilesArray = [];
-
-    for (let pr = 0; pr < profiles.length; pr++) {
-      const profile = {
-        _id: null,
-        manufacturer: profiles[pr].profile.manufacturer,
-        material: profiles[pr].profile.material,
-        density: profiles[pr].profile.density,
-        diameter: profiles[pr].profile.diameter
-      };
-      if (this.#settingsStore.isFilamentEnabled()) {
-        profile._id = profiles[pr].profile.index;
-      } else {
-        profile._id = profiles[pr]._id;
-      }
-      profilesArray.push(profile);
-    }
 
     for (let sp = 0; sp < spools.length; sp++) {
       const spool = {
@@ -85,68 +57,11 @@ class FilamentCache {
       spoolsArray.push(spool);
     }
 
-    this.#spoolsClean = spoolsArray;
-    this.#profilesClean = profilesArray;
+    this.#filamentSpools = spoolsArray;
 
     this.#selectedFilamentList = await this.selectedFilament(printers);
-    this.#statisticsClean = this.createStatistics(spoolsArray, profilesArray);
-    await this.dropDownList(spools, profiles);
+    this.#statistics = this.createStatistics(spoolsArray, profilesArray);
     this.#logger.info("Filament information cleaned and ready for consumption...");
-  }
-
-  dropDownList(spools, profiles) {
-    const normalDropObject = [noSpoolOptionTemplate];
-    const historyDropObject = [noSpoolOptionTemplate];
-
-    spools.forEach((spool) => {
-      let profileId;
-      if (this.#settingsStore.isFilamentEnabled()) {
-        profileId = _.findIndex(profiles, function (o) {
-          return o.profile.index === spool.spools.profile;
-        });
-      } else {
-        profileId = _.findIndex(profiles, function (o) {
-          return o._id === spool.spools.profile;
-        });
-      }
-      const index = _.findIndex(this.#selectedFilamentList, function (o) {
-        return o === spool._id;
-      });
-
-      if (profileId >= 0) {
-        if (this.#settingsStore.isFilamentEnabled()) {
-          historyDropObject.push(`
-                  <option value="${spool._id}">${spool.spools.name} (${(
-            spool.spools.weight - spool.spools.used
-          ).toFixed(2)}g) - ${profiles[profileId].profile.material}</option>
-              `);
-          if (index > -1) {
-            normalDropObject.push(`
-                  <option value="${spool._id}" disabled>${spool.spools.name} (${(
-              spool.spools.weight - spool.spools.used
-            ).toFixed(2)}g) - ${profiles[profileId].profile.material}</option>
-              `);
-          } else {
-            normalDropObject.push(`
-                  <option value="${spool._id}">${spool.spools.name} (${(
-              spool.spools.weight - spool.spools.used
-            ).toFixed(2)}g) - ${profiles[profileId].profile.material}</option>
-              `);
-          }
-        } else {
-          historyDropObject.push(`
-                  <option value="${spool._id}">${spool.spools.name} - ${profiles[profileId].profile.material}</option>
-              `);
-          normalDropObject.push(`
-                  <option value="${spool._id}">${spool.spools.name} - ${profiles[profileId].profile.material}</option>
-              `);
-        }
-      }
-    });
-    this.#dropDownList = {
-      normalDropDown: normalDropObject,
-      historyDropDown: historyDropObject
-    };
   }
 
   async selectedFilament(printers) {
