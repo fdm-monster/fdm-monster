@@ -41,6 +41,7 @@ class AppController {
     }
 
     res.json({
+      version: this.#serverVersion,
       isDockerContainer: isDocker(),
       isNodemon: isNodemon(),
       isNode: isNode(),
