@@ -11,8 +11,8 @@
       transition="slide-x-transition"
     >
       <template v-slot:activator="{ on, attrs }">
-        <v-btn v-bind="attrs" v-on="on" dark>
-          <span>Print jobs</span>
+        <v-btn v-bind="attrs" v-on="on" dark :color="activePrintCount ? 'primary' : 'secondary'">
+          <span>Print jobs {{ activePrintCount ? `(${activePrintCount})`: "" }}</span>
           <v-icon right>work</v-icon>
         </v-btn>
       </template>
@@ -34,23 +34,27 @@
         <v-divider></v-divider>
 
         <v-list>
-          <v-list-item v-for="job of activePrintJobs" :key="job.fileName">
+          <v-list-item v-if="!activePrintCount">
+            No active prints
+          </v-list-item>
+          <v-list-item v-for="printer of activePrintJobs" :key="printer.id">
             <v-list-item-action>
               <v-progress-circular
                 :size="50"
-                :value="job.progress"
+                :value="printer.currentJob.progress"
                 :width="5"
                 color="green"
               >
-                {{ job.progress }}
+                {{ printer.currentJob.progress + "%" || ""}}
               </v-progress-circular>
             </v-list-item-action>
             <v-list-item-content>
               <v-list-item-title>
-                {{ job.fileName }}
+                {{ printer.currentJob.fileName }}
               </v-list-item-title>
               <v-list-item-subtitle>
-                Elapsed: {{ Math.round(job.printTimeElapsed / 60) }} minutes
+                Elapsed: {{ Math.round(printer.currentJob.printTimeElapsed / 60) }} minutes <br />
+                Printer: {{ printer.printerName }}
               </v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
@@ -59,7 +63,7 @@
         <v-card-actions>
           <v-spacer></v-spacer>
 
-          <v-btn text @click="menu = false"> Cancel</v-btn>
+          <v-btn text @click="menu = false">Close</v-btn>
         </v-card-actions>
       </v-card>
     </v-menu>
@@ -83,7 +87,7 @@ import { PrinterJob } from "@/models/printers/printer-current-job.model";
 })
 export default class PrintJobsMenu extends Vue {
   get activePrintJobs() {
-    return printersState.printersWithJob.map(p => p.currentJob);
+    return printersState.printersWithJob;
   }
 
   get activePrintCount() {
