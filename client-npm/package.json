@@ -1,4 +1,4 @@
-{
+﻿{
   "name": "@3d-hub/client",
   "author": "David Zwart",
   "version": "0.1.9",
@@ -7,6 +7,8 @@
     "type": "git",
     "url": "https://github.com/3d-hub/3d-hub"
   },
-  "dependencies": {},
-  "devDependencies": {}
+  "dependencies": {
+  },
+  "devDependencies": {
+  }
 }

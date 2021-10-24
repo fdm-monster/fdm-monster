@@ -1,6 +1,6 @@
-# client-3dhub
+# 3D Hub Client
 
-The client UI for 3D Hub. Please see https://github.com/3d-hub/3d-hub for more information.
+The client UI for 3D Hub built with Vue. Please see https://github.com/3d-hub/3d-hub for more information.
 
 ## Project setup
 ```

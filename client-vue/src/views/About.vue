@@ -1,7 +1,7 @@
 <template>
   <v-container>
-    3D Print Farm was created by D. Zwart (https://github.com/davidzwa) in collaboration with
-    <strong><a href="https://mtb3d.com">MTB3D</a></strong> as a spin-off of OctoFarm.
+    3D Hub was created by D. Zwart (https://github.com/davidzwa) in collaboration with
+    <strong><a href="https://mtb3d.com">MTB3D</a></strong>.
 
     <br />
     <br />

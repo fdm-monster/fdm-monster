@@ -1,8 +1,16 @@
 npm cache clear --force
-$versionArray = (npm view @3d-hub/client versions --json | ConvertFrom-Json)
-$lastVersion = $versionArray[$versionArray.Count - 1]
+$package="@3d-hub/client"
+$versionArray = (npm view $package versions --json | ConvertFrom-Json)
+if ($versionArray.Count -eq 1) {
+    $lastVersion = $versionArray
+}
+else {
+    $lastVersion = $versionArray[$versionArray.Count - 1]
+}
 
-echo  "Running: npm --prefix ..\..\ install --save --save-exact @3d-hub/client@~${lastVersion}"
+echo "Installing version ${lastVersion} of package ${package}"
 
-npm --prefix "..\..\" install --save --save-exact "@3d-hub/client@~${lastVersion}"
+echo  "Running: npm --prefix ..\..\ install --save --save-exact ${package}@${lastVersion}"
+
+npm --prefix "..\..\" install --save --save-exact "${package}@${lastVersion}"
 
