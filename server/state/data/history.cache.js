@@ -10,6 +10,9 @@ const { floatOrZero } = require("../../utils/number.util");
 const { toTimeFormat } = require("../../utils/time.util");
 const { getJobAnalysis } = require("../../utils/job.utils");
 
+/**
+ * A standalone cache as in-memory layer for the underlying history service
+ */
 class HistoryCache {
   #statisticsClean = getDefaultHistoryStatistics();
   #historyClean = [];

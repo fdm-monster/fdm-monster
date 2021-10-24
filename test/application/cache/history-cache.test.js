@@ -12,7 +12,6 @@ const {
   processHistorySpools,
   calcSpoolWeightAsString
 } = require("../../../server/utils/spool.utils");
-const { legacyGetFile } = require("./history-cache-legacy");
 const interestingButWeirdHistoryCache = [
   {
     printHistory: {
@@ -111,7 +110,6 @@ describe("History-Cache", () => {
 
     const { history, stats } = historyCache.getHistoryCache();
     expect(history[0].path).toBeUndefined();
-    expect(legacyGetFile({}).path).toBeUndefined();
     expect(stats).toBeTruthy();
   });
 
