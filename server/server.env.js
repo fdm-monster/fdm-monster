@@ -8,7 +8,7 @@ const { AppConstants } = require("./server.constants");
 const { status, up } = require("migrate-mongo");
 const isDocker = require("is-docker");
 const Logger = require("./handlers/logger.js");
-const logger = new Logger("3DH-Environment", false);
+const logger = new Logger("3DHUB-Environment", false);
 
 // Constants and definition
 const instructionsReferralURL = "https://github.com/3d-hub/3d-hub/blob/master/README.md";

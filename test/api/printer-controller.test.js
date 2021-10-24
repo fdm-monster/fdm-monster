@@ -29,7 +29,7 @@ const batchRoute = `${listRoute}/batch`;
 
 let request;
 let octoPrintApiService;
-const apiKey = "3dhub3dhub3dhub3dhub3dhub3dhub3dhub3dhub";
+const apiKey = "3dhub3dhub3dhub3dhub3dhub3dhubbb";
 
 beforeAll(async () => {
   await dbHandler.connect();
