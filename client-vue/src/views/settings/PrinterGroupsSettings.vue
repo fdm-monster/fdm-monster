@@ -4,7 +4,7 @@
       <v-btn dark icon>
         <v-icon>settings</v-icon>
       </v-btn>
-      <v-toolbar-title>Hub Settings</v-toolbar-title>
+      <v-toolbar-title>Printer Group Management</v-toolbar-title>
     </v-toolbar>
     <v-list subheader three-line>
       <v-subheader>Printer Groups</v-subheader>

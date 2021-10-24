@@ -57,7 +57,7 @@ import { PrinterSettingsService } from "@/backend/printer-settings.service";
       items: [
         {title: 'Printer groups', icon: 'dashboard', path: '/settings/printer-groups'},
         {title: 'Hub settings', icon: 'image', path: '/settings/system'},
-        {title: 'Logs', icon: 'help', path: '/settings/logs'},
+        {title: 'Other', icon: 'help', path: '/settings/other'},
       ]
     };
   }

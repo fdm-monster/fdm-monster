@@ -7,6 +7,7 @@ import PrinterGroupsSettings from "@/views/settings/PrinterGroupsSettings.vue";
 import About from "@/views/About.vue";
 import Scheduling from "@/views/Scheduling.vue";
 import HubSettings from "@/views/settings/HubSettings.vue";
+import OtherSettings from "@/views/settings/OtherSettings.vue";
 
 Vue.use(VueRouter);
 
@@ -38,8 +39,8 @@ const routes: Array<RouteConfig> = [
         component: HubSettings
       },
       {
-        path: "logs",
-        component: PrinterGroupsSettings
+        path: "other",
+        component: OtherSettings
       }
     ]
   },
