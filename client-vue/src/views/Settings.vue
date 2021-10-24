@@ -1,14 +1,44 @@
 <template>
   <v-container>
-    <v-toolbar color="primary" dark>
-      <v-btn dark icon @click="dialog = false">
-        <v-icon>close</v-icon>
+    <v-navigation-drawer absolute>
+      <v-list-item>
+        <v-list-item-content>
+          <v-list-item-title class="text-h6">
+            Settings
+          </v-list-item-title>
+          <v-list-item-subtitle>
+            Adjust your Hub
+          </v-list-item-subtitle>
+        </v-list-item-content>
+      </v-list-item>
+
+      <v-divider></v-divider>
+
+      <v-list
+        dense
+        nav
+      >
+        <v-list-item
+          v-for="item in items"
+          :key="item.title"
+          link
+        >
+          <v-list-item-icon>
+            <v-icon>{{ item.icon }}</v-icon>
+          </v-list-item-icon>
+
+          <v-list-item-content>
+            <v-list-item-title>{{ item.title }}</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
+
+    <v-toolbar color="primary">
+      <v-btn dark icon>
+        <v-icon>settings</v-icon>
       </v-btn>
       <v-toolbar-title>Server Settings</v-toolbar-title>
-      <v-spacer></v-spacer>
-      <v-toolbar-items>
-        <v-btn dark disabled text @click="dialog = false"> Save</v-btn>
-      </v-toolbar-items>
     </v-toolbar>
     <v-list subheader three-line>
       <v-subheader>Groups and Files</v-subheader>
@@ -100,6 +130,12 @@ import { PrinterSettingsService } from "@/backend/printer-settings.service";
   components: {},
   data() {
     return {
+      items: [
+        { title: 'Printer groups', icon: 'dashboard' },
+        { title: 'System settings', icon: 'image' },
+        { title: 'Logs', icon: 'help' },
+      ],
+      right: null,
       dialog: false,
       notifications: false,
       sound: true,
