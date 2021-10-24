@@ -2,7 +2,7 @@ const _ = require("lodash");
 const { createController } = require("awilix-express");
 const { ensureAuthenticated } = require("../middleware/auth");
 const Filament = require("../models/Filament");
-const Profiles = require("../models/Profiles.js");
+const Profile = require("../models/Profile");
 const { AppConstants } = require("../server.constants");
 const { validateMiddleware } = require("../handlers/validators");
 const { idRules } = require("./validation/generic.validation");
@@ -41,7 +41,7 @@ class FilamentController {
   async disableFilamentManagerPlugin(req, res) {
     this.#logger.info("Disabling filament manager plugin for 3DPF");
     await Filament.deleteMany();
-    await Profiles.deleteMany();
+    await Profile.deleteMany();
 
     await this.#settingsStore.setFilamentManagerPluginEnabled(false);
     this.#logger.info("Successfully disabled filament manager");
@@ -51,14 +51,14 @@ class FilamentController {
 
   async selectFilament(req, res) {
     const { filamentManager } = this.#settingsStore.getServerSettings();
-
     if (!filamentManager) return res.send();
 
     const { id } = await validateMiddleware(req, idRules);
+    // TODO rules
     const { tool, filamentId } = req.body;
     const printer = this.#printersStore.getPrinterState(id);
 
-    await this.#filamentManagerPluginService.selectPrinterFilament(printer, filamentId, tool);
+    await this.#filamentManagerPluginService.setSelectedFilament(printer, filamentId, tool);
 
     res.send();
   }
@@ -75,7 +75,7 @@ class FilamentController {
       // TODO replace this 'first-active' logic
       let printer = printerList[0];
 
-      const profiles = await Profiles.find({});
+      const profiles = await Profile.find({});
       const profile = _.find(profiles, function (o) {
         return o.profile.index === filament.spoolsProfile;
       });
@@ -205,7 +205,7 @@ class FilamentController {
         }
       }
       const filamentManagerID = newContent[5];
-      const profiles = await Profiles.find({});
+      const profiles = await Profile.find({});
       const findID = _.findIndex(profiles, function (o) {
         return o.profile.index == filamentManagerID;
       });
@@ -315,7 +315,7 @@ class FilamentController {
       }
     });
 
-    this.#logger.info("Grabbing Profiles");
+    this.#logger.info("Grabbing Profile");
     // TODO move to client service
     let profiles = await fetch(`${printer.printerURL}/plugin/filamentmanager/profiles`, {
       method: "GET",
@@ -329,7 +329,7 @@ class FilamentController {
     // Make sure filament manager responds...
     if (spools.status != 200 || profiles.status != 200) {
       this.#logger.info(
-        "Couldn't grab something: Profiles Status:" +
+        "Couldn't grab something: Profile Status:" +
           profiles.status +
           " Spools Status: " +
           spools.status
@@ -337,7 +337,7 @@ class FilamentController {
       res.send({ status: false });
     }
     await Filament.deleteMany({});
-    await Profiles.deleteMany({});
+    await Profile.deleteMany({});
     spools = await spools.json();
     profiles = await profiles.json();
     spools.spools.forEach((sp) => {
@@ -365,7 +365,7 @@ class FilamentController {
         manufacturer: sp.vendor,
         material: sp.material
       };
-      const newP = new Profiles({
+      const newP = new Profile({
         profile
       });
       newP.save();

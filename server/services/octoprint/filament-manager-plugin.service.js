@@ -1,17 +1,28 @@
-const Logger = require("../../handlers/logger.js");
-const Filament = require("../../models/Filament.js");
-const Profile = require("../../models/Profiles.js");
+const Logger = require("../../handlers/logger");
+const Filament = require("../../models/Filament");
+const Profile = require("../../models/Profile");
 const { OPClientErrors } = require("./constants/octoprint-service.constants");
+const OctoPrintApiService = require("./octoprint-api.service");
+const DITokens = require("../../container.tokens");
+const { processResponse } = require("./utils/api.utils");
 
-class FilamentManagerPluginService {
+class FilamentManagerPluginService extends OctoPrintApiService {
+  apiPluginManager = `${this.apiBase}/plugin/pluginmanager`;
+  apiPluginManagerRepository1_6_0 = `${this.octoPrintBase}plugin/pluginmanager/repository`;
+  apiPluginPiSupport = `${this.apiBase}/plugin/pi_support`;
+  apiPluginFilamentManagerSpools = `${this.apiBase}/plugin/filamentmanager/spools`;
+  apiPluginFilamentManagerSelections = `${this.apiBase}/plugin/filamentmanager/selections/0`;
+  apiPluginFilamentManagerProfiles = `${this.apiBase}/plugin/filamentmanager/profiles`;
+
   #printersStore;
   #octoPrintApiService;
 
   #logger = new Logger("Server-FilamentManager");
 
-  constructor({ printersStore, octoPrintApiService }) {
-    this.#printersStore = printersStore;
-    this.#octoPrintApiService = octoPrintApiService;
+  constructor(cradle) {
+    super(cradle);
+    this.#printersStore = cradle[DITokens.printersStore];
+    this.#octoPrintApiService = cradle[DITokens.octoPrintApiService];
   }
 
   #validateFilamentId(value) {
@@ -25,22 +36,49 @@ class FilamentManagerPluginService {
     return parsedFilamentID;
   }
 
-  async createFilamentSpool(printer, spool) {
-    const printerLogin = printer.getLoginDetails();
-    return this.#octoPrintApiService.createPluginFilamentManagerFilamentSpool(printerLogin, spool);
+  async listProfiles(printer, responseOptions) {
+    const { url, options } = this._prepareRequest(printer, this.apiPluginFilamentManagerProfiles);
+    const response = await this._httpClient.get(url, options);
+    return processResponse(response, responseOptions);
   }
 
-  async selectPrinterFilament(printer, filamentId, tool) {
-    const printerLogin = printer.getLoginDetails();
+  async createProfile(printer, profile, responseOptions) {
+    const path = `${this.apiPluginFilamentManagerProfiles}/`;
+    const { url, options } = this._prepareRequest(printer, path);
+    const response = await this._httpClient.post(url, profile, options);
+    return processResponse(response, responseOptions);
+  }
+
+  async listFilament(printer, responseOptions) {
+    const { url, options } = this._prepareRequest(printer, this.apiPluginFilamentManagerSpools);
+    const response = await this._httpClient.get(url, options);
+    return processResponse(response, responseOptions);
+  }
+
+  async getFilament(printer, filamentID, responseOptions) {
+    const path = `${this.apiPluginFilamentManagerSpools}/${filamentID}`;
+    const { url, options } = this._prepareRequest(printer, path);
+    const response = await this._httpClient.get(url, options);
+    return processResponse(response, responseOptions);
+  }
+
+  async createFilamentSpool(printer, spool, responseOptions) {
+    const path = `${this.apiPluginFilamentManagerSpools}/`;
+    const { url, options } = this._prepareRequest(printer, path);
+    const response = await this._httpClient.post(url, spool, options);
+    return processResponse(response, responseOptions);
+  }
+
+  async setSelectedFilament(printer, filamentId, tool, responseOptions) {
     this.#validateFilamentId(filamentId);
     const selection = {
       tool,
       spool: { id: filamentId }
     };
-    return await this.#octoPrintApiService.setPluginFilamentManagerSelection(
-      printerLogin,
-      selection
-    );
+    const path = `${this.apiPluginFilamentManagerSelections}`;
+    const { url, options } = this._prepareRequest(printer, path);
+    const response = await this._httpClient.patch(url, selection, options);
+    return processResponse(response, responseOptions);
   }
 
   async updatePrinterSelectedFilament(printer) {
@@ -48,42 +86,30 @@ class FilamentManagerPluginService {
     for (let i = 0; i < printer.selectedFilament.length; i++) {
       if (printer.selectedFilament[i] !== null) {
         const filamentId = printer.selectedFilament[i].spools.fmID;
-        if (!filamentId) {
-          throw `Could not query OctoPrint FilamentManager for filament. FilamentID '${filamentId}' not found.`;
-        }
-
-        const response = await this.#octoPrintApiService.getPluginFilamentManagerFilament(
-          printer.getLoginDetails(),
-          this.#validateFilamentId(filamentId)
-        );
+        const validFilamentId = this.#validateFilamentId(filamentId);
+        const filament = await this.getFilament(printer.getLoginDetails(), validFilamentId);
 
         this.#logger.info(`${printer.printerURL}: spools fetched. Status: ${response.status}`);
-        const sp = await response.json();
 
         const spoolID = printer.selectedFilament[i]._id;
-        const spoolEntity = await Filament.findById(spoolID);
+        let spoolEntity = await Filament.findById(spoolID);
         if (!spoolEntity) {
           throw `Spool database entity by ID '${spoolID}' not found. Cant update filament.`;
         }
-        spoolEntity.spools = {
-          name: sp.spool.name,
-          profile: sp.spool.profile.id,
-          cost: sp.spool.cost,
-          weight: sp.spool.weight,
-          used: sp.spool.used,
-          tempOffset: sp.spool.temp_offset,
-          fmID: sp.spool.id
+        const spool = filament.spool;
+        spoolEntity = {
+          name: spool.name,
+          profile: spool.profile.id,
+          cost: spool.cost,
+          weight: spool.weight,
+          used: spool.used,
+          tempOffset: spool.temp_offset,
+          fmID: spool.id
         };
-        this.#logger.info(`${printer.printerURL}: updating... spool status ${spoolEntity.spools}`);
-        spoolEntity.markModified("spools");
         await spoolEntity.save();
         returnSpools.push(spoolEntity);
       }
     }
-
-    // TODO isnt this over the top? Cant we just sync 1 spool at at time and be done?
-    const reSync = await this.filamentManagerReSync();
-    this.#logger.info(reSync);
 
     return returnSpools;
   }
@@ -91,38 +117,8 @@ class FilamentManagerPluginService {
   async filamentManagerReSync(addSpool) {
     const printerStates = this.#printersStore.listPrintersFlat();
 
-    // TODO ?????
-    let printer = null;
-    for (let i = 0; i < printerStates.length; i++) {
-      if (
-        printerList[i].stateColour.category === "Disconnected" ||
-        printerList[i].stateColour.category === "Idle" ||
-        printerList[i].stateColour.category === "Active" ||
-        printerList[i].stateColour.category === "Complete"
-      ) {
-        // TODO ?????
-        printer = printerList[i];
-        // TODO ????
-        break;
-      }
-    }
-    if (printer === null) {
-      // TODO ?????
-      return "error";
-    }
-
-    const spools = await this.#octoPrintApiService.listPluginFilamentManagerFilament(printer);
-    const profiles = await this.#octoPrintApiService.listPluginFilamentManagerProfiles(printer);
-
-    // Make sure filament manager responds...
-    // TODO this will not be reached in case of errors due to .json() now failing
-    if (spools.status != 200 || profiles.status != 200) {
-      return {
-        success: false,
-        spools: spools.status,
-        profiles: profiles.status
-      };
-    }
+    const spools = await this.listFilament(printer);
+    const profiles = await this.listProfiles(printer);
 
     const newSpools = [];
     const updatedSpools = [];

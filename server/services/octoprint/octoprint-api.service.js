@@ -1,6 +1,5 @@
 const fs = require("fs");
 const {
-  OPClientErrors,
   contentTypeHeaderKey,
   apiKeyHeaderKey,
   multiPartContentType
@@ -262,39 +261,6 @@ class OctoPrintApiService extends OctoPrintRoutes {
   async listProfiles(printer, responseOptions) {
     const { url, options } = this._prepareRequest(printer, this.apiProfiles);
     const response = await this._httpClient.get(url, options);
-    return processResponse(response, responseOptions);
-  }
-
-  async listPluginFilamentManagerProfiles(printer, responseOptions) {
-    const { url, options } = this._prepareRequest(printer, this.apiPluginFilamentManagerProfiles);
-    const response = await this._httpClient.get(url, options);
-    return processResponse(response, responseOptions);
-  }
-
-  async listPluginFilamentManagerFilament(printer, responseOptions) {
-    const { url, options } = this._prepareRequest(printer, this.apiPluginFilamentManagerSpools);
-    const response = await this._httpClient.get(url, options);
-    return processResponse(response, responseOptions);
-  }
-
-  async getPluginFilamentManagerFilament(printer, filamentID, responseOptions) {
-    const path = `${this.apiPluginFilamentManagerSpools}/${filamentID}`;
-    const { url, options } = this._prepareRequest(printer, path);
-    const response = await this._httpClient.get(url, options);
-    return processResponse(response, responseOptions);
-  }
-
-  async createPluginFilamentManagerFilamentSpool(printer, spool, responseOptions) {
-    const path = `${this.apiPluginFilamentManagerSpools}/`;
-    const { url, options } = this._prepareRequest(printer, path);
-    const response = await this._httpClient.post(url, spool, options);
-    return processResponse(response, responseOptions);
-  }
-
-  async setPluginFilamentManagerSelection(printer, selection, responseOptions) {
-    const path = `${this.apiPluginFilamentManagerSelections}`;
-    const { url, options } = this._prepareRequest(printer, path);
-    const response = await this._httpClient.patch(url, selection, options);
     return processResponse(response, responseOptions);
   }
 
