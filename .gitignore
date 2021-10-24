@@ -4,7 +4,6 @@
 **/.clinic/
 **/dist/
 **/.env
-**/docker-compose.yml
 **/.build
 **/.cache
 **/coverage
@@ -16,6 +15,6 @@ server-nest/assets/public/assets/
 *.tgz
 
 # Runtime folders
+/3DHub
 /images
-/3DPF
 /file-uploads

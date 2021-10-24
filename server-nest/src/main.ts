@@ -23,8 +23,8 @@ const logger = new Logger("Main");
 
 function AddSwagger(app: INestApplication): INestApplication {
   const config = new DocumentBuilder()
-    .setTitle("3DPF V2 API docs")
-    .setDescription("3DPF public API description")
+    .setTitle("3D Hub V2 API docs")
+    .setDescription("3D Hub public API description")
     .setVersion(process.env.npm_package_version)
     .build();
   const document = SwaggerModule.createDocument(app, config);
@@ -34,7 +34,7 @@ function AddSwagger(app: INestApplication): INestApplication {
 }
 
 function printPreBootMessage(error = null) {
-  logger.log(`3DPF ${Y}v${process.env.npm_package_version}${D}`);
+  logger.log(`3D Hub ${Y}v${process.env.npm_package_version}${D}`);
   logger.log(`NodeJS ${Y}${process.version}${D}`);
   const startDate = new Date().toDateString();
   const startTime = new Date().toLocaleTimeString();
@@ -132,11 +132,7 @@ async function bootstrap<T>(Module: T) {
   });
 
   app.enableCors();
-  app.setBaseViewsDir("views");
-  app.setViewEngine("ejs");
-
   app.useWebSocketAdapter(new WsAdapter(app));
-
   legacyMiddleware(app);
   app.useGlobalPipes(
     new ValidationPipe({

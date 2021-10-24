@@ -6,12 +6,12 @@ https://www.npmjs.com/package/migrate-mongo
 #### Apply all pending migrations
     npm run migration:up
 
-3DPF will do this automatically for you. The output should look similar to this:
+3D Hub will do this automatically for you. The output should look similar to this:
 ```
 $ npm run migration:up
 27/07/2021, 18:54:35 | INFO | Server-Environment | ✓ Parsed environment and (optional) .env file
 27/07/2021, 18:54:35 | INFO | Server-Environment | ✓ NODE_ENV variable correctly set (development)!
-27/07/2021, 18:54:35 | INFO | Server-Environment | ✓ Running 3DPF version 1.2.0 in non-NPM mode!
+27/07/2021, 18:54:35 | INFO | Server-Environment | ✓ Running 3D Hub version 1.2.0 in non-NPM mode!
 27/07/2021, 18:54:35 | INFO | Server-Environment | ✓ MONGO environment variable set!
 MIGRATED UP: 20210713120034-printers-settingsapperance-apikey.js
 ```
@@ -25,7 +25,7 @@ The output should look like the following:
 $ npm run migration:status
 27/07/2021, 19:08:40 | INFO | Server-Environment | ✓ Parsed environment and (optional) .env file
 27/07/2021, 19:08:40 | INFO | Server-Environment | ✓ NODE_ENV variable correctly set (development)!
-27/07/2021, 19:08:40 | INFO | Server-Environment | ✓ Running 3DPF version 1.2.0 in non-NPM mode!
+27/07/2021, 19:08:40 | INFO | Server-Environment | ✓ Running 3D Hub version 1.2.0 in non-NPM mode!
 27/07/2021, 19:08:40 | INFO | Server-Environment | ✓ MONGO environment variable set!
 ┌─────────────────────────────────────────────────────┬──────────────────────────┐
 │ Filename                                            │ Applied At               │
@@ -48,7 +48,7 @@ This command here is a `package.json` script equivalent to `migrate-mongo status
 
 ## Commands for a (plugin) developer
 
-We discuss create, up, down and 
+We discuss create, up, down and some important notes.
 
 ### Create a migration
     migrate-mongo create printers-settingsapperance-apikey
@@ -116,5 +116,5 @@ This is why we need `down(...)`. You never need it ... until you do. We mostly u
 - Making collection backups before a migration can be a good idea, but be careful with large size collection (10MB) and consider your actions carefully.
 
 ### Initiate a migration configuration
-You dont need this as a developer for an existing 3DPF setup.
+You dont need this as a developer for an existing 3D Hub setup.
 > migrate-mongo init

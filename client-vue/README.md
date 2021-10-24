@@ -1,10 +1,10 @@
-# client-3dpf
+# client-3dhub
 
-The client UI for 3D Print Farm. Please see https://github.com/davidzwa/3d-print-farm for more information.
+The client UI for 3D Hub. Please see https://github.com/3d-hub/3d-hub for more information.
 
 ## Project setup
 ```
-npm install @davidzwa/client-3dpf
+npm install @3d-hub/client
 ```
 
 ### Compiles and hot-reloads for development

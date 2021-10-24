@@ -8,10 +8,10 @@ const { AppConstants } = require("./server.constants");
 const { status, up } = require("migrate-mongo");
 const isDocker = require("is-docker");
 const Logger = require("./handlers/logger.js");
-const logger = new Logger("3DPF-Environment", false);
+const logger = new Logger("3DH-Environment", false);
 
 // Constants and definition
-const instructionsReferralURL = "https://github.com/davidzwa/3d-print-farm/blob/master/README.md";
+const instructionsReferralURL = "https://github.com/3d-hub/3d-hub/blob/master/README.md";
 const packageJsonPath = path.join(__dirname, "../package.json");
 const dotEnvPath = path.join(__dirname, "../.env");
 
@@ -53,22 +53,22 @@ function ensureEnvNpmVersionSet() {
   if (!process.env[AppConstants.VERSION_KEY]) {
     process.env[AppConstants.VERSION_KEY] = packageJsonVersion;
     process.env[AppConstants.NON_NPM_MODE_KEY] = "true";
-    logger.info(`✓ Running 3DPF version ${process.env[AppConstants.VERSION_KEY]} in non-NPM mode!`);
+    logger.info(`✓ Running 3DH version ${process.env[AppConstants.VERSION_KEY]} in non-NPM mode!`);
   } else {
-    logger.debug(`✓ Running 3DPF version ${process.env[AppConstants.VERSION_KEY]} in NPM mode!`);
+    logger.debug(`✓ Running 3DH version ${process.env[AppConstants.VERSION_KEY]} in NPM mode!`);
   }
 
   if (process.env[AppConstants.VERSION_KEY] !== packageJsonVersion) {
     process.env[AppConstants.VERSION_KEY] = packageJsonVersion;
     logger.warning(
-      `~ Had to synchronize 3DPF version to '${packageJsonVersion}' as it was outdated.`
+      `~ Had to synchronize 3DH version to '${packageJsonVersion}' as it was outdated.`
     );
   }
 }
 
 function removePm2Service(reason) {
   logger.error(`Removing PM2 service as Server failed to start: ${reason}`);
-  execSync("pm2 delete 3DPF");
+  execSync("pm2 delete 3DHUB");
 }
 
 function setupPackageJsonVersionOrThrow() {
@@ -78,7 +78,7 @@ function setupPackageJsonVersionOrThrow() {
       // TODO test this works under docker as well
       removePm2Service("didnt pass startup validation (package.json)");
     }
-    throw new Error("Aborting 3DPF server.");
+    throw new Error("Aborting 3D Hub server.");
   }
 }
 
@@ -184,13 +184,13 @@ function setupEnvConfig(skipDotEnv = false) {
 }
 
 function getAppDistPath() {
-  const clientPackage = "@3d-print-farm/client";
+  const clientPackage = "@3d-hub/client";
   let appDistPath;
   try {
     appDistPath = require(clientPackage).getAppDistPath();
   } catch (e) {
     logger.error(
-      `~ The client package for 3DPF '${clientPackage}' was not installed. Can not load frontend app`
+      `~ The client package for 3DH '${clientPackage}' was not installed. Can not load frontend app`
     );
     return;
   }
@@ -203,11 +203,11 @@ function getAppDistPath() {
     const errorMessagePrefix = `Could not find Vue app path at ${appDistPath}`;
 
     if (isEnvProd() && envUtils.isPm2() && !isDocker()) {
-      const message = `${errorMessagePrefix} when running in non-dockerized PM2 mode. Removing pm2 3DPF service.`;
+      const message = `${errorMessagePrefix} when running in non-dockerized PM2 mode. Removing pm2 3DH service.`;
       removePm2Service(message);
     } else {
       throw new Error(
-        `${errorMessagePrefix}. 3DPF server aborting in docker|nodemon or other mode.`
+        `${errorMessagePrefix}. 3DH server aborting in docker|nodemon or other mode.`
       );
     }
   }

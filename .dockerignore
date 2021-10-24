@@ -13,7 +13,7 @@
 /**/node_modules
 
 # Runtime and non-production folders
-/3DPF
+/3DHub
 /client-npm
 /client-vue
 /coverage

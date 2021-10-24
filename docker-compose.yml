@@ -1,0 +1,20 @@
+volumes:
+  mongodb-data:
+
+services:
+  3DHUB:
+    container_name: 3d-hub
+    image: davidzwa/3d-hub:0.0.3-pre1
+    restart: always
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    ports:
+      - 4001:4000
+    environment:
+      - MONGO=mongodb://host.docker.internal:27017/3dhub?authSource=admin&readPreference=primary&ssl=false
+    volumes:
+      # Volumes as local relative folders (validate with 'docker-compose config')
+      - ./3DHub/logs:/app/logs
+      - ./3DHub/scripts:/app/scripts
+      - ./3DHub/images:/app/images
