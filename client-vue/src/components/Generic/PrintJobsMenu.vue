@@ -11,7 +11,7 @@
       transition="slide-x-transition"
     >
       <template v-slot:activator="{ on, attrs }">
-        <v-btn v-bind="attrs" v-on="on" dark :color="activePrintCount ? 'primary' : 'secondary'">
+        <v-btn v-bind="attrs" v-on="on" dark :color="activePrintCount ? 'green' : 'secondary'">
           <span>Print jobs {{ activePrintCount ? `(${activePrintCount})`: "" }}</span>
           <v-icon right>work</v-icon>
         </v-btn>
