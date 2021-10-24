@@ -76,7 +76,7 @@
       </v-col>
     </v-row>
 
-    <v-expansion-panels>
+    <v-expansion-panels accordion>
       <v-expansion-panel>
         <v-expansion-panel-header>Advanced settings</v-expansion-panel-header>
         <v-expansion-panel-content>

@@ -1,8 +1,8 @@
 <template>
   <v-app-bar app color="primary" dark>
     <v-toolbar-title class="text-uppercase white--text">
-      <span class="font-weight-light">3D Print Far</span>
-      <strong>MTB3D</strong>
+      <span class="font-weight-light">MTB</span>
+      <strong>3D HUB</strong>
       <strong class="ml-14"> {{ currentTimeDiff4h || getWorkTimeDiff() }}H to 16:00</strong>
       <strong class="ml-14"> {{ currentTimeDiff5h || getWorkTimeDiff() }}H to 17:00</strong>
       <strong class="ml-14"> {{ currentTimeDiff6h || getWorkTimeDiff() }}H to 18:00</strong>

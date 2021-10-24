@@ -1,91 +1,45 @@
 <template>
-  <v-container>
-    <v-toolbar color="primary" dark>
-      <v-btn dark icon @click="dialog = false">
-        <v-icon>close</v-icon>
-      </v-btn>
-      <v-toolbar-title>Server Settings</v-toolbar-title>
-      <v-spacer></v-spacer>
-      <v-toolbar-items>
-        <v-btn dark disabled text @click="dialog = false"> Save</v-btn>
-      </v-toolbar-items>
-    </v-toolbar>
-    <v-list subheader three-line>
-      <v-subheader>Groups and Files</v-subheader>
+  <v-row style="height: 100%">
+    <v-col cols="2">
+      <v-navigation-drawer>
+        <v-list-item>
+          <v-list-item-content>
+            <v-list-item-title class="text-h6">
+              Settings
+            </v-list-item-title>
+            <v-list-item-subtitle>
+              Adjust your Hub
+            </v-list-item-subtitle>
+          </v-list-item-content>
+        </v-list-item>
 
-      <v-list-item>
-        <v-list-item-content>
-          <v-list-item-title>Legacy Groups</v-list-item-title>
-          <v-list-item-subtitle>
-            Synchronise the legacy printer groups to the new separate PrinterGroup data.
-            <br />
-            <v-btn color="primary" @click="syncLegacyGroups()">Sync legacy</v-btn>
-          </v-list-item-subtitle>
-        </v-list-item-content>
-      </v-list-item>
+        <v-divider></v-divider>
 
-      <v-list-item>
-        <v-list-item-content>
-          <v-list-item-title>Clean file references</v-list-item-title>
-          <v-list-item-subtitle>
-            Clear out the file references for all printers - this does not remove them from
-            OctoPrint!
-            <br />
-            <v-btn color="primary" @click="purgeFiles()">Purge file references</v-btn>
-          </v-list-item-subtitle>
-        </v-list-item-content>
-      </v-list-item>
+        <v-list
+          dense
+          nav
+        >
+          <v-list-item
+            v-for="item in items"
+            :key="item.title"
+            :to="item.path"
+            link router-link
+          >
+            <v-list-item-icon>
+              <v-icon>{{ item.icon }}</v-icon>
+            </v-list-item-icon>
 
-      <v-list-item>
-        <v-list-item-content>
-          <v-list-item-title>Disable inefficient GCode analysis</v-list-item-title>
-          <v-list-item-subtitle>
-            Disable GCode analysis on all printers at once, preventing CPU intensive and inaccurate
-            time/size estimates.
-            <br />
-            <v-btn color="primary" @click="bulkDisableGCodeAnalysis()"
-              >Bulk disable GCode Analysis</v-btn
-            >
-          </v-list-item-subtitle>
-        </v-list-item-content>
-      </v-list-item>
-    </v-list>
-    <v-divider></v-divider>
-    <v-list v-show="false" subheader three-line>
-      <v-subheader>General</v-subheader>
-      <v-list-item>
-        <v-list-item-action>
-          <v-checkbox v-model="notifications"></v-checkbox>
-        </v-list-item-action>
-        <v-list-item-content>
-          <v-list-item-title>Notifications</v-list-item-title>
-          <v-list-item-subtitle>
-            Notify me about updates to apps or games that I downloaded
-          </v-list-item-subtitle>
-        </v-list-item-content>
-      </v-list-item>
-      <v-list-item>
-        <v-list-item-action>
-          <v-checkbox v-model="sound"></v-checkbox>
-        </v-list-item-action>
-        <v-list-item-content>
-          <v-list-item-title>Sound</v-list-item-title>
-          <v-list-item-subtitle
-            >Auto-update apps at any time. Data charges may apply
-          </v-list-item-subtitle>
-        </v-list-item-content>
-      </v-list-item>
-      <v-list-item>
-        <v-list-item-action>
-          <v-checkbox v-model="widgets"></v-checkbox>
-        </v-list-item-action>
-        <v-list-item-content>
-          <v-list-item-title>Auto-add widgets</v-list-item-title>
-          <v-list-item-subtitle>Automatically add home screen widgets</v-list-item-subtitle>
-        </v-list-item-content>
-      </v-list-item>
-    </v-list>
-  </v-container>
+            <v-list-item-content>
+              <v-list-item-title>{{ item.title }}</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list>
+      </v-navigation-drawer>
+    </v-col>
+    <v-col>
+      <router-view></router-view>
+    </v-col>
+  </v-row>
 </template>
 
 <script>
@@ -100,39 +54,14 @@ import { PrinterSettingsService } from "@/backend/printer-settings.service";
   components: {},
   data() {
     return {
-      dialog: false,
-      notifications: false,
-      sound: true,
-      widgets: false
+      items: [
+        {title: 'Printer groups', icon: 'dashboard', path: '/settings/printer-groups'},
+        {title: 'Hub settings', icon: 'image', path: '/settings/system'},
+        {title: 'Other', icon: 'help', path: '/settings/other'},
+      ]
     };
   }
 })
 export default class Settings extends Vue {
-  async syncLegacyGroups() {
-    const groups = await PrinterGroupService.syncLegacyGroups();
-
-    this.$bus.emit(infoMessageEvent, `Succesfully synced ${groups.length} groups!`);
-  }
-
-  async purgeFiles() {
-    await PrinterFileService.purgeFiles();
-
-    this.$bus.emit(infoMessageEvent, `Succesfully purged all references to printer files!`);
-  }
-
-  async bulkDisableGCodeAnalysis() {
-    const printers = printersState.onlinePrinters;
-    this.$bus.emit(
-      infoMessageEvent,
-      `Trying to disable gcode analysis for ${printers.length} online printers.`
-    );
-    for (let printer of printers) {
-      await PrinterSettingsService.setGCodeAnalysis(printer.id, false);
-    }
-    this.$bus.emit(
-      infoMessageEvent,
-      `Finished disabling gcode analysis for ${printers.length} online printers.`
-    );
-  }
 }
 </script>
