@@ -55,6 +55,12 @@ class PrintersModule extends VuexModule {
     return (printerId?: string) => this.printer(printerId)?.printerState?.flags?.printing;
   }
 
+  get printersWithJob(): Printer[] {
+    return this.printers.filter(
+      (p) => p.printerState.flags.printing || p.printerState.flags.printing
+    );
+  }
+
   get gridSortedPrinterGroups() {
     if (!this.printerGroups) return () => [];
 
