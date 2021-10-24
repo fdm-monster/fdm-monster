@@ -20,9 +20,6 @@ class ServerSettingsService {
       if (!primarySettings.server) {
         primarySettings.server = Constants.server;
       }
-      if (!Object.keys(primarySettings).includes(Constants.filamentManager.name)) {
-        primarySettings.filamentManager = Constants.filamentManager;
-      }
       if (!primarySettings.history) {
         primarySettings.history = Constants.history;
       }
@@ -33,14 +30,6 @@ class ServerSettingsService {
       await primarySettings.save();
       return primarySettings;
     }
-  }
-
-  async setFilamentManagerPluginSetting(enabled) {
-    const settings = await this.getOrCreate();
-    settings.filamentManager = enabled;
-
-    await settings.save();
-    return settings;
   }
 
   async update(obj) {

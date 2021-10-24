@@ -19,9 +19,6 @@ const getDefaultTimeout = () => ({
   webSocketRetry: 5000
 });
 
-// TODO rename to filamentManagerEnabled
-const filamentManager = false;
-
 const HISTORY_SETTINGS = {
   snapshot: "snapshot",
   thumbnails: "thumbnails",
@@ -62,7 +59,6 @@ const getDefaultSettings = () => ({
   onlinePolling,
   server,
   timeout: getDefaultTimeout(),
-  filamentManager,
   history,
   influxExport
 });
@@ -71,7 +67,6 @@ module.exports = {
   influxExport,
   HISTORY_SETTINGS,
   history,
-  filamentManager,
   server,
   getDefaultTimeout,
   onlinePolling,

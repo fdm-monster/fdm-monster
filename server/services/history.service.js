@@ -33,7 +33,6 @@ function ensureBaseFolderExists() {
 
 class HistoryService {
   #octoPrintApiService;
-  #filamentManagerPluginService;
   #influxDbHistoryService;
   #settingsStore;
 
@@ -41,16 +40,10 @@ class HistoryService {
 
   #logger = new Logger("Server-HistoryCollection");
 
-  constructor({
-    octoPrintApiService,
-    influxDbHistoryService,
-    filamentManagerPluginService,
-    settingsStore
-  }) {
+  constructor({ octoPrintApiService, influxDbHistoryService, settingsStore }) {
     this.#octoPrintApiService = octoPrintApiService;
     // TODO Better to decouple Influx using EventEmitter2
     this.#influxDbHistoryService = influxDbHistoryService;
-    this.#filamentManagerPluginService = filamentManagerPluginService;
     this.#settingsStore = settingsStore;
   }
 
@@ -234,7 +227,6 @@ class HistoryService {
   async saveJobCompletion(printer, job, status = "success", { payload, resends, files }) {
     let printerName = printer.getName();
     const { startDate, endDate } = durationToDates(payload.time);
-    const filamentPluginEnabled = this.#settingsStore.isFilamentEnabled();
     const jobSuccess = status === "success";
     const eventName = jobSuccess ? "onComplete" : "onFailure";
 
@@ -242,14 +234,6 @@ class HistoryService {
       this.#logger.info(`Completed print event triggered for printer ${printerName}`, payload);
     } else if (status === "failed") {
       this.#logger.info(`Failed print event triggered for printer ${printerName}`, payload);
-    }
-
-    // TODO filamentCache instead
-    const previousFilament = JSON.parse(JSON.stringify(printer.selectedFilament));
-
-    if (filamentPluginEnabled && Array.isArray(printer?.selectedFilament)) {
-      printer.selectedFilament =
-        await this.#filamentManagerPluginService.updatePrinterSelectedFilament(printer);
     }
 
     const historyCollection = await History.find({});

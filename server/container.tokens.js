@@ -14,7 +14,6 @@ const DITokens = {
   githubApiService: "githubApiService",
   userTokenService: "userTokenService",
   octoPrintApiService: "octoPrintApiService",
-  filamentManagerPluginService: "filamentManagerPluginService",
   influxDbSetupService: "influxDbSetupService",
   influxDbFilamentService: "influxDbFilamentService",
   influxDbHistoryService: "influxDbHistoryService",

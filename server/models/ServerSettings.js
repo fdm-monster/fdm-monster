@@ -52,18 +52,6 @@ const ServerSettingsSchema = new mongoose.Schema({
       required: true
     }
   },
-  filamentManager: {
-    type: Boolean,
-    default: false,
-    required: false
-  },
-  filament: {
-    filamentCheck: {
-      type: Boolean,
-      default: false,
-      require: true
-    }
-  },
   history: {
     snapshot: {
       onComplete: {

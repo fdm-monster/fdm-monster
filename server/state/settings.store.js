@@ -22,20 +22,10 @@ class SettingsStore {
     });
   }
 
-  async setFilamentManagerPluginEnabled(enabled) {
-    this.#serverSettings = await this.#serverSettingsService.setFilamentManagerPluginSetting(
-      enabled
-    );
-  }
-
   getClientSettings() {
     return Object.freeze({
       ...this.#clientSettings._doc
     });
-  }
-
-  isFilamentEnabled() {
-    return this.#serverSettings.filamentManager;
   }
 
   getHistorySetting() {

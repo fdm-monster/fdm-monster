@@ -77,13 +77,8 @@ class FilamentStore {
       if (selectedFilament[s] !== null) {
         let profile = null;
         try {
-          if (serverSettings.filamentManager) {
-            profile = await Profiles.findOne({
-              "profile.index": selectedFilament[s].spools.profile
-            });
-          } else {
-            profile = await Profiles.findById(selectedFilament[s].spools.profile);
-          }
+          profile = await Profiles.findById(selectedFilament[s].spools.profile);
+
           currentFilament[s].spools.profile = profile.profile;
           farmPrinters[i].selectedFilament[s].spools.material = profile.profile.material;
         } catch (e) {
