@@ -2,9 +2,15 @@ volumes:
   mongodb-data:
 
 services:
+  3DHUB-latest:
+    image: davidzwa/3d-hub:latest
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+
   3DHUB:
     container_name: 3d-hub
-    image: davidzwa/3d-hub:0.0.3-pre1
+    image: davidzwa/3d-hub:0.0.3-pre2
     restart: always
     build:
       context: .

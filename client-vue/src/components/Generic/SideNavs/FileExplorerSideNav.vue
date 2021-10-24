@@ -47,9 +47,20 @@
           </span>
           <v-progress-linear
             v-if="storedSideNavPrinter.currentJob"
+            height="8px"
             :value="storedSideNavPrinter.currentJob.progress"
-            class="mt-1"
-          ></v-progress-linear>
+            class="mt-1 mb-1"
+          >
+          </v-progress-linear>
+
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn small outlined v-bind="attrs" v-on="on">
+                {{ currentJob().fileName }}
+              </v-btn>
+            </template>
+            <span>{{ currentJob().fileName }}</span>
+          </v-tooltip>
         </v-list-item-subtitle>
       </v-list-item-content>
     </v-list-item>
@@ -278,7 +289,11 @@ export default class FileExplorerSideNav extends Vue {
     if (!this.storedSideNavPrinter) return false;
     // Completed job will not disappear (yet)
     if (this.storedSideNavPrinter.printerState.state === "Operational") return false;
-    return this.storedSideNavPrinter.currentJob.fileName === file.name;
+    return this.storedSideNavPrinter.currentJob?.fileName === file.name;
+  }
+
+  currentJob() {
+    return this.storedSideNavPrinter?.currentJob || {};
   }
 
   avatarInitials() {
