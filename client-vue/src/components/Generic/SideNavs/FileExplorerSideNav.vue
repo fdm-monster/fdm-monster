@@ -10,7 +10,7 @@
   >
     <v-list-item>
       <v-list-item-avatar>
-        <v-btn color="primary" fab @click="openPrinterURL()">
+        <v-btn color="primary" fab @click="openPrinterURL()" @click.middle="openPrinterURL()">
           {{ avatarInitials() }}
         </v-btn>
       </v-list-item-avatar>
@@ -307,6 +307,8 @@ export default class FileExplorerSideNav extends Vue {
     if (!this.storedSideNavPrinter) return;
 
     PrintersService.openPrinterURL(this.storedSideNavPrinter.printerURL);
+
+    this.closeDrawer();
   }
 
   async togglePrinterConnection() {
