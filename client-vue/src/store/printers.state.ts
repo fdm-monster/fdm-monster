@@ -35,8 +35,12 @@ class PrintersModule extends VuexModule {
     return this.updateDialogPrinter;
   }
 
+  get printerGroup() {
+    return (groupId: string) => this.printerGroups.find((pg) => pg._id === groupId);
+  }
+
   get printer() {
-    return (printerId?: string) => this.printers.find((p: Printer) => p.id === printerId);
+    return (printerId?: string) => this.printers.find((p) => p.id === printerId);
   }
 
   get onlinePrinters() {

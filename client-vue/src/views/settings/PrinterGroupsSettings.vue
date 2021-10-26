@@ -6,6 +6,7 @@
       </v-btn>
       <v-toolbar-title>Printer Group Management</v-toolbar-title>
     </v-toolbar>
+
     <v-list subheader three-line>
       <v-subheader>Printer Groups</v-subheader>
 
@@ -24,32 +25,77 @@
     <v-divider></v-divider>
 
     <v-list>
-      <v-list-item>
-        <v-list-item-content v-for="group of printerGroups" :key="group.name">
-          <v-list-item-title>
-          {{ group.name }}
-            <br/>
-          </v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
+      <v-list-group
+        v-for="group of printerGroups" :key="group.name"
+        no-action
+      >
+        <template v-slot:activator>
+          <v-list-item-content>
+            <v-list-item-title>{{ group.name }}</v-list-item-title>
+            <v-list-item-subtitle>
+              {{ group.printers.length || 0 }} assigned
+            </v-list-item-subtitle>
+          </v-list-item-content>
+        </template>
+
+        <v-list-item
+          v-for="x in printersPerGroup"
+          :key="x"
+        >
+          <v-list-item-content v-if="printerInGroup(group, x)">
+            <v-list-item-title>
+              {{ printerInGroup(group, x).printerName }}
+            </v-list-item-title>
+            <v-list-item-subtitle>
+              {{ printerLocation(group, x) }}
+            </v-list-item-subtitle>
+          </v-list-item-content>
+          <v-list-item-content v-else>
+            <em>Not assigned</em>
+          </v-list-item-content>
+
+          <v-list-item-action v-if="printerInGroup(group, x)">
+            <v-btn>
+              <v-icon>edit</v-icon> Edit printer
+            </v-btn>
+          </v-list-item-action>
+          <v-list-item-action v-else>
+              <v-btn>
+                <v-icon>add</v-icon> Add new printer
+              </v-btn>
+          </v-list-item-action>
+
+        </v-list-item>
+      </v-list-group>
     </v-list>
   </v-container>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from "vue";
 import { Component } from "vue-property-decorator";
-import { PrinterGroupService, PrinterFileService } from "@/backend";
+import { PrinterGroupService } from "@/backend";
 import { infoMessageEvent } from "@/event-bus/alert.events";
 import { printersState } from "@/store/printers.state";
-import { PrinterSettingsService } from "@/backend/printer-settings.service";
+import { PrinterGroup } from "@/models/printers/printer-group.model";
 
 @Component({
   components: {},
 })
 export default class PrinterGroupsSettings extends Vue {
+  readonly printersPerGroup = 4;
+
   get printerGroups() {
     return printersState.printerGroups;
+  }
+
+  printerLocation(group: PrinterGroup, index: number) {
+    return group.printers[index - 1]?.location;
+  }
+
+  printerInGroup(group: PrinterGroup, index: number) {
+    const printer = group.printers[index - 1];
+    return printersState.printer(printer?.printerId);
   }
 
   async syncLegacyGroups() {
