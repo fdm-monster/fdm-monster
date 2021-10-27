@@ -35,6 +35,7 @@ This work is under active development with cutting edge tech and standards. Feel
 - [ ] 🔌 Raspberry Pi image and prebuilt customized OctoPi image
 - [ ] :rocket: First core release with documentation
 - [ ] :rocket: Plugin system (preparation work is ready)
+- [ ] Support for OctoPrint 2.0.0 (when it comes out)
 - [ ] More to be found here https://github.com/3d-hub/3d-hub/discussions/48
 
 There are a lot of plans in the making (f.e. tunneling, auto-discovery, plugin system,  etc.), which will be announced as we go!
