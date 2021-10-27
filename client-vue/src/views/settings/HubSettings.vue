@@ -1,9 +1,9 @@
 <template>
-  <v-container>
+  <v-card>
     <v-toolbar color="primary">
-      <v-btn dark icon>
+      <v-avatar>
         <v-icon>settings</v-icon>
-      </v-btn>
+      </v-avatar>
       <v-toolbar-title>Hub Settings</v-toolbar-title>
     </v-toolbar>
     <v-list subheader three-line>
@@ -36,7 +36,7 @@
         </v-list-item-content>
       </v-list-item>
     </v-list>
-  </v-container>
+  </v-card>
 </template>
 
 <script lang="ts">
@@ -48,7 +48,7 @@ import { printersState } from "@/store/printers.state";
 import { infoMessageEvent } from "@/event-bus/alert.events";
 
 @Component({
-  
+
 })
 export default class HubSettings extends Vue {
   async purgeFiles() {

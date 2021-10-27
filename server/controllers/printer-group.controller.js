@@ -27,6 +27,17 @@ class PrinterGroupController {
     res.send(printerGroup);
   }
 
+  async updateName(req, res) {
+    const { id: groupId } = await validateInput(req.params, idRules);
+
+    // Has internal validation
+    const printerGroup = await this.#printerGroupService.updateName(groupId, req.body);
+
+    await this.#printerGroupsCache.loadCache();
+
+    res.send(printerGroup);
+  }
+
   async addPrinterToGroup(req, res) {
     const { id: groupId } = await validateInput(req.params, idRules);
 
@@ -88,6 +99,7 @@ module.exports = createController(PrinterGroupController)
     .before([ensureAuthenticated])
     .get("/", "list")
     .get("/:id", "get")
+    .patch("/:id/name", "updateName")
     .post("/:id/printer", "addPrinterToGroup")
     .delete("/:id/printer", "removePrinterFromGroup")
     .delete("/:id", "delete")

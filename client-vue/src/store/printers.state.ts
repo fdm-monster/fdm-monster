@@ -163,8 +163,36 @@ class PrintersModule extends VuexModule {
   }
 
   @Mutation setPrinterGroups(printerGroups: PrinterGroup[]) {
-    this.printerGroups = printerGroups;
+    this.printerGroups = printerGroups.sort((g1, g2) => {
+      const l1 = g1.location;
+      const l2 = g2.location;
+      if (l1.x < l2.x) return -1;
+      if (l1.x > l2.x) return 1;
+      if (l1.x === l2.x) {
+        if (l1.y < l2.y) return -1;
+        if (l1.y > l2.y) return 1;
+        return g1.name.localeCompare(g2.name) ? -1 : 1;
+      }
+
+      // Silence TS
+      return 1;
+    });
     this.lastUpdated = Date.now();
+  }
+
+  @Mutation replacePrinterGroup(printerGroup: PrinterGroup) {
+    const foundGroupIndex = this.printerGroups.findIndex((pg) => pg._id === printerGroup._id);
+    if (foundGroupIndex !== -1) {
+      this.printerGroups[foundGroupIndex] = printerGroup;
+      this.lastUpdated = Date.now();
+    }
+  }
+
+  @Mutation popPrinterGroup(groupId: string) {
+    const foundGroupIndex = this.printerGroups.findIndex((pg) => pg._id === groupId);
+    if (foundGroupIndex !== -1) {
+      this.printerGroups.splice(foundGroupIndex, 1);
+    }
   }
 
   @Mutation _clearPrinterFiles({
@@ -376,6 +404,22 @@ class PrintersModule extends VuexModule {
     this.popPrinterFile({ printerId, fullPath });
 
     return this.printerFiles(printerId) as PrinterFile[];
+  }
+
+  @Action
+  async updatePrinterGroupName({ groupId, name }: { groupId: string; name: string }) {
+    const group = await PrinterGroupService.updateGroupName(groupId, name);
+
+    this.replacePrinterGroup(group);
+
+    return group;
+  }
+
+  @Action
+  async deletePrinterGroup(groupId: string) {
+    await PrinterGroupService.deleteGroup(groupId);
+
+    this.popPrinterGroup(groupId);
   }
 }
 

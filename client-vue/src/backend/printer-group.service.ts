@@ -9,6 +9,18 @@ export class PrinterGroupService extends BaseService {
     return (await this.getApi<PrinterGroup[]>(path)) as PrinterGroup[];
   }
 
+  static async updateGroupName(groupId: string, name: string) {
+    const path = `${ServerApi.updatePrinterGroupNameRoute(groupId)}/`;
+
+    return (await this.patchApi(path, { name })) as PrinterGroup;
+  }
+
+  static async deleteGroup(groupId: string) {
+    const path = `${ServerApi.getPrinterGroupRoute(groupId)}/`;
+
+    return await this.deleteApi(path);
+  }
+
   static async syncLegacyGroups() {
     const path = `${ServerApi.printerGroupSyncLegacyRoute}/`;
 
