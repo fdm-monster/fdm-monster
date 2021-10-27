@@ -4,8 +4,8 @@ export class ServerApi {
   static printerRoute = ServerApi.base + "/printer";
   static printerBatchRoute = `${ServerApi.printerRoute}/batch`;
   static printerTestConnectionRoute = `${ServerApi.printerRoute}/test-connection`;
-  static printerGroupRoute = ServerApi.base + "/printer-group";
   static printerSettingsRoute = ServerApi.base + "/printer-settings";
+  static printerGroupRoute = ServerApi.base + "/printer-group";
   static printerGroupSyncLegacyRoute = `${ServerApi.printerGroupRoute}/sync-legacy`;
   static printerFilesRoute = `${ServerApi.base}/printer-files`;
   static printerFilesUploadStubRoute = `${ServerApi.base}/printer-files/upload-stub`;
@@ -35,6 +35,8 @@ export class ServerApi {
   static getPrinterSettingsRoute = (id: string) => `${ServerApi.printerSettingsRoute}/${id}`;
   static setPrinterSettingsGCodeAnalysisRoute = (id: string) =>
     `${ServerApi.getPrinterSettingsRoute(id)}/gcode-analysis`;
+  static getPrinterGroupRoute = (id: string) => `${ServerApi.printerGroupRoute}/${id}`;
+  static updatePrinterGroupNameRoute = (id: string) => `${ServerApi.getPrinterGroupRoute(id)}/name`;
   static printerFilesClearRoute = (id: string) => `${ServerApi.printerFilesRoute}/${id}/clear`;
   static printerFilesSelectAndPrintRoute = (id: string) =>
     `${ServerApi.printerFilesRoute}/${id}/select`;

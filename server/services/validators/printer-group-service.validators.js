@@ -9,6 +9,10 @@ const printerInGroupRules = {
   location: "string"
 };
 
+const updatePrinterGroupNameRules = {
+  name: `required|minLength:${minPrinterGroupNameLength}`
+};
+
 const createPrinterGroupRules = {
   name: `required|minLength:${minPrinterGroupNameLength}`,
   printers: "array",
@@ -19,6 +23,7 @@ const createPrinterGroupRules = {
 
 module.exports = {
   createPrinterGroupRules,
+  updatePrinterGroupNameRules,
   printerIdRules,
   printerInGroupRules
 };

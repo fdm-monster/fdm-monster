@@ -4,7 +4,8 @@ const { validateInput } = require("../handlers/validators");
 const {
   createPrinterGroupRules,
   printerInGroupRules,
-  printerIdRules
+  printerIdRules,
+  updatePrinterGroupNameRules
 } = require("./validators/printer-group-service.validators");
 const { NotFoundException } = require("../exceptions/runtime.exceptions");
 
@@ -18,6 +19,21 @@ class PrinterGroupService {
   }
 
   /**
+   * Lists the printer groups present in the database.
+   */
+  async list() {
+    return PrinterGroupModel.find({});
+  }
+
+  async get(groupId) {
+    const printerGroup = await PrinterGroupModel.findOne({ _id: groupId });
+    if (printerGroup === null)
+      throw new NotFoundException(`Printer group with id ${groupId} does not exist.`);
+
+    return printerGroup;
+  }
+
+  /**
    * Stores a new printer group into the database.
    * @param {Object} group object to create.
    * @throws {Error} If the printer group is not correctly provided.
@@ -28,6 +44,14 @@ class PrinterGroupService {
     const validatedInput = await validateInput(group, createPrinterGroupRules);
 
     return PrinterGroupModel.create(validatedInput);
+  }
+
+  async updateName(printerGroupId, input) {
+    const printerGroup = await this.get(printerGroupId);
+
+    const { name } = await validateInput(input, updatePrinterGroupNameRules);
+    printerGroup.name = name;
+    return await printerGroup.save();
   }
 
   /**
@@ -75,21 +99,6 @@ class PrinterGroupService {
     group.updateOne();
 
     return group;
-  }
-
-  /**
-   * Lists the printer groups present in the database.
-   */
-  async list() {
-    return PrinterGroupModel.find({});
-  }
-
-  async get(groupId) {
-    const printerGroup = await PrinterGroupModel.findOne({ _id: groupId });
-    if (printerGroup === null)
-      throw new NotFoundException(`Printer group with id ${groupId} does not exist.`);
-
-    return printerGroup;
   }
 
   async delete(groupId) {
