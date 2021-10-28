@@ -1,5 +1,5 @@
 const dbHandler = require("../db-handler");
-const User = require("../../server/models/User");
+const User = require("../../server/models/Auth/User");
 const bcrypt = require("bcryptjs");
 
 /**

@@ -35,6 +35,8 @@ class AuthController {
 
   logout(req, res) {
     req.logout();
+
+    res.end();
   }
 
   async register(req, res) {
@@ -52,4 +54,4 @@ module.exports = createController(AuthController)
   .post("/login", "login", {
     before: [passport.authenticate("local")]
   })
-  .get("/logout", "logout");
+  .post("/logout", "logout");

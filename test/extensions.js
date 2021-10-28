@@ -42,6 +42,10 @@ function expectRedirectResponse(response) {
   expect(response.statusCode).toEqual(302);
 }
 
+function expectUnauthorizedResponse(response, keys, exact = false) {
+  expect(response.statusCode).toEqual(401);
+}
+
 function expectInvalidResponse(response, keys, exact = false) {
   expect(response.statusCode).toEqual(400);
 
@@ -59,6 +63,7 @@ module.exports = {
   expectRedirectResponse,
   expectOkResponse,
   expectValidationError,
+  expectUnauthorizedResponse,
   expectInvalidResponse,
   expectNotFoundResponse,
   getExpectExtensions

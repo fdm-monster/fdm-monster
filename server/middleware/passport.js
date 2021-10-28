@@ -1,7 +1,7 @@
 const LocalStrategy = require("passport-local").Strategy;
 const bcrypt = require("bcryptjs");
 const RememberMeStrategy = require("passport-remember-me").Strategy;
-const User = require("../models/User.js");
+const User = require("../models/Auth/User.js");
 
 module.exports = function (passport, tokenService) {
   passport.use(
