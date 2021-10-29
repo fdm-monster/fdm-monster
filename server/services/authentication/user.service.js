@@ -18,12 +18,18 @@ class UserService {
     const salt = await bcrypt.genSaltSync(10);
     const hash = await bcrypt.hash(password, salt);
 
-    return await UserModel.create({
+    const model = await UserModel.create({
       username,
       passwordHash: hash,
       name,
       roles
     });
+
+    return {
+      username: model.username,
+      name: model.name,
+      roles: model.roles
+    };
   }
 }
 

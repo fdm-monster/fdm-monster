@@ -45,14 +45,15 @@ class AuthController {
     }
 
     const { name, username, password } = await validateMiddleware(req, registerUserRules);
-    this.#userService.register({ name, username, password });
-    throw new NotImplementedException("Registration is now implemented");
+    const result = await this.#userService.register({ name, username, password });
+
+    res.send(result);
   }
 }
 
 module.exports = createController(AuthController)
   .prefix(AppConstants.apiRoute + "/users")
-  .post("/create-test", "createTest")
+  .post("/register", "register")
   .post("/login", "login", {
     before: [passport.authenticate("local")]
   })

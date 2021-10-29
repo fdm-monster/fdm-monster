@@ -1,17 +1,32 @@
 const User = require("../../../server/models/Auth/User");
 const bcrypt = require("bcryptjs");
 
-async function createTestUser(password = "testpassword") {
+function getUserData(password = "testpassword") {
+  return {
+    name: "Tester",
+    username: "tester",
+    password
+  };
+}
+
+async function createTestUser(passwordIn) {
+  const { name, username, password } = getUserData(passwordIn);
   const salt = await bcrypt.genSaltSync(10);
   const hash = await bcrypt.hash(password, salt);
 
-  return await User.create({
-    name: "Tester",
-    username: "tester",
-    password: hash
+  const user = await User.create({
+    name,
+    username,
+    passwordHash: hash
   });
+
+  return {
+    username: user.username,
+    name: user.name
+  };
 }
 
 module.exports = {
-  createTestUser
+  createTestUser,
+  getUserData
 };

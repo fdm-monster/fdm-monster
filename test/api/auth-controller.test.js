@@ -6,12 +6,13 @@ const {
   expectInvalidResponse,
   expectUnauthorizedResponse
 } = require("../extensions");
-const { createTestUser } = require("./test-data/create-user");
+const { getUserData, createTestUser } = require("./test-data/create-user");
 
 let request;
 
 const baseRoute = AppConstants.apiRoute + "/users";
 const loginRoute = `${baseRoute}/login`;
+const registerRoute = `${baseRoute}/register`;
 const logoutRoute = `${baseRoute}/logout`;
 
 beforeAll(async () => {
@@ -20,24 +21,37 @@ beforeAll(async () => {
 });
 
 describe("AuthController", () => {
-  it("should fail login without creds", async function () {
+  it("should fail login without creds", async () => {
     const response = await request.post(loginRoute).send();
     expectInvalidResponse(response);
   });
 
-  it("should not authorize unknown credentials", async function () {
+  it("should not authorize unknown credentials", async () => {
     const response = await request.post(loginRoute).send({ username: "test", password: "test" });
     expectUnauthorizedResponse(response);
   });
 
-  it("should authorize known credentials", async function () {
-    const defaultPassword = "testpassword";
-    const { username } = await createTestUser(defaultPassword);
-    const response = await request.post(loginRoute).send({ username, password: defaultPassword });
+  it("should register new user", async () => {
+    const password = "registeredPassword";
+    const { username, name } = getUserData(password);
+    const response = await request.post(registerRoute).send({
+      username,
+      name,
+      password,
+      password2: password,
+      roles: []
+    });
     expectOkResponse(response);
   });
 
-  it("should succeed logout", async function () {
+  it("should authorize known user", async () => {
+    const password = "newPassword";
+    const { username } = await createTestUser(password);
+    const response = await request.post(loginRoute).send({ username, password });
+    expectOkResponse(response);
+  });
+
+  it("should succeed logout", async () => {
     const response = await request.post(logoutRoute).send();
 
     expectOkResponse(response);

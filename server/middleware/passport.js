@@ -33,7 +33,7 @@ module.exports = function (passport, tokenService) {
           }
 
           // Match password
-          bcrypt.compare(password, user.password, (err, isMatch) => {
+          bcrypt.compare(password, user.passwordHash, (err, isMatch) => {
             if (err) throw err;
 
             if (isMatch) {
