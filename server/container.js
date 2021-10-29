@@ -55,6 +55,8 @@ const BootTask = require("./tasks/boot.task");
 const PrinterProfilesCache = require("./state/data/printer-profiles.cache");
 const UserService = require("./services/authentication/user.service");
 const RoleService = require("./services/authentication/role.service");
+const { ToadScheduler } = require("toad-scheduler");
+const { ServerTasks } = require("./tasks");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -68,6 +70,7 @@ function configureContainer() {
       process.env[AppConstants.VERSION_KEY] || AppConstants.defaultServerPageTitle
     ),
     serverPageTitle: asValue(process.env[AppConstants.SERVER_SITE_TITLE_KEY]),
+    [DITokens.serverTasks]: asValue(ServerTasks),
 
     // -- asFunction --
     [DITokens.printerStateFactory]: asFunction(PrinterStateFactory).transient(), // Factory function, transient on purpose!
@@ -83,6 +86,7 @@ function configureContainer() {
 
     [DITokens.loggerFactory]: asFunction(LoggerFactory).transient(),
     [DITokens.taskManagerService]: asClass(TaskManagerService).singleton(),
+    [DITokens.toadScheduler]: asClass(ToadScheduler).singleton(),
     [DITokens.eventEmitter2]: asFunction(configureEventEmitter).singleton(),
     [DITokens.serverUpdateService]: asClass(ServerUpdateService).singleton(),
     [DITokens.systemInfoStore]: asClass(SystemInfoStore).singleton(),

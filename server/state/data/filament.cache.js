@@ -1,6 +1,5 @@
 const _ = require("lodash");
 const Filament = require("../../models/Filament");
-const { noSpoolOptionTemplate } = require("../../constants/template.constants");
 
 class FilamentCache {
   #filamentSpools = [];

@@ -18,16 +18,16 @@ class SettingsStore {
     this.#clientSettings = await this.#clientSettingsService.getOrCreate();
   }
 
-  setRegistrationEnabled(enabled = true) {
-    this.#serverSettings = this.#serverSettingsService.setRegistrationEnabled(enabled);
-  }
-
   isRegistrationEnabled() {
     if (!this.#serverSettings)
       throw new InternalServerException(
         "Could not check server settings (server settings not loaded"
       );
     return this.#serverSettings.server.registration;
+  }
+
+  getHistorySetting() {
+    return this.#serverSettings.history;
   }
 
   getServerSettings() {
@@ -42,8 +42,20 @@ class SettingsStore {
     });
   }
 
-  getHistorySetting() {
-    return this.#serverSettings.history;
+  async setRegistrationEnabled(enabled = true) {
+    this.#serverSettings = await this.#serverSettingsService.setRegistrationEnabled(enabled);
+  }
+
+  async updateClientSettings(fullUpdate) {
+    this.#clientSettings = await this.#clientSettingsService.update(fullUpdate);
+
+    return this.getClientSettings();
+  }
+
+  async updateServerSettings(fullUpdate) {
+    this.#serverSettings = await this.#serverSettingsService.update(fullUpdate);
+
+    return this.getServerSettings();
   }
 }
 

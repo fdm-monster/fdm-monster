@@ -4,6 +4,7 @@ const DITokens = {
   httpClient: "httpClient",
   multerService: "multerService",
   taskManagerService: "taskManagerService",
+  toadScheduler: "toadScheduler",
   eventEmitter2: "eventEmitter2",
   printerService: "printerService",
   printerGroupService: "printerGroupService",
@@ -47,6 +48,7 @@ const DITokens = {
   historyCache: "historyCache",
   filamentCache: "filamentCache",
   // Tasks
+  serverTasks: "serverTasks",
   bootTask: "bootTask",
   printerSystemTask: "printerSystemTask",
   softwareUpdateTask: "softwareUpdateTask",
@@ -56,7 +58,6 @@ const DITokens = {
   systemCommandsService: "systemCommandsService",
   printerWebsocketTask: "printerWebsocketTask",
   printerFilesTask: "printerFilesTask"
-
 };
 
 module.exports = DITokens;

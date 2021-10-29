@@ -1,34 +1,34 @@
-const ServerSettingsDB = require("../models/ServerSettings.js");
+const ServerSettingsModel = require("../models/ServerSettings.js");
 const Constants = require("../constants/server-settings.constants");
+const { validateInput } = require("../handlers/validators");
+const { serverSettingsUpdateRules } = require("./validators/server-settings-service.validation");
 
 class ServerSettingsService {
   async getOrCreate() {
-    const settings = await ServerSettingsDB.find({});
-    if (settings.length < 1) {
-      const defaultSystemSettings = new ServerSettingsDB(Constants.getDefaultSettings());
+    const settings = await ServerSettingsModel.findOne();
+    if (!settings) {
+      const defaultSystemSettings = new ServerSettingsModel(Constants.getDefaultSettings());
       await defaultSystemSettings.save();
 
       // Return to upper layer
       return defaultSystemSettings;
     } else {
-      const primarySettings = settings[0];
-
       // Server settings exist, but need updating with new ones if they don't exists.
-      if (!primarySettings.timeout) {
-        primarySettings.timeout = Constants.getDefaultTimeout();
+      if (!settings.timeout) {
+        settings.timeout = Constants.getDefaultTimeout();
       }
-      if (!primarySettings.server) {
-        primarySettings.server = Constants.server;
+      if (!settings.server) {
+        settings.server = Constants.server;
       }
-      if (!primarySettings.history) {
-        primarySettings.history = Constants.history;
+      if (!settings.history) {
+        settings.history = Constants.history;
       }
-      if (!primarySettings?.influxExport) {
-        primarySettings.influxExport = Constants.influxExport;
+      if (!settings?.influxExport) {
+        settings.influxExport = Constants.influxExport;
       }
 
-      await primarySettings.save();
-      return primarySettings;
+      await settings.save();
+      return settings;
     }
   }
 
@@ -38,11 +38,11 @@ class ServerSettingsService {
     return await settingsDoc.save();
   }
 
-  async update(obj) {
-    const checked = await ServerSettingsDB.find({});
+  async update(patchUpdate) {
+    const validatedInput = validateInput(patchUpdate, serverSettingsUpdateRules);
+    const settingsDoc = await this.getOrCreate();
 
-    checked[0] = obj;
-    checked[0].save();
+    return ServerSettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, validatedInput);
   }
 }
 

@@ -10,9 +10,10 @@ const OctoPrintApiMock = require("./mocks/octoprint-api.mock");
  * Setup the application without hassle
  * @param loadPrinterStore (default: false) setup printer store with database connection
  * @param mocks allows overriding IoC container
+ * @param quick_boot skip tasks
  * @returns {Promise<{container: AwilixContainer<any>, server: Server}>}
  */
-async function setupTestApp(loadPrinterStore = false, mocks) {
+async function setupTestApp(loadPrinterStore = false, mocks = undefined, quick_boot = true) {
   setupEnvConfig(true);
 
   const { httpServer, container } = setupNormalServer();
@@ -27,7 +28,7 @@ async function setupTestApp(loadPrinterStore = false, mocks) {
   // Setup
   await container.resolve(DITokens.settingsStore).loadSettings();
   const serverHost = container.resolve(DITokens.serverHost);
-  await serverHost.boot(httpServer, true, false);
+  await serverHost.boot(httpServer, quick_boot, false);
 
   if (loadPrinterStore) {
     // Requires (in-memory) database connection, so its optional
