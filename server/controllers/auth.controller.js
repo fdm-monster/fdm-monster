@@ -1,55 +1,63 @@
 const { createController } = require("awilix-express");
 const passport = require("passport");
-const Logger = require("../handlers/logger.js");
-const { NotImplementedException } = require("../exceptions/runtime.exceptions");
+const { InternalServerException } = require("../exceptions/runtime.exceptions");
 const { AppConstants } = require("../server.constants");
+const { validateMiddleware } = require("../handlers/validators");
+const { registerUserRules } = require("./validation/user-controller.validation");
 
 class AuthController {
   #settingsStore;
   #userTokenService;
+  #userService;
+  #roleService;
 
-  #logger = new Logger("Server-API");
+  #logger;
 
-  constructor({ settingsStore, userTokenService }) {
+  constructor({ settingsStore, userTokenService, userService, roleService, loggerFactory }) {
     this.#settingsStore = settingsStore;
     this.#userTokenService = userTokenService;
+    this.#userService = userService;
+    this.#roleService = roleService;
+    this.#logger = loggerFactory("Server-API");
   }
 
-  async login(req, res, next) {
-    if (!req.body.remember_me) {
-      return next();
-    }
-
-    await this.#userTokenService.issueTokenWithDone(req.user, function (err, token) {
-      if (err) {
-        return next(err);
-      }
+  async login(req, res) {
+    if (req.body.remember_me) {
+      const token = await this.#userTokenService.issueTokenWithDone(req.user);
       res.cookie("remember_me", token, {
         path: "/",
         httpOnly: true,
         maxAge: 604800000
       });
-      return next();
-    });
+    }
+
+    return res.send();
   }
 
   logout(req, res) {
     req.logout();
+
+    res.end();
   }
 
   async register(req, res) {
-    const { name, username, password, password2 } = req.body;
-    const errors = [];
+    let registrationEnabled = this.#settingsStore.isRegistrationEnabled();
+    if (!registrationEnabled) {
+      throw new InternalServerException("Registration is disabled. Cant register user");
+    }
+    const { name, username, password } = await validateMiddleware(req, registerUserRules);
 
-    let settings = this.#settingsStore.getServerSettings();
+    const roles = await this.#roleService.getDefaultRoles();
+    const result = await this.#userService.register({ name, username, password, roles });
 
-    throw new NotImplementedException("Registration is now implemented");
+    res.send(result);
   }
 }
 
 module.exports = createController(AuthController)
   .prefix(AppConstants.apiRoute + "/users")
+  .post("/register", "register")
   .post("/login", "login", {
     before: [passport.authenticate("local")]
   })
-  .get("/logout", "logout");
+  .post("/logout", "logout");

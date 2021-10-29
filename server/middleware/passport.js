@@ -1,7 +1,8 @@
 const LocalStrategy = require("passport-local").Strategy;
 const bcrypt = require("bcryptjs");
 const RememberMeStrategy = require("passport-remember-me").Strategy;
-const User = require("../models/User.js");
+const User = require("../models/Auth/User.js");
+const AuthenticationError = require("passport");
 
 module.exports = function (passport, tokenService) {
   passport.use(
@@ -32,7 +33,7 @@ module.exports = function (passport, tokenService) {
           }
 
           // Match password
-          bcrypt.compare(password, user.password, (err, isMatch) => {
+          bcrypt.compare(password, user.passwordHash, (err, isMatch) => {
             if (err) throw err;
 
             if (isMatch) {
@@ -41,7 +42,9 @@ module.exports = function (passport, tokenService) {
             return done(null, false, { message: "Password incorrect" });
           });
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+          throw new AuthenticationError(err);
+        });
     })
   );
 

@@ -53,6 +53,8 @@ const FileUploadTrackerCache = require("./state/data/file-upload-tracker.cache")
 const ServerHost = require("./server.host");
 const BootTask = require("./tasks/boot.task");
 const PrinterProfilesCache = require("./state/data/printer-profiles.cache");
+const UserService = require("./services/authentication/user.service");
+const RoleService = require("./services/authentication/role.service");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -76,6 +78,8 @@ function configureContainer() {
     [DITokens.serverSettingsService]: asClass(ServerSettingsService),
     [DITokens.clientSettingsService]: asClass(ClientSettingsService),
     [DITokens.userTokenService]: asClass(UserTokenService).singleton(),
+    [DITokens.userService]: asClass(UserService),
+    [DITokens.roleService]: asClass(RoleService).singleton(), // caches roles
 
     [DITokens.loggerFactory]: asFunction(LoggerFactory).transient(),
     [DITokens.taskManagerService]: asClass(TaskManagerService).singleton(),

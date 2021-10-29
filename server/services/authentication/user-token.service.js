@@ -3,7 +3,7 @@ const { randomString } = require("../../utils/random.util");
 class UserTokenService {
   tokens = {};
 
-  async issueTokenWithDone(user, done) {
+  async issueTokenWithDone(user) {
     const token = randomString(64);
 
     // Purge beforehand
@@ -12,8 +12,7 @@ class UserTokenService {
     // Create it
     await this.create(token, user.id);
 
-    // Error, value
-    done(null, token);
+    return token;
   }
 
   /**

@@ -38,8 +38,16 @@ function expectValidationError(object, keys, exact = false) {
   }
 }
 
+function expectInternalServerError(response) {
+  expect(response.statusCode).toEqual(500);
+}
+
 function expectRedirectResponse(response) {
   expect(response.statusCode).toEqual(302);
+}
+
+function expectUnauthorizedResponse(response) {
+  expect(response.statusCode).toEqual(401);
 }
 
 function expectInvalidResponse(response, keys, exact = false) {
@@ -59,6 +67,8 @@ module.exports = {
   expectRedirectResponse,
   expectOkResponse,
   expectValidationError,
+  expectUnauthorizedResponse,
+  expectInternalServerError,
   expectInvalidResponse,
   expectNotFoundResponse,
   getExpectExtensions

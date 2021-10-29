@@ -10,21 +10,17 @@ const UserSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
-  password: {
+  passwordHash: {
     type: String,
     required: true
   },
-  date: {
+  createdAt: {
     type: Date,
     default: Date.now
   },
-  group: {
-    type: String,
-    required: false
-  },
-  clientSettings: {
-    type: Object,
-    required: false
+  roles: {
+    type: Array,
+    required: true
   }
 });
 

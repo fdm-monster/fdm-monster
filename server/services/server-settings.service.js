@@ -32,6 +32,12 @@ class ServerSettingsService {
     }
   }
 
+  async setRegistrationEnabled(enabled = true) {
+    const settingsDoc = await this.getOrCreate();
+    settingsDoc.server.registration = enabled;
+    return await settingsDoc.save();
+  }
+
   async update(obj) {
     const checked = await ServerSettingsDB.find({});
 

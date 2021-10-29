@@ -6,7 +6,7 @@ const {
   printerInGroupRules,
   printerIdRules,
   updatePrinterGroupNameRules
-} = require("./validators/printer-group-service.validators");
+} = require("./validators/printer-group-service.validation");
 const { NotFoundException } = require("../exceptions/runtime.exceptions");
 
 class PrinterGroupService {
@@ -27,7 +27,7 @@ class PrinterGroupService {
 
   async get(groupId) {
     const printerGroup = await PrinterGroupModel.findOne({ _id: groupId });
-    if (printerGroup === null)
+    if (!printerGroup)
       throw new NotFoundException(`Printer group with id ${groupId} does not exist.`);
 
     return printerGroup;
