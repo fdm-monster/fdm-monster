@@ -26,7 +26,7 @@ class TaskManagerService {
         "Task ID was not provided. Cant register task or schedule job."
       );
     }
-    const prefix = `Job '${workload.name || "anonymous"}' with ID '${taskId}'`;
+    const prefix = `Job '${workload?.name || "anonymous"}' with ID '${taskId}'`;
     if (!!this.taskStates[taskId]) {
       throw new JobValidationException(
         `${prefix} was already registered. Cant register a key twice.`,
