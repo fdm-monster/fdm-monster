@@ -13,24 +13,22 @@ class ServerSettingsService {
       // Return to upper layer
       return defaultSystemSettings;
     } else {
-      const primarySettings = settings[0];
-
       // Server settings exist, but need updating with new ones if they don't exists.
-      if (!primarySettings.timeout) {
-        primarySettings.timeout = Constants.getDefaultTimeout();
+      if (!settings.timeout) {
+        settings.timeout = Constants.getDefaultTimeout();
       }
-      if (!primarySettings.server) {
-        primarySettings.server = Constants.server;
+      if (!settings.server) {
+        settings.server = Constants.server;
       }
-      if (!primarySettings.history) {
-        primarySettings.history = Constants.history;
+      if (!settings.history) {
+        settings.history = Constants.history;
       }
-      if (!primarySettings?.influxExport) {
-        primarySettings.influxExport = Constants.influxExport;
+      if (!settings?.influxExport) {
+        settings.influxExport = Constants.influxExport;
       }
 
-      await primarySettings.save();
-      return primarySettings;
+      await settings.save();
+      return settings;
     }
   }
 
