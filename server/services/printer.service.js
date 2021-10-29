@@ -1,11 +1,11 @@
-const Printers = require("../models/Printer");
+const PrinterModel = require("../models/Printer");
 const { NotFoundException } = require("../exceptions/runtime.exceptions");
 const { sanitizeURL } = require("../utils/url.utils");
 const { validateInput } = require("../handlers/validators");
 const {
   createPrinterRules,
   updatePrinterEnabledRule
-} = require("./validators/printer-service.validators");
+} = require("./validators/printer-service.validation");
 const {
   getDefaultPrinterEntry,
   getPowerSettingsDefault
@@ -16,18 +16,18 @@ class PrinterService {
    * Lists the printers present in the database.
    */
   async list() {
-    return Printers.find({}, null, {
+    return PrinterModel.find({}, null, {
       sort: { sortIndex: 1 }
     });
   }
 
   async #printerCount() {
-    return Printers.countDocuments();
+    return PrinterModel.countDocuments();
   }
 
   async get(printerId) {
     const filter = { _id: printerId };
-    const printer = await Printers.findOne(filter);
+    const printer = await PrinterModel.findOne(filter);
 
     if (!printer) {
       throw new NotFoundException(
@@ -41,7 +41,7 @@ class PrinterService {
   async delete(printerId) {
     const filter = { _id: printerId };
 
-    return Printers.findOneAndDelete(filter);
+    return PrinterModel.findOneAndDelete(filter);
   }
 
   async validateAndDefault(printer) {
@@ -68,7 +68,7 @@ class PrinterService {
     mergedPrinter.dateAdded = Date.now();
     mergedPrinter.sortIndex = await this.#printerCount(); // 0-based index so no +1 needed
 
-    return Printers.create(mergedPrinter);
+    return PrinterModel.create(mergedPrinter);
   }
 
   /**
@@ -105,7 +105,7 @@ class PrinterService {
    */
   async updateSortIndex(printerId, sortIndex) {
     const update = { sortIndex };
-    return Printers.findByIdAndUpdate(printerId, update, {
+    return PrinterModel.findByIdAndUpdate(printerId, update, {
       new: true,
       useFindAndModify: false
     });
@@ -113,7 +113,7 @@ class PrinterService {
 
   async updateFlowRate(printerId, flowRate) {
     const update = { flowRate };
-    return Printers.findByIdAndUpdate(printerId, update, {
+    return PrinterModel.findByIdAndUpdate(printerId, update, {
       new: true,
       useFindAndModify: false
     });
@@ -121,7 +121,7 @@ class PrinterService {
 
   async updateFeedRate(printerId, feedRate) {
     const update = { feedRate };
-    return Printers.findByIdAndUpdate(printerId, update, {
+    return PrinterModel.findByIdAndUpdate(printerId, update, {
       new: true,
       useFindAndModify: false
     });
@@ -132,7 +132,7 @@ class PrinterService {
       powerSettings: getPowerSettingsDefault()
     };
 
-    return Printers.findByIdAndUpdate(printerId, update, {
+    return PrinterModel.findByIdAndUpdate(printerId, update, {
       new: true,
       useFindAndModify: false
     });
@@ -148,7 +148,7 @@ class PrinterService {
 
     await validateInput(update, createPrinterRules);
 
-    return Printers.findByIdAndUpdate(printerId, update, {
+    return PrinterModel.findByIdAndUpdate(printerId, update, {
       new: true,
       useFindAndModify: false
     });
@@ -161,14 +161,14 @@ class PrinterService {
 
     await validateInput(update, updatePrinterEnabledRule);
 
-    return Printers.findByIdAndUpdate(printerId, update, {
+    return PrinterModel.findByIdAndUpdate(printerId, update, {
       new: true,
       useFindAndModify: false
     });
   }
 
   async savePrinterAdminUsername(id, opAdminUserName) {
-    const printer = Printers.findById(id);
+    const printer = PrinterModel.findById(id);
     if (!printer) {
       throw new NotFoundException(`The printer with ID ${id} does not exist in database.`);
     }

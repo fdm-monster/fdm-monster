@@ -1,20 +1,22 @@
 const { createController } = require("awilix-express");
 const passport = require("passport");
-const Logger = require("../handlers/logger.js");
-const { NotImplementedException } = require("../exceptions/runtime.exceptions");
+const { NotImplementedException, InternalServerException } = require("../exceptions/runtime.exceptions");
 const { AppConstants } = require("../server.constants");
-const User = require("../models/Auth/User");
-const bcrypt = require("bcryptjs");
+const { validateMiddleware } = require("../handlers/validators");
+const { registerUserRules } = require("./validation/user-controller.validation");
 
 class AuthController {
   #settingsStore;
   #userTokenService;
+  #userService;
 
-  #logger = new Logger("Server-API");
+  #logger;
 
-  constructor({ settingsStore, userTokenService }) {
+  constructor({ settingsStore, userTokenService, userService, loggerFactory }) {
     this.#settingsStore = settingsStore;
     this.#userTokenService = userTokenService;
+    this.#userService = userService;
+    this.#logger = loggerFactory("Server-API");
   }
 
   async login(req, res) {
@@ -37,11 +39,13 @@ class AuthController {
   }
 
   async register(req, res) {
-    const { name, username, password, password2 } = req.body;
-    const errors = [];
+    let registrationEnabled = this.#settingsStore.isUserRegistrationEnabled();
+    if (!registrationEnabled) {
+      throw new InternalServerException("Registration is disabled. Cant register user");
+    }
 
-    let settings = this.#settingsStore.getServerSettings();
-
+    const { name, username, password } = await validateMiddleware(req, registerUserRules);
+    this.#userService.register({ name, username, password });
     throw new NotImplementedException("Registration is now implemented");
   }
 }

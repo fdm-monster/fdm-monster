@@ -1,3 +1,5 @@
+const { InternalServerException } = require("../exceptions/runtime.exceptions");
+
 class SettingsStore {
   #serverSettings;
   #clientSettings;
@@ -14,6 +16,11 @@ class SettingsStore {
     // Setup Settings as connection is established
     this.#serverSettings = await this.#serverSettingsService.getOrCreate();
     this.#clientSettings = await this.#clientSettingsService.getOrCreate();
+  }
+
+  isUserRegistrationEnabled() {
+    if (!this.#serverSettings) throw new InternalServerException("Could not check server settings (server settings not loaded");
+    return this.#serverSettings.server.registration;
   }
 
   getServerSettings() {

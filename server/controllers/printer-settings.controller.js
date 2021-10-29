@@ -3,7 +3,7 @@ const { createController } = require("awilix-express");
 const { validateInput } = require("../handlers/validators");
 const { AppConstants } = require("../server.constants");
 const { idRules } = require("./validation/generic.validation");
-const { setGcodeAnalysis } = require("./validation/printer-settings.validation");
+const { setGcodeAnalysis } = require("./validation/printer-settings-controller.validation");
 
 class PrinterSettingsController {
   #printersStore;
