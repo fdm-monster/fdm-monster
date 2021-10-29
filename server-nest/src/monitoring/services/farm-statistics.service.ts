@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { CreateAlertDto } from "../dto/create-monitoring.dto";
-import { UpdateAlertDto } from "../dto/update-monitoring.dto";
+import { CreateAlertDto } from "../dto/create-alert.dto";
+import { UpdateAlertDto } from "../dto/update-alert.dto";
 
 @Injectable()
 export class FarmStatisticsService {

@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
-import { CreateAlertDto } from "../dto/create-monitoring.dto";
-import { UpdateAlertDto } from "../dto/update-monitoring.dto";
+import { CreateAlertDto } from "../dto/create-alert.dto";
+import { UpdateAlertDto } from "../dto/update-alert.dto";
 import { ErrorLogService } from "../services/error-log.service";
 import { ApiTags } from "@nestjs/swagger";
 

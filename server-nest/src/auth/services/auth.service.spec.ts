@@ -1,7 +1,6 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { AuthService } from "./auth.service";
 import { TestProviders } from "../../../test/base/test.provider";
-import { CryptoModule } from "../../crypto/crypto.module";
 import { JwtModule } from "@nestjs/jwt";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { User } from "../../users/entities/user.entity";
@@ -23,7 +22,7 @@ describe("AuthService", () => {
         UsersService,
         AuthService
       ],
-      imports: [CryptoModule, JwtModule.register({})]
+      imports: [JwtModule.register({})]
     }).compile();
 
     service = module.get<AuthService>(AuthService);
