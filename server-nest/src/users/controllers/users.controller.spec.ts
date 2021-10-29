@@ -22,7 +22,7 @@ describe("UsersController", () => {
         },
         UsersService
       ],
-      imports: [AuthModule]
+      imports: []
     }).compile();
 
     controller = module.get<UsersController>(UsersController);

@@ -3,7 +3,7 @@ import { UsersService } from "./users.service";
 import { TestProviders } from "../../../test/base/test.provider";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { User } from "../entities/user.entity";
-import { AuthModule } from "../../auth/auth.module";
+import { UsersModule } from "../users.module";
 
 describe("UsersService", () => {
   let service: UsersService;
@@ -20,7 +20,7 @@ describe("UsersService", () => {
         },
         UsersService
       ],
-      imports: [AuthModule]
+      imports: []
     }).compile();
 
     service = module.get<UsersService>(UsersService);

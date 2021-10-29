@@ -12,7 +12,6 @@ import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 import { UsersService } from "../users/services/users.service";
 import { GroupEnum } from "../users/types/group.enum";
 import { SettingsModule } from "../settings/settings.module";
-import { CryptoService } from "./services/crypto.service";
 
 @Module({
   providers: [
@@ -21,8 +20,7 @@ import { CryptoService } from "./services/crypto.service";
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard
-    },
-    CryptoService
+    }
   ],
   imports: [
     PassportModule,

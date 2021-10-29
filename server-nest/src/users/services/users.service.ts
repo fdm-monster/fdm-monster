@@ -4,17 +4,17 @@ import { UpdateUserDto } from "../dto/update-user.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ObjectID, Repository } from "typeorm";
 import { User } from "../entities/user.entity";
-import { CryptoService } from "../../auth/services/crypto.service";
 import { RegisterInputDto } from "../dto/register-input.dto";
 import { GroupEnum } from "../types/group.enum";
 import { ValidationException } from "../../providers/validation.exception";
+import { hashPassword } from "../../utils/crypto.util";
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User) private usersRepository: Repository<User>,
-    private readonly cryptoService: CryptoService
-  ) {}
+    @InjectRepository(User) private usersRepository: Repository<User>
+  ) {
+  }
 
   async register(registerInputDto: RegisterInputDto): Promise<void> {
     delete registerInputDto.password2;
@@ -27,7 +27,7 @@ export class UsersService {
   async create(createUserDto: CreateUserDto): Promise<void> {
     await this.assertUsernameAvailable(createUserDto.username);
 
-    const passwordHash = await this.cryptoService.hashPasswordAsync(createUserDto.password);
+    const passwordHash = hashPassword(createUserDto.password);
     delete createUserDto.password;
 
     const user = new User({
@@ -39,7 +39,7 @@ export class UsersService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<void> {
-    const passwordHash = await this.cryptoService.hashPasswordAsync(updateUserDto.password);
+    const passwordHash = hashPassword(updateUserDto.password);
     delete updateUserDto.password;
     const user = new User({
       ...updateUserDto,

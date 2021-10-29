@@ -5,11 +5,15 @@ import { JwtModule } from "@nestjs/jwt";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { User } from "../../users/entities/user.entity";
 import { UsersService } from "../../users/services/users.service";
+import { AuthModule } from "../auth.module";
+import { JWT_SECRET_KEY } from "../auth.config";
+import { UsersModule } from "../../users/users.module";
 
 describe("AuthService", () => {
   let service: AuthService;
 
   beforeEach(async () => {
+    process.env[JWT_SECRET_KEY] = "asd123";
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ...TestProviders,
