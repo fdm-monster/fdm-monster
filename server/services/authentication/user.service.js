@@ -5,7 +5,7 @@ const { registerUserRules } = require("../validators/user-service.validation");
 const bcrypt = require("bcryptjs");
 
 class UserService {
-  async get(userId) {
+  async getUser(userId) {
     const user = await UserModel.findById(userId);
     if (!user) throw new NotFoundException("User not found");
 
