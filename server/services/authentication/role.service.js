@@ -5,6 +5,10 @@ const { NotFoundException } = require("../../exceptions/runtime.exceptions");
 class RoleService {
   #roles = [];
 
+  get roles() {
+    return this.#roles;
+  }
+
   async getDefaultRoles() {
     if (!this.#roles?.length) {
       await this.syncRoles();
@@ -22,7 +26,7 @@ class RoleService {
   }
 
   async getRole(roleId) {
-    const role = await this.#roles.find((r) => r._id === roleId);
+    const role = await this.#roles.find((r) => r.id === roleId);
     if (!role) throw new NotFoundException("Role not found");
 
     return role;

@@ -28,25 +28,25 @@ describe("User:Schema", function () {
     const newUser = new User({
       name: "testname",
       username: "SAMENAME",
-      password: "pwpwpwpw123",
+      passwordHash: "pwpwpwpw123",
       group: "User"
     });
     const newUser2 = new User({
       name: "testname2",
       username: "SAMENAME",
-      password: "pwpwpwpw123",
+      passwordHash: "pwpwpwpw123",
       group: "User"
     });
 
     // Hash Password
     const salt = bcrypt.genSaltSync(10);
     expect(salt).not.toBeUndefined();
-    const hash = bcrypt.hashSync(newUser.password, salt);
+    const hash = bcrypt.hashSync(newUser.passwordHash, salt);
     expect(hash).not.toBeUndefined();
 
     // Set password to hashed
-    newUser.password = hash;
-    newUser2.password = hash;
+    newUser.passwordHash = hash;
+    newUser2.passwordHash = hash;
     // Save new User
     await newUser.save();
     let wasThrown = false;
