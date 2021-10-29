@@ -1,7 +1,7 @@
-const UserModel = require("../models/Auth/User");
-const { NotFoundException } = require("../exceptions/runtime.exceptions");
-const { validateInput } = require("../handlers/validators");
-const { registerUserRules } = require("./validators/user-service.validation");
+const UserModel = require("../../models/Auth/User");
+const { NotFoundException } = require("../../exceptions/runtime.exceptions");
+const { validateInput } = require("../../handlers/validators");
+const { registerUserRules } = require("../validators/user-service.validation");
 const bcrypt = require("bcryptjs");
 
 class UserService {

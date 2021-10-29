@@ -14,6 +14,7 @@ const DITokens = {
   githubApiService: "githubApiService",
   userTokenService: "userTokenService",
   userService: "userService",
+  roleService: "roleService",
   octoPrintApiService: "octoPrintApiService",
   influxDbSetupService: "influxDbSetupService",
   influxDbFilamentService: "influxDbFilamentService",
@@ -54,7 +55,8 @@ const DITokens = {
   printerTestTask: "printerTestTask",
   systemCommandsService: "systemCommandsService",
   printerWebsocketTask: "printerWebsocketTask",
-  printerFilesTask: "printerFilesTask",
+  printerFilesTask: "printerFilesTask"
+
 };
 
 module.exports = DITokens;

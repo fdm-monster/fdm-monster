@@ -17,6 +17,7 @@ module.exports = class BootTask {
   currOpsCache;
   historyCache;
   filamentCache;
+  roleService;
   influxDbSetupService;
 
   constructor({
@@ -30,6 +31,7 @@ module.exports = class BootTask {
     currentOperationsCache,
     historyCache,
     filamentCache,
+    roleService,
     taskManagerService,
     influxDbSetupService
   }) {
@@ -42,6 +44,7 @@ module.exports = class BootTask {
     this.currOpsCache = currentOperationsCache;
     this.historyCache = historyCache;
     this.filamentCache = filamentCache;
+    this.roleService = roleService;
     this.#taskManagerService = taskManagerService;
     this.influxDbSetupService = influxDbSetupService;
     this.#logger = loggerFactory("Server");
@@ -81,6 +84,9 @@ module.exports = class BootTask {
     await this.historyCache.initCache();
     await this.filamentCache.initCache();
     await this.influxDbSetupService.optionalInfluxDatabaseSetup();
+
+    this.#logger.info("Synchronizing user roles definition");
+    await this.roleService.syncRoles();
 
     if (bootTaskScheduler && process.env.SAFEMODE_ENABLED !== "true") {
       ServerTasks.BOOT_TASKS.forEach((task) => {
