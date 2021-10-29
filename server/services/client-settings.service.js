@@ -1,16 +1,26 @@
-const ClientSettingsDB = require("../models/ClientSettings.js");
+const ClientSettingsModel = require("../models/ClientSettings.js");
 const Constants = require("../constants/client-settings.constants");
+const { validateInput } = require("../handlers/validators");
+const { clientSettingsUpdateRules } = require("./validators/client-settings-service.validation");
 
 class ClientSettingsService {
   async getOrCreate() {
-    const settings = await ClientSettingsDB.find({});
+    const settings = await ClientSettingsModel.findOne();
 
-    if (settings.length < 1) {
-      const defaultClientSettings = new ClientSettingsDB(Constants.getDefaultSettings());
+    if (!settings) {
+      const defaultClientSettings = new ClientSettingsModel(Constants.getDefaultSettings());
       await defaultClientSettings.save();
       return defaultClientSettings;
     }
-    return settings[0];
+
+    return settings;
+  }
+
+  async update(patchUpdate) {
+    const validatedInput = validateInput(patchUpdate, clientSettingsUpdateRules);
+    const settingsDoc = await this.getOrCreate();
+
+    return ClientSettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, validatedInput);
   }
 }
 

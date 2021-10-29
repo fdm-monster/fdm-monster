@@ -1,11 +1,13 @@
-const ServerSettingsDB = require("../models/ServerSettings.js");
+const ServerSettingsModel = require("../models/ServerSettings.js");
 const Constants = require("../constants/server-settings.constants");
+const { validateInput } = require("../handlers/validators");
+const { serverSettingsUpdateRules } = require("./validators/server-settings-service.validation");
 
 class ServerSettingsService {
   async getOrCreate() {
-    const settings = await ServerSettingsDB.find({});
-    if (settings.length < 1) {
-      const defaultSystemSettings = new ServerSettingsDB(Constants.getDefaultSettings());
+    const settings = await ServerSettingsModel.findOne();
+    if (!settings) {
+      const defaultSystemSettings = new ServerSettingsModel(Constants.getDefaultSettings());
       await defaultSystemSettings.save();
 
       // Return to upper layer
@@ -38,11 +40,11 @@ class ServerSettingsService {
     return await settingsDoc.save();
   }
 
-  async update(obj) {
-    const checked = await ServerSettingsDB.find({});
+  async update(patchUpdate) {
+    const validatedInput = validateInput(patchUpdate, serverSettingsUpdateRules);
+    const settingsDoc = await this.getOrCreate();
 
-    checked[0] = obj;
-    checked[0].save();
+    return ServerSettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, validatedInput);
   }
 }
 
