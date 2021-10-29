@@ -25,7 +25,6 @@ const PrinterFilesTask = require("./tasks/printer-files.task");
 const PrinterTickerStore = require("./state/printer-ticker.store");
 const PrinterWebsocketTask = require("./tasks/printer-websocket.task");
 const PrinterSseTask = require("./tasks/printer-sse.task");
-const CurrentOperationsCache = require("./state/data/current-operations.cache");
 const PrinterSystemTask = require("./tasks/printer-system.task");
 const OctoPrintApiService = require("./services/octoprint/octoprint-api.service");
 const FilamentCache = require("./state/data/filament.cache");
@@ -111,7 +110,6 @@ function configureContainer() {
 
     [DITokens.filamentCache]: asClass(FilamentCache).singleton(),
     [DITokens.printerProfilesCache]: asClass(PrinterProfilesCache).singleton(),
-    [DITokens.currentOperationsCache]: asClass(CurrentOperationsCache).singleton(),
     [DITokens.printerState]: asClass(PrinterState).transient(), // Transient on purpose!
     [DITokens.printerGroupsCache]: asClass(PrinterGroupsCache).singleton(),
     [DITokens.historyCache]: asClass(HistoryCache).singleton(),

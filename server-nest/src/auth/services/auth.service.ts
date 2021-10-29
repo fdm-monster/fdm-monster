@@ -1,12 +1,12 @@
 import { Inject, Injectable, Logger, UnauthorizedException } from "@nestjs/common";
 import { UsersService } from "../../users/services/users.service";
 import { LoginUserDto } from "../dto/login-user.dto";
-import { CryptoService } from "../../crypto/crypto.service";
 import { User } from "../../users/entities/user.entity";
 import { JwtService } from "@nestjs/jwt";
 import { UserPayload } from "../interfaces/user-payload.model";
 import { AuthConfig } from "../auth.config";
 import { ConfigType } from "@nestjs/config";
+import { comparePasswordHash } from "../../utils/crypto.util";
 
 @Injectable()
 export class AuthService {
@@ -14,10 +14,10 @@ export class AuthService {
 
   constructor(
     @Inject(AuthConfig.KEY) private jwtOptions: ConfigType<typeof AuthConfig>,
-    private readonly cryptoService: CryptoService,
     private readonly usersService: UsersService,
     private jwtService: JwtService
-  ) {}
+  ) {
+  }
 
   async createToken(loginUserDto: LoginUserDto) {
     const { id, username } = await this.validateLoginUserDto(loginUserDto);
@@ -36,7 +36,7 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException();
     }
-    const isValid = await this.cryptoService.comparePasswordHash(password, user.passwordHash);
+    const isValid = await comparePasswordHash(password, user.passwordHash);
     if (!isValid) {
       throw new UnauthorizedException();
     }

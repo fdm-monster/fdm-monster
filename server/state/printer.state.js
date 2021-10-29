@@ -53,15 +53,13 @@ class PrinterState {
 
   #logger = new Logger("Printer-State");
   #eventEmitter2;
-  #currentOperationsCache;
   #jobsCache;
   #fileCache;
 
-  constructor({ eventEmitter2, currentOperationsCache, jobsCache, fileCache }) {
+  constructor({ eventEmitter2, jobsCache, fileCache }) {
     this.#eventEmitter2 = eventEmitter2;
     this.#jobsCache = jobsCache;
     this.#fileCache = fileCache;
-    this.#currentOperationsCache = currentOperationsCache;
   }
 
   get id() {
@@ -360,11 +358,9 @@ class PrinterState {
     }
     if (event.type === PEVENTS.init) {
       this.#jobsCache.savePrinterJob(this.#id, event.data);
-      this.#currentOperationsCache.generateCurrentOperations();
     }
     if (event.type === PEVENTS.current) {
       this.#jobsCache.updatePrinterJob(this.#id, event.data);
-      this.#currentOperationsCache.generateCurrentOperations();
     }
   }
 

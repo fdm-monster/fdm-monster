@@ -124,41 +124,6 @@ class JobsCache {
 
     this.#cachedJobProgress[id] = cachedPrinterJob;
   }
-
-  // let spoolCost = 0;
-  // let totalVolume = 0;
-  // let totalLength = 0;
-  // let totalWeight = 0;
-  // if (!!currentJob.expectedFilamentCosts) {
-  //   const keys = Object.keys(currentJob.expectedFilamentCosts);
-  //   for (let s = 0; s < currentJob.expectedFilamentCosts.length; s++) {
-  //     const toolFilamentCosts = currentJob.expectedFilamentCosts[s][`tool${keys[s]}`];
-  //     if (!!toolFilamentCosts) {
-  //       spoolCost += floatOrZero(toolFilamentCosts.cost);
-  //       totalVolume += floatOrZero(toolFilamentCosts.volume);
-  //       totalLength += floatOrZero(toolFilamentCosts.length);
-  //       totalWeight += floatOrZero(toolFilamentCosts.weight);
-  //     }
-  //   }
-  // }
-  //
-  // spoolCost = floatOrZero(spoolCost);
-  // currentJob.expectedTotals = {
-  //   // TODO String a good idea?
-  //   totalCost: (parseFloat(currentJob.expectedPrinterCosts) + spoolCost).toFixed(2),
-  //   totalVolume,
-  //   totalLength,
-  //   totalWeight,
-  //   spoolCost
-  // };
-  //
-
-  // TODO do a 'set state call' instead
-  // if (!!printerState.systemChecks) {
-  //   const systemCleaningJob = printerState.systemChecks.cleaning.job;
-  //   systemCleaningJob.status = "success";
-  //   systemCleaningJob.date = new Date();
-  // }
 }
 
 module.exports = JobsCache;

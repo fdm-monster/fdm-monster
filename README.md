@@ -1,4 +1,4 @@
-# 3D Hub [![GitHub stars](https://img.shields.io/github/stars/3d-hub/3d-hub)](https://github.com/3d-hub/3d-hub/stargazers) ![GitHub issues](https://img.shields.io/github/issues/3d-hub/3d-hub?color=green) [![GitHub forks](https://img.shields.io/github/forks/3d-hub/3d-hub)](https://github.com/3d-hub/3d-hub/network) [![Latest Release](https://img.shields.io/github/release/3d-hub/3d-hub)](https://img.shields.io/github/v/tag/3d-hub/3d-hub?sort=date) ![Coverage](https://img.shields.io/codecov/c/github/3d-hub/3d-hub)
+# 3D Hub [![GitHub stars](https://img.shields.io/github/stars/3d-hub/3d-hub)](https://github.com/3d-hub/3d-hub/stargazers) ![GitHub issues](https://img.shields.io/github/issues/3d-hub/3d-hub?color=green) [![GitHub forks](https://img.shields.io/github/forks/3d-hub/3d-hub)](https://github.com/3d-hub/3d-hub/network) [![Latest Release](https://img.shields.io/github/release/3d-hub/3d-hub)](https://img.shields.io/github/v/tag/3d-hub/3d-hub?sort=date) ![Coverage](https://img.shields.io/codecov/c/github/3d-hub/3d-hub?color=green)
 
 **_The server for managing 3D printers with great overview_**
 
