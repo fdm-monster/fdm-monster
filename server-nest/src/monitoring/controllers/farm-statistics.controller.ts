@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
-import { CreateMonitoringDto } from "../dto/create-monitoring.dto";
-import { UpdateMonitoringDto } from "../dto/update-monitoring.dto";
+import { CreateAlertDto } from "../dto/create-monitoring.dto";
+import { UpdateAlertDto } from "../dto/update-monitoring.dto";
 import { ApiTags } from "@nestjs/swagger";
 import { FarmStatisticsService } from "../services/farm-statistics.service";
 
@@ -10,7 +10,7 @@ export class FarmStatisticsController {
   constructor(private readonly farmStatisticsService: FarmStatisticsService) {}
 
   @Post()
-  create(@Body() createMonitoringDto: CreateMonitoringDto) {
+  create(@Body() createMonitoringDto: CreateAlertDto) {
     return this.farmStatisticsService.create(createMonitoringDto);
   }
 
@@ -25,7 +25,7 @@ export class FarmStatisticsController {
   }
 
   @Put(":id")
-  update(@Param("id") id: string, @Body() updateMonitoringDto: UpdateMonitoringDto) {
+  update(@Param("id") id: string, @Body() updateMonitoringDto: UpdateAlertDto) {
     return this.farmStatisticsService.update(+id, updateMonitoringDto);
   }
 

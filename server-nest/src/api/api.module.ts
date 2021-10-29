@@ -4,11 +4,11 @@ import { ApiController } from "./api.controller";
 import { HealthController } from "./controllers/health.controller";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { TerminusModule } from "@nestjs/terminus";
-import { LegacyRedirectsController } from "./controllers/legacy-redirects.controller";
 
 @Module({
   imports: [TypeOrmModule.forRoot(), TerminusModule],
-  controllers: [ApiController, HealthController, LegacyRedirectsController],
+  controllers: [ApiController, HealthController],
   providers: [ApiService]
 })
-export class ApiModule {}
+export class ApiModule {
+}

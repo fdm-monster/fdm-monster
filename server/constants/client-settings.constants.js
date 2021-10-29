@@ -29,10 +29,6 @@ function getDefaultDashboardSettings() {
       printerProgress: true,
       currentStatus: true
     },
-    farmUtilisation: {
-      currentUtilisation: true,
-      farmUtilisation: true
-    },
     historical: {
       weeklyUtilisation: true,
       hourlyTotalTemperatures: false,

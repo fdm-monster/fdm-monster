@@ -4,7 +4,7 @@ import { UpdateUserDto } from "../dto/update-user.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ObjectID, Repository } from "typeorm";
 import { User } from "../entities/user.entity";
-import { CryptoService } from "../../crypto/crypto.service";
+import { CryptoService } from "../../auth/services/crypto.service";
 import { RegisterInputDto } from "../dto/register-input.dto";
 import { GroupEnum } from "../types/group.enum";
 import { ValidationException } from "../../providers/validation.exception";

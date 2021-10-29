@@ -1,7 +1,7 @@
 import { Inject, Injectable, Logger, UnauthorizedException } from "@nestjs/common";
 import { UsersService } from "../../users/services/users.service";
 import { LoginUserDto } from "../dto/login-user.dto";
-import { CryptoService } from "../../crypto/crypto.service";
+import { CryptoService } from "./crypto.service";
 import { User } from "../../users/entities/user.entity";
 import { JwtService } from "@nestjs/jwt";
 import { UserPayload } from "../interfaces/user-payload.model";

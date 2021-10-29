@@ -1,4 +1,3 @@
-import { FarmActivityModel } from "./farm-activity.model";
 import { LayoutModel } from "../layout-settings/layout.model";
 import { PrinterStatesModel } from "./printers-states.model";
 import { FarmUtilizationModel } from "./farm-utilization.model";
@@ -7,12 +6,12 @@ import { HistoricalModel } from "./historical.model";
 export class ClientDashboardSettings {
   public defaultLayout: LayoutModel;
   public savedLayout: LayoutModel;
-  public farmActivity: FarmActivityModel;
   public printerStates: PrinterStatesModel;
   public farmUtilization: FarmUtilizationModel;
   public historical: HistoricalModel;
 
-  constructor() { // Adjust default with dynamic config
+  constructor() {
+    // Adjust default with dynamic config
     this.defaultLayout = [
       { x: 0, y: 0, width: 2, height: 5, id: "currentUtil" },
       { x: 5, y: 0, width: 3, height: 5, id: "farmUtil" },
@@ -32,11 +31,6 @@ export class ClientDashboardSettings {
       { x: 0, y: 19, width: 12, height: 8, id: "historyCompletionByDay" }
     ];
     this.savedLayout = [];
-    this.farmActivity = {
-      currentOperations: false,
-      cumulativeTimes: true,
-      averageTimes: true
-    };
     this.printerStates = {
       printerState: true,
       printerTemps: true,

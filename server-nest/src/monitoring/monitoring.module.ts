@@ -1,5 +1,4 @@
 import { Module } from "@nestjs/common";
-import { MonitoringMvcController } from "./controllers/monitoring-mvc.controller";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Alert } from "./entities/alert.entity";
 import { ErrorLog } from "./entities/error-log.entity";
@@ -20,12 +19,7 @@ import { SettingsModule } from "../settings/settings.module";
     ConfigModule.forFeature(MonitoringConfig),
     SettingsModule
   ],
-  controllers: [
-    MonitoringMvcController,
-    ErrorLogController,
-    FarmStatisticsController,
-    AlertsController
-  ],
+  controllers: [ErrorLogController, FarmStatisticsController, AlertsController],
   providers: [ErrorLogService, FarmStatisticsService, AlertsService]
 })
 export class MonitoringModule {}

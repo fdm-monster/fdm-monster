@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
-import { CreateMonitoringDto } from "../dto/create-monitoring.dto";
-import { UpdateMonitoringDto } from "../dto/update-monitoring.dto";
+import { CreateAlertDto } from "../dto/create-monitoring.dto";
+import { UpdateAlertDto } from "../dto/update-monitoring.dto";
 import { ErrorLogService } from "../services/error-log.service";
 import { ApiTags } from "@nestjs/swagger";
 
@@ -10,7 +10,7 @@ export class ErrorLogController {
   constructor(private readonly errorLogService: ErrorLogService) {}
 
   @Post()
-  create(@Body() createMonitoringDto: CreateMonitoringDto) {
+  create(@Body() createMonitoringDto: CreateAlertDto) {
     return this.errorLogService.create(createMonitoringDto);
   }
 
@@ -25,7 +25,7 @@ export class ErrorLogController {
   }
 
   @Put(":id")
-  update(@Param("id") id: string, @Body() updateMonitoringDto: UpdateMonitoringDto) {
+  update(@Param("id") id: string, @Body() updateMonitoringDto: UpdateAlertDto) {
     return this.errorLogService.update(+id, updateMonitoringDto);
   }
 
