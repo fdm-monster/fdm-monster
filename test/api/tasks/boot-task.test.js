@@ -12,12 +12,20 @@ beforeAll(async () => {
   ({ container } = await setupTestApp(true));
   taskManager = container.resolve(DITokens.taskManagerService);
   task = container.resolve(DITokens.bootTask);
-
-  taskManager.registerJobOrTask(ServerTasks.SERVER_BOOT_TASK);
 });
 
 describe("BootTask", () => {
+  it("should run boot tasks once without having to register", async () => {
+    await task.runOnce();
+    expect(taskManager.isTaskDisabled(DITokens.bootTask)).toBeTruthy();
+    taskManager.stopSchedulerTasks();
+    taskManager.deregisterTask(DITokens.bootTask);
+  });
+
   it("should skip running tasks by default", async () => {
+    taskManager.registerJobOrTask(ServerTasks.SERVER_BOOT_TASK);
     await task.run();
+
+    expect(taskManager.isTaskDisabled(DITokens.bootTask)).toBeTruthy();
   });
 });

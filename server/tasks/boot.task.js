@@ -21,20 +21,20 @@ module.exports = class BootTask {
   influxDbSetupService;
 
   constructor({
-    loggerFactory,
-    serverSettingsService,
-    settingsStore,
-    multerService,
-    printersStore,
-    filesStore,
-    printerGroupsCache,
-    currentOperationsCache,
-    historyCache,
-    filamentCache,
-    roleService,
-    taskManagerService,
-    influxDbSetupService
-  }) {
+                loggerFactory,
+                serverSettingsService,
+                settingsStore,
+                multerService,
+                printersStore,
+                filesStore,
+                printerGroupsCache,
+                currentOperationsCache,
+                historyCache,
+                filamentCache,
+                roleService,
+                taskManagerService,
+                influxDbSetupService
+              }) {
     this.serverSettingsService = serverSettingsService;
     this.settingsStore = settingsStore;
     this.multerService = multerService;
@@ -63,12 +63,14 @@ module.exports = class BootTask {
       await this.migrateDatabase();
     } catch (e) {
       if (e instanceof MongooseError) {
-        if (e.message.includes("ECONNREFUSED")) {
-          this.#logger.error("Database connection timed-out. Retrying in 5000.");
+        // Tests should just continue
+        if (!e.message.includes("Can't call `openUri()` on an active connection with different connection strings.")) {
+          if (e.message.includes("ECONNREFUSED")) {
+            this.#logger.error("Database connection timed-out. Retrying in 5000.");
+          }
+          this.#taskManagerService.scheduleDisabledJob(DITokens.bootTask, false);
+          return;
         }
-
-        this.#taskManagerService.scheduleDisabledJob(DITokens.bootTask, false);
-        return;
       }
     }
 

@@ -7,7 +7,7 @@ const { ToadScheduler, SimpleIntervalJob, AsyncTask } = require("toad-scheduler"
  * Manage immediate or delayed tasks and recurring jobs.
  */
 class TaskManagerService {
-  jobScheduler = new ToadScheduler();
+  jobScheduler;
   taskStates = {};
 
   #container;
@@ -16,6 +16,7 @@ class TaskManagerService {
 
   constructor(container) {
     this.#container = container;
+    this.jobScheduler = new ToadScheduler();
   }
 
   validateInput(taskId, workload, schedulerOptions) {
@@ -114,17 +115,17 @@ class TaskManagerService {
    * Create a recurring job
    * Tip: use the options properties `runImmediately` and `seconds/milliseconds/minutes/hours/days`
    */
-  registerJobOrTask({ id: taskID, task: asyncTaskCallbackOrToken, preset: schedulerOptions }) {
+  registerJobOrTask({ id: taskId, task: asyncTaskCallbackOrToken, preset: schedulerOptions }) {
     try {
-      this.validateInput(taskID, asyncTaskCallbackOrToken, schedulerOptions);
+      this.validateInput(taskId, asyncTaskCallbackOrToken, schedulerOptions);
     } catch (e) {
       this.#logger.error(e.stack, schedulerOptions);
       return;
     }
 
-    const timedTask = this.getSafeTimedTask(taskID, asyncTaskCallbackOrToken);
+    const timedTask = this.getSafeTimedTask(taskId, asyncTaskCallbackOrToken);
 
-    this.taskStates[taskID] = {
+    this.taskStates[taskId] = {
       options: schedulerOptions,
       timedTask
     };
@@ -133,25 +134,25 @@ class TaskManagerService {
       timedTask.execute();
     } else if (schedulerOptions.runDelayed) {
       const delay = (schedulerOptions.milliseconds || 0) + (schedulerOptions.seconds || 0) * 1000;
-      this.runTimeoutTaskInstance(taskID, delay);
+      this.runTimeoutTaskInstance(taskId, delay);
     } else {
       // This must be 'periodic'
-      this.#scheduleEnabledPeriodicJob(taskID);
+      this.#scheduleEnabledPeriodicJob(taskId);
     }
   }
 
   /**
    * Enable the job which must be disabled at boot. Handy for conditional, heavy or long-running non-critical tasks
-   * @param taskID
+   * @param taskId
    * @param failIfEnabled throws when the job is already running
    */
-  scheduleDisabledJob(taskID, failIfEnabled = true) {
-    const taskState = this.getTaskState(taskID);
+  scheduleDisabledJob(taskId, failIfEnabled = true) {
+    const taskState = this.getTaskState(taskId);
     const schedulerOptions = taskState?.options;
     if (schedulerOptions?.disabled !== true) {
       if (failIfEnabled) {
         throw new JobValidationException(
-          `The requested task with ID ${taskID} was not explicitly disabled and must be running already.`
+          `The requested task with ID ${taskId} was not explicitly disabled and must be running already.`
         );
       }
       return;
@@ -159,64 +160,71 @@ class TaskManagerService {
 
     taskState.options.disabled = false;
 
-    this.#scheduleEnabledPeriodicJob(taskID);
+    this.#scheduleEnabledPeriodicJob(taskId);
   }
 
-  disableJob(taskID, failIfDisabled = true) {
-    if (this.isTaskDisabled(taskID)) {
+  disableJob(taskId, failIfDisabled = true) {
+    if (this.isTaskDisabled(taskId)) {
       if (failIfDisabled) {
         throw new JobValidationException("Cant disable a job which is already disabled");
       }
       return;
     }
 
-    const taskState = this.getTaskState(taskID);
+    const taskState = this.getTaskState(taskId);
     taskState.options.disabled = true;
     taskState.job.stop();
   }
 
-  isTaskDisabled(taskID) {
-    return !!this.getTaskState(taskID).options.disabled;
+  isTaskDisabled(taskId) {
+    return !!this.getTaskState(taskId).options.disabled;
   }
 
-  #scheduleEnabledPeriodicJob(taskID) {
-    const taskState = this.getTaskState(taskID);
+  deregisterTask(taskId) {
+    this.getTaskState(taskId);
+
+    delete this.taskStates[taskId];
+    this.jobScheduler.removeById(taskId);
+  }
+
+  #scheduleEnabledPeriodicJob(taskId) {
+    const taskState = this.getTaskState(taskId);
     if (!taskState?.timedTask || !taskState?.options) {
       throw new JobValidationException(
-        `The requested task with ID ${taskID} was not registered properly ('timedTask' or 'options' missing).`
+        `The requested task with ID ${taskId} was not registered properly ('timedTask' or 'options' missing).`
       );
     }
     const schedulerOptions = taskState?.options;
     const timedTask = taskState.timedTask;
     if (!schedulerOptions?.periodic) {
       throw new JobValidationException(
-        `The requested task with ID ${taskID} is not periodic and cannot be enabled.`
+        `The requested task with ID ${taskId} is not periodic and cannot be enabled.`
       );
     }
     if (!schedulerOptions.disabled) {
       this.#logger.info(
-        `Task '${taskID}' was scheduled (runImmediately: ${!!schedulerOptions.runImmediately}).`
+        `Task '${taskId}' was scheduled (runImmediately: ${!!schedulerOptions.runImmediately}).`
       );
       const job = new SimpleIntervalJob(schedulerOptions, timedTask);
       this.jobScheduler.addSimpleIntervalJob(job);
       taskState.job = job;
     } else {
-      this.#logger.info(`Task '${taskID}' was marked as disabled (deferred execution).`);
+      this.#logger.info(`Task '${taskId}' was marked as disabled (deferred execution).`);
     }
   }
 
-  getTaskState(taskID) {
-    const taskState = this.taskStates[taskID];
+  getTaskState(taskId) {
+    const taskState = this.taskStates[taskId];
     if (!taskState) {
-      throw new JobValidationException(`The requested task with ID ${taskID} was not registered`);
+      throw new JobValidationException(`The requested task with ID ${taskId} was not registered`);
     }
     return taskState;
   }
 
-  runTimeoutTaskInstance(taskID, timeoutMs) {
-    const taskState = this.getTaskState(taskID);
-    this.#logger.info(`Running delayed task ${taskID} in ${timeoutMs}ms`);
-    setTimeout(() => taskState.timedTask.execute(), timeoutMs, taskID);
+  runTimeoutTaskInstance(taskId, timeoutMs) {
+    const taskState = this.getTaskState(taskId);
+    this.#logger.info(`Running delayed task ${taskId} in ${timeoutMs}ms`);
+    setTimeout(() => taskState.timedTask.execute(), timeoutMs, taskId);
   }
 
   getSafeTimedTask(taskId, handler) {
