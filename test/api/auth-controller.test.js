@@ -30,7 +30,7 @@ describe("AuthController", () => {
     expectUnauthorizedResponse(response);
   });
 
-  test.skip("should authorize known credentials", async function () {
+  it("should authorize known credentials", async function () {
     const defaultPassword = "testpassword";
     const { username } = await createTestUser(defaultPassword);
     const response = await request.post(loginRoute).send({ username, password: defaultPassword });

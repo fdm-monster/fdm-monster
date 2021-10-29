@@ -3,6 +3,8 @@ const passport = require("passport");
 const Logger = require("../handlers/logger.js");
 const { NotImplementedException } = require("../exceptions/runtime.exceptions");
 const { AppConstants } = require("../server.constants");
+const User = require("../models/Auth/User");
+const bcrypt = require("bcryptjs");
 
 class AuthController {
   #settingsStore;
@@ -15,22 +17,17 @@ class AuthController {
     this.#userTokenService = userTokenService;
   }
 
-  async login(req, res, next) {
-    if (!req.body.remember_me) {
-      return next();
-    }
-
-    await this.#userTokenService.issueTokenWithDone(req.user, function (err, token) {
-      if (err) {
-        return next(err);
-      }
+  async login(req, res) {
+    if (req.body.remember_me) {
+      const token = await this.#userTokenService.issueTokenWithDone(req.user);
       res.cookie("remember_me", token, {
         path: "/",
         httpOnly: true,
         maxAge: 604800000
       });
-      return next();
-    });
+    }
+
+    return res.send();
   }
 
   logout(req, res) {
@@ -51,6 +48,7 @@ class AuthController {
 
 module.exports = createController(AuthController)
   .prefix(AppConstants.apiRoute + "/users")
+  .post("/create-test", "createTest")
   .post("/login", "login", {
     before: [passport.authenticate("local")]
   })

@@ -5,6 +5,13 @@ class NotImplementedException extends Error {
   }
 }
 
+class AuthenticationError extends Error {
+  constructor(error) {
+    super(error);
+    this.name = AuthenticationError.name;
+  }
+}
+
 class NotFoundException extends Error {
   constructor(message, path) {
     super(message);
@@ -40,6 +47,7 @@ class InternalServerException extends Error {
 module.exports = {
   NotImplementedException,
   NotFoundException,
+  AuthenticationError,
   InternalServerException,
   ExternalServiceError,
   ValidationException
