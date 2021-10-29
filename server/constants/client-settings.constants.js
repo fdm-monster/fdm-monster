@@ -22,11 +22,6 @@ function getDefaultDashboardSettings() {
   return {
     defaultLayout: getDefaultLayout(),
     savedLayout: [],
-    farmActivity: {
-      currentOperations: false,
-      cumulativeTimes: true,
-      averageTimes: true
-    },
     printerStates: {
       printerState: true,
       printerTemps: true,

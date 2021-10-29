@@ -42,7 +42,6 @@ const DITokens = {
   terminalLogsCache: "terminalLogsCache",
   jobsCache: "jobsCache",
   dashboardStatisticsCache: "dashboardCache",
-  currentOperationsCache: "currentOperationsCache",
   fileCache: "fileCache",
   fileUploadTrackerCache: "fileUploadTrackerCache",
   historyCache: "historyCache",

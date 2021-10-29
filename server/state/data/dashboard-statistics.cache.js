@@ -17,10 +17,8 @@ class DashboardStatisticsCache {
 
   #printersInformation; // stub
 
-  #currentOperationsCache;
   #historyCache;
-  constructor({ currentOperationsCache, historyCache }) {
-    this.#currentOperationsCache = currentOperationsCache;
+  constructor({ historyCache }) {
     this.#historyCache = historyCache;
   }
 
@@ -230,36 +228,6 @@ class DashboardStatisticsCache {
     const historyCache = this.#historyCache().getHistoryCache();
     let historyStats = historyCache.stats;
 
-    const currentOperations = this.#currentOperationsCache.getCurrentOperations();
-
-    this.#dashboardStatistics.currentUtilisation = [
-      {
-        data: [
-          currentOperations.count.active,
-          currentOperations.count.complete,
-          currentOperations.count.idle,
-          currentOperations.count.disconnected,
-          currentOperations.count.offline
-        ]
-      }
-    ];
-
-    const farmTotal =
-      currentOperations.count.active +
-      currentOperations.count.complete +
-      currentOperations.count.idle +
-      currentOperations.count.disconnected +
-      currentOperations.count.offline;
-    const activeTotal = currentOperations.count.active;
-    const offlineTotal = currentOperations.count.offline;
-    const idleTotal =
-      currentOperations.count.complete +
-      currentOperations.count.idle +
-      currentOperations.count.disconnected;
-    const activePer = (activeTotal / farmTotal) * 100;
-    const idlePer = (idleTotal / farmTotal) * 100;
-    const offlinePer = (offlineTotal / farmTotal) * 100;
-    this.#dashboardStatistics.currentStatus = [activePer, idlePer, offlinePer];
 
     const arrayEstimated = [];
     const arrayRemaining = [];
