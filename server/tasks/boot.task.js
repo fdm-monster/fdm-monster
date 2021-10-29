@@ -1,13 +1,13 @@
 const mongoose = require("mongoose");
-const { ServerTasks } = require("../tasks");
+
 const { fetchMongoDBConnectionString, runMigrations } = require("../server.env");
 const DITokens = require("../container.tokens");
 const MongooseError = require("mongoose/lib/error/mongooseError");
 
-module.exports = class BootTask {
+class BootTask {
   #logger;
   #taskManagerService;
-
+  #serverTasks;
   settingsStore;
   serverSettingsService;
   multerService;
@@ -21,20 +21,22 @@ module.exports = class BootTask {
   influxDbSetupService;
 
   constructor({
-                loggerFactory,
-                serverSettingsService,
-                settingsStore,
-                multerService,
-                printersStore,
-                filesStore,
-                printerGroupsCache,
-                currentOperationsCache,
-                historyCache,
-                filamentCache,
-                roleService,
-                taskManagerService,
-                influxDbSetupService
-              }) {
+    loggerFactory,
+    serverTasks,
+    serverSettingsService,
+    settingsStore,
+    multerService,
+    printersStore,
+    filesStore,
+    printerGroupsCache,
+    currentOperationsCache,
+    historyCache,
+    filamentCache,
+    roleService,
+    taskManagerService,
+    influxDbSetupService
+  }) {
+    this.#serverTasks = serverTasks;
     this.serverSettingsService = serverSettingsService;
     this.settingsStore = settingsStore;
     this.multerService = multerService;
@@ -52,7 +54,7 @@ module.exports = class BootTask {
 
   async runOnce() {
     // To cope with retries after failures we register this task - disabled
-    this.#taskManagerService.registerJobOrTask(ServerTasks.SERVER_BOOT_TASK);
+    this.#taskManagerService.registerJobOrTask(this.#serverTasks.SERVER_BOOT_TASK);
 
     await this.run(true);
   }
@@ -64,7 +66,11 @@ module.exports = class BootTask {
     } catch (e) {
       if (e instanceof MongooseError) {
         // Tests should just continue
-        if (!e.message.includes("Can't call `openUri()` on an active connection with different connection strings.")) {
+        if (
+          !e.message.includes(
+            "Can't call `openUri()` on an active connection with different connection strings."
+          )
+        ) {
           if (e.message.includes("ECONNREFUSED")) {
             this.#logger.error("Database connection timed-out. Retrying in 5000.");
           }
@@ -91,7 +97,7 @@ module.exports = class BootTask {
     await this.roleService.syncRoles();
 
     if (bootTaskScheduler && process.env.SAFEMODE_ENABLED !== "true") {
-      ServerTasks.BOOT_TASKS.forEach((task) => {
+      this.#serverTasks.BOOT_TASKS.forEach((task) => {
         this.#taskManagerService.registerJobOrTask(task);
       });
     } else {
@@ -115,4 +121,6 @@ module.exports = class BootTask {
   async migrateDatabase() {
     await runMigrations(mongoose.connection.db, mongoose.connection.getClient());
   }
-};
+}
+
+module.exports = BootTask;

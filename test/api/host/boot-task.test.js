@@ -1,10 +1,10 @@
 const dbHandler = require("../../db-handler");
 const { setupTestApp } = require("../../test-server");
 const DITokens = require("../../../server/container.tokens");
-const { ServerTasks } = require("../../../server/tasks");
 
 let container;
 let taskManager;
+let serverTasks;
 let task;
 
 beforeAll(async () => {
@@ -12,6 +12,7 @@ beforeAll(async () => {
   ({ container } = await setupTestApp(true));
   taskManager = container.resolve(DITokens.taskManagerService);
   task = container.resolve(DITokens.bootTask);
+  serverTasks = container.resolve(DITokens.serverTasks);
 });
 
 describe("BootTask", () => {
@@ -23,7 +24,7 @@ describe("BootTask", () => {
   });
 
   it("should skip running tasks by default", async () => {
-    taskManager.registerJobOrTask(ServerTasks.SERVER_BOOT_TASK);
+    taskManager.registerJobOrTask(serverTasks.SERVER_BOOT_TASK);
     await task.run();
 
     expect(taskManager.isTaskDisabled(DITokens.bootTask)).toBeTruthy();

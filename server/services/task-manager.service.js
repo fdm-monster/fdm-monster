@@ -1,7 +1,7 @@
-const Logger = require("../handlers/logger.js");
 const { AwilixResolutionError } = require("awilix");
 const { JobValidationException } = require("../exceptions/job.exceptions");
-const { ToadScheduler, SimpleIntervalJob, AsyncTask } = require("toad-scheduler");
+const { SimpleIntervalJob, AsyncTask } = require("toad-scheduler");
+const DITokens = require("../container.tokens");
 
 /**
  * Manage immediate or delayed tasks and recurring jobs.
@@ -12,11 +12,12 @@ class TaskManagerService {
 
   #container;
 
-  #logger = new Logger("Server-TaskManager");
+  #logger;
 
   constructor(container) {
     this.#container = container;
-    this.jobScheduler = new ToadScheduler();
+    this.#logger = container[DITokens.loggerFactory]("Server-TaskManager");
+    this.jobScheduler = container[DITokens.toadScheduler];
   }
 
   validateInput(taskId, workload, schedulerOptions) {
