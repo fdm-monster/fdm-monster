@@ -11,7 +11,12 @@ function getUserData(username = "tester", password = "testpassword") {
 
 async function ensureTestUserCreated(usernameIn, passwordIn) {
   const foundUser = await User.findOne({ username: usernameIn });
-  if (foundUser) return;
+  if (foundUser)
+    return {
+      id: foundUser.id,
+      username: foundUser.username,
+      name: foundUser.name
+    };
 
   const { name, username, password } = getUserData(usernameIn, passwordIn);
   const salt = await bcrypt.genSaltSync(10);
@@ -24,6 +29,7 @@ async function ensureTestUserCreated(usernameIn, passwordIn) {
   });
 
   return {
+    id: user.id,
     username: user.username,
     name: user.name
   };
