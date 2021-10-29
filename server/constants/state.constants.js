@@ -48,21 +48,6 @@ const OP_STATE = {
   UnknownState: "Unknown State ()" // Unknown State (...) needs proper parsing
 };
 
-// Handy model to understand state.flags
-const OP_STATE_FLAGS = {
-  operational: "operational",
-  printing: "printing",
-  cancelling: "cancelling",
-  pausing: "pausing",
-  resuming: "resuming",
-  finishing: "finishing",
-  closedOrError: "closedOrError",
-  error: "error",
-  paused: "paused",
-  ready: "ready",
-  sdReady: "sdReady"
-};
-
 // All states of the app. Nice to share between server and client
 const PSTATE = {
   Offline: "Offline",

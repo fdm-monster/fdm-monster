@@ -1,7 +1,6 @@
 const dbHandler = require("../../db-handler");
 const { configureContainer } = require("../../../server/container");
 const DITokens = require("../../../server/container.tokens");
-const { noSpoolOptionTemplate } = require("../../../server/constants/template.constants");
 
 let container;
 let filamentCache;
