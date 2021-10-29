@@ -18,8 +18,15 @@ class SettingsStore {
     this.#clientSettings = await this.#clientSettingsService.getOrCreate();
   }
 
-  isUserRegistrationEnabled() {
-    if (!this.#serverSettings) throw new InternalServerException("Could not check server settings (server settings not loaded");
+  setRegistrationEnabled(enabled = true) {
+    this.#serverSettings = this.#serverSettingsService.setRegistrationEnabled(enabled);
+  }
+
+  isRegistrationEnabled() {
+    if (!this.#serverSettings)
+      throw new InternalServerException(
+        "Could not check server settings (server settings not loaded"
+      );
     return this.#serverSettings.server.registration;
   }
 

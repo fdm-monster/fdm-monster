@@ -1,6 +1,6 @@
 const { createController } = require("awilix-express");
 const passport = require("passport");
-const { NotImplementedException, InternalServerException } = require("../exceptions/runtime.exceptions");
+const { InternalServerException } = require("../exceptions/runtime.exceptions");
 const { AppConstants } = require("../server.constants");
 const { validateMiddleware } = require("../handlers/validators");
 const { registerUserRules } = require("./validation/user-controller.validation");
@@ -9,13 +9,15 @@ class AuthController {
   #settingsStore;
   #userTokenService;
   #userService;
+  #roleService;
 
   #logger;
 
-  constructor({ settingsStore, userTokenService, userService, loggerFactory }) {
+  constructor({ settingsStore, userTokenService, userService, roleService, loggerFactory }) {
     this.#settingsStore = settingsStore;
     this.#userTokenService = userTokenService;
     this.#userService = userService;
+    this.#roleService = roleService;
     this.#logger = loggerFactory("Server-API");
   }
 
@@ -39,13 +41,14 @@ class AuthController {
   }
 
   async register(req, res) {
-    let registrationEnabled = this.#settingsStore.isUserRegistrationEnabled();
+    let registrationEnabled = this.#settingsStore.isRegistrationEnabled();
     if (!registrationEnabled) {
       throw new InternalServerException("Registration is disabled. Cant register user");
     }
-
     const { name, username, password } = await validateMiddleware(req, registerUserRules);
-    const result = await this.#userService.register({ name, username, password });
+
+    const roles = await this.#roleService.getDefaultRoles();
+    const result = await this.#userService.register({ name, username, password, roles });
 
     res.send(result);
   }

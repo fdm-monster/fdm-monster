@@ -4,11 +4,13 @@ const { setupTestApp } = require("../test-server");
 const {
   expectOkResponse,
   expectInvalidResponse,
-  expectUnauthorizedResponse
+  expectUnauthorizedResponse, expectInternalServerError
 } = require("../extensions");
-const { getUserData, createTestUser } = require("./test-data/create-user");
+const { getUserData, ensureTestUserCreated } = require("./test-data/create-user");
+const DITokens = require("../../server/container.tokens");
 
 let request;
+let container;
 
 const baseRoute = AppConstants.apiRoute + "/users";
 const loginRoute = `${baseRoute}/login`;
@@ -17,7 +19,7 @@ const logoutRoute = `${baseRoute}/logout`;
 
 beforeAll(async () => {
   await dbHandler.connect();
-  ({ request } = await setupTestApp(true));
+  ({ request, container } = await setupTestApp(true));
 });
 
 describe("AuthController", () => {
@@ -33,27 +35,32 @@ describe("AuthController", () => {
 
   it("should register new user", async () => {
     const password = "registeredPassword";
-    const { username, name } = getUserData(password);
+
+    const { username, name } = getUserData("default1", password);
     const response = await request.post(registerRoute).send({
       username,
       name,
       password,
-      password2: password,
-      roles: []
+      password2: password
     });
     expectOkResponse(response);
   });
 
+  it("should fail new user registration when server:registration is disabled", async () => {
+    await container.resolve(DITokens.settingsStore).setRegistrationEnabled(false);
+    const response = await request.post(registerRoute).send();
+    expectInternalServerError(response);
+  });
+
   it("should authorize known user", async () => {
     const password = "newPassword";
-    const { username } = await createTestUser(password);
+    const { username } = await ensureTestUserCreated("default", password);
     const response = await request.post(loginRoute).send({ username, password });
     expectOkResponse(response);
   });
 
   it("should succeed logout", async () => {
     const response = await request.post(logoutRoute).send();
-
     expectOkResponse(response);
   }, 10000);
 });

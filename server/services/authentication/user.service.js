@@ -13,7 +13,7 @@ class UserService {
   }
 
   async register(input) {
-    const { username, name, password, roles } = validateInput(input, registerUserRules);
+    const { username, name, password, roles } = await validateInput(input, registerUserRules);
 
     const salt = await bcrypt.genSaltSync(10);
     const hash = await bcrypt.hash(password, salt);
