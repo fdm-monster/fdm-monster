@@ -23,7 +23,6 @@ module.exports = function (passport, tokenService) {
 
   passport.use(
     new LocalStrategy({ usernameField: "username" }, (username, password, done) => {
-      // Match User in db
       User.findOne({ username })
         .then((user) => {
           if (!user) {

@@ -55,7 +55,7 @@ class AuthController {
 }
 
 module.exports = createController(AuthController)
-  .prefix(AppConstants.apiRoute + "/users")
+  .prefix(AppConstants.apiRoute + "/auth")
   .post("/register", "register")
   .post("/login", "login", {
     before: [passport.authenticate("local")]

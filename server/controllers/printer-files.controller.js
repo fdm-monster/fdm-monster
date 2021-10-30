@@ -15,7 +15,7 @@ const {
 const { ValidationException } = require("../exceptions/runtime.exceptions");
 const fs = require("fs");
 const { printerLoginToken, printerResolveMiddleware } = require("../middleware/printer");
-const { ROLES } = require("../constants/service.constants");
+const { ROLES } = require("../constants/authorization.constants");
 const { authorizeRoles } = require("../middleware/authenticate");
 
 class PrinterFilesController {

@@ -1,9 +1,15 @@
-const { ROLES } = require("../../constants/service.constants");
+const { ROLES } = require("../../constants/authorization.constants");
 const RoleModel = require("../../models/Auth/Role");
 const { NotFoundException } = require("../../exceptions/runtime.exceptions");
+const ObjectID = require("mongodb").ObjectID;
 
 class RoleService {
   #roles = [];
+  #logger;
+
+  constructor({ loggerFactory }) {
+    this.#logger = loggerFactory("RoleService");
+  }
 
   get roles() {
     return this.#roles;
@@ -16,6 +22,41 @@ class RoleService {
 
     const guestRole = await this.getRoleByName(ROLES.GUEST);
     return [guestRole.id];
+  }
+
+  #normalizeRole(assignedRole) {
+    if (ObjectID.isValid(assignedRole)) {
+      const roleInstance = this.roles.find((r) => r.id === assignedRole);
+      if (!roleInstance) {
+        console.warn(`The role by ID ${assignedRole} did not exist. Skipping.`);
+        return;
+      }
+      return roleInstance.name;
+    } else if (Object.values(ROLES).includes(assignedRole)) {
+      return assignedRole;
+    } else {
+      console.warn(`The role by Name ${assignedRole} did not exist in definition. Skipping.`);
+    }
+  }
+
+  authorizeRole(requiredRole, assignedRoles) {
+    return !!assignedRoles.find((ar) => {
+      const normalizedRole = this.#normalizeRole(ar);
+      if (!normalizedRole) return false;
+      return normalizedRole === requiredRole;
+    });
+  }
+
+  authorizeRoles(requiredRoles, assignedRoles, subset = true) {
+    let isAuthorized = false;
+
+    if (!requiredRoles?.length) return true;
+    requiredRoles.forEach((rr) => {
+      const result = this.authorizeRole(rr, assignedRoles);
+      isAuthorized = subset ? isAuthorized || result : isAuthorized && result;
+    });
+
+    return isAuthorized;
   }
 
   async getRoleByName(roleName) {
@@ -41,8 +82,7 @@ class RoleService {
           name: roleName
         });
         this.#roles.push(newRole);
-      }
-      else {
+      } else {
         this.#roles.push(storedRole);
       }
     }

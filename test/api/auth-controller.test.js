@@ -4,7 +4,8 @@ const { setupTestApp } = require("../test-server");
 const {
   expectOkResponse,
   expectInvalidResponse,
-  expectUnauthorizedResponse, expectInternalServerError
+  expectUnauthorizedResponse,
+  expectInternalServerError
 } = require("../extensions");
 const { getUserData, ensureTestUserCreated } = require("./test-data/create-user");
 const DITokens = require("../../server/container.tokens");
@@ -12,7 +13,7 @@ const DITokens = require("../../server/container.tokens");
 let request;
 let container;
 
-const baseRoute = AppConstants.apiRoute + "/users";
+const baseRoute = AppConstants.apiRoute + "/auth";
 const loginRoute = `${baseRoute}/login`;
 const registerRoute = `${baseRoute}/register`;
 const logoutRoute = `${baseRoute}/logout`;
