@@ -47,7 +47,7 @@ class LogsController {
 // prettier-ignore
 module.exports = createController(LogsController)
   .prefix(AppConstants.apiRoute + "/settings/logs")
-  .before([authenticate])
+  .before([authenticate()])
   .get("", "list")
   .get("/download/:name", "download")
   .put("/generate-log-dump", "generateLogDumpZip");

@@ -233,7 +233,7 @@ class PrinterFilesController {
 // prettier-ignore
 module.exports = createController(PrinterFilesController)
     .prefix(AppConstants.apiRoute + "/printer-files")
-    .before([authenticate, authorizeRoles([ROLES.OPERATOR, ROLES.ADMIN]), printerResolveMiddleware()])
+    .before([authenticate(), authorizeRoles([ROLES.OPERATOR, ROLES.ADMIN]), printerResolveMiddleware()])
     .post("/purge", "purgeIndexedFiles")
     .post("/stub-upload", "stubUploadFiles")
     .get("/tracked-uploads", "getTrackedUploads")

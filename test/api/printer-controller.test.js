@@ -1,5 +1,3 @@
-jest.mock("../../server/middleware/auth");
-
 const dbHandler = require("../db-handler");
 const { AppConstants } = require("../../server/server.constants");
 const { setupTestApp } = require("../test-server");
@@ -40,7 +38,7 @@ afterAll(async () => {
   return Model.deleteMany({});
 });
 
-describe("PrintersController", () => {
+describe("PrinterController", () => {
   it(`should not be able to POST ${createRoute} - invalid apiKey`, async () => {
     const response = await request.post(createRoute).send({
       settingsAppearance: null,

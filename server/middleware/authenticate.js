@@ -2,7 +2,7 @@ const DITokens = require("../container.tokens");
 const AuthenticationError = require("passport/lib/errors/authenticationerror");
 
 module.exports = {
-  async authenticate(req, res, next) {
+  authenticate: () => async (req, res, next) => {
     const settingsStore = req.container.resolve(DITokens.settingsStore);
     const serverSettings = settingsStore.getServerSettings();
 

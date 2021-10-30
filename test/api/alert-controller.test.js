@@ -1,5 +1,3 @@
-jest.mock("../../server/middleware/auth");
-
 const dbHandler = require("../db-handler");
 const { asValue } = require("awilix");
 const DITokens = require("../../server/container.tokens");

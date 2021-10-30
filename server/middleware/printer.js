@@ -5,7 +5,7 @@ const printerIdToken = "currentPrinterId";
 const currentPrinterToken = "currentPrinter";
 const printerLoginToken = "printerLogin";
 
-const printerMiddleware = () => {
+const printerResolveMiddleware = () => {
   return (req, res, next) => {
     const printersStore = req.container.resolve(DITokens.printersStore);
 
@@ -26,7 +26,7 @@ const printerMiddleware = () => {
 };
 
 module.exports = {
-  printerResolveMiddleware: printerMiddleware,
+  printerResolveMiddleware,
   currentPrinterToken,
   printerLoginToken,
   printerIdToken

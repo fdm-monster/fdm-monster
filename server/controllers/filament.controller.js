@@ -113,7 +113,7 @@ class FilamentController {
 // prettier-ignore
 module.exports = createController(FilamentController)
     .prefix(AppConstants.apiRoute + "/filament")
-    .before([authenticate])
+    .before([authenticate()])
     .get("/", "list")
     .post("/:id", "create")
     .patch("/:id", "update")

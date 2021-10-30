@@ -64,7 +64,7 @@ class AlertController {
 // prettier-ignore
 module.exports = createController(AlertController)
     .prefix(AppConstants.apiRoute + "/alert")
-    .before([authenticate])
+    .before([authenticate()])
     .get("/", "list")
     .post("/", "create")
     .put("/:id", "update")

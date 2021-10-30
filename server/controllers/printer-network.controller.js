@@ -23,6 +23,6 @@ class PrinterNetworkController {
 // prettier-ignore
 module.exports = createController(PrinterNetworkController)
   .prefix(AppConstants.apiRoute + "/printer-network")
-  .before([authenticate])
+  .before([authenticate()])
   .get("/scan-ssdp", "scanSsdp")
   .post("/wake-host", "wakeHost");

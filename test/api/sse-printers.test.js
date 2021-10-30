@@ -1,5 +1,3 @@
-jest.mock("../../server/middleware/auth");
-
 const EventSource = require("eventsource");
 const dbHandler = require("../db-handler");
 const getEndpoints = require("express-list-endpoints");
@@ -8,7 +6,7 @@ const DITokens = require("../../server/container.tokens");
 
 let request;
 let container;
-let server;
+let httpServer;
 let sseTask;
 const routeBase = "/api/printer/";
 const ssePath = "sse";

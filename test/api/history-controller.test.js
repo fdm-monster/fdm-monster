@@ -1,13 +1,7 @@
-jest.mock("../../server/middleware/auth");
-
 const dbHandler = require("../db-handler");
 const { AppConstants } = require("../../server/server.constants");
 const { setupTestApp } = require("../test-server");
-const {
-  expectInvalidResponse,
-  expectOkResponse,
-  expectNotFoundResponse
-} = require("../extensions");
+const { expectOkResponse, expectNotFoundResponse } = require("../extensions");
 const Printer = require("../../server/models/Printer");
 
 const defaultRoute = `${AppConstants.apiRoute}/history`;

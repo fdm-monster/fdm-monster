@@ -156,7 +156,7 @@ class HistoryController {
 // prettier-ignore
 module.exports = createController(HistoryController)
     .prefix(AppConstants.apiRoute + "/history")
-    .before([authenticate])
+    .before([authenticate()])
     .get("/", "getCache")
     .delete("/:id", "delete")
     .put("/:id", "update")

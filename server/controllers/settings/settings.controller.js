@@ -35,7 +35,7 @@ class SettingsController {
 // prettier-ignore
 module.exports = createController(SettingsController)
   .prefix(AppConstants.apiRoute + "/settings")
-  .before([authenticate])
+  .before([authenticate()])
   .get("/client", "getClientSettings")
   .put("/client", "updateClientSettings")
   .get("/server", "getServerSettings")

@@ -71,6 +71,6 @@ class PrinterSettingsController {
 // prettier-ignore
 module.exports = createController(PrinterSettingsController)
     .prefix(AppConstants.apiRoute + "/printer-settings")
-    .before([authenticate])
+    .before([authenticate()])
     .get("/:id", "get")
     .post("/:id/gcode-analysis", "setGCodeAnalysis");

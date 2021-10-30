@@ -15,7 +15,7 @@ class PrinterGroupController {
     this.#printerService = printerService;
     this.#printerGroupService = printerGroupService;
     this.#printerGroupsCache = printerGroupsCache;
-    this.#logger = loggerFactory(PrinterGroupController.name);
+    this.#logger = loggerFactory("Server-API");
   }
 
   async create(req, res) {
@@ -96,7 +96,7 @@ class PrinterGroupController {
 // prettier-ignore
 module.exports = createController(PrinterGroupController)
     .prefix(AppConstants.apiRoute + "/printer-group")
-    .before([authenticate])
+    .before([authenticate()])
     .get("/", "list")
     .get("/:id", "get")
     .patch("/:id/name", "updateName")

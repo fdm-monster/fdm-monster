@@ -60,7 +60,7 @@ class ServerCommandsController {
 // prettier-ignore
 module.exports = createController(ServerCommandsController)
   .prefix(AppConstants.apiRoute + "/settings/server")
-  .before([authenticate])
+  .before([authenticate()])
   .get("/update/check", "checkUpdate")
   .post("/update/server", "updateServer")
   .patch("/restart", "restartServer");
