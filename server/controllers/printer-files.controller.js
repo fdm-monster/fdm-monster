@@ -1,4 +1,4 @@
-const { ensureAuthenticated } = require("../middleware/auth");
+const { authenticate } = require("../middleware/authenticate");
 const { createController } = require("awilix-express");
 const { validateInput, getScopedPrinter, validateMiddleware } = require("../handlers/validators");
 const { AppConstants } = require("../server.constants");
@@ -15,6 +15,8 @@ const {
 const { ValidationException } = require("../exceptions/runtime.exceptions");
 const fs = require("fs");
 const { printerLoginToken, printerResolveMiddleware } = require("../middleware/printer");
+const { ROLES } = require("../constants/service.constants");
+const { authorizeRoles } = require("../middleware/authenticate");
 
 class PrinterFilesController {
   #filesStore;
@@ -231,7 +233,7 @@ class PrinterFilesController {
 // prettier-ignore
 module.exports = createController(PrinterFilesController)
     .prefix(AppConstants.apiRoute + "/printer-files")
-    .before([ensureAuthenticated, printerResolveMiddleware()])
+    .before([authenticate, authorizeRoles([ROLES.OPERATOR, ROLES.ADMIN]), printerResolveMiddleware()])
     .post("/purge", "purgeIndexedFiles")
     .post("/stub-upload", "stubUploadFiles")
     .get("/tracked-uploads", "getTrackedUploads")

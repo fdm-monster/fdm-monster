@@ -12,6 +12,8 @@ class UserService {
     return user;
   }
 
+  async getUserRoles(userId) {}
+
   async register(input) {
     const { username, name, password, roles } = await validateInput(input, registerUserRules);
 

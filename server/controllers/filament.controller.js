@@ -1,6 +1,6 @@
 const _ = require("lodash");
 const { createController } = require("awilix-express");
-const { ensureAuthenticated } = require("../middleware/auth");
+const { authenticate } = require("../middleware/authenticate");
 const Filament = require("../models/Filament");
 const { AppConstants } = require("../server.constants");
 const { validateMiddleware } = require("../handlers/validators");
@@ -113,7 +113,7 @@ class FilamentController {
 // prettier-ignore
 module.exports = createController(FilamentController)
     .prefix(AppConstants.apiRoute + "/filament")
-    .before([ensureAuthenticated])
+    .before([authenticate])
     .get("/", "list")
     .post("/:id", "create")
     .patch("/:id", "update")

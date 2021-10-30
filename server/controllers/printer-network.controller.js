@@ -1,4 +1,4 @@
-const { ensureAuthenticated } = require("../middleware/auth");
+const { authenticate } = require("../middleware/authenticate");
 const { createController } = require("awilix-express");
 const Logger = require("../handlers/logger.js");
 const { AppConstants } = require("../server.constants");
@@ -23,6 +23,6 @@ class PrinterNetworkController {
 // prettier-ignore
 module.exports = createController(PrinterNetworkController)
   .prefix(AppConstants.apiRoute + "/printer-network")
-  .before([ensureAuthenticated])
+  .before([authenticate])
   .get("/scan-ssdp", "scanSsdp")
   .post("/wake-host", "wakeHost");

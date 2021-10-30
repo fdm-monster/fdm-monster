@@ -1,4 +1,4 @@
-const { ensureAuthenticated } = require("../middleware/auth");
+const { authenticate } = require("../middleware/authenticate");
 const { createController } = require("awilix-express");
 const { AppConstants } = require("../server.constants");
 const { validateInput } = require("../handlers/validators");
@@ -96,7 +96,7 @@ class PrinterGroupController {
 // prettier-ignore
 module.exports = createController(PrinterGroupController)
     .prefix(AppConstants.apiRoute + "/printer-group")
-    .before([ensureAuthenticated])
+    .before([authenticate])
     .get("/", "list")
     .get("/:id", "get")
     .patch("/:id/name", "updateName")

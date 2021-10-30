@@ -1,4 +1,4 @@
-const { ensureAuthenticated } = require("../middleware/auth");
+const { authenticate } = require("../middleware/authenticate");
 const { createController } = require("awilix-express");
 const { validateInput } = require("../handlers/validators");
 const { AppConstants } = require("../server.constants");
@@ -71,6 +71,6 @@ class PrinterSettingsController {
 // prettier-ignore
 module.exports = createController(PrinterSettingsController)
     .prefix(AppConstants.apiRoute + "/printer-settings")
-    .before([ensureAuthenticated])
+    .before([authenticate])
     .get("/:id", "get")
     .post("/:id/gcode-analysis", "setGCodeAnalysis");

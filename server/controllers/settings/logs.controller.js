@@ -1,19 +1,19 @@
 const { createController } = require("awilix-express");
-const { ensureAuthenticated } = require("../../middleware/auth");
-const Logger = require("../../handlers/logger.js");
+const { authenticate } = require("../../middleware/authenticate");
 const { AppConstants } = require("../../server.constants");
 
 class LogsController {
-  #logger = new Logger("Server-API");
+  #logger;
 
   #serverLogsService;
 
-  constructor({ serverLogsService }) {
+  constructor({ serverLogsService, loggerFactory }) {
     this.#serverLogsService = serverLogsService;
+    this.#logger = loggerFactory("Server-API");
   }
 
   async list(req, res) {
-    const serverLogs = await this.#serverLogsService.grabLogs();
+    const serverLogs = await this.#serverLogsService.collectLogFiles();
     res.send(serverLogs);
   }
 
@@ -47,7 +47,7 @@ class LogsController {
 // prettier-ignore
 module.exports = createController(LogsController)
   .prefix(AppConstants.apiRoute + "/settings/logs")
-  .before([ensureAuthenticated])
+  .before([authenticate])
   .get("", "list")
   .get("/download/:name", "download")
   .put("/generate-log-dump", "generateLogDumpZip");

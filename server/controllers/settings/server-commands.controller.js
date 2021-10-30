@@ -1,5 +1,5 @@
 const { createController } = require("awilix-express");
-const { ensureAuthenticated } = require("../../middleware/auth");
+const { authenticate } = require("../../middleware/authenticate");
 const Logger = require("../../handlers/logger.js");
 const { AppConstants } = require("../../server.constants");
 
@@ -60,7 +60,7 @@ class ServerCommandsController {
 // prettier-ignore
 module.exports = createController(ServerCommandsController)
   .prefix(AppConstants.apiRoute + "/settings/server")
-  .before([ensureAuthenticated])
+  .before([authenticate])
   .get("/update/check", "checkUpdate")
   .post("/update/server", "updateServer")
   .patch("/restart", "restartServer");

@@ -1,5 +1,5 @@
 const { createController } = require("awilix-express");
-const { ensureAuthenticated } = require("../../middleware/auth");
+const { authenticate } = require("../../middleware/authenticate");
 const Logger = require("../../handlers/logger.js");
 const { AppConstants } = require("../../server.constants");
 
@@ -35,7 +35,7 @@ class SettingsController {
 // prettier-ignore
 module.exports = createController(SettingsController)
   .prefix(AppConstants.apiRoute + "/settings")
-  .before([ensureAuthenticated])
+  .before([authenticate])
   .get("/client", "getClientSettings")
   .put("/client", "updateClientSettings")
   .get("/server", "getServerSettings")

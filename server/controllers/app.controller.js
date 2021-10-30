@@ -2,7 +2,6 @@ const { createController } = require("awilix-express");
 const { AppConstants } = require("../server.constants");
 const isDocker = require("is-docker");
 const { isNodemon, isNode, isPm2 } = require("../utils/env.utils");
-const { ensureCurrentUserAndGroup } = require("../middleware/users");
 
 class AppController {
   #serverVersion;
@@ -55,7 +54,7 @@ class AppController {
 // prettier-ignore
 module.exports = createController(AppController)
     .prefix(AppConstants.apiRoute + "/")
-    .before([ensureCurrentUserAndGroup])
+    .before([])
     //.get("wizard, "wizard")
     .get("", "welcome")
     .get("version", "getVersion");

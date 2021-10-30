@@ -1,5 +1,5 @@
 const { createController } = require("awilix-express");
-const { ensureAuthenticated } = require("../middleware/auth");
+const { authenticate } = require("../middleware/authenticate");
 const { AppConstants } = require("../server.constants");
 const { validateInput } = require("../handlers/validators");
 const { idRules } = require("./validation/generic.validation");
@@ -156,7 +156,7 @@ class HistoryController {
 // prettier-ignore
 module.exports = createController(HistoryController)
     .prefix(AppConstants.apiRoute + "/history")
-    .before([ensureAuthenticated])
+    .before([authenticate])
     .get("/", "getCache")
     .delete("/:id", "delete")
     .put("/:id", "update")

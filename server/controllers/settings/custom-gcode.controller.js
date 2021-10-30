@@ -1,19 +1,15 @@
 const CustomGcode = require("../../models/CustomGcode");
 const { createController } = require("awilix-express");
-const { ensureAuthenticated } = require("../../middleware/auth");
-const Logger = require("../../handlers/logger.js");
+const { authenticate } = require("../../middleware/authenticate");
 const { AppConstants } = require("../../server.constants");
 
 class CustomGcodeController {
-  #logger = new Logger("Server-API");
-  #serverVersion;
+  #logger;
   #settingsStore;
-  #serverPageTitle;
 
-  constructor({ settingsStore, serverVersion, serverPageTitle }) {
+  constructor({ settingsStore, loggerFactory }) {
     this.#settingsStore = settingsStore;
-    this.#serverVersion = serverVersion;
-    this.#serverPageTitle = serverPageTitle;
+    this.#logger = loggerFactory("Server-API");
   }
 
   deleteGcode(req, res) {
@@ -54,9 +50,9 @@ class CustomGcodeController {
 
 // prettier-ignore
 module.exports = createController(CustomGcodeController)
-  .prefix(AppConstants.apiRoute + "/settings/custom-gcode")
-  .before([ensureAuthenticated])
-  .delete("/delete/:id", "deleteGcode")
-  .get("/", "list")
-  .post("/edit", "edit")
-  .post("/create", "create");
+    .prefix(AppConstants.apiRoute + "/settings/custom-gcode")
+    .before([authenticate])
+    .delete("/delete/:id", "deleteGcode")
+    .get("/", "list")
+    .post("/edit", "edit")
+    .post("/create", "create");
