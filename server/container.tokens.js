@@ -29,6 +29,7 @@ const DITokens = {
   printerFilesService: "printerFilesService",
   alertService: "alertService",
   scriptService: "scriptService",
+  customGCodeService: "customGCodeService",
   autoDiscoveryService: "autoDiscoveryService",
   historyService: "historyService",
   // Stores/states

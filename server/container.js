@@ -58,6 +58,7 @@ const { ToadScheduler } = require("toad-scheduler");
 const { ServerTasks } = require("./tasks");
 const PermissionService = require("./services/authentication/permission.service");
 const { ROLES } = require("./constants/authorization.constants");
+const CustomGCodeService = require("./services/custom-gcode.service");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -129,6 +130,7 @@ function configureContainer() {
     // Extensibility and export
     [DITokens.alertService]: asClass(AlertService),
     [DITokens.scriptService]: asClass(ScriptService),
+    [DITokens.customGCodeService]: asClass(CustomGCodeService),
     [DITokens.influxDbSetupService]: asClass(InfluxDbSetupService).singleton(),
     [DITokens.influxDbFilamentService]: asClass(InfluxDbFilamentService),
     [DITokens.influxDbHistoryService]: asClass(InfluxDbHistoryService),

@@ -30,9 +30,7 @@ class PrinterService {
     const printer = await PrinterModel.findOne(filter);
 
     if (!printer) {
-      throw new NotFoundException(
-        `The printer ID '${printerId}' is not an existing printer. This is a bug.`
-      );
+      throw new NotFoundException(`The printer ID '${printerId}' is not an existing printer.`);
     }
 
     return printer;

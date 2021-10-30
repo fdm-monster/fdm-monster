@@ -2,57 +2,48 @@ const { createController } = require("awilix-express");
 const { authenticate, authorizeRoles } = require("../middleware/authenticate");
 const { AppConstants } = require("../server.constants");
 const { ROLES } = require("../constants/authorization.constants");
+const { validateMiddleware, validateInput } = require("../handlers/validators");
+const { idRules } = require("./validation/generic.validation");
 
 class CustomGCodeController {
   #logger;
   #settingsStore;
+  #customGCodeService;
 
-  constructor({ settingsStore, loggerFactory }) {
+  constructor({ settingsStore, customGCodeService, loggerFactory }) {
     this.#settingsStore = settingsStore;
+    this.#customGCodeService = customGCodeService;
     this.#logger = loggerFactory("Server-API");
   }
 
-  deleteGcode(req, res) {
-    const scriptId = req.params.id;
-    CustomGcode.findByIdAndDelete(scriptId, function (err) {
-      if (err) {
-        res.send(err);
-      } else {
-        res.send(scriptId);
-      }
-    });
-  }
-
   async list(req, res) {
-    const all = await CustomGcode.find();
-    res.send(all);
+    const allScripts = await this.#customGCodeService.list();
+    res.send(allScripts);
   }
 
   async create(req, res) {
-    let newScript = req.body;
-    const saveScript = new CustomGcode(newScript);
-    await saveScript
-      .save()
-      .then(res.send(saveScript))
-      .catch((e) => res.send(e));
+    const createdScript = await this.#customGCodeService.create(req.body);
+    res.send(createdScript);
   }
 
-  async edit(req, res) {
-    const newObj = req.body;
-    let script = await CustomGcode.findById(newObj.id);
-    script.gcode = newObj.gcode;
-    script.name = newObj.name;
-    script.description = newObj.description;
-    script.save();
-    res.send(script);
+  async delete(req, res) {
+    const { id } = validateInput(req.params, idRules);
+    await this.#customGCodeService.delete(id);
+    res.send();
+  }
+
+  async update(req, res) {
+    const { id } = validateInput(req.params, idRules);
+    const createdScript = await this.#customGCodeService.update(id, req.body);
+    res.send(createdScript);
   }
 }
 
 // prettier-ignore
 module.exports = createController(CustomGCodeController)
-    .prefix(AppConstants.apiRoute + "/settings/custom-gcode")
+    .prefix(`${ AppConstants.apiRoute }/custom-gcode`)
     .before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR])])
-    .delete("/delete/:id", "deleteGcode")
     .get("/", "list")
-    .post("/edit", "edit")
-    .post("/create", "create");
+    .post("/", "create")
+    .delete("/:id", "delete")
+    .put("/:id", "update");
