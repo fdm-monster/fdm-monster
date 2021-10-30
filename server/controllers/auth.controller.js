@@ -47,7 +47,7 @@ class AuthController {
     }
     const { name, username, password } = await validateMiddleware(req, registerUserRules);
 
-    const roles = await this.#roleService.getDefaultRoles();
+    const roles = await this.#roleService.getDefaultRolesId();
     const result = await this.#userService.register({ name, username, password, roles });
 
     res.send(result);
@@ -55,7 +55,7 @@ class AuthController {
 }
 
 module.exports = createController(AuthController)
-  .prefix(AppConstants.apiRoute + "/users")
+  .prefix(AppConstants.apiRoute + "/auth")
   .post("/register", "register")
   .post("/login", "login", {
     before: [passport.authenticate("local")]

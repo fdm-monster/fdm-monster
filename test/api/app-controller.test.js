@@ -1,5 +1,3 @@
-jest.mock("../../server/middleware/auth");
-
 const dbHandler = require("../db-handler");
 const { AppConstants } = require("../../server/server.constants");
 const { setupTestApp } = require("../test-server");

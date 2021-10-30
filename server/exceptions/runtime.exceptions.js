@@ -12,6 +12,13 @@ class AuthenticationError extends Error {
   }
 }
 
+class AuthorizationError extends Error {
+  constructor(criterium) {
+    super(`Authorization failed ${criterium.toString()}`);
+    this.name = AuthorizationError.name;
+  }
+}
+
 class NotFoundException extends Error {
   constructor(message, path) {
     super(message);
@@ -48,6 +55,7 @@ module.exports = {
   NotImplementedException,
   NotFoundException,
   AuthenticationError,
+  AuthorizationError,
   InternalServerException,
   ExternalServiceError,
   ValidationException

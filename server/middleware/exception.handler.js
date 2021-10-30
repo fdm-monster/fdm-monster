@@ -2,7 +2,9 @@ const {
   ValidationException,
   NotFoundException,
   InternalServerException,
-  ExternalServiceError
+  ExternalServiceError,
+  AuthenticationError,
+  AuthorizationError
 } = require("../exceptions/runtime.exceptions");
 const { AppConstants } = require("../server.constants");
 
@@ -19,6 +21,14 @@ function exceptionHandler(err, req, res, next) {
       type: "axios-error",
       data: err.response?.data
     });
+  }
+  if (err instanceof AuthenticationError) {
+    const code = err.statusCode || 401;
+    return res.status(code).send({ error: err.message });
+  }
+  if (err instanceof AuthorizationError) {
+    const code = err.statusCode || 403;
+    return res.status(code).send({ error: err.message });
   }
   if (err instanceof NotFoundException) {
     const code = err.statusCode || 404;

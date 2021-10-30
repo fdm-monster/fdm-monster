@@ -56,6 +56,9 @@ const UserService = require("./services/authentication/user.service");
 const RoleService = require("./services/authentication/role.service");
 const { ToadScheduler } = require("toad-scheduler");
 const { ServerTasks } = require("./tasks");
+const PermissionService = require("./services/authentication/permission.service");
+const { ROLES } = require("./constants/authorization.constants");
+const CustomGCodeService = require("./services/custom-gcode.service");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -70,6 +73,7 @@ function configureContainer() {
     ),
     serverPageTitle: asValue(process.env[AppConstants.SERVER_SITE_TITLE_KEY]),
     [DITokens.serverTasks]: asValue(ServerTasks),
+    [DITokens.defaultRole]: asValue([ROLES.GUEST]),
 
     // -- asFunction --
     [DITokens.printerStateFactory]: asFunction(PrinterStateFactory).transient(), // Factory function, transient on purpose!
@@ -82,6 +86,7 @@ function configureContainer() {
     [DITokens.userTokenService]: asClass(UserTokenService).singleton(),
     [DITokens.userService]: asClass(UserService),
     [DITokens.roleService]: asClass(RoleService).singleton(), // caches roles
+    [DITokens.permissionService]: asClass(PermissionService).singleton(),
 
     [DITokens.loggerFactory]: asFunction(LoggerFactory).transient(),
     [DITokens.taskManagerService]: asClass(TaskManagerService).singleton(),
@@ -125,6 +130,7 @@ function configureContainer() {
     // Extensibility and export
     [DITokens.alertService]: asClass(AlertService),
     [DITokens.scriptService]: asClass(ScriptService),
+    [DITokens.customGCodeService]: asClass(CustomGCodeService),
     [DITokens.influxDbSetupService]: asClass(InfluxDbSetupService).singleton(),
     [DITokens.influxDbFilamentService]: asClass(InfluxDbFilamentService),
     [DITokens.influxDbHistoryService]: asClass(InfluxDbHistoryService),

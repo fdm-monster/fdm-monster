@@ -7,6 +7,12 @@ export class ApiController {
   constructor(private readonly apiService: ApiService) {}
 
   @Public()
+  @Get()
+  apiStatus() {
+    return { status: "up" };
+  }
+
+  @Public()
   @Get("check-database")
   checkDatabaseConnected() {
     return this.apiService.isDatabaseConnected();

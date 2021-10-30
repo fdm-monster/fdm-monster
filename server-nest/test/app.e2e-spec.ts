@@ -23,10 +23,7 @@ describe("AppController (e2e)", () => {
   });
 
   it("/ (GET) - redirect to login", () => {
-    return request(app.getHttpServer())
-      .get("/")
-      .expect(302)
-      .expect("Location", /auth\/login/);
+    return request(app.getHttpServer()).get("/api").expect(200);
   });
 
   it("/health (GET)", () => {

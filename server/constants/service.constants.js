@@ -1,9 +1,3 @@
-const ROLES = {
-  ADMIN: "ADMIN",
-  OPERATOR: "OPERATOR",
-  GUEST: "GUEST"
-};
-
 /**
  * Default model properties for history entries saved to database
  * @returns {{fileName: string, notes: string, endDate: string, spoolUsed: string, success: boolean, filePath: string, printerName: string, printerIndex: number, filamentLength: number, startDate: string, printTime: string, filamentVolume: number}}
@@ -126,6 +120,5 @@ module.exports = {
   getDefaultPrinterEntry,
   UUID_LENGTH,
   minPrinterGroupNameLength,
-  Status,
-  ROLES
+  Status
 };

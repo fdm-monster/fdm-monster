@@ -16,6 +16,7 @@ class BootTask {
   printerGroupsCache;
   historyCache;
   filamentCache;
+  permissionService;
   roleService;
   influxDbSetupService;
 
@@ -30,6 +31,7 @@ class BootTask {
     printerGroupsCache,
     historyCache,
     filamentCache,
+    permissionService,
     roleService,
     taskManagerService,
     influxDbSetupService
@@ -43,6 +45,7 @@ class BootTask {
     this.printerGroupsCache = printerGroupsCache;
     this.historyCache = historyCache;
     this.filamentCache = filamentCache;
+    this.permissionService = permissionService;
     this.roleService = roleService;
     this.#taskManagerService = taskManagerService;
     this.influxDbSetupService = influxDbSetupService;
@@ -89,7 +92,8 @@ class BootTask {
     await this.filamentCache.initCache();
     await this.influxDbSetupService.optionalInfluxDatabaseSetup();
 
-    this.#logger.info("Synchronizing user roles definition");
+    this.#logger.info("Synchronizing user permission and roles definition");
+    await this.permissionService.syncPermissions();
     await this.roleService.syncRoles();
 
     if (bootTaskScheduler && process.env.SAFEMODE_ENABLED !== "true") {

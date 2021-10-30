@@ -1,4 +1,4 @@
-const { ensureAuthenticated } = require("../middleware/auth");
+const { authenticate, authorizeRoles } = require("../middleware/authenticate");
 const { createController } = require("awilix-express");
 const { validateMiddleware, getScopedPrinter } = require("../handlers/validators");
 const {
@@ -15,6 +15,7 @@ const DITokens = require("../container.tokens");
 const { Status, getSettingsAppearanceDefault } = require("../constants/service.constants");
 const { printerResolveMiddleware } = require("../middleware/printer");
 const { generateCorrelationToken } = require("../utils/correlation-token.util");
+const { ROLES } = require("../constants/authorization.constants");
 
 class PrinterController {
   #printersStore;
@@ -293,7 +294,7 @@ class PrinterController {
 // prettier-ignore
 module.exports = createController(PrinterController)
     .prefix(AppConstants.apiRoute + "/printer")
-    .before([ensureAuthenticated, printerResolveMiddleware()])
+    .before([authenticate(), authorizeRoles([ROLES.OPERATOR, ROLES.ADMIN]), printerResolveMiddleware()])
     .get("/", "list")
     .get("/sse", "sse")
     .post("/", "create")

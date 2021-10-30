@@ -1,30 +1,19 @@
-jest.mock("../../server/middleware/auth");
-
 const EventSource = require("eventsource");
 const dbHandler = require("../db-handler");
-const getEndpoints = require("express-list-endpoints");
 const { setupTestApp } = require("../test-server");
 const DITokens = require("../../server/container.tokens");
 
 let request;
 let container;
-let server;
 let sseTask;
 const routeBase = "/api/printer/";
 const ssePath = "sse";
 
 beforeAll(async () => {
   await dbHandler.connect();
-  ({ request, container, httpServer } = await setupTestApp(true));
+  ({ request, container } = await setupTestApp(true));
 
   sseTask = container.resolve(DITokens.printerSseTask);
-
-  const endpoints = getEndpoints(httpServer);
-  expect(endpoints).toContainEqual({
-    methods: ["GET"],
-    middlewares: ["anonymous", "anonymous", "memberInvoker"],
-    path: routeBase + ssePath
-  });
 });
 
 describe("SSE-printers", () => {

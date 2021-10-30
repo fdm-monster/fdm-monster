@@ -1,5 +1,5 @@
 const { createController } = require("awilix-express");
-const { ensureAuthenticated } = require("../middleware/auth");
+const { authenticate, withPermission } = require("../middleware/authenticate");
 const { AppConstants } = require("../server.constants");
 const { validateInput } = require("../handlers/validators");
 const { idRules } = require("./validation/generic.validation");
@@ -8,21 +8,18 @@ const {
   createAlertRules,
   updateAlertRules
 } = require("./validation/alert-controller.validation");
-const Logger = require("../handlers/logger.js");
+const { PERMS } = require("../constants/authorization.constants");
 
 class AlertController {
-  #serverVersion;
-  #serverPageTitle;
   #settingsStore;
   #alertService;
   #scriptService;
 
-  logger = new Logger("Server-API");
+  #logger;
 
-  constructor({ settingsStore, serverVersion, alertService, scriptService, serverPageTitle }) {
+  constructor({ settingsStore, alertService, scriptService, loggerFactory }) {
     this.#settingsStore = settingsStore;
-    this.#serverVersion = serverVersion;
-    this.#serverPageTitle = serverPageTitle;
+    this.#logger = loggerFactory("Server-API");
     this.#alertService = alertService;
     this.#scriptService = scriptService;
   }
@@ -68,9 +65,9 @@ class AlertController {
 // prettier-ignore
 module.exports = createController(AlertController)
     .prefix(AppConstants.apiRoute + "/alert")
-    .before([ensureAuthenticated])
+    .before([authenticate()])
     .get("/", "list")
     .post("/", "create")
     .put("/:id", "update")
     .delete("/:id", "delete")
-    .post("/test-alert-script", "testAlertScript");
+    .post("/test-alert-script", "testAlertScript", withPermission(PERMS.Alerts.Test));

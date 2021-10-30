@@ -1,4 +1,7 @@
 const DITokens = {
+  // Values
+  defaultRole: "defaultRole",
+  // Instances
   serverHost: "serverHost",
   loggerFactory: "loggerFactory",
   httpClient: "httpClient",
@@ -15,6 +18,7 @@ const DITokens = {
   githubApiService: "githubApiService",
   userTokenService: "userTokenService",
   userService: "userService",
+  permissionService: "permissionService",
   roleService: "roleService",
   octoPrintApiService: "octoPrintApiService",
   influxDbSetupService: "influxDbSetupService",
@@ -25,6 +29,7 @@ const DITokens = {
   printerFilesService: "printerFilesService",
   alertService: "alertService",
   scriptService: "scriptService",
+  customGCodeService: "customGCodeService",
   autoDiscoveryService: "autoDiscoveryService",
   historyService: "historyService",
   // Stores/states

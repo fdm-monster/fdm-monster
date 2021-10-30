@@ -1,10 +1,11 @@
 const _ = require("lodash");
 const { createController } = require("awilix-express");
-const { ensureAuthenticated } = require("../middleware/auth");
+const { authenticate, authorizeRoles } = require("../middleware/authenticate");
 const Filament = require("../models/Filament");
 const { AppConstants } = require("../server.constants");
 const { validateMiddleware } = require("../handlers/validators");
 const { idRules } = require("./validation/generic.validation");
+const { ROLES } = require("../constants/authorization.constants");
 
 class FilamentController {
   #settingsStore;
@@ -113,7 +114,7 @@ class FilamentController {
 // prettier-ignore
 module.exports = createController(FilamentController)
     .prefix(AppConstants.apiRoute + "/filament")
-    .before([ensureAuthenticated])
+    .before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR])])
     .get("/", "list")
     .post("/:id", "create")
     .patch("/:id", "update")

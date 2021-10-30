@@ -1,4 +1,4 @@
-const { ensureAuthenticated } = require("../middleware/auth");
+const { authenticate, withPermission } = require("../middleware/authenticate");
 const { createController } = require("awilix-express");
 const { validateInput, getScopedPrinter, validateMiddleware } = require("../handlers/validators");
 const { AppConstants } = require("../server.constants");
@@ -15,6 +15,8 @@ const {
 const { ValidationException } = require("../exceptions/runtime.exceptions");
 const fs = require("fs");
 const { printerLoginToken, printerResolveMiddleware } = require("../middleware/printer");
+const { ROLES, PERMS } = require("../constants/authorization.constants");
+const { authorizeRoles } = require("../middleware/authenticate");
 
 class PrinterFilesController {
   #filesStore;
@@ -231,16 +233,16 @@ class PrinterFilesController {
 // prettier-ignore
 module.exports = createController(PrinterFilesController)
     .prefix(AppConstants.apiRoute + "/printer-files")
-    .before([ensureAuthenticated, printerResolveMiddleware()])
-    .post("/purge", "purgeIndexedFiles")
-    .post("/stub-upload", "stubUploadFiles")
-    .get("/tracked-uploads", "getTrackedUploads")
-    .get("/:id", "getFiles")
-    .get("/:id/cache", "getFilesCache")
-    .delete("/:id", "deleteFileOrFolder")
-    .post("/:id/local-upload", "localUploadFile")
-    .post("/:id/upload", "uploadFile")
-    .post("/:id/create-folder", "createFolder")
-    .post("/:id/select", "selectAndPrintFile")
-    .post("/:id/move", "moveFileOrFolder")
-    .delete("/:id/clear", "clearPrinterFiles");
+    .before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR]), printerResolveMiddleware()])
+    .post("/purge", "purgeIndexedFiles",withPermission(PERMS.PrinterFiles.Clear))
+    .post("/stub-upload", "stubUploadFiles",withPermission(PERMS.PrinterFiles.Upload))
+    .get("/tracked-uploads", "getTrackedUploads",withPermission(PERMS.PrinterFiles.Upload))
+    .get("/:id", "getFiles", withPermission(PERMS.PrinterFiles.Get))
+    .get("/:id/cache", "getFilesCache", withPermission(PERMS.PrinterFiles.Get))
+    .post("/:id/local-upload", "localUploadFile", withPermission(PERMS.PrinterFiles.Upload))
+    .post("/:id/upload", "uploadFile", withPermission(PERMS.PrinterFiles.Upload))
+    .post("/:id/create-folder", "createFolder", withPermission(PERMS.PrinterFiles.Actions))
+    .post("/:id/select", "selectAndPrintFile", withPermission(PERMS.PrinterFiles.Actions))
+    .post("/:id/move", "moveFileOrFolder", withPermission(PERMS.PrinterFiles.Actions))
+    .delete("/:id", "deleteFileOrFolder", withPermission(PERMS.PrinterFiles.Delete))
+    .delete("/:id/clear", "clearPrinterFiles", withPermission(PERMS.PrinterFiles.Clear));

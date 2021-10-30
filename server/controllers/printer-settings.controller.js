@@ -1,9 +1,10 @@
-const { ensureAuthenticated } = require("../middleware/auth");
+const { authenticate, withPermission } = require("../middleware/authenticate");
 const { createController } = require("awilix-express");
 const { validateInput } = require("../handlers/validators");
 const { AppConstants } = require("../server.constants");
 const { idRules } = require("./validation/generic.validation");
 const { setGcodeAnalysis } = require("./validation/printer-settings-controller.validation");
+const { PERMS } = require("../constants/authorization.constants");
 
 class PrinterSettingsController {
   #printersStore;
@@ -50,9 +51,7 @@ class PrinterSettingsController {
     const { id: printerId } = await validateInput(req.params, idRules);
 
     const printerLogin = this.#printersStore.getPrinterLogin(printerId);
-
     const settings = await this.#octoPrintApiService.getSettings(printerLogin);
-
     res.send(settings);
   }
 
@@ -61,9 +60,7 @@ class PrinterSettingsController {
     const input = await validateInput(req.body, setGcodeAnalysis);
 
     const printerLogin = this.#printersStore.getPrinterLogin(printerId);
-
     const settings = await this.#octoPrintApiService.setGCodeAnalysis(printerLogin, input);
-
     res.send(settings);
   }
 }
@@ -71,6 +68,6 @@ class PrinterSettingsController {
 // prettier-ignore
 module.exports = createController(PrinterSettingsController)
     .prefix(AppConstants.apiRoute + "/printer-settings")
-    .before([ensureAuthenticated])
-    .get("/:id", "get")
+    .before([authenticate()])
+    .get("/:id", "get", withPermission(PERMS.PrinterSettings.Get))
     .post("/:id/gcode-analysis", "setGCodeAnalysis");
