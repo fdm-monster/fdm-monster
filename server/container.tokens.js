@@ -15,6 +15,7 @@ const DITokens = {
   githubApiService: "githubApiService",
   userTokenService: "userTokenService",
   userService: "userService",
+  permissionService: "permissionService",
   roleService: "roleService",
   octoPrintApiService: "octoPrintApiService",
   influxDbSetupService: "influxDbSetupService",

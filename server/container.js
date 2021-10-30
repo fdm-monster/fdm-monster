@@ -56,6 +56,7 @@ const UserService = require("./services/authentication/user.service");
 const RoleService = require("./services/authentication/role.service");
 const { ToadScheduler } = require("toad-scheduler");
 const { ServerTasks } = require("./tasks");
+const PermissionService = require("./services/authentication/permission.service");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -82,6 +83,7 @@ function configureContainer() {
     [DITokens.userTokenService]: asClass(UserTokenService).singleton(),
     [DITokens.userService]: asClass(UserService),
     [DITokens.roleService]: asClass(RoleService).singleton(), // caches roles
+    [DITokens.permissionService]: asClass(PermissionService).singleton(),
 
     [DITokens.loggerFactory]: asFunction(LoggerFactory).transient(),
     [DITokens.taskManagerService]: asClass(TaskManagerService).singleton(),

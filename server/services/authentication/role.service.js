@@ -68,7 +68,7 @@ class RoleService {
 
   async getRole(roleId) {
     const role = await this.#roles.find((r) => r.id === roleId);
-    if (!role) throw new NotFoundException("Role not found");
+    if (!role) throw new NotFoundException(`Role Id '${roleId}' not found`);
 
     return role;
   }
