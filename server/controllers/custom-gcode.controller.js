@@ -1,6 +1,7 @@
 const { createController } = require("awilix-express");
-const { authenticate } = require("../middleware/authenticate");
+const { authenticate, authorizeRoles } = require("../middleware/authenticate");
 const { AppConstants } = require("../server.constants");
+const { ROLES } = require("../constants/authorization.constants");
 
 class CustomGCodeController {
   #logger;
@@ -50,7 +51,7 @@ class CustomGCodeController {
 // prettier-ignore
 module.exports = createController(CustomGCodeController)
     .prefix(AppConstants.apiRoute + "/settings/custom-gcode")
-    .before([authenticate()])
+    .before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR])])
     .delete("/delete/:id", "deleteGcode")
     .get("/", "list")
     .post("/edit", "edit")

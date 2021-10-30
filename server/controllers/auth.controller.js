@@ -47,7 +47,7 @@ class AuthController {
     }
     const { name, username, password } = await validateMiddleware(req, registerUserRules);
 
-    const roles = await this.#roleService.getDefaultRoles();
+    const roles = [this.#roleService.getDefaultRole()];
     const result = await this.#userService.register({ name, username, password, roles });
 
     res.send(result);

@@ -1,17 +1,39 @@
+const { union } = require("lodash");
+
 function serializePerm(group, perm) {
   return `${group}.${perm}`;
 }
 
 const PERM_GROUP = {
-  PrinterFiles: "PrinterFiles"
+  Alerts: "Alerts",
+  PrinterFiles: "PrinterFiles",
+  PrinterSettings: "PrinterSettings",
+  PrinterGroups: "PrinterGroups"
 };
 
 const PERMS = {
+  Alerts: {
+    Test: serializePerm(PERM_GROUP.Alerts, "Test")
+  },
   PrinterFiles: {
     Default: serializePerm(PERM_GROUP.PrinterFiles, "Default"),
-    List: serializePerm(PERM_GROUP.PrinterFiles, "List"),
+    Get: serializePerm(PERM_GROUP.PrinterFiles, "Get"),
     Delete: serializePerm(PERM_GROUP.PrinterFiles, "Delete"),
+    Clear: serializePerm(PERM_GROUP.PrinterFiles, "Clear"),
+    Upload: serializePerm(PERM_GROUP.PrinterFiles, "Upload"),
     Actions: serializePerm(PERM_GROUP.PrinterFiles, "Actions")
+  },
+  PrinterSettings: {
+    Default: serializePerm(PERM_GROUP.PrinterSettings, "Default"),
+    Get: serializePerm(PERM_GROUP.PrinterSettings, "Get")
+  },
+  PrinterGroups: {
+    Default: serializePerm(PERM_GROUP.PrinterGroups, "Default"),
+    List: serializePerm(PERM_GROUP.PrinterGroups, "List"),
+    Get: serializePerm(PERM_GROUP.PrinterGroups, "Get"),
+    Create: serializePerm(PERM_GROUP.PrinterGroups, "Create"),
+    Update: serializePerm(PERM_GROUP.PrinterGroups, "Update"),
+    Delete: serializePerm(PERM_GROUP.PrinterGroups, "Delete")
   }
 };
 
@@ -38,9 +60,14 @@ const ROLES = {
 };
 
 const ROLE_PERMS = {
-  [ROLES.ADMIN]: [allPerms(PERM_GROUP.PrinterFiles)],
-  [ROLES.OPERATOR]: [allPerms(PERM_GROUP.PrinterFiles)],
-  [ROLES.GUEST]: [PERMS.PrinterFiles.Default]
+  [ROLES.ADMIN]: union(
+    allPerms(PERM_GROUP.PrinterFiles),
+    allPerms(PERM_GROUP.PrinterSettings),
+    allPerms(PERM_GROUP.PrinterGroups),
+    allPerms(PERM_GROUP.Alerts)
+  ),
+  [ROLES.OPERATOR]: union(allPerms(PERM_GROUP.PrinterFiles), allPerms(PERM_GROUP.PrinterGroups)),
+  [ROLES.GUEST]: [PERMS.PrinterFiles.Default, PERMS.PrinterFiles.Upload, PERMS.PrinterGroups.List]
 };
 
 module.exports = {

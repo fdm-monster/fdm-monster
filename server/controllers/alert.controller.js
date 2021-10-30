@@ -1,5 +1,5 @@
 const { createController } = require("awilix-express");
-const { authenticate } = require("../middleware/authenticate");
+const { authenticate, withPermission } = require("../middleware/authenticate");
 const { AppConstants } = require("../server.constants");
 const { validateInput } = require("../handlers/validators");
 const { idRules } = require("./validation/generic.validation");
@@ -8,6 +8,7 @@ const {
   createAlertRules,
   updateAlertRules
 } = require("./validation/alert-controller.validation");
+const { PERMS } = require("../constants/authorization.constants");
 
 class AlertController {
   #settingsStore;
@@ -69,4 +70,4 @@ module.exports = createController(AlertController)
     .post("/", "create")
     .put("/:id", "update")
     .delete("/:id", "delete")
-    .post("/test-alert-script", "testAlertScript");
+    .post("/test-alert-script", "testAlertScript", withPermission(PERMS.Alerts.Test));

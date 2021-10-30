@@ -13,8 +13,8 @@ class AuthenticationError extends Error {
 }
 
 class AuthorizationError extends Error {
-  constructor() {
-    super("Authorization failed");
+  constructor(criterium) {
+    super(`Authorization failed ${criterium.toString()}`);
     this.name = AuthorizationError.name;
   }
 }

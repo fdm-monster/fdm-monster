@@ -6,6 +6,7 @@ const DITokens = require("./container.tokens");
 const { configureContainer } = require("./container");
 const { scopePerRequest } = require("awilix-express");
 const cors = require("cors");
+const { interceptRoles } = require("./middleware/authorization");
 
 function setupNormalServer() {
   const httpServer = express();
@@ -35,7 +36,8 @@ function setupNormalServer() {
     .use(passport.initialize())
     .use(passport.session())
     .use(passport.authenticate("remember-me"))
-    .use(scopePerRequest(container));
+    .use(scopePerRequest(container))
+    .use(interceptRoles);
 
   return {
     httpServer,

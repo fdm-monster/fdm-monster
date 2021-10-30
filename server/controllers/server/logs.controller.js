@@ -1,6 +1,8 @@
 const { createController } = require("awilix-express");
 const { authenticate } = require("../../middleware/authenticate");
 const { AppConstants } = require("../../server.constants");
+const { authorizeRoles } = require("../../middleware/authenticate");
+const { ROLES } = require("../../constants/authorization.constants");
 
 class LogsController {
   #logger;
@@ -13,7 +15,7 @@ class LogsController {
   }
 
   async list(req, res) {
-    const serverLogs = await this.#serverLogsService.collectLogFiles();
+    const serverLogs = this.#serverLogsService.collectLogFiles();
     res.send(serverLogs);
   }
 
@@ -46,8 +48,8 @@ class LogsController {
 
 // prettier-ignore
 module.exports = createController(LogsController)
-  .prefix(AppConstants.apiRoute + "/settings/logs")
-  .before([authenticate()])
-  .get("", "list")
-  .get("/download/:name", "download")
-  .put("/generate-log-dump", "generateLogDumpZip");
+    .prefix(AppConstants.apiRoute + "/settings/logs")
+    .before([authenticate(), authorizeRoles([ROLES.ADMIN])])
+    .get("", "list")
+    .get("/download/:name", "download")
+    .put("/generate-log-dump", "generateLogDumpZip");

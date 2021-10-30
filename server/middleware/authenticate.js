@@ -1,6 +1,21 @@
 const { inject } = require("awilix-express");
 const { AuthorizationError, AuthenticationError } = require("../exceptions/runtime.exceptions");
 
+function authorizePermission(permission) {
+  return inject(({ permissionService, roleService }) => async (req, res, next) => {
+    if (!req.roles?.length) {
+      throw new AuthorizationError(permission);
+    }
+
+    const assignedPermissions = roleService.getRolesPermissions(req.roles);
+    if (!permissionService.authorizePermission(permission, assignedPermissions)) {
+      throw new AuthorizationError(permission);
+    }
+
+    next();
+  });
+}
+
 module.exports = {
   authenticate: () =>
     inject(({ settingsStore }) => async (req, res, next) => {
@@ -16,12 +31,7 @@ module.exports = {
       throw new AuthenticationError("Not authenticated", 401);
     }),
   authorizeRoles(roles, subset = true) {
-    return inject(({ settingsStore, roleService }) => async (req, res, next) => {
-      const serverSettings = settingsStore.getServerSettings();
-      if (!serverSettings?.server?.loginRequired && !req.roles) {
-        req.roles = await roleService.getDefaultRoles();
-      }
-
+    return inject(({ roleService }) => async (req, res, next) => {
       if (!roleService.authorizeRoles(roles, req.roles, subset)) {
         throw new AuthorizationError(roles);
       }
@@ -29,11 +39,10 @@ module.exports = {
       next();
     });
   },
-  authorizePermissions(permissionArray) {
-    return inject(({ settingsStore, roleService }) => async (req, res, next) => {
-      console.log("asd", req.user, permissionArray, req.roles);
-
-      next();
-    });
+  authorizePermission,
+  withPermission(permission) {
+    return {
+      before: [authorizePermission(permission)]
+    };
   }
 };

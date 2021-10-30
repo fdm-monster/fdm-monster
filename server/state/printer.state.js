@@ -184,7 +184,7 @@ class PrinterState {
       printerName: this.#entityData.settingsAppearance?.name,
       webSocketURL: this.#websocketAdapter?.webSocketURL || this.#entityData.webSocketURL,
       camURL: this.#entityData.camURL,
-      apiKey: this.#entityData.apiKey,
+      // apiKey: this.#entityData.apiKey, // INSECURE
       printerURL: this.#entityData.printerURL,
       group: this.#entityData.group
     });

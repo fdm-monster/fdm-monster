@@ -1,10 +1,11 @@
 const { createController } = require("awilix-express");
-const { authenticate } = require("../middleware/authenticate");
+const { authenticate, authorizeRoles } = require("../middleware/authenticate");
 const { AppConstants } = require("../server.constants");
 const { validateInput } = require("../handlers/validators");
 const { idRules } = require("./validation/generic.validation");
 const { getCostSettingsDefault } = require("../constants/service.constants");
 const { NotImplementedException } = require("../exceptions/runtime.exceptions");
+const { ROLES } = require("../constants/authorization.constants");
 
 class HistoryController {
   #serverVersion;
@@ -156,7 +157,7 @@ class HistoryController {
 // prettier-ignore
 module.exports = createController(HistoryController)
     .prefix(AppConstants.apiRoute + "/history")
-    .before([authenticate()])
+    .before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR])])
     .get("/", "getCache")
     .delete("/:id", "delete")
     .put("/:id", "update")

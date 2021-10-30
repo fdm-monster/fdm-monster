@@ -1,7 +1,6 @@
-const { ROLES, flattenPermissionDefinition } = require("../../constants/authorization.constants");
+const { flattenPermissionDefinition } = require("../../constants/authorization.constants");
 const PermissionModel = require("../../models/Auth/Permission");
 const { NotFoundException } = require("../../exceptions/runtime.exceptions");
-const ObjectID = require("mongodb").ObjectID;
 
 class PermissionService {
   #permissions = {};
@@ -15,41 +14,23 @@ class PermissionService {
     return this.#permissions;
   }
 
-  #normalizeRole(assignedPermission) {
-    if (ObjectID.isValid(assignedPermission)) {
-      const permissionInstance = this.permissions.find((r) => r.id === assignedPermission);
-      if (!permissionInstance) {
-        console.warn(`The permission by ID ${assignedPermission} did not exist. Skipping.`);
-        return;
-      }
-      return permissionInstance.name;
-    } else if (Object.values(ROLES).includes(assignedPermission)) {
-      return assignedPermission;
-    } else {
-      console.warn(
-        `The permission by Name ${assignedPermission} did not exist in definition. Skipping.`
-      );
+  #normalizePermission(assignedPermission) {
+    const permissionInstance = this.permissions.find(
+      (r) => r.id === assignedPermission || r.name === assignedPermission
+    );
+    if (!permissionInstance) {
+      console.warn(`The permission by ID ${assignedPermission} did not exist. Skipping.`);
+      return;
     }
+    return permissionInstance.name;
   }
 
-  authorizePermission(requiredRole, assignedRoles) {
-    return !!assignedRoles.find((assignedPermission) => {
-      const normalizePermission = this.#normalizeRole(assignedPermission);
+  authorizePermission(requiredPermission, assignedPermissions) {
+    return !!assignedPermissions.find((assignedPermission) => {
+      const normalizePermission = this.#normalizePermission(assignedPermission);
       if (!normalizePermission) return false;
-      return normalizePermission === requiredRole;
+      return normalizePermission === requiredPermission;
     });
-  }
-
-  authorizePermissions(requiredPermissions, assignedPermissions) {
-    let isAuthorized = false;
-
-    if (!requiredPermissions?.length) return true;
-    requiredPermissions.forEach((requiredPermission) => {
-      const result = this.authorizePermission(requiredPermission, assignedPermissions);
-      isAuthorized = isAuthorized && result;
-    });
-
-    return isAuthorized;
   }
 
   async getPermissionByName(permissionName) {
@@ -60,17 +41,16 @@ class PermissionService {
   }
 
   async getPermission(permissionId) {
-    const role = await this.permissions.find((r) => r.id === permissionId);
-    if (!role) throw new NotFoundException(`Permission Id '${permissionId}' not found`);
+    const permission = await this.permissions.find((r) => r.id === permissionId);
+    if (!permission) throw new NotFoundException(`Permission Id '${permissionId}' not found`);
 
-    return role;
+    return permission;
   }
 
   async syncPermissions() {
     this.#permissions = [];
-    const permissionDefinition = flattenPermissionDefinition();
-    console.log(permissionDefinition);
 
+    const permissionDefinition = flattenPermissionDefinition();
     for (let permission of permissionDefinition) {
       const storedPermission = await PermissionModel.findOne({ name: permission });
       if (!storedPermission) {

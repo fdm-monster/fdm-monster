@@ -1,8 +1,9 @@
 const { createController } = require("awilix-express");
 const { AppConstants } = require("../server.constants");
-const { authenticate } = require("../middleware/authenticate");
+const { authenticate, authorizeRoles } = require("../middleware/authenticate");
 const { printerResolveMiddleware } = require("../middleware/printer");
 const { getScopedPrinter } = require("../handlers/validators");
+const { ROLES } = require("../constants/authorization.constants");
 
 class PrinterProfilesController {
   #printerProfilesCache;
@@ -32,7 +33,11 @@ class PrinterProfilesController {
 
 module.exports = createController(PrinterProfilesController)
   .prefix(AppConstants.apiRoute + "/printer-profiles")
-  .before([authenticate(), printerResolveMiddleware()])
+  .before([
+    authenticate(),
+    authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR]),
+    printerResolveMiddleware()
+  ])
   .get("/:id", "listProfiles")
   .get("/:id/cache", "listProfilesCache")
   .post("/:id", "create")

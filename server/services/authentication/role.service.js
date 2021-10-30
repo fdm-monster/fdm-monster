@@ -1,6 +1,7 @@
-const { ROLES } = require("../../constants/authorization.constants");
+const { ROLES, ROLE_PERMS } = require("../../constants/authorization.constants");
 const RoleModel = require("../../models/Auth/Role");
 const { NotFoundException } = require("../../exceptions/runtime.exceptions");
+const { union } = require("lodash");
 const ObjectID = require("mongodb").ObjectID;
 
 class RoleService {
@@ -15,28 +16,46 @@ class RoleService {
     return this.#roles;
   }
 
-  async getDefaultRoles() {
+  getRolesPermissions(roles) {
+    let permissions = [];
+    if (!roles?.length) return [];
+
+    for (let role of roles) {
+      const normalizedRole = this.#normalizeRole(role);
+      const rolePermissions = this.getRolePermissions(normalizedRole);
+      permissions = union(permissions, rolePermissions);
+    }
+
+    return permissions;
+  }
+
+  getRolePermissions(role) {
+    const normalizedRole = this.#normalizeRole(role);
+    return ROLE_PERMS[normalizedRole];
+  }
+
+  getDefaultRole() {
+    return ROLES.GUEST;
+  }
+
+  async getDefaultRolesId() {
     if (!this.#roles?.length) {
       await this.syncRoles();
     }
 
-    const guestRole = await this.getRoleByName(ROLES.GUEST);
+    const guestRole = await this.getRoleByName(this.getDefaultRole());
     return [guestRole.id];
   }
 
   #normalizeRole(assignedRole) {
-    if (ObjectID.isValid(assignedRole)) {
-      const roleInstance = this.roles.find((r) => r.id === assignedRole);
-      if (!roleInstance) {
-        console.warn(`The role by ID ${assignedRole} did not exist. Skipping.`);
-        return;
-      }
-      return roleInstance.name;
-    } else if (Object.values(ROLES).includes(assignedRole)) {
-      return assignedRole;
-    } else {
-      console.warn(`The role by Name ${assignedRole} did not exist in definition. Skipping.`);
+    const roleInstance = this.roles.find((r) => r.id === assignedRole || r.name === assignedRole);
+
+    if (!roleInstance) {
+      console.warn(`The role by ID '${assignedRole}' did not exist in definition. Skipping.`);
+      return;
     }
+
+    return roleInstance.name;
   }
 
   authorizeRole(requiredRole, assignedRoles) {
