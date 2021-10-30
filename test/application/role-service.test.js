@@ -2,7 +2,7 @@ const dbHandler = require("../db-handler");
 const { configureContainer } = require("../../server/container");
 const DITokens = require("../../server/container.tokens");
 const RoleModel = require("../../server/models/Auth/Role");
-const { ROLES } = require("../../server/constants/service.constants");
+const { ROLES } = require("../../server/constants/authorization.constants");
 
 let container;
 let roleService;
@@ -34,4 +34,4 @@ describe("RoleService", () => {
   it("should resolve guest role", async () => {
     await roleService.getRoleByName(ROLES.GUEST);
   });
-})
+});

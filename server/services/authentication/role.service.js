@@ -8,8 +8,11 @@ class RoleService {
   #roles = [];
   #logger;
 
-  constructor({ loggerFactory }) {
+  #defaultRole;
+
+  constructor({ loggerFactory, defaultRole }) {
     this.#logger = loggerFactory("RoleService");
+    this.#defaultRole = defaultRole;
   }
 
   get roles() {
@@ -35,7 +38,7 @@ class RoleService {
   }
 
   getDefaultRole() {
-    return ROLES.GUEST;
+    return this.#defaultRole;
   }
 
   async getDefaultRolesId() {

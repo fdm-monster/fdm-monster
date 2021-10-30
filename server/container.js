@@ -57,6 +57,7 @@ const RoleService = require("./services/authentication/role.service");
 const { ToadScheduler } = require("toad-scheduler");
 const { ServerTasks } = require("./tasks");
 const PermissionService = require("./services/authentication/permission.service");
+const { ROLES } = require("./constants/authorization.constants");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -71,6 +72,7 @@ function configureContainer() {
     ),
     serverPageTitle: asValue(process.env[AppConstants.SERVER_SITE_TITLE_KEY]),
     [DITokens.serverTasks]: asValue(ServerTasks),
+    [DITokens.defaultRole]: asValue([ROLES.GUEST]),
 
     // -- asFunction --
     [DITokens.printerStateFactory]: asFunction(PrinterStateFactory).transient(), // Factory function, transient on purpose!

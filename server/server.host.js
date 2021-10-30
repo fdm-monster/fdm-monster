@@ -46,7 +46,7 @@ class ServerHost {
           next();
         }
       })
-      .use(loadControllers(`${routePath}/settings/*.controller.js`, { cwd: __dirname }))
+      .use(loadControllers(`${routePath}/server/*.controller.js`, { cwd: __dirname }))
       .use(loadControllers(`${routePath}/*.controller.js`, { cwd: __dirname }))
       .use(interceptDatabaseError)
       .use(exceptionHandler);

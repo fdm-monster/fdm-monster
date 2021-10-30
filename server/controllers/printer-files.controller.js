@@ -233,16 +233,16 @@ class PrinterFilesController {
 // prettier-ignore
 module.exports = createController(PrinterFilesController)
     .prefix(AppConstants.apiRoute + "/printer-files")
-    .before([authenticate(), authorizeRoles([ROLES.OPERATOR, ROLES.ADMIN]), printerResolveMiddleware()])
+    .before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR]), printerResolveMiddleware()])
+    .post("/purge", "purgeIndexedFiles",withPermission(PERMS.PrinterFiles.Clear))
+    .post("/stub-upload", "stubUploadFiles",withPermission(PERMS.PrinterFiles.Upload))
+    .get("/tracked-uploads", "getTrackedUploads",withPermission(PERMS.PrinterFiles.Upload))
     .get("/:id", "getFiles", withPermission(PERMS.PrinterFiles.Get))
     .get("/:id/cache", "getFilesCache", withPermission(PERMS.PrinterFiles.Get))
     .post("/:id/local-upload", "localUploadFile", withPermission(PERMS.PrinterFiles.Upload))
     .post("/:id/upload", "uploadFile", withPermission(PERMS.PrinterFiles.Upload))
-    .post("/stub-upload", "stubUploadFiles",withPermission(PERMS.PrinterFiles.Upload))
-    .get("/tracked-uploads", "getTrackedUploads",withPermission(PERMS.PrinterFiles.Upload))
     .post("/:id/create-folder", "createFolder", withPermission(PERMS.PrinterFiles.Actions))
     .post("/:id/select", "selectAndPrintFile", withPermission(PERMS.PrinterFiles.Actions))
     .post("/:id/move", "moveFileOrFolder", withPermission(PERMS.PrinterFiles.Actions))
     .delete("/:id", "deleteFileOrFolder", withPermission(PERMS.PrinterFiles.Delete))
-    .delete("/:id/clear", "clearPrinterFiles", withPermission(PERMS.PrinterFiles.Clear))
-    .post("/purge", "purgeIndexedFiles",withPermission(PERMS.PrinterFiles.Clear));
+    .delete("/:id/clear", "clearPrinterFiles", withPermission(PERMS.PrinterFiles.Clear));

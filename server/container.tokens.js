@@ -1,4 +1,7 @@
 const DITokens = {
+  // Values
+  defaultRole: "defaultRole",
+  // Instances
   serverHost: "serverHost",
   loggerFactory: "loggerFactory",
   httpClient: "httpClient",

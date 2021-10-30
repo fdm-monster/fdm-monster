@@ -128,7 +128,12 @@ describe("PrinterController", () => {
       printerName: "asd124"
     };
     const updatePatch = await request.patch(updateRoute(printer.id)).send(patch);
-    expectOkResponse(updatePatch, patch);
+    expectOkResponse(updatePatch, {
+      webSocketURL: "ws://google.com",
+      printerURL: "https://test.com/",
+      enabled: false,
+      printerName: "asd124"
+    });
   });
 
   it("should update printer connection settings correctly", async function () {
