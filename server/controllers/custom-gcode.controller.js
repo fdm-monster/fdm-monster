@@ -27,15 +27,15 @@ class CustomGCodeController {
   }
 
   async delete(req, res) {
-    const { id } = validateInput(req.params, idRules);
+    const { id } = await validateInput(req.params, idRules);
     await this.#customGCodeService.delete(id);
     res.send();
   }
 
   async update(req, res) {
-    const { id } = validateInput(req.params, idRules);
-    const createdScript = await this.#customGCodeService.update(id, req.body);
-    res.send(createdScript);
+    const { id } = await validateInput(req.params, idRules);
+    const updatedScript = await this.#customGCodeService.update(id, req.body);
+    res.send(updatedScript);
   }
 }
 
