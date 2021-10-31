@@ -27,11 +27,13 @@ This work is under active development with cutting edge tech and standards. Feel
 - [x] 🌟 Printer Location Map based on 2x2 groups
 - [x] 🛡️ Server resilient against database connection failures with automatic retry of 5 seconds
 - [x] 🔌 3D Hub Connector (OctoPrint Plugin) prerelease 0.1.0 ([find it here](https://github.com/3d-hub/3d-hub-connector/releases))
+- [x] 🛡️ Better authentication and authorization mechanisms
+- [x] :rocket: Docker multi-arch image (arm/v7, arm64 and amd64 architectures => Raspberry Pi with an 64 bits OS!)
 - [ ] :rocket: Printer Group management
 - [ ] 🛡️ Full API and client test coverage >80% (now at 50%+) 
 - [ ] 🛡️ NodeJS Server legacy-free (history, alerts, custom gcode and filament)
+- [ ] 🛡️ Frontend user and basic role management
 - [ ] 🔌 Hub Connector - filament tracker 
-- [ ] 🛡️ Better authentication, user and basic role management
 - [ ] 🔌 Raspberry Pi image and prebuilt customized OctoPi image
 - [ ] :rocket: First core release with documentation
 - [ ] :rocket: Plugin system (preparation work is ready)
