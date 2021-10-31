@@ -4,7 +4,7 @@ volumes:
 services:
   3DHUB:
     container_name: 3d-hub
-    image: davidzwa/3d-hub:0.0.3-pre2
+    image: davidzwa/3d-hub:0.0.4-pre1
     restart: always
     build:
       context: .
