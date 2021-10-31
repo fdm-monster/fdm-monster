@@ -19,7 +19,7 @@ jobs:
           elif ${{ github.ref == 'refs/heads/development' }} == true; then
             echo 'TAG_EDGE=development' >> $GITHUB_ENV
           else
-            echo 'TAG_EDGE=alpha' >> $GITHUB_ENV
+            echo 'TAG_EDGE=edge' >> $GITHUB_ENV
           fi
       -
         name: Docker meta
