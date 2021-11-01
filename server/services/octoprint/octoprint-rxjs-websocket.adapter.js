@@ -89,14 +89,18 @@ module.exports = class OctoprintRxjsWebsocketAdapter extends GenericWebsocketAda
     );
   }
 
-  #sendSetupData() {
-    const data = { auth: `${this.#currentUser}:${this.#sessionKey}` };
-    this.#sendMessage(data);
-
+  sendThrottleMessage() {
     if (this.#throttle) {
       const throtleSettings = { throttle: this.#throttle };
       this.#sendMessage(throtleSettings);
     }
+  }
+
+  #sendSetupData() {
+    const data = { auth: `${this.#currentUser}:${this.#sessionKey}` };
+    this.#sendMessage(data);
+
+    this.sendThrottleMessage();
   }
 
   #transformStatefulMessage(parsedMessage) {
@@ -127,6 +131,9 @@ module.exports = class OctoprintRxjsWebsocketAdapter extends GenericWebsocketAda
         break;
       case OP_WS_MSG.event:
         serverEvents.push({ type: PEVENTS.event, data });
+        break;
+      case OP_WS_MSG.reauthRequired:
+        console.log("Reauth required!");
         break;
       default:
         console.log("unhandled message", header);

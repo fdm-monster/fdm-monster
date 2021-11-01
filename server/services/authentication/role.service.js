@@ -2,7 +2,6 @@ const { ROLES, ROLE_PERMS } = require("../../constants/authorization.constants")
 const RoleModel = require("../../models/Auth/Role");
 const { NotFoundException } = require("../../exceptions/runtime.exceptions");
 const { union } = require("lodash");
-const ObjectID = require("mongodb").ObjectID;
 
 class RoleService {
   #roles = [];
