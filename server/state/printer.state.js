@@ -345,8 +345,8 @@ class PrinterState {
   }
 
   #processEvent(event) {
-    event.data.printerID = this.#id;
-    // Other interested parties
+    // Other interested parties can be informed
+    event.data.printerId = this.#id;
     this.#eventEmitter2.emit(event.type, event.data);
 
     if (event.type === PEVENTS.event) {
@@ -358,6 +358,12 @@ class PrinterState {
         this.setFirmwareState("Disconnecting...");
       } else if (data.type === EVENT_TYPES.Disconnected) {
         this.setFirmwareState("-");
+      }
+      if (
+        [EVENT_TYPES.PrintCancelled, EVENT_TYPES.PrintDone, EVENT_TYPES.PrintFailed].includes(
+          data.type
+        )
+      ) {
       }
     }
     if (event.type === PEVENTS.init) {

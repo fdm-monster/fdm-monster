@@ -16,7 +16,7 @@ const SystemInfoBundleService = require("./services/system-info-bundle.service")
 const GithubApiService = require("./services/github-api.service");
 const HistoryService = require("./services/history.service");
 const FileCache = require("./state/data/file.cache");
-const HistoryCache = require("./state/data/history.cache");
+const HistoryStore = require("./state/history.store");
 const JobsCache = require("./state/data/jobs.cache");
 const UserTokenService = require("./services/authentication/user-token.service");
 const ServerSentEventsHandler = require("./handlers/sse.handler");
@@ -115,7 +115,7 @@ function configureContainer() {
     [DITokens.printerProfilesCache]: asClass(PrinterProfilesCache).singleton(),
     [DITokens.printerState]: asClass(PrinterState).transient(), // Transient on purpose!
     [DITokens.printerGroupsCache]: asClass(PrinterGroupsCache).singleton(),
-    [DITokens.historyCache]: asClass(HistoryCache).singleton(),
+    [DITokens.historyStore]: asClass(HistoryStore).singleton(),
     [DITokens.jobsCache]: asClass(JobsCache).singleton(),
     [DITokens.terminalLogsCache]: asClass(TerminalLogsCache).singleton(),
     [DITokens.printerTickerStore]: asClass(PrinterTickerStore).singleton(),

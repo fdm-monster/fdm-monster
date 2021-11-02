@@ -1,19 +1,19 @@
-const Logger = require("../../handlers/logger.js");
-const { getDefaultHistoryStatistics } = require("../../constants/cleaner.constants");
-const { arrayCounts } = require("../../utils/array.util");
-const { sumValuesGroupByDate, assignYCumSum } = require("../../utils/graph-point.utils");
-const { getSpool, processHistorySpools } = require("../../utils/spool.utils");
-const { getPrintCostNumeric, noCostSettingsMessage } = require("../../utils/print-cost.util");
-const { stateToHtml } = require("../../utils/html.util");
-const { toDefinedKeyValue } = require("../../utils/property.util");
-const { floatOrZero } = require("../../utils/number.util");
-const { toTimeFormat } = require("../../utils/time.util");
-const { getJobAnalysis } = require("../../utils/job.utils");
+const Logger = require("../handlers/logger.js");
+const { getDefaultHistoryStatistics } = require("../constants/cleaner.constants");
+const { arrayCounts } = require("../utils/array.util");
+const { sumValuesGroupByDate, assignYCumSum } = require("../utils/graph-point.utils");
+const { getSpool, processHistorySpools } = require("../utils/spool.utils");
+const { getPrintCostNumeric, noCostSettingsMessage } = require("../utils/print-cost.util");
+const { stateToHtml } = require("../utils/html.util");
+const { toDefinedKeyValue } = require("../utils/property.util");
+const { floatOrZero } = require("../utils/number.util");
+const { toTimeFormat } = require("../utils/time.util");
+const { getJobAnalysis } = require("../utils/job.utils");
 
 /**
  * A standalone cache as in-memory layer for the underlying history service
  */
-class HistoryCache {
+class HistoryStore {
   #statisticsClean = getDefaultHistoryStatistics();
   #historyClean = [];
 
@@ -232,4 +232,4 @@ class HistoryCache {
   }
 }
 
-module.exports = HistoryCache;
+module.exports = HistoryStore;

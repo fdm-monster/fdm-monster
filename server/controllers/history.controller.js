@@ -10,23 +10,23 @@ const { ROLES } = require("../constants/authorization.constants");
 class HistoryController {
   #serverVersion;
   #settingsStore;
-  #historyCache;
+  #historyStore;
   #serverPageTitle;
 
-  constructor({ settingsStore, serverVersion, serverPageTitle, historyCache }) {
+  constructor({ settingsStore, serverVersion, serverPageTitle, historyStore }) {
     this.#settingsStore = settingsStore;
-    this.#historyCache = historyCache;
+    this.#historyStore = historyStore;
     this.#serverVersion = serverVersion;
     this.#serverPageTitle = serverPageTitle;
   }
 
   async getCache(req, res) {
-    const { history } = this.#historyCache.getHistoryCache();
+    const { history } = this.#historyStore.getHistoryCache();
     res.send({ history });
   }
 
   async stats(req, res) {
-    const stats = this.#historyCache.generateStatistics();
+    const stats = this.#historyStore.generateStatistics();
     res.send({ history: stats });
   }
 
@@ -35,7 +35,7 @@ class HistoryController {
 
     await History.findOneAndDelete({ _id: historyId });
 
-    await this.#historyCache.initCache();
+    await this.#historyStore.initCache();
 
     res.send();
   }
@@ -94,7 +94,7 @@ class HistoryController {
     }
     history.markModified("printHistory");
     history.save().then(() => {
-      this.#historyCache().initCache();
+      this.#historyStore().initCache();
     });
     res.send("success");
   }
@@ -144,7 +144,7 @@ class HistoryController {
       };
       historyEntity.markModified("printHistory");
       historyEntity.save().then(() => {
-        this.#historyCache.initCache();
+        this.#historyStore.initCache();
       });
 
       res.send(send);
