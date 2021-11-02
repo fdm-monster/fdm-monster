@@ -10,11 +10,12 @@ const Printer = require("../../server/models/Printer");
 const { testApiKey, createTestPrinter } = require("./test-data/create-printer");
 
 let Model = Printer;
-const listRoute = AppConstants.apiRoute + "/printer";
-const createRoute = listRoute;
-const getRoute = (id) => `${listRoute}/${id}`;
-const deleteRoute = (id) => `${listRoute}/${id}`;
-const updateRoute = (id) => `${listRoute}/${id}`;
+const defaultRoute = AppConstants.apiRoute + "/printer";
+const createRoute = defaultRoute;
+const getRoute = (id) => `${defaultRoute}/${id}`;
+const deleteRoute = (id) => `${defaultRoute}/${id}`;
+const updateRoute = (id) => `${defaultRoute}/${id}`;
+const stopJobRoute = (id) => `${defaultRoute}/${id}/job/stop`;
 const connectionRoute = (id) => `${updateRoute(id)}/connection`;
 const enabledRoute = (id) => `${updateRoute(id)}/enabled`;
 const stepSizeRoute = (id) => `${updateRoute(id)}/step-size`;
@@ -23,7 +24,7 @@ const flowRateRoute = (id) => `${updateRoute(id)}/flow-rate`;
 const resetPowerSettingsRoute = (id) => `${updateRoute(id)}/reset-power-settings`;
 const terminalLogsRoute = (id) => `${getRoute(id)}/terminal-logs`;
 const pluginListRoute = (id) => `${getRoute(id)}/plugin-list`;
-const batchRoute = `${listRoute}/batch`;
+const batchRoute = `${defaultRoute}/batch`;
 
 let request;
 let octoPrintApiService;
@@ -81,7 +82,7 @@ describe("PrinterController", () => {
   });
 
   it("should return printer list when no Id is provided", async function () {
-    const response = await request.get(listRoute).send();
+    const response = await request.get(defaultRoute).send();
 
     expectOkResponse(response);
   });
@@ -114,6 +115,22 @@ describe("PrinterController", () => {
       }
     ]);
     expectOkResponse(response);
+  });
+
+  it("should get printer correctly", async function () {
+    const printer = await createTestPrinter(request);
+    expect(printer.enabled).toBe(false);
+
+    const response = await request.get(getRoute(printer.id)).send();
+    expectOkResponse(response, { enabled: false });
+  });
+
+  it("should stop printer job correctly", async function () {
+    const printer = await createTestPrinter(request);
+    expect(printer.enabled).toBe(false);
+
+    const response = await request.post(stopJobRoute(printer.id)).send();
+    expectOkResponse(response, { success: true, message: "Cancel command sent" });
   });
 
   it("should update printer correctly", async function () {

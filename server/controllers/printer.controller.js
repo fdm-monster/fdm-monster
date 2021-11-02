@@ -314,5 +314,5 @@ module.exports = createController(PrinterController)
     .patch("/:id/flow-rate", "setFlowRate")
     .patch("/:id/feed-rate", "setFeedRate")
     .patch("/:id/reset-power-settings", "resetPowerSettings")
-    .get("/:id/terminal-logs/", "getTerminalLogs")
+    .get("/:id/terminal-logs", "getTerminalLogs")
     .get("/:id/plugin-list", "getPluginList");
