@@ -109,5 +109,5 @@ describe("System-Info-Store", () => {
 
     expect(diskFormats).toContain(systemInfo.systemDisk.type);
     expect(systemInfo.warnings).toBeTruthy();
-  }, 7000);
+  }, 10000);
 });
