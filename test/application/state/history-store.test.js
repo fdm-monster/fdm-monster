@@ -1,5 +1,4 @@
 jest.mock("../../../server/services/history.service");
-const { noCostSettingsMessage } = require("../../../server/utils/print-cost.util");
 const { isPromise } = require("jest-util");
 
 const illegalHistoryCache = [{ printHistory2: null }];
@@ -15,8 +14,8 @@ const {
 const interestingButWeirdHistoryCache = [
   {
     printHistory: {
-      historyIndex: 0, // No historyIndex means big problem, but deferred... ouch
-      state: "pfff im ok", // No state means errpr
+      success: false,
+      reason: "failed",
       totalLength: 1,
       filamentSelection: {
         spools: {
@@ -93,7 +92,7 @@ describe("History-Cache", () => {
   it("should initiate and finish within 5 sec for empty history", async () => {
     expect(await mockHistoryService.find({})).toHaveLength(0);
 
-    await historyStore.initCache();
+    await historyStore.loadHistoryStore();
     const { stats, history } = historyStore.getHistoryCache();
 
     expect(stats).toBeTruthy();
@@ -106,7 +105,7 @@ describe("History-Cache", () => {
     mockHistoryService.saveMockData(emptyLegalHistoryCache);
     expect(await mockHistoryService.find({})).toStrictEqual(emptyLegalHistoryCache);
 
-    await historyStore.initCache();
+    await historyStore.loadHistoryStore();
 
     const { history, stats } = historyStore.getHistoryCache();
     expect(history[0].path).toBeUndefined();
@@ -119,21 +118,17 @@ describe("History-Cache", () => {
 
     expect(await mockHistoryService.find({})).toStrictEqual(realisticHistoryCache);
 
-    await historyStore.initCache();
+    await historyStore.loadHistoryStore();
 
     const { history } = historyStore.getHistoryCache();
     expect(history.length).toEqual(realisticHistoryCache.length);
     history.forEach((h) => {
-      expect(h.printer).toContain("PRINTER");
+      expect(h.printerName).toContain("PRINTER");
       expect(h.notes).not.toBeUndefined();
-      // TODO ... jeez
-      // expect(Date.parse(h.startDate)).not.toBeNaN();
-      // expect(Date.parse(h.endDate)).not.toBeNaN();
       expect(h.startDate).toContain("202");
       expect(h.endDate).toContain("202");
-      expect(h.printerCost).not.toBeUndefined();
-      expect(h.printerCost).not.toBeNaN();
-      expect(h.printerCost).toEqual(parseFloat(h.printerCost).toFixed(2));
+      expect(h.printCost).not.toBeUndefined();
+      expect(h.printCost).not.toBeNaN();
     });
     const stats = historyStore.generateStatistics();
     expect(stats).toBeTruthy();
@@ -157,7 +152,7 @@ describe("History-Cache", () => {
       lowestFilamentUsage: "0.00g / 0.00m",
       totalSpoolCost: "1.99",
       highestSpoolCost: "1.85",
-      totalPrinterCost: "7.62",
+      totalPrinterCost: "7.63",
       highestPrinterCost: "1.89",
       currentFailed: 247,
       historyByDay: [
@@ -244,7 +239,7 @@ describe("History-Cache", () => {
 
   it("should reject when history entities contain illegal entry key", async () => {
     mockHistoryService.saveMockData(illegalHistoryCache);
-    await expect(historyStore.initCache()).rejects.toBeTruthy();
+    await expect(historyStore.loadHistoryStore()).rejects.toBeTruthy();
   });
 
   it("should be able to generate statistics without error", async function () {
@@ -252,18 +247,15 @@ describe("History-Cache", () => {
     expect(await mockHistoryService.find({})).toHaveLength(1);
 
     // Empty history database => empty cache
-    await historyStore.initCache();
+    await historyStore.loadHistoryStore();
     const { history } = historyStore.getHistoryCache();
     expect(history).toHaveLength(1);
 
     // Another test phase
     mockHistoryService.saveMockData(interestingButWeirdHistoryCache);
-    await historyStore.initCache();
+    await historyStore.loadHistoryStore();
     const { history: history2 } = historyStore.getHistoryCache();
-
-    expect(history2[0].printerCost).toEqual(noCostSettingsMessage);
-    // Expect the rabbit hole to be deep.
-    expect(history2[0].index).toEqual(interestingButWeirdHistoryCache[0].printHistory.historyIndex);
+    expect(history2[0].printCost).toEqual(0);
     // Act
     const historyStats = historyStore.generateStatistics();
     // Assert
@@ -276,7 +268,7 @@ describe("History-Cache", () => {
   it("should turn a single tool into array", async () => {
     mockHistoryService.saveMockData(realisticHistoryCache);
 
-    await historyStore.initCache();
+    await historyStore.loadHistoryStore();
     const { history } = historyStore.getHistoryCache();
 
     expect(history).toHaveLength(14);
@@ -288,7 +280,7 @@ describe("History-Cache", () => {
   it("should not return NaN in printHours", async () => {
     mockHistoryService.saveMockData(interestingButWeirdHistoryCache);
 
-    await historyStore.initCache();
+    await historyStore.loadHistoryStore();
     const { history } = historyStore.getHistoryCache();
 
     expect(history[0].printHours).not.toContain("NaN");
@@ -298,7 +290,7 @@ describe("History-Cache", () => {
   it("should allow process spools to return associative array when spools is non-empty", async () => {
     mockHistoryService.saveMockData(interestingButWeirdHistoryCache);
 
-    await historyStore.initCache();
+    await historyStore.loadHistoryStore();
     const { history } = historyStore.getHistoryCache();
 
     const resultingSpoolsReport = processHistorySpools(history[0], [], [], []);
@@ -311,7 +303,7 @@ describe("History-Cache", () => {
   it("should not throw when job property is null", async () => {
     mockHistoryService.saveMockData(nullJobHistoryCache);
 
-    await expect(await historyStore.initCache()).resolves;
+    await expect(await historyStore.loadHistoryStore()).resolves;
     const stats = await historyStore.generateStatistics();
 
     expect(stats).toBeTruthy();
@@ -332,8 +324,26 @@ describe("historyStore:Static", () => {
       { x: 0 },
       { x: 0, y: 1 }
     ];
-    const missingYInput = [{ x: 0 }, { x: 0, y: 1 }, { x: 0, y: 1 }, { x: 0 }, { x: 0, y: 1 }];
-    const falsyContainingInput = [null, { x: 0, y: 1 }, { x: 0 }, undefined, { x: 0, y: 1 }];
+    const missingYInput = [
+      { x: 0 },
+      { x: 0, y: 1 },
+      {
+        x: 0,
+        y: 1
+      },
+      { x: 0 },
+      { x: 0, y: 1 }
+    ];
+    const falsyContainingInput = [
+      null,
+      {
+        x: 0,
+        y: 1
+      },
+      { x: 0 },
+      undefined,
+      { x: 0, y: 1 }
+    ];
     // Prove that the old function was buggy
     expect(legacyConvertIncremental(undefinedYInput)[4]).toStrictEqual({
       x: 0,

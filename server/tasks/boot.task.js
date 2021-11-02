@@ -87,8 +87,8 @@ class BootTask {
     await this.multerService.clearUploadsFolder();
     await this.printersStore.loadPrintersStore();
     await this.filesStore.loadFilesStore();
+    await this.historyStore.loadHistoryStore();
     await this.printerGroupsCache.loadCache();
-    await this.historyStore.initCache();
     await this.filamentCache.initCache();
     await this.influxDbSetupService.optionalInfluxDatabaseSetup();
 

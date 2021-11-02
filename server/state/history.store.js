@@ -3,11 +3,10 @@ const { getDefaultHistoryStatistics } = require("../constants/cleaner.constants"
 const { arrayCounts } = require("../utils/array.util");
 const { sumValuesGroupByDate, assignYCumSum } = require("../utils/graph-point.utils");
 const { getSpool, processHistorySpools } = require("../utils/spool.utils");
-const { getPrintCostNumeric, noCostSettingsMessage } = require("../utils/print-cost.util");
+const { getPrintCostNumeric } = require("../utils/print-cost.util");
 const { toDefinedKeyValue } = require("../utils/property.util");
 const { floatOrZero } = require("../utils/number.util");
 const { toTimeFormat } = require("../utils/time.util");
-const { getJobAnalysis } = require("../utils/job.utils");
 
 /**
  * A standalone store as in-memory layer for the underlying history service
@@ -38,40 +37,27 @@ class HistoryStore {
    * Set the initial state for the history cache
    * @returns {Promise<void>}
    */
-  async initCache() {
+  async loadHistoryStore() {
     const storedHistory = await this.#historyService.find(100);
     const historyEntities = storedHistory ?? [];
-
-    // Empty history means database was nuked - so dont skip
-    // if (!historyEntities?.length) {
-    //   return;
-    // }
 
     const historyArray = [];
     for (let hist of historyEntities) {
       const printHistory = hist.printHistory;
       const printCost = getPrintCostNumeric(printHistory.printTime, printHistory.costSettings);
-      const historyJob = printHistory;
       const printSummary = {
         _id: hist._id,
-        index: printHistory.historyIndex,
         success: printHistory.success,
-        reason: printHistory?.reason,
-        printer: printHistory.printerName,
-        // TODO why this conversion?? Only creates possibility for mistakes. Keep job a job, and file a file
-        file: {
-          name: printHistory.fileName,
-          uploadDate: historyJob?.date || null,
-          path: historyJob?.path || printHistory.filePath, // TODO discuss this alternative
-          size: historyJob?.size || null,
-          averagePrintTime: historyJob?.averagePrintTime || null,
-          lastPrintTime: historyJob?.lastPrintTime || null
-        },
+        reason: printHistory.reason,
+        printerName: printHistory.printerName,
+        filePath: printHistory.filePath,
+        fileName: printHistory.fileName,
         startDate: printHistory.startDate,
         endDate: printHistory.endDate,
         printTime: printHistory.printTime,
+        job: printHistory.job,
         notes: printHistory.notes,
-        printerCost: printCost?.toFixed(2) || noCostSettingsMessage,
+        printCost: printCost,
         spools: getSpool(
           printHistory.filamentSelection,
           printHistory.job,
@@ -79,7 +65,6 @@ class HistoryStore {
           printHistory.printTime
         ),
         thumbnail: printHistory.thumbnail,
-        job: getJobAnalysis(printHistory.job, printHistory.printTime),
         spoolCost: 0,
         totalVolume: 0,
         totalLength: 0,
@@ -124,7 +109,7 @@ class HistoryStore {
     const printerNames = [];
     const filamentWeight = [];
     const filamentLength = [];
-    const printCost = [];
+    const printCostArray = [];
     const filamentCost = [];
     const failedPrintTime = [];
 
@@ -134,13 +119,13 @@ class HistoryStore {
 
     for (let h = 0; h < this.#historyCache.length; h++) {
       const {
-        printerCost,
-        file,
+        printCost,
+        fileName,
         totalLength,
         success,
         reason,
         printTime,
-        printer,
+        printerName,
         totalWeight,
         spoolCost
       } = this.#historyCache[h];
@@ -148,11 +133,11 @@ class HistoryStore {
       if (success) {
         completedJobsCount++;
         printTimes.push(printTime);
-        fileNames.push(file.name);
-        printerNames.push(printer);
+        fileNames.push(fileName);
+        printerNames.push(printerName);
         filamentWeight.push(totalWeight);
         filamentLength.push(totalLength);
-        printCost.push(parseFloat(printerCost));
+        printCostArray.push(parseFloat(printCost));
       } else if (reason === "cancelled") {
         cancelledCount++;
         failedPrintTime.push(printTime);
@@ -230,8 +215,8 @@ class HistoryStore {
         "m",
       totalSpoolCost: filamentCost.reduce((a, b) => a + b, 0).toFixed(2),
       highestSpoolCost: Math.max(...filamentCost).toFixed(2),
-      totalPrinterCost: printCost.reduce((a, b) => a + b, 0).toFixed(2),
-      highestPrinterCost: Math.max(...printCost).toFixed(2),
+      totalPrinterCost: printCostArray.reduce((a, b) => a + b, 0).toFixed(2),
+      highestPrinterCost: Math.max(...printCostArray).toFixed(2),
       currentFailed: failedPrintTime.reduce((a, b) => a + b, 0),
       totalByDay: totalByDay,
       usageOverTime: usageOverTime,

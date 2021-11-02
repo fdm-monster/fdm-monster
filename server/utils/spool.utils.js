@@ -37,8 +37,8 @@ function getCostAsString(grams, spool, completionRatio) {
   return completionRatio * ((spool.spools.price / spool.spools.weight) * grams).toFixed(2);
 }
 
-function getSpoolLabel(id) {
-  const spool = id?.spools;
+function getSpoolLabel(spoolDoc) {
+  const spool = spoolDoc?.spools;
   if (!spool) {
     return null;
   }

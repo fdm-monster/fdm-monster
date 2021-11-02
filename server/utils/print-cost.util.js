@@ -1,5 +1,3 @@
-const noCostSettingsMessage = "No cost settings to calculate from";
-
 /**
  * Calculate the cost of printing
  * @param printTime
@@ -9,7 +7,7 @@ const noCostSettingsMessage = "No cost settings to calculate from";
 function getPrintCostNumeric(printTime, costSettings) {
   if (!costSettings) {
     // Attempt to update cost settings in history...
-    return null;
+    return 0;
   }
   // calculating electricity cost
   const powerConsumption = parseFloat(costSettings.powerConsumption);
@@ -29,6 +27,5 @@ function getPrintCostNumeric(printTime, costSettings) {
 }
 
 module.exports = {
-  noCostSettingsMessage,
   getPrintCostNumeric
 };
