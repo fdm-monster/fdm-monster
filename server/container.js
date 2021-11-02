@@ -12,7 +12,6 @@ const ScriptService = require("./services/script.service");
 const TaskManagerService = require("./services/task-manager.service");
 const SystemInfoStore = require("./state/system-info.store");
 const SystemCommandsService = require("./services/system-commands.service");
-const ServerLogsService = require("./services/server-logs.service");
 const SystemInfoBundleService = require("./services/system-info-bundle.service");
 const GithubApiService = require("./services/github-api.service");
 const HistoryService = require("./services/history.service");
@@ -59,6 +58,7 @@ const { ServerTasks } = require("./tasks");
 const PermissionService = require("./services/authentication/permission.service");
 const { ROLES } = require("./constants/authorization.constants");
 const CustomGCodeService = require("./services/custom-gcode.service");
+const PrinterWebsocketPingTask = require("./tasks/printer-websocket-ping.task");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -73,7 +73,7 @@ function configureContainer() {
     ),
     serverPageTitle: asValue(process.env[AppConstants.SERVER_SITE_TITLE_KEY]),
     [DITokens.serverTasks]: asValue(ServerTasks),
-    [DITokens.defaultRole]: asValue([ROLES.GUEST]),
+    [DITokens.defaultRole]: asValue(ROLES.ADMIN),
 
     // -- asFunction --
     [DITokens.printerStateFactory]: asFunction(PrinterStateFactory).transient(), // Factory function, transient on purpose!
@@ -97,7 +97,6 @@ function configureContainer() {
     [DITokens.githubApiService]: asClass(GithubApiService),
     [DITokens.autoDiscoveryService]: asClass(AutoDiscoveryService),
     [DITokens.systemCommandsService]: asClass(SystemCommandsService),
-    [DITokens.serverLogsService]: asClass(ServerLogsService),
     [DITokens.systemInfoBundleService]: asClass(SystemInfoBundleService),
     [DITokens.httpClient]: asValue(
       axios.create({
@@ -146,6 +145,8 @@ function configureContainer() {
     [DITokens.printerFilesTask]: asClass(PrinterFilesTask).singleton(),
     // This task is a quick task (~100ms per printer)
     [DITokens.printerWebsocketTask]: asClass(PrinterWebsocketTask).singleton(),
+    // This task is a recurring heartbeat task
+    [DITokens.printerWebsocketPingTask]: asClass(PrinterWebsocketPingTask).singleton(),
     // Task dependent on WS to fire - disabled at boot
     [DITokens.printerSystemTask]: asClass(PrinterSystemTask).singleton(),
     // Task dependent on test printer in store - disabled at boot

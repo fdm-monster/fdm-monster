@@ -30,7 +30,7 @@ This work is under active development with cutting edge tech and standards. Feel
 - [x] 🛡️ Better authentication and authorization mechanisms
 - [x] :rocket: Docker multi-arch image (arm/v7, arm64 and amd64 architectures => Raspberry Pi with an 64 bits OS!)
 - [ ] :rocket: Printer Group management
-- [ ] 🛡️ Full API and client test coverage >80% (now at 50%+) 
+- [ ] 🛡️ Full API and client test coverage >80% (now at 60%) 
 - [ ] 🛡️ NodeJS Server legacy-free (history, alerts, custom gcode and filament)
 - [ ] 🛡️ Frontend user and basic role management
 - [ ] 🔌 Hub Connector - filament tracker 

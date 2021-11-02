@@ -3,7 +3,9 @@ const DITokens = require("../container.tokens");
 const { PSTATE, ERR_COUNT, MESSAGE } = require("../constants/state.constants");
 const HttpStatusCode = require("../constants/http-status-codes.constants");
 const { ExternalServiceError } = require("../exceptions/runtime.exceptions");
-const { isLoginResponseGlobal } = require("../services/octoprint/constants/octoprint-service.constants");
+const {
+  isLoginResponseGlobal
+} = require("../services/octoprint/constants/octoprint-service.constants");
 
 class PrinterWebsocketTask {
   #printersStore;
@@ -23,13 +25,13 @@ class PrinterWebsocketTask {
   };
 
   constructor({
-                printersStore,
-                octoPrintApiService,
-                settingsStore,
-                taskManagerService,
-                loggerFactory,
-                printerSystemTask // Just to make sure it can resolve
-              }) {
+    printersStore,
+    octoPrintApiService,
+    settingsStore,
+    taskManagerService,
+    loggerFactory,
+    printerSystemTask // Just to make sure it can resolve
+  }) {
     this.#printersStore = printersStore;
     this.#settingsStore = settingsStore;
     this.#octoPrintService = octoPrintApiService;

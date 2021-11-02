@@ -336,6 +336,10 @@ class PrinterState {
     );
   }
 
+  sendPing() {
+    this.#websocketAdapter.sendThrottleMessage();
+  }
+
   setFirmwareState(name) {
     this.#octoPrintSystemInfo["printer.firmware"] = name;
   }
@@ -362,6 +366,10 @@ class PrinterState {
     if (event.type === PEVENTS.current) {
       this.#jobsCache.updatePrinterJob(this.#id, event.data);
     }
+  }
+
+  isAdapterAuthed() {
+    return this.getAdapterState() === WS_STATE.authed;
   }
 
   getAdapterState() {

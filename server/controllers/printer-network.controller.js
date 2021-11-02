@@ -25,5 +25,4 @@ class PrinterNetworkController {
 module.exports = createController(PrinterNetworkController)
   .prefix(AppConstants.apiRoute + "/printer-network")
   .before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR])])
-  .get("/scan-ssdp", "scanSsdp")
-  .post("/wake-host", "wakeHost");
+  .post("/scan-ssdp", "scanSsdp");

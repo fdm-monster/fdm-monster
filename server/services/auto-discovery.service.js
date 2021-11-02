@@ -16,7 +16,7 @@ class AutoDiscoveryService {
     this.#httpClient = httpClient;
   }
 
-  #setupSsdp() {
+  setupSsdp() {
     this.#ssdpClient = require("node-upnp-ssdp");
     this.#bindSsdp();
   }
@@ -76,7 +76,7 @@ class AutoDiscoveryService {
     this.#logger.info("Running automatic scan...");
 
     if (!this.#ssdpClient) {
-      this.#setupSsdp();
+      this.setupSsdp();
     }
 
     this.#discoveredDevices = [];
@@ -87,7 +87,7 @@ class AutoDiscoveryService {
         setTimeout(() => {
           this.#ssdpClient.close();
           resolve(this.#discoveredDevices);
-        }, 20001);
+        }, 3001);
       });
     };
 

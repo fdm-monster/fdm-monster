@@ -1,5 +1,8 @@
 const _ = require("lodash");
-const { NotImplementedException, ValidationException } = require("../exceptions/runtime.exceptions");
+const {
+  NotImplementedException,
+  ValidationException
+} = require("../exceptions/runtime.exceptions");
 const { NotFoundException } = require("../exceptions/runtime.exceptions");
 const { validateInput } = require("../handlers/validators");
 const { createTestPrinterRules } = require("./validation/create-test-printer.validation");
@@ -17,13 +20,13 @@ class PrintersStore {
   #logger;
 
   constructor({
-                settingsStore,
-                printerTickerStore,
-                printerStateFactory,
-                eventEmitter2,
-                printerService,
-                loggerFactory
-              }) {
+    settingsStore,
+    printerTickerStore,
+    printerStateFactory,
+    eventEmitter2,
+    printerService,
+    loggerFactory
+  }) {
     this.#settingsStore = settingsStore;
     this.#printerService = printerService;
     this.#printerTickerStore = printerTickerStore;
@@ -329,6 +332,8 @@ class PrintersStore {
   }
 
   getOctoPrintVersions() {
+    if (!this.#printerStates) return [];
+
     return this.#printerStates.map((printer) => printer.getOctoPrintVersion());
   }
 

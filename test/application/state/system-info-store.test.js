@@ -1,5 +1,5 @@
-const { configureContainer } = require("../../server/container");
-const DITokens = require("../../server/container.tokens");
+const { configureContainer } = require("../../../server/container");
+const DITokens = require("../../../server/container.tokens");
 
 const diskFormats = ["NTFS", "exFAT", "ext4", "ext3", "ext2", "FAT32", "FAT16", "FAT8", "FAT"];
 
@@ -109,5 +109,5 @@ describe("System-Info-Store", () => {
 
     expect(diskFormats).toContain(systemInfo.systemDisk.type);
     expect(systemInfo.warnings).toBeTruthy();
-  }, 7000);
+  }, 10000);
 });
