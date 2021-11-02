@@ -116,28 +116,11 @@ function getEmptyToolTemperatureArray() {
   ];
 }
 
-function getEmptyOperationsObject() {
-  return {
-    operations: [],
-    count: {
-      printerCount: 0,
-      complete: 0,
-      offline: 0,
-      active: 0,
-      idle: 0,
-      disconnected: 0,
-      farmProgress: 0,
-      farmProgressColour: "danger"
-    }
-  };
-}
-
 module.exports = {
   getDefaultFileCleanStatistics,
   getDefaultDashboardStatisticsObject,
   getDefaultHistoryStatistics,
   getEmptyToolTemperatureArray,
-  getEmptyOperationsObject,
   DEFAULT_SPOOL_DENSITY,
   DEFAULT_SPOOL_RATIO,
   ALL_MONTHS
