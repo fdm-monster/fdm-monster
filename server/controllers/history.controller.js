@@ -31,8 +31,7 @@ class HistoryController {
   }
 
   async delete(req, res) {
-    const data = await validateInput(req.params, idRules);
-    const historyId = data.id;
+    const { id: historyId } = await validateInput(req.params, idRules);
 
     await History.findOneAndDelete({ _id: historyId });
 
@@ -42,8 +41,7 @@ class HistoryController {
   }
 
   async update(req, res) {
-    const data = await validateInput(req.params, idRules);
-    const historyId = data.id;
+    const { id: historyId } = await validateInput(req.params, idRules);
 
     // Check required fields
     const latest = req.body;

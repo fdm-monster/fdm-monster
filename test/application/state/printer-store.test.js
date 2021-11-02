@@ -75,14 +75,20 @@ describe("PrintersStore", () => {
     await expect(async () => await printersStore.addPrinter(weakNewPrinter2)).rejects.toBeDefined();
   });
 
-  it("should be able to add printer - receiving an state object back", async () => {
+  it("should be able to add and flatten new printer", async () => {
     let frozenObject = await printersStore.addPrinter(validNewPrinter);
-    expect(Object.isFrozen(frozenObject)).toBeFalsy();
+    const flatState = printersStore.getPrinterFlat(frozenObject.id);
+    expect(Object.isFrozen(flatState)).toBeTruthy();
+  });
+
+  it("should be able to add printer - receiving an state object back", async () => {
+    let unfrozenStateInstance = await printersStore.addPrinter(validNewPrinter);
+    expect(Object.isFrozen(unfrozenStateInstance)).toBeFalsy();
 
     // Need the store in order to have files to refer to
     await filesStore.loadFilesStore();
 
-    const flatState = frozenObject.toFlat();
+    const flatState = unfrozenStateInstance.toFlat();
     expect(Object.isFrozen(flatState)).toBeTruthy();
 
     expect(flatState).toMatchObject({
