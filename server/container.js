@@ -20,7 +20,6 @@ const HistoryCache = require("./state/data/history.cache");
 const JobsCache = require("./state/data/jobs.cache");
 const UserTokenService = require("./services/authentication/user-token.service");
 const ServerSentEventsHandler = require("./handlers/sse.handler");
-const PrinterFilesTask = require("./tasks/printer-files.task");
 const PrinterTickerStore = require("./state/printer-ticker.store");
 const PrinterWebsocketTask = require("./tasks/printer-websocket.task");
 const PrinterSseTask = require("./tasks/printer-sse.task");
@@ -141,8 +140,6 @@ function configureContainer() {
     [DITokens.printerSseHandler]: asClass(ServerSentEventsHandler).singleton(),
     // Task bound to send on SSE Handler
     [DITokens.printerSseTask]: asClass(PrinterSseTask).singleton(),
-    // Normal post-analysis operations (previously called cleaners)
-    [DITokens.printerFilesTask]: asClass(PrinterFilesTask).singleton(),
     // This task is a quick task (~100ms per printer)
     [DITokens.printerWebsocketTask]: asClass(PrinterWebsocketTask).singleton(),
     // This task is a recurring heartbeat task

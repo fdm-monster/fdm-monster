@@ -1,7 +1,7 @@
 const Logger = require("../handlers/logger.js");
 
 class ServerUpdateService {
-  #lastSuccessfulReleaseCheckMoment = null;
+  #lastCheckTimestamp = null;
   #latestReleaseKnown = null;
   #lastReleaseCheckFailed = null;
   #lastReleaseCheckError = null;
@@ -21,7 +21,7 @@ class ServerUpdateService {
     this.#githubApiService = githubApiService;
   }
 
-  static findGithubRelease(releases, prerelease = false, tag_name = null) {
+  static filterGithubReleases(releases, prerelease = false, tag_name = null) {
     return releases.find(
       (r) =>
         r.draft === false &&
@@ -36,59 +36,58 @@ class ServerUpdateService {
    * @returns {Promise<*|null>}
    */
   async syncLatestRelease(includePre = false) {
-    await this.#githubApiService
-      .getGithubReleasesPromise()
-      .then((githubReleases) => {
-        this.#airGapped = !githubReleases;
-        if (!githubReleases) {
-          return Promise.resolve(null);
-        } else {
-          if (!!githubReleases && githubReleases.length > 0) {
-            const latestRelease = ServerUpdateService.findGithubRelease(githubReleases, includePre);
-            // Whether the package version exists at all - developer at work if not!
-            this.#installedReleaseFound = !!ServerUpdateService.findGithubRelease(
-              githubReleases,
-              includePre,
-              this.#serverVersion
-            );
-            if (!!latestRelease && !!latestRelease?.tag_name) {
-              delete latestRelease.body;
-              delete latestRelease.author;
-              this.#loadedWithPrereleases = includePre;
-              this.#lastSuccessfulReleaseCheckMoment = new Date();
-              this.#lastReleaseCheckFailed = false;
-              this.#latestReleaseKnown = latestRelease;
-              this.#notificationReady =
-                latestRelease.tag_name !== this.#serverVersion && !!this.#installedReleaseFound;
-            } else if (!latestRelease?.tag_name) {
-              // Falsy tag_name is very unlikely - probably tests only
-              this.#lastReleaseCheckFailed = false;
-              this.#notificationReady = false;
-            } else {
-              console.log("Latest release check failed because latestRelease not set");
-              this.#lastReleaseCheckFailed = true;
-            }
-          } else {
-            console.log("Latest release check failed because releases from github empty");
-            this.#lastReleaseCheckFailed = true;
-          }
-        }
-      })
-      .catch((e) => {
-        this.#logger.error(e);
-        this.#lastReleaseCheckError = e;
+    const githubReleases = await this.#githubApiService.getGithubReleases();
+    // .catch((e) => {
+    //   this.#logger.error(e);
+    //   this.#lastReleaseCheckError = e;
+    //   this.#lastReleaseCheckFailed = true;
+    // });
+
+    this.#airGapped = !githubReleases;
+    if (!githubReleases) {
+      return;
+    }
+
+    if (githubReleases?.length > 0) {
+      const latestRelease = ServerUpdateService.filterGithubReleases(githubReleases, includePre);
+      // Whether the package version exists at all - developer at work if not!
+      this.#installedReleaseFound = !!ServerUpdateService.filterGithubReleases(
+        githubReleases,
+        includePre,
+        this.#serverVersion
+      );
+
+      this.#lastCheckTimestamp = Date.now();
+      if (!!latestRelease && !!latestRelease?.tag_name) {
+        delete latestRelease.body;
+        delete latestRelease.author;
+        this.#loadedWithPrereleases = includePre;
+        this.#lastReleaseCheckFailed = false;
+        this.#latestReleaseKnown = latestRelease;
+        this.#notificationReady =
+          latestRelease.tag_name !== this.#serverVersion && !!this.#installedReleaseFound;
+      } else if (!latestRelease?.tag_name) {
+        // Falsy tag_name is very unlikely - probably tests only
+        this.#lastReleaseCheckFailed = false;
+        this.#notificationReady = false;
+      } else {
+        console.log("Latest release check failed because latestRelease not set");
         this.#lastReleaseCheckFailed = true;
-      });
+      }
+    } else {
+      console.log("Latest release check failed because releases from github empty");
+      this.#lastReleaseCheckFailed = true;
+    }
   }
 
   /**
    * Get state of this runner
-   * @returns {{airGapped: null, lastReleaseCheckFailed: null, loadedWithPrereleases: null, lastSuccessfulReleaseCheckMoment: null, latestReleaseKnown: null}}
+   * @returns {{airGapped: null, lastReleaseCheckFailed: null, loadedWithPrereleases: null, lastCheckTimestamp: null, latestReleaseKnown: null}}
    */
   getLastReleaseSyncState() {
     return {
       latestReleaseKnown: this.#latestReleaseKnown,
-      lastSuccessfulReleaseCheckMoment: this.#lastSuccessfulReleaseCheckMoment,
+      lastCheckTimestamp: this.#lastCheckTimestamp,
       lastReleaseCheckFailed: this.#lastReleaseCheckFailed,
       loadedWithPrereleases: this.#loadedWithPrereleases,
       airGapped: this.#airGapped,
