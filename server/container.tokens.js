@@ -13,7 +13,6 @@ const DITokens = {
   printerGroupService: "printerGroupService",
   serverSettingsService: "serverSettingsService",
   serverUpdateService: "serverUpdateService",
-  serverLogsService: "serverLogsService",
   clientSettingsService: "clientSettingsService",
   githubApiService: "githubApiService",
   userTokenService: "userTokenService",

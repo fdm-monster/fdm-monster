@@ -12,7 +12,6 @@ const ScriptService = require("./services/script.service");
 const TaskManagerService = require("./services/task-manager.service");
 const SystemInfoStore = require("./state/system-info.store");
 const SystemCommandsService = require("./services/system-commands.service");
-const ServerLogsService = require("./services/server-logs.service");
 const SystemInfoBundleService = require("./services/system-info-bundle.service");
 const GithubApiService = require("./services/github-api.service");
 const HistoryService = require("./services/history.service");
@@ -98,7 +97,6 @@ function configureContainer() {
     [DITokens.githubApiService]: asClass(GithubApiService),
     [DITokens.autoDiscoveryService]: asClass(AutoDiscoveryService),
     [DITokens.systemCommandsService]: asClass(SystemCommandsService),
-    [DITokens.serverLogsService]: asClass(ServerLogsService),
     [DITokens.systemInfoBundleService]: asClass(SystemInfoBundleService),
     [DITokens.httpClient]: asValue(
       axios.create({
