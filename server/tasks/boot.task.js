@@ -110,10 +110,6 @@ class BootTask {
 
   async createConnection() {
     await mongoose.connect(fetchMongoDBConnectionString(), {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useFindAndModify: false,
-      useCreateIndex: true,
       serverSelectionTimeoutMS: 1500
     });
   }
