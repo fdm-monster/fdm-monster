@@ -67,13 +67,13 @@ function legacyConvertIncremental(input) {
 }
 
 let container;
-let historyCache;
+let historyStore;
 let mockHistoryService;
 
 beforeEach(() => {
   if (container) container.dispose();
   container = configureContainer();
-  historyCache = container.resolve(DITokens.historyStore);
+  historyStore = container.resolve(DITokens.historyStore);
   mockHistoryService = container.resolve(DITokens.historyService);
 
   mockHistoryService.resetMockData();
@@ -93,8 +93,8 @@ describe("History-Cache", () => {
   it("should initiate and finish within 5 sec for empty history", async () => {
     expect(await mockHistoryService.find({})).toHaveLength(0);
 
-    await historyCache.initCache();
-    const { stats, history } = historyCache.getHistoryCache();
+    await historyStore.initCache();
+    const { stats, history } = historyStore.getHistoryCache();
 
     expect(stats).toBeTruthy();
     expect(history).toBeTruthy();
@@ -106,9 +106,9 @@ describe("History-Cache", () => {
     mockHistoryService.saveMockData(emptyLegalHistoryCache);
     expect(await mockHistoryService.find({})).toStrictEqual(emptyLegalHistoryCache);
 
-    await historyCache.initCache();
+    await historyStore.initCache();
 
-    const { history, stats } = historyCache.getHistoryCache();
+    const { history, stats } = historyStore.getHistoryCache();
     expect(history[0].path).toBeUndefined();
     expect(stats).toBeTruthy();
   });
@@ -119,9 +119,9 @@ describe("History-Cache", () => {
 
     expect(await mockHistoryService.find({})).toStrictEqual(realisticHistoryCache);
 
-    await historyCache.initCache();
+    await historyStore.initCache();
 
-    const { history } = historyCache.getHistoryCache();
+    const { history } = historyStore.getHistoryCache();
     expect(history.length).toEqual(realisticHistoryCache.length);
     history.forEach((h) => {
       expect(h.printer).toContain("PRINTER");
@@ -135,7 +135,7 @@ describe("History-Cache", () => {
       expect(h.printerCost).not.toBeNaN();
       expect(h.printerCost).toEqual(parseFloat(h.printerCost).toFixed(2));
     });
-    const stats = historyCache.generateStatistics();
+    const stats = historyStore.generateStatistics();
     expect(stats).toBeTruthy();
 
     expect(stats).toEqual({
@@ -244,7 +244,7 @@ describe("History-Cache", () => {
 
   it("should reject when history entities contain illegal entry key", async () => {
     mockHistoryService.saveMockData(illegalHistoryCache);
-    await expect(historyCache.initCache()).rejects.toBeTruthy();
+    await expect(historyStore.initCache()).rejects.toBeTruthy();
   });
 
   it("should be able to generate statistics without error", async function () {
@@ -252,32 +252,32 @@ describe("History-Cache", () => {
     expect(await mockHistoryService.find({})).toHaveLength(1);
 
     // Empty history database => empty cache
-    await historyCache.initCache();
-    const { history } = historyCache.getHistoryCache();
+    await historyStore.initCache();
+    const { history } = historyStore.getHistoryCache();
     expect(history).toHaveLength(1);
 
     // Another test phase
     mockHistoryService.saveMockData(interestingButWeirdHistoryCache);
-    await historyCache.initCache();
-    const { history: history2 } = historyCache.getHistoryCache();
+    await historyStore.initCache();
+    const { history: history2 } = historyStore.getHistoryCache();
 
     expect(history2[0].printerCost).toEqual(noCostSettingsMessage);
     // Expect the rabbit hole to be deep.
     expect(history2[0].index).toEqual(interestingButWeirdHistoryCache[0].printHistory.historyIndex);
     // Act
-    const historyStats = historyCache.generateStatistics();
+    const historyStats = historyStore.generateStatistics();
     // Assert
     expect(historyStats).toBeTruthy();
     expect(historyStats.failed).toEqual(1);
   });
 
   // TODO conform new type for filament (key-value array)
-  // TODO historyCache[0]:job:printTimeAccuracy === NaN
+  // TODO historyStore[0]:job:printTimeAccuracy === NaN
   it("should turn a single tool into array", async () => {
     mockHistoryService.saveMockData(realisticHistoryCache);
 
-    await historyCache.initCache();
-    const { history } = historyCache.getHistoryCache();
+    await historyStore.initCache();
+    const { history } = historyStore.getHistoryCache();
 
     expect(history).toHaveLength(14);
     // A case where a tool is not set
@@ -288,8 +288,8 @@ describe("History-Cache", () => {
   it("should not return NaN in printHours", async () => {
     mockHistoryService.saveMockData(interestingButWeirdHistoryCache);
 
-    await historyCache.initCache();
-    const { history } = historyCache.getHistoryCache();
+    await historyStore.initCache();
+    const { history } = historyStore.getHistoryCache();
 
     expect(history[0].printHours).not.toContain("NaN");
     expect(history[0].printHours).toEqual("?");
@@ -298,8 +298,8 @@ describe("History-Cache", () => {
   it("should allow process spools to return associative array when spools is non-empty", async () => {
     mockHistoryService.saveMockData(interestingButWeirdHistoryCache);
 
-    await historyCache.initCache();
-    const { history } = historyCache.getHistoryCache();
+    await historyStore.initCache();
+    const { history } = historyStore.getHistoryCache();
 
     const resultingSpoolsReport = processHistorySpools(history[0], [], [], []);
     expect(resultingSpoolsReport.historyByDay).toContainEqual({
@@ -311,8 +311,8 @@ describe("History-Cache", () => {
   it("should not throw when job property is null", async () => {
     mockHistoryService.saveMockData(nullJobHistoryCache);
 
-    await expect(await historyCache.initCache()).resolves;
-    const stats = await historyCache.generateStatistics();
+    await expect(await historyStore.initCache()).resolves;
+    const stats = await historyStore.generateStatistics();
 
     expect(stats).toBeTruthy();
     expect(stats.completed).toEqual(1);
@@ -323,7 +323,7 @@ describe("History-Cache", () => {
 /**
  * Most of these functions below are easily tested in isolation
  */
-describe("historyCache:Static", () => {
+describe("historyStore:Static", () => {
   it("assignYCumSum tolerate falsy y values and skips falsy entries", () => {
     const undefinedYInput = [
       { x: 0, y: undefined },
@@ -454,7 +454,7 @@ describe("historyCache:Static", () => {
   });
 });
 
-describe("historyCache:Utilities", () => {
+describe("historyStore:Utilities", () => {
   it("deeply nested property material should never resolve to falsy property", () => {
     const testedValues = ["", null, undefined, {}, [], 0, -1];
     for (let value of testedValues) {

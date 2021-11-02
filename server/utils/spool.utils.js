@@ -99,7 +99,7 @@ function getSpool(filamentSelection, job, success, time) {
 
 function processHistorySpools(historyCleanEntry, usageOverTime, totalByDay, historyByDay) {
   const spools = historyCleanEntry?.spools;
-  const historyState = historyCleanEntry.state;
+  const { success, reason } = historyCleanEntry;
 
   const timestampDiffDaysAgo = 90 * 24 * 60 * 60 * 1000;
   let ninetyDaysAgo = new Date(Date.now() - timestampDiffDaysAgo);
@@ -114,11 +114,11 @@ function processHistorySpools(historyCleanEntry, usageOverTime, totalByDay, hist
         if (!!checkNestedResult) {
           // TODO state is being rechecked uselessly
           let checkNestedIndexHistoryRates = null;
-          if (historyState.includes("success")) {
+          if (success) {
             searchKeyword = "Success";
-          } else if (historyState.includes("warning")) {
+          } else if (reason === "cancelled") {
             searchKeyword = "Cancelled";
-          } else if (historyState.includes("danger")) {
+          } else if (reason === "failed") {
             searchKeyword = "Failed";
           } else {
             // TODO why return? Not continue?

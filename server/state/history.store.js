@@ -4,18 +4,17 @@ const { arrayCounts } = require("../utils/array.util");
 const { sumValuesGroupByDate, assignYCumSum } = require("../utils/graph-point.utils");
 const { getSpool, processHistorySpools } = require("../utils/spool.utils");
 const { getPrintCostNumeric, noCostSettingsMessage } = require("../utils/print-cost.util");
-const { stateToHtml } = require("../utils/html.util");
 const { toDefinedKeyValue } = require("../utils/property.util");
 const { floatOrZero } = require("../utils/number.util");
 const { toTimeFormat } = require("../utils/time.util");
 const { getJobAnalysis } = require("../utils/job.utils");
 
 /**
- * A standalone cache as in-memory layer for the underlying history service
+ * A standalone store as in-memory layer for the underlying history service
  */
 class HistoryStore {
-  #statisticsClean = getDefaultHistoryStatistics();
-  #historyClean = [];
+  #generatedStatistics = getDefaultHistoryStatistics();
+  #historyCache = [];
 
   #enableLogging = false;
   #logger = new Logger("Server-History", this.#enableLogging, "warn");
@@ -30,8 +29,8 @@ class HistoryStore {
 
   getHistoryCache() {
     return {
-      history: this.#historyClean,
-      stats: this.#statisticsClean
+      history: this.#historyCache,
+      stats: this.#generatedStatistics
     };
   }
 
@@ -56,8 +55,8 @@ class HistoryStore {
       const printSummary = {
         _id: hist._id,
         index: printHistory.historyIndex,
-        // TODO success: printHistory.success, // Proposal to avoid parsing html again
-        state: stateToHtml(printHistory.success, printHistory?.reason),
+        success: printHistory.success,
+        reason: printHistory?.reason,
         printer: printHistory.printerName,
         // TODO why this conversion?? Only creates possibility for mistakes. Keep job a job, and file a file
         file: {
@@ -112,8 +111,8 @@ class HistoryStore {
       historyArray.push(printSummary);
     }
 
-    this.#historyClean = historyArray;
-    this.#statisticsClean = this.generateStatistics();
+    this.#historyCache = historyArray;
+    this.#generatedStatistics = this.generateStatistics();
   }
 
   generateStatistics() {
@@ -133,11 +132,20 @@ class HistoryStore {
     const totalByDay = [];
     const historyByDay = [];
 
-    for (let h = 0; h < this.#historyClean.length; h++) {
-      const { printerCost, file, totalLength, state, printTime, printer, totalWeight, spoolCost } =
-        this.#historyClean[h];
+    for (let h = 0; h < this.#historyCache.length; h++) {
+      const {
+        printerCost,
+        file,
+        totalLength,
+        success,
+        reason,
+        printTime,
+        printer,
+        totalWeight,
+        spoolCost
+      } = this.#historyCache[h];
 
-      if (state.includes("success")) {
+      if (success) {
         completedJobsCount++;
         printTimes.push(printTime);
         fileNames.push(file.name);
@@ -145,16 +153,16 @@ class HistoryStore {
         filamentWeight.push(totalWeight);
         filamentLength.push(totalLength);
         printCost.push(parseFloat(printerCost));
-      } else if (state.includes("warning")) {
+      } else if (reason === "cancelled") {
         cancelledCount++;
         failedPrintTime.push(printTime);
-      } else if (state.includes("danger")) {
+      } else {
         failedCount++;
         failedPrintTime.push(printTime);
       }
       filamentCost.push(spoolCost);
 
-      processHistorySpools(this.#historyClean[h], usageOverTime, totalByDay, historyByDay);
+      processHistorySpools(this.#historyCache[h], usageOverTime, totalByDay, historyByDay);
     }
 
     // TODO huge refactor #2
