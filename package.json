@@ -37,9 +37,9 @@
   ],
   "dependencies": {
     "@3d-hub/client": "0.1.12",
-    "awilix": "^5.0.1",
-    "awilix-express": "^5.0.0",
-    "axios": "^0.22.0",
+    "awilix": "^6.0.0",
+    "awilix-express": "^6.0.0",
+    "axios": "^0.24.0",
     "bcryptjs": "^2.4.3",
     "connect-history-api-fallback": "^1.6.0",
     "cookie-parser": "^1.4.5",
@@ -69,8 +69,8 @@
     "rxjs-websockets": "^9.0.0",
     "semver": "^7.3.5",
     "simple-git": "^2.46.0",
-    "systeminformation": "^5.9.4",
-    "toad-scheduler": "^1.5.0",
+    "systeminformation": "^5.9.9",
+    "toad-scheduler": "^1.6.0",
     "winston": "^3.3.3",
     "ws": "^8.2.3",
     "xml2js": "^0.4.23"
