@@ -9,9 +9,6 @@ beforeAll(async () => {
 });
 
 describe("SystemInfoBundleService", () => {
-  /**
-   * Tests that valid system information is passed from the SystemRunner
-   */
   it("should return valid system information bundle", async () => {
     const result = systemInfoBundleService.generateSystemInformationContents();
 

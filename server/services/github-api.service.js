@@ -12,7 +12,7 @@ class GithubApiService {
     this.#logger = loggerFactory("Github-API", false);
   }
 
-  async getGithubReleasesPromise() {
+  async getGithubReleases() {
     const connected = await this.#httpClient
       .get("https://google.com", {
         headers: { [contentTypeHeaderKey]: jsonContentType }
@@ -21,19 +21,22 @@ class GithubApiService {
       .catch(() => false);
 
     if (!connected) {
-      return Promise.resolve(null);
+      return;
     }
 
-    return await this.#httpClient
-      .get("https://api.github.com/repos/3d-hub/3d-hub/releases", {
+    const response = await this.#httpClient.get(
+      "https://api.github.com/repos/3d-hub/3d-hub/releases",
+      {
         headers: {
           [contentTypeHeaderKey]: jsonContentType
         }
-      })
-      .then((r) => {
-        this.#logger.info(`Received ${r.data.length} releases from github.`);
-        return r.data;
-      });
+      }
+    );
+
+    if (!response?.data?.length) return;
+
+    this.#logger.info(`Received ${response.data.length} releases from github.`);
+    return response.data;
   }
 }
 
