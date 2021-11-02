@@ -1,7 +1,7 @@
 const Logger = require("../handlers/logger.js");
 
 class ServerUpdateService {
-  #lastSuccessfulReleaseCheckMoment = null;
+  #lastCheckTimestamp = null;
   #latestReleaseKnown = null;
   #lastReleaseCheckFailed = null;
   #lastReleaseCheckError = null;
@@ -56,11 +56,12 @@ class ServerUpdateService {
         includePre,
         this.#serverVersion
       );
+
+      this.#lastCheckTimestamp = Date.now();
       if (!!latestRelease && !!latestRelease?.tag_name) {
         delete latestRelease.body;
         delete latestRelease.author;
         this.#loadedWithPrereleases = includePre;
-        this.#lastSuccessfulReleaseCheckMoment = new Date();
         this.#lastReleaseCheckFailed = false;
         this.#latestReleaseKnown = latestRelease;
         this.#notificationReady =
@@ -81,12 +82,12 @@ class ServerUpdateService {
 
   /**
    * Get state of this runner
-   * @returns {{airGapped: null, lastReleaseCheckFailed: null, loadedWithPrereleases: null, lastSuccessfulReleaseCheckMoment: null, latestReleaseKnown: null}}
+   * @returns {{airGapped: null, lastReleaseCheckFailed: null, loadedWithPrereleases: null, lastCheckTimestamp: null, latestReleaseKnown: null}}
    */
   getLastReleaseSyncState() {
     return {
       latestReleaseKnown: this.#latestReleaseKnown,
-      lastSuccessfulReleaseCheckMoment: this.#lastSuccessfulReleaseCheckMoment,
+      lastCheckTimestamp: this.#lastCheckTimestamp,
       lastReleaseCheckFailed: this.#lastReleaseCheckFailed,
       loadedWithPrereleases: this.#loadedWithPrereleases,
       airGapped: this.#airGapped,
