@@ -4,7 +4,7 @@ const { isPromise } = require("jest-util");
 
 const illegalHistoryCache = [{ printHistory2: null }];
 const emptyLegalHistoryCache = [{ printHistory: {} }];
-const realisticHistoryCache = require("./mock-data/Histories.json");
+const realisticHistoryCache = require("../mock-data/Histories.json");
 const { configureContainer } = require("../../../server/container");
 const DITokens = require("../../../server/container.tokens");
 const { assignYCumSum } = require("../../../server/utils/graph-point.utils");
@@ -73,7 +73,7 @@ let mockHistoryService;
 beforeEach(() => {
   if (container) container.dispose();
   container = configureContainer();
-  historyCache = container.resolve(DITokens.historyCache);
+  historyCache = container.resolve(DITokens.historyStore);
   mockHistoryService = container.resolve(DITokens.historyService);
 
   mockHistoryService.resetMockData();

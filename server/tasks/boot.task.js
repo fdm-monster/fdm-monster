@@ -14,7 +14,7 @@ class BootTask {
   printersStore;
   filesStore;
   printerGroupsCache;
-  historyCache;
+  historyStore;
   filamentCache;
   permissionService;
   roleService;
@@ -27,9 +27,9 @@ class BootTask {
     settingsStore,
     multerService,
     printersStore,
+    historyStore,
     filesStore,
     printerGroupsCache,
-    historyCache,
     filamentCache,
     permissionService,
     roleService,
@@ -43,7 +43,7 @@ class BootTask {
     this.printersStore = printersStore;
     this.filesStore = filesStore;
     this.printerGroupsCache = printerGroupsCache;
-    this.historyCache = historyCache;
+    this.historyStore = historyStore;
     this.filamentCache = filamentCache;
     this.permissionService = permissionService;
     this.roleService = roleService;
@@ -88,7 +88,7 @@ class BootTask {
     await this.printersStore.loadPrintersStore();
     await this.filesStore.loadFilesStore();
     await this.printerGroupsCache.loadCache();
-    await this.historyCache.initCache();
+    await this.historyStore.initCache();
     await this.filamentCache.initCache();
     await this.influxDbSetupService.optionalInfluxDatabaseSetup();
 
