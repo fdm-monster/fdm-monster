@@ -87,7 +87,7 @@ class AutoDiscoveryService {
         setTimeout(() => {
           this.#ssdpClient.close();
           resolve(this.#discoveredDevices);
-        }, 20001);
+        }, 3001);
       });
     };
 
