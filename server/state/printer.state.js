@@ -359,12 +359,14 @@ class PrinterState {
       } else if (data.type === EVENT_TYPES.Disconnected) {
         this.setFirmwareState("-");
       }
-      if (
-        [EVENT_TYPES.PrintCancelled, EVENT_TYPES.PrintDone, EVENT_TYPES.PrintFailed].includes(
-          data.type
-        )
-      ) {
-      }
+
+      // TODO Process the event with the history store
+      // if (
+      //   [EVENT_TYPES.PrintCancelled, EVENT_TYPES.PrintDone, EVENT_TYPES.PrintFailed].includes(
+      //     data.type
+      //   )
+      // ) {
+      // }
     }
     if (event.type === PEVENTS.init) {
       this.#jobsCache.savePrinterJob(this.#id, event.data);
