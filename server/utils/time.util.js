@@ -21,12 +21,6 @@ function getCompletionDate(printTimeLeftSeconds, completion) {
   return printDoneDT.toFormat("ccc LLL dd yyyy: HH:mm");
 }
 
-function getDayName() {
-  return new Intl.DateTimeFormat(["en"], {
-    weekday: "long" // ?? what should I put here
-  }).format(new Date());
-}
-
 /**
  * Calculate a start and end time using a duration and 'now' as end
  * @param printDuration
@@ -57,6 +51,5 @@ function durationToDates(printDuration) {
 module.exports = {
   toTimeFormat,
   durationToDates,
-  getCompletionDate,
-  getDayName
+  getCompletionDate
 };
