@@ -13,17 +13,16 @@ const { checkNestedIndex, checkNested } = require("../../utils/array.util");
 class DashboardStatisticsCache {
   #dashboardStatistics = getDefaultDashboardStatisticsObject();
   #currentHistoryTemp = getEmptyToolTemperatureArray();
-  #farmStats = null;
 
   #printersInformation; // stub
 
-  #historyCache;
-  constructor({ historyCache }) {
-    this.#historyCache = historyCache;
+  #historyStore;
+  constructor({ historyStore }) {
+    this.#historyStore = historyStore;
   }
 
   async generatePrinterStatistics(id) {
-    const historyCache = this.#historyCache().getHistoryCache();
+    const historyCache = this.#historyStore().getHistoryCache();
     let currentHistory = JSON.parse(JSON.stringify(historyCache.history));
 
     let currentPrinters = this.#printersInformation;
@@ -225,9 +224,8 @@ class DashboardStatisticsCache {
   }
 
   async statisticsStart() {
-    const historyCache = this.#historyCache().getHistoryCache();
+    const historyCache = this.#historyStore().getHistoryCache();
     let historyStats = historyCache.stats;
-
 
     const arrayEstimated = [];
     const arrayRemaining = [];

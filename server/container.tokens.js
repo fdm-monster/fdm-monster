@@ -48,7 +48,7 @@ const DITokens = {
   dashboardStatisticsCache: "dashboardCache",
   fileCache: "fileCache",
   fileUploadTrackerCache: "fileUploadTrackerCache",
-  historyCache: "historyCache",
+  historyStore: "historyStore",
   filamentCache: "filamentCache",
   // Tasks
   serverTasks: "serverTasks",

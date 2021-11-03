@@ -11,10 +11,10 @@ const examplePrintTime = 30;
 
 describe("printCostUtil", function () {
   it("should return known message when costSetting is undefined", async function () {
-    expect(getPrintCostNumeric(1, undefined)).toBe(null);
+    expect(getPrintCostNumeric(1, undefined)).toBe(0);
   });
   it("should return known message when costSetting is null", async function () {
-    expect(getPrintCostNumeric(1, null)).toBe(null);
+    expect(getPrintCostNumeric(1, null)).toBe(0);
   });
 
   it('should return cost estimation "NaN" when powerConsumption is not in costSettings', async function () {
