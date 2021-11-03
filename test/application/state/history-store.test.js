@@ -7,10 +7,7 @@ const realisticHistoryCache = require("../mock-data/Histories.json");
 const { configureContainer } = require("../../../server/container");
 const DITokens = require("../../../server/container.tokens");
 const { assignYCumSum } = require("../../../server/utils/graph-point.utils");
-const {
-  processHistorySpools,
-  calcSpoolWeightAsString
-} = require("../../../server/utils/spool.utils");
+
 const interestingButWeirdHistoryCache = [
   {
     printHistory: {
@@ -137,102 +134,23 @@ describe("History-Cache", () => {
       completed: 10,
       cancelled: 4,
       failed: 0,
-      completedPercent: "71.43",
-      cancelledPercent: "28.57",
-      failedPercent: "0.00",
-      longestPrintTime: "20900.00",
-      shortestPrintTime: "64.00",
-      averagePrintTime: "11014.10",
+      longestPrintTime: 20900,
+      shortestPrintTime: 64,
+      averagePrintTime: 11014.1,
       mostPrintedFile: "file.gcode",
       printerMost: "PRINTER2",
-      printerLoad: "PRINTER1",
-      totalFilamentUsage: "286.66g / 95.56m",
-      averageFilamentUsage: "28.67g / 9.56m",
-      highestFilamentUsage: "68.50g / 22.42m",
-      lowestFilamentUsage: "0.00g / 0.00m",
-      totalSpoolCost: "1.99",
-      highestSpoolCost: "1.85",
-      totalPrinterCost: "7.63",
-      highestPrinterCost: "1.89",
+      printerLeast: "PRINTER1",
+      totalFilamentCost: 0,
+      highestFilamentCost: 0,
+      totalPrintCost: 7.634603469051243,
+      highestPrintCost: 1.8927111237950278,
       currentFailed: 247,
-      historyByDay: [
-        {
-          data: [
-            {
-              x: expect.any(Date),
-              y: 1
-            },
-            {
-              x: expect.any(Date),
-              y: 1
-            }
-          ],
-          name: "Success"
-        },
-        {
-          data: [],
-          name: "Failed"
-        },
-        {
-          data: [
-            {
-              x: expect.any(Date),
-              y: 2
-            }
-          ],
-          name: "Cancelled"
-        }
-      ],
-      totalByDay: [
-        {
-          data: [
-            {
-              x: expect.any(Date),
-              y: 68.5
-            }
-          ],
-          name: "PETG"
-        },
-        {
-          data: [
-            {
-              x: expect.any(Date),
-              y: 2.3499999999999996
-            }
-          ],
-          name: "PLA"
-        }
-      ],
-      usageOverTime: [
-        {
-          data: [
-            {
-              x: expect.any(Date),
-              y: 68.5
-            }
-          ],
-          name: "PETG"
-        },
-        {
-          data: [
-            {
-              x: expect.any(Date),
-              y: 2.3499999999999996
-            }
-          ],
-          name: "PLA"
-        }
-      ]
+      historyByDay: [],
+      totalByDay: [],
+      usageOverTime: []
     });
 
-    expect(stats.historyByDay).toHaveLength(3);
-    expect(stats.historyByDay[0].data.length).toBeGreaterThan(0); // Success
-    expect(stats.historyByDay[1].data.length).toBe(0); // Cancelled
-    expect(stats.historyByDay[2].data.length).toBe(1); // Failed
-    expect(stats.usageOverTime[0].data.length).toBe(1);
-    expect(stats.usageOverTime[1].data.length).toBe(1);
-    expect(stats.totalByDay[0].data.length).toBe(1); // PETG usage > 1
-    expect(stats.totalByDay[1].data.length).toBeGreaterThan(0);
+    expect(stats.historyByDay).toHaveLength(0);
     expect(stats.totalSpoolCost).not.toBe("NaN");
     expect(stats.highestSpoolCost).not.toBe("NaN");
   });
@@ -272,9 +190,7 @@ describe("History-Cache", () => {
     const { history } = historyStore.getHistoryCache();
 
     expect(history).toHaveLength(14);
-    // A case where a tool is not set
-    expect(history[3].spools).toBeNull();
-    expect(history[13].spools[0].tool0.toolName).toBe("Tool 0");
+    expect(history[3].spools).toBeFalsy();
   });
 
   it("should not return NaN in printHours", async () => {
@@ -285,19 +201,6 @@ describe("History-Cache", () => {
 
     expect(history[0].printHours).not.toContain("NaN");
     expect(history[0].printHours).toEqual("?");
-  });
-
-  it("should allow process spools to return associative array when spools is non-empty", async () => {
-    mockHistoryService.saveMockData(interestingButWeirdHistoryCache);
-
-    await historyStore.loadHistoryStore();
-    const { history } = historyStore.getHistoryCache();
-
-    const resultingSpoolsReport = processHistorySpools(history[0], [], [], []);
-    expect(resultingSpoolsReport.historyByDay).toContainEqual({
-      name: "Success",
-      data: []
-    });
   });
 
   it("should not throw when job property is null", async () => {
@@ -385,82 +288,6 @@ describe("historyStore:Static", () => {
 
     const operatorComparedResult = assignYCumSum(input);
     expect(operatorComparedResult).toStrictEqual(unitUnderTestResult);
-  });
-
-  it("should not return Promise on static processHistorySpools", () => {
-    const result = processHistorySpools(
-      {
-        spools: [
-          {
-            pla: {
-              type: "abs"
-            }
-          }
-        ]
-      },
-      [],
-      [],
-      []
-    );
-
-    expect(isPromise(result)).toEqual(false);
-  });
-
-  it("should calculate spool weight with calcSpoolWeightAsString equivalently to getWeight function", () => {
-    function getWeight(length, spool, printPercentage, success) {
-      if (typeof spool !== "undefined" && spool !== null) {
-        if (typeof length !== "undefined") {
-          if (length === 0) {
-            return length;
-          } else {
-            const radius = parseFloat(spool.spools.profile.diameter) / 2;
-            const volume = length * Math.PI * radius * radius;
-            let usage = "";
-            if (success) {
-              usage = (volume * parseFloat(spool.spools.profile.density)).toFixed(2);
-            } else {
-              usage = (
-                (printPercentage / 100) *
-                (volume * parseFloat(spool.spools.profile.density))
-              ).toFixed(2);
-            }
-            return usage;
-          }
-        } else {
-          return 0;
-        }
-      } else {
-        if (typeof length !== "undefined") {
-          length = length;
-          if (length === 0) {
-            return length;
-          } else {
-            const radius = 1.75 / 2;
-            const volume = length * Math.PI * radius * radius;
-            let usage = "";
-            if (success) {
-              usage = (volume * 1.24).toFixed(2);
-            } else {
-              usage = ((printPercentage / 100) * (volume * 1.24)).toFixed(2);
-            }
-            return usage;
-          }
-        } else {
-          return 0;
-        }
-      }
-    }
-
-    const length1 = 18.648094819996633;
-    expect(getWeight(length1, undefined, 100, 0)).toEqual(
-      calcSpoolWeightAsString(length1, undefined, 1)
-    );
-    expect(getWeight(length1, undefined, 50, 0)).toEqual(
-      calcSpoolWeightAsString(length1, undefined, 0.5)
-    );
-    expect(getWeight(length1, undefined, 50, 1)).toEqual(
-      calcSpoolWeightAsString(length1, undefined, 1)
-    );
   });
 });
 

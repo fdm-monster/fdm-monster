@@ -2,7 +2,6 @@ const Logger = require("../handlers/logger.js");
 const { getDefaultHistoryStatistics } = require("../constants/cleaner.constants");
 const { arrayCounts } = require("../utils/array.util");
 const { sumValuesGroupByDate, assignYCumSum } = require("../utils/graph-point.utils");
-const { getSpool, processHistorySpools } = require("../utils/spool.utils");
 const { getPrintCostNumeric } = require("../utils/print-cost.util");
 const { toDefinedKeyValue } = require("../utils/property.util");
 const { floatOrZero } = require("../utils/number.util");
@@ -58,12 +57,6 @@ class HistoryStore {
         job: printHistory.job,
         notes: printHistory.notes,
         printCost: printCost,
-        spools: getSpool(
-          printHistory.filamentSelection,
-          printHistory.job,
-          printHistory.success,
-          printHistory.printTime
-        ),
         thumbnail: printHistory.thumbnail,
         spoolCost: 0,
         totalVolume: 0,
@@ -87,10 +80,10 @@ class HistoryStore {
           }
         }
       }
-      printSummary.totalCost = (printCost + printSummary.spoolCost).toFixed(2);
+      printSummary.totalCost = printCost + printSummary.spoolCost;
       printSummary.costPerHour = floatOrZero(
         parseFloat(printSummary.totalCost) / ((100 * parseFloat(printHistory.printTime)) / 360000)
-      ).toFixed(2);
+      );
 
       printSummary.printHours = toTimeFormat(printHistory.printTime);
       historyArray.push(printSummary);
@@ -107,8 +100,6 @@ class HistoryStore {
     const printTimes = [];
     const fileNames = [];
     const printerNames = [];
-    const filamentWeight = [];
-    const filamentLength = [];
     const printCostArray = [];
     const filamentCost = [];
     const failedPrintTime = [];
@@ -135,8 +126,6 @@ class HistoryStore {
         printTimes.push(printTime);
         fileNames.push(fileName);
         printerNames.push(printerName);
-        filamentWeight.push(totalWeight);
-        filamentLength.push(totalLength);
         printCostArray.push(parseFloat(printCost));
       } else if (reason === "cancelled") {
         cancelledCount++;
@@ -146,13 +135,8 @@ class HistoryStore {
         failedPrintTime.push(printTime);
       }
       filamentCost.push(spoolCost);
-
-      processHistorySpools(this.#historyCache[h], usageOverTime, totalByDay, historyByDay);
     }
 
-    // TODO huge refactor #2
-    const totalFilamentWeight = filamentWeight.reduce((a, b) => a + b, 0);
-    const totalFilamentLength = filamentLength.reduce((a, b) => a + b, 0);
     const filesArray = arrayCounts(fileNames);
     let mostPrintedFile = "No Files";
     if (filesArray[0].length !== 0) {
@@ -169,7 +153,6 @@ class HistoryStore {
       mostUsedPrinter = printerNamesArray[0][maxIndexPrinterNames];
       leastUsedPrinter = printerNamesArray[0][minIndexPrinterNames];
     }
-    const statTotal = completedJobsCount + cancelledCount + failedCount;
     totalByDay.forEach((usage) => {
       usage.data = sumValuesGroupByDate(usage.data);
     });
@@ -187,36 +170,16 @@ class HistoryStore {
       completed: completedJobsCount,
       cancelled: cancelledCount,
       failed: failedCount,
-      completedPercent: ((completedJobsCount / statTotal) * 100).toFixed(2),
-      cancelledPercent: ((cancelledCount / statTotal) * 100).toFixed(2),
-      failedPercent: ((failedCount / statTotal) * 100).toFixed(2),
-      longestPrintTime: Math.max(...printTimes).toFixed(2),
-      shortestPrintTime: Math.min(...printTimes).toFixed(2),
-      averagePrintTime: (printTimes.reduce((a, b) => a + b, 0) / printTimes.length).toFixed(2),
+      longestPrintTime: Math.max(...printTimes),
+      shortestPrintTime: Math.min(...printTimes),
+      averagePrintTime: printTimes.reduce((a, b) => a + b, 0) / printTimes.length,
       mostPrintedFile,
       printerMost: mostUsedPrinter,
-      printerLoad: leastUsedPrinter,
-      totalFilamentUsage:
-        totalFilamentWeight.toFixed(2) + "g / " + totalFilamentLength.toFixed(2) + "m",
-      averageFilamentUsage:
-        (totalFilamentWeight / filamentWeight.length).toFixed(2) +
-        "g / " +
-        (totalFilamentLength / filamentLength.length).toFixed(2) +
-        "m",
-      highestFilamentUsage:
-        Math.max(...filamentWeight).toFixed(2) +
-        "g / " +
-        Math.max(...filamentLength).toFixed(2) +
-        "m",
-      lowestFilamentUsage:
-        Math.min(...filamentWeight).toFixed(2) +
-        "g / " +
-        Math.min(...filamentLength).toFixed(2) +
-        "m",
-      totalSpoolCost: filamentCost.reduce((a, b) => a + b, 0).toFixed(2),
-      highestSpoolCost: Math.max(...filamentCost).toFixed(2),
-      totalPrinterCost: printCostArray.reduce((a, b) => a + b, 0).toFixed(2),
-      highestPrinterCost: Math.max(...printCostArray).toFixed(2),
+      printerLeast: leastUsedPrinter,
+      totalFilamentCost: filamentCost.reduce((a, b) => a + b, 0),
+      highestFilamentCost: Math.max(...filamentCost),
+      totalPrintCost: printCostArray.reduce((a, b) => a + b, 0),
+      highestPrintCost: Math.max(...printCostArray),
       currentFailed: failedPrintTime.reduce((a, b) => a + b, 0),
       totalByDay: totalByDay,
       usageOverTime: usageOverTime,
