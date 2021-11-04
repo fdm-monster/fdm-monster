@@ -3,10 +3,12 @@ const { AppConstants } = require("../../server/server.constants");
 const { setupTestApp } = require("../test-server");
 const { expectOkResponse, expectNotFoundResponse } = require("../extensions");
 const Printer = require("../../server/models/Printer");
+const { createTestHistory } = require("./test-data/create-history");
 
 const defaultRoute = `${AppConstants.apiRoute}/history`;
 const statsRoute = `${defaultRoute}/stats`;
 const getRoute = (id) => `${defaultRoute}/${id}`;
+const deleteRoute = (id) => `${getRoute(id)}`;
 
 let request;
 
@@ -27,6 +29,12 @@ describe("HistoryController", () => {
 
   it(`should allow GET on ${statsRoute}`, async () => {
     const response = await request.get(statsRoute).send();
+    expectOkResponse(response);
+  });
+
+  it(`should allow DELETE on ${statsRoute}`, async () => {
+    const historyElement = await createTestHistory();
+    const response = await request.delete(deleteRoute(historyElement.id)).send();
     expectOkResponse(response);
   });
 

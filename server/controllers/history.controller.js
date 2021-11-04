@@ -5,6 +5,7 @@ const { validateInput, validateMiddleware } = require("../handlers/validators");
 const { idRules } = require("./validation/generic.validation");
 const { getCostSettingsDefault } = require("../constants/service.constants");
 const { ROLES } = require("../constants/authorization.constants");
+const HistoryModel = require("../models/History");
 
 class HistoryController {
   #serverVersion;
@@ -32,7 +33,7 @@ class HistoryController {
   async delete(req, res) {
     const { id: historyId } = await validateInput(req.params, idRules);
 
-    await History.findOneAndDelete({ _id: historyId });
+    await HistoryModel.findOneAndDelete({ _id: historyId });
 
     res.send();
   }
@@ -41,7 +42,7 @@ class HistoryController {
     const { id: historyId } = await validateInput(req.params, idRules);
     const { note } = validateMiddleware(req, {});
 
-    const history = await History.findOne({ _id: historyId });
+    const history = await HistoryModel.findOne({ _id: historyId });
     history.printHistory.notes = note;
     await history.save();
 
@@ -51,7 +52,7 @@ class HistoryController {
   async updateCostSettings(req, res) {
     const { id } = await validateInput(req.params, idRules);
 
-    const historyEntity = await History.findOne({ _id: id });
+    const historyEntity = await HistoryModel.findOne({ _id: id });
     historyEntity.printHistory.costSettings = getCostSettingsDefault();
     await historyEntity.save();
 
