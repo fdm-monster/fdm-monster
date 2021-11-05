@@ -17,7 +17,7 @@ class HistoryService {
     return History.find({}).sort({ historyIndex: -1 }).limit(limit);
   }
 
-  async saveJobCompletion(printer, job, status = "success", { payload, resends, files }) {
+  async saveJobCompletion(printer, job, status = "success", { payload, resends }) {
     let printerName = printer.getName();
     const { startDate, endDate } = durationToDates(payload.time);
 
@@ -34,15 +34,12 @@ class HistoryService {
       filePath: payload.path,
       startDate,
       endDate,
-      printTime: payload.time,
-      filamentSelection: printer.selectedFilament
+      printTime: payload.time
     };
 
-    const newHistoryDoc = new History({
-      printHistory
-    });
-
+    const newHistoryDoc = new History(printHistory);
     await newHistoryDoc.save();
+    return newHistoryDoc;
   }
 }
 

@@ -4,6 +4,7 @@ const { setupTestApp } = require("../test-server");
 const { expectOkResponse, expectNotFoundResponse } = require("../extensions");
 const Printer = require("../../server/models/Printer");
 const { createTestHistory } = require("./test-data/create-history");
+const { createTestPrinter } = require("./test-data/create-printer");
 
 const defaultRoute = `${AppConstants.apiRoute}/history`;
 const statsRoute = `${defaultRoute}/stats`;
@@ -33,7 +34,8 @@ describe("HistoryController", () => {
   });
 
   it(`should allow DELETE on ${statsRoute}`, async () => {
-    const historyElement = await createTestHistory();
+    const printer = await createTestPrinter(request);
+    const historyElement = await createTestHistory(printer.id, "testname");
     const response = await request.delete(deleteRoute(historyElement.id)).send();
     expectOkResponse(response);
   });
