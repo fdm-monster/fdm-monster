@@ -40,7 +40,7 @@ class HistoryService {
     return historyDoc;
   }
 
-  async saveJobCompletion(printer, job, status = "success", { payload, resends }) {
+  async create(printer, job, { payload, resends }) {
     let printerName = printer.getName();
     const { startDate, endDate } = durationToDates(payload.time);
 

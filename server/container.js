@@ -20,7 +20,7 @@ const HistoryStore = require("./state/history.store");
 const JobsCache = require("./state/data/jobs.cache");
 const UserTokenService = require("./services/authentication/user-token.service");
 const ServerSentEventsHandler = require("./handlers/sse.handler");
-const PrinterTickerStore = require("./state/printer-ticker.store");
+const OctoPrintLogsCache = require("./state/data/octoprint-logs.cache");
 const PrinterWebsocketTask = require("./tasks/printer-websocket.task");
 const PrinterSseTask = require("./tasks/printer-sse.task");
 const PrinterSystemTask = require("./tasks/printer-system.task");
@@ -118,7 +118,7 @@ function configureContainer() {
     [DITokens.historyStore]: asClass(HistoryStore).singleton(),
     [DITokens.jobsCache]: asClass(JobsCache).singleton(),
     [DITokens.terminalLogsCache]: asClass(TerminalLogsCache).singleton(),
-    [DITokens.printerTickerStore]: asClass(PrinterTickerStore).singleton(),
+    [DITokens.octoPrintLogsCache]: asClass(OctoPrintLogsCache).singleton(),
     [DITokens.fileCache]: asClass(FileCache).singleton(),
     [DITokens.fileUploadTrackerCache]: asClass(FileUploadTrackerCache).singleton(),
     [DITokens.filamentStore]: asClass(FilamentStore), // No need for singleton as its now based on filamentCache

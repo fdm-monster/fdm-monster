@@ -17,11 +17,13 @@ class HistoryStore {
 
   #historyService;
   #settingsStore;
+  #printersStore;
   #jobsCache;
 
-  constructor({ historyService, jobsCache, settingsStore, loggerFactory }) {
+  constructor({ historyService, jobsCache, printersStore, settingsStore, loggerFactory }) {
     this.#historyService = historyService;
     this.#settingsStore = settingsStore;
+    this.#printersStore = printersStore;
     this.#jobsCache = jobsCache;
     this.#logger = loggerFactory(HistoryStore.name, this.#enableLogging, "warn");
   }
@@ -33,6 +35,13 @@ class HistoryStore {
     };
   }
 
+  getEntryIndex(id) {
+    const entryIndex = this.#historyCache.findIndex((h) => h.id === id);
+    if (entryIndex === -1) throw new NotFoundException("History entry not found in cache");
+
+    return entryIndex;
+  }
+
   getEntry(id) {
     const entry = this.#historyCache.find((h) => h.id === id);
     if (!entry) throw new NotFoundException("History entry not found in cache");
@@ -40,20 +49,28 @@ class HistoryStore {
     return entry;
   }
 
-  createJobHistoryEntry(printerId) {
+  async createJobHistoryEntry(printerId, { payload, resends }) {
     const job = this.#jobsCache.getPrinterJob(printerId);
+    const printerState = this.#printersStore.getPrinterState(printerId);
+
+    const entry = await this.#historyService.create(printerState, job, { payload, resends });
+    this.#historyCache.push(entry);
+
+    return entry;
   }
 
   async updateCostSettings(id, costSettings) {
-    const historyEntry = this.getEntry(id);
-    historyEntry.costSettings = costSettings;
-    return await historyEntry.save();
+    const entryIndex = this.getEntryIndex(id);
+    const historyEntry = await this.#historyService.updateCostSettings(id, costSettings);
+
+    this.#historyCache[entryIndex] = historyEntry;
+    return historyEntry;
   }
 
   async deleteEntry(id) {
     await this.#historyService.delete(id);
 
-    const index = this.#historyCache.findIndex((h) => h.id === id);
+    const index = this.getEntryIndex(id);
     if (index !== -1) {
       this.#historyCache.pop(index);
 

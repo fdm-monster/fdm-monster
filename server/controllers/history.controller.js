@@ -5,7 +5,6 @@ const { validateInput, validateMiddleware } = require("../handlers/validators");
 const { idRules } = require("./validation/generic.validation");
 const { getCostSettingsDefault } = require("../constants/service.constants");
 const { ROLES } = require("../constants/authorization.constants");
-const HistoryModel = require("../models/History");
 
 class HistoryController {
   #settingsStore;

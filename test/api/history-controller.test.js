@@ -23,10 +23,6 @@ beforeAll(async () => {
   historyStore = container.resolve(DITokens.historyStore);
 });
 
-beforeEach(async () => {
-  Printer.deleteMany({});
-});
-
 describe("HistoryController", () => {
   it(`should allow GET on ${defaultRoute}`, async () => {
     const response = await request.get(defaultRoute).send();
@@ -41,6 +37,7 @@ describe("HistoryController", () => {
   it(`should allow DELETE on ${statsRoute}`, async () => {
     const printer = await createTestPrinter(request);
     const historyElement = await createTestHistory(printer.id, "testname");
+    await historyStore.loadHistoryStore();
     const response = await request.delete(deleteRoute(historyElement.id)).send();
     expectOkResponse(response);
   });
