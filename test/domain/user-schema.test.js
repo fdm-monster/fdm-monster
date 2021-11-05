@@ -50,9 +50,11 @@ describe("User:Schema", function () {
     // Save new User
     await newUser.save();
     let wasThrown = false;
-    await newUser2.save().catch((e) => {
+    try {
+      await newUser2.save();
+    } catch (e) {
       wasThrown = true;
-    });
+    }
     expect(wasThrown).toBe(true);
 
     const users = await User.find({ username: "SAMENAME" });
