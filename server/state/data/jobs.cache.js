@@ -50,9 +50,7 @@ class JobsCache {
       return;
     }
 
-    // console.log(Object.keys(this.#cachedJobProgress), "before");
     delete this.#cachedJobProgress[printerId];
-    // console.log(Object.keys(this.#cachedJobProgress), "after");
 
     this.#logger.info(`Purged printerId '${printerId}' job progress cache`);
   }
@@ -79,7 +77,7 @@ class JobsCache {
       filePath: cachedJob.job.file.path,
       averagePrintTime: cachedJob.job.averagePrintTime,
       lastPrintTime: cachedJob.job.lastPrintTime,
-      expectedPrintTime: cachedJob.job.estimatedPrintTime // Rename?
+      estimatedPrintTime: cachedJob.job.estimatedPrintTime // Rename?
     };
     if (!!cachedJob.currentZ) {
       transformedJob.currentZ = cachedJob.currentZ;
@@ -87,15 +85,9 @@ class JobsCache {
 
     const progress = cachedJob.progress;
     if (!!progress) {
-      transformedJob.progress = Math.floor(progress.completion); // Rename + floor
-      transformedJob.printTimeRemaining = progress.printTimeLeft; // Rename
+      transformedJob.progress = progress.completion;
+      transformedJob.printTimeLeft = progress.printTimeLeft; // Rename
       transformedJob.printTimeElapsed = progress.printTime; // Rename
-      transformedJob.expectedPrintTime =
-        Math.round((progress.printTimeLeft + progress.printTime) / 1000) * 1000; // Calc
-      transformedJob.expectedCompletionDate = getCompletionDate(
-        progress.printTimeLeft,
-        progress.completion
-      );
     } else {
       transformedJob.progress = 0;
     }

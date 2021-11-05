@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const Schema = require("mongoose/lib/schema");
-const { arrayValidator } = require("../handlers/validators");
 
 const PrinterInGroupSchema = new mongoose.Schema({
   printerId: Schema.Types.ObjectId,

@@ -10,7 +10,6 @@ const ObjectID = require("mongodb").ObjectID;
 
 class PrintersStore {
   #settingsStore;
-  #printerTickerStore;
   #printerService;
   #printerStateFactory;
   #eventEmitter2;
@@ -21,7 +20,6 @@ class PrintersStore {
 
   constructor({
     settingsStore,
-    printerTickerStore,
     printerStateFactory,
     eventEmitter2,
     printerService,
@@ -29,7 +27,6 @@ class PrintersStore {
   }) {
     this.#settingsStore = settingsStore;
     this.#printerService = printerService;
-    this.#printerTickerStore = printerTickerStore;
     this.#printerStateFactory = printerStateFactory;
     this.#eventEmitter2 = eventEmitter2;
     this.#logger = loggerFactory("Server-PrintersStore");
@@ -100,10 +97,6 @@ class PrintersStore {
     this._validateState();
 
     return this.#printerStates.filter((p) => includeDisconnected || p.markForRemoval === false);
-  }
-
-  getPrinterCount() {
-    return this.listPrinterStates().length;
   }
 
   getPrinterState(id) {
@@ -229,11 +222,6 @@ class PrintersStore {
     }
     sorted.sort((a, b) => (a.sortIndex > b.sortIndex ? 1 : -1));
     return sorted;
-  }
-
-  addLoggedTicker(printer, message, state) {
-    this.#logger.info(message);
-    this.#printerTickerStore.addIssue(printer, message, state);
   }
 
   async batchImport(printers) {

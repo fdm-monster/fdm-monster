@@ -10,13 +10,6 @@ beforeAll(async () => {
 });
 
 /**
- * Clear all test data after every test.
- */
-afterEach(async () => {
-  await dbHandler.clearDatabase();
-});
-
-/**
  * Remove and close the db and server.
  */
 afterAll(async () => {
@@ -50,9 +43,11 @@ describe("User:Schema", function () {
     // Save new User
     await newUser.save();
     let wasThrown = false;
-    await newUser2.save().catch((e) => {
+    try {
+      await newUser2.save();
+    } catch (e) {
       wasThrown = true;
-    });
+    }
     expect(wasThrown).toBe(true);
 
     const users = await User.find({ username: "SAMENAME" });

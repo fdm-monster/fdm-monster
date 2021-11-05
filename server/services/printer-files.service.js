@@ -1,6 +1,5 @@
 const { NotFoundException } = require("../exceptions/runtime.exceptions");
 const { findFileIndex } = require("./utils/find-predicate.utils");
-const Logger = require("../handlers/logger.js");
 const { Status } = require("../constants/service.constants");
 
 /**
@@ -9,10 +8,11 @@ const { Status } = require("../constants/service.constants");
 class PrinterFilesService {
   #printerService;
 
-  #logger = new Logger(PrinterFilesService.name);
+  #logger;
 
-  constructor({ printerService }) {
+  constructor({ printerService, loggerFactory }) {
     this.#printerService = printerService;
+    this.#logger = loggerFactory(PrinterFilesService.name);
   }
 
   async getPrinterFilesStorage(printerId) {
