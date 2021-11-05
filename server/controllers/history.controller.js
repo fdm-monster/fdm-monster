@@ -42,8 +42,8 @@ class HistoryController {
     const { id: historyId } = await validateInput(req.params, idRules);
     const { note } = validateMiddleware(req, {});
 
-    const history = await HistoryModel.findOne({ _id: historyId });
-    history.printHistory.notes = note;
+    const history = await HistoryModel.findById(historyId);
+    history.notes = note;
     await history.save();
 
     res.send();
@@ -53,7 +53,7 @@ class HistoryController {
     const { id } = await validateInput(req.params, idRules);
 
     const historyEntity = await HistoryModel.findOne({ _id: id });
-    historyEntity.printHistory.costSettings = getCostSettingsDefault();
+    historyEntity.costSettings = getCostSettingsDefault();
     await historyEntity.save();
 
     res.send();
