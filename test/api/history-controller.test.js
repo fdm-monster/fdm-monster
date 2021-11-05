@@ -5,17 +5,22 @@ const { expectOkResponse, expectNotFoundResponse } = require("../extensions");
 const Printer = require("../../server/models/Printer");
 const { createTestHistory } = require("./test-data/create-history");
 const { createTestPrinter } = require("./test-data/create-printer");
+const DITokens = require("../../server/container.tokens");
 
 const defaultRoute = `${AppConstants.apiRoute}/history`;
 const statsRoute = `${defaultRoute}/stats`;
 const getRoute = (id) => `${defaultRoute}/${id}`;
 const deleteRoute = (id) => `${getRoute(id)}`;
+const costSettingsRoute = (id) => `${getRoute(id)}/cost-settings`;
 
 let request;
+let container;
+let historyStore;
 
 beforeAll(async () => {
   await dbHandler.connect();
-  ({ request } = await setupTestApp(true));
+  ({ request, container } = await setupTestApp(true));
+  historyStore = container.resolve(DITokens.historyStore);
 });
 
 beforeEach(async () => {
@@ -37,6 +42,14 @@ describe("HistoryController", () => {
     const printer = await createTestPrinter(request);
     const historyElement = await createTestHistory(printer.id, "testname");
     const response = await request.delete(deleteRoute(historyElement.id)).send();
+    expectOkResponse(response);
+  });
+
+  it(`should update costSettings`, async () => {
+    const printer = await createTestPrinter(request);
+    const historyElement = await createTestHistory(printer.id, "testname");
+    await historyStore.loadHistoryStore();
+    const response = await request.patch(costSettingsRoute(historyElement.id)).send();
     expectOkResponse(response);
   });
 

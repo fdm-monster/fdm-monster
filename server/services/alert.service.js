@@ -28,7 +28,6 @@ class AlertService {
 
   async delete(alertId) {
     const alert = await this.get(alertId);
-
     await Alert.findByIdAndDelete(alert.id);
   }
 

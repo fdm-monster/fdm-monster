@@ -1,6 +1,14 @@
 const HistoryModel = require("../../../server/models/History");
+const { getCostSettingsDefault } = require("../../../server/constants/service.constants");
 
-async function createTestHistory(printerId, name, costSettings = {}, job = {}) {
+async function createTestHistory(
+  printerId,
+  name,
+  costSettings = {},
+  job = {
+    test: true
+  }
+) {
   const history = new HistoryModel({
     filePath: "test",
     fileDisplay: "Testfile",
@@ -9,10 +17,11 @@ async function createTestHistory(printerId, name, costSettings = {}, job = {}) {
     success: true,
     reason: "Yay",
     job: job,
-    costSettings: costSettings,
+    costSettings: getCostSettingsDefault(),
     printerId: printerId,
     printerName: name
   });
+  await history.validate();
   return history.save();
 }
 

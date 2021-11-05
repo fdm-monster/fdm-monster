@@ -1,7 +1,5 @@
 jest.mock("../../../server/services/history.service");
-const { isPromise } = require("jest-util");
 
-const illegalHistoryCache = [{ printHistory2: null }];
 const emptyLegalHistoryCache = [{ printHistory: {} }];
 const realisticHistoryCache = require("../mock-data/Histories.json");
 const { configureContainer } = require("../../../server/container");
@@ -10,25 +8,23 @@ const { assignYCumSum } = require("../../../server/utils/graph-point.utils");
 
 const interestingButWeirdHistoryCache = [
   {
-    printHistory: {
-      success: false,
-      reason: "failed",
-      totalLength: 1,
-      filamentSelection: {
-        spools: {
-          profile: {
-            diameter: 5,
-            density: 3
-          }
-        }
-      },
-      job: {
-        filament: "pla"
-      },
+    success: false,
+    reason: "failed",
+    totalLength: 1,
+    filamentSelection: {
       spools: {
-        pla: {
-          type: "pla"
+        profile: {
+          diameter: 5,
+          density: 3
         }
+      }
+    },
+    job: {
+      filament: "pla"
+    },
+    spools: {
+      pla: {
+        type: "pla"
       }
     }
   }
@@ -36,15 +32,11 @@ const interestingButWeirdHistoryCache = [
 
 const nullJobHistoryCache = [
   {
-    printHistory: {
-      job: null
-    }
+    job: null
   },
   {
-    printHistory: {
-      success: true,
-      job: null
-    }
+    success: true,
+    job: null
   }
 ];
 
@@ -82,7 +74,7 @@ afterEach(() => {
   jest.resetAllMocks();
 });
 
-describe("History-Cache", () => {
+describe("historyStore", () => {
   Date.now = () => 1618059562000;
   process.env.TZ = "UTC";
 
@@ -140,8 +132,8 @@ describe("History-Cache", () => {
       mostPrintedFile: "file.gcode",
       printerMost: "PRINTER2",
       printerLeast: "PRINTER1",
-      totalFilamentCost: 0,
-      highestFilamentCost: 0,
+      totalFilamentCost: NaN,
+      highestFilamentCost: NaN,
       totalPrintCost: 7.634603469051243,
       highestPrintCost: 1.8927111237950278,
       currentFailed: 247,
@@ -153,11 +145,6 @@ describe("History-Cache", () => {
     expect(stats.historyByDay).toHaveLength(0);
     expect(stats.totalSpoolCost).not.toBe("NaN");
     expect(stats.highestSpoolCost).not.toBe("NaN");
-  });
-
-  it("should reject when history entities contain illegal entry key", async () => {
-    mockHistoryService.saveMockData(illegalHistoryCache);
-    await expect(historyStore.loadHistoryStore()).rejects.toBeTruthy();
   });
 
   it("should be able to generate statistics without error", async function () {
@@ -191,16 +178,6 @@ describe("History-Cache", () => {
 
     expect(history).toHaveLength(14);
     expect(history[3].spools).toBeFalsy();
-  });
-
-  it("should not return NaN in printHours", async () => {
-    mockHistoryService.saveMockData(interestingButWeirdHistoryCache);
-
-    await historyStore.loadHistoryStore();
-    const { history } = historyStore.getHistoryCache();
-
-    expect(history[0].printHours).not.toContain("NaN");
-    expect(history[0].printHours).toEqual("?");
   });
 
   it("should not throw when job property is null", async () => {

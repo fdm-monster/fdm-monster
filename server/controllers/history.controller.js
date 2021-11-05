@@ -8,16 +8,12 @@ const { ROLES } = require("../constants/authorization.constants");
 const HistoryModel = require("../models/History");
 
 class HistoryController {
-  #serverVersion;
   #settingsStore;
   #historyStore;
-  #serverPageTitle;
 
-  constructor({ settingsStore, serverVersion, serverPageTitle, historyStore }) {
+  constructor({ settingsStore, historyStore }) {
     this.#settingsStore = settingsStore;
     this.#historyStore = historyStore;
-    this.#serverVersion = serverVersion;
-    this.#serverPageTitle = serverPageTitle;
   }
 
   async getCache(req, res) {
@@ -31,20 +27,9 @@ class HistoryController {
   }
 
   async delete(req, res) {
-    const { id: historyId } = await validateInput(req.params, idRules);
+    const { id } = await validateInput(req.params, idRules);
 
-    await HistoryModel.findOneAndDelete({ _id: historyId });
-
-    res.send();
-  }
-
-  async update(req, res) {
-    const { id: historyId } = await validateInput(req.params, idRules);
-    const { note } = validateMiddleware(req, {});
-
-    const history = await HistoryModel.findById(historyId);
-    history.notes = note;
-    await history.save();
+    await this.#historyStore.deleteEntry(id);
 
     res.send();
   }
@@ -52,11 +37,9 @@ class HistoryController {
   async updateCostSettings(req, res) {
     const { id } = await validateInput(req.params, idRules);
 
-    const historyEntity = await HistoryModel.findOne({ _id: id });
-    historyEntity.costSettings = getCostSettingsDefault();
-    await historyEntity.save();
+    const result = await this.#historyStore.updateCostSettings(id, getCostSettingsDefault());
 
-    res.send();
+    res.send(result);
   }
 }
 
@@ -66,6 +49,6 @@ module.exports = createController(HistoryController)
     .before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR])])
     .get("/", "getCache")
     .delete("/:id", "delete")
-    .put("/:id", "update")
+    // .put("/:id", "update")
     .get("/stats", "stats")
-    .patch("/:id/cost-settings", "updateCostMatch");
+    .patch("/:id/cost-settings", "updateCostSettings");

@@ -1,11 +1,9 @@
-const Logger = require("../handlers/logger.js");
 const { getDefaultHistoryStatistics } = require("../constants/cleaner.constants");
 const { arrayCounts } = require("../utils/array.util");
 const { sumValuesGroupByDate, assignYCumSum } = require("../utils/graph-point.utils");
 const { getPrintCostNumeric } = require("../utils/print-cost.util");
-const { toDefinedKeyValue } = require("../utils/property.util");
-const { floatOrZero } = require("../utils/number.util");
-const { toTimeFormat } = require("../utils/time.util");
+const { Status } = require("../constants/service.constants");
+const { NotFoundException } = require("../exceptions/runtime.exceptions");
 
 /**
  * A standalone store as in-memory layer for the underlying history service
@@ -15,14 +13,17 @@ class HistoryStore {
   #historyCache = [];
 
   #enableLogging = false;
-  #logger = new Logger("Server-History", this.#enableLogging, "warn");
+  #logger;
 
   #historyService;
   #settingsStore;
+  #jobsCache;
 
-  constructor({ historyService, settingsStore }) {
+  constructor({ historyService, jobsCache, settingsStore, loggerFactory }) {
     this.#historyService = historyService;
     this.#settingsStore = settingsStore;
+    this.#jobsCache = jobsCache;
+    this.#logger = loggerFactory(HistoryStore.name, this.#enableLogging, "warn");
   }
 
   getHistoryCache() {
@@ -30,6 +31,36 @@ class HistoryStore {
       history: this.#historyCache,
       stats: this.#generatedStatistics
     };
+  }
+
+  getEntry(id) {
+    const entry = this.#historyCache.find((h) => h.id === id);
+    if (!entry) throw new NotFoundException("History entry not found in cache");
+
+    return entry;
+  }
+
+  createJobHistoryEntry(printerId) {
+    const job = this.#jobsCache.getPrinterJob(printerId);
+  }
+
+  async updateCostSettings(id, costSettings) {
+    const historyEntry = this.getEntry(id);
+    historyEntry.costSettings = costSettings;
+    return await historyEntry.save();
+  }
+
+  async deleteEntry(id) {
+    await this.#historyService.delete(id);
+
+    const index = this.#historyCache.findIndex((h) => h.id === id);
+    if (index !== -1) {
+      this.#historyCache.pop(index);
+
+      return Status.success("Deleted history entry from cached history");
+    } else {
+      return Status.failure("History entry was not found in cached history");
+    }
   }
 
   /**
@@ -41,52 +72,12 @@ class HistoryStore {
     const historyEntities = storedHistory ?? [];
 
     const historyArray = [];
-    for (let hist of historyEntities) {
-      const printHistory = hist.printHistory;
-      const printCost = getPrintCostNumeric(printHistory.printTime, printHistory.costSettings);
-      const printSummary = {
-        _id: hist._id,
-        success: printHistory.success,
-        reason: printHistory.reason,
-        printerName: printHistory.printerName,
-        filePath: printHistory.filePath,
-        fileName: printHistory.fileName,
-        startDate: printHistory.startDate,
-        endDate: printHistory.endDate,
-        printTime: printHistory.printTime,
-        job: printHistory.job,
-        notes: printHistory.notes,
-        printCost: printCost,
-        thumbnail: printHistory.thumbnail,
-        spoolCost: 0,
-        totalVolume: 0,
-        totalLength: 0,
-        totalWeight: 0,
-        ...toDefinedKeyValue(printHistory.resends, "resend"),
-        ...toDefinedKeyValue(printHistory.snapshot, "snapshot"),
-        ...toDefinedKeyValue(printHistory.timelapse, "timelapse")
-      };
-
-      if (!!printSummary.spools) {
-        const keys = Object.keys(printSummary.spools);
-        for (let s = 0; s < printSummary.spools.length; s++) {
-          const toolProp = "tool" + keys[s];
-          const spoolTool = printSummary.spools[s][toolProp];
-          if (!!spoolTool) {
-            printSummary.spoolCost += floatOrZero(spoolTool.cost);
-            printSummary.totalVolume += floatOrZero(spoolTool.volume);
-            printSummary.totalLength += floatOrZero(spoolTool.length);
-            printSummary.totalWeight += floatOrZero(spoolTool.weight);
-          }
-        }
-      }
-      printSummary.totalCost = printCost + printSummary.spoolCost;
-      printSummary.costPerHour = floatOrZero(
-        parseFloat(printSummary.totalCost) / ((100 * parseFloat(printHistory.printTime)) / 360000)
+    for (let printHistory of historyEntities) {
+      printHistory.printCost = getPrintCostNumeric(
+        printHistory.printTime,
+        printHistory.costSettings
       );
-
-      printSummary.printHours = toTimeFormat(printHistory.printTime);
-      historyArray.push(printSummary);
+      historyArray.push(printHistory);
     }
 
     this.#historyCache = historyArray;
@@ -109,17 +100,8 @@ class HistoryStore {
     const historyByDay = [];
 
     for (let h = 0; h < this.#historyCache.length; h++) {
-      const {
-        printCost,
-        fileName,
-        totalLength,
-        success,
-        reason,
-        printTime,
-        printerName,
-        totalWeight,
-        spoolCost
-      } = this.#historyCache[h];
+      const { printCost, fileName, success, reason, printTime, printerName, spoolCost } =
+        this.#historyCache[h];
 
       if (success) {
         completedJobsCount++;
