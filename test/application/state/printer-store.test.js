@@ -3,6 +3,7 @@ const dbHandler = require("../../db-handler");
 const DITokens = require("../../../server/container.tokens");
 const { configureContainer } = require("../../../server/container");
 const { ValidationException } = require("../../../server/exceptions/runtime.exceptions");
+const { CATEGORY } = require("../../../server/constants/state.constants");
 
 let container;
 let printersStore;
@@ -118,5 +119,71 @@ describe("PrintersStore", () => {
       stepSize: expect.any(Number),
       alerts: null
     });
+  });
+
+  it("should load printerStore with a saved printer", async () => {
+    await printersStore.addPrinter(validNewPrinter);
+    await printersStore.loadPrintersStore();
+  });
+
+  it("should update api user from printerStore", async () => {
+    const newPrinter = await printersStore.addPrinter(validNewPrinter);
+    await printersStore.updateApiUserName(newPrinter.id, "testname");
+  });
+
+  it("should skip teardown test printer when already undefined", async () => {
+    await printersStore.deleteTestPrinter();
+  });
+
+  it("should get undefined test printer from store", async () => {
+    expect(printersStore.getTestPrinter()).toBeUndefined();
+  });
+
+  it("should get whether printerState is authed", async () => {
+    let printerState = await printersStore.addPrinter(validNewPrinter);
+
+    expect(printerState.isAdapterAuthed()).toBeFalsy();
+  });
+
+  it("should get printerState apiAccessibility", async () => {
+    let printerState = await printersStore.addPrinter(validNewPrinter);
+
+    expect(printerState.getApiAccessibility()).toMatchObject({
+      accessible: true,
+      retryable: true,
+      reason: null
+    });
+  });
+
+  it("should get printerState api accessible and retryable", async () => {
+    let printerState = await printersStore.addPrinter(validNewPrinter);
+    expect(printerState.isApiAccessible()).toBeTruthy();
+    expect(printerState.isApiRetryable()).toBeTruthy();
+    expect(printerState.shouldRetryConnect()).toBeTruthy();
+  });
+
+  it("should get printerState octoprint undefined stored version when disconnected", async () => {
+    let printerState = await printersStore.addPrinter(validNewPrinter);
+    expect(printerState.getOctoPrintVersion()).toBeUndefined();
+  });
+
+  it("should get printerState url", async () => {
+    let printerState = await printersStore.addPrinter(validNewPrinter);
+    expect(printerState.getURL()).toBeTruthy();
+  });
+
+  it("should get printerState url", async () => {
+    let printerState = await printersStore.addPrinter(validNewPrinter);
+    expect(printerState.getStateCategory()).toEqual(CATEGORY.Offline);
+  });
+
+  it("should get printerState sortIndex", async () => {
+    let printerState = await printersStore.addPrinter(validNewPrinter);
+    printerState.getSortIndex();
+  });
+
+  it("should update printerState systemInfo", async () => {
+    let printerState = await printersStore.addPrinter(validNewPrinter);
+    expect(printerState.updateSystemInfo({})).toBeUndefined();
   });
 });

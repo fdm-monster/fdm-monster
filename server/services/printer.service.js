@@ -165,15 +165,14 @@ class PrinterService {
     });
   }
 
-  async savePrinterAdminUsername(id, opAdminUserName) {
-    const printer = PrinterModel.findById(id);
+  async updateApiUsername(id, opAdminUserName) {
+    const printer = await PrinterModel.findById(id);
     if (!printer) {
       throw new NotFoundException(`The printer with ID ${id} does not exist in database.`);
     }
 
     printer.currentUser = opAdminUserName;
-    printer.markModified("currentUser");
-    await printer.updateOne();
+    return printer.save();
   }
 }
 
