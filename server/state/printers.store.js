@@ -162,8 +162,9 @@ class PrintersStore {
   }
 
   async deleteTestPrinter() {
-    await this.#testPrinterState.tearDown();
+    if (!this.#testPrinterState) return;
 
+    await this.#testPrinterState.tearDown();
     this.#testPrinterState = undefined;
   }
 
@@ -198,30 +199,21 @@ class PrintersStore {
     }
   }
 
+  async updateApiUserName(printerId, username) {
+    let printer = this.getPrinterState(printerId);
+    if (!username?.length) throw new ValidationException([{ error: "Username must be non-empty" }]);
+
+    const doc = await this.#printerService.updateApiUsername(printer.id, username);
+    printer.updateEntityData(doc);
+    return printer.toFlat();
+  }
+
   async updateEnabled(printerId, enabled) {
-    // Check existence with cache first
     let printer = this.getPrinterState(printerId);
 
     const doc = await this.#printerService.updateEnabled(printerId, enabled);
 
     printer.updateEntityData(doc, true);
-  }
-
-  /**
-   * @deprecated A list used to sort printers. This is obsolete next minor release.
-   * @returns {*[]}
-   */
-  getPrinterSortingList() {
-    const sorted = [];
-    for (let p = 0; p < this.#printerStates.length; p++) {
-      const sort = {
-        sortIndex: this.#printerStates[p].sortIndex,
-        actualIndex: p
-      };
-      sorted.push(sort);
-    }
-    sorted.sort((a, b) => (a.sortIndex > b.sortIndex ? 1 : -1));
-    return sorted;
   }
 
   async batchImport(printers) {
