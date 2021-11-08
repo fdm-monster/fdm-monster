@@ -69,6 +69,11 @@ class PrinterController {
     res.send(foundPrinter);
   }
 
+  async getPrinterLoginDetails(req, res) {
+    const { printerLogin } = getScopedPrinter(req);
+    res.send(printerLogin);
+  }
+
   async sendSerialConnectCommand(req, res) {
     const { printerLogin } = getScopedPrinter(req);
 
@@ -304,6 +309,7 @@ module.exports = createController(PrinterController)
     .get("/:id", "get")
     .patch("/:id", "update")
     .delete("/:id", "delete")
+    .get("/:id/login-details", "getPrinterLoginDetails")
     .post("/:id/serial-connect", "sendSerialConnectCommand")
     .post("/:id/serial-disconnect", "sendSerialDisconnectCommand")
     .post("/:id/job/stop", "stopPrintJob")

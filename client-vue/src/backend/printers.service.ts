@@ -1,6 +1,6 @@
 import { ServerApi } from "@/backend/server.api";
 import { BaseService } from "@/backend/base.service";
-import { Printer } from "@/models/printers/printer.model";
+import { LoginDetails, Printer } from "@/models/printers/printer.model";
 import {
   CreatePrinter,
   getDefaultCreatePrinter,
@@ -56,6 +56,12 @@ export class PrintersService extends BaseService {
     const path = ServerApi.printerRoute;
 
     return (await this.getApi<Printer[]>(path)) as Printer[];
+  }
+
+  static async getPrinterLoginDetails(printerId: string) {
+    const path = ServerApi.getPrinterLoginDetailsRoute(printerId);
+
+    return (await this.getApi<LoginDetails>(path)) as LoginDetails;
   }
 
   static async sendPrinterConnectCommand(printerId: string) {

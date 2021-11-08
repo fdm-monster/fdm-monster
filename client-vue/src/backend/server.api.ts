@@ -32,6 +32,8 @@ export class ServerApi {
   static testAlertScriptRoute = `${ServerApi.alertRoute}/test-alert-script`;
 
   static getPrinterRoute = (id: string) => `${ServerApi.printerRoute}/${id}`;
+  static getPrinterLoginDetailsRoute = (id: string) =>
+    `${ServerApi.getPrinterRoute(id)}/login-details`;
   static getPrinterSettingsRoute = (id: string) => `${ServerApi.printerSettingsRoute}/${id}`;
   static setPrinterSettingsGCodeAnalysisRoute = (id: string) =>
     `${ServerApi.getPrinterSettingsRoute(id)}/gcode-analysis`;
