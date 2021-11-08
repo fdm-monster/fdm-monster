@@ -13,7 +13,7 @@
         <v-card-text>
           <v-row>
             <v-col :cols="showChecksPanel ? 8 : 12">
-              <PrinterCrudForm ref="printerUpdateForm" :printer-id="storedUpdatedPrinter.id" />
+              <PrinterCrudForm ref="printerUpdateForm" :printer-id="storedUpdatedPrinter.id"/>
             </v-col>
 
             <PrinterChecksPanel v-if="showChecksPanel" :cols="4" :test-progress="testProgress">
@@ -70,12 +70,12 @@ export default class UpdatePrinterDialog extends Vue {
     printerUpdateForm: InstanceType<typeof PrinterCrudForm>;
   };
 
-  formData() {
-    return this.$refs.printerUpdateForm?.formData;
-  }
-
   get storedUpdatedPrinter() {
     return printersState.currentUpdateDialogPrinter;
+  }
+
+  formData() {
+    return this.$refs.printerUpdateForm?.formData;
   }
 
   @Watch("storedUpdatedPrinter")
@@ -83,6 +83,9 @@ export default class UpdatePrinterDialog extends Vue {
     this.dialogShowed = !!viewedPrinter;
     const printerId = viewedPrinter?.id;
     if (!viewedPrinter || !printerId) return;
+
+    const loginDetails = await PrintersService.getPrinterLoginDetails(printerId);
+    this.formData().apiKey = loginDetails.apiKey;
   }
 
   @Watch("dialogShowed")
@@ -147,7 +150,7 @@ export default class UpdatePrinterDialog extends Vue {
     });
 
     this.$bus.emit(updatedPrinterEvent(printerId as string), updatedData);
-    this.$bus.emit(infoMessageEvent, `Printer ${updatedPrinter.printerName} updated`);
+    this.$bus.emit(infoMessageEvent, `Printer ${ updatedPrinter.printerName } updated`);
   }
 
   closeDialog() {

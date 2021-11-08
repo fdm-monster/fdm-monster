@@ -10,6 +10,11 @@ export interface ApiAccessibility {
   reason: string;
 }
 
+export interface LoginDetails {
+  apiKey: string;
+  printerURL: string;
+}
+
 export interface Printer {
   id: string;
   correlationToken?: string;
