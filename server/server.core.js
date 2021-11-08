@@ -7,6 +7,7 @@ const { configureContainer } = require("./container");
 const { scopePerRequest } = require("awilix-express");
 const cors = require("cors");
 const { interceptRoles } = require("./middleware/authorization");
+const helmet = require("helmet");
 
 function setupNormalServer() {
   const httpServer = express();
@@ -22,6 +23,7 @@ function setupNormalServer() {
         methods: "GET,HEAD,PUT,PATCH,POST,DELETE"
       })
     )
+    .use(helmet())
     .use(express.json({ limit: "10mb" }))
     .use("/images", express.static("./images"))
     .use(cookieParser())
