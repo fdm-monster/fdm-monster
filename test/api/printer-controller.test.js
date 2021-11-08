@@ -18,6 +18,7 @@ const deleteRoute = (id) => `${defaultRoute}/${id}`;
 const updateRoute = (id) => `${defaultRoute}/${id}`;
 const stopJobRoute = (id) => `${defaultRoute}/${id}/job/stop`;
 const connectionRoute = (id) => `${updateRoute(id)}/connection`;
+const loginDetailsRoute = (id) => `${updateRoute(id)}/login-details`;
 const enabledRoute = (id) => `${updateRoute(id)}/enabled`;
 const stepSizeRoute = (id) => `${updateRoute(id)}/step-size`;
 const feedRateRoute = (id) => `${updateRoute(id)}/feed-rate`;
@@ -126,6 +127,13 @@ describe("PrinterController", () => {
 
     const response = await request.get(getRoute(printer.id)).send();
     expectOkResponse(response, { enabled: false });
+  });
+
+  it("should get printer loginDetails correctly", async () => {
+    const printer = await createTestPrinter(request);
+
+    const response = await request.get(loginDetailsRoute(printer.id)).send();
+    expectOkResponse(response, { printerURL: "http://url.com", apiKey: testApiKey });
   });
 
   it("should stop printer job correctly", async () => {
