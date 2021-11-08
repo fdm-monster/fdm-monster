@@ -20,7 +20,7 @@
     "core-js": "^3.18.3",
     "luxon": "^2.0.2",
     "register-service-worker": "^1.7.2",
-    "validator": "^13.6.0",
+    "validator": "^13.7.0",
     "vee-validate": "^3.4.13",
     "vue": "^2.6.14",
     "vue-axios": "^3.3.7",
