@@ -6,19 +6,22 @@ const { createTestPrinter } = require("./test-data/create-printer");
 const {
   expectOkResponse,
   expectInvalidResponse,
-  expectNotFoundResponse
+  expectNotFoundResponse,
+  expectInternalServerError
 } = require("../extensions");
 
 let Model = Printer;
-const printerFilesRoute = AppConstants.apiRoute + "/printer-files";
-const trackedUploadsRoute = `${printerFilesRoute}/tracked-uploads`;
-const purgeIndexedFilesRoute = `${printerFilesRoute}/purge`;
-const getRoute = (id) => `${printerFilesRoute}/${id}`;
+const defaultRoute = AppConstants.apiRoute + "/printer-files";
+const trackedUploadsRoute = `${defaultRoute}/tracked-uploads`;
+const purgeIndexedFilesRoute = `${defaultRoute}/purge`;
+const stubUploadFileRoute = `${defaultRoute}/stub-upload`;
+const getRoute = (id) => `${defaultRoute}/${id}`;
 const clearFilesRoute = (id) => `${getRoute(id)}/clear`;
 const moveFileOrFolderRoute = (id) => `${getRoute(id)}/move`;
 const deleteFileOrFolderRoute = (id, path) => `${getRoute(id)}?path=${path}`;
 const selectAndPrintRoute = (id) => `${getRoute(id)}/select`;
 const uploadFileRoute = (id) => `${getRoute(id)}/upload`;
+const localUploadFileRoute = (id) => `${getRoute(id)}/local-upload`;
 const createFolderRoute = (id) => `${getRoute(id)}/create-folder`;
 const getFilesRoute = (id, recursive) => `${getRoute(id)}?recursive=${recursive}`;
 const getCacheRoute = (id) => `${getRoute(id)}/cache`;
@@ -37,12 +40,12 @@ beforeEach(async () => {
 });
 
 describe("PrinterFilesController", () => {
-  it(`should return 404 on ${printerFilesRoute} for nonexisting printer`, async () => {
+  it(`should return 404 on ${defaultRoute} for nonexisting printer`, async () => {
     const res = await request.get(getRoute("60ae2b760bca4f5930be3d88")).send();
     expectNotFoundResponse(res);
   });
 
-  it(`should require 'recursive' on ${printerFilesRoute} for existing printer`, async () => {
+  it(`should require 'recursive' on ${defaultRoute} for existing printer`, async () => {
     const printer = await createTestPrinter(request);
     const response = await request.get(getRoute(printer.id)).send();
     expectInvalidResponse(response, ["recursive"]);
@@ -128,5 +131,36 @@ describe("PrinterFilesController", () => {
     const printer = await createTestPrinter(request);
     const response = await request.post(uploadFileRoute(printer.id)).send();
     expectInvalidResponse(response);
+  });
+
+  it("should error 400 on POST to upload local file being a folder", async () => {
+    // We let it fail as late as possible checking the error to not be related to our API
+    const printer = await createTestPrinter(request);
+    octoPrintApiService.storeResponse({}, 200);
+    const response = await request.post(localUploadFileRoute(printer.id)).send({
+      localLocation: "test",
+      select: true,
+      print: true
+    });
+
+    expectInvalidResponse(response, ["localLocation"]);
+  });
+
+  it("should error 404 on POST to upload local non-existing file", async () => {
+    // We let it fail as late as possible checking the error to not be related to our API
+    const printer = await createTestPrinter(request);
+    octoPrintApiService.storeResponse({}, 200);
+    const response = await request.post(localUploadFileRoute(printer.id)).send({
+      localLocation: "test-file.gcode",
+      select: true,
+      print: true
+    });
+
+    expectNotFoundResponse(response);
+  });
+
+  it("should allow empty upload to stub upload endpoint", async () => {
+    const response = await request.post(stubUploadFileRoute).send();
+    expectOkResponse(response);
   });
 });

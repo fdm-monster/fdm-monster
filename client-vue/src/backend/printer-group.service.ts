@@ -21,6 +21,21 @@ export class PrinterGroupService extends BaseService {
     return await this.deleteApi(path);
   }
 
+  static async addPrinterToGroup(
+    groupId: string,
+    { printerId, location }: { printerId: string; location: string }
+  ) {
+    const path = `${ServerApi.getPrinterFromGroupRoute(groupId)}/`;
+
+    return (await this.postApi(path, { printerId, location })) as PrinterGroup;
+  }
+
+  static async deletePrinterFromGroup(groupId: string, printerId: string) {
+    const path = `${ServerApi.getPrinterFromGroupRoute(groupId)}/`;
+
+    return (await this.deleteApi(path, { printerId })) as PrinterGroup;
+  }
+
   static async syncLegacyGroups() {
     const path = `${ServerApi.printerGroupSyncLegacyRoute}/`;
 

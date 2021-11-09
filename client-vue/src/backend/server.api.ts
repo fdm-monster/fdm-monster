@@ -38,6 +38,9 @@ export class ServerApi {
   static setPrinterSettingsGCodeAnalysisRoute = (id: string) =>
     `${ServerApi.getPrinterSettingsRoute(id)}/gcode-analysis`;
   static getPrinterGroupRoute = (id: string) => `${ServerApi.printerGroupRoute}/${id}`;
+  static getPrinterFromGroupRoute = (id: string) => `${ServerApi.getPrinterGroupRoute(id)}/printer`;
+  static deletePrinterFromGroupRoute = (id: string) =>
+    `${ServerApi.getPrinterGroupRoute(id)}/printer?`;
   static updatePrinterGroupNameRoute = (id: string) => `${ServerApi.getPrinterGroupRoute(id)}/name`;
   static printerFilesClearRoute = (id: string) => `${ServerApi.printerFilesRoute}/${id}/clear`;
   static printerFilesSelectAndPrintRoute = (id: string) =>

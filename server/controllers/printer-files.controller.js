@@ -12,7 +12,7 @@ const {
   moveFileOrFolderRules,
   createFolderRules
 } = require("./validation/printer-files-controller.validation");
-const { ValidationException } = require("../exceptions/runtime.exceptions");
+const { ValidationException, NotFoundException } = require("../exceptions/runtime.exceptions");
 const fs = require("fs");
 const { printerLoginToken, printerResolveMiddleware } = require("../middleware/printer");
 const { ROLES, PERMS } = require("../constants/authorization.constants");
@@ -207,6 +207,15 @@ class PrinterFilesController {
     const { currentPrinterId, printerLogin } = getScopedPrinter(req);
     const { select, print, localLocation } = await validateInput(req.body, localFileUploadRules);
 
+    if (!fs.existsSync(localLocation)) {
+      throw new NotFoundException("The indicated file was not found.");
+    }
+    if (fs.lstatSync(localLocation).isDirectory()) {
+      throw new ValidationException({
+        localLocation: "The indicated file was not correctly found."
+      });
+    }
+
     const stream = fs.createReadStream(localLocation);
     const response = await this.#octoPrintApiService.uploadFileAsMultiPart(printerLogin, stream, {
       select,
@@ -234,9 +243,9 @@ class PrinterFilesController {
 module.exports = createController(PrinterFilesController)
     .prefix(AppConstants.apiRoute + "/printer-files")
     .before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR]), printerResolveMiddleware()])
-    .post("/purge", "purgeIndexedFiles",withPermission(PERMS.PrinterFiles.Clear))
-    .post("/stub-upload", "stubUploadFiles",withPermission(PERMS.PrinterFiles.Upload))
-    .get("/tracked-uploads", "getTrackedUploads",withPermission(PERMS.PrinterFiles.Upload))
+    .post("/purge", "purgeIndexedFiles", withPermission(PERMS.PrinterFiles.Clear))
+    .post("/stub-upload", "stubUploadFiles", withPermission(PERMS.PrinterFiles.Upload))
+    .get("/tracked-uploads", "getTrackedUploads", withPermission(PERMS.PrinterFiles.Upload))
     .get("/:id", "getFiles", withPermission(PERMS.PrinterFiles.Get))
     .get("/:id/cache", "getFilesCache", withPermission(PERMS.PrinterFiles.Get))
     .post("/:id/local-upload", "localUploadFile", withPermission(PERMS.PrinterFiles.Upload))

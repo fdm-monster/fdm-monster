@@ -179,10 +179,16 @@ class OctoPrintApiService extends OctoPrintRoutes {
       return await processGotResponse(response, responseOptions);
     } catch (e) {
       this._eventEmitter2.emit(`${uploadProgressEvent(token)}`, token, { failed: true }, e);
+      let data;
+      try {
+        data = JSON.parse(e.response?.body);
+      } catch {
+        data = e.response?.body;
+      }
       throw new ExternalServiceError({
         error: e.message,
         statusCode: e.response?.statusCode,
-        data: JSON.parse(e.response?.body),
+        data,
         success: false,
         stack: e.stack
       });

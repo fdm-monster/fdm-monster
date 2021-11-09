@@ -72,7 +72,7 @@
 
           <v-spacer></v-spacer>
 
-          <v-btn color="primary" @click="clickDeleteGroup()" v-if="selectedPrinterGroup">
+          <v-btn v-if="selectedPrinterGroup" color="primary" @click="clickDeleteGroup()">
             <v-icon>delete</v-icon>
             Delete group
           </v-btn>
@@ -90,13 +90,21 @@
               </v-list-item-subtitle>
             </v-list-item-content>
             <v-list-item-content v-else>
-              <em>Not assigned</em>
+              <v-select
+                :items="unassignedPrinters()"
+                item-text="printerName"
+                label="Not assigned"
+                no-data-text="No printers left"
+                outlined
+                return-object
+                @change="addPrinterToGroup(selectedPrinterGroup, x, $event)"
+              ></v-select>
             </v-list-item-content>
 
             <v-list-item-action v-if="printerInGroup(selectedPrinterGroup, x)">
-              <v-btn disabled>
-                <v-icon>edit</v-icon>
-                Change
+              <v-btn @click="clearPrinterFromGroup(selectedPrinterGroup, x)">
+                <v-icon>close</v-icon>
+                Clear
               </v-btn>
             </v-list-item-action>
             <v-list-item-action v-else>
@@ -119,6 +127,7 @@ import { PrinterGroupService } from "@/backend";
 import { infoMessageEvent } from "@/event-bus/alert.events";
 import { printersState } from "@/store/printers.state";
 import { PrinterGroup } from "@/models/printers/printer-group.model";
+import { Printer } from "@/models/printers/printer.model";
 
 @Component({
   components: {},
@@ -143,8 +152,12 @@ export default class PrinterGroupsSettings extends Vue {
     return group?.printers[index - 1]?.location;
   }
 
-  printerInGroup(group: PrinterGroup, index: number) {
-    if (!group?.printers) return {};
+  unassignedPrinters() {
+    return printersState.ungroupedPrinters;
+  }
+
+  printerInGroup(group: PrinterGroup, index: number): Printer | undefined {
+    if (!group?.printers) return;
 
     const printer = group.printers[index - 1];
     return printersState.printer(printer?.printerId);
@@ -171,6 +184,19 @@ export default class PrinterGroupsSettings extends Vue {
     if (!this.selectedPrinterGroup?._id) return;
 
     await printersState.deletePrinterGroup(this.selectedPrinterGroup._id);
+  }
+
+  async addPrinterToGroup(group: PrinterGroup, position: number, printer: Printer) {
+    if (!this.selectedPrinterGroup._id) return;
+    const location = (position - 1).toString();
+    await printersState.addPrinterToGroup({ groupId: this.selectedPrinterGroup._id, printerId: printer.id, location });
+  }
+
+  async clearPrinterFromGroup(group: PrinterGroup, index: number) {
+    const printer = this.printerInGroup(group, index);
+    if (!group?._id || !printer) return;
+
+    await printersState.deletePrinterFromGroup({ groupId: group._id, printerId: printer.id });
   }
 }
 </script>
