@@ -59,6 +59,12 @@ class PrintersModule extends VuexModule {
     return (printerId?: string) => this.printer(printerId)?.printerState?.flags?.printing;
   }
 
+  get ungroupedPrinters() {
+    return this.printers.filter((p) => {
+      !this.printerGroups.find((g) => g.printers.find((pgp) => pgp.printerId == p.id));
+    });
+  }
+
   get printersWithJob(): Printer[] {
     return this.printers.filter(
       (p) => p.printerState.flags.printing || p.printerState.flags.printing
@@ -420,6 +426,13 @@ class PrintersModule extends VuexModule {
     await PrinterGroupService.deleteGroup(groupId);
 
     this.popPrinterGroup(groupId);
+  }
+
+  @Action
+  async deletePrinterFromGroup({ groupId, printerId }: { groupId: string; printerId: string }) {
+    const result = await PrinterGroupService.deletePrinterFromGroup(groupId, printerId);
+
+    this.replacePrinterGroup(result);
   }
 }
 

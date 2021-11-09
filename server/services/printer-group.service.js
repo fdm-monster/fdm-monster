@@ -93,12 +93,8 @@ class PrinterGroupService {
       (pig) => pig.printerId.toString() === validInput.printerId
     );
     if (foundPrinterInGroupIndex === -1) return group;
-
     group.printers.splice(foundPrinterInGroupIndex, 1);
-    group.markModified("printers");
-    group.updateOne();
-
-    return group;
+    return await group.save();
   }
 
   async delete(groupId) {
