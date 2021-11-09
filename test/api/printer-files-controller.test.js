@@ -133,7 +133,7 @@ describe("PrinterFilesController", () => {
     expectInvalidResponse(response);
   });
 
-  it("should error 500 on POST to upload not-found local printer file", async () => {
+  it("should error 400 on POST to upload local file being a folder", async () => {
     // We let it fail as late as possible checking the error to not be related to our API
     const printer = await createTestPrinter(request);
     octoPrintApiService.storeResponse({}, 200);
@@ -143,8 +143,20 @@ describe("PrinterFilesController", () => {
       print: true
     });
 
-    expectInternalServerError(response);
-    expect(response.body.error).toEqual("EISDIR: illegal operation on a directory, read");
+    expectInvalidResponse(response, ["localLocation"]);
+  });
+
+  it("should error 404 on POST to upload local non-existing file", async () => {
+    // We let it fail as late as possible checking the error to not be related to our API
+    const printer = await createTestPrinter(request);
+    octoPrintApiService.storeResponse({}, 200);
+    const response = await request.post(localUploadFileRoute(printer.id)).send({
+      localLocation: "test-file.gcode",
+      select: true,
+      print: true
+    });
+
+    expectNotFoundResponse(response);
   });
 
   it("should allow empty upload to stub upload endpoint", async () => {
