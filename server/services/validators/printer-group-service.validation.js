@@ -6,7 +6,7 @@ const printerIdRules = {
 
 const printerInGroupRules = {
   printerId: "required|mongoId",
-  location: "string"
+  location: "required|string"
 };
 
 const updatePrinterGroupNameRules = {

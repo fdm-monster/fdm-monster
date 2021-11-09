@@ -90,13 +90,14 @@
               </v-list-item-subtitle>
             </v-list-item-content>
             <v-list-item-content v-else>
-              <em>Not assigned</em>
-              {{ unassignedPrinters().length }}
               <v-select
                 :items="unassignedPrinters()"
                 item-text="printerName"
-                label="Outlined style"
+                label="Not assigned"
+                no-data-text="No printers left"
                 outlined
+                return-object
+                @change="addPrinterToGroup(selectedPrinterGroup, x, $event)"
               ></v-select>
             </v-list-item-content>
 
@@ -183,6 +184,12 @@ export default class PrinterGroupsSettings extends Vue {
     if (!this.selectedPrinterGroup?._id) return;
 
     await printersState.deletePrinterGroup(this.selectedPrinterGroup._id);
+  }
+
+  async addPrinterToGroup(group: PrinterGroup, position: number, printer: Printer) {
+    if (!this.selectedPrinterGroup._id) return;
+    const location = (position - 1).toString();
+    await printersState.addPrinterToGroup({ groupId: this.selectedPrinterGroup._id, printerId: printer.id, location });
   }
 
   async clearPrinterFromGroup(group: PrinterGroup, index: number) {

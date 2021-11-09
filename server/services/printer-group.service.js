@@ -78,7 +78,6 @@ class PrinterGroupService {
       group.printers.push(validInput);
     }
 
-    group.markModified("printers");
     await group.save();
 
     return group;
