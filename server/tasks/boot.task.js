@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const { fetchMongoDBConnectionString, runMigrations } = require("../server.env");
 const DITokens = require("../container.tokens");
 const MongooseError = require("mongoose/lib/error/mongooseError");
+const { ROLES } = require("../constants/authorization.constants");
 
 class BootTask {
   #logger;
@@ -18,6 +19,7 @@ class BootTask {
   filamentCache;
   permissionService;
   roleService;
+  userService;
   influxDbSetupService;
 
   constructor({
@@ -33,6 +35,7 @@ class BootTask {
     filamentCache,
     permissionService,
     roleService,
+    userService,
     taskManagerService,
     influxDbSetupService
   }) {
@@ -47,6 +50,7 @@ class BootTask {
     this.filamentCache = filamentCache;
     this.permissionService = permissionService;
     this.roleService = roleService;
+    this.userService = userService;
     this.#taskManagerService = taskManagerService;
     this.influxDbSetupService = influxDbSetupService;
     this.#logger = loggerFactory("Server");
@@ -95,6 +99,7 @@ class BootTask {
     this.#logger.info("Synchronizing user permission and roles definition");
     await this.permissionService.syncPermissions();
     await this.roleService.syncRoles();
+    await this.ensureAdminUserExists();
 
     if (bootTaskScheduler && process.env.SAFEMODE_ENABLED !== "true") {
       this.#serverTasks.BOOT_TASKS.forEach((task) => {
@@ -112,6 +117,22 @@ class BootTask {
     await mongoose.connect(fetchMongoDBConnectionString(), {
       serverSelectionTimeoutMS: 1500
     });
+  }
+
+  async ensureAdminUserExists() {
+    const adminRole = this.roleService.getRoleByName(ROLES.ADMIN);
+    const administrators = await this.userService.findByRoleId(adminRole.id);
+    if (!administrators?.length) {
+      await this.userService.register({
+        username: "root",
+        name: "Admin",
+        password: "3dhub-root",
+        roles: [adminRole.id]
+      });
+      this.#logger.info(
+        "Created admin account as it was missing. Please consult the documentation for credentials."
+      );
+    }
   }
 
   async migrateDatabase() {
