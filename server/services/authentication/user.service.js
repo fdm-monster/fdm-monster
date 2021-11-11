@@ -5,14 +5,33 @@ const { registerUserRules } = require("../validators/user-service.validation");
 const bcrypt = require("bcryptjs");
 
 class UserService {
+  #toDto(user) {
+    return {
+      id: user.id,
+      createdAt: user.createdAt,
+      username: user.username,
+      name: user.name,
+      roles: user.roles
+    };
+  }
+
+  async listUsers(limit = 10) {
+    const userDocs = await UserModel.find().limit(limit);
+
+    return userDocs.map((u) => this.#toDto(u));
+  }
+
   async getUser(userId) {
     const user = await UserModel.findById(userId);
     if (!user) throw new NotFoundException("User not found");
 
-    return user;
+    return this.#toDto(user);
   }
 
-  async getUserRoles(userId) {}
+  async getUserRoles(userId) {
+    const user = await this.getUser(userId);
+    return user.roles;
+  }
 
   async register(input) {
     const { username, name, password, roles } = await validateInput(input, registerUserRules);
@@ -20,18 +39,14 @@ class UserService {
     const salt = await bcrypt.genSaltSync(10);
     const hash = await bcrypt.hash(password, salt);
 
-    const model = await UserModel.create({
+    const userDoc = await UserModel.create({
       username,
       passwordHash: hash,
       name,
       roles
     });
 
-    return {
-      username: model.username,
-      name: model.name,
-      roles: model.roles
-    };
+    return this.#toDto(userDoc);
   }
 }
 

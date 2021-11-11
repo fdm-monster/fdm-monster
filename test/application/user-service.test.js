@@ -25,4 +25,16 @@ describe("UserService", () => {
     const { id } = await ensureTestUserCreated();
     await userService.getUser(id);
   });
+
+  it("should get users", async () => {
+    await ensureTestUserCreated();
+    const users = await userService.listUsers(5);
+    expect(users.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("should get user roles", async () => {
+    const { id } = await ensureTestUserCreated();
+    const userRoles = await userService.getUserRoles(id);
+    expect(userRoles).toEqual([]);
+  });
 });
