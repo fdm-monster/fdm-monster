@@ -8,6 +8,7 @@ import About from "@/views/About.vue";
 import Scheduling from "@/views/Scheduling.vue";
 import HubSettings from "@/views/settings/HubSettings.vue";
 import OtherSettings from "@/views/settings/OtherSettings.vue";
+import UserManagementSettings from "@/views/settings/UserManagementSettings.vue";
 
 Vue.use(VueRouter);
 
@@ -29,6 +30,10 @@ const routes: Array<RouteConfig> = [
       {
         path: "",
         redirect: "printer-groups"
+      },
+      {
+        path: "user-management",
+        component: UserManagementSettings
       },
       {
         path: "printer-groups",

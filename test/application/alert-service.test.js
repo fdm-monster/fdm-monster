@@ -2,6 +2,7 @@ const dbHandler = require("../db-handler");
 const Alert = require("../../server/models/Alert");
 const { configureContainer } = require("../../server/container");
 const DITokens = require("../../server/container.tokens");
+const { NotFoundException } = require("../../server/exceptions/runtime.exceptions");
 
 let container;
 let alertService;
@@ -26,10 +27,27 @@ afterAll(async () => {
 });
 
 describe("AlertService", () => {
+  it("should throw NotFoundException on not nonexisting alert id", async () => {
+    const id = "617d32ee1811ca343cbddee8";
+    let thrown = false;
+    try {
+      await alertService.get(id);
+    } catch (e) {
+      thrown = true;
+      expect(e instanceof NotFoundException).toBeTruthy();
+    }
+    expect(thrown).toBeTruthy();
+  });
+
   it("should save ok", async () => {
     // Model validation for trigger, message and scriptLocation
     await expect(
-      async () => await alertService.create({ trigger: "", message: "", scriptLocation: "" })
+      async () =>
+        await alertService.create({
+          trigger: "",
+          message: "",
+          scriptLocation: ""
+        })
     ).rejects.toBeTruthy();
     await expect(async () => await alertService.create({})).rejects.toBeTruthy();
 
@@ -66,7 +84,13 @@ describe("AlertService", () => {
   it("should convertMessage with ok message", async () => {
     // Doesnt report error back
     await alertService.convertMessage({ active: "asd" }, "null");
-    await alertService.convertMessage({ job: "asd", progress: { completion: true } }, "null");
+    await alertService.convertMessage(
+      {
+        job: "asd",
+        progress: { completion: true }
+      },
+      "null"
+    );
     await alertService.convertMessage({ active: "asd" }, "[historyID]");
     await alertService.convertMessage({ active: "asd" }, "[historyID]", 123);
     await alertService.convertMessage({ progress: { printTimeLeft: 1 } }, "[ETA]");

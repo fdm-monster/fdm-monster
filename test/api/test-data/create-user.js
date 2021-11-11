@@ -9,7 +9,7 @@ function getUserData(username = "tester", password = "testpassword") {
   };
 }
 
-async function ensureTestUserCreated(usernameIn, passwordIn) {
+async function ensureTestUserCreated(usernameIn = "test", passwordIn = "test") {
   const foundUser = await User.findOne({ username: usernameIn });
   if (foundUser)
     return {
