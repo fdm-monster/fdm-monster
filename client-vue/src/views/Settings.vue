@@ -58,6 +58,7 @@ import { PrinterSettingsService } from "@/backend/printer-settings.service";
     return {
       items: [
         {title: 'Printer groups', icon: 'dashboard', path: '/settings/printer-groups'},
+        {title: 'User Management', icon: 'group', path: '/settings/user-management'},
         {title: 'Hub settings', icon: 'image', path: '/settings/system'},
         {title: 'Other', icon: 'help', path: '/settings/other'},
       ]
