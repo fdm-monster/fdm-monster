@@ -1,10 +1,20 @@
 const UserModel = require("../../models/Auth/User");
-const { NotFoundException } = require("../../exceptions/runtime.exceptions");
+const {
+  NotFoundException,
+  InternalServerException
+} = require("../../exceptions/runtime.exceptions");
 const { validateInput } = require("../../handlers/validators");
 const { registerUserRules } = require("../validators/user-service.validation");
 const bcrypt = require("bcryptjs");
+const { ROLES } = require("../../constants/authorization.constants");
 
 class UserService {
+  #roleService;
+
+  constructor({ roleService }) {
+    this.#roleService = roleService;
+  }
+
   #toDto(user) {
     return {
       id: user.id,
@@ -17,8 +27,11 @@ class UserService {
 
   async listUsers(limit = 10) {
     const userDocs = await UserModel.find().limit(limit);
-
     return userDocs.map((u) => this.#toDto(u));
+  }
+
+  async findByRoleId(roleId) {
+    return UserModel.find({ roles: { $in: [roleId] } });
   }
 
   async getUser(userId) {
@@ -31,6 +44,21 @@ class UserService {
   async getUserRoles(userId) {
     const user = await this.getUser(userId);
     return user.roles;
+  }
+
+  async deleteUser(userId) {
+    // Validate
+    const user = await this.getUser(userId);
+    const role = this.#roleService.getRoleByName(ROLES.ADMIN);
+
+    if (user.roles.includes(role.id)) {
+      const administrators = await this.findByRoleId(role.id);
+      if (administrators?.length === 1) {
+        throw new InternalServerException("Cannot delete the last user with ADMIN role.");
+      }
+    }
+
+    await UserModel.findByIdAndDelete(user.id);
   }
 
   async register(input) {

@@ -2,16 +2,18 @@ const dbHandler = require("../db-handler");
 const { configureContainer } = require("../../server/container");
 const DITokens = require("../../server/container.tokens");
 const UserModel = require("../../server/models/Auth/User");
-const { ROLES } = require("../../server/constants/service.constants");
 const { ensureTestUserCreated } = require("../api/test-data/create-user");
+const { ROLES } = require("../../server/constants/authorization.constants");
 
 let container;
 let userService;
+let roleService;
 
 beforeAll(async () => {
   await dbHandler.connect();
   container = configureContainer();
   userService = container.resolve(DITokens.userService);
+  roleService = container.resolve(DITokens.roleService);
 });
 afterEach(async () => {
   await UserModel.deleteMany();
@@ -24,6 +26,13 @@ describe("UserService", () => {
   it("should get user ", async () => {
     const { id } = await ensureTestUserCreated();
     await userService.getUser(id);
+  });
+
+  it("should find no user by role id ", async () => {
+    await roleService.syncRoles();
+    const role = await roleService.getRoleByName(ROLES.ADMIN);
+    const result = await userService.findByRoleId(role.id);
+    expect(result?.length).toBeFalsy();
   });
 
   it("should get users", async () => {

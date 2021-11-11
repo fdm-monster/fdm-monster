@@ -80,15 +80,15 @@ class RoleService {
     return isAuthorized;
   }
 
-  async getRoleByName(roleName) {
-    const role = await this.#roles.find((r) => r.name === roleName);
+  getRoleByName(roleName) {
+    const role = this.#roles.find((r) => r.name === roleName);
     if (!role) throw new NotFoundException("Role not found");
 
     return role;
   }
 
-  async getRole(roleId) {
-    const role = await this.#roles.find((r) => r.id === roleId);
+  getRole(roleId) {
+    const role = this.#roles.find((r) => r.id === roleId);
     if (!role) throw new NotFoundException(`Role Id '${roleId}' not found`);
 
     return role;

@@ -2,7 +2,7 @@ const { createController } = require("awilix-express");
 const { AppConstants } = require("../server.constants");
 const { authenticate, authorizeRoles } = require("../middleware/authenticate");
 const { ROLES } = require("../constants/authorization.constants");
-const { validateMiddleware } = require("../handlers/validators");
+const { validateInput } = require("../handlers/validators");
 const { idRules } = require("./validation/generic.validation");
 
 class UserController {
@@ -18,13 +18,13 @@ class UserController {
   }
 
   async delete(req, res) {
-    const { id } = await validateMiddleware(req, idRules);
+    const { id } = await validateInput(req.params, idRules);
     await this.#userService.deleteUser(id);
     res.send();
   }
 
   async get(req, res) {
-    const { id } = await validateMiddleware(req, idRules);
+    const { id } = await validateInput(req.params, idRules);
     const users = await this.#userService.getUser(id);
     res.send(users);
   }
@@ -34,4 +34,5 @@ module.exports = createController(UserController)
   .prefix(AppConstants.apiRoute + "/user")
   .before([authenticate(), authorizeRoles([ROLES.ADMIN])])
   .get("/", "list")
-  .get("/:id", "get");
+  .get("/:id", "get")
+  .delete("/:id", "delete");
