@@ -14,7 +14,7 @@
           <v-list-item-title>Other Settings Subgroup</v-list-item-title>
           <v-list-item-subtitle>
             Some other settings will come here
-            <br/>
+            <br />
           </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
@@ -31,9 +31,7 @@ import { printersState } from "@/store/printers.state";
 import { PrinterSettingsService } from "@/backend/printer-settings.service";
 
 @Component({
-  components: {},
+  components: {}
 })
-export default class UserManagementSettings extends Vue {
-
-}
+export default class UserManagementSettings extends Vue {}
 </script>

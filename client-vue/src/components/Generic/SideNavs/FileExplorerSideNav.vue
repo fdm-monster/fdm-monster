@@ -183,13 +183,17 @@
         <v-list-item-content>
           <v-tooltip bottom>
             <template v-slot:activator="{ on, attrs }">
-              <span v-bind="attrs" v-on="on" :class="{'current-file-print' : isFileBeingPrinted(file)}">
+              <span
+                v-bind="attrs"
+                v-on="on"
+                :class="{ 'current-file-print': isFileBeingPrinted(file) }"
+              >
                 {{ file.name }}
               </span>
             </template>
             <span>
-              File: {{ file.name }} <br/>
-              Size: {{ formatBytes(file.size) }} <br/>
+              File: {{ file.name }} <br />
+              Size: {{ formatBytes(file.size) }} <br />
               <strong>{{ isFileBeingPrinted(file) ? "Printing" : "Unused" }}</strong>
             </span>
           </v-tooltip>
@@ -199,15 +203,17 @@
         <v-list-item-action>
           <v-tooltip bottom>
             <template v-slot:activator="{ on, attrs }">
-              <v-btn v-bind="attrs"
-                     v-on="on"
-                     :disabled="isFileBeingPrinted(file)" icon @click="deleteFile(file)">
+              <v-btn
+                v-bind="attrs"
+                v-on="on"
+                :disabled="isFileBeingPrinted(file)"
+                icon
+                @click="deleteFile(file)"
+              >
                 <v-icon color="grey lighten-1">delete</v-icon>
               </v-btn>
             </template>
-            <span>
-              Delete file
-            </span>
+            <span> Delete file </span>
           </v-tooltip>
         </v-list-item-action>
       </v-list-item>

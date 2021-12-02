@@ -3,17 +3,17 @@
     <validation-observer ref="validationObserver" v-slot="{ invalid }">
       <v-card>
         <v-card-title>
-            <span class="text-h5">
-              <v-avatar color="primary" size="56">
-                {{ avatarInitials() }}
-              </v-avatar>
-              New Printer
-            </span>
+          <span class="text-h5">
+            <v-avatar color="primary" size="56">
+              {{ avatarInitials() }}
+            </v-avatar>
+            New Printer
+          </span>
         </v-card-title>
         <v-card-text>
           <v-row>
             <v-col :cols="showChecksPanel ? 8 : 12">
-              <PrinterCrudForm ref="printerCrudForm"/>
+              <PrinterCrudForm ref="printerCrudForm" />
             </v-col>
 
             <PrinterChecksPanel v-if="showChecksPanel" :cols="4" :test-progress="testProgress">
@@ -42,7 +42,10 @@ import { Component, Watch } from "vue-property-decorator";
 import { ValidationObserver } from "vee-validate";
 import { Printer } from "@/models/printers/printer.model";
 import { sseTestPrinterUpdate } from "@/event-bus/sse.events";
-import { PrinterSseMessage, TestProgressDetails } from "@/models/sse-messages/printer-sse-message.model";
+import {
+  PrinterSseMessage,
+  TestProgressDetails
+} from "@/models/sse-messages/printer-sse-message.model";
 import { PrintersService } from "@/backend";
 import { generateInitials } from "@/constants/noun-adjectives.data";
 import PrinterChecksPanel from "@/components/Generic/Dialogs/PrinterChecksPanel.vue";
@@ -132,7 +135,7 @@ export default class CreatePrinterDialog extends Vue {
 
     await printersState.createPrinter(newPrinterData);
 
-    this.$bus.emit(infoMessageEvent, `Printer ${ newPrinterData.printerName } created`);
+    this.$bus.emit(infoMessageEvent, `Printer ${newPrinterData.printerName} created`);
 
     this.closeDialog();
   }

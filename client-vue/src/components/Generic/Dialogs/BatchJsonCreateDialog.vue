@@ -117,7 +117,7 @@ export default class BatchJsonCreateDialog extends Vue {
     const printers = await this.parsedPrinters();
 
     const numPrinters = printers.length;
-    const answer = confirm(`Are you sure to import ${ numPrinters } printers?`);
+    const answer = confirm(`Are you sure to import ${numPrinters} printers?`);
 
     if (answer) {
       printers.forEach((p) => {

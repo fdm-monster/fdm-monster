@@ -13,7 +13,7 @@
         <v-card-text>
           <v-row>
             <v-col :cols="showChecksPanel ? 8 : 12">
-              <PrinterCrudForm ref="printerUpdateForm" :printer-id="storedUpdatedPrinter.id"/>
+              <PrinterCrudForm ref="printerUpdateForm" :printer-id="storedUpdatedPrinter.id" />
             </v-col>
 
             <PrinterChecksPanel v-if="showChecksPanel" :cols="4" :test-progress="testProgress">
@@ -41,7 +41,10 @@ import { Component, Watch } from "vue-property-decorator";
 import { ValidationObserver } from "vee-validate";
 import { Printer } from "@/models/printers/printer.model";
 import { sseTestPrinterUpdate } from "@/event-bus/sse.events";
-import { PrinterSseMessage, TestProgressDetails } from "@/models/sse-messages/printer-sse-message.model";
+import {
+  PrinterSseMessage,
+  TestProgressDetails
+} from "@/models/sse-messages/printer-sse-message.model";
 import { PrintersService } from "@/backend";
 import { generateInitials } from "@/constants/noun-adjectives.data";
 import { updatedPrinterEvent } from "@/event-bus/printer.events";
@@ -150,7 +153,7 @@ export default class UpdatePrinterDialog extends Vue {
     });
 
     this.$bus.emit(updatedPrinterEvent(printerId as string), updatedData);
-    this.$bus.emit(infoMessageEvent, `Printer ${ updatedPrinter.printerName } updated`);
+    this.$bus.emit(infoMessageEvent, `Printer ${updatedPrinter.printerName} updated`);
   }
 
   closeDialog() {

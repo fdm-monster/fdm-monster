@@ -8,6 +8,6 @@
 <script>
 import CalendarView from "@/components/Scheduling/CalendarView";
 export default {
-  components: {CalendarView}
+  components: { CalendarView }
 };
 </script>

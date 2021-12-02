@@ -1,7 +1,8 @@
 <template>
   <v-container>
     3D Hub was created by D. Zwart (https://github.com/davidzwa) in collaboration with
-    <strong><a href="https://mtb3d.com">MTB3D</a></strong>.
+    <strong><a href="https://mtb3d.com">MTB3D</a></strong
+    >.
 
     <br />
     <br />

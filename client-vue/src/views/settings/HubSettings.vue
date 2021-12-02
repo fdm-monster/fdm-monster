@@ -15,7 +15,7 @@
           <v-list-item-subtitle>
             Clear out the file references for all printers - this does not remove them from
             OctoPrint!
-            <br/>
+            <br />
             <v-btn color="primary" @click="purgeFiles()">Purge file references</v-btn>
           </v-list-item-subtitle>
         </v-list-item-content>
@@ -27,11 +27,10 @@
           <v-list-item-subtitle>
             Disable GCode analysis on all printers at once, preventing CPU intensive and inaccurate
             time/size estimates.
-            <br/>
+            <br />
             <v-btn color="primary" @click="bulkDisableGCodeAnalysis()"
-            >Bulk disable GCode Analysis
-            </v-btn
-            >
+              >Bulk disable GCode Analysis
+            </v-btn>
           </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
@@ -47,9 +46,7 @@ import { PrinterSettingsService } from "@/backend/printer-settings.service";
 import { printersState } from "@/store/printers.state";
 import { infoMessageEvent } from "@/event-bus/alert.events";
 
-@Component({
-
-})
+@Component({})
 export default class HubSettings extends Vue {
   async purgeFiles() {
     await PrinterFileService.purgeFiles();
@@ -61,14 +58,14 @@ export default class HubSettings extends Vue {
     const printers = printersState.onlinePrinters;
     this.$bus.emit(
       infoMessageEvent,
-      `Trying to disable gcode analysis for ${ printers.length } online printers.`
+      `Trying to disable gcode analysis for ${printers.length} online printers.`
     );
     for (let printer of printers) {
       await PrinterSettingsService.setGCodeAnalysis(printer.id, false);
     }
     this.$bus.emit(
       infoMessageEvent,
-      `Finished disabling gcode analysis for ${ printers.length } online printers.`
+      `Finished disabling gcode analysis for ${printers.length} online printers.`
     );
   }
 }

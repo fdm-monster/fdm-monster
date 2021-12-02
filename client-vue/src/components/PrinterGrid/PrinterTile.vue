@@ -19,7 +19,7 @@
       <v-btn class="float-right d-none d-lg-inline" icon @click.prevent.stop="clickStop()">
         <v-icon>stop</v-icon>
       </v-btn>
-      <br/>
+      <br />
       <small class="xsmall-resized-font ml-2 text--secondary">
         {{ printer.printerState.state }}
       </small>
