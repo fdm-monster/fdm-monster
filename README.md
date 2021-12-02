@@ -29,14 +29,18 @@ This work is under active development with cutting edge tech and standards. Feel
 - [x] 🔌 3D Hub Connector (OctoPrint Plugin) prerelease 0.1.0 ([find it here](https://github.com/3d-hub/3d-hub-connector/releases))
 - [x] 🛡️ Better authentication and authorization mechanisms
 - [x] :rocket: Docker multi-arch image (arm/v7, arm64 and amd64 architectures => Raspberry Pi with an 64 bits OS!)
-- [ ] :rocket: Printer Group management
-- [ ] 🛡️ Full API and client test coverage >80% (now at 60%) 
+- [x] :rocket: Printer Group management
+- [ ] 🛡️ MongoDB 5 support (so far no issues, but just to be sure)
 - [ ] 🛡️ NodeJS Server legacy-free (history, alerts, custom gcode and filament)
 - [ ] 🛡️ Frontend user and basic role management
+- [ ] 🛡️ Full API and client test coverage >80% (now at 60%) 
 - [ ] 🔌 Hub Connector - filament tracker 
 - [ ] 🔌 Raspberry Pi image and prebuilt customized OctoPi image
+- [ ] :rocket: Chocolatey package (Windows install)
 - [ ] :rocket: First core release with documentation
 - [ ] :rocket: Plugin system (preparation work is ready)
+- [ ] :rocket: Docker overlay as service management (daemonized restart & auto-updates)
+- [ ] :rocket: .NET 6 cross-platform daemon (drop necessity of pm2)
 - [ ] Support for OctoPrint 2.0.0 (when it comes out)
 - [ ] More to be found here https://github.com/3d-hub/3d-hub/discussions/48
 
