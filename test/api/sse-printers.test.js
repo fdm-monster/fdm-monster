@@ -34,7 +34,11 @@ describe("SSE-printers", () => {
         expect(parsedMsg).toEqual({
           printers: [],
           printerGroups: [],
-          trackedUploads: []
+          trackedUploads: {
+            current: [],
+            done: [],
+            failed: []
+          }
         });
         es.close();
         resolve();
