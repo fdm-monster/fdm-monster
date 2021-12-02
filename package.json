@@ -36,7 +36,7 @@
     "vue"
   ],
   "dependencies": {
-    "@3d-hub/client": "0.1.14",
+    "@3d-hub/client": "0.1.15",
     "awilix": "^6.0.0",
     "awilix-express": "6.0.0",
     "axios": "^0.24.0",

@@ -1,7 +1,7 @@
 {
   "name": "@3d-hub/client",
   "author": "David Zwart",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "private": false,
   "repository": {
     "type": "git",
