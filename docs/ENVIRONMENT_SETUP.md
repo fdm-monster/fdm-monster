@@ -24,6 +24,9 @@ The following variables are read and used by 3D Hub at startup. Always restart y
 > SERVER_SITE_TITLE=3D Hub
 - SAFEMODE_ENABLED **Safely start 3D Hub: without any task being run to avoid crashes.**
 > SAFEMODE_ENABLED=true
+- CONTENT_SECURITY_POLICY_ENABLED **Toggle the CSP mode of helmet on/off (default: false)**. Note that turning this on requires HTTPS to be set up (reverse proxy & ssl certificate)! Otherwise it will fail to serve the API and client.
+> CONTENT_SECURITY_POLICY_ENABLED=true
+ 
 ## The `.env` file
 A very simple text file with a variable per line. The following `.env` is often already enough to make sure 3D Hub works as you like:
 ```

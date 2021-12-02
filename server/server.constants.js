@@ -43,6 +43,10 @@ class ServerConstants {
     return process.env["OVERRIDE_VUE_DIST"];
   }
 
+  static get CONTENT_SECURITY_POLICY_ENABLED() {
+    return "CONTENT_SECURITY_POLICY_ENABLED";
+  }
+  
   static get NODE_ENV_KEY() {
     return "NODE_ENV";
   }
