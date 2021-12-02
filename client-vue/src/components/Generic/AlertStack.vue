@@ -2,20 +2,37 @@
   <div>
     <slot></slot>
     <div v-if="err || info">
-      <v-snackbar v-if="progress" v-model="snackbarOpened" absolute bottom centered rounded="pill">
-        {{ info }}
+      <v-snackbar
+        v-if="progressStates && progressStates.length"
+        v-model="snackbarOpened"
+        absolute
+        bottom
+        right
+        rounded="pill"
+      >
+        {{ progressInfo }}
+        <div v-for="(state, index) in progressStates" :key="index">
+          <v-progress-linear v-if="state" :value="100 * state.progress.percent"></v-progress-linear>
+        </div>
 
-        <v-progress-linear v-if="progress" :value="100 * progress"></v-progress-linear>
         <template v-slot:action="{ attrs }">
-          <v-btn v-bind="attrs" color="error" text @click="snackbarOpened = false"> Close</v-btn>
+          <v-btn color="error" text v-bind="attrs" @click="snackbarOpened = false"> Close</v-btn>
         </template>
       </v-snackbar>
-      <v-snackbar v-if="!progress" v-model="snackbarOpened" absolute bottom right rounded="pill">
+
+      <v-snackbar
+        v-if="info || err"
+        v-model="infoSnackbarOpened"
+        absolute
+        bottom
+        right
+        rounded="pill"
+      >
         <span v-if="err">{{ err.message }}</span>
         {{ info }}
 
         <template v-slot:action="{ attrs }">
-          <v-btn v-bind="attrs" color="error" text @click="snackbarOpened = false"> Close</v-btn>
+          <v-btn color="error" text v-bind="attrs" @click="snackbarOpened = false"> Close</v-btn>
         </template>
       </v-snackbar>
     </div>
@@ -26,36 +43,53 @@
 import Component from "vue-class-component";
 import Vue from "vue";
 import { Prop } from "vue-property-decorator";
-import { infoMessageEvent, vuexErrorEvent } from "@/event-bus/alert.events";
+import {
+  eventTypeToMessage,
+  InfoEventType,
+  infoMessageEvent,
+  uploadMessageEvent,
+  vuexErrorEvent
+} from "@/event-bus/alert.events";
+import { TrackedUpload } from "@/models/sse-messages/printer-sse-message.model";
 
 @Component({
   data: () => ({
     err: undefined,
-    progress: undefined,
+    progressStates: undefined,
+    progressInfo: undefined,
     info: undefined
   })
 })
 export default class ErrorAlert extends Vue {
   @Prop() stopPropagation: boolean;
   snackbarOpened = false;
+  infoSnackbarOpened = false;
   err?: Error;
-  progress?: number;
+  progressStates?: TrackedUpload[];
+  progressInfo?: any;
   vm?: Vue;
   info?: any;
 
   created() {
     this.$bus.on(vuexErrorEvent, this.storeError);
     this.$bus.on(infoMessageEvent, this.infoMessage);
+    this.$bus.on(uploadMessageEvent, this.uploadTracker);
   }
 
   beforeDestroyed() {
     this.$bus.off(vuexErrorEvent, this.storeError);
     this.$bus.off(infoMessageEvent, this.infoMessage);
+    this.$bus.off(uploadMessageEvent, this.uploadTracker);
   }
 
-  infoMessage(message: string, progress: number) {
+  infoMessage(message: string) {
     this.info = message;
-    this.progress = progress;
+    this.infoSnackbarOpened = true;
+  }
+
+  uploadTracker(type: InfoEventType, uploadProgress: TrackedUpload[]) {
+    this.progressInfo = eventTypeToMessage(type, uploadProgress.length);
+    this.progressStates = uploadProgress;
     this.err = undefined;
     this.snackbarOpened = true;
   }
@@ -75,7 +109,7 @@ export default class ErrorAlert extends Vue {
 
   cancelError() {
     this.err = undefined;
-    this.progress = undefined;
+    this.progressStates = undefined;
   }
 }
 </script>

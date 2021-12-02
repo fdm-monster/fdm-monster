@@ -51,7 +51,7 @@ export default class HubSettings extends Vue {
   async purgeFiles() {
     await PrinterFileService.purgeFiles();
 
-    this.$bus.emit(infoMessageEvent, `Succesfully purged all references to printer files!`);
+    this.$bus.emit(infoMessageEvent, `Successfully purged all references to printer files!`);
   }
 
   async bulkDisableGCodeAnalysis() {

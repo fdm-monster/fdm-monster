@@ -4,7 +4,7 @@ import { FileUploadCommands } from "@/models/printers/file-upload-commands.model
 import { PrinterFileCache } from "@/models/printers/printer-file-cache.model";
 import { ClearedFilesResult, PrinterFile } from "@/models/printers/printer-file.model";
 import Vue from "vue";
-import { infoMessageEvent } from "@/event-bus/alert.events";
+import { InfoEventType, uploadMessageEvent } from "@/event-bus/alert.events";
 import { Printer } from "@/models/printers/printer.model";
 
 export class PrinterFileService extends BaseService {
@@ -49,7 +49,11 @@ export class PrinterFileService extends BaseService {
   }
 
   static uploadUpdateProgress(progress: ProgressEvent) {
-    Vue.bus.emit(infoMessageEvent, "Browser to server uploading", progress.loaded / progress.total);
+    Vue.bus.emit(uploadMessageEvent, InfoEventType.UPLOAD_FRONTEND, [
+      {
+        progress: { percent: progress.loaded / progress.total }
+      }
+    ]);
   }
 
   static async uploadFile(

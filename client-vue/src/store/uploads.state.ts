@@ -40,6 +40,7 @@ class UploadsModule extends VuexModule {
   }
 
   @Action queueUploads(newQueuedUploads: QueuedUpload[]) {
+    // TODO implement this ability and check if file was already uploaded or already printing
     if (this.queuedUploads?.length > 0) return;
 
     this._setUploads(newQueuedUploads);

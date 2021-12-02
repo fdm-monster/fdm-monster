@@ -13,7 +13,7 @@
         <v-card-text>
           <v-row>
             <v-col :cols="showChecksPanel ? 8 : 12">
-              <PrinterCrudForm ref="printerCrudForm" />
+              <PrinterCrudForm ref="printerCrudForm"/>
             </v-col>
 
             <PrinterChecksPanel v-if="showChecksPanel" :cols="4" :test-progress="testProgress">
@@ -38,20 +38,17 @@
 <script lang="ts">
 // https://www.digitalocean.com/community/tutorials/vuejs-typescript-class-components
 import Vue from "vue";
-import { Component, Watch } from "vue-property-decorator";
-import { ValidationObserver } from "vee-validate";
-import { Printer } from "@/models/printers/printer.model";
-import { sseTestPrinterUpdate } from "@/event-bus/sse.events";
-import {
-  PrinterSseMessage,
-  TestProgressDetails
-} from "@/models/sse-messages/printer-sse-message.model";
-import { PrintersService } from "@/backend";
-import { generateInitials } from "@/constants/noun-adjectives.data";
+import {Component, Watch} from "vue-property-decorator";
+import {ValidationObserver} from "vee-validate";
+import {Printer} from "@/models/printers/printer.model";
+import {sseTestPrinterUpdate} from "@/event-bus/sse.events";
+import {PrinterSseMessage, TestProgressDetails} from "@/models/sse-messages/printer-sse-message.model";
+import {PrintersService} from "@/backend";
+import {generateInitials} from "@/constants/noun-adjectives.data";
 import PrinterChecksPanel from "@/components/Generic/Dialogs/PrinterChecksPanel.vue";
-import { printersState } from "@/store/printers.state";
+import {printersState} from "@/store/printers.state";
 import PrinterCrudForm from "@/components/Generic/Forms/PrinterCrudForm.vue";
-import { infoMessageEvent } from "@/event-bus/alert.events";
+import {infoMessageEvent} from "@/event-bus/alert.events";
 
 @Component({
   components: {
