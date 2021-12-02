@@ -42,20 +42,20 @@
           </strong>
         </v-list-item-title>
         <v-list-item-subtitle v-if="storedSideNavPrinter.currentJob">
-          <span class="d-flex justify-center">
-            Progress: {{ storedSideNavPrinter.currentJob.progress }}%
+          <span v-if="storedSideNavPrinter.currentJob.progress" class="d-flex justify-center">
+            Progress: {{ truncateProgress(storedSideNavPrinter.currentJob.progress) }}%
           </span>
           <v-progress-linear
             v-if="storedSideNavPrinter.currentJob"
-            height="8px"
-            :value="storedSideNavPrinter.currentJob.progress"
+            :value="truncateProgress(storedSideNavPrinter.currentJob.progress)"
             class="mt-1 mb-1"
+            height="8px"
           >
           </v-progress-linear>
 
           <v-tooltip bottom>
             <template v-slot:activator="{ on, attrs }">
-              <v-btn small outlined v-bind="attrs" v-on="on">
+              <v-btn outlined small v-bind="attrs" v-on="on">
                 {{ currentJob().fileName }}
               </v-btn>
             </template>
@@ -151,7 +151,7 @@
         <v-list-item-avatar>
           <v-tooltip bottom>
             <template v-slot:activator="{ on, attrs }">
-              <v-btn v-bind="attrs" v-on="on" icon @click="clickDownloadFile(file)">
+              <v-btn icon v-bind="attrs" @click="clickDownloadFile(file)" v-on="on">
                 <v-icon>download</v-icon>
               </v-btn>
             </template>
@@ -163,11 +163,11 @@
           <v-tooltip bottom>
             <template v-slot:activator="{ on, attrs }">
               <v-btn
-                v-bind="attrs"
-                v-on="on"
                 :disabled="isFileBeingPrinted(file)"
                 icon
+                v-bind="attrs"
                 @click="clickPrintFile(file)"
+                v-on="on"
               >
                 <v-icon>play_arrow</v-icon>
               </v-btn>
@@ -184,9 +184,9 @@
           <v-tooltip bottom>
             <template v-slot:activator="{ on, attrs }">
               <span
+                :class="{ 'current-file-print': isFileBeingPrinted(file) }"
                 v-bind="attrs"
                 v-on="on"
-                :class="{ 'current-file-print': isFileBeingPrinted(file) }"
               >
                 {{ file.name }}
               </span>
@@ -204,11 +204,11 @@
           <v-tooltip bottom>
             <template v-slot:activator="{ on, attrs }">
               <v-btn
-                v-bind="attrs"
-                v-on="on"
                 :disabled="isFileBeingPrinted(file)"
                 icon
+                v-bind="attrs"
                 @click="deleteFile(file)"
+                v-on="on"
               >
                 <v-icon color="grey lighten-1">delete</v-icon>
               </v-btn>
@@ -270,6 +270,11 @@ export default class FileExplorerSideNav extends Vue {
     return (
       this.shownFileBucket?.files?.length && this.storedSideNavPrinter?.apiAccessibility.accessible
     );
+  }
+
+  truncateProgress(progress: number) {
+    if (!progress) return "";
+    return progress?.toFixed(1);
   }
 
   @Watch("storedSideNavPrinter")

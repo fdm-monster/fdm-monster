@@ -3,8 +3,7 @@
     <slot></slot>
     <div v-if="err || info">
       <v-snackbar
-        v-if="progressStates && progressStates.length"
-        v-model="snackbarOpened"
+        v-model="progressSnackbarOpened"
         absolute
         bottom
         right
@@ -16,7 +15,9 @@
         </div>
 
         <template v-slot:action="{ attrs }">
-          <v-btn color="error" text v-bind="attrs" @click="snackbarOpened = false"> Close</v-btn>
+          <v-btn color="error" text v-bind="attrs" @click="progressSnackbarOpened = false">
+            Close
+          </v-btn>
         </template>
       </v-snackbar>
 
@@ -32,7 +33,9 @@
         {{ info }}
 
         <template v-slot:action="{ attrs }">
-          <v-btn color="error" text v-bind="attrs" @click="snackbarOpened = false"> Close</v-btn>
+          <v-btn color="error" text v-bind="attrs" @click="progressSnackbarOpened = false">
+            Close</v-btn
+          >
         </template>
       </v-snackbar>
     </div>
@@ -62,7 +65,7 @@ import { TrackedUpload } from "@/models/sse-messages/printer-sse-message.model";
 })
 export default class ErrorAlert extends Vue {
   @Prop() stopPropagation: boolean;
-  snackbarOpened = false;
+  progressSnackbarOpened = false;
   infoSnackbarOpened = false;
   err?: Error;
   progressStates?: TrackedUpload[];
@@ -90,17 +93,16 @@ export default class ErrorAlert extends Vue {
   uploadTracker(type: InfoEventType, uploadProgress: TrackedUpload[]) {
     this.progressInfo = eventTypeToMessage(type, uploadProgress.length);
     this.progressStates = uploadProgress;
-    this.err = undefined;
-    this.snackbarOpened = true;
+    this.progressSnackbarOpened = true;
   }
 
   storeError(event: PromiseRejectionEvent) {
     this.err = event.reason;
-    this.snackbarOpened = true;
+    this.infoSnackbarOpened = true;
   }
 
   errorCaptured(err: Error, vm: Vue, info: any) {
-    this.snackbarOpened = true;
+    this.infoSnackbarOpened = true;
     this.err = err;
     this.vm = vm;
     this.info = info;

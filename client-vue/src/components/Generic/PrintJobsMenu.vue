@@ -38,12 +38,12 @@
           <v-list-item v-for="printer of activePrintJobs" :key="printer.id">
             <v-list-item-action>
               <v-progress-circular
-                :size="50"
+                :size="60"
                 :value="printer.currentJob.progress"
                 :width="5"
                 color="green"
               >
-                {{ printer.currentJob.progress + "%" || "" }}
+                {{ truncateProgress(printer.currentJob.progress) + "%" || "" }}
               </v-progress-circular>
             </v-list-item-action>
             <v-list-item-content>
@@ -68,7 +68,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
 import { printersState } from "@/store/printers.state";
@@ -84,6 +84,11 @@ import { PrinterJob } from "@/models/printers/printer-current-job.model";
   })
 })
 export default class PrintJobsMenu extends Vue {
+  truncateProgress(progress: number) {
+    if (!progress) return "";
+    return progress?.toFixed(0);
+  }
+
   get activePrintJobs() {
     return printersState.printersWithJob;
   }
