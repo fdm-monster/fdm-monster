@@ -8,7 +8,7 @@ const { checkPluginManagerAPIDeprecation } = require("../../utils/compatibility.
 const { processResponse, processGotResponse } = require("./utils/api.utils");
 const FormData = require("form-data");
 const got = require("got");
-const { uploadProgressEvent } = require("../../constants/event.constants");
+const { uploadProgressEvent, uploadCompletionEvent } = require("../../constants/event.constants");
 const { ExternalServiceError } = require("../../exceptions/runtime.exceptions");
 const OctoPrintRoutes = require("./octoprint-api.routes");
 

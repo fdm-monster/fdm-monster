@@ -6,13 +6,22 @@ import { PrinterFileService } from "@/backend";
 @Module
 class UploadsModule extends VuexModule {
   queuedUploads: QueuedUpload[] = [];
+  uploadingNow = false;
 
   get hasPendingUploads() {
     return this.queuedUploads?.length > 0;
   }
 
+  get isUploadingNow() {
+    return this.uploadingNow;
+  }
+
   get nextUpload() {
     return this.queuedUploads[0];
+  }
+
+  @Mutation _setUploadingNow(uploading: boolean) {
+    this.uploadingNow = uploading;
   }
 
   @Mutation _setUploads(uploads: QueuedUpload[]) {
@@ -29,7 +38,10 @@ class UploadsModule extends VuexModule {
 
   @Action
   async handleNextUpload() {
+    // Dont upload when queue empty
     if (!this.queuedUploads?.length) return;
+
+    this._setUploadingNow(true);
 
     const { file, printer, commands } = this.nextUpload;
 
@@ -37,9 +49,12 @@ class UploadsModule extends VuexModule {
     this._spliceNextUpload();
 
     await PrinterFileService.uploadFile(printer, file, commands);
+
+    this._setUploadingNow(false);
   }
 
   @Action queueUploads(newQueuedUploads: QueuedUpload[]) {
+    // TODO implement this ability and check if file was already uploaded or already printing
     if (this.queuedUploads?.length > 0) return;
 
     this._setUploads(newQueuedUploads);

@@ -5,8 +5,8 @@
         <v-navigation-drawer permanent>
           <v-list-item>
             <v-list-item-content>
-              <v-list-item-title class="text-h6"> Settings </v-list-item-title>
-              <v-list-item-subtitle> Adjust your Hub </v-list-item-subtitle>
+              <v-list-item-title class="text-h6"> Settings</v-list-item-title>
+              <v-list-item-subtitle> Adjust your Hub</v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
 
@@ -35,10 +35,6 @@
 <script>
 import Vue from "vue";
 import { Component } from "vue-property-decorator";
-import { PrinterGroupService, PrinterFileService } from "@/backend";
-import { infoMessageEvent } from "@/event-bus/alert.events";
-import { printersState } from "@/store/printers.state";
-import { PrinterSettingsService } from "@/backend/printer-settings.service";
 
 @Component({
   components: {},

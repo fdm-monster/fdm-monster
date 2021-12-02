@@ -1,6 +1,5 @@
 const { generateCorrelationToken } = require("../../utils/correlation-token.util");
-const { uploadProgressEvent, uploadCancelHandler } = require("../../constants/event.constants");
-const { NotFoundException } = require("../../exceptions/runtime.exceptions");
+const { uploadProgressEvent } = require("../../constants/event.constants");
 
 /**
  * A generic cache for file upload progress
@@ -18,12 +17,21 @@ class FileUploadTrackerCache {
   }
 
   progressCallback = (token, p) => {
+    // Ensure binding of this is correct
     this.updateUploadProgress(token, p);
   };
 
-  getUploads(filterCurrent = false) {
-    return filterCurrent
-      ? this.#currentUploads
+  getUploads(filterHourOld = false) {
+    const currentTime = Date.now();
+
+    const done = this.#uploadsDone.filter((d) => currentTime - d.startedAt < 60 * 60 * 1000);
+    const failed = this.#uploadsFailed.filter((d) => currentTime - d.startedAt < 60 * 60 * 1000);
+    return filterHourOld
+      ? {
+          current: this.#currentUploads,
+          done,
+          failed
+        }
       : {
           current: this.#currentUploads,
           done: this.#uploadsDone,

@@ -2,7 +2,7 @@
   "name": "3d-hub",
   "author": "David Zwart",
   "license": "AGPLv3",
-  "version": "0.0.4-pre1",
+  "version": "0.0.4-pre2",
   "description": "3D Hub is a bulk OctoPrint manager to set up, configure and monitor 3D printers. Our aim is to provide extremely optimized performance and reliability.",
   "main": "index.js",
   "scripts": {

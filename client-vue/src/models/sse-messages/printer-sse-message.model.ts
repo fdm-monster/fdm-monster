@@ -13,7 +13,8 @@ export interface TrackedUpload {
   correlationToken: string;
   startedAt: number;
   multerFile: {
-    [k: string]: number;
+    originalname: string;
+    [k: string]: any;
   };
   progress: {
     percent: number;
@@ -21,10 +22,16 @@ export interface TrackedUpload {
   };
 }
 
+export interface UploadStates {
+  current: TrackedUpload[];
+  done: TrackedUpload[];
+  failed: TrackedUpload[];
+}
+
 export interface PrinterSseMessage {
   printers: Printer[];
   printerGroups: PrinterGroup[];
   testPrinter: Printer;
-  trackedUploads: TrackedUpload[];
+  trackedUploads: UploadStates;
   testProgress: TestProgressDetails;
 }

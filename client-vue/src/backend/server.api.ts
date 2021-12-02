@@ -12,6 +12,7 @@ export class ServerApi {
   static printerFilesPurgeRoute = `${ServerApi.printerFilesRoute}/purge`;
   static printerNetworkRoute = `${ServerApi.base}/printer-network`;
   static scanSsdp = `${ServerApi.printerNetworkRoute}/scan-ssdp`;
+  static userRoute = `${ServerApi.base}/user`;
   static settingsRoute = `${ServerApi.base}/settings`;
   static serverSettingsRoute = `${ServerApi.settingsRoute}/server`;
   static serverLogsRoute = `${ServerApi.serverSettingsRoute}/logs`;

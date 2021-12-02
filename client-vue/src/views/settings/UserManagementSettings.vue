@@ -4,34 +4,46 @@
       <v-avatar>
         <v-icon>settings</v-icon>
       </v-avatar>
-      <v-toolbar-title>User Management Settings</v-toolbar-title>
+      <v-toolbar-title>Users</v-toolbar-title>
     </v-toolbar>
     <v-list subheader three-line>
-      <v-subheader>User Management Settings</v-subheader>
+      <v-subheader>Showing current users</v-subheader>
 
-      <v-list-item>
+      <v-list-item v-for="(user, index) in users" :key="index">
         <v-list-item-content>
-          <v-list-item-title>Other Settings Subgroup</v-list-item-title>
+          <v-list-item-title>
+            User <strong>{{ user.name }}</strong>
+          </v-list-item-title>
           <v-list-item-subtitle>
-            Some other settings will come here
+            Username <strong>{{ user.username }}</strong> <br />
             <br />
+          </v-list-item-subtitle>
+          <v-list-item-subtitle>
+            Created at <strong>{{ user.createdAt }}</strong> <br />
+            Role count <strong>{{ user.roles.length }}</strong>
           </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
+      <v-divider></v-divider>
     </v-list>
   </v-card>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from "vue";
 import { Component } from "vue-property-decorator";
-import { PrinterGroupService, PrinterFileService } from "@/backend";
-import { infoMessageEvent } from "@/event-bus/alert.events";
-import { printersState } from "@/store/printers.state";
-import { PrinterSettingsService } from "@/backend/printer-settings.service";
+import { UserService } from "@/backend/user.service";
+import { User } from "@/models/user.model";
 
 @Component({
-  components: {}
+  components: {},
+  data: () => ({ users: [] })
 })
-export default class UserManagementSettings extends Vue {}
+export default class UserManagementSettings extends Vue {
+  users: User[];
+
+  async created() {
+    this.users = await UserService.listUsers();
+  }
+}
 </script>

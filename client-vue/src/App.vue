@@ -29,7 +29,7 @@ import { sseGroups, sseMessageGlobal, sseTestPrinterUpdate } from "@/event-bus/s
 import { serverSettingsState } from "@/store/server-settings.state";
 import { printersState } from "@/store/printers.state";
 import { updatedPrinterEvent } from "@/event-bus/printer.events";
-import { infoMessageEvent } from "@/event-bus/alert.events";
+import { InfoEventType, uploadMessageEvent } from "@/event-bus/alert.events";
 import UpdatePrinterDialog from "@/components/Generic/Dialogs/UpdatePrinterDialog.vue";
 import FileExplorerSideNav from "@/components/Generic/SideNavs/FileExplorerSideNav.vue";
 import CreatePrinterDialog from "@/components/Generic/Dialogs/CreatePrinterDialog.vue";
@@ -50,6 +50,10 @@ import { QueuedUpload } from "@/models/uploads/queued-upload.model";
 export default class App extends Vue {
   sseClient?: SSEClient;
 
+  get queuedUploads() {
+    return uploadsState.queuedUploads;
+  }
+
   async created() {
     await serverSettingsState.loadServerSettings();
     await this.connectSseClient();
@@ -66,10 +70,6 @@ export default class App extends Vue {
       .catch((err: any) => console.error("Failed make initial connection:", err));
   }
 
-  get queuedUploads() {
-    return uploadsState.queuedUploads;
-  }
-
   @Watch("queuedUploads")
   async changeInUploads(newValue: QueuedUpload[]) {
     await uploadsState.handleNextUpload();
@@ -81,12 +81,8 @@ export default class App extends Vue {
       this.$bus.emit(sseGroups, message.printerGroups);
     }
 
-    if (message.trackedUploads?.length > 0) {
-      this.$bus.emit(
-        infoMessageEvent,
-        "Server to OctoPrint (1/1) uploading",
-        message.trackedUploads[0].progress?.percent
-      );
+    if (message.trackedUploads) {
+      this.$bus.emit(uploadMessageEvent, InfoEventType.UPLOAD_BACKEND, message.trackedUploads);
     }
 
     if (message.printers) {

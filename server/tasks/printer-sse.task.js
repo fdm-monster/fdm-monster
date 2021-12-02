@@ -29,11 +29,11 @@ class PrinterSseTask {
   async run() {
     const printerStates = this.#printersStore.listPrintersFlat();
     const printerGroups = this.#printerGroupsCache.getCache();
-    const currentFileUploadTrackers = this.#fileUploadTrackerCache.getUploads(true);
+    const trackedUploads = this.#fileUploadTrackerCache.getUploads(true);
 
     const sseData = {
       printers: printerStates,
-      trackedUploads: currentFileUploadTrackers,
+      trackedUploads,
       printerGroups
     };
 
