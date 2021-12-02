@@ -13,7 +13,8 @@ export interface TrackedUpload {
   correlationToken: string;
   startedAt: number;
   multerFile: {
-    [k: string]: number;
+    originalname: string;
+    [k: string]: any;
   };
   progress: {
     percent: number;
