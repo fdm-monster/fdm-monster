@@ -21,10 +21,16 @@ export interface TrackedUpload {
   };
 }
 
+export interface UploadStates {
+  current: TrackedUpload[];
+  done: TrackedUpload[];
+  failed: TrackedUpload[];
+}
+
 export interface PrinterSseMessage {
   printers: Printer[];
   printerGroups: PrinterGroup[];
   testPrinter: Printer;
-  trackedUploads: TrackedUpload[];
+  trackedUploads: UploadStates;
   testProgress: TestProgressDetails;
 }

@@ -49,11 +49,13 @@ export class PrinterFileService extends BaseService {
   }
 
   static uploadUpdateProgress(progress: ProgressEvent) {
-    Vue.bus.emit(uploadMessageEvent, InfoEventType.UPLOAD_FRONTEND, [
-      {
-        progress: { percent: progress.loaded / progress.total }
-      }
-    ]);
+    Vue.bus.emit(uploadMessageEvent, InfoEventType.UPLOAD_FRONTEND, {
+      current: [
+        {
+          progress: { percent: progress.loaded / progress.total }
+        }
+      ]
+    });
   }
 
   static async uploadFile(

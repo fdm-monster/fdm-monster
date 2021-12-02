@@ -7,15 +7,17 @@
         absolute
         bottom
         right
-        rounded="pill"
+        rounded="rounded"
+        timeout="-1"
       >
         {{ progressInfo }}
         <div v-for="(state, index) in progressStates" :key="index" class="mb-2">
+          {{ getUploadingFileName(state) }}
           <v-progress-linear v-if="state" :value="100 * state.progress.percent"></v-progress-linear>
         </div>
 
         <template v-slot:action="{ attrs }">
-          <v-btn color="error" text v-bind="attrs" @click="progressSnackbarOpened = false">
+          <v-btn color="success" text v-bind="attrs" @click="progressSnackbarOpened = false">
             Close
           </v-btn>
         </template>
@@ -34,8 +36,8 @@
 
         <template v-slot:action="{ attrs }">
           <v-btn color="error" text v-bind="attrs" @click="progressSnackbarOpened = false">
-            Close</v-btn
-          >
+            Close
+          </v-btn>
         </template>
       </v-snackbar>
     </div>
@@ -53,7 +55,7 @@ import {
   uploadMessageEvent,
   vuexErrorEvent
 } from "@/event-bus/alert.events";
-import { TrackedUpload } from "@/models/sse-messages/printer-sse-message.model";
+import { TrackedUpload, UploadStates } from "@/models/sse-messages/printer-sse-message.model";
 
 @Component({
   data: () => ({
@@ -73,6 +75,11 @@ export default class ErrorAlert extends Vue {
   vm?: Vue;
   info?: any;
 
+  getUploadingFileName(state: TrackedUpload) {
+    if (!state.multerFile?.length) return "";
+    return state.multerFile[0].originalname;
+  }
+
   created() {
     this.$bus.on(vuexErrorEvent, this.storeError);
     this.$bus.on(infoMessageEvent, this.infoMessage);
@@ -90,9 +97,14 @@ export default class ErrorAlert extends Vue {
     this.infoSnackbarOpened = true;
   }
 
-  uploadTracker(type: InfoEventType, uploadProgress: TrackedUpload[]) {
-    this.progressInfo = eventTypeToMessage(type, uploadProgress.length);
-    this.progressStates = uploadProgress;
+  uploadTracker(type: InfoEventType, uploadProgress: UploadStates) {
+    if (!uploadProgress.current?.length) {
+      this.progressSnackbarOpened = false;
+      return;
+    }
+
+    this.progressInfo = eventTypeToMessage(type, uploadProgress.current?.length);
+    this.progressStates = uploadProgress.current;
     this.progressSnackbarOpened = true;
   }
 

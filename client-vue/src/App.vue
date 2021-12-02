@@ -29,7 +29,7 @@ import { sseGroups, sseMessageGlobal, sseTestPrinterUpdate } from "@/event-bus/s
 import { serverSettingsState } from "@/store/server-settings.state";
 import { printersState } from "@/store/printers.state";
 import { updatedPrinterEvent } from "@/event-bus/printer.events";
-import {InfoEventType, uploadMessageEvent} from "@/event-bus/alert.events";
+import { InfoEventType, uploadMessageEvent } from "@/event-bus/alert.events";
 import UpdatePrinterDialog from "@/components/Generic/Dialogs/UpdatePrinterDialog.vue";
 import FileExplorerSideNav from "@/components/Generic/SideNavs/FileExplorerSideNav.vue";
 import CreatePrinterDialog from "@/components/Generic/Dialogs/CreatePrinterDialog.vue";
@@ -81,7 +81,7 @@ export default class App extends Vue {
       this.$bus.emit(sseGroups, message.printerGroups);
     }
 
-    if (message.trackedUploads?.length > 0) {
+    if (message.trackedUploads) {
       this.$bus.emit(uploadMessageEvent, InfoEventType.UPLOAD_BACKEND, message.trackedUploads);
     }
 

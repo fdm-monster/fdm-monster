@@ -1,4 +1,3 @@
-const { PSTATE, MESSAGE } = require("../constants/state.constants");
 const HttpStatusCode = require("../constants/http-status-codes.constants");
 const OctoprintRxjsWebsocketAdapter = require("../services/octoprint/octoprint-rxjs-websocket.adapter");
 const {
