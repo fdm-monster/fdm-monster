@@ -9,7 +9,7 @@
     </v-toolbar-title>
     <v-spacer></v-spacer>
 
-    <PrintJobsMenu/>
+    <PrintJobsMenu />
   </v-app-bar>
 </template>
 
@@ -20,7 +20,7 @@ import Vue from "vue";
 import { DateTime } from "luxon";
 
 @Component({
-  components: {PrintJobsMenu}
+  components: { PrintJobsMenu }
 })
 export default class TopBar extends Vue {
   currentTimeDiff4h = "";
@@ -36,9 +36,9 @@ export default class TopBar extends Vue {
   }
 
   setWorkTimeDiff() {
-    this.currentTimeDiff4h = DateTime.fromObject({hour: 16}).diffNow().toFormat("hh:mm");
-    this.currentTimeDiff5h = DateTime.fromObject({hour: 17}).diffNow().toFormat("hh:mm");
-    this.currentTimeDiff6h = DateTime.fromObject({hour: 18}).diffNow().toFormat("hh:mm");
+    this.currentTimeDiff4h = DateTime.fromObject({ hour: 16 }).diffNow().toFormat("hh:mm");
+    this.currentTimeDiff5h = DateTime.fromObject({ hour: 17 }).diffNow().toFormat("hh:mm");
+    this.currentTimeDiff6h = DateTime.fromObject({ hour: 18 }).diffNow().toFormat("hh:mm");
   }
 }
 </script>

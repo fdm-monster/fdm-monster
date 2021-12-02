@@ -15,7 +15,7 @@
           <v-list-item-title>Legacy Groups</v-list-item-title>
           <v-list-item-subtitle>
             Convert the legacy printer group to the new separate PrinterGroup data.
-            <br/>
+            <br />
             <v-btn color="primary" @click="syncLegacyGroups()">Sync legacy</v-btn>
           </v-list-item-subtitle>
         </v-list-item-content>
@@ -47,8 +47,11 @@
         <v-toolbar>
           <v-hover v-slot="{ hover }">
             <v-toolbar-title>
-              <v-edit-dialog v-if="selectedPrinterGroup" @open="setEditedPrinterGroupName"
-                             @save="updatePrinterGroupName">
+              <v-edit-dialog
+                v-if="selectedPrinterGroup"
+                @open="setEditedPrinterGroupName"
+                @save="updatePrinterGroupName"
+              >
                 <v-btn color="secondary">
                   <v-icon v-if="hover" small>edit</v-icon>
                   {{ selectedPrinterGroup.name }}
@@ -66,7 +69,6 @@
               </v-edit-dialog>
 
               <span v-else> Select a group on the left </span>
-
             </v-toolbar-title>
           </v-hover>
 
@@ -76,7 +78,6 @@
             <v-icon>delete</v-icon>
             Delete group
           </v-btn>
-
         </v-toolbar>
 
         <v-list v-if="selectedPrinterGroup">
@@ -166,7 +167,7 @@ export default class PrinterGroupsSettings extends Vue {
   async syncLegacyGroups() {
     const groups = await PrinterGroupService.syncLegacyGroups();
 
-    this.$bus.emit(infoMessageEvent, `Succesfully synced ${ groups.length } groups!`);
+    this.$bus.emit(infoMessageEvent, `Succesfully synced ${groups.length} groups!`);
   }
 
   setEditedPrinterGroupName() {
@@ -189,7 +190,11 @@ export default class PrinterGroupsSettings extends Vue {
   async addPrinterToGroup(group: PrinterGroup, position: number, printer: Printer) {
     if (!this.selectedPrinterGroup._id) return;
     const location = (position - 1).toString();
-    await printersState.addPrinterToGroup({ groupId: this.selectedPrinterGroup._id, printerId: printer.id, location });
+    await printersState.addPrinterToGroup({
+      groupId: this.selectedPrinterGroup._id,
+      printerId: printer.id,
+      location
+    });
   }
 
   async clearPrinterFromGroup(group: PrinterGroup, index: number) {

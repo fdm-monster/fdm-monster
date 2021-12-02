@@ -72,7 +72,6 @@ export default class App extends Vue {
 
   @Watch("queuedUploads")
   async changeInUploads(newValue: QueuedUpload[]) {
-
     await uploadsState.handleNextUpload();
   }
 

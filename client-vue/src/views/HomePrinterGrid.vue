@@ -16,7 +16,7 @@
       </v-btn>
     </v-toolbar>
 
-    <v-banner v-drop-upload="{printers: selectedPrinters}">
+    <v-banner v-drop-upload="{ printers: selectedPrinters }">
       <v-row>
         <v-col>
           <v-btn color="secondary" small @click="clearSelectedPrinters()">Clear selection</v-btn>
@@ -36,7 +36,7 @@
         </v-col>
         <v-col align="right">
           <strong class="mr-2">Drop or select GCODE to print</strong>
-          <br/>
+          <br />
           <input
             ref="fileUpload"
             :multiple="false"
@@ -51,7 +51,7 @@
               <strong class="pl-1">{{ formatBytes(selectedFile.size) }}</strong>
             </v-chip>
           </v-chip-group>
-          <br/>
+          <br />
           <v-btn class="ml-2" color="primary" small @click="$refs.fileUpload.click()">
             Select gcode file
           </v-btn>
@@ -62,7 +62,7 @@
       </v-row>
     </v-banner>
 
-    <PrinterGrid class="ma-2"/>
+    <PrinterGrid class="ma-2" />
   </div>
 </template>
 
@@ -101,14 +101,17 @@ export default class HomePage extends Vue {
 
   async uploadFile() {
     const selectedPrinters = this.selectedPrinters;
-    const accessiblePrinters = selectedPrinters.filter(p => p.apiAccessibility.accessible);
+    const accessiblePrinters = selectedPrinters.filter((p) => p.apiAccessibility.accessible);
 
     if (!this.selectedFile) return;
 
     // Checking and informing user
     const incompleteListCount = selectedPrinters.length - accessiblePrinters.length;
     if (incompleteListCount > 0) {
-      this.$bus.emit(infoMessageEvent, `${ incompleteListCount } printers were skipped as they are not accessible or disabled (now).`);
+      this.$bus.emit(
+        infoMessageEvent,
+        `${incompleteListCount} printers were skipped as they are not accessible or disabled (now).`
+      );
     }
 
     const uploads = convertMultiPrinterFileToQueue(accessiblePrinters, this.selectedFile);

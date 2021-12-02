@@ -10,7 +10,13 @@
       <v-icon v-if="isPrinterOperational(printer)">check</v-icon>
       <v-icon v-else>close</v-icon>
     </template>
-    <v-btn :color="printer.printerState.colour.name" fab small @click="togglePrinterConnection()" :disabled="isPrinterPrinting()">
+    <v-btn
+      :color="printer.printerState.colour.name"
+      fab
+      small
+      @click="togglePrinterConnection()"
+      :disabled="isPrinterPrinting()"
+    >
       <v-icon>usb</v-icon>
     </v-btn>
   </v-badge>

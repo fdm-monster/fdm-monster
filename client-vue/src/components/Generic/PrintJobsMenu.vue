@@ -12,7 +12,7 @@
     >
       <template v-slot:activator="{ on, attrs }">
         <v-btn v-bind="attrs" v-on="on" dark :color="activePrintCount ? 'green' : 'secondary'">
-          <span>Print jobs {{ activePrintCount ? `(${activePrintCount})`: "" }}</span>
+          <span>Print jobs {{ activePrintCount ? `(${activePrintCount})` : "" }}</span>
           <v-icon right>work</v-icon>
         </v-btn>
       </template>
@@ -34,9 +34,7 @@
         <v-divider></v-divider>
 
         <v-list>
-          <v-list-item v-if="!activePrintCount">
-            No active prints
-          </v-list-item>
+          <v-list-item v-if="!activePrintCount"> No active prints </v-list-item>
           <v-list-item v-for="printer of activePrintJobs" :key="printer.id">
             <v-list-item-action>
               <v-progress-circular
@@ -45,7 +43,7 @@
                 :width="5"
                 color="green"
               >
-                {{ printer.currentJob.progress + "%" || ""}}
+                {{ printer.currentJob.progress + "%" || "" }}
               </v-progress-circular>
             </v-list-item-action>
             <v-list-item-content>

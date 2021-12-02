@@ -30,6 +30,7 @@
             v-model="formData.groups"
             :error-messages="errors"
             :items="printerGroupNames"
+            no-data-text="No groups known"
             label="Groups"
             multiple
             required
@@ -124,7 +125,10 @@ import { ValidationProvider } from "vee-validate";
 import Vue from "vue";
 import { Inject, Prop, Watch } from "vue-property-decorator";
 import { AppConstants } from "@/constants/app.constants";
-import { getDefaultCreatePrinter, PreCreatePrinter } from "@/models/printers/crud/create-printer.model";
+import {
+  getDefaultCreatePrinter,
+  PreCreatePrinter
+} from "@/models/printers/crud/create-printer.model";
 import { printersState } from "@/store/printers.state";
 import { PrintersService } from "@/backend";
 import { Printer } from "@/models/printers/printer.model";
