@@ -15,7 +15,7 @@
     "pupdate": "pm2 update",
     "stop": "pm2 stop 3DHub",
     "stop:delete": "pm2 delete 3DHub",
-    "prettier": "prettier --write \\\"server/**/*.js\\\" \\\"./test/**/*.js\\\" \\\"./client-vue/**/*.js\\\"",
+    "prettier": "prettier --write server/**/*.js test/**/*.js ./client-vue/**/*.js",
     "dev": "nodemon ./index.js",
     "test": "jest --forceExit"
   },
