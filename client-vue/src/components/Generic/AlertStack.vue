@@ -24,6 +24,7 @@
       </v-snackbar>
 
       <v-snackbar
+        class="mb-16"
         v-if="info || err"
         v-model="infoSnackbarOpened"
         absolute
@@ -35,7 +36,12 @@
         {{ info }}
 
         <template v-slot:action="{ attrs }">
-          <v-btn color="error" text v-bind="attrs" @click="progressSnackbarOpened = false">
+          <v-btn
+            :color="err ? 'error' : 'success'"
+            text
+            v-bind="attrs"
+            @click="infoSnackbarOpened = false"
+          >
             Close
           </v-btn>
         </template>
@@ -56,6 +62,7 @@ import {
   vuexErrorEvent
 } from "@/event-bus/alert.events";
 import { TrackedUpload, UploadStates } from "@/models/sse-messages/printer-sse-message.model";
+import { uploadsState } from "@/store/uploads.state";
 
 @Component({
   data: () => ({
@@ -98,7 +105,11 @@ export default class ErrorAlert extends Vue {
   }
 
   uploadTracker(type: InfoEventType, uploadProgress: UploadStates) {
-    if (!uploadProgress.current?.length) {
+    if (
+      !uploadProgress.current?.length &&
+      !uploadsState.hasPendingUploads &&
+      !uploadsState.isUploadingNow
+    ) {
       this.progressSnackbarOpened = false;
       return;
     }
