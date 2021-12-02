@@ -8,6 +8,7 @@ const { scopePerRequest } = require("awilix-express");
 const cors = require("cors");
 const { interceptRoles } = require("./middleware/authorization");
 const helmet = require("helmet");
+const { AppConstants } = require("./server.constants");
 
 function setupNormalServer() {
   const httpServer = express();
@@ -23,7 +24,12 @@ function setupNormalServer() {
         methods: "GET,HEAD,PUT,PATCH,POST,DELETE"
       })
     )
-    .use(helmet())
+    .use(
+      helmet({
+        contentSecurityPolicy: process.env[AppConstants.CONTENT_SECURITY_POLICY_ENABLED] || false
+        // hsts: true
+      })
+    )
     .use(express.json({ limit: "10mb" }))
     .use("/images", express.static("./images"))
     .use(cookieParser())
