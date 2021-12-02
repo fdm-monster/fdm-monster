@@ -1,7 +1,7 @@
 <template>
   <div>
     <slot></slot>
-    <div v-if="err || info">
+    <div>
       <v-snackbar
         v-model="progressSnackbarOpened"
         absolute
@@ -10,7 +10,7 @@
         rounded="pill"
       >
         {{ progressInfo }}
-        <div v-for="(state, index) in progressStates" :key="index">
+        <div v-for="(state, index) in progressStates" :key="index" class="mb-2">
           <v-progress-linear v-if="state" :value="100 * state.progress.percent"></v-progress-linear>
         </div>
 
