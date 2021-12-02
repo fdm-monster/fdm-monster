@@ -27,7 +27,7 @@ describe("printer-schema", function () {
     });
 
     m.validate(function (err) {
-      expect(err).toBeNull();
+      expect(err).toBeFalsy();
       done();
     });
   });
