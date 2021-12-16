@@ -27,6 +27,8 @@ class PrintersModule extends VuexModule {
   createDialogOpened?: boolean = false;
   selectedPrinters: Printer[] = [];
 
+  readonly horizontalOffset = 1;
+
   get currentSideNavPrinter() {
     return this.sideNavPrinter;
   }
@@ -81,7 +83,7 @@ class PrintersModule extends VuexModule {
         groupMatrix[i] = [];
         for (let j = 0; j < rows; j++) {
           groupMatrix[i][j] = this.printerGroups.find(
-            (pg) => pg.location.x === i && pg.location.y === j
+            (pg) => (pg.location.x + this.horizontalOffset) === i && pg.location.y === j
           );
         }
       }

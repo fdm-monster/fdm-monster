@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-row v-for="y in rows" :key="y" class="ma-1" no-gutters>
-      <v-col v-for="x in columns" :key="x" :cols="2" :sm="2">
+      <v-col v-for="x in columns" :key="x" :cols="columnWidth" :sm="columnWidth">
         <v-row class="test-top" no-gutters>
           <v-col cols="6">
             <PrinterGridTile :printer="getPrinter(x, y, 3)" :loading="loading" />
@@ -44,7 +44,7 @@ export default class PrinterGrid extends Vue {
   readonly columns = columnCount; // x-value choice
   readonly rows = rowCount; // y-value choice
 
-  columnWidth = 2; // default value overwritten later
+  columnWidth = 3; // default value overwritten later
   groupMatrix: PrinterGroup[][] = [];
 
   get printers() {
@@ -90,7 +90,7 @@ export default class PrinterGrid extends Vue {
   }
 
   updateGridMatrix() {
-    this.groupMatrix = printersState.gridSortedPrinterGroups(5, 5);
+    this.groupMatrix = printersState.gridSortedPrinterGroups(4, 4);
   }
 
   beforeDestroy() {
