@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-row v-for="y in rows" :key="y" class="ma-1" no-gutters>
-      <v-col v-for="x in columns" :key="x" :cols="4" :sm="4">
+      <v-col v-for="x in columns" :key="x" :cols="2" :sm="2">
         <v-row class="test-top" no-gutters>
           <v-col cols="6">
             <PrinterGridTile :printer="getPrinter(x, y, 3)" :loading="loading" />
@@ -32,7 +32,7 @@ import { sseGroups, sseMessageGlobal } from "@/event-bus/sse.events";
 import { printersState } from "@/store/printers.state";
 import PrinterGridTile from "@/components/PrinterGrid/PrinterTile.vue";
 import { PrinterGroup } from "@/models/printers/printer-group.model";
-import { columnCount, rowCount } from "@/constants/printer-grid.constants";
+import { columnCount, rowCount, totalVuetifyColumnCount } from "@/constants/printer-grid.constants";
 
 @Component({
   components: { UpdatePrinterDialog, PrinterGridTile, Login }
@@ -40,13 +40,12 @@ import { columnCount, rowCount } from "@/constants/printer-grid.constants";
 export default class PrinterGrid extends Vue {
   loading = true;
 
-  // Translation value from 12 cols => 12/x
-  columnWidth = 4;
-  groupMatrix: PrinterGroup[][] = [];
-
-  readonly maxColumnUnits = 12; // Built-in to vuetify
+  readonly maxColumnUnits = totalVuetifyColumnCount; // Built-in to vuetify
   readonly columns = columnCount; // x-value choice
   readonly rows = rowCount; // y-value choice
+
+  columnWidth = 2; // default value overwritten later
+  groupMatrix: PrinterGroup[][] = [];
 
   get printers() {
     return printersState.printers;
@@ -91,7 +90,7 @@ export default class PrinterGrid extends Vue {
   }
 
   updateGridMatrix() {
-    this.groupMatrix = printersState.gridSortedPrinterGroups(4, 4);
+    this.groupMatrix = printersState.gridSortedPrinterGroups(5, 5);
   }
 
   beforeDestroy() {
