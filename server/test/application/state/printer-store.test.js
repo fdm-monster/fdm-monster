@@ -1,4 +1,4 @@
-jest.mock("../../../server/services/octoprint/octoprint-api.service");
+jest.mock("../../../services/octoprint/octoprint-api.service");
 const dbHandler = require("../../db-handler");
 const DITokens = require("../../../container.tokens");
 const { configureContainer } = require("../../../container");
