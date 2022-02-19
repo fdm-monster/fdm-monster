@@ -15,6 +15,14 @@ export class BaseService {
     return this.handleResponse(response, options);
   }
 
+  protected static async putApi<T>(path: string, body?: any, options = this.UNWRAP) {
+    const response = await axios.put<T>(`${apiBase}/${path}`, body);
+
+    // Do interception or global handling here
+    // ...
+    return this.handleResponse<T>(response, options);
+  }
+
   protected static async postApi<T>(path: string, body?: any, options = this.UNWRAP) {
     const response = await axios.post<T>(`${apiBase}/${path}`, body);
 

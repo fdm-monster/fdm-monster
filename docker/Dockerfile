@@ -1,4 +1,4 @@
-FROM node:16-bullseye-slim
+FROM node:16.14-bullseye-slim
 WORKDIR /app
 
 RUN npm install -g pm2

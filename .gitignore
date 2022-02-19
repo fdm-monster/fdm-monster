@@ -15,6 +15,6 @@ server-nest/assets/public/assets/
 *.tgz
 
 # Runtime folders
-/3DHub
-/images
-/file-uploads
+**/fdm-monster
+**/images
+**/file-uploads

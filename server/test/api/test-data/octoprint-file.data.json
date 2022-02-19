@@ -1,0 +1,35 @@
+{
+  "date": 1634934973,
+  "display": "XboxOne_0.2mm_PLA_MINI_2h12m.gcode",
+  "hash": "a5af253ab4eafc462bdcd0e37c49e0e9a6a9c877",
+  "name": "XboxOne_0.2mm_PLA_MINI_2h12m.gcode",
+  "origin": "local",
+  "path": "XboxOne_0.2mm_PLA_MINI_2h12m.gcode",
+  "prints": {
+    "failure": 1,
+    "last": {
+      "date": 1634943648.4806864,
+      "printTime": 7969.708982282999,
+      "success": true
+    },
+    "success": 1
+  },
+  "refs": {
+    "download": "http://printer/downloads/files/local/XboxOne_0.2mm_PLA_MINI_2h12m.gcode",
+    "resource": "http://printer/api/files/local/XboxOne_0.2mm_PLA_MINI_2h12m.gcode"
+  },
+  "size": 2247615,
+  "statistics": {
+    "averagePrintTime": {
+      "_default": 7969.708982282999
+    },
+    "lastPrintTime": {
+      "_default": 7969.708982282999
+    }
+  },
+  "type": "machinecode",
+  "typePath": [
+    "machinecode",
+    "gcode"
+  ]
+}

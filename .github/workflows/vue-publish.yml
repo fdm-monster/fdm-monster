@@ -13,6 +13,7 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 14.x
+
       - run: npm ci --no-optional
         working-directory: client-vue
       - run: npm build
@@ -20,7 +21,7 @@ jobs:
       - run: npm run build
         working-directory: client-vue
       - uses: JS-DevTools/npm-publish@v1
-        if: ${{ github.repository.name == '3d-hub' }}
+        if: ${{ github.repository.name == 'fdm-monster' }}
         with:
           dry-run: false
           token: ${{ secrets.NPM_TOKEN }}

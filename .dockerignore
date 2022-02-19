@@ -13,14 +13,14 @@
 /**/node_modules
 
 # Runtime and non-production folders
-/3DHub
+/**/fdm-monster
 /client-npm
 /client-vue
 /coverage
 /docs
-/file-uploads
-/images
-/logs
+/**/file-uploads
+/**/images
+/**/logs
 /server-nest
-/test
-/views
+/**/test
+/**/views

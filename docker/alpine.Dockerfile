@@ -1,6 +1,6 @@
 # https://pkgs.alpinelinux.org/packages?name=nodejs&branch=v3.13
-# Results in NodeJS 14.17.0
-FROM alpine:3.14 as base
+# Results in NodeJS 16.13.0
+FROM alpine:3.15 as base
 
 RUN apk add --no-cache --virtual .base-deps \
     nodejs \
@@ -9,9 +9,9 @@ RUN apk add --no-cache --virtual .base-deps \
 
 RUN npm install -g pm2
 
-RUN adduser -D 3dhub --home /app && \
+RUN adduser -D fdm --home /app && \
     mkdir -p /scripts && \
-    chown -R 3dhub:3dhub /scripts/
+    chown -R fdm:fdm /scripts/
 
 FROM base as compiler
 
@@ -30,11 +30,11 @@ RUN apk del .build-deps
 
 FROM base as runtime
 
-COPY --chown=3dhub:3dhub --from=compiler /tmp/app/node_modules /app/node_modules
-COPY --chown=3dhub:3dhub . /app
+COPY --chown=fdm:fdm --from=compiler /tmp/app/node_modules /app/node_modules
+COPY --chown=fdm:fdm . /app
 RUN rm -rf /tmp/app
 
-USER 3dhub
+USER fdm
 WORKDIR /app
 
 ENTRYPOINT [ "/sbin/tini", "--" ]

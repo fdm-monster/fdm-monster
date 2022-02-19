@@ -25,7 +25,7 @@ jobs:
         id: docker_meta
         uses: crazy-max/ghaction-docker-meta@v1
         with:
-          images: davidzwa/3d-hub
+          images: davidzwa/fdm-monster
           # x.y.z versioning (not strictly 'vx.y.z' semver)
           tag-match: ^(\d+\.)?(\d+\.)?(\*|\d+)$
           tag-custom: |

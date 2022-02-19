@@ -13,7 +13,8 @@ const bindDropConditionally = (el: HTMLElement, printers: Printer[], context?: V
 
       if (!e.dataTransfer?.files.length) return;
 
-      const files = [...e.dataTransfer?.files];
+      const filesArray = e.dataTransfer?.files;
+      const files = [...filesArray];
       const file = files[0];
 
       const uploads = convertMultiPrinterFileToQueue(printers, file);

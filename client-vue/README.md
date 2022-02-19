@@ -1,10 +1,10 @@
-# client-3dhub
+# @fdm-monster/client
 
-The client UI for 3D Hub. Please see https://github.com/3d-hub/3d-hub for more information.
+The client UI for FDM Monster. Please see https://github.com/fdm-monster/fdm-monster for more information.
 
 ## Project setup
 ```
-npm install @3d-hub/client
+npm install @fdm-monster/client
 ```
 
 ### Compiles and hot-reloads for development
