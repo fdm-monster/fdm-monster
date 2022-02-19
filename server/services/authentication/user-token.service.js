@@ -16,22 +16,6 @@ class UserTokenService {
   }
 
   /**
-   * Invalidate the single-use token
-   * @param token
-   * @param fn
-   * @returns {Promise<*>}
-   */
-  popRememberMeTokenWithDone(token, fn) {
-    if (!token) {
-      return fn(false);
-    }
-
-    const userId = this.tokens[token];
-
-    return fn(null, userId);
-  }
-
-  /**
    * Stores a new printer into the database.
    * @param {Object} token object to create.
    * @param userId

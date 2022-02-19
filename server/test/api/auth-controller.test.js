@@ -63,5 +63,5 @@ describe("AuthController", () => {
   it("should succeed logout", async () => {
     const response = await request.post(logoutRoute).send();
     expectOkResponse(response);
-  }, 10000);
+  });
 });
