@@ -7,12 +7,10 @@ import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { ValidationException } from "./providers/validation.exception";
 import { FallbackModule } from "./fallback.module";
 import * as session from "express-session";
-import * as expressLayouts from "express-ejs-layouts";
 import { join } from "path";
 import { ApiService } from "./api/api.service";
 import { MongoClient } from "mongodb";
 import * as cookieParser from "cookie-parser";
-import * as flash from "connect-flash";
 import { WsAdapter } from "@nestjs/platform-ws";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const db = require("../ormconfig");
@@ -71,7 +69,6 @@ async function testDatabase() {
 function legacyMiddleware(app: NestExpressApplication) {
   // Bodyparser
   app.use(cookieParser());
-  // app.use(express.urlencoded({extended: false}));
 
   // Express Session Middleware
   app.use(
@@ -84,7 +81,6 @@ function legacyMiddleware(app: NestExpressApplication) {
   // app.use(passport.initialize());
   // app.use(passport.session());
   // app.use(passport.authenticate("remember-me"));
-  app.use(flash());
   // Global Vars
   app.use((req, res, next) => {
     res.locals.success_msg = req.flash("success_msg");
@@ -92,7 +88,6 @@ function legacyMiddleware(app: NestExpressApplication) {
     res.locals.error = req.flash("error");
     next();
   });
-  app.use(expressLayouts);
   process.env.SERVER_VERSION = `${process.env.NPM_PACKAGE_VERSION}`;
 
   const assetsPath = join(__dirname, "../..", "assets", "public");
