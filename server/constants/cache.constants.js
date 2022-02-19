@@ -1,21 +1,21 @@
-const { getFileListDefault } = require("./service.constants");
-
+import service from "./service.constants";
+const { getFileListDefault } = service;
 function getJobCacheDefault() {
-  return {
-    job: undefined,
-    progress: undefined,
-    currentZ: undefined
-  };
+    return {
+        job: undefined,
+        progress: undefined,
+        currentZ: undefined
+    };
 }
-
 function getFileCacheDefault() {
-  return {
-    fileList: getFileListDefault(),
-    storage: undefined
-  };
+    return {
+        fileList: getFileListDefault(),
+        storage: undefined
+    };
 }
-
-module.exports = {
-  getJobCacheDefault,
-  getFileCacheDefault
+export { getJobCacheDefault };
+export { getFileCacheDefault };
+export default {
+    getJobCacheDefault,
+    getFileCacheDefault
 };

@@ -1,75 +1,72 @@
 function getExpectExtensions() {
-  return {
-    toHaveErrors(received, keys) {
-      expect(received.errors).toMatchObject(keys);
-
-      return {
-        pass: true
-      };
-    }
-  };
+    return {
+        toHaveErrors(received, keys) {
+            expect(received.errors).toMatchObject(keys);
+            return {
+                pass: true
+            };
+        }
+    };
 }
-
 function expectEmptyResponse(response) {
-  expect(response.statusCode).toEqual(204);
-  expect(response.body).toBeFalsy();
+    expect(response.statusCode).toEqual(204);
+    expect(response.body).toBeFalsy();
 }
-
 function expectOkResponse(response, matchedBody) {
-  if (response.statusCode >= 400) {
-    console.warn(response.body);
-  }
-  expect(response.statusCode).toEqual(200);
-  if (!matchedBody) {
-    return;
-  }
-
-  expect(response.body).toMatchObject(matchedBody);
-
-  return response.body;
+    if (response.statusCode >= 400) {
+        console.warn(response.body);
+    }
+    expect(response.statusCode).toEqual(200);
+    if (!matchedBody) {
+        return;
+    }
+    expect(response.body).toMatchObject(matchedBody);
+    return response.body;
 }
-
 function expectValidationError(object, keys, exact = false) {
-  const objectErrors = Object.keys(object.errors);
-  if (!exact) {
-    keys.forEach((key) => expect(objectErrors).toContain(key));
-  } else {
-    expect(keys).toMatchObject(objectErrors);
-  }
+    const objectErrors = Object.keys(object.errors);
+    if (!exact) {
+        keys.forEach((key) => expect(objectErrors).toContain(key));
+    }
+    else {
+        expect(keys).toMatchObject(objectErrors);
+    }
 }
-
 function expectInternalServerError(response) {
-  expect(response.statusCode).toEqual(500);
+    expect(response.statusCode).toEqual(500);
 }
-
 function expectRedirectResponse(response) {
-  expect(response.statusCode).toEqual(302);
+    expect(response.statusCode).toEqual(302);
 }
-
 function expectUnauthorizedResponse(response) {
-  expect(response.statusCode).toEqual(401);
+    expect(response.statusCode).toEqual(401);
 }
-
 function expectInvalidResponse(response, keys, exact = false) {
-  expect(response.statusCode).toEqual(400);
-
-  if (!keys) return;
-
-  expectValidationError(response.body, keys, exact);
+    expect(response.statusCode).toEqual(400);
+    if (!keys)
+        return;
+    expectValidationError(response.body, keys, exact);
 }
-
 function expectNotFoundResponse(response) {
-  expect(response.statusCode).toEqual(404);
+    expect(response.statusCode).toEqual(404);
 }
-
-module.exports = {
-  expectEmptyResponse,
-  expectRedirectResponse,
-  expectOkResponse,
-  expectValidationError,
-  expectUnauthorizedResponse,
-  expectInternalServerError,
-  expectInvalidResponse,
-  expectNotFoundResponse,
-  getExpectExtensions
+export { expectEmptyResponse };
+export { expectRedirectResponse };
+export { expectOkResponse };
+export { expectValidationError };
+export { expectUnauthorizedResponse };
+export { expectInternalServerError };
+export { expectInvalidResponse };
+export { expectNotFoundResponse };
+export { getExpectExtensions };
+export default {
+    expectEmptyResponse,
+    expectRedirectResponse,
+    expectOkResponse,
+    expectValidationError,
+    expectUnauthorizedResponse,
+    expectInternalServerError,
+    expectInvalidResponse,
+    expectNotFoundResponse,
+    getExpectExtensions
 };

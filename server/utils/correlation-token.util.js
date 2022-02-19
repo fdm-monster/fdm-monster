@@ -1,7 +1,7 @@
 function generateCorrelationToken() {
-  return Math.random().toString(36).slice(2);
+    return Math.random().toString(36).slice(2);
 }
-
-module.exports = {
-  generateCorrelationToken
+export { generateCorrelationToken };
+export default {
+    generateCorrelationToken
 };

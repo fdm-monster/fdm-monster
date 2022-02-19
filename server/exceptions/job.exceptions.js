@@ -1,10 +1,10 @@
 class JobValidationException extends Error {
-  constructor(message, taskId) {
-    super(message);
-    this.name = `JobValidationError [${taskId || "anonymous"}]`;
-  }
+    constructor(message, taskId) {
+        super(message);
+        this.name = `JobValidationError [${taskId || "anonymous"}]`;
+    }
 }
-
-module.exports = {
-  JobValidationException
+export { JobValidationException };
+export default {
+    JobValidationException
 };

@@ -1,69 +1,65 @@
-const HistoryModel = require("../models/History");
-const { durationToDates } = require("../utils/time.util");
-const { NotFoundException } = require("../exceptions/runtime.exceptions");
-const { Status } = require("../constants/service.constants");
+import HistoryModel from "../models/History.js";
+import {durationToDates} from "../utils/time.util.js";
+import {NotFoundException} from "../exceptions/runtime.exceptions.js";
+import {Status} from "../constants/service.constants.js";
 
 class HistoryService {
-  #octoPrintApiService;
-  #settingsStore;
+    #octoPrintApiService;
+    #settingsStore;
+    #logger;
 
-  #logger;
+    constructor({octoPrintApiService, settingsStore, loggerFactory}) {
+        this.#octoPrintApiService = octoPrintApiService;
+        this.#settingsStore = settingsStore;
+        this.#logger = loggerFactory(HistoryService.name);
+    }
 
-  constructor({ octoPrintApiService, settingsStore, loggerFactory }) {
-    this.#octoPrintApiService = octoPrintApiService;
-    this.#settingsStore = settingsStore;
-    this.#logger = loggerFactory(HistoryService.name);
-  }
+    async find(limit = 100) {
+        return HistoryModel.find({}).sort({historyIndex: -1}).limit(limit);
+    }
 
-  async find(limit = 100) {
-    return HistoryModel.find({}).sort({ historyIndex: -1 }).limit(limit);
-  }
+    async get(id) {
+        const history = await HistoryModel.findById(id);
+        if (!history)
+            throw new NotFoundException(`The history entry by id ${id} was not found.`);
+        return history;
+    }
 
-  async get(id) {
-    const history = await HistoryModel.findById(id);
-    if (!history) throw new NotFoundException(`The history entry by id ${id} was not found.`);
-    return history;
-  }
+    async delete(id) {
+        const history = await this.get(id);
+        await HistoryModel.findByIdAndDelete(history.id);
+        return Status.success("History entry was removed");
+    }
 
-  async delete(id) {
-    const history = await this.get(id);
-    await HistoryModel.findByIdAndDelete(history.id);
+    async updateCostSettings(id, costSettings) {
+        const historyDoc = await this.get(id);
+        historyDoc.costSettings = costSettings;
+        await historyDoc.save();
+        return historyDoc;
+    }
 
-    return Status.success("History entry was removed");
-  }
-
-  async updateCostSettings(id, costSettings) {
-    const historyDoc = await this.get(id);
-    historyDoc.costSettings = costSettings;
-    await historyDoc.save();
-
-    return historyDoc;
-  }
-
-  async create(printer, job, { payload, resends }) {
-    let printerName = printer.getName();
-    const { startDate, endDate } = durationToDates(payload.time);
-
-    const printHistory = {
-      printerName,
-      printerId: printer._id,
-      costSettings: printer.costSettings,
-      job,
-      resends,
-      success: payload.success,
-      reason: payload.reason,
-      fileName: payload.name,
-      fileDisplay: payload.display,
-      filePath: payload.path,
-      startDate,
-      endDate,
-      printTime: payload.time
-    };
-
-    const newHistoryDoc = new HistoryModel(printHistory);
-    await newHistoryDoc.save();
-    return newHistoryDoc;
-  }
+    async create(printer, job, {payload, resends}) {
+        let printerName = printer.getName();
+        const {startDate, endDate} = durationToDates(payload.time);
+        const printHistory = {
+            printerName,
+            printerId: printer._id,
+            costSettings: printer.costSettings,
+            job,
+            resends,
+            success: payload.success,
+            reason: payload.reason,
+            fileName: payload.name,
+            fileDisplay: payload.display,
+            filePath: payload.path,
+            startDate,
+            endDate,
+            printTime: payload.time
+        };
+        const newHistoryDoc = new HistoryModel(printHistory);
+        await newHistoryDoc.save();
+        return newHistoryDoc;
+    }
 }
 
-module.exports = HistoryService;
+export default HistoryService;

@@ -1,9 +1,9 @@
 const clientSettingsUpdateRules = {
-  fileHandling: "object",
-  "fileHandling.autoRemoveOldFilesBeforeUpload": "boolean",
-  "fileHandling.autoRemoveOldFilesCriteriumDays": "integer|min:0",
+    fileHandling: "object",
+    "fileHandling.autoRemoveOldFilesBeforeUpload": "boolean",
+    "fileHandling.autoRemoveOldFilesCriteriumDays": "integer|min:0",
 };
-
-module.exports = {
-  clientSettingsUpdateRules
+export { clientSettingsUpdateRules };
+export default {
+    clientSettingsUpdateRules
 };

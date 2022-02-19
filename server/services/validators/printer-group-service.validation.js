@@ -1,29 +1,29 @@
-const { minPrinterGroupNameLength } = require("../../constants/service.constants");
-
+import service from "../../constants/service.constants";
+const { minPrinterGroupNameLength } = service;
 const printerIdRules = {
-  printerId: "required|mongoId"
+    printerId: "required|mongoId"
 };
-
 const printerInGroupRules = {
-  printerId: "required|mongoId",
-  location: "required|string"
+    printerId: "required|mongoId",
+    location: "required|string"
 };
-
 const updatePrinterGroupNameRules = {
-  name: `required|minLength:${minPrinterGroupNameLength}`
+    name: `required|minLength:${minPrinterGroupNameLength}`
 };
-
 const createPrinterGroupRules = {
-  name: `required|minLength:${minPrinterGroupNameLength}`,
-  printers: "array",
-  "printers.*": "required|object",
-  "printers.*.printerId": "required|mongoId",
-  "printers.*.location": "string"
+    name: `required|minLength:${minPrinterGroupNameLength}`,
+    printers: "array",
+    "printers.*": "required|object",
+    "printers.*.printerId": "required|mongoId",
+    "printers.*.location": "string"
 };
-
-module.exports = {
-  createPrinterGroupRules,
-  updatePrinterGroupNameRules,
-  printerIdRules,
-  printerInGroupRules
+export { createPrinterGroupRules };
+export { updatePrinterGroupNameRules };
+export { printerIdRules };
+export { printerInGroupRules };
+export default {
+    createPrinterGroupRules,
+    updatePrinterGroupNameRules,
+    printerIdRules,
+    printerInGroupRules
 };

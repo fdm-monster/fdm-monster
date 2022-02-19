@@ -1,8 +1,14 @@
-module.exports = {
-  testEnvironment: "node",
-  testTimeout: 5000,
-  modulePathIgnorePatterns: ["server-nest", "client-vue", "client-npm"],
-  globalSetup: "./test/setup-global.js",
-  setupFilesAfterEnv: ["./test/setup-after-env.js"],
-  collectCoverageFrom: ["server/**/*.js"]
+export const testEnvironment = "node";
+export const testTimeout = 5000;
+export const modulePathIgnorePatterns = ["server-nest", "client-vue", "client-npm"];
+export const globalSetup = "./test/setup-global.js";
+export const setupFilesAfterEnv = ["./test/setup-after-env.js"];
+export const collectCoverageFrom = ["server/**/*.js"];
+export default {
+    testEnvironment,
+    testTimeout,
+    modulePathIgnorePatterns,
+    globalSetup,
+    setupFilesAfterEnv,
+    collectCoverageFrom
 };

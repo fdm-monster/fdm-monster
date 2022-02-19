@@ -1,37 +1,34 @@
-const { configureContainer } = require("../../../container");
-const DITokens = require("../../../container.tokens");
-const dbHandler = require("../../db-handler");
-
+import container$0 from "../../../container.js";
+import DITokens from "../../../container.tokens";
+import * as dbHandler from "../../db-handler.js";
+const { configureContainer } = container$0;
 let container;
 let terminalLogsCache;
 let printersStore;
-
 beforeAll(async () => {
-  await dbHandler.connect();
-  container = configureContainer();
-  terminalLogsCache = container.resolve(DITokens.terminalLogsCache);
-  printersStore = container.resolve(DITokens.printersStore);
-  await printersStore.loadPrintersStore();
+    await dbHandler.connect();
+    container = configureContainer();
+    terminalLogsCache = container.resolve(DITokens.terminalLogsCache);
+    printersStore = container.resolve(DITokens.printersStore);
+    await printersStore.loadPrintersStore();
 });
 afterEach(async () => {
-  await dbHandler.clearDatabase();
+    await dbHandler.clearDatabase();
 });
 afterAll(async () => {
-  await dbHandler.closeDatabase();
+    await dbHandler.closeDatabase();
 });
-
 describe(DITokens.terminalLogsCache, () => {
-  it("should resolve", async () => {
-    expect(terminalLogsCache).toBeDefined();
-  });
-
-  it("should run generateConnectionLogs just fine", async () => {
-    const printerState = await printersStore.addPrinter({
-      printerURL: "http://url.com",
-      webSocketURL: "ws://url.com",
-      apiKey: "3dhub3dhub3dhub3dhub3dhub3dhubbb",
-      tempTriggers: { heatingVariation: null }
+    it("should resolve", async () => {
+        expect(terminalLogsCache).toBeDefined();
     });
-    await terminalLogsCache.getPrinterTerminalLogs(printerState.id);
-  });
+    it("should run generateConnectionLogs just fine", async () => {
+        const printerState = await printersStore.addPrinter({
+            printerURL: "http://url.com",
+            webSocketURL: "ws://url.com",
+            apiKey: "3dhub3dhub3dhub3dhub3dhub3dhubbb",
+            tempTriggers: { heatingVariation: null }
+        });
+        await terminalLogsCache.getPrinterTerminalLogs(printerState.id);
+    });
 });

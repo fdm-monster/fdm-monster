@@ -1,62 +1,57 @@
-const { InternalServerException } = require("../exceptions/runtime.exceptions");
+import {InternalServerException} from "../exceptions/runtime.exceptions.js";
 
 class SettingsStore {
-  #serverSettings;
-  #clientSettings;
+    #serverSettings;
+    #clientSettings;
+    #clientSettingsService;
+    #serverSettingsService;
 
-  #clientSettingsService;
-  #serverSettingsService;
+    constructor({clientSettingsService, serverSettingsService}) {
+        this.#clientSettingsService = clientSettingsService;
+        this.#serverSettingsService = serverSettingsService;
+    }
 
-  constructor({ clientSettingsService, serverSettingsService }) {
-    this.#clientSettingsService = clientSettingsService;
-    this.#serverSettingsService = serverSettingsService;
-  }
+    async loadSettings() {
+        // Setup Settings as connection is established
+        this.#serverSettings = await this.#serverSettingsService.getOrCreate();
+        this.#clientSettings = await this.#clientSettingsService.getOrCreate();
+    }
 
-  async loadSettings() {
-    // Setup Settings as connection is established
-    this.#serverSettings = await this.#serverSettingsService.getOrCreate();
-    this.#clientSettings = await this.#clientSettingsService.getOrCreate();
-  }
+    isRegistrationEnabled() {
+        if (!this.#serverSettings)
+            throw new InternalServerException("Could not check server settings (server settings not loaded");
+        return this.#serverSettings.server.registration;
+    }
 
-  isRegistrationEnabled() {
-    if (!this.#serverSettings)
-      throw new InternalServerException(
-        "Could not check server settings (server settings not loaded"
-      );
-    return this.#serverSettings.server.registration;
-  }
+    getHistorySetting() {
+        return this.#serverSettings.history;
+    }
 
-  getHistorySetting() {
-    return this.#serverSettings.history;
-  }
+    getServerSettings() {
+        return Object.freeze({
+            ...this.#serverSettings._doc
+        });
+    }
 
-  getServerSettings() {
-    return Object.freeze({
-      ...this.#serverSettings._doc
-    });
-  }
+    getClientSettings() {
+        return Object.freeze({
+            ...this.#clientSettings._doc
+        });
+    }
 
-  getClientSettings() {
-    return Object.freeze({
-      ...this.#clientSettings._doc
-    });
-  }
+    async setRegistrationEnabled(enabled = true) {
+        this.#serverSettings = await this.#serverSettingsService.setRegistrationEnabled(enabled);
+    }
 
-  async setRegistrationEnabled(enabled = true) {
-    this.#serverSettings = await this.#serverSettingsService.setRegistrationEnabled(enabled);
-  }
+    async updateClientSettings(fullUpdate) {
+        this.#clientSettings = await this.#clientSettingsService.update(fullUpdate);
+        return this.getClientSettings();
+    }
 
-  async updateClientSettings(fullUpdate) {
-    this.#clientSettings = await this.#clientSettingsService.update(fullUpdate);
-
-    return this.getClientSettings();
-  }
-
-  async updateServerSettings(fullUpdate) {
-    this.#serverSettings = await this.#serverSettingsService.update(fullUpdate);
-
-    return this.getServerSettings();
-  }
+    async updateServerSettings(fullUpdate) {
+        this.#serverSettings = await this.#serverSettingsService.update(fullUpdate);
+        return this.getServerSettings();
+    }
 }
 
-module.exports = SettingsStore;
+export default SettingsStore;

@@ -1,13 +1,13 @@
-const { UUID_LENGTH } = require("../../constants/service.constants");
-
+import service from "../../constants/service.constants";
+const { UUID_LENGTH } = service;
 const createTestPrinterRules = {
-  apiKey: `required|length:${UUID_LENGTH},${UUID_LENGTH}|alphaNumeric`,
-  correlationToken: "required|string",
-  printerURL: "required|httpurl",
-  webSocketURL: "required|wsurl",
-  camURL: "httpurl"
+    apiKey: `required|length:${UUID_LENGTH},${UUID_LENGTH}|alphaNumeric`,
+    correlationToken: "required|string",
+    printerURL: "required|httpurl",
+    webSocketURL: "required|wsurl",
+    camURL: "httpurl"
 };
-
-module.exports = {
-  createTestPrinterRules
+export { createTestPrinterRules };
+export default {
+    createTestPrinterRules
 };

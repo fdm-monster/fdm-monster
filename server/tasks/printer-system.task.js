@@ -4,35 +4,31 @@
  * @type {PrinterSystemTask}
  */
 class PrinterSystemTask {
-  #printersStore;
-  #octoPrintApiService;
-
-  constructor({ printersStore, octoPrintApiService }) {
-    this.#printersStore = printersStore;
-    this.#octoPrintApiService = octoPrintApiService;
-  }
-
-  async run() {
-    const printers = this.#printersStore.listPrinterStates();
-
-    // TODO pool this
-    for (let printer of printers) {
-      await this.refreshOctoPrintSystemInfo(printer);
+    #printersStore;
+    #octoPrintApiService;
+    constructor({ printersStore, octoPrintApiService }) {
+        this.#printersStore = printersStore;
+        this.#octoPrintApiService = octoPrintApiService;
     }
-  }
-
-  async refreshOctoPrintSystemInfo(printerState) {
-    if (!printerState.isApiAccessible()) return;
-
-    try {
-      const data = await this.#octoPrintApiService.getSystemInfo(printerState.getLoginDetails());
-      if (!!data.systeminfo) {
-        printerState.updateSystemInfo(data.systeminfo);
-      }
-    } catch (e) {
-      console.log(e.stack);
+    async run() {
+        const printers = this.#printersStore.listPrinterStates();
+        // TODO pool this
+        for (let printer of printers) {
+            await this.refreshOctoPrintSystemInfo(printer);
+        }
     }
-  }
+    async refreshOctoPrintSystemInfo(printerState) {
+        if (!printerState.isApiAccessible())
+            return;
+        try {
+            const data = await this.#octoPrintApiService.getSystemInfo(printerState.getLoginDetails());
+            if (!!data.systeminfo) {
+                printerState.updateSystemInfo(data.systeminfo);
+            }
+        }
+        catch (e) {
+            console.log(e.stack);
+        }
+    }
 }
-
-module.exports = PrinterSystemTask;
+export default PrinterSystemTask;

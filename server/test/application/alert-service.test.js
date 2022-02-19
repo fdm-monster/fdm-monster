@@ -1,111 +1,98 @@
-const dbHandler = require("../db-handler");
-const Alert = require("../../models/Alert");
-const { configureContainer } = require("../../container");
-const DITokens = require("../../container.tokens");
-const { NotFoundException } = require("../../exceptions/runtime.exceptions");
-
+import * as dbHandler from "../db-handler.js";
+import Alert from "../../models/Alert.js";
+import container$0 from "../../container.js";
+import DITokens from "../../container.tokens";
+import runtime from "../../exceptions/runtime.exceptions";
+const { configureContainer } = container$0;
+const { NotFoundException } = runtime;
 let container;
 let alertService;
 const testAlert = {
-  active: true,
-  trigger: "value",
-  message: "value",
-  scriptLocation: "value",
-  printer: []
+    active: true,
+    trigger: "value",
+    message: "value",
+    scriptLocation: "value",
+    printer: []
 };
-
 beforeAll(async () => {
-  await dbHandler.connect();
-  container = configureContainer();
-  alertService = container.resolve(DITokens.alertService);
+    await dbHandler.connect();
+    container = configureContainer();
+    alertService = container.resolve(DITokens.alertService);
 });
 afterEach(async () => {
-  await Alert.deleteMany();
+    await Alert.deleteMany();
 });
 afterAll(async () => {
-  await dbHandler.closeDatabase();
+    await dbHandler.closeDatabase();
 });
-
 describe("AlertService", () => {
-  it("should throw NotFoundException on not nonexisting alert id", async () => {
-    const id = "617d32ee1811ca343cbddee8";
-    let thrown = false;
-    try {
-      await alertService.get(id);
-    } catch (e) {
-      thrown = true;
-      expect(e instanceof NotFoundException).toBeTruthy();
-    }
-    expect(thrown).toBeTruthy();
-  });
-
-  it("should save ok", async () => {
-    // Model validation for trigger, message and scriptLocation
-    await expect(
-      async () =>
-        await alertService.create({
-          trigger: "",
-          message: "",
-          scriptLocation: ""
-        })
-    ).rejects.toBeTruthy();
-    await expect(async () => await alertService.create({})).rejects.toBeTruthy();
-
-    await alertService.create(testAlert);
-  });
-
-  it("should edit ok", async () => {
-    const createdAlert = await alertService.create(testAlert);
-    // Find validation not checked
-    const msg = await alertService.update(createdAlert.id, {
-      ...testAlert,
-      trigger: "value2"
+    it("should throw NotFoundException on not nonexisting alert id", async () => {
+        const id = "617d32ee1811ca343cbddee8";
+        let thrown = false;
+        try {
+            await alertService.get(id);
+        }
+        catch (e) {
+            thrown = true;
+            expect(e instanceof NotFoundException).toBeTruthy();
+        }
+        expect(thrown).toBeTruthy();
     });
-    expect(msg).toBeDefined();
-    expect(msg.trigger).toEqual("value2");
-  });
-
-  it("should check ok", async () => {
-    // We have work to do
-    await alertService.check({ active: "asd" }, null, {});
-  });
-
-  it("should execute ok", async () => {
-    const createdAlert = await alertService.create(testAlert);
-    // Doesnt report error back
-    await alertService.executeAlertScript(createdAlert, null);
-  });
-
-  test.skip("should convertMessage ok - .includes error", async () => {
-    // Doesnt report error back
-    await alertService.convertMessage({ active: "asd" }, null);
-  });
-
-  it("should convertMessage with ok message", async () => {
-    // Doesnt report error back
-    await alertService.convertMessage({ active: "asd" }, "null");
-    await alertService.convertMessage(
-      {
-        job: "asd",
-        progress: { completion: true }
-      },
-      "null"
-    );
-    await alertService.convertMessage({ active: "asd" }, "[historyID]");
-    await alertService.convertMessage({ active: "asd" }, "[historyID]", 123);
-    await alertService.convertMessage({ progress: { printTimeLeft: 1 } }, "[ETA]");
-    await alertService.convertMessage({ settingsAppearance: { name: "asd" } }, "[PrinterName]");
-    await alertService.convertMessage({ active: "asd" }, "[PrinterURL]");
-    await alertService.convertMessage({ active: "asd" }, "[PrinterAPIKey]");
-    await alertService.convertMessage({ active: "asd" }, "[TimeRemaining]");
-    await alertService.convertMessage({ active: "asd" }, "[EstimatedTime]");
-    await alertService.convertMessage({ active: "asd" }, "[CurrentZ]");
-    await alertService.convertMessage({ active: "asd" }, "[PercentRemaining]");
-    await alertService.convertMessage({ active: "asd" }, "[CurrentTime]");
-    await alertService.convertMessage({ active: "asd" }, "[CurrentFile]");
-    await alertService.convertMessage({ active: "asd" }, "[CurrentFilePath]");
-    await alertService.convertMessage({ active: "asd" }, "[Tool0Temp]");
-    await alertService.convertMessage({ active: "asd" }, "[BedTemp]");
-    await alertService.convertMessage({ active: "asd" }, "[Error!]");
-  });
+    it("should save ok", async () => {
+        // Model validation for trigger, message and scriptLocation
+        await expect(async () => await alertService.create({
+            trigger: "",
+            message: "",
+            scriptLocation: ""
+        })).rejects.toBeTruthy();
+        await expect(async () => await alertService.create({})).rejects.toBeTruthy();
+        await alertService.create(testAlert);
+    });
+    it("should edit ok", async () => {
+        const createdAlert = await alertService.create(testAlert);
+        // Find validation not checked
+        const msg = await alertService.update(createdAlert.id, {
+            ...testAlert,
+            trigger: "value2"
+        });
+        expect(msg).toBeDefined();
+        expect(msg.trigger).toEqual("value2");
+    });
+    it("should check ok", async () => {
+        // We have work to do
+        await alertService.check({ active: "asd" }, null, {});
+    });
+    it("should execute ok", async () => {
+        const createdAlert = await alertService.create(testAlert);
+        // Doesnt report error back
+        await alertService.executeAlertScript(createdAlert, null);
+    });
+    test.skip("should convertMessage ok - .includes error", async () => {
+        // Doesnt report error back
+        await alertService.convertMessage({ active: "asd" }, null);
+    });
+    it("should convertMessage with ok message", async () => {
+        // Doesnt report error back
+        await alertService.convertMessage({ active: "asd" }, "null");
+        await alertService.convertMessage({
+            job: "asd",
+            progress: { completion: true }
+        }, "null");
+        await alertService.convertMessage({ active: "asd" }, "[historyID]");
+        await alertService.convertMessage({ active: "asd" }, "[historyID]", 123);
+        await alertService.convertMessage({ progress: { printTimeLeft: 1 } }, "[ETA]");
+        await alertService.convertMessage({ settingsAppearance: { name: "asd" } }, "[PrinterName]");
+        await alertService.convertMessage({ active: "asd" }, "[PrinterURL]");
+        await alertService.convertMessage({ active: "asd" }, "[PrinterAPIKey]");
+        await alertService.convertMessage({ active: "asd" }, "[TimeRemaining]");
+        await alertService.convertMessage({ active: "asd" }, "[EstimatedTime]");
+        await alertService.convertMessage({ active: "asd" }, "[CurrentZ]");
+        await alertService.convertMessage({ active: "asd" }, "[PercentRemaining]");
+        await alertService.convertMessage({ active: "asd" }, "[CurrentTime]");
+        await alertService.convertMessage({ active: "asd" }, "[CurrentFile]");
+        await alertService.convertMessage({ active: "asd" }, "[CurrentFilePath]");
+        await alertService.convertMessage({ active: "asd" }, "[Tool0Temp]");
+        await alertService.convertMessage({ active: "asd" }, "[BedTemp]");
+        await alertService.convertMessage({ active: "asd" }, "[Error!]");
+    });
 });

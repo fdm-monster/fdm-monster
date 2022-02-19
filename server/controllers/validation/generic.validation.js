@@ -1,7 +1,7 @@
 const idRules = {
-  id: "required|mongoId"
+    id: "required|mongoId"
 };
-
-module.exports = {
-  idRules
+export { idRules };
+export default {
+    idRules
 };

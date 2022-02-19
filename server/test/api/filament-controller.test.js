@@ -1,27 +1,20 @@
-const dbHandler = require("../db-handler");
-const { AppConstants } = require("../../server.constants");
-const { setupTestApp } = require("../test-server");
-const {
-  expectInvalidResponse,
-  expectOkResponse,
-  expectNotFoundResponse
-} = require("../extensions");
-
+import * as dbHandler from "../db-handler.js";
+import { AppConstants } from "../../server.constants";
+import testServer from "../test-server.js";
+import extensions from "../extensions.js";
+const { setupTestApp } = testServer;
+const { expectInvalidResponse, expectOkResponse, expectNotFoundResponse } = extensions;
 const defaultRoute = `${AppConstants.apiRoute}/filament`;
 const getRoute = (id) => `${defaultRoute}/${id}`;
-
 let request;
-
 beforeAll(async () => {
-  await dbHandler.connect();
-  ({ request } = await setupTestApp(true));
+    await dbHandler.connect();
+    ({ request } = await setupTestApp(true));
 });
-
-beforeEach(async () => {});
-
+beforeEach(async () => { });
 describe("FilamentController", () => {
-  it(`should allow GET on ${defaultRoute}`, async () => {
-    const response = await request.get(defaultRoute).send();
-    expectOkResponse(response);
-  });
+    it(`should allow GET on ${defaultRoute}`, async () => {
+        const response = await request.get(defaultRoute).send();
+        expectOkResponse(response);
+    });
 });

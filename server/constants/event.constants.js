@@ -1,13 +1,13 @@
 // This is still work in progress
 const PEVENTS = {
-  init: "init",
-  current: "current",
-  event: "event"
+    init: "init",
+    current: "current",
+    event: "event"
 };
-
 const uploadProgressEvent = (token) => `upload.progress.${token}`;
-
-module.exports = {
-  PEVENTS,
-  uploadProgressEvent
+export { PEVENTS };
+export { uploadProgressEvent };
+export default {
+    PEVENTS,
+    uploadProgressEvent
 };

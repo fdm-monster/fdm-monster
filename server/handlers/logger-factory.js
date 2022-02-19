@@ -1,9 +1,9 @@
-const Logger = require("./logger");
+import Logger from "./logger.js";
 
 function LoggerFactory(_) {
-  return (name, logToFile, logLevel) => {
-    return new Logger(name, logToFile, logLevel);
-  };
+    return (name, logToFile, logLevel) => {
+        return new Logger(name, logToFile, logLevel);
+    };
 }
 
-module.exports = LoggerFactory;
+export default LoggerFactory;

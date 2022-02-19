@@ -1,9 +1,9 @@
 const serverSettingsUpdateRules = {
-  server: "required|object",
-  "server.registration": "required|boolean",
-  "server.loginRequired": "required|boolean"
+    server: "required|object",
+    "server.registration": "required|boolean",
+    "server.loginRequired": "required|boolean"
 };
-
-module.exports = {
-  serverSettingsUpdateRules
+export { serverSettingsUpdateRules };
+export default {
+    serverSettingsUpdateRules
 };

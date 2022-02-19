@@ -1,13 +1,13 @@
 const getDefaultFileHandlingSettings = () => ({
-  autoRemoveOldFilesBeforeUpload: false,
-  autoRemoveOldFilesCriteriumDays: 5
+    autoRemoveOldFilesBeforeUpload: false,
+    autoRemoveOldFilesCriteriumDays: 5
 });
-
 const getDefaultClientSettings = () => ({
-  fileHandling: getDefaultFileHandlingSettings()
+    fileHandling: getDefaultFileHandlingSettings()
 });
-
-module.exports = {
-  getDefaultFileHandlingSettings,
-  getDefaultClientSettings
+export { getDefaultFileHandlingSettings };
+export { getDefaultClientSettings };
+export default {
+    getDefaultFileHandlingSettings,
+    getDefaultClientSettings
 };

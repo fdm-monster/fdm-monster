@@ -1,3 +1,3 @@
-module.exports = async () => {
-  process.env.TZ = "UTC";
+export default async () => {
+    process.env.TZ = "UTC";
 };

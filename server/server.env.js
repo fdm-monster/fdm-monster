@@ -1,18 +1,15 @@
-const fs = require("fs");
-const path = require("path");
-const {execSync} = require("child_process");
-const envUtils = require("./utils/env.utils");
-const dotenv = require("dotenv");
-const {AppConstants} = require("./server.constants");
+import fs from "fs";
+import path from "path";
+import dotenv from "dotenv";
+import {status, up} from "migrate-mongo";
+import isDocker from "is-docker";
+import {execSync} from "child_process";
 
-const {status, up} = require("migrate-mongo");
-const isDocker = require("is-docker");
-const Logger = require("./handlers/logger.js");
-const logger = new Logger("3DHUB-Environment", false);
+import Logger from "./handlers/logger.js";
+import {AppConstants} from "./server.constants.js";
 
-// Constants and definition
+const logger = new Logger("FDN-Environment", false);
 const instructionsReferralURL = "https://github.com/fdm-monster/fdm-monster/blob/master/README.md";
-const packageJsonPath = path.join(__dirname, "./package.json");
 const dotEnvPath = path.join(__dirname, "./.env");
 
 function isEnvProd() {
@@ -28,18 +25,11 @@ function ensureNodeEnvSet() {
     if (!environment || !AppConstants.knownEnvNames.includes(environment)) {
         const newEnvName = AppConstants.defaultProductionEnv;
         process.env[AppConstants.NODE_ENV_KEY] = newEnvName;
-        logger.warning(
-            `NODE_ENV=${environment} was not set, or not known. Defaulting to NODE_ENV=${newEnvName}`
-        );
-
+        logger.warning(`NODE_ENV=${environment} was not set, or not known. Defaulting to NODE_ENV=${newEnvName}`);
         // Avoid writing to .env in case of docker
-        if (isDocker()) return;
-
-        envUtils.writeVariableToEnvFile(
-            path.resolve(dotEnvPath),
-            AppConstants.NODE_ENV_KEY,
-            newEnvName
-        );
+        if (isDocker())
+            return;
+        envUtils.writeVariableToEnvFile(path.resolve(dotEnvPath), AppConstants.NODE_ENV_KEY, newEnvName);
     } else {
         logger.info(`✓ NODE_ENV variable correctly set (${environment})!`);
     }
@@ -49,7 +39,6 @@ function ensureNodeEnvSet() {
  * Ensures that `process.env[AppConstants.VERSION_KEY]` is never undefined
  */
 function ensureEnvNpmVersionSet() {
-    const packageJsonVersion = require(packageJsonPath).version;
     if (!process.env[AppConstants.VERSION_KEY]) {
         process.env[AppConstants.VERSION_KEY] = packageJsonVersion;
         process.env[AppConstants.NON_NPM_MODE_KEY] = "true";
@@ -57,12 +46,9 @@ function ensureEnvNpmVersionSet() {
     } else {
         logger.debug(`✓ Running ${AppConstants.titleShort} version ${process.env[AppConstants.VERSION_KEY]} in NPM mode!`);
     }
-
     if (process.env[AppConstants.VERSION_KEY] !== packageJsonVersion) {
         process.env[AppConstants.VERSION_KEY] = packageJsonVersion;
-        logger.warning(
-            `~ Had to synchronize 3DH version to '${packageJsonVersion}' as it was outdated.`
-        );
+        logger.warning(`~ Had to synchronize 3DH version to '${packageJsonVersion}' as it was outdated.`);
     }
 }
 
@@ -86,26 +72,17 @@ function setupPackageJsonVersionOrThrow() {
  * Print out instructions URL
  */
 function printInstructionsURL() {
-    logger.info(
-        `Please make sure to read ${instructionsReferralURL} on how to configure your environment correctly.`
-    );
+    logger.info(`Please make sure to read ${instructionsReferralURL} on how to configure your environment correctly.`);
 }
 
 function fetchMongoDBConnectionString(persistToEnv = false) {
     if (!process.env[AppConstants.MONGO_KEY]) {
-        logger.warning(
-            `~ ${AppConstants.MONGO_KEY} environment variable is not set. Assuming default: ${AppConstants.MONGO_KEY}=${AppConstants.defaultMongoStringUnauthenticated}`
-        );
+        logger.warning(`~ ${AppConstants.MONGO_KEY} environment variable is not set. Assuming default: ${AppConstants.MONGO_KEY}=${AppConstants.defaultMongoStringUnauthenticated}`);
         printInstructionsURL();
         process.env[AppConstants.MONGO_KEY] = AppConstants.defaultMongoStringUnauthenticated;
-
         // is not isDocker just to be sure, also checked in writeVariableToEnvFile
         if (persistToEnv && !isDocker()) {
-            envUtils.writeVariableToEnvFile(
-                path.resolve(dotEnvPath),
-                AppConstants.MONGO_KEY,
-                AppConstants.defaultMongoStringUnauthenticated
-            );
+            envUtils.writeVariableToEnvFile(path.resolve(dotEnvPath), AppConstants.MONGO_KEY, AppConstants.defaultMongoStringUnauthenticated);
         }
     }
     return process.env[AppConstants.MONGO_KEY];
@@ -114,22 +91,12 @@ function fetchMongoDBConnectionString(persistToEnv = false) {
 function fetchServerPort() {
     let port = process.env[AppConstants.SERVER_PORT_KEY];
     if (Number.isNaN(parseInt(port))) {
-        logger.warning(
-            `~ The ${AppConstants.SERVER_PORT_KEY} setting was not a correct port number: >= 0 and < 65536. Actual value: ${port}.`
-        );
-
+        logger.warning(`~ The ${AppConstants.SERVER_PORT_KEY} setting was not a correct port number: >= 0 and < 65536. Actual value: ${port}.`);
         // is not isDocker just to be sure, also checked in writeVariableToEnvFile
         if (!isDocker()) {
-            envUtils.writeVariableToEnvFile(
-                path.resolve(dotEnvPath),
-                AppConstants.SERVER_PORT_KEY,
-                AppConstants.defaultServerPort
-            );
-            logger.info(
-                `~ Written ${AppConstants.SERVER_PORT_KEY}=${AppConstants.defaultServerPort} setting to .env file.`
-            );
+            envUtils.writeVariableToEnvFile(path.resolve(dotEnvPath), AppConstants.SERVER_PORT_KEY, AppConstants.defaultServerPort);
+            logger.info(`~ Written ${AppConstants.SERVER_PORT_KEY}=${AppConstants.defaultServerPort} setting to .env file.`);
         }
-
         // Update config immediately
         process.env[AppConstants.SERVER_PORT_KEY] = AppConstants.defaultServerPort.toString();
         port = process.env[AppConstants.SERVER_PORT_KEY];
@@ -145,7 +112,6 @@ function ensureMongoDBConnectionStringSet() {
     if (!dbConnectionString) {
         // In docker we better not write to .env
         const persistDbString = !isDocker();
-
         fetchMongoDBConnectionString(persistDbString);
     } else {
         logger.info(`✓ ${AppConstants.MONGO_KEY} environment variable set!`);
@@ -154,11 +120,8 @@ function ensureMongoDBConnectionStringSet() {
 
 function ensurePortSet() {
     fetchServerPort();
-
     if (!process.env[AppConstants.SERVER_PORT_KEY]) {
-        logger.info(
-            `~ ${AppConstants.SERVER_PORT_KEY} environment variable is not set. Assuming default: ${AppConstants.SERVER_PORT_KEY}=${AppConstants.defaultServerPort}.`
-        );
+        logger.info(`~ ${AppConstants.SERVER_PORT_KEY} environment variable is not set. Assuming default: ${AppConstants.SERVER_PORT_KEY}=${AppConstants.defaultServerPort}.`);
         printInstructionsURL();
         process.env[AppConstants.SERVER_PORT_KEY] = AppConstants.defaultServerPort.toString();
     }
@@ -168,13 +131,12 @@ function ensurePortSet() {
  * Parse and consume the .env file. Validate everything before starting the server.
  * Later this will switch to parsing a `config.yaml` file.
  */
-function setupEnvConfig(skipDotEnv = false) {
+export function setupEnvConfig(skipDotEnv = false) {
     if (!skipDotEnv) {
         // This needs to be CWD of app.js, so be careful not to move this call.
         dotenv.config({path: dotEnvPath});
         logger.info("✓ Parsed environment and (optional) .env file");
     }
-
     ensureNodeEnvSet();
     setupPackageJsonVersionOrThrow();
     ensureEnvNpmVersionSet();
@@ -183,37 +145,28 @@ function setupEnvConfig(skipDotEnv = false) {
     ensurePageTitle();
 }
 
-function getAppDistPath() {
+export function getAppDistPath() {
     const clientPackage = AppConstants.clientPackageName;
     let appDistPath;
     try {
         appDistPath = require(clientPackage).getAppDistPath();
     } catch (e) {
-        logger.error(
-            `~ The client package for 3DH '${clientPackage}' was not installed. Can not load frontend app`
-        );
+        logger.error(`~ The client package for 3DH '${clientPackage}' was not installed. Can not load frontend app`);
         return;
     }
-
     if (AppConstants.OVERRIDE_VUE_DIST) {
         appDistPath = AppConstants.OVERRIDE_VUE_DIST;
     }
-
     if (!fs.existsSync(appDistPath)) {
         const errorMessagePrefix = `Could not find Vue app path at ${appDistPath}`;
-
         if (isEnvProd() && envUtils.isPm2() && !isDocker()) {
             const message = `${errorMessagePrefix} when running in non-dockerized PM2 mode. Removing pm2 3DH service.`;
             removePm2Service(message);
         } else {
-            throw new Error(
-                `${errorMessagePrefix}. ${AppConstants.titleShort} server aborting in docker|nodemon or other mode.`
-            );
+            throw new Error(`${errorMessagePrefix}. ${AppConstants.titleShort} server aborting in docker|nodemon or other mode.`);
         }
     }
-
     logger.info(`✓ Vue dist folder found: ${appDistPath}`);
-
     return appDistPath;
 }
 
@@ -223,37 +176,23 @@ function getAppDistPath() {
  * @param client
  * @returns {Promise<void>}
  */
-async function runMigrations(db, client) {
+export async function runMigrations(db, client) {
     const migrationsStatus = await status(db);
     const pendingMigrations = migrationsStatus.filter((m) => m.appliedAt === "PENDING");
-
     if (pendingMigrations.length) {
-        logger.info(
-            `! MongoDB has ${pendingMigrations.length} migrations left to run (${migrationsStatus.length} migrations in total)`
-        );
+        logger.info(`! MongoDB has ${pendingMigrations.length} migrations left to run (${migrationsStatus.length} migrations in total)`);
     } else {
         logger.info(`✓ Mongo Database is up to date [${migrationsStatus.length} migration applied]`);
     }
-
     const migrationResult = await up(db, client);
-
     if (migrationResult > 0) {
         logger.info(`Applied ${migrationResult.length} migrations successfully`, migrationResult);
     }
 }
 
-function ensurePageTitle() {
+export function ensurePageTitle() {
     if (!process.env[AppConstants.SERVER_SITE_TITLE_KEY]) {
         process.env[AppConstants.SERVER_SITE_TITLE_KEY] =
             AppConstants.defaultServerPageTitle?.toString();
     }
 }
-
-module.exports = {
-    isEnvProd,
-    setupEnvConfig,
-    runMigrations,
-    fetchMongoDBConnectionString,
-    fetchServerPort,
-    getAppDistPath
-};
