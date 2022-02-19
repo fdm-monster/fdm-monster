@@ -43,6 +43,9 @@ describe("User:Schema", function () {
     // Save new User
     await newUser.save();
     let wasThrown = false;
+
+    await User.syncIndexes();
+
     try {
       await newUser2.save();
     } catch (e) {
