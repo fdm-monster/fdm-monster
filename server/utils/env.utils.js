@@ -72,13 +72,13 @@ function verifyPackageJsonRequirements(rootPath) {
     return false;
   } else {
     logger.debug("✓ found 'package.json'");
-    const packageName = require("../../package.json").name;
+    const packageName = require("../package.json").name;
     if (!packageName) {
       logger.error("X Could not find 'name' property in package.json file. Aborting 3DH Server.");
       return false;
-    } else if (packageName.toLowerCase() !== "3d-hub") {
+    } else if (packageName.toLowerCase() !== "fdm-monster") {
       logger.error(
-        `X property 'name' in package.json file didnt equal '3d-hub' (found: ${packageName.toLowerCase()}). Aborting 3DH Server.`
+        `X property 'name' in package.json file didnt equal 'fdm-monster' (found: ${packageName.toLowerCase()}). Aborting 3DH Server.`
       );
       return false;
     }

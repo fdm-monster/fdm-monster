@@ -8,7 +8,7 @@ class ClientSettingsService {
     const settings = await ClientSettingsModel.findOne();
 
     if (!settings) {
-      const defaultClientSettings = new ClientSettingsModel(Constants.getDefaultSettings());
+      const defaultClientSettings = new ClientSettingsModel(Constants.getDefaultClientSettings());
       await defaultClientSettings.save();
       return defaultClientSettings;
     }
@@ -17,7 +17,7 @@ class ClientSettingsService {
   }
 
   async update(patchUpdate) {
-    const validatedInput = validateInput(patchUpdate, clientSettingsUpdateRules);
+    const validatedInput = await validateInput(patchUpdate, clientSettingsUpdateRules);
     const settingsDoc = await this.getOrCreate();
 
     return ClientSettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, validatedInput);

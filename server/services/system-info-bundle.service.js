@@ -23,7 +23,7 @@ class SystemInfoBundleService {
    */
   generateSystemInformationContents() {
     let systemInformationContents = "--- 3DH System Information ---\n\n";
-    systemInformationContents += `3D Hub Version\n ${this.serverVersion} \n`;
+    systemInformationContents += `FDM Monster Version\n ${this.serverVersion} \n`;
     const airGapped = "Are we connected to the internet?\n";
     const pm2 = "Are we running under pm2?\n";
     const nodemon = "Are we running under nodemon?\n";

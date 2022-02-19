@@ -20,23 +20,23 @@ jobs:
         id: docker_meta
         uses: crazy-max/ghaction-docker-meta@v1
         with:
-          images: davidzwa/3d-hub
+          images: davidzwa/fdm-monster
           # x.y.z versioning (not strictly 'vx.y.z' semver)
           tag-match: ^(\d+\.)?(\d+\.)?(\*|\d+)$
           tag-custom: |
             ${{env.TAG_EDGE}}
       -
         name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: setup-qemu-action@v1
       -
         name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: setup-buildx-action@v1
       -
         name: Cache Docker layers
         uses: actions/cache@v2
         with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ hashfiles('./docker/Dockerfile') }}
+          key: ${{ runner.os }}-buildx-${{ hashfiles('./server/docker/Dockerfile') }}
           restore-keys: |
             ${{ runner.os }}-buildx-
       -
@@ -50,7 +50,7 @@ jobs:
         with:
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
-          file: ./docker/Dockerfile
+          file: ./server/docker/Dockerfile
           push: false
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}

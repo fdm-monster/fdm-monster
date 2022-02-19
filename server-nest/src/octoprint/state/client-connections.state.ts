@@ -100,7 +100,7 @@ export class ClientConnectionsState {
         });
         if (!userFulfillsRequiredGroups) {
           throw new Error(
-            "User does not have the required groups to operate OctoPrint remotely from 3D Hub."
+            "User does not have the required groups to operate OctoPrint remotely from FDM Monster."
           );
         }
 

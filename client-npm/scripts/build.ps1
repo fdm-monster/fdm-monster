@@ -28,7 +28,7 @@ Write-PackageJson -File $target_package_json -Target $target_package_json -Versi
 
 # Check version
 npm cache clear --force
-$versionArray = (npm view @3d-hub/client versions --json | ConvertFrom-Json)
+$versionArray = (npm view @fdm-monster/client versions --json | ConvertFrom-Json)
 $lastVersion = $versionArray[$versionArray.Count - 1]
 if ($lastVersion -eq $client_version) {
     $v = [version]::New($client_version)

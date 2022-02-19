@@ -25,7 +25,7 @@ class GithubApiService {
     }
 
     const response = await this.#httpClient.get(
-      "https://api.github.com/repos/3d-hub/3d-hub/releases",
+      "https://api.github.com/repos/fdm-monster/fdm-monster/releases",
       {
         headers: {
           [contentTypeHeaderKey]: jsonContentType

@@ -2,19 +2,19 @@ volumes:
   mongodb-data:
 
 services:
-  3DHUB:
-    container_name: 3d-hub
-    image: davidzwa/3d-hub:0.0.4-pre2
+  fdm-monster:
+    container_name: fdm-monster
+    image: davidzwa/fdm-monster:development
     restart: always
     build:
-      context: .
+      context: ./server
       dockerfile: docker/Dockerfile
     ports:
       - 4001:4000
     environment:
-      - MONGO=mongodb://host.docker.internal:27017/3dhub?authSource=admin&readPreference=primary&ssl=false
+      - MONGO=mongodb://host.docker.internal:27017/fdm-monster?readPreference=primary&ssl=false
     volumes:
       # Volumes as local relative folders (validate with 'docker-compose config')
-      - ./3DHub/logs:/app/logs
-      - ./3DHub/scripts:/app/scripts
-      - ./3DHub/images:/app/images
+      - ./fdm-monster/logs:/app/logs
+      - ./fdm-monster/scripts:/app/scripts
+      - ./fdm-monster/images:/app/images

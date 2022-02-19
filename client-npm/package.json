@@ -1,11 +1,11 @@
 {
-  "name": "@3d-hub/client",
+  "name": "@fdm-monster/client",
   "author": "David Zwart",
-  "version": "0.1.16",
+  "version": "0.2.0",
   "private": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/3d-hub/3d-hub"
+    "url": "https://github.com/fdm-monster/fdm-monster"
   },
   "dependencies": {},
   "devDependencies": {}

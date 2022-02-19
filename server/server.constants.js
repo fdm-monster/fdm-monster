@@ -20,7 +20,27 @@ class ServerConstants {
   }
 
   static get defaultServerPageTitle() {
-    return "3D Hub";
+    return "FDM Monster";
+  }
+
+  static get titleShort() {
+    return "FDM";
+  }
+
+  static get pm2ServiceName() {
+    return "FDM";
+  }
+
+  /**
+   * Relative root path of server
+   * @returns {string}
+   */
+  static get serverPath() {
+    return "./";
+  }
+
+  static get clientPackageName() {
+    return "@fdm-monster/client";
   }
 
   static get knownEnvNames() {

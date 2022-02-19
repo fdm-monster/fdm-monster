@@ -11,6 +11,26 @@
 
       <v-list-item>
         <v-list-item-content>
+          <v-list-item-title>Pre-upload file cleanup</v-list-item-title>
+          <v-list-item-subtitle>
+            Automatically cleanup old files to ensure the SD card has enough space.
+            <br />
+            <v-checkbox v-model="fileHandlingSettings.autoRemoveOldFilesBeforeUpload"
+                        label="Remove old file before upload"></v-checkbox>
+            <v-text-field
+              v-model="fileHandlingSettings.autoRemoveOldFilesCriteriumDays"
+              :disabled="!fileHandlingSettings.autoRemoveOldFilesBeforeUpload"
+              min="0"
+              outlined
+              type="number"
+            />
+            <v-btn @click="setFileHandlingClientSettings">save</v-btn>
+          </v-list-item-subtitle>
+        </v-list-item-content>
+      </v-list-item>
+
+      <v-list-item>
+        <v-list-item-content>
           <v-list-item-title>Clean file references</v-list-item-title>
           <v-list-item-subtitle>
             Clear out the file references for all printers - this does not remove them from
@@ -29,7 +49,7 @@
             time/size estimates.
             <br />
             <v-btn color="primary" @click="bulkDisableGCodeAnalysis()"
-              >Bulk disable GCode Analysis
+            >Bulk disable GCode Analysis
             </v-btn>
           </v-list-item-subtitle>
         </v-list-item-content>
@@ -41,13 +61,29 @@
 <script lang="ts">
 import Component from "vue-class-component";
 import Vue from "vue";
-import { PrinterFileService } from "@/backend";
+import { PrinterFileService, SettingsService } from "@/backend";
 import { PrinterSettingsService } from "@/backend/printer-settings.service";
 import { printersState } from "@/store/printers.state";
 import { infoMessageEvent } from "@/event-bus/alert.events";
+import { FileHandlingSettings } from "@/models/client-settings/file-handling-settings.model";
 
 @Component({})
 export default class HubSettings extends Vue {
+  fileHandlingSettings: FileHandlingSettings = {
+    autoRemoveOldFilesBeforeUpload: true,
+    autoRemoveOldFilesCriteriumDays: 5
+  };
+
+  async created() {
+    const clientSettings = await SettingsService.getClientSettings();
+    this.fileHandlingSettings = clientSettings.fileHandling;
+  }
+
+  async setFileHandlingClientSettings() {
+    const clientSettings = await SettingsService.setFileHandlingClientSettings(this.fileHandlingSettings);
+    this.fileHandlingSettings = clientSettings.fileHandling;
+  }
+
   async purgeFiles() {
     await PrinterFileService.purgeFiles();
 

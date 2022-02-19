@@ -5,7 +5,7 @@ import Printers from "@/views/Printers.vue";
 import Settings from "@/views/Settings.vue";
 import PrinterGroupsSettings from "@/views/settings/PrinterGroupsSettings.vue";
 import About from "@/views/About.vue";
-import Scheduling from "@/views/Scheduling.vue";
+import Scheduling from "@/views/PrintScheduling.vue";
 import HubSettings from "@/views/settings/HubSettings.vue";
 import OtherSettings from "@/views/settings/OtherSettings.vue";
 import UserManagementSettings from "@/views/settings/UserManagementSettings.vue";

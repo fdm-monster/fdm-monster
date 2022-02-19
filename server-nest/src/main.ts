@@ -23,8 +23,8 @@ const logger = new Logger("Main");
 
 function AddSwagger(app: INestApplication): INestApplication {
   const config = new DocumentBuilder()
-    .setTitle("3D Hub V2 API docs")
-    .setDescription("3D Hub public API description")
+    .setTitle("FDM Monster V2 API docs")
+    .setDescription("FDM Monster public API description")
     .setVersion(process.env.npm_package_version)
     .build();
   const document = SwaggerModule.createDocument(app, config);
@@ -34,7 +34,7 @@ function AddSwagger(app: INestApplication): INestApplication {
 }
 
 function printPreBootMessage(error = null) {
-  logger.log(`3D Hub ${Y}v${process.env.npm_package_version}${D}`);
+  logger.log(`FDM Monster ${Y}v${process.env.npm_package_version}${D}`);
   logger.log(`NodeJS ${Y}${process.version}${D}`);
   const startDate = new Date().toDateString();
   const startTime = new Date().toLocaleTimeString();

@@ -1,12 +1,12 @@
-# 3D Hub Client
+# FDM Monster Client
 
-The client UI for 3D Hub built with Vue. Please see https://github.com/3d-hub/3d-hub for more information.
+The client UI for FDM Monster built with Vue. Please see https://github.com/fdm-monster/fdm-monster for more information.
 
 ## Project setup
 ```
-npm install @3d-hub/client
+npm install @fdm-monster/client
 ```
-https://www.npmjs.com/package/@3d-hub/client
+https://www.npmjs.com/package/@fdm-monster/client
 
 ### Compiled and minified for production
 This package is built for hosting only and does not contain references to vue CLI directly.
