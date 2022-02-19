@@ -8,7 +8,7 @@ import {
 } from "../exceptions/runtime.exceptions.js";
 import {AppConstants} from "../server.constants.js";
 
-export function exceptionHandler(err, req, res, next) {
+export default function exceptionHandler(err, req, res, next) {
     // https://dev.to/rajajaganathan/express-scalable-way-to-handle-errors-1kd6
     const isTest = process.env.NODE_ENV === AppConstants.defaultTestEnv;
     if (!isTest) {

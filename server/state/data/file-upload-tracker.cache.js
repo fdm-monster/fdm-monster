@@ -1,7 +1,6 @@
-import correlationToken from "../../utils/correlation-token.util";
-import event from "../../constants/event.constants";
-const { generateCorrelationToken } = correlationToken;
-const { uploadProgressEvent } = event;
+import {generateCorrelationToken} from "../../utils/correlation-token.util.js";
+import {uploadProgressEvent} from "../../constants/event.constants.js";
+
 /**
  * A generic cache for file upload progress
  */
@@ -11,14 +10,17 @@ class FileUploadTrackerCache {
     #uploadsFailed = [];
     #eventEmitter2;
     #logger;
-    constructor({ loggerFactory, eventEmitter2 }) {
+
+    constructor({loggerFactory, eventEmitter2}) {
         this.#eventEmitter2 = eventEmitter2;
         this.#logger = loggerFactory("Server-FileUploadTrackerCache");
     }
+
     progressCallback = (token, p) => {
         // Ensure binding of this is correct
         this.updateUploadProgress(token, p);
     };
+
     getUploads(filterHourOld = false) {
         const currentTime = Date.now();
         const done = this.#uploadsDone.filter((d) => currentTime - d.startedAt < 60 * 60 * 1000);
@@ -35,9 +37,11 @@ class FileUploadTrackerCache {
                 failed: this.#uploadsFailed
             };
     }
+
     getUpload(correlationToken) {
         return this.#currentUploads.find((cu) => cu.correlationToken === correlationToken);
     }
+
     addUploadTracker(multerFile) {
         const correlationToken = generateCorrelationToken();
         this.#logger.info(`Starting upload session with token ${correlationToken}`);
@@ -50,21 +54,21 @@ class FileUploadTrackerCache {
         });
         return correlationToken;
     }
+
     updateUploadProgress(token, progress, reason) {
         if (progress.done || progress.percent === 1) {
             this.#logger.info("Upload tracker completed");
             this.markUploadDone(token, true);
             this.#eventEmitter2.off(uploadProgressEvent(token), this.progressCallback);
-        }
-        else if (progress.failed) {
+        } else if (progress.failed) {
             this.markUploadDone(token, false, reason);
             this.#eventEmitter2.off(uploadProgressEvent(token), this.progressCallback);
-        }
-        else {
+        } else {
             const upload = this.getUpload(token);
             upload.progress = progress;
         }
     }
+
     markUploadDone(token, success, reason) {
         const trackedUploadIndex = this.#currentUploads.findIndex((cu) => cu.correlationToken === token);
         if (trackedUploadIndex === -1) {
@@ -76,12 +80,12 @@ class FileUploadTrackerCache {
             trackedUpload.failedAt = Date.now();
             trackedUpload.reason = reason;
             this.#uploadsDone.push(trackedUpload);
-        }
-        else {
+        } else {
             trackedUpload.succeededAt = Date.now();
             this.#uploadsFailed.push(trackedUpload);
         }
         this.#currentUploads.splice(trackedUploadIndex, 1);
     }
 }
+
 export default FileUploadTrackerCache;

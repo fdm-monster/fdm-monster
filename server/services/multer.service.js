@@ -1,14 +1,16 @@
 import multer from "multer";
-import { AppConstants } from "../server.constants";
 import path from "path";
 import fs from "fs";
-import runtime from "../exceptions/runtime.exceptions";
-const { NotFoundException } = runtime;
+
+import {AppConstants} from "../server.constants.js";
+
 class MulterService {
     #fileUploadTrackerCache;
-    constructor({ fileUploadTrackerCache }) {
+
+    constructor({fileUploadTrackerCache}) {
         this.#fileUploadTrackerCache = fileUploadTrackerCache;
     }
+
     clearUploadsFolder() {
         if (!fs.existsSync(AppConstants.defaultFileUploadFolder))
             return;
@@ -23,6 +25,7 @@ class MulterService {
             }
         });
     }
+
     gcodeFileFilter(req, file, callback) {
         const ext = path.extname(file.originalname);
         if (ext !== ".gcode") {
@@ -30,6 +33,7 @@ class MulterService {
         }
         callback(null, true);
     }
+
     getMulterGCodeFileFilter(storeAsFile = true) {
         return multer({
             storage: storeAsFile
@@ -40,11 +44,14 @@ class MulterService {
             fileFilter: this.gcodeFileFilter
         }).any();
     }
+
     startTrackingSession(multerFile) {
         return this.#fileUploadTrackerCache.addUploadTracker(multerFile);
     }
+
     getSessions() {
         return this.#fileUploadTrackerCache.getUploads();
     }
 }
+
 export default MulterService;

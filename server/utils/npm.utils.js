@@ -1,6 +1,5 @@
-import util from "util";
-import { type exec$0 } from "child_process";
-const exec = util.promisify({ exec: exec$0 }.exec);
+import {exec} from "child_process";
+
 async function returnListOfMissingPackages() {
     try {
         const outdatedPackageJsonList = await exec("npm outdated --production --json");
@@ -15,21 +14,21 @@ async function returnListOfMissingPackages() {
             });
             return missingPackageList;
         }
-    }
-    catch (e) {
+    } catch (e) {
         throw `Error running npm outdated command | ${e}`;
     }
 }
+
 async function installNpmDependency(dependency) {
     try {
         await exec(`npm install ${dependency}`);
-    }
-    catch (e) {
+    } catch (e) {
         throw `Error running installation command | ${e}`;
     }
 }
-export { returnListOfMissingPackages };
-export { installNpmDependency };
+
+export {returnListOfMissingPackages};
+export {installNpmDependency};
 export default {
     returnListOfMissingPackages,
     installNpmDependency

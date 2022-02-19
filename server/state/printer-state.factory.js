@@ -1,4 +1,5 @@
-import DITokens from "../container.tokens";
+import DITokens from "../container.tokens.js";
+
 function PrinterStateFactory(cradle) {
     return {
         async create(printerDocument, isTestPrinter = false) {

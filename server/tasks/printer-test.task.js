@@ -1,8 +1,8 @@
-import HttpStatusCode from "../constants/http-status-codes.constants";
-import OctoprintRxjsWebsocketAdapter from "../services/octoprint/octoprint-rxjs-websocket.adapter";
-import octoprintService from "../services/octoprint/constants/octoprint-service.constants";
-import DITokens from "../container.tokens";
-const { isLoginResponseGlobal } = octoprintService;
+import HttpStatusCode from "../constants/http-status-codes.constants.js";
+import OctoprintRxjsWebsocketAdapter from "../services/octoprint/octoprint-rxjs-websocket.adapter.js";
+import {isLoginResponseGlobal} from "../services/octoprint/constants/octoprint-service.constants.js";
+import DITokens from "../container.tokens.js";
+
 class PrinterTestTask {
     #lastTestRunTime;
     #printerSseHandler;
@@ -11,7 +11,15 @@ class PrinterTestTask {
     #octoPrintService;
     #taskManagerService;
     #logger;
-    constructor({ printersStore, octoPrintApiService, settingsStore, taskManagerService, loggerFactory, printerSseHandler }) {
+
+    constructor({
+                    printersStore,
+                    octoPrintApiService,
+                    settingsStore,
+                    taskManagerService,
+                    loggerFactory,
+                    printerSseHandler
+                }) {
         this.#printersStore = printersStore;
         this.#settingsStore = settingsStore;
         this.#octoPrintService = octoPrintApiService;
@@ -19,9 +27,11 @@ class PrinterTestTask {
         this.#printerSseHandler = printerSseHandler;
         this.#logger = loggerFactory("Printer-Test-task");
     }
+
     get maxRunTime() {
         return 10000; // 10 sec
     }
+
     async run() {
         const testPrinterState = this.#printersStore.getTestPrinter();
         const taskExpired = this.#lastTestRunTime
@@ -38,11 +48,13 @@ class PrinterTestTask {
         await this.#testPrinterConnection(testPrinterState);
         this.#stopRunning();
     }
+
     #stopRunning() {
         this.#lastTestRunTime = undefined;
         this.#taskManagerService.disableJob(DITokens.printerTestTask);
         this.#logger.info("Printer test task has stopped running and is disabled.");
     }
+
     /**
      * Update the UI with test status
      * @param testPrinterState
@@ -50,7 +62,7 @@ class PrinterTestTask {
      * @returns {Promise<void>}
      */
     async #sendStateProgress(testPrinterState, progress) {
-        const { printerURL, printerName, apiKey, correlationToken } = testPrinterState?.toFlat();
+        const {printerURL, printerName, apiKey, correlationToken} = testPrinterState?.toFlat();
         const sseData = {
             testPrinter: {
                 printerURL,
@@ -63,6 +75,7 @@ class PrinterTestTask {
         const serializedData = JSON.stringify(sseData);
         this.#printerSseHandler.send(serializedData);
     }
+
     async #testPrinterConnection(printerState) {
         this.#lastTestRunTime = Date.now();
         const loginDetails = printerState.getLoginDetails();
@@ -78,14 +91,14 @@ class PrinterTestTask {
         // Transport related error
         let errorCode = localError?.response?.status;
         if (errorThrown && !localError.response) {
-            return await this.#sendStateProgress(printerState, { connected: false });
+            return await this.#sendStateProgress(printerState, {connected: false});
         }
-        await this.#sendStateProgress(printerState, { connected: true });
+        await this.#sendStateProgress(printerState, {connected: true});
         // API related errors
         if (errorCode === HttpStatusCode.BAD_REQUEST) {
-            return await this.#sendStateProgress(printerState, { connected: true, apiOk: false });
+            return await this.#sendStateProgress(printerState, {connected: true, apiOk: false});
         }
-        await this.#sendStateProgress(printerState, { connected: true, apiOk: true });
+        await this.#sendStateProgress(printerState, {connected: true, apiOk: true});
         // Response related errors
         const loginResponse = responseObject.data;
         // This is a check which is best done after checking 400 code (GlobalAPIKey or pass-thru) - possible
@@ -141,4 +154,5 @@ class PrinterTestTask {
         });
     }
 }
+
 export default PrinterTestTask;

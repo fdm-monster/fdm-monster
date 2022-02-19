@@ -1,7 +1,11 @@
-import octoprintService from "../constants/octoprint-service.constants";
-import runtime from "../../../exceptions/runtime.exceptions";
-const { jsonContentType, contentTypeHeaderKey, apiKeyHeaderKey, OPClientErrors } = octoprintService;
-const { ValidationException } = runtime;
+import {
+    apiKeyHeaderKey,
+    contentTypeHeaderKey,
+    jsonContentType,
+    OPClientErrors
+} from "../constants/octoprint-service.constants.js";
+import {ValidationException} from "../../../exceptions/runtime.exceptions.js";
+
 function validatePrinter(printer) {
     if (!printer.apiKey || !printer.printerURL) {
         throw new ValidationException(OPClientErrors.printerValidationErrorMessage);
@@ -11,47 +15,51 @@ function validatePrinter(printer) {
         printerURL: printer.printerURL
     };
 }
+
 function constructHeaders(apiKey, contentType = jsonContentType) {
     return {
         [contentTypeHeaderKey]: contentType,
         [apiKeyHeaderKey]: apiKey
     };
 }
+
 /**
  * Process an Axios response (default)
  * @param response
  * @param options
  * @returns {{data, status}|*}
  */
-function processResponse(response, options = { unwrap: true }) {
+function processResponse(response, options = {unwrap: true}) {
     if (options.unwrap) {
         return response.data;
     }
     if (options.simple) {
-        return { status: response.status, data: response.data };
+        return {status: response.status, data: response.data};
     }
     return response;
 }
+
 /**
  * Process a Got based request
  * @param response
  * @param options
  * @returns {{data, status}|*}
  */
-async function processGotResponse(response, options = { unwrap: true }) {
+async function processGotResponse(response, options = {unwrap: true}) {
     if (options.unwrap) {
         return JSON.parse(response.body);
     }
     if (options.simple) {
         const data = JSON.parse(response.body);
-        return { status: response.statusCode, data };
+        return {status: response.statusCode, data};
     }
     return response;
 }
-export { validatePrinter };
-export { constructHeaders };
-export { processResponse };
-export { processGotResponse };
+
+export {validatePrinter};
+export {constructHeaders};
+export {processResponse};
+export {processGotResponse};
 export default {
     validatePrinter,
     constructHeaders,

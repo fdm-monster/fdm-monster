@@ -7,9 +7,9 @@ const dtFormat = new Intl.DateTimeFormat("en-GB", {
     timeZone: "UTC"
 });
 
-// dateFormat = () => {
-//     return dtFormat.format(new Date());
-// };
+const dateFormat = () => {
+    return dtFormat.format(new Date());
+};
 
 class LoggerService {
     constructor(name, enableFileLogs = true, logFilterLevel) {

@@ -1,28 +1,33 @@
 import Logger from "../handlers/logger.js";
 import Alert from "../models/Alert.js";
-import runtime from "../exceptions/runtime.exceptions";
-const { NotFoundException } = runtime;
+import {NotFoundException} from "../exceptions/runtime.exceptions.js";
+
 class AlertService {
     #scriptService;
     #logger = new Logger("Server-Scripts");
-    constructor({ scriptService }) {
+
+    constructor({scriptService}) {
         this.#scriptService = scriptService;
     }
+
     async get(alertId) {
-        const filter = { _id: alertId };
+        const filter = {_id: alertId};
         const alert = await Alert.findOne(filter);
         if (!alert) {
             throw new NotFoundException(`The alert ID '${alertId}' is not an existing Alert.`);
         }
         return alert;
     }
+
     async list() {
         return Alert.find({});
     }
+
     async delete(alertId) {
         const alert = await this.get(alertId);
         await Alert.findByIdAndDelete(alert.id);
     }
+
     /**
      * Currently unused
      * @param alertId
@@ -34,6 +39,7 @@ class AlertService {
         this.#logger.info("Testing Alerts: " + alert.scriptLocation + " " + messagePayload);
         return await this.#scriptService.execute(alert.scriptLocation, JSON.stringify(messagePayload));
     }
+
     /**
      * Save alert - TODO Trigger, message and location validation lacking
      * @param printer
@@ -42,7 +48,7 @@ class AlertService {
      * @param scriptLocation
      * @returns {Promise<string>}
      */
-    async create({ printer, trigger, message, scriptLocation }) {
+    async create({printer, trigger, message, scriptLocation}) {
         let alert = {
             active: true,
             trigger,
@@ -55,6 +61,7 @@ class AlertService {
         this.#logger.info("Saved: " + trigger + " " + scriptLocation + " " + message);
         return newAlert;
     }
+
     /**
      * Update relevant alert without touching printers
      * @param alertId
@@ -70,6 +77,7 @@ class AlertService {
         await alert.save();
         return alert;
     }
+
     /**
      *
      * @param printer
@@ -88,12 +96,12 @@ class AlertService {
             }
         }
     }
+
     async convertMessage(printer, message, historyID) {
         let job = "";
         if (typeof printer.job != "undefined") {
             job = printer.job;
-        }
-        else {
+        } else {
             job = {
                 file: {
                     name: "No File Selected",
@@ -107,8 +115,7 @@ class AlertService {
         let progress = "";
         if (typeof printer.progress != "undefined" && printer.progress.completion != null) {
             progress = printer.progress;
-        }
-        else {
+        } else {
             progress = {
                 completion: 0,
                 filepos: 0,
@@ -119,8 +126,7 @@ class AlertService {
         if (message.includes("[historyID]")) {
             if (typeof historyID !== "undefined") {
                 message = message.replace(/\[historyID\]/g, historyID);
-            }
-            else {
+            } else {
                 message = message.replace(/\[historyID\]/g, "(undefined history id)");
             }
         }
@@ -155,8 +161,7 @@ class AlertService {
             let current = "";
             if (typeof printer.currentZ === "undefined" || printer.currentZ === null) {
                 current = "No Current Z";
-            }
-            else {
+            } else {
                 current = printer.currentZ + "mm";
             }
             message = message.replace(/\[CurrentZ\]/g, current);
@@ -164,8 +169,7 @@ class AlertService {
         if (message.includes("[PercentRemaining]")) {
             if (progress.completion === 0) {
                 message = message.replace(/\[PercentRemaining\]/g, progress.completion + "%");
-            }
-            else {
+            } else {
                 message = message.replace(/\[PercentRemaining\]/g, progress.completion.toFixed(2) + "%");
             }
         }
@@ -190,8 +194,7 @@ class AlertService {
                     " / A:" +
                     printer.temps[0].tool0.actual +
                     "°C");
-            }
-            else {
+            } else {
                 message = message.replace(/\[Tool0Temp\]/g, "No tool0 temperature");
             }
         }
@@ -200,8 +203,7 @@ class AlertService {
                 typeof printer.temps[0].bed != "undefined" &&
                 typeof printer.temps[0].bed.target != "undefined") {
                 message = message.replace(/\[BedTemp\]/g, "T:" + printer.temps[0].bed.target + "°C" + " / A:" + printer.temps[0].bed.actual + "°C");
-            }
-            else {
+            } else {
                 message = message.replace(/\[BedTemp\]/g, "No tool0 temperature");
             }
         }
@@ -215,13 +217,13 @@ class AlertService {
         return JSON.stringify(message);
     }
 }
+
 // TODO replace with luxon formatter
 const generateTime = function (seconds) {
     let string = "";
     if (seconds === undefined || isNaN(seconds) || seconds === null) {
         string = "Done";
-    }
-    else {
+    } else {
         let days = Math.floor(seconds / (3600 * 24));
         seconds -= days * 3600 * 24;
         let hrs = Math.floor(seconds / 3600);

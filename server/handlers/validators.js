@@ -1,8 +1,8 @@
 import nodeInputValidator from "node-input-validator";
-import runtime from "../exceptions/runtime.exceptions";
-import printer from "../middleware/printer.js";
-const { ValidationException, InternalServerException } = runtime;
-const { printerLoginToken, currentPrinterToken, printerIdToken } = printer;
+
+import {InternalServerException, ValidationException} from "../exceptions/runtime.exceptions.js";
+import {currentPrinterToken, printerIdToken, printerLoginToken} from "../middleware/printer.js";
+
 const arrayValidator = function arrayLengthValidator(minIncl = null, maxIncl = null) {
     return (arrayValue) => {
         let isMinLength = true;
@@ -16,35 +16,38 @@ const arrayValidator = function arrayLengthValidator(minIncl = null, maxIncl = n
         return isMinLength && isMaxLength;
     };
 };
+
 function validateMongoURL(mongoURL) {
     const mongoString = mongoURL.toLowerCase();
     const hasMongoPrefix = mongoString.toLowerCase().includes("mongodb://") ||
         mongoString.toLowerCase().includes("mongodb+srv://");
-    const isKnownDatabase = mongoString.includes("/3dhub");
+    const isKnownDatabase = mongoString.includes("/fdm-monster");
     return {
         hasMongoPrefix,
         isKnownDatabase,
         isValid: isKnownDatabase || hasMongoPrefix
     };
 }
+
 function getExtendedValidator() {
-    nodeInputValidator.extend("wsurl", ({ value, args }, validator) => {
+    nodeInputValidator.extend("wsurl", ({value, args}, validator) => {
         if (!value)
             return false;
         const url = new URL(value).href;
         return url.includes("ws://") || url.includes("wss://");
     });
-    nodeInputValidator.extend("httpurl", ({ value, args }, validator) => {
+    nodeInputValidator.extend("httpurl", ({value, args}, validator) => {
         if (!value)
             return false;
         const url = new URL(value).href;
         return url.includes("http://") || url.includes("https://");
     });
-    nodeInputValidator.extend("not", ({ value, args }, validator) => {
+    nodeInputValidator.extend("not", ({value, args}, validator) => {
         return !value && value !== false;
     });
     return nodeInputValidator;
 }
+
 function getScopedPrinter(req) {
     const tokens = [printerLoginToken, currentPrinterToken, printerIdToken];
     let resolvedDependencies = {};
@@ -56,8 +59,7 @@ function getScopedPrinter(req) {
                 errors.push(`Scoped Dependency '${t}' was not resolved. Please ensure the route requires a :id param and the printerId was provided.`);
             }
             resolvedDependencies[t] = dependency;
-        }
-        catch (e) {
+        } catch (e) {
             throw new InternalServerException(`Dependency ${t} could not be resolved. Aborted request.`);
         }
     });
@@ -66,6 +68,7 @@ function getScopedPrinter(req) {
     }
     return resolvedDependencies;
 }
+
 async function validateInput(data, rules) {
     const localNIV = getExtendedValidator();
     const v = new localNIV.Validator(data, rules);
@@ -75,6 +78,7 @@ async function validateInput(data, rules) {
     }
     return v.inputs;
 }
+
 /**
  * Handle API input validation
  * @param req
@@ -84,11 +88,12 @@ async function validateInput(data, rules) {
 async function validateMiddleware(req, rules) {
     return validateInput(req.body, rules);
 }
-export { arrayValidator };
-export { validateMiddleware };
-export { validateInput };
-export { getScopedPrinter };
-export { validateMongoURL };
+
+export {arrayValidator};
+export {validateMiddleware};
+export {validateInput};
+export {getScopedPrinter};
+export {validateMongoURL};
 export default {
     arrayValidator,
     validateMiddleware,

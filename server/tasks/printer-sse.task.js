@@ -1,5 +1,5 @@
-import benchmark from "../utils/benchmark.util";
-const { byteCount } = benchmark;
+import {byteCount} from "../utils/benchmark.util.js";
+
 class PrinterSseTask {
     #printerSseHandler;
     #printerGroupsCache;
@@ -10,13 +10,15 @@ class PrinterSseTask {
     #aggregateSizes = [];
     #rounding = 2;
     #logger;
-    constructor({ printerSseHandler, printerGroupsCache, printersStore, loggerFactory, fileUploadTrackerCache }) {
+
+    constructor({printerSseHandler, printerGroupsCache, printersStore, loggerFactory, fileUploadTrackerCache}) {
         this.#printerSseHandler = printerSseHandler;
         this.#printersStore = printersStore;
         this.#printerGroupsCache = printerGroupsCache;
         this.#fileUploadTrackerCache = fileUploadTrackerCache;
         this.#logger = loggerFactory("Printer-SSE-task");
     }
+
     async run() {
         const printerStates = this.#printersStore.listPrintersFlat();
         const printerGroups = this.#printerGroupsCache.getCache();
@@ -31,6 +33,7 @@ class PrinterSseTask {
         this.updateAggregator(transportDataSize);
         this.#printerSseHandler.send(serializedData);
     }
+
     updateAggregator(transportDataLength) {
         if (this.#aggregateSizeCounter >= this.#aggregateWindowLength) {
             const summedPayloadSize = this.#aggregateSizes.reduce((t, n) => (t += n));
@@ -43,4 +46,5 @@ class PrinterSseTask {
         ++this.#aggregateSizeCounter;
     }
 }
+
 export default PrinterSseTask;

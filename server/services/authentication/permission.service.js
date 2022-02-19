@@ -1,17 +1,19 @@
-import authorization from "../../constants/authorization.constants";
 import PermissionModel from "../../models/Auth/Permission.js";
-import runtime from "../../exceptions/runtime.exceptions";
-const { flattenPermissionDefinition } = authorization;
-const { NotFoundException } = runtime;
+import {flattenPermissionDefinition} from "../../constants/authorization.constants.js";
+import {NotFoundException} from "../../exceptions/runtime.exceptions.js";
+
 class PermissionService {
     #permissions = {};
     #logger;
-    constructor({ loggerFactory }) {
+
+    constructor({loggerFactory}) {
         this.#logger = loggerFactory("RoleService");
     }
+
     get permissions() {
         return this.#permissions;
     }
+
     #normalizePermission(assignedPermission) {
         const permissionInstance = this.permissions.find((r) => r.id === assignedPermission || r.name === assignedPermission);
         if (!permissionInstance) {
@@ -20,6 +22,7 @@ class PermissionService {
         }
         return permissionInstance.name;
     }
+
     authorizePermission(requiredPermission, assignedPermissions) {
         return !!assignedPermissions.find((assignedPermission) => {
             const normalizePermission = this.#normalizePermission(assignedPermission);
@@ -28,33 +31,36 @@ class PermissionService {
             return normalizePermission === requiredPermission;
         });
     }
+
     async getPermissionByName(permissionName) {
         const permission = await this.permissions.find((r) => r.name === permissionName);
         if (!permission)
             throw new NotFoundException("Permission not found");
         return permission;
     }
+
     async getPermission(permissionId) {
         const permission = await this.permissions.find((r) => r.id === permissionId);
         if (!permission)
             throw new NotFoundException(`Permission Id '${permissionId}' not found`);
         return permission;
     }
+
     async syncPermissions() {
         this.#permissions = [];
         const permissionDefinition = flattenPermissionDefinition();
         for (let permission of permissionDefinition) {
-            const storedPermission = await PermissionModel.findOne({ name: permission });
+            const storedPermission = await PermissionModel.findOne({name: permission});
             if (!storedPermission) {
                 const newPermission = await PermissionModel.create({
                     name: permission
                 });
                 this.#permissions.push(newPermission);
-            }
-            else {
+            } else {
                 this.#permissions.push(storedPermission);
             }
         }
     }
 }
+
 export default PermissionService;

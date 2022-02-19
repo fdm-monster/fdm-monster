@@ -1,13 +1,7 @@
-import _ from "lodash";
 import Logger from "../../handlers/logger.js";
-import printCost from "../../utils/print-cost.util";
-import time from "../../utils/time.util";
-import cache from "../../constants/cache.constants";
-import runtime from "../../exceptions/runtime.exceptions";
-const { getPrintCostNumeric } = printCost;
-const { getCompletionDate } = time;
-const { getJobCacheDefault } = cache;
-const { ValidationException } = runtime;
+import {getJobCacheDefault} from "../../constants/cache.constants.js";
+import {ValidationException} from "../../exceptions/runtime.exceptions.js";
+
 /**
  * Stores a delegate job progress state for each printer - making it easier to access the latest job state.
  * No need to initialize as this is done by the printer states in a safe manner.
@@ -17,9 +11,11 @@ class JobsCache {
     #cachedJobProgress = {};
     #eventEmitter2;
     #logger = new Logger("Jobs-Cache");
-    constructor({ eventEmitter2 }) {
+
+    constructor({eventEmitter2}) {
         this.#eventEmitter2 = eventEmitter2;
     }
+
     getPrinterJob(printerId) {
         if (!printerId) {
             throw new Error("Job Cache cant get a null/undefined printer id");
@@ -30,9 +26,11 @@ class JobsCache {
         }
         return this.#cachedJobProgress[printerId];
     }
+
     jobExists(id) {
         return !!this.#cachedJobProgress.hasOwnProperty(id);
     }
+
     purgePrinterId(printerId) {
         if (!printerId) {
             throw new ValidationException("Parameter printerId was not provided.");
@@ -45,6 +43,7 @@ class JobsCache {
         delete this.#cachedJobProgress[printerId];
         this.#logger.info(`Purged printerId '${printerId}' job progress cache`);
     }
+
     /**
      * By calling the job is supposed to exist, so the requestor must be certain this job exists.
      * This will crash if not the case, so call jobExists(id) to check beforehand.
@@ -75,12 +74,12 @@ class JobsCache {
             transformedJob.progress = progress.completion;
             transformedJob.printTimeLeft = progress.printTimeLeft; // Rename
             transformedJob.printTimeElapsed = progress.printTime; // Rename
-        }
-        else {
+        } else {
             transformedJob.progress = 0;
         }
         return transformedJob;
     }
+
     savePrinterJob(id, data) {
         let cachedPrinterJob = this.#cachedJobProgress[id];
         if (!cachedPrinterJob) {
@@ -88,6 +87,7 @@ class JobsCache {
         }
         this.updatePrinterJob(id, data);
     }
+
     updatePrinterJob(id, data) {
         let cachedPrinterJob = this.#cachedJobProgress[id];
         if (!cachedPrinterJob) {
@@ -99,4 +99,5 @@ class JobsCache {
         this.#cachedJobProgress[id] = cachedPrinterJob;
     }
 }
+
 export default JobsCache;

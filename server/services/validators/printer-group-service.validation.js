@@ -1,5 +1,5 @@
-import service from "../../constants/service.constants";
-const { minPrinterGroupNameLength } = service;
+import {minPrinterGroupNameLength} from "../../constants/service.constants.js";
+
 const printerIdRules = {
     printerId: "required|mongoId"
 };
@@ -17,10 +17,10 @@ const createPrinterGroupRules = {
     "printers.*.printerId": "required|mongoId",
     "printers.*.location": "string"
 };
-export { createPrinterGroupRules };
-export { updatePrinterGroupNameRules };
-export { printerIdRules };
-export { printerInGroupRules };
+export {createPrinterGroupRules};
+export {updatePrinterGroupNameRules};
+export {printerIdRules};
+export {printerInGroupRules};
 export default {
     createPrinterGroupRules,
     updatePrinterGroupNameRules,

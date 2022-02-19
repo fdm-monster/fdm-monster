@@ -1,5 +1,5 @@
-import service from "../../constants/service.constants";
-const { UUID_LENGTH } = service;
+import {UUID_LENGTH} from "../../constants/service.constants.js";
+
 const createPrinterRules = {
     _id: "not",
     apiKey: `required|length:${UUID_LENGTH},${UUID_LENGTH}|alphaNumeric`,
@@ -13,8 +13,8 @@ const createPrinterRules = {
 const updatePrinterEnabledRule = {
     enabled: "required|boolean"
 };
-export { createPrinterRules };
-export { updatePrinterEnabledRule };
+export {createPrinterRules};
+export {updatePrinterEnabledRule};
 export default {
     createPrinterRules,
     updatePrinterEnabledRule

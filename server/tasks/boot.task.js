@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
-import server from "../server.env";
-import DITokens from "../container.tokens";
-import MongooseError from "mongoose/lib/error/mongooseError";
-import authorization from "../constants/authorization.constants";
-const { fetchMongoDBConnectionString, runMigrations } = server;
-const { ROLES } = authorization;
+import * as MongooseError from 'mongoose/lib/error/index.js';
+
+import DITokens from "../container.tokens.js";
+import {fetchMongoDBConnectionString, runMigrations} from "../server.env.js";
+import {ROLES} from "../constants/authorization.constants.js";
+
 class BootTask {
     #logger;
     #taskManagerService;
@@ -21,7 +21,24 @@ class BootTask {
     roleService;
     userService;
     influxDbSetupService;
-    constructor({ loggerFactory, serverTasks, serverSettingsService, settingsStore, multerService, printersStore, historyStore, filesStore, printerGroupsCache, filamentCache, permissionService, roleService, userService, taskManagerService, influxDbSetupService }) {
+
+    constructor({
+                    loggerFactory,
+                    serverTasks,
+                    serverSettingsService,
+                    settingsStore,
+                    multerService,
+                    printersStore,
+                    historyStore,
+                    filesStore,
+                    printerGroupsCache,
+                    filamentCache,
+                    permissionService,
+                    roleService,
+                    userService,
+                    taskManagerService,
+                    influxDbSetupService
+                }) {
         this.#serverTasks = serverTasks;
         this.serverSettingsService = serverSettingsService;
         this.settingsStore = settingsStore;
@@ -38,17 +55,18 @@ class BootTask {
         this.influxDbSetupService = influxDbSetupService;
         this.#logger = loggerFactory("Server");
     }
+
     async runOnce() {
         // To cope with retries after failures we register this task - disabled
         this.#taskManagerService.registerJobOrTask(this.#serverTasks.SERVER_BOOT_TASK);
         await this.run(true);
     }
+
     async run(bootTaskScheduler = false) {
         try {
             await this.createConnection();
             await this.migrateDatabase();
-        }
-        catch (e) {
+        } catch (e) {
             if (e instanceof MongooseError) {
                 // Tests should just continue
                 if (!e.message.includes("Can't call `openUri()` on an active connection with different connection strings.")) {
@@ -78,18 +96,19 @@ class BootTask {
             this.#serverTasks.BOOT_TASKS.forEach((task) => {
                 this.#taskManagerService.registerJobOrTask(task);
             });
-        }
-        else {
+        } else {
             this.#logger.warning("Starting in safe mode due to SAFEMODE_ENABLED");
         }
         // Success so we disable this task
         this.#taskManagerService.disableJob(DITokens.bootTask, false);
     }
+
     async createConnection() {
         await mongoose.connect(fetchMongoDBConnectionString(), {
             serverSelectionTimeoutMS: 1500
         });
     }
+
     async ensureAdminUserExists() {
         const adminRole = this.roleService.getRoleByName(ROLES.ADMIN);
         const administrators = await this.userService.findByRoleId(adminRole.id);
@@ -103,8 +122,10 @@ class BootTask {
             this.#logger.info("Created admin account as it was missing. Please consult the documentation for credentials.");
         }
     }
+
     async migrateDatabase() {
         await runMigrations(mongoose.connection.db, mongoose.connection.getClient());
     }
 }
+
 export default BootTask;

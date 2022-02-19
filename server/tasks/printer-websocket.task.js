@@ -1,12 +1,10 @@
-import OctoprintRxjsWebsocketAdapter from "../services/octoprint/octoprint-rxjs-websocket.adapter";
-import DITokens from "../container.tokens";
-import state from "../constants/state.constants";
-import HttpStatusCode from "../constants/http-status-codes.constants";
-import runtime from "../exceptions/runtime.exceptions";
-import octoprintService from "../services/octoprint/constants/octoprint-service.constants";
-const { PSTATE, ERR_COUNT, MESSAGE } = state;
-const { ExternalServiceError } = runtime;
-const { isLoginResponseGlobal } = octoprintService;
+import OctoprintRxjsWebsocketAdapter from "../services/octoprint/octoprint-rxjs-websocket.adapter.js";
+import DITokens from "../container.tokens.js";
+import {ERR_COUNT, MESSAGE, PSTATE} from "../constants/state.constants.js";
+import HttpStatusCode from "../constants/http-status-codes.constants.js";
+import {ExternalServiceError} from "../exceptions/runtime.exceptions.js";
+import {isLoginResponseGlobal} from "../services/octoprint/constants/octoprint-service.constants.js";
+
 class PrinterWebsocketTask {
     #printersStore;
     #settingsStore;
@@ -21,17 +19,26 @@ class PrinterWebsocketTask {
         [ERR_COUNT.apiKeyIsGlobal]: {},
         [ERR_COUNT.missingSessionKey]: {}
     };
-    constructor({ printersStore, octoPrintApiService, settingsStore, taskManagerService, loggerFactory, printerSystemTask // Just to make sure it can resolve
-     }) {
+
+    constructor({
+                    printersStore,
+                    octoPrintApiService,
+                    settingsStore,
+                    taskManagerService,
+                    loggerFactory,
+                    printerSystemTask // Just to make sure it can resolve
+                }) {
         this.#printersStore = printersStore;
         this.#settingsStore = settingsStore;
         this.#octoPrintService = octoPrintApiService;
         this.#taskManagerService = taskManagerService;
         this.#logger = loggerFactory("Printer-Websocket-Task");
     }
+
     getRetriedPrinters() {
         return this.#printersStore.listPrinterStates().filter((p) => p.shouldRetryConnect());
     }
+
     async run() {
         const startTime = Date.now();
         const printerStates = this.getRetriedPrinters();
@@ -39,8 +46,7 @@ class PrinterWebsocketTask {
             try {
                 // Pooling these promises with Promises.all or race is probably much faster
                 await this.setupPrinterConnection(printerState);
-            }
-            catch (e) {
+            } catch (e) {
                 this.#logger.error(`WebSocket task failed for '${printerState.getName()}'`, e.stack);
             }
         }
@@ -56,6 +62,7 @@ class PrinterWebsocketTask {
             this.#taskManagerService.scheduleDisabledJob(taskName);
         }
     }
+
     async setupPrinterConnection(printerState) {
         const loginDetails = printerState.getLoginDetails();
         const printerName = printerState.getName();
@@ -77,8 +84,7 @@ class PrinterWebsocketTask {
             printerState.setHostState(PSTATE.Offline, MESSAGE.offline);
             printerState.setApiAccessibility(false, true, MESSAGE.retryingApiConnection);
             return this.handleSilencedError(errorCount, MESSAGE.retryingApiConnection, printerName, true);
-        }
-        else {
+        } else {
             this.#resetPrinterErrorCount(ERR_COUNT.offline, printerId);
         }
         // API related errors
@@ -96,8 +102,7 @@ class PrinterWebsocketTask {
             printerState.setHostState(PSTATE.GlobalAPIKey, MESSAGE.globalAPIKeyDetected);
             printerState.setApiAccessibility(false, false, MESSAGE.globalAPIKeyDetected);
             return this.handleSilencedError(errorCount, MESSAGE.globalAPIKeyDetected, printerName);
-        }
-        else {
+        } else {
             this.#resetPrinterErrorCount(ERR_COUNT.apiKeyIsGlobal, printerId);
         }
         // Check for an name (defines connection state NoAPI) - undefined when apikey is wrong
@@ -106,8 +111,7 @@ class PrinterWebsocketTask {
             printerState.setHostState(PSTATE.ApiKeyRejected, MESSAGE.apiKeyNotAccepted);
             printerState.setApiAccessibility(false, false, MESSAGE.apiKeyNotAccepted);
             return this.handleSilencedError(errorCount, MESSAGE.apiKeyNotAccepted, printerName);
-        }
-        else {
+        } else {
             this.#resetPrinterErrorCount(ERR_COUNT.apiKeyNotAccepted, printerId);
         }
         // Sanity check for login success (alt: could also check status code) - quite rare
@@ -116,8 +120,7 @@ class PrinterWebsocketTask {
             printerState.setHostState(PSTATE.NoAPI, MESSAGE.missingSessionKey);
             printerState.setApiAccessibility(false, false, MESSAGE.missingSessionKey);
             return this.handleSilencedError(errorCount, MESSAGE.missingSessionKey, printerName);
-        }
-        else {
+        } else {
             this.#resetPrinterErrorCount(ERR_COUNT.missingSessionKey, printerId);
         }
         printerState.setApiLoginSuccessState(loginResponse.name, loginResponse?.session);
@@ -129,30 +132,32 @@ class PrinterWebsocketTask {
         // Delaying or staggering this will speed up startup tasks - ~90 to 150ms per printer on non-congested (W)LAN
         printerState.connectAdapter();
     }
+
     #incrementErrorCount(key, printerId) {
         const errorType = this.#errorCounts[key];
         if (!errorType[printerId]) {
             errorType[printerId] = 1;
-        }
-        else {
+        } else {
             errorType[printerId]++;
         }
         return errorType[printerId];
     }
+
     #resetPrinterErrorCount(key, printerId) {
         delete this.#getPrinterErrorCount(key, printerId);
     }
+
     #getPrinterErrorCount(key, printerId) {
         return this.#errorCounts[key][printerId] || 0;
     }
+
     handleSilencedError(errorCount, taskMessage, printerName, willRetry = false) {
         if (errorCount <= this.#errorMaxThrows) {
             const retrySilencePostFix = willRetry
                 ? `(Error muted in ${this.#errorMaxThrows - errorCount} tries.)`
                 : "(Not retried)";
             throw new Error(`${taskMessage} ${retrySilencePostFix}`);
-        }
-        else if (errorCount % this.#errorModulus === 0) {
+        } else if (errorCount % this.#errorModulus === 0) {
             throw new Error(`${taskMessage} ${errorCount} times for printer '${printerName}'.`);
         }
         // Really nice for debug or dev, but not for normal usage
@@ -161,4 +166,5 @@ class PrinterWebsocketTask {
         // }
     }
 }
+
 export default PrinterWebsocketTask;

@@ -1,37 +1,38 @@
 import fs from "fs";
-import octoprintService from "./constants/octoprint-service.constants";
-import compatibility from "../../utils/compatibility.utils";
-import api from "./utils/api.utils";
 import FormData from "form-data";
 import got from "got";
-import event from "../../constants/event.constants";
-import runtime from "../../exceptions/runtime.exceptions";
-import OctoPrintRoutes from "./octoprint-api.routes";
-const { contentTypeHeaderKey, apiKeyHeaderKey, multiPartContentType } = octoprintService;
-const { checkPluginManagerAPIDeprecation } = compatibility;
-const { processResponse, processGotResponse } = api;
-const { uploadProgressEvent, uploadCompletionEvent } = event;
-const { ExternalServiceError } = runtime;
+
+import {apiKeyHeaderKey, contentTypeHeaderKey, multiPartContentType} from "./constants/octoprint-service.constants.js";
+import {checkPluginManagerAPIDeprecation} from "../../utils/compatibility.utils.js";
+import {processGotResponse, processResponse} from "./utils/api.utils.js";
+import {uploadProgressEvent} from "../../constants/event.constants.js";
+import {ExternalServiceError} from "../../exceptions/runtime.exceptions.js";
+import OctoPrintRoutes from "./octoprint-api.routes.js";
+
 class OctoPrintApiService extends OctoPrintRoutes {
     _httpClient;
     _eventEmitter2;
     _logger;
-    constructor({ settingsStore, httpClient, loggerFactory, eventEmitter2 }) {
-        super({ settingsStore });
+
+    constructor({settingsStore, httpClient, loggerFactory, eventEmitter2}) {
+        super({settingsStore});
         this._httpClient = httpClient;
         this._eventEmitter2 = eventEmitter2;
         this._logger = loggerFactory("OctoPrint-API-Service");
     }
+
     async login(printer, responseOptions) {
-        const { url, options } = this._prepareRequest(printer, this.apiLogin);
+        const {url, options} = this._prepareRequest(printer, this.apiLogin);
         const response = await this._httpClient.post(url, {}, options);
         return processResponse(response, responseOptions);
     }
+
     async sendConnectionCommand(printer, commandData, responseOptions) {
-        const { url, options, data } = this._prepareJsonRequest(printer, this.apiConnection, commandData);
+        const {url, options, data} = this._prepareJsonRequest(printer, this.apiConnection, commandData);
         const response = await this._httpClient.post(url, data, options);
         return processResponse(response, responseOptions);
     }
+
     /**
      * Ability to start, cancel, restart, or pause a job
      * @param printer
@@ -40,21 +41,24 @@ class OctoPrintApiService extends OctoPrintRoutes {
      * @returns {Promise<*|{data: *, status: *}>}
      */
     async sendJobCommand(printer, commandData, responseOptions) {
-        const { url, options, data } = this._prepareJsonRequest(printer, this.apiJob, commandData);
+        const {url, options, data} = this._prepareJsonRequest(printer, this.apiJob, commandData);
         const response = await this._httpClient.post(url, data, options);
         return processResponse(response, responseOptions);
     }
+
     async getSettings(printer, responseOptions) {
-        const { url, options } = this._prepareRequest(printer, this.apiSettingsPart);
+        const {url, options} = this._prepareRequest(printer, this.apiSettingsPart);
         const response = await this._httpClient.get(url, options);
         return processResponse(response, responseOptions);
     }
-    async setGCodeAnalysis(printer, { enabled }, responseOptions) {
-        const { url, options } = this._prepareRequest(printer, this.apiSettingsPart);
+
+    async setGCodeAnalysis(printer, {enabled}, responseOptions) {
+        const {url, options} = this._prepareRequest(printer, this.apiSettingsPart);
         const settingPatch = this.gcodeAnalysisSetting(enabled);
         const response = await this._httpClient.post(url, settingPatch, options);
         return processResponse(response, responseOptions);
     }
+
     async getAdminUserOrDefault(printer) {
         const data = await this.getUsers(printer);
         let opAdminUserName = "admin";
@@ -65,23 +69,27 @@ class OctoPrintApiService extends OctoPrintRoutes {
         }
         return opAdminUserName;
     }
+
     async getUsers(printer, responseOptions) {
-        const { url, options } = this._prepareRequest(printer, this.apiUsers);
+        const {url, options} = this._prepareRequest(printer, this.apiUsers);
         const response = await this._httpClient.get(url, options);
         return processResponse(response, responseOptions);
     }
+
     async getFiles(printer, recursive = false, responseOptions) {
-        const { url, options } = this._prepareRequest(printer, this.apiGetFiles(recursive));
+        const {url, options} = this._prepareRequest(printer, this.apiGetFiles(recursive));
         const response = await this._httpClient.get(url, options);
         return processResponse(response, responseOptions);
     }
+
     async getFile(printer, path, responseOptions) {
-        const { url, options } = this._prepareRequest(printer, this.apiFile(path));
+        const {url, options} = this._prepareRequest(printer, this.apiFile(path));
         const response = await this._httpClient.get(url, options);
         return processResponse(response, responseOptions);
     }
+
     async createFolder(printer, path, foldername, responseOptions) {
-        const { url, options } = this._prepareRequest(printer, this.apiFilesLocation);
+        const {url, options} = this._prepareRequest(printer, this.apiFilesLocation);
         const formData = new FormData();
         formData.append("path", path);
         formData.append("foldername", foldername);
@@ -95,20 +103,23 @@ class OctoPrintApiService extends OctoPrintRoutes {
         });
         return processResponse(response, responseOptions);
     }
+
     async moveFileOrFolder(printer, path, destination, responseOptions) {
-        const { url, options } = this._prepareRequest(printer, this.apiFile(path));
+        const {url, options} = this._prepareRequest(printer, this.apiFile(path));
         const command = this.moveFileCommand(destination);
         const response = await this._httpClient.post(url, command, options);
         return processResponse(response, responseOptions);
     }
+
     async selectPrintFile(printer, path, print, responseOptions) {
-        const { url, options } = this._prepareRequest(printer, this.apiFile(path));
+        const {url, options} = this._prepareRequest(printer, this.apiFile(path));
         const command = this.selectCommand(print);
         const response = await this._httpClient.post(url, command, options);
         return processResponse(response, responseOptions);
     }
+
     async uploadFileAsMultiPart(printer, fileStreamOrBuffer, commands, token, responseOptions) {
-        const { url, options } = this._prepareRequest(printer, this.apiFilesLocation, null, multiPartContentType);
+        const {url, options} = this._prepareRequest(printer, this.apiFilesLocation, null, multiPartContentType);
         const formData = new FormData();
         if (commands.select) {
             formData.append("select", "true");
@@ -121,7 +132,7 @@ class OctoPrintApiService extends OctoPrintRoutes {
         if (!source) {
             source = fs.createReadStream(fileStreamOrBuffer.path);
         }
-        formData.append("file", source, { filename: fileStreamOrBuffer.originalname });
+        formData.append("file", source, {filename: fileStreamOrBuffer.originalname});
         try {
             const headers = {
                 ...options.headers,
@@ -129,27 +140,25 @@ class OctoPrintApiService extends OctoPrintRoutes {
             };
             const response = await got
                 .post(url, {
-                body: formData,
-                headers
-            })
+                    body: formData,
+                    headers
+                })
                 .on("uploadProgress", (p) => {
-                if (token) {
-                    this._eventEmitter2.emit(`${uploadProgressEvent(token)}`, token, p);
-                }
-            });
+                    if (token) {
+                        this._eventEmitter2.emit(`${uploadProgressEvent(token)}`, token, p);
+                    }
+                });
             // Cleanup
             if (isPhysicalFile) {
                 fs.unlinkSync(fileStreamOrBuffer.path);
             }
             return await processGotResponse(response, responseOptions);
-        }
-        catch (e) {
-            this._eventEmitter2.emit(`${uploadProgressEvent(token)}`, token, { failed: true }, e);
+        } catch (e) {
+            this._eventEmitter2.emit(`${uploadProgressEvent(token)}`, token, {failed: true}, e);
             let data;
             try {
                 data = JSON.parse(e.response?.body);
-            }
-            catch {
+            } catch {
                 data = e.response?.body;
             }
             throw new ExternalServiceError({
@@ -161,67 +170,79 @@ class OctoPrintApiService extends OctoPrintRoutes {
             });
         }
     }
+
     async deleteFileOrFolder(printer, path, responseOptions) {
-        const { url, options } = this._prepareRequest(printer, this.apiFile(path));
+        const {url, options} = this._prepareRequest(printer, this.apiFile(path));
         const response = await this._httpClient.delete(url, options);
         return processResponse(response, responseOptions);
     }
+
     async getConnection(printer, responseOptions) {
-        const { url, options } = this._prepareRequest(printer, this.apiConnection);
+        const {url, options} = this._prepareRequest(printer, this.apiConnection);
         const response = await this._httpClient.get(url, options);
         return processResponse(response, responseOptions);
     }
+
     async getPrinterProfiles(printer, responseOptions) {
-        const { url, options } = this._prepareRequest(printer, this.apiPrinterProfiles);
+        const {url, options} = this._prepareRequest(printer, this.apiPrinterProfiles);
         const response = await this._httpClient.get(url, options);
         return processResponse(response, responseOptions);
     }
+
     async getPluginManager(printer, responseOptions) {
         const printerManagerApiCompatible = checkPluginManagerAPIDeprecation(printer.octoPrintVersion);
         const path = printerManagerApiCompatible || !printer.octoPrintVersion
             ? this.apiPluginManagerRepository1_6_0
             : this.apiPluginManager;
-        const { url, options } = this._prepareRequest(printer, path);
+        const {url, options} = this._prepareRequest(printer, path);
         const response = await this._httpClient.get(url, options);
         return processResponse(response, responseOptions);
     }
+
     async getSystemInfo(printer, responseOptions) {
-        const { url, options } = this._prepareRequest(printer, this.apiSystemInfo);
+        const {url, options} = this._prepareRequest(printer, this.apiSystemInfo);
         const response = await this._httpClient.get(url, options);
         return processResponse(response, responseOptions);
     }
+
     async getSystemCommands(printer, responseOptions) {
-        const { url, options } = this._prepareRequest(printer, this.apiSystemCommands);
+        const {url, options} = this._prepareRequest(printer, this.apiSystemCommands);
         const response = await this._httpClient.get(url, options);
         return processResponse(response, responseOptions);
     }
+
     async getSoftwareUpdateCheck(printer, force, responseOptions) {
-        const { url, options } = this._prepareRequest(printer, this.apiSoftwareUpdateCheck(force));
+        const {url, options} = this._prepareRequest(printer, this.apiSoftwareUpdateCheck(force));
         const response = await this._httpClient.get(url, options);
         return processResponse(response, responseOptions);
     }
+
     async getPluginPiSupport(printer, responseOptions) {
-        const { url, options } = this._prepareRequest(printer, this.apiPluginPiSupport);
+        const {url, options} = this._prepareRequest(printer, this.apiPluginPiSupport);
         const response = await this._httpClient.get(url, options);
         return processResponse(response, responseOptions);
     }
+
     async deleteTimeLapse(printer, fileName, responseOptions) {
         const path = `${this.apiTimelapse}/${fileName}`;
-        const { url, options } = this._prepareRequest(printer, path);
+        const {url, options} = this._prepareRequest(printer, path);
         const response = await this._httpClient.delete(url, options);
         return processResponse(response, responseOptions);
     }
+
     async listUnrenderedTimeLapses(printer, responseOptions) {
         const path = `${this.apiTimelapse}?unrendered=true`;
-        const { url, options } = this._prepareRequest(printer, path);
+        const {url, options} = this._prepareRequest(printer, path);
         const response = await this._httpClient.get(url, options);
         return processResponse(response, responseOptions);
     }
+
     async listProfiles(printer, responseOptions) {
-        const { url, options } = this._prepareRequest(printer, this.apiProfiles);
+        const {url, options} = this._prepareRequest(printer, this.apiProfiles);
         const response = await this._httpClient.get(url, options);
         return processResponse(response, responseOptions);
     }
+
     async downloadFile(printerConnection, fetchPath, targetPath, callback) {
         const fileStream = fs.createWriteStream(targetPath);
         // TODO
@@ -234,8 +255,9 @@ class OctoPrintApiService extends OctoPrintRoutes {
             });
         });
     }
+
     // TODO WIP
-    async downloadImage({ printerURL, apiKey }, fetchPath, targetPath, callback) {
+    async downloadImage({printerURL, apiKey}, fetchPath, targetPath, callback) {
         // https://stackoverflow.com/questions/55374755/node-js-axios-download-file-stream-and-writefile
         const downloadURL = new URL(fetchPath, printerURL);
         return request.head(downloadURL, (err, res, body) => {
@@ -245,4 +267,5 @@ class OctoPrintApiService extends OctoPrintRoutes {
         });
     }
 }
+
 export default OctoPrintApiService;

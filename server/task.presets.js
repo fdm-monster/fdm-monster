@@ -9,7 +9,7 @@
 //   {
 //   PERIODIC_TASK_PRESET_2500MS
 // );
-class TASK_PRESETS {
+export const TaskPresets = class TASK_PRESETS {
     static PERIODIC = {
         periodic: true,
         logFirstCompletion: true,
@@ -36,7 +36,3 @@ class TASK_PRESETS {
         seconds: 0 // other timing units will be ignored (by design)
     };
 }
-export { type TaskPresets };
-export default {
-    TaskPresets: TASK_PRESETS
-};

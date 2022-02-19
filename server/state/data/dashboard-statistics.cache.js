@@ -1,12 +1,8 @@
-import mapping from "../../utils/mapping.utils";
-import cleaner from "../../constants/cleaner.constants";
-import graphPoint from "../../utils/graph-point.utils";
-import array from "../../utils/array.util";
-const { checkTempRange } = mapping;
-const { mapProgressToColor } = mapping;
-const { getDefaultDashboardStatisticsObject, getEmptyToolTemperatureArray } = cleaner;
-const { sumValuesGroupByDate } = graphPoint;
-const { checkNestedIndex, checkNested } = array;
+import {checkTempRange, mapProgressToColor} from "../../utils/mapping.utils.js";
+import {getDefaultDashboardStatisticsObject, getEmptyToolTemperatureArray} from "../../constants/cleaner.constants.js";
+import {sumValuesGroupByDate} from "../../utils/graph-point.utils.js";
+import {checkNested, checkNestedIndex} from "../../utils/array.util.js";
+
 /**
  * A store able to aggregate different substates and cache singletons
  */
@@ -15,9 +11,11 @@ class DashboardStatisticsCache {
     #currentHistoryTemp = getEmptyToolTemperatureArray();
     #printersInformation; // stub
     #historyStore;
-    constructor({ historyStore }) {
+
+    constructor({historyStore}) {
         this.#historyStore = historyStore;
     }
+
     async generatePrinterStatistics(id) {
         const historyCache = this.#historyStore().getHistoryCache();
         let currentHistory = JSON.parse(JSON.stringify(historyCache.history));
@@ -93,11 +91,9 @@ class DashboardStatisticsCache {
                 }
                 if (h.state.includes("success")) {
                     printerStatistics.printSuccessTotal.push(1);
-                }
-                else if (h.state.includes("warning")) {
+                } else if (h.state.includes("warning")) {
                     printerStatistics.printCancelTotal.push(1);
-                }
-                else if (h.state.includes("danger")) {
+                } else if (h.state.includes("danger")) {
                     printerStatistics.printErrorTotal.push(1);
                 }
                 if (dateParse.getTime() > todaysDate.getTime()) {
@@ -113,14 +109,11 @@ class DashboardStatisticsCache {
                     let checkNestedIndexHistoryRates = null;
                     if (h.state.includes("success")) {
                         checkNestedIndexHistoryRates = checkNestedIndex("Success", printerStatistics.historyByDay);
-                    }
-                    else if (h.state.includes("warning")) {
+                    } else if (h.state.includes("warning")) {
                         checkNestedIndexHistoryRates = checkNestedIndex("Cancelled", printerStatistics.historyByDay);
-                    }
-                    else if (h.state.includes("danger")) {
+                    } else if (h.state.includes("danger")) {
                         checkNestedIndexHistoryRates = checkNestedIndex("Failed", printerStatistics.historyByDay);
-                    }
-                    else {
+                    } else {
                         return;
                     }
                     //Check if more than 30 days ago...
@@ -130,8 +123,7 @@ class DashboardStatisticsCache {
                             y: 1
                         });
                     }
-                }
-                else {
+                } else {
                     let successKey = {
                         name: "Success",
                         data: []
@@ -163,11 +155,9 @@ class DashboardStatisticsCache {
             }
             if (d.state.includes("success")) {
                 printerStatistics.printSuccessDay.push(1);
-            }
-            else if (d.state.includes("warning")) {
+            } else if (d.state.includes("warning")) {
                 printerStatistics.printCancelDay.push(1);
-            }
-            else if (d.state.includes("danger")) {
+            } else if (d.state.includes("danger")) {
                 printerStatistics.printErrorDay.push(1);
             }
         });
@@ -182,11 +172,9 @@ class DashboardStatisticsCache {
             }
             if (w.state.includes("success")) {
                 printerStatistics.printerSuccessWeek.push(1);
-            }
-            else if (w.state.includes("warning")) {
+            } else if (w.state.includes("warning")) {
                 printerStatistics.printerCancelWeek.push(1);
-            }
-            else if (w.state.includes("danger")) {
+            } else if (w.state.includes("danger")) {
                 printerStatistics.printerErrorWeek.push(1);
             }
         });
@@ -205,6 +193,7 @@ class DashboardStatisticsCache {
         });
         return printerStatistics;
     }
+
     async statisticsStart() {
         const historyCache = this.#historyStore().getHistoryCache();
         let historyStats = historyCache.stats;
@@ -252,8 +241,7 @@ class DashboardStatisticsCache {
                     if (printer.printerState.colour.category === "Active" ||
                         printer.printerState.colour.category === "Complete") {
                         tools = printer.tools;
-                    }
-                    else {
+                    } else {
                         tools = [];
                         tools.push({
                             bed: {
@@ -286,8 +274,7 @@ class DashboardStatisticsCache {
                                         actual = `Chamber A: ${printer.tools[0][keys[k]].actual}°C `;
                                         arrayOtherActual.push(printer.tools[0][keys[k]].actual);
                                         arrayGlobalChamberTempActual.push(printer.tools[0][keys[k]].actual);
-                                    }
-                                    else {
+                                    } else {
                                         actual = `Chamber A: ${0}°C`;
                                     }
                                     if (printer.tools !== null &&
@@ -296,8 +283,7 @@ class DashboardStatisticsCache {
                                         target = `Chamber T: ${printer.tools[0][keys[k]].target}°C `;
                                         arrayOtherTarget.push(printer.tools[0][keys[k]].target);
                                         arrayGlobalChamberTempTarget.push(printer.tools[0][keys[k]].target);
-                                    }
-                                    else {
+                                    } else {
                                         target = `Chamber T: ${0}°C`;
                                     }
                                     rightString[2] = `${actual}, ${target}`;
@@ -312,8 +298,7 @@ class DashboardStatisticsCache {
                                         actual = `Bed A: ${printer.tools[0][keys[k]].actual}°C `;
                                         arrayOtherActual.push(printer.tools[0][keys[k]].actual);
                                         arrayGlobalBedTempActual.push(printer.tools[0][keys[k]].actual);
-                                    }
-                                    else {
+                                    } else {
                                         actual = `Bed A: ${0}°C`;
                                     }
                                     if (printer.tools[0][keys[k]].target !== null &&
@@ -321,8 +306,7 @@ class DashboardStatisticsCache {
                                         target = `Bed T: ${printer.tools[0][keys[k]].target}°C `;
                                         arrayOtherTarget.push(printer.tools[0][keys[k]].target);
                                         arrayGlobalBedTempTarget.push(printer.tools[0][keys[k]].target);
-                                    }
-                                    else {
+                                    } else {
                                         target = `Bed T: ${0}°C`;
                                     }
                                     rightString[1] = `${actual}, ${target}`;
@@ -337,8 +321,7 @@ class DashboardStatisticsCache {
                                         actual = `Tool ${toolNumber} A: ${printer.tools[0][keys[k]].actual}°C `;
                                         arrayToolActual.push(printer.tools[0][keys[k]].actual);
                                         arrayGlobalToolTempActual.push(printer.tools[0][keys[k]].actual);
-                                    }
-                                    else {
+                                    } else {
                                         actual = `Tool ${toolNumber} A: 0°C`;
                                     }
                                     if (printer.tools !== null &&
@@ -347,14 +330,12 @@ class DashboardStatisticsCache {
                                         target = `Tool ${toolNumber} T: ${printer.tools[0][keys[k]].target}°C `;
                                         arrayToolTarget.push(printer.tools[0][keys[k]].target);
                                         arrayGlobalToolTempTarget.push(printer.tools[0][keys[k]].target);
-                                    }
-                                    else {
+                                    } else {
                                         target = `Tool ${toolNumber} T: 0°C`;
                                     }
                                     leftString[parseInt(toolNumber) + 1] = `${actual}, ${target}`;
                                 }
-                            }
-                            else {
+                            } else {
                                 leftString[1] = "Offline";
                                 rightString[1] = "Offline";
                             }
@@ -478,4 +459,5 @@ class DashboardStatisticsCache {
         };
     }
 }
+
 export default DashboardStatisticsCache;

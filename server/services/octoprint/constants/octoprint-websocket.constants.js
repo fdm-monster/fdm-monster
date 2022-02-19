@@ -1,6 +1,6 @@
-import state from "../../../constants/state.constants";
-const { mapStateToColor, PSTATE } = state;
-function getDefaultProgressState() {
+import {mapStateToColor, PSTATE} from "../../../constants/state.constants.js";
+
+export function getDefaultProgressState() {
     return {
         completion: undefined,
         filepos: undefined,
@@ -9,7 +9,8 @@ function getDefaultProgressState() {
         printTimeLeftOrigin: undefined
     };
 }
-function getDefaultJobState() {
+
+export function getDefaultJobState() {
     return {
         file: undefined,
         estimatedPrintTime: undefined,
@@ -19,15 +20,17 @@ function getDefaultJobState() {
         user: undefined
     };
 }
-function getDefaultPrinterState() {
+
+export function getDefaultPrinterState() {
     return {
         state: PSTATE.Offline,
-        flags: { operational: false },
+        flags: {operational: false},
         desc: "Printer needs WebSocket connection first",
         colour: mapStateToColor(PSTATE.Offline)
     };
 }
-function getDefaultCurrentState() {
+
+export function getDefaultCurrentState() {
     return {
         state: undefined,
         job: getDefaultJobState(),
@@ -41,7 +44,8 @@ function getDefaultCurrentState() {
         plugins: undefined // TODO might be better in different state
     };
 }
-const EVENT_TYPES = {
+
+export const EVENT_TYPES = {
     ClientAuthed: "ClientAuthed",
     ClientClosed: "ClientClosed",
     ClientOpened: "ClientOpened",
@@ -74,7 +78,8 @@ const EVENT_TYPES = {
     UserLoggedIn: "UserLoggedIn",
     ZChange: "ZChange"
 };
-const OP_WS_MSG = {
+
+export const OP_WS_MSG = {
     connected: "connected",
     reauthRequired: "reauthRequired",
     current: "current",
@@ -84,30 +89,12 @@ const OP_WS_MSG = {
     timelapse: "timelapse",
     slicingProgress: "slicingProgress"
 };
-const OP_WS_SKIP = [OP_WS_MSG.slicingProgress, OP_WS_MSG.timelapse];
-const WS_STATE = {
+export const OP_WS_SKIP = [OP_WS_MSG.slicingProgress, OP_WS_MSG.timelapse];
+export const WS_STATE = {
     unopened: "unopened",
     opening: "opening",
     connected: "connected",
     authed: "authed",
     errored: "errored",
     closed: "closed" // Closing error received
-};
-export { getDefaultProgressState };
-export { getDefaultJobState };
-export { getDefaultPrinterState };
-export { getDefaultCurrentState };
-export { EVENT_TYPES };
-export { WS_STATE };
-export { OP_WS_MSG };
-export { OP_WS_SKIP };
-export default {
-    getDefaultProgressState,
-    getDefaultJobState,
-    getDefaultPrinterState,
-    getDefaultCurrentState,
-    EVENT_TYPES,
-    WS_STATE,
-    OP_WS_MSG,
-    OP_WS_SKIP
 };

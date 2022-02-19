@@ -1,15 +1,22 @@
-import { exec } from "child_process";
-import envutils from "../utils/env.utils.js";
-import lookpath$0 from "lookpath";
-import npmutils from "../utils/npm.utils.js";
-import gitutils from "../utils/git.utils.js";
-const { isPm2 } = envutils;
-const { isNodemon } = envutils;
-const { lookpath } = lookpath$0;
-const { returnListOfMissingPackages, installNpmDependency } = npmutils;
-const { returnCurrentGitStatus, isBranchUpToDate, isBranchInfront, getListOfModifiedFiles, pullLatestRepository, checkIfWereInAGitRepo, makeSureBranchIsUpToDateWithRemote } = gitutils;
+import {exec} from "child_process";
+
+import {lookpath} from "lookpath";
+import {installNpmDependency, returnListOfMissingPackages} from "../utils/npm.utils.js";
+import {
+    checkIfWereInAGitRepo,
+    getListOfModifiedFiles,
+    isBranchInfront,
+    isBranchUpToDate,
+    makeSureBranchIsUpToDateWithRemote,
+    pullLatestRepository,
+    returnCurrentGitStatus
+} from "../utils/git.utils.js";
+import {isNodemon} from "../utils/env.utils.js";
+
 class SystemCommandsService {
-    constructor() { }
+    constructor() {
+    }
+
     async restartServer() {
         let checkForNamedService = false;
         // If we're on pm2, then restart buddy!
@@ -22,8 +29,7 @@ class SystemCommandsService {
                     }, 5000);
                     checkForNamedService = true;
                 }
-            }
-            catch (e) {
+            } catch (e) {
                 throw "Error with pm2 restart command: " + e;
             }
         }
@@ -36,13 +42,13 @@ class SystemCommandsService {
                     }, 5000);
                     checkForNamedService = true;
                 }
-            }
-            catch (e) {
+            } catch (e) {
                 throw "Error with nodemon restart command: " + e;
             }
         }
         return checkForNamedService;
     }
+
     // This will need changing when .deb / installation script becomes a thing. It's built to deal with the current implementation.
     async checkServerUpdate(clientResponse, force) {
         // Check to see if current dir contains a git folder... hard fail otherwise.
@@ -76,16 +82,15 @@ class SystemCommandsService {
                     //If the branch is not front of current branch, then we need to relay the developer message.
                     clientResponse.message =
                         "<span class='text-warning'>The update is failing due to local changes been detected. <br><br>" +
-                            "<b class='text-success'>Override:</b> Will just run a <code>git pull</code> command if you continue.<br><br>" +
-                            "<b class='text-danger'>Cancel:</b> This option will cancel the update process.<br><br>";
+                        "<b class='text-success'>Override:</b> Will just run a <code>git pull</code> command if you continue.<br><br>" +
+                        "<b class='text-danger'>Cancel:</b> This option will cancel the update process.<br><br>";
                     return clientResponse;
-                }
-                else {
+                } else {
                     // If the branch has no commits then we can relay the user message.
                     clientResponse.message =
                         "<span class='text-warning'>The update is failing due to local changes been detected. Please check the file list below for what has been modified. </span><br><br>" +
-                            "<b class='text-success'>Override:</b> This option will ignore the local changes and run the Server Update process. (You will lose your changes with this option)<br><br>" +
-                            "<b class='text-danger'>Cancel:</b> This option will cancel the update process keeping your local changes. No update will run and manual intervention by the user is required. <br><br>";
+                        "<b class='text-success'>Override:</b> This option will ignore the local changes and run the Server Update process. (You will lose your changes with this option)<br><br>" +
+                        "<b class='text-danger'>Cancel:</b> This option will cancel the update process keeping your local changes. No update will run and manual intervention by the user is required. <br><br>";
                     modifiedFilesList.forEach((line) => {
                         clientResponse.message += `<div class="alert alert-secondary m-1 p-2" role="alert"><i class="fas fa-file"></i> ${line.replace("modified: ", "")} </div>`;
                     });
@@ -103,11 +108,10 @@ class SystemCommandsService {
                 clientResponse.statusTypeForUser = "warning";
                 clientResponse.message =
                     "<span class='text-warning'>You have missing dependencies that are required, Do you want to update these? </span><br><br>" +
-                        "<b class='text-success'>Confirm:</b> This option will install the missing local dependencies and continue the upgrade process<br><br>" +
-                        "<b class='text-danger'>Cancel:</b> This option will cancel the update process and not install the required dependencies. No update will run and manual intervention by the user is required. <br><br>";
+                    "<b class='text-success'>Confirm:</b> This option will install the missing local dependencies and continue the upgrade process<br><br>" +
+                    "<b class='text-danger'>Cancel:</b> This option will cancel the update process and not install the required dependencies. No update will run and manual intervention by the user is required. <br><br>";
                 return clientResponse;
-            }
-            else {
+            } else {
                 for (let i = 0; i > missingPackagesList.length; i++) {
                     await installNpmDependency(missingPackagesList[i]);
                 }
@@ -121,4 +125,5 @@ class SystemCommandsService {
         return clientResponse;
     }
 }
+
 export default SystemCommandsService;

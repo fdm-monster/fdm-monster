@@ -1,13 +1,9 @@
-import cleaner from "../../constants/cleaner.constants";
-import findPredicate from "../../services/utils/find-predicate.utils";
-import cache from "../../constants/cache.constants";
-import runtime from "../../exceptions/runtime.exceptions";
-import service from "../../constants/service.constants";
-const { getDefaultFileCleanStatistics } = cleaner;
-const { findFileIndex } = findPredicate;
-const { getFileCacheDefault } = cache;
-const { ValidationException } = runtime;
-const { Status } = service;
+import {getDefaultFileCleanStatistics} from "../../constants/cleaner.constants.js";
+import {findFileIndex} from "../../services/utils/find-predicate.utils.js";
+import {getFileCacheDefault} from "../../constants/cache.constants.js";
+import {ValidationException} from "../../exceptions/runtime.exceptions.js";
+import {Status} from "../../constants/service.constants.js";
+
 /**
  * A generic cache for file references, which will be abstracted in future to allow for proxy files and local files.
  */
@@ -17,29 +13,34 @@ class FileCache {
     #totalFileCount = 0;
     #fileStatistics = getDefaultFileCleanStatistics();
     #logger;
-    constructor({ loggerFactory }) {
+
+    constructor({loggerFactory}) {
         this.#logger = loggerFactory("Server-FileCache");
     }
+
     /**
      * Save a printer storage reference to cache
      * @param printerId
      * @param fileList
      * @param storage
      */
-    cachePrinterFileStorage(printerId, { fileList, storage }) {
+    cachePrinterFileStorage(printerId, {fileList, storage}) {
         this.cachePrinterStorage(printerId, storage);
         this.cachePrinterFiles(printerId, fileList);
     }
+
     cachePrinterFiles(printerID, fileList) {
         const printerFileStorage = this.#getPrinterFileStorage(printerID);
         printerFileStorage.fileList = fileList;
         this.updateCacheFileRefCount();
     }
+
     cachePrinterStorage(printerId, storage) {
         const printerFileStorage = this.#getPrinterFileStorage(printerId);
         printerFileStorage.storage = storage;
         this.updateCacheFileRefCount();
     }
+
     #getPrinterFileStorage(printerId) {
         if (!printerId) {
             throw new Error("File Cache cant get a null/undefined printer id");
@@ -51,17 +52,21 @@ class FileCache {
         }
         return fileStorage;
     }
+
     getStatistics() {
         return this.#fileStatistics;
     }
+
     getPrinterFiles(printerId) {
         const fileStorage = this.#getPrinterFileStorage(printerId);
         return fileStorage?.fileList;
     }
+
     getPrinterStorage(printerId) {
         const fileStorage = this.#getPrinterFileStorage(printerId);
         return fileStorage?.storage;
     }
+
     updateCacheFileRefCount() {
         let totalFiles = 0;
         for (const storage of Object.values(this.#printerFileStorage)) {
@@ -73,6 +78,7 @@ class FileCache {
         }
         return totalFiles;
     }
+
     purgePrinterId(printerId) {
         if (!printerId) {
             throw new ValidationException("Parameter printerId was not provided.");
@@ -85,8 +91,9 @@ class FileCache {
         delete this.#printerFileStorage[printerId];
         this.#logger.info(`Purged printerId '${printerId}' file cache`);
     }
+
     purgeFile(printerId, filePath) {
-        const { fileList } = this.#getPrinterFileStorage(printerId);
+        const {fileList} = this.#getPrinterFileStorage(printerId);
         const fileIndex = findFileIndex(fileList, filePath);
         if (fileIndex === -1) {
             // We can always choose to throw - if we trust the cache consistency
@@ -97,4 +104,5 @@ class FileCache {
         return Status.success("File was removed");
     }
 }
+
 export default FileCache;

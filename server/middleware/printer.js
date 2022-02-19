@@ -1,6 +1,7 @@
-import DITokens from "../container.tokens";
-import awilix from "awilix";
-const { asValue } = awilix;
+import {asValue} from "awilix";
+
+import DITokens from "../container.tokens.js";
+
 const printerIdToken = "currentPrinterId";
 const currentPrinterToken = "currentPrinter";
 const printerLoginToken = "printerLogin";
@@ -19,10 +20,10 @@ const printerResolveMiddleware = () => {
         next();
     };
 };
-export { printerResolveMiddleware };
-export { currentPrinterToken };
-export { printerLoginToken };
-export { printerIdToken };
+export {printerResolveMiddleware};
+export {currentPrinterToken};
+export {printerLoginToken};
+export {printerIdToken};
 export default {
     printerResolveMiddleware,
     currentPrinterToken,

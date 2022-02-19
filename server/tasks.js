@@ -1,6 +1,6 @@
-import task from "./task.presets";
-import DITokens from "./container.tokens";
-const { TaskPresets } = task;
+import DITokens from "./container.tokens.js";
+import {TaskPresets} from "./task.presets.js";
+
 /**
  * Register a task with a preset and timing (run immediate does not retry in case of failure)
  * @param task
@@ -9,7 +9,7 @@ const { TaskPresets } = task;
  * @returns {{task, id, preset}}
  */
 function registerTask(task, preset, milliseconds = 0, runImmediately) {
-    let timingPreset = { ...preset };
+    let timingPreset = {...preset};
     timingPreset.milliseconds = preset.milliseconds || milliseconds;
     timingPreset.runImmediately = runImmediately | false;
     return {
@@ -18,7 +18,9 @@ function registerTask(task, preset, milliseconds = 0, runImmediately) {
         preset: timingPreset
     };
 }
+
 const HOUR_MS = 3600 * 1000;
+
 class ServerTasks {
     static SERVER_BOOT_TASK = registerTask(DITokens.bootTask, TaskPresets.PERIODIC_DISABLED, 5000, false);
     static BOOT_TASKS = [
@@ -30,7 +32,8 @@ class ServerTasks {
         registerTask(DITokens.printerWebsocketPingTask, TaskPresets.PERIODIC, 30000, false)
     ];
 }
-export { ServerTasks };
+
+export {ServerTasks};
 export default {
     ServerTasks
 };

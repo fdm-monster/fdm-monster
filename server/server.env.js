@@ -1,5 +1,5 @@
 import fs from "fs";
-import path from "path";
+import path, {resolve} from "path";
 import dotenv from "dotenv";
 import {status, up} from "migrate-mongo";
 import isDocker from "is-docker";
@@ -7,10 +7,11 @@ import {execSync} from "child_process";
 
 import Logger from "./handlers/logger.js";
 import {AppConstants} from "./server.constants.js";
-
+import * as envUtils from "./utils/env.utils.js";
+import packageJson from './package.json' assert { type: 'json' };
 const logger = new Logger("FDN-Environment", false);
 const instructionsReferralURL = "https://github.com/fdm-monster/fdm-monster/blob/master/README.md";
-const dotEnvPath = path.join(__dirname, "./.env");
+const dotEnvPath = path.join(resolve(".env"));
 
 function isEnvProd() {
     return process.env[AppConstants.NODE_ENV_KEY] === AppConstants.defaultProductionEnv;
@@ -40,15 +41,15 @@ function ensureNodeEnvSet() {
  */
 function ensureEnvNpmVersionSet() {
     if (!process.env[AppConstants.VERSION_KEY]) {
-        process.env[AppConstants.VERSION_KEY] = packageJsonVersion;
+        process.env[AppConstants.VERSION_KEY] = packageJson.version;
         process.env[AppConstants.NON_NPM_MODE_KEY] = "true";
         logger.info(`✓ Running ${AppConstants.titleShort} version ${process.env[AppConstants.VERSION_KEY]} in non-NPM mode!`);
     } else {
         logger.debug(`✓ Running ${AppConstants.titleShort} version ${process.env[AppConstants.VERSION_KEY]} in NPM mode!`);
     }
-    if (process.env[AppConstants.VERSION_KEY] !== packageJsonVersion) {
-        process.env[AppConstants.VERSION_KEY] = packageJsonVersion;
-        logger.warning(`~ Had to synchronize 3DH version to '${packageJsonVersion}' as it was outdated.`);
+    if (process.env[AppConstants.VERSION_KEY] !== packageJson.version) {
+        process.env[AppConstants.VERSION_KEY] = packageJson.version;
+        logger.warning(`~ Had to synchronize 3DH version to '${packageJson.version}' as it was outdated.`);
     }
 }
 
@@ -58,7 +59,7 @@ function removePm2Service(reason) {
 }
 
 function setupPackageJsonVersionOrThrow() {
-    const result = envUtils.verifyPackageJsonRequirements(path.join(__dirname, AppConstants.serverPath));
+    const result = envUtils.verifyPackageJsonRequirements(path.join(path.resolve(), AppConstants.serverPath));
     if (!result) {
         if (envUtils.isPm2()) {
             // TODO test this works under docker as well
@@ -75,7 +76,7 @@ function printInstructionsURL() {
     logger.info(`Please make sure to read ${instructionsReferralURL} on how to configure your environment correctly.`);
 }
 
-function fetchMongoDBConnectionString(persistToEnv = false) {
+export function fetchMongoDBConnectionString(persistToEnv = false) {
     if (!process.env[AppConstants.MONGO_KEY]) {
         logger.warning(`~ ${AppConstants.MONGO_KEY} environment variable is not set. Assuming default: ${AppConstants.MONGO_KEY}=${AppConstants.defaultMongoStringUnauthenticated}`);
         printInstructionsURL();
@@ -88,7 +89,7 @@ function fetchMongoDBConnectionString(persistToEnv = false) {
     return process.env[AppConstants.MONGO_KEY];
 }
 
-function fetchServerPort() {
+export function fetchServerPort() {
     let port = process.env[AppConstants.SERVER_PORT_KEY];
     if (Number.isNaN(parseInt(port))) {
         logger.warning(`~ The ${AppConstants.SERVER_PORT_KEY} setting was not a correct port number: >= 0 and < 65536. Actual value: ${port}.`);

@@ -1,9 +1,9 @@
 import fs from "fs";
-import Logger from "../handlers/logger.js";
 import dotenv from "dotenv";
 import isDocker from "is-docker";
-import package$0 from "../package.json";
 
+import Logger from "../handlers/logger.js";
+import packageJson from '../package.json' assert { type: 'json' };
 const logger = new Logger("OF-Utils-Env", false);
 
 export function isPm2() {
@@ -65,7 +65,7 @@ export function verifyPackageJsonRequirements(rootPath) {
         return false;
     } else {
         logger.debug("✓ found 'package.json'");
-        const packageName = package$0.name;
+        const packageName = packageJson.name;
         if (!packageName) {
             logger.error("X Could not find 'name' property in package.json file. Aborting 3DH Server.");
             return false;

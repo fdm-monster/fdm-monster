@@ -1,15 +1,10 @@
-import cleaner from "../constants/cleaner.constants";
-import array from "../utils/array.util";
-import graphPoint from "../utils/graph-point.utils";
-import printCost from "../utils/print-cost.util";
-import service from "../constants/service.constants";
-import runtime from "../exceptions/runtime.exceptions";
-const { getDefaultHistoryStatistics } = cleaner;
-const { arrayCounts } = array;
-const { sumValuesGroupByDate, assignYCumSum } = graphPoint;
-const { getPrintCostNumeric } = printCost;
-const { Status } = service;
-const { NotFoundException } = runtime;
+import {getDefaultHistoryStatistics} from "../constants/cleaner.constants.js";
+import {arrayCounts} from "../utils/array.util.js";
+import {assignYCumSum, sumValuesGroupByDate} from "../utils/graph-point.utils.js";
+import {getPrintCostNumeric} from "../utils/print-cost.util.js";
+import {Status} from "../constants/service.constants.js";
+import {NotFoundException} from "../exceptions/runtime.exceptions.js";
+
 /**
  * A standalone store as in-memory layer for the underlying history service
  */
@@ -22,55 +17,62 @@ class HistoryStore {
     #settingsStore;
     #printersStore;
     #jobsCache;
-    constructor({ historyService, jobsCache, printersStore, settingsStore, loggerFactory }) {
+
+    constructor({historyService, jobsCache, printersStore, settingsStore, loggerFactory}) {
         this.#historyService = historyService;
         this.#settingsStore = settingsStore;
         this.#printersStore = printersStore;
         this.#jobsCache = jobsCache;
         this.#logger = loggerFactory(HistoryStore.name, this.#enableLogging, "warn");
     }
+
     getHistoryCache() {
         return {
             history: this.#historyCache,
             stats: this.#generatedStatistics
         };
     }
+
     getEntryIndex(id) {
         const entryIndex = this.#historyCache.findIndex((h) => h.id === id);
         if (entryIndex === -1)
             throw new NotFoundException("History entry not found in cache");
         return entryIndex;
     }
+
     getEntry(id) {
         const entry = this.#historyCache.find((h) => h.id === id);
         if (!entry)
             throw new NotFoundException("History entry not found in cache");
         return entry;
     }
-    async createJobHistoryEntry(printerId, { payload, resends }) {
+
+    async createJobHistoryEntry(printerId, {payload, resends}) {
         const job = this.#jobsCache.getPrinterJob(printerId);
         const printerState = this.#printersStore.getPrinterState(printerId);
-        const entry = await this.#historyService.create(printerState, job, { payload, resends });
+        const entry = await this.#historyService.create(printerState, job, {payload, resends});
         this.#historyCache.push(entry);
         return entry;
     }
+
     async updateCostSettings(id, costSettings) {
         const entryIndex = this.getEntryIndex(id);
         const historyEntry = await this.#historyService.updateCostSettings(id, costSettings);
         this.#historyCache[entryIndex] = historyEntry;
         return historyEntry;
     }
+
     async deleteEntry(id) {
         await this.#historyService.delete(id);
         const index = this.getEntryIndex(id);
         if (index !== -1) {
             this.#historyCache.pop(index);
             return Status.success("Deleted history entry from cached history");
-        }
-        else {
+        } else {
             return Status.failure("History entry was not found in cached history");
         }
     }
+
     /**
      * Set the initial state for the history cache
      * @returns {Promise<void>}
@@ -86,6 +88,7 @@ class HistoryStore {
         this.#historyCache = historyArray;
         this.#generatedStatistics = this.generateStatistics();
     }
+
     generateStatistics() {
         let completedJobsCount = 0;
         let cancelledCount = 0;
@@ -100,19 +103,17 @@ class HistoryStore {
         const totalByDay = [];
         const historyByDay = [];
         for (let h = 0; h < this.#historyCache.length; h++) {
-            const { printCost, fileName, success, reason, printTime, printerName, spoolCost } = this.#historyCache[h];
+            const {printCost, fileName, success, reason, printTime, printerName, spoolCost} = this.#historyCache[h];
             if (success) {
                 completedJobsCount++;
                 printTimes.push(printTime);
                 fileNames.push(fileName);
                 printerNames.push(printerName);
                 printCostArray.push(parseFloat(printCost));
-            }
-            else if (reason === "cancelled") {
+            } else if (reason === "cancelled") {
                 cancelledCount++;
                 failedPrintTime.push(printTime);
-            }
-            else {
+            } else {
                 failedCount++;
                 failedPrintTime.push(printTime);
             }
@@ -167,4 +168,5 @@ class HistoryStore {
         };
     }
 }
+
 export default HistoryStore;

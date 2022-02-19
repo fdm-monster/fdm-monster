@@ -4,13 +4,14 @@ import cookieParser from "cookie-parser";
 import passport from "passport";
 import cors from "cors";
 import helmet from "helmet";
-import {scopePerRequest} from "awilix-express";
-
 import {interceptRoles} from "./middleware/authorization.js";
 import {passportFactory} from "./middleware/passport.js";
 import {configureContainer} from "./container.js";
 import DITokens from "./container.tokens.js";
 import {AppConstants} from "./server.constants.js";
+import awilixExpress from "awilix-express";
+
+const {scopePerRequest} = awilixExpress;
 
 export function setupNormalServer() {
     const httpServer = express();

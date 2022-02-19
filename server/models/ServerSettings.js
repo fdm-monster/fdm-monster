@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
-import { AppConstants } from "../server.constants";
+
+import { AppConstants } from "../server.constants.js";
+
 const ServerSettingsSchema = new mongoose.Schema({
     onlinePolling: {
         seconds: {

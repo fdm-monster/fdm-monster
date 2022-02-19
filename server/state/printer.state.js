@@ -1,12 +1,13 @@
-import octoprintService from "../services/octoprint/constants/octoprint-service.constants";
-import event from "../constants/event.constants";
-import octoprintWebsocket from "../services/octoprint/constants/octoprint-websocket.constants";
-import state from "../constants/state.constants";
 import Logger from "../handlers/logger.js";
-const { getCurrentProfileDefault } = octoprintService;
-const { PEVENTS } = event;
-const { getDefaultPrinterState, WS_STATE, EVENT_TYPES } = octoprintWebsocket;
-const { mapStateToColor, PSTATE, MESSAGE } = state;
+import {getCurrentProfileDefault} from "../services/octoprint/constants/octoprint-service.constants.js";
+import {PEVENTS} from "../constants/event.constants.js";
+import {
+    EVENT_TYPES,
+    getDefaultPrinterState,
+    WS_STATE
+} from "../services/octoprint/constants/octoprint-websocket.constants.js";
+import {mapStateToColor, MESSAGE, PSTATE} from "../constants/state.constants.js";
+
 /**
  * This is a model to simplify unified printers state
  * This class is designed with serialization to network, file and possibly database in mind.
@@ -45,30 +46,37 @@ class PrinterState {
     #eventEmitter2;
     #jobsCache;
     #fileCache;
-    constructor({ eventEmitter2, jobsCache, fileCache }) {
+
+    constructor({eventEmitter2, jobsCache, fileCache}) {
         this.#eventEmitter2 = eventEmitter2;
         this.#jobsCache = jobsCache;
         this.#fileCache = fileCache;
     }
+
     get id() {
         return this.#id;
     }
+
     get isTest() {
         return this.#isTest;
     }
+
     get correlationToken() {
         if (this.isTest)
             return this.#entityData.correlationToken;
     }
+
     get markForRemoval() {
         return this.#markedForRemoval;
     }
+
     async setup(printerDocument, isTest = false) {
         if (!isTest)
             this.#id = printerDocument._id.toString();
         this.#isTest = isTest;
         this.updateEntityData(printerDocument, true);
     }
+
     async tearDown() {
         this.resetWebSocketAdapter();
         this.#markedForRemoval = true;
@@ -77,6 +85,7 @@ class PrinterState {
         this.#fileCache.purgePrinterId(this.#id);
         this.#jobsCache.purgePrinterId(this.#id);
     }
+
     /**
      * Update the in-memory copy of the document
      * @param printerDocument the database model to freeze
@@ -91,6 +100,7 @@ class PrinterState {
             this.resetConnectionState();
         }
     }
+
     toFlat() {
         const convertedWSState = this.getWebSocketState();
         const opMeta = this.#websocketAdapter?.getOctoPrintMeta();
@@ -101,7 +111,7 @@ class PrinterState {
                 correlationToken: this.#entityData.correlationToken,
                 isTest: this.isTest
             }
-            : { id: this.#id };
+            : {id: this.#id};
         return Object.freeze({
             ...identification,
             printerState: this.getPrinterState(),
@@ -109,7 +119,7 @@ class PrinterState {
             hostState: this.#hostState,
             webSocketState: convertedWSState,
             // ...
-            costSettings: { ...this.#entityData.costSettings },
+            costSettings: {...this.#entityData.costSettings},
             // Caches
             currentJob: flatJob,
             // Hot OP data
@@ -163,6 +173,7 @@ class PrinterState {
             group: this.#entityData.group
         });
     }
+
     /**
      * Reset the API state and dispose any websocket related data
      */
@@ -170,25 +181,28 @@ class PrinterState {
         if (this.#entityData.enabled) {
             this.setHostState(PSTATE.Searching, "Attempting to connect to OctoPrint");
             this.resetApiAccessibility();
-        }
-        else {
+        } else {
             this.setHostState(PSTATE.Disabled, "Printer was disabled explicitly");
             this.setApiAccessibility(false, false, MESSAGE.disabled);
         }
         this.resetWebSocketAdapter();
     }
+
     /**
      * Another entity passes the acquired system info with handy metadata
      */
     updateSystemInfo(systemInfo) {
         this.#octoPrintSystemInfo = systemInfo;
     }
+
     updateStepSize(stepSize) {
         this.#stepSize = stepSize;
     }
+
     getSortIndex() {
         return this.#entityData.sortIndex;
     }
+
     getWebSocketState() {
         // Translate the adapter state to something the client knows
         const adapterState = this.getAdapterState();
@@ -216,29 +230,33 @@ class PrinterState {
                 };
         }
     }
+
     getStateCategory() {
         const pState = this.getPrinterState();
         return pState.colour.category;
     }
+
     getPrinterState() {
         if (!this.#websocketAdapter) {
             return getDefaultPrinterState();
         }
         return this.#websocketAdapter.getPrinterState();
     }
+
     getURL() {
         return this.#entityData.printerURL;
     }
+
     getName() {
         return this.#entityData?.settingsAppearance?.name || this.#entityData.printerURL;
     }
+
     getOctoPrintVersion() {
         const opMeta = this.#websocketAdapter?.getOctoPrintMeta();
         const dbVersion = this.#entityData.octoPrintVersion;
         if (!opMeta) {
             return dbVersion;
-        }
-        else {
+        } else {
             if (dbVersion !== opMeta.octoPrintVersion && !!opMeta.octoPrintVersion) {
                 // TODO prevent this in an earlier stage (like a websocket connect message)
                 // TODO do something with this? This is a change of version.
@@ -246,12 +264,14 @@ class PrinterState {
             return opMeta.octoPrintVersion;
         }
     }
+
     getLoginDetails() {
         return {
             printerURL: this.#entityData.printerURL,
             apiKey: this.#entityData.apiKey
         };
     }
+
     bindWebSocketAdapter(adapterType) {
         if (!!this.#websocketAdapter) {
             throw new Error(`This websocket adapter was already bound with type '${this.#websocketAdapterType}'. Please reset it first with 'resetWebSocketAdapter' if you're switching over dynamically.`);
@@ -269,6 +289,7 @@ class PrinterState {
         });
         this.#messageStream = this.#websocketAdapter.getMessages$();
     }
+
     /**
      * Connect the adapter to the configured transport using the constructor printer document and the bindWebSocketAdapter calls
      */
@@ -284,12 +305,15 @@ class PrinterState {
             console.log("RxJS Subject WS complete");
         });
     }
+
     sendPing() {
         this.#websocketAdapter.sendThrottleMessage();
     }
+
     setFirmwareState(name) {
         this.#octoPrintSystemInfo["printer.firmware"] = name;
     }
+
     #processEvent(event) {
         // Other interested parties can be informed
         event.data.printerId = this.#id;
@@ -299,11 +323,9 @@ class PrinterState {
             if (data.type === EVENT_TYPES.FirmwareData) {
                 // We can update Firmware from here
                 this.setFirmwareState(data.payload.name);
-            }
-            else if (data.type === EVENT_TYPES.Disconnecting) {
+            } else if (data.type === EVENT_TYPES.Disconnecting) {
                 this.setFirmwareState("Disconnecting...");
-            }
-            else if (data.type === EVENT_TYPES.Disconnected) {
+            } else if (data.type === EVENT_TYPES.Disconnected) {
                 this.setFirmwareState("-");
             }
             // TODO Process the event with the history store
@@ -321,21 +343,25 @@ class PrinterState {
             this.#jobsCache.updatePrinterJob(this.#id, event.data);
         }
     }
+
     isAdapterAuthed() {
         return this.getAdapterState() === WS_STATE.authed;
     }
+
     getAdapterState() {
         if (!this.#websocketAdapter) {
             return WS_STATE.unopened;
         }
         return this.#websocketAdapter.getWebSocketState();
     }
+
     shouldRetryConnect() {
         if (this.markForRemoval || !this.isApiRetryable()) {
             return false;
         }
         return [WS_STATE.unopened, WS_STATE.closed].includes(this.getAdapterState());
     }
+
     /**
      * Reset the type of adapter provided, saving/sending state, disposing and closing the sockets.
      */
@@ -352,11 +378,13 @@ class PrinterState {
             this.#logger.warning("Reset printer websocket adapter.");
         }
     }
+
     setApiLoginSuccessState(sessionUser, sessionKey) {
         this.#sessionUser = sessionUser;
         this.#sessionKey = sessionKey;
         this.setHostState(PSTATE.Online, "Printer device is Online");
     }
+
     setHostState(state, description) {
         this.#hostState = {
             state,
@@ -364,6 +392,7 @@ class PrinterState {
             desc: description
         };
     }
+
     /**
      * Tracking for API failures like GlobalAPIKey, ApiKey rejected which can only be fixed manually
      */
@@ -379,9 +408,11 @@ class PrinterState {
             reason
         };
     }
+
     getApiAccessibility() {
         return Object.freeze(this.#apiAccessibility);
     }
+
     /**
      * Determines whether API was marked accessible - whether it should be skipped or not.
      * @returns {boolean}
@@ -389,11 +420,14 @@ class PrinterState {
     isApiAccessible() {
         return this.#apiAccessibility.accessible;
     }
+
     isApiRetryable() {
         return this.isApiAccessible() || this.#apiAccessibility.retryable;
     }
+
     resetApiAccessibility() {
         this.setApiAccessibility(true, true, null);
     }
 }
+
 export default PrinterState;

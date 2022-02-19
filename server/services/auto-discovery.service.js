@@ -1,42 +1,45 @@
-import xml2js from "xml2js";
+import {parseString} from "xml2js";
 import Logger from "../handlers/logger.js";
-import octoprintService from "./octoprint/constants/octoprint-service.constants";
-const { parseString } = xml2js;
-const { jsonContentType, contentTypeHeaderKey } = octoprintService;
+import {contentTypeHeaderKey, jsonContentType} from "./octoprint/constants/octoprint-service.constants.js";
+
 class AutoDiscoveryService {
     #discoveredDevices = [];
     #ssdpClient;
     #httpClient;
     #logger = new Logger("Server");
-    constructor({ httpClient }) {
+
+    constructor({httpClient}) {
         this.#httpClient = httpClient;
     }
+
     setupSsdp() {
         this.#ssdpClient = require("node-upnp-ssdp");
         this.#bindSsdp();
     }
+
     #bindSsdp() {
         this.#ssdpClient.on("DeviceFound", (res) => {
             this.#logger.info("Device found! Parsing information", res.location);
             if (res.location) {
                 this.#httpClient
                     .get(res.location, {
-                    headers: {
-                        [contentTypeHeaderKey]: jsonContentType
-                    }
-                })
-                    .then((response) => {
-                    parseString(response.data, (err, result) => {
-                        if (err) {
-                            this.#logger.error(err);
-                            return;
+                        headers: {
+                            [contentTypeHeaderKey]: jsonContentType
                         }
-                        this.processDevice(result.root.device);
+                    })
+                    .then((response) => {
+                        parseString(response.data, (err, result) => {
+                            if (err) {
+                                this.#logger.error(err);
+                                return;
+                            }
+                            this.processDevice(result.root.device);
+                        });
                     });
-                });
             }
         });
     }
+
     processDevice(devices) {
         if (!devices || devices.length === 0)
             return;
@@ -59,6 +62,7 @@ class AutoDiscoveryService {
             }
         }
     }
+
     async searchForDevicesOnNetwork() {
         this.#logger.info("Running automatic scan...");
         if (!this.#ssdpClient) {
@@ -77,4 +81,5 @@ class AutoDiscoveryService {
         return await x();
     }
 }
+
 export default AutoDiscoveryService;

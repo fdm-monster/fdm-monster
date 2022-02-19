@@ -1,19 +1,19 @@
-import runtime from "../exceptions/runtime.exceptions";
-import findPredicate from "./utils/find-predicate.utils";
-import service from "../constants/service.constants";
-const { NotFoundException } = runtime;
-const { findFileIndex } = findPredicate;
-const { Status } = service;
-/**
- * An extension repository for managing printer files in database
- */
+import {findFileIndex} from "./utils/find-predicate.utils.js";
+import {NotFoundException} from "../exceptions/runtime.exceptions.js";
+import {Status} from "../constants/service.constants.js";
+
 class PrinterFilesService {
+    /**
+     * An extension repository for managing printer files in database
+     */
     #printerService;
     #logger;
-    constructor({ printerService, loggerFactory }) {
+
+    constructor({printerService, loggerFactory}) {
         this.#printerService = printerService;
         this.#logger = loggerFactory(PrinterFilesService.name);
     }
+
     async getPrinterFilesStorage(printerId) {
         const printer = await this.#printerService.get(printerId);
         return {
@@ -21,6 +21,7 @@ class PrinterFilesService {
             storage: printer.storage
         };
     }
+
     async updateFiles(printerId, fileList) {
         const printer = await this.#printerService.get(printerId);
         printer.fileList = fileList;
@@ -28,25 +29,27 @@ class PrinterFilesService {
         printer.save();
         return printer.fileList;
     }
+
     async appendOrReplaceFile(printerId, addedFile) {
         const printer = await this.#printerService.get(printerId);
         const foundFileIndex = printer.fileList.files.findIndex((f) => f.path === addedFile.path);
         if (foundFileIndex === -1) {
             printer.fileList.files.push(addedFile);
-        }
-        else {
+        } else {
             printer.fileList.files[foundFileIndex] = addedFile;
         }
         printer.markModified("fileList");
         await printer.save();
         return printer.fileList;
     }
+
     async clearFiles(printerId) {
         const printer = await this.#printerService.get(printerId);
         printer.fileList.files = [];
         printer.markModified("fileList");
         await printer.save();
     }
+
     /**
      * Perform delete action on database
      * @param printerId
@@ -60,8 +63,7 @@ class PrinterFilesService {
         if (fileIndex === -1) {
             if (throwError) {
                 throw new NotFoundException(`A file removal was ordered but this file was not found in database for printer Id ${printerId}`, filePath);
-            }
-            else {
+            } else {
                 return Status.failure("File was not found in printer fileList");
             }
         }
@@ -71,4 +73,5 @@ class PrinterFilesService {
         return Status.success("File was removed");
     }
 }
+
 export default PrinterFilesService;

@@ -1,9 +1,7 @@
-import octoprintService from "./constants/octoprint-service.constants";
-import api from "./utils/api.utils";
-import serverSettings from "../../constants/server-settings.constants";
-const { jsonContentType, contentTypeHeaderKey } = octoprintService;
-const { validatePrinter, constructHeaders } = api;
-const { getDefaultTimeout } = serverSettings;
+import {contentTypeHeaderKey, jsonContentType} from "./constants/octoprint-service.constants.js";
+import {constructHeaders, validatePrinter} from "./utils/api.utils.js";
+import {getDefaultTimeout} from "../../constants/server-settings.constants.js";
+
 class OctoPrintRoutes {
     octoPrintBase = "/";
     apiBase = `${this.octoPrintBase}api`;
@@ -22,27 +20,34 @@ class OctoPrintRoutes {
     apiTimelapse = `${this.apiBase}/timelapse`;
     _settingsStore;
     _timeouts; // TODO apply apiTimeout, but apply apiRetry, apiRetryCutoff elsewhere (and webSocketRetry)
-    constructor({ settingsStore }) {
+    constructor({settingsStore}) {
         this._settingsStore = settingsStore;
     }
+
     get disconnectCommand() {
-        return { command: "disconnect" };
+        return {command: "disconnect"};
     }
+
     get cancelJobCommand() {
-        return { command: "cancel" };
+        return {command: "cancel"};
     }
+
     get connectCommand() {
-        return { command: "connect" };
+        return {command: "connect"};
     }
+
     apiFile = (path) => `${this.apiFilesLocation}/${path}`;
     apiGetFiles = (recursive = false) => `${this.apiFiles}/local?recursive=${recursive}`;
     apiSoftwareUpdateCheck = (force) => `${this.octoPrintBase}plugin/softwareupdate/check${force ? "?force=true" : ""}`;
+
     selectCommand(print = false) {
-        return { command: "select", print };
+        return {command: "select", print};
     }
+
     moveFileCommand(destination) {
-        return { command: "move", destination };
+        return {command: "move", destination};
     }
+
     gcodeAnalysisSetting(enabled) {
         return {
             gcodeAnalysis: {
@@ -50,16 +55,18 @@ class OctoPrintRoutes {
             }
         };
     }
+
     _ensureTimeoutSettingsLoaded() {
         const serverSettings = this._settingsStore.getServerSettings();
-        this._timeouts = { ...serverSettings.timeout };
+        this._timeouts = {...serverSettings.timeout};
         if (!this._timeouts) {
             throw new Error("OctoPrint API Service could not load timeout settings. settingsStore:ServerSettings:timeout didnt return anything");
         }
     }
+
     _prepareRequest(printer, path, timeoutOverride, contentType = jsonContentType) {
         this._ensureTimeoutSettingsLoaded();
-        const { apiKey, printerURL } = validatePrinter(printer);
+        const {apiKey, printerURL} = validatePrinter(printer);
         let headers = constructHeaders(apiKey, contentType);
         let timeout = timeoutOverride || this._timeouts.apiTimeout;
         if (timeout <= 0) {
@@ -73,9 +80,10 @@ class OctoPrintRoutes {
             }
         };
     }
+
     // Unused because we dont have any PUT/PATCH/POST with relevant data so far
     _prepareJsonRequest(printer, path, data, timeoutOverride) {
-        const { url, options } = this._prepareRequest(printer, path, timeoutOverride);
+        const {url, options} = this._prepareRequest(printer, path, timeoutOverride);
         // We must allow file uploads elsewhere, so be explicit about the content type and data in this JSON request
         let serializedData = data ? JSON.stringify(data) : undefined;
         options.headers[contentTypeHeaderKey] = jsonContentType;
@@ -86,4 +94,5 @@ class OctoPrintRoutes {
         };
     }
 }
+
 export default OctoPrintRoutes;

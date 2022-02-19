@@ -1,18 +1,17 @@
-import UserModel from "../../models/Auth/User.js";
-import runtime from "../../exceptions/runtime.exceptions";
-import validators from "../../handlers/validators.js";
-import userService from "../validators/user-service.validation";
 import bcrypt from "bcryptjs";
-import authorization from "../../constants/authorization.constants";
-const { NotFoundException, InternalServerException } = runtime;
-const { validateInput } = validators;
-const { registerUserRules } = userService;
-const { ROLES } = authorization;
+
+import UserModel from "../../models/Auth/User.js";
+import {registerUserRules} from "../validators/user-service.validation.js";
+import {ROLES} from "../../constants/authorization.constants.js";
+import {InternalServerException} from "../../exceptions/runtime.exceptions.js";
+
 class UserService {
     #roleService;
-    constructor({ roleService }) {
+
+    constructor({roleService}) {
         this.#roleService = roleService;
     }
+
     #toDto(user) {
         return {
             id: user.id,
@@ -22,23 +21,28 @@ class UserService {
             roles: user.roles
         };
     }
+
     async listUsers(limit = 10) {
         const userDocs = await UserModel.find().limit(limit);
         return userDocs.map((u) => this.#toDto(u));
     }
+
     async findByRoleId(roleId) {
-        return UserModel.find({ roles: { $in: [roleId] } });
+        return UserModel.find({roles: {$in: [roleId]}});
     }
+
     async getUser(userId) {
         const user = await UserModel.findById(userId);
         if (!user)
             throw new NotFoundException("User not found");
         return this.#toDto(user);
     }
+
     async getUserRoles(userId) {
         const user = await this.getUser(userId);
         return user.roles;
     }
+
     async deleteUser(userId) {
         // Validate
         const user = await this.getUser(userId);
@@ -51,8 +55,9 @@ class UserService {
         }
         await UserModel.findByIdAndDelete(user.id);
     }
+
     async register(input) {
-        const { username, name, password, roles } = await validateInput(input, registerUserRules);
+        const {username, name, password, roles} = await validateInput(input, registerUserRules);
         const salt = await bcrypt.genSaltSync(10);
         const hash = await bcrypt.hash(password, salt);
         const userDoc = await UserModel.create({
@@ -64,4 +69,5 @@ class UserService {
         return this.#toDto(userDoc);
     }
 }
+
 export default UserService;

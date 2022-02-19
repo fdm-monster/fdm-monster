@@ -1,20 +1,17 @@
-import {major} from "semver";
+import {server} from "./constants/server-settings.constants.js";
 import {serveNode12Fallback} from "./server.fallback.js";
+import {setupEnvConfig} from "./server.env.js";
+import {setupNormalServer} from "./server.core.js";
 
 /**
  * Safety check for Node 12
  */
-let majorVersion = major(process.version, false);
+let majorVersion = process.version;
 if (!!majorVersion && majorVersion < 14) {
     // Dont require this in the normal flow (or NODE_ENV can not be fixed before start)
-
     serveNode12Fallback(server);
-
     process.exit(1);
 }
-
-import {setupEnvConfig} from "./server.env.js";
-import {setupNormalServer} from "./server.core.js";
 
 /**
  * Intermediate server when booting

@@ -1,20 +1,24 @@
 import WebSocket from "ws";
-import operators from "rxjs/operators";
-import rxjsWebsockets from "rxjs-websockets";
-import GenericWebsocketAdapter from "../../handlers/generic-websocket.adapter";
+import {default as makeWebSocketObservable, normalClosureMessage} from "rxjs-websockets";
+import {catchError, filter, map, share, switchMap} from "rxjs/operators";
+
+import GenericWebsocketAdapter from "../../handlers/generic-websocket.adapter.js";
 import QueueingSubject from "../../handlers/queued-subject.js";
-import event from "../../constants/event.constants";
-import websocket from "./utils/websocket.utils";
-import state from "../../constants/state.constants";
-import octoprintWebsocket from "./constants/octoprint-websocket.constants";
-const { throwError, catchError, map, filter, switchMap, share } = operators;
-const { default: makeWebSocketObservable, normalClosureMessage } = rxjsWebsockets;
-const { PEVENTS } = event;
-const { parseOctoPrintWebsocketMessage } = websocket;
-const { PSTATE, mapStateToColor, remapOctoPrintState } = state;
-const { OP_WS_SKIP, OP_WS_MSG, getDefaultPrinterState, getDefaultCurrentState, WS_STATE } = octoprintWebsocket;
+import {PEVENTS} from "../../constants/event.constants.js";
+import {parseOctoPrintWebsocketMessage} from "./utils/websocket.utils.js";
+import {mapStateToColor, PSTATE, remapOctoPrintState} from "../../constants/state.constants.js";
+import {throwError} from "rxjs";
+import {
+    getDefaultCurrentState,
+    getDefaultPrinterState,
+    OP_WS_MSG,
+    OP_WS_SKIP,
+    WS_STATE
+} from "./constants/octoprint-websocket.constants.js";
+
 const _OctoPrintWebSocketRoute = "/sockjs/websocket";
-export default (class OctoprintRxjsWebsocketAdapter extends GenericWebsocketAdapter {
+
+export default class OctoprintRxjsWebsocketAdapter extends GenericWebsocketAdapter {
     // Required data to setup OctoPrint WS connection
     #currentUser;
     #sessionKey;
@@ -30,8 +34,9 @@ export default (class OctoprintRxjsWebsocketAdapter extends GenericWebsocketAdap
     // Feel free to add in stuff like branch, permissions, plugin_hash and config_hash
     #octoPrintMeta = {};
     #webSocketState = WS_STATE.unopened;
-    constructor({ id, webSocketURL, currentUser, sessionKey, throttle, debug = false }) {
-        super({ id: id?.toString(), webSocketURL });
+
+    constructor({id, webSocketURL, currentUser, sessionKey, throttle, debug = false}) {
+        super({id: id?.toString(), webSocketURL});
         this.#currentUser = currentUser;
         this.#sessionKey = sessionKey;
         this.#throttle = throttle;
@@ -39,6 +44,7 @@ export default (class OctoprintRxjsWebsocketAdapter extends GenericWebsocketAdap
         this.#constructClient();
         this.#messageInputSubject = new QueueingSubject();
     }
+
     #constructClient() {
         const options = {
             makeWebSocket: (url, protocols) => new WebSocket(url, protocols)
@@ -48,49 +54,51 @@ export default (class OctoprintRxjsWebsocketAdapter extends GenericWebsocketAdap
         this.#socket$ = makeWebSocketObservable(constructedUrl.href, options);
         // setup the transform pipeline
         this.#messageOutput$ = this.#socket$.pipe(switchMap((getResponses) => {
-            this.#setWebSocketState(WS_STATE.opening);
-            this.#sendSetupData();
-            this.#setWebSocketState(WS_STATE.connected);
-            return getResponses(this.#messageInputSubject);
-        }), share(), // share the websocket connection across subscribers
-        map((r) => {
-            this.#setWebSocketState(WS_STATE.authed);
-            return parseOctoPrintWebsocketMessage(r);
-        }), filter((msg) => !OP_WS_SKIP.includes(msg.header)), map((msg) => {
-            return this.#transformStatefulMessage(msg);
-        }), catchError((error) => {
-            const { message } = error;
-            this.resetPrinterState();
-            if (message === normalClosureMessage) {
-                console.log("Server closed the websocket connection normally.");
-                this.#setWebSocketState(WS_STATE.closed);
-            }
-            else {
-                console.log("WebSocket threw error:", error.stack);
-                // TODO an error does not immediately mean its closed
-                this.#setWebSocketState(WS_STATE.closed);
-                throwError(error);
-            }
-        }));
+                this.#setWebSocketState(WS_STATE.opening);
+                this.#sendSetupData();
+                this.#setWebSocketState(WS_STATE.connected);
+                return getResponses(this.#messageInputSubject);
+            }), share(), // share the websocket connection across subscribers
+            map((r) => {
+                this.#setWebSocketState(WS_STATE.authed);
+                return parseOctoPrintWebsocketMessage(r);
+            }), filter((msg) => !OP_WS_SKIP.includes(msg.header)), map((msg) => {
+                return this.#transformStatefulMessage(msg);
+            }), catchError((error) => {
+                const {message} = error;
+                this.resetPrinterState();
+                if (message === normalClosureMessage) {
+                    console.log("Server closed the websocket connection normally.");
+                    this.#setWebSocketState(WS_STATE.closed);
+                } else {
+                    console.log("WebSocket threw error:", error.stack);
+                    // TODO an error does not immediately mean its closed
+                    this.#setWebSocketState(WS_STATE.closed);
+                    throwError(error);
+                }
+            }));
     }
+
     sendThrottleMessage() {
         if (this.#throttle) {
-            const throtleSettings = { throttle: this.#throttle };
+            const throtleSettings = {throttle: this.#throttle};
             this.#sendMessage(throtleSettings);
         }
     }
+
     #sendSetupData() {
-        const data = { auth: `${this.#currentUser}:${this.#sessionKey}` };
+        const data = {auth: `${this.#currentUser}:${this.#sessionKey}`};
         this.#sendMessage(data);
         this.sendThrottleMessage();
     }
+
     #transformStatefulMessage(parsedMessage) {
         if (!parsedMessage?.header) {
             throw new Error("Parsed OP message didnt contain 'header'.");
         }
         // This is a initial setup for an event bus implementation
         const serverEvents = [];
-        const { header, data } = parsedMessage;
+        const {header, data} = parsedMessage;
         switch (header) {
             case OP_WS_MSG.connected:
                 this.#octoPrintMeta = {
@@ -98,18 +106,18 @@ export default (class OctoprintRxjsWebsocketAdapter extends GenericWebsocketAdap
                     config_hash: data.config_hash,
                     plugin_hash: data.plugin_hash
                 };
-                this.#setPrinterState({ state: PSTATE.Offline, desc: "Awaiting printer state messages" });
+                this.#setPrinterState({state: PSTATE.Offline, desc: "Awaiting printer state messages"});
                 break;
             case OP_WS_MSG.history:
                 this.#handleCurrentStateData(data);
-                serverEvents.push({ type: PEVENTS.init, data });
+                serverEvents.push({type: PEVENTS.init, data});
                 break;
             case OP_WS_MSG.current:
                 this.#handleCurrentStateData(data);
-                serverEvents.push({ type: PEVENTS.current, data });
+                serverEvents.push({type: PEVENTS.current, data});
                 break;
             case OP_WS_MSG.event:
-                serverEvents.push({ type: PEVENTS.event, data });
+                serverEvents.push({type: PEVENTS.event, data});
                 break;
             case OP_WS_MSG.reauthRequired:
                 console.log("Reauth required!");
@@ -119,6 +127,7 @@ export default (class OctoprintRxjsWebsocketAdapter extends GenericWebsocketAdap
         }
         return serverEvents;
     }
+
     #handleCurrentStateData(data) {
         // Basically buffer the last state for ease of access - might be removed
         this.#saveSubStateData("resends", data);
@@ -128,29 +137,34 @@ export default (class OctoprintRxjsWebsocketAdapter extends GenericWebsocketAdap
         const octoPrintRemappedState = remapOctoPrintState(data.state);
         this.#setPrinterState(octoPrintRemappedState);
     }
+
     #saveSubStateData(subState, data) {
         if (data.hasOwnProperty(subState)) {
             this.#currentState[subState] = data[subState];
-        }
-        else {
+        } else {
             console.warn(`Received OP substate ${subState} was not initialized and thus not recognized.`);
         }
     }
+
     getCurrentStateData() {
         return this.#currentState;
     }
+
     #sendMessage(message) {
         this.#messageInputSubject.next(JSON.stringify(message));
     }
+
     #setWebSocketState(newState) {
         if (newState !== this.#webSocketState && this.#debug) {
             console.log(`ws changing state ${newState}`);
         }
         this.#webSocketState = newState;
     }
+
     getOctoPrintMeta() {
         return this.#octoPrintMeta;
     }
+
     /**
      * Pass the current job state upward
      * @returns {{file: undefined, lastPrintTime: undefined, estimatedPrintTime: undefined, averagePrintTime: undefined, filament: undefined, user: undefined}}
@@ -158,23 +172,29 @@ export default (class OctoprintRxjsWebsocketAdapter extends GenericWebsocketAdap
     getPrinterJob() {
         return this.#currentState?.job;
     }
+
     getPrinterState() {
         return this.#printerState;
     }
+
     resetPrinterState() {
         this.#printerState = getDefaultPrinterState();
     }
+
     getWebSocketState() {
         return this.#webSocketState;
     }
+
     getMessages$() {
         return this.#messageOutput$;
     }
+
     close() {
         this.#messageInputSubject.complete();
         this.resetPrinterState();
     }
-    #setPrinterState({ state, desc, flags }) {
+
+    #setPrinterState({state, desc, flags}) {
         if (this.#printerState.state !== state && this.#debug) {
             console.log(`changing OP printer state ${state}`);
         }
@@ -185,4 +205,4 @@ export default (class OctoprintRxjsWebsocketAdapter extends GenericWebsocketAdap
             desc
         };
     }
-});
+}

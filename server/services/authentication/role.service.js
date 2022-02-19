@@ -1,21 +1,23 @@
-import authorization from "../../constants/authorization.constants";
+import {union} from "lodash-es";
+
+import {ROLE_PERMS, ROLES} from "../../constants/authorization.constants.js";
 import RoleModel from "../../models/Auth/Role.js";
-import runtime from "../../exceptions/runtime.exceptions";
-import lodash from "lodash";
-const { ROLES, ROLE_PERMS } = authorization;
-const { NotFoundException } = runtime;
-const { union } = lodash;
+import {NotFoundException} from "../../exceptions/runtime.exceptions.js";
+
 class RoleService {
     #roles = [];
     #logger;
     #defaultRole;
-    constructor({ loggerFactory, defaultRole }) {
+
+    constructor({loggerFactory, defaultRole}) {
         this.#logger = loggerFactory("RoleService");
         this.#defaultRole = defaultRole;
     }
+
     get roles() {
         return this.#roles;
     }
+
     getRolesPermissions(roles) {
         let permissions = [];
         if (!roles?.length)
@@ -27,13 +29,16 @@ class RoleService {
         }
         return permissions;
     }
+
     getRolePermissions(role) {
         const normalizedRole = this.#normalizeRole(role);
         return ROLE_PERMS[normalizedRole];
     }
+
     getDefaultRole() {
         return this.#defaultRole;
     }
+
     async getDefaultRolesId() {
         if (!this.#roles?.length) {
             await this.syncRoles();
@@ -41,6 +46,7 @@ class RoleService {
         const guestRole = await this.getRoleByName(this.getDefaultRole());
         return [guestRole.id];
     }
+
     #normalizeRole(assignedRole) {
         const roleInstance = this.roles.find((r) => r.id === assignedRole || r.name === assignedRole);
         if (!roleInstance) {
@@ -49,6 +55,7 @@ class RoleService {
         }
         return roleInstance.name;
     }
+
     authorizeRole(requiredRole, assignedRoles) {
         return !!assignedRoles.find((ar) => {
             const normalizedRole = this.#normalizeRole(ar);
@@ -57,6 +64,7 @@ class RoleService {
             return normalizedRole === requiredRole;
         });
     }
+
     authorizeRoles(requiredRoles, assignedRoles, subset = true) {
         let isAuthorized = false;
         if (!requiredRoles?.length)
@@ -67,32 +75,35 @@ class RoleService {
         });
         return isAuthorized;
     }
+
     getRoleByName(roleName) {
         const role = this.#roles.find((r) => r.name === roleName);
         if (!role)
             throw new NotFoundException("Role not found");
         return role;
     }
+
     getRole(roleId) {
         const role = this.#roles.find((r) => r.id === roleId);
         if (!role)
             throw new NotFoundException(`Role Id '${roleId}' not found`);
         return role;
     }
+
     async syncRoles() {
         this.#roles = [];
         for (let roleName of Object.values(ROLES)) {
-            const storedRole = await RoleModel.findOne({ name: roleName });
+            const storedRole = await RoleModel.findOne({name: roleName});
             if (!storedRole) {
                 const newRole = await RoleModel.create({
                     name: roleName
                 });
                 this.#roles.push(newRole);
-            }
-            else {
+            } else {
                 this.#roles.push(storedRole);
             }
         }
     }
 }
+
 export default RoleService;

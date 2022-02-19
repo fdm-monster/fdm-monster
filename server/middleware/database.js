@@ -1,4 +1,5 @@
-import DITokens from "../container.tokens";
+import DITokens from "../container.tokens.js";
+
 export async function interceptDatabaseError(req, res, next) {
     const serverHost = req.container.resolve(DITokens.serverHost);
     const databaseReadyState = serverHost.hasConnected();

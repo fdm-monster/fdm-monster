@@ -1,7 +1,8 @@
-import random from "../../utils/random.util";
-const { randomString } = random;
+import {randomString} from "../../utils/random.util.js";
+
 class UserTokenService {
     tokens = {};
+
     async issueTokenWithDone(user) {
         const token = randomString(64);
         // Purge beforehand
@@ -10,6 +11,7 @@ class UserTokenService {
         await this.create(token, user.id);
         return token;
     }
+
     /**
      * Stores a new printer into the database.
      * @param {Object} token object to create.
@@ -21,12 +23,14 @@ class UserTokenService {
             throw new Error("Missing token to save");
         return (this.tokens[token] = userId);
     }
+
     /**
      * Clear all tokens, irrespective of user or creation time
      */
     clearAll() {
         this.tokens = {};
     }
+
     /**
      * Checks whether one token exists by providing the userToken instance
      */
@@ -40,4 +44,5 @@ class UserTokenService {
         delete this.tokens[foundTokenIndex];
     }
 }
+
 export default UserTokenService;
