@@ -12,13 +12,11 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: 14.x
+          node-version: 16.x
 
       - run: npm ci --no-optional
         working-directory: client-vue
-      - run: npm build
-        working-directory: client-vue
-      - run: npm run build
+     - run: npm run build
         working-directory: client-vue
       - uses: JS-DevTools/npm-publish@v1
         if: ${{ github.repository.name == 'fdm-monster' }}
