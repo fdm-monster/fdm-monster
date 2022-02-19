@@ -7,7 +7,6 @@ import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { ValidationException } from "./providers/validation.exception";
 import { FallbackModule } from "./fallback.module";
 import * as session from "express-session";
-import * as expressLayouts from "express-ejs-layouts";
 import { join } from "path";
 import { ApiService } from "./api/api.service";
 import { MongoClient } from "mongodb";
@@ -92,7 +91,6 @@ function legacyMiddleware(app: NestExpressApplication) {
     res.locals.error = req.flash("error");
     next();
   });
-  app.use(expressLayouts);
   process.env.SERVER_VERSION = `${process.env.NPM_PACKAGE_VERSION}`;
 
   const assetsPath = join(__dirname, "../..", "assets", "public");
