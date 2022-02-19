@@ -1,4 +1,4 @@
-jest.mock("../../../server/services/history.service");
+jest.mock("../../../services/history.service");
 
 const emptyLegalHistoryCache = [{ printHistory: {} }];
 const realisticHistoryCache = require("../mock-data/Histories.json");

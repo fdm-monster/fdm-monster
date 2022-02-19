@@ -6,8 +6,7 @@ const { createTestPrinter } = require("./test-data/create-printer");
 const {
   expectOkResponse,
   expectInvalidResponse,
-  expectNotFoundResponse,
-  expectInternalServerError
+  expectNotFoundResponse
 } = require("../extensions");
 
 let Model = Printer;

@@ -3,7 +3,7 @@ jest.mock("child_process", () => {
     exec: () => Promise.resolve()
   };
 });
-jest.mock("../../server/utils/npm.utils");
+jest.mock("../../utils/npm.utils");
 jest.mock("simple-git");
 const SimpleGit = require("simple-git");
 const mockedSimpleGit = SimpleGit();
@@ -13,7 +13,6 @@ jest.mock("lookpath", () => {
     lookpath: () => Promise.resolve("/usr/random/path")
   };
 });
-const { lookpath } = require("lookpath");
 const { configureContainer } = require("../../container");
 const DITokens = require("../../container.tokens");
 

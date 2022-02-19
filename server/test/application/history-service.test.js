@@ -1,6 +1,5 @@
-jest.mock("../../server/services/octoprint/octoprint-api.service");
+jest.mock("../../services/octoprint/octoprint-api.service");
 const { configureContainer } = require("../../container");
-const Filament = require("../../models/Filament");
 const DITokens = require("../../container.tokens");
 
 const dbHandler = require("../db-handler");
