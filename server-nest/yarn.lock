@@ -33,6 +33,18 @@
     rxjs "6.6.7"
     source-map "0.7.3"
 
+"@angular-devkit/core@13.2.2":
+  version "13.2.2"
+  resolved "https://registry.yarnpkg.com/@angular-devkit/core/-/core-13.2.2.tgz#643a97991e25584cc7c54574c2aa4eee45cf40a0"
+  integrity sha512-qH0Vu8qwGD5uhmE8PtePA1lm7xL3JtbBCcrQICmLqD6njLDVb2N5pbdDXeiXDlWGUoIRHUhu6Uw4AsY8zXP/FA==
+  dependencies:
+    ajv "8.9.0"
+    ajv-formats "2.1.1"
+    fast-json-stable-stringify "2.1.0"
+    magic-string "0.25.7"
+    rxjs "6.6.7"
+    source-map "0.7.3"
+
 "@angular-devkit/schematics-cli@12.2.7":
   version "12.2.7"
   resolved "https://registry.npmjs.org/@angular-devkit/schematics-cli/-/schematics-cli-12.2.7.tgz"
@@ -60,6 +72,17 @@
   integrity sha512-E0hCFyyfbixjerf0Okt4ynC6F1dsT2Wl7MwAePe+wzPTHCnKIRTa2PQTxJzdWeTlSkQMkSK6ft2iyWOD/FODng==
   dependencies:
     "@angular-devkit/core" "12.2.7"
+    ora "5.4.1"
+    rxjs "6.6.7"
+
+"@angular-devkit/schematics@13.2.2":
+  version "13.2.2"
+  resolved "https://registry.yarnpkg.com/@angular-devkit/schematics/-/schematics-13.2.2.tgz#034aa816a16cc372586c0c153c24dc4569b90f1e"
+  integrity sha512-kXPLTkSzRCeBX+SYUkC6MIrWCkH90Y8hVegR9R5n2YqhCJyE+dZlcx4d/8d3VHtZlzAs0LL8BU+liC3wMIagjA==
+  dependencies:
+    "@angular-devkit/core" "13.2.2"
+    jsonc-parser "3.0.0"
+    magic-string "0.25.7"
     ora "5.4.1"
     rxjs "6.6.7"
 
@@ -1102,7 +1125,18 @@
     cron "1.7.2"
     uuid "8.3.2"
 
-"@nestjs/schematics@8.0.3", "@nestjs/schematics@^8.0.3":
+"@nestjs/schematics@8.0.6":
+  version "8.0.6"
+  resolved "https://registry.yarnpkg.com/@nestjs/schematics/-/schematics-8.0.6.tgz#925369ffc51e0d6d0284ad656cc0491e9f1e1cfd"
+  integrity sha512-IgWuplXg3I+2lzQqy5jR45C+EpBiOuPQwh8zWCjlQDYU9/X/2a8B8byJXw3nuguZS/huuuXx3ZhfHJKQYk6uIA==
+  dependencies:
+    "@angular-devkit/core" "13.2.2"
+    "@angular-devkit/schematics" "13.2.2"
+    fs-extra "10.0.0"
+    jsonc-parser "3.0.0"
+    pluralize "8.0.0"
+
+"@nestjs/schematics@^8.0.3":
   version "8.0.3"
   resolved "https://registry.npmjs.org/@nestjs/schematics/-/schematics-8.0.3.tgz"
   integrity sha512-A5qyS9yv6v2RIBqbsyYG57NfYA8Jm/aypRV1nc7JXjhdfDHwWKqCsgQ/7/82vVjhlvVAfr5x/dpCWqcF3XYd7w==
@@ -1812,6 +1846,13 @@ ajv-formats@2.1.0:
   dependencies:
     ajv "^8.0.0"
 
+ajv-formats@2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/ajv-formats/-/ajv-formats-2.1.1.tgz#6e669400659eb74973bbf2e33327180a0996b520"
+  integrity sha512-Wx0Kx52hxE7C18hkMEggYlEifqWZtYaRgouJor+WMdPnQyEK13vgEWyVNup7SoeeoLMsr4kf5h6dOW11I15MUA==
+  dependencies:
+    ajv "^8.0.0"
+
 ajv-keywords@^3.4.1, ajv-keywords@^3.5.2:
   version "3.5.2"
   resolved "https://registry.npmjs.org/ajv-keywords/-/ajv-keywords-3.5.2.tgz"
@@ -1831,6 +1872,16 @@ ajv@8.6.2, ajv@^8.0.0, ajv@^8.0.1:
   version "8.6.2"
   resolved "https://registry.npmjs.org/ajv/-/ajv-8.6.2.tgz"
   integrity sha512-9807RlWAgT564wT+DjeyU5OFMPjmzxVobvDFmNAhY+5zD6A2ly3jDp6sgnfyDtlIQ+7H97oc/DGCzzfu9rjw9w==
+  dependencies:
+    fast-deep-equal "^3.1.1"
+    json-schema-traverse "^1.0.0"
+    require-from-string "^2.0.2"
+    uri-js "^4.2.2"
+
+ajv@8.9.0:
+  version "8.9.0"
+  resolved "https://registry.yarnpkg.com/ajv/-/ajv-8.9.0.tgz#738019146638824dea25edcf299dcba1b0e7eb18"
+  integrity sha512-qOKJyNj/h+OWx7s5DePL6Zu1KeM9jPZhwBqs+7DzP6bGOvqzVCSf0xueYmVuaC/oQ/VtS2zLMLHdQFbkka+XDQ==
   dependencies:
     fast-deep-equal "^3.1.1"
     json-schema-traverse "^1.0.0"
