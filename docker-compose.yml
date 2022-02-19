@@ -7,7 +7,7 @@ services:
     image: davidzwa/fdm-monster:development
     restart: always
     build:
-      context: .
+      context: ./server
       dockerfile: docker/Dockerfile
     ports:
       - 4001:4000
