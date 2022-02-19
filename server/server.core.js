@@ -43,7 +43,6 @@ function setupNormalServer() {
     )
     .use(passport.initialize())
     .use(passport.session())
-    .use(passport.authenticate("remember-me"))
     .use(scopePerRequest(container))
     .use(interceptRoles);
 
