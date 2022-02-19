@@ -78,7 +78,7 @@
     "json-to-typescript": "1.0.1",
     "mongo-unit": "2.0.1",
     "prettier": "2.3.2",
-    "supertest": "6.1.4",
+    "supertest": "6.2.2",
     "ts-jest": "27.0.4",
     "ts-loader": "9.2.4",
     "ts-node": "10.1.0",
