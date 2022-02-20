@@ -14,10 +14,10 @@ We dont aim to provide webcam support right now as this is one of the big bottle
 
 ## Stability
 
-This server is currently not yet released, so give it a star ⭐and be the first to experience it! 
+This server is currently freshly released, so give it a star ⭐and be the first to experience it! 
 
-#### Last finished: printer file commander and printer location map
-#### Current work: printer group, setting and location management
+#### Last finished features: printer group, setting and location management
+#### Current work: auto-clean OctoPrint files with different settings
 
 ## Development [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://gitHub.com/fdm-monster/fdmonster/graphs/commit-activity) ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/fdm-monster/fdmonster/Node.js%20CI/development) [![GitHub license](https://img.shields.io/github/license/fdm-monster/fdmonster)](https://github.com/fdm-monster/fdmonster/blob/master/LICENSE.txt)
 
@@ -34,13 +34,14 @@ This work is under active development with cutting edge tech and standards. Feel
 - [x] :rocket: Docker multi-arch image (arm/v7, arm64 and amd64 architectures => Raspberry Pi with an 64 bits OS!)
 - [x] :rocket: Printer Group management
 - [x] 🛡️ MongoDB 5 support
+- [x] :rocket: First core release tested in the field
 - [ ] 🛡️ NodeJS Server legacy-free (history, alerts, custom gcode and filament)
 - [ ] 🛡️ Frontend user and basic role management
 - [ ] 🛡️ Full API and client test coverage >80% (now at 60%) 
 - [ ] 🔌 FDM Connector - filament tracker 
 - [ ] 🔌 Raspberry Pi image and prebuilt customized OctoPi image
 - [ ] :rocket: Chocolatey package (Windows install)
-- [ ] :rocket: First core release with documentation
+- [ ] :rocket: Documentation
 - [ ] :rocket: Plugin system (preparation work is ready)
 - [ ] :rocket: Docker overlay as service management (daemonized restart & auto-updates)
 - [ ] :rocket: .NET 6 cross-platform daemon (drop necessity of pm2)

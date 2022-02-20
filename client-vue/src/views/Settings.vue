@@ -6,7 +6,7 @@
           <v-list-item>
             <v-list-item-content>
               <v-list-item-title class="text-h6"> Settings</v-list-item-title>
-              <v-list-item-subtitle> Adjust your Hub</v-list-item-subtitle>
+              <v-list-item-subtitle> Adjust your Fdm Monster</v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
 
@@ -43,7 +43,7 @@ import { Component } from "vue-property-decorator";
       items: [
         { title: "Printer groups", icon: "dashboard", path: "/settings/printer-groups" },
         { title: "User Management", icon: "group", path: "/settings/user-management" },
-        { title: "Hub settings", icon: "image", path: "/settings/system" },
+        { title: "FDM settings", icon: "image", path: "/settings/system" },
         { title: "Other", icon: "help", path: "/settings/other" }
       ]
     };

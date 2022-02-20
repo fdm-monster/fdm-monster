@@ -4,7 +4,7 @@
       <v-avatar>
         <v-icon>settings</v-icon>
       </v-avatar>
-      <v-toolbar-title>Hub Settings</v-toolbar-title>
+      <v-toolbar-title>FDM Monster Settings</v-toolbar-title>
     </v-toolbar>
     <v-list subheader three-line>
       <v-subheader>Files and GCode</v-subheader>
@@ -70,7 +70,7 @@ import { infoMessageEvent } from "@/event-bus/alert.events";
 import { FileHandlingSettings } from "@/models/client-settings/file-handling-settings.model";
 
 @Component({})
-export default class HubSettings extends Vue {
+export default class FdmSettings extends Vue {
   fileHandlingSettings: FileHandlingSettings = {
     autoRemoveOldFilesBeforeUpload: true,
     autoRemoveOldFilesCriteriumDays: 5
