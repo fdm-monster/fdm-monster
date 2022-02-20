@@ -64,7 +64,7 @@ describe("ServerCommands", () => {
 
     const successType = "success";
     const warningType = "warning";
-    const upToDateMessage = "FDM Monster Server is already up to date! Your good to go!";
+    const upToDateMessage = "FDM Server is already up to date! Your good to go!";
     const notAGitRepoStart = "Not a git repository";
     const upDateCompletedMessage = "Update command has run successfully, FDM Server will restart.";
     const missingPackagesMessage =
