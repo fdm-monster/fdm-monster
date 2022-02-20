@@ -43,7 +43,7 @@
     "express-session": "1.17.2",
     "lodash": "4.17.21",
     "luxon": "2.3.0",
-    "mongodb": "3.6.10",
+    "mongodb": "3.7.3",
     "passport": "0.5.2",
     "passport-jwt": "4.0.0",
     "passport-local": "1.0.0",
