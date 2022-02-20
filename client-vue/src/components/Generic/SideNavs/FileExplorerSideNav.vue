@@ -289,7 +289,7 @@ export default class FileExplorerSideNav extends Vue {
   }
 
   @Watch("drawerOpened")
-  updateStore(newVal: boolean, oldVal: boolean) {
+  updateStore(newVal: boolean) {
     // Due to the animation delay the nav model lags behind enough for SSE to pick up and override
     if (!newVal) {
       printersState.setSideNavPrinter(undefined);

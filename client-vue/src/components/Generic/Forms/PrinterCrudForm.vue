@@ -165,7 +165,7 @@ export default class PrinterCrudForm extends Vue {
   }
 
   @Watch(watchedId)
-  onChildChanged(val?: string, oldVal?: string) {
+  onChildChanged(val?: string) {
     if (!val) return;
 
     const printer = this.$store.getters.printer(val) as Printer;
