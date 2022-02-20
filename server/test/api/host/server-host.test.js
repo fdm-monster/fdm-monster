@@ -1,7 +1,7 @@
 import * as dbHandler from "../../db-handler.js";
 import testServer from "../../test-server.js";
 import DITokens from "../../../container.tokens";
-import { AppConstants } from "../../../server.constants";
+import { AppConstants } from "../../../server.constants.js";
 import extensions from "../../extensions.js";
 const { setupTestApp } = testServer;
 const { expectOkResponse, expectNotFoundResponse } = extensions;

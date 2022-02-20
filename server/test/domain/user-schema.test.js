@@ -1,5 +1,5 @@
 import * as dbHandler from "../db-handler.js";
-import User from "../../models/Auth/User.js";
+import User from "../../models/Auth/User.ts";
 import bcrypt from "bcryptjs";
 /**
  * Connect to a new in-memory database before running any tests.

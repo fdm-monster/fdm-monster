@@ -3,12 +3,11 @@
   "author": "David Zwart",
   "license": "AGPLv3",
   "version": "0.1.0",
-  "type": "module",
   "description": "FDM Monster is a bulk OctoPrint manager to set up, configure and monitor 3D printers. Our aim is to provide extremely optimized websocket performance and reliability.",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
     "prestart": "npm ci --production",
-    "start": "pm2 flush && pm2 start index.js --name FDM -e ./logs/pm2.error.log -o ./logs/pm2.out.log --time --restart-delay=1000 --update-env --exp-backoff-restart-delay=1500",
+    "start": "pm2 flush && pm2 start index.ts --name FDM -e ./logs/pm2.error.log -o ./logs/pm2.out.log --time --restart-delay=1000 --update-env --exp-backoff-restart-delay=1500",
     "restart": "pm2 restart FDM",
     "pupdate": "pm2 update",
     "stop": "pm2 stop FDM",
@@ -17,7 +16,11 @@
     "migration:down": "migrate-mongo down",
     "migration:status": "migrate-mongo status",
     "prettier": "prettier --write server/**/*.js test/**/*.js ./client-vue/**/*.js",
-    "dev": "nodemon index.js",
+    "tsc": "tsc",
+    "tsc-watch": "tsc -w",
+    "postinstall": "npx tsc",
+    "dev2": "ts-node-dev --respawn --pretty --transpile-only index.ts",
+    "dev": "nodemon index.ts",
     "test": "jest --forceExit"
   },
   "repository": {
@@ -25,7 +28,7 @@
     "url": "https://github.com/fdm-monster/fdm-monster"
   },
   "bin": {
-    "fdm-monster": "./app.js"
+    "fdm-monster": "./index.js"
   },
   "keywords": [
     "fdm-monster",
@@ -55,8 +58,8 @@
     "got": "^11.8.3",
     "helmet": "^5.0.2",
     "influx": "^5.9.3",
-    "is-docker": "^3.0.0",
-    "lodash-es": "^4.17.21",
+    "is-docker": "^2.2.1",
+    "lodash": "^4.17.21",
     "lookpath": "^1.2.2",
     "luxon": "^2.3.0",
     "migrate-mongo": "^8.2.3",
@@ -78,6 +81,28 @@
     "xml2js": "^0.4.23"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.2",
+    "@types/connect-history-api-fallback": "^1.3.5",
+    "@types/cookie-parser": "^1.4.2",
+    "@types/cors": "^2.8.12",
+    "@types/dotenv": "^8.2.0",
+    "@types/eventemitter2": "^4.1.0",
+    "@types/express": "^4.17.13",
+    "@types/express-session": "^1.17.4",
+    "@types/helmet": "^4.0.0",
+    "@types/jest": "^27.4.0",
+    "@types/lodash": "^4.14.178",
+    "@types/luxon": "^2.0.9",
+    "@types/migrate-mongo": "^8.1.3",
+    "@types/multer": "^1.4.7",
+    "@types/node": "^17.0.18",
+    "@types/nodemon": "^1.19.1",
+    "@types/passport": "^1.0.7",
+    "@types/passport-local": "^1.0.34",
+    "@types/semver": "^7.3.9",
+    "@types/ws": "^8.2.3",
+    "@types/xml2js": "^0.4.9",
+    "@typescript-eslint/parser": "^5.12.0",
     "eslint": "7.32.0",
     "eslint-config-airbnb-base": "15.0.0",
     "eslint-config-prettier": "8.4.0",
@@ -95,7 +120,10 @@
     "nodemon": "2.0.15",
     "prettier": "2.5.1",
     "rimraf": "3.0.2",
-    "supertest": "6.2.2"
+    "supertest": "6.2.2",
+    "ts-node": "^10.5.0",
+    "ts-node-dev": "^1.1.8",
+    "typescript": "^4.5.5"
   },
   "engine-strict": true,
   "engines": {

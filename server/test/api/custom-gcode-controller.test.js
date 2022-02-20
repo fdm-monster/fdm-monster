@@ -1,4 +1,4 @@
-import { AppConstants } from "../../server.constants";
+import { AppConstants } from "../../server.constants.js";
 import * as dbHandler from "../db-handler.js";
 import testServer from "../test-server.js";
 import extensions from "../extensions.js";

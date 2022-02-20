@@ -1,4 +1,4 @@
-import { AppConstants } from "../../../server.constants";
+import { AppConstants } from "../../../server.constants.js";
 import extensions from "../../extensions.js";
 const { expectOkResponse } = extensions;
 const printerGroupRoute = AppConstants.apiRoute + "/printer-group";

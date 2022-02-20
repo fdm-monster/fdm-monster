@@ -1,7 +1,7 @@
 import * as dbHandler from "../db-handler.js";
 import container$0 from "../../container.js";
 import DITokens from "../../container.tokens";
-import RoleModel from "../../models/Auth/Role.js";
+import RoleModel from "../../models/Auth/Role.ts";
 import authorization from "../../constants/authorization.constants";
 const { configureContainer } = container$0;
 const { ROLES } = authorization;

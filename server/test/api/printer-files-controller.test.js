@@ -1,5 +1,5 @@
 import * as dbHandler from "../db-handler.js";
-import { AppConstants } from "../../server.constants";
+import { AppConstants } from "../../server.constants.js";
 import testServer from "../test-server.js";
 import Printer from "../../models/Printer.js";
 import createPrinter from "./test-data/create-printer.js";

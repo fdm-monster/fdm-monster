@@ -1,9 +1,9 @@
 import * as dbHandler from "../db-handler.js";
-import { AppConstants } from "../../server.constants";
+import { AppConstants } from "../../server.constants.js";
 import testServer from "../test-server.js";
 import extensions from "../extensions.js";
 import createPrinter from "./test-data/create-printer.js";
-import UserModel from "../../models/Auth/User.js";
+import UserModel from "../../models/Auth/User.ts";
 import createUser from "./test-data/create-user.js";
 const { setupTestApp } = testServer;
 const { expectOkResponse, expectNotFoundResponse } = extensions;

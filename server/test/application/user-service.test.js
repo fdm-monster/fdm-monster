@@ -1,7 +1,7 @@
 import * as dbHandler from "../db-handler.js";
 import container$0 from "../../container.js";
 import DITokens from "../../container.tokens";
-import UserModel from "../../models/Auth/User.js";
+import UserModel from "../../models/Auth/User.ts";
 import createUser from "../api/test-data/create-user.js";
 import authorization from "../../constants/authorization.constants";
 const { configureContainer } = container$0;

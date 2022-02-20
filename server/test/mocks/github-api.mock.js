@@ -1,4 +1,4 @@
-import { AppConstants } from "../../server.constants";
+import { AppConstants } from "../../server.constants.js";
 class GithubApiServiceMock {
     /**
      * Test version of: connection-safe acquire data about the installed and latest released server version.

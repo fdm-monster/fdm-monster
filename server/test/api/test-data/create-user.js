@@ -1,4 +1,4 @@
-import User from "../../../models/Auth/User.js";
+import User from "../../../models/Auth/User.ts";
 import bcrypt from "bcryptjs";
 function getUserData(username = "tester", password = "testpassword") {
     return {
