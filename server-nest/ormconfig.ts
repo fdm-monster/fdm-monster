@@ -1,8 +1,8 @@
 module.exports = {
   type: "mongodb",
   synchronize: true,
-  hostname: process.env.TYPEORM_HOSTNAME || "host.docker.internal",
-  database: process.env.TYPEORM_DATABASE || "3dhub2",
+  hostname: process.env.TYPEORM_HOSTNAME || "127.0.0.1",
+  database: process.env.TYPEORM_DATABASE || "fdm-monster2",
   username: process.env.TYPEORM_USERNAME || "root",
   password: process.env.TYPEORM_PASSWORD || "",
   port: process.env.TYPEORM_PORT || 27017,
