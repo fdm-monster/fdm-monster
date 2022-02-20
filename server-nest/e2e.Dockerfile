@@ -1,4 +1,4 @@
-FROM node:13-stretch
+FROM node:17-stretch
 WORKDIR /app
 
 RUN npm install yarn

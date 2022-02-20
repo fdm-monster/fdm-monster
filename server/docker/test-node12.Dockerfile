@@ -1,5 +1,5 @@
 # Test the Node12 environment to crash in a friendly manner
-FROM node:12-stretch-slim
+FROM node:17-stretch-slim
 WORKDIR /app
 
 RUN npm install -g pm2
