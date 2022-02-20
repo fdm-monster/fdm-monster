@@ -81,13 +81,6 @@ function legacyMiddleware(app: NestExpressApplication) {
   // app.use(passport.initialize());
   // app.use(passport.session());
   // app.use(passport.authenticate("remember-me"));
-  // Global Vars
-  app.use((req, res, next) => {
-    res.locals.success_msg = req.flash("success_msg");
-    res.locals.error_msg = req.flash("error_msg");
-    res.locals.error = req.flash("error");
-    next();
-  });
   process.env.SERVER_VERSION = `${process.env.NPM_PACKAGE_VERSION}`;
 
   const assetsPath = join(__dirname, "../..", "assets", "public");
