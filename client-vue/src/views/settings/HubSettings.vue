@@ -15,8 +15,10 @@
           <v-list-item-subtitle>
             Automatically cleanup old files to ensure the SD card has enough space.
             <br />
-            <v-checkbox v-model="fileHandlingSettings.autoRemoveOldFilesBeforeUpload"
-                        label="Remove old file before upload"></v-checkbox>
+            <v-checkbox
+              v-model="fileHandlingSettings.autoRemoveOldFilesBeforeUpload"
+              label="Remove old file before upload"
+            ></v-checkbox>
             <v-text-field
               v-model="fileHandlingSettings.autoRemoveOldFilesCriteriumDays"
               :disabled="!fileHandlingSettings.autoRemoveOldFilesBeforeUpload"
@@ -49,7 +51,7 @@
             time/size estimates.
             <br />
             <v-btn color="primary" @click="bulkDisableGCodeAnalysis()"
-            >Bulk disable GCode Analysis
+              >Bulk disable GCode Analysis
             </v-btn>
           </v-list-item-subtitle>
         </v-list-item-content>
@@ -80,7 +82,9 @@ export default class HubSettings extends Vue {
   }
 
   async setFileHandlingClientSettings() {
-    const clientSettings = await SettingsService.setFileHandlingClientSettings(this.fileHandlingSettings);
+    const clientSettings = await SettingsService.setFileHandlingClientSettings(
+      this.fileHandlingSettings
+    );
     this.fileHandlingSettings = clientSettings.fileHandling;
   }
 

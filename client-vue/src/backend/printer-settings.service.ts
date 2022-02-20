@@ -1,6 +1,5 @@
 import { BaseService } from "@/backend/base.service";
 import { ServerApi } from "@/backend/server.api";
-import { FileHandlingSettings } from "@/models/client-settings/file-handling-settings.model";
 
 export class PrinterSettingsService extends BaseService {
   static async getSettings(printerId: string) {

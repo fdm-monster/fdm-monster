@@ -34,7 +34,6 @@ import UpdatePrinterDialog from "@/components/Generic/Dialogs/UpdatePrinterDialo
 import FileExplorerSideNav from "@/components/Generic/SideNavs/FileExplorerSideNav.vue";
 import CreatePrinterDialog from "@/components/Generic/Dialogs/CreatePrinterDialog.vue";
 import { uploadsState } from "@/store/uploads.state";
-import { QueuedUpload } from "@/models/uploads/queued-upload.model";
 
 @Component({
   components: {
@@ -71,7 +70,7 @@ export default class App extends Vue {
   }
 
   @Watch("queuedUploads")
-  async changeInUploads(newValue: QueuedUpload[]) {
+  async changeInUploads() {
     await uploadsState.handleNextUpload();
   }
 

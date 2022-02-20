@@ -175,7 +175,7 @@ class PrinterController {
   }
 
   /**
-   * Update the 3DH printer entity, does not adjust everything
+   * Update the printer entity, does not adjust everything
    * @param req
    * @param res
    * @returns {Promise<void>}

@@ -64,9 +64,9 @@ describe("ServerCommands", () => {
 
     const successType = "success";
     const warningType = "warning";
-    const upToDateMessage = "3DH Server is already up to date! Your good to go!";
+    const upToDateMessage = "FDM Server is already up to date! Your good to go!";
     const notAGitRepoStart = "Not a git repository";
-    const upDateCompletedMessage = "Update command has run successfully, 3DH Server will restart.";
+    const upDateCompletedMessage = "Update command has run successfully, FDM Server will restart.";
     const missingPackagesMessage =
       "You have missing dependencies that are required, Do you want to update these?";
     const modificationsDetectedMessage =

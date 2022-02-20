@@ -83,7 +83,7 @@ class PrintersModule extends VuexModule {
         groupMatrix[i] = [];
         for (let j = 0; j < rows; j++) {
           groupMatrix[i][j] = this.printerGroups.find(
-            (pg) => (pg.location.x + this.horizontalOffset) === i && pg.location.y === j
+            (pg) => pg.location.x + this.horizontalOffset === i && pg.location.y === j
           );
         }
       }

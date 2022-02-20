@@ -8,7 +8,7 @@ const {AppConstants} = require("./server.constants");
 const {status, up} = require("migrate-mongo");
 const isDocker = require("is-docker");
 const Logger = require("./handlers/logger.js");
-const logger = new Logger("3DHUB-Environment", false);
+const logger = new Logger("FDM-Environment", false);
 
 // Constants and definition
 const instructionsReferralURL = "https://github.com/fdm-monster/fdm-monster/blob/master/README.md";
@@ -61,7 +61,7 @@ function ensureEnvNpmVersionSet() {
     if (process.env[AppConstants.VERSION_KEY] !== packageJsonVersion) {
         process.env[AppConstants.VERSION_KEY] = packageJsonVersion;
         logger.warning(
-            `~ Had to synchronize 3DH version to '${packageJsonVersion}' as it was outdated.`
+            `~ Had to synchronize FDM version to '${packageJsonVersion}' as it was outdated.`
         );
     }
 }
@@ -190,7 +190,7 @@ function getAppDistPath() {
         appDistPath = require(clientPackage).getAppDistPath();
     } catch (e) {
         logger.error(
-            `~ The client package for 3DH '${clientPackage}' was not installed. Can not load frontend app`
+            `~ The client package for FDM '${clientPackage}' was not installed. Can not load frontend app`
         );
         return;
     }
@@ -203,7 +203,7 @@ function getAppDistPath() {
         const errorMessagePrefix = `Could not find Vue app path at ${appDistPath}`;
 
         if (isEnvProd() && envUtils.isPm2() && !isDocker()) {
-            const message = `${errorMessagePrefix} when running in non-dockerized PM2 mode. Removing pm2 3DH service.`;
+            const message = `${errorMessagePrefix} when running in non-dockerized PM2 mode. Removing pm2 FDM service.`;
             removePm2Service(message);
         } else {
             throw new Error(

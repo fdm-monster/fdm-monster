@@ -16,7 +16,7 @@ const config = {
     url: mongoDbString,
 
     // Dont override this unless you know what you are doing
-    // databaseName: "3dhub",
+    // databaseName: "fdm-monster",
 
     options: {
       useNewUrlParser: true, // removes a deprecation warning when connecting
