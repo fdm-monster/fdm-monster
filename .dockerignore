@@ -10,13 +10,17 @@
 *.txt
 /.build
 /.cache
-Makefile
 /**/node_modules
 
-/client_2x
-/server_2x
-/screenshots
-/test
-
-/OctoFarm
-/logs
+# Runtime and non-production folders
+/**/fdm-monster
+/client-npm
+/client-vue
+/coverage
+/docs
+/**/file-uploads
+/**/images
+/**/logs
+/server-nest
+/**/test
+/**/views

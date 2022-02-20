@@ -1,0 +1,26 @@
+name: Vue publish
+on:
+  pull_request:
+  push:
+    branches:
+      - 'master'
+      - 'development'
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16.x
+
+      - run: npm ci --no-optional
+        working-directory: client-vue
+      - run: npm run build
+        working-directory: client-vue
+      - uses: JS-DevTools/npm-publish@v1
+        if: ${{ github.repository.name == 'fdm-monster' }}
+        with:
+          dry-run: false
+          token: ${{ secrets.NPM_TOKEN }}
+          package: client-vue/package.json

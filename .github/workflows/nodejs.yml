@@ -2,22 +2,28 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ develop, master ]
+    branches: [ development, master ]
   pull_request:
 jobs:
   nodejs-build:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        node-version: [ 16.x, 15.x, 14.x ]
+        node-version: [ 16.x, 14.x ]
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
+
       - run: npm ci
+        working-directory: server
       - run: npm run build --if-present
+        working-directory: server
       - run: npm test -- --coverage
+        working-directory: server
+
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v2
