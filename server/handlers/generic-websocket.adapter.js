@@ -1,5 +1,5 @@
 /**
- * An 3DH websocket handler suitable for any websocket application like OctoPrint, Mariner, Klipper, etc.
+ * An websocket handler suitable for any websocket application like OctoPrint, Mariner, Klipper, etc.
  * Copy it to fit your needs, or take a look at 'octoprint-websocket.adapter.js'
  */
 module.exports = class GenericWebsocketAdapter {

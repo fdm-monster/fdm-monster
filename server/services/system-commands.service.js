@@ -27,7 +27,7 @@ class SystemCommandsService {
 
         if (doesFunctionExist) {
           setTimeout(async () => {
-            await exec("pm2 restart 3DH");
+            await exec("pm2 restart FDM");
           }, 5000);
 
           checkForNamedService = true;
@@ -63,7 +63,7 @@ class SystemCommandsService {
     if (!isThisAGitRepo) {
       clientResponse.statusTypeForUser = "warning";
       clientResponse.message =
-        "Not a git repository, user intervention required! You will have to clone 3DH again and re-unpack it over this directory. Make sure to backup your images folder!";
+        "Not a git repository, user intervention required! You will have to clone FDM again and re-unpack it over this directory. Make sure to backup your images folder!";
       return clientResponse;
     }
 
@@ -77,7 +77,7 @@ class SystemCommandsService {
       const gitBranchUpToDate = isBranchUpToDate(gitCurrentStatus);
       if (gitBranchUpToDate) {
         clientResponse.updateSuccess = false;
-        clientResponse.message = "3DH Server is already up to date! Your good to go!";
+        clientResponse.message = "FDM Server is already up to date! Your good to go!";
         clientResponse.statusTypeForUser = "success";
         return clientResponse;
       }
@@ -137,7 +137,7 @@ class SystemCommandsService {
     // Everything went well, enjoy the tasty updates!
     clientResponse.updateSuccess = true;
     clientResponse.statusTypeForUser = "success";
-    clientResponse.message = "Update command has run successfully, 3DH Server will restart.";
+    clientResponse.message = "Update command has run successfully, FDM Server will restart.";
     // Local changes
     return clientResponse;
   }

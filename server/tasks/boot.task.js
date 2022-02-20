@@ -126,7 +126,7 @@ class BootTask {
       await this.userService.register({
         username: "root",
         name: "Admin",
-        password: "3dhub-root",
+        password: "fdm-root",
         roles: [adminRole.id]
       });
       this.#logger.info(

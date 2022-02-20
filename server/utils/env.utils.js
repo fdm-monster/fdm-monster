@@ -74,16 +74,16 @@ function verifyPackageJsonRequirements(rootPath) {
     logger.debug("✓ found 'package.json'");
     const packageName = require("../package.json").name;
     if (!packageName) {
-      logger.error("X Could not find 'name' property in package.json file. Aborting 3DH Server.");
+      logger.error("X Could not find 'name' property in package.json file. Aborting FDM Server.");
       return false;
     } else if (packageName.toLowerCase() !== "fdm-monster") {
       logger.error(
-        `X property 'name' in package.json file didnt equal 'fdm-monster' (found: ${packageName.toLowerCase()}). Aborting 3DH Server.`
+        `X property 'name' in package.json file didnt equal 'fdm-monster' (found: ${packageName.toLowerCase()}). Aborting FDM Server.`
       );
       return false;
     }
   }
-  logger.debug("✓ Correctly validated 3DH package.json file!");
+  logger.debug("✓ Correctly validated FDM package.json file!");
   return true;
 }
 

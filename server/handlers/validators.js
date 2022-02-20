@@ -24,7 +24,7 @@ function validateMongoURL(mongoURL) {
   const hasMongoPrefix =
     mongoString.toLowerCase().includes("mongodb://") ||
     mongoString.toLowerCase().includes("mongodb+srv://");
-  const isKnownDatabase = mongoString.includes("/3dhub");
+  const isKnownDatabase = mongoString.includes("/fdm-monster");
 
   return {
     hasMongoPrefix,

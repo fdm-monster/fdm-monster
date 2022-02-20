@@ -22,7 +22,7 @@ class SystemInfoBundleService {
    * @throws {String} If the SystemInformation object doesn't return
    */
   generateSystemInformationContents() {
-    let systemInformationContents = "--- 3DH System Information ---\n\n";
+    let systemInformationContents = "--- System Information ---\n\n";
     systemInformationContents += `FDM Monster Version\n ${this.serverVersion} \n`;
     const airGapped = "Are we connected to the internet?\n";
     const pm2 = "Are we running under pm2?\n";
