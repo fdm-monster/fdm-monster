@@ -1,6 +1,6 @@
 import { OnlinePollingModel } from "@/models/server-settings/online-polling.model";
 import { ServerModel } from "@/models/server-settings/server.model";
-import { PrinterFileCleanSettings } from "@/models/server-settings/file-handling-settings.model";
+import { PrinterFileCleanSettings } from "@/models/server-settings/printer-file-clean-settings.model";
 
 export type PrinterFileCleanSubSetting = { printerFileClean: PrinterFileCleanSettings };
 
