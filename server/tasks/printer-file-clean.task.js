@@ -29,8 +29,7 @@ class PrinterFileCleanTask {
     try {
       if (autoCleanAtBootEnabled) {
         this.#logger.info(`Cleaning files of ${printers.length} active printers [printerFileClean:autoRemoveOldFilesAtBoot].`);
-      }
-      else {
+      } else {
         this.#logger.info(`Reporting about old files of ${printers.length} printers.`);
       }
 
@@ -40,9 +39,12 @@ class PrinterFileCleanTask {
         const outdatedFiles = this.getPrinterOutdatedFiles(printer);
         if (!outdatedFiles?.length) continue;
 
+        // Report
         this.#logger.info(`Found ${outdatedFiles?.length} old files of ${printer.getName()}`);
+
+        // Act
         if (autoCleanAtBootEnabled) {
-          await this.octoPrintFileSystemClean();
+          await this.octoPrintFileSystemClean(printer.id, outdatedFiles);
         }
       }
     } finally {
@@ -60,8 +62,8 @@ class PrinterFileCleanTask {
     return this.#filesStore.getOutdatedFiles(printer.id, ageDaysMax);
   }
 
-  async octoPrintFileSystemClean() {
-
+  async octoPrintFileSystemClean(printerId) {
+    this.#octoPrintApiService.
   }
 }
 

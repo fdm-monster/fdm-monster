@@ -189,6 +189,7 @@ class PrinterFilesController {
     const commands = await validateInput(req.body, fileUploadCommandsRules);
 
     const fileCleanSettings = this.#settingsStore.getPrinterFileCleanSettings();
+    // Perform specific file clean if configured
 
     const token = this.#multerService.startTrackingSession(files);
     const response = await this.#octoPrintApiService.uploadFileAsMultiPart(
