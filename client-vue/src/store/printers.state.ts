@@ -69,7 +69,7 @@ class PrintersModule extends VuexModule {
 
   get printersWithJob(): Printer[] {
     return this.printers.filter(
-      // If flags are falsy, we can skip the printer => its still connecting 
+      // If flags are falsy, we can skip the printer => its still connecting
       (p) => p.printerState.flags && (p.printerState.flags.printing || p.printerState.flags.printing)
     );
   }
