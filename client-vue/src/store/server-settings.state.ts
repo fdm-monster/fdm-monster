@@ -1,4 +1,4 @@
-import { ServerSettings } from "@/models/server-settings.model";
+import { ServerSettings } from "@/models/server-settings/server-settings.model";
 import { Action, Module, Mutation, VuexModule } from "vuex-class-modules";
 import { SettingsService } from "@/backend";
 import store from "@/store/index";

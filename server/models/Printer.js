@@ -27,6 +27,7 @@ const PrinterSchema = new mongoose.Schema({
     default: true
   },
   settingsAppearance: {
+    // Not modeling this could be cause of .save() not working
     type: Object,
     required: true
   },

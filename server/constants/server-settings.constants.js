@@ -19,6 +19,12 @@ const getDefaultTimeout = () => ({
   webSocketRetry: 5000
 });
 
+const printerFileCleanSettingKey = 'printerFileClean';
+const getDefaultPrinterFileCleanSettings = () => ({
+  autoRemoveOldFilesBeforeUpload: false,
+  autoRemoveOldFilesCriteriumDays: 5
+});
+
 const HISTORY_SETTINGS = {
   snapshot: "snapshot",
   thumbnails: "thumbnails",
@@ -58,6 +64,7 @@ const influxExport = {
 const getDefaultSettings = () => ({
   onlinePolling,
   server,
+  [printerFileCleanSettingKey]: getDefaultPrinterFileCleanSettings(),
   timeout: getDefaultTimeout(),
   history,
   influxExport
@@ -70,5 +77,7 @@ module.exports = {
   server,
   getDefaultTimeout,
   onlinePolling,
+  printerFileCleanSettingKey,
+  getDefaultPrinterFileCleanSettings,
   getDefaultSettings
 };

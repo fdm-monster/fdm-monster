@@ -67,7 +67,7 @@ import { PrinterFileService, SettingsService } from "@/backend";
 import { PrinterSettingsService } from "@/backend/printer-settings.service";
 import { printersState } from "@/store/printers.state";
 import { infoMessageEvent } from "@/event-bus/alert.events";
-import { FileHandlingSettings } from "@/models/client-settings/file-handling-settings.model";
+import { FileHandlingSettings } from "@/models/server-settings/file-handling-settings.model";
 
 @Component({})
 export default class FdmSettings extends Vue {
@@ -77,15 +77,15 @@ export default class FdmSettings extends Vue {
   };
 
   async created() {
-    const clientSettings = await SettingsService.getClientSettings();
-    this.fileHandlingSettings = clientSettings.fileHandling;
+    const serverSettings = await SettingsService.getServerSettings();
+    this.fileHandlingSettings = serverSettings.fileHandling;
   }
 
   async setFileHandlingClientSettings() {
-    const clientSettings = await SettingsService.setFileHandlingClientSettings(
+    const serverSettings = await SettingsService.setFileHandlingClientSettings(
       this.fileHandlingSettings
     );
-    this.fileHandlingSettings = clientSettings.fileHandling;
+    this.fileHandlingSettings = serverSettings.fileHandling;
   }
 
   async purgeFiles() {

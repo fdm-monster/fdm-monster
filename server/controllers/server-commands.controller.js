@@ -1,8 +1,8 @@
 const { createController } = require("awilix-express");
-const { authenticate, authorizeRoles } = require("../../middleware/authenticate");
-const Logger = require("../../handlers/logger.js");
-const { AppConstants } = require("../../server.constants");
-const { ROLES } = require("../../constants/authorization.constants");
+const { authenticate, authorizeRoles } = require("../middleware/authenticate");
+const Logger = require("../handlers/logger.js");
+const { AppConstants } = require("../server.constants");
+const { ROLES } = require("../constants/authorization.constants");
 
 class ServerCommandsController {
   #logger = new Logger("Server-API");

@@ -1,11 +1,24 @@
 const mongoose = require("mongoose");
 const { AppConstants } = require("../server.constants");
+const { printerFileCleanSettingKey } = require("../constants/server-settings.constants");
 
 const ServerSettingsSchema = new mongoose.Schema({
   onlinePolling: {
     seconds: {
       type: String,
       default: "0.5",
+      required: true
+    }
+  },
+  [printerFileCleanSettingKey]: {
+    autoRemoveOldFilesBeforeUpload: {
+      type: Boolean,
+      default: false,
+      required: true
+    },
+    autoRemoveOldFilesCriteriumDays:  {
+      type: Number,
+      default: 14,
       required: true
     }
   },
