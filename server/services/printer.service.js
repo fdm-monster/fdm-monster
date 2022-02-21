@@ -91,7 +91,9 @@ class PrinterService {
     }
     printer.settingsAppearance.name = settingsAppearance.name;
 
-    return PrinterModel.updateOne({ _id: printerId }, printer);
+    await PrinterModel.updateOne({ _id: printerId }, printer);
+
+    return printer;
   }
 
   /**
