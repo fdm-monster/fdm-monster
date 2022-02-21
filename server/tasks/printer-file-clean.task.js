@@ -14,8 +14,8 @@ class PrinterFileCleanTask {
   }
 
   async run() {
-    const printers = this.#printersStore.listPrinterStates();
-    this.#logger.info(`Cleaning files of ${printers.length} active printers`);
+    const printers = this.#printersStore.listPrinterStates(false);
+    this.#logger.info(`Cleaning files of ${printers.length} active printers. Syncing state first.`);
 
     // Filter printer states - cant clean unconnected OctoPrint instances
 

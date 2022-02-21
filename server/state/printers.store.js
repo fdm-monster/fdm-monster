@@ -91,7 +91,6 @@ class PrintersStore {
    * We check and throw instead of loading proactively: more predictable and not async
    * @returns {*}
    * @param includeDisconnected
-   * @param isTest takes complete preference over 'includeDisconnected'
    */
   listPrinterStates(includeDisconnected = false) {
     this._validateState();
