@@ -69,7 +69,7 @@ class PrintersModule extends VuexModule {
 
   get printersWithJob(): Printer[] {
     return this.printers.filter(
-      (p) => p.printerState.flags.printing || p.printerState.flags.printing
+      (p) => p.printerState && (p.printerState.flags.printing || p.printerState.flags.printing)
     );
   }
 
