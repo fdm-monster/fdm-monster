@@ -67,11 +67,11 @@ import { PrinterFileService, SettingsService } from "@/backend";
 import { PrinterSettingsService } from "@/backend/printer-settings.service";
 import { printersState } from "@/store/printers.state";
 import { infoMessageEvent } from "@/event-bus/alert.events";
-import { FileHandlingSettings } from "@/models/server-settings/file-handling-settings.model";
+import { PrinterFileCleanSettings } from "@/models/server-settings/file-handling-settings.model";
 
 @Component({})
 export default class FdmSettings extends Vue {
-  fileHandlingSettings: FileHandlingSettings = {
+  fileHandlingSettings: PrinterFileCleanSettings = {
     autoRemoveOldFilesBeforeUpload: true,
     autoRemoveOldFilesCriteriumDays: 5
   };

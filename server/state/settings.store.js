@@ -26,10 +26,6 @@ class SettingsStore {
     return this.#serverSettings.server.registration;
   }
 
-  getHistorySetting() {
-    return this.#serverSettings.history;
-  }
-
   getServerSettings() {
     return Object.freeze({
       ...this.#serverSettings._doc
@@ -55,7 +51,8 @@ class SettingsStore {
   async updateServerSettings(fullUpdate) {
     this.#serverSettings = await this.#serverSettingsService.update(fullUpdate);
 
-    return this.getServerSettings();
+    const cachedSettings = this.getServerSettings();
+    return cachedSettings;
   }
 }
 

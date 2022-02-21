@@ -1,12 +1,14 @@
 import { OnlinePollingModel } from "@/models/server-settings/online-polling.model";
 import { ServerModel } from "@/models/server-settings/server.model";
-import { FileHandlingSettings } from "@/models/server-settings/file-handling-settings.model";
+import { PrinterFileCleanSettings } from "@/models/server-settings/file-handling-settings.model";
+
+export type PrinterFileCleanSubSetting = { printerFileClean: PrinterFileCleanSettings };
 
 export interface ServerSettings {
   id: string;
   onlinePolling: OnlinePollingModel; // TODO finish model
   server: ServerModel;
-  printerFileClean: FileHandlingSettings;
+  printerFileClean: PrinterFileCleanSettings;
 
   timeout: any; // TODO model
   filamentManager: boolean;

@@ -1,4 +1,4 @@
-export interface FileHandlingSettings {
+export interface PrinterFileCleanSettings {
   autoRemoveOldFilesBeforeUpload: boolean,
   autoRemoveOldFilesCriteriumDays: number
 }

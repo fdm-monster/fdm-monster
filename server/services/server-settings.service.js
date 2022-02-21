@@ -17,8 +17,7 @@ class ServerSettingsService {
       // Perform patch of settings
       settings = this.#migrateSettingsRuntime(settings);
 
-      await ServerSettingsModel.updateOne({ _id: settings.id }, settings);
-      return settings;
+      return ServerSettingsModel.findOneAndUpdate({ _id: settings.id }, settings, { new: true });
     }
   }
 
@@ -53,14 +52,15 @@ class ServerSettingsService {
   async setRegistrationEnabled(enabled = true) {
     const settingsDoc = await this.getOrCreate();
     settingsDoc.server.registration = enabled;
-    return await settingsDoc.save();
+
+    return ServerSettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, { new: true });
   }
 
   async update(patchUpdate) {
-    const validatedInput = validateInput(patchUpdate, serverSettingsUpdateRules);
+    const validatedInput = await validateInput(patchUpdate, serverSettingsUpdateRules);
     const settingsDoc = await this.getOrCreate();
 
-    return ServerSettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, validatedInput);
+    return ServerSettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, validatedInput, { new: true });
   }
 }
 
