@@ -148,8 +148,8 @@ class ServerUpdateService {
       this.#logger.info(
         `\x1b[36mAre you a god? A new release ey? Bloody terrific mate!\x1b[0m
     Here's github's latest released: \x1b[32m${latestReleaseTag}\x1b[0m
-    Here's your release tag: \x1b[32m${packageVersion}\x1b[0m
-    Appreciate the hard work, you rock!`
+    Here's your release tag: \x1b[32mv${packageVersion}\x1b[0m
+    Thanks for using FDM Monster!`
       );
       return;
     }
