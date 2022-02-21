@@ -90,7 +90,7 @@
     "express-list-endpoints": "6.0.0",
     "jest": "27.5.1",
     "jest-util": "27.5.1",
-    "mongodb-memory-server": "8.3.0",
+    "mongodb-memory-server": "8.4.0",
     "nodemon": "2.0.15",
     "prettier": "2.5.1",
     "rimraf": "3.0.2",
