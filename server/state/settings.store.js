@@ -1,4 +1,5 @@
 const { InternalServerException } = require("../exceptions/runtime.exceptions");
+const { printerFileCleanSettingKey } = require("../constants/server-settings.constants");
 
 class SettingsStore {
   #serverSettings;
@@ -36,6 +37,14 @@ class SettingsStore {
     return Object.freeze({
       ...this.#clientSettings._doc
     });
+  }
+
+  /**
+   * Cross-cutting concern for file clean operation
+   * @returns {*}
+   */
+  getPrinterFileCleanSettings() {
+    return this.getServerSettings()[printerFileCleanSettingKey];
   }
 
   async setRegistrationEnabled(enabled = true) {

@@ -1,3 +1,5 @@
+const DITokens = require("../container.tokens");
+
 /**
  * Task which regularly cleans all printer files based on a configured predicate
  * This could be "older than 2 weeks". More options to be added on request.
@@ -6,26 +8,45 @@ class PrinterFileCleanTask {
   #logger;
   #filesStore;
   #printersStore;
-  #serverSettingsService;
+  #taskManagerService;
+  #settingsStore;
   #octoPrintApiService;
 
-  constructor({ printersStore, filesStore, octoPrintApiService, serverSettingsService, loggerFactory }) {
+  constructor({ printersStore, filesStore, octoPrintApiService, taskManagerService, settingsStore, loggerFactory }) {
     this.#printersStore = printersStore;
     this.#filesStore = filesStore;
+    this.#taskManagerService = taskManagerService;
     this.#octoPrintApiService = octoPrintApiService;
-    this.#serverSettingsService = serverSettingsService;
+    this.#settingsStore = settingsStore;
     this.#logger = loggerFactory("Printer-FileClean-task");
   }
 
   async run() {
     const printers = this.#printersStore.listPrinterStates(false);
-    this.#logger.info(`Cleaning files of ${printers.length} active printers. Syncing state first.`);
+    const fileCleanSettings = this.#settingsStore.getPrinterFileCleanSettings();
+    const autoCleanAtBootEnabled = fileCleanSettings.autoRemoveOldFilesAtBoot;
 
-    // Filter printer states - cant clean unconnected OctoPrint instances
+    try {
+      if (autoCleanAtBootEnabled) {
+        this.#logger.info(`Cleaning files of ${printers.length} active printers [printerFileClean:autoRemoveOldFilesAtBoot].`);
+      }
+      else {
+        this.#logger.info(`Reporting about old files of ${printers.length} printers.`);
+      }
 
-    for (let printer of printers) {
-      const outdatedFiles = this.getPrinterOutdatedFiles(printer);
-      await this.octoPrintFileSystemClean();
+      // Filter printer states - cant clean unconnected OctoPrint instances
+
+      for (let printer of printers) {
+        const outdatedFiles = this.getPrinterOutdatedFiles(printer);
+        if (!outdatedFiles?.length) continue;
+
+        this.#logger.info(`Found ${outdatedFiles?.length} old files of ${printer.getName()}`);
+        if (autoCleanAtBootEnabled) {
+          await this.octoPrintFileSystemClean();
+        }
+      }
+    } finally {
+      this.#logger.info(`Printer file clean job ended`);
     }
   }
 
@@ -34,9 +55,9 @@ class PrinterFileCleanTask {
    * @param printer
    */
   getPrinterOutdatedFiles(printer) {
-    const printerFiles = this.#filesStore.getFiles(printer.id);
-
-    return printerFiles;
+    const fileCleanSettings = this.#settingsStore.getPrinterFileCleanSettings();
+    const ageDaysMax = fileCleanSettings.autoRemoveOldFilesCriteriumDays;
+    return this.#filesStore.getOutdatedFiles(printer.id, ageDaysMax);
   }
 
   async octoPrintFileSystemClean() {

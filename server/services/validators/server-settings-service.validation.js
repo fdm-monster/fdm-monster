@@ -5,6 +5,7 @@ const serverSettingsUpdateRules = {
   "server.loginRequired": "boolean",
   [printerFileCleanSettingKey]: "object",
   [`${printerFileCleanSettingKey}.autoRemoveOldFilesBeforeUpload`]: "boolean",
+  [`${printerFileCleanSettingKey}.autoRemoveOldFilesAtBoot`]: "boolean",
   [`${printerFileCleanSettingKey}.autoRemoveOldFilesCriteriumDays`]: "integer|min:0",
 };
 

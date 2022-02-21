@@ -36,9 +36,15 @@ class FilesStore {
     }
   }
 
-  async getFiles(printerId) {
+  getFiles(printerId) {
     // Might introduce a filter like folder later
     return this.#fileCache.getPrinterFiles(printerId);
+  }
+
+  getOutdatedFiles(printerId, ageDaysMax) {
+    const printerFiles = this.getFiles(printerId);
+    if (!printerFiles?.files?.length) return [];
+    return printerFiles.files.filter(file => !!file.date && file.date + ageDaysMax < Date.now());
   }
 
   async purgePrinterFiles(printerId) {

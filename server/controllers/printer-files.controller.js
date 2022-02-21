@@ -20,15 +20,16 @@ const { authorizeRoles } = require("../middleware/authenticate");
 
 class PrinterFilesController {
   #filesStore;
-
+  #settingsStore;
   #octoPrintApiService;
   #printersStore;
   #multerService;
 
   #logger;
 
-  constructor({ filesStore, octoPrintApiService, printersStore, loggerFactory, multerService }) {
+  constructor({ filesStore, octoPrintApiService, printersStore, settingsStore, loggerFactory, multerService }) {
     this.#filesStore = filesStore;
+    this.#settingsStore = settingsStore;
     this.#octoPrintApiService = octoPrintApiService;
     this.#printersStore = printersStore;
     this.#multerService = multerService;
@@ -187,6 +188,8 @@ class PrinterFilesController {
     // Multer has processed the remaining multipart data into the body as json
     const commands = await validateInput(req.body, fileUploadCommandsRules);
 
+    const fileCleanSettings = this.#settingsStore.getPrinterFileCleanSettings();
+
     const token = this.#multerService.startTrackingSession(files);
     const response = await this.#octoPrintApiService.uploadFileAsMultiPart(
       printerLogin,
@@ -203,6 +206,12 @@ class PrinterFilesController {
     res.send(response);
   }
 
+  /**
+   * This endpoint is not actively used. Its better to introduce a virtual file system (VFS) to be able to manage centralized uploads.
+   * @param req
+   * @param res
+   * @returns {Promise<void>}
+   */
   async localUploadFile(req, res) {
     const { currentPrinterId, printerLogin } = getScopedPrinter(req);
     const { select, print, localLocation } = await validateInput(req.body, localFileUploadRules);

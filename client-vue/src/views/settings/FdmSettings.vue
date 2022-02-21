@@ -19,6 +19,10 @@
               v-model="fileHandlingSettings.autoRemoveOldFilesBeforeUpload"
               label="Remove old file before upload"
             ></v-checkbox>
+            <v-checkbox
+              v-model="fileHandlingSettings.autoRemoveOldFilesAtBoot"
+              label="Remove old files when (re)booting the server"
+            ></v-checkbox>
             <v-text-field
               v-model="fileHandlingSettings.autoRemoveOldFilesCriteriumDays"
               :disabled="!fileHandlingSettings.autoRemoveOldFilesBeforeUpload"
@@ -67,18 +71,20 @@ import { PrinterFileService, SettingsService } from "@/backend";
 import { PrinterSettingsService } from "@/backend/printer-settings.service";
 import { printersState } from "@/store/printers.state";
 import { infoMessageEvent } from "@/event-bus/alert.events";
-import { PrinterFileCleanSettings } from "@/models/server-settings/file-handling-settings.model";
+import { PrinterFileCleanSettings } from "@/models/server-settings/printer-file-clean-settings.model";
 
 @Component({})
 export default class FdmSettings extends Vue {
   fileHandlingSettings: PrinterFileCleanSettings = {
-    autoRemoveOldFilesBeforeUpload: true,
-    autoRemoveOldFilesCriteriumDays: 5
+    autoRemoveOldFilesBeforeUpload: false,
+    autoRemoveOldFilesAtBoot: false,
+    autoRemoveOldFilesCriteriumDays: 7
   };
 
   async created() {
     const serverSettings = await SettingsService.getServerSettings();
     this.fileHandlingSettings = serverSettings.printerFileClean;
+    console.log(this.fileHandlingSettings);
   }
 
   async setFileHandlingClientSettings() {

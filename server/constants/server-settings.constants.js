@@ -22,7 +22,8 @@ const getDefaultTimeout = () => ({
 const printerFileCleanSettingKey = 'printerFileClean';
 const getDefaultPrinterFileCleanSettings = () => ({
   autoRemoveOldFilesBeforeUpload: false,
-  autoRemoveOldFilesCriteriumDays: 5
+  autoRemoveOldFilesAtBoot: false,
+  autoRemoveOldFilesCriteriumDays: 7
 });
 
 const HISTORY_SETTINGS = {
