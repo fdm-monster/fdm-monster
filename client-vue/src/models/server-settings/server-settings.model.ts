@@ -6,7 +6,7 @@ export interface ServerSettings {
   id: string;
   onlinePolling: OnlinePollingModel; // TODO finish model
   server: ServerModel;
-  fileHandling: FileHandlingSettings;
+  printerFileClean: FileHandlingSettings;
 
   timeout: any; // TODO model
   filamentManager: boolean;

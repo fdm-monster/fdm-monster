@@ -78,14 +78,14 @@ export default class FdmSettings extends Vue {
 
   async created() {
     const serverSettings = await SettingsService.getServerSettings();
-    this.fileHandlingSettings = serverSettings.fileHandling;
+    this.fileHandlingSettings = serverSettings.printerFileClean;
   }
 
   async setFileHandlingClientSettings() {
     const serverSettings = await SettingsService.setFileHandlingClientSettings(
       this.fileHandlingSettings
     );
-    this.fileHandlingSettings = serverSettings.fileHandling;
+    this.fileHandlingSettings = serverSettings.printerFileClean;
   }
 
   async purgeFiles() {
