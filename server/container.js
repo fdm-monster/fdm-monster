@@ -55,6 +55,7 @@ const RoleService = require("./services/authentication/role.service");
 const { ToadScheduler } = require("toad-scheduler");
 const { ServerTasks } = require("./tasks");
 const PermissionService = require("./services/authentication/permission.service");
+const PrinterFileCleanTask = require("./tasks/printer-file-clean.task");
 const { ROLES } = require("./constants/authorization.constants");
 const CustomGCodeService = require("./services/custom-gcode.service");
 const PrinterWebsocketPingTask = require("./tasks/printer-websocket-ping.task");
@@ -147,7 +148,9 @@ function configureContainer() {
     // Task dependent on WS to fire - disabled at boot
     [DITokens.printerSystemTask]: asClass(PrinterSystemTask).singleton(),
     // Task dependent on test printer in store - disabled at boot
-    [DITokens.printerTestTask]: asClass(PrinterTestTask).singleton()
+    [DITokens.printerTestTask]: asClass(PrinterTestTask).singleton(),
+    // Task to regularly clean printer files based on certain configuration settings
+    [DITokens.printerFileCleanTask]: asClass(PrinterFileCleanTask).singleton()
   });
 
   return container;
