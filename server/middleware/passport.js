@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/Auth/User.js");
 const AuthenticationError = require("passport");
 
-module.exports = function (passport, tokenService) {
+module.exports = function (passport) {
     passport.use(
         new LocalStrategy({usernameField: "username"}, (username, password, done) => {
             User.findOne({username})

@@ -1,7 +1,12 @@
+const { printerFileCleanSettingKey } = require("../../constants/server-settings.constants");
 const serverSettingsUpdateRules = {
-  server: "required|object",
-  "server.registration": "required|boolean",
-  "server.loginRequired": "required|boolean"
+  server: "object",
+  "server.registration": "boolean",
+  "server.loginRequired": "boolean",
+  [printerFileCleanSettingKey]: "object",
+  [`${printerFileCleanSettingKey}.autoRemoveOldFilesBeforeUpload`]: "boolean",
+  [`${printerFileCleanSettingKey}.autoRemoveOldFilesAtBoot`]: "boolean",
+  [`${printerFileCleanSettingKey}.autoRemoveOldFilesCriteriumDays`]: "integer|min:0",
 };
 
 module.exports = {

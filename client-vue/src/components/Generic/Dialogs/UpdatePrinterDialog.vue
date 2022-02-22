@@ -88,7 +88,8 @@ export default class UpdatePrinterDialog extends Vue {
     if (!viewedPrinter || !printerId) return;
 
     const loginDetails = await PrintersService.getPrinterLoginDetails(printerId);
-    this.formData().apiKey = loginDetails.apiKey;
+    const formData = this.formData();
+    if (formData) formData.apiKey = loginDetails.apiKey;
   }
 
   @Watch("dialogShowed")
@@ -132,7 +133,11 @@ export default class UpdatePrinterDialog extends Vue {
   async testPrinter() {
     if (!(await this.isValid())) return;
 
-    const testPrinter = PrintersService.convertCreateFormToPrinter(this.formData());
+    const formData = this.formData();
+    if (!formData) return;
+
+    const testPrinter = PrintersService.convertCreateFormToPrinter(formData);
+    if (!testPrinter) return;
     this.openTestPanel();
 
     const result: Printer = await printersState.createTestPrinter(testPrinter);
@@ -144,7 +149,10 @@ export default class UpdatePrinterDialog extends Vue {
   async submit() {
     if (!(await this.isValid())) return;
 
-    const updatedPrinter = PrintersService.convertCreateFormToPrinter(this.formData());
+    const formData = this.formData();
+    if (!formData) return;
+
+    const updatedPrinter = PrintersService.convertCreateFormToPrinter(formData);
     const printerId = updatedPrinter.id;
 
     const updatedData = await printersState.updatePrinter({

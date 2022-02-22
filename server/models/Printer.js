@@ -27,7 +27,13 @@ const PrinterSchema = new mongoose.Schema({
     default: true
   },
   settingsAppearance: {
-    type: Object,
+    // Not modeling properties is the cause of .save() not working
+    type: {
+      name: {
+        type: String,
+        required: false
+      }
+    },
     required: true
   },
   // Auto-generated below

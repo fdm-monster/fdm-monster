@@ -40,7 +40,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  return Model.deleteMany({});
+  await Model.deleteMany({});
 });
 
 describe("PrinterController", () => {
@@ -80,6 +80,9 @@ describe("PrinterController", () => {
 
   it(`should be able to DELETE ${deleteRoute} - existing id`, async () => {
     const printer = await createTestPrinter(request);
+
+    const res = await request.get(getRoute(printer.id)).send();
+    expectOkResponse(res);
 
     const deletionResponse = await request.delete(deleteRoute(printer.id)).send();
     expectOkResponse(deletionResponse, expect.anything());

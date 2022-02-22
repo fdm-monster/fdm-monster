@@ -7,30 +7,19 @@ const { registerUserRules } = require("./validation/user-controller.validation")
 
 class AuthController {
   #settingsStore;
-  #userTokenService;
   #userService;
   #roleService;
 
   #logger;
 
-  constructor({ settingsStore, userTokenService, userService, roleService, loggerFactory }) {
+  constructor({ settingsStore, userService, roleService, loggerFactory }) {
     this.#settingsStore = settingsStore;
-    this.#userTokenService = userTokenService;
     this.#userService = userService;
     this.#roleService = roleService;
     this.#logger = loggerFactory("Server-API");
   }
 
   async login(req, res) {
-    if (req.body.remember_me) {
-      const token = await this.#userTokenService.issueTokenWithDone(req.user);
-      res.cookie("remember_me", token, {
-        path: "/",
-        httpOnly: true,
-        maxAge: 604800000
-      });
-    }
-
     return res.send();
   }
 

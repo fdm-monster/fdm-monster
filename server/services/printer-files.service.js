@@ -30,7 +30,7 @@ class PrinterFilesService {
     printer.fileList = fileList;
 
     printer.markModified("fileList");
-    printer.save();
+    await printer.save();
 
     return printer.fileList;
   }

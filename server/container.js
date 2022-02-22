@@ -18,7 +18,6 @@ const HistoryService = require("./services/history.service");
 const FileCache = require("./state/data/file.cache");
 const HistoryStore = require("./state/history.store");
 const JobsCache = require("./state/data/jobs.cache");
-const UserTokenService = require("./services/authentication/user-token.service");
 const ServerSentEventsHandler = require("./handlers/sse.handler");
 const OctoPrintLogsCache = require("./state/data/octoprint-logs.cache");
 const PrinterWebsocketTask = require("./tasks/printer-websocket.task");
@@ -55,6 +54,7 @@ const RoleService = require("./services/authentication/role.service");
 const { ToadScheduler } = require("toad-scheduler");
 const { ServerTasks } = require("./tasks");
 const PermissionService = require("./services/authentication/permission.service");
+const PrinterFileCleanTask = require("./tasks/printer-file-clean.task");
 const { ROLES } = require("./constants/authorization.constants");
 const CustomGCodeService = require("./services/custom-gcode.service");
 const PrinterWebsocketPingTask = require("./tasks/printer-websocket-ping.task");
@@ -82,7 +82,6 @@ function configureContainer() {
     [DITokens.settingsStore]: asClass(SettingsStore).singleton(),
     [DITokens.serverSettingsService]: asClass(ServerSettingsService),
     [DITokens.clientSettingsService]: asClass(ClientSettingsService),
-    [DITokens.userTokenService]: asClass(UserTokenService).singleton(),
     [DITokens.userService]: asClass(UserService),
     [DITokens.roleService]: asClass(RoleService).singleton(), // caches roles
     [DITokens.permissionService]: asClass(PermissionService).singleton(),
@@ -147,7 +146,9 @@ function configureContainer() {
     // Task dependent on WS to fire - disabled at boot
     [DITokens.printerSystemTask]: asClass(PrinterSystemTask).singleton(),
     // Task dependent on test printer in store - disabled at boot
-    [DITokens.printerTestTask]: asClass(PrinterTestTask).singleton()
+    [DITokens.printerTestTask]: asClass(PrinterTestTask).singleton(),
+    // Task to regularly clean printer files based on certain configuration settings
+    [DITokens.printerFileCleanTask]: asClass(PrinterFileCleanTask).singleton()
   });
 
   return container;

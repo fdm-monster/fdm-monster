@@ -10,7 +10,7 @@ module.exports = {
     "eslint:recommended",
     "@vue/typescript/recommended",
     "@vue/prettier",
-    '@vue/eslint-config-typescript'
+    "@vue/eslint-config-typescript"
   ],
   parserOptions: {
     ecmaVersion: 2020
@@ -23,9 +23,13 @@ module.exports = {
     "@typescript-eslint/explicit-module-boundary-types": isProduction ? "warn" : "off",
     "@typescript-eslint/no-empty-function": isProduction ? "warn" : "off",
     "@typescript-eslint/no-inferrable-types": "off",
-    'vue/valid-v-slot': ['error', {
-      allowModifiers: true,
-    }],
+    "vue/valid-v-slot": [
+      "error",
+      {
+        allowModifiers: true
+      }
+    ],
+    "prettier/prettier": ["error", { endOfLine: "auto" }]
   },
   overrides: [
     {

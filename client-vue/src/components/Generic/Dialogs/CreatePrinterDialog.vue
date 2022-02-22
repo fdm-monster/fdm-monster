@@ -120,7 +120,9 @@ export default class CreatePrinterDialog extends Vue {
     this.showChecksPanel = true;
     this.testProgress = undefined;
 
-    const testPrinter = PrintersService.convertCreateFormToPrinter(this.formData());
+    const formData = this.formData();
+    if (!formData) return;
+    const testPrinter = PrintersService.convertCreateFormToPrinter(formData);
 
     const result: Printer = await printersState.createTestPrinter(testPrinter);
     if (!result.correlationToken) throw new Error("Test Printer CorrelationToken was empty.");
@@ -131,7 +133,9 @@ export default class CreatePrinterDialog extends Vue {
   async submit() {
     if (!(await this.isValid())) return;
 
-    const newPrinterData = PrintersService.convertCreateFormToPrinter(this.formData());
+    const formData = this.formData();
+    if (!formData) return;
+    const newPrinterData = PrintersService.convertCreateFormToPrinter(formData);
 
     await printersState.createPrinter(newPrinterData);
 

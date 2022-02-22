@@ -20,7 +20,7 @@ class ClientSettingsService {
     const validatedInput = await validateInput(patchUpdate, clientSettingsUpdateRules);
     const settingsDoc = await this.getOrCreate();
 
-    return ClientSettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, validatedInput);
+    return ClientSettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, validatedInput, { new: true });
   }
 }
 

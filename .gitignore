@@ -6,7 +6,7 @@
 **/.env
 **/.build
 **/.cache
-**/coverage
+coverage
 
 # V2 Server
 server-nest/assets/public/assets/

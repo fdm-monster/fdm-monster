@@ -14,8 +14,7 @@ function setupNormalServer() {
   const httpServer = express();
   const container = configureContainer();
 
-  const userTokenService = container.resolve(DITokens.userTokenService);
-  require("./middleware/passport.js")(passport, userTokenService);
+  require("./middleware/passport.js")(passport);
 
   httpServer
     .use(

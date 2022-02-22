@@ -24,6 +24,10 @@ module.exports.PrinterGroupMockData = class PrinterGroupMockData {
   static get PrinterGroupMock() {
     return {
       name: "Laser Jets",
+      location: {
+        x: 1,
+        y: 1
+      },
       printers: []
     };
   }

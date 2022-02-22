@@ -91,7 +91,6 @@ class PrintersStore {
    * We check and throw instead of loading proactively: more predictable and not async
    * @returns {*}
    * @param includeDisconnected
-   * @param isTest takes complete preference over 'includeDisconnected'
    */
   listPrinterStates(includeDisconnected = false) {
     this._validateState();
@@ -103,7 +102,7 @@ class PrintersStore {
     this._validateState();
     if (!ObjectID.isValid(id)) {
       // Go for synchronous error
-      throw new ValidationException({ printerId: "Printer Id is not a valid Mongo ID" });
+      throw new ValidationException({ printerId: `Printer Id '${id}' is not a valid Mongo ID` });
     }
 
     const printerState = this.#printerStates.find((p) => p.id === id);
