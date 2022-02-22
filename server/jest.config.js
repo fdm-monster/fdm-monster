@@ -12,5 +12,9 @@ module.exports = {
   ],
   globalSetup: "./test/setup-global.js",
   setupFilesAfterEnv: ["./test/setup-after-env.js"],
-  collectCoverageFrom: ["**/*.js"]
+  collectCoverageFrom: ["**/*.js"],
+  coveragePathIgnorePatterns: [
+      "node_modules",
+      "test"
+  ]
 };
