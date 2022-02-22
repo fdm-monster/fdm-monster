@@ -5062,10 +5062,10 @@ moment-timezone@^0.5.x:
   resolved "https://registry.npmjs.org/moment/-/moment-2.29.1.tgz"
   integrity sha512-kHmoybcPV8Sqy59DwNDY3Jefr64lK/by/da0ViFcuA4DH0vQg5Q6Ze5VimxkfQNSC+Mls/Kx53s7TjP1RhFEDQ==
 
-mongo-unit@3.1.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/mongo-unit/-/mongo-unit-3.1.0.tgz#9c1212c020238bade9eb554f7990e77b627b1948"
-  integrity sha512-HexPftLYAQyQfizq9BzCqh99BcfouzfEn9vYjuKZp4rlEVt/avNkZWuLejusnNSGGY34O6bLjkzw0pe3+OCZPw==
+mongo-unit@3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/mongo-unit/-/mongo-unit-3.2.0.tgz#915ab5b8777d346e6fa966c610240022ed83f81b"
+  integrity sha512-PyCZv/nFKdOQOtcgi/2+0gCvZTaAYEr9LHC1lbRZycgvvCAqdpv9EvGiwdd9eOd4CsHEw0GKxj9lxl4IrjioPw==
   dependencies:
     debug "^4.3.3"
     mongodb "^4.3.1"
