@@ -8,7 +8,6 @@ module.exports = {
     "file-uploads",
     "node_modules",
     "logs",
-    "test",
     "views"
   ],
   globalSetup: "./test/setup-global.js",
