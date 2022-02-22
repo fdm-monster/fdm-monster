@@ -47,6 +47,10 @@ class SettingsStore {
     return this.getServerSettings()[printerFileCleanSettingKey];
   }
 
+  isPreUploadFileCleanEnabled() {
+    return this.getServerSettings()[printerFileCleanSettingKey]?.autoRemoveOldFilesBeforeUpload;
+  }
+
   async setRegistrationEnabled(enabled = true) {
     this.#serverSettings = await this.#serverSettingsService.setRegistrationEnabled(enabled);
   }
@@ -60,8 +64,7 @@ class SettingsStore {
   async updateServerSettings(fullUpdate) {
     this.#serverSettings = await this.#serverSettingsService.update(fullUpdate);
 
-    const cachedSettings = this.getServerSettings();
-    return cachedSettings;
+    return this.getServerSettings();
   }
 }
 

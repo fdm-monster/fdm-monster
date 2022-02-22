@@ -25,11 +25,22 @@ class PrinterFilesController {
   #printersStore;
   #multerService;
 
+  #printerFileCleanTask;
+
   #logger;
 
-  constructor({ filesStore, octoPrintApiService, printersStore, settingsStore, loggerFactory, multerService }) {
+  constructor({
+    filesStore,
+    octoPrintApiService,
+    printersStore,
+    printerFileCleanTask,
+    settingsStore,
+    loggerFactory,
+    multerService
+  }) {
     this.#filesStore = filesStore;
     this.#settingsStore = settingsStore;
+    this.#printerFileCleanTask = printerFileCleanTask;
     this.#octoPrintApiService = octoPrintApiService;
     this.#printersStore = printersStore;
     this.#multerService = multerService;
@@ -63,15 +74,12 @@ class PrinterFilesController {
   }
 
   async getFiles(req, res) {
-    const { printerLogin, currentPrinterId } = getScopedPrinter(req);
+    const { currentPrinterId } = getScopedPrinter(req);
     const { recursive } = await validateInput(req.query, getFilesRules);
 
-    const response = await this.#octoPrintApiService.getFiles(printerLogin, recursive, {
-      unwrap: false,
-      simple: true
-    });
+    this.#logger.info("Refreshing file storage by eager load");
 
-    await this.#filesStore.updatePrinterFiles(currentPrinterId, response.data);
+    const response = await this.#filesStore.eagerLoadPrinterFiles(currentPrinterId, recursive);
 
     this.#statusResponse(res, response);
   }
@@ -188,8 +196,11 @@ class PrinterFilesController {
     // Multer has processed the remaining multipart data into the body as json
     const commands = await validateInput(req.body, fileUploadCommandsRules);
 
-    const fileCleanSettings = this.#settingsStore.getPrinterFileCleanSettings();
     // Perform specific file clean if configured
+    const fileCleanEnabled = this.#settingsStore.isPreUploadFileCleanEnabled();
+    if (fileCleanEnabled) {
+      await this.#printerFileCleanTask.cleanPrinterFiles(currentPrinterId);
+    }
 
     const token = this.#multerService.startTrackingSession(files);
     const response = await this.#octoPrintApiService.uploadFileAsMultiPart(
@@ -222,7 +233,7 @@ class PrinterFilesController {
         localLocation: "The indicated file extension did not match '.gcode'"
       });
     }
-    
+
     if (!fs.existsSync(localLocation)) {
       throw new NotFoundException("The indicated file was not found.");
     }
