@@ -124,7 +124,10 @@ import Vue from "vue";
 import { Component, Inject, Prop, Watch } from "vue-property-decorator";
 import { ValidationProvider } from "vee-validate";
 import { AppConstants } from "@/constants/app.constants";
-import { getDefaultCreatePrinter, PreCreatePrinter } from "@/models/printers/crud/create-printer.model";
+import {
+  getDefaultCreatePrinter,
+  PreCreatePrinter
+} from "@/models/printers/crud/create-printer.model";
 import { printersState } from "@/store/printers.state";
 import { PrintersService } from "@/backend";
 import { Printer } from "@/models/printers/printer.model";

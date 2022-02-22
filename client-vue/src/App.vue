@@ -11,6 +11,7 @@
 
     <UpdatePrinterDialog />
     <CreatePrinterDialog />
+    <CreatePrinterGroupDialog />
     <FileExplorerSideNav />
     <!--    <FooterList></FooterList>-->
   </v-app>
@@ -34,6 +35,7 @@ import UpdatePrinterDialog from "@/components/Generic/Dialogs/UpdatePrinterDialo
 import FileExplorerSideNav from "@/components/Generic/SideNavs/FileExplorerSideNav.vue";
 import CreatePrinterDialog from "@/components/Generic/Dialogs/CreatePrinterDialog.vue";
 import { uploadsState } from "@/store/uploads.state";
+import CreatePrinterGroupDialog from "@/components/Generic/Dialogs/CreatePrinterGroupDialog.vue";
 
 @Component({
   components: {
@@ -41,6 +43,7 @@ import { uploadsState } from "@/store/uploads.state";
     NavigationDrawer,
     UpdatePrinterDialog,
     CreatePrinterDialog,
+    CreatePrinterGroupDialog,
     FileExplorerSideNav,
     FooterList,
     ErrorAlert

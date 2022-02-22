@@ -48,6 +48,5 @@ module.exports = createController(HistoryController)
     .before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR])])
     .get("/", "getCache")
     .delete("/:id", "delete")
-    // .put("/:id", "update")
     .get("/stats", "stats")
     .patch("/:id/cost-settings", "updateCostSettings");

@@ -20,6 +20,17 @@
           </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
+
+      <v-list-item>
+        <v-list-item-content>
+          <v-list-item-title>Create new group</v-list-item-title>
+          <v-list-item-subtitle>
+            Creates an empty group to be placed on the grid
+            <br />
+            <v-btn color="primary" @click="createGroup()">Create group</v-btn>
+          </v-list-item-subtitle>
+        </v-list-item-content>
+      </v-list-item>
     </v-list>
 
     <v-divider></v-divider>
@@ -162,6 +173,11 @@ export default class PrinterGroupsSettings extends Vue {
 
     const printer = group.printers[index - 1];
     return printersState.printer(printer?.printerId);
+  }
+
+  async createGroup() {
+    // Trigger watch connected to printer group CRUD dialog
+    printersState.setCreateGroupDialogOpened(true);
   }
 
   async syncLegacyGroups() {

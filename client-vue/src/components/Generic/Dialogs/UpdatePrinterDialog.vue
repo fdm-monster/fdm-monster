@@ -41,7 +41,10 @@ import { Component, Watch } from "vue-property-decorator";
 import { ValidationObserver } from "vee-validate";
 import { Printer } from "@/models/printers/printer.model";
 import { sseTestPrinterUpdate } from "@/event-bus/sse.events";
-import { PrinterSseMessage, TestProgressDetails } from "@/models/sse-messages/printer-sse-message.model";
+import {
+  PrinterSseMessage,
+  TestProgressDetails
+} from "@/models/sse-messages/printer-sse-message.model";
 import { PrintersService } from "@/backend";
 import { generateInitials } from "@/constants/noun-adjectives.data";
 import { updatedPrinterEvent } from "@/event-bus/printer.events";
@@ -86,8 +89,7 @@ export default class UpdatePrinterDialog extends Vue {
 
     const loginDetails = await PrintersService.getPrinterLoginDetails(printerId);
     const formData = this.formData();
-    if (formData)
-      formData.apiKey = loginDetails.apiKey;
+    if (formData) formData.apiKey = loginDetails.apiKey;
   }
 
   @Watch("dialogShowed")
