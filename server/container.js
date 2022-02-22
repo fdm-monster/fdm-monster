@@ -18,7 +18,6 @@ const HistoryService = require("./services/history.service");
 const FileCache = require("./state/data/file.cache");
 const HistoryStore = require("./state/history.store");
 const JobsCache = require("./state/data/jobs.cache");
-const UserTokenService = require("./services/authentication/user-token.service");
 const ServerSentEventsHandler = require("./handlers/sse.handler");
 const OctoPrintLogsCache = require("./state/data/octoprint-logs.cache");
 const PrinterWebsocketTask = require("./tasks/printer-websocket.task");
@@ -83,7 +82,6 @@ function configureContainer() {
     [DITokens.settingsStore]: asClass(SettingsStore).singleton(),
     [DITokens.serverSettingsService]: asClass(ServerSettingsService),
     [DITokens.clientSettingsService]: asClass(ClientSettingsService),
-    [DITokens.userTokenService]: asClass(UserTokenService).singleton(),
     [DITokens.userService]: asClass(UserService),
     [DITokens.roleService]: asClass(RoleService).singleton(), // caches roles
     [DITokens.permissionService]: asClass(PermissionService).singleton(),
