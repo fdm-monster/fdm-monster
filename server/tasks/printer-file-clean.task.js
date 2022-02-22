@@ -63,7 +63,7 @@ class PrinterFileCleanTask {
   }
 
   async octoPrintFileSystemClean(printerId) {
-    this.#octoPrintApiService.
+    // this.#octoPrintApiService.
   }
 }
 

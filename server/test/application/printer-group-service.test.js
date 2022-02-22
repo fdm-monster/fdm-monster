@@ -2,7 +2,7 @@ const printerGroupModel = require("../../models/PrinterGroup");
 const dbHandler = require("../db-handler");
 const DITokens = require("../../container.tokens");
 const { configureContainer } = require("../../container");
-const { PrinterGroupMockData } = require("./mock-data/printer-group.data");
+const { PrinterGroupMockData } = require("./test-data/printer-group.data");
 
 let printerService;
 let printerGroupService;

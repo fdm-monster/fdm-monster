@@ -1,7 +1,7 @@
 jest.mock("../../../services/history.service");
 
 const emptyLegalHistoryCache = [{ printHistory: {} }];
-const realisticHistoryCache = require("../mock-data/Histories.json");
+const realisticHistoryCache = require("../test-data/Histories.json");
 const { configureContainer } = require("../../../container");
 const DITokens = require("../../../container.tokens");
 const { assignYCumSum } = require("../../../utils/graph-point.utils");
