@@ -21,9 +21,10 @@
           <em class="red--text">* indicates required field</em>
           <v-spacer></v-spacer>
           <v-btn text @click="closeDialog()">Close</v-btn>
-          <v-btn :disabled="invalid" color="warning" text @click="validateGroup()">
-            Validate
-          </v-btn>
+          <!--          Might be used later if problems arise-->
+          <!--          <v-btn :disabled="invalid" color="warning" text @click="validateGroup()">-->
+          <!--            Validate-->
+          <!--          </v-btn>-->
           <v-btn :disabled="invalid" color="blue darken-1" text @click="submit()">Create</v-btn>
         </v-card-actions>
       </v-card>
@@ -89,14 +90,12 @@ export default class CreatePrinterGroupDialog extends Vue {
     return await this.$refs.validationObserver.validate();
   }
 
-  async validateGroup() {}
-
   async submit() {
     if (!(await this.isValid())) return;
 
     const formData = this.formData();
     if (!formData) return;
-    const newPrinterGroupData = PrinterGroupService.convertPrinterGroupToCreateForm(formData);
+    const newPrinterGroupData = PrinterGroupService.convertCreateFormToPrinterGroup(formData);
 
     await printersState.createPrinterGroup(newPrinterGroupData);
 

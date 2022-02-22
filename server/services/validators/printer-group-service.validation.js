@@ -15,6 +15,9 @@ const updatePrinterGroupNameRules = {
 
 const createPrinterGroupRules = {
   name: `required|minLength:${minPrinterGroupNameLength}`,
+  location: "required|object",
+  "location.x": "required|integer|min:0|max:4",
+  "location.y": "required|integer|min:0|max:4",
   printers: "array",
   "printers.*": "required|object",
   "printers.*.printerId": "required|mongoId",

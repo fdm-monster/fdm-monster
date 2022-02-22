@@ -3,21 +3,40 @@ import { ServerApi } from "@/backend/server.api";
 import { PrinterGroup } from "@/models/printers/printer-group.model";
 import {
   CreatePrinterGroup,
-  getDefaultCreatePrinterGroup
+  getDefaultCreatePrinterGroup,
+  PreCreatePrinterGroup
 } from "@/models/printer-groups/crud/create-printer-group.model";
 import { newRandomNamePair } from "@/constants/noun-adjectives.data";
 
 export class PrinterGroupService extends BaseService {
-  static convertPrinterGroupToCreateForm(printerGroup: CreatePrinterGroup) {
+  static convertPrinterGroupToCreateForm(printerGroup: PrinterGroup): PreCreatePrinterGroup {
     // Inverse transformation
     const newFormData = getDefaultCreatePrinterGroup();
 
-    newFormData.id = printerGroup.id;
+    newFormData.id = printerGroup._id;
     newFormData.name = printerGroup.name || newRandomNamePair();
     newFormData.printers = [];
-    newFormData.location = printerGroup.location || { x: 0, y: 0 };
+
+    newFormData.location = {
+      x: printerGroup.location?.x.toString() || "0",
+      y: printerGroup.location.y?.toString() || "0"
+    };
 
     return newFormData;
+  }
+
+  static convertCreateFormToPrinterGroup(formData: PreCreatePrinterGroup) {
+    const modifiedData: any = { ...formData };
+
+    // Fix the string properties to become int
+    modifiedData.location.x = parseInt(modifiedData.location.x);
+    modifiedData.location.y = parseInt(modifiedData.location.y);
+
+    if (Number.isNaN(modifiedData.location.x) || Number.isNaN(modifiedData.location.y)) {
+      throw new Error("Group location X or Y did not convert to number.");
+    }
+
+    return modifiedData as CreatePrinterGroup;
   }
 
   static async getGroups() {

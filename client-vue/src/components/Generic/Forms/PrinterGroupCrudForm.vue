@@ -14,23 +14,23 @@
 
         <validation-provider v-slot="{ errors }" :rules="locationXRules" name="LocationX">
           <v-text-field
-            type="number"
             v-model="formData.location.x"
             :counter="locationXRules.max"
             :error-messages="errors"
             label="Location X"
             required
+            type="number"
           />
         </validation-provider>
 
         <validation-provider v-slot="{ errors }" :rules="locationYRules" name="LocationY">
           <v-text-field
-            type="number"
             v-model="formData.location.y"
             :counter="locationYRules.max"
             :error-messages="errors"
             label="Location Y*"
             required
+            type="number"
           />
         </validation-provider>
 
@@ -59,8 +59,8 @@ import { AppConstants } from "@/constants/app.constants";
 import { printersState } from "@/store/printers.state";
 import { PrinterGroupService } from "@/backend";
 import {
-  CreatePrinterGroup,
-  getDefaultCreatePrinterGroup
+  getDefaultCreatePrinterGroup,
+  PreCreatePrinterGroup
 } from "@/models/printer-groups/crud/create-printer-group.model";
 import { PrinterGroup } from "@/models/printers/printer-group.model";
 import { Printer } from "@/models/printers/printer.model";
@@ -79,7 +79,7 @@ export default class PrinterGroupCrudForm extends Vue {
   @Inject() readonly appConstants!: AppConstants;
   @Prop() printerGroupId: string;
   printersWithoutGroup: Printer[];
-  formData?: CreatePrinterGroup = getDefaultCreatePrinterGroup();
+  formData?: PreCreatePrinterGroup = getDefaultCreatePrinterGroup();
 
   public get printerGroupNameRules() {
     return { required: true, max: this.appConstants.maxPrinterGroupNameLength };
