@@ -36,7 +36,7 @@ describe("printerGroup ", () => {
     // Prepare the CRUD DTO
     const newPrinterGroup = PrinterGroupMockData.PrinterGroupMock;
     newPrinterGroup.printers.push({
-      location: "top right 123",
+      location: "top right something",
       printerId: createdPrinter._id
     });
 

@@ -12,5 +12,6 @@ echo "Installing version ${lastVersion} of package ${package}"
 
 echo  "Running: npm --prefix ..\..\ install --save --save-exact ${package}@${lastVersion}"
 
+npm --prefix "..\..\server\" uninstall "${package}"
 npm --prefix "..\..\server\" install --save --save-exact "${package}@${lastVersion}"
 
