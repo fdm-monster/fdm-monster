@@ -137,7 +137,7 @@ describe("PrinterFilesController", () => {
     const printer = await createTestPrinter(request);
     octoPrintApiService.storeResponse({}, 200);
     const response = await request.post(localUploadFileRoute(printer.id)).send({
-      localLocation: "test",
+      localLocation: "node_modules",
       select: true,
       print: true
     });

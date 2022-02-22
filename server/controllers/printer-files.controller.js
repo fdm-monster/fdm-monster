@@ -217,9 +217,16 @@ class PrinterFilesController {
     const { currentPrinterId, printerLogin } = getScopedPrinter(req);
     const { select, print, localLocation } = await validateInput(req.body, localFileUploadRules);
 
+    if (!localLocation.endsWith(".gcode")) {
+      throw new ValidationException({
+        localLocation: "The indicated file extension did not match '.gcode'"
+      });
+    }
+    
     if (!fs.existsSync(localLocation)) {
       throw new NotFoundException("The indicated file was not found.");
     }
+
     if (fs.lstatSync(localLocation).isDirectory()) {
       throw new ValidationException({
         localLocation: "The indicated file was not correctly found."
