@@ -21,12 +21,12 @@ class ServerUpdateService {
     this.#githubApiService = githubApiService;
   }
 
-  static filterGithubReleases(releases, prerelease = false, tag_name = null) {
+  static filterGithubReleases(releases, prerelease_only = false, tag_name = null) {
     return releases.find(
       (r) =>
         r.draft === false &&
-        (tag_name ? r.tag_name === tag_name : true) &&
-        (r.prerelease === false || prerelease)
+        (tag_name ? r.tag_name?.replace("v","") === tag_name : true) &&
+        (r.prerelease === false || prerelease_only)
     );
   }
 
@@ -37,11 +37,6 @@ class ServerUpdateService {
    */
   async syncLatestRelease(includePre = false) {
     const githubReleases = await this.#githubApiService.getGithubReleases();
-    // .catch((e) => {
-    //   this.#logger.error(e);
-    //   this.#lastReleaseCheckError = e;
-    //   this.#lastReleaseCheckFailed = true;
-    // });
 
     this.#airGapped = !githubReleases;
     if (!githubReleases) {
@@ -136,20 +131,20 @@ class ServerUpdateService {
       return;
     }
     const latestRelease = this.getLastReleaseSyncState().latestReleaseKnown;
-    if (!latestRelease || !latestRelease.tag_name) {
+    const latestReleaseTag = latestRelease.tag_name?.replace("v", "");
+    if (!latestReleaseTag?.tag_name) {
       // Tests only, silence it
       return;
     }
 
     const packageVersion = this.#serverVersion;
 
-    const latestReleaseTag = latestRelease.tag_name;
     if (!this.#installedReleaseFound) {
       this.#logger.info(
-        `\x1b[36mAre you a god? A new release ey? Bloody terrific mate!\x1b[0m
+        `\x1b[36mVersion not detected as release.\x1b[0m
     Here's github's latest released: \x1b[32m${latestReleaseTag}\x1b[0m
-    Here's your release tag: \x1b[32m${packageVersion}\x1b[0m
-    Appreciate the hard work, you rock!`
+    Here's your release tag: \x1b[32mv${packageVersion}\x1b[0m
+    Thanks for using FDM Monster!`
       );
       return;
     }

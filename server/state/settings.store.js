@@ -1,4 +1,5 @@
 const { InternalServerException } = require("../exceptions/runtime.exceptions");
+const { printerFileCleanSettingKey } = require("../constants/server-settings.constants");
 
 class SettingsStore {
   #serverSettings;
@@ -26,10 +27,6 @@ class SettingsStore {
     return this.#serverSettings.server.registration;
   }
 
-  getHistorySetting() {
-    return this.#serverSettings.history;
-  }
-
   getServerSettings() {
     return Object.freeze({
       ...this.#serverSettings._doc
@@ -40,6 +37,18 @@ class SettingsStore {
     return Object.freeze({
       ...this.#clientSettings._doc
     });
+  }
+
+  /**
+   * Cross-cutting concern for file clean operation
+   * @returns {*}
+   */
+  getPrinterFileCleanSettings() {
+    return this.getServerSettings()[printerFileCleanSettingKey];
+  }
+
+  isPreUploadFileCleanEnabled() {
+    return this.getServerSettings()[printerFileCleanSettingKey]?.autoRemoveOldFilesBeforeUpload;
   }
 
   async setRegistrationEnabled(enabled = true) {

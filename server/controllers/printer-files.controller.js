@@ -20,15 +20,27 @@ const { authorizeRoles } = require("../middleware/authenticate");
 
 class PrinterFilesController {
   #filesStore;
-
+  #settingsStore;
   #octoPrintApiService;
   #printersStore;
   #multerService;
 
+  #printerFileCleanTask;
+
   #logger;
 
-  constructor({ filesStore, octoPrintApiService, printersStore, loggerFactory, multerService }) {
+  constructor({
+    filesStore,
+    octoPrintApiService,
+    printersStore,
+    printerFileCleanTask,
+    settingsStore,
+    loggerFactory,
+    multerService
+  }) {
     this.#filesStore = filesStore;
+    this.#settingsStore = settingsStore;
+    this.#printerFileCleanTask = printerFileCleanTask;
     this.#octoPrintApiService = octoPrintApiService;
     this.#printersStore = printersStore;
     this.#multerService = multerService;
@@ -62,15 +74,12 @@ class PrinterFilesController {
   }
 
   async getFiles(req, res) {
-    const { printerLogin, currentPrinterId } = getScopedPrinter(req);
+    const { currentPrinterId } = getScopedPrinter(req);
     const { recursive } = await validateInput(req.query, getFilesRules);
 
-    const response = await this.#octoPrintApiService.getFiles(printerLogin, recursive, {
-      unwrap: false,
-      simple: true
-    });
+    this.#logger.info("Refreshing file storage by eager load");
 
-    await this.#filesStore.updatePrinterFiles(currentPrinterId, response.data);
+    const response = await this.#filesStore.eagerLoadPrinterFiles(currentPrinterId, recursive);
 
     this.#statusResponse(res, response);
   }
@@ -187,6 +196,12 @@ class PrinterFilesController {
     // Multer has processed the remaining multipart data into the body as json
     const commands = await validateInput(req.body, fileUploadCommandsRules);
 
+    // Perform specific file clean if configured
+    const fileCleanEnabled = this.#settingsStore.isPreUploadFileCleanEnabled();
+    if (fileCleanEnabled) {
+      await this.#printerFileCleanTask.cleanPrinterFiles(currentPrinterId);
+    }
+
     const token = this.#multerService.startTrackingSession(files);
     const response = await this.#octoPrintApiService.uploadFileAsMultiPart(
       printerLogin,
@@ -203,13 +218,26 @@ class PrinterFilesController {
     res.send(response);
   }
 
+  /**
+   * This endpoint is not actively used. Its better to introduce a virtual file system (VFS) to be able to manage centralized uploads.
+   * @param req
+   * @param res
+   * @returns {Promise<void>}
+   */
   async localUploadFile(req, res) {
     const { currentPrinterId, printerLogin } = getScopedPrinter(req);
     const { select, print, localLocation } = await validateInput(req.body, localFileUploadRules);
 
+    if (!localLocation.endsWith(".gcode")) {
+      throw new ValidationException({
+        localLocation: "The indicated file extension did not match '.gcode'"
+      });
+    }
+
     if (!fs.existsSync(localLocation)) {
       throw new NotFoundException("The indicated file was not found.");
     }
+
     if (fs.lstatSync(localLocation).isDirectory()) {
       throw new ValidationException({
         localLocation: "The indicated file was not correctly found."

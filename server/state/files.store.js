@@ -1,4 +1,5 @@
 const Logger = require("../handlers/logger.js");
+const { ValidationException } = require("../exceptions/runtime.exceptions");
 
 /**
  * Generic store for synchronisation of files and storage information of printers.
@@ -36,9 +37,64 @@ class FilesStore {
     }
   }
 
-  async getFiles(printerId) {
+  /**
+   * Performs an OctoPrint call and updates both cache and database
+   * @param printerId
+   * @param recursive
+   * @returns {Promise<*>}
+   */
+  async eagerLoadPrinterFiles(printerId, recursive) {
+    const printer = this.#printersStore.getPrinterState(printerId);
+    const printerLogin = printer.getLoginDetails();
+    const response = await this.#octoPrintApiService.getFiles(printerLogin, recursive, {
+      unwrap: false,
+      simple: true
+    });
+
+    await this.updatePrinterFiles(printerId, response.data);
+
+    return response;
+  }
+
+  getFiles(printerId) {
     // Might introduce a filter like folder later
     return this.#fileCache.getPrinterFiles(printerId);
+  }
+
+  getOutdatedFiles(printerId, ageDaysMax) {
+    if (!ageDaysMax)
+      throw new ValidationException(
+        "ageDaysMax property is required to get printer's outdated files"
+      );
+    const printerFiles = this.getFiles(printerId);
+    if (!printerFiles?.files?.length) return [];
+    return printerFiles.files.filter((file) => !!file.date && (file.date + ageDaysMax * 86400) < Date.now());
+  }
+
+  async deleteOutdatedFiles(printerId, ageDaysMax) {
+    const failedFiles = [];
+    const succeededFiles = [];
+
+    const nonRecursiveFiles = this.getOutdatedFiles(printerId, ageDaysMax);
+    const printerLogin = this.#printersStore.getPrinterLogin(printerId);
+    const printerName = this.#printersStore.getPrinterState(printerId).getName();
+
+    for (let file of nonRecursiveFiles) {
+      try {
+        await this.#octoPrintApiService.deleteFileOrFolder(printerLogin, file.path);
+        succeededFiles.push(file);
+      } catch (e) {
+        failedFiles.push(file);
+      }
+    }
+
+    this.#logger.info(
+      `Deleted ${succeededFiles.length} successfully and ${failedFiles.length} with failure for printer ${printerName}.`
+    );
+    return {
+      failedFiles,
+      succeededFiles
+    };
   }
 
   async purgePrinterFiles(printerId) {

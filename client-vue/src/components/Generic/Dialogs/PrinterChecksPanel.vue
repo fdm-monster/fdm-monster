@@ -57,7 +57,7 @@ import { TestProgressDetails } from "@/models/sse-messages/printer-sse-message.m
 })
 export default class PrinterChecksPanel extends Vue {
   @Prop() testProgress: TestProgressDetails;
-  @Prop() cols = 4;
+  cols = 4;
 
   isSet(value: boolean) {
     return value === false || value === true;

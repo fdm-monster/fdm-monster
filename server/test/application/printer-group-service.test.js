@@ -2,7 +2,7 @@ const printerGroupModel = require("../../models/PrinterGroup");
 const dbHandler = require("../db-handler");
 const DITokens = require("../../container.tokens");
 const { configureContainer } = require("../../container");
-const { PrinterGroupMockData } = require("./mock-data/printer-group.data");
+const { PrinterGroupMockData } = require("./test-data/printer-group.data");
 
 let printerService;
 let printerGroupService;
@@ -36,7 +36,7 @@ describe("printerGroup ", () => {
     // Prepare the CRUD DTO
     const newPrinterGroup = PrinterGroupMockData.PrinterGroupMock;
     newPrinterGroup.printers.push({
-      location: "top right 123",
+      location: "top right something",
       printerId: createdPrinter._id
     });
 

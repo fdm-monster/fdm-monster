@@ -60,7 +60,8 @@ const DITokens = {
   printerTestTask: "printerTestTask",
   systemCommandsService: "systemCommandsService",
   printerWebsocketTask: "printerWebsocketTask",
-  printerWebsocketPingTask: "printerWebsocketPingTask"
+  printerWebsocketPingTask: "printerWebsocketPingTask",
+  printerFileCleanTask: "printerFileCleanTask"
 };
 
 module.exports = DITokens;

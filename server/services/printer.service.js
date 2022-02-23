@@ -90,7 +90,8 @@ class PrinterService {
       printer.enabled = enabled;
     }
     printer.settingsAppearance.name = settingsAppearance.name;
-    printer.save();
+
+    await printer.save();
 
     return printer;
   }

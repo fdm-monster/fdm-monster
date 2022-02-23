@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row>
-      <v-col cols="12" md="6">
+      <v-col v-if="formData" cols="12" md="6">
         <validation-provider v-slot="{ errors }" :rules="printerNameRules" name="Name">
           <v-text-field
             v-model="formData.printerName"
@@ -30,9 +30,9 @@
             v-model="formData.groups"
             :error-messages="errors"
             :items="printerGroupNames"
-            no-data-text="No groups known"
             label="Groups"
             multiple
+            no-data-text="No groups known"
             required
           ></v-select>
         </validation-provider>
@@ -120,10 +120,9 @@
 </template>
 
 <script lang="ts">
-import Component from "vue-class-component";
-import { ValidationProvider } from "vee-validate";
 import Vue from "vue";
-import { Inject, Prop, Watch } from "vue-property-decorator";
+import { Component, Inject, Prop, Watch } from "vue-property-decorator";
+import { ValidationProvider } from "vee-validate";
 import { AppConstants } from "@/constants/app.constants";
 import {
   getDefaultCreatePrinter,
@@ -138,18 +137,20 @@ const watchedId = "printerId";
 @Component({
   components: {
     ValidationProvider
-  },
-  data: () => ({
-    testProgress: undefined
-  })
+  }
 })
 export default class PrinterCrudForm extends Vue {
   @Inject() readonly appConstants!: AppConstants;
   @Prop() printerId: string;
+  formData?: PreCreatePrinter = getDefaultCreatePrinter();
 
-  apiKeyRules = { required: true, length: this.appConstants.apiKeyLength, alpha_num: true };
-  printerNameRules = { required: true, max: this.appConstants.maxPrinterNameLength };
-  formData: PreCreatePrinter = getDefaultCreatePrinter();
+  public get apiKeyRules() {
+    return { required: true, length: this.appConstants.apiKeyLength, alpha_num: true };
+  }
+
+  public get printerNameRules() {
+    return { required: true, max: this.appConstants.maxPrinterNameLength };
+  }
 
   get printerGroupNames() {
     return printersState.printerGroupNames;

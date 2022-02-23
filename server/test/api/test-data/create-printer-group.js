@@ -7,13 +7,13 @@ async function createTestPrinterGroup(request) {
   const createResponse = await request.post(printerGroupRoute).send({
     name: "Group0_0",
     location: {
-      x: -1,
-      y: -1
+      x: 1,
+      y: 1
     },
     printers: []
   });
   return expectOkResponse(createResponse, {
-    location: { x: -1, y: -1 },
+    location: { x: 1, y: 1 },
     printers: expect.any(Array)
   });
 }

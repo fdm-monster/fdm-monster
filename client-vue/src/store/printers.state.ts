@@ -9,6 +9,7 @@ import { ClearedFilesResult, PrinterFile } from "@/models/printers/printer-file.
 import { PrinterFileBucket } from "@/models/printers/printer-file-bucket.model";
 import { PrinterFileCache } from "@/models/printers/printer-file-cache.model";
 import { PrinterJobService } from "@/backend/printer-job.service";
+import { CreatePrinterGroup } from "@/models/printer-groups/crud/create-printer-group.model";
 
 @Module({
   dynamic: true,
@@ -25,6 +26,7 @@ class PrintersModule extends VuexModule {
   sideNavPrinter?: Printer = undefined;
   updateDialogPrinter?: Printer = undefined;
   createDialogOpened?: boolean = false;
+  createGroupDialogOpened?: boolean = false;
   selectedPrinters: Printer[] = [];
 
   readonly horizontalOffset = 1;
@@ -69,7 +71,9 @@ class PrintersModule extends VuexModule {
 
   get printersWithJob(): Printer[] {
     return this.printers.filter(
-      (p) => p.printerState.flags.printing || p.printerState.flags.printing
+      // If flags are falsy, we can skip the printer => its still connecting
+      (p) =>
+        p.printerState.flags && (p.printerState.flags.printing || p.printerState.flags.printing)
     );
   }
 
@@ -125,6 +129,11 @@ class PrintersModule extends VuexModule {
     }
   }
 
+  @Mutation addPrinterGroup(printerGroup: PrinterGroup) {
+    // No need to sort as `gridSortedPrinterGroups` will fix this on the go
+    this.printerGroups.push(printerGroup);
+  }
+
   @Mutation _resetSelectedPrinters() {
     this.selectedPrinters = [];
   }
@@ -139,6 +148,10 @@ class PrintersModule extends VuexModule {
 
   @Mutation _setCreateDialogOpened(opened: boolean) {
     this.createDialogOpened = opened;
+  }
+
+  @Mutation _setCreateGroupDialogOpened(opened: boolean) {
+    this.createGroupDialogOpened = opened;
   }
 
   @Mutation replacePrinter({ printerId, printer }: { printerId: string; printer: Printer }) {
@@ -318,6 +331,15 @@ class PrintersModule extends VuexModule {
   }
 
   @Action
+  async createPrinterGroup(newPrinterGroup: CreatePrinterGroup) {
+    const data = await PrinterGroupService.createGroup(newPrinterGroup);
+
+    this.addPrinterGroup(data);
+
+    return data;
+  }
+
+  @Action
   async savePrinterGroups(printerGroups: PrinterGroup[]) {
     this.setPrinterGroups(printerGroups);
 
@@ -374,6 +396,11 @@ class PrintersModule extends VuexModule {
   @Action
   setCreateDialogOpened(opened: boolean) {
     this._setCreateDialogOpened(opened);
+  }
+
+  @Action
+  setCreateGroupDialogOpened(opened: boolean) {
+    this._setCreateGroupDialogOpened(opened);
   }
 
   @Action
