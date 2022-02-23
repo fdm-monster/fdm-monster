@@ -7,8 +7,11 @@ let filesStore;
 let printerFilesService;
 let printersStore;
 
-beforeEach(async () => {
+beforeAll(async () => {
   await dbHandler.connect();
+});
+
+beforeEach(async () => {
   if (container) container.dispose();
   container = configureContainer();
   filesStore = container.resolve(DITokens.filesStore);
@@ -46,16 +49,19 @@ describe("filesStore", () => {
 
     await printerFilesService.updateFiles(testPrinterState.id, {
       files: [{
-        date: 1645611270597
+        date: Date.now()
       }]
     });
     await filesStore.loadFilesStore();
 
-    const filesCache = filesStore.getFiles(frozenObject.id);
-    expect(filesCache.fileCount).toBe(1);
+    const filesCache = filesStore.getFiles(testPrinterState.id);
+    expect(filesCache.files.length).toBe(1);
 
-    const oldFiles = filesStore.getOutdatedFiles(frozenObject.id, 7);
+    const oldFiles = filesStore.getOutdatedFiles(testPrinterState.id, 7);
     expect(oldFiles.length).toBe(0);
+    await printerFilesService.updateFiles(testPrinterState.id, {
+      files: []
+    });
   });
 
   it("old files - should filter old files correctly", async () => {
@@ -64,9 +70,9 @@ describe("filesStore", () => {
 
     await printerFilesService.updateFiles(testPrinterState.id, {
       files: [{
-        date: 1645611270597
+        date: Date.now()
       }, {
-        date: 1642929348000
+        date: Date.now() - 8 * 86400
       }]
     });
     await filesStore.loadFilesStore();
