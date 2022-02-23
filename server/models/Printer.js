@@ -45,7 +45,7 @@ const PrinterSchema = new mongoose.Schema({
     type: Number,
     required: false
   },
-  // TODO move out
+  // TODO move out and model better
   fileList: {
     type: Object,
     required: false

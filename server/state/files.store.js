@@ -1,5 +1,5 @@
 const Logger = require("../handlers/logger.js");
-const {ValidationException} = require("../exceptions/runtime.exceptions");
+const { ValidationException } = require("../exceptions/runtime.exceptions");
 
 /**
  * Generic store for synchronisation of files and storage information of printers.
@@ -68,7 +68,7 @@ class FilesStore {
       );
     const printerFiles = this.getFiles(printerId);
     if (!printerFiles?.files?.length) return [];
-    return printerFiles.files.filter((file) => !!file.date && file.date + ageDaysMax < Date.now());
+    return printerFiles.files.filter((file) => !!file.date && (file.date + ageDaysMax * 86400) < Date.now());
   }
 
   async deleteOutdatedFiles(printerId, ageDaysMax) {
