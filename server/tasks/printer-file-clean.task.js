@@ -51,7 +51,6 @@ class PrinterFileCleanTask {
       }
 
       // Filter printer states - cant clean unconnected OctoPrint instances
-
       for (let printer of printers) {
         const outdatedFiles = this.getPrinterOutdatedFiles(printer);
         if (!outdatedFiles?.length) continue;
@@ -64,7 +63,7 @@ class PrinterFileCleanTask {
         }
       }
     } finally {
-      this.#logger.info(`Printer file clean job ended`);
+      this.#logger.info(`Printer old file analysis job ended`);
     }
   }
 
