@@ -59,7 +59,7 @@
     "@nestjs/testing": "8.3.1",
     "@types/bcrypt": "5.0.0",
     "@types/express": "4.17.13",
-    "@types/jest": "27.4.0",
+    "@types/jest": "27.4.1",
     "@types/mongodb": "4.0.7",
     "@types/node": "17.0.18",
     "@types/passport-jwt": "3.0.6",
