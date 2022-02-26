@@ -6,7 +6,8 @@ if (!!majorVersion && majorVersion < 14) {
   // Dont require this in the normal flow (or NODE_ENV can not be fixed before start)
   const { serveNode12Fallback, setupFallbackServer } = require("./server.fallback");
   const server = setupFallbackServer();
-  return serveNode12Fallback(server);
+  serveNode12Fallback(server);
+  process.exit(1);
 }
 
 /**
