@@ -55,7 +55,7 @@ Distributed under GNU Affero General Public License v3.0. See `LICENSE` for more
 
 ## Contact
 - Main repository: [https://github.com/fdm-monster/fdmonster](https://github.com/fdm-monster/fdmonster)
-- Discord: [The Hub](https://discord.gg/pGPjB8Qn)
+- Discord: [The Hub](https://discord.gg/mwA8uP8CMc)
 
 Please join the discord, but stay professional and proactive!
 > "You give some, you take some."
