@@ -5,8 +5,8 @@ const { printerFileCleanSettingKey } = require("../constants/server-settings.con
 const ServerSettingsSchema = new mongoose.Schema({
   onlinePolling: {
     seconds: {
-      type: String,
-      default: "0.5",
+      type: Number,
+      default: 0.5,
       required: true
     }
   },
@@ -123,7 +123,7 @@ const ServerSettingsSchema = new mongoose.Schema({
       type: String
     },
     port: {
-      type: String
+      type: Number
     },
     database: {
       type: String
@@ -137,6 +137,12 @@ const ServerSettingsSchema = new mongoose.Schema({
     retentionPolicy: {
       defaultRet: {
         type: Boolean
+      },
+      duration: {
+        type: String
+      },
+      replication: {
+        type: Number
       }
     }
   }

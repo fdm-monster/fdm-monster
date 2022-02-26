@@ -2,11 +2,8 @@ const dbHandler = require("../db-handler");
 const { AppConstants } = require("../../server.constants");
 const { setupTestApp } = require("../test-server");
 const { expectOkResponse, expectNotFoundResponse } = require("../extensions");
-const { createTestPrinter } = require("./test-data/create-printer");
-const UserModel = require("../../models/Auth/User");
 const { ensureTestUserCreated } = require("./test-data/create-user");
 
-let Model = UserModel;
 const defaultRoute = `${AppConstants.apiRoute}/user`;
 const getRoute = (id) => `${defaultRoute}/${id}`;
 const deleteRoute = (id) => `${defaultRoute}/${id}`;
