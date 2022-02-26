@@ -33,6 +33,5 @@ describe("AppController", () => {
         air_gapped: null
       }
     });
-    expectOkResponse(response);
   });
 });

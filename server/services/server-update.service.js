@@ -99,7 +99,7 @@ class ServerUpdateService {
    * @returns {boolean}
    */
   getUpdateNotificationIfAny() {
-    if (this.#notificationReady === true && airGapped !== true) {
+    if (this.#notificationReady === true && this.#airGapped !== true) {
       const latestReleaseCheckState = this.getLastReleaseSyncState();
       return {
         update_available: true,
