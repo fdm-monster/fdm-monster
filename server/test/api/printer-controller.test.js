@@ -78,13 +78,14 @@ describe("PrinterController", () => {
     expectInvalidResponse(response, ["printerId"], true);
   });
 
-  test.skip(`should be able to DELETE ${deleteRoute} - existing id`, async () => {
+  it(`should be able to DELETE ${deleteRoute} - existing id`, async () => {
     const printer = await createTestPrinter(request);
 
     const res = await request.get(getRoute(printer.id)).send();
     expectOkResponse(res);
 
     const deletionResponse = await request.delete(deleteRoute(printer.id)).send();
+    console.log(deletionResponse);
     expectOkResponse(deletionResponse, expect.anything());
   });
 
