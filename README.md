@@ -62,3 +62,8 @@ Distributed under GNU Affero General Public License v3.0. See `LICENSE` for more
 
 Please join the discord, but stay professional and proactive!
 > "You give some, you take some."
+
+## Historical Note
+
+This project has been forked from OctoFarm at September 2021 when I ended as a contributor to this project. 
+FDM Monster is not intending to compete with OctoFarm, we're just another project with a different vision.
