@@ -1,5 +1,6 @@
 const DITokens = {
   // Values
+  serverVersion: "serverVersion",
   defaultRole: "defaultRole",
   // Instances
   serverHost: "serverHost",

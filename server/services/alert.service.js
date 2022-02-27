@@ -88,21 +88,15 @@ class AlertService {
     return alert;
   }
 
-  /**
-   *
-   * @param printer
-   * @param trigger
-   * @param historyID
-   * @returns {Promise<void>}
-   */
   async check(printer, trigger, historyID) {
-    let currentAlerts = await Alert.find({});
+    let currentAlerts = await this.list();
+
     for (let i = 0; i < currentAlerts.length; i++) {
       if (currentAlerts[i].printer === printer._id || currentAlerts[i].printer.length === 0) {
         if (currentAlerts[i].trigger === trigger && currentAlerts[i].active) {
           let newMessage = await this.convertMessage(printer, currentAlerts[i].message, historyID);
 
-          this.#scriptService.fire(currentAlerts[i].scriptLocation, newMessage);
+          this.#scriptService.execute(currentAlerts[i].scriptLocation, newMessage);
         }
       }
     }
