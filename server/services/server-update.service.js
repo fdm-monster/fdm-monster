@@ -1,7 +1,7 @@
 const { isPm2 } = require("../utils/env.utils.js");
 const { isNodemon } = require("../utils/env.utils.js");
 const { AppConstants } = require("../server.constants");
-const { exec } = require("child_process");
+const { exec, execSync } = require("child_process");
 const {
   InternalServerException,
   ValidationException
@@ -25,11 +25,10 @@ class ServerUpdateService {
     }
 
     if (isPm2()) {
-      await exec(`pm2 restart ${AppConstants.pm2ServiceName}`, { timeout: 5000 });
+      execSync(`pm2 restart ${AppConstants.pm2ServiceName}`, { timeout: 5000 });
       return true;
     } else if (isNodemon()) {
-      const result = await exec("touch ../index.js", { timeout: 5000 });
-      
+      execSync("echo '// Restart file for nodemon' > ./nodemon_restart_trigger.js", { timeout: 5000 });
       return true;
     }
   }
