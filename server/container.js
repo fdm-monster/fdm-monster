@@ -66,14 +66,13 @@ function configureContainer() {
   });
 
   container.register({
-    // -- asValue --
-    serverVersion: asValue(
-      process.env[AppConstants.VERSION_KEY] || AppConstants.defaultServerPageTitle
-    ),
+    // -- asValue/asFunction constants --
     serverPageTitle: asValue(process.env[AppConstants.SERVER_SITE_TITLE_KEY]),
     [DITokens.serverTasks]: asValue(ServerTasks),
     [DITokens.defaultRole]: asValue(ROLES.ADMIN),
-
+    [DITokens.serverVersion]: asFunction(() => {
+      return process.env[AppConstants.VERSION_KEY]
+    }),
     // -- asFunction --
     [DITokens.printerStateFactory]: asFunction(PrinterStateFactory).transient(), // Factory function, transient on purpose!
 
@@ -155,5 +154,5 @@ function configureContainer() {
 }
 
 module.exports = {
-  configureContainer
+    configureContainer
 };

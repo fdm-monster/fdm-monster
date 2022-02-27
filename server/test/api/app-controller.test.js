@@ -30,7 +30,9 @@ describe("AppController", () => {
       isDockerContainer: false,
       isPm2: false,
       update: {
-        air_gapped: null
+        includingPrerelease: false,
+        airGapped: false,
+        updateAvailable: true
       }
     });
   });

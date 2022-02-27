@@ -1,27 +1,37 @@
+const { AppConstants } = require("../../server.constants");
 const { configureContainer } = require("../../container");
 const DITokens = require("../../container.tokens");
 
+let container;
 let service;
+const v1 = "1.0.0";
 
 beforeAll(async () => {
-  const container = configureContainer();
+  container = configureContainer();
   service = container.resolve(DITokens.serverUpdateService);
 });
 
 describe("ServerUpdateService", () => {
+  it("should know process version", () => {
+    expect(process.env[AppConstants.VERSION_KEY]).toEqual(v1);
+    expect(container.resolve(DITokens.serverVersion)).toEqual(v1);
+  });
+
   it("should return github releases", async () => {
     await service.syncLatestRelease(false);
     expect(service.getAirGapped()).toBeFalsy();
-    expect(service.getLastReleaseSyncState()).toMatchObject({
-      // latestReleaseKnown: expect.anything(),
-      // loadedWithPrereleases: expect.anything()
-      lastCheckTimestamp: expect.any(Number),
+    expect(service.getState()).toMatchObject({
+      includingPrerelease: false,
       airGapped: false,
-      lastReleaseCheckFailed: expect.anything()
+      latestRelease: expect.anything(),
+      installedRelease: expect.anything(),
+      serverVersion: v1,
+      installedReleaseFound: true,
+      updateAvailable: true
     });
   });
 
   it("should log server update", async () => {
-    await service.checkReleaseAndLogUpdate();
+    await service.logServerVersionState();
   });
 });

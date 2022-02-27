@@ -6,9 +6,8 @@ class SoftwareUpdateTask {
   }
 
   async run() {
-    await this.#serverUpdateService.syncLatestRelease(false).then(() => {
-      this.#serverUpdateService.checkReleaseAndLogUpdate();
-    });
+    await this.#serverUpdateService.syncLatestRelease(false);
+    this.#serverUpdateService.logServerVersionState();
   }
 }
 
