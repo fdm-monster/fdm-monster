@@ -45,6 +45,7 @@ class AppController {
       isPm2: isPm2(),
       os: process.env.OS,
       update: {
+        synced: updateState.synced,
         updateAvailable: updateState.updateAvailable,
         includingPrerelease: updateState.includingPrerelease,
         airGapped: updateState.airGapped

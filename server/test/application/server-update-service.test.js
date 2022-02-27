@@ -27,7 +27,8 @@ describe("ServerUpdateService", () => {
       installedRelease: expect.anything(),
       serverVersion: v1,
       installedReleaseFound: true,
-      updateAvailable: true
+      updateAvailable: true,
+      synced: true
     });
   });
 

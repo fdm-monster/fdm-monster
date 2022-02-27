@@ -2,7 +2,11 @@ const dbHandler = require("../db-handler");
 const { AppConstants } = require("../../server.constants");
 const { setupTestApp } = require("../test-server");
 const { expectOkResponse } = require("../extensions");
+const DITokens = require("../../container.tokens");
 
+let container;
+let updateService;
+let mockedHttpClient;
 let request;
 
 const welcomeRoute = AppConstants.apiRoute;
@@ -11,7 +15,9 @@ const versionRoute = `${welcomeRoute}/version`;
 
 beforeAll(async () => {
   await dbHandler.connect();
-  ({ request } = await setupTestApp(true));
+  ({ request, container } = await setupTestApp(true));
+  updateService = container.resolve(DITokens.serverUpdateService);
+  mockedHttpClient = container.resolve(DITokens.httpClient);
 });
 
 describe("AppController", () => {
@@ -24,15 +30,51 @@ describe("AppController", () => {
     expectOkResponse(response);
   });
 
-  it("should return version", async function () {
+  it("should return unsynced state response", async function () {
     const response = await request.get(versionRoute).send();
     expectOkResponse(response, {
       isDockerContainer: false,
       isPm2: false,
       update: {
+        synced: false,
+        includingPrerelease: null,
+        airGapped: null,
+        updateAvailable: null
+      }
+    });
+  });
+
+  it("should return airGapped response", async function () {
+    await updateService.syncLatestRelease(false);
+
+    const response = await request.get(versionRoute).send();
+    expectOkResponse(response, {
+      isDockerContainer: false,
+      isPm2: false,
+      update: {
+        synced: true,
+        includingPrerelease: false,
+        airGapped: true, // AxiosMock causes this
+        updateAvailable: null
+      }
+    });
+  });
+
+  it("should return update-to-date response", async function () {
+    const githubReleasesResponse = require("./test-data/github-releases.data.json");
+    mockedHttpClient.saveMockResponse(githubReleasesResponse,200);
+
+    await updateService.syncLatestRelease(false);
+
+    const response = await request.get(versionRoute).send();
+    expectOkResponse(response, {
+      isDockerContainer: false,
+      isPm2: false,
+      update: {
+        synced: true,
         includingPrerelease: false,
         airGapped: false,
-        updateAvailable: true
+        updateAvailable: false // package.json is respected
       }
     });
   });

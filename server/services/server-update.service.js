@@ -2,6 +2,7 @@ const Logger = require("../handlers/logger.js");
 const semver = require("semver");
 
 class ServerUpdateService {
+  #synced = false;
   #includingPrerelease = null; // env bool
   #airGapped = null; // Connection error
   #installedReleaseFound = null;
@@ -27,7 +28,8 @@ class ServerUpdateService {
       installedRelease: this.#installedRelease,
       serverVersion: this.#serverVersion,
       installedReleaseFound: this.#installedReleaseFound,
-      updateAvailable: this.#updateAvailable
+      updateAvailable: this.#updateAvailable,
+      synced: this.#synced
     };
   }
 
@@ -36,13 +38,13 @@ class ServerUpdateService {
   }
 
   #filterPreReleases(releases, includePrereleases = false) {
-    return releases.filter(
+    return releases?.filter(
       (r) => (r.draft === false && r.prerelease === false) || includePrereleases
     );
   }
 
   #findLatestRelease(releases) {
-    return releases.reduce((a, b) => {
+    return releases?.reduce((a, b) => {
       return new Date(a.created_at) > new Date(b.created_at) ? a : b;
     });
   }
@@ -50,7 +52,7 @@ class ServerUpdateService {
   #findReleaseByTag(releases, tagName) {
     if (!tagName) return null;
 
-    return releases.find((r) => r.tag_name?.replace("v", "") === tagName);
+    return releases?.find((r) => r.tag_name?.replace("v", "") === tagName);
   }
 
   #transformGithubRelease(release) {
@@ -67,6 +69,8 @@ class ServerUpdateService {
   async syncLatestRelease(includePrereleases = false) {
     const allGithubReleases = await this.#githubApiService.getGithubReleases();
     const githubReleases = this.#filterPreReleases(allGithubReleases, includePrereleases);
+
+    this.#synced = true;
 
     // Connection timeout results in airGapped state
     this.#airGapped = !allGithubReleases;
