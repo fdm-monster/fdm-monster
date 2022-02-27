@@ -6,7 +6,7 @@ const { isNodemon, isNode, isPm2 } = require("../utils/env.utils");
 const { authenticate, withPermission } = require("../middleware/authenticate");
 const { PERMS } = require("../constants/authorization.constants");
 
-class AppController {
+class ServerPublicController {
   #serverVersion;
   #settingsStore;
   #printersStore;
@@ -55,7 +55,7 @@ class AppController {
 }
 
 // prettier-ignore
-module.exports = createController(AppController)
+module.exports = createController(ServerPublicController)
     .prefix(AppConstants.apiRoute + "/")
     .before([authenticate()])
     .get("", "welcome")

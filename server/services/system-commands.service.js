@@ -13,51 +13,28 @@ const {
   checkIfWereInAGitRepo,
   makeSureBranchIsUpToDateWithRemote
 } = require("../utils/git.utils.js");
+const {AppConstants} = require("../server.constants");
+const {InternalServerException} = require("../exceptions/runtime.exceptions");
 
 class SystemCommandsService {
   constructor() {}
 
   async restartServer() {
-    let checkForNamedService = false;
+    if (!isPm2() && !isNodemon()) {
+        // No deamon/overlay to trigger
+        throw new InternalServerException("Restart requested, but no daemon was available to perform this action");
+    }
 
-    // If we're on pm2, then restart buddy!
     if (isPm2()) {
-      try {
-        let doesFunctionExist = await lookpath("pm2");
-
-        if (doesFunctionExist) {
-          setTimeout(async () => {
-            await exec("pm2 restart FDM");
-          }, 5000);
-
-          checkForNamedService = true;
-        }
-      } catch (e) {
-        throw "Error with pm2 restart command: " + e;
-      }
+    await exec(`pm2 restart ${AppConstants.pm2ServiceName}`, {timeout: 5000});
+    return true;
     }
 
-    if (isNodemon()) {
-      try {
-        let doesFunctionExist = await lookpath("touch");
-
-        if (doesFunctionExist) {
-          setTimeout(async () => {
-            await exec("touch ./app.js");
-          }, 5000);
-
-          checkForNamedService = true;
-        }
-      } catch (e) {
-        throw "Error with nodemon restart command: " + e;
-      }
-    }
-
-    return checkForNamedService;
+    await exec("touch ./app.js");
+    return true;
   }
 
-  // This will need changing when .deb / installation script becomes a thing. It's built to deal with the current implementation.
-  async checkServerUpdate(clientResponse, force) {
+  async checkServerUpdate(force) {
     // Check to see if current dir contains a git folder... hard fail otherwise.
     let isThisAGitRepo = await checkIfWereInAGitRepo();
     if (!isThisAGitRepo) {
