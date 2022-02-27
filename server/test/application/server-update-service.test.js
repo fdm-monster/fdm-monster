@@ -1,6 +1,7 @@
 jest.mock("child_process", () => {
   return {
-    exec: () => Promise.resolve()
+    exec: () => Promise.resolve(),
+    execSync: () => Promise.resolve(),
   };
 });
 jest.mock("simple-git");
@@ -10,7 +11,7 @@ const mockedSimpleGit = SimpleGit();
 const { configureContainer } = require("../../container");
 const DITokens = require("../../container.tokens");
 
-describe("ServerCommandsService", () => {
+describe("ServerUpdateService", () => {
   let container;
   let serverUpdateService;
 

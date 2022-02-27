@@ -60,7 +60,7 @@ function ensureEnvNpmVersionSet() {
 
     if (process.env[AppConstants.VERSION_KEY] !== packageJsonVersion) {
         process.env[AppConstants.VERSION_KEY] = packageJsonVersion;
-        logger.warning(
+        logger.debug(
             `~ Had to synchronize FDM version to '${packageJsonVersion}' as it was outdated.`
         );
     }

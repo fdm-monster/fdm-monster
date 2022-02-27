@@ -1,7 +1,7 @@
 const { isPm2 } = require("../utils/env.utils.js");
 const { isNodemon } = require("../utils/env.utils.js");
 const { AppConstants } = require("../server.constants");
-const { exec, execSync } = require("child_process");
+const { execSync } = require("child_process");
 const {
   InternalServerException,
   ValidationException
