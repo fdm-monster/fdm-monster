@@ -2,6 +2,9 @@ module.exports = {
   testEnvironment: "node",
   testTimeout: 5000,
   modulePathIgnorePatterns: [
+    "index.js",
+    "migrate-mongo-config.js",
+    ".eslintrc.js",
     "assets",
     "coverage",
     "docker",
@@ -13,8 +16,5 @@ module.exports = {
   globalSetup: "./test/setup-global.js",
   setupFilesAfterEnv: ["./test/setup-after-env.js"],
   collectCoverageFrom: ["**/*.js"],
-  coveragePathIgnorePatterns: [
-      "node_modules",
-      "test"
-  ]
+  coveragePathIgnorePatterns: ["node_modules", "test"]
 };

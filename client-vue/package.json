@@ -1,8 +1,9 @@
 {
   "name": "@fdm-monster/client",
   "author": "David Zwart",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "private": false,
+  "license": "AGPLv3",
   "repository": {
     "type": "git",
     "url": "https://github.com/fdm-monster/fdm-monster"
@@ -18,7 +19,7 @@
   "dependencies": {
     "axios": "0.26.0",
     "core-js": "3.21.1",
-    "luxon": "2.3.0",
+    "luxon": "2.3.1",
     "register-service-worker": "1.7.2",
     "validator": "13.7.0",
     "vee-validate": "3.4.14",
@@ -52,16 +53,16 @@
     "@vue/eslint-config-prettier": "7.0.0",
     "@vue/eslint-config-typescript": "10.0.0",
     "@vue/test-utils": "1.3.0",
-    "eslint": "8.9.0",
+    "eslint": "8.10.0",
     "eslint-plugin-prettier": "4.0.0",
     "eslint-plugin-vue": "8.5.0",
     "prettier": "2.5.1",
     "rimraf": "3.0.2",
-    "sass": "1.49.8",
+    "sass": "1.49.9",
     "sass-loader": "12.6.0",
     "typescript": "4.5.5",
-    "webpack": "5.55.1",
-    "vue-cli-plugin-vuetify": "2.4.5",
+    "webpack": "5.56.1",
+    "vue-cli-plugin-vuetify": "2.4.6",
     "vue-template-compiler": "2.6.14",
     "vuetify-loader": "1.7.3"
   }

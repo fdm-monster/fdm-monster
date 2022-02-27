@@ -1,4 +1,4 @@
-# FDM Monster [![GitHub stars](https://img.shields.io/github/stars/fdm-monster/fdmonster)](https://github.com/fdm-monster/fdmonster/stargazers) ![GitHub issues](https://img.shields.io/github/issues/fdm-monster/fdmonster?color=green) [![GitHub forks](https://img.shields.io/github/forks/fdm-monster/fdmonster)](https://github.com/fdm-monster/fdmonster/network) [![Latest Release](https://img.shields.io/github/release/fdm-monster/fdmonster)](https://img.shields.io/github/v/tag/fdm-monster/fdmonster?sort=date) ![Coverage](https://img.shields.io/codecov/c/github/fdm-monster/fdmonster?color=green)
+# FDM Monster [![GitHub stars](https://img.shields.io/github/stars/fdm-monster/fdmonster)](https://github.com/fdm-monster/fdmonster/stargazers) ![GitHub issues](https://img.shields.io/github/issues/fdm-monster/fdmonster?color=green) [![GitHub forks](https://img.shields.io/github/forks/fdm-monster/fdmonster)](https://github.com/fdm-monster/fdmonster/network) [![Latest Release](https://img.shields.io/github/release/fdm-monster/fdmonster)](https://img.shields.io/github/v/tag/fdm-monster/fdmonster?sort=date) ![Coverage](https://img.shields.io/codecov/c/github/fdm-monster/fdm-monster?color=green)
 
 **_The server for managing 3D printers with great overview_**
 
@@ -16,12 +16,14 @@ We dont aim to provide webcam support right now as this is one of the big bottle
 
 This server is currently freshly released, so give it a star ⭐and be the first to experience it! 
 
-#### Last finished features: printer group, setting and location management
-#### Current work: auto-clean OctoPrint files with different settings
+#### Last finished features: auto-clean OctoPrint files with different settings
+#### Current work: safe and robust server update mechanism using git releases
 
 ## Development [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://gitHub.com/fdm-monster/fdmonster/graphs/commit-activity) ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/fdm-monster/fdmonster/Node.js%20CI/development) [![GitHub license](https://img.shields.io/github/license/fdm-monster/fdmonster)](https://github.com/fdm-monster/fdmonster/blob/master/LICENSE.txt)
+This work is under active development with cutting edge tech and open-source standards. 
 
-This work is under active development with cutting edge tech and standards. Feel like joining in? Your options are to create a pull-request, send an email, or open a discussion!
+Have you spotted something wrong or do you have ideas for improvement? Please do create an issue, create a pull-request, send an email, or open a discussion!
+Feel like joining in as a developer or do you have a quick fix? Great! Please read the [CONTRIBUTING.md](CONTRIBUTING.md) file.
 
 ## Roadmap
 
@@ -35,9 +37,10 @@ This work is under active development with cutting edge tech and standards. Feel
 - [x] :rocket: Printer Group management
 - [x] 🛡️ MongoDB 5 support
 - [x] :rocket: First core release tested in the field
+- [x] Server restart capability using PM2 and nodemon (for Linux, Windows)
 - [ ] 🛡️ NodeJS Server legacy-free (history, alerts, custom gcode and filament)
 - [ ] 🛡️ Frontend user and basic role management
-- [ ] 🛡️ Full API and client test coverage >80% (now at 60%) 
+- [ ] 🛡️ Full API and client test coverage >80% (now at 67%) 
 - [ ] 🔌 FDM Connector - filament tracker 
 - [ ] 🔌 Raspberry Pi image and prebuilt customized OctoPi image
 - [ ] :rocket: Chocolatey package (Windows install)
@@ -55,7 +58,7 @@ Distributed under GNU Affero General Public License v3.0. See `LICENSE` for more
 
 ## Contact
 - Main repository: [https://github.com/fdm-monster/fdmonster](https://github.com/fdm-monster/fdmonster)
-- Discord: [The Hub](https://discord.gg/pGPjB8Qn)
+- Discord: [The Hub](https://discord.gg/mwA8uP8CMc)
 
 Please join the discord, but stay professional and proactive!
 > "You give some, you take some."

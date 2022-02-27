@@ -5,7 +5,6 @@ const { AppConstants } = require("../server.constants");
 const { ROLES } = require("../constants/authorization.constants");
 
 class SettingsController {
-  #logger = new Logger("Server-API");
   #settingsStore;
 
   constructor({ settingsStore }) {

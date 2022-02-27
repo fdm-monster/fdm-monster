@@ -1,10 +1,12 @@
 const DITokens = {
   // Values
+  serverVersion: "serverVersion",
   defaultRole: "defaultRole",
   // Instances
   serverHost: "serverHost",
   loggerFactory: "loggerFactory",
   httpClient: "httpClient",
+  simpleGitService: "simpleGitService",
   multerService: "multerService",
   taskManagerService: "taskManagerService",
   toadScheduler: "toadScheduler",
@@ -12,6 +14,7 @@ const DITokens = {
   printerService: "printerService",
   printerGroupService: "printerGroupService",
   serverSettingsService: "serverSettingsService",
+  serverReleaseService: "serverReleaseService",
   serverUpdateService: "serverUpdateService",
   clientSettingsService: "clientSettingsService",
   githubApiService: "githubApiService",
@@ -58,7 +61,6 @@ const DITokens = {
   printerSseTask: "printerSseTask",
   printerSseHandler: "printerSseHandler",
   printerTestTask: "printerTestTask",
-  systemCommandsService: "systemCommandsService",
   printerWebsocketTask: "printerWebsocketTask",
   printerWebsocketPingTask: "printerWebsocketPingTask",
   printerFileCleanTask: "printerFileCleanTask"

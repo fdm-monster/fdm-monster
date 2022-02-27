@@ -6,12 +6,12 @@ const PrintersStore = require("./state/printers.store");
 const SettingsStore = require("./state/settings.store");
 const ServerSettingsService = require("./services/server-settings.service");
 const ClientSettingsService = require("./services/client-settings.service");
-const ServerUpdateService = require("./services/server-update.service");
+const ServerReleaseService = require("./services/server-release.service");
 const InfluxDbSetupService = require("./services/influx/influx-db-setup.service");
 const ScriptService = require("./services/script.service");
 const TaskManagerService = require("./services/task-manager.service");
 const SystemInfoStore = require("./state/system-info.store");
-const SystemCommandsService = require("./services/system-commands.service");
+const ServerUpdateService = require("./services/server-update.service");
 const SystemInfoBundleService = require("./services/system-info-bundle.service");
 const GithubApiService = require("./services/github-api.service");
 const HistoryService = require("./services/history.service");
@@ -52,6 +52,7 @@ const PrinterProfilesCache = require("./state/data/printer-profiles.cache");
 const UserService = require("./services/authentication/user.service");
 const RoleService = require("./services/authentication/role.service");
 const { ToadScheduler } = require("toad-scheduler");
+const SimpleGitFactory = require("simple-git");
 const { ServerTasks } = require("./tasks");
 const PermissionService = require("./services/authentication/permission.service");
 const PrinterFileCleanTask = require("./tasks/printer-file-clean.task");
@@ -66,14 +67,13 @@ function configureContainer() {
   });
 
   container.register({
-    // -- asValue --
-    serverVersion: asValue(
-      process.env[AppConstants.VERSION_KEY] || AppConstants.defaultServerPageTitle
-    ),
+    // -- asValue/asFunction constants --
     serverPageTitle: asValue(process.env[AppConstants.SERVER_SITE_TITLE_KEY]),
     [DITokens.serverTasks]: asValue(ServerTasks),
     [DITokens.defaultRole]: asValue(ROLES.ADMIN),
-
+    [DITokens.serverVersion]: asFunction(() => {
+      return process.env[AppConstants.VERSION_KEY]
+    }),
     // -- asFunction --
     [DITokens.printerStateFactory]: asFunction(PrinterStateFactory).transient(), // Factory function, transient on purpose!
 
@@ -90,12 +90,13 @@ function configureContainer() {
     [DITokens.taskManagerService]: asClass(TaskManagerService).singleton(),
     [DITokens.toadScheduler]: asClass(ToadScheduler).singleton(),
     [DITokens.eventEmitter2]: asFunction(configureEventEmitter).singleton(),
+    [DITokens.serverReleaseService]: asClass(ServerReleaseService).singleton(),
     [DITokens.serverUpdateService]: asClass(ServerUpdateService).singleton(),
     [DITokens.systemInfoStore]: asClass(SystemInfoStore).singleton(),
     [DITokens.githubApiService]: asClass(GithubApiService),
     [DITokens.autoDiscoveryService]: asClass(AutoDiscoveryService),
-    [DITokens.systemCommandsService]: asClass(SystemCommandsService),
     [DITokens.systemInfoBundleService]: asClass(SystemInfoBundleService),
+    [DITokens.simpleGitService]: asValue(SimpleGitFactory()),
     [DITokens.httpClient]: asValue(
       axios.create({
         maxBodyLength: 1000 * 1000 * 1000, // 1GB
@@ -155,5 +156,5 @@ function configureContainer() {
 }
 
 module.exports = {
-  configureContainer
+    configureContainer
 };

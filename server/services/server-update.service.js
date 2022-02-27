@@ -1,171 +1,76 @@
-const Logger = require("../handlers/logger.js");
+const { isPm2 } = require("../utils/env.utils.js");
+const { isNodemon } = require("../utils/env.utils.js");
+const { AppConstants } = require("../server.constants");
+const { execSync } = require("child_process");
+const {
+  InternalServerException,
+  ValidationException
+} = require("../exceptions/runtime.exceptions");
 
 class ServerUpdateService {
-  #lastCheckTimestamp = null;
-  #latestReleaseKnown = null;
-  #lastReleaseCheckFailed = null;
-  #lastReleaseCheckError = null;
-  #airGapped = null;
-  #loadedWithPrereleases = null;
-  #installedReleaseFound = null;
-  #notificationReady = false;
+  #gitService;
+  #logger;
 
-  #logger = new Logger("Server-SoftwareUpdateChecker");
-
-  // Resolved
-  #serverVersion;
-  #githubApiService;
-
-  constructor({ serverVersion, githubApiService }) {
-    this.#serverVersion = serverVersion;
-    this.#githubApiService = githubApiService;
+  constructor({ simpleGitService, loggerFactory }) {
+    this.#gitService = simpleGitService;
+    this.#logger = loggerFactory("ServerUpdateService");
   }
 
-  static filterGithubReleases(releases, prerelease_only = false, tag_name = null) {
-    return releases.find(
-      (r) =>
-        r.draft === false &&
-        (tag_name ? r.tag_name?.replace("v","") === tag_name : true) &&
-        (r.prerelease === false || prerelease_only)
-    );
-  }
-
-  /**
-   * Connection-safe acquire data about the installed and latest released FDM versions.
-   * @param includePre
-   * @returns {Promise<*|null>}
-   */
-  async syncLatestRelease(includePre = false) {
-    const githubReleases = await this.#githubApiService.getGithubReleases();
-
-    this.#airGapped = !githubReleases;
-    if (!githubReleases) {
-      return;
-    }
-
-    if (githubReleases?.length > 0) {
-      const latestRelease = ServerUpdateService.filterGithubReleases(githubReleases, includePre);
-      // Whether the package version exists at all - developer at work if not!
-      this.#installedReleaseFound = !!ServerUpdateService.filterGithubReleases(
-        githubReleases,
-        includePre,
-        this.#serverVersion
+  async restartServer() {
+    if (!isPm2() && !isNodemon()) {
+      // No daemon/overlay to trigger restart
+      throw new InternalServerException(
+        "Restart requested, but no daemon was available to perform this action"
       );
+    }
 
-      this.#lastCheckTimestamp = Date.now();
-      if (!!latestRelease && !!latestRelease?.tag_name) {
-        delete latestRelease.body;
-        delete latestRelease.author;
-        this.#loadedWithPrereleases = includePre;
-        this.#lastReleaseCheckFailed = false;
-        this.#latestReleaseKnown = latestRelease;
-        this.#notificationReady =
-          latestRelease.tag_name !== this.#serverVersion && !!this.#installedReleaseFound;
-      } else if (!latestRelease?.tag_name) {
-        // Falsy tag_name is very unlikely - probably tests only
-        this.#lastReleaseCheckFailed = false;
-        this.#notificationReady = false;
-      } else {
-        console.log("Latest release check failed because latestRelease not set");
-        this.#lastReleaseCheckFailed = true;
-      }
-    } else {
-      console.log("Latest release check failed because releases from github empty");
-      this.#lastReleaseCheckFailed = true;
+    if (isPm2()) {
+      execSync(`pm2 restart ${AppConstants.pm2ServiceName}`, { timeout: 5000 });
+      return true;
+    } else if (isNodemon()) {
+      execSync("echo '// Restart file for nodemon' > ./nodemon_restart_trigger.js", { timeout: 5000 });
+      return true;
     }
   }
 
-  /**
-   * Get state of this runner
-   * @returns {{airGapped: null, lastReleaseCheckFailed: null, loadedWithPrereleases: null, lastCheckTimestamp: null, latestReleaseKnown: null}}
-   */
-  getLastReleaseSyncState() {
-    return {
-      latestReleaseKnown: this.#latestReleaseKnown,
-      lastCheckTimestamp: this.#lastCheckTimestamp,
-      lastReleaseCheckFailed: this.#lastReleaseCheckFailed,
-      loadedWithPrereleases: this.#loadedWithPrereleases,
-      airGapped: this.#airGapped,
-      ...(this.#lastReleaseCheckFailed && { lastReleaseCheckError: this.#lastReleaseCheckError })
+  async checkGitUpdates() {
+    let isValidGitRepo = this.#gitService.checkIsRepo();
+    if (!isValidGitRepo) {
+      throw new ValidationException(
+        "Server update could not proceed as the server had no .git repository folder"
+      );
+    }
+
+    await this.#gitService.fetch();
+    const localRepoStatus = await this.#gitService.status();
+
+    if (!localRepoStatus) return;
+
+    const result = {
+      gitFolderFound: true,
+      updateCheckSuccess: true,
+      commitsBehind: localRepoStatus.behind,
+      commitsAhead: localRepoStatus.ahead,
+      filesModified: localRepoStatus.modified?.length
     };
-  }
 
-  getAirGapped() {
-    return this.#airGapped;
-  }
-
-  /**
-   * Returns a notification message ready to be alerted on frontend, but does not fail without such information.
-   * @returns {boolean}
-   */
-  getUpdateNotificationIfAny() {
-    if (this.#notificationReady === true && airGapped !== true) {
-      const latestReleaseCheckState = this.getLastReleaseSyncState();
-      return {
-        update_available: true,
-        installed_release_found: this.#installedReleaseFound,
-        message:
-          "You can update FDM Server to the latest version available: " +
-          latestReleaseCheckState.latestReleaseKnown.tag_name,
-        current_version: this.#serverVersion,
-        ...latestReleaseCheckState
-      };
-    } else {
-      return {
-        update_available: false,
-        installed_release_found: this.#installedReleaseFound,
-        air_gapped: this.#airGapped,
-        current_version: this.#serverVersion
-      };
-    }
-  }
-
-  /**
-   * Logs whether a firmware update is ready
-   */
-  checkReleaseAndLogUpdate() {
-    if (!!this.#lastReleaseCheckFailed) {
-      this.#logger.error(
-        "Cant check release as it was not fetched yet or the last fetch failed. Call and await 'syncLatestRelease' first."
-      );
-      return;
-    }
-    const latestRelease = this.getLastReleaseSyncState().latestReleaseKnown;
-    const latestReleaseTag = latestRelease.tag_name?.replace("v", "");
-    if (!latestReleaseTag?.tag_name) {
-      // Tests only, silence it
-      return;
+    if (localRepoStatus?.behind === 0) {
+      result.status = "No commits to pull";
+      return result;
     }
 
-    const packageVersion = this.#serverVersion;
-
-    if (!this.#installedReleaseFound) {
-      this.#logger.info(
-        `\x1b[36mVersion not detected as release.\x1b[0m
-    Here's github's latest released: \x1b[32m${latestReleaseTag}\x1b[0m
-    Here's your release tag: \x1b[32mv${packageVersion}\x1b[0m
-    Thanks for using FDM Monster!`
-      );
-      return;
+    // Either something was not ignored properly or we are in unstable/dev mode
+    if (localRepoStatus?.modified?.length > 0 || localRepoStatus.ahead !== 0) {
+      result.status = "Files were modified or the repo was commits ahead - cannot pull safely";
+      return result;
     }
 
-    if (!!packageVersion && packageVersion !== latestReleaseTag) {
-      if (!!this.#airGapped) {
-        this.#logger.warning(
-          `Installed release: ${packageVersion}. Skipping update check (air-gapped/disconnected from internet)`
-        );
-      } else {
-        this.#logger.info(
-          `Update available! New version: ${latestReleaseTag} (prerelease: ${latestRelease.prerelease})`
-        );
-      }
-    } else if (!packageVersion) {
-      return this.#logger.error(
-        "Cant check release as package.json version environment variable is not set. Make sure FDM Server is run from a 'package.json' or NPM context."
-      );
-    } else {
-      return this.#logger.debug(`Installed release: ${packageVersion}. You are up to date!`);
-    }
+    this.#logger.warning("Pulling git to get the latest FDM-Monster server updates");
+
+    const pullDetails = await this.#gitService.pull();
+    result.status = "Pull action completed";
+    result.pullStatus = pullDetails;
+    return result;
   }
 }
 

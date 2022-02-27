@@ -60,7 +60,7 @@ function ensureEnvNpmVersionSet() {
 
     if (process.env[AppConstants.VERSION_KEY] !== packageJsonVersion) {
         process.env[AppConstants.VERSION_KEY] = packageJsonVersion;
-        logger.warning(
+        logger.debug(
             `~ Had to synchronize FDM version to '${packageJsonVersion}' as it was outdated.`
         );
     }
@@ -93,7 +93,7 @@ function printInstructionsURL() {
 
 function fetchMongoDBConnectionString(persistToEnv = false) {
     if (!process.env[AppConstants.MONGO_KEY]) {
-        logger.warning(
+        logger.debug(
             `~ ${AppConstants.MONGO_KEY} environment variable is not set. Assuming default: ${AppConstants.MONGO_KEY}=${AppConstants.defaultMongoStringUnauthenticated}`
         );
         printInstructionsURL();

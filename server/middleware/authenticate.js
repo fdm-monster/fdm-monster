@@ -30,15 +30,14 @@ module.exports = {
 
       throw new AuthenticationError("Not authenticated", 401);
     }),
-  authorizeRoles(roles, subset = true) {
-    return inject(({ roleService }) => async (req, res, next) => {
+  authorizeRoles: (roles, subset = true) =>
+    inject(({ roleService }) => async (req, res, next) => {
       if (!roleService.authorizeRoles(roles, req.roles, subset)) {
         throw new AuthorizationError(roles);
       }
 
       next();
-    });
-  },
+    }),
   authorizePermission,
   withPermission(permission) {
     return {

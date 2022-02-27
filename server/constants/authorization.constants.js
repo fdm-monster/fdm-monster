@@ -8,7 +8,8 @@ const PERM_GROUP = {
   Alerts: "Alerts",
   PrinterFiles: "PrinterFiles",
   PrinterSettings: "PrinterSettings",
-  PrinterGroups: "PrinterGroups"
+  PrinterGroups: "PrinterGroups",
+  ServerInfo: "ServerInfo"
 };
 
 const PERMS = {
@@ -34,6 +35,10 @@ const PERMS = {
   PrinterSettings: {
     Default: serializePerm(PERM_GROUP.PrinterSettings, "Default"),
     Get: serializePerm(PERM_GROUP.PrinterSettings, "Get")
+  },
+  ServerInfo: {
+    Default: serializePerm(PERM_GROUP.ServerInfo, "Default"),
+    Get: serializePerm(PERM_GROUP.ServerInfo, "Get")
   }
 };
 
@@ -64,7 +69,8 @@ const ROLE_PERMS = {
     allPerms(PERM_GROUP.Alerts),
     allPerms(PERM_GROUP.PrinterFiles),
     allPerms(PERM_GROUP.PrinterGroups),
-    allPerms(PERM_GROUP.PrinterSettings)
+    allPerms(PERM_GROUP.PrinterSettings),
+    allPerms(PERM_GROUP.ServerInfo)
   ),
   [ROLES.OPERATOR]: union(allPerms(PERM_GROUP.PrinterFiles), allPerms(PERM_GROUP.PrinterGroups)),
   [ROLES.GUEST]: [PERMS.PrinterFiles.Default, PERMS.PrinterFiles.Upload, PERMS.PrinterGroups.List]

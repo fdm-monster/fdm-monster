@@ -85,6 +85,7 @@ describe("PrinterController", () => {
     expectOkResponse(res);
 
     const deletionResponse = await request.delete(deleteRoute(printer.id)).send();
+    console.log(deletionResponse);
     expectOkResponse(deletionResponse, expect.anything());
   });
 
