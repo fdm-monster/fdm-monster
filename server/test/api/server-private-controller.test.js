@@ -1,11 +1,13 @@
 const dbHandler = require("../db-handler");
 const { setupTestApp } = require("../test-server");
-const { expectOkResponse } = require("../extensions");
+const { expectOkResponse, expectInternalServerError} = require("../extensions");
 const { AppConstants } = require("../../server.constants");
 
 let request;
 
 const defaultRoute = `${AppConstants.apiRoute}/server`;
+const gitUpdateRoute = `${defaultRoute}/git-update`;
+const restartRoute = `${defaultRoute}/restart`;
 
 beforeAll(async () => {
   await dbHandler.connect();
@@ -27,5 +29,15 @@ describe("ServerPrivateController", () => {
       updateAvailable: null,
       synced: true
     });
+  });
+
+  it("should pull git updates", async function () {
+    const response = await request.post(gitUpdateRoute).send();
+    expectOkResponse(response);
+  });
+
+  it("should skip server restart - no daemon error", async function () {
+    const response = await request.post(restartRoute).send();
+    expectInternalServerError(response);
   });
 });

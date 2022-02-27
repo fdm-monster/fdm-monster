@@ -28,7 +28,8 @@ class ServerUpdateService {
       await exec(`pm2 restart ${AppConstants.pm2ServiceName}`, { timeout: 5000 });
       return true;
     } else if (isNodemon()) {
-      await exec("touch ../index.js", { timeout: 5000 });
+      const result = await exec("touch ../index.js", { timeout: 5000 });
+      
       return true;
     }
   }
@@ -44,6 +45,8 @@ class ServerUpdateService {
     await this.#gitService.fetch();
     const localRepoStatus = await this.#gitService.status();
 
+    if (!localRepoStatus) return;
+
     const result = {
       gitFolderFound: true,
       updateCheckSuccess: true,
@@ -52,13 +55,13 @@ class ServerUpdateService {
       filesModified: localRepoStatus.modified?.length
     };
 
-    if (localRepoStatus.behind === 0) {
+    if (localRepoStatus?.behind === 0) {
       result.status = "No commits to pull";
       return result;
     }
 
     // Either something was not ignored properly or we are in unstable/dev mode
-    if (localRepoStatus.modified?.length > 0 || localRepoStatus.ahead !== 0) {
+    if (localRepoStatus?.modified?.length > 0 || localRepoStatus.ahead !== 0) {
       result.status = "Files were modified or the repo was commits ahead - cannot pull safely";
       return result;
     }
