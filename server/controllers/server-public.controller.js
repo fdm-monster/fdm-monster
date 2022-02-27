@@ -6,17 +6,17 @@ const { isNodemon, isNode, isPm2 } = require("../utils/env.utils");
 const { authenticate, withPermission } = require("../middleware/authenticate");
 const { PERMS } = require("../constants/authorization.constants");
 
-class AppController {
+class ServerPublicController {
   #serverVersion;
   #settingsStore;
   #printersStore;
-  #serverUpdateService;
+  #serverReleaseService;
 
-  constructor({ settingsStore, printersStore, serverVersion, serverUpdateService }) {
+  constructor({ settingsStore, printersStore, serverVersion, serverReleaseService }) {
     this.#settingsStore = settingsStore;
     this.#serverVersion = serverVersion;
     this.#printersStore = printersStore;
-    this.#serverUpdateService = serverUpdateService;
+    this.#serverReleaseService = serverReleaseService;
   }
 
   welcome(req, res) {
@@ -35,7 +35,7 @@ class AppController {
   }
 
   async getVersion(req, res) {
-    let updateState = this.#serverUpdateService.getState();
+    let updateState = this.#serverReleaseService.getState();
 
     res.json({
       version: this.#serverVersion,
@@ -55,7 +55,7 @@ class AppController {
 }
 
 // prettier-ignore
-module.exports = createController(AppController)
+module.exports = createController(ServerPublicController)
     .prefix(AppConstants.apiRoute + "/")
     .before([authenticate()])
     .get("", "welcome")

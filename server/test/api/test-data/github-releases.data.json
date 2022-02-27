@@ -471,6 +471,6 @@
     "assets": [],
     "tarball_url": "https://api.github.com/repos/fdm-monster/fdm-monster/tarball/v0.0.1-pre",
     "zipball_url": "https://api.github.com/repos/fdm-monster/fdm-monster/zipball/v0.0.1-pre",
-    "body": "In this version of 3D Hub we're able to manage our printer farm based on OctoPrint. We can upload files and manage the printer farm state. While adding printers to 3D Hub there's a test button to visualize whether the printer is safe to use or whether connection changes are required.\r\n\r\nA website based on Vue 2 and Vuetify makes the developer of 3DPF capable of supporting user feature requests with high speed and reliability due to backend test coverage."
+    "body": "In this version of 3D Hub we're able to manage our printer farm based on OctoPrint. We can upload files and manage the printer farm state. While adding printers to 3D Hub there's a test button to visualize whether the printer is safe to use or whether connection changes are required.\r\n\r\nA website based on Vue 2 and Vuetify makes the developer of FDM capable of supporting user feature requests with high speed and reliability due to backend test coverage."
   }
 ]

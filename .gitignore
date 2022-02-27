@@ -18,3 +18,4 @@ server-nest/assets/public/assets/
 **/fdm-monster
 **/images
 **/file-uploads
+**/nodemon_restart_trigger.js
