@@ -20,8 +20,10 @@ This server is currently freshly released, so give it a star ⭐and be the first
 #### Current work: auto-clean OctoPrint files with different settings
 
 ## Development [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://gitHub.com/fdm-monster/fdmonster/graphs/commit-activity) ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/fdm-monster/fdmonster/Node.js%20CI/development) [![GitHub license](https://img.shields.io/github/license/fdm-monster/fdmonster)](https://github.com/fdm-monster/fdmonster/blob/master/LICENSE.txt)
+This work is under active development with cutting edge tech and open-source standards. 
 
-This work is under active development with cutting edge tech and standards. Feel like joining in? Your options are to create a pull-request, send an email, or open a discussion!
+Have you spotted something wrong or do you have ideas for improvement? Please do create an issue, create a pull-request, send an email, or open a discussion!
+Feel like joining in as a developer or do you have a quick fix? Great! Please read the [CONTRIBUTING.md](CONTRIBUTING.md) file.
 
 ## Roadmap
 
