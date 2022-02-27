@@ -6,6 +6,7 @@ const DITokens = require("../../container.tokens");
 
 let container;
 let updateService;
+let releaseService;
 let mockedHttpClient;
 let request;
 
@@ -17,6 +18,7 @@ beforeAll(async () => {
   await dbHandler.connect();
   ({ request, container } = await setupTestApp(true));
   updateService = container.resolve(DITokens.serverUpdateService);
+  releaseService = container.resolve(DITokens.serverReleaseService);
   mockedHttpClient = container.resolve(DITokens.httpClient);
 });
 
@@ -45,7 +47,7 @@ describe("AppController", () => {
   });
 
   it("should return airGapped response", async function () {
-    await updateService.syncLatestRelease(false);
+    await releaseService.syncLatestRelease(false);
 
     const response = await request.get(versionRoute).send();
     expectOkResponse(response, {
@@ -64,7 +66,7 @@ describe("AppController", () => {
     const githubReleasesResponse = require("./test-data/github-releases.data.json");
     mockedHttpClient.saveMockResponse(githubReleasesResponse,200);
 
-    await updateService.syncLatestRelease(false);
+    await releaseService.syncLatestRelease(false);
 
     const response = await request.get(versionRoute).send();
     expectOkResponse(response, {

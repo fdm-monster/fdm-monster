@@ -1,13 +1,13 @@
 class SoftwareUpdateTask {
-  #serverUpdateService;
+  #serverReleaseService;
 
-  constructor({ serverUpdateService }) {
-    this.#serverUpdateService = serverUpdateService;
+  constructor({ serverReleaseService }) {
+    this.#serverReleaseService = serverReleaseService;
   }
 
   async run() {
-    await this.#serverUpdateService.syncLatestRelease(false);
-    this.#serverUpdateService.logServerVersionState();
+    await this.#serverReleaseService.syncLatestRelease(false);
+    this.#serverReleaseService.logServerVersionState();
   }
 }
 

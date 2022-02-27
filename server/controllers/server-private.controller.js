@@ -3,42 +3,41 @@ const { authenticate, authorizeRoles } = require("../middleware/authenticate");
 const Logger = require("../handlers/logger.js");
 const { AppConstants } = require("../server.constants");
 const { ROLES } = require("../constants/authorization.constants");
-const {validateMiddleware} = require("../handlers/validators");
-const {updateServerRules} = require("./validation/server-update.validation");
 
 class ServerPrivateController {
-  #logger = new Logger("Server-API");
-  #systemCommandsService;
+  #logger = new Logger("Server-Private-API");
   #serverUpdateService;
+  #serverReleaseService;
 
-  constructor({ systemCommandsService, serverUpdateService }) {
-    this.#systemCommandsService = systemCommandsService;
+  constructor({ serverUpdateService, serverReleaseService }) {
+    this.#serverReleaseService = serverReleaseService;
     this.#serverUpdateService = serverUpdateService;
   }
 
-  async getUpdateInfo(req, res) {
-    await this.#serverUpdateService.syncLatestRelease(false);
-    const updateState = this.#serverUpdateService.getState();
+  async getReleaseStateInfo(req, res) {
+    await this.#serverReleaseService.syncLatestRelease(false);
+    const updateState = this.#serverReleaseService.getState();
     res.send(updateState);
   }
 
-  async updateServer(req, res) {
-    const input = await validateMiddleware(req, updateServerRules);
-    await this.#systemCommandsService.checkServerUpdate(input);
-    res.end();
+  async pullGitUpdates(req, res) {
+    const result = await this.#serverUpdateService.checkGitUpdates();
+    res.send(result);
   }
 
   async restartServer(req, res) {
-    this.#logger.warning("Server restart command fired. Expect the server to be unavailable for a moment");
-    await this.#systemCommandsService.restartServer();
-    res.end();
+    this.#logger.warning(
+      "Server restart command fired. Expect the server to be unavailable for a moment"
+    );
+    const result = await this.#serverUpdateService.restartServer();
+    res.send(result);
   }
 }
 
 // prettier-ignore
 module.exports = createController(ServerPrivateController)
-  .prefix(AppConstants.apiRoute + "/server")
-  .before([authenticate(), authorizeRoles([ROLES.ADMIN])])
-  .get("/", "getUpdateInfo")
-  .post("/update", "updateServer")
-  .post("/restart", "restartServer");
+    .prefix(AppConstants.apiRoute + "/server")
+    .before([authenticate(), authorizeRoles([ROLES.ADMIN])])
+    .get("/", "getReleaseStateInfo")
+    .post("/git-update", "pullGitUpdates")
+    .post("/restart", "restartServer");

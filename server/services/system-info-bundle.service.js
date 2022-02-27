@@ -5,14 +5,14 @@ const { prettyPrintArray } = require("../utils/pretty-print.utils.js");
 class SystemInfoBundleService {
   #systemInfoStore;
   #printersStore;
-  #serverUpdateService;
+  #serverReleaseService;
 
   serverVersion;
 
-  constructor({ systemInfoStore, printersStore, serverUpdateService, serverVersion }) {
+  constructor({ systemInfoStore, printersStore, serverReleaseService, serverVersion }) {
     this.#systemInfoStore = systemInfoStore;
     this.#printersStore = printersStore;
-    this.#serverUpdateService = serverUpdateService;
+    this.#serverReleaseService = serverReleaseService;
 
     this.serverVersion = serverVersion;
   }
@@ -32,7 +32,7 @@ class SystemInfoBundleService {
     const yes = " ✓  \n";
     const no = " ✘ \n";
 
-    const isAirGapped = this.#serverUpdateService.getAirGapped();
+    const isAirGapped = this.#serverReleaseService.getAirGapped();
     systemInformationContents += `${airGapped} ${isAirGapped ? no : yes}`;
     systemInformationContents += `${node} ${isNode() ? yes : no}`;
     systemInformationContents += `${pm2} ${isPm2() ? yes : no}`;

@@ -10,13 +10,13 @@ class ServerPublicController {
   #serverVersion;
   #settingsStore;
   #printersStore;
-  #serverUpdateService;
+  #serverReleaseService;
 
-  constructor({ settingsStore, printersStore, serverVersion, serverUpdateService }) {
+  constructor({ settingsStore, printersStore, serverVersion, serverReleaseService }) {
     this.#settingsStore = settingsStore;
     this.#serverVersion = serverVersion;
     this.#printersStore = printersStore;
-    this.#serverUpdateService = serverUpdateService;
+    this.#serverReleaseService = serverReleaseService;
   }
 
   welcome(req, res) {
@@ -35,7 +35,7 @@ class ServerPublicController {
   }
 
   async getVersion(req, res) {
-    let updateState = this.#serverUpdateService.getState();
+    let updateState = this.#serverReleaseService.getState();
 
     res.json({
       version: this.#serverVersion,
