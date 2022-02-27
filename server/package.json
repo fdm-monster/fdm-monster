@@ -24,7 +24,7 @@
     "url": "https://github.com/fdm-monster/fdm-monster"
   },
   "bin": {
-    "fdm-monster": "./app.js"
+    "fdm-monster": "./index.js"
   },
   "keywords": [
     "fdm-monster",
