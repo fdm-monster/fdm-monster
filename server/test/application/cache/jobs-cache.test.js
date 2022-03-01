@@ -108,7 +108,7 @@ describe("JobsCache", () => {
   });
 
   it("should throw on deleting unknown job", () => {
-    expect(() => jobsCache.purgePrinterId("notknown")).toThrow();
+    expect(jobsCache.purgePrinterId("notknown")).toBeUndefined();
   });
 
   it("should be able to delete known job", () => {
