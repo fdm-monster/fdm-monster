@@ -10,8 +10,8 @@ jobs:
         run: |
           if ${{ github.ref == 'refs/heads/main' }} == true; then
             echo 'TAG_EDGE=latest' >> $GITHUB_ENV
-          elif ${{ github.ref == 'refs/heads/development' }} == true; then
-            echo 'TAG_EDGE=development' >> $GITHUB_ENV
+          elif ${{ github.ref == 'refs/heads/develop' }} == true; then
+            echo 'TAG_EDGE=develop' >> $GITHUB_ENV
           else
             echo 'TAG_EDGE=edge' >> $GITHUB_ENV
           fi
