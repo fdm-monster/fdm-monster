@@ -58,7 +58,7 @@
     "lodash": "^4.17.21",
     "luxon": "^2.3.1",
     "migrate-mongo": "^8.2.3",
-    "mongoose": "^6.2.3",
+    "mongoose": "^6.2.4",
     "multer": "^1.4.4",
     "node-input-validator": "^4.5.0",
     "node-upnp-ssdp": "^0.1.1",
