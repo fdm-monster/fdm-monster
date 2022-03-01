@@ -40,7 +40,8 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await Model.deleteMany({});
+  console.log("End of printer controller tests");
+//   await Model.deleteMany({});
 });
 
 describe("PrinterController", () => {
