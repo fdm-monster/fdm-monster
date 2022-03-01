@@ -106,4 +106,14 @@ describe("JobsCache", () => {
   it("should throw for serializing unknown printer job id", () => {
     jobsCache.getPrinterJobFlat("nonexistingid");
   });
+
+  it("should throw on deleting unknown job", () => {
+    expect(() => jobsCache.purgePrinterId("notknown")).toThrow();
+  });
+
+  it("should be able to delete known job", () => {
+    const knownPrinter = "knownPrinter";
+    jobsCache.savePrinterJob(knownPrinter, websocketCurrentMsg);
+    jobsCache.purgePrinterId(knownPrinter);
+  })
 });
