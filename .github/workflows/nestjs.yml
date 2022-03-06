@@ -2,7 +2,7 @@ name: NestJS CI
 
 on:
   push:
-    branches: [ development, master ]
+    branches: [ develop, main ]
   pull_request:
 jobs:
   nestjs:
