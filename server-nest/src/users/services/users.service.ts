@@ -11,10 +11,7 @@ import { hashPassword } from "../../utils/crypto.util";
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @InjectRepository(User) private usersRepository: Repository<User>
-  ) {
-  }
+  constructor(@InjectRepository(User) private usersRepository: Repository<User>) {}
 
   async register(registerInputDto: RegisterInputDto): Promise<void> {
     delete registerInputDto.password2;
@@ -76,11 +73,16 @@ export class UsersService {
   }
 
   async findOne(conditions: Partial<User>): Promise<User> {
-    return await this.usersRepository.findOne(conditions);
+    return await this.usersRepository.findOne({ where: conditions });
   }
 
   async findById(id: string | ObjectID): Promise<User> {
-    return await this.usersRepository.findOne(id);
+    return await this.usersRepository.findOne({
+
+      where: {
+        id: new ObjectID(id)
+      }
+    });
   }
 
   async getUserCount() {
