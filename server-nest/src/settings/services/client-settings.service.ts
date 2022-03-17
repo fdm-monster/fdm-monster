@@ -13,7 +13,7 @@ export class ClientSettingsService {
   ) {}
 
   async findFirstOrAdd(): Promise<ClientSettings> {
-    const clientSettings = await this.clientSettingsRepository.findOne();
+    const clientSettings = await this.clientSettingsRepository.findOne({});
     if (!!clientSettings) {
       return clientSettings;
     } else {

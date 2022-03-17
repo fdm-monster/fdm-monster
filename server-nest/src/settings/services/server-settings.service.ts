@@ -12,7 +12,7 @@ export class ServerSettingsService {
   ) {}
 
   async findFirstOrAdd(): Promise<ServerSettings> {
-    const serverSettings = await this.serverSettingsRepository.findOne();
+    const serverSettings = await this.serverSettingsRepository.findOne({});
     if (!!serverSettings) {
       return serverSettings;
     } else {
