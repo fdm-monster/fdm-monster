@@ -39,8 +39,8 @@
   ],
   "dependencies": {
     "@fdm-monster/client": "0.3.3",
-    "awilix": "^6.1.0",
-    "awilix-express": "6.0.0",
+    "awilix": "7.0.0",
+    "awilix-express": "7.0.0",
     "axios": "^0.26.0",
     "bcryptjs": "^2.4.3",
     "connect-history-api-fallback": "^1.6.0",
