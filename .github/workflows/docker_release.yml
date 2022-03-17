@@ -5,7 +5,7 @@ on:
       - '*'
     branches:
       - 'main'
-      - 'development'
+      - 'develop'
 jobs:
   docker:
     runs-on: ubuntu-latest

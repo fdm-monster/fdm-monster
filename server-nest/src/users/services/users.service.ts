@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { CreateUserDto } from "../dto/create-user.dto";
 import { UpdateUserDto } from "../dto/update-user.dto";
 import { InjectRepository } from "@nestjs/typeorm";
-import { ObjectID, Repository } from "typeorm";
+import {FindOptionsWhere, ObjectID, Repository} from "typeorm";
 import { User } from "../entities/user.entity";
 import { RegisterInputDto } from "../dto/register-input.dto";
 import { GroupEnum } from "../types/group.enum";
@@ -11,10 +11,7 @@ import { hashPassword } from "../../utils/crypto.util";
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @InjectRepository(User) private usersRepository: Repository<User>
-  ) {
-  }
+  constructor(@InjectRepository(User) private usersRepository: Repository<User>) {}
 
   async register(registerInputDto: RegisterInputDto): Promise<void> {
     delete registerInputDto.password2;
@@ -75,12 +72,16 @@ export class UsersService {
     return await this.usersRepository.find({});
   }
 
-  async findOne(conditions: Partial<User>): Promise<User> {
-    return await this.usersRepository.findOne(conditions);
+  async findOne(conditions: FindOptionsWhere<User>): Promise<User> {
+    return await this.usersRepository.findOne({ where: conditions });
   }
 
-  async findById(id: string | ObjectID): Promise<User> {
-    return await this.usersRepository.findOne(id);
+  async findById(id: ObjectID): Promise<User> {
+    return await this.usersRepository.findOne({
+      where: {
+        id
+      }
+    });
   }
 
   async getUserCount() {

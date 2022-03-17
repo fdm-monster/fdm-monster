@@ -3,8 +3,8 @@ on:
   pull_request:
   push:
     branches:
-      - 'master'
-      - 'development'
+      - 'main'
+      - 'develop'
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -21,6 +21,6 @@ jobs:
       - uses: JS-DevTools/npm-publish@v1
         if: ${{ github.repository.name == 'fdm-monster' }}
         with:
-          dry-run: false
+          dry-run: true
           token: ${{ secrets.NPM_TOKEN }}
           package: client-vue/package.json
