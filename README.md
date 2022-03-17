@@ -16,8 +16,8 @@ We dont aim to provide webcam support right now as this is one of the big bottle
 
 This server is currently freshly released, so give it a star ⭐and be the first to experience it! 
 
-#### Last finished features: auto-clean OctoPrint files with different settings
-#### Current work: safe and robust server update mechanism using git releases
+#### Last finished features: auto-clean old OctoPrint files with different settings
+#### Current work: dependency updates using Renovate (thanks to @mkevenaar for the tips)
 
 ## Development [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://gitHub.com/fdm-monster/fdmonster/graphs/commit-activity) ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/fdm-monster/fdmonster/Node.js%20CI/development) [![GitHub license](https://img.shields.io/github/license/fdm-monster/fdmonster)](https://github.com/fdm-monster/fdmonster/blob/master/LICENSE.txt)
 This work is under active development with cutting edge tech and open-source standards. 
