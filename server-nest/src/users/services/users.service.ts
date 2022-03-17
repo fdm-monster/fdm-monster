@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { CreateUserDto } from "../dto/create-user.dto";
 import { UpdateUserDto } from "../dto/update-user.dto";
 import { InjectRepository } from "@nestjs/typeorm";
-import { ObjectID, Repository } from "typeorm";
+import {FindOptionsWhere, ObjectID, Repository} from "typeorm";
 import { User } from "../entities/user.entity";
 import { RegisterInputDto } from "../dto/register-input.dto";
 import { GroupEnum } from "../types/group.enum";
@@ -72,15 +72,14 @@ export class UsersService {
     return await this.usersRepository.find({});
   }
 
-  async findOne(conditions: Partial<User>): Promise<User> {
+  async findOne(conditions: FindOptionsWhere<User>): Promise<User> {
     return await this.usersRepository.findOne({ where: conditions });
   }
 
-  async findById(id: string | ObjectID): Promise<User> {
+  async findById(id: ObjectID): Promise<User> {
     return await this.usersRepository.findOne({
-
       where: {
-        id: new ObjectID(id)
+        id
       }
     });
   }
