@@ -9,8 +9,8 @@
     tile
     @click="selectPrinter()"
   >
-    <v-container v-if="printer">
-      <small class="small-resized-font ml-2">
+    <v-container v-if="printer" class="tile-inner">
+      <small class="small-resized-font ml-1">
         {{ printer.printerName }}
       </small>
       <v-btn class="float-right" icon @click.prevent.stop="clickInfo()">
@@ -20,7 +20,7 @@
         <v-icon>stop</v-icon>
       </v-btn>
       <br />
-      <small class="xsmall-resized-font ml-2 text--secondary">
+      <small class="xsmall-resized-font ml-1 text--secondary">
         {{ printer.printerState.state }}
       </small>
     </v-container>
@@ -94,12 +94,17 @@ export default class PrinterGridTile extends Vue {
   user-select: none; /* Standard */
 }
 
-.tile-setup:hover {
-  border: 1px solid red !important;
+.tile-inner {
+  opacity: 0.85;
 }
 
 .tile-selected {
-  border: 1px solid green !important;
+  outline: 2px solid rgb(2, 248, 23) !important;
+  opacity: 1;
+}
+
+.tile-setup:hover {
+  outline: 2px solid #02b102 !important;
 }
 
 .small-resized-font {
