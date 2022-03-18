@@ -19,7 +19,13 @@
     <v-banner v-drop-upload="{ printers: selectedPrinters }">
       <v-row>
         <v-col>
-          <v-btn color="secondary" small @click="clearSelectedPrinters()">Clear selection</v-btn>
+          <v-btn
+            :color="hasPrintersSelected ? 'primary' : 'secondary'"
+            small
+            @click="clearSelectedPrinters()"
+          >
+            Clear selection ({{ selectedPrinters.length }} selected)
+          </v-btn>
           <v-chip-group>
             <v-chip v-if="selectedPrinters.length === 0">No printers selected</v-chip>
             <v-chip
@@ -94,6 +100,10 @@ export default class HomePage extends Vue {
     fileUpload: InstanceType<typeof HTMLInputElement>;
   };
   selectedFile?: File;
+
+  get hasPrintersSelected(): boolean {
+    return this.selectedPrinters?.length > 0;
+  }
 
   get selectedPrinters() {
     return printersState.selectedPrinters;
