@@ -92,16 +92,14 @@ export default class PrinterGridTile extends Vue {
   -moz-user-select: none; /* Firefox */
   -ms-user-select: none; /* IE10+/Edge */
   user-select: none; /* Standard */
-
-  outline: 2px solid transparent !important;
 }
 
 .tile-selected {
-  outline: 2px solid #02b102 !important;
+  outline: 3px solid rgba(255, 204, 0, 0.62) !important;
 }
 
 .tile-setup:hover {
-  outline: 2px solid #eeff00 !important;
+  outline: 2px solid #02b102 !important;
 }
 
 .small-resized-font {
