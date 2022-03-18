@@ -5,9 +5,9 @@
       <v-spacer></v-spacer>
       <v-text-field
         v-model="search"
-        append-icon="mdi-magnify"
+        prepend-icon="search"
+        clearable
         class="p-2"
-        hide-details
         label="Search"
         single-line
       ></v-text-field>

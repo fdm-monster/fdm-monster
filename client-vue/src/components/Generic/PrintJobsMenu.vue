@@ -28,6 +28,16 @@
               <v-list-item-title>Print Jobs</v-list-item-title>
               <v-list-item-subtitle>All active files being printed</v-list-item-subtitle>
             </v-list-item-content>
+            <v-text-field
+              v-model="search"
+              class="p-2"
+              clearable
+              label="Search"
+              persistent-placeholder
+              placeholder="Search printers"
+              prepend-icon="search"
+              single-line
+            ></v-text-field>
           </v-list-item>
         </v-list>
 
@@ -51,8 +61,10 @@
                 {{ printer.currentJob.fileName }}
               </v-list-item-title>
               <v-list-item-subtitle>
-                Elapsed: {{ Math.round(printer.currentJob.printTimeElapsed / 60) }} minutes <br />
-                Printer: {{ printer.printerName }}
+                Elapsed:
+                <strong>{{ Math.round(printer.currentJob.printTimeElapsed / 60) }} minutes</strong>
+                <br />
+                Printer: <strong>{{ printer.printerName }}</strong>
               </v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
@@ -61,7 +73,7 @@
         <v-card-actions>
           <v-spacer></v-spacer>
 
-          <v-btn text @click="menu = false">Close</v-btn>
+          <v-btn text @click="closeMenu()">Close</v-btn>
         </v-card-actions>
       </v-card>
     </v-menu>
@@ -72,27 +84,44 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { printersState } from "@/store/printers.state";
+import { Watch } from "vue-property-decorator";
 
 @Component({
   data: () => ({
     fav: true,
     menu: false,
+    filter: undefined,
     message: false,
-    hints: true
+    hints: true,
+    search: ""
   })
 })
 export default class PrintJobsMenu extends Vue {
+  search?: string;
+  menu: boolean;
+
   get activePrintJobs() {
-    return printersState.printersWithJob;
+    return printersState.printersWithJob.filter(
+      (p) => !this.search || p.printerName.toLowerCase().includes(this.search.toLowerCase())
+    );
   }
 
   get activePrintCount() {
     return printersState.printersWithJob?.length;
   }
 
+  closeMenu() {
+    this.menu = false;
+  }
+
   truncateProgress(progress: number) {
     if (!progress) return "";
     return progress?.toFixed(0);
+  }
+
+  @Watch("menu")
+  onMenuChange() {
+    this.search = undefined;
   }
 }
 </script>
