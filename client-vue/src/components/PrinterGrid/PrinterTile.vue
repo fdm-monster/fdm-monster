@@ -9,7 +9,7 @@
     tile
     @click="selectPrinter()"
   >
-    <v-container v-if="printer">
+    <v-container v-if="printer" class="tile-inner">
       <small class="small-resized-font ml-1">
         {{ printer.printerName }}
       </small>
@@ -94,8 +94,13 @@ export default class PrinterGridTile extends Vue {
   user-select: none; /* Standard */
 }
 
+.tile-inner {
+  opacity: 0.85;
+}
+
 .tile-selected {
-  outline: 3px solid rgba(255, 204, 0, 0.62) !important;
+  outline: 2px solid rgb(2, 248, 23) !important;
+  opacity: 1;
 }
 
 .tile-setup:hover {
