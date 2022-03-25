@@ -2,9 +2,12 @@ import store from "@/store/index";
 import { Action, Module, Mutation, VuexModule } from "vuex-class-modules";
 import { QueuedUpload } from "@/models/uploads/queued-upload.model";
 import { PrinterFileService } from "@/backend";
+import { VueBus } from "vue-bus";
+import { uploadFailureMessageEvent, uploadOtherMessageEvent } from "@/event-bus/alert.events";
 
 @Module
 class UploadsModule extends VuexModule {
+  $bus: VueBus;
   queuedUploads: QueuedUpload[] = [];
   uploadingNow = false;
 
@@ -18,6 +21,10 @@ class UploadsModule extends VuexModule {
 
   get nextUpload() {
     return this.queuedUploads[0];
+  }
+
+  @Mutation _injectEventBus(eventBus: VueBus) {
+    this.$bus = eventBus;
   }
 
   @Mutation _setUploadingNow(uploading: boolean) {
@@ -48,7 +55,15 @@ class UploadsModule extends VuexModule {
     // We'd rather fail fast and avoid the same upload failing many times
     this._spliceNextUpload();
 
-    await PrinterFileService.uploadFile(printer, file, commands);
+    try {
+      await PrinterFileService.uploadFile(printer, file, commands);
+    } catch (e: any) {
+      if (e.isAxiosError) {
+        this.$bus.emit(uploadFailureMessageEvent, e);
+      } else {
+        this.$bus.emit(uploadOtherMessageEvent, e);
+      }
+    }
 
     this._setUploadingNow(false);
   }
