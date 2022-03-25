@@ -59,6 +59,7 @@ class UploadsModule extends VuexModule {
       await PrinterFileService.uploadFile(printer, file, commands);
     } catch (e: any) {
       if (e.isAxiosError) {
+        console.log("Axio error caught");
         this.$bus.emit(uploadFailureMessageEvent, e);
       } else {
         this.$bus.emit(uploadOtherMessageEvent, e);
