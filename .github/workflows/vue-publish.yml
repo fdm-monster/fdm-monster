@@ -14,9 +14,9 @@ jobs:
         with:
           node-version: 16.x
 
-      - run: npm ci --no-optional
+      - run: yarn install --frozen-lockfile
         working-directory: client-vue
-      - run: npm run build
+      - run: yarn run build
         working-directory: client-vue
       - uses: JS-DevTools/npm-publish@v1
         if: ${{ github.repository.name == 'fdm-monster' }}

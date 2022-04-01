@@ -3,6 +3,8 @@ export const vuexErrorEvent = "store-axios-error";
 // message, progress
 export const infoMessageEvent = "info-message";
 export const uploadMessageEvent = "upload-message";
+export const uploadFailureMessageEvent = "upload-failure-message";
+export const uploadOtherMessageEvent = "upload-other-message";
 
 export enum InfoEventType {
   UPLOAD_BACKEND,

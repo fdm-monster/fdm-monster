@@ -57,6 +57,8 @@ export default class App extends Vue {
   }
 
   async created() {
+    uploadsState._injectEventBus(this.$bus);
+
     await serverSettingsState.loadServerSettings();
     await this.connectSseClient();
   }

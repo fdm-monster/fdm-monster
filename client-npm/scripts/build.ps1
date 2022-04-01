@@ -24,8 +24,6 @@ function Write-PackageJson {
 
 $client_version = (Get-Content $client_package_json) -join "`n" | ConvertFrom-Json | Select -ExpandProperty "version"
 
-Write-PackageJson -File $target_package_json -Target $target_package_json -Version $client_version
-
 # Check version
 npm cache clear --force
 $versionArray = (npm view @fdm-monster/client versions --json | ConvertFrom-Json)
@@ -48,6 +46,8 @@ if ($lastVersion -eq $client_version) {
         Throw "Aborted as package '${client_version}' was not new"
     }
 }
+
+Write-PackageJson -File $target_package_json -Target $target_package_json -Version $client_version
 
 Remove-Item -Path "${target_dist}" -Recurse -ErrorAction Ignore
 npm --prefix $client_src run build
