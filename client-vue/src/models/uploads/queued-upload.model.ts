@@ -6,3 +6,7 @@ export interface QueuedUpload {
   commands: FileUploadCommands;
   file: File;
 }
+
+export interface FailedQueuedUpload extends QueuedUpload {
+  error: any;
+}

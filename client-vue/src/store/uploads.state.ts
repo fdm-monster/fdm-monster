@@ -1,6 +1,6 @@
 import store from "@/store/index";
 import { Action, Module, Mutation, VuexModule } from "vuex-class-modules";
-import { QueuedUpload } from "@/models/uploads/queued-upload.model";
+import { FailedQueuedUpload, QueuedUpload } from "@/models/uploads/queued-upload.model";
 import { PrinterFileService } from "@/backend";
 import { VueBus } from "vue-bus";
 import { uploadFailureMessageEvent, uploadOtherMessageEvent } from "@/event-bus/alert.events";
@@ -9,6 +9,7 @@ import { uploadFailureMessageEvent, uploadOtherMessageEvent } from "@/event-bus/
 class UploadsModule extends VuexModule {
   $bus: VueBus;
   queuedUploads: QueuedUpload[] = [];
+  failedUploads: FailedQueuedUpload[] = [];
   uploadingNow = false;
 
   get hasPendingUploads() {
@@ -31,8 +32,12 @@ class UploadsModule extends VuexModule {
     this.uploadingNow = uploading;
   }
 
-  @Mutation _setUploads(uploads: QueuedUpload[]) {
-    this.queuedUploads = uploads;
+  @Mutation _appendUploads(uploads: QueuedUpload[]) {
+    this.queuedUploads.push(...uploads);
+  }
+
+  @Mutation _appendFailedUpload(failedUpload: FailedQueuedUpload) {
+    this.failedUploads.push(failedUpload);
   }
 
   @Mutation _spliceNextUpload() {
@@ -41,6 +46,7 @@ class UploadsModule extends VuexModule {
 
   @Mutation _resetUploads() {
     this.queuedUploads = [];
+    this.failedUploads = [];
   }
 
   @Action
@@ -59,7 +65,14 @@ class UploadsModule extends VuexModule {
       await PrinterFileService.uploadFile(printer, file, commands);
     } catch (e: any) {
       if (e.isAxiosError) {
-        console.log("Axio error caught");
+        console.log("Axios error caught and emitted to bus");
+        const failedUpload: FailedQueuedUpload = {
+          file,
+          printer,
+          commands,
+          error: e
+        };
+        this._appendFailedUpload(failedUpload);
         this.$bus.emit(uploadFailureMessageEvent, e);
       } else {
         this.$bus.emit(uploadOtherMessageEvent, e);
@@ -70,10 +83,7 @@ class UploadsModule extends VuexModule {
   }
 
   @Action queueUploads(newQueuedUploads: QueuedUpload[]) {
-    // TODO implement this ability and check if file was already uploaded or already printing
-    if (this.queuedUploads?.length > 0) return;
-
-    this._setUploads(newQueuedUploads);
+    this._appendUploads(newQueuedUploads);
   }
 
   @Action cancelUploads() {

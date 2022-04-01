@@ -1,24 +1,40 @@
 import Vue from "vue";
 import { Printer } from "@/models/printers/printer.model";
 import { uploadsState } from "@/store/uploads.state";
-import { convertMultiPrinterFileToQueue } from "@/utils/uploads-state.utils";
+import {
+  convertMultiPrinterFileToQueue,
+  convertPrinterMultiFileToQueue
+} from "@/utils/uploads-state.utils";
 import { infoMessageEvent } from "@/event-bus/alert.events";
 import { printersState } from "@/store/printers.state";
 
 const bindDropConditionally = (el: HTMLElement, printers: Printer[], context?: Vue) => {
   if (printers?.length) {
+    const isSinglePrinter = printers.length === 1;
+    const firstPrinter = printers[0];
+
     el.ondrop = async (e) => {
       e.preventDefault();
       el.style.border = defaultBorder;
 
-      if (!e.dataTransfer?.files.length) return;
-
       const filesArray = e.dataTransfer?.files;
-      const files = [...filesArray];
-      const file = files[0];
+      if (!filesArray?.length) return;
 
-      const uploads = convertMultiPrinterFileToQueue(printers, file);
-      uploadsState.queueUploads(uploads);
+      const clonedFiles = [...filesArray];
+      let convertedUploads = [];
+      if (isSinglePrinter) {
+        console.debug("Single printer upload mode", printers.length, clonedFiles.length);
+        convertedUploads = convertPrinterMultiFileToQueue(firstPrinter, clonedFiles);
+      } else {
+        if (filesArray.length > 0) {
+          throw "Cannot upload multiple files to multiple printers";
+        }
+        console.debug("Multi printer upload mode", printers.length, clonedFiles.length);
+        const clonedFile = clonedFiles[0];
+        convertedUploads = convertMultiPrinterFileToQueue(printers, clonedFile);
+      }
+
+      uploadsState.queueUploads(convertedUploads);
 
       printersState.clearSelectedPrinters();
     };
