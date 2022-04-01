@@ -33,6 +33,7 @@ class UploadsModule extends VuexModule {
   }
 
   @Mutation _appendUploads(uploads: QueuedUpload[]) {
+    this.failedUploads = [];
     this.queuedUploads.push(...uploads);
   }
 
