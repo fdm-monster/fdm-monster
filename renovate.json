@@ -8,7 +8,21 @@
   "labels": [
     "renovate"
   ],
+
   "packageRules": [
+    {
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "bump",
+        "digest",
+        "rollback"
+      ],
+      "enabled": true
+    },
     {
       "matchUpdateTypes": [
         "minor",
