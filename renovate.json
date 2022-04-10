@@ -16,7 +16,15 @@
         "pin",
         "digest"
       ],
+      "enabled": true,
       "automerge": true
+    },
+    {
+      "updateTypes": [
+        "major"
+      ],
+      "enabled": true,
+      "automerge": false
     },
     {
       "paths": [
