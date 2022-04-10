@@ -2,12 +2,37 @@
   "extends": [
     "config:base"
   ],
-  "assignees": ["davidzwa"],
-  "labels": ["renovate"],
+  "assignees": [
+    "davidzwa"
+  ],
+  "labels": [
+    "renovate"
+  ],
   "packageRules": [
     {
-      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "pin",
+        "digest"
+      ],
       "automerge": true
+    },
+    {
+      "paths": [
+        "client-vue/package.json"
+      ],
+      "enabled": true,
+      "automerge": true,
+      "updateTypes": [
+        "minor",
+        "patch",
+        "pin",
+        "digest"
+      ]
     }
+  ],
+  "ignorePaths": [
+    "server/docker/test-node12.Dockerfile"
   ]
 }
