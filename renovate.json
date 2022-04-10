@@ -8,7 +8,21 @@
   "labels": [
     "renovate"
   ],
+
   "packageRules": [
+    {
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "bump",
+        "digest",
+        "rollback"
+      ],
+      "enabled": true
+    },
     {
       "matchUpdateTypes": [
         "minor",
@@ -20,24 +34,15 @@
       "automerge": true
     },
     {
-      "updateTypes": [
-        "major"
-      ],
-      "enabled": true,
-      "automerge": false
-    },
-    {
       "paths": [
         "client-vue/package.json"
       ],
-      "enabled": true,
-      "automerge": true,
-      "updateTypes": [
-        "minor",
-        "patch",
-        "pin",
-        "digest"
-      ]
+      "matchPackageNames": [
+        "vue",
+        "vuex",
+        "vue-router"
+      ],
+      "enabled": false,
     }
   ],
   "ignorePaths": [
