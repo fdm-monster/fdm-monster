@@ -42,7 +42,7 @@
         "vuex",
         "vue-router"
       ],
-      "enabled": false,
+      "enabled": false
     }
   ],
   "ignorePaths": [
