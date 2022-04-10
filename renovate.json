@@ -5,14 +5,14 @@
   "packageRules": [
     {
       "matchDatasources": ["docker"],
-      "matchUpdateTypes": ["minor", "patch", "bump", "digest", "rollback"],
-      "enabled": true
-    },
-    {
-      "matchDatasources": ["docker"],
       "matchUpdateTypes": ["major"],
       "matchPackageNames": ["node"],
       "enabled": false
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchUpdateTypes": ["minor", "patch", "bump", "digest", "rollback"],
+      "enabled": true
     },
     {
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
