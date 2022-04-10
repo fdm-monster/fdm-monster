@@ -1,4 +1,4 @@
-FROM node:16-bullseye-slim
+FROM node:17-bullseye-slim
 WORKDIR /app
 
 RUN npm install yarn
