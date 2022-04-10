@@ -1,51 +1,29 @@
 {
-  "extends": [
-    "config:base"
-  ],
-  "assignees": [
-    "davidzwa"
-  ],
-  "labels": [
-    "renovate"
-  ],
-
+  "extends": ["config:base"],
+  "assignees": ["davidzwa"],
+  "labels": ["renovate"],
   "packageRules": [
     {
-      "matchDatasources": [
-        "docker"
-      ],
-      "matchUpdateTypes": [
-        "minor",
-        "patch",
-        "bump",
-        "digest",
-        "rollback"
-      ],
+      "matchDatasources": ["docker"],
+      "matchUpdateTypes": ["minor", "patch", "bump", "digest", "rollback"],
       "enabled": true
     },
     {
-      "matchUpdateTypes": [
-        "minor",
-        "patch",
-        "pin",
-        "digest"
-      ],
+      "matchDatasources": ["docker"],
+      "matchUpdateTypes": ["major"],
+      "matchPackageNames": ["node"],
+      "enabled": false
+    },
+    {
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
       "enabled": true,
       "automerge": true
     },
     {
-      "paths": [
-        "client-vue/package.json"
-      ],
-      "matchPackageNames": [
-        "vue",
-        "vuex",
-        "vue-router"
-      ],
+      "paths": ["client-vue/package.json"],
+      "matchPackageNames": ["vue", "vuex", "vue-router"],
       "enabled": false
     }
   ],
-  "ignorePaths": [
-    "server/docker/test-node12.Dockerfile"
-  ]
+  "ignorePaths": ["server/docker/test-node12.Dockerfile"]
 }
