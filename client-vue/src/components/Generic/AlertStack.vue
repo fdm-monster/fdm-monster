@@ -47,6 +47,7 @@
         </template>
       </v-snackbar>
     </div>
+    <AlertErrorDialog />
   </div>
 </template>
 
@@ -63,6 +64,7 @@ import {
 } from "@/event-bus/alert.events";
 import { TrackedUpload, UploadStates } from "@/models/sse-messages/printer-sse-message.model";
 import { uploadsState } from "@/store/uploads.state";
+import AlertErrorDialog from "@/components/Generic/AlertErrorDialog.vue";
 
 @Component({
   data: () => ({
@@ -70,7 +72,10 @@ import { uploadsState } from "@/store/uploads.state";
     progressStates: undefined,
     progressInfo: undefined,
     info: undefined
-  })
+  }),
+  components: {
+    AlertErrorDialog
+  }
 })
 export default class ErrorAlert extends Vue {
   @Prop() stopPropagation: boolean;
