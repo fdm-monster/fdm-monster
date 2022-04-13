@@ -193,7 +193,6 @@
               <strong>{{ isFileBeingPrinted(file) ? "Printing" : "Unused" }}</strong>
             </span>
           </v-tooltip>
-          <v-list-item-title></v-list-item-title>
         </v-list-item-content>
 
         <v-list-item-action>
