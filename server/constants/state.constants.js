@@ -1,6 +1,7 @@
 const MESSAGE = {
   offline: "OctoPrint instance seems to be offline",
   retryingApiConnection: "OctoPrint is offline. Retry is scheduled",
+  notOctoPrint: "Not OctoPrint as host responded with incompatible response",
   badRequest: "OctoPrint login responded with bad request. This is a bug",
   apiKeyNotAccepted: "OctoPrint apiKey was rejected.",
   disabled: "Printer was disabled explicitly",
@@ -9,6 +10,7 @@ const MESSAGE = {
 };
 const ERR_COUNT = {
   offline: "offline",
+  notOctoPrint: "notOctoPrint",
   apiKeyNotAccepted: "apiKeyNotAccepted",
   apiKeyIsGlobal: "apiKeyIsGlobal",
   missingSessionKey: "missingSessionKey"

@@ -10,6 +10,14 @@
       <small>Connected</small>
     </v-alert>
     <v-alert
+        v-if="testProgress && isSet(testProgress.isOctoPrint)"
+        :type="testProgress.isOctoPrint ? 'success' : 'error'"
+        dense
+        text
+    >
+      <small>Is OctoPrint</small>
+    </v-alert>
+    <v-alert
       v-if="testProgress && isSet(testProgress.apiOk)"
       :type="testProgress.apiOk ? 'success' : 'error'"
       dense

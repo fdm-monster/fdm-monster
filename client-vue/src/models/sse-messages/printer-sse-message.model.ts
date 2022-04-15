@@ -3,6 +3,7 @@ import { PrinterGroup } from "@/models/printers/printer-group.model";
 
 export interface TestProgressDetails {
   connected: boolean;
+  isOctoPrint?: boolean;
   apiOk?: boolean;
   apiKeyNotGlobal?: boolean;
   apiKeyOk?: boolean;
