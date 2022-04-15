@@ -104,7 +104,6 @@ class PrinterTestTask {
 
     let errorCode = localError?.response?.status;
     // Transport related error
-    this.#logger.info("ErrorCode", { errorCode, errorThrown, data: localError.response?.data });
     if (errorThrown && !localError.response?.data) {
       return await this.#sendStateProgress(printerState, { connected: false });
     }
