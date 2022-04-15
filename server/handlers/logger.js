@@ -41,7 +41,7 @@ class LoggerService {
         const level = info.level.toUpperCase();
         const date = dateFormat();
         let message = `${date} | ${level} | ${name} | ${info.message}`;
-        message = info.meta ? message + ` - ${JSON.stringify(info.meta)} | ` : message;
+        message = info.meta ? message + ` - ${JSON.stringify(info.meta)}` : message;
         return message;
       })
     });

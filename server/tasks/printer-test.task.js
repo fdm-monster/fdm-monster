@@ -4,6 +4,7 @@ const {
   isLoginResponseGlobal
 } = require("../services/octoprint/constants/octoprint-service.constants");
 const DITokens = require("../container.tokens");
+const { ERR_COUNT, PSTATE, MESSAGE } = require("../constants/state.constants");
 
 class PrinterTestTask {
   #lastTestRunTime;
@@ -101,31 +102,43 @@ class PrinterTestTask {
       localError = e;
     });
 
-    // Transport related error
     let errorCode = localError?.response?.status;
-    if (errorThrown && !localError.response) {
+    // Transport related error
+    if (errorThrown && !localError.response?.data) {
       return await this.#sendStateProgress(printerState, { connected: false });
     }
     await this.#sendStateProgress(printerState, { connected: true });
+
+    // Illegal API response
+    if (errorThrown && errorCode === HttpStatusCode.NOT_FOUND) {
+      return await this.#sendStateProgress(printerState, { connected: true, isOctoPrint: false });
+    }
+    await this.#sendStateProgress(printerState, { connected: true, isOctoPrint: true });
 
     // API related errors
     if (errorCode === HttpStatusCode.BAD_REQUEST) {
       return await this.#sendStateProgress(printerState, { connected: true, apiOk: false });
     }
-    await this.#sendStateProgress(printerState, { connected: true, apiOk: true });
+    await this.#sendStateProgress(printerState, {
+      connected: true,
+      isOctoPrint: true,
+      apiOk: true
+    });
 
     // Response related errors
-    const loginResponse = responseObject.data;
+    const loginResponse = responseObject?.data;
     // This is a check which is best done after checking 400 code (GlobalAPIKey or pass-thru) - possible
     if (isLoginResponseGlobal(loginResponse)) {
       return await this.#sendStateProgress(printerState, {
         connected: true,
+        isOctoPrint: true,
         apiOk: true,
         apiKeyNotGlobal: false
       });
     }
     await this.#sendStateProgress(printerState, {
       connected: true,
+      isOctoPrint: true,
       apiOk: true,
       apiKeyNotGlobal: true
     });
@@ -134,6 +147,7 @@ class PrinterTestTask {
     if (!loginResponse?.name) {
       return await this.#sendStateProgress(printerState, {
         connected: true,
+        isOctoPrint: true,
         apiOk: true,
         apiKeyNotGlobal: true,
         apiKeyOk: false
@@ -141,6 +155,7 @@ class PrinterTestTask {
     }
     await this.#sendStateProgress(printerState, {
       connected: true,
+      isOctoPrint: true,
       apiOk: true,
       apiKeyNotGlobal: true,
       apiKeyOk: true
@@ -150,6 +165,7 @@ class PrinterTestTask {
     if (!loginResponse?.session) {
       return await this.#sendStateProgress(printerState, {
         connected: true,
+        isOctoPrint: true,
         apiOk: true,
         apiKeyNotGlobal: true,
         apiKeyOk: true,
@@ -167,6 +183,7 @@ class PrinterTestTask {
 
     await this.#sendStateProgress(printerState, {
       connected: true,
+      isOctoPrint: true,
       apiOk: true,
       apiKeyNotGlobal: true,
       apiKeyOk: true,

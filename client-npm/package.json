@@ -1,9 +1,9 @@
 {
   "name": "@fdm-monster/client",
   "author": "David Zwart",
-  "version": "0.3.9",
+  "version": "0.3.10",
   "private": false,
-  "license": "AGPLv3",
+  "license": "AGPL-3.0-or-later",
   "repository": {
     "type": "git",
     "url": "https://github.com/fdm-monster/fdm-monster"

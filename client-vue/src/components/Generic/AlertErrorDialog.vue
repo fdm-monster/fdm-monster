@@ -66,7 +66,8 @@ export default class AlertErrorDialog extends Vue {
     this.failedUploads = uploadsState.failedUploads;
   }
 
-  uploadOtherHandler(e: any) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  uploadOtherHandler(_e: any) {
     this.errorType = "Unknown error";
     this.errorCode = undefined;
     this.dialogOpened = true;

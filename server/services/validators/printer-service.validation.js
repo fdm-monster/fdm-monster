@@ -15,7 +15,12 @@ const updatePrinterEnabledRule = {
   enabled: "required|boolean"
 };
 
+const updateApiUsernameRule = {
+  currentUser: "required|string"
+};
+
 module.exports = {
   createPrinterRules,
-  updatePrinterEnabledRule
+  updatePrinterEnabledRule,
+  updateApiUsernameRule
 };
