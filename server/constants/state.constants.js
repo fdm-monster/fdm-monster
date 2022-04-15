@@ -22,7 +22,7 @@ const CATEGORY = {
   Offline: "Offline",
   Disconnected: "Disconnected",
   Complete: "Complete",
-  Error: "Error!",
+  Error: "Error",
   Active: "Active"
 };
 
@@ -53,6 +53,7 @@ const OP_STATE = {
 // All states of the app. Nice to share between server and client
 const PSTATE = {
   Offline: "Offline",
+  Loading: "Loading",
   Disabled: "Disabled",
   GlobalAPIKey: "Global API Key Issue",
   ApiKeyRejected: "API Key rejected",
@@ -152,7 +153,8 @@ function remapOctoPrintState(octoPrintState) {
   const flags = octoPrintState.flags;
   const stateLabel = octoPrintState.text;
 
-  if (stateLabel.includes("Error:") || stateLabel.includes("error")) {
+  const stateLabelLower = stateLabel?.toLowerCase();
+  if (stateLabelLower?.includes("Error:") || stateLabelLower?.includes("error")) {
     return {
       state: PSTATE.Error,
       flags,
@@ -160,7 +162,7 @@ function remapOctoPrintState(octoPrintState) {
     };
   }
 
-  const mapping = OF_STATE_REMAP[stateLabel];
+  const mapping = OF_STATE_REMAP[stateLabel] || {};
   mapping.flags = flags;
   if (!!mapping) return mapping;
 
