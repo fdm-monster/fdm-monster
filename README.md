@@ -40,7 +40,7 @@ Feel like joining in as a developer or do you have a quick fix? Great! Please re
 - [x] Server restart capability using PM2 and nodemon (for Linux, Windows)
 - [ ] 🛡️ NodeJS Server legacy-free (history, alerts, custom gcode and filament)
 - [ ] 🛡️ Frontend user and basic role management
-- [ ] 🛡️ Full API and client test coverage >80% (now at 67%) 
+- [ ] 🛡️ Full API and client test coverage >80% (now at 68%) 
 - [ ] 🔌 FDM Connector - filament tracker 
 - [ ] 🔌 Raspberry Pi image and prebuilt customized OctoPi image
 - [ ] :rocket: Chocolatey package (Windows install)
