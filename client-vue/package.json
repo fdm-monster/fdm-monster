@@ -1,7 +1,7 @@
 {
   "name": "@fdm-monster/client",
   "author": "David Zwart",
-  "version": "0.3.9",
+  "version": "0.3.10",
   "private": false,
   "license": "AGPLv3",
   "repository": {
