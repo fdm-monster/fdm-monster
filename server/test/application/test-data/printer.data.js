@@ -1,4 +1,3 @@
-
 const groupName = "Row0_0";
 const testApiKey = "fdmonsterfdmonsterfdmonsterfdmon";
 
@@ -13,6 +12,14 @@ const testPrinterData = {
   }
 };
 
+const validNewPrinterState = {
+  apiKey: "asdasasdasdasdasdasdasdasdasdasd",
+  webSocketURL: "ws://asd.com/",
+  printerURL: "https://asd.com:81",
+  camURL: "http://asd.com:81"
+};
+
 module.exports = {
-  testPrinterData
-}
+  testPrinterData,
+  validNewPrinterState
+};
