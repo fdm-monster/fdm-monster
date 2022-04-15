@@ -80,6 +80,7 @@ export default class CreatePrinterDialog extends Vue {
   @Watch("dialogOpenedState")
   changeDialogOpened(newValue: boolean) {
     this.showingDialog = newValue;
+    this.testProgress = undefined;
   }
 
   formData() {

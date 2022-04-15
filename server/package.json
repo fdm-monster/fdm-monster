@@ -38,7 +38,7 @@
     "vue"
   ],
   "dependencies": {
-    "@fdm-monster/client": "0.3.10",
+    "@fdm-monster/client": "0.3.11",
     "awilix": "7.0.2",
     "awilix-express": "7.0.0",
     "axios": "^0.26.1",

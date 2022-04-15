@@ -97,6 +97,7 @@ export default class UpdatePrinterDialog extends Vue {
     // Due to the animation delay the nav model lags behind enough for SSE to pick up and override
     if (!newVal) {
       printersState.setUpdateDialogPrinter(undefined);
+      this.testProgress = undefined;
     }
   }
 
