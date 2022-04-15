@@ -45,6 +45,35 @@ const PrinterSchema = new mongoose.Schema({
     type: Number,
     required: false
   },
+  lastUploadedFile: {
+    type: {
+      fileName: {
+        type: String,
+        required: true
+      },
+      uploadTimestamp: {
+        type: Number,
+        required: true
+      },
+      parsedColor: {
+        type: String,
+        required: false
+      },
+      parsedAmount: {
+        type: Number,
+        required: false
+      },
+      parsedMaterial: {
+        type: String,
+        required: false
+      },
+      parsedAssignee: {
+        type: String,
+        required: false
+      }
+    },
+    required: false
+  },
   // TODO move out and model better
   fileList: {
     type: Object,
