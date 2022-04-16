@@ -25,7 +25,7 @@ const moveFileOrFolderRules = {
 
 const fileUploadCommandsRules = {
   select: "boolean",
-  print: "boolean"
+  print: "required|boolean"
 };
 
 const localFileUploadRules = {

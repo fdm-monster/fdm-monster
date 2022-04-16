@@ -9,8 +9,21 @@ import {
   WebSocketProtocol
 } from "@/models/printers/crud/create-printer.model";
 import { newRandomNamePair } from "@/constants/noun-adjectives.data";
+import PrinterCrudForm from "@/components/Generic/Forms/PrinterCrudForm.vue";
 
 export class PrintersService extends BaseService {
+  static applyLoginDetailsPatchForm(
+    patch: { printerURL: string; apiKey: string; printerName: string },
+    formData: PreCreatePrinter
+  ) {
+    const printerURL = new URL(patch.printerURL);
+    formData.printerHostPort = parseInt(printerURL.port) || 80;
+    formData.printerHostName = printerURL.hostname;
+    formData.printerHostPrefix = printerURL.protocol.replace(":", "") as HttpProtocol;
+    formData.printerName = patch.printerName || newRandomNamePair();
+    formData.apiKey = patch.apiKey;
+  }
+
   static convertPrinterToCreateForm(printer: CreatePrinter) {
     // Inverse transformation
     const newFormData = getDefaultCreatePrinter();
