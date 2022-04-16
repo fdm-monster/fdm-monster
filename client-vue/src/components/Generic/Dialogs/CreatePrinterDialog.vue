@@ -25,6 +25,7 @@
           <em class="red--text">* indicates required field</em>
           <v-spacer></v-spacer>
           <v-btn text @click="closeDialog()">Close</v-btn>
+          <v-btn text @click="fromClipboard()">Paste</v-btn>
           <v-btn :disabled="invalid" color="warning" text @click="testPrinter()">
             Test connection
           </v-btn>
@@ -104,6 +105,15 @@ export default class CreatePrinterDialog extends Vue {
 
   async isValid() {
     return await this.$refs.validationObserver.validate();
+  }
+
+  async fromClipboard() {
+    if (!this.$refs.printerCrudForm.formData) return;
+
+    const jsonData = await navigator.clipboard.readText();
+    const printerObject = JSON.parse(jsonData);
+
+    PrintersService.applyLoginDetailsPatchForm(printerObject, this.$refs.printerCrudForm.formData);
   }
 
   openTestPanel() {
