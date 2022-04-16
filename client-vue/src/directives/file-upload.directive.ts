@@ -20,11 +20,21 @@ const bindDropConditionally = (el: HTMLElement, printers: Printer[], context?: V
       const filesArray = e.dataTransfer?.files;
       if (!filesArray?.length) return;
 
-      const clonedFiles = [...filesArray];
+      const clonedFiles = [...Array.from(filesArray)];
       let convertedUploads = [];
       if (isSinglePrinter) {
-        console.debug("Single printer upload mode", printers.length, clonedFiles.length);
-        convertedUploads = convertPrinterMultiFileToQueue(firstPrinter, clonedFiles);
+        const printedFilename = clonedFiles.length === 1 ? clonedFiles[0].name : null;
+        console.debug(
+          "Single printer upload mode",
+          printers.length,
+          clonedFiles.length,
+          printedFilename
+        );
+        convertedUploads = convertPrinterMultiFileToQueue(
+          firstPrinter,
+          clonedFiles,
+          printedFilename
+        );
       } else {
         if (filesArray.length > 0) {
           throw "Cannot upload multiple files to multiple printers";

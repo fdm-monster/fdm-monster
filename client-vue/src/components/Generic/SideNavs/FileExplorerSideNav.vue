@@ -149,7 +149,7 @@
 
       <v-list-item v-for="(file, index) in filesListed" :key="index" link>
         <v-list-item-avatar>
-          <v-tooltip bottom>
+          <v-tooltip left>
             <template v-slot:activator="{ on, attrs }">
               <v-btn icon v-bind="attrs" @click="clickDownloadFile(file)" v-on="on">
                 <v-icon>download</v-icon>
@@ -160,7 +160,7 @@
         </v-list-item-avatar>
 
         <v-list-item-action>
-          <v-tooltip bottom>
+          <v-tooltip left>
             <template v-slot:activator="{ on, attrs }">
               <v-btn
                 :disabled="isFileBeingPrinted(file)"
@@ -176,12 +176,8 @@
           </v-tooltip>
         </v-list-item-action>
 
-        <v-list-item-icon>
-          <v-icon>{{ file.icon }}</v-icon>
-        </v-list-item-icon>
-
         <v-list-item-content>
-          <v-tooltip bottom>
+          <v-tooltip left>
             <template v-slot:activator="{ on, attrs }">
               <span
                 :class="{ 'current-file-print': isFileBeingPrinted(file) }"
@@ -197,11 +193,10 @@
               <strong>{{ isFileBeingPrinted(file) ? "Printing" : "Unused" }}</strong>
             </span>
           </v-tooltip>
-          <v-list-item-title></v-list-item-title>
         </v-list-item-content>
 
         <v-list-item-action>
-          <v-tooltip bottom>
+          <v-tooltip left>
             <template v-slot:activator="{ on, attrs }">
               <v-btn
                 :disabled="isFileBeingPrinted(file)"

@@ -19,6 +19,7 @@ class PrinterWebsocketTask {
   #errorModulus = 50; // After max throws, log it every x failures
   #errorCounts = {
     [ERR_COUNT.offline]: {},
+    [ERR_COUNT.notOctoPrint]: {},
     [ERR_COUNT.apiKeyNotAccepted]: {},
     [ERR_COUNT.apiKeyIsGlobal]: {},
     [ERR_COUNT.missingSessionKey]: {}
@@ -90,9 +91,9 @@ class PrinterWebsocketTask {
       localError = e;
     });
 
-    // Transport related error
     let errorCode = localError?.response?.status;
-    if (errorThrown && !localError.response) {
+    // Transport related error
+    if (errorThrown && !localError.response?.data) {
       // Not connected or DNS issue - abort flow
       const errorCount = this.#incrementErrorCount(ERR_COUNT.offline, printerId);
       printerState.setHostState(PSTATE.Offline, MESSAGE.offline);
@@ -102,16 +103,26 @@ class PrinterWebsocketTask {
       this.#resetPrinterErrorCount(ERR_COUNT.offline, printerId);
     }
 
-    // API related errors
+    // Illegal API response
+    if (errorThrown && errorCode === HttpStatusCode.NOT_FOUND) {
+      const errorCount = this.#incrementErrorCount(ERR_COUNT.notOctoPrint, printerId);
+      printerState.setHostState(PSTATE.NoAPI, MESSAGE.notOctoPrint);
+      printerState.setApiAccessibility(false, false, MESSAGE.notOctoPrint);
+      return this.handleSilencedError(errorCount, MESSAGE.notOctoPrint, printerName, true);
+    } else {
+      this.#resetPrinterErrorCount(ERR_COUNT.notOctoPrint, printerId);
+    }
+
+    // API related errors or empty response
     if (errorCode === HttpStatusCode.BAD_REQUEST) {
       // Bug
       printerState.setHostState(PSTATE.NoAPI, MESSAGE.badRequest);
       printerState.setApiAccessibility(false, false, MESSAGE.badRequest);
-      throw new ExternalServiceError(localError.response?.data);
+      throw new ExternalServiceError(localError?.response?.data);
     }
 
     // Response related errors
-    const loginResponse = response.data;
+    const loginResponse = response?.data;
     // This is a check which is best done after checking 400 code (GlobalAPIKey or pass-thru) - possible
     if (isLoginResponseGlobal(loginResponse)) {
       const errorCount = this.#incrementErrorCount(ERR_COUNT.apiKeyIsGlobal, printerId);

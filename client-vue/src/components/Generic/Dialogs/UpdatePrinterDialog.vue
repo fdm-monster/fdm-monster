@@ -25,6 +25,9 @@
           <em class="red--text">* indicates required field</em>
           <v-spacer></v-spacer>
           <v-btn text @click="closeDialog()">Close</v-btn>
+          <v-btn :disabled="invalid" color="gray" text @click="quickCopyConnectionString()">
+            Copy
+          </v-btn>
           <v-btn :disabled="invalid" color="warning" text @click="testPrinter()">
             Test connection
           </v-btn>
@@ -97,6 +100,7 @@ export default class UpdatePrinterDialog extends Vue {
     // Due to the animation delay the nav model lags behind enough for SSE to pick up and override
     if (!newVal) {
       printersState.setUpdateDialogPrinter(undefined);
+      this.testProgress = undefined;
     }
   }
 
@@ -144,6 +148,16 @@ export default class UpdatePrinterDialog extends Vue {
     if (!result.correlationToken) throw new Error("Test Printer CorrelationToken was empty.");
 
     this.$bus.on(sseTestPrinterUpdate(result.correlationToken), this.onTestPrinterUpdate);
+  }
+
+  async quickCopyConnectionString() {
+    const printer = this.storedUpdatedPrinter;
+    if (!printer) return;
+    const loginDetails = await PrintersService.getPrinterLoginDetails(printer.id);
+
+    await navigator.clipboard.writeText(
+      `{"printerURL": "${loginDetails.printerURL}", "apiKey": "${loginDetails.apiKey}", "printerName": "${printer.printerName}"}`
+    );
   }
 
   async submit() {

@@ -4,7 +4,8 @@ const { sanitizeURL } = require("../utils/url.utils");
 const { validateInput } = require("../handlers/validators");
 const {
   createPrinterRules,
-  updatePrinterEnabledRule
+  updatePrinterEnabledRule,
+  updateApiUsernameRule
 } = require("./validators/printer-service.validation");
 const {
   getDefaultPrinterEntry,
@@ -83,6 +84,8 @@ class PrinterService {
       createPrinterRules
     );
 
+    await this.get(printerId);
+
     printer.printerURL = printerURL;
     printer.webSocketURL = webSocketURL;
     printer.apiKey = apiKey;
@@ -104,6 +107,7 @@ class PrinterService {
    */
   async updateSortIndex(printerId, sortIndex) {
     const update = { sortIndex };
+    await this.get(printerId);
     return PrinterModel.findByIdAndUpdate(printerId, update, {
       new: true,
       useFindAndModify: false
@@ -112,6 +116,7 @@ class PrinterService {
 
   async updateFlowRate(printerId, flowRate) {
     const update = { flowRate };
+    await this.get(printerId);
     return PrinterModel.findByIdAndUpdate(printerId, update, {
       new: true,
       useFindAndModify: false
@@ -120,6 +125,7 @@ class PrinterService {
 
   async updateFeedRate(printerId, feedRate) {
     const update = { feedRate };
+    await this.get(printerId);
     return PrinterModel.findByIdAndUpdate(printerId, update, {
       new: true,
       useFindAndModify: false
@@ -130,6 +136,8 @@ class PrinterService {
     const update = {
       powerSettings: getPowerSettingsDefault()
     };
+
+    await this.get(printerId);
 
     return PrinterModel.findByIdAndUpdate(printerId, update, {
       new: true,
@@ -146,6 +154,7 @@ class PrinterService {
     };
 
     await validateInput(update, createPrinterRules);
+    await this.get(printerId);
 
     return PrinterModel.findByIdAndUpdate(printerId, update, {
       new: true,
@@ -159,6 +168,7 @@ class PrinterService {
     };
 
     await validateInput(update, updatePrinterEnabledRule);
+    await this.get(printerId);
 
     return PrinterModel.findByIdAndUpdate(printerId, update, {
       new: true,
@@ -166,14 +176,18 @@ class PrinterService {
     });
   }
 
-  async updateApiUsername(id, opAdminUserName) {
-    const printer = await PrinterModel.findById(id);
-    if (!printer) {
-      throw new NotFoundException(`The printer with ID ${id} does not exist in database.`);
-    }
+  async updateApiUsername(printerId, opAdminUserName) {
+    const update = {
+      currentUser: opAdminUserName
+    };
 
-    printer.currentUser = opAdminUserName;
-    return printer.save();
+    await validateInput(update, updateApiUsernameRule);
+    await this.get(printerId);
+
+    return PrinterModel.findByIdAndUpdate(printerId, update, {
+      new: true,
+      useFindAndModify: false
+    });
   }
 }
 

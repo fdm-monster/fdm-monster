@@ -1,9 +1,9 @@
 {
   "name": "@fdm-monster/client",
   "author": "David Zwart",
-  "version": "0.3.9",
+  "version": "0.3.12",
   "private": false,
-  "license": "AGPLv3",
+  "license": "AGPL-3.0-or-later",
   "repository": {
     "type": "git",
     "url": "https://github.com/fdm-monster/fdm-monster"
@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "axios": "0.26.1",
-    "core-js": "3.21.1",
+    "core-js": "3.22.0",
     "luxon": "2.3.1",
     "register-service-worker": "1.7.2",
     "validator": "13.7.0",
@@ -39,8 +39,8 @@
   "devDependencies": {
     "@types/jest": "27.4.1",
     "@types/validator": "13.7.2",
-    "@typescript-eslint/eslint-plugin": "5.18.0",
-    "@typescript-eslint/parser": "5.18.0",
+    "@typescript-eslint/eslint-plugin": "5.19.0",
+    "@typescript-eslint/parser": "5.19.0",
     "@vue/cli-plugin-babel": "5.0.4",
     "@vue/cli-plugin-e2e-cypress": "5.0.4",
     "@vue/cli-plugin-eslint": "5.0.4",

@@ -51,7 +51,7 @@
     "rimraf": "3.0.2",
     "rxjs": "7.5.5",
     "swagger-ui-express": "4.3.0",
-    "typeorm": "0.3.5"
+    "typeorm": "0.3.6"
   },
   "devDependencies": {
     "@nestjs/cli": "8.2.5",
@@ -65,8 +65,8 @@
     "@types/passport-local": "1.0.34",
     "@types/supertest": "2.0.12",
     "@types/ws": "8.5.3",
-    "@typescript-eslint/eslint-plugin": "5.18.0",
-    "@typescript-eslint/parser": "5.18.0",
+    "@typescript-eslint/eslint-plugin": "5.19.0",
+    "@typescript-eslint/parser": "5.19.0",
     "eslint": "8.13.0",
     "eslint-config-prettier": "8.5.0",
     "eslint-plugin-prettier": "4.0.0",
