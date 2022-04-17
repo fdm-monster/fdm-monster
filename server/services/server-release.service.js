@@ -123,7 +123,7 @@ class ServerReleaseService {
       return;
     }
 
-    if (!!packageVersion && packageVersion !== latestReleaseTag) {
+    if (!!packageVersion && latestReleaseState.updateAvailable) {
       if (!!this.#airGapped) {
         this.#logger.warning(
           `Installed release: ${packageVersion}. Skipping update check (air-gapped/disconnected from internet)`

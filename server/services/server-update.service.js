@@ -65,7 +65,7 @@ class ServerUpdateService {
       return result;
     }
 
-    this.#logger.warning("Pulling git to get the latest FDM-Monster server updates");
+    this.#logger.warning("Pulling git to get the latest server updates");
 
     const pullDetails = await this.#gitService.pull();
     result.status = "Pull action completed";
