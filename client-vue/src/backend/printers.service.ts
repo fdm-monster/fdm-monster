@@ -9,7 +9,6 @@ import {
   WebSocketProtocol
 } from "@/models/printers/crud/create-printer.model";
 import { newRandomNamePair } from "@/constants/noun-adjectives.data";
-import PrinterCrudForm from "@/components/Generic/Forms/PrinterCrudForm.vue";
 
 export class PrintersService extends BaseService {
   static applyLoginDetailsPatchForm(
