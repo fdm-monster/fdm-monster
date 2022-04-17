@@ -3,7 +3,7 @@
     <v-menu
       v-model="menu"
       :close-on-content-click="false"
-      :nudge-width="200"
+      :nudge-width="400"
       bottom
       offset-x
       offset-y
@@ -26,7 +26,6 @@
 
             <v-list-item-content>
               <v-list-item-title>Print Jobs</v-list-item-title>
-              <v-list-item-subtitle>All active files being printed</v-list-item-subtitle>
             </v-list-item-content>
             <v-text-field
               v-model="search"
@@ -101,9 +100,14 @@ export default class PrintJobsMenu extends Vue {
   menu: boolean;
 
   get activePrintJobs() {
-    return printersState.printersWithJob.filter(
-      (p) => !this.search || p.printerName.toLowerCase().includes(this.search.toLowerCase())
-    );
+    return printersState.printersWithJob.filter((p) => {
+      const fileNameSearch = p.currentJob.fileName?.toLowerCase() || "";
+      const printerUrlSearch = p.printerURL?.toLowerCase() || "";
+      const searchSearch = p.printerName?.toLowerCase() || "";
+
+      const combineSearch = `${fileNameSearch} ${printerUrlSearch} ${searchSearch}`;
+      return !this.search || combineSearch.includes(this.search.toLowerCase());
+    });
   }
 
   get activePrintCount() {
