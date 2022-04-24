@@ -40,7 +40,7 @@ export interface CreatePrinter {
   id?: string; // Only in case of update
 
   enabled: boolean;
-  display: boolean;
+  sortIndex: number;
   printerName: string;
 
   webSocketURL: string;
