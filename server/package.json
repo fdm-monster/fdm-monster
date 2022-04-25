@@ -84,7 +84,7 @@
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-prettier": "4.0.0",
     "eslint-plugin-promise": "6.0.0",
-    "eventsource": "2.0.0",
+    "eventsource": "2.0.1",
     "express-list-endpoints": "6.0.0",
     "jest": "27.5.1",
     "jest-util": "27.5.1",
