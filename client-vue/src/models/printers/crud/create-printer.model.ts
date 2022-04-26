@@ -1,4 +1,4 @@
-import {newRandomNamePair} from "@/constants/noun-adjectives.data";
+import { newRandomNamePair } from "@/constants/noun-adjectives.data";
 
 export type WebSocketProtocol = "ws" | "wss";
 export type HttpProtocol = "http" | "https";
@@ -13,7 +13,7 @@ export const getDefaultCreatePrinter = (): PreCreatePrinter => ({
   sortIndex: 0,
   apiKey: "",
   enabled: true,
-  stepSize: 1,
+  stepSize: 1
 });
 
 /**
