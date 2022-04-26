@@ -7,7 +7,7 @@ const {
   stepSizeRules,
   flowRateRules,
   feedRateRules,
-  updatePrinterEnabledRule
+  updatePrinterEnabledRule, testPrinterApiRules
 } = require("./validation/printer-controller.validation");
 const { AppConstants } = require("../server.constants");
 const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
@@ -108,7 +108,8 @@ class PrinterController {
   }
 
   async testConnection(req, res) {
-    const newPrinter = req.body;
+    const newPrinter = await validateMiddleware(req, testPrinterApiRules);
+
     if (!newPrinter.webSocketURL) {
       newPrinter.webSocketURL = convertHttpUrlToWebsocket(newPrinter.printerURL);
     }
@@ -245,7 +246,7 @@ class PrinterController {
 
   async setStepSize(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
-    const data = await validateMiddleware(req, stepSizeRules, res);
+    const data = await validateMiddleware(req, stepSizeRules);
 
     this.#printersStore.setPrinterStepSize(currentPrinterId, data.stepSize);
     res.send();
@@ -253,7 +254,7 @@ class PrinterController {
 
   async setFeedRate(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
-    const data = await validateMiddleware(req, feedRateRules, res);
+    const data = await validateMiddleware(req, feedRateRules);
 
     await this.#printersStore.setPrinterFeedRate(currentPrinterId, data.feedRate);
     res.send();
@@ -261,7 +262,7 @@ class PrinterController {
 
   async setFlowRate(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
-    const data = await validateMiddleware(req, flowRateRules, res);
+    const data = await validateMiddleware(req, flowRateRules);
 
     await this.#printersStore.setPrinterFlowRate(currentPrinterId, data.flowRate);
     res.send();

@@ -12,6 +12,13 @@ const feedRateRules = {
   feedRate: "required|between:10,200|integer"
 };
 
+const testPrinterApiRules = {
+  apiKey: `required|length:${UUID_LENGTH},${UUID_LENGTH}|alphaNumeric`,
+  printerURL: "required|httpurl",
+  webSocketURL: "wsurl",
+  camURL: "httpurl"
+}
+
 const updateSortIndexRules = {
   sortList: "required|array|minLength:1",
   "sortList.*": "required|mongoId"
@@ -32,6 +39,7 @@ module.exports = {
   stepSizeRules,
   feedRateRules,
   flowRateRules,
+  testPrinterApiRules,
   updateSortIndexRules,
   updatePrinterEnabledRule,
   updatePrinterConnectionSettingRules
