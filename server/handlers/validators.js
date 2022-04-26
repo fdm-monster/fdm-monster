@@ -5,34 +5,6 @@ const {
 } = require("../exceptions/runtime.exceptions");
 const { printerLoginToken, currentPrinterToken, printerIdToken } = require("../middleware/printer");
 
-const arrayValidator = function arrayLengthValidator(minIncl = null, maxIncl = null) {
-  return (arrayValue) => {
-    let isMinLength = true;
-    let isMaxLength = true;
-    if (!!minIncl) {
-      isMinLength = arrayValue.length >= minIncl;
-    }
-    if (!!maxIncl) {
-      isMaxLength = arrayValue.length <= maxIncl;
-    }
-    return isMinLength && isMaxLength;
-  };
-};
-
-function validateMongoURL(mongoURL) {
-  const mongoString = mongoURL.toLowerCase();
-  const hasMongoPrefix =
-    mongoString.toLowerCase().includes("mongodb://") ||
-    mongoString.toLowerCase().includes("mongodb+srv://");
-  const isKnownDatabase = mongoString.includes("/fdm-monster");
-
-  return {
-    hasMongoPrefix,
-    isKnownDatabase,
-    isValid: isKnownDatabase || hasMongoPrefix
-  };
-}
-
 function getExtendedValidator() {
   nodeInputValidator.extend("wsurl", ({ value, args }, validator) => {
     if (!value) return false;
@@ -98,9 +70,7 @@ async function validateMiddleware(req, rules) {
 }
 
 module.exports = {
-  arrayValidator,
   validateMiddleware,
   validateInput,
-  getScopedPrinter,
-  validateMongoURL
+  getScopedPrinter
 };
