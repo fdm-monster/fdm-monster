@@ -8,11 +8,14 @@ const {
 } = require("../extensions");
 const Printer = require("../../models/Printer");
 const { testApiKey, createTestPrinter } = require("./test-data/create-printer");
+const { TaskPresets } = require("../../task.presets");
+const DITokens = require("../../container.tokens");
 
 let Model = Printer;
 const defaultRoute = AppConstants.apiRoute + "/printer";
 const createRoute = defaultRoute;
 const updateSortIndexRoute = `${defaultRoute}/sort-index`;
+const testPrinterRoute = `${defaultRoute}/test-connection`;
 const getRoute = (id) => `${defaultRoute}/${id}`;
 const deleteRoute = (id) => `${defaultRoute}/${id}`;
 const updateRoute = (id) => `${defaultRoute}/${id}`;
@@ -32,11 +35,12 @@ const batchRoute = `${defaultRoute}/batch`;
 
 let request;
 let octoPrintApiService;
+let taskManagerService;
 const apiKey = "fdmfdmfdmfdmfdmfdmfdmfdmfdmfdmfd";
 
 beforeAll(async () => {
   await dbHandler.connect();
-  ({ request, octoPrintApiService } = await setupTestApp(true));
+  ({ request, octoPrintApiService, taskManagerService } = await setupTestApp(true));
 });
 
 afterAll(async () => {
@@ -185,6 +189,31 @@ describe("PrinterController", () => {
       printerURL: "https://test.com/",
       apiKey
     });
+  });
+
+  it("should invalidate empty test printer connection", async () => {
+    const res = await request.post(testPrinterRoute).send();
+    expectInvalidResponse(res, ["apiKey", "printerURL"]);
+  });
+
+  it("should test printer connection", async () => {
+    let ranTask = false;
+    const preset = TaskPresets.PERIODIC_DISABLED;
+    preset.milliseconds = 2000;
+    await taskManagerService.registerJobOrTask({
+      id: DITokens.printerTestTask,
+      task: () => {
+        ranTask = true;
+      },
+      preset
+    });
+    const res = await request.post(testPrinterRoute).send({
+      apiKey,
+      webSocketURL: "ws://google.com/", // Sanitized
+      printerURL: "https://test.com/"
+    });
+    expectOkResponse(res);
+    expect(ranTask).toBeTruthy();
   });
 
   it("should update printer enabled setting correctly", async () => {

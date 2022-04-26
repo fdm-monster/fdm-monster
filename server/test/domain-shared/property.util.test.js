@@ -10,7 +10,7 @@ function unitUnderTest(someCondition, value, key) {
   };
 }
 
-describe("toDefinedKeyValue", function () {
+describe("toDefinedKeyValue", () => {
   const key = "testKey";
   const undefinedValue = undefined;
   const trueValue = true;
