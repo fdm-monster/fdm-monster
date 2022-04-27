@@ -1,4 +1,4 @@
-FROM node:16.14-bullseye-slim
+FROM node:16.15-bullseye-slim
 
 # Update Local Repository Index
 RUN apt-get update
