@@ -39,7 +39,7 @@
   ],
   "dependencies": {
     "@fdm-monster/client": "0.3.14",
-    "awilix": "7.0.2",
+    "awilix": "7.0.3",
     "awilix-express": "7.0.0",
     "axios": "^0.27.0",
     "bcryptjs": "^2.4.3",
