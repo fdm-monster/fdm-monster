@@ -5788,10 +5788,10 @@ tree-kill@1.2.2:
   resolved "https://registry.yarnpkg.com/tree-kill/-/tree-kill-1.2.2.tgz#4ca09a9092c88b73a7cdc5e8a01b507b0790a0cc"
   integrity sha512-L0Orpi8qGpRG//Nd+H90vFB+3iHnue1zSSGmNOOCh1GLJ7rUKVwV2HvijphGQS2UmhUZewS9VgvxYIdgr+fG1A==
 
-ts-jest@28.0.0:
-  version "28.0.0"
-  resolved "https://registry.yarnpkg.com/ts-jest/-/ts-jest-28.0.0.tgz#8a696cd1696c471154f7f0c81184ac99b526f400"
-  integrity sha512-JOUGExRO4vNaQdc920/sJjFZxe9lBGa6WIuNWkvtZoORGI9dyHTBqhuaJUdBVWIfqj+vaK3TRt/B1T0hQ0ROaA==
+ts-jest@28.0.1:
+  version "28.0.1"
+  resolved "https://registry.yarnpkg.com/ts-jest/-/ts-jest-28.0.1.tgz#626b4d7d5c386f88f4813d959ffc4ca0a8ffef96"
+  integrity sha512-PbkbitaT/9ZYAqqzk3UYTvCq080Seo46T3m/AdwcZ0D8WH2uBhG6PvA8oOAWsZIknzPQU66fYobvFCL8IqIhmg==
   dependencies:
     bs-logger "0.x"
     fast-json-stable-stringify "2.x"
