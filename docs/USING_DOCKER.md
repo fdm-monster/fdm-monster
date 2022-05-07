@@ -24,20 +24,20 @@ services:
       MONGO_INITDB_DATABASE: fdm-monster
     ports:
      # HOST:CONTAINER
-    - 27017:27017
+    - "28017:27017"
     volumes:
     - ./mongodb-data:/data/db
-    restart: unless_stopped
+    restart: unless-stopped
 
   fdm-monster:
     container_name: fdm-monster    
     image: davidzwa/fdm-monster:latest
-    restart: always
+    restart: unless-stopped
     mem_limit: 400m # Feel free to adjust! 400 MB is quite high and a safety limit.
     ports:
-    - 4000:4000
+    - "4000:4000"
     environment:
-    - MONGO=mongodb://mongodb:27017/fdm-monster?authSource=admin
+    - MONGO=mongodb://mongodb:28017/fdm-monster?authSource=admin
     volumes:
     # Volumes as local relative folders (validate with 'docker-compose config')
     - ./fdm-monster/logs:/app/logs
