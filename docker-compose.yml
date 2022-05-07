@@ -1,18 +1,31 @@
 volumes:
   mongodb-data:
 
+# For more detailed info, read /docs/USING_DOCKER.md
 services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    environment:
+      MONGO_INITDB_DATABASE: fdm-monster
+    ports:
+      # default is 27017
+      - "28017:27017"
+    volumes:
+      - ./mongodb-data:/data/db
+    restart: unless-stopped
+
   fdm-monster:
     container_name: fdm-monster
     image: davidzwa/fdm-monster:development
-    restart: always
+    restart: unless-stopped
     build:
       context: ./server
       dockerfile: docker/Dockerfile
     ports:
-      - 4001:4000
+      - "4001:4000"
     environment:
-      - MONGO=mongodb://host.docker.internal:27017/fdm-monster?readPreference=primary&ssl=false
+      - MONGO=mongodb://mongodb:28017/fdm-monster?readPreference=primary&ssl=false
     volumes:
       # Volumes as local relative folders (validate with 'docker-compose config')
       - ./fdm-monster/logs:/app/logs
