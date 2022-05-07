@@ -14,6 +14,7 @@ module.exports = {
     if (databaseReadyState === 1) {
       next();
     } else {
+      res.status(500);
       res.send({
         databaseReadyState: serverHost.hasConnected(),
         state: "Retrying mongo connection. Please contact the developer if this persists."

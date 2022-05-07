@@ -9,6 +9,7 @@ const cors = require("cors");
 const { interceptRoles } = require("./middleware/authorization");
 const helmet = require("helmet");
 const { AppConstants } = require("./server.constants");
+const { interceptDatabaseError } = require("./middleware/database");
 
 function setupNormalServer() {
   const httpServer = express();
@@ -43,6 +44,7 @@ function setupNormalServer() {
     .use(passport.initialize())
     .use(passport.session())
     .use(scopePerRequest(container))
+    .use(interceptDatabaseError)
     .use(interceptRoles);
 
   return {
