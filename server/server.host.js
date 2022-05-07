@@ -5,7 +5,6 @@ const { loadControllers } = require("awilix-express");
 const exceptionHandler = require("./middleware/exception.handler");
 const { getAppDistPath, fetchServerPort } = require("./server.env");
 const { NotFoundException } = require("./exceptions/runtime.exceptions");
-const { interceptDatabaseError } = require("./middleware/database");
 
 class ServerHost {
   #logger;
@@ -48,7 +47,6 @@ class ServerHost {
       })
       .use(loadControllers(`${routePath}/server/*.controller.js`, { cwd: __dirname }))
       .use(loadControllers(`${routePath}/*.controller.js`, { cwd: __dirname }))
-      .use(interceptDatabaseError)
       .use(exceptionHandler);
 
     // Serve the files for our frontend - do this later than the controllers
