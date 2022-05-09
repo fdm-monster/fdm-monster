@@ -6,9 +6,10 @@ const DITokens = require("./container.tokens");
  * @param task
  * @param preset
  * @param milliseconds optional parameter to quickly set milliseconds timing
+ * @param runImmediately
  * @returns {{task, id, preset}}
  */
-function registerTask(task, preset, milliseconds = 0, runImmediately) {
+function registerTask(task, preset, milliseconds = 0, runImmediately = false) {
   let timingPreset = { ...preset };
   timingPreset.milliseconds = preset.milliseconds || milliseconds;
   timingPreset.runImmediately = runImmediately | false;
@@ -32,7 +33,7 @@ class ServerTasks {
     registerTask(DITokens.softwareUpdateTask, TaskPresets.RUNDELAYED, 1500),
     registerTask(DITokens.printerSseTask, TaskPresets.PERIODIC, 500),
     registerTask(DITokens.printerTestTask, TaskPresets.PERIODIC_DISABLED, 2000, true),
-    registerTask(DITokens.printerFileCleanTask, TaskPresets.RUNONCE, 60*1000, true),
+    registerTask(DITokens.printerFileCleanTask, TaskPresets.RUNONCE, 60 * 1000, true),
     registerTask(DITokens.printerSystemTask, TaskPresets.PERIODIC_DISABLED, 6 * HOUR_MS, true),
     registerTask(DITokens.printerWebsocketTask, TaskPresets.PERIODIC, 5000, true),
     registerTask(DITokens.printerWebsocketPingTask, TaskPresets.PERIODIC, 30000, false)

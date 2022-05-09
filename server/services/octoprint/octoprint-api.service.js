@@ -270,29 +270,29 @@ class OctoPrintApiService extends OctoPrintRoutes {
     return processResponse(response, responseOptions);
   }
 
-  async downloadFile(printerConnection, fetchPath, targetPath, callback) {
-    const fileStream = fs.createWriteStream(targetPath);
-    // TODO
-    const res = await this._httpClient.get(printerConnection, fetchPath, false);
-    return await new Promise((resolve, reject) => {
-      res.body.pipe(fileStream);
-      res.body.on("error", reject);
-      fileStream.on("finish", async () => {
-        await callback(resolve, reject);
-      });
-    });
-  }
-
-  // TODO WIP
-  async downloadImage({ printerURL, apiKey }, fetchPath, targetPath, callback) {
-    // https://stackoverflow.com/questions/55374755/node-js-axios-download-file-stream-and-writefile
-    const downloadURL = new URL(fetchPath, printerURL);
-    return request.head(downloadURL, (err, res, body) => {
-      res.headers[contentTypeHeaderKey] = "image/png";
-      res.headers[apiKeyHeaderKey] = apiKey;
-      request(downloadURL).pipe(fs.createWriteStream(targetPath)).on("close", callback);
-    });
-  }
+  // async downloadFile(printerConnection, fetchPath, targetPath, callback) {
+  //   const fileStream = fs.createWriteStream(targetPath);
+  //   // TODO
+  //   const res = await this._httpClient.get(printerConnection, fetchPath, false);
+  //   return await new Promise((resolve, reject) => {
+  //     res.body.pipe(fileStream);
+  //     res.body.on("error", reject);
+  //     fileStream.on("finish", async () => {
+  //       await callback(resolve, reject);
+  //     });
+  //   });
+  // }
+  //
+  // // TODO WIP
+  // async downloadImage({ printerURL, apiKey }, fetchPath, targetPath, callback) {
+  //   // https://stackoverflow.com/questions/55374755/node-js-axios-download-file-stream-and-writefile
+  //   const downloadURL = new URL(fetchPath, printerURL);
+  //   return request.head(downloadURL, (err, res, body) => {
+  //     res.headers[contentTypeHeaderKey] = "image/png";
+  //     res.headers[apiKeyHeaderKey] = apiKey;
+  //     request(downloadURL).pipe(fs.createWriteStream(targetPath)).on("close", callback);
+  //   });
+  // }
 }
 
 module.exports = OctoPrintApiService;

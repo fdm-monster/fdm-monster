@@ -5,6 +5,7 @@ module.exports = {
     "index.js",
     "migrate-mongo-config.js",
     ".eslintrc.js",
+    "jest.config.js",
     "assets",
     "coverage",
     "docker",

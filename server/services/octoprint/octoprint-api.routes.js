@@ -19,6 +19,7 @@ class OctoPrintRoutes {
   apiSystemCommands = `${this.apiSystem}/commands`;
   apiUsers = `${this.apiBase}/users`;
   apiLogin = `${this.apiBase}/login?passive=true`;
+  apiPluginPiSupport = `${this.apiBase}/plugin/pi_support`;
   apiProfiles = `${this.apiBase}/plugin/printerprofiles`;
   apiTimelapse = `${this.apiBase}/timelapse`;
   _settingsStore;

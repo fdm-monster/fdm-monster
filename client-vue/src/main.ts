@@ -49,3 +49,5 @@ new Vue({
   },
   render: (h) => h(App)
 }).$mount("#app");
+
+console.log("App Build UTC", document.documentElement.dataset.buildTimestampUtc);
