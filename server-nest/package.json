@@ -44,7 +44,7 @@
     "lodash": "4.17.21",
     "luxon": "2.4.0",
     "mongodb": "4.6.0",
-    "passport": "0.5.2",
+    "passport": "0.5.3",
     "passport-jwt": "4.0.0",
     "passport-local": "1.0.0",
     "reflect-metadata": "0.1.13",
