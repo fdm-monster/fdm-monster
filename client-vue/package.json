@@ -39,8 +39,8 @@
   "devDependencies": {
     "@types/jest": "27.5.1",
     "@types/validator": "13.7.2",
-    "@typescript-eslint/eslint-plugin": "5.23.0",
-    "@typescript-eslint/parser": "5.23.0",
+    "@typescript-eslint/eslint-plugin": "5.24.0",
+    "@typescript-eslint/parser": "5.24.0",
     "@vue/cli-plugin-babel": "5.0.4",
     "@vue/cli-plugin-e2e-cypress": "5.0.4",
     "@vue/cli-plugin-eslint": "5.0.4",
