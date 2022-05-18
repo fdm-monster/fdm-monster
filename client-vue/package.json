@@ -59,7 +59,7 @@
     "prettier": "2.6.2",
     "rimraf": "3.0.2",
     "sass": "1.51.0",
-    "sass-loader": "12.6.0",
+    "sass-loader": "13.0.0",
     "typescript": "4.6.4",
     "webpack": "5.72.1",
     "vue-cli-plugin-vuetify": "2.4.8",
