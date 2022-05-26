@@ -28,7 +28,6 @@ class AuthController {
       if (err) {
         throw new InternalServerException(err);
       }
-      res.redirect("/");
     });
 
     res.end();
