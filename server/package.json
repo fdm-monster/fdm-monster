@@ -63,7 +63,7 @@
     "node-input-validator": "^4.5.0",
     "node-upnp-ssdp": "^0.1.1",
     "nodemon": "^2.0.15",
-    "passport": "^0.5.2",
+    "passport": "^0.6.0",
     "passport-local": "^1.0.0",
     "rxjs": "^7.5.5",
     "rxjs-websockets": "^9.0.0",
