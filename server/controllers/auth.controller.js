@@ -24,7 +24,12 @@ class AuthController {
   }
 
   logout(req, res) {
-    req.logout();
+    req.logout(function (err) {
+      if (err) {
+        throw new InternalServerException(err);
+      }
+      res.redirect("/");
+    });
 
     res.end();
   }
