@@ -1,5 +1,3 @@
-const _ = require("lodash");
-const Logger = require("../../handlers/logger.js");
 const { getJobCacheDefault } = require("../../constants/cache.constants");
 const { ValidationException } = require("../../exceptions/runtime.exceptions");
 
@@ -12,11 +10,11 @@ class JobsCache {
   #cachedJobProgress = {};
 
   #eventEmitter2;
+  #logger;
 
-  #logger = new Logger("Jobs-Cache");
-
-  constructor({ eventEmitter2 }) {
+  constructor({ eventEmitter2, loggerFactory }) {
     this.#eventEmitter2 = eventEmitter2;
+    this.#logger = loggerFactory("Jobs-Cache");
   }
 
   getPrinterJob(printerId) {
