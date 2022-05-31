@@ -12,15 +12,6 @@ function toTimeFormat(printTime) {
   return `${h}:${m}`;
 }
 
-function getCompletionDate(printTimeLeftSeconds, completion) {
-  if (completion === 100) {
-    return "No Active Job";
-  }
-
-  const printDoneDT = DateTime.now().plus({ seconds: printTimeLeftSeconds });
-  return printDoneDT.toFormat("ccc LLL dd yyyy: HH:mm");
-}
-
 /**
  * Calculate a start and end time using a duration and 'now' as end
  * @param printDuration

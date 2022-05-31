@@ -1,7 +1,5 @@
 const _ = require("lodash");
 const Logger = require("../../handlers/logger.js");
-const { getPrintCostNumeric } = require("../../utils/print-cost.util");
-const { getCompletionDate } = require("../../utils/time.util");
 const { getJobCacheDefault } = require("../../constants/cache.constants");
 const { ValidationException } = require("../../exceptions/runtime.exceptions");
 
