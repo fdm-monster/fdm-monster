@@ -2,7 +2,7 @@ const _ = require("lodash");
 const { ValidationException } = require("../../exceptions/runtime.exceptions");
 
 class FilamentCache {
-  #filamentList = {};
+  #filamentList = [];
 
   #logger;
 
@@ -25,9 +25,13 @@ class FilamentCache {
     }
   }
 
+  getFilament(filamentId) {
+    return this.#filamentList.find((f) => f.id === filamentId);
+  }
+
   addFilament(filamentEntry) {
     const filamentCacheEntry = this.#mapFilamentEntryToCacheEntry(filamentEntry);
-    this.#filamentList[filamentCacheEntry.id] = filamentCacheEntry;
+    this.#filamentList.push(filamentCacheEntry);
 
     return filamentCacheEntry;
   }
@@ -37,14 +41,15 @@ class FilamentCache {
       throw new ValidationException("Parameter filamentId was not provided.");
     }
 
-    const filamentEntry = this.#filamentList[filamentId];
+    const filamentEntry = this.getFilament(filamentId);
 
     if (!filamentEntry) {
       this.#logger.warning("Did not remove cached Filament as it was not found in cache");
       return;
     }
 
-    delete this.#filamentList[filamentId];
+    const index = this.#filamentList.findIndex((f) => f.id === filamentId);
+    this.#filamentList.splice(index, 1);
 
     this.#logger.info(`Purged filamentId '${filamentId}' Filament cache`);
   }

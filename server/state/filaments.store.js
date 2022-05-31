@@ -20,8 +20,7 @@ class FilamentsStore {
   }
 
   getFilament(filamentId) {
-    const cachedFilaments = this.listFilaments();
-    return cachedFilaments[filamentId];
+    return this.#filamentCache.getFilament(filamentId);
   }
 
   async addFilament(filament) {
