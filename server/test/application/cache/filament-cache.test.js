@@ -23,7 +23,7 @@ afterAll(async () => {
 
 describe("Filament-Cache", function () {
   it("should have default values", () => {
-    const spools = filamentCache.getFilamentSpools();
+    const spools = filamentCache.listFilaments();
     const stats = filamentCache.getStatistics();
     const selectedFilamentList = filamentCache.getSelected();
 
