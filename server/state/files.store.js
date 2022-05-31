@@ -161,7 +161,7 @@ class FilesStore {
    * @param printerId
    * @param filePath
    * @param throwError silence any missing file error if false
-   * @returns {Promise<void>}
+   * @returns {Promise<{cache: ((*&{success: boolean, message})|(*&{success: boolean, message})), service: *}>}
    */
   async deleteFile(printerId, filePath, throwError) {
     const serviceActionResult = await this.#printerFilesService.deleteFile(

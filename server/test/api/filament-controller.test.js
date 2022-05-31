@@ -7,6 +7,7 @@ const { testBadSpool, testNewSpool } = require("../application/test-data/filamen
 
 const defaultRoute = `${AppConstants.apiRoute}/filament`;
 const getRoute = (id) => `${defaultRoute}/${id}`;
+const deleteRoute = (id) => `${defaultRoute}/${id}`;
 const createRoute = defaultRoute;
 
 let request;
@@ -40,6 +41,17 @@ describe("FilamentController", () => {
   it("should create spool correctly", async () => {
     const response = await request.post(createRoute).send(testNewSpool);
     expectOkResponse(response, { id: expect.any(String) });
+  });
+
+  it("should delete spool from cache correctly", async () => {
+    const response = await request.post(createRoute).send(testNewSpool);
+    const data = expectOkResponse(response, { id: expect.any(String) });
+    expect(data).toBeTruthy();
+
+    const deleteResponse = await request.delete(deleteRoute(data.id)).send();
+    expectOkResponse(deleteResponse);
+
+    expect(filamentsStore.getFilament(data.id)).toBeUndefined();
   });
 
   it("should create and get spool correctly", async () => {

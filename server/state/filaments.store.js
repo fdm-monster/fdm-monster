@@ -21,12 +21,18 @@ class FilamentsStore {
 
   getFilament(filamentId) {
     const cachedFilaments = this.listFilaments();
-    return cachedFilaments.find((filament) => filament.id === filamentId);
+    return cachedFilaments[filamentId];
   }
 
   async addFilament(filament) {
     const entity = await this.#filamentService.create(filament);
     return this.#filamentCache.addFilament(entity);
+  }
+
+  async deleteFilament(filamentId) {
+    await this.#filamentService.delete(filamentId);
+
+    this.#filamentCache.purgeFilament(filamentId);
   }
 }
 

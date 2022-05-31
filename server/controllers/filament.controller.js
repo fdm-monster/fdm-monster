@@ -33,15 +33,6 @@ class FilamentController {
     res.send(filament);
   }
 
-  async selectFilament(req, res) {
-    const { id } = await validateMiddleware(req, idRules);
-    // TODO rules
-    const { tool, filamentId } = req.body;
-    const printer = this.#printersStore.getPrinterState(id);
-
-    res.send();
-  }
-
   async create(req, res) {
     const data = await validateMiddleware(req, createFilamentRules);
 
@@ -50,52 +41,49 @@ class FilamentController {
   }
 
   async delete(req, res) {
-    let searchId = req.body.id;
-    this.#logger.info("Deleting Filament Manager Profile: ", searchId);
+    const { id } = await validateInput(req.params, idRules);
 
-    await Filament.deleteOne({ _id: searchId }).exec();
-    this.#logger.info("Successfully deleted: ", searchId);
-
-    const filamentList = Filament.find({});
-    res.send(filamentList);
+    await this.#filamentsStore.deleteFilament(id);
+    res.send();
   }
 
-  async update(req, res) {
-    const searchId = req.body.id;
-    this.#logger.info("Request to update spool id: ", searchId);
-    this.#logger.info("New details: ", req.body.spool);
-    const newContent = req.body.spool;
-    const spools = await Filament.findById(searchId);
-
-    if (spools.spools.name != newContent[0]) {
-      spools.spools.name = newContent[0];
-      spools.markModified("spools");
-    }
-    if (spools.spools.profile != newContent[5]) {
-      spools.spools.profile = newContent[5];
-      spools.markModified("spools");
-    }
-    if (spools.spools.price != newContent[1]) {
-      spools.spools.price = newContent[1];
-      spools.markModified("spools");
-    }
-    if (spools.spools.weight != newContent[2]) {
-      spools.spools.weight = newContent[2];
-      spools.markModified("spools");
-    }
-    if (spools.spools.used != newContent[3]) {
-      spools.spools.used = newContent[3];
-      spools.markModified("spools");
-    }
-    if (spools.spools.tempOffset != newContent[4]) {
-      spools.spools.tempOffset = newContent[4];
-      spools.markModified("spools");
-    }
-    await spools.save();
-
-    const filamentList = Filament.find({});
-    res.send(filamentList);
-  }
+  // TODO reimplement
+  // async update(req, res) {
+  //   const searchId = req.body.id;
+  //   this.#logger.info("Request to update spool id: ", searchId);
+  //   this.#logger.info("New details: ", req.body.spool);
+  //   const newContent = req.body.spool;
+  //   const spools = await Filament.findById(searchId);
+  //
+  //   if (spools.spools.name != newContent[0]) {
+  //     spools.spools.name = newContent[0];
+  //     spools.markModified("spools");
+  //   }
+  //   if (spools.spools.profile != newContent[5]) {
+  //     spools.spools.profile = newContent[5];
+  //     spools.markModified("spools");
+  //   }
+  //   if (spools.spools.price != newContent[1]) {
+  //     spools.spools.price = newContent[1];
+  //     spools.markModified("spools");
+  //   }
+  //   if (spools.spools.weight != newContent[2]) {
+  //     spools.spools.weight = newContent[2];
+  //     spools.markModified("spools");
+  //   }
+  //   if (spools.spools.used != newContent[3]) {
+  //     spools.spools.used = newContent[3];
+  //     spools.markModified("spools");
+  //   }
+  //   if (spools.spools.tempOffset != newContent[4]) {
+  //     spools.spools.tempOffset = newContent[4];
+  //     spools.markModified("spools");
+  //   }
+  //   await spools.save();
+  //
+  //   const filamentList = Filament.find({});
+  //   res.send(filamentList);
+  // }
 }
 
 // prettier-ignore
@@ -105,6 +93,5 @@ module.exports = createController(FilamentController)
   .get("/", "list")
   .post("/", "create")
   .get("/:id", "get")
-  .patch("/:id", "update")
-  .delete("/:id", "delete")
-  .post("/:id/select-filament", "selectFilament");
+  // .patch("/:id", "update")
+  .delete("/:id", "delete");
