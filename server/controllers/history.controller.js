@@ -27,18 +27,8 @@ class HistoryController {
 
   async delete(req, res) {
     const { id } = await validateInput(req.params, idRules);
-
     await this.#historyStore.deleteEntry(id);
-
     res.send();
-  }
-
-  async updateCostSettings(req, res) {
-    const { id } = await validateInput(req.params, idRules);
-
-    const result = await this.#historyStore.updateCostSettings(id, getCostSettingsDefault());
-
-    res.send(result);
   }
 }
 
@@ -48,5 +38,4 @@ module.exports = createController(HistoryController)
     .before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR])])
     .get("/", "getCache")
     .delete("/:id", "delete")
-    .get("/stats", "stats")
-    .patch("/:id/cost-settings", "updateCostSettings");
+    .get("/stats", "stats");

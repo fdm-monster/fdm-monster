@@ -2,7 +2,6 @@ const dbHandler = require("../db-handler");
 const { AppConstants } = require("../../server.constants");
 const { setupTestApp } = require("../test-server");
 const { expectOkResponse, expectNotFoundResponse } = require("../extensions");
-const Printer = require("../../models/Printer");
 const { createTestHistory } = require("./test-data/create-history");
 const { createTestPrinter } = require("./test-data/create-printer");
 const DITokens = require("../../container.tokens");
@@ -42,18 +41,10 @@ describe("HistoryController", () => {
     expectOkResponse(response);
   });
 
-  it(`should update costSettings`, async () => {
-    const printer = await createTestPrinter(request);
-    const historyElement = await createTestHistory(printer.id, "testname");
-    await historyStore.loadHistoryStore();
-    const response = await request.patch(costSettingsRoute(historyElement.id)).send();
-    expectOkResponse(response);
-  });
-
   /**
    * TODO the endpoint is weakly protected against failure
    */
-  test.skip(`should 404 DELETE on ${statsRoute} for nonexisting history entry`, async () => {
+  it(`should 404 DELETE on ${statsRoute} for nonexisting history entry`, async () => {
     const response = await request.delete(getRoute("615f4fa37081fa06f428df90")).send();
 
     // Assert 404
