@@ -5,6 +5,11 @@ const realisticHistoryCache = require("../test-data/Histories.json");
 const { configureContainer } = require("../../../container");
 const DITokens = require("../../../container.tokens");
 const { assignYCumSum } = require("../../../utils/graph-point.utils");
+const { validNewPrinterState } = require("../test-data/printer.data");
+const {
+  EVENT_TYPES
+} = require("../../../services/octoprint/constants/octoprint-websocket.constants");
+const dbHandler = require("../../db-handler");
 
 const interestingButWeirdHistoryCache = [
   {
@@ -56,12 +61,20 @@ function legacyConvertIncremental(input) {
 
 let container;
 let historyStore;
+let printersStore;
 let mockHistoryService;
 
+beforeAll(async () => {
+  await dbHandler.connect();
+});
+
 beforeEach(() => {
+  dbHandler.clearDatabase();
+
   if (container) container.dispose();
   container = configureContainer();
   historyStore = container.resolve(DITokens.historyStore);
+  printersStore = container.resolve(DITokens.printersStore);
   mockHistoryService = container.resolve(DITokens.historyService);
 
   mockHistoryService.resetMockData();
@@ -74,11 +87,32 @@ afterEach(() => {
   jest.resetAllMocks();
 });
 
-describe("historyStore", () => {
+afterAll(async () => {
+  await dbHandler.closeDatabase();
+});
+
+describe("HistoryStore", () => {
   Date.now = () => 1618059562000;
   process.env.TZ = "UTC";
 
-  it("should initiate and finish within 5 sec for empty history", async () => {
+  it("should throw on getting non-existing history entry", async () => {
+    await expect(async () => historyStore.getEntry("asd")).rejects.toThrow(
+      "History entry not found in cache"
+    );
+  });
+
+  it("should create job history entry", async () => {
+    await printersStore.loadPrintersStore();
+    let printerState = await printersStore.addPrinter(validNewPrinterState);
+
+    await historyStore.createJobHistoryEntry(
+      printerState.id,
+      { payload: {}, resends: 0 },
+      EVENT_TYPES.PrintFailed
+    );
+  });
+
+  it("should load empty history cache", async () => {
     expect(await mockHistoryService.find({})).toHaveLength(0);
 
     await historyStore.loadHistoryStore();

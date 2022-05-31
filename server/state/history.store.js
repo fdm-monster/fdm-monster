@@ -49,11 +49,11 @@ class HistoryStore {
     return entry;
   }
 
-  async createJobHistoryEntry(printerId, { payload, resends }) {
+  async createJobHistoryEntry(printerId, { payload, resends }, eventType) {
     const job = this.#jobsCache.getPrinterJob(printerId);
     const printerState = this.#printersStore.getPrinterState(printerId);
 
-    const entry = await this.#historyService.create(printerState, job, { payload, resends });
+    const entry = await this.#historyService.create(printerState, job, payload, resends, eventType);
     this.#historyCache.push(entry);
 
     return entry;
@@ -63,13 +63,7 @@ class HistoryStore {
     await this.#historyService.delete(id);
 
     const index = this.getEntryIndex(id);
-    if (index !== -1) {
-      this.#historyCache.pop(index);
-
-      return Status.success("Deleted history entry from cached history");
-    } else {
-      return Status.failure("History entry was not found in cached history");
-    }
+    this.#historyCache.slice(index, 1);
   }
 
   /**
