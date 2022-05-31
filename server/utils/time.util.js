@@ -41,6 +41,5 @@ function durationToDates(printDuration) {
 
 module.exports = {
   toTimeFormat,
-  durationToDates,
-  getCompletionDate
+  durationToDates
 };
