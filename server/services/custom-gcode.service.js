@@ -1,9 +1,9 @@
-const CustomGCode = require("../models/CustomGCode");
+const Model = require("../models/CustomGCode");
 const { NotFoundException } = require("../exceptions/runtime.exceptions");
 
 class CustomGCodeService {
   async get(gcodeScriptId) {
-    const document = await CustomGCode.findById(gcodeScriptId);
+    const document = await Model.findById(gcodeScriptId);
     if (!document)
       throw new NotFoundException(`Custom GCode script with id ${gcodeScriptId} does not exist.`);
 
@@ -11,16 +11,16 @@ class CustomGCodeService {
   }
 
   async list() {
-    return CustomGCode.find();
+    return Model.find();
   }
 
   async create(gcodeScript) {
-    return CustomGCode.create(gcodeScript);
+    return Model.create(gcodeScript);
   }
 
   async delete(gcodeScriptId) {
     const gcode = await this.get(gcodeScriptId);
-    return CustomGCode.findByIdAndDelete(gcode.id);
+    return Model.findByIdAndDelete(gcode.id);
   }
 
   async update(gcodeScriptId, updatedData) {

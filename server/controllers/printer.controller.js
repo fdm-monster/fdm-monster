@@ -170,7 +170,6 @@ class PrinterController {
     const { currentPrinterId } = getScopedPrinter(req);
 
     this.#logger.info("Deleting printer with id", currentPrinterId);
-
     const result = await this.#printersStore.deletePrinter(currentPrinterId);
 
     res.send(result);
@@ -200,7 +199,7 @@ class PrinterController {
    */
   async updateConnectionSettings(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
-    const inputData = await validateMiddleware(req, updatePrinterConnectionSettingRules, res);
+    const inputData = await validateMiddleware(req, updatePrinterConnectionSettingRules);
 
     const newEntity = await this.#printersStore.updatePrinterConnectionSettings(
       currentPrinterId,
@@ -219,7 +218,6 @@ class PrinterController {
     const data = await validateMiddleware(req, updateSortIndexRules);
 
     this.#logger.info("Sorting printers according to provided order", JSON.stringify(data));
-
     await this.#printersStore.updateSortIndex(data.sortList);
 
     // TODO return array with printerID ordering
@@ -231,8 +229,8 @@ class PrinterController {
     const data = await validateMiddleware(req, updatePrinterEnabledRule);
 
     this.#logger.info("Changing printer enabled setting", JSON.stringify(data));
-
     await this.#printersStore.updateEnabled(currentPrinterId, data.enabled);
+
     res.send();
   }
 
@@ -240,7 +238,7 @@ class PrinterController {
     const { currentPrinterId } = getScopedPrinter(req);
 
     this.#logger.info("Refreshing OctoPrint API connection", currentPrinterId);
-    this.#printersStore.reconnectOctoPrint(currentPrinterId, true);
+    this.#printersStore.reconnectOctoPrint(currentPrinterId);
 
     res.send();
   }

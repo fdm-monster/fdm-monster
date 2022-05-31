@@ -30,6 +30,7 @@ const DITokens = {
   systemInfoBundleService: "systemInfoBundleService",
   printerFilesService: "printerFilesService",
   alertService: "alertService",
+  filamentService: "filamentService",
   scriptService: "scriptService",
   customGCodeService: "customGCodeService",
   autoDiscoveryService: "autoDiscoveryService",
@@ -40,7 +41,7 @@ const DITokens = {
   octoPrintLogsCache: "printerTickerStore",
   systemInfoStore: "systemInfoStore",
   filesStore: "filesStore",
-  filamentStore: "filamentStore",
+  filamentsStore: "filamentsStore",
   printerStateFactory: "printerStateFactory",
   printerState: "printerState",
   // Caches

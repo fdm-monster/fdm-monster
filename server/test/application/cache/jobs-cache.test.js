@@ -1,36 +1,6 @@
-const { getCompletionDate } = require("../../../utils/time.util");
 const { configureContainer } = require("../../../container");
 const DITokens = require("../../../container.tokens");
 const { getJobCacheDefault } = require("../../../constants/cache.constants");
-
-// Before luxon
-function legacyUUTGetCompletionDate(printTimeLeft, completion) {
-  let currentDate = new Date();
-  let dateComplete = "";
-  if (completion === 100) {
-    dateComplete = "No Active Job";
-  } else {
-    currentDate = currentDate.getTime();
-    const futureDateString = new Date(currentDate + printTimeLeft * 1000).toDateString();
-    let futureTimeString = new Date(currentDate + printTimeLeft * 1000).toTimeString();
-    futureTimeString = futureTimeString.substring(0, 5);
-    dateComplete = `${futureDateString}: ${futureTimeString}`;
-  }
-  return dateComplete;
-}
-
-describe("getCompletionDate", () => {
-  it("should calculate formatted completion date", async function () {
-    const completionDate = getCompletionDate(10, 99);
-    expect(completionDate).toBeTruthy();
-    const cutoffDate = completionDate.substring(0, completionDate.length - 1 - 4);
-    const refCutoffDate = legacyUUTGetCompletionDate(10, 99).substring(
-      0,
-      completionDate.length - 1 - 4
-    );
-    expect(cutoffDate).toEqual(refCutoffDate);
-  });
-});
 
 const printerId1 = "asd";
 const copiedFileName = "bla.geezcode";
@@ -81,7 +51,7 @@ describe("JobsCache", () => {
 
   it("should not tolerate updating with wrong id", () => {
     expect(() => jobsCache.updatePrinterJob()).toThrow(
-      `this printer ID undefined is not known. Cant update printer job cache.`
+      "this printer ID undefined is not known. Cant update printer job cache."
     );
   });
 
@@ -115,5 +85,5 @@ describe("JobsCache", () => {
     const knownPrinter = "knownPrinter";
     jobsCache.savePrinterJob(knownPrinter, websocketCurrentMsg);
     jobsCache.purgePrinterId(knownPrinter);
-  })
+  });
 });

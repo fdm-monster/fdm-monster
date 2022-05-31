@@ -1,5 +1,3 @@
-const { DateTime } = require("luxon");
-
 function toTimeFormat(printTime) {
   if (!printTime) {
     return "?";
@@ -10,15 +8,6 @@ function toTimeFormat(printTime) {
   const m = Math.floor((printTime / 1000 / 60 / 60 - h) * 60);
   const s = Math.floor(((printTime / 1000 / 60 / 60 - h) * 60 - m) * 60);
   return `${h}:${m}`;
-}
-
-function getCompletionDate(printTimeLeftSeconds, completion) {
-  if (completion === 100) {
-    return "No Active Job";
-  }
-
-  const printDoneDT = DateTime.now().plus({ seconds: printTimeLeftSeconds });
-  return printDoneDT.toFormat("ccc LLL dd yyyy: HH:mm");
 }
 
 /**
@@ -50,6 +39,5 @@ function durationToDates(printDuration) {
 
 module.exports = {
   toTimeFormat,
-  durationToDates,
-  getCompletionDate
+  durationToDates
 };

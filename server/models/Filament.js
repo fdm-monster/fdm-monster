@@ -17,7 +17,7 @@ const FilamentSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  used: {
+  consumedRatio: {
     type: Number,
     required: true
   },
@@ -25,7 +25,7 @@ const FilamentSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  metaData: {
+  meta: {
     type: Object,
     required: false
   }

@@ -1,4 +1,3 @@
-const Logger = require("../handlers/logger.js");
 const { ValidationException } = require("../exceptions/runtime.exceptions");
 
 /**
@@ -10,13 +9,21 @@ class FilesStore {
   #fileCache;
   #octoPrintApiService;
 
-  #logger = new Logger("Server-FilesStore");
+  #logger;
 
-  constructor({ printersStore, printerFilesService, fileCache, octoPrintApiService }) {
+  constructor({
+    printersStore,
+    printerFilesService,
+    fileCache,
+    octoPrintApiService,
+    loggerFactory
+  }) {
     this.#printersStore = printersStore;
     this.#printerFilesService = printerFilesService;
     this.#fileCache = fileCache;
     this.#octoPrintApiService = octoPrintApiService;
+
+    this.#logger = loggerFactory("Server-FilesStore");
   }
 
   /**
@@ -68,7 +75,9 @@ class FilesStore {
       );
     const printerFiles = this.getFiles(printerId);
     if (!printerFiles?.files?.length) return [];
-    return printerFiles.files.filter((file) => !!file.date && (file.date + ageDaysMax * 86400) < Date.now());
+    return printerFiles.files.filter(
+      (file) => !!file.date && file.date + ageDaysMax * 86400 < Date.now()
+    );
   }
 
   async deleteOutdatedFiles(printerId, ageDaysMax) {
@@ -152,7 +161,7 @@ class FilesStore {
    * @param printerId
    * @param filePath
    * @param throwError silence any missing file error if false
-   * @returns {Promise<void>}
+   * @returns {Promise<{cache: ((*&{success: boolean, message})|(*&{success: boolean, message})), service: *}>}
    */
   async deleteFile(printerId, filePath, throwError) {
     const serviceActionResult = await this.#printerFilesService.deleteFile(
