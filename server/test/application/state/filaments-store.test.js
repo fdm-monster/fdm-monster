@@ -29,6 +29,9 @@ describe("FilamentsStore", () => {
 
     // Test the filament is cached after boot
     await filamentsStore.loadFilamentsStore();
-    expect(filamentsStore.listFilaments()).toHaveLength(1);
+    const filaments = filamentsStore.listFilaments();
+    expect(filaments).toHaveLength(1);
+    expect(filaments[0].id).toBeTruthy();
+    expect(filaments[0]._id).toBeUndefined();
   });
 });
