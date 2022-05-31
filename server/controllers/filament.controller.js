@@ -1,4 +1,3 @@
-const _ = require("lodash");
 const { createController } = require("awilix-express");
 const { authenticate, authorizeRoles } = require("../middleware/authenticate");
 const Filament = require("../models/Filament");
@@ -11,26 +10,26 @@ const { createFilamentRules } = require("./validation/filament-controller.valida
 class FilamentController {
   #settingsStore;
   #printersStore;
-  #filamentStore;
+  #filamentsStore;
 
   #logger;
 
-  constructor({ settingsStore, printersStore, filamentStore, loggerFactory }) {
+  constructor({ settingsStore, printersStore, filamentsStore, loggerFactory }) {
     this.#settingsStore = settingsStore;
     this.#printersStore = printersStore;
-    this.#filamentStore = filamentStore;
+    this.#filamentsStore = filamentsStore;
 
     this.#logger = loggerFactory("Server-Filament");
   }
 
   async list(req, res) {
-    const spools = await this.#filamentStore.listFilaments();
+    const spools = await this.#filamentsStore.listFilaments();
     res.send(spools);
   }
 
   async get(req, res) {
     const { id } = await validateInput(req.params, idRules);
-    const filament = await this.#filamentStore.getFilament(id);
+    const filament = await this.#filamentsStore.getFilament(id);
     res.send(filament);
   }
 
@@ -46,7 +45,7 @@ class FilamentController {
   async create(req, res) {
     const data = await validateMiddleware(req, createFilamentRules);
 
-    const result = await this.#filamentStore.addFilament(data);
+    const result = await this.#filamentsStore.addFilament(data);
     res.send(result);
   }
 

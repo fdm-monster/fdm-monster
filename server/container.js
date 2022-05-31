@@ -28,7 +28,7 @@ const FilamentCache = require("./state/data/filament.cache");
 const PrinterState = require("./state/printer.state");
 const PrinterStateFactory = require("./state/printer-state.factory");
 const FilesStore = require("./state/files.store");
-const FilamentStore = require("./state/filament.store");
+const FilamentsStore = require("./state/filaments.store");
 const InfluxDbHistoryService = require("./services/influx/influx-db-history.service");
 const InfluxDbFilamentService = require("./services/influx/influx-db-filament.service");
 const InfluxDbPrinterStateService = require("./services/influx/influx-db-printer-state.service");
@@ -122,7 +122,7 @@ function configureContainer() {
     [DITokens.octoPrintLogsCache]: asClass(OctoPrintLogsCache).singleton(),
     [DITokens.fileCache]: asClass(FileCache).singleton(),
     [DITokens.fileUploadTrackerCache]: asClass(FileUploadTrackerCache).singleton(),
-    [DITokens.filamentStore]: asClass(FilamentStore), // No need for singleton as its now based on filamentCache
+    [DITokens.filamentsStore]: asClass(FilamentsStore), // No need for singleton as its now based on filamentCache
     [DITokens.filesStore]: asClass(FilesStore).singleton(),
     [DITokens.printersStore]: asClass(PrintersStore).singleton(),
 

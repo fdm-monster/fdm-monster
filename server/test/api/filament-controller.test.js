@@ -1,21 +1,22 @@
 const dbHandler = require("../db-handler");
 const { AppConstants } = require("../../server.constants");
 const { setupTestApp } = require("../test-server");
-const {
-  expectInvalidResponse,
-  expectOkResponse,
-  expectNotFoundResponse
-} = require("../extensions");
+const { expectInvalidResponse, expectOkResponse } = require("../extensions");
+const DITokens = require("../../container.tokens");
 
 const defaultRoute = `${AppConstants.apiRoute}/filament`;
 const getRoute = (id) => `${defaultRoute}/${id}`;
 const createRoute = defaultRoute;
 
 let request;
+let container;
+let filamentsStore;
 
 beforeAll(async () => {
   await dbHandler.connect();
-  ({ request } = await setupTestApp(true));
+
+  ({ request, container } = await setupTestApp(true));
+  filamentsStore = container.resolve(DITokens.filamentsStore);
 });
 
 beforeEach(async () => {});
@@ -50,14 +51,14 @@ describe("FilamentController", () => {
 
   it("should create spool correctly", async () => {
     const response = await request.post(createRoute).send(newSpool);
-    expectOkResponse(response, { _id: expect.any(String) });
+    expectOkResponse(response, { id: expect.any(String) });
   });
 
   it("should create and get spool correctly", async () => {
     const response = await request.post(createRoute).send(newSpool);
-    const data = expectOkResponse(response, { _id: expect.any(String) });
+    const data = expectOkResponse(response, { id: expect.any(String) });
 
-    const getResponse = await request.get(getRoute(data._id)).send();
-    expectOkResponse(getResponse, { _id: data._id });
+    const getResponse = await request.get(getRoute(data.id)).send();
+    expectOkResponse(getResponse, { id: data.id });
   });
 });

@@ -41,7 +41,7 @@ const DITokens = {
   octoPrintLogsCache: "printerTickerStore",
   systemInfoStore: "systemInfoStore",
   filesStore: "filesStore",
-  filamentStore: "filamentStore",
+  filamentsStore: "filamentsStore",
   printerStateFactory: "printerStateFactory",
   printerState: "printerState",
   // Caches

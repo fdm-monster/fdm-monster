@@ -1,8 +1,7 @@
 const _ = require("lodash");
-const Filament = require("../../models/Filament");
 
 class FilamentCache {
-  #filamentSpools = [];
+  #filamentList = [];
   #statistics = [];
   #selectedFilamentList = [];
 
@@ -17,15 +16,29 @@ class FilamentCache {
     this.#printersStore = printersStore;
     this.#printerProfilesCache = printerProfilesCache;
 
-    this.#logger = loggerFactory("Server-Filament");
+    this.#logger = loggerFactory("FilamentCache");
+  }
+
+  cacheFilaments(filaments) {
+    this.#filamentList = [];
+    for (let filament in filaments) {
+      this.addFilament(filament);
+    }
+
+    // Legacy code
+    // this.#selectedFilamentList = await this.selectedFilament(printers);
+    // this.#statistics = this.createStatistics();
   }
 
   addFilament(filamentEntry) {
-    this.#filamentSpools.push(filamentEntry);
+    const filamentCacheEntry = this.#mapFilamentEntryToCacheEntry(filamentEntry);
+    this.#filamentList.push(filamentCacheEntry);
+
+    return filamentCacheEntry;
   }
 
   listFilaments() {
-    return this.#filamentSpools;
+    return this.#filamentList;
   }
 
   getStatistics() {
@@ -34,51 +47,6 @@ class FilamentCache {
 
   getSelected() {
     return this.#selectedFilamentList;
-  }
-
-  async initCache() {
-    const printers = this.#printersStore.listPrinterStates();
-
-    const spools = await Filament.find({});
-    const spoolsArray = [];
-    const profilesArray = [];
-
-    for (let sp = 0; sp < spools.length; sp++) {
-      const spool = {
-        _id: spools[sp]._id,
-        name: spools[sp].spools.name,
-        profile: spools[sp].spools.profile,
-        price: spools[sp].spools.price,
-        weight: spools[sp].spools.weight,
-        used: spools[sp].spools.used,
-        remaining: spools[sp].spools.weight - spools[sp].spools.used,
-        percent: 100 - (spools[sp].spools.used / spools[sp].spools.weight) * 100,
-        tempOffset: spools[sp].spools.tempOffset,
-        printerAssignment: this.getPrinterAssignment(spools[sp]._id, printers),
-        fmID: spools[sp].spools.fmID
-      };
-      spoolsArray.push(spool);
-    }
-
-    this.#filamentSpools = spoolsArray;
-
-    this.#selectedFilamentList = await this.selectedFilament(printers);
-    this.#statistics = this.createStatistics(spoolsArray, profilesArray);
-    this.#logger.info("Filament information cleaned and ready for consumption...");
-  }
-
-  async selectedFilament(printers) {
-    const selectedArray = [];
-    for (let s = 0; s < printers.length; s++) {
-      if (typeof printers[s] !== "undefined" && Array.isArray(printers[s].selectedFilament)) {
-        for (let f = 0; f < printers[s].selectedFilament.length; f++) {
-          if (printers[s].selectedFilament[f] !== null) {
-            selectedArray.push(printers[s].selectedFilament[f]._id);
-          }
-        }
-      }
-    }
-    return selectedArray;
   }
 
   createStatistics(spools, profiles) {
@@ -142,29 +110,17 @@ class FilamentCache {
     };
   }
 
-  // TODO broken w.r.t. printerState
-  getPrinterAssignment(spoolID, farmPrinters) {
-    const assignments = [];
-    for (let p = 0; p < farmPrinters.length; p++) {
-      if (
-        typeof farmPrinters[p] !== "undefined" &&
-        Array.isArray(farmPrinters[p].selectedFilament)
-      ) {
-        for (let s = 0; s < farmPrinters[p].selectedFilament.length; s++) {
-          if (farmPrinters[p].selectedFilament[s] !== null) {
-            if (farmPrinters[p].selectedFilament[s]._id.toString() === spoolID.toString()) {
-              const printer = {
-                id: farmPrinters[p]._id,
-                tool: s,
-                name: farmPrinters[p].printerName
-              };
-              assignments.push(printer);
-            }
-          }
-        }
-      }
-    }
-    return assignments;
+  #mapFilamentEntryToCacheEntry(document) {
+    return {
+      id: String(document._id),
+      name: document.name,
+      manufacturer: document.manufacturer,
+      cost: document.cost,
+      weight: document.weight,
+      consumedRatio: document.consumedRatio,
+      printTemperature: document.printTemperature,
+      meta: document.meta
+    };
   }
 }
 

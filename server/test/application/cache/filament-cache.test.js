@@ -21,7 +21,7 @@ afterAll(async () => {
   await dbHandler.closeDatabase();
 });
 
-describe("Filament-Cache", function () {
+describe("FilamentCache", function () {
   it("should have default values", () => {
     const spools = filamentCache.listFilaments();
     const stats = filamentCache.getStatistics();
@@ -30,11 +30,6 @@ describe("Filament-Cache", function () {
     expect(spools).toHaveLength(0);
     expect(stats).toHaveLength(0);
     expect(selectedFilamentList).toHaveLength(0);
-  });
-
-  it("should be able to get printer assignment at start", async () => {
-    const result = filamentCache.getPrinterAssignment(null, []);
-    expect(result).toEqual([]);
   });
 
   it("should create stats with minimal input", async () => {
@@ -51,9 +46,5 @@ describe("Filament-Cache", function () {
       activeSpoolCount: expect.any(Number),
       materialBreakDown: []
     });
-  });
-
-  it("should be able to start with empty database", async () => {
-    await filamentCache.initCache();
   });
 });
