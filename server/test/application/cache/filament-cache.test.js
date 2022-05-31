@@ -23,28 +23,8 @@ afterAll(async () => {
 
 describe("FilamentCache", function () {
   it("should have default values", () => {
-    const spools = filamentCache.listFilaments();
-    const stats = filamentCache.getStatistics();
-    const selectedFilamentList = filamentCache.getSelected();
+    const filaments = filamentCache.listFilaments();
 
-    expect(spools).toHaveLength(0);
-    expect(stats).toHaveLength(0);
-    expect(selectedFilamentList).toHaveLength(0);
-  });
-
-  it("should create stats with minimal input", async () => {
-    const result = filamentCache.createStatistics([], [], []);
-
-    expect(result).toMatchObject({
-      materialList: [],
-      used: expect.any(Number),
-      total: expect.any(Number),
-      price: expect.any(Number),
-      profileCount: 0,
-      spoolCount: 0,
-      activeSpools: expect.any(Array),
-      activeSpoolCount: expect.any(Number),
-      materialBreakDown: []
-    });
+    expect(filaments).toHaveLength(0);
   });
 });
