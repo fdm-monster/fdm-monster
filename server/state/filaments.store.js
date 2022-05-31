@@ -12,10 +12,7 @@ class FilamentsStore {
 
   async loadFilamentsStore() {
     const documents = await this.#filamentService.list();
-
-    for (const document in documents) {
-      this.#filamentCache.cacheFilaments(document._doc);
-    }
+    this.#filamentCache.cacheFilaments(documents);
   }
 
   listFilaments() {
@@ -29,7 +26,7 @@ class FilamentsStore {
 
   async addFilament(filament) {
     const entity = await this.#filamentService.create(filament);
-    return this.#filamentCache.addFilament(entity._doc);
+    return this.#filamentCache.addFilament(entity);
   }
 }
 

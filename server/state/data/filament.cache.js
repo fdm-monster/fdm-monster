@@ -17,9 +17,9 @@ class FilamentCache {
     this.#logger = loggerFactory("FilamentCache");
   }
 
-  cacheFilaments(filaments) {
+  cacheFilaments(filamentDocs) {
     this.#filamentList = [];
-    for (let filament in filaments) {
+    for (let filament of filamentDocs) {
       this.addFilament(filament);
     }
   }
@@ -37,7 +37,7 @@ class FilamentCache {
 
   #mapFilamentEntryToCacheEntry(document) {
     return {
-      id: String(document._id),
+      id: String(document.id),
       name: document.name,
       manufacturer: document.manufacturer,
       cost: document.cost,
