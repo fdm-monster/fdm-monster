@@ -1,7 +1,6 @@
 const HistoryModel = require("../models/History");
-const { durationToDates } = require("../utils/time.util");
 const { NotFoundException } = require("../exceptions/runtime.exceptions");
-const { Status } = require("../constants/service.constants");
+const { EVENT_TYPES } = require("./octoprint/constants/octoprint-websocket.constants");
 
 class HistoryService {
   #octoPrintApiService;
@@ -12,7 +11,7 @@ class HistoryService {
   constructor({ octoPrintApiService, settingsStore, loggerFactory }) {
     this.#octoPrintApiService = octoPrintApiService;
     this.#settingsStore = settingsStore;
-    this.#logger = loggerFactory(HistoryService.name);
+    this.#logger = loggerFactory("HistoryService");
   }
 
   async find(limit = 100) {
@@ -28,36 +27,20 @@ class HistoryService {
   async delete(id) {
     const history = await this.get(id);
     await HistoryModel.findByIdAndDelete(history.id);
-
-    return Status.success("History entry was removed");
   }
 
-  async updateCostSettings(id, costSettings) {
-    const historyDoc = await this.get(id);
-    historyDoc.costSettings = costSettings;
-    await historyDoc.save();
-
-    return historyDoc;
-  }
-
-  async create(printer, job, { payload, resends }) {
-    let printerName = printer.getName();
-    const { startDate, endDate } = durationToDates(payload.time);
-
+  async create(printerState, job, payload, resends, eventType = EVENT_TYPES.PrintDone) {
     const printHistory = {
-      printerName,
-      printerId: printer._id,
-      costSettings: printer.costSettings,
+      printerName: printerState.getName(),
+      printerId: printerState.id,
       job,
-      resends,
-      success: payload.success,
-      reason: payload.reason,
-      fileName: payload.name,
-      fileDisplay: payload.display,
-      filePath: payload.path,
-      startDate,
-      endDate,
-      printTime: payload.time
+      payload,
+      meta: {
+        resends,
+        metaVersion: 1.0,
+        registeredAt: Date.now()
+      },
+      octoPrintEventType: eventType
     };
 
     const newHistoryDoc = new HistoryModel(printHistory);

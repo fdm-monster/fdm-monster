@@ -59,14 +59,6 @@ class HistoryStore {
     return entry;
   }
 
-  async updateCostSettings(id, costSettings) {
-    const entryIndex = this.getEntryIndex(id);
-    const historyEntry = await this.#historyService.updateCostSettings(id, costSettings);
-
-    this.#historyCache[entryIndex] = historyEntry;
-    return historyEntry;
-  }
-
   async deleteEntry(id) {
     await this.#historyService.delete(id);
 
