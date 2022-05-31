@@ -59,6 +59,7 @@ const PrinterFileCleanTask = require("./tasks/printer-file-clean.task");
 const { ROLES } = require("./constants/authorization.constants");
 const CustomGCodeService = require("./services/custom-gcode.service");
 const PrinterWebsocketPingTask = require("./tasks/printer-websocket-ping.task");
+const FilamentService = require("./services/filament.service");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -72,7 +73,7 @@ function configureContainer() {
     [DITokens.serverTasks]: asValue(ServerTasks),
     [DITokens.defaultRole]: asValue(ROLES.ADMIN),
     [DITokens.serverVersion]: asFunction(() => {
-      return process.env[AppConstants.VERSION_KEY]
+      return process.env[AppConstants.VERSION_KEY];
     }),
     // -- asFunction --
     [DITokens.printerStateFactory]: asFunction(PrinterStateFactory).transient(), // Factory function, transient on purpose!
@@ -127,6 +128,7 @@ function configureContainer() {
 
     // Extensibility and export
     [DITokens.alertService]: asClass(AlertService),
+    [DITokens.filamentService]: asClass(FilamentService),
     [DITokens.scriptService]: asClass(ScriptService),
     [DITokens.customGCodeService]: asClass(CustomGCodeService),
     [DITokens.influxDbSetupService]: asClass(InfluxDbSetupService).singleton(),
@@ -156,5 +158,5 @@ function configureContainer() {
 }
 
 module.exports = {
-    configureContainer
+  configureContainer
 };

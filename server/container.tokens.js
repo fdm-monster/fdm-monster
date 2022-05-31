@@ -30,6 +30,7 @@ const DITokens = {
   systemInfoBundleService: "systemInfoBundleService",
   printerFilesService: "printerFilesService",
   alertService: "alertService",
+  filamentService: "filamentService",
   scriptService: "scriptService",
   customGCodeService: "customGCodeService",
   autoDiscoveryService: "autoDiscoveryService",

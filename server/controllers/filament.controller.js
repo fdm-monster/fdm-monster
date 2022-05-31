@@ -3,30 +3,35 @@ const { createController } = require("awilix-express");
 const { authenticate, authorizeRoles } = require("../middleware/authenticate");
 const Filament = require("../models/Filament");
 const { AppConstants } = require("../server.constants");
-const { validateMiddleware } = require("../handlers/validators");
+const { validateMiddleware, validateInput } = require("../handlers/validators");
 const { idRules } = require("./validation/generic.validation");
 const { ROLES } = require("../constants/authorization.constants");
+const { createFilamentRules } = require("./validation/filament-controller.validation");
 
 class FilamentController {
   #settingsStore;
   #printersStore;
-  #filamentCache;
   #filamentStore;
 
   #logger;
 
-  constructor({ settingsStore, printersStore, filamentCache, filamentStore, loggerFactory }) {
+  constructor({ settingsStore, printersStore, filamentStore, loggerFactory }) {
     this.#settingsStore = settingsStore;
     this.#printersStore = printersStore;
-    this.#filamentCache = filamentCache;
     this.#filamentStore = filamentStore;
 
     this.#logger = loggerFactory("Server-Filament");
   }
 
   async list(req, res) {
-    const spools = await this.#filamentCache.getFilamentSpools();
-    res.send({ spools });
+    const spools = await this.#filamentStore.listFilaments();
+    res.send(spools);
+  }
+
+  async get(req, res) {
+    const { id } = await validateInput(req.params, idRules);
+    const filament = await this.#filamentStore.getFilament(id);
+    res.send(filament);
   }
 
   async selectFilament(req, res) {
@@ -39,27 +44,10 @@ class FilamentController {
   }
 
   async create(req, res) {
-    const filament = req.body;
-    this.#logger.info("Saving Filament Manager Filament: ", filament);
+    const data = await validateMiddleware(req, createFilamentRules);
 
-    // TODO What a mess
-    const spool = {
-      name: filament.spoolsName,
-      profile: filament.spoolsProfile,
-      price: filament.spoolsPrice,
-      weight: filament.spoolsWeight,
-      used: filament.spoolsUsed,
-      tempOffset: filament.spoolsTempOffset
-    };
-    const newFilament = new Filament(spool);
-    await newFilament.save();
-
-    this.#logger.info("New Filament saved successfully: ", newFilament);
-
-    res.send({
-      res: "success",
-      spools: newFilament
-    });
+    const result = await this.#filamentStore.addFilament(data);
+    res.send(result);
   }
 
   async delete(req, res) {
@@ -113,10 +101,11 @@ class FilamentController {
 
 // prettier-ignore
 module.exports = createController(FilamentController)
-    .prefix(AppConstants.apiRoute + "/filament")
-    .before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR])])
-    .get("/", "list")
-    .post("/:id", "create")
-    .patch("/:id", "update")
-    .delete("/:id", "delete")
-    .post("/:id/select-filament", "selectFilament");
+  .prefix(AppConstants.apiRoute + "/filament")
+  .before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR])])
+  .get("/", "list")
+  .post("/", "create")
+  .get("/:id", "get")
+  .patch("/:id", "update")
+  .delete("/:id", "delete")
+  .post("/:id/select-filament", "selectFilament");

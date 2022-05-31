@@ -1,7 +1,26 @@
 class FilamentStore {
   #filamentCache;
-  constructor({ filamentCache }) {
+  #filamentService;
+
+  constructor({ filamentCache, filamentService }) {
     this.#filamentCache = filamentCache;
+    this.#filamentService = filamentService;
+  }
+
+  listFilaments() {
+    return this.#filamentCache.listFilaments();
+  }
+
+  getFilament(filamentId) {
+    const cachedFilaments = this.listFilaments();
+    return cachedFilaments.find((filament) => String(filament._id) === filamentId);
+  }
+
+  async addFilament(filament) {
+    const entity = await this.#filamentService.create(filament);
+    this.#filamentCache.addFilament(entity._doc);
+
+    return Object.freeze({ ...entity._doc });
   }
 
   // TODO scrutiny
