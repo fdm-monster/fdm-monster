@@ -7,7 +7,8 @@ const {
   stepSizeRules,
   flowRateRules,
   feedRateRules,
-  updatePrinterEnabledRule, testPrinterApiRules
+  updatePrinterEnabledRule,
+  testPrinterApiRules
 } = require("./validation/printer-controller.validation");
 const { AppConstants } = require("../server.constants");
 const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
@@ -215,7 +216,7 @@ class PrinterController {
   }
 
   async updateSortIndex(req, res) {
-    const data = await validateMiddleware(req, updateSortIndexRules, res);
+    const data = await validateMiddleware(req, updateSortIndexRules);
 
     this.#logger.info("Sorting printers according to provided order", JSON.stringify(data));
 
@@ -227,7 +228,7 @@ class PrinterController {
 
   async updateEnabled(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
-    const data = await validateMiddleware(req, updatePrinterEnabledRule, res);
+    const data = await validateMiddleware(req, updatePrinterEnabledRule);
 
     this.#logger.info("Changing printer enabled setting", JSON.stringify(data));
 
@@ -238,10 +239,10 @@ class PrinterController {
   async reconnectOctoPrint(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
 
-    this.#logger.info("Reconnecting OctoPrint API connection", printerId);
+    this.#logger.info("Refreshing OctoPrint API connection", currentPrinterId);
     this.#printersStore.reconnectOctoPrint(currentPrinterId, true);
 
-    res.send({ success: true, message: "Printer will reconnect soon" });
+    res.send();
   }
 
   async setStepSize(req, res) {
@@ -299,27 +300,27 @@ class PrinterController {
 
 // prettier-ignore
 module.exports = createController(PrinterController)
-    .prefix(AppConstants.apiRoute + "/printer")
-    .before([authenticate(), authorizeRoles([ROLES.OPERATOR, ROLES.ADMIN]), printerResolveMiddleware()])
-    .get("/", "list")
-    .get("/sse", "sse")
-    .post("/", "create")
-    .post("/batch", "importBatch")
-    .post("/test-connection", "testConnection")
-    .post("/sort-index", "updateSortIndex")
-    .get("/:id", "get")
-    .patch("/:id", "update")
-    .delete("/:id", "delete")
-    .get("/:id/login-details", "getPrinterLoginDetails")
-    .post("/:id/serial-connect", "sendSerialConnectCommand")
-    .post("/:id/serial-disconnect", "sendSerialDisconnectCommand")
-    .post("/:id/job/stop", "stopPrintJob")
-    .patch("/:id/enabled", "updateEnabled")
-    .put("/:id/reconnect", "reconnectOctoPrint")
-    .patch("/:id/connection", "updateConnectionSettings")
-    .patch("/:id/step-size", "setStepSize")
-    .patch("/:id/flow-rate", "setFlowRate")
-    .patch("/:id/feed-rate", "setFeedRate")
-    .patch("/:id/reset-power-settings", "resetPowerSettings")
-    .get("/:id/terminal-logs", "getTerminalLogs")
-    .get("/:id/plugin-list", "getPluginList");
+  .prefix(AppConstants.apiRoute + "/printer")
+  .before([authenticate(), authorizeRoles([ROLES.OPERATOR, ROLES.ADMIN]), printerResolveMiddleware()])
+  .get("/", "list")
+  .get("/sse", "sse")
+  .post("/", "create")
+  .post("/batch", "importBatch")
+  .post("/test-connection", "testConnection")
+  .post("/sort-index", "updateSortIndex")
+  .get("/:id", "get")
+  .patch("/:id", "update")
+  .delete("/:id", "delete")
+  .get("/:id/login-details", "getPrinterLoginDetails")
+  .post("/:id/serial-connect", "sendSerialConnectCommand")
+  .post("/:id/serial-disconnect", "sendSerialDisconnectCommand")
+  .post("/:id/job/stop", "stopPrintJob")
+  .post("/:id/reconnect", "reconnectOctoPrint")
+  .patch("/:id/enabled", "updateEnabled")
+  .patch("/:id/connection", "updateConnectionSettings")
+  .patch("/:id/step-size", "setStepSize")
+  .patch("/:id/flow-rate", "setFlowRate")
+  .patch("/:id/feed-rate", "setFeedRate")
+  .patch("/:id/reset-power-settings", "resetPowerSettings")
+  .get("/:id/terminal-logs", "getTerminalLogs")
+  .get("/:id/plugin-list", "getPluginList");

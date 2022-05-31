@@ -19,7 +19,8 @@ const testPrinterRoute = `${defaultRoute}/test-connection`;
 const getRoute = (id) => `${defaultRoute}/${id}`;
 const deleteRoute = (id) => `${defaultRoute}/${id}`;
 const updateRoute = (id) => `${defaultRoute}/${id}`;
-const stopJobRoute = (id) => `${defaultRoute}/${id}/job/stop`;
+const stopJobRoute = (id) => `${updateRoute(id)}/job/stop`;
+const reconnectRoute = (id) => `${updateRoute(id)}/reconnect`;
 const connectionRoute = (id) => `${updateRoute(id)}/connection`;
 const loginDetailsRoute = (id) => `${updateRoute(id)}/login-details`;
 const enabledRoute = (id) => `${updateRoute(id)}/enabled`;
@@ -90,7 +91,6 @@ describe("PrinterController", () => {
     expectOkResponse(res);
 
     const deletionResponse = await request.delete(deleteRoute(printer.id)).send();
-    console.log(deletionResponse);
     expectOkResponse(deletionResponse, expect.anything());
   });
 
@@ -143,6 +143,13 @@ describe("PrinterController", () => {
 
     const response = await request.get(loginDetailsRoute(printer.id)).send();
     expectOkResponse(response, { printerURL: "http://url.com", apiKey: testApiKey });
+  });
+
+  it("should command store to reconnect OctoPrint", async () => {
+    const printer = await createTestPrinter(request);
+
+    const response = await request.post(reconnectRoute(printer.id)).send();
+    expectOkResponse(response);
   });
 
   it("should stop printer job correctly", async () => {
@@ -283,7 +290,7 @@ describe("PrinterController", () => {
     expectOkResponse(res, { message: "Disconnect command sent" });
   });
 
-  it("should update sort indexes", async () => {
+  it("should update sort indices", async () => {
     const printer = await createTestPrinter(request);
     const printer2 = await createTestPrinter(request, "Group0_1");
 
