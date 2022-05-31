@@ -69,8 +69,6 @@ beforeAll(async () => {
 });
 
 beforeEach(() => {
-  dbHandler.clearDatabase();
-
   if (container) container.dispose();
   container = configureContainer();
   historyStore = container.resolve(DITokens.historyStore);
