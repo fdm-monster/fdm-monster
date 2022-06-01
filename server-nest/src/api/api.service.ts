@@ -1,13 +1,14 @@
 import { Injectable } from "@nestjs/common";
-import { Connection } from "typeorm";
-import { InjectConnection } from "@nestjs/typeorm";
+import { DataSource } from "typeorm";
+import { InjectDataSource } from "@nestjs/typeorm";
 
 @Injectable()
 export class ApiService {
   public static databaseStartupErrorOccurred = false;
-  constructor(@InjectConnection() private readonly connection: Connection) {}
+
+  constructor(@InjectDataSource() private readonly connection: DataSource) {}
 
   isDatabaseConnected(): boolean {
-    return this.connection.isConnected;
+    return this.connection.isInitialized;
   }
 }
