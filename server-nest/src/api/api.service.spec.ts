@@ -1,6 +1,6 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { ApiService } from "./api.service";
-import { Connection } from "typeorm";
+import { DataSource } from "typeorm";
 
 describe("ApiService", () => {
   let service: ApiService;
@@ -10,9 +10,9 @@ describe("ApiService", () => {
       providers: [
         ApiService,
         {
-          provide: Connection,
+          provide: DataSource,
           useValue: {
-            isConnected: false
+            isInitialized: false
           }
         }
       ]
