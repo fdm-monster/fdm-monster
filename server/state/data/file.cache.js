@@ -1,4 +1,4 @@
-const { getDefaultFileCleanStatistics } = require("../../constants/cleaner.constants");
+const { getDefaultFileStatistics } = require("../../constants/cleaner.constants");
 const { findFileIndex } = require("../../services/utils/find-predicate.utils");
 const { getFileCacheDefault } = require("../../constants/cache.constants");
 const { ValidationException } = require("../../exceptions/runtime.exceptions");
@@ -11,7 +11,7 @@ class FileCache {
   // Associative array
   #printerFileStorage = {}; // Ass. array [Id] : { fileList, storage }
   #totalFileCount = 0;
-  #fileStatistics = getDefaultFileCleanStatistics();
+  #fileStatistics = getDefaultFileStatistics();
 
   #logger;
 

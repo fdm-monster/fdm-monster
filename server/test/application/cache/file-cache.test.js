@@ -1,6 +1,6 @@
 const { configureContainer } = require("../../../container");
 const DITokens = require("../../../container.tokens");
-const { getDefaultFileCleanStatistics } = require("../../../constants/cleaner.constants");
+const { getDefaultFileStatistics } = require("../../../constants/cleaner.constants");
 
 let container;
 let fileCache;
@@ -36,7 +36,7 @@ describe("generate", function () {
     const fileList = fileCache.getPrinterFiles(testPrinterId);
     expect(fileList).toBeTruthy();
     const stats = fileCache.getStatistics();
-    expect(stats).toEqual(getDefaultFileCleanStatistics());
+    expect(stats).toEqual(getDefaultFileStatistics());
   });
 
   // TODO We are not that far yet

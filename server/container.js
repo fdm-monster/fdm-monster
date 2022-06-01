@@ -38,7 +38,6 @@ const PrinterFilesService = require("./services/printer-files.service");
 const SoftwareUpdateTask = require("./tasks/software-update.task");
 const AutoDiscoveryService = require("./services/auto-discovery.service");
 const TerminalLogsCache = require("./state/data/terminal-logs.cache");
-const DashboardStatisticsCache = require("./state/data/dashboard-statistics.cache");
 const AlertService = require("./services/alert.service");
 const { asFunction, asClass, asValue, createContainer, InjectionMode } = require("awilix");
 const LoggerFactory = require("./handlers/logger-factory");
@@ -110,7 +109,6 @@ function configureContainer() {
     [DITokens.printerGroupService]: asClass(PrinterGroupService),
     [DITokens.octoPrintApiService]: asClass(OctoPrintApiService).singleton(),
     [DITokens.historyService]: asClass(HistoryService),
-    [DITokens.dashboardStatisticsCache]: asClass(DashboardStatisticsCache),
 
     [DITokens.filamentCache]: asClass(FilamentCache).singleton(),
     [DITokens.printerProfilesCache]: asClass(PrinterProfilesCache).singleton(),
