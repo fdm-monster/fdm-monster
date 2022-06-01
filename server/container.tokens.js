@@ -49,7 +49,6 @@ const DITokens = {
   printerProfilesCache: "printerProfilesCache",
   terminalLogsCache: "terminalLogsCache",
   jobsCache: "jobsCache",
-  dashboardStatisticsCache: "dashboardCache",
   fileCache: "fileCache",
   fileUploadTrackerCache: "fileUploadTrackerCache",
   historyStore: "historyStore",

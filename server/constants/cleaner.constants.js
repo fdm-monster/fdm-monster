@@ -17,7 +17,7 @@ const ALL_MONTHS = [
  * Get an empty history statistics object (inflate to class when methods and meta is required!)
  * @returns {{storageRemain: number, storageUsed: number, averageLength: number, biggestLength: number, storageTotal: number, storagePercent: number, smallestLength: number, folderCount: number, fileCount: number, smallestFile: number, averageFile: number, biggestFile: number}}
  */
-function getDefaultFileCleanStatistics() {
+function getDefaultFileStatistics() {
   return {
     storageUsed: 0,
     storageTotal: 0,
@@ -31,26 +31,6 @@ function getDefaultFileCleanStatistics() {
     smallestLength: 0,
     averageFile: 0,
     averageLength: 0
-  };
-}
-
-/**
- * Get a default dashboard statistics object (inflate to class when methods and meta is required!)
- * @returns {{printerHeatMaps: {}, currentPressure: null, timeEstimates: {}, farmUtilisation: {}, currentTemperature: null, currentUtilisation: {}, utilisationGraph: {}, currentStatus: {}, currentIAQ: null, currentHumidity: null, temperatureGraph: {}}}
- */
-function getDefaultDashboardStatisticsObject() {
-  return {
-    currentUtilisation: {},
-    currentStatus: {},
-    timeEstimates: {},
-    farmUtilisation: {},
-    printerHeatMaps: {},
-    utilisationGraph: {},
-    temperatureGraph: {},
-    currentIAQ: null,
-    currentTemperature: null,
-    currentPressure: null,
-    currentHumidity: null
   };
 }
 
@@ -117,8 +97,7 @@ function getEmptyToolTemperatureArray() {
 }
 
 module.exports = {
-  getDefaultFileCleanStatistics,
-  getDefaultDashboardStatisticsObject,
+  getDefaultFileStatistics,
   getDefaultHistoryStatistics,
   getEmptyToolTemperatureArray,
   DEFAULT_SPOOL_DENSITY,
