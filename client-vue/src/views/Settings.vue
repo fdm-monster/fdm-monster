@@ -35,7 +35,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { Component } from "vue-property-decorator";
-import CreatePrinterGroupDialog from "@/components/Generic/Dialogs/CreatePrinterGroupDialog";
+import CreatePrinterGroupDialog from "@/components/Generic/Dialogs/CreatePrinterGroupDialog.vue";
 
 @Component({
   components: { CreatePrinterGroupDialog },

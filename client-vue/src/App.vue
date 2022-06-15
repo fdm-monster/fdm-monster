@@ -13,7 +13,6 @@
     <CreatePrinterDialog />
     <CreatePrinterGroupDialog />
     <FileExplorerSideNav />
-    <!--    <FooterList></FooterList>-->
   </v-app>
 </template>
 
@@ -22,7 +21,6 @@ import Vue from "vue";
 import NavigationDrawer from "@/components/Generic/NavigationDrawer.vue";
 import TopBar from "@/components/Generic/TopBar.vue";
 import ErrorAlert from "@/components/Generic/AlertStack.vue";
-import FooterList from "@/components/Generic/FooterList.vue";
 import { Component, Watch } from "vue-property-decorator";
 import { SSEClient } from "vue-sse";
 import { PrinterSseMessage } from "@/models/sse-messages/printer-sse-message.model";
@@ -45,7 +43,6 @@ import CreatePrinterGroupDialog from "@/components/Generic/Dialogs/CreatePrinter
     CreatePrinterDialog,
     CreatePrinterGroupDialog,
     FileExplorerSideNav,
-    FooterList,
     ErrorAlert
   }
 })
