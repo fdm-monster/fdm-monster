@@ -13,7 +13,7 @@
   </v-app-bar>
 </template>
 
-<script>
+<script lang="ts">
 import PrintJobsMenu from "@/components/Generic/PrintJobsMenu.vue";
 import Component from "vue-class-component";
 import Vue from "vue";

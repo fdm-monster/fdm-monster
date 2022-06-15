@@ -105,7 +105,7 @@ export default class FdmSettings extends Vue {
       infoMessageEvent,
       `Trying to disable gcode analysis for ${printers.length} online printers.`
     );
-    for (let printer of printers) {
+    for (const printer of printers) {
       await PrinterSettingsService.setGCodeAnalysis(printer.id, false);
     }
     this.$bus.emit(
