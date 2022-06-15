@@ -32,7 +32,7 @@
   </v-container>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from "vue";
 import { Component } from "vue-property-decorator";
 import CreatePrinterGroupDialog from "@/components/Generic/Dialogs/CreatePrinterGroupDialog";

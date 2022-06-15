@@ -40,7 +40,7 @@
   </v-footer>
 </template>
 
-<script>
+<script lang="ts">
 import Component from "vue-class-component";
 import Vue from "vue";
 
@@ -48,6 +48,8 @@ import Vue from "vue";
   data: () => ({ openPrinterSlideGroup: false, selectedPrinter: null })
 })
 export default class FooterList extends Vue {
+  openPrinterSlideGroup: boolean;
+
   togglePrinterSlideGroup() {
     this.openPrinterSlideGroup = !this.openPrinterSlideGroup;
   }
