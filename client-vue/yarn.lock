@@ -1817,10 +1817,10 @@
     lodash.kebabcase "^4.1.1"
     svg-tags "^1.0.0"
 
-"@vue/babel-preset-app@^5.0.5":
-  version "5.0.5"
-  resolved "https://registry.yarnpkg.com/@vue/babel-preset-app/-/babel-preset-app-5.0.5.tgz#ccd05a6e4c0c2afc8e9c6ab34b476db43864a956"
-  integrity sha512-TmM4wWmNUYoW/YnCWwXxIbJCL/dXUMTfaduGTGLAyZDjV2VNI2ObWfMYM7oH31epXvxK2nKOskxWKnnNEiXDCA==
+"@vue/babel-preset-app@^5.0.6":
+  version "5.0.6"
+  resolved "https://registry.yarnpkg.com/@vue/babel-preset-app/-/babel-preset-app-5.0.6.tgz#049e1b54caa6d210ad2a134edbbbb6bef64d8d34"
+  integrity sha512-hoVr5M5RIvAL8F6MX8ZG0RvjA7MB7eDOkykK+M+qThkkrsAvlianzygnE86xN1N7JVSq7kGOyZk0Te+L20KqeQ==
   dependencies:
     "@babel/core" "^7.12.16"
     "@babel/helper-compilation-targets" "^7.12.16"
@@ -1902,67 +1902,67 @@
     "@vue/babel-plugin-transform-vue-jsx" "^1.2.1"
     camelcase "^5.0.0"
 
-"@vue/cli-overlay@^5.0.5":
-  version "5.0.5"
-  resolved "https://registry.yarnpkg.com/@vue/cli-overlay/-/cli-overlay-5.0.5.tgz#d37c741f759032257c7e29deff3c9d8834f31ce3"
-  integrity sha512-+zS1MBuLyTvFhBnixby3wpG3f3W8hicVwGjOZIpTkzp8IGKiQjtMF4zIF+EqdZJMh/7V+2GQKLHFP77n/VYoRw==
+"@vue/cli-overlay@^5.0.6":
+  version "5.0.6"
+  resolved "https://registry.yarnpkg.com/@vue/cli-overlay/-/cli-overlay-5.0.6.tgz#1c9dd0a2ff90ab7c5dc5c25eff8b57721b4795ae"
+  integrity sha512-rghCRMPVQ4FIKmQy8ipn8fKztdaQSQTktAKob2SGuEL/iBWfclSMAQCXfj908nyzOBymo+q/Sn/oiLhi07oHlA==
 
-"@vue/cli-plugin-babel@5.0.5":
-  version "5.0.5"
-  resolved "https://registry.yarnpkg.com/@vue/cli-plugin-babel/-/cli-plugin-babel-5.0.5.tgz#a2fca7f090cf872e82ceb3204fcd4fdc232610de"
-  integrity sha512-8R9fZetJdZgODMsNQzaP+BCc+MMditc5v5SICJNd/3ObR1H/AOjqxJAI8DGaY8dltqi4q1Tws9I1I+iABRgoLg==
+"@vue/cli-plugin-babel@5.0.6":
+  version "5.0.6"
+  resolved "https://registry.yarnpkg.com/@vue/cli-plugin-babel/-/cli-plugin-babel-5.0.6.tgz#a7701e74694044619588fd4abcc40a4bd9d81269"
+  integrity sha512-ruQhfhj2WM6Fe/VDQneQc/kqNp/p138SjQMfz7q/rxMTMG1kpV5B0jYWschXHXLQ6aDsFnqmBmIK+XjU3XTF3g==
   dependencies:
     "@babel/core" "^7.12.16"
-    "@vue/babel-preset-app" "^5.0.5"
-    "@vue/cli-shared-utils" "^5.0.5"
+    "@vue/babel-preset-app" "^5.0.6"
+    "@vue/cli-shared-utils" "^5.0.6"
     babel-loader "^8.2.2"
     thread-loader "^3.0.0"
     webpack "^5.54.0"
 
-"@vue/cli-plugin-e2e-cypress@5.0.5":
-  version "5.0.5"
-  resolved "https://registry.yarnpkg.com/@vue/cli-plugin-e2e-cypress/-/cli-plugin-e2e-cypress-5.0.5.tgz#0aa04459e77f6b0679c0752ecf813449713d7c92"
-  integrity sha512-qGubP0186JDxq7O8cXnq7/uViUx7pZtQxW9lNBm0r9fVITo4xrdtT7VcRd2zGhBacaDy8+uXK/LvkLIapk0f3Q==
+"@vue/cli-plugin-e2e-cypress@5.0.6":
+  version "5.0.6"
+  resolved "https://registry.yarnpkg.com/@vue/cli-plugin-e2e-cypress/-/cli-plugin-e2e-cypress-5.0.6.tgz#07da8c733ce6dbf179e33e21359f82205723ab71"
+  integrity sha512-M+xFbg3ftAusMgclnCblILktV8sem9IOKLEh+omd38gFi0i9lWdPo7i9MJ9yPqe9RP1DDTkyVU88KHqRhrJFmA==
   dependencies:
-    "@vue/cli-shared-utils" "^5.0.5"
+    "@vue/cli-shared-utils" "^5.0.6"
     eslint-plugin-cypress "^2.11.2"
 
-"@vue/cli-plugin-eslint@5.0.5":
-  version "5.0.5"
-  resolved "https://registry.yarnpkg.com/@vue/cli-plugin-eslint/-/cli-plugin-eslint-5.0.5.tgz#2a2fe7514171c9527a381a2bd21d850f6d266360"
-  integrity sha512-eEe4HY6VQkeaUDsgKitqdxanlSfzLkxEroMjLQrQB8pPtOpw9w4V9d9DqWJJhQnbw4LxQHnYvcu4eluDS3X0dA==
+"@vue/cli-plugin-eslint@5.0.6":
+  version "5.0.6"
+  resolved "https://registry.yarnpkg.com/@vue/cli-plugin-eslint/-/cli-plugin-eslint-5.0.6.tgz#63688b6366feb0e4949a23453dbd4984996c6092"
+  integrity sha512-fuc8w2IujzoenA/cdr/QYYMq2yaI1fYr0Fqom/M55B+DmW19GIuIRxYQvh0CEeCbFB2hAl3Flrazfx96/nAaQA==
   dependencies:
-    "@vue/cli-shared-utils" "^5.0.5"
+    "@vue/cli-shared-utils" "^5.0.6"
     eslint-webpack-plugin "^3.1.0"
     globby "^11.0.2"
     webpack "^5.54.0"
     yorkie "^2.0.0"
 
-"@vue/cli-plugin-pwa@5.0.5":
-  version "5.0.5"
-  resolved "https://registry.yarnpkg.com/@vue/cli-plugin-pwa/-/cli-plugin-pwa-5.0.5.tgz#23bcd101e15b9da77fe3aad061f89952dab30dbb"
-  integrity sha512-jNkZ8iVFdUoKUzxKpYKUFfiOXAbZLzFHfe0zCFOaH9dJSDAPyB0s3ZVhLY5YZ29cH1Pc9v1rI8wH9z4MRpjFzw==
+"@vue/cli-plugin-pwa@5.0.6":
+  version "5.0.6"
+  resolved "https://registry.yarnpkg.com/@vue/cli-plugin-pwa/-/cli-plugin-pwa-5.0.6.tgz#7c188b7362d0938f56ed4ca3f6087161892651a9"
+  integrity sha512-WVI4cS3BD1k41Fak7+7wQwqYwVUG7AEe64O6CVAyp/EcUtYdVoN+Oqe34DrzcR4ViEugqYkxWRKRFMhJfa1fpQ==
   dependencies:
-    "@vue/cli-shared-utils" "^5.0.5"
+    "@vue/cli-shared-utils" "^5.0.6"
     html-webpack-plugin "^5.1.0"
     webpack "^5.54.0"
     workbox-webpack-plugin "^6.1.0"
 
-"@vue/cli-plugin-router@5.0.5", "@vue/cli-plugin-router@^5.0.5":
-  version "5.0.5"
-  resolved "https://registry.yarnpkg.com/@vue/cli-plugin-router/-/cli-plugin-router-5.0.5.tgz#3ae4ed22a72f46cb7d872683e5454d0458740138"
-  integrity sha512-a8zSnRraaNlKTW8+kumRq+8PaKEldyMI2diGF2p0SuEJY3pCV9lh15xaG+j+kM2M/UAYaEClPQVAkTxmVvIHEQ==
+"@vue/cli-plugin-router@5.0.6", "@vue/cli-plugin-router@^5.0.6":
+  version "5.0.6"
+  resolved "https://registry.yarnpkg.com/@vue/cli-plugin-router/-/cli-plugin-router-5.0.6.tgz#b65d39845a8a53dc51b9c263bf75bdd24a53d8be"
+  integrity sha512-5ikUdfsSoKqpBhB5GhGYijH6mJnU+ZGqDv3QBf0brDeeh7PhClntxNAOLkB73c+LNxjBrlNCTkItuByF+AD29w==
   dependencies:
-    "@vue/cli-shared-utils" "^5.0.5"
+    "@vue/cli-shared-utils" "^5.0.6"
 
-"@vue/cli-plugin-typescript@5.0.5":
-  version "5.0.5"
-  resolved "https://registry.yarnpkg.com/@vue/cli-plugin-typescript/-/cli-plugin-typescript-5.0.5.tgz#8472a333c0dd341333ad4e60a248d5869a2288e4"
-  integrity sha512-pBE3ihBSa+9vcAxjyRvJ5rh0LQzUhunEwChFa0IlWmA3EVHSQdoqoBvLbjExFnElGcbNJ1FQEplOs7WoQasLvw==
+"@vue/cli-plugin-typescript@5.0.6":
+  version "5.0.6"
+  resolved "https://registry.yarnpkg.com/@vue/cli-plugin-typescript/-/cli-plugin-typescript-5.0.6.tgz#c98b6fe67d71034109694f53a92c4a102fd5f060"
+  integrity sha512-DKw3SZEWs+9v6oUMTJAGcmJY4XCIdLhwXU1MsXDmhea/VqoGTcY9yl1mb/QfZ3AttdRtC7n4Vk01tGa0pnewsA==
   dependencies:
     "@babel/core" "^7.12.16"
     "@types/webpack-env" "^1.15.2"
-    "@vue/cli-shared-utils" "^5.0.5"
+    "@vue/cli-shared-utils" "^5.0.6"
     babel-loader "^8.2.2"
     fork-ts-checker-webpack-plugin "^6.4.0"
     globby "^11.0.2"
@@ -1970,15 +1970,15 @@
     ts-loader "^9.2.5"
     webpack "^5.54.0"
 
-"@vue/cli-plugin-unit-jest@5.0.5":
-  version "5.0.5"
-  resolved "https://registry.yarnpkg.com/@vue/cli-plugin-unit-jest/-/cli-plugin-unit-jest-5.0.5.tgz#7d602fc476b5a97132ebc7e0368f386f8392f03f"
-  integrity sha512-sRNr52ck0HyeDheoZxbDsRaZGqBpPQMdtLAa8PWpRQlJDQu7RQ38WXW1IAUcBEHzIbX3DRqQ8G3PxHZmfdNJOA==
+"@vue/cli-plugin-unit-jest@5.0.6":
+  version "5.0.6"
+  resolved "https://registry.yarnpkg.com/@vue/cli-plugin-unit-jest/-/cli-plugin-unit-jest-5.0.6.tgz#21b039199b70a990675695d9fc0ec7370f47b477"
+  integrity sha512-PZ2/q4bo7UWKI2CXNomGrutJTPD+LHZWlz4QQ5uTTLSvrvWxZaULuMItIrTIZPUfDTnl98LpyTLRzNAhZBr63A==
   dependencies:
     "@babel/core" "^7.12.16"
     "@babel/plugin-transform-modules-commonjs" "^7.15.0"
     "@types/jest" "^27.0.1"
-    "@vue/cli-shared-utils" "^5.0.5"
+    "@vue/cli-shared-utils" "^5.0.6"
     babel-jest "^27.1.0"
     deepmerge "^4.2.2"
     jest "^27.1.0"
@@ -1986,24 +1986,24 @@
     jest-transform-stub "^2.0.0"
     jest-watch-typeahead "^1.0.0"
 
-"@vue/cli-plugin-vuex@5.0.5", "@vue/cli-plugin-vuex@^5.0.5":
-  version "5.0.5"
-  resolved "https://registry.yarnpkg.com/@vue/cli-plugin-vuex/-/cli-plugin-vuex-5.0.5.tgz#c2f0b34bdfea36b024e462fb88cce2583fef515a"
-  integrity sha512-rW2/rJVYg5KdnUuvxKSWRGymqB3GUCc9tlNjzV4rd/hTbtBylIv4Aioy0e8p0dk7XWnDzyoiaCYRmw48XP6u6A==
+"@vue/cli-plugin-vuex@5.0.6", "@vue/cli-plugin-vuex@^5.0.6":
+  version "5.0.6"
+  resolved "https://registry.yarnpkg.com/@vue/cli-plugin-vuex/-/cli-plugin-vuex-5.0.6.tgz#177bb2904ea57d606b8a3cad0147379fcc304174"
+  integrity sha512-9bwkaLxGqqrD5FPN7iNsIe5x60P0nScioMQvHf2ZIIoFAiM5yuTgOQkdSKGBhn0YG4IjYd1tnlVY4Q/P4ZHaTA==
 
-"@vue/cli-service@5.0.5":
-  version "5.0.5"
-  resolved "https://registry.yarnpkg.com/@vue/cli-service/-/cli-service-5.0.5.tgz#2c405e695ab49b100ece1bdf3f5f1e2204178e66"
-  integrity sha512-NJhjD9Frf2eoV+RNJlC6/j7ds7upvma42dPe/P2LnTlvCVg8L8xLNo3VAT18YNK1W/JCSMLSvNrzW3B3uOLuHA==
+"@vue/cli-service@5.0.6":
+  version "5.0.6"
+  resolved "https://registry.yarnpkg.com/@vue/cli-service/-/cli-service-5.0.6.tgz#2de955eacd84eec07b0e288779701459c5a5db9e"
+  integrity sha512-XSiTCjUMk8adjvQIJXBxk3ltEBLyBme8rpqdhJrpgCgSj+8pcPPyYKs1M0petkhwLMv3mEXVPNQmXKFzpdWVrw==
   dependencies:
     "@babel/helper-compilation-targets" "^7.12.16"
     "@soda/friendly-errors-webpack-plugin" "^1.8.0"
     "@soda/get-current-script" "^1.0.2"
     "@types/minimist" "^1.2.0"
-    "@vue/cli-overlay" "^5.0.5"
-    "@vue/cli-plugin-router" "^5.0.5"
-    "@vue/cli-plugin-vuex" "^5.0.5"
-    "@vue/cli-shared-utils" "^5.0.5"
+    "@vue/cli-overlay" "^5.0.6"
+    "@vue/cli-plugin-router" "^5.0.6"
+    "@vue/cli-plugin-vuex" "^5.0.6"
+    "@vue/cli-shared-utils" "^5.0.6"
     "@vue/component-compiler-utils" "^3.3.0"
     "@vue/vue-loader-v15" "npm:vue-loader@^15.9.7"
     "@vue/web-component-wrapper" "^1.3.0"
@@ -2052,10 +2052,10 @@
     webpack-virtual-modules "^0.4.2"
     whatwg-fetch "^3.6.2"
 
-"@vue/cli-shared-utils@^5.0.5":
-  version "5.0.5"
-  resolved "https://registry.yarnpkg.com/@vue/cli-shared-utils/-/cli-shared-utils-5.0.5.tgz#c0d9865c7af136445339fa42f3db3990b2e36645"
-  integrity sha512-L7cdGQUTYBeSOBA5c5ktXAdjH/3tfKaKkIJEGfu77JvWQ7ixGcHG2lJE6criCRLMfZLtaJmKQL1QIE6QA2sQQw==
+"@vue/cli-shared-utils@^5.0.6":
+  version "5.0.6"
+  resolved "https://registry.yarnpkg.com/@vue/cli-shared-utils/-/cli-shared-utils-5.0.6.tgz#f47202d68dfd4c2e41160c63721263b39cd97d1e"
+  integrity sha512-5HmlRtMByOCFO0P3mMUx8dVruTRhZ3pqQ0f1cCH9TmAoDjetmD/Ib7yx/5KxTHV8QY3xZJxYvgAmOU5C49K5xA==
   dependencies:
     "@achrinza/node-ipc" "^9.2.5"
     chalk "^4.1.2"
