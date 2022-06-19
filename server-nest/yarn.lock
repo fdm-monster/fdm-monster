@@ -930,10 +930,10 @@
     lodash "4.17.21"
     path-to-regexp "3.2.0"
 
-"@nestjs/terminus@8.0.6":
-  version "8.0.6"
-  resolved "https://registry.yarnpkg.com/@nestjs/terminus/-/terminus-8.0.6.tgz#012c00fb9bc133f53f6e029358e4bcbe1638ec90"
-  integrity sha512-HevQNlJzIkiZ5S1Yb+ll4pwiqg8qB5M6G+2LD0hIkUHzWFvVdCAZDIhLhtwjjRGJ76dwC8BFE/YyUC/4reGAzQ==
+"@nestjs/terminus@8.0.7":
+  version "8.0.7"
+  resolved "https://registry.yarnpkg.com/@nestjs/terminus/-/terminus-8.0.7.tgz#f078d98a9ca3d80fa3bd3bb89be16c844948dd8f"
+  integrity sha512-Gavu6f2eFZ554sHyHsfc1VsSIpcqU3fF8wxcKEdcMkt4loaqej+I46dMKujdWxfGjCnGsKSCf97xdiPBuOf6sw==
   dependencies:
     check-disk-space "3.3.0"
 
