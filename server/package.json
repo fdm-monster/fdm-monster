@@ -89,7 +89,7 @@
     "jest": "28.1.1",
     "jest-util": "28.1.1",
     "mongodb-memory-server": "8.7.1",
-    "nodemon": "2.0.16",
+    "nodemon": "2.0.17",
     "prettier": "2.7.1",
     "rimraf": "3.0.2",
     "supertest": "6.2.3"
