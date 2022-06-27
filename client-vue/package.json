@@ -55,7 +55,7 @@
     "@vue/eslint-config-typescript": "11.0.0",
     "@vue/test-utils": "2.0.1",
     "eslint": "8.18.0",
-    "eslint-plugin-prettier": "4.0.0",
+    "eslint-plugin-prettier": "4.1.0",
     "eslint-plugin-vue": "9.1.1",
     "prettier": "2.7.1",
     "rimraf": "3.0.2",
