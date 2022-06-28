@@ -1,7 +1,7 @@
 {
   "name": "fdm-monster",
   "author": "David Zwart",
-  "license": "AGPLv3",
+  "license": "AGPL-3.0-or-later",
   "version": "1.1.7",
   "description": "FDM Monster is a bulk OctoPrint manager to set up, configure and monitor 3D printers. Our aim is to provide extremely optimized websocket performance and reliability.",
   "main": "index.js",
