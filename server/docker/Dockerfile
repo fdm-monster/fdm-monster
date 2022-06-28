@@ -1,10 +1,10 @@
 FROM node:16.15-bullseye-slim
 WORKDIR /app
 
-RUN npm install -g pm2
+RUN yarn global add pm2
 
 COPY . .
-RUN npm ci --production
+RUN yarn install --production
 
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh

@@ -2,7 +2,7 @@
 FROM node:12-stretch-slim
 WORKDIR /app
 
-RUN npm install -g pm2
+RUN yarn global add pm2
 
 COPY ../.. /app
 
