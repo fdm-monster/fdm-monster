@@ -152,6 +152,8 @@ export default class CreatePrinterDialog extends Vue {
 
     this.$bus.emit(infoMessageEvent, `Printer ${newPrinterData.printerName} created`);
 
+    this.$refs.printerCrudForm.resetForm();
+    this.$refs.validationObserver.reset();
     this.closeDialog();
   }
 
