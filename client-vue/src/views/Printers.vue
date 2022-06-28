@@ -39,7 +39,7 @@
       </template>
       <template v-slot:top>
         <v-toolbar flat>
-          <v-toolbar-title>Showing printers</v-toolbar-title>
+          <v-toolbar-title>Filtering {{ printers.length || 0 }} printers</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-switch v-model="reorder" class="mt-5 mr-3" dark label="Sort mode" />
 
