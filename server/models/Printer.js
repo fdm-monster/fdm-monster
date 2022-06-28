@@ -45,13 +45,13 @@ const PrinterSchema = new mongoose.Schema({
     type: Number,
     required: false
   },
-  lastUploadedFile: {
+  lastPrintedFile: {
     type: {
       fileName: {
         type: String,
         required: true
       },
-      uploadTimestamp: {
+      editTimestamp: {
         type: Number,
         required: true
       },
@@ -67,7 +67,7 @@ const PrinterSchema = new mongoose.Schema({
         type: String,
         required: false
       },
-      parsedAssignee: {
+      parsedOrderCode: {
         type: String,
         required: false
       }

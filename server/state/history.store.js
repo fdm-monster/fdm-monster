@@ -1,8 +1,7 @@
-const { getDefaultHistoryStatistics } = require("../constants/cleaner.constants");
 const { arrayCounts } = require("../utils/array.util");
 const { sumValuesGroupByDate, assignYCumSum } = require("../utils/graph-point.utils");
 const { getPrintCostNumeric } = require("../utils/print-cost.util");
-const { Status } = require("../constants/service.constants");
+const { getDefaultHistoryStatistics } = require("../constants/service.constants");
 const { NotFoundException } = require("../exceptions/runtime.exceptions");
 
 /**

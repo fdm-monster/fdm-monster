@@ -178,6 +178,7 @@ class PrinterState {
       // Unmapped data - comes from database model so would be nicer to make a child object
       gcodeScripts: {},
       octoPrintVersion: this.getOctoPrintVersion(),
+      lastPrintedFile: this.#entityData.lastPrintedFile,
       selectedFilament: this.#entityData.selectedFilament,
       enabled: this.#entityData.enabled,
       sortIndex: this.#entityData.sortIndex,
