@@ -111,7 +111,7 @@ export default class PrintJobsMenu extends Vue {
   }
 
   get activePrintCount() {
-    return printersState.printersWithJob?.length;
+    return this.activePrintJobs.length || 0;
   }
 
   closeMenu() {
