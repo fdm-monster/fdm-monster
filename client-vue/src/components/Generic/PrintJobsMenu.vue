@@ -43,7 +43,7 @@
         <v-divider></v-divider>
 
         <v-list>
-          <v-list-item v-if="!activePrintCount"> No active prints</v-list-item>
+          <v-list-item v-if="!activePrintCount"> No results</v-list-item>
           <v-list-item v-for="printer of activePrintJobs" :key="printer.id">
             <v-list-item-action>
               <v-progress-circular
