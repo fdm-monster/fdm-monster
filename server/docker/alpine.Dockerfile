@@ -7,7 +7,7 @@ RUN apk add --no-cache --virtual .base-deps \
     npm \
     tini
 
-RUN npm install -g pm2
+RUN yarn global add pm2
 
 RUN adduser -D fdm --home /app && \
     mkdir -p /scripts && \
@@ -24,7 +24,7 @@ RUN apk add --no-cache --virtual .build-deps \
 
 WORKDIR /tmp/app
 COPY package.json .
-RUN npm install --only=production
+RUN yarn install --production
 
 RUN apk del .build-deps
 

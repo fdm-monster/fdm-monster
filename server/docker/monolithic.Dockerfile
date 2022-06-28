@@ -16,8 +16,9 @@ RUN rm -rf /var/lib/apt/lists/
 COPY . /app
 WORKDIR /app
 
-RUN npm ci --production
-RUN npm install -g pm2
+RUN yarn global add pm2
+
+RUN yarn install --production
 
 EXPOSE 4000
 
