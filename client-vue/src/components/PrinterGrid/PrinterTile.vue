@@ -26,9 +26,9 @@
     </v-container>
     <v-progress-linear
       v-if="printer && printer.currentJob"
-      bottom
-      absolute
       :value="printer.currentJob.progress"
+      absolute
+      bottom
       color="green"
     >
     </v-progress-linear>
@@ -58,7 +58,16 @@ export default class PrinterGridTile extends Vue {
   }
 
   get printerStateColor() {
+    const color = this.convertColor(this.printer.lastPrintedFile?.parsedColor?.toLowerCase());
+    if (color) {
+      return color;
+    }
+
     return this.printer?.printerState.colour.hex || "rgba(0,0,0,0)";
+  }
+
+  convertColor(colorName?: string) {
+    return this.printer?.lastPrintedFile.parsedColor?.toLowerCase();
   }
 
   id() {

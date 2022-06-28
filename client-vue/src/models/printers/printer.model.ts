@@ -15,10 +15,20 @@ export interface LoginDetails {
   printerURL: string;
 }
 
+export interface LastPrintedFile {
+  fileName: string;
+  editTimestamp: number;
+  parsedColor: string;
+  parsedAmount: number;
+  parsedMaterial: string;
+  parsedOrderCode: string;
+}
+
 export interface Printer {
   id: string;
   correlationToken?: string;
   printerState: PrinterState;
+  lastPrintedFile: LastPrintedFile;
   hostState: HostState;
   apiAccessibility: ApiAccessibility;
   webSocketState: WebsocketState;
