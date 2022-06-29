@@ -1,6 +1,6 @@
 const { NotFoundException } = require("../exceptions/runtime.exceptions");
 const { findFileIndex } = require("./utils/find-predicate.utils");
-const { Status, MATERIALS, PRINTER_PREFIXES } = require("../constants/service.constants");
+const { Status, MATERIALS } = require("../constants/service.constants");
 
 /**
  * An extension repository for managing printer files in database
@@ -12,7 +12,7 @@ class PrinterFilesService {
 
   constructor({ printerService, loggerFactory }) {
     this.#printerService = printerService;
-    this.#logger = loggerFactory(PrinterFilesService.name);
+    this.#logger = loggerFactory("PrinterFilesService");
   }
 
   async getPrinterFilesStorage(printerId) {
@@ -49,19 +49,19 @@ class PrinterFilesService {
     await printer.save();
 
     // Only now are we allowed to adjust the last uploaded printer file
+    let lastPrintedFile = {};
     try {
-      await this.setPrinterLastPrintedFile(printerId, addedFile);
+      lastPrintedFile = await this.setPrinterLastPrintedFile(printerId, addedFile.name);
     } catch (e) {
       this.#logger.warning(`Parsing printer file did not succeed. Filename: ${addedFile}`);
     }
 
-    return printer.fileList;
+    return { fileList: printer.fileList, lastPrintedFile };
   }
 
-  async setPrinterLastPrintedFile(printerId, addedFile) {
+  async setPrinterLastPrintedFile(printerId, fileName) {
     const printer = await this.#printerService.get(printerId);
 
-    const fileName = addedFile.name;
     const parsedData = !!fileName ? this.parseFileNameFormat(fileName) : {};
 
     printer.lastPrintedFile = {
@@ -75,6 +75,9 @@ class PrinterFilesService {
 
     printer.markModified("lastPrintedFile");
     await printer.save();
+
+    this.#logger.info("Parsed and updated printer file", printer.lastPrintedFile);
+    return printer.lastPrintedFile;
   }
 
   async clearFiles(printerId) {
@@ -110,8 +113,6 @@ class PrinterFilesService {
     printer.fileList.files.splice(fileIndex, 1);
     printer.markModified("fileList");
     await printer.save();
-
-    return Status.success("File was removed");
   }
 
   parseFileNameFormat(fileName) {
@@ -128,9 +129,7 @@ class PrinterFilesService {
 
     // Independently split order code
     const orderCodeOptions = amountReducedName.split("_", 1);
-    const hasOrderCode =
-      !!(orderCodeOptions?.length && orderCodeOptions[0]?.length) &&
-      PRINTER_PREFIXES.includes(orderCodeOptions[0][0]);
+    const hasOrderCode = !!(orderCodeOptions?.length && orderCodeOptions[0]?.length);
     const orderCode = hasOrderCode ? orderCodeOptions[0] : undefined;
 
     // Independently parse material and optionally color (PLA,PETG)

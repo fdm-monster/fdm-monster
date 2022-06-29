@@ -22,8 +22,6 @@ const MATERIALS = {
   FLEX: "FLEX"
 };
 
-const PRINTER_PREFIXES = ["F", "P", "C"];
-
 /**
  * Get an empty history statistics object (inflate to class when methods and meta is required!)
  * @returns {{storageRemain: number, storageUsed: number, averageLength: number, biggestLength: number, storageTotal: number, storagePercent: number, smallestLength: number, folderCount: number, fileCount: number, smallestFile: number, averageFile: number, biggestFile: number}}
@@ -228,7 +226,6 @@ module.exports = {
   DEFAULT_SPOOL_RATIO,
   ALL_MONTHS,
   MATERIALS,
-  PRINTER_PREFIXES,
   getSettingsAppearanceDefault,
   getCostSettingsDefault,
   getPowerSettingsDefault,

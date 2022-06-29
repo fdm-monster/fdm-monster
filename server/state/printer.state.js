@@ -111,6 +111,13 @@ class PrinterState {
     }
   }
 
+  updateLastPrintedFile(lastPrintedFile) {
+    this.#entityData = {
+      ...this.#entityData,
+      lastPrintedFile
+    };
+  }
+
   toFlat() {
     const convertedWSState = this.getWebSocketState();
     const opMeta = this.#websocketAdapter?.getOctoPrintMeta();
