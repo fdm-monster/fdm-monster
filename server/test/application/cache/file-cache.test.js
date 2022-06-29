@@ -1,6 +1,6 @@
 const { configureContainer } = require("../../../container");
 const DITokens = require("../../../container.tokens");
-const { getDefaultFileStatistics } = require("../../../constants/cleaner.constants");
+const { getDefaultFileStatistics } = require("../../../constants/service.constants");
 
 let container;
 let fileCache;

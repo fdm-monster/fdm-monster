@@ -147,13 +147,28 @@ class FilesStore {
     const printer = this.#printersStore.getPrinterState(printerId);
 
     // Check printer in database and modify
-    const printerFileList = await this.#printerFilesService.appendOrReplaceFile(
+    const { fileList, lastPrintedFile } = await this.#printerFilesService.appendOrReplaceFile(
       printer.id,
       addedFile
     );
 
     // Update cache with data from storage
-    await this.#fileCache.cachePrinterFiles(printer.id, printerFileList);
+    await this.#fileCache.cachePrinterFiles(printer.id, fileList);
+
+    // Update printer state with lastPrintedFile
+    printer.updateLastPrintedFile(lastPrintedFile);
+  }
+
+  async setExistingFileForPrint(printerId, filePath) {
+    const printer = this.#printersStore.getPrinterState(printerId);
+
+    const lastPrintedFile = await this.#printerFilesService.setPrinterLastPrintedFile(
+      printerId,
+      filePath
+    );
+
+    // Update printer state with lastPrintedFile
+    printer.updateLastPrintedFile(lastPrintedFile);
   }
 
   /**

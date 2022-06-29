@@ -168,11 +168,12 @@ class PrinterFilesController {
   }
 
   async selectAndPrintFile(req, res) {
-    const { printerLogin } = getScopedPrinter(req, [printerLoginToken]);
+    const { currentPrinterId, printerLogin } = getScopedPrinter(req, [printerLoginToken]);
     const { filePath: path, print } = await validateInput(req.body, selectAndPrintFileRules);
 
     const result = await this.#octoPrintApiService.selectPrintFile(printerLogin, path, print);
 
+    await this.#filesStore.setExistingFileForPrint(currentPrinterId, path);
     res.send(result);
   }
 
