@@ -85,7 +85,7 @@
     "eslint-plugin-promise": "6.0.0",
     "eventsource": "2.0.2",
     "express-list-endpoints": "6.0.0",
-    "jest": "28.1.1",
+    "jest": "28.1.2",
     "jest-util": "28.1.1",
     "mongodb-memory-server": "8.7.1",
     "nodemon": "2.0.18",
