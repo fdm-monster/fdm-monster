@@ -91,7 +91,7 @@
     "nodemon": "2.0.18",
     "prettier": "2.7.1",
     "rimraf": "3.0.2",
-    "supertest": "6.2.3"
+    "supertest": "6.2.4"
   },
   "resolutions": {
     "got": "11.8.5"
