@@ -2,7 +2,10 @@ const ServerSettingsModel = require("../models/ServerSettings.js");
 const Constants = require("../constants/server-settings.constants");
 const { validateInput } = require("../handlers/validators");
 const { serverSettingsUpdateRules } = require("./validators/server-settings-service.validation");
-const { printerFileCleanSettingKey, getDefaultPrinterFileCleanSettings } = require("../constants/server-settings.constants");
+const {
+  printerFileCleanSettingKey,
+  getDefaultPrinterFileCleanSettings
+} = require("../constants/server-settings.constants");
 
 class ServerSettingsService {
   async getOrCreate() {
@@ -53,14 +56,27 @@ class ServerSettingsService {
     const settingsDoc = await this.getOrCreate();
     settingsDoc.server.registration = enabled;
 
-    return ServerSettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, { new: true });
+    return ServerSettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
+      new: true
+    });
+  }
+
+  async setLoginRequired(enabled = true) {
+    const settingsDoc = await this.getOrCreate();
+    settingsDoc.server.loginRequired = enabled;
+
+    return ServerSettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
+      new: true
+    });
   }
 
   async update(patchUpdate) {
     const validatedInput = await validateInput(patchUpdate, serverSettingsUpdateRules);
     const settingsDoc = await this.getOrCreate();
 
-    return ServerSettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, validatedInput, { new: true });
+    return ServerSettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, validatedInput, {
+      new: true
+    });
   }
 }
 

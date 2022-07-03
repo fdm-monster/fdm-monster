@@ -62,7 +62,7 @@ export class Printer {
   @Column()
   camURL: string;
 
-  // TODO check if semver constrained, make OF-service readonly
+  // TODO check if semver constrained, make service readonly
   @Column()
   octoPrintVersion: string;
 

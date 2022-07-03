@@ -22,15 +22,14 @@ class ServerPublicController {
   welcome(req, res) {
     const serverSettings = this.#settingsStore.getServerSettings();
 
-    if (serverSettings.server.loginRequired === false || req.isAuthenticated()) {
+    if (serverSettings.server.loginRequired === false) {
       return res.send({
-        message:
-          "Login not required. Please load UI instead by requesting any route with text/html Content-Type"
+        message: "Login disabled. Please load the Vue app."
       });
     }
 
-    res.send({
-      message: "Please load the welcome API as this server is not instantiated properly."
+    return res.send({
+      message: "Login successful. Please load the Vue app."
     });
   }
 

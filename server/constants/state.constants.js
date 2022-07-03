@@ -73,7 +73,7 @@ const PSTATE = {
   Online: "Online"
 };
 
-const OF_STATE_REMAP = {
+const FDM_STATE_REMAP = {
   [OP_STATE.Offline]: {
     state: PSTATE.Disconnected, // hard remap!
     desc: "Your printer is disconnected"
@@ -162,7 +162,7 @@ function remapOctoPrintState(octoPrintState) {
     };
   }
 
-  const mapping = OF_STATE_REMAP[stateLabel] || {};
+  const mapping = FDM_STATE_REMAP[stateLabel] || {};
   mapping.flags = flags;
   if (!!mapping) return mapping;
 
