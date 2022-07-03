@@ -55,6 +55,10 @@ class SettingsStore {
     this.#serverSettings = await this.#serverSettingsService.setRegistrationEnabled(enabled);
   }
 
+  async setLoginRequired(enabled = true) {
+    this.#serverSettings = await this.#serverSettingsService.setLoginRequired(enabled);
+  }
+
   async updateClientSettings(fullUpdate) {
     this.#clientSettings = await this.#clientSettingsService.update(fullUpdate);
 
