@@ -3,6 +3,7 @@ const { AppConstants } = require("../../server.constants");
 const { setupTestApp } = require("../test-server");
 const { expectOkResponse, expectUnauthorizedResponse } = require("../extensions");
 const DITokens = require("../../container.tokens");
+const { loginTestUser } = require("./auth/login-test-user");
 
 let container;
 let updateService;
@@ -24,7 +25,7 @@ beforeAll(async () => {
   mockedHttpClient = container.resolve(DITokens.httpClient);
 });
 
-describe("AppController", () => {
+describe("ServerPublicController", () => {
   it("should return non-auth welcome", async function () {
     const response = await request.get(getRoute).send();
     expect(response.body).toMatchObject({
@@ -40,7 +41,30 @@ describe("AppController", () => {
       error: "Not authenticated"
     });
     expectUnauthorizedResponse(response);
+    // Return to default
+    await settingsStore.setLoginRequired(false);
+  });
 
+  it("should get login error", async function () {
+    await settingsStore.setLoginRequired();
+    const response = await request.get(getRoute).send();
+    expect(response.body).toMatchObject({
+      error: "Not authenticated"
+    });
+    expectUnauthorizedResponse(response);
+    // Return to default
+    await settingsStore.setLoginRequired(false);
+  });
+
+  it("should get welcome message", async function () {
+    await settingsStore.setLoginRequired();
+
+    const requestCookie = await loginTestUser(request);
+    const response = await request.get(getRoute).set("Cookie", requestCookie).send();
+    expect(response.body).toMatchObject({
+      message: "Login successful. Please load the Vue app."
+    });
+    expectOkResponse(response);
     // Return to default
     await settingsStore.setLoginRequired(false);
   });

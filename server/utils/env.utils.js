@@ -3,7 +3,7 @@ const Logger = require("../handlers/logger.js");
 const dotenv = require("dotenv");
 const isDocker = require("is-docker");
 
-const logger = new Logger("OF-Utils-Env", false);
+const logger = new Logger("Utils-Env", false);
 
 function isPm2() {
   return (

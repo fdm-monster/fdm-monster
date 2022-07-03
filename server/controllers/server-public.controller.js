@@ -29,7 +29,7 @@ class ServerPublicController {
     }
 
     return res.send({
-      message: "Login required. Please load the Vue app."
+      message: "Login successful. Please load the Vue app."
     });
   }
 
