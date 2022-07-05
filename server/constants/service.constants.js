@@ -178,12 +178,11 @@ function getTempTriggersDefault() {
 }
 
 function getFileListDefault() {
-  // Also used cache constant!
   return {
     files: [],
-    fileCount: 0,
-    folders: [],
-    folderCount: 0
+    // folders: [],
+    free: 0,
+    total: 0
   };
 }
 

@@ -79,6 +79,7 @@ const PrinterSchema = new mongoose.Schema({
     type: Object,
     default: {
       files: [],
+      folders: [],
       free: 0,
       total: 0
     },

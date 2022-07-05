@@ -58,13 +58,7 @@ class PrinterController {
     await this.#sseTask.run();
   }
 
-  /**
-   * Previous printerInfo action (not a list function)
-   * @param req
-   * @param res
-   * @returns {Promise<void>}
-   */
-  async get(req, res) {
+  async getPrinter(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
     const foundPrinter = this.#printersStore.getPrinterFlat(currentPrinterId);
     res.send(foundPrinter);
@@ -299,7 +293,7 @@ module.exports = createController(PrinterController)
   .post("/batch", "importBatch")
   .post("/test-connection", "testConnection")
   .post("/sort-index", "updateSortIndex")
-  .get("/:id", "get")
+  .get("/:id", "getPrinter")
   .patch("/:id", "update")
   .delete("/:id", "delete")
   .get("/:id/login-details", "getPrinterLoginDetails")

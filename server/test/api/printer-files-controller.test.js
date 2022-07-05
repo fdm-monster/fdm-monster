@@ -41,6 +41,11 @@ beforeEach(async () => {
 });
 
 describe("PrinterFilesController", () => {
+  const gcodePath = "./test/api/test-data/sample.gcode";
+  expect(existsSync(gcodePath)).toBeTruthy();
+  const invalidGcodePath = "./test/api/test-data/sample.gco";
+  expect(existsSync(invalidGcodePath)).toBeTruthy();
+
   it(`should return 404 on ${defaultRoute} for nonexisting printer`, async () => {
     const res = await request.get(getRoute("60ae2b760bca4f5930be3d88")).send();
     expectNotFoundResponse(res);
@@ -129,11 +134,9 @@ describe("PrinterFilesController", () => {
   });
 
   it("should allow POST upload file", async () => {
-    const gcodePath = "./test/api/test-data/sample.gcode";
-    expect(existsSync(gcodePath)).toBeTruthy();
     const printer = await createTestPrinter(request);
 
-    const scope = nock(printer.printerURL)
+    nock(printer.printerURL)
       .post("/api/files/local")
       .reply(200, {
         files: {
@@ -150,6 +153,51 @@ describe("PrinterFilesController", () => {
       .field("print", true)
       .attach("file", gcodePath);
     expectOkResponse(response);
+  });
+
+  it("should not allow POSTing multiple uploaded file", async () => {
+    const printer = await createTestPrinter(request);
+
+    nock(printer.printerURL)
+      .post("/api/files/local")
+      .reply(200, {
+        files: {
+          local: {
+            path: "/home/yes",
+            name: "3xP1234A_PLA_ParelWit_1h31m.gcode"
+          }
+        }
+      })
+      .persist();
+
+    const response = await request
+      .post(uploadFileRoute(printer.id))
+      .field("print", true)
+      .attach("file", gcodePath)
+      .attach("file", gcodePath);
+    expectInvalidResponse(response, ["error"]);
+  });
+
+  it("should not allow POSTing wrong extensions", async () => {
+    const printer = await createTestPrinter(request);
+
+    nock(printer.printerURL)
+      .post("/api/files/local")
+      .reply(200, {
+        files: {
+          local: {
+            path: "/home/yes",
+            name: "3xP1234A_PLA_ParelWit_1h31m.gcode"
+          }
+        }
+      })
+      .persist();
+
+    const response = await request
+      .post(uploadFileRoute(printer.id))
+      .field("print", true)
+      .attach("file", invalidGcodePath);
+    expectInvalidResponse(response, ["error"]);
   });
 
   it("should deny POST to upload printer files when empty", async () => {
