@@ -216,7 +216,6 @@ describe("PrinterController", () => {
     });
     const res = await request.post(testPrinterRoute).send({
       apiKey,
-      webSocketURL: "ws://google.com/", // Sanitized
       printerURL: "https://test.com/"
     });
     expectOkResponse(res);
