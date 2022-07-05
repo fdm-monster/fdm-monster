@@ -276,7 +276,6 @@ class PrinterController {
 
   async getTerminalLogs(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
-
     this.#logger.info("Querying terminal logs for: ", currentPrinterId);
     let connectionLogs = this.#terminalLogsCache.getPrinterTerminalLogs(currentPrinterId);
 
@@ -284,10 +283,7 @@ class PrinterController {
   }
 
   async getPluginList(req, res) {
-    const { printerLogin, currentPrinterId } = getScopedPrinter(req);
-
-    // TODO requires octoprint version for compatibility...
-    this.#logger.info("Querying OctoPrint plugin list for: ", currentPrinterId);
+    const { printerLogin } = getScopedPrinter(req);
     let pluginList = await this.#octoPrintApiService.getPluginManager(printerLogin);
     res.send(pluginList);
   }

@@ -8,6 +8,7 @@ const {
   expectInvalidResponse,
   expectNotFoundResponse
 } = require("../extensions");
+const { existsSync } = require("fs");
 
 let Model = Printer;
 const defaultRoute = AppConstants.apiRoute + "/printer-files";
@@ -124,6 +125,14 @@ describe("PrinterFilesController", () => {
       print: false
     });
     expectOkResponse(response);
+  });
+
+  it("should allow POST upload file", async () => {
+    const gcodePath = "./test/apitest-data/sample.gcode";
+    expect(existsSync(gcodePath)).toBeTruthy();
+    const printer = await createTestPrinter(request);
+    const response = await request.post(uploadFileRoute(printer.id)).attach("file", gcodePath);
+    expectInvalidResponse(response);
   });
 
   it("should deny POST to upload printer files when empty", async () => {
