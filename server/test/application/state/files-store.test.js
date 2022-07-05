@@ -37,7 +37,7 @@ describe("FilesStore", () => {
     await filesStore.loadFilesStore();
 
     const filesCache = filesStore.getFiles(testPrinterState.id);
-    expect(filesCache.fileCount).toBe(0);
+    expect(filesCache.files.length).toBe(0);
 
     const oldFiles = filesStore.getOutdatedFiles(testPrinterState.id, 7);
     expect(oldFiles.length).toBe(0);

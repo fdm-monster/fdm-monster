@@ -74,7 +74,6 @@ const PrinterSchema = new mongoose.Schema({
     },
     required: false
   },
-  // TODO move out
   fileList: {
     type: Object,
     default: {

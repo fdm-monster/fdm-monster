@@ -24,7 +24,7 @@ const MATERIALS = {
 
 /**
  * Get an empty history statistics object (inflate to class when methods and meta is required!)
- * @returns {{storageRemain: number, storageUsed: number, averageLength: number, biggestLength: number, storageTotal: number, storagePercent: number, smallestLength: number, folderCount: number, fileCount: number, smallestFile: number, averageFile: number, biggestFile: number}}
+ * @returns {{storageRemain: number, storageUsed: number, averageLength: number, biggestLength: number, storageTotal: number, storagePercent: number, smallestLength: number, smallestFile: number, averageFile: number, biggestFile: number}}
  */
 function getDefaultFileStatistics() {
   return {
@@ -32,8 +32,6 @@ function getDefaultFileStatistics() {
     storageTotal: 0,
     storageRemain: 0,
     storagePercent: 0,
-    fileCount: 0,
-    folderCount: 0,
     biggestFile: 0,
     smallestFile: 0,
     biggestLength: 0,
@@ -180,7 +178,7 @@ function getTempTriggersDefault() {
 function getFileListDefault() {
   return {
     files: [],
-    // folders: [],
+    folders: [],
     free: 0,
     total: 0
   };
