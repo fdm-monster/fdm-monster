@@ -132,7 +132,6 @@ describe("PrinterFilesController", () => {
   });
 
   it("should allow POST upload file", async () => {
-    expect(existsSync(gcodePath)).toBeTruthy();
     const printer = await createTestPrinter(request);
 
     nock(printer.printerURL)
@@ -156,7 +155,6 @@ describe("PrinterFilesController", () => {
 
   it("should not allow POSTing multiple uploaded file", async () => {
     const printer = await createTestPrinter(request);
-    expect(existsSync(gcodePath)).toBeTruthy();
 
     nock(printer.printerURL)
       .post("/api/files/local")
@@ -180,7 +178,6 @@ describe("PrinterFilesController", () => {
 
   it("should not allow POSTing wrong extensions", async () => {
     const printer = await createTestPrinter(request);
-    expect(existsSync(gcodePath)).toBeTruthy();
 
     nock(printer.printerURL)
       .post("/api/files/local")
@@ -198,6 +195,7 @@ describe("PrinterFilesController", () => {
       .post(uploadFileRoute(printer.id))
       .field("print", true)
       .attach("file", invalidGcodePath);
+    console.log(response);
     expectInvalidResponse(response, ["error"]);
   });
 
