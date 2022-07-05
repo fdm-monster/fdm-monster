@@ -168,10 +168,7 @@ class PrinterController {
 
   async delete(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
-
-    this.#logger.info("Deleting printer with id", currentPrinterId);
     const result = await this.#printersStore.deletePrinter(currentPrinterId);
-
     res.send(result);
   }
 
