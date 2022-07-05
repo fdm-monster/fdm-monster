@@ -180,9 +180,9 @@ function getTempTriggersDefault() {
 function getFileListDefault() {
   // Also used cache constant!
   return {
-    files: undefined,
+    files: [],
     fileCount: 0,
-    folders: undefined,
+    folders: [],
     folderCount: 0
   };
 }

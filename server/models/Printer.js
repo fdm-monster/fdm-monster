@@ -74,10 +74,15 @@ const PrinterSchema = new mongoose.Schema({
     },
     required: false
   },
-  // TODO move out and model better
+  // TODO move out
   fileList: {
     type: Object,
-    required: false
+    default: {
+      files: [],
+      free: 0,
+      total: 0
+    },
+    required: true
   },
   // Non-essentials below
   powerSettings: {
