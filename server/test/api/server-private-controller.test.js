@@ -1,6 +1,6 @@
 const dbHandler = require("../db-handler");
 const { setupTestApp } = require("../test-server");
-const { expectOkResponse, expectInternalServerError} = require("../extensions");
+const { expectOkResponse, expectInternalServerError } = require("../extensions");
 const { AppConstants } = require("../../server.constants");
 
 let request;
@@ -39,5 +39,15 @@ describe("ServerPrivateController", () => {
   it("should skip server restart - no daemon error", async function () {
     const response = await request.post(restartRoute).send();
     expectInternalServerError(response);
+  });
+
+  it("should do server restart when nodemon is detected", async function () {
+    let valueBefore = process.env.npm_lifecycle_script;
+
+    process.env.npm_lifecycle_script = "nodemon";
+    const response = await request.post(restartRoute).send();
+    expectOkResponse(response);
+
+    process.env.npm_lifecycle_script = valueBefore;
   });
 });
