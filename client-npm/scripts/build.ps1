@@ -25,7 +25,7 @@ function Write-PackageJson {
 $client_version = (Get-Content $client_package_json) -join "`n" | ConvertFrom-Json | Select -ExpandProperty "version"
 
 # Check version
-npm cache clear --force
+yarn cache clean @fdm-monster/client
 $versionArray = (npm view @fdm-monster/client versions --json | ConvertFrom-Json)
 $lastVersion = $versionArray[$versionArray.Count - 1]
 if ($lastVersion -eq $client_version) {
@@ -50,8 +50,8 @@ if ($lastVersion -eq $client_version) {
 Write-PackageJson -File $target_package_json -Target $target_package_json -Version $client_version
 
 Remove-Item -Path "${target_dist}" -Recurse -ErrorAction Ignore
-npm --prefix $client_src run build
+yarn --cwd $client_src run build
 Copy-Item -Path "${client_dist}\" -Destination "${target_dist}\" -Recurse
 
-npm pack
+yarn pack
 Pop-Location
