@@ -23,6 +23,8 @@ const DITokens = {
   permissionService: "permissionService",
   roleService: "roleService",
   octoPrintApiService: "octoPrintApiService",
+  pluginRepositoryCache: "pluginRepositoryCache",
+  pluginFirmwareUpdateService: "pluginFirmwareUpdateService",
   influxDbSetupService: "influxDbSetupService",
   influxDbFilamentService: "influxDbFilamentService",
   influxDbHistoryService: "influxDbHistoryService",

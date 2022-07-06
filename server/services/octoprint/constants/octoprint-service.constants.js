@@ -4,6 +4,39 @@ class OPClientErrors {
   static printerValidationErrorMessage = "printer apiKey or URL undefined";
 }
 
+const pluginManagerCommands = {
+  install: {
+    name: "install",
+    param: "url"
+  },
+  uninstall: {
+    name: "install",
+    param: "plugin"
+  },
+  enable: {
+    name: "enable",
+    param: "plugin"
+  },
+  disable: {
+    name: "disable",
+    param: "plugin"
+  },
+  cleanup: {
+    name: "cleanup",
+    param: "plugin"
+  },
+  cleanup_all: {
+    name: "cleanup_all",
+    param: undefined
+  },
+  refresh_repository: {
+    name: "refresh_repository",
+    param: undefined
+  }
+};
+
+const pluginRepositoryUrl = "https://plugins.octoprint.org/plugins.json";
+
 const contentTypeHeaderKey = "Content-Type";
 const apiKeyHeaderKey = "X-Api-Key";
 const jsonContentType = "application/json";
@@ -69,7 +102,9 @@ module.exports = {
   contentTypeHeaderKey,
   apiKeyHeaderKey,
   jsonContentType,
+  pluginRepositoryUrl,
   multiPartContentType,
+  pluginManagerCommands,
   isLoginResponseGlobal,
   getCurrentProfileDefault
 };

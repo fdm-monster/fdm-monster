@@ -21,6 +21,8 @@ class BootTask {
   roleService;
   userService;
   influxDbSetupService;
+  pluginRepositoryCache;
+  pluginFirmwareUpdateService;
 
   constructor({
     loggerFactory,
@@ -37,7 +39,9 @@ class BootTask {
     roleService,
     userService,
     taskManagerService,
-    influxDbSetupService
+    influxDbSetupService,
+    pluginRepositoryCache,
+    pluginFirmwareUpdateService
   }) {
     this.#serverTasks = serverTasks;
     this.serverSettingsService = serverSettingsService;
@@ -53,6 +57,8 @@ class BootTask {
     this.userService = userService;
     this.#taskManagerService = taskManagerService;
     this.influxDbSetupService = influxDbSetupService;
+    this.pluginRepositoryCache = pluginRepositoryCache;
+    this.pluginFirmwareUpdateService = pluginFirmwareUpdateService;
     this.#logger = loggerFactory("Server");
   }
 
@@ -105,6 +111,14 @@ class BootTask {
       this.#serverTasks.BOOT_TASKS.forEach((task) => {
         this.#taskManagerService.registerJobOrTask(task);
       });
+
+      // Low priority tasks
+      await this.pluginRepositoryCache.queryCache();
+
+      // Query test
+      // const printers = this.printersStore.listPrinterStates(true);
+      // // await this.pluginFirmwareUpdateService.isPluginInstalled(printers[0].id, false);
+      // await this.pluginFirmwareUpdateService.installPlugin(printers[0].id, true);
     } else {
       this.#logger.warning("Starting in safe mode due to SAFEMODE_ENABLED");
     }

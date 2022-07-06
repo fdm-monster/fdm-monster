@@ -4,7 +4,6 @@ const {
   isLoginResponseGlobal
 } = require("../services/octoprint/constants/octoprint-service.constants");
 const DITokens = require("../container.tokens");
-const { ERR_COUNT, PSTATE, MESSAGE } = require("../constants/state.constants");
 
 class PrinterTestTask {
   #lastTestRunTime;

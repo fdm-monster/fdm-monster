@@ -24,6 +24,7 @@ class PrinterController {
   #taskManagerService;
   #terminalLogsCache;
   #octoPrintApiService;
+  #pluginRepositoryCache;
   #fileCache;
   #sseHandler;
   #sseTask;
@@ -38,6 +39,7 @@ class PrinterController {
     printerSseTask,
     loggerFactory,
     octoPrintApiService,
+    pluginRepositoryCache,
     jobsCache,
     fileCache
   }) {
@@ -48,6 +50,7 @@ class PrinterController {
     this.#terminalLogsCache = terminalLogsCache;
     this.#taskManagerService = taskManagerService;
     this.#octoPrintApiService = octoPrintApiService;
+    this.#pluginRepositoryCache = pluginRepositoryCache;
     this.#fileCache = fileCache;
     this.#sseHandler = printerSseHandler;
     this.#sseTask = printerSseTask;
@@ -276,9 +279,26 @@ class PrinterController {
     res.send(connectionLogs);
   }
 
+  /**
+   * This list should move to generic controller
+   * @param req
+   * @param res
+   * @returns {Promise<void>}
+   */
   async getPluginList(req, res) {
+    let pluginList = await this.#pluginRepositoryCache.getCache();
+    res.send(pluginList);
+  }
+
+  /**
+   * List installed plugins (OP 1.6.0+)
+   * @param req
+   * @param res
+   * @returns {Promise<void>}
+   */
+  async getPrinterPluginList(req, res) {
     const { printerLogin } = getScopedPrinter(req);
-    let pluginList = await this.#octoPrintApiService.getPluginManager(printerLogin);
+    let pluginList = await this.#octoPrintApiService.getPluginManagerPlugins(printerLogin);
     res.send(pluginList);
   }
 }
@@ -293,7 +313,8 @@ module.exports = createController(PrinterController)
   .post("/batch", "importBatch")
   .post("/test-connection", "testConnection")
   .post("/sort-index", "updateSortIndex")
-  .get("/:id", "getPrinter")
+    .get("/plugin-list", "getPluginList")
+  .get("/:id", "get")
   .patch("/:id", "update")
   .delete("/:id", "delete")
   .get("/:id/login-details", "getPrinterLoginDetails")
@@ -308,4 +329,4 @@ module.exports = createController(PrinterController)
   .patch("/:id/feed-rate", "setFeedRate")
   .patch("/:id/reset-power-settings", "resetPowerSettings")
   .get("/:id/terminal-logs", "getTerminalLogs")
-  .get("/:id/plugin-list", "getPluginList");
+  .get("/:id/plugin-list", "getPrinterPluginList");

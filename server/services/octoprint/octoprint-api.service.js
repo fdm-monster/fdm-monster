@@ -1,10 +1,8 @@
 const fs = require("fs");
 const {
-  contentTypeHeaderKey,
-  apiKeyHeaderKey,
-  multiPartContentType
+  multiPartContentType,
+  pluginRepositoryUrl
 } = require("./constants/octoprint-service.constants");
-const { checkPluginManagerAPIDeprecation } = require("../../utils/compatibility.utils");
 const { processResponse, processGotResponse } = require("./utils/api.utils");
 const FormData = require("form-data");
 const got = require("got");
@@ -213,14 +211,65 @@ class OctoPrintApiService extends OctoPrintRoutes {
     return processResponse(response, responseOptions);
   }
 
-  async getPluginManager(printer, responseOptions) {
-    const printerManagerApiCompatible = checkPluginManagerAPIDeprecation(printer.octoPrintVersion);
+  // TODO implement when UI is ready, preferably using websocket stream and timing
+  // async getSoftwareUpdateCheck(printer, responseOptions) {
+  //   const { url, options } = this._prepareRequest(printer, this.pluginSoftwareUpdateCheck);
+  //
+  //   const response = await this._httpClient.get(url, options);
+  //   return processResponse(response, responseOptions);
+  // }
 
-    const path =
-      printerManagerApiCompatible || !printer.octoPrintVersion
-        ? this.apiPluginManagerRepository1_6_0
-        : this.apiPluginManager;
-    const { url, options } = this._prepareRequest(printer, path);
+  /**
+   * Based on https://github.com/OctoPrint/OctoPrint/blob/f430257d7072a83692fc2392c683ed8c97ae47b6/src/octoprint/plugins/softwareupdate/__init__.py#L1265
+   * @param printer
+   * @param targets
+   * @param responseOptions
+   * @returns {Promise<{data, status}|*>}
+   */
+  async postSoftwareUpdate(printer, targets, responseOptions) {
+    const { url, options } = this._prepareJsonRequest(printer, this.pluginSoftwareUpdateUpdate, {
+      targets
+    });
+
+    const response = await this._httpClient.post(url, options);
+    return processResponse(response, responseOptions);
+  }
+
+  /**
+   * Only queries OS, pip and plugin information (quickest call)
+   * @param printer
+   * @param responseOptions
+   * @returns {Promise<{data, status}|*>}
+   */
+  async getPluginManagerPlugins(printer, responseOptions) {
+    const { url, options } = this._prepareRequest(printer, this.pluginManagerPlugins);
+
+    const response = await this._httpClient.get(url, options);
+    return processResponse(response, responseOptions);
+  }
+
+  async getPluginManagerPlugin(printer, pluginName, responseOptions) {
+    const { url, options } = this._prepareRequest(printer, this.pluginManagerPlugin(pluginName));
+
+    const response = await this._httpClient.get(url, options);
+    return processResponse(response, responseOptions);
+  }
+
+  async postApiPluginManagerCommand(printer, pluginCommand, pluginUrl, responseOptions) {
+    const { url, options } = this._prepareRequest(printer, this.apiPluginManager);
+    const command = this.pluginManagerCommand(pluginCommand, pluginUrl);
+
+    const response = await this._httpClient.post(url, command, options);
+    return processResponse(response, responseOptions);
+  }
+
+  /**
+   * Does not require printer login, much faster, requires internet connectivity
+   * @param responseOptions
+   * @returns {Promise<{data, status}|*>}
+   */
+  async fetchOctoPrintPlugins(responseOptions) {
+    const { url, options } = this._prepareAnonymousRequest(pluginRepositoryUrl);
 
     const response = await this._httpClient.get(url, options);
     return processResponse(response, responseOptions);
@@ -235,6 +284,12 @@ class OctoPrintApiService extends OctoPrintRoutes {
   async getSystemCommands(printer, responseOptions) {
     const { url, options } = this._prepareRequest(printer, this.apiSystemCommands);
     const response = await this._httpClient.get(url, options);
+    return processResponse(response, responseOptions);
+  }
+
+  async postSystemRestartCommand(printer, responseOptions) {
+    const { url, options } = this._prepareRequest(printer, this.apiSystemRestartCommand);
+    const response = await this._httpClient.post(url, options);
     return processResponse(response, responseOptions);
   }
 

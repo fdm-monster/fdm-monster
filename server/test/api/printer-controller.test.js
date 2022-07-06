@@ -16,6 +16,7 @@ const defaultRoute = AppConstants.apiRoute + "/printer";
 const createRoute = defaultRoute;
 const updateSortIndexRoute = `${defaultRoute}/sort-index`;
 const testPrinterRoute = `${defaultRoute}/test-connection`;
+const pluginListRoute = `${defaultRoute}/plugin-list`;
 const getRoute = (id) => `${defaultRoute}/${id}`;
 const deleteRoute = (id) => `${defaultRoute}/${id}`;
 const updateRoute = (id) => `${defaultRoute}/${id}`;
@@ -29,7 +30,7 @@ const feedRateRoute = (id) => `${updateRoute(id)}/feed-rate`;
 const flowRateRoute = (id) => `${updateRoute(id)}/flow-rate`;
 const resetPowerSettingsRoute = (id) => `${updateRoute(id)}/reset-power-settings`;
 const terminalLogsRoute = (id) => `${getRoute(id)}/terminal-logs`;
-const pluginListRoute = (id) => `${getRoute(id)}/plugin-list`;
+const printerPluginListRoute = (id) => `${getRoute(id)}/plugin-list`;
 const serialConnectCommandRoute = (id) => `${getRoute(id)}/serial-connect`;
 const serialDisconnectCommandRoute = (id) => `${getRoute(id)}/serial-disconnect`;
 const batchRoute = `${defaultRoute}/batch`;
@@ -266,10 +267,16 @@ describe("PrinterController", () => {
     expectOkResponse(updatePatch);
   });
 
+  it("should get plugin list", async () => {
+    octoPrintApiService.storeResponse(["test"], 200);
+    const res = await request.get(pluginListRoute).send();
+    expectOkResponse(res, []); // Cache is not loaded
+  });
+
   it("should get printer plugin list", async () => {
     const printer = await createTestPrinter(request);
     octoPrintApiService.storeResponse(["test"], 200);
-    const res = await request.get(pluginListRoute(printer.id)).send();
+    const res = await request.get(printerPluginListRoute(printer.id)).send();
     expectOkResponse(res, ["test"]);
   });
 
