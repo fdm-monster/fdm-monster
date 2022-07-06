@@ -24,11 +24,14 @@ class AuthController {
   }
 
   logout(req, res) {
-    req.logout(function (err) {
-      if (err) {
-        throw new InternalServerException(err);
+    req.logout(
+      /* istanbul ignore next */
+      function (err) {
+        if (err) {
+          throw new InternalServerException(err);
+        }
       }
-    });
+    );
 
     res.end();
   }

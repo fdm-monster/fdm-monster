@@ -58,13 +58,7 @@ class PrinterController {
     await this.#sseTask.run();
   }
 
-  /**
-   * Previous printerInfo action (not a list function)
-   * @param req
-   * @param res
-   * @returns {Promise<void>}
-   */
-  async get(req, res) {
+  async getPrinter(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
     const foundPrinter = this.#printersStore.getPrinterFlat(currentPrinterId);
     res.send(foundPrinter);
@@ -168,10 +162,7 @@ class PrinterController {
 
   async delete(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
-
-    this.#logger.info("Deleting printer with id", currentPrinterId);
     const result = await this.#printersStore.deletePrinter(currentPrinterId);
-
     res.send(result);
   }
 
@@ -279,7 +270,6 @@ class PrinterController {
 
   async getTerminalLogs(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
-
     this.#logger.info("Querying terminal logs for: ", currentPrinterId);
     let connectionLogs = this.#terminalLogsCache.getPrinterTerminalLogs(currentPrinterId);
 
@@ -287,10 +277,7 @@ class PrinterController {
   }
 
   async getPluginList(req, res) {
-    const { printerLogin, currentPrinterId } = getScopedPrinter(req);
-
-    // TODO requires octoprint version for compatibility...
-    this.#logger.info("Querying OctoPrint plugin list for: ", currentPrinterId);
+    const { printerLogin } = getScopedPrinter(req);
     let pluginList = await this.#octoPrintApiService.getPluginManager(printerLogin);
     res.send(pluginList);
   }
@@ -306,7 +293,7 @@ module.exports = createController(PrinterController)
   .post("/batch", "importBatch")
   .post("/test-connection", "testConnection")
   .post("/sort-index", "updateSortIndex")
-  .get("/:id", "get")
+  .get("/:id", "getPrinter")
   .patch("/:id", "update")
   .delete("/:id", "delete")
   .get("/:id/login-details", "getPrinterLoginDetails")

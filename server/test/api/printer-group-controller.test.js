@@ -8,7 +8,6 @@ const { createTestPrinter } = require("./test-data/create-printer");
 
 let Model = PrinterGroup;
 const listRoute = `${AppConstants.apiRoute}/printer-group`;
-const createRoute = listRoute;
 const syncLegacyRoute = `${listRoute}/sync-legacy`;
 const getRoute = (id) => `${listRoute}/${id}`;
 const addPrinterToGroupRoute = (id) => `${listRoute}/${id}/printer`;
