@@ -9,7 +9,11 @@
     tile
     @click="selectPrinter()"
   >
-    <v-container v-if="printer" class="tile-inner">
+    <v-container
+      v-if="printer"
+      :style="{ 'border-right': printerFilamentColor }"
+      class="tile-inner"
+    >
       <small class="small-resized-font ml-1">
         {{ printer.printerName }}
       </small>
@@ -48,6 +52,8 @@ import RAL_CODES from "@/constants/ral.reference.json";
 export default class PrinterGridTile extends Vue {
   @Prop() printer: Printer;
   @Prop() loading: boolean;
+  readonly defaultColor = "rgba(0,0,0,0)";
+  readonly defaultBorder = "0 solid black";
 
   get selected() {
     if (!this.printer) return false;
@@ -58,20 +64,23 @@ export default class PrinterGridTile extends Vue {
     return printersState.printers;
   }
 
-  get printerStateColor() {
-    const defaultColor = "rgba(0,0,0,0)";
-    if (!this.printer) return defaultColor;
-
+  get printerFilamentColor() {
     const color = this.convertColor(this.printer?.lastPrintedFile?.parsedColor?.toLowerCase());
-    if (color) {
-      const finds = Object.values(RAL_CODES).find(
-        (r) => r.names.nl.toLowerCase() === color.toLowerCase()
-      );
-      if (!finds) return defaultColor;
-      return finds.color.websafe;
+    if (!color) {
+      return this.defaultBorder;
     }
 
-    return this.printer?.printerState.colour.hex || defaultColor;
+    const finds = Object.values(RAL_CODES).find(
+      (r) => r.names.nl.toLowerCase() === color.toLowerCase()
+    );
+    if (!finds) return this.defaultBorder;
+    return `8px solid ${finds.color.websafe}`;
+  }
+
+  get printerStateColor() {
+    if (!this.printer) return this.defaultColor;
+
+    return this.printer?.printerState.colour.hex || this.defaultColor;
   }
 
   convertColor(colorName?: string) {
@@ -122,6 +131,7 @@ export default class PrinterGridTile extends Vue {
 
 .tile-setup:hover {
   outline: 2px solid #02b102 !important;
+  border-right-width: 8px;
 }
 
 .small-resized-font {
