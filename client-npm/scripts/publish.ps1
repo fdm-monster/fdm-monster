@@ -1,1 +1,1 @@
-npm publish "../" --access public
+yarn publish "../" --access public
