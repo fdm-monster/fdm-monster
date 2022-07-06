@@ -33,12 +33,12 @@ class OctoPrintRoutes {
   pluginManager = `${this.pluginsBase}/pluginmanager`;
   pluginManagerPlugins = `${this.pluginManager}/plugins`; // Fast
   pluginManagerPlugin = (pluginName) => `${this.pluginManager}/${pluginName}`;
-  // pluginManagerExport = `${this.pluginManager}/export`;
-  // pluginManagerOrphans = `${this.pluginManager}/orphans`;
+  pluginManagerExport = `${this.pluginManager}/export`;
+  pluginManagerOrphans = `${this.pluginManager}/orphans`;
   pluginManagerRepository = (refresh = false) =>
-    //   `${this.pluginManager}/repository?refresh=${refresh}`;
-    _settingsStore;
-  _timeouts; // TODO apply apiTimeout, but apply apiRetry, apiRetryCutoff elsewhere (and webSocketRetry)
+    `${this.pluginManager}/repository?refresh=${refresh}`;
+  _settingsStore;
+  _timeouts;
 
   constructor({ settingsStore }) {
     this._settingsStore = settingsStore;

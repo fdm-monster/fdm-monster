@@ -8,20 +8,54 @@ const cacheKey = "firmware-state";
 
 class PluginFirmwareUpdateController {
   #cacheManager;
+  #printersStore;
+  #pluginFirmwareUpdateService;
 
-  constructor({ cacheManager }) {
+  constructor({ cacheManager, printersStore, pluginFirmwareUpdateService }) {
     this.#cacheManager = cacheManager;
+    this.#printersStore = printersStore;
+    this.#pluginFirmwareUpdateService = pluginFirmwareUpdateService;
   }
 
   async listUpdateState(req, res) {
-    const result = this.#cacheManager.get(cacheKey);
-    res.send({
-      cache: result
-    });
+    let result = await this.#cacheManager.get(cacheKey);
+    if (!result) {
+      result = await this.#performScanOnPrinters();
+    }
+    res.send(result);
   }
 
   async scanPrinterFirmwareVersions(req, res) {
-    this.#cacheManager.set(cacheKey, true);
+    const result = await this.#performScanOnPrinters();
+    res.send(result);
+  }
+
+  async #performScanOnPrinters() {
+    const printers = this.#printersStore.listPrinterStates();
+    const printerVersionMap = {};
+    const failureMap = {};
+    for (let printer of printers) {
+      try {
+        const version = await this.#pluginFirmwareUpdateService.getPrinterFirmwareVersion(
+          printer.getLoginDetails()
+        );
+
+        printerVersionMap[printer.id] = {
+          firmware: version,
+          printerName: printer.getName()
+        };
+      } catch (e) {
+        failureMap[printer.id] = {
+          printerName: printer.getName(),
+          error: e
+        };
+      }
+    }
+    this.#cacheManager.set(cacheKey, printerVersionMap, { ttl: 3600 * 4 });
+    return {
+      versions: printerVersionMap,
+      failures: failureMap
+    };
   }
 }
 
