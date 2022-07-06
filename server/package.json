@@ -86,6 +86,7 @@
     "eventsource": "2.0.2",
     "express-list-endpoints": "6.0.0",
     "jest": "28.1.2",
+    "jest-27-expect-message": "1.1.0",
     "jest-util": "28.1.1",
     "mongodb-memory-server": "8.7.2",
     "nock": "13.2.8",
