@@ -274,9 +274,8 @@ class PrinterController {
   async getTerminalLogs(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
     this.#logger.info("Querying terminal logs for: ", currentPrinterId);
-    let connectionLogs = this.#terminalLogsCache.getPrinterTerminalLogs(currentPrinterId);
-
-    res.send(connectionLogs);
+    let terminalLogs = this.#terminalLogsCache.getPrinterTerminalLogs(currentPrinterId);
+    res.send(terminalLogs);
   }
 
   /**
