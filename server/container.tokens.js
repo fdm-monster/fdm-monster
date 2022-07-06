@@ -11,6 +11,7 @@ const DITokens = {
   taskManagerService: "taskManagerService",
   toadScheduler: "toadScheduler",
   eventEmitter2: "eventEmitter2",
+  cacheManager: "cacheManager",
   printerService: "printerService",
   printerGroupService: "printerGroupService",
   serverSettingsService: "serverSettingsService",

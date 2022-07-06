@@ -63,6 +63,7 @@ const {
   PluginFirmwareUpdateService
 } = require("./services/octoprint/plugin-firmware-update.service");
 const { PluginRepositoryCache } = require("./services/octoprint/plugin-repository.cache");
+const { configureCacheManager } = require("./handlers/cache-manager");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -93,6 +94,7 @@ function configureContainer() {
     [DITokens.taskManagerService]: asClass(TaskManagerService).singleton(),
     [DITokens.toadScheduler]: asClass(ToadScheduler).singleton(),
     [DITokens.eventEmitter2]: asFunction(configureEventEmitter).singleton(),
+    [DITokens.cacheManager]: asFunction(configureCacheManager).singleton(),
     [DITokens.serverReleaseService]: asClass(ServerReleaseService).singleton(),
     [DITokens.serverUpdateService]: asClass(ServerUpdateService).singleton(),
     [DITokens.systemInfoStore]: asClass(SystemInfoStore).singleton(),
