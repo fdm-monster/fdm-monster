@@ -1,6 +1,7 @@
-const { NotFoundException } = require("../exceptions/runtime.exceptions");
-const { findFileIndex } = require("./utils/find-predicate.utils");
-const { Status, MATERIALS } = require("../constants/service.constants");
+const {NotFoundException} = require("../exceptions/runtime.exceptions");
+const {findFileIndex} = require("../utils/find-predicate.utils");
+const {Status, MATERIALS} = require("../constants/service.constants");
+const {findColorRAL} = require("../constants/ral-color-map.constants");
 
 /**
  * An extension repository for managing printer files in database
@@ -10,7 +11,7 @@ class PrinterFilesService {
 
   #logger;
 
-  constructor({ printerService, loggerFactory }) {
+  constructor({printerService, loggerFactory}) {
     this.#printerService = printerService;
     this.#logger = loggerFactory("PrinterFilesService");
   }
@@ -56,22 +57,27 @@ class PrinterFilesService {
       this.#logger.warning(`Parsing printer file did not succeed. Filename: ${addedFile}`);
     }
 
-    return { fileList: printer.fileList, lastPrintedFile };
+    return {fileList: printer.fileList, lastPrintedFile};
   }
 
   async setPrinterLastPrintedFile(printerId, fileName) {
     const printer = await this.#printerService.get(printerId);
 
     const parsedData = !!fileName ? this.parseFileNameFormat(fileName) : {};
+    const mappedRALColor = findColorRAL(parsedData?.color);
 
-    printer.lastPrintedFile = {
-      fileName,
-      editTimestamp: Date.now(),
-      parsedColor: parsedData?.color || undefined,
-      parsedAmount: parsedData?.amount || undefined,
-      parsedOrderCode: parsedData?.orderCode || undefined,
-      parsedMaterial: parsedData?.material || undefined
-    };
+    // If we have no info yet, or if we certainly have a parsed color
+    if (!printer.lastPrintedFile?.parsedColor || !!mappedRALColor?.RAL) {
+      printer.lastPrintedFile = {
+        fileName,
+        editTimestamp: Date.now(),
+        parsedColor: parsedData?.color || undefined,
+        parsedVisualizationRAL: mappedRALColor?.RAL || undefined,
+        parsedAmount: parsedData?.amount || undefined,
+        parsedOrderCode: parsedData?.orderCode || undefined,
+        parsedMaterial: parsedData?.material || undefined
+      };
+    }
 
     printer.markModified("lastPrintedFile");
     await printer.save();
