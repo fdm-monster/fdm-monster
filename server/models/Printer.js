@@ -59,6 +59,10 @@ const PrinterSchema = new mongoose.Schema({
         type: String,
         required: false
       },
+      parsedVisualizationRAL: {
+        type: Number,
+        required: false
+      },
       parsedAmount: {
         type: Number,
         required: false

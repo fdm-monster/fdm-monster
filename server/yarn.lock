@@ -2700,6 +2700,11 @@ istanbul-reports@^3.1.3:
     html-escaper "^2.0.0"
     istanbul-lib-report "^3.0.0"
 
+jest-27-expect-message@1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/jest-27-expect-message/-/jest-27-expect-message-1.1.0.tgz#aaaf04f87fea69cdfe892806bc5baf159945cb67"
+  integrity sha512-ZezSbz2lDKJ/NfCy5/qFLAsFl/j84qmS8Zh8RTY1hoXh4KooQufnI6/qDnYMOye4eooylTfL/ffE8zr7/TAj1w==
+
 jest-changed-files@^28.0.2:
   version "28.0.2"
   resolved "https://registry.yarnpkg.com/jest-changed-files/-/jest-changed-files-28.0.2.tgz#7d7810660a5bd043af9e9cfbe4d58adb05e91531"
