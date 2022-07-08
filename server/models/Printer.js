@@ -45,10 +45,48 @@ const PrinterSchema = new mongoose.Schema({
     type: Number,
     required: false
   },
-  // TODO move out and model better
+  lastPrintedFile: {
+    type: {
+      fileName: {
+        type: String,
+        required: true
+      },
+      editTimestamp: {
+        type: Number,
+        required: true
+      },
+      parsedColor: {
+        type: String,
+        required: false
+      },
+      parsedVisualizationRAL: {
+        type: Number,
+        required: false
+      },
+      parsedAmount: {
+        type: Number,
+        required: false
+      },
+      parsedMaterial: {
+        type: String,
+        required: false
+      },
+      parsedOrderCode: {
+        type: String,
+        required: false
+      }
+    },
+    required: false
+  },
   fileList: {
     type: Object,
-    required: false
+    default: {
+      files: [],
+      folders: [],
+      free: 0,
+      total: 0
+    },
+    required: true
   },
   // Non-essentials below
   powerSettings: {

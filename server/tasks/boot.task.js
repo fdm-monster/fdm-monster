@@ -16,7 +16,7 @@ class BootTask {
   filesStore;
   printerGroupsCache;
   historyStore;
-  filamentCache;
+  filamentsStore;
   permissionService;
   roleService;
   userService;
@@ -32,7 +32,7 @@ class BootTask {
     historyStore,
     filesStore,
     printerGroupsCache,
-    filamentCache,
+    filamentsStore,
     permissionService,
     roleService,
     userService,
@@ -47,7 +47,7 @@ class BootTask {
     this.filesStore = filesStore;
     this.printerGroupsCache = printerGroupsCache;
     this.historyStore = historyStore;
-    this.filamentCache = filamentCache;
+    this.filamentsStore = filamentsStore;
     this.permissionService = permissionService;
     this.roleService = roleService;
     this.userService = userService;
@@ -91,9 +91,9 @@ class BootTask {
     await this.multerService.clearUploadsFolder();
     await this.printersStore.loadPrintersStore();
     await this.filesStore.loadFilesStore();
+    await this.filamentsStore.loadFilamentsStore();
     await this.historyStore.loadHistoryStore();
     await this.printerGroupsCache.loadCache();
-    await this.filamentCache.initCache();
     await this.influxDbSetupService.optionalInfluxDatabaseSetup();
 
     this.#logger.info("Synchronizing user permission and roles definition");

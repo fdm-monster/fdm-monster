@@ -332,7 +332,7 @@ export default class FileExplorerSideNav extends Vue {
     const printerId = viewedPrinter.id;
     // Offline printer fallback
     if (viewedPrinter.apiAccessibility.accessible) {
-      let fileCache = await printersState.loadPrinterFiles({ printerId, recursive: false });
+      const fileCache = await printersState.loadPrinterFiles({ printerId, recursive: false });
       this.shownFileBucket = {
         printerId,
         ...fileCache

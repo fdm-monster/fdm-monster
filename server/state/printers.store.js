@@ -121,7 +121,6 @@ class PrintersStore {
 
   getPrinterLogin(id) {
     const state = this.getPrinterState(id);
-
     return state.getLoginDetails();
   }
 
@@ -297,15 +296,8 @@ class PrintersStore {
   /**
    * Reconnect the OctoPrint Websocket connection
    * @param id
-   * @param lazy (Not implemented yet, default: true)
    */
-  reconnectOctoPrint(id, lazy = true) {
-    if (!lazy) {
-      // TODO eager reconnect
-      throw new NotImplementedException(
-        "Eager (lazy==true) reconnect OctoPrint mode is not implemented yet."
-      );
-    }
+  reconnectOctoPrint(id) {
     const printer = this.getPrinterState(id);
     printer.resetConnectionState();
   }

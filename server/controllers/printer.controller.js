@@ -7,7 +7,8 @@ const {
   stepSizeRules,
   flowRateRules,
   feedRateRules,
-  updatePrinterEnabledRule, testPrinterApiRules
+  updatePrinterEnabledRule,
+  testPrinterApiRules
 } = require("./validation/printer-controller.validation");
 const { AppConstants } = require("../server.constants");
 const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
@@ -57,13 +58,7 @@ class PrinterController {
     await this.#sseTask.run();
   }
 
-  /**
-   * Previous printerInfo action (not a list function)
-   * @param req
-   * @param res
-   * @returns {Promise<void>}
-   */
-  async get(req, res) {
+  async getPrinter(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
     const foundPrinter = this.#printersStore.getPrinterFlat(currentPrinterId);
     res.send(foundPrinter);
@@ -167,11 +162,7 @@ class PrinterController {
 
   async delete(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
-
-    this.#logger.info("Deleting printer with id", currentPrinterId);
-
     const result = await this.#printersStore.deletePrinter(currentPrinterId);
-
     res.send(result);
   }
 
@@ -199,7 +190,7 @@ class PrinterController {
    */
   async updateConnectionSettings(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
-    const inputData = await validateMiddleware(req, updatePrinterConnectionSettingRules, res);
+    const inputData = await validateMiddleware(req, updatePrinterConnectionSettingRules);
 
     const newEntity = await this.#printersStore.updatePrinterConnectionSettings(
       currentPrinterId,
@@ -215,10 +206,9 @@ class PrinterController {
   }
 
   async updateSortIndex(req, res) {
-    const data = await validateMiddleware(req, updateSortIndexRules, res);
+    const data = await validateMiddleware(req, updateSortIndexRules);
 
     this.#logger.info("Sorting printers according to provided order", JSON.stringify(data));
-
     await this.#printersStore.updateSortIndex(data.sortList);
 
     // TODO return array with printerID ordering
@@ -227,21 +217,21 @@ class PrinterController {
 
   async updateEnabled(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
-    const data = await validateMiddleware(req, updatePrinterEnabledRule, res);
+    const data = await validateMiddleware(req, updatePrinterEnabledRule);
 
     this.#logger.info("Changing printer enabled setting", JSON.stringify(data));
-
     await this.#printersStore.updateEnabled(currentPrinterId, data.enabled);
+
     res.send();
   }
 
   async reconnectOctoPrint(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
 
-    this.#logger.info("Reconnecting OctoPrint API connection", printerId);
-    this.#printersStore.reconnectOctoPrint(currentPrinterId, true);
+    this.#logger.info("Refreshing OctoPrint API connection", currentPrinterId);
+    this.#printersStore.reconnectOctoPrint(currentPrinterId);
 
-    res.send({ success: true, message: "Printer will reconnect soon" });
+    res.send();
   }
 
   async setStepSize(req, res) {
@@ -280,7 +270,6 @@ class PrinterController {
 
   async getTerminalLogs(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
-
     this.#logger.info("Querying terminal logs for: ", currentPrinterId);
     let connectionLogs = this.#terminalLogsCache.getPrinterTerminalLogs(currentPrinterId);
 
@@ -288,10 +277,7 @@ class PrinterController {
   }
 
   async getPluginList(req, res) {
-    const { printerLogin, currentPrinterId } = getScopedPrinter(req);
-
-    // TODO requires octoprint version for compatibility...
-    this.#logger.info("Querying OctoPrint plugin list for: ", currentPrinterId);
+    const { printerLogin } = getScopedPrinter(req);
     let pluginList = await this.#octoPrintApiService.getPluginManager(printerLogin);
     res.send(pluginList);
   }
@@ -299,27 +285,27 @@ class PrinterController {
 
 // prettier-ignore
 module.exports = createController(PrinterController)
-    .prefix(AppConstants.apiRoute + "/printer")
-    .before([authenticate(), authorizeRoles([ROLES.OPERATOR, ROLES.ADMIN]), printerResolveMiddleware()])
-    .get("/", "list")
-    .get("/sse", "sse")
-    .post("/", "create")
-    .post("/batch", "importBatch")
-    .post("/test-connection", "testConnection")
-    .post("/sort-index", "updateSortIndex")
-    .get("/:id", "get")
-    .patch("/:id", "update")
-    .delete("/:id", "delete")
-    .get("/:id/login-details", "getPrinterLoginDetails")
-    .post("/:id/serial-connect", "sendSerialConnectCommand")
-    .post("/:id/serial-disconnect", "sendSerialDisconnectCommand")
-    .post("/:id/job/stop", "stopPrintJob")
-    .patch("/:id/enabled", "updateEnabled")
-    .put("/:id/reconnect", "reconnectOctoPrint")
-    .patch("/:id/connection", "updateConnectionSettings")
-    .patch("/:id/step-size", "setStepSize")
-    .patch("/:id/flow-rate", "setFlowRate")
-    .patch("/:id/feed-rate", "setFeedRate")
-    .patch("/:id/reset-power-settings", "resetPowerSettings")
-    .get("/:id/terminal-logs", "getTerminalLogs")
-    .get("/:id/plugin-list", "getPluginList");
+  .prefix(AppConstants.apiRoute + "/printer")
+  .before([authenticate(), authorizeRoles([ROLES.OPERATOR, ROLES.ADMIN]), printerResolveMiddleware()])
+  .get("/", "list")
+  .get("/sse", "sse")
+  .post("/", "create")
+  .post("/batch", "importBatch")
+  .post("/test-connection", "testConnection")
+  .post("/sort-index", "updateSortIndex")
+  .get("/:id", "getPrinter")
+  .patch("/:id", "update")
+  .delete("/:id", "delete")
+  .get("/:id/login-details", "getPrinterLoginDetails")
+  .post("/:id/serial-connect", "sendSerialConnectCommand")
+  .post("/:id/serial-disconnect", "sendSerialDisconnectCommand")
+  .post("/:id/job/stop", "stopPrintJob")
+  .post("/:id/reconnect", "reconnectOctoPrint")
+  .patch("/:id/enabled", "updateEnabled")
+  .patch("/:id/connection", "updateConnectionSettings")
+  .patch("/:id/step-size", "setStepSize")
+  .patch("/:id/flow-rate", "setFlowRate")
+  .patch("/:id/feed-rate", "setFeedRate")
+  .patch("/:id/reset-power-settings", "resetPowerSettings")
+  .get("/:id/terminal-logs", "getTerminalLogs")
+  .get("/:id/plugin-list", "getPluginList");

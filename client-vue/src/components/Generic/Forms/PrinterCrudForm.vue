@@ -165,6 +165,10 @@ export default class PrinterCrudForm extends Vue {
     await printersState.loadPrinterGroups();
   }
 
+  resetForm() {
+    this.formData = getDefaultCreatePrinter();
+  }
+
   @Watch(watchedId)
   onChildChanged(val?: string) {
     if (!val) return;

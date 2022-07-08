@@ -78,9 +78,7 @@ class PrinterFilesController {
     const { recursive } = await validateInput(req.query, getFilesRules);
 
     this.#logger.info("Refreshing file storage by eager load");
-
     const response = await this.#filesStore.eagerLoadPrinterFiles(currentPrinterId, recursive);
-
     this.#statusResponse(res, response);
   }
 
@@ -94,7 +92,6 @@ class PrinterFilesController {
     const { currentPrinter } = getScopedPrinter(req);
 
     const filesCache = await this.#filesStore.getFiles(currentPrinter.id);
-
     res.send(filesCache);
   }
 
@@ -168,11 +165,12 @@ class PrinterFilesController {
   }
 
   async selectAndPrintFile(req, res) {
-    const { printerLogin } = getScopedPrinter(req, [printerLoginToken]);
+    const { currentPrinterId, printerLogin } = getScopedPrinter(req, [printerLoginToken]);
     const { filePath: path, print } = await validateInput(req.body, selectAndPrintFileRules);
 
     const result = await this.#octoPrintApiService.selectPrintFile(printerLogin, path, print);
 
+    await this.#filesStore.setExistingFileForPrint(currentPrinterId, path);
     res.send(result);
   }
 

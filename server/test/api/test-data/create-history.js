@@ -1,25 +1,25 @@
 const HistoryModel = require("../../../models/History");
-const { getCostSettingsDefault } = require("../../../constants/service.constants");
+const {
+  EVENT_TYPES
+} = require("../../../services/octoprint/constants/octoprint-websocket.constants");
 
 async function createTestHistory(
   printerId,
   name,
-  costSettings = {},
   job = {
     test: true
-  }
+  },
+  payload = {},
+  meta = {},
+  octoPrintEventType = EVENT_TYPES.PrintDone
 ) {
   const history = new HistoryModel({
-    filePath: "test",
-    fileDisplay: "Testfile",
-    fileName: "testfilename",
-    printTime: 123,
-    success: true,
-    reason: "Yay",
+    printerName: name,
+    printerId,
     job: job,
-    costSettings: getCostSettingsDefault(),
-    printerId: printerId,
-    printerName: name
+    payload,
+    meta,
+    octoPrintEventType
   });
   await history.validate();
   return history.save();

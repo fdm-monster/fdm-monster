@@ -1,2 +1,1 @@
-export interface ClientSettings {
-}
+export interface ClientSettings {}

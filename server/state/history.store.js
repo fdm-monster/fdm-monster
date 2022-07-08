@@ -1,8 +1,7 @@
-const { getDefaultHistoryStatistics } = require("../constants/cleaner.constants");
 const { arrayCounts } = require("../utils/array.util");
 const { sumValuesGroupByDate, assignYCumSum } = require("../utils/graph-point.utils");
 const { getPrintCostNumeric } = require("../utils/print-cost.util");
-const { Status } = require("../constants/service.constants");
+const { getDefaultHistoryStatistics } = require("../constants/service.constants");
 const { NotFoundException } = require("../exceptions/runtime.exceptions");
 
 /**
@@ -49,35 +48,21 @@ class HistoryStore {
     return entry;
   }
 
-  async createJobHistoryEntry(printerId, { payload, resends }) {
+  async createJobHistoryEntry(printerId, { payload, resends }, eventType) {
     const job = this.#jobsCache.getPrinterJob(printerId);
     const printerState = this.#printersStore.getPrinterState(printerId);
 
-    const entry = await this.#historyService.create(printerState, job, { payload, resends });
+    const entry = await this.#historyService.create(printerState, job, payload, resends, eventType);
     this.#historyCache.push(entry);
 
     return entry;
-  }
-
-  async updateCostSettings(id, costSettings) {
-    const entryIndex = this.getEntryIndex(id);
-    const historyEntry = await this.#historyService.updateCostSettings(id, costSettings);
-
-    this.#historyCache[entryIndex] = historyEntry;
-    return historyEntry;
   }
 
   async deleteEntry(id) {
     await this.#historyService.delete(id);
 
     const index = this.getEntryIndex(id);
-    if (index !== -1) {
-      this.#historyCache.pop(index);
-
-      return Status.success("Deleted history entry from cached history");
-    } else {
-      return Status.failure("History entry was not found in cached history");
-    }
+    this.#historyCache.slice(index, 1);
   }
 
   /**

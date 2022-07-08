@@ -9,7 +9,11 @@
     tile
     @click="selectPrinter()"
   >
-    <v-container v-if="printer" class="tile-inner">
+    <v-container
+      v-if="printer"
+      :style="{ 'border-right': printerFilamentColor }"
+      class="tile-inner"
+    >
       <small class="small-resized-font ml-1">
         {{ printer.printerName }}
       </small>
@@ -26,9 +30,9 @@
     </v-container>
     <v-progress-linear
       v-if="printer && printer.currentJob"
-      bottom
-      absolute
       :value="printer.currentJob.progress"
+      absolute
+      bottom
       color="green"
     >
     </v-progress-linear>
@@ -40,6 +44,7 @@ import Vue from "vue";
 import { Component, Prop } from "vue-property-decorator";
 import { printersState } from "@/store/printers.state";
 import { Printer } from "@/models/printers/printer.model";
+import RAL_CODES from "@/constants/ral.reference.json";
 
 @Component({
   components: {}
@@ -47,6 +52,8 @@ import { Printer } from "@/models/printers/printer.model";
 export default class PrinterGridTile extends Vue {
   @Prop() printer: Printer;
   @Prop() loading: boolean;
+  readonly defaultColor = "rgba(0,0,0,0)";
+  readonly defaultBorder = "0 solid black";
 
   get selected() {
     if (!this.printer) return false;
@@ -57,8 +64,27 @@ export default class PrinterGridTile extends Vue {
     return printersState.printers;
   }
 
+  get printerFilamentColor() {
+    const color = this.convertColor(this.printer?.lastPrintedFile?.parsedColor?.toLowerCase());
+    if (!color) {
+      return this.defaultBorder;
+    }
+
+    const finds = Object.values(RAL_CODES).find(
+      (r) => r.names.nl.toLowerCase() === color.toLowerCase()
+    );
+    if (!finds) return this.defaultBorder;
+    return `8px solid ${finds.color.websafe}`;
+  }
+
   get printerStateColor() {
-    return this.printer?.printerState.colour.hex || "rgba(0,0,0,0)";
+    if (!this.printer) return this.defaultColor;
+
+    return this.printer?.printerState.colour.hex || this.defaultColor;
+  }
+
+  convertColor(colorName?: string) {
+    return colorName;
   }
 
   id() {
@@ -105,6 +131,7 @@ export default class PrinterGridTile extends Vue {
 
 .tile-setup:hover {
   outline: 2px solid #02b102 !important;
+  border-right-width: 8px;
 }
 
 .small-resized-font {

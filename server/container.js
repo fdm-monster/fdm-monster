@@ -28,7 +28,7 @@ const FilamentCache = require("./state/data/filament.cache");
 const PrinterState = require("./state/printer.state");
 const PrinterStateFactory = require("./state/printer-state.factory");
 const FilesStore = require("./state/files.store");
-const FilamentStore = require("./state/filament.store");
+const FilamentsStore = require("./state/filaments.store");
 const InfluxDbHistoryService = require("./services/influx/influx-db-history.service");
 const InfluxDbFilamentService = require("./services/influx/influx-db-filament.service");
 const InfluxDbPrinterStateService = require("./services/influx/influx-db-printer-state.service");
@@ -38,7 +38,6 @@ const PrinterFilesService = require("./services/printer-files.service");
 const SoftwareUpdateTask = require("./tasks/software-update.task");
 const AutoDiscoveryService = require("./services/auto-discovery.service");
 const TerminalLogsCache = require("./state/data/terminal-logs.cache");
-const DashboardStatisticsCache = require("./state/data/dashboard-statistics.cache");
 const AlertService = require("./services/alert.service");
 const { asFunction, asClass, asValue, createContainer, InjectionMode } = require("awilix");
 const LoggerFactory = require("./handlers/logger-factory");
@@ -59,6 +58,7 @@ const PrinterFileCleanTask = require("./tasks/printer-file-clean.task");
 const { ROLES } = require("./constants/authorization.constants");
 const CustomGCodeService = require("./services/custom-gcode.service");
 const PrinterWebsocketPingTask = require("./tasks/printer-websocket-ping.task");
+const FilamentService = require("./services/filament.service");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -72,7 +72,7 @@ function configureContainer() {
     [DITokens.serverTasks]: asValue(ServerTasks),
     [DITokens.defaultRole]: asValue(ROLES.ADMIN),
     [DITokens.serverVersion]: asFunction(() => {
-      return process.env[AppConstants.VERSION_KEY]
+      return process.env[AppConstants.VERSION_KEY];
     }),
     // -- asFunction --
     [DITokens.printerStateFactory]: asFunction(PrinterStateFactory).transient(), // Factory function, transient on purpose!
@@ -109,7 +109,6 @@ function configureContainer() {
     [DITokens.printerGroupService]: asClass(PrinterGroupService),
     [DITokens.octoPrintApiService]: asClass(OctoPrintApiService).singleton(),
     [DITokens.historyService]: asClass(HistoryService),
-    [DITokens.dashboardStatisticsCache]: asClass(DashboardStatisticsCache),
 
     [DITokens.filamentCache]: asClass(FilamentCache).singleton(),
     [DITokens.printerProfilesCache]: asClass(PrinterProfilesCache).singleton(),
@@ -121,12 +120,13 @@ function configureContainer() {
     [DITokens.octoPrintLogsCache]: asClass(OctoPrintLogsCache).singleton(),
     [DITokens.fileCache]: asClass(FileCache).singleton(),
     [DITokens.fileUploadTrackerCache]: asClass(FileUploadTrackerCache).singleton(),
-    [DITokens.filamentStore]: asClass(FilamentStore), // No need for singleton as its now based on filamentCache
+    [DITokens.filamentsStore]: asClass(FilamentsStore), // No need for singleton as its now based on filamentCache
     [DITokens.filesStore]: asClass(FilesStore).singleton(),
     [DITokens.printersStore]: asClass(PrintersStore).singleton(),
 
     // Extensibility and export
     [DITokens.alertService]: asClass(AlertService),
+    [DITokens.filamentService]: asClass(FilamentService),
     [DITokens.scriptService]: asClass(ScriptService),
     [DITokens.customGCodeService]: asClass(CustomGCodeService),
     [DITokens.influxDbSetupService]: asClass(InfluxDbSetupService).singleton(),
@@ -156,5 +156,5 @@ function configureContainer() {
 }
 
 module.exports = {
-    configureContainer
+  configureContainer
 };

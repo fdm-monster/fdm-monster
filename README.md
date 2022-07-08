@@ -17,12 +17,13 @@ We dont aim to provide webcam support right now as this is one of the big bottle
 This server is currently freshly released, so give it a star ⭐and be the first to experience it! 
 
 #### Last finished features: 
+- Print material/color/assignee parser and tile border color
 - Optional Auto-clean old OctoPrint files with different settings
 - Dependency updates using Renovate (thanks to @mkevenaar for the tips)
 - Quick copy paste of OctoPrint credentials
 #### Current work: 
 - Firmware update plugin service
-- Print material/color/assignee parser and tile representation
+- Client in Vue3, waiting for Vuetify 3.0 and 3.1 release (https://github.com/fdm-monster/fdm-monster-client)
 
 ## Development [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://gitHub.com/fdm-monster/fdm-monster/graphs/commit-activity) [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/fdm-monster/fdm-monster/Node.js%20CI?query=branch%3Adevelop)](https://github.com/fdm-monster/fdm-monster/actions/workflows/nodejs.yml?query=branch%3Adevelop) [![GitHub license](https://img.shields.io/github/license/fdm-monster/fdm-monster)](https://github.com/fdm-monster/fdm-monster/blob/master/LICENSE.txt)
 This work is under active development with cutting edge tech and open-source standards. 
@@ -44,9 +45,10 @@ Feel like joining in as a developer or do you have a quick fix? Great! Please re
 - [x] :rocket: First core release tested in the field
 - [x] Server restart capability using PM2 and nodemon (for Linux, Windows)
 - [x] :rocket: Quick copy paste of OctoPrint credentials
+- [x] 🛡️ Complete API test coverage >80% (now at 80.5%)
 - [ ] 🛡️ NodeJS Server legacy-free (history, alerts, custom gcode and filament)
 - [ ] 🛡️ Frontend user and basic role management
-- [ ] 🛡️ Full API and client test coverage >80% (now at 71%) 
+- [ ] 🛡️ Client test coverage
 - [ ] 🔌 FDM Connector - filament tracker 
 - [ ] 🔌 Raspberry Pi image and prebuilt customized OctoPi image
 - [ ] :rocket: Chocolatey package (Windows install)

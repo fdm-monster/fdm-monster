@@ -1,13 +1,13 @@
 # https://pkgs.alpinelinux.org/packages?name=nodejs&branch=v3.13
 # Results in NodeJS 16.13.0
-FROM alpine:3.15 as base
+FROM alpine:3.16 as base
 
 RUN apk add --no-cache --virtual .base-deps \
     nodejs \
     npm \
     tini
 
-RUN npm install -g pm2
+RUN yarn global add pm2
 
 RUN adduser -D fdm --home /app && \
     mkdir -p /scripts && \
@@ -24,7 +24,7 @@ RUN apk add --no-cache --virtual .build-deps \
 
 WORKDIR /tmp/app
 COPY package.json .
-RUN npm install --only=production
+RUN yarn install --production
 
 RUN apk del .build-deps
 

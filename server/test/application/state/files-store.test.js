@@ -23,7 +23,7 @@ afterAll(async () => {
   await dbHandler.closeDatabase();
 });
 
-describe("filesStore", () => {
+describe("FilesStore", () => {
   const validNewPrinter = {
     apiKey: "asdasasdasdasdasdasdasdasdasdasd",
     webSocketURL: "ws://asd.com/",
@@ -37,7 +37,7 @@ describe("filesStore", () => {
     await filesStore.loadFilesStore();
 
     const filesCache = filesStore.getFiles(testPrinterState.id);
-    expect(filesCache.fileCount).toBe(0);
+    expect(filesCache.files.length).toBe(0);
 
     const oldFiles = filesStore.getOutdatedFiles(testPrinterState.id, 7);
     expect(oldFiles.length).toBe(0);
@@ -48,9 +48,11 @@ describe("filesStore", () => {
     let testPrinterState = await printersStore.addPrinter(validNewPrinter);
 
     await printerFilesService.updateFiles(testPrinterState.id, {
-      files: [{
-        date: Date.now()
-      }]
+      files: [
+        {
+          date: Date.now()
+        }
+      ]
     });
     await filesStore.loadFilesStore();
 
@@ -69,11 +71,14 @@ describe("filesStore", () => {
     let testPrinterState = await printersStore.addPrinter(validNewPrinter);
 
     await printerFilesService.updateFiles(testPrinterState.id, {
-      files: [{
-        date: Date.now()
-      }, {
-        date: Date.now() - 8 * 86400
-      }]
+      files: [
+        {
+          date: Date.now()
+        },
+        {
+          date: Date.now() - 8 * 86400
+        }
+      ]
     });
     await filesStore.loadFilesStore();
 

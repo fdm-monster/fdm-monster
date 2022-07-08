@@ -7,6 +7,10 @@ class HistoryServiceMock {
     return testHistory;
   }
 
+  async create(inputData) {
+    testHistory.push(inputData);
+  }
+
   saveMockData(inputData) {
     if (!Array.isArray(inputData)) {
       throw new Error(

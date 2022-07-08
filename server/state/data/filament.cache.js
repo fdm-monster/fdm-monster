@@ -1,10 +1,8 @@
 const _ = require("lodash");
-const Filament = require("../../models/Filament");
+const { ValidationException } = require("../../exceptions/runtime.exceptions");
 
 class FilamentCache {
-  #filamentSpools = [];
-  #statistics = [];
-  #selectedFilamentList = [];
+  #filamentList = [];
 
   #logger;
 
@@ -17,150 +15,60 @@ class FilamentCache {
     this.#printersStore = printersStore;
     this.#printerProfilesCache = printerProfilesCache;
 
-    this.#logger = loggerFactory("Server-Filament");
+    this.#logger = loggerFactory("FilamentCache");
   }
 
-  getFilamentSpools() {
-    return this.#filamentSpools;
+  cacheFilaments(filamentDocs) {
+    this.#filamentList = [];
+    for (let filament of filamentDocs) {
+      this.addFilament(filament);
+    }
   }
 
-  getStatistics() {
-    return this.#statistics;
+  getFilament(filamentId) {
+    return this.#filamentList.find((f) => f.id === filamentId);
   }
 
-  getSelected() {
-    return this.#selectedFilamentList;
+  addFilament(filamentEntry) {
+    const filamentCacheEntry = this.#mapFilamentEntryToCacheEntry(filamentEntry);
+    this.#filamentList.push(filamentCacheEntry);
+
+    return filamentCacheEntry;
   }
 
-  async initCache() {
-    const printers = this.#printersStore.listPrinterStates();
-
-    const spools = await Filament.find({});
-    const spoolsArray = [];
-    const profilesArray = [];
-
-    for (let sp = 0; sp < spools.length; sp++) {
-      const spool = {
-        _id: spools[sp]._id,
-        name: spools[sp].spools.name,
-        profile: spools[sp].spools.profile,
-        price: spools[sp].spools.price,
-        weight: spools[sp].spools.weight,
-        used: spools[sp].spools.used,
-        remaining: spools[sp].spools.weight - spools[sp].spools.used,
-        percent: 100 - (spools[sp].spools.used / spools[sp].spools.weight) * 100,
-        tempOffset: spools[sp].spools.tempOffset,
-        printerAssignment: this.getPrinterAssignment(spools[sp]._id, printers),
-        fmID: spools[sp].spools.fmID
-      };
-      spoolsArray.push(spool);
+  purgeFilament(filamentId) {
+    if (!filamentId) {
+      throw new ValidationException("Parameter filamentId was not provided.");
     }
 
-    this.#filamentSpools = spoolsArray;
+    const filamentEntry = this.getFilament(filamentId);
 
-    this.#selectedFilamentList = await this.selectedFilament(printers);
-    this.#statistics = this.createStatistics(spoolsArray, profilesArray);
-    this.#logger.info("Filament information cleaned and ready for consumption...");
+    if (!filamentEntry) {
+      this.#logger.warning("Did not remove cached Filament as it was not found in cache");
+      return;
+    }
+
+    const index = this.#filamentList.findIndex((f) => f.id === filamentId);
+    this.#filamentList.splice(index, 1);
+
+    this.#logger.info(`Purged filamentId '${filamentId}' Filament cache`);
   }
 
-  async selectedFilament(printers) {
-    const selectedArray = [];
-    for (let s = 0; s < printers.length; s++) {
-      if (typeof printers[s] !== "undefined" && Array.isArray(printers[s].selectedFilament)) {
-        for (let f = 0; f < printers[s].selectedFilament.length; f++) {
-          if (printers[s].selectedFilament[f] !== null) {
-            selectedArray.push(printers[s].selectedFilament[f]._id);
-          }
-        }
-      }
-    }
-    return selectedArray;
+  listFilaments() {
+    return this.#filamentList;
   }
 
-  createStatistics(spools, profiles) {
-    const materials = [];
-    let materialBreak = [];
-    for (let p = 0; p < profiles.length; p++) {
-      materials.push(profiles[p].material.replace(/ /g, "_"));
-      const material = {
-        name: profiles[p].material.replace(/ /g, "_"),
-        weight: [],
-        used: [],
-        price: []
-      };
-      materialBreak.push(material);
-    }
-    materialBreak = _.uniqWith(materialBreak, _.isEqual);
-
-    const used = [];
-    const total = [];
-    const price = [];
-    for (let s = 0; s < spools.length; s++) {
-      used.push(parseFloat(spools[s].used));
-      total.push(parseFloat(spools[s].weight));
-      price.push(parseFloat(spools[s].price));
-      const profInd = _.findIndex(profiles, function (o) {
-        return o._id == spools[s].profile;
-      });
-      if (profInd > -1) {
-        const index = _.findIndex(materialBreak, function (o) {
-          return o.name == profiles[profInd].material.replace(/ /g, "_");
-        });
-
-        materialBreak[index].weight.push(parseFloat(spools[s].weight));
-        materialBreak[index].used.push(parseFloat(spools[s].used));
-        materialBreak[index].price.push(parseFloat(spools[s].price));
-      }
-    }
-
-    const materialBreakDown = [];
-    for (let m = 0; m < materialBreak.length; m++) {
-      const mat = {
-        name: materialBreak[m].name,
-        used: materialBreak[m].used.reduce((a, b) => a + b, 0),
-        total: materialBreak[m].weight.reduce((a, b) => a + b, 0),
-        price: materialBreak[m].price.reduce((a, b) => a + b, 0)
-      };
-      materialBreakDown.push(mat);
-    }
+  #mapFilamentEntryToCacheEntry(document) {
     return {
-      materialList: materials.filter(function (item, i, ar) {
-        return ar.indexOf(item) === i;
-      }),
-      used: used.reduce((a, b) => a + b, 0),
-      total: total.reduce((a, b) => a + b, 0),
-      price: price.reduce((a, b) => a + b, 0),
-      profileCount: profiles.length,
-      spoolCount: spools.length,
-      activeSpools: this.#selectedFilamentList,
-      activeSpoolCount: this.#selectedFilamentList.length,
-      materialBreakDown
+      id: String(document.id),
+      name: document.name,
+      manufacturer: document.manufacturer,
+      cost: document.cost,
+      weight: document.weight,
+      consumedRatio: document.consumedRatio,
+      printTemperature: document.printTemperature,
+      meta: document.meta
     };
-  }
-
-  // TODO broken w.r.t. printerState
-  getPrinterAssignment(spoolID, farmPrinters) {
-    const assignments = [];
-    for (let p = 0; p < farmPrinters.length; p++) {
-      if (
-        typeof farmPrinters[p] !== "undefined" &&
-        Array.isArray(farmPrinters[p].selectedFilament)
-      ) {
-        for (let s = 0; s < farmPrinters[p].selectedFilament.length; s++) {
-          if (farmPrinters[p].selectedFilament[s] !== null) {
-            if (farmPrinters[p].selectedFilament[s]._id.toString() === spoolID.toString()) {
-              const printer = {
-                id: farmPrinters[p]._id,
-                tool: s,
-                name: farmPrinters[p].printerName
-              };
-              assignments.push(printer);
-            }
-          }
-        }
-      }
-    }
-    return assignments;
   }
 }
 

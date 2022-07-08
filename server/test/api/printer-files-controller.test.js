@@ -8,6 +8,7 @@ const {
   expectInvalidResponse,
   expectNotFoundResponse
 } = require("../extensions");
+const nock = require("nock");
 
 let Model = Printer;
 const defaultRoute = AppConstants.apiRoute + "/printer-files";
@@ -39,6 +40,17 @@ beforeEach(async () => {
 });
 
 describe("PrinterFilesController", () => {
+  const gcodePath = "test/api/test-data/sample.gcode";
+  const invalidGcodePath = "test/api/test-data/sample.gco";
+  const nockResponse = {
+    files: {
+      local: {
+        path: "/home/yes",
+        name: "3xP1234A_PLA_ParelWit_1h31m.gcode"
+      }
+    }
+  };
+
   it(`should return 404 on ${defaultRoute} for nonexisting printer`, async () => {
     const res = await request.get(getRoute("60ae2b760bca4f5930be3d88")).send();
     expectNotFoundResponse(res);
@@ -124,6 +136,74 @@ describe("PrinterFilesController", () => {
       print: false
     });
     expectOkResponse(response);
+  });
+
+  test.skip("should allow POST upload file", async () => {
+    const printer = await createTestPrinter(request);
+
+    nock(printer.printerURL)
+      .post("/api/files/local")
+      .reply(200, {
+        files: {
+          local: {
+            path: "/home/yes",
+            name: "3xP1234A_PLA_ParelWit_1h31m.gcode"
+          }
+        }
+      })
+      .persist();
+
+    const response = await request
+      .post(uploadFileRoute(printer.id))
+      .field("print", true)
+      .attach("file", gcodePath);
+    expectOkResponse(response);
+  });
+
+  test.skip("should not allow POSTing multiple uploaded file", async () => {
+    const printer = await createTestPrinter(request);
+
+    nock(printer.printerURL)
+      .post("/api/files/local")
+      .reply(200, {
+        files: {
+          local: {
+            path: "/home/yes",
+            name: "3xP1234A_PLA_ParelWit_1h31m.gcode"
+          }
+        }
+      })
+      .persist();
+
+    const response = await request
+      .post(uploadFileRoute(printer.id))
+      .field("print", true)
+      .attach("file", gcodePath)
+      .attach("file", gcodePath);
+    expectInvalidResponse(response, ["error"]);
+  });
+
+  test.skip("should not allow POSTing wrong extensions", async () => {
+    const printer = await createTestPrinter(request);
+
+    nock(printer.printerURL)
+      .post("/api/files/local")
+      .reply(200, {
+        files: {
+          local: {
+            path: "/home/yes",
+            name: "3xP1234A_PLA_ParelWit_1h31m.gcode"
+          }
+        }
+      })
+      .persist();
+
+    const response = await request
+      .post(uploadFileRoute(printer.id))
+      .field("print", true)
+      .attach("file", invalidGcodePath);
+    console.log(response);
+    expectInvalidResponse(response, ["error"]);
   });
 
   it("should deny POST to upload printer files when empty", async () => {
