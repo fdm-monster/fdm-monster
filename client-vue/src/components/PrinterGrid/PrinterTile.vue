@@ -65,26 +65,24 @@ export default class PrinterGridTile extends Vue {
   }
 
   get printerFilamentColor() {
-    const color = this.convertColor(this.printer?.lastPrintedFile?.parsedColor?.toLowerCase());
-    if (!color) {
+    const ralCode = this.printer?.lastPrintedFile.parsedVisualizationRAL;
+    if (!ralCode) {
       return this.defaultBorder;
     }
 
-    const finds = Object.values(RAL_CODES).find(
-      (r) => r.names.nl.toLowerCase() === color.toLowerCase()
-    );
-    if (!finds) return this.defaultBorder;
-    return `8px solid ${finds.color.websafe}`;
+    const ralString = ralCode.toString();
+    const foundColor = Object.values(RAL_CODES).find((r) => r.code === ralString);
+    if (!foundColor) {
+      return this.defaultBorder;
+    }
+
+    return `8px solid ${foundColor.color.hex}`;
   }
 
   get printerStateColor() {
     if (!this.printer) return this.defaultColor;
 
     return this.printer?.printerState.colour.hex || this.defaultColor;
-  }
-
-  convertColor(colorName?: string) {
-    return colorName;
   }
 
   id() {
