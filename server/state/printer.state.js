@@ -186,7 +186,8 @@ class PrinterState {
       gcodeScripts: {},
       octoPrintVersion: this.getOctoPrintVersion(),
       lastPrintedFile: this.#entityData.lastPrintedFile || {
-        parsedColor: "any"
+        parsedColor: "any",
+        parsedVisualizationRAL: 0
       },
       selectedFilament: this.#entityData.selectedFilament,
       enabled: this.#entityData.enabled,

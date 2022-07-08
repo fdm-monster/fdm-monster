@@ -19,6 +19,7 @@ export interface LastPrintedFile {
   fileName: string;
   editTimestamp: number;
   parsedColor: string;
+  parsedVisualizationRAL: number;
   parsedAmount: number;
   parsedMaterial: string;
   parsedOrderCode: string;
