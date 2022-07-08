@@ -854,10 +854,10 @@
     tslib "2.4.0"
     uuid "8.3.2"
 
-"@nestjs/config@2.1.0":
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/@nestjs/config/-/config-2.1.0.tgz#334d6c3211f288eb40b1f8e2dbfbaf50b538f300"
-  integrity sha512-wUpt1/QJEN7xnJl4pM3c9rHrY1widq2yPOZfjaMD1//XAP9LLHTaW+RxSEG6BSGIm3w4wGtjco+gKNB2WL7yRg==
+"@nestjs/config@2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@nestjs/config/-/config-2.2.0.tgz#9f3da35f7c4a58724c0a0817d6f04b66e6703430"
+  integrity sha512-78Eg6oMbCy3D/YvqeiGBTOWei1Jwi3f2pSIZcZ1QxY67kYsJzTRTkwRT8Iv30DbK0sGKc1mcloDLD5UXgZAZtg==
   dependencies:
     dotenv "16.0.1"
     dotenv-expand "8.0.3"
