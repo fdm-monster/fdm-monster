@@ -42,7 +42,7 @@
     "cookie-parser": "1.4.6",
     "express-session": "1.17.3",
     "lodash": "4.17.21",
-    "luxon": "2.4.0",
+    "luxon": "2.5.0",
     "mongodb": "4.7.0",
     "passport": "0.6.0",
     "passport-jwt": "4.0.0",
