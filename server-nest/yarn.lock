@@ -4270,10 +4270,10 @@ lru-queue@^0.1.0:
   dependencies:
     es5-ext "~0.10.2"
 
-luxon@2.5.0:
-  version "2.5.0"
-  resolved "https://registry.yarnpkg.com/luxon/-/luxon-2.5.0.tgz#098090f67d690b247e83c090267a60b1aa8ea96c"
-  integrity sha512-IDkEPB80Rb6gCAU+FEib0t4FeJ4uVOuX1CQ9GsvU3O+JAGIgu0J7sf1OarXKaKDygTZIoJyU6YdZzTFRu+YR0A==
+luxon@3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/luxon/-/luxon-3.0.0.tgz#4d007ac1ef6774e6cf7aafa5a24b9fa0e68d10de"
+  integrity sha512-6N4zsi2WTot29/ZWNIX9ad1W3NZyTZHMTf3b+bhKDy67/e9YyMM3tB9S8yuJliOG78wXUKOkX2oNTSWRG09ggg==
 
 luxon@^1.23.x:
   version "1.28.0"
