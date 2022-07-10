@@ -1,4 +1,4 @@
-import { HttpService, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { Observable } from "rxjs";
 import { OctoPrintSettingsDto } from "../dto/octoprint-settings.dto";
 import { RestConnectionParams } from "../models/rest-connection.params";
@@ -6,7 +6,7 @@ import { map } from "rxjs/operators";
 import { AxiosRequestConfig } from "axios";
 import { OctoPrintCurrentUserDto } from "../dto/octoprint-currentuser.dto";
 import { OctoPrintSessionDto } from "../dto/octoprint-session.dto";
-import { WebsocketConnectionParams } from "../models/websocket-connection.params";
+import { HttpService } from "@nestjs/axios";
 
 @Injectable()
 export class OctoPrintClientService {
