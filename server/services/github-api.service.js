@@ -28,7 +28,7 @@ class GithubApiService {
     }
 
     const releases = await this.getRepoGithubReleases(fdmGithubRepoUrl, includePrereleases);
-    this.#logger.info(`Received ${releases.length} releases from github.`);
+    this.#logger.info(`Received ${releases?.length || "?"} releases from github.`);
     return releases;
   }
 
