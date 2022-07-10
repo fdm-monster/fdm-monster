@@ -76,10 +76,13 @@ class ServerReleaseService {
     }
 
     // Illegal response should not store the latestRelease
-    const currentlyInstalledRelease = this.#findReleaseByTag(githubReleases, this.#serverVersion);
+    const currentlyInstalledRelease = this.#findReleaseByTag(
+      allGithubReleases,
+      this.#serverVersion
+    );
 
     this.#installedRelease = this.#transformGithubRelease(currentlyInstalledRelease);
-    this.#latestRelease = this.#transformGithubRelease(this.#findLatestRelease(githubReleases));
+    this.#latestRelease = this.#transformGithubRelease(this.#findLatestRelease(allGithubReleases));
 
     this.#installedReleaseFound = !!currentlyInstalledRelease;
     if (!this.#installedReleaseFound) {
