@@ -1,5 +1,6 @@
 const { PluginBaseService } = require("./plugin-base.service");
 const { ValidationException } = require("../../exceptions/runtime.exceptions");
+const HttpStatusCode = require("../../constants/http-status-codes.constants");
 
 const config = {
   pluginName: "firmwareupdater",
@@ -20,6 +21,7 @@ class PluginFirmwareUpdateService extends PluginBaseService {
   #multerService;
 
   #prusaFirmwareReleases;
+  #latestFirmware;
 
   constructor({
     octoPrintApiService,
@@ -47,21 +49,33 @@ class PluginFirmwareUpdateService extends PluginBaseService {
       );
     }
 
-    const latestFirmware = this.#prusaFirmwareReleases[0];
+    if (!this.#prusaFirmwareReleases?.length) return;
+
+    this.#latestFirmware = this.#prusaFirmwareReleases[0];
     this._logger.info(
       `Plugin Cache filled with ${this.#prusaFirmwareReleases?.length || "?"} firmware releases`,
       {
-        url: latestFirmware.url,
-        tag_name: latestFirmware.tag_name
+        url: this.#latestFirmware.url,
+        tag_name: this.#latestFirmware.tag_name
       }
     );
+  }
+
+  async downloadFirmware(version) {
+    if (!this.#prusaFirmwareReleases?.length || !this.#latestFirmware) {
+      throw new ValidationException(
+        "No firmware releases were scanned. Download was not successful"
+      );
+    }
+
+    const latestFirmware = this.#prusaFirmwareReleases[0];
 
     // Download the latest firmware asset
     const firmwareAsset = latestFirmware.assets.find((asset) => asset.name.includes("MK3S_MK3S+"));
     const downloadUrl = firmwareAsset.browser_download_url;
     const downloadName = firmwareAsset.name;
     this._logger.info(`Checking firmware ${downloadName}`);
-    if (!this.#multerService.fileExists(downloadName, firmwareDownloadPath)) {
+    if (!!this.#multerService.fileExists(downloadName, firmwareDownloadPath)) {
       await this.#multerService.downloadFile(downloadUrl, downloadName, firmwareDownloadPath);
       this._logger.info(`Downloaded firmware ${downloadName}`);
     } else {

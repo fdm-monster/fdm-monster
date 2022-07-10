@@ -3,6 +3,8 @@ const {
   contentTypeHeaderKey
 } = require("./octoprint/constants/octoprint-service.constants");
 const { fdmGithubRepoUrl } = require("../constants/software-update.constants");
+const GithubETag = require("../models/GithubETag");
+const HttpStatusCode = require("../constants/http-status-codes.constants");
 
 class GithubApiService {
   #httpClient;
@@ -37,17 +39,41 @@ class GithubApiService {
    * @returns {Promise<*>}
    */
   async getRepoGithubReleases(repoUrl, includePrereleases = false) {
-    const response = await this.#httpClient.get(`${repoUrl}/releases`, {
-      headers: {
-        [contentTypeHeaderKey]: jsonContentType
-      }
+    const foundEtag = await GithubETag.findOne({
+      repoUrl
     });
 
-    if (!response?.data?.length) return;
+    const optionalHeader = foundEtag ? { "If-None-Match": foundEtag.etag } : {};
+    const response = await this.#httpClient
+      .get(`${repoUrl}/releases`, {
+        headers: {
+          [contentTypeHeaderKey]: jsonContentType,
+          ...(optionalHeader || {})
+        }
+      })
+      .catch((e) => {
+        if (e.response.status === HttpStatusCode.NOT_MODIFIED) {
+          return { data: foundEtag.cachedResponse, isCached: true };
+        }
+        throw e;
+      });
 
-    const releases = response?.data;
+    // Cache the response including pre-releases for later re-use
+    const etag = response?.headers?.etag;
+    if (!!etag && !!response?.isCached) {
+      await GithubETag.updateOne(
+        { repoUrl },
+        { repoUrl, etag, cachedResponse: response.data },
+        {
+          new: true,
+          upsert: true
+        }
+      );
+    }
+
+    let releases = response?.data;
     if (!includePrereleases) {
-      return this.#filterPreReleases(releases);
+      releases = this.#filterPreReleases(releases);
     }
 
     return releases;

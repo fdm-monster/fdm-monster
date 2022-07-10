@@ -25,6 +25,10 @@ class PluginFirmwareUpdateController {
     res.send(result);
   }
 
+  async getFirmwareReleases(req, res) {}
+
+  async downloadFirmware(req, res) {}
+
   async scanPrinterFirmwareVersions(req, res) {
     const result = await this.#performScanOnPrinters();
     res.send(result);
@@ -67,4 +71,6 @@ module.exports = createController(PluginFirmwareUpdateController)
     printerResolveMiddleware()
   ])
   .get("/", "listUpdateState")
-  .post("/scan", "scanPrinterFirmwareVersions");
+  .post("/scan", "scanPrinterFirmwareVersions")
+  .post("/releases", "getFirmwareReleases")
+  .post("/download-firmware", "downloadFirmware");
