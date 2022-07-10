@@ -12,7 +12,7 @@ class PluginBaseService {
   #pluginName;
   #pluginUrl;
 
-  #logger;
+  _logger;
 
   constructor(
     { octoPrintApiService, printersStore, pluginRepositoryCache, loggerFactory },
@@ -22,7 +22,7 @@ class PluginBaseService {
     this.printersStore = printersStore;
     this.pluginRepositoryCache = pluginRepositoryCache;
     this.#pluginName = pluginName;
-    this.#logger = loggerFactory(`Plugin-${pluginName}`);
+    this._logger = loggerFactory(`Plugin-${pluginName}`);
 
     const pluginReference = pluginRepositoryCache.getPlugin(pluginName);
     this.#pluginUrl = pluginUrl || pluginReference.archive;

@@ -114,6 +114,7 @@ class BootTask {
 
       // Low priority tasks
       await this.pluginRepositoryCache.queryCache();
+      await this.pluginFirmwareUpdateService.queryGithubPrusaFirmwareReleasesCache();
     } else {
       this.#logger.warning("Starting in safe mode due to SAFEMODE_ENABLED");
     }

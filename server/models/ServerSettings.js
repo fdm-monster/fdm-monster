@@ -21,7 +21,7 @@ const ServerSettingsSchema = new mongoose.Schema({
       default: false,
       required: true
     },
-    autoRemoveOldFilesCriteriumDays:  {
+    autoRemoveOldFilesCriteriumDays: {
       type: Number,
       default: 14,
       required: true
@@ -30,7 +30,7 @@ const ServerSettingsSchema = new mongoose.Schema({
   server: {
     uploadFolder: {
       type: String,
-      default: AppConstants.defaultFileStorageFolder
+      default: AppConstants.defaultFileUploadFolder
     },
     port: {
       type: Number,

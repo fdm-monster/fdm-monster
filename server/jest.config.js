@@ -9,7 +9,7 @@ module.exports = {
     "assets",
     "coverage",
     "docker",
-    "file-uploads",
+    "file-storage",
     "node_modules",
     "logs",
     "views"

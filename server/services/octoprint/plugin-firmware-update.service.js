@@ -7,7 +7,7 @@ const config = {
 };
 
 const defaultRepos = {
-  prusaFirmare: "https://github.com/prusa3d/Prusa-Firmware/"
+  prusaFirmare: "https://api.github.com/repos/prusa3d/Prusa-Firmware"
 };
 
 const connectivityProp = "connectivity.connection_ok";
@@ -17,7 +17,7 @@ class PluginFirmwareUpdateService extends PluginBaseService {
   #octoPrintApiService;
   #githubApiService;
 
-  #prusaFirmwareCache;
+  #prusaFirmwareReleases;
 
   constructor({
     octoPrintApiService,
@@ -31,10 +31,18 @@ class PluginFirmwareUpdateService extends PluginBaseService {
     this.#githubApiService = githubApiService;
   }
 
-  async queryGithubPrusaFirmware() {
-    this.#prusaFirmwareCache = await this.#githubApiService.getRepoGithubReleases(
-      defaultRepos.prusaFirmare,
-      false
+  async queryGithubPrusaFirmwareReleasesCache() {
+    this.#prusaFirmwareReleases =
+      (await this.#githubApiService.getRepoGithubReleases(defaultRepos.prusaFirmare, false)) || [];
+
+    const latestFirmware = this.#prusaFirmwareReleases[0];
+
+    this._logger.info(
+      `Plugin Cache filled with ${this.#prusaFirmwareReleases?.length || "?"} firmware releases`,
+      {
+        url: latestFirmware.url,
+        tag_name: latestFirmware.tag_name
+      }
     );
   }
 
