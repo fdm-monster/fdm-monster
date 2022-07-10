@@ -27,6 +27,11 @@ class MulterService {
     }
   }
 
+  fileExists(downloadFilename, collection) {
+    const downloadPath = join(AppConstants.defaultFileUploadFolder, collection, downloadFilename);
+    return fs.existsSync(downloadPath);
+  }
+
   async downloadFile(downloadUrl, downloadFilename, collection) {
     const downloadFolder = join(AppConstants.defaultFileUploadFolder, collection);
     if (!fs.existsSync(downloadFolder)) {

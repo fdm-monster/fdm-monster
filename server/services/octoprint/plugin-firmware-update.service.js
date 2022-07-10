@@ -36,11 +36,18 @@ class PluginFirmwareUpdateService extends PluginBaseService {
   }
 
   async queryGithubPrusaFirmwareReleasesCache() {
-    this.#prusaFirmwareReleases =
-      (await this.#githubApiService.getRepoGithubReleases(defaultRepos.prusaFirmare, false)) || [];
+    try {
+      this.#prusaFirmwareReleases = await this.#githubApiService.getRepoGithubReleases(
+        defaultRepos.prusaFirmare,
+        false
+      );
+    } catch (e) {
+      return this._logger.error(
+        "Github fetch error. Probably rate limited, skipping firmware dowmload"
+      );
+    }
 
     const latestFirmware = this.#prusaFirmwareReleases[0];
-
     this._logger.info(
       `Plugin Cache filled with ${this.#prusaFirmwareReleases?.length || "?"} firmware releases`,
       {
@@ -49,12 +56,17 @@ class PluginFirmwareUpdateService extends PluginBaseService {
       }
     );
 
-    const latestPrinterFirmware = latestFirmware.assets.find((asset) =>
-      asset.name.includes("MK3S_MK3S+")
-    );
-    const downloadUrl = latestPrinterFirmware.browser_download_url;
-    const downloadName = latestPrinterFirmware.name;
-    await this.#multerService.downloadFile(downloadUrl, downloadName, firmwareDownloadPath);
+    // Download the latest firmware asset
+    const firmwareAsset = latestFirmware.assets.find((asset) => asset.name.includes("MK3S_MK3S+"));
+    const downloadUrl = firmwareAsset.browser_download_url;
+    const downloadName = firmwareAsset.name;
+    this._logger.info(`Checking firmware ${downloadName}`);
+    if (!this.#multerService.fileExists(downloadName, firmwareDownloadPath)) {
+      await this.#multerService.downloadFile(downloadUrl, downloadName, firmwareDownloadPath);
+      this._logger.info(`Downloaded firmware ${downloadName}`);
+    } else {
+      this._logger.info(`Found firmware ${downloadName}`);
+    }
   }
 
   async getPrinterFirmwareVersion(printer) {
