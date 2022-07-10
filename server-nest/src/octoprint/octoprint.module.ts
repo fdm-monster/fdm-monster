@@ -1,10 +1,11 @@
-import { HttpModule, Inject, Module } from "@nestjs/common";
+import { Inject, Module } from "@nestjs/common";
 import { OctoPrintClientService } from "./services/octoprint-client.service";
 
 import { ClientConnectionsState } from "./state/client-connections.state";
 import { ConfigModule, ConfigType } from "@nestjs/config";
 import { OctoPrintConfig } from "./octoprint.config";
 import { WebsocketClientService } from "./services/websocket-client.service";
+import { HttpModule } from "@nestjs/axios";
 
 @Module({
   imports: [HttpModule, ConfigModule.forFeature(OctoPrintConfig)],
