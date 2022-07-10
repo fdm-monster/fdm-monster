@@ -1,12 +1,13 @@
 const { PluginBaseService } = require("./plugin-base.service");
-const {
-  InternalServerException,
-  ValidationException
-} = require("../../exceptions/runtime.exceptions");
+const { ValidationException } = require("../../exceptions/runtime.exceptions");
 
 const config = {
   pluginName: "firmwareupdater",
   pluginUrl: "https://github.com/OctoPrint/OctoPrint-FirmwareUpdater/archive/master.zip"
+};
+
+const defaultRepos = {
+  prusaFirmare: "https://github.com/prusa3d/Prusa-Firmware/"
 };
 
 const connectivityProp = "connectivity.connection_ok";
@@ -14,10 +15,27 @@ const firmwareProp = "printer.firmware";
 
 class PluginFirmwareUpdateService extends PluginBaseService {
   #octoPrintApiService;
+  #githubApiService;
 
-  constructor({ octoPrintApiService, printersStore, pluginRepositoryCache, loggerFactory }) {
+  #prusaFirmwareCache;
+
+  constructor({
+    octoPrintApiService,
+    printersStore,
+    pluginRepositoryCache,
+    githubApiService,
+    loggerFactory
+  }) {
     super({ octoPrintApiService, printersStore, pluginRepositoryCache, loggerFactory }, config);
     this.#octoPrintApiService = octoPrintApiService;
+    this.#githubApiService = githubApiService;
+  }
+
+  async queryGithubPrusaFirmware() {
+    this.#prusaFirmwareCache = await this.#githubApiService.getRepoGithubReleases(
+      defaultRepos.prusaFirmare,
+      false
+    );
   }
 
   async getPrinterFirmwareVersion(printer) {

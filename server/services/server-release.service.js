@@ -37,12 +37,6 @@ class ServerReleaseService {
     return this.#airGapped;
   }
 
-  #filterPreReleases(releases, includePrereleases = false) {
-    return releases?.filter(
-      (r) => (r.draft === false && r.prerelease === false) || includePrereleases
-    );
-  }
-
   #findLatestRelease(releases) {
     return releases?.reduce((a, b) => {
       return new Date(a.created_at) > new Date(b.created_at) ? a : b;
@@ -70,9 +64,7 @@ class ServerReleaseService {
    * @returns {Promise<*|null>}
    */
   async syncLatestRelease(includePrereleases = false) {
-    const allGithubReleases = await this.#githubApiService.getGithubReleases();
-    const githubReleases = this.#filterPreReleases(allGithubReleases, includePrereleases);
-
+    const allGithubReleases = await this.#githubApiService.getFDMGithubReleases(includePrereleases);
     this.#synced = true;
 
     // Connection timeout results in airGapped state
@@ -96,7 +88,11 @@ class ServerReleaseService {
     }
 
     // If the installed release is unknown/unstable, no update should be triggered
-    const lastTagIsNewer = semver.gt(this.#latestRelease.tag_name, this.#installedRelease.tag_name, true);
+    const lastTagIsNewer = semver.gt(
+      this.#latestRelease.tag_name,
+      this.#installedRelease.tag_name,
+      true
+    );
     this.#updateAvailable = this.#installedReleaseFound && lastTagIsNewer;
   }
 
@@ -119,7 +115,8 @@ class ServerReleaseService {
         `\x1b[36mCurrent release tag not found in github releases.\x1b[0m
     Here's github's latest released: \x1b[32m${latestReleaseTag}\x1b[0m
     Here's your release tag: \x1b[32mv${packageVersion}\x1b[0m
-    Thanks for using FDM Monster!`);
+    Thanks for using FDM Monster!`
+      );
       return;
     }
 
