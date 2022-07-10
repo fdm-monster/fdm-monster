@@ -1,27 +1,47 @@
 const multer = require("multer");
 const { AppConstants } = require("../server.constants");
-const path = require("path");
+const { join } = require("path");
 const fs = require("fs");
-const { NotFoundException } = require("../exceptions/runtime.exceptions");
 
 class MulterService {
   #fileUploadTrackerCache;
+  #httpClient;
 
-  constructor({ fileUploadTrackerCache }) {
+  constructor({ fileUploadTrackerCache, httpClient }) {
     this.#fileUploadTrackerCache = fileUploadTrackerCache;
+    this.#httpClient = httpClient;
   }
 
   clearUploadsFolder() {
     if (!fs.existsSync(AppConstants.defaultFileUploadFolder)) return;
 
-    fs.readdir(AppConstants.defaultFileUploadFolder, (err, files) => {
-      if (err) throw err;
+    const files = fs
+      .readdirSync(AppConstants.defaultFileUploadFolder, { withFileTypes: true })
+      .filter((item) => !item.isDirectory())
+      .map((item) => item.name);
 
-      for (const file of files) {
-        fs.unlink(path.join(AppConstants.defaultFileUploadFolder, file), (err) => {
-          if (err) throw err;
-        });
-      }
+    for (const file of files) {
+      fs.unlink(join(AppConstants.defaultFileUploadFolder, file), (err) => {
+        if (err) throw err;
+      });
+    }
+  }
+
+  async downloadFile(downloadUrl, downloadFilename, collection) {
+    const downloadFolder = join(AppConstants.defaultFileUploadFolder, collection);
+    if (!fs.existsSync(downloadFolder)) {
+      fs.mkdirSync(downloadFolder, { recursive: true });
+    }
+    const downloadPath = join(AppConstants.defaultFileUploadFolder, collection, downloadFilename);
+    const fileStream = fs.createWriteStream(downloadPath);
+
+    const res = await this.#httpClient.get(downloadUrl);
+    return await new Promise((resolve, reject) => {
+      res.body.pipe(fileStream);
+      res.body.on("error", reject);
+      fileStream.on("finish", async () => {
+        resolve();
+      });
     });
   }
 

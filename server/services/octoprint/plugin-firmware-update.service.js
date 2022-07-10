@@ -12,10 +12,12 @@ const defaultRepos = {
 
 const connectivityProp = "connectivity.connection_ok";
 const firmwareProp = "printer.firmware";
+const firmwareDownloadPath = "firmware-downloads";
 
 class PluginFirmwareUpdateService extends PluginBaseService {
   #octoPrintApiService;
   #githubApiService;
+  #multerService;
 
   #prusaFirmwareReleases;
 
@@ -24,11 +26,13 @@ class PluginFirmwareUpdateService extends PluginBaseService {
     printersStore,
     pluginRepositoryCache,
     githubApiService,
+    multerService,
     loggerFactory
   }) {
     super({ octoPrintApiService, printersStore, pluginRepositoryCache, loggerFactory }, config);
     this.#octoPrintApiService = octoPrintApiService;
     this.#githubApiService = githubApiService;
+    this.#multerService = multerService;
   }
 
   async queryGithubPrusaFirmwareReleasesCache() {
@@ -44,6 +48,13 @@ class PluginFirmwareUpdateService extends PluginBaseService {
         tag_name: latestFirmware.tag_name
       }
     );
+
+    const latestPrinterFirmware = latestFirmware.assets.find((asset) =>
+      asset.name.includes("MK3S_MK3S+")
+    );
+    const downloadUrl = latestPrinterFirmware.browser_download_url;
+    const downloadName = latestPrinterFirmware.name;
+    await this.#multerService.downloadFile(downloadUrl, downloadName, firmwareDownloadPath);
   }
 
   async getPrinterFirmwareVersion(printer) {
