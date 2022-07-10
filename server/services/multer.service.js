@@ -22,6 +22,7 @@ class MulterService {
 
     for (const file of files) {
       fs.unlink(join(AppConstants.defaultFileUploadFolder, file), (err) => {
+        /* istanbul ignore next */
         if (err) throw err;
       });
     }
