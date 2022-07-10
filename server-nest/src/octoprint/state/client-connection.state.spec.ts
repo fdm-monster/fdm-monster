@@ -1,10 +1,10 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { ClientConnectionsState } from "./client-connections.state";
 import { OctoPrintClientService } from "../services/octoprint-client.service";
-import { HttpService } from "@nestjs/common";
 import { of } from "rxjs";
 import { RestConnectionParams } from "../models/rest-connection.params";
 import { WebsocketClientService } from "../services/websocket-client.service";
+import { HttpService } from "@nestjs/axios";
 
 describe(ClientConnectionsState.name, () => {
   let service: ClientConnectionsState;
