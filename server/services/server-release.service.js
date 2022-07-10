@@ -70,7 +70,7 @@ class ServerReleaseService {
     // Connection timeout results in airGapped state
     this.#airGapped = !allGithubReleases;
     this.#includingPrerelease = includePrereleases;
-    if (!githubReleases?.length) {
+    if (!allGithubReleases?.length) {
       this.#logger.warning("Latest release check failed because releases from github empty");
       return;
     }
