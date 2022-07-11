@@ -4107,10 +4107,10 @@ rxjs-websockets@9.0.0:
   resolved "https://registry.yarnpkg.com/rxjs-websockets/-/rxjs-websockets-9.0.0.tgz#7720ec81939211a54c3412ad849ccd000d9f488f"
   integrity sha512-COglkihJWOYqVeQOn00xShYGb8KZ9va0eoTKmxV76D3j6LuM0S8RKBUcZSq+ebiSu1ZiS6tr2OEJnQL78ZB9MA==
 
-rxjs@7.5.5:
-  version "7.5.5"
-  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-7.5.5.tgz#2ebad89af0f560f460ad5cc4213219e1f7dd4e9f"
-  integrity sha512-sy+H0pQofO95VDmFLzyaw9xNJU4KTRSwQIGM6+iG3SypAtCiLDzpeG8sJrNCWn2Up9km+KhkvTdbkrdy+yzZdw==
+rxjs@7.5.6:
+  version "7.5.6"
+  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-7.5.6.tgz#0446577557862afd6903517ce7cae79ecb9662bc"
+  integrity sha512-dnyv2/YsXhnm461G+R/Pe5bWP41Nm6LBXEYWI6eiFP4fiwx6WRI/CD0zbdVAudd9xwLEF2IDcKXLHit0FYjUzw==
   dependencies:
     tslib "^2.1.0"
 
