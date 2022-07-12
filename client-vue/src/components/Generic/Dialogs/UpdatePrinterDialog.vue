@@ -155,6 +155,9 @@ export default class UpdatePrinterDialog extends Vue {
     if (!printer) return;
     const loginDetails = await PrintersService.getPrinterLoginDetails(printer.id);
 
+    if (!navigator.clipboard) {
+      throw new Error(`Clipboard API is not available. Secure context: ${window.isSecureContext}`);
+    }
     await navigator.clipboard.writeText(
       `{"printerURL": "${loginDetails.printerURL}", "apiKey": "${loginDetails.apiKey}", "printerName": "${printer.printerName}"}`
     );
