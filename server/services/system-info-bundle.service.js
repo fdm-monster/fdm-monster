@@ -1,6 +1,6 @@
 const { isPm2, isNodemon, isNode } = require("../utils/env.utils.js");
-const isDocker = require("is-docker");
 const { prettyPrintArray } = require("../utils/pretty-print.utils.js");
+const { isDocker } = require("../utils/is-docker");
 
 class SystemInfoBundleService {
   #systemInfoStore;

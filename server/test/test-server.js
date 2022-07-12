@@ -1,4 +1,4 @@
-const envUtils = require("../utils/env.utils");
+require("../utils/env.utils");
 jest.mock("../utils/env.utils", () => ({
   ...jest.requireActual("../utils/env.utils"),
   writeVariableToEnvFile: jest.fn()

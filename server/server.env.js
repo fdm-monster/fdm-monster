@@ -4,10 +4,9 @@ const { execSync } = require("child_process");
 const envUtils = require("./utils/env.utils");
 const dotenv = require("dotenv");
 const { AppConstants } = require("./server.constants");
-
 const { status, up } = require("migrate-mongo");
-const isDocker = require("is-docker");
 const Logger = require("./handlers/logger.js");
+const { isDocker } = require("./utils/is-docker");
 const logger = new Logger("FDM-Environment", false);
 
 // Constants and definition

@@ -55,7 +55,6 @@
     "got": "11.8.5",
     "helmet": "5.1.0",
     "influx": "5.9.3",
-    "is-docker": "2.2.1",
     "lodash": "4.17.21",
     "luxon": "3.0.1",
     "migrate-mongo": "9.0.0",
