@@ -36,7 +36,6 @@ const DITokens = {
   filamentService: "filamentService",
   scriptService: "scriptService",
   customGCodeService: "customGCodeService",
-  autoDiscoveryService: "autoDiscoveryService",
   historyService: "historyService",
   // Stores/states
   settingsStore: "settingsStore",

@@ -36,7 +36,6 @@ const { configureEventEmitter } = require("./handlers/event-emitter");
 const { AppConstants } = require("./server.constants");
 const PrinterFilesService = require("./services/printer-files.service");
 const SoftwareUpdateTask = require("./tasks/software-update.task");
-const AutoDiscoveryService = require("./services/auto-discovery.service");
 const TerminalLogsCache = require("./state/data/terminal-logs.cache");
 const AlertService = require("./services/alert.service");
 const { asFunction, asClass, asValue, createContainer, InjectionMode } = require("awilix");
@@ -99,7 +98,6 @@ function configureContainer() {
     [DITokens.serverUpdateService]: asClass(ServerUpdateService).singleton(),
     [DITokens.systemInfoStore]: asClass(SystemInfoStore).singleton(),
     [DITokens.githubApiService]: asClass(GithubApiService),
-    [DITokens.autoDiscoveryService]: asClass(AutoDiscoveryService),
     [DITokens.systemInfoBundleService]: asClass(SystemInfoBundleService),
     [DITokens.simpleGitService]: asValue(SimpleGitFactory()),
     [DITokens.httpClient]: asValue(
