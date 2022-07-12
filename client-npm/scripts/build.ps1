@@ -26,7 +26,7 @@ $client_version = (Get-Content $client_package_json) -join "`n" | ConvertFrom-Js
 
 # Check version
 yarn cache clean @fdm-monster/client
-$versionArray = (npm view @fdm-monster/client versions --json | ConvertFrom-Json)
+$versionArray = (yarn info @fdm-monster/client versions --json | ConvertFrom-Json).data
 $lastVersion = $versionArray[$versionArray.Count - 1]
 if ($lastVersion -eq $client_version) {
     $v = [version]::New($client_version)
@@ -45,6 +45,9 @@ if ($lastVersion -eq $client_version) {
         Pop-Location
         Throw "Aborted as package '${client_version}' was not new"
     }
+}
+else {
+    Echo "Version ${client_version} is new (compared to last version ${lastVersion})"
 }
 
 Write-PackageJson -File $target_package_json -Target $target_package_json -Version $client_version
