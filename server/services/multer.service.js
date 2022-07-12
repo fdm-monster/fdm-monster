@@ -1,6 +1,6 @@
 const multer = require("multer");
 const { AppConstants } = require("../server.constants");
-const { join } = require("path");
+const { join, extname } = require("path");
 const fs = require("fs");
 
 class MulterService {
@@ -55,7 +55,7 @@ class MulterService {
   }
 
   gcodeFileFilter(req, file, callback) {
-    const ext = path.extname(file.originalname);
+    const ext = extname(file.originalname);
     if (ext !== ".gcode") {
       return callback(new Error("Only .gcode files are allowed"));
     }
