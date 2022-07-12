@@ -43,7 +43,7 @@
     "awilix-express": "7.0.0",
     "axios": "0.27.2",
     "bcryptjs": "2.4.3",
-    "cache-manager": "4.0.1",
+    "cache-manager": "4.1.0",
     "connect-history-api-fallback": "2.0.0",
     "cookie-parser": "1.4.6",
     "cors": "2.8.5",
