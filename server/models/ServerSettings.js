@@ -21,7 +21,7 @@ const ServerSettingsSchema = new mongoose.Schema({
       default: false,
       required: true
     },
-    autoRemoveOldFilesCriteriumDays:  {
+    autoRemoveOldFilesCriteriumDays: {
       type: Number,
       default: 14,
       required: true

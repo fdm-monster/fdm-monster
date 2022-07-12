@@ -19,7 +19,7 @@ const getDefaultTimeout = () => ({
   webSocketRetry: 5000
 });
 
-const printerFileCleanSettingKey = 'printerFileClean';
+const printerFileCleanSettingKey = "printerFileClean";
 const getDefaultPrinterFileCleanSettings = () => ({
   autoRemoveOldFilesBeforeUpload: false,
   autoRemoveOldFilesAtBoot: false,

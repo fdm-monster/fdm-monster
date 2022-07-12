@@ -24,6 +24,7 @@ class PrinterController {
   #taskManagerService;
   #terminalLogsCache;
   #octoPrintApiService;
+  #pluginRepositoryCache;
   #fileCache;
   #sseHandler;
   #sseTask;
@@ -38,6 +39,7 @@ class PrinterController {
     printerSseTask,
     loggerFactory,
     octoPrintApiService,
+    pluginRepositoryCache,
     jobsCache,
     fileCache
   }) {
@@ -48,6 +50,7 @@ class PrinterController {
     this.#terminalLogsCache = terminalLogsCache;
     this.#taskManagerService = taskManagerService;
     this.#octoPrintApiService = octoPrintApiService;
+    this.#pluginRepositoryCache = pluginRepositoryCache;
     this.#fileCache = fileCache;
     this.#sseHandler = printerSseHandler;
     this.#sseTask = printerSseTask;
@@ -271,41 +274,58 @@ class PrinterController {
   async getTerminalLogs(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
     this.#logger.info("Querying terminal logs for: ", currentPrinterId);
-    let connectionLogs = this.#terminalLogsCache.getPrinterTerminalLogs(currentPrinterId);
-
-    res.send(connectionLogs);
+    let terminalLogs = this.#terminalLogsCache.getPrinterTerminalLogs(currentPrinterId);
+    res.send(terminalLogs);
   }
 
+  /**
+   * This list should move to generic controller
+   * @param req
+   * @param res
+   * @returns {Promise<void>}
+   */
   async getPluginList(req, res) {
+    let pluginList = await this.#pluginRepositoryCache.getCache();
+    res.send(pluginList);
+  }
+
+  /**
+   * List installed plugins (OP 1.6.0+)
+   * @param req
+   * @param res
+   * @returns {Promise<void>}
+   */
+  async getPrinterPluginList(req, res) {
     const { printerLogin } = getScopedPrinter(req);
-    let pluginList = await this.#octoPrintApiService.getPluginManager(printerLogin);
+    let pluginList = await this.#octoPrintApiService.getPluginManagerPlugins(printerLogin);
     res.send(pluginList);
   }
 }
 
 // prettier-ignore
 module.exports = createController(PrinterController)
-  .prefix(AppConstants.apiRoute + "/printer")
-  .before([authenticate(), authorizeRoles([ROLES.OPERATOR, ROLES.ADMIN]), printerResolveMiddleware()])
-  .get("/", "list")
-  .get("/sse", "sse")
-  .post("/", "create")
-  .post("/batch", "importBatch")
-  .post("/test-connection", "testConnection")
-  .post("/sort-index", "updateSortIndex")
-  .get("/:id", "getPrinter")
-  .patch("/:id", "update")
-  .delete("/:id", "delete")
-  .get("/:id/login-details", "getPrinterLoginDetails")
-  .post("/:id/serial-connect", "sendSerialConnectCommand")
-  .post("/:id/serial-disconnect", "sendSerialDisconnectCommand")
-  .post("/:id/job/stop", "stopPrintJob")
-  .post("/:id/reconnect", "reconnectOctoPrint")
-  .patch("/:id/enabled", "updateEnabled")
-  .patch("/:id/connection", "updateConnectionSettings")
-  .patch("/:id/step-size", "setStepSize")
-  .patch("/:id/flow-rate", "setFlowRate")
-  .patch("/:id/feed-rate", "setFeedRate")
-  .patch("/:id/reset-power-settings", "resetPowerSettings")
-  .get("/:id/terminal-logs", "getTerminalLogs")
-  .get("/:id/plugin-list", "getPluginList");
+    .prefix(AppConstants.apiRoute + "/printer")
+    .before([authenticate(), authorizeRoles([ROLES.OPERATOR, ROLES.ADMIN]), printerResolveMiddleware()])
+    .get("/", "list")
+    .get("/sse", "sse")
+    .post("/", "create")
+    .post("/batch", "importBatch")
+    .post("/test-connection", "testConnection")
+    .post("/sort-index", "updateSortIndex")
+    .get("/plugin-list", "getPluginList")
+    .get("/:id", "getPrinter")
+    .patch("/:id", "update")
+    .delete("/:id", "delete")
+    .get("/:id/login-details", "getPrinterLoginDetails")
+    .post("/:id/serial-connect", "sendSerialConnectCommand")
+    .post("/:id/serial-disconnect", "sendSerialDisconnectCommand")
+    .post("/:id/job/stop", "stopPrintJob")
+    .post("/:id/reconnect", "reconnectOctoPrint")
+    .patch("/:id/enabled", "updateEnabled")
+    .patch("/:id/connection", "updateConnectionSettings")
+    .patch("/:id/step-size", "setStepSize")
+    .patch("/:id/flow-rate", "setFlowRate")
+    .patch("/:id/feed-rate", "setFeedRate")
+    .patch("/:id/reset-power-settings", "resetPowerSettings")
+    .get("/:id/terminal-logs", "getTerminalLogs")
+    .get("/:id/plugin-list", "getPrinterPluginList");

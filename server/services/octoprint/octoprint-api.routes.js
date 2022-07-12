@@ -17,13 +17,28 @@ class OctoPrintRoutes {
   apiSystem = `${this.apiBase}/system`;
   apiSystemInfo = `${this.apiSystem}/info`;
   apiSystemCommands = `${this.apiSystem}/commands`;
+  apiSystemRestartCommand = `${this.apiSystemCommands}/core/restart`;
   apiUsers = `${this.apiBase}/users`;
   apiLogin = `${this.apiBase}/login?passive=true`;
   apiPluginPiSupport = `${this.apiBase}/plugin/pi_support`;
   apiProfiles = `${this.apiBase}/plugin/printerprofiles`;
   apiTimelapse = `${this.apiBase}/timelapse`;
+  apiPlugin = `${this.apiBase}/plugin`;
+  apiPluginManager = `${this.apiPlugin}/pluginmanager`; // GET is deprecated, POST is in use
+
+  pluginsBase = `${this.octoPrintBase}/plugins`;
+  pluginSoftwareUpdate = `${this.pluginsBase}/softwareupdate`;
+  pluginSoftwareUpdateCheck = `${this.pluginSoftwareUpdate}/check`; // GET
+  pluginSoftwareUpdateUpdate = `${this.pluginSoftwareUpdate}/update`; // POST
+  pluginManager = `${this.pluginsBase}/pluginmanager`;
+  pluginManagerPlugins = `${this.pluginManager}/plugins`; // Fast
+  pluginManagerPlugin = (pluginName) => `${this.pluginManager}/${pluginName}`;
+  pluginManagerExport = `${this.pluginManager}/export`;
+  pluginManagerOrphans = `${this.pluginManager}/orphans`;
+  pluginManagerRepository = (refresh = false) =>
+    `${this.pluginManager}/repository?refresh=${refresh}`;
   _settingsStore;
-  _timeouts; // TODO apply apiTimeout, but apply apiRetry, apiRetryCutoff elsewhere (and webSocketRetry)
+  _timeouts;
 
   constructor({ settingsStore }) {
     this._settingsStore = settingsStore;
@@ -64,6 +79,13 @@ class OctoPrintRoutes {
     };
   }
 
+  pluginManagerCommand(command, url) {
+    return {
+      command,
+      url
+    };
+  }
+
   _ensureTimeoutSettingsLoaded() {
     const serverSettings = this._settingsStore.getServerSettings();
     this._timeouts = { ...serverSettings.timeout };
@@ -89,6 +111,26 @@ class OctoPrintRoutes {
 
     return {
       url: new URL(path, printerURL).href,
+      options: {
+        headers,
+        timeout
+      }
+    };
+  }
+
+  _prepareAnonymousRequest(path, timeoutOverride, contentType = jsonContentType) {
+    this._ensureTimeoutSettingsLoaded();
+
+    let headers = {
+      [contentTypeHeaderKey]: contentType
+    };
+    let timeout = timeoutOverride || this._timeouts.apiTimeout;
+    if (timeout <= 0) {
+      timeout = getDefaultTimeout().apiTimeout;
+    }
+
+    return {
+      url: path,
       options: {
         headers,
         timeout

@@ -18,7 +18,7 @@
 /client-vue
 /coverage
 /docs
-/**/file-uploads
+/**/file-storage
 /**/images
 /**/logs
 /server-nest

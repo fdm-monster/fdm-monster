@@ -1,14 +1,21 @@
 const { AppConstants } = require("../../server.constants");
 const { configureContainer } = require("../../container");
 const DITokens = require("../../container.tokens");
+const dbHandler = require("../db-handler");
+const GithubETag = require("../../models/GithubETag");
 
 let container;
 let service;
 const v1 = "1.0.0";
 
 beforeAll(async () => {
+  await dbHandler.connect();
   container = configureContainer();
   service = container.resolve(DITokens.serverReleaseService);
+});
+
+afterAll(async () => {
+  return GithubETag.deleteMany({});
 });
 
 describe("ServerUpdateService", () => {

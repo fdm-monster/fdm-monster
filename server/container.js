@@ -36,7 +36,6 @@ const { configureEventEmitter } = require("./handlers/event-emitter");
 const { AppConstants } = require("./server.constants");
 const PrinterFilesService = require("./services/printer-files.service");
 const SoftwareUpdateTask = require("./tasks/software-update.task");
-const AutoDiscoveryService = require("./services/auto-discovery.service");
 const TerminalLogsCache = require("./state/data/terminal-logs.cache");
 const AlertService = require("./services/alert.service");
 const { asFunction, asClass, asValue, createContainer, InjectionMode } = require("awilix");
@@ -59,6 +58,11 @@ const { ROLES } = require("./constants/authorization.constants");
 const CustomGCodeService = require("./services/custom-gcode.service");
 const PrinterWebsocketPingTask = require("./tasks/printer-websocket-ping.task");
 const FilamentService = require("./services/filament.service");
+const {
+  PluginFirmwareUpdateService
+} = require("./services/octoprint/plugin-firmware-update.service");
+const { PluginRepositoryCache } = require("./services/octoprint/plugin-repository.cache");
+const { configureCacheManager } = require("./handlers/cache-manager");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -73,8 +77,7 @@ function configureContainer() {
     [DITokens.defaultRole]: asValue(ROLES.ADMIN),
     [DITokens.serverVersion]: asFunction(() => {
       return process.env[AppConstants.VERSION_KEY];
-    }),
-    // -- asFunction --
+    }), // -- asFunction --
     [DITokens.printerStateFactory]: asFunction(PrinterStateFactory).transient(), // Factory function, transient on purpose!
 
     // -- asClass --
@@ -90,11 +93,11 @@ function configureContainer() {
     [DITokens.taskManagerService]: asClass(TaskManagerService).singleton(),
     [DITokens.toadScheduler]: asClass(ToadScheduler).singleton(),
     [DITokens.eventEmitter2]: asFunction(configureEventEmitter).singleton(),
+    [DITokens.cacheManager]: asFunction(configureCacheManager).singleton(),
     [DITokens.serverReleaseService]: asClass(ServerReleaseService).singleton(),
     [DITokens.serverUpdateService]: asClass(ServerUpdateService).singleton(),
     [DITokens.systemInfoStore]: asClass(SystemInfoStore).singleton(),
     [DITokens.githubApiService]: asClass(GithubApiService),
-    [DITokens.autoDiscoveryService]: asClass(AutoDiscoveryService),
     [DITokens.systemInfoBundleService]: asClass(SystemInfoBundleService),
     [DITokens.simpleGitService]: asValue(SimpleGitFactory()),
     [DITokens.httpClient]: asValue(
@@ -108,6 +111,7 @@ function configureContainer() {
     [DITokens.printerFilesService]: asClass(PrinterFilesService),
     [DITokens.printerGroupService]: asClass(PrinterGroupService),
     [DITokens.octoPrintApiService]: asClass(OctoPrintApiService).singleton(),
+    [DITokens.pluginFirmwareUpdateService]: asClass(PluginFirmwareUpdateService).singleton(),
     [DITokens.historyService]: asClass(HistoryService),
 
     [DITokens.filamentCache]: asClass(FilamentCache).singleton(),
@@ -118,6 +122,7 @@ function configureContainer() {
     [DITokens.jobsCache]: asClass(JobsCache).singleton(),
     [DITokens.terminalLogsCache]: asClass(TerminalLogsCache).singleton(),
     [DITokens.octoPrintLogsCache]: asClass(OctoPrintLogsCache).singleton(),
+    [DITokens.pluginRepositoryCache]: asClass(PluginRepositoryCache).singleton(),
     [DITokens.fileCache]: asClass(FileCache).singleton(),
     [DITokens.fileUploadTrackerCache]: asClass(FileUploadTrackerCache).singleton(),
     [DITokens.filamentsStore]: asClass(FilamentsStore), // No need for singleton as its now based on filamentCache
@@ -135,20 +140,13 @@ function configureContainer() {
     [DITokens.influxDbPrinterStateService]: asClass(InfluxDbPrinterStateService),
 
     [DITokens.bootTask]: asClass(BootTask),
-    [DITokens.softwareUpdateTask]: asClass(SoftwareUpdateTask),
-    // Provided SSE handlers (couplers) shared with controllers
-    [DITokens.printerSseHandler]: asClass(ServerSentEventsHandler).singleton(),
-    // Task bound to send on SSE Handler
-    [DITokens.printerSseTask]: asClass(PrinterSseTask).singleton(),
-    // This task is a quick task (~100ms per printer)
-    [DITokens.printerWebsocketTask]: asClass(PrinterWebsocketTask).singleton(),
-    // This task is a recurring heartbeat task
-    [DITokens.printerWebsocketPingTask]: asClass(PrinterWebsocketPingTask).singleton(),
-    // Task dependent on WS to fire - disabled at boot
-    [DITokens.printerSystemTask]: asClass(PrinterSystemTask).singleton(),
-    // Task dependent on test printer in store - disabled at boot
-    [DITokens.printerTestTask]: asClass(PrinterTestTask).singleton(),
-    // Task to regularly clean printer files based on certain configuration settings
+    [DITokens.softwareUpdateTask]: asClass(SoftwareUpdateTask), // Provided SSE handlers (couplers) shared with controllers
+    [DITokens.printerSseHandler]: asClass(ServerSentEventsHandler).singleton(), // Task bound to send on SSE Handler
+    [DITokens.printerSseTask]: asClass(PrinterSseTask).singleton(), // This task is a quick task (~100ms per printer)
+    [DITokens.printerWebsocketTask]: asClass(PrinterWebsocketTask).singleton(), // This task is a recurring heartbeat task
+    [DITokens.printerWebsocketPingTask]: asClass(PrinterWebsocketPingTask).singleton(), // Task dependent on WS to fire - disabled at boot
+    [DITokens.printerSystemTask]: asClass(PrinterSystemTask).singleton(), // Task dependent on test printer in store - disabled at boot
+    [DITokens.printerTestTask]: asClass(PrinterTestTask).singleton(), // Task to regularly clean printer files based on certain configuration settings
     [DITokens.printerFileCleanTask]: asClass(PrinterFileCleanTask).singleton()
   });
 

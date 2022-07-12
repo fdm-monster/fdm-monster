@@ -29,5 +29,6 @@ services:
     volumes:
       # Volumes as local relative folders (validate with 'docker-compose config')
       - ./fdm-monster/logs:/app/logs
+      - ./fdm-monster/file-storage:/app/file-storage
       - ./fdm-monster/scripts:/app/scripts
       - ./fdm-monster/images:/app/images

@@ -26,7 +26,10 @@ describe("PrinterFileService", () => {
     "3x P7743A_PLA_lictgrij_1d_8h_682g_reslice met fillet gespiegeld.gcode",
     "3x P7743A_PLA_lictgrij_1d_8h_682g_reslice met fillet.gcode"
   ];
-  const noAmountNames = ["P8296A_PERFECTE 1e LAAG!!_PLA_lichtroze_9h5m_87g_20stuks.gcode"];
+  const noAmountNames = [
+    "P8296A_PERFECTE 1e LAAG!!_PLA_lichtroze_9h5m_87g_20stuks.gcode",
+    "P8896C_PLA_zwart_5h30m_61g_smooth bed_6 stuks"
+  ];
   const carbonNames = ["1x P5803A_PETGCarbon_6h_78g.gcode"];
 
   it("Must be able to parse common file names", () => {

@@ -4,6 +4,7 @@ const { setupTestApp } = require("../test-server");
 const { expectOkResponse, expectUnauthorizedResponse } = require("../extensions");
 const DITokens = require("../../container.tokens");
 const { loginTestUser } = require("./auth/login-test-user");
+const githubReleasesResponse = require("./test-data/github-releases.data.json");
 
 let container;
 let updateService;
@@ -84,6 +85,7 @@ describe("ServerPublicController", () => {
   });
 
   it("should return airGapped response", async function () {
+    mockedHttpClient.saveMockResponse(undefined, 0, false, true);
     await releaseService.syncLatestRelease(false);
 
     const response = await request.get(versionRoute).send();
@@ -100,7 +102,6 @@ describe("ServerPublicController", () => {
   });
 
   it("should return update-to-date response", async function () {
-    const githubReleasesResponse = require("./test-data/github-releases.data.json");
     mockedHttpClient.saveMockResponse(githubReleasesResponse, 200);
 
     await releaseService.syncLatestRelease(false);

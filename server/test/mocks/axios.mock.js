@@ -1,7 +1,10 @@
+const { AxiosError } = require("axios");
+
 class AxiosMock {
   mockStatus = undefined;
   mockResponse = undefined;
   isStream = undefined;
+  willThrow = undefined;
   timeout = null;
   streamRejectPayload;
 
@@ -13,14 +16,15 @@ class AxiosMock {
     this.streamRejectPayload = rejectPayload;
   }
 
-  saveMockResponse(response, status, isStream = false) {
+  saveMockResponse(response, status, isStream = false, throws = false) {
     this.mockStatus = status;
     this.mockResponse = response;
     this.isStream = isStream;
+    this.willThrow = throws;
   }
 
   async getMockResponse() {
-    return Promise.resolve({
+    const result = Promise.resolve({
       status: this.mockStatus,
       data: this.isStream
         ? {
@@ -37,6 +41,11 @@ class AxiosMock {
           }
         : this.mockResponse
     });
+
+    if (this.willThrow) {
+      throw new AxiosError(this.mockResponse, this.mockStatus);
+    }
+    return result;
   }
 
   get() {

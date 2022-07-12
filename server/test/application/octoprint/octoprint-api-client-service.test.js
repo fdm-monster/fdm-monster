@@ -104,8 +104,8 @@ describe("OctoPrint-API-Client-Service", () => {
     expect(result).toBeUndefined();
   });
 
-  it("should not throw error on getPluginManager", async () => {
-    const result = await octoPrintApi.getPluginManager(auth);
+  it("should not throw error on getApiPluginManager", async () => {
+    const result = await octoPrintApi.getPluginManagerPlugins(auth);
     expect(result).toBeUndefined();
   });
 

@@ -317,6 +317,7 @@ class PrinterState {
     this.#websocketAdapterType = adapterType?.name;
     this.#websocketAdapter = new adapterType({
       id: this.id,
+      logger: this.#logger,
       webSocketURL: this.#entityData.webSocketURL,
       currentUser: this.#sessionUser,
       sessionKey: this.#sessionKey,

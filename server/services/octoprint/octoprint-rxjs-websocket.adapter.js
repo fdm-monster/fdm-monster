@@ -21,6 +21,7 @@ module.exports = class OctoprintRxjsWebsocketAdapter extends GenericWebsocketAda
   #currentUser;
   #sessionKey;
   #throttle;
+  #logger;
   #debug = false;
 
   #socket$;
@@ -35,12 +36,13 @@ module.exports = class OctoprintRxjsWebsocketAdapter extends GenericWebsocketAda
   #octoPrintMeta = {};
   #webSocketState = WS_STATE.unopened;
 
-  constructor({ id, webSocketURL, currentUser, sessionKey, throttle, debug = false }) {
+  constructor({ id, logger, webSocketURL, currentUser, sessionKey, throttle, debug = false }) {
     super({ id: id?.toString(), webSocketURL });
 
     this.#currentUser = currentUser;
     this.#sessionKey = sessionKey;
     this.#throttle = throttle;
+    this.#logger = logger;
     this.#debug = debug;
 
     this.#constructClient();
@@ -133,10 +135,10 @@ module.exports = class OctoprintRxjsWebsocketAdapter extends GenericWebsocketAda
         serverEvents.push({ type: PEVENTS.event, data });
         break;
       case OP_WS_MSG.reauthRequired:
-        console.log("Reauth required!");
+        this.#logger.warn("Re-authentication required - ", header);
         break;
       default:
-        console.log("unhandled message", header);
+        this.#logger.info("Unhandled Websocket message", data?.plugin);
     }
 
     return serverEvents;

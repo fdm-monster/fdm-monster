@@ -1,7 +1,7 @@
 const fs = require("fs");
 const Logger = require("../handlers/logger.js");
 const dotenv = require("dotenv");
-const isDocker = require("is-docker");
+const { isDocker } = require("./is-docker");
 
 const logger = new Logger("Utils-Env", false);
 
