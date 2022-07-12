@@ -1,8 +1,8 @@
-const { createController } = require("awilix-express");
-const { AppConstants } = require("../server.constants");
-const { authenticate, authorizeRoles } = require("../middleware/authenticate");
-const { ROLES } = require("../constants/authorization.constants");
-const { printerResolveMiddleware } = require("../middleware/printer");
+const {createController} = require("awilix-express");
+const {AppConstants} = require("../server.constants");
+const {authenticate, authorizeRoles} = require("../middleware/authenticate");
+const {ROLES} = require("../constants/authorization.constants");
+const {printerResolveMiddleware} = require("../middleware/printer");
 
 const cacheKey = "firmware-state";
 
@@ -11,7 +11,7 @@ class PluginFirmwareUpdateController {
   #printersStore;
   #pluginFirmwareUpdateService;
 
-  constructor({ cacheManager, printersStore, pluginFirmwareUpdateService }) {
+  constructor({cacheManager, printersStore, pluginFirmwareUpdateService}) {
     this.#cacheManager = cacheManager;
     this.#printersStore = printersStore;
     this.#pluginFirmwareUpdateService = pluginFirmwareUpdateService;
@@ -25,9 +25,15 @@ class PluginFirmwareUpdateController {
     res.send(result);
   }
 
-  async getFirmwareReleases(req, res) {}
+  async listFirmwareReleasesCache(req, res) {
+    res.send(this.#pluginFirmwareUpdateService.firmwareReleases);
+  }
 
-  async downloadFirmware(req, res) {}
+  async downloadFirmware(req, res) {
+    await this.#pluginFirmwareUpdateService.downloadFirmware();
+
+    res.send({});
+  }
 
   async scanPrinterFirmwareVersions(req, res) {
     const result = await this.#performScanOnPrinters();
@@ -55,7 +61,7 @@ class PluginFirmwareUpdateController {
         };
       }
     }
-    this.#cacheManager.set(cacheKey, printerVersionMap, { ttl: 3600 * 4 });
+    this.#cacheManager.set(cacheKey, printerVersionMap, {ttl: 3600 * 4});
     return {
       versions: printerVersionMap,
       failures: failureMap
@@ -72,5 +78,5 @@ module.exports = createController(PluginFirmwareUpdateController)
   ])
   .get("/", "listUpdateState")
   .post("/scan", "scanPrinterFirmwareVersions")
-  .post("/releases", "getFirmwareReleases")
+  .post("/releases", "listFirmwareReleasesCache")
   .post("/download-firmware", "downloadFirmware");

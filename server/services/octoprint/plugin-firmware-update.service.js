@@ -1,6 +1,5 @@
 const { PluginBaseService } = require("./plugin-base.service");
 const { ValidationException } = require("../../exceptions/runtime.exceptions");
-const HttpStatusCode = require("../../constants/http-status-codes.constants");
 
 const config = {
   pluginName: "firmwareupdater",
@@ -37,6 +36,10 @@ class PluginFirmwareUpdateService extends PluginBaseService {
     this.#multerService = multerService;
   }
 
+  get firmwareReleases() {
+    return this.#prusaFirmwareReleases;
+  }
+
   async queryGithubPrusaFirmwareReleasesCache() {
     try {
       this.#prusaFirmwareReleases = await this.#githubApiService.getRepoGithubReleases(
@@ -61,7 +64,7 @@ class PluginFirmwareUpdateService extends PluginBaseService {
     );
   }
 
-  async downloadFirmware(version) {
+  async downloadFirmware() {
     if (!this.#prusaFirmwareReleases?.length || !this.#latestFirmware) {
       throw new ValidationException(
         "No firmware releases were scanned. Download was not successful"
@@ -75,7 +78,7 @@ class PluginFirmwareUpdateService extends PluginBaseService {
     const downloadUrl = firmwareAsset.browser_download_url;
     const downloadName = firmwareAsset.name;
     this._logger.info(`Checking firmware ${downloadName}`);
-    if (!!this.#multerService.fileExists(downloadName, firmwareDownloadPath)) {
+    if (!this.#multerService.fileExists(downloadName, firmwareDownloadPath)) {
       await this.#multerService.downloadFile(downloadUrl, downloadName, firmwareDownloadPath);
       this._logger.info(`Downloaded firmware ${downloadName}`);
     } else {
