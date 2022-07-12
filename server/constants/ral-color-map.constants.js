@@ -78,7 +78,8 @@ const dutchColorRALMap = {
   },
   pastelroze: {
     // Lichtroze
-    RAL: 3015
+    RAL: 3015,
+    alts: ["lichtroze"]
   },
   bruin: {
     // mahoniebruin
