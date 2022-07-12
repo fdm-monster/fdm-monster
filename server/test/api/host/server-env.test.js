@@ -15,10 +15,11 @@ describe("ServerEnv", () => {
   });
 
   it("Expect env utils to not create .env when in docker mode", () => {
+    const before = isDockerUtility.isDocker.mock.calls.length;
     process.env[AppConstants.NODE_ENV_KEY] = "ILLEGAL_MODE";
     isDockerUtility.isDocker.mockReturnValueOnce(true);
     expect(setupEnvConfig()).toBeUndefined();
-    expect(isDockerUtility.isDocker.mock.calls.length).toBe(1);
+    expect(isDockerUtility.isDocker.mock.calls.length - before).toBe(1);
   });
 
   it("Should patch node env when in non-docker mode", () => {
