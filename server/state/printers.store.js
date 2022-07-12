@@ -1,8 +1,5 @@
 const _ = require("lodash");
-const {
-  NotImplementedException,
-  ValidationException
-} = require("../exceptions/runtime.exceptions");
+const { ValidationException } = require("../exceptions/runtime.exceptions");
 const { NotFoundException } = require("../exceptions/runtime.exceptions");
 const { validateInput } = require("../handlers/validators");
 const { createTestPrinterRules } = require("./validation/create-test-printer.validation");

@@ -39,6 +39,14 @@ class OctoPrintApiService extends OctoPrintRoutes {
     return processResponse(response, responseOptions);
   }
 
+  async sendCustomGCodeCommand(printer, commandString, responseOptions) {
+    const { url, options, data } = this._prepareJsonRequest(printer, this.apiPrinterCustomCommand, {
+      command: commandString
+    });
+    const response = await this._httpClient.post(url, data, options);
+    return processResponse(response, responseOptions);
+  }
+
   /**
    * Ability to start, cancel, restart, or pause a job
    * @param printer

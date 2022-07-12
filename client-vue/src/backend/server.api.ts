@@ -10,8 +10,7 @@ export class ServerApi {
   static printerFilesRoute = `${ServerApi.base}/printer-files`;
   static printerFilesUploadStubRoute = `${ServerApi.base}/printer-files/upload-stub`;
   static printerFilesPurgeRoute = `${ServerApi.printerFilesRoute}/purge`;
-  static printerNetworkRoute = `${ServerApi.base}/printer-network`;
-  static scanSsdp = `${ServerApi.printerNetworkRoute}/scan-ssdp`;
+  static customGCodeRoute = `${ServerApi.base}/custom-gcode`;
   static userRoute = `${ServerApi.base}/user`;
   static settingsRoute = `${ServerApi.base}/settings`;
   static serverSettingsRoute = `${ServerApi.settingsRoute}/server`;
@@ -42,6 +41,8 @@ export class ServerApi {
   static getPrinterFromGroupRoute = (id: string) => `${ServerApi.getPrinterGroupRoute(id)}/printer`;
   static deletePrinterFromGroupRoute = (id: string) =>
     `${ServerApi.getPrinterGroupRoute(id)}/printer?`;
+  static sendEmergencyM112Route = (id: string) =>
+    `${ServerApi.customGCodeRoute}/send-emergency-m112/${id}`;
   static updatePrinterGroupNameRoute = (id: string) => `${ServerApi.getPrinterGroupRoute(id)}/name`;
   static printerFilesClearRoute = (id: string) => `${ServerApi.printerFilesRoute}/${id}/clear`;
   static printerFilesSelectAndPrintRoute = (id: string) =>
