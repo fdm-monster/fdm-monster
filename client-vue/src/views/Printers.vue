@@ -189,11 +189,9 @@ export default class Printers extends Vue {
     if (!printer.id) {
       throw new Error("Printer ID not set, cant toggle enabled");
     }
-    const isPrinterEnabled = printer.enabled;
-    if (!isPrinterEnabled || confirm("Are you sure?")) {
-      printer.enabled = !printer.enabled;
-      await PrintersService.toggleEnabled(printer.id, printer.enabled);
-    }
+
+    printer.enabled = !printer.enabled;
+    await PrintersService.toggleEnabled(printer.id, printer.enabled);
   }
 }
 </script>

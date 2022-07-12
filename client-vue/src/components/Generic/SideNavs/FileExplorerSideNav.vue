@@ -70,6 +70,23 @@
     <v-list v-drop-upload="{ printers: [storedSideNavPrinter] }" dense subheader>
       <v-subheader inset>Commands</v-subheader>
 
+      <v-list-item class="extra-dense-list-item" link @click.prevent.stop="toggleEnabled()">
+        <v-list-item-avatar>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-icon :color="isEnabled ? 'primary' : 'secondary'" dark v-bind="attrs" v-on="on">
+                dns
+              </v-icon>
+            </template>
+            <span>This does not impact your print</span>
+          </v-tooltip>
+        </v-list-item-avatar>
+        <v-list-item-content>
+          <span v-if="isEnabled">Disable API/Websocket</span>
+          <span v-else-if="!isEnabled">Enable API/Websocket</span>
+        </v-list-item-content>
+      </v-list-item>
+
       <v-list-item
         :disabled="isStoppable"
         class="extra-dense-list-item"
@@ -248,6 +265,10 @@ export default class FileExplorerSideNav extends Vue {
     return printersState.isPrinterOperational(this.printerId);
   }
 
+  get isEnabled() {
+    return this.storedSideNavPrinter?.enabled;
+  }
+
   get filesListed() {
     return this.shownFileBucket?.files || [];
   }
@@ -325,6 +346,18 @@ export default class FileExplorerSideNav extends Vue {
     }
 
     await PrintersService.sendPrinterConnectCommand(this.printerId);
+  }
+
+  async toggleEnabled() {
+    if (!this.printerId) {
+      throw new Error("Printer ID not set, cant toggle enabled");
+    }
+    if (!this.storedSideNavPrinter) {
+      throw new Error("Cant toggle enabled, sidenav printer unset");
+    }
+
+    const newSetting = !this.storedSideNavPrinter.enabled;
+    await PrintersService.toggleEnabled(this.printerId, newSetting);
   }
 
   async refreshFiles(viewedPrinter: Printer) {
