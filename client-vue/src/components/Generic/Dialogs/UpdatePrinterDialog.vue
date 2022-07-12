@@ -20,6 +20,13 @@
               <v-btn @click="showChecksPanel = false">Hide checks</v-btn>
             </PrinterChecksPanel>
           </v-row>
+          <v-row>
+            <v-col v-if="!isClipboardApiAvailable()" cols="12">
+              Clipboard is not available. Copy or paste the following:
+              <br />
+              <v-textarea v-model="copyPasteConnectionString" rows="3"></v-textarea>
+            </v-col>
+          </v-row>
         </v-card-text>
         <v-card-actions>
           <em class="red--text">* indicates required field</em>
@@ -63,17 +70,20 @@ import { infoMessageEvent } from "@/event-bus/alert.events";
     PrinterChecksPanel
   },
   data: () => ({
-    testProgress: undefined
+    testProgress: undefined,
+    copyPasteConnectionString: ""
   })
 })
 export default class UpdatePrinterDialog extends Vue {
   dialogShowed = false;
+  copyPasteConnectionString = "";
 
   showChecksPanel = false;
   testProgress?: TestProgressDetails = undefined;
   $refs!: {
     validationObserver: InstanceType<typeof ValidationObserver>;
     printerUpdateForm: InstanceType<typeof PrinterCrudForm>;
+    clipboardPasteField: InstanceType<typeof HTMLFormElement>;
   };
 
   get storedUpdatedPrinter() {
@@ -150,17 +160,26 @@ export default class UpdatePrinterDialog extends Vue {
     this.$bus.on(sseTestPrinterUpdate(result.correlationToken), this.onTestPrinterUpdate);
   }
 
+  isClipboardApiAvailable() {
+    return false && navigator.clipboard;
+  }
+
   async quickCopyConnectionString() {
     const printer = this.storedUpdatedPrinter;
     if (!printer) return;
     const loginDetails = await PrintersService.getPrinterLoginDetails(printer.id);
+    const connectionString = `{"printerURL": "${loginDetails.printerURL}", "apiKey": "${loginDetails.apiKey}", "printerName": "${printer.printerName}"}`;
 
+    if (!this.isClipboardApiAvailable()) {
+      this.copyPasteConnectionString = connectionString;
+      return;
+    }
+
+    // Likely happens in Firefox
     if (!navigator.clipboard) {
       throw new Error(`Clipboard API is not available. Secure context: ${window.isSecureContext}`);
     }
-    await navigator.clipboard.writeText(
-      `{"printerURL": "${loginDetails.printerURL}", "apiKey": "${loginDetails.apiKey}", "printerName": "${printer.printerName}"}`
-    );
+    await navigator.clipboard.writeText(connectionString);
   }
 
   async submit() {
@@ -183,6 +202,7 @@ export default class UpdatePrinterDialog extends Vue {
 
   closeDialog() {
     printersState.setUpdateDialogPrinter(undefined);
+    this.copyPasteConnectionString = "";
   }
 }
 </script>

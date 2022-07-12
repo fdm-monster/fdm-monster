@@ -20,12 +20,21 @@
               <v-btn @click="showChecksPanel = false">Hide checks</v-btn>
             </PrinterChecksPanel>
           </v-row>
+          <v-row>
+            <v-col v-if="!isClipboardApiAvailable()" cols="12">
+              Clipboard is not available. Copy or paste the following:
+              <br />
+              <v-textarea v-model="copyPasteConnectionString" rows="3"></v-textarea>
+            </v-col>
+          </v-row>
         </v-card-text>
         <v-card-actions>
           <em class="red--text">* indicates required field</em>
           <v-spacer></v-spacer>
           <v-btn text @click="closeDialog()">Close</v-btn>
-          <v-btn text @click="fromClipboard()">Paste</v-btn>
+          <v-btn text @click="pasteFromClipboardOrField()" :disabled="isPasteDisabled()">
+            Paste
+          </v-btn>
           <v-btn :disabled="invalid" color="warning" text @click="testPrinter()">
             Test connection
           </v-btn>
@@ -61,11 +70,13 @@ import { infoMessageEvent } from "@/event-bus/alert.events";
     PrinterChecksPanel
   },
   data: () => ({
-    testProgress: undefined
+    testProgress: undefined,
+    copyPasteConnectionString: ""
   })
 })
 export default class CreatePrinterDialog extends Vue {
   showingDialog = false;
+  copyPasteConnectionString = "";
 
   showChecksPanel = false;
   testProgress?: TestProgressDetails = undefined;
@@ -76,6 +87,32 @@ export default class CreatePrinterDialog extends Vue {
 
   get dialogOpenedState() {
     return printersState.createDialogOpened;
+  }
+
+  isClipboardApiAvailable() {
+    return false && navigator.clipboard;
+  }
+
+  isPasteDisabled() {
+    if (!this.isClipboardApiAvailable()) {
+      return !this.copyPasteConnectionString?.length;
+    }
+    return false;
+  }
+
+  async pasteFromClipboardOrField() {
+    if (!this.$refs.printerCrudForm.formData) return;
+
+    if (!this.isClipboardApiAvailable() && !this.copyPasteConnectionString?.length) {
+      return;
+    }
+
+    const jsonData = !this.isClipboardApiAvailable()
+      ? await navigator.clipboard.readText()
+      : this.copyPasteConnectionString;
+    const printerObject = JSON.parse(jsonData);
+
+    PrintersService.applyLoginDetailsPatchForm(printerObject, this.$refs.printerCrudForm.formData);
   }
 
   @Watch("dialogOpenedState")
@@ -107,15 +144,6 @@ export default class CreatePrinterDialog extends Vue {
     return await this.$refs.validationObserver.validate();
   }
 
-  async fromClipboard() {
-    if (!this.$refs.printerCrudForm.formData) return;
-
-    const jsonData = await navigator.clipboard.readText();
-    const printerObject = JSON.parse(jsonData);
-
-    PrintersService.applyLoginDetailsPatchForm(printerObject, this.$refs.printerCrudForm.formData);
-  }
-
   openTestPanel() {
     this.showChecksPanel = true;
     this.testProgress = undefined;
@@ -128,8 +156,7 @@ export default class CreatePrinterDialog extends Vue {
   async testPrinter() {
     if (!(await this.isValid())) return;
 
-    this.showChecksPanel = true;
-    this.testProgress = undefined;
+    this.openTestPanel();
 
     const formData = this.formData();
     if (!formData) return;
@@ -159,6 +186,7 @@ export default class CreatePrinterDialog extends Vue {
 
   closeDialog() {
     printersState._setCreateDialogOpened(false);
+    this.copyPasteConnectionString = "";
   }
 }
 </script>
