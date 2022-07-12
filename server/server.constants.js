@@ -11,7 +11,7 @@ class ServerConstants {
     return 4000;
   }
 
-  static get defaultFileUploadFolder() {
+  static get defaultFileStorageFolder() {
     return "./file-storage";
   }
 

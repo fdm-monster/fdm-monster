@@ -13,15 +13,15 @@ class MulterService {
   }
 
   clearUploadsFolder() {
-    if (!fs.existsSync(AppConstants.defaultFileUploadFolder)) return;
+    if (!fs.existsSync(AppConstants.defaultFileStorageFolder)) return;
 
     const files = fs
-      .readdirSync(AppConstants.defaultFileUploadFolder, { withFileTypes: true })
+      .readdirSync(AppConstants.defaultFileStorageFolder, { withFileTypes: true })
       .filter((item) => !item.isDirectory())
       .map((item) => item.name);
 
     for (const file of files) {
-      fs.unlink(join(AppConstants.defaultFileUploadFolder, file), (err) => {
+      fs.unlink(join(AppConstants.defaultFileStorageFolder, file), (err) => {
         /* istanbul ignore next */
         if (err) throw err;
       });
@@ -29,16 +29,16 @@ class MulterService {
   }
 
   fileExists(downloadFilename, collection) {
-    const downloadPath = join(AppConstants.defaultFileUploadFolder, collection, downloadFilename);
+    const downloadPath = join(AppConstants.defaultFileStorageFolder, collection, downloadFilename);
     return fs.existsSync(downloadPath);
   }
 
   async downloadFile(downloadUrl, downloadFilename, collection) {
-    const downloadFolder = join(AppConstants.defaultFileUploadFolder, collection);
+    const downloadFolder = join(AppConstants.defaultFileStorageFolder, collection);
     if (!fs.existsSync(downloadFolder)) {
       fs.mkdirSync(downloadFolder, { recursive: true });
     }
-    const downloadPath = join(AppConstants.defaultFileUploadFolder, collection, downloadFilename);
+    const downloadPath = join(AppConstants.defaultFileStorageFolder, collection, downloadFilename);
     const fileStream = fs.createWriteStream(downloadPath);
 
     const res = await this.#httpClient.get(downloadUrl);
@@ -66,7 +66,7 @@ class MulterService {
     return multer({
       storage: storeAsFile
         ? multer.diskStorage({
-            destination: AppConstants.defaultFileUploadFolder
+            destination: AppConstants.defaultFileStorageFolder
           })
         : multer.memoryStorage(),
       fileFilter: this.gcodeFileFilter

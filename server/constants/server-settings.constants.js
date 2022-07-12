@@ -7,7 +7,7 @@ const onlinePolling = {
 
 const server = {
   port: AppConstants.defaultServerPort,
-  uploadFolder: AppConstants.defaultFileUploadFolder,
+  uploadFolder: AppConstants.defaultFileStorageFolder,
   registration: true,
   loginRequired: false
 };

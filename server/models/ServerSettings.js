@@ -30,7 +30,7 @@ const ServerSettingsSchema = new mongoose.Schema({
   server: {
     uploadFolder: {
       type: String,
-      default: AppConstants.defaultFileUploadFolder
+      default: AppConstants.defaultFileStorageFolder
     },
     port: {
       type: Number,
