@@ -32,7 +32,9 @@ function ensureNodeEnvSet() {
     );
 
     // Avoid writing to .env in case of docker
-    if (isDocker()) return;
+    if (isDocker()) {
+      return false;
+    }
 
     envUtils.writeVariableToEnvFile(
       path.resolve(dotEnvPath),
