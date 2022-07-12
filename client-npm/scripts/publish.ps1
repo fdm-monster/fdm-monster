@@ -1,1 +1,1 @@
-yarn publish "../" --access public
+yarn publish --cwd "../" --access public
