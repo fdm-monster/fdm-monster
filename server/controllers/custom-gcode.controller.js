@@ -2,23 +2,38 @@ const { createController } = require("awilix-express");
 const { authenticate, authorizeRoles } = require("../middleware/authenticate");
 const { AppConstants } = require("../server.constants");
 const { ROLES } = require("../constants/authorization.constants");
-const { validateMiddleware, validateInput } = require("../handlers/validators");
+const { validateInput, getScopedPrinter } = require("../handlers/validators");
 const { idRules } = require("./validation/generic.validation");
+const { printerResolveMiddleware } = require("../middleware/printer");
 
 class CustomGCodeController {
   #logger;
   #settingsStore;
+  #octoPrintApiService;
   #customGCodeService;
 
-  constructor({ settingsStore, customGCodeService, loggerFactory }) {
+  constructor({ settingsStore, customGCodeService, octoPrintApiService, loggerFactory }) {
     this.#settingsStore = settingsStore;
     this.#customGCodeService = customGCodeService;
+    this.#octoPrintApiService = octoPrintApiService;
     this.#logger = loggerFactory("Server-API");
   }
 
   async list(req, res) {
     const allScripts = await this.#customGCodeService.list();
     res.send(allScripts);
+  }
+
+  /**
+   * Sends gcode according to https://docs.octoprint.org/en/master/api/printer.html#send-an-arbitrary-command-to-the-printer
+   * @param req
+   * @param res
+   * @returns {Promise<void>}
+   */
+  async sendEmergencyM112(req, res) {
+    const { printerLogin } = getScopedPrinter(req);
+    const response = await this.#octoPrintApiService.sendCustomGCodeCommand(printerLogin, "M112");
+    res.send(response);
   }
 
   async create(req, res) {
@@ -41,9 +56,10 @@ class CustomGCodeController {
 
 // prettier-ignore
 module.exports = createController(CustomGCodeController)
-    .prefix(`${ AppConstants.apiRoute }/custom-gcode`)
+    .prefix(`${AppConstants.apiRoute}/custom-gcode`)
     .before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR])])
     .get("/", "list")
     .post("/", "create")
+    .post("/send-emergency-m112/:printerId", "sendEmergencyM112", {before: [printerResolveMiddleware("printerId")]})
     .delete("/:id", "delete")
     .put("/:id", "update");

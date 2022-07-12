@@ -15,11 +15,11 @@ function expectEmptyResponse(response) {
   expect(response.body).toBeFalsy();
 }
 
-function expectOkResponse(response, matchedBody) {
+function expectOkResponse(response, matchedBody, message) {
   if (response.statusCode >= 400) {
     console.warn(response.body);
   }
-  expect(response.statusCode).toEqual(200);
+  expect(response.statusCode, message).toEqual(200);
   if (!matchedBody) {
     return;
   }

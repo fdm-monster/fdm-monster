@@ -13,6 +13,8 @@ class OctoPrintRoutes {
   apiFilesLocation = `${this.apiFiles}/local`;
   apiConnection = `${this.apiBase}/connection`;
   apiJob = `${this.apiBase}/job`;
+  apiPrinterOperations = `${this.apiBase}/printer`;
+  apiPrinterCustomCommand = `${this.apiPrinterOperations}/command`;
   apiPrinterProfiles = `${this.apiBase}/printerprofiles`;
   apiSystem = `${this.apiBase}/system`;
   apiSystemInfo = `${this.apiSystem}/info`;

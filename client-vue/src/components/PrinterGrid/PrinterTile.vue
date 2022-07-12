@@ -20,7 +20,7 @@
       <v-btn class="float-right" icon @click.prevent.stop="clickInfo()">
         <v-icon>info</v-icon>
       </v-btn>
-      <v-btn class="float-right d-none d-lg-inline" icon @click.prevent.stop="clickStop()">
+      <v-btn class="float-right d-none d-lg-inline" icon @click.prevent.stop="clickEmergencyStop()">
         <v-icon>stop</v-icon>
       </v-btn>
       <br />
@@ -45,6 +45,7 @@ import { Component, Prop } from "vue-property-decorator";
 import { printersState } from "@/store/printers.state";
 import { Printer } from "@/models/printers/printer.model";
 import RAL_CODES from "@/constants/ral.reference.json";
+import { CustomGcodeService } from "@/backend/custom-gcode.service";
 
 @Component({
   components: {}
@@ -97,8 +98,10 @@ export default class PrinterGridTile extends Vue {
     printersState.setSideNavPrinter(this.printer);
   }
 
-  clickStop() {
-    printersState.sendStopJobCommand(this.printer.id);
+  async clickEmergencyStop() {
+    if (confirm("Are you sure to abort the print? Please reconnect after.")) {
+      await CustomGcodeService.postEmergencyM112Command(this.printer.id);
+    }
   }
 
   selectPrinter() {

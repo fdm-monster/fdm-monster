@@ -386,7 +386,7 @@ export default class FileExplorerSideNav extends Vue {
     await printersState.deletePrinterFile({ printerId: this.printerId, fullPath: file.path });
   }
 
-  async clickStop() {
+  async clickEmergencyStop() {
     await printersState.sendStopJobCommand(this.printerId);
   }
 

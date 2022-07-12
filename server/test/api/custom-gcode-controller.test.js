@@ -3,13 +3,15 @@ const dbHandler = require("../db-handler");
 const { setupTestApp } = require("../test-server");
 const { expectOkResponse } = require("../extensions");
 const CustomGCode = require("../../models/CustomGCode");
+const { createTestPrinter } = require("./test-data/create-printer");
 
 let Model = CustomGCode;
-const listRoute = `${AppConstants.apiRoute}/custom-gcode`;
-const createRoute = listRoute;
-const getRoute = (id) => `${listRoute}/${id}`;
-const deleteRoute = (id) => `${listRoute}/${id}`;
-const updateRoute = (id) => `${listRoute}/${id}`;
+const defaultRoute = `${AppConstants.apiRoute}/custom-gcode`;
+const createRoute = defaultRoute;
+const emergencyGCodeRoute = (printerId) => `${defaultRoute}/send-emergency-m112/${printerId}`;
+const getRoute = (id) => `${defaultRoute}/${id}`;
+const deleteRoute = (id) => `${defaultRoute}/${id}`;
+const updateRoute = (id) => `${defaultRoute}/${id}`;
 
 let container;
 let request;
@@ -37,8 +39,14 @@ async function createNormalGCodeScript(request) {
 }
 
 describe("CustomGCodeController", () => {
+  it("should send emergency gcode command", async function () {
+    const printer = await createTestPrinter(request);
+    const response = await request.post(emergencyGCodeRoute(printer.id)).send();
+    expectOkResponse(response, null, response.body);
+  });
+
   it("should return empty gcode script list", async function () {
-    const response = await request.get(listRoute).send();
+    const response = await request.get(defaultRoute).send();
     expect(response.body).toMatchObject([]);
     expectOkResponse(response);
   });

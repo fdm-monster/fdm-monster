@@ -15,7 +15,7 @@ module.exports = {
     "views"
   ],
   globalSetup: "./test/setup-global.js",
-  setupFilesAfterEnv: ["./test/setup-after-env.js"],
+  setupFilesAfterEnv: ["jest-27-expect-message", "./test/setup-after-env.js"],
   collectCoverageFrom: ["**/*.js"],
   coveragePathIgnorePatterns: ["node_modules", "test"]
 };

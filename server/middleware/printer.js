@@ -5,20 +5,20 @@ const printerIdToken = "currentPrinterId";
 const currentPrinterToken = "currentPrinter";
 const printerLoginToken = "printerLogin";
 
-const printerResolveMiddleware = () => {
+const printerResolveMiddleware = (key = "id") => {
   return (req, res, next) => {
     const printersStore = req.container.resolve(DITokens.printersStore);
 
     let scopedPrinter = undefined;
 
-    if (req.params.id) {
-      scopedPrinter = printersStore.getPrinterState(req.params.id);
+    if (req.params[key]) {
+      scopedPrinter = printersStore.getPrinterState(req.params[key]);
     }
 
     req.container.register({
       [currentPrinterToken]: asValue(scopedPrinter),
       [printerLoginToken]: asValue(scopedPrinter?.getLoginDetails()),
-      [printerIdToken]: asValue(req.params.id)
+      [printerIdToken]: asValue(req.params[key])
     });
 
     next();
