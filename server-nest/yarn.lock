@@ -900,10 +900,10 @@
   dependencies:
     path-to-regexp "0.2.5"
 
-"@nestjs/swagger@6.0.3":
-  version "6.0.3"
-  resolved "https://registry.yarnpkg.com/@nestjs/swagger/-/swagger-6.0.3.tgz#8a967e6ad3f543eb0a6621a31af80345e05369be"
-  integrity sha512-mpKfa1VOp7c8CPYdS403dO3XP8v6Hq6dI88yzzgmapKLEYPN0cFKXqTF2zULKv+BxqGl7EJM4h3P+cc0I9PStA==
+"@nestjs/swagger@6.0.4":
+  version "6.0.4"
+  resolved "https://registry.yarnpkg.com/@nestjs/swagger/-/swagger-6.0.4.tgz#36c472c92f12b0af5094a5b54dbf1ac81e5b3640"
+  integrity sha512-YKf9RvCYHAgqkMvUG3xRr0zAcnuN8JsWPfvi7h0hzEXLRhNxByj2FT8Rzj+0fPAe6VZioWXBDpLzshO2PjE48Q==
   dependencies:
     "@nestjs/mapped-types" "1.1.0"
     js-yaml "4.1.0"
