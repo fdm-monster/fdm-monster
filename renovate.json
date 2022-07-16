@@ -15,6 +15,13 @@
       "enabled": true
     },
     {
+      "paths": ["client-vue/package.json"],
+      "matchPackageNames": ["vue", "vue-template-compiler"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "vue",
+      "automerge": true
+    },
+    {
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
       "enabled": true,
       "automerge": true
