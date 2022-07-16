@@ -29,6 +29,7 @@
     {
       "paths": ["client-vue/package.json"],
       "matchPackageNames": ["vue", "vuex", "vue-router"],
+      "matchUpdateTypes": ["major"],
       "enabled": false
     }
   ],
