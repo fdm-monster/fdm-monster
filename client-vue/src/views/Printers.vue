@@ -5,10 +5,10 @@
       <v-spacer></v-spacer>
       <v-text-field
         v-model="search"
-        prepend-icon="search"
-        clearable
         class="p-2"
+        clearable
         label="Search"
+        prepend-icon="search"
         single-line
       ></v-text-field>
     </v-card-title>
@@ -22,6 +22,7 @@
       class="elevation-1"
       item-key="id"
       show-expand
+      @click:row="clickRow"
     >
       <template v-if="reorder" v-slot:body="props">
         <draggable :list="props.items" tag="tbody">
@@ -41,39 +42,21 @@
         <v-toolbar flat>
           <v-toolbar-title>Filtering {{ printers.length || 0 }} printers</v-toolbar-title>
           <v-spacer></v-spacer>
+          <v-switch v-model="firmwareUpdate" class="mt-5 mr-3" dark label="Firmware update" />
           <v-switch v-model="reorder" class="mt-5 mr-3" dark label="Sort mode" />
 
-          <v-btn class="ml-3" color="primary" type="button" @click="openImportJsonPrintersDialog()">
+          <v-btn
+            class="ml-3"
+            color="primary"
+            type="button"
+            @click.self="openImportJsonPrintersDialog()"
+          >
             Import JSON Printers
           </v-btn>
 
-          <v-btn class="ml-3" color="primary" type="button" @click="openCreatePrinterDialog()">
+          <v-btn class="ml-3" color="primary" type="button" @click.self="openCreatePrinterDialog()">
             Create Printer
           </v-btn>
-
-          <v-switch
-            v-show="false"
-            v-model="deleteMany"
-            class="mt-5 mr-3"
-            dark
-            label="Delete printers"
-          />
-          <v-switch
-            v-show="false"
-            v-model="bulkFileClean"
-            class="mt-5 mr-3"
-            dark
-            disabled
-            label="Bulk file clean"
-          />
-          <v-switch
-            v-show="false"
-            v-model="bulkUpdate"
-            class="mt-5"
-            dark
-            disabled
-            label="Bulk file clean"
-          />
         </v-toolbar>
       </template>
       <template v-slot:item.enabled="{ item }">
@@ -100,6 +83,7 @@
       <template v-slot:item.actions="{ item }">
         <PrinterUrlAction :printer="item" />
         <PrinterConnectionAction :printer="item" />
+        <PrinterEmergencyStopAction :printer="item" />
         <PrinterSettingsAction :printer="item" v-on:update:show="openEditDialog(item)" />
       </template>
       <template v-slot:expanded-item="{ headers, item }">
@@ -127,6 +111,7 @@ import { printersState } from "@/store/printers.state";
 import BatchJsonCreateDialog from "@/components/Generic/Dialogs/BatchJsonCreateDialog.vue";
 import UpdatePrinterDialog from "@/components/Generic/Dialogs/UpdatePrinterDialog.vue";
 import CreatePrinterDialog from "@/components/Generic/Dialogs/CreatePrinterDialog.vue";
+import PrinterEmergencyStopAction from "@/components/Generic/Actions/PrinterEmergencyStopAction.vue";
 
 @Component({
   components: {
@@ -137,19 +122,17 @@ import CreatePrinterDialog from "@/components/Generic/Dialogs/CreatePrinterDialo
     CreatePrinterDialog,
     PrinterUrlAction,
     PrinterSettingsAction,
+    PrinterEmergencyStopAction,
     PrinterConnectionAction
   }
 })
 export default class Printers extends Vue {
   reorder = false;
-  deleteMany = false;
-  bulkFileClean = false;
-  bulkUpdate = false;
 
   autoPrint = true;
   showJsonImportDialog = false;
   search = "";
-  expanded = [];
+  expanded: Printer[] = [];
   tableHeaders = [
     {
       text: "Order",
@@ -179,6 +162,15 @@ export default class Printers extends Vue {
 
   openCreatePrinterDialog() {
     printersState.setCreateDialogOpened(true);
+  }
+
+  clickRow(item: Printer, event: any) {
+    if (event.isExpanded) {
+      const index = this.expanded.findIndex((i) => i === item);
+      this.expanded.splice(index, 1);
+    } else {
+      this.expanded.push(item);
+    }
   }
 
   async openImportJsonPrintersDialog() {
