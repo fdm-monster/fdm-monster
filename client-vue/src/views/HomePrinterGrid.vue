@@ -16,8 +16,8 @@
       </v-btn>
     </v-toolbar>
 
-    <v-banner v-drop-upload="{ printers: selectedPrinters }">
-      <v-row>
+    <v-banner v-drop-upload="{ printers: selectedPrinters }" style="margin-bottom: 0">
+      <v-row style="margin-bottom: -20px">
         <v-col>
           <v-btn
             :color="hasPrintersSelected ? 'primary' : 'secondary'"

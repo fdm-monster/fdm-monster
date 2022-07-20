@@ -9,11 +9,7 @@
     tile
     @click="selectPrinter()"
   >
-    <v-container
-      v-if="printer"
-      :style="{ 'border-right': printerFilamentColor }"
-      class="tile-inner"
-    >
+    <v-container v-if="printer" class="tile-inner">
       <small class="small-resized-font ml-1">
         {{ printer.printerName }}
       </small>
@@ -27,7 +23,12 @@
       <small class="xsmall-resized-font ml-1 text--secondary">
         {{ printer.printerState.state }}
       </small>
+      <div
+        :style="{ background: printerFilamentColor }"
+        class="d-flex justify-end filament-abs-border"
+      ></div>
     </v-container>
+
     <v-progress-linear
       v-if="printer && printer.currentJob"
       :value="printer.currentJob.progress"
@@ -53,8 +54,9 @@ import { CustomGcodeService } from "@/backend/custom-gcode.service";
 export default class PrinterGridTile extends Vue {
   @Prop() printer: Printer;
   @Prop() loading: boolean;
-  readonly defaultColor = "rgba(0,0,0,0)";
-  readonly defaultBorder = "0 solid black";
+  readonly defaultColor = "rgba(100,100,100,0.1)";
+  readonly defaultFilamentColor =
+    "repeating-linear-gradient(-30deg, #222, #555 5px, #444 5px, #555 6px)";
 
   get selected() {
     if (!this.printer) return false;
@@ -68,16 +70,16 @@ export default class PrinterGridTile extends Vue {
   get printerFilamentColor() {
     const ralCode = this.printer?.lastPrintedFile.parsedVisualizationRAL;
     if (!ralCode) {
-      return this.defaultBorder;
+      return this.defaultFilamentColor;
     }
 
     const ralString = ralCode.toString();
     const foundColor = Object.values(RAL_CODES).find((r) => r.code === ralString);
     if (!foundColor) {
-      return this.defaultBorder;
+      return this.defaultFilamentColor;
     }
 
-    return `8px solid ${foundColor.color.hex}`;
+    return `${foundColor.color.hex}`;
   }
 
   get printerStateColor() {
@@ -141,5 +143,15 @@ export default class PrinterGridTile extends Vue {
 
 .xsmall-resized-font {
   font-size: clamp(8px, 1vw, 10px);
+}
+
+.filament-abs-border {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 14px;
+  height: 100%;
+  /*background: repeating-linear-gradient(-30deg, #222, #555 5px, #444 5px, #555 6px);*/
+  border: 2px solid rgba(255, 250, 250, 0.5);
 }
 </style>
