@@ -75,8 +75,9 @@ class FilesStore {
       );
     const printerFiles = this.getFiles(printerId);
     if (!printerFiles?.files?.length) return [];
+    const nowTimestampSeconds = Date.now() / 1000;
     return printerFiles.files.filter(
-      (file) => !!file.date && file.date + ageDaysMax * 86400 < Date.now()
+      (file) => !!file.date && file.date + ageDaysMax * 86400 < nowTimestampSeconds
     );
   }
 

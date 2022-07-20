@@ -50,7 +50,7 @@ describe("FilesStore", () => {
     await printerFilesService.updateFiles(testPrinterState.id, {
       files: [
         {
-          date: Date.now()
+          date: Date.now() / 1000
         }
       ]
     });
@@ -73,10 +73,10 @@ describe("FilesStore", () => {
     await printerFilesService.updateFiles(testPrinterState.id, {
       files: [
         {
-          date: Date.now()
+          date: Date.now() / 1000
         },
         {
-          date: Date.now() - 8 * 86400
+          date: Date.now() / 1000 - 8 * 86400
         }
       ]
     });
