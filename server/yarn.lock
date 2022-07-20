@@ -313,10 +313,10 @@
     minimatch "^3.1.2"
     strip-json-comments "^3.1.1"
 
-"@fdm-monster/client@0.3.26":
-  version "0.3.26"
-  resolved "https://registry.yarnpkg.com/@fdm-monster/client/-/client-0.3.26.tgz#a055a9aa77caa787d11b8f30460e8eb7c2f8a159"
-  integrity sha512-4Y5dhDULpwetsxu+/B3Zay7ZrRdPiyUoIINYCTRoLXy0F7GlYdjvFhb1MXcTo2DJmPTKPGI1AHgJ1W/Tu0CxDg==
+"@fdm-monster/client@0.3.27":
+  version "0.3.27"
+  resolved "https://registry.yarnpkg.com/@fdm-monster/client/-/client-0.3.27.tgz#23273dac428df43a560d5f7c56b81f72bc77d14f"
+  integrity sha512-3HfLZc+OG4Fvqy/H1+2IrDwf4F8RqedhcOqaZUN9i5r4Qz9u+L5RaHNsdkUEvxWJr7MffV15WGuDImW3akevCg==
 
 "@humanwhocodes/config-array@^0.9.2":
   version "0.9.5"
