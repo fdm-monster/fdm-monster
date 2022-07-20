@@ -36,7 +36,7 @@ class PluginFirmwareUpdateService extends PluginBaseService {
     this.#multerService = multerService;
   }
 
-  get firmwareReleases() {
+  getFirmwareReleases() {
     return this.#prusaFirmwareReleases;
   }
 

@@ -42,7 +42,6 @@
         <v-toolbar flat>
           <v-toolbar-title>Filtering {{ printers.length || 0 }} printers</v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-switch v-model="firmwareUpdate" class="mt-5 mr-3" dark label="Firmware update" />
           <v-switch v-model="reorder" class="mt-5 mr-3" dark label="Sort mode" />
 
           <v-btn
@@ -93,6 +92,34 @@
       </template>
     </v-data-table>
 
+    <v-data-table
+      class="disabled-highlight"
+      key="id"
+      :headers="firmwareTableHeaders"
+      :items="firmwareUpdateStates"
+    >
+      <template v-slot:top>
+        <v-toolbar flat prominent>
+          <v-toolbar-title>
+            <div>Showing firmware update status</div>
+            <small>Latest (downloaded) firmware:</small>
+            <br />
+            <v-btn color="secondary" small @click="loadFirmwareData">Show firmware versions</v-btn>
+            <v-btn color="primary" small @click="loadFirmwareData">Scan firmware versions</v-btn>
+          </v-toolbar-title>
+          <v-spacer></v-spacer>
+        </v-toolbar>
+      </template>
+      <template v-slot:no-data> No firmware information loaded. </template>
+      <template v-slot:no-results> No results</template>
+      <template v-slot:item.actions="{ item }">
+        <v-btn color="primary" @click="updateFirmware(item)">
+          <v-icon>updates</v-icon>
+          Update
+        </v-btn>
+      </template>
+    </v-data-table>
+
     <BatchJsonCreateDialog :show.sync="showJsonImportDialog" />
   </v-card>
 </template>
@@ -112,6 +139,12 @@ import BatchJsonCreateDialog from "@/components/Generic/Dialogs/BatchJsonCreateD
 import UpdatePrinterDialog from "@/components/Generic/Dialogs/UpdatePrinterDialog.vue";
 import CreatePrinterDialog from "@/components/Generic/Dialogs/CreatePrinterDialog.vue";
 import PrinterEmergencyStopAction from "@/components/Generic/Actions/PrinterEmergencyStopAction.vue";
+import { PrinterFirmwareUpdateService } from "@/backend/printer-firmware-update.service";
+import { PrusaFirmwareReleaseModel } from "@/models/plugins/firmware-updates/prusa-firmware-release.model";
+import {
+  PrinterFirmwareStateModel,
+  PrinterFirmwareStateResponse
+} from "@/models/plugins/firmware-updates/printer-firmware-state.model";
 
 @Component({
   components: {
@@ -124,10 +157,15 @@ import PrinterEmergencyStopAction from "@/components/Generic/Actions/PrinterEmer
     PrinterSettingsAction,
     PrinterEmergencyStopAction,
     PrinterConnectionAction
-  }
+  },
+  data: () => ({
+    firmwareUpdates: []
+  })
 })
 export default class Printers extends Vue {
   reorder = false;
+  firmwareUpdateStates: PrinterFirmwareStateModel[] = [];
+  firmwareReleases: PrusaFirmwareReleaseModel[] = [];
 
   autoPrint = true;
   showJsonImportDialog = false;
@@ -151,10 +189,37 @@ export default class Printers extends Vue {
     { text: "Actions", value: "actions", sortable: false },
     { text: "", value: "data-table-expand" }
   ];
+  firmwareTableHeaders = [
+    {
+      text: "Printer Name",
+      align: "start",
+      sortable: true,
+      value: "printerName"
+    },
+    {
+      text: "Firmware Label",
+      sortable: true,
+      value: "firmware"
+    },
+
+    { text: "Actions", value: "actions", sortable: false }
+  ];
+
+  async created() {
+    this.firmwareReleases = await PrinterFirmwareUpdateService.getFirmwareReleases();
+  }
 
   get printers() {
     return printersState.printers;
   }
+
+  async loadFirmwareData() {
+    const releasesResult = await PrinterFirmwareUpdateService.loadFirmwareUpdateState();
+    this.firmwareUpdateStates = releasesResult;
+    console.log(this.firmwareUpdateStates);
+  }
+
+  async updateFirmware(printer: Printer) {}
 
   openEditDialog(printer: Printer) {
     printersState.setUpdateDialogPrinter(printer);
@@ -188,7 +253,13 @@ export default class Printers extends Vue {
 }
 </script>
 
-<style>
+<style lang="scss">
+.disabled-highlight tbody {
+  tr:hover {
+    background-color: transparent !important;
+  }
+}
+
 .reorder-row-icon {
   cursor: move;
 }
