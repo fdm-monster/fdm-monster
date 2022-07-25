@@ -62,7 +62,7 @@
     "sass": "1.54.0",
     "sass-loader": "13.0.2",
     "typescript": "4.7.4",
-    "webpack": "5.73.0",
+    "webpack": "5.74.0",
     "vue-cli-plugin-vuetify": "2.5.1",
     "vue-template-compiler": "2.7.8",
     "vuetify-loader": "1.9.1"
