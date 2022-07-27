@@ -32,7 +32,7 @@
             class="d-flex justify-end filament-abs-border"
           ></div>
         </template>
-        <span>Color: {{ printerFilamentColorName }}</span>
+        <span>{{ printerFilamentColorName }}</span>
       </v-tooltip>
     </v-container>
 
@@ -91,7 +91,7 @@ export default class PrinterGridTile extends Vue {
       return "UNKNOWN";
     }
 
-    return `${this.printer?.lastPrintedFile.parsedVisualizationRAL}`;
+    return `${this.printer?.lastPrintedFile.parsedColor}`;
   }
 
   get printerFilamentColorRgba() {
