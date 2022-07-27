@@ -102,21 +102,36 @@
         <v-toolbar flat prominent>
           <v-toolbar-title>
             <div>Showing firmware update status</div>
-            <small>Latest (downloaded) firmware:</small>
+            <small>Latest (downloaded) firmware: {{ latestReleaseVersion }}</small>
             <br />
-            <v-btn color="secondary" small @click="loadFirmwareData">Show firmware versions</v-btn>
-            <v-btn color="primary" small @click="loadFirmwareData">Scan firmware versions</v-btn>
+            <v-btn color="primary" small @click="loadFirmwareData">Scan printers (SLOW)</v-btn>
           </v-toolbar-title>
           <v-spacer></v-spacer>
         </v-toolbar>
       </template>
-      <template v-slot:no-data> No firmware information loaded. </template>
+      <template v-slot:no-data> No firmware information loaded.</template>
       <template v-slot:no-results> No results</template>
       <template v-slot:item.actions="{ item }">
-        <v-btn color="primary" @click="updateFirmware(item)">
+        Feature coming soon:
+        <v-btn
+          color="primary"
+          @click="updateFirmware(item)"
+          :disabled="true || !isUpdatableFirmware(item.firmware)"
+        >
           <v-icon>updates</v-icon>
-          Update
+          Update {{ isVirtualFirmware(item.firmware) ? "(VIRTUAL)" : "" }}
         </v-btn>
+        <!--        Sadly this is not available yet -->
+        <!--        <div v-if="isVirtualFirmware(item.firmware)">-->
+        <!--          <v-btn-->
+        <!--            color="primary"-->
+        <!--            @click="toggleVirtualFirmware(item)"-->
+        <!--            :disabled="!isVirtualFirmware(item.firmware)"-->
+        <!--          >-->
+        <!--            <v-icon>query_stats</v-icon>-->
+        <!--            Toggle VIRTUAL {{ isVirtualFirmware(item.firmware) ? "(enabled)" : "(disabled)" }}-->
+        <!--          </v-btn>-->
+        <!--        </div>-->
       </template>
     </v-data-table>
 
@@ -141,10 +156,7 @@ import CreatePrinterDialog from "@/components/Generic/Dialogs/CreatePrinterDialo
 import PrinterEmergencyStopAction from "@/components/Generic/Actions/PrinterEmergencyStopAction.vue";
 import { PrinterFirmwareUpdateService } from "@/backend/printer-firmware-update.service";
 import { PrusaFirmwareReleaseModel } from "@/models/plugins/firmware-updates/prusa-firmware-release.model";
-import {
-  PrinterFirmwareStateModel,
-  PrinterFirmwareStateResponse
-} from "@/models/plugins/firmware-updates/printer-firmware-state.model";
+import { PrinterFirmwareStateModel } from "@/models/plugins/firmware-updates/printer-firmware-state.model";
 
 @Component({
   components: {
@@ -213,13 +225,37 @@ export default class Printers extends Vue {
     return printersState.printers;
   }
 
-  async loadFirmwareData() {
-    const releasesResult = await PrinterFirmwareUpdateService.loadFirmwareUpdateState();
-    this.firmwareUpdateStates = releasesResult;
-    console.log(this.firmwareUpdateStates);
+  get latestReleaseVersion() {
+    const result = this.firmwareReleases.sort(
+      (a, b) => Date.parse(b.created_at) - Date.parse(a.created_at)
+    );
+    console.log(result.map((r) => r.tag_name));
+
+    if (!result?.length) return "?";
+
+    return result[0].tag_name;
   }
 
-  async updateFirmware(printer: Printer) {}
+  isVirtualFirmware(firmwareTag: string) {
+    const firmwareTagUpper = firmwareTag?.toUpperCase();
+    if (!firmwareTagUpper) return false;
+    if (firmwareTagUpper.includes("VIRTUAL")) return true;
+  }
+
+  isUpdatableFirmware(firmwareTag: string) {
+    const firmwareTagUpper = firmwareTag?.toUpperCase();
+    if (!firmwareTagUpper) return false;
+    if (this.isVirtualFirmware(firmwareTag)) return false;
+  }
+
+  async loadFirmwareData() {
+    const updateStates = await PrinterFirmwareUpdateService.loadFirmwareUpdateState();
+    this.firmwareUpdateStates = updateStates?.versions || [];
+  }
+
+  async updateFirmware(printer: Printer) {
+    //TODO
+  }
 
   openEditDialog(printer: Printer) {
     printersState.setUpdateDialogPrinter(printer);
