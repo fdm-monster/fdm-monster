@@ -26,7 +26,19 @@ class PluginFirmwareUpdateController {
   }
 
   async listFirmwareReleasesCache(req, res) {
-    res.send(this.#pluginFirmwareUpdateService.getFirmwareReleases());
+    const releases = this.#pluginFirmwareUpdateService.getFirmwareReleases();
+    res.send(releases);
+  }
+
+  /**
+   * Explicit query, use with care (to prevent Github rate limit)
+   * @param req
+   * @param res
+   * @returns {Promise<void>}
+   */
+  async syncFirmwareReleasesCache(req, res) {
+    const releases = await this.#pluginFirmwareUpdateService.queryGithubPrusaFirmwareReleasesCache();
+    res.send(releases);
   }
 
   async downloadFirmware(req, res) {
@@ -43,7 +55,7 @@ class PluginFirmwareUpdateController {
   async #performScanOnPrinters() {
     const printers = this.#printersStore.listPrinterStates();
     const printerFirmwareStates = [];
-    const failureMap = {};
+    const failureStates = [];
     for (let printer of printers) {
       try {
         const version = await this.#pluginFirmwareUpdateService.getPrinterFirmwareVersion(
@@ -56,7 +68,7 @@ class PluginFirmwareUpdateController {
           printerName: printer.getName()
         });
       } catch (e) {
-        failureMap.push({
+        failureStates.push({
           id: printer.id,
           printerName: printer.getName(),
           error: e
@@ -65,7 +77,7 @@ class PluginFirmwareUpdateController {
     }
     const result = {
       versions: printerFirmwareStates,
-      failures: failureMap
+      failures: failureStates
     };
     this.#cacheManager.set(cacheKey, result, { ttl: 3600 * 4 });
     return result;
@@ -81,5 +93,6 @@ module.exports = createController(PluginFirmwareUpdateController)
   ])
   .get("/", "listUpdateState")
   .get("/releases", "listFirmwareReleasesCache")
+  .post("/releases/sync", "syncFirmwareReleasesCache")
   .post("/scan", "scanPrinterFirmwareVersions")
   .post("/download-firmware", "downloadFirmware");
