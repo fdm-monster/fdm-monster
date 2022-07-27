@@ -1,6 +1,6 @@
 # FDM Monster [![GitHub stars](https://img.shields.io/github/stars/fdm-monster/fdmonster)](https://github.com/fdm-monster/fdm-monster/stargazers) [![GitHub issues](https://img.shields.io/github/issues/fdm-monster/fdm-monster?color=green)](https://github.com/fdm-monster/fdm-monster/issues) [![GitHub forks](https://img.shields.io/github/forks/fdm-monster/fdm-monster)](https://github.com/fdm-monster/fdm-monster/network/members) [![Latest Release](https://img.shields.io/github/release/fdm-monster/fdm-monster)](https://github.com/fdm-monster/fdm-monster/releases/latest) [![Coverage](https://img.shields.io/codecov/c/github/fdm-monster/fdm-monster/develop?color=green)](https://app.codecov.io/gh/fdm-monster/fdm-monster)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 **_The server for managing 3D printers with great overview_**
@@ -74,6 +74,7 @@ These awesome people involved in the project ([emoji key](https://allcontributor
   <tr>
     <td align="center"><a href="https://github.com/davidzwa"><img src="https://avatars.githubusercontent.com/u/6005355?v=4?s=100" width="100px;" alt=""/><br /><sub><b>David Zwart</b></sub></a><br /><a href="https://github.com/fdm-monster/fdm-monster/issues?q=author%3Adavidzwa" title="Bug reports">🐛</a> <a href="https://github.com/fdm-monster/fdm-monster/commits?author=davidzwa" title="Code">💻</a> <a href="#maintenance-davidzwa" title="Maintenance">🚧</a> <a href="#userTesting-davidzwa" title="User Testing">📓</a></td>
     <td align="center"><a href="https://kevenaar.name"><img src="https://avatars.githubusercontent.com/u/834643?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Maurice Kevenaar</b></sub></a><br /><a href="#security-mkevenaar" title="Security">🛡️</a> <a href="#maintenance-mkevenaar" title="Maintenance">🚧</a> <a href="#ideas-mkevenaar" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="https://github.com/tobikiss"><img src="https://avatars.githubusercontent.com/u/32313126?v=4?s=100" width="100px;" alt=""/><br /><sub><b>tobikiss</b></sub></a><br /><a href="#ideas-tobikiss" title="Ideas, Planning, & Feedback">🤔</a> <a href="#maintenance-tobikiss" title="Maintenance">🚧</a></td>
   </tr>
 </table>
 
