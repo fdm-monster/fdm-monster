@@ -27,6 +27,16 @@
         "maintenance",
         "ideas"
       ]
+    },
+    {
+      "login": "tobikiss",
+      "name": "tobikiss",
+      "avatar_url": "https://avatars.githubusercontent.com/u/32313126?v=4",
+      "profile": "https://github.com/tobikiss",
+      "contributions": [
+        "ideas",
+        "maintenance"
+      ]
     }
   ],
   "contributorsPerLine": 7,
