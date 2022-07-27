@@ -16,6 +16,17 @@
         "maintenance",
         "userTesting"
       ]
+    },
+    {
+      "login": "mkevenaar",
+      "name": "Maurice Kevenaar",
+      "avatar_url": "https://avatars.githubusercontent.com/u/834643?v=4",
+      "profile": "https://kevenaar.name",
+      "contributions": [
+        "security",
+        "maintenance",
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
