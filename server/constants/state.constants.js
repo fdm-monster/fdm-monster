@@ -19,6 +19,7 @@ const ERR_COUNT = {
 // State category
 const CATEGORY = {
   Idle: "Idle",
+  Disabled: "Disabled",
   Offline: "Offline",
   Disconnected: "Disconnected",
   Complete: "Complete",
@@ -199,7 +200,7 @@ const mapStateToColor = (state) => {
     return { name: "warning", hex: "#583c0e", category: CATEGORY.Active };
   }
   if (state === PSTATE.Disabled) {
-    return { name: "secondary", hex: "#2e0905", category: CATEGORY.Offline };
+    return { name: "secondary", hex: "#050c2e", category: CATEGORY.Disabled };
   }
   if (state === PSTATE.Offline) {
     return { name: "danger", hex: "#2e0905", category: CATEGORY.Offline };
