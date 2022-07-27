@@ -3,9 +3,28 @@
     <v-toolbar-title class="text-uppercase white--text">
       <span class="font-weight-light">FDM</span>
       <strong>Monster</strong>
-      <strong class="ml-14"> {{ currentTimeDiff4h || getWorkTimeDiff() }} 16:00</strong>
-      <strong class="ml-14"> {{ currentTimeDiff5h || getWorkTimeDiff() }} 17:00</strong>
-      <strong class="ml-14"> {{ currentTimeDiff6h || getWorkTimeDiff() }} 18:00</strong>
+      <strong class="ml-4 pa-2 border-time">
+        {{ currentTimeDiff4h || getWorkTimeDiff() }} 16:00</strong
+      >
+      <strong class="ml-4 pa-2 border-time">
+        {{ currentTimeDiff5h || getWorkTimeDiff() }} 17:00</strong
+      >
+      <strong class="ml-4 pa-2 border-time">
+        {{ currentTimeDiff6h || getWorkTimeDiff() }} 18:00</strong
+      >
+      <div class="d-inline-flex border-time ml-4">
+        <v-text-field
+          class="d-inline-flex pl-1"
+          color="default"
+          style="margin-bottom: -12px; width: 125px"
+          prepend-icon="watch"
+          v-model="timeOfDay"
+          single-line
+        ></v-text-field>
+        <strong class="ml-2 pt-1 pr-2 border-time"
+          >{{ currentTimeDiff || "? TO" }} {{ timeOfDay }}</strong
+        >
+      </div>
     </v-toolbar-title>
     <v-spacer></v-spacer>
 
@@ -20,27 +39,35 @@ import Vue from "vue";
 import { DateTime } from "luxon";
 
 @Component({
-  components: { PrintJobsMenu }
+  components: { PrintJobsMenu },
+  data: () => ({
+    timeOfDay: "17:00"
+  })
 })
 export default class TopBar extends Vue {
   currentTimeDiff4h = "";
   currentTimeDiff5h = "";
   currentTimeDiff6h = "";
+  currentTimeDiff?: string = "";
+  timeOfDay = "17:00";
 
   getWorkTimeDiff() {
     this.setWorkTimeDiff();
 
     setInterval(() => {
       this.setWorkTimeDiff();
-    }, 15000);
+    }, 500);
   }
 
-  getDiffFormat(dayHourMoment: number) {
+  getDiffFormat(dayHourMoment: number, simple = false) {
     const soonMoment = DateTime.fromObject({ hour: dayHourMoment }).toMillis();
     const nowTime = DateTime.now().toMillis();
     if (nowTime > soonMoment) return "PAST";
 
     const duration = DateTime.fromObject({ hour: dayHourMoment }).diffNow();
+    if (simple) {
+      return duration.toFormat("hh:mm");
+    }
     return duration.toFormat("hh'h'mm'm' 'to'");
   }
 
@@ -48,6 +75,23 @@ export default class TopBar extends Vue {
     this.currentTimeDiff4h = this.getDiffFormat(16);
     this.currentTimeDiff5h = this.getDiffFormat(17);
     this.currentTimeDiff6h = this.getDiffFormat(18);
+
+    try {
+      const date = DateTime.fromFormat(this.timeOfDay, "hh:mm");
+      if (!date) this.currentTimeDiff = undefined;
+      this.currentTimeDiff = this.getDiffFormat(date.hour, false);
+    } catch (e) {
+      this.currentTimeDiff = undefined;
+    }
   }
 }
 </script>
+<style lang="scss">
+.border-time {
+  border: 1px solid white;
+
+  * {
+    border: none;
+  }
+}
+</style>
