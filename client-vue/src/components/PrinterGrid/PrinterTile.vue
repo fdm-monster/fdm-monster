@@ -23,10 +23,17 @@
       <small class="xsmall-resized-font ml-1 text--secondary">
         {{ printer.printerState.state }}
       </small>
-      <div
-        :style="{ background: printerFilamentColor }"
-        class="d-flex justify-end filament-abs-border"
-      ></div>
+      <v-tooltip top open-delay="100" close-delay="1000">
+        <template v-slot:activator="{ on, attrs }">
+          <div
+            v-bind="attrs"
+            v-on="on"
+            :style="{ background: printerFilamentColorRgba }"
+            class="d-flex justify-end filament-abs-border"
+          ></div>
+        </template>
+        <span>Color: {{ printerFilamentColorName }}</span>
+      </v-tooltip>
     </v-container>
 
     <v-progress-linear
@@ -55,7 +62,7 @@ export default class PrinterGridTile extends Vue {
   @Prop() printer: Printer;
   @Prop() loading: boolean;
   readonly defaultColor = "rgba(100,100,100,0.1)";
-  readonly defaultFilamentColor =
+  readonly defaultFilamentGradient =
     "repeating-linear-gradient(-30deg, #222, #555 5px, #444 5px, #555 6px)";
 
   get selected() {
@@ -67,16 +74,36 @@ export default class PrinterGridTile extends Vue {
     return printersState.printers;
   }
 
-  get printerFilamentColor() {
+  private printerFilamentColor() {
     const ralCode = this.printer?.lastPrintedFile.parsedVisualizationRAL;
     if (!ralCode) {
-      return this.defaultFilamentColor;
+      return undefined;
+    }
+
+    const ralString = ralCode.toString();
+    return Object.values(RAL_CODES).find((r) => r.code === ralString);
+  }
+
+  get printerFilamentColorName() {
+    const printerColor = this.printerFilamentColor();
+
+    if (!printerColor) {
+      return "UNKNOWN";
+    }
+
+    return `${this.printer?.lastPrintedFile.parsedVisualizationRAL}`;
+  }
+
+  get printerFilamentColorRgba() {
+    const ralCode = this.printer?.lastPrintedFile.parsedVisualizationRAL;
+    if (!ralCode) {
+      return this.defaultFilamentGradient;
     }
 
     const ralString = ralCode.toString();
     const foundColor = Object.values(RAL_CODES).find((r) => r.code === ralString);
     if (!foundColor) {
-      return this.defaultFilamentColor;
+      return this.defaultFilamentGradient;
     }
 
     return `${foundColor.color.hex}`;
@@ -90,10 +117,6 @@ export default class PrinterGridTile extends Vue {
 
   id() {
     return this.printer?.printerName;
-  }
-
-  getTileClass() {
-    return this.selected ? "tile tile-selected" : "tile";
   }
 
   clickInfo() {
