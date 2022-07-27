@@ -61,6 +61,20 @@ Feel like joining in as a developer or do you have a quick fix? Great! Please re
 
 There are a lot of plans in the making (f.e. tunneling, auto-discovery, plugin system,  etc.), which will be announced as we go!
 
+## Contributors ✨
+
+These awesome people involved in the project ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<table></table>
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
 ## License
 Distributed under GNU Affero General Public License v3.0. See `LICENSE` for more information.
 
