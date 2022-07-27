@@ -50,6 +50,7 @@ async function setupTestApp(loadPrinterStore = false, mocks = undefined, quick_b
     httpServer,
     request: supertest(httpServer),
     container,
+    [DITokens.httpClient]: container.resolve(DITokens.httpClient),
     [DITokens.octoPrintApiService]: container.resolve(DITokens.octoPrintApiService),
     [DITokens.taskManagerService]: container.resolve(DITokens.taskManagerService)
   };

@@ -52,7 +52,7 @@ class PluginFirmwareUpdateService extends PluginBaseService {
       );
     }
 
-    if (!this.#prusaFirmwareReleases?.length) return;
+    if (!this.#prusaFirmwareReleases?.length) return [];
 
     this.#latestFirmware = this.#prusaFirmwareReleases[0];
     this._logger.info(
@@ -62,6 +62,8 @@ class PluginFirmwareUpdateService extends PluginBaseService {
         tag_name: this.#latestFirmware.tag_name
       }
     );
+
+    return this.#prusaFirmwareReleases;
   }
 
   async downloadFirmware() {
