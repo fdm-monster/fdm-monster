@@ -82,8 +82,8 @@
           </v-tooltip>
         </v-list-item-avatar>
         <v-list-item-content>
-          <span v-if="isEnabled">Disable API/Websocket</span>
-          <span v-else-if="!isEnabled">Enable API/Websocket</span>
+          <span v-if="isEnabled">Disable Printer Location</span>
+          <span v-else-if="!isEnabled">Enable Printer Location</span>
         </v-list-item-content>
       </v-list-item>
 
