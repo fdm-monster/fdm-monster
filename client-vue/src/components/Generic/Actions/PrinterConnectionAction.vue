@@ -14,7 +14,7 @@
       :color="printer.printerState.colour.name"
       fab
       small
-      @click="togglePrinterConnection()"
+      @click.c.capture.native.stop="togglePrinterConnection()"
       :disabled="isPrinterPrinting()"
     >
       <v-icon>usb</v-icon>

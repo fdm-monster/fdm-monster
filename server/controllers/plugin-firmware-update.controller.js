@@ -1,8 +1,8 @@
-const {createController} = require("awilix-express");
-const {AppConstants} = require("../server.constants");
-const {authenticate, authorizeRoles} = require("../middleware/authenticate");
-const {ROLES} = require("../constants/authorization.constants");
-const {printerResolveMiddleware} = require("../middleware/printer");
+const { createController } = require("awilix-express");
+const { AppConstants } = require("../server.constants");
+const { authenticate, authorizeRoles } = require("../middleware/authenticate");
+const { ROLES } = require("../constants/authorization.constants");
+const { printerResolveMiddleware } = require("../middleware/printer");
 
 const cacheKey = "firmware-state";
 
@@ -11,7 +11,7 @@ class PluginFirmwareUpdateController {
   #printersStore;
   #pluginFirmwareUpdateService;
 
-  constructor({cacheManager, printersStore, pluginFirmwareUpdateService}) {
+  constructor({ cacheManager, printersStore, pluginFirmwareUpdateService }) {
     this.#cacheManager = cacheManager;
     this.#printersStore = printersStore;
     this.#pluginFirmwareUpdateService = pluginFirmwareUpdateService;
@@ -26,7 +26,7 @@ class PluginFirmwareUpdateController {
   }
 
   async listFirmwareReleasesCache(req, res) {
-    res.send(this.#pluginFirmwareUpdateService.firmwareReleases);
+    res.send(this.#pluginFirmwareUpdateService.getFirmwareReleases());
   }
 
   async downloadFirmware(req, res) {
@@ -42,7 +42,7 @@ class PluginFirmwareUpdateController {
 
   async #performScanOnPrinters() {
     const printers = this.#printersStore.listPrinterStates();
-    const printerVersionMap = {};
+    const printerFirmwareStates = [];
     const failureMap = {};
     for (let printer of printers) {
       try {
@@ -50,22 +50,25 @@ class PluginFirmwareUpdateController {
           printer.getLoginDetails()
         );
 
-        printerVersionMap[printer.id] = {
+        printerFirmwareStates.push({
+          id: printer.id,
           firmware: version,
           printerName: printer.getName()
-        };
+        });
       } catch (e) {
-        failureMap[printer.id] = {
+        failureMap.push({
+          id: printer.id,
           printerName: printer.getName(),
           error: e
-        };
+        });
       }
     }
-    this.#cacheManager.set(cacheKey, printerVersionMap, {ttl: 3600 * 4});
-    return {
-      versions: printerVersionMap,
+    const result = {
+      versions: printerFirmwareStates,
       failures: failureMap
     };
+    this.#cacheManager.set(cacheKey, result, { ttl: 3600 * 4 });
+    return result;
   }
 }
 
@@ -77,6 +80,6 @@ module.exports = createController(PluginFirmwareUpdateController)
     printerResolveMiddleware()
   ])
   .get("/", "listUpdateState")
+  .get("/releases", "listFirmwareReleasesCache")
   .post("/scan", "scanPrinterFirmwareVersions")
-  .post("/releases", "listFirmwareReleasesCache")
   .post("/download-firmware", "downloadFirmware");

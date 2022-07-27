@@ -30,6 +30,9 @@ export class ServerApi {
   static filamentSelectRoute = `${ServerApi.filamentRoute}/select`;
   static alertRoute = `${ServerApi.base}/alert`;
   static testAlertScriptRoute = `${ServerApi.alertRoute}/test-alert-script`;
+  static pluginRoute = `${ServerApi.base}/plugin`;
+  static pluginFirmwareUpdateRoute = `${ServerApi.pluginRoute}/firmware-update`;
+  static pluginFirmwareReleasesRoute = `${ServerApi.pluginFirmwareUpdateRoute}/releases`;
 
   static getPrinterRoute = (id: string) => `${ServerApi.printerRoute}/${id}`;
   static getPrinterLoginDetailsRoute = (id: string) =>

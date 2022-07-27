@@ -5,10 +5,10 @@
       <v-spacer></v-spacer>
       <v-text-field
         v-model="search"
-        prepend-icon="search"
-        clearable
         class="p-2"
+        clearable
         label="Search"
+        prepend-icon="search"
         single-line
       ></v-text-field>
     </v-card-title>
@@ -22,6 +22,7 @@
       class="elevation-1"
       item-key="id"
       show-expand
+      @click:row="clickRow"
     >
       <template v-if="reorder" v-slot:body="props">
         <draggable :list="props.items" tag="tbody">
@@ -43,37 +44,18 @@
           <v-spacer></v-spacer>
           <v-switch v-model="reorder" class="mt-5 mr-3" dark label="Sort mode" />
 
-          <v-btn class="ml-3" color="primary" type="button" @click="openImportJsonPrintersDialog()">
+          <v-btn
+            class="ml-3"
+            color="primary"
+            type="button"
+            @click.self="openImportJsonPrintersDialog()"
+          >
             Import JSON Printers
           </v-btn>
 
-          <v-btn class="ml-3" color="primary" type="button" @click="openCreatePrinterDialog()">
+          <v-btn class="ml-3" color="primary" type="button" @click.self="openCreatePrinterDialog()">
             Create Printer
           </v-btn>
-
-          <v-switch
-            v-show="false"
-            v-model="deleteMany"
-            class="mt-5 mr-3"
-            dark
-            label="Delete printers"
-          />
-          <v-switch
-            v-show="false"
-            v-model="bulkFileClean"
-            class="mt-5 mr-3"
-            dark
-            disabled
-            label="Bulk file clean"
-          />
-          <v-switch
-            v-show="false"
-            v-model="bulkUpdate"
-            class="mt-5"
-            dark
-            disabled
-            label="Bulk file clean"
-          />
         </v-toolbar>
       </template>
       <template v-slot:item.enabled="{ item }">
@@ -100,12 +82,56 @@
       <template v-slot:item.actions="{ item }">
         <PrinterUrlAction :printer="item" />
         <PrinterConnectionAction :printer="item" />
+        <PrinterEmergencyStopAction :printer="item" />
         <PrinterSettingsAction :printer="item" v-on:update:show="openEditDialog(item)" />
       </template>
       <template v-slot:expanded-item="{ headers, item }">
         <td :colspan="headers.length">
           <PrinterDetails :printer="item"></PrinterDetails>
         </td>
+      </template>
+    </v-data-table>
+
+    <v-data-table
+      class="disabled-highlight"
+      key="id"
+      :headers="firmwareTableHeaders"
+      :items="firmwareUpdateStates"
+    >
+      <template v-slot:top>
+        <v-toolbar flat prominent>
+          <v-toolbar-title>
+            <div>Showing firmware update status</div>
+            <small>Latest (downloaded) firmware: {{ latestReleaseVersion }}</small>
+            <br />
+            <v-btn color="primary" small @click="loadFirmwareData">Scan printers (SLOW)</v-btn>
+          </v-toolbar-title>
+          <v-spacer></v-spacer>
+        </v-toolbar>
+      </template>
+      <template v-slot:no-data> No firmware information loaded.</template>
+      <template v-slot:no-results> No results</template>
+      <template v-slot:item.actions="{ item }">
+        Feature coming soon:
+        <v-btn
+          color="primary"
+          @click="updateFirmware(item)"
+          :disabled="true || !isUpdatableFirmware(item.firmware)"
+        >
+          <v-icon>updates</v-icon>
+          Update {{ isVirtualFirmware(item.firmware) ? "(VIRTUAL)" : "" }}
+        </v-btn>
+        <!--        Sadly this is not available yet -->
+        <!--        <div v-if="isVirtualFirmware(item.firmware)">-->
+        <!--          <v-btn-->
+        <!--            color="primary"-->
+        <!--            @click="toggleVirtualFirmware(item)"-->
+        <!--            :disabled="!isVirtualFirmware(item.firmware)"-->
+        <!--          >-->
+        <!--            <v-icon>query_stats</v-icon>-->
+        <!--            Toggle VIRTUAL {{ isVirtualFirmware(item.firmware) ? "(enabled)" : "(disabled)" }}-->
+        <!--          </v-btn>-->
+        <!--        </div>-->
       </template>
     </v-data-table>
 
@@ -127,6 +153,10 @@ import { printersState } from "@/store/printers.state";
 import BatchJsonCreateDialog from "@/components/Generic/Dialogs/BatchJsonCreateDialog.vue";
 import UpdatePrinterDialog from "@/components/Generic/Dialogs/UpdatePrinterDialog.vue";
 import CreatePrinterDialog from "@/components/Generic/Dialogs/CreatePrinterDialog.vue";
+import PrinterEmergencyStopAction from "@/components/Generic/Actions/PrinterEmergencyStopAction.vue";
+import { PrinterFirmwareUpdateService } from "@/backend/printer-firmware-update.service";
+import { PrusaFirmwareReleaseModel } from "@/models/plugins/firmware-updates/prusa-firmware-release.model";
+import { PrinterFirmwareStateModel } from "@/models/plugins/firmware-updates/printer-firmware-state.model";
 
 @Component({
   components: {
@@ -137,19 +167,22 @@ import CreatePrinterDialog from "@/components/Generic/Dialogs/CreatePrinterDialo
     CreatePrinterDialog,
     PrinterUrlAction,
     PrinterSettingsAction,
+    PrinterEmergencyStopAction,
     PrinterConnectionAction
-  }
+  },
+  data: () => ({
+    firmwareUpdates: []
+  })
 })
 export default class Printers extends Vue {
   reorder = false;
-  deleteMany = false;
-  bulkFileClean = false;
-  bulkUpdate = false;
+  firmwareUpdateStates: PrinterFirmwareStateModel[] = [];
+  firmwareReleases: PrusaFirmwareReleaseModel[] = [];
 
   autoPrint = true;
   showJsonImportDialog = false;
   search = "";
-  expanded = [];
+  expanded: Printer[] = [];
   tableHeaders = [
     {
       text: "Order",
@@ -168,9 +201,60 @@ export default class Printers extends Vue {
     { text: "Actions", value: "actions", sortable: false },
     { text: "", value: "data-table-expand" }
   ];
+  firmwareTableHeaders = [
+    {
+      text: "Printer Name",
+      align: "start",
+      sortable: true,
+      value: "printerName"
+    },
+    {
+      text: "Firmware Label",
+      sortable: true,
+      value: "firmware"
+    },
+
+    { text: "Actions", value: "actions", sortable: false }
+  ];
+
+  async created() {
+    this.firmwareReleases = await PrinterFirmwareUpdateService.getFirmwareReleases();
+  }
 
   get printers() {
     return printersState.printers;
+  }
+
+  get latestReleaseVersion() {
+    const result = this.firmwareReleases.sort(
+      (a, b) => Date.parse(b.created_at) - Date.parse(a.created_at)
+    );
+    console.log(result.map((r) => r.tag_name));
+
+    if (!result?.length) return "?";
+
+    return result[0].tag_name;
+  }
+
+  isVirtualFirmware(firmwareTag: string) {
+    const firmwareTagUpper = firmwareTag?.toUpperCase();
+    if (!firmwareTagUpper) return false;
+    if (firmwareTagUpper.includes("VIRTUAL")) return true;
+  }
+
+  isUpdatableFirmware(firmwareTag: string) {
+    const firmwareTagUpper = firmwareTag?.toUpperCase();
+    if (!firmwareTagUpper) return false;
+    if (this.isVirtualFirmware(firmwareTag)) return false;
+  }
+
+  async loadFirmwareData() {
+    const updateStates = await PrinterFirmwareUpdateService.loadFirmwareUpdateState();
+    this.firmwareUpdateStates = updateStates?.versions || [];
+  }
+
+  async updateFirmware(printer: Printer) {
+    //TODO
   }
 
   openEditDialog(printer: Printer) {
@@ -179,6 +263,15 @@ export default class Printers extends Vue {
 
   openCreatePrinterDialog() {
     printersState.setCreateDialogOpened(true);
+  }
+
+  clickRow(item: Printer, event: any) {
+    if (event.isExpanded) {
+      const index = this.expanded.findIndex((i) => i === item);
+      this.expanded.splice(index, 1);
+    } else {
+      this.expanded.push(item);
+    }
   }
 
   async openImportJsonPrintersDialog() {
@@ -196,7 +289,13 @@ export default class Printers extends Vue {
 }
 </script>
 
-<style>
+<style lang="scss">
+.disabled-highlight tbody {
+  tr:hover {
+    background-color: transparent !important;
+  }
+}
+
 .reorder-row-icon {
   cursor: move;
 }

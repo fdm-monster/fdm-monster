@@ -40,7 +40,11 @@ import { printersState } from "@/store/printers.state";
 import RefreshFilesAction from "@/components/Generic/Actions/RefreshFilesAction.vue";
 
 @Component({
-  components: { FileList: FileControlList, PrinterDeleteAction, RefreshFilesAction }
+  components: {
+    FileList: FileControlList,
+    PrinterDeleteAction,
+    RefreshFilesAction
+  }
 })
 export default class PrinterDetails extends Vue {
   @Prop() printer: Printer;
