@@ -5,7 +5,8 @@ const { PEVENTS } = require("../constants/event.constants");
 const {
   getDefaultPrinterState,
   WS_STATE,
-  EVENT_TYPES
+  EVENT_TYPES,
+  getDefaultDisabledPrinterState
 } = require("../services/octoprint/constants/octoprint-websocket.constants");
 const { mapStateToColor, PSTATE, MESSAGE } = require("../constants/state.constants");
 const Logger = require("../handlers/logger.js");
@@ -265,6 +266,9 @@ class PrinterState {
   }
 
   getPrinterState() {
+    if (!this.#apiAccessibility.accessible) {
+      return getDefaultDisabledPrinterState();
+    }
     if (!this.#websocketAdapter) {
       return getDefaultPrinterState();
     }

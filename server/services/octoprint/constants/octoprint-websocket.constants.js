@@ -30,6 +30,15 @@ function getDefaultPrinterState() {
   };
 }
 
+function getDefaultDisabledPrinterState() {
+  return {
+    state: PSTATE.Disabled,
+    flags: { operational: false },
+    desc: "Printer is disabled",
+    colour: mapStateToColor(PSTATE.Disabled)
+  };
+}
+
 function getDefaultCurrentState() {
   return {
     state: undefined,
@@ -105,6 +114,7 @@ module.exports = {
   getDefaultProgressState,
   getDefaultJobState,
   getDefaultPrinterState,
+  getDefaultDisabledPrinterState,
   getDefaultCurrentState,
   EVENT_TYPES,
   WS_STATE,

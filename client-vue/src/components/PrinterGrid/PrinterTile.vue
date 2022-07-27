@@ -21,7 +21,7 @@
       </v-btn>
       <br />
       <small class="xsmall-resized-font ml-1 text--secondary">
-        {{ printer.printerState.state }}
+        {{ printer.printerState.state?.toUpperCase() }}
       </small>
       <v-tooltip top open-delay="100" close-delay="1000">
         <template v-slot:activator="{ on, attrs }">
