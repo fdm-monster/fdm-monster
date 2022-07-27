@@ -19,3 +19,5 @@ server-nest/assets/public/assets/
 **/images
 **/file-storage
 **/nodemon_restart_trigger.js
+
+**/yarn-error.log
