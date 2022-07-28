@@ -674,10 +674,10 @@
     webpack "5.73.0"
     webpack-node-externals "3.0.0"
 
-"@nestjs/common@9.0.5":
-  version "9.0.5"
-  resolved "https://registry.yarnpkg.com/@nestjs/common/-/common-9.0.5.tgz#cc082a0ef24c2693cf637f2758a357b4db2b6489"
-  integrity sha512-13mncUq4JDSluI5IGvusDZANUfNYCIyPamxlPXJOLawGp8JjqRLHGn9ppNJp7W9mN/B/SmpvW9NFEYFIrKYj9g==
+"@nestjs/common@9.0.6":
+  version "9.0.6"
+  resolved "https://registry.yarnpkg.com/@nestjs/common/-/common-9.0.6.tgz#d3051d74175985318414f69e150564d2cb57fa56"
+  integrity sha512-8eEpdvXmTrS8MVM6VIASmey+jQAwGcoyb8J4mFdDA5UdDfvKNAZ3PN0eoBiphsZIn49WGubdFCmg4CcvoninbA==
   dependencies:
     iterare "1.2.1"
     tslib "2.4.0"
@@ -693,10 +693,10 @@
     lodash "4.17.21"
     uuid "8.3.2"
 
-"@nestjs/core@9.0.5":
-  version "9.0.5"
-  resolved "https://registry.yarnpkg.com/@nestjs/core/-/core-9.0.5.tgz#b4cb8f8b0c1d234a840f06e265717d4a24f8d224"
-  integrity sha512-41BBJlsquasVrGeRWNYb74Fwsc+oB5EmKC/hioQJAhGqIw5Kr5AcdEoEFaMKFzNLAPbU6c/nVW8T8CrvtQbQww==
+"@nestjs/core@9.0.6":
+  version "9.0.6"
+  resolved "https://registry.yarnpkg.com/@nestjs/core/-/core-9.0.6.tgz#01bd6a832706e367016408e10d6572a1bacea435"
+  integrity sha512-8B9+AT/bdM69q8h0/q62Jpp314Yx3CYol5UyzzZzUod6wtFLAUMWR6vizKXoakG9gvVDMwoPYRVDWZSG9fg5ig==
   dependencies:
     "@nuxtjs/opencollective" "0.3.2"
     fast-safe-stringify "2.1.1"
@@ -724,10 +724,10 @@
   resolved "https://registry.yarnpkg.com/@nestjs/passport/-/passport-9.0.0.tgz#0571bb08f8043456bc6df44cd4f59ca5f10c9b9f"
   integrity sha512-Gnh8n1wzFPOLSS/94X1sUP4IRAoXTgG4odl7/AO5h+uwscEGXxJFercrZfqdAwkWhqkKWbsntM3j5mRy/6ZQDA==
 
-"@nestjs/platform-express@9.0.5":
-  version "9.0.5"
-  resolved "https://registry.yarnpkg.com/@nestjs/platform-express/-/platform-express-9.0.5.tgz#e271b0a93a6f137b55ddb5fd4eea542b36a1db89"
-  integrity sha512-I6NiOPfL116cBqEwAEdJc+L1N9iIcmoqWjMJY52Kb5cMV2PUzxebddXPqo2HOs7WQv3OLVg0zIUcgwIntq1CEQ==
+"@nestjs/platform-express@9.0.6":
+  version "9.0.6"
+  resolved "https://registry.yarnpkg.com/@nestjs/platform-express/-/platform-express-9.0.6.tgz#4968dcb98daaf2df5e8d44df858839d797ec2c84"
+  integrity sha512-kfqI3SwXITEFnnI5r71RP9kBXmvTVc0ZrUr63kdP+kPFILoQjY8pdXFyYKOiHEX1Atd4EZMAITGc1HZXjRpE8Q==
   dependencies:
     body-parser "1.20.0"
     cors "2.8.5"
@@ -735,10 +735,10 @@
     multer "1.4.4-lts.1"
     tslib "2.4.0"
 
-"@nestjs/platform-ws@9.0.5":
-  version "9.0.5"
-  resolved "https://registry.yarnpkg.com/@nestjs/platform-ws/-/platform-ws-9.0.5.tgz#a028e70d7ac16c6fc035191bab6c3d14b8e2c696"
-  integrity sha512-Lz3/sXi6yAtBX3lIw/b4okAGYqoenej9ezxMgFcVYun/pqDrET+JF3F+zw3nqekAGGjmPmIFf2UxQePcIhaS3w==
+"@nestjs/platform-ws@9.0.6":
+  version "9.0.6"
+  resolved "https://registry.yarnpkg.com/@nestjs/platform-ws/-/platform-ws-9.0.6.tgz#fe23b0a7febd51a24cf3bf134c34469bc38d2125"
+  integrity sha512-ptuUC8vkxsLirvcdnazDb0uINmsYo8Odm7zfYqB/wNwyeiffn0E4N5+so2qRVYaydkcutBEUN5hTYXo7A3S44g==
   dependencies:
     tslib "2.4.0"
     ws "8.8.1"
@@ -787,10 +787,10 @@
   dependencies:
     check-disk-space "3.3.0"
 
-"@nestjs/testing@9.0.5":
-  version "9.0.5"
-  resolved "https://registry.yarnpkg.com/@nestjs/testing/-/testing-9.0.5.tgz#970c2977475aed67102362d1b2477432f16b863d"
-  integrity sha512-/RwWhOBz0rPZzoMiKXsuyCr8FkQrtMxPUHwS+SFnZBsNa/jb56GswgUD7/UnTATU15sjcv0fFtFT3rlu6KK5Ew==
+"@nestjs/testing@9.0.6":
+  version "9.0.6"
+  resolved "https://registry.yarnpkg.com/@nestjs/testing/-/testing-9.0.6.tgz#373fea5a0a33e6e98bdf3461a3b3a867eb8fedd5"
+  integrity sha512-qsOb9bf+95L5KWeXBAQFkhDRgoJ6BcY5Vzm8NGOrwKGWT6cUvvFtpVeU3jOeuKB8c4cX0HXZCTAm0vT55fQhRg==
   dependencies:
     tslib "2.4.0"
 
@@ -801,10 +801,10 @@
   dependencies:
     uuid "8.3.2"
 
-"@nestjs/websockets@9.0.5":
-  version "9.0.5"
-  resolved "https://registry.yarnpkg.com/@nestjs/websockets/-/websockets-9.0.5.tgz#084d376c350c46c7cf0d931cbadcaae90ebc2867"
-  integrity sha512-tb3Lj2qwCKTigVo1TKQleELcZihUh16E7hlLuKUrRkGFh6KygXCv1lNAmX75zdWXEIIAMKhwyILkeJxJZjksrA==
+"@nestjs/websockets@9.0.6":
+  version "9.0.6"
+  resolved "https://registry.yarnpkg.com/@nestjs/websockets/-/websockets-9.0.6.tgz#c9a118d9f9fad08fe9c24aa83dd12fc17099c37f"
+  integrity sha512-JjPxuwemEYzsOTcrnPHg0JcA/qS3zY38dQw5aj8Iz91d242GXCRvwuP/sRqvevaVt4tYDVWf7U4sd+0OON+g+w==
   dependencies:
     iterare "1.2.1"
     object-hash "3.0.0"
