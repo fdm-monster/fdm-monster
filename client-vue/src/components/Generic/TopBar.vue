@@ -16,14 +16,12 @@
         <v-text-field
           class="d-inline-flex pl-1"
           color="default"
-          style="margin-bottom: -12px; width: 125px"
+          style="margin-bottom: -12px; width: 80px"
           prepend-icon="watch"
-          v-model="timeOfDay"
+          v-model="printTimeHoursMinutes"
           single-line
         ></v-text-field>
-        <strong class="ml-2 pt-1 pr-2 border-time"
-          >{{ currentTimeDiff || "? TO" }} {{ timeOfDay }}</strong
-        >
+        <strong class="ml-2 pt-1 pr-2 border-time">{{ finishedPrintTimeOfDay || "?" }}</strong>
       </div>
     </v-toolbar-title>
     <v-spacer></v-spacer>
@@ -36,20 +34,20 @@
 import PrintJobsMenu from "@/components/Generic/PrintJobsMenu.vue";
 import Component from "vue-class-component";
 import Vue from "vue";
-import { DateTime } from "luxon";
+import { DateTime, Duration } from "luxon";
 
 @Component({
   components: { PrintJobsMenu },
   data: () => ({
-    timeOfDay: "17:00"
+    printTimeHoursMinutes: "05:00"
   })
 })
 export default class TopBar extends Vue {
   currentTimeDiff4h = "";
   currentTimeDiff5h = "";
   currentTimeDiff6h = "";
-  currentTimeDiff?: string = "";
-  timeOfDay = "17:00";
+  finishedPrintTimeOfDay?: string = "";
+  printTimeHoursMinutes = "05:00";
 
   getWorkTimeDiff() {
     this.setWorkTimeDiff();
@@ -77,11 +75,13 @@ export default class TopBar extends Vue {
     this.currentTimeDiff6h = this.getDiffFormat(18);
 
     try {
-      const date = DateTime.fromFormat(this.timeOfDay, "hh:mm");
-      if (!date) this.currentTimeDiff = undefined;
-      this.currentTimeDiff = this.getDiffFormat(date.hour, false);
+      const printTimeDuration = Duration.fromISOTime(this.printTimeHoursMinutes);
+      const finishTime = DateTime.now().plus(printTimeDuration);
+      if (!printTimeDuration) this.finishedPrintTimeOfDay = undefined;
+
+      this.finishedPrintTimeOfDay = finishTime.toFormat("hh'H' mm'M'");
     } catch (e) {
-      this.currentTimeDiff = undefined;
+      this.finishedPrintTimeOfDay = undefined;
     }
   }
 }
