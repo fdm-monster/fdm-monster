@@ -94,7 +94,9 @@ These awesome people involved in the project ([emoji key](https://allcontributor
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 ## License
-Distributed under GNU Affero General Public License v3.0. See `LICENSE` for more information.
+
+FDM Power is licensed with [LGPL-3.0](LICENSE). This means in essence that you may use it commercially, but it must be in FOSS fashion.
+Any changes should be publicly available through Github forks or repositories. For details, please consult the LICENSE file.
 
 ## Contact
 - Main repository: [https://github.com/fdm-monster/fdm-monster](https://github.com/fdm-monster/fdm-monster)
