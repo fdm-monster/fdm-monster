@@ -4948,9 +4948,9 @@ yallist@^4.0.0:
   integrity sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==
 
 yargs-parser@^21.0.0:
-  version "21.0.1"
-  resolved "https://registry.yarnpkg.com/yargs-parser/-/yargs-parser-21.0.1.tgz#0267f286c877a4f0f728fceb6f8a3e4cb95c6e35"
-  integrity sha512-9BK1jFpLzJROCI5TzwZL/TU4gqjK5xiHV/RfWLOahrjAko/e4DJkRDZQXfvqAsiZzzYhgAzbgz6lg48jcm4GLg==
+  version "21.1.0"
+  resolved "https://registry.yarnpkg.com/yargs-parser/-/yargs-parser-21.1.0.tgz#a11d06a3bf57f064e951aa3ef55fcf3a5705f876"
+  integrity sha512-xzm2t63xTV/f7+bGMSRzLhUNk1ajv/tDoaD5OeGyC3cFo2fl7My9Z4hS3q2VdQ7JaLvTxErO8Jp5pRIFGMD/zg==
 
 yargs@^17.3.1:
   version "17.5.1"
