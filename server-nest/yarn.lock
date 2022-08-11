@@ -1070,9 +1070,9 @@
     "@types/node" "*"
 
 "@types/node@*":
-  version "18.6.5"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.6.5.tgz#06caea822caf9e59d5034b695186ee74154d2802"
-  integrity sha512-Xjt5ZGUa5WusGZJ4WJPbOT8QOqp6nDynVFRKcUt32bOgvXEoc6o085WNkYTMO7ifAj2isEfQQ2cseE+wT6jsRw==
+  version "18.7.1"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.7.1.tgz#352bee64f93117d867d05f7406642a52685cbca6"
+  integrity sha512-GKX1Qnqxo4S+Z/+Z8KKPLpH282LD7jLHWJcVryOflnsnH+BtSDfieR6ObwBMwpnNws0bUK8GI7z0unQf9bARNQ==
 
 "@types/node@18.0.3":
   version "18.0.3"
@@ -1111,9 +1111,9 @@
     "@types/passport" "*"
 
 "@types/passport@*":
-  version "1.0.9"
-  resolved "https://registry.yarnpkg.com/@types/passport/-/passport-1.0.9.tgz#b32fa8f7485dace77a9b58e82d0c92908f6e8387"
-  integrity sha512-9+ilzUhmZQR4JP49GdC2O4UdDE3POPLwpmaTC/iLkW7l0TZCXOo1zsTnnlXPq6rP1UsUZPfbAV4IUdiwiXyC7g==
+  version "1.0.10"
+  resolved "https://registry.yarnpkg.com/@types/passport/-/passport-1.0.10.tgz#c518f2bae8b1538b7be71ee7f9220fbd3f569f05"
+  integrity sha512-IZamnXuN7mY+2/v8bAW6nuTcKiay7gXBBcMBZ8n7YHB4u5DwsWoJaNrHdAQ8PZEODRjCv3oHOg76CYJ40j9RqA==
   dependencies:
     "@types/express" "*"
 
@@ -1870,9 +1870,9 @@ camelcase@^6.2.0, camelcase@^6.3.0:
   integrity sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==
 
 caniuse-lite@^1.0.30001370:
-  version "1.0.30001374"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001374.tgz#3dab138e3f5485ba2e74bd13eca7fe1037ce6f57"
-  integrity sha512-mWvzatRx3w+j5wx/mpFN5v5twlPrabG8NqX2c6e45LCpymdoGqNvRkRutFUqpRTXKFQFNQJasvK0YT7suW6/Hw==
+  version "1.0.30001375"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001375.tgz#8e73bc3d1a4c800beb39f3163bf0190d7e5d7672"
+  integrity sha512-kWIMkNzLYxSvnjy0hL8w1NOaWNr2rn39RTAVyIwcw8juu60bZDWiF1/loOYANzjtJmy6qPgNmn38ro5Pygagdw==
 
 chalk@3.0.0:
   version "3.0.0"
@@ -2377,9 +2377,9 @@ ee-first@1.1.1:
   integrity sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==
 
 electron-to-chromium@^1.4.202:
-  version "1.4.213"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.213.tgz#a0d0f535e4fbddc25196c91ff2964b5660932297"
-  integrity sha512-+3DbGHGOCHTVB/Ms63bGqbyC1b8y7Fk86+7ltssB8NQrZtSCvZG6eooSl9U2Q0yw++fL2DpHKOdTU0NVEkFObg==
+  version "1.4.215"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.215.tgz#553372e74bde3164290d61f6792f93e443b16733"
+  integrity sha512-vqZxT8C5mlDZ//hQFhneHmOLnj1LhbzxV0+I1yqHV8SB1Oo4Y5Ne9+qQhwHl7O1s9s9cRuo2l5CoLEHdhMTwZg==
 
 emittery@^0.10.2:
   version "0.10.2"
@@ -3954,9 +3954,9 @@ levn@^0.4.1:
     type-check "~0.4.0"
 
 libphonenumber-js@^1.9.43:
-  version "1.10.11"
-  resolved "https://registry.yarnpkg.com/libphonenumber-js/-/libphonenumber-js-1.10.11.tgz#0078756857bcc5c9dfe097123c6e04ea930e309b"
-  integrity sha512-ehoihx4HpRXO6FH/uJ0EnaEV4dVU+FDny+jv0S6k9JPyPsAIr0eXDAFvGRMBKE1daCtyHAaFSKCiuCxrOjVAzQ==
+  version "1.10.12"
+  resolved "https://registry.yarnpkg.com/libphonenumber-js/-/libphonenumber-js-1.10.12.tgz#75ebe2f1887d12bbf45af5655fdb63f55f4ee05b"
+  integrity sha512-xTFBs3ipFQNmjCUkDj6ZzRJvs97IyazFHBKWtrQrLiYs0Zk0GANob1hkMRlQUQXbJrpQGwnI+/yU4oyD4ohvpw==
 
 lines-and-columns@^1.1.6:
   version "1.2.4"
