@@ -2855,9 +2855,9 @@ caniuse-api@^3.0.0:
     lodash.uniq "^4.5.0"
 
 caniuse-lite@^1.0.0, caniuse-lite@^1.0.30001370, caniuse-lite@^1.0.30001373:
-  version "1.0.30001377"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001377.tgz#fa446cef27f25decb0c7420759c9ea17a2221a70"
-  integrity sha512-I5XeHI1x/mRSGl96LFOaSk528LA/yZG3m3iQgImGujjO8gotd/DL8QaI1R1h1dg5ATeI2jqPblMpKq4Tr5iKfQ==
+  version "1.0.30001378"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001378.tgz#3d2159bf5a8f9ca093275b0d3ecc717b00f27b67"
+  integrity sha512-JVQnfoO7FK7WvU4ZkBRbPjaot4+YqxogSDosHv0Hv5mWpUESmN+UubMU6L/hGz8QlQ2aY5U0vR6MOs6j/CXpNA==
 
 case-sensitive-paths-webpack-plugin@^2.3.0:
   version "2.4.0"
@@ -3642,9 +3642,9 @@ ejs@^3.1.6:
     jake "^10.8.5"
 
 electron-to-chromium@^1.4.202:
-  version "1.4.222"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.222.tgz#2ba24bef613fc1985dbffea85df8f62f2dec6448"
-  integrity sha512-gEM2awN5HZknWdLbngk4uQCVfhucFAfFzuchP3wM3NN6eow1eDU0dFy2kts43FB20ZfhVFF0jmFSTb1h5OhyIg==
+  version "1.4.223"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.223.tgz#a99fe80208721da36938e416791baf1543bb5da5"
+  integrity sha512-uWa+i2Vz1odvE+zWXOe23rW9UPLh/5X7ESUVdK8wmNg+T6FfOZbhyZEK1GuC8JqaAZ4VBFUYaTYHFPrAX6y5bA==
 
 emittery@^0.10.2:
   version "0.10.2"
