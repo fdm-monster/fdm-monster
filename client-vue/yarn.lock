@@ -8260,10 +8260,10 @@ vue-property-decorator@9.1.2:
   resolved "https://registry.yarnpkg.com/vue-property-decorator/-/vue-property-decorator-9.1.2.tgz#266a2eac61ba6527e2e68a6933cfb98fddab5457"
   integrity sha512-xYA8MkZynPBGd/w5QFJ2d/NM0z/YeegMqYTphy7NJQXbZcuU6FC6AOdUAcy4SXP+YnkerC6AfH+ldg7PDk9ESQ==
 
-vue-router@3.5.4:
-  version "3.5.4"
-  resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-3.5.4.tgz#c453c0b36bc75554de066fefc3f2a9c3212aca70"
-  integrity sha512-x+/DLAJZv2mcQ7glH2oV9ze8uPwcI+H+GgTgTmb5I55bCgY3+vXWIsqbYUzbBSZnwFHEJku4eoaH/x98veyymQ==
+vue-router@3.6.0:
+  version "3.6.0"
+  resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-3.6.0.tgz#d598616ccb9e04ee0a6dc027452c619c36e8ab08"
+  integrity sha512-pcU/wpHhsCMNkRyBKWbutP1D9+i4XlRy4dZbxb0L2MCrlbivSaea1o++wBECsK4b+dog/B0p9lajx3tUMf4UtQ==
 
 vue-sse@2.5.2:
   version "2.5.2"
