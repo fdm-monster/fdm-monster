@@ -17,7 +17,7 @@ services:
 
   fdm-monster:
     container_name: fdm-monster
-    image: davidzwa/fdm-monster:development
+    image: davidzwa/fdm-monster:develop
     restart: unless-stopped
     build:
       context: ./server
