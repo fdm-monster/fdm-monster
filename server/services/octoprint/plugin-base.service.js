@@ -57,7 +57,7 @@ class PluginBaseService {
 
   async isPluginInstalled(printerId) {
     const printerLogin = this.printersStore.getPrinterLogin(printerId);
-    return this.#findPluginFromListQuery(printerLogin);
+    return await this.#findPluginFromListQuery(printerLogin);
   }
 
   async #findPluginFromListQuery(printerLogin) {
