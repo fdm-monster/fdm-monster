@@ -28,7 +28,7 @@ class OctoPrintRoutes {
   apiPlugin = `${this.apiBase}/plugin`;
   apiPluginManager = `${this.apiPlugin}/pluginmanager`; // GET is deprecated, POST is in use
 
-  pluginsBase = `${this.octoPrintBase}plugins`;
+  pluginsBase = `${this.octoPrintBase}plugin`;
   pluginSoftwareUpdate = `${this.pluginsBase}/softwareupdate`;
   pluginSoftwareUpdateCheck = `${this.pluginSoftwareUpdate}/check`; // GET
   pluginSoftwareUpdateUpdate = `${this.pluginSoftwareUpdate}/update`; // POST
