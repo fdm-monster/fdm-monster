@@ -57,11 +57,11 @@ class PluginFirmwareUpdateController {
   }
 
   async configurePrinterFirmwareUpdaterPlugin(req, res) {
-    const isInstalled = await this.#pluginFirmwareUpdateService.isPluginInstalled();
-
     const { currentPrinterId } = getScopedPrinter(req);
+
+    const isInstalled = await this.#pluginFirmwareUpdateService.isPluginInstalled(currentPrinterId);
     if (!isInstalled) {
-      this.#lo;
+      this.#logger.info("Installing firmware-update plugin");
       await this.#pluginFirmwareUpdateService.installPlugin(currentPrinterId);
     }
   }

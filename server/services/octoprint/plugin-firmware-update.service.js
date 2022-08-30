@@ -116,9 +116,9 @@ class PluginFirmwareUpdateService extends PluginBaseService {
     return firmware;
   }
 
-  sendPrusaRamboConfiguration() {}
+  configurePrusaRamboAvrUpdateProfile() {}
 
-  triggerFirmwareUpdate() {}
+  flashPrusaFirmware() {}
 }
 
 module.exports = {

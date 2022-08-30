@@ -8,14 +8,13 @@ const {
 } = require("../exceptions/runtime.exceptions");
 const { AppConstants } = require("../server.constants");
 
-// https://dev.to/rajajaganathan/express-scalable-way-to-handle-errors-1kd6
 function exceptionHandler(err, req, res, next) {
   const isTest = process.env.NODE_ENV === AppConstants.defaultTestEnv;
   if (!isTest) {
     console.error("[API Exception Handler]", err.stack);
   }
   if (err.isAxiosError) {
-    const code = err.response?.status;
+    const code = err.response?.status || 500;
     return res.status(code).send({
       error: "External API call failed",
       type: "axios-error",
