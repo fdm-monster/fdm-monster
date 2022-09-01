@@ -833,10 +833,10 @@
   dependencies:
     path-to-regexp "0.2.5"
 
-"@nestjs/swagger@6.1.0":
-  version "6.1.0"
-  resolved "https://registry.yarnpkg.com/@nestjs/swagger/-/swagger-6.1.0.tgz#a22a972eda8c202f63d3147bc57cc5e00e8dff97"
-  integrity sha512-Lflplv216nXkH6By/jMggQjpuH1V67M07tgHXUAZujAwG3LAJ1CfSvzuFckK4MAb54xQTYvFgfVPWkXqvKXzdA==
+"@nestjs/swagger@6.1.1":
+  version "6.1.1"
+  resolved "https://registry.yarnpkg.com/@nestjs/swagger/-/swagger-6.1.1.tgz#0f8716458f13800dd04a898c06647788b60f5df6"
+  integrity sha512-csCVDIpGm7Bc63lc/QdmXSTvOZICgsTK91rEPOZHn9mzqUZVjnCfWo4bFi678a5Ue1LoqdZBLSyKBbcit/JnRw==
   dependencies:
     "@nestjs/mapped-types" "1.1.0"
     js-yaml "4.1.0"
