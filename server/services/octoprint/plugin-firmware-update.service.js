@@ -3,6 +3,9 @@ const {
   ValidationException,
   NotImplementedException
 } = require("../../exceptions/runtime.exceptions");
+const {
+  defaultFirmwareUpdaterSettings
+} = require("./constants/firmware-update-settings.constants");
 
 const config = {
   pluginName: "firmwareupdater",
@@ -91,16 +94,17 @@ class PluginFirmwareUpdateService extends PluginBaseService {
     }
   }
 
-  async getPrinterFirmwareVersion(printer) {
-    const response = await this.#octoPrintApiService.getSystemInfo(printer);
+  async getPrinterFirmwareVersion(printerLogin) {
+    const response = await this.#octoPrintApiService.getSystemInfo(printerLogin);
     const systemInfo = response.systeminfo;
 
+    // @todo If this fails, the printer most likely is not connected...
     if (
       !Object.keys(systemInfo).includes(connectivityProp) ||
       !Object.keys(systemInfo).includes(firmwareProp)
     ) {
       throw new ValidationException(
-        "Could not retrieve printer firmware version as the OctoPrint response was not recognized"
+        "Could not retrieve printer firmware version as the OctoPrint response was not recognized. Is it connected?"
       );
     }
 
@@ -119,16 +123,20 @@ class PluginFirmwareUpdateService extends PluginBaseService {
     return firmware;
   }
 
-  async getPluginFirmwareStatus(printer) {
-    return await this.#octoPrintApiService.getPluginFirmwareUpdateStatus(printer);
+  async getPluginFirmwareStatus(printerLogin) {
+    return await this.#octoPrintApiService.getPluginFirmwareUpdateStatus(printerLogin);
   }
 
-  configurePrusaRamboAvrUpdateProfile() {}
+  async configureFirmwareUpdaterSettings(printerLogin) {
+    return await this.#octoPrintApiService.updateFirmwareUpdaterSettings(
+      printerLogin,
+      defaultFirmwareUpdaterSettings
+    );
+  }
 
-  async flashPrusaFirmware(printer) {
+  async flashPrusaFirmware(printerLogin) {
     // todo setup BG task to track progress
-    // return await this.#octoPrintApiService.postPluginFirmwareUpdateFlash(printer);
-    throw new NotImplementedException();
+    return await this.#octoPrintApiService.postPluginFirmwareUpdateFlash(printerLogin);
   }
 }
 

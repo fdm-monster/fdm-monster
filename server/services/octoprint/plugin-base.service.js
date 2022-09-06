@@ -79,53 +79,67 @@ class PluginBaseService {
     );
   }
 
-  async installPlugin(printerId, restartAfter = false) {
-    const printer = this.printersStore.getPrinterLogin(printerId);
+  async installPlugin(printerLogin, restartAfter = false) {
     const command = pluginManagerCommands.install.name;
     const plugin = this.pluginRepositoryCache.getPlugin(this.pluginName);
-    await this.octoPrintApiService.postApiPluginManagerCommand(printer, command, plugin.archive);
+    await this.octoPrintApiService.postApiPluginManagerCommand(
+      printerLogin,
+      command,
+      plugin.archive
+    );
 
-    await this.#conditionalRestartCommand(printer, restartAfter);
+    await this.#conditionalRestartCommand(printerLogin, restartAfter);
   }
 
-  async uninstallPlugin(printerId, restartAfter = false) {
-    const printer = this.printersStore.getPrinterLogin(printerId);
+  async uninstallPlugin(printerLogin, restartAfter = false) {
     const command = pluginManagerCommands.uninstall.name;
-    await this.octoPrintApiService.postApiPluginManagerCommand(printer, command, this.pluginName);
+    await this.octoPrintApiService.postApiPluginManagerCommand(
+      printerLogin,
+      command,
+      this.pluginName
+    );
 
-    await this.#conditionalRestartCommand(printer, restartAfter);
+    await this.#conditionalRestartCommand(printerLogin, restartAfter);
   }
 
-  async enablePlugin(printerId, restartAfter = false) {
-    const printer = this.printersStore.getPrinterLogin(printerId);
+  async enablePlugin(printerLogin, restartAfter = false) {
     const command = pluginManagerCommands.enable.name;
-    await this.octoPrintApiService.postApiPluginManagerCommand(printer, command, this.pluginName);
+    await this.octoPrintApiService.postApiPluginManagerCommand(
+      printerLogin,
+      command,
+      this.pluginName
+    );
 
-    await this.#conditionalRestartCommand(printer, restartAfter);
+    await this.#conditionalRestartCommand(printerLogin, restartAfter);
   }
 
-  async disablePlugin(printerId, restartAfter = false) {
-    const printer = this.printersStore.getPrinterLogin(printerId);
+  async disablePlugin(printerLogin, restartAfter = false) {
     const command = pluginManagerCommands.disable.name;
-    await this.octoPrintApiService.postApiPluginManagerCommand(printer, command, this.pluginName);
+    await this.octoPrintApiService.postApiPluginManagerCommand(
+      printerLogin,
+      command,
+      this.pluginName
+    );
 
-    await this.#conditionalRestartCommand(printer, restartAfter);
+    await this.#conditionalRestartCommand(printerLogin, restartAfter);
   }
 
-  async cleanupPlugin(printerId, restartAfter = false) {
-    const printer = this.printersStore.getPrinterLogin(printerId);
+  async cleanupPlugin(printerLogin, restartAfter = false) {
     const command = pluginManagerCommands.cleanup.name;
-    await this.octoPrintApiService.postApiPluginManagerCommand(printer, command, this.pluginName);
+    await this.octoPrintApiService.postApiPluginManagerCommand(
+      printerLogin,
+      command,
+      this.pluginName
+    );
 
-    await this.#conditionalRestartCommand(printer, restartAfter);
+    await this.#conditionalRestartCommand(printerLogin, restartAfter);
   }
 
-  async cleanupAllPlugins(printerId, restartAfter = false) {
-    const printer = this.printersStore.getPrinterLogin(printerId);
+  async cleanupAllPlugins(printerLogin, restartAfter = false) {
     const command = pluginManagerCommands.cleanup_all.name;
-    await this.octoPrintApiService.postApiPluginManagerCommand(printer, command);
+    await this.octoPrintApiService.postApiPluginManagerCommand(printerLogin, command);
 
-    await this.#conditionalRestartCommand(printer, restartAfter);
+    await this.#conditionalRestartCommand(printerLogin, restartAfter);
   }
 
   async #conditionalRestartCommand(printerLogin, restartAfter = false) {

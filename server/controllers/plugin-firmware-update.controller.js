@@ -22,10 +22,10 @@ class PluginFirmwareUpdateController {
   }
 
   async listUpdateState(req, res) {
-    let result = await this.#cacheManager.get(cacheKey);
-    if (!result) {
-      result = await this.#performScanOnPrinters();
-    }
+    // let result = await this.#cacheManager.get(cacheKey);
+    // if (!result) {
+    const result = await this.#performScanOnPrinters();
+    // }
     res.send(result);
   }
 
@@ -83,16 +83,34 @@ class PluginFirmwareUpdateController {
     res.send(status);
   }
 
+  async configurePluginSettings(req, res) {
+    const { printerLogin } = getScopedPrinter(req);
+    const response = await this.#pluginFirmwareUpdateService.configureFirmwareUpdaterSettings(
+      printerLogin
+    );
+    res.send(response);
+  }
+
+  async flashFirmware(req, res) {
+    const { printerLogin } = getScopedPrinter(req);
+    await this.#pluginFirmwareUpdateService.flashPrusaFirmware(printerLogin);
+
+    res.send({});
+  }
+
   async #performScanOnPrinters() {
     const printers = this.#printersStore.listPrinterStates();
     const printerFirmwareStates = [];
     const failureStates = [];
     for (let printer of printers) {
       try {
-        const version = await this.#pluginFirmwareUpdateService.getPrinterFirmwareVersion(
-          printer.getLoginDetails()
-        );
-        const isInstalled = await this.#pluginFirmwareUpdateService.isPluginInstalled(printer.id);
+        const loginDetails = printer.getLoginDetails();
+        const isInstalled = await this.#pluginFirmwareUpdateService.isPluginInstalled(loginDetails);
+
+        let version;
+        if (isInstalled) {
+          version = await this.#pluginFirmwareUpdateService.getPrinterFirmwareVersion(loginDetails);
+        }
 
         printerFirmwareStates.push({
           id: printer.id,
@@ -101,6 +119,7 @@ class PluginFirmwareUpdateController {
           pluginInstalled: isInstalled
         });
       } catch (e) {
+        this.#logger.warning("Firmware updater plugin scan failed", e);
         failureStates.push({
           id: printer.id,
           printerName: printer.getName(),
@@ -129,6 +148,8 @@ module.exports = createController(PluginFirmwareUpdateController)
   .post("/releases/sync", "syncFirmwareReleasesCache")
   .post("/scan", "scanPrinterFirmwareVersions")
   .post("/download-firmware", "downloadFirmware")
+  .post("/:id/install-firmware-update-plugin", "installFirmwareUpdatePlugin")
   .get("/:id/is-plugin-installed", "isPluginInstalled")
+  .post("/:id/configure-plugin-settings", "configurePluginSettings")
   .get("/:id/status", "getFirmwareUpdaterStatus")
-  .post("/:id/install-firmware-update-plugin", "installFirmwareUpdatePlugin");
+  .post("/:id/flash-firmware", "flashFirmware");

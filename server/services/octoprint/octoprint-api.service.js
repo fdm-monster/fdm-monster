@@ -66,6 +66,13 @@ class OctoPrintApiService extends OctoPrintRoutes {
     return processResponse(response, responseOptions);
   }
 
+  async updateFirmwareUpdaterSettings(printer, firmwareUpdateConfig, responseOptions) {
+    const { url, options } = this._prepareRequest(printer, this.apiSettingsPart);
+    const settingPatch = this.pluginFirmwareUpdaterSettings(firmwareUpdateConfig);
+    const response = await this._httpClient.post(url, settingPatch, options);
+    return processResponse(response, responseOptions);
+  }
+
   async setGCodeAnalysis(printer, { enabled }, responseOptions) {
     const { url, options } = this._prepareRequest(printer, this.apiSettingsPart);
     const settingPatch = this.gcodeAnalysisSetting(enabled);
@@ -271,7 +278,7 @@ class OctoPrintApiService extends OctoPrintRoutes {
     return processResponse(response, responseOptions);
   }
 
-  async getPluginFirmwareUpdateFlash(printer, hardwareFlashCommand, responseOptions) {
+  async postPluginFirmwareUpdateFlash(printer, hardwareFlashCommand, responseOptions) {
     const { url, options } = this._prepareRequest(printer, this.pluginFirmwareUpdaterFlash);
 
     const response = await this._httpClient.post(url, hardwareFlashCommand, options);

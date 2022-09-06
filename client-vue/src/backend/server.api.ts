@@ -50,6 +50,10 @@ export class ServerApi {
     `${ServerApi.customGCodeRoute}/send-emergency-m112/${id}`;
   static installFirmwareUpdatePluginRoute = (id: string) =>
     `${ServerApi.pluginFirmwareUpdateRoute}/${id}/install-firmware-update-plugin`;
+  static configurePluginSettingsRoute = (id: string) =>
+    `${ServerApi.pluginFirmwareUpdateRoute}/${id}/configure-plugin-settings`;
+  static flashFirmwareRoute = (id: string) =>
+    `${ServerApi.pluginFirmwareUpdateRoute}/${id}/flash-firmware`;
   static updatePrinterGroupNameRoute = (id: string) => `${ServerApi.getPrinterGroupRoute(id)}/name`;
   static printerFilesClearRoute = (id: string) => `${ServerApi.printerFilesRoute}/${id}/clear`;
   static printerFilesSelectAndPrintRoute = (id: string) =>

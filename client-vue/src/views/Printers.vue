@@ -115,11 +115,12 @@
         <v-btn :disabled="isPluginInstalled(item)" @click="installPlugin(item)">
           Install plugin
         </v-btn>
-        <v-btn @click="restartOctoPrint(item)"> Restart</v-btn>
+        <v-btn @click="restartOctoPrint(item)"> Restart OctoPrint</v-btn>
+        <v-btn @click="configureFirmwareUpdaterSettings(item)"> Configure</v-btn>
         <v-btn
           color="primary"
-          @click="updateFirmware(item)"
-          :disabled="true || !isUpdatableFirmware(item.firmware)"
+          @click="flashFirmwareUpdate(item)"
+          :disabled="isVirtualFirmware(item.firmware) || !isUpdatableFirmware(item.firmware)"
         >
           <v-icon>updates</v-icon>
           Update {{ isVirtualFirmware(item.firmware) ? "(VIRTUAL)" : "" }}
@@ -249,7 +250,7 @@ export default class Printers extends Vue {
   isUpdatableFirmware(firmwareTag: string) {
     const firmwareTagUpper = firmwareTag?.toUpperCase();
     if (!firmwareTagUpper) return false;
-    if (this.isVirtualFirmware(firmwareTag)) return false;
+    return !this.isVirtualFirmware(firmwareTag);
   }
 
   isPluginInstalled(printer: Printer) {
@@ -270,8 +271,12 @@ export default class Printers extends Vue {
     await PrintersService.restartOctoPrint(printer.id);
   }
 
-  async updateFirmware(printer: Printer) {
-    //TODO
+  async configureFirmwareUpdaterSettings(printer: Printer) {
+    await PrinterFirmwareUpdateService.configureFirmwareUpdaterSettings(printer.id);
+  }
+
+  async flashFirmwareUpdate(printer: Printer) {
+    await PrinterFirmwareUpdateService.flashFirmwareUpdate(printer.id);
   }
 
   openEditDialog(printer: Printer) {

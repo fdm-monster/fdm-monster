@@ -37,11 +37,8 @@ class OctoPrintRoutes {
   pluginFirmwareUpdaterFlash = `${this.pluginsBase}/firmwareupdater/flash`; // POST
   pluginManager = `${this.pluginsBase}/pluginmanager`;
   pluginManagerPlugins = `${this.pluginManager}/plugins`; // Fast
-  pluginManagerPlugin = (pluginName) => `${this.pluginManager}/${pluginName}`;
   pluginManagerExport = `${this.pluginManager}/export`;
   pluginManagerOrphans = `${this.pluginManager}/orphans`;
-  pluginManagerRepository = (refresh = false) =>
-    `${this.pluginManager}/repository?refresh=${refresh}`;
   _settingsStore;
   _timeouts;
 
@@ -60,6 +57,11 @@ class OctoPrintRoutes {
   get connectCommand() {
     return { command: "connect" };
   }
+
+  pluginManagerPlugin = (pluginName) => `${this.pluginManager}/${pluginName}`;
+
+  pluginManagerRepository = (refresh = false) =>
+    `${this.pluginManager}/repository?refresh=${refresh}`;
 
   apiFile = (path) => `${this.apiFilesLocation}/${path}`;
 
@@ -80,6 +82,14 @@ class OctoPrintRoutes {
     return {
       gcodeAnalysis: {
         runAt: enabled ? "idle" : "never"
+      }
+    };
+  }
+
+  pluginFirmwareUpdaterSettings(subsettings) {
+    return {
+      plugins: {
+        firmwareupdater: subsettings
       }
     };
   }

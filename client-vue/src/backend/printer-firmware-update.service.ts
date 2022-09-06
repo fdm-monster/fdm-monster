@@ -12,6 +12,16 @@ export class PrinterFirmwareUpdateService extends BaseService {
     return (await this.postApi(path)) as PrinterInstalledResponse;
   }
 
+  static async configureFirmwareUpdaterSettings(printerId: string) {
+    const path = `${ServerApi.configurePluginSettingsRoute(printerId)}`;
+    return (await this.postApi(path)) as any; // Generic settings object
+  }
+
+  static async flashFirmwareUpdate(printerId: string) {
+    const path = `${ServerApi.flashFirmwareRoute(printerId)}`;
+    return (await this.postApi(path)) as any; // Generic settings object
+  }
+
   static async loadFirmwareUpdateState() {
     const path = `${ServerApi.pluginFirmwareUpdateRoute}`;
 
