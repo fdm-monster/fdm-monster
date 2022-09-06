@@ -1,8 +1,5 @@
 const { PluginBaseService } = require("./plugin-base.service");
-const {
-  ValidationException,
-  NotImplementedException
-} = require("../../exceptions/runtime.exceptions");
+const { ValidationException } = require("../../exceptions/runtime.exceptions");
 const {
   defaultFirmwareUpdaterSettings
 } = require("./constants/firmware-update-settings.constants");
@@ -86,6 +83,7 @@ class PluginFirmwareUpdateService extends PluginBaseService {
     const downloadUrl = firmwareAsset.browser_download_url;
     const downloadName = firmwareAsset.name;
     this._logger.info(`Checking firmware ${downloadName}`);
+    console.log(firmwareDownloadPath);
     if (!this.#multerService.fileExists(downloadName, firmwareDownloadPath)) {
       await this.#multerService.downloadFile(downloadUrl, downloadName, firmwareDownloadPath);
       this._logger.info(`Downloaded firmware ${downloadName}`);
@@ -134,9 +132,12 @@ class PluginFirmwareUpdateService extends PluginBaseService {
     );
   }
 
-  async flashPrusaFirmware(printerLogin) {
+  async flashPrusaFirmware(currentPrinterId, printerLogin) {
     // todo setup BG task to track progress
-    return await this.#octoPrintApiService.postPluginFirmwareUpdateFlash(printerLogin);
+    return await this.#octoPrintApiService.postPluginFirmwareUpdateFlash(
+      currentPrinterId,
+      printerLogin
+    );
   }
 }
 

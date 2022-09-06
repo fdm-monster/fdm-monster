@@ -6,7 +6,7 @@ const {
 const { processResponse, processGotResponse } = require("./utils/api.utils");
 const FormData = require("form-data");
 const got = require("got");
-const { uploadProgressEvent } = require("../../constants/event.constants");
+const { uploadProgressEvent, firmwareFlashUpload } = require("../../constants/event.constants");
 const { ExternalServiceError } = require("../../exceptions/runtime.exceptions");
 const OctoPrintRoutes = require("./octoprint-api.routes");
 
@@ -208,6 +208,14 @@ class OctoPrintApiService extends OctoPrintRoutes {
     }
   }
 
+  // TODO implement when UI is ready, preferably using websocket stream and timing
+  // async getSoftwareUpdateCheck(printer, responseOptions) {
+  //   const { url, options } = this._prepareRequest(printer, this.pluginSoftwareUpdateCheck);
+  //
+  //   const response = await this._httpClient.get(url, options);
+  //   return processResponse(response, responseOptions);
+  // }
+
   async deleteFileOrFolder(printer, path, responseOptions) {
     const { url, options } = this._prepareRequest(printer, this.apiFile(path));
     const response = await this._httpClient.delete(url, options);
@@ -225,14 +233,6 @@ class OctoPrintApiService extends OctoPrintRoutes {
     const response = await this._httpClient.get(url, options);
     return processResponse(response, responseOptions);
   }
-
-  // TODO implement when UI is ready, preferably using websocket stream and timing
-  // async getSoftwareUpdateCheck(printer, responseOptions) {
-  //   const { url, options } = this._prepareRequest(printer, this.pluginSoftwareUpdateCheck);
-  //
-  //   const response = await this._httpClient.get(url, options);
-  //   return processResponse(response, responseOptions);
-  // }
 
   /**
    * Based on https://github.com/OctoPrint/OctoPrint/blob/f430257d7072a83692fc2392c683ed8c97ae47b6/src/octoprint/plugins/softwareupdate/__init__.py#L1265
@@ -278,11 +278,70 @@ class OctoPrintApiService extends OctoPrintRoutes {
     return processResponse(response, responseOptions);
   }
 
-  async postPluginFirmwareUpdateFlash(printer, hardwareFlashCommand, responseOptions) {
-    const { url, options } = this._prepareRequest(printer, this.pluginFirmwareUpdaterFlash);
+  async postPluginFirmwareUpdateFlash(
+    currentPrinterId,
+    printer,
+    hardwareFlashCommand,
+    firmwarePath,
+    responseOptions
+  ) {
+    const { url, options } = this._prepareRequest(
+      printer,
+      this.pluginFirmwareUpdaterFlash,
+      null,
+      multiPartContentType
+    );
 
-    const response = await this._httpClient.post(url, hardwareFlashCommand, options);
-    return processResponse(response, responseOptions);
+    const formData = new FormData();
+    formData.append("port", "/dev/op2");
+    formData.append("profile", "default");
+    const filename = path.basename(firmwarePath);
+    const fileReadStream = fs.createReadStream(firmwarePath);
+    formData.append("file", fileReadStream, { filename });
+
+    try {
+      const headers = {
+        ...options.headers,
+        ...formData.getHeaders()
+      };
+
+      const response = await got
+        .post(url, {
+          body: formData,
+          headers
+        })
+        .on("uploadProgress", (p) => {
+          if (currentPrinterId) {
+            this._eventEmitter2.emit(
+              `${firmwareFlashUpload(currentPrinterId)}`,
+              currentPrinterId,
+              p
+            );
+          }
+        });
+
+      return await processGotResponse(response, responseOptions);
+    } catch (e) {
+      this._eventEmitter2.emit(
+        `${uploadProgressEvent(currentPrinterId)}`,
+        currentPrinterId,
+        { failed: true },
+        e
+      );
+      let data;
+      try {
+        data = JSON.parse(e.response?.body);
+      } catch {
+        data = e.response?.body;
+      }
+      throw new ExternalServiceError({
+        error: e.message,
+        statusCode: e.response?.statusCode,
+        data,
+        success: false,
+        stack: e.stack
+      });
+    }
   }
 
   async getPluginFirmwareUpdateStatus(printer, responseOptions) {

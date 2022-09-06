@@ -8,8 +8,10 @@ const PEVENTS = {
 };
 
 const uploadProgressEvent = (token) => `upload.progress.${token}`;
+const firmwareFlashUpload = (printerId) => `firmware-upload.${printerId}`;
 
 module.exports = {
   PEVENTS,
-  uploadProgressEvent
+  uploadProgressEvent,
+  firmwareFlashUpload
 };

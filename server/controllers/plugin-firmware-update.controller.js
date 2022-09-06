@@ -92,8 +92,8 @@ class PluginFirmwareUpdateController {
   }
 
   async flashFirmware(req, res) {
-    const { printerLogin } = getScopedPrinter(req);
-    await this.#pluginFirmwareUpdateService.flashPrusaFirmware(printerLogin);
+    const { printerLogin, currentPrinterId } = getScopedPrinter(req);
+    await this.#pluginFirmwareUpdateService.flashPrusaFirmware(currentPrinterId, printerLogin);
 
     res.send({});
   }
