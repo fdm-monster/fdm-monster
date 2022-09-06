@@ -112,6 +112,7 @@
       <template v-slot:no-data> No firmware information loaded.</template>
       <template v-slot:no-results> No results</template>
       <template v-slot:item.actions="{ item }">
+        <v-btn :disabled="isPluginInstalled(item)"></v-btn>
         Feature coming soon:
         <v-btn
           color="primary"
@@ -209,11 +210,14 @@ export default class Printers extends Vue {
       value: "printerName"
     },
     {
-      text: "Firmware Label",
+      text: "Firmware Version",
       sortable: true,
       value: "firmware"
     },
-
+    {
+      text: "Plugin installed",
+      value: "pluginInstalled"
+    },
     { text: "Actions", value: "actions", sortable: false }
   ];
 
@@ -229,10 +233,8 @@ export default class Printers extends Vue {
     const result = this.firmwareReleases.sort(
       (a, b) => Date.parse(b.created_at) - Date.parse(a.created_at)
     );
-    console.log(result.map((r) => r.tag_name));
 
     if (!result?.length) return "?";
-
     return result[0].tag_name;
   }
 
@@ -248,9 +250,15 @@ export default class Printers extends Vue {
     if (this.isVirtualFirmware(firmwareTag)) return false;
   }
 
+  isPluginInstalled(printer: Printer) {
+    // awai
+    return true;
+  }
+
   async loadFirmwareData() {
     const updateStates = await PrinterFirmwareUpdateService.loadFirmwareUpdateState();
-    this.firmwareUpdateStates = updateStates?.versions || [];
+    this.firmwareUpdateStates = updateStates?.firmwareStates || [];
+    console.log(this.firmwareUpdateStates);
   }
 
   async updateFirmware(printer: Printer) {

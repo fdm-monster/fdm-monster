@@ -7,16 +7,14 @@ const printerLoginToken = "printerLogin";
 
 const printerResolveMiddleware = (key = "id") => {
   return (req, res, next) => {
-    const loggerFactory = req.container.resolve(DITokens.loggerFactory);
+    // const loggerFactory = req.container.resolve(DITokens.loggerFactory);
+    // const logger = loggerFactory("PrinterResolverMiddleware");
     const printersStore = req.container.resolve(DITokens.printersStore);
-    const logger = loggerFactory("PrinterResolverMiddleware");
 
     let scopedPrinter = undefined;
 
     if (req.params[key]) {
       scopedPrinter = printersStore.getPrinterState(req.params[key]);
-    } else {
-      logger.warn(`Could not resolve printer with id ${key}:${req.params[key]}`);
     }
 
     req.container.register({

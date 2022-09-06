@@ -12,5 +12,5 @@ export interface PrinterFirmwareStateModel {
 
 export interface PrinterFirmwareStateResponse {
   failed: PrinterFailedScanStateModel[];
-  versions: PrinterFirmwareStateModel[];
+  firmwareStates: PrinterFirmwareStateModel[];
 }
