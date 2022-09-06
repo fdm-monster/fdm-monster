@@ -52,7 +52,7 @@
     "@vue/cli-plugin-vuex": "5.0.8",
     "@vue/cli-service": "5.0.8",
     "@vue/eslint-config-prettier": "7.0.0",
-    "@vue/eslint-config-typescript": "11.0.0",
+    "@vue/eslint-config-typescript": "11.0.1",
     "@vue/test-utils": "2.0.2",
     "eslint": "8.23.0",
     "eslint-plugin-prettier": "4.2.1",
