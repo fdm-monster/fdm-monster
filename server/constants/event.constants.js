@@ -2,7 +2,9 @@
 const PEVENTS = {
   init: "init",
   current: "current",
-  event: "event"
+  event: "event",
+  reauth: "reauth",
+  plugin: "plugin"
 };
 
 const uploadProgressEvent = (token) => `upload.progress.${token}`;

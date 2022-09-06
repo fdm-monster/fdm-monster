@@ -135,13 +135,27 @@ module.exports = class OctoprintRxjsWebsocketAdapter extends GenericWebsocketAda
         serverEvents.push({ type: PEVENTS.event, data });
         break;
       case OP_WS_MSG.reauthRequired:
-        this.#logger.warn("Re-authentication required - ", header);
+        this.#logger.warning("Re-authentication required - ", header);
+        serverEvents.push({ type: PEVENTS.reauth, data });
+        break;
+      case OP_WS_MSG.plugin:
+        this.#logger.warning("Plugin message ", data);
+        serverEvents.push({ type: PEVENTS.plugin, data });
+        this.#handlePluginMessage(header, data);
         break;
       default:
         this.#logger.info("Unhandled Websocket message", data?.plugin);
     }
 
     return serverEvents;
+  }
+
+  #handlePluginMessage(header, data) {
+    let handled = false;
+
+    // switch(head)
+
+    return handled;
   }
 
   #handleCurrentStateData(data) {

@@ -112,7 +112,9 @@
       <template v-slot:no-data> No firmware information loaded.</template>
       <template v-slot:no-results> No results</template>
       <template v-slot:item.actions="{ item }">
-        <v-btn :disabled="isPluginInstalled(item)"></v-btn>
+        <v-btn :disabled="isPluginInstalled(item)" @click="installPlugin(item)"
+          >Install plugin</v-btn
+        >
         Feature coming soon:
         <v-btn
           color="primary"
@@ -251,14 +253,17 @@ export default class Printers extends Vue {
   }
 
   isPluginInstalled(printer: Printer) {
-    // awai
-    return true;
+    const firmwarePluginState = this.firmwareUpdateStates.find((f) => f.id === printer.id);
+    return firmwarePluginState?.pluginInstalled || false;
   }
 
   async loadFirmwareData() {
     const updateStates = await PrinterFirmwareUpdateService.loadFirmwareUpdateState();
     this.firmwareUpdateStates = updateStates?.firmwareStates || [];
-    console.log(this.firmwareUpdateStates);
+  }
+
+  async installPlugin(printer: Printer) {
+    await PrinterFirmwareUpdateService.installPlugin(printer.id);
   }
 
   async updateFirmware(printer: Printer) {

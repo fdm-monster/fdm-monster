@@ -63,7 +63,7 @@ class PluginFirmwareUpdateController {
     res.send({ isInstalled });
   }
 
-  async configurePrinterFirmwareUpdaterPlugin(req, res) {
+  async installFirmwareUpdatePlugin(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
 
     const isInstalled = await this.#pluginFirmwareUpdateService.isPluginInstalled(currentPrinterId);
@@ -124,4 +124,4 @@ module.exports = createController(PluginFirmwareUpdateController)
   .post("/scan", "scanPrinterFirmwareVersions")
   .post("/download-firmware", "downloadFirmware")
   .get("/:id/is-plugin-installed", "isPluginInstalled")
-  .post("/:id/prepare-update-plugin", "configurePrinterFirmwareUpdaterPlugin");
+  .post("/:id/install-firmware-update-plugin", "installFirmwareUpdatePlugin");

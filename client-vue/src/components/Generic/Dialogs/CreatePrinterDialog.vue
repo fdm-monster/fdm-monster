@@ -107,7 +107,7 @@ export default class CreatePrinterDialog extends Vue {
       return;
     }
 
-    const jsonData = !this.isClipboardApiAvailable()
+    const jsonData = this.isClipboardApiAvailable()
       ? await navigator.clipboard.readText()
       : this.copyPasteConnectionString;
     const printerObject = JSON.parse(jsonData);
