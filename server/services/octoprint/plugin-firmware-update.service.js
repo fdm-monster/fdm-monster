@@ -1,5 +1,8 @@
 const { PluginBaseService } = require("./plugin-base.service");
-const { ValidationException } = require("../../exceptions/runtime.exceptions");
+const {
+  ValidationException,
+  NotImplementedException
+} = require("../../exceptions/runtime.exceptions");
 
 const config = {
   pluginName: "firmwareupdater",
@@ -116,9 +119,17 @@ class PluginFirmwareUpdateService extends PluginBaseService {
     return firmware;
   }
 
+  async getPluginFirmwareStatus(printer) {
+    return await this.#octoPrintApiService.getPluginFirmwareUpdateStatus(printer);
+  }
+
   configurePrusaRamboAvrUpdateProfile() {}
 
-  flashPrusaFirmware() {}
+  async flashPrusaFirmware(printer) {
+    // todo setup BG task to track progress
+    // return await this.#octoPrintApiService.postPluginFirmwareUpdateFlash(printer);
+    throw new NotImplementedException();
+  }
 }
 
 module.exports = {

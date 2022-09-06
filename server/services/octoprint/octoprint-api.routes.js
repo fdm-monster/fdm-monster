@@ -32,6 +32,9 @@ class OctoPrintRoutes {
   pluginSoftwareUpdate = `${this.pluginsBase}/softwareupdate`;
   pluginSoftwareUpdateCheck = `${this.pluginSoftwareUpdate}/check`; // GET
   pluginSoftwareUpdateUpdate = `${this.pluginSoftwareUpdate}/update`; // POST
+  pluginFirmwareUpdater = `${this.pluginsBase}/firmwareupdater`;
+  pluginFirmwareUpdaterStatus = `${this.pluginsBase}/firmwareupdater/status`; // GET
+  pluginFirmwareUpdaterFlash = `${this.pluginsBase}/firmwareupdater/flash`; // POST
   pluginManager = `${this.pluginsBase}/pluginmanager`;
   pluginManagerPlugins = `${this.pluginManager}/plugins`; // Fast
   pluginManagerPlugin = (pluginName) => `${this.pluginManager}/${pluginName}`;

@@ -36,8 +36,7 @@ class PluginBaseService {
     return this.#pluginName;
   }
 
-  async isPluginUpToDate(printerId) {
-    const printerLogin = this.printersStore.getPrinterLogin(printerId);
+  async isPluginUpToDate(printerLogin) {
     const response = await this.#queryInstalledPlugin(printerLogin);
 
     const result = this.pluginRepositoryCache.getPlugin(this.pluginName);
@@ -55,8 +54,7 @@ class PluginBaseService {
     return response.plugin;
   }
 
-  async isPluginInstalled(printerId) {
-    const printerLogin = this.printersStore.getPrinterLogin(printerId);
+  async isPluginInstalled(printerLogin) {
     const foundPlugin = await this.#findPluginFromListQuery(printerLogin);
     return !!foundPlugin;
   }
@@ -73,10 +71,9 @@ class PluginBaseService {
     return pluginList.find((p) => p.key.toLowerCase() === this.pluginName.toLowerCase());
   }
 
-  async updatePlugin(printerId) {
-    const printer = this.printersStore.getPrinterLogin(printerId);
+  async updatePlugin(printerLogin) {
     return await this.octoPrintApiService.postSoftwareUpdate(
-      printer,
+      printerLogin,
       [this.pluginName],
       this.#pluginUrl
     );

@@ -271,6 +271,20 @@ class OctoPrintApiService extends OctoPrintRoutes {
     return processResponse(response, responseOptions);
   }
 
+  async getPluginFirmwareUpdateFlash(printer, hardwareFlashCommand, responseOptions) {
+    const { url, options } = this._prepareRequest(printer, this.pluginFirmwareUpdaterFlash);
+
+    const response = await this._httpClient.post(url, hardwareFlashCommand, options);
+    return processResponse(response, responseOptions);
+  }
+
+  async getPluginFirmwareUpdateStatus(printer, responseOptions) {
+    const { url, options } = this._prepareRequest(printer, this.pluginFirmwareUpdaterStatus);
+
+    const response = await this._httpClient.get(url, options);
+    return processResponse(response, responseOptions);
+  }
+
   /**
    * Does not require printer login, much faster, requires internet connectivity
    * @param responseOptions
