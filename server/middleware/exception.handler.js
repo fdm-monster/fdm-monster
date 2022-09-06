@@ -11,7 +11,7 @@ const { AppConstants } = require("../server.constants");
 function exceptionHandler(err, req, res, next) {
   const isTest = process.env.NODE_ENV === AppConstants.defaultTestEnv;
   if (!isTest) {
-    console.error("[API Exception Handler]", err.stack);
+    console.error("[API Exception Handler]", err.stack || err?.response?.data);
   }
   if (err.isAxiosError) {
     const code = err.response?.status || 500;

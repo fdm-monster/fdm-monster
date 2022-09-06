@@ -1,5 +1,4 @@
-const clientSettingsUpdateRules = {
-};
+const clientSettingsUpdateRules = {};
 
 module.exports = {
   clientSettingsUpdateRules

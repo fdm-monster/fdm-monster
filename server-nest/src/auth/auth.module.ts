@@ -37,8 +37,7 @@ import { SettingsModule } from "../settings/settings.module";
 export class AuthModule {
   private logger = new Logger(AuthModule.name);
 
-  constructor(private userService: UsersService) {
-  }
+  constructor(private userService: UsersService) {}
 
   async onModuleInit() {
     await this.ensureAdminUserExists();

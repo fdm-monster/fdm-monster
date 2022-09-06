@@ -112,10 +112,10 @@
       <template v-slot:no-data> No firmware information loaded.</template>
       <template v-slot:no-results> No results</template>
       <template v-slot:item.actions="{ item }">
-        <v-btn :disabled="isPluginInstalled(item)" @click="installPlugin(item)"
-          >Install plugin</v-btn
-        >
-        Feature coming soon:
+        <v-btn :disabled="isPluginInstalled(item)" @click="installPlugin(item)">
+          Install plugin
+        </v-btn>
+        <v-btn @click="restartOctoPrint(item)"> Restart</v-btn>
         <v-btn
           color="primary"
           @click="updateFirmware(item)"
@@ -264,6 +264,10 @@ export default class Printers extends Vue {
 
   async installPlugin(printer: Printer) {
     await PrinterFirmwareUpdateService.installPlugin(printer.id);
+  }
+
+  async restartOctoPrint(printer: Printer) {
+    await PrintersService.restartOctoPrint(printer.id);
   }
 
   async updateFirmware(printer: Printer) {

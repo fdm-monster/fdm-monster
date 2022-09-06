@@ -1,7 +1,7 @@
 jest.mock("child_process", () => {
   return {
     exec: () => Promise.resolve(),
-    execSync: () => Promise.resolve(),
+    execSync: () => Promise.resolve()
   };
 });
 jest.mock("simple-git");
@@ -121,7 +121,9 @@ describe("ServerUpdateService", () => {
   describe("Reboot command", () => {
     it("should not reboot FDM in unknown mode", async () => {
       await serverUpdateService.restartServer().catch((e) => {
-        expect(e.message).toBe("Restart requested, but no daemon was available to perform this action");
+        expect(e.message).toBe(
+          "Restart requested, but no daemon was available to perform this action"
+        );
       });
     });
 

@@ -15,7 +15,7 @@
     "migration:up": "migrate-mongo up",
     "migration:down": "migrate-mongo down",
     "migration:status": "migrate-mongo status",
-    "prettier": "prettier --write **/*.js",
+    "format": "prettier --write \"src/**/*.js\" \"test/**/*.js\"",
     "dev": "nodemon index.js",
     "test": "jest --forceExit"
   },

@@ -1,7 +1,7 @@
 const dbHandler = require("../db-handler");
 const { AppConstants } = require("../../server.constants");
 const { setupTestApp } = require("../test-server");
-const { expectOkResponse, expectInternalServerError} = require("../extensions");
+const { expectOkResponse, expectInternalServerError } = require("../extensions");
 const Printer = require("../../models/Printer");
 const { createTestPrinter } = require("./test-data/create-printer");
 
@@ -51,7 +51,7 @@ describe("PluginFirmwareUpdateController", () => {
     expectOkResponse(releasesResponse);
     expect(releasesResponse.body).toHaveLength(16);
 
-    httpClient.saveMockResponse([],200, false, false);
+    httpClient.saveMockResponse([], 200, false, false);
     const response = await request.post(downloadFirmwareRoute).send();
     expectInternalServerError(response);
 

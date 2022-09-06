@@ -28,7 +28,9 @@ class ServerUpdateService {
       execSync(`pm2 restart ${AppConstants.pm2ServiceName}`, { timeout: 5000 });
       return true;
     } else if (isNodemon()) {
-      execSync("echo '// Restart file for nodemon' > ./nodemon_restart_trigger.js", { timeout: 5000 });
+      execSync("echo '// Restart file for nodemon' > ./nodemon_restart_trigger.js", {
+        timeout: 5000
+      });
       return true;
     }
   }

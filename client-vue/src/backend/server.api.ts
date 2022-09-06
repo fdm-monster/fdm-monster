@@ -37,6 +37,8 @@ export class ServerApi {
   static getPrinterRoute = (id: string) => `${ServerApi.printerRoute}/${id}`;
   static getPrinterLoginDetailsRoute = (id: string) =>
     `${ServerApi.getPrinterRoute(id)}/login-details`;
+  static restartOctoPrintRoute = (id: string) =>
+    `${ServerApi.getPrinterRoute(id)}/restart-octoprint`;
   static getPrinterSettingsRoute = (id: string) => `${ServerApi.printerSettingsRoute}/${id}`;
   static setPrinterSettingsGCodeAnalysisRoute = (id: string) =>
     `${ServerApi.getPrinterSettingsRoute(id)}/gcode-analysis`;

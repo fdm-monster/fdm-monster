@@ -72,6 +72,13 @@ class PrinterController {
     res.send(printerLogin);
   }
 
+  async restartOctoprint(req, res) {
+    const { printerLogin } = getScopedPrinter(req);
+    await this.#octoPrintApiService.postSystemRestartCommand(printerLogin);
+
+    res.send({});
+  }
+
   async sendSerialConnectCommand(req, res) {
     const { printerLogin } = getScopedPrinter(req);
 
@@ -317,6 +324,7 @@ module.exports = createController(PrinterController)
     .patch("/:id", "update")
     .delete("/:id", "delete")
     .get("/:id/login-details", "getPrinterLoginDetails")
+    .post("/:id/restart-octoprint", "restartOctoprint")
     .post("/:id/serial-connect", "sendSerialConnectCommand")
     .post("/:id/serial-disconnect", "sendSerialDisconnectCommand")
     .post("/:id/job/stop", "stopPrintJob")

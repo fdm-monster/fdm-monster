@@ -140,22 +140,17 @@ module.exports = class OctoprintRxjsWebsocketAdapter extends GenericWebsocketAda
         break;
       case OP_WS_MSG.plugin:
         this.#logger.warning("Plugin message ", data);
+
         serverEvents.push({ type: PEVENTS.plugin, data });
-        this.#handlePluginMessage(header, data);
+
+        // @todo specifically distribute the handling
+        // this.#handlePluginMessage(header, data);
         break;
       default:
         this.#logger.info("Unhandled Websocket message", data?.plugin);
     }
 
     return serverEvents;
-  }
-
-  #handlePluginMessage(header, data) {
-    let handled = false;
-
-    // switch(head)
-
-    return handled;
   }
 
   #handleCurrentStateData(data) {

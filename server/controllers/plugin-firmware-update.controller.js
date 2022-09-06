@@ -104,7 +104,7 @@ class PluginFirmwareUpdateController {
     }
     const result = {
       firmwareStates: printerFirmwareStates,
-      failures: failureStates,
+      failures: failureStates
     };
     this.#cacheManager.set(cacheKey, result, { ttl: 3600 * 4 });
     return result;

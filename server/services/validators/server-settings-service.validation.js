@@ -6,7 +6,7 @@ const serverSettingsUpdateRules = {
   [printerFileCleanSettingKey]: "object",
   [`${printerFileCleanSettingKey}.autoRemoveOldFilesBeforeUpload`]: "boolean",
   [`${printerFileCleanSettingKey}.autoRemoveOldFilesAtBoot`]: "boolean",
-  [`${printerFileCleanSettingKey}.autoRemoveOldFilesCriteriumDays`]: "integer|min:0",
+  [`${printerFileCleanSettingKey}.autoRemoveOldFilesCriteriumDays`]: "integer|min:0"
 };
 
 module.exports = {
