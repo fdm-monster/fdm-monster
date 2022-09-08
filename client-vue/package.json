@@ -61,7 +61,7 @@
     "rimraf": "3.0.2",
     "sass": "1.54.9",
     "sass-loader": "13.0.2",
-    "typescript": "4.8.2",
+    "typescript": "4.8.3",
     "webpack": "5.74.0",
     "vue-cli-plugin-vuetify": "2.5.5",
     "vue-template-compiler": "2.7.10",
