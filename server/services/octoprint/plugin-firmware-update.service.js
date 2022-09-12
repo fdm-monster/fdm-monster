@@ -83,7 +83,6 @@ class PluginFirmwareUpdateService extends PluginBaseService {
     const downloadUrl = firmwareAsset.browser_download_url;
     const downloadName = firmwareAsset.name;
     this._logger.info(`Checking firmware ${downloadName}`);
-    console.log(firmwareDownloadPath);
     if (!this.#multerService.fileExists(downloadName, firmwareDownloadPath)) {
       await this.#multerService.downloadFile(downloadUrl, downloadName, firmwareDownloadPath);
       this._logger.info(`Downloaded firmware ${downloadName}`);

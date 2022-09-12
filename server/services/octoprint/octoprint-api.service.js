@@ -1,4 +1,5 @@
 const fs = require("fs");
+const path = require("path");
 const {
   multiPartContentType,
   pluginRepositoryUrl
@@ -278,13 +279,7 @@ class OctoPrintApiService extends OctoPrintRoutes {
     return processResponse(response, responseOptions);
   }
 
-  async postPluginFirmwareUpdateFlash(
-    currentPrinterId,
-    printer,
-    hardwareFlashCommand,
-    firmwarePath,
-    responseOptions
-  ) {
+  async postPluginFirmwareUpdateFlash(currentPrinterId, printer, firmwarePath, responseOptions) {
     const { url, options } = this._prepareRequest(
       printer,
       this.pluginFirmwareUpdaterFlash,
