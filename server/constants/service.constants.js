@@ -71,60 +71,6 @@ function getDefaultHistoryStatistics() {
   };
 }
 
-/**
- * Get an empty associative array with empty tool and bed temperature data objects
- * @returns {({data: [], name: string}|{data: [], name: string}|{data: [], name: string}|{data: [], name: string}|{data: [], name: string})[]}
- */
-function getEmptyToolTemperatureArray() {
-  return [
-    {
-      name: "Actual Tool",
-      data: []
-    },
-    {
-      name: "Target Tool",
-      data: []
-    },
-    {
-      name: "Actual Bed",
-      data: []
-    },
-    {
-      name: "Target Bed",
-      data: []
-    },
-    {
-      name: "Actual Chamber",
-      data: []
-    },
-    {
-      name: "Target Chamber",
-      data: []
-    }
-  ];
-}
-
-/**
- * Default model properties for history entries saved to database
- * @returns {{fileName: string, notes: string, endDate: string, spoolUsed: string, success: boolean, filePath: string, printerName: string, printerIndex: number, filamentLength: number, startDate: string, printTime: string, filamentVolume: number}}
- */
-function getDefaultHistoryEntry() {
-  return {
-    printerIndex: 0,
-    printerName: "",
-    success: true,
-    fileName: "",
-    filePath: "",
-    startDate: "",
-    endDate: "",
-    printTime: "",
-    spoolUsed: "",
-    filamentLength: 0,
-    filamentVolume: 0,
-    notes: ""
-  };
-}
-
 const getWolPowerSubSettingsDefault = () => {
   return {
     enabled: false,
@@ -218,7 +164,6 @@ class Status {
 module.exports = {
   getDefaultFileStatistics,
   getDefaultHistoryStatistics,
-  getEmptyToolTemperatureArray,
   DEFAULT_SPOOL_DENSITY,
   DEFAULT_SPOOL_RATIO,
   ALL_MONTHS,
@@ -228,7 +173,6 @@ module.exports = {
   getPowerSettingsDefault,
   getWolPowerSubSettingsDefault,
   getFileListDefault,
-  getDefaultHistoryEntry,
   getDefaultPrinterEntry,
   UUID_LENGTH,
   minPrinterGroupNameLength,
