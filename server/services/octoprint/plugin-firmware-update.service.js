@@ -3,6 +3,7 @@ const { ValidationException } = require("../../exceptions/runtime.exceptions");
 const {
   defaultFirmwareUpdaterSettings
 } = require("./constants/firmware-update-settings.constants");
+const { AppConstants } = require("../../server.constants");
 
 const config = {
   pluginName: "firmwareupdater",
@@ -132,10 +133,12 @@ class PluginFirmwareUpdateService extends PluginBaseService {
   }
 
   async flashPrusaFirmware(currentPrinterId, printerLogin) {
+    const latestHexFilePath = this.#multerService.getNewestFile(firmwareDownloadPath);
     // todo setup BG task to track progress
     return await this.#octoPrintApiService.postPluginFirmwareUpdateFlash(
       currentPrinterId,
-      printerLogin
+      printerLogin,
+      latestHexFilePath
     );
   }
 }
