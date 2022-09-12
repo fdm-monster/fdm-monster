@@ -89,11 +89,11 @@ describe("PluginFirmwareUpdateController", () => {
     expectOkResponse(response);
   });
 
-  it("should trigger flash firmware action", async () => {
+  it("should not trigger flash firmware action on illegal files", async () => {
     const testPrinter = await createTestPrinter(request);
     httpClient.saveMockResponse({ flashing: true }, 200);
     const response = await request.post(flashFirmwareRoute(testPrinter.id)).send();
-    expectOkResponse(response, { flashing: true });
+    expect(response).not.toBe(200);
   });
 
   // This is too intrusive still (needs fs isolation)
