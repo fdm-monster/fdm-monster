@@ -20,8 +20,14 @@ class CustomGCodeController {
   }
 
   async list(req, res) {
-    const allScripts = await this.#customGCodeService.list();
-    res.send(allScripts);
+    const entities = await this.#customGCodeService.list();
+    res.send(entities);
+  }
+
+  async get(req, res) {
+    const { id } = await validateInput(req.params, idRules);
+    const entity = await this.#customGCodeService.get(id);
+    res.send(entity);
   }
 
   /**

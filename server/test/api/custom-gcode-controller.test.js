@@ -68,9 +68,13 @@ describe("CustomGCodeController", () => {
     });
   });
 
-  it("should delete existing gcode script", async function () {
+  it("should delete existing gcode script", async () => {
     const gcodeScript = await createNormalGCodeScript(request);
     const response = await request.delete(updateRoute(gcodeScript._id)).send();
     expectOkResponse(response);
+  });
+
+  it("should not get non-existing gcode script", async () => {
+    expect(request.get(getRoute("fake")).send()).rejects.toBeTruthy();
   });
 });
