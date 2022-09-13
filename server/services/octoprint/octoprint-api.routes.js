@@ -28,17 +28,17 @@ class OctoPrintRoutes {
   apiPlugin = `${this.apiBase}/plugin`;
   apiPluginManager = `${this.apiPlugin}/pluginmanager`; // GET is deprecated, POST is in use
 
-  pluginsBase = `${this.octoPrintBase}/plugins`;
+  pluginsBase = `${this.octoPrintBase}plugin`;
   pluginSoftwareUpdate = `${this.pluginsBase}/softwareupdate`;
   pluginSoftwareUpdateCheck = `${this.pluginSoftwareUpdate}/check`; // GET
   pluginSoftwareUpdateUpdate = `${this.pluginSoftwareUpdate}/update`; // POST
+  pluginFirmwareUpdater = `${this.pluginsBase}/firmwareupdater`;
+  pluginFirmwareUpdaterStatus = `${this.pluginsBase}/firmwareupdater/status`; // GET
+  pluginFirmwareUpdaterFlash = `${this.pluginsBase}/firmwareupdater/flash`; // POST
   pluginManager = `${this.pluginsBase}/pluginmanager`;
   pluginManagerPlugins = `${this.pluginManager}/plugins`; // Fast
-  pluginManagerPlugin = (pluginName) => `${this.pluginManager}/${pluginName}`;
   pluginManagerExport = `${this.pluginManager}/export`;
   pluginManagerOrphans = `${this.pluginManager}/orphans`;
-  pluginManagerRepository = (refresh = false) =>
-    `${this.pluginManager}/repository?refresh=${refresh}`;
   _settingsStore;
   _timeouts;
 
@@ -57,6 +57,11 @@ class OctoPrintRoutes {
   get connectCommand() {
     return { command: "connect" };
   }
+
+  pluginManagerPlugin = (pluginName) => `${this.pluginManager}/${pluginName}`;
+
+  pluginManagerRepository = (refresh = false) =>
+    `${this.pluginManager}/repository?refresh=${refresh}`;
 
   apiFile = (path) => `${this.apiFilesLocation}/${path}`;
 
@@ -77,6 +82,14 @@ class OctoPrintRoutes {
     return {
       gcodeAnalysis: {
         runAt: enabled ? "idle" : "never"
+      }
+    };
+  }
+
+  pluginFirmwareUpdaterSettings(subsettings) {
+    return {
+      plugins: {
+        firmwareupdater: subsettings
       }
     };
   }

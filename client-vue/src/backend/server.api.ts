@@ -37,6 +37,8 @@ export class ServerApi {
   static getPrinterRoute = (id: string) => `${ServerApi.printerRoute}/${id}`;
   static getPrinterLoginDetailsRoute = (id: string) =>
     `${ServerApi.getPrinterRoute(id)}/login-details`;
+  static restartOctoPrintRoute = (id: string) =>
+    `${ServerApi.getPrinterRoute(id)}/restart-octoprint`;
   static getPrinterSettingsRoute = (id: string) => `${ServerApi.printerSettingsRoute}/${id}`;
   static setPrinterSettingsGCodeAnalysisRoute = (id: string) =>
     `${ServerApi.getPrinterSettingsRoute(id)}/gcode-analysis`;
@@ -46,6 +48,12 @@ export class ServerApi {
     `${ServerApi.getPrinterGroupRoute(id)}/printer?`;
   static sendEmergencyM112Route = (id: string) =>
     `${ServerApi.customGCodeRoute}/send-emergency-m112/${id}`;
+  static installFirmwareUpdatePluginRoute = (id: string) =>
+    `${ServerApi.pluginFirmwareUpdateRoute}/${id}/install-firmware-update-plugin`;
+  static configurePluginSettingsRoute = (id: string) =>
+    `${ServerApi.pluginFirmwareUpdateRoute}/${id}/configure-plugin-settings`;
+  static flashFirmwareRoute = (id: string) =>
+    `${ServerApi.pluginFirmwareUpdateRoute}/${id}/flash-firmware`;
   static updatePrinterGroupNameRoute = (id: string) => `${ServerApi.getPrinterGroupRoute(id)}/name`;
   static printerFilesClearRoute = (id: string) => `${ServerApi.printerFilesRoute}/${id}/clear`;
   static printerFilesSelectAndPrintRoute = (id: string) =>

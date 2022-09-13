@@ -113,8 +113,13 @@ class BootTask {
       });
 
       // Low priority tasks
-      await this.pluginRepositoryCache.queryCache();
-      await this.pluginFirmwareUpdateService.queryGithubPrusaFirmwareReleasesCache();
+      try {
+        await this.pluginRepositoryCache.queryCache();
+        await this.pluginFirmwareUpdateService.queryGithubPrusaFirmwareReleasesCache();
+        await this.pluginFirmwareUpdateService.downloadFirmware();
+      } catch (e) {
+        this.#logger.warning("Could not fully complete loading of plugin firmware data");
+      }
     } else {
       this.#logger.warning("Starting in safe mode due to SAFEMODE_ENABLED");
     }

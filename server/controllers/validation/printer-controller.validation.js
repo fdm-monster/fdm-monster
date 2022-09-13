@@ -17,7 +17,7 @@ const testPrinterApiRules = {
   printerURL: "required|httpurl",
   webSocketURL: "wsurl",
   camURL: "httpurl"
-}
+};
 
 const updateSortIndexRules = {
   sortList: "required|array|minLength:1",

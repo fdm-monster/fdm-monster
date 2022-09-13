@@ -1,7 +1,11 @@
 const { AppConstants } = require("../../server.constants");
 const dbHandler = require("../db-handler");
 const { setupTestApp } = require("../test-server");
-const { expectOkResponse } = require("../extensions");
+const {
+  expectOkResponse,
+  expectInvalidResponse,
+  expectNotFoundResponse
+} = require("../extensions");
 const CustomGCode = require("../../models/CustomGCode");
 const { createTestPrinter } = require("./test-data/create-printer");
 
@@ -68,9 +72,19 @@ describe("CustomGCodeController", () => {
     });
   });
 
-  it("should delete existing gcode script", async function () {
+  it("should delete existing gcode script", async () => {
     const gcodeScript = await createNormalGCodeScript(request);
     const response = await request.delete(updateRoute(gcodeScript._id)).send();
     expectOkResponse(response);
+  });
+
+  it("should not accept bad id for gcode script", async () => {
+    const response = await request.get(getRoute("fake")).send();
+    expectInvalidResponse(response);
+  });
+
+  it("should not get non-existing gcode script", async () => {
+    const response = await request.get(getRoute("62e0e02478368d2013aff094")).send();
+    expectNotFoundResponse(response);
   });
 });

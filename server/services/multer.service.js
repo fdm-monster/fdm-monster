@@ -12,6 +12,25 @@ class MulterService {
     this.#httpClient = httpClient;
   }
 
+  #orderRecentFiles = (dir) => {
+    return fs
+      .readdirSync(dir)
+      .filter((file) => fs.lstatSync(join(dir, file)).isFile())
+      .map((file) => ({ file, mtime: fs.lstatSync(join(dir, file)).mtime }))
+      .sort((a, b) => b.mtime.getTime() - a.mtime.getTime());
+  };
+
+  #collectionPath(collection) {
+    return join(AppConstants.defaultFileStorageFolder, collection);
+  }
+
+  getNewestFile(collection) {
+    const dirPath = this.#collectionPath(collection);
+    const files = this.#orderRecentFiles(dirPath);
+    const latestFile = files.length ? files[0] : undefined;
+    return latestFile ? join(dirPath, latestFile.file) : undefined;
+  }
+
   clearUploadsFolder() {
     if (!fs.existsSync(AppConstants.defaultFileStorageFolder)) return;
 

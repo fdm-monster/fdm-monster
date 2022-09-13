@@ -49,32 +49,33 @@ describe("PluginFirmwareUpdateService", () => {
 
   it("should see that plugin is installed", async () => {
     httpClient.saveMockResponse(pmPluginsResponse, 200, false);
-    await pluginService.isPluginInstalled(printerState.id);
+    await pluginService.isPluginInstalled(printerState.getLoginDetails());
   });
   it("should see that plugin is up-to-date", async () => {
     httpClient.saveMockResponse(pmFUPluginResponse, 200, false);
-    const result = await pluginService.isPluginUpToDate(printerState.id);
+    const result = await pluginService.isPluginUpToDate(printerState.getLoginDetails());
     expect(result).toBeTruthy();
   });
   it("should update plugin", async () => {
     httpClient.saveMockResponse(pmFUPluginResponse, 200, false);
-    const result = await pluginService.updatePlugin(printerState.id);
+    const result = await pluginService.updatePlugin(printerState.getLoginDetails());
     expect(result).toBeTruthy();
   });
   it("should be able to call install/uninstall plugin", async () => {
     httpClient.saveMockResponse(pmPluginsResponse, 200, false);
-    await pluginService.installPlugin(printerState.id);
-    await pluginService.uninstallPlugin(printerState.id);
+    await pluginService.installPlugin(printerState.getLoginDetails());
+    await pluginService.uninstallPlugin(printerState.getLoginDetails());
   });
   it("should be able to install plugin with system restart", async () => {
     httpClient.saveMockResponse(pmPluginsResponse, 200, false);
-    await pluginService.installPlugin(printerState.id, true);
+    await pluginService.installPlugin(printerState.getLoginDetails(), true);
   });
   it("should be able to perform all plugin commands", async () => {
     httpClient.saveMockResponse(pmPluginsResponse, 200, false);
-    await pluginService.enablePlugin(printerState.id);
-    await pluginService.disablePlugin(printerState.id);
-    await pluginService.cleanupPlugin(printerState.id);
-    await pluginService.cleanupAllPlugins(printerState.id);
+    const printerLogin = printerState.getLoginDetails();
+    await pluginService.enablePlugin(printerLogin);
+    await pluginService.disablePlugin(printerLogin);
+    await pluginService.cleanupPlugin(printerLogin);
+    await pluginService.cleanupAllPlugins(printerLogin);
   });
 });

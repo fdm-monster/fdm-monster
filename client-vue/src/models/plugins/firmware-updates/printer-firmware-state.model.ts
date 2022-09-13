@@ -7,10 +7,16 @@ export interface PrinterFailedScanStateModel {
 export interface PrinterFirmwareStateModel {
   id: string;
   printerName: string;
+  pluginInstalled: boolean;
   firmware: string;
+}
+
+export interface PrinterInstalledResponse {
+  isInstalled: boolean;
+  installing: boolean;
 }
 
 export interface PrinterFirmwareStateResponse {
   failed: PrinterFailedScanStateModel[];
-  versions: PrinterFirmwareStateModel[];
+  firmwareStates: PrinterFirmwareStateModel[];
 }

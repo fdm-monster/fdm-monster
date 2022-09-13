@@ -20,8 +20,14 @@ class CustomGCodeController {
   }
 
   async list(req, res) {
-    const allScripts = await this.#customGCodeService.list();
-    res.send(allScripts);
+    const entities = await this.#customGCodeService.list();
+    res.send(entities);
+  }
+
+  async get(req, res) {
+    const { id } = await validateInput(req.params, idRules);
+    const entity = await this.#customGCodeService.get(id);
+    res.send(entity);
   }
 
   /**
@@ -56,10 +62,11 @@ class CustomGCodeController {
 
 // prettier-ignore
 module.exports = createController(CustomGCodeController)
-    .prefix(`${AppConstants.apiRoute}/custom-gcode`)
-    .before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR])])
-    .get("/", "list")
-    .post("/", "create")
-    .post("/send-emergency-m112/:printerId", "sendEmergencyM112", {before: [printerResolveMiddleware("printerId")]})
-    .delete("/:id", "delete")
-    .put("/:id", "update");
+  .prefix(`${AppConstants.apiRoute}/custom-gcode`)
+  .before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR])])
+  .get("/", "list")
+  .get("/:id", "get")
+  .post("/", "create")
+  .post("/send-emergency-m112/:printerId", "sendEmergencyM112", {before: [printerResolveMiddleware("printerId")]})
+  .delete("/:id", "delete")
+  .put("/:id", "update");

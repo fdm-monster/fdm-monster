@@ -1,7 +1,7 @@
 const dbHandler = require("../db-handler");
 const { AppConstants } = require("../../server.constants");
 const { setupTestApp } = require("../test-server");
-const { expectOkResponse, expectInternalServerError} = require("../extensions");
+const { expectOkResponse, expectInternalServerError } = require("../extensions");
 const Printer = require("../../models/Printer");
 const { createTestPrinter } = require("./test-data/create-printer");
 
@@ -12,6 +12,11 @@ const scanRoute = `${defaultRoute}/scan`;
 const releasesRoute = `${defaultRoute}/releases`;
 const syncReleasesRoute = `${defaultRoute}/releases/sync`;
 const downloadFirmwareRoute = `${defaultRoute}/download-firmware`;
+const isPluginInstalledRoute = (id) => `${defaultRoute}/${id}/is-plugin-installed`;
+const installPluginRoute = (id) => `${defaultRoute}/${id}/install-firmware-update-plugin`;
+const pluginStatusRoute = (id) => `${defaultRoute}/${id}/status`;
+const configurePluginSettingsRoute = (id) => `${defaultRoute}/${id}/configure-plugin-settings`;
+const flashFirmwareRoute = (id) => `${defaultRoute}/${id}/flash-firmware`;
 
 let request;
 let octoPrintApiService;
@@ -40,6 +45,57 @@ describe("PluginFirmwareUpdateController", () => {
     expectOkResponse(response);
   });
 
+  it("should query github releases", async () => {
+    httpClient.saveMockResponse(require("./test-data/prusa-github-releases.data.json"), 200);
+    const syncResponse = await request.post(syncReleasesRoute).send();
+    expectOkResponse(syncResponse);
+    expect(syncResponse.body).toHaveLength(16);
+  });
+
+  it("should list firmware releases cache", async () => {
+    const response = await request.get(releasesRoute);
+    expectOkResponse(response);
+  });
+
+  it("should indicate plugin is installed", async () => {
+    const testPrinter = await createTestPrinter(request);
+    httpClient.saveMockResponse({ plugins: [{ key: "firmwareupdater" }] }, 200);
+    const response = await request.get(isPluginInstalledRoute(testPrinter.id)).send();
+    expectOkResponse(response);
+    expect(response.body.isInstalled).toBeTruthy();
+  });
+
+  it("should not install plugin when already installed", async () => {
+    const testPrinter = await createTestPrinter(request);
+    httpClient.saveMockResponse({ plugins: [{ key: "firmwareupdater" }] }, 200);
+    const response = await request.post(installPluginRoute(testPrinter.id)).send();
+    expectOkResponse(response, {
+      isInstalled: true,
+      installing: false
+    });
+  });
+
+  it("should get idle firmware updater status", async () => {
+    const testPrinter = await createTestPrinter(request);
+    httpClient.saveMockResponse({ flashing: false }, 200);
+    const response = await request.get(pluginStatusRoute(testPrinter.id)).send();
+    expectOkResponse(response, { flashing: false });
+  });
+
+  it("should configure plugin settings", async () => {
+    const testPrinter = await createTestPrinter(request);
+    httpClient.saveMockResponse({ plugins: [] }, 200);
+    const response = await request.post(configurePluginSettingsRoute(testPrinter.id)).send();
+    expectOkResponse(response);
+  });
+
+  it("should not trigger flash firmware action on illegal files", async () => {
+    const testPrinter = await createTestPrinter(request);
+    httpClient.saveMockResponse({ flashing: true }, 200);
+    const response = await request.post(flashFirmwareRoute(testPrinter.id)).send();
+    expect(response).not.toBe(200);
+  });
+
   // This is too intrusive still (needs fs isolation)
   test.skip(`should be able to POST ${downloadFirmwareRoute} to let server download firmware`, async () => {
     httpClient.saveMockResponse(require("./test-data/prusa-github-releases.data.json"), 200);
@@ -51,7 +107,7 @@ describe("PluginFirmwareUpdateController", () => {
     expectOkResponse(releasesResponse);
     expect(releasesResponse.body).toHaveLength(16);
 
-    httpClient.saveMockResponse([],200, false, false);
+    httpClient.saveMockResponse([], 200, false, false);
     const response = await request.post(downloadFirmwareRoute).send();
     expectInternalServerError(response);
 

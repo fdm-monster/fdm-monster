@@ -2,7 +2,7 @@ const EventSource = require("eventsource");
 const dbHandler = require("../db-handler");
 const { setupTestApp } = require("../test-server");
 const DITokens = require("../../container.tokens");
-const {AppConstants} = require("../../server.constants");
+const { AppConstants } = require("../../server.constants");
 
 let request;
 let container;

@@ -1,3 +1,4 @@
+const fs = require("fs");
 const { authenticate, withPermission } = require("../middleware/authenticate");
 const { createController } = require("awilix-express");
 const { validateInput, getScopedPrinter, validateMiddleware } = require("../handlers/validators");
@@ -13,7 +14,6 @@ const {
   createFolderRules
 } = require("./validation/printer-files-controller.validation");
 const { ValidationException, NotFoundException } = require("../exceptions/runtime.exceptions");
-const fs = require("fs");
 const { printerLoginToken, printerResolveMiddleware } = require("../middleware/printer");
 const { ROLES, PERMS } = require("../constants/authorization.constants");
 const { authorizeRoles } = require("../middleware/authenticate");

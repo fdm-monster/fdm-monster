@@ -19,6 +19,5 @@ module.exports = {
     }
   },
 
-  async down(db, client) {
-  }
+  async down(db, client) {}
 };

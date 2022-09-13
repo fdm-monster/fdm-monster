@@ -112,11 +112,15 @@
       <template v-slot:no-data> No firmware information loaded.</template>
       <template v-slot:no-results> No results</template>
       <template v-slot:item.actions="{ item }">
-        Feature coming soon:
+        <v-btn :disabled="isPluginInstalled(item)" @click="installPlugin(item)">
+          Install plugin
+        </v-btn>
+        <v-btn @click="restartOctoPrint(item)"> Restart OctoPrint</v-btn>
+        <v-btn @click="configureFirmwareUpdaterSettings(item)"> Configure</v-btn>
         <v-btn
           color="primary"
-          @click="updateFirmware(item)"
-          :disabled="true || !isUpdatableFirmware(item.firmware)"
+          @click="flashFirmwareUpdate(item)"
+          :disabled="isVirtualFirmware(item.firmware) || !isUpdatableFirmware(item.firmware)"
         >
           <v-icon>updates</v-icon>
           Update {{ isVirtualFirmware(item.firmware) ? "(VIRTUAL)" : "" }}
@@ -209,11 +213,14 @@ export default class Printers extends Vue {
       value: "printerName"
     },
     {
-      text: "Firmware Label",
+      text: "Firmware Version",
       sortable: true,
       value: "firmware"
     },
-
+    {
+      text: "Plugin installed",
+      value: "pluginInstalled"
+    },
     { text: "Actions", value: "actions", sortable: false }
   ];
 
@@ -229,10 +236,8 @@ export default class Printers extends Vue {
     const result = this.firmwareReleases.sort(
       (a, b) => Date.parse(b.created_at) - Date.parse(a.created_at)
     );
-    console.log(result.map((r) => r.tag_name));
 
     if (!result?.length) return "?";
-
     return result[0].tag_name;
   }
 
@@ -245,16 +250,33 @@ export default class Printers extends Vue {
   isUpdatableFirmware(firmwareTag: string) {
     const firmwareTagUpper = firmwareTag?.toUpperCase();
     if (!firmwareTagUpper) return false;
-    if (this.isVirtualFirmware(firmwareTag)) return false;
+    return !this.isVirtualFirmware(firmwareTag);
+  }
+
+  isPluginInstalled(printer: Printer) {
+    const firmwarePluginState = this.firmwareUpdateStates.find((f) => f.id === printer.id);
+    return firmwarePluginState?.pluginInstalled || false;
   }
 
   async loadFirmwareData() {
     const updateStates = await PrinterFirmwareUpdateService.loadFirmwareUpdateState();
-    this.firmwareUpdateStates = updateStates?.versions || [];
+    this.firmwareUpdateStates = updateStates?.firmwareStates || [];
   }
 
-  async updateFirmware(printer: Printer) {
-    //TODO
+  async installPlugin(printer: Printer) {
+    await PrinterFirmwareUpdateService.installPlugin(printer.id);
+  }
+
+  async restartOctoPrint(printer: Printer) {
+    await PrintersService.restartOctoPrint(printer.id);
+  }
+
+  async configureFirmwareUpdaterSettings(printer: Printer) {
+    await PrinterFirmwareUpdateService.configureFirmwareUpdaterSettings(printer.id);
+  }
+
+  async flashFirmwareUpdate(printer: Printer) {
+    await PrinterFirmwareUpdateService.flashFirmwareUpdate(printer.id);
   }
 
   openEditDialog(printer: Printer) {
