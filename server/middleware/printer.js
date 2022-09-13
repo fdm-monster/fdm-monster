@@ -7,8 +7,6 @@ const printerLoginToken = "printerLogin";
 
 const printerResolveMiddleware = (key = "id") => {
   return (req, res, next) => {
-    // const loggerFactory = req.container.resolve(DITokens.loggerFactory);
-    // const logger = loggerFactory("PrinterResolverMiddleware");
     const printersStore = req.container.resolve(DITokens.printersStore);
 
     let scopedPrinter = undefined;
