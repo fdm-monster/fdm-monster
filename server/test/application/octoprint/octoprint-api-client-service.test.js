@@ -31,6 +31,10 @@ describe("OctoPrint-API-Client-Service", () => {
   const printerURL = "http://someurl/";
   const auth = { apiKey, printerURL };
 
+  beforeEach(() => {
+    httpClient.saveMockResponse(undefined, 200);
+  });
+
   it("should throw error on getSettings with incorrect printerURL", async () => {
     // TODO Not human-friendly
     await expect(
