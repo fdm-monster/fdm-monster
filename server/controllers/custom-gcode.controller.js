@@ -62,10 +62,11 @@ class CustomGCodeController {
 
 // prettier-ignore
 module.exports = createController(CustomGCodeController)
-    .prefix(`${AppConstants.apiRoute}/custom-gcode`)
-    .before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR])])
-    .get("/", "list")
-    .post("/", "create")
-    .post("/send-emergency-m112/:printerId", "sendEmergencyM112", {before: [printerResolveMiddleware("printerId")]})
-    .delete("/:id", "delete")
-    .put("/:id", "update");
+  .prefix(`${AppConstants.apiRoute}/custom-gcode`)
+  .before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR])])
+  .get("/", "list")
+  .get("/:id", "get")
+  .post("/", "create")
+  .post("/send-emergency-m112/:printerId", "sendEmergencyM112", {before: [printerResolveMiddleware("printerId")]})
+  .delete("/:id", "delete")
+  .put("/:id", "update");
