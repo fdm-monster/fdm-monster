@@ -85,9 +85,9 @@ class OctoPrintApiService extends OctoPrintRoutes {
     const data = await this.getUsers(printer);
 
     let opAdminUserName = "admin";
-    if (!!data?.users && Array.isArray(data)) {
+    if (!!data?.users && Array.isArray(data.users)) {
       const adminUser = data.users.find((user) => !!user.admin);
-      if (!adminUser) opAdminUserName = adminUser.name;
+      if (!!adminUser) opAdminUserName = adminUser.name;
     }
 
     return opAdminUserName;

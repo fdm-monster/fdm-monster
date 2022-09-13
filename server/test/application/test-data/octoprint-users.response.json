@@ -1,0 +1,69 @@
+{
+  "users": [
+    {
+      "active": true,
+      "admin": true,
+      "apikey": "0F5BB5EC6C014BC0936E683388B39BE3",
+      "groups": [
+        "admins",
+        "users"
+      ],
+      "name": "root",
+      "needs": {
+        "group": [
+          "users",
+          "admins"
+        ],
+        "role": [
+          "files_upload",
+          "plugin_pi_support_check",
+          "plugin_pluginmanager_manage",
+          "plugin_softwareupdate_check",
+          "plugin_announcements_manage",
+          "system",
+          "files_select",
+          "files_delete",
+          "plugin_softwareupdate_configure",
+          "plugin_backup_access",
+          "webcam",
+          "monitor_terminal",
+          "slice",
+          "plugin_pluginmanager_install",
+          "timelapse_admin",
+          "gcodeviewer",
+          "admin",
+          "plugin_announcements_read",
+          "plugin_softwareupdate_update",
+          "plugin_action_command_prompt_interact",
+          "timelapse_download",
+          "settings",
+          "files_download",
+          "plugin_appkeys_admin",
+          "plugin_action_command_notification_show",
+          "status",
+          "plugin_firmware_check_display",
+          "connection",
+          "print",
+          "plugin_action_command_notification_clear",
+          "timelapse_list",
+          "settings_read",
+          "files_list",
+          "timelapse_delete",
+          "plugin_logging_manage",
+          "control"
+        ]
+      },
+      "permissions": [],
+      "roles": [
+        "user",
+        "admin"
+      ],
+      "settings": {
+        "interface": {
+          "language": "_default"
+        }
+      },
+      "user": true
+    }
+  ]
+}
