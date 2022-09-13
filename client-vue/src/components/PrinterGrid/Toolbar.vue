@@ -1,7 +1,7 @@
 <template>
   <v-toolbar flat>
-    <v-toolbar-title>Location Map</v-toolbar-title>
-    <v-btn-toggle class="ml-7">
+    <v-toolbar-title>Printer Floors</v-toolbar-title>
+    <v-btn-toggle rounded class="ml-7">
       <v-btn>
         <v-icon>format_align_left</v-icon>
         Floor 1
@@ -10,6 +10,11 @@
       <v-btn>
         <v-icon>format_align_center</v-icon>
         Floor 2
+      </v-btn>
+
+      <v-btn>
+        <v-icon>format_align_right</v-icon>
+        Floor 3
       </v-btn>
     </v-btn-toggle>
 
