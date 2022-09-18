@@ -1428,9 +1428,9 @@
   integrity sha512-RNiOoTPkptFtSVzQevY/yWtZwf/RxyVnPy/OcA9HBM3MlGDnBEYL5B41H0MTn0Uec8Hi+2qUtTfG2WWZBmMejQ==
 
 "@sinclair/typebox@^0.24.1":
-  version "0.24.41"
-  resolved "https://registry.yarnpkg.com/@sinclair/typebox/-/typebox-0.24.41.tgz#45470b8bae32a28f1e0501066d0bacbd8b772804"
-  integrity sha512-TJCgQurls4FipFvHeC+gfAzb+GGstL0TDwYJKQVtTeSvJIznWzP7g3bAd5gEBlr8+bIxqnWS9VGVWREDhmE8jA==
+  version "0.24.42"
+  resolved "https://registry.yarnpkg.com/@sinclair/typebox/-/typebox-0.24.42.tgz#a74b608d494a1f4cc079738e050142a678813f52"
+  integrity sha512-d+2AtrHGyWek2u2ITF0lHRIv6Tt7X0dEHW+0rP+5aDCEjC3fiN2RBjrLD0yU0at52BcZbRGxLbAtXiR0hFCjYw==
 
 "@sinonjs/commons@^1.7.0":
   version "1.8.3"
@@ -2881,9 +2881,9 @@ caniuse-api@^3.0.0:
     lodash.uniq "^4.5.0"
 
 caniuse-lite@^1.0.0, caniuse-lite@^1.0.30001399, caniuse-lite@^1.0.30001400:
-  version "1.0.30001401"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001401.tgz#d8b2434b376266ce48274ff70d1094250636776c"
-  integrity sha512-fmC/D1YCOvs5uWFP3FNVJGTdE0QFQLs1dJ7W94wP0p46lXrDl3BNgZArKPm6+XdIVtczMN1dPNVOFsJd/HRnGQ==
+  version "1.0.30001402"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001402.tgz#aa29e1f47f5055b0d0c07696a67b8b08023d14c8"
+  integrity sha512-Mx4MlhXO5NwuvXGgVb+hg65HZ+bhUYsz8QtDGDo2QmaJS2GBX47Xfi2koL86lc8K+l+htXeTEB/Aeqvezoo6Ew==
 
 case-sensitive-paths-webpack-plugin@^2.3.0:
   version "2.4.0"
@@ -3455,9 +3455,9 @@ decache@^4.6.0:
     callsite "^1.0.0"
 
 decimal.js@^10.2.1:
-  version "10.4.0"
-  resolved "https://registry.yarnpkg.com/decimal.js/-/decimal.js-10.4.0.tgz#97a7448873b01e92e5ff9117d89a7bca8e63e0fe"
-  integrity sha512-Nv6ENEzyPQ6AItkGwLE2PGKinZZ9g59vSh2BeH6NqPu0OTKZ5ruJsVqh/orbAnqXc9pBbgXAIrc2EyaCj8NpGg==
+  version "10.4.1"
+  resolved "https://registry.yarnpkg.com/decimal.js/-/decimal.js-10.4.1.tgz#be75eeac4a2281aace80c1a8753587c27ef053e7"
+  integrity sha512-F29o+vci4DodHYT9UrR5IEbfBw9pE5eSapIJdTqXK5+6hq+t8VRxwQyKlW2i+KDKFkkJQRvFyI/QXD83h8LyQw==
 
 dedent@^0.7.0:
   version "0.7.0"
@@ -3667,9 +3667,9 @@ ejs@^3.1.6:
     jake "^10.8.5"
 
 electron-to-chromium@^1.4.251:
-  version "1.4.253"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.253.tgz#3402fd2159530fc6d94237f1b9535fa7bebaf399"
-  integrity sha512-1pezJ2E1UyBTGbA7fUlHdPSXQw1k+82VhTFLG5G0AUqLGvsZqFzleOblceqegZzxYX4kC7hGEEdzIQI9RZ1Cuw==
+  version "1.4.254"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.254.tgz#c6203583890abf88dfc0be046cd72d3b48f8beb6"
+  integrity sha512-Sh/7YsHqQYkA6ZHuHMy24e6TE4eX6KZVsZb9E/DvU1nQRIrH4BflO/4k+83tfdYvDl+MObvlqHPRICzEdC9c6Q==
 
 emittery@^0.10.2:
   version "0.10.2"
@@ -8563,9 +8563,9 @@ webpack-sources@^3.2.3:
   integrity sha512-/DyMEOrDgLKKIG0fmvtz+4dUX/3Ghozwgm6iPp8KRhvn+eQf9+Q7GWxVNMk3+uCPWfdXYC4ExGBckIXdFEfH1w==
 
 webpack-virtual-modules@^0.4.2:
-  version "0.4.4"
-  resolved "https://registry.yarnpkg.com/webpack-virtual-modules/-/webpack-virtual-modules-0.4.4.tgz#a19fcf371923c59c4712d63d7d194b1e4d8262cc"
-  integrity sha512-h9atBP/bsZohWpHnr+2sic8Iecb60GxftXsWNLLLSqewgIsGzByd2gcIID4nXcG+3tNe4GQG3dLcff3kXupdRA==
+  version "0.4.5"
+  resolved "https://registry.yarnpkg.com/webpack-virtual-modules/-/webpack-virtual-modules-0.4.5.tgz#e476842dab5eafb7beb844aa2f747fc12ebbf6ec"
+  integrity sha512-8bWq0Iluiv9lVf9YaqWQ9+liNgXSHICm+rg544yRgGYaR8yXZTVBaHZkINZSB2yZSWo4b0F6MIxqJezVfOEAlg==
 
 webpack@5.74.0, webpack@^5.54.0:
   version "5.74.0"
