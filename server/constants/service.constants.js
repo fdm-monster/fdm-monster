@@ -142,6 +142,7 @@ function getDefaultPrinterEntry() {
 
 const UUID_LENGTH = 32;
 const minPrinterGroupNameLength = 3;
+const minPrinterFloorNameLength = 3;
 
 class Status {
   static failure(message = "", args) {
@@ -176,5 +177,6 @@ module.exports = {
   getDefaultPrinterEntry,
   UUID_LENGTH,
   minPrinterGroupNameLength,
+  minPrinterFloorNameLength,
   Status
 };

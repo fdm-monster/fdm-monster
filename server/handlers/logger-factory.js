@@ -1,8 +1,8 @@
-const Logger = require("./logger");
+const LoggerService = require("./logger");
 
 function LoggerFactory(_) {
   return (name, logToFile, logLevel) => {
-    return new Logger(name, logToFile, logLevel);
+    return new LoggerService(name, logToFile, logLevel);
   };
 }
 

@@ -14,6 +14,7 @@ const DITokens = {
   cacheManager: "cacheManager",
   printerService: "printerService",
   printerGroupService: "printerGroupService",
+  printerFloorService: "printerFloorService",
   serverSettingsService: "serverSettingsService",
   serverReleaseService: "serverReleaseService",
   serverUpdateService: "serverUpdateService",

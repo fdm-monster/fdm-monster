@@ -64,6 +64,7 @@ const {
 const { PluginRepositoryCache } = require("./services/octoprint/plugin-repository.cache");
 const { configureCacheManager } = require("./handlers/cache-manager");
 const { PluginFirmwareUpdatePreparationTask } = require("./tasks/plugin-firmware-download.task");
+const PrinterFloorService = require("./services/printer-floor.service");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -111,6 +112,7 @@ function configureContainer() {
     [DITokens.printerService]: asClass(PrinterService),
     [DITokens.printerFilesService]: asClass(PrinterFilesService),
     [DITokens.printerGroupService]: asClass(PrinterGroupService),
+    [DITokens.printerFloorService]: asClass(PrinterFloorService),
     [DITokens.octoPrintApiService]: asClass(OctoPrintApiService).singleton(),
     [DITokens.pluginFirmwareUpdateService]: asClass(PluginFirmwareUpdateService).singleton(),
     [DITokens.historyService]: asClass(HistoryService),
