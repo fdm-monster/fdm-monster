@@ -75,7 +75,7 @@
   },
   "devDependencies": {
     "caniuse-lite": "1.0.30001410",
-    "eslint": "8.23.1",
+    "eslint": "8.24.0",
     "eslint-config-airbnb-base": "15.0.0",
     "eslint-config-prettier": "8.5.0",
     "eslint-config-standard": "17.0.0",
