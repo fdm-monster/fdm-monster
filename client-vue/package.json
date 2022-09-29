@@ -23,7 +23,7 @@
     "luxon": "3.0.4",
     "register-service-worker": "1.7.2",
     "validator": "13.7.0",
-    "vee-validate": "3.4.14",
+    "vee-validate": "4.6.9",
     "vue": "2.7.10",
     "vue-axios": "3.4.1",
     "vue-bus": "1.2.1",
