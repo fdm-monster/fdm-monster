@@ -47,9 +47,9 @@ describe("StateConstants-Mapping", function () {
   it("should map illegal state to color", () => {
     expect(mapStateToColor(null).category).toBe(CATEGORY.Active);
     expect(mapStateToColor(undefined).category).toBe(CATEGORY.Active);
-    expect(mapStateToColor(PSTATE.OfflineAfterError).category).toBe(CATEGORY.Error);
     expect(mapStateToColor(PSTATE.Loading).category).toBe(CATEGORY.Idle);
     expect(mapStateToColor(PSTATE.Operational).category).toBe(CATEGORY.Idle);
+    expect(mapStateToColor(PSTATE.Online).category).toBe(CATEGORY.Idle);
     expect(mapStateToColor(PSTATE.Paused).category).toBe(CATEGORY.Idle);
     expect(mapStateToColor(PSTATE.Printing).category).toBe(CATEGORY.Active);
     expect(mapStateToColor(PSTATE.Pausing).category).toBe(CATEGORY.Active);
