@@ -3,7 +3,6 @@ const { ValidationException } = require("../../exceptions/runtime.exceptions");
 const {
   defaultFirmwareUpdaterSettings
 } = require("./constants/firmware-update-settings.constants");
-const { AppConstants } = require("../../server.constants");
 
 const config = {
   pluginName: "firmwareupdater",
@@ -85,6 +84,7 @@ class PluginFirmwareUpdateService extends PluginBaseService {
     const downloadName = firmwareAsset.name;
     this._logger.info(`Checking firmware ${downloadName}`);
     if (!this.#multerService.fileExists(downloadName, firmwareDownloadPath)) {
+      this._logger.info(`Downloading firmware from ${downloadUrl}`);
       await this.#multerService.downloadFile(downloadUrl, downloadName, firmwareDownloadPath);
       this._logger.info(`Downloaded firmware ${downloadName}`);
     } else {

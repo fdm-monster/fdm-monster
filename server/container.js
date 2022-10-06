@@ -63,6 +63,7 @@ const {
 } = require("./services/octoprint/plugin-firmware-update.service");
 const { PluginRepositoryCache } = require("./services/octoprint/plugin-repository.cache");
 const { configureCacheManager } = require("./handlers/cache-manager");
+const { PluginFirmwareUpdatePreparationTask } = require("./tasks/plugin-firmware-download.task");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -147,7 +148,10 @@ function configureContainer() {
     [DITokens.printerWebsocketPingTask]: asClass(PrinterWebsocketPingTask).singleton(), // Task dependent on WS to fire - disabled at boot
     [DITokens.printerSystemTask]: asClass(PrinterSystemTask).singleton(), // Task dependent on test printer in store - disabled at boot
     [DITokens.printerTestTask]: asClass(PrinterTestTask).singleton(), // Task to regularly clean printer files based on certain configuration settings
-    [DITokens.printerFileCleanTask]: asClass(PrinterFileCleanTask).singleton()
+    [DITokens.printerFileCleanTask]: asClass(PrinterFileCleanTask).singleton(),
+    [DITokens.pluginFirmwareUpdatePreparationTask]: asClass(
+      PluginFirmwareUpdatePreparationTask
+    ).singleton() // Delayed run-once cache loader and firmware download utility
   });
 
   return container;

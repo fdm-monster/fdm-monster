@@ -90,36 +90,34 @@ class BootTask {
       }
     }
 
-    this.#logger.info("Loading Server settings.");
-    await this.settingsStore.loadSettings();
+    try {
+      this.#logger.info("Loading Server settings.");
+      await this.settingsStore.loadSettings();
 
-    this.#logger.info("Loading caches.");
-    await this.multerService.clearUploadsFolder();
-    await this.printersStore.loadPrintersStore();
-    await this.filesStore.loadFilesStore();
-    await this.filamentsStore.loadFilamentsStore();
-    await this.historyStore.loadHistoryStore();
-    await this.printerGroupsCache.loadCache();
-    await this.influxDbSetupService.optionalInfluxDatabaseSetup();
+      this.#logger.info("Loading caches.");
+      await this.multerService.clearUploadsFolder();
+      await this.printersStore.loadPrintersStore();
+      await this.filesStore.loadFilesStore();
+      await this.filamentsStore.loadFilamentsStore();
+      await this.historyStore.loadHistoryStore();
+      await this.printerGroupsCache.loadCache();
+      await this.influxDbSetupService.optionalInfluxDatabaseSetup();
 
-    this.#logger.info("Synchronizing user permission and roles definition");
-    await this.permissionService.syncPermissions();
-    await this.roleService.syncRoles();
-    await this.ensureAdminUserExists();
+      this.#logger.info("Synchronizing user permission and roles definition");
+      await this.permissionService.syncPermissions();
+      await this.roleService.syncRoles();
+      await this.ensureAdminUserExists();
+    } catch (e) {
+      this.#logger.error(
+        "A startup error occurred. The server might not have started correctly.",
+        e
+      );
+    }
 
     if (bootTaskScheduler && process.env.SAFEMODE_ENABLED !== "true") {
       this.#serverTasks.BOOT_TASKS.forEach((task) => {
         this.#taskManagerService.registerJobOrTask(task);
       });
-
-      // Low priority tasks
-      try {
-        await this.pluginRepositoryCache.queryCache();
-        await this.pluginFirmwareUpdateService.queryGithubPrusaFirmwareReleasesCache();
-        await this.pluginFirmwareUpdateService.downloadFirmware();
-      } catch (e) {
-        this.#logger.warning("Could not fully complete loading of plugin firmware data");
-      }
     } else {
       this.#logger.warning("Starting in safe mode due to SAFEMODE_ENABLED");
     }

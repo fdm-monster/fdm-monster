@@ -63,13 +63,16 @@ class MulterService {
     const res = await this.#httpClient.get(downloadUrl);
     return await new Promise((resolve, reject) => {
       fileStream.write(res.data);
-      fileStream.on("error", (err) => reject(err));
+      fileStream.on("error", (err) => {
+        return reject(err);
+      });
       fileStream.on("finish", async () => {
-        resolve();
+        return resolve();
       });
       fileStream.on("close", async () => {
-        resolve();
+        return resolve();
       });
+      resolve();
     });
   }
 

@@ -211,11 +211,11 @@ const mapStateToColor = (state) => {
   if (state === PSTATE.NoAPI) {
     return { name: "danger", hex: "#2e0905", category: CATEGORY.Offline };
   }
-  if (state === PSTATE.Disconnected) {
-    return { name: "danger", hex: "#2e0905", category: CATEGORY.Disconnected };
-  }
   if (state === PSTATE.Shutdown) {
     return { name: "danger", hex: "#2e0905", category: CATEGORY.Offline };
+  }
+  if (state === PSTATE.Disconnected) {
+    return { name: "danger", hex: "#2e0905", category: CATEGORY.Disconnected };
   }
   if (state === PSTATE.Complete) {
     return { name: "success", hex: "#00330e", category: CATEGORY.Complete };

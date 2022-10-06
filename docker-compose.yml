@@ -17,15 +17,17 @@ services:
 
   fdm-monster:
     container_name: fdm-monster
-    image: davidzwa/fdm-monster:v1.2.0-rc2
+    image: davidzwa/fdm-monster:v1.2.0-rc3
     restart: unless-stopped
     build:
       context: ./server
       dockerfile: docker/Dockerfile
     ports:
-      - "4001:4000"
+      - "4001:5001"
     environment:
-      - MONGO=mongodb://mongodb:21111/fdm-monster?readPreference=primary&ssl=false
+      - MONGO=mongodb://mongodb:27017/fdm-monster?readPreference=primary&ssl=false
+      - NODE_ENV=development
+      - SERVER_PORT=5001
     volumes:
       # Volumes as local relative folders (validate with 'docker-compose config')
       - ./fdm-monster/logs:/app/logs

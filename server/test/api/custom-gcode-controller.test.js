@@ -87,4 +87,11 @@ describe("CustomGCodeController", () => {
     const response = await request.get(getRoute("62e0e02478368d2013aff094")).send();
     expectNotFoundResponse(response);
   });
+
+  it("should create new gcode script", async function () {
+    const script = await createNormalGCodeScript(request);
+
+    const response = await request.get(getRoute(script._id)).send();
+    expectOkResponse(response);
+  });
 });
