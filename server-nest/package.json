@@ -36,7 +36,7 @@
     "@nestjs/terminus": "9.1.2",
     "@nestjs/typeorm": "9.0.1",
     "@nestjs/websockets": "9.1.4",
-    "bcrypt": "5.0.1",
+    "bcrypt": "5.1.0",
     "class-transformer": "0.5.1",
     "class-validator": "0.13.2",
     "cookie-parser": "1.4.6",
