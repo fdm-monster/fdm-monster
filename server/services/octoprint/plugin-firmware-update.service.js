@@ -18,7 +18,6 @@ const firmwareProp = "printer.firmware";
 const firmwareDownloadPath = "firmware-downloads";
 
 class PluginFirmwareUpdateService extends PluginBaseService {
-  _logger;
   #octoPrintApiService;
   #githubApiService;
   #multerService;
