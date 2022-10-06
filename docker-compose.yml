@@ -12,7 +12,7 @@ services:
       # default is 27017
       - "21111:27017"
     volumes:
-      - ./mongodb-data:/data/db
+      - ./fdm-monster/mongodb-data:/data/db
     restart: unless-stopped
 
   fdm-monster:
