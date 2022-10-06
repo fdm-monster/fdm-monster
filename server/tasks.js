@@ -36,7 +36,8 @@ class ServerTasks {
     registerTask(DITokens.printerFileCleanTask, TaskPresets.RUNONCE, 60 * 1000, true),
     registerTask(DITokens.printerSystemTask, TaskPresets.PERIODIC_DISABLED, 6 * HOUR_MS, true),
     registerTask(DITokens.printerWebsocketTask, TaskPresets.PERIODIC, 5000, true),
-    registerTask(DITokens.printerWebsocketPingTask, TaskPresets.PERIODIC, 30000, false)
+    registerTask(DITokens.printerWebsocketPingTask, TaskPresets.PERIODIC, 30000, false),
+    registerTask(DITokens.pluginFirmwareUpdatePreparationTask, TaskPresets.RUNDELAYED, 5000)
   ];
 }
 

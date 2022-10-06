@@ -84,8 +84,9 @@ class ServerHost {
       throw new Error("The FDM Server requires a numeric port input argument to run");
     }
 
-    this.#httpServerInstance.listen(port, "0.0.0.0", () => {
-      this.#logger.info(`Server started... open it at http://127.0.0.1:${port}`);
+    const hostOrFqdn = "0.0.0.0";
+    this.#httpServerInstance.listen(port, hostOrFqdn, () => {
+      this.#logger.info(`Server started... open it at http://${hostOrFqdn}:${port}`);
     });
   }
 }
