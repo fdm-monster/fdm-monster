@@ -1,4 +1,4 @@
-const { bench } = require("../../utils/benchmark.util");
+const { bench, byteCount } = require("../../utils/benchmark.util");
 const { sleep } = require("../../utils/time.utils");
 
 describe("BenchUtil", () => {
@@ -32,5 +32,8 @@ describe("BenchUtil", () => {
     expect(report).toEqual(true);
   });
 
-  it("");
+  it("bytecount should work", () => {
+    const length = byteCount("asd");
+    expect(length).not.toBe(0);
+  });
 });
