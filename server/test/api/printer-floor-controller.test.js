@@ -5,6 +5,7 @@ const {
   expectOkResponse,
   expectInternalServerError,
   expectNotFoundResponse,
+  expectInvalidResponse,
 } = require("../extensions");
 const PrinterGroup = require("../../models/PrinterGroup");
 const { createTestPrinterGroup } = require("./test-data/create-printer-group");
@@ -35,6 +36,11 @@ describe("PrinterFloorController", () => {
   it("should return empty printer floor list", async () => {
     const response = await request.get(listRoute).send();
     expectOkResponse(response, []);
+  });
+
+  it("should not be able to create falsy printer floor", async () => {
+    const createResponse = await request.post(printerFloorRoute).send({});
+    expectInvalidResponse(createResponse);
   });
 
   it("should not be able to create printer floor with same floor level number", async () => {
