@@ -37,4 +37,5 @@ export interface PrinterSseMessage {
   trackedUploads: UploadStates;
   testProgress: TestProgressDetails;
   selectedFloor: PrinterFloor;
+  floors: PrinterFloor[];
 }

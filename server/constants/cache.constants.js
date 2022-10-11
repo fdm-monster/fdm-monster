@@ -4,18 +4,18 @@ function getJobCacheDefault() {
   return {
     job: undefined,
     progress: undefined,
-    currentZ: undefined
+    currentZ: undefined,
   };
 }
 
 function getFileCacheDefault() {
   return {
     fileList: getFileListDefault(),
-    storage: undefined
+    storage: undefined,
   };
 }
 
 module.exports = {
   getJobCacheDefault,
-  getFileCacheDefault
+  getFileCacheDefault,
 };

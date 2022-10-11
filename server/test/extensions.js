@@ -4,9 +4,9 @@ function getExpectExtensions() {
       expect(received.errors).toMatchObject(keys);
 
       return {
-        pass: true
+        pass: true,
       };
-    }
+    },
   };
 }
 
@@ -71,5 +71,5 @@ module.exports = {
   expectInternalServerError,
   expectInvalidResponse,
   expectNotFoundResponse,
-  getExpectExtensions
+  getExpectExtensions,
 };

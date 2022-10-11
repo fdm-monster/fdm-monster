@@ -2,6 +2,7 @@ const {
   allPerms,
   flattenPermissionDefinition,
 } = require("../../constants/authorization.constants");
+
 describe("authorization constants", () => {
   it("allPerms should throw for no permission group", async () => {
     expect(() => allPerms()).toThrow(`Permission group name 'undefined' was not found`);

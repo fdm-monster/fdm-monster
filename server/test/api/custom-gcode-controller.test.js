@@ -4,7 +4,7 @@ const { setupTestApp } = require("../test-server");
 const {
   expectOkResponse,
   expectInvalidResponse,
-  expectNotFoundResponse
+  expectNotFoundResponse,
 } = require("../extensions");
 const CustomGCode = require("../../models/CustomGCode");
 const { createTestPrinter } = require("./test-data/create-printer");
@@ -32,7 +32,7 @@ beforeEach(async () => {
 function getGCodeScript() {
   return {
     name: "custom-script",
-    gcode: "G28\nG28"
+    gcode: "G28\nG28",
   };
 }
 
@@ -64,11 +64,11 @@ describe("CustomGCodeController", () => {
 
     const data = {
       ...existingScript,
-      name: "newName"
+      name: "newName",
     };
     const response = await request.put(updateRoute(existingScript._id)).send(data);
     expectOkResponse(response, {
-      name: "newName"
+      name: "newName",
     });
   });
 
