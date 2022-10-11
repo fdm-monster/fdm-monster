@@ -1,5 +1,4 @@
 const winston = require("winston");
-const { isTestEnvironment, isProductionEnvironment } = require("../utils/env.utils");
 const { AppConstants } = require("../server.constants");
 
 const dtFormat = new Intl.DateTimeFormat("en-GB", {

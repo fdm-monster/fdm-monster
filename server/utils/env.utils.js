@@ -5,10 +5,6 @@ const { isDocker } = require("./is-docker");
 
 const logger = new Logger("Utils-Env", false);
 
-function isProductionEnvironment() {
-  return process.env.NODE_ENV === "production";
-}
-
 function isTestEnvironment() {
   return process.env.NODE_ENV === "test";
 }
