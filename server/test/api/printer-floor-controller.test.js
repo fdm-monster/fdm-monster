@@ -1,7 +1,11 @@
 const dbHandler = require("../db-handler");
 const { AppConstants } = require("../../server.constants");
 const { setupTestApp } = require("../test-server");
-const { expectOkResponse, expectInternalServerError } = require("../extensions");
+const {
+  expectOkResponse,
+  expectInternalServerError,
+  expectNotFoundResponse,
+} = require("../extensions");
 const PrinterGroup = require("../../models/PrinterGroup");
 const { createTestPrinterGroup } = require("./test-data/create-printer-group");
 const { createTestPrinterFloor, printerFloorRoute } = require("./test-data/create-printer-floor");
@@ -56,6 +60,11 @@ describe("PrinterFloorController", () => {
     const floor = await createTestPrinterFloor(request, "Floor123", 506);
     const response = await request.get(getRoute(floor._id)).send();
     expectOkResponse(response, { name: "Floor123" });
+  });
+
+  it("should throw on getting non-existing printer floor", async () => {
+    const response = await request.get(getRoute("63452115122876ea11cd1656")).send();
+    expectNotFoundResponse(response);
   });
 
   it("should be able to get selected printer floor", async () => {

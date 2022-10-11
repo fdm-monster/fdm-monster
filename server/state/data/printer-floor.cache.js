@@ -78,7 +78,10 @@ class PrinterFloorsCache {
       }
     }
 
-    return this.#printerFloors.find((pf) => pf.id.toString() === floorId);
+    const floor = this.#printerFloors.find((pf) => pf.id.toString() === floorId);
+    if (!!floor) return floor;
+
+    return await this.#printerFloorService.get(floorId);
   }
 
   async updateName(floorId, updateSpec) {
