@@ -145,7 +145,11 @@ export default class PrinterCrudForm extends Vue {
   formData?: PreCreatePrinter = getDefaultCreatePrinter();
 
   public get apiKeyRules() {
-    return { required: true, length: this.appConstants.apiKeyLength, alpha_num: true };
+    return {
+      required: true,
+      length: this.appConstants.apiKeyLength,
+      alpha_num: true
+    };
   }
 
   public get printerNameRules() {

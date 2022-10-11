@@ -194,7 +194,10 @@ export default class PrinterGroupsSettings extends Vue {
     if (!this.selectedPrinterGroup?._id) return;
 
     const { _id: groupId } = this.selectedPrinterGroup;
-    await printersState.updatePrinterGroupName({ groupId, name: this.editedPrinterGroupName });
+    await printersState.updatePrinterGroupName({
+      groupId,
+      name: this.editedPrinterGroupName
+    });
   }
 
   async clickDeleteGroup() {
@@ -217,7 +220,10 @@ export default class PrinterGroupsSettings extends Vue {
     const printer = this.printerInGroup(group, index);
     if (!group?._id || !printer) return;
 
-    await printersState.deletePrinterFromGroup({ groupId: group._id, printerId: printer.id });
+    await printersState.deletePrinterFromGroup({
+      groupId: group._id,
+      printerId: printer.id
+    });
   }
 }
 </script>
