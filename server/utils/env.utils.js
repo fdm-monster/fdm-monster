@@ -2,11 +2,12 @@ const fs = require("fs");
 const Logger = require("../handlers/logger.js");
 const dotenv = require("dotenv");
 const { isDocker } = require("./is-docker");
+const { AppConstants } = require("../server.constants");
 
 const logger = new Logger("Utils-Env", false);
 
 function isTestEnvironment() {
-  return process.env.NODE_ENV === "test";
+  return process.env.NODE_ENV === AppConstants.defaultTestEnv;
 }
 
 function isPm2() {
@@ -93,7 +94,6 @@ function verifyPackageJsonRequirements(rootPath) {
 
 module.exports = {
   isTestEnvironment,
-  isProductionEnvironment,
   isPm2,
   isNodemon,
   isNode,
