@@ -27,10 +27,9 @@ class PrinterFloorService {
 
   async get(floorId, throwError = true) {
     const printerFloor = await PrinterFloorModel.findOne({ _id: floorId });
-    if (!printerFloor)
-      if (throwError) {
-        throw new NotFoundException(`Printer floor with id ${floorId} does not exist.`);
-      }
+    if (!printerFloor && throwError) {
+      throw new NotFoundException(`Printer floor with id ${floorId} does not exist.`);
+    }
 
     return printerFloor;
   }

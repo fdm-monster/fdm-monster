@@ -44,8 +44,9 @@ class PrinterFloorsCache {
   async getSelectedFloor(throwError = false) {
     if (!this.#selectedFloorId) {
       this.#logger.info(
-        "Could not provide selected floor, it was not loaded or selected. Was setSelectedFloor initialization called?"
+        "Could not provide selected floor, it was not loaded or selected. Initializing now"
       );
+      await this.setSelectedFloor();
     }
 
     return this.getFloor(this.#selectedFloorId, throwError);
@@ -60,10 +61,10 @@ class PrinterFloorsCache {
         name: "default floor",
         floor: 1,
       });
-      this.#selectedFloorId = floor._id;
+      this.#selectedFloorId = floor.id;
     } else {
       const index = arrayIndex || 0;
-      this.#selectedFloorId = floors[index]._id;
+      this.#selectedFloorId = floors[index].id;
     }
 
     this.#logger.info(`Set selected floor to id '${this.#selectedFloorId}'`);
@@ -76,7 +77,7 @@ class PrinterFloorsCache {
         throw new NotFoundException(`Floor with ID ${floorId} was not found`);
     }
 
-    return this.#printerFloors.find((pf) => pf._id.toString() === floorId);
+    return this.#printerFloors.find((pf) => pf.id.toString() === floorId);
   }
 
   async updateName(floorId, updateSpec) {
