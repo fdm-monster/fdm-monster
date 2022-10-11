@@ -30,7 +30,8 @@ describe("PrinterFloorService ", () => {
     // Create it
     await printerFloorService.create({
       name: "TopFloor1",
-      printerGroups: []
+      floor: 1,
+      printerGroups: [],
     });
 
     // Assert creation
@@ -42,7 +43,8 @@ describe("PrinterFloorService ", () => {
     // Create it
     const floor = await printerFloorService.create({
       name: "TopFloor1",
-      printerGroups: []
+      floor: 1,
+      printerGroups: [],
     });
 
     expect(printerFloorService.get(floor.id)).toBeTruthy();

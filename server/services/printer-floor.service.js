@@ -6,13 +6,12 @@ const {
   createPrinterFloorRules,
   updatePrinterFloorNameRules,
   printerGroupInFloorRules,
+  updatePrinterFloorNumberRules,
 } = require("./validators/printer-floor-service.validation");
 
 class PrinterFloorService {
   #printerGroupService;
   #logger;
-
-  #selectedFloorId = null;
 
   constructor({ printerGroupService, loggerFactory }) {
     this.#printerGroupService = printerGroupService;
@@ -53,6 +52,14 @@ class PrinterFloorService {
 
     const { name } = await validateInput(input, updatePrinterFloorNameRules);
     printerFloor.name = name;
+    return await printerFloor.save();
+  }
+
+  async updateFloorNumber(floorId, input) {
+    const printerFloor = await this.get(floorId);
+
+    const { floor } = await validateInput(input, updatePrinterFloorNumberRules);
+    printerFloor.floor = floor;
     return await printerFloor.save();
   }
 
