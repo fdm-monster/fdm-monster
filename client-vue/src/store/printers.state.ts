@@ -14,7 +14,7 @@ import { CreatePrinterGroup } from "@/models/printer-groups/crud/create-printer-
 @Module({
   dynamic: true,
   store: store,
-  name: PrintersModule.name
+  name: PrintersModule.name,
 })
 class PrintersModule extends VuexModule {
   printers: Printer[] = [];
@@ -223,7 +223,7 @@ class PrintersModule extends VuexModule {
 
   @Mutation _clearPrinterFiles({
     printerId,
-    result
+    result,
   }: {
     printerId: string;
     result: ClearedFilesResult;
@@ -237,7 +237,7 @@ class PrintersModule extends VuexModule {
 
   @Mutation setPrinterFiles({
     printerId,
-    fileList
+    fileList,
   }: {
     printerId: string;
     fileList: PrinterFileCache;
@@ -247,7 +247,7 @@ class PrintersModule extends VuexModule {
     if (!fileBucket) {
       fileBucket = {
         printerId,
-        ...fileList
+        ...fileList,
       };
       this.printerFileBuckets.push(fileBucket);
     } else {
@@ -293,7 +293,7 @@ class PrintersModule extends VuexModule {
   @Action
   async updatePrinter({
     printerId,
-    updatedPrinter
+    updatedPrinter,
   }: {
     printerId: string;
     updatedPrinter: CreatePrinter;
@@ -433,7 +433,7 @@ class PrintersModule extends VuexModule {
 
     this._clearPrinterFiles({
       printerId,
-      result: result as ClearedFilesResult
+      result: result as ClearedFilesResult,
     });
   }
 
@@ -466,7 +466,7 @@ class PrintersModule extends VuexModule {
   async addPrinterToGroup({
     groupId,
     printerId,
-    location
+    location,
   }: {
     groupId: string;
     printerId: string;
@@ -474,7 +474,7 @@ class PrintersModule extends VuexModule {
   }) {
     const result = await PrinterGroupService.addPrinterToGroup(groupId, {
       printerId,
-      location
+      location,
     });
 
     this.replacePrinterGroup(result);

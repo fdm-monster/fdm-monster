@@ -37,7 +37,7 @@ import { User } from "@/models/user.model";
 
 @Component({
   components: {},
-  data: () => ({ users: [] })
+  data: () => ({ users: [] }),
 })
 export default class UserManagementSettings extends Vue {
   users: User[];

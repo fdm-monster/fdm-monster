@@ -12,7 +12,7 @@ import { Prop } from "vue-property-decorator";
 import { Printer } from "@/models/printers/printer.model";
 
 @Component({
-  components: { FileList: FileControlList }
+  components: { FileList: FileControlList },
 })
 export default class PrinterSettingsAction extends Vue {
   @Prop() printer: Printer;

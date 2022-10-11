@@ -56,14 +56,14 @@ extend("json", {
       return false;
     }
   },
-  message: "{_field_} needs to be valid JSON."
+  message: "{_field_} needs to be valid JSON.",
 });
 
 @Component({
   components: {
     ValidationProvider,
-    ValidationObserver
-  }
+    ValidationObserver,
+  },
 })
 export default class BatchJsonCreateDialog extends Vue {
   @Prop(Boolean) show: boolean;

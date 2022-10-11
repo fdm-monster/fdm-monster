@@ -13,7 +13,7 @@ export const getDefaultCreatePrinter = (): PreCreatePrinter => ({
   sortIndex: 0,
   apiKey: "",
   enabled: true,
-  stepSize: 1
+  stepSize: 1,
 });
 
 /**

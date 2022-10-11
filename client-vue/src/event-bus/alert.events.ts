@@ -8,7 +8,7 @@ export const uploadOtherMessageEvent = "upload-other-message";
 
 export enum InfoEventType {
   UPLOAD_BACKEND,
-  UPLOAD_FRONTEND
+  UPLOAD_FRONTEND,
 }
 
 export const eventTypeToMessage = (type: InfoEventType, count: number) => {

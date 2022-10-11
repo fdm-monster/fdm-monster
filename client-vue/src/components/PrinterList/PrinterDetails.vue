@@ -44,8 +44,8 @@ import RefreshFilesAction from "@/components/Generic/Actions/RefreshFilesAction.
   components: {
     FileList: FileControlList,
     PrinterDeleteAction,
-    RefreshFilesAction
-  }
+    RefreshFilesAction,
+  },
 })
 export default class PrinterDetails extends Vue {
   @Prop() printer: Printer;

@@ -78,7 +78,7 @@ export default class FdmSettings extends Vue {
   fileHandlingSettings: PrinterFileCleanSettings = {
     autoRemoveOldFilesBeforeUpload: false,
     autoRemoveOldFilesAtBoot: false,
-    autoRemoveOldFilesCriteriumDays: 7
+    autoRemoveOldFilesCriteriumDays: 7,
   };
 
   async created() {

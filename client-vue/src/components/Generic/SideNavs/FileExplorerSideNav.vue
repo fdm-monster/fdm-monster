@@ -249,8 +249,8 @@ import { formatBytes } from "@/utils/file-size.util";
 
 @Component({
   data: () => ({
-    shownFileBucket: {}
-  })
+    shownFileBucket: {},
+  }),
 })
 export default class FileExplorerSideNav extends Vue {
   drawerOpened = false;
@@ -368,17 +368,17 @@ export default class FileExplorerSideNav extends Vue {
     if (viewedPrinter.apiAccessibility.accessible) {
       const fileCache = await printersState.loadPrinterFiles({
         printerId,
-        recursive: false
+        recursive: false,
       });
       this.shownFileBucket = {
         printerId,
-        ...fileCache
+        ...fileCache,
       };
     } else {
       const fileCache = await PrinterFileService.getFileCache(printerId);
       this.shownFileBucket = {
         printerId,
-        ...fileCache
+        ...fileCache,
       };
     }
     this.loading = false;
@@ -389,7 +389,7 @@ export default class FileExplorerSideNav extends Vue {
 
     await printersState.deletePrinterFile({
       printerId: this.printerId,
-      fullPath: file.path
+      fullPath: file.path,
     });
   }
 
@@ -418,7 +418,7 @@ export default class FileExplorerSideNav extends Vue {
 
     await printersState.selectAndPrintFile({
       printerId: this.printerId,
-      fullPath: file.path
+      fullPath: file.path,
     });
   }
 

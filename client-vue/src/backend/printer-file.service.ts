@@ -41,7 +41,7 @@ export class PrinterFileService extends BaseService {
       path,
       formData,
       {
-        onUploadProgress: this.uploadUpdateProgress
+        onUploadProgress: this.uploadUpdateProgress,
       },
       { unwrap: false }
     );
@@ -51,9 +51,9 @@ export class PrinterFileService extends BaseService {
     Vue.bus.emit(uploadMessageEvent, InfoEventType.UPLOAD_FRONTEND, {
       current: [
         {
-          progress: { percent: progress.loaded / progress.total }
-        }
-      ]
+          progress: { percent: progress.loaded / progress.total },
+        },
+      ],
     });
   }
 
@@ -81,7 +81,7 @@ export class PrinterFileService extends BaseService {
       path,
       formData,
       {
-        onUploadProgress: this.uploadUpdateProgress
+        onUploadProgress: this.uploadUpdateProgress,
       },
       { unwrap: false }
     );

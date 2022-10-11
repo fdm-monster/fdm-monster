@@ -56,7 +56,7 @@ import RAL_CODES from "@/constants/ral.reference.json";
 import { CustomGcodeService } from "@/backend/custom-gcode.service";
 
 @Component({
-  components: {}
+  components: {},
 })
 export default class PrinterGridTile extends Vue {
   @Prop() printer: Printer;

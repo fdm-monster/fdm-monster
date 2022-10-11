@@ -61,7 +61,7 @@ import { Prop } from "vue-property-decorator";
 import { TestProgressDetails } from "@/models/sse-messages/printer-sse-message.model";
 
 @Component({
-  components: {}
+  components: {},
 })
 export default class PrinterChecksPanel extends Vue {
   @Prop() testProgress: TestProgressDetails;

@@ -14,7 +14,7 @@ import { Printer } from "@/models/printers/printer.model";
 import { printersState } from "@/store/printers.state";
 
 @Component({
-  components: { FileList: FileControlList }
+  components: { FileList: FileControlList },
 })
 export default class PrinterDeleteAction extends Vue {
   @Prop() printer: Printer;

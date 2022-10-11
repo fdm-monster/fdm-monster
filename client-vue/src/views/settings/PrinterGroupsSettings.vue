@@ -144,8 +144,8 @@ import { Printer } from "@/models/printers/printer.model";
 @Component({
   components: {},
   data: () => ({
-    selectedItem: 0
-  })
+    selectedItem: 0,
+  }),
 })
 export default class PrinterGroupsSettings extends Vue {
   editedPrinterGroupName: string = "";
@@ -196,7 +196,7 @@ export default class PrinterGroupsSettings extends Vue {
     const { _id: groupId } = this.selectedPrinterGroup;
     await printersState.updatePrinterGroupName({
       groupId,
-      name: this.editedPrinterGroupName
+      name: this.editedPrinterGroupName,
     });
   }
 
@@ -212,7 +212,7 @@ export default class PrinterGroupsSettings extends Vue {
     await printersState.addPrinterToGroup({
       groupId: this.selectedPrinterGroup._id,
       printerId: printer.id,
-      location
+      location,
     });
   }
 
@@ -222,7 +222,7 @@ export default class PrinterGroupsSettings extends Vue {
 
     await printersState.deletePrinterFromGroup({
       groupId: group._id,
-      printerId: printer.id
+      printerId: printer.id,
     });
   }
 }

@@ -43,8 +43,8 @@ export default {
         ["printer", "Printers", "/printers"],
         ["settings", "Settings", "/settings"],
         ["history", "PrintScheduling", "/scheduling"],
-        ["contact_support", "About", "/about"]
-      ]
+        ["contact_support", "About", "/about"],
+      ],
     };
   },
   computed: {
@@ -53,8 +53,8 @@ export default {
         (route) => !route.meta || !route.meta.hidden
       );
       return routes;
-    }
-  }
+    },
+  },
 };
 </script>
 

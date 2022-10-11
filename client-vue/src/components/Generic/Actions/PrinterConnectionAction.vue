@@ -32,7 +32,7 @@ import { PrintersService } from "@/backend";
 import { printersState } from "@/store/printers.state";
 
 @Component({
-  components: { FileList: FileControlList }
+  components: { FileList: FileControlList },
 })
 export default class PrinterConnectionAction extends Vue {
   @Prop() printer: Printer;

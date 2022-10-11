@@ -24,7 +24,7 @@ export function convertPrinterMultiFileToQueue(
     return {
       file: f,
       printer,
-      commands
+      commands,
     };
   }) as QueuedUpload[];
 }
@@ -46,7 +46,7 @@ export function convertMultiPrinterFileToQueue(
     return {
       file,
       printer: p,
-      commands
+      commands,
     };
   }) as QueuedUpload[];
 }

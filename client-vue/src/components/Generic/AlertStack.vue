@@ -60,7 +60,7 @@ import {
   InfoEventType,
   infoMessageEvent,
   uploadMessageEvent,
-  vuexErrorEvent
+  vuexErrorEvent,
 } from "@/event-bus/alert.events";
 import { TrackedUpload, UploadStates } from "@/models/sse-messages/printer-sse-message.model";
 import { uploadsState } from "@/store/uploads.state";
@@ -71,11 +71,11 @@ import AlertErrorDialog from "@/components/Generic/AlertErrorDialog.vue";
     err: undefined,
     progressStates: undefined,
     progressInfo: undefined,
-    info: undefined
+    info: undefined,
   }),
   components: {
-    AlertErrorDialog
-  }
+    AlertErrorDialog,
+  },
 })
 export default class ErrorAlert extends Vue {
   @Prop() stopPropagation: boolean;

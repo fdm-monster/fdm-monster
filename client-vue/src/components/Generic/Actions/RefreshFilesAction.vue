@@ -13,7 +13,7 @@ import { printersState } from "@/store/printers.state";
 import { Printer } from "@/models/printers/printer.model";
 
 @Component({
-  data: () => ({})
+  data: () => ({}),
 })
 export default class RefreshFilesAction extends Vue {
   @Prop() printer: Printer;
@@ -21,7 +21,7 @@ export default class RefreshFilesAction extends Vue {
   async getFiles() {
     await printersState.loadPrinterFiles({
       printerId: this.printer.id,
-      recursive: false
+      recursive: false,
     });
   }
 }

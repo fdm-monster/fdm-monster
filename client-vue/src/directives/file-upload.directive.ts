@@ -3,7 +3,7 @@ import { Printer } from "@/models/printers/printer.model";
 import { uploadsState } from "@/store/uploads.state";
 import {
   convertMultiPrinterFileToQueue,
-  convertPrinterMultiFileToQueue
+  convertPrinterMultiFileToQueue,
 } from "@/utils/uploads-state.utils";
 import { infoMessageEvent } from "@/event-bus/alert.events";
 import { printersState } from "@/store/printers.state";
@@ -84,6 +84,6 @@ export function registerFileDropDirective() {
     },
     update: (el, binding, vnode) => {
       bindDropConditionally(el, binding.value?.printers, vnode.context);
-    }
+    },
   });
 }

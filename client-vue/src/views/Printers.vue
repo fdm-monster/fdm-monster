@@ -172,11 +172,11 @@ import { PrinterFirmwareStateModel } from "@/models/plugins/firmware-updates/pri
     PrinterUrlAction,
     PrinterSettingsAction,
     PrinterEmergencyStopAction,
-    PrinterConnectionAction
+    PrinterConnectionAction,
   },
   data: () => ({
-    firmwareUpdates: []
-  })
+    firmwareUpdates: [],
+  }),
 })
 export default class Printers extends Vue {
   reorder = false;
@@ -192,36 +192,36 @@ export default class Printers extends Vue {
       text: "Order",
       align: "start",
       sortable: true,
-      value: "sortIndex"
+      value: "sortIndex",
     },
     { text: "Enabled", value: "enabled" },
     {
       text: "Printer Name",
       align: "start",
       sortable: true,
-      value: "printerName"
+      value: "printerName",
     },
     { text: "Groups", value: "group" },
     { text: "Actions", value: "actions", sortable: false },
-    { text: "", value: "data-table-expand" }
+    { text: "", value: "data-table-expand" },
   ];
   firmwareTableHeaders = [
     {
       text: "Printer Name",
       align: "start",
       sortable: true,
-      value: "printerName"
+      value: "printerName",
     },
     {
       text: "Firmware Version",
       sortable: true,
-      value: "firmware"
+      value: "firmware",
     },
     {
       text: "Plugin installed",
-      value: "pluginInstalled"
+      value: "pluginInstalled",
     },
-    { text: "Actions", value: "actions", sortable: false }
+    { text: "Actions", value: "actions", sortable: false },
   ];
 
   async created() {

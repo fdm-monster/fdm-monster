@@ -27,7 +27,7 @@ import Vue from "vue";
 import { Component } from "vue-property-decorator";
 
 @Component({
-  components: {}
+  components: {},
 })
 export default class OtherSettings extends Vue {}
 </script>

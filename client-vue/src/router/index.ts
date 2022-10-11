@@ -16,12 +16,12 @@ const routes: Array<RouteConfig> = [
   {
     path: "/",
     name: "Home",
-    component: HomePrinterGrid
+    component: HomePrinterGrid,
   },
   {
     path: "/printers",
     name: "Printers",
-    component: Printers
+    component: Printers,
   },
   {
     path: "/settings",
@@ -29,47 +29,47 @@ const routes: Array<RouteConfig> = [
     children: [
       {
         path: "",
-        redirect: "printer-groups"
+        redirect: "printer-groups",
       },
       {
         path: "user-management",
-        component: UserManagementSettings
+        component: UserManagementSettings,
       },
       {
         path: "printer-groups",
-        component: PrinterGroupsSettings
+        component: PrinterGroupsSettings,
       },
       {
         path: "system",
-        component: FdmSettings
+        component: FdmSettings,
       },
       {
         path: "other",
-        component: OtherSettings
-      }
-    ]
+        component: OtherSettings,
+      },
+    ],
   },
   {
     path: "/scheduling",
     name: "Scheduling",
-    component: Scheduling
+    component: Scheduling,
   },
   {
     path: "/about",
     name: "About",
-    component: About
+    component: About,
   },
   {
     path: "*",
     name: "NotFound",
-    component: () => import(/* webpackChunkName: "about" */ "../views/NotFound.vue")
-  }
+    component: () => import(/* webpackChunkName: "about" */ "../views/NotFound.vue"),
+  },
 ];
 
 const router = new VueRouter({
   mode: "history",
   base: process.env.BASE_URL,
-  routes
+  routes,
 });
 
 export default router;

@@ -3,7 +3,7 @@ import { ServerApi } from "@/backend/server.api";
 import { PrusaFirmwareReleaseModel } from "@/models/plugins/firmware-updates/prusa-firmware-release.model";
 import {
   PrinterFirmwareStateResponse,
-  PrinterInstalledResponse
+  PrinterInstalledResponse,
 } from "@/models/plugins/firmware-updates/printer-firmware-state.model";
 
 export class PrinterFirmwareUpdateService extends BaseService {

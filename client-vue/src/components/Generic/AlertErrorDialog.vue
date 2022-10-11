@@ -39,8 +39,8 @@ import { uploadsState } from "@/store/uploads.state";
     dialogOpened: false,
     errorCode: undefined,
     failedUploads: [],
-    errorType: ""
-  })
+    errorType: "",
+  }),
 })
 export default class AlertErrorDialog extends Vue {
   dialogOpened: boolean;
