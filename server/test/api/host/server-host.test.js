@@ -2,7 +2,7 @@ const dbHandler = require("../../db-handler");
 const { setupTestApp } = require("../../test-server");
 const DITokens = require("../../../container.tokens");
 const { AppConstants } = require("../../../server.constants");
-const { expectOkResponse, expectNotFoundResponse } = require("../../extensions");
+const { expectOkResponse } = require("../../extensions");
 
 let container;
 let serverHost;
@@ -24,7 +24,7 @@ describe("ServerHost", () => {
   });
 
   /**
-   * The /test endpoint does not exist on the backed, so its rewritten to /index.html
+   * The /test endpoint does not exist on the backend, so it's rewritten to /index.html
    */
   it("should hit history redirect for /test", async () => {
     const response = await request.get("/test").set("Accept", "text/html").send();

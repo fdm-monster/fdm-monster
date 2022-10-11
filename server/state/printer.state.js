@@ -1,12 +1,12 @@
 const {
-  getCurrentProfileDefault
+  getCurrentProfileDefault,
 } = require("../services/octoprint/constants/octoprint-service.constants");
 const { PEVENTS } = require("../constants/event.constants");
 const {
   getDefaultPrinterState,
   WS_STATE,
   EVENT_TYPES,
-  getDefaultDisabledPrinterState
+  getDefaultDisabledPrinterState,
 } = require("../services/octoprint/constants/octoprint-websocket.constants");
 const { mapStateToColor, PSTATE, MESSAGE } = require("../constants/state.constants");
 const Logger = require("../handlers/logger.js");
@@ -23,7 +23,7 @@ class PrinterState {
     state: PSTATE.Offline,
     flags: {},
     colour: mapStateToColor(PSTATE.Offline),
-    desc: "Setting up your Printer"
+    desc: "Setting up your Printer",
   };
 
   #websocketAdapter;
@@ -49,7 +49,7 @@ class PrinterState {
   #apiAccessibility = {
     accessible: true,
     retryable: true,
-    reason: null
+    reason: null,
   };
 
   #logger = new Logger("Printer-State");
@@ -103,7 +103,7 @@ class PrinterState {
    */
   updateEntityData(printerDocument, reconnect = false) {
     this.#entityData = Object.freeze({
-      ...printerDocument._doc
+      ...printerDocument._doc,
     });
 
     // We could compare previous and new data to check whether a reset is necessary
@@ -115,7 +115,7 @@ class PrinterState {
   updateLastPrintedFile(lastPrintedFile) {
     this.#entityData = {
       ...this.#entityData,
-      lastPrintedFile
+      lastPrintedFile,
     };
   }
 
@@ -129,7 +129,7 @@ class PrinterState {
     const identification = this.isTest
       ? {
           correlationToken: this.#entityData.correlationToken,
-          isTest: this.isTest
+          isTest: this.isTest,
         }
       : { id: this.#id };
 
@@ -153,7 +153,7 @@ class PrinterState {
         ports: [],
         portPreference: "VIRTUAL",
         printerProfiles: [],
-        printerProfilePreference: "_default"
+        printerProfilePreference: "_default",
       },
       currentProfile: this.#currentProfile,
       octoPrintSystemInfo: this.#octoPrintSystemInfo,
@@ -164,31 +164,31 @@ class PrinterState {
       otherSettings: {
         temperatureTriggers: this.#entityData.tempTriggers,
         system: {
-          commands: {}
+          commands: {},
         },
-        webCamSettings: {}
+        webCamSettings: {},
       },
       octoPi: {
         version: "sure",
-        model: "American Pi"
+        model: "American Pi",
       },
       tools: [
         {
           time: 0,
           bed: {
-            actual: 0
+            actual: 0,
           },
           chamber: {
-            actual: 0
-          }
-        }
+            actual: 0,
+          },
+        },
       ],
       // Unmapped data - comes from database model so would be nicer to make a child object
       gcodeScripts: {},
       octoPrintVersion: this.getOctoPrintVersion(),
       lastPrintedFile: this.#entityData.lastPrintedFile || {
         parsedColor: "any",
-        parsedVisualizationRAL: 0
+        parsedVisualizationRAL: 0,
       },
       selectedFilament: this.#entityData.selectedFilament,
       enabled: this.#entityData.enabled,
@@ -199,7 +199,7 @@ class PrinterState {
       // apiKey: this.#entityData.apiKey, // INSECURE
       // currentUser // INSECURE
       printerURL: this.#entityData.printerURL,
-      group: this.#entityData.group
+      group: this.#entityData.group,
     });
   }
 
@@ -239,23 +239,23 @@ class PrinterState {
       case WS_STATE.connected:
         return {
           colour: "success",
-          desc: "Connection tentative"
+          desc: "Connection tentative",
         };
       case WS_STATE.errored:
         return {
           colour: "warning",
-          desc: adapterState
+          desc: adapterState,
         };
       case WS_STATE.authed:
         return {
           colour: "success",
-          desc: adapterState
+          desc: adapterState,
         };
       default:
       case WS_STATE.unopened:
         return {
           colour: "danger",
-          desc: adapterState
+          desc: adapterState,
         };
     }
   }
@@ -300,7 +300,7 @@ class PrinterState {
   getLoginDetails() {
     return {
       printerURL: this.#entityData.printerURL,
-      apiKey: this.#entityData.apiKey
+      apiKey: this.#entityData.apiKey,
     };
   }
 
@@ -325,7 +325,7 @@ class PrinterState {
       webSocketURL: this.#entityData.webSocketURL,
       currentUser: this.#sessionUser,
       sessionKey: this.#sessionKey,
-      throttle: 2
+      throttle: 2,
     });
 
     this.#messageStream = this.#websocketAdapter.getMessages$();
@@ -442,7 +442,7 @@ class PrinterState {
     this.#hostState = {
       state,
       colour: mapStateToColor(state),
-      desc: description
+      desc: description,
     };
   }
 
@@ -451,16 +451,15 @@ class PrinterState {
    */
   setApiAccessibility(accessible, retryable, reason) {
     if (!accessible) {
-      if (!retryable) {
+      if (!retryable && process.env.NODE_ENV !== "test")
         this.#logger.warning(
           `Printer API '${this.getName()}' was marked as inaccessible. Reason: '${reason}'. Please check connection settings.`
         );
-      }
     }
     this.#apiAccessibility = {
       accessible,
       retryable,
-      reason
+      reason,
     };
   }
 
