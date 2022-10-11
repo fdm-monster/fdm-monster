@@ -30,7 +30,7 @@ class PrinterSseTask {
   }
 
   async run() {
-    const selectedFloor = this.#printerFloorService.getSelectedFloor();
+    const selectedFloor = await this.#printerFloorService.getSelectedFloor();
     const printerStates = this.#printersStore.listPrintersFlat();
     const printerGroups = this.#printerGroupsCache.getCache();
     const trackedUploads = this.#fileUploadTrackerCache.getUploads(true);

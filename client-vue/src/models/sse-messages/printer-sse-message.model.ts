@@ -1,5 +1,6 @@
 import { Printer } from "@/models/printers/printer.model";
 import { PrinterGroup } from "@/models/printers/printer-group.model";
+import { PrinterFloor } from "@/models/printer-floor/printer-floor.model";
 
 export interface TestProgressDetails {
   connected: boolean;
@@ -35,4 +36,5 @@ export interface PrinterSseMessage {
   testPrinter: Printer;
   trackedUploads: UploadStates;
   testProgress: TestProgressDetails;
+  selectedFloor: PrinterFloor;
 }
