@@ -63,7 +63,7 @@ function flattenPermissionDefinition() {
 }
 
 function allPerms(group) {
-  if (!group) throw new Error(`Permission group name '${group}' was not found`);
+  if (!group || !PERMS[group]) throw new Error(`Permission group name '${group}' was not found`);
   return Object.values(PERMS[group]);
 }
 
