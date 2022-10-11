@@ -5,7 +5,7 @@ const { NotFoundException } = require("../exceptions/runtime.exceptions");
 const {
   createPrinterFloorRules,
   updatePrinterFloorNameRules,
-  printerGroupInFloorRules
+  printerGroupInFloorRules,
 } = require("./validators/printer-floor-service.validation");
 
 class PrinterFloorService {
@@ -17,34 +17,6 @@ class PrinterFloorService {
   constructor({ printerGroupService, loggerFactory }) {
     this.#printerGroupService = printerGroupService;
     this.#logger = loggerFactory("PrinterFloorService");
-  }
-
-  async getSelectedFloor(throwError = false) {
-    if (!this.#selectedFloorId) {
-      this.#logger.info(
-        "Could not provide selected floor, it was not loaded or selected. Was setSelectedFloor initialization called?"
-      );
-    }
-
-    return this.get(this.#selectedFloorId, throwError);
-  }
-
-  async setSelectedFloor(arrayIndex = null) {
-    const floors = await this.list();
-    if (!floors?.length) {
-      this.#logger.info("Creating default floor as non existed");
-
-      const floor = await this.create({
-        name: "default floor",
-        floor: 1
-      });
-      this.#selectedFloorId = floor._id;
-    } else {
-      const index = arrayIndex || 0;
-      this.#selectedFloorId = floors[index]._id;
-    }
-
-    this.#logger.info(`Set selected floor to id '${this.#selectedFloorId}'`);
   }
 
   /**

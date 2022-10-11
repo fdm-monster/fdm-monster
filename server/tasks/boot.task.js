@@ -22,7 +22,7 @@ class BootTask {
   userService;
   influxDbSetupService;
   pluginRepositoryCache;
-  printerFloorService;
+  printerFloorsCache;
   pluginFirmwareUpdateService;
 
   constructor({
@@ -42,8 +42,8 @@ class BootTask {
     taskManagerService,
     influxDbSetupService,
     pluginRepositoryCache,
-    printerFloorService,
-    pluginFirmwareUpdateService
+    printerFloorsCache,
+    pluginFirmwareUpdateService,
   }) {
     this.#serverTasks = serverTasks;
     this.serverSettingsService = serverSettingsService;
@@ -60,7 +60,7 @@ class BootTask {
     this.#taskManagerService = taskManagerService;
     this.influxDbSetupService = influxDbSetupService;
     this.pluginRepositoryCache = pluginRepositoryCache;
-    this.printerFloorService = printerFloorService;
+    this.printerFloorsCache = printerFloorsCache;
     this.pluginFirmwareUpdateService = pluginFirmwareUpdateService;
     this.#logger = loggerFactory("Server");
   }
@@ -104,7 +104,7 @@ class BootTask {
       await this.filamentsStore.loadFilamentsStore();
       await this.historyStore.loadHistoryStore();
       await this.printerGroupsCache.loadCache();
-      await this.printerFloorService.setSelectedFloor();
+      await this.printerFloorsCache.setSelectedFloor();
       await this.influxDbSetupService.optionalInfluxDatabaseSetup();
 
       this.#logger.info("Synchronizing user permission and roles definition");
@@ -132,7 +132,7 @@ class BootTask {
 
   async createConnection() {
     await mongoose.connect(fetchMongoDBConnectionString(), {
-      serverSelectionTimeoutMS: 1500
+      serverSelectionTimeoutMS: 1500,
     });
   }
 
@@ -144,7 +144,7 @@ class BootTask {
         username: "root",
         name: "Admin",
         password: "fdm-root",
-        roles: [adminRole.id]
+        roles: [adminRole.id],
       });
       this.#logger.info(
         "Created admin account as it was missing. Please consult the documentation for credentials."

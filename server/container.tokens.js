@@ -49,6 +49,7 @@ const DITokens = {
   printerState: "printerState",
   // Caches
   printerGroupsCache: "printerGroupsCache",
+  printerFloorsCache: "printerFloorsCache",
   printerProfilesCache: "printerProfilesCache",
   terminalLogsCache: "terminalLogsCache",
   jobsCache: "jobsCache",
@@ -67,7 +68,7 @@ const DITokens = {
   printerWebsocketTask: "printerWebsocketTask",
   printerWebsocketPingTask: "printerWebsocketPingTask",
   printerFileCleanTask: "printerFileCleanTask",
-  pluginFirmwareUpdatePreparationTask: "PluginFirmwareUpdatePreparationTask"
+  pluginFirmwareUpdatePreparationTask: "PluginFirmwareUpdatePreparationTask",
 };
 
 module.exports = DITokens;
