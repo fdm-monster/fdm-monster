@@ -10,6 +10,7 @@ const {
 } = require("../services/octoprint/constants/octoprint-websocket.constants");
 const { mapStateToColor, PSTATE, MESSAGE } = require("../constants/state.constants");
 const Logger = require("../handlers/logger.js");
+const { isTestEnvironment } = require("../utils/env.utils");
 
 /**
  * This is a model to simplify unified printers state
@@ -451,7 +452,7 @@ class PrinterState {
    */
   setApiAccessibility(accessible, retryable, reason) {
     if (!accessible) {
-      if (!retryable && process.env.NODE_ENV !== "test")
+      if (!retryable && !isTestEnvironment())
         this.#logger.warning(
           `Printer API '${this.getName()}' was marked as inaccessible. Reason: '${reason}'. Please check connection settings.`
         );

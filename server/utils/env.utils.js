@@ -2,8 +2,17 @@ const fs = require("fs");
 const Logger = require("../handlers/logger.js");
 const dotenv = require("dotenv");
 const { isDocker } = require("./is-docker");
+const { AppConstants } = require("../server.constants");
 
 const logger = new Logger("Utils-Env", false);
+
+function isProductionEnvironment() {
+  return process.env.NODE_ENV === AppConstants.defaultProductionEnv;
+}
+
+function isTestEnvironment() {
+  return process.env[AppConstants.NODE_ENV_KEY] === "test";
+}
 
 function isPm2() {
   return (
@@ -57,7 +66,7 @@ function writeVariableToEnvFile(absoluteEnvPath, variableKey, jsonObject) {
 
   const newDotEnv = {
     ...latestDotEnvConfig.parsed,
-    [variableKey]: jsonObject
+    [variableKey]: jsonObject,
   };
 
   const dotEnvResult = stringifyDotEnv(newDotEnv);
@@ -88,9 +97,11 @@ function verifyPackageJsonRequirements(rootPath) {
 }
 
 module.exports = {
+  isTestEnvironment,
+  isProductionEnvironment,
   isPm2,
   isNodemon,
   isNode,
   writeVariableToEnvFile,
-  verifyPackageJsonRequirements
+  verifyPackageJsonRequirements,
 };
