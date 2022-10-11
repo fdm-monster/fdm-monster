@@ -20,7 +20,7 @@
 export default {
   data: () => ({
     value: "",
-    ready: false
+    ready: false,
   }),
   computed: {
     cal() {
@@ -28,7 +28,7 @@ export default {
     },
     nowY() {
       return this.cal ? this.cal.timeToY(this.cal.times.now) + "px" : "-10px";
-    }
+    },
   },
   mounted() {
     this.ready = true;
@@ -47,8 +47,8 @@ export default {
     },
     updateTime() {
       setInterval(() => this.cal.updateTimes(), 60 * 1000);
-    }
-  }
+    },
+  },
 };
 </script>
 

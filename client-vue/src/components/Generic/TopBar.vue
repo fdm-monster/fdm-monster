@@ -39,8 +39,8 @@ import { DateTime, Duration } from "luxon";
 @Component({
   components: { PrintJobsMenu },
   data: () => ({
-    printTimeHoursMinutes: "05:00"
-  })
+    printTimeHoursMinutes: "05:00",
+  }),
 })
 export default class TopBar extends Vue {
   currentTimeDiff4h = "";

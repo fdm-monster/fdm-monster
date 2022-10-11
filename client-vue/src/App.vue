@@ -43,8 +43,8 @@ import CreatePrinterGroupDialog from "@/components/Generic/Dialogs/CreatePrinter
     CreatePrinterDialog,
     CreatePrinterGroupDialog,
     FileExplorerSideNav,
-    ErrorAlert
-  }
+    ErrorAlert,
+  },
 })
 export default class App extends Vue {
   sseClient?: SSEClient;
@@ -105,7 +105,7 @@ export default class App extends Vue {
 
       this.$bus.emit(sseTestPrinterUpdate(testPrinter.correlationToken), {
         testPrinter,
-        testProgress
+        testProgress,
       });
     }
   }

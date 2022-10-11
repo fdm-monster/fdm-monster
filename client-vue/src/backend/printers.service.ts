@@ -6,7 +6,7 @@ import {
   getDefaultCreatePrinter,
   HttpProtocol,
   PreCreatePrinter,
-  WebSocketProtocol
+  WebSocketProtocol,
 } from "@/models/printers/crud/create-printer.model";
 import { newRandomNamePair } from "@/constants/noun-adjectives.data";
 

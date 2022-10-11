@@ -19,7 +19,7 @@ import { Printer } from "@/models/printers/printer.model";
 import { PrintersService } from "@/backend";
 
 @Component({
-  components: { FileList: FileControlList }
+  components: { FileList: FileControlList },
 })
 export default class PrinterUrlAction extends Vue {
   @Prop() printer: Printer;

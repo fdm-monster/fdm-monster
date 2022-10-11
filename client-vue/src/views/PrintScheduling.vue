@@ -8,6 +8,6 @@
 <script>
 import CalendarView from "@/components/PrintScheduling/CalendarView";
 export default {
-  components: { CalendarView }
+  components: { CalendarView },
 };
 </script>

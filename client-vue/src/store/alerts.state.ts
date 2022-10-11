@@ -4,7 +4,7 @@ import store from "@/store";
 
 @Module({
   name: "alerts",
-  store: store
+  store: store,
 })
 export class AlertsModule extends VuexModule {
   count = 0;

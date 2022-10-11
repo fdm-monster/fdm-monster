@@ -1,19 +1,20 @@
 # Ignore transient folders
+.idea
 .git
-logs
-coverage
+**/logs
+**/coverage
+**/.github
+**/docker
+**/docs
+**/images
+**/fdm-monster
+**/file-storage
 
 # Ignore unuseful folders
-.github
-docker
-docs
-images
-node_modules
-server-nest
-
-# Ignore client for now
-client-vue
+**/node_modules
+**/assets
+**/dist
 
 # Ignore root files
 CHANGELOG.md
-README.md
+**/README.md

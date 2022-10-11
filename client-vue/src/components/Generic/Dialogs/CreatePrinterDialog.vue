@@ -54,7 +54,7 @@ import { Printer } from "@/models/printers/printer.model";
 import { sseTestPrinterUpdate } from "@/event-bus/sse.events";
 import {
   PrinterSseMessage,
-  TestProgressDetails
+  TestProgressDetails,
 } from "@/models/sse-messages/printer-sse-message.model";
 import { PrintersService } from "@/backend";
 import { generateInitials } from "@/constants/noun-adjectives.data";
@@ -67,12 +67,12 @@ import { infoMessageEvent } from "@/event-bus/alert.events";
   components: {
     ValidationObserver,
     PrinterCrudForm,
-    PrinterChecksPanel
+    PrinterChecksPanel,
   },
   data: () => ({
     testProgress: undefined,
-    copyPasteConnectionString: ""
-  })
+    copyPasteConnectionString: "",
+  }),
 })
 export default class CreatePrinterDialog extends Vue {
   showingDialog = false;

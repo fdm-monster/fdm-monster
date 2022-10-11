@@ -4,7 +4,7 @@ import { PrinterGroup } from "@/models/printers/printer-group.model";
 import {
   CreatePrinterGroup,
   getDefaultCreatePrinterGroup,
-  PreCreatePrinterGroup
+  PreCreatePrinterGroup,
 } from "@/models/printer-groups/crud/create-printer-group.model";
 import { newRandomNamePair } from "@/constants/noun-adjectives.data";
 
@@ -19,7 +19,7 @@ export class PrinterGroupService extends BaseService {
 
     newFormData.location = {
       x: printerGroup.location?.x.toString() || "0",
-      y: printerGroup.location.y?.toString() || "0"
+      y: printerGroup.location.y?.toString() || "0",
     };
 
     return newFormData;

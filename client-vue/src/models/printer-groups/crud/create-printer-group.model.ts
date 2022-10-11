@@ -5,7 +5,7 @@ export const getDefaultCreatePrinterGroup = (): PreCreatePrinterGroup => ({
   id: undefined,
   name: newRandomNamePair(),
   location: {},
-  printers: []
+  printers: [],
 });
 
 export interface PreCreatePrinterGroup {

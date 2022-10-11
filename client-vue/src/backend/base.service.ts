@@ -48,7 +48,7 @@ export class BaseService {
     const response = await axios.request<T>({
       url: `${apiBase}/${path}`,
       method: "delete",
-      data: body
+      data: body,
     });
 
     // Do interception or global handling here

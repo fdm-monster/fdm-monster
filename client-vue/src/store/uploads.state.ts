@@ -71,7 +71,7 @@ class UploadsModule extends VuexModule {
           file,
           printer,
           commands,
-          error: e
+          error: e,
         };
         this._appendFailedUpload(failedUpload);
         this.$bus.emit(uploadFailureMessageEvent, e);
@@ -94,5 +94,5 @@ class UploadsModule extends VuexModule {
 
 export const uploadsState = new UploadsModule({
   store,
-  name: "uploads"
+  name: "uploads",
 });

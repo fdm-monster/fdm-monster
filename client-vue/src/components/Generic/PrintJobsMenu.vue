@@ -92,8 +92,8 @@ import { Watch } from "vue-property-decorator";
     filter: undefined,
     message: false,
     hints: true,
-    search: ""
-  })
+    search: "",
+  }),
 })
 export default class PrintJobsMenu extends Vue {
   search?: string;

@@ -7,27 +7,27 @@ export function configureVeeValidate() {
 
   extend("digits", {
     ...digits,
-    message: "{_field_} needs to be {length} digits. ({_value_})"
+    message: "{_field_} needs to be {length} digits. ({_value_})",
   });
 
   extend("required", {
     ...required,
-    message: "{_field_} can not be empty"
+    message: "{_field_} can not be empty",
   });
 
   extend("length", {
     ...length,
-    message: "{_field_} must be of length {length}"
+    message: "{_field_} must be of length {length}",
   });
 
   extend("integer", {
     ...integer,
-    message: "{_field_} must be an integer"
+    message: "{_field_} must be an integer",
   });
 
   extend("alpha_num", {
     ...alpha_num,
-    message: "{_field_} must be alphanumeric"
+    message: "{_field_} must be alphanumeric",
   });
 
   extend("ip_or_fqdn", (value) => {
@@ -36,6 +36,6 @@ export function configureVeeValidate() {
 
   extend("max", {
     ...max,
-    message: "{_field_} may not be greater than {length} characters"
+    message: "{_field_} may not be greater than {length} characters",
   });
 }

@@ -43,7 +43,8 @@
         </v-list-item-title>
         <v-list-item-subtitle v-if="storedSideNavPrinter.currentJob">
           <span v-if="storedSideNavPrinter.currentJob.progress" class="d-flex justify-center">
-            Progress: {{ truncateProgress(storedSideNavPrinter.currentJob.progress) }}%
+            Progress:
+            {{ truncateProgress(storedSideNavPrinter.currentJob.progress) }}%
           </span>
           <v-progress-linear
             v-if="storedSideNavPrinter.currentJob"
@@ -248,8 +249,8 @@ import { formatBytes } from "@/utils/file-size.util";
 
 @Component({
   data: () => ({
-    shownFileBucket: {}
-  })
+    shownFileBucket: {},
+  }),
 })
 export default class FileExplorerSideNav extends Vue {
   drawerOpened = false;
@@ -365,16 +366,19 @@ export default class FileExplorerSideNav extends Vue {
     const printerId = viewedPrinter.id;
     // Offline printer fallback
     if (viewedPrinter.apiAccessibility.accessible) {
-      const fileCache = await printersState.loadPrinterFiles({ printerId, recursive: false });
+      const fileCache = await printersState.loadPrinterFiles({
+        printerId,
+        recursive: false,
+      });
       this.shownFileBucket = {
         printerId,
-        ...fileCache
+        ...fileCache,
       };
     } else {
       const fileCache = await PrinterFileService.getFileCache(printerId);
       this.shownFileBucket = {
         printerId,
-        ...fileCache
+        ...fileCache,
       };
     }
     this.loading = false;
@@ -383,7 +387,10 @@ export default class FileExplorerSideNav extends Vue {
   async deleteFile(file: PrinterFile) {
     if (!this.printerId) return;
 
-    await printersState.deletePrinterFile({ printerId: this.printerId, fullPath: file.path });
+    await printersState.deletePrinterFile({
+      printerId: this.printerId,
+      fullPath: file.path,
+    });
   }
 
   async clickEmergencyStop() {
@@ -409,7 +416,10 @@ export default class FileExplorerSideNav extends Vue {
   async clickPrintFile(file: PrinterFile) {
     if (!this.printerId) return;
 
-    await printersState.selectAndPrintFile({ printerId: this.printerId, fullPath: file.path });
+    await printersState.selectAndPrintFile({
+      printerId: this.printerId,
+      fullPath: file.path,
+    });
   }
 
   clickDownloadFile(file: PrinterFile) {

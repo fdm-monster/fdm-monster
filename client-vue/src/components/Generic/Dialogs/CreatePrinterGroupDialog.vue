@@ -45,9 +45,9 @@ import PrinterGroupCrudForm from "@/components/Generic/Forms/PrinterGroupCrudFor
 @Component({
   components: {
     ValidationObserver,
-    PrinterGroupCrudForm
+    PrinterGroupCrudForm,
   },
-  data: () => ({})
+  data: () => ({}),
 })
 export default class CreatePrinterGroupDialog extends Vue {
   showingDialog = false;

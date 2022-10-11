@@ -60,7 +60,7 @@ import { printersState } from "@/store/printers.state";
 import { PrinterGroupService } from "@/backend";
 import {
   getDefaultCreatePrinterGroup,
-  PreCreatePrinterGroup
+  PreCreatePrinterGroup,
 } from "@/models/printer-groups/crud/create-printer-group.model";
 import { PrinterGroup } from "@/models/printers/printer-group.model";
 import { Printer } from "@/models/printers/printer.model";
@@ -69,11 +69,11 @@ const watchedId = "printerId";
 
 @Component({
   components: {
-    ValidationProvider
+    ValidationProvider,
   },
   data: () => ({
-    printersWithoutGroup: []
-  })
+    printersWithoutGroup: [],
+  }),
 })
 export default class PrinterGroupCrudForm extends Vue {
   @Inject() readonly appConstants!: AppConstants;
@@ -89,7 +89,7 @@ export default class PrinterGroupCrudForm extends Vue {
     return {
       required: true,
       integer: true,
-      max: this.appConstants.maxPrinterGroupLocationX
+      max: this.appConstants.maxPrinterGroupLocationX,
     };
   }
 
@@ -97,7 +97,7 @@ export default class PrinterGroupCrudForm extends Vue {
     return {
       required: true,
       integer: true,
-      max: this.appConstants.maxPrinterGroupLocationY
+      max: this.appConstants.maxPrinterGroupLocationY,
     };
   }
 

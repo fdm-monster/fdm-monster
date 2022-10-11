@@ -2,7 +2,7 @@ import { ServerApi } from "@/backend/server.api";
 import { BaseService } from "@/backend/base.service";
 import {
   PrinterFileCleanSubSetting,
-  ServerSettings
+  ServerSettings,
 } from "@/models/server-settings/server-settings.model";
 import { PrinterFileCleanSettings } from "@/models/server-settings/printer-file-clean-settings.model";
 import { ClientSettings } from "@/models/client-settings/client-settings.model";
@@ -24,7 +24,7 @@ export class SettingsService extends BaseService {
     const path = `${ServerApi.serverSettingsRoute}`;
 
     return (await this.putApi(path, {
-      printerFileClean: subSettings
+      printerFileClean: subSettings,
     } as PrinterFileCleanSubSetting)) as ServerSettings;
   }
 }

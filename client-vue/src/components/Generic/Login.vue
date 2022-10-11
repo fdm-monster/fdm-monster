@@ -40,8 +40,8 @@ import Vue from "vue";
 
 @Component({
   props: {
-    source: String
-  }
+    source: String,
+  },
 })
 export default class Login extends Vue {}
 </script>

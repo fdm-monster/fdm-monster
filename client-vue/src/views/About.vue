@@ -19,7 +19,7 @@ import { Component } from "vue-property-decorator";
 import { printersState } from "@/store/printers.state";
 
 @Component({
-  components: {}
+  components: {},
 })
 export default class AboutPage extends Vue {
   loaded = false;

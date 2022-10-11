@@ -42,13 +42,21 @@ import CreatePrinterGroupDialog from "@/components/Generic/Dialogs/CreatePrinter
   data() {
     return {
       items: [
-        { title: "Printer groups", icon: "dashboard", path: "/settings/printer-groups" },
-        { title: "User Management", icon: "group", path: "/settings/user-management" },
+        {
+          title: "Printer groups",
+          icon: "dashboard",
+          path: "/settings/printer-groups",
+        },
+        {
+          title: "User Management",
+          icon: "group",
+          path: "/settings/user-management",
+        },
         { title: "FDM settings", icon: "image", path: "/settings/system" },
-        { title: "Other", icon: "help", path: "/settings/other" }
-      ]
+        { title: "Other", icon: "help", path: "/settings/other" },
+      ],
     };
-  }
+  },
 })
 export default class Settings extends Vue {}
 </script>

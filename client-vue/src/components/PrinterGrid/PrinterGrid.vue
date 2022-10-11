@@ -35,7 +35,7 @@ import { PrinterGroup } from "@/models/printers/printer-group.model";
 import { columnCount, rowCount, totalVuetifyColumnCount } from "@/constants/printer-grid.constants";
 
 @Component({
-  components: { UpdatePrinterDialog, PrinterGridTile, Login }
+  components: { UpdatePrinterDialog, PrinterGridTile, Login },
 })
 export default class PrinterGrid extends Vue {
   loading = true;

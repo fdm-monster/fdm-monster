@@ -126,7 +126,7 @@ import { ValidationProvider } from "vee-validate";
 import { AppConstants } from "@/constants/app.constants";
 import {
   getDefaultCreatePrinter,
-  PreCreatePrinter
+  PreCreatePrinter,
 } from "@/models/printers/crud/create-printer.model";
 import { printersState } from "@/store/printers.state";
 import { PrintersService } from "@/backend";
@@ -136,8 +136,8 @@ const watchedId = "printerId";
 
 @Component({
   components: {
-    ValidationProvider
-  }
+    ValidationProvider,
+  },
 })
 export default class PrinterCrudForm extends Vue {
   @Inject() readonly appConstants!: AppConstants;
@@ -145,7 +145,11 @@ export default class PrinterCrudForm extends Vue {
   formData?: PreCreatePrinter = getDefaultCreatePrinter();
 
   public get apiKeyRules() {
-    return { required: true, length: this.appConstants.apiKeyLength, alpha_num: true };
+    return {
+      required: true,
+      length: this.appConstants.apiKeyLength,
+      alpha_num: true,
+    };
   }
 
   public get printerNameRules() {

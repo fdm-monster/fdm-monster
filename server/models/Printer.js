@@ -45,6 +45,7 @@ const PrinterSchema = new mongoose.Schema({
     type: Number,
     required: false
   },
+  // Deprecated, Will become many to many 
   lastPrintedFile: {
     type: {
       fileName: {

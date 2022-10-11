@@ -23,7 +23,7 @@ import { PrinterFileCache } from "@/models/printers/printer-file-cache.model";
 import { printersState } from "@/store/printers.state";
 
 @Component({
-  data: () => ({})
+  data: () => ({}),
 })
 export default class FileControlList extends Vue {
   @Prop() fileList: PrinterFileCache;
@@ -32,7 +32,7 @@ export default class FileControlList extends Vue {
   async deleteFile(file: PrinterFile) {
     this.fileList.files = await printersState.deletePrinterFile({
       printerId: this.printerId,
-      fullPath: file.path
+      fullPath: file.path,
     });
   }
 }

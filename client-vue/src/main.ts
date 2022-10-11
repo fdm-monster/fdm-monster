@@ -23,7 +23,7 @@ Vue.use(VueBus);
 Vue.use(VueSSE, {
   format: "json",
   polyfill: true,
-  url: apiBase + "/api/printer/sse"
+  url: apiBase + "/api/printer/sse",
 });
 
 configureVeeValidate();
@@ -45,9 +45,9 @@ new Vue({
   store,
   vuetify,
   provide: {
-    appConstants: generateAppConstants()
+    appConstants: generateAppConstants(),
   },
-  render: (h) => h(App)
+  render: (h) => h(App),
 }).$mount("#app");
 
 console.log("App Build UTC", document.documentElement.dataset.buildTimestampUtc);

@@ -90,8 +90,8 @@ import { convertMultiPrinterFileToQueue } from "@/utils/uploads-state.utils";
   components: { PrinterGrid, SideNavExplorer, CreatePrinterDialog },
   data: () => ({
     selectedFile: undefined,
-    viewedPrinter: undefined
-  })
+    viewedPrinter: undefined,
+  }),
 })
 export default class HomePage extends Vue {
   autoPrint = true;
