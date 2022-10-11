@@ -9,6 +9,7 @@ import Scheduling from "@/views/PrintScheduling.vue";
 import FdmSettings from "@/views/settings/FdmSettings.vue";
 import OtherSettings from "@/views/settings/OtherSettings.vue";
 import UserManagementSettings from "@/views/settings/UserManagementSettings.vue";
+import PrinterFloorSettings from "@/views/settings/PrinterFloorSettings.vue";
 
 Vue.use(VueRouter);
 
@@ -30,6 +31,10 @@ const routes: Array<RouteConfig> = [
       {
         path: "",
         redirect: "printer-groups",
+      },
+      {
+        path: "printer-floors",
+        component: PrinterFloorSettings,
       },
       {
         path: "user-management",

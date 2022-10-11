@@ -11,6 +11,7 @@ import { PrinterFileCache } from "@/models/printers/printer-file-cache.model";
 import { PrinterJobService } from "@/backend/printer-job.service";
 import { CreatePrinterGroup } from "@/models/printer-groups/crud/create-printer-group.model";
 import { PrinterFloor } from "@/models/printer-floor/printer-floor.model";
+import { PrinterFloorService } from "@/backend/printer-floor.service";
 
 @Module({
   dynamic: true,
@@ -30,6 +31,7 @@ class PrintersModule extends VuexModule {
   updateDialogPrinter?: Printer = undefined;
   createDialogOpened?: boolean = false;
   createGroupDialogOpened?: boolean = false;
+  createFloorDialogOpened?: boolean = false;
   selectedPrinters: Printer[] = [];
 
   readonly horizontalOffset = 1;
@@ -77,6 +79,12 @@ class PrintersModule extends VuexModule {
   get ungroupedPrinters() {
     return this.printers.filter(
       (p) => !this.printerGroups.find((g) => g.printers.find((pgp) => pgp.printerId === p.id))
+    );
+  }
+
+  get floorlessGroups() {
+    return this.printerGroups.filter(
+      (p) => !this.printerFloors.find((g) => g.printerGroups.find((pgp) => pgp === p._id))
     );
   }
 
@@ -173,6 +181,10 @@ class PrintersModule extends VuexModule {
     this.createGroupDialogOpened = opened;
   }
 
+  @Mutation _setCreateFloorDialogOpened(opened: boolean) {
+    this.createFloorDialogOpened = opened;
+  }
+
   @Mutation replacePrinter({ printerId, printer }: { printerId: string; printer: Printer }) {
     const printerIndex = this.printers.findIndex((p: Printer) => p.id === printerId);
 
@@ -237,6 +249,21 @@ class PrintersModule extends VuexModule {
     const foundGroupIndex = this.printerGroups.findIndex((pg) => pg._id === groupId);
     if (foundGroupIndex !== -1) {
       this.printerGroups.splice(foundGroupIndex, 1);
+    }
+  }
+
+  @Mutation popPrinterFloor(floorId: string) {
+    const foundFloorIndex = this.printerFloors.findIndex((pg) => pg._id === floorId);
+    if (foundFloorIndex !== -1) {
+      this.printerFloors.splice(foundFloorIndex, 1);
+    }
+  }
+
+  @Mutation replacePrinterFloor(printerFloor: PrinterFloor) {
+    const foundFloorIndex = this.printerFloors.findIndex((pf) => pf._id === printerFloor._id);
+    if (foundFloorIndex !== -1) {
+      this.printerFloors[foundFloorIndex] = printerFloor;
+      this.lastUpdated = Date.now();
     }
   }
 
@@ -437,6 +464,11 @@ class PrintersModule extends VuexModule {
   }
 
   @Action
+  setCreateFloorDialogOpened(opened: boolean) {
+    this._setCreateFloorDialogOpened(opened);
+  }
+
+  @Action
   selectPrinter(printer: Printer) {
     this.toggleSelectedPrinter(printer);
   }
@@ -489,10 +521,26 @@ class PrintersModule extends VuexModule {
   }
 
   @Action
+  async updatePrinterFloorName({ floorId, name }: { floorId: string; name: string }) {
+    const floor = await PrinterFloorService.updateFloorName(floorId, name);
+
+    this.replacePrinterFloor(floor);
+
+    return floor;
+  }
+
+  @Action
   async deletePrinterGroup(groupId: string) {
     await PrinterGroupService.deleteGroup(groupId);
 
     this.popPrinterGroup(groupId);
+  }
+
+  @Action
+  async deletePrinterFloor(floorId: string) {
+    await PrinterFloorService.deleteFloor(floorId);
+
+    this.popPrinterFloor(floorId);
   }
 
   @Action
@@ -514,10 +562,37 @@ class PrintersModule extends VuexModule {
   }
 
   @Action
+  async addPrinterGroupToFloor({
+    floorId,
+    printerGroupId,
+  }: {
+    floorId: string;
+    printerGroupId: string;
+  }) {
+    const result = await PrinterFloorService.addPrinterGroupToFloor(floorId, {
+      printerGroupId,
+    });
+
+    this.replacePrinterFloor(result);
+  }
+
+  @Action
   async deletePrinterFromGroup({ groupId, printerId }: { groupId: string; printerId: string }) {
     const result = await PrinterGroupService.deletePrinterFromGroup(groupId, printerId);
 
     this.replacePrinterGroup(result);
+  }
+  @Action
+  async deletePrinterGroupFromFloor({
+    floorId,
+    printerGroupId,
+  }: {
+    floorId: string;
+    printerGroupId: string;
+  }) {
+    const result = await PrinterFloorService.deletePrinterGroupFromFloor(floorId, printerGroupId);
+
+    this.replacePrinterFloor(result);
   }
 }
 

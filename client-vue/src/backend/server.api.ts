@@ -7,6 +7,7 @@ export class ServerApi {
   static printerSettingsRoute = ServerApi.base + "/printer-settings";
   static printerGroupRoute = ServerApi.base + "/printer-group";
   static printerGroupSyncLegacyRoute = `${ServerApi.printerGroupRoute}/sync-legacy`;
+  static printerFloorRoute = ServerApi.base + "/printer-floor";
   static printerFilesRoute = `${ServerApi.base}/printer-files`;
   static printerFilesUploadStubRoute = `${ServerApi.base}/printer-files/upload-stub`;
   static printerFilesPurgeRoute = `${ServerApi.printerFilesRoute}/purge`;
@@ -43,6 +44,7 @@ export class ServerApi {
   static setPrinterSettingsGCodeAnalysisRoute = (id: string) =>
     `${ServerApi.getPrinterSettingsRoute(id)}/gcode-analysis`;
   static getPrinterGroupRoute = (id: string) => `${ServerApi.printerGroupRoute}/${id}`;
+  static getPrinterFloorRoute = (id: string) => `${ServerApi.printerFloorRoute}/${id}`;
   static getPrinterFromGroupRoute = (id: string) => `${ServerApi.getPrinterGroupRoute(id)}/printer`;
   static deletePrinterFromGroupRoute = (id: string) =>
     `${ServerApi.getPrinterGroupRoute(id)}/printer?`;
@@ -54,6 +56,9 @@ export class ServerApi {
     `${ServerApi.pluginFirmwareUpdateRoute}/${id}/configure-plugin-settings`;
   static flashFirmwareRoute = (id: string) =>
     `${ServerApi.pluginFirmwareUpdateRoute}/${id}/flash-firmware`;
+  static updatePrinterFloorNameRoute = (id: string) => `${ServerApi.getPrinterFloorRoute(id)}/name`;
+  static updatePrinterFloorNumberRoute = (id: string) =>
+    `${ServerApi.getPrinterFloorRoute(id)}/name`;
   static updatePrinterGroupNameRoute = (id: string) => `${ServerApi.getPrinterGroupRoute(id)}/name`;
   static printerFilesClearRoute = (id: string) => `${ServerApi.printerFilesRoute}/${id}/clear`;
   static printerFilesSelectAndPrintRoute = (id: string) =>

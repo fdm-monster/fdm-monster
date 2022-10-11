@@ -38,6 +38,14 @@ class PrinterFloorsCache {
     const deleteResult = await this.#printerFloorService.delete(floorId);
     await this.loadCache();
 
+    if (!this.#printerFloors.length) {
+      this.#printerFloors = [];
+      this.#selectedFloorId = null;
+    }
+    if (floorId === this.#selectedFloorId) {
+      this.#selectedFloorId = this.#printerFloors[0].id || null;
+    }
+
     return deleteResult;
   }
 
