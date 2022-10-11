@@ -10,9 +10,9 @@ let Model = PrinterGroup;
 const listRoute = `${AppConstants.apiRoute}/printer-floor`;
 const getRoute = (id) => `${listRoute}/${id}`;
 const getSelectedFloorRoute = `${listRoute}/selected-floor`;
+const setSelectedFloorRoute = (id) => `${listRoute}/selected-floor/${id}`;
 const addPrinterGroupToFloorRoute = (id) => `${listRoute}/${id}/printer-group`;
 const deleteRoute = (id) => `${listRoute}/${id}`;
-const updateRoute = (id) => `${listRoute}/${id}`;
 const updateNameRoute = (id) => `${getRoute(id)}/name`;
 const updateFloorNumberRoute = (id) => `${getRoute(id)}/floor-number`;
 
@@ -60,7 +60,13 @@ describe("PrinterFloorController", () => {
 
   it("should be able to get selected printer floor", async () => {
     const response = await request.get(getSelectedFloorRoute).send();
-    expectOkResponse(response, { name: "default floor" });
+    expectOkResponse(response);
+  });
+
+  it("should be able to set selected printer floor", async () => {
+    const floor = await createTestPrinterFloor(request, "Floor123", 5060);
+    const response = await request.post(setSelectedFloorRoute(floor._id)).send();
+    expectOkResponse(response);
   });
 
   it("should be able to update printer floor name", async () => {
@@ -86,8 +92,8 @@ describe("PrinterFloorController", () => {
   });
 
   it("should be able to add printer-group to floor", async () => {
-    const printerGroup = await createTestPrinterGroup(request, "Floor123", 509);
-    const floor = await createTestPrinterFloor(request);
+    const printerGroup = await createTestPrinterGroup(request);
+    const floor = await createTestPrinterFloor(request, "Floor123", 509);
     expect(floor).toMatchObject({ _id: expect.any(String) });
 
     const response = await request.post(addPrinterGroupToFloorRoute(floor._id)).send({

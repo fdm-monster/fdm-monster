@@ -34,10 +34,17 @@ class PrinterFloorService {
     return printerFloor;
   }
 
+  async createDefaultFloor() {
+    return await this.create({
+      name: "default floor",
+      floor: 1,
+    });
+  }
+
   /**
-   * Stores a new printer group into the database.
+   * Stores a new printer floor into the database.
    * @param {Object} floor object to create.
-   * @throws {Error} If the printer group is not correctly provided.
+   * @throws {Error} If the printer floor is not correctly provided.
    */
   async create(floor) {
     if (!floor) throw new Error("Missing printer-floor input to create");
@@ -60,14 +67,6 @@ class PrinterFloorService {
     const { floor } = await validateInput(input, updatePrinterFloorNumberRules);
     printerFloor.floor = floor;
     return await printerFloor.save();
-  }
-
-  /**
-   * Updates the printerGroup present in the database.
-   * @param {Object} printerFloor object to create.
-   */
-  async update(printerFloor) {
-    return PrinterFloorModel.updateOne(printerFloor.id, printerFloor);
   }
 
   async addOrUpdatePrinterGroup(floorId, printerGroupInFloor) {
