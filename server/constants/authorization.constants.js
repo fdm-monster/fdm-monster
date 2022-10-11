@@ -94,5 +94,6 @@ module.exports = {
   ROLES,
   PERMS,
   flattenPermissionDefinition,
+  allPerms,
   ROLE_PERMS,
 };
