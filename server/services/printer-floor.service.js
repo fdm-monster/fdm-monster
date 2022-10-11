@@ -19,6 +19,16 @@ class PrinterFloorService {
     this.#logger = loggerFactory("PrinterFloorService");
   }
 
+  async getSelectedFloor(throwError = false) {
+    if (!this.#selectedFloorId) {
+      this.#logger.info(
+        "Could not provide selected floor, it was not loaded or selected. Was setSelectedFloor initialization called?"
+      );
+    }
+
+    return this.get(this.#selectedFloorId, throwError);
+  }
+
   async setSelectedFloor(arrayIndex = null) {
     const floors = await this.list();
     if (!floors?.length) {
@@ -34,7 +44,7 @@ class PrinterFloorService {
       this.#selectedFloorId = floors[index]._id;
     }
 
-    this.#logger.debug(`Set selected floor to ${this.#selectedFloorId}`);
+    this.#logger.info(`Set selected floor to id '${this.#selectedFloorId}'`);
   }
 
   /**
@@ -44,10 +54,12 @@ class PrinterFloorService {
     return PrinterFloorModel.find({});
   }
 
-  async get(floorId) {
+  async get(floorId, throwError = true) {
     const printerFloor = await PrinterFloorModel.findOne({ _id: floorId });
     if (!printerFloor)
-      throw new NotFoundException(`Printer floor with id ${floorId} does not exist.`);
+      if (throwError) {
+        throw new NotFoundException(`Printer floor with id ${floorId} does not exist.`);
+      }
 
     return printerFloor;
   }

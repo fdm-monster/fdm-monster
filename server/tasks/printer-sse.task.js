@@ -4,6 +4,7 @@ class PrinterSseTask {
   #printerSseHandler;
   #printerGroupsCache;
   #printersStore;
+  #printerFloorService;
   #fileUploadTrackerCache;
 
   #aggregateSizeCounter = 0;
@@ -16,6 +17,7 @@ class PrinterSseTask {
     printerSseHandler,
     printerGroupsCache,
     printersStore,
+    printerFloorService,
     loggerFactory,
     fileUploadTrackerCache
   }) {
@@ -23,16 +25,19 @@ class PrinterSseTask {
     this.#printersStore = printersStore;
     this.#printerGroupsCache = printerGroupsCache;
     this.#fileUploadTrackerCache = fileUploadTrackerCache;
+    this.#printerFloorService = printerFloorService;
     this.#logger = loggerFactory("Printer-SSE-task");
   }
 
   async run() {
+    const selectedFloor = this.#printerFloorService.getSelectedFloor();
     const printerStates = this.#printersStore.listPrintersFlat();
     const printerGroups = this.#printerGroupsCache.getCache();
     const trackedUploads = this.#fileUploadTrackerCache.getUploads(true);
 
     const sseData = {
       printers: printerStates,
+      selectedFloor,
       trackedUploads,
       printerGroups
     };
