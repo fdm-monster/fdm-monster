@@ -2,16 +2,15 @@ const fs = require("fs");
 const Logger = require("../handlers/logger.js");
 const dotenv = require("dotenv");
 const { isDocker } = require("./is-docker");
-const { AppConstants } = require("../server.constants");
 
 const logger = new Logger("Utils-Env", false);
 
 function isProductionEnvironment() {
-  return process.env.NODE_ENV === AppConstants.defaultProductionEnv;
+  return process.env.NODE_ENV === "production";
 }
 
 function isTestEnvironment() {
-  return process.env[AppConstants.NODE_ENV_KEY] === "test";
+  return process.env.NODE_ENV === "test";
 }
 
 function isPm2() {

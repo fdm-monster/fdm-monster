@@ -1,6 +1,6 @@
 const winston = require("winston");
-const { AppConstants } = require("../server.constants");
 const { isTestEnvironment, isProductionEnvironment } = require("../utils/env.utils");
+const { AppConstants } = require("../server.constants");
 
 const dtFormat = new Intl.DateTimeFormat("en-GB", {
   timeStyle: "medium",
@@ -14,8 +14,8 @@ dateFormat = () => {
 
 class LoggerService {
   constructor(name, enableFileLogs = true, logFilterLevel) {
-    const isProd = isProductionEnvironment();
-    const isTest = isTestEnvironment();
+    const isProd = process.env[AppConstants.NODE_ENV_KEY] === AppConstants.defaultProductionEnv;
+    const isTest = process.env[AppConstants.NODE_ENV_KEY] === AppConstants.defaultTestEnv;
 
     if (!logFilterLevel) {
       logFilterLevel = isProd || isTest ? "warn" : "info";
