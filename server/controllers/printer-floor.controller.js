@@ -77,6 +77,12 @@ class PrinterGroupController {
     res.send(printerFloor);
   }
 
+  async setSelectedFloor(req, res) {
+    const { id: printerFloorId } = await validateInput(req.params, idRules);
+    const printerFloor = await this.#printerFloorsCache.setSelectedFloor(printerFloorId);
+    res.send(printerFloor);
+  }
+
   async delete(req, res) {
     const { id: printerFloorId } = await validateInput(req.params, idRules);
     const result = await this.#printerFloorsCache.delete(printerFloorId);
