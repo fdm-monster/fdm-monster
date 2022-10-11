@@ -112,7 +112,7 @@ function configureContainer() {
     [DITokens.printerService]: asClass(PrinterService),
     [DITokens.printerFilesService]: asClass(PrinterFilesService),
     [DITokens.printerGroupService]: asClass(PrinterGroupService),
-    [DITokens.printerFloorService]: asClass(PrinterFloorService),
+    [DITokens.printerFloorService]: asClass(PrinterFloorService).singleton(),
     [DITokens.octoPrintApiService]: asClass(OctoPrintApiService).singleton(),
     [DITokens.pluginFirmwareUpdateService]: asClass(PluginFirmwareUpdateService).singleton(),
     [DITokens.historyService]: asClass(HistoryService),

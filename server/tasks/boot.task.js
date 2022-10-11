@@ -22,6 +22,7 @@ class BootTask {
   userService;
   influxDbSetupService;
   pluginRepositoryCache;
+  printerFloorService;
   pluginFirmwareUpdateService;
 
   constructor({
@@ -41,6 +42,7 @@ class BootTask {
     taskManagerService,
     influxDbSetupService,
     pluginRepositoryCache,
+    printerFloorService,
     pluginFirmwareUpdateService
   }) {
     this.#serverTasks = serverTasks;
@@ -58,6 +60,7 @@ class BootTask {
     this.#taskManagerService = taskManagerService;
     this.influxDbSetupService = influxDbSetupService;
     this.pluginRepositoryCache = pluginRepositoryCache;
+    this.printerFloorService = printerFloorService;
     this.pluginFirmwareUpdateService = pluginFirmwareUpdateService;
     this.#logger = loggerFactory("Server");
   }
@@ -101,6 +104,7 @@ class BootTask {
       await this.filamentsStore.loadFilamentsStore();
       await this.historyStore.loadHistoryStore();
       await this.printerGroupsCache.loadCache();
+      await this.printerFloorService.setSelectedFloor();
       await this.influxDbSetupService.optionalInfluxDatabaseSetup();
 
       this.#logger.info("Synchronizing user permission and roles definition");
@@ -110,7 +114,7 @@ class BootTask {
     } catch (e) {
       this.#logger.error(
         "A startup error occurred. The server might not have started correctly.",
-        e
+        e.stack
       );
     }
 

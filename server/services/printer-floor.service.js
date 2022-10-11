@@ -1,4 +1,3 @@
-const PrinterGroupModel = require("../models/PrinterGroup");
 const PrinterFloorModel = require("../models/PrinterFloor");
 const _ = require("lodash");
 const { validateInput } = require("../handlers/validators");
@@ -13,9 +12,29 @@ class PrinterFloorService {
   #printerGroupService;
   #logger;
 
+  #selectedFloorId = null;
+
   constructor({ printerGroupService, loggerFactory }) {
     this.#printerGroupService = printerGroupService;
     this.#logger = loggerFactory("PrinterFloorService");
+  }
+
+  async setSelectedFloor(arrayIndex = null) {
+    const floors = await this.list();
+    if (!floors?.length) {
+      this.#logger.info("Creating default floor as non existed");
+
+      const floor = await this.create({
+        name: "default floor",
+        floor: 1
+      });
+      this.#selectedFloorId = floor._id;
+    } else {
+      const index = arrayIndex || 0;
+      this.#selectedFloorId = floors[index]._id;
+    }
+
+    this.#logger.debug(`Set selected floor to ${this.#selectedFloorId}`);
   }
 
   /**
@@ -25,28 +44,28 @@ class PrinterFloorService {
     return PrinterFloorModel.find({});
   }
 
-  async get(groupId) {
-    const printerFloor = await PrinterFloorModel.findOne({ _id: groupId });
+  async get(floorId) {
+    const printerFloor = await PrinterFloorModel.findOne({ _id: floorId });
     if (!printerFloor)
-      throw new NotFoundException(`Printer floor with id ${groupId} does not exist.`);
+      throw new NotFoundException(`Printer floor with id ${floorId} does not exist.`);
 
     return printerFloor;
   }
 
   /**
    * Stores a new printer group into the database.
-   * @param {Object} group object to create.
+   * @param {Object} floor object to create.
    * @throws {Error} If the printer group is not correctly provided.
    */
-  async create(group) {
-    if (!group) throw new Error("Missing printer-floor input to create");
+  async create(floor) {
+    if (!floor) throw new Error("Missing printer-floor input to create");
 
-    const validatedInput = await validateInput(group, createPrinterFloorRules);
+    const validatedInput = await validateInput(floor, createPrinterFloorRules);
     return PrinterFloorModel.create(validatedInput);
   }
 
-  async updateName(printerGroupId, input) {
-    const printerFloor = await this.get(printerGroupId);
+  async updateName(floorId, input) {
+    const printerFloor = await this.get(floorId);
 
     const { name } = await validateInput(input, updatePrinterFloorNameRules);
     printerFloor.name = name;
@@ -61,30 +80,30 @@ class PrinterFloorService {
     return PrinterFloorModel.updateOne(printerFloor.id, printerFloor);
   }
 
-  async addOrUpdatePrinterGroup(printerFloorId, printerGroupInFloor) {
-    const printerFloor = await this.get(printerFloorId);
-    if (!printerFloor) throw new NotFoundException("This floor does not exist", "printerFloorId");
+  async addOrUpdatePrinterGroup(floorId, printerGroupInFloor) {
+    const floor = await this.get(floorId);
+    if (!floor) throw new NotFoundException("This floor does not exist", "floorId");
 
     const validInput = await validateInput(printerGroupInFloor, printerGroupInFloorRules);
 
-    const foundPrinterGroupInFloorIndex = printerFloor.printerGroups.findIndex(
+    const foundPrinterGroupInFloorIndex = floor.printerGroups.findIndex(
       (pgif) => pgif.printerGroupId.toString() === validInput.printerGroupId
     );
     if (foundPrinterGroupInFloorIndex !== -1) {
-      printerFloor.printerGroups[foundPrinterGroupInFloorIndex] = validInput;
-      return printerFloor;
+      floor.printerGroups[foundPrinterGroupInFloorIndex] = validInput;
+      return floor;
     } else {
-      printerFloor.printerGroups.push(validInput);
+      floor.printerGroups.push(validInput);
     }
 
-    await printerFloor.save();
+    await floor.save();
 
-    return printerFloor;
+    return floor;
   }
 
-  async removePrinterGroup(printerFloorId, input) {
+  async removePrinterGroup(floorId, input) {
     const validInput = await validateInput(input, printerGroupInFloorRules);
-    const floor = await this.get(printerFloorId);
+    const floor = await this.get(floorId);
     if (!floor) throw new NotFoundException("This floor does not exist", "printerFloorId");
 
     const foundPrinterGroupInFloorIndex = floor.printerGroups.findIndex(
@@ -95,8 +114,8 @@ class PrinterFloorService {
     return await floor.save();
   }
 
-  async delete(printerFloorId) {
-    return PrinterFloorModel.deleteOne({ _id: printerFloorId });
+  async delete(floorId) {
+    return PrinterFloorModel.deleteOne({ _id: floorId });
   }
 }
 
