@@ -47,8 +47,6 @@ class PrinterFloorService {
    * @throws {Error} If the printer floor is not correctly provided.
    */
   async create(floor) {
-    if (!floor) throw new Error("Missing printer-floor input to create");
-
     const validatedInput = await validateInput(floor, createPrinterFloorRules);
     return PrinterFloorModel.create(validatedInput);
   }
@@ -70,9 +68,7 @@ class PrinterFloorService {
   }
 
   async addOrUpdatePrinterGroup(floorId, printerGroupInFloor) {
-    const floor = await this.get(floorId);
-    if (!floor) throw new NotFoundException("This floor does not exist", "floorId");
-
+    const floor = await this.get(floorId, true);
     const validInput = await validateInput(printerGroupInFloor, printerGroupInFloorRules);
 
     const foundPrinterGroupInFloorIndex = floor.printerGroups.findIndex(
@@ -91,9 +87,8 @@ class PrinterFloorService {
   }
 
   async removePrinterGroup(floorId, input) {
+    const floor = await this.get(floorId, true);
     const validInput = await validateInput(input, printerGroupInFloorRules);
-    const floor = await this.get(floorId);
-    if (!floor) throw new NotFoundException("This floor does not exist", "printerFloorId");
 
     const foundPrinterGroupInFloorIndex = floor.printerGroups.findIndex(
       (pgif) => pgif.printerGroupId.toString() === validInput.printerGroupId

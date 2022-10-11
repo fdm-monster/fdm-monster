@@ -38,6 +38,11 @@ describe("PrinterFloorController", () => {
     expectOkResponse(response, []);
   });
 
+  it("should be able to get default floor", async () => {
+    const response = await request.get(getSelectedFloorRoute).send();
+    expectOkResponse(response);
+  });
+
   it("should not be able to create falsy printer floor", async () => {
     const createResponse = await request.post(printerFloorRoute).send({});
     expectInvalidResponse(createResponse);
@@ -106,6 +111,17 @@ describe("PrinterFloorController", () => {
     expectOkResponse(response);
   });
 
+  it("should not be able to add printer-group to non-existing floor", async () => {
+    const printerGroup = await createTestPrinterGroup(request);
+
+    const response = await request
+      .post(addPrinterGroupToFloorRoute("63452115122876ea11cd1656"))
+      .send({
+        printerGroupId: printerGroup._id,
+      });
+    expectNotFoundResponse(response);
+  });
+
   it("should be able to add printer-group to floor", async () => {
     const printerGroup = await createTestPrinterGroup(request);
     const floor = await createTestPrinterFloor(request, "Floor123", 509);
@@ -115,6 +131,12 @@ describe("PrinterFloorController", () => {
       printerGroupId: printerGroup._id,
     });
     expectOkResponse(response);
+
+    // Sadly no distinctness criterium yet
+    const response2 = await request.post(addPrinterGroupToFloorRoute(floor._id)).send({
+      printerGroupId: printerGroup._id,
+    });
+    expectOkResponse(response2);
   });
 
   it("should be able to remove printer group from floor", async () => {
@@ -130,5 +152,10 @@ describe("PrinterFloorController", () => {
       printerGroupId: printerGroup._id,
     });
     expectOkResponse(deleteResponse);
+
+    const deleteResponse2 = await request.delete(addPrinterGroupToFloorRoute(floor._id)).send({
+      printerGroupId: "63452115122876ea11cd1656",
+    });
+    expectOkResponse(deleteResponse2);
   });
 });

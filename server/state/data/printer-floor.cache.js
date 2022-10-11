@@ -56,15 +56,16 @@ class PrinterFloorsCache {
     const floors = await this.listCache();
     if (!floors?.length) {
       this.#logger.info("Creating default floor as non existed");
-      const floor = this.#printerFloorService.createDefaultFloor();
+      const floor = await this.#printerFloorService.createDefaultFloor();
       await this.loadCache();
       this.#selectedFloorId = floor.id;
     } else {
       if (floorId) {
         const foundFloor = await this.getFloor(floorId);
         this.#selectedFloorId = foundFloor.id || null;
+      } else {
+        this.#selectedFloorId = floors[0].id;
       }
-      this.#selectedFloorId = floors[0].id;
     }
 
     this.#logger.info(`Set selected floor to id '${this.#selectedFloorId}'`);
