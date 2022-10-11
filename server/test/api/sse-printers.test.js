@@ -35,6 +35,7 @@ describe("SSE-Printers", () => {
         expect(parsedMsg).toEqual({
           printers: [],
           printerGroups: [],
+          selectedFloor: null,
           trackedUploads: {
             current: [],
             done: [],
