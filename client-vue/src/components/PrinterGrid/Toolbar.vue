@@ -1,23 +1,12 @@
 <template>
   <v-toolbar flat>
     <v-toolbar-title>Printer Floors</v-toolbar-title>
-    <v-btn-toggle rounded class="ml-7">
-      <v-btn>
+    <v-btn-toggle class="ml-7" rounded>
+      <v-btn v-for="f in floors" :key="f._id">
         <v-icon>format_align_left</v-icon>
-        Floor 1
-      </v-btn>
-
-      <v-btn>
-        <v-icon>format_align_center</v-icon>
-        Floor 2
-      </v-btn>
-
-      <v-btn>
-        <v-icon>format_align_right</v-icon>
-        Floor 3
+        {{ f.name }}
       </v-btn>
     </v-btn-toggle>
-
     <v-spacer></v-spacer>
     <div>
       <v-switch v-model="autoPrint" disabled hide-details label="Auto-select and print"></v-switch>
@@ -36,6 +25,14 @@ import { printersState } from "@/store/printers.state";
 @Component({})
 export default class Toolbar extends Vue {
   autoPrint = true;
+
+  get selectedFloor() {
+    return printersState.selectedPrinterFloor?.name;
+  }
+
+  get floors() {
+    return printersState.printerFloors;
+  }
 
   openCreatePrinterDialog() {
     printersState.setCreateDialogOpened(true);

@@ -87,7 +87,11 @@ export default class App extends Vue {
     }
 
     if (message.selectedFloor) {
-      // console.log(message.selectedFloor, message.floors);
+      printersState.saveSelectedFloor(message.selectedFloor);
+
+      if (message.floors) {
+        printersState.savePrinterFloors(message.floors);
+      }
     }
 
     if (message.printers) {

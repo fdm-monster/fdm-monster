@@ -10,6 +10,7 @@ import { PrinterFileBucket } from "@/models/printers/printer-file-bucket.model";
 import { PrinterFileCache } from "@/models/printers/printer-file-cache.model";
 import { PrinterJobService } from "@/backend/printer-job.service";
 import { CreatePrinterGroup } from "@/models/printer-groups/crud/create-printer-group.model";
+import { PrinterFloor } from "@/models/printer-floor/printer-floor.model";
 
 @Module({
   dynamic: true,
@@ -21,6 +22,8 @@ class PrintersModule extends VuexModule {
   testPrinters?: Printer = undefined;
   printerFileBuckets: PrinterFileBucket[] = [];
   printerGroups: PrinterGroup[] = [];
+  floors: PrinterFloor[] = [];
+  selectedFloor?: PrinterFloor = undefined;
   lastUpdated?: number = undefined;
 
   sideNavPrinter?: Printer = undefined;
@@ -30,6 +33,14 @@ class PrintersModule extends VuexModule {
   selectedPrinters: Printer[] = [];
 
   readonly horizontalOffset = 1;
+
+  get selectedPrinterFloor() {
+    return this.selectedFloor;
+  }
+
+  get printerFloors() {
+    return this.floors;
+  }
 
   get currentSideNavPrinter() {
     return this.sideNavPrinter;
@@ -132,6 +143,14 @@ class PrintersModule extends VuexModule {
   @Mutation addPrinterGroup(printerGroup: PrinterGroup) {
     // No need to sort as `gridSortedPrinterGroups` will fix this on the go
     this.printerGroups.push(printerGroup);
+  }
+
+  @Mutation _setSelectedPrinterFloor(floor: PrinterFloor) {
+    this.selectedFloor = floor;
+  }
+
+  @Mutation _setPrinterFloors(floors: PrinterFloor[]) {
+    this.floors = floors;
   }
 
   @Mutation _resetSelectedPrinters() {
@@ -353,6 +372,20 @@ class PrintersModule extends VuexModule {
     this.setPrinterGroups(data);
 
     return data;
+  }
+
+  @Action
+  savePrinterFloors(floors: PrinterFloor[]) {
+    this._setPrinterFloors(floors);
+
+    return floors;
+  }
+
+  @Action
+  saveSelectedFloor(selectedPrinterFloor: PrinterFloor) {
+    this._setSelectedPrinterFloor(selectedPrinterFloor);
+
+    return selectedPrinterFloor;
   }
 
   @Action
