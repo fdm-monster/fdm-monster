@@ -35,7 +35,7 @@ describe("SSE-Printers", () => {
         expect(parsedMsg).toMatchObject({
           printers: [],
           printerGroups: [],
-          selectedFloor: expect.any(),
+          selectedFloor: expect.anything(),
           trackedUploads: {
             current: [],
             done: [],
