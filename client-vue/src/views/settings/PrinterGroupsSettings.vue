@@ -183,7 +183,7 @@ export default class PrinterGroupsSettings extends Vue {
   async syncLegacyGroups() {
     const groups = await PrinterGroupService.syncLegacyGroups();
 
-    this.$bus.emit(infoMessageEvent, `Succesfully synced ${groups.length} groups!`);
+    this.$bus.emit(infoMessageEvent, `Successfully synced ${groups.length} groups!`);
   }
 
   setEditedPrinterGroupName() {

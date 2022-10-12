@@ -45,7 +45,7 @@ import {
 } from "@/models/printer-floor/printer-floor.model";
 import { PrinterFloorService } from "@/backend/printer-floor.service";
 
-const watchedId = "printerGroupId";
+const watchedId = "printerFloorId";
 
 @Component({
   components: {
@@ -62,7 +62,7 @@ export default class PrinterFloorCrudForm extends Vue {
   formData?: PreCreatePrinterFloor = getDefaultCreatePrinterFloor();
 
   public get printerFloorNameRules() {
-    return { required: true, max: this.appConstants.minPrinterFloorNameLength };
+    return { required: true, min: this.appConstants.minPrinterFloorNameLength };
   }
 
   public get floorNumberRules() {

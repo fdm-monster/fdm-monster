@@ -41,7 +41,7 @@ class PrintersModule extends VuexModule {
   }
 
   get printerFloors() {
-    return this.floors;
+    return this.floors.sort((f, f2) => f.floor - f2.floor);
   }
 
   get currentSideNavPrinter() {
@@ -57,7 +57,7 @@ class PrintersModule extends VuexModule {
   }
 
   get printerFloor() {
-    return (floorId: string) => this.printerFloors.find((pf) => pf._id === floorId);
+    return (floorId: string) => this.floors.find((pf) => pf._id === floorId);
   }
 
   get printer() {
@@ -88,7 +88,7 @@ class PrintersModule extends VuexModule {
 
   get floorlessGroups() {
     return this.printerGroups.filter(
-      (p) => !this.printerFloors.find((g) => g.printerGroups.find((pgp) => pgp === p._id))
+      (p) => !this.floors.find((g) => g.printerGroups.find((pgp) => pgp === p._id))
     );
   }
 
@@ -155,6 +155,10 @@ class PrintersModule extends VuexModule {
   @Mutation addPrinterGroup(printerGroup: PrinterGroup) {
     // No need to sort as `gridSortedPrinterGroups` will fix this on the go
     this.printerGroups.push(printerGroup);
+  }
+
+  @Mutation addPrinterFloor(printerFloor: PrinterFloor) {
+    this.floors.push(printerFloor);
   }
 
   @Mutation _setSelectedPrinterFloor(floor: PrinterFloor) {
@@ -257,16 +261,16 @@ class PrintersModule extends VuexModule {
   }
 
   @Mutation popPrinterFloor(floorId: string) {
-    const foundFloorIndex = this.printerFloors.findIndex((pg) => pg._id === floorId);
+    const foundFloorIndex = this.floors.findIndex((pg) => pg._id === floorId);
     if (foundFloorIndex !== -1) {
-      this.printerFloors.splice(foundFloorIndex, 1);
+      this.floors.splice(foundFloorIndex, 1);
     }
   }
 
   @Mutation replacePrinterFloor(printerFloor: PrinterFloor) {
-    const foundFloorIndex = this.printerFloors.findIndex((pf) => pf._id === printerFloor._id);
+    const foundFloorIndex = this.floors.findIndex((pf) => pf._id === printerFloor._id);
     if (foundFloorIndex !== -1) {
-      this.printerFloors[foundFloorIndex] = printerFloor;
+      this.floors[foundFloorIndex] = printerFloor;
       this.lastUpdated = Date.now();
     }
   }
@@ -385,6 +389,15 @@ class PrintersModule extends VuexModule {
     const data = await PrinterGroupService.createGroup(newPrinterGroup);
 
     this.addPrinterGroup(data);
+
+    return data;
+  }
+
+  @Action
+  async createPrinterFloor(newPrinterFloor: PrinterFloor) {
+    const data = await PrinterFloorService.createFloor(newPrinterFloor);
+
+    this.addPrinterFloor(data);
 
     return data;
   }
@@ -586,6 +599,7 @@ class PrintersModule extends VuexModule {
 
     this.replacePrinterGroup(result);
   }
+
   @Action
   async deletePrinterGroupFromFloor({
     floorId,

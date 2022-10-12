@@ -13,7 +13,7 @@
         <v-card-text>
           <v-row>
             <v-col :cols="12">
-              <PrinterGroupCrudForm ref="printerGroupCrudForm" />
+              <PrinterFloorCrudForm ref="printerFloorCrudForm" />
             </v-col>
           </v-row>
         </v-card-text>
@@ -36,30 +36,30 @@
 import Vue from "vue";
 import { Component, Watch } from "vue-property-decorator";
 import { ValidationObserver } from "vee-validate";
-import { PrinterGroupService } from "@/backend";
 import { generateInitials } from "@/constants/noun-adjectives.data";
 import { printersState } from "@/store/printers.state";
 import { infoMessageEvent } from "@/event-bus/alert.events";
-import PrinterGroupCrudForm from "@/components/Generic/Forms/PrinterGroupCrudForm.vue";
+import PrinterFloorCrudForm from "@/components/Generic/Forms/PrinterFloorCrudForm.vue";
+import { PrinterFloorService } from "@/backend/printer-floor.service";
 
 @Component({
   components: {
+    PrinterFloorCrudForm,
     ValidationObserver,
-    PrinterGroupCrudForm,
   },
   data: () => ({}),
 })
-export default class CreatePrinterGroupDialog extends Vue {
+export default class CreatePrinterFloorDialog extends Vue {
   showingDialog = false;
 
   showChecksPanel = false;
   $refs!: {
     validationObserver: InstanceType<typeof ValidationObserver>;
-    printerFloorCrudForm: InstanceType<typeof PrinterGroupCrudForm>;
+    printerFloorCrudForm: InstanceType<typeof PrinterFloorCrudForm>;
   };
 
   get dialogOpenedState() {
-    return printersState.createGroupDialogOpened;
+    return printersState.createFloorDialogOpened;
   }
 
   @Watch("dialogOpenedState")
@@ -68,7 +68,7 @@ export default class CreatePrinterGroupDialog extends Vue {
   }
 
   formData() {
-    return this.$refs.printerGroupCrudForm?.formData;
+    return this.$refs.printerFloorCrudForm?.formData;
   }
 
   async created() {
@@ -95,17 +95,17 @@ export default class CreatePrinterGroupDialog extends Vue {
 
     const formData = this.formData();
     if (!formData) return;
-    const newPrinterGroupData = PrinterGroupService.convertCreateFormToPrinterGroup(formData);
+    const newPrinterFloorData = PrinterFloorService.convertCreateFormToPrinterFloor(formData);
 
-    await printersState.createPrinterGroup(newPrinterGroupData);
+    await printersState.createPrinterFloor(newPrinterFloorData);
 
-    this.$bus.emit(infoMessageEvent, `Printer ${newPrinterGroupData.name} created`);
+    this.$bus.emit(infoMessageEvent, `Printer floor ${newPrinterFloorData.name} created`);
 
     this.closeDialog();
   }
 
   closeDialog() {
-    printersState._setCreateGroupDialogOpened(false);
+    printersState.setCreateFloorDialogOpened(false);
   }
 }
 </script>

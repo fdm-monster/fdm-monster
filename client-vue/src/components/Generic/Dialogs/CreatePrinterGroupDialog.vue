@@ -99,13 +99,13 @@ export default class CreatePrinterGroupDialog extends Vue {
 
     await printersState.createPrinterGroup(newPrinterGroupData);
 
-    this.$bus.emit(infoMessageEvent, `Printer ${newPrinterGroupData.name} created`);
+    this.$bus.emit(infoMessageEvent, `Printer group ${newPrinterGroupData.name} created`);
 
     this.closeDialog();
   }
 
   closeDialog() {
-    printersState._setCreateGroupDialogOpened(false);
+    printersState.setCreateGroupDialogOpened(false);
   }
 }
 </script>

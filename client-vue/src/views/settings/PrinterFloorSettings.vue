@@ -158,8 +158,8 @@ export default class PrinterGroupsSettings extends Vue {
   }
 
   async createFloor() {
-    // Trigger watch connected to printer group CRUD dialog
-    printersState.setCreateGroupDialogOpened(true);
+    // Trigger watch connected to printer floor CRUD dialog
+    printersState.setCreateFloorDialogOpened(true);
   }
 
   setEditedPrinterFloorName() {
