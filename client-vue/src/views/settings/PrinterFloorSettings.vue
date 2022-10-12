@@ -219,6 +219,9 @@ export default class PrinterGroupsSettings extends Vue {
       floorId,
       floorNumber: this.editedPrinterFloorNumber,
     });
+
+    // Adapt to potential sort change
+    this.selectedItem = -1;
   }
 
   async clickDeleteFloor() {
