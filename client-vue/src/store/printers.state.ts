@@ -411,6 +411,11 @@ class PrintersModule extends VuexModule {
 
   @Action
   async loadPrinterGroups() {
+    if (this.selectedFloor) {
+    } else {
+      // Gotta figure something out to still show printers
+    }
+
     const data = await PrinterGroupService.getGroups();
 
     this.setPrinterGroups(data);
