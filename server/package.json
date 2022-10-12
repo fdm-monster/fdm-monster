@@ -69,7 +69,7 @@
     "semver": "7.3.8",
     "simple-git": "3.14.1",
     "systeminformation": "5.12.6",
-    "toad-scheduler": "1.6.1",
+    "toad-scheduler": "2.0.0",
     "winston": "3.8.2",
     "ws": "8.9.0"
   },
