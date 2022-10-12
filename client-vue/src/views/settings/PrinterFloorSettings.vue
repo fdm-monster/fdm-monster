@@ -198,7 +198,6 @@ export default class PrinterGroupsSettings extends Vue {
     const printerGroup = this.printerGroupInFloor(floor, index);
     if (!floor?._id || !printerGroup?._id) return;
 
-    console.log(printerGroup._id);
     await printersState.deletePrinterGroupFromFloor({
       floorId: floor._id,
       printerGroupId: printerGroup._id,

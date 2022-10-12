@@ -52,7 +52,7 @@ extend("json", {
       JSON.parse(value);
       return true;
     } catch (e) {
-      console.log(e);
+      console.error("Error parsing JSON for validation", e);
       return false;
     }
   },
