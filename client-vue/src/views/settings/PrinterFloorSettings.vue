@@ -92,8 +92,6 @@
                   ></v-text-field>
                 </template>
               </v-edit-dialog>
-
-              <span v-else> Select a floor on the left </span>
             </v-toolbar-title>
           </v-hover>
 
