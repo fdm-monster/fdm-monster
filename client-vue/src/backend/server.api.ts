@@ -60,7 +60,7 @@ export class ServerApi {
     `${ServerApi.pluginFirmwareUpdateRoute}/${id}/flash-firmware`;
   static updatePrinterFloorNameRoute = (id: string) => `${ServerApi.getPrinterFloorRoute(id)}/name`;
   static updatePrinterFloorNumberRoute = (id: string) =>
-    `${ServerApi.getPrinterFloorRoute(id)}/name`;
+    `${ServerApi.getPrinterFloorRoute(id)}/floor-number`;
   static updatePrinterGroupNameRoute = (id: string) => `${ServerApi.getPrinterGroupRoute(id)}/name`;
   static printerFilesClearRoute = (id: string) => `${ServerApi.printerFilesRoute}/${id}/clear`;
   static printerFilesSelectAndPrintRoute = (id: string) =>

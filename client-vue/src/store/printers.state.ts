@@ -547,6 +547,21 @@ class PrintersModule extends VuexModule {
   }
 
   @Action
+  async updatePrinterFloorNumber({
+    floorId,
+    floorNumber,
+  }: {
+    floorId: string;
+    floorNumber: number;
+  }) {
+    const floor = await PrinterFloorService.updateFloorNumber(floorId, floorNumber);
+
+    this.replacePrinterFloor(floor);
+
+    return floor;
+  }
+
+  @Action
   async deletePrinterGroup(groupId: string) {
     await PrinterGroupService.deleteGroup(groupId);
 

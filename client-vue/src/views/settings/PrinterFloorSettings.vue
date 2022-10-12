@@ -70,6 +70,33 @@
             </v-toolbar-title>
           </v-hover>
 
+          <v-hover v-slot="{ hover }">
+            <v-toolbar-title>
+              <v-edit-dialog
+                v-if="selectedPrinterFloor"
+                @open="setEditedPrinterFloorNumber"
+                @save="updatePrinterFloorNumber"
+              >
+                <v-btn color="secondary">
+                  <v-icon v-if="hover" small>edit</v-icon>
+                  {{ selectedPrinterFloor.floor }}
+                </v-btn>
+
+                <template v-slot:input>
+                  <v-text-field
+                    v-model="editedPrinterFloorNumber"
+                    :return-value.sync="editedPrinterFloorNumber"
+                    type="number"
+                    label="Edit"
+                    single-line
+                  ></v-text-field>
+                </template>
+              </v-edit-dialog>
+
+              <span v-else> Select a floor on the left </span>
+            </v-toolbar-title>
+          </v-hover>
+
           <v-spacer></v-spacer>
 
           <v-btn v-if="selectedPrinterFloor" color="primary" @click="clickDeleteFloor()">
@@ -135,6 +162,7 @@ import { PrinterFloorService } from "@/backend/printer-floor.service";
 })
 export default class PrinterGroupsSettings extends Vue {
   editedPrinterFloorName: string = "";
+  editedPrinterFloorNumber: number = 0;
   selectedItem: number;
   get showAddedGroups() {
     return this.selectedPrinterFloor.printerGroups?.length + 1;
@@ -169,6 +197,10 @@ export default class PrinterGroupsSettings extends Vue {
     this.editedPrinterFloorName = this.selectedPrinterFloor.name;
   }
 
+  setEditedPrinterFloorNumber() {
+    this.editedPrinterFloorNumber = this.selectedPrinterFloor.floor;
+  }
+
   async updatePrinterFloorName() {
     if (!this.selectedPrinterFloor?._id) return;
 
@@ -176,6 +208,16 @@ export default class PrinterGroupsSettings extends Vue {
     await printersState.updatePrinterFloorName({
       floorId,
       name: this.editedPrinterFloorName,
+    });
+  }
+
+  async updatePrinterFloorNumber() {
+    if (!this.selectedPrinterFloor?._id) return;
+
+    const { _id: floorId } = this.selectedPrinterFloor;
+    await printersState.updatePrinterFloorNumber({
+      floorId,
+      floorNumber: this.editedPrinterFloorNumber,
     });
   }
 

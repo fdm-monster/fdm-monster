@@ -52,6 +52,12 @@ export class PrinterFloorService extends BaseService {
     return (await this.patchApi(path, { name })) as PrinterFloor;
   }
 
+  static async updateFloorNumber(groupId: string, floor: number) {
+    const path = `${ServerApi.updatePrinterFloorNumberRoute(groupId)}/`;
+
+    return (await this.patchApi(path, { floor })) as PrinterFloor;
+  }
+
   static async deleteFloor(groupId: string) {
     const path = `${ServerApi.getPrinterFloorRoute(groupId)}/`;
 

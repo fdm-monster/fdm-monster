@@ -16,7 +16,7 @@ const PrinterFloorSchema = new Schema({
     type: Number,
     unique: true,
     min: [0, "Floors must be numbered from 0 and up"],
-    required: false,
+    required: true,
   },
   printerGroups: {
     type: [PrinterGroupInFloorSchema],
