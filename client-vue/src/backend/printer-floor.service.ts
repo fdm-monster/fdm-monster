@@ -67,9 +67,9 @@ export class PrinterFloorService extends BaseService {
     return (await this.postApi(path, { printerGroupId })) as PrinterFloor;
   }
 
-  static async deletePrinterGroupFromFloor(floorId: string, groupId: string) {
+  static async deletePrinterGroupFromFloor(floorId: string, printerGroupId: string) {
     const path = `${ServerApi.addOrRemovePrinterGroupFromFloorRoute(floorId)}/`;
 
-    return (await this.deleteApi(path, { groupId })) as PrinterFloor;
+    return (await this.deleteApi(path, { printerGroupId })) as PrinterFloor;
   }
 }

@@ -88,7 +88,7 @@ class PrintersModule extends VuexModule {
 
   get floorlessGroups() {
     return this.printerGroups.filter(
-      (p) => !this.floors.find((g) => g.printerGroups.find((pgp) => pgp === p._id))
+      (p) => !this.floors.find((g) => g.printerGroups.find((pgp) => pgp.printerGroupId === p._id))
     );
   }
 

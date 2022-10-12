@@ -79,7 +79,7 @@
         </v-toolbar>
 
         <v-list v-if="selectedPrinterFloor">
-          <v-list-item v-for="x in printerGroupsPerFloor" :key="x">
+          <v-list-item v-for="x in showAddedGroups" :key="x">
             <v-list-item-content v-if="printerGroupInFloor(selectedPrinterFloor, x)">
               <v-list-item-title>
                 {{ printerGroupInFloor(selectedPrinterFloor, x).name }}
@@ -90,7 +90,7 @@
                 :items="unassignedGroups()"
                 item-text="name"
                 label="Not assigned"
-                no-data-text="No printer groups left"
+                no-data-text="No printer groups left, create more"
                 outlined
                 return-object
                 @change="addPrinterGroupToFloor(selectedPrinterFloor, $event)"
@@ -136,7 +136,9 @@ import { PrinterFloorService } from "@/backend/printer-floor.service";
 export default class PrinterGroupsSettings extends Vue {
   editedPrinterFloorName: string = "";
   selectedItem: number;
-  readonly printerGroupsPerFloor = 16;
+  get showAddedGroups() {
+    return this.selectedPrinterFloor.printerGroups?.length + 1;
+  }
 
   get printerFloors() {
     return printersState.printerFloors;
@@ -153,8 +155,9 @@ export default class PrinterGroupsSettings extends Vue {
   printerGroupInFloor(floor: PrinterFloor, index: number): PrinterGroup | undefined {
     if (!floor?.printerGroups) return;
 
-    const printerGroupId = floor.printerGroups[index - 1];
-    return printersState.printerGroup(printerGroupId);
+    const printerFloorGroup = floor.printerGroups[index - 1];
+    if (!printerFloorGroup) return;
+    return printersState.printerGroup(printerFloorGroup.printerGroupId);
   }
 
   async createFloor() {
@@ -195,6 +198,7 @@ export default class PrinterGroupsSettings extends Vue {
     const printerGroup = this.printerGroupInFloor(floor, index);
     if (!floor?._id || !printerGroup?._id) return;
 
+    console.log(printerGroup._id);
     await printersState.deletePrinterGroupFromFloor({
       floorId: floor._id,
       printerGroupId: printerGroup._id,
