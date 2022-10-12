@@ -62,13 +62,13 @@ export class PrinterFloorService extends BaseService {
     floorId: string,
     { printerGroupId }: { printerGroupId: string }
   ) {
-    const path = `${ServerApi.getPrinterFloorRoute(floorId)}/`;
+    const path = `${ServerApi.addOrRemovePrinterGroupFromFloorRoute(floorId)}/`;
 
     return (await this.postApi(path, { printerGroupId })) as PrinterFloor;
   }
 
   static async deletePrinterGroupFromFloor(floorId: string, groupId: string) {
-    const path = `${ServerApi.getPrinterFromGroupRoute(floorId)}/`;
+    const path = `${ServerApi.addOrRemovePrinterGroupFromFloorRoute(floorId)}/`;
 
     return (await this.deleteApi(path, { groupId })) as PrinterFloor;
   }
