@@ -3,21 +3,35 @@ import { ServerApi } from "@/backend/server.api";
 import { newRandomNamePair } from "@/constants/noun-adjectives.data";
 import {
   getDefaultCreatePrinterFloor,
+  PreCreatePrinterFloor,
   PrinterFloor,
 } from "@/models/printer-floor/printer-floor.model";
 
 export class PrinterFloorService extends BaseService {
-  static convertPrinterFloorToCreateForm(printerFloor: PrinterFloor): PrinterFloor {
+  static convertPrinterFloorToCreateForm(printerFloor?: PrinterFloor): PreCreatePrinterFloor {
     // Inverse transformation
     const newFormData = getDefaultCreatePrinterFloor();
 
-    newFormData._id = printerFloor._id;
-    newFormData.name = printerFloor.name || newRandomNamePair();
+    newFormData._id = printerFloor?._id;
+    newFormData.name = printerFloor?.name || newRandomNamePair();
     newFormData.printerGroups = [];
 
-    newFormData.floor = printerFloor.floor;
+    newFormData.floor = (printerFloor?.floor || 1).toString();
 
     return newFormData;
+  }
+
+  static convertCreateFormToPrinterFloor(formData: PreCreatePrinterFloor) {
+    const modifiedData: any = { ...formData };
+
+    // Fix the string properties to become int
+    modifiedData.floor = parseInt(modifiedData.floor);
+
+    if (Number.isNaN(modifiedData.floor)) {
+      throw new Error("Floor number did not convert to number.");
+    }
+
+    return modifiedData as PrinterFloor;
   }
 
   static async getFloors() {

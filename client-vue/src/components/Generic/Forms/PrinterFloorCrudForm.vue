@@ -2,50 +2,24 @@
   <v-container>
     <v-row>
       <v-col v-if="formData" cols="12" md="6">
-        <validation-provider v-slot="{ errors }" :rules="printerGroupNameRules" name="Name">
+        <validation-provider v-slot="{ errors }" :rules="printerFloorNameRules" name="Name">
           <v-text-field
             v-model="formData.name"
-            :counter="printerGroupNameRules.max"
             :error-messages="errors"
             label="Floor name*"
             required
           />
         </validation-provider>
 
-        <validation-provider v-slot="{ errors }" :rules="locationXRules" name="LocationX">
+        <validation-provider v-slot="{ errors }" :rules="floorNumberRules" name="LocationX">
           <v-text-field
-            v-model="formData.location.x"
-            :counter="locationXRules.max"
+            v-model="formData.floor"
             :error-messages="errors"
-            label="Location X"
+            label="Floor number"
             required
             type="number"
           />
         </validation-provider>
-
-        <validation-provider v-slot="{ errors }" :rules="locationYRules" name="LocationY">
-          <v-text-field
-            v-model="formData.location.y"
-            :counter="locationYRules.max"
-            :error-messages="errors"
-            label="Location Y*"
-            required
-            type="number"
-          />
-        </validation-provider>
-
-        <!--        Maybe we'll add this in future -->
-        <!--        <validation-provider v-slot="{ errors }" name="Groups">-->
-        <!--          <v-select-->
-        <!--            v-model="formData.printers"-->
-        <!--            :error-messages="errors"-->
-        <!--            :items="printersWithoutGroup"-->
-        <!--            label="Printers"-->
-        <!--            multiple-->
-        <!--            no-data-text="No printers without group"-->
-        <!--            required-->
-        <!--          ></v-select>-->
-        <!--        </validation-provider>-->
       </v-col>
     </v-row>
   </v-container>
@@ -64,40 +38,37 @@ import {
 } from "@/models/printer-groups/crud/create-printer-group.model";
 import { PrinterGroup } from "@/models/printers/printer-group.model";
 import { Printer } from "@/models/printers/printer.model";
+import {
+  getDefaultCreatePrinterFloor,
+  PreCreatePrinterFloor,
+  PrinterFloor,
+} from "@/models/printer-floor/printer-floor.model";
+import { PrinterFloorService } from "@/backend/printer-floor.service";
 
-const watchedId = "printerId";
+const watchedId = "printerGroupId";
 
 @Component({
   components: {
     ValidationProvider,
   },
   data: () => ({
-    printersWithoutGroup: [],
+    printerGroupsWithoutFloor: [],
   }),
 })
-export default class PrinterGroupCrudForm extends Vue {
+export default class PrinterFloorCrudForm extends Vue {
   @Inject() readonly appConstants!: AppConstants;
-  @Prop() printerGroupId: string;
-  printersWithoutGroup: Printer[];
-  formData?: PreCreatePrinterGroup = getDefaultCreatePrinterGroup();
+  @Prop() printerFloorId: string;
+  printerGroupsWithoutFloor: PrinterGroup[];
+  formData?: PreCreatePrinterFloor = getDefaultCreatePrinterFloor();
 
-  public get printerGroupNameRules() {
-    return { required: true, max: this.appConstants.maxPrinterGroupNameLength };
+  public get printerFloorNameRules() {
+    return { required: true, max: this.appConstants.minPrinterFloorNameLength };
   }
 
-  public get locationXRules() {
+  public get floorNumberRules() {
     return {
       required: true,
       integer: true,
-      max: this.appConstants.maxPrinterGroupLocationX,
-    };
-  }
-
-  public get locationYRules() {
-    return {
-      required: true,
-      integer: true,
-      max: this.appConstants.maxPrinterGroupLocationY,
     };
   }
 
@@ -106,9 +77,9 @@ export default class PrinterGroupCrudForm extends Vue {
   }
 
   async created() {
-    if (this.printerGroupId) {
-      const crudeData = this.$store.getters.printer(this.printerGroupId);
-      this.formData = PrinterGroupService.convertPrinterGroupToCreateForm(crudeData);
+    if (this.printerFloorId) {
+      const crudeData = printersState.printerFloor(this.printerFloorId);
+      this.formData = PrinterFloorService.convertPrinterFloorToCreateForm(crudeData);
     }
 
     await printersState.loadPrinterGroups();
@@ -118,10 +89,10 @@ export default class PrinterGroupCrudForm extends Vue {
   onChildChanged(val?: string) {
     if (!val) return;
 
-    const printerGroup = this.$store.getters.printerGroup(val) as PrinterGroup;
+    const printerFloor = printersState.printerFloor(val);
 
     // Inverse transformation
-    this.formData = PrinterGroupService.convertPrinterGroupToCreateForm(printerGroup);
+    this.formData = PrinterFloorService.convertPrinterFloorToCreateForm(printerFloor);
   }
 }
 </script>

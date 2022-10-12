@@ -56,6 +56,10 @@ class PrintersModule extends VuexModule {
     return (groupId: string) => this.printerGroups.find((pg) => pg._id === groupId);
   }
 
+  get printerFloor() {
+    return (floorId: string) => this.printerFloors.find((pf) => pf._id === floorId);
+  }
+
   get printer() {
     return (printerId?: string) => this.printers.find((p) => p.id === printerId);
   }

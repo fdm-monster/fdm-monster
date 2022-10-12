@@ -8,9 +8,16 @@ export interface PrinterFloor {
   printerGroups: string[];
 }
 
-export const getDefaultCreatePrinterFloor = (): PrinterFloor => ({
+export interface PreCreatePrinterFloor {
+  _id?: string;
+  name: string;
+  floor: string;
+  printerGroups: string[];
+}
+
+export const getDefaultCreatePrinterFloor = (): PreCreatePrinterFloor => ({
   _id: undefined,
   name: newRandomNamePair(),
-  floor: 1,
+  floor: "1",
   printerGroups: [],
 });

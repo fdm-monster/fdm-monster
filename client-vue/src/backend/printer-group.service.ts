@@ -9,17 +9,17 @@ import {
 import { newRandomNamePair } from "@/constants/noun-adjectives.data";
 
 export class PrinterGroupService extends BaseService {
-  static convertPrinterGroupToCreateForm(printerGroup: PrinterGroup): PreCreatePrinterGroup {
+  static convertPrinterGroupToCreateForm(printerGroup?: PrinterGroup): PreCreatePrinterGroup {
     // Inverse transformation
     const newFormData = getDefaultCreatePrinterGroup();
 
-    newFormData.id = printerGroup._id;
-    newFormData.name = printerGroup.name || newRandomNamePair();
+    newFormData.id = printerGroup?._id;
+    newFormData.name = printerGroup?.name || newRandomNamePair();
     newFormData.printers = [];
 
     newFormData.location = {
-      x: printerGroup.location?.x.toString() || "0",
-      y: printerGroup.location.y?.toString() || "0",
+      x: printerGroup?.location?.x.toString() || "0",
+      y: printerGroup?.location.y?.toString() || "0",
     };
 
     return newFormData;
