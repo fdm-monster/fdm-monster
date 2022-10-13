@@ -72,13 +72,14 @@ const watchedId = "printerId";
     ValidationProvider,
   },
   data: () => ({
-    printersWithoutGroup: [],
+    // printersWithoutGroup: [],
   }),
 })
 export default class PrinterGroupCrudForm extends Vue {
   @Inject() readonly appConstants!: AppConstants;
   @Prop() printerGroupId: string;
-  printersWithoutGroup: Printer[];
+  // We need more thorough UI for this
+  // printersWithoutGroup: Printer[];
   formData?: PreCreatePrinterGroup = getDefaultCreatePrinterGroup();
 
   public get printerGroupNameRules() {
@@ -107,7 +108,7 @@ export default class PrinterGroupCrudForm extends Vue {
 
   async created() {
     if (this.printerGroupId) {
-      const crudeData = this.$store.getters.printer(this.printerGroupId);
+      const crudeData = printersState.printerGroup(this.printerGroupId);
       this.formData = PrinterGroupService.convertPrinterGroupToCreateForm(crudeData);
     }
 
@@ -118,7 +119,7 @@ export default class PrinterGroupCrudForm extends Vue {
   onChildChanged(val?: string) {
     if (!val) return;
 
-    const printerGroup = this.$store.getters.printerGroup(val) as PrinterGroup;
+    const printerGroup = printersState.printerGroup(val) as PrinterGroup;
 
     // Inverse transformation
     this.formData = PrinterGroupService.convertPrinterGroupToCreateForm(printerGroup);

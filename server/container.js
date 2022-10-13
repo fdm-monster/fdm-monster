@@ -59,16 +59,18 @@ const CustomGCodeService = require("./services/custom-gcode.service");
 const PrinterWebsocketPingTask = require("./tasks/printer-websocket-ping.task");
 const FilamentService = require("./services/filament.service");
 const {
-  PluginFirmwareUpdateService
+  PluginFirmwareUpdateService,
 } = require("./services/octoprint/plugin-firmware-update.service");
 const { PluginRepositoryCache } = require("./services/octoprint/plugin-repository.cache");
 const { configureCacheManager } = require("./handlers/cache-manager");
 const { PluginFirmwareUpdatePreparationTask } = require("./tasks/plugin-firmware-download.task");
+const PrinterFloorService = require("./services/printer-floor.service");
+const PrinterFloorsCache = require("./state/data/printer-floor.cache");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
   const container = createContainer({
-    injectionMode: InjectionMode.PROXY
+    injectionMode: InjectionMode.PROXY,
   });
 
   container.register({
@@ -104,13 +106,14 @@ function configureContainer() {
     [DITokens.httpClient]: asValue(
       axios.create({
         maxBodyLength: 1000 * 1000 * 1000, // 1GB
-        maxContentLength: 1000 * 1000 * 1000 // 1GB
+        maxContentLength: 1000 * 1000 * 1000, // 1GB
       })
     ),
     [DITokens.multerService]: asClass(MulterService).singleton(),
     [DITokens.printerService]: asClass(PrinterService),
     [DITokens.printerFilesService]: asClass(PrinterFilesService),
     [DITokens.printerGroupService]: asClass(PrinterGroupService),
+    [DITokens.printerFloorService]: asClass(PrinterFloorService).singleton(),
     [DITokens.octoPrintApiService]: asClass(OctoPrintApiService).singleton(),
     [DITokens.pluginFirmwareUpdateService]: asClass(PluginFirmwareUpdateService).singleton(),
     [DITokens.historyService]: asClass(HistoryService),
@@ -119,6 +122,7 @@ function configureContainer() {
     [DITokens.printerProfilesCache]: asClass(PrinterProfilesCache).singleton(),
     [DITokens.printerState]: asClass(PrinterState).transient(), // Transient on purpose!
     [DITokens.printerGroupsCache]: asClass(PrinterGroupsCache).singleton(),
+    [DITokens.printerFloorsCache]: asClass(PrinterFloorsCache).singleton(),
     [DITokens.historyStore]: asClass(HistoryStore).singleton(),
     [DITokens.jobsCache]: asClass(JobsCache).singleton(),
     [DITokens.terminalLogsCache]: asClass(TerminalLogsCache).singleton(),
@@ -151,12 +155,12 @@ function configureContainer() {
     [DITokens.printerFileCleanTask]: asClass(PrinterFileCleanTask).singleton(),
     [DITokens.pluginFirmwareUpdatePreparationTask]: asClass(
       PluginFirmwareUpdatePreparationTask
-    ).singleton() // Delayed run-once cache loader and firmware download utility
+    ).singleton(), // Delayed run-once cache loader and firmware download utility
   });
 
   return container;
 }
 
 module.exports = {
-  configureContainer
+  configureContainer,
 };

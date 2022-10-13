@@ -326,10 +326,10 @@
     minimatch "^3.1.2"
     strip-json-comments "^3.1.1"
 
-"@fdm-monster/client@0.3.35":
-  version "0.3.35"
-  resolved "https://registry.yarnpkg.com/@fdm-monster/client/-/client-0.3.35.tgz#5c52bdc6e71a8ccc38868716e61d8ba60281a6b1"
-  integrity sha512-sAK3qKCjyl7EMrrcvLjqlU7N2u2BiT5CwT2wzWJVDREjn9tdIe/iSaXCn9018eaPruOOCNb2hnen0QdCKRZgoA==
+"@fdm-monster/client@0.3.36":
+  version "0.3.36"
+  resolved "https://registry.yarnpkg.com/@fdm-monster/client/-/client-0.3.36.tgz#f41999a17472954256fb7009849eec9e63eb9c19"
+  integrity sha512-tGa6j8mSO6ZuLZDwPiCSjNzC2+lnJ4AbrPtsinrGKXWFsv0NG+xpB5O1hZsNuakWvfvcT5SGzWXaslY7TBtggA==
 
 "@humanwhocodes/config-array@^0.10.5":
   version "0.10.7"
@@ -610,6 +610,20 @@
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@kwsites/promise-deferred/-/promise-deferred-1.1.1.tgz#8ace5259254426ccef57f3175bc64ed7095ed919"
   integrity sha512-GaHYm+c0O9MjZRu0ongGBRbinu8gVAMd2UZjji6jVmqKtZluZnptXGWhz1E8j8D2HJ3f/yMxKAUC0b+57wncIw==
+
+"@lcov-viewer/cli@^1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@lcov-viewer/cli/-/cli-1.3.0.tgz#0cc2e961c5fb97a9d393565b003a44ea0a5e8806"
+  integrity sha512-A9altXh2ZyeuagYZsJqVja6WMlgGJGcV+SHOOgIZB+CA2bfk78vgOqrPJrWg+IflFpoEzo1QeqwH4WbKSM4d9A==
+  dependencies:
+    commander "^9.3.0"
+
+"@lcov-viewer/istanbul-report@^1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@lcov-viewer/istanbul-report/-/istanbul-report-1.3.0.tgz#40ac103bfb0f165a1ac04b5218627c17f208f377"
+  integrity sha512-LM/gXdyj6atkPjRWV0vp/IlpyNUCEkgcIGzKo8gr8JG52EPAZlF5yj2KVJrmP+hh9pynqCK8vdfoTxZsOalJqg==
+  dependencies:
+    istanbul-lib-report "^3.0.0"
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
@@ -1373,7 +1387,7 @@ combined-stream@^1.0.8:
   dependencies:
     delayed-stream "~1.0.0"
 
-commander@^9.1.0:
+commander@^9.1.0, commander@^9.3.0:
   version "9.4.1"
   resolved "https://registry.yarnpkg.com/commander/-/commander-9.4.1.tgz#d1dd8f2ce6faf93147295c0df13c7c21141cfbdd"
   integrity sha512-5EEkTNyHNGFPD2H+c/dXXfQZYa/scCKasxWcXJaWnNJ99pnQN9Vnmqow+p+PlFPE63Q6mThaZws1T+HxfpgtPw==

@@ -11,7 +11,7 @@ const {
   selectAndPrintFileRules,
   localFileUploadRules,
   moveFileOrFolderRules,
-  createFolderRules
+  createFolderRules,
 } = require("./validation/printer-files-controller.validation");
 const { ValidationException, NotFoundException } = require("../exceptions/runtime.exceptions");
 const { printerLoginToken, printerResolveMiddleware } = require("../middleware/printer");
@@ -36,7 +36,7 @@ class PrinterFilesController {
     printerFileCleanTask,
     settingsStore,
     loggerFactory,
-    multerService
+    multerService,
   }) {
     this.#filesStore = filesStore;
     this.#settingsStore = settingsStore;
@@ -54,7 +54,6 @@ class PrinterFilesController {
 
   getTrackedUploads(req, res) {
     const sessions = this.#multerService.getSessions();
-
     res.send(sessions);
   }
 
@@ -116,7 +115,7 @@ class PrinterFilesController {
 
     res.send({
       failedFiles,
-      succeededFiles
+      succeededFiles,
     });
   }
 
@@ -182,12 +181,12 @@ class PrinterFilesController {
 
     if (!files?.length) {
       throw new ValidationException({
-        error: "No file was available for upload. Did you upload files with extension '.gcode'?"
+        error: "No file was available for upload. Did you upload files with extension '.gcode'?",
       });
     }
     if (files.length > 1) {
       throw new ValidationException({
-        error: "Only 1 .gcode file can be uploaded at a time due to bandwidth restrictions"
+        error: "Only 1 .gcode file can be uploaded at a time due to bandwidth restrictions",
       });
     }
 
@@ -228,7 +227,7 @@ class PrinterFilesController {
 
     if (!localLocation.endsWith(".gcode")) {
       throw new ValidationException({
-        localLocation: "The indicated file extension did not match '.gcode'"
+        localLocation: "The indicated file extension did not match '.gcode'",
       });
     }
 
@@ -238,14 +237,14 @@ class PrinterFilesController {
 
     if (fs.lstatSync(localLocation).isDirectory()) {
       throw new ValidationException({
-        localLocation: "The indicated file was not correctly found."
+        localLocation: "The indicated file was not correctly found.",
       });
     }
 
     const stream = fs.createReadStream(localLocation);
     const response = await this.#octoPrintApiService.uploadFileAsMultiPart(printerLogin, stream, {
       select,
-      print
+      print,
     });
 
     // TODO update file cache with files store

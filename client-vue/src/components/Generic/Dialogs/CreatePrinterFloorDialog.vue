@@ -7,13 +7,13 @@
             <v-avatar color="primary" size="56">
               {{ avatarInitials() }}
             </v-avatar>
-            New Printer Group
+            New Printer Floor
           </span>
         </v-card-title>
         <v-card-text>
           <v-row>
             <v-col :cols="12">
-              <PrinterGroupCrudForm ref="printerGroupCrudForm" />
+              <PrinterFloorCrudForm ref="printerFloorCrudForm" />
             </v-col>
           </v-row>
         </v-card-text>
@@ -21,10 +21,6 @@
           <em class="red--text">* indicates required field</em>
           <v-spacer></v-spacer>
           <v-btn text @click="closeDialog()">Close</v-btn>
-          <!--          Might be used later if problems arise-->
-          <!--          <v-btn :disabled="invalid" color="warning" text @click="validateGroup()">-->
-          <!--            Validate-->
-          <!--          </v-btn>-->
           <v-btn :disabled="invalid" color="blue darken-1" text @click="submit()">Create</v-btn>
         </v-card-actions>
       </v-card>
@@ -36,30 +32,31 @@
 import Vue from "vue";
 import { Component, Watch } from "vue-property-decorator";
 import { ValidationObserver } from "vee-validate";
-import { PrinterGroupService } from "@/backend";
-import { generateInitials } from "@/constants/noun-adjectives.data";
+import { generateInitials, newRandomNamePair } from "@/constants/noun-adjectives.data";
 import { printersState } from "@/store/printers.state";
 import { infoMessageEvent } from "@/event-bus/alert.events";
-import PrinterGroupCrudForm from "@/components/Generic/Forms/PrinterGroupCrudForm.vue";
+import PrinterFloorCrudForm from "@/components/Generic/Forms/PrinterFloorCrudForm.vue";
+import { PrinterFloorService } from "@/backend/printer-floor.service";
+import { getDefaultCreatePrinterFloor } from "@/models/printer-floor/printer-floor.model";
 
 @Component({
   components: {
+    PrinterFloorCrudForm,
     ValidationObserver,
-    PrinterGroupCrudForm,
   },
   data: () => ({}),
 })
-export default class CreatePrinterGroupDialog extends Vue {
+export default class CreatePrinterFloorDialog extends Vue {
   showingDialog = false;
 
   showChecksPanel = false;
   $refs!: {
     validationObserver: InstanceType<typeof ValidationObserver>;
-    printerGroupCrudForm: InstanceType<typeof PrinterGroupCrudForm>;
+    printerFloorCrudForm: InstanceType<typeof PrinterFloorCrudForm>;
   };
 
   get dialogOpenedState() {
-    return printersState.createGroupDialogOpened;
+    return printersState.createFloorDialogOpened;
   }
 
   @Watch("dialogOpenedState")
@@ -68,7 +65,7 @@ export default class CreatePrinterGroupDialog extends Vue {
   }
 
   formData() {
-    return this.$refs.printerGroupCrudForm?.formData;
+    return this.$refs.printerFloorCrudForm?.formData;
   }
 
   async created() {
@@ -95,17 +92,21 @@ export default class CreatePrinterGroupDialog extends Vue {
 
     const formData = this.formData();
     if (!formData) return;
-    const newPrinterGroupData = PrinterGroupService.convertCreateFormToPrinterGroup(formData);
+    const newPrinterFloorData = PrinterFloorService.convertCreateFormToPrinterFloor(formData);
 
-    await printersState.createPrinterGroup(newPrinterGroupData);
+    await printersState.createPrinterFloor(newPrinterFloorData);
 
-    this.$bus.emit(infoMessageEvent, `Printer group ${newPrinterGroupData.name} created`);
+    this.$bus.emit(infoMessageEvent, `Printer floor ${newPrinterFloorData.name} created`);
+
+    formData.name = newRandomNamePair();
+    const maxIndex = Math.max(...printersState.printerFloors.map((pf) => pf.floor)) + 1;
+    formData.floor = maxIndex.toString();
 
     this.closeDialog();
   }
 
   closeDialog() {
-    printersState.setCreateGroupDialogOpened(false);
+    printersState.setCreateFloorDialogOpened(false);
   }
 }
 </script>

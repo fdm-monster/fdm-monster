@@ -1,5 +1,6 @@
 const envUtils = require("../../utils/env.utils");
 const path = require("path");
+const { isTestEnvironment } = require("../../utils/env.utils");
 
 describe("Env util", () => {
   it("should pass validation", () => {
@@ -10,5 +11,6 @@ describe("Env util", () => {
 
   it("environment should be test", () => {
     expect(process.env.NODE_ENV).toBe("test");
+    expect(isTestEnvironment()).toBeTruthy();
   });
 });

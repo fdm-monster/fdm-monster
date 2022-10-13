@@ -22,6 +22,7 @@ class BootTask {
   userService;
   influxDbSetupService;
   pluginRepositoryCache;
+  printerFloorsCache;
   pluginFirmwareUpdateService;
 
   constructor({
@@ -41,7 +42,8 @@ class BootTask {
     taskManagerService,
     influxDbSetupService,
     pluginRepositoryCache,
-    pluginFirmwareUpdateService
+    printerFloorsCache,
+    pluginFirmwareUpdateService,
   }) {
     this.#serverTasks = serverTasks;
     this.serverSettingsService = serverSettingsService;
@@ -58,6 +60,7 @@ class BootTask {
     this.#taskManagerService = taskManagerService;
     this.influxDbSetupService = influxDbSetupService;
     this.pluginRepositoryCache = pluginRepositoryCache;
+    this.printerFloorsCache = printerFloorsCache;
     this.pluginFirmwareUpdateService = pluginFirmwareUpdateService;
     this.#logger = loggerFactory("Server");
   }
@@ -90,29 +93,22 @@ class BootTask {
       }
     }
 
-    try {
-      this.#logger.info("Loading Server settings.");
-      await this.settingsStore.loadSettings();
+    this.#logger.info("Loading Server settings.");
+    await this.settingsStore.loadSettings();
 
-      this.#logger.info("Loading caches.");
-      await this.multerService.clearUploadsFolder();
-      await this.printersStore.loadPrintersStore();
-      await this.filesStore.loadFilesStore();
-      await this.filamentsStore.loadFilamentsStore();
-      await this.historyStore.loadHistoryStore();
-      await this.printerGroupsCache.loadCache();
-      await this.influxDbSetupService.optionalInfluxDatabaseSetup();
+    this.#logger.info("Loading caches.");
+    await this.multerService.clearUploadsFolder();
+    await this.printersStore.loadPrintersStore();
+    await this.filesStore.loadFilesStore();
+    await this.filamentsStore.loadFilamentsStore();
+    await this.historyStore.loadHistoryStore();
+    await this.printerGroupsCache.loadCache();
+    await this.influxDbSetupService.optionalInfluxDatabaseSetup();
 
-      this.#logger.info("Synchronizing user permission and roles definition");
-      await this.permissionService.syncPermissions();
-      await this.roleService.syncRoles();
-      await this.ensureAdminUserExists();
-    } catch (e) {
-      this.#logger.error(
-        "A startup error occurred. The server might not have started correctly.",
-        e
-      );
-    }
+    this.#logger.info("Synchronizing user permission and roles definition");
+    await this.permissionService.syncPermissions();
+    await this.roleService.syncRoles();
+    await this.ensureAdminUserExists();
 
     if (bootTaskScheduler && process.env.SAFEMODE_ENABLED !== "true") {
       this.#serverTasks.BOOT_TASKS.forEach((task) => {
@@ -128,7 +124,7 @@ class BootTask {
 
   async createConnection() {
     await mongoose.connect(fetchMongoDBConnectionString(), {
-      serverSelectionTimeoutMS: 1500
+      serverSelectionTimeoutMS: 1500,
     });
   }
 
@@ -140,7 +136,7 @@ class BootTask {
         username: "root",
         name: "Admin",
         password: "fdm-root",
-        roles: [adminRole.id]
+        roles: [adminRole.id],
       });
       this.#logger.info(
         "Created admin account as it was missing. Please consult the documentation for credentials."

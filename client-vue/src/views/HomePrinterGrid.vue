@@ -1,20 +1,6 @@
 <template>
   <div>
-    <v-toolbar flat>
-      <v-toolbar-title>Location Map</v-toolbar-title>
-      <v-spacer></v-spacer>
-      <div>
-        <v-switch
-          v-model="autoPrint"
-          disabled
-          hide-details
-          label="Auto-select and print"
-        ></v-switch>
-      </div>
-      <v-btn class="ml-3" color="primary" type="button" @click="openCreatePrinterDialog()">
-        Create Printer
-      </v-btn>
-    </v-toolbar>
+    <Toolbar />
 
     <v-banner v-drop-upload="{ printers: selectedPrinters }">
       <v-row style="margin-bottom: -20px">
@@ -85,16 +71,16 @@ import SideNavExplorer from "@/components/Generic/SideNavs/FileExplorerSideNav.v
 import { infoMessageEvent } from "@/event-bus/alert.events";
 import { uploadsState } from "@/store/uploads.state";
 import { convertMultiPrinterFileToQueue } from "@/utils/uploads-state.utils";
+import Toolbar from "@/components/PrinterGrid/Toolbar.vue";
 
 @Component({
-  components: { PrinterGrid, SideNavExplorer, CreatePrinterDialog },
+  components: { PrinterGrid, SideNavExplorer, CreatePrinterDialog, Toolbar },
   data: () => ({
     selectedFile: undefined,
     viewedPrinter: undefined,
   }),
 })
 export default class HomePage extends Vue {
-  autoPrint = true;
   formatBytes = formatBytes;
   $refs!: {
     fileUpload: InstanceType<typeof HTMLInputElement>;
@@ -152,10 +138,6 @@ export default class HomePage extends Vue {
 
   openPrinter(printer: Printer) {
     PrintersService.openPrinterURL(printer.printerURL);
-  }
-
-  openCreatePrinterDialog() {
-    printersState.setCreateDialogOpened(true);
   }
 }
 </script>

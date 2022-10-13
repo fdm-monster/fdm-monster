@@ -12,10 +12,11 @@ module.exports = {
     "file-storage",
     "node_modules",
     "logs",
-    "views"
+    "views",
   ],
   globalSetup: "./test/setup-global.js",
   setupFilesAfterEnv: ["jest-27-expect-message", "./test/setup-after-env.js"],
   collectCoverageFrom: ["**/*.js"],
-  coveragePathIgnorePatterns: ["node_modules", "test"]
+  coveragePathIgnorePatterns: ["node_modules", "test"],
+  coverageReporters: ["@lcov-viewer/istanbul-report"],
 };

@@ -1,5 +1,5 @@
 import { extend, setInteractionMode } from "vee-validate";
-import { alpha_num, digits, integer, length, max, required } from "vee-validate/dist/rules";
+import { alpha_num, digits, integer, length, max, min, required } from "vee-validate/dist/rules";
 import validator from "validator";
 
 export function configureVeeValidate() {
@@ -32,6 +32,11 @@ export function configureVeeValidate() {
 
   extend("ip_or_fqdn", (value) => {
     return validator.isFQDN(value) || validator.isIP(value) || value === "localhost";
+  });
+
+  extend("min", {
+    ...min,
+    message: "{_field_} must at least {length} characters long",
   });
 
   extend("max", {

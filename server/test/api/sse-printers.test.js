@@ -32,14 +32,14 @@ describe("SSE-Printers", () => {
         firedEvent = true;
 
         let parsedMsg = JSON.parse(e.data);
-        expect(parsedMsg).toEqual({
+        expect(parsedMsg).toMatchObject({
           printers: [],
           printerGroups: [],
           trackedUploads: {
             current: [],
             done: [],
-            failed: []
-          }
+            failed: [],
+          },
         });
         es.close();
         resolve();

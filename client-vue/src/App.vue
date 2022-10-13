@@ -12,6 +12,7 @@
     <UpdatePrinterDialog />
     <CreatePrinterDialog />
     <CreatePrinterGroupDialog />
+    <CreatePrinterFloorDialog />
     <FileExplorerSideNav />
   </v-app>
 </template>
@@ -34,6 +35,7 @@ import FileExplorerSideNav from "@/components/Generic/SideNavs/FileExplorerSideN
 import CreatePrinterDialog from "@/components/Generic/Dialogs/CreatePrinterDialog.vue";
 import { uploadsState } from "@/store/uploads.state";
 import CreatePrinterGroupDialog from "@/components/Generic/Dialogs/CreatePrinterGroupDialog.vue";
+import CreatePrinterFloorDialog from "@/components/Generic/Dialogs/CreatePrinterFloorDialog.vue";
 
 @Component({
   components: {
@@ -42,6 +44,7 @@ import CreatePrinterGroupDialog from "@/components/Generic/Dialogs/CreatePrinter
     UpdatePrinterDialog,
     CreatePrinterDialog,
     CreatePrinterGroupDialog,
+    CreatePrinterFloorDialog,
     FileExplorerSideNav,
     ErrorAlert,
   },
@@ -84,6 +87,10 @@ export default class App extends Vue {
 
     if (message.trackedUploads) {
       this.$bus.emit(uploadMessageEvent, InfoEventType.UPLOAD_BACKEND, message.trackedUploads);
+    }
+
+    if (message.floors) {
+      printersState.savePrinterFloors(message.floors);
     }
 
     if (message.printers) {

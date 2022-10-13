@@ -4,6 +4,7 @@ class PrinterSseTask {
   #printerSseHandler;
   #printerGroupsCache;
   #printersStore;
+  #printerFloorsCache;
   #fileUploadTrackerCache;
 
   #aggregateSizeCounter = 0;
@@ -15,26 +16,30 @@ class PrinterSseTask {
   constructor({
     printerSseHandler,
     printerGroupsCache,
+    printerFloorsCache,
     printersStore,
     loggerFactory,
-    fileUploadTrackerCache
+    fileUploadTrackerCache,
   }) {
     this.#printerSseHandler = printerSseHandler;
     this.#printersStore = printersStore;
     this.#printerGroupsCache = printerGroupsCache;
     this.#fileUploadTrackerCache = fileUploadTrackerCache;
+    this.#printerFloorsCache = printerFloorsCache;
     this.#logger = loggerFactory("Printer-SSE-task");
   }
 
   async run() {
+    const floors = await this.#printerFloorsCache.listCache();
     const printerStates = this.#printersStore.listPrintersFlat();
     const printerGroups = this.#printerGroupsCache.getCache();
     const trackedUploads = this.#fileUploadTrackerCache.getUploads(true);
 
     const sseData = {
       printers: printerStates,
+      floors,
       trackedUploads,
-      printerGroups
+      printerGroups,
     };
 
     const serializedData = JSON.stringify(sseData);

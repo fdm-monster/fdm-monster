@@ -1,3 +1,5 @@
+const { isTestEnvironment } = require("../../utils/env.utils");
+
 class PluginRepositoryCache {
   #octoPrintApiService;
   #logger;
@@ -13,7 +15,9 @@ class PluginRepositoryCache {
 
   getPlugin(pluginName) {
     if (!this.wasCached) {
-      this.#logger.warning(`Could not check plugin '${pluginName}', as cache was not loaded.`);
+      if (!isTestEnvironment()) {
+        this.#logger.warning(`Could not check plugin '${pluginName}', as cache was not loaded.`);
+      }
       return;
     }
 

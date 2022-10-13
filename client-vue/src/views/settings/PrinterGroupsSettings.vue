@@ -183,7 +183,7 @@ export default class PrinterGroupsSettings extends Vue {
   async syncLegacyGroups() {
     const groups = await PrinterGroupService.syncLegacyGroups();
 
-    this.$bus.emit(infoMessageEvent, `Succesfully synced ${groups.length} groups!`);
+    this.$bus.emit(infoMessageEvent, `Successfully synced ${groups.length} groups!`);
   }
 
   setEditedPrinterGroupName() {
@@ -198,6 +198,9 @@ export default class PrinterGroupsSettings extends Vue {
       groupId,
       name: this.editedPrinterGroupName,
     });
+
+    // Adapt to potential sort change
+    this.selectedItem = -1;
   }
 
   async clickDeleteGroup() {

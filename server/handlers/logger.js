@@ -4,7 +4,7 @@ const { AppConstants } = require("../server.constants");
 const dtFormat = new Intl.DateTimeFormat("en-GB", {
   timeStyle: "medium",
   dateStyle: "short",
-  timeZone: "UTC"
+  timeZone: "UTC",
 });
 
 dateFormat = () => {
@@ -13,8 +13,8 @@ dateFormat = () => {
 
 class LoggerService {
   constructor(name, enableFileLogs = true, logFilterLevel) {
-    const isProd = process.env.NODE_ENV === AppConstants.defaultProductionEnv;
-    const isTest = process.env.NODE_ENV === AppConstants.defaultTestEnv;
+    const isProd = process.env[AppConstants.NODE_ENV_KEY] === AppConstants.defaultProductionEnv;
+    const isTest = process.env[AppConstants.NODE_ENV_KEY] === AppConstants.defaultTestEnv;
 
     if (!logFilterLevel) {
       logFilterLevel = isProd || isTest ? "warn" : "info";
@@ -24,7 +24,7 @@ class LoggerService {
     this.logger = winston.createLogger({
       transports: [
         new winston.transports.Console({
-          level: logFilterLevel
+          level: logFilterLevel,
         }),
         ...(enableFileLogs
           ? [
@@ -32,10 +32,10 @@ class LoggerService {
                 level: isTest ? "warn" : "info", // Irrespective of environment
                 filename: `./logs/${name}.log`,
                 maxsize: "5000000",
-                maxFiles: 5
-              })
+                maxFiles: 5,
+              }),
             ]
-          : [])
+          : []),
       ],
       format: winston.format.printf((info) => {
         const level = info.level.toUpperCase();
@@ -43,25 +43,25 @@ class LoggerService {
         let message = `${date} | ${level} | ${name} | ${info.message}`;
         message = info.meta ? message + ` - ${JSON.stringify(info.meta)}` : message;
         return message;
-      })
+      }),
     });
   }
 
   info(message, meta) {
     this.logger.log("info", message, {
-      meta
+      meta,
     });
   }
 
   warning(message, meta) {
     this.logger.log("warn", message, {
-      meta
+      meta,
     });
   }
 
   debug(message, meta) {
     this.logger.log("debug", message, {
-      meta
+      meta,
     });
   }
 
