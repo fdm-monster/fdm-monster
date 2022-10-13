@@ -36,6 +36,9 @@ describe("PrinterFloorController", () => {
     const data = expectOkResponse(response);
     expect(data).toHaveLength(1);
     expect(data[0].name).toBe("default floor");
+
+    const getResponse = await request.get(getRoute(data[0]._id));
+    expectOkResponse(getResponse);
   });
 
   it("should not be able to create falsy printer floor", async () => {
