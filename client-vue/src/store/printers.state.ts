@@ -442,7 +442,22 @@ class PrintersModule extends VuexModule {
   }
 
   @Action
-  saveSelectedFloor(selectedPrinterFloor: PrinterFloor) {
+  async changeSelectedFloorByIndex(selectedPrinterFloorIndex: number) {
+    if (!this.floors?.length) return;
+    if (this.floors.length <= selectedPrinterFloorIndex) return;
+
+    // SSE will sync result
+    const newFloor = this.floors[selectedPrinterFloorIndex];
+    if (!newFloor) return;
+
+    await PrinterFloorService.setSelectedFloor(newFloor._id!);
+    return newFloor;
+  }
+
+  @Action
+  async saveSelectedFloor(selectedPrinterFloor: PrinterFloor) {
+    if (!selectedPrinterFloor._id) return;
+
     this._setSelectedPrinterFloor(selectedPrinterFloor);
 
     return selectedPrinterFloor;

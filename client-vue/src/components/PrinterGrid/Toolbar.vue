@@ -1,7 +1,9 @@
 <template>
   <v-toolbar flat>
     <v-toolbar-title>Printer Floors</v-toolbar-title>
-    <v-btn-toggle class="ml-7" rounded>
+    <v-btn-toggle class="ml-7" rounded :value="selectedFloorToggleIndex" @change="changeFloorIndex">
+      {{ selectedFloorIndex }}
+      {{ selectedFloorToggleIndex }}
       <v-btn v-for="f in floors" :key="f._id">
         <v-icon>format_align_left</v-icon>
         {{ f.name }}
@@ -25,13 +27,23 @@ import { printersState } from "@/store/printers.state";
 @Component({})
 export default class Toolbar extends Vue {
   autoPrint = true;
+  selectedFloorToggleIndex = 0;
 
-  get selectedFloor() {
-    return printersState.selectedPrinterFloor?.name;
+  get selectedFloorIndex() {
+    if (!printersState.printerFloors || !printersState.selectedPrinterFloor) return null;
+
+    return printersState.printerFloors.findIndex(
+      (pf) => pf._id == printersState.selectedPrinterFloor!._id
+    );
   }
 
   get floors() {
     return printersState.printerFloors;
+  }
+
+  changeFloorIndex(index: any) {
+    printersState.changeSelectedFloorByIndex(index);
+    this.selectedFloorToggleIndex = index;
   }
 
   openCreatePrinterDialog() {

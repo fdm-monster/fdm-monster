@@ -77,6 +77,7 @@ class PrinterFloorsCache {
     }
 
     this.#logger.info(`Set selected floor to id '${this.#selectedFloorId}'`);
+    return this.getSelectedFloor();
   }
 
   async getFloor(floorId) {

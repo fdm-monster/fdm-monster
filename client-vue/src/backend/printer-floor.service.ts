@@ -46,6 +46,12 @@ export class PrinterFloorService extends BaseService {
     return (await this.postApi(path, printerFloor)) as PrinterFloor;
   }
 
+  static async setSelectedFloor(printerFloorId: string) {
+    const path = `${ServerApi.setSelectedPrinterFloorRoute(printerFloorId)}/`;
+
+    return (await this.postApi(path, { name })) as PrinterFloor;
+  }
+
   static async updateFloorName(groupId: string, name: string) {
     const path = `${ServerApi.updatePrinterFloorNameRoute(groupId)}/`;
 
