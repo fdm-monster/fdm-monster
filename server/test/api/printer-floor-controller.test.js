@@ -14,8 +14,6 @@ const { createTestPrinterFloor, printerFloorRoute } = require("./test-data/creat
 let Model = PrinterGroup;
 const listRoute = `${AppConstants.apiRoute}/printer-floor`;
 const getRoute = (id) => `${listRoute}/${id}`;
-const getSelectedFloorRoute = `${listRoute}/selected-floor`;
-const setSelectedFloorRoute = (id) => `${listRoute}/selected-floor/${id}`;
 const addPrinterGroupToFloorRoute = (id) => `${listRoute}/${id}/printer-group`;
 const deleteRoute = (id) => `${listRoute}/${id}`;
 const updateNameRoute = (id) => `${getRoute(id)}/name`;
@@ -76,17 +74,6 @@ describe("PrinterFloorController", () => {
   it("should throw on getting non-existing printer floor", async () => {
     const response = await request.get(getRoute("63452115122876ea11cd1656")).send();
     expectNotFoundResponse(response);
-  });
-
-  it("should be able to get selected printer floor", async () => {
-    const response = await request.get(getSelectedFloorRoute).send();
-    expectOkResponse(response);
-  });
-
-  it("should be able to set selected printer floor", async () => {
-    const floor = await createTestPrinterFloor(request, "Floor123", 5060);
-    const response = await request.post(setSelectedFloorRoute(floor._id)).send();
-    expectOkResponse(response);
   });
 
   it("should be able to update printer floor name", async () => {
