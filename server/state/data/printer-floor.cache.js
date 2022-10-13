@@ -17,6 +17,12 @@ class PrinterFloorsCache {
 
   async loadCache() {
     this.#printerFloors = await this.#printerFloorService.list();
+
+    if (!this.#printerFloors?.length) {
+      this.#logger.info("Creating default floor as non existed");
+      const floor = await this.#printerFloorService.createDefaultFloor();
+      this.#printerFloors.push(floor);
+    }
   }
 
   async listCache() {

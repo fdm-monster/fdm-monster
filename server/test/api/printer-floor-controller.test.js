@@ -7,11 +7,11 @@ const {
   expectNotFoundResponse,
   expectInvalidResponse,
 } = require("../extensions");
-const PrinterGroup = require("../../models/PrinterGroup");
 const { createTestPrinterGroup } = require("./test-data/create-printer-group");
 const { createTestPrinterFloor, printerFloorRoute } = require("./test-data/create-printer-floor");
+const PrinterFloor = require("../../models/PrinterFloor");
 
-let Model = PrinterGroup;
+let Model = PrinterFloor;
 const listRoute = `${AppConstants.apiRoute}/printer-floor`;
 const getRoute = (id) => `${listRoute}/${id}`;
 const addPrinterGroupToFloorRoute = (id) => `${listRoute}/${id}/printer-group`;
@@ -31,14 +31,11 @@ beforeEach(async () => {
 });
 
 describe("PrinterFloorController", () => {
-  it("should return empty printer floor list", async () => {
+  it("should return non-empty printer floor list", async () => {
     const response = await request.get(listRoute).send();
-    expectOkResponse(response, []);
-  });
-
-  it("should be able to get default floor", async () => {
-    const response = await request.get(getSelectedFloorRoute).send();
-    expectOkResponse(response);
+    const data = expectOkResponse(response);
+    expect(data).toHaveLength(1);
+    expect(data[0].name).toBe("default floor");
   });
 
   it("should not be able to create falsy printer floor", async () => {

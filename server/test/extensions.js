@@ -21,11 +21,10 @@ function expectOkResponse(response, matchedBody) {
   }
   expect(response.statusCode, response.body).toEqual(200);
   if (!matchedBody) {
-    return;
+    return response.body;
   }
 
   expect(response.body).toMatchObject(matchedBody);
-
   return response.body;
 }
 
