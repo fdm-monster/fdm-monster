@@ -198,6 +198,9 @@ export default class PrinterGroupsSettings extends Vue {
       groupId,
       name: this.editedPrinterGroupName,
     });
+
+    // Adapt to potential sort change
+    this.selectedItem = -1;
   }
 
   async clickDeleteGroup() {
