@@ -72,17 +72,6 @@ class PrinterGroupController {
     res.send(printerFloor);
   }
 
-  async getSelectedFloor(req, res) {
-    const printerFloor = await this.#printerFloorsCache.getSelectedFloor();
-    res.send(printerFloor);
-  }
-
-  async setSelectedFloor(req, res) {
-    const { id: printerFloorId } = await validateInput(req.params, idRules);
-    const printerFloor = await this.#printerFloorsCache.setSelectedFloor(printerFloorId);
-    res.send(printerFloor);
-  }
-
   async delete(req, res) {
     const { id: printerFloorId } = await validateInput(req.params, idRules);
     const result = await this.#printerFloorsCache.delete(printerFloorId);
@@ -95,8 +84,6 @@ module.exports = createController(PrinterGroupController)
   .prefix(AppConstants.apiRoute + "/printer-floor")
   .before([authenticate()])
   .get("/", "list", withPermission(PERMS.PrinterFloors.List))
-  .get("/selected-floor", "getSelectedFloor", withPermission(PERMS.PrinterFloors.Get))
-  .post("/selected-floor/:id", "setSelectedFloor", withPermission(PERMS.PrinterFloors.Update))
   .get("/:id", "get", withPermission(PERMS.PrinterFloors.Get))
   .patch("/:id/name", "updateName", withPermission(PERMS.PrinterFloors.Update))
   .patch("/:id/floor-number", "updateFloorNumber", withPermission(PERMS.PrinterFloors.Update))

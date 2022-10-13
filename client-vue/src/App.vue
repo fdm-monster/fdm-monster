@@ -89,12 +89,8 @@ export default class App extends Vue {
       this.$bus.emit(uploadMessageEvent, InfoEventType.UPLOAD_BACKEND, message.trackedUploads);
     }
 
-    if (message.selectedFloor) {
-      printersState.saveSelectedFloor(message.selectedFloor);
-
-      if (message.floors) {
-        printersState.savePrinterFloors(message.floors);
-      }
+    if (message.floors) {
+      printersState.savePrinterFloors(message.floors);
     }
 
     if (message.printers) {

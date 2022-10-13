@@ -7,7 +7,6 @@ class PrinterFloorsCache {
   #logger;
   // Data array
   #printerFloors = [];
-  #selectedFloorId;
 
   #printerFloorService;
 
@@ -40,44 +39,9 @@ class PrinterFloorsCache {
 
     if (!this.#printerFloors.length) {
       this.#printerFloors = [];
-      this.#selectedFloorId = null;
-    }
-    if (floorId === this.#selectedFloorId) {
-      this.#selectedFloorId = this.#printerFloors[0].id || null;
     }
 
     return deleteResult;
-  }
-
-  async getSelectedFloor(throwError = false) {
-    if (!this.#selectedFloorId) {
-      this.#logger.info(
-        "Could not provide selected floor, it was not loaded or selected. Initializing now"
-      );
-      await this.setSelectedFloor();
-    }
-
-    return this.getFloor(this.#selectedFloorId, throwError);
-  }
-
-  async setSelectedFloor(floorId = null) {
-    const floors = await this.listCache();
-    if (!floors?.length) {
-      this.#logger.info("Creating default floor as non existed");
-      const floor = await this.#printerFloorService.createDefaultFloor();
-      await this.loadCache();
-      this.#selectedFloorId = floor.id;
-    } else {
-      if (floorId) {
-        const foundFloor = await this.getFloor(floorId);
-        this.#selectedFloorId = foundFloor.id || null;
-      } else {
-        this.#selectedFloorId = floors[0].id;
-      }
-    }
-
-    this.#logger.info(`Set selected floor to id '${this.#selectedFloorId}'`);
-    return this.getSelectedFloor();
   }
 
   async getFloor(floorId) {

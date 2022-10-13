@@ -177,6 +177,10 @@ class PrintersModule extends VuexModule {
 
   @Mutation _setPrinterFloors(floors: PrinterFloor[]) {
     this.floors = floors;
+    if (!this.selectedFloor) {
+      console.log("Setting selected floor");
+      this.selectedFloor = floors[0];
+    }
   }
 
   @Mutation _resetSelectedPrinters() {
@@ -450,17 +454,9 @@ class PrintersModule extends VuexModule {
     const newFloor = this.floors[selectedPrinterFloorIndex];
     if (!newFloor) return;
 
-    await PrinterFloorService.setSelectedFloor(newFloor._id!);
+    this._setSelectedPrinterFloor(newFloor);
+
     return newFloor;
-  }
-
-  @Action
-  async saveSelectedFloor(selectedPrinterFloor: PrinterFloor) {
-    if (!selectedPrinterFloor._id) return;
-
-    this._setSelectedPrinterFloor(selectedPrinterFloor);
-
-    return selectedPrinterFloor;
   }
 
   @Action

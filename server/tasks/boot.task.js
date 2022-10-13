@@ -93,30 +93,22 @@ class BootTask {
       }
     }
 
-    try {
-      this.#logger.info("Loading Server settings.");
-      await this.settingsStore.loadSettings();
+    this.#logger.info("Loading Server settings.");
+    await this.settingsStore.loadSettings();
 
-      this.#logger.info("Loading caches.");
-      await this.multerService.clearUploadsFolder();
-      await this.printersStore.loadPrintersStore();
-      await this.filesStore.loadFilesStore();
-      await this.filamentsStore.loadFilamentsStore();
-      await this.historyStore.loadHistoryStore();
-      await this.printerGroupsCache.loadCache();
-      await this.printerFloorsCache.setSelectedFloor();
-      await this.influxDbSetupService.optionalInfluxDatabaseSetup();
+    this.#logger.info("Loading caches.");
+    await this.multerService.clearUploadsFolder();
+    await this.printersStore.loadPrintersStore();
+    await this.filesStore.loadFilesStore();
+    await this.filamentsStore.loadFilamentsStore();
+    await this.historyStore.loadHistoryStore();
+    await this.printerGroupsCache.loadCache();
+    await this.influxDbSetupService.optionalInfluxDatabaseSetup();
 
-      this.#logger.info("Synchronizing user permission and roles definition");
-      await this.permissionService.syncPermissions();
-      await this.roleService.syncRoles();
-      await this.ensureAdminUserExists();
-    } catch (e) {
-      this.#logger.error(
-        "A startup error occurred. The server might not have started correctly.",
-        e.stack
-      );
-    }
+    this.#logger.info("Synchronizing user permission and roles definition");
+    await this.permissionService.syncPermissions();
+    await this.roleService.syncRoles();
+    await this.ensureAdminUserExists();
 
     if (bootTaskScheduler && process.env.SAFEMODE_ENABLED !== "true") {
       this.#serverTasks.BOOT_TASKS.forEach((task) => {
