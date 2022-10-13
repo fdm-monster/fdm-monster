@@ -1,8 +1,6 @@
 /**
  * A generic cache for printer groups
  */
-const { NotFoundException } = require("../../exceptions/runtime.exceptions");
-
 class PrinterFloorsCache {
   #logger;
   // Data array
@@ -43,19 +41,12 @@ class PrinterFloorsCache {
     const deleteResult = await this.#printerFloorService.delete(floorId);
     await this.loadCache();
 
-    if (!this.#printerFloors.length) {
-      this.#printerFloors = [];
-    }
-
     return deleteResult;
   }
 
   async getFloor(floorId) {
     if (!this.#printerFloors.length) {
       await this.loadCache();
-      if (!this.#printerFloors) {
-        throw new NotFoundException(`Floor with ID ${floorId} was not found`);
-      }
     }
 
     const floor = this.#printerFloors.find((pf) => pf.id.toString() === floorId);
