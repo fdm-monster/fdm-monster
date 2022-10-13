@@ -20,7 +20,7 @@
   "dependencies": {
     "@sentry/tracing": "7.15.0",
     "@sentry/vue": "7.15.0",
-    "axios": "0.27.2",
+    "axios": "1.1.2",
     "core-js": "3.25.5",
     "luxon": "3.0.4",
     "register-service-worker": "1.7.2",

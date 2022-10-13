@@ -6,6 +6,7 @@ import { ClearedFilesResult, PrinterFile } from "@/models/printers/printer-file.
 import Vue from "vue";
 import { InfoEventType, uploadMessageEvent } from "@/event-bus/alert.events";
 import { Printer } from "@/models/printers/printer.model";
+import { AxiosProgressEvent } from "axios";
 
 export class PrinterFileService extends BaseService {
   static async getFiles(printerId: string, recursive = false) {
@@ -47,11 +48,11 @@ export class PrinterFileService extends BaseService {
     );
   }
 
-  static uploadUpdateProgress(progress: ProgressEvent) {
+  static uploadUpdateProgress(progress: AxiosProgressEvent) {
     Vue.bus.emit(uploadMessageEvent, InfoEventType.UPLOAD_FRONTEND, {
       current: [
         {
-          progress: { percent: progress.loaded / progress.total },
+          progress: { percent: progress.loaded / progress.total! },
         },
       ],
     });
