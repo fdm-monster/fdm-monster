@@ -2,8 +2,6 @@
   <v-toolbar flat>
     <v-toolbar-title>Printer Floors</v-toolbar-title>
     <v-btn-toggle class="ml-7" rounded :value="selectedFloorToggleIndex" @change="changeFloorIndex">
-      {{ selectedFloorIndex }}
-      {{ selectedFloorToggleIndex }}
       <v-btn v-for="f in floors" :key="f._id">
         <v-icon>format_align_left</v-icon>
         {{ f.name }}
