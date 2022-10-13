@@ -11,7 +11,7 @@
           />
         </validation-provider>
 
-        <validation-provider v-slot="{ errors }" :rules="floorNumberRules" name="LocationX">
+        <validation-provider v-slot="{ errors }" :rules="floorNumberRules" name="FloorNumber">
           <v-text-field
             v-model="formData.floor"
             :error-messages="errors"
@@ -31,17 +31,9 @@ import { Component, Inject, Prop, Watch } from "vue-property-decorator";
 import { ValidationProvider } from "vee-validate";
 import { AppConstants } from "@/constants/app.constants";
 import { printersState } from "@/store/printers.state";
-import { PrinterGroupService } from "@/backend";
-import {
-  getDefaultCreatePrinterGroup,
-  PreCreatePrinterGroup,
-} from "@/models/printer-groups/crud/create-printer-group.model";
-import { PrinterGroup } from "@/models/printers/printer-group.model";
-import { Printer } from "@/models/printers/printer.model";
 import {
   getDefaultCreatePrinterFloor,
   PreCreatePrinterFloor,
-  PrinterFloor,
 } from "@/models/printer-floor/printer-floor.model";
 import { PrinterFloorService } from "@/backend/printer-floor.service";
 
@@ -58,8 +50,7 @@ const watchedId = "printerFloorId";
 export default class PrinterFloorCrudForm extends Vue {
   @Inject() readonly appConstants!: AppConstants;
   @Prop() printerFloorId: string;
-  printerGroupsWithoutFloor: PrinterGroup[];
-  formData?: PreCreatePrinterFloor = getDefaultCreatePrinterFloor();
+  formData: PreCreatePrinterFloor = getDefaultCreatePrinterFloor();
 
   public get printerFloorNameRules() {
     return { required: true, min: this.appConstants.minPrinterFloorNameLength };
@@ -80,6 +71,9 @@ export default class PrinterFloorCrudForm extends Vue {
     if (this.printerFloorId) {
       const crudeData = printersState.printerFloor(this.printerFloorId);
       this.formData = PrinterFloorService.convertPrinterFloorToCreateForm(crudeData);
+    } else if (printersState.printerFloors?.length) {
+      const maxIndex = Math.max(...printersState.printerFloors.map((pf) => pf.floor)) + 1;
+      this.formData.floor = maxIndex.toString();
     }
 
     await printersState.loadPrinterGroups();

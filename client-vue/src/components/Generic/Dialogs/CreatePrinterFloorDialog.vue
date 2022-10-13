@@ -21,10 +21,6 @@
           <em class="red--text">* indicates required field</em>
           <v-spacer></v-spacer>
           <v-btn text @click="closeDialog()">Close</v-btn>
-          <!--          Might be used later if problems arise-->
-          <!--          <v-btn :disabled="invalid" color="warning" text @click="validateGroup()">-->
-          <!--            Validate-->
-          <!--          </v-btn>-->
           <v-btn :disabled="invalid" color="blue darken-1" text @click="submit()">Create</v-btn>
         </v-card-actions>
       </v-card>
@@ -36,11 +32,12 @@
 import Vue from "vue";
 import { Component, Watch } from "vue-property-decorator";
 import { ValidationObserver } from "vee-validate";
-import { generateInitials } from "@/constants/noun-adjectives.data";
+import { generateInitials, newRandomNamePair } from "@/constants/noun-adjectives.data";
 import { printersState } from "@/store/printers.state";
 import { infoMessageEvent } from "@/event-bus/alert.events";
 import PrinterFloorCrudForm from "@/components/Generic/Forms/PrinterFloorCrudForm.vue";
 import { PrinterFloorService } from "@/backend/printer-floor.service";
+import { getDefaultCreatePrinterFloor } from "@/models/printer-floor/printer-floor.model";
 
 @Component({
   components: {
@@ -100,6 +97,10 @@ export default class CreatePrinterFloorDialog extends Vue {
     await printersState.createPrinterFloor(newPrinterFloorData);
 
     this.$bus.emit(infoMessageEvent, `Printer floor ${newPrinterFloorData.name} created`);
+
+    formData.name = newRandomNamePair();
+    const maxIndex = Math.max(...printersState.printerFloors.map((pf) => pf.floor)) + 1;
+    formData.floor = maxIndex.toString();
 
     this.closeDialog();
   }
