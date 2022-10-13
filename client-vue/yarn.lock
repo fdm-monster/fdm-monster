@@ -1424,7 +1424,7 @@
     "@sentry/utils" "7.15.0"
     tslib "^1.9.3"
 
-"@sentry/tracing@^7.15.0":
+"@sentry/tracing@7.15.0":
   version "7.15.0"
   resolved "https://registry.yarnpkg.com/@sentry/tracing/-/tracing-7.15.0.tgz#ea516957b2ed39f389c21132f433b6470d54b465"
   integrity sha512-c0Y3+z6EWsc+EJsfBcRtc58ugkWYa6+6KTu3ceMkx2ZgZTCmRUuzAb7yodMt/gwezBsxzq706fnQivx1lQgzlQ==
@@ -1447,7 +1447,7 @@
     "@sentry/types" "7.15.0"
     tslib "^1.9.3"
 
-"@sentry/vue@^7.15.0":
+"@sentry/vue@7.15.0":
   version "7.15.0"
   resolved "https://registry.yarnpkg.com/@sentry/vue/-/vue-7.15.0.tgz#8ffb649ba8929ea74d8600ed89211bd3866a3d44"
   integrity sha512-F5Sl4qe4SNgyjijQGcWiQglutmWC2POWpx3OKK37BQ/FwsiRHVUdR/XihRc0uWmCRl5fCCs8gMNTn4RqMOwwRw==
