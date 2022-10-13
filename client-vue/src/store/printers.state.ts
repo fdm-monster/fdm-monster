@@ -103,13 +103,23 @@ class PrintersModule extends VuexModule {
   get gridSortedPrinterGroups() {
     if (!this.printerGroups) return () => [];
 
+    // TODO loader
+    if (!this.selectedPrinterFloor) return () => [];
+
+    const relevantPrinterGroupIds = this.selectedPrinterFloor.printerGroups.map(
+      (spfg) => spfg.printerGroupId
+    );
+    const relevantGroups = this.printerGroups.filter((pg) =>
+      relevantPrinterGroupIds.includes(pg._id!)
+    );
+
     return (cols: number, rows: number) => {
       const groupMatrix: any[] = [];
 
       for (let i = 0; i < cols; i++) {
         groupMatrix[i] = [];
         for (let j = 0; j < rows; j++) {
-          groupMatrix[i][j] = this.printerGroups.find(
+          groupMatrix[i][j] = relevantGroups.find(
             (pg) => pg.location.x + this.horizontalOffset === i && pg.location.y === j
           );
         }
