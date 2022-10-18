@@ -35,7 +35,7 @@
                   {{ floor.printerGroups.length || 0 }} assigned
                 </v-list-item-subtitle>
               </v-list-item-content>
-              <v-list-item-action-text> Floor number: {{ floor.floor }} </v-list-item-action-text>
+              <v-list-item-action-text> Floor number: {{ floor.floor }}</v-list-item-action-text>
             </v-list-item>
           </v-list-item-group>
         </v-list>
@@ -86,9 +86,9 @@
                   <v-text-field
                     v-model="editedPrinterFloorNumber"
                     :return-value.sync="editedPrinterFloorNumber"
-                    type="number"
                     label="Edit"
                     single-line
+                    type="number"
                   ></v-text-field>
                 </template>
               </v-edit-dialog>
@@ -104,13 +104,9 @@
         </v-toolbar>
 
         <v-list v-if="selectedPrinterFloor">
-          <v-list-item v-for="x in showAddedGroups" :key="x">
-            <v-list-item-content v-if="printerGroupInFloor(selectedPrinterFloor, x)">
-              <v-list-item-title>
-                {{ printerGroupInFloor(selectedPrinterFloor, x).name }}
-              </v-list-item-title>
-            </v-list-item-content>
-            <v-list-item-content v-else>
+          <v-list-item>
+            <!-- New group -->
+            <v-list-item-content>
               <v-select
                 :items="unassignedGroups()"
                 item-text="name"
@@ -120,6 +116,15 @@
                 return-object
                 @change="addPrinterGroupToFloor(selectedPrinterFloor, $event)"
               ></v-select>
+            </v-list-item-content>
+          </v-list-item>
+
+          <!-- Existing groups -->
+          <v-list-item v-for="x in showAddedGroups" :key="x">
+            <v-list-item-content v-if="printerGroupInFloor(selectedPrinterFloor, x)">
+              <v-list-item-title>
+                {{ printerGroupInFloor(selectedPrinterFloor, x).name }}
+              </v-list-item-title>
             </v-list-item-content>
 
             <v-list-item-action v-if="printerGroupInFloor(selectedPrinterFloor, x)">
@@ -144,13 +149,9 @@
 <script lang="ts">
 import Vue from "vue";
 import { Component } from "vue-property-decorator";
-import { PrinterGroupService } from "@/backend";
-import { infoMessageEvent } from "@/event-bus/alert.events";
 import { printersState } from "@/store/printers.state";
 import { PrinterGroup } from "@/models/printers/printer-group.model";
-import { Printer } from "@/models/printers/printer.model";
 import { PrinterFloor } from "@/models/printer-floor/printer-floor.model";
-import { PrinterFloorService } from "@/backend/printer-floor.service";
 
 @Component({
   components: {},
@@ -162,6 +163,7 @@ export default class PrinterGroupsSettings extends Vue {
   editedPrinterFloorName: string = "";
   editedPrinterFloorNumber: number = 0;
   selectedItem: number;
+
   get showAddedGroups() {
     return this.selectedPrinterFloor.printerGroups?.length + 1;
   }
