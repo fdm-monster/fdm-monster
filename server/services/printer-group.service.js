@@ -6,6 +6,7 @@ const {
   printerInGroupRules,
   printerIdRules,
   updatePrinterGroupNameRules,
+  updatePrinterGroupRules,
 } = require("./validators/printer-group-service.validation");
 const { NotFoundException } = require("../exceptions/runtime.exceptions");
 
@@ -56,10 +57,12 @@ class PrinterGroupService {
 
   /**
    * Updates the printerGroup present in the database.
-   * @param {Object} printerGroup object to create.
+   * @param printerGroupId
+   * @param input printerGroup to update
    */
-  async update(printerGroup) {
-    return PrinterGroupModel.updateOne(printerGroup.id, printerGroup);
+  async update(printerGroupId, input) {
+    const updateSpec = await validateInput(input, updatePrinterGroupRules);
+    return PrinterGroupModel.updateOne({ id: printerGroupId }, updateSpec);
   }
 
   async addOrUpdatePrinter(printerGroupId, printerInGroup) {
