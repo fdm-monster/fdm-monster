@@ -85,6 +85,15 @@
 
           <v-spacer></v-spacer>
 
+          <v-btn
+            v-if="selectedPrinterGroup"
+            color="secondary"
+            class="mr-2"
+            @click="clickUpdateGroup()"
+          >
+            <v-icon>edit</v-icon>
+            Update group
+          </v-btn>
           <v-btn v-if="selectedPrinterGroup" color="primary" @click="clickDeleteGroup()">
             <v-icon>delete</v-icon>
             Delete group
@@ -207,6 +216,10 @@ export default class PrinterGroupsSettings extends Vue {
     if (!this.selectedPrinterGroup?._id) return;
 
     await printersState.deletePrinterGroup(this.selectedPrinterGroup._id);
+  }
+
+  async clickUpdateGroup() {
+    printersState.setCreateGroupDialogOpened(true);
   }
 
   async addPrinterToGroup(group: PrinterGroup, position: number, printer: Printer) {

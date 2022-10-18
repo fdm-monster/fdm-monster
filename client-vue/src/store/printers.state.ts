@@ -31,6 +31,7 @@ class PrintersModule extends VuexModule {
   updateDialogPrinter?: Printer = undefined;
   createDialogOpened?: boolean = false;
   createGroupDialogOpened?: boolean = false;
+  updateDialogPrinterGroup?: PrinterGroup = undefined;
   createFloorDialogOpened?: boolean = false;
   selectedPrinters: Printer[] = [];
 
@@ -193,6 +194,10 @@ class PrintersModule extends VuexModule {
 
   @Mutation _setUpdateDialogPrinter(printer?: Printer) {
     this.updateDialogPrinter = printer;
+  }
+
+  @Mutation _setUpdateDialogPrinterGroup(printerGroup?: PrinterGroup) {
+    this.updateDialogPrinterGroup = printerGroup;
   }
 
   @Mutation _setCreateDialogOpened(opened: boolean) {
@@ -495,6 +500,11 @@ class PrintersModule extends VuexModule {
   @Action
   setUpdateDialogPrinter(printer?: Printer) {
     this._setUpdateDialogPrinter(printer);
+  }
+
+  @Action
+  setUpdateDialogPrinterGroup(printergroup?: PrinterGroup) {
+    this._setUpdateDialogPrinterGroup(printergroup);
   }
 
   @Action
