@@ -13,7 +13,10 @@
         <v-card-text>
           <v-row>
             <v-col :cols="12">
-              <PrinterGroupCrudForm ref="printerGroupCrudForm" />
+              <PrinterGroupCrudForm
+                ref="printerGroupCrudForm"
+                :printer-group-id="updatePrinterGroup?._id"
+              />
             </v-col>
           </v-row>
         </v-card-text>
@@ -58,8 +61,18 @@ export default class CreatePrinterGroupDialog extends Vue {
     printerGroupCrudForm: InstanceType<typeof PrinterGroupCrudForm>;
   };
 
+  get updatePrinterGroup() {
+    // Must call getter (otherwise will not listen)
+    return printersState.currentUpdateDialogPrinterGroup;
+  }
+
   get dialogOpenedState() {
     return printersState.createGroupDialogOpened;
+  }
+
+  @Watch("updatePrinterGroup")
+  async inputUpdate(id?: string) {
+    if (!id) return;
   }
 
   @Watch("dialogOpenedState")
@@ -106,6 +119,7 @@ export default class CreatePrinterGroupDialog extends Vue {
 
   closeDialog() {
     printersState.setCreateGroupDialogOpened(false);
+    printersState.setUpdateDialogPrinterGroup();
   }
 }
 </script>

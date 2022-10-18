@@ -70,12 +70,6 @@ class PrinterGroupController {
     await this.#printerGroupsCache.loadCache();
     res.json(result);
   }
-
-  async syncLegacyGroups(req, res) {
-    const groups = await this.#printerGroupService.syncPrinterGroups();
-    await this.#printerGroupsCache.loadCache();
-    res.send(groups);
-  }
 }
 
 // prettier-ignore
@@ -88,5 +82,4 @@ module.exports = createController(PrinterGroupController)
     .post("/:id/printer", "addPrinterToGroup", withPermission(PERMS.PrinterGroups.Update))
     .delete("/:id/printer", "removePrinterFromGroup", withPermission(PERMS.PrinterGroups.Update))
     .delete("/:id", "delete", withPermission(PERMS.PrinterGroups.Delete))
-    .post("/", "create", withPermission(PERMS.PrinterGroups.Create))
-    .post("/sync-legacy", "syncLegacyGroups", withPermission(PERMS.PrinterGroups.Create));
+    .post("/", "create", withPermission(PERMS.PrinterGroups.Create));

@@ -53,6 +53,10 @@ class PrintersModule extends VuexModule {
     return this.updateDialogPrinter;
   }
 
+  get currentUpdateDialogPrinterGroup() {
+    return this.updateDialogPrinterGroup;
+  }
+
   get printerGroup() {
     return (groupId: string) => this.printerGroups.find((pg) => pg._id === groupId);
   }
@@ -179,7 +183,6 @@ class PrintersModule extends VuexModule {
   @Mutation _setPrinterFloors(floors: PrinterFloor[]) {
     this.floors = floors;
     if (!this.selectedFloor) {
-      console.log("Setting selected floor");
       this.selectedFloor = floors[0];
     }
   }
@@ -503,8 +506,8 @@ class PrintersModule extends VuexModule {
   }
 
   @Action
-  setUpdateDialogPrinterGroup(printergroup?: PrinterGroup) {
-    this._setUpdateDialogPrinterGroup(printergroup);
+  setUpdateDialogPrinterGroup(printerGroup?: PrinterGroup) {
+    this._setUpdateDialogPrinterGroup(printerGroup);
   }
 
   @Action
