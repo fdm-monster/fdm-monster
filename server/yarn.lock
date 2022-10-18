@@ -973,10 +973,10 @@ asynckit@^0.4.0:
   resolved "https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
   integrity sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==
 
-awilix-express@7.0.0:
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/awilix-express/-/awilix-express-7.0.0.tgz#40ab8a4de8b4c1b1c9e03a1fbab5d1ad65df8639"
-  integrity sha512-IWMnobKo+qtHv78wZ1L7XkATZbfGTGDLVk6psg3M9mVMvku7b+LgDPZBaXPP0evx6/a4FFPzZdFN3FQ7oiSZvQ==
+awilix-express@8.0.0:
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/awilix-express/-/awilix-express-8.0.0.tgz#4416204308b78935a1cb1c98a8686ca3ed9c6b30"
+  integrity sha512-UxMhm6DSl0lTiuQHgDMnSG86+gNYlhIWgFwmy/DkqYhfE6rHpKFfBaDsdUreEn1N9DeIi41dFxWGJI1OEzID2Q==
   dependencies:
     awilix-router-core "^1.6.1"
     tslib "^2.3.1"
