@@ -4,7 +4,6 @@ const { execSync } = require("child_process");
 const envUtils = require("./utils/env.utils");
 const dotenv = require("dotenv");
 const { AppConstants } = require("./server.constants");
-const { status, up } = require("migrate-mongo");
 const Logger = require("./handlers/logger.js");
 const { isDocker } = require("./utils/is-docker");
 const logger = new Logger("FDM-Environment", false);
@@ -222,31 +221,6 @@ function getAppDistPath() {
   return appDistPath;
 }
 
-/**
- * Checks and runs database migrations
- * @param db
- * @param client
- * @returns {Promise<void>}
- */
-async function runMigrations(db, client) {
-  const migrationsStatus = await status(db);
-  const pendingMigrations = migrationsStatus.filter((m) => m.appliedAt === "PENDING");
-
-  if (pendingMigrations.length) {
-    logger.info(
-      `! MongoDB has ${pendingMigrations.length} migrations left to run (${migrationsStatus.length} migrations in total)`
-    );
-  } else {
-    logger.info(`✓ Mongo Database is up to date [${migrationsStatus.length} migration applied]`);
-  }
-
-  const migrationResult = await up(db, client);
-
-  if (migrationResult > 0) {
-    logger.info(`Applied ${migrationResult.length} migrations successfully`, migrationResult);
-  }
-}
-
 function ensurePageTitle() {
   if (!process.env[AppConstants.SERVER_SITE_TITLE_KEY]) {
     process.env[AppConstants.SERVER_SITE_TITLE_KEY] =
@@ -257,8 +231,7 @@ function ensurePageTitle() {
 module.exports = {
   isEnvProd,
   setupEnvConfig,
-  runMigrations,
   fetchMongoDBConnectionString,
   fetchServerPort,
-  getAppDistPath
+  getAppDistPath,
 };
