@@ -31,6 +31,7 @@ class PrintersModule extends VuexModule {
   updateDialogPrinter?: Printer = undefined;
   createDialogOpened?: boolean = false;
   createGroupDialogOpened?: boolean = false;
+  updateDialogPrinterGroup?: PrinterGroup = undefined;
   createFloorDialogOpened?: boolean = false;
   selectedPrinters: Printer[] = [];
 
@@ -50,6 +51,10 @@ class PrintersModule extends VuexModule {
 
   get currentUpdateDialogPrinter() {
     return this.updateDialogPrinter;
+  }
+
+  get currentUpdateDialogPrinterGroup() {
+    return this.updateDialogPrinterGroup;
   }
 
   get printerGroup() {
@@ -178,7 +183,6 @@ class PrintersModule extends VuexModule {
   @Mutation _setPrinterFloors(floors: PrinterFloor[]) {
     this.floors = floors;
     if (!this.selectedFloor) {
-      console.log("Setting selected floor");
       this.selectedFloor = floors[0];
     }
   }
@@ -193,6 +197,10 @@ class PrintersModule extends VuexModule {
 
   @Mutation _setUpdateDialogPrinter(printer?: Printer) {
     this.updateDialogPrinter = printer;
+  }
+
+  @Mutation _setUpdateDialogPrinterGroup(printerGroup?: PrinterGroup) {
+    this.updateDialogPrinterGroup = printerGroup;
   }
 
   @Mutation _setCreateDialogOpened(opened: boolean) {
@@ -374,6 +382,19 @@ class PrintersModule extends VuexModule {
   }
 
   @Action
+  async updatePrinterGroup({
+    printerGroupId,
+    updatePrinterGroup,
+  }: {
+    printerGroupId: string;
+    updatePrinterGroup: CreatePrinterGroup;
+  }) {
+    const data = await PrinterGroupService.updateGroup(printerGroupId, updatePrinterGroup);
+    this.replacePrinterGroup(data);
+    return data;
+  }
+
+  @Action
   savePrinters(newPrinters: Printer[]) {
     this.setPrinters(newPrinters);
 
@@ -495,6 +516,11 @@ class PrintersModule extends VuexModule {
   @Action
   setUpdateDialogPrinter(printer?: Printer) {
     this._setUpdateDialogPrinter(printer);
+  }
+
+  @Action
+  setUpdateDialogPrinterGroup(printerGroup?: PrinterGroup) {
+    this._setUpdateDialogPrinterGroup(printerGroup);
   }
 
   @Action

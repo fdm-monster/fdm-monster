@@ -161,6 +161,7 @@ export default class UpdatePrinterDialog extends Vue {
   }
 
   isClipboardApiAvailable() {
+    // TODO is this false on purpose?
     return false && navigator.clipboard;
   }
 

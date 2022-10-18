@@ -85,6 +85,15 @@
 
           <v-spacer></v-spacer>
 
+          <v-btn
+            v-if="selectedPrinterGroup"
+            class="mr-2"
+            color="secondary"
+            @click="clickUpdateGroup()"
+          >
+            <v-icon>edit</v-icon>
+            Update group
+          </v-btn>
           <v-btn v-if="selectedPrinterGroup" color="primary" @click="clickDeleteGroup()">
             <v-icon>delete</v-icon>
             Delete group
@@ -135,8 +144,6 @@
 <script lang="ts">
 import Vue from "vue";
 import { Component } from "vue-property-decorator";
-import { PrinterGroupService } from "@/backend";
-import { infoMessageEvent } from "@/event-bus/alert.events";
 import { printersState } from "@/store/printers.state";
 import { PrinterGroup } from "@/models/printers/printer-group.model";
 import { Printer } from "@/models/printers/printer.model";
@@ -177,13 +184,8 @@ export default class PrinterGroupsSettings extends Vue {
 
   async createGroup() {
     // Trigger watch connected to printer group CRUD dialog
+    printersState.setUpdateDialogPrinterGroup();
     printersState.setCreateGroupDialogOpened(true);
-  }
-
-  async syncLegacyGroups() {
-    const groups = await PrinterGroupService.syncLegacyGroups();
-
-    this.$bus.emit(infoMessageEvent, `Successfully synced ${groups.length} groups!`);
   }
 
   setEditedPrinterGroupName() {
@@ -207,6 +209,11 @@ export default class PrinterGroupsSettings extends Vue {
     if (!this.selectedPrinterGroup?._id) return;
 
     await printersState.deletePrinterGroup(this.selectedPrinterGroup._id);
+  }
+
+  async clickUpdateGroup() {
+    printersState.setUpdateDialogPrinterGroup(this.selectedPrinterGroup);
+    printersState.setCreateGroupDialogOpened(true);
   }
 
   async addPrinterToGroup(group: PrinterGroup, position: number, printer: Printer) {

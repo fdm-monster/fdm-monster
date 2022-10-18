@@ -5,7 +5,8 @@ const {
   createPrinterGroupRules,
   printerInGroupRules,
   printerIdRules,
-  updatePrinterGroupNameRules
+  updatePrinterGroupNameRules,
+  updatePrinterGroupRules,
 } = require("./validators/printer-group-service.validation");
 const { NotFoundException } = require("../exceptions/runtime.exceptions");
 
@@ -56,10 +57,12 @@ class PrinterGroupService {
 
   /**
    * Updates the printerGroup present in the database.
-   * @param {Object} printerGroup object to create.
+   * @param printerGroupId
+   * @param input printerGroup to update
    */
-  async update(printerGroup) {
-    return PrinterGroupModel.updateOne(printerGroup.id, printerGroup);
+  async update(printerGroupId, input) {
+    const updateSpec = await validateInput(input, updatePrinterGroupRules);
+    return PrinterGroupModel.updateOne({ id: printerGroupId }, updateSpec);
   }
 
   async addOrUpdatePrinter(printerGroupId, printerInGroup) {
@@ -98,57 +101,6 @@ class PrinterGroupService {
 
   async delete(groupId) {
     return PrinterGroupModel.deleteOne({ _id: groupId });
-  }
-
-  /**
-   * Synchronize the old 'group' prop of each printer to become full-fledged PrinterGroup docs
-   */
-  async syncPrinterGroups() {
-    const existingGroups = await this.list();
-    const printers = (await this.#printerService.list()).filter((p) => !!p.group?.length);
-    const printersGrouped = _.groupBy(printers, "group");
-
-    // Early quit
-    if (!printers || printers.length === 0) return [];
-
-    // Detect groups which are not yet made
-    for (const [groupName, printers] of Object.entries(printersGrouped)) {
-      // Skip any printer with falsy group property
-      if (typeof groupName !== "string" || !groupName) continue;
-
-      // Check if group already exists by this name
-      const printerIds = printers.map((p) => {
-        const index = (new URL(p.printerURL).port || 80) - 80;
-        return {
-          printerId: p._id,
-          location: index
-        };
-      });
-      const matchingGroup = existingGroups.find(
-        (g) => g.name.toUpperCase() === groupName.toUpperCase()
-      );
-      if (!!matchingGroup) {
-        matchingGroup.printers = printerIds;
-        await matchingGroup.save();
-      } else {
-        let location = { x: -1, y: -1 };
-        if (groupName.includes("_")) {
-          const lastThree = groupName.substr(groupName.length - 3);
-          const y = parseInt(lastThree[2]);
-          const x = parseInt(lastThree[0]);
-          location = { x, y };
-        }
-
-        const newGroup = await PrinterGroupModel.create({
-          name: groupName,
-          location,
-          printers: printerIds
-        });
-        existingGroups.push(newGroup);
-      }
-    }
-
-    return PrinterGroupModel.find({});
   }
 }
 

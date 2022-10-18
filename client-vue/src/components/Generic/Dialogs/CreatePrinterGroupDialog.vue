@@ -7,13 +7,17 @@
             <v-avatar color="primary" size="56">
               {{ avatarInitials() }}
             </v-avatar>
-            New Printer Group
+            <span v-if="updatePrinterGroup"> Update Printer Group </span>
+            <span v-else> New Printer Group </span>
           </span>
         </v-card-title>
         <v-card-text>
           <v-row>
             <v-col :cols="12">
-              <PrinterGroupCrudForm ref="printerGroupCrudForm" />
+              <PrinterGroupCrudForm
+                ref="printerGroupCrudForm"
+                :printer-group-id="updatePrinterGroup?._id"
+              />
             </v-col>
           </v-row>
         </v-card-text>
@@ -25,7 +29,17 @@
           <!--          <v-btn :disabled="invalid" color="warning" text @click="validateGroup()">-->
           <!--            Validate-->
           <!--          </v-btn>-->
-          <v-btn :disabled="invalid" color="blue darken-1" text @click="submit()">Create</v-btn>
+          <v-btn
+            v-if="!updatePrinterGroup"
+            :disabled="invalid"
+            color="blue darken-1"
+            text
+            @click="submitCreate()"
+            >Create</v-btn
+          >
+          <v-btn v-else :disabled="invalid" color="blue darken-1" text @click="submitUpdate()"
+            >Update</v-btn
+          >
         </v-card-actions>
       </v-card>
     </validation-observer>
@@ -58,8 +72,18 @@ export default class CreatePrinterGroupDialog extends Vue {
     printerGroupCrudForm: InstanceType<typeof PrinterGroupCrudForm>;
   };
 
+  get updatePrinterGroup() {
+    // Must call getter (otherwise will not listen)
+    return printersState.currentUpdateDialogPrinterGroup;
+  }
+
   get dialogOpenedState() {
     return printersState.createGroupDialogOpened;
+  }
+
+  @Watch("updatePrinterGroup")
+  async inputUpdate(id?: string) {
+    if (!id) return;
   }
 
   @Watch("dialogOpenedState")
@@ -90,7 +114,7 @@ export default class CreatePrinterGroupDialog extends Vue {
     return await this.$refs.validationObserver.validate();
   }
 
-  async submit() {
+  async submitCreate() {
     if (!(await this.isValid())) return;
 
     const formData = this.formData();
@@ -98,14 +122,30 @@ export default class CreatePrinterGroupDialog extends Vue {
     const newPrinterGroupData = PrinterGroupService.convertCreateFormToPrinterGroup(formData);
 
     await printersState.createPrinterGroup(newPrinterGroupData);
-
     this.$bus.emit(infoMessageEvent, `Printer group ${newPrinterGroupData.name} created`);
+
+    this.closeDialog();
+  }
+
+  async submitUpdate() {
+    if (!(await this.isValid())) return;
+
+    const formData = this.formData();
+    if (!formData || !this.updatePrinterGroup?._id) return;
+    const updatePrinterGroup = PrinterGroupService.convertCreateFormToPrinterGroup(formData);
+
+    await printersState.updatePrinterGroup({
+      printerGroupId: this.updatePrinterGroup!._id!,
+      updatePrinterGroup,
+    });
+    this.$bus.emit(infoMessageEvent, `Printer group ${updatePrinterGroup.name} updated`);
 
     this.closeDialog();
   }
 
   closeDialog() {
     printersState.setCreateGroupDialogOpened(false);
+    printersState.setUpdateDialogPrinterGroup();
   }
 }
 </script>

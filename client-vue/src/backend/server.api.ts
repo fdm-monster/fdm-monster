@@ -6,7 +6,6 @@ export class ServerApi {
   static printerTestConnectionRoute = `${ServerApi.printerRoute}/test-connection`;
   static printerSettingsRoute = ServerApi.base + "/printer-settings";
   static printerGroupRoute = ServerApi.base + "/printer-group";
-  static printerGroupSyncLegacyRoute = `${ServerApi.printerGroupRoute}/sync-legacy`;
   static printerFloorRoute = ServerApi.base + "/printer-floor";
   static printerFilesRoute = `${ServerApi.base}/printer-files`;
   static printerFilesUploadStubRoute = `${ServerApi.base}/printer-files/upload-stub`;
@@ -63,6 +62,7 @@ export class ServerApi {
   static updatePrinterFloorNameRoute = (id: string) => `${ServerApi.getPrinterFloorRoute(id)}/name`;
   static updatePrinterFloorNumberRoute = (id: string) =>
     `${ServerApi.getPrinterFloorRoute(id)}/floor-number`;
+  static updatePrinterGroupRoute = (id: string) => `${ServerApi.getPrinterGroupRoute(id)}`;
   static updatePrinterGroupNameRoute = (id: string) => `${ServerApi.getPrinterGroupRoute(id)}/name`;
   static printerFilesClearRoute = (id: string) => `${ServerApi.printerFilesRoute}/${id}/clear`;
   static printerFilesSelectAndPrintRoute = (id: string) =>

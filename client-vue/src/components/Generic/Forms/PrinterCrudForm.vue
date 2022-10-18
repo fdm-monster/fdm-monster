@@ -9,6 +9,7 @@
             :error-messages="errors"
             label="Printer name*"
             required
+            autofocus
           />
         </validation-provider>
 
@@ -125,6 +126,7 @@ import { Component, Inject, Prop, Watch } from "vue-property-decorator";
 import { ValidationProvider } from "vee-validate";
 import { AppConstants } from "@/constants/app.constants";
 import {
+  CreatePrinter,
   getDefaultCreatePrinter,
   PreCreatePrinter,
 } from "@/models/printers/crud/create-printer.model";
@@ -177,7 +179,7 @@ export default class PrinterCrudForm extends Vue {
   onChildChanged(val?: string) {
     if (!val) return;
 
-    const printer = this.$store.getters.printer(val) as Printer;
+    const printer = printersState.printer(val) as CreatePrinter;
 
     // Inverse transformation
     this.formData = PrintersService.convertPrinterToCreateForm(printer);

@@ -8,6 +8,7 @@
             :error-messages="errors"
             label="Floor name*"
             required
+            autofocus
           />
         </validation-provider>
 
