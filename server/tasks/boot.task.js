@@ -75,7 +75,6 @@ class BootTask {
   async run(bootTaskScheduler = false) {
     try {
       await this.createConnection();
-      await this.migrateDatabase();
     } catch (e) {
       if (e instanceof MongooseError) {
         // Tests should just continue
@@ -142,10 +141,6 @@ class BootTask {
         "Created admin account as it was missing. Please consult the documentation for credentials."
       );
     }
-  }
-
-  async migrateDatabase() {
-    await runMigrations(mongoose.connection.db, mongoose.connection.getClient());
   }
 }
 
