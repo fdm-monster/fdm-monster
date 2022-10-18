@@ -7,7 +7,8 @@
             <v-avatar color="primary" size="56">
               {{ avatarInitials() }}
             </v-avatar>
-            New Printer Group
+            <span v-if="updatePrinterGroup"> Update Printer Group </span>
+            <span v-else> New Printer Group </span>
           </span>
         </v-card-title>
         <v-card-text>
