@@ -18,6 +18,17 @@
           </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
+
+      <v-list-item>
+        <v-list-item-content>
+          <v-list-item-title>Server commands</v-list-item-title>
+          <v-list-item-subtitle>
+            Restart the server
+            <br />
+            <v-btn color="primary" @click="restartServer()">Restart server</v-btn>
+          </v-list-item-subtitle>
+        </v-list-item-content>
+      </v-list-item>
     </v-list>
   </v-card>
 </template>
@@ -25,9 +36,14 @@
 <script lang="ts">
 import Vue from "vue";
 import { Component } from "vue-property-decorator";
+import { ServerPrivateService } from "@/backend/server-private.service";
 
 @Component({
   components: {},
 })
-export default class OtherSettings extends Vue {}
+export default class OtherSettings extends Vue {
+  async restartServer() {
+    await ServerPrivateService.restartServer();
+  }
+}
 </script>

@@ -12,17 +12,6 @@
 
       <v-list-item>
         <v-list-item-content>
-          <v-list-item-title>Legacy Groups</v-list-item-title>
-          <v-list-item-subtitle>
-            Convert the legacy printer group to the new separate PrinterGroup data.
-            <br />
-            <v-btn color="primary" @click="syncLegacyGroups()">Sync legacy</v-btn>
-          </v-list-item-subtitle>
-        </v-list-item-content>
-      </v-list-item>
-
-      <v-list-item>
-        <v-list-item-content>
           <v-list-item-title>Create new group</v-list-item-title>
           <v-list-item-subtitle>
             Creates an empty group to be placed on the grid

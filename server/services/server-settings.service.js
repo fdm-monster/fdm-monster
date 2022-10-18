@@ -4,7 +4,7 @@ const { validateInput } = require("../handlers/validators");
 const { serverSettingsUpdateRules } = require("./validators/server-settings-service.validation");
 const {
   printerFileCleanSettingKey,
-  getDefaultPrinterFileCleanSettings
+  getDefaultPrinterFileCleanSettings,
 } = require("../constants/server-settings.constants");
 
 class ServerSettingsService {
@@ -35,7 +35,7 @@ class ServerSettingsService {
       doc[printerFileCleanSettingKey] = getDefaultPrinterFileCleanSettings();
     }
 
-    // Server settings exist, but need updating with new ones if they don't exists.
+    // Server settings exist, but need updating with new ones if they don't exist.
     if (!doc.timeout) {
       doc.timeout = Constants.getDefaultTimeout();
     }
@@ -57,7 +57,7 @@ class ServerSettingsService {
     settingsDoc.server.registration = enabled;
 
     return ServerSettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
-      new: true
+      new: true,
     });
   }
 
@@ -66,7 +66,7 @@ class ServerSettingsService {
     settingsDoc.server.loginRequired = enabled;
 
     return ServerSettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
-      new: true
+      new: true,
     });
   }
 
@@ -75,7 +75,7 @@ class ServerSettingsService {
     const settingsDoc = await this.getOrCreate();
 
     return ServerSettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, validatedInput, {
-      new: true
+      new: true,
     });
   }
 }
