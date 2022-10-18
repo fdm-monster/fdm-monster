@@ -2,7 +2,7 @@
   "name": "fdm-monster",
   "author": "David Zwart",
   "license": "AGPL-3.0-or-later",
-  "version": "1.2.0-rc4",
+  "version": "1.2.0-rc5",
   "description": "FDM Monster is a bulk OctoPrint manager to set up, configure and monitor 3D printers. Our aim is to provide extremely optimized websocket performance and reliability.",
   "main": "index.js",
   "scripts": {
@@ -39,7 +39,7 @@
     "vue"
   ],
   "dependencies": {
-    "@fdm-monster/client": "0.3.37",
+    "@fdm-monster/client": "0.3.38",
     "awilix": "8.0.0",
     "awilix-express": "7.0.0",
     "axios": "1.1.3",

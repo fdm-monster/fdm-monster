@@ -61,14 +61,19 @@ class PrinterGroupService {
    * @param input printerGroup to update
    */
   async update(printerGroupId, input) {
-    const updateSpec = await validateInput(input, updatePrinterGroupRules);
-    return PrinterGroupModel.updateOne({ id: printerGroupId }, updateSpec);
+    // Avoid data loss on update
+    delete input.printers;
+    const { name, location } = await validateInput(input, updatePrinterGroupRules);
+
+    const group = await this.get(printerGroupId);
+    group.name = name;
+    group.location = location;
+    // Perform patch update
+    return await group.save();
   }
 
   async addOrUpdatePrinter(printerGroupId, printerInGroup) {
     const group = await this.get(printerGroupId);
-    if (!group) throw new NotFoundException("This group does not exist", "printerGroupId");
-
     const validInput = await validateInput(printerInGroup, printerInGroupRules);
 
     const foundPrinterInGroupIndex = group.printers.findIndex(
