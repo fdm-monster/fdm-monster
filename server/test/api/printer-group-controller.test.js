@@ -41,6 +41,18 @@ describe("PrinterGroupsController", () => {
     expectOkResponse(response, { name: "Group0_0" });
   });
 
+  it("should be able to update printer group", async () => {
+    const group = await createTestPrinterGroup(request);
+    const response = await request.patch(updateRoute(group._id)).send({
+      name: "newName",
+      location: {
+        x: 1,
+        y: 4,
+      },
+    });
+    expectOkResponse(response);
+  });
+
   it("should be able to update printer group name", async () => {
     const group = await createTestPrinterGroup(request);
     const response = await request.patch(updateNameRoute(group._id)).send({
