@@ -37,7 +37,7 @@ describe("PrinterGroupService ", () => {
     const newPrinterGroup = PrinterGroupMockData.PrinterGroupMock;
     newPrinterGroup.printers.push({
       location: "top right something",
-      printerId: createdPrinter._id
+      printerId: createdPrinter._id,
     });
 
     // Create it
@@ -46,59 +46,5 @@ describe("PrinterGroupService ", () => {
     // Assert creation
     const createdPrinterGroup = await printerGroupModel.findOne();
     expect(createdPrinterGroup).toBeTruthy();
-  });
-
-  it("can be synced by unique printer's group values", async () => {
-    const newPrinterData = PrinterGroupMockData.PrinterMockWithGroup;
-    const createdPrinter = await printerService.create(newPrinterData);
-    expect(createdPrinter._id).toBeTruthy();
-
-    const groups = await printerGroupService.syncPrinterGroups();
-    expect(groups).toHaveLength(1);
-    expect(groups[0].printers[0]).toMatchObject({
-      printerId: createdPrinter._id,
-      location: "0"
-    });
-    expect(groups.errors).toBeFalsy();
-  });
-
-  it("can be synced with multiple printer's with the same group", async () => {
-    const newPrinterData = PrinterGroupMockData.PrinterMockWithGroup;
-    const createdPrinter = await printerService.create(newPrinterData);
-    expect(createdPrinter._id).toBeTruthy();
-    const createdPrinter2 = await printerService.create(newPrinterData);
-    expect(createdPrinter2._id).toBeTruthy();
-
-    const groups = await printerGroupService.syncPrinterGroups();
-    expect(groups).toHaveLength(1);
-    expect(groups[0]).toHaveProperty("printers");
-    expect(groups[0].printers).toHaveLength(2);
-    expect(groups.errors).toBeFalsy();
-  });
-
-  it("can be synced with multiple printer's with multiple groups", async () => {
-    const newPrinterData = PrinterGroupMockData.PrinterMockWithGroup;
-    const createdPrinter = await printerService.create(newPrinterData);
-    expect(createdPrinter._id).toBeTruthy();
-    newPrinterData.group = "anotherdifferentGroupName";
-    const createdPrinter2 = await printerService.create(newPrinterData);
-    expect(createdPrinter2._id).toBeTruthy();
-
-    const groups = await printerGroupService.syncPrinterGroups();
-    expect(groups).toHaveLength(2);
-    expect(groups[0]).toHaveProperty("printers");
-    expect(groups[0].printers).toHaveLength(1);
-    expect(groups[1].printers).toHaveLength(1);
-    expect(groups[0].printers[0]).toMatchObject({
-      printerId: createdPrinter._id,
-      location: "0"
-    });
-    expect(groups.errors).toBeFalsy();
-  });
-
-  it("return empty array if no groups or printers are present to sync up", async () => {
-    const groups = await printerGroupService.syncPrinterGroups();
-    expect(groups).toHaveLength(0);
-    expect(groups.errors).toBeFalsy();
   });
 });

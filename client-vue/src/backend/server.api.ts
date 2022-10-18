@@ -6,7 +6,6 @@ export class ServerApi {
   static printerTestConnectionRoute = `${ServerApi.printerRoute}/test-connection`;
   static printerSettingsRoute = ServerApi.base + "/printer-settings";
   static printerGroupRoute = ServerApi.base + "/printer-group";
-  static printerGroupSyncLegacyRoute = `${ServerApi.printerGroupRoute}/sync-legacy`;
   static printerFloorRoute = ServerApi.base + "/printer-floor";
   static printerFilesRoute = `${ServerApi.base}/printer-files`;
   static printerFilesUploadStubRoute = `${ServerApi.base}/printer-files/upload-stub`;
