@@ -1,12 +1,12 @@
 export class ServerApi {
   static base = "api";
-  static amIAliveRoute = ServerApi.base + "/amialive";
-  static printerRoute = ServerApi.base + "/printer";
+  static amIAliveRoute = `${ServerApi.base}/amialive`;
+  static printerRoute = `${ServerApi.base}/printer`;
   static printerBatchRoute = `${ServerApi.printerRoute}/batch`;
   static printerTestConnectionRoute = `${ServerApi.printerRoute}/test-connection`;
-  static printerSettingsRoute = ServerApi.base + "/printer-settings";
-  static printerGroupRoute = ServerApi.base + "/printer-group";
-  static printerFloorRoute = ServerApi.base + "/printer-floor";
+  static printerSettingsRoute = `${ServerApi.base}/printer-settings`;
+  static printerGroupRoute = `${ServerApi.base}/printer-group`;
+  static printerFloorRoute = `${ServerApi.base}/printer-floor`;
   static printerFilesRoute = `${ServerApi.base}/printer-files`;
   static printerFilesUploadStubRoute = `${ServerApi.base}/printer-files/upload-stub`;
   static serverPrivateRoute = `${ServerApi.base}/server`;
