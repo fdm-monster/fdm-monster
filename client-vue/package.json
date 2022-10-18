@@ -40,7 +40,7 @@
     "vuex-module-decorators": "2.0.0"
   },
   "devDependencies": {
-    "@types/jest": "29.1.2",
+    "@types/jest": "29.2.0",
     "@types/luxon": "3.0.2",
     "@types/validator": "13.7.8",
     "@typescript-eslint/eslint-plugin": "5.40.1",
