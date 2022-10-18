@@ -9,6 +9,7 @@
             :error-messages="errors"
             label="Printer name*"
             required
+            autofocus
           />
         </validation-provider>
 
