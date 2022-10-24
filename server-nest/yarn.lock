@@ -1567,9 +1567,9 @@
     node-fetch "^2.6.1"
 
 "@sinclair/typebox@^0.24.1":
-  version "0.24.48"
-  resolved "https://registry.yarnpkg.com/@sinclair/typebox/-/typebox-0.24.48.tgz#bd558c6059df563d49a4d94df8e8e0510b662e3f"
-  integrity sha512-WPGpRNHbkOsfBDmh8QHU7a5NWzEuYNThST8x1cISvX0RpP+1+V8zjuJqNwGJkHGIlhdIIhv6qVYqXz2q5/gjAA==
+  version "0.24.50"
+  resolved "https://registry.yarnpkg.com/@sinclair/typebox/-/typebox-0.24.50.tgz#35ee4db4ab8f3a8ff56490c51f92445d2776451e"
+  integrity sha512-k8ETQOOQDg5FtK7y9KJWpsGLik+QlPmIi8zzl/dGUgshV2QitprkFlCR/AemjWOTyKn9UwSSGRTzLVotvgCjYQ==
 
 "@sinonjs/commons@^1.7.0":
   version "1.8.3"
@@ -1786,9 +1786,9 @@
     "@types/node" "*"
 
 "@types/node@*":
-  version "18.11.3"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.11.3.tgz#78a6d7ec962b596fc2d2ec102c4dd3ef073fea6a"
-  integrity sha512-fNjDQzzOsZeKZu5NATgXUPsaFaTxeRgFXoosrHivTl8RGeV733OLawXsGfEk9a8/tySyZUyiZ6E8LcjPFZ2y1A==
+  version "18.11.4"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.11.4.tgz#7017a52e18dfaad32f55eebd539993014441949c"
+  integrity sha512-BxcJpBu8D3kv/GZkx/gSMz6VnTJREBj/4lbzYOQueUOELkt8WrO6zAcSPmp9uRPEW/d+lUO8QK0W2xnS1hEU0A==
 
 "@types/node@18.0.3":
   version "18.0.3"
