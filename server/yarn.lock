@@ -5224,10 +5224,10 @@ supports-preserve-symlinks-flag@^1.0.0:
   resolved "https://registry.yarnpkg.com/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz#6eda4bd344a3c94aea376d4cc31bc77311039e09"
   integrity sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==
 
-systeminformation@5.12.9:
-  version "5.12.9"
-  resolved "https://registry.yarnpkg.com/systeminformation/-/systeminformation-5.12.9.tgz#549d60e8849362a298801f225b2e1c3f65d549eb"
-  integrity sha512-vEEojySG45Z52Me2YZuEa0HARIyyq5cHvf89HPDUvCxc+kXllYkVry//Qlzt7J9X0tJyL7eac0+kF2ctPvlz8A==
+systeminformation@5.12.10:
+  version "5.12.10"
+  resolved "https://registry.yarnpkg.com/systeminformation/-/systeminformation-5.12.10.tgz#05b70c2e1c41209b88bc670b81e5cbd2ea8c9bd3"
+  integrity sha512-rLShZFpz14aWqg3nNCS8zw74WicRV6c3R17Ob7oO37zSypZATT4M2Dgjr4nE6PYGlome9ObU0A2uqXiAlaBbuA==
 
 tar-stream@^2.1.4:
   version "2.2.0"
