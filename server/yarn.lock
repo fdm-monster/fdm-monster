@@ -4165,19 +4165,7 @@ mongodb-memory-server@8.9.3:
     mongodb-memory-server-core "8.9.3"
     tslib "^2.4.0"
 
-mongodb@4.9.1, mongodb@~4.9.0:
-  version "4.9.1"
-  resolved "https://registry.yarnpkg.com/mongodb/-/mongodb-4.9.1.tgz#0c769448228bcf9a6aa7d16daa3625b48312479e"
-  integrity sha512-ZhgI/qBf84fD7sI4waZBoLBNJYPQN5IOC++SBCiPiyhzpNKOxN/fi0tBHvH2dEC42HXtNEbFB0zmNz4+oVtorQ==
-  dependencies:
-    bson "^4.7.0"
-    denque "^2.1.0"
-    mongodb-connection-string-url "^2.5.3"
-    socks "^2.7.0"
-  optionalDependencies:
-    saslprep "^1.0.3"
-
-mongodb@^4.4.1:
+mongodb@4.11.0, mongodb@^4.4.1:
   version "4.11.0"
   resolved "https://registry.yarnpkg.com/mongodb/-/mongodb-4.11.0.tgz#d28fdc7509f24d0d274f456529441fa3e570415c"
   integrity sha512-9l9n4Nk2BYZzljW3vHah3Z0rfS5npKw6ktnkmFgTcnzaXH1DRm3pDl6VMHu84EVb1lzmSaJC4OzWZqTkB5i2wg==
@@ -4190,14 +4178,26 @@ mongodb@^4.4.1:
     "@aws-sdk/credential-providers" "^3.186.0"
     saslprep "^1.0.3"
 
-mongoose@6.6.7:
-  version "6.6.7"
-  resolved "https://registry.yarnpkg.com/mongoose/-/mongoose-6.6.7.tgz#4388022210b9750a9b040d0e7c8a5da143f8f434"
-  integrity sha512-CzJebrogP/CIdRba8DopgPUfmxlZFV0K4B+3Lf0mxQOyrRJ+1+48Ucl2PuRJfh2XavjG2NRP5B4pPOiZahsQKw==
+mongodb@~4.9.0:
+  version "4.9.1"
+  resolved "https://registry.yarnpkg.com/mongodb/-/mongodb-4.9.1.tgz#0c769448228bcf9a6aa7d16daa3625b48312479e"
+  integrity sha512-ZhgI/qBf84fD7sI4waZBoLBNJYPQN5IOC++SBCiPiyhzpNKOxN/fi0tBHvH2dEC42HXtNEbFB0zmNz4+oVtorQ==
+  dependencies:
+    bson "^4.7.0"
+    denque "^2.1.0"
+    mongodb-connection-string-url "^2.5.3"
+    socks "^2.7.0"
+  optionalDependencies:
+    saslprep "^1.0.3"
+
+mongoose@6.7.0:
+  version "6.7.0"
+  resolved "https://registry.yarnpkg.com/mongoose/-/mongoose-6.7.0.tgz#1c1b9124ccba1853e5d5c1dcbad75a0560a9891a"
+  integrity sha512-Jt6NSiSpgcrSBzRb9+YwkpjjVuq4H532c4jbf+5Nu0wd/nIPHSOKhr8jnQZ8gQTdPjubF+szR5r6KMSqaY4/Wg==
   dependencies:
     bson "^4.6.5"
     kareem "2.4.1"
-    mongodb "4.9.1"
+    mongodb "4.11.0"
     mpath "0.9.0"
     mquery "4.0.3"
     ms "2.1.3"
