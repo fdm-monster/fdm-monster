@@ -18,5 +18,5 @@ module.exports = {
   setupFilesAfterEnv: ["jest-27-expect-message", "./test/setup-after-env.js"],
   collectCoverageFrom: ["**/*.js"],
   coveragePathIgnorePatterns: ["node_modules", "test"],
-  coverageReporters: ["@lcov-viewer/istanbul-report"],
+  coverageReporters: ["clover", "json", "lcov", "text", "@lcov-viewer/istanbul-report"],
 };
