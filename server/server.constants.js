@@ -23,5 +23,10 @@ module.exports = {
     knownEnvNames: ["development", "production", "test"],
     clientPackageName: "@fdm-monster/client",
     serverPath: "./",
+
+    influxUrl: "INFLUX_URL",
+    influxToken: "INFLUX_TOKEN",
+    influxOrg: "INFLUX_ORG",
+    influxBucket: "INFLUX_BUCKET",
   },
 };

@@ -1,4 +1,5 @@
 const { InfluxDB } = require("@influxdata/influxdb-client");
+const { AppConstants } = require("../../server.constants");
 
 class InfluxDbV2BaseService {
   configService;
@@ -16,10 +17,10 @@ class InfluxDbV2BaseService {
 
   #getConfig() {
     return {
-      url: this.configService.get(influxUrl),
-      token: this.configService.get(influxToken),
-      org: this.configService.get(influxOrg),
-      bucket: this.configService.get(influxBucket),
+      url: this.configService.get(AppConstants.influxUrl),
+      token: this.configService.get(AppConstants.influxToken),
+      org: this.configService.get(AppConstants.influxOrg),
+      bucket: this.configService.get(AppConstants.influxBucket),
     };
   }
 
