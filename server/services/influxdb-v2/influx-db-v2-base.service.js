@@ -3,16 +3,31 @@ const { AppConstants } = require("../../server.constants");
 
 class InfluxDbV2BaseService {
   configService;
+  logger;
 
-  constructor({ configService }) {
+  constructor({ configService, loggerFactory }) {
     this.configService = configService;
+    this.logger = loggerFactory(InfluxDbV2BaseService.name);
   }
 
-  async readPoints(tags) {
-    const readApi = this.#getReadApi();
+  async getPointObservable(
+    tags = ["3-prusa-rek3laag-rek4laag", "8-prusa-rek1laag-rek2laag", "11-k2-prusa-rekhoog"],
+    measurement = "outlet"
+  ) {
+    const { bucket } = this.#getConfig();
+    const readApi = this.#getQueryApi();
 
-    await readApi.flush(true);
-    await readApi.close();
+    const deviceFilterQuery =
+      "> filter(fn: (r) => " + tags.map((t) => `r["_field"] == "${t}"`).join(" or ") + ")\n";
+    const query = `from(bucket: "${bucket}")
+  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+  ${deviceFilterQuery}
+  |> filter(fn: (r) => r["_measurement"] == "${measurement}")
+  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: true)
+  |> yield(name: "mean")`;
+    this.logger.log(query);
+
+    return readApi.rows(query);
   }
 
   #getConfig() {
@@ -29,7 +44,7 @@ class InfluxDbV2BaseService {
     return new InfluxDB({ url, token });
   }
 
-  #getReadApi() {
+  #getQueryApi() {
     const { org } = this.#getConfig();
     return this.#getClient().getQueryApi(org);
   }

@@ -16,7 +16,7 @@ function registerTask(task, preset, milliseconds = 0, runImmediately = false) {
   return {
     id: task.name || task,
     task,
-    preset: timingPreset
+    preset: timingPreset,
   };
 }
 
@@ -37,10 +37,11 @@ class ServerTasks {
     registerTask(DITokens.printerSystemTask, TaskPresets.PERIODIC_DISABLED, 6 * HOUR_MS, true),
     registerTask(DITokens.printerWebsocketTask, TaskPresets.PERIODIC, 5000, true),
     registerTask(DITokens.printerWebsocketPingTask, TaskPresets.PERIODIC, 30000, false),
-    registerTask(DITokens.pluginFirmwareUpdatePreparationTask, TaskPresets.RUNDELAYED, 5000)
+    registerTask(DITokens.pluginFirmwareUpdatePreparationTask, TaskPresets.RUNDELAYED, 5000),
+    registerTask(DITokens.influxDbQueryTask, TaskPresets.PERIODIC, 1000, true),
   ];
 }
 
 module.exports = {
-  ServerTasks
+  ServerTasks,
 };

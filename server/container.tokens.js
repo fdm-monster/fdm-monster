@@ -67,6 +67,7 @@ const DITokens = {
   printerWebsocketPingTask: "printerWebsocketPingTask",
   printerFileCleanTask: "printerFileCleanTask",
   pluginFirmwareUpdatePreparationTask: "PluginFirmwareUpdatePreparationTask",
+  influxDbQueryTask: "influxDbQueryTask",
 };
 
 module.exports = DITokens;

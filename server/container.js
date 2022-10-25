@@ -64,6 +64,7 @@ const PrinterFloorService = require("./services/printer-floor.service");
 const PrinterFloorsCache = require("./state/data/printer-floor.cache");
 const { InfluxDbV2BaseService } = require("./services/influxdb-v2/influx-db-v2-base.service");
 const { ConfigService } = require("./services/config.service");
+const { InfluxDbQueryTask } = require("./tasks/influxdb-query.task");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -153,6 +154,7 @@ function configureContainer() {
     [DITokens.pluginFirmwareUpdatePreparationTask]: asClass(
       PluginFirmwareUpdatePreparationTask
     ).singleton(), // Delayed run-once cache loader and firmware download utility
+    [DITokens.influxDbQueryTask]: asClass(InfluxDbQueryTask).singleton(),
   });
 
   return container;
