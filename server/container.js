@@ -7,7 +7,6 @@ const SettingsStore = require("./state/settings.store");
 const ServerSettingsService = require("./services/server-settings.service");
 const ClientSettingsService = require("./services/client-settings.service");
 const ServerReleaseService = require("./services/server-release.service");
-const InfluxDbSetupService = require("./services/influx/influx-db-setup.service");
 const ScriptService = require("./services/script.service");
 const TaskManagerService = require("./services/task-manager.service");
 const SystemInfoStore = require("./state/system-info.store");
@@ -29,9 +28,6 @@ const PrinterState = require("./state/printer.state");
 const PrinterStateFactory = require("./state/printer-state.factory");
 const FilesStore = require("./state/files.store");
 const FilamentsStore = require("./state/filaments.store");
-const InfluxDbHistoryService = require("./services/influx/influx-db-history.service");
-const InfluxDbFilamentService = require("./services/influx/influx-db-filament.service");
-const InfluxDbPrinterStateService = require("./services/influx/influx-db-printer-state.service");
 const { configureEventEmitter } = require("./handlers/event-emitter");
 const { AppConstants } = require("./server.constants");
 const PrinterFilesService = require("./services/printer-files.service");
@@ -66,6 +62,8 @@ const { configureCacheManager } = require("./handlers/cache-manager");
 const { PluginFirmwareUpdatePreparationTask } = require("./tasks/plugin-firmware-download.task");
 const PrinterFloorService = require("./services/printer-floor.service");
 const PrinterFloorsCache = require("./state/data/printer-floor.cache");
+const { InfluxDbV2BaseService } = require("./services/influxdb-v2/influx-db-v2-base.service");
+const { ConfigService } = require("./services/config.service");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -78,9 +76,10 @@ function configureContainer() {
     serverPageTitle: asValue(process.env[AppConstants.SERVER_SITE_TITLE_KEY]),
     [DITokens.serverTasks]: asValue(ServerTasks),
     [DITokens.defaultRole]: asValue(ROLES.ADMIN),
+    // -- asFunction --
     [DITokens.serverVersion]: asFunction(() => {
       return process.env[AppConstants.VERSION_KEY];
-    }), // -- asFunction --
+    }),
     [DITokens.printerStateFactory]: asFunction(PrinterStateFactory).transient(), // Factory function, transient on purpose!
 
     // -- asClass --
@@ -88,6 +87,7 @@ function configureContainer() {
     [DITokens.settingsStore]: asClass(SettingsStore).singleton(),
     [DITokens.serverSettingsService]: asClass(ServerSettingsService),
     [DITokens.clientSettingsService]: asClass(ClientSettingsService),
+    [DITokens.configService]: asClass(ConfigService),
     [DITokens.userService]: asClass(UserService),
     [DITokens.roleService]: asClass(RoleService).singleton(), // caches roles
     [DITokens.permissionService]: asClass(PermissionService).singleton(),
@@ -139,10 +139,7 @@ function configureContainer() {
     [DITokens.filamentService]: asClass(FilamentService),
     [DITokens.scriptService]: asClass(ScriptService),
     [DITokens.customGCodeService]: asClass(CustomGCodeService),
-    [DITokens.influxDbSetupService]: asClass(InfluxDbSetupService).singleton(),
-    [DITokens.influxDbFilamentService]: asClass(InfluxDbFilamentService),
-    [DITokens.influxDbHistoryService]: asClass(InfluxDbHistoryService),
-    [DITokens.influxDbPrinterStateService]: asClass(InfluxDbPrinterStateService),
+    [DITokens.influxDbV2BaseService]: asClass(InfluxDbV2BaseService),
 
     [DITokens.bootTask]: asClass(BootTask),
     [DITokens.softwareUpdateTask]: asClass(SoftwareUpdateTask), // Provided SSE handlers (couplers) shared with controllers

@@ -40,7 +40,6 @@ class BootTask {
     roleService,
     userService,
     taskManagerService,
-    influxDbSetupService,
     pluginRepositoryCache,
     printerFloorsCache,
     pluginFirmwareUpdateService,
@@ -58,7 +57,6 @@ class BootTask {
     this.roleService = roleService;
     this.userService = userService;
     this.#taskManagerService = taskManagerService;
-    this.influxDbSetupService = influxDbSetupService;
     this.pluginRepositoryCache = pluginRepositoryCache;
     this.printerFloorsCache = printerFloorsCache;
     this.pluginFirmwareUpdateService = pluginFirmwareUpdateService;
@@ -103,7 +101,6 @@ class BootTask {
     await this.filamentsStore.loadFilamentsStore();
     await this.historyStore.loadHistoryStore();
     await this.printerGroupsCache.loadCache();
-    await this.influxDbSetupService.optionalInfluxDatabaseSetup();
 
     this.#logger.info("Synchronizing user permission and roles definition");
     await this.permissionService.syncPermissions();
