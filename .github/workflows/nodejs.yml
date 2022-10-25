@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [ 16.x, 14.x ]
+        node-version: [ 16.x ]
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
@@ -20,8 +20,11 @@ jobs:
 
       - run: yarn install --frozen-lockfile
         working-directory: server
-      - run: yarn run test -- --coverage
+      - run: yarn run test:cov
         working-directory: server
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
+        with:
+          dry_run: ${{ matrix.node-version == '16.x' }}
+          directory: server/coverage
