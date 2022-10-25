@@ -18,6 +18,7 @@
     "format": "prettier --write \"src/**/*.js\" \"test/**/*.js\"",
     "dev": "nodemon index.js",
     "test": "jest --forceExit",
+    "test:cov": "jest --forceExit --coverage",
     "cov:show": "./coverage/lcov-report/index.html"
   },
   "repository": {
