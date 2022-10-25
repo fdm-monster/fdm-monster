@@ -17,15 +17,16 @@ class InfluxDbV2BaseService {
     const { bucket } = this.#getConfig();
     const readApi = this.#getQueryApi();
 
+    // |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+    // |> aggregateWindow(every: '5s', fn: mean, createEmpty: true)
+    //   |> yield(name: "mean")
     const deviceFilterQuery =
-      "> filter(fn: (r) => " + tags.map((t) => `r["_field"] == "${t}"`).join(" or ") + ")\n";
+      "|> filter(fn: (r) => " + tags.map((t) => `r["_field"] == "${t}"`).join(" or ") + ")";
     const query = `from(bucket: "${bucket}")
-  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
   ${deviceFilterQuery}
-  |> filter(fn: (r) => r["_measurement"] == "${measurement}")
-  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: true)
-  |> yield(name: "mean")`;
-    this.logger.log(query);
+    |> filter(fn: (r) => r["_measurement"] == "${measurement}")
+    |> tail(n: 1)`;
+    this.logger.info(query);
 
     return readApi.rows(query);
   }

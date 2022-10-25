@@ -8,12 +8,19 @@ class InfluxDbQueryTask {
   }
 
   async run() {
-    if (!this.#subscription) {
-      const power$ = this.influxDbV2BaseService.getPointObservable();
-      this.#subscription = power$.subscribe((r) => {
-        console.log("Message from Influx", r);
-      });
+    if (this.#subscription) {
+      this.#subscription.unsubscribe();
     }
+
+    const power$ = await this.influxDbV2BaseService.getPointObservable();
+    this.#subscription = power$.subscribe({
+      next: (r) => {
+        console.log("Message from Influx", r);
+      },
+      error: (e) => {
+        console.error(e);
+      },
+    });
   }
 }
 
