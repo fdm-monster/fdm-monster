@@ -62,12 +62,14 @@ export default class PrinterGrid extends Vue {
   }
 
   get outletCurrentValues() {
-    if (!outletCurrentValuesState.values) return null;
-    const highRack = outletCurrentValuesState.values["11-k2-prusa-rekhoog"].value;
-    const rack34 = outletCurrentValuesState.values["3-prusa-rek3laag-rek4laag"].value;
-    const rack12 = outletCurrentValuesState.values["8-prusa-rek1laag-rek2laag"].value;
+    const outletValues = outletCurrentValuesState.values;
+    if (!outletValues) return null;
+    if (!Object.keys(outletValues).includes("11-k2-prusa-rekhoog")) return null;
 
-    console.log(rack12, rack34, highRack, this.selectedFloorLevel);
+    const highRack = outletValues["11-k2-prusa-rekhoog"].value;
+    const rack34 = outletValues["3-prusa-rek3laag-rek4laag"].value;
+    const rack12 = outletValues["8-prusa-rek1laag-rek2laag"].value;
+
     return {
       highRack,
       rack34,
