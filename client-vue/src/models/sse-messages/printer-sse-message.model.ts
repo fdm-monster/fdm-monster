@@ -30,6 +30,13 @@ export interface UploadStates {
   failed: TrackedUpload[];
 }
 
+export interface OutletCurrentValues {
+  [k: string]: {
+    value: number;
+    time: string;
+  };
+}
+
 export interface PrinterSseMessage {
   printers: Printer[];
   printerGroups: PrinterGroup[];
@@ -37,4 +44,5 @@ export interface PrinterSseMessage {
   trackedUploads: UploadStates;
   testProgress: TestProgressDetails;
   floors: PrinterFloor[];
+  outletCurrentValues: OutletCurrentValues;
 }

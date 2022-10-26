@@ -40,6 +40,7 @@ describe("SSE-Printers", () => {
             done: [],
             failed: [],
           },
+          outletCurrentValues: expect.anything(),
         });
         es.close();
         resolve();

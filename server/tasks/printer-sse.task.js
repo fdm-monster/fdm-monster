@@ -6,6 +6,7 @@ class PrinterSseTask {
   #printersStore;
   #printerFloorsCache;
   #fileUploadTrackerCache;
+  #influxDbQueryTask;
 
   #aggregateSizeCounter = 0;
   #aggregateWindowLength = 100;
@@ -20,12 +21,14 @@ class PrinterSseTask {
     printersStore,
     loggerFactory,
     fileUploadTrackerCache,
+    influxDbQueryTask,
   }) {
     this.#printerSseHandler = printerSseHandler;
     this.#printersStore = printersStore;
     this.#printerGroupsCache = printerGroupsCache;
     this.#fileUploadTrackerCache = fileUploadTrackerCache;
     this.#printerFloorsCache = printerFloorsCache;
+    this.#influxDbQueryTask = influxDbQueryTask;
     this.#logger = loggerFactory("Printer-SSE-task");
   }
 
@@ -40,6 +43,7 @@ class PrinterSseTask {
       floors,
       trackedUploads,
       printerGroups,
+      outletCurrentValues: this.#influxDbQueryTask.lastOutletCurrentValues(),
     };
 
     const serializedData = JSON.stringify(sseData);

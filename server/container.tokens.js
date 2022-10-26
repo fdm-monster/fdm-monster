@@ -8,6 +8,7 @@ const DITokens = {
   httpClient: "httpClient",
   simpleGitService: "simpleGitService",
   multerService: "multerService",
+  configService: "configService",
   taskManagerService: "taskManagerService",
   toadScheduler: "toadScheduler",
   eventEmitter2: "eventEmitter2",
@@ -27,10 +28,7 @@ const DITokens = {
   octoPrintApiService: "octoPrintApiService",
   pluginRepositoryCache: "pluginRepositoryCache",
   pluginFirmwareUpdateService: "pluginFirmwareUpdateService",
-  influxDbSetupService: "influxDbSetupService",
-  influxDbFilamentService: "influxDbFilamentService",
-  influxDbHistoryService: "influxDbHistoryService",
-  influxDbPrinterStateService: "InfluxDbPrinterStateService",
+  influxDbV2BaseService: "influxDbV2BaseService",
   systemInfoBundleService: "systemInfoBundleService",
   printerFilesService: "printerFilesService",
   alertService: "alertService",
@@ -69,6 +67,7 @@ const DITokens = {
   printerWebsocketPingTask: "printerWebsocketPingTask",
   printerFileCleanTask: "printerFileCleanTask",
   pluginFirmwareUpdatePreparationTask: "PluginFirmwareUpdatePreparationTask",
+  influxDbQueryTask: "influxDbQueryTask",
 };
 
 module.exports = DITokens;
