@@ -1,5 +1,14 @@
 <template>
   <div>
+    <v-row no-gutters v-if="outletCurrentValues" class="ma-1">
+      <v-col v-for="x in columns" :key="x" style="margin-left: 20px">
+        <h3 v-if="selectedFloorLevel === 1">
+          <v-icon>bolt</v-icon>
+          {{ x === 1 || x === 2 ? outletCurrentValues.rack12 : outletCurrentValues.rack34 }}A / 16A
+        </h3>
+        <h3 v-else><v-icon>bolt</v-icon>{{ outletCurrentValues.highRack }}A / 16A</h3>
+      </v-col>
+    </v-row>
     <v-row v-for="y in rows" :key="y" class="ma-1" no-gutters>
       <v-col v-for="x in columns" :key="x" :cols="columnWidth" :sm="columnWidth">
         <v-row class="test-top" no-gutters>
@@ -33,6 +42,7 @@ import { printersState } from "@/store/printers.state";
 import PrinterGridTile from "@/components/PrinterGrid/PrinterTile.vue";
 import { PrinterGroup } from "@/models/printers/printer-group.model";
 import { columnCount, rowCount, totalVuetifyColumnCount } from "@/constants/printer-grid.constants";
+import { outletCurrentValuesState } from "@/store/outlet-current.state";
 
 @Component({
   components: { UpdatePrinterDialog, PrinterGridTile, Login },
@@ -46,6 +56,24 @@ export default class PrinterGrid extends Vue {
 
   columnWidth = 3; // default value overwritten later
   groupMatrix: PrinterGroup[][] = [];
+
+  get selectedFloorLevel() {
+    return printersState.selectedPrinterFloor?.floor;
+  }
+
+  get outletCurrentValues() {
+    if (!outletCurrentValuesState.values) return null;
+    const highRack = outletCurrentValuesState.values["11-k2-prusa-rekhoog"].value;
+    const rack34 = outletCurrentValuesState.values["3-prusa-rek3laag-rek4laag"].value;
+    const rack12 = outletCurrentValuesState.values["8-prusa-rek1laag-rek2laag"].value;
+
+    console.log(rack12, rack34, highRack, this.selectedFloorLevel);
+    return {
+      highRack,
+      rack34,
+      rack12,
+    };
+  }
 
   get printers() {
     return printersState.printers;

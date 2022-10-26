@@ -1,12 +1,14 @@
-import { ServerSettings } from "@/models/server-settings/server-settings.model";
 import { Action, Module, Mutation, VuexModule } from "vuex-class-modules";
-import { SettingsService } from "@/backend";
 import store from "@/store/index";
 import { OutletCurrentValues } from "@/models/sse-messages/printer-sse-message.model";
 
 @Module
 export class OutletCurrentModule extends VuexModule {
   outletCurrentValues?: OutletCurrentValues = undefined;
+
+  get values() {
+    return this.outletCurrentValues;
+  }
 
   @Mutation
   _setOutletCurrentValues(outletCurrentValues: OutletCurrentValues) {
