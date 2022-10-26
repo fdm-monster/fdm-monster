@@ -1,7 +1,7 @@
 const {
   getCurrentProfileDefault,
 } = require("../services/octoprint/constants/octoprint-service.constants");
-const { PEVENTS } = require("../constants/event.constants");
+const { PEVENTS, octoPrintWebsocketEvent } = require("../constants/event.constants");
 const {
   getDefaultPrinterState,
   WS_STATE,
@@ -365,7 +365,7 @@ class PrinterState {
   #processEvent(event) {
     // Other interested parties can be informed
     event.data.printerId = this.#id;
-    this.#eventEmitter2.emit(event.type, event.data);
+    this.#eventEmitter2.emit(octoPrintWebsocketEvent(this.#id), event.type, event.data);
 
     if (event.type === PEVENTS.event) {
       const data = event.data;
@@ -377,14 +377,6 @@ class PrinterState {
       } else if (data.type === EVENT_TYPES.Disconnected) {
         this.setFirmwareState("-");
       }
-
-      // TODO Process the event with the history store
-      // if (
-      //   [EVENT_TYPES.PrintCancelled, EVENT_TYPES.PrintDone, EVENT_TYPES.PrintFailed].includes(
-      //     data.type
-      //   )
-      // ) {
-      // }
     }
     if (event.type === PEVENTS.init) {
       this.#jobsCache.savePrinterJob(this.#id, event.data);

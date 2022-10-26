@@ -1,3 +1,4 @@
+const { PrintEventsSseTask } = require("./tasks/print-events.sse.task");
 const DITokens = {
   // Values
   serverVersion: "serverVersion",
@@ -61,7 +62,8 @@ const DITokens = {
   printerSystemTask: "printerSystemTask",
   softwareUpdateTask: "softwareUpdateTask",
   printerSseTask: "printerSseTask",
-  printerSseHandler: "printerSseHandler",
+  printEventsSseTask: "printEventsSseTask",
+  sseHandler: "sseHandler",
   printerTestTask: "printerTestTask",
   printerWebsocketTask: "printerWebsocketTask",
   printerWebsocketPingTask: "printerWebsocketPingTask",
