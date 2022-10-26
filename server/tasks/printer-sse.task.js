@@ -43,7 +43,7 @@ class PrinterSseTask {
       floors,
       trackedUploads,
       printerGroups,
-      currentValues: this.#influxDbQueryTask.lastCurrentValues(),
+      outletCurrentValues: this.#influxDbQueryTask.lastOutletCurrentValues(),
     };
 
     const serializedData = JSON.stringify(sseData);

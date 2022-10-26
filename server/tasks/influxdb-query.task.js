@@ -8,7 +8,7 @@ class InfluxDbQueryTask {
     this.influxDbV2BaseService = influxDbV2BaseService;
   }
 
-  lastCurrentValues() {
+  lastOutletCurrentValues() {
     return {
       ...this.#lastValues,
     };

@@ -36,6 +36,7 @@ import CreatePrinterDialog from "@/components/Generic/Dialogs/CreatePrinterDialo
 import { uploadsState } from "@/store/uploads.state";
 import CreatePrinterGroupDialog from "@/components/Generic/Dialogs/CreatePrinterGroupDialog.vue";
 import CreatePrinterFloorDialog from "@/components/Generic/Dialogs/CreatePrinterFloorDialog.vue";
+import { outletCurrentValuesState } from "@/store/outlet-current.state";
 
 @Component({
   components: {
@@ -114,6 +115,10 @@ export default class App extends Vue {
         testPrinter,
         testProgress,
       });
+    }
+
+    if (message.outletCurrentValues) {
+      outletCurrentValuesState.setOutletCurrentValues(message.outletCurrentValues);
     }
   }
 
