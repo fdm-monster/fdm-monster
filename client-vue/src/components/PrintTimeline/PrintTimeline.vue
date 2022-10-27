@@ -4,78 +4,97 @@
       <v-sheet height="100%" width="100%">
         <div>
           <v-row>
-            <v-icon>filter_list</v-icon>
-            Filtering {{ filterPrinterFloors.length }} of {{ printerFloors.length }} printer floors
-            (optional)
-            <v-select
-              v-model="filterPrinterFloors"
-              :items="printerFloors"
-              clearable
-              item-text="name"
-              label="Printer Floors"
-              multiple
-              return-object
-            >
-            </v-select>
+            <v-col>
+              <v-icon>filter_list</v-icon>
+              Filtering {{ filterPrinterFloors.length }} of {{ printerFloors.length }} printer
+              floors (optional)
+            </v-col>
+            <v-col>
+              <v-select
+                v-model="filterPrinterFloors"
+                :items="printerFloors"
+                clearable
+                item-text="name"
+                label="Printer Floors"
+                multiple
+                return-object
+              >
+              </v-select
+            ></v-col>
           </v-row>
 
           <v-row>
-            <v-icon>filter_list</v-icon>
-            Filtering {{ filterPrinterGroups.length }} of {{ printerGroups.length }} printer groups
-            (optional)
-            <v-select
-              v-model="filterPrinterGroups"
-              :items="printerGroups"
-              clearable
-              item-text="name"
-              label="Printer groups"
-              multiple
-              return-object
-            >
-            </v-select>
+            <v-col>
+              <v-icon>filter_list</v-icon>
+              Filtering {{ filterPrinterGroups.length }} of {{ printerGroups.length }} printer
+              groups (optional)
+            </v-col>
+            <v-col>
+              <v-select
+                v-model="filterPrinterGroups"
+                :items="printerGroups"
+                clearable
+                item-text="name"
+                label="Printer groups"
+                multiple
+                return-object
+              >
+              </v-select>
+            </v-col>
           </v-row>
 
           <v-row>
-            <v-icon>filter_list</v-icon>
-            Filtering {{ filterFdmPrinters.length }} of {{ floorGroupFdmPrinters.length }} FDM
-            printers
-            <strong>&nbsp;(required)</strong>
-            <v-select
-              v-model="filterFdmPrinters"
-              :items="floorGroupFdmPrinters"
-              clearable
-              item-text="printerName"
-              label="FDM Printers"
-              multiple
-              open-on-clear
-              return-object
-            >
-            </v-select>
+            <v-col>
+              <v-icon>filter_list</v-icon>
+              Filtering {{ filterFdmPrinters.length }} of {{ floorGroupFdmPrinters.length }} FDM
+              printers <strong>&nbsp;(required)</strong> </v-col
+            ><v-col>
+              <v-select
+                v-model="filterFdmPrinters"
+                :items="floorGroupFdmPrinters"
+                clearable
+                item-text="printerName"
+                label="FDM Printers"
+                multiple
+                open-on-clear
+                return-object
+              >
+              </v-select>
+            </v-col>
           </v-row>
           <v-row>
-            <v-icon>filter_list</v-icon>
-            Filtering {{ filterEventTypes.length }} of {{ eventTypes.length }} OctoPrint events
-            (optional)
-            <v-select
-              v-model="filterEventTypes"
-              :items="eventTypes"
-              clearable
-              label="OctoPrint Events"
-              multiple
-            >
-            </v-select>
+            <v-col>
+              <v-icon>filter_list</v-icon>
+              Filtering {{ filterEventTypes.length }} of {{ eventTypes.length }} OctoPrint events
+              (optional)
+            </v-col>
+
+            <v-col>
+              <v-select
+                v-model="filterEventTypes"
+                :items="eventTypes"
+                clearable
+                label="OctoPrint Events"
+                multiple
+              >
+              </v-select>
+            </v-col>
           </v-row>
           <v-row>
-            <v-icon>filter_list</v-icon>
-            Filtering {{ filterStateTypes.length }} of {{ stateTypes.length }} states (optional)
-            <v-select
-              v-model="filterStateTypes"
-              :items="stateTypes"
-              clearable
-              label="Printer state labels"
-              multiple
-            >
-            </v-select>
+            <v-col>
+              <v-icon>filter_list</v-icon>
+              Filtering {{ filterStateTypes.length }} of {{ stateTypes.length }} states (optional)
+            </v-col>
+            <v-col>
+              <v-select
+                v-model="filterStateTypes"
+                :items="stateTypes"
+                clearable
+                label="Printer state labels"
+                multiple
+              >
+              </v-select>
+            </v-col>
           </v-row>
         </div>
         <hr />
