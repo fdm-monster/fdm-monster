@@ -4,9 +4,14 @@
       <v-sheet height="100%" width="100%">
         <div>
           <v-icon>filter_list</v-icon>
-          Filter FDM events <v-select :items="fdmEventTypes" label="Events" multiple> </v-select>
+          Filtering {{ filterFdmEventTypes.length }} FDM printers
+          <v-select v-model="filterFdmEventTypes" :items="fdmEventTypes" label="Events" multiple>
+          </v-select>
+
           <v-icon>filter_list</v-icon>
-          Filter OctoPrint events <v-select :items="eventTypes" label="Events" multiple> </v-select>
+          Filtering {{ filterEventTypes.length }} OctoPrint events
+          <v-select v-model="filterEventTypes" :items="eventTypes" label="Events" multiple>
+          </v-select>
         </div>
         <hr />
         <v-simple-table dark>
@@ -20,7 +25,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="item in events" :key="item.name">
+              <tr v-for="item in shownEvents" :key="item.name">
                 <td>{{ item.fdmEvent }}</td>
                 <td>{{ item.octoPrintEvent }}</td>
                 <td>{{ item.timestamp }}</td>
@@ -42,10 +47,31 @@ export default Vue.extend({
   data: () =>
     ({
       events: [],
+      shownEvents: [],
       eventTypes: [],
+      filterEventTypes: [],
       fdmEventTypes: [],
-    } as { events: any[]; eventTypes: string[]; fdmEventTypes: string[] }),
+      filterFdmEventTypes: [],
+    } as {
+      events: any[];
+      shownEvents: any[];
+      eventTypes: string[];
+      filterEventTypes: string[];
+      fdmEventTypes: string[];
+      filterFdmEventTypes: string[];
+    }),
   computed: {},
+  watch: {
+    events() {
+      this.updateShownEvents();
+    },
+    filterEventTypes() {
+      this.updateShownEvents();
+    },
+    filterFdmEventTypes() {
+      this.updateShownEvents();
+    },
+  },
   async mounted() {
     const sseClient = await this.$sse.create({
       format: "json",
@@ -53,7 +79,6 @@ export default Vue.extend({
       url: apiBase + "/api/history/sse",
     });
     sseClient.on("message", (msg: any) => {
-      console.log(msg);
       msg.timestamp = new Date().toLocaleTimeString();
 
       this.events = [msg, ...this.events];
@@ -62,7 +87,15 @@ export default Vue.extend({
     });
     sseClient.connect().catch((err) => console.error("Failed make initial connection:", err));
   },
-  methods: {},
+  methods: {
+    updateShownEvents() {
+      this.shownEvents = this.events.filter(
+        (e) =>
+          this.filterFdmEventTypes.includes(e.fdmEvent) &&
+          this.filterEventTypes.includes(e.octoPrintEvent)
+      );
+    },
+  },
 });
 </script>
 
