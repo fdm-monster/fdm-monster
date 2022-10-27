@@ -8339,10 +8339,10 @@ vee-validate@3.4.14:
   resolved "https://registry.yarnpkg.com/vee-validate/-/vee-validate-3.4.14.tgz#51f91c01d6660c43c6252c417c89fb07cdf8b8dd"
   integrity sha512-Hqqic8G9WcRSIzCxiCPqMZv4qB8JE1lIQqIOLDm2K5BXUiL8d4a2+kqkanv8gQSGDzYpnCQZ7BO/T99Aj05T1Q==
 
-vue-axios@3.5.0:
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/vue-axios/-/vue-axios-3.5.0.tgz#9f37ed7e40351511e4a71f60c5d1eceff76c63db"
-  integrity sha512-I66AmSUI/dT/OEMNTHZQusmOqKtMxN5qgwFh4sq3kUGG0aEqBy1erKt66FAeR8o6agLGW80iLaIK/Sk/ogxsMw==
+vue-axios@3.5.1:
+  version "3.5.1"
+  resolved "https://registry.yarnpkg.com/vue-axios/-/vue-axios-3.5.1.tgz#bef9c7faa8b31834b70b45bdffdbe52e93cde8a0"
+  integrity sha512-PyiCHFZ30IGgzmW8mr8DkrzUqqDc5F1qtDfRVMDVx3q1zNSi3UxWKBHxtt/Gsz+HVJehxtc7vxyk+Vxr1Ok2BQ==
 
 vue-bus@1.2.1:
   version "1.2.1"
