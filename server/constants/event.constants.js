@@ -4,14 +4,16 @@ const PEVENTS = {
   current: "current",
   event: "event",
   reauth: "reauth",
-  plugin: "plugin"
+  plugin: "plugin",
 };
 
+const octoPrintWebsocketEvent = (printerId) => `octoprint.${printerId}`;
 const uploadProgressEvent = (token) => `upload.progress.${token}`;
-const firmwareFlashUpload = (printerId) => `firmware-upload.${printerId}`;
+const firmwareFlashUploadEvent = (printerId) => `firmware-upload.${printerId}`;
 
 module.exports = {
   PEVENTS,
   uploadProgressEvent,
-  firmwareFlashUpload
+  firmwareFlashUploadEvent,
+  octoPrintWebsocketEvent,
 };

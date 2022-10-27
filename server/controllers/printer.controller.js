@@ -8,7 +8,7 @@ const {
   flowRateRules,
   feedRateRules,
   updatePrinterEnabledRule,
-  testPrinterApiRules
+  testPrinterApiRules,
 } = require("./validation/printer-controller.validation");
 const { AppConstants } = require("../server.constants");
 const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
@@ -34,14 +34,14 @@ class PrinterController {
   constructor({
     printersStore,
     terminalLogsCache,
-    printerSseHandler,
+    sseHandler,
     taskManagerService,
     printerSseTask,
     loggerFactory,
     octoPrintApiService,
     pluginRepositoryCache,
     jobsCache,
-    fileCache
+    fileCache,
   }) {
     this.#logger = loggerFactory("Server-API");
 
@@ -52,12 +52,12 @@ class PrinterController {
     this.#octoPrintApiService = octoPrintApiService;
     this.#pluginRepositoryCache = pluginRepositoryCache;
     this.#fileCache = fileCache;
-    this.#sseHandler = printerSseHandler;
+    this.#sseHandler = sseHandler;
     this.#sseTask = printerSseTask;
   }
 
   async sse(req, res) {
-    this.#sseHandler.handleRequest(req, res);
+    this.#sseHandler.handleRequest(req, res, "default");
     await this.#sseTask.run();
   }
 
@@ -211,7 +211,7 @@ class PrinterController {
       printerURL: newEntity.printerURL,
       camURL: newEntity.camURL,
       apiKey: newEntity.apiKey,
-      webSocketURL: newEntity.webSocketURL
+      webSocketURL: newEntity.webSocketURL,
     });
   }
 

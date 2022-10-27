@@ -2,64 +2,50 @@ const { AppConstants } = require("../server.constants");
 
 // Default Settings
 const onlinePolling = {
-  seconds: 0.5
+  seconds: 0.5,
 };
 
 const server = {
   port: AppConstants.defaultServerPort,
   uploadFolder: AppConstants.defaultFileStorageFolder,
   registration: true,
-  loginRequired: false
+  loginRequired: false,
 };
 
 const getDefaultTimeout = () => ({
   apiTimeout: 1000,
   apiRetryCutoff: 10000,
   apiRetry: 30000,
-  webSocketRetry: 5000
+  webSocketRetry: 5000,
 });
 
 const printerFileCleanSettingKey = "printerFileClean";
 const getDefaultPrinterFileCleanSettings = () => ({
   autoRemoveOldFilesBeforeUpload: false,
   autoRemoveOldFilesAtBoot: false,
-  autoRemoveOldFilesCriteriumDays: 7
+  autoRemoveOldFilesCriteriumDays: 7,
 });
 
 const HISTORY_SETTINGS = {
   snapshot: "snapshot",
   thumbnails: "thumbnails",
-  timelapse: "timelapse"
+  timelapse: "timelapse",
 };
 
 const history = {
   [HISTORY_SETTINGS.snapshot]: {
     onFailure: true,
-    onComplete: true
+    onComplete: true,
   },
   [HISTORY_SETTINGS.thumbnails]: {
     onFailure: true,
-    onComplete: true
+    onComplete: true,
   },
   [HISTORY_SETTINGS.timelapse]: {
     onFailure: false,
     onComplete: false,
-    deleteAfter: false
-  }
-};
-
-const influxExport = {
-  active: false,
-  host: null,
-  port: 8086,
-  database: "3DPrintExport",
-  username: null,
-  password: null,
-  retentionPolicy: {
-    duration: "365d",
-    replication: 1,
-    defaultRet: true
-  }
+    deleteAfter: false,
+  },
 };
 
 const getDefaultSettings = () => ({
@@ -68,11 +54,9 @@ const getDefaultSettings = () => ({
   [printerFileCleanSettingKey]: getDefaultPrinterFileCleanSettings(),
   timeout: getDefaultTimeout(),
   history,
-  influxExport
 });
 
 module.exports = {
-  influxExport,
   HISTORY_SETTINGS,
   history,
   server,
@@ -80,5 +64,5 @@ module.exports = {
   onlinePolling,
   printerFileCleanSettingKey,
   getDefaultPrinterFileCleanSettings,
-  getDefaultSettings
+  getDefaultSettings,
 };

@@ -100,15 +100,18 @@
               </v-list-item-subtitle>
             </v-list-item-content>
             <v-list-item-content v-else>
-              <v-select
-                :items="unassignedPrinters()"
-                item-text="printerName"
-                label="Not assigned"
-                no-data-text="No printers left"
-                outlined
-                return-object
-                @change="addPrinterToGroup(selectedPrinterGroup, x, $event)"
-              ></v-select>
+              <v-list-item-title>
+                {{ x - 1 }}
+                <v-select
+                  :items="unassignedPrinters()"
+                  item-text="printerName"
+                  label="Not assigned"
+                  no-data-text="No printers left"
+                  flat
+                  return-object
+                  @change="addPrinterToGroup(selectedPrinterGroup, x, $event)"
+                ></v-select>
+              </v-list-item-title>
             </v-list-item-content>
 
             <v-list-item-action v-if="printerInGroup(selectedPrinterGroup, x)">

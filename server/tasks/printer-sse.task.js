@@ -1,7 +1,7 @@
 const { byteCount } = require("../utils/benchmark.util");
 
 class PrinterSseTask {
-  #printerSseHandler;
+  #sseHandler;
   #printerGroupsCache;
   #printersStore;
   #printerFloorsCache;
@@ -15,7 +15,7 @@ class PrinterSseTask {
   #logger;
 
   constructor({
-    printerSseHandler,
+    sseHandler,
     printerGroupsCache,
     printerFloorsCache,
     printersStore,
@@ -23,7 +23,7 @@ class PrinterSseTask {
     fileUploadTrackerCache,
     influxDbQueryTask,
   }) {
-    this.#printerSseHandler = printerSseHandler;
+    this.#sseHandler = sseHandler;
     this.#printersStore = printersStore;
     this.#printerGroupsCache = printerGroupsCache;
     this.#fileUploadTrackerCache = fileUploadTrackerCache;
@@ -49,7 +49,7 @@ class PrinterSseTask {
     const serializedData = JSON.stringify(sseData);
     const transportDataSize = byteCount(serializedData);
     this.updateAggregator(transportDataSize);
-    this.#printerSseHandler.send(serializedData);
+    this.#sseHandler.send(serializedData);
   }
 
   updateAggregator(transportDataLength) {

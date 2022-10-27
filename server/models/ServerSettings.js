@@ -7,145 +7,112 @@ const ServerSettingsSchema = new mongoose.Schema({
     seconds: {
       type: Number,
       default: 0.5,
-      required: true
-    }
+      required: true,
+    },
   },
   [printerFileCleanSettingKey]: {
     autoRemoveOldFilesBeforeUpload: {
       type: Boolean,
       default: false,
-      required: true
+      required: true,
     },
     autoRemoveOldFilesAtBoot: {
       type: Boolean,
       default: false,
-      required: true
+      required: true,
     },
     autoRemoveOldFilesCriteriumDays: {
       type: Number,
       default: 14,
-      required: true
-    }
+      required: true,
+    },
   },
   server: {
     uploadFolder: {
       type: String,
-      default: AppConstants.defaultFileStorageFolder
+      default: AppConstants.defaultFileStorageFolder,
     },
     port: {
       type: Number,
       default: AppConstants.defaultServerPort,
-      required: true
+      required: true,
     },
     loginRequired: {
       type: Boolean,
       default: false,
-      required: true
+      required: true,
     },
     registration: {
       type: Boolean,
       default: true,
-      required: true
-    }
+      required: true,
+    },
   },
   timeout: {
     apiTimeout: {
       type: Number,
       default: 1000,
-      required: true
+      required: true,
     },
     apiRetryCutoff: {
       type: Number,
       default: 10000,
-      required: true
+      required: true,
     },
     apiRetry: {
       type: Number,
       default: 30000,
-      required: true
+      required: true,
     },
     webSocketRetry: {
       type: Number,
       default: 5000,
-      required: true
-    }
+      required: true,
+    },
   },
   history: {
     snapshot: {
       onComplete: {
         type: Boolean,
         default: false,
-        required: true
+        required: true,
       },
       onFailure: {
         type: Boolean,
         default: false,
-        required: true
-      }
+        required: true,
+      },
     },
     thumbnails: {
       onComplete: {
         type: Boolean,
         default: false,
-        required: true
+        required: true,
       },
       onFailure: {
         type: Boolean,
         default: false,
-        required: true
-      }
+        required: true,
+      },
     },
     timelapse: {
       onComplete: {
         type: Boolean,
         default: false,
-        required: true
+        required: true,
       },
       onFailure: {
         type: Boolean,
         default: false,
-        required: true
+        required: true,
       },
       deleteAfter: {
         type: Boolean,
         default: false,
-        required: true
-      }
-    }
+        required: true,
+      },
+    },
   },
-  influxExport: {
-    active: {
-      type: Boolean,
-      default: false,
-      required: true
-    },
-    host: {
-      type: String
-    },
-    port: {
-      type: Number
-    },
-    database: {
-      type: String
-    },
-    username: {
-      type: String
-    },
-    password: {
-      type: String
-    },
-    retentionPolicy: {
-      defaultRet: {
-        type: Boolean
-      },
-      duration: {
-        type: String
-      },
-      replication: {
-        type: Number
-      }
-    }
-  }
 });
 
 const ServerSettings = mongoose.model("ServerSettings", ServerSettingsSchema);

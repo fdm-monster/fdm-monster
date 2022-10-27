@@ -11,13 +11,13 @@ const {
   OP_WS_MSG,
   getDefaultPrinterState,
   getDefaultCurrentState,
-  WS_STATE
+  WS_STATE,
 } = require("./constants/octoprint-websocket.constants");
 
 const _OctoPrintWebSocketRoute = "/sockjs/websocket";
 
-module.exports = class OctoprintRxjsWebsocketAdapter extends GenericWebsocketAdapter {
-  // Required data to setup OctoPrint WS connection
+class OctoprintRxjsWebsocketAdapter extends GenericWebsocketAdapter {
+  // Required data to set up OctoPrint WS connection
   #currentUser;
   #sessionKey;
   #throttle;
@@ -51,7 +51,7 @@ module.exports = class OctoprintRxjsWebsocketAdapter extends GenericWebsocketAda
 
   #constructClient() {
     const options = {
-      makeWebSocket: (url, protocols) => new WebSocket(url, protocols)
+      makeWebSocket: (url, protocols) => new WebSocket(url, protocols),
     };
 
     // create the websocket observable, does *not* open the websocket connection
@@ -82,7 +82,8 @@ module.exports = class OctoprintRxjsWebsocketAdapter extends GenericWebsocketAda
           console.log("Server closed the websocket connection normally.");
           this.#setWebSocketState(WS_STATE.closed);
         } else {
-          console.log("WebSocket threw error:", error.stack);
+          console.log("WebSocket threw error:", error);
+          console.error(error.stack);
           // TODO an error does not immediately mean its closed
           this.#setWebSocketState(WS_STATE.closed);
           throwError(error);
@@ -119,7 +120,7 @@ module.exports = class OctoprintRxjsWebsocketAdapter extends GenericWebsocketAda
         this.#octoPrintMeta = {
           octoPrintVersion: data.version,
           config_hash: data.config_hash,
-          plugin_hash: data.plugin_hash
+          plugin_hash: data.plugin_hash,
         };
         this.#setPrinterState({ state: PSTATE.Offline, desc: "Awaiting printer state messages" });
         break;
@@ -139,8 +140,6 @@ module.exports = class OctoprintRxjsWebsocketAdapter extends GenericWebsocketAda
         serverEvents.push({ type: PEVENTS.reauth, data });
         break;
       case OP_WS_MSG.plugin:
-        this.#logger.warning("Plugin message ", data);
-
         serverEvents.push({ type: PEVENTS.plugin, data });
 
         // @todo specifically distribute the handling
@@ -228,7 +227,9 @@ module.exports = class OctoprintRxjsWebsocketAdapter extends GenericWebsocketAda
       state,
       flags,
       colour: mapStateToColor(state),
-      desc
+      desc,
     };
   }
-};
+}
+
+module.exports = OctoprintRxjsWebsocketAdapter;

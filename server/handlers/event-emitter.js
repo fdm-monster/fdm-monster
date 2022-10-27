@@ -3,7 +3,7 @@ const { EventEmitter2 } = require("eventemitter2");
 function configureEventEmitter() {
   return new EventEmitter2({
     // set this to `true` to use wildcards
-    wildcard: false,
+    wildcard: true,
 
     // the delimiter used to segment namespaces
     delimiter: ".",
@@ -21,10 +21,10 @@ function configureEventEmitter() {
     verboseMemoryLeak: false,
 
     // disable throwing uncaughtException if an error event is emitted and it has no listeners
-    ignoreErrors: false
+    ignoreErrors: false,
   });
 }
 
 module.exports = {
-  configureEventEmitter
+  configureEventEmitter,
 };

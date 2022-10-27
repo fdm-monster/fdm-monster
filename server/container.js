@@ -17,7 +17,7 @@ const HistoryService = require("./services/history.service");
 const FileCache = require("./state/data/file.cache");
 const HistoryStore = require("./state/history.store");
 const JobsCache = require("./state/data/jobs.cache");
-const ServerSentEventsHandler = require("./handlers/sse.handler");
+const SseHandler = require("./handlers/sse.handler");
 const OctoPrintLogsCache = require("./state/data/octoprint-logs.cache");
 const PrinterWebsocketTask = require("./tasks/printer-websocket.task");
 const PrinterSseTask = require("./tasks/printer-sse.task");
@@ -65,6 +65,7 @@ const PrinterFloorsCache = require("./state/data/printer-floor.cache");
 const { InfluxDbV2BaseService } = require("./services/influxdb-v2/influx-db-v2-base.service");
 const { ConfigService } = require("./services/config.service");
 const { InfluxDbQueryTask } = require("./tasks/influxdb-query.task");
+const { PrintEventsSseTask } = require("./tasks/print-events.sse.task");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -144,8 +145,9 @@ function configureContainer() {
 
     [DITokens.bootTask]: asClass(BootTask),
     [DITokens.softwareUpdateTask]: asClass(SoftwareUpdateTask), // Provided SSE handlers (couplers) shared with controllers
-    [DITokens.printerSseHandler]: asClass(ServerSentEventsHandler).singleton(), // Task bound to send on SSE Handler
+    [DITokens.sseHandler]: asClass(SseHandler).singleton(), // Task bound to send on SSE Handler
     [DITokens.printerSseTask]: asClass(PrinterSseTask).singleton(), // This task is a quick task (~100ms per printer)
+    [DITokens.printEventsSseTask]: asClass(PrintEventsSseTask).singleton(),
     [DITokens.printerWebsocketTask]: asClass(PrinterWebsocketTask).singleton(), // This task is a recurring heartbeat task
     [DITokens.printerWebsocketPingTask]: asClass(PrinterWebsocketPingTask).singleton(), // Task dependent on WS to fire - disabled at boot
     [DITokens.printerSystemTask]: asClass(PrinterSystemTask).singleton(), // Task dependent on test printer in store - disabled at boot

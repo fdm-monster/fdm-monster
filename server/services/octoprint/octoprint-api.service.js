@@ -2,12 +2,15 @@ const fs = require("fs");
 const path = require("path");
 const {
   multiPartContentType,
-  pluginRepositoryUrl
+  pluginRepositoryUrl,
 } = require("./constants/octoprint-service.constants");
 const { processResponse, processGotResponse } = require("./utils/api.utils");
 const FormData = require("form-data");
 const got = require("got");
-const { uploadProgressEvent, firmwareFlashUpload } = require("../../constants/event.constants");
+const {
+  uploadProgressEvent,
+  firmwareFlashUploadEvent,
+} = require("../../constants/event.constants");
 const { ExternalServiceError } = require("../../exceptions/runtime.exceptions");
 const OctoPrintRoutes = require("./octoprint-api.routes");
 
@@ -42,7 +45,7 @@ class OctoPrintApiService extends OctoPrintRoutes {
 
   async sendCustomGCodeCommand(printer, commandString, responseOptions) {
     const { url, options, data } = this._prepareJsonRequest(printer, this.apiPrinterCustomCommand, {
-      command: commandString
+      command: commandString,
     });
     const response = await this._httpClient.post(url, data, options);
     return processResponse(response, responseOptions);
@@ -121,11 +124,11 @@ class OctoPrintApiService extends OctoPrintRoutes {
     const headers = {
       ...options.headers,
       ...formData.getHeaders(),
-      "Content-Length": formData.getLengthSync()
+      "Content-Length": formData.getLengthSync(),
     };
 
     const response = await this._httpClient.post(url, formData, {
-      headers
+      headers,
     });
 
     return processResponse(response, responseOptions);
@@ -171,13 +174,13 @@ class OctoPrintApiService extends OctoPrintRoutes {
     try {
       const headers = {
         ...options.headers,
-        ...formData.getHeaders()
+        ...formData.getHeaders(),
       };
 
       const response = await got
         .post(url, {
           body: formData,
-          headers
+          headers,
         })
         .on("uploadProgress", (p) => {
           if (token) {
@@ -204,7 +207,7 @@ class OctoPrintApiService extends OctoPrintRoutes {
         statusCode: e.response?.statusCode,
         data,
         success: false,
-        stack: e.stack
+        stack: e.stack,
       });
     }
   }
@@ -244,7 +247,7 @@ class OctoPrintApiService extends OctoPrintRoutes {
    */
   async postSoftwareUpdate(printer, targets, responseOptions) {
     const { url, options } = this._prepareJsonRequest(printer, this.pluginSoftwareUpdateUpdate, {
-      targets
+      targets,
     });
 
     const response = await this._httpClient.post(url, options);
@@ -297,18 +300,18 @@ class OctoPrintApiService extends OctoPrintRoutes {
     try {
       const headers = {
         ...options.headers,
-        ...formData.getHeaders()
+        ...formData.getHeaders(),
       };
 
       const response = await got
         .post(url, {
           body: formData,
-          headers
+          headers,
         })
         .on("uploadProgress", (p) => {
           if (currentPrinterId) {
             this._eventEmitter2.emit(
-              `${firmwareFlashUpload(currentPrinterId)}`,
+              `${firmwareFlashUploadEvent(currentPrinterId)}`,
               currentPrinterId,
               p
             );
@@ -334,7 +337,7 @@ class OctoPrintApiService extends OctoPrintRoutes {
         statusCode: e.response?.statusCode,
         data,
         success: false,
-        stack: e.stack
+        stack: e.stack,
       });
     }
   }

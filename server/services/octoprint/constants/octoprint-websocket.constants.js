@@ -6,7 +6,7 @@ function getDefaultProgressState() {
     filepos: undefined,
     printTime: undefined,
     printTimeLeft: undefined,
-    printTimeLeftOrigin: undefined
+    printTimeLeftOrigin: undefined,
   };
 }
 
@@ -17,7 +17,7 @@ function getDefaultJobState() {
     averagePrintTime: undefined,
     lastPrintTime: undefined,
     filament: undefined,
-    user: undefined
+    user: undefined,
   };
 }
 
@@ -26,7 +26,7 @@ function getDefaultPrinterState() {
     state: PSTATE.Offline,
     flags: { operational: false },
     desc: "Printer needs WebSocket connection first",
-    colour: mapStateToColor(PSTATE.Offline)
+    colour: mapStateToColor(PSTATE.Offline),
   };
 }
 
@@ -35,7 +35,7 @@ function getDefaultDisabledPrinterState() {
     state: PSTATE.Disabled,
     flags: { operational: false },
     desc: "Printer is disabled",
-    colour: mapStateToColor(PSTATE.Disabled)
+    colour: mapStateToColor(PSTATE.Disabled),
   };
 }
 
@@ -50,7 +50,7 @@ function getDefaultCurrentState() {
     logs: undefined,
     messages: undefined,
     resends: undefined,
-    plugins: undefined // TODO might be better in different state
+    plugins: undefined, // TODO might be better in different state
   };
 }
 
@@ -61,7 +61,10 @@ const EVENT_TYPES = {
   Connected: "Connected",
   Disconnecting: "Disconnecting",
   Disconnected: "Disconnected",
-  Dwelling: "Dwelling",
+  Dwelling: "Dwell",
+  Eject: "Eject",
+  Error: "Error",
+  EStop: "EStop",
   FileAdded: "FileAdded",
   FileDeselected: "FileDeselected",
   FileRemoved: "FileRemoved",
@@ -73,6 +76,8 @@ const EVENT_TYPES = {
   MetadataAnalysisStarted: "MetadataAnalysisStarted",
   MetadataStatisticsUpdated: "MetadataStatisticsUpdated",
   PositionUpdate: "PositionUpdate",
+  PowerOff: "PowerOff",
+  PowerOn: "PowerOn",
   PrintCancelled: "PrintCancelled",
   PrintCancelling: "PrintCancelling",
   PrintDone: "PrintDone",
@@ -85,7 +90,8 @@ const EVENT_TYPES = {
   UpdatedFiles: "UpdatedFiles",
   Upload: "Upload",
   UserLoggedIn: "UserLoggedIn",
-  ZChange: "ZChange"
+  Waiting: "Waiting",
+  ZChange: "ZChange",
 };
 
 const OP_WS_MSG = {
@@ -96,7 +102,7 @@ const OP_WS_MSG = {
   event: "event",
   plugin: "plugin",
   timelapse: "timelapse",
-  slicingProgress: "slicingProgress"
+  slicingProgress: "slicingProgress",
 };
 
 const OP_WS_SKIP = [OP_WS_MSG.slicingProgress, OP_WS_MSG.timelapse];
@@ -107,7 +113,7 @@ const WS_STATE = {
   connected: "connected",
   authed: "authed",
   errored: "errored", // Not a disconnect error
-  closed: "closed" // Closing error received
+  closed: "closed", // Closing error received
 };
 
 module.exports = {
@@ -119,5 +125,5 @@ module.exports = {
   EVENT_TYPES,
   WS_STATE,
   OP_WS_MSG,
-  OP_WS_SKIP
+  OP_WS_SKIP,
 };

@@ -1,18 +1,25 @@
 const { createController } = require("awilix-express");
 const { authenticate, authorizeRoles } = require("../middleware/authenticate");
 const { AppConstants } = require("../server.constants");
-const { validateInput, validateMiddleware } = require("../handlers/validators");
+const { validateInput } = require("../handlers/validators");
 const { idRules } = require("./validation/generic.validation");
-const { getCostSettingsDefault } = require("../constants/service.constants");
 const { ROLES } = require("../constants/authorization.constants");
 
 class HistoryController {
   #settingsStore;
   #historyStore;
+  #sseHandler;
+  #sseTask;
 
-  constructor({ settingsStore, historyStore }) {
+  constructor({ settingsStore, historyStore, sseHandler, printEventsSseTask }) {
     this.#settingsStore = settingsStore;
     this.#historyStore = historyStore;
+    this.#sseHandler = sseHandler;
+    this.#sseTask = printEventsSseTask;
+  }
+
+  async sse(req, res) {
+    this.#sseHandler.handleRequest(req, res, "octoprint-events");
   }
 
   async getCache(req, res) {
@@ -34,8 +41,9 @@ class HistoryController {
 
 // prettier-ignore
 module.exports = createController(HistoryController)
-    .prefix(AppConstants.apiRoute + "/history")
-    .before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR])])
-    .get("/", "getCache")
-    .delete("/:id", "delete")
-    .get("/stats", "stats");
+  .prefix(AppConstants.apiRoute + "/history")
+  .before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR])])
+  .get("/", "getCache")
+  .get("/sse", "sse")
+  .get("/stats", "stats")
+  .delete("/:id", "delete");
