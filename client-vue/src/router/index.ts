@@ -5,7 +5,7 @@ import Printers from "@/views/Printers.vue";
 import Settings from "@/views/Settings.vue";
 import PrinterGroupsSettings from "@/views/settings/PrinterGroupsSettings.vue";
 import About from "@/views/About.vue";
-import Scheduling from "@/views/PrintScheduling.vue";
+import PrintTimeline from "@/views/PrintTimeline.vue";
 import FdmSettings from "@/views/settings/FdmSettings.vue";
 import OtherSettings from "@/views/settings/OtherSettings.vue";
 import UserManagementSettings from "@/views/settings/UserManagementSettings.vue";
@@ -56,8 +56,8 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: "/scheduling",
-    name: "Scheduling",
-    component: Scheduling,
+    name: "Print Timeline",
+    component: PrintTimeline,
   },
   {
     path: "/about",

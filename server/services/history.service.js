@@ -15,7 +15,7 @@ class HistoryService {
   }
 
   async find(limit = 100) {
-    return HistoryModel.find({}).sort({ historyIndex: -1 }).limit(limit);
+    return HistoryModel.find({}).limit(limit);
   }
 
   async get(id) {
@@ -38,9 +38,9 @@ class HistoryService {
       meta: {
         resends,
         metaVersion: 1.0,
-        registeredAt: Date.now()
+        registeredAt: Date.now(),
       },
-      octoPrintEventType: eventType
+      octoPrintEventType: eventType,
     };
 
     const newHistoryDoc = new HistoryModel(printHistory);
