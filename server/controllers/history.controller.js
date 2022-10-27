@@ -44,6 +44,6 @@ module.exports = createController(HistoryController)
   .prefix(AppConstants.apiRoute + "/history")
   .before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR])])
   .get("/", "getCache")
-  .get("/event-stream", "sse")
+  .get("/sse", "sse")
   .get("/stats", "stats")
   .delete("/:id", "delete");

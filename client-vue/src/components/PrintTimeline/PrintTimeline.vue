@@ -1,75 +1,69 @@
 <template>
   <v-row>
     <v-col>
-      <v-sheet height="600">
-        <v-calendar dark ref="calendar" v-model="value" type="week">
-          <template v-slot:day-body="{ date, week }">
-            <div
-              class="v-current-time"
-              :class="{ first: date === week[0].date }"
-              :style="{ top: nowY }"
-            ></div>
+      <v-sheet height="100%" width="100%">
+        <div>
+          <v-icon>filter_list</v-icon>
+          Filter FDM events <v-select :items="fdmEventTypes" label="Events" multiple> </v-select>
+          <v-icon>filter_list</v-icon>
+          Filter OctoPrint events <v-select :items="eventTypes" label="Events" multiple> </v-select>
+        </div>
+        <hr />
+        <v-simple-table dark>
+          <template v-slot:default>
+            <thead>
+              <tr>
+                <th class="text-left">FDM event</th>
+                <th class="text-left">OctoPrint Event</th>
+                <th class="text-left">Time</th>
+                <th class="text-left">State</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="item in events" :key="item.name">
+                <td>{{ item.fdmEvent }}</td>
+                <td>{{ item.octoPrintEvent }}</td>
+                <td>{{ item.timestamp }}</td>
+                <td>{{ item.data?.plugin }} {{ item.data?.state?.text }} {{ item.data?.type }}</td>
+              </tr>
+            </tbody>
           </template>
-        </v-calendar>
+        </v-simple-table>
       </v-sheet>
     </v-col>
   </v-row>
 </template>
 
-<script>
-export default {
-  data: () => ({
-    value: "",
-    ready: false,
-  }),
-  computed: {
-    cal() {
-      return this.ready ? this.$refs.calendar : null;
-    },
-    nowY() {
-      return this.cal ? this.cal.timeToY(this.cal.times.now) + "px" : "-10px";
-    },
-  },
-  mounted() {
-    this.ready = true;
-    this.scrollToTime();
-    this.updateTime();
-  },
-  methods: {
-    getCurrentTime() {
-      return this.cal ? this.cal.times.now.hour * 60 + this.cal.times.now.minute : 0;
-    },
-    scrollToTime() {
-      const time = this.getCurrentTime();
-      const first = Math.max(0, time - (time % 30) - 30);
+<script lang="ts">
+import { apiBase } from "@/backend/base.service";
+import Vue from "vue";
 
-      this.cal.scrollToTime(first);
-    },
-    updateTime() {
-      setInterval(() => this.cal.updateTimes(), 60 * 1000);
-    },
+export default Vue.extend({
+  data: () =>
+    ({
+      events: [],
+      eventTypes: [],
+      fdmEventTypes: [],
+    } as { events: any[]; eventTypes: string[]; fdmEventTypes: string[] }),
+  computed: {},
+  async mounted() {
+    const sseClient = await this.$sse.create({
+      format: "json",
+      forcePolyfill: true,
+      url: apiBase + "/api/history/sse",
+    });
+    sseClient.on("message", (msg: any) => {
+      console.log(msg);
+      msg.timestamp = new Date().toLocaleTimeString();
+
+      this.events = [msg, ...this.events];
+      this.fdmEventTypes = this.events.map((e) => e.fdmEvent);
+      this.eventTypes = this.events.map((e) => e.octoPrintEvent);
+    });
+    sseClient.connect().catch((err) => console.error("Failed make initial connection:", err));
   },
-};
+  methods: {},
+});
 </script>
 
-<style lang="scss">
-.v-current-time {
-  height: 2px;
-  background-color: #ea4335;
-  position: absolute;
-  left: -1px;
-  right: 0;
-  pointer-events: none;
-
-  &.first::before {
-    content: "";
-    position: absolute;
-    background-color: #ea4335;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    margin-top: -5px;
-    margin-left: -6.5px;
-  }
-}
-</style>
+<style lang="scss"></style>
