@@ -54,7 +54,7 @@ describe("SSE-Printers", () => {
       delay(async () => {
         await sseTask.run();
         resolve();
-      }, 100);
+      }, 1000);
     });
 
     expect(firedEvent).toBeTruthy();

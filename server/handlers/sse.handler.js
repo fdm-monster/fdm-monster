@@ -23,11 +23,20 @@ class SseHandler {
     }
     this.#clientId++;
 
+    const deleteClient = (topic, clientId) => {
+      const clients = this.#clients[topic];
+      if (clients[clientId]) {
+        delete clients[clientId];
+      } else {
+        console.log("SSE client not found, was it already deleted?");
+      }
+    };
+
     req.on("close", () => {
-      delete this.#clients[topic][newClientId];
+      deleteClient(topic, newClientId);
     });
     req.on("error", () => {
-      delete this.#clients[topic][newClientId];
+      deleteClient(topic, newClientId);
     });
   }
 
