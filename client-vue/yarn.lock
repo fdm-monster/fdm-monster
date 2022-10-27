@@ -1402,57 +1402,57 @@
     estree-walker "^1.0.1"
     picomatch "^2.2.2"
 
-"@sentry/browser@7.17.0":
-  version "7.17.0"
-  resolved "https://registry.yarnpkg.com/@sentry/browser/-/browser-7.17.0.tgz#e5235e94fa26f3d3620b254aedd7e57d7668be1a"
-  integrity sha512-4fcHRmfe5xM1PcM9jt+V/JCpwPPajQTvaXoljhS5z8sQD1OgFX/YLrg3l56LRVfUgLVnRWmVTy/kpVDPiLD0Tg==
+"@sentry/browser@7.17.1":
+  version "7.17.1"
+  resolved "https://registry.yarnpkg.com/@sentry/browser/-/browser-7.17.1.tgz#53930523b9ce0fb086063624221b31b01e07a98b"
+  integrity sha512-9W2OHgXBedHwtK5jG+Zh0WqItO178PZqrdPn6oQYLwO55XDjWKfgb1GuvHwjEK7JslqmjgY6mCmHG9JEse0Oog==
   dependencies:
-    "@sentry/core" "7.17.0"
-    "@sentry/types" "7.17.0"
-    "@sentry/utils" "7.17.0"
+    "@sentry/core" "7.17.1"
+    "@sentry/types" "7.17.1"
+    "@sentry/utils" "7.17.1"
     tslib "^1.9.3"
 
-"@sentry/core@7.17.0":
-  version "7.17.0"
-  resolved "https://registry.yarnpkg.com/@sentry/core/-/core-7.17.0.tgz#e2dfd259f6b91b0381f315abfd34f630dcf482b0"
-  integrity sha512-TEmYvjjeX9ggLkyxmuSm6txaWPW5FY/mkn61/o4qekN3v27oIp3rQ8mnHvhg8qMVpOl5RXuX7XWIGACkHloPfw==
+"@sentry/core@7.17.1":
+  version "7.17.1"
+  resolved "https://registry.yarnpkg.com/@sentry/core/-/core-7.17.1.tgz#c9f0ed8ecf64d1f88baeddf25e6e0115cb8fa454"
+  integrity sha512-SA9SmKNn2zLrZt+lOnaGN9ko5yU72PUh2fac76CU3QfyYdMwe7BxWiZTb3C6ipy11bfJfDYM3ZbeCOBk68sirg==
   dependencies:
-    "@sentry/types" "7.17.0"
-    "@sentry/utils" "7.17.0"
+    "@sentry/types" "7.17.1"
+    "@sentry/utils" "7.17.1"
     tslib "^1.9.3"
 
-"@sentry/tracing@7.17.0":
-  version "7.17.0"
-  resolved "https://registry.yarnpkg.com/@sentry/tracing/-/tracing-7.17.0.tgz#45885c9d7ce1a34cddb058cf8cca05235cd3de43"
-  integrity sha512-NyYjoq6izfXRq3kjRgx5S+/kpvwVzDhunscVa73Q8CgGwBg5QwV1Dt51FLNcZGoqCqjs0bylXbe/3fHJXF/Yxg==
+"@sentry/tracing@7.17.1":
+  version "7.17.1"
+  resolved "https://registry.yarnpkg.com/@sentry/tracing/-/tracing-7.17.1.tgz#b428dcfdf9771ff3fe82ed5a815780dfd0112d85"
+  integrity sha512-eepg2QiR6FIwFPt3VJ2S/ixA5vryVKQ63a6E+Ta9eRuc0ZbUo6+3tBcTtG3Oo+liLTl//3eo7rKdLxi76cGuBw==
   dependencies:
-    "@sentry/core" "7.17.0"
-    "@sentry/types" "7.17.0"
-    "@sentry/utils" "7.17.0"
+    "@sentry/core" "7.17.1"
+    "@sentry/types" "7.17.1"
+    "@sentry/utils" "7.17.1"
     tslib "^1.9.3"
 
-"@sentry/types@7.17.0":
-  version "7.17.0"
-  resolved "https://registry.yarnpkg.com/@sentry/types/-/types-7.17.0.tgz#a6959f0eb6dc48ec2e28f566f6a66cc98c8b152a"
-  integrity sha512-iN6BPRwZRt6jfJf9F1pVPlUUjnTn5PXHilssGSzTYrBQBtE9eoi4WCYAdnCP9qpa7TGBBDiWyDBN3ZkbtGFsvQ==
+"@sentry/types@7.17.1":
+  version "7.17.1"
+  resolved "https://registry.yarnpkg.com/@sentry/types/-/types-7.17.1.tgz#2931677d0c0fb7173a3e57230ede70d2a294e463"
+  integrity sha512-1rMZInb0rypqslYzJukiHe+EpHI/zgYiTK816I5pF8/e0JrE3WD/j+ZSugMYszczJIECCKtfI0Rst6jWn7Zs8Q==
 
-"@sentry/utils@7.17.0":
-  version "7.17.0"
-  resolved "https://registry.yarnpkg.com/@sentry/utils/-/utils-7.17.0.tgz#6d09b8f75a235dcc6486e9fa0fcc86c89be6a699"
-  integrity sha512-rsBemXHTabP9YL63jdlE23OhvPs2ElHKCBqWTC003oHSkhTjl3Png3Sca4DaMeWFdotSltXVjp5Cp9dbcglfzw==
+"@sentry/utils@7.17.1":
+  version "7.17.1"
+  resolved "https://registry.yarnpkg.com/@sentry/utils/-/utils-7.17.1.tgz#452373890522f62c8a3e6732728ba78bd247f796"
+  integrity sha512-dypRfPRGfPPu7+x6r4zbEJwTTE9XlSLZBdq8BRvazaWBLZ6tQXYH/3U8hHaNVkdO6ELX53B6gLVRCyKFdUIUYw==
   dependencies:
-    "@sentry/types" "7.17.0"
+    "@sentry/types" "7.17.1"
     tslib "^1.9.3"
 
-"@sentry/vue@7.17.0":
-  version "7.17.0"
-  resolved "https://registry.yarnpkg.com/@sentry/vue/-/vue-7.17.0.tgz#867633c7be63ac7e3d9a4f7ac541ab1fbc454b9f"
-  integrity sha512-1LHToWEZSnf1+OTJ+stFIrTQEy3wh2gYeOon331BN6RJmlUIoSqY73ywF+8M6munUuk3NtgEwQHhnG0WFWQW4Q==
+"@sentry/vue@7.17.1":
+  version "7.17.1"
+  resolved "https://registry.yarnpkg.com/@sentry/vue/-/vue-7.17.1.tgz#3b7d0e535ae2774f97db454e63e4eefa34511242"
+  integrity sha512-XkdwzUVpNYZf5p8CtwHR9c7Rh/dkUUj/sS0skIyZc5ca/8I/Y/RE4xxcTBEhjJZoS6UM3QzZ/EUHWlGuA+xdhg==
   dependencies:
-    "@sentry/browser" "7.17.0"
-    "@sentry/core" "7.17.0"
-    "@sentry/types" "7.17.0"
-    "@sentry/utils" "7.17.0"
+    "@sentry/browser" "7.17.1"
+    "@sentry/core" "7.17.1"
+    "@sentry/types" "7.17.1"
+    "@sentry/utils" "7.17.1"
     tslib "^1.9.3"
 
 "@sideway/address@^4.1.3":
