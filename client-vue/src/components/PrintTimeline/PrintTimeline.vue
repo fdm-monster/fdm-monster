@@ -10,10 +10,11 @@
             <v-select
               v-model="filterPrinterFloors"
               :items="printerFloors"
+              clearable
               item-text="name"
-              return-object
               label="Printer Floors"
               multiple
+              return-object
             >
             </v-select>
           </v-row>
@@ -24,25 +25,30 @@
             (optional)
             <v-select
               v-model="filterPrinterGroups"
-              item-text="name"
               :items="printerGroups"
-              return-object
+              clearable
+              item-text="name"
               label="Printer groups"
               multiple
+              return-object
             >
             </v-select>
           </v-row>
 
           <v-row>
             <v-icon>filter_list</v-icon>
-            Filtering {{ filterFdmEventTypes.length }} of {{ floorGroupFdmEventTypes.length }} FDM
+            Filtering {{ filterFdmPrinters.length }} of {{ floorGroupFdmPrinters.length }} FDM
             printers
             <strong>&nbsp;(required)</strong>
             <v-select
-              v-model="filterFdmEventTypes"
-              :items="floorGroupFdmEventTypes"
+              v-model="filterFdmPrinters"
+              :items="floorGroupFdmPrinters"
+              clearable
+              item-text="printerName"
               label="FDM Printers"
               multiple
+              open-on-clear
+              return-object
             >
             </v-select>
           </v-row>
@@ -53,6 +59,7 @@
             <v-select
               v-model="filterEventTypes"
               :items="eventTypes"
+              clearable
               label="OctoPrint Events"
               multiple
             >
@@ -64,6 +71,7 @@
             <v-select
               v-model="filterStateTypes"
               :items="stateTypes"
+              clearable
               label="Printer state labels"
               multiple
             >
@@ -103,6 +111,7 @@ import { distinct } from "@/utils/array.utils";
 import { printersState } from "@/store/printers.state";
 import { PrinterFloor } from "@/models/printer-floor/printer-floor.model";
 import { PrinterGroup } from "@/models/printers/printer-group.model";
+import { Printer } from "@/models/printers/printer.model";
 
 export default Vue.extend({
   data: () =>
@@ -113,8 +122,8 @@ export default Vue.extend({
       filterEventTypes: [],
       fdmEventTypes: [],
       // Final result of all groups/floors
-      floorGroupFdmEventTypes: [],
-      filterFdmEventTypes: [],
+      floorGroupFdmPrinters: [],
+      filterFdmPrinters: [],
       filterPrinterFloors: [],
       printerGroups: [],
       filterPrinterGroups: [],
@@ -128,8 +137,8 @@ export default Vue.extend({
       eventTypes: string[];
       filterEventTypes: string[];
       fdmEventTypes: string[];
-      floorGroupFdmEventTypes: string[];
-      filterFdmEventTypes: string[];
+      floorGroupFdmPrinters: Printer[];
+      filterFdmPrinters: Printer[];
       filterPrinterFloors: PrinterFloor[];
       printerGroups: PrinterGroup[];
       filterPrinterGroups: PrinterGroup[];
@@ -193,6 +202,7 @@ export default Vue.extend({
     updateFloors() {
       if (!this.filterPrinterFloors?.length) {
         this.printerGroups = this.availablePrinterGroups;
+        return;
       }
       const flattenedGroupIds = this.filterPrinterFloors.flatMap((pf) => {
         return pf.printerGroups.map((pg) => pg.printerGroupId);
@@ -203,15 +213,21 @@ export default Vue.extend({
       });
     },
     updateGroups() {
-      const flattenedPrinterIds = this.printerGroups.flatMap((pg) => {
+      let usedFilter = this.filterPrinterGroups;
+      if (!this.filterPrinterGroups.length) {
+        usedFilter = this.printerGroups;
+      }
+      const flattenedPrinterIds = usedFilter.flatMap((pg) => {
         return pg.printers.map((p) => p.printerId);
       });
-      this.floorGroupFdmEventTypes = flattenedPrinterIds.map((fpId) => `octoprint.${fpId}`);
+
+      this.floorGroupFdmPrinters = flattenedPrinterIds.map((fpId) => printersState.printer(fpId)!);
     },
     updateShownEvents() {
+      const printerEventNames = this.filterFdmPrinters.map((p) => `octoprint.${p.id}`);
       this.shownEvents = this.events.filter(
         (e) =>
-          this.filterFdmEventTypes.includes(e.fdmEvent) &&
+          printerEventNames.includes(e.fdmEvent) &&
           (!this.filterEventTypes.length || this.filterEventTypes.includes(e.octoPrintEvent)) &&
           (!this.filterStateTypes.length ||
             (e.item.data?.state && this.filterStateTypes.includes(e.item.data?.state?.text)))

@@ -82,7 +82,8 @@ class OctoprintRxjsWebsocketAdapter extends GenericWebsocketAdapter {
           console.log("Server closed the websocket connection normally.");
           this.#setWebSocketState(WS_STATE.closed);
         } else {
-          console.log("WebSocket threw error:", error.stack);
+          console.log("WebSocket threw error:", error);
+          console.error(error.stack);
           // TODO an error does not immediately mean its closed
           this.#setWebSocketState(WS_STATE.closed);
           throwError(error);
@@ -139,8 +140,6 @@ class OctoprintRxjsWebsocketAdapter extends GenericWebsocketAdapter {
         serverEvents.push({ type: PEVENTS.reauth, data });
         break;
       case OP_WS_MSG.plugin:
-        this.#logger.warning("Plugin message ", data);
-
         serverEvents.push({ type: PEVENTS.plugin, data });
 
         // @todo specifically distribute the handling

@@ -19,8 +19,7 @@ class PrintEventsSseTask {
   }
 
   async run() {
-    // Run once
-    console.log("sse task");
+    // Run once to bind event handler
   }
 }
 
