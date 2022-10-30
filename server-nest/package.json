@@ -22,6 +22,9 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@automapper/classes": "^8.7.6",
+    "@automapper/core": "^8.7.6",
+    "@automapper/nestjs": "^8.7.6",
     "@nestjs/axios": "1.0.0",
     "@nestjs/common": "9.2.0",
     "@nestjs/config": "2.2.0",
@@ -41,9 +44,12 @@
     "class-validator": "0.13.2",
     "cookie-parser": "1.4.6",
     "express-session": "1.17.3",
+    "helmet": "^6.0.0",
+    "joi": "17.6.2",
     "lodash": "4.17.21",
     "luxon": "3.1.0",
     "mongodb": "4.11.0",
+    "nest-winston": "1.7.1",
     "passport": "0.6.0",
     "passport-jwt": "4.0.0",
     "passport-local": "1.0.0",
@@ -51,7 +57,8 @@
     "rimraf": "3.0.2",
     "rxjs": "7.5.7",
     "swagger-ui-express": "4.6.0",
-    "typeorm": "0.3.10"
+    "typeorm": "0.3.10",
+    "winston": "^3.8.2"
   },
   "devDependencies": {
     "@nestjs/cli": "9.1.5",
@@ -63,6 +70,7 @@
     "@types/node": "18.11.9",
     "@types/passport-jwt": "3.0.7",
     "@types/passport-local": "1.0.34",
+    "@types/sqlite3": "^3.1.8",
     "@types/supertest": "2.0.12",
     "@types/ws": "8.5.3",
     "@typescript-eslint/eslint-plugin": "5.43.0",
@@ -74,7 +82,7 @@
     "json-to-typescript": "1.0.1",
     "mongo-unit": "3.2.0",
     "prettier": "2.7.1",
-    "supertest": "6.3.1",
+    "supertest": "6.3.0",
     "ts-jest": "29.0.3",
     "ts-loader": "9.4.1",
     "ts-node": "10.9.1",

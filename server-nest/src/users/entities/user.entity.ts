@@ -8,9 +8,9 @@ import {
   ObjectIdColumn
 } from "typeorm";
 import { IsNotEmpty, MinLength, validate } from "class-validator";
-import { ValidationException } from "../../providers/validation.exception";
+import { ValidationException } from "@/core/providers/validation.exception";
 import { UserConstants } from "../users.constants";
-import { GroupEnum } from "../types/group.enum";
+import { GroupEnum } from "../models/group.enum";
 
 @Entity()
 export class User {

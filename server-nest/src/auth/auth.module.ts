@@ -4,14 +4,14 @@ import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 import { JwtStrategy } from "./strategies/jwt.strategy";
 import { AuthController } from "./controllers/auth.controller";
-import { UsersModule } from "../users/users.module";
+import { UsersModule } from "@/users/users.module";
 import { ConfigModule } from "@nestjs/config";
 import { AuthConfig, DefaultAdminPassword } from "./auth.config";
 import { APP_GUARD } from "@nestjs/core";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
-import { UsersService } from "../users/services/users.service";
-import { GroupEnum } from "../users/types/group.enum";
-import { SettingsModule } from "../settings/settings.module";
+import { UsersService } from "@/users/users.service";
+import { GroupEnum } from "@/users/models/group.enum";
+import { SettingsModule } from "@/settings/settings.module";
 
 @Module({
   providers: [

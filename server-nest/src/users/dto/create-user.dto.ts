@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, IsString, MinLength } from "class-validator";
-import { GroupEnum } from "../types/group.enum";
+import { GroupEnum } from "../models/group.enum";
 import { UserConstants } from "../users.constants";
 
 export class CreateUserDto {

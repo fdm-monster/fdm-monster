@@ -1,6 +1,6 @@
 import { IsDate, IsDefined, validate } from "class-validator";
 import { BeforeInsert, BeforeUpdate, Column, Entity, ObjectID, ObjectIdColumn } from "typeorm";
-import { ValidationException } from "../../providers/validation.exception";
+import { ValidationException } from "../../core/providers/validation.exception";
 
 // TODO PrinterRoomData table limit/cap needs to be enforced at a higher lvl
 // QueryRunner or Migrations https://github.com/typeorm/typeorm/issues/5187

@@ -14,6 +14,7 @@ export interface LoginDetails {
 
 export interface LastPrintedFile {
   fileName: string;
+  createdTimestamp: number;
   editTimestamp: number;
   parsedColor: string;
   parsedVisualizationRAL: number;

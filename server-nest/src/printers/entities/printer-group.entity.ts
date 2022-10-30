@@ -8,7 +8,7 @@ import {
   ObjectID,
   ObjectIdColumn
 } from "typeorm";
-import { ValidationException } from "../../providers/validation.exception";
+import { ValidationException } from "../../core/providers/validation.exception";
 
 @Entity()
 export class PrinterGroup {

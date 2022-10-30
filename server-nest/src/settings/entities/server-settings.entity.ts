@@ -1,6 +1,6 @@
 import { BeforeInsert, BeforeUpdate, Column, Entity, ObjectID, ObjectIdColumn } from "typeorm";
 import { IsDefined, validate } from "class-validator";
-import { ValidationException } from "../../providers/validation.exception";
+import { ValidationException } from "../../core/providers/validation.exception";
 import { OnlinePollingModel } from "../models/online-polling.model";
 import { ServerModel } from "../models/server/server.model";
 

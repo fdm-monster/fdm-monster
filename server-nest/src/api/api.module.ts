@@ -1,14 +1,12 @@
 import { Module } from "@nestjs/common";
 import { ApiService } from "./api.service";
 import { ApiController } from "./api.controller";
-import { HealthController } from "./controllers/health.controller";
-import { TypeOrmModule } from "@nestjs/typeorm";
+import { HealthController } from "./health.controller";
 import { TerminusModule } from "@nestjs/terminus";
 
 @Module({
-  imports: [TypeOrmModule.forRoot(), TerminusModule],
+  imports: [TerminusModule],
   controllers: [ApiController, HealthController],
   providers: [ApiService]
 })
-export class ApiModule {
-}
+export class ApiModule {}

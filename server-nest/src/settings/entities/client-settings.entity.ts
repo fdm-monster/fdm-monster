@@ -1,6 +1,6 @@
 import { BeforeInsert, BeforeUpdate, Column, Entity, ObjectID, ObjectIdColumn } from "typeorm";
 import { IsDefined, validate } from "class-validator";
-import { ValidationException } from "../../providers/validation.exception";
+import { ValidationException } from "../../core/providers/validation.exception";
 import { ClientDashboardSettings } from "../models/client-dashboard/client-dashboard.settings";
 
 @Entity()

@@ -1,12 +1,12 @@
 import { Inject, Logger, Module } from "@nestjs/common";
 import { APP_FILTER } from "@nestjs/core";
-import { ExceptionsLoggerFilter } from "../../src/providers/exception.filters";
+import { ExceptionsLoggerFilter } from "@/services/exceptions-logger.filter";
 import { ConfigModule, ConfigType } from "@nestjs/config";
 import { OctoprintGateway } from "./gateway/octoprint.gateway";
 import { TestClientController } from "./controllers/test-client.controller";
-import { OctoPrintClientService } from "../../src/octoprint/services/octoprint-client.service";
-import { OctoPrintConfig } from "../../src/octoprint/octoprint.config";
-import { ClientConnectionsState } from "../../src/octoprint/state/client-connections.state";
+import { OctoPrintClientService } from "@/octoprint/services/octoprint-client.service";
+import { OctoPrintConfig } from "@/octoprint/octoprint.config";
+import { ClientConnectionsState } from "@/octoprint/state/client-connections.state";
 import { HttpModule } from "@nestjs/axios";
 
 @Module({

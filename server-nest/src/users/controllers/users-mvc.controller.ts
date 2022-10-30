@@ -2,7 +2,7 @@ import { Body, Controller, Get, Post, Req, Res } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
 import { ServerSettingsService } from "../../settings/services/server-settings.service";
 import { Public } from "../../utils/auth.decorators";
-import { UsersService } from "../services/users.service";
+import { UsersService } from "../users.service";
 import { RegisterInputDto } from "../dto/register-input.dto";
 
 @Controller("users")
