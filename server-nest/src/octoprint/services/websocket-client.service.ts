@@ -10,7 +10,7 @@ import { CurrentMessageDto } from "../dto/websocket-output/current-message.dto";
 import { EventMessageDto } from "../dto/websocket-output/event-message.dto";
 import { PluginMessageDto } from "../dto/websocket-output/plugin-message.dto";
 import path from "path";
-import { transform } from "json-to-typescript/index";
+import { transform } from "json-to-typescript";
 import fs from "fs";
 import { backoff } from "../providers/backoff.generator";
 

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { ApiController } from "./api.controller";
 import { ApiService } from "./api.service";
-import { Connection, DataSource } from "typeorm";
+import { DataSource } from "typeorm";
 
 describe("ApiController", () => {
   let controller: ApiController;

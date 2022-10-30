@@ -24,12 +24,6 @@ export function registerGlobals(app: INestApplication) {
   // Common security policies like HSTS
   app.use(helmet());
 
-  // Artificially slow down API calls
-  // app.use(async (req: Request) => {
-  //   await sleep(200);
-  //   return req.next();
-  // });
-
   // SPA cross-origin capabilities without policy
   app.enableCors();
 

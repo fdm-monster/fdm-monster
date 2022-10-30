@@ -2,7 +2,7 @@ import { Body, Controller, NotImplementedException, Post, Req } from "@nestjs/co
 import { AuthService } from "../services/auth.service";
 import { ApiTags } from "@nestjs/swagger";
 import { LoginUserDto } from "../dto/login-user.dto";
-import { Public } from "../../utils/auth.decorators";
+import { Public } from "@/utils/auth.decorators";
 
 @Controller("auth")
 @ApiTags(AuthController.name)

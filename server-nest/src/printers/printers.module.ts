@@ -3,7 +3,7 @@ import { PrintersController } from "./controllers/printers.controller";
 import { PrintersService } from "./services/printers.service";
 import { Printer } from "./entities/printer.entity";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { SettingsModule } from "../settings/settings.module";
+import { SettingsModule } from "@/settings/settings.module";
 import { PrinterGroupsController } from "./controllers/printer-groups.controller";
 import { PrinterGroupsService } from "./services/printer-groups.service";
 import { PrinterGroup } from "./entities/printer-group.entity";
@@ -13,10 +13,7 @@ import { PrinterProfile } from "./entities/printer-profile.entity";
 import { PrinterRoomData } from "./entities/printer-room-data.entity";
 import { PrinterTempHistory } from "./entities/printer-temp-history.entity";
 import { PrinterQueryTask } from "./tasks/printer-query.task";
-import { HistoryService } from "./services/history.service";
 import { PrinterHistory } from "./entities/printer-history.entity";
-import { HistoryCache } from "./services/history.cache";
-import { JobStatisticsService } from "./services/job-statistics.service";
 
 @Module({
   imports: [
@@ -31,15 +28,8 @@ import { JobStatisticsService } from "./services/job-statistics.service";
     ]),
     SettingsModule
   ],
-  providers: [
-    PrintersService,
-    HistoryCache,
-    HistoryService,
-    JobStatisticsService,
-    PrinterGroupsService,
-    PrinterQueryTask
-  ],
-  exports: [PrintersService, JobStatisticsService],
+  providers: [PrintersService, PrinterGroupsService, PrinterQueryTask],
+  exports: [PrintersService],
   controllers: [PrintersController, PrinterGroupsController]
 })
 export class PrintersModule {}

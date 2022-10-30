@@ -1,18 +1,17 @@
 import { DataSource } from "typeorm";
-import { MysqlConnectionOptions } from "typeorm/driver/mysql/MysqlConnectionOptions";
 import { config } from "dotenv";
 import {
-  MONGO_DATABASE_URL,
+  POSTGRES_DATABASE_URL,
   TYPEORM_DATABASE,
   TYPEORM_PASSWORD,
   TYPEORM_USERNAME
 } from "./data-source.constants";
-import { MongoConnectionOptions } from "typeorm/driver/mongodb/MongoConnectionOptions";
+import { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions";
 
 // @todo this does not allow dynamic reconfiguration of datasource
 config();
 
-const mongoDbUrl = process.env[MONGO_DATABASE_URL];
+const postgresUrl = process.env[POSTGRES_DATABASE_URL];
 const defaultDatabaseName = "fdm-monster";
 
 const commonConfig = {
@@ -26,14 +25,14 @@ const commonConfig = {
     charset: "utf8mb4_0900_ai_ci"
   }
 };
-export const AppOrmConfig: MongoConnectionOptions = !!mongoDbUrl?.length
+export const AppOrmConfig: PostgresConnectionOptions = !!postgresUrl?.length
   ? {
-      type: "mongodb",
-      url: mongoDbUrl,
+      type: "postgres",
+      url: postgresUrl,
       ...commonConfig
     }
   : {
-      type: "mongodb",
+      type: "postgres",
       database: process.env[TYPEORM_DATABASE] || defaultDatabaseName,
       username: process.env[TYPEORM_USERNAME] || "root",
       password: process.env[TYPEORM_PASSWORD] || "",

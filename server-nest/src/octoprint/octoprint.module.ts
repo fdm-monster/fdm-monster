@@ -1,4 +1,4 @@
-import { Inject, Module } from "@nestjs/common";
+import { Inject, Module, OnModuleInit } from "@nestjs/common";
 import { OctoPrintClientService } from "./services/octoprint-client.service";
 
 import { ClientConnectionsState } from "./state/client-connections.state";
@@ -12,7 +12,7 @@ import { HttpModule } from "@nestjs/axios";
   providers: [OctoPrintClientService, WebsocketClientService, ClientConnectionsState],
   exports: [OctoPrintClientService, WebsocketClientService]
 })
-export class OctoprintModule {
+export class OctoprintModule implements OnModuleInit {
   constructor(
     private service: OctoPrintClientService,
     private clientConnectionsState: ClientConnectionsState,

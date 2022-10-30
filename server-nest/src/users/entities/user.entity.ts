@@ -5,7 +5,7 @@ import {
   CreateDateColumn,
   Entity,
   ObjectID,
-  ObjectIdColumn
+  PrimaryGeneratedColumn
 } from "typeorm";
 import { IsNotEmpty, MinLength, validate } from "class-validator";
 import { ValidationException } from "@/core/providers/validation.exception";
@@ -14,7 +14,7 @@ import { GroupEnum } from "../models/group.enum";
 
 @Entity()
 export class User {
-  @ObjectIdColumn()
+  @PrimaryGeneratedColumn()
   id: ObjectID;
 
   @Column()

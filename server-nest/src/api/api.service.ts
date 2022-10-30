@@ -4,8 +4,6 @@ import { InjectDataSource } from "@nestjs/typeorm";
 
 @Injectable()
 export class ApiService {
-  public static databaseStartupErrorOccurred = false;
-
   constructor(@InjectDataSource() private readonly connection: DataSource) {}
 
   isDatabaseConnected(): boolean {
