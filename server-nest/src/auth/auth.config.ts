@@ -1,28 +1,31 @@
 import { registerAs } from "@nestjs/config";
 import { Logger } from "@nestjs/common";
 
+export const jwtSecretToken = "JWT_SECRET";
+export const jwtExpirySecsToken = "JWT_EXPIRY_SECS";
+
 export const JWT_OPTIONS = "JWT_MODULE_OPTIONS";
-export const JWT_EXPIRES_IN_KEY = "JWT_EXPIRES_IN";
-export const JWT_SECRET_KEY = "JWT_SECRET";
+
+// Two JWT expiry settings
+export const defaultJwtSecret = `auto-jwt-fdm-monster-11-${new Date().getMonth()}-2022`;
+export const defaultJwtExpiry = 60;
 
 const logger = new Logger("AuthConfiguration");
 
 export const AuthConfig = registerAs(JWT_OPTIONS, () => {
-  if (!process.env[JWT_SECRET_KEY]) {
-    throw new Error(
-      `Please configure '${JWT_SECRET_KEY}' environment variable as a strong secret string and restart.`
-    );
+  if (!process.env[jwtSecretToken]) {
+    logger.warn(`Please configure ${jwtSecretToken} as a secret string. Providing default for now`);
   }
 
-  let parsedExpirySeconds = parseInt(process.env[JWT_EXPIRES_IN_KEY], 10);
+  let parsedExpirySeconds = parseInt(process.env[jwtExpirySecsToken], 10);
   if (!parsedExpirySeconds || parsedExpirySeconds < 60) {
-    logger.error(
-      `Please properly configure '${JWT_EXPIRES_IN_KEY}' as a number in seconds >60 and restart. Defaulting to 60 seconds.`
+    logger.warn(
+      `Please properly configure '${jwtExpirySecsToken}' as a number in seconds >60 and restart. Defaulting to 60 seconds`
     );
-    parsedExpirySeconds = 60;
+    parsedExpirySeconds = defaultJwtExpiry;
   }
   return {
-    secret: process.env[JWT_SECRET_KEY],
+    secret: process.env[jwtSecretToken] || defaultJwtSecret,
     expiresIn: parsedExpirySeconds
   };
 });

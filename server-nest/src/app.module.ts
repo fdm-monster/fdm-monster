@@ -1,18 +1,19 @@
 import { Logger, Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { ConfigModule } from "@nestjs/config";
+import { ConfigModule, ConfigService } from "@nestjs/config";
 import { PrintersModule } from "./printers/printers.module";
 import { UsersModule } from "./users/users.module";
 import { AuthModule } from "./auth/auth.module";
 import { APP_FILTER } from "@nestjs/core";
-import { ExceptionsLoggerFilter } from "./providers/exception.filters";
+import { ExceptionsLoggerFilter } from "./services/exceptions-logger.filter";
 import { ApiModule } from "./api/api.module";
-import { MigrationsModule } from "./migrations/migrations.module";
 import { BootController } from "./boot/boot.controller";
 import { SettingsModule } from "./settings/settings.module";
-import { MonitoringModule } from "./monitoring/monitoring.module";
 import { OctoprintModule } from "./octoprint/octoprint.module";
 import { ScheduleModule } from "@nestjs/schedule";
+import { CoreModule } from "@/core/core.module";
+import { DataSource } from "typeorm";
+import { TypeOrmConfigService } from "@/services/typeorm-config.service";
 
 @Module({
   providers: [
@@ -22,19 +23,24 @@ import { ScheduleModule } from "@nestjs/schedule";
     }
   ],
   imports: [
+    CoreModule,
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath: [".env", ".env.development", ".env.production"]
+      isGlobal: true
     }),
-    TypeOrmModule.forRoot(),
-    MigrationsModule,
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useClass: TypeOrmConfigService,
+      dataSourceFactory: async (options) => {
+        return await new DataSource(options).initialize();
+      }
+    }),
     ApiModule,
     AuthModule,
     UsersModule,
     SettingsModule,
     PrintersModule,
-    MonitoringModule,
     OctoprintModule
   ],
   controllers: [BootController]

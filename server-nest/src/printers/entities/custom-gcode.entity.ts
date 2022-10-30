@@ -1,6 +1,6 @@
 import { IsNotEmpty, validate } from "class-validator";
 import { BeforeInsert, BeforeUpdate, Column, Entity, ObjectID, ObjectIdColumn } from "typeorm";
-import { ValidationException } from "../../providers/validation.exception";
+import { ValidationException } from "../../core/providers/validation.exception";
 
 // TODO unused? Also, should this go to fileManagement module? File management can be daunting.
 @Entity()

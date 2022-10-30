@@ -6,6 +6,10 @@ module.exports = {
     "^.+\\.(t|j)s$": "ts-jest"
   },
   collectCoverageFrom: ["**/*.(t|j)s"],
+  setupFiles: ["../test/unit-setup/setup.ts"],
   coverageDirectory: "../coverage",
-  testEnvironment: "node"
+  testEnvironment: "node",
+  moduleNameMapper: {
+    "^@/(.*)$": "<rootDir>/../src/$1"
+  }
 };

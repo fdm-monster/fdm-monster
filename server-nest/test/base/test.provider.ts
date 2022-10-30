@@ -1,8 +1,10 @@
 import { Provider } from "@nestjs/common";
-import { AuthConfig } from "../../src/auth/auth.config";
-import { JwtOptions } from "../../src/auth/interfaces/jwt-options.model";
+import { AuthConfig } from "@/auth/auth.config";
+import { JwtOptions } from "@/auth/interfaces/jwt-options.model";
+import { CoreTestModule } from "./core-test.module";
 
 export const TestProviders: Provider<any>[] = [
+  CoreTestModule,
   {
     provide: AuthConfig.KEY,
     useValue: {

@@ -1,7 +1,7 @@
 import { PartialType } from "@nestjs/mapped-types";
 import { CreateUserDto } from "./create-user.dto";
 import { IsEnum, IsNotEmpty } from "class-validator";
-import { GroupEnum } from "../types/group.enum";
+import { GroupEnum } from "../models/group.enum";
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
   name: string;

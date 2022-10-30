@@ -4,7 +4,7 @@ import { TestProviders } from "../../../test/base/test.provider";
 import { JwtModule } from "@nestjs/jwt";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { User } from "../../users/entities/user.entity";
-import { UsersService } from "../../users/services/users.service";
+import { UsersService } from "../../users/users.service";
 import { JWT_SECRET_KEY } from "../auth.config";
 
 describe("AuthService", () => {
