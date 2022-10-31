@@ -42,14 +42,14 @@ Feel like joining in as a developer or do you have a quick fix? Great! Please re
 - [x] 🛡️ Server resilient against database connection failures with automatic retry of 5 seconds
 - [x] 🔌 FDM Monster Connector (OctoPrint Plugin) prerelease 0.1.0 ([find it here](https://gitHub.com/fdm-monster/fdm-connector/releases))
 - [x] 🛡️ Better authentication and authorization mechanisms
-- [x] :rocket: Docker multi-arch image (arm/v7, arm64 and amd64 architectures => Raspberry Pi with an 64 bits OS!)
+- [x] :rocket: Docker amd64 image (sadly arm/v7 has become intractable)
 - [x] :rocket: Printer Group management
 - [x] 🛡️ MongoDB 5 support
 - [x] :rocket: First core release tested in the field
 - [x] Server restart capability using PM2 and nodemon (for Linux, Windows)
 - [x] :rocket: Quick copy paste of OctoPrint credentials
 - [x] 🛡️ Complete API test coverage >80% (now at 80.5%)
-- [ ] 🛡️ NodeJS Server legacy-free (history, alerts, custom gcode and filament)
+- [x] 🛡️ NodeJS Server legacy-free (history, alerts, custom gcode and filament)
 - [ ] 🛡️ Frontend user and basic role management
 - [ ] 🛡️ Client test coverage
 - [ ] 🔌 FDM Connector - filament tracker 
@@ -100,7 +100,7 @@ Any changes should be publicly available through Github forks or repositories. F
 
 ## Contact
 - Main repository: [https://github.com/fdm-monster/fdm-monster](https://github.com/fdm-monster/fdm-monster)
-- Discord: [The Hub](https://discord.gg/mwA8uP8CMc)
+- Discord: [FDM Monster - Discord server](https://discord.gg/mwA8uP8CMc)
 
 Please join the discord, but stay professional and proactive!
 > "You give some, you take some."
