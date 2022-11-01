@@ -32,9 +32,9 @@
               <v-icon class="reorder-row-icon">reorder</v-icon>
               {{ printer.sortIndex }}
             </td>
-            <td>{{ printer.printerName }}</td>
-            <td>{{ printer.group }}</td>
             <td>{{ printer.enabled }}</td>
+            <td>{{ printer.printerName }}</td>
+            <td>{{ groupOfPrinter(printer.id).name }}</td>
           </tr>
         </draggable>
       </template>
@@ -75,8 +75,8 @@
         </v-chip>
       </template>
       <template v-slot:item.group="{ item }">
-        <v-chip v-if="item.group" color="primary" dark>
-          {{ item.group }}
+        <v-chip v-if="item.id" color="primary" dark>
+          {{ groupOfPrinter(item.id).name }}
         </v-chip>
       </template>
       <template v-slot:item.actions="{ item }">
@@ -125,17 +125,6 @@
           <v-icon>updates</v-icon>
           Update {{ isVirtualFirmware(item.firmware) ? "(VIRTUAL)" : "" }}
         </v-btn>
-        <!--        Sadly this is not available yet -->
-        <!--        <div v-if="isVirtualFirmware(item.firmware)">-->
-        <!--          <v-btn-->
-        <!--            color="primary"-->
-        <!--            @click="toggleVirtualFirmware(item)"-->
-        <!--            :disabled="!isVirtualFirmware(item.firmware)"-->
-        <!--          >-->
-        <!--            <v-icon>query_stats</v-icon>-->
-        <!--            Toggle VIRTUAL {{ isVirtualFirmware(item.firmware) ? "(enabled)" : "(disabled)" }}-->
-        <!--          </v-btn>-->
-        <!--        </div>-->
       </template>
     </v-data-table>
 
@@ -201,7 +190,7 @@ export default class Printers extends Vue {
       sortable: true,
       value: "printerName",
     },
-    { text: "Groups", value: "group" },
+    { text: "Assigned Group", value: "group", sortable: false },
     { text: "Actions", value: "actions", sortable: false },
     { text: "", value: "data-table-expand" },
   ];
@@ -230,6 +219,10 @@ export default class Printers extends Vue {
 
   get printers() {
     return printersState.printers;
+  }
+
+  groupOfPrinter(printerId: string) {
+    return printersState.groupOfPrinter(printerId);
   }
 
   get latestReleaseVersion() {
