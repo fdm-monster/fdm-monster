@@ -4,7 +4,7 @@ const { validateInput } = require("../handlers/validators");
 
 class PrintCompletionService {
   async create(input) {
-    const { printerId, fileName, completionLog, status } = await validateInput(
+    const { printerId, fileName, completionLog, status, context } = await validateInput(
       input,
       createPrintCompletionRules
     );
@@ -15,6 +15,7 @@ class PrintCompletionService {
       completionLog,
       status,
       createdAt: Date.now(),
+      context,
     });
   }
 

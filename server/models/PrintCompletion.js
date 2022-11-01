@@ -24,7 +24,7 @@ const PrintCompletionSchema = new Schema({
   },
   context: {
     type: Object,
-    required: false,
+    required: true,
   },
 });
 

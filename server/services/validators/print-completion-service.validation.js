@@ -4,7 +4,7 @@ const createPrintCompletionRules = {
   status: `required|string|in:${Object.values(EVENT_TYPES)}`,
   printerId: "required|string|mongoId",
   completionLog: "string",
-  context: "object",
+  context: "required|object",
 };
 
 module.exports = {
