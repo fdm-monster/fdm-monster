@@ -128,7 +128,7 @@ class TaskManagerService {
 
     this.taskStates[taskId] = {
       options: schedulerOptions,
-      timedTask
+      timedTask,
     };
 
     if (schedulerOptions.runOnce) {
@@ -174,7 +174,9 @@ class TaskManagerService {
 
     const taskState = this.getTaskState(taskId);
     taskState.options.disabled = true;
+    // TODO this does not seem to work as intended #https://github.com/fdm-monster/fdm-monster/issues/1071
     taskState.job.stop();
+    this.jobScheduler.stopById(taskId);
   }
 
   isTaskDisabled(taskId) {
@@ -206,9 +208,11 @@ class TaskManagerService {
       this.#logger.info(
         `Task '${taskId}' was scheduled (runImmediately: ${!!schedulerOptions.runImmediately}).`
       );
-      const job = new SimpleIntervalJob(schedulerOptions, timedTask);
-      this.jobScheduler.addSimpleIntervalJob(job);
+      const job = new SimpleIntervalJob(schedulerOptions, timedTask, {
+        id: taskId,
+      });
       taskState.job = job;
+      this.jobScheduler.addSimpleIntervalJob(job);
     } else {
       this.#logger.info(`Task '${taskId}' was marked as disabled (deferred execution).`);
     }
@@ -260,7 +264,7 @@ class TaskManagerService {
       if (!registration.lastError)
         registration.erroredlastError = {
           time: Date.now(),
-          error
+          error,
         };
 
       this.#logger.error(`Task '${taskId}' threw an exception:` + error.stack);

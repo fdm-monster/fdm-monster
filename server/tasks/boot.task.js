@@ -20,7 +20,6 @@ class BootTask {
   permissionService;
   roleService;
   userService;
-  influxDbSetupService;
   pluginRepositoryCache;
   printerFloorsCache;
   pluginFirmwareUpdateService;

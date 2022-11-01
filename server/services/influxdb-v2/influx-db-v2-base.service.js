@@ -10,6 +10,11 @@ class InfluxDbV2BaseService {
     this.logger = loggerFactory(InfluxDbV2BaseService.name);
   }
 
+  isConfigValid() {
+    const { bucket, org, url, token } = this.#getConfig();
+    return bucket && org && url && token;
+  }
+
   async getPointObservable(
     tags = ["3-prusa-rek3laag-rek4laag", "8-prusa-rek1laag-rek2laag", "11-k2-prusa-rekhoog"],
     measurement = "outlet"
