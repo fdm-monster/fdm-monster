@@ -4,6 +4,7 @@ const DITokens = require("../../container.tokens");
 const { configureContainer } = require("../../container");
 const { PrinterGroupMockData } = require("./test-data/printer-group.data");
 const { PrintCompletionService } = require("../../services/print-completion.service");
+const { EVENT_TYPES } = require("../../services/octoprint/constants/octoprint-websocket.constants");
 
 let printCompletionService;
 
@@ -30,14 +31,14 @@ describe(PrintCompletionService.name, () => {
     const completionEntry = await printCompletionService.create({
       printerId: "5f14968b11034c4ca49e7c69",
       completionLog: "some log happened here",
-      status: "failed",
+      status: EVENT_TYPES.PrintStarted,
       fileName: "mycode.gcode",
     });
     expect(completionEntry._id).toBeTruthy();
 
     const completionEntryWithoutLog = await printCompletionService.create({
       printerId: "5f14968b11034c4ca49e7c69",
-      status: "failed",
+      status: EVENT_TYPES.PrintFailed,
       fileName: "mycode.gcode",
     });
     expect(completionEntryWithoutLog._id).toBeTruthy();
