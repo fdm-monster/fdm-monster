@@ -3,13 +3,6 @@ const { AppConstants } = require("../server.constants");
 const { printerFileCleanSettingKey } = require("../constants/server-settings.constants");
 
 const ServerSettingsSchema = new mongoose.Schema({
-  onlinePolling: {
-    seconds: {
-      type: Number,
-      default: 0.5,
-      required: true,
-    },
-  },
   [printerFileCleanSettingKey]: {
     autoRemoveOldFilesBeforeUpload: {
       type: Boolean,
@@ -68,49 +61,6 @@ const ServerSettingsSchema = new mongoose.Schema({
       type: Number,
       default: 5000,
       required: true,
-    },
-  },
-  history: {
-    snapshot: {
-      onComplete: {
-        type: Boolean,
-        default: false,
-        required: true,
-      },
-      onFailure: {
-        type: Boolean,
-        default: false,
-        required: true,
-      },
-    },
-    thumbnails: {
-      onComplete: {
-        type: Boolean,
-        default: false,
-        required: true,
-      },
-      onFailure: {
-        type: Boolean,
-        default: false,
-        required: true,
-      },
-    },
-    timelapse: {
-      onComplete: {
-        type: Boolean,
-        default: false,
-        required: true,
-      },
-      onFailure: {
-        type: Boolean,
-        default: false,
-        required: true,
-      },
-      deleteAfter: {
-        type: Boolean,
-        default: false,
-        required: true,
-      },
     },
   },
 });

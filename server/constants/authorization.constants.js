@@ -10,6 +10,7 @@ const PERM_GROUP = {
   PrinterSettings: "PrinterSettings",
   PrinterGroups: "PrinterGroups",
   PrinterFloors: "PrinterFloors",
+  PrintCompletion: "PrintCompletion",
   ServerInfo: "ServerInfo",
 };
 
@@ -24,6 +25,10 @@ const PERMS = {
     Clear: serializePerm(PERM_GROUP.PrinterFiles, "Clear"),
     Upload: serializePerm(PERM_GROUP.PrinterFiles, "Upload"),
     Actions: serializePerm(PERM_GROUP.PrinterFiles, "Actions"),
+  },
+  [PERM_GROUP.PrintCompletion]: {
+    Default: serializePerm(PERM_GROUP.PrintCompletion, "Default"),
+    List: serializePerm(PERM_GROUP.PrintCompletion, "List"),
   },
   [PERM_GROUP.PrinterGroups]: {
     Default: serializePerm(PERM_GROUP.PrinterGroups, "Default"),
@@ -79,12 +84,14 @@ const ROLE_PERMS = {
     allPerms(PERM_GROUP.PrinterFloors),
     allPerms(PERM_GROUP.PrinterFiles),
     allPerms(PERM_GROUP.PrinterGroups),
+    allPerms(PERM_GROUP.PrintCompletion),
     allPerms(PERM_GROUP.PrinterSettings),
     allPerms(PERM_GROUP.ServerInfo)
   ),
   [ROLES.OPERATOR]: union(
     allPerms(PERM_GROUP.PrinterFiles),
     allPerms(PERM_GROUP.PrinterGroups),
+    allPerms(PERM_GROUP.PrintCompletion),
     allPerms(PERM_GROUP.PrinterFloors)
   ),
   [ROLES.GUEST]: [PERMS.PrinterFiles.Default, PERMS.PrinterFiles.Upload, PERMS.PrinterGroups.List],
