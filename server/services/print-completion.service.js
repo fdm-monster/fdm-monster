@@ -72,34 +72,34 @@ class PrintCompletionService {
       }));
 
       const failureEvents = mappedEvents.filter((e) => e.status === EVENT_TYPES.PrintFailed);
-      pc.failureEventsLastWeek = failureEvents.filter(
-        (e) => e.createdAt > Date.now() - 7 * durationDayMSec
-      );
-      pc.failureEventsLast48H = failureEvents.filter(
-        (e) => e.createdAt > Date.now() - 2 * durationDayMSec
-      );
-      pc.failureEventsLast24H = failureEvents.filter(
-        (e) => e.createdAt > Date.now() - durationDayMSec
-      );
       pc.failureCount = failureEvents?.length;
       pc.lastFailure = failureEvents?.length
         ? failureEvents.reduce((j1, j2) => (j1.createdAt > j2.createdAt ? j1 : j2))
         : null;
+      pc.failureEventsLastWeek = failureEvents.filter(
+        (e) => e.createdAt > Date.now() - 7 * durationDayMSec
+      )?.length;
+      pc.failureEventsLast48H = failureEvents.filter(
+        (e) => e.createdAt > Date.now() - 2 * durationDayMSec
+      )?.length;
+      pc.failureEventsLast24H = failureEvents.filter(
+        (e) => e.createdAt > Date.now() - durationDayMSec
+      )?.length;
 
       const successEvents = mappedEvents.filter((e) => e.status === EVENT_TYPES.PrintDone);
-      pc.successEventsLastWeek = successEvents.filter(
-        (e) => e.createdAt > Date.now() - 7 * durationDayMSec
-      );
-      pc.successEventsLast48H = successEvents.filter(
-        (e) => e.createdAt > Date.now() - 2 * durationDayMSec
-      );
-      pc.successEventsLast24H = successEvents.filter(
-        (e) => e.createdAt > Date.now() - durationDayMSec
-      );
       pc.successCount = successEvents?.length;
       pc.lastSuccess = successEvents?.length
         ? successEvents?.reduce((j1, j2) => (j1.createdAt > j2.createdAt ? j1 : j2))
         : null;
+      pc.successEventsLastWeek = successEvents.filter(
+        (e) => e.createdAt > Date.now() - 7 * durationDayMSec
+      )?.length;
+      pc.successEventsLast48H = successEvents.filter(
+        (e) => e.createdAt > Date.now() - 2 * durationDayMSec
+      )?.length;
+      pc.successEventsLast24H = successEvents.filter(
+        (e) => e.createdAt > Date.now() - durationDayMSec
+      )?.length;
 
       // Explodes in size quickly, remove the event timeline
       delete pc.printEvents;

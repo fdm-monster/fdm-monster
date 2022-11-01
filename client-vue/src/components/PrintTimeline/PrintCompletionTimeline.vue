@@ -76,11 +76,11 @@
                 <th class="text-left">Printer name</th>
                 <th class="text-left">Printer group</th>
                 <th class="text-left">Printer floor</th>
+                <th class="text-left">Succ/ Fail/ Total</th>
+                <th class="text-left">Last success</th>
                 <th class="text-left">Last failure</th>
-                <th class="text-left">Last completion</th>
-                <th class="text-left">Successes</th>
-                <th class="text-left">Failures</th>
-                <th class="text-left">Jobs tracked</th>
+                <th class="text-left">Successes (week/48H/24H)</th>
+                <th class="text-left">Failures (week/48H/24H)</th>
               </tr>
             </thead>
             <tbody>
@@ -88,10 +88,20 @@
                 <td>{{ printer(item._id)?.printerName }}</td>
                 <td>{{ groupOfPrinter(item._id)?.name }}</td>
                 <td>{{ floorOfPrinterGroup(groupOfPrinter(item._id)?._id)?.name }}</td>
-                <td>{{ 0 }}</td>
-                <td>{{ 0 }}</td>
-                <td>{{ item.timestamp }}</td>
-                <td>{{ item.data?.plugin }} {{ item.data?.state?.text }} {{ item.data?.type }}</td>
+                <td>
+                  &#215; {{ item.failureCount }} / &#128504; {{ item.successCount }}
+                  <strong>~{{ item.printCount }}</strong>
+                </td>
+                <td>{{ Date.now() - item.lastSuccess?.createdAt || "-" }}</td>
+                <td>{{ Date.now() - item.lastFailure?.createdAt || "-" }}</td>
+                <td>
+                  {{ item.successEventsLastWeek }} {{ item.successEventsLast48H }}
+                  {{ item.successEventsLast24H }}
+                </td>
+                <td>
+                  {{ item.failureEventsLastWeek }} {{ item.failureEventsLast48H }}
+                  {{ item.failureEventsLast24H }}
+                </td>
               </tr>
             </tbody>
           </template>
@@ -108,10 +118,7 @@ import { PrinterFloor } from "@/models/printer-floor/printer-floor.model";
 import { PrinterGroup } from "@/models/printer-groups/printer-group.model";
 import { Printer } from "@/models/printers/printer.model";
 import { PrintCompletionsService } from "@/backend/print-completions.service";
-import {
-  PrintCompletionsModel,
-  PrinterCompletions,
-} from "@/models/print-completions/print-completions.model";
+import { PrintCompletionsModel } from "@/models/print-completions/print-completions.model";
 
 export default Vue.extend({
   data(): {

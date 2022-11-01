@@ -1,14 +1,26 @@
-export type PrintJobEvents = {
-  printerId: string;
-  context: {
+export interface ShortEvent {
+  status: string;
+  fileName: string;
+  createdAt: number;
+}
+
+export interface ContextEvent extends ShortEvent {
+  context?: {
     correlationId: string;
-    events: {
-      status: string;
-      fileName: string;
-      createdAt: number;
-      printerId: string;
-    }[]; // ... others
+    [k: string]:
+      | string
+      | {
+          status: string;
+          createdAt: number;
+          printerId: string;
+        };
   };
+}
+
+export type PrintJobEvents = {
+  correlationId: string;
+  events: ShortEvent[]; // ... others
+  lastEvent: ShortEvent;
 };
 
 export interface PrinterCompletions {
@@ -17,13 +29,18 @@ export interface PrinterCompletions {
   eventCount: number;
   successCount: number;
   failureCount: number;
-  lastSuccess: any;
-  printEvents: PrintJobEvents;
-  printJobs: {
-    [k: string]: PrintJobEvents;
-  };
+  lastSuccess: ContextEvent;
+  lastFailure: ContextEvent;
+  failuresLastWeek: number;
+  failuresLast48H: number;
+  failuresLast24H: number;
+  successesLastWeek: number;
+  successesLast48H: number;
+  successesLast24H: number;
 
-  correlationIds: any[];
+  printJobs: PrintJobEvents[];
+
+  correlationIds: string[];
 }
 
 export type PrintCompletionsModel = PrinterCompletions[];
