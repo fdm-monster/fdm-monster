@@ -50,10 +50,11 @@ class PrintCompletionService {
     return printCompletionsAggr.map((pc) => {
       const jobs = groupArrayBy(pc.printEvents, (e) => e.context?.correlationId);
       pc.printJobs = Object.entries(jobs).map(([id, events]) => {
-        const eventMap = events.map(({ status, createdAt, fileName }) => ({
+        const eventMap = events.map(({ status, createdAt, fileName, completionLog }) => ({
           status,
           createdAt,
           fileName, // if this changes across events then a bug occurred
+          completionLog,
         }));
         return {
           correlationId: id,
@@ -64,12 +65,15 @@ class PrintCompletionService {
       pc.correlationIds = pc.printJobs.map((j) => j.correlationId);
       pc.printCount = pc.correlationIds?.length;
 
-      const mappedEvents = pc.printEvents.map(({ status, createdAt, fileName, context }) => ({
-        status,
-        createdAt,
-        fileName,
-        context,
-      }));
+      const mappedEvents = pc.printEvents.map(
+        ({ status, createdAt, fileName, context, completionLog }) => ({
+          status,
+          createdAt,
+          fileName,
+          context,
+          completionLog,
+        })
+      );
 
       const failureEvents = mappedEvents.filter((e) => e.status === EVENT_TYPES.PrintFailed);
       pc.failureCount = failureEvents?.length;

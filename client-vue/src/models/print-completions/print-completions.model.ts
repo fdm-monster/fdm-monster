@@ -2,6 +2,7 @@ export interface ShortEvent {
   status: string;
   fileName: string;
   createdAt: number;
+  completionLog?: string;
 }
 
 export interface ContextEvent extends ShortEvent {

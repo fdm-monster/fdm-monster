@@ -56,7 +56,7 @@ describe("PrinterGroupsController", () => {
     expect(printerEvents._id).toEqual("5f14968b11034c4ca49e7c69");
     expect(printerEvents.eventCount).toEqual(2);
     expect(printerEvents.printCount).toEqual(1);
-    expect(printerEvents.printCompletionEvents).toHaveLength(2);
-    expect(printerEvents.printJobs["123"]).toBeDefined();
+    expect(printerEvents.printJobs).toHaveLength(1);
+    expect(printerEvents.printJobs[0].correlationId).toEqual("123");
   });
 });

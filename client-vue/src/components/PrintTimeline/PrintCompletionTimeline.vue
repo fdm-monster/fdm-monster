@@ -93,7 +93,19 @@
                   <strong>~{{ item.printCount }}</strong>
                 </td>
                 <td>{{ Date.now() - item.lastSuccess?.createdAt || "-" }}</td>
-                <td>{{ Date.now() - item.lastFailure?.createdAt || "-" }}</td>
+                <td>
+                  <v-tooltip bottom>
+                    <template v-if="item.lastFailure?.status" v-slot:activator="{ on, attrs }">
+                      <v-icon v-bind="attrs" v-on="on">info</v-icon>
+                    </template>
+                    <span>
+                      {{ item.lastFailure?.status || "-" }} <br />
+                      {{ item.lastFailure?.createdAt }} <br />
+                      <small>{{ item.lastFailure?.fileName }}</small> <br />
+                      <strong>{{ item.lastFailure?.completionLog }}</strong> <br />
+                    </span>
+                  </v-tooltip>
+                </td>
                 <td>
                   {{ item.successEventsLastWeek }} {{ item.successEventsLast48H }}
                   {{ item.successEventsLast24H }}
