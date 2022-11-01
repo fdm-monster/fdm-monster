@@ -29,7 +29,7 @@ class PrintCompletionService {
       {
         $group: {
           _id: "$printerId",
-          count: { $sum: 1 },
+          eventCount: { $sum: 1 },
           printCompletionEvents: {
             $push: {
               printerId: "$printerId",
@@ -45,6 +45,8 @@ class PrintCompletionService {
 
     printCompletionsAggr.map((pc) => {
       pc.printJobs = groupArrayBy(pc.printCompletionEvents, (e) => e.context?.correlationId);
+      pc.correlationIds = Object.keys(pc.printJobs);
+      pc.printCount = pc.correlationIds?.length;
       return pc;
     });
 

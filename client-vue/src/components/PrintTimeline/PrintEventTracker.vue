@@ -19,8 +19,8 @@
                 multiple
                 return-object
               >
-              </v-select
-            ></v-col>
+              </v-select>
+            </v-col>
           </v-row>
 
           <v-row>
@@ -47,8 +47,9 @@
             <v-col>
               <v-icon>filter_list</v-icon>
               Filtering {{ filterFdmPrinters.length }} of {{ floorGroupFdmPrinters.length }} FDM
-              printers <strong>&nbsp;(required)</strong> </v-col
-            ><v-col>
+              printers <strong>&nbsp;(required)</strong></v-col
+            >
+            <v-col>
               <v-select
                 v-model="filterFdmPrinters"
                 :items="floorGroupFdmPrinters"
