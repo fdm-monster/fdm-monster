@@ -1,6 +1,7 @@
 const PrintCompletionModel = require("../models/PrintCompletion");
 const { createPrintCompletionRules } = require("./validators/print-completion-service.validation");
 const { validateInput } = require("../handlers/validators");
+const { groupArrayBy } = require("../utils/array.util");
 
 class PrintCompletionService {
   async create(input) {
@@ -24,7 +25,7 @@ class PrintCompletionService {
   }
 
   async listGroupByPrinterStatus() {
-    return PrintCompletionModel.aggregate([
+    const printCompletionsAggr = await PrintCompletionModel.aggregate([
       {
         $group: {
           _id: "$printerId",
@@ -41,6 +42,13 @@ class PrintCompletionService {
         },
       },
     ]);
+
+    printCompletionsAggr.map((pc) => {
+      pc.printJobs = groupArrayBy(pc.printCompletionEvents, (e) => e.context?.correlationId);
+      return pc;
+    });
+
+    return printCompletionsAggr;
   }
 }
 

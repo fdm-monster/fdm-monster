@@ -58,6 +58,7 @@ class PrintEventsSseTask {
       data.type === EVENT_TYPES.Error
     ) {
       this.#contextCache[printerId] = {
+        ...this.#contextCache[printerId],
         [data.type]: completion,
       };
       return;
