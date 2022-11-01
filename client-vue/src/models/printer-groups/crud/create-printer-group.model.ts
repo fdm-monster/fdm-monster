@@ -1,5 +1,5 @@
 import { newRandomNamePair } from "@/constants/noun-adjectives.data";
-import { PrinterInGroup } from "@/models/printers/printer-group.model";
+import { PrinterInGroup } from "@/models/printer-groups/printer-group.model";
 
 export const getDefaultCreatePrinterGroup = (): PreCreatePrinterGroup => ({
   id: undefined,

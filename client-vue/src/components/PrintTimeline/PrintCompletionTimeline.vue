@@ -65,6 +65,10 @@
           </v-row>
         </div>
         <hr />
+        <v-alert>
+          Please reload here if you want updated results:
+          <v-btn color="primary" @click="loadCompletions()">Reload</v-btn>
+        </v-alert>
         <v-simple-table dark>
           <template v-slot:default>
             <thead>
@@ -81,10 +85,11 @@
             </thead>
             <tbody>
               <tr v-for="item in shownCompletions" :key="item.name">
-                <td>{{ item.fdmEvent }}</td>
-                <td>{{ item.fdmEvent }}</td>
-                <td>{{ item.fdmEvent }}</td>
-                <td>{{ item.octoPrintEvent }}</td>
+                <td>{{ printer(item._id)?.printerName }}</td>
+                <td>{{ groupOfPrinter(item._id)?.name }}</td>
+                <td>{{ floorOfPrinterGroup(groupOfPrinter(item._id)?._id)?.name }}</td>
+                <td>{{ 0 }}</td>
+                <td>{{ 0 }}</td>
                 <td>{{ item.timestamp }}</td>
                 <td>{{ item.data?.plugin }} {{ item.data?.state?.text }} {{ item.data?.type }}</td>
               </tr>
@@ -100,12 +105,24 @@
 import Vue from "vue";
 import { printersState } from "@/store/printers.state";
 import { PrinterFloor } from "@/models/printer-floor/printer-floor.model";
-import { PrinterGroup } from "@/models/printers/printer-group.model";
+import { PrinterGroup } from "@/models/printer-groups/printer-group.model";
 import { Printer } from "@/models/printers/printer.model";
+import { PrintCompletionsService } from "@/backend/print-completions.service";
+import {
+  PrintCompletionsModel,
+  PrinterCompletions,
+} from "@/models/print-completions/print-completions.model";
 
 export default Vue.extend({
-  data: () =>
-    ({
+  data(): {
+    shownCompletions: PrintCompletionsModel;
+    floorGroupFdmPrinters: Printer[];
+    filterFdmPrinters: Printer[];
+    filterPrinterFloors: PrinterFloor[];
+    printerGroups: PrinterGroup[];
+    filterPrinterGroups: PrinterGroup[];
+  } {
+    return {
       shownCompletions: [],
       // Final result of all groups/floors
       floorGroupFdmPrinters: [],
@@ -113,14 +130,11 @@ export default Vue.extend({
       filterPrinterFloors: [],
       printerGroups: [],
       filterPrinterGroups: [],
-    } as {
-      shownCompletions: any[];
-      floorGroupFdmPrinters: Printer[];
-      filterFdmPrinters: Printer[];
-      filterPrinterFloors: PrinterFloor[];
-      printerGroups: PrinterGroup[];
-      filterPrinterGroups: PrinterGroup[];
-    }),
+    };
+  },
+  async created() {
+    await this.loadCompletions();
+  },
   computed: {
     printerFloors: () => {
       return printersState.printerFloors;
@@ -155,8 +169,19 @@ export default Vue.extend({
       this.updateGroups();
     },
   },
-  async mounted() {},
   methods: {
+    printer: (printerId: string) => {
+      return printersState.printer(printerId);
+    },
+    groupOfPrinter: (printerId: string) => {
+      return printersState.groupOfPrinter(printerId);
+    },
+    floorOfPrinterGroup: (printerGroupId: string) => {
+      return printersState.floorOfGroup(printerGroupId);
+    },
+    async loadCompletions() {
+      this.shownCompletions = await PrintCompletionsService.getCompletions();
+    },
     updateFloors() {
       if (!this.filterPrinterFloors?.length) {
         this.printerGroups = this.availablePrinterGroups;

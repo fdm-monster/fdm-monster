@@ -130,7 +130,7 @@ import Vue from "vue";
 import { distinct } from "@/utils/array.utils";
 import { printersState } from "@/store/printers.state";
 import { PrinterFloor } from "@/models/printer-floor/printer-floor.model";
-import { PrinterGroup } from "@/models/printers/printer-group.model";
+import { PrinterGroup } from "@/models/printer-groups/printer-group.model";
 import { Printer } from "@/models/printers/printer.model";
 
 export default Vue.extend({

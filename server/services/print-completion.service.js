@@ -2,6 +2,7 @@ const PrintCompletionModel = require("../models/PrintCompletion");
 const { createPrintCompletionRules } = require("./validators/print-completion-service.validation");
 const { validateInput } = require("../handlers/validators");
 const { groupArrayBy } = require("../utils/array.util");
+const { EVENT_TYPES } = require("./octoprint/constants/octoprint-websocket.constants");
 
 class PrintCompletionService {
   async create(input) {
@@ -30,11 +31,12 @@ class PrintCompletionService {
         $group: {
           _id: "$printerId",
           eventCount: { $sum: 1 },
-          printCompletionEvents: {
+          printEvents: {
             $push: {
               printerId: "$printerId",
               context: "$context",
               completionLog: "$completionLog",
+              fileName: "$fileName",
               status: "$status",
               createdAt: "$createdAt",
             },
@@ -43,14 +45,67 @@ class PrintCompletionService {
       },
     ]);
 
-    printCompletionsAggr.map((pc) => {
-      pc.printJobs = groupArrayBy(pc.printCompletionEvents, (e) => e.context?.correlationId);
-      pc.correlationIds = Object.keys(pc.printJobs);
+    const durationDayMSec = 24 * 60 * 60 * 1000;
+
+    return printCompletionsAggr.map((pc) => {
+      const jobs = groupArrayBy(pc.printEvents, (e) => e.context?.correlationId);
+      pc.printJobs = Object.entries(jobs).map(([id, events]) => {
+        const eventMap = events.map(({ status, createdAt, fileName }) => ({
+          status,
+          createdAt,
+          fileName, // if this changes across events then a bug occurred
+        }));
+        return {
+          correlationId: id,
+          events: eventMap,
+          lastEvent: eventMap.reduce((e1, e2) => (e1.createdAt > e2.createdAt ? e1 : e2)),
+        };
+      });
+      pc.correlationIds = pc.printJobs.map((j) => j.correlationId);
       pc.printCount = pc.correlationIds?.length;
+
+      const mappedEvents = pc.printEvents.map(({ status, createdAt, fileName, context }) => ({
+        status,
+        createdAt,
+        fileName,
+        context,
+      }));
+
+      const failureEvents = mappedEvents.filter((e) => e.status === EVENT_TYPES.PrintFailed);
+      pc.failureEventsLastWeek = failureEvents.filter(
+        (e) => e.createdAt > Date.now() - 7 * durationDayMSec
+      );
+      pc.failureEventsLast48H = failureEvents.filter(
+        (e) => e.createdAt > Date.now() - 2 * durationDayMSec
+      );
+      pc.failureEventsLast24H = failureEvents.filter(
+        (e) => e.createdAt > Date.now() - durationDayMSec
+      );
+      pc.failureCount = failureEvents?.length;
+      pc.lastFailure = failureEvents?.length
+        ? failureEvents.reduce((j1, j2) => (j1.createdAt > j2.createdAt ? j1 : j2))
+        : null;
+
+      const successEvents = mappedEvents.filter((e) => e.status === EVENT_TYPES.PrintDone);
+      pc.successEventsLastWeek = successEvents.filter(
+        (e) => e.createdAt > Date.now() - 7 * durationDayMSec
+      );
+      pc.successEventsLast48H = successEvents.filter(
+        (e) => e.createdAt > Date.now() - 2 * durationDayMSec
+      );
+      pc.successEventsLast24H = successEvents.filter(
+        (e) => e.createdAt > Date.now() - durationDayMSec
+      );
+      pc.successCount = successEvents?.length;
+      pc.lastSuccess = successEvents?.length
+        ? successEvents?.reduce((j1, j2) => (j1.createdAt > j2.createdAt ? j1 : j2))
+        : null;
+
+      // Explodes in size quickly, remove the event timeline
+      delete pc.printEvents;
+
       return pc;
     });
-
-    return printCompletionsAggr;
   }
 }
 

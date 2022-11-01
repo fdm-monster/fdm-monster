@@ -137,7 +137,7 @@
 import Vue from "vue";
 import { Component } from "vue-property-decorator";
 import { printersState } from "@/store/printers.state";
-import { PrinterGroup } from "@/models/printers/printer-group.model";
+import { PrinterGroup } from "@/models/printer-groups/printer-group.model";
 import { Printer } from "@/models/printers/printer.model";
 
 @Component({

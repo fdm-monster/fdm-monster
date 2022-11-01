@@ -14,8 +14,8 @@ class PrintCompletionController {
   }
 
   async list(req, res) {
-    const groups = await this.#printCompletionService.listGroupByPrinterStatus();
-    res.send(groups);
+    const completions = await this.#printCompletionService.listGroupByPrinterStatus();
+    res.send(completions);
   }
 }
 
