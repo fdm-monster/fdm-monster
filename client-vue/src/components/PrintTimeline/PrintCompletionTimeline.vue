@@ -47,8 +47,8 @@
             <v-col>
               <v-icon>filter_list</v-icon>
               Filtering {{ filterFdmPrinters.length }} of {{ floorGroupFdmPrinters.length }} FDM
-              printers <strong>&nbsp;(required)</strong></v-col
-            >
+              printers (optional)
+            </v-col>
             <v-col>
               <v-select
                 v-model="filterFdmPrinters"
@@ -59,40 +59,6 @@
                 multiple
                 open-on-clear
                 return-object
-              >
-              </v-select>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col>
-              <v-icon>filter_list</v-icon>
-              Filtering {{ filterEventTypes.length }} of {{ eventTypes.length }} OctoPrint events
-              (optional)
-            </v-col>
-
-            <v-col>
-              <v-select
-                v-model="filterEventTypes"
-                :items="eventTypes"
-                clearable
-                label="OctoPrint Events"
-                multiple
-              >
-              </v-select>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col>
-              <v-icon>filter_list</v-icon>
-              Filtering {{ filterStateTypes.length }} of {{ stateTypes.length }} states (optional)
-            </v-col>
-            <v-col>
-              <v-select
-                v-model="filterStateTypes"
-                :items="stateTypes"
-                clearable
-                label="Printer state labels"
-                multiple
               >
               </v-select>
             </v-col>
