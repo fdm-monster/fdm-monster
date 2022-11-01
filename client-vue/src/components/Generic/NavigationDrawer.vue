@@ -6,7 +6,7 @@
           <div class="d-flex align-center">
             <v-img
               :src="require('@/assets/logo.png')"
-              alt="Vuetify Logo"
+              alt="FDM Monster Logo"
               class="shrink mr-2 pt-3"
               contain
               transition="scale-transition"

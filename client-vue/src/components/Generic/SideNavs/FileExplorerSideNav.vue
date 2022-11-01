@@ -108,7 +108,7 @@
         :disabled="!isStoppable"
         class="extra-dense-list-item"
         link
-        @click.prevent.stop="clickStop()"
+        @click.prevent.stop="clickEmergencyStop()"
       >
         <v-list-item-avatar>
           <v-icon>stop</v-icon>
@@ -246,6 +246,7 @@ import { PrinterFile } from "@/models/printers/printer-file.model";
 import { PrinterFileBucket } from "@/models/printers/printer-file-bucket.model";
 import { isPrinterStoppable } from "@/utils/printer-state.utils";
 import { formatBytes } from "@/utils/file-size.util";
+import { CustomGcodeService } from "@/backend/custom-gcode.service";
 
 @Component({
   data: () => ({
@@ -394,7 +395,11 @@ export default class FileExplorerSideNav extends Vue {
   }
 
   async clickEmergencyStop() {
-    await printersState.sendStopJobCommand(this.printerId);
+    if (!this.printerId) return;
+
+    if (confirm("Are you sure to abort the print? Please reconnect after.")) {
+      await CustomGcodeService.postEmergencyM112Command(this.printerId);
+    }
   }
 
   async clickClearFiles() {
