@@ -33,6 +33,7 @@ describe(PrintCompletionService.name, () => {
       completionLog: "some log happened here",
       status: EVENT_TYPES.PrintStarted,
       fileName: "mycode.gcode",
+      context: {},
     });
     expect(completionEntry._id).toBeTruthy();
 
@@ -40,6 +41,7 @@ describe(PrintCompletionService.name, () => {
       printerId: "5f14968b11034c4ca49e7c69",
       status: EVENT_TYPES.PrintFailed,
       fileName: "mycode.gcode",
+      context: {},
     });
     expect(completionEntryWithoutLog._id).toBeTruthy();
   });
