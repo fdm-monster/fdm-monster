@@ -396,7 +396,7 @@ export default class FileExplorerSideNav extends Vue {
 
   async clickEmergencyStop() {
     if (!this.printerId) return;
-    
+
     if (confirm("Are you sure to abort the print? Please reconnect after.")) {
       await CustomGcodeService.postEmergencyM112Command(this.printerId);
     }
