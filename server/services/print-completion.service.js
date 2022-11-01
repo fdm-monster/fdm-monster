@@ -27,8 +27,17 @@ class PrintCompletionService {
     return PrintCompletionModel.aggregate([
       {
         $group: {
-          _id: "$status",
+          _id: "$printerId",
           count: { $sum: 1 },
+          printCompletionEvents: {
+            $push: {
+              printerId: "$printerId",
+              context: "$context",
+              completionLog: "$completionLog",
+              status: "$status",
+              createdAt: "$createdAt",
+            },
+          },
         },
       },
     ]);
