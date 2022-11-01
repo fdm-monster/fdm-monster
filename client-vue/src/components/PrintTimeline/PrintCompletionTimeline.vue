@@ -6,12 +6,12 @@
           <v-row>
             <v-col>
               <v-icon>filter_list</v-icon>
-              Filtering {{ filterPrinterFloors.length }} of {{ printerFloors.length }} printer
+              Filtering {{ filteredPrinterFloors.length }} of {{ printerFloors.length }} printer
               floors (optional)
             </v-col>
             <v-col>
               <v-select
-                v-model="filterPrinterFloors"
+                v-model="filteredPrinterFloors"
                 :items="printerFloors"
                 clearable
                 item-text="name"
@@ -26,12 +26,12 @@
           <v-row>
             <v-col>
               <v-icon>filter_list</v-icon>
-              Filtering {{ filterPrinterGroups.length }} of {{ printerGroups.length }} printer
+              Filtering {{ filteredPrinterGroups.length }} of {{ printerGroups.length }} printer
               groups (optional)
             </v-col>
             <v-col>
               <v-select
-                v-model="filterPrinterGroups"
+                v-model="filteredPrinterGroups"
                 :items="printerGroups"
                 clearable
                 item-text="name"
@@ -46,12 +46,12 @@
           <v-row>
             <v-col>
               <v-icon>filter_list</v-icon>
-              Filtering {{ filterFdmPrinters.length }} of {{ floorGroupFdmPrinters.length }} FDM
+              Filtering {{ filteredFdmPrinters.length }} of {{ floorGroupFdmPrinters.length }} FDM
               printers (optional)
             </v-col>
             <v-col>
               <v-select
-                v-model="filterFdmPrinters"
+                v-model="filteredFdmPrinters"
                 :items="floorGroupFdmPrinters"
                 clearable
                 item-text="printerName"
@@ -67,7 +67,7 @@
         <hr />
         <v-alert>
           Please reload here if you want updated results:
-          <v-btn color="primary" @click="loadCompletions()">Reload</v-btn>
+          <v-btn color="primary" x-small @click="loadCompletions()">Reload</v-btn>
         </v-alert>
         <v-simple-table dark>
           <template v-slot:default>
@@ -118,25 +118,27 @@ import { PrinterFloor } from "@/models/printer-floor/printer-floor.model";
 import { PrinterGroup } from "@/models/printer-groups/printer-group.model";
 import { Printer } from "@/models/printers/printer.model";
 import { PrintCompletionsService } from "@/backend/print-completions.service";
-import { PrintCompletionsModel } from "@/models/print-completions/print-completions.model";
+import { PrinterCompletions } from "@/models/print-completions/print-completions.model";
 
 export default Vue.extend({
   data(): {
-    shownCompletions: PrintCompletionsModel;
+    loadedCompletions: PrinterCompletions[];
+    shownCompletions: PrinterCompletions[];
     floorGroupFdmPrinters: Printer[];
-    filterFdmPrinters: Printer[];
-    filterPrinterFloors: PrinterFloor[];
+    filteredFdmPrinters: Printer[];
+    filteredPrinterFloors: PrinterFloor[];
     printerGroups: PrinterGroup[];
-    filterPrinterGroups: PrinterGroup[];
+    filteredPrinterGroups: PrinterGroup[];
   } {
     return {
+      loadedCompletions: [],
       shownCompletions: [],
       // Final result of all groups/floors
       floorGroupFdmPrinters: [],
-      filterFdmPrinters: [],
-      filterPrinterFloors: [],
+      filteredFdmPrinters: [],
+      filteredPrinterFloors: [],
       printerGroups: [],
-      filterPrinterGroups: [],
+      filteredPrinterGroups: [],
     };
   },
   async created() {
@@ -151,32 +153,29 @@ export default Vue.extend({
     },
   },
   watch: {
-    events() {
-      this.updateShownEvents();
-    },
-    filterStateTypes() {
-      this.updateShownEvents();
-    },
-    filterEventTypes() {
-      this.updateShownEvents();
-    },
-    filterFdmEventTypes() {
-      this.updateShownEvents();
-    },
     printerFloors() {
       this.updateFloors();
     },
     availablePrinterGroups() {
       this.updateGroups();
     },
-    filterPrinterFloors() {
+    filteredPrinterFloors() {
       this.updateFloors();
     },
-    filterPrinterGroups() {
+    filteredPrinterGroups() {
       this.updateGroups();
+    },
+    filteredFdmPrinters() {
+      this.updatePrinters();
     },
   },
   methods: {
+    async loadCompletions() {
+      this.loadedCompletions = [];
+      this.shownCompletions = [];
+      this.loadedCompletions = await PrintCompletionsService.getCompletions();
+      this.updatePrinters();
+    },
     printer: (printerId: string) => {
       return printersState.printer(printerId);
     },
@@ -186,15 +185,12 @@ export default Vue.extend({
     floorOfPrinterGroup: (printerGroupId: string) => {
       return printersState.floorOfGroup(printerGroupId);
     },
-    async loadCompletions() {
-      this.shownCompletions = await PrintCompletionsService.getCompletions();
-    },
     updateFloors() {
-      if (!this.filterPrinterFloors?.length) {
+      if (!this.filteredPrinterFloors?.length) {
         this.printerGroups = this.availablePrinterGroups;
         return;
       }
-      const flattenedGroupIds = this.filterPrinterFloors.flatMap((pf) => {
+      const flattenedGroupIds = this.filteredPrinterFloors.flatMap((pf) => {
         return pf.printerGroups.map((pg) => pg.printerGroupId);
       });
       this.printerGroups = this.availablePrinterGroups.filter((pg) => {
@@ -203,8 +199,8 @@ export default Vue.extend({
       });
     },
     updateGroups() {
-      let usedFilter = this.filterPrinterGroups;
-      if (!this.filterPrinterGroups.length) {
+      let usedFilter = this.filteredPrinterGroups;
+      if (!this.filteredPrinterGroups.length) {
         usedFilter = this.printerGroups;
       }
       const flattenedPrinterIds = usedFilter.flatMap((pg) => {
@@ -213,8 +209,11 @@ export default Vue.extend({
 
       this.floorGroupFdmPrinters = flattenedPrinterIds.map((fpId) => printersState.printer(fpId)!);
     },
-    updateShownEvents() {
-      this.shownCompletions = [];
+    updatePrinters() {
+      const pIds = this.filteredFdmPrinters.map((p) => p.id);
+      this.shownCompletions = pIds.length
+        ? this.loadedCompletions.filter((c) => pIds.includes(c._id))
+        : this.loadedCompletions;
     },
   },
 });
