@@ -41,7 +41,6 @@ export interface Printer {
   sortIndex: number;
   printerName: string;
   webSocketURL: string;
-  camURL: string;
   apiKey: string;
   printerURL: string;
   group: string;

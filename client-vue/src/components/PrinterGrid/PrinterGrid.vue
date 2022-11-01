@@ -40,7 +40,7 @@ import UpdatePrinterDialog from "@/components/Generic/Dialogs/UpdatePrinterDialo
 import { sseGroups, sseMessageGlobal } from "@/event-bus/sse.events";
 import { printersState } from "@/store/printers.state";
 import PrinterGridTile from "@/components/PrinterGrid/PrinterTile.vue";
-import { PrinterGroup } from "@/models/printers/printer-group.model";
+import { PrinterGroup } from "@/models/printer-groups/printer-group.model";
 import { columnCount, rowCount, totalVuetifyColumnCount } from "@/constants/printer-grid.constants";
 import { outletCurrentValuesState } from "@/store/outlet-current.state";
 

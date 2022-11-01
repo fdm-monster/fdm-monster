@@ -1,5 +1,5 @@
 import { Printer } from "@/models/printers/printer.model";
-import { PrinterGroup } from "@/models/printers/printer-group.model";
+import { PrinterGroup } from "@/models/printer-groups/printer-group.model";
 import { PrinterFloor } from "@/models/printer-floor/printer-floor.model";
 
 export interface TestProgressDetails {

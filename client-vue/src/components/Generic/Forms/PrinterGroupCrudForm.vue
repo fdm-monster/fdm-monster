@@ -63,7 +63,7 @@ import {
   getDefaultCreatePrinterGroup,
   PreCreatePrinterGroup,
 } from "@/models/printer-groups/crud/create-printer-group.model";
-import { PrinterGroup } from "@/models/printers/printer-group.model";
+import { PrinterGroup } from "@/models/printer-groups/printer-group.model";
 import { Printer } from "@/models/printers/printer.model";
 
 const watchedId = "printerId";

@@ -1,6 +1,6 @@
 import { BaseService } from "@/backend/base.service";
 import { ServerApi } from "@/backend/server.api";
-import { PrinterGroup } from "@/models/printers/printer-group.model";
+import { PrinterGroup } from "@/models/printer-groups/printer-group.model";
 import {
   CreatePrinterGroup,
   getDefaultCreatePrinterGroup,

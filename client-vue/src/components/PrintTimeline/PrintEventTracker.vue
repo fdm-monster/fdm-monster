@@ -19,8 +19,8 @@
                 multiple
                 return-object
               >
-              </v-select
-            ></v-col>
+              </v-select>
+            </v-col>
           </v-row>
 
           <v-row>
@@ -47,8 +47,9 @@
             <v-col>
               <v-icon>filter_list</v-icon>
               Filtering {{ filterFdmPrinters.length }} of {{ floorGroupFdmPrinters.length }} FDM
-              printers <strong>&nbsp;(required)</strong> </v-col
-            ><v-col>
+              printers <strong>&nbsp;(required)</strong></v-col
+            >
+            <v-col>
               <v-select
                 v-model="filterFdmPrinters"
                 :items="floorGroupFdmPrinters"
@@ -129,7 +130,7 @@ import Vue from "vue";
 import { distinct } from "@/utils/array.utils";
 import { printersState } from "@/store/printers.state";
 import { PrinterFloor } from "@/models/printer-floor/printer-floor.model";
-import { PrinterGroup } from "@/models/printers/printer-group.model";
+import { PrinterGroup } from "@/models/printer-groups/printer-group.model";
 import { Printer } from "@/models/printers/printer.model";
 
 export default Vue.extend({

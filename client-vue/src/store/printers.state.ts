@@ -1,5 +1,5 @@
 import { Action, getModule, Module, Mutation, VuexModule } from "vuex-module-decorators";
-import { PrinterGroup } from "@/models/printers/printer-group.model";
+import { PrinterGroup } from "@/models/printer-groups/printer-group.model";
 import { Printer } from "@/models/printers/printer.model";
 import { PrinterFileService, PrintersService } from "@/backend";
 import { CreatePrinter } from "@/models/printers/crud/create-printer.model";
@@ -67,6 +67,13 @@ class PrintersModule extends VuexModule {
 
   get printer() {
     return (printerId?: string) => this.printers.find((p) => p.id === printerId);
+  }
+
+  get floorOfGroup() {
+    return (printerGroupId: string) =>
+      this.printerFloors.find((pg) =>
+        pg.printerGroups.map((pid) => pid.printerGroupId).includes(printerGroupId)
+      );
   }
 
   get groupOfPrinter() {

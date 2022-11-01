@@ -1,11 +1,12 @@
 <template>
   <v-container>
-    <PrintTimeline />
+    <PrinterCompletionsTimeline />
   </v-container>
 </template>
 <script>
-import PrintTimeline from "@/components/PrintTimeline/PrintTimeline";
+// import PrintEventTracker from "@/components/PrintTimeline/PrintEventTracker.vue";
+import PrinterCompletionsTimeline from "@/components/PrintTimeline/PrintCompletionTimeline.vue";
 export default {
-  components: { PrintTimeline },
+  components: { PrinterCompletionsTimeline },
 };
 </script>

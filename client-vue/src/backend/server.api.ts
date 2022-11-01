@@ -7,6 +7,7 @@ export class ServerApi {
   static printerSettingsRoute = `${ServerApi.base}/printer-settings`;
   static printerGroupRoute = `${ServerApi.base}/printer-group`;
   static printerFloorRoute = `${ServerApi.base}/printer-floor`;
+  static printCompletionRoute = `${ServerApi.base}/print-completion`;
   static printerFilesRoute = `${ServerApi.base}/printer-files`;
   static printerFilesUploadStubRoute = `${ServerApi.base}/printer-files/upload-stub`;
   static serverPrivateRoute = `${ServerApi.base}/server`;
