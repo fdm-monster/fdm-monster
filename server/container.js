@@ -66,6 +66,7 @@ const { InfluxDbV2BaseService } = require("./services/influxdb-v2/influx-db-v2-b
 const { ConfigService } = require("./services/config.service");
 const { InfluxDbQueryTask } = require("./tasks/influxdb-query.task");
 const { PrintEventsSseTask } = require("./tasks/print-events.sse.task");
+const { PrintCompletionService } = require("./services/print-completion.service");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -116,6 +117,7 @@ function configureContainer() {
     [DITokens.printerFilesService]: asClass(PrinterFilesService),
     [DITokens.printerGroupService]: asClass(PrinterGroupService),
     [DITokens.printerFloorService]: asClass(PrinterFloorService).singleton(),
+    [DITokens.printCompletionService]: asClass(PrintCompletionService).singleton(),
     [DITokens.octoPrintApiService]: asClass(OctoPrintApiService).singleton(),
     [DITokens.pluginFirmwareUpdateService]: asClass(PluginFirmwareUpdateService).singleton(),
     [DITokens.historyService]: asClass(HistoryService),
