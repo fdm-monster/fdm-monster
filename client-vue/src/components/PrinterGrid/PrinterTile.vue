@@ -1,7 +1,7 @@
 <template>
   <v-card
     v-drop-upload="{ printers: [printer] }"
-    :class="{ 'tile-selected': selected, 'tile-setup': printer }"
+    :class="{ 'tile-selected': selected, 'tile-unselected': unselected, 'tile-setup': printer }"
     :disabled="!printer"
     :style="{ 'background-color': printerStateColor }"
     class="tile"
@@ -20,16 +20,16 @@
         <v-icon>stop</v-icon>
       </v-btn>
       <br />
-      <small class="xsmall-resized-font ml-1 text--secondary">
+      <small class="xsmall-resized-font text--secondary d-lg-inline d-none">
         {{ printer.printerState.state?.toUpperCase() }}
       </small>
-      <v-tooltip top open-delay="100" close-delay="1000">
+      <v-tooltip close-delay="1000" open-delay="0" right>
         <template v-slot:activator="{ on, attrs }">
           <div
-            v-bind="attrs"
-            v-on="on"
             :style="{ background: printerFilamentColorRgba }"
             class="d-flex justify-end filament-abs-border"
+            v-bind="attrs"
+            v-on="on"
           ></div>
         </template>
         <span>{{ printerFilamentColorName }}</span>
@@ -70,18 +70,12 @@ export default class PrinterGridTile extends Vue {
     return printersState.isSelectedPrinter(this.printer?.id);
   }
 
-  get printers() {
-    return printersState.printers;
+  get unselected() {
+    return printersState.selectedPrinters?.length && !this.selected;
   }
 
-  private printerFilamentColor() {
-    const ralCode = this.printer?.lastPrintedFile.parsedVisualizationRAL;
-    if (!ralCode) {
-      return undefined;
-    }
-
-    const ralString = ralCode.toString();
-    return Object.values(RAL_CODES).find((r) => r.code === ralString);
+  get printers() {
+    return printersState.printers;
   }
 
   get printerFilamentColorName() {
@@ -134,6 +128,16 @@ export default class PrinterGridTile extends Vue {
 
     printersState.toggleSelectedPrinter(this.printer);
   }
+
+  private printerFilamentColor() {
+    const ralCode = this.printer?.lastPrintedFile.parsedVisualizationRAL;
+    if (!ralCode) {
+      return undefined;
+    }
+
+    const ralString = ralCode.toString();
+    return Object.values(RAL_CODES).find((r) => r.code === ralString);
+  }
 }
 </script>
 
@@ -153,6 +157,10 @@ export default class PrinterGridTile extends Vue {
 .tile-selected {
   outline: 2px solid rgb(2, 248, 23) !important;
   opacity: 1;
+}
+
+.tile-unselected {
+  opacity: 0.65;
 }
 
 .tile-setup:hover {
