@@ -86,7 +86,9 @@ class ServerHost {
 
     const hostOrFqdn = "0.0.0.0";
     this.#httpServerInstance.listen(port, hostOrFqdn, () => {
-      this.#logger.info(`Server started... open it at http://${hostOrFqdn}:${port}`);
+      this.#logger.info(
+        `Server started... open it at http://${hostOrFqdn}:${port} or http://127.0.0.1:${port}`
+      );
     });
   }
 }
