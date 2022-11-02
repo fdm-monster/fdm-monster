@@ -9,6 +9,9 @@ const DITokens = require("../../container.tokens");
 let Model = PrintCompletion;
 let printCompletionService;
 const listRoute = `${AppConstants.apiRoute}/print-completion`;
+const getCompletionEntryRoute = (corrId) => `${listRoute}/${corrId}`;
+const contextsRoute = `${listRoute}/contexts`;
+const testRoute = `${listRoute}/test`;
 
 let request;
 
@@ -27,6 +30,17 @@ describe("PrinterGroupsController", () => {
     const response = await request.get(listRoute).send();
     expectOkResponse(response, []);
   });
+
+  it("should return context list", async () => {
+    const response = await request.get(contextsRoute).send();
+    expectOkResponse(response, {});
+  });
+
+  it("should return test query result", async () => {
+    const response = await request.get(testRoute).send();
+    expectOkResponse(response, {});
+  });
+
   it("should aggregate created completions", async () => {
     const completionEntryStart = await printCompletionService.create({
       printerId: "5f14968b11034c4ca49e7c69",
@@ -58,5 +72,9 @@ describe("PrinterGroupsController", () => {
     expect(printerEvents.printCount).toEqual(1);
     expect(printerEvents.printJobs).toHaveLength(1);
     expect(printerEvents.printJobs[0].correlationId).toEqual("123");
+
+    const responseEntries = await request.get(getCompletionEntryRoute("123"));
+    const completionEntries = expectOkResponse(responseEntries);
+    expect(completionEntries).toHaveLength(2);
   });
 });
