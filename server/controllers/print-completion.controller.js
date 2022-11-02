@@ -5,11 +5,13 @@ const { PERMS } = require("../constants/authorization.constants");
 
 class PrintCompletionController {
   #printCompletionService;
+  #printEventsSseTask;
 
   #logger;
 
-  constructor({ printCompletionService, loggerFactory }) {
+  constructor({ printCompletionService, loggerFactory, printEventsSseTask }) {
     this.#printCompletionService = printCompletionService;
+    this.#printEventsSseTask = printEventsSseTask;
     this.#logger = loggerFactory(PrintCompletionController.name);
   }
 
@@ -24,6 +26,11 @@ class PrintCompletionController {
     res.send(result);
   }
 
+  contexts(req, res) {
+    const contexts = this.#printEventsSseTask.contexts;
+    res.send(contexts);
+  }
+
   async list(req, res) {
     const completions = await this.#printCompletionService.listGroupByPrinterStatus();
     res.send(completions);
@@ -35,4 +42,5 @@ module.exports = createController(PrintCompletionController)
   .prefix(AppConstants.apiRoute + "/print-completion")
   .before([authenticate()])
   .get("/", "list", withPermission(PERMS.PrintCompletion.List))
-  .get("/test", "test", withPermission(PERMS.PrintCompletion.List));
+  .get("/test", "test", withPermission(PERMS.PrintCompletion.List))
+  .get("/contexts", "contexts", withPermission(PERMS.PrintCompletion.List));

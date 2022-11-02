@@ -23,6 +23,10 @@ class PrintEventsSseTask {
     });
   }
 
+  get contexts() {
+    return this.#contextCache;
+  }
+
   async handleMessage(fdmEvent, octoPrintEvent, data) {
     this.#sseHandler.send(JSON.stringify({ fdmEvent, octoPrintEvent, data }), "octoprint-events");
 

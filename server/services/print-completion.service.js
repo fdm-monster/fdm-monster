@@ -49,7 +49,7 @@ class PrintCompletionService {
   }
 
   async loadPrintContexts() {
-    return PrintCompletionModel.aggregate([
+    const contexts = await PrintCompletionModel.aggregate([
       { $sort: { printerId: 1, createdAt: -1 } },
       {
         $group: {
@@ -68,6 +68,14 @@ class PrintCompletionService {
         },
       },
     ]);
+
+    return Object.fromEntries(
+      contexts.map((c) => {
+        c.printerId = c._id;
+        delete c._id;
+        return [c.printerId, c];
+      })
+    );
   }
 
   async listGroupByPrinterStatus() {
