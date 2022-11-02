@@ -61,6 +61,9 @@ class PrintEventsSseTask {
         ...this.#contextCache[printerId],
         [data.type]: completion,
       };
+
+      const corrId = this.#contextCache[printerId].correlationId;
+      await this.#printCompletionService.updateContext(corrId, this.#contextCache[printerId]);
       return;
     }
 
@@ -74,13 +77,15 @@ class PrintEventsSseTask {
     } else if (data.type === EVENT_TYPES.PrintFailed || data.type === EVENT_TYPES.PrintDone) {
       completion.context = this.#contextCache[printerId] || {};
       await this.#printCompletionService.create(completion);
+
       // Clear the context now
       this.#contextCache[printerId] = {};
     }
   }
 
   async run() {
-    // Run once to bind event handler
+    // Run once to bind event handler and reload the cache
+    this.#contextCache = await this.#printCompletionService.loadPrintContexts();
   }
 }
 

@@ -5,6 +5,12 @@ const { groupArrayBy } = require("../utils/array.util");
 const { EVENT_TYPES } = require("./octoprint/constants/octoprint-websocket.constants");
 
 class PrintCompletionService {
+  #logger;
+
+  constructor({ loggerFactory }) {
+    this.#logger = loggerFactory(PrintCompletionService.name);
+  }
+
   async create(input) {
     const { printerId, fileName, completionLog, status, context } = await validateInput(
       input,
@@ -23,6 +29,45 @@ class PrintCompletionService {
 
   async list() {
     return PrintCompletionModel.find({});
+  }
+
+  async updateContext(correlationId, context) {
+    const completionEntry = await PrintCompletionModel.findOne({
+      status: EVENT_TYPES.PrintStarted,
+      context: {
+        correlationId,
+      },
+    });
+
+    if (!completionEntry) {
+      this.#logger.warning(
+        `Print with correlationId ${correlationId} could not be updated with new context as it was not found`
+      );
+    }
+    completionEntry.context = context;
+    await completionEntry.save();
+  }
+
+  async loadPrintContexts() {
+    return PrintCompletionModel.aggregate([
+      { $sort: { printerId: 1, createdAt: -1 } },
+      {
+        $group: {
+          _id: "$printerId",
+          createdAt: { $first: "$createdAt" },
+          context: { $first: "$context" },
+          status: { $first: "$status" },
+          fileName: { $first: "$fileName" },
+        },
+      },
+      {
+        $match: {
+          status: {
+            $nin: [EVENT_TYPES.PrintDone, EVENT_TYPES.PrintFailed],
+          },
+        },
+      },
+    ]);
   }
 
   async listGroupByPrinterStatus() {
