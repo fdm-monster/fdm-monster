@@ -10,7 +10,6 @@ class FileCache {
   // Associative array
   #printerFileStorage = {}; // Ass. array [Id] : { fileList, storage }
   #totalFileCount = 0;
-  #fileStatistics = getDefaultFileStatistics();
 
   #logger;
 
@@ -59,10 +58,6 @@ class FileCache {
     }
 
     return fileStorage;
-  }
-
-  getStatistics() {
-    return this.#fileStatistics;
   }
 
   getPrinterFiles(printerId) {
@@ -117,12 +112,11 @@ class FileCache {
         filePath
       );
 
-      return Status.failure("File was not found in cached printer fileList");
+      return this.#logger.info("File was not found in cached printer fileList");
     }
 
     fileList.files.splice(fileIndex, 1);
-
-    return Status.success("File was removed");
+    this.#logger.info(`File ${filePath} was removed`);
   }
 }
 

@@ -1,6 +1,3 @@
-const {
-  getCurrentProfileDefault,
-} = require("../services/octoprint/constants/octoprint-service.constants");
 const { PEVENTS, octoPrintWebsocketEvent } = require("../constants/event.constants");
 const {
   getDefaultPrinterState,
@@ -35,17 +32,8 @@ class PrinterState {
   #sessionKey;
 
   #stepSize = 10; // 0.1, 1, 10 or 100
-  #alerts = null;
-
   #entityData;
-
-  // We could split this off to a substate cache container as this data is hot from OP
-  #gcodeScripts;
-  #octoPrintVersion;
   #octoPrintSystemInfo = {};
-  #currentProfile = getCurrentProfileDefault();
-  #octoPi;
-
   #markedForRemoval = false;
   #apiAccessibility = {
     accessible: true,
@@ -156,51 +144,25 @@ class PrinterState {
         printerProfiles: [],
         printerProfilePreference: "_default",
       },
-      currentProfile: this.#currentProfile,
       octoPrintSystemInfo: this.#octoPrintSystemInfo,
-      corsCheck: true,
-      display: true, // TODO causes monitoring to show it. But it is not a proper place
       stepSize: this.#stepSize,
-      alerts: this.#alerts,
-      otherSettings: {
-        temperatureTriggers: this.#entityData.tempTriggers,
-        system: {
-          commands: {},
-        },
-        webCamSettings: {},
-      },
       octoPi: {
         version: "sure",
         model: "American Pi",
       },
-      tools: [
-        {
-          time: 0,
-          bed: {
-            actual: 0,
-          },
-          chamber: {
-            actual: 0,
-          },
-        },
-      ],
       // Unmapped data - comes from database model so would be nicer to make a child object
-      gcodeScripts: {},
       octoPrintVersion: this.getOctoPrintVersion(),
       lastPrintedFile: this.#entityData.lastPrintedFile || {
         parsedColor: "any",
         parsedVisualizationRAL: 0,
       },
-      selectedFilament: this.#entityData.selectedFilament,
       enabled: this.#entityData.enabled,
       sortIndex: this.#entityData.sortIndex,
       printerName: this.#entityData.settingsAppearance?.name,
       webSocketURL: this.#websocketAdapter?.webSocketURL || this.#entityData.webSocketURL,
-      camURL: this.#entityData.camURL,
       // apiKey: this.#entityData.apiKey, // INSECURE
       // currentUser // INSECURE
       printerURL: this.#entityData.printerURL,
-      group: this.#entityData.group,
     });
   }
 

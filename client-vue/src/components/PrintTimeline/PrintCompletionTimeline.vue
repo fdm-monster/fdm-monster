@@ -76,7 +76,7 @@
                 <th class="text-left">Printer name</th>
                 <th class="text-left">Printer group</th>
                 <th class="text-left">Printer floor</th>
-                <th class="text-left">Succ/ Fail/ Total</th>
+                <th class="text-left">Fail/ Success/ Total</th>
                 <th class="text-left">Last success</th>
                 <th class="text-left">Last failure</th>
                 <th class="text-left">Successes (week/48H/24H)</th>

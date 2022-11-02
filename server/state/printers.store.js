@@ -6,7 +6,6 @@ const { createTestPrinterRules } = require("./validation/create-test-printer.val
 const ObjectID = require("mongodb").ObjectID;
 
 class PrintersStore {
-  #settingsStore;
   #printerService;
   #printerStateFactory;
   #eventEmitter2;
@@ -15,14 +14,7 @@ class PrintersStore {
   #testPrinterState;
   #logger;
 
-  constructor({
-    settingsStore,
-    printerStateFactory,
-    eventEmitter2,
-    printerService,
-    loggerFactory
-  }) {
-    this.#settingsStore = settingsStore;
+  constructor({ printerStateFactory, eventEmitter2, printerService, loggerFactory }) {
     this.#printerService = printerService;
     this.#printerStateFactory = printerStateFactory;
     this.#eventEmitter2 = eventEmitter2;
@@ -128,7 +120,7 @@ class PrintersStore {
       printerURL,
       camURL,
       webSocketURL,
-      apiKey
+      apiKey,
     });
 
     printerState.updateEntityData(newDoc, true);
@@ -326,16 +318,6 @@ class PrintersStore {
     const doc = await this.#printerService.updateFlowRate(id, flowRate);
 
     printerState.updateEntityData(doc, false);
-  }
-
-  async resetPrinterPowerSettings(id) {
-    const printerState = this.getPrinterState(id);
-
-    const doc = await this.#printerService.resetPowerSettings(id);
-
-    printerState.updateEntityData(doc, false);
-
-    return doc.powerSettings;
   }
 }
 

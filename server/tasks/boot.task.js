@@ -15,8 +15,6 @@ class BootTask {
   printersStore;
   filesStore;
   printerGroupsCache;
-  historyStore;
-  filamentsStore;
   permissionService;
   roleService;
   userService;
@@ -31,10 +29,8 @@ class BootTask {
     settingsStore,
     multerService,
     printersStore,
-    historyStore,
     filesStore,
     printerGroupsCache,
-    filamentsStore,
     permissionService,
     roleService,
     userService,
@@ -50,8 +46,6 @@ class BootTask {
     this.printersStore = printersStore;
     this.filesStore = filesStore;
     this.printerGroupsCache = printerGroupsCache;
-    this.historyStore = historyStore;
-    this.filamentsStore = filamentsStore;
     this.permissionService = permissionService;
     this.roleService = roleService;
     this.userService = userService;
@@ -97,8 +91,6 @@ class BootTask {
     await this.multerService.clearUploadsFolder();
     await this.printersStore.loadPrintersStore();
     await this.filesStore.loadFilesStore();
-    await this.filamentsStore.loadFilamentsStore();
-    await this.historyStore.loadHistoryStore();
     await this.printerGroupsCache.loadCache();
 
     this.#logger.info("Synchronizing user permission and roles definition");

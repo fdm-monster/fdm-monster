@@ -85,51 +85,12 @@ const PrinterSchema = new mongoose.Schema({
     },
     required: true,
   },
-  // Non-essentials below
-  powerSettings: {
-    type: Object,
-    required: false,
-  },
-  costSettings: {
-    type: Object,
-    required: false,
-  },
-  tempTriggers: {
-    type: Object,
-    required: false,
-  },
   feedRate: {
     type: Number,
     required: false,
   },
   flowRate: {
     type: Number,
-    required: false,
-  },
-  selectedFilament: {
-    type: Object,
-    required: false,
-  },
-  currentIdle: {
-    type: Number,
-    required: false,
-  },
-  currentActive: {
-    type: Number,
-    required: false,
-  },
-  currentOffline: {
-    type: Number,
-    required: false,
-  },
-  // TODO move out
-  group: {
-    type: String,
-    required: false,
-  },
-  // TODO remove
-  storage: {
-    type: Object,
     required: false,
   },
 });

@@ -10,7 +10,6 @@ class PrinterSettingsController {
   #printersStore;
   #jobsCache;
   #taskManagerService;
-  #terminalLogsCache;
   #octoPrintApiService;
   #fileCache;
   #sseTask;
@@ -19,7 +18,6 @@ class PrinterSettingsController {
 
   constructor({
     printersStore,
-    terminalLogsCache,
     taskManagerService,
     printerSseTask,
     loggerFactory,
@@ -31,7 +29,6 @@ class PrinterSettingsController {
 
     this.#printersStore = printersStore;
     this.#jobsCache = jobsCache;
-    this.#terminalLogsCache = terminalLogsCache;
     this.#taskManagerService = taskManagerService;
     this.#octoPrintApiService = octoPrintApiService;
     this.#fileCache = fileCache;
