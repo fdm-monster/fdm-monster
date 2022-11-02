@@ -2,6 +2,8 @@ const { authenticate, withPermission } = require("../middleware/authenticate");
 const { createController } = require("awilix-express");
 const { AppConstants } = require("../server.constants");
 const { PERMS } = require("../constants/authorization.constants");
+const { validateInput } = require("../handlers/validators");
+const { idRules } = require("./validation/generic.validation");
 
 class PrintCompletionController {
   #printCompletionService;
@@ -31,6 +33,12 @@ class PrintCompletionController {
     res.send(contexts);
   }
 
+  async findCorrelatedEntries(req, res) {
+    const { correlationId } = await validateInput(req.params, { correlationId: "required|string" });
+    const result = await this.#printCompletionService.findPrintCompletion(correlationId);
+    res.send(result);
+  }
+
   async list(req, res) {
     const completions = await this.#printCompletionService.listGroupByPrinterStatus();
     res.send(completions);
@@ -43,4 +51,5 @@ module.exports = createController(PrintCompletionController)
   .before([authenticate()])
   .get("/", "list", withPermission(PERMS.PrintCompletion.List))
   .get("/test", "test", withPermission(PERMS.PrintCompletion.List))
-  .get("/contexts", "contexts", withPermission(PERMS.PrintCompletion.List));
+  .get("/contexts", "contexts", withPermission(PERMS.PrintCompletion.List))
+  .get("/:correlationId", "findCorrelatedEntries", withPermission(PERMS.PrintCompletion.Default));

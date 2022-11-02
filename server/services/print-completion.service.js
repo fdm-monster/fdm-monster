@@ -31,18 +31,23 @@ class PrintCompletionService {
     return PrintCompletionModel.find({});
   }
 
+  async findPrintCompletion(correlationId) {
+    return PrintCompletionModel.find({
+      "context.correlationId": correlationId,
+    });
+  }
+
   async updateContext(correlationId, context) {
     const completionEntry = await PrintCompletionModel.findOne({
+      "context.correlationId": correlationId,
       status: EVENT_TYPES.PrintStarted,
-      context: {
-        correlationId,
-      },
     });
 
     if (!completionEntry) {
       this.#logger.warning(
         `Print with correlationId ${correlationId} could not be updated with new context as it was not found`
       );
+      return;
     }
     completionEntry.context = context;
     await completionEntry.save();
