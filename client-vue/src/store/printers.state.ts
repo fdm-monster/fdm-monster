@@ -78,7 +78,11 @@ class PrintersModule extends VuexModule {
 
   get groupOfPrinter() {
     return (printerId: string) =>
-      this.printerGroups.find((pg) => pg.printers.map((pid) => pid.printerId).includes(printerId));
+      this.printerGroups?.length
+        ? this.printerGroups?.find((pg) =>
+            pg.printers.map((pid) => pid.printerId).includes(printerId)
+          )
+        : undefined;
   }
 
   get onlinePrinters() {

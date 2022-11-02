@@ -1,21 +1,21 @@
 <template>
   <v-dialog v-model="dialogOpened" persistent max-width="500">
     <v-card>
-      <v-card-title class="text-h5">
-        Upload problem
-        <span v-if="errorCode"> (code: {{ errorCode }})</span>
-      </v-card-title>
+      <v-card-title class="text-h5"> Upload problem occurred </v-card-title>
       <v-layout justify-center>
         <v-icon color="red" size="100">error_outline</v-icon>
       </v-layout>
       <v-card-text>
+        Please check: Was the printer connected and printing in OctoPrint? If yes, please reload.
+        this page. <br />
+
         Error type: {{ errorType }}<br />
         Failed uploads:
         <ul>
           <li v-for="(upload, index) in failedUploads" :key="index">
-            File: {{ upload.file.name }}<br />
-            Printer: {{ upload.printer.printerName }}<br />
-            Reason: <small>{{ upload.error }}</small>
+            File: {{ upload.file?.name }}<br />
+            Printer: {{ upload.printer?.printerName }}<br />
+            Reason: <small>{{ upload?.error }}</small>
           </li>
         </ul>
       </v-card-text>

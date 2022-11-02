@@ -76,7 +76,7 @@
       </template>
       <template v-slot:item.group="{ item }">
         <v-chip v-if="item.id" color="primary" dark>
-          {{ groupOfPrinter(item.id).name }}
+          {{ groupOfPrinter(item.id)?.name }}
         </v-chip>
       </template>
       <template v-slot:item.actions="{ item }">
