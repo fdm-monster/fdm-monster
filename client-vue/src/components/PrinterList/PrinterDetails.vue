@@ -9,13 +9,13 @@
       <v-col>
         Name: {{ printer.printerName }} <br />
         URL: {{ printer.printerURL }} <br />
-        Host: {{ printer.hostState.state }} -
+        Host: {{ printer.hostState?.state }} -
         <small>
-          <strong>{{ printer.hostState.desc }}</strong>
+          <strong>{{ printer.hostState?.desc }}</strong>
         </small>
         <br />
-        WebSocket: {{ printer.webSocketState.colour }} <br />
-        Printer: {{ printer.printerState.state }} <br />
+        WebSocket: {{ printer.webSocketState?.colour }} <br />
+        Printer: {{ printer.printerState?.state }} <br />
         Files: {{ getPrinterFileCount() }} <br />
         Sort Index: {{ printer.sortIndex }} <br />
         Id: {{ printer.id }}
