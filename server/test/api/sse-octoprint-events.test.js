@@ -47,7 +47,7 @@ describe("SSE-OctoPrint-Events", () => {
       // Emit fake event asynchronously
       delay(async () => {
         await eventEmitter.emit(octoPrintWebsocketEvent("someId"), {});
-      }, 100);
+      }, 200);
     });
 
     expect(firedEvent).toBeTruthy();
