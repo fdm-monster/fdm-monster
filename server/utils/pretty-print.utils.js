@@ -1,6 +1,4 @@
 function prettyPrintArray(array) {
-  if (!Array.isArray(array)) throw new Error("PrettyPrintArray | No Array Supplied");
-
   let arrayText = "";
 
   array.forEach((l) => {

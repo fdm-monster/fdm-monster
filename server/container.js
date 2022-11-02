@@ -11,7 +11,6 @@ const ScriptService = require("./services/script.service");
 const TaskManagerService = require("./services/task-manager.service");
 const SystemInfoStore = require("./state/system-info.store");
 const ServerUpdateService = require("./services/server-update.service");
-const SystemInfoBundleService = require("./services/system-info-bundle.service");
 const GithubApiService = require("./services/github-api.service");
 const HistoryService = require("./services/history.service");
 const FileCache = require("./state/data/file.cache");
@@ -104,7 +103,6 @@ function configureContainer() {
     [DITokens.serverUpdateService]: asClass(ServerUpdateService).singleton(),
     [DITokens.systemInfoStore]: asClass(SystemInfoStore).singleton(),
     [DITokens.githubApiService]: asClass(GithubApiService),
-    [DITokens.systemInfoBundleService]: asClass(SystemInfoBundleService),
     [DITokens.simpleGitService]: asValue(SimpleGitFactory()),
     [DITokens.httpClient]: asValue(
       axios.create({
