@@ -51,5 +51,5 @@ describe("SSE-OctoPrint-Events", () => {
     });
 
     expect(firedEvent).toBeTruthy();
-  }, 10000);
+  }, 2000);
 });

@@ -7,32 +7,32 @@ class OPClientErrors {
 const pluginManagerCommands = {
   install: {
     name: "install",
-    param: "url"
+    param: "url",
   },
   uninstall: {
     name: "install",
-    param: "plugin"
+    param: "plugin",
   },
   enable: {
     name: "enable",
-    param: "plugin"
+    param: "plugin",
   },
   disable: {
     name: "disable",
-    param: "plugin"
+    param: "plugin",
   },
   cleanup: {
     name: "cleanup",
-    param: "plugin"
+    param: "plugin",
   },
   cleanup_all: {
     name: "cleanup_all",
-    param: undefined
+    param: undefined,
   },
   refresh_repository: {
     name: "refresh_repository",
-    param: undefined
-  }
+    param: undefined,
+  },
 };
 
 const pluginRepositoryUrl = "https://plugins.octoprint.org/plugins.json";
@@ -53,50 +53,6 @@ function isLoginResponseGlobal(octoPrintResponse) {
   return !!octoPrintResponse && octoPrintResponse.name === "_api";
 }
 
-// TODO ofc this is lazy - but I'd rather have working code and optimize later
-function getCurrentProfileDefault() {
-  return {
-    id: "_default",
-    name: "Default",
-    color: "default",
-    model: "Generic RepRap Printer",
-    default: true,
-    current: true,
-    resource: "http://example.com/api/printerprofiles/_default",
-    volume: {
-      formFactor: "rectangular",
-      origin: "lowerleft",
-      width: 200,
-      depth: 200,
-      height: 200
-    },
-    heatedBed: true,
-    heatedChamber: false,
-    axes: {
-      x: {
-        speed: 6000,
-        inverted: false
-      },
-      y: {
-        speed: 6000,
-        inverted: false
-      },
-      z: {
-        speed: 200,
-        inverted: false
-      },
-      e: {
-        speed: 300,
-        inverted: false
-      }
-    },
-    extruder: {
-      count: 1,
-      offsets: [{ x: 0.0, y: 0.0 }]
-    }
-  };
-}
-
 module.exports = {
   OPClientErrors,
   contentTypeHeaderKey,
@@ -106,5 +62,4 @@ module.exports = {
   multiPartContentType,
   pluginManagerCommands,
   isLoginResponseGlobal,
-  getCurrentProfileDefault
 };

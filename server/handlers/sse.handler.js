@@ -4,8 +4,6 @@ class SseHandler {
     default: [],
   };
 
-  constructor({}) {}
-
   handleRequest(req, res, topic = "default") {
     res.writeHead(200, {
       "Content-Type": "text/event-stream",

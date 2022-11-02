@@ -29,19 +29,19 @@ describe("PrintersStore", () => {
     apiKey: "asd",
     webSocketURL: null,
     printerURL: null,
-    camURL: null
+    camURL: null,
   };
 
   const weakNewPrinter = {
     apiKey: "asdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasd",
     webSocketURL: "http://192.168.1.0:81",
-    printerURL: "http://192.168.1.0"
+    printerURL: "http://192.168.1.0",
   };
 
   const weakNewPrinter2 = {
     apiKey: "1C0KVOKWEAKWEAK8VBGAR",
     webSocketURL: "http://192.168.1.0:81",
-    printerURL: "http://192.168.1.0"
+    printerURL: "http://192.168.1.0",
   };
 
   it("should return with empty octoprint versions array", async () => {
@@ -56,11 +56,11 @@ describe("PrintersStore", () => {
 
     expect(() => printersStore.addPrinter(invalidNewPrinterState)).rejects.toHaveErrors({
       apiKey: {
-        rule: "length"
+        rule: "length",
       },
       webSocketURL: {
-        rule: "required"
-      }
+        rule: "required",
+      },
     });
 
     await expect(async () => await printersStore.addPrinter(weakNewPrinter)).rejects.toBeInstanceOf(
@@ -94,8 +94,8 @@ describe("PrintersStore", () => {
         colour: {
           category: expect.any(String),
           hex: expect.any(String),
-          name: expect.any(String)
-        }
+          name: expect.any(String),
+        },
       },
       hostState: {
         state: expect.any(String),
@@ -103,15 +103,14 @@ describe("PrintersStore", () => {
         colour: {
           category: expect.any(String),
           hex: expect.any(String),
-          name: expect.any(String)
-        }
+          name: expect.any(String),
+        },
       },
       webSocketState: {
         desc: expect.any(String),
-        colour: expect.any(String) // ?
+        colour: expect.any(String), // ?
       },
       stepSize: expect.any(Number),
-      alerts: null
     });
   });
 
@@ -148,7 +147,7 @@ describe("PrintersStore", () => {
     expect(printerState.getApiAccessibility()).toMatchObject({
       accessible: true,
       retryable: true,
-      reason: null
+      reason: null,
     });
   });
 

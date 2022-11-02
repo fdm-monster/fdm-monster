@@ -5,18 +5,16 @@ const { ROLES } = require("../constants/authorization.constants");
 
 class OctoprintEventsController {
   #settingsStore;
-  #historyStore;
   #sseHandler;
   #sseTask;
 
-  constructor({ settingsStore, historyStore, sseHandler, printEventsSseTask }) {
+  constructor({ settingsStore, sseHandler, printEventsSseTask }) {
     this.#settingsStore = settingsStore;
-    this.#historyStore = historyStore;
     this.#sseHandler = sseHandler;
     this.#sseTask = printEventsSseTask;
   }
 
-  async sse(req, res) {
+  sse(req, res) {
     this.#sseHandler.handleRequest(req, res, "octoprint-events");
   }
 }
