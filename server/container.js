@@ -9,7 +9,6 @@ const ClientSettingsService = require("./services/client-settings.service");
 const ServerReleaseService = require("./services/server-release.service");
 const ScriptService = require("./services/script.service");
 const TaskManagerService = require("./services/task-manager.service");
-const SystemInfoStore = require("./state/system-info.store");
 const ServerUpdateService = require("./services/server-update.service");
 const GithubApiService = require("./services/github-api.service");
 const HistoryService = require("./services/history.service");
@@ -101,7 +100,6 @@ function configureContainer() {
     [DITokens.cacheManager]: asFunction(configureCacheManager).singleton(),
     [DITokens.serverReleaseService]: asClass(ServerReleaseService).singleton(),
     [DITokens.serverUpdateService]: asClass(ServerUpdateService).singleton(),
-    [DITokens.systemInfoStore]: asClass(SystemInfoStore).singleton(),
     [DITokens.githubApiService]: asClass(GithubApiService),
     [DITokens.simpleGitService]: asValue(SimpleGitFactory()),
     [DITokens.httpClient]: asValue(
