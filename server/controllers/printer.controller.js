@@ -13,7 +13,7 @@ const {
 const { AppConstants } = require("../server.constants");
 const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
 const DITokens = require("../container.tokens");
-const { Status, getSettingsAppearanceDefault } = require("../constants/service.constants");
+const { getSettingsAppearanceDefault } = require("../constants/service.constants");
 const { printerResolveMiddleware } = require("../middleware/printer");
 const { generateCorrelationToken } = require("../utils/correlation-token.util");
 const { ROLES } = require("../constants/authorization.constants");
@@ -22,7 +22,6 @@ class PrinterController {
   #printersStore;
   #jobsCache;
   #taskManagerService;
-  #terminalLogsCache;
   #octoPrintApiService;
   #pluginRepositoryCache;
   #fileCache;
@@ -33,7 +32,6 @@ class PrinterController {
 
   constructor({
     printersStore,
-    terminalLogsCache,
     sseHandler,
     taskManagerService,
     printerSseTask,
@@ -47,7 +45,6 @@ class PrinterController {
 
     this.#printersStore = printersStore;
     this.#jobsCache = jobsCache;
-    this.#terminalLogsCache = terminalLogsCache;
     this.#taskManagerService = taskManagerService;
     this.#octoPrintApiService = octoPrintApiService;
     this.#pluginRepositoryCache = pluginRepositoryCache;
@@ -85,7 +82,7 @@ class PrinterController {
     const command = this.#octoPrintApiService.connectCommand;
     await this.#octoPrintApiService.sendConnectionCommand(printerLogin, command);
 
-    res.send(Status.success("Connect command sent"));
+    res.send({});
   }
 
   async sendSerialDisconnectCommand(req, res) {
@@ -94,7 +91,7 @@ class PrinterController {
     const command = this.#octoPrintApiService.disconnectCommand;
     await this.#octoPrintApiService.sendConnectionCommand(printerLogin, command);
 
-    res.send(Status.success("Disconnect command sent"));
+    res.send({});
   }
 
   /**
@@ -109,7 +106,7 @@ class PrinterController {
     const command = this.#octoPrintApiService.cancelJobCommand;
     await this.#octoPrintApiService.sendJobCommand(printerLogin, command);
 
-    res.send(Status.success("Cancel command sent"));
+    res.send({});
   }
 
   async testConnection(req, res) {
@@ -221,7 +218,6 @@ class PrinterController {
     this.#logger.info("Sorting printers according to provided order", JSON.stringify(data));
     await this.#printersStore.updateSortIndex(data.sortList);
 
-    // TODO return array with printerID ordering
     res.send({});
   }
 
@@ -232,7 +228,7 @@ class PrinterController {
     this.#logger.info("Changing printer enabled setting", JSON.stringify(data));
     await this.#printersStore.updateEnabled(currentPrinterId, data.enabled);
 
-    res.send();
+    res.send({});
   }
 
   async reconnectOctoPrint(req, res) {
@@ -241,7 +237,7 @@ class PrinterController {
     this.#logger.info("Refreshing OctoPrint API connection", currentPrinterId);
     this.#printersStore.reconnectOctoPrint(currentPrinterId);
 
-    res.send();
+    res.send({});
   }
 
   async setStepSize(req, res) {
@@ -249,7 +245,7 @@ class PrinterController {
     const data = await validateMiddleware(req, stepSizeRules);
 
     this.#printersStore.setPrinterStepSize(currentPrinterId, data.stepSize);
-    res.send();
+    res.send({});
   }
 
   async setFeedRate(req, res) {
@@ -257,7 +253,7 @@ class PrinterController {
     const data = await validateMiddleware(req, feedRateRules);
 
     await this.#printersStore.setPrinterFeedRate(currentPrinterId, data.feedRate);
-    res.send();
+    res.send({});
   }
 
   async setFlowRate(req, res) {
@@ -265,24 +261,7 @@ class PrinterController {
     const data = await validateMiddleware(req, flowRateRules);
 
     await this.#printersStore.setPrinterFlowRate(currentPrinterId, data.flowRate);
-    res.send();
-  }
-
-  async resetPowerSettings(req, res) {
-    const { currentPrinterId } = getScopedPrinter(req);
-
-    const defaultPowerSettings = await this.#printersStore.resetPrinterPowerSettings(
-      currentPrinterId
-    );
-
-    res.send({ powerSettings: defaultPowerSettings });
-  }
-
-  async getTerminalLogs(req, res) {
-    const { currentPrinterId } = getScopedPrinter(req);
-    this.#logger.info("Querying terminal logs for: ", currentPrinterId);
-    let terminalLogs = this.#terminalLogsCache.getPrinterTerminalLogs(currentPrinterId);
-    res.send(terminalLogs);
+    res.send({});
   }
 
   /**
@@ -334,6 +313,4 @@ module.exports = createController(PrinterController)
     .patch("/:id/step-size", "setStepSize")
     .patch("/:id/flow-rate", "setFlowRate")
     .patch("/:id/feed-rate", "setFeedRate")
-    .patch("/:id/reset-power-settings", "resetPowerSettings")
-    .get("/:id/terminal-logs", "getTerminalLogs")
     .get("/:id/plugin-list", "getPrinterPluginList");

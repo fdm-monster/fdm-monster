@@ -204,7 +204,7 @@ export default Vue.extend({
     const sseClient = await this.$sse.create({
       format: "json",
       forcePolyfill: true,
-      url: apiBase + "/api/history/sse",
+      url: apiBase + "/api/octoprint-events/sse",
     });
     sseClient.on("message", (msg: any) => {
       msg.timestamp = new Date().toLocaleTimeString();

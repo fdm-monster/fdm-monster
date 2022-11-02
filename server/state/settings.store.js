@@ -3,20 +3,15 @@ const { printerFileCleanSettingKey } = require("../constants/server-settings.con
 
 class SettingsStore {
   #serverSettings;
-  #clientSettings;
-
-  #clientSettingsService;
   #serverSettingsService;
 
-  constructor({ clientSettingsService, serverSettingsService }) {
-    this.#clientSettingsService = clientSettingsService;
+  constructor({ serverSettingsService }) {
     this.#serverSettingsService = serverSettingsService;
   }
 
   async loadSettings() {
     // Setup Settings as connection is established
     this.#serverSettings = await this.#serverSettingsService.getOrCreate();
-    this.#clientSettings = await this.#clientSettingsService.getOrCreate();
   }
 
   isRegistrationEnabled() {
@@ -29,13 +24,7 @@ class SettingsStore {
 
   getServerSettings() {
     return Object.freeze({
-      ...this.#serverSettings._doc
-    });
-  }
-
-  getClientSettings() {
-    return Object.freeze({
-      ...this.#clientSettings._doc
+      ...this.#serverSettings._doc,
     });
   }
 
@@ -57,12 +46,6 @@ class SettingsStore {
 
   async setLoginRequired(enabled = true) {
     this.#serverSettings = await this.#serverSettingsService.setLoginRequired(enabled);
-  }
-
-  async updateClientSettings(fullUpdate) {
-    this.#clientSettings = await this.#clientSettingsService.update(fullUpdate);
-
-    return this.getClientSettings();
   }
 
   async updateServerSettings(fullUpdate) {

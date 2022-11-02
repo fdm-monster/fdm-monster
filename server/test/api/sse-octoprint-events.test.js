@@ -10,7 +10,7 @@ let request;
 let container;
 let eventEmitter;
 let sseTask;
-const defaultRoute = `${AppConstants.apiRoute}/history`;
+const defaultRoute = `${AppConstants.apiRoute}/octoprint-events`;
 const sseRoute = `${defaultRoute}/sse`;
 
 beforeAll(async () => {
@@ -21,7 +21,7 @@ beforeAll(async () => {
   sseTask = container.resolve(DITokens.printEventsSseTask);
 });
 
-describe("SSE-History", () => {
+describe("SSE-OctoPrint-Events", () => {
   it("should be able to be called with an EventSource", async () => {
     const getRequest = request.get(sseRoute);
     const url = getRequest.url;

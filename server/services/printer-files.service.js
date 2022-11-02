@@ -21,7 +21,7 @@ class PrinterFilesService {
 
     return {
       fileList: printer.fileList,
-      storage: printer.storage
+      storage: printer.storage,
     };
   }
 
@@ -75,7 +75,7 @@ class PrinterFilesService {
         parsedVisualizationRAL: mappedRALColor?.RAL || undefined,
         parsedAmount: parsedData?.amount || undefined,
         parsedOrderCode: parsedData?.orderCode || undefined,
-        parsedMaterial: parsedData?.material || undefined
+        parsedMaterial: parsedData?.material || undefined,
       };
     }
 
@@ -112,7 +112,7 @@ class PrinterFilesService {
           filePath
         );
       } else {
-        return Status.failure("File was not found in printer fileList");
+        this.#logger.warning("File was not found in printer fileList");
       }
     }
 
@@ -176,7 +176,7 @@ class PrinterFilesService {
       fallbackApplied,
       orderCode,
       amount,
-      material
+      material,
     };
   }
 

@@ -28,8 +28,6 @@ const enabledRoute = (id) => `${updateRoute(id)}/enabled`;
 const stepSizeRoute = (id) => `${updateRoute(id)}/step-size`;
 const feedRateRoute = (id) => `${updateRoute(id)}/feed-rate`;
 const flowRateRoute = (id) => `${updateRoute(id)}/flow-rate`;
-const resetPowerSettingsRoute = (id) => `${updateRoute(id)}/reset-power-settings`;
-const terminalLogsRoute = (id) => `${getRoute(id)}/terminal-logs`;
 const printerPluginListRoute = (id) => `${getRoute(id)}/plugin-list`;
 const serialConnectCommandRoute = (id) => `${getRoute(id)}/serial-connect`;
 const serialDisconnectCommandRoute = (id) => `${getRoute(id)}/serial-disconnect`;
@@ -161,10 +159,7 @@ describe("PrinterController", () => {
     expect(printer.enabled).toBe(false);
 
     const response = await request.post(stopJobRoute(printer.id)).send();
-    expectOkResponse(response, {
-      success: true,
-      message: "Cancel command sent",
-    });
+    expectOkResponse(response);
   });
 
   it("should update printer correctly", async () => {
@@ -258,18 +253,6 @@ describe("PrinterController", () => {
     expectOkResponse(updatePatch);
   });
 
-  it("should reset printer power settings correctly", async () => {
-    const printer = await createTestPrinter(request);
-    const updatePatch = await request.patch(resetPowerSettingsRoute(printer.id)).send();
-    expectOkResponse(updatePatch);
-  });
-
-  it("should get printer connection logs cache", async () => {
-    const printer = await createTestPrinter(request);
-    const updatePatch = await request.get(terminalLogsRoute(printer.id)).send();
-    expectOkResponse(updatePatch);
-  });
-
   it("should get plugin list", async () => {
     octoPrintApiService.storeResponse(["test"], 200);
     const res = await request.get(pluginListRoute).send();
@@ -288,7 +271,7 @@ describe("PrinterController", () => {
     const response = { port: "/dev/ttyACM0" };
     octoPrintApiService.storeResponse(response, 200);
     const res = await request.post(serialConnectCommandRoute(printer.id)).send();
-    expectOkResponse(res, { message: "Connect command sent" });
+    expectOkResponse(res);
   });
 
   it("should send serial disconnect command", async () => {
@@ -296,7 +279,7 @@ describe("PrinterController", () => {
     const response = { port: "/dev/ttyACM0" };
     octoPrintApiService.storeResponse(response, 200);
     const res = await request.post(serialDisconnectCommandRoute(printer.id)).send();
-    expectOkResponse(res, { message: "Disconnect command sent" });
+    expectOkResponse(res);
   });
 
   it("should update sort indices", async () => {

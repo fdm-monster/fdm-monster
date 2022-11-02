@@ -2,10 +2,8 @@ const dbHandler = require("../db-handler");
 const { AppConstants } = require("../../server.constants");
 const { setupTestApp } = require("../test-server");
 const { expectOkResponse, expectInternalServerError } = require("../extensions");
-const Printer = require("../../models/Printer");
 const { createTestPrinter } = require("./test-data/create-printer");
 
-let Model = Printer;
 const defaultRoute = AppConstants.apiRoute + "/plugin/firmware-update";
 const listRoute = `${defaultRoute}/`;
 const scanRoute = `${defaultRoute}/scan`;
@@ -71,7 +69,7 @@ describe("PluginFirmwareUpdateController", () => {
     const response = await request.post(installPluginRoute(testPrinter.id)).send();
     expectOkResponse(response, {
       isInstalled: true,
-      installing: false
+      installing: false,
     });
   });
 

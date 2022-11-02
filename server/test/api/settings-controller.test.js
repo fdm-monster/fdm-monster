@@ -5,14 +5,13 @@ const { expectOkResponse } = require("../extensions");
 const {
   printerFileCleanSettingKey,
   getDefaultPrinterFileCleanSettings,
-  getDefaultSettings
+  getDefaultSettings,
 } = require("../../constants/server-settings.constants");
 
 let request;
 let container;
 
 const defaultRoute = `${AppConstants.apiRoute}/settings`;
-const clientRoute = `${defaultRoute}/client`;
 const serverRoute = `${defaultRoute}/server`;
 
 beforeAll(async () => {
@@ -21,23 +20,11 @@ beforeAll(async () => {
 });
 
 describe("SettingsController", () => {
-  const newClientSettings = {};
   const newServerSettings = {
     [printerFileCleanSettingKey]: {
-      autoRemoveOldFilesBeforeUpload: true
-    }
+      autoRemoveOldFilesBeforeUpload: true,
+    },
   };
-  it("should OK on GET client-settings", async () => {
-    const response = await request.get(clientRoute).send();
-    expect(response.body).not.toBeNull();
-    expectOkResponse(response);
-  });
-
-  it("should OK on PUT client-settings", async () => {
-    const response = await request.put(clientRoute).send(newClientSettings);
-    expect(response.body).not.toBeNull();
-    expectOkResponse(response);
-  });
 
   it("should OK on GET server-settings", async () => {
     const response = await request.get(serverRoute).send();
