@@ -146,9 +146,12 @@ class PrinterService {
   }
 
   async updateEnabled(printerId, enabled) {
-    const update = {
-      enabled,
-    };
+    const update = enabled
+      ? {
+          enabled,
+          disabledReason: null,
+        }
+      : { enabled };
 
     await validateInput(update, updatePrinterEnabledRule);
     await this.get(printerId);
@@ -160,8 +163,10 @@ class PrinterService {
   }
 
   async updateDisabledReason(printerId, disabledReason) {
+    const enabled = !!disabledReason?.length;
     const update = {
       disabledReason,
+      enabled,
     };
 
     await validateInput(update, update);
