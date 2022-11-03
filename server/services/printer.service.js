@@ -8,6 +8,9 @@ const {
   updateApiUsernameRule,
 } = require("./validators/printer-service.validation");
 const { getDefaultPrinterEntry } = require("../constants/service.constants");
+const {
+  updatePrinterDisabledReasonRules,
+} = require("../controllers/validation/printer-controller.validation");
 
 class PrinterService {
   /**
@@ -126,7 +129,7 @@ class PrinterService {
     });
   }
 
-  async updateConnectionSettings(printerId, { printerURL, camURL, webSocketURL, apiKey }) {
+  async updateConnectionSettings(printerId, { printerURL, webSocketURL, apiKey }) {
     const update = {
       printerURL: sanitizeURL(printerURL),
       webSocketURL: sanitizeURL(webSocketURL),
@@ -148,6 +151,20 @@ class PrinterService {
     };
 
     await validateInput(update, updatePrinterEnabledRule);
+    await this.get(printerId);
+
+    return PrinterModel.findByIdAndUpdate(printerId, update, {
+      new: true,
+      useFindAndModify: false,
+    });
+  }
+
+  async updateDisabledReason(printerId, disabledReason) {
+    const update = {
+      disabledReason,
+    };
+
+    await validateInput(update, update);
     await this.get(printerId);
 
     return PrinterModel.findByIdAndUpdate(printerId, update, {

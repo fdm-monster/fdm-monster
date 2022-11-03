@@ -113,12 +113,11 @@ class PrintersStore {
     return state.getLoginDetails();
   }
 
-  async updatePrinterConnectionSettings(printerId, { printerURL, camURL, webSocketURL, apiKey }) {
+  async updatePrinterConnectionSettings(printerId, { printerURL, webSocketURL, apiKey }) {
     const printerState = this.getPrinterState(printerId);
 
     const newDoc = await this.#printerService.updateConnectionSettings(printerId, {
       printerURL,
-      camURL,
       webSocketURL,
       apiKey,
     });
@@ -199,6 +198,13 @@ class PrintersStore {
     let printer = this.getPrinterState(printerId);
 
     const doc = await this.#printerService.updateEnabled(printerId, enabled);
+
+    printer.updateEntityData(doc, true);
+  }
+
+  async updateDisabledReason(printerId, disabledReason) {
+    let printer = this.getPrinterState(printerId);
+    const doc = await this.#printerService.updateDisabledReason(printerId, disabledReason);
 
     printer.updateEntityData(doc, true);
   }

@@ -9,6 +9,7 @@ const {
   feedRateRules,
   updatePrinterEnabledRule,
   testPrinterApiRules,
+  updatePrinterDisabledReasonRules,
 } = require("./validation/printer-controller.validation");
 const { AppConstants } = require("../server.constants");
 const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
@@ -206,7 +207,6 @@ class PrinterController {
 
     res.send({
       printerURL: newEntity.printerURL,
-      camURL: newEntity.camURL,
       apiKey: newEntity.apiKey,
       webSocketURL: newEntity.webSocketURL,
     });
@@ -227,6 +227,16 @@ class PrinterController {
 
     this.#logger.info("Changing printer enabled setting", JSON.stringify(data));
     await this.#printersStore.updateEnabled(currentPrinterId, data.enabled);
+
+    res.send({});
+  }
+
+  async updatePrinterDisabledReason(req, res) {
+    const { currentPrinterId } = getScopedPrinter(req);
+    const data = await validateMiddleware(req, updatePrinterDisabledReasonRules);
+
+    this.#logger.info("Changing printer disabled reason setting", JSON.stringify(data));
+    await this.#printersStore.updateDisabledReason(currentPrinterId, data.disabledReason);
 
     res.send({});
   }

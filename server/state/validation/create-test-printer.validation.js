@@ -5,9 +5,8 @@ const createTestPrinterRules = {
   correlationToken: "required|string",
   printerURL: "required|httpurl",
   webSocketURL: "required|wsurl",
-  camURL: "httpurl"
 };
 
 module.exports = {
-  createTestPrinterRules
+  createTestPrinterRules,
 };

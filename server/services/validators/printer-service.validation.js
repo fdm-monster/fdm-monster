@@ -8,19 +8,23 @@ const createPrinterRules = {
   enabled: "boolean",
   settingsAppearance: "object",
   "settingsAppearance.name": "string",
-  camURL: "httpurl"
 };
 
 const updatePrinterEnabledRule = {
-  enabled: "required|boolean"
+  enabled: "required|boolean",
 };
 
 const updateApiUsernameRule = {
-  currentUser: "required|string"
+  currentUser: "required|string",
+};
+
+const updatePrinterDisabledReasonRule = {
+  disabledReason: "string",
 };
 
 module.exports = {
   createPrinterRules,
   updatePrinterEnabledRule,
-  updateApiUsernameRule
+  updateApiUsernameRule,
+  updatePrinterDisabledReasonRule,
 };
