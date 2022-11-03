@@ -85,6 +85,7 @@ export default class PrinterMaintenanceDialog extends Vue {
 
     const printerId = this.printer?.id;
     if (!printerId) {
+      this.formData = {};
       this.closeDialog();
       return;
     }
@@ -92,6 +93,7 @@ export default class PrinterMaintenanceDialog extends Vue {
     const disabledReason = this.formData.disabledReason;
     await PrintersService.updatePrinterMaintenance(printerId, disabledReason);
 
+    this.formData = {};
     this.closeDialog();
   }
 
