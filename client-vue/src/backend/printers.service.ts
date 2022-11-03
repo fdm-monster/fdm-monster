@@ -117,6 +117,12 @@ export class PrintersService extends BaseService {
     return (await this.patchApi(path, printer)) as Printer;
   }
 
+  static async updatePrinterMaintenance(printerId: string, disabledReason: string) {
+    const path = ServerApi.postPrinterDisabledReasonRoute(printerId);
+
+    return (await this.patchApi(path, { disabledReason })) as Printer;
+  }
+
   static async testConnection(printer: CreatePrinter) {
     const path = ServerApi.printerTestConnectionRoute;
 

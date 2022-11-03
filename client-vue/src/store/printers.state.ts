@@ -34,6 +34,7 @@ class PrintersModule extends VuexModule {
   updateDialogPrinterGroup?: PrinterGroup = undefined;
   createFloorDialogOpened?: boolean = false;
   selectedPrinters: Printer[] = [];
+  maintenanceDialogPrinter?: Printer = undefined;
 
   readonly horizontalOffset = 1;
 
@@ -55,6 +56,10 @@ class PrintersModule extends VuexModule {
 
   get currentUpdateDialogPrinterGroup() {
     return this.updateDialogPrinterGroup;
+  }
+
+  get currentMaintenanceDialogPrinter() {
+    return this.maintenanceDialogPrinter;
   }
 
   get printerGroup() {
@@ -229,6 +234,10 @@ class PrintersModule extends VuexModule {
 
   @Mutation _setCreateFloorDialogOpened(opened: boolean) {
     this.createFloorDialogOpened = opened;
+  }
+
+  @Mutation _setMaintenanceDialogPrinter(printer?: Printer) {
+    this.maintenanceDialogPrinter = printer;
   }
 
   @Mutation replacePrinter({ printerId, printer }: { printerId: string; printer: Printer }) {
@@ -552,6 +561,11 @@ class PrintersModule extends VuexModule {
   @Action
   setCreateFloorDialogOpened(opened: boolean) {
     this._setCreateFloorDialogOpened(opened);
+  }
+
+  @Action
+  setMaintenanceDialogPrinter(printer?: Printer) {
+    this._setMaintenanceDialogPrinter(printer);
   }
 
   @Action

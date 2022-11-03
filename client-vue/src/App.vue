@@ -14,6 +14,7 @@
     <CreatePrinterGroupDialog />
     <CreatePrinterFloorDialog />
     <FileExplorerSideNav />
+    <PrinterMaintenanceDialog />
   </v-app>
 </template>
 
@@ -37,6 +38,7 @@ import { uploadsState } from "@/store/uploads.state";
 import CreatePrinterGroupDialog from "@/components/Generic/Dialogs/CreatePrinterGroupDialog.vue";
 import CreatePrinterFloorDialog from "@/components/Generic/Dialogs/CreatePrinterFloorDialog.vue";
 import { outletCurrentValuesState } from "@/store/outlet-current.state";
+import PrinterMaintenanceDialog from "@/components/Generic/Dialogs/PrinterMaintenanceDialog.vue";
 
 @Component({
   components: {
@@ -46,6 +48,7 @@ import { outletCurrentValuesState } from "@/store/outlet-current.state";
     CreatePrinterDialog,
     CreatePrinterGroupDialog,
     CreatePrinterFloorDialog,
+    PrinterMaintenanceDialog,
     FileExplorerSideNav,
     ErrorAlert,
   },
