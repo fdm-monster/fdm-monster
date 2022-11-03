@@ -17,6 +17,7 @@
       <v-list-item-content v-if="storedSideNavPrinter">
         <v-list-item-title>
           {{ storedSideNavPrinter.printerName }}
+          <strong> ({{ storedSideNavPrinter.enabled ? "enabled" : "disabled" }}) </strong>
           <strong
             v-if="storedSideNavPrinter.printerState.state === 'Operational'"
             class="float-end"
@@ -65,7 +66,9 @@
         </v-list-item-subtitle>
       </v-list-item-content>
     </v-list-item>
-
+    <v-alert color="primary" v-if="!storedSideNavPrinter?.apiAccessibility?.accessible">
+      This OctoPrint seems unreachable... Retrying. <v-icon>hourglass_top</v-icon>
+    </v-alert>
     <v-divider></v-divider>
 
     <v-list v-drop-upload="{ printers: [storedSideNavPrinter] }" dense subheader>
@@ -124,8 +127,8 @@
         </v-list-item-avatar>
         <v-list-item-content>
           <span v-if="isStoppable">Disconnect - stop print first</span>
-          <span v-else-if="isOperational">Disconnect</span>
-          <span v-else>Connect</span>
+          <span v-else-if="isOperational">Disconnect USB</span>
+          <span v-else>Connect USB</span>
         </v-list-item-content>
       </v-list-item>
 
@@ -170,7 +173,7 @@
         <v-list-item-avatar>
           <v-icon>settings</v-icon>
         </v-list-item-avatar>
-        <v-list-item-content> Settings</v-list-item-content>
+        <v-list-item-content> Settings </v-list-item-content>
       </v-list-item>
     </v-list>
     <v-divider></v-divider>

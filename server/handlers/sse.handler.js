@@ -4,6 +4,11 @@ class SseHandler {
     default: [],
   };
 
+  #logger;
+  constructor({ loggerFactory }) {
+    this.#logger = loggerFactory(SseHandler.name);
+  }
+
   handleRequest(req, res, topic = "default") {
     res.writeHead(200, {
       "Content-Type": "text/event-stream",
@@ -25,8 +30,9 @@ class SseHandler {
       const clients = this.#clients[topic];
       if (clients[clientId]) {
         delete clients[clientId];
+        this.#logger.info(`Removed SSE client ${clientId}`);
       } else {
-        console.log("SSE client not found, was it already deleted?");
+        this.#logger.info(`SSE client ${clientId} not found, was it already deleted?`);
       }
     };
 
