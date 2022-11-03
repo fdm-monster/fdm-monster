@@ -4,7 +4,7 @@ const { Schema } = require("mongoose");
 const PrinterGroupInFloorSchema = new Schema({
   printerGroupId: Schema.Types.ObjectId,
   // No metadata needed yet
-  id: false,
+  _id: false,
 });
 
 const PrinterFloorSchema = new Schema({
