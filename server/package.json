@@ -70,7 +70,7 @@
     "rxjs-websockets": "9.0.0",
     "semver": "7.3.8",
     "simple-git": "3.14.1",
-    "systeminformation": "5.12.11",
+    "systeminformation": "5.12.12",
     "toad-scheduler": "2.0.0",
     "winston": "3.8.2",
     "ws": "8.10.0"
