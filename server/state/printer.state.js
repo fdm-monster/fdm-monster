@@ -129,9 +129,6 @@ class PrinterState {
       hostState: this.#hostState,
       webSocketState: convertedWSState,
 
-      // ...
-      costSettings: { ...this.#entityData.costSettings },
-
       // Caches
       currentJob: flatJob,
 
@@ -156,12 +153,11 @@ class PrinterState {
         parsedColor: "any",
         parsedVisualizationRAL: 0,
       },
+      disabledReason: this.#entityData.disabledReason,
       enabled: this.#entityData.enabled,
       sortIndex: this.#entityData.sortIndex,
       printerName: this.#entityData.settingsAppearance?.name,
       webSocketURL: this.#websocketAdapter?.webSocketURL || this.#entityData.webSocketURL,
-      // apiKey: this.#entityData.apiKey, // INSECURE
-      // currentUser // INSECURE
       printerURL: this.#entityData.printerURL,
     });
   }

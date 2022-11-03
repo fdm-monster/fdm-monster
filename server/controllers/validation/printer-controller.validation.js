@@ -23,6 +23,10 @@ const updateSortIndexRules = {
   "sortList.*": "required|mongoId",
 };
 
+const updatePrinterDisabledReasonRules = {
+  disabledReason: "string",
+};
+
 const updatePrinterEnabledRule = {
   enabled: "required|boolean",
 };
@@ -30,7 +34,6 @@ const updatePrinterEnabledRule = {
 const updatePrinterConnectionSettingRules = {
   printerURL: "required|httpurl",
   webSocketURL: "required|wsurl",
-  camURL: "httpurl",
   apiKey: `required|minLength:${UUID_LENGTH}|maxLength:${UUID_LENGTH}`,
 };
 
@@ -42,4 +45,5 @@ module.exports = {
   updateSortIndexRules,
   updatePrinterEnabledRule,
   updatePrinterConnectionSettingRules,
+  updatePrinterDisabledReasonRules,
 };

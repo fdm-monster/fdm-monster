@@ -29,7 +29,6 @@ describe("PrintersStore", () => {
     apiKey: "asd",
     webSocketURL: null,
     printerURL: null,
-    camURL: null,
   };
 
   const weakNewPrinter = {

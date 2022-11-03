@@ -8,18 +8,17 @@ const testPrinterData = {
   enabled: false,
   group: groupName,
   settingsAppearance: {
-    name: "testPrinter 123"
-  }
+    name: "testPrinter 123",
+  },
 };
 
 const validNewPrinterState = {
   apiKey: "asdasasdasdasdasdasdasdasdasdasd",
   webSocketURL: "ws://asd.com/",
   printerURL: "https://asd.com:81",
-  camURL: "http://asd.com:81"
 };
 
 module.exports = {
   testPrinterData,
-  validNewPrinterState
+  validNewPrinterState,
 };

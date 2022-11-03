@@ -24,6 +24,8 @@ export class ServerApi {
   static pluginFirmwareReleasesRoute = `${ServerApi.pluginFirmwareUpdateRoute}/releases`;
 
   static getPrinterRoute = (id: string) => `${ServerApi.printerRoute}/${id}`;
+  static postPrinterDisabledReasonRoute = (id: string) =>
+    `${ServerApi.printerRoute}/${id}/disabled-reason`;
   static getPrinterLoginDetailsRoute = (id: string) =>
     `${ServerApi.getPrinterRoute(id)}/login-details`;
   static restartOctoPrintRoute = (id: string) =>

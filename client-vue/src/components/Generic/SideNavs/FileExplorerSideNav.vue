@@ -5,7 +5,7 @@
     loading="true"
     right
     temporary
-    width="500"
+    width="700"
     @close="closeDrawer()"
   >
     <v-list-item>
@@ -17,6 +17,7 @@
       <v-list-item-content v-if="storedSideNavPrinter">
         <v-list-item-title>
           {{ storedSideNavPrinter.printerName }}
+          <strong> ({{ storedSideNavPrinter.enabled ? "enabled" : "disabled" }}) </strong>
           <strong
             v-if="storedSideNavPrinter.printerState.state === 'Operational'"
             class="float-end"
@@ -65,17 +66,37 @@
         </v-list-item-subtitle>
       </v-list-item-content>
     </v-list-item>
-
+    <v-alert
+      color="primary"
+      v-if="!storedSideNavPrinter?.enabled || !storedSideNavPrinter?.apiAccessibility?.accessible"
+    >
+      <span v-if="!storedSideNavPrinter?.enabled">
+        Disabled OctoPrint, enable it first to get live updates
+      </span>
+      <span v-else>
+        This OctoPrint seems unreachable... Will keep trying for you <v-icon>hourglass_top</v-icon>
+      </span>
+    </v-alert>
+    <v-alert
+      v-if="!storedSideNavPrinter?.enabled && !storedSideNavPrinter?.disabledReason"
+      color="secondary"
+    >
+      This OctoPrint was disabled without reason.
+    </v-alert>
+    <v-alert v-if="storedSideNavPrinter?.disabledReason" color="black">
+      This OctoPrint was disabled for maintenance: <br />
+      <small>&nbsp;&nbsp;{{ storedSideNavPrinter?.disabledReason }} </small>
+    </v-alert>
     <v-divider></v-divider>
 
     <v-list v-drop-upload="{ printers: [storedSideNavPrinter] }" dense subheader>
-      <v-subheader inset>Commands</v-subheader>
+      <v-subheader inset>Manage FDM Monster instance</v-subheader>
 
       <v-list-item class="extra-dense-list-item" link @click.prevent.stop="toggleEnabled()">
         <v-list-item-avatar>
           <v-tooltip bottom>
             <template v-slot:activator="{ on, attrs }">
-              <v-icon :color="isEnabled ? 'primary' : 'secondary'" dark v-bind="attrs" v-on="on">
+              <v-icon :color="isEnabled ? 'primary' : 'green'" dark v-bind="attrs" v-on="on">
                 dns
               </v-icon>
             </template>
@@ -88,6 +109,31 @@
         </v-list-item-content>
       </v-list-item>
 
+      <v-list-item class="extra-dense-list-item" link @click.prevent.stop="toggleMaintenance()">
+        <v-list-item-avatar>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-icon
+                :color="!isUnderMaintenance ? 'primary' : 'green'"
+                dark
+                v-bind="attrs"
+                v-on="on"
+              >
+                construction
+              </v-icon>
+            </template>
+            <span>This does not impact your print</span>
+          </v-tooltip>
+        </v-list-item-avatar>
+        <v-list-item-content>
+          <span v-if="!isUnderMaintenance">Enable Maintenance</span>
+          <span v-else-if="isUnderMaintenance">Complete Maintenance</span>
+        </v-list-item-content>
+      </v-list-item>
+
+      <v-divider></v-divider>
+      <v-subheader inset>Commands</v-subheader>
+
       <v-list-item
         :disabled="isStoppable"
         class="extra-dense-list-item"
@@ -99,8 +145,8 @@
         </v-list-item-avatar>
         <v-list-item-content>
           <span v-if="isStoppable">Disconnect - stop print first</span>
-          <span v-else-if="isOperational">Disconnect</span>
-          <span v-else>Connect</span>
+          <span v-else-if="isOperational">Disconnect USB</span>
+          <span v-else>Connect USB</span>
         </v-list-item-content>
       </v-list-item>
 
@@ -271,6 +317,10 @@ export default class FileExplorerSideNav extends Vue {
     return this.storedSideNavPrinter?.enabled;
   }
 
+  get isUnderMaintenance() {
+    return !!this.storedSideNavPrinter?.disabledReason?.length;
+  }
+
   get filesListed() {
     return this.shownFileBucket?.files || [];
   }
@@ -299,7 +349,9 @@ export default class FileExplorerSideNav extends Vue {
   async inputUpdate(viewedPrinter?: Printer, oldVal?: Printer) {
     this.drawerOpened = !!viewedPrinter;
     const printerId = viewedPrinter?.id;
-    if (!viewedPrinter || !printerId) return;
+    if (!viewedPrinter || !printerId) {
+      return;
+    }
 
     if (!this.shownFileBucket || viewedPrinter.id !== this.shownFileBucket.printerId || !oldVal) {
       await this.refreshFiles(viewedPrinter);
@@ -360,6 +412,23 @@ export default class FileExplorerSideNav extends Vue {
 
     const newSetting = !this.storedSideNavPrinter.enabled;
     await PrintersService.toggleEnabled(this.printerId, newSetting);
+  }
+
+  async toggleMaintenance() {
+    if (!this.printerId) {
+      throw new Error("Printer ID not set, cant toggle maintenance");
+    }
+    if (!this.storedSideNavPrinter) {
+      throw new Error("Cant toggle enabled, sidenav printer unset");
+    }
+
+    if (this.isUnderMaintenance) {
+      await PrintersService.updatePrinterMaintenance(this.printerId);
+      return;
+    }
+
+    printersState.setMaintenanceDialogPrinter(this.storedSideNavPrinter);
+    this.closeDrawer();
   }
 
   async refreshFiles(viewedPrinter: Printer) {

@@ -6,7 +6,6 @@ const { printerResolveMiddleware } = require("../middleware/printer");
 const { getScopedPrinter } = require("../handlers/validators");
 
 const cacheKey = "firmware-state";
-const cachePluginStateKey = "firmware-plugin-installed-state";
 
 class PluginFirmwareUpdateController {
   #cacheManager;
@@ -116,20 +115,20 @@ class PluginFirmwareUpdateController {
           id: printer.id,
           firmware: version,
           printerName: printer.getName(),
-          pluginInstalled: isInstalled
+          pluginInstalled: isInstalled,
         });
       } catch (e) {
         this.#logger.warning("Firmware updater plugin scan failed", e);
         failureStates.push({
           id: printer.id,
           printerName: printer.getName(),
-          error: e
+          error: e,
         });
       }
     }
     const result = {
       firmwareStates: printerFirmwareStates,
-      failures: failureStates
+      failures: failureStates,
     };
     this.#cacheManager.set(cacheKey, result, { ttl: 3600 * 4 });
     return result;
@@ -141,7 +140,7 @@ module.exports = createController(PluginFirmwareUpdateController)
   .before([
     authenticate(),
     authorizeRoles([ROLES.OPERATOR, ROLES.ADMIN]),
-    printerResolveMiddleware()
+    printerResolveMiddleware(),
   ])
   .get("/", "listUpdateState")
   .get("/releases", "listFirmwareReleasesCache")

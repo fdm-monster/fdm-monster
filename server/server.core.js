@@ -2,7 +2,6 @@ const express = require("express");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const passport = require("passport");
-const DITokens = require("./container.tokens");
 const { configureContainer } = require("./container");
 const { scopePerRequest } = require("awilix-express");
 const cors = require("cors");
@@ -21,12 +20,12 @@ function setupNormalServer() {
     .use(
       cors({
         origin: "*",
-        methods: "GET,HEAD,PUT,PATCH,POST,DELETE"
+        methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
       })
     )
     .use(
       helmet({
-        contentSecurityPolicy: process.env[AppConstants.CONTENT_SECURITY_POLICY_ENABLED] || false
+        contentSecurityPolicy: process.env[AppConstants.CONTENT_SECURITY_POLICY_ENABLED] || false,
         // hsts: true
       })
     )
@@ -38,7 +37,7 @@ function setupNormalServer() {
       session({
         secret: "supersecret",
         resave: true,
-        saveUninitialized: true
+        saveUninitialized: true,
       })
     )
     .use(passport.initialize())
@@ -49,10 +48,10 @@ function setupNormalServer() {
 
   return {
     httpServer,
-    container
+    container,
   };
 }
 
 module.exports = {
-  setupNormalServer
+  setupNormalServer,
 };
