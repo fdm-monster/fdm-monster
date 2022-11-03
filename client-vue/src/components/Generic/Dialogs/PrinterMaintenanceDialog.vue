@@ -6,9 +6,20 @@
           <v-card-title>
             <span class="text-h5"> Mark printer for maintenance </span>
           </v-card-title>
+          <v-alert color="secondary"> Keep this short so it fits on a Print Tile</v-alert>
           <v-card-text>
             <v-row>
               <v-col cols="12">
+                <v-select
+                  v-model="selectedQuickItems"
+                  :chips="true"
+                  :items="quickItems"
+                  clearable
+                  color="primary"
+                  multiple
+                  placeholder="Quick select reason"
+                  @change="updateText()"
+                ></v-select>
                 <validation-provider v-slot="{ errors }" name="JSON" rules="required">
                   <v-textarea
                     v-model="formData.disabledReason"
@@ -16,7 +27,7 @@
                     data-vv-validate-on="change|blur"
                   >
                     <template v-slot:label>
-                      <div>Disabled reason (required)</div>
+                      <div>Type the reason*</div>
                     </template>
                   </v-textarea>
                 </validation-provider>
@@ -48,10 +59,37 @@ import { Printer } from "@/models/printers/printer.model";
     ValidationProvider,
     ValidationObserver,
   },
+  data() {
+    return { selectedQuickItems: [] };
+  },
 })
 export default class PrinterMaintenanceDialog extends Vue {
   showingDialog = false;
   formData: any = {};
+  selectedQuickItems = [];
+  quickItems = [
+    "Cable USB ",
+    "Cable Heatbed",
+    "Thermistor Heatbed",
+    "Thermistor Heatblock",
+    "Mintemp",
+    "Thermal Runaway",
+    "Mintemp Nozzle",
+    "Mintemp Heatbed",
+    "Nozzle",
+    "Nozzle Clog",
+    "Fan Hotend",
+    "Fan Part cooling",
+    "Extruder rattle",
+    "Extruder",
+    "Z Axis",
+    "X Axis",
+    "Y Axis",
+    "Rented",
+    "Rambo",
+    "Other",
+    "Clean",
+  ];
 
   $refs!: {
     validationObserver: InstanceType<typeof ValidationObserver>;
@@ -74,6 +112,10 @@ export default class PrinterMaintenanceDialog extends Vue {
         this.closeDialog();
       }
     });
+  }
+
+  updateText() {
+    this.formData.disabledReason = this.selectedQuickItems.join(", ");
   }
 
   async isValid() {

@@ -84,7 +84,8 @@
       This OctoPrint was disabled without reason.
     </v-alert>
     <v-alert v-if="storedSideNavPrinter?.disabledReason" color="black">
-      This OctoPrint was disabled for maintenance: {{ storedSideNavPrinter?.disabledReason }}
+      This OctoPrint was disabled for maintenance: <br />
+      <small>&nbsp;&nbsp;{{ storedSideNavPrinter?.disabledReason }} </small>
     </v-alert>
     <v-divider></v-divider>
 
