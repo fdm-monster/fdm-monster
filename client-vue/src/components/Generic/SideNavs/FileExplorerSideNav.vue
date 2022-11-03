@@ -5,7 +5,7 @@
     loading="true"
     right
     temporary
-    width="500"
+    width="700"
     @close="closeDrawer()"
   >
     <v-list-item>
@@ -69,13 +69,13 @@
     <v-divider></v-divider>
 
     <v-list v-drop-upload="{ printers: [storedSideNavPrinter] }" dense subheader>
-      <v-subheader inset>Commands</v-subheader>
+      <v-subheader inset>Manage FDM Monster instance</v-subheader>
 
       <v-list-item class="extra-dense-list-item" link @click.prevent.stop="toggleEnabled()">
         <v-list-item-avatar>
           <v-tooltip bottom>
             <template v-slot:activator="{ on, attrs }">
-              <v-icon :color="isEnabled ? 'primary' : 'secondary'" dark v-bind="attrs" v-on="on">
+              <v-icon :color="isEnabled ? 'primary' : 'green'" dark v-bind="attrs" v-on="on">
                 dns
               </v-icon>
             </template>
@@ -93,22 +93,25 @@
           <v-tooltip bottom>
             <template v-slot:activator="{ on, attrs }">
               <v-icon
-                :color="isUnderMaintenance ? 'primary' : 'secondary'"
+                :color="!isUnderMaintenance ? 'primary' : 'green'"
                 dark
                 v-bind="attrs"
                 v-on="on"
               >
-                dns
+                construction
               </v-icon>
             </template>
             <span>This does not impact your print</span>
           </v-tooltip>
         </v-list-item-avatar>
         <v-list-item-content>
-          <span v-if="isEnabled">Disable Printer Location for Maintenance</span>
-          <span v-else-if="!isEnabled">Remove Printer Location for Maintenance</span>
+          <span v-if="!isUnderMaintenance">Enable Maintenance</span>
+          <span v-else-if="isUnderMaintenance">Complete Maintenance</span>
         </v-list-item-content>
       </v-list-item>
+
+      <v-divider></v-divider>
+      <v-subheader inset>Commands</v-subheader>
 
       <v-list-item
         :disabled="isStoppable"
@@ -388,12 +391,17 @@ export default class FileExplorerSideNav extends Vue {
     await PrintersService.toggleEnabled(this.printerId, newSetting);
   }
 
-  toggleMaintenance() {
+  async toggleMaintenance() {
     if (!this.printerId) {
       throw new Error("Printer ID not set, cant toggle maintenance");
     }
     if (!this.storedSideNavPrinter) {
       throw new Error("Cant toggle enabled, sidenav printer unset");
+    }
+
+    if (this.isUnderMaintenance) {
+      await PrintersService.updatePrinterMaintenance(this.printerId);
+      return;
     }
 
     printersState.setMaintenanceDialogPrinter(this.storedSideNavPrinter);

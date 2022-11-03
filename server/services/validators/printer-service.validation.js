@@ -19,7 +19,8 @@ const updateApiUsernameRule = {
 };
 
 const updatePrinterDisabledReasonRule = {
-  disabledReason: "string",
+  disabledReason: "required|nullable|string",
+  enabled: "boolean",
 };
 
 module.exports = {

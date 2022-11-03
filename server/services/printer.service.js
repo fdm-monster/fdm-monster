@@ -6,6 +6,7 @@ const {
   createPrinterRules,
   updatePrinterEnabledRule,
   updateApiUsernameRule,
+  updatePrinterDisabledReasonRule,
 } = require("./validators/printer-service.validation");
 const { getDefaultPrinterEntry } = require("../constants/service.constants");
 const {
@@ -163,13 +164,13 @@ class PrinterService {
   }
 
   async updateDisabledReason(printerId, disabledReason) {
-    const enabled = !!disabledReason?.length;
+    const enabled = !disabledReason?.length;
     const update = {
       disabledReason,
       enabled,
     };
 
-    await validateInput(update, update);
+    await validateInput(update, updatePrinterDisabledReasonRule);
     await this.get(printerId);
 
     return PrinterModel.findByIdAndUpdate(printerId, update, {
