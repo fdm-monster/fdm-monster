@@ -2,6 +2,7 @@ const printerFloorModel = require("../../models/PrinterFloor");
 const dbHandler = require("../db-handler");
 const DITokens = require("../../container.tokens");
 const { configureContainer } = require("../../container");
+const { PrinterGroupMockData } = require("./test-data/printer-group.data");
 
 let printerGroupService;
 let printerFloorService;
@@ -50,5 +51,46 @@ describe("PrinterFloorService ", () => {
     expect(printerFloorService.get(floor.id)).toBeTruthy();
     await printerFloorService.delete(floor.id);
     expect(printerFloorService.get(floor.id)).rejects.toBeTruthy();
+  });
+
+  it("can add group to floor", async () => {
+    // Prepare the CRUD DTO
+    const newPrinterGroup = PrinterGroupMockData.PrinterGroupMock;
+    const pg = await printerGroupService.create(newPrinterGroup);
+
+    // Create it
+    const floor = await printerFloorService.create({
+      name: "TopFloor1",
+      floor: 1,
+      printerGroups: [],
+    });
+
+    expect(printerFloorService.get(floor.id)).toBeTruthy();
+    const newFloor = await printerFloorService.addOrUpdatePrinterGroup(floor.id, {
+      printerGroupId: pg.id,
+    });
+    expect(newFloor.printerGroups).toHaveLength(1);
+  });
+
+  it("can delete group from floor", async () => {
+    // Prepare the CRUD DTO
+    const newPrinterGroup = PrinterGroupMockData.PrinterGroupMock;
+    const pg = await printerGroupService.create(newPrinterGroup);
+
+    // Create it
+    const floor = await printerFloorService.create({
+      name: "TopFloor1",
+      floor: 1,
+      printerGroups: [{ printerGroupId: pg.id }],
+    });
+
+    // Check existence
+    expect(printerFloorService.get(floor.id)).toBeTruthy();
+    expect(floor.printerGroups).toHaveLength(1);
+
+    const newFloor = await printerFloorService.removePrinterGroup(floor.id, {
+      printerGroupId: pg.id,
+    });
+    expect(newFloor.printerGroups).toHaveLength(0);
   });
 });
