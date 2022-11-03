@@ -21,7 +21,11 @@
       </v-btn>
       <br />
       <small class="xsmall-resized-font text--secondary d-lg-inline d-none">
-        {{ printer.printerState.state?.toUpperCase() }}
+        {{
+          printer.disabledReason
+            ? `MAINTENANCE: ${printer.disabledReason}`
+            : printer.printerState.state?.toUpperCase()
+        }}
       </small>
       <v-tooltip close-delay="1000" open-delay="0" right>
         <template v-slot:activator="{ on, attrs }">
@@ -62,6 +66,7 @@ export default class PrinterGridTile extends Vue {
   @Prop() printer: Printer;
   @Prop() loading: boolean;
   readonly defaultColor = "rgba(100,100,100,0.1)";
+  readonly maintenanceColor = "black";
   readonly defaultFilamentGradient =
     "repeating-linear-gradient(-30deg, #222, #555 5px, #444 5px, #555 6px)";
 
@@ -105,6 +110,8 @@ export default class PrinterGridTile extends Vue {
 
   get printerStateColor() {
     if (!this.printer) return this.defaultColor;
+
+    if (this.printer.disabledReason?.length) return this.maintenanceColor;
 
     return this.printer?.printerState.colour.hex || this.defaultColor;
   }

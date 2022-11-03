@@ -68,19 +68,22 @@
     </v-list-item>
     <v-alert
       color="primary"
-      v-if="!storedSideNavPrinter.enabled || !storedSideNavPrinter?.apiAccessibility?.accessible"
+      v-if="!storedSideNavPrinter?.enabled || !storedSideNavPrinter?.apiAccessibility?.accessible"
     >
-      <span v-if="!storedSideNavPrinter.enabled">
+      <span v-if="!storedSideNavPrinter?.enabled">
         Disabled OctoPrint, enable it first to get live updates
       </span>
       <span v-else>
         This OctoPrint seems unreachable... Will keep trying for you <v-icon>hourglass_top</v-icon>
       </span>
     </v-alert>
-    <v-alert v-if="!storedSideNavPrinter?.enabled" color="blue">
+    <v-alert
+      v-if="!storedSideNavPrinter?.enabled && !storedSideNavPrinter?.disabledReason"
+      color="secondary"
+    >
       This OctoPrint was disabled without reason.
     </v-alert>
-    <v-alert v-if="storedSideNavPrinter?.disabledReason" color="blue">
+    <v-alert v-if="storedSideNavPrinter?.disabledReason" color="black">
       This OctoPrint was disabled for maintenance: {{ storedSideNavPrinter?.disabledReason }}
     </v-alert>
     <v-divider></v-divider>
@@ -345,7 +348,9 @@ export default class FileExplorerSideNav extends Vue {
   async inputUpdate(viewedPrinter?: Printer, oldVal?: Printer) {
     this.drawerOpened = !!viewedPrinter;
     const printerId = viewedPrinter?.id;
-    if (!viewedPrinter || !printerId) return;
+    if (!viewedPrinter || !printerId) {
+      return;
+    }
 
     if (!this.shownFileBucket || viewedPrinter.id !== this.shownFileBucket.printerId || !oldVal) {
       await this.refreshFiles(viewedPrinter);
