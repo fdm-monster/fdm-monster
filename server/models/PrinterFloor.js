@@ -18,10 +18,7 @@ const PrinterFloorSchema = new Schema({
     min: [0, "Floors must be numbered from 0 and up"],
     required: true,
   },
-  printerGroups: {
-    type: [PrinterGroupInFloorSchema],
-    required: true,
-  },
+  printerGroups: [PrinterGroupInFloorSchema],
 });
 
 const PrinterFloor = mongoose.model("PrinterFloor", PrinterFloorSchema);

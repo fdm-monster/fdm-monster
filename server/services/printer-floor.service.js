@@ -38,7 +38,6 @@ class PrinterFloorService {
     return await this.create({
       name: "default floor",
       floor: 1,
-      printerGroups: [],
     });
   }
 
