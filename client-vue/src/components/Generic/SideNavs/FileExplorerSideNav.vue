@@ -66,8 +66,22 @@
         </v-list-item-subtitle>
       </v-list-item-content>
     </v-list-item>
-    <v-alert color="primary" v-if="!storedSideNavPrinter?.apiAccessibility?.accessible">
-      This OctoPrint seems unreachable... Retrying. <v-icon>hourglass_top</v-icon>
+    <v-alert
+      color="primary"
+      v-if="!storedSideNavPrinter.enabled || !storedSideNavPrinter?.apiAccessibility?.accessible"
+    >
+      <span v-if="!storedSideNavPrinter.enabled">
+        Disabled OctoPrint, enable it first to get live updates
+      </span>
+      <span v-else>
+        This OctoPrint seems unreachable... Will keep trying for you <v-icon>hourglass_top</v-icon>
+      </span>
+    </v-alert>
+    <v-alert v-if="!storedSideNavPrinter?.enabled" color="blue">
+      This OctoPrint was disabled without reason.
+    </v-alert>
+    <v-alert v-if="storedSideNavPrinter?.disabledReason" color="blue">
+      This OctoPrint was disabled for maintenance: {{ storedSideNavPrinter?.disabledReason }}
     </v-alert>
     <v-divider></v-divider>
 
@@ -173,7 +187,7 @@
         <v-list-item-avatar>
           <v-icon>settings</v-icon>
         </v-list-item-avatar>
-        <v-list-item-content> Settings </v-list-item-content>
+        <v-list-item-content> Settings</v-list-item-content>
       </v-list-item>
     </v-list>
     <v-divider></v-divider>
@@ -408,6 +422,7 @@ export default class FileExplorerSideNav extends Vue {
     }
 
     printersState.setMaintenanceDialogPrinter(this.storedSideNavPrinter);
+    this.closeDrawer();
   }
 
   async refreshFiles(viewedPrinter: Printer) {
