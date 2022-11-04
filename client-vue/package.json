@@ -27,7 +27,7 @@
     "validator": "13.7.0",
     "vee-validate": "3.4.14",
     "vue": "2.7.13",
-    "vue-axios": "3.5.1",
+    "vue-axios": "3.5.2",
     "vue-bus": "1.2.1",
     "vue-class-component": "7.2.6",
     "vue-property-decorator": "9.1.2",
