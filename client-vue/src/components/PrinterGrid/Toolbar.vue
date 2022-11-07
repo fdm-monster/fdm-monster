@@ -7,13 +7,6 @@
         {{ f.name }}
       </v-btn>
     </v-btn-toggle>
-    <v-spacer></v-spacer>
-    <div>
-      <v-switch v-model="autoPrint" disabled hide-details label="Auto-select and print"></v-switch>
-    </div>
-    <v-btn class="ml-3" color="primary" type="button" @click="openCreatePrinterDialog()">
-      Create Printer
-    </v-btn>
   </v-toolbar>
 </template>
 
@@ -24,7 +17,6 @@ import { printersState } from "@/store/printers.state";
 
 @Component({})
 export default class Toolbar extends Vue {
-  autoPrint = true;
   selectedFloorToggleIndex = 0;
 
   get selectedFloorIndex() {
