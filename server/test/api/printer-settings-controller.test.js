@@ -8,6 +8,7 @@ const defaultRoute = `${AppConstants.apiRoute}/printer-settings`;
 
 const getRoute = (id) => `${defaultRoute}/${id}`;
 const setGCodeAnalysisRoute = (id) => `${getRoute(id)}/gcode-analysis`;
+const syncPrinterNameRoute = (id) => `${getRoute(id)}/sync-printername`;
 
 let request;
 let octoPrintApiService;
@@ -24,10 +25,10 @@ describe("PrinterSettingsController", () => {
       {
         api: {
           allowCrossOrigin: true,
-          key: "test"
+          key: "test",
         },
         appearance: {},
-        feature: {}
+        feature: {},
       },
       200
     );
@@ -39,8 +40,15 @@ describe("PrinterSettingsController", () => {
     const testPrinter = await createTestPrinter(request);
     octoPrintApiService.storeResponse({}, 200);
     const response = await request.post(setGCodeAnalysisRoute(testPrinter.id)).send({
-      enabled: false
+      enabled: false,
     });
+    expectOkResponse(response, {});
+  });
+
+  it("should sync printer name to OctoPrint", async () => {
+    const testPrinter = await createTestPrinter(request);
+    octoPrintApiService.storeResponse({}, 200);
+    const response = await request.post(syncPrinterNameRoute(testPrinter.id)).send({});
     expectOkResponse(response, {});
   });
 });
