@@ -53,6 +53,7 @@ Feel like joining in as a developer or do you have a quick fix? Great! Please re
 - [x] :rocket: Quick copy paste of OctoPrint credentials
 - [x] 🛡️ Complete API test coverage >80% (now at 80.5%)
 - [x] 🛡️ NodeJS Server legacy-free (history, alerts, custom gcode and filament)
+- [x] :rocket: Printer Floor management (departments)
 - [ ] Client with Vuetify 3.0
 - [ ] Client with Vuetify 3.1 (datatable!)
 - [ ] :rocket: Documentation
