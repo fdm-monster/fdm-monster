@@ -70,6 +70,13 @@ class OctoPrintApiService extends OctoPrintRoutes {
     return processResponse(response, responseOptions);
   }
 
+  async updatePrinterNameSetting(printerLogin, printerName, responseOptions) {
+    const { url, options } = this._prepareRequest(printerLogin, this.apiSettingsPart);
+    const settingPatch = this.printerNameSetting(printerName);
+    const response = await this._httpClient.post(url, settingPatch, options);
+    return processResponse(response, responseOptions);
+  }
+
   async updateFirmwareUpdaterSettings(printer, firmwareUpdateConfig, responseOptions) {
     const { url, options } = this._prepareRequest(printer, this.apiSettingsPart);
     const settingPatch = this.pluginFirmwareUpdaterSettings(firmwareUpdateConfig);
