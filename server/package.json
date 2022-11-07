@@ -40,7 +40,7 @@
     "vue"
   ],
   "dependencies": {
-    "@fdm-monster/client": "0.5.4",
+    "@fdm-monster/client": "0.5.5",
     "@influxdata/influxdb-client": "^1.31.0",
     "awilix": "8.0.0",
     "awilix-express": "8.0.0",
