@@ -244,7 +244,7 @@ export default Vue.extend({
         ? this.loadedCompletions.filter((c) => pIds.includes(c._id))
         : this.loadedCompletions;
 
-      this.shownCompletions = this.printerNameSearch?.length
+      const preSortPrinters = this.printerNameSearch?.length
         ? preSearchPrinters.filter((p) => {
             const printer = this.floorGroupFdmPrinters.find((f) => f.id === p._id);
             if (!printer) return false;
@@ -254,6 +254,13 @@ export default Vue.extend({
               .includes(this.printerNameSearch.toLowerCase());
           })
         : preSearchPrinters;
+
+      this.shownCompletions = preSortPrinters.sort((p1, p2) => {
+        if (p1.failureCount === p2.failureCount) {
+          return p1.printCount > p2.printCount ? -1 : 1;
+        }
+        return p1.failureCount > p2.failureCount ? -1 : 1;
+      });
     },
   },
 });
