@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Toolbar style="margin-top: 10px" />
+    <Toolbar />
 
     <v-banner v-drop-upload="{ printers: selectedPrinters }">
       <v-row style="margin-bottom: -5px">
