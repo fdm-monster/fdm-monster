@@ -50,8 +50,8 @@ import PrinterMaintenanceDialog from "@/components/Generic/Dialogs/PrinterMainte
     CreatePrinterFloorDialog,
     PrinterMaintenanceDialog,
     FileExplorerSideNav,
-    ErrorAlert,
-  },
+    ErrorAlert
+  }
 })
 export default class App extends Vue {
   sseClient?: SSEClient;
@@ -116,7 +116,7 @@ export default class App extends Vue {
 
       this.$bus.emit(sseTestPrinterUpdate(testPrinter.correlationToken), {
         testPrinter,
-        testProgress,
+        testProgress
       });
     }
 
@@ -134,5 +134,6 @@ export default class App extends Vue {
 <style>
 html {
   overflow-y: auto;
+  background-color: #121212;
 }
 </style>
