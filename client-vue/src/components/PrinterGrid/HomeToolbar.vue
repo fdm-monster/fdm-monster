@@ -10,12 +10,13 @@
     <v-spacer></v-spacer>
 
     <div>
-      <v-checkbox label="Override bedtemp" value="true"></v-checkbox>
+      <v-checkbox v-model="bedTempOverrideEnabled" label="Override bedtemp"></v-checkbox>
     </div>
     <div align="center" class="ml-2">
       <v-select
+        v-model="bedTemperatureOverride"
+        :disabled="!bedTempOverrideEnabled"
         :items="bedTempOptions"
-        :value="50"
         hint="Select bedtemp override"
         persistent-hint
       ></v-select>
@@ -30,10 +31,14 @@ import { printersState } from "@/store/printers.state";
 export default Vue.extend({
   data(): {
     selectedFloorToggleIndex: number;
+    bedTempOverrideEnabled: boolean;
+    bedTemperatureOverride: number;
     bedTempOptions: number[];
   } {
     return {
       selectedFloorToggleIndex: 0,
+      bedTempOverrideEnabled: true,
+      bedTemperatureOverride: 50,
       bedTempOptions: [50, 60],
     };
   },
