@@ -60,7 +60,7 @@
     "lodash": "4.17.21",
     "luxon": "3.1.0",
     "migrate-mongo": "9.0.0",
-    "mongoose": "6.7.1",
+    "mongoose": "6.7.2",
     "multer": "1.4.5-lts.1",
     "node-input-validator": "4.5.0",
     "passport": "0.6.0",
