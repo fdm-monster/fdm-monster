@@ -83,6 +83,7 @@
         <PrinterUrlAction :printer="item" />
         <PrinterConnectionAction :printer="item" />
         <PrinterEmergencyStopAction :printer="item" />
+        <SyncPrinterNameAction :printer="item" />
         <PrinterSettingsAction :printer="item" v-on:update:show="openEditDialog(item)" />
       </template>
       <template v-slot:expanded-item="{ headers, item }">
@@ -150,6 +151,7 @@ import PrinterEmergencyStopAction from "@/components/Generic/Actions/PrinterEmer
 import { PrinterFirmwareUpdateService } from "@/backend/printer-firmware-update.service";
 import { PrusaFirmwareReleaseModel } from "@/models/plugins/firmware-updates/prusa-firmware-release.model";
 import { PrinterFirmwareStateModel } from "@/models/plugins/firmware-updates/printer-firmware-state.model";
+import SyncPrinterNameAction from "@/components/Generic/Actions/SyncPrinterNameAction.vue";
 
 @Component({
   components: {
@@ -161,6 +163,7 @@ import { PrinterFirmwareStateModel } from "@/models/plugins/firmware-updates/pri
     PrinterUrlAction,
     PrinterSettingsAction,
     PrinterEmergencyStopAction,
+    SyncPrinterNameAction,
     PrinterConnectionAction,
   },
   data: () => ({
@@ -226,6 +229,7 @@ export default class Printers extends Vue {
   }
 
   get latestReleaseVersion() {
+    if (!this.firmwareReleases?.length) return null;
     const result = this.firmwareReleases.sort(
       (a, b) => Date.parse(b.created_at) - Date.parse(a.created_at)
     );

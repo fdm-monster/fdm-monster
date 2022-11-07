@@ -23,9 +23,12 @@ This server is currently freshly released, so give it a star ⭐and be the first
 - Print material/color/assignee parser and tile border color
 - Optional Auto-clean old OctoPrint files with different settings
 - Dependency updates using Renovate (thanks to @mkevenaar for the tips)
-- Quick copy paste of OctoPrint credentials
-#### Current work: 
+- Quick copy and paste of a FDM Monster printer
 - Firmware update plugin service
+- Printer Floors (like departments) and Printer Groups improvements
+#### Current work:
+- Preparation migration work to NestJS
+- Printer completion/failure tracking (with statistics page)
 - Client in Vue3, waiting for Vuetify 3.0 and 3.1 release (https://github.com/fdm-monster/fdm-monster-client)
 
 ## Development [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://gitHub.com/fdm-monster/fdm-monster/graphs/commit-activity) [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/fdm-monster/fdm-monster/Node.js%20CI?query=branch%3Adevelop)](https://github.com/fdm-monster/fdm-monster/actions/workflows/nodejs.yml?query=branch%3Adevelop) [![GitHub license](https://img.shields.io/github/license/fdm-monster/fdm-monster)](https://github.com/fdm-monster/fdm-monster/blob/master/LICENSE.txt)
@@ -50,15 +53,17 @@ Feel like joining in as a developer or do you have a quick fix? Great! Please re
 - [x] :rocket: Quick copy paste of OctoPrint credentials
 - [x] 🛡️ Complete API test coverage >80% (now at 80.5%)
 - [x] 🛡️ NodeJS Server legacy-free (history, alerts, custom gcode and filament)
+- [x] :rocket: Printer Floor management (departments)
+- [ ] Client with Vuetify 3.0
+- [ ] Client with Vuetify 3.1 (datatable!)
+- [ ] :rocket: Documentation
 - [ ] 🛡️ Frontend user and basic role management
 - [ ] 🛡️ Client test coverage
 - [ ] 🔌 FDM Connector - filament tracker 
 - [ ] 🔌 Raspberry Pi image and prebuilt customized OctoPi image
 - [ ] :rocket: Chocolatey package (Windows install)
-- [ ] :rocket: Documentation
 - [ ] :rocket: Plugin system (preparation work is ready)
 - [ ] :rocket: Docker overlay as service management (daemonized restart & auto-updates)
-- [ ] :rocket: .NET 6 cross-platform daemon (drop necessity of pm2)
 - [ ] Support for OctoPrint 2.0.0 (when it comes out)
 - [ ] More to be found here https://github.com/fdm-monster/fdm-monster/discussions/48
 

@@ -1,6 +1,6 @@
 const {
   jsonContentType,
-  contentTypeHeaderKey
+  contentTypeHeaderKey,
 } = require("./constants/octoprint-service.constants");
 const { validatePrinter, constructHeaders } = require("./utils/api.utils");
 const { getDefaultTimeout } = require("../../constants/server-settings.constants");
@@ -78,26 +78,34 @@ class OctoPrintRoutes {
     return { command: "move", destination };
   }
 
+  printerNameSetting(printerName) {
+    return {
+      appearance: {
+        name: printerName,
+      },
+    };
+  }
+
   gcodeAnalysisSetting(enabled) {
     return {
       gcodeAnalysis: {
-        runAt: enabled ? "idle" : "never"
-      }
+        runAt: enabled ? "idle" : "never",
+      },
     };
   }
 
   pluginFirmwareUpdaterSettings(subsettings) {
     return {
       plugins: {
-        firmwareupdater: subsettings
-      }
+        firmwareupdater: subsettings,
+      },
     };
   }
 
   pluginManagerCommand(command, url) {
     return {
       command,
-      url
+      url,
     };
   }
 
@@ -128,8 +136,8 @@ class OctoPrintRoutes {
       url: new URL(path, printerURL).href,
       options: {
         headers,
-        timeout
-      }
+        timeout,
+      },
     };
   }
 
@@ -137,7 +145,7 @@ class OctoPrintRoutes {
     this._ensureTimeoutSettingsLoaded();
 
     let headers = {
-      [contentTypeHeaderKey]: contentType
+      [contentTypeHeaderKey]: contentType,
     };
     let timeout = timeoutOverride || this._timeouts.apiTimeout;
     if (timeout <= 0) {
@@ -148,8 +156,8 @@ class OctoPrintRoutes {
       url: path,
       options: {
         headers,
-        timeout
-      }
+        timeout,
+      },
     };
   }
 
@@ -164,7 +172,7 @@ class OctoPrintRoutes {
     return {
       url,
       data: serializedData,
-      options
+      options,
     };
   }
 }
