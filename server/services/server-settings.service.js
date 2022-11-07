@@ -42,12 +42,6 @@ class ServerSettingsService {
     if (!doc.server) {
       doc.server = Constants.server;
     }
-    if (!doc.history) {
-      doc.history = Constants.history;
-    }
-    if (!doc?.influxExport) {
-      doc.influxExport = Constants.influxExport;
-    }
 
     return knownSettings;
   }
