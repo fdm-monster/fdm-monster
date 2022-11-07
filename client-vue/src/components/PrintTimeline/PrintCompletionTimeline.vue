@@ -2,7 +2,7 @@
   <v-row>
     <v-col>
       <v-sheet height="100%" width="100%">
-        <div>
+        <v-container>
           <v-row>
             <v-col>
               <v-icon>filter_list</v-icon>
@@ -63,8 +63,20 @@
               </v-select>
             </v-col>
           </v-row>
-        </div>
-        <hr />
+          <v-row>
+            <v-col>Filter by printer name (optional)</v-col>
+            <v-col>
+              <v-text-field
+                v-model="printerNameSearch"
+                class="p-2"
+                clearable
+                label="Search"
+                prepend-icon="search"
+                single-line
+              ></v-text-field>
+            </v-col>
+          </v-row>
+        </v-container>
         <v-alert>
           Please reload here if you want updated results:
           <v-btn color="primary" x-small @click="loadCompletions()">Reload</v-btn>
@@ -141,6 +153,7 @@ export default Vue.extend({
     filteredPrinterFloors: PrinterFloor[];
     printerGroups: PrinterGroup[];
     filteredPrinterGroups: PrinterGroup[];
+    printerNameSearch: string;
   } {
     return {
       loadedCompletions: [],
@@ -151,9 +164,10 @@ export default Vue.extend({
       filteredPrinterFloors: [],
       printerGroups: [],
       filteredPrinterGroups: [],
+      printerNameSearch: "",
     };
   },
-  async created() {
+  async mounted() {
     await this.loadCompletions();
   },
   computed: {
@@ -178,6 +192,9 @@ export default Vue.extend({
       this.updateGroups();
     },
     filteredFdmPrinters() {
+      this.updatePrinters();
+    },
+    printerNameSearch() {
       this.updatePrinters();
     },
   },
@@ -223,9 +240,20 @@ export default Vue.extend({
     },
     updatePrinters() {
       const pIds = this.filteredFdmPrinters.map((p) => p.id);
-      this.shownCompletions = pIds.length
+      const preSearchPrinters = pIds.length
         ? this.loadedCompletions.filter((c) => pIds.includes(c._id))
         : this.loadedCompletions;
+
+      this.shownCompletions = this.printerNameSearch?.length
+        ? preSearchPrinters.filter((p) => {
+            const printer = this.floorGroupFdmPrinters.find((f) => f.id === p._id);
+            if (!printer) return false;
+
+            return (printer.printerName + printer.printerURL)
+              .toLowerCase()
+              .includes(this.printerNameSearch.toLowerCase());
+          })
+        : preSearchPrinters;
     },
   },
 });
