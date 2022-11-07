@@ -13,8 +13,8 @@
     <CreatePrinterDialog />
     <CreatePrinterGroupDialog />
     <CreatePrinterFloorDialog />
-    <FileExplorerSideNav />
     <PrinterMaintenanceDialog />
+    <FileExplorerSideNav />
   </v-app>
 </template>
 
