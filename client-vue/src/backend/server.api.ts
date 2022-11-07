@@ -33,6 +33,8 @@ export class ServerApi {
   static getPrinterSettingsRoute = (id: string) => `${ServerApi.printerSettingsRoute}/${id}`;
   static setPrinterSettingsGCodeAnalysisRoute = (id: string) =>
     `${ServerApi.getPrinterSettingsRoute(id)}/gcode-analysis`;
+  static syncPrinterNameSettingRoute = (id: string) =>
+    `${ServerApi.getPrinterSettingsRoute(id)}/sync-printername`;
   static getPrinterGroupRoute = (id: string) => `${ServerApi.printerGroupRoute}/${id}`;
   static getPrinterFloorRoute = (id: string) => `${ServerApi.printerFloorRoute}/${id}`;
   static setSelectedPrinterFloorRoute = (floorId: string) =>
