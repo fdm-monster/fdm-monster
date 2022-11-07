@@ -21,11 +21,7 @@
       </v-btn>
       <br />
       <small class="xsmall-resized-font text--secondary d-lg-inline d-none">
-        {{
-          printer.disabledReason
-            ? `MAINTENANCE: ${printer.disabledReason}`
-            : printer.printerState.state?.toUpperCase()
-        }}
+        {{ printer.disabledReason ? "MAINTENANCE" : printer.printerState.state?.toUpperCase() }}
       </small>
       <v-tooltip close-delay="1000" open-delay="0" right>
         <template v-slot:activator="{ on, attrs }">
