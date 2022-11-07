@@ -1,49 +1,47 @@
 <template>
-  <v-row justify="center">
-    <v-dialog v-model="showingDialog" :max-width="'600px'" persistent>
-      <validation-observer ref="validationObserver" v-slot="{ invalid }">
-        <v-card>
-          <v-card-title>
-            <span class="text-h5"> Mark printer for maintenance </span>
-          </v-card-title>
-          <v-alert color="secondary"> Keep this short so it fits on a Print Tile</v-alert>
-          <v-card-text>
-            <v-row>
-              <v-col cols="12">
-                <v-select
-                  v-model="selectedQuickItems"
-                  :chips="true"
-                  :items="quickItems"
-                  clearable
-                  color="primary"
-                  multiple
-                  placeholder="Quick select reason"
-                  @change="updateText()"
-                ></v-select>
-                <validation-provider v-slot="{ errors }" name="JSON" rules="required">
-                  <v-textarea
-                    v-model="formData.disabledReason"
-                    :error-messages="errors"
-                    data-vv-validate-on="change|blur"
-                  >
-                    <template v-slot:label>
-                      <div>Type the reason*</div>
-                    </template>
-                  </v-textarea>
-                </validation-provider>
-              </v-col>
-            </v-row>
-          </v-card-text>
-          <v-card-actions>
-            <em class="red--text">* indicates required field</em>
-            <v-spacer></v-spacer>
-            <v-btn text @click="closeDialog()">Close</v-btn>
-            <v-btn :disabled="invalid" color="blue darken-1" text @click="submit()">Save</v-btn>
-          </v-card-actions>
-        </v-card>
-      </validation-observer>
-    </v-dialog>
-  </v-row>
+  <v-dialog v-model="showingDialog" :max-width="'600px'" persistent>
+    <validation-observer ref="validationObserver" v-slot="{ invalid }">
+      <v-card>
+        <v-card-title>
+          <span class="text-h5"> Mark printer for maintenance </span>
+        </v-card-title>
+        <v-alert color="secondary"> Keep this short so it fits on a Print Tile</v-alert>
+        <v-card-text>
+          <v-row>
+            <v-col cols="12">
+              <v-select
+                v-model="selectedQuickItems"
+                :chips="true"
+                :items="quickItems"
+                clearable
+                color="primary"
+                multiple
+                placeholder="Quick select reason"
+                @change="updateText()"
+              ></v-select>
+              <validation-provider v-slot="{ errors }" name="JSON" rules="required">
+                <v-textarea
+                  v-model="formData.disabledReason"
+                  :error-messages="errors"
+                  data-vv-validate-on="change|blur"
+                >
+                  <template v-slot:label>
+                    <div>Type the reason*</div>
+                  </template>
+                </v-textarea>
+              </validation-provider>
+            </v-col>
+          </v-row>
+        </v-card-text>
+        <v-card-actions>
+          <em class="red--text">* indicates required field</em>
+          <v-spacer></v-spacer>
+          <v-btn text @click="closeDialog()">Close</v-btn>
+          <v-btn :disabled="invalid" color="blue darken-1" text @click="submit()">Save</v-btn>
+        </v-card-actions>
+      </v-card>
+    </validation-observer>
+  </v-dialog>
 </template>
 
 <script lang="ts">

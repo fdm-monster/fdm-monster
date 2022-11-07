@@ -13,8 +13,8 @@
     <CreatePrinterDialog />
     <CreatePrinterGroupDialog />
     <CreatePrinterFloorDialog />
-    <FileExplorerSideNav />
     <PrinterMaintenanceDialog />
+    <FileExplorerSideNav />
   </v-app>
 </template>
 
@@ -134,5 +134,6 @@ export default class App extends Vue {
 <style>
 html {
   overflow-y: auto;
+  background-color: #121212;
 }
 </style>

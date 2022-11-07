@@ -10,23 +10,66 @@
     @click="selectPrinter()"
   >
     <v-container v-if="printer" class="tile-inner">
-      <small class="small-resized-font ml-1">
+      <small class="small-resized-font">
         {{ printer.printerName }}
       </small>
-      <v-btn class="float-right" icon @click.prevent.stop="clickInfo()">
+      <v-menu offset-y>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn class="float-right d-inline d-xl-none" icon v-bind="attrs" v-on="on">
+            <v-icon>more_vert</v-icon>
+          </v-btn>
+        </template>
+        <v-list>
+          <v-list-item @click.prevent.stop="clickInfo()">
+            <v-icon>info</v-icon>
+            &nbsp;Details
+          </v-list-item>
+          <v-list-item @click.prevent.stop="clickOpenPrinterURL()">
+            <v-icon>directions</v-icon>
+            &nbsp;Visit OctoPrint
+          </v-list-item>
+          <v-list-item @click.prevent.stop="clickOpenSettings()">
+            <v-icon>settings</v-icon>
+            &nbsp;Edit Printer
+          </v-list-item>
+          <v-list-item @click.prevent.stop="clickEmergencyStop()">
+            <v-icon>stop</v-icon>
+            &nbsp;Emergency stop
+          </v-list-item>
+        </v-list>
+      </v-menu>
+
+      <v-btn class="float-right d-none d-xl-inline" icon @click.prevent.stop="clickInfo()">
         <v-icon>info</v-icon>
       </v-btn>
-      <v-btn class="float-right d-none d-lg-inline" icon @click.prevent.stop="clickEmergencyStop()">
+      <v-btn class="float-right d-none d-xl-inline" icon @click.prevent.stop="clickEmergencyStop()">
         <v-icon>stop</v-icon>
       </v-btn>
       <br />
-      <small class="xsmall-resized-font text--secondary d-lg-inline d-none">
-        {{
-          printer.disabledReason
-            ? `MAINTENANCE: ${printer.disabledReason}`
-            : printer.printerState.state?.toUpperCase()
-        }}
-      </small>
+
+      <v-tooltip
+        :disabled="!printer.disabledReason"
+        close-delay="100"
+        color="danger"
+        open-delay="0"
+        top
+      >
+        <template v-slot:activator="{ on, attrs }">
+          <small
+            class="xsmall-resized-font text--secondary d-lg-inline d-none"
+            v-bind="attrs"
+            v-on="on"
+          >
+            <span v-if="printer.disabledReason">
+              MAINTENANCE <v-icon class="d-none d-xl-inline" color="primary" small>info</v-icon>
+            </span>
+            <span v-else>{{ printer.printerState.state?.toUpperCase() }}</span>
+          </small>
+        </template>
+        Maintenance reason: <br />
+        {{ printer.disabledReason }}
+      </v-tooltip>
+
       <v-tooltip close-delay="1000" open-delay="0" right>
         <template v-slot:activator="{ on, attrs }">
           <div
@@ -58,6 +101,7 @@ import { printersState } from "@/store/printers.state";
 import { Printer } from "@/models/printers/printer.model";
 import RAL_CODES from "@/constants/ral.reference.json";
 import { CustomGcodeService } from "@/backend/custom-gcode.service";
+import { PrintersService } from "@/backend";
 
 @Component({
   components: {},
@@ -122,6 +166,14 @@ export default class PrinterGridTile extends Vue {
 
   clickInfo() {
     printersState.setSideNavPrinter(this.printer);
+  }
+
+  clickOpenPrinterURL() {
+    PrintersService.openPrinterURL(this.printer.printerURL);
+  }
+
+  clickOpenSettings() {
+    printersState.setUpdateDialogPrinter(this.printer);
   }
 
   async clickEmergencyStop() {
