@@ -27,6 +27,8 @@ class PrintersModule extends VuexModule {
   selectedFloor?: PrinterFloor = undefined;
   lastUpdated?: number = undefined;
 
+  bedTempOverride: boolean = true;
+  bedTemp: number | null = 50;
   sideNavPrinter?: Printer = undefined;
   updateDialogPrinter?: Printer = undefined;
   createDialogOpened?: boolean = false;
@@ -35,8 +37,15 @@ class PrintersModule extends VuexModule {
   createFloorDialogOpened?: boolean = false;
   selectedPrinters: Printer[] = [];
   maintenanceDialogPrinter?: Printer = undefined;
-
   readonly horizontalOffset = 1;
+
+  get currentBedTempOverride() {
+    return this.bedTempOverride;
+  }
+
+  get currentbedTemp() {
+    return this.bedTemp;
+  }
 
   get selectedPrinterFloor() {
     return this.selectedFloor;
@@ -165,6 +174,26 @@ class PrintersModule extends VuexModule {
 
   get printerGroupNames() {
     return this.printerGroups.map((pg: PrinterGroup) => pg.name);
+  }
+
+  @Mutation
+  _setBedTemp(bedTemp: number = 50) {
+    this.bedTemp = bedTemp;
+  }
+
+  @Action
+  setBedTemp(bedTemp: number = 50) {
+    this._setBedTemp(bedTemp);
+  }
+
+  @Mutation
+  _setBedTempOverride(bedTempOverride: boolean = true) {
+    this.bedTempOverride = bedTempOverride;
+  }
+
+  @Action
+  setBedTempOverride(bedTempOverride: boolean = true) {
+    this._setBedTempOverride(bedTempOverride);
   }
 
   @Mutation addPrinter(printer: Printer) {

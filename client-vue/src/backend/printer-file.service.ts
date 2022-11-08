@@ -65,7 +65,7 @@ export class PrinterFileService extends BaseService {
       select: true,
       print: true,
       overrideBedTemp: false,
-      bedTemp: undefined,
+      bedTemp: null,
     }
   ) {
     const path = ServerApi.printerFilesUploadRoute(printer.id);
