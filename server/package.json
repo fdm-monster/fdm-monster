@@ -87,7 +87,7 @@
     "eslint-plugin-promise": "6.1.1",
     "eventsource": "2.0.2",
     "express-list-endpoints": "6.0.0",
-    "jest": "29.2.2",
+    "jest": "29.3.0",
     "jest-27-expect-message": "1.1.0",
     "jest-util": "29.2.1",
     "mongodb-memory-server": "8.9.5",
