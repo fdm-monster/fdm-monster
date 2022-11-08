@@ -30,6 +30,7 @@ const stepSizeRoute = (id) => `${updateRoute(id)}/step-size`;
 const feedRateRoute = (id) => `${updateRoute(id)}/feed-rate`;
 const flowRateRoute = (id) => `${updateRoute(id)}/flow-rate`;
 const printerPluginListRoute = (id) => `${getRoute(id)}/plugin-list`;
+const restartOctoPrintRoute = (id) => `${getRoute(id)}/restart-octoprint`;
 const serialConnectCommandRoute = (id) => `${getRoute(id)}/serial-connect`;
 const serialDisconnectCommandRoute = (id) => `${getRoute(id)}/serial-disconnect`;
 const batchRoute = `${defaultRoute}/batch`;
@@ -273,6 +274,14 @@ describe("PrinterController", () => {
     octoPrintApiService.storeResponse(["test"], 200);
     const res = await request.get(printerPluginListRoute(printer.id)).send();
     expectOkResponse(res, ["test"]);
+  });
+
+  it("should send restart octoprint command", async () => {
+    const printer = await createTestPrinter(request);
+    const response = {};
+    octoPrintApiService.storeResponse(response, 200);
+    const res = await request.post(restartOctoPrintRoute(printer.id)).send();
+    expectOkResponse(res);
   });
 
   it("should send serial connect command", async () => {
