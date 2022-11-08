@@ -16,7 +16,12 @@ export function convertPrinterMultiFileToQueue(
   if (!printer) return [];
 
   return files.map((f) => {
-    const commands: FileUploadCommands = { select: false, print: false };
+    const commands: FileUploadCommands = {
+      select: false,
+      print: false,
+      overrideBedTemp: false,
+      bedTemp: 50,
+    };
     if (f.name === printedFileName) {
       commands.print = true;
     }
@@ -38,7 +43,12 @@ export function convertPrinterMultiFileToQueue(
 export function convertMultiPrinterFileToQueue(
   printers: Printer[],
   file: File,
-  commands: FileUploadCommands = { select: true, print: true }
+  commands: FileUploadCommands = {
+    select: true,
+    print: true,
+    overrideBedTemp: false,
+    bedTemp: 50,
+  }
 ) {
   if (!printers?.length || !file) return [];
 
