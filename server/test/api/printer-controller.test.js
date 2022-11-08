@@ -25,6 +25,7 @@ const reconnectRoute = (id) => `${updateRoute(id)}/reconnect`;
 const connectionRoute = (id) => `${updateRoute(id)}/connection`;
 const loginDetailsRoute = (id) => `${updateRoute(id)}/login-details`;
 const enabledRoute = (id) => `${updateRoute(id)}/enabled`;
+const disabledReasonRoute = (id) => `${updateRoute(id)}/disabled-reason`;
 const stepSizeRoute = (id) => `${updateRoute(id)}/step-size`;
 const feedRateRoute = (id) => `${updateRoute(id)}/feed-rate`;
 const flowRateRoute = (id) => `${updateRoute(id)}/flow-rate`;
@@ -225,6 +226,14 @@ describe("PrinterController", () => {
     const printer = await createTestPrinter(request);
     const updatePatch = await request.patch(enabledRoute(printer.id)).send({
       enabled: false,
+    });
+    expectOkResponse(updatePatch);
+  });
+
+  it("should update printer enabled setting correctly", async () => {
+    const printer = await createTestPrinter(request);
+    const updatePatch = await request.patch(disabledReasonRoute(printer.id)).send({
+      disabledReason: "Under maintenance",
     });
     expectOkResponse(updatePatch);
   });
