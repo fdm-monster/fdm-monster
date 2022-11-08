@@ -61,7 +61,12 @@ export class PrinterFileService extends BaseService {
   static async uploadFile(
     printer: Printer,
     file: File,
-    commands: FileUploadCommands = { select: true, print: true }
+    commands: FileUploadCommands = {
+      select: true,
+      print: true,
+      overrideBedTemp: false,
+      bedTemp: null,
+    }
   ) {
     const path = ServerApi.printerFilesUploadRoute(printer.id);
 
@@ -74,6 +79,9 @@ export class PrinterFileService extends BaseService {
       }
       if (commands.print) {
         formData.append("print", "true");
+      }
+      if (commands.overrideBedTemp && !!commands.bedTemp) {
+        formData.append("bedTemp", commands.bedTemp.toString());
       }
     }
     formData.append("files[0]", file);

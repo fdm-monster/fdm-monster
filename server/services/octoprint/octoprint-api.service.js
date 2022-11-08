@@ -173,7 +173,7 @@ class OctoPrintApiService extends OctoPrintRoutes {
 
     let source = fileStreamOrBuffer.buffer;
     const isPhysicalFile = !source;
-    if (!source) {
+    if (isPhysicalFile) {
       source = fs.createReadStream(fileStreamOrBuffer.path);
     }
     formData.append("file", source, { filename: fileStreamOrBuffer.originalname });

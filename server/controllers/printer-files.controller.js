@@ -17,6 +17,8 @@ const { ValidationException, NotFoundException } = require("../exceptions/runtim
 const { printerLoginToken, printerResolveMiddleware } = require("../middleware/printer");
 const { ROLES, PERMS } = require("../constants/authorization.constants");
 const { authorizeRoles } = require("../middleware/authenticate");
+const { readLinesAsync, lineReplacePromise, lineReplaceAsync } = require("../utils/file-io.utils");
+const { replaceInFileSync } = require("replace-in-file");
 
 class PrinterFilesController {
   #filesStore;
@@ -191,7 +193,48 @@ class PrinterFilesController {
     }
 
     // Multer has processed the remaining multipart data into the body as json
-    const commands = await validateInput(req.body, fileUploadCommandsRules);
+    const { print, select, bedTemp } = await validateInput(req.body, fileUploadCommandsRules);
+
+    const uploadedFile = files[0];
+    const uploadPath = uploadedFile.path;
+
+    // Replace BedTemp in GCode
+    if (bedTemp) {
+      const lines = await readLinesAsync(uploadPath, 100);
+      let limitUsed = 100;
+      let foundLineIndices = lines
+        .map((line, index) => (line.includes("M140") ? index : null))
+        .filter((e) => !!e);
+      if (!foundLineIndices?.length) {
+        // Give it another shot with more lines
+        const lines = await readLinesAsync(uploadPath, 500);
+        foundLineIndices = lines
+          .map((line, index) => (line.includes("M140") ? index : null))
+          .filter((e) => !!e);
+        limitUsed = 500;
+      }
+
+      // Replace M140 if requested
+      if (foundLineIndices?.length) {
+        for (const lineIndex of foundLineIndices) {
+          replaceInFileSync({
+            files: [uploadPath],
+            from: "M140 S60",
+            to: `M140 S${bedTemp}`,
+          });
+        }
+
+        this.#logger.info(
+          `Replaced ${foundLineIndices?.length} occurrences of M140 with bed temp ${bedTemp} within ${limitUsed} GCode lines`
+        );
+      } else {
+        this.#logger.info(
+          `Could not find any bedtemp occurrences of M140 with bed temp ${bedTemp}`
+        );
+      }
+    } else {
+      this.#logger.info("BedTemp not overwritten");
+    }
 
     // Perform specific file clean if configured
     const fileCleanEnabled = this.#settingsStore.isPreUploadFileCleanEnabled();
@@ -202,8 +245,8 @@ class PrinterFilesController {
     const token = this.#multerService.startTrackingSession(files);
     const response = await this.#octoPrintApiService.uploadFileAsMultiPart(
       printerLogin,
-      files[0],
-      commands,
+      uploadedFile,
+      { print, select },
       token
     );
 
@@ -266,17 +309,17 @@ class PrinterFilesController {
 
 // prettier-ignore
 module.exports = createController(PrinterFilesController)
-    .prefix(AppConstants.apiRoute + "/printer-files")
-    .before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR]), printerResolveMiddleware()])
-    .post("/purge", "purgeIndexedFiles", withPermission(PERMS.PrinterFiles.Clear))
-    .post("/stub-upload", "stubUploadFiles", withPermission(PERMS.PrinterFiles.Upload))
-    .get("/tracked-uploads", "getTrackedUploads", withPermission(PERMS.PrinterFiles.Upload))
-    .get("/:id", "getFiles", withPermission(PERMS.PrinterFiles.Get))
-    .get("/:id/cache", "getFilesCache", withPermission(PERMS.PrinterFiles.Get))
-    .post("/:id/local-upload", "localUploadFile", withPermission(PERMS.PrinterFiles.Upload))
-    .post("/:id/upload", "uploadFile", withPermission(PERMS.PrinterFiles.Upload))
-    .post("/:id/create-folder", "createFolder", withPermission(PERMS.PrinterFiles.Actions))
-    .post("/:id/select", "selectAndPrintFile", withPermission(PERMS.PrinterFiles.Actions))
-    .post("/:id/move", "moveFileOrFolder", withPermission(PERMS.PrinterFiles.Actions))
-    .delete("/:id", "deleteFileOrFolder", withPermission(PERMS.PrinterFiles.Delete))
-    .delete("/:id/clear", "clearPrinterFiles", withPermission(PERMS.PrinterFiles.Clear));
+  .prefix(AppConstants.apiRoute + "/printer-files")
+  .before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR]), printerResolveMiddleware()])
+  .post("/purge", "purgeIndexedFiles", withPermission(PERMS.PrinterFiles.Clear))
+  .post("/stub-upload", "stubUploadFiles", withPermission(PERMS.PrinterFiles.Upload))
+  .get("/tracked-uploads", "getTrackedUploads", withPermission(PERMS.PrinterFiles.Upload))
+  .get("/:id", "getFiles", withPermission(PERMS.PrinterFiles.Get))
+  .get("/:id/cache", "getFilesCache", withPermission(PERMS.PrinterFiles.Get))
+  .post("/:id/local-upload", "localUploadFile", withPermission(PERMS.PrinterFiles.Upload))
+  .post("/:id/upload", "uploadFile", withPermission(PERMS.PrinterFiles.Upload))
+  .post("/:id/create-folder", "createFolder", withPermission(PERMS.PrinterFiles.Actions))
+  .post("/:id/select", "selectAndPrintFile", withPermission(PERMS.PrinterFiles.Actions))
+  .post("/:id/move", "moveFileOrFolder", withPermission(PERMS.PrinterFiles.Actions))
+  .delete("/:id", "deleteFileOrFolder", withPermission(PERMS.PrinterFiles.Delete))
+  .delete("/:id/clear", "clearPrinterFiles", withPermission(PERMS.PrinterFiles.Clear));

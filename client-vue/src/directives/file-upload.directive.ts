@@ -30,10 +30,14 @@ const bindDropConditionally = (el: HTMLElement, printers: Printer[], context?: V
           clonedFiles.length,
           printedFilename
         );
+
+        // Convert the file and bound printer to a file upload
         convertedUploads = convertPrinterMultiFileToQueue(
           firstPrinter,
           clonedFiles,
-          printedFilename
+          printedFilename,
+          printersState.currentBedTempOverride,
+          printersState.currentbedTemp
         );
       } else {
         if (clonedFiles.length > 1) {
@@ -41,7 +45,12 @@ const bindDropConditionally = (el: HTMLElement, printers: Printer[], context?: V
         }
         console.debug("Multi printer upload mode", printers.length, clonedFiles.length);
         const clonedFile = clonedFiles[0];
-        convertedUploads = convertMultiPrinterFileToQueue(printers, clonedFile);
+        convertedUploads = convertMultiPrinterFileToQueue(printers, clonedFile, {
+          select: true,
+          print: true,
+          overrideBedTemp: printersState.currentBedTempOverride,
+          bedTemp: printersState.currentbedTemp,
+        });
       }
 
       uploadsState.queueUploads(convertedUploads);

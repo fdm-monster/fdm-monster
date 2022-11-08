@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Toolbar />
+    <HomeToolbar />
 
     <v-banner v-drop-upload="{ printers: selectedPrinters }">
       <v-row style="margin-bottom: -5px">
@@ -70,10 +70,10 @@ import SideNavExplorer from "@/components/Generic/SideNavs/FileExplorerSideNav.v
 import { infoMessageEvent } from "@/event-bus/alert.events";
 import { uploadsState } from "@/store/uploads.state";
 import { convertMultiPrinterFileToQueue } from "@/utils/uploads-state.utils";
-import Toolbar from "@/components/PrinterGrid/Toolbar.vue";
+import HomeToolbar from "@/components/PrinterGrid/HomeToolbar.vue";
 
 @Component({
-  components: { PrinterGrid, SideNavExplorer, CreatePrinterDialog, Toolbar },
+  components: { PrinterGrid, SideNavExplorer, CreatePrinterDialog, HomeToolbar },
   data: () => ({
     selectedFile: undefined,
     viewedPrinter: undefined,
