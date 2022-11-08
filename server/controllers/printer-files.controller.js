@@ -236,8 +236,6 @@ class PrinterFilesController {
       this.#logger.info("BedTemp not overwritten");
     }
 
-    throw new Error("asd");
-
     // Perform specific file clean if configured
     const fileCleanEnabled = this.#settingsStore.isPreUploadFileCleanEnabled();
     if (fileCleanEnabled) {
