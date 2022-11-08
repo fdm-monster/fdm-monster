@@ -26,7 +26,7 @@ const moveFileOrFolderRules = {
 const fileUploadCommandsRules = {
   select: "boolean",
   print: "required|boolean",
-  bedTemp: "nullable|integer|between:0,80",
+  bedTemp: "integer|between:0,80",
 };
 
 const localFileUploadRules = {
