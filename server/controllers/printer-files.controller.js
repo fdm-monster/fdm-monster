@@ -219,7 +219,9 @@ class PrinterFilesController {
         for (const lineIndex of foundLineIndices) {
           replaceInFileSync({
             files: [uploadPath],
-            from: "M140 S60",
+            from: (file) => {
+              return "M140 S60";
+            },
             to: `M140 S${bedTemp}`,
           });
         }
