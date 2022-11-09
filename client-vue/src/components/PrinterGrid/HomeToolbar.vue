@@ -30,10 +30,10 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { printersState } from "@/store/printers.state";
 
-export default Vue.extend({
+export default defineComponent({
   data(): {
     selectedFloorToggleIndex: number;
     bedTempOverrideEnabled: boolean;
@@ -48,13 +48,6 @@ export default Vue.extend({
     };
   },
   computed: {
-    selectedFloorIndex() {
-      if (!printersState.printerFloors || !printersState.selectedPrinterFloor) return null;
-
-      return printersState.printerFloors.findIndex(
-        (pf) => pf._id == printersState.selectedPrinterFloor!._id
-      );
-    },
     floors() {
       return printersState.printerFloors;
     },

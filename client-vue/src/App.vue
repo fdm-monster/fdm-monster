@@ -37,8 +37,8 @@ import CreatePrinterDialog from "@/components/Generic/Dialogs/CreatePrinterDialo
 import { uploadsState } from "@/store/uploads.state";
 import CreatePrinterGroupDialog from "@/components/Generic/Dialogs/CreatePrinterGroupDialog.vue";
 import CreatePrinterFloorDialog from "@/components/Generic/Dialogs/CreatePrinterFloorDialog.vue";
-import { outletCurrentValuesState } from "@/store/outlet-current.state";
 import PrinterMaintenanceDialog from "@/components/Generic/Dialogs/PrinterMaintenanceDialog.vue";
+import { useOutletCurrentStore } from "@/stores-pinia/outlet-current.store";
 
 @Component({
   components: {
@@ -119,9 +119,9 @@ export default class App extends Vue {
         testProgress,
       });
     }
-
+    const outletStore = useOutletCurrentStore();
     if (message.outletCurrentValues) {
-      outletCurrentValuesState.setOutletCurrentValues(message.outletCurrentValues);
+      outletStore.setOutletCurrentValues(message.outletCurrentValues);
     }
   }
 

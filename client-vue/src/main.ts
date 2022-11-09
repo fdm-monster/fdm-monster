@@ -16,6 +16,7 @@ import { generateAppConstants } from "@/constants/app.constants";
 import { registerFileDropDirective } from "@/directives/file-upload.directive";
 import store from "@/store";
 import { vuexErrorEvent } from "@/event-bus/alert.events";
+import { PiniaVuePlugin, createPinia } from "pinia";
 
 Vue.config.productionTip = false;
 // Http Client
@@ -60,6 +61,9 @@ Sentry.init({
 //   console.log("Global Error captured", err, vm, info);
 // };
 
+Vue.use(PiniaVuePlugin);
+const pinia = createPinia();
+
 new Vue({
   router,
   store,
@@ -67,6 +71,7 @@ new Vue({
   provide: {
     appConstants: generateAppConstants(),
   },
+  pinia,
   render: (h) => h(App),
 }).$mount("#app");
 

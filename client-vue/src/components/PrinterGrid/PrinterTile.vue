@@ -108,7 +108,6 @@ import { PrintersService } from "@/backend";
 })
 export default class PrinterGridTile extends Vue {
   @Prop() printer: Printer;
-  @Prop() loading: boolean;
   readonly defaultColor = "rgba(100,100,100,0.1)";
   readonly maintenanceColor = "black";
   readonly defaultFilamentGradient =
