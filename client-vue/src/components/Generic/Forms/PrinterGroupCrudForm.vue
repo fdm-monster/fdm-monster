@@ -53,7 +53,6 @@ import { usePrintersStore } from "@/store/printers.store";
 
 interface Data {
   formData?: PreCreatePrinterGroup;
-  appConstants: AppConstants;
 }
 
 const watchedId = "printerId";
@@ -66,6 +65,7 @@ export default defineComponent({
   setup: () => {
     return {
       printersStore: usePrintersStore(),
+      appConstants: inject("appConstants") as AppConstants,
     };
   },
   async created() {
@@ -82,7 +82,6 @@ export default defineComponent({
   },
   data: (): Data => ({
     formData: getDefaultCreatePrinterGroup(),
-    appConstants: inject("appConstants") as AppConstants,
   }),
   computed: {
     printerGroupNameRules() {

@@ -27,10 +27,12 @@
         </validation-provider>
 
         <validation-provider v-slot="{ errors }" name="Groups">
+          <!-- TODO Groups not defined -->
           <v-select
             v-model="formData.groups"
             :error-messages="errors"
             :items="printerGroupNames"
+            disabled
             label="Groups"
             multiple
             no-data-text="No groups known"
@@ -136,7 +138,6 @@ const watchedId = "printerId";
 
 interface Data {
   formData: PreCreatePrinter;
-  appConstants: AppConstants;
 }
 
 export default defineComponent({
@@ -147,6 +148,7 @@ export default defineComponent({
   setup: () => {
     return {
       printersStore: usePrintersStore(),
+      appConstants: inject("appConstants") as AppConstants,
     };
   },
   async created() {
@@ -163,7 +165,6 @@ export default defineComponent({
   },
   data: (): Data => ({
     formData: getDefaultCreatePrinter(),
-    appConstants: inject("appConstants") as AppConstants,
   }),
   computed: {
     printerGroupNames() {

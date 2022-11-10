@@ -41,7 +41,6 @@ const watchedId = "printerFloorId";
 
 interface Data {
   formData: PreCreatePrinterFloor;
-  appConstants: AppConstants;
 }
 
 export default defineComponent({
@@ -52,6 +51,7 @@ export default defineComponent({
   setup: () => {
     return {
       printersStore: usePrintersStore(),
+      appConstants: inject("appConstants") as AppConstants,
     };
   },
   async created() {
@@ -71,7 +71,6 @@ export default defineComponent({
   },
   data: (): Data => ({
     formData: getDefaultCreatePrinterFloor(),
-    appConstants: inject("appConstants") as AppConstants,
   }),
   computed: {
     printerFloorNameRules() {
