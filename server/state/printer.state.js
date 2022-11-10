@@ -45,11 +45,13 @@ class PrinterState {
   #eventEmitter2;
   #jobsCache;
   #fileCache;
+  #socketIoGateway;
 
-  constructor({ eventEmitter2, jobsCache, fileCache }) {
+  constructor({ eventEmitter2, jobsCache, fileCache, socketIoGateway }) {
     this.#eventEmitter2 = eventEmitter2;
     this.#jobsCache = jobsCache;
     this.#fileCache = fileCache;
+    this.#socketIoGateway = socketIoGateway;
   }
 
   get id() {
@@ -390,6 +392,10 @@ class PrinterState {
   }
 
   setHostState(state, description) {
+    if (this.#hostState?.state !== state) {
+      this.#socketIoGateway.pushPrinterUpdate(this.#id, "hostState");
+    }
+
     this.#hostState = {
       state,
       colour: mapStateToColor(state),
@@ -407,6 +413,8 @@ class PrinterState {
           `Printer API '${this.getName()}' was marked as inaccessible. Reason: '${reason}'. Please check connection settings.`
         );
     }
+
+    this.#socketIoGateway.pushPrinterUpdate(this.#id, "apiAccessibility");
     this.#apiAccessibility = {
       accessible,
       retryable,

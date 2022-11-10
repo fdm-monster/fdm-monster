@@ -54,6 +54,7 @@ const { ConfigService } = require("./services/config.service");
 const { InfluxDbQueryTask } = require("./tasks/influxdb-query.task");
 const { PrintEventsSseTask } = require("./tasks/print-events.sse.task");
 const { PrintCompletionService } = require("./services/print-completion.service");
+const { SocketIoGateway } = require("./state/socket-io.gateway");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -96,6 +97,7 @@ function configureContainer() {
         maxContentLength: 1000 * 1000 * 1000, // 1GB
       })
     ),
+    [DITokens.socketIoGateway]: asClass(SocketIoGateway).singleton(),
     [DITokens.multerService]: asClass(MulterService).singleton(),
     [DITokens.printerService]: asClass(PrinterService),
     [DITokens.printerFilesService]: asClass(PrinterFilesService),

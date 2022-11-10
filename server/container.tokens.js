@@ -7,6 +7,7 @@ const DITokens = {
   serverHost: "serverHost",
   loggerFactory: "loggerFactory",
   httpClient: "httpClient",
+  socketIoGateway: "socketIoGateway",
   simpleGitService: "simpleGitService",
   multerService: "multerService",
   configService: "configService",
