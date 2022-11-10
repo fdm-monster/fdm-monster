@@ -87,7 +87,6 @@ export default defineComponent({
         this.closeDialog();
       }
     });
-
     await this.printersStore.loadPrinterGroups();
   },
   async mounted() {},
@@ -102,6 +101,8 @@ export default defineComponent({
     storedUpdatedPrinter() {
       return this.printersStore.updateDialogPrinter;
     },
+  },
+  methods: {
     printerUpdateForm() {
       return this.$refs.printerUpdateForm as InstanceType<typeof PrinterCrudForm>;
     },
@@ -112,14 +113,13 @@ export default defineComponent({
       return this.$refs.clipboardPasteField as InstanceType<typeof HTMLFormElement>;
     },
     formData() {
-      return this.printerUpdateForm?.formData;
+      return this.printerUpdateForm()?.formData;
     },
-  },
-  methods: {
     avatarInitials() {
-      if (this.formData && this.dialogShowed) {
-        return generateInitials(this.formData.printerName);
+      if (this.formData() && this.dialogShowed) {
+        return generateInitials(this.formData().printerName);
       }
+      return "";
     },
     openTestPanel() {
       this.showChecksPanel = true;
@@ -129,13 +129,13 @@ export default defineComponent({
       this.testProgress = payload.testProgress;
     },
     async isValid() {
-      return await this.validationObserver.validate();
+      return await this.validationObserver().validate();
     },
     async testPrinter() {
       if (!(await this.isValid())) return;
       if (!this.formData) return;
 
-      const testPrinter = PrintersService.convertCreateFormToPrinter(this.formData);
+      const testPrinter = PrintersService.convertCreateFormToPrinter(this.formData());
       if (!testPrinter) return;
       this.openTestPanel();
 
@@ -168,9 +168,9 @@ export default defineComponent({
     },
     async submit() {
       if (!(await this.isValid())) return;
-      if (!this.formData) return;
+      if (!this.formData()) return;
 
-      const updatedPrinter = PrintersService.convertCreateFormToPrinter(this.formData);
+      const updatedPrinter = PrintersService.convertCreateFormToPrinter(this.formData());
       const printerId = updatedPrinter.id;
 
       const updatedData = await this.printersStore.updatePrinter({
@@ -180,6 +180,8 @@ export default defineComponent({
 
       this.$bus.emit(updatedPrinterEvent(printerId as string), updatedData);
       this.$bus.emit(infoMessageEvent, `Printer ${updatedPrinter.printerName} updated`);
+
+      this.closeDialog();
     },
     closeDialog() {
       this.printersStore.setUpdateDialogPrinter(undefined);
@@ -193,7 +195,7 @@ export default defineComponent({
       if (!viewedPrinter || !printerId) return;
 
       const loginDetails = await PrintersService.getPrinterLoginDetails(printerId);
-      if (this.formData) this.formData.apiKey = loginDetails.apiKey;
+      if (this.formData) this.formData().apiKey = loginDetails.apiKey;
     },
     dialogShowed(newVal: boolean) {
       // Due to the animation delay the nav model lags behind enough for SSE to pick up and override

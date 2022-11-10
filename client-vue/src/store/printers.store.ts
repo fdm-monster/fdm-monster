@@ -19,7 +19,6 @@ interface State {
   printerGroups: PrinterGroup[];
   floors: PrinterFloor[];
   selectedFloor?: PrinterFloor;
-  lastUpdated?: number;
 
   bedTempOverride: boolean;
   bedTemp: number | null;
@@ -41,7 +40,6 @@ export const usePrintersStore = defineStore("Printers", {
     printerGroups: [],
     floors: [],
     selectedFloor: undefined,
-    lastUpdated: undefined,
 
     bedTempOverride: true,
     bedTemp: 50,
@@ -166,7 +164,6 @@ export const usePrintersStore = defineStore("Printers", {
     async createTestPrinter(newPrinter: CreatePrinter) {
       const data = await PrintersService.testConnection(newPrinter);
       this.testPrinters = data;
-      this.lastUpdated = Date.now();
       return data;
     },
     // TODO renamed
@@ -254,7 +251,6 @@ export const usePrintersStore = defineStore("Printers", {
         this.sideNavPrinter = printers.find((p) => p.id === viewedPrinterId);
       }
       this.printers = printers;
-      this.lastUpdated = Date.now();
     },
     _popPrinter(printerId: string) {
       const printerIndex = this.printers.findIndex((p: Printer) => p.id === printerId);
@@ -301,7 +297,6 @@ export const usePrintersStore = defineStore("Printers", {
         pg.printers.sort((p1, p2) => p1.location.localeCompare(p2.location))
       );
       this.printerGroups = sortedPrinterGroups;
-      this.lastUpdated = Date.now();
       return this.printerGroups;
     },
     async loadPrinterGroups() {
@@ -363,7 +358,6 @@ export const usePrintersStore = defineStore("Printers", {
       const foundGroupIndex = this.printerGroups.findIndex((pg) => pg._id === printerGroup._id);
       if (foundGroupIndex !== -1) {
         this.printerGroups[foundGroupIndex] = printerGroup;
-        this.lastUpdated = Date.now();
       }
     },
     /* Floors */
@@ -419,7 +413,6 @@ export const usePrintersStore = defineStore("Printers", {
       const foundFloorIndex = this.floors.findIndex((pf) => pf._id === printerFloor._id);
       if (foundFloorIndex !== -1) {
         this.floors[foundFloorIndex] = printerFloor;
-        this.lastUpdated = Date.now();
       }
     },
     async clearPrinterFiles(printerId: string) {

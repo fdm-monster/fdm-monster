@@ -60,6 +60,7 @@ export default defineComponent({
     return {
       uploadsStore: useUploadsStore(),
       printersStore: usePrintersStore(),
+      outletCurrentStore: useOutletCurrentStore(),
       serverSettingsStore: useServerSettingsStore(),
     };
   },
