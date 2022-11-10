@@ -60,17 +60,27 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import PrinterGrid from "@/components/PrinterGrid/PrinterGrid.vue";
-import { printersState } from "@/store/printers.state";
 import { Printer } from "@/models/printers/printer.model";
 import { PrintersService } from "@/backend";
 import { formatBytes } from "@/utils/file-size.util";
 import { infoMessageEvent } from "@/event-bus/alert.events";
-import { uploadsState } from "@/store/uploads.state";
 import { convertMultiPrinterFileToQueue } from "@/utils/uploads-state.utils";
 import HomeToolbar from "@/components/PrinterGrid/HomeToolbar.vue";
+import { usePrintersStore } from "@/store/printers.store";
+import { useUploadsStore } from "@/store/uploads.store";
 
 export default defineComponent({
+  name: "PrinterGridView",
   components: { PrinterGrid, HomeToolbar },
+  setup: () => {
+    return {
+      printersStore: usePrintersStore(),
+      uploadsStore: useUploadsStore(),
+    };
+  },
+  async created() {},
+  async mounted() {},
+  props: {},
   data(): {
     selectedFile?: File;
     viewedPrinter?: Printer;
@@ -85,7 +95,7 @@ export default defineComponent({
       return this.selectedPrinters?.length > 0;
     },
     selectedPrinters() {
-      return printersState.selectedPrinters;
+      return this.printersStore.selectedPrinters;
     },
     fileUpload() {
       return this.$refs.fileUpload as InstanceType<typeof HTMLInputElement>;
@@ -99,7 +109,7 @@ export default defineComponent({
     formatBytes: formatBytes,
 
     clearSelectedPrinters() {
-      printersState.clearSelectedPrinters();
+      this.printersStore.clearSelectedPrinters();
     },
     async uploadFile() {
       const selectedPrinters = this.selectedPrinters;
@@ -117,7 +127,7 @@ export default defineComponent({
       }
 
       const uploads = convertMultiPrinterFileToQueue(accessiblePrinters, this.selectedFile);
-      uploadsState.queueUploads(uploads);
+      this.uploadsStore.queueUploads(uploads);
 
       this.fileUpload!.value = "";
       this.clearSelectedPrinters();
@@ -128,7 +138,7 @@ export default defineComponent({
       this.selectedFile = this.fileUpload.files[0];
     },
     deselectPrinter(printer: Printer) {
-      printersState.toggleSelectedPrinter(printer);
+      this.printersStore.toggleSelectedPrinter(printer);
     },
     openPrinter(printer: Printer) {
       PrintersService.openPrinterURL(printer.printerURL);

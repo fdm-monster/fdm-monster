@@ -14,9 +14,8 @@ import { apiBase } from "@/backend/base.service";
 import { configureVeeValidate } from "@/plugins/veevalidate";
 import { generateAppConstants } from "@/constants/app.constants";
 import { registerFileDropDirective } from "@/directives/file-upload.directive";
-import store from "@/store";
 import { vuexErrorEvent } from "@/event-bus/alert.events";
-import { PiniaVuePlugin, createPinia } from "pinia";
+import { createPinia, PiniaVuePlugin } from "pinia";
 
 Vue.config.productionTip = false;
 // Http Client
@@ -66,7 +65,6 @@ const pinia = createPinia();
 
 new Vue({
   router,
-  store,
   vuetify,
   provide: {
     appConstants: generateAppConstants(),

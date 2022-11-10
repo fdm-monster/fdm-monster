@@ -6,23 +6,41 @@
 </template>
 
 <script lang="ts">
-import Component from "vue-class-component";
-import Vue from "vue";
-import { Prop } from "vue-property-decorator";
-import { printersState } from "@/store/printers.state";
+import { usePrintersStore } from "@/store/printers.store";
+import { defineComponent, PropType } from "vue";
 import { Printer } from "@/models/printers/printer.model";
 
-@Component({
-  data: () => ({}),
-})
-export default class RefreshFilesAction extends Vue {
-  @Prop() printer: Printer;
-
-  async getFiles() {
-    await printersState.loadPrinterFiles({
-      printerId: this.printer.id,
-      recursive: false,
-    });
-  }
+interface Data {
+  property: number;
 }
+
+export default defineComponent({
+  name: "RefreshFilesAction",
+  components: {},
+  setup: () => {
+    return {
+      printersStore: usePrintersStore(),
+    };
+  },
+  async created() {},
+  async mounted() {},
+  props: {
+    printer: Object as PropType<Printer>,
+  },
+  data: (): Data => ({
+    property: 0,
+  }),
+  computed: {},
+  methods: {
+    async getFiles() {
+      if (!this.printer) return;
+
+      await this.printersStore.loadPrinterFiles({
+        printerId: this.printer.id,
+        recursive: false,
+      });
+    },
+  },
+  watch: {},
+});
 </script>

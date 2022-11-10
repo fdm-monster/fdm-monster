@@ -33,8 +33,11 @@
   </v-navigation-drawer>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from "vue";
+
+export default defineComponent({
+  name: "NavigationDrawer",
   data() {
     return {
       drawer: true,
@@ -49,10 +52,11 @@ export default {
   },
   computed: {
     routes() {
+      if (!this.$router.options.routes) return [];
       return this.$router.options.routes.filter((route) => !route.meta || !route.meta.hidden);
     },
   },
-};
+});
 </script>
 
 <style>

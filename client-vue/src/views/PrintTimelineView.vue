@@ -3,10 +3,13 @@
     <PrinterCompletionsTimeline />
   </v-container>
 </template>
-<script>
-// import PrintEventTracker from "@/components/PrintTimeline/PrintEventTracker.vue";
+
+<script lang="ts">
+import { defineComponent } from "vue";
 import PrinterCompletionsTimeline from "@/components/PrintTimeline/PrintCompletionTimeline.vue";
-export default {
+
+export default defineComponent({
+  name: "PrintTimelineView",
   components: { PrinterCompletionsTimeline },
-};
+});
 </script>

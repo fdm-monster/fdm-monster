@@ -108,7 +108,7 @@
             <!-- New group -->
             <v-list-item-content>
               <v-select
-                :items="unassignedGroups()"
+                :items="unassignedGroups"
                 item-text="name"
                 label="Not assigned"
                 no-data-text="No printer groups left, create more"
@@ -147,106 +147,106 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { Component } from "vue-property-decorator";
-import { printersState } from "@/store/printers.state";
+import { defineComponent } from "vue";
 import { PrinterGroup } from "@/models/printer-groups/printer-group.model";
 import { PrinterFloor } from "@/models/printer-floor/printer-floor.model";
+import { usePrintersStore } from "@/store/printers.store";
 
-@Component({
-  components: {},
-  data: () => ({
-    selectedItem: 0,
-  }),
-})
-export default class PrinterGroupsSettings extends Vue {
-  editedPrinterFloorName: string = "";
-  editedPrinterFloorNumber: number = 0;
+interface Data {
+  editedPrinterFloorName: string;
+  editedPrinterFloorNumber: number;
   selectedItem: number;
-
-  get showAddedGroups() {
-    return this.selectedPrinterFloor.printerGroups?.length + 1;
-  }
-
-  get printerFloors() {
-    return printersState.printerFloors;
-  }
-
-  get selectedPrinterFloor() {
-    return printersState.printerFloors[this.selectedItem];
-  }
-
-  unassignedGroups() {
-    return printersState.floorlessGroups;
-  }
-
-  printerGroupInFloor(floor: PrinterFloor, index: number): PrinterGroup | undefined {
-    if (!floor?.printerGroups) return;
-
-    const printerFloorGroup = floor.printerGroups[index - 1];
-    if (!printerFloorGroup) return;
-    return printersState.printerGroup(printerFloorGroup.printerGroupId);
-  }
-
-  async createFloor() {
-    // Trigger watch connected to printer floor CRUD dialog
-    printersState.setCreateFloorDialogOpened(true);
-  }
-
-  setEditedPrinterFloorName() {
-    this.editedPrinterFloorName = this.selectedPrinterFloor.name;
-  }
-
-  setEditedPrinterFloorNumber() {
-    this.editedPrinterFloorNumber = this.selectedPrinterFloor.floor;
-  }
-
-  async updatePrinterFloorName() {
-    if (!this.selectedPrinterFloor?._id) return;
-
-    const { _id: floorId } = this.selectedPrinterFloor;
-    await printersState.updatePrinterFloorName({
-      floorId,
-      name: this.editedPrinterFloorName,
-    });
-  }
-
-  async updatePrinterFloorNumber() {
-    if (!this.selectedPrinterFloor?._id) return;
-
-    const { _id: floorId } = this.selectedPrinterFloor;
-    await printersState.updatePrinterFloorNumber({
-      floorId,
-      floorNumber: this.editedPrinterFloorNumber,
-    });
-
-    // Adapt to potential sort change
-    this.selectedItem = -1;
-  }
-
-  async clickDeleteFloor() {
-    if (!this.selectedPrinterFloor?._id) return;
-
-    await printersState.deletePrinterFloor(this.selectedPrinterFloor._id);
-  }
-
-  async addPrinterGroupToFloor(floor: PrinterFloor, printerGroup: PrinterGroup) {
-    if (!this.selectedPrinterFloor._id || !printerGroup?._id) return;
-
-    await printersState.addPrinterGroupToFloor({
-      floorId: this.selectedPrinterFloor._id,
-      printerGroupId: printerGroup._id,
-    });
-  }
-
-  async clearPrinterGroupFromFloor(floor: PrinterFloor, index: number) {
-    const printerGroup = this.printerGroupInFloor(floor, index);
-    if (!floor?._id || !printerGroup?._id) return;
-
-    await printersState.deletePrinterGroupFromFloor({
-      floorId: floor._id,
-      printerGroupId: printerGroup._id,
-    });
-  }
 }
+
+export default defineComponent({
+  name: "PrinterFloorSettings",
+  setup: () => {
+    return {
+      printersStore: usePrintersStore(),
+    };
+  },
+  props: {},
+  data: (): Data => ({
+    selectedItem: 0,
+    editedPrinterFloorName: "",
+    editedPrinterFloorNumber: 0,
+  }),
+  created() {},
+  mounted() {},
+  computed: {
+    printerFloors() {
+      return this.printersStore.printerFloors;
+    },
+    selectedPrinterFloor() {
+      return this.printersStore.printerFloors[this.selectedItem];
+    },
+    showAddedGroups() {
+      return this.selectedPrinterFloor.printerGroups?.length + 1;
+    },
+    unassignedGroups() {
+      return this.printersStore.floorlessGroups;
+    },
+  },
+  methods: {
+    printerGroupInFloor(floor: PrinterFloor, index: number): PrinterGroup | undefined {
+      if (!floor?.printerGroups) return;
+
+      const printerFloorGroup = floor.printerGroups[index - 1];
+      if (!printerFloorGroup) return;
+      return this.printersStore.printerGroup(printerFloorGroup.printerGroupId);
+    },
+
+    async createFloor() {
+      // Trigger watch connected to printer floor CRUD dialog
+      this.printersStore.setCreateFloorDialogOpened(true);
+    },
+    setEditedPrinterFloorName() {
+      this.editedPrinterFloorName = this.selectedPrinterFloor.name;
+    },
+    setEditedPrinterFloorNumber() {
+      this.editedPrinterFloorNumber = this.selectedPrinterFloor.floor;
+    },
+    async updatePrinterFloorName() {
+      if (!this.selectedPrinterFloor?._id) return;
+      const { _id: floorId } = this.selectedPrinterFloor;
+      await this.printersStore.updatePrinterFloorName({
+        floorId,
+        name: this.editedPrinterFloorName,
+      });
+    },
+    async updatePrinterFloorNumber() {
+      if (!this.selectedPrinterFloor?._id) return;
+      const { _id: floorId } = this.selectedPrinterFloor;
+      await this.printersStore.updatePrinterFloorNumber({
+        floorId,
+        floorNumber: this.editedPrinterFloorNumber,
+      });
+      // Adapt to potential sort change
+      this.selectedItem = -1;
+    },
+    async clickDeleteFloor() {
+      if (!this.selectedPrinterFloor?._id) return;
+
+      await this.printersStore.deletePrinterFloor(this.selectedPrinterFloor._id);
+    },
+    async addPrinterGroupToFloor(floor: PrinterFloor, printerGroup: PrinterGroup) {
+      if (!this.selectedPrinterFloor._id || !printerGroup?._id) return;
+
+      await this.printersStore.addPrinterGroupToFloor({
+        floorId: this.selectedPrinterFloor._id,
+        printerGroupId: printerGroup._id,
+      });
+    },
+    async clearPrinterGroupFromFloor(floor: PrinterFloor, index: number) {
+      const printerGroup = this.printerGroupInFloor(floor, index);
+      if (!floor?._id || !printerGroup?._id) return;
+
+      await this.printersStore.deletePrinterGroupFromFloor({
+        floorId: floor._id,
+        printerGroupId: printerGroup._id,
+      });
+    },
+  },
+  watch: {},
+});
 </script>

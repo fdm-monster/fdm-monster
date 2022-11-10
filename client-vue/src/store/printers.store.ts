@@ -25,7 +25,7 @@ interface State {
   bedTemp: number | null;
   sideNavPrinter?: Printer;
   updateDialogPrinter?: Printer;
-  createDialogOpened?: boolean;
+  createPrinterDialogOpened?: boolean;
   createGroupDialogOpened?: boolean;
   updateDialogPrinterGroup?: PrinterGroup;
   createFloorDialogOpened?: boolean;
@@ -47,7 +47,7 @@ export const usePrintersStore = defineStore("Printers", {
     bedTemp: 50,
     sideNavPrinter: undefined,
     updateDialogPrinter: undefined,
-    createDialogOpened: false,
+    createPrinterDialogOpened: false,
     createGroupDialogOpened: false,
     updateDialogPrinterGroup: undefined,
     createFloorDialogOpened: false,
@@ -104,8 +104,8 @@ export const usePrintersStore = defineStore("Printers", {
         (p) => !this.floors.find((g) => g.printerGroups.find((pgp) => pgp.printerGroupId === p._id))
       );
     },
-    printer: (state) => {
-      return (printerId?: string) => state.printers.find((p) => p.id === printerId);
+    printer() {
+      return (printerId?: string) => this.printers.find((p) => p.id === printerId);
     },
     groupOfPrinter(state) {
       return (printerId: string) =>
@@ -125,9 +125,8 @@ export const usePrintersStore = defineStore("Printers", {
           p.printerState.flags && (p.printerState.flags.printing || p.printerState.flags.printing)
       );
     },
-    // TODO note typing is needed
-    ungroupedPrinters(state): Printer[] {
-      return state.printers.filter(
+    ungroupedPrinters(): Printer[] {
+      return this.printers.filter(
         (p) => !this.printerGroups.find((g) => g.printers.find((pgp) => pgp.printerId === p.id))
       );
     },
@@ -158,13 +157,13 @@ export const usePrintersStore = defineStore("Printers", {
     setBedTempOverride(bedTempOverride: boolean = true) {
       this.bedTempOverride = bedTempOverride;
     },
-    async createPrinter(newPrinter: Printer) {
+    async createPrinter(newPrinter: CreatePrinter) {
       const data = await PrintersService.createPrinter(newPrinter);
       this.printers.push(data);
       this.printers.sort((a: Printer, b: Printer) => (a.sortIndex > b.sortIndex ? 1 : -1));
       return data;
     },
-    async setTestPrinter(newPrinter: Printer) {
+    async createTestPrinter(newPrinter: CreatePrinter) {
       const data = await PrintersService.testConnection(newPrinter);
       this.testPrinters = data;
       this.lastUpdated = Date.now();
@@ -215,8 +214,8 @@ export const usePrintersStore = defineStore("Printers", {
     setUpdateDialogPrinterGroup(printerGroup?: PrinterGroup) {
       this.updateDialogPrinterGroup = printerGroup;
     },
-    setCreateDialogOpened(opened: boolean) {
-      this.createDialogOpened = opened;
+    setCreatePrinterDialogOpened(opened: boolean) {
+      this.createPrinterDialogOpened = opened;
     },
     setCreateGroupDialogOpened(opened: boolean) {
       this.createGroupDialogOpened = opened;
@@ -241,7 +240,7 @@ export const usePrintersStore = defineStore("Printers", {
     },
     async loadPrinters() {
       const data = await PrintersService.getPrinters();
-      this._setPrinters(data);
+      this.setPrinters(data);
       return data;
     },
     async deletePrinter(printerId: string) {
@@ -249,7 +248,7 @@ export const usePrintersStore = defineStore("Printers", {
       this._popPrinter(printerId);
       return data;
     },
-    _setPrinters(printers: Printer[]) {
+    setPrinters(printers: Printer[]) {
       const viewedPrinterId = this.sideNavPrinter?.id;
       if (viewedPrinterId) {
         this.sideNavPrinter = printers.find((p) => p.id === viewedPrinterId);
@@ -423,19 +422,20 @@ export const usePrintersStore = defineStore("Printers", {
         this.lastUpdated = Date.now();
       }
     },
-    async clearPrinterFiles({ printerId }: { printerId: string; result: ClearedFilesResult }) {
+    async clearPrinterFiles(printerId: string) {
       // TODO diagnostics
       if (!printerId) return;
       // TODO axios type, TODO OpenAPI
       const result = (await PrinterFileService.clearFiles(printerId)) as ClearedFilesResult;
-
+      if (!result?.failedFiles) {
+        throw new Error("No failed files were returned");
+      }
       const bucket = this.printerFileBuckets.find((b) => b.printerId === printerId);
-
       if (bucket) {
         bucket.files = result.failedFiles;
       }
     },
-    async setPrinterFiles({ printerId, recursive }: { printerId: string; recursive: boolean }) {
+    async loadPrinterFiles({ printerId, recursive }: { printerId: string; recursive: boolean }) {
       const fileList = await PrinterFileService.getFiles(printerId, recursive);
 
       fileList.files.sort((f1, f2) => {
@@ -453,6 +453,9 @@ export const usePrintersStore = defineStore("Printers", {
       } else {
         fileBucket.files = fileList.files;
       }
+
+      // Note: just the list, not the bucket
+      return fileList;
     },
     async deletePrinterFile({ printerId, fullPath }: { printerId: string; fullPath: string }) {
       await PrinterFileService.deleteFileOrFolder(printerId, fullPath);

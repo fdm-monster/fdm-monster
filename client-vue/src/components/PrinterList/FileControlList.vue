@@ -15,25 +15,37 @@
 </template>
 
 <script lang="ts">
-import Component from "vue-class-component";
-import Vue from "vue";
-import { Prop } from "vue-property-decorator";
+import { defineComponent, PropType } from "vue";
 import { PrinterFile } from "@/models/printers/printer-file.model";
 import { PrinterFileCache } from "@/models/printers/printer-file-cache.model";
-import { printersState } from "@/store/printers.state";
+import { usePrintersStore } from "@/store/printers.store";
 
-@Component({
-  data: () => ({}),
-})
-export default class FileControlList extends Vue {
-  @Prop() fileList: PrinterFileCache;
-  @Prop() printerId: string;
+export default defineComponent({
+  name: "FileControlList",
+  components: {},
+  setup: () => {
+    return {
+      printersStore: usePrintersStore(),
+    };
+  },
+  async created() {},
+  async mounted() {},
+  props: {
+    fileList: Object as PropType<PrinterFileCache>,
+    printerId: String,
+  },
+  computed: {},
+  methods: {
+    async deleteFile(file: PrinterFile) {
+      if (!this.fileList || !this.printerId) return;
 
-  async deleteFile(file: PrinterFile) {
-    this.fileList.files = await printersState.deletePrinterFile({
-      printerId: this.printerId,
-      fullPath: file.path,
-    });
-  }
-}
+      // this.fileList.files =
+      await this.printersStore.deletePrinterFile({
+        printerId: this.printerId,
+        fullPath: file.path,
+      });
+    },
+  },
+  watch: {},
+});
 </script>

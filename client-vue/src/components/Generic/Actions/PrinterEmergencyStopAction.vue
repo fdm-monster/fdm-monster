@@ -15,24 +15,26 @@
 </template>
 
 <script lang="ts">
-import Component from "vue-class-component";
-import Vue from "vue";
-import { Prop } from "vue-property-decorator";
+import { defineComponent, PropType } from "vue";
 import { Printer } from "@/models/printers/printer.model";
 import { CustomGcodeService } from "@/backend/custom-gcode.service";
 
-@Component({})
-export default class PrinterEmergencyStopAction extends Vue {
-  @Prop() printer: Printer;
-
-  get printerId() {
-    return this.printer.id;
-  }
-
-  async clickEmergencyStop() {
-    if (confirm("Are you sure to abort the print? Please reconnect after.")) {
-      await CustomGcodeService.postEmergencyM112Command(this.printer.id);
-    }
-  }
-}
+export default defineComponent({
+  name: "PrinterUrlAction",
+  props: {
+    printer: Object as PropType<Printer>,
+  },
+  computed: {
+    printerId() {
+      return this.printer!.id;
+    },
+  },
+  methods: {
+    async clickEmergencyStop() {
+      if (confirm("Are you sure to abort the print? Please reconnect after.")) {
+        await CustomGcodeService.postEmergencyM112Command(this.printer!.id);
+      }
+    },
+  },
+});
 </script>

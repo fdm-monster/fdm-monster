@@ -6,9 +6,9 @@
           <v-text-field
             v-model="formData.name"
             :error-messages="errors"
+            autofocus
             label="Floor name*"
             required
-            autofocus
           />
         </validation-provider>
 
@@ -27,67 +27,70 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { Component, Inject, Prop, Watch } from "vue-property-decorator";
+import { defineComponent, inject } from "vue";
 import { ValidationProvider } from "vee-validate";
 import { AppConstants } from "@/constants/app.constants";
-import { printersState } from "@/store/printers.state";
 import {
   getDefaultCreatePrinterFloor,
   PreCreatePrinterFloor,
 } from "@/models/printer-floor/printer-floor.model";
 import { PrinterFloorService } from "@/backend/printer-floor.service";
+import { usePrintersStore } from "@/store/printers.store";
 
 const watchedId = "printerFloorId";
 
-@Component({
+interface Data {
+  formData: PreCreatePrinterFloor;
+  appConstants: AppConstants;
+}
+
+export default defineComponent({
+  name: "PrinterFloorCrudForm",
   components: {
     ValidationProvider,
   },
-  data: () => ({
-    printerGroupsWithoutFloor: [],
-  }),
-})
-export default class PrinterFloorCrudForm extends Vue {
-  @Inject() readonly appConstants!: AppConstants;
-  @Prop() printerFloorId: string;
-  formData: PreCreatePrinterFloor = getDefaultCreatePrinterFloor();
-
-  public get printerFloorNameRules() {
-    return { required: true, min: this.appConstants.minPrinterFloorNameLength };
-  }
-
-  public get floorNumberRules() {
+  setup: () => {
     return {
-      required: true,
-      integer: true,
+      printersStore: usePrintersStore(),
     };
-  }
-
-  get printerGroupNames() {
-    return printersState.printerGroupNames;
-  }
-
+  },
   async created() {
     if (this.printerFloorId) {
-      const crudeData = printersState.printerFloor(this.printerFloorId);
+      const crudeData = this.printersStore.printerFloor(this.printerFloorId);
       this.formData = PrinterFloorService.convertPrinterFloorToCreateForm(crudeData);
-    } else if (printersState.printerFloors?.length) {
-      const maxIndex = Math.max(...printersState.printerFloors.map((pf) => pf.floor)) + 1;
+    } else if (this.printersStore.printerFloors?.length) {
+      const maxIndex = Math.max(...this.printersStore.printerFloors.map((pf) => pf.floor)) + 1;
       this.formData.floor = maxIndex.toString();
     }
 
-    await printersState.loadPrinterGroups();
-  }
-
-  @Watch(watchedId)
-  onChildChanged(val?: string) {
-    if (!val) return;
-
-    const printerFloor = printersState.printerFloor(val);
-
-    // Inverse transformation
-    this.formData = PrinterFloorService.convertPrinterFloorToCreateForm(printerFloor);
-  }
-}
+    await this.printersStore.loadPrinterGroups();
+  },
+  async mounted() {},
+  props: {
+    printerFloorId: String,
+  },
+  data: (): Data => ({
+    formData: getDefaultCreatePrinterFloor(),
+    appConstants: inject("appConstants") as AppConstants,
+  }),
+  computed: {
+    printerFloorNameRules() {
+      return { required: true, min: this.appConstants.minPrinterFloorNameLength };
+    },
+    floorNumberRules() {
+      return {
+        required: true,
+        integer: true,
+      };
+    },
+  },
+  methods: {},
+  watch: {
+    [watchedId](val?: string) {
+      if (!val) return;
+      const printerFloor = this.printersStore.printerFloor(val);
+      this.formData = PrinterFloorService.convertPrinterFloorToCreateForm(printerFloor);
+    },
+  },
+});
 </script>

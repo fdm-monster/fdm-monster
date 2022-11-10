@@ -94,10 +94,10 @@
     </v-data-table>
 
     <v-data-table
-      class="disabled-highlight"
       key="id"
       :headers="firmwareTableHeaders"
       :items="firmwareUpdateStates"
+      class="disabled-highlight"
     >
       <template v-slot:top>
         <v-toolbar flat prominent>
@@ -119,9 +119,9 @@
         <v-btn @click="restartOctoPrint(item)"> Restart OctoPrint</v-btn>
         <v-btn @click="configureFirmwareUpdaterSettings(item)"> Configure</v-btn>
         <v-btn
+          :disabled="isVirtualFirmware(item.firmware) || !isUpdatableFirmware(item.firmware)"
           color="primary"
           @click="flashFirmwareUpdate(item)"
-          :disabled="isVirtualFirmware(item.firmware) || !isUpdatableFirmware(item.firmware)"
         >
           <v-icon>updates</v-icon>
           Update {{ isVirtualFirmware(item.firmware) ? "(VIRTUAL)" : "" }}
@@ -134,8 +134,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { Component } from "vue-property-decorator";
+import { defineComponent } from "vue";
 import { Printer } from "@/models/printers/printer.model";
 import draggable from "vuedraggable";
 import { PrintersService } from "@/backend/printers.service";
@@ -143,169 +142,169 @@ import PrinterDetails from "@/components/PrinterList/PrinterDetails.vue";
 import PrinterUrlAction from "@/components/Generic/Actions/PrinterUrlAction.vue";
 import PrinterSettingsAction from "@/components/Generic/Actions/PrinterSettingsAction.vue";
 import PrinterConnectionAction from "@/components/Generic/Actions/PrinterConnectionAction.vue";
-import { printersState } from "@/store/printers.state";
 import BatchJsonCreateDialog from "@/components/Generic/Dialogs/BatchJsonCreateDialog.vue";
-import UpdatePrinterDialog from "@/components/Generic/Dialogs/UpdatePrinterDialog.vue";
-import CreatePrinterDialog from "@/components/Generic/Dialogs/CreatePrinterDialog.vue";
 import PrinterEmergencyStopAction from "@/components/Generic/Actions/PrinterEmergencyStopAction.vue";
 import { PrinterFirmwareUpdateService } from "@/backend/printer-firmware-update.service";
 import { PrusaFirmwareReleaseModel } from "@/models/plugins/firmware-updates/prusa-firmware-release.model";
 import { PrinterFirmwareStateModel } from "@/models/plugins/firmware-updates/printer-firmware-state.model";
 import SyncPrinterNameAction from "@/components/Generic/Actions/SyncPrinterNameAction.vue";
 
-@Component({
+import { usePrintersStore } from "@/store/printers.store";
+
+interface Data {
+  reorder: boolean;
+  showJsonImportDialog: boolean;
+  search: string;
+  expanded: Printer[];
+  tableHeaders: any[];
+  firmwareTableHeaders: any[];
+  firmwareUpdateStates: PrinterFirmwareStateModel[];
+  firmwareReleases: PrusaFirmwareReleaseModel[];
+}
+
+export default defineComponent({
+  name: "PrintersView",
   components: {
     PrinterDetails,
     draggable,
     BatchJsonCreateDialog,
-    UpdatePrinterDialog,
-    CreatePrinterDialog,
     PrinterUrlAction,
     PrinterSettingsAction,
     PrinterEmergencyStopAction,
     SyncPrinterNameAction,
     PrinterConnectionAction,
   },
-  data: () => ({
-    firmwareUpdates: [],
+  setup: () => {
+    return {
+      printersStore: usePrintersStore(),
+    };
+  },
+  props: {},
+  data: (): Data => ({
+    reorder: false,
+    firmwareUpdateStates: [],
+    firmwareReleases: [],
+    showJsonImportDialog: false,
+    search: "",
+    expanded: [],
+    tableHeaders: [
+      {
+        text: "Order",
+        align: "start",
+        sortable: true,
+        value: "sortIndex",
+      },
+      { text: "Enabled", value: "enabled" },
+      {
+        text: "Printer Name",
+        align: "start",
+        sortable: true,
+        value: "printerName",
+      },
+      { text: "Assigned Group", value: "group", sortable: false },
+      { text: "Actions", value: "actions", sortable: false },
+      { text: "", value: "data-table-expand" },
+    ],
+    firmwareTableHeaders: [
+      {
+        text: "Printer Name",
+        align: "start",
+        sortable: true,
+        value: "printerName",
+      },
+      {
+        text: "Firmware Version",
+        sortable: true,
+        value: "firmware",
+      },
+      {
+        text: "Plugin installed",
+        value: "pluginInstalled",
+      },
+      { text: "Actions", value: "actions", sortable: false },
+    ],
   }),
-})
-export default class Printers extends Vue {
-  reorder = false;
-  firmwareUpdateStates: PrinterFirmwareStateModel[] = [];
-  firmwareReleases: PrusaFirmwareReleaseModel[] = [];
-
-  autoPrint = true;
-  showJsonImportDialog = false;
-  search = "";
-  expanded: Printer[] = [];
-  tableHeaders = [
-    {
-      text: "Order",
-      align: "start",
-      sortable: true,
-      value: "sortIndex",
-    },
-    { text: "Enabled", value: "enabled" },
-    {
-      text: "Printer Name",
-      align: "start",
-      sortable: true,
-      value: "printerName",
-    },
-    { text: "Assigned Group", value: "group", sortable: false },
-    { text: "Actions", value: "actions", sortable: false },
-    { text: "", value: "data-table-expand" },
-  ];
-  firmwareTableHeaders = [
-    {
-      text: "Printer Name",
-      align: "start",
-      sortable: true,
-      value: "printerName",
-    },
-    {
-      text: "Firmware Version",
-      sortable: true,
-      value: "firmware",
-    },
-    {
-      text: "Plugin installed",
-      value: "pluginInstalled",
-    },
-    { text: "Actions", value: "actions", sortable: false },
-  ];
-
   async created() {
     this.firmwareReleases = await PrinterFirmwareUpdateService.getFirmwareReleases();
-  }
+  },
+  async mounted() {},
+  computed: {
+    printers() {
+      return this.printersStore.printers;
+    },
+    latestReleaseVersion() {
+      if (!this.firmwareReleases?.length) return null;
+      const copiedReleases = [...this.firmwareReleases];
+      const result = copiedReleases.sort(
+        (a, b) => Date.parse(b.created_at) - Date.parse(a.created_at)
+      );
 
-  get printers() {
-    return printersState.printers;
-  }
+      if (!result?.length) return "?";
+      return result[0].tag_name;
+    },
+  },
+  methods: {
+    groupOfPrinter(printerId: string) {
+      return this.printersStore.groupOfPrinter(printerId);
+    },
+    isVirtualFirmware(firmwareTag: string) {
+      const firmwareTagUpper = firmwareTag?.toUpperCase();
+      if (!firmwareTagUpper) return false;
+      if (firmwareTagUpper.includes("VIRTUAL")) return true;
+    },
+    isUpdatableFirmware(firmwareTag: string) {
+      const firmwareTagUpper = firmwareTag?.toUpperCase();
+      if (!firmwareTagUpper) return false;
+      return !this.isVirtualFirmware(firmwareTag);
+    },
+    isPluginInstalled(printer: Printer) {
+      const firmwarePluginState = this.firmwareUpdateStates.find((f) => f.id === printer.id);
+      return firmwarePluginState?.pluginInstalled || false;
+    },
+    async loadFirmwareData() {
+      const updateStates = await PrinterFirmwareUpdateService.loadFirmwareUpdateState();
+      this.firmwareUpdateStates = updateStates?.firmwareStates || [];
+    },
+    async installPlugin(printer: Printer) {
+      await PrinterFirmwareUpdateService.installPlugin(printer.id);
+    },
+    async restartOctoPrint(printer: Printer) {
+      await PrintersService.restartOctoPrint(printer.id);
+    },
+    async configureFirmwareUpdaterSettings(printer: Printer) {
+      await PrinterFirmwareUpdateService.configureFirmwareUpdaterSettings(printer.id);
+    },
+    async flashFirmwareUpdate(printer: Printer) {
+      await PrinterFirmwareUpdateService.flashFirmwareUpdate(printer.id);
+    },
+    openEditDialog(printer: Printer) {
+      this.printersStore.setUpdateDialogPrinter(printer);
+    },
+    openCreatePrinterDialog() {
+      this.printersStore.setCreatePrinterDialogOpened(true);
+    },
+    clickRow(item: Printer, event: any) {
+      if (event.isExpanded) {
+        const index = this.expanded.findIndex((i) => i === item);
+        this.expanded.splice(index, 1);
+      } else {
+        this.expanded.push(item);
+      }
+    },
+    async openImportJsonPrintersDialog() {
+      this.showJsonImportDialog = true;
+    },
+    async toggleEnabled(event: any, printer: Printer) {
+      if (!printer.id) {
+        throw new Error("Printer ID not set, cant toggle enabled");
+      }
 
-  groupOfPrinter(printerId: string) {
-    return printersState.groupOfPrinter(printerId);
-  }
-
-  get latestReleaseVersion() {
-    if (!this.firmwareReleases?.length) return null;
-    const result = this.firmwareReleases.sort(
-      (a, b) => Date.parse(b.created_at) - Date.parse(a.created_at)
-    );
-
-    if (!result?.length) return "?";
-    return result[0].tag_name;
-  }
-
-  isVirtualFirmware(firmwareTag: string) {
-    const firmwareTagUpper = firmwareTag?.toUpperCase();
-    if (!firmwareTagUpper) return false;
-    if (firmwareTagUpper.includes("VIRTUAL")) return true;
-  }
-
-  isUpdatableFirmware(firmwareTag: string) {
-    const firmwareTagUpper = firmwareTag?.toUpperCase();
-    if (!firmwareTagUpper) return false;
-    return !this.isVirtualFirmware(firmwareTag);
-  }
-
-  isPluginInstalled(printer: Printer) {
-    const firmwarePluginState = this.firmwareUpdateStates.find((f) => f.id === printer.id);
-    return firmwarePluginState?.pluginInstalled || false;
-  }
-
-  async loadFirmwareData() {
-    const updateStates = await PrinterFirmwareUpdateService.loadFirmwareUpdateState();
-    this.firmwareUpdateStates = updateStates?.firmwareStates || [];
-  }
-
-  async installPlugin(printer: Printer) {
-    await PrinterFirmwareUpdateService.installPlugin(printer.id);
-  }
-
-  async restartOctoPrint(printer: Printer) {
-    await PrintersService.restartOctoPrint(printer.id);
-  }
-
-  async configureFirmwareUpdaterSettings(printer: Printer) {
-    await PrinterFirmwareUpdateService.configureFirmwareUpdaterSettings(printer.id);
-  }
-
-  async flashFirmwareUpdate(printer: Printer) {
-    await PrinterFirmwareUpdateService.flashFirmwareUpdate(printer.id);
-  }
-
-  openEditDialog(printer: Printer) {
-    printersState.setUpdateDialogPrinter(printer);
-  }
-
-  openCreatePrinterDialog() {
-    printersState.setCreateDialogOpened(true);
-  }
-
-  clickRow(item: Printer, event: any) {
-    if (event.isExpanded) {
-      const index = this.expanded.findIndex((i) => i === item);
-      this.expanded.splice(index, 1);
-    } else {
-      this.expanded.push(item);
-    }
-  }
-
-  async openImportJsonPrintersDialog() {
-    this.showJsonImportDialog = true;
-  }
-
-  async toggleEnabled(event: any, printer: Printer) {
-    if (!printer.id) {
-      throw new Error("Printer ID not set, cant toggle enabled");
-    }
-
-    printer.enabled = !printer.enabled;
-    await PrintersService.toggleEnabled(printer.id, printer.enabled);
-  }
-}
+      printer.enabled = !printer.enabled;
+      await PrintersService.toggleEnabled(printer.id, printer.enabled);
+    },
+  },
+  watch: {},
+});
 </script>
 
 <style lang="scss">

@@ -38,14 +38,12 @@
 </template>
 
 <script lang="ts">
-// https://www.digitalocean.com/community/tutorials/vuejs-typescript-class-components
-import Vue from "vue";
-import { Component, Prop } from "vue-property-decorator";
+import Vue, { defineComponent } from "vue";
 import { extend, setInteractionMode, ValidationObserver, ValidationProvider } from "vee-validate";
 import { PrintersService } from "@/backend";
+import { usePrintersStore } from "@/store/printers.store";
 
 setInteractionMode("eager");
-
 extend("json", {
   validate: (value) => {
     try {
@@ -59,44 +57,24 @@ extend("json", {
   message: "{_field_} needs to be valid JSON.",
 });
 
-@Component({
+interface Data {
+  formData: {
+    json: string;
+  };
+  numPrinters: number;
+}
+
+export default defineComponent({
+  name: "BatchJsonCreateDialog",
   components: {
     ValidationProvider,
     ValidationObserver,
   },
-})
-export default class BatchJsonCreateDialog extends Vue {
-  @Prop(Boolean) show: boolean;
-  formData: any = {};
-  numPrinters = 0;
-
-  $refs!: {
-    validationObserver: InstanceType<typeof ValidationObserver>;
-  };
-
-  get mutableShow() {
-    // https://forum.vuejs.org/t/update-data-when-prop-changes-data-derived-from-prop/1517/27
-    return this.show;
-  }
-
-  set mutableShow(newValue: boolean) {
-    this.$emit("update:show", newValue);
-  }
-
-  async updatePrinterCount() {
-    this.numPrinters = (await this.parsedPrinters()).length;
-  }
-
-  async parsedPrinters() {
-    if (!this.$refs.validationObserver) return [];
-    if (!(await this.isValid())) return [];
-
-    const data = JSON.parse(this.formData.json);
-    if (!Array.isArray(data)) return [];
-
-    return data;
-  }
-
+  setup: () => {
+    return {
+      printersStore: usePrintersStore(),
+    };
+  },
   async created() {
     window.addEventListener("keydown", (e) => {
       if (e.key == "Escape") {
@@ -105,43 +83,76 @@ export default class BatchJsonCreateDialog extends Vue {
     });
 
     this.numPrinters = 0;
-  }
+  },
+  async mounted() {},
+  props: {
+    show: Boolean,
+  },
+  data: (): Data => ({
+    formData: {
+      json: "",
+    },
+    numPrinters: 0,
+  }),
+  computed: {
+    validationObserver() {
+      return this.$refs.validationObserver as InstanceType<typeof ValidationObserver>;
+    },
+    mutableShow: {
+      get() {
+        return this.show;
+      },
+      set(newValue: boolean) {
+        this.$emit("update:show", newValue);
+      },
+    },
+  },
+  methods: {
+    async isValid() {
+      return await this.validationObserver.validate();
+    },
+    async parsedPrinters() {
+      if (!this.$refs.validationObserver) return [];
+      if (!(await this.isValid())) return [];
 
-  async isValid() {
-    return await this.$refs.validationObserver.validate();
-  }
+      const data = JSON.parse(this.formData.json);
+      if (!Array.isArray(data)) return [];
 
-  async submit() {
-    if (!(await this.isValid())) return;
+      return data;
+    },
+    async updatePrinterCount() {
+      this.numPrinters = (await this.parsedPrinters()).length;
+    },
+    async submit() {
+      if (!(await this.isValid())) return;
+      const printers = await this.parsedPrinters();
 
-    const printers = await this.parsedPrinters();
+      const numPrinters = printers.length;
+      const answer = confirm(`Are you sure to import ${numPrinters} printers?`);
+      if (answer) {
+        printers.forEach((p) => {
+          p.enabled = false;
+          if (p["_id"]) {
+            delete p["_id"];
+          }
+          if (p["apikey"]) {
+            p.apiKey = p["apikey"];
+            delete p["apikey"];
+          }
+          if (p["settingsApperance"]) {
+            p.settingsAppearance = p["settingsApperance"];
+            delete p["settingsApperance"];
+          }
+        });
+        await PrintersService.batchImportPrinters(printers);
+      }
 
-    const numPrinters = printers.length;
-    const answer = confirm(`Are you sure to import ${numPrinters} printers?`);
-
-    if (answer) {
-      printers.forEach((p) => {
-        p.enabled = false;
-        if (p["_id"]) {
-          delete p["_id"];
-        }
-        if (p["apikey"]) {
-          p.apiKey = p["apikey"];
-          delete p["apikey"];
-        }
-        if (p["settingsApperance"]) {
-          p.settingsAppearance = p["settingsApperance"];
-          delete p["settingsApperance"];
-        }
-      });
-      await PrintersService.batchImportPrinters(printers);
-    }
-
-    this.closeDialog();
-  }
-
-  closeDialog() {
-    this.mutableShow = false;
-  }
-}
+      this.closeDialog();
+    },
+    closeDialog() {
+      this.mutableShow = false;
+    },
+  },
+  watch: {},
+});
 </script>

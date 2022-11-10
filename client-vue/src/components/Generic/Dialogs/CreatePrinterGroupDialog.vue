@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="showingDialog" :max-width="'700px'" persistent>
+  <v-dialog v-model="dialogShowed" :max-width="'700px'" persistent>
     <validation-observer ref="validationObserver" v-slot="{ invalid }">
       <v-card>
         <v-card-title>
@@ -35,11 +35,11 @@
             color="blue darken-1"
             text
             @click="submitCreate()"
-            >Create</v-btn
-          >
+            >Create
+          </v-btn>
           <v-btn v-else :disabled="invalid" color="blue darken-1" text @click="submitUpdate()"
-            >Update</v-btn
-          >
+            >Update
+          </v-btn>
         </v-card-actions>
       </v-card>
     </validation-observer>
@@ -47,105 +47,102 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { Component, Watch } from "vue-property-decorator";
+import { defineComponent } from "vue";
 import { ValidationObserver } from "vee-validate";
 import { PrinterGroupService } from "@/backend";
 import { generateInitials } from "@/constants/noun-adjectives.data";
-import { printersState } from "@/store/printers.state";
 import { infoMessageEvent } from "@/event-bus/alert.events";
 import PrinterGroupCrudForm from "@/components/Generic/Forms/PrinterGroupCrudForm.vue";
+import { usePrintersStore } from "@/store/printers.store";
 
-@Component({
+interface Data {
+  dialogShowed: boolean;
+}
+
+export default defineComponent({
+  name: "CreatePrinterGroupDialog",
   components: {
     ValidationObserver,
     PrinterGroupCrudForm,
   },
-  data: () => ({}),
-})
-export default class CreatePrinterGroupDialog extends Vue {
-  showingDialog = false;
-
-  showChecksPanel = false;
-  $refs!: {
-    validationObserver: InstanceType<typeof ValidationObserver>;
-    printerGroupCrudForm: InstanceType<typeof PrinterGroupCrudForm>;
-  };
-
-  get updatePrinterGroup() {
-    // Must call getter (otherwise will not listen)
-    return printersState.currentUpdateDialogPrinterGroup;
-  }
-
-  get dialogOpenedState() {
-    return printersState.createGroupDialogOpened;
-  }
-
-  @Watch("updatePrinterGroup")
-  async inputUpdate(id?: string) {
-    if (!id) return;
-  }
-
-  @Watch("dialogOpenedState")
-  changeDialogOpened(newValue: boolean) {
-    this.showingDialog = newValue;
-  }
-
-  formData() {
-    return this.$refs.printerGroupCrudForm?.formData;
-  }
-
+  setup: () => {
+    return {
+      printersStore: usePrintersStore(),
+    };
+  },
   async created() {
     window.addEventListener("keydown", (e) => {
       if (e.key == "Escape") {
         this.closeDialog();
       }
     });
-  }
+  },
+  async mounted() {},
+  props: {},
+  data: (): Data => ({
+    dialogShowed: false,
+  }),
+  computed: {
+    validationObserver() {
+      return this.$refs.validationObserver as InstanceType<typeof ValidationObserver>;
+    },
+    printerGroupCrudForm() {
+      return this.$refs.printerGroupCrudForm as InstanceType<typeof PrinterGroupCrudForm>;
+    },
+    formData() {
+      return this.printerGroupCrudForm?.formData;
+    },
+    dialogOpenedState() {
+      return this.printersStore.createGroupDialogOpened;
+    },
+    updatePrinterGroup() {
+      // TODO Must still call getter for watch?
+      return this.printersStore.updateDialogPrinterGroup;
+    },
+  },
+  methods: {
+    avatarInitials() {
+      if (this.formData && this.dialogShowed) {
+        return generateInitials(this.formData.name);
+      }
+    },
+    async isValid() {
+      return await this.validationObserver.validate();
+    },
+    async submitCreate() {
+      if (!(await this.isValid())) return;
+      if (!this.formData) return;
+      const newPrinterGroupData = PrinterGroupService.convertCreateFormToPrinterGroup(
+        this.formData
+      );
+      await this.printersStore.createPrinterGroup(newPrinterGroupData);
+      this.$bus.emit(infoMessageEvent, `Printer group ${newPrinterGroupData.name} created`);
+      this.closeDialog();
+    },
+    async submitUpdate() {
+      if (!(await this.isValid())) return;
+      if (!this.formData || !this.updatePrinterGroup?._id) return;
+      const updatePrinterGroup = PrinterGroupService.convertCreateFormToPrinterGroup(this.formData);
+      await this.printersStore.updatePrinterGroup({
+        printerGroupId: this.updatePrinterGroup!._id!,
+        updatePrinterGroup,
+      });
+      this.$bus.emit(infoMessageEvent, `Printer group ${updatePrinterGroup.name} updated`);
 
-  avatarInitials() {
-    const formData = this.formData();
-    if (formData && this.showingDialog) {
-      return generateInitials(formData.name);
-    }
-  }
-
-  async isValid() {
-    return await this.$refs.validationObserver.validate();
-  }
-
-  async submitCreate() {
-    if (!(await this.isValid())) return;
-
-    const formData = this.formData();
-    if (!formData) return;
-    const newPrinterGroupData = PrinterGroupService.convertCreateFormToPrinterGroup(formData);
-
-    await printersState.createPrinterGroup(newPrinterGroupData);
-    this.$bus.emit(infoMessageEvent, `Printer group ${newPrinterGroupData.name} created`);
-
-    this.closeDialog();
-  }
-
-  async submitUpdate() {
-    if (!(await this.isValid())) return;
-
-    const formData = this.formData();
-    if (!formData || !this.updatePrinterGroup?._id) return;
-    const updatePrinterGroup = PrinterGroupService.convertCreateFormToPrinterGroup(formData);
-
-    await printersState.updatePrinterGroup({
-      printerGroupId: this.updatePrinterGroup!._id!,
-      updatePrinterGroup,
-    });
-    this.$bus.emit(infoMessageEvent, `Printer group ${updatePrinterGroup.name} updated`);
-
-    this.closeDialog();
-  }
-
-  closeDialog() {
-    printersState.setCreateGroupDialogOpened(false);
-    printersState.setUpdateDialogPrinterGroup();
-  }
-}
+      this.closeDialog();
+    },
+    closeDialog() {
+      this.printersStore.setCreateGroupDialogOpened(false);
+      this.printersStore.setUpdateDialogPrinterGroup();
+    },
+  },
+  watch: {
+    dialogShowed(newVal: boolean) {
+      this.dialogShowed = newVal;
+    },
+    async updatePrinterGroup(id?: string) {
+      if (!id) return;
+    },
+  },
+});
 </script>

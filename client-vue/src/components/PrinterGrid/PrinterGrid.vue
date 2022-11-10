@@ -41,8 +41,8 @@ import { sseGroups, sseMessageGlobal } from "@/event-bus/sse.events";
 import PrinterGridTile from "@/components/PrinterGrid/PrinterGridTile.vue";
 import { PrinterGroup } from "@/models/printer-groups/printer-group.model";
 import { columnCount, rowCount, totalVuetifyColumnCount } from "@/constants/printer-grid.constants";
-import { useOutletCurrentStore } from "@/stores-pinia/outlet-current.store";
-import { usePrintersStore } from "@/stores-pinia/printers.store";
+import { useOutletCurrentStore } from "@/store/outlet-current.store";
+import { usePrintersStore } from "@/store/printers.store";
 
 export default defineComponent({
   components: { PrinterGridTile },

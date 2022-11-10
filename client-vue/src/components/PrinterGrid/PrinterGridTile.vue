@@ -100,7 +100,7 @@ import { Printer } from "@/models/printers/printer.model";
 import RAL_CODES from "@/constants/ral.reference.json";
 import { CustomGcodeService } from "@/backend/custom-gcode.service";
 import { PrintersService } from "@/backend";
-import { usePrintersStore } from "@/stores-pinia/printers.store";
+import { usePrintersStore } from "@/store/printers.store";
 
 const defaultColor = "rgba(100,100,100,0.1)";
 const maintenanceColor = "black";

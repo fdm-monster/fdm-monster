@@ -11,25 +11,24 @@
 </template>
 
 <script lang="ts">
-import Component from "vue-class-component";
-import Vue from "vue";
-import FileControlList from "@/components/PrinterList/FileControlList.vue";
-import { Prop } from "vue-property-decorator";
+import { defineComponent, PropType } from "vue";
 import { Printer } from "@/models/printers/printer.model";
 import { PrintersService } from "@/backend";
 
-@Component({
-  components: { FileList: FileControlList },
-})
-export default class PrinterUrlAction extends Vue {
-  @Prop() printer: Printer;
-
-  get printerId() {
-    return this.printer.id;
-  }
-
-  openPrinterURL(printer: Printer) {
-    PrintersService.openPrinterURL(printer.printerURL);
-  }
-}
+export default defineComponent({
+  name: "PrinterUrlAction",
+  props: {
+    printer: Object as PropType<Printer>,
+  },
+  computed: {
+    printerId() {
+      return this.printer!.id;
+    },
+  },
+  methods: {
+    openPrinterURL(printer: Printer) {
+      PrintersService.openPrinterURL(printer.printerURL);
+    },
+  },
+});
 </script>

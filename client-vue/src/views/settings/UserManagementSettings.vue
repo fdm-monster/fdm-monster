@@ -30,20 +30,27 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { Component } from "vue-property-decorator";
+import { defineComponent } from "vue";
 import { UserService } from "@/backend/user.service";
 import { User } from "@/models/user.model";
 
-@Component({
-  components: {},
-  data: () => ({ users: [] }),
-})
-export default class UserManagementSettings extends Vue {
+interface Data {
   users: User[];
+}
 
+export default defineComponent({
+  name: "UserManagementSettings",
+  setup: () => {
+    return {};
+  },
+  props: {},
+  data: (): Data => ({ users: [] }),
   async created() {
     this.users = await UserService.listUsers();
-  }
-}
+  },
+  async mounted() {},
+  computed: {},
+  methods: {},
+  watch: {},
+});
 </script>

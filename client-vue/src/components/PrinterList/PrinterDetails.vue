@@ -31,32 +31,48 @@
 </template>
 
 <script lang="ts">
-import Component from "vue-class-component";
-import Vue from "vue";
+import { defineComponent, PropType } from "vue";
 import FileControlList from "@/components/PrinterList/FileControlList.vue";
-import { Prop } from "vue-property-decorator";
 import { Printer } from "@/models/printers/printer.model";
 import PrinterDeleteAction from "@/components/Generic/Actions/PrinterDeleteAction.vue";
-import { printersState } from "@/store/printers.state";
 import RefreshFilesAction from "@/components/Generic/Actions/RefreshFilesAction.vue";
+import { usePrintersStore } from "@/store/printers.store";
 
-@Component({
+interface Data {
+  dragging: boolean;
+}
+
+export default defineComponent({
+  name: "PrinterDetails",
   components: {
     FileControlList,
     PrinterDeleteAction,
     RefreshFilesAction,
   },
-})
-export default class PrinterDetails extends Vue {
-  @Prop() printer: Printer;
-  dragging = false;
-
-  get printerId() {
-    return this.printer.id;
-  }
-
-  getPrinterFileCount() {
-    return printersState.printerFileBucket(this.printer.id)?.files.length || 0;
-  }
-}
+  setup: () => {
+    return {
+      printersStore: usePrintersStore(),
+    };
+  },
+  async created() {},
+  async mounted() {},
+  props: {
+    printer: Object as PropType<Printer>,
+  },
+  data: (): Data => ({
+    dragging: false,
+  }),
+  computed: {
+    printerId() {
+      return this.printer?.id;
+    },
+  },
+  methods: {
+    getPrinterFileCount() {
+      if (!this.printer) return undefined;
+      return this.printersStore.printerFileBucket(this.printer.id)?.files.length || 0;
+    },
+  },
+  watch: {},
+});
 </script>
