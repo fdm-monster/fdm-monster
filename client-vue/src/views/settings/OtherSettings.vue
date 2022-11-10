@@ -34,16 +34,30 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { Component } from "vue-property-decorator";
+import { defineComponent } from "vue";
 import { ServerPrivateService } from "@/backend/server-private.service";
 
-@Component({
-  components: {},
-})
-export default class OtherSettings extends Vue {
-  async restartServer() {
-    await ServerPrivateService.restartServer();
-  }
+interface Data {
+  property: number;
 }
+
+export default defineComponent({
+  name: "OtherSettings",
+  setup: () => {
+    return {};
+  },
+  props: {},
+  data: (): Data => ({
+    property: 0,
+  }),
+  async created() {},
+  async mounted() {},
+  computed: {},
+  methods: {
+    async restartServer() {
+      await ServerPrivateService.restartServer();
+    },
+  },
+  watch: {},
+});
 </script>

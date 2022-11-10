@@ -1,11 +1,11 @@
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
-import HomePrinterGrid from "@/views/HomePrinterGrid.vue";
-import Printers from "@/views/Printers.vue";
-import Settings from "@/views/Settings.vue";
+import HomePrinterGrid from "@/views/PrinterGridView.vue";
+import Printers from "@/views/PrintersView.vue";
+import Settings from "@/views/SettingsView.vue";
 import PrinterGroupsSettings from "@/views/settings/PrinterGroupsSettings.vue";
-import About from "@/views/About.vue";
-import PrintTimeline from "@/views/PrintTimeline.vue";
+import About from "@/views/AboutView.vue";
+import PrintTimeline from "@/views/PrintTimelineView.vue";
 import FdmSettings from "@/views/settings/FdmSettings.vue";
 import OtherSettings from "@/views/settings/OtherSettings.vue";
 import UserManagementSettings from "@/views/settings/UserManagementSettings.vue";
@@ -67,7 +67,7 @@ const routes: Array<RouteConfig> = [
   {
     path: "*",
     name: "NotFound",
-    component: () => import(/* webpackChunkName: "about" */ "../views/NotFound.vue"),
+    component: () => import(/* webpackChunkName: "about" */ "../views/NotFoundView.vue"),
   },
 ];
 

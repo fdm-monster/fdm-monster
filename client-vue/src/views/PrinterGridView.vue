@@ -58,85 +58,91 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { Component } from "vue-property-decorator";
-import CreatePrinterDialog from "@/components/Generic/Dialogs/CreatePrinterDialog.vue";
+import { defineComponent } from "vue";
 import PrinterGrid from "@/components/PrinterGrid/PrinterGrid.vue";
-import { printersState } from "@/store/printers.state";
 import { Printer } from "@/models/printers/printer.model";
 import { PrintersService } from "@/backend";
 import { formatBytes } from "@/utils/file-size.util";
-import SideNavExplorer from "@/components/Generic/SideNavs/FileExplorerSideNav.vue";
 import { infoMessageEvent } from "@/event-bus/alert.events";
-import { uploadsState } from "@/store/uploads.state";
 import { convertMultiPrinterFileToQueue } from "@/utils/uploads-state.utils";
 import HomeToolbar from "@/components/PrinterGrid/HomeToolbar.vue";
+import { usePrintersStore } from "@/store/printers.store";
+import { useUploadsStore } from "@/store/uploads.store";
 
-@Component({
-  components: { PrinterGrid, SideNavExplorer, CreatePrinterDialog, HomeToolbar },
-  data: () => ({
-    selectedFile: undefined,
-    viewedPrinter: undefined,
-  }),
-})
-export default class HomePage extends Vue {
-  formatBytes = formatBytes;
-  $refs!: {
-    fileUpload: InstanceType<typeof HTMLInputElement>;
-  };
-  selectedFile?: File;
+export default defineComponent({
+  name: "PrinterGridView",
+  components: { PrinterGrid, HomeToolbar },
+  setup: () => {
+    return {
+      printersStore: usePrintersStore(),
+      uploadsStore: useUploadsStore(),
+    };
+  },
+  async created() {},
+  async mounted() {},
+  props: {},
+  data(): {
+    selectedFile?: File;
+    viewedPrinter?: Printer;
+  } {
+    return {
+      selectedFile: undefined,
+      viewedPrinter: undefined,
+    };
+  },
+  computed: {
+    hasPrintersSelected(): boolean {
+      return this.selectedPrinters?.length > 0;
+    },
+    selectedPrinters() {
+      return this.printersStore.selectedPrinters;
+    },
+    fileUpload() {
+      return this.$refs.fileUpload as InstanceType<typeof HTMLInputElement>;
+    },
+  },
+  methods: {
+    deselectFile() {
+      (this.$refs.fileUpload as InstanceType<typeof HTMLInputElement>)!.value = "";
+      this.selectedFile = undefined;
+    },
+    formatBytes: formatBytes,
 
-  get hasPrintersSelected(): boolean {
-    return this.selectedPrinters?.length > 0;
-  }
+    clearSelectedPrinters() {
+      this.printersStore.clearSelectedPrinters();
+    },
+    async uploadFile() {
+      const selectedPrinters = this.selectedPrinters;
+      const accessiblePrinters = selectedPrinters.filter((p) => p.apiAccessibility.accessible);
 
-  get selectedPrinters() {
-    return printersState.selectedPrinters;
-  }
+      if (!this.selectedFile) return;
 
-  async uploadFile() {
-    const selectedPrinters = this.selectedPrinters;
-    const accessiblePrinters = selectedPrinters.filter((p) => p.apiAccessibility.accessible);
+      // Checking and informing user
+      const incompleteListCount = selectedPrinters.length - accessiblePrinters.length;
+      if (incompleteListCount > 0) {
+        this.$bus.emit(
+          infoMessageEvent,
+          `${incompleteListCount} printers were skipped as they are not accessible or disabled (now).`
+        );
+      }
 
-    if (!this.selectedFile) return;
+      const uploads = convertMultiPrinterFileToQueue(accessiblePrinters, this.selectedFile);
+      this.uploadsStore.queueUploads(uploads);
 
-    // Checking and informing user
-    const incompleteListCount = selectedPrinters.length - accessiblePrinters.length;
-    if (incompleteListCount > 0) {
-      this.$bus.emit(
-        infoMessageEvent,
-        `${incompleteListCount} printers were skipped as they are not accessible or disabled (now).`
-      );
-    }
+      this.fileUpload!.value = "";
+      this.clearSelectedPrinters();
+    },
+    filesSelected() {
+      if (!this.fileUpload.files) return (this.selectedFile = undefined);
 
-    const uploads = convertMultiPrinterFileToQueue(accessiblePrinters, this.selectedFile);
-    uploadsState.queueUploads(uploads);
-
-    this.$refs.fileUpload.value = "";
-    this.clearSelectedPrinters();
-  }
-
-  deselectFile() {
-    this.$refs.fileUpload.value = "";
-    this.selectedFile = undefined;
-  }
-
-  filesSelected() {
-    if (!this.$refs.fileUpload.files) return (this.selectedFile = undefined);
-
-    this.selectedFile = this.$refs.fileUpload.files[0];
-  }
-
-  deselectPrinter(printer: Printer) {
-    printersState.toggleSelectedPrinter(printer);
-  }
-
-  clearSelectedPrinters() {
-    printersState.clearSelectedPrinters();
-  }
-
-  openPrinter(printer: Printer) {
-    PrintersService.openPrinterURL(printer.printerURL);
-  }
-}
+      this.selectedFile = this.fileUpload.files[0];
+    },
+    deselectPrinter(printer: Printer) {
+      this.printersStore.toggleSelectedPrinter(printer);
+    },
+    openPrinter(printer: Printer) {
+      PrintersService.openPrinterURL(printer.printerURL);
+    },
+  },
+});
 </script>

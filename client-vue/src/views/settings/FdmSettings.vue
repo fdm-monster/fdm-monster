@@ -30,7 +30,7 @@
               outlined
               type="number"
             />
-            <v-btn @click="setFileHandlingClientSettings">save</v-btn>
+            <v-btn @click="setFileCleanSettings()">save</v-btn>
           </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
@@ -65,51 +65,63 @@
 </template>
 
 <script lang="ts">
-import Component from "vue-class-component";
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { PrinterFileService, SettingsService } from "@/backend";
 import { PrinterSettingsService } from "@/backend/printer-settings.service";
-import { printersState } from "@/store/printers.state";
 import { infoMessageEvent } from "@/event-bus/alert.events";
 import { PrinterFileCleanSettings } from "@/models/server-settings/printer-file-clean-settings.model";
+import { usePrintersStore } from "@/store/printers.store";
 
-@Component({})
-export default class FdmSettings extends Vue {
-  fileHandlingSettings: PrinterFileCleanSettings = {
-    autoRemoveOldFilesBeforeUpload: false,
-    autoRemoveOldFilesAtBoot: false,
-    autoRemoveOldFilesCriteriumDays: 7,
-  };
+interface Data {
+  fileHandlingSettings: PrinterFileCleanSettings;
+}
 
+export default defineComponent({
+  name: "FdmSettings",
+  setup: () => {
+    return {
+      printersStore: usePrintersStore(),
+    };
+  },
+  props: {},
+  data: (): Data => ({
+    fileHandlingSettings: {
+      autoRemoveOldFilesBeforeUpload: false,
+      autoRemoveOldFilesAtBoot: false,
+      autoRemoveOldFilesCriteriumDays: 7,
+    },
+  }),
   async created() {
     const serverSettings = await SettingsService.getServerSettings();
     this.fileHandlingSettings = serverSettings.printerFileClean;
-  }
+  },
+  mounted() {},
+  computed: {},
+  methods: {
+    async setFileCleanSettings() {
+      const serverSettings = await SettingsService.setFileCleanSettings(this.fileHandlingSettings);
+      this.fileHandlingSettings = serverSettings.printerFileClean;
+    },
+    async purgeFiles() {
+      await PrinterFileService.purgeFiles();
 
-  async setFileCleanSettings() {
-    const serverSettings = await SettingsService.setFileCleanSettings(this.fileHandlingSettings);
-    this.fileHandlingSettings = serverSettings.printerFileClean;
-  }
-
-  async purgeFiles() {
-    await PrinterFileService.purgeFiles();
-
-    this.$bus.emit(infoMessageEvent, `Successfully purged all references to printer files!`);
-  }
-
-  async bulkDisableGCodeAnalysis() {
-    const printers = printersState.onlinePrinters;
-    this.$bus.emit(
-      infoMessageEvent,
-      `Trying to disable gcode analysis for ${printers.length} online printers.`
-    );
-    for (const printer of printers) {
-      await PrinterSettingsService.setGCodeAnalysis(printer.id, false);
-    }
-    this.$bus.emit(
-      infoMessageEvent,
-      `Finished disabling gcode analysis for ${printers.length} online printers.`
-    );
-  }
-}
+      this.$bus.emit(infoMessageEvent, `Successfully purged all references to printer files!`);
+    },
+    async bulkDisableGCodeAnalysis() {
+      const printers = this.printersStore.onlinePrinters;
+      this.$bus.emit(
+        infoMessageEvent,
+        `Trying to disable gcode analysis for ${printers.length} online printers.`
+      );
+      for (const printer of printers) {
+        await PrinterSettingsService.setGCodeAnalysis(printer.id, false);
+      }
+      this.$bus.emit(
+        infoMessageEvent,
+        `Finished disabling gcode analysis for ${printers.length} online printers.`
+      );
+    },
+  },
+  watch: {},
+});
 </script>

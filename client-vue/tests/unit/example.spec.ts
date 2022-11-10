@@ -1,12 +1,10 @@
 import { shallowMount } from "@vue/test-utils";
-import HelloWorld from "@/components/PrinterGrid/LocationMap.vue";
+import HomeToolbar from "@/components/PrinterGrid/HomeToolbar.vue";
 
-describe("Map.vue", () => {
+describe("HomeToolbar", () => {
   it("renders props.msg when passed", () => {
     const msg = "new message";
-    const wrapper = shallowMount(HelloWorld, {
-      propsData: { msg }
-    });
+    const wrapper = shallowMount(HomeToolbar, {});
     expect(wrapper.text()).toMatch(msg);
   });
 });

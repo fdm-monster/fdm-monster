@@ -33,35 +33,47 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { Component } from "vue-property-decorator";
-import CreatePrinterGroupDialog from "@/components/Generic/Dialogs/CreatePrinterGroupDialog.vue";
+import { defineComponent } from "vue";
+import { usePrintersStore } from "@/store/printers.store";
 
-@Component({
-  components: { CreatePrinterGroupDialog },
-  data() {
+interface Data {
+  items: any[];
+}
+
+export default defineComponent({
+  name: "SettingsView",
+  components: {},
+  setup: () => {
     return {
-      items: [
-        {
-          title: "Printer floors",
-          icon: "house_siding",
-          path: "/settings/printer-floors",
-        },
-        {
-          title: "Printer groups",
-          icon: "dashboard",
-          path: "/settings/printer-groups",
-        },
-        {
-          title: "User Management",
-          icon: "group",
-          path: "/settings/user-management",
-        },
-        { title: "FDM settings", icon: "image", path: "/settings/system" },
-        { title: "Other", icon: "help", path: "/settings/other" },
-      ],
+      printersStore: usePrintersStore(),
     };
   },
-})
-export default class Settings extends Vue {}
+  async created() {},
+  async mounted() {},
+  props: {},
+  data: (): Data => ({
+    items: [
+      {
+        title: "Printer floors",
+        icon: "house_siding",
+        path: "/settings/printer-floors",
+      },
+      {
+        title: "Printer groups",
+        icon: "dashboard",
+        path: "/settings/printer-groups",
+      },
+      {
+        title: "User Management",
+        icon: "group",
+        path: "/settings/user-management",
+      },
+      { title: "FDM settings", icon: "image", path: "/settings/system" },
+      { title: "Other", icon: "help", path: "/settings/other" },
+    ],
+  }),
+  computed: {},
+  methods: {},
+  watch: {},
+});
 </script>

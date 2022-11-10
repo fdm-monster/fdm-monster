@@ -7,9 +7,9 @@
             v-model="formData.printerName"
             :counter="printerNameRules.max"
             :error-messages="errors"
+            autofocus
             label="Printer name*"
             required
-            autofocus
           />
         </validation-provider>
 
@@ -27,10 +27,12 @@
         </validation-provider>
 
         <validation-provider v-slot="{ errors }" name="Groups">
+          <!-- TODO Groups not defined -->
           <v-select
             v-model="formData.groups"
             :error-messages="errors"
             :items="printerGroupNames"
+            disabled
             label="Groups"
             multiple
             no-data-text="No groups known"
@@ -121,8 +123,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { Component, Inject, Prop, Watch } from "vue-property-decorator";
+import { defineComponent, inject } from "vue";
 import { ValidationProvider } from "vee-validate";
 import { AppConstants } from "@/constants/app.constants";
 import {
@@ -130,59 +131,67 @@ import {
   getDefaultCreatePrinter,
   PreCreatePrinter,
 } from "@/models/printers/crud/create-printer.model";
-import { printersState } from "@/store/printers.state";
 import { PrintersService } from "@/backend";
-import { Printer } from "@/models/printers/printer.model";
+import { usePrintersStore } from "@/store/printers.store";
 
 const watchedId = "printerId";
 
-@Component({
+interface Data {
+  formData: PreCreatePrinter;
+}
+
+export default defineComponent({
+  name: "PrinterCrudForm",
   components: {
     ValidationProvider,
   },
-})
-export default class PrinterCrudForm extends Vue {
-  @Inject() readonly appConstants!: AppConstants;
-  @Prop() printerId: string;
-  formData?: PreCreatePrinter = getDefaultCreatePrinter();
-
-  public get apiKeyRules() {
+  setup: () => {
     return {
-      required: true,
-      length: this.appConstants.apiKeyLength,
-      alpha_num: true,
+      printersStore: usePrintersStore(),
+      appConstants: inject("appConstants") as AppConstants,
     };
-  }
-
-  public get printerNameRules() {
-    return { required: true, max: this.appConstants.maxPrinterNameLength };
-  }
-
-  get printerGroupNames() {
-    return printersState.printerGroupNames;
-  }
-
+  },
   async created() {
     if (this.printerId) {
-      const crudeData = this.$store.getters.printer(this.printerId);
+      const crudeData = this.printersStore.printer(this.printerId) as CreatePrinter;
       this.formData = PrintersService.convertPrinterToCreateForm(crudeData);
     }
 
-    await printersState.loadPrinterGroups();
-  }
-
-  resetForm() {
-    this.formData = getDefaultCreatePrinter();
-  }
-
-  @Watch(watchedId)
-  onChildChanged(val?: string) {
-    if (!val) return;
-
-    const printer = printersState.printer(val) as CreatePrinter;
-
-    // Inverse transformation
-    this.formData = PrintersService.convertPrinterToCreateForm(printer);
-  }
-}
+    await this.printersStore.loadPrinterGroups();
+  },
+  async mounted() {},
+  props: {
+    printerId: String,
+  },
+  data: (): Data => ({
+    formData: getDefaultCreatePrinter(),
+  }),
+  computed: {
+    printerGroupNames() {
+      return this.printersStore.printerGroupNames;
+    },
+    printerNameRules() {
+      return { required: true, max: this.appConstants.maxPrinterNameLength };
+    },
+    apiKeyRules() {
+      return {
+        required: true,
+        length: this.appConstants.apiKeyLength,
+        alpha_num: true,
+      };
+    },
+  },
+  methods: {
+    resetForm() {
+      this.formData = getDefaultCreatePrinter();
+    },
+  },
+  watch: {
+    [watchedId](val?: string) {
+      if (!val) return;
+      const printer = this.printersStore.printer(val) as CreatePrinter;
+      this.formData = PrintersService.convertPrinterToCreateForm(printer);
+    },
+  },
+});
 </script>

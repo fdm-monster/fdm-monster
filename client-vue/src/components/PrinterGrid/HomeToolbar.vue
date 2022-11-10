@@ -30,10 +30,17 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { printersState } from "@/store/printers.state";
+import { defineComponent } from "vue";
+import { usePrintersStore } from "@/store/printers.store";
 
-export default Vue.extend({
+export default defineComponent({
+  name: "HomeToolbar",
+  components: {},
+  setup() {
+    return {
+      printersStore: usePrintersStore(),
+    };
+  },
   data(): {
     selectedFloorToggleIndex: number;
     bedTempOverrideEnabled: boolean;
@@ -48,30 +55,20 @@ export default Vue.extend({
     };
   },
   computed: {
-    selectedFloorIndex() {
-      if (!printersState.printerFloors || !printersState.selectedPrinterFloor) return null;
-
-      return printersState.printerFloors.findIndex(
-        (pf) => pf._id == printersState.selectedPrinterFloor!._id
-      );
-    },
     floors() {
-      return printersState.printerFloors;
+      return this.printersStore.printerFloors;
     },
   },
   methods: {
     changeFloorIndex(index: any) {
-      printersState.changeSelectedFloorByIndex(index);
+      this.printersStore.changeSelectedFloorByIndex(index);
       this.selectedFloorToggleIndex = index;
     },
-    openCreatePrinterDialog() {
-      printersState.setCreateDialogOpened(true);
-    },
     saveBedTemperatureOverride() {
-      printersState.setBedTempOverride(this.bedTempOverrideEnabled);
+      this.printersStore.setBedTempOverride(this.bedTempOverrideEnabled);
     },
     saveBedTemperature() {
-      printersState.setBedTemp(this.bedTemperature);
+      this.printersStore.setBedTemp(this.bedTemperature);
     },
   },
 });

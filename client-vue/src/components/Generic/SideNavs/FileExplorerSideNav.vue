@@ -67,8 +67,8 @@
       </v-list-item-content>
     </v-list-item>
     <v-alert
-      color="primary"
       v-if="!storedSideNavPrinter?.enabled || !storedSideNavPrinter?.apiAccessibility?.accessible"
+      color="primary"
     >
       <span v-if="!storedSideNavPrinter?.enabled">
         Disabled OctoPrint, enable it first to get live updates
@@ -281,10 +281,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component from "vue-class-component";
-import { Watch } from "vue-property-decorator";
-import { printersState } from "@/store/printers.state";
+import { defineComponent } from "vue";
 import { Printer } from "@/models/printers/printer.model";
 import { generateInitials } from "@/constants/noun-adjectives.data";
 import { PrinterFileService, PrintersService } from "@/backend";
@@ -294,216 +291,199 @@ import { isPrinterStoppable } from "@/utils/printer-state.utils";
 import { formatBytes } from "@/utils/file-size.util";
 import { CustomGcodeService } from "@/backend/custom-gcode.service";
 
-@Component({
-  data: () => ({
-    shownFileBucket: {},
-  }),
-})
-export default class FileExplorerSideNav extends Vue {
-  drawerOpened = false;
-  loading = true;
+import { usePrintersStore } from "@/store/printers.store";
+
+interface Data {
   shownFileBucket?: PrinterFileBucket;
-  formatBytes = formatBytes;
-
-  get printerId() {
-    return this.storedSideNavPrinter?.id;
-  }
-
-  get isOperational() {
-    return printersState.isPrinterOperational(this.printerId);
-  }
-
-  get isEnabled() {
-    return this.storedSideNavPrinter?.enabled;
-  }
-
-  get isUnderMaintenance() {
-    return !!this.storedSideNavPrinter?.disabledReason?.length;
-  }
-
-  get filesListed() {
-    return this.shownFileBucket?.files || [];
-  }
-
-  get storedSideNavPrinter() {
-    return printersState.currentSideNavPrinter;
-  }
-
-  get isStoppable() {
-    if (!this.storedSideNavPrinter) return false;
-    return isPrinterStoppable(this.storedSideNavPrinter);
-  }
-
-  get canBeCleared() {
-    return (
-      this.shownFileBucket?.files?.length && this.storedSideNavPrinter?.apiAccessibility.accessible
-    );
-  }
-
-  truncateProgress(progress: number) {
-    if (!progress) return "";
-    return progress?.toFixed(1);
-  }
-
-  @Watch("storedSideNavPrinter")
-  async inputUpdate(viewedPrinter?: Printer, oldVal?: Printer) {
-    this.drawerOpened = !!viewedPrinter;
-    const printerId = viewedPrinter?.id;
-    if (!viewedPrinter || !printerId) {
-      return;
-    }
-
-    if (!this.shownFileBucket || viewedPrinter.id !== this.shownFileBucket.printerId || !oldVal) {
-      await this.refreshFiles(viewedPrinter);
-    }
-  }
-
-  @Watch("drawerOpened")
-  updateStore(newVal: boolean) {
-    // Due to the animation delay the nav model lags behind enough for SSE to pick up and override
-    if (!newVal) {
-      printersState.setSideNavPrinter(undefined);
-    }
-  }
-
-  isFileBeingPrinted(file: PrinterFile) {
-    if (!this.storedSideNavPrinter) return false;
-    // Completed job will not disappear (yet)
-    if (this.storedSideNavPrinter.printerState.state === "Operational") return false;
-    return this.storedSideNavPrinter.currentJob?.fileName === file.name;
-  }
-
-  currentJob() {
-    return this.storedSideNavPrinter?.currentJob || {};
-  }
-
-  avatarInitials() {
-    const viewedPrinter = this.storedSideNavPrinter;
-    if (viewedPrinter && this.drawerOpened) {
-      return generateInitials(viewedPrinter.printerName);
-    }
-  }
-
-  openPrinterURL() {
-    if (!this.storedSideNavPrinter) return;
-
-    PrintersService.openPrinterURL(this.storedSideNavPrinter.printerURL);
-
-    this.closeDrawer();
-  }
-
-  async togglePrinterConnection() {
-    if (!this.printerId) return;
-
-    if (printersState.isPrinterOperational(this.printerId)) {
-      return await PrintersService.sendPrinterDisconnectCommand(this.printerId);
-    }
-
-    await PrintersService.sendPrinterConnectCommand(this.printerId);
-  }
-
-  async toggleEnabled() {
-    if (!this.printerId) {
-      throw new Error("Printer ID not set, cant toggle enabled");
-    }
-    if (!this.storedSideNavPrinter) {
-      throw new Error("Cant toggle enabled, sidenav printer unset");
-    }
-
-    const newSetting = !this.storedSideNavPrinter.enabled;
-    await PrintersService.toggleEnabled(this.printerId, newSetting);
-  }
-
-  async toggleMaintenance() {
-    if (!this.printerId) {
-      throw new Error("Printer ID not set, cant toggle maintenance");
-    }
-    if (!this.storedSideNavPrinter) {
-      throw new Error("Cant toggle enabled, sidenav printer unset");
-    }
-
-    if (this.isUnderMaintenance) {
-      await PrintersService.updatePrinterMaintenance(this.printerId);
-      return;
-    }
-
-    printersState.setMaintenanceDialogPrinter(this.storedSideNavPrinter);
-    this.closeDrawer();
-  }
-
-  async refreshFiles(viewedPrinter: Printer) {
-    this.loading = true;
-    const printerId = viewedPrinter.id;
-    // Offline printer fallback
-    if (viewedPrinter.apiAccessibility.accessible) {
-      const fileCache = await printersState.loadPrinterFiles({
-        printerId,
-        recursive: false,
-      });
-      this.shownFileBucket = {
-        printerId,
-        ...fileCache,
-      };
-    } else {
-      const fileCache = await PrinterFileService.getFileCache(printerId);
-      this.shownFileBucket = {
-        printerId,
-        ...fileCache,
-      };
-    }
-    this.loading = false;
-  }
-
-  async deleteFile(file: PrinterFile) {
-    if (!this.printerId) return;
-
-    await printersState.deletePrinterFile({
-      printerId: this.printerId,
-      fullPath: file.path,
-    });
-  }
-
-  async clickEmergencyStop() {
-    if (!this.printerId) return;
-
-    if (confirm("Are you sure to abort the print? Please reconnect after.")) {
-      await CustomGcodeService.postEmergencyM112Command(this.printerId);
-    }
-  }
-
-  async clickClearFiles() {
-    this.loading = true;
-    await printersState.clearPrinterFiles(this.printerId);
-
-    this.loading = false;
-    this.shownFileBucket = printersState.printerFileBucket(this.printerId);
-  }
-
-  clickSettings() {
-    if (!this.storedSideNavPrinter) return;
-
-    printersState.setUpdateDialogPrinter(this.storedSideNavPrinter);
-
-    this.closeDrawer();
-  }
-
-  async clickPrintFile(file: PrinterFile) {
-    if (!this.printerId) return;
-
-    await printersState.selectAndPrintFile({
-      printerId: this.printerId,
-      fullPath: file.path,
-    });
-  }
-
-  clickDownloadFile(file: PrinterFile) {
-    PrinterFileService.downloadFile(file);
-  }
-
-  closeDrawer() {
-    printersState.setSideNavPrinter(undefined);
-  }
+  drawerOpened: boolean;
+  loading: boolean;
 }
+
+export default defineComponent({
+  name: "FileExplorerSideNav",
+  components: {},
+  setup: () => {
+    return {
+      printersStore: usePrintersStore(),
+    };
+  },
+  async created() {},
+  async mounted() {},
+  props: {},
+  data: (): Data => ({
+    shownFileBucket: undefined,
+    drawerOpened: false,
+    loading: true,
+  }),
+  computed: {
+    storedSideNavPrinter() {
+      return this.printersStore.sideNavPrinter;
+    },
+    printerId() {
+      return this.storedSideNavPrinter!.id;
+    },
+    isOperational() {
+      return this.printersStore.isPrinterOperational(this.printerId);
+    },
+    isEnabled() {
+      return this.storedSideNavPrinter?.enabled;
+    },
+    isUnderMaintenance() {
+      return !!this.storedSideNavPrinter?.disabledReason?.length;
+    },
+    filesListed() {
+      return this.shownFileBucket?.files || [];
+    },
+    isStoppable() {
+      if (!this.storedSideNavPrinter) return false;
+      return isPrinterStoppable(this.storedSideNavPrinter);
+    },
+    canBeCleared() {
+      return (
+        this.shownFileBucket?.files?.length &&
+        this.storedSideNavPrinter?.apiAccessibility.accessible
+      );
+    },
+  },
+  methods: {
+    formatBytes: formatBytes,
+    truncateProgress(progress: number) {
+      if (!progress) return "";
+      return progress?.toFixed(1);
+    },
+    isFileBeingPrinted(file: PrinterFile) {
+      if (!this.storedSideNavPrinter) return false;
+      // Completed job will not disappear (yet)
+      if (this.storedSideNavPrinter.printerState.state === "Operational") return false;
+      return this.storedSideNavPrinter.currentJob?.fileName === file.name;
+    },
+    currentJob() {
+      return this.storedSideNavPrinter?.currentJob || {};
+    },
+    avatarInitials() {
+      const viewedPrinter = this.storedSideNavPrinter;
+      if (viewedPrinter && this.drawerOpened) {
+        return generateInitials(viewedPrinter.printerName);
+      }
+    },
+    openPrinterURL() {
+      if (!this.storedSideNavPrinter) return;
+      PrintersService.openPrinterURL(this.storedSideNavPrinter.printerURL);
+      this.closeDrawer();
+    },
+    async togglePrinterConnection() {
+      if (!this.printerId) return;
+      if (this.printersStore.isPrinterOperational(this.printerId)) {
+        return await PrintersService.sendPrinterDisconnectCommand(this.printerId);
+      }
+      await PrintersService.sendPrinterConnectCommand(this.printerId);
+    },
+    async toggleEnabled() {
+      if (!this.printerId) {
+        throw new Error("Printer ID not set, cant toggle enabled");
+      }
+      if (!this.storedSideNavPrinter) {
+        throw new Error("Cant toggle enabled, sidenav printer unset");
+      }
+      const newSetting = !this.storedSideNavPrinter.enabled;
+      await PrintersService.toggleEnabled(this.printerId, newSetting);
+    },
+    async toggleMaintenance() {
+      if (!this.printerId) {
+        throw new Error("Printer ID not set, cant toggle maintenance");
+      }
+      if (!this.storedSideNavPrinter) {
+        throw new Error("Cant toggle enabled, sidenav printer unset");
+      }
+      if (this.isUnderMaintenance) {
+        await PrintersService.updatePrinterMaintenance(this.printerId);
+        return;
+      }
+
+      this.printersStore.setMaintenanceDialogPrinter(this.storedSideNavPrinter);
+      this.closeDrawer();
+    },
+    async refreshFiles(viewedPrinter: Printer) {
+      this.loading = true;
+      const printerId = viewedPrinter.id;
+      // Offline printer fallback
+      if (viewedPrinter.apiAccessibility.accessible) {
+        const fileCache = await this.printersStore.loadPrinterFiles({
+          printerId,
+          recursive: false,
+        });
+        this.shownFileBucket = {
+          printerId,
+          ...fileCache,
+        };
+      } else {
+        const fileCache = await PrinterFileService.getFileCache(printerId);
+        this.shownFileBucket = {
+          printerId,
+          ...fileCache,
+        };
+      }
+      this.loading = false;
+    },
+    async deleteFile(file: PrinterFile) {
+      if (!this.printerId) return;
+      await this.printersStore.deletePrinterFile({
+        printerId: this.printerId,
+        fullPath: file.path,
+      });
+    },
+    async clickEmergencyStop() {
+      if (!this.printerId) return;
+
+      if (confirm("Are you sure to abort the print? Please reconnect after.")) {
+        await CustomGcodeService.postEmergencyM112Command(this.printerId);
+      }
+    },
+    async clickClearFiles() {
+      this.loading = true;
+      await this.printersStore.clearPrinterFiles(this.printerId);
+      this.loading = false;
+      this.shownFileBucket = this.printersStore.printerFileBucket(this.printerId);
+    },
+    clickSettings() {
+      if (!this.storedSideNavPrinter) return;
+      this.printersStore.setUpdateDialogPrinter(this.storedSideNavPrinter);
+      this.closeDrawer();
+    },
+    async clickPrintFile(file: PrinterFile) {
+      if (!this.printerId) return;
+      await this.printersStore.selectAndPrintFile({
+        printerId: this.printerId,
+        fullPath: file.path,
+      });
+    },
+    clickDownloadFile(file: PrinterFile) {
+      PrinterFileService.downloadFile(file);
+    },
+    closeDrawer() {
+      this.printersStore.setSideNavPrinter(undefined);
+    },
+  },
+  watch: {
+    async storedSideNavPrinter(viewedPrinter?: Printer, oldVal?: Printer) {
+      this.drawerOpened = !!viewedPrinter;
+      const printerId = viewedPrinter?.id;
+      if (!viewedPrinter || !printerId) {
+        return;
+      }
+
+      if (!this.shownFileBucket || viewedPrinter.id !== this.shownFileBucket.printerId || !oldVal) {
+        await this.refreshFiles(viewedPrinter);
+      }
+    },
+    drawerOpened(newVal: boolean) {
+      // Due to the animation delay the nav model lags behind enough for SSE to pick up and override
+      if (!newVal) {
+        this.printersStore.setSideNavPrinter(undefined);
+      }
+    },
+  },
+});
 </script>
 
 <style>

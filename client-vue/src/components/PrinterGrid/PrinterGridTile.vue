@@ -95,109 +95,98 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { Component, Prop } from "vue-property-decorator";
-import { printersState } from "@/store/printers.state";
+import { defineComponent, PropType } from "vue";
 import { Printer } from "@/models/printers/printer.model";
 import RAL_CODES from "@/constants/ral.reference.json";
 import { CustomGcodeService } from "@/backend/custom-gcode.service";
 import { PrintersService } from "@/backend";
+import { usePrintersStore } from "@/store/printers.store";
 
-@Component({
+const defaultColor = "rgba(100,100,100,0.1)";
+const maintenanceColor = "black";
+const defaultFilamentGradient =
+  "repeating-linear-gradient(-30deg, #222, #555 5px, #444 5px, #555 6px)";
+
+export default defineComponent({
+  name: "PrinterGridTile",
   components: {},
-})
-export default class PrinterGridTile extends Vue {
-  @Prop() printer: Printer;
-  @Prop() loading: boolean;
-  readonly defaultColor = "rgba(100,100,100,0.1)";
-  readonly maintenanceColor = "black";
-  readonly defaultFilamentGradient =
-    "repeating-linear-gradient(-30deg, #222, #555 5px, #444 5px, #555 6px)";
+  props: {
+    printer: Object as PropType<Printer>,
+  },
+  setup() {
+    return {
+      printersStore: usePrintersStore(),
+    };
+  },
+  computed: {
+    selected() {
+      if (!this.printer) return false;
+      return this.printersStore.isSelectedPrinter(this.printer?.id);
+    },
+    unselected() {
+      return this.printersStore.selectedPrinters?.length && !this.selected;
+    },
+    printers() {
+      return this.printersStore.printers;
+    },
+    printerFilamentColorName() {
+      const printerColor = this.printerFilamentColor();
+      if (!printerColor) {
+        return "UNKNOWN";
+      }
+      return `${this.printer?.lastPrintedFile.parsedColor}`;
+    },
+    printerFilamentColorRgba() {
+      const ralCode = this.printer?.lastPrintedFile.parsedVisualizationRAL;
+      if (!ralCode) {
+        return defaultFilamentGradient;
+      }
 
-  get selected() {
-    if (!this.printer) return false;
-    return printersState.isSelectedPrinter(this.printer?.id);
-  }
+      const ralString = ralCode.toString();
+      const foundColor = Object.values(RAL_CODES).find((r) => r.code === ralString);
+      if (!foundColor) {
+        return defaultFilamentGradient;
+      }
+      return `${foundColor.color.hex}`;
+    },
+    printerStateColor() {
+      if (!this.printer) return defaultColor;
+      if (this.printer.disabledReason?.length) return maintenanceColor;
+      return this.printer?.printerState.colour.hex || defaultColor;
+    },
+  },
+  methods: {
+    clickInfo() {
+      this.printersStore.setSideNavPrinter(this.printer);
+    },
+    clickOpenPrinterURL() {
+      if (!this.printer) return;
+      PrintersService.openPrinterURL(this.printer.printerURL);
+    },
+    clickOpenSettings() {
+      this.printersStore.setUpdateDialogPrinter(this.printer);
+    },
+    async clickEmergencyStop() {
+      if (!this.printer) return;
+      if (confirm("Are you sure to abort the print? Please reconnect after.")) {
+        await CustomGcodeService.postEmergencyM112Command(this.printer.id);
+      }
+    },
+    selectPrinter() {
+      if (!this.printer) return;
+      this.printersStore.toggleSelectedPrinter(this.printer);
+    },
+    printerFilamentColor() {
+      const ralCode = this.printer?.lastPrintedFile.parsedVisualizationRAL;
+      if (!ralCode) {
+        return undefined;
+      }
 
-  get unselected() {
-    return printersState.selectedPrinters?.length && !this.selected;
-  }
-
-  get printers() {
-    return printersState.printers;
-  }
-
-  get printerFilamentColorName() {
-    const printerColor = this.printerFilamentColor();
-
-    if (!printerColor) {
-      return "UNKNOWN";
-    }
-
-    return `${this.printer?.lastPrintedFile.parsedColor}`;
-  }
-
-  get printerFilamentColorRgba() {
-    const ralCode = this.printer?.lastPrintedFile.parsedVisualizationRAL;
-    if (!ralCode) {
-      return this.defaultFilamentGradient;
-    }
-
-    const ralString = ralCode.toString();
-    const foundColor = Object.values(RAL_CODES).find((r) => r.code === ralString);
-    if (!foundColor) {
-      return this.defaultFilamentGradient;
-    }
-
-    return `${foundColor.color.hex}`;
-  }
-
-  get printerStateColor() {
-    if (!this.printer) return this.defaultColor;
-
-    if (this.printer.disabledReason?.length) return this.maintenanceColor;
-
-    return this.printer?.printerState.colour.hex || this.defaultColor;
-  }
-
-  id() {
-    return this.printer?.printerName;
-  }
-
-  clickInfo() {
-    printersState.setSideNavPrinter(this.printer);
-  }
-
-  clickOpenPrinterURL() {
-    PrintersService.openPrinterURL(this.printer.printerURL);
-  }
-
-  clickOpenSettings() {
-    printersState.setUpdateDialogPrinter(this.printer);
-  }
-
-  async clickEmergencyStop() {
-    if (confirm("Are you sure to abort the print? Please reconnect after.")) {
-      await CustomGcodeService.postEmergencyM112Command(this.printer.id);
-    }
-  }
-
-  selectPrinter() {
-    if (!this.printer) return;
-
-    printersState.toggleSelectedPrinter(this.printer);
-  }
-
-  private printerFilamentColor() {
-    const ralCode = this.printer?.lastPrintedFile.parsedVisualizationRAL;
-    if (!ralCode) {
-      return undefined;
-    }
-
-    const ralString = ralCode.toString();
-    return Object.values(RAL_CODES).find((r) => r.code === ralString);
-  }
-}
+      const ralString = ralCode.toString();
+      return Object.values(RAL_CODES).find((r) => r.code === ralString);
+    },
+  },
+});
 </script>
 
 <style>

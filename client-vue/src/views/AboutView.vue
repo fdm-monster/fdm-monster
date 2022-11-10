@@ -14,22 +14,19 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { Component } from "vue-property-decorator";
-import { printersState } from "@/store/printers.state";
+import { defineComponent } from "vue";
 
-@Component({
+export default defineComponent({
+  name: "AboutView",
   components: {},
-})
-export default class AboutPage extends Vue {
-  loaded = false;
-
-  async created() {
-    const printers = await printersState.loadPrinters();
-
-    if (printers.length === 0) return;
-
-    this.loaded = true;
-  }
-}
+  setup: () => {
+    return {};
+  },
+  async created() {},
+  async mounted() {},
+  props: {},
+  computed: {},
+  methods: {},
+  watch: {},
+});
 </script>

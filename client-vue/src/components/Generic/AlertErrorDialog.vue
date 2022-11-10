@@ -1,7 +1,7 @@
 <template>
-  <v-dialog v-model="dialogOpened" persistent max-width="500">
+  <v-dialog v-model="dialogOpened" max-width="500" persistent>
     <v-card>
-      <v-card-title class="text-h5"> Upload problem occurred </v-card-title>
+      <v-card-title class="text-h5"> Upload problem occurred</v-card-title>
       <v-layout justify-center>
         <v-icon color="red" size="100">error_outline</v-icon>
       </v-layout>
@@ -21,56 +21,65 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="red" text @click="dialogOpened = false"> Close </v-btn>
+        <v-btn color="red" text @click="dialogOpened = false"> Close</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 <script lang="ts">
-import Component from "vue-class-component";
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { AxiosError } from "axios";
 import { uploadFailureMessageEvent, uploadOtherMessageEvent } from "@/event-bus/alert.events";
 import { FailedQueuedUpload } from "@/models/uploads/queued-upload.model";
-import { uploadsState } from "@/store/uploads.state";
+import { usePrintersStore } from "@/store/printers.store";
+import { useUploadsStore } from "@/store/uploads.store";
 
-@Component({
-  data: () => ({
+interface Data {
+  dialogOpened: boolean;
+  errorCode?: number;
+  errorType: string;
+  failedUploads: FailedQueuedUpload[];
+}
+
+export default defineComponent({
+  name: "AlertErrorDialog",
+  components: {},
+  setup: () => {
+    return {
+      printersStore: usePrintersStore(),
+      uploadsStore: useUploadsStore(),
+    };
+  },
+  created() {
+    this.$bus.on(uploadFailureMessageEvent, this.uploadFailureHandler);
+    this.$bus.on(uploadOtherMessageEvent, this.uploadOtherHandler);
+  },
+  beforeDestroyed() {
+    this.$bus.off(uploadFailureMessageEvent, this.uploadFailureHandler);
+    this.$bus.off(uploadOtherMessageEvent, this.uploadOtherHandler);
+  },
+  async mounted() {},
+  props: {},
+  data: (): Data => ({
     dialogOpened: false,
     errorCode: undefined,
     failedUploads: [],
     errorType: "",
   }),
-})
-export default class AlertErrorDialog extends Vue {
-  dialogOpened: boolean;
-  errorCode?: number;
-  errorType: string = "Upload error(s)";
-
-  failedUploads: FailedQueuedUpload[];
-
-  created() {
-    this.$bus.on(uploadFailureMessageEvent, this.uploadFailureHandler);
-    this.$bus.on(uploadOtherMessageEvent, this.uploadOtherHandler);
-  }
-
-  beforeDestroyed() {
-    this.$bus.off(uploadFailureMessageEvent, this.uploadFailureHandler);
-    this.$bus.off(uploadOtherMessageEvent, this.uploadOtherHandler);
-  }
-
-  uploadFailureHandler(e: AxiosError<any>) {
-    this.errorType = "Upload error(s)";
-    this.errorCode = e.response?.status;
-    this.dialogOpened = true;
-    this.failedUploads = uploadsState.failedUploads;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  uploadOtherHandler(_e: any) {
-    this.errorType = "Unknown error";
-    this.errorCode = undefined;
-    this.dialogOpened = true;
-  }
-}
+  computed: {},
+  methods: {
+    uploadFailureHandler(e: AxiosError<any>) {
+      this.errorType = "Upload error(s)";
+      this.errorCode = e.response?.status;
+      this.dialogOpened = true;
+      this.failedUploads = this.uploadsStore.failedUploads;
+    },
+    uploadOtherHandler(_e: any) {
+      this.errorType = "Unknown error";
+      this.errorCode = undefined;
+      this.dialogOpened = true;
+    },
+  },
+  watch: {},
+});
 </script>

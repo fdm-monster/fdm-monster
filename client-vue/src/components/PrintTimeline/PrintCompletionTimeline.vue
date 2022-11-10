@@ -136,25 +136,34 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { printersState } from "@/store/printers.state";
+import { defineComponent } from "vue";
 import { PrinterFloor } from "@/models/printer-floor/printer-floor.model";
 import { PrinterGroup } from "@/models/printer-groups/printer-group.model";
 import { Printer } from "@/models/printers/printer.model";
 import { PrintCompletionsService } from "@/backend/print-completions.service";
 import { PrinterCompletions } from "@/models/print-completions/print-completions.model";
+import { usePrintersStore } from "@/store/printers.store";
 
-export default Vue.extend({
-  data(): {
-    loadedCompletions: PrinterCompletions[];
-    shownCompletions: PrinterCompletions[];
-    floorGroupFdmPrinters: Printer[];
-    filteredFdmPrinters: Printer[];
-    filteredPrinterFloors: PrinterFloor[];
-    printerGroups: PrinterGroup[];
-    filteredPrinterGroups: PrinterGroup[];
-    printerNameSearch: string;
-  } {
+interface Data {
+  loadedCompletions: PrinterCompletions[];
+  shownCompletions: PrinterCompletions[];
+  floorGroupFdmPrinters: Printer[];
+  filteredFdmPrinters: Printer[];
+  filteredPrinterFloors: PrinterFloor[];
+  printerGroups: PrinterGroup[];
+  filteredPrinterGroups: PrinterGroup[];
+  printerNameSearch: string;
+}
+
+export default defineComponent({
+  name: "PrintCompletionTimeline",
+  components: {},
+  setup: () => {
+    return {
+      printersStore: usePrintersStore(),
+    };
+  },
+  data(): Data {
     return {
       loadedCompletions: [],
       shownCompletions: [],
@@ -171,11 +180,11 @@ export default Vue.extend({
     await this.loadCompletions();
   },
   computed: {
-    printerFloors: () => {
-      return printersState.printerFloors;
+    printerFloors() {
+      return this.printersStore.printerFloors;
     },
-    availablePrinterGroups: () => {
-      return printersState.printerGroups;
+    availablePrinterGroups() {
+      return this.printersStore.printerGroups;
     },
   },
   watch: {
@@ -205,14 +214,14 @@ export default Vue.extend({
       this.loadedCompletions = await PrintCompletionsService.getCompletions();
       this.updatePrinters();
     },
-    printer: (printerId: string) => {
-      return printersState.printer(printerId);
+    printer(printerId: string) {
+      return this.printersStore.printer(printerId);
     },
-    groupOfPrinter: (printerId: string) => {
-      return printersState.groupOfPrinter(printerId);
+    groupOfPrinter(printerId: string) {
+      return this.printersStore.groupOfPrinter(printerId);
     },
-    floorOfPrinterGroup: (printerGroupId: string) => {
-      return printersState.floorOfGroup(printerGroupId);
+    floorOfPrinterGroup(printerGroupId: string) {
+      return this.printersStore.floorOfGroup(printerGroupId);
     },
     updateFloors() {
       if (!this.filteredPrinterFloors?.length) {
@@ -236,7 +245,9 @@ export default Vue.extend({
         return pg.printers.map((p) => p.printerId);
       });
 
-      this.floorGroupFdmPrinters = flattenedPrinterIds.map((fpId) => printersState.printer(fpId)!);
+      this.floorGroupFdmPrinters = flattenedPrinterIds.map(
+        (fpId) => this.printersStore.printer(fpId)!
+      );
     },
     updatePrinters() {
       const pIds = this.filteredFdmPrinters.map((p) => p.id);

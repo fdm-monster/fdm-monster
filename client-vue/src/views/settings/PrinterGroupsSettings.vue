@@ -104,10 +104,10 @@
                 {{ x - 1 }}
                 <v-select
                   :items="unassignedPrinters()"
+                  flat
                   item-text="printerName"
                   label="Not assigned"
                   no-data-text="No printers left"
-                  flat
                   return-object
                   @change="addPrinterToGroup(selectedPrinterGroup, x, $event)"
                 ></v-select>
@@ -134,98 +134,94 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { Component } from "vue-property-decorator";
-import { printersState } from "@/store/printers.state";
+import { defineComponent } from "vue";
 import { PrinterGroup } from "@/models/printer-groups/printer-group.model";
 import { Printer } from "@/models/printers/printer.model";
+import { usePrintersStore } from "@/store/printers.store";
 
-@Component({
+export default defineComponent({
+  name: "PrinterGroupsSettings",
   components: {},
-  data: () => ({
+  setup() {
+    return {
+      printersStore: usePrintersStore(),
+    };
+  },
+  data: (): {
+    selectedItem: number;
+    editedPrinterGroupName: string;
+    printersPerGroup: 4;
+  } => ({
     selectedItem: 0,
+    editedPrinterGroupName: "",
+    printersPerGroup: 4,
   }),
-})
-export default class PrinterGroupsSettings extends Vue {
-  editedPrinterGroupName: string = "";
-  selectedItem: number;
-  readonly printersPerGroup = 4;
+  computed: {
+    printerGroups() {
+      return this.printersStore.printerGroups;
+    },
+    selectedPrinterGroup() {
+      return this.printersStore.printerGroups[this.selectedItem];
+    },
+  },
+  methods: {
+    printerLocation(group: PrinterGroup, index: number) {
+      return group?.printers[index - 1]?.location;
+    },
+    unassignedPrinters() {
+      return this.printersStore.ungroupedPrinters;
+    },
+    printerInGroup(group: PrinterGroup, index: number): Printer | undefined {
+      if (!group?.printers) return;
+      const printer = group.printers[index - 1];
+      return this.printersStore.printer(printer?.printerId);
+    },
+    setEditedPrinterGroupName() {
+      this.editedPrinterGroupName = this.selectedPrinterGroup.name;
+    },
+    async createGroup() {
+      // Trigger watch connected to printer group CRUD dialog
+      this.printersStore.setUpdateDialogPrinterGroup();
+      this.printersStore.setCreateGroupDialogOpened(true);
+    },
+    async updatePrinterGroupName() {
+      if (!this.selectedPrinterGroup?._id) return;
 
-  get printerGroups() {
-    return printersState.printerGroups;
-  }
+      const { _id: groupId } = this.selectedPrinterGroup;
+      await this.printersStore.updatePrinterGroupName({
+        groupId,
+        name: this.editedPrinterGroupName,
+      });
+      // Adapt to potential sort change
+      this.selectedItem = -1;
+    },
+    async clickDeleteGroup() {
+      if (!this.selectedPrinterGroup?._id) return;
 
-  get selectedPrinterGroup() {
-    return printersState.printerGroups[this.selectedItem];
-  }
+      await this.printersStore.deletePrinterGroup(this.selectedPrinterGroup._id);
+    },
+    async clickUpdateGroup() {
+      this.printersStore.setUpdateDialogPrinterGroup(this.selectedPrinterGroup);
+      this.printersStore.setCreateGroupDialogOpened(true);
+    },
+    async addPrinterToGroup(group: PrinterGroup, position: number, printer: Printer) {
+      if (!this.selectedPrinterGroup._id) return;
+      const location = (position - 1).toString();
+      await this.printersStore.addPrinterToGroup({
+        groupId: this.selectedPrinterGroup._id,
+        printerId: printer.id,
+        location,
+      });
+    },
+    async clearPrinterFromGroup(group: PrinterGroup, index: number) {
+      const printer = this.printerInGroup(group, index);
+      if (!group?._id || !printer) return;
 
-  printerLocation(group: PrinterGroup, index: number) {
-    return group?.printers[index - 1]?.location;
-  }
-
-  unassignedPrinters() {
-    return printersState.ungroupedPrinters;
-  }
-
-  printerInGroup(group: PrinterGroup, index: number): Printer | undefined {
-    if (!group?.printers) return;
-
-    const printer = group.printers[index - 1];
-    return printersState.printer(printer?.printerId);
-  }
-
-  async createGroup() {
-    // Trigger watch connected to printer group CRUD dialog
-    printersState.setUpdateDialogPrinterGroup();
-    printersState.setCreateGroupDialogOpened(true);
-  }
-
-  setEditedPrinterGroupName() {
-    this.editedPrinterGroupName = this.selectedPrinterGroup.name;
-  }
-
-  async updatePrinterGroupName() {
-    if (!this.selectedPrinterGroup?._id) return;
-
-    const { _id: groupId } = this.selectedPrinterGroup;
-    await printersState.updatePrinterGroupName({
-      groupId,
-      name: this.editedPrinterGroupName,
-    });
-
-    // Adapt to potential sort change
-    this.selectedItem = -1;
-  }
-
-  async clickDeleteGroup() {
-    if (!this.selectedPrinterGroup?._id) return;
-
-    await printersState.deletePrinterGroup(this.selectedPrinterGroup._id);
-  }
-
-  async clickUpdateGroup() {
-    printersState.setUpdateDialogPrinterGroup(this.selectedPrinterGroup);
-    printersState.setCreateGroupDialogOpened(true);
-  }
-
-  async addPrinterToGroup(group: PrinterGroup, position: number, printer: Printer) {
-    if (!this.selectedPrinterGroup._id) return;
-    const location = (position - 1).toString();
-    await printersState.addPrinterToGroup({
-      groupId: this.selectedPrinterGroup._id,
-      printerId: printer.id,
-      location,
-    });
-  }
-
-  async clearPrinterFromGroup(group: PrinterGroup, index: number) {
-    const printer = this.printerInGroup(group, index);
-    if (!group?._id || !printer) return;
-
-    await printersState.deletePrinterFromGroup({
-      groupId: group._id,
-      printerId: printer.id,
-    });
-  }
-}
+      await this.printersStore.deletePrinterFromGroup({
+        groupId: group._id,
+        printerId: printer.id,
+      });
+    },
+  },
+});
 </script>

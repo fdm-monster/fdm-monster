@@ -1,30 +1,33 @@
 <template>
   <div>
-    <v-row no-gutters v-if="outletCurrentValues" class="ma-1">
+    <v-row v-if="outletCurrentValues" class="ma-1" no-gutters>
       <v-col v-for="x in columns" :key="x" style="margin-left: 20px">
         <h3 v-if="selectedFloorLevel === 1">
           <v-icon>bolt</v-icon>
           {{ x === 1 || x === 2 ? outletCurrentValues.rack12 : outletCurrentValues.rack34 }}A / 16A
         </h3>
-        <h3 v-else><v-icon>bolt</v-icon>{{ outletCurrentValues.highRack }}A / 16A</h3>
+        <h3 v-else>
+          <v-icon>bolt</v-icon>
+          {{ outletCurrentValues.highRack }}A / 16A
+        </h3>
       </v-col>
     </v-row>
     <v-row v-for="y in rows" :key="y" class="ma-1" no-gutters>
       <v-col v-for="x in columns" :key="x" :cols="columnWidth" :sm="columnWidth">
         <v-row class="test-top" no-gutters>
           <v-col cols="6">
-            <PrinterGridTile :printer="getPrinter(x, y, 3)" :loading="loading" />
+            <PrinterGridTile :printer="getPrinter(x, y, 3)" />
           </v-col>
           <v-col cols="6">
-            <PrinterGridTile :printer="getPrinter(x, y, 0)" :loading="loading" />
+            <PrinterGridTile :printer="getPrinter(x, y, 0)" />
           </v-col>
         </v-row>
         <v-row class="test-bottom" no-gutters>
           <v-col cols="6">
-            <PrinterGridTile :printer="getPrinter(x, y, 2)" :loading="loading" />
+            <PrinterGridTile :printer="getPrinter(x, y, 2)" />
           </v-col>
           <v-col cols="6">
-            <PrinterGridTile :printer="getPrinter(x, y, 1)" :loading="loading" />
+            <PrinterGridTile :printer="getPrinter(x, y, 1)" />
           </v-col>
         </v-row>
       </v-col>
@@ -33,100 +36,100 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Login from "@/components/Generic/Login.vue";
-import { Component } from "vue-property-decorator";
-import UpdatePrinterDialog from "@/components/Generic/Dialogs/UpdatePrinterDialog.vue";
+import { defineComponent } from "vue";
 import { sseGroups, sseMessageGlobal } from "@/event-bus/sse.events";
-import { printersState } from "@/store/printers.state";
-import PrinterGridTile from "@/components/PrinterGrid/PrinterTile.vue";
+import PrinterGridTile from "@/components/PrinterGrid/PrinterGridTile.vue";
 import { PrinterGroup } from "@/models/printer-groups/printer-group.model";
 import { columnCount, rowCount, totalVuetifyColumnCount } from "@/constants/printer-grid.constants";
-import { outletCurrentValuesState } from "@/store/outlet-current.state";
+import { useOutletCurrentStore } from "@/store/outlet-current.store";
+import { usePrintersStore } from "@/store/printers.store";
 
-@Component({
-  components: { UpdatePrinterDialog, PrinterGridTile, Login },
-})
-export default class PrinterGrid extends Vue {
-  loading = true;
-
-  readonly maxColumnUnits = totalVuetifyColumnCount; // Built-in to vuetify
-  readonly columns = columnCount; // x-value choice
-  readonly rows = rowCount; // y-value choice
-
-  columnWidth = 3; // default value overwritten later
-  groupMatrix: PrinterGroup[][] = [];
-
-  get selectedFloorLevel() {
-    return printersState.selectedPrinterFloor?.floor;
-  }
-
-  get outletCurrentValues() {
-    const outletValues = outletCurrentValuesState.values;
-    if (!outletValues) return null;
-    if (!Object.keys(outletValues).includes("11-k2-prusa-rekhoog")) return null;
-
-    const highRack = outletValues["11-k2-prusa-rekhoog"].value;
-    const rack34 = outletValues["3-prusa-rek3laag-rek4laag"].value;
-    const rack12 = outletValues["8-prusa-rek1laag-rek2laag"].value;
-
+export default defineComponent({
+  components: { PrinterGridTile },
+  data(): {
+    columnWidth: number;
+    maxColumnUnits: number;
+    columns: number;
+    rows: number;
+    groupMatrix: PrinterGroup[][];
+  } {
     return {
-      highRack,
-      rack34,
-      rack12,
+      columnWidth: 3,
+      maxColumnUnits: totalVuetifyColumnCount,
+      columns: columnCount,
+      rows: rowCount,
+      groupMatrix: [],
     };
-  }
-
-  get printers() {
-    return printersState.printers;
-  }
-
-  calculateGrid() {
-    this.columnWidth = this.maxColumnUnits / this.columns;
-  }
-
+  },
+  setup() {
+    return {
+      outletCurrentStore: useOutletCurrentStore(),
+      printersStore: usePrintersStore(),
+    };
+  },
   async created() {
     this.calculateGrid();
-    await printersState.loadPrinters();
-    await printersState.loadPrinterGroups();
-    this.loading = false;
+    await this.printersStore.loadPrinters();
+    await this.printersStore.loadPrinterGroups();
 
     this.updateGridMatrix();
-  }
+  },
+  computed: {
+    printers() {
+      return this.printersStore.printers;
+    },
+    selectedFloorLevel() {
+      return this.printersStore.selectedFloor?.floor;
+    },
 
-  getPrinter(col: number, row: number, index: number) {
-    const x = col - 1;
-    const y = this.rows - row;
+    outletCurrentValues() {
+      const outletValues = this.outletCurrentStore.outletCurrentValues;
+      if (!outletValues) return null;
+      if (!Object.keys(outletValues).includes("11-k2-prusa-rekhoog")) return null;
 
-    if (!this.groupMatrix?.length || !this.groupMatrix[x]) return;
-    const group = this.groupMatrix[x][y];
-    if (!group) return;
+      const highRack = outletValues["11-k2-prusa-rekhoog"].value;
+      const rack34 = outletValues["3-prusa-rek3laag-rek4laag"].value;
+      const rack12 = outletValues["8-prusa-rek1laag-rek2laag"].value;
 
-    const printerInGroup = this.groupMatrix[x][y].printers?.find(
-      (p) => p.location === index.toString()
-    );
+      return {
+        highRack,
+        rack34,
+        rack12,
+      };
+    },
+  },
+  methods: {
+    calculateGrid() {
+      this.columnWidth = this.maxColumnUnits / this.columns;
+    },
+    getPrinter(col: number, row: number, index: number) {
+      const x = col - 1;
+      const y = this.rows - row;
 
-    if (!printerInGroup) return;
+      if (!this.groupMatrix?.length || !this.groupMatrix[x]) return;
+      const group = this.groupMatrix[x][y];
+      if (!group) return;
 
-    return printersState.printer(printerInGroup.printerId);
-  }
-
+      const printerInGroup = this.groupMatrix[x][y].printers?.find(
+        (p) => p.location === index.toString()
+      );
+      if (!printerInGroup) return;
+      return this.printersStore.printer(printerInGroup.printerId);
+    },
+    updateGridMatrix() {
+      this.groupMatrix = this.printersStore.gridSortedPrinterGroups(4, 4);
+    },
+    onSseMessage() {
+      this.updateGridMatrix();
+    },
+  },
   async mounted() {
     this.$bus.on(sseGroups, this.onSseMessage);
-  }
-
-  onSseMessage() {
-    this.updateGridMatrix();
-  }
-
-  updateGridMatrix() {
-    this.groupMatrix = printersState.gridSortedPrinterGroups(4, 4);
-  }
-
+  },
   beforeDestroy() {
     this.$bus.off(sseMessageGlobal, this.onSseMessage);
-  }
-}
+  },
+});
 </script>
 
 <style>

@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="showingDialog" :max-width="'700px'" persistent>
+  <v-dialog v-model="dialogShowed" :max-width="'700px'" persistent>
     <validation-observer ref="validationObserver" v-slot="{ invalid }">
       <v-card>
         <v-card-title>
@@ -29,84 +29,87 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { Component, Watch } from "vue-property-decorator";
+import { defineComponent } from "vue";
 import { ValidationObserver } from "vee-validate";
 import { generateInitials, newRandomNamePair } from "@/constants/noun-adjectives.data";
-import { printersState } from "@/store/printers.state";
 import { infoMessageEvent } from "@/event-bus/alert.events";
+
+import { usePrintersStore } from "@/store/printers.store";
 import PrinterFloorCrudForm from "@/components/Generic/Forms/PrinterFloorCrudForm.vue";
 import { PrinterFloorService } from "@/backend/printer-floor.service";
-import { getDefaultCreatePrinterFloor } from "@/models/printer-floor/printer-floor.model";
 
-@Component({
+interface Data {
+  dialogShowed: boolean;
+}
+
+export default defineComponent({
+  name: "CreatePrinterFloorDialog",
   components: {
-    PrinterFloorCrudForm,
     ValidationObserver,
+    PrinterFloorCrudForm,
   },
-  data: () => ({}),
-})
-export default class CreatePrinterFloorDialog extends Vue {
-  showingDialog = false;
-
-  showChecksPanel = false;
-  $refs!: {
-    validationObserver: InstanceType<typeof ValidationObserver>;
-    printerFloorCrudForm: InstanceType<typeof PrinterFloorCrudForm>;
-  };
-
-  get dialogOpenedState() {
-    return printersState.createFloorDialogOpened;
-  }
-
-  @Watch("dialogOpenedState")
-  changeDialogOpened(newValue: boolean) {
-    this.showingDialog = newValue;
-  }
-
-  formData() {
-    return this.$refs.printerFloorCrudForm?.formData;
-  }
-
+  setup: () => {
+    return {
+      printersStore: usePrintersStore(),
+    };
+  },
   async created() {
     window.addEventListener("keydown", (e) => {
       if (e.key == "Escape") {
         this.closeDialog();
       }
     });
-  }
+  },
+  async mounted() {},
+  props: {},
+  data: (): Data => ({
+    dialogShowed: false,
+  }),
+  computed: {
+    validationObserver() {
+      return this.$refs.validationObserver as InstanceType<typeof ValidationObserver>;
+    },
+    printerFloorCrudForm() {
+      return this.$refs.printerFloorCrudForm as InstanceType<typeof PrinterFloorCrudForm>;
+    },
+    formData() {
+      return this.printerFloorCrudForm?.formData;
+    },
+    dialogOpenedState() {
+      return this.printersStore.createFloorDialogOpened;
+    },
+  },
+  methods: {
+    avatarInitials() {
+      if (this.formData && this.dialogShowed) {
+        return generateInitials(this.formData.name);
+      }
+    },
+    async isValid() {
+      return await this.validationObserver.validate();
+    },
+    async submit() {
+      if (!(await this.isValid())) return;
+      if (!this.formData) return;
+      const newPrinterFloorData = PrinterFloorService.convertCreateFormToPrinterFloor(
+        this.formData
+      );
+      await this.printersStore.createPrinterFloor(newPrinterFloorData);
 
-  avatarInitials() {
-    const formData = this.formData();
-    if (formData && this.showingDialog) {
-      return generateInitials(formData.name);
-    }
-  }
-
-  async isValid() {
-    return await this.$refs.validationObserver.validate();
-  }
-
-  async submit() {
-    if (!(await this.isValid())) return;
-
-    const formData = this.formData();
-    if (!formData) return;
-    const newPrinterFloorData = PrinterFloorService.convertCreateFormToPrinterFloor(formData);
-
-    await printersState.createPrinterFloor(newPrinterFloorData);
-
-    this.$bus.emit(infoMessageEvent, `Printer floor ${newPrinterFloorData.name} created`);
-
-    formData.name = newRandomNamePair();
-    const maxIndex = Math.max(...printersState.printerFloors.map((pf) => pf.floor)) + 1;
-    formData.floor = maxIndex.toString();
-
-    this.closeDialog();
-  }
-
-  closeDialog() {
-    printersState.setCreateFloorDialogOpened(false);
-  }
-}
+      this.$bus.emit(infoMessageEvent, `Printer floor ${newPrinterFloorData.name} created`);
+      this.formData.name = newRandomNamePair();
+      const maxIndex = Math.max(...this.printersStore.printerFloors.map((pf) => pf.floor)) + 1;
+      this.formData.floor = maxIndex.toString();
+      this.closeDialog();
+    },
+    closeDialog() {
+      this.printersStore.setCreateFloorDialogOpened(false);
+    },
+  },
+  watch: {
+    dialogShowed(newVal: boolean) {
+      this.dialogShowed = newVal;
+    },
+  },
+});
 </script>

@@ -1,14 +1,16 @@
 import Vue from "vue";
 import { Printer } from "@/models/printers/printer.model";
-import { uploadsState } from "@/store/uploads.state";
 import {
   convertMultiPrinterFileToQueue,
   convertPrinterMultiFileToQueue,
 } from "@/utils/uploads-state.utils";
 import { infoMessageEvent } from "@/event-bus/alert.events";
-import { printersState } from "@/store/printers.state";
+import { usePrintersStore } from "@/store/printers.store";
+import { useUploadsStore } from "@/store/uploads.store";
 
 const bindDropConditionally = (el: HTMLElement, printers: Printer[], context?: Vue) => {
+  const printersStore = usePrintersStore();
+  const uploadsStore = useUploadsStore();
   if (printers?.length) {
     const isSinglePrinter = printers.length === 1;
     const firstPrinter = printers[0];
@@ -36,8 +38,8 @@ const bindDropConditionally = (el: HTMLElement, printers: Printer[], context?: V
           firstPrinter,
           clonedFiles,
           printedFilename,
-          printersState.currentBedTempOverride,
-          printersState.currentbedTemp
+          printersStore.bedTempOverride,
+          printersStore.bedTemp
         );
       } else {
         if (clonedFiles.length > 1) {
@@ -48,14 +50,14 @@ const bindDropConditionally = (el: HTMLElement, printers: Printer[], context?: V
         convertedUploads = convertMultiPrinterFileToQueue(printers, clonedFile, {
           select: true,
           print: true,
-          overrideBedTemp: printersState.currentBedTempOverride,
-          bedTemp: printersState.currentbedTemp,
+          overrideBedTemp: printersStore.bedTempOverride,
+          bedTemp: printersStore.bedTemp,
         });
       }
 
-      uploadsState.queueUploads(convertedUploads);
+      uploadsStore.queueUploads(convertedUploads);
 
-      printersState.clearSelectedPrinters();
+      printersStore.clearSelectedPrinters();
     };
   } else {
     el.ondrop = async (e) => {

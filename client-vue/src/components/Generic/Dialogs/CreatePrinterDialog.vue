@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="showingDialog" :max-width="showChecksPanel ? '700px' : '600px'" persistent>
+  <v-dialog v-model="dialogShowed" :max-width="showChecksPanel ? '700px' : '600px'" persistent>
     <validation-observer ref="validationObserver" v-slot="{ invalid }">
       <v-card>
         <v-card-title>
@@ -32,7 +32,7 @@
           <em class="red--text">* indicates required field</em>
           <v-spacer></v-spacer>
           <v-btn text @click="closeDialog()">Close</v-btn>
-          <v-btn text @click="pasteFromClipboardOrField()" :disabled="isPasteDisabled()">
+          <v-btn :disabled="isPasteDisabled()" text @click="pasteFromClipboardOrField()">
             Paste
           </v-btn>
           <v-btn :disabled="invalid" color="warning" text @click="testPrinter()">
@@ -46,10 +46,11 @@
 </template>
 
 <script lang="ts">
-// https://www.digitalocean.com/community/tutorials/vuejs-typescript-class-components
-import Vue from "vue";
-import { Component, Watch } from "vue-property-decorator";
+import { defineComponent } from "vue";
 import { ValidationObserver } from "vee-validate";
+import { generateInitials } from "@/constants/noun-adjectives.data";
+import { infoMessageEvent } from "@/event-bus/alert.events";
+import { usePrintersStore } from "@/store/printers.store";
 import { Printer } from "@/models/printers/printer.model";
 import { sseTestPrinterUpdate } from "@/event-bus/sse.events";
 import {
@@ -57,136 +58,133 @@ import {
   TestProgressDetails,
 } from "@/models/sse-messages/printer-sse-message.model";
 import { PrintersService } from "@/backend";
-import { generateInitials } from "@/constants/noun-adjectives.data";
 import PrinterChecksPanel from "@/components/Generic/Dialogs/PrinterChecksPanel.vue";
-import { printersState } from "@/store/printers.state";
 import PrinterCrudForm from "@/components/Generic/Forms/PrinterCrudForm.vue";
-import { infoMessageEvent } from "@/event-bus/alert.events";
 
-@Component({
+interface Data {
+  dialogShowed: boolean;
+  showChecksPanel: boolean;
+  copyPasteConnectionString: string;
+  testProgress?: TestProgressDetails;
+}
+
+export default defineComponent({
+  name: "CreatePrinterDialog",
   components: {
     ValidationObserver,
     PrinterCrudForm,
     PrinterChecksPanel,
   },
-  data: () => ({
-    testProgress: undefined,
-    copyPasteConnectionString: "",
-  }),
-})
-export default class CreatePrinterDialog extends Vue {
-  showingDialog = false;
-  copyPasteConnectionString = "";
-
-  showChecksPanel = false;
-  testProgress?: TestProgressDetails = undefined;
-  $refs!: {
-    validationObserver: InstanceType<typeof ValidationObserver>;
-    printerCrudForm: InstanceType<typeof PrinterCrudForm>;
-  };
-
-  get dialogOpenedState() {
-    return printersState.createDialogOpened;
-  }
-
-  isClipboardApiAvailable() {
-    return false && navigator.clipboard;
-  }
-
-  isPasteDisabled() {
-    if (!this.isClipboardApiAvailable()) {
-      return !this.copyPasteConnectionString?.length;
-    }
-    return false;
-  }
-
-  async pasteFromClipboardOrField() {
-    if (!this.$refs.printerCrudForm.formData) return;
-
-    if (!this.isClipboardApiAvailable() && !this.copyPasteConnectionString?.length) {
-      return;
-    }
-
-    const jsonData = this.isClipboardApiAvailable()
-      ? await navigator.clipboard.readText()
-      : this.copyPasteConnectionString;
-    const printerObject = JSON.parse(jsonData);
-
-    PrintersService.applyLoginDetailsPatchForm(printerObject, this.$refs.printerCrudForm.formData);
-  }
-
-  @Watch("dialogOpenedState")
-  changeDialogOpened(newValue: boolean) {
-    this.showingDialog = newValue;
-    this.testProgress = undefined;
-  }
-
-  formData() {
-    return this.$refs.printerCrudForm?.formData;
-  }
-
+  setup: () => {
+    return {
+      printersStore: usePrintersStore(),
+    };
+  },
   async created() {
     window.addEventListener("keydown", (e) => {
       if (e.key == "Escape") {
         this.closeDialog();
       }
     });
-  }
+  },
+  async mounted() {},
+  props: {},
+  data: (): Data => ({
+    dialogShowed: false,
+    testProgress: undefined,
+    showChecksPanel: false,
+    copyPasteConnectionString: "",
+  }),
+  computed: {
+    validationObserver() {
+      return this.$refs.validationObserver as InstanceType<typeof ValidationObserver>;
+    },
+    printerCrudForm() {
+      return this.$refs.printerCrudForm as InstanceType<typeof PrinterCrudForm>;
+    },
+    formData() {
+      return this.printerCrudForm?.formData;
+    },
+    dialogOpenedState() {
+      return this.printersStore.createPrinterDialogOpened;
+    },
+    updatePrinterGroup() {
+      // TODO Must still call getter for watch?
+      return this.printersStore.updateDialogPrinterGroup;
+    },
+  },
+  methods: {
+    avatarInitials() {
+      if (this.formData && this.dialogShowed) {
+        return generateInitials(this.formData.printerName);
+      }
+    },
+    openTestPanel() {
+      this.showChecksPanel = true;
+      this.testProgress = undefined;
+    },
+    async onTestPrinterUpdate(payload: PrinterSseMessage) {
+      this.testProgress = payload.testProgress;
+    },
+    async testPrinter() {
+      if (!(await this.isValid())) return;
 
-  avatarInitials() {
-    const formData = this.formData();
-    if (formData && this.showingDialog) {
-      return generateInitials(formData.printerName);
-    }
-  }
+      this.openTestPanel();
+      if (!this.formData) return;
+      const testPrinter = PrintersService.convertCreateFormToPrinter(this.formData);
+      const result: Printer = await this.printersStore.createTestPrinter(testPrinter);
+      if (!result.correlationToken) throw new Error("Test Printer CorrelationToken was empty.");
+      this.$bus.on(sseTestPrinterUpdate(result.correlationToken), this.onTestPrinterUpdate);
+    },
+    isPasteDisabled() {
+      if (!this.isClipboardApiAvailable()) {
+        return !this.copyPasteConnectionString?.length;
+      }
+      return false;
+    },
+    async pasteFromClipboardOrField() {
+      if (!this.printerCrudForm.formData) return;
 
-  async isValid() {
-    return await this.$refs.validationObserver.validate();
-  }
+      if (!this.isClipboardApiAvailable() && !this.copyPasteConnectionString?.length) {
+        return;
+      }
 
-  openTestPanel() {
-    this.showChecksPanel = true;
-    this.testProgress = undefined;
-  }
+      const jsonData = this.isClipboardApiAvailable()
+        ? await navigator.clipboard.readText()
+        : this.copyPasteConnectionString;
+      const printerObject = JSON.parse(jsonData);
 
-  async onTestPrinterUpdate(payload: PrinterSseMessage) {
-    this.testProgress = payload.testProgress;
-  }
-
-  async testPrinter() {
-    if (!(await this.isValid())) return;
-
-    this.openTestPanel();
-
-    const formData = this.formData();
-    if (!formData) return;
-    const testPrinter = PrintersService.convertCreateFormToPrinter(formData);
-
-    const result: Printer = await printersState.createTestPrinter(testPrinter);
-    if (!result.correlationToken) throw new Error("Test Printer CorrelationToken was empty.");
-
-    this.$bus.on(sseTestPrinterUpdate(result.correlationToken), this.onTestPrinterUpdate);
-  }
-
-  async submit() {
-    if (!(await this.isValid())) return;
-
-    const formData = this.formData();
-    if (!formData) return;
-    const newPrinterData = PrintersService.convertCreateFormToPrinter(formData);
-
-    await printersState.createPrinter(newPrinterData);
-
-    this.$bus.emit(infoMessageEvent, `Printer ${newPrinterData.printerName} created`);
-
-    this.$refs.printerCrudForm.resetForm();
-    this.$refs.validationObserver.reset();
-    this.closeDialog();
-  }
-
-  closeDialog() {
-    printersState._setCreateDialogOpened(false);
-    this.copyPasteConnectionString = "";
-  }
-}
+      PrintersService.applyLoginDetailsPatchForm(printerObject, this.printerCrudForm.formData);
+    },
+    async isValid() {
+      return await this.validationObserver.validate();
+    },
+    async submit() {
+      if (!(await this.isValid())) return;
+      if (!this.formData) return;
+      const newPrinterData = PrintersService.convertCreateFormToPrinter(this.formData);
+      await this.printersStore.createPrinter(newPrinterData);
+      this.$bus.emit(infoMessageEvent, `Printer ${newPrinterData.printerName} created`);
+      this.printerCrudForm.resetForm();
+      this.validationObserver.reset();
+      this.closeDialog();
+    },
+    closeDialog() {
+      this.printersStore.setCreatePrinterDialogOpened(false);
+      this.copyPasteConnectionString = "";
+    },
+    isClipboardApiAvailable() {
+      return navigator.clipboard;
+    },
+  },
+  watch: {
+    dialogOpenedState(newValue: boolean) {
+      this.dialogShowed = newValue;
+      this.testProgress = undefined;
+    },
+    async updatePrinterGroup(id?: string) {
+      if (!id) return;
+    },
+  },
+});
 </script>
