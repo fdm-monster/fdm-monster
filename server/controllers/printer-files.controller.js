@@ -17,7 +17,7 @@ const { ValidationException, NotFoundException } = require("../exceptions/runtim
 const { printerLoginToken, printerResolveMiddleware } = require("../middleware/printer");
 const { ROLES, PERMS } = require("../constants/authorization.constants");
 const { authorizeRoles } = require("../middleware/authenticate");
-const { readLinesAsync, lineReplacePromise, lineReplaceAsync } = require("../utils/file-io.utils");
+const { readLinesAsync } = require("../utils/file-io.utils");
 const { replaceInFileSync } = require("replace-in-file");
 
 class PrinterFilesController {
