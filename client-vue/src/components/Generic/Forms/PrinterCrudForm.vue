@@ -7,9 +7,9 @@
             v-model="formData.printerName"
             :counter="printerNameRules.max"
             :error-messages="errors"
+            autofocus
             label="Printer name*"
             required
-            autofocus
           />
         </validation-provider>
 
@@ -132,7 +132,6 @@ import {
 } from "@/models/printers/crud/create-printer.model";
 import { printersState } from "@/store/printers.state";
 import { PrintersService } from "@/backend";
-import { Printer } from "@/models/printers/printer.model";
 
 const watchedId = "printerId";
 

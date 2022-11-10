@@ -39,7 +39,6 @@ import { Printer } from "@/models/printers/printer.model";
 import PrinterDeleteAction from "@/components/Generic/Actions/PrinterDeleteAction.vue";
 import { printersState } from "@/store/printers.state";
 import RefreshFilesAction from "@/components/Generic/Actions/RefreshFilesAction.vue";
-import SyncPrinterNameAction from "@/components/Generic/Actions/SyncPrinterNameAction.vue";
 
 @Component({
   components: {

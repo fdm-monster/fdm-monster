@@ -59,20 +59,18 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import CreatePrinterDialog from "@/components/Generic/Dialogs/CreatePrinterDialog.vue";
 import PrinterGrid from "@/components/PrinterGrid/PrinterGrid.vue";
 import { printersState } from "@/store/printers.state";
 import { Printer } from "@/models/printers/printer.model";
 import { PrintersService } from "@/backend";
 import { formatBytes } from "@/utils/file-size.util";
-import SideNavExplorer from "@/components/Generic/SideNavs/FileExplorerSideNav.vue";
 import { infoMessageEvent } from "@/event-bus/alert.events";
 import { uploadsState } from "@/store/uploads.state";
 import { convertMultiPrinterFileToQueue } from "@/utils/uploads-state.utils";
 import HomeToolbar from "@/components/PrinterGrid/HomeToolbar.vue";
 
 export default defineComponent({
-  components: { PrinterGrid, SideNavExplorer, CreatePrinterDialog, HomeToolbar },
+  components: { PrinterGrid, HomeToolbar },
   data(): {
     selectedFile?: File;
     viewedPrinter?: Printer;

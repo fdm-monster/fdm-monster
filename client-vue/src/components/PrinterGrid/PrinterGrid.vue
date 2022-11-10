@@ -37,8 +37,6 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import Login from "@/components/Generic/Login.vue";
-import UpdatePrinterDialog from "@/components/Generic/Dialogs/UpdatePrinterDialog.vue";
 import { sseGroups, sseMessageGlobal } from "@/event-bus/sse.events";
 import { printersState } from "@/store/printers.state";
 import PrinterGridTile from "@/components/PrinterGrid/PrinterTile.vue";
@@ -47,7 +45,7 @@ import { columnCount, rowCount, totalVuetifyColumnCount } from "@/constants/prin
 import { useOutletCurrentStore } from "@/stores-pinia/outlet-current.store";
 
 export default defineComponent({
-  components: { UpdatePrinterDialog, PrinterGridTile, Login },
+  components: { PrinterGridTile },
   data(): {
     columnWidth: number;
     maxColumnUnits: number;

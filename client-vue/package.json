@@ -1,21 +1,16 @@
 {
   "name": "@fdm-monster/client",
-  "author": "David Zwart",
   "version": "0.5.7",
   "private": false,
-  "license": "AGPL-3.0-or-later",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/fdm-monster/fdm-monster"
-  },
+  "author": "David Zwart",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --skip-plugins pwa,workbox",
-    "build:dev": "vue-cli-service build --mode development",
-    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.vue\"",
     "test:unit": "vue-cli-service test:unit",
     "test:e2e": "vue-cli-service test:e2e",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "build:dev": "vue-cli-service build --mode development",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.vue\""
   },
   "dependencies": {
     "@sentry/tracing": "7.18.0",
@@ -53,23 +48,32 @@
     "@vue/cli-plugin-pwa": "5.0.8",
     "@vue/cli-plugin-router": "5.0.8",
     "@vue/cli-plugin-typescript": "5.0.8",
-    "@vue/cli-plugin-unit-jest": "5.0.8",
+    "@vue/cli-plugin-unit-jest": "~5.0.0",
     "@vue/cli-plugin-vuex": "5.0.8",
     "@vue/cli-service": "5.0.8",
     "@vue/eslint-config-prettier": "7.0.0",
     "@vue/eslint-config-typescript": "11.0.2",
     "@vue/test-utils": "2.2.1",
+    "@vue/vue2-jest": "^27.0.0-alpha.2",
+    "babel-jest": "^27.0.6",
     "eslint": "8.27.0",
     "eslint-plugin-prettier": "4.2.1",
     "eslint-plugin-vue": "9.7.0",
+    "jest": "^27.0.5",
     "prettier": "2.7.1",
     "rimraf": "3.0.2",
     "sass": "1.56.1",
     "sass-loader": "13.2.0",
+    "ts-jest": "^27.0.4",
     "typescript": "4.8.4",
     "vue-cli-plugin-vuetify": "2.5.8",
     "vue-template-compiler": "2.7.14",
     "vuetify-loader": "1.9.2",
     "webpack": "5.75.0"
+  },
+  "license": "AGPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fdm-monster/fdm-monster"
   }
 }
