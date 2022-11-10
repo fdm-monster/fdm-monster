@@ -21,64 +21,32 @@ class SocketIoGateway {
     this.io = new Server(httpServer, { cors: { origin: "*" } });
     const that = this;
     this.io.on("connection", (socket) => this.onConnect.bind(that)(socket));
-    this.io.on("request", () => {
-      console.log("request");
-    });
-
-    this.#eventEmitter2.on("octoprint.*", (event, data) => {
-      console.log("event");
-      this.io.emit(event, JSON.stringify(data));
-    });
   }
 
   onConnect(socket) {
-    console.log("Client connected", socket.id);
+    this.#logger.info("SocketIO Client connected", socket.id);
 
     socket.on("disconnect", () => {
-      console.log("Client disconnected", socket.id);
+      this.#logger.info("SocketIO Client disconnected", socket.id);
     });
-
-    socket.on("request", () => {
-      console.log("request");
-      socket.emit("printers", this.#printersStore.listPrinterStates());
-    });
-
-    this.io?.emit("message", "world");
   }
 
-  pushPrinterUpdate(printerId, event, data) {
-    console.log("Updating printer", printerId, !!this.io);
+  send(event, serializedData) {
+    // Legacy SSE replacement
     if (!this.io) {
-      this.#logger.warning("no io");
+      this.#logger.warning("No io server setup yet");
       return;
     }
 
-    try {
-      this.io?.emit(
-        `fdmmonster`,
-        JSON.stringify({
-          event,
-          printerId,
-          data,
-        })
-      );
-    } catch (e) {
-      console.log("ERROR");
-      this.#logger.error(e);
-    }
-  }
-
-  pushUploadUpdate(event, data) {
-    console.log("Updating printer", printerId, !!this.io);
-    if (!this.io) return;
-
-    this.io?.emit(`${events.UPLOAD}`, {
-      event,
-      data,
-    });
+    this.io.emit(event, serializedData);
   }
 }
 
 module.exports = {
   SocketIoGateway,
+  IO_MESSAGES: {
+    LegacyUpdate: "legacy-update",
+    HostState: "host-state",
+    ApiAccessibility: "api-accessibility",
+  },
 };

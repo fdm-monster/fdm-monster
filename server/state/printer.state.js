@@ -8,6 +8,7 @@ const {
 const { mapStateToColor, PSTATE, MESSAGE } = require("../constants/state.constants");
 const Logger = require("../handlers/logger.js");
 const { isTestEnvironment } = require("../utils/env.utils");
+const { IO_MESSAGES } = require("./socket-io.gateway");
 
 /**
  * This is a model to simplify unified printers state
@@ -393,7 +394,13 @@ class PrinterState {
 
   setHostState(state, description) {
     if (this.#hostState?.state !== state) {
-      this.#socketIoGateway.pushPrinterUpdate(this.#id, "hostState");
+      this.#socketIoGateway.send(
+        IO_MESSAGES.HostState,
+        JSON.stringify({
+          apiAccessibility: this.#hostState,
+          printerId: this.id,
+        })
+      );
     }
 
     this.#hostState = {
@@ -414,12 +421,18 @@ class PrinterState {
         );
     }
 
-    this.#socketIoGateway.pushPrinterUpdate(this.#id, "apiAccessibility");
     this.#apiAccessibility = {
       accessible,
       retryable,
       reason,
     };
+    this.#socketIoGateway.send(
+      IO_MESSAGES.ApiAccessibility,
+      JSON.stringify({
+        apiAccessibility: this.#apiAccessibility,
+        printerId: this.id,
+      })
+    );
   }
 
   getApiAccessibility() {

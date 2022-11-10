@@ -31,7 +31,7 @@ class ServerTasks {
   );
   static BOOT_TASKS = [
     registerTask(DITokens.softwareUpdateTask, TaskPresets.RUNDELAYED, 1500),
-    registerTask(DITokens.printerSseTask, TaskPresets.PERIODIC, 2000),
+    registerTask(DITokens.printerSocketIoTask, TaskPresets.PERIODIC, 500),
     registerTask(DITokens.printEventsSseTask, TaskPresets.RUNONCE),
     registerTask(DITokens.printerTestTask, TaskPresets.PERIODIC_DISABLED, 2000, true),
     registerTask(DITokens.printerFileCleanTask, TaskPresets.RUNONCE, 60 * 1000, true),

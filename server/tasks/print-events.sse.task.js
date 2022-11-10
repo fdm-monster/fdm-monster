@@ -4,16 +4,16 @@ const { generateCorrelationToken } = require("../utils/correlation-token.util");
 
 class PrintEventsSseTask {
   #eventEmitter2;
-  #sseHandler;
+  #socketIoGateway;
   #logger;
 
   #printCompletionService;
 
   #contextCache = {};
 
-  constructor({ eventEmitter2, sseHandler, printCompletionService, loggerFactory }) {
+  constructor({ eventEmitter2, socketIoGateway, printCompletionService, loggerFactory }) {
     this.#eventEmitter2 = eventEmitter2;
-    this.#sseHandler = sseHandler;
+    this.#socketIoGateway = socketIoGateway;
     this.#printCompletionService = printCompletionService;
     this.#logger = loggerFactory(PrintEventsSseTask.name);
 
@@ -28,8 +28,6 @@ class PrintEventsSseTask {
   }
 
   async handleMessage(fdmEvent, octoPrintEvent, data) {
-    this.#sseHandler.send(JSON.stringify({ fdmEvent, octoPrintEvent, data }), "octoprint-events");
-
     // If not parsed well, skip log
     const printerId = fdmEvent.replace("octoprint.", "");
     if (!printerId) {
@@ -47,6 +45,12 @@ class PrintEventsSseTask {
       completionLog: data.payload?.error,
       printerId: printerId,
     };
+
+    this.#socketIoGateway.send(
+      "completion",
+      JSON.stringify({ fdmEvent, octoPrintEvent, data }),
+      "octoprint-events"
+    );
 
     if (
       data.type === EVENT_TYPES.EStop ||

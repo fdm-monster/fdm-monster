@@ -21,42 +21,25 @@ const { ROLES } = require("../constants/authorization.constants");
 
 class PrinterController {
   #printersStore;
-  #jobsCache;
   #taskManagerService;
   #octoPrintApiService;
   #pluginRepositoryCache;
-  #fileCache;
-  #sseHandler;
-  #sseTask;
 
   #logger;
 
   constructor({
     printersStore,
-    sseHandler,
     taskManagerService,
-    printerSseTask,
     loggerFactory,
     octoPrintApiService,
     pluginRepositoryCache,
-    jobsCache,
-    fileCache,
   }) {
     this.#logger = loggerFactory("Server-API");
 
     this.#printersStore = printersStore;
-    this.#jobsCache = jobsCache;
     this.#taskManagerService = taskManagerService;
     this.#octoPrintApiService = octoPrintApiService;
     this.#pluginRepositoryCache = pluginRepositoryCache;
-    this.#fileCache = fileCache;
-    this.#sseHandler = sseHandler;
-    this.#sseTask = printerSseTask;
-  }
-
-  async sse(req, res) {
-    this.#sseHandler.handleRequest(req, res, "default");
-    await this.#sseTask.run();
   }
 
   async getPrinter(req, res) {
@@ -303,7 +286,6 @@ module.exports = createController(PrinterController)
   .prefix(AppConstants.apiRoute + "/printer")
   .before([authenticate(), authorizeRoles([ROLES.OPERATOR, ROLES.ADMIN]), printerResolveMiddleware()])
   .get("/", "list")
-  .get("/sse", "sse")
   .post("/", "create")
   .post("/batch", "importBatch")
   .post("/test-connection", "testConnection")

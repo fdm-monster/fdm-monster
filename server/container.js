@@ -11,9 +11,8 @@ const ServerUpdateService = require("./services/server-update.service");
 const GithubApiService = require("./services/github-api.service");
 const FileCache = require("./state/data/file.cache");
 const JobsCache = require("./state/data/jobs.cache");
-const SseHandler = require("./handlers/sse.handler");
 const PrinterWebsocketTask = require("./tasks/printer-websocket.task");
-const PrinterSseTask = require("./tasks/printer-sse.task");
+const PrinterSocketIoTask = require("./tasks/printer-socketio.task");
 const PrinterSystemTask = require("./tasks/printer-system.task");
 const OctoPrintApiService = require("./services/octoprint/octoprint-api.service");
 const PrinterState = require("./state/printer.state");
@@ -123,8 +122,7 @@ function configureContainer() {
 
     [DITokens.bootTask]: asClass(BootTask),
     [DITokens.softwareUpdateTask]: asClass(SoftwareUpdateTask), // Provided SSE handlers (couplers) shared with controllers
-    [DITokens.sseHandler]: asClass(SseHandler).singleton(), // Task bound to send on SSE Handler
-    [DITokens.printerSseTask]: asClass(PrinterSseTask).singleton(), // This task is a quick task (~100ms per printer)
+    [DITokens.printerSocketIoTask]: asClass(PrinterSocketIoTask).singleton(), // This task is a quick task (~100ms per printer)
     [DITokens.printEventsSseTask]: asClass(PrintEventsSseTask).singleton(),
     [DITokens.printerWebsocketTask]: asClass(PrinterWebsocketTask).singleton(), // This task is a recurring heartbeat task
     [DITokens.printerWebsocketPingTask]: asClass(PrinterWebsocketPingTask).singleton(), // Task dependent on WS to fire - disabled at boot

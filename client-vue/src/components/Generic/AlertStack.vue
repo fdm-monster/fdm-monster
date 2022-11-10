@@ -58,7 +58,7 @@ import {
   InfoEventType,
   infoMessageEvent,
   uploadMessageEvent,
-  vuexErrorEvent,
+  errorEvent,
 } from "@/event-bus/alert.events";
 import { TrackedUpload, UploadStates } from "@/models/sse-messages/printer-sse-message.model";
 import AlertErrorDialog from "@/components/Generic/AlertErrorDialog.vue";
@@ -87,7 +87,7 @@ export default defineComponent({
     };
   },
   created() {
-    this.$bus.on(vuexErrorEvent, this.storeError);
+    this.$bus.on(errorEvent, this.storeError);
     this.$bus.on(infoMessageEvent, this.infoMessage);
     this.$bus.on(uploadMessageEvent, this.uploadTracker);
   },
@@ -106,7 +106,7 @@ export default defineComponent({
   }),
   computed: {},
   beforeDestroyed() {
-    this.$bus.off(vuexErrorEvent, this.storeError);
+    this.$bus.off(errorEvent, this.storeError);
     this.$bus.off(infoMessageEvent, this.infoMessage);
     this.$bus.off(uploadMessageEvent, this.uploadTracker);
   },
