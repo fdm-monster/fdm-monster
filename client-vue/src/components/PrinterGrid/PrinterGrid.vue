@@ -38,11 +38,11 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { sseGroups, sseMessageGlobal } from "@/event-bus/sse.events";
-import { printersState } from "@/store/printers.state";
-import PrinterGridTile from "@/components/PrinterGrid/PrinterTile.vue";
+import PrinterGridTile from "@/components/PrinterGrid/PrinterGridTile.vue";
 import { PrinterGroup } from "@/models/printer-groups/printer-group.model";
 import { columnCount, rowCount, totalVuetifyColumnCount } from "@/constants/printer-grid.constants";
 import { useOutletCurrentStore } from "@/stores-pinia/outlet-current.store";
+import { usePrintersStore } from "@/stores-pinia/printers.store";
 
 export default defineComponent({
   components: { PrinterGridTile },
@@ -61,25 +61,25 @@ export default defineComponent({
       groupMatrix: [],
     };
   },
+  setup() {
+    return {
+      outletCurrentStore: useOutletCurrentStore(),
+      printersStore: usePrintersStore(),
+    };
+  },
   async created() {
     this.calculateGrid();
-    await printersState.loadPrinters();
-    await printersState.loadPrinterGroups();
+    await this.printersStore.loadPrinters();
+    await this.printersStore.loadPrinterGroups();
 
     this.updateGridMatrix();
   },
-  setup() {
-    const outletCurrentStore = useOutletCurrentStore();
-    return {
-      outletCurrentStore,
-    };
-  },
   computed: {
     printers() {
-      return printersState.printers;
+      return this.printersStore.printers;
     },
     selectedFloorLevel() {
-      return printersState.selectedPrinterFloor?.floor;
+      return this.printersStore.selectedFloor?.floor;
     },
 
     outletCurrentValues() {
@@ -113,14 +113,11 @@ export default defineComponent({
       const printerInGroup = this.groupMatrix[x][y].printers?.find(
         (p) => p.location === index.toString()
       );
-
       if (!printerInGroup) return;
-
-      return printersState.printer(printerInGroup.printerId);
+      return this.printersStore.printer(printerInGroup.printerId);
     },
-
     updateGridMatrix() {
-      this.groupMatrix = printersState.gridSortedPrinterGroups(4, 4);
+      this.groupMatrix = this.printersStore.gridSortedPrinterGroups(4, 4);
     },
     onSseMessage() {
       this.updateGridMatrix();
