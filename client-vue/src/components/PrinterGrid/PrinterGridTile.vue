@@ -20,19 +20,19 @@
           </v-btn>
         </template>
         <v-list>
-          <v-list-item @click.prevent.stop="clickInfo()">
+          <v-list-item :close-on-click="true" @click="clickInfo()">
             <v-icon>info</v-icon>
             &nbsp;Details
           </v-list-item>
-          <v-list-item @click.prevent.stop="clickOpenPrinterURL()">
+          <v-list-item :close-on-click="true" @click="clickOpenPrinterURL()">
             <v-icon>directions</v-icon>
             &nbsp;Visit OctoPrint
           </v-list-item>
-          <v-list-item @click.prevent.stop="clickOpenSettings()">
+          <v-list-item :close-on-click="true" @click="clickOpenSettings()">
             <v-icon>settings</v-icon>
             &nbsp;Edit Printer
           </v-list-item>
-          <v-list-item @click.prevent.stop="clickEmergencyStop()">
+          <v-list-item :close-on-click="true" @click="clickEmergencyStop()">
             <v-icon>stop</v-icon>
             &nbsp;Emergency stop
           </v-list-item>
