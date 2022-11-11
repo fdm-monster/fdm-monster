@@ -131,7 +131,8 @@ export default defineComponent({
     },
     async testPrinter() {
       if (!(await this.isValid())) return;
-      if (!this.formData) return;
+      const formData = this.formData();
+      if (!formData) return;
 
       const testPrinter = PrintersService.convertCreateFormToPrinter(this.formData());
       if (!testPrinter) return;
