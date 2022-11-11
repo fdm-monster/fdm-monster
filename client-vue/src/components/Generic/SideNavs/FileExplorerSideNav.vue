@@ -453,6 +453,7 @@ export default defineComponent({
     clickSettings() {
       if (!this.storedSideNavPrinter) return;
       this.printersStore.setUpdateDialogPrinter(this.storedSideNavPrinter);
+      this.dialogsStore.openDialog(DialogName.UpdatePrinterDialog);
       this.closeDrawer();
     },
     async clickPrintFile(file: PrinterFile) {
