@@ -23,10 +23,6 @@ import { defineComponent } from "vue";
 import NavigationDrawer from "@/components/Generic/NavigationDrawer.vue";
 import TopBar from "@/components/Generic/TopBar.vue";
 import ErrorAlert from "@/components/Generic/AlertStack.vue";
-import { PrinterSseMessage } from "@/models/sse-messages/printer-sse-message.model";
-import { sseGroups, sseMessageGlobal, sseTestPrinterUpdate } from "@/event-bus/sse.events";
-import { updatedPrinterEvent } from "@/event-bus/printer.events";
-import { InfoEventType, uploadMessageEvent } from "@/event-bus/alert.events";
 import UpdatePrinterDialog from "@/components/Generic/Dialogs/UpdatePrinterDialog.vue";
 import FileExplorerSideNav from "@/components/Generic/SideNavs/FileExplorerSideNav.vue";
 import CreatePrinterDialog from "@/components/Generic/Dialogs/CreatePrinterDialog.vue";
@@ -37,7 +33,6 @@ import { useOutletCurrentStore } from "@/store/outlet-current.store";
 import { useUploadsStore } from "@/store/uploads.store";
 import { usePrintersStore } from "@/store/printers.store";
 import { useServerSettingsStore } from "@/store/server-settings.store";
-import { Socket } from "socket.io-client";
 import { SocketIoService } from "@/services/socketio.service";
 
 interface Data {
