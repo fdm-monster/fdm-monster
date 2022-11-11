@@ -1,44 +1,42 @@
 <template>
-  <v-row justify="center">
-    <v-dialog v-model="mutableShow" :max-width="'600px'" persistent>
-      <validation-observer ref="validationObserver" v-slot="{ invalid }">
-        <v-card>
-          <v-card-title>
-            <span class="text-h5"> Batch Import JSON printers </span>
-          </v-card-title>
-          <v-card-text>
-            <v-row>
-              <v-col cols="12">
-                <validation-provider v-slot="{ errors }" name="JSON" rules="required|json">
-                  <v-textarea
-                    v-model="formData.json"
-                    :error-messages="errors"
-                    data-vv-validate-on="change|blur"
-                    @change="updatePrinterCount()"
-                  >
-                    <template v-slot:label>
-                      <div>JSON import <small>(optional)</small></div>
-                    </template>
-                  </v-textarea>
-                </validation-provider>
-                {{ numPrinters }} printers
-              </v-col>
-            </v-row>
-          </v-card-text>
-          <v-card-actions>
-            <em class="red--text">* indicates required field</em>
-            <v-spacer></v-spacer>
-            <v-btn text @click="closeDialog()">Close</v-btn>
-            <v-btn :disabled="invalid" color="blue darken-1" text @click="submit()">Create</v-btn>
-          </v-card-actions>
-        </v-card>
-      </validation-observer>
-    </v-dialog>
-  </v-row>
+  <v-dialog v-model="mutableShow" :max-width="'600px'" persistent>
+    <validation-observer ref="validationObserver" v-slot="{ invalid }">
+      <v-card>
+        <v-card-title>
+          <span class="text-h5"> Batch Import JSON printers </span>
+        </v-card-title>
+        <v-card-text>
+          <v-row>
+            <v-col cols="12">
+              <validation-provider v-slot="{ errors }" name="JSON" rules="required|json">
+                <v-textarea
+                  v-model="formData.json"
+                  :error-messages="errors"
+                  data-vv-validate-on="change|blur"
+                  @change="updatePrinterCount()"
+                >
+                  <template v-slot:label>
+                    <div>JSON import <small>(optional)</small></div>
+                  </template>
+                </v-textarea>
+              </validation-provider>
+              {{ numPrinters }} printers
+            </v-col>
+          </v-row>
+        </v-card-text>
+        <v-card-actions>
+          <em class="red--text">* indicates required field</em>
+          <v-spacer></v-spacer>
+          <v-btn text @click="closeDialog()">Close</v-btn>
+          <v-btn :disabled="invalid" color="blue darken-1" text @click="submit()">Create</v-btn>
+        </v-card-actions>
+      </v-card>
+    </validation-observer>
+  </v-dialog>
 </template>
 
 <script lang="ts">
-import Vue, { defineComponent } from "vue";
+import { defineComponent } from "vue";
 import { extend, setInteractionMode, ValidationObserver, ValidationProvider } from "vee-validate";
 import { PrintersService } from "@/backend";
 import { usePrintersStore } from "@/store/printers.store";
