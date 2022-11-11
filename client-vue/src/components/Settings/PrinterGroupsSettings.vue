@@ -199,7 +199,6 @@ export default defineComponent({
     },
     async clickDeleteGroup() {
       if (!this.selectedPrinterGroup?._id) return;
-
       await this.printersStore.deletePrinterGroup(this.selectedPrinterGroup._id);
     },
     async clickUpdateGroup() {
@@ -218,7 +217,6 @@ export default defineComponent({
     async clearPrinterFromGroup(group: PrinterGroup, index: number) {
       const printer = this.printerInGroup(group, index);
       if (!group?._id || !printer) return;
-
       await this.printersStore.deletePrinterFromGroup({
         groupId: group._id,
         printerId: printer.id,

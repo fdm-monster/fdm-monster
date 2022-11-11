@@ -292,6 +292,8 @@ import { formatBytes } from "@/utils/file-size.util";
 import { CustomGcodeService } from "@/backend/custom-gcode.service";
 
 import { usePrintersStore } from "@/store/printers.store";
+import { DialogName } from "@/components/Generic/Dialogs/dialog.constants";
+import { useDialogsStore } from "@/store/dialog.store";
 
 interface Data {
   shownFileBucket?: PrinterFileBucket;
@@ -305,6 +307,7 @@ export default defineComponent({
   setup: () => {
     return {
       printersStore: usePrintersStore(),
+      dialogsStore: useDialogsStore(),
     };
   },
   async created() {},
@@ -401,6 +404,7 @@ export default defineComponent({
       }
 
       this.printersStore.setMaintenanceDialogPrinter(this.storedSideNavPrinter);
+      this.dialogsStore.openDialog(DialogName.PrinterMaintenanceDialog);
       this.closeDrawer();
     },
     async refreshFiles(viewedPrinter: Printer) {

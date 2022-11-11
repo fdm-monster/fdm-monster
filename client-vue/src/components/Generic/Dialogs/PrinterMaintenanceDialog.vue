@@ -1,11 +1,11 @@
 <template>
-  <v-dialog v-model="dialogShowed" :max-width="'600px'" persistent>
+  <BaseDialog :id="dialogId" :max-width="'600px'">
     <validation-observer ref="validationObserver" v-slot="{ invalid }">
       <v-card>
         <v-card-title>
-          <span class="text-h5"> Mark printer for maintenance </span>
+          <span class="text-h5"> Mark '{{ printer?.printerName }}' for maintenance </span>
         </v-card-title>
-        <v-alert color="secondary"> Keep this short so it fits on a Print Tile</v-alert>
+        <v-alert color="secondary">Keep this info clear and stick to convention</v-alert>
         <v-card-text>
           <v-row>
             <v-col cols="12">
@@ -41,7 +41,7 @@
         </v-card-actions>
       </v-card>
     </validation-observer>
-  </v-dialog>
+  </BaseDialog>
 </template>
 
 <script lang="ts">
@@ -50,9 +50,11 @@ import { ValidationObserver, ValidationProvider } from "vee-validate";
 import { PrintersService } from "@/backend";
 import { Printer } from "@/models/printers/printer.model";
 import { usePrintersStore } from "@/store/printers.store";
+import { WithDialog } from "@/utils/dialog.utils";
+import { DialogName } from "@/components/Generic/Dialogs/dialog.constants";
+import { useDialogsStore } from "@/store/dialog.store";
 
-interface Data {
-  dialogShowed: boolean;
+interface Data extends WithDialog {
   selectedQuickItems: string[];
   quickItems: string[];
   formData: any;
@@ -67,19 +69,14 @@ export default defineComponent({
   setup: () => {
     return {
       printersStore: usePrintersStore(),
+      dialogsStore: useDialogsStore(),
     };
   },
-  async created() {
-    window.addEventListener("keydown", (e) => {
-      if (e.key == "Escape") {
-        this.closeDialog();
-      }
-    });
-  },
+  async created() {},
   async mounted() {},
   props: {},
   data: (): Data => ({
-    dialogShowed: false,
+    dialogId: DialogName.PrinterMaintenanceDialog,
     selectedQuickItems: [],
     quickItems: [
       "Cable USB ",
@@ -138,12 +135,12 @@ export default defineComponent({
       this.closeDialog();
     },
     closeDialog() {
+      this.dialogsStore.closeDialog(this.dialogId);
       this.printersStore.setMaintenanceDialogPrinter();
     },
   },
   watch: {
     async printer(viewedPrinter?: Printer, oldVal?: Printer) {
-      this.dialogShowed = !!viewedPrinter;
       const printerId = viewedPrinter?.id;
       if (!viewedPrinter || !printerId) return;
     },
