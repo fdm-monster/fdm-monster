@@ -151,6 +151,8 @@ import { defineComponent } from "vue";
 import { PrinterGroup } from "@/models/printer-groups/printer-group.model";
 import { PrinterFloor } from "@/models/printer-floor/printer-floor.model";
 import { usePrintersStore } from "@/store/printers.store";
+import { useDialogsStore } from "@/store/dialog.store";
+import { DialogName } from "@/components/Generic/Dialogs/dialog.constants";
 
 interface Data {
   editedPrinterFloorName: string;
@@ -163,6 +165,7 @@ export default defineComponent({
   setup: () => {
     return {
       printersStore: usePrintersStore(),
+      dialogsStore: useDialogsStore(),
     };
   },
   props: {},
@@ -195,10 +198,8 @@ export default defineComponent({
       if (!printerFloorGroup) return;
       return this.printersStore.printerGroup(printerFloorGroup.printerGroupId);
     },
-
     async createFloor() {
-      // Trigger watch connected to printer floor CRUD dialog
-      this.printersStore.setCreateFloorDialogOpened(true);
+      this.dialogsStore.openDialog(DialogName.CreatePrinterFloorDialog);
     },
     setEditedPrinterFloorName() {
       this.editedPrinterFloorName = this.selectedPrinterFloor.name;

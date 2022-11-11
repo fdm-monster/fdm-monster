@@ -1,7 +1,5 @@
 import Vue from "vue";
 import App from "./App.vue";
-import * as Sentry from "@sentry/vue";
-import { BrowserTracing } from "@sentry/tracing";
 
 // import "./registerServiceWorker";
 import router from "./router";

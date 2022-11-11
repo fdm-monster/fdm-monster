@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="mutableShow" :max-width="'600px'" persistent>
+  <BaseDialog :id="dialogId" max-width="500px">
     <validation-observer ref="validationObserver" v-slot="{ invalid }">
       <v-card>
         <v-card-title>
@@ -32,7 +32,7 @@
         </v-card-actions>
       </v-card>
     </validation-observer>
-  </v-dialog>
+  </BaseDialog>
 </template>
 
 <script lang="ts">
@@ -40,6 +40,9 @@ import { defineComponent } from "vue";
 import { extend, setInteractionMode, ValidationObserver, ValidationProvider } from "vee-validate";
 import { PrintersService } from "@/backend";
 import { usePrintersStore } from "@/store/printers.store";
+import { useDialogsStore } from "@/store/dialog.store";
+import { DialogName } from "@/components/Generic/Dialogs/dialog.constants";
+import { WithDialog } from "@/utils/dialog.utils";
 
 setInteractionMode("eager");
 extend("json", {
@@ -55,7 +58,7 @@ extend("json", {
   message: "{_field_} needs to be valid JSON.",
 });
 
-interface Data {
+interface Data extends WithDialog {
   formData: {
     json: string;
   };
@@ -71,38 +74,24 @@ export default defineComponent({
   setup: () => {
     return {
       printersStore: usePrintersStore(),
+      dialogsStore: useDialogsStore(),
     };
   },
   async created() {
-    window.addEventListener("keydown", (e) => {
-      if (e.key == "Escape") {
-        this.closeDialog();
-      }
-    });
-
     this.numPrinters = 0;
   },
   async mounted() {},
-  props: {
-    show: Boolean,
-  },
+  props: {},
   data: (): Data => ({
     formData: {
       json: "",
     },
     numPrinters: 0,
+    dialogId: DialogName.BatchJson,
   }),
   computed: {
     validationObserver() {
       return this.$refs.validationObserver as InstanceType<typeof ValidationObserver>;
-    },
-    mutableShow: {
-      get() {
-        return this.show;
-      },
-      set(newValue: boolean) {
-        this.$emit("update:show", newValue);
-      },
     },
   },
   methods: {
@@ -148,7 +137,7 @@ export default defineComponent({
       this.closeDialog();
     },
     closeDialog() {
-      this.mutableShow = false;
+      this.dialogsStore.closeDialog(this.dialogId);
     },
   },
   watch: {},

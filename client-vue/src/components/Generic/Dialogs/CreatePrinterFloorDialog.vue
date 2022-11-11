@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialogShowed" :max-width="'700px'" persistent>
+  <BaseDialog :id="dialogId" :max-width="'700px'">
     <validation-observer ref="validationObserver" v-slot="{ invalid }">
       <v-card>
         <v-card-title>
@@ -25,7 +25,7 @@
         </v-card-actions>
       </v-card>
     </validation-observer>
-  </v-dialog>
+  </BaseDialog>
 </template>
 
 <script lang="ts">
@@ -37,10 +37,11 @@ import { infoMessageEvent } from "@/event-bus/alert.events";
 import { usePrintersStore } from "@/store/printers.store";
 import PrinterFloorCrudForm from "@/components/Generic/Forms/PrinterFloorCrudForm.vue";
 import { PrinterFloorService } from "@/backend/printer-floor.service";
+import { useDialogsStore } from "@/store/dialog.store";
+import { WithDialog } from "@/utils/dialog.utils";
+import { DialogName } from "@/components/Generic/Dialogs/dialog.constants";
 
-interface Data {
-  dialogShowed: boolean;
-}
+type Data = WithDialog;
 
 export default defineComponent({
   name: "CreatePrinterFloorDialog",
@@ -51,19 +52,14 @@ export default defineComponent({
   setup: () => {
     return {
       printersStore: usePrintersStore(),
+      dialogsStore: useDialogsStore(),
     };
   },
-  async created() {
-    window.addEventListener("keydown", (e) => {
-      if (e.key == "Escape") {
-        this.closeDialog();
-      }
-    });
-  },
+  async created() {},
   async mounted() {},
   props: {},
   data: (): Data => ({
-    dialogShowed: false,
+    dialogId: DialogName.CreatePrinterFloorDialog,
   }),
   computed: {
     validationObserver() {
@@ -75,13 +71,10 @@ export default defineComponent({
     formData() {
       return this.printerFloorCrudForm?.formData;
     },
-    dialogOpenedState() {
-      return this.printersStore.createFloorDialogOpened;
-    },
   },
   methods: {
     avatarInitials() {
-      if (this.formData && this.dialogShowed) {
+      if (this.formData) {
         return generateInitials(this.formData.name);
       }
     },
@@ -103,13 +96,9 @@ export default defineComponent({
       this.closeDialog();
     },
     closeDialog() {
-      this.printersStore.setCreateFloorDialogOpened(false);
+      this.dialogsStore.closeDialog(this.dialogId);
     },
   },
-  watch: {
-    dialogShowed(newVal: boolean) {
-      this.dialogShowed = newVal;
-    },
-  },
+  watch: {},
 });
 </script>

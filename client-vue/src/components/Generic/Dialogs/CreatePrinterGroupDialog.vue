@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialogShowed" :max-width="'700px'" persistent>
+  <BaseDialog :id="dialogId" :max-width="'700px'">
     <validation-observer ref="validationObserver" v-slot="{ invalid }">
       <v-card>
         <v-card-title>
@@ -25,10 +25,6 @@
           <em class="red--text">* indicates required field</em>
           <v-spacer></v-spacer>
           <v-btn text @click="closeDialog()">Close</v-btn>
-          <!--          Might be used later if problems arise-->
-          <!--          <v-btn :disabled="invalid" color="warning" text @click="validateGroup()">-->
-          <!--            Validate-->
-          <!--          </v-btn>-->
           <v-btn
             v-if="!updatePrinterGroup"
             :disabled="invalid"
@@ -43,7 +39,7 @@
         </v-card-actions>
       </v-card>
     </validation-observer>
-  </v-dialog>
+  </BaseDialog>
 </template>
 
 <script lang="ts">
@@ -54,10 +50,11 @@ import { generateInitials } from "@/constants/noun-adjectives.data";
 import { infoMessageEvent } from "@/event-bus/alert.events";
 import PrinterGroupCrudForm from "@/components/Generic/Forms/PrinterGroupCrudForm.vue";
 import { usePrintersStore } from "@/store/printers.store";
+import { WithDialog } from "@/utils/dialog.utils";
+import { DialogName } from "@/components/Generic/Dialogs/dialog.constants";
+import { useDialogsStore } from "@/store/dialog.store";
 
-interface Data {
-  dialogShowed: boolean;
-}
+type Data = WithDialog;
 
 export default defineComponent({
   name: "CreatePrinterGroupDialog",
@@ -68,19 +65,14 @@ export default defineComponent({
   setup: () => {
     return {
       printersStore: usePrintersStore(),
+      dialogsStore: useDialogsStore(),
     };
   },
-  async created() {
-    window.addEventListener("keydown", (e) => {
-      if (e.key == "Escape") {
-        this.closeDialog();
-      }
-    });
-  },
+  async created() {},
   async mounted() {},
   props: {},
   data: (): Data => ({
-    dialogShowed: false,
+    dialogId: DialogName.CreatePrinterGroupDialog,
   }),
   computed: {
     validationObserver() {
@@ -92,9 +84,6 @@ export default defineComponent({
     formData() {
       return this.printerGroupCrudForm?.formData;
     },
-    dialogOpenedState() {
-      return this.printersStore.createGroupDialogOpened;
-    },
     updatePrinterGroup() {
       // TODO Must still call getter for watch?
       return this.printersStore.updateDialogPrinterGroup;
@@ -102,8 +91,8 @@ export default defineComponent({
   },
   methods: {
     avatarInitials() {
-      if (this.formData && this.dialogShowed) {
-        return generateInitials(this.formData.name);
+      if (this.formData) {
+        return generateInitials(this.formData?.name);
       }
     },
     async isValid() {
@@ -132,14 +121,11 @@ export default defineComponent({
       this.closeDialog();
     },
     closeDialog() {
-      this.printersStore.setCreateGroupDialogOpened(false);
+      this.dialogsStore.closeDialog(this.dialogId);
       this.printersStore.setUpdateDialogPrinterGroup();
     },
   },
   watch: {
-    dialogShowed(newVal: boolean) {
-      this.dialogShowed = newVal;
-    },
     async updatePrinterGroup(id?: string) {
       if (!id) return;
     },

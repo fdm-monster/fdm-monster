@@ -138,6 +138,8 @@ import { defineComponent } from "vue";
 import { PrinterGroup } from "@/models/printer-groups/printer-group.model";
 import { Printer } from "@/models/printers/printer.model";
 import { usePrintersStore } from "@/store/printers.store";
+import { useDialogsStore } from "@/store/dialog.store";
+import { DialogName } from "@/components/Generic/Dialogs/dialog.constants";
 
 export default defineComponent({
   name: "PrinterGroupsSettings",
@@ -145,6 +147,7 @@ export default defineComponent({
   setup() {
     return {
       printersStore: usePrintersStore(),
+      dialogsStore: useDialogsStore(),
     };
   },
   data: (): {
@@ -180,9 +183,8 @@ export default defineComponent({
       this.editedPrinterGroupName = this.selectedPrinterGroup.name;
     },
     async createGroup() {
-      // Trigger watch connected to printer group CRUD dialog
       this.printersStore.setUpdateDialogPrinterGroup();
-      this.printersStore.setCreateGroupDialogOpened(true);
+      this.dialogsStore.openDialog(DialogName.CreatePrinterGroupDialog);
     },
     async updatePrinterGroupName() {
       if (!this.selectedPrinterGroup?._id) return;
@@ -202,7 +204,7 @@ export default defineComponent({
     },
     async clickUpdateGroup() {
       this.printersStore.setUpdateDialogPrinterGroup(this.selectedPrinterGroup);
-      this.printersStore.setCreateGroupDialogOpened(true);
+      this.dialogsStore.openDialog(DialogName.CreatePrinterGroupDialog);
     },
     async addPrinterToGroup(group: PrinterGroup, position: number, printer: Printer) {
       if (!this.selectedPrinterGroup._id) return;

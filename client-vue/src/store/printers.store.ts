@@ -24,10 +24,7 @@ interface State {
   bedTemp: number | null;
   sideNavPrinter?: Printer;
   updateDialogPrinter?: Printer;
-  createPrinterDialogOpened?: boolean;
-  createGroupDialogOpened?: boolean;
   updateDialogPrinterGroup?: PrinterGroup;
-  createFloorDialogOpened?: boolean;
   selectedPrinters: Printer[];
   maintenanceDialogPrinter?: Printer;
 }
@@ -45,10 +42,7 @@ export const usePrintersStore = defineStore("Printers", {
     bedTemp: 50,
     sideNavPrinter: undefined,
     updateDialogPrinter: undefined,
-    createPrinterDialogOpened: false,
-    createGroupDialogOpened: false,
     updateDialogPrinterGroup: undefined,
-    createFloorDialogOpened: false,
     selectedPrinters: [],
     maintenanceDialogPrinter: undefined,
   }),
@@ -211,15 +205,6 @@ export const usePrintersStore = defineStore("Printers", {
     setUpdateDialogPrinterGroup(printerGroup?: PrinterGroup) {
       this.updateDialogPrinterGroup = printerGroup;
     },
-    setCreatePrinterDialogOpened(opened: boolean) {
-      this.createPrinterDialogOpened = opened;
-    },
-    setCreateGroupDialogOpened(opened: boolean) {
-      this.createGroupDialogOpened = opened;
-    },
-    setCreateFloorDialogOpened(opened: boolean) {
-      this.createFloorDialogOpened = opened;
-    },
     setMaintenanceDialogPrinter(printer?: Printer) {
       this.maintenanceDialogPrinter = printer;
     },
@@ -248,7 +233,7 @@ export const usePrintersStore = defineStore("Printers", {
     setPrinters(printers: Printer[]) {
       const viewedPrinterId = this.sideNavPrinter?.id;
       if (viewedPrinterId) {
-        // this.sideNavPrinter = printers.find((p) => p.id === viewedPrinterId);
+        this.sideNavPrinter = printers.find((p) => p.id === viewedPrinterId);
       }
       this.printers = printers;
     },

@@ -14,6 +14,7 @@
     <CreatePrinterGroupDialog />
     <CreatePrinterFloorDialog />
     <PrinterMaintenanceDialog />
+    <BatchJsonCreateDialog />
     <FileExplorerSideNav />
   </v-app>
 </template>
@@ -34,6 +35,8 @@ import { useUploadsStore } from "@/store/uploads.store";
 import { usePrintersStore } from "@/store/printers.store";
 import { useServerSettingsStore } from "@/store/server-settings.store";
 import { SocketIoService } from "@/services/socketio.service";
+import { useDialogsStore } from "@/store/dialog.store";
+import BatchJsonCreateDialog from "@/components/Generic/Dialogs/BatchJsonCreateDialog.vue";
 
 interface Data {
   socketIoClient?: SocketIoService;
@@ -51,6 +54,7 @@ export default defineComponent({
     PrinterMaintenanceDialog,
     FileExplorerSideNav,
     ErrorAlert,
+    BatchJsonCreateDialog,
   },
   setup: () => {
     return {
@@ -58,6 +62,7 @@ export default defineComponent({
       printersStore: usePrintersStore(),
       outletCurrentStore: useOutletCurrentStore(),
       serverSettingsStore: useServerSettingsStore(),
+      dialogsStore: useDialogsStore(),
     };
   },
   async created() {

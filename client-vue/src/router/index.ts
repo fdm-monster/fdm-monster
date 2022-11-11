@@ -3,13 +3,13 @@ import VueRouter, { RouteConfig } from "vue-router";
 import HomePrinterGrid from "@/views/PrinterGridView.vue";
 import Printers from "@/views/PrintersView.vue";
 import Settings from "@/views/SettingsView.vue";
-import PrinterGroupsSettings from "@/views/settings/PrinterGroupsSettings.vue";
+import PrinterGroupsSettings from "@/components/Settings/PrinterGroupsSettings.vue";
 import About from "@/views/AboutView.vue";
 import PrintTimeline from "@/views/PrintTimelineView.vue";
-import FdmSettings from "@/views/settings/FdmSettings.vue";
-import OtherSettings from "@/views/settings/OtherSettings.vue";
-import UserManagementSettings from "@/views/settings/UserManagementSettings.vue";
-import PrinterFloorSettings from "@/views/settings/PrinterFloorSettings.vue";
+import FdmSettings from "@/components/Settings/FdmSettings.vue";
+import OtherSettings from "@/components/Settings/OtherSettings.vue";
+import UserManagementSettings from "@/components/Settings/UserManagementSettings.vue";
+import PrinterFloorSettings from "@/components/Settings/PrinterFloorSettings.vue";
 
 Vue.use(VueRouter);
 
