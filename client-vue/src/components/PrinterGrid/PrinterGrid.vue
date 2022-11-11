@@ -81,7 +81,6 @@ export default defineComponent({
     selectedFloorLevel() {
       return this.printersStore.selectedFloor?.floor;
     },
-
     outletCurrentValues() {
       const outletValues = this.outletCurrentStore.outletCurrentValues;
       if (!outletValues) return null;

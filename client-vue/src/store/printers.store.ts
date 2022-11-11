@@ -183,9 +183,9 @@ export const usePrintersStore = defineStore("Printers", {
       return data;
     },
     savePrinterFloors(floors: PrinterFloor[]) {
-      this.floors = floors;
+      this.floors = floors.sort((f1, f2) => (f1.floor < f2.floor ? 1 : -1));
       if (!this.selectedFloor) {
-        this.selectedFloor = floors[0];
+        this.selectedFloor = this.printerFloors[0];
       }
     },
     async changeSelectedFloorByIndex(selectedPrinterFloorIndex: number) {
