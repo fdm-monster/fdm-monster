@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { DialogName } from "@/components/Generic/Dialogs/dialog.constants";
 
 interface DialogReference {
-  id: string;
+  id: DialogName;
   opened: boolean;
 }
 
@@ -16,12 +16,12 @@ export const useDialogsStore = defineStore("Dialog", {
   }),
   getters: {
     _getDialog(state) {
-      return (id?: string) => {
+      return (id?: DialogName) => {
         return state.dialogReferences.find((dr) => dr.id === id);
       };
     },
     isDialogOpened() {
-      return (id: string) => {
+      return (id: DialogName) => {
         return this._getDialog(id)?.opened;
       };
     },
