@@ -13,6 +13,7 @@
 import { defineComponent } from "vue";
 import { usePrintersStore } from "@/store/printers.store";
 import { useDialogsStore } from "@/store/dialog.store";
+import { DialogName } from "@/components/Generic/Dialogs/dialog.constants";
 
 export default defineComponent({
   name: "BaseDialog",
@@ -38,7 +39,7 @@ export default defineComponent({
   },
   props: {
     id: {
-      type: String,
+      type: String as () => DialogName,
       required: true,
     },
     maxWidth: {
