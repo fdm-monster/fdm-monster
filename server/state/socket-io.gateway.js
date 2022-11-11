@@ -1,10 +1,5 @@
 const { Server } = require("socket.io");
 
-const events = {
-  PRINTER: "PRINTER",
-  UPLOAD: "UPLOAD",
-};
-
 class SocketIoGateway {
   #logger;
   #printersStore;
@@ -34,7 +29,7 @@ class SocketIoGateway {
   send(event, serializedData) {
     // Legacy SSE replacement
     if (!this.io) {
-      this.#logger.warning("No io server setup yet");
+      this.#logger.debug("No io server setup yet");
       return;
     }
 
