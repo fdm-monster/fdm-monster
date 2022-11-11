@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialogShowed" :max-width="showChecksPanel ? '700px' : '600px'" persistent>
+  <BaseDialog :id="dialogId" :max-width="showChecksPanel ? '700px' : '600px'">
     <validation-observer ref="validationObserver" v-slot="{ invalid }">
       <v-card>
         <v-card-title>
@@ -42,7 +42,7 @@
         </v-card-actions>
       </v-card>
     </validation-observer>
-  </v-dialog>
+  </BaseDialog>
 </template>
 
 <script lang="ts">
@@ -60,9 +60,11 @@ import {
 import { PrintersService } from "@/backend";
 import PrinterChecksPanel from "@/components/Generic/Dialogs/PrinterChecksPanel.vue";
 import PrinterCrudForm from "@/components/Generic/Forms/PrinterCrudForm.vue";
+import { WithDialog } from "@/utils/dialog.utils";
+import { DialogName } from "@/components/Generic/Dialogs/dialog.constants";
+import { useDialogsStore } from "@/store/dialog.store";
 
-interface Data {
-  dialogShowed: boolean;
+interface Data extends WithDialog {
   showChecksPanel: boolean;
   copyPasteConnectionString: string;
   testProgress?: TestProgressDetails;
@@ -78,22 +80,17 @@ export default defineComponent({
   setup: () => {
     return {
       printersStore: usePrintersStore(),
+      dialogsStore: useDialogsStore(),
     };
   },
-  async created() {
-    window.addEventListener("keydown", (e) => {
-      if (e.key == "Escape") {
-        this.closeDialog();
-      }
-    });
-  },
+  async created() {},
   async mounted() {},
   props: {},
   data: (): Data => ({
-    dialogShowed: false,
     testProgress: undefined,
     showChecksPanel: false,
     copyPasteConnectionString: "",
+    dialogId: DialogName.CreatePrinterDialog,
   }),
   computed: {
     validationObserver() {
@@ -106,7 +103,7 @@ export default defineComponent({
       return this.printerCrudForm?.formData;
     },
     dialogOpenedState() {
-      return this.printersStore.createPrinterDialogOpened;
+      return this.dialogsStore.isDialogOpened(this.dialogId);
     },
     updatePrinterGroup() {
       // TODO Must still call getter for watch?
@@ -115,8 +112,8 @@ export default defineComponent({
   },
   methods: {
     avatarInitials() {
-      if (this.formData && this.dialogShowed) {
-        return generateInitials(this.formData.printerName);
+      if (this.formData) {
+        return generateInitials(this.formData?.printerName);
       }
     },
     openTestPanel() {
@@ -170,7 +167,7 @@ export default defineComponent({
       this.closeDialog();
     },
     closeDialog() {
-      this.printersStore.setCreatePrinterDialogOpened(false);
+      this.dialogsStore.closeDialog(this.dialogId);
       this.copyPasteConnectionString = "";
     },
     isClipboardApiAvailable() {
@@ -179,7 +176,6 @@ export default defineComponent({
   },
   watch: {
     dialogOpenedState(newValue: boolean) {
-      this.dialogShowed = newValue;
       this.testProgress = undefined;
     },
     async updatePrinterGroup(id?: string) {

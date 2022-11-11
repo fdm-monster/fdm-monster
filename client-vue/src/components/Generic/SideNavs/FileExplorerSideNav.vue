@@ -292,6 +292,8 @@ import { formatBytes } from "@/utils/file-size.util";
 import { CustomGcodeService } from "@/backend/custom-gcode.service";
 
 import { usePrintersStore } from "@/store/printers.store";
+import { DialogName } from "@/components/Generic/Dialogs/dialog.constants";
+import { useDialogsStore } from "@/store/dialog.store";
 
 interface Data {
   shownFileBucket?: PrinterFileBucket;
@@ -305,6 +307,7 @@ export default defineComponent({
   setup: () => {
     return {
       printersStore: usePrintersStore(),
+      dialogsStore: useDialogsStore(),
     };
   },
   async created() {},
@@ -320,7 +323,7 @@ export default defineComponent({
       return this.printersStore.sideNavPrinter;
     },
     printerId() {
-      return this.storedSideNavPrinter!.id;
+      return this.storedSideNavPrinter?.id;
     },
     isOperational() {
       return this.printersStore.isPrinterOperational(this.printerId);
@@ -401,6 +404,7 @@ export default defineComponent({
       }
 
       this.printersStore.setMaintenanceDialogPrinter(this.storedSideNavPrinter);
+      this.dialogsStore.openDialog(DialogName.PrinterMaintenanceDialog);
       this.closeDrawer();
     },
     async refreshFiles(viewedPrinter: Printer) {
@@ -440,6 +444,7 @@ export default defineComponent({
       }
     },
     async clickClearFiles() {
+      if (!this.printerId) return;
       this.loading = true;
       await this.printersStore.clearPrinterFiles(this.printerId);
       this.loading = false;
@@ -448,6 +453,7 @@ export default defineComponent({
     clickSettings() {
       if (!this.storedSideNavPrinter) return;
       this.printersStore.setUpdateDialogPrinter(this.storedSideNavPrinter);
+      this.dialogsStore.openDialog(DialogName.UpdatePrinterDialog);
       this.closeDrawer();
     },
     async clickPrintFile(file: PrinterFile) {

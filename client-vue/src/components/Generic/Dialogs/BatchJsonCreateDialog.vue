@@ -1,47 +1,48 @@
 <template>
-  <v-row justify="center">
-    <v-dialog v-model="mutableShow" :max-width="'600px'" persistent>
-      <validation-observer ref="validationObserver" v-slot="{ invalid }">
-        <v-card>
-          <v-card-title>
-            <span class="text-h5"> Batch Import JSON printers </span>
-          </v-card-title>
-          <v-card-text>
-            <v-row>
-              <v-col cols="12">
-                <validation-provider v-slot="{ errors }" name="JSON" rules="required|json">
-                  <v-textarea
-                    v-model="formData.json"
-                    :error-messages="errors"
-                    data-vv-validate-on="change|blur"
-                    @change="updatePrinterCount()"
-                  >
-                    <template v-slot:label>
-                      <div>JSON import <small>(optional)</small></div>
-                    </template>
-                  </v-textarea>
-                </validation-provider>
-                {{ numPrinters }} printers
-              </v-col>
-            </v-row>
-          </v-card-text>
-          <v-card-actions>
-            <em class="red--text">* indicates required field</em>
-            <v-spacer></v-spacer>
-            <v-btn text @click="closeDialog()">Close</v-btn>
-            <v-btn :disabled="invalid" color="blue darken-1" text @click="submit()">Create</v-btn>
-          </v-card-actions>
-        </v-card>
-      </validation-observer>
-    </v-dialog>
-  </v-row>
+  <BaseDialog :id="dialogId" max-width="500px">
+    <validation-observer ref="validationObserver" v-slot="{ invalid }">
+      <v-card>
+        <v-card-title>
+          <span class="text-h5"> Batch Import JSON printers </span>
+        </v-card-title>
+        <v-card-text>
+          <v-row>
+            <v-col cols="12">
+              <validation-provider v-slot="{ errors }" name="JSON" rules="required|json">
+                <v-textarea
+                  v-model="formData.json"
+                  :error-messages="errors"
+                  data-vv-validate-on="change|blur"
+                  @change="updatePrinterCount()"
+                >
+                  <template v-slot:label>
+                    <div>JSON import <small>(optional)</small></div>
+                  </template>
+                </v-textarea>
+              </validation-provider>
+              {{ numPrinters }} printers
+            </v-col>
+          </v-row>
+        </v-card-text>
+        <v-card-actions>
+          <em class="red--text">* indicates required field</em>
+          <v-spacer></v-spacer>
+          <v-btn text @click="closeDialog()">Close</v-btn>
+          <v-btn :disabled="invalid" color="blue darken-1" text @click="submit()">Create</v-btn>
+        </v-card-actions>
+      </v-card>
+    </validation-observer>
+  </BaseDialog>
 </template>
 
 <script lang="ts">
-import Vue, { defineComponent } from "vue";
+import { defineComponent } from "vue";
 import { extend, setInteractionMode, ValidationObserver, ValidationProvider } from "vee-validate";
 import { PrintersService } from "@/backend";
 import { usePrintersStore } from "@/store/printers.store";
+import { useDialogsStore } from "@/store/dialog.store";
+import { DialogName } from "@/components/Generic/Dialogs/dialog.constants";
+import { WithDialog } from "@/utils/dialog.utils";
 
 setInteractionMode("eager");
 extend("json", {
@@ -57,7 +58,7 @@ extend("json", {
   message: "{_field_} needs to be valid JSON.",
 });
 
-interface Data {
+interface Data extends WithDialog {
   formData: {
     json: string;
   };
@@ -73,38 +74,24 @@ export default defineComponent({
   setup: () => {
     return {
       printersStore: usePrintersStore(),
+      dialogsStore: useDialogsStore(),
     };
   },
   async created() {
-    window.addEventListener("keydown", (e) => {
-      if (e.key == "Escape") {
-        this.closeDialog();
-      }
-    });
-
     this.numPrinters = 0;
   },
   async mounted() {},
-  props: {
-    show: Boolean,
-  },
+  props: {},
   data: (): Data => ({
     formData: {
       json: "",
     },
     numPrinters: 0,
+    dialogId: DialogName.BatchJson,
   }),
   computed: {
     validationObserver() {
       return this.$refs.validationObserver as InstanceType<typeof ValidationObserver>;
-    },
-    mutableShow: {
-      get() {
-        return this.show;
-      },
-      set(newValue: boolean) {
-        this.$emit("update:show", newValue);
-      },
     },
   },
   methods: {
@@ -150,7 +137,7 @@ export default defineComponent({
       this.closeDialog();
     },
     closeDialog() {
-      this.mutableShow = false;
+      this.dialogsStore.closeDialog(this.dialogId);
     },
   },
   watch: {},

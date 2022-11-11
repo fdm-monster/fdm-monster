@@ -145,6 +145,8 @@ import { PrinterFirmwareStateModel } from "@/models/plugins/firmware-updates/pri
 import SyncPrinterNameAction from "@/components/Generic/Actions/SyncPrinterNameAction.vue";
 
 import { usePrintersStore } from "@/store/printers.store";
+import { useDialogsStore } from "@/store/dialog.store";
+import { DialogName } from "@/components/Generic/Dialogs/dialog.constants";
 
 interface Data {
   reorder: boolean;
@@ -172,6 +174,7 @@ export default defineComponent({
   setup: () => {
     return {
       printersStore: usePrintersStore(),
+      dialogsStore: useDialogsStore(),
     };
   },
   props: {},
@@ -276,7 +279,7 @@ export default defineComponent({
       this.printersStore.setUpdateDialogPrinter(printer);
     },
     openCreatePrinterDialog() {
-      this.printersStore.setCreatePrinterDialogOpened(true);
+      this.dialogsStore.openDialog(DialogName.CreatePrinterDialog);
     },
     clickRow(item: Printer, event: any) {
       if (event.isExpanded) {
@@ -288,6 +291,7 @@ export default defineComponent({
     },
     async openImportJsonPrintersDialog() {
       this.showJsonImportDialog = true;
+      this.dialogsStore.openDialog(DialogName.BatchJson);
     },
     async toggleEnabled(event: any, printer: Printer) {
       if (!printer.id) {

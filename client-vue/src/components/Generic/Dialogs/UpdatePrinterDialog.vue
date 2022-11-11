@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialogShowed" :max-width="showChecksPanel ? '700px' : '600px'" persistent>
+  <BaseDialog :id="dialogId" :max-width="showChecksPanel ? '700px' : '600px'">
     <validation-observer ref="validationObserver" v-slot="{ invalid }">
       <v-card v-if="storedUpdatedPrinter">
         <v-card-title>
@@ -42,7 +42,7 @@
         </v-card-actions>
       </v-card>
     </validation-observer>
-  </v-dialog>
+  </BaseDialog>
 </template>
 
 <script lang="ts">
@@ -61,9 +61,11 @@ import PrinterChecksPanel from "@/components/Generic/Dialogs/PrinterChecksPanel.
 import PrinterCrudForm from "@/components/Generic/Forms/PrinterCrudForm.vue";
 import { infoMessageEvent } from "@/event-bus/alert.events";
 import { usePrintersStore } from "@/store/printers.store";
+import { WithDialog } from "@/utils/dialog.utils";
+import { DialogName } from "@/components/Generic/Dialogs/dialog.constants";
+import { useDialogsStore } from "@/store/dialog.store";
 
-interface Data {
-  dialogShowed: boolean;
+interface Data extends WithDialog {
   showChecksPanel: boolean;
   testProgress?: TestProgressDetails;
   copyPasteConnectionString: string;
@@ -79,20 +81,16 @@ export default defineComponent({
   setup: () => {
     return {
       printersStore: usePrintersStore(),
+      dialogsStore: useDialogsStore(),
     };
   },
   async created() {
-    window.addEventListener("keydown", (e) => {
-      if (e.key == "Escape") {
-        this.closeDialog();
-      }
-    });
     await this.printersStore.loadPrinterGroups();
   },
   async mounted() {},
   props: {},
   data: (): Data => ({
-    dialogShowed: false,
+    dialogId: DialogName.UpdatePrinterDialog,
     showChecksPanel: false,
     testProgress: undefined,
     copyPasteConnectionString: "",
@@ -116,8 +114,8 @@ export default defineComponent({
       return this.printerUpdateForm()?.formData;
     },
     avatarInitials() {
-      if (this.formData() && this.dialogShowed) {
-        return generateInitials(this.formData().printerName);
+      if (this.formData()) {
+        return generateInitials(this.formData()?.printerName);
       }
       return "";
     },
@@ -184,25 +182,23 @@ export default defineComponent({
       this.closeDialog();
     },
     closeDialog() {
+      this.dialogsStore.closeDialog(this.dialogId);
       this.printersStore.setUpdateDialogPrinter(undefined);
       this.copyPasteConnectionString = "";
     },
   },
   watch: {
     async storedUpdatedPrinter(viewedPrinter?: Printer) {
-      this.dialogShowed = !!viewedPrinter;
       const printerId = viewedPrinter?.id;
+
+      if (!viewedPrinter) {
+        this.printersStore.setUpdateDialogPrinter(undefined);
+      }
+
       if (!viewedPrinter || !printerId) return;
 
       const loginDetails = await PrintersService.getPrinterLoginDetails(printerId);
       if (this.formData) this.formData().apiKey = loginDetails.apiKey;
-    },
-    dialogShowed(newVal: boolean) {
-      // Due to the animation delay the nav model lags behind enough for SSE to pick up and override
-      if (!newVal) {
-        this.printersStore.setUpdateDialogPrinter(undefined);
-        this.testProgress = undefined;
-      }
     },
   },
 });

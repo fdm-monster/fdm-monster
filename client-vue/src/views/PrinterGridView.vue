@@ -107,7 +107,6 @@ export default defineComponent({
       this.selectedFile = undefined;
     },
     formatBytes: formatBytes,
-
     clearSelectedPrinters() {
       this.printersStore.clearSelectedPrinters();
     },
