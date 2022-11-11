@@ -320,7 +320,7 @@ export default defineComponent({
       return this.printersStore.sideNavPrinter;
     },
     printerId() {
-      return this.storedSideNavPrinter!.id;
+      return this.storedSideNavPrinter?.id;
     },
     isOperational() {
       return this.printersStore.isPrinterOperational(this.printerId);
@@ -440,6 +440,7 @@ export default defineComponent({
       }
     },
     async clickClearFiles() {
+      if (!this.printerId) return;
       this.loading = true;
       await this.printersStore.clearPrinterFiles(this.printerId);
       this.loading = false;

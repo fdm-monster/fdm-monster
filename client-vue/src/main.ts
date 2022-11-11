@@ -14,6 +14,7 @@ import { generateAppConstants } from "@/constants/app.constants";
 import { registerFileDropDirective } from "@/directives/file-upload.directive";
 import { errorEvent } from "@/event-bus/alert.events";
 import { createPinia, PiniaVuePlugin } from "pinia";
+import BaseDialog from "@/components/Generic/Dialogs/BaseDialog.vue";
 
 Vue.config.productionTip = false;
 Vue.use(VueAxios, axios);
@@ -30,28 +31,30 @@ window.addEventListener("unhandledrejection", (event) => {
   event.preventDefault();
 });
 
-Sentry.init({
-  Vue,
-  dsn: "https://f64683e8d1cb4ac291434993cff1bf9b@o4503975545733120.ingest.sentry.io/4503975546912768",
-  integrations: [
-    new BrowserTracing({
-      routingInstrumentation: Sentry.vueRouterInstrumentation(router),
-      tracingOrigins: ["localhost", "my-site-url.com", /^\//],
-    }),
-  ],
-  // Set tracesSampleRate to 1.0 to capture 100%
-  // of transactions for performance monitoring.
-  // We recommend adjusting this value in production
-  tracesSampleRate: 1.0,
-});
+// Sentry.init({
+//   Vue,
+//   dsn: "https://f64683e8d1cb4ac291434993cff1bf9b@o4503975545733120.ingest.sentry.io/4503975546912768",
+//   integrations: [
+//     new BrowserTracing({
+//       routingInstrumentation: Sentry.vueRouterInstrumentation(router),
+//       tracingOrigins: ["localhost", "my-site-url.com", /^\//],
+//     }),
+//   ],
+//   // Set tracesSampleRate to 1.0 to capture 100%
+//   // of transactions for performance monitoring.
+//   // We recommend adjusting this value in production
+//   tracesSampleRate: 1.0,
+// });
 
 // Not sure how this works with Sentry
-// Vue.config.errorHandler = (err: Error, vm: Vue, info: string) => {
-//   console.log("Global Error captured", err, vm, info);
-// };
+Vue.config.errorHandler = (err: Error, vm: Vue, info: string) => {
+  console.log("Global Error captured", err, vm, info);
+};
 
 Vue.use(PiniaVuePlugin);
 const pinia = createPinia();
+
+Vue.component(BaseDialog.name, BaseDialog);
 
 new Vue({
   router,
