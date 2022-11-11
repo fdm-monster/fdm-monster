@@ -8,6 +8,7 @@ const {
 const { mapStateToColor, PSTATE, MESSAGE } = require("../constants/state.constants");
 const Logger = require("../handlers/logger.js");
 const { isTestEnvironment } = require("../utils/env.utils");
+const { IO_MESSAGES } = require("./socket-io.gateway");
 
 /**
  * This is a model to simplify unified printers state
@@ -45,11 +46,13 @@ class PrinterState {
   #eventEmitter2;
   #jobsCache;
   #fileCache;
+  #socketIoGateway;
 
-  constructor({ eventEmitter2, jobsCache, fileCache }) {
+  constructor({ eventEmitter2, jobsCache, fileCache, socketIoGateway }) {
     this.#eventEmitter2 = eventEmitter2;
     this.#jobsCache = jobsCache;
     this.#fileCache = fileCache;
+    this.#socketIoGateway = socketIoGateway;
   }
 
   get id() {
@@ -390,6 +393,16 @@ class PrinterState {
   }
 
   setHostState(state, description) {
+    if (this.#hostState?.state !== state) {
+      this.#socketIoGateway.send(
+        IO_MESSAGES.HostState,
+        JSON.stringify({
+          apiAccessibility: this.#hostState,
+          printerId: this.id,
+        })
+      );
+    }
+
     this.#hostState = {
       state,
       colour: mapStateToColor(state),
@@ -407,11 +420,19 @@ class PrinterState {
           `Printer API '${this.getName()}' was marked as inaccessible. Reason: '${reason}'. Please check connection settings.`
         );
     }
+
     this.#apiAccessibility = {
       accessible,
       retryable,
       reason,
     };
+    this.#socketIoGateway.send(
+      IO_MESSAGES.ApiAccessibility,
+      JSON.stringify({
+        apiAccessibility: this.#apiAccessibility,
+        printerId: this.id,
+      })
+    );
   }
 
   getApiAccessibility() {

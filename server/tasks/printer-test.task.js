@@ -7,7 +7,7 @@ const DITokens = require("../container.tokens");
 
 class PrinterTestTask {
   #lastTestRunTime;
-  #sseHandler;
+  #socketIoGateway;
 
   #printersStore;
   #settingsStore;
@@ -22,14 +22,14 @@ class PrinterTestTask {
     settingsStore,
     taskManagerService,
     loggerFactory,
-    sseHandler,
+    socketIoGateway,
   }) {
     this.#printersStore = printersStore;
     this.#settingsStore = settingsStore;
     this.#octoPrintService = octoPrintApiService;
     this.#taskManagerService = taskManagerService;
-    this.#sseHandler = sseHandler;
-    this.#logger = loggerFactory("Printer-Test-task");
+    this.#socketIoGateway = socketIoGateway;
+    this.#logger = loggerFactory(PrinterTestTask.name);
   }
 
   get maxRunTime() {
@@ -82,7 +82,7 @@ class PrinterTestTask {
     };
 
     const serializedData = JSON.stringify(sseData);
-    this.#sseHandler.send(serializedData);
+    this.#socketIoGateway.send("legacy-printer-test", serializedData);
   }
 
   async #testPrinterConnection(printerState) {

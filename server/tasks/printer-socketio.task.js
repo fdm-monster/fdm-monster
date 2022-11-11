@@ -1,7 +1,8 @@
 const { byteCount } = require("../utils/benchmark.util");
+const { IO_MESSAGES } = require("../state/socket-io.gateway");
 
-class PrinterSseTask {
-  #sseHandler;
+class PrinterSocketIoTask {
+  #socketIoGateway;
   #printerGroupsCache;
   #printersStore;
   #printerFloorsCache;
@@ -15,7 +16,7 @@ class PrinterSseTask {
   #logger;
 
   constructor({
-    sseHandler,
+    socketIoGateway,
     printerGroupsCache,
     printerFloorsCache,
     printersStore,
@@ -23,13 +24,13 @@ class PrinterSseTask {
     fileUploadTrackerCache,
     influxDbQueryTask,
   }) {
-    this.#sseHandler = sseHandler;
+    this.#socketIoGateway = socketIoGateway;
     this.#printersStore = printersStore;
     this.#printerGroupsCache = printerGroupsCache;
     this.#fileUploadTrackerCache = fileUploadTrackerCache;
     this.#printerFloorsCache = printerFloorsCache;
     this.#influxDbQueryTask = influxDbQueryTask;
-    this.#logger = loggerFactory("Printer-SSE-task");
+    this.#logger = loggerFactory(PrinterSocketIoTask.name);
   }
 
   async run() {
@@ -38,7 +39,7 @@ class PrinterSseTask {
     const printerGroups = this.#printerGroupsCache.getCache();
     const trackedUploads = this.#fileUploadTrackerCache.getUploads(true);
 
-    const sseData = {
+    const socketIoData = {
       printers: printerStates,
       floors,
       trackedUploads,
@@ -46,10 +47,10 @@ class PrinterSseTask {
       outletCurrentValues: this.#influxDbQueryTask.lastOutletCurrentValues(),
     };
 
-    const serializedData = JSON.stringify(sseData);
+    const serializedData = JSON.stringify(socketIoData);
     const transportDataSize = byteCount(serializedData);
     this.updateAggregator(transportDataSize);
-    this.#sseHandler.send(serializedData);
+    this.#socketIoGateway.send(IO_MESSAGES.LegacyUpdate, serializedData);
   }
 
   updateAggregator(transportDataLength) {
@@ -57,7 +58,7 @@ class PrinterSseTask {
       const summedPayloadSize = this.#aggregateSizes.reduce((t, n) => (t += n));
       const averagePayloadSize = summedPayloadSize / 1000 / this.#aggregateWindowLength;
       this.#logger.info(
-        `Printer SSE metrics ${averagePayloadSize.toFixed(this.#rounding)} kB [${
+        `Printer SocketIO metrics ${averagePayloadSize.toFixed(this.#rounding)} kB [${
           this.#aggregateWindowLength
         } TX avg].`
       );
@@ -70,4 +71,4 @@ class PrinterSseTask {
   }
 }
 
-module.exports = PrinterSseTask;
+module.exports = PrinterSocketIoTask;

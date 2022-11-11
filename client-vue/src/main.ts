@@ -8,26 +8,16 @@ import router from "./router";
 import vuetify from "./plugins/vuetify";
 import axios from "axios";
 import VueAxios from "vue-axios";
-import VueSSE from "vue-sse";
 import VueBus from "vue-bus";
-import { apiBase } from "@/backend/base.service";
 import { configureVeeValidate } from "@/plugins/veevalidate";
 import { generateAppConstants } from "@/constants/app.constants";
 import { registerFileDropDirective } from "@/directives/file-upload.directive";
-import { vuexErrorEvent } from "@/event-bus/alert.events";
+import { errorEvent } from "@/event-bus/alert.events";
 import { createPinia, PiniaVuePlugin } from "pinia";
 
 Vue.config.productionTip = false;
-// Http Client
 Vue.use(VueAxios, axios);
-// Event Bus
 Vue.use(VueBus);
-// SSE Handler
-Vue.use(VueSSE, {
-  format: "json",
-  polyfill: true,
-  url: apiBase + "/api/printer/sse",
-});
 
 configureVeeValidate();
 registerFileDropDirective();
@@ -36,7 +26,7 @@ window.addEventListener("unhandledrejection", (event) => {
   if (event.reason?.isAxiosError) {
     console.warn(`Handled error through alert`, event.reason);
   }
-  Vue.bus.emit(vuexErrorEvent, event);
+  Vue.bus.emit(errorEvent, event);
   event.preventDefault();
 });
 

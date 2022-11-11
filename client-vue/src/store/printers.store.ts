@@ -183,9 +183,9 @@ export const usePrintersStore = defineStore("Printers", {
       return data;
     },
     savePrinterFloors(floors: PrinterFloor[]) {
-      this.floors = floors;
+      this.floors = floors.sort((f, f2) => f.floor - f2.floor);
       if (!this.selectedFloor) {
-        this.selectedFloor = floors[0];
+        this.selectedFloor = this.printerFloors[0];
       }
     },
     async changeSelectedFloorByIndex(selectedPrinterFloorIndex: number) {
@@ -248,7 +248,7 @@ export const usePrintersStore = defineStore("Printers", {
     setPrinters(printers: Printer[]) {
       const viewedPrinterId = this.sideNavPrinter?.id;
       if (viewedPrinterId) {
-        this.sideNavPrinter = printers.find((p) => p.id === viewedPrinterId);
+        // this.sideNavPrinter = printers.find((p) => p.id === viewedPrinterId);
       }
       this.printers = printers;
     },

@@ -3,17 +3,16 @@ const { createController } = require("awilix-express");
 const { AppConstants } = require("../server.constants");
 const { PERMS } = require("../constants/authorization.constants");
 const { validateInput } = require("../handlers/validators");
-const { idRules } = require("./validation/generic.validation");
 
 class PrintCompletionController {
   #printCompletionService;
-  #printEventsSseTask;
+  #printCompletionSocketIoTask;
 
   #logger;
 
-  constructor({ printCompletionService, loggerFactory, printEventsSseTask }) {
+  constructor({ printCompletionService, loggerFactory, printCompletionSocketIoTask }) {
     this.#printCompletionService = printCompletionService;
-    this.#printEventsSseTask = printEventsSseTask;
+    this.#printCompletionSocketIoTask = printCompletionSocketIoTask;
     this.#logger = loggerFactory(PrintCompletionController.name);
   }
 
@@ -29,7 +28,7 @@ class PrintCompletionController {
   }
 
   contexts(req, res) {
-    const contexts = this.#printEventsSseTask.contexts;
+    const contexts = this.#printCompletionSocketIoTask.contexts;
     res.send(contexts);
   }
 

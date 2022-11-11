@@ -1,4 +1,4 @@
-const { PrintEventsSseTask } = require("./tasks/print-events.sse.task");
+const { PrintEventsSseTask } = require("./tasks/print-completion.socketio.task");
 const DITokens = {
   // Values
   serverVersion: "serverVersion",
@@ -7,6 +7,7 @@ const DITokens = {
   serverHost: "serverHost",
   loggerFactory: "loggerFactory",
   httpClient: "httpClient",
+  socketIoGateway: "socketIoGateway",
   simpleGitService: "simpleGitService",
   multerService: "multerService",
   configService: "configService",
@@ -51,9 +52,8 @@ const DITokens = {
   bootTask: "bootTask",
   printerSystemTask: "printerSystemTask",
   softwareUpdateTask: "softwareUpdateTask",
-  printerSseTask: "printerSseTask",
-  printEventsSseTask: "printEventsSseTask",
-  sseHandler: "sseHandler",
+  printerSocketIoTask: "printerSocketIoTask",
+  printCompletionSocketIoTask: "printCompletionSocketIoTask",
   printerTestTask: "printerTestTask",
   printerWebsocketTask: "printerWebsocketTask",
   printerWebsocketPingTask: "printerWebsocketPingTask",

@@ -1,21 +1,22 @@
 const { octoPrintWebsocketEvent } = require("../constants/event.constants");
 const { EVENT_TYPES } = require("../services/octoprint/constants/octoprint-websocket.constants");
 const { generateCorrelationToken } = require("../utils/correlation-token.util");
+const { IO_MESSAGES } = require("../state/socket-io.gateway");
 
-class PrintEventsSseTask {
+class PrintCompletionSocketIoTask {
   #eventEmitter2;
-  #sseHandler;
+  #socketIoGateway;
   #logger;
 
   #printCompletionService;
 
   #contextCache = {};
 
-  constructor({ eventEmitter2, sseHandler, printCompletionService, loggerFactory }) {
+  constructor({ eventEmitter2, socketIoGateway, printCompletionService, loggerFactory }) {
     this.#eventEmitter2 = eventEmitter2;
-    this.#sseHandler = sseHandler;
+    this.#socketIoGateway = socketIoGateway;
     this.#printCompletionService = printCompletionService;
-    this.#logger = loggerFactory(PrintEventsSseTask.name);
+    this.#logger = loggerFactory(PrintCompletionSocketIoTask.name);
 
     let that = this;
     this.#eventEmitter2.on(octoPrintWebsocketEvent("*"), async function (data1, data2) {
@@ -28,8 +29,6 @@ class PrintEventsSseTask {
   }
 
   async handleMessage(fdmEvent, octoPrintEvent, data) {
-    this.#sseHandler.send(JSON.stringify({ fdmEvent, octoPrintEvent, data }), "octoprint-events");
-
     // If not parsed well, skip log
     const printerId = fdmEvent.replace("octoprint.", "");
     if (!printerId) {
@@ -47,6 +46,11 @@ class PrintEventsSseTask {
       completionLog: data.payload?.error,
       printerId: printerId,
     };
+
+    this.#socketIoGateway.send(
+      IO_MESSAGES.CompletionEvent,
+      JSON.stringify({ fdmEvent, octoPrintEvent, data })
+    );
 
     if (
       data.type === EVENT_TYPES.EStop ||
@@ -94,5 +98,5 @@ class PrintEventsSseTask {
 }
 
 module.exports = {
-  PrintEventsSseTask,
+  PrintCompletionSocketIoTask,
 };

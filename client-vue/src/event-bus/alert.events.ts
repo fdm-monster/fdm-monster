@@ -1,4 +1,4 @@
-export const vuexErrorEvent = "store-axios-error";
+export const errorEvent = "store-axios-error";
 
 // message, progress
 export const infoMessageEvent = "info-message";

@@ -8,31 +8,14 @@ const { PERMS } = require("../constants/authorization.constants");
 
 class PrinterSettingsController {
   #printersStore;
-  #jobsCache;
-  #taskManagerService;
   #octoPrintApiService;
-  #fileCache;
-  #sseTask;
 
   #logger;
 
-  constructor({
-    printersStore,
-    taskManagerService,
-    printerSseTask,
-    loggerFactory,
-    octoPrintApiService,
-    jobsCache,
-    fileCache,
-  }) {
-    this.#logger = loggerFactory("Server-API");
-
+  constructor({ printersStore, loggerFactory, octoPrintApiService }) {
+    this.#logger = loggerFactory(PrinterSettingsController.name);
     this.#printersStore = printersStore;
-    this.#jobsCache = jobsCache;
-    this.#taskManagerService = taskManagerService;
     this.#octoPrintApiService = octoPrintApiService;
-    this.#fileCache = fileCache;
-    this.#sseTask = printerSseTask;
   }
 
   /**
@@ -74,8 +57,8 @@ class PrinterSettingsController {
 
 // prettier-ignore
 module.exports = createController(PrinterSettingsController)
-    .prefix(AppConstants.apiRoute + "/printer-settings")
-    .before([authenticate()])
-    .get("/:id", "get", withPermission(PERMS.PrinterSettings.Get))
-    .post("/:id/gcode-analysis", "setGCodeAnalysis")
-    .post("/:id/sync-printername", "syncPrinterName");
+  .prefix(AppConstants.apiRoute + "/printer-settings")
+  .before([authenticate()])
+  .get("/:id", "get", withPermission(PERMS.PrinterSettings.Get))
+  .post("/:id/gcode-analysis", "setGCodeAnalysis")
+  .post("/:id/sync-printername", "syncPrinterName");
