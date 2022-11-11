@@ -25,7 +25,7 @@ beforeEach(async () => {
   Model.deleteMany({});
 });
 
-describe("PrinterGroupsController", () => {
+describe("PrintCompletionController", () => {
   it("should return empty print completion list", async () => {
     const response = await request.get(listRoute).send();
     expectOkResponse(response, []);
