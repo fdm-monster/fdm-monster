@@ -101,6 +101,8 @@ import RAL_CODES from "@/constants/ral.reference.json";
 import { CustomGcodeService } from "@/backend/custom-gcode.service";
 import { PrintersService } from "@/backend";
 import { usePrintersStore } from "@/store/printers.store";
+import { useDialogsStore } from "@/store/dialog.store";
+import { DialogName } from "@/components/Generic/Dialogs/dialog.constants";
 
 const defaultColor = "rgba(100,100,100,0.1)";
 const maintenanceColor = "black";
@@ -116,6 +118,7 @@ export default defineComponent({
   setup() {
     return {
       printersStore: usePrintersStore(),
+      dialogsStore: useDialogsStore(),
     };
   },
   computed: {
@@ -165,6 +168,7 @@ export default defineComponent({
     },
     clickOpenSettings() {
       this.printersStore.setUpdateDialogPrinter(this.printer);
+      this.dialogsStore.openDialog(DialogName.UpdatePrinterDialog);
     },
     async clickEmergencyStop() {
       if (!this.printer) return;

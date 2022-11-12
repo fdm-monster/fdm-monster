@@ -134,7 +134,7 @@ export default defineComponent({
       const formData = this.formData();
       if (!formData) return;
 
-      const testPrinter = PrintersService.convertCreateFormToPrinter(this.formData());
+      const testPrinter = PrintersService.convertCreateFormToPrinter(formData);
       if (!testPrinter) return;
       this.openTestPanel();
 
@@ -167,9 +167,10 @@ export default defineComponent({
     },
     async submit() {
       if (!(await this.isValid())) return;
-      if (!this.formData()) return;
+      const formData = this.formData();
+      if (!formData) return;
 
-      const updatedPrinter = PrintersService.convertCreateFormToPrinter(this.formData());
+      const updatedPrinter = PrintersService.convertCreateFormToPrinter(formData);
       const printerId = updatedPrinter.id;
 
       const updatedData = await this.printersStore.updatePrinter({
@@ -199,7 +200,8 @@ export default defineComponent({
       if (!viewedPrinter || !printerId) return;
 
       const loginDetails = await PrintersService.getPrinterLoginDetails(printerId);
-      if (this.formData) this.formData().apiKey = loginDetails.apiKey;
+      const formData = this.formData();
+      if (formData) formData.apiKey = loginDetails.apiKey;
     },
   },
 });
