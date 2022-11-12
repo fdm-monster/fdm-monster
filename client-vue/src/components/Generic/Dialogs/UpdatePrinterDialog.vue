@@ -52,7 +52,6 @@ import { Printer } from "@/models/printers/printer.model";
 import { sseTestPrinterUpdate } from "@/event-bus/sse.events";
 import {
   SocketIoTestPrinterMessage,
-  SocketIoUpdateMessage,
   TestProgressDetails,
 } from "@/models/sse-messages/printer-sse-message.model";
 import { PrintersService } from "@/backend";
@@ -97,6 +96,9 @@ export default defineComponent({
     copyPasteConnectionString: "",
   }),
   computed: {
+    validationObserver() {
+      return this.$refs.validationObserver as InstanceType<typeof ValidationObserver>;
+    },
     storedUpdatedPrinter() {
       return this.printersStore.updateDialogPrinter;
     },
@@ -104,9 +106,6 @@ export default defineComponent({
   methods: {
     printerUpdateForm() {
       return this.$refs.printerUpdateForm as InstanceType<typeof PrinterCrudForm>;
-    },
-    validationObserver() {
-      return this.$refs.validationObserver as InstanceType<typeof ValidationObserver>;
     },
     clipboardPasteField() {
       return this.$refs.clipboardPasteField as InstanceType<typeof HTMLFormElement>;
@@ -128,7 +127,7 @@ export default defineComponent({
       this.testProgress = payload.testProgress;
     },
     async isValid() {
-      return await this.validationObserver().validate();
+      return await this.validationObserver.validate();
     },
     async testPrinter() {
       if (!(await this.isValid())) return;

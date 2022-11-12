@@ -5,7 +5,7 @@
         <v-card-title>
           <span class="text-h5">
             <v-avatar color="primary" size="56">
-              {{ avatarInitials }}
+              {{ avatarInitials() }}
             </v-avatar>
             <span v-if="updatePrinterGroup"> Update Printer Group </span>
             <span v-else> New Printer Group </span>
@@ -79,18 +79,17 @@ export default defineComponent({
     updatePrinterGroup() {
       return this.printersStore.updateDialogPrinterGroup;
     },
+    validationObserver() {
+      return this.$refs.validationObserver as InstanceType<typeof ValidationObserver>;
+    },
+  },
+  methods: {
     avatarInitials() {
       const formData = this.formData();
       if (formData) {
         return generateInitials(formData?.name);
       }
-      console.log("No Formdata", formData);
       return "";
-    },
-  },
-  methods: {
-    validationObserver() {
-      return this.$refs.validationObserver as InstanceType<typeof ValidationObserver>;
     },
     printerGroupCrudForm() {
       return this.$refs.printerGroupCrudForm as InstanceType<typeof PrinterGroupCrudForm>;
@@ -99,7 +98,7 @@ export default defineComponent({
       return this.printerGroupCrudForm()?.formData;
     },
     async isValid() {
-      return await this.validationObserver().validate();
+      return await this.validationObserver.validate();
     },
     async submitCreate() {
       if (!(await this.isValid())) return;
