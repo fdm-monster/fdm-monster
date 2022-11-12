@@ -54,7 +54,8 @@ import { usePrintersStore } from "@/store/printers.store";
 import { Printer } from "@/models/printers/printer.model";
 import { sseTestPrinterUpdate } from "@/event-bus/sse.events";
 import {
-  PrinterSseMessage,
+  SocketIoTestPrinterMessage,
+  SocketIoUpdateMessage,
   TestProgressDetails,
 } from "@/models/sse-messages/printer-sse-message.model";
 import { PrintersService } from "@/backend";
@@ -120,7 +121,7 @@ export default defineComponent({
       this.showChecksPanel = true;
       this.testProgress = undefined;
     },
-    async onTestPrinterUpdate(payload: PrinterSseMessage) {
+    async onTestPrinterUpdate(payload: SocketIoTestPrinterMessage) {
       this.testProgress = payload.testProgress;
     },
     async testPrinter() {

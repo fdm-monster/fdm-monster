@@ -1,7 +1,10 @@
 import { io, Socket } from "socket.io-client";
 import Vue from "vue";
 import { VueBus } from "vue-bus";
-import { PrinterSseMessage } from "@/models/sse-messages/printer-sse-message.model";
+import {
+  SocketIoTestPrinterMessage,
+  SocketIoUpdateMessage,
+} from "@/models/sse-messages/printer-sse-message.model";
 import { sseGroups, sseMessageGlobal, sseTestPrinterUpdate } from "@/event-bus/sse.events";
 import { InfoEventType, uploadMessageEvent } from "@/event-bus/alert.events";
 import { updatedPrinterEvent } from "@/event-bus/printer.events";
@@ -10,6 +13,8 @@ import { usePrintersStore } from "@/store/printers.store";
 
 enum IO_MESSAGES {
   LegacyUpdate = "legacy-update",
+  LegacyPrinterTest = "legacy-printer-test",
+  CompletionEvent = "completion-event",
   HostState = "host-state",
   ApiAccessibility = "api-accessibility",
 }
@@ -23,6 +28,9 @@ export class SocketIoService {
     this.socket = io(Vue.config.devtools ? "http://localhost:4000" : ""); // Same-origin policy);
     this.$bus = $bus;
     this.socket.on(IO_MESSAGES.LegacyUpdate, (data) => this.onMessage(JSON.parse(data)));
+    this.socket.on(IO_MESSAGES.LegacyPrinterTest, (data) =>
+      this.onPrinterTestMessage(JSON.parse(data))
+    );
   }
 
   disconnect() {
@@ -31,7 +39,20 @@ export class SocketIoService {
     }
   }
 
-  onMessage(message: PrinterSseMessage) {
+  onPrinterTestMessage(message: SocketIoTestPrinterMessage) {
+    if (message.testPrinter) {
+      // Emit a specific testing session update
+      const { testPrinter, testProgress } = message;
+      if (!testPrinter?.correlationToken) return;
+
+      this.$bus.emit(sseTestPrinterUpdate(testPrinter.correlationToken), {
+        testPrinter,
+        testProgress,
+      });
+    }
+  }
+
+  onMessage(message: SocketIoUpdateMessage) {
     if (message.printerGroups) {
       this.printersStore.savePrinterGroups(message.printerGroups);
       this.$bus.emit(sseGroups, message.printerGroups);
@@ -57,16 +78,6 @@ export class SocketIoService {
       });
     }
 
-    if (message.testPrinter) {
-      // Emit a specific testing session update
-      const { testPrinter, testProgress } = message;
-      if (!testPrinter?.correlationToken) return;
-
-      this.$bus.emit(sseTestPrinterUpdate(testPrinter.correlationToken), {
-        testPrinter,
-        testProgress,
-      });
-    }
     const outletStore = useOutletCurrentStore();
     if (message.outletCurrentValues) {
       outletStore.setOutletCurrentValues(message.outletCurrentValues);

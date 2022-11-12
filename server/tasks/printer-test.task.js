@@ -4,6 +4,7 @@ const {
   isLoginResponseGlobal,
 } = require("../services/octoprint/constants/octoprint-service.constants");
 const DITokens = require("../container.tokens");
+const { IO_MESSAGES } = require("../state/socket-io.gateway");
 
 class PrinterTestTask {
   #lastTestRunTime;
@@ -71,7 +72,7 @@ class PrinterTestTask {
    */
   async #sendStateProgress(testPrinterState, progress) {
     const { printerURL, printerName, apiKey, correlationToken } = testPrinterState?.toFlat();
-    const sseData = {
+    const socketIoData = {
       testPrinter: {
         printerURL,
         printerName,
@@ -81,8 +82,8 @@ class PrinterTestTask {
       testProgress: progress,
     };
 
-    const serializedData = JSON.stringify(sseData);
-    this.#socketIoGateway.send("legacy-printer-test", serializedData);
+    const serializedData = JSON.stringify(socketIoData);
+    this.#socketIoGateway.send(IO_MESSAGES.LegacyPrinterTest, serializedData);
   }
 
   async #testPrinterConnection(printerState) {
