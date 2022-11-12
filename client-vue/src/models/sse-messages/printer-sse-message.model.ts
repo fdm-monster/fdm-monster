@@ -37,12 +37,15 @@ export interface OutletCurrentValues {
   };
 }
 
-export interface PrinterSseMessage {
+export interface SocketIoTestPrinterMessage {
+  testPrinter: Printer;
+  testProgress: TestProgressDetails;
+}
+
+export interface SocketIoUpdateMessage {
   printers: Printer[];
   printerGroups: PrinterGroup[];
-  testPrinter: Printer;
   trackedUploads: UploadStates;
-  testProgress: TestProgressDetails;
   floors: PrinterFloor[];
   outletCurrentValues: OutletCurrentValues;
 }

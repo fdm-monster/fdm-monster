@@ -51,7 +51,7 @@ import { ValidationObserver } from "vee-validate";
 import { Printer } from "@/models/printers/printer.model";
 import { sseTestPrinterUpdate } from "@/event-bus/sse.events";
 import {
-  PrinterSseMessage,
+  SocketIoTestPrinterMessage,
   TestProgressDetails,
 } from "@/models/sse-messages/printer-sse-message.model";
 import { PrintersService } from "@/backend";
@@ -96,6 +96,9 @@ export default defineComponent({
     copyPasteConnectionString: "",
   }),
   computed: {
+    validationObserver() {
+      return this.$refs.validationObserver as InstanceType<typeof ValidationObserver>;
+    },
     storedUpdatedPrinter() {
       return this.printersStore.updateDialogPrinter;
     },
@@ -103,9 +106,6 @@ export default defineComponent({
   methods: {
     printerUpdateForm() {
       return this.$refs.printerUpdateForm as InstanceType<typeof PrinterCrudForm>;
-    },
-    validationObserver() {
-      return this.$refs.validationObserver as InstanceType<typeof ValidationObserver>;
     },
     clipboardPasteField() {
       return this.$refs.clipboardPasteField as InstanceType<typeof HTMLFormElement>;
@@ -123,17 +123,18 @@ export default defineComponent({
       this.showChecksPanel = true;
       this.testProgress = undefined;
     },
-    async onTestPrinterUpdate(payload: PrinterSseMessage) {
+    async onTestPrinterUpdate(payload: SocketIoTestPrinterMessage) {
       this.testProgress = payload.testProgress;
     },
     async isValid() {
-      return await this.validationObserver().validate();
+      return await this.validationObserver.validate();
     },
     async testPrinter() {
       if (!(await this.isValid())) return;
-      if (!this.formData) return;
+      const formData = this.formData();
+      if (!formData) return;
 
-      const testPrinter = PrintersService.convertCreateFormToPrinter(this.formData());
+      const testPrinter = PrintersService.convertCreateFormToPrinter(formData);
       if (!testPrinter) return;
       this.openTestPanel();
 
@@ -166,9 +167,10 @@ export default defineComponent({
     },
     async submit() {
       if (!(await this.isValid())) return;
-      if (!this.formData()) return;
+      const formData = this.formData();
+      if (!formData) return;
 
-      const updatedPrinter = PrintersService.convertCreateFormToPrinter(this.formData());
+      const updatedPrinter = PrintersService.convertCreateFormToPrinter(formData);
       const printerId = updatedPrinter.id;
 
       const updatedData = await this.printersStore.updatePrinter({
@@ -198,7 +200,8 @@ export default defineComponent({
       if (!viewedPrinter || !printerId) return;
 
       const loginDetails = await PrintersService.getPrinterLoginDetails(printerId);
-      if (this.formData) this.formData().apiKey = loginDetails.apiKey;
+      const formData = this.formData();
+      if (formData) formData.apiKey = loginDetails.apiKey;
     },
   },
 });

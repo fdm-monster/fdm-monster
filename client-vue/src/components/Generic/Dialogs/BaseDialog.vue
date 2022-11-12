@@ -1,6 +1,6 @@
 <template>
   <v-dialog
-    v-model="showingDialog"
+    :value="showingDialog"
     :max-width="maxWidth"
     :retain-focus="false"
     persistent

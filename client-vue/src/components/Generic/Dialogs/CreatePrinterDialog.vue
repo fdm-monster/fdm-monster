@@ -13,7 +13,7 @@
         <v-card-text>
           <v-row>
             <v-col :cols="showChecksPanel ? 8 : 12">
-              <PrinterCrudForm ref="printerCrudForm" />
+              <PrinterCrudForm ref="printerCrudForm" @onChange="onFormChange" />
             </v-col>
 
             <PrinterChecksPanel v-if="showChecksPanel" :cols="4" :test-progress="testProgress">
@@ -54,7 +54,7 @@ import { usePrintersStore } from "@/store/printers.store";
 import { Printer } from "@/models/printers/printer.model";
 import { sseTestPrinterUpdate } from "@/event-bus/sse.events";
 import {
-  PrinterSseMessage,
+  SocketIoTestPrinterMessage,
   TestProgressDetails,
 } from "@/models/sse-messages/printer-sse-message.model";
 import { PrintersService } from "@/backend";
@@ -96,39 +96,37 @@ export default defineComponent({
     validationObserver() {
       return this.$refs.validationObserver as InstanceType<typeof ValidationObserver>;
     },
+    dialogOpenedState() {
+      return this.dialogsStore.isDialogOpened(this.dialogId);
+    },
+  },
+  methods: {
     printerCrudForm() {
       return this.$refs.printerCrudForm as InstanceType<typeof PrinterCrudForm>;
     },
     formData() {
-      return this.printerCrudForm?.formData;
+      return this.printerCrudForm()?.formData;
     },
-    dialogOpenedState() {
-      return this.dialogsStore.isDialogOpened(this.dialogId);
-    },
-    updatePrinterGroup() {
-      // TODO Must still call getter for watch?
-      return this.printersStore.updateDialogPrinterGroup;
-    },
-  },
-  methods: {
     avatarInitials() {
-      if (this.formData) {
-        return generateInitials(this.formData?.printerName);
+      const formData = this.formData();
+      if (formData) {
+        return generateInitials(formData?.printerName);
       }
     },
     openTestPanel() {
       this.showChecksPanel = true;
       this.testProgress = undefined;
     },
-    async onTestPrinterUpdate(payload: PrinterSseMessage) {
+    async onTestPrinterUpdate(payload: SocketIoTestPrinterMessage) {
       this.testProgress = payload.testProgress;
     },
     async testPrinter() {
       if (!(await this.isValid())) return;
 
       this.openTestPanel();
-      if (!this.formData) return;
-      const testPrinter = PrintersService.convertCreateFormToPrinter(this.formData);
+      const formData = this.formData();
+      if (!formData) return;
+      const testPrinter = PrintersService.convertCreateFormToPrinter(formData);
       const result: Printer = await this.printersStore.createTestPrinter(testPrinter);
       if (!result.correlationToken) throw new Error("Test Printer CorrelationToken was empty.");
       this.$bus.on(sseTestPrinterUpdate(result.correlationToken), this.onTestPrinterUpdate);
@@ -140,7 +138,8 @@ export default defineComponent({
       return false;
     },
     async pasteFromClipboardOrField() {
-      if (!this.printerCrudForm.formData) return;
+      const formData = this.formData();
+      if (!formData) return;
 
       if (!this.isClipboardApiAvailable() && !this.copyPasteConnectionString?.length) {
         return;
@@ -151,18 +150,19 @@ export default defineComponent({
         : this.copyPasteConnectionString;
       const printerObject = JSON.parse(jsonData);
 
-      PrintersService.applyLoginDetailsPatchForm(printerObject, this.printerCrudForm.formData);
+      PrintersService.applyLoginDetailsPatchForm(printerObject, formData);
     },
     async isValid() {
       return await this.validationObserver.validate();
     },
     async submit() {
       if (!(await this.isValid())) return;
-      if (!this.formData) return;
-      const newPrinterData = PrintersService.convertCreateFormToPrinter(this.formData);
+      const formData = this.formData();
+      if (!formData) return;
+      const newPrinterData = PrintersService.convertCreateFormToPrinter(formData);
       await this.printersStore.createPrinter(newPrinterData);
       this.$bus.emit(infoMessageEvent, `Printer ${newPrinterData.printerName} created`);
-      this.printerCrudForm.resetForm();
+      this.printerCrudForm().resetForm();
       this.validationObserver.reset();
       this.closeDialog();
     },
@@ -177,9 +177,6 @@ export default defineComponent({
   watch: {
     dialogOpenedState(newValue: boolean) {
       this.testProgress = undefined;
-    },
-    async updatePrinterGroup(id?: string) {
-      if (!id) return;
     },
   },
 });

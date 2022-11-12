@@ -41,6 +41,7 @@ module.exports = {
   SocketIoGateway,
   IO_MESSAGES: {
     LegacyUpdate: "legacy-update",
+    LegacyPrinterTest: "legacy-printer-test",
     CompletionEvent: "completion-event",
     HostState: "host-state",
     ApiAccessibility: "api-accessibility",

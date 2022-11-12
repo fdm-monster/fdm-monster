@@ -55,7 +55,7 @@ interface Data {
   formData?: PreCreatePrinterGroup;
 }
 
-const watchedId = "printerId";
+const watchedId = "printerGroupId";
 
 export default defineComponent({
   name: "PrinterGroupCrudForm",
@@ -73,7 +73,6 @@ export default defineComponent({
       const crudeData = this.printersStore.printerGroup(this.printerGroupId);
       this.formData = PrinterGroupService.convertPrinterGroupToCreateForm(crudeData);
     }
-
     await this.printersStore.loadPrinterGroups();
   },
   async mounted() {},
@@ -110,9 +109,8 @@ export default defineComponent({
     [watchedId](val?: string) {
       if (!val) return;
 
-      const printerGroup = this.printersStore.printerGroup(val) as PrinterGroup;
-
       // Inverse transformation
+      const printerGroup = this.printersStore.printerGroup(val) as PrinterGroup;
       this.formData = PrinterGroupService.convertPrinterGroupToCreateForm(printerGroup);
     },
   },

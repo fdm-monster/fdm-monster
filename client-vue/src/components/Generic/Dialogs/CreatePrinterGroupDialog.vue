@@ -31,10 +31,11 @@
             color="blue darken-1"
             text
             @click="submitCreate()"
-            >Create
+          >
+            Create
           </v-btn>
-          <v-btn v-else :disabled="invalid" color="blue darken-1" text @click="submitUpdate()"
-            >Update
+          <v-btn v-else :disabled="invalid" color="blue darken-1" text @click="submitUpdate()">
+            Update
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -75,43 +76,44 @@ export default defineComponent({
     dialogId: DialogName.CreatePrinterGroupDialog,
   }),
   computed: {
+    updatePrinterGroup() {
+      return this.printersStore.updateDialogPrinterGroup;
+    },
     validationObserver() {
       return this.$refs.validationObserver as InstanceType<typeof ValidationObserver>;
+    },
+  },
+  methods: {
+    avatarInitials() {
+      const formData = this.formData();
+      if (formData) {
+        return generateInitials(formData?.name);
+      }
+      return "";
     },
     printerGroupCrudForm() {
       return this.$refs.printerGroupCrudForm as InstanceType<typeof PrinterGroupCrudForm>;
     },
     formData() {
-      return this.printerGroupCrudForm?.formData;
-    },
-    updatePrinterGroup() {
-      // TODO Must still call getter for watch?
-      return this.printersStore.updateDialogPrinterGroup;
-    },
-  },
-  methods: {
-    avatarInitials() {
-      if (this.formData) {
-        return generateInitials(this.formData?.name);
-      }
+      return this.printerGroupCrudForm()?.formData;
     },
     async isValid() {
       return await this.validationObserver.validate();
     },
     async submitCreate() {
       if (!(await this.isValid())) return;
-      if (!this.formData) return;
-      const newPrinterGroupData = PrinterGroupService.convertCreateFormToPrinterGroup(
-        this.formData
-      );
+      const formData = this.formData();
+      if (!formData) return;
+      const newPrinterGroupData = PrinterGroupService.convertCreateFormToPrinterGroup(formData);
       await this.printersStore.createPrinterGroup(newPrinterGroupData);
       this.$bus.emit(infoMessageEvent, `Printer group ${newPrinterGroupData.name} created`);
       this.closeDialog();
     },
     async submitUpdate() {
       if (!(await this.isValid())) return;
-      if (!this.formData || !this.updatePrinterGroup?._id) return;
-      const updatePrinterGroup = PrinterGroupService.convertCreateFormToPrinterGroup(this.formData);
+      const formData = this.formData();
+      if (!formData || !this.updatePrinterGroup?._id) return;
+      const updatePrinterGroup = PrinterGroupService.convertCreateFormToPrinterGroup(formData);
       await this.printersStore.updatePrinterGroup({
         printerGroupId: this.updatePrinterGroup!._id!,
         updatePrinterGroup,
@@ -125,10 +127,6 @@ export default defineComponent({
       this.printersStore.setUpdateDialogPrinterGroup();
     },
   },
-  watch: {
-    async updatePrinterGroup(id?: string) {
-      if (!id) return;
-    },
-  },
+  watch: {},
 });
 </script>

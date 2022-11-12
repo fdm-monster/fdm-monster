@@ -65,17 +65,18 @@ export default defineComponent({
     validationObserver() {
       return this.$refs.validationObserver as InstanceType<typeof ValidationObserver>;
     },
+  },
+  methods: {
     printerFloorCrudForm() {
       return this.$refs.printerFloorCrudForm as InstanceType<typeof PrinterFloorCrudForm>;
     },
     formData() {
-      return this.printerFloorCrudForm?.formData;
+      return this.printerFloorCrudForm()?.formData;
     },
-  },
-  methods: {
     avatarInitials() {
-      if (this.formData) {
-        return generateInitials(this.formData.name);
+      const formData = this.formData();
+      if (formData) {
+        return generateInitials(formData.name);
       }
     },
     async isValid() {
@@ -83,16 +84,15 @@ export default defineComponent({
     },
     async submit() {
       if (!(await this.isValid())) return;
-      if (!this.formData) return;
-      const newPrinterFloorData = PrinterFloorService.convertCreateFormToPrinterFloor(
-        this.formData
-      );
+      const formData = this.formData();
+      if (!formData) return;
+      const newPrinterFloorData = PrinterFloorService.convertCreateFormToPrinterFloor(formData);
       await this.printersStore.createPrinterFloor(newPrinterFloorData);
 
       this.$bus.emit(infoMessageEvent, `Printer floor ${newPrinterFloorData.name} created`);
-      this.formData.name = newRandomNamePair();
+      formData.name = newRandomNamePair();
       const maxIndex = Math.max(...this.printersStore.printerFloors.map((pf) => pf.floor)) + 1;
-      this.formData.floor = maxIndex.toString();
+      formData.floor = maxIndex.toString();
       this.closeDialog();
     },
     closeDialog() {
