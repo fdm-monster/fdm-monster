@@ -19,7 +19,7 @@ jobs:
 
       - run: yarn install --frozen-lockfile
         working-directory: server-nest
-      - run: yarn run build --if-present
+      - run: yarn run build
         working-directory: server-nest
       - run: yarn run test:cov
         name: "Run unit tests with coverage"
