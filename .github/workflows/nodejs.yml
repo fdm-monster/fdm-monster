@@ -26,4 +26,5 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
+          flags: server-nodejs
           dry_run: ${{ matrix.node-version != '16.x' }}
