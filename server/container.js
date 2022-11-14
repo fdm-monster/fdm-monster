@@ -54,6 +54,7 @@ const { InfluxDbQueryTask } = require("./tasks/influxdb-query.task");
 const { PrintCompletionSocketIoTask } = require("./tasks/print-completion.socketio.task");
 const { PrintCompletionService } = require("./services/print-completion.service");
 const { SocketIoGateway } = require("./state/socket-io.gateway");
+const { BedTempOverrideTask } = require("./tasks/bed-temp-override.task");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -121,6 +122,7 @@ function configureContainer() {
     [DITokens.influxDbV2BaseService]: asClass(InfluxDbV2BaseService),
 
     [DITokens.bootTask]: asClass(BootTask),
+    [DITokens.bedTempOverrideTask]: asClass(BedTempOverrideTask).singleton(),
     [DITokens.softwareUpdateTask]: asClass(SoftwareUpdateTask), // Provided SSE handlers (couplers) shared with controllers
     [DITokens.printerSocketIoTask]: asClass(PrinterSocketIoTask).singleton(), // This task is a quick task (~100ms per printer)
     [DITokens.printCompletionSocketIoTask]: asClass(PrintCompletionSocketIoTask).singleton(),

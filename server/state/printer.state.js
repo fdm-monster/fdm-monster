@@ -1,4 +1,9 @@
-const { PEVENTS, octoPrintWebsocketEvent } = require("../constants/event.constants");
+const {
+  PEVENTS,
+  octoPrintWebsocketEvent,
+  octoPrintWebsocketZChangeEvent,
+  octoPrintWebsocketCurrentEvent,
+} = require("../constants/event.constants");
 const {
   getDefaultPrinterState,
   WS_STATE,
@@ -338,11 +343,10 @@ class PrinterState {
       } else if (data.type === EVENT_TYPES.Disconnected) {
         this.setFirmwareState("-");
       }
-    }
-    if (event.type === PEVENTS.init) {
+    } else if (event.type === PEVENTS.init) {
       this.#jobsCache.savePrinterJob(this.#id, event.data);
-    }
-    if (event.type === PEVENTS.current) {
+    } else if (event.type === PEVENTS.current) {
+      this.#eventEmitter2.emit(octoPrintWebsocketCurrentEvent(this.#id), event.type, event.data);
       this.#jobsCache.updatePrinterJob(this.#id, event.data);
     }
   }

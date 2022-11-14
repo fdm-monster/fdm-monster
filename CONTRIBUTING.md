@@ -94,7 +94,7 @@ You might be delighted to know that the FDM Monster server was structured consis
 
 Please make sure you understand the meaning of these files/folders:
 - package.json
-- index.js
+- index.mjs
 - container.js // container.tokens.js
 - server.core.js // server.host.js
 - tasks.js // tasks/... // tasks/boot.task.js

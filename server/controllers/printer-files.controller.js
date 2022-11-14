@@ -17,8 +17,6 @@ const { ValidationException, NotFoundException } = require("../exceptions/runtim
 const { printerLoginToken, printerResolveMiddleware } = require("../middleware/printer");
 const { ROLES, PERMS } = require("../constants/authorization.constants");
 const { authorizeRoles } = require("../middleware/authenticate");
-const { readLinesAsync } = require("../utils/file-io.utils");
-const { replaceInFileSync } = require("replace-in-file");
 
 class PrinterFilesController {
   #filesStore;
@@ -26,6 +24,7 @@ class PrinterFilesController {
   #octoPrintApiService;
   #printersStore;
   #multerService;
+  #bedTempOverrideTask;
 
   #printerFileCleanTask;
 
@@ -34,6 +33,7 @@ class PrinterFilesController {
   constructor({
     filesStore,
     octoPrintApiService,
+    bedTempOverrideTask,
     printersStore,
     printerFileCleanTask,
     settingsStore,
@@ -43,6 +43,7 @@ class PrinterFilesController {
     this.#filesStore = filesStore;
     this.#settingsStore = settingsStore;
     this.#printerFileCleanTask = printerFileCleanTask;
+    this.#bedTempOverrideTask = bedTempOverrideTask;
     this.#octoPrintApiService = octoPrintApiService;
     this.#printersStore = printersStore;
     this.#multerService = multerService;
@@ -194,46 +195,11 @@ class PrinterFilesController {
 
     // Multer has processed the remaining multipart data into the body as json
     const { print, select, bedTemp } = await validateInput(req.body, fileUploadCommandsRules);
-
     const uploadedFile = files[0];
-    const uploadPath = uploadedFile.path;
 
     // Replace BedTemp in GCode
     if (bedTemp) {
-      const lines = await readLinesAsync(uploadPath, 100);
-      let limitUsed = 100;
-      let foundLineIndices = lines
-        .map((line, index) => (line.includes("M140") ? index : null))
-        .filter((e) => !!e);
-      if (!foundLineIndices?.length) {
-        // Give it another shot with more lines
-        const lines = await readLinesAsync(uploadPath, 500);
-        foundLineIndices = lines
-          .map((line, index) => (line.includes("M140") ? index : null))
-          .filter((e) => !!e);
-        limitUsed = 500;
-      }
-
-      // Replace M140 if requested
-      if (foundLineIndices?.length) {
-        for (const lineIndex of foundLineIndices) {
-          replaceInFileSync({
-            files: [uploadPath],
-            from: (file) => {
-              return "M140 S60";
-            },
-            to: `M140 S${bedTemp}`,
-          });
-        }
-
-        this.#logger.info(
-          `Replaced ${foundLineIndices?.length} occurrences of M140 with bed temp ${bedTemp} within ${limitUsed} GCode lines`
-        );
-      } else {
-        this.#logger.info(
-          `Could not find any bedtemp occurrences of M140 with bed temp ${bedTemp}`
-        );
-      }
+      this.#bedTempOverrideTask.addBedTempOverride(currentPrinterId, bedTemp);
     } else {
       this.#logger.info("BedTemp not overwritten");
     }

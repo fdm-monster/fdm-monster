@@ -2,7 +2,7 @@ module.exports = {
   testEnvironment: "node",
   testTimeout: 5000,
   modulePathIgnorePatterns: [
-    "index.js",
+    "index.mjs",
     "migrate-mongo-config.js",
     ".eslintrc.js",
     "jest.config.js",
