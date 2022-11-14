@@ -35,15 +35,26 @@
 </template>
 
 <script lang="ts">
-import { Component } from "vue-property-decorator";
-import Vue from "vue";
+import { defineComponent } from "vue";
 
-@Component({
-  props: {
-    source: String
-  }
-})
-export default class Login extends Vue {}
+interface Data {}
+
+export default defineComponent({
+  name: "Login",
+  components: {},
+  setup: () => {
+    return {};
+  },
+  async created() {},
+  async mounted() {},
+  props: {},
+  data: (): Data => ({
+    property: 0,
+  }),
+  computed: {},
+  methods: {},
+  watch: {},
+});
 </script>
 
 <style></style>

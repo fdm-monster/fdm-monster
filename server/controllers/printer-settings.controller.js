@@ -8,37 +8,14 @@ const { PERMS } = require("../constants/authorization.constants");
 
 class PrinterSettingsController {
   #printersStore;
-  #jobsCache;
-  #taskManagerService;
-  #terminalLogsCache;
   #octoPrintApiService;
-  #fileCache;
-  #sseHandler;
-  #sseTask;
 
   #logger;
 
-  constructor({
-    printersStore,
-    terminalLogsCache,
-    printerSseHandler,
-    taskManagerService,
-    printerSseTask,
-    loggerFactory,
-    octoPrintApiService,
-    jobsCache,
-    fileCache
-  }) {
-    this.#logger = loggerFactory("Server-API");
-
+  constructor({ printersStore, loggerFactory, octoPrintApiService }) {
+    this.#logger = loggerFactory(PrinterSettingsController.name);
     this.#printersStore = printersStore;
-    this.#jobsCache = jobsCache;
-    this.#terminalLogsCache = terminalLogsCache;
-    this.#taskManagerService = taskManagerService;
     this.#octoPrintApiService = octoPrintApiService;
-    this.#fileCache = fileCache;
-    this.#sseHandler = printerSseHandler;
-    this.#sseTask = printerSseTask;
   }
 
   /**
@@ -63,11 +40,25 @@ class PrinterSettingsController {
     const settings = await this.#octoPrintApiService.setGCodeAnalysis(printerLogin, input);
     res.send(settings);
   }
+
+  async syncPrinterName(req, res) {
+    const { id: printerId } = await validateInput(req.params, idRules);
+
+    const printerState = this.#printersStore.getPrinterState(printerId);
+    const printerLogin = printerState.getLoginDetails();
+    const printerName = printerState.getName();
+    const settings = await this.#octoPrintApiService.updatePrinterNameSetting(
+      printerLogin,
+      printerName
+    );
+    res.send(settings);
+  }
 }
 
 // prettier-ignore
 module.exports = createController(PrinterSettingsController)
-    .prefix(AppConstants.apiRoute + "/printer-settings")
-    .before([authenticate()])
-    .get("/:id", "get", withPermission(PERMS.PrinterSettings.Get))
-    .post("/:id/gcode-analysis", "setGCodeAnalysis");
+  .prefix(AppConstants.apiRoute + "/printer-settings")
+  .before([authenticate()])
+  .get("/:id", "get", withPermission(PERMS.PrinterSettings.Get))
+  .post("/:id/gcode-analysis", "setGCodeAnalysis")
+  .post("/:id/sync-printername", "syncPrinterName");

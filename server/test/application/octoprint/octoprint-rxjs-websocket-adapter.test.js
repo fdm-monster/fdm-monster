@@ -1,4 +1,5 @@
 const OctoprintRxjsWebsocketAdapter = require("../../../services/octoprint/octoprint-rxjs-websocket.adapter");
+
 describe("OctoPrint-rjxs-websocket-adapter", () => {
   it("should construct without problems", () => {
     const adapter = new OctoprintRxjsWebsocketAdapter({

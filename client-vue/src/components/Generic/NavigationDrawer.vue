@@ -1,12 +1,12 @@
 <template>
-  <v-navigation-drawer app class="video-background-page" :mini-variant="true" dark permanent>
+  <v-navigation-drawer app mini-variant class="gradient-bg" dark permanent>
     <v-list-item class="px-2">
       <v-list-item-content>
         <v-list-item-title class="text-h5">
           <div class="d-flex align-center">
             <v-img
               :src="require('@/assets/logo.png')"
-              alt="Vuetify Logo"
+              alt="FDM Monster Logo"
               class="shrink mr-2 pt-3"
               contain
               transition="scale-transition"
@@ -33,8 +33,11 @@
   </v-navigation-drawer>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from "vue";
+
+export default defineComponent({
+  name: "NavigationDrawer",
   data() {
     return {
       drawer: true,
@@ -42,33 +45,25 @@ export default {
         ["home", "Devices", "/"],
         ["printer", "Printers", "/printers"],
         ["settings", "Settings", "/settings"],
-        ["history", "PrintScheduling", "/scheduling"],
-        ["contact_support", "About", "/about"]
-      ]
+        ["timeline", "PrintScheduling", "/scheduling"],
+        ["contact_support", "About", "/about"],
+      ],
     };
   },
   computed: {
     routes() {
-      const routes = this.$router.options.routes.filter(
-        (route) => !route.meta || !route.meta.hidden
-      );
-      return routes;
-    }
-  }
-};
+      if (!this.$router.options.routes) return [];
+      return this.$router.options.routes.filter((route) => !route.meta || !route.meta.hidden);
+    },
+  },
+});
 </script>
 
 <style>
-/*https://mdbootstrap.com/docs/vue/css/background-image/*/
-.video-background-page {
+.gradient-bg {
   background: -moz-linear-gradient(45deg, rgba(46, 49, 146, 1), rgba(155, 5, 5, 1) 100%);
   background: -webkit-linear-gradient(45deg, rgba(46, 49, 146, 1), rgba(155, 5, 5, 1) 100%);
   background: linear-gradient(45deg, rgba(18, 18, 18, 1), rgba(155, 5, 5, 1) 100%);
-}
-.video-background-page .view video {
-  top: 0 !important;
-  left: 0 !important;
-  transform: none !important;
-  height: calc(100vh - 60px);
+  /*margin-bottom: -100px !important;*/
 }
 </style>

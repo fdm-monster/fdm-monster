@@ -11,7 +11,7 @@ else {
 
 echo "Installing version ${lastVersion} of package ${package}"
 
-echo  "Running: npm --prefix ..\..\ install --save --save-exact ${package}@${lastVersion}"
+echo  "Running: yarn --cwd ..\..\ add --exact ${package}@${lastVersion}"
 
 yarn --cwd "..\..\server\" remove "${package}"
 yarn --cwd "..\..\server\" add --exact "${package}@${lastVersion}"

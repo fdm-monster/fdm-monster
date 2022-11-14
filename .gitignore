@@ -17,5 +17,7 @@ server-nest/assets/public/assets/
 # Runtime folders
 **/fdm-monster
 **/images
-**/file-uploads
+**/file-storage
 **/nodemon_restart_trigger.js
+
+**/yarn-error.log

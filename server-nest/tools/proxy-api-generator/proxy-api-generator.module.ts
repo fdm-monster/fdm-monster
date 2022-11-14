@@ -1,4 +1,4 @@
-import { HttpModule, Logger, Module } from "@nestjs/common";
+import { Logger, Module } from "@nestjs/common";
 import { APP_FILTER } from "@nestjs/core";
 import { ExceptionsLoggerFilter } from "../../src/providers/exception.filters";
 import { ConfigModule } from "@nestjs/config";
@@ -6,6 +6,7 @@ import { OctoprintModule } from "../../src/octoprint/octoprint.module";
 import { BootController } from "../../src/boot/boot.controller";
 import { ProxyApiGeneratorService } from "./proxy-api-generator.service";
 import { OctoPrintConfig } from "../../src/octoprint/octoprint.config";
+import {HttpModule} from "@nestjs/axios";
 
 @Module({
   providers: [

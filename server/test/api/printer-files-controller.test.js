@@ -6,9 +6,10 @@ const { createTestPrinter } = require("./test-data/create-printer");
 const {
   expectOkResponse,
   expectInvalidResponse,
-  expectNotFoundResponse
+  expectNotFoundResponse,
 } = require("../extensions");
 const nock = require("nock");
+const DITokens = require("../../container.tokens");
 
 let Model = Printer;
 const defaultRoute = AppConstants.apiRoute + "/printer-files";
@@ -28,10 +29,12 @@ const getCacheRoute = (id) => `${getRoute(id)}/cache`;
 
 let request;
 let octoPrintApiService;
-
+let container;
+let bedTempOverrideTask;
 beforeAll(async () => {
   await dbHandler.connect();
-  ({ request, octoPrintApiService } = await setupTestApp(true));
+  ({ request, container, octoPrintApiService } = await setupTestApp(true));
+  bedTempOverrideTask = container.resolve(DITokens.bedTempOverrideTask);
 });
 
 beforeEach(async () => {
@@ -46,9 +49,9 @@ describe("PrinterFilesController", () => {
     files: {
       local: {
         path: "/home/yes",
-        name: "3xP1234A_PLA_ParelWit_1h31m.gcode"
-      }
-    }
+        name: "3xP1234A_PLA_ParelWit_1h31m.gcode",
+      },
+    },
   };
 
   it(`should return 404 on ${defaultRoute} for nonexisting printer`, async () => {
@@ -92,7 +95,7 @@ describe("PrinterFilesController", () => {
     const response = await request.delete(clearFilesRoute(printer.id)).send();
     expectOkResponse(response, {
       succeededFiles: expect.any(Array),
-      failedFiles: expect.any(Array)
+      failedFiles: expect.any(Array),
     });
     expect(response.body.succeededFiles).toHaveLength(1);
     expect(response.body.failedFiles).toHaveLength(0);
@@ -109,7 +112,7 @@ describe("PrinterFilesController", () => {
     const printer = await createTestPrinter(request);
     const response = await request.post(moveFileOrFolderRoute(printer.id)).send({
       filePath: "/test",
-      destination: "/test2"
+      destination: "/test2",
     });
     expectOkResponse(response);
   });
@@ -118,7 +121,7 @@ describe("PrinterFilesController", () => {
     const printer = await createTestPrinter(request);
     const response = await request.post(createFolderRoute(printer.id)).send({
       foldername: "/test",
-      path: "local"
+      path: "local",
     });
     expectOkResponse(response);
   });
@@ -133,12 +136,12 @@ describe("PrinterFilesController", () => {
     const printer = await createTestPrinter(request);
     const response = await request.post(selectAndPrintRoute(printer.id)).send({
       filePath: "file.gcode",
-      print: false
+      print: false,
     });
     expectOkResponse(response);
   });
 
-  test.skip("should allow POST upload file", async () => {
+  it("should allow POST upload file", async () => {
     const printer = await createTestPrinter(request);
 
     nock(printer.printerURL)
@@ -147,17 +150,20 @@ describe("PrinterFilesController", () => {
         files: {
           local: {
             path: "/home/yes",
-            name: "3xP1234A_PLA_ParelWit_1h31m.gcode"
-          }
-        }
+            name: "3xP1234A_PLA_ParelWit_1h31m.gcode",
+          },
+        },
       })
       .persist();
 
     const response = await request
       .post(uploadFileRoute(printer.id))
       .field("print", true)
+      .field("bedTemp", 50)
       .attach("file", gcodePath);
     expectOkResponse(response);
+
+    expect(bedTempOverrideTask.bedTempOverrides[printer.id].bedTemp).toBe(50);
   });
 
   test.skip("should not allow POSTing multiple uploaded file", async () => {
@@ -169,9 +175,9 @@ describe("PrinterFilesController", () => {
         files: {
           local: {
             path: "/home/yes",
-            name: "3xP1234A_PLA_ParelWit_1h31m.gcode"
-          }
-        }
+            name: "3xP1234A_PLA_ParelWit_1h31m.gcode",
+          },
+        },
       })
       .persist();
 
@@ -192,9 +198,9 @@ describe("PrinterFilesController", () => {
         files: {
           local: {
             path: "/home/yes",
-            name: "3xP1234A_PLA_ParelWit_1h31m.gcode"
-          }
-        }
+            name: "3xP1234A_PLA_ParelWit_1h31m.gcode",
+          },
+        },
       })
       .persist();
 
@@ -219,7 +225,7 @@ describe("PrinterFilesController", () => {
     const response = await request.post(localUploadFileRoute(printer.id)).send({
       localLocation: "node_modules",
       select: true,
-      print: true
+      print: true,
     });
 
     expectInvalidResponse(response, ["localLocation"]);
@@ -232,7 +238,7 @@ describe("PrinterFilesController", () => {
     const response = await request.post(localUploadFileRoute(printer.id)).send({
       localLocation: "test-file.gcode",
       select: true,
-      print: true
+      print: true,
     });
 
     expectNotFoundResponse(response);

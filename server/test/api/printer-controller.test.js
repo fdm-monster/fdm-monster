@@ -4,7 +4,7 @@ const { setupTestApp } = require("../test-server");
 const {
   expectInvalidResponse,
   expectOkResponse,
-  expectNotFoundResponse
+  expectNotFoundResponse,
 } = require("../extensions");
 const Printer = require("../../models/Printer");
 const { testApiKey, createTestPrinter } = require("./test-data/create-printer");
@@ -16,6 +16,7 @@ const defaultRoute = AppConstants.apiRoute + "/printer";
 const createRoute = defaultRoute;
 const updateSortIndexRoute = `${defaultRoute}/sort-index`;
 const testPrinterRoute = `${defaultRoute}/test-connection`;
+const pluginListRoute = `${defaultRoute}/plugin-list`;
 const getRoute = (id) => `${defaultRoute}/${id}`;
 const deleteRoute = (id) => `${defaultRoute}/${id}`;
 const updateRoute = (id) => `${defaultRoute}/${id}`;
@@ -24,12 +25,12 @@ const reconnectRoute = (id) => `${updateRoute(id)}/reconnect`;
 const connectionRoute = (id) => `${updateRoute(id)}/connection`;
 const loginDetailsRoute = (id) => `${updateRoute(id)}/login-details`;
 const enabledRoute = (id) => `${updateRoute(id)}/enabled`;
+const disabledReasonRoute = (id) => `${updateRoute(id)}/disabled-reason`;
 const stepSizeRoute = (id) => `${updateRoute(id)}/step-size`;
 const feedRateRoute = (id) => `${updateRoute(id)}/feed-rate`;
 const flowRateRoute = (id) => `${updateRoute(id)}/flow-rate`;
-const resetPowerSettingsRoute = (id) => `${updateRoute(id)}/reset-power-settings`;
-const terminalLogsRoute = (id) => `${getRoute(id)}/terminal-logs`;
-const pluginListRoute = (id) => `${getRoute(id)}/plugin-list`;
+const printerPluginListRoute = (id) => `${getRoute(id)}/plugin-list`;
+const restartOctoPrintRoute = (id) => `${getRoute(id)}/restart-octoprint`;
 const serialConnectCommandRoute = (id) => `${getRoute(id)}/serial-connect`;
 const serialDisconnectCommandRoute = (id) => `${getRoute(id)}/serial-disconnect`;
 const batchRoute = `${defaultRoute}/batch`;
@@ -55,7 +56,7 @@ describe("PrinterController", () => {
       settingsAppearance: null,
       printerURL: "http://url.com",
       apiKey: "notcorrect",
-      tempTriggers: { heatingVariation: null }
+      tempTriggers: { heatingVariation: null },
     });
     expectInvalidResponse(response, ["apiKey"]);
   });
@@ -65,10 +66,10 @@ describe("PrinterController", () => {
       printerURL: "http://url.com",
       apiKey: testApiKey,
       printerName: "test123",
-      tempTriggers: { heatingVariation: null }
+      tempTriggers: { heatingVariation: null },
     });
     const body = expectOkResponse(response, {
-      printerURL: expect.any(String)
+      printerURL: expect.any(String),
     });
 
     expect(body.printerName).toEqual("test123");
@@ -84,13 +85,16 @@ describe("PrinterController", () => {
     expectInvalidResponse(response, ["printerId"], true);
   });
 
-  test.skip(`should be able to DELETE ${deleteRoute} - existing id`, async () => {
+  it(`should be able to DELETE ${deleteRoute} - existing id`, async () => {
     const printer = await createTestPrinter(request);
 
     const res = await request.get(getRoute(printer.id)).send();
     expectOkResponse(res);
 
     const deletionResponse = await request.delete(deleteRoute(printer.id)).send();
+
+    // We accept race conditions for now
+    if (deletionResponse.statusCode === 404) return;
     expectOkResponse(deletionResponse, expect.anything());
   });
 
@@ -105,7 +109,7 @@ describe("PrinterController", () => {
     const res = await request.get(getRoute(printerId)).send();
     expectNotFoundResponse(res);
     expect(res.body).toEqual({
-      error: `The printer ID '${printerId}' was not found in the PrintersStore.`
+      error: `The printer ID '${printerId}' was not found in the PrintersStore.`,
     });
   });
 
@@ -124,8 +128,8 @@ describe("PrinterController", () => {
       {
         printerURL: "http://localhost/",
         webSocketURL: "ws://localhost/",
-        apiKey
-      }
+        apiKey,
+      },
     ]);
     expectOkResponse(response);
   });
@@ -157,10 +161,7 @@ describe("PrinterController", () => {
     expect(printer.enabled).toBe(false);
 
     const response = await request.post(stopJobRoute(printer.id)).send();
-    expectOkResponse(response, {
-      success: true,
-      message: "Cancel command sent"
-    });
+    expectOkResponse(response);
   });
 
   it("should update printer correctly", async () => {
@@ -172,14 +173,14 @@ describe("PrinterController", () => {
       printerURL: "https://test.com/",
       apiKey,
       enabled: false,
-      printerName: "asd124"
+      printerName: "asd124",
     };
     const updatePatch = await request.patch(updateRoute(printer.id)).send(patch);
     expectOkResponse(updatePatch, {
       webSocketURL: "ws://google.com",
       printerURL: "https://test.com/",
       enabled: false,
-      printerName: "asd124"
+      printerName: "asd124",
     });
   });
 
@@ -189,12 +190,12 @@ describe("PrinterController", () => {
     const updatePatch = await request.patch(connectionRoute(printer.id)).send({
       webSocketURL: "ws://google.com",
       printerURL: "https://test.com/",
-      apiKey
+      apiKey,
     });
     expectOkResponse(updatePatch, {
       webSocketURL: "ws://google.com/", // Sanitized
       printerURL: "https://test.com/",
-      apiKey
+      apiKey,
     });
   });
 
@@ -212,11 +213,11 @@ describe("PrinterController", () => {
       task: () => {
         ranTask = true;
       },
-      preset
+      preset,
     });
     const res = await request.post(testPrinterRoute).send({
       apiKey,
-      printerURL: "https://test.com/"
+      printerURL: "https://test.com/",
     });
     expectOkResponse(res);
     expect(ranTask).toBeTruthy();
@@ -225,7 +226,15 @@ describe("PrinterController", () => {
   it("should update printer enabled setting correctly", async () => {
     const printer = await createTestPrinter(request);
     const updatePatch = await request.patch(enabledRoute(printer.id)).send({
-      enabled: false
+      enabled: false,
+    });
+    expectOkResponse(updatePatch);
+  });
+
+  it("should update printer enabled setting correctly", async () => {
+    const printer = await createTestPrinter(request);
+    const updatePatch = await request.patch(disabledReasonRoute(printer.id)).send({
+      disabledReason: "Under maintenance",
     });
     expectOkResponse(updatePatch);
   });
@@ -233,7 +242,7 @@ describe("PrinterController", () => {
   it("should update printer stepSize setting correctly", async () => {
     const printer = await createTestPrinter(request);
     const updatePatch = await request.patch(stepSizeRoute(printer.id)).send({
-      stepSize: 0.1
+      stepSize: 0.1,
     });
     expectOkResponse(updatePatch);
   });
@@ -241,7 +250,7 @@ describe("PrinterController", () => {
   it("should update printer feed rate setting correctly", async () => {
     const printer = await createTestPrinter(request);
     const updatePatch = await request.patch(feedRateRoute(printer.id)).send({
-      feedRate: 10
+      feedRate: 10,
     });
     expectOkResponse(updatePatch);
   });
@@ -249,28 +258,30 @@ describe("PrinterController", () => {
   it("should update printer flow rate setting correctly", async () => {
     const printer = await createTestPrinter(request);
     const updatePatch = await request.patch(flowRateRoute(printer.id)).send({
-      flowRate: 75
+      flowRate: 75,
     });
     expectOkResponse(updatePatch);
   });
 
-  it("should reset printer power settings correctly", async () => {
-    const printer = await createTestPrinter(request);
-    const updatePatch = await request.patch(resetPowerSettingsRoute(printer.id)).send();
-    expectOkResponse(updatePatch);
-  });
-
-  it("should get printer connection logs cache", async () => {
-    const printer = await createTestPrinter(request);
-    const updatePatch = await request.get(terminalLogsRoute(printer.id)).send();
-    expectOkResponse(updatePatch);
+  it("should get plugin list", async () => {
+    octoPrintApiService.storeResponse(["test"], 200);
+    const res = await request.get(pluginListRoute).send();
+    expectOkResponse(res, []); // Cache is not loaded
   });
 
   it("should get printer plugin list", async () => {
     const printer = await createTestPrinter(request);
     octoPrintApiService.storeResponse(["test"], 200);
-    const res = await request.get(pluginListRoute(printer.id)).send();
+    const res = await request.get(printerPluginListRoute(printer.id)).send();
     expectOkResponse(res, ["test"]);
+  });
+
+  it("should send restart octoprint command", async () => {
+    const printer = await createTestPrinter(request);
+    const response = {};
+    octoPrintApiService.storeResponse(response, 200);
+    const res = await request.post(restartOctoPrintRoute(printer.id)).send();
+    expectOkResponse(res);
   });
 
   it("should send serial connect command", async () => {
@@ -278,7 +289,7 @@ describe("PrinterController", () => {
     const response = { port: "/dev/ttyACM0" };
     octoPrintApiService.storeResponse(response, 200);
     const res = await request.post(serialConnectCommandRoute(printer.id)).send();
-    expectOkResponse(res, { message: "Connect command sent" });
+    expectOkResponse(res);
   });
 
   it("should send serial disconnect command", async () => {
@@ -286,7 +297,7 @@ describe("PrinterController", () => {
     const response = { port: "/dev/ttyACM0" };
     octoPrintApiService.storeResponse(response, 200);
     const res = await request.post(serialDisconnectCommandRoute(printer.id)).send();
-    expectOkResponse(res, { message: "Disconnect command sent" });
+    expectOkResponse(res);
   });
 
   it("should update sort indices", async () => {
@@ -294,7 +305,7 @@ describe("PrinterController", () => {
     const printer2 = await createTestPrinter(request, "Group0_1");
 
     const res = await request.post(updateSortIndexRoute).send({
-      sortList: [printer.id, printer2.id]
+      sortList: [printer.id, printer2.id],
     });
     expectOkResponse(res, {});
   });

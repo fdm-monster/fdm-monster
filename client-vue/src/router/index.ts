@@ -1,14 +1,15 @@
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
-import HomePrinterGrid from "@/views/HomePrinterGrid.vue";
-import Printers from "@/views/Printers.vue";
-import Settings from "@/views/Settings.vue";
-import PrinterGroupsSettings from "@/views/settings/PrinterGroupsSettings.vue";
-import About from "@/views/About.vue";
-import Scheduling from "@/views/PrintScheduling.vue";
-import FdmSettings from "@/views/settings/FdmSettings.vue";
-import OtherSettings from "@/views/settings/OtherSettings.vue";
-import UserManagementSettings from "@/views/settings/UserManagementSettings.vue";
+import HomePrinterGrid from "@/views/PrinterGridView.vue";
+import Printers from "@/views/PrintersView.vue";
+import Settings from "@/views/SettingsView.vue";
+import PrinterGroupsSettings from "@/components/Settings/PrinterGroupsSettings.vue";
+import About from "@/views/AboutView.vue";
+import PrintTimeline from "@/views/PrintTimelineView.vue";
+import FdmSettings from "@/components/Settings/FdmSettings.vue";
+import OtherSettings from "@/components/Settings/OtherSettings.vue";
+import UserManagementSettings from "@/components/Settings/UserManagementSettings.vue";
+import PrinterFloorSettings from "@/components/Settings/PrinterFloorSettings.vue";
 
 Vue.use(VueRouter);
 
@@ -16,12 +17,12 @@ const routes: Array<RouteConfig> = [
   {
     path: "/",
     name: "Home",
-    component: HomePrinterGrid
+    component: HomePrinterGrid,
   },
   {
     path: "/printers",
     name: "Printers",
-    component: Printers
+    component: Printers,
   },
   {
     path: "/settings",
@@ -29,47 +30,51 @@ const routes: Array<RouteConfig> = [
     children: [
       {
         path: "",
-        redirect: "printer-groups"
+        redirect: "printer-groups",
+      },
+      {
+        path: "printer-floors",
+        component: PrinterFloorSettings,
       },
       {
         path: "user-management",
-        component: UserManagementSettings
+        component: UserManagementSettings,
       },
       {
         path: "printer-groups",
-        component: PrinterGroupsSettings
+        component: PrinterGroupsSettings,
       },
       {
         path: "system",
-        component: FdmSettings
+        component: FdmSettings,
       },
       {
         path: "other",
-        component: OtherSettings
-      }
-    ]
+        component: OtherSettings,
+      },
+    ],
   },
   {
     path: "/scheduling",
-    name: "Scheduling",
-    component: Scheduling
+    name: "Print Timeline",
+    component: PrintTimeline,
   },
   {
     path: "/about",
     name: "About",
-    component: About
+    component: About,
   },
   {
     path: "*",
     name: "NotFound",
-    component: () => import(/* webpackChunkName: "about" */ "../views/NotFound.vue")
-  }
+    component: () => import(/* webpackChunkName: "about" */ "../views/NotFoundView.vue"),
+  },
 ];
 
 const router = new VueRouter({
   mode: "history",
   base: process.env.BASE_URL,
-  routes
+  routes,
 });
 
 export default router;

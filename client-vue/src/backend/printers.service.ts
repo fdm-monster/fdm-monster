@@ -6,7 +6,7 @@ import {
   getDefaultCreatePrinter,
   HttpProtocol,
   PreCreatePrinter,
-  WebSocketProtocol
+  WebSocketProtocol,
 } from "@/models/printers/crud/create-printer.model";
 import { newRandomNamePair } from "@/constants/noun-adjectives.data";
 
@@ -76,6 +76,11 @@ export class PrintersService extends BaseService {
     return (await this.getApi<LoginDetails>(path)) as LoginDetails;
   }
 
+  static async restartOctoPrint(printerId: string) {
+    const path = `${ServerApi.restartOctoPrintRoute(printerId)}`;
+    return (await this.postApi(path)) as any;
+  }
+
   static async sendPrinterConnectCommand(printerId: string) {
     const path = ServerApi.printerSerialConnectRoute(printerId);
 
@@ -110,6 +115,12 @@ export class PrintersService extends BaseService {
     const path = ServerApi.getPrinterRoute(printerId);
 
     return (await this.patchApi(path, printer)) as Printer;
+  }
+
+  static async updatePrinterMaintenance(printerId: string, disabledReason: string | null = null) {
+    const path = ServerApi.postPrinterDisabledReasonRoute(printerId);
+
+    return (await this.patchApi(path, { disabledReason })) as Printer;
   }
 
   static async testConnection(printer: CreatePrinter) {

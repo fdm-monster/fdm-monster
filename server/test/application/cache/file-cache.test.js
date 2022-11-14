@@ -13,13 +13,13 @@ beforeEach(() => {
 const testPrinterId = "asd";
 const fileStorageEntry = {
   fileList: [1],
-  storage: {}
+  storage: {},
 };
 
 describe("generate", function () {
   it("should generate printer file cache without strict checks", function () {
     const fileStorageEntryNoStorage = {
-      fileList: [1]
+      fileList: [1],
     };
     fileCache.cachePrinterFileStorage(testPrinterId, fileStorageEntryNoStorage);
     expect(fileCache.getPrinterFiles(testPrinterId)).toEqual([1]);
@@ -28,14 +28,5 @@ describe("generate", function () {
     fileCache.cachePrinterFileStorage(testPrinterId, fileStorageEntry);
     expect(fileCache.getPrinterFiles(testPrinterId)).toEqual([1]);
     expect(fileCache.getPrinterStorage(testPrinterId)).toEqual({});
-  });
-
-  it("should generate file statistics for badly formatted fileList", function () {
-    fileCache.cachePrinterFileStorage(testPrinterId, fileStorageEntry);
-
-    const fileList = fileCache.getPrinterFiles(testPrinterId);
-    expect(fileList).toBeTruthy();
-    const stats = fileCache.getStatistics();
-    expect(stats).toEqual(getDefaultFileStatistics());
   });
 });

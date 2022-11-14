@@ -2,6 +2,7 @@
   "extends": ["config:base"],
   "assignees": ["davidzwa"],
   "labels": ["renovate"],
+  "lockFileMaintenance": {"enabled": true, "extends": ["schedule:daily"]},
   "packageRules": [
     {
       "matchDatasources": ["docker"],
@@ -15,13 +16,21 @@
       "enabled": true
     },
     {
-      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "paths": ["client-vue/package.json"],
+      "matchPackageNames": ["vue", "vue-template-compiler"],
+      "matchUpdateTypes": ["minor", "patch", "lockFileMaintenance"],
+      "groupName": "vue",
+      "automerge": true
+    },
+    {
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest", "lockFileMaintenance"],
       "enabled": true,
       "automerge": true
     },
     {
       "paths": ["client-vue/package.json"],
       "matchPackageNames": ["vue", "vuex", "vue-router"],
+      "matchUpdateTypes": ["major"],
       "enabled": false
     }
   ],

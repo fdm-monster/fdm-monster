@@ -1,5 +1,6 @@
 import { Printer } from "@/models/printers/printer.model";
-import { PrinterGroup } from "@/models/printers/printer-group.model";
+import { PrinterGroup } from "@/models/printer-groups/printer-group.model";
+import { PrinterFloor } from "@/models/printer-floor/printer-floor.model";
 
 export interface TestProgressDetails {
   connected: boolean;
@@ -29,10 +30,22 @@ export interface UploadStates {
   failed: TrackedUpload[];
 }
 
-export interface PrinterSseMessage {
+export interface OutletCurrentValues {
+  [k: string]: {
+    value: number;
+    time: string;
+  };
+}
+
+export interface SocketIoTestPrinterMessage {
+  testPrinter: Printer;
+  testProgress: TestProgressDetails;
+}
+
+export interface SocketIoUpdateMessage {
   printers: Printer[];
   printerGroups: PrinterGroup[];
-  testPrinter: Printer;
   trackedUploads: UploadStates;
-  testProgress: TestProgressDetails;
+  floors: PrinterFloor[];
+  outletCurrentValues: OutletCurrentValues;
 }

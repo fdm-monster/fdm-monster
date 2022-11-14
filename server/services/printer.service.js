@@ -5,12 +5,13 @@ const { validateInput } = require("../handlers/validators");
 const {
   createPrinterRules,
   updatePrinterEnabledRule,
-  updateApiUsernameRule
+  updateApiUsernameRule,
+  updatePrinterDisabledReasonRule,
 } = require("./validators/printer-service.validation");
+const { getDefaultPrinterEntry } = require("../constants/service.constants");
 const {
-  getDefaultPrinterEntry,
-  getPowerSettingsDefault
-} = require("../constants/service.constants");
+  updatePrinterDisabledReasonRules,
+} = require("../controllers/validation/printer-controller.validation");
 
 class PrinterService {
   /**
@@ -18,7 +19,7 @@ class PrinterService {
    */
   async list() {
     return PrinterModel.find({}, null, {
-      sort: { sortIndex: 1 }
+      sort: { sortIndex: 1 },
     });
   }
 
@@ -46,7 +47,7 @@ class PrinterService {
   async validateAndDefault(printer) {
     const mergedPrinter = {
       ...getDefaultPrinterEntry(),
-      ...printer
+      ...printer,
     };
     return await validateInput(mergedPrinter, createPrinterRules);
   }
@@ -60,9 +61,6 @@ class PrinterService {
     if (!newPrinter) throw new Error("Missing printer");
 
     const mergedPrinter = await this.validateAndDefault(newPrinter);
-
-    // We should not to this now: Regenerate sort index on printer add...
-    // await this.reGenerateSortIndex();
 
     mergedPrinter.dateAdded = Date.now();
     mergedPrinter.sortIndex = await this.#printerCount(); // 0-based index so no +1 needed
@@ -110,7 +108,7 @@ class PrinterService {
     await this.get(printerId);
     return PrinterModel.findByIdAndUpdate(printerId, update, {
       new: true,
-      useFindAndModify: false
+      useFindAndModify: false,
     });
   }
 
@@ -119,7 +117,7 @@ class PrinterService {
     await this.get(printerId);
     return PrinterModel.findByIdAndUpdate(printerId, update, {
       new: true,
-      useFindAndModify: false
+      useFindAndModify: false,
     });
   }
 
@@ -128,29 +126,15 @@ class PrinterService {
     await this.get(printerId);
     return PrinterModel.findByIdAndUpdate(printerId, update, {
       new: true,
-      useFindAndModify: false
+      useFindAndModify: false,
     });
   }
 
-  async resetPowerSettings(printerId) {
-    const update = {
-      powerSettings: getPowerSettingsDefault()
-    };
-
-    await this.get(printerId);
-
-    return PrinterModel.findByIdAndUpdate(printerId, update, {
-      new: true,
-      useFindAndModify: false
-    });
-  }
-
-  async updateConnectionSettings(printerId, { printerURL, camURL, webSocketURL, apiKey }) {
+  async updateConnectionSettings(printerId, { printerURL, webSocketURL, apiKey }) {
     const update = {
       printerURL: sanitizeURL(printerURL),
-      camURL: sanitizeURL(camURL),
       webSocketURL: sanitizeURL(webSocketURL),
-      apiKey
+      apiKey,
     };
 
     await validateInput(update, createPrinterRules);
@@ -158,27 +142,46 @@ class PrinterService {
 
     return PrinterModel.findByIdAndUpdate(printerId, update, {
       new: true,
-      useFindAndModify: false
+      useFindAndModify: false,
     });
   }
 
   async updateEnabled(printerId, enabled) {
-    const update = {
-      enabled
-    };
+    const update = enabled
+      ? {
+          enabled,
+          disabledReason: null,
+        }
+      : { enabled };
 
     await validateInput(update, updatePrinterEnabledRule);
     await this.get(printerId);
 
     return PrinterModel.findByIdAndUpdate(printerId, update, {
       new: true,
-      useFindAndModify: false
+      useFindAndModify: false,
+    });
+  }
+
+  async updateDisabledReason(printerId, disabledReason) {
+    const enabled = !disabledReason?.length;
+    const update = {
+      disabledReason,
+      enabled,
+    };
+
+    await validateInput(update, updatePrinterDisabledReasonRule);
+    await this.get(printerId);
+
+    return PrinterModel.findByIdAndUpdate(printerId, update, {
+      new: true,
+      useFindAndModify: false,
     });
   }
 
   async updateApiUsername(printerId, opAdminUserName) {
     const update = {
-      currentUser: opAdminUserName
+      currentUser: opAdminUserName,
     };
 
     await validateInput(update, updateApiUsernameRule);
@@ -186,7 +189,7 @@ class PrinterService {
 
     return PrinterModel.findByIdAndUpdate(printerId, update, {
       new: true,
-      useFindAndModify: false
+      useFindAndModify: false,
     });
   }
 }

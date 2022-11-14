@@ -3,6 +3,7 @@ const { authenticate, authorizeRoles } = require("../middleware/authenticate");
 const Logger = require("../handlers/logger.js");
 const { AppConstants } = require("../server.constants");
 const { ROLES } = require("../constants/authorization.constants");
+const { isTestEnvironment } = require("../utils/env.utils");
 
 class ServerPrivateController {
   #logger = new Logger("Server-Private-API");
@@ -26,9 +27,11 @@ class ServerPrivateController {
   }
 
   async restartServer(req, res) {
-    this.#logger.warning(
-      "Server restart command fired. Expect the server to be unavailable for a moment"
-    );
+    if (!isTestEnvironment()) {
+      this.#logger.warning(
+        "Server restart command fired. Expect the server to be unavailable for a moment"
+      );
+    }
     const result = await this.#serverUpdateService.restartServer();
     res.send(result);
   }

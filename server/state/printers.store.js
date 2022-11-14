@@ -1,15 +1,11 @@
 const _ = require("lodash");
-const {
-  NotImplementedException,
-  ValidationException
-} = require("../exceptions/runtime.exceptions");
+const { ValidationException } = require("../exceptions/runtime.exceptions");
 const { NotFoundException } = require("../exceptions/runtime.exceptions");
 const { validateInput } = require("../handlers/validators");
 const { createTestPrinterRules } = require("./validation/create-test-printer.validation");
 const ObjectID = require("mongodb").ObjectID;
 
 class PrintersStore {
-  #settingsStore;
   #printerService;
   #printerStateFactory;
   #eventEmitter2;
@@ -18,14 +14,7 @@ class PrintersStore {
   #testPrinterState;
   #logger;
 
-  constructor({
-    settingsStore,
-    printerStateFactory,
-    eventEmitter2,
-    printerService,
-    loggerFactory
-  }) {
-    this.#settingsStore = settingsStore;
+  constructor({ printerStateFactory, eventEmitter2, printerService, loggerFactory }) {
     this.#printerService = printerService;
     this.#printerStateFactory = printerStateFactory;
     this.#eventEmitter2 = eventEmitter2;
@@ -124,14 +113,13 @@ class PrintersStore {
     return state.getLoginDetails();
   }
 
-  async updatePrinterConnectionSettings(printerId, { printerURL, camURL, webSocketURL, apiKey }) {
+  async updatePrinterConnectionSettings(printerId, { printerURL, webSocketURL, apiKey }) {
     const printerState = this.getPrinterState(printerId);
 
     const newDoc = await this.#printerService.updateConnectionSettings(printerId, {
       printerURL,
-      camURL,
       webSocketURL,
-      apiKey
+      apiKey,
     });
 
     printerState.updateEntityData(newDoc, true);
@@ -210,6 +198,13 @@ class PrintersStore {
     let printer = this.getPrinterState(printerId);
 
     const doc = await this.#printerService.updateEnabled(printerId, enabled);
+
+    printer.updateEntityData(doc, true);
+  }
+
+  async updateDisabledReason(printerId, disabledReason) {
+    let printer = this.getPrinterState(printerId);
+    const doc = await this.#printerService.updateDisabledReason(printerId, disabledReason);
 
     printer.updateEntityData(doc, true);
   }
@@ -329,16 +324,6 @@ class PrintersStore {
     const doc = await this.#printerService.updateFlowRate(id, flowRate);
 
     printerState.updateEntityData(doc, false);
-  }
-
-  async resetPrinterPowerSettings(id) {
-    const printerState = this.getPrinterState(id);
-
-    const doc = await this.#printerService.resetPowerSettings(id);
-
-    printerState.updateEntityData(doc, false);
-
-    return doc.powerSettings;
   }
 }
 

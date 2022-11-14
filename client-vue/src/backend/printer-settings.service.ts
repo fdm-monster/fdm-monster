@@ -18,4 +18,10 @@ export class PrinterSettingsService extends BaseService {
 
     return await this.postApi(path, { enabled });
   }
+
+  static async syncPrinterName(printerId: string) {
+    const path = `${ServerApi.syncPrinterNameSettingRoute(printerId)}`;
+
+    return await this.postApi(path);
+  }
 }

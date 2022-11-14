@@ -1,3 +1,8 @@
+require("../utils/env.utils");
+jest.mock("../utils/env.utils", () => ({
+  ...jest.requireActual("../utils/env.utils"),
+  writeVariableToEnvFile: jest.fn()
+}));
 const supertest = require("supertest");
 const { asClass, asValue } = require("awilix");
 const DITokens = require("../container.tokens");
@@ -45,11 +50,12 @@ async function setupTestApp(loadPrinterStore = false, mocks = undefined, quick_b
     httpServer,
     request: supertest(httpServer),
     container,
+    [DITokens.httpClient]: container.resolve(DITokens.httpClient),
     [DITokens.octoPrintApiService]: container.resolve(DITokens.octoPrintApiService),
     [DITokens.taskManagerService]: container.resolve(DITokens.taskManagerService)
   };
 }
 
 module.exports = {
-    setupTestApp
+  setupTestApp
 };

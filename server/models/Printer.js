@@ -3,80 +3,81 @@ const mongoose = require("mongoose");
 const PrinterSchema = new mongoose.Schema({
   apiKey: {
     type: String,
-    required: true // !
-  },
-  camURL: {
-    type: String,
-    required: false
+    required: true, // !
   },
   printerURL: {
     type: String,
-    required: true // !
+    required: true, // !
   },
   webSocketURL: {
     type: String,
-    required: true // !
+    required: true, // !
   },
   sortIndex: {
     type: Number,
-    required: true
+    required: true,
   },
   enabled: {
     type: Boolean,
     required: true,
-    default: true
+    default: true,
+  },
+  disabledReason: {
+    type: String,
+    required: false,
   },
   settingsAppearance: {
     // Not modeling properties is the cause of .save() not working
     type: {
       name: {
         type: String,
-        required: false
-      }
+        required: false,
+      },
     },
-    required: true
+    required: true,
   },
   // Auto-generated below
   currentUser: {
     type: String,
-    required: false
+    required: false,
   },
   dateAdded: {
     type: Number,
-    required: false
+    required: false,
   },
+  // Deprecated, Will become many to many
   lastPrintedFile: {
     type: {
       fileName: {
         type: String,
-        required: true
+        required: true,
       },
       editTimestamp: {
         type: Number,
-        required: true
+        required: true,
       },
       parsedColor: {
         type: String,
-        required: false
+        required: false,
       },
       parsedVisualizationRAL: {
         type: Number,
-        required: false
+        required: false,
       },
       parsedAmount: {
         type: Number,
-        required: false
+        required: false,
       },
       parsedMaterial: {
         type: String,
-        required: false
+        required: false,
       },
       parsedOrderCode: {
         type: String,
-        required: false
-      }
+        required: false,
+      },
     },
-    required: false
+    required: false,
   },
   fileList: {
     type: Object,
@@ -84,57 +85,18 @@ const PrinterSchema = new mongoose.Schema({
       files: [],
       folders: [],
       free: 0,
-      total: 0
+      total: 0,
     },
-    required: true
-  },
-  // Non-essentials below
-  powerSettings: {
-    type: Object,
-    required: false
-  },
-  costSettings: {
-    type: Object,
-    required: false
-  },
-  tempTriggers: {
-    type: Object,
-    required: false
+    required: true,
   },
   feedRate: {
     type: Number,
-    required: false
+    required: false,
   },
   flowRate: {
     type: Number,
-    required: false
+    required: false,
   },
-  selectedFilament: {
-    type: Object,
-    required: false
-  },
-  currentIdle: {
-    type: Number,
-    required: false
-  },
-  currentActive: {
-    type: Number,
-    required: false
-  },
-  currentOffline: {
-    type: Number,
-    required: false
-  },
-  // TODO move out
-  group: {
-    type: String,
-    required: false
-  },
-  // TODO remove
-  storage: {
-    type: Object,
-    required: false
-  }
 });
 
 const Printer = mongoose.model("Printer", PrinterSchema);

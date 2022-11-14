@@ -62,10 +62,6 @@ jobs:
           context: "{{defaultContext}}:server"
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
-          platforms: |
-            linux/amd64
-            linux/arm/v7
-            linux/arm64
           file: ./docker/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.docker_meta.outputs.tags }}

@@ -1,0 +1,48 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "davidzwa",
+      "name": "David Zwart",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6005355?v=4",
+      "profile": "https://github.com/davidzwa",
+      "contributions": [
+        "bug",
+        "code",
+        "maintenance",
+        "userTesting"
+      ]
+    },
+    {
+      "login": "mkevenaar",
+      "name": "Maurice Kevenaar",
+      "avatar_url": "https://avatars.githubusercontent.com/u/834643?v=4",
+      "profile": "https://kevenaar.name",
+      "contributions": [
+        "security",
+        "maintenance",
+        "ideas"
+      ]
+    },
+    {
+      "login": "Tobikisss",
+      "name": "Tobias",
+      "avatar_url": "https://avatars.githubusercontent.com/u/45754890?v=4",
+      "profile": "https://github.com/Tobikisss",
+      "contributions": [
+        "ideas",
+        "maintenance"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "fdm-monster",
+  "projectOwner": "fdm-monster",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}

@@ -8,7 +8,6 @@ const { createTestPrinter } = require("./test-data/create-printer");
 
 let Model = PrinterGroup;
 const listRoute = `${AppConstants.apiRoute}/printer-group`;
-const syncLegacyRoute = `${listRoute}/sync-legacy`;
 const getRoute = (id) => `${listRoute}/${id}`;
 const addPrinterToGroupRoute = (id) => `${listRoute}/${id}/printer`;
 const deleteRoute = (id) => `${listRoute}/${id}`;
@@ -42,10 +41,22 @@ describe("PrinterGroupsController", () => {
     expectOkResponse(response, { name: "Group0_0" });
   });
 
+  it("should be able to update printer group", async () => {
+    const group = await createTestPrinterGroup(request);
+    const response = await request.patch(updateRoute(group._id)).send({
+      name: "newName",
+      location: {
+        x: 1,
+        y: 4,
+      },
+    });
+    expectOkResponse(response);
+  });
+
   it("should be able to update printer group name", async () => {
     const group = await createTestPrinterGroup(request);
     const response = await request.patch(updateNameRoute(group._id)).send({
-      name: "newName"
+      name: "newName",
     });
     expectOkResponse(response, { name: "newName" });
   });
@@ -63,7 +74,7 @@ describe("PrinterGroupsController", () => {
 
     const response = await request.post(addPrinterToGroupRoute(group._id)).send({
       printerId: printer.id,
-      location: "0"
+      location: "0",
     });
     expectOkResponse(response);
   });
@@ -74,21 +85,13 @@ describe("PrinterGroupsController", () => {
     expect(group).toMatchObject({ _id: expect.any(String) });
     const response = await request.post(addPrinterToGroupRoute(group._id)).send({
       printerId: printer.id,
-      location: "0"
+      location: "0",
     });
     expectOkResponse(response);
 
     const deleteResponse = await request.delete(addPrinterToGroupRoute(group._id)).send({
-      printerId: printer.id
+      printerId: printer.id,
     });
     expectOkResponse(deleteResponse);
-  });
-
-  it("should be able to sync legacy printers to create group automatically", async () => {
-    await createTestPrinter(request, "Test0_0");
-
-    const response = await request.post(syncLegacyRoute).send();
-    const data = expectOkResponse(response, expect.any(Array));
-    expect(data[data.length - 1]).toMatchObject({ name: "Test0_0" });
   });
 });

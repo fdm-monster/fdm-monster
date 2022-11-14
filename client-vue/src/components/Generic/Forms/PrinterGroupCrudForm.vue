@@ -7,6 +7,7 @@
             v-model="formData.name"
             :counter="printerGroupNameRules.max"
             :error-messages="errors"
+            autofocus
             label="Printer name*"
             required
           />
@@ -33,95 +34,85 @@
             type="number"
           />
         </validation-provider>
-
-        <!--        Maybe we'll add this in future -->
-        <!--        <validation-provider v-slot="{ errors }" name="Groups">-->
-        <!--          <v-select-->
-        <!--            v-model="formData.printers"-->
-        <!--            :error-messages="errors"-->
-        <!--            :items="printersWithoutGroup"-->
-        <!--            label="Printers"-->
-        <!--            multiple-->
-        <!--            no-data-text="No printers without group"-->
-        <!--            required-->
-        <!--          ></v-select>-->
-        <!--        </validation-provider>-->
       </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { Component, Inject, Prop, Watch } from "vue-property-decorator";
+import { defineComponent, inject } from "vue";
 import { ValidationProvider } from "vee-validate";
 import { AppConstants } from "@/constants/app.constants";
-import { printersState } from "@/store/printers.state";
 import { PrinterGroupService } from "@/backend";
 import {
   getDefaultCreatePrinterGroup,
-  PreCreatePrinterGroup
+  PreCreatePrinterGroup,
 } from "@/models/printer-groups/crud/create-printer-group.model";
-import { PrinterGroup } from "@/models/printers/printer-group.model";
-import { Printer } from "@/models/printers/printer.model";
+import { PrinterGroup } from "@/models/printer-groups/printer-group.model";
+import { usePrintersStore } from "@/store/printers.store";
 
-const watchedId = "printerId";
+interface Data {
+  formData?: PreCreatePrinterGroup;
+}
 
-@Component({
+const watchedId = "printerGroupId";
+
+export default defineComponent({
+  name: "PrinterGroupCrudForm",
   components: {
-    ValidationProvider
+    ValidationProvider,
   },
-  data: () => ({
-    printersWithoutGroup: []
-  })
-})
-export default class PrinterGroupCrudForm extends Vue {
-  @Inject() readonly appConstants!: AppConstants;
-  @Prop() printerGroupId: string;
-  printersWithoutGroup: Printer[];
-  formData?: PreCreatePrinterGroup = getDefaultCreatePrinterGroup();
-
-  public get printerGroupNameRules() {
-    return { required: true, max: this.appConstants.maxPrinterGroupNameLength };
-  }
-
-  public get locationXRules() {
+  setup: () => {
     return {
-      required: true,
-      integer: true,
-      max: this.appConstants.maxPrinterGroupLocationX
+      printersStore: usePrintersStore(),
+      appConstants: inject("appConstants") as AppConstants,
     };
-  }
-
-  public get locationYRules() {
-    return {
-      required: true,
-      integer: true,
-      max: this.appConstants.maxPrinterGroupLocationY
-    };
-  }
-
-  get printerGroupNames() {
-    return printersState.printerGroupNames;
-  }
-
+  },
   async created() {
     if (this.printerGroupId) {
-      const crudeData = this.$store.getters.printer(this.printerGroupId);
+      const crudeData = this.printersStore.printerGroup(this.printerGroupId);
       this.formData = PrinterGroupService.convertPrinterGroupToCreateForm(crudeData);
     }
+    await this.printersStore.loadPrinterGroups();
+  },
+  async mounted() {},
+  props: {
+    printerGroupId: String,
+  },
+  data: (): Data => ({
+    formData: getDefaultCreatePrinterGroup(),
+  }),
+  computed: {
+    printerGroupNameRules() {
+      return { required: true, max: this.appConstants.maxPrinterGroupNameLength };
+    },
+    locationXRules() {
+      return {
+        required: true,
+        integer: true,
+        max: this.appConstants.maxPrinterGroupLocationX,
+      };
+    },
+    locationYRules() {
+      return {
+        required: true,
+        integer: true,
+        max: this.appConstants.maxPrinterGroupLocationY,
+      };
+    },
+    printerGroupNames() {
+      return this.printersStore.printerGroupNames;
+    },
+  },
+  methods: {},
+  watch: {
+    [watchedId](val?: string) {
+      if (!val) return;
 
-    await printersState.loadPrinterGroups();
-  }
-
-  @Watch(watchedId)
-  onChildChanged(val?: string) {
-    if (!val) return;
-
-    const printerGroup = this.$store.getters.printerGroup(val) as PrinterGroup;
-
-    // Inverse transformation
-    this.formData = PrinterGroupService.convertPrinterGroupToCreateForm(printerGroup);
-  }
-}
+      // Inverse transformation
+      const printerGroup = this.printersStore.printerGroup(val) as PrinterGroup;
+      this.formData = PrinterGroupService.convertPrinterGroupToCreateForm(printerGroup);
+    },
+  },
+});
 </script>

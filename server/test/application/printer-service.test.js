@@ -26,7 +26,7 @@ describe("PrinterService", () => {
       settingsAppearance: {
         name: updatedName
       }
-    }
+    };
 
     await printerService.update(printer.id, printerUpdate);
     const foundPrinter = await PrinterModel.findOne({ id: printer.id });

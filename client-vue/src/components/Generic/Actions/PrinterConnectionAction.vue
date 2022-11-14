@@ -12,10 +12,10 @@
     </template>
     <v-btn
       :color="printer.printerState.colour.name"
+      :disabled="isPrinterPrinting()"
       fab
       small
-      @click="togglePrinterConnection()"
-      :disabled="isPrinterPrinting()"
+      @click.c.capture.native.stop="togglePrinterConnection()"
     >
       <v-icon>usb</v-icon>
     </v-btn>
@@ -23,38 +23,42 @@
 </template>
 
 <script lang="ts">
-import Component from "vue-class-component";
-import Vue from "vue";
-import FileControlList from "@/components/PrinterList/FileControlList.vue";
-import { Prop } from "vue-property-decorator";
+import { defineComponent, PropType } from "vue";
 import { Printer } from "@/models/printers/printer.model";
 import { PrintersService } from "@/backend";
-import { printersState } from "@/store/printers.state";
+import { usePrintersStore } from "@/store/printers.store";
 
-@Component({
-  components: { FileList: FileControlList }
-})
-export default class PrinterConnectionAction extends Vue {
-  @Prop() printer: Printer;
-
-  get printerId() {
-    return this.printer.id;
-  }
-
-  isPrinterOperational() {
-    return printersState.isPrinterOperational(this.printerId);
-  }
-
-  isPrinterPrinting() {
-    return printersState.isPrinterPrinting(this.printerId);
-  }
-
-  async togglePrinterConnection() {
-    if (this.isPrinterOperational()) {
-      return PrintersService.sendPrinterDisconnectCommand(this.printerId);
-    }
-
-    await PrintersService.sendPrinterConnectCommand(this.printerId);
-  }
-}
+export default defineComponent({
+  name: "PrinterConnectionAction",
+  components: {},
+  setup: () => {
+    return {
+      printersStore: usePrintersStore(),
+    };
+  },
+  async created() {},
+  async mounted() {},
+  props: {
+    printer: Object as PropType<Printer>,
+  },
+  computed: {
+    printerId() {
+      return this.printer!.id;
+    },
+  },
+  methods: {
+    isPrinterOperational() {
+      return this.printersStore.isPrinterOperational(this.printerId);
+    },
+    isPrinterPrinting() {
+      return this.printersStore.isPrinterPrinting(this.printerId);
+    },
+    async togglePrinterConnection() {
+      if (this.isPrinterOperational()) {
+        return PrintersService.sendPrinterDisconnectCommand(this.printerId);
+      }
+      await PrintersService.sendPrinterConnectCommand(this.printerId);
+    },
+  },
+});
 </script>

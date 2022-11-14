@@ -1,10 +1,9 @@
-const isDocker = require("is-docker");
-
 const { createController } = require("awilix-express");
 const { AppConstants } = require("../server.constants");
 const { isNodemon, isNode, isPm2 } = require("../utils/env.utils");
 const { authenticate, withPermission } = require("../middleware/authenticate");
 const { PERMS } = require("../constants/authorization.constants");
+const { isDocker } = require("../utils/is-docker");
 
 class ServerPublicController {
   #serverVersion;

@@ -6,13 +6,15 @@ const AxiosMock = require("../../mocks/axios.mock");
 const awilix = require("awilix");
 
 let octoPrintApi;
+let httpClient;
 
 beforeAll(async () => {
   await dbHandler.connect();
   const container = configureContainer();
-  container.register(DITokens.httpClient, awilix.asClass(AxiosMock));
+  container.register(DITokens.httpClient, awilix.asClass(AxiosMock).singleton());
   await container.resolve(DITokens.settingsStore).loadSettings();
 
+  httpClient = container.resolve(DITokens.httpClient);
   octoPrintApi = container.resolve(DITokens.octoPrintApiService);
 });
 
@@ -29,13 +31,17 @@ describe("OctoPrint-API-Client-Service", () => {
   const printerURL = "http://someurl/";
   const auth = { apiKey, printerURL };
 
+  beforeEach(() => {
+    httpClient.saveMockResponse(undefined, 200);
+  });
+
   it("should throw error on getSettings with incorrect printerURL", async () => {
     // TODO Not human-friendly
     await expect(
       async () =>
         await octoPrintApi.getSettings({
           apiKey: "surewhynot",
-          printerURL: "some uwrl"
+          printerURL: "some uwrl",
         })
     ).rejects.toHaveProperty("code", "ERR_INVALID_URL");
   });
@@ -44,9 +50,17 @@ describe("OctoPrint-API-Client-Service", () => {
     const settings = await octoPrintApi.getSettings(auth);
   });
 
-  it("should not throw error on getAdminUserOrDefault with correct printerURL", async () => {
+  it("should get first admin's username when response not recognized", async () => {
+    httpClient.saveMockResponse([], 200);
     const adminResult = await octoPrintApi.getAdminUserOrDefault(auth);
     expect(adminResult).toBe("admin");
+  });
+
+  it("should pick admin user from keys", async () => {
+    const usersResponse = require("../test-data/octoprint-users.response.json");
+    httpClient.saveMockResponse(usersResponse, 200);
+    const adminResult = await octoPrintApi.getAdminUserOrDefault(auth);
+    expect(adminResult).toBe("root");
   });
 
   it("should not throw error on getUsers", async () => {
@@ -66,6 +80,11 @@ describe("OctoPrint-API-Client-Service", () => {
 
   it("should not throw error on sendJobCommand", async () => {
     const result = await octoPrintApi.sendJobCommand(auth, { select: true });
+    expect(result).toBeUndefined();
+  });
+
+  it("should not throw error on sendBedTempCommand", async () => {
+    const result = await octoPrintApi.sendBedTempCommand(auth, 50);
     expect(result).toBeUndefined();
   });
 
@@ -104,8 +123,8 @@ describe("OctoPrint-API-Client-Service", () => {
     expect(result).toBeUndefined();
   });
 
-  it("should not throw error on getPluginManager", async () => {
-    const result = await octoPrintApi.getPluginManager(auth);
+  it("should not throw error on getApiPluginManager", async () => {
+    const result = await octoPrintApi.getPluginManagerPlugins(auth);
     expect(result).toBeUndefined();
   });
 

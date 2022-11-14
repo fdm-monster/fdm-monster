@@ -1,6 +1,6 @@
 /**
  * Task to fetch system/info with mostly firmware version. This is run every couple of hours as it is 50ms+ per printer
- * Note: this is a cool task which is disabled at boot and scheduled by the websocket task.
+ * Note: this is disabled at boot and scheduled by the websocket task.
  * @type {PrinterSystemTask}
  */
 class PrinterSystemTask {

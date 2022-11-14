@@ -1,25 +1,25 @@
 import { BaseService } from "@/backend/base.service";
 import { ServerApi } from "@/backend/server.api";
-import { PrinterGroup } from "@/models/printers/printer-group.model";
+import { PrinterGroup } from "@/models/printer-groups/printer-group.model";
 import {
   CreatePrinterGroup,
   getDefaultCreatePrinterGroup,
-  PreCreatePrinterGroup
+  PreCreatePrinterGroup,
 } from "@/models/printer-groups/crud/create-printer-group.model";
 import { newRandomNamePair } from "@/constants/noun-adjectives.data";
 
 export class PrinterGroupService extends BaseService {
-  static convertPrinterGroupToCreateForm(printerGroup: PrinterGroup): PreCreatePrinterGroup {
+  static convertPrinterGroupToCreateForm(printerGroup?: PrinterGroup): PreCreatePrinterGroup {
     // Inverse transformation
     const newFormData = getDefaultCreatePrinterGroup();
 
-    newFormData.id = printerGroup._id;
-    newFormData.name = printerGroup.name || newRandomNamePair();
+    newFormData.id = printerGroup?._id;
+    newFormData.name = printerGroup?.name || newRandomNamePair();
     newFormData.printers = [];
 
     newFormData.location = {
-      x: printerGroup.location?.x.toString() || "0",
-      y: printerGroup.location.y?.toString() || "0"
+      x: printerGroup?.location?.x.toString() || "0",
+      y: printerGroup?.location.y?.toString() || "0",
     };
 
     return newFormData;
@@ -51,6 +51,11 @@ export class PrinterGroupService extends BaseService {
     return (await this.postApi(path, printerGroup)) as PrinterGroup;
   }
 
+  static async updateGroup(printerGroupId: string, printerGroup: CreatePrinterGroup) {
+    const path = `${ServerApi.updatePrinterGroupRoute(printerGroupId)}`;
+    return (await this.patchApi(path, printerGroup)) as PrinterGroup;
+  }
+
   static async updateGroupName(groupId: string, name: string) {
     const path = `${ServerApi.updatePrinterGroupNameRoute(groupId)}/`;
 
@@ -76,11 +81,5 @@ export class PrinterGroupService extends BaseService {
     const path = `${ServerApi.getPrinterFromGroupRoute(groupId)}/`;
 
     return (await this.deleteApi(path, { printerId })) as PrinterGroup;
-  }
-
-  static async syncLegacyGroups() {
-    const path = `${ServerApi.printerGroupSyncLegacyRoute}/`;
-
-    return (await this.postApi(path)) as PrinterGroup[];
   }
 }

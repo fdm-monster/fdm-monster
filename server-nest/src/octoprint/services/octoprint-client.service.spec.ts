@@ -1,6 +1,6 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { OctoPrintClientService } from "./octoprint-client.service";
-import { HttpModule } from "@nestjs/common";
+import { HttpModule } from "@nestjs/axios";
 
 describe(OctoPrintClientService.name, () => {
   let service: OctoPrintClientService;

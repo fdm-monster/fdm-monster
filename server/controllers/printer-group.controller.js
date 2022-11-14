@@ -26,6 +26,15 @@ class PrinterGroupController {
     res.send(printerGroup);
   }
 
+  async update(req, res) {
+    const { id: groupId } = await validateInput(req.params, idRules);
+
+    // Has internal validation
+    const printerGroup = await this.#printerGroupService.update(groupId, req.body);
+    await this.#printerGroupsCache.loadCache();
+    res.send(printerGroup);
+  }
+
   async updateName(req, res) {
     const { id: groupId } = await validateInput(req.params, idRules);
 
@@ -70,23 +79,17 @@ class PrinterGroupController {
     await this.#printerGroupsCache.loadCache();
     res.json(result);
   }
-
-  async syncLegacyGroups(req, res) {
-    const groups = await this.#printerGroupService.syncPrinterGroups();
-    await this.#printerGroupsCache.loadCache();
-    res.send(groups);
-  }
 }
 
 // prettier-ignore
 module.exports = createController(PrinterGroupController)
-    .prefix(AppConstants.apiRoute + "/printer-group")
-    .before([authenticate()])
-    .get("/", "list", withPermission(PERMS.PrinterGroups.List))
-    .get("/:id", "get", withPermission(PERMS.PrinterGroups.Get))
-    .patch("/:id/name", "updateName", withPermission(PERMS.PrinterGroups.Update))
-    .post("/:id/printer", "addPrinterToGroup", withPermission(PERMS.PrinterGroups.Update))
-    .delete("/:id/printer", "removePrinterFromGroup", withPermission(PERMS.PrinterGroups.Update))
-    .delete("/:id", "delete", withPermission(PERMS.PrinterGroups.Delete))
-    .post("/", "create", withPermission(PERMS.PrinterGroups.Create))
-    .post("/sync-legacy", "syncLegacyGroups", withPermission(PERMS.PrinterGroups.Create));
+  .prefix(AppConstants.apiRoute + "/printer-group")
+  .before([authenticate()])
+  .get("/", "list", withPermission(PERMS.PrinterGroups.List))
+  .get("/:id", "get", withPermission(PERMS.PrinterGroups.Get))
+  .patch("/:id", "update", withPermission(PERMS.PrinterGroups.Update))
+  .patch("/:id/name", "updateName", withPermission(PERMS.PrinterGroups.Update))
+  .post("/:id/printer", "addPrinterToGroup", withPermission(PERMS.PrinterGroups.Update))
+  .delete("/:id/printer", "removePrinterFromGroup", withPermission(PERMS.PrinterGroups.Update))
+  .delete("/:id", "delete", withPermission(PERMS.PrinterGroups.Delete))
+  .post("/", "create", withPermission(PERMS.PrinterGroups.Create));

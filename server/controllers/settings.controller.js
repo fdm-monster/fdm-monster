@@ -11,19 +11,9 @@ class SettingsController {
     this.#settingsStore = settingsStore;
   }
 
-  getClientSettings(req, res) {
-    const clientSettings = this.#settingsStore.getClientSettings();
-    res.send(clientSettings);
-  }
-
   getServerSettings(req, res) {
     const serverSettings = this.#settingsStore.getServerSettings();
     res.send(serverSettings);
-  }
-
-  async updateClientSettings(req, res) {
-    const result = await this.#settingsStore.updateClientSettings(req.body);
-    res.send(result);
   }
 
   async updateServerSettings(req, res) {
@@ -36,7 +26,5 @@ class SettingsController {
 module.exports = createController(SettingsController)
   .prefix(AppConstants.apiRoute + "/settings")
   .before([authenticate(), authorizeRoles([ROLES.ADMIN])])
-  .get("/client", "getClientSettings")
-  .put("/client", "updateClientSettings")
   .get("/server", "getServerSettings")
   .put("/server", "updateServerSettings");

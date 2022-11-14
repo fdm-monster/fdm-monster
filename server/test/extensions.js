@@ -4,9 +4,9 @@ function getExpectExtensions() {
       expect(received.errors).toMatchObject(keys);
 
       return {
-        pass: true
+        pass: true,
       };
-    }
+    },
   };
 }
 
@@ -19,13 +19,12 @@ function expectOkResponse(response, matchedBody) {
   if (response.statusCode >= 400) {
     console.warn(response.body);
   }
-  expect(response.statusCode).toEqual(200);
+  expect(response.statusCode, response.body).toEqual(200);
   if (!matchedBody) {
-    return;
+    return response.body;
   }
 
   expect(response.body).toMatchObject(matchedBody);
-
   return response.body;
 }
 
@@ -71,5 +70,5 @@ module.exports = {
   expectInternalServerError,
   expectInvalidResponse,
   expectNotFoundResponse,
-  getExpectExtensions
+  getExpectExtensions,
 };

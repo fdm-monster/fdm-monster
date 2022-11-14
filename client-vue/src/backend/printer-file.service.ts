@@ -6,6 +6,7 @@ import { ClearedFilesResult, PrinterFile } from "@/models/printers/printer-file.
 import Vue from "vue";
 import { InfoEventType, uploadMessageEvent } from "@/event-bus/alert.events";
 import { Printer } from "@/models/printers/printer.model";
+import { AxiosProgressEvent } from "axios";
 
 export class PrinterFileService extends BaseService {
   static async getFiles(printerId: string, recursive = false) {
@@ -24,9 +25,14 @@ export class PrinterFileService extends BaseService {
     return (await this.getApi(path)) as PrinterFileCache;
   }
 
-  static async selectAndPrintFile(printerId: string, filePath: string, print = true) {
+  static async selectAndPrintFile(
+    printerId: string,
+    filePath: string,
+    print = true,
+    bedTemp: number | null = null
+  ) {
     const path = ServerApi.printerFilesSelectAndPrintRoute(printerId);
-    return await this.postApi(path, { filePath, print });
+    return await this.postApi(path, { filePath, print, bedTemp });
   }
 
   static async uploadStubFile(printerId: string, files: File[]) {
@@ -41,26 +47,31 @@ export class PrinterFileService extends BaseService {
       path,
       formData,
       {
-        onUploadProgress: this.uploadUpdateProgress
+        onUploadProgress: this.uploadUpdateProgress,
       },
       { unwrap: false }
     );
   }
 
-  static uploadUpdateProgress(progress: ProgressEvent) {
+  static uploadUpdateProgress(progress: AxiosProgressEvent) {
     Vue.bus.emit(uploadMessageEvent, InfoEventType.UPLOAD_FRONTEND, {
       current: [
         {
-          progress: { percent: progress.loaded / progress.total }
-        }
-      ]
+          progress: { percent: progress.loaded / progress.total! },
+        },
+      ],
     });
   }
 
   static async uploadFile(
     printer: Printer,
     file: File,
-    commands: FileUploadCommands = { select: true, print: true }
+    commands: FileUploadCommands = {
+      select: true,
+      print: true,
+      overrideBedTemp: false,
+      bedTemp: null,
+    }
   ) {
     const path = ServerApi.printerFilesUploadRoute(printer.id);
 
@@ -74,6 +85,9 @@ export class PrinterFileService extends BaseService {
       if (commands.print) {
         formData.append("print", "true");
       }
+      if (commands.overrideBedTemp && !!commands.bedTemp) {
+        formData.append("bedTemp", commands.bedTemp.toString());
+      }
     }
     formData.append("files[0]", file);
 
@@ -81,7 +95,7 @@ export class PrinterFileService extends BaseService {
       path,
       formData,
       {
-        onUploadProgress: this.uploadUpdateProgress
+        onUploadProgress: this.uploadUpdateProgress,
       },
       { unwrap: false }
     );

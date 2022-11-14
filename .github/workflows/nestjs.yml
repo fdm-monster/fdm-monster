@@ -19,8 +19,14 @@ jobs:
 
       - run: yarn install --frozen-lockfile
         working-directory: server-nest
-      - run: npm run build --if-present
+      - run: yarn run build
         working-directory: server-nest
-      - run: npm test
-        name: "Run unit and integration tests"
+      - run: yarn run test:cov
+        name: "Run unit tests with coverage"
         working-directory: server-nest
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          flags: server-nestjs
+          dry_run: ${{ matrix.node-version != '16.x' }}

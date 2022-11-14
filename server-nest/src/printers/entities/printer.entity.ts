@@ -58,10 +58,6 @@ export class Printer {
   @Length(ApiKeyLengthMinimumDefault)
   apiKey: string;
 
-  // TODO Sanitize URL - allow default empty
-  @Column()
-  camURL: string;
-
   // TODO check if semver constrained, make service readonly
   @Column()
   octoPrintVersion: string;

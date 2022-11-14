@@ -80,52 +80,57 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component from "vue-class-component";
-import { printersState } from "@/store/printers.state";
-import { Watch } from "vue-property-decorator";
+import { defineComponent } from "vue";
+import { usePrintersStore } from "@/store/printers.store";
 
-@Component({
-  data: () => ({
-    fav: true,
-    menu: false,
-    filter: undefined,
-    message: false,
-    hints: true,
-    search: ""
-  })
-})
-export default class PrintJobsMenu extends Vue {
+interface Data {
   search?: string;
   menu: boolean;
-
-  get activePrintJobs() {
-    return printersState.printersWithJob.filter((p) => {
-      const fileNameSearch = p.currentJob.fileName?.toLowerCase() || "";
-      const printerUrlSearch = p.printerURL?.toLowerCase() || "";
-      const searchSearch = p.printerName?.toLowerCase() || "";
-
-      const combineSearch = `${fileNameSearch} ${printerUrlSearch} ${searchSearch}`;
-      return !this.search || combineSearch.includes(this.search.toLowerCase());
-    });
-  }
-
-  get activePrintCount() {
-    return this.activePrintJobs.length || 0;
-  }
-
-  closeMenu() {
-    this.menu = false;
-  }
-
-  truncateProgress(progress: number) {
-    if (!progress) return "";
-    return progress?.toFixed(0);
-  }
-
-  @Watch("menu")
-  onMenuChange() {
-    this.search = undefined;
-  }
 }
+
+export default defineComponent({
+  name: "PrintJobsMenu",
+  components: {},
+  setup: () => {
+    return {
+      printersStore: usePrintersStore(),
+    };
+  },
+  async created() {},
+  async mounted() {},
+  props: {},
+  data: (): Data => ({
+    menu: false,
+    search: "",
+  }),
+  computed: {
+    activePrintJobs() {
+      return this.printersStore.printersWithJob.filter((p) => {
+        const fileNameSearch = p.currentJob.fileName?.toLowerCase() || "";
+        const printerUrlSearch = p.printerURL?.toLowerCase() || "";
+        const searchSearch = p.printerName?.toLowerCase() || "";
+
+        const combineSearch = `${fileNameSearch} ${printerUrlSearch} ${searchSearch}`;
+        return !this.search || combineSearch.includes(this.search.toLowerCase());
+      });
+    },
+    activePrintCount() {
+      return this.activePrintJobs.length || 0;
+    },
+  },
+  methods: {
+    closeMenu() {
+      this.menu = false;
+    },
+    truncateProgress(progress: number) {
+      if (!progress) return "";
+      return progress?.toFixed(0);
+    },
+  },
+  watch: {
+    menu() {
+      this.search = undefined;
+    },
+  },
+});
 </script>

@@ -28,7 +28,6 @@ describe("FilesStore", () => {
     apiKey: "asdasasdasdasdasdasdasdasdasdasd",
     webSocketURL: "ws://asd.com/",
     printerURL: "https://asd.com:81",
-    camURL: "http://asd.com:81"
   };
 
   it("old files - should deal with empty files cache correctly", async () => {
@@ -50,9 +49,9 @@ describe("FilesStore", () => {
     await printerFilesService.updateFiles(testPrinterState.id, {
       files: [
         {
-          date: Date.now()
-        }
-      ]
+          date: Date.now() / 1000,
+        },
+      ],
     });
     await filesStore.loadFilesStore();
 
@@ -62,7 +61,7 @@ describe("FilesStore", () => {
     const oldFiles = filesStore.getOutdatedFiles(testPrinterState.id, 7);
     expect(oldFiles.length).toBe(0);
     await printerFilesService.updateFiles(testPrinterState.id, {
-      files: []
+      files: [],
     });
   });
 
@@ -73,12 +72,12 @@ describe("FilesStore", () => {
     await printerFilesService.updateFiles(testPrinterState.id, {
       files: [
         {
-          date: Date.now()
+          date: Date.now() / 1000,
         },
         {
-          date: Date.now() - 8 * 86400
-        }
-      ]
+          date: Date.now() / 1000 - 8 * 86400,
+        },
+      ],
     });
     await filesStore.loadFilesStore();
 

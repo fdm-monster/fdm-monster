@@ -1,29 +1,30 @@
 const MESSAGE = {
   offline: "OctoPrint instance seems to be offline",
-  retryingApiConnection: "OctoPrint is offline. Retry is scheduled",
+  retryingApiConnection: "OctoPrint is offline. Retry has been scheduled.",
   notOctoPrint: "Not OctoPrint as host responded with incompatible response",
   badRequest: "OctoPrint login responded with bad request. This is a bug",
   apiKeyNotAccepted: "OctoPrint apiKey was rejected.",
   disabled: "Printer was disabled explicitly",
   globalAPIKeyDetected: "Global API Key was detected (username/name was '_api')",
-  missingSessionKey: "Missing session key in login response"
+  missingSessionKey: "Missing session key in login response",
 };
 const ERR_COUNT = {
   offline: "offline",
   notOctoPrint: "notOctoPrint",
   apiKeyNotAccepted: "apiKeyNotAccepted",
   apiKeyIsGlobal: "apiKeyIsGlobal",
-  missingSessionKey: "missingSessionKey"
+  missingSessionKey: "missingSessionKey",
 };
 
 // State category
 const CATEGORY = {
   Idle: "Idle",
+  Disabled: "Disabled",
   Offline: "Offline",
   Disconnected: "Disconnected",
   Complete: "Complete",
   Error: "Error",
-  Active: "Active"
+  Active: "Active",
 };
 
 // https://github.com/OctoPrint/OctoPrint/blob/161e21fe0f6344ec3b9b9b541e9b2c472087ba77/src/octoprint/util/comm.py#L913
@@ -47,7 +48,7 @@ const OP_STATE = {
   Finishing: "Finishing",
   Error: "Error",
   OfflineAfterError: "Offline after error",
-  UnknownState: "Unknown State ()" // Unknown State (...) needs proper parsing
+  UnknownState: "Unknown State ()", // Unknown State (...) needs proper parsing
 };
 
 // All states of the app. Nice to share between server and client
@@ -70,82 +71,82 @@ const PSTATE = {
   OfflineAfterError: "Offline after error",
   Complete: "Complete",
   Shutdown: "Shutdown",
-  Online: "Online"
+  Online: "Online",
 };
 
 const FDM_STATE_REMAP = {
   [OP_STATE.Offline]: {
     state: PSTATE.Disconnected, // hard remap!
-    desc: "Your printer is disconnected"
+    desc: "Your printer is disconnected",
   },
   [OP_STATE.OpeningSerial]: {
     state: PSTATE.Searching, // Lack of better
-    desc: "Your printer is connecting to serial"
+    desc: "Your printer is connecting to serial",
   },
   [OP_STATE.DetectingSerial]: {
     state: PSTATE.Searching, // Lack of better
-    desc: "Your printer is detecting serial connections"
+    desc: "Your printer is detecting serial connections",
   },
   [OP_STATE.Connecting]: {
     state: PSTATE.Connecting,
-    desc: "Your printer is connecting to serial"
+    desc: "Your printer is connecting to serial",
   },
   [OP_STATE.Operational]: {
     state: PSTATE.Operational,
-    desc: "Printer is ready to print"
+    desc: "Printer is ready to print",
   },
   [OP_STATE.StartingPrintFromSD]: {
     state: PSTATE.Searching,
-    desc: "STARTING PRINT FROM SD!"
+    desc: "STARTING PRINT FROM SD!",
   },
   [OP_STATE.StartSendingPrintToSD]: {
     state: PSTATE.Searching,
-    desc: "Starting to send file to SD"
+    desc: "Starting to send file to SD",
   },
   [OP_STATE.Starting]: {
     state: PSTATE.Starting,
-    desc: "Printing right now"
+    desc: "Printing right now",
   },
   [OP_STATE.TransferringFileToSD]: {
     state: PSTATE.Searching,
-    desc: "Transferring to SD"
+    desc: "Transferring to SD",
   },
   [OP_STATE.SendingFileToSD]: {
     state: PSTATE.Searching,
-    desc: "Busy sending file to SD"
+    desc: "Busy sending file to SD",
   },
   [OP_STATE.PrintingFromSD]: {
     state: PSTATE.Printing,
-    desc: "PRINTING FROM SD!"
+    desc: "PRINTING FROM SD!",
   },
   [OP_STATE.Printing]: {
     state: PSTATE.Printing,
-    desc: "Printing right now"
+    desc: "Printing right now",
   },
   [OP_STATE.Cancelling]: {
     state: PSTATE.Cancelling,
-    desc: "Print is cancelling"
+    desc: "Print is cancelling",
   },
   [OP_STATE.Pausing]: {
     state: PSTATE.Pausing,
-    desc: "Printing paused"
+    desc: "Printing paused",
   },
   [OP_STATE.Paused]: {
     state: PSTATE.Paused,
-    desc: "Printing paused"
+    desc: "Printing paused",
   },
   [OP_STATE.Resuming]: {
     state: PSTATE.Starting,
-    desc: "Print resuming"
+    desc: "Print resuming",
   },
   [OP_STATE.Finishing]: {
     state: PSTATE.Complete,
-    desc: "Print finishing"
+    desc: "Print finishing",
   },
   [OP_STATE.UnknownState]: {
     state: "Unknown state",
-    desc: "Unknown state"
-  }
+    desc: "Unknown state",
+  },
 };
 
 function remapOctoPrintState(octoPrintState) {
@@ -158,7 +159,7 @@ function remapOctoPrintState(octoPrintState) {
     return {
       state: PSTATE.Error,
       flags,
-      desc: stateLabel
+      desc: stateLabel,
     };
   }
 
@@ -169,7 +170,7 @@ function remapOctoPrintState(octoPrintState) {
   return {
     state: stateLabel,
     flags,
-    desc: "OctoPrint's state was not recognized"
+    desc: "OctoPrint's state was not recognized",
   };
 }
 
@@ -199,7 +200,7 @@ const mapStateToColor = (state) => {
     return { name: "warning", hex: "#583c0e", category: CATEGORY.Active };
   }
   if (state === PSTATE.Disabled) {
-    return { name: "secondary", hex: "#2e0905", category: CATEGORY.Offline };
+    return { name: "secondary", hex: "#050c2e", category: CATEGORY.Disabled };
   }
   if (state === PSTATE.Offline) {
     return { name: "danger", hex: "#2e0905", category: CATEGORY.Offline };
@@ -210,11 +211,11 @@ const mapStateToColor = (state) => {
   if (state === PSTATE.NoAPI) {
     return { name: "danger", hex: "#2e0905", category: CATEGORY.Offline };
   }
-  if (state === PSTATE.Disconnected) {
-    return { name: "danger", hex: "#2e0905", category: CATEGORY.Disconnected };
-  }
   if (state === PSTATE.Shutdown) {
     return { name: "danger", hex: "#2e0905", category: CATEGORY.Offline };
+  }
+  if (state === PSTATE.Disconnected) {
+    return { name: "danger", hex: "#2e0905", category: CATEGORY.Disconnected };
   }
   if (state === PSTATE.Complete) {
     return { name: "success", hex: "#00330e", category: CATEGORY.Complete };
@@ -243,5 +244,5 @@ module.exports = {
   MESSAGE,
   PSTATE,
   OP_STATE,
-  CATEGORY
+  CATEGORY,
 };

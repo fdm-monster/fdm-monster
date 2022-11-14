@@ -1,14 +1,14 @@
 const HttpStatusCode = require("../constants/http-status-codes.constants");
 const OctoprintRxjsWebsocketAdapter = require("../services/octoprint/octoprint-rxjs-websocket.adapter");
 const {
-  isLoginResponseGlobal
+  isLoginResponseGlobal,
 } = require("../services/octoprint/constants/octoprint-service.constants");
 const DITokens = require("../container.tokens");
-const { ERR_COUNT, PSTATE, MESSAGE } = require("../constants/state.constants");
+const { IO_MESSAGES } = require("../state/socket-io.gateway");
 
 class PrinterTestTask {
   #lastTestRunTime;
-  #printerSseHandler;
+  #socketIoGateway;
 
   #printersStore;
   #settingsStore;
@@ -23,14 +23,14 @@ class PrinterTestTask {
     settingsStore,
     taskManagerService,
     loggerFactory,
-    printerSseHandler
+    socketIoGateway,
   }) {
     this.#printersStore = printersStore;
     this.#settingsStore = settingsStore;
     this.#octoPrintService = octoPrintApiService;
     this.#taskManagerService = taskManagerService;
-    this.#printerSseHandler = printerSseHandler;
-    this.#logger = loggerFactory("Printer-Test-task");
+    this.#socketIoGateway = socketIoGateway;
+    this.#logger = loggerFactory(PrinterTestTask.name);
   }
 
   get maxRunTime() {
@@ -72,18 +72,18 @@ class PrinterTestTask {
    */
   async #sendStateProgress(testPrinterState, progress) {
     const { printerURL, printerName, apiKey, correlationToken } = testPrinterState?.toFlat();
-    const sseData = {
+    const socketIoData = {
       testPrinter: {
         printerURL,
         printerName,
         apiKey,
-        correlationToken
+        correlationToken,
       },
-      testProgress: progress
+      testProgress: progress,
     };
 
-    const serializedData = JSON.stringify(sseData);
-    this.#printerSseHandler.send(serializedData);
+    const serializedData = JSON.stringify(socketIoData);
+    this.#socketIoGateway.send(IO_MESSAGES.LegacyPrinterTest, serializedData);
   }
 
   async #testPrinterConnection(printerState) {
@@ -122,7 +122,7 @@ class PrinterTestTask {
     await this.#sendStateProgress(printerState, {
       connected: true,
       isOctoPrint: true,
-      apiOk: true
+      apiOk: true,
     });
 
     // Response related errors
@@ -133,14 +133,14 @@ class PrinterTestTask {
         connected: true,
         isOctoPrint: true,
         apiOk: true,
-        apiKeyNotGlobal: false
+        apiKeyNotGlobal: false,
       });
     }
     await this.#sendStateProgress(printerState, {
       connected: true,
       isOctoPrint: true,
       apiOk: true,
-      apiKeyNotGlobal: true
+      apiKeyNotGlobal: true,
     });
 
     // Check for an name (defines connection state NoAPI) - undefined when apikey is wrong
@@ -150,7 +150,7 @@ class PrinterTestTask {
         isOctoPrint: true,
         apiOk: true,
         apiKeyNotGlobal: true,
-        apiKeyOk: false
+        apiKeyOk: false,
       });
     }
     await this.#sendStateProgress(printerState, {
@@ -158,7 +158,7 @@ class PrinterTestTask {
       isOctoPrint: true,
       apiOk: true,
       apiKeyNotGlobal: true,
-      apiKeyOk: true
+      apiKeyOk: true,
     });
 
     // Sanity check for login success (alt: could also check status code) - quite rare
@@ -169,7 +169,7 @@ class PrinterTestTask {
         apiOk: true,
         apiKeyNotGlobal: true,
         apiKeyOk: true,
-        websocketBound: false
+        websocketBound: false,
       });
     }
 
@@ -187,7 +187,7 @@ class PrinterTestTask {
       apiOk: true,
       apiKeyNotGlobal: true,
       apiKeyOk: true,
-      websocketBound: true
+      websocketBound: true,
     });
   }
 }

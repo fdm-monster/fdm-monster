@@ -16,7 +16,7 @@ function registerTask(task, preset, milliseconds = 0, runImmediately = false) {
   return {
     id: task.name || task,
     task,
-    preset: timingPreset
+    preset: timingPreset,
   };
 }
 
@@ -31,15 +31,19 @@ class ServerTasks {
   );
   static BOOT_TASKS = [
     registerTask(DITokens.softwareUpdateTask, TaskPresets.RUNDELAYED, 1500),
-    registerTask(DITokens.printerSseTask, TaskPresets.PERIODIC, 500),
+    registerTask(DITokens.printerSocketIoTask, TaskPresets.PERIODIC, 500),
+    registerTask(DITokens.printCompletionSocketIoTask, TaskPresets.RUNONCE),
     registerTask(DITokens.printerTestTask, TaskPresets.PERIODIC_DISABLED, 2000, true),
     registerTask(DITokens.printerFileCleanTask, TaskPresets.RUNONCE, 60 * 1000, true),
     registerTask(DITokens.printerSystemTask, TaskPresets.PERIODIC_DISABLED, 6 * HOUR_MS, true),
     registerTask(DITokens.printerWebsocketTask, TaskPresets.PERIODIC, 5000, true),
-    registerTask(DITokens.printerWebsocketPingTask, TaskPresets.PERIODIC, 30000, false)
+    registerTask(DITokens.printerWebsocketPingTask, TaskPresets.PERIODIC, 30000, false),
+    registerTask(DITokens.pluginFirmwareUpdatePreparationTask, TaskPresets.RUNDELAYED, 5000),
+    registerTask(DITokens.influxDbQueryTask, TaskPresets.PERIODIC, 1000, true),
+    registerTask(DITokens.bedTempOverrideTask, TaskPresets.RUNONCE, 0, true),
   ];
 }
 
 module.exports = {
-  ServerTasks
+  ServerTasks,
 };

@@ -1,14 +1,16 @@
 import Vue from "vue";
 import { Printer } from "@/models/printers/printer.model";
-import { uploadsState } from "@/store/uploads.state";
 import {
   convertMultiPrinterFileToQueue,
-  convertPrinterMultiFileToQueue
+  convertPrinterMultiFileToQueue,
 } from "@/utils/uploads-state.utils";
 import { infoMessageEvent } from "@/event-bus/alert.events";
-import { printersState } from "@/store/printers.state";
+import { usePrintersStore } from "@/store/printers.store";
+import { useUploadsStore } from "@/store/uploads.store";
 
 const bindDropConditionally = (el: HTMLElement, printers: Printer[], context?: Vue) => {
+  const printersStore = usePrintersStore();
+  const uploadsStore = useUploadsStore();
   if (printers?.length) {
     const isSinglePrinter = printers.length === 1;
     const firstPrinter = printers[0];
@@ -30,10 +32,14 @@ const bindDropConditionally = (el: HTMLElement, printers: Printer[], context?: V
           clonedFiles.length,
           printedFilename
         );
+
+        // Convert the file and bound printer to a file upload
         convertedUploads = convertPrinterMultiFileToQueue(
           firstPrinter,
           clonedFiles,
-          printedFilename
+          printedFilename,
+          printersStore.bedTempOverride,
+          printersStore.bedTemp
         );
       } else {
         if (clonedFiles.length > 1) {
@@ -41,12 +47,17 @@ const bindDropConditionally = (el: HTMLElement, printers: Printer[], context?: V
         }
         console.debug("Multi printer upload mode", printers.length, clonedFiles.length);
         const clonedFile = clonedFiles[0];
-        convertedUploads = convertMultiPrinterFileToQueue(printers, clonedFile);
+        convertedUploads = convertMultiPrinterFileToQueue(printers, clonedFile, {
+          select: true,
+          print: true,
+          overrideBedTemp: printersStore.bedTempOverride,
+          bedTemp: printersStore.bedTemp,
+        });
       }
 
-      uploadsState.queueUploads(convertedUploads);
+      uploadsStore.queueUploads(convertedUploads);
 
-      printersState.clearSelectedPrinters();
+      printersStore.clearSelectedPrinters();
     };
   } else {
     el.ondrop = async (e) => {
@@ -84,6 +95,6 @@ export function registerFileDropDirective() {
     },
     update: (el, binding, vnode) => {
       bindDropConditionally(el, binding.value?.printers, vnode.context);
-    }
+    },
   });
 }

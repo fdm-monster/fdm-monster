@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialogShowed" :max-width="showChecksPanel ? '700px' : '600px'" persistent>
+  <BaseDialog :id="dialogId" :max-width="showChecksPanel ? '700px' : '600px'">
     <validation-observer ref="validationObserver" v-slot="{ invalid }">
       <v-card v-if="storedUpdatedPrinter">
         <v-card-title>
@@ -20,6 +20,13 @@
               <v-btn @click="showChecksPanel = false">Hide checks</v-btn>
             </PrinterChecksPanel>
           </v-row>
+          <v-row>
+            <v-col v-if="!isClipboardApiAvailable()" cols="12">
+              Clipboard is not available. Copy or paste the following:
+              <br />
+              <v-textarea v-model="copyPasteConnectionString" rows="3"></v-textarea>
+            </v-col>
+          </v-row>
         </v-card-text>
         <v-card-actions>
           <em class="red--text">* indicates required field</em>
@@ -35,151 +42,167 @@
         </v-card-actions>
       </v-card>
     </validation-observer>
-  </v-dialog>
+  </BaseDialog>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { Component, Watch } from "vue-property-decorator";
+import { defineComponent } from "vue";
 import { ValidationObserver } from "vee-validate";
 import { Printer } from "@/models/printers/printer.model";
 import { sseTestPrinterUpdate } from "@/event-bus/sse.events";
 import {
-  PrinterSseMessage,
-  TestProgressDetails
+  SocketIoTestPrinterMessage,
+  TestProgressDetails,
 } from "@/models/sse-messages/printer-sse-message.model";
 import { PrintersService } from "@/backend";
 import { generateInitials } from "@/constants/noun-adjectives.data";
 import { updatedPrinterEvent } from "@/event-bus/printer.events";
 import PrinterChecksPanel from "@/components/Generic/Dialogs/PrinterChecksPanel.vue";
-import { printersState } from "@/store/printers.state";
 import PrinterCrudForm from "@/components/Generic/Forms/PrinterCrudForm.vue";
 import { infoMessageEvent } from "@/event-bus/alert.events";
+import { usePrintersStore } from "@/store/printers.store";
+import { WithDialog } from "@/utils/dialog.utils";
+import { DialogName } from "@/components/Generic/Dialogs/dialog.constants";
+import { useDialogsStore } from "@/store/dialog.store";
 
-@Component({
+interface Data extends WithDialog {
+  showChecksPanel: boolean;
+  testProgress?: TestProgressDetails;
+  copyPasteConnectionString: string;
+}
+
+export default defineComponent({
+  name: "UpdatePrinterDialog",
   components: {
     ValidationObserver,
     PrinterCrudForm,
-    PrinterChecksPanel
+    PrinterChecksPanel,
   },
-  data: () => ({
-    testProgress: undefined
-  })
-})
-export default class UpdatePrinterDialog extends Vue {
-  dialogShowed = false;
-
-  showChecksPanel = false;
-  testProgress?: TestProgressDetails = undefined;
-  $refs!: {
-    validationObserver: InstanceType<typeof ValidationObserver>;
-    printerUpdateForm: InstanceType<typeof PrinterCrudForm>;
-  };
-
-  get storedUpdatedPrinter() {
-    return printersState.currentUpdateDialogPrinter;
-  }
-
-  formData() {
-    return this.$refs.printerUpdateForm?.formData;
-  }
-
-  @Watch("storedUpdatedPrinter")
-  async inputUpdate(viewedPrinter?: Printer) {
-    this.dialogShowed = !!viewedPrinter;
-    const printerId = viewedPrinter?.id;
-    if (!viewedPrinter || !printerId) return;
-
-    const loginDetails = await PrintersService.getPrinterLoginDetails(printerId);
-    const formData = this.formData();
-    if (formData) formData.apiKey = loginDetails.apiKey;
-  }
-
-  @Watch("dialogShowed")
-  updateStore(newVal: boolean) {
-    // Due to the animation delay the nav model lags behind enough for SSE to pick up and override
-    if (!newVal) {
-      printersState.setUpdateDialogPrinter(undefined);
-      this.testProgress = undefined;
-    }
-  }
-
+  setup: () => {
+    return {
+      printersStore: usePrintersStore(),
+      dialogsStore: useDialogsStore(),
+    };
+  },
   async created() {
-    window.addEventListener("keydown", (e) => {
-      if (e.key == "Escape") {
-        this.closeDialog();
+    await this.printersStore.loadPrinterGroups();
+  },
+  async mounted() {},
+  props: {},
+  data: (): Data => ({
+    dialogId: DialogName.UpdatePrinterDialog,
+    showChecksPanel: false,
+    testProgress: undefined,
+    copyPasteConnectionString: "",
+  }),
+  computed: {
+    validationObserver() {
+      return this.$refs.validationObserver as InstanceType<typeof ValidationObserver>;
+    },
+    storedUpdatedPrinter() {
+      return this.printersStore.updateDialogPrinter;
+    },
+  },
+  methods: {
+    printerUpdateForm() {
+      return this.$refs.printerUpdateForm as InstanceType<typeof PrinterCrudForm>;
+    },
+    clipboardPasteField() {
+      return this.$refs.clipboardPasteField as InstanceType<typeof HTMLFormElement>;
+    },
+    formData() {
+      return this.printerUpdateForm()?.formData;
+    },
+    avatarInitials() {
+      if (this.formData()) {
+        return generateInitials(this.formData()?.printerName);
       }
-    });
+      return "";
+    },
+    openTestPanel() {
+      this.showChecksPanel = true;
+      this.testProgress = undefined;
+    },
+    async onTestPrinterUpdate(payload: SocketIoTestPrinterMessage) {
+      this.testProgress = payload.testProgress;
+    },
+    async isValid() {
+      return await this.validationObserver.validate();
+    },
+    async testPrinter() {
+      if (!(await this.isValid())) return;
+      const formData = this.formData();
+      if (!formData) return;
 
-    await printersState.loadPrinterGroups();
-  }
+      const testPrinter = PrintersService.convertCreateFormToPrinter(formData);
+      if (!testPrinter) return;
+      this.openTestPanel();
 
-  avatarInitials() {
-    const formData = this.formData();
-    if (formData && this.dialogShowed) {
-      return generateInitials(formData.printerName);
-    }
-  }
+      const result: Printer = await this.printersStore.createTestPrinter(testPrinter);
+      if (!result.correlationToken) throw new Error("Test Printer CorrelationToken was empty.");
 
-  openTestPanel() {
-    this.showChecksPanel = true;
-    this.testProgress = undefined;
-  }
+      this.$bus.on(sseTestPrinterUpdate(result.correlationToken), this.onTestPrinterUpdate);
+    },
+    isClipboardApiAvailable() {
+      return navigator.clipboard;
+    },
+    async quickCopyConnectionString() {
+      const printer = this.storedUpdatedPrinter;
+      if (!printer) return;
+      const loginDetails = await PrintersService.getPrinterLoginDetails(printer.id);
+      const connectionString = `{"printerURL": "${loginDetails.printerURL}", "apiKey": "${loginDetails.apiKey}", "printerName": "${printer.printerName}"}`;
 
-  async onTestPrinterUpdate(payload: PrinterSseMessage) {
-    this.testProgress = payload.testProgress;
-  }
+      if (!this.isClipboardApiAvailable()) {
+        this.copyPasteConnectionString = connectionString;
+        return;
+      }
 
-  async isValid() {
-    return await this.$refs.validationObserver.validate();
-  }
+      // Likely happens in Firefox
+      if (!navigator.clipboard) {
+        throw new Error(
+          `Clipboard API is not available. Secure context: ${window.isSecureContext}`
+        );
+      }
+      await navigator.clipboard.writeText(connectionString);
+    },
+    async submit() {
+      if (!(await this.isValid())) return;
+      const formData = this.formData();
+      if (!formData) return;
 
-  async testPrinter() {
-    if (!(await this.isValid())) return;
+      const updatedPrinter = PrintersService.convertCreateFormToPrinter(formData);
+      const printerId = updatedPrinter.id;
 
-    const formData = this.formData();
-    if (!formData) return;
+      const updatedData = await this.printersStore.updatePrinter({
+        printerId: printerId as string,
+        updatedPrinter,
+      });
 
-    const testPrinter = PrintersService.convertCreateFormToPrinter(formData);
-    if (!testPrinter) return;
-    this.openTestPanel();
+      this.$bus.emit(updatedPrinterEvent(printerId as string), updatedData);
+      this.$bus.emit(infoMessageEvent, `Printer ${updatedPrinter.printerName} updated`);
 
-    const result: Printer = await printersState.createTestPrinter(testPrinter);
-    if (!result.correlationToken) throw new Error("Test Printer CorrelationToken was empty.");
+      this.closeDialog();
+    },
+    closeDialog() {
+      this.dialogsStore.closeDialog(this.dialogId);
+      this.printersStore.setUpdateDialogPrinter(undefined);
+      this.copyPasteConnectionString = "";
+    },
+  },
+  watch: {
+    async storedUpdatedPrinter(viewedPrinter?: Printer) {
+      const printerId = viewedPrinter?.id;
 
-    this.$bus.on(sseTestPrinterUpdate(result.correlationToken), this.onTestPrinterUpdate);
-  }
+      if (!viewedPrinter) {
+        this.printersStore.setUpdateDialogPrinter(undefined);
+      }
 
-  async quickCopyConnectionString() {
-    const printer = this.storedUpdatedPrinter;
-    if (!printer) return;
-    const loginDetails = await PrintersService.getPrinterLoginDetails(printer.id);
+      if (!viewedPrinter || !printerId) return;
 
-    await navigator.clipboard.writeText(
-      `{"printerURL": "${loginDetails.printerURL}", "apiKey": "${loginDetails.apiKey}", "printerName": "${printer.printerName}"}`
-    );
-  }
-
-  async submit() {
-    if (!(await this.isValid())) return;
-
-    const formData = this.formData();
-    if (!formData) return;
-
-    const updatedPrinter = PrintersService.convertCreateFormToPrinter(formData);
-    const printerId = updatedPrinter.id;
-
-    const updatedData = await printersState.updatePrinter({
-      printerId: printerId as string,
-      updatedPrinter
-    });
-
-    this.$bus.emit(updatedPrinterEvent(printerId as string), updatedData);
-    this.$bus.emit(infoMessageEvent, `Printer ${updatedPrinter.printerName} updated`);
-  }
-
-  closeDialog() {
-    printersState.setUpdateDialogPrinter(undefined);
-  }
-}
+      const loginDetails = await PrintersService.getPrinterLoginDetails(printerId);
+      const formData = this.formData();
+      if (formData) formData.apiKey = loginDetails.apiKey;
+    },
+  },
+});
 </script>

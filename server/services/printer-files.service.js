@@ -1,7 +1,7 @@
-const {NotFoundException} = require("../exceptions/runtime.exceptions");
-const {findFileIndex} = require("../utils/find-predicate.utils");
-const {Status, MATERIALS} = require("../constants/service.constants");
-const {findColorRAL} = require("../constants/ral-color-map.constants");
+const { NotFoundException } = require("../exceptions/runtime.exceptions");
+const { findFileIndex } = require("../utils/find-predicate.utils");
+const { Status, MATERIALS } = require("../constants/service.constants");
+const { findColorRAL, flattenedDutchRALMap } = require("../constants/ral-color-map.constants");
 
 /**
  * An extension repository for managing printer files in database
@@ -11,7 +11,7 @@ class PrinterFilesService {
 
   #logger;
 
-  constructor({printerService, loggerFactory}) {
+  constructor({ printerService, loggerFactory }) {
     this.#printerService = printerService;
     this.#logger = loggerFactory("PrinterFilesService");
   }
@@ -21,7 +21,7 @@ class PrinterFilesService {
 
     return {
       fileList: printer.fileList,
-      storage: printer.storage
+      storage: printer.storage,
     };
   }
 
@@ -57,7 +57,7 @@ class PrinterFilesService {
       this.#logger.warning(`Parsing printer file did not succeed. Filename: ${addedFile}`);
     }
 
-    return {fileList: printer.fileList, lastPrintedFile};
+    return { fileList: printer.fileList, lastPrintedFile };
   }
 
   async setPrinterLastPrintedFile(printerId, fileName) {
@@ -75,7 +75,7 @@ class PrinterFilesService {
         parsedVisualizationRAL: mappedRALColor?.RAL || undefined,
         parsedAmount: parsedData?.amount || undefined,
         parsedOrderCode: parsedData?.orderCode || undefined,
-        parsedMaterial: parsedData?.material || undefined
+        parsedMaterial: parsedData?.material || undefined,
       };
     }
 
@@ -112,7 +112,7 @@ class PrinterFilesService {
           filePath
         );
       } else {
-        return Status.failure("File was not found in printer fileList");
+        this.#logger.warning("File was not found in printer fileList");
       }
     }
 
@@ -125,13 +125,14 @@ class PrinterFilesService {
     const compactName = fileName.replace(/ /g, ""); // Remove whitespace
     const compactNameUpper = compactName.toUpperCase();
 
-    const amountSplit = compactNameUpper.split("X", 2);
-    const hasAmount = amountSplit?.length === 2;
-    const amountCorrect = hasAmount && amountSplit[0].length < 4;
-    const amount = amountCorrect ? parseInt(amountSplit[0]) : undefined;
+    const amountRestStr = compactNameUpper.substring(compactNameUpper.indexOf("X") + 1);
+    const amountStr = compactNameUpper.substring(0, compactNameUpper.indexOf("X"));
+    const hasAmount = amountStr?.length >= 1;
+    const amountCorrect = hasAmount && amountStr.length < 4;
+    const amount = amountCorrect ? parseInt(amountStr) : undefined;
 
     // Fallback if no X present
-    const amountReducedName = hasAmount ? amountSplit[1] : compactNameUpper;
+    const amountReducedName = hasAmount ? amountRestStr : compactNameUpper;
 
     // Independently split order code
     const orderCodeOptions = amountReducedName.split("_", 1);
@@ -152,12 +153,38 @@ class PrinterFilesService {
       }
     }
 
+    const colorExists = color?.length
+      ? flattenedDutchRALMap.find((c) => color === Object.keys(c)[0].toUpperCase())
+      : false;
+
+    // Determine if fallback is needed
+    let fallbackApplied = false;
+    if (!colorExists) {
+      if (!color?.length) {
+        color = this.#fallbackColorMapping(amountReducedName);
+      } else {
+        color = this.#fallbackColorMapping(color) || color;
+      }
+      fallbackApplied = true;
+      this.#logger.warning(
+        `Fallback color analyzed. String ${amountReducedName} resulted in color ${color}`
+      );
+    }
+
     return {
       color,
+      fallbackApplied,
       orderCode,
       amount,
-      material
+      material,
     };
+  }
+
+  #fallbackColorMapping(searchString) {
+    const mappedColor = flattenedDutchRALMap.find((c) =>
+      searchString?.includes(Object.keys(c)[0].toUpperCase())
+    );
+    return !!mappedColor ? Object.keys(mappedColor)[0]?.toUpperCase() : undefined;
   }
 
   #parseMaterialType(input) {

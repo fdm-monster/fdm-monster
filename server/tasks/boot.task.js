@@ -15,12 +15,12 @@ class BootTask {
   printersStore;
   filesStore;
   printerGroupsCache;
-  historyStore;
-  filamentsStore;
   permissionService;
   roleService;
   userService;
-  influxDbSetupService;
+  pluginRepositoryCache;
+  printerFloorsCache;
+  pluginFirmwareUpdateService;
 
   constructor({
     loggerFactory,
@@ -29,15 +29,15 @@ class BootTask {
     settingsStore,
     multerService,
     printersStore,
-    historyStore,
     filesStore,
     printerGroupsCache,
-    filamentsStore,
     permissionService,
     roleService,
     userService,
     taskManagerService,
-    influxDbSetupService
+    pluginRepositoryCache,
+    printerFloorsCache,
+    pluginFirmwareUpdateService,
   }) {
     this.#serverTasks = serverTasks;
     this.serverSettingsService = serverSettingsService;
@@ -46,13 +46,13 @@ class BootTask {
     this.printersStore = printersStore;
     this.filesStore = filesStore;
     this.printerGroupsCache = printerGroupsCache;
-    this.historyStore = historyStore;
-    this.filamentsStore = filamentsStore;
     this.permissionService = permissionService;
     this.roleService = roleService;
     this.userService = userService;
     this.#taskManagerService = taskManagerService;
-    this.influxDbSetupService = influxDbSetupService;
+    this.pluginRepositoryCache = pluginRepositoryCache;
+    this.printerFloorsCache = printerFloorsCache;
+    this.pluginFirmwareUpdateService = pluginFirmwareUpdateService;
     this.#logger = loggerFactory("Server");
   }
 
@@ -91,10 +91,7 @@ class BootTask {
     await this.multerService.clearUploadsFolder();
     await this.printersStore.loadPrintersStore();
     await this.filesStore.loadFilesStore();
-    await this.filamentsStore.loadFilamentsStore();
-    await this.historyStore.loadHistoryStore();
     await this.printerGroupsCache.loadCache();
-    await this.influxDbSetupService.optionalInfluxDatabaseSetup();
 
     this.#logger.info("Synchronizing user permission and roles definition");
     await this.permissionService.syncPermissions();
@@ -115,7 +112,7 @@ class BootTask {
 
   async createConnection() {
     await mongoose.connect(fetchMongoDBConnectionString(), {
-      serverSelectionTimeoutMS: 1500
+      serverSelectionTimeoutMS: 1500,
     });
   }
 
@@ -127,7 +124,7 @@ class BootTask {
         username: "root",
         name: "Admin",
         password: "fdm-root",
-        roles: [adminRole.id]
+        roles: [adminRole.id],
       });
       this.#logger.info(
         "Created admin account as it was missing. Please consult the documentation for credentials."

@@ -2,20 +2,21 @@ module.exports = {
   testEnvironment: "node",
   testTimeout: 5000,
   modulePathIgnorePatterns: [
-    "index.js",
+    "index.mjs",
     "migrate-mongo-config.js",
     ".eslintrc.js",
     "jest.config.js",
     "assets",
     "coverage",
     "docker",
-    "file-uploads",
+    "file-storage",
     "node_modules",
     "logs",
-    "views"
+    "views",
   ],
   globalSetup: "./test/setup-global.js",
-  setupFilesAfterEnv: ["./test/setup-after-env.js"],
+  setupFilesAfterEnv: ["jest-27-expect-message", "./test/setup-after-env.js"],
   collectCoverageFrom: ["**/*.js"],
-  coveragePathIgnorePatterns: ["node_modules", "test"]
+  coveragePathIgnorePatterns: ["node_modules", "test"],
+  coverageReporters: ["clover", "json", "lcov", "text", "@lcov-viewer/istanbul-report"],
 };

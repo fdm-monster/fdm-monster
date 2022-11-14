@@ -1,38 +1,40 @@
 const { UUID_LENGTH } = require("../../constants/service.constants");
 
 const stepSizeRules = {
-  stepSize: "required|in:0.1,1,10,100|numeric"
+  stepSize: "required|in:0.1,1,10,100|numeric",
 };
 
 const flowRateRules = {
-  flowRate: "required|between:75,125|integer"
+  flowRate: "required|between:75,125|integer",
 };
 
 const feedRateRules = {
-  feedRate: "required|between:10,200|integer"
+  feedRate: "required|between:10,200|integer",
 };
 
 const testPrinterApiRules = {
   apiKey: `required|length:${UUID_LENGTH},${UUID_LENGTH}|alphaNumeric`,
   printerURL: "required|httpurl",
   webSocketURL: "wsurl",
-  camURL: "httpurl"
-}
+};
 
 const updateSortIndexRules = {
   sortList: "required|array|minLength:1",
-  "sortList.*": "required|mongoId"
+  "sortList.*": "required|mongoId",
+};
+
+const updatePrinterDisabledReasonRules = {
+  disabledReason: "string",
 };
 
 const updatePrinterEnabledRule = {
-  enabled: "required|boolean"
+  enabled: "required|boolean",
 };
 
 const updatePrinterConnectionSettingRules = {
   printerURL: "required|httpurl",
   webSocketURL: "required|wsurl",
-  camURL: "httpurl",
-  apiKey: `required|minLength:${UUID_LENGTH}|maxLength:${UUID_LENGTH}`
+  apiKey: `required|minLength:${UUID_LENGTH}|maxLength:${UUID_LENGTH}`,
 };
 
 module.exports = {
@@ -42,5 +44,6 @@ module.exports = {
   testPrinterApiRules,
   updateSortIndexRules,
   updatePrinterEnabledRule,
-  updatePrinterConnectionSettingRules
+  updatePrinterConnectionSettingRules,
+  updatePrinterDisabledReasonRules,
 };

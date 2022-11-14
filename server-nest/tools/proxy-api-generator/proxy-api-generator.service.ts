@@ -1,11 +1,12 @@
 import * as fs from "fs";
 import { transform } from "json-to-typescript";
-import { HttpService, Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { OctoPrintClientService } from "../../src/octoprint/services/octoprint-client.service";
 import * as path from "path";
 import { Observable } from "rxjs";
 import { OctoPrintConfig } from "../../src/octoprint/octoprint.config";
 import { ConfigType } from "@nestjs/config";
+import { HttpService } from "@nestjs/axios";
 
 @Injectable()
 export class ProxyApiGeneratorService {

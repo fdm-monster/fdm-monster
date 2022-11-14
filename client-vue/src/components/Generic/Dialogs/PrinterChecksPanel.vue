@@ -55,20 +55,26 @@
 </template>
 
 <script lang="ts">
-import Component from "vue-class-component";
-import Vue from "vue";
-import { Prop } from "vue-property-decorator";
+import { defineComponent, PropType } from "vue";
 import { TestProgressDetails } from "@/models/sse-messages/printer-sse-message.model";
 
-@Component({
-  components: {}
-})
-export default class PrinterChecksPanel extends Vue {
-  @Prop() testProgress: TestProgressDetails;
-  cols = 4;
-
-  isSet(value: boolean) {
-    return value === false || value === true;
-  }
+interface Data {
+  cols: 4;
 }
+
+export default defineComponent({
+  name: "PrinterChecksPanel",
+  components: {},
+  props: {
+    testProgress: Object as PropType<TestProgressDetails>,
+  },
+  data: (): Data => ({
+    cols: 4,
+  }),
+  methods: {
+    isSet(value: boolean) {
+      return value === false || value === true;
+    },
+  },
+});
 </script>

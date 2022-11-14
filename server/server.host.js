@@ -10,17 +10,19 @@ class ServerHost {
   #logger;
   #bootTask;
   #taskManagerService;
-  #httpServerInstance = null;
+  #socketIoGateway;
+  #appInstance = null;
 
-  constructor({ loggerFactory, bootTask, taskManagerService }) {
+  constructor({ loggerFactory, bootTask, taskManagerService, socketIoGateway }) {
     this.#logger = loggerFactory("Server");
     this.#bootTask = bootTask;
     this.#taskManagerService = taskManagerService;
+    this.#socketIoGateway = socketIoGateway;
   }
 
-  async boot(httpServer, quick_boot = false, listenRequests = true) {
-    this.#httpServerInstance = httpServer;
-    this.serveControllerRoutes(this.#httpServerInstance);
+  async boot(app, quick_boot = false, listenRequests = true) {
+    this.#appInstance = app;
+    this.serveControllerRoutes(this.#appInstance);
 
     if (!quick_boot) {
       await this.#bootTask.runOnce();
@@ -39,7 +41,7 @@ class ServerHost {
     // Catches any HTML request to paths like / or file/ as long as its text/html
     app
       .use((req, res, next) => {
-        if (!req.originalUrl.startsWith("/api")) {
+        if (!req.originalUrl.startsWith("/api") && !req.originalUrl.startsWith("/socket.io")) {
           history()(req, res, next);
         } else {
           next();
@@ -64,7 +66,11 @@ class ServerHost {
         const path = req.originalUrl;
 
         let resource = "MVC";
-        if (path.startsWith("/api") || path.startsWith("/plugins")) {
+        if (
+          path.startsWith("/socket.io") ||
+          path.startsWith("/api") ||
+          path.startsWith("/plugins")
+        ) {
           resource = "API";
         } else if (path.endsWith(".min.js")) {
           resource = "client-bundle";
@@ -72,7 +78,9 @@ class ServerHost {
 
         this.#logger.error(`${resource} resource at '${path}' was not found`);
 
-        throw new NotFoundException(`${resource} resource was not found`, path);
+        if (!path.startsWith("/socket.io")) {
+          throw new NotFoundException(`${resource} resource was not found`, path);
+        }
       })
       .use(exceptionHandler);
   }
@@ -84,9 +92,13 @@ class ServerHost {
       throw new Error("The FDM Server requires a numeric port input argument to run");
     }
 
-    this.#httpServerInstance.listen(port, "0.0.0.0", () => {
-      this.#logger.info(`Server started... open it at http://127.0.0.1:${port}`);
+    const hostOrFqdn = "0.0.0.0";
+    const server = this.#appInstance.listen(port, hostOrFqdn, () => {
+      this.#logger.info(
+        `Server started... open it at http://${hostOrFqdn}:${port} or http://127.0.0.1:${port}`
+      );
     });
+    this.#socketIoGateway.attachServer(server);
   }
 }
 
