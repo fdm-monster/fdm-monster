@@ -24,6 +24,9 @@ jobs:
       - run: yarn run test:cov
         name: "Run unit tests with coverage"
         working-directory: server-nest
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
         with:
           flags: server-nestjs
           dry_run: ${{ matrix.node-version != '16.x' }}
