@@ -10,7 +10,7 @@ const {
 } = require("../controllers/validation/printer-files-controller.validation");
 
 class BedTempOverrideTask {
-  #bedTempOverrides = {}; // bedTemp, lastOverride, silencedOverrides
+  bedTempOverrides = {}; // bedTemp, lastOverride, silencedOverrides
   // Time in msec between an override call
   #minDeltaTimeOverride = 10000;
   #resetSilencedOveridesMax = 10;
@@ -29,13 +29,13 @@ class BedTempOverrideTask {
 
   addBedTempOverride(printerId, bedTemp) {
     if (this.#hasOverride(printerId)) {
-      const oldTemp = this.#bedTempOverrides[printerId];
+      const oldTemp = this.bedTempOverrides[printerId];
 
       this.#logger.warning(
         `BedTemp override for printer ${printerId} already exists, overwriting ${oldTemp} with new temp ${bedTemp}`
       );
     }
-    this.#bedTempOverrides[printerId] = {
+    this.bedTempOverrides[printerId] = {
       bedTemp: bedTemp,
       lastOverride: null,
       silencedOverrides: 0,
@@ -50,7 +50,7 @@ class BedTempOverrideTask {
       return;
     }
 
-    delete this.#bedTempOverrides[printerId];
+    delete this.bedTempOverrides[printerId];
   }
 
   async #onOctoPrintCurrentEvent(fdmEvent, octoPrintEvent, data) {
@@ -62,11 +62,11 @@ class BedTempOverrideTask {
   async #onTemperatureMessage(printerId, event, data) {
     const currentTemps = data.temps[0];
     const currentBedTarget = currentTemps.bed.target;
-    if (currentBedTarget === 0 || !Object.keys(this.#bedTempOverrides).includes(printerId)) {
+    if (currentBedTarget === 0 || !Object.keys(this.bedTempOverrides).includes(printerId)) {
       return;
     }
 
-    const bedTempOverride = this.#bedTempOverrides[printerId];
+    const bedTempOverride = this.bedTempOverrides[printerId];
     const desiredTargetBedTemp = bedTempOverride?.bedTemp;
     if (
       !desiredTargetBedTemp ||
@@ -124,7 +124,7 @@ class BedTempOverrideTask {
   }
 
   #hasOverride(printerId) {
-    return Object.keys(this.#bedTempOverrides).includes(printerId);
+    return Object.keys(this.bedTempOverrides).includes(printerId);
   }
 
   async run() {
