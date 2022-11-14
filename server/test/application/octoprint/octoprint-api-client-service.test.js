@@ -41,7 +41,7 @@ describe("OctoPrint-API-Client-Service", () => {
       async () =>
         await octoPrintApi.getSettings({
           apiKey: "surewhynot",
-          printerURL: "some uwrl"
+          printerURL: "some uwrl",
         })
     ).rejects.toHaveProperty("code", "ERR_INVALID_URL");
   });
@@ -80,6 +80,11 @@ describe("OctoPrint-API-Client-Service", () => {
 
   it("should not throw error on sendJobCommand", async () => {
     const result = await octoPrintApi.sendJobCommand(auth, { select: true });
+    expect(result).toBeUndefined();
+  });
+
+  it("should not throw error on sendBedTempCommand", async () => {
+    const result = await octoPrintApi.sendBedTempCommand(auth, 50);
     expect(result).toBeUndefined();
   });
 

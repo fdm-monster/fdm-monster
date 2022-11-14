@@ -2,12 +2,12 @@
   "name": "fdm-monster",
   "author": "David Zwart",
   "license": "LGPL-3.0-or-later",
-  "version": "1.2.0-rc7",
+  "version": "1.2.0-rc8",
   "description": "FDM Monster is a bulk OctoPrint manager to set up, configure and monitor 3D printers. Our aim is to provide extremely optimized websocket performance and reliability.",
-  "main": "index.js",
+  "main": "index.mjs",
   "scripts": {
     "prestart": "npm ci --production",
-    "start": "pm2 flush && pm2 start index.js --name FDM -e ./logs/pm2.error.log -o ./logs/pm2.out.log --time --restart-delay=1000 --update-env --exp-backoff-restart-delay=1500",
+    "start": "pm2 flush && pm2 start index.mjs --name FDM -e ./logs/pm2.error.log -o ./logs/pm2.out.log --time --restart-delay=1000 --update-env --exp-backoff-restart-delay=1500",
     "restart": "pm2 restart FDM",
     "pupdate": "pm2 update",
     "stop": "pm2 stop FDM",
@@ -16,7 +16,7 @@
     "migration:down": "migrate-mongo down",
     "migration:status": "migrate-mongo status",
     "format": "prettier --write \"src/**/*.js\" \"test/**/*.js\"",
-    "dev": "nodemon index.js",
+    "dev": "nodemon index.mjs",
     "test": "jest --forceExit",
     "test:cov": "jest --forceExit --coverage",
     "cov:show": "./coverage/lcov-report/index.html"
@@ -26,7 +26,7 @@
     "url": "https://github.com/fdm-monster/fdm-monster"
   },
   "bin": {
-    "fdm-monster": "./index.js"
+    "fdm-monster": "./index.mjs"
   },
   "keywords": [
     "fdm-monster",
@@ -40,7 +40,7 @@
     "vue"
   ],
   "dependencies": {
-    "@fdm-monster/client": "0.6.0-alpha",
+    "@fdm-monster/client": "0.6.0-alpha2",
     "@influxdata/influxdb-client": "^1.31.0",
     "awilix": "8.0.0",
     "awilix-express": "8.0.0",
@@ -57,7 +57,6 @@
     "form-data": "4.0.0",
     "got": "11.8.5",
     "helmet": "6.0.0",
-    "line-reader": "^0.4.0",
     "lodash": "4.17.21",
     "luxon": "3.1.0",
     "migrate-mongo": "9.0.0",
@@ -66,7 +65,6 @@
     "node-input-validator": "4.5.0",
     "passport": "0.6.0",
     "passport-local": "1.0.0",
-    "replace-in-file": "^6.3.5",
     "rxjs": "7.5.7",
     "rxjs-websockets": "9.0.0",
     "semver": "7.3.8",
@@ -101,10 +99,12 @@
   "resolutions": {
     "got": "11.8.5"
   },
+  "ignore-engines": false,
   "engine-strict": true,
   "engines": {
-    "node": ">= 14.0.0",
-    "npm": ">= 6.10.0"
+    "node": ">= 16.0.0",
+    "npm": ">= 8.1.4",
+    "yarn": ">= 1.22.10"
   },
   "nodemonConfig": {
     "verbose": false,

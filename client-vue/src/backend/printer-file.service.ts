@@ -25,9 +25,14 @@ export class PrinterFileService extends BaseService {
     return (await this.getApi(path)) as PrinterFileCache;
   }
 
-  static async selectAndPrintFile(printerId: string, filePath: string, print = true) {
+  static async selectAndPrintFile(
+    printerId: string,
+    filePath: string,
+    print = true,
+    bedTemp: number | null = null
+  ) {
     const path = ServerApi.printerFilesSelectAndPrintRoute(printerId);
-    return await this.postApi(path, { filePath, print });
+    return await this.postApi(path, { filePath, print, bedTemp });
   }
 
   static async uploadStubFile(printerId: string, files: File[]) {

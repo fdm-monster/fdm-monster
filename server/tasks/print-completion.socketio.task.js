@@ -1,4 +1,7 @@
-const { octoPrintWebsocketEvent } = require("../constants/event.constants");
+const {
+  octoPrintWebsocketEvent,
+  fdmMonsterPrinterStoppedEvent,
+} = require("../constants/event.constants");
 const { EVENT_TYPES } = require("../services/octoprint/constants/octoprint-websocket.constants");
 const { generateCorrelationToken } = require("../utils/correlation-token.util");
 const { IO_MESSAGES } = require("../state/socket-io.gateway");
@@ -19,8 +22,8 @@ class PrintCompletionSocketIoTask {
     this.#logger = loggerFactory(PrintCompletionSocketIoTask.name);
 
     let that = this;
-    this.#eventEmitter2.on(octoPrintWebsocketEvent("*"), async function (data1, data2) {
-      await that.handleMessage(this.event, data1, data2);
+    this.#eventEmitter2.on(octoPrintWebsocketEvent("*"), async function (octoPrintEvent, data) {
+      await that.handleMessage(this.event, octoPrintEvent, data);
     });
   }
 
@@ -85,6 +88,8 @@ class PrintCompletionSocketIoTask {
     } else if (data.type === EVENT_TYPES.PrintFailed || data.type === EVENT_TYPES.PrintDone) {
       completion.context = this.#contextCache[printerId] || {};
       await this.#printCompletionService.create(completion);
+
+      this.#eventEmitter2.emit(fdmMonsterPrinterStoppedEvent(printerId));
 
       // Clear the context now
       this.#contextCache[printerId] = {};

@@ -61,9 +61,12 @@
             v-on="on"
           >
             <span v-if="printer.disabledReason">
-              MAINTENANCE <v-icon class="d-none d-xl-inline" color="primary" small>info</v-icon>
+              <small> MAINTENANCE</small>
+              <v-icon class="d-none d-xl-inline" color="primary" small>info</v-icon>
             </span>
-            <span v-else>{{ printer.printerState.state?.toUpperCase() }}</span>
+            <span v-else>
+              <small>{{ printer.printerState.state?.toUpperCase() }}</small>
+            </span>
           </small>
         </template>
         Maintenance reason: <br />

@@ -476,7 +476,8 @@ export const usePrintersStore = defineStore("Printers", {
         return;
       }
 
-      await PrinterFileService.selectAndPrintFile(printerId, fullPath);
+      const bedTemp = this.bedTempOverride ? this.bedTemp : null;
+      await PrinterFileService.selectAndPrintFile(printerId, fullPath, true, bedTemp);
     },
   },
 });

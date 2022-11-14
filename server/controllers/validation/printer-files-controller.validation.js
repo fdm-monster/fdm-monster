@@ -2,11 +2,6 @@ const getFilesRules = {
   recursive: "required|boolean",
 };
 
-const selectAndPrintFileRules = {
-  filePath: "required|string",
-  print: "required|boolean",
-};
-
 const uploadFileRules = {};
 
 const getFileRules = {
@@ -23,10 +18,19 @@ const moveFileOrFolderRules = {
   destination: "required|string",
 };
 
+const minBedTemp = 30;
+const maxBedTemp = 80;
+
 const fileUploadCommandsRules = {
   select: "boolean",
   print: "required|boolean",
-  bedTemp: "integer|between:0,80",
+  bedTemp: `integer|between:${minBedTemp},${maxBedTemp}`,
+};
+
+const selectAndPrintFileRules = {
+  filePath: "required|string",
+  print: "required|boolean",
+  bedTemp: `integer|between:${minBedTemp},${maxBedTemp}`,
 };
 
 const localFileUploadRules = {
@@ -36,6 +40,8 @@ const localFileUploadRules = {
 };
 
 module.exports = {
+  minBedTemp,
+  maxBedTemp,
   getFilesRules,
   selectAndPrintFileRules,
   localFileUploadRules,

@@ -50,6 +50,7 @@ const DITokens = {
   // Tasks
   serverTasks: "serverTasks",
   bootTask: "bootTask",
+  bedTempOverrideTask: "bedTempOverrideTask",
   printerSystemTask: "printerSystemTask",
   softwareUpdateTask: "softwareUpdateTask",
   printerSocketIoTask: "printerSocketIoTask",

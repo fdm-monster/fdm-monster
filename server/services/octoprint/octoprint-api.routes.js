@@ -14,6 +14,7 @@ class OctoPrintRoutes {
   apiConnection = `${this.apiBase}/connection`;
   apiJob = `${this.apiBase}/job`;
   apiPrinterOperations = `${this.apiBase}/printer`;
+  apiPrinterBed = `${this.apiPrinterOperations}/bed`;
   apiPrinterCustomCommand = `${this.apiPrinterOperations}/command`;
   apiPrinterProfiles = `${this.apiBase}/printerprofiles`;
   apiSystem = `${this.apiBase}/system`;
@@ -56,6 +57,10 @@ class OctoPrintRoutes {
 
   get connectCommand() {
     return { command: "connect" };
+  }
+
+  getBedTargetCommand(targetTemperature) {
+    return { command: "target", target: targetTemperature };
   }
 
   pluginManagerPlugin = (pluginName) => `${this.pluginManager}/${pluginName}`;

@@ -43,10 +43,14 @@ class OctoPrintApiService extends OctoPrintRoutes {
     return processResponse(response, responseOptions);
   }
 
-  async sendCustomGCodeCommand(printer, commandString, responseOptions) {
-    const { url, options, data } = this._prepareJsonRequest(printer, this.apiPrinterCustomCommand, {
-      command: commandString,
-    });
+  async sendCustomGCodeCommand(printerLogin, commandString, responseOptions) {
+    const { url, options, data } = this._prepareJsonRequest(
+      printerLogin,
+      this.apiPrinterCustomCommand,
+      {
+        command: commandString,
+      }
+    );
     const response = await this._httpClient.post(url, data, options);
     return processResponse(response, responseOptions);
   }
@@ -58,14 +62,24 @@ class OctoPrintApiService extends OctoPrintRoutes {
    * @param responseOptions
    * @returns {Promise<*|{data: *, status: *}>}
    */
-  async sendJobCommand(printer, commandData, responseOptions) {
-    const { url, options, data } = this._prepareJsonRequest(printer, this.apiJob, commandData);
+  async sendJobCommand(printerLogin, commandData, responseOptions) {
+    const { url, options, data } = this._prepareJsonRequest(printerLogin, this.apiJob, commandData);
     const response = await this._httpClient.post(url, data, options);
     return processResponse(response, responseOptions);
   }
 
-  async getSettings(printer, responseOptions) {
-    const { url, options } = this._prepareRequest(printer, this.apiSettingsPart);
+  async sendBedTempCommand(printerLogin, targetTemp, responseOptions) {
+    const { url, options, data } = this._prepareJsonRequest(
+      printerLogin,
+      this.apiPrinterBed,
+      this.getBedTargetCommand(targetTemp)
+    );
+    const response = await this._httpClient.post(url, data, options);
+    return processResponse(response, responseOptions);
+  }
+
+  async getSettings(printerLogin, responseOptions) {
+    const { url, options } = this._prepareRequest(printerLogin, this.apiSettingsPart);
     const response = await this._httpClient.get(url, options);
     return processResponse(response, responseOptions);
   }
@@ -197,7 +211,7 @@ class OctoPrintApiService extends OctoPrintRoutes {
 
       // Cleanup
       if (isPhysicalFile) {
-        fs.unlinkSync(fileStreamOrBuffer.path);
+        // fs.unlinkSync(fileStreamOrBuffer.path);
       }
 
       return await processGotResponse(response, responseOptions);
