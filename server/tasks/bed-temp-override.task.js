@@ -4,11 +4,15 @@ const {
   fdmMonsterPrinterStoppedEvent,
   fdmPrinterEventToPrinterId,
 } = require("../constants/event.constants");
+const {
+  minBedTemp,
+  maxBedTemp,
+} = require("../controllers/validation/printer-files-controller.validation");
 
 class BedTempOverrideTask {
   #bedTempOverrides = {}; // bedTemp, lastOverride, silencedOverrides
   // Time in msec between an override call
-  #minDeltaTimeOverride = 50000;
+  #minDeltaTimeOverride = 10000;
   #resetSilencedOveridesMax = 10;
 
   #logger;
@@ -58,13 +62,17 @@ class BedTempOverrideTask {
   async #onTemperatureMessage(printerId, event, data) {
     const currentTemps = data.temps[0];
     const currentBedTarget = currentTemps.bed.target;
-    if (!Object.keys(this.#bedTempOverrides).includes(printerId)) {
+    if (currentBedTarget === 0 || !Object.keys(this.#bedTempOverrides).includes(printerId)) {
       return;
     }
 
     const bedTempOverride = this.#bedTempOverrides[printerId];
     const desiredTargetBedTemp = bedTempOverride?.bedTemp;
-    if (!desiredTargetBedTemp || desiredTargetBedTemp > 80 || desiredTargetBedTemp < 30) {
+    if (
+      !desiredTargetBedTemp ||
+      desiredTargetBedTemp > maxBedTemp ||
+      desiredTargetBedTemp < minBedTemp
+    ) {
       return;
     }
 

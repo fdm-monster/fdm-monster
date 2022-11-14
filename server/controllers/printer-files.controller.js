@@ -168,7 +168,18 @@ class PrinterFilesController {
 
   async selectAndPrintFile(req, res) {
     const { currentPrinterId, printerLogin } = getScopedPrinter(req, [printerLoginToken]);
-    const { filePath: path, print } = await validateInput(req.body, selectAndPrintFileRules);
+    const {
+      filePath: path,
+      print,
+      bedTemp,
+    } = await validateInput(req.body, selectAndPrintFileRules);
+
+    // Add BedTemp override modifier to FDM Monster
+    if (bedTemp) {
+      this.#bedTempOverrideTask.addBedTempOverride(currentPrinterId, parseInt(bedTemp));
+    } else {
+      this.#logger.info("BedTemp of print will not be watched");
+    }
 
     const result = await this.#octoPrintApiService.selectPrintFile(printerLogin, path, print);
 
@@ -197,11 +208,11 @@ class PrinterFilesController {
     const { print, select, bedTemp } = await validateInput(req.body, fileUploadCommandsRules);
     const uploadedFile = files[0];
 
-    // Replace BedTemp in GCode
+    // Add BedTemp override modifier to FDM Monster
     if (bedTemp) {
-      this.#bedTempOverrideTask.addBedTempOverride(currentPrinterId, bedTemp);
+      this.#bedTempOverrideTask.addBedTempOverride(currentPrinterId, parseInt(bedTemp));
     } else {
-      this.#logger.info("BedTemp not overwritten");
+      this.#logger.info("BedTemp of print will not be watched");
     }
 
     // Perform specific file clean if configured
