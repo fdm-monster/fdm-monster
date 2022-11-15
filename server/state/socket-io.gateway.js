@@ -1,4 +1,5 @@
 const { Server } = require("socket.io");
+const { socketIoConnectedEvent } = require("../constants/event.constants");
 
 class SocketIoGateway {
   #logger;
@@ -20,6 +21,7 @@ class SocketIoGateway {
 
   onConnect(socket) {
     this.#logger.info("SocketIO Client connected", socket.id);
+    this.#eventEmitter2.emit(socketIoConnectedEvent, socket.id);
 
     socket.on("disconnect", () => {
       this.#logger.info("SocketIO Client disconnected", socket.id);
