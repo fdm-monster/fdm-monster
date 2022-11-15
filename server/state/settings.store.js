@@ -1,5 +1,8 @@
 const { InternalServerException } = require("../exceptions/runtime.exceptions");
-const { printerFileCleanSettingKey } = require("../constants/server-settings.constants");
+const {
+  printerFileCleanSettingKey,
+  serverSettingKey,
+} = require("../constants/server-settings.constants");
 
 class SettingsStore {
   #serverSettings;
@@ -19,7 +22,7 @@ class SettingsStore {
       throw new InternalServerException(
         "Could not check server settings (server settings not loaded"
       );
-    return this.#serverSettings.server.registration;
+    return this.#serverSettings[serverSettingKey].registration;
   }
 
   getServerSettings() {
@@ -42,15 +45,21 @@ class SettingsStore {
 
   async setRegistrationEnabled(enabled = true) {
     this.#serverSettings = await this.#serverSettingsService.setRegistrationEnabled(enabled);
+    return this.getServerSettings();
   }
 
   async setLoginRequired(enabled = true) {
     this.#serverSettings = await this.#serverSettingsService.setLoginRequired(enabled);
+    return this.getServerSettings();
+  }
+
+  async setWhitelist(enabled = true, ipAddresses) {
+    this.#serverSettings = await this.#serverSettingsService.setWhitelist(enabled, ipAddresses);
+    return this.getServerSettings();
   }
 
   async updateServerSettings(fullUpdate) {
     this.#serverSettings = await this.#serverSettingsService.update(fullUpdate);
-
     return this.getServerSettings();
   }
 }

@@ -1,11 +1,16 @@
 const { AppConstants } = require("../server.constants");
 
-const server = {
+const getDefaultWhitelistIpAddresses = () => ["::12", "127.0.0.1"];
+
+const serverSettingKey = "server";
+const getDefaultServerSettings = () => ({
   port: AppConstants.defaultServerPort,
   uploadFolder: AppConstants.defaultFileStorageFolder,
   registration: true,
+  whitelistEnabled: false,
+  whitelistedIpAddresses: getDefaultWhitelistIpAddresses(),
   loginRequired: false,
-};
+});
 
 const getDefaultTimeout = () => ({
   apiTimeout: 1000,
@@ -22,15 +27,17 @@ const getDefaultPrinterFileCleanSettings = () => ({
 });
 
 const getDefaultSettings = () => ({
-  server,
+  server: getDefaultServerSettings(),
   [printerFileCleanSettingKey]: getDefaultPrinterFileCleanSettings(),
   timeout: getDefaultTimeout(),
 });
 
 module.exports = {
-  server,
+  serverSettingKey,
+  getDefaultServerSettings,
   getDefaultTimeout,
   printerFileCleanSettingKey,
+  getDefaultWhitelistIpAddresses,
   getDefaultPrinterFileCleanSettings,
   getDefaultSettings,
 };

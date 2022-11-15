@@ -54,21 +54,21 @@ export default defineComponent({
   data: (): Data => ({
     items: [
       {
-        title: "Printer floors",
-        icon: "house_siding",
-        path: "/settings/printer-floors",
-      },
-      {
         title: "Printer groups",
         icon: "dashboard",
         path: "/settings/printer-groups",
+      },
+      {
+        title: "Printer floors",
+        icon: "house_siding",
+        path: "/settings/printer-floors",
       },
       {
         title: "User Management",
         icon: "group",
         path: "/settings/user-management",
       },
-      { title: "FDM settings", icon: "image", path: "/settings/system" },
+      { title: "FDM Monster settings", icon: "image", path: "/settings/system" },
       { title: "Other", icon: "help", path: "/settings/other" },
     ],
   }),
