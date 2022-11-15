@@ -15,22 +15,23 @@
     </v-btn-toggle>
     <v-spacer></v-spacer>
 
-    <div>
+    <div align="center" class="mt-4 ml-2">
       <v-checkbox
         v-model="bedTempOverrideEnabled"
-        label="Override bedtemp"
+        label="Override BedTemp (0-100 degr)"
         @change="saveBedTemperatureOverride"
       ></v-checkbox>
     </div>
-    <div align="center" class="ml-2">
-      <v-select
+    <div align="center" class="mt-8 ml-2">
+      <v-text-field
         v-model="bedTemperature"
         :disabled="!bedTempOverrideEnabled"
-        :items="bedTempOptions"
-        hint="Select bedtemp override"
-        persistent-hint
+        min="0"
+        max="100"
         @change="saveBedTemperature"
-      ></v-select>
+        outlined
+        type="number"
+      />
     </div>
   </v-toolbar>
 </template>
@@ -51,13 +52,11 @@ export default defineComponent({
     selectedFloorToggleIndex: number;
     bedTempOverrideEnabled: boolean;
     bedTemperature: number;
-    bedTempOptions: number[];
   } {
     return {
       selectedFloorToggleIndex: 0,
-      bedTempOverrideEnabled: true,
+      bedTempOverrideEnabled: false,
       bedTemperature: 50,
-      bedTempOptions: [50, 60],
     };
   },
   computed: {

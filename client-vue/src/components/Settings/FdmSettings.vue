@@ -54,8 +54,8 @@
             Disable GCode analysis on all printers at once, preventing CPU intensive and inaccurate
             time/size estimates.
             <br />
-            <v-btn color="primary" @click="bulkDisableGCodeAnalysis()"
-              >Bulk disable GCode Analysis
+            <v-btn color="primary" @click="bulkDisableGCodeAnalysis()">
+              Bulk disable GCode Analysis
             </v-btn>
           </v-list-item-subtitle>
         </v-list-item-content>
