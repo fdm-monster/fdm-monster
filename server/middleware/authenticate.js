@@ -1,5 +1,7 @@
 const { inject } = require("awilix-express");
 const { AuthorizationError, AuthenticationError } = require("../exceptions/runtime.exceptions");
+const { asValue } = require("awilix");
+const { serverSettingKey } = require("../constants/server-settings.constants");
 
 function authorizePermission(permission) {
   return inject(({ permissionService, roleService }) => async (req, res, next) => {
@@ -17,11 +19,27 @@ function authorizePermission(permission) {
 }
 
 module.exports = {
+  validateWhitelistedIp: inject(({ settingsStore }) => async (req, res, next) => {
+    const serverSettings = settingsStore.getServerSettings();
+    if (!serverSettings) next();
+
+    const whitelist = serverSettings[serverSettingKey].whitelistedIpAddresses;
+    const ipAddress = req.connection.remoteAddress;
+    req.container.register({
+      whitelistedIp: asValue({
+        whitelisted: whitelist?.includes(ipAddress),
+        ipAddress: ipAddress,
+        whitelist,
+      }),
+    });
+
+    next();
+  }),
   authenticate: () =>
     inject(({ settingsStore }) => async (req, res, next) => {
       const serverSettings = settingsStore.getServerSettings();
 
-      if (!serverSettings?.server?.loginRequired) {
+      if (serverSettings && !serverSettings[serverSettingKey]?.loginRequired) {
         return next();
       }
       if (req.isAuthenticated()) {
@@ -41,7 +59,7 @@ module.exports = {
   authorizePermission,
   withPermission(permission) {
     return {
-      before: [authorizePermission(permission)]
+      before: [authorizePermission(permission)],
     };
-  }
+  },
 };

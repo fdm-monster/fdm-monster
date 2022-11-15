@@ -9,6 +9,7 @@ const { interceptRoles } = require("./middleware/authorization");
 const helmet = require("helmet");
 const { AppConstants } = require("./server.constants");
 const { interceptDatabaseError } = require("./middleware/database");
+const { validateWhitelistedIp } = require("./middleware/authenticate");
 
 function setupNormalServer() {
   const httpServer = express();
@@ -44,7 +45,9 @@ function setupNormalServer() {
     .use(passport.session())
     .use(scopePerRequest(container))
     .use(interceptDatabaseError)
-    .use(interceptRoles);
+    // Global guards
+    .use(interceptRoles)
+    .use(validateWhitelistedIp);
 
   return {
     httpServer,

@@ -6,6 +6,7 @@ const {
   printerFileCleanSettingKey,
   getDefaultPrinterFileCleanSettings,
   getDefaultSettings,
+  serverSettingKey,
 } = require("../../constants/server-settings.constants");
 
 let request;
@@ -30,7 +31,7 @@ describe("SettingsController", () => {
     const response = await request.get(serverRoute).send();
     expect(response.body).not.toBeNull();
     expect(response.body).toMatchObject(getDefaultSettings());
-    expect(response.body.server.registration).toBeTruthy();
+    expect(response.body[serverSettingKey].registration).toBeTruthy();
     expect(response.body[printerFileCleanSettingKey]).toMatchObject(
       getDefaultPrinterFileCleanSettings()
     );
