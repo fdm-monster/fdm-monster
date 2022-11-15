@@ -44,14 +44,14 @@ export default defineComponent({
   components: {},
   setup() {
     return {
-      printersStore: usePrintersStore()
+      printersStore: usePrintersStore(),
     };
   },
   data(): {
     selectedFloorToggleIndex: number;
   } {
     return {
-      selectedFloorToggleIndex: 0
+      selectedFloorToggleIndex: 0,
     };
   },
   computed: {
@@ -61,7 +61,7 @@ export default defineComponent({
       },
       set(value: boolean) {
         this.printersStore.setBedTempOverride(value);
-      }
+      },
     },
     bedTempOverride: {
       get() {
@@ -69,17 +69,17 @@ export default defineComponent({
       },
       set(value: number) {
         this.printersStore.setBedTemp(value);
-      }
+      },
     },
     floors() {
       return this.printersStore.printerFloors;
-    }
+    },
   },
   methods: {
     changeFloorIndex(index: any) {
       this.printersStore.changeSelectedFloorByIndex(index);
       this.selectedFloorToggleIndex = index;
-    }
-  }
+    },
+  },
 });
 </script>
