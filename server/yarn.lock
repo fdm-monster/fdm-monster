@@ -1056,10 +1056,10 @@
     minimatch "^3.1.2"
     strip-json-comments "^3.1.1"
 
-"@fdm-monster/client@0.6.1":
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/@fdm-monster/client/-/client-0.6.1.tgz#98e185b85273834443b0886bc5390573a2b98ba3"
-  integrity sha512-xN0fzuc0ioMXkvWhwIaOAoq2UXD8eXVty9Byh6DkhjEhgjU3enfcBTuqY0TwyHYUlLsJAAZk451I4R4KfJs97A==
+"@fdm-monster/client@0.6.2":
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/@fdm-monster/client/-/client-0.6.2.tgz#cd8c19db6e6ff76cee819d6419239f1c01a0b4c2"
+  integrity sha512-OeIwH+TXhIUL9LqbtzpMHNEa5ghDmQqPUTJ6V7imrKQy2ym2hutbeJ+a6ke1LB2/wrifPB1BSZF/Dr7XB4nRpw==
 
 "@humanwhocodes/config-array@^0.11.6":
   version "0.11.7"
