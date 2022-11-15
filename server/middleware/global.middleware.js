@@ -17,7 +17,8 @@ module.exports = {
     const whitelist = serverSettings[serverSettingKey].whitelistedIpAddresses;
     const ipAddress = req.connection.remoteAddress;
     // Empty whitelist is treated as disabled as well
-    if (whitelist?.length && !whitelist.includes(ipAddress)) {
+    // Both ::ffff:127.0.0.1 and 127.0.0.1 will be accepted
+    if (whitelist?.length && !whitelist.includes(ipAddress) && ipAddress !== "::ffff:127.0.0.1") {
       // Direct comparison did not pass - now parse wildcard subnets
       const subnextMatched = whitelist.find((w) => {
         return ipAddress.startsWith(w);
