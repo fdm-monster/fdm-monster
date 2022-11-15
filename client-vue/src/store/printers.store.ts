@@ -9,6 +9,7 @@ import { CreatePrinter } from "@/models/printers/crud/create-printer.model";
 import { CreatePrinterGroup } from "@/models/printer-groups/crud/create-printer-group.model";
 import { PrinterFloorService } from "@/backend/printer-floor.service";
 import { PrinterJobService } from "@/backend/printer-job.service";
+import { defaultBedTemp, defaultBedTempOverride } from "@/constants/app.constants";
 
 const horizontalOffset = 1;
 
@@ -38,8 +39,8 @@ export const usePrintersStore = defineStore("Printers", {
     floors: [],
     selectedFloor: undefined,
 
-    bedTempOverride: true,
-    bedTemp: 50,
+    bedTempOverride: defaultBedTempOverride,
+    bedTemp: defaultBedTemp,
     sideNavPrinter: undefined,
     updateDialogPrinter: undefined,
     updateDialogPrinterGroup: undefined,
@@ -146,7 +147,7 @@ export const usePrintersStore = defineStore("Printers", {
     setBedTemp(bedTemp: number = 50) {
       this.bedTemp = bedTemp;
     },
-    setBedTempOverride(bedTempOverride: boolean = true) {
+    setBedTempOverride(bedTempOverride: boolean) {
       this.bedTempOverride = bedTempOverride;
     },
     async createPrinter(newPrinter: CreatePrinter) {

@@ -39,6 +39,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { usePrintersStore } from "@/store/printers.store";
+import { defaultBedTemp, defaultBedTempOverride } from "@/constants/app.constants";
 
 export default defineComponent({
   name: "HomeToolbar",
@@ -55,8 +56,8 @@ export default defineComponent({
   } {
     return {
       selectedFloorToggleIndex: 0,
-      bedTempOverrideEnabled: false,
-      bedTemperature: 50,
+      bedTempOverrideEnabled: defaultBedTempOverride,
+      bedTemperature: defaultBedTemp,
     };
   },
   computed: {
