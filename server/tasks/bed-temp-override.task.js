@@ -61,8 +61,8 @@ class BedTempOverrideTask {
 
   async #onTemperatureMessage(printerId, event, data) {
     const currentTemps = data.temps[0];
-    const currentBedTarget = currentTemps.bed.target;
-    if (currentBedTarget === 0 || !Object.keys(this.bedTempOverrides).includes(printerId)) {
+    const currentBedTarget = currentTemps.bed?.target;
+    if (!currentBedTarget || !Object.keys(this.bedTempOverrides).includes(printerId)) {
       return;
     }
 

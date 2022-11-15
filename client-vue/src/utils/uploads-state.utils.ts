@@ -23,8 +23,8 @@ export function convertPrinterMultiFileToQueue(
     const commands: FileUploadCommands = {
       select: false,
       print: false,
-      overrideBedTemp: overrideBedTemp,
-      bedTemp: bedTemp,
+      overrideBedTemp,
+      bedTemp,
     };
     if (f.name === printedFileName) {
       commands.print = true;
