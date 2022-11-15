@@ -18,8 +18,8 @@ const moveFileOrFolderRules = {
   destination: "required|string",
 };
 
-const minBedTemp = 30;
-const maxBedTemp = 80;
+const minBedTemp = 0;
+const maxBedTemp = 100;
 
 const fileUploadCommandsRules = {
   select: "boolean",
