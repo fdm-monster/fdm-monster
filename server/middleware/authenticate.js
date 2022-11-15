@@ -19,19 +19,24 @@ function authorizePermission(permission) {
 }
 
 module.exports = {
-  validateWhitelistedIp: inject(({ settingsStore }) => async (req, res, next) => {
+  validateWhitelistedIp: inject(({ settingsStore, loggerFactory }) => async (req, res, next) => {
+    const logger = loggerFactory("validateWhitelistedIp");
     const serverSettings = settingsStore.getServerSettings();
-    if (!serverSettings) next();
+    if (
+      (serverSettings && !serverSettings[serverSettingKey]) ||
+      serverSettings[serverSettingKey]?.whitelistEnabled
+    ) {
+      next();
+    }
 
     const whitelist = serverSettings[serverSettingKey].whitelistedIpAddresses;
     const ipAddress = req.connection.remoteAddress;
-    req.container.register({
-      whitelistedIp: asValue({
-        whitelisted: whitelist?.includes(ipAddress),
-        ipAddress: ipAddress,
-        whitelist,
-      }),
-    });
+    // Empty whitelist is treated as disabled as well
+    if (whitelist?.length && !whitelist.includes(ipAddress)) {
+      logger.error("IP was not whitelisted ", req.connection.remoteAddress);
+      const err = new Error("Bad IP: " + req.connection.remoteAddress);
+      next(err);
+    }
 
     next();
   }),

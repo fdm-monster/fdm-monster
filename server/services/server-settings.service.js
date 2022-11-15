@@ -6,6 +6,7 @@ const {
   printerFileCleanSettingKey,
   getDefaultPrinterFileCleanSettings,
   getDefaultWhitelistIpAddresses,
+  serverSettingKey,
 } = require("../constants/server-settings.constants");
 
 class ServerSettingsService {
@@ -61,7 +62,18 @@ class ServerSettingsService {
 
   async setLoginRequired(enabled = true) {
     const settingsDoc = await this.getOrCreate();
-    settingsDoc.server.loginRequired = enabled;
+    settingsDoc[serverSettingKey].loginRequired = enabled;
+
+    return ServerSettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
+      new: true,
+    });
+  }
+
+  async setWhitelist(enabled, ipAddresses) {
+    const settingsDoc = await this.getOrCreate();
+    const settings = settingsDoc[serverSettingKey];
+    settings.whitelistEnabled = enabled;
+    settings.whitelistedIpAddresses = ipAddresses;
 
     return ServerSettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
       new: true,

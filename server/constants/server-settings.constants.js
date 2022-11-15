@@ -7,6 +7,7 @@ const getDefaultServerSettings = () => ({
   port: AppConstants.defaultServerPort,
   uploadFolder: AppConstants.defaultFileStorageFolder,
   registration: true,
+  whitelistEnabled: false,
   whitelistedIpAddresses: getDefaultWhitelistIpAddresses(),
   loginRequired: false,
 });

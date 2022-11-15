@@ -45,15 +45,21 @@ class SettingsStore {
 
   async setRegistrationEnabled(enabled = true) {
     this.#serverSettings = await this.#serverSettingsService.setRegistrationEnabled(enabled);
+    return this.getServerSettings();
   }
 
   async setLoginRequired(enabled = true) {
     this.#serverSettings = await this.#serverSettingsService.setLoginRequired(enabled);
+    return this.getServerSettings();
+  }
+
+  async setWhitelist(enabled = true, ipAddresses) {
+    this.#serverSettings = await this.#serverSettingsService.setWhitelist(enabled, ipAddresses);
+    return this.getServerSettings();
   }
 
   async updateServerSettings(fullUpdate) {
     this.#serverSettings = await this.#serverSettingsService.update(fullUpdate);
-
     return this.getServerSettings();
   }
 }
