@@ -7,6 +7,8 @@ const PEVENTS = {
   plugin: "plugin",
 };
 
+const socketIoConnectedEvent = "socketio.connected";
+
 const octoPrintWebsocketEvent = (printerId) => `octoprint.${printerId}`;
 const octoPrintWebsocketCurrentEvent = (printerId) => `octoprint.${printerId}.current`;
 const uploadProgressEvent = (token) => `upload.progress.${token}`;
@@ -17,6 +19,7 @@ const fdmMonsterPrinterStoppedEvent = (printerId) => `${prefix}.${printerId}.pri
 const fdmPrinterEventToPrinterId = (event) => event.split(".")[1];
 
 module.exports = {
+  socketIoConnectedEvent,
   PEVENTS,
   uploadProgressEvent,
   firmwareFlashUploadEvent,

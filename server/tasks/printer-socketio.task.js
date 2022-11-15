@@ -1,5 +1,6 @@
 const { byteCount } = require("../utils/benchmark.util");
 const { IO_MESSAGES } = require("../state/socket-io.gateway");
+const { socketIoConnectedEvent } = require("../constants/event.constants");
 
 class PrinterSocketIoTask {
   #socketIoGateway;
@@ -8,6 +9,7 @@ class PrinterSocketIoTask {
   #printerFloorsCache;
   #fileUploadTrackerCache;
   #influxDbQueryTask;
+  #eventEmitter2;
 
   #aggregateSizeCounter = 0;
   #aggregateWindowLength = 100;
@@ -23,6 +25,7 @@ class PrinterSocketIoTask {
     loggerFactory,
     fileUploadTrackerCache,
     influxDbQueryTask,
+    eventEmitter2,
   }) {
     this.#socketIoGateway = socketIoGateway;
     this.#printersStore = printersStore;
@@ -31,9 +34,18 @@ class PrinterSocketIoTask {
     this.#printerFloorsCache = printerFloorsCache;
     this.#influxDbQueryTask = influxDbQueryTask;
     this.#logger = loggerFactory(PrinterSocketIoTask.name);
+    this.#eventEmitter2 = eventEmitter2;
+
+    this.#eventEmitter2.on(socketIoConnectedEvent, async () => {
+      await this.sendUpdate();
+    });
   }
 
   async run() {
+    await this.sendUpdate();
+  }
+
+  async sendUpdate() {
     const floors = await this.#printerFloorsCache.listCache();
     const printerStates = this.#printersStore.listPrintersFlat();
     const printerGroups = this.#printerGroupsCache.getCache();
