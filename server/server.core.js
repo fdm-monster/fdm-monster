@@ -5,11 +5,10 @@ const passport = require("passport");
 const { configureContainer } = require("./container");
 const { scopePerRequest } = require("awilix-express");
 const cors = require("cors");
-const { interceptRoles } = require("./middleware/authorization");
 const helmet = require("helmet");
 const { AppConstants } = require("./server.constants");
 const { interceptDatabaseError } = require("./middleware/database");
-const { validateWhitelistedIp } = require("./middleware/authenticate");
+const { validateWhitelistedIp, interceptRoles } = require("./middleware/global.middleware");
 
 function setupNormalServer() {
   const httpServer = express();
@@ -46,8 +45,8 @@ function setupNormalServer() {
     .use(scopePerRequest(container))
     .use(interceptDatabaseError)
     // Global guards
-    .use(interceptRoles)
-    .use(validateWhitelistedIp);
+    .use(validateWhitelistedIp)
+    .use(interceptRoles);
 
   return {
     httpServer,

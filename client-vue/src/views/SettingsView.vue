@@ -54,14 +54,14 @@ export default defineComponent({
   data: (): Data => ({
     items: [
       {
-        title: "Printer floors",
-        icon: "house_siding",
-        path: "/settings/printer-floors",
-      },
-      {
         title: "Printer groups",
         icon: "dashboard",
         path: "/settings/printer-groups",
+      },
+      {
+        title: "Printer floors",
+        icon: "house_siding",
+        path: "/settings/printer-floors",
       },
       {
         title: "User Management",

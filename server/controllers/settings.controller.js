@@ -22,6 +22,9 @@ class SettingsController {
       req.body,
       whitelistSettingRules
     );
+    if (!whitelistedIpAddresses.includes("127.0.0.1")) {
+      whitelistedIpAddresses.push("127.0.0.1");
+    }
     const result = await this.#settingsStore.setWhitelist(whitelistEnabled, whitelistedIpAddresses);
     res.send(result);
   }
