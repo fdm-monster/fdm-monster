@@ -29,8 +29,7 @@
     "vue-bus": "1.2.1",
     "vue-router": "3.6.5",
     "vuedraggable": "2.24.3",
-    "vuetify": "2.6.12",
-    "vuex": "3.6.2"
+    "vuetify": "2.6.12"
   },
   "devDependencies": {
     "@types/jest": "29.2.3",
@@ -45,7 +44,6 @@
     "@vue/cli-plugin-router": "5.0.8",
     "@vue/cli-plugin-typescript": "5.0.8",
     "@vue/cli-plugin-unit-jest": "~5.0.0",
-    "@vue/cli-plugin-vuex": "5.0.8",
     "@vue/cli-service": "5.0.8",
     "@vue/eslint-config-prettier": "7.0.0",
     "@vue/eslint-config-typescript": "11.0.2",

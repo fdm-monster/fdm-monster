@@ -2191,7 +2191,7 @@
     jest-transform-stub "^2.0.0"
     jest-watch-typeahead "^1.0.0"
 
-"@vue/cli-plugin-vuex@5.0.8", "@vue/cli-plugin-vuex@^5.0.8":
+"@vue/cli-plugin-vuex@^5.0.8":
   version "5.0.8"
   resolved "https://registry.yarnpkg.com/@vue/cli-plugin-vuex/-/cli-plugin-vuex-5.0.8.tgz#0d4cb3020f9102bea9288d750729dde176c66ccd"
   integrity sha512-HSYWPqrunRE5ZZs8kVwiY6oWcn95qf/OQabwLfprhdpFWAGtLStShjsGED2aDpSSeGAskQETrtR/5h7VqgIlBA==
@@ -9341,11 +9341,6 @@ vuetify@2.6.12:
   version "2.6.12"
   resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-2.6.12.tgz#ef1871c720834d53e00fef142b9841a3e8c1a4f9"
   integrity sha512-qe3hcMpWmT1O15tp+p65lOS7UKZ/hQYQktCsw9iXx2u3RwVbX6GR82gY2iROrKsiAzYDvMgrYxWQwY/pUfkekw==
-
-vuex@3.6.2:
-  version "3.6.2"
-  resolved "https://registry.yarnpkg.com/vuex/-/vuex-3.6.2.tgz#236bc086a870c3ae79946f107f16de59d5895e71"
-  integrity sha512-ETW44IqCgBpVomy520DT5jf8n0zoCac+sxWnn+hMe/CzaSejb/eVw2YToiXYX+Ex/AuHHia28vWTq4goAexFbw==
 
 w3c-hr-time@^1.0.2:
   version "1.0.2"
