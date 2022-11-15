@@ -14,6 +14,7 @@ let container;
 
 const defaultRoute = `${AppConstants.apiRoute}/settings`;
 const serverRoute = `${defaultRoute}/server`;
+const serverWhitelistRoute = `${serverRoute}/whitelist`;
 
 beforeAll(async () => {
   await dbHandler.connect();
@@ -35,6 +36,21 @@ describe("SettingsController", () => {
     expect(response.body[printerFileCleanSettingKey]).toMatchObject(
       getDefaultPrinterFileCleanSettings()
     );
+    expectOkResponse(response);
+  });
+
+  it("should OK on PUT whitelist server-settings ", async () => {
+    const response = await request.put(serverWhitelistRoute).send({
+      whitelistEnabled: true,
+      whitelistedIpAddresses: ["127.0.0", "192.178.168"],
+    });
+    expect(response.body).not.toBeNull();
+    expect(response.body).toMatchObject({
+      [serverSettingKey]: {
+        whitelistEnabled: true,
+        whitelistedIpAddresses: ["127.0.0", "192.178.168", "127.0.0.1"],
+      },
+    });
     expectOkResponse(response);
   });
 
