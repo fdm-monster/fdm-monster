@@ -20,4 +20,4 @@ export const generateAppConstants = (): Readonly<AppConstants> =>
   }) as Readonly<AppConstants>;
 
 export const defaultBedTempOverride = false;
-export const defaultBedTemp = 50;
+export const defaultBedTemp = 30;

@@ -58,6 +58,7 @@ const bindDropConditionally = (el: HTMLElement, printers: Printer[], context?: V
       uploadsStore.queueUploads(convertedUploads);
 
       printersStore.clearSelectedPrinters();
+      printersStore.resetBedTempOverride();
     };
   } else {
     el.ondrop = async (e) => {

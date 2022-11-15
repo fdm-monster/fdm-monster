@@ -4,8 +4,8 @@
     <v-btn-toggle
       :value="selectedFloorToggleIndex"
       class="ml-7"
-      rounded
       mandatory
+      rounded
       @change="changeFloorIndex"
     >
       <v-btn v-for="f in floors" :key="f._id">
@@ -19,16 +19,15 @@
       <v-checkbox
         v-model="bedTempOverrideEnabled"
         label="Override BedTemp (0-100 degr)"
-        @change="saveBedTemperatureOverride"
+        value="bedTempOverrideEnabled"
       ></v-checkbox>
     </div>
     <div align="center" class="mt-8 ml-2">
       <v-text-field
-        v-model="bedTemperature"
+        v-model="bedTempOverride"
         :disabled="!bedTempOverrideEnabled"
-        min="0"
         max="100"
-        @change="saveBedTemperature"
+        min="0"
         outlined
         type="number"
       />
@@ -39,7 +38,6 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { usePrintersStore } from "@/store/printers.store";
-import { defaultBedTemp, defaultBedTempOverride } from "@/constants/app.constants";
 
 export default defineComponent({
   name: "HomeToolbar",
@@ -51,16 +49,28 @@ export default defineComponent({
   },
   data(): {
     selectedFloorToggleIndex: number;
-    bedTempOverrideEnabled: boolean;
-    bedTemperature: number;
   } {
     return {
       selectedFloorToggleIndex: 0,
-      bedTempOverrideEnabled: defaultBedTempOverride,
-      bedTemperature: defaultBedTemp,
     };
   },
   computed: {
+    bedTempOverrideEnabled: {
+      get() {
+        return this.printersStore.bedTempOverride;
+      },
+      set(value: boolean) {
+        this.printersStore.setBedTempOverride(value);
+      },
+    },
+    bedTempOverride: {
+      get() {
+        return this.printersStore.bedTemp;
+      },
+      set(value: number) {
+        this.printersStore.setBedTemp(value);
+      },
+    },
     floors() {
       return this.printersStore.printerFloors;
     },
@@ -69,12 +79,6 @@ export default defineComponent({
     changeFloorIndex(index: any) {
       this.printersStore.changeSelectedFloorByIndex(index);
       this.selectedFloorToggleIndex = index;
-    },
-    saveBedTemperatureOverride() {
-      this.printersStore.setBedTempOverride(this.bedTempOverrideEnabled);
-    },
-    saveBedTemperature() {
-      this.printersStore.setBedTemp(this.bedTemperature);
     },
   },
 });
