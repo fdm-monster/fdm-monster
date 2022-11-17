@@ -110,7 +110,10 @@ Any changes should be publicly available through Github forks or repositories. F
 - Discord: [FDM Monster - Discord server](https://discord.gg/mwA8uP8CMc)
 
 Please join the discord, but stay professional and proactive!
-> "You give some, you take some."
+
+## Sponsors
+
+- MTB3D https://www.mtb3d.com/
 
 ## Historical Note
 
