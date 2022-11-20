@@ -29,8 +29,7 @@ This server is currently freshly released, so give it a star ⭐and be the first
 - Printer Floors (like departments) and Printer Groups improvements
 - Printer completion/failure tracking (with statistics page)
 #### Current work:
-- BedTemp override (default true and 50 deg) to reduce farm power consumption 
-- Preparation migration work to NestJS
+- BedTemp override (default true and 50 deg) to reduce farm power consumption
 - Client in Vue3, waiting for Vuetify 3.0 and 3.1 release (https://github.com/fdm-monster/fdm-monster-client)
 
 ## Development [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://gitHub.com/fdm-monster/fdm-monster/graphs/commit-activity) [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/fdm-monster/fdm-monster/Node.js%20CI?query=branch%3Adevelop)](https://github.com/fdm-monster/fdm-monster/actions/workflows/nodejs.yml?query=branch%3Adevelop) [![GitHub license](https://img.shields.io/github/license/fdm-monster/fdm-monster)](https://github.com/fdm-monster/fdm-monster/blob/master/LICENSE.txt)

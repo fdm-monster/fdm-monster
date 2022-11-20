@@ -18,8 +18,7 @@ Please delete options that are not relevant.
 Please describe the tests that you ran to verify your changes.
 
 - [ ] Vue test
-- [ ] Node test
-- [ ] NestJS test 
+- [ ] Node test 
 
 **Test Configuration**:
 * Node version:
