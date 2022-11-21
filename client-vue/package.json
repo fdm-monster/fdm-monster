@@ -1,8 +1,9 @@
 {
   "name": "@fdm-monster/client",
-  "version": "0.6.4",
+  "version": "0.6.6",
   "private": false,
   "author": "David Zwart",
+  "license": "AGPL-3.0-or-later",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --skip-plugins pwa,workbox",
@@ -68,7 +69,6 @@
     "vuetify-loader": "1.9.2",
     "webpack": "5.75.0"
   },
-  "license": "LGPL-3.0-or-later",
   "repository": {
     "type": "git",
     "url": "https://github.com/fdm-monster/fdm-monster"
