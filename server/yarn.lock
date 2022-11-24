@@ -1563,9 +1563,9 @@
   integrity sha512-iO9ZQHkZxHn4mSakYV0vFHAVDyEOIJQrV2uZ06HxEPcx+mt8swXoZHIbaaJ2crJYFfErySgktuTZ3BeLz+XmFA==
 
 "@types/yargs@^17.0.8":
-  version "17.0.13"
-  resolved "https://registry.yarnpkg.com/@types/yargs/-/yargs-17.0.13.tgz#34cced675ca1b1d51fcf4d34c3c6f0fa142a5c76"
-  integrity sha512-9sWaruZk2JGxIQU+IhI1fhPYRcQ0UuTNuKuCW9bR5fp7qi2Llf7WDzNa17Cy7TKnh3cdxDOiyTu6gaLS0eDatg==
+  version "17.0.14"
+  resolved "https://registry.yarnpkg.com/@types/yargs/-/yargs-17.0.14.tgz#0943473052c24bd8cf2d1de25f1a710259327237"
+  integrity sha512-9Pj7abXoW1RSTcZaL2Hk6G2XyLMlp5ECdVC/Zf2p/KBjC3srijLGgRAXOBjtFrJoIrvxdTKyKDA14bEcbxBaWw==
   dependencies:
     "@types/yargs-parser" "*"
 
@@ -4254,9 +4254,9 @@ mongodb@4.11.0, mongodb@~4.11.0:
     saslprep "^1.0.3"
 
 mongodb@^4.4.1:
-  version "4.12.0"
-  resolved "https://registry.yarnpkg.com/mongodb/-/mongodb-4.12.0.tgz#cbf14d4bc7f9d320d16e5971f76d8b8a36af7752"
-  integrity sha512-ssWod7DqVE4faluZESdOqYhV1BI5CQA5c31sr+zxDLJDBX9EA5VJLo8RNSItPTwxExmuGn/T6MbETQWjywNehA==
+  version "4.12.1"
+  resolved "https://registry.yarnpkg.com/mongodb/-/mongodb-4.12.1.tgz#224eb39b8784af835b515aa687c6010cecaabb1a"
+  integrity sha512-koT87tecZmxPKtxRQD8hCKfn+ockEL2xBiUvx3isQGI6mFmagWt4f4AyCE9J4sKepnLhMacoCTQQA6SLAI2L6w==
   dependencies:
     bson "^4.7.0"
     mongodb-connection-string-url "^2.5.4"
@@ -5076,9 +5076,9 @@ simple-swizzle@^0.2.2:
     is-arrayish "^0.3.1"
 
 simple-update-notifier@^1.0.7:
-  version "1.0.7"
-  resolved "https://registry.yarnpkg.com/simple-update-notifier/-/simple-update-notifier-1.0.7.tgz#7edf75c5bdd04f88828d632f762b2bc32996a9cc"
-  integrity sha512-BBKgR84BJQJm6WjWFMHgLVuo61FBDSj1z/xSFUIozqO6wO7ii0JxCqlIud7Enr/+LhlbNI0whErq96P2qHNWew==
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/simple-update-notifier/-/simple-update-notifier-1.0.8.tgz#d78fd1857da58e115127bf363bcd9c1973585082"
+  integrity sha512-KPXw773wEyrIIhjZh83kmHGrmiAWTxwhAFOhN09IIN1I6ZAmh1luQnS9KPmFaz3X53dcIJ4II80iYV7z7LsUjQ==
   dependencies:
     semver "~7.0.0"
 
