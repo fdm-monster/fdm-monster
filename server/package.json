@@ -57,7 +57,7 @@
     "got": "11.8.5",
     "helmet": "6.0.0",
     "lodash": "4.17.21",
-    "luxon": "3.1.0",
+    "luxon": "3.1.1",
     "migrate-mongo": "9.0.0",
     "mongoose": "6.7.4",
     "multer": "1.4.5-lts.1",
