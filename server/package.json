@@ -61,7 +61,7 @@
     "migrate-mongo": "9.0.0",
     "mongoose": "6.7.5",
     "multer": "1.4.5-lts.1",
-    "node-input-validator": "4.5.0",
+    "node-input-validator": "4.5.1",
     "passport": "0.6.0",
     "passport-local": "1.0.0",
     "rxjs": "7.5.7",
