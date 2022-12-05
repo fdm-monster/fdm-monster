@@ -4,6 +4,7 @@ const { isNodemon, isNode, isPm2 } = require("../utils/env.utils");
 const { authenticate, withPermission } = require("../middleware/authenticate");
 const { PERMS } = require("../constants/authorization.constants");
 const { isDocker } = require("../utils/is-docker");
+const { serverSettingKey } = require("../constants/server-settings.constants");
 
 class ServerPublicController {
   #serverVersion;
@@ -21,14 +22,14 @@ class ServerPublicController {
   welcome(req, res) {
     const serverSettings = this.#settingsStore.getServerSettings();
 
-    if (serverSettings.server.loginRequired === false) {
+    if (serverSettings[serverSettingKey].loginRequired === false) {
       return res.send({
-        message: "Login disabled. Please load the Vue app."
+        message: "Login disabled. Please load the Vue app.",
       });
     }
 
     return res.send({
-      message: "Login successful. Please load the Vue app."
+      message: "Login successful. Please load the Vue app.",
     });
   }
 
@@ -46,8 +47,8 @@ class ServerPublicController {
         synced: updateState.synced,
         updateAvailable: updateState.updateAvailable,
         includingPrerelease: updateState.includingPrerelease,
-        airGapped: updateState.airGapped
-      }
+        airGapped: updateState.airGapped,
+      },
     });
   }
 }

@@ -11,10 +11,7 @@ FDM Monster is a bulk OctoPrint manager and dashboard written in Vue with Typesc
 Note: our aim is to support all kinds of 3D Printer (FDM, resin) API's with a plugin system and documentation for extensibility - in the future. Read more about this in the roadmap section below.
 
 **What we dont aim for**
-We dont aim to provide webcam support right now as this is one of the big bottlenecks for stable server performance. This might change once the developers of FDM Monster have the plugin system tested and working.
-
-<!--  ![Docker Pulls](https://img.shields.io/docker/pulls/fdm-monster/fdm-monster) -->
-<!-- ![GitHub release (latest by date)](https://img.shields.io/github/downloads/fdm-monster/fdm-monster/latest/total) -->
+We don't aim to provide webcam support right now as this is one of the big bottlenecks for stable server performance. This might change once the developers of FDM Monster have the plugin system tested and working.
 
 ## Stability
 
@@ -29,8 +26,7 @@ This server is currently freshly released, so give it a star ⭐and be the first
 - Printer Floors (like departments) and Printer Groups improvements
 - Printer completion/failure tracking (with statistics page)
 #### Current work:
-- BedTemp override (default true and 50 deg) to reduce farm power consumption 
-- Preparation migration work to NestJS
+- BedTemp override (default true and 50 deg) to reduce farm power consumption
 - Client in Vue3, waiting for Vuetify 3.0 and 3.1 release (https://github.com/fdm-monster/fdm-monster-client)
 
 ## Development [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://gitHub.com/fdm-monster/fdm-monster/graphs/commit-activity) [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/fdm-monster/fdm-monster/Node.js%20CI?query=branch%3Adevelop)](https://github.com/fdm-monster/fdm-monster/actions/workflows/nodejs.yml?query=branch%3Adevelop) [![GitHub license](https://img.shields.io/github/license/fdm-monster/fdm-monster)](https://github.com/fdm-monster/fdm-monster/blob/master/LICENSE.txt)
@@ -102,15 +98,18 @@ These awesome people involved in the project ([emoji key](https://allcontributor
 
 ## License
 
-FDM Power is licensed with [LGPL-3.0](LICENSE). This means in essence that you may use it commercially, but it must be in FOSS fashion.
-Any changes should be publicly available through Github forks or repositories. For details, please consult the LICENSE file.
+FDM Power is licensed with [AGPL-3.0](LICENSE). This means in essence that you may use it commercially, but it must be in FOSS fashion.
+Any changes, deployments or usages should be publicly available and downloadable through Github forks or public repositories. For details, please consult the LICENSE file.
 
 ## Contact
 - Main repository: [https://github.com/fdm-monster/fdm-monster](https://github.com/fdm-monster/fdm-monster)
 - Discord: [FDM Monster - Discord server](https://discord.gg/mwA8uP8CMc)
 
 Please join the discord, but stay professional and proactive!
-> "You give some, you take some."
+
+## Sponsors
+
+- MTB3D https://www.mtb3d.com/
 
 ## Historical Note
 

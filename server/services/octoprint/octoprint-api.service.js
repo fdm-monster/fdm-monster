@@ -211,7 +211,7 @@ class OctoPrintApiService extends OctoPrintRoutes {
 
       // Cleanup
       if (isPhysicalFile) {
-        // fs.unlinkSync(fileStreamOrBuffer.path);
+        fs.unlinkSync(fileStreamOrBuffer.path);
       }
 
       return await processGotResponse(response, responseOptions);

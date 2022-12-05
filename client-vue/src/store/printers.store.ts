@@ -150,6 +150,10 @@ export const usePrintersStore = defineStore("Printers", {
     setBedTempOverride(bedTempOverride: boolean) {
       this.bedTempOverride = bedTempOverride;
     },
+    resetBedTempOverride() {
+      this.bedTemp = defaultBedTemp;
+      this.bedTempOverride = defaultBedTempOverride;
+    },
     async createPrinter(newPrinter: CreatePrinter) {
       const data = await PrintersService.createPrinter(newPrinter);
       this.printers.push(data);
@@ -479,6 +483,7 @@ export const usePrintersStore = defineStore("Printers", {
 
       const bedTemp = this.bedTempOverride ? this.bedTemp : null;
       await PrinterFileService.selectAndPrintFile(printerId, fullPath, true, bedTemp);
+      this.resetBedTempOverride();
     },
   },
 });

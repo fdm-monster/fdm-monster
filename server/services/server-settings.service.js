@@ -5,6 +5,8 @@ const { serverSettingsUpdateRules } = require("./validators/server-settings-serv
 const {
   printerFileCleanSettingKey,
   getDefaultPrinterFileCleanSettings,
+  getDefaultWhitelistIpAddresses,
+  serverSettingKey,
 } = require("../constants/server-settings.constants");
 
 class ServerSettingsService {
@@ -40,7 +42,10 @@ class ServerSettingsService {
       doc.timeout = Constants.getDefaultTimeout();
     }
     if (!doc.server) {
-      doc.server = Constants.server;
+      doc.server = Constants.getDefaultServerSettings();
+    }
+    if (!doc.server.whitelistedIpAddresses?.length) {
+      doc.server.whitelistedIpAddresses = getDefaultWhitelistIpAddresses();
     }
 
     return knownSettings;
@@ -57,7 +62,18 @@ class ServerSettingsService {
 
   async setLoginRequired(enabled = true) {
     const settingsDoc = await this.getOrCreate();
-    settingsDoc.server.loginRequired = enabled;
+    settingsDoc[serverSettingKey].loginRequired = enabled;
+
+    return ServerSettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
+      new: true,
+    });
+  }
+
+  async setWhitelist(enabled, ipAddresses) {
+    const settingsDoc = await this.getOrCreate();
+    const settings = settingsDoc[serverSettingKey];
+    settings.whitelistEnabled = enabled;
+    settings.whitelistedIpAddresses = ipAddresses;
 
     return ServerSettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
       new: true,
