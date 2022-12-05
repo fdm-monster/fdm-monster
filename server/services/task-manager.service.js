@@ -176,7 +176,6 @@ class TaskManagerService {
     taskState.options.disabled = true;
     // TODO this does not seem to work as intended #https://github.com/fdm-monster/fdm-monster/issues/1071
     taskState.job.stop();
-    this.jobScheduler.stopById(taskId);
   }
 
   isTaskDisabled(taskId) {
