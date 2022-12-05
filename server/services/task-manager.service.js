@@ -176,7 +176,6 @@ class TaskManagerService {
     taskState.options.disabled = true;
     // TODO this does not seem to work as intended #https://github.com/fdm-monster/fdm-monster/issues/1071
     taskState.job.stop();
-    this.jobScheduler.stopById(taskId);
   }
 
   isTaskDisabled(taskId) {
@@ -208,9 +207,7 @@ class TaskManagerService {
       this.#logger.info(
         `Task '${taskId}' was scheduled (runImmediately: ${!!schedulerOptions.runImmediately}).`
       );
-      const job = new SimpleIntervalJob(schedulerOptions, timedTask, {
-        id: taskId,
-      });
+      const job = new SimpleIntervalJob(schedulerOptions, timedTask);
       taskState.job = job;
       this.jobScheduler.addSimpleIntervalJob(job);
     } else {

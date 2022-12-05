@@ -37,8 +37,8 @@ const pluginManagerCommands = {
 
 const pluginRepositoryUrl = "https://plugins.octoprint.org/plugins.json";
 
-const contentTypeHeaderKey = "Content-Type";
-const apiKeyHeaderKey = "X-Api-Key";
+const contentTypeHeaderKey = "content-type";
+const apiKeyHeaderKey = "x-api-key";
 const jsonContentType = "application/json";
 const multiPartContentType = "multipart/form-data";
 
