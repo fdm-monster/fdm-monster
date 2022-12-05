@@ -208,9 +208,7 @@ class TaskManagerService {
       this.#logger.info(
         `Task '${taskId}' was scheduled (runImmediately: ${!!schedulerOptions.runImmediately}).`
       );
-      const job = new SimpleIntervalJob(schedulerOptions, timedTask, {
-        id: taskId,
-      });
+      const job = new SimpleIntervalJob(schedulerOptions, timedTask);
       taskState.job = job;
       this.jobScheduler.addSimpleIntervalJob(job);
     } else {
