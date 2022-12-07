@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import Vue from "vue";
 
-export const apiBase = Vue.config.devtools ? "http://localhost:4000" : ""; // Same-origin policy
+export const apiBase = Vue.config.devtools ? "http://127.0.0.1:4123" : ""; // Same-origin policy
 
 export class BaseService {
   static readonly UNWRAP = { unwrap: true };

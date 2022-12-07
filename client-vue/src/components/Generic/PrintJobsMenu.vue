@@ -30,6 +30,7 @@
             <v-text-field
               v-model="search"
               class="p-2"
+              autofocus
               clearable
               label="Search"
               persistent-placeholder
