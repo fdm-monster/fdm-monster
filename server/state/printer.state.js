@@ -1,7 +1,6 @@
 const {
   PEVENTS,
   octoPrintWebsocketEvent,
-  octoPrintWebsocketZChangeEvent,
   octoPrintWebsocketCurrentEvent,
 } = require("../constants/event.constants");
 const {
