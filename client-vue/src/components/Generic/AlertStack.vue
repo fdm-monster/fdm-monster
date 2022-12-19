@@ -62,7 +62,6 @@ import {
 } from "@/event-bus/alert.events";
 import { TrackedUpload, UploadStates } from "@/models/sse-messages/printer-sse-message.model";
 import AlertErrorDialog from "@/components/Generic/AlertErrorDialog.vue";
-import { useAlertsStore } from "@/store/alerts.store";
 import { useUploadsStore } from "@/store/uploads.store";
 
 interface Data {
@@ -82,7 +81,6 @@ export default defineComponent({
   },
   setup: () => {
     return {
-      alertsStore: useAlertsStore(),
       uploadsStore: useUploadsStore(),
     };
   },
