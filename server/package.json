@@ -54,7 +54,7 @@
     "express": "4.18.2",
     "express-session": "1.17.3",
     "form-data": "4.0.0",
-    "got": "11.8.6",
+    "got": "12.5.3",
     "helmet": "6.0.1",
     "lodash": "4.17.21",
     "luxon": "3.1.1",
@@ -96,7 +96,7 @@
     "supertest": "6.3.3"
   },
   "resolutions": {
-    "got": "11.8.6"
+    "got": "12.5.3"
   },
   "ignore-engines": false,
   "engine-strict": true,
