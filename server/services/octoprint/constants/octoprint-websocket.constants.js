@@ -83,6 +83,7 @@ const EVENT_TYPES = {
   PrintDone: "PrintDone",
   PrintFailed: "PrintFailed",
   PrintPaused: "PrintPaused",
+  PrintResumed: "PrintResumed",
   PrintStarted: "PrintStarted",
   PrinterStateChanged: "PrinterStateChanged",
   TransferDone: "TransferDone",
