@@ -10,6 +10,7 @@ import { InfoEventType, uploadMessageEvent } from "@/event-bus/alert.events";
 import { updatedPrinterEvent } from "@/event-bus/printer.events";
 import { useOutletCurrentStore } from "@/store/outlet-current.store";
 import { usePrintersStore } from "@/store/printers.store";
+import { apiBase } from "@/backend/base.service";
 
 enum IO_MESSAGES {
   LegacyUpdate = "legacy-update",
@@ -25,7 +26,7 @@ export class SocketIoService {
   printersStore = usePrintersStore();
 
   setupSocketConnection($bus: VueBus) {
-    this.socket = io(Vue.config.devtools ? "http://localhost:4000" : ""); // Same-origin policy);
+    this.socket = io(apiBase); // Same-origin policy);
     this.$bus = $bus;
     this.socket.on(IO_MESSAGES.LegacyUpdate, (data) => this.onMessage(JSON.parse(data)));
     this.socket.on(IO_MESSAGES.LegacyPrinterTest, (data) =>

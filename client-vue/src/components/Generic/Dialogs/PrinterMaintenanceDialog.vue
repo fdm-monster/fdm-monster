@@ -13,6 +13,10 @@
                 v-model="selectedQuickItems"
                 :chips="true"
                 :items="quickItems"
+                :menu-props="{
+                  closeOnClick: true,
+                  closeOnContentClick: true,
+                }"
                 clearable
                 color="primary"
                 multiple
@@ -79,11 +83,14 @@ export default defineComponent({
     dialogId: DialogName.PrinterMaintenanceDialog,
     selectedQuickItems: [],
     quickItems: [
+      "Broken part",
+      "Blob",
+      "Maxtemp",
+      "Preheat error",
       "Cable USB ",
-      "Cable Heatbed",
+      "Bed thermal runaway",
       "Thermistor Heatbed",
       "Thermistor Heatblock",
-      "Mintemp",
       "Thermal Runaway",
       "Mintemp Nozzle",
       "Mintemp Heatbed",

@@ -1,4 +1,4 @@
-FROM node:16.18-bullseye-slim
+FROM node:16.19-bullseye-slim
 WORKDIR /app
 
 RUN yarn global add pm2

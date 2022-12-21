@@ -3,7 +3,7 @@ const { ValidationException } = require("../exceptions/runtime.exceptions");
 const { NotFoundException } = require("../exceptions/runtime.exceptions");
 const { validateInput } = require("../handlers/validators");
 const { createTestPrinterRules } = require("./validation/create-test-printer.validation");
-const ObjectID = require("mongodb").ObjectID;
+const { ObjectID } = require("mongodb");
 
 class PrintersStore {
   #printerService;

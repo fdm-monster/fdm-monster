@@ -167,7 +167,7 @@ class PrinterFilesController {
   }
 
   async selectAndPrintFile(req, res) {
-    const { currentPrinterId, printerLogin } = getScopedPrinter(req, [printerLoginToken]);
+    const { currentPrinterId, printerLogin } = getScopedPrinter(req);
     const {
       filePath: path,
       print,
