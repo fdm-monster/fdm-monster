@@ -155,7 +155,7 @@ function remapOctoPrintState(octoPrintState) {
   const stateLabel = octoPrintState.text;
 
   const stateLabelLower = stateLabel?.toLowerCase();
-  if (stateLabelLower?.includes("Error:") || stateLabelLower?.includes("error")) {
+  if (stateLabelLower?.includes("error")) {
     return {
       state: PSTATE.Error,
       flags,
