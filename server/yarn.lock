@@ -5411,10 +5411,10 @@ to-regex-range@^5.0.1:
   dependencies:
     is-number "^7.0.0"
 
-toad-scheduler@2.1.1:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/toad-scheduler/-/toad-scheduler-2.1.1.tgz#de6ab8e9da3df2f958b710022d7a4e6a6cbd997f"
-  integrity sha512-XOeke4vAj3P93hayxmHI734RjsBMqbwotMIPQJ/jVwNMYk+LHpbClvHs4R4PWXXR2GIkmMA518JDkYfBiWWtEQ==
+toad-scheduler@2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/toad-scheduler/-/toad-scheduler-2.2.0.tgz#e24dd009f3a5566a89555b0e811f1e56af528395"
+  integrity sha512-o/3na7CMVfW40x8H/Vw078GNIR6F7jNmPnuSRY2yVqFIPXRrQttcfRlkQk0dwFiw7fQCqpCGXoC/vo7QtoQMhw==
 
 toidentifier@1.0.1:
   version "1.0.1"
