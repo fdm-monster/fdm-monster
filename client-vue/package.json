@@ -1,6 +1,6 @@
 {
   "name": "@fdm-monster/client",
-  "version": "0.6.10",
+  "version": "0.6.11",
   "private": false,
   "author": "David Zwart",
   "license": "AGPL-3.0-or-later",
@@ -22,7 +22,7 @@
     "luxon": "3.2.0",
     "pinia": "^2.0.23",
     "register-service-worker": "1.7.2",
-    "socket.io-client": "^4.5.3",
+    "socket.io-client": "4.5.3",
     "validator": "13.7.0",
     "vee-validate": "3.4.14",
     "vue": "2.7.14",

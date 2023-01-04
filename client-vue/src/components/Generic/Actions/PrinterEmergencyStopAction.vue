@@ -20,7 +20,7 @@ import { Printer } from "@/models/printers/printer.model";
 import { CustomGcodeService } from "@/backend/custom-gcode.service";
 
 export default defineComponent({
-  name: "PrinterUrlAction",
+  name: "PrinterEmergencyAction",
   props: {
     printer: Object as PropType<Printer>,
   },
