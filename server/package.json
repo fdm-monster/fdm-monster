@@ -91,7 +91,7 @@
     "mongodb-memory-server": "8.11.1",
     "nock": "13.3.0",
     "nodemon": "2.0.20",
-    "prettier": "2.8.2",
+    "prettier": "2.8.3",
     "rimraf": "4.0.4",
     "supertest": "6.3.3"
   },
