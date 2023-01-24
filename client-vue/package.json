@@ -17,7 +17,7 @@
     "@sentry/tracing": "7.32.1",
     "@sentry/vue": "7.32.1",
     "@vue/composition-api": "1.7.1",
-    "axios": "1.2.2",
+    "axios": "1.2.4",
     "core-js": "3.27.2",
     "luxon": "3.2.1",
     "pinia": "^2.0.23",
