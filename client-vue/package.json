@@ -33,7 +33,7 @@
     "vuetify": "2.6.14"
   },
   "devDependencies": {
-    "@types/jest": "29.4.4",
+    "@types/jest": "29.5.0",
     "@types/luxon": "3.2.0",
     "@types/validator": "13.7.14",
     "@typescript-eslint/eslint-plugin": "5.55.0",
