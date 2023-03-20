@@ -79,7 +79,7 @@
     "caniuse-lite": "1.0.30001468",
     "eslint": "8.36.0",
     "eslint-config-airbnb-base": "15.0.0",
-    "eslint-config-prettier": "8.7.0",
+    "eslint-config-prettier": "8.8.0",
     "eslint-config-standard": "17.0.0",
     "eslint-plugin-import": "2.27.5",
     "eslint-plugin-node": "11.1.0",
