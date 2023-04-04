@@ -23,6 +23,7 @@ function getDefaultJobState() {
 
 function getDefaultPrinterState() {
   return {
+    updatedAt: null,
     state: PSTATE.Offline,
     flags: { operational: false },
     desc: "Printer needs WebSocket connection first",
@@ -32,6 +33,7 @@ function getDefaultPrinterState() {
 
 function getDefaultDisabledPrinterState() {
   return {
+    updatedAt: Date.now(),
     state: PSTATE.Disabled,
     flags: { operational: false },
     desc: "Printer is disabled",
