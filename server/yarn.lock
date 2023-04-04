@@ -1776,10 +1776,10 @@ awilix-router-core@^1.6.1:
     glob "^7.1.3"
     tslib "^1.9.3"
 
-awilix@8.0.0:
-  version "8.0.0"
-  resolved "https://registry.yarnpkg.com/awilix/-/awilix-8.0.0.tgz#556fa20e0f7b52b39479ed6b027ee054efd8f16a"
-  integrity sha512-9y4ejNj2nLu7ET8jtQPiI3Ibvu68iKcLbLy5pGsPy9HWWVyQhTT8YE+Ao7ZawTNXRWjosSy/r4QNmhaUt/ju0A==
+awilix@8.0.1:
+  version "8.0.1"
+  resolved "https://registry.yarnpkg.com/awilix/-/awilix-8.0.1.tgz#4f4704038cc5df3f8f2b9254031af79d4d3708bb"
+  integrity sha512-zDSp4R204scvQIDb2GMoWigzXemn0+3AKKIAt543T9v2h7lmoypvkmcx1W/Jet/nm27R1N1AsqrsYVviAR9KrA==
   dependencies:
     camel-case "^4.1.2"
     fast-glob "^3.2.12"
