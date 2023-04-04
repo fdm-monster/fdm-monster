@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "@types/jest": "29.5.0",
-    "@types/luxon": "3.2.0",
+    "@types/luxon": "3.2.2",
     "@types/validator": "13.7.14",
     "@typescript-eslint/eslint-plugin": "5.57.1",
     "@typescript-eslint/parser": "5.57.1",
