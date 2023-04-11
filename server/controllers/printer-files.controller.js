@@ -14,7 +14,7 @@ const {
   createFolderRules,
 } = require("./validation/printer-files-controller.validation");
 const { ValidationException, NotFoundException } = require("../exceptions/runtime.exceptions");
-const { printerLoginToken, printerResolveMiddleware } = require("../middleware/printer");
+const { printerResolveMiddleware } = require("../middleware/printer");
 const { ROLES, PERMS } = require("../constants/authorization.constants");
 const { authorizeRoles } = require("../middleware/authenticate");
 

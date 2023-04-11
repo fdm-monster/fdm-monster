@@ -224,6 +224,7 @@ class OctoprintRxjsWebsocketAdapter extends GenericWebsocketAdapter {
       console.log(`changing OP printer state ${state}`);
     }
     this.#printerState = {
+      updatedAt: Date.now(),
       state,
       flags,
       colour: mapStateToColor(state),

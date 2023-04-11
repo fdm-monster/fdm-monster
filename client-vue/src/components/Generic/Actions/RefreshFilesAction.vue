@@ -1,5 +1,5 @@
 <template>
-  <v-btn color="secondary" @click="getFiles">
+  <v-btn color="secondary" @click="getFiles()">
     <v-icon>refresh</v-icon>
     <span class="d-none d-lg-inline">Refresh files</span>
   </v-btn>
