@@ -3280,10 +3280,10 @@ has@^1.0.3:
   dependencies:
     function-bind "^1.1.1"
 
-helmet@6.1.2:
-  version "6.1.2"
-  resolved "https://registry.yarnpkg.com/helmet/-/helmet-6.1.2.tgz#063af3d2c7fa25c09f377aaede7b8a9dffbbe761"
-  integrity sha512-n39kcD7ntw83PMeqqjSOPrY/VpIH+XniLoxFXLfK6UCgTTN9XkOGp2YWKB/zfgZS+zRQdiHo3fgNmy0l5xoFPg==
+helmet@6.1.4:
+  version "6.1.4"
+  resolved "https://registry.yarnpkg.com/helmet/-/helmet-6.1.4.tgz#a57dc478532e811f7dfd64b69f9023dad1c6e28e"
+  integrity sha512-nCJIriKjOYcRmHRpK+Z5DayEh6xwOKO0U0qzWL3MEIwsB8OSxxBu/mUE9U5PRH8ln/+WySlK2eYe5FOlo0v9aA==
 
 hexoid@^1.0.0:
   version "1.0.0"
