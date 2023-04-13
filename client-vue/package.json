@@ -18,7 +18,7 @@
     "@sentry/vue": "7.47.0",
     "@vue/composition-api": "1.7.1",
     "axios": "1.3.5",
-    "core-js": "3.30.0",
+    "core-js": "3.30.1",
     "luxon": "3.3.0",
     "pinia": "^2.0.23",
     "register-service-worker": "1.7.2",
