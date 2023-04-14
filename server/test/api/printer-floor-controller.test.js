@@ -2,14 +2,14 @@ const dbHandler = require("../db-handler");
 const { AppConstants } = require("../../server.constants");
 const { setupTestApp } = require("../test-server");
 const { expectOkResponse, expectInternalServerError, expectNotFoundResponse, expectInvalidResponse } = require("../extensions");
-const { createTestPrinterGroup } = require("./test-data/create-printer-group");
+const { createTestPrinter } = require("./test-data/create-printer");
 const { createTestPrinterFloor, printerFloorRoute } = require("./test-data/create-printer-floor");
 const PrinterFloor = require("../../models/Floor");
 
 let Model = PrinterFloor;
 const listRoute = `${AppConstants.apiRoute}/printer-floor`;
 const getRoute = (id) => `${listRoute}/${id}`;
-const addPrinterGroupToFloorRoute = (id) => `${listRoute}/${id}/printer-group`;
+const addPrinterToFloorRoute = (id) => `${listRoute}/${id}/printer`;
 const deleteRoute = (id) => `${listRoute}/${id}`;
 const updateNameRoute = (id) => `${getRoute(id)}/name`;
 const updateFloorNumberRoute = (id) => `${getRoute(id)}/floor-number`;
@@ -48,7 +48,7 @@ describe("PrinterFloorController", () => {
     const createResponse = await request.post(printerFloorRoute).send({
       name: body.name,
       floor: floorNumber,
-      printerGroups: [],
+      printers: [],
     });
     expectInternalServerError(createResponse);
   });
@@ -94,47 +94,55 @@ describe("PrinterFloorController", () => {
   });
 
   it("should not be able to add printer-group to non-existing floor", async () => {
-    const printerGroup = await createTestPrinterGroup(request);
+    const printer = await createTestPrinter(request);
 
-    const response = await request.post(addPrinterGroupToFloorRoute("63452115122876ea11cd1656")).send({
-      printerGroupId: printerGroup._id,
+    const response = await request.post(addPrinterToFloorRoute("63452115122876ea11cd1656")).send({
+      printerId: printer._id,
+      x: 1,
+      y: 1,
     });
     expectNotFoundResponse(response);
   });
 
   it("should be able to add printer-group to floor", async () => {
-    const printerGroup = await createTestPrinterGroup(request);
+    const printer = await createTestPrinter(request);
     const floor = await createTestPrinterFloor(request, "Floor123", 509);
     expect(floor).toMatchObject({ _id: expect.any(String) });
 
-    const response = await request.post(addPrinterGroupToFloorRoute(floor._id)).send({
-      printerGroupId: printerGroup._id,
+    const response = await request.post(addPrinterToFloorRoute(floor._id)).send({
+      printerId: printer._id,
+      x: 1,
+      y: 1,
     });
     expectOkResponse(response);
 
     // Sadly no distinctness criterium yet
-    const response2 = await request.post(addPrinterGroupToFloorRoute(floor._id)).send({
-      printerGroupId: printerGroup._id,
+    const response2 = await request.post(addPrinterToFloorRoute(floor._id)).send({
+      printerId: printer._id,
+      x: 1,
+      y: 1,
     });
     expectOkResponse(response2);
   });
 
   it("should be able to remove printer group from floor", async () => {
-    const printerGroup = await createTestPrinterGroup(request);
+    const printer = await createTestPrinter(request);
     const floor = await createTestPrinterFloor(request, "Floor123", 510);
     expect(floor).toMatchObject({ _id: expect.any(String) });
-    const response = await request.post(addPrinterGroupToFloorRoute(floor._id)).send({
-      printerGroupId: printerGroup._id,
+    const response = await request.post(addPrinterToFloorRoute(floor._id)).send({
+      printerId: printer._id,
+      x: 1,
+      y: 1,
     });
     expectOkResponse(response);
 
-    const deleteResponse = await request.delete(addPrinterGroupToFloorRoute(floor._id)).send({
-      printerGroupId: printerGroup._id,
+    const deleteResponse = await request.delete(addPrinterToFloorRoute(floor._id)).send({
+      printerId: printer._id,
     });
     expectOkResponse(deleteResponse);
 
-    const deleteResponse2 = await request.delete(addPrinterGroupToFloorRoute(floor._id)).send({
-      printerGroupId: "63452115122876ea11cd1656",
+    const deleteResponse2 = await request.delete(addPrinterToFloorRoute(floor._id)).send({
+      printerId: "63452115122876ea11cd1656",
     });
     expectOkResponse(deleteResponse2);
   });

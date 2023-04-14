@@ -42,7 +42,6 @@ const { PluginFirmwareUpdateService } = require("./services/octoprint/plugin-fir
 const { PluginRepositoryCache } = require("./services/octoprint/plugin-repository.cache");
 const { configureCacheManager } = require("./handlers/cache-manager");
 const { PluginFirmwareUpdatePreparationTask } = require("./tasks/plugin-firmware-download.task");
-const PrinterFloorsCache = require("./state/floor.cache");
 const { InfluxDbV2BaseService } = require("./services/influxdb-v2/influx-db-v2-base.service");
 const { ConfigService } = require("./services/config.service");
 const { InfluxDbQueryTask } = require("./tasks/influxdb-query.task");
@@ -53,6 +52,7 @@ const { BedTempOverrideTask } = require("./tasks/bed-temp-override.task");
 const { ClientBundleService } = require("./services/client-bundle.service");
 const { Octokit } = require("octokit");
 const FloorService = require("./services/floor.service");
+const FloorCache = require("./state/floor.cache");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -115,7 +115,7 @@ function configureContainer() {
     [DITokens.pluginFirmwareUpdateService]: asClass(PluginFirmwareUpdateService).singleton(),
 
     [DITokens.printerState]: asClass(PrinterState).transient(), // Transient on purpose!
-    [DITokens.floorsCache]: asClass(PrinterFloorsCache).singleton(),
+    [DITokens.floorCache]: asClass(FloorCache).singleton(),
     [DITokens.jobsCache]: asClass(JobsCache).singleton(),
     [DITokens.pluginRepositoryCache]: asClass(PluginRepositoryCache).singleton(),
     [DITokens.fileCache]: asClass(FileCache).singleton(),

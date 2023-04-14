@@ -7,7 +7,7 @@ const printerInFloorRules = {
 };
 
 const updatePrinterFloorNameRules = {
-  name: `required|minLength:${minPrinterGroupNameLength}`,
+  name: `required|minLength:${minPrinterFloorNameLength}`,
 };
 
 const updatePrinterFloorNumberRules = {

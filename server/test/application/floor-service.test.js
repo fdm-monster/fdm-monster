@@ -68,11 +68,13 @@ describe("floorService ", () => {
     expect(floorService.get(floor.id)).toBeTruthy();
     const newFloor = await floorService.addOrUpdatePrinter(floor.id, {
       printerId: pg.id,
+      x: 1,
+      y: 1,
     });
     expect(newFloor.printers).toHaveLength(1);
   });
 
-  it("can delete group from floor", async () => {
+  it("can delete printer from floor", async () => {
     // Prepare the CRUD DTO
     const newPrinter = PrinterMockData.PrinterMock;
     const printer = await printerService.create(newPrinter);

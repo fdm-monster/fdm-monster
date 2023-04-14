@@ -42,7 +42,7 @@ const DITokens = {
   printerStateFactory: "printerStateFactory",
   printerState: "printerState",
   // Caches
-  floorsCache: "floorsCache",
+  floorCache: "floorCache",
   jobsCache: "jobsCache",
   fileCache: "fileCache",
   fileUploadTrackerCache: "fileUploadTrackerCache",

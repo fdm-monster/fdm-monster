@@ -9,11 +9,11 @@ const {
 } = require("./validators/printer-floor-service.validation");
 
 class FloorService {
-  #printerGroupService;
+  printerService;
   #logger;
 
-  constructor({ printerGroupService, loggerFactory }) {
-    this.#printerGroupService = printerGroupService;
+  constructor({ printerService, loggerFactory }) {
+    this.printerService = printerService;
     this.#logger = loggerFactory("PrinterFloorService");
   }
 
@@ -86,9 +86,7 @@ class FloorService {
     const floor = await this.get(floorId, true);
     const validInput = await validateInput(input, printerInFloorRules);
 
-    const foundPrinterInFloorIndex = floor.printerGroups.findIndex(
-      (pif) => pif.printerId.toString() === validInput.printerGroupId
-    );
+    const foundPrinterInFloorIndex = floor.printers.findIndex((pif) => pif.printerId.toString() === validInput.printerId);
     if (foundPrinterInFloorIndex === -1) return floor;
     floor.printers.splice(foundPrinterInFloorIndex, 1);
     return await floor.save();

@@ -7,11 +7,11 @@ async function createTestPrinterFloor(request, name = "Floor101", floorNumber = 
   const createResponse = await request.post(printerFloorRoute).send({
     name,
     floor: floorNumber,
-    printerGroups: [],
+    printers: [],
   });
   return expectOkResponse(createResponse, {
     name,
-    printerGroups: expect.any(Array),
+    printers: expect.any(Array),
   });
 }
 
