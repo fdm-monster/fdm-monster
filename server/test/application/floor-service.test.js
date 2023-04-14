@@ -36,8 +36,8 @@ describe("floorService ", () => {
     });
 
     // Assert creation
-    const createdPrinterGroup = await printerFloorModel.findOne();
-    expect(createdPrinterGroup).toBeTruthy();
+    const floor = await printerFloorModel.findOne();
+    expect(floor).toBeTruthy();
   });
 
   it("can delete existing floor", async () => {

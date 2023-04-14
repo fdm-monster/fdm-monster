@@ -14,7 +14,6 @@ class BootTask {
   multerService;
   printersStore;
   filesStore;
-  printerGroupsCache;
   permissionService;
   roleService;
   userService;

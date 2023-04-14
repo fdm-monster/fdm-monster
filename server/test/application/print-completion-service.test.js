@@ -18,9 +18,6 @@ afterAll(async () => {
   await dbHandler.closeDatabase();
 });
 
-/**
- * PrinterGroupService test suite.
- */
 describe(PrintCompletionService.name, () => {
   /**
    * Tests that a valid printer group can be created through the printerGrouoService without throwing any errors.
