@@ -5,7 +5,7 @@ const {
   createPrinterFloorRules,
   updatePrinterFloorNameRules,
   updatePrinterFloorNumberRules,
-  printerInFloorRules,
+  printerInFloorRules, removePrinterInFloorRules,
 } = require("./validators/printer-floor-service.validation");
 
 class FloorService {
@@ -84,7 +84,7 @@ class FloorService {
 
   async removePrinter(floorId, input) {
     const floor = await this.get(floorId, true);
-    const validInput = await validateInput(input, printerInFloorRules);
+    const validInput = await validateInput(input, removePrinterInFloorRules);
 
     const foundPrinterInFloorIndex = floor.printers.findIndex((pif) => pif.printerId.toString() === validInput.printerId);
     if (foundPrinterInFloorIndex === -1) return floor;

@@ -125,7 +125,7 @@ describe("FloorController", () => {
     expectOkResponse(response2);
   });
 
-  it("should be able to remove printer group from floor", async () => {
+  it("should be able to remove printer from floor", async () => {
     const printer = await createTestPrinter(request);
     const floor = await createTestPrinterFloor(request, "Floor123", 510);
     expect(floor).toMatchObject({ _id: expect.any(String) });
