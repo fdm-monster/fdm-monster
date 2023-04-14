@@ -12,12 +12,14 @@ class ServerHost {
   #taskManagerService;
   #socketIoGateway;
   #appInstance = null;
+  #clientBundleService;
 
-  constructor({ loggerFactory, bootTask, taskManagerService, socketIoGateway }) {
+  constructor({ loggerFactory, bootTask, taskManagerService, socketIoGateway, clientBundleService }) {
     this.#logger = loggerFactory("Server");
     this.#bootTask = bootTask;
     this.#taskManagerService = taskManagerService;
     this.#socketIoGateway = socketIoGateway;
+    this.#clientBundleService = clientBundleService;
   }
 
   async boot(app, quick_boot = false, listenRequests = true) {
@@ -27,6 +29,8 @@ class ServerHost {
     if (!quick_boot) {
       await this.#bootTask.runOnce();
     }
+
+    await this.#clientBundleService.downloadBundle();
 
     if (listenRequests) return this.httpListen();
   }

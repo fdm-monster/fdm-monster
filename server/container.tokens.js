@@ -1,4 +1,3 @@
-const { PrintEventsSseTask } = require("./tasks/print-completion.socketio.task");
 const DITokens = {
   // Values
   serverVersion: "serverVersion",
@@ -23,6 +22,8 @@ const DITokens = {
   serverReleaseService: "serverReleaseService",
   serverUpdateService: "serverUpdateService",
   githubApiService: "githubApiService",
+  octokitService: "octokitService",
+  clientBundleService: "clientBundleService",
   userTokenService: "userTokenService",
   userService: "userService",
   permissionService: "permissionService",

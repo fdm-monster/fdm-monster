@@ -21,7 +21,10 @@ module.exports = {
     defaultTestEnv: "test",
     defaultProductionEnv: "production",
     knownEnvNames: ["development", "production", "test"],
+    GITHUB_PAT: "GITHUB_PAT",
     clientPackageName: "@fdm-monster/client",
+    clientRepoName: "fdm-monster-client",
+    clientOrgName: "fdm-monster",
     serverPath: "./",
 
     influxUrl: "INFLUX_URL",

@@ -55,6 +55,8 @@ const { PrintCompletionSocketIoTask } = require("./tasks/print-completion.socket
 const { PrintCompletionService } = require("./services/print-completion.service");
 const { SocketIoGateway } = require("./state/socket-io.gateway");
 const { BedTempOverrideTask } = require("./tasks/bed-temp-override.task");
+const { OctokitService, ClientBundleService } = require("./services/octokit.service");
+const { Octokit } = require("octokit");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -66,8 +68,7 @@ function configureContainer() {
     // -- asValue/asFunction constants --
     serverPageTitle: asValue(process.env[AppConstants.SERVER_SITE_TITLE_KEY]),
     [DITokens.serverTasks]: asValue(ServerTasks),
-    [DITokens.defaultRole]: asValue(ROLES.ADMIN),
-    // -- asFunction --
+    [DITokens.defaultRole]: asValue(ROLES.ADMIN), // -- asFunction --
     [DITokens.serverVersion]: asFunction(() => {
       return process.env[AppConstants.VERSION_KEY];
     }),
@@ -90,6 +91,17 @@ function configureContainer() {
     [DITokens.serverReleaseService]: asClass(ServerReleaseService).singleton(),
     [DITokens.serverUpdateService]: asClass(ServerUpdateService).singleton(),
     [DITokens.githubApiService]: asClass(GithubApiService),
+    [DITokens.octokitService]: asFunction((cradle) => {
+      const config = cradle.configService;
+      // cradle.
+      return new Octokit({
+        auth: config.get(AppConstants.GITHUB_PAT),
+        request: {
+          fetch: require("node-fetch"),
+        },
+      });
+    }),
+    [DITokens.clientBundleService]: asClass(ClientBundleService),
     [DITokens.simpleGitService]: asValue(SimpleGitFactory()),
     [DITokens.httpClient]: asValue(
       axios.create({
