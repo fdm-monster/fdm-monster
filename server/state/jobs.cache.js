@@ -1,5 +1,5 @@
-const { getJobCacheDefault } = require("../../constants/cache.constants");
-const { ValidationException } = require("../../exceptions/runtime.exceptions");
+const { getJobCacheDefault } = require("../constants/cache.constants");
+const { ValidationException } = require("../exceptions/runtime.exceptions");
 
 /**
  * Stores a delegate job progress state for each printer - making it easier to access the latest job state.
@@ -73,7 +73,7 @@ class JobsCache {
       filePath: cachedJob.job.file.path,
       averagePrintTime: cachedJob.job.averagePrintTime,
       lastPrintTime: cachedJob.job.lastPrintTime,
-      estimatedPrintTime: cachedJob.job.estimatedPrintTime // Rename?
+      estimatedPrintTime: cachedJob.job.estimatedPrintTime, // Rename?
     };
     if (!!cachedJob.currentZ) {
       transformedJob.currentZ = cachedJob.currentZ;

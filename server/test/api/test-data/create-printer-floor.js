@@ -1,17 +1,17 @@
 const { AppConstants } = require("../../../server.constants");
 const { expectOkResponse } = require("../../extensions");
 
-const printerFloorRoute = AppConstants.apiRoute + "/printer-floor";
+const printerFloorRoute = AppConstants.apiRoute + "/floor";
 
 async function createTestPrinterFloor(request, name = "Floor101", floorNumber = 1) {
   const createResponse = await request.post(printerFloorRoute).send({
     name,
     floor: floorNumber,
-    printerGroups: [],
+    printers: [],
   });
   return expectOkResponse(createResponse, {
     name,
-    printerGroups: expect.any(Array),
+    printers: expect.any(Array),
   });
 }
 

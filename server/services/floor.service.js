@@ -1,32 +1,31 @@
-const PrinterFloorModel = require("../models/PrinterFloor");
-const _ = require("lodash");
+const FloorModel = require("../models/Floor");
 const { validateInput } = require("../handlers/validators");
 const { NotFoundException } = require("../exceptions/runtime.exceptions");
 const {
   createPrinterFloorRules,
   updatePrinterFloorNameRules,
-  printerGroupInFloorRules,
   updatePrinterFloorNumberRules,
+  printerInFloorRules, removePrinterInFloorRules,
 } = require("./validators/printer-floor-service.validation");
 
-class PrinterFloorService {
-  #printerGroupService;
+class FloorService {
+  printerService;
   #logger;
 
-  constructor({ printerGroupService, loggerFactory }) {
-    this.#printerGroupService = printerGroupService;
+  constructor({ printerService, loggerFactory }) {
+    this.printerService = printerService;
     this.#logger = loggerFactory("PrinterFloorService");
   }
 
   /**
-   * Lists the printer groups present in the database.
+   * Lists the floors present in the database.
    */
   async list() {
-    return PrinterFloorModel.find({});
+    return FloorModel.find({});
   }
 
   async get(floorId, throwError = true) {
-    const printerFloor = await PrinterFloorModel.findOne({ _id: floorId });
+    const printerFloor = await FloorModel.findOne({ _id: floorId });
     if (!printerFloor && throwError) {
       throw new NotFoundException(`Printer floor with id ${floorId} does not exist.`);
     }
@@ -36,7 +35,7 @@ class PrinterFloorService {
 
   async createDefaultFloor() {
     return await this.create({
-      name: "default floor",
+      name: "Default Floor",
       floor: 1,
     });
   }
@@ -48,7 +47,7 @@ class PrinterFloorService {
    */
   async create(floor) {
     const validatedInput = await validateInput(floor, createPrinterFloorRules);
-    return PrinterFloorModel.create(validatedInput);
+    return FloorModel.create(validatedInput);
   }
 
   async updateName(floorId, input) {
@@ -67,40 +66,35 @@ class PrinterFloorService {
     return await printerFloor.save();
   }
 
-  async addOrUpdatePrinterGroup(floorId, printerGroupInFloor) {
+  async addOrUpdatePrinter(floorId, printerInFloor) {
     const floor = await this.get(floorId, true);
-    const validInput = await validateInput(printerGroupInFloor, printerGroupInFloorRules);
+    const validInput = await validateInput(printerInFloor, printerInFloorRules);
 
-    const foundPrinterGroupInFloorIndex = floor.printerGroups.findIndex(
-      (pgif) => pgif.printerGroupId.toString() === validInput.printerGroupId
-    );
-    if (foundPrinterGroupInFloorIndex !== -1) {
-      floor.printerGroups[foundPrinterGroupInFloorIndex] = validInput;
+    const foundPrinterInFloorIndex = floor.printers.findIndex((pif) => pif.printerId.toString() === validInput.printerId);
+    if (foundPrinterInFloorIndex !== -1) {
+      floor.printers[foundPrinterInFloorIndex] = validInput;
       return floor;
     } else {
-      floor.printerGroups.push(validInput);
+      floor.printers.push(validInput);
     }
 
     await floor.save();
-
     return floor;
   }
 
-  async removePrinterGroup(floorId, input) {
+  async removePrinter(floorId, input) {
     const floor = await this.get(floorId, true);
-    const validInput = await validateInput(input, printerGroupInFloorRules);
+    const validInput = await validateInput(input, removePrinterInFloorRules);
 
-    const foundPrinterGroupInFloorIndex = floor.printerGroups.findIndex(
-      (pgif) => pgif.printerGroupId.toString() === validInput.printerGroupId
-    );
-    if (foundPrinterGroupInFloorIndex === -1) return floor;
-    floor.printerGroups.splice(foundPrinterGroupInFloorIndex, 1);
+    const foundPrinterInFloorIndex = floor.printers.findIndex((pif) => pif.printerId.toString() === validInput.printerId);
+    if (foundPrinterInFloorIndex === -1) return floor;
+    floor.printers.splice(foundPrinterInFloorIndex, 1);
     return await floor.save();
   }
 
   async delete(floorId) {
-    return PrinterFloorModel.deleteOne({ _id: floorId });
+    return FloorModel.deleteOne({ _id: floorId });
   }
 }
 
-module.exports = PrinterFloorService;
+module.exports = FloorService;

@@ -80,6 +80,7 @@ class ClientBundleService {
     const path = join(zipPath, asset.name);
     writeFileSync(path, Buffer.from(attachmentResult.data));
 
+    // Extract ZIP archive to client bundle folder
     const clientBundlePath = join(superRootPath(), AppConstants.defaultClientBundleStorage);
     const zip = new AdmZip(path);
     ensureDirExists(clientBundlePath);

@@ -28,7 +28,6 @@ function getDefaultPrinterEntry() {
 }
 
 const UUID_LENGTH = 32;
-const minPrinterGroupNameLength = 3;
 const minPrinterFloorNameLength = 3;
 
 module.exports = {
@@ -37,6 +36,5 @@ module.exports = {
   getFileListDefault,
   getDefaultPrinterEntry,
   UUID_LENGTH,
-  minPrinterGroupNameLength,
   minPrinterFloorNameLength,
 };
