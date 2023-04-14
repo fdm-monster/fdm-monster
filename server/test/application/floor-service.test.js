@@ -90,8 +90,9 @@ describe("floorService ", () => {
     expect(floorService.get(floor.id)).toBeTruthy();
     expect(floor.printers).toHaveLength(1);
 
+    // TODO when printerId is undefined error should be thrown
     const newFloor = await floorService.removePrinter(floor.id, {
-      printerId: printer._id,
+      printerId: printer.id,
       x: 1,
       y: 1,
     });
