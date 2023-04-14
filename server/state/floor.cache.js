@@ -3,7 +3,7 @@
  */
 class FloorCache {
   #logger;
-  #floors = [];
+  floors = [];
 
   #floorService;
 
@@ -44,11 +44,11 @@ class FloorCache {
   }
 
   async getFloor(floorId) {
-    if (!this.#floors.length) {
+    if (!this.floors.length) {
       await this.loadCache();
     }
 
-    const floor = this.#floors.find((pf) => pf.id.toString() === floorId);
+    const floor = this.floors.find((pf) => pf.id.toString() === floorId);
     if (!!floor) return floor;
 
     return await this.#floorService.get(floorId);
@@ -72,13 +72,13 @@ class FloorCache {
     return floor;
   }
 
-  async addOrUpdatePrinterGroup(floorId, printerInFloor) {
+  async addOrUpdatePrinter(floorId, printerInFloor) {
     const floor = await this.#floorService.addOrUpdatePrinter(floorId, printerInFloor);
     await this.loadCache();
     return floor;
   }
 
-  async removePrinterGroup(floorId, printerGroupInFloor) {
+  async removePrinter(floorId, printerInFloor) {
     const floor = await this.#floorService.removePrinter(floorId, printerInFloor);
     await this.loadCache();
     return floor;
