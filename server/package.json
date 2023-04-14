@@ -40,7 +40,7 @@
   ],
   "dependencies": {
     "@fdm-monster/client": "1.0.0-rc4",
-    "@influxdata/influxdb-client": "1.31.0",
+    "@influxdata/influxdb-client": "1.33.2",
     "adm-zip": "0.5.10",
     "awilix": "8.0.1",
     "awilix-express": "8.0.0",
