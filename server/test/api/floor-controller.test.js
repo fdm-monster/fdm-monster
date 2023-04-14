@@ -4,9 +4,9 @@ const { setupTestApp } = require("../test-server");
 const { expectOkResponse, expectInternalServerError, expectNotFoundResponse, expectInvalidResponse } = require("../extensions");
 const { createTestPrinter } = require("./test-data/create-printer");
 const { createTestPrinterFloor, printerFloorRoute } = require("./test-data/create-printer-floor");
-const PrinterFloor = require("../../models/Floor");
+const Floor = require("../../models/Floor");
 
-let Model = PrinterFloor;
+let Model = Floor;
 const listRoute = `${AppConstants.apiRoute}/floor`;
 const getRoute = (id) => `${listRoute}/${id}`;
 const addPrinterToFloorRoute = (id) => `${listRoute}/${id}/printer`;
@@ -26,7 +26,7 @@ beforeEach(async () => {
 });
 
 describe("FloorController", () => {
-  it("should return non-empty printer floor list", async () => {
+  it("should return non-empty floor list", async () => {
     const response = await request.get(listRoute).send();
     const data = expectOkResponse(response);
     expect(data).toHaveLength(1);
