@@ -18,7 +18,32 @@ const validNewPrinterState = {
   printerURL: "https://asd.com:81",
 };
 
+/**
+ * Mock data
+ */
+class PrinterMockData {
+  static get PrinterMock() {
+    return {
+      name: "Printuh",
+      printerURL: "http://test.com/",
+      webSocketURL: "ws://test/",
+      apiKey: "asdasasdasdasdasdasdasdasdasdasd",
+    };
+  }
+
+  static get PrinterMockWithGroup() {
+    return {
+      name: "Printuh",
+      printerURL: "http://test.com/",
+      webSocketURL: "ws://test/",
+      apiKey: "asdasdasdasdasdasdasdasdasdasdas",
+      group: "testGroupName",
+    };
+  }
+}
+
 module.exports = {
   testPrinterData,
+  PrinterMockData,
   validNewPrinterState,
 };

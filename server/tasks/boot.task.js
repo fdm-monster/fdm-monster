@@ -19,7 +19,7 @@ class BootTask {
   roleService;
   userService;
   pluginRepositoryCache;
-  printerFloorsCache;
+  floorCache;
   pluginFirmwareUpdateService;
   clientBundleService;
 
@@ -31,13 +31,12 @@ class BootTask {
     multerService,
     printersStore,
     filesStore,
-    printerGroupsCache,
     permissionService,
     roleService,
     userService,
     taskManagerService,
     pluginRepositoryCache,
-    printerFloorsCache,
+    floorCache,
     pluginFirmwareUpdateService,
     clientBundleService,
   }) {
@@ -47,13 +46,12 @@ class BootTask {
     this.multerService = multerService;
     this.printersStore = printersStore;
     this.filesStore = filesStore;
-    this.printerGroupsCache = printerGroupsCache;
     this.permissionService = permissionService;
     this.roleService = roleService;
     this.userService = userService;
     this.#taskManagerService = taskManagerService;
     this.pluginRepositoryCache = pluginRepositoryCache;
-    this.printerFloorsCache = printerFloorsCache;
+    this.floorCache = floorCache;
     this.pluginFirmwareUpdateService = pluginFirmwareUpdateService;
     this.#logger = loggerFactory("Server");
     this.clientBundleService = clientBundleService;
@@ -83,7 +81,7 @@ class BootTask {
       }
     }
 
-    await this.clientBundleService.downloadBundle().catch(e=> {
+    await this.clientBundleService.downloadBundle().catch((e) => {
       this.#logger.error(`Error downloading latest client bundle: ${e.message} (${e.status})`);
     });
 
@@ -94,7 +92,7 @@ class BootTask {
     await this.multerService.clearUploadsFolder();
     await this.printersStore.loadPrintersStore();
     await this.filesStore.loadFilesStore();
-    await this.printerGroupsCache.loadCache();
+    await this.floorCache.loadCache();
 
     this.#logger.info("Synchronizing user permission and roles definition");
     await this.permissionService.syncPermissions();
