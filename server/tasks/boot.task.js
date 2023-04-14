@@ -21,6 +21,7 @@ class BootTask {
   pluginRepositoryCache;
   printerFloorsCache;
   pluginFirmwareUpdateService;
+  clientBundleService;
 
   constructor({
     loggerFactory,
@@ -38,6 +39,7 @@ class BootTask {
     pluginRepositoryCache,
     printerFloorsCache,
     pluginFirmwareUpdateService,
+    clientBundleService,
   }) {
     this.#serverTasks = serverTasks;
     this.serverSettingsService = serverSettingsService;
@@ -54,6 +56,7 @@ class BootTask {
     this.printerFloorsCache = printerFloorsCache;
     this.pluginFirmwareUpdateService = pluginFirmwareUpdateService;
     this.#logger = loggerFactory("Server");
+    this.clientBundleService = clientBundleService;
   }
 
   async runOnce() {
@@ -70,11 +73,7 @@ class BootTask {
     } catch (e) {
       if (e instanceof MongooseError) {
         // Tests should just continue
-        if (
-          !e.message.includes(
-            "Can't call `openUri()` on an active connection with different connection strings."
-          )
-        ) {
+        if (!e.message.includes("Can't call `openUri()` on an active connection with different connection strings.")) {
           if (e.message.includes("ECONNREFUSED")) {
             this.#logger.error("Database connection timed-out. Retrying in 5000.");
           }
@@ -83,6 +82,10 @@ class BootTask {
         }
       }
     }
+
+    await this.clientBundleService.downloadBundle().catch(e=> {
+      this.#logger.error(`Error downloading latest client bundle: ${e.message} (${e.status})`);
+    });
 
     this.#logger.info("Loading Server settings.");
     await this.settingsStore.loadSettings();
@@ -126,9 +129,7 @@ class BootTask {
         password: "fdm-root",
         roles: [adminRole.id],
       });
-      this.#logger.info(
-        "Created admin account as it was missing. Please consult the documentation for credentials."
-      );
+      this.#logger.info("Created admin account as it was missing. Please consult the documentation for credentials.");
     }
   }
 

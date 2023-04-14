@@ -6,7 +6,6 @@ const { configureContainer } = require("./container");
 const { scopePerRequest } = require("awilix-express");
 const cors = require("cors");
 const helmet = require("helmet");
-const { AppConstants } = require("./server.constants");
 const { interceptDatabaseError } = require("./middleware/database");
 const { validateWhitelistedIp, interceptRoles } = require("./middleware/global.middleware");
 
@@ -25,8 +24,7 @@ function setupNormalServer() {
     )
     .use(
       helmet({
-        contentSecurityPolicy: process.env[AppConstants.CONTENT_SECURITY_POLICY_ENABLED] || false,
-        // hsts: true
+        contentSecurityPolicy: false,
       })
     )
     .use(express.json({ limit: "10mb" }))

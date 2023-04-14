@@ -15,6 +15,7 @@ coverage
 **/fdm-monster
 **/images
 **/file-storage
+**/media
 **/nodemon_restart_trigger.js
 
 **/yarn-error.log

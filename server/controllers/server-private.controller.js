@@ -9,10 +9,20 @@ class ServerPrivateController {
   #logger = new Logger("Server-Private-API");
   #serverUpdateService;
   #serverReleaseService;
+  clientBundleService;
 
-  constructor({ serverUpdateService, serverReleaseService }) {
+  constructor({ serverUpdateService, serverReleaseService, clientBundleService }) {
     this.#serverReleaseService = serverReleaseService;
     this.#serverUpdateService = serverUpdateService;
+    this.clientBundleService = clientBundleService;
+  }
+
+  async updateClientBundleGithub(req, res) {
+    await this.clientBundleService.downloadBundle();
+
+    res.send({
+      executed: true,
+    });
   }
 
   async getReleaseStateInfo(req, res) {
@@ -28,9 +38,7 @@ class ServerPrivateController {
 
   async restartServer(req, res) {
     if (!isTestEnvironment()) {
-      this.#logger.warning(
-        "Server restart command fired. Expect the server to be unavailable for a moment"
-      );
+      this.#logger.warning("Server restart command fired. Expect the server to be unavailable for a moment");
     }
     const result = await this.#serverUpdateService.restartServer();
     res.send(result);
@@ -39,8 +47,9 @@ class ServerPrivateController {
 
 // prettier-ignore
 module.exports = createController(ServerPrivateController)
-    .prefix(AppConstants.apiRoute + "/server")
-    .before([authenticate(), authorizeRoles([ROLES.ADMIN])])
-    .get("/", "getReleaseStateInfo")
-    .post("/git-update", "pullGitUpdates")
-    .post("/restart", "restartServer");
+  .prefix(AppConstants.apiRoute + "/server")
+  .before([authenticate(), authorizeRoles([ROLES.ADMIN])])
+  .get("/", "getReleaseStateInfo")
+  .post("/git-update", "pullGitUpdates")
+  .post("/restart", "restartServer")
+  .post("/update-client-bundle-github", "updateClientBundleGithub");
