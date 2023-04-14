@@ -5,21 +5,21 @@ const { validateInput } = require("../handlers/validators");
 const { idRules } = require("./validation/generic.validation");
 const { PERMS } = require("../constants/authorization.constants");
 
-class PrinterGroupController {
+class FloorController {
   #printerService;
-  floorsCache;
+  floorCache;
 
   #logger;
 
-  constructor({ printerService, printerFloorsCache, loggerFactory }) {
+  constructor({ printerService, floorCache, loggerFactory }) {
     this.#printerService = printerService;
-    this.floorsCache = printerFloorsCache;
+    this.floorCache = floorCache;
     this.#logger = loggerFactory("Server-API");
   }
 
   async create(req, res) {
     // Has internal validation
-    const printerFloor = await this.floorsCache.create(req.body);
+    const printerFloor = await this.floorCache.create(req.body);
     res.send(printerFloor);
   }
 
@@ -27,7 +27,7 @@ class PrinterGroupController {
     const { id: groupId } = await validateInput(req.params, idRules);
 
     // Has internal validation
-    const printerFloor = await this.floorsCache.updateName(groupId, req.body);
+    const printerFloor = await this.floorCache.updateName(groupId, req.body);
     res.send(printerFloor);
   }
 
@@ -35,7 +35,7 @@ class PrinterGroupController {
     const { id: groupId } = await validateInput(req.params, idRules);
 
     // Has internal validation
-    const printerFloor = await this.floorsCache.updateFloorNumber(groupId, req.body);
+    const printerFloor = await this.floorCache.updateFloorNumber(groupId, req.body);
     res.send(printerFloor);
   }
 
@@ -43,7 +43,7 @@ class PrinterGroupController {
     const { id: printerFloorId } = await validateInput(req.params, idRules);
 
     // Has internal validation
-    const printerFloor = await this.floorsCache.addOrUpdatePrinter(printerFloorId, req.body);
+    const printerFloor = await this.floorCache.addOrUpdatePrinter(printerFloorId, req.body);
     res.send(printerFloor);
   }
 
@@ -51,30 +51,30 @@ class PrinterGroupController {
     const { id: printerFloorId } = await validateInput(req.params, idRules);
 
     // Has internal validation
-    const printerFloor = await this.floorsCache.removePrinter(printerFloorId, req.body);
+    const printerFloor = await this.floorCache.removePrinter(printerFloorId, req.body);
     res.send(printerFloor);
   }
 
   async list(req, res) {
-    const printerFloors = await this.floorsCache.listCache();
+    const printerFloors = await this.floorCache.listCache();
     res.send(printerFloors);
   }
 
   async get(req, res) {
     const { id: printerFloorId } = await validateInput(req.params, idRules);
-    const printerFloor = await this.floorsCache.getFloor(printerFloorId);
+    const printerFloor = await this.floorCache.getFloor(printerFloorId);
     res.send(printerFloor);
   }
 
   async delete(req, res) {
     const { id: printerFloorId } = await validateInput(req.params, idRules);
-    const result = await this.floorsCache.delete(printerFloorId);
+    const result = await this.floorCache.delete(printerFloorId);
     res.json(result);
   }
 }
 
 // prettier-ignore
-module.exports = createController(PrinterGroupController)
+module.exports = createController(FloorController)
   .prefix(AppConstants.apiRoute + "/floor")
   .before([authenticate()])
   .get("/", "list", withPermission(PERMS.PrinterFloors.List))
