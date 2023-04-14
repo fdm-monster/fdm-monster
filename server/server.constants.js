@@ -11,12 +11,15 @@ module.exports = {
     SERVER_SITE_TITLE_KEY: "SERVER_SITE_TITLE",
     titleShort: "FDM",
     defaultServerPageTitle: "FDM Monster",
+    // @Deprecated: old storage path
     defaultFileStorageFolder: "./file-storage",
+    // New place for all downloads, files etc
+    defaultMediaStorage: "./media",
+    defaultClientBundleStorage: "./media/client-dist",
+    defaultClientBundleZipsStorage: "./media/client-dist-zips",
     defaultServerPort: 4000,
     defaultMongoStringUnauthenticated: "mongodb://127.0.0.1:27017/fdm-monster",
     apiRoute: "/api",
-    CONTENT_SECURITY_POLICY_ENABLED: "CONTENT_SECURITY_POLICY_ENABLED",
-    OVERRIDE_VUE_DIST: process.env["OVERRIDE_VUE_DIST"],
 
     defaultTestEnv: "test",
     defaultProductionEnv: "production",

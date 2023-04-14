@@ -55,7 +55,7 @@ const { PrintCompletionSocketIoTask } = require("./tasks/print-completion.socket
 const { PrintCompletionService } = require("./services/print-completion.service");
 const { SocketIoGateway } = require("./state/socket-io.gateway");
 const { BedTempOverrideTask } = require("./tasks/bed-temp-override.task");
-const { OctokitService, ClientBundleService } = require("./services/octokit.service");
+const { OctokitService, ClientBundleService } = require("./services/client-bundle.service");
 const { Octokit } = require("octokit");
 
 function configureContainer() {
