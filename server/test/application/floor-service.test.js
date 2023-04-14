@@ -91,7 +91,9 @@ describe("floorService ", () => {
     expect(floor.printers).toHaveLength(1);
 
     const newFloor = await floorService.removePrinter(floor.id, {
-      printerId: pg.id,
+      printerId: printer._id,
+      x: 1,
+      y: 1,
     });
     expect(newFloor.printers).toHaveLength(0);
   });
