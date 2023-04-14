@@ -5,7 +5,7 @@ const { socketIoConnectedEvent } = require("../constants/event.constants");
 class PrinterSocketIoTask {
   #socketIoGateway;
   #printersStore;
-  floorsCache;
+  floorCache;
   #fileUploadTrackerCache;
   #influxDbQueryTask;
   #eventEmitter2;
@@ -18,7 +18,7 @@ class PrinterSocketIoTask {
 
   constructor({
     socketIoGateway,
-    floorsCache,
+    floorCache,
     printersStore,
     loggerFactory,
     fileUploadTrackerCache,
@@ -28,7 +28,7 @@ class PrinterSocketIoTask {
     this.#socketIoGateway = socketIoGateway;
     this.#printersStore = printersStore;
     this.#fileUploadTrackerCache = fileUploadTrackerCache;
-    this.floorsCache = floorsCache;
+    this.floorCache = floorCache;
     this.#influxDbQueryTask = influxDbQueryTask;
     this.#logger = loggerFactory(PrinterSocketIoTask.name);
     this.#eventEmitter2 = eventEmitter2;
@@ -43,7 +43,7 @@ class PrinterSocketIoTask {
   }
 
   async sendUpdate() {
-    const floors = await this.floorsCache.listCache();
+    const floors = await this.floorCache.listCache();
     const printerStates = this.#printersStore.listPrintersFlat();
     const trackedUploads = this.#fileUploadTrackerCache.getUploads(true);
 
