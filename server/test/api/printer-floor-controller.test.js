@@ -7,7 +7,7 @@ const { createTestPrinterFloor, printerFloorRoute } = require("./test-data/creat
 const PrinterFloor = require("../../models/Floor");
 
 let Model = PrinterFloor;
-const listRoute = `${AppConstants.apiRoute}/printer-floor`;
+const listRoute = `${AppConstants.apiRoute}/floor`;
 const getRoute = (id) => `${listRoute}/${id}`;
 const addPrinterToFloorRoute = (id) => `${listRoute}/${id}/printer`;
 const deleteRoute = (id) => `${listRoute}/${id}`;
@@ -25,7 +25,7 @@ beforeEach(async () => {
   Model.deleteMany({});
 });
 
-describe("PrinterFloorController", () => {
+describe("FloorController", () => {
   it("should return non-empty printer floor list", async () => {
     const response = await request.get(listRoute).send();
     const data = expectOkResponse(response);

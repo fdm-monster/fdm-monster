@@ -75,7 +75,7 @@ class PrinterGroupController {
 
 // prettier-ignore
 module.exports = createController(PrinterGroupController)
-  .prefix(AppConstants.apiRoute + "/printer-floor")
+  .prefix(AppConstants.apiRoute + "/floor")
   .before([authenticate()])
   .get("/", "list", withPermission(PERMS.PrinterFloors.List))
   .get("/:id", "get", withPermission(PERMS.PrinterFloors.Get))
