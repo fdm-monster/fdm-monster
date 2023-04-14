@@ -17,7 +17,7 @@ module.exports = {
     try {
       await db.collection("printerfloors").update({}, { $set: { printerGroups: [] } }, { multi: true });
       await db.collection("printerfloors").update({}, { $unset: { printers: 1 } }, { multi: true });
-      // await db.collection("floors").rename("printerfloors");
+      await db.collection("floors").rename("printerfloors");
     } finally {
       await session.endSession();
     }

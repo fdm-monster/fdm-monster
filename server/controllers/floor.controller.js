@@ -19,56 +19,56 @@ class FloorController {
 
   async create(req, res) {
     // Has internal validation
-    const printerFloor = await this.floorCache.create(req.body);
-    res.send(printerFloor);
+    const floor = await this.floorCache.create(req.body);
+    res.send(floor);
   }
 
   async updateName(req, res) {
     const { id: groupId } = await validateInput(req.params, idRules);
 
     // Has internal validation
-    const printerFloor = await this.floorCache.updateName(groupId, req.body);
-    res.send(printerFloor);
+    const floor = await this.floorCache.updateName(groupId, req.body);
+    res.send(floor);
   }
 
   async updateFloorNumber(req, res) {
     const { id: groupId } = await validateInput(req.params, idRules);
 
     // Has internal validation
-    const printerFloor = await this.floorCache.updateFloorNumber(groupId, req.body);
-    res.send(printerFloor);
+    const floor = await this.floorCache.updateFloorNumber(groupId, req.body);
+    res.send(floor);
   }
 
   async addPrinterToFloor(req, res) {
-    const { id: printerFloorId } = await validateInput(req.params, idRules);
+    const { id: floorId } = await validateInput(req.params, idRules);
 
     // Has internal validation
-    const printerFloor = await this.floorCache.addOrUpdatePrinter(printerFloorId, req.body);
-    res.send(printerFloor);
+    const floor = await this.floorCache.addOrUpdatePrinter(floorId, req.body);
+    res.send(floor);
   }
 
   async removePrinterFromFloor(req, res) {
-    const { id: printerFloorId } = await validateInput(req.params, idRules);
+    const { id: floorId } = await validateInput(req.params, idRules);
 
     // Has internal validation
-    const printerFloor = await this.floorCache.removePrinter(printerFloorId, req.body);
-    res.send(printerFloor);
+    const floor = await this.floorCache.removePrinter(floorId, req.body);
+    res.send(floor);
   }
 
   async list(req, res) {
-    const printerFloors = await this.floorCache.listCache();
-    res.send(printerFloors);
+    const floors = await this.floorCache.listCache();
+    res.send(floors);
   }
 
   async get(req, res) {
-    const { id: printerFloorId } = await validateInput(req.params, idRules);
-    const printerFloor = await this.floorCache.getFloor(printerFloorId);
-    res.send(printerFloor);
+    const { id: floorId } = await validateInput(req.params, idRules);
+    const floor = await this.floorCache.getFloor(floorId);
+    res.send(floor);
   }
 
   async delete(req, res) {
-    const { id: printerFloorId } = await validateInput(req.params, idRules);
-    const result = await this.floorCache.delete(printerFloorId);
+    const { id: floorId } = await validateInput(req.params, idRules);
+    const result = await this.floorCache.delete(floorId);
     res.json(result);
   }
 }
