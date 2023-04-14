@@ -1,5 +1,5 @@
-const { generateCorrelationToken } = require("../../utils/correlation-token.util");
-const { uploadProgressEvent } = require("../../constants/event.constants");
+const { generateCorrelationToken } = require("../utils/correlation-token.util");
+const { uploadProgressEvent } = require("../constants/event.constants");
 
 /**
  * A generic cache for file upload progress
@@ -30,12 +30,12 @@ class FileUploadTrackerCache {
       ? {
           current: this.#currentUploads,
           done,
-          failed
+          failed,
         }
       : {
           current: this.#currentUploads,
           done: this.#uploadsDone,
-          failed: this.#uploadsFailed
+          failed: this.#uploadsFailed,
         };
   }
 
@@ -53,7 +53,7 @@ class FileUploadTrackerCache {
       correlationToken,
       startedAt: Date.now(),
       multerFile,
-      progress: {}
+      progress: {},
     });
 
     return correlationToken;
@@ -74,13 +74,9 @@ class FileUploadTrackerCache {
   }
 
   markUploadDone(token, success, reason) {
-    const trackedUploadIndex = this.#currentUploads.findIndex(
-      (cu) => cu.correlationToken === token
-    );
+    const trackedUploadIndex = this.#currentUploads.findIndex((cu) => cu.correlationToken === token);
     if (trackedUploadIndex === -1) {
-      this.#logger.warning(
-        `Could not mark upload tracker with token '${token}' as done as it was not found.`
-      );
+      this.#logger.warning(`Could not mark upload tracker with token '${token}' as done as it was not found.`);
       return;
     }
 

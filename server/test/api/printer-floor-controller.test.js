@@ -1,15 +1,10 @@
 const dbHandler = require("../db-handler");
 const { AppConstants } = require("../../server.constants");
 const { setupTestApp } = require("../test-server");
-const {
-  expectOkResponse,
-  expectInternalServerError,
-  expectNotFoundResponse,
-  expectInvalidResponse,
-} = require("../extensions");
+const { expectOkResponse, expectInternalServerError, expectNotFoundResponse, expectInvalidResponse } = require("../extensions");
 const { createTestPrinterGroup } = require("./test-data/create-printer-group");
 const { createTestPrinterFloor, printerFloorRoute } = require("./test-data/create-printer-floor");
-const PrinterFloor = require("../../models/PrinterFloor");
+const PrinterFloor = require("../../models/Floor");
 
 let Model = PrinterFloor;
 const listRoute = `${AppConstants.apiRoute}/printer-floor`;
@@ -101,11 +96,9 @@ describe("PrinterFloorController", () => {
   it("should not be able to add printer-group to non-existing floor", async () => {
     const printerGroup = await createTestPrinterGroup(request);
 
-    const response = await request
-      .post(addPrinterGroupToFloorRoute("63452115122876ea11cd1656"))
-      .send({
-        printerGroupId: printerGroup._id,
-      });
+    const response = await request.post(addPrinterGroupToFloorRoute("63452115122876ea11cd1656")).send({
+      printerGroupId: printerGroup._id,
+    });
     expectNotFoundResponse(response);
   });
 

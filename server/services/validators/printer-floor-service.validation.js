@@ -1,10 +1,9 @@
-const {
-  minPrinterGroupNameLength,
-  minPrinterFloorNameLength,
-} = require("../../constants/service.constants");
+const { minPrinterGroupNameLength, minPrinterFloorNameLength } = require("../../constants/service.constants");
 
-const printerGroupInFloorRules = {
-  printerGroupId: "required|mongoId",
+const printerInFloorRules = {
+  printerId: "required|mongoId",
+  x: "required|integer|between:0,8",
+  y: "required|integer|between:0,8",
 };
 
 const updatePrinterFloorNameRules = {
@@ -18,11 +17,11 @@ const updatePrinterFloorNumberRules = {
 const createPrinterFloorRules = {
   name: `required|minLength:${minPrinterFloorNameLength}`,
   floor: `required|integer`,
-  printerGroups: "array",
+  printers: "array",
 };
 
 module.exports = {
-  printerGroupInFloorRules,
+  printerInFloorRules,
   updatePrinterFloorNameRules,
   updatePrinterFloorNumberRules,
   createPrinterFloorRules,

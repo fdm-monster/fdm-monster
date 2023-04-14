@@ -1,4 +1,4 @@
-const printerFloorModel = require("../../models/PrinterFloor");
+const printerFloorModel = require("../../models/Floor");
 const dbHandler = require("../db-handler");
 const DITokens = require("../../container.tokens");
 const { configureContainer } = require("../../container");
