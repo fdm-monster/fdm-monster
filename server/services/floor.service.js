@@ -89,7 +89,8 @@ class FloorService {
     const foundPrinterInFloorIndex = floor.printers.findIndex((pif) => pif.printerId.toString() === validInput.printerId);
     if (foundPrinterInFloorIndex === -1) return floor;
     floor.printers.splice(foundPrinterInFloorIndex, 1);
-    return await floor.save();
+    await floor.save();
+    return floor;
   }
 
   async delete(floorId) {
