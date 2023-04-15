@@ -1,0 +1,61 @@
+name: NodeJS Release
+on:
+  push:
+    branches:
+      - 'develop'
+      - 'main'
+jobs:
+  checkversion:
+    runs-on: ubuntu-latest
+    outputs:
+      foundServerVersion: ${{ steps.init.outputs.foundServerVersion }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: get-client-version
+        working-directory: server
+        # https://gist.github.com/DarrenN/8c6a5b969481725a4413?permalink_comment_id=3863317#gistcomment-3863317
+        run: |
+          echo "SERVER_VERSION=$(npm pkg get version | sed 's/"//g')" >> $GITHUB_ENV
+      - uses: mukunku/tag-exists-action@v1.2.0
+        id: checkTag
+        with:
+          tag: ${{ env.SERVER_VERSION }}
+      - run: echo ${{ steps.checkTag.outputs.exists }}
+      - name: Environment variables to output
+        id: init
+        run: |
+          echo "foundServerVersion=${{ steps.checkTag.outputs.exists }}" >> $GITHUB_OUTPUT
+
+  release:
+    needs: checkversion
+    runs-on: ubuntu-latest
+    if: needs.checkversion.outputs.foundServerVersion == 'false'
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+
+      # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions
+      - name: get-server-version
+        working-directory: server
+        # https://gist.github.com/DarrenN/8c6a5b969481725a4413?permalink_comment_id=3863317#gistcomment-3863317
+        run: |
+          echo "SERVER_VERSION=$(npm pkg get version | sed 's/"//g')" >> $GITHUB_ENV
+
+      - run: yarn install --immutable --immutable-cache --check-cache
+        working-directory: server
+      - run: yarn build
+        working-directory: server
+
+      - name: Create release
+        uses: actions/create-release@v1
+        id: create_release
+        with:
+          draft: false
+          prerelease: ${{ github.ref_name != 'main' }}
+          release_name: "fdm-monster-server ${{ env.SERVER_VERSION }}"
+          tag_name: ${{ env.SERVER_VERSION }}
+          body: "Release notes not added" # ${{ steps.build_changelog.outputs.changelog }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
