@@ -8,8 +8,7 @@ const PERM_GROUP = {
   Alerts: "Alerts",
   PrinterFiles: "PrinterFiles",
   PrinterSettings: "PrinterSettings",
-  PrinterGroups: "PrinterGroups",
-  PrinterFloors: "PrinterFloors",
+  PrinterFloors: "PrinterFloors", // TODO rename in migration or seed
   PrintCompletion: "PrintCompletion",
   ServerInfo: "ServerInfo",
 };
@@ -29,14 +28,6 @@ const PERMS = {
   [PERM_GROUP.PrintCompletion]: {
     Default: serializePerm(PERM_GROUP.PrintCompletion, "Default"),
     List: serializePerm(PERM_GROUP.PrintCompletion, "List"),
-  },
-  [PERM_GROUP.PrinterGroups]: {
-    Default: serializePerm(PERM_GROUP.PrinterGroups, "Default"),
-    List: serializePerm(PERM_GROUP.PrinterGroups, "List"),
-    Get: serializePerm(PERM_GROUP.PrinterGroups, "Get"),
-    Create: serializePerm(PERM_GROUP.PrinterGroups, "Create"),
-    Update: serializePerm(PERM_GROUP.PrinterGroups, "Update"),
-    Delete: serializePerm(PERM_GROUP.PrinterGroups, "Delete"),
   },
   [PERM_GROUP.PrinterFloors]: {
     Default: serializePerm(PERM_GROUP.PrinterFloors, "Default"),
@@ -83,18 +74,16 @@ const ROLE_PERMS = {
     allPerms(PERM_GROUP.Alerts),
     allPerms(PERM_GROUP.PrinterFloors),
     allPerms(PERM_GROUP.PrinterFiles),
-    allPerms(PERM_GROUP.PrinterGroups),
     allPerms(PERM_GROUP.PrintCompletion),
     allPerms(PERM_GROUP.PrinterSettings),
     allPerms(PERM_GROUP.ServerInfo)
   ),
   [ROLES.OPERATOR]: union(
     allPerms(PERM_GROUP.PrinterFiles),
-    allPerms(PERM_GROUP.PrinterGroups),
     allPerms(PERM_GROUP.PrintCompletion),
     allPerms(PERM_GROUP.PrinterFloors)
   ),
-  [ROLES.GUEST]: [PERMS.PrinterFiles.Default, PERMS.PrinterFiles.Upload, PERMS.PrinterGroups.List],
+  [ROLES.GUEST]: [PERMS.PrinterFiles.Default, PERMS.PrinterFiles.Upload],
 };
 
 module.exports = {

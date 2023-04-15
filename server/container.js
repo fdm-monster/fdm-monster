@@ -1,7 +1,6 @@
 const axios = require("axios");
 const DITokens = require("./container.tokens");
 const PrinterService = require("./services/printer.service");
-const PrinterGroupService = require("./services/printer-group.service");
 const PrintersStore = require("./state/printers.store");
 const SettingsStore = require("./state/settings.store");
 const ServerSettingsService = require("./services/server-settings.service");
@@ -9,8 +8,8 @@ const ServerReleaseService = require("./services/server-release.service");
 const TaskManagerService = require("./services/task-manager.service");
 const ServerUpdateService = require("./services/server-update.service");
 const GithubApiService = require("./services/github-api.service");
-const FileCache = require("./state/data/file.cache");
-const JobsCache = require("./state/data/jobs.cache");
+const FileCache = require("./state/file.cache");
+const JobsCache = require("./state/jobs.cache");
 const PrinterWebsocketTask = require("./tasks/printer-websocket.task");
 const PrinterSocketIoTask = require("./tasks/printer-socketio.task");
 const PrinterSystemTask = require("./tasks/printer-system.task");
@@ -25,9 +24,8 @@ const SoftwareUpdateTask = require("./tasks/software-update.task");
 const { asFunction, asClass, asValue, createContainer, InjectionMode } = require("awilix");
 const LoggerFactory = require("./handlers/logger-factory");
 const PrinterTestTask = require("./tasks/printer-test.task");
-const PrinterGroupsCache = require("./state/data/printer-groups.cache");
 const MulterService = require("./services/multer.service");
-const FileUploadTrackerCache = require("./state/data/file-upload-tracker.cache");
+const FileUploadTrackerCache = require("./state/file-upload-tracker.cache");
 const ServerHost = require("./server.host");
 const BootTask = require("./tasks/boot.task");
 const UserService = require("./services/authentication/user.service");
@@ -40,14 +38,10 @@ const PrinterFileCleanTask = require("./tasks/printer-file-clean.task");
 const { ROLES } = require("./constants/authorization.constants");
 const CustomGCodeService = require("./services/custom-gcode.service");
 const PrinterWebsocketPingTask = require("./tasks/printer-websocket-ping.task");
-const {
-  PluginFirmwareUpdateService,
-} = require("./services/octoprint/plugin-firmware-update.service");
+const { PluginFirmwareUpdateService } = require("./services/octoprint/plugin-firmware-update.service");
 const { PluginRepositoryCache } = require("./services/octoprint/plugin-repository.cache");
 const { configureCacheManager } = require("./handlers/cache-manager");
 const { PluginFirmwareUpdatePreparationTask } = require("./tasks/plugin-firmware-download.task");
-const PrinterFloorService = require("./services/printer-floor.service");
-const PrinterFloorsCache = require("./state/data/printer-floor.cache");
 const { InfluxDbV2BaseService } = require("./services/influxdb-v2/influx-db-v2-base.service");
 const { ConfigService } = require("./services/config.service");
 const { InfluxDbQueryTask } = require("./tasks/influxdb-query.task");
@@ -55,8 +49,10 @@ const { PrintCompletionSocketIoTask } = require("./tasks/print-completion.socket
 const { PrintCompletionService } = require("./services/print-completion.service");
 const { SocketIoGateway } = require("./state/socket-io.gateway");
 const { BedTempOverrideTask } = require("./tasks/bed-temp-override.task");
-const { OctokitService, ClientBundleService } = require("./services/client-bundle.service");
+const { ClientBundleService } = require("./services/client-bundle.service");
 const { Octokit } = require("octokit");
+const FloorService = require("./services/floor.service");
+const FloorCache = require("./state/floor.cache");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -113,15 +109,13 @@ function configureContainer() {
     [DITokens.multerService]: asClass(MulterService).singleton(),
     [DITokens.printerService]: asClass(PrinterService),
     [DITokens.printerFilesService]: asClass(PrinterFilesService),
-    [DITokens.printerGroupService]: asClass(PrinterGroupService),
-    [DITokens.printerFloorService]: asClass(PrinterFloorService).singleton(),
+    [DITokens.floorService]: asClass(FloorService).singleton(),
     [DITokens.printCompletionService]: asClass(PrintCompletionService).singleton(),
     [DITokens.octoPrintApiService]: asClass(OctoPrintApiService).singleton(),
     [DITokens.pluginFirmwareUpdateService]: asClass(PluginFirmwareUpdateService).singleton(),
 
     [DITokens.printerState]: asClass(PrinterState).transient(), // Transient on purpose!
-    [DITokens.printerGroupsCache]: asClass(PrinterGroupsCache).singleton(),
-    [DITokens.printerFloorsCache]: asClass(PrinterFloorsCache).singleton(),
+    [DITokens.floorCache]: asClass(FloorCache).singleton(),
     [DITokens.jobsCache]: asClass(JobsCache).singleton(),
     [DITokens.pluginRepositoryCache]: asClass(PluginRepositoryCache).singleton(),
     [DITokens.fileCache]: asClass(FileCache).singleton(),
@@ -143,9 +137,7 @@ function configureContainer() {
     [DITokens.printerSystemTask]: asClass(PrinterSystemTask).singleton(), // Task dependent on test printer in store - disabled at boot
     [DITokens.printerTestTask]: asClass(PrinterTestTask).singleton(), // Task to regularly clean printer files based on certain configuration settings
     [DITokens.printerFileCleanTask]: asClass(PrinterFileCleanTask).singleton(),
-    [DITokens.pluginFirmwareUpdatePreparationTask]: asClass(
-      PluginFirmwareUpdatePreparationTask
-    ).singleton(), // Delayed run-once cache loader and firmware download utility
+    [DITokens.pluginFirmwareUpdatePreparationTask]: asClass(PluginFirmwareUpdatePreparationTask).singleton(), // Delayed run-once cache loader and firmware download utility
     [DITokens.influxDbQueryTask]: asClass(InfluxDbQueryTask).singleton(),
   });
 

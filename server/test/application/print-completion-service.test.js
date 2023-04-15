@@ -1,8 +1,6 @@
-const printerGroupModel = require("../../models/PrinterGroup");
 const dbHandler = require("../db-handler");
 const DITokens = require("../../container.tokens");
 const { configureContainer } = require("../../container");
-const { PrinterGroupMockData } = require("./test-data/printer-group.data");
 const { PrintCompletionService } = require("../../services/print-completion.service");
 const { EVENT_TYPES } = require("../../services/octoprint/constants/octoprint-websocket.constants");
 
@@ -20,9 +18,6 @@ afterAll(async () => {
   await dbHandler.closeDatabase();
 });
 
-/**
- * PrinterGroupService test suite.
- */
 describe(PrintCompletionService.name, () => {
   /**
    * Tests that a valid printer group can be created through the printerGrouoService without throwing any errors.

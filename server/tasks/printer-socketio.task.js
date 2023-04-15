@@ -4,9 +4,8 @@ const { socketIoConnectedEvent } = require("../constants/event.constants");
 
 class PrinterSocketIoTask {
   #socketIoGateway;
-  #printerGroupsCache;
   #printersStore;
-  #printerFloorsCache;
+  floorCache;
   #fileUploadTrackerCache;
   #influxDbQueryTask;
   #eventEmitter2;
@@ -19,8 +18,7 @@ class PrinterSocketIoTask {
 
   constructor({
     socketIoGateway,
-    printerGroupsCache,
-    printerFloorsCache,
+    floorCache,
     printersStore,
     loggerFactory,
     fileUploadTrackerCache,
@@ -29,9 +27,8 @@ class PrinterSocketIoTask {
   }) {
     this.#socketIoGateway = socketIoGateway;
     this.#printersStore = printersStore;
-    this.#printerGroupsCache = printerGroupsCache;
     this.#fileUploadTrackerCache = fileUploadTrackerCache;
-    this.#printerFloorsCache = printerFloorsCache;
+    this.floorCache = floorCache;
     this.#influxDbQueryTask = influxDbQueryTask;
     this.#logger = loggerFactory(PrinterSocketIoTask.name);
     this.#eventEmitter2 = eventEmitter2;
@@ -46,16 +43,14 @@ class PrinterSocketIoTask {
   }
 
   async sendUpdate() {
-    const floors = await this.#printerFloorsCache.listCache();
+    const floors = await this.floorCache.listCache();
     const printerStates = this.#printersStore.listPrintersFlat();
-    const printerGroups = this.#printerGroupsCache.getCache();
     const trackedUploads = this.#fileUploadTrackerCache.getUploads(true);
 
     const socketIoData = {
       printers: printerStates,
       floors,
       trackedUploads,
-      printerGroups,
       outletCurrentValues: this.#influxDbQueryTask.lastOutletCurrentValues(),
     };
 
@@ -70,9 +65,7 @@ class PrinterSocketIoTask {
       const summedPayloadSize = this.#aggregateSizes.reduce((t, n) => (t += n));
       const averagePayloadSize = summedPayloadSize / 1000 / this.#aggregateWindowLength;
       this.#logger.info(
-        `Printer SocketIO metrics ${averagePayloadSize.toFixed(this.#rounding)} kB [${
-          this.#aggregateWindowLength
-        } TX avg].`
+        `Printer SocketIO metrics ${averagePayloadSize.toFixed(this.#rounding)} kB [${this.#aggregateWindowLength} TX avg].`
       );
       this.#aggregateSizeCounter = 0;
       this.#aggregateSizes = [];
