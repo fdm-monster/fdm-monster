@@ -2,8 +2,8 @@ module.exports = {
   async up(db, client) {
     const dbCollection = db.collection("printergroups");
     const dbCollection2 = db.collection("printerfloors");
-    await dbCollection.syncIndexes();
-    await dbCollection2.syncIndexes();
+    // await dbCollection.syncIndexes();
+    // await dbCollection2.syncIndexes();
 
     // TODO write your migration here.
     // See https://github.com/seppevs/migrate-mongo/#creating-a-new-migration-script
