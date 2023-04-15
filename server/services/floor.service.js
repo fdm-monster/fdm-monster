@@ -73,7 +73,6 @@ class FloorService {
     const foundPrinterInFloorIndex = floor.printers.findIndex((pif) => pif.printerId.toString() === validInput.printerId);
     if (foundPrinterInFloorIndex !== -1) {
       floor.printers[foundPrinterInFloorIndex] = validInput;
-      return floor;
     } else {
       floor.printers.push(validInput);
     }
