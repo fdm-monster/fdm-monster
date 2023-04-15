@@ -43,18 +43,13 @@ jobs:
         run: |
           echo "SERVER_VERSION=$(npm pkg get version | sed 's/"//g')" >> $GITHUB_ENV
 
-      - run: yarn install --immutable --immutable-cache --check-cache
-        working-directory: server
-      - run: yarn build
-        working-directory: server
-
       - name: Create release
         uses: actions/create-release@v1
         id: create_release
         with:
           draft: false
           prerelease: ${{ github.ref_name != 'main' }}
-          release_name: "fdm-monster-server ${{ env.SERVER_VERSION }}"
+          release_name: "${{ env.SERVER_VERSION }} Speed Rabbit Unstable 🐰"
           tag_name: ${{ env.SERVER_VERSION }}
           body: "Release notes not added" # ${{ steps.build_changelog.outputs.changelog }}
         env:
