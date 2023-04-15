@@ -27,20 +27,14 @@ function ensureNodeEnvSet() {
   if (!environment || !AppConstants.knownEnvNames.includes(environment)) {
     const newEnvName = AppConstants.defaultProductionEnv;
     process.env[AppConstants.NODE_ENV_KEY] = newEnvName;
-    logger.warning(
-      `NODE_ENV=${environment} was not set, or not known. Defaulting to NODE_ENV=${newEnvName}`
-    );
+    logger.warning(`NODE_ENV=${environment} was not set, or not known. Defaulting to NODE_ENV=${newEnvName}`);
 
     // Avoid writing to .env in case of docker
     if (isDocker()) {
       return false;
     }
 
-    envUtils.writeVariableToEnvFile(
-      path.resolve(dotEnvPath),
-      AppConstants.NODE_ENV_KEY,
-      newEnvName
-    );
+    envUtils.writeVariableToEnvFile(path.resolve(dotEnvPath), AppConstants.NODE_ENV_KEY, newEnvName);
   } else {
     logger.info(`✓ NODE_ENV variable correctly set (${environment})!`);
   }
@@ -54,17 +48,9 @@ function ensureEnvNpmVersionSet() {
   if (!process.env[AppConstants.VERSION_KEY]) {
     process.env[AppConstants.VERSION_KEY] = packageJsonVersion;
     process.env[AppConstants.NON_NPM_MODE_KEY] = "true";
-    logger.info(
-      `✓ Running ${AppConstants.titleShort} version ${
-        process.env[AppConstants.VERSION_KEY]
-      } in non-NPM mode!`
-    );
+    logger.info(`✓ Running ${AppConstants.titleShort} version ${process.env[AppConstants.VERSION_KEY]} in non-NPM mode!`);
   } else {
-    logger.debug(
-      `✓ Running ${AppConstants.titleShort} version ${
-        process.env[AppConstants.VERSION_KEY]
-      } in NPM mode!`
-    );
+    logger.debug(`✓ Running ${AppConstants.titleShort} version ${process.env[AppConstants.VERSION_KEY]} in NPM mode!`);
   }
 
   if (process.env[AppConstants.VERSION_KEY] !== packageJsonVersion) {
@@ -79,9 +65,7 @@ function removePm2Service(reason) {
 }
 
 function setupPackageJsonVersionOrThrow() {
-  const result = envUtils.verifyPackageJsonRequirements(
-    path.join(__dirname, AppConstants.serverPath)
-  );
+  const result = envUtils.verifyPackageJsonRequirements(path.join(__dirname, AppConstants.serverPath));
   if (!result) {
     if (envUtils.isPm2()) {
       // TODO test this works under docker as well
@@ -95,9 +79,7 @@ function setupPackageJsonVersionOrThrow() {
  * Print out instructions URL
  */
 function printInstructionsURL() {
-  logger.info(
-    `Please make sure to read ${instructionsReferralURL} on how to configure your environment correctly.`
-  );
+  logger.info(`Please make sure to read ${instructionsReferralURL} on how to configure your environment correctly.`);
 }
 
 function fetchMongoDBConnectionString(persistToEnv = false) {
@@ -125,14 +107,8 @@ function fetchServerPort() {
   if (Number.isNaN(parseInt(port))) {
     // is not isDocker just to be sure, also checked in writeVariableToEnvFile
     if (!isDocker()) {
-      envUtils.writeVariableToEnvFile(
-        path.resolve(dotEnvPath),
-        AppConstants.SERVER_PORT_KEY,
-        AppConstants.defaultServerPort
-      );
-      logger.info(
-        `~ Written ${AppConstants.SERVER_PORT_KEY}=${AppConstants.defaultServerPort} setting to .env file.`
-      );
+      envUtils.writeVariableToEnvFile(path.resolve(dotEnvPath), AppConstants.SERVER_PORT_KEY, AppConstants.defaultServerPort);
+      logger.info(`~ Written ${AppConstants.SERVER_PORT_KEY}=${AppConstants.defaultServerPort} setting to .env file.`);
     }
 
     // Update config immediately
@@ -188,40 +164,6 @@ function setupEnvConfig(skipDotEnv = false) {
   ensurePageTitle();
 }
 
-function getAppDistPath() {
-  const clientPackage = AppConstants.clientPackageName;
-  let appDistPath;
-  try {
-    appDistPath = require(clientPackage).getAppDistPath();
-  } catch (e) {
-    logger.error(
-      `~ The client package for FDM '${clientPackage}' was not installed. Can not load frontend app`
-    );
-    return;
-  }
-
-  if (AppConstants.OVERRIDE_VUE_DIST) {
-    appDistPath = AppConstants.OVERRIDE_VUE_DIST;
-  }
-
-  if (!fs.existsSync(appDistPath)) {
-    const errorMessagePrefix = `Could not find Vue app path at ${appDistPath}`;
-
-    if (isEnvProd() && envUtils.isPm2() && !isDocker()) {
-      const message = `${errorMessagePrefix} when running in non-dockerized PM2 mode. Removing pm2 FDM service.`;
-      removePm2Service(message);
-    } else {
-      throw new Error(
-        `${errorMessagePrefix}. ${AppConstants.titleShort} server aborting in docker|nodemon or other mode.`
-      );
-    }
-  }
-
-  logger.info(`✓ Vue dist folder found: ${appDistPath}`);
-
-  return appDistPath;
-}
-
 /**
  * Checks and runs database migrations
  * @param db
@@ -249,8 +191,7 @@ async function runMigrations(db, client) {
 
 function ensurePageTitle() {
   if (!process.env[AppConstants.SERVER_SITE_TITLE_KEY]) {
-    process.env[AppConstants.SERVER_SITE_TITLE_KEY] =
-      AppConstants.defaultServerPageTitle?.toString();
+    process.env[AppConstants.SERVER_SITE_TITLE_KEY] = AppConstants.defaultServerPageTitle?.toString();
   }
 }
 
@@ -260,5 +201,4 @@ module.exports = {
   runMigrations,
   fetchMongoDBConnectionString,
   fetchServerPort,
-  getAppDistPath
 };

@@ -3,8 +3,12 @@ const mongoose = require("mongoose");
 const history = require("connect-history-api-fallback");
 const { loadControllers } = require("awilix-express");
 const exceptionHandler = require("./middleware/exception.handler");
-const { getAppDistPath, fetchServerPort } = require("./server.env");
+const { fetchServerPort } = require("./server.env");
+const { join } = require("path");
 const { NotFoundException } = require("./exceptions/runtime.exceptions");
+const { AppConstants } = require("./server.constants");
+const { superRootPath, rootPath } = require("./utils/fs.utils");
+const { existsSync } = require("node:fs");
 
 class ServerHost {
   #logger;
@@ -52,25 +56,17 @@ class ServerHost {
       .use(exceptionHandler);
 
     // Serve the files for our frontend - do this later than the controllers
-    const appDistPath = getAppDistPath();
-    if (appDistPath) {
-      app.use(express.static(appDistPath)).get("/", function (req, res) {
-        res.sendFile("index.html", { root: appDistPath });
-      });
-    } else {
-      this.#logger.warning("~ Skipped loading Vue frontend as no path was returned");
-    }
+    const bundleDistPath = join(superRootPath(), AppConstants.defaultClientBundleStorage, "dist");
+    app.use(express.static(bundleDistPath));
+    // Backup client in node_modules
+    app.use(express.static(join(rootPath(), "node_modules", AppConstants.clientPackageName, "dist")));
 
     app
       .get("*", (req, res) => {
         const path = req.originalUrl;
 
         let resource = "MVC";
-        if (
-          path.startsWith("/socket.io") ||
-          path.startsWith("/api") ||
-          path.startsWith("/plugins")
-        ) {
+        if (path.startsWith("/socket.io") || path.startsWith("/api") || path.startsWith("/plugins")) {
           resource = "API";
         } else if (path.endsWith(".min.js")) {
           resource = "client-bundle";
@@ -94,9 +90,7 @@ class ServerHost {
 
     const hostOrFqdn = "0.0.0.0";
     const server = this.#appInstance.listen(port, hostOrFqdn, () => {
-      this.#logger.info(
-        `Server started... open it at http://${hostOrFqdn}:${port} or http://127.0.0.1:${port}`
-      );
+      this.#logger.info(`Server started... open it at http://127.0.0.1:${port}`);
     });
     this.#socketIoGateway.attachServer(server);
   }
