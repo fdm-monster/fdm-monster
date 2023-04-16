@@ -19,9 +19,16 @@ The following steps will install the following:
 - node-windows (npm package)
 
 At step 4 you **can** choose to skip the remaining steps by running the `installations/fdm-monster-node-service` installation scripts.
-Step 5 to 8 are just there to let you know how the scripts work.
+Step 5 to 8 are just there to let you know how the scripts work. Step 9 concludes the installation.
 
-### Step 1) 
+### Caveats
+
+- Internet is required
+- Windows only (please use docker on Linux)
+- Pay attention to versions (f.e. Node 16 or 18, and not Node 15/17)
+- Understand powershell execution policy: `Set-ExecutionPolicy -ExecutionPolicy Unrestricted` will allow anything to run.
+
+### Step 1) Installing NodeJS 16+
 Install NodeJS LTS (long-term support) from https://nodejs.org/en/download. 
 At the moment of writing this is Node 18. The FDM Monster server requires you to use at least NodeJS LTS 16.
 
@@ -29,7 +36,7 @@ To check Node is installed properly, you can execute this in command prompt, or 
 > PS C:\Users\SomeUser> node -v
 <br/> v18.14.2
 
-### Step 2)
+### Step 2) Installing MongoDB 5+
 Install MongoDB Community Edition. This URL should allow you to download the MongoDB installation setup: https://fastdl.mongodb.org/windows/mongodb-windows-x86_64-6.0.5-signed.msi. 
 If not select the Windows MSI package: https://www.mongodb.com/try/download/community.
 
@@ -44,12 +51,19 @@ The following tools might be of interest:
 - MongoDB VS Code Extension https://www.mongodb.com/products/vs-code. Inside VS Code, connect to your database and see/adjust the data in place.
 - MongoDB shell https://www.mongodb.com/products/shell. Shell access to the database. For advanced users only!
 
-### Step 3a)
+### Step 3) Installing Git
 Prepare the installation, by ensuring you have git installed. This will help you in updating FDM Monster in the future.
 Find it here: https://git-scm.com/downloads
 
 ### Step 4)
-The following steps 5-9 will install FDM Monster as a service manually. If you'd like to skip this, please use the `installations/fdm-monster-node-service` where I've provided scripts that will install the necessary stuff for you.
+The following steps 5-8 will install FDM Monster as a service manually. If you'd like to skip this, please use the `installations/fdm-monster-node-service` where I've provided scripts that will install the necessary stuff for you.
+
+The first time I would run the powershell script `download-fdm-monster-server.ps1` inside a powershell instance:
+
+> cd installations/fdm-monster-node-service  
+> ./download-fdm-monster-server.ps1
+
+If no errors occurred, please skip to Step 9! You're almost done.
 
 ### Step 5)
 From now on we will be working inside the Powershell (preferred), or Command Prompt (CMD). You should **not** use Administrator mode. 
