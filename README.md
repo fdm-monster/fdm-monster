@@ -1,33 +1,43 @@
+<img src="docs/images/logo-copyright.png" width="200" />
+
 # FDM Monster [![GitHub stars](https://img.shields.io/github/stars/fdm-monster/fdmonster)](https://github.com/fdm-monster/fdm-monster/stargazers) [![GitHub issues](https://img.shields.io/github/issues/fdm-monster/fdm-monster?color=green)](https://github.com/fdm-monster/fdm-monster/issues) [![GitHub forks](https://img.shields.io/github/forks/fdm-monster/fdm-monster)](https://github.com/fdm-monster/fdm-monster/network/members) [![Latest Release](https://img.shields.io/github/release/fdm-monster/fdm-monster)](https://github.com/fdm-monster/fdm-monster/releases/latest) [![Coverage](https://codecov.io/gh/fdm-monster/fdm-monster/branch/develop/graph/badge.svg?flag=server-nodejs&precision=2)](https://app.codecov.io/gh/fdm-monster/fdm-monster)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-**_The server for managing 3D printers with great overview_**
+
 
 FDM Monster is a bulk OctoPrint manager and dashboard written in Vue with Typescript meant to be accessed local, remote, offline or online. This project has a different approach to farm management than normal - it actually scales for bigger farms (50-100). We therefore aim 🚀 for high code quality 😎 and robustness all around 💪. The goals are to deliver a smooth initial setup and 100% clear user experience to ensure you can smash those printing records 🖨️!
 
-Note: our aim is to support all kinds of 3D Printer (FDM, resin) API's with a plugin system and documentation for extensibility - in the future. Read more about this in the roadmap section below.
+![Image](docs/images/server-running.png)
 
-**What we dont aim for**
-We don't aim to provide webcam support right now as this is one of the big bottlenecks for stable server performance. This might change once the developers of FDM Monster have the plugin system tested and working.
+## Getting started
 
-## Stability
+Please read the [GETTING_STARTED](docs/1_GETTING_STARTED.md) for a windows service installation or docker installation.
 
-This server is currently freshly released, so give it a star ⭐and be the first to experience it! 
+### Reach out for questions
+Please join the discord, but stay professional and proactive!
+- Discord serverL: https://discord.gg/mwA8uP8CMc
+- Website: [https://fdm-monster.net](https://fdm-monster.net) 
+- Mail: davidzwa@gmail.com
+
+## Features
+This server is has been battle-tested in the field, so give it a star ⭐and enhance your 3D Printing Farm's workflow! 
 
 #### Last finished features: 
 - Print material/color/assignee parser and tile border color
 - Optional Auto-clean old OctoPrint files with different settings
 - Dependency updates using Renovate (thanks to @mkevenaar for the tips)
 - Quick copy and paste of a FDM Monster printer
-- Firmware update plugin service
-- Printer Floors (like departments) and Printer Groups improvements
+- Prusa Firmware update plugin service
+- Printer Floors (like departments)
 - Printer completion/failure tracking (with statistics page)
-#### Current work:
 - BedTemp override (default true and 50 deg) to reduce farm power consumption
-- Client in Vue3, waiting for Vuetify 3.0 and 3.1 release (https://github.com/fdm-monster/fdm-monster-client)
+- Windows service using node-windows
+#### Current work:
+- Printer placement using drag n drop
+- Documentation
 
 ## Development [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://gitHub.com/fdm-monster/fdm-monster/graphs/commit-activity) [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/fdm-monster/fdm-monster/Node.js%20CI?query=branch%3Adevelop)](https://github.com/fdm-monster/fdm-monster/actions/workflows/nodejs.yml?query=branch%3Adevelop) [![GitHub license](https://img.shields.io/github/license/fdm-monster/fdm-monster)](https://github.com/fdm-monster/fdm-monster/blob/master/LICENSE.txt)
 This work is under active development with cutting edge tech and open-source standards. 
@@ -52,9 +62,10 @@ Feel like joining in as a developer or do you have a quick fix? Great! Please re
 - [x] 🛡️ Complete API test coverage >80% (now at 80.5%)
 - [x] 🛡️ NodeJS Server legacy-free (history, alerts, custom gcode and filament)
 - [x] :rocket: Printer Floor management (departments)
-- [ ] Client with Vuetify 3.0
-- [ ] Client with Vuetify 3.1 (datatable!)
+- [x] :rocket: Windows Service
 - [ ] :rocket: Documentation
+- [ ] Client with Vuetify 3.1 (+ labs datatable)
+- [ ] Klipper/OctoKlipper (and MoonRaker/Fluidd/Mainsail API integration)
 - [ ] 🛡️ Frontend user and basic role management
 - [ ] 🛡️ Client test coverage
 - [ ] 🔌 FDM Connector - filament tracker 
@@ -63,7 +74,6 @@ Feel like joining in as a developer or do you have a quick fix? Great! Please re
 - [ ] :rocket: Plugin system (preparation work is ready)
 - [ ] :rocket: Docker overlay as service management (daemonized restart & auto-updates)
 - [ ] Support for OctoPrint 2.0.0 (when it comes out)
-- [ ] More to be found here https://github.com/fdm-monster/fdm-monster/discussions/48
 
 There are a lot of plans in the making (f.e. tunneling, auto-discovery, plugin system,  etc.), which will be announced as we go!
 
@@ -100,16 +110,6 @@ These awesome people involved in the project ([emoji key](https://allcontributor
 
 FDM Power is licensed with [AGPL-3.0](LICENSE). This means in essence that you may use it commercially, but it must be in FOSS fashion.
 Any changes, deployments or usages should be publicly available and downloadable through Github forks or public repositories. For details, please consult the LICENSE file.
-
-## Contact
-- Main repository: [https://github.com/fdm-monster/fdm-monster](https://github.com/fdm-monster/fdm-monster)
-- Discord: [FDM Monster - Discord server](https://discord.gg/mwA8uP8CMc)
-
-Please join the discord, but stay professional and proactive!
-
-## Sponsors
-
-- MTB3D https://www.mtb3d.com/
 
 ## Historical Note
 
