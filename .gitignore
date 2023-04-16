@@ -13,7 +13,6 @@ coverage
 
 # Runtime folders
 **/fdm-monster
-**/images
 **/file-storage
 **/media
 **/nodemon_restart_trigger.js
