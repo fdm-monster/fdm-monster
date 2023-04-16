@@ -41,10 +41,6 @@ services:
     volumes:
     # Volumes as local relative folders (validate with 'docker-compose config')
     - ./fdm-monster/logs:/app/logs
-    - ./fdm-monster/scripts:/app/scripts
-    - ./fdm-monster/images:/app/images
+    - ./fdm-monster/media:/app/media
+    - ./fdm-monster/file-storage:/app/file-storage
 ```
-
-### Docker or docker-compose for version 2.0 (not released yet!)
-In version 2.0 we will stop using MongoDB and move to a much simpler database MySQL. This means that you won't have to do anything and you can remove your MongoDB database!
-Of course we will provide the tools to hop on to the 2.0 train, when the time comes. The only change is that the `monolithic` will become the same as the `latest` image.
