@@ -9,6 +9,9 @@ Note: the Windows service installation involves quite some steps, and it's quite
 reporting problems, or on how you would like to see this setup improved! <br/>
 Discord: https://discord.gg/mwA8uP8CMc
 
+This is how the webpage looks after installation (visit http://localhost:4000), I hope enjoy running your farm with FDM Monster!
+![Image](images/server-running.png)
+
 ## Preparation of the Windows service installation
 
 The following steps will install the following:
@@ -206,7 +209,8 @@ The service should have Status: Running. If this is not the case, something went
 
 ![Image](images/task-manager.png)
 
+If things are working, you can open fdm monster with this URL: http://localhost:4000 or http://127.0.0.1:4000.
 
-If things are working, you can open fdm monster with this URL: http://localhost:4000 or http://127.0.0.1:4000
+Documentation on how to create and place printers on the grid will follow asap!
 
 Please continue to [2_ENVIRONMENT_SETUP.md](2_ENVIRONMENT_SETUP.md) to change setup configurations.

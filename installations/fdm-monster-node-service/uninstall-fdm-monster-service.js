@@ -12,7 +12,7 @@ const svc = new Service({
 });
 
 svc.on("stop", function () {
-  console.log("Service stopped,. Service exists:", svc.exists);
+  console.log("Service stopped. Service exists:", svc.exists);
 });
 svc.on("uninstall", function () {
   console.log("Uninstall complete. Service exists:", svc.exists);
