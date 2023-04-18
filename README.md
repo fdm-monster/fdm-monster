@@ -18,7 +18,7 @@ Please read the [GETTING_STARTED](docs/1_GETTING_STARTED.md) for a windows servi
 
 ### Reach out for questions
 Please join the discord, but stay professional and proactive!
-- Discord serverL: https://discord.gg/mwA8uP8CMc
+- Discord server: https://discord.gg/mwA8uP8CMc
 - Website: [https://fdm-monster.net](https://fdm-monster.net) 
 - Mail: davidzwa@gmail.com
 
