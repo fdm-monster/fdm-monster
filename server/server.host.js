@@ -8,7 +8,6 @@ const { join } = require("path");
 const { NotFoundException } = require("./exceptions/runtime.exceptions");
 const { AppConstants } = require("./server.constants");
 const { superRootPath, rootPath } = require("./utils/fs.utils");
-const { existsSync } = require("node:fs");
 
 class ServerHost {
   #logger;

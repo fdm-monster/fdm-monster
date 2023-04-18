@@ -1,10 +1,8 @@
-const fs = require("fs");
 const path = require("path");
 const { execSync } = require("child_process");
 const envUtils = require("./utils/env.utils");
 const dotenv = require("dotenv");
 const { AppConstants } = require("./server.constants");
-const { status, up } = require("migrate-mongo");
 const Logger = require("./handlers/logger.js");
 const { isDocker } = require("./utils/is-docker");
 const logger = new Logger("FDM-Environment", false);
@@ -71,7 +69,7 @@ function setupPackageJsonVersionOrThrow() {
       // TODO test this works under docker as well
       removePm2Service("didnt pass startup validation (package.json)");
     }
-    throw new Error(`Aborting server.`);
+    throw new Error("Aborting server.");
   }
 }
 
@@ -171,22 +169,22 @@ function setupEnvConfig(skipDotEnv = false) {
  * @returns {Promise<void>}
  */
 async function runMigrations(db, client) {
-  const migrationsStatus = await status(db);
-  const pendingMigrations = migrationsStatus.filter((m) => m.appliedAt === "PENDING");
-
-  if (pendingMigrations.length) {
-    logger.info(
-      `! MongoDB has ${pendingMigrations.length} migrations left to run (${migrationsStatus.length} migrations in total)`
-    );
-  } else {
-    logger.info(`✓ Mongo Database is up to date [${migrationsStatus.length} migration applied]`);
-  }
-
-  const migrationResult = await up(db, client);
-
-  if (migrationResult > 0) {
-    logger.info(`Applied ${migrationResult.length} migrations successfully`, migrationResult);
-  }
+  // const migrationsStatus = await status(db);
+  // const pendingMigrations = migrationsStatus.filter((m) => m.appliedAt === "PENDING");
+  //
+  // if (pendingMigrations.length) {
+  //   logger.info(
+  //     `! MongoDB has ${pendingMigrations.length} migrations left to run (${migrationsStatus.length} migrations in total)`
+  //   );
+  // } else {
+  //   logger.info(`✓ Mongo Database is up to date [${migrationsStatus.length} migration applied]`);
+  // }
+  //
+  // const migrationResult = await up(db, client);
+  //
+  // if (migrationResult > 0) {
+  //   logger.info(`Applied ${migrationResult.length} migrations successfully`, migrationResult);
+  // }
 }
 
 function ensurePageTitle() {
