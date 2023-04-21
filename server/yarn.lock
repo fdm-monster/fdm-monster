@@ -1535,10 +1535,10 @@
     "@octokit/types" "^9.0.0"
     btoa-lite "^1.0.0"
 
-"@octokit/openapi-types@^16.1.0":
-  version "16.1.0"
-  resolved "https://registry.yarnpkg.com/@octokit/openapi-types/-/openapi-types-16.1.0.tgz#c0a65a89bb67389dbe2dd7960cc8a86e42d5f4d5"
-  integrity sha512-+m6+376kp4gZAYtg64aXGHK2qM2LtIiZctqtbTnETdUaD7OSuX7zDV5kciqw1QIN13lg9jWz039OF7NZUdYEeQ==
+"@octokit/openapi-types@^17.0.0":
+  version "17.0.0"
+  resolved "https://registry.yarnpkg.com/@octokit/openapi-types/-/openapi-types-17.0.0.tgz#7356d287f48b20e9a1f497ef8dfaabdff9cf8622"
+  integrity sha512-V8BVJGN0ZmMlURF55VFHFd/L92XQQ43KvFjNmY1IYbCN3V/h/uUFV6iQi19WEHM395Nn+1qhUbViCAD/1czzog==
 
 "@octokit/plugin-paginate-rest@^6.0.0":
   version "6.0.0"
@@ -1593,11 +1593,11 @@
     universal-user-agent "^6.0.0"
 
 "@octokit/types@^9.0.0":
-  version "9.1.0"
-  resolved "https://registry.yarnpkg.com/@octokit/types/-/types-9.1.0.tgz#c81f85c00b1b1b499f262097838f126612665068"
-  integrity sha512-MPKlN20dSKZ2JGV8KHNO4Y9z6xs74p5sQ2a5++5/uVme44K/5UEntIpai2n1WIrVtMlafYLdfN27BiBs2taY6g==
+  version "9.1.1"
+  resolved "https://registry.yarnpkg.com/@octokit/types/-/types-9.1.1.tgz#8a71f05c4e72fe51aac2c66ed71999abdd7e2777"
+  integrity sha512-hFheiHJEZzE5qn/u4R2IeMLXqUzXgd1vSokHS5x4oq+klHhXNFLL69kanAtrlTqj3K9Dps9XhOqOtDhDmPdlxQ==
   dependencies:
-    "@octokit/openapi-types" "^16.1.0"
+    "@octokit/openapi-types" "^17.0.0"
 
 "@octokit/webhooks-methods@^3.0.0":
   version "3.0.2"
