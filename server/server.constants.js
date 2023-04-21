@@ -12,7 +12,7 @@ module.exports = {
     titleShort: "FDM",
     defaultServerPageTitle: "FDM Monster",
     // @Deprecated: old storage path
-    defaultFileStorageFolder: "./file-storage",
+    defaultFileStorageFolder: "./media",
     // New place for all downloads, files etc
     defaultMediaStorage: "./media",
     defaultClientBundleStorage: "./media/client-dist",

@@ -2,6 +2,7 @@ const multer = require("multer");
 const { AppConstants } = require("../server.constants");
 const { join, extname } = require("path");
 const fs = require("fs");
+const { superRootPath } = require("../utils/fs.utils");
 
 class MulterService {
   #fileUploadTrackerCache;
@@ -21,7 +22,7 @@ class MulterService {
   };
 
   #collectionPath(collection) {
-    return join(AppConstants.defaultFileStorageFolder, collection);
+    return join(superRootPath(), AppConstants.defaultFileStorageFolder, collection);
   }
 
   getNewestFile(collection) {
@@ -32,15 +33,16 @@ class MulterService {
   }
 
   clearUploadsFolder() {
-    if (!fs.existsSync(AppConstants.defaultFileStorageFolder)) return;
+    const fileStoragePath = join(superRootPath(), AppConstants.defaultFileStorageFolder);
+    if (!fs.existsSync(fileStoragePath)) return;
 
     const files = fs
-      .readdirSync(AppConstants.defaultFileStorageFolder, { withFileTypes: true })
+      .readdirSync(fileStoragePath, { withFileTypes: true })
       .filter((item) => !item.isDirectory())
       .map((item) => item.name);
 
     for (const file of files) {
-      fs.unlink(join(AppConstants.defaultFileStorageFolder, file), (err) => {
+      fs.unlink(join(fileStoragePath, file), (err) => {
         /* istanbul ignore next */
         if (err) throw err;
       });
@@ -48,16 +50,16 @@ class MulterService {
   }
 
   fileExists(downloadFilename, collection) {
-    const downloadPath = join(AppConstants.defaultFileStorageFolder, collection, downloadFilename);
+    const downloadPath = join(superRootPath(), AppConstants.defaultFileStorageFolder, collection, downloadFilename);
     return fs.existsSync(downloadPath);
   }
 
   async downloadFile(downloadUrl, downloadFilename, collection) {
-    const downloadFolder = join(AppConstants.defaultFileStorageFolder, collection);
+    const downloadFolder = join(superRootPath(), AppConstants.defaultFileStorageFolder, collection);
     if (!fs.existsSync(downloadFolder)) {
       fs.mkdirSync(downloadFolder, { recursive: true });
     }
-    const downloadPath = join(AppConstants.defaultFileStorageFolder, collection, downloadFilename);
+    const downloadPath = join(superRootPath(), AppConstants.defaultFileStorageFolder, collection, downloadFilename);
     const fileStream = fs.createWriteStream(downloadPath);
 
     const res = await this.#httpClient.get(downloadUrl);
@@ -88,10 +90,10 @@ class MulterService {
     return multer({
       storage: storeAsFile
         ? multer.diskStorage({
-            destination: AppConstants.defaultFileStorageFolder
+            destination: join(superRootPath(), AppConstants.defaultFileStorageFolder),
           })
         : multer.memoryStorage(),
-      fileFilter: this.gcodeFileFilter
+      fileFilter: this.gcodeFileFilter,
     }).any();
   }
 

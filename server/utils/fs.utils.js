@@ -1,5 +1,6 @@
 const { existsSync, mkdirSync } = require("node:fs");
 const { join } = require("path");
+
 function superRootPath() {
   return join(__dirname, "../..");
 }
@@ -17,5 +18,5 @@ function ensureDirExists(dir) {
 module.exports = {
   ensureDirExists,
   superRootPath,
-  rootPath
+  rootPath,
 };

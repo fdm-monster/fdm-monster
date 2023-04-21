@@ -1,5 +1,7 @@
 const winston = require("winston");
 const { AppConstants } = require("../server.constants");
+const { superRootPath } = require("../utils/fs.utils");
+const { join } = require("path");
 
 const dtFormat = new Intl.DateTimeFormat("en-GB", {
   timeStyle: "medium",
@@ -30,7 +32,7 @@ class LoggerService {
           ? [
               new winston.transports.File({
                 level: isTest ? "warn" : "info", // Irrespective of environment
-                filename: `./logs/${name}.log`,
+                filename: join(superRootPath(), AppConstants.defaultFileStorageFolder, `logs/${name}.log`),
                 maxsize: "5000000",
                 maxFiles: 5,
               }),
