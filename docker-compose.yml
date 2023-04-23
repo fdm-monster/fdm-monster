@@ -17,7 +17,7 @@ services:
 
   fdm-monster:
     container_name: fdm-monster
-    image: davidzwa/fdm-monster:v1.2.0-rc5
+    image: davidzwa/fdm-monster:v1.3.0-rc4
     restart: unless-stopped
     build:
       context: ./server
@@ -29,8 +29,4 @@ services:
       - NODE_ENV=development
       - SERVER_PORT=5001
     volumes:
-      # Volumes as local relative folders (validate with 'docker-compose config')
-      - ./fdm-monster/logs:/app/logs
-      - ./fdm-monster/file-storage:/app/file-storage
-      - ./fdm-monster/scripts:/app/scripts
-      - ./fdm-monster/images:/app/images
+      - ./fdm-monster/media/:/app/media
