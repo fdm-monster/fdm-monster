@@ -9,9 +9,6 @@ const {
   updatePrinterDisabledReasonRule,
 } = require("./validators/printer-service.validation");
 const { getDefaultPrinterEntry } = require("../constants/service.constants");
-const {
-  updatePrinterDisabledReasonRules,
-} = require("../controllers/validation/printer-controller.validation");
 
 class PrinterService {
   /**
@@ -45,8 +42,11 @@ class PrinterService {
   }
 
   async validateAndDefault(printer) {
+    const defaultWebSocketURL = printer.printerURL?.replace("http://", "ws://").replace("https://", "wss://");
     const mergedPrinter = {
       ...getDefaultPrinterEntry(),
+      webSocketURL: defaultWebSocketURL,
+      enabled: true,
       ...printer,
     };
     return await validateInput(mergedPrinter, createPrinterRules);
@@ -77,10 +77,7 @@ class PrinterService {
   async update(printerId, updateData) {
     const printer = await this.get(printerId);
 
-    const { printerURL, webSocketURL, apiKey, enabled, settingsAppearance } = await validateInput(
-      updateData,
-      createPrinterRules
-    );
+    const { printerURL, webSocketURL, apiKey, enabled, settingsAppearance } = await validateInput(updateData, createPrinterRules);
 
     await this.get(printerId);
 
