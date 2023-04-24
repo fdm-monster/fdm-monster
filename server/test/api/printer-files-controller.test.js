@@ -30,11 +30,9 @@ const getCacheRoute = (id) => `${getRoute(id)}/cache`;
 let request;
 let octoPrintApiService;
 let container;
-let bedTempOverrideTask;
 beforeAll(async () => {
   await dbHandler.connect();
   ({ request, container, octoPrintApiService } = await setupTestApp(true));
-  bedTempOverrideTask = container.resolve(DITokens.bedTempOverrideTask);
 });
 
 beforeEach(async () => {
@@ -159,11 +157,8 @@ describe("PrinterFilesController", () => {
     const response = await request
       .post(uploadFileRoute(printer.id))
       .field("print", true)
-      .field("bedTemp", 50)
       .attach("file", gcodePath);
     expectOkResponse(response);
-
-    expect(bedTempOverrideTask.bedTempOverrides[printer.id].bedTemp).toBe(50);
   });
 
   test.skip("should not allow POSTing multiple uploaded file", async () => {

@@ -49,7 +49,6 @@ const DITokens = {
   // Tasks
   serverTasks: "serverTasks",
   bootTask: "bootTask",
-  bedTempOverrideTask: "bedTempOverrideTask",
   printerSystemTask: "printerSystemTask",
   softwareUpdateTask: "softwareUpdateTask",
   printerSocketIoTask: "printerSocketIoTask",
@@ -59,7 +58,6 @@ const DITokens = {
   printerWebsocketPingTask: "printerWebsocketPingTask",
   printerFileCleanTask: "printerFileCleanTask",
   pluginFirmwareUpdatePreparationTask: "PluginFirmwareUpdatePreparationTask",
-  influxDbQueryTask: "influxDbQueryTask",
 };
 
 module.exports = DITokens;

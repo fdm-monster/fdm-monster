@@ -18,19 +18,14 @@ const moveFileOrFolderRules = {
   destination: "required|string",
 };
 
-const minBedTemp = 0;
-const maxBedTemp = 100;
-
 const fileUploadCommandsRules = {
   select: "boolean",
   print: "required|boolean",
-  bedTemp: `integer|between:${minBedTemp},${maxBedTemp}`,
 };
 
 const selectAndPrintFileRules = {
   filePath: "required|string",
   print: "required|boolean",
-  bedTemp: `integer|between:${minBedTemp},${maxBedTemp}`,
 };
 
 const localFileUploadRules = {
@@ -40,8 +35,6 @@ const localFileUploadRules = {
 };
 
 module.exports = {
-  minBedTemp,
-  maxBedTemp,
   getFilesRules,
   selectAndPrintFileRules,
   localFileUploadRules,

@@ -24,7 +24,6 @@ class PrinterFilesController {
   #octoPrintApiService;
   #printersStore;
   #multerService;
-  #bedTempOverrideTask;
 
   #printerFileCleanTask;
 
@@ -33,7 +32,6 @@ class PrinterFilesController {
   constructor({
     filesStore,
     octoPrintApiService,
-    bedTempOverrideTask,
     printersStore,
     printerFileCleanTask,
     settingsStore,
@@ -43,7 +41,6 @@ class PrinterFilesController {
     this.#filesStore = filesStore;
     this.#settingsStore = settingsStore;
     this.#printerFileCleanTask = printerFileCleanTask;
-    this.#bedTempOverrideTask = bedTempOverrideTask;
     this.#octoPrintApiService = octoPrintApiService;
     this.#printersStore = printersStore;
     this.#multerService = multerService;
@@ -171,15 +168,7 @@ class PrinterFilesController {
     const {
       filePath: path,
       print,
-      bedTemp,
     } = await validateInput(req.body, selectAndPrintFileRules);
-
-    // Add BedTemp override modifier to FDM Monster
-    if (bedTemp) {
-      this.#bedTempOverrideTask.addBedTempOverride(currentPrinterId, parseInt(bedTemp));
-    } else {
-      this.#logger.info("BedTemp of print will not be watched");
-    }
 
     const result = await this.#octoPrintApiService.selectPrintFile(printerLogin, path, print);
 
@@ -205,15 +194,8 @@ class PrinterFilesController {
     }
 
     // Multer has processed the remaining multipart data into the body as json
-    const { print, select, bedTemp } = await validateInput(req.body, fileUploadCommandsRules);
+    const { print, select } = await validateInput(req.body, fileUploadCommandsRules);
     const uploadedFile = files[0];
-
-    // Add BedTemp override modifier to FDM Monster
-    if (bedTemp) {
-      this.#bedTempOverrideTask.addBedTempOverride(currentPrinterId, parseInt(bedTemp));
-    } else {
-      this.#logger.info("BedTemp of print will not be watched");
-    }
 
     // Perform specific file clean if configured
     const fileCleanEnabled = this.#settingsStore.isPreUploadFileCleanEnabled();

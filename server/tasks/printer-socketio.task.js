@@ -22,14 +22,12 @@ class PrinterSocketIoTask {
     printersStore,
     loggerFactory,
     fileUploadTrackerCache,
-    influxDbQueryTask,
     eventEmitter2,
   }) {
     this.#socketIoGateway = socketIoGateway;
     this.#printersStore = printersStore;
     this.#fileUploadTrackerCache = fileUploadTrackerCache;
     this.floorCache = floorCache;
-    this.#influxDbQueryTask = influxDbQueryTask;
     this.#logger = loggerFactory(PrinterSocketIoTask.name);
     this.#eventEmitter2 = eventEmitter2;
 
@@ -51,7 +49,6 @@ class PrinterSocketIoTask {
       printers: printerStates,
       floors,
       trackedUploads,
-      outletCurrentValues: this.#influxDbQueryTask.lastOutletCurrentValues(),
     };
 
     const serializedData = JSON.stringify(socketIoData);

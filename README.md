@@ -33,7 +33,6 @@ This server is has been battle-tested in the field, so give it a star ⭐and enh
 - Prusa Firmware update plugin service
 - Printer Floors (like departments)
 - Printer completion/failure tracking (with statistics page)
-- BedTemp override (default true and 50 deg) to reduce farm power consumption
 - Windows service using node-windows
 #### Current work:
 - Printer placement using drag n drop
