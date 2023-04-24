@@ -39,8 +39,6 @@ class ServerTasks {
     registerTask(DITokens.printerWebsocketTask, TaskPresets.PERIODIC, 5000, true),
     registerTask(DITokens.printerWebsocketPingTask, TaskPresets.PERIODIC, 30000, false),
     registerTask(DITokens.pluginFirmwareUpdatePreparationTask, TaskPresets.RUNDELAYED, 5000),
-    registerTask(DITokens.influxDbQueryTask, TaskPresets.PERIODIC, 1000, true),
-    registerTask(DITokens.bedTempOverrideTask, TaskPresets.RUNONCE, 0, true),
   ];
 }
 

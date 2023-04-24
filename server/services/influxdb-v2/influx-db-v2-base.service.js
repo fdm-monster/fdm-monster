@@ -15,24 +15,6 @@ class InfluxDbV2BaseService {
     return bucket && org && url && token;
   }
 
-  async getPointObservable(
-    tags = ["3-prusa-rek3laag-rek4laag", "8-prusa-rek1laag-rek2laag", "11-k2-prusa-rekhoog"],
-    measurement = "outlet"
-  ) {
-    const { bucket } = this.#getConfig();
-    const readApi = this.#getQueryApi();
-
-    const deviceFilterQuery =
-      "|> filter(fn: (r) => " + tags.map((t) => `r["_field"] == "${t}"`).join(" or ") + ")";
-    const query = `from(bucket: "${bucket}")
-    |> range(start: -10s)
-    |> filter(fn: (r) => r["_measurement"] == "${measurement}")
-  ${deviceFilterQuery}
-    |> max()`;
-
-    return readApi.rows(query);
-  }
-
   #getConfig() {
     return {
       url: this.configService.get(AppConstants.influxUrl),

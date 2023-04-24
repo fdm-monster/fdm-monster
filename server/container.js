@@ -44,11 +44,9 @@ const { configureCacheManager } = require("./handlers/cache-manager");
 const { PluginFirmwareUpdatePreparationTask } = require("./tasks/plugin-firmware-download.task");
 const { InfluxDbV2BaseService } = require("./services/influxdb-v2/influx-db-v2-base.service");
 const { ConfigService } = require("./services/config.service");
-const { InfluxDbQueryTask } = require("./tasks/influxdb-query.task");
 const { PrintCompletionSocketIoTask } = require("./tasks/print-completion.socketio.task");
 const { PrintCompletionService } = require("./services/print-completion.service");
 const { SocketIoGateway } = require("./state/socket-io.gateway");
-const { BedTempOverrideTask } = require("./tasks/bed-temp-override.task");
 const { ClientBundleService } = require("./services/client-bundle.service");
 const { Octokit } = require("octokit");
 const FloorService = require("./services/floor.service");
@@ -128,7 +126,6 @@ function configureContainer() {
     [DITokens.influxDbV2BaseService]: asClass(InfluxDbV2BaseService),
 
     [DITokens.bootTask]: asClass(BootTask),
-    [DITokens.bedTempOverrideTask]: asClass(BedTempOverrideTask).singleton(),
     [DITokens.softwareUpdateTask]: asClass(SoftwareUpdateTask), // Provided SSE handlers (couplers) shared with controllers
     [DITokens.printerSocketIoTask]: asClass(PrinterSocketIoTask).singleton(), // This task is a quick task (~100ms per printer)
     [DITokens.printCompletionSocketIoTask]: asClass(PrintCompletionSocketIoTask).singleton(),
@@ -138,7 +135,6 @@ function configureContainer() {
     [DITokens.printerTestTask]: asClass(PrinterTestTask).singleton(), // Task to regularly clean printer files based on certain configuration settings
     [DITokens.printerFileCleanTask]: asClass(PrinterFileCleanTask).singleton(),
     [DITokens.pluginFirmwareUpdatePreparationTask]: asClass(PluginFirmwareUpdatePreparationTask).singleton(), // Delayed run-once cache loader and firmware download utility
-    [DITokens.influxDbQueryTask]: asClass(InfluxDbQueryTask).singleton(),
   });
 
   return container;
