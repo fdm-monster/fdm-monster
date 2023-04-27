@@ -49,7 +49,7 @@ jobs:
         with:
           draft: false
           prerelease: ${{ github.ref_name != 'main' }}
-          release_name: "${{ env.SERVER_VERSION }} Speed Rabbit Unstable 🐰"
+          release_name: "${{ env.SERVER_VERSION }} Speedy Rabbit Unstable 🐰"
           tag_name: ${{ env.SERVER_VERSION }}
           body: "Release notes not added" # ${{ steps.build_changelog.outputs.changelog }}
         env:
