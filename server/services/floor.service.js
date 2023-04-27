@@ -8,7 +8,6 @@ const {
   printerInFloorRules,
   removePrinterInFloorRules,
 } = require("./validators/floor-service.validation");
-const { model } = require("mongoose");
 
 class FloorService {
   printerStore;
@@ -22,7 +21,9 @@ class FloorService {
   /**
    * Lists the floors present in the database.
    */
-  async list(patchFloors = true) {
+  async list() {
+    const printerIds = this.printerStore.listPrintersFlat(true).map((p) => p.id);
+
     const floors = await Floor.find({});
     for (const floor of floors) {
       if (!floor.printers?.length) continue;
@@ -30,6 +31,14 @@ class FloorService {
       const removedPositionPrinterIds = [];
       const positionsKnown = {};
       for (const fp of floor.printers) {
+        // Remove orphans
+        const printerExists = printerIds.includes(fp.printerId.toString());
+        if (!printerExists) {
+          removedPositionPrinterIds.push(fp.printerId);
+          continue;
+        }
+
+        // Remove duplicate position, keeping the last added one
         const xyPos = positionsKnown[`${fp.x}${fp.y}`];
         if (!!xyPos) {
           removedPositionPrinterIds.push(xyPos.printerId);
@@ -40,13 +49,14 @@ class FloorService {
       }
 
       if (removedPositionPrinterIds?.length) {
-        floor.printers = floor.printers.filter(fp => !removedPositionPrinterIds.includes(fp.printerId));
-        // await floor.save();
-        this.#logger.warning(`Found ${removedPositionPrinterIds} (floor printerIds) to be in need of removal for floor (duplicate position)`);
+        floor.printers = floor.printers.filter((fp) => !removedPositionPrinterIds.includes(fp.printerId));
+        await floor.save();
+        this.#logger.warning(
+          `Found ${removedPositionPrinterIds} (floor printerIds) to be in need of removal for floor (duplicate position or non-existing printer)`
+        );
       }
-
-
     }
+
     return floors;
   }
 
