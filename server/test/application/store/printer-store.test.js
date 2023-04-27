@@ -172,11 +172,6 @@ describe("PrinterStore", () => {
     expect(printerState.getStateCategory()).toEqual(CATEGORY.Offline);
   });
 
-  it("should get printerState sortIndex", async () => {
-    let printerState = await printerStore.addPrinter(validNewPrinterState);
-    printerState.getSortIndex();
-  });
-
   it("should update printerState systemInfo", async () => {
     let printerState = await printerStore.addPrinter(validNewPrinterState);
     expect(printerState.updateSystemInfo({})).toBeUndefined();

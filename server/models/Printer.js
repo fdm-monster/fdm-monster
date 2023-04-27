@@ -13,10 +13,6 @@ const PrinterSchema = new Schema({
     type: String,
     required: true, // !
   },
-  sortIndex: {
-    type: Number,
-    required: true,
-  },
   enabled: {
     type: Boolean,
     required: true,

@@ -162,7 +162,6 @@ class PrinterState {
       },
       disabledReason: this.#entityData.disabledReason,
       enabled: this.#entityData.enabled,
-      sortIndex: this.#entityData.sortIndex,
       printerName: this.#entityData.settingsAppearance?.name,
       webSocketURL: this.#websocketAdapter?.webSocketURL || this.#entityData.webSocketURL,
       printerURL: this.#entityData.printerURL,
@@ -192,10 +191,6 @@ class PrinterState {
 
   updateStepSize(stepSize) {
     this.#stepSize = stepSize;
-  }
-
-  getSortIndex() {
-    return this.#entityData.sortIndex;
   }
 
   getWebSocketState() {

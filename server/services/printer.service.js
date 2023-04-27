@@ -16,12 +16,8 @@ class PrinterService {
    */
   async list() {
     return Printer.find({}, null, {
-      sort: { sortIndex: 1 },
+      sort: { dateAdded: 1 },
     });
-  }
-
-  async #printerCount() {
-    return Printer.countDocuments();
   }
 
   async get(printerId) {
@@ -61,10 +57,7 @@ class PrinterService {
     if (!newPrinter) throw new Error("Missing printer");
 
     const mergedPrinter = await this.validateAndDefault(newPrinter);
-
     mergedPrinter.dateAdded = Date.now();
-    mergedPrinter.sortIndex = await this.#printerCount(); // 0-based index so no +1 needed
-
     return Printer.create(mergedPrinter);
   }
 
@@ -92,21 +85,6 @@ class PrinterService {
     await printer.save();
 
     return printer;
-  }
-
-  /**
-   *
-   * @param printerId
-   * @param sortIndex
-   * @returns {Promise<Query<Document<any, any> | null, Document<any, any>, {}>>}
-   */
-  async updateSortIndex(printerId, sortIndex) {
-    const update = { sortIndex };
-    await this.get(printerId);
-    return Printer.findByIdAndUpdate(printerId, update, {
-      new: true,
-      useFindAndModify: false,
-    });
   }
 
   async updateFlowRate(printerId, flowRate) {

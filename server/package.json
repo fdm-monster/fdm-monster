@@ -12,7 +12,7 @@
     "pupdate": "pm2 update",
     "stop": "pm2 stop FDM",
     "stop:delete": "pm2 delete FDM",
-    "migration:create": "migrate-mongo create floor-remove-groupinfloor",
+    "migration:create": "migrate-mongo create printer-remove-sortindex",
     "migration:up": "migrate-mongo up",
     "migration:down": "migrate-mongo down",
     "migration:status": "migrate-mongo status",
