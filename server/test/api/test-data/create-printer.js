@@ -11,13 +11,13 @@ async function createTestPrinter(request, groupName = "Row0_0") {
     enabled: false,
     group: groupName,
     settingsAppearance: {
-      name: "testPrinter 123"
-    }
+      name: "testPrinter 123",
+    },
   });
   return expectOkResponse(createResponse, { enabled: false });
 }
 
 module.exports = {
   createTestPrinter,
-  testApiKey
+  testApiKey,
 };

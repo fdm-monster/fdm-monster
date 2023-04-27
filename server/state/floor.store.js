@@ -1,7 +1,7 @@
 /**
  * A generic cache for printer groups
  */
-class FloorCache {
+class FloorStore {
   #logger;
   floors = [];
 
@@ -9,10 +9,10 @@ class FloorCache {
 
   constructor({ floorService, loggerFactory }) {
     this.#floorService = floorService;
-    this.#logger = loggerFactory(FloorCache.name);
+    this.#logger = loggerFactory(FloorStore.name);
   }
 
-  async loadCache() {
+  async loadStore() {
     this.floors = await this.#floorService.list();
 
     if (!this.floors?.length) {
@@ -24,28 +24,28 @@ class FloorCache {
 
   async listCache() {
     if (!this.floors.length) {
-      await this.loadCache();
+      await this.loadStore();
     }
     return this.floors;
   }
 
   async create(input) {
     const floor = await this.#floorService.create(input);
-    await this.loadCache();
+    await this.loadStore();
 
     return floor;
   }
 
   async delete(floorId) {
     const deleteResult = await this.#floorService.delete(floorId);
-    await this.loadCache();
+    await this.loadStore();
 
     return deleteResult;
   }
 
   async getFloor(floorId) {
     if (!this.floors.length) {
-      await this.loadCache();
+      await this.loadStore();
     }
 
     const floor = this.floors.find((pf) => pf.id.toString() === floorId);
@@ -72,13 +72,13 @@ class FloorCache {
 
   async addOrUpdatePrinter(floorId, printerInFloor) {
     const floor = await this.#floorService.addOrUpdatePrinter(floorId, printerInFloor);
-    await this.loadCache();
+    await this.loadStore();
     return floor;
   }
 
   async removePrinter(floorId, printerInFloor) {
     const floor = await this.#floorService.removePrinter(floorId, printerInFloor);
-    await this.loadCache();
+    await this.loadStore();
     return floor;
   }
 
@@ -87,4 +87,4 @@ class FloorCache {
   }
 }
 
-module.exports = FloorCache;
+module.exports = FloorStore;

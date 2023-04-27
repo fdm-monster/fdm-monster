@@ -3,8 +3,9 @@ const { AppConstants } = require("../../server.constants");
 const { setupTestApp } = require("../test-server");
 const { expectOkResponse, expectInternalServerError, expectNotFoundResponse, expectInvalidResponse } = require("../extensions");
 const { createTestPrinter } = require("./test-data/create-printer");
-const { createTestPrinterFloor, printerFloorRoute } = require("./test-data/create-printer-floor");
-const Floor = require("../../models/Floor");
+const { createTestFloor, printerFloorRoute } = require("./test-data/create-printer-floor");
+const { Floor } = require("../../models/Floor");
+const DITokens = require("../../container.tokens");
 
 let Model = Floor;
 const listRoute = `${AppConstants.apiRoute}/floor`;
@@ -15,10 +16,12 @@ const updateNameRoute = (id) => `${getRoute(id)}/name`;
 const updateFloorNumberRoute = (id) => `${getRoute(id)}/floor-number`;
 
 let request;
+let printerStore;
 
 beforeAll(async () => {
   await dbHandler.connect();
-  ({ request } = await setupTestApp(true));
+  ({ request, container } = await setupTestApp(true));
+  printerStore = container.resolve(DITokens.printerStore);
 });
 
 beforeEach(async () => {
@@ -43,7 +46,7 @@ describe("FloorController", () => {
 
   it("should not be able to create printer floor with same floor level number", async () => {
     const floorNumber = 234;
-    const body = await createTestPrinterFloor(request, "Floor101", floorNumber);
+    const body = await createTestFloor(request, "Floor101", floorNumber);
     expect(body.name).toBe("Floor101");
     const createResponse = await request.post(printerFloorRoute).send({
       name: body.name,
@@ -54,14 +57,14 @@ describe("FloorController", () => {
   });
 
   it("should be able to create printer floor with different floor numbers", async () => {
-    const body = await createTestPrinterFloor(request, "Floor101", 1234);
+    const body = await createTestFloor(request, "Floor101", 1234);
     expect(body.name).toBe("Floor101");
-    const body2 = await createTestPrinterFloor(request, "Floor102", 1235);
+    const body2 = await createTestFloor(request, "Floor102", 1235);
     expect(body2.name).toBe("Floor102");
   });
 
   it("should be able to get printer floor", async () => {
-    const floor = await createTestPrinterFloor(request, "Floor123", 506);
+    const floor = await createTestFloor(request, "Floor123", 506);
     const response = await request.get(getRoute(floor._id)).send();
     expectOkResponse(response, { name: "Floor123" });
   });
@@ -72,7 +75,7 @@ describe("FloorController", () => {
   });
 
   it("should be able to update printer floor name", async () => {
-    const floor = await createTestPrinterFloor(request, "Floor123", 507);
+    const floor = await createTestFloor(request, "Floor123", 507);
     const response = await request.patch(updateNameRoute(floor._id)).send({
       name: "newName",
     });
@@ -80,15 +83,15 @@ describe("FloorController", () => {
   });
 
   it("should be able to update printer floor number", async () => {
-    const floor = await createTestPrinterFloor(request, "Floor123", 5070);
+    const floor = await createTestFloor(request, "Floor123", 5070);
     const response = await request.patch(updateFloorNumberRoute(floor._id)).send({
       floor: 5071,
     });
     expectOkResponse(response, { name: "Floor123", floor: 5071 });
   });
 
-  it("should be able to delete printer floor", async () => {
-    const floor = await createTestPrinterFloor(request, "Floor123", 508);
+  it("should be able to delete floor", async () => {
+    const floor = await createTestFloor(request, "Floor123", 508);
     const response = await request.delete(deleteRoute(floor._id)).send();
     expectOkResponse(response);
   });
@@ -106,7 +109,7 @@ describe("FloorController", () => {
 
   it("should be able to add printer to floor", async () => {
     const printer = await createTestPrinter(request);
-    const floor = await createTestPrinterFloor(request, "Floor123", 509);
+    const floor = await createTestFloor(request, "Floor123", 509);
     expect(floor).toMatchObject({ _id: expect.any(String) });
 
     const response = await request.post(addPrinterToFloorRoute(floor._id)).send({
@@ -127,8 +130,10 @@ describe("FloorController", () => {
 
   it("should be able to remove printer from floor", async () => {
     const printer = await createTestPrinter(request);
-    const floor = await createTestPrinterFloor(request, "Floor123", 510);
+    const floor = await createTestFloor(request, "Floor123", 510);
     expect(floor).toMatchObject({ _id: expect.any(String) });
+    await printerStore.loadPrinterStore();
+
     const response = await request.post(addPrinterToFloorRoute(floor._id)).send({
       printerId: printer.id,
       x: 1,
@@ -144,6 +149,6 @@ describe("FloorController", () => {
     const deleteResponse2 = await request.delete(addPrinterToFloorRoute(floor._id)).send({
       printerId: "63452115122876ea11cd1656",
     });
-    expectOkResponse(deleteResponse2);
+    expectNotFoundResponse(deleteResponse2);
   });
 });

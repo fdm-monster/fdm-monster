@@ -3,12 +3,10 @@ const DITokens = require("../container.tokens");
 const { PSTATE, ERR_COUNT, MESSAGE } = require("../constants/state.constants");
 const HttpStatusCode = require("../constants/http-status-codes.constants");
 const { ExternalServiceError } = require("../exceptions/runtime.exceptions");
-const {
-  isLoginResponseGlobal
-} = require("../services/octoprint/constants/octoprint-service.constants");
+const { isLoginResponseGlobal } = require("../services/octoprint/constants/octoprint-service.constants");
 
 class PrinterWebsocketTask {
-  #printersStore;
+  #printerStore;
   #settingsStore;
   #octoPrintService;
   #taskManagerService;
@@ -22,18 +20,18 @@ class PrinterWebsocketTask {
     [ERR_COUNT.notOctoPrint]: {},
     [ERR_COUNT.apiKeyNotAccepted]: {},
     [ERR_COUNT.apiKeyIsGlobal]: {},
-    [ERR_COUNT.missingSessionKey]: {}
+    [ERR_COUNT.missingSessionKey]: {},
   };
 
   constructor({
-    printersStore,
+    printerStore,
     octoPrintApiService,
     settingsStore,
     taskManagerService,
     loggerFactory,
-    printerSystemTask // Just to make sure it can resolve
+    printerSystemTask, // Just to make sure it can resolve
   }) {
-    this.#printersStore = printersStore;
+    this.#printerStore = printerStore;
     this.#settingsStore = settingsStore;
     this.#octoPrintService = octoPrintApiService;
     this.#taskManagerService = taskManagerService;
@@ -41,7 +39,7 @@ class PrinterWebsocketTask {
   }
 
   getRetriedPrinters() {
-    return this.#printersStore.listPrinterStates().filter((p) => p.shouldRetryConnect());
+    return this.#printerStore.listPrinterStates().filter((p) => p.shouldRetryConnect());
   }
 
   async run() {
@@ -182,9 +180,7 @@ class PrinterWebsocketTask {
 
   handleSilencedError(errorCount, taskMessage, printerName, willRetry = false) {
     if (errorCount <= this.#errorMaxThrows) {
-      const retrySilencePostFix = willRetry
-        ? `(Error muted in ${this.#errorMaxThrows - errorCount} tries.)`
-        : "(Not retried)";
+      const retrySilencePostFix = willRetry ? `(Error muted in ${this.#errorMaxThrows - errorCount} tries.)` : "(Not retried)";
       throw new Error(`${taskMessage} ${retrySilencePostFix}`);
     } else if (errorCount % this.#errorModulus === 0) {
       throw new Error(`${taskMessage} ${errorCount} times for printer '${printerName}'.`);

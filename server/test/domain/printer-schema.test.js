@@ -1,4 +1,4 @@
-const Printer = require("../../models/Printer");
+const { Printer } = require("../../models/Printer");
 const { expectValidationError } = require("../extensions");
 
 describe("printer-schema", function () {

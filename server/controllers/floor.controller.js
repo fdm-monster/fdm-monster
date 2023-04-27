@@ -7,19 +7,19 @@ const { PERMS } = require("../constants/authorization.constants");
 
 class FloorController {
   #printerService;
-  floorCache;
+  floorStore;
 
   #logger;
 
-  constructor({ printerService, floorCache, loggerFactory }) {
+  constructor({ printerService, floorStore, loggerFactory }) {
     this.#printerService = printerService;
-    this.floorCache = floorCache;
+    this.floorStore = floorStore;
     this.#logger = loggerFactory("Server-API");
   }
 
   async create(req, res) {
     // Has internal validation
-    const floor = await this.floorCache.create(req.body);
+    const floor = await this.floorStore.create(req.body);
     res.send(floor);
   }
 
@@ -27,7 +27,7 @@ class FloorController {
     const { id: groupId } = await validateInput(req.params, idRules);
 
     // Has internal validation
-    const floor = await this.floorCache.updateName(groupId, req.body);
+    const floor = await this.floorStore.updateName(groupId, req.body);
     res.send(floor);
   }
 
@@ -35,7 +35,7 @@ class FloorController {
     const { id: groupId } = await validateInput(req.params, idRules);
 
     // Has internal validation
-    const floor = await this.floorCache.updateFloorNumber(groupId, req.body);
+    const floor = await this.floorStore.updateFloorNumber(groupId, req.body);
     res.send(floor);
   }
 
@@ -43,7 +43,7 @@ class FloorController {
     const { id: floorId } = await validateInput(req.params, idRules);
 
     // Has internal validation
-    const floor = await this.floorCache.addOrUpdatePrinter(floorId, req.body);
+    const floor = await this.floorStore.addOrUpdatePrinter(floorId, req.body);
     res.send(floor);
   }
 
@@ -51,24 +51,24 @@ class FloorController {
     const { id: floorId } = await validateInput(req.params, idRules);
 
     // Has internal validation
-    const floor = await this.floorCache.removePrinter(floorId, req.body);
+    const floor = await this.floorStore.removePrinter(floorId, req.body);
     res.send(floor);
   }
 
   async list(req, res) {
-    const floors = await this.floorCache.listCache();
+    const floors = await this.floorStore.listCache();
     res.send(floors);
   }
 
   async get(req, res) {
     const { id: floorId } = await validateInput(req.params, idRules);
-    const floor = await this.floorCache.getFloor(floorId);
+    const floor = await this.floorStore.getFloor(floorId);
     res.send(floor);
   }
 
   async delete(req, res) {
     const { id: floorId } = await validateInput(req.params, idRules);
-    const result = await this.floorCache.delete(floorId);
+    const result = await this.floorStore.delete(floorId);
     res.json(result);
   }
 }

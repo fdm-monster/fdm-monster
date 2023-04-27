@@ -1,4 +1,4 @@
-const printerFloorModel = require("../../models/Floor");
+const { Floor } = require("../../models/Floor");
 const dbHandler = require("../db-handler");
 const DITokens = require("../../container.tokens");
 const { configureContainer } = require("../../container");
@@ -6,11 +6,13 @@ const { PrinterMockData } = require("./test-data/printer.data");
 
 let floorService;
 let printerService;
+let printerStore;
 
 beforeAll(async () => {
   await dbHandler.connect();
   const container = configureContainer();
   printerService = container.resolve(DITokens.printerService);
+  printerStore = container.resolve(DITokens.printerStore);
   floorService = container.resolve(DITokens.floorService);
 });
 afterEach(async () => {
@@ -36,7 +38,7 @@ describe("floorService ", () => {
     });
 
     // Assert creation
-    const floor = await printerFloorModel.findOne();
+    const floor = await Floor.findOne();
     expect(floor).toBeTruthy();
   });
 
@@ -53,10 +55,11 @@ describe("floorService ", () => {
     expect(floorService.get(floor.id)).rejects.toBeTruthy();
   });
 
-  it("can add printer to floor", async () => {
+  it("can not add printer to floor", async () => {
     // Prepare the CRUD DTO
     const newPrinter = PrinterMockData.PrinterMock;
     const pg = await printerService.create(newPrinter);
+    await printerStore.loadPrinterStore();
 
     // Create it
     const floor = await floorService.create({
@@ -78,6 +81,7 @@ describe("floorService ", () => {
     // Prepare the CRUD DTO
     const newPrinter = PrinterMockData.PrinterMock;
     const printer = await printerService.create(newPrinter);
+    await printerStore.loadPrinterStore();
 
     // Create it
     const floor = await floorService.create({

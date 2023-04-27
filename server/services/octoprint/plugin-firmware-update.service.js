@@ -27,13 +27,13 @@ class PluginFirmwareUpdateService extends PluginBaseService {
 
   constructor({
     octoPrintApiService,
-    printersStore,
+    printerStore,
     pluginRepositoryCache,
     githubApiService,
     multerService,
     loggerFactory
   }) {
-    super({ octoPrintApiService, printersStore, pluginRepositoryCache, loggerFactory }, config);
+    super({ octoPrintApiService, printerStore, pluginRepositoryCache, loggerFactory }, config);
     this.#octoPrintApiService = octoPrintApiService;
     this.#githubApiService = githubApiService;
     this.#multerService = multerService;

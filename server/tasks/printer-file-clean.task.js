@@ -7,20 +7,20 @@ const DITokens = require("../container.tokens");
 class PrinterFileCleanTask {
   #logger;
   #filesStore;
-  #printersStore;
+  #printerStore;
   #taskManagerService;
   #settingsStore;
   #octoPrintApiService;
 
   constructor({
-    printersStore,
+    printerStore,
     filesStore,
     octoPrintApiService,
     taskManagerService,
     settingsStore,
     loggerFactory
   }) {
-    this.#printersStore = printersStore;
+    this.#printerStore = printerStore;
     this.#filesStore = filesStore;
     this.#taskManagerService = taskManagerService;
     this.#octoPrintApiService = octoPrintApiService;
@@ -37,7 +37,7 @@ class PrinterFileCleanTask {
   }
 
   async run() {
-    const printers = this.#printersStore.listPrinterStates(false);
+    const printers = this.#printerStore.listPrinterStates(false);
     const fileCleanSettings = this.#getSettings();
     const autoCleanAtBootEnabled = fileCleanSettings.autoRemoveOldFilesAtBoot;
 

@@ -5,24 +5,49 @@ const {
   createFloorRules,
   updateFloorNameRules,
   updateFloorNumberRules,
-  printerInFloorRules, removePrinterInFloorRules,
+  printerInFloorRules,
+  removePrinterInFloorRules,
 } = require("./validators/floor-service.validation");
 const { model } = require("mongoose");
 
 class FloorService {
-  printerService;
+  printerStore;
   #logger;
 
-  constructor({ printerService, loggerFactory }) {
-    this.printerService = printerService;
+  constructor({ printerStore, loggerFactory }) {
+    this.printerStore = printerStore;
     this.#logger = loggerFactory("PrinterFloorService");
   }
 
   /**
    * Lists the floors present in the database.
    */
-  async list() {
-    return Floor.find({});
+  async list(patchFloors = true) {
+    const floors = await Floor.find({});
+    for (const floor of floors) {
+      if (!floor.printers?.length) continue;
+
+      const removedPositionPrinterIds = [];
+      const positionsKnown = {};
+      for (const fp of floor.printers) {
+        const xyPos = positionsKnown[`${fp.x}${fp.y}`];
+        if (!!xyPos) {
+          removedPositionPrinterIds.push(xyPos.printerId);
+        }
+
+        // Keep last floor printer
+        positionsKnown[`${fp.x}${fp.y}`] = fp;
+      }
+
+      if (removedPositionPrinterIds?.length) {
+        floor.printers = floor.printers.filter(fp => !removedPositionPrinterIds.includes(fp.printerId));
+        // await floor.save();
+        this.#logger.warning(`Found ${removedPositionPrinterIds} (floor printerIds) to be in need of removal for floor (duplicate position)`);
+      }
+
+
+    }
+    return floors;
   }
 
   async get(floorId, throwError = true) {
@@ -85,6 +110,12 @@ class FloorService {
     const floor = await this.get(floorId, true);
     const validInput = await validateInput(printerInFloor, printerInFloorRules);
 
+    // Ensure printer exists
+    await this.printerStore.getPrinterFlat(validInput.printerId);
+
+    // Ensure position is not taken twice
+    floor.printers = floor.printers.filter((pif) => !(pif.x === printerInFloor.x && pif.y === printerInFloor.y));
+
     const foundPrinterInFloorIndex = floor.printers.findIndex((pif) => pif.printerId.toString() === validInput.printerId);
     if (foundPrinterInFloorIndex !== -1) {
       floor.printers[foundPrinterInFloorIndex] = validInput;
@@ -99,6 +130,9 @@ class FloorService {
   async removePrinter(floorId, input) {
     const floor = await this.get(floorId, true);
     const validInput = await validateInput(input, removePrinterInFloorRules);
+
+    // Ensure printer exists
+    await this.printerStore.getPrinterFlat(validInput.printerId);
 
     const foundPrinterInFloorIndex = floor.printers.findIndex((pif) => pif.printerId.toString() === validInput.printerId);
     if (foundPrinterInFloorIndex === -1) return floor;

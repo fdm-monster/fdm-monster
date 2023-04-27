@@ -11,13 +11,13 @@ class ServerPrivateController {
   #serverUpdateService;
   #serverReleaseService;
   clientBundleService;
-  printersStore;
+  printerStore;
 
-  constructor({ serverUpdateService, serverReleaseService, clientBundleService, printersStore }) {
+  constructor({ serverUpdateService, serverReleaseService, clientBundleService, printerStore }) {
     this.#serverReleaseService = serverReleaseService;
     this.#serverUpdateService = serverUpdateService;
     this.clientBundleService = clientBundleService;
-    this.printersStore = printersStore;
+    this.printerStore = printerStore;
   }
 
   async updateClientBundleGithub(req, res) {
@@ -49,7 +49,7 @@ class ServerPrivateController {
 
   async deleteAllPrinters(req, res) {
     await Printer.deleteMany({});
-    await this.printersStore.loadPrintersStore();
+    await this.printerStore.loadPrinterStore();
     res.send();
   }
 }

@@ -10,7 +10,7 @@ class PrinterTestTask {
   #lastTestRunTime;
   #socketIoGateway;
 
-  #printersStore;
+  #printerStore;
   #settingsStore;
   #octoPrintService;
   #taskManagerService;
@@ -18,14 +18,14 @@ class PrinterTestTask {
   #logger;
 
   constructor({
-    printersStore,
+    printerStore,
     octoPrintApiService,
     settingsStore,
     taskManagerService,
     loggerFactory,
     socketIoGateway,
   }) {
-    this.#printersStore = printersStore;
+    this.#printerStore = printerStore;
     this.#settingsStore = settingsStore;
     this.#octoPrintService = octoPrintApiService;
     this.#taskManagerService = taskManagerService;
@@ -38,7 +38,7 @@ class PrinterTestTask {
   }
 
   async run() {
-    const testPrinterState = this.#printersStore.getTestPrinter();
+    const testPrinterState = this.#printerStore.getTestPrinter();
     const taskExpired = this.#lastTestRunTime
       ? Date.now() <= this.#lastTestRunTime + this.maxRunTime
       : false;
@@ -47,7 +47,7 @@ class PrinterTestTask {
       this.#stopRunning();
 
       if (testPrinterState?.toFlat) {
-        await this.#printersStore.deleteTestPrinter();
+        await this.#printerStore.deleteTestPrinter();
       }
 
       this.#taskManagerService.disableJob(DITokens.printerTestTask);

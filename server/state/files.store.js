@@ -4,21 +4,15 @@ const { ValidationException } = require("../exceptions/runtime.exceptions");
  * Generic store for synchronisation of files and storage information of printers.
  */
 class FilesStore {
-  #printersStore;
+  #printerStore;
   #printerFilesService;
   #fileCache;
   #octoPrintApiService;
 
   #logger;
 
-  constructor({
-    printersStore,
-    printerFilesService,
-    fileCache,
-    octoPrintApiService,
-    loggerFactory
-  }) {
-    this.#printersStore = printersStore;
+  constructor({ printerStore, printerFilesService, fileCache, octoPrintApiService, loggerFactory }) {
+    this.#printerStore = printerStore;
     this.#printerFilesService = printerFilesService;
     this.#fileCache = fileCache;
     this.#octoPrintApiService = octoPrintApiService;
@@ -31,12 +25,10 @@ class FilesStore {
    * @returns {Promise<void>}
    */
   async loadFilesStore() {
-    const printers = this.#printersStore.listPrinterStates();
+    const printers = this.#printerStore.listPrinterStates();
     for (let printer of printers) {
       try {
-        const printerFileStorage = await this.#printerFilesService.getPrinterFilesStorage(
-          printer.id
-        );
+        const printerFileStorage = await this.#printerFilesService.getPrinterFilesStorage(printer.id);
         this.#fileCache.cachePrinterFileStorage(printer.id, printerFileStorage);
       } catch (e) {
         this.#logger.error("Files store failed to reconstruct files from database.", e.stack);
@@ -51,11 +43,11 @@ class FilesStore {
    * @returns {Promise<*>}
    */
   async eagerLoadPrinterFiles(printerId, recursive) {
-    const printer = this.#printersStore.getPrinterState(printerId);
+    const printer = this.#printerStore.getPrinterState(printerId);
     const printerLogin = printer.getLoginDetails();
     const response = await this.#octoPrintApiService.getFiles(printerLogin, recursive, {
       unwrap: false,
-      simple: true
+      simple: true,
     });
 
     await this.updatePrinterFiles(printerId, response.data);
@@ -69,16 +61,11 @@ class FilesStore {
   }
 
   getOutdatedFiles(printerId, ageDaysMax) {
-    if (!ageDaysMax)
-      throw new ValidationException(
-        "ageDaysMax property is required to get printer's outdated files"
-      );
+    if (!ageDaysMax) throw new ValidationException("ageDaysMax property is required to get printer's outdated files");
     const printerFiles = this.getFiles(printerId);
     if (!printerFiles?.files?.length) return [];
     const nowTimestampSeconds = Date.now() / 1000;
-    return printerFiles.files.filter(
-      (file) => !!file.date && file.date + ageDaysMax * 86400 < nowTimestampSeconds
-    );
+    return printerFiles.files.filter((file) => !!file.date && file.date + ageDaysMax * 86400 < nowTimestampSeconds);
   }
 
   async deleteOutdatedFiles(printerId, ageDaysMax) {
@@ -86,8 +73,8 @@ class FilesStore {
     const succeededFiles = [];
 
     const nonRecursiveFiles = this.getOutdatedFiles(printerId, ageDaysMax);
-    const printerLogin = this.#printersStore.getPrinterLogin(printerId);
-    const printerName = this.#printersStore.getPrinterState(printerId).getName();
+    const printerLogin = this.#printerStore.getPrinterLogin(printerId);
+    const printerName = this.#printerStore.getPrinterState(printerId).getName();
 
     for (let file of nonRecursiveFiles) {
       try {
@@ -103,12 +90,12 @@ class FilesStore {
     );
     return {
       failedFiles,
-      succeededFiles
+      succeededFiles,
     };
   }
 
   async purgePrinterFiles(printerId) {
-    const printerState = this.#printersStore.getPrinterState(printerId);
+    const printerState = this.#printerStore.getPrinterState(printerId);
 
     this.#logger.info(`Purging files from printer ${printerId}`);
     await this.#printerFilesService.clearFiles(printerState.id);
@@ -120,7 +107,7 @@ class FilesStore {
   }
 
   async purgeFiles() {
-    const allPrinters = this.#printersStore.listPrinterStates(true);
+    const allPrinters = this.#printerStore.listPrinterStates(true);
 
     this.#logger.info(`Purging files from ${allPrinters.length} printers`);
     for (let printer of allPrinters) {
@@ -135,7 +122,7 @@ class FilesStore {
   }
 
   async updatePrinterFiles(printerId, files) {
-    const printer = this.#printersStore.getPrinterState(printerId);
+    const printer = this.#printerStore.getPrinterState(printerId);
 
     // Check printer in database and modify
     const printerFileList = await this.#printerFilesService.updateFiles(printer.id, files);
@@ -145,13 +132,10 @@ class FilesStore {
   }
 
   async appendOrSetPrinterFile(printerId, addedFile) {
-    const printer = this.#printersStore.getPrinterState(printerId);
+    const printer = this.#printerStore.getPrinterState(printerId);
 
     // Check printer in database and modify
-    const { fileList, lastPrintedFile } = await this.#printerFilesService.appendOrReplaceFile(
-      printer.id,
-      addedFile
-    );
+    const { fileList, lastPrintedFile } = await this.#printerFilesService.appendOrReplaceFile(printer.id, addedFile);
 
     // Update cache with data from storage
     await this.#fileCache.cachePrinterFiles(printer.id, fileList);
@@ -161,12 +145,9 @@ class FilesStore {
   }
 
   async setExistingFileForPrint(printerId, filePath) {
-    const printer = this.#printersStore.getPrinterState(printerId);
+    const printer = this.#printerStore.getPrinterState(printerId);
 
-    const lastPrintedFile = await this.#printerFilesService.setPrinterLastPrintedFile(
-      printerId,
-      filePath
-    );
+    const lastPrintedFile = await this.#printerFilesService.setPrinterLastPrintedFile(printerId, filePath);
 
     // Update printer state with lastPrintedFile
     printer.updateLastPrintedFile(lastPrintedFile);
@@ -180,11 +161,7 @@ class FilesStore {
    * @returns {Promise<{cache: ((*&{success: boolean, message})|(*&{success: boolean, message})), service: *}>}
    */
   async deleteFile(printerId, filePath, throwError) {
-    const serviceActionResult = await this.#printerFilesService.deleteFile(
-      printerId,
-      filePath,
-      throwError
-    );
+    const serviceActionResult = await this.#printerFilesService.deleteFile(printerId, filePath, throwError);
 
     // Warning only
     const cacheActionResult = this.#fileCache.purgeFile(printerId, filePath);

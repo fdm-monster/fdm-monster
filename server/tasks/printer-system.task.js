@@ -4,16 +4,16 @@
  * @type {PrinterSystemTask}
  */
 class PrinterSystemTask {
-  #printersStore;
+  #printerStore;
   #octoPrintApiService;
 
-  constructor({ printersStore, octoPrintApiService }) {
-    this.#printersStore = printersStore;
+  constructor({ printerStore, octoPrintApiService }) {
+    this.#printerStore = printerStore;
     this.#octoPrintApiService = octoPrintApiService;
   }
 
   async run() {
-    const printers = this.#printersStore.listPrinterStates();
+    const printers = this.#printerStore.listPrinterStates();
 
     // TODO pool this
     for (let printer of printers) {

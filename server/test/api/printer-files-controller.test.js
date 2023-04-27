@@ -1,13 +1,9 @@
 const dbHandler = require("../db-handler");
 const { AppConstants } = require("../../server.constants");
 const { setupTestApp } = require("../test-server");
-const Printer = require("../../models/Printer");
+const { Printer } = require("../../models/Printer");
 const { createTestPrinter } = require("./test-data/create-printer");
-const {
-  expectOkResponse,
-  expectInvalidResponse,
-  expectNotFoundResponse,
-} = require("../extensions");
+const { expectOkResponse, expectInvalidResponse, expectNotFoundResponse } = require("../extensions");
 const nock = require("nock");
 const DITokens = require("../../container.tokens");
 
@@ -154,10 +150,7 @@ describe("PrinterFilesController", () => {
       })
       .persist();
 
-    const response = await request
-      .post(uploadFileRoute(printer.id))
-      .field("print", true)
-      .attach("file", gcodePath);
+    const response = await request.post(uploadFileRoute(printer.id)).field("print", true).attach("file", gcodePath);
     expectOkResponse(response);
   });
 
@@ -199,10 +192,7 @@ describe("PrinterFilesController", () => {
       })
       .persist();
 
-    const response = await request
-      .post(uploadFileRoute(printer.id))
-      .field("print", true)
-      .attach("file", invalidGcodePath);
+    const response = await request.post(uploadFileRoute(printer.id)).field("print", true).attach("file", invalidGcodePath);
     console.log(response);
     expectInvalidResponse(response, ["error"]);
   });

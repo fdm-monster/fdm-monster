@@ -109,7 +109,7 @@ describe("PrinterController", () => {
     const res = await request.get(getRoute(printerId)).send();
     expectNotFoundResponse(res);
     expect(res.body).toEqual({
-      error: `The printer ID '${printerId}' was not found in the PrintersStore.`,
+      error: `The printer ID '${printerId}' was not found in the printerStore.`,
     });
   });
 

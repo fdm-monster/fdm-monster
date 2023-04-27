@@ -9,13 +9,13 @@ const { serverSettingKey } = require("../constants/server-settings.constants");
 class ServerPublicController {
   #serverVersion;
   #settingsStore;
-  #printersStore;
+  #printerStore;
   #serverReleaseService;
 
-  constructor({ settingsStore, printersStore, serverVersion, serverReleaseService }) {
+  constructor({ settingsStore, printerStore, serverVersion, serverReleaseService }) {
     this.#settingsStore = settingsStore;
     this.#serverVersion = serverVersion;
-    this.#printersStore = printersStore;
+    this.#printerStore = printerStore;
     this.#serverReleaseService = serverReleaseService;
   }
 

@@ -1,5 +1,5 @@
 class PrinterWebsocketPingTask {
-  #printersStore;
+  #printerStore;
   #settingsStore;
   #octoPrintService;
   #taskManagerService;
@@ -7,13 +7,13 @@ class PrinterWebsocketPingTask {
   #logger;
 
   constructor({
-    printersStore,
+    printerStore,
     octoPrintApiService,
     settingsStore,
     taskManagerService,
     loggerFactory
   }) {
-    this.#printersStore = printersStore;
+    this.#printerStore = printerStore;
     this.#settingsStore = settingsStore;
     this.#octoPrintService = octoPrintApiService;
     this.#taskManagerService = taskManagerService;
@@ -21,7 +21,7 @@ class PrinterWebsocketPingTask {
   }
 
   getConnectedPrinters() {
-    return this.#printersStore.listPrinterStates().filter((p) => p.isAdapterAuthed());
+    return this.#printerStore.listPrinterStates().filter((p) => p.isAdapterAuthed());
   }
 
   async run() {

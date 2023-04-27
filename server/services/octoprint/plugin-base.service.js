@@ -7,7 +7,7 @@ const { pluginManagerCommands } = require("./constants/octoprint-service.constan
 class PluginBaseService {
   // https://github.com/OctoPrint/OctoPrint/blob/76e87ba81329e6ce761c9307d3e80c291000871e/src/octoprint/plugins/pluginmanager/__init__.py#L609
   octoPrintApiService;
-  printersStore;
+  printerStore;
   pluginRepositoryCache;
   #pluginName;
   #pluginUrl;
@@ -15,11 +15,11 @@ class PluginBaseService {
   _logger;
 
   constructor(
-    { octoPrintApiService, printersStore, pluginRepositoryCache, loggerFactory },
+    { octoPrintApiService, printerStore, pluginRepositoryCache, loggerFactory },
     { pluginName, pluginUrl }
   ) {
     this.octoPrintApiService = octoPrintApiService;
-    this.printersStore = printersStore;
+    this.printerStore = printerStore;
     this.pluginRepositoryCache = pluginRepositoryCache;
     this.#pluginName = pluginName;
     this._logger = loggerFactory(`Plugin-${pluginName}`);

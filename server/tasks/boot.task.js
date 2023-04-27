@@ -12,13 +12,13 @@ class BootTask {
   settingsStore;
   serverSettingsService;
   multerService;
-  printersStore;
+  printerStore;
   filesStore;
   permissionService;
   roleService;
   userService;
   pluginRepositoryCache;
-  floorCache;
+  floorStore;
   pluginFirmwareUpdateService;
   clientBundleService;
 
@@ -28,14 +28,14 @@ class BootTask {
     serverSettingsService,
     settingsStore,
     multerService,
-    printersStore,
+    printerStore,
     filesStore,
     permissionService,
     roleService,
     userService,
     taskManagerService,
     pluginRepositoryCache,
-    floorCache,
+    floorStore,
     pluginFirmwareUpdateService,
     clientBundleService,
   }) {
@@ -43,14 +43,14 @@ class BootTask {
     this.serverSettingsService = serverSettingsService;
     this.settingsStore = settingsStore;
     this.multerService = multerService;
-    this.printersStore = printersStore;
+    this.printerStore = printerStore;
     this.filesStore = filesStore;
     this.permissionService = permissionService;
     this.roleService = roleService;
     this.userService = userService;
     this.#taskManagerService = taskManagerService;
     this.pluginRepositoryCache = pluginRepositoryCache;
-    this.floorCache = floorCache;
+    this.floorStore = floorStore;
     this.pluginFirmwareUpdateService = pluginFirmwareUpdateService;
     this.#logger = loggerFactory("Server");
     this.clientBundleService = clientBundleService;
@@ -87,11 +87,11 @@ class BootTask {
     this.#logger.info("Loading Server settings.");
     await this.settingsStore.loadSettings();
 
-    this.#logger.info("Loading caches.");
+    this.#logger.info("Loading data cache and storage folders.");
     await this.multerService.clearUploadsFolder();
-    await this.printersStore.loadPrintersStore();
+    await this.printerStore.loadPrinterStore();
     await this.filesStore.loadFilesStore();
-    await this.floorCache.loadCache();
+    await this.floorStore.loadStore();
 
     this.#logger.info("Synchronizing user permission and roles definition");
     await this.permissionService.syncPermissions();

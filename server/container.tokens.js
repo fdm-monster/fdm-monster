@@ -36,13 +36,13 @@ const DITokens = {
   customGCodeService: "customGCodeService",
   // Stores/states
   settingsStore: "settingsStore",
-  printersStore: "printersStore",
+  printerStore: "printerStore",
   octoPrintLogsCache: "printerTickerStore",
   filesStore: "filesStore",
   printerStateFactory: "printerStateFactory",
   printerState: "printerState",
   // Caches
-  floorCache: "floorCache",
+  floorStore: "floorStore",
   jobsCache: "jobsCache",
   fileCache: "fileCache",
   fileUploadTrackerCache: "fileUploadTrackerCache",

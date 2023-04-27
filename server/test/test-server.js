@@ -42,8 +42,8 @@ async function setupTestApp(loadPrinterStore = false, mocks = undefined, quick_b
 
   if (loadPrinterStore) {
     // Requires (in-memory) database connection, so its optional
-    const printersStore = container.resolve(DITokens.printersStore);
-    await printersStore.loadPrintersStore();
+    const printerStore = container.resolve(DITokens.printerStore);
+    await printerStore.loadPrinterStore();
   }
 
   return {
