@@ -7,7 +7,6 @@
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 
-
 FDM Monster is a bulk OctoPrint manager and dashboard written in Vue with Typescript meant to be accessed local, remote, offline or online. This project has a different approach to farm management than normal - it actually scales for bigger farms (50-100). We therefore aim 🚀 for high code quality 😎 and robustness all around 💪. The goals are to deliver a smooth initial setup and 100% clear user experience to ensure you can smash those printing records 🖨️!
 
 ![Image](docs/images/server-running.png)
@@ -15,9 +14,11 @@ FDM Monster is a bulk OctoPrint manager and dashboard written in Vue with Typesc
 ## Getting started
 
 Please read the [GETTING_STARTED](docs/1_GETTING_STARTED.md) for a windows service installation or docker installation.
+We also offer a [Raspberry Pi Image](docs/4_MONSTER_PI.md).
 
 ### Reach out for questions
 Please join the discord, but stay professional and proactive!
+- Documentation (work in progress): https://docs.fdm-monster.net
 - Discord server: https://discord.gg/mwA8uP8CMc
 - Website: [https://fdm-monster.net](https://fdm-monster.net) 
 - Mail: davidzwa@gmail.com
@@ -26,17 +27,20 @@ Please join the discord, but stay professional and proactive!
 This server is has been battle-tested in the field, so give it a star ⭐and enhance your 3D Printing Farm's workflow! 
 
 #### Last finished features: 
-- Print material/color/assignee parser and tile border color
 - Optional Auto-clean old OctoPrint files with different settings
 - Dependency updates using Renovate (thanks to @mkevenaar for the tips)
-- Quick copy and paste of a FDM Monster printer
-- Prusa Firmware update plugin service
+- Quick copy and paste of a FDM Monster printers
+<!-- - Prusa Firmware update plugin service -->
 - Printer Floors (like departments)
 - Printer completion/failure tracking (with statistics page)
 - Windows service using node-windows
-#### Current work:
+- Raspberry Pi image (MonsterPi) https://github.com/fdm-monster/MonsterPi
 - Printer placement using drag n drop
-- Documentation
+
+#### Current work:
+- Documentation on  https://docs.fdm-monster.net
+- Maintenance repair log page
+- MQTT autodiscovery
 
 ## Development [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://gitHub.com/fdm-monster/fdm-monster/graphs/commit-activity) [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/fdm-monster/fdm-monster/Node.js%20CI?query=branch%3Adevelop)](https://github.com/fdm-monster/fdm-monster/actions/workflows/nodejs.yml?query=branch%3Adevelop) [![GitHub license](https://img.shields.io/github/license/fdm-monster/fdm-monster)](https://github.com/fdm-monster/fdm-monster/blob/master/LICENSE.txt)
 This work is under active development with cutting edge tech and open-source standards. 
@@ -62,13 +66,13 @@ Feel like joining in as a developer or do you have a quick fix? Great! Please re
 - [x] 🛡️ NodeJS Server legacy-free (history, alerts, custom gcode and filament)
 - [x] :rocket: Printer Floor management (departments)
 - [x] :rocket: Windows Service
-- [ ] :rocket: Documentation
-- [ ] Client with Vuetify 3.1 (+ labs datatable)
+- [x] :rocket: Documentation
+- [x] 🔌 Raspberry Pi image and prebuilt customized OctoPi image
+- [ ] Client with Vuetify 3.2 (+ labs datatable)
 - [ ] Klipper/OctoKlipper (and MoonRaker/Fluidd/Mainsail API integration)
 - [ ] 🛡️ Frontend user and basic role management
 - [ ] 🛡️ Client test coverage
 - [ ] 🔌 FDM Connector - filament tracker 
-- [ ] 🔌 Raspberry Pi image and prebuilt customized OctoPi image
 - [ ] :rocket: Chocolatey package (Windows install)
 - [ ] :rocket: Plugin system (preparation work is ready)
 - [ ] :rocket: Docker overlay as service management (daemonized restart & auto-updates)
@@ -113,4 +117,3 @@ Any changes, deployments or usages should be publicly available and downloadable
 ## Historical Note
 
 This project has been forked from OctoFarm at September 2021 when I ended as a contributor to this project. 
-FDM Monster is not intending to compete with OctoFarm, we're just another project with a different vision.
