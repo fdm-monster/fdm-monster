@@ -18,28 +18,26 @@ const { getSettingsAppearanceDefault } = require("../constants/service.constants
 const { printerResolveMiddleware } = require("../middleware/printer");
 const { generateCorrelationToken } = require("../utils/correlation-token.util");
 const { ROLES } = require("../constants/authorization.constants");
+const { model } = require("mongoose");
+const { Floor } = require("../models/Floor");
 
 class PrinterController {
   #printersStore;
   #taskManagerService;
   #octoPrintApiService;
   #pluginRepositoryCache;
+  floorCache;
 
   #logger;
 
-  constructor({
-    printersStore,
-    taskManagerService,
-    loggerFactory,
-    octoPrintApiService,
-    pluginRepositoryCache,
-  }) {
+  constructor({ printersStore, taskManagerService, loggerFactory, octoPrintApiService, pluginRepositoryCache, floorCache }) {
     this.#logger = loggerFactory("Server-API");
 
     this.#printersStore = printersStore;
     this.#taskManagerService = taskManagerService;
     this.#octoPrintApiService = octoPrintApiService;
     this.#pluginRepositoryCache = pluginRepositoryCache;
+    this.floorCache = floorCache;
   }
 
   async getPrinter(req, res) {
@@ -132,9 +130,7 @@ class PrinterController {
     // Has internal validation, but might add some here above as well
     const printerState = await this.#printersStore.addPrinter(newPrinter);
 
-    this.#logger.info(
-      `Created printer with ID ${printerState.id || printerState.correlationToken}`
-    );
+    this.#logger.info(`Created printer with ID ${printerState.id || printerState.correlationToken}`);
 
     res.send(printerState.toFlat());
   }
@@ -151,9 +147,19 @@ class PrinterController {
     res.send(listedPrinters);
   }
 
+  async listPrinterFloors(req, res) {
+    const { currentPrinterId } = getScopedPrinter(req);
+    const results = await Floor.find({
+      "printers.printerId": currentPrinterId,
+    });
+
+    res.send(results);
+  }
+
   async delete(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
     const result = await this.#printersStore.deletePrinter(currentPrinterId);
+    await this.floorCache.removePrinterFromAnyFloor(currentPrinterId);
     res.send(result);
   }
 
@@ -183,10 +189,7 @@ class PrinterController {
     const { currentPrinterId } = getScopedPrinter(req);
     const inputData = await validateMiddleware(req, updatePrinterConnectionSettingRules);
 
-    const newEntity = await this.#printersStore.updatePrinterConnectionSettings(
-      currentPrinterId,
-      inputData
-    );
+    const newEntity = await this.#printersStore.updatePrinterConnectionSettings(currentPrinterId, inputData);
 
     res.send({
       printerURL: newEntity.printerURL,
@@ -306,4 +309,5 @@ module.exports = createController(PrinterController)
   .patch("/:id/flow-rate", "setFlowRate")
   .patch("/:id/feed-rate", "setFeedRate")
   .patch("/:id/disabled-reason", "updatePrinterDisabledReason")
+  .get("/:id/list-printer-floors", "listPrinterFloors")
   .get("/:id/plugin-list", "getPrinterPluginList");

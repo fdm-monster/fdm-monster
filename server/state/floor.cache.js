@@ -65,10 +65,8 @@ class FloorCache {
 
   async updateFloorNumber(floorId, updateSpec) {
     await this.#floorService.updateFloorNumber(floorId, updateSpec);
-
     const floor = await this.getFloor(floorId);
     floor.floor = updateSpec.floor;
-
     return floor;
   }
 
@@ -82,6 +80,10 @@ class FloorCache {
     const floor = await this.#floorService.removePrinter(floorId, printerInFloor);
     await this.loadCache();
     return floor;
+  }
+
+  async removePrinterFromAnyFloor(printerId) {
+    return await this.#floorService.deletePrinterFromAnyFloor(printerId);
   }
 }
 

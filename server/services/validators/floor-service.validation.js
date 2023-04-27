@@ -10,15 +10,15 @@ const printerInFloorRules = {
   y: "required|integer|between:0,8",
 };
 
-const updatePrinterFloorNameRules = {
+const updateFloorNameRules = {
   name: `required|minLength:${minPrinterFloorNameLength}`,
 };
 
-const updatePrinterFloorNumberRules = {
+const updateFloorNumberRules = {
   floor: `required|integer`,
 };
 
-const createPrinterFloorRules = {
+const createFloorRules = {
   name: `required|minLength:${minPrinterFloorNameLength}`,
   floor: `required|integer`,
   printers: "array",
@@ -27,7 +27,7 @@ const createPrinterFloorRules = {
 module.exports = {
   printerInFloorRules,
   removePrinterInFloorRules,
-  updatePrinterFloorNameRules,
-  updatePrinterFloorNumberRules,
-  createPrinterFloorRules,
+  updateFloorNameRules,
+  updateFloorNumberRules,
+  createFloorRules,
 };

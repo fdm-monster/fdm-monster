@@ -1,12 +1,13 @@
-const FloorModel = require("../models/Floor");
+const { Floor } = require("../models/Floor");
 const { validateInput } = require("../handlers/validators");
 const { NotFoundException } = require("../exceptions/runtime.exceptions");
 const {
-  createPrinterFloorRules,
-  updatePrinterFloorNameRules,
-  updatePrinterFloorNumberRules,
+  createFloorRules,
+  updateFloorNameRules,
+  updateFloorNumberRules,
   printerInFloorRules, removePrinterInFloorRules,
-} = require("./validators/printer-floor-service.validation");
+} = require("./validators/floor-service.validation");
+const { model } = require("mongoose");
 
 class FloorService {
   printerService;
@@ -21,16 +22,16 @@ class FloorService {
    * Lists the floors present in the database.
    */
   async list() {
-    return FloorModel.find({});
+    return Floor.find({});
   }
 
   async get(floorId, throwError = true) {
-    const printerFloor = await FloorModel.findOne({ _id: floorId });
-    if (!printerFloor && throwError) {
+    const floor = await Floor.findOne({ _id: floorId });
+    if (!floor && throwError) {
       throw new NotFoundException(`Floor with id ${floorId} does not exist.`);
     }
 
-    return printerFloor;
+    return floor;
   }
 
   async createDefaultFloor() {
@@ -41,29 +42,43 @@ class FloorService {
   }
 
   /**
-   * Stores a new printer floor into the database.
+   * Stores a new floor into the database.
    * @param {Object} floor object to create.
    * @throws {Error} If the printer floor is not correctly provided.
    */
   async create(floor) {
-    const validatedInput = await validateInput(floor, createPrinterFloorRules);
-    return FloorModel.create(validatedInput);
+    const validatedInput = await validateInput(floor, createFloorRules);
+    return Floor.create(validatedInput);
   }
 
   async updateName(floorId, input) {
-    const printerFloor = await this.get(floorId);
+    const floor = await this.get(floorId);
 
-    const { name } = await validateInput(input, updatePrinterFloorNameRules);
-    printerFloor.name = name;
-    return await printerFloor.save();
+    const { name } = await validateInput(input, updateFloorNameRules);
+    floor.name = name;
+    return await floor.save();
   }
 
   async updateFloorNumber(floorId, input) {
-    const printerFloor = await this.get(floorId);
+    const floor = await this.get(floorId);
+    const { floor: level } = await validateInput(input, updateFloorNumberRules);
+    floor.floor = level;
+    return await floor.save();
+  }
 
-    const { floor } = await validateInput(input, updatePrinterFloorNumberRules);
-    printerFloor.floor = floor;
-    return await printerFloor.save();
+  async deletePrinterFromAnyFloor(printerId) {
+    return Floor.updateMany(
+      {},
+      {
+        $pull: {
+          printers: {
+            printerId: {
+              $in: [printerId],
+            },
+          },
+        },
+      }
+    );
   }
 
   async addOrUpdatePrinter(floorId, printerInFloor) {
@@ -93,7 +108,7 @@ class FloorService {
   }
 
   async delete(floorId) {
-    return FloorModel.deleteOne({ _id: floorId });
+    return Floor.deleteOne({ _id: floorId });
   }
 }
 
