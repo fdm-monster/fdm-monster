@@ -3,13 +3,13 @@ const { socketIoConnectedEvent } = require("../constants/event.constants");
 
 class SocketIoGateway {
   #logger;
-  #printersStore;
+  #printerStore;
   #eventEmitter2;
   io;
 
-  constructor({ loggerFactory, printersStore, eventEmitter2 }) {
+  constructor({ loggerFactory, printerStore, eventEmitter2 }) {
     this.#logger = loggerFactory(SocketIoGateway.name);
-    this.#printersStore = printersStore;
+    this.#printerStore = printerStore;
     this.#eventEmitter2 = eventEmitter2;
   }
 

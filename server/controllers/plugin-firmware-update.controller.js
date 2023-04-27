@@ -9,13 +9,13 @@ const cacheKey = "firmware-state";
 
 class PluginFirmwareUpdateController {
   #cacheManager;
-  #printersStore;
+  #printerStore;
   #pluginFirmwareUpdateService;
   #logger;
 
-  constructor({ cacheManager, printersStore, pluginFirmwareUpdateService, loggerFactory }) {
+  constructor({ cacheManager, printerStore, pluginFirmwareUpdateService, loggerFactory }) {
     this.#cacheManager = cacheManager;
-    this.#printersStore = printersStore;
+    this.#printerStore = printerStore;
     this.#pluginFirmwareUpdateService = pluginFirmwareUpdateService;
     this.#logger = loggerFactory("PluginFirmwareUpdateController");
   }
@@ -98,7 +98,7 @@ class PluginFirmwareUpdateController {
   }
 
   async #performScanOnPrinters() {
-    const printers = this.#printersStore.listPrinterStates();
+    const printers = this.#printerStore.listPrinterStates();
     const printerFirmwareStates = [];
     const failureStates = [];
     for (let printer of printers) {

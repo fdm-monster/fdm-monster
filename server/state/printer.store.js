@@ -4,8 +4,9 @@ const { NotFoundException } = require("../exceptions/runtime.exceptions");
 const { validateInput } = require("../handlers/validators");
 const { createTestPrinterRules } = require("./validation/create-test-printer.validation");
 const { ObjectId } = require("mongodb");
+const { isEnvProd } = require("../server.env");
 
-class PrintersStore {
+class PrinterStore {
   #printerService;
   #printerStateFactory;
   #eventEmitter2;
@@ -18,14 +19,12 @@ class PrintersStore {
     this.#printerService = printerService;
     this.#printerStateFactory = printerStateFactory;
     this.#eventEmitter2 = eventEmitter2;
-    this.#logger = loggerFactory("Server-PrintersStore");
+    this.#logger = loggerFactory("Server-printerStore");
   }
 
   _validateState() {
-    if (!this.#printerStates) {
-      throw new Error(
-        "PrintersStore was not loaded. Cant fire printer loading action. Call 'loadPrintersStore' first."
-      );
+    if (isEnvProd() && !this.#printerStates) {
+      throw new Error("printerStore was not loaded. Cant fire printer loading action. Call 'loadprinterStore' first.");
     }
   }
 
@@ -49,14 +48,10 @@ class PrintersStore {
     });
 
     if (notFoundIDs.length > 0) {
-      throw new Error(
-        `The following provided IDs did not match the printer IDS ${JSON.stringify(notFoundIDs)}`
-      );
+      throw new Error(`The following provided IDs did not match the printer IDS ${JSON.stringify(notFoundIDs)}`);
     }
     if (duplicateIDs.length > 0) {
-      throw new Error(
-        `The following provided IDs were provided as duplicates ${JSON.stringify(duplicateIDs)}`
-      );
+      throw new Error(`The following provided IDs were provided as duplicates ${JSON.stringify(duplicateIDs)}`);
     }
   }
 
@@ -94,10 +89,9 @@ class PrintersStore {
       throw new ValidationException({ printerId: `Printer Id '${id}' is not a valid Mongo ID` });
     }
 
-    const printerState = this.#printerStates.find((p) => p.id === id);
-
+    const printerState = this.#printerStates?.find((p) => p.id === id);
     if (!printerState) {
-      throw new NotFoundException(`The printer ID '${id}' was not found in the PrintersStore.`);
+      throw new NotFoundException(`The printer ID '${id}' was not found in the printerStore.`);
     }
 
     return printerState;
@@ -131,7 +125,7 @@ class PrintersStore {
    * Fetch printers from database and setup the state models (destructive action!)
    * @returns {Promise<void>}
    */
-  async loadPrintersStore() {
+  async loadPrinterStore() {
     const printerDocs = await this.#printerService.list();
 
     this.#printerStates = [];
@@ -234,9 +228,7 @@ class PrintersStore {
     this._validateState();
 
     const newPrinterDoc = await this.#printerService.create(printer);
-    this.#logger.info(
-      `Saved new Printer: ${newPrinterDoc.printerURL} with ID ${newPrinterDoc._id}`
-    );
+    this.#logger.info(`Saved new Printer: ${newPrinterDoc.printerURL} with ID ${newPrinterDoc._id}`);
 
     const newPrinterState = await this.#printerStateFactory.create(newPrinterDoc);
     this.#printerStates.push(newPrinterState);
@@ -274,9 +266,7 @@ class PrintersStore {
     validatedData.enabled = true;
 
     const newPrinterDoc = { _doc: validatedData };
-    this.#logger.info(
-      `Stored test Printer: ${validatedData.printerURL} with ID ${validatedData.correlationToken}`
-    );
+    this.#logger.info(`Stored test Printer: ${validatedData.printerURL} with ID ${validatedData.correlationToken}`);
 
     const newPrinterState = await this.#printerStateFactory.create(newPrinterDoc, true);
     if (this.#testPrinterState) {
@@ -327,4 +317,4 @@ class PrintersStore {
   }
 }
 
-module.exports = PrintersStore;
+module.exports = PrinterStore;

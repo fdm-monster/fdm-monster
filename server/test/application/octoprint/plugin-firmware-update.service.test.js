@@ -12,7 +12,7 @@ const pluginJson = require("../test-data/plugins.json");
 let octoPrintApi;
 let httpClient;
 let container;
-let printersStore;
+let printerStore;
 let pluginService;
 let printerState;
 
@@ -24,12 +24,12 @@ beforeAll(async () => {
 
   octoPrintApi = container.resolve(DITokens.octoPrintApiService);
   pluginService = container.resolve(DITokens.pluginFirmwareUpdateService);
-  printersStore = container.resolve(DITokens.printersStore);
+  printerStore = container.resolve(DITokens.printerStore);
   httpClient = container.resolve(DITokens.httpClient);
   cache = container.resolve(DITokens.pluginRepositoryCache);
 
-  await printersStore.loadPrintersStore();
-  printerState = await printersStore.addPrinter(validNewPrinterState);
+  await printerStore.loadPrinterStore();
+  printerState = await printerStore.addPrinter(validNewPrinterState);
   httpClient.saveMockResponse(pluginJson, 200, false);
   await cache.queryCache();
 });

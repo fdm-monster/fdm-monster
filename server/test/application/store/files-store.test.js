@@ -5,7 +5,7 @@ const dbHandler = require("../../db-handler");
 let container;
 let filesStore;
 let printerFilesService;
-let printersStore;
+let printerStore;
 
 beforeAll(async () => {
   await dbHandler.connect();
@@ -16,7 +16,7 @@ beforeEach(async () => {
   container = configureContainer();
   filesStore = container.resolve(DITokens.filesStore);
   printerFilesService = container.resolve(DITokens.printerFilesService);
-  printersStore = container.resolve(DITokens.printersStore);
+  printerStore = container.resolve(DITokens.printerStore);
 });
 
 afterAll(async () => {
@@ -31,8 +31,8 @@ describe("FilesStore", () => {
   };
 
   it("old files - should deal with empty files cache correctly", async () => {
-    await printersStore.loadPrintersStore();
-    let testPrinterState = await printersStore.addPrinter(validNewPrinter);
+    await printerStore.loadPrinterStore();
+    let testPrinterState = await printerStore.addPrinter(validNewPrinter);
     await filesStore.loadFilesStore();
 
     const filesCache = filesStore.getFiles(testPrinterState.id);
@@ -43,8 +43,8 @@ describe("FilesStore", () => {
   });
 
   it("old files - should keep new files correctly", async () => {
-    await printersStore.loadPrintersStore();
-    let testPrinterState = await printersStore.addPrinter(validNewPrinter);
+    await printerStore.loadPrinterStore();
+    let testPrinterState = await printerStore.addPrinter(validNewPrinter);
 
     await printerFilesService.updateFiles(testPrinterState.id, {
       files: [
@@ -66,8 +66,8 @@ describe("FilesStore", () => {
   });
 
   it("old files - should filter old files correctly", async () => {
-    await printersStore.loadPrintersStore();
-    let testPrinterState = await printersStore.addPrinter(validNewPrinter);
+    await printerStore.loadPrinterStore();
+    let testPrinterState = await printerStore.addPrinter(validNewPrinter);
 
     await printerFilesService.updateFiles(testPrinterState.id, {
       files: [

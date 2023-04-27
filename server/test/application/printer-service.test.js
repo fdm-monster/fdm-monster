@@ -1,6 +1,6 @@
 const dbHandler = require("../db-handler");
 const { configureContainer } = require("../../container");
-const PrinterModel = require("../../models/Printer");
+const { Printer } = require("../../models/Printer");
 const DITokens = require("../../container.tokens");
 const { testPrinterData } = require("./test-data/printer.data");
 
@@ -14,7 +14,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  return PrinterModel.deleteMany({});
+  return Printer.deleteMany({});
 });
 
 describe("PrinterService", () => {
@@ -24,12 +24,12 @@ describe("PrinterService", () => {
     const printerUpdate = {
       ...testPrinterData,
       settingsAppearance: {
-        name: updatedName
-      }
+        name: updatedName,
+      },
     };
 
     await printerService.update(printer.id, printerUpdate);
-    const foundPrinter = await PrinterModel.findOne({ id: printer.id });
+    const foundPrinter = await Printer.findOne({ id: printer.id });
     expect(foundPrinter.settingsAppearance.name).toEqual(updatedName);
   });
 });

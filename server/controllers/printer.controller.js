@@ -18,33 +18,31 @@ const { getSettingsAppearanceDefault } = require("../constants/service.constants
 const { printerResolveMiddleware } = require("../middleware/printer");
 const { generateCorrelationToken } = require("../utils/correlation-token.util");
 const { ROLES } = require("../constants/authorization.constants");
+const { model } = require("mongoose");
+const { Floor } = require("../models/Floor");
 
 class PrinterController {
-  #printersStore;
+  #printerStore;
   #taskManagerService;
   #octoPrintApiService;
   #pluginRepositoryCache;
+  floorStore;
 
   #logger;
 
-  constructor({
-    printersStore,
-    taskManagerService,
-    loggerFactory,
-    octoPrintApiService,
-    pluginRepositoryCache,
-  }) {
+  constructor({ printerStore, taskManagerService, loggerFactory, octoPrintApiService, pluginRepositoryCache, floorStore }) {
     this.#logger = loggerFactory("Server-API");
 
-    this.#printersStore = printersStore;
+    this.#printerStore = printerStore;
     this.#taskManagerService = taskManagerService;
     this.#octoPrintApiService = octoPrintApiService;
     this.#pluginRepositoryCache = pluginRepositoryCache;
+    this.floorStore = floorStore;
   }
 
   async getPrinter(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
-    const foundPrinter = this.#printersStore.getPrinterFlat(currentPrinterId);
+    const foundPrinter = this.#printerStore.getPrinterFlat(currentPrinterId);
     res.send(foundPrinter);
   }
 
@@ -56,7 +54,6 @@ class PrinterController {
   async restartOctoPrint(req, res) {
     const { printerLogin } = getScopedPrinter(req);
     await this.#octoPrintApiService.postSystemRestartCommand(printerLogin);
-
     res.send({});
   }
 
@@ -65,7 +62,6 @@ class PrinterController {
 
     const command = this.#octoPrintApiService.connectCommand;
     await this.#octoPrintApiService.sendConnectionCommand(printerLogin, command);
-
     res.send({});
   }
 
@@ -74,7 +70,6 @@ class PrinterController {
 
     const command = this.#octoPrintApiService.disconnectCommand;
     await this.#octoPrintApiService.sendConnectionCommand(printerLogin, command);
-
     res.send({});
   }
 
@@ -89,7 +84,6 @@ class PrinterController {
 
     const command = this.#octoPrintApiService.cancelJobCommand;
     await this.#octoPrintApiService.sendJobCommand(printerLogin, command);
-
     res.send({});
   }
 
@@ -106,7 +100,7 @@ class PrinterController {
     this.#logger.info(`Testing printer with correlation token ${newPrinter.correlationToken}`);
 
     // Add printer with test=true
-    const printerState = await this.#printersStore.setupTestPrinter(newPrinter);
+    const printerState = await this.#printerStore.setupTestPrinter(newPrinter);
 
     this.#taskManagerService.scheduleDisabledJob(DITokens.printerTestTask);
     res.send(printerState.toFlat());
@@ -130,30 +124,38 @@ class PrinterController {
     newPrinter = this.#adjustPrinterObject(newPrinter);
 
     // Has internal validation, but might add some here above as well
-    const printerState = await this.#printersStore.addPrinter(newPrinter);
+    const printerState = await this.#printerStore.addPrinter(newPrinter);
 
-    this.#logger.info(
-      `Created printer with ID ${printerState.id || printerState.correlationToken}`
-    );
+    this.#logger.info(`Created printer with ID ${printerState.id || printerState.correlationToken}`);
 
     res.send(printerState.toFlat());
   }
 
   async importBatch(req, res) {
-    const flattenedPrinters = await this.#printersStore.batchImport(req.body);
+    const flattenedPrinters = await this.#printerStore.batchImport(req.body);
 
     res.send(flattenedPrinters);
   }
 
   async list(req, res) {
-    const listedPrinters = this.#printersStore.listPrintersFlat();
+    const listedPrinters = this.#printerStore.listPrintersFlat();
 
     res.send(listedPrinters);
   }
 
+  async listPrinterFloors(req, res) {
+    const { currentPrinterId } = getScopedPrinter(req);
+    const results = await Floor.find({
+      "printers.printerId": currentPrinterId,
+    });
+
+    res.send(results);
+  }
+
   async delete(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
-    const result = await this.#printersStore.deletePrinter(currentPrinterId);
+    const result = await this.#printerStore.deletePrinter(currentPrinterId);
+    await this.floorStore.removePrinterFromAnyFloor(currentPrinterId);
     res.send(result);
   }
 
@@ -168,7 +170,7 @@ class PrinterController {
     let updatedPrinter = req.body;
     updatedPrinter = this.#adjustPrinterObject(updatedPrinter);
 
-    const result = await this.#printersStore.updatePrinter(currentPrinterId, updatedPrinter);
+    const result = await this.#printerStore.updatePrinter(currentPrinterId, updatedPrinter);
 
     res.send(result);
   }
@@ -183,10 +185,7 @@ class PrinterController {
     const { currentPrinterId } = getScopedPrinter(req);
     const inputData = await validateMiddleware(req, updatePrinterConnectionSettingRules);
 
-    const newEntity = await this.#printersStore.updatePrinterConnectionSettings(
-      currentPrinterId,
-      inputData
-    );
+    const newEntity = await this.#printerStore.updatePrinterConnectionSettings(currentPrinterId, inputData);
 
     res.send({
       printerURL: newEntity.printerURL,
@@ -199,7 +198,7 @@ class PrinterController {
     const data = await validateMiddleware(req, updateSortIndexRules);
 
     this.#logger.info("Sorting printers according to provided order", JSON.stringify(data));
-    await this.#printersStore.updateSortIndex(data.sortList);
+    await this.#printerStore.updateSortIndex(data.sortList);
 
     res.send({});
   }
@@ -209,7 +208,7 @@ class PrinterController {
     const data = await validateMiddleware(req, updatePrinterEnabledRule);
 
     this.#logger.info("Changing printer enabled setting", JSON.stringify(data));
-    await this.#printersStore.updateEnabled(currentPrinterId, data.enabled);
+    await this.#printerStore.updateEnabled(currentPrinterId, data.enabled);
 
     res.send({});
   }
@@ -219,7 +218,7 @@ class PrinterController {
     const data = await validateMiddleware(req, updatePrinterDisabledReasonRules);
 
     this.#logger.info("Changing printer disabled reason setting", JSON.stringify(data));
-    await this.#printersStore.updateDisabledReason(currentPrinterId, data.disabledReason);
+    await this.#printerStore.updateDisabledReason(currentPrinterId, data.disabledReason);
 
     res.send({});
   }
@@ -228,7 +227,7 @@ class PrinterController {
     const { currentPrinterId } = getScopedPrinter(req);
 
     this.#logger.info("Refreshing OctoPrint API connection", currentPrinterId);
-    this.#printersStore.reconnectOctoPrint(currentPrinterId);
+    this.#printerStore.reconnectOctoPrint(currentPrinterId);
 
     res.send({});
   }
@@ -237,7 +236,7 @@ class PrinterController {
     const { currentPrinterId } = getScopedPrinter(req);
     const data = await validateMiddleware(req, stepSizeRules);
 
-    this.#printersStore.setPrinterStepSize(currentPrinterId, data.stepSize);
+    this.#printerStore.setPrinterStepSize(currentPrinterId, data.stepSize);
     res.send({});
   }
 
@@ -245,7 +244,7 @@ class PrinterController {
     const { currentPrinterId } = getScopedPrinter(req);
     const data = await validateMiddleware(req, feedRateRules);
 
-    await this.#printersStore.setPrinterFeedRate(currentPrinterId, data.feedRate);
+    await this.#printerStore.setPrinterFeedRate(currentPrinterId, data.feedRate);
     res.send({});
   }
 
@@ -253,7 +252,7 @@ class PrinterController {
     const { currentPrinterId } = getScopedPrinter(req);
     const data = await validateMiddleware(req, flowRateRules);
 
-    await this.#printersStore.setPrinterFlowRate(currentPrinterId, data.flowRate);
+    await this.#printerStore.setPrinterFlowRate(currentPrinterId, data.flowRate);
     res.send({});
   }
 
@@ -306,4 +305,5 @@ module.exports = createController(PrinterController)
   .patch("/:id/flow-rate", "setFlowRate")
   .patch("/:id/feed-rate", "setFeedRate")
   .patch("/:id/disabled-reason", "updatePrinterDisabledReason")
+  .get("/:id/list-printer-floors", "listPrinterFloors")
   .get("/:id/plugin-list", "getPrinterPluginList");

@@ -3,7 +3,7 @@ const { expectOkResponse } = require("../../extensions");
 
 const printerFloorRoute = AppConstants.apiRoute + "/floor";
 
-async function createTestPrinterFloor(request, name = "Floor101", floorNumber = 1) {
+async function createTestFloor(request, name = "Floor101", floorNumber = 1) {
   const createResponse = await request.post(printerFloorRoute).send({
     name,
     floor: floorNumber,
@@ -16,6 +16,6 @@ async function createTestPrinterFloor(request, name = "Floor101", floorNumber = 
 }
 
 module.exports = {
-  createTestPrinterFloor,
+  createTestFloor,
   printerFloorRoute,
 };

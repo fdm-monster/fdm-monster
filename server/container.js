@@ -1,7 +1,6 @@
 const axios = require("axios");
 const DITokens = require("./container.tokens");
 const PrinterService = require("./services/printer.service");
-const PrintersStore = require("./state/printers.store");
 const SettingsStore = require("./state/settings.store");
 const ServerSettingsService = require("./services/server-settings.service");
 const ServerReleaseService = require("./services/server-release.service");
@@ -50,7 +49,8 @@ const { SocketIoGateway } = require("./state/socket-io.gateway");
 const { ClientBundleService } = require("./services/client-bundle.service");
 const { Octokit } = require("octokit");
 const FloorService = require("./services/floor.service");
-const FloorCache = require("./state/floor.cache");
+const FloorStore = require("./state/floor.store");
+const PrinterStore = require("./state/printer.store");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -113,13 +113,13 @@ function configureContainer() {
     [DITokens.pluginFirmwareUpdateService]: asClass(PluginFirmwareUpdateService).singleton(),
 
     [DITokens.printerState]: asClass(PrinterState).transient(), // Transient on purpose!
-    [DITokens.floorCache]: asClass(FloorCache).singleton(),
+    [DITokens.floorStore]: asClass(FloorStore).singleton(),
     [DITokens.jobsCache]: asClass(JobsCache).singleton(),
     [DITokens.pluginRepositoryCache]: asClass(PluginRepositoryCache).singleton(),
     [DITokens.fileCache]: asClass(FileCache).singleton(),
     [DITokens.fileUploadTrackerCache]: asClass(FileUploadTrackerCache).singleton(),
     [DITokens.filesStore]: asClass(FilesStore).singleton(),
-    [DITokens.printersStore]: asClass(PrintersStore).singleton(),
+    [DITokens.printerStore]: asClass(PrinterStore).singleton(),
 
     // Extensibility and export
     [DITokens.customGCodeService]: asClass(CustomGCodeService),

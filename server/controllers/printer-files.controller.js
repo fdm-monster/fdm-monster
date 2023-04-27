@@ -22,7 +22,7 @@ class PrinterFilesController {
   #filesStore;
   #settingsStore;
   #octoPrintApiService;
-  #printersStore;
+  #printerStore;
   #multerService;
 
   #printerFileCleanTask;
@@ -32,7 +32,7 @@ class PrinterFilesController {
   constructor({
     filesStore,
     octoPrintApiService,
-    printersStore,
+    printerStore,
     printerFileCleanTask,
     settingsStore,
     loggerFactory,
@@ -42,7 +42,7 @@ class PrinterFilesController {
     this.#settingsStore = settingsStore;
     this.#printerFileCleanTask = printerFileCleanTask;
     this.#octoPrintApiService = octoPrintApiService;
-    this.#printersStore = printersStore;
+    this.#printerStore = printerStore;
     this.#multerService = multerService;
     this.#logger = loggerFactory("Server-API");
   }

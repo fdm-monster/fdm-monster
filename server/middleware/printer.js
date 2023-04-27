@@ -7,12 +7,12 @@ const printerLoginToken = "printerLogin";
 
 const printerResolveMiddleware = (key = "id") => {
   return (req, res, next) => {
-    const printersStore = req.container.resolve(DITokens.printersStore);
+    const printerStore = req.container.resolve(DITokens.printerStore);
 
     let scopedPrinter = undefined;
 
     if (req.params[key]) {
-      scopedPrinter = printersStore.getPrinterState(req.params[key]);
+      scopedPrinter = printerStore.getPrinterState(req.params[key]);
     }
 
     req.container.register({

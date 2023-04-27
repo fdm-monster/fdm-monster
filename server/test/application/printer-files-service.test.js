@@ -1,6 +1,6 @@
 const dbHandler = require("../db-handler");
 const { configureContainer } = require("../../container");
-const PrinterModel = require("../../models/Printer");
+const { Printer } = require("../../models/Printer");
 const DITokens = require("../../container.tokens");
 const { MATERIALS } = require("../../constants/service.constants");
 const { flattenedDutchRALMap } = require("../../constants/ral-color-map.constants");
@@ -15,7 +15,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  return PrinterModel.deleteMany({});
+  return Printer.deleteMany({});
 });
 
 describe("PrinterFileService", () => {

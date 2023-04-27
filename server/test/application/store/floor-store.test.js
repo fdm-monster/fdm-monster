@@ -1,27 +1,30 @@
 const dbHandler = require("../../db-handler");
 const { configureContainer } = require("../../../container");
 const DITokens = require("../../../container.tokens");
-const PrinterFloor = require("../../../models/Floor");
+const { Floor } = require("../../../models/Floor");
 
 let container;
-let floorCache;
-let Model = PrinterFloor;
+let printerStore;
+let floorStore;
+let Model = Floor;
 
 beforeAll(async () => {
   await dbHandler.connect();
   container = configureContainer();
-  floorCache = container.resolve(DITokens.floorCache);
+  printerStore = container.resolve(DITokens.printerStore);
+  floorStore = container.resolve(DITokens.floorStore);
 });
 
 beforeEach(async () => {
   Model.deleteMany({});
 });
 
-describe(DITokens.floorCache, () => {
+describe(DITokens.floorStore, () => {
   it("should throw on getting non-existing floor", async function () {
-    await expect(() => floorCache.getFloor("63452115122876ea11cd1656")).rejects.toBeDefined();
+    await expect(() => floorStore.getFloor("63452115122876ea11cd1656")).rejects.toBeDefined();
   });
   it("should delete floor", async function () {
-    await floorCache.delete("63452115122876ea11cd1656");
+    await printerStore.loadPrinterStore();
+    await floorStore.delete("63452115122876ea11cd1656");
   });
 });

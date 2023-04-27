@@ -1,19 +1,6 @@
 const mongoose = require("mongoose");
 const { Schema } = require("mongoose");
-
-const PrinterInFloorSchema = new Schema({
-  printerId: Schema.Types.ObjectId,
-  x: {
-    type: Number,
-    required: true,
-  },
-  y: {
-    type: Number,
-    required: true,
-  },
-  // No metadata needed yet
-  _id: false,
-});
+const { PrinterInFloorSchema } = require("./FloorPrinter");
 
 const FloorSchema = new Schema({
   name: {
@@ -31,4 +18,6 @@ const FloorSchema = new Schema({
 
 const Floor = mongoose.model("Floor", FloorSchema);
 
-module.exports = Floor;
+module.exports = {
+  Floor,
+};

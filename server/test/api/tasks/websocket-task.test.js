@@ -5,7 +5,7 @@ const { validNewPrinterState } = require("../../application/test-data/printer.da
 
 let container;
 let taskManager;
-let printersStore;
+let printerStore;
 let serverTasks;
 let task;
 
@@ -13,7 +13,7 @@ beforeAll(async () => {
   await dbHandler.connect();
   ({ container } = await setupTestApp(true));
   taskManager = container.resolve(DITokens.taskManagerService);
-  printersStore = container.resolve(DITokens.printersStore);
+  printerStore = container.resolve(DITokens.printerStore);
   task = container.resolve(DITokens.printerWebsocketTask);
   serverTasks = container.resolve(DITokens.serverTasks);
 });
@@ -30,7 +30,7 @@ describe("PrinterWebsocketTask", () => {
     }
   });
   it("should try connecting to OctoPrint websocket", async () => {
-    const newPrinterState = await printersStore.addPrinter(validNewPrinterState);
+    const newPrinterState = await printerStore.addPrinter(validNewPrinterState);
 
     try {
       await task.setupPrinterConnection(newPrinterState);
