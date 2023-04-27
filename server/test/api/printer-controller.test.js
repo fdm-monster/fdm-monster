@@ -14,7 +14,6 @@ const DITokens = require("../../container.tokens");
 let Model = Printer;
 const defaultRoute = AppConstants.apiRoute + "/printer";
 const createRoute = defaultRoute;
-const updateSortIndexRoute = `${defaultRoute}/sort-index`;
 const testPrinterRoute = `${defaultRoute}/test-connection`;
 const pluginListRoute = `${defaultRoute}/plugin-list`;
 const getRoute = (id) => `${defaultRoute}/${id}`;
@@ -298,15 +297,5 @@ describe("PrinterController", () => {
     octoPrintApiService.storeResponse(response, 200);
     const res = await request.post(serialDisconnectCommandRoute(printer.id)).send();
     expectOkResponse(res);
-  });
-
-  it("should update sort indices", async () => {
-    const printer = await createTestPrinter(request);
-    const printer2 = await createTestPrinter(request, "Group0_1");
-
-    const res = await request.post(updateSortIndexRoute).send({
-      sortList: [printer.id, printer2.id],
-    });
-    expectOkResponse(res, {});
   });
 });

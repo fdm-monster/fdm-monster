@@ -162,6 +162,7 @@ class PrinterState {
       },
       disabledReason: this.#entityData.disabledReason,
       enabled: this.#entityData.enabled,
+      dateAdded: this.#entityData.dateAdded,
       printerName: this.#entityData.settingsAppearance?.name,
       webSocketURL: this.#websocketAdapter?.webSocketURL || this.#entityData.webSocketURL,
       printerURL: this.#entityData.printerURL,
