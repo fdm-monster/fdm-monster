@@ -5,7 +5,6 @@ const { Printer } = require("../../models/Printer");
 const { createTestPrinter } = require("./test-data/create-printer");
 const { expectOkResponse, expectInvalidResponse, expectNotFoundResponse } = require("../extensions");
 const nock = require("nock");
-const DITokens = require("../../container.tokens");
 
 let Model = Printer;
 const defaultRoute = AppConstants.apiRoute + "/printer-files";
