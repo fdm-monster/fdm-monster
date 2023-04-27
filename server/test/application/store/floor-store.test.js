@@ -4,12 +4,14 @@ const DITokens = require("../../../container.tokens");
 const { Floor } = require("../../../models/Floor");
 
 let container;
+let printerStore;
 let floorStore;
 let Model = Floor;
 
 beforeAll(async () => {
   await dbHandler.connect();
   container = configureContainer();
+  printerStore = container.resolve(DITokens.printerStore);
   floorStore = container.resolve(DITokens.floorStore);
 });
 
@@ -22,6 +24,7 @@ describe(DITokens.floorStore, () => {
     await expect(() => floorStore.getFloor("63452115122876ea11cd1656")).rejects.toBeDefined();
   });
   it("should delete floor", async function () {
+    await printerStore.loadPrinterStore();
     await floorStore.delete("63452115122876ea11cd1656");
   });
 });
