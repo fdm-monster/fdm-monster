@@ -111,7 +111,7 @@ These awesome people involved in the project ([emoji key](https://allcontributor
 
 ## License
 
-FDM Power is licensed with [AGPL-3.0](LICENSE). This means in essence that you may use it commercially, but it must be in FOSS fashion.
+FDM Monster is licensed with [AGPL-3.0](LICENSE). This means in essence that you may use it commercially, but it must be in FOSS fashion.
 Any changes, deployments or usages should be publicly available and downloadable through Github forks or public repositories. For details, please consult the LICENSE file.
 
 ## Historical Note
