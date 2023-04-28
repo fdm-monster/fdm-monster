@@ -2,6 +2,7 @@
 layout: default
 title: Setting up MonsterPi
 nav_order: 1
+permalink: /guides/monsterpi
 last_modified_at: 2023-04-08T10:56:00+02:00
 ---
 
