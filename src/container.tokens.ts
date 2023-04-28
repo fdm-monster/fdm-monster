@@ -29,6 +29,7 @@ export const DITokens = {
   serverUpdateService: "serverUpdateService",
   githubService: "githubService",
   octokitService: "octokitService",
+  mqttService: "mqttService",
   clientBundleService: "clientBundleService",
   logDumpService: "logDumpService",
   userTokenService: "userTokenService",
