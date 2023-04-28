@@ -11,10 +11,10 @@ MonsterPi 0.1.0 can be downloaded with the URL https://drive.google.com/file/d/1
 - FDM Monster 1.3.0
 
 ## MonsterPi 0.1.1
-MonsterPi 0.1.1 can be downloaded with the URL **coming soon**
+MonsterPi 0.1.1 can be downloaded with the URL https://drive.google.com/file/d/1Dw66rziFuSCXACrRE-mUpuC0QAFY9WGs/view?usp=share_link
 - MongoDB 4.4
 - HAProxy (work in progress)
-- FDM Monster 1.3.0
+- FDM Monster 1.3.1-rd2
 
 ## Installing MonsterPi 
 Steps:
