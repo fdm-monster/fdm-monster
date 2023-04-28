@@ -10,31 +10,12 @@ last_modified_at: 2023-04-07T21:50:00+02:00
 
 Welcome to the FDM Monster documentation. You should find all the documentation required to setup your own FDM Monster server here. Have a look at the [Guides](guides) section for more information.
 
-If you need a quick start, look at the [Setup FDM Monster](guides/setup.md) documentation.
+![Image](./images/server-running.png)
 
-## MonsterPi 
-MonsterPi is a Raspberry Pi image built using CustomPiOS. The repository is to be found here: https://github.com/fdm-monster/MonsterPi
+## Getting started - MonsterPi
 
-This raspberry pi image includes FDM Monster and MongoDB. All versions can be downloaded from this Google Drive folder: https://drive.google.com/drive/folders/1jyifNu2oPVpQkTYa4zwtYVvr0GKAjP94?usp=sharing
-Below you can find the versions available.
+Read the [Setup MonsterPi](guides/monsterpi.md) chapter for installing the MonsterPi Raspberry Pi image.
 
-### Latest Version - MonsterPi 0.1.1
-MonsterPi 0.1.1 can be downloaded with the URL https://drive.google.com/file/d/1Dw66rziFuSCXACrRE-mUpuC0QAFY9WGs/view?usp=share_link
-- MongoDB 4.4
-- HAProxy (work in progress)
-- FDM Monster 1.3.1-rc2
+## Getting started - Linux/Windows
 
-### Older versions
-MonsterPi 0.1.0 can be downloaded with the URL https://drive.google.com/file/d/1a4DLk2Yy8uvyv9BskA073DdTLCI6w4UT/view?usp=share_link
-- MongoDB 4.4
-- HAProxy (work in progress)
-- FDM Monster 1.3.0
-
-### Installing MonsterPi
-Steps:
-1) Download Raspberry Pi Imager https://www.raspberrypi.com/software/
-2) Insert a 16GB+ SD Card of high quality (class 10) and decent brand, **do not save money on this**!
-3) Flash the image on the SD card. Do not forget to set the configuration (WiFi, SSH, hostname) according to your specifications:
-   ![RaspberryPiImager.png](images/raspberrypi-imager.png)
-4) Insert the SD card into your Raspberry Pi 3 or 4 and power it up (with a recommended 5.1V power supply)
-5) Visit http://monsterpi.local:4000 to access FDM Monster
+Look at the [Setup FDM Monster](guides/setup.md) documentation.
