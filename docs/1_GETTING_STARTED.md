@@ -72,9 +72,9 @@ If no errors occurred, please skip to Step 9! You're almost done.
 From now on we will be working inside the Powershell (preferred), or Command Prompt (CMD). You should **not** use Administrator mode. 
 Execute the following git clone command in a folder. This will create the `fdm-monster` sub-folder for you with all the code inside.
 
-> git clone https://github.com/fdm-monster/fdm-monster.git --branch 1.2.4
+> git clone https://github.com/fdm-monster/fdm-monster.git --branch 1.3.1-rc2
 
-Note that I added `--branch 1.2.4`? This is the latest stable release of FDM Monster. You can find them all here:
+Note that I added `--branch 1.3.1-rc2`? This is the latest release of FDM Monster. You can find them all here:
 https://github.com/fdm-monster/fdm-monster/releases
 
 Please head inside the `fdm-monster/server` sub-folder.
@@ -83,10 +83,10 @@ Please head inside the `fdm-monster/server` sub-folder.
 
 Once another version is available, you can run the following commands in sequence to prepare updating your service. 
 Note that we are now **inside** the `fdm-monster/server/` folder.
-Note that I filled in the unstable release `1.3.0-rc3` for the `git switch` command, please replace this with the relevant release of your choice:
+Note that I filled in the unstable release `1.3.1-rc2` for the `git switch` command, please replace this with the relevant release of your choice:
 
 > git fetch --prune
-> git switch --detach 1.3.0-rc3
+> git switch --detach 1.3.1-rc3
 
 ### Step 6)
 The folder `fdm-monster` is now present, and you've changed to the directory `fdm-monster/server/` with Powershell or CMD.
@@ -124,6 +124,11 @@ svc.on("install", function () {
   console.log("Service running: ", svc.isRunning);
 });
 
+if (svc.isRunning) {
+  svc.stop();
+  svc.uninstall();
+}
+
 svc.install();
 ```
 
@@ -158,7 +163,7 @@ If you prefer to install specific versions, it's advised to replace this line:
  
 with for example:
 
-> $tag = 1.3.0
+> $tag = 1.3.1-rc2
 
 Execute the update with:
 > powershell ./download-update.ps1
@@ -171,7 +176,7 @@ This will do the following:
 During these steps the server will not be available for a short while. Please check [Step 9](#Step-9) for verifying whether your service is running.
 
 ### Step 8) Uninstalling the service. 
-Create a file called `install-fdm-monster-service.js`. Write this code to it:
+Create a file called `uninstall-fdm-monster-service.js`. Write this code to it:
 
 ```
 const { Service } = require("node-windows");

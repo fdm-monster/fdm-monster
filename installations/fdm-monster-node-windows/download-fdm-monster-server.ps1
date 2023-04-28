@@ -1,4 +1,4 @@
-git clone https://github.com/fdm-monster/fdm-monster.git --branch 1.2.4
+git clone https://github.com/fdm-monster/fdm-monster.git --branch 1.3.1-rc2
 
 cd fdm-monster
 git fetch --prune
@@ -9,4 +9,4 @@ yarn -v
 yarn install --production --pure-lockfile
 
 cd ../../
-node ./run_fdm_service.js
+node ./install-fdm-monster-service.js

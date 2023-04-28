@@ -37,10 +37,8 @@ services:
     ports:
     - "4000:4000"
     environment:
-    - MONGO=mongodb://mongodb:28017/fdm-monster?authSource=admin
+    - MONGO=mongodb://mongodb:27017/fdm-monster?authSource=admin
     volumes:
     # Volumes as local relative folders (validate with 'docker-compose config')
-    - ./fdm-monster/logs:/app/logs
     - ./fdm-monster/media:/app/media
-    - ./fdm-monster/file-storage:/app/file-storage
 ```

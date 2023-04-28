@@ -14,5 +14,6 @@ To install FDM Monster please select a type of installation:
 - Linux service with `node-linux`
   - Coming soon! 
 - Windows/Linux service with `pm2`
+  - Coming soon!
 - Docker-compose installation (Windows & Linux)
     - Read the docker-compose instructions [Docker instructions](3_USING_DOCKER.md)

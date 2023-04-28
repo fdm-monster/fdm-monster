@@ -11,4 +11,4 @@ yarn -v
 yarn install --production --pure-lockfile
 
 cd ../../
-node ./run_fdm_service.js
+node ./install-fdm-monster-service.js

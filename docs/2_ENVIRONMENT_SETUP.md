@@ -69,4 +69,4 @@ services:
 Please add each environment variable in a file named `.env` in the folder where you run you docker command.
 If you don't like a file, `-e VARIABLE_NAME=value` is a possible fix, although it is quite hard to maintain it like that.
 
-We advise if you find this too hard, to consider using [docker-compose](#docker-compose)
+We advise if you find this too hard, to consider using docker-compose. Read more about that in the [Docker chapter](./3_USING_DOCKER.md)
