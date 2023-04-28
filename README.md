@@ -27,7 +27,7 @@ Please join the discord, but stay professional and proactive!
 
 ## Contributors ✨
 
-These awesome people involved in the project ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+These are the people involved in the project ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
