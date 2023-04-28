@@ -3,7 +3,7 @@
 # FDM Monster [![GitHub stars](https://img.shields.io/github/stars/fdm-monster/fdmonster)](https://github.com/fdm-monster/fdm-monster/stargazers) [![GitHub issues](https://img.shields.io/github/issues/fdm-monster/fdm-monster?color=green)](https://github.com/fdm-monster/fdm-monster/issues) [![GitHub forks](https://img.shields.io/github/forks/fdm-monster/fdm-monster)](https://github.com/fdm-monster/fdm-monster/network/members) [![Latest Release](https://img.shields.io/github/release/fdm-monster/fdm-monster)](https://github.com/fdm-monster/fdm-monster/releases/latest) [![Coverage](https://codecov.io/gh/fdm-monster/fdm-monster/branch/develop/graph/badge.svg?flag=server-nodejs&precision=2)](https://app.codecov.io/gh/fdm-monster/fdm-monster)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 FDM Monster is a bulk OctoPrint manager and dashboard written in Vue with Typescript meant to be accessed local, remote, offline or online. This project has a different approach to farm management than normal - it actually scales for bigger farms (50-100). We therefore aim 🚀 for high code quality 😎 and robustness all around 💪. The goals are to deliver a smooth initial setup and 100% clear user experience to ensure you can smash those printing records 🖨️!
@@ -32,11 +32,14 @@ These awesome people involved in the project ([emoji key](https://allcontributor
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
 <table>
-  <tr>
-    <td align="center"><a href="https://github.com/davidzwa"><img src="https://avatars.githubusercontent.com/u/6005355?v=4?s=100" width="100px;" alt=""/><br /><sub><b>David Zwart</b></sub></a><br /><a href="https://github.com/fdm-monster/fdm-monster/issues?q=author%3Adavidzwa" title="Bug reports">🐛</a> <a href="https://github.com/fdm-monster/fdm-monster/commits?author=davidzwa" title="Code">💻</a> <a href="#maintenance-davidzwa" title="Maintenance">🚧</a> <a href="#userTesting-davidzwa" title="User Testing">📓</a></td>
-    <td align="center"><a href="https://kevenaar.name"><img src="https://avatars.githubusercontent.com/u/834643?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Maurice Kevenaar</b></sub></a><br /><a href="#security-mkevenaar" title="Security">🛡️</a> <a href="#maintenance-mkevenaar" title="Maintenance">🚧</a> <a href="#ideas-mkevenaar" title="Ideas, Planning, & Feedback">🤔</a></td>
-    <td align="center"><a href="https://github.com/Tobikisss"><img src="https://avatars.githubusercontent.com/u/45754890?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Tobias</b></sub></a><br /><a href="#ideas-Tobikisss" title="Ideas, Planning, & Feedback">🤔</a> <a href="#maintenance-Tobikisss" title="Maintenance">🚧</a></td>
-  </tr>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/davidzwa"><img src="https://avatars.githubusercontent.com/u/6005355?v=4?s=80" width="80px;" alt="David Zwart"/><br /><sub><b>David Zwart</b></sub></a><br /><a href="https://github.com/fdm-monster/fdm-monster/issues?q=author%3Adavidzwa" title="Bug reports">🐛</a> <a href="https://github.com/fdm-monster/fdm-monster/commits?author=davidzwa" title="Code">💻</a> <a href="#maintenance-davidzwa" title="Maintenance">🚧</a> <a href="#userTesting-davidzwa" title="User Testing">📓</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://kevenaar.name"><img src="https://avatars.githubusercontent.com/u/834643?v=4?s=80" width="80px;" alt="Maurice Kevenaar"/><br /><sub><b>Maurice Kevenaar</b></sub></a><br /><a href="#security-mkevenaar" title="Security">🛡️</a> <a href="#maintenance-mkevenaar" title="Maintenance">🚧</a> <a href="#ideas-mkevenaar" title="Ideas, Planning, & Feedback">🤔</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Tobikisss"><img src="https://avatars.githubusercontent.com/u/45754890?v=4?s=80" width="80px;" alt="Tobias"/><br /><sub><b>Tobias</b></sub></a><br /><a href="#ideas-Tobikisss" title="Ideas, Planning, & Feedback">🤔</a> <a href="#maintenance-Tobikisss" title="Maintenance">🚧</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://tideline3d.com"><img src="https://avatars.githubusercontent.com/u/12903320?v=4?s=80" width="80px;" alt="tideline3d"/><br /><sub><b>tideline3d</b></sub></a><br /><a href="https://github.com/fdm-monster/fdm-monster/issues?q=author%3Atideline3d" title="Bug reports">🐛</a></td>
+    </tr>
+  </tbody>
 </table>
 
 <!-- markdownlint-restore -->
