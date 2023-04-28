@@ -10,10 +10,10 @@ To install FDM Monster please select a type of installation:
 - MonsterPi Raspberry Pi 3/4 (64 bits) image
   - Read  the [Monster Pi chapter](./monsterpi.md)
 - Windows service with `node-windows`
-  - Read ([GETTING_STARTED](../1_GETTING_STARTED.md) file)
+  - Read ([Getting Started](../1_GETTING_STARTED.md) file)
 - Linux service with `node-linux`
   - Coming soon! 
 - Windows/Linux service with `pm2`
   - Coming soon!
 - Docker-compose installation (Windows & Linux)
-    - Read the docker-compose instructions [Docker instructions](3_USING_DOCKER.md)
+    - Read the docker-compose instructions [Using Docker](../3_USING_DOCKER.md)
