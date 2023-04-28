@@ -13,12 +13,13 @@ FDM Monster is a bulk OctoPrint manager and dashboard written in Vue with Typesc
 
 ## Getting started
 
-Please read the [GETTING_STARTED](docs/1_GETTING_STARTED.md) for a windows service installation or docker installation.
-We also offer a [Raspberry Pi Image](docs/4_MONSTER_PI.md).
+Please read the [GETTING_STARTED](docs/1_GETTING_STARTED.md) for a Windows service installation, or, alternatively, a docker installation for Windows/Linux.
+More importantly, we offer the [MonsterPi - Raspberry Pi Image](docs/4_MONSTER_PI.md).
+
+Note that the new documentation can be found on https://docs.fdm-monster.net. Do note these docs are work in progress.
 
 ### Reach out for questions
 Please join the discord, but stay professional and proactive!
-- Documentation (work in progress): https://docs.fdm-monster.net
 - Discord server: https://discord.gg/mwA8uP8CMc
 - Website: [https://fdm-monster.net](https://fdm-monster.net) 
 - Mail: davidzwa@gmail.com
@@ -30,15 +31,16 @@ This server is has been battle-tested in the field, so give it a star ⭐and enh
 - Optional Auto-clean old OctoPrint files with different settings
 - Dependency updates using Renovate (thanks to @mkevenaar for the tips)
 - Quick copy and paste of a FDM Monster printers
-<!-- - Prusa Firmware update plugin service -->
-- Printer Floors (like departments)
+- Floors (like departments) for organising printers
 - Printer completion/failure tracking (with statistics page)
 - Windows service using node-windows
+- Linux service using node-linux
 - Raspberry Pi image (MonsterPi) https://github.com/fdm-monster/MonsterPi
 - Printer placement using drag n drop
 
 #### Current work:
 - Documentation on  https://docs.fdm-monster.net
+- Testing installation using `pm2`
 - Maintenance repair log page
 - MQTT autodiscovery
 
