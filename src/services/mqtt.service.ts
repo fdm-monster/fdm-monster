@@ -39,16 +39,17 @@ class MqttService {
       password,
     } as IClientOptions);
 
-    const eventName = "octoPrint/#";
+    // octoPrint/# to subscribe to all messages
+    const eventName = "octoPrint/mqtt";
     this.#client.on("connect", () => {
       this.logger.info("Connection established successfully!");
       this.#client.subscribe(eventName);
     });
 
-    this.#client.on("message", function (topic, message) {
-      console.log("message is: " + message);
-      console.log("topic is: " + topic);
-    });
+    // this.#client.on("message", function (topic, message) {
+    //   console.log("message is: " + message);
+    //   console.log("topic is: " + topic);
+    // });
   }
 }
 
