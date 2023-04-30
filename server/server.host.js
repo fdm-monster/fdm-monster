@@ -24,6 +24,7 @@ class ServerHost {
   }
 
   async boot(app, quick_boot = false, listenRequests = true) {
+    mongoose.set('strictQuery', true);
     this.#appInstance = app;
     this.serveControllerRoutes(this.#appInstance);
 

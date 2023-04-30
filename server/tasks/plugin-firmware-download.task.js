@@ -1,4 +1,5 @@
 /**
+ * @Obsolete this task is too specific and will be removed or changed
  * Plugin which downloads the latest firmware and loads firmware caches
  */
 class PluginFirmwareUpdatePreparationTask {
