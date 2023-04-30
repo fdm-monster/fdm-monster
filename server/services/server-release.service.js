@@ -117,10 +117,18 @@ class ServerReleaseService {
       this.#logger.info(
         `\x1b[36mCurrent release tag not found in github releases.\x1b[0m
     Here's github's latest released: \x1b[32m${latestReleaseTag}\x1b[0m
-    Here's your release tag: \x1b[32mv${packageVersion}\x1b[0m
+    Here's your release tag: \x1b[32m${packageVersion}\x1b[0m
     Thanks for using FDM Monster!`
       );
       return;
+    }
+    else {
+      this.#logger.info(
+        `\x1b[36mCurrent release was found in github releases.\x1b[0m
+    Here's github's latest released: \x1b[32m${latestReleaseTag}\x1b[0m
+    Here's your release tag: \x1b[32m${packageVersion}\x1b[0m
+    Thanks for using FDM Monster!`
+      );
     }
 
     if (!!packageVersion && latestReleaseState.updateAvailable) {

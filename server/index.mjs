@@ -1,12 +1,18 @@
 import { setupEnvConfig } from "./server.env.js";
-import { setupNormalServer } from "./server.core.js";
+import { setupServer } from "./server.core.js";
+import * as sentry from "@sentry/node";
 
 setupEnvConfig();
-const { httpServer, container } = setupNormalServer();
+
+const { httpServer, container } = setupServer();
 
 container
   .resolve("serverHost")
   .boot(httpServer)
-  .catch((e) => {
+  .catch(async (e) => {
     console.error("Server has crashed unintentionally - please report this", e);
+
+    sentry.captureException(e);
+    await sentry.flush(0);
+    process.exit(1);
   });

@@ -6,20 +6,22 @@ const { AppConstants } = require("../server.constants");
 
 const logger = new Logger("Utils-Env", false);
 
+function getEnvOrDefault(key, defaultVal) {
+  const val = process.env[key];
+  if (!val?.length) return defaultVal;
+  return val;
+}
+
 function isTestEnvironment() {
   return process.env.NODE_ENV === AppConstants.defaultTestEnv;
 }
 
 function isPm2() {
-  return (
-    "PM2_HOME" in process.env || "PM2_JSON_PROCESSING" in process.env || "PM2_CLI" in process.env
-  );
+  return "PM2_HOME" in process.env || "PM2_JSON_PROCESSING" in process.env || "PM2_CLI" in process.env;
 }
 
 function isNodemon() {
-  return (
-    "npm_lifecycle_script" in process.env && process.env.npm_lifecycle_script.includes("nodemon")
-  );
+  return "npm_lifecycle_script" in process.env && process.env.npm_lifecycle_script.includes("nodemon");
 }
 
 function isNode() {
@@ -99,4 +101,5 @@ module.exports = {
   isNode,
   writeVariableToEnvFile,
   verifyPackageJsonRequirements,
+  getEnvOrDefault
 };

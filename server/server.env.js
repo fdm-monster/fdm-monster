@@ -1,4 +1,3 @@
-const fs = require("fs");
 const path = require("path");
 const { execSync } = require("child_process");
 const envUtils = require("./utils/env.utils");
@@ -7,12 +6,19 @@ const { AppConstants } = require("./server.constants");
 const { status, up } = require("migrate-mongo");
 const Logger = require("./handlers/logger.js");
 const { isDocker } = require("./utils/is-docker");
+const { getEnvOrDefault } = require("./utils/env.utils");
+const Sentry = require("@sentry/node");
+const { errorSummary } = require("./utils/error.utils");
 const logger = new Logger("FDM-Environment", false);
 
 // Constants and definition
 const instructionsReferralURL = "https://github.com/fdm-monster/fdm-monster/blob/master/README.md";
 const packageJsonPath = path.join(__dirname, "./package.json");
 const dotEnvPath = path.join(__dirname, "./.env");
+
+function isEnvTest() {
+  return process.env[AppConstants.NODE_ENV_KEY] === AppConstants.defaultTestEnv;
+}
 
 function isEnvProd() {
   return process.env[AppConstants.NODE_ENV_KEY] === AppConstants.defaultProductionEnv;
@@ -133,6 +139,35 @@ function ensureMongoDBConnectionStringSet() {
   }
 }
 
+function setupSentry() {
+  const sentryEnabled = getEnvOrDefault(AppConstants.sentryEnabledToken, AppConstants.sentryEnabledDefault) === "true";
+  if (sentryEnabled) {
+    logger.warning("Sentry is enabled. You can change this by setting 'SENTRY_ENABLED=false'");
+  } else {
+    logger.warning("Sentry is disabled. You can change this by setting 'SENTRY_ENABLED=true'");
+  }
+
+  const sentryDsnToken = getEnvOrDefault(AppConstants.sentryCustomDsnToken, AppConstants.sentryCustomDsnDefault);
+
+  Sentry.init({
+    dsn: sentryDsnToken,
+    environment: process.env.NODE_ENV,
+    release: process.env.npm_package_version,
+    enabled: sentryEnabled && !isEnvTest(),
+    // We recommend adjusting this value in production, or using tracesSampler
+    // for finer control
+    tracesSampleRate: 1.0,
+  });
+
+  process.on("unhandledRejection", (e) => {
+    const message = `Unhandled rejection error - ${errorSummary(e)}`;
+    logger.error(message);
+
+    // The server must not crash
+    Sentry.captureException(e);
+  });
+}
+
 function ensurePortSet() {
   fetchServerPort();
 
@@ -159,6 +194,7 @@ function setupEnvConfig(skipDotEnv = false) {
   ensureNodeEnvSet();
   setupPackageJsonVersionOrThrow();
   ensureEnvNpmVersionSet();
+  setupSentry();
   ensureMongoDBConnectionStringSet();
   ensurePortSet();
   ensurePageTitle();

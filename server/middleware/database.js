@@ -1,4 +1,5 @@
 const DITokens = require("../container.tokens");
+
 module.exports = {
   /**
    * 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting
@@ -17,8 +18,8 @@ module.exports = {
       res.status(500);
       res.send({
         databaseReadyState: serverHost.hasConnected(),
-        state: "Retrying mongo connection. Please contact the developer if this persists."
+        state: "Retrying mongo connection. Please contact the developer if this persists.",
       });
     }
-  }
+  },
 };
