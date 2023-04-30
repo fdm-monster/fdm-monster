@@ -57,21 +57,6 @@ class PrinterFilesController {
     res.send(sessions);
   }
 
-  async #getUploadedFile(req, res, storeAsTempFile = true) {
-    const multerMiddleware = this.#multerService.getMulterGCodeFileFilter(storeAsTempFile);
-
-    await new Promise((resolve, reject) =>
-      multerMiddleware(req, res, (err) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve();
-      })
-    );
-
-    return req.files;
-  }
-
   async getFiles(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
     const { recursive } = await validateInput(req.query, getFilesRules);
@@ -129,11 +114,7 @@ class PrinterFilesController {
     const { printerLogin } = getScopedPrinter(req);
     const { filePath: path, destination } = await validateMiddleware(req, moveFileOrFolderRules);
 
-    const result = await this.#octoPrintApiService.moveFileOrFolder(
-      printerLogin,
-      path,
-      destination
-    );
+    const result = await this.#octoPrintApiService.moveFileOrFolder(printerLogin, path, destination);
 
     // TODO Update file storage
 
@@ -165,10 +146,7 @@ class PrinterFilesController {
 
   async selectAndPrintFile(req, res) {
     const { currentPrinterId, printerLogin } = getScopedPrinter(req);
-    const {
-      filePath: path,
-      print,
-    } = await validateInput(req.body, selectAndPrintFileRules);
+    const { filePath: path, print } = await validateInput(req.body, selectAndPrintFileRules);
 
     const result = await this.#octoPrintApiService.selectPrintFile(printerLogin, path, print);
 
@@ -180,7 +158,7 @@ class PrinterFilesController {
     const { printerLogin, currentPrinterId } = getScopedPrinter(req);
     const {} = await validateInput(req.query, uploadFileRules);
 
-    const files = await this.#getUploadedFile(req, res, true);
+    const files = await this.#multerService.multerLoadFileAsync(req, res, ".gcode", true);
 
     if (!files?.length) {
       throw new ValidationException({
@@ -204,12 +182,7 @@ class PrinterFilesController {
     }
 
     const token = this.#multerService.startTrackingSession(files);
-    const response = await this.#octoPrintApiService.uploadFileAsMultiPart(
-      printerLogin,
-      uploadedFile,
-      { print, select },
-      token
-    );
+    const response = await this.#octoPrintApiService.uploadFileAsMultiPart(printerLogin, uploadedFile, { print, select }, token);
 
     if (response.success !== false) {
       const newOrUpdatedFile = response.files.local;
@@ -259,13 +232,6 @@ class PrinterFilesController {
 
     res.send(response);
   }
-
-  async stubUploadFiles(req, res) {
-    await this.#getUploadedFile(req, res);
-
-    this.#logger.info("Stub file upload complete.");
-    res.send();
-  }
 }
 
 // prettier-ignore
@@ -273,7 +239,6 @@ module.exports = createController(PrinterFilesController)
   .prefix(AppConstants.apiRoute + "/printer-files")
   .before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR]), printerResolveMiddleware()])
   .post("/purge", "purgeIndexedFiles", withPermission(PERMS.PrinterFiles.Clear))
-  .post("/stub-upload", "stubUploadFiles", withPermission(PERMS.PrinterFiles.Upload))
   .get("/tracked-uploads", "getTrackedUploads", withPermission(PERMS.PrinterFiles.Upload))
   .get("/:id", "getFiles", withPermission(PERMS.PrinterFiles.Get))
   .get("/:id/cache", "getFilesCache", withPermission(PERMS.PrinterFiles.Get))
