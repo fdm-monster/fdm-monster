@@ -34,5 +34,14 @@ module.exports = {
     influxToken: "INFLUX_TOKEN",
     influxOrg: "INFLUX_ORG",
     influxBucket: "INFLUX_BUCKET",
+
+    // Future experimental feature
+    enableMqttAutoDiscoveryToken: "ENABLE_MQTT_AUTODISCOVERY",
+    enableMqttAutoDiscoveryDefault: "false",
+    mqttUrlToken: "MQTT_HOST",
+    mqttPortToken: "MQTT_PORT",
+    mqttPortDefault: 1883,
+    mqttUsernameToken: "MQTT_USERNAME",
+    mqttPasswordToken: "MQTT_PASSWORD",
   },
 };
