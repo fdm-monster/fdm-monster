@@ -7,6 +7,7 @@ const {
   updateFloorNumberRules,
   printerInFloorRules,
   removePrinterInFloorRules,
+  updateFloorRules,
 } = require("./validators/floor-service.validation");
 
 class FloorService {
@@ -88,6 +89,15 @@ class FloorService {
   async create(floor) {
     const validatedInput = await validateInput(floor, createFloorRules);
     return Floor.create(validatedInput);
+  }
+
+  async update(floorId, input) {
+    const existingFloor = await this.get(floorId);
+    const { name, floor, printers } = await validateInput(input, updateFloorRules);
+    existingFloor.name = name;
+    existingFloor.floor = floor;
+    existingFloor.printers = printers;
+    return await existingFloor.save();
   }
 
   async updateName(floorId, input) {

@@ -50,20 +50,67 @@ class YamlService {
       importData.config.floorComparisonStrategiesByPriority
     );
 
-    this.#logger.info(`Performing pure insert import printers (${insertPrinters.length} printers)`);
+    this.#logger.info(`Performing pure insert printers (${insertPrinters.length} printers)`);
+    const printerIdMap = {};
+    for (const newPrinter of insertPrinters) {
+      const state = await this.printerStore.addPrinter(newPrinter);
+      printerIdMap[newPrinter.id] = state.id;
+    }
+    this.#logger.info(`Performing update import printers (${updateByPropertyPrinters.length} printers)`);
+    for (const updatePrinterSpec of updateByPropertyPrinters) {
+      const updateId = updatePrinterSpec.printerId;
+      const state = await this.printerStore.updatePrinter(updateId, updatePrinterSpec.value);
+      printerIdMap[updatePrinterSpec.printerId] = state.id;
+    }
 
-    // TODO this dereferences the printer by associating it to a new MongoDB
-    // await this.printerStore.batchImport(insertPrinters);
+    this.#logger.info(`Performing pure create floors (${insertFloors.length} floors)`);
+    const floorIdMap = {};
+    for (const newFloor of insertFloors) {
+      // Replace printerIds with newly mapped IDs
+      const knownPrinters = [];
+      for (const floorPosition of newFloor.printers) {
+        const knownPrinterId = printerIdMap[floorPosition.printerId];
+        // If the ID was not mapped, this position is considered discarded
+        if (!knownPrinterId) continue;
 
-    // for (const printer of insertPrinters) {
-    //
-    // }
+        floorPosition.printerId = knownPrinterId;
+        knownPrinters.push(floorPosition);
+      }
+      newFloor.printers = knownPrinters;
+
+      const state = await this.floorStore.create(newFloor, false);
+      floorIdMap[newFloor.id] = state.id;
+    }
+
+    this.#logger.info(`Performing update of floors (${updateByPropertyFloors.length} floors)`);
+    for (const updateFloorSpec of updateByPropertyFloors) {
+      const updateId = updateFloorSpec.floorId;
+      const updatedFloor = updateFloorSpec.value;
+
+      const knownPrinters = [];
+      for (const floorPosition of updatedFloor.printers) {
+        const knownPrinterId = printerIdMap[floorPosition.printerId];
+        // If the ID was not mapped, this position is considered discarded
+        if (!knownPrinterId) continue;
+
+        floorPosition.printerId = knownPrinterId;
+        knownPrinters.push(floorPosition);
+      }
+      updatedFloor.printers = knownPrinters;
+
+      const state = await this.floorStore.update(updateId, updatedFloor);
+      floorIdMap[updateId] = state.id;
+    }
+
+    await this.floorStore.loadStore();
 
     return {
       updateByPropertyPrinters,
       updateByPropertyFloors,
       insertPrinters,
       insertFloors,
+      printerIdMap,
+      floorIdMap,
     };
   }
 
@@ -90,6 +137,7 @@ class YamlService {
           if (foundIndex !== -1) {
             updateByPropertyPrinters.push({
               strategy: "name",
+              printerId: ids[foundIndex],
               value: printer,
             });
             break;
@@ -100,6 +148,7 @@ class YamlService {
           if (foundIndex !== -1) {
             updateByPropertyPrinters.push({
               strategy: "url",
+              printerId: ids[foundIndex],
               value: printer,
             });
             break;
@@ -110,6 +159,7 @@ class YamlService {
           if (foundIndex !== -1) {
             updateByPropertyPrinters.push({
               strategy: "id",
+              printerId: ids[foundIndex],
               value: printer,
             });
             break;
@@ -143,6 +193,7 @@ class YamlService {
           if (foundIndex !== -1) {
             updateByPropertyFloors.push({
               strategy: "name",
+              floorId: ids[foundIndex],
               value: floor,
             });
             break;
@@ -153,6 +204,7 @@ class YamlService {
           if (foundIndex !== -1) {
             updateByPropertyFloors.push({
               strategy: "floor",
+              floorId: ids[foundIndex],
               value: floor,
             });
             break;
@@ -163,6 +215,7 @@ class YamlService {
           if (foundIndex !== -1) {
             updateByPropertyFloors.push({
               strategy: "id",
+              floorId: ids[foundIndex],
               value: floor,
             });
             break;
