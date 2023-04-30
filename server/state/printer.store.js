@@ -89,7 +89,6 @@ class PrinterStore {
       throw new ValidationException({ printerId: `Printer Id '${id}' is not a valid Mongo ID` });
     }
 
-    console.log(this.#printerStates.map(p => p.id), id)
     const printerState = this.#printerStates?.find((p) => p.id === id);
     if (!printerState) {
       throw new NotFoundException(`The printer ID '${id}' was not found in the printerStore.`);

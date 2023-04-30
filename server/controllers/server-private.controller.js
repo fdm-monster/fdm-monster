@@ -14,13 +14,15 @@ class ServerPrivateController {
   clientBundleService;
   printerStore;
   yamlService;
+  multerService;
 
-  constructor({ serverUpdateService, serverReleaseService, clientBundleService, printerStore, floorStore, yamlService }) {
+  constructor({ serverUpdateService, serverReleaseService, clientBundleService, printerStore, yamlService, multerService }) {
     this.#serverReleaseService = serverReleaseService;
     this.#serverUpdateService = serverUpdateService;
     this.clientBundleService = clientBundleService;
     this.printerStore = printerStore;
     this.yamlService = yamlService;
+    this.multerService = multerService;
   }
 
   async updateClientBundleGithub(req, res) {
@@ -50,8 +52,19 @@ class ServerPrivateController {
     res.send(result);
   }
 
+  async importPrintersAndFloorsYaml(req, res) {
+    const files = await this.multerService.multerUploadFileAsync(req, res, ".yaml", false);
+    const firstFile = files[0];
+    const spec = await this.yamlService.importPrintersAndFloors(firstFile.buffer.toString());
+
+    res.send({
+      success: true,
+      spec,
+    });
+  }
+
   async exportPrintersAndFloorsYaml(req, res) {
-    const yaml = await this.yamlService.exportPrinterFloors(req.body);
+    const yaml = await this.yamlService.exportPrintersAndFloors(req.body);
     const fileContents = Buffer.from(yaml);
     const readStream = new PassThrough();
     readStream.end(fileContents);
@@ -75,6 +88,7 @@ module.exports = createController(ServerPrivateController)
   .before([authenticate(), authorizeRoles([ROLES.ADMIN])])
   .get("/", "getReleaseStateInfo")
   .get("/export-printers-floors-yaml", "exportPrintersAndFloorsYaml")
+  .post("/import-printers-floors-yaml", "importPrintersAndFloorsYaml")
   .post("/git-update", "pullGitUpdates")
   .post("/restart", "restartServer")
   .post("/update-client-bundle-github", "updateClientBundleGithub")

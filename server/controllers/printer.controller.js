@@ -18,7 +18,6 @@ const { getSettingsAppearanceDefault } = require("../constants/service.constants
 const { printerResolveMiddleware } = require("../middleware/printer");
 const { generateCorrelationToken } = require("../utils/correlation-token.util");
 const { ROLES } = require("../constants/authorization.constants");
-const { model } = require("mongoose");
 const { Floor } = require("../models/Floor");
 
 class PrinterController {
@@ -32,7 +31,6 @@ class PrinterController {
 
   constructor({ printerStore, taskManagerService, loggerFactory, octoPrintApiService, pluginRepositoryCache, floorStore }) {
     this.#logger = loggerFactory("Server-API");
-
     this.#printerStore = printerStore;
     this.#taskManagerService = taskManagerService;
     this.#octoPrintApiService = octoPrintApiService;

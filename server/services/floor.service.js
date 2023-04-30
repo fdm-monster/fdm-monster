@@ -21,10 +21,14 @@ class FloorService {
   /**
    * Lists the floors present in the database.
    */
-  async list() {
+  async list(patchPositions = true) {
     const printerIds = this.printerStore.listPrintersFlat(true).map((p) => p.id);
 
     const floors = await Floor.find({});
+    if (!patchPositions) {
+      return floors;
+    }
+
     for (const floor of floors) {
       if (!floor.printers?.length) continue;
 
