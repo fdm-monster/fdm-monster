@@ -183,9 +183,10 @@ async function runMigrations(db, client) {
   }
 
   const migrationResult = await up(db, client);
-
   if (migrationResult > 0) {
     logger.info(`Applied ${migrationResult.length} migrations successfully`, migrationResult);
+  } else {
+    logger.info("No migrations were run");
   }
 }
 
