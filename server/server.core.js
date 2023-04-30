@@ -9,13 +9,6 @@ const helmet = require("helmet");
 const { interceptDatabaseError } = require("./middleware/database");
 const { validateWhitelistedIp, interceptRoles } = require("./middleware/global.middleware");
 const passportMiddleware = require("./middleware/passport");
-const Logger = require("./handlers/logger.js");
-const Sentry = require("@sentry/node");
-const { errorSummary } = require("./utils/error.utils");
-const { AppConstants } = require("./server.constants");
-const { getEnvOrDefault } = require("./utils/env.utils");
-
-const logger = new Logger("Server-Core", true);
 
 function setupServer() {
   const httpServer = express();

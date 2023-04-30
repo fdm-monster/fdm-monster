@@ -4,7 +4,8 @@ const Logger = require("../handlers/logger.js");
 const { AppConstants } = require("../server.constants");
 const { ROLES } = require("../constants/authorization.constants");
 const { isTestEnvironment } = require("../utils/env.utils");
-const { Printer } = require("../models/Printer");
+const { Printer } = require("../models");
+const { PassThrough } = require("stream");
 
 class ServerPrivateController {
   #logger = new Logger("Server-Private-API");
@@ -12,12 +13,14 @@ class ServerPrivateController {
   #serverReleaseService;
   clientBundleService;
   printerStore;
+  yamlService;
 
-  constructor({ serverUpdateService, serverReleaseService, clientBundleService, printerStore }) {
+  constructor({ serverUpdateService, serverReleaseService, clientBundleService, printerStore, floorStore, yamlService }) {
     this.#serverReleaseService = serverReleaseService;
     this.#serverUpdateService = serverUpdateService;
     this.clientBundleService = clientBundleService;
     this.printerStore = printerStore;
+    this.yamlService = yamlService;
   }
 
   async updateClientBundleGithub(req, res) {
@@ -47,6 +50,18 @@ class ServerPrivateController {
     res.send(result);
   }
 
+  async exportPrintersAndFloorsYaml(req, res) {
+    const yaml = await this.yamlService.exportPrinterFloors(req.body);
+    const fileContents = Buffer.from(yaml);
+    const readStream = new PassThrough();
+    readStream.end(fileContents);
+
+    const fileName = "export-fdm-monster-" + Date.now() + ".yaml";
+    res.set("Content-disposition", "attachment; filename=" + fileName);
+    res.set("Content-Type", "text/plain");
+    readStream.pipe(res);
+  }
+
   async deleteAllPrinters(req, res) {
     await Printer.deleteMany({});
     await this.printerStore.loadPrinterStore();
@@ -59,6 +74,7 @@ module.exports = createController(ServerPrivateController)
   .prefix(AppConstants.apiRoute + "/server")
   .before([authenticate(), authorizeRoles([ROLES.ADMIN])])
   .get("/", "getReleaseStateInfo")
+  .get("/export-printers-floors-yaml", "exportPrintersAndFloorsYaml")
   .post("/git-update", "pullGitUpdates")
   .post("/restart", "restartServer")
   .post("/update-client-bundle-github", "updateClientBundleGithub")

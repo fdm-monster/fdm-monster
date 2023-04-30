@@ -1,8 +1,5 @@
 const nodeInputValidator = require("node-input-validator");
-const {
-  ValidationException,
-  InternalServerException
-} = require("../exceptions/runtime.exceptions");
+const { ValidationException, InternalServerException } = require("../exceptions/runtime.exceptions");
 const { printerLoginToken, currentPrinterToken, printerIdToken } = require("../middleware/printer");
 
 function getExtendedValidator() {
@@ -47,6 +44,12 @@ function getScopedPrinter(req) {
   return resolvedDependencies;
 }
 
+/**
+ * Validate input based on rules
+ * @param data
+ * @param rules
+ * @returns {Promise<object>}
+ */
 async function validateInput(data, rules) {
   const localNIV = getExtendedValidator();
 
@@ -72,5 +75,5 @@ async function validateMiddleware(req, rules) {
 module.exports = {
   validateMiddleware,
   validateInput,
-  getScopedPrinter
+  getScopedPrinter,
 };
