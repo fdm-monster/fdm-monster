@@ -143,7 +143,7 @@ function setupSentry() {
   const sentryEnabled = getEnvOrDefault(AppConstants.sentryEnabledToken, AppConstants.sentryEnabledDefault) === "true";
   if (sentryEnabled) {
     logger.warning("Sentry is enabled. You can change this by setting 'SENTRY_ENABLED=false'");
-  } else {
+  } else if (isEnvProd()) {
     logger.warning("Sentry is disabled. You can change this by setting 'SENTRY_ENABLED=true'");
   }
 

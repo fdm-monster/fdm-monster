@@ -23,7 +23,7 @@ const importPrintersFloorsYamlRules = (importPrinters, importFloorGrid, importFl
   "config.printerComparisonStrategiesByPriority": "required|arrayUnique|minLength:1",
   "config.printerComparisonStrategiesByPriority.*": "required|string|in:name,url,id",
   "config.floorComparisonStrategiesByPriority": "required|string|in:name,floor,id",
-  printers: `${!!importPrinters ? "required|array|minLength:1" : "not"}`,
+  printers: `${!!importPrinters ? "array|minLength:0" : "not"}`,
   "printers.*.id": "mongoId",
   "printers.*.apiKey": `required|length:${UUID_LENGTH},${UUID_LENGTH}|alphaNumeric`,
   "printers.*.printerURL": "required|httpurl",
@@ -31,14 +31,14 @@ const importPrintersFloorsYamlRules = (importPrinters, importFloorGrid, importFl
   "printers.*.enabled": "boolean",
   "printers.*.settingsAppearance": "required|object",
   "printers.*.settingsAppearance.name": "required|string",
-  floors: `${!!importFloors ? "required|array|minLength:1" : "not"}`,
+  floors: `${!!importFloors ? "array|minLength:0" : "not"}`,
   "floors.*.id": "required|mongoId",
   "floors.*.floor": "required|integer",
   "floors.*.name": "required|string",
 });
 
 const importPrinterPositionsRules = {
-  printers: "required|array|minLength:1",
+  printers: "array|minLength:0",
   "printers.*.printerId": "required|mongoId",
   "printers.*.x": "required|integer|min:0|max:12",
   "printers.*.y": "required|integer|min:0|max:12",
