@@ -17,6 +17,7 @@ const DITokens = {
   printerService: "printerService",
   printCompletionService: "printCompletionService",
   floorService: "floorService",
+  yamlService: "yamlService",
   serverSettingsService: "serverSettingsService",
   serverReleaseService: "serverReleaseService",
   serverUpdateService: "serverUpdateService",

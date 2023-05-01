@@ -29,9 +29,20 @@ class FloorStore {
     return this.floors;
   }
 
-  async create(input) {
+  async create(input, reloadStore = true) {
     const floor = await this.#floorService.create(input);
-    await this.loadStore();
+    if (reloadStore) {
+      await this.loadStore();
+    }
+
+    return floor;
+  }
+
+  async update(floorId, input, reloadStore = true) {
+    const floor = await this.#floorService.update(floorId, input);
+    if (reloadStore) {
+      await this.loadStore();
+    }
 
     return floor;
   }

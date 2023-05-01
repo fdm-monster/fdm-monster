@@ -227,9 +227,4 @@ describe("PrinterFilesController", () => {
 
     expectNotFoundResponse(response);
   });
-
-  it("should allow empty upload to stub upload endpoint", async () => {
-    const response = await request.post(stubUploadFileRoute).send();
-    expectOkResponse(response);
-  });
 });

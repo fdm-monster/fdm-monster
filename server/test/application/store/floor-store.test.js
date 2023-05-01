@@ -27,4 +27,15 @@ describe(DITokens.floorStore, () => {
     await printerStore.loadPrinterStore();
     await floorStore.delete("63452115122876ea11cd1656");
   });
+
+  it("should update floor", async () => {
+    await printerStore.loadPrinterStore();
+    const floors = await floorStore.listCache();
+    expect(floors).toHaveLength(1);
+    await floorStore.update(floors[0], {
+      name: "flo",
+      floor: 1,
+      printers: [],
+    });
+  });
 });

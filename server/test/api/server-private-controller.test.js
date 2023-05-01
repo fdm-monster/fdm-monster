@@ -1,25 +1,31 @@
 const dbHandler = require("../db-handler");
 const { setupTestApp } = require("../test-server");
-const {
-  expectOkResponse,
-  expectInternalServerError,
-  expectUnauthorizedResponse
-} = require("../extensions");
+const { expectOkResponse, expectInternalServerError, expectUnauthorizedResponse } = require("../extensions");
 const { AppConstants } = require("../../server.constants");
 const DITokens = require("../../container.tokens");
+const { validateInput } = require("../../handlers/validators");
+const { importPrintersFloorsYamlRules } = require("../../services/validators/yaml-service.validation");
+const { load } = require("js-yaml");
+const { exportYamlBuffer } = require("../application/test-data/yaml-import");
 
 let request;
 let container;
 let settingsStore;
+let printerStore;
+let floorStore;
 
 const defaultRoute = `${AppConstants.apiRoute}/server`;
 const gitUpdateRoute = `${defaultRoute}/git-update`;
+const exportPrintersAndFloorsRoute = `${defaultRoute}/export-printers-floors-yaml`;
+const importPrintersAndFloorsRoute = `${defaultRoute}/import-printers-floors-yaml`;
 const restartRoute = `${defaultRoute}/restart`;
 
 beforeAll(async () => {
   await dbHandler.connect();
   ({ request, container } = await setupTestApp());
   settingsStore = container.resolve(DITokens.settingsStore);
+  printerStore = container.resolve(DITokens.printerStore);
+  floorStore = container.resolve(DITokens.floorStore);
 });
 
 describe("ServerPrivateController", () => {
@@ -35,7 +41,7 @@ describe("ServerPrivateController", () => {
       serverVersion: process.env.npm_package_version,
       installedReleaseFound: null,
       updateAvailable: null,
-      synced: true
+      synced: true,
     });
   });
 
@@ -64,5 +70,27 @@ describe("ServerPrivateController", () => {
     expectOkResponse(response);
 
     process.env.npm_lifecycle_script = valueBefore;
+  });
+
+  it("should export YAML and return valid object", async () => {
+    await printerStore.loadPrinterStore();
+    const response = await request.get(exportPrintersAndFloorsRoute).send({
+      exportPrinters: true,
+      exportFloorGrid: true,
+      exportFloors: true,
+      printerComparisonStrategiesByPriority: ["name"],
+      floorComparisonStrategiesByPriority: "name",
+      notes: "Some export from 2023",
+    });
+    expectOkResponse(response);
+
+    const yamlObject = load(response.text);
+    await validateInput(yamlObject, importPrintersFloorsYamlRules(true, true, true));
+  });
+
+  test.skip("should import YAML and have data loaded", async () => {
+    await printerStore.loadPrinterStore();
+    const response = await request.post(importPrintersAndFloorsRoute).attach("file", exportYamlBuffer);
+    expectOkResponse(response);
   });
 });

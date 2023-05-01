@@ -78,23 +78,40 @@ class MulterService {
     });
   }
 
-  gcodeFileFilter(req, file, callback) {
-    const ext = extname(file.originalname);
-    if (ext !== ".gcode") {
-      return callback(new Error("Only .gcode files are allowed"));
-    }
-    callback(null, true);
+  getMulterGCodeFileFilter(storeAsFile = true) {
+    return this.getMulterFileFilter(".gcode", storeAsFile);
   }
 
-  getMulterGCodeFileFilter(storeAsFile = true) {
+  async multerLoadFileAsync(req, res, fileExtension, storeAsFile=true) {
+    return await new Promise((resolve, reject) =>
+      this.getMulterFileFilter(fileExtension, storeAsFile)(req, res, (err) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(req.files);
+      })
+    );
+  }
+
+  getMulterFileFilter(fileExtension, storeAsFile = true) {
     return multer({
       storage: storeAsFile
         ? multer.diskStorage({
             destination: join(superRootPath(), AppConstants.defaultFileStorageFolder),
           })
         : multer.memoryStorage(),
-      fileFilter: this.gcodeFileFilter,
+      fileFilter: this.multerFileFilter(fileExtension),
     }).any();
+  }
+
+  multerFileFilter(extension) {
+    return (req, file, callback) => {
+      const ext = extname(file.originalname);
+      if (ext !== extension) {
+        return callback(new Error("Only .gcode files are allowed"));
+      }
+      return callback(null, true);
+    };
   }
 
   startTrackingSession(multerFile) {

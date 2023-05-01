@@ -233,7 +233,7 @@ class PrinterStore {
     const newPrinterState = await this.#printerStateFactory.create(newPrinterDoc);
     this.#printerStates.push(newPrinterState);
 
-    // The next 'round' will involve setting up a websocket for this printer
+    // The next 'round' will involve setting up a websocket for this updated printer
     return newPrinterState;
   }
 
@@ -252,7 +252,7 @@ class PrinterStore {
     const updatedPrinterState = await this.getPrinterState(printerId);
     updatedPrinterState.updateEntityData(updatedDoc, true);
 
-    // The next 'round' will involve setting up a websocket for this printer
+    // The next 'round' will involve setting up a websocket for this updated printer
     return updatedPrinterState.toFlat();
   }
 

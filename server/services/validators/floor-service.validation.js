@@ -6,8 +6,8 @@ const removePrinterInFloorRules = {
 
 const printerInFloorRules = {
   printerId: "required|mongoId",
-  x: "required|integer|between:0,8",
-  y: "required|integer|between:0,8",
+  x: "required|integer|between:0,12",
+  y: "required|integer|between:0,12",
 };
 
 const updateFloorNameRules = {
@@ -15,18 +15,28 @@ const updateFloorNameRules = {
 };
 
 const updateFloorNumberRules = {
-  floor: `required|integer`,
+  floor: "required|integer",
+};
+
+const updateFloorRules = {
+  name: `required|minLength:${minPrinterFloorNameLength}`,
+  floor: "required|integer",
+  printers: "array",
+  "printer.*.printerId": "required|mongoId",
+  "printer.*.x": "required|integer|between:0,12",
+  "printer.*.y": "required|integer|between:0,12",
 };
 
 const createFloorRules = {
   name: `required|minLength:${minPrinterFloorNameLength}`,
-  floor: `required|integer`,
+  floor: "required|integer",
   printers: "array",
 };
 
 module.exports = {
   printerInFloorRules,
   removePrinterInFloorRules,
+  updateFloorRules,
   updateFloorNameRules,
   updateFloorNumberRules,
   createFloorRules,

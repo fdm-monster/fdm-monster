@@ -51,6 +51,7 @@ const { ClientBundleService } = require("./services/client-bundle.service");
 const FloorService = require("./services/floor.service");
 const FloorStore = require("./state/floor.store");
 const PrinterStore = require("./state/printer.store");
+const { YamlService } = require("./services/yaml.service");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -108,6 +109,7 @@ function configureContainer() {
     [DITokens.printerService]: asClass(PrinterService),
     [DITokens.printerFilesService]: asClass(PrinterFilesService),
     [DITokens.floorService]: asClass(FloorService).singleton(),
+    [DITokens.yamlService]: asClass(YamlService),
     [DITokens.printCompletionService]: asClass(PrintCompletionService).singleton(),
     [DITokens.octoPrintApiService]: asClass(OctoPrintApiService).singleton(),
     [DITokens.pluginFirmwareUpdateService]: asClass(PluginFirmwareUpdateService).singleton(),

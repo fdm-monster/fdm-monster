@@ -24,7 +24,9 @@ class ServerHost {
   }
 
   async boot(app, quick_boot = false, listenRequests = true) {
+    // Enforce models to be strictly applied, any unknown property will not be persisted
     mongoose.set('strictQuery', true);
+
     this.#appInstance = app;
     this.serveControllerRoutes(this.#appInstance);
 
@@ -51,7 +53,6 @@ class ServerHost {
           next();
         }
       })
-      .use(loadControllers(`${routePath}/server/*.controller.js`, { cwd: __dirname }))
       .use(loadControllers(`${routePath}/*.controller.js`, { cwd: __dirname }))
       .use(exceptionHandler);
 
