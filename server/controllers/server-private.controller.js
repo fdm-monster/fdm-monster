@@ -53,7 +53,7 @@ class ServerPrivateController {
   }
 
   async importPrintersAndFloorsYaml(req, res) {
-    const files = await this.multerService.multerUploadFileAsync(req, res, ".yaml", false);
+    const files = await this.multerService.multerLoadFileAsync(req, res, ".yaml", false);
     const firstFile = files[0];
     const spec = await this.yamlService.importPrintersAndFloors(firstFile.buffer.toString());
 
