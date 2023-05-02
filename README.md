@@ -38,7 +38,7 @@ These are the people involved in the project ([emoji key](https://allcontributor
       <td align="center" valign="top" width="14.28%"><a href="https://kevenaar.name"><img src="https://avatars.githubusercontent.com/u/834643?v=4?s=80" width="80px;" alt="Maurice Kevenaar"/><br /><sub><b>Maurice Kevenaar</b></sub></a><br /><a href="#security-mkevenaar" title="Security">🛡️</a> <a href="#maintenance-mkevenaar" title="Maintenance">🚧</a> <a href="#ideas-mkevenaar" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Tobikisss"><img src="https://avatars.githubusercontent.com/u/45754890?v=4?s=80" width="80px;" alt="Tobias"/><br /><sub><b>Tobias</b></sub></a><br /><a href="#ideas-Tobikisss" title="Ideas, Planning, & Feedback">🤔</a> <a href="#maintenance-Tobikisss" title="Maintenance">🚧</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://tideline3d.com"><img src="https://avatars.githubusercontent.com/u/12903320?v=4?s=80" width="80px;" alt="tideline3d"/><br /><sub><b>tideline3d</b></sub></a><br /><a href="https://github.com/fdm-monster/fdm-monster/issues?q=author%3Atideline3d" title="Bug reports">🐛</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ndarrow"><img src="https://avatars.githubusercontent.com/u/91099282?v=4?s=80" width="80px;" alt="ndarrow"/><br /><sub><b>ndarrow</b></sub></a><br /><a href="https://github.com/fdm-monster/fdm-monster/issues?q=author%3Andarrow" title="Bug reports">🐛</a> <a href="#financial-ndarrow" title="Financial">💵</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/WindArrow3d"><img src="https://avatars.githubusercontent.com/u/91099282?v=4?s=80" width="80px;" alt="ndarrow"/><br /><sub><b>ndarrow</b></sub></a><br /><a href="https://github.com/fdm-monster/fdm-monster/issues?q=author%3AWindArrow3d" title="Bug reports">🐛</a> <a href="#financial-ndarrow" title="Financial">💵</a></td>
     </tr>
   </tbody>
 </table>
@@ -63,7 +63,7 @@ These are the people involved in the project ([emoji key](https://allcontributor
 Thanks to the following parties for their financial support [see Github Sponsorship Tiers here](https://github.com/sponsors/fdm-monster):
 
 ### Tier - Dragon Apprentice 🐲🐲
-- @ndarrow   
+- [WindArrow3d](https://github.com/WindArrow3d)
 
 ## Features
 This server is has been battle-tested in the field, so give it a star ⭐and enhance your 3D Printing Farm's workflow! 
