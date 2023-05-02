@@ -13,7 +13,7 @@ FDM Monster is a bulk OctoPrint manager and dashboard written in Vue with Typesc
 ## Getting started
 
 Please read the [GETTING_STARTED](docs/1_GETTING_STARTED.md) for a Windows service installation, or, alternatively, a docker installation for Windows/Linux.
-More importantly, we offer the [MonsterPi - Raspberry Pi Image](docs/4_MONSTER_PI.md).
+More importantly, we offer the [MonsterPi - Raspberry Pi Image](docs/guides/monsterpi.md).
 
 ### Documentation 
 [Documentation](https://docs.fdm-monster.net), please create an issue if something is unclear or needs a fix on these pages.

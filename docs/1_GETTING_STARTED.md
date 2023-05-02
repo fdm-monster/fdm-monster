@@ -21,7 +21,7 @@ The following steps will install the following:
 - fdm-monster (github cloned source code)
 - node-windows (npm package)
 
-At step 4 you **can** choose to skip the remaining steps by running the `installations/fdm-monster-node-service` installation scripts.
+At step 4 you **can** choose to skip the remaining steps by running the `installations/fdm-monster-node-windows` installation scripts.
 Step 5 to 8 are just there to let you know how the scripts work. Step 9 concludes the installation.
 
 ### Caveats
@@ -59,11 +59,11 @@ Prepare the installation, by ensuring you have git installed. This will help you
 Find it here: https://git-scm.com/downloads
 
 ### Step 4)
-The following steps 5-8 will install FDM Monster as a service manually. If you'd like to skip this, please use the `installations/fdm-monster-node-service` where I've provided scripts that will install the necessary stuff for you.
+The following steps 5-8 will install FDM Monster as a service manually. If you'd like to skip this, please use the `installations/fdm-monster-node-windows` where I've provided scripts that will install the necessary stuff for you.
 
 The first time I would run the powershell script `download-fdm-monster-server.ps1` inside a powershell instance:
 
-> cd installations/fdm-monster-node-service  
+> cd installations/fdm-monster-node-windows  
 > ./download-fdm-monster-server.ps1
 
 If no errors occurred, please skip to Step 9! You're almost done.
