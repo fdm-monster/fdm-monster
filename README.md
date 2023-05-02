@@ -58,6 +58,13 @@ These are the people involved in the project ([emoji key](https://allcontributor
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
+## Sponsors
+
+Thanks to the following parties for their financial support [see Github Sponsorship Tiers here](https://github.com/sponsors/fdm-monster):
+
+### Tier - Dragon Apprentice 🐲🐲
+- @ndarrow   
+
 ## Features
 This server is has been battle-tested in the field, so give it a star ⭐and enhance your 3D Printing Farm's workflow! 
 
