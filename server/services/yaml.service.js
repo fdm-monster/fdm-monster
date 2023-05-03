@@ -68,15 +68,17 @@ class YamlService {
     for (const newFloor of insertFloors) {
       // Replace printerIds with newly mapped IDs
       const knownPrinters = [];
-      for (const floorPosition of newFloor.printers) {
-        const knownPrinterId = printerIdMap[floorPosition.printerId];
-        // If the ID was not mapped, this position is considered discarded
-        if (!knownPrinterId) continue;
+      if (exportFloorGrid && exportPrinters) {
+        for (const floorPosition of newFloor.printers) {
+          const knownPrinterId = printerIdMap[floorPosition.printerId];
+          // If the ID was not mapped, this position is considered discarded
+          if (!knownPrinterId) continue;
 
-        floorPosition.printerId = knownPrinterId;
-        knownPrinters.push(floorPosition);
+          floorPosition.printerId = knownPrinterId;
+          knownPrinters.push(floorPosition);
+        }
+        newFloor.printers = knownPrinters;
       }
-      newFloor.printers = knownPrinters;
 
       const state = await this.floorStore.create(newFloor, false);
       floorIdMap[newFloor.id] = state.id;
@@ -88,15 +90,17 @@ class YamlService {
       const updatedFloor = updateFloorSpec.value;
 
       const knownPrinters = [];
-      for (const floorPosition of updatedFloor.printers) {
-        const knownPrinterId = printerIdMap[floorPosition.printerId];
-        // If the ID was not mapped, this position is considered discarded
-        if (!knownPrinterId) continue;
+      if (exportFloorGrid && exportPrinters) {
+        for (const floorPosition of updatedFloor?.printers) {
+          const knownPrinterId = printerIdMap[floorPosition.printerId];
+          // If the ID was not mapped, this position is considered discarded
+          if (!knownPrinterId) continue;
 
-        floorPosition.printerId = knownPrinterId;
-        knownPrinters.push(floorPosition);
+          floorPosition.printerId = knownPrinterId;
+          knownPrinters.push(floorPosition);
+        }
+        updatedFloor.printers = knownPrinters;
       }
-      updatedFloor.printers = knownPrinters;
 
       const state = await this.floorStore.update(updateId, updatedFloor);
       floorIdMap[updateId] = state.id;
