@@ -185,13 +185,13 @@ const mapStateToColor = (state) => {
     return { name: "success", hex: "#00330e", category: CATEGORY.Idle };
   }
   if (state === PSTATE.Paused) {
-    return { name: "warning", hex: "#583c0e", category: CATEGORY.Idle };
+    return { name: "warning", hex: "#5b0d69", category: CATEGORY.Idle };
   }
   if (state === PSTATE.Printing) {
     return { name: "success", hex: "#583c0e", category: CATEGORY.Active };
   }
   if (state === PSTATE.Pausing) {
-    return { name: "warning", hex: "#583c0e", category: CATEGORY.Active };
+    return { name: "warning", hex: "#60176e", category: CATEGORY.Active };
   }
   if (state === PSTATE.Cancelling) {
     return { name: "warning", hex: "#583c0e", category: CATEGORY.Active };
