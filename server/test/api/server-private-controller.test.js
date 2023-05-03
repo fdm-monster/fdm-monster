@@ -74,7 +74,7 @@ describe("ServerPrivateController", () => {
 
   it("should export YAML and return valid object", async () => {
     await printerStore.loadPrinterStore();
-    const response = await request.get(exportPrintersAndFloorsRoute).send({
+    const response = await request.post(exportPrintersAndFloorsRoute).send({
       exportPrinters: true,
       exportFloorGrid: true,
       exportFloors: true,
