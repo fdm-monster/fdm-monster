@@ -22,7 +22,7 @@ class ClientBundleService {
   }
 
   get clientIndexHtmlPath() {
-    return join(superRootPath(), AppConstants.defaultClientBundleStorage, "index.html");
+    return join(superRootPath(), AppConstants.defaultClientBundleStorage, "dist/index.html");
   }
 
   async downloadBundle() {
@@ -107,7 +107,6 @@ class ClientBundleService {
     const version = this.getCurrentClientVersion();
     const comparison = compare(version, latestReleaseTag);
     if (comparison > -1) {
-      this.logger.info(`Client bundle is up-to-date with latest release ${version}`);
       return false;
     }
 
