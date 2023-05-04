@@ -63,7 +63,7 @@ These are the people involved in the project ([emoji key](https://allcontributor
 
 Want to sponsor FDM Monster? You can find the [Github Sponsorship Tiers here](https://github.com/sponsors/fdm-monster). Thanks to the following parties for their financial support :
 
-**Tier 1 - Dragon egg 🐲**
+**Tier 1 - Dragon Egg 🐲**
 
 **Tier 2 - Dragon Hatchling 🐲**
 
