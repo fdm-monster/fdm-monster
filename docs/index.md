@@ -8,7 +8,7 @@ last_modified_at: 2023-04-07T21:50:00+02:00
 
 # FDM Monster - Connect 100+ OctoPrint instances
 
-Welcome to the FDM Monster documentation. You should find all the documentation required to setup your own FDM Monster server here. Have a look at the [Guides](guides) section for more information.
+Welcome to the FDM Monster documentation. You should find all the documentation required to setup your own FDM Monster server here. Please choose a section below to get started.
 
 ![Image](./images/server-running.png)
 
