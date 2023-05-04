@@ -61,10 +61,16 @@ These are the people involved in the project ([emoji key](https://allcontributor
 
 ## Sponsors
 
-Thanks to the following parties for their financial support [see Github Sponsorship Tiers here](https://github.com/sponsors/fdm-monster):
+Want to sponsor FDM Monster? You can find the [Github Sponsorship Tiers here](https://github.com/sponsors/fdm-monster). Thanks to the following parties for their financial support :
 
-### Tier - Dragon Apprentice 🐲🐲
+**Tier 1 - Dragon egg 🐲**
+
+**Tier 2 - Dragon Hatchling 🐲**
+
+**Tier 3 - Dragon Apprentice 🐲🐲**
 - [WindArrow3d](https://github.com/WindArrow3d)
+
+**Tier 4 - Adult Dragon 🐲 🐲 🐲**
 
 ## Features
 This server is has been battle-tested in the field, so give it a star ⭐and enhance your 3D Printing Farm's workflow! 
