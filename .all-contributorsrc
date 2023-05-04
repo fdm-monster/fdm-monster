@@ -56,6 +56,15 @@
         "bug",
         "financial"
       ]
+    },
+    {
+      "login": "lucian151",
+      "name": "Lucian Chapar",
+      "avatar_url": "https://avatars.githubusercontent.com/u/33263520?v=4",
+      "profile": "http://lucianchapar.com",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
