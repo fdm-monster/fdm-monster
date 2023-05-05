@@ -76,6 +76,8 @@ Personally I like the [VS Code SSH extension](https://code.visualstudio.com/docs
 
 # MonsterPi Version 0.2.0+
 
+Run the following commands to change to the `pi` user and execute an update with root elevation.
+
 ```
 # Change to pi user
 sudo su pi
@@ -86,10 +88,15 @@ cd /home/pi/fdm-monster-daemon
 sudo bash ./update-fdm-monster.sh 
 ```
 
-## Updating MonsterPi manually from 0.1.1 -> 0.2.0
+## Updating MonsterPi manually 0.1.x -> 0.2.0
 
 This strategy allows you to stick with 0.1.1. I cannot recommend it in the long run however, because the image of 0.2.0
 has changed quite a bit.
+
+This script will not install:
+- HAProxy
+- gencert (SSL certificate generator)
+- welcome script
 
 We will be downloading a gist from Github. You can also download the latest version of the file yourself
 from [this Github URL](https://github.com/fdm-monster/MonsterPi/blob/main/src/modules/monsterpi/filesystem/home/pi/fdm-monster-daemon/update-fdm-monster.sh).
