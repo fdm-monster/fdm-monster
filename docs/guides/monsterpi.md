@@ -68,7 +68,7 @@ I assume you know how to SSH into your MonsterPi. For me the following SSH entry
 ```
 Host monsterpi
    HostName monsterpi.local
-   User david
+   User yourcustompiuser # replace with your user
    # PasswordAuthentication true # I Do not like using passwords
    IdentityFile ~/.ssh/id_rsa_file # Replace with your SSH Key
    Port 22
