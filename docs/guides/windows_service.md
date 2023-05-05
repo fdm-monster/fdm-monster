@@ -6,8 +6,6 @@ nav_order: 3
 last_modified_at: 2023-05-05T10:01:00+02:00
 ---
 
-> :warning: **This page is work in progress!**
-
 # Windows Service
 **Note**: the Windows service installation involves quite some steps, and it's quite new and new.
 

@@ -20,6 +20,7 @@ const DITokens = {
   yamlService: "yamlService",
   serverSettingsService: "serverSettingsService",
   serverReleaseService: "serverReleaseService",
+  monsterPiService: "monsterPiService",
   serverUpdateService: "serverUpdateService",
   githubApiService: "githubApiService",
   octokitService: "octokitService",
