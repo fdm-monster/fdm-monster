@@ -59,8 +59,8 @@ Steps:
 
 5) Visit [http://monsterpi.local:4000](http://monsterpi.local:4000) to access FDM Monster
 
-6) Alternatively you can visit [http://monsterpi.local:80](http://monsterpi.local:80)
-   or [https://monsterpi.local:80 (Self-Signed SSL Certificate)](https://monsterpi.local:80) to access FDM Monster
+6) Alternatively you can visit [http://monsterpi.local](http://monsterpi.local)
+   or [https://monsterpi.local (Self-Signed SSL Certificate)](https://monsterpi.local) to access FDM Monster
 
 # Updating FDM Monster in MonsterPi 
 
@@ -68,7 +68,7 @@ I assume you know how to SSH into your MonsterPi. For me the following SSH entry
 ```
 Host monsterpi
    HostName monsterpi.local
-   User david
+   User yourcustompiuser # replace with your user
    # PasswordAuthentication true # I Do not like using passwords
    IdentityFile ~/.ssh/id_rsa_file # Replace with your SSH Key
    Port 22
