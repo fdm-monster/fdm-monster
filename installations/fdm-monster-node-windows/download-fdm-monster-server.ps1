@@ -15,7 +15,7 @@ $repoUrl = "https://github.com/${org}/${repo}"
 $serverPath = "./fdm-monster/server"
 
 # Get tags selecting the newest only
-$latestTag = git ls-remote --tags --sort=taggerdate $repoUrl | Select-Object -First 1
+$latestTag = git describe --tags $(git rev-list --tags --max-count=1)
 # Extract the tag name from the tag reference
 $latestTagName = $latestTag.Substring($latestTag.LastIndexOf("/") + 1)
 # Output the latest tag name
