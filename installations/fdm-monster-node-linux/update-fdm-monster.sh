@@ -1,4 +1,12 @@
 #!/bin/bash
+: '
+/**
+ * Created by D. Zwart
+ * Description: Performs all the steps to update FDM Monster
+ * v1.0
+ * 05/05/2023
+ */
+'
 
 # If you are logging in as pi user, you can skip the sudo su pi command.
 # I decided to switch to the pi user with sudo su pi beforehand as I was logging in as david.
@@ -21,7 +29,7 @@ repo_url="https://github.com/${org}/${repo}"
 
 # Step 1) Check latest release of FDM Monster
 tag=$(git ls-remote --tags $repo_url | awk -F"/" '{print $NF}' | grep -E "^[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+$" | sort -V | tail -1)
-echo "[1/${ts}] Found the latest release ${val}"
+echo "[1/${ts}] Found the latest release ${tag}"
 
 # Step 2) Temporarily stop FDM Monster Daemon
 # `curl 0.0.0.0:4000` will fail to connect, you can test it if you want to be sure

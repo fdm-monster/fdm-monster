@@ -1,3 +1,10 @@
+/**
+ * Created by D. Zwart
+ * Description: Uninstalls the Windows Service for FDM Monster
+ * v1.0
+ * 05/05/2023
+ */
+
 const { Service } = require("node-windows");
 const { join } = require("path");
 

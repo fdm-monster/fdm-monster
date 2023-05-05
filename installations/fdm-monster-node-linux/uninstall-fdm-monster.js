@@ -1,6 +1,7 @@
 /**
  * Created by D. Zwart
- * V1.0
+ * Description: Uninstalls the Linux Service for FDM Monster
+ * v1.0
  * 05/05/2023
  */
 
