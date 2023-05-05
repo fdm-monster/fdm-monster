@@ -1,7 +1,6 @@
 volumes:
   mongodb-data:
 
-# For more detailed info, read /docs/USING_DOCKER.md
 services:
   mongodb:
     image: mongo:latest
@@ -17,16 +16,13 @@ services:
 
   fdm-monster:
     container_name: fdm-monster
-    image: davidzwa/fdm-monster:v1.3.0-rc4
+    image: davidzwa/fdm-monster:latest
     restart: unless-stopped
-    build:
-      context: ./server
-      dockerfile: docker/Dockerfile
     ports:
-      - "4001:5001"
+      - "4000:4000"
     environment:
       - MONGO=mongodb://mongodb:27017/fdm-monster?readPreference=primary&ssl=false
       - NODE_ENV=development
-      - SERVER_PORT=5001
+      - SERVER_PORT=4000
     volumes:
       - ./fdm-monster/media/:/app/media

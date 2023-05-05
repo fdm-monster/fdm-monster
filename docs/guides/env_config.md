@@ -18,7 +18,6 @@ The following variables are read and used by FDM Monster at startup. Always rest
 - MONGO (Required) **the connection to mongodb**. For example:
 > MONGO=mongodb://127.0.0.1:27017/fdm-monster
 - SERVER_PORT (Optional, default=4000) **the port of the local FDM Monster website**. For example:
-> 
 > SERVER_PORT=4000
 - SERVER_SITE_TITLE **Custom site title for FDM Monster**
 > SERVER_SITE_TITLE=FDM Monster

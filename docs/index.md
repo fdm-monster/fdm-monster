@@ -7,15 +7,36 @@ last_modified_at: 2023-04-07T21:50:00+02:00
 ---
 
 # FDM Monster - Connect 100+ OctoPrint instances
-
-Welcome to the FDM Monster documentation. You should find all the documentation required to setup your own FDM Monster server here. Please choose a section below to get started.
+Welcome to the FDM Monster documentation. You should find all the documentation required to setup your own FDM Monster server here. 
+Please choose an installation type below to get started.
 
 ![Image](./images/server-running.png)
 
 ## Getting started - MonsterPi
+**Skill level required: low**
 
-Read the [Setup MonsterPi](guides/monsterpi.md) chapter for installing the MonsterPi Raspberry Pi image.
+Raspberry Pi install using MonsterPi. 
+Read the [Setting up MonsterPi](guides/monsterpi.md) chapter for installing the MonsterPi Raspberry Pi image using Raspberry Pi imager.
 
-## Getting started - Linux/Windows
+## Getting started - Docker Compose
+**Skill level required: low**
 
-Look at the [Setup FDM Monster](guides/setup.md) documentation.
+Docker-compose installation for both Windows and Linux.
+Look at the docker-compose instructions [Docker Compose](guides/docker_compose.md)
+
+## Getting started - Windows Service
+**Skill level required: medium**
+
+Windows service with `node-windows`.
+Look at the [Windows Service](guides/windows_service.md) section.
+
+## Getting started - Linux Service
+**Skill level required: medium**
+
+> :warning: **This page is work in progress!**
+
+Linux service with `node-linux`.
+Look at the [Windows Service](guides/windows_service.md) section.
+
+# Updating the client
+Please look at the [Updating Client Bundle](guides/updating_client_bundle.md) section.
