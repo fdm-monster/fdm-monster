@@ -1,3 +1,12 @@
+<#
+/**
+ * Created by D. Zwart
+ * Description: Performs all the steps to update FDM Monster
+ * v1.0
+ * 05/05/2023
+ */
+#>
+
 npm run uninstall
 
 cd fdm-monster
