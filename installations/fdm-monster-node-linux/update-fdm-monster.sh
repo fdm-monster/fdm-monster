@@ -22,9 +22,9 @@ fi
 
 # Step 0b) Set the variables needed later
 ts=6 # total steps
-temp_updates_dir=temp-updates
 org=fdm-monster
 repo=fdm-monster
+server_path="../fdm-monster/server/"
 repo_url="https://github.com/${org}/${repo}"
 
 # Step 1) Check latest release of FDM Monster
@@ -37,10 +37,10 @@ echo "[2/${ts}] Stopping FDM Monster before an update"
 npm run uninstall
 
 # Step 3) Switch the latest FDM Monster to this tag
-pushd ../fdm-monster/server/
+pushd "${server_path}"
 echo "[3/${ts}] Finding the latest version of FDM Monster from Github"
-git fetch
-git checkout $tag
+git fetch --prune
+git checkout "${tag}"
 
 # Step 4a) Ensure yarn is new, (optional)
 # npm i -g yarn
