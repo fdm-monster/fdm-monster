@@ -6,13 +6,13 @@ nav_order: 4
 last_modified_at: 2023-05-05T10:01:00+02:00
 ---
 
-> > :warning: **This page is work in progress!**
+> :warning: **This page is work in progress!**
 
 # Linux Service
 The scripts on this page are available in [installations/fdm-monster-node-linux](../../installations/fdm-monster-node-linux).
 
-This is how the webpage looks after installation (visit [http://127.0.0.1:4000](http://127.0.0.1:4000)).
 ![Image](../images/server-running.png)
+*This is the FDM Monster webapp after installation (visit [http://127.0.0.1:4000](http://127.0.0.1:4000))*
 
 ## Preparation of the Linux Service installation
 

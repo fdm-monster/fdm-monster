@@ -13,8 +13,8 @@ last_modified_at: 2023-05-05T10:01:00+02:00
 
 The scripts are available in [installations/fdm-monster-node-windows](../../installations/fdm-monster-node-windows)
 
-This is how the webpage looks after installation (visit [http://localhost:4000](http://localhost:4000)).
 ![Image](../images/server-running.png)
+*This is the FDM Monster webapp after installation (visit [http://localhost:4000](http://localhost:4000))*
 
 ## Preparation of the Windows service installation
 
