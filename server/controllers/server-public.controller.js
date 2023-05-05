@@ -11,12 +11,14 @@ class ServerPublicController {
   #settingsStore;
   #printerStore;
   #serverReleaseService;
+  monsterPiService;
 
-  constructor({ settingsStore, printerStore, serverVersion, serverReleaseService }) {
+  constructor({ settingsStore, printerStore, serverVersion, serverReleaseService, monsterPiService }) {
     this.#settingsStore = settingsStore;
     this.#serverVersion = serverVersion;
     this.#printerStore = printerStore;
     this.#serverReleaseService = serverReleaseService;
+    this.monsterPiService = monsterPiService;
   }
 
   welcome(req, res) {
@@ -35,6 +37,7 @@ class ServerPublicController {
 
   async getVersion(req, res) {
     let updateState = this.#serverReleaseService.getState();
+    const monsterPiVersion = this.monsterPiService.getMonsterPiVersionSafe();
 
     res.json({
       version: this.#serverVersion,
@@ -43,6 +46,7 @@ class ServerPublicController {
       isNode: isNode(),
       isPm2: isPm2(),
       os: process.env.OS,
+      monsterPi: monsterPiVersion,
       update: {
         synced: updateState.synced,
         updateAvailable: updateState.updateAvailable,

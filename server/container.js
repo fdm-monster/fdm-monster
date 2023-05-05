@@ -52,6 +52,7 @@ const FloorService = require("./services/floor.service");
 const FloorStore = require("./state/floor.store");
 const PrinterStore = require("./state/printer.store");
 const { YamlService } = require("./services/yaml.service");
+const { MonsterPiService } = require("./services/monsterpi.service");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -84,6 +85,7 @@ function configureContainer() {
     [DITokens.eventEmitter2]: asFunction(configureEventEmitter).singleton(),
     [DITokens.cacheManager]: asFunction(configureCacheManager).singleton(),
     [DITokens.serverReleaseService]: asClass(ServerReleaseService).singleton(),
+    [DITokens.monsterPiService]: asClass(MonsterPiService).singleton(),
     [DITokens.serverUpdateService]: asClass(ServerUpdateService).singleton(),
     [DITokens.githubApiService]: asClass(GithubApiService),
     [DITokens.octokitService]: asFunction((cradle) => {
