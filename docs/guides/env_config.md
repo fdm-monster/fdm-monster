@@ -4,7 +4,7 @@ FDM Monster Server can be configured with environment variables. There's differe
     - NodeJS with `pm2` 
     - NodeJS with `nodemon`
     - Windows service setup
-    - (FUTURE) Unix setup (not available yet)
+    - Linux service setup
 - docker - specify each variable separately, this can become tedious:
     - docker: using the `-e VARIABLE=value` command repeatedly
 - docker - all at once
