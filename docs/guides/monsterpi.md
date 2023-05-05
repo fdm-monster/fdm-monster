@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Setting up MonsterPi
+parent: Installations
 nav_order: 1
 permalink: /guides/monsterpi
 last_modified_at: 2023-05-05T10:01:00+02:00
