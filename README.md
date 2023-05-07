@@ -38,7 +38,7 @@ This server is has been battle-tested in the field for 100+ printers, so give it
 - Batch select and print GCode
 - Marking printers as maintenance mode
 - Import printers from OctoFarm
-- [Raspberry Pi image MonsterPi](https://github.com/fdm-monster/MonsterPi)
+- [Raspberry Pi image MonsterPi](https://docs.fdm-monster.net/guides/monsterpi)
 
 #### Current work:
 
