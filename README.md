@@ -144,7 +144,7 @@ the [CONTRIBUTING](CONTRIBUTING.md) file.
 
 ## License
 
-FDM Monster is licensed with [AGPL-3.0](LICENSE). For details, please consult the LICENSE file.
+FDM Monster is licensed with [AGPL-3.0](LICENSE). For details, please consult the [LICENSE](LICENSE) file.
 
 ## Historical Note
 
