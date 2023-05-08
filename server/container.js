@@ -53,6 +53,7 @@ const FloorStore = require("./state/floor.store");
 const PrinterStore = require("./state/printer.store");
 const { YamlService } = require("./services/yaml.service");
 const { MonsterPiService } = require("./services/monsterpi.service");
+const { BatchCallService } = require("./services/batch-call.service");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -114,6 +115,7 @@ function configureContainer() {
     [DITokens.yamlService]: asClass(YamlService),
     [DITokens.printCompletionService]: asClass(PrintCompletionService).singleton(),
     [DITokens.octoPrintApiService]: asClass(OctoPrintApiService).singleton(),
+    [DITokens.batchCallService]: asClass(BatchCallService).singleton(),
     [DITokens.pluginFirmwareUpdateService]: asClass(PluginFirmwareUpdateService).singleton(),
 
     [DITokens.printerState]: asClass(PrinterState).transient(), // Transient on purpose!

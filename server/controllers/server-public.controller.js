@@ -35,6 +35,15 @@ class ServerPublicController {
     });
   }
 
+  getFeatures(req, res) {
+    res.send({
+      batchReprintCalls: {
+        available: true,
+        version: 1,
+      },
+    });
+  }
+
   async getVersion(req, res) {
     let updateState = this.#serverReleaseService.getState();
     const monsterPiVersion = this.monsterPiService.getMonsterPiVersionSafe();
@@ -59,7 +68,8 @@ class ServerPublicController {
 
 // prettier-ignore
 module.exports = createController(ServerPublicController)
-    .prefix(AppConstants.apiRoute + "/")
-    .before([authenticate()])
-    .get("", "welcome")
-    .get("version", "getVersion", withPermission(PERMS.ServerInfo.Get));
+  .prefix(AppConstants.apiRoute + "/")
+  .before([authenticate()])
+  .get("", "welcome")
+  .get("features", "getFeatures")
+  .get("version", "getVersion", withPermission(PERMS.ServerInfo.Get));
