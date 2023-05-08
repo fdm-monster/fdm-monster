@@ -12,6 +12,7 @@ const {
   localFileUploadRules,
   moveFileOrFolderRules,
   createFolderRules,
+  batchReprintRules,
 } = require("./validation/printer-files-controller.validation");
 const { ValidationException, NotFoundException } = require("../exceptions/runtime.exceptions");
 const { printerResolveMiddleware } = require("../middleware/printer");
@@ -22,6 +23,7 @@ class PrinterFilesController {
   #filesStore;
   #settingsStore;
   #octoPrintApiService;
+  batchCallService;
   #printerStore;
   #multerService;
 
@@ -32,6 +34,7 @@ class PrinterFilesController {
   constructor({
     filesStore,
     octoPrintApiService,
+    batchCallService,
     printerStore,
     printerFileCleanTask,
     settingsStore,
@@ -42,6 +45,7 @@ class PrinterFilesController {
     this.#settingsStore = settingsStore;
     this.#printerFileCleanTask = printerFileCleanTask;
     this.#octoPrintApiService = octoPrintApiService;
+    this.batchCallService = batchCallService;
     this.#printerStore = printerStore;
     this.#multerService = multerService;
     this.#logger = loggerFactory("Server-API");
@@ -144,6 +148,12 @@ class PrinterFilesController {
     res.send(result);
   }
 
+  async batchReprintFiles(req, res) {
+    const { printerIds } = await validateInput(req.body, batchReprintRules);
+    const results = await this.batchCallService.batchReprintCalls(printerIds);
+    res.send(results);
+  }
+
   async selectAndPrintFile(req, res) {
     const { currentPrinterId, printerLogin } = getScopedPrinter(req);
     const { filePath: path, print } = await validateInput(req.body, selectAndPrintFileRules);
@@ -182,7 +192,15 @@ class PrinterFilesController {
     }
 
     const token = this.#multerService.startTrackingSession(files);
-    const response = await this.#octoPrintApiService.uploadFileAsMultiPart(printerLogin, uploadedFile, { print, select }, token);
+    const response = await this.#octoPrintApiService.uploadFileAsMultiPart(
+      printerLogin,
+      uploadedFile,
+      {
+        print,
+        select,
+      },
+      token
+    );
 
     if (response.success !== false) {
       const newOrUpdatedFile = response.files.local;
@@ -240,6 +258,7 @@ module.exports = createController(PrinterFilesController)
   .before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR]), printerResolveMiddleware()])
   .post("/purge", "purgeIndexedFiles", withPermission(PERMS.PrinterFiles.Clear))
   .get("/tracked-uploads", "getTrackedUploads", withPermission(PERMS.PrinterFiles.Upload))
+  .post("/batch/reprint-files", "batchReprintFiles", withPermission(PERMS.PrinterFiles.Actions))
   .get("/:id", "getFiles", withPermission(PERMS.PrinterFiles.Get))
   .get("/:id/cache", "getFilesCache", withPermission(PERMS.PrinterFiles.Get))
   .post("/:id/local-upload", "localUploadFile", withPermission(PERMS.PrinterFiles.Upload))
