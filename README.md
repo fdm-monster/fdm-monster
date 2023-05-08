@@ -67,7 +67,7 @@ Please join the discord, but stay professional and proactive!
 These are the people involved in the project:
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-6-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-7-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
@@ -82,6 +82,7 @@ These are the people involved in the project:
       <td align="center" valign="top" width="14.28%"><a href="https://tideline3d.com"><img src="https://avatars.githubusercontent.com/u/12903320?v=4?s=80" width="80px;" alt="tideline3d"/><br /><sub><b>tideline3d</b></sub></a><br /><a href="https://github.com/fdm-monster/fdm-monster/issues?q=author%3Atideline3d" title="Bug reports">🐛</a> <a href="#ideas-tideline3d" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ndarrow"><img src="https://avatars.githubusercontent.com/u/91099282?v=4?s=80" width="80px;" alt="ndarrow"/><br /><sub><b>ndarrow</b></sub></a><br /><a href="https://github.com/fdm-monster/fdm-monster/issues?q=author%3Andarrow" title="Bug reports">🐛</a> <a href="#financial-ndarrow" title="Financial">💵</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://lucianchapar.com"><img src="https://avatars.githubusercontent.com/u/33263520?v=4?s=80" width="80px;" alt="Lucian Chapar"/><br /><sub><b>Lucian Chapar</b></sub></a><br /><a href="https://github.com/fdm-monster/fdm-monster/issues?q=author%3Alucian151" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/WindArrow3d"><img src="https://avatars.githubusercontent.com/u/91099282?v=4?s=80" width="80px;" alt="windarrow3d"/><br /><sub><b>windarrow3d</b></sub></a><br /><a href="#ideas-windarrow3d" title="Ideas, Planning, & Feedback">🤔</a></td>
     </tr>
   </tbody>
 </table>
