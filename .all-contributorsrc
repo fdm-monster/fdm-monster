@@ -49,13 +49,14 @@
       ]
     },
     {
-      "login": "ndarrow",
-      "name": "ndarrow",
+      "login": "windarrow3d",
+      "name": "WindArrow3d",
       "avatar_url": "https://avatars.githubusercontent.com/u/91099282?v=4",
-      "profile": "https://github.com/ndarrow",
+      "profile": "https://github.com/windarrow3d",
       "contributions": [
         "bug",
-        "financial"
+        "financial",
+        "ideas"
       ]
     },
     {
@@ -65,15 +66,6 @@
       "profile": "http://lucianchapar.com",
       "contributions": [
         "bug"
-      ]
-    },
-    {
-      "login": "windarrow3d",
-      "name": "windarrow3d",
-      "avatar_url": "https://avatars.githubusercontent.com/u/91099282?v=4",
-      "profile": "https://github.com/WindArrow3d",
-      "contributions": [
-        "ideas"
       ]
     }
   ],
