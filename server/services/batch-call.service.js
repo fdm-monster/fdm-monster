@@ -1,23 +1,37 @@
 class BatchCallService {
   octoPrintApiService;
   printerStore;
-  jobCache;
+  jobsCache;
+  filesStore;
 
-  constructor({ octoPrintApiService, printerStore, jobCache }) {
+  constructor({ octoPrintApiService, printerStore, jobsCache, filesStore }) {
     this.octoPrintApiService = octoPrintApiService;
     this.printerStore = printerStore;
-    this.jobCache = jobCache;
+    this.jobsCache = jobsCache;
+    this.filesStore = filesStore;
   }
 
   async batchReprintCalls(printerIds) {
     const promises = [];
     for (const printerId of printerIds) {
       const printerLogin = this.printerStore.getPrinterLogin(printerId);
-      const job = this.jobCache.getPrinterJob(printerId);
-      const reprintPath = job?.filePath;
+      const job = this.jobsCache.getPrinterJob(printerId);
+      let reprintPath = job?.filePath;
       if (!reprintPath?.length) {
-        promises.push(Promise.resolve({ failure: true, error: "No file to reprint", printerId }));
-        continue;
+        const files = this.filesStore.getFiles(printerId)?.files;
+        if (files?.length) {
+          files.sort((f1, f2) => {
+            // Sort by date, newest first
+            return f1.date < f2.date ? 1 : -1;
+          });
+
+          reprintPath = files[0].path;
+        }
+
+        if (!files?.length) {
+          promises.push(Promise.resolve({ failure: true, error: "No file to reprint", printerId }));
+          continue;
+        }
       }
 
       const time = Date.now();
