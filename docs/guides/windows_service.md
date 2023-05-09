@@ -55,6 +55,7 @@ v18.14.2
 ### Step 2) Installing MongoDB 5+
 
 Install MongoDB Community Edition from [https://www.mongodb.com/try/download/community](https://www.mongodb.com/try/download/community). You can use [this URL](https://fastdl.mongodb.org/windows/mongodb-windows-x86_64-6.0.5-signed.msi) to download the MongoDB installation setup if the previous link doesn't work.
+
 ---
 ### Step 2b) (Optional)
 
