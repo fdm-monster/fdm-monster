@@ -24,7 +24,8 @@ const fileUploadCommandsRules = {
 };
 
 const batchReprintRules = {
-  printerIds: "required|array|mongoId",
+  printerIds: "required|array",
+  "printerIds.*": "required|mongoId",
 };
 
 const selectAndPrintFileRules = {
