@@ -3,7 +3,7 @@ layout: default
 title: Windows Service
 parent: Installations
 nav_order: 3
-last_modified_at: 2023-09-05T10:03:00+02:00
+last_modified_at: 2023-09-05T10:04:00+02:00
 ---
 
 # Windows Service
@@ -73,7 +73,8 @@ Prepare the installation by ensuring you have Git installed. This will help you 
 ---
 
 ### Step 4)
-The first time I would run the powershell script `download-fdm-monster-server.ps1` inside a powershell instance:
+During first installation, it's required to run the powershell script download-fdm-monster-server.ps1 inside a powershell instance:
+
 
 ```powershell
 cd installations/fdm-monster-node-windows
@@ -145,6 +146,7 @@ npm run service-start
 ```
 
 That's it! The FDM Monster service should now be up and running.
+
 ---
 ### Additional notes
 If you want to remove the service, you can execute the following command inside the `fdm-monster/server` folder:
