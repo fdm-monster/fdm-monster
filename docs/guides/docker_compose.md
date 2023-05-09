@@ -12,7 +12,7 @@ This is a guide on how to use Docker Compose to run FDM Monster. Please note tha
 
 ### Prerequisites
 
-Familiarity with Docker and Docker Compose is assumed. While these tools are beneficial, they may be unfamiliar to some users. Please note that we cannot support custom scenarios or setups. Therefore, it is essential to check your device's memory limits, architecture, and CPU power. You can use commands like `docker stats` and `mem_limit: 400m` in Docker Compose to set memory limits for your containers.
+Familiarity with Docker and Docker Compose is assumed. While these tools are beneficial, they may be unfamiliar to some users. Please note that we cannot support custom scenarios or setups. Therefore, it is essential to check your device's memory limits, architecture, and CPU power.
 
 ### Running FDM Monster with Docker Compose
 
