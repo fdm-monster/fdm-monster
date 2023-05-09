@@ -10,7 +10,7 @@ let Model = Printer;
 const defaultRoute = AppConstants.apiRoute + "/printer-files";
 const trackedUploadsRoute = `${defaultRoute}/tracked-uploads`;
 const purgeIndexedFilesRoute = `${defaultRoute}/purge`;
-const stubUploadFileRoute = `${defaultRoute}/stub-upload`;
+const batchReprintRoute = `${defaultRoute}/batch/reprint-files`;
 const getRoute = (id) => `${defaultRoute}/${id}`;
 const clearFilesRoute = (id) => `${getRoute(id)}/clear`;
 const moveFileOrFolderRoute = (id) => `${getRoute(id)}/move`;
@@ -122,6 +122,15 @@ describe("PrinterFilesController", () => {
   it("should allow DELETE to remove a printer file or folder", async () => {
     const printer = await createTestPrinter(request);
     const response = await request.delete(deleteFileOrFolderRoute(printer.id, "test")).send();
+    expectOkResponse(response);
+  });
+
+  it("should allow POST to select and print a printer file", async () => {
+    const printer = await createTestPrinter(request);
+    const printer2 = await createTestPrinter(request);
+    const response = await request.post(batchReprintRoute).send({
+      printerIds: [printer.id, printer2.id],
+    });
     expectOkResponse(response);
   });
 
