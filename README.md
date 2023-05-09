@@ -67,7 +67,7 @@ Please join the discord, but stay professional and proactive!
 These are the people involved in the project:
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-6-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-7-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
@@ -82,6 +82,7 @@ These are the people involved in the project:
       <td align="center" valign="top" width="14.28%"><a href="https://tideline3d.com"><img src="https://avatars.githubusercontent.com/u/12903320?v=4?s=80" width="80px;" alt="tideline3d"/><br /><sub><b>tideline3d</b></sub></a><br /><a href="https://github.com/fdm-monster/fdm-monster/issues?q=author%3Atideline3d" title="Bug reports">🐛</a> <a href="#ideas-tideline3d" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/windarrow3d"><img src="https://avatars.githubusercontent.com/u/91099282?v=4?s=80" width="80px;" alt="WindArrow3d"/><br /><sub><b>WindArrow3d</b></sub></a><br /><a href="https://github.com/fdm-monster/fdm-monster/issues?q=author%3Awindarrow3d" title="Bug reports">🐛</a> <a href="#financial-windarrow3d" title="Financial">💵</a> <a href="#ideas-windarrow3d" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://lucianchapar.com"><img src="https://avatars.githubusercontent.com/u/33263520?v=4?s=80" width="80px;" alt="Lucian Chapar"/><br /><sub><b>Lucian Chapar</b></sub></a><br /><a href="https://github.com/fdm-monster/fdm-monster/issues?q=author%3Alucian151" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Dumnersm580"><img src="https://avatars.githubusercontent.com/u/80608783?v=4?s=80" width="80px;" alt="Dumnersm580"/><br /><sub><b>Dumnersm580</b></sub></a><br /><a href="https://github.com/fdm-monster/fdm-monster/commits?author=Dumnersm580" title="Documentation">📖</a></td>
     </tr>
   </tbody>
 </table>
