@@ -3,7 +3,7 @@ layout: default
 title: Docker Compose
 parent: Installations
 nav_order: 2
-last_modified_at: 2023-05-05T10:01:00+02:00
+last_modified_at: 2023-09-05T10:012:00+02:00
 ---
 
 ## Docker Compose for FDM Monster
@@ -42,7 +42,6 @@ services:
     container_name: fdm-monster    
     image: davidzwa/fdm-monster:latest
     restart: unless-stopped
-    mem_limit: 400m # Feel free to adjust! 400 MB is quite high and a safety limit.
     ports:
     - "4000:4000"
     environment:
