@@ -33,6 +33,7 @@ The following steps will install:
 - Windows only (if you use Linux, please use Docker)
 - Pay attention to versions (e.g., Node 16 or 18, not Node 15/17)
 - Understand PowerShell execution policy: `Set-ExecutionPolicy -ExecutionPolicy Unrestricted` will allow anything to run.
+
 ---
 ### Step 1) Installing NodeJS 16+
 
@@ -49,6 +50,7 @@ The output should be:
 PS C:\Users\SomeUser> node -v
 v18.14.2
 ```
+
 ---
 ### Step 2) Installing MongoDB 5+
 
@@ -87,6 +89,8 @@ Followed by:
 
 If no errors occurred, FDM Monster should be running! You're almost done.
 
+---
+
 ### Step 5) Updating the service
 The powershell script `download-update.ps1` has been created to update the service.
 
@@ -102,6 +106,8 @@ This script will do the following things:
 
 During these steps the server will not be available for a short while. Please check [Step 7](#Step-7-Checking-the-service) for verifying whether your service is running.
 
+---
+
 ### Step 6) Uninstalling the service
 Uninstalling the service is possible through a node script.
 
@@ -109,6 +115,8 @@ Run the script as follows:
 ```powershell
 node ./uninstall-fdm-monster-service.js
 ```
+
+---
 
 ### Step 7) Checking the service
 
