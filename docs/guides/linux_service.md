@@ -3,49 +3,49 @@ layout: default
 title: Linux Service
 parent: Installations
 nav_order: 4
-last_modified_at: 2023-05-05T10:01:00+02:00
+last_modified_at: 2023-09-05T10:03:00+02:00
 ---
 
-> :warning: **This page is work in progress!**
-
 # Linux Service
-The scripts on this page are available in [installations/fdm-monster-node-linux](../../installations/fdm-monster-node-linux).
+
+> :warning: **Note: This page is currently a work in progress!**
+
+The scripts for this installation can be found in [installations/fdm-monster-node-linux](../../installations/fdm-monster-node-linux).
 
 ![Image](../images/server-running.png)
-*This is the FDM Monster webapp after installation (visit [http://127.0.0.1:4000](http://127.0.0.1:4000))*
+*Screenshot of the FDM Monster webapp after installation (accessible at [http://127.0.0.1:4000](http://127.0.0.1:4000))*
 
-## Preparation of the Linux Service installation
 
-Please ensure the following dependencies are installed and working:
+## Preparing for the Linux Service installation
 
-- nodejs 16+
-- git
-- yarn (npm package)
-- fdm-monster (github cloned source code)
-- node-windows (npm package)
+Before proceeding with the installation, please ensure that the following dependencies are installed and properly functioning:
 
-## Installation of the service
+- Node.js version 16 or later
+- Git
+- Yarn (npm package)
+- FDM Monster (GitHub cloned source code)
+- Node-windows (npm package)
 
-Please ensure that:
+## Installing the service
 
-- You've cloned the repository
-- Changed directory to [installations/fdm-monster-node-linux](../../installations/fdm-monster-node-linux)
-- MongoDB 4.4+ has been installed
-- `yarn` dependencies are installed in `fdm-monster/server/`
-- `yarn`/`npm` dependencies are installed in `fdm-monster-node-linux/`
+To install the service, follow these steps:
 
-Please ensure the service is installed (executed inside `fdm-monster-node-linux`):
+1. Clone the repository.
+2. Change directory to [installations/fdm-monster-node-linux](../../installations/fdm-monster-node-linux).
+3. Install MongoDB version 4.4 or later.
+4. Install `yarn` dependencies in `fdm-monster/server/`.
+5. Install `yarn`/`npm` dependencies in `fdm-monster-node-linux/`.
+6. Make sure the service is installed by running the following command inside `fdm-monster-node-linux`:
 
 ```shell
 npm i
 ```
 
-This will call `node ./install-fdm-monster.js` indirectly.
+This will indirectly call `node ./install-fdm-monster.js`.
 
-# Configuring server environment
+## Configuring the server environment
 
-The server has configuration options that allow changing how it operates. Warning, wrong configuration might cause the
-server unable to correctly startup.
+The server has configuration options that allow you to change how it operates. However, be aware that incorrect configuration might cause the server to fail to start up.
 
 Each configuration change requires you to run the update script:
 
@@ -53,12 +53,11 @@ Each configuration change requires you to run the update script:
 npm i
 ```
 
-Please read the [Environment configuration](env_config.md) section for adjusting the `.env` file.
+Please refer to the [Environment configuration](env_config.md) section for instructions on adjusting the `.env` file.
 
-# Updating the server
+## Updating the server
 
-The server is easily updated with the provided script `update-fdm-monster.sh`.
-You will need to run this with elevation:
+To update the server, use the provided script `update-fdm-monster.sh`. Please note that you will need to run this script with elevation:
 
 ```bash
 sudo bash ./update-fdm-monster.sh

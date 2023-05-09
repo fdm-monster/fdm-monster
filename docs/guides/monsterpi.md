@@ -4,8 +4,10 @@ title: Setting up MonsterPi
 parent: Installations
 nav_order: 1
 permalink: /guides/monsterpi
-last_modified_at: 2023-05-05T10:01:00+02:00
+last_modified_at: 2023-09-05T10:03:00+02:00
 ---
+
+
 
 # Setting up MonsterPi
 
@@ -67,52 +69,4 @@ Steps:
 I assume you know how to SSH into your MonsterPi. For me the following SSH entry (See `~/.ssh/config`) works well:
 ```
 Host monsterpi
-   HostName monsterpi.local
-   User yourcustompiuser # replace with your user
-   # PasswordAuthentication true # I Do not like using passwords
-   IdentityFile ~/.ssh/id_rsa_file # Replace with your SSH Key
-   Port 22
-```
-Personally I like the [VS Code SSH extension](https://code.visualstudio.com/docs/remote/ssh) for this!
-
-# MonsterPi Version 0.2.0+
-
-Run the following commands to change to the `pi` user and execute an update with root elevation.
-
-```
-# Change to pi user
-sudo su pi
-
-cd /home/pi/fdm-monster-daemon
-
-# Deploy the fdm-monster server update
-sudo bash ./update-fdm-monster.sh 
-```
-
-## Updating MonsterPi manually 0.1.x -> 0.2.0
-
-This strategy allows you to stick with 0.1.1. I cannot recommend it in the long run however, because the image of 0.2.0
-has changed quite a bit.
-
-This script will not install:
-- HAProxy
-- gencert (SSL certificate generator)
-- welcome script
-
-We will be downloading a gist from Github. You can also download the latest version of the file yourself
-from [this Github URL](https://github.com/fdm-monster/MonsterPi/blob/main/src/modules/monsterpi/filesystem/home/pi/fdm-monster-daemon/update-fdm-monster.sh).
-
-```
-# Change to pi user
-sudo su pi
-
-cd /home/pi/fdm-monster-daemon
-
-# Remove the existing (empty placeholder file in MonsterPi 0.1.1)
-rm ./update-fdm-monster.sh
-# Download new script
-wget https://gist.githubusercontent.com/davidzwa/f0e094bd2223a0f1907009d576ad0b77/raw/4cf65be675dc09439873d504acf25abd32cda9c3/update-fdm-monster.sh
-
-# Deploy the fdm-monster server update
-sudo bash ./update-fdm-monster.sh 
-```
+   HostName monster

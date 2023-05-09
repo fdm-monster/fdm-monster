@@ -1,13 +1,12 @@
-# Client Bundle
+# FDM Monster Client Bundle
 
-The client bundle is pushed to [Github Releases](https://github.com/fdm-monster/fdm-monster-client/releases) 
-as well as [NPM package](https://www.npmjs.com/package/@fdm-monster/client). 
+The FDM Monster client bundle is available on two platforms, namely [Github Releases](https://github.com/fdm-monster/fdm-monster-client/releases) and [NPM package](https://www.npmjs.com/package/@fdm-monster/client).
 
-We add the bundle as a NPM package as an offline fallback for air-gapped installations. The bundle is immediately checked, downloaded and extracted from Github at startup.
+The client bundle is also included as an NPM package for air-gapped installations, serving as an offline fallback. The bundle is verified, downloaded, and extracted from Github during startup.
 
-## Triggering the update yourself
+## Manual Update Triggering
 
-Click the **UPDATE CLIENT** button on the Help page to do this yourself.
+To update the FDM Monster client bundle manually, navigate to the Help page and click on the **UPDATE CLIENT** button.
 
-After confirmation, the page will reload in about 5 to 10 seconds triggering the update to be presented to you.
-![img.png](../images/5-updating-client-bundle.png)
+Upon confirmation, the page will reload within 5 to 10 seconds and present you with the updated bundle.
+![Screenshot of the Help page with the UPDATE CLIENT button highlighted](../images/5-updating-client-bundle.png)
