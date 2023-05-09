@@ -29,7 +29,6 @@ if (Test-Path -Path $repo) {
 # Clone the release by tag
 git clone $repoUrl --branch $latestTagName
 
-
 # Visit the FDM Monster server folder
 Push-Location $serverPath
 
@@ -37,6 +36,9 @@ Push-Location $serverPath
 npm i -g yarn
 yarn -v
 yarn install --production --pure-lockfile
+
+# Return to the original folder
+Pop-Location
 
 # Install node-windows and the FDM Monster service
 yarn install --production
