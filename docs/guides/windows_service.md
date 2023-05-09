@@ -64,6 +64,7 @@ If you're an experienced user, you might want to install the [MongoDB Developer 
 - [Compass](https://www.mongodb.com/products/compass): Connects to your database and query/adjust collections or documents.
 - [MongoDB VS Code Extension](https://www.mongodb.com/products/vs-code): Connects to your database inside VS Code and allows you to see/adjust data in place.
 - [MongoDB Shell](https://www.mongodb.com/products/shell): Provides shell access to the database. For advanced users only!
+
 ---
 ### Step 3) Installing Git
 
