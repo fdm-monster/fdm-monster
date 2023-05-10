@@ -21,7 +21,7 @@
 
 </p>
 <h2 align="center">
-<a href="https://docs.fdm-monster.net/" target="_blank">Documentation Website</a>
+<a href="https://docs.fdm-monster.net/" target="_blank">Documentation</a>
 </h2>
 
 ## What is FDM Monster?
@@ -108,11 +108,10 @@ Please consider sponsoring FDM Monster to help this project! You can find the [G
 
 Thanks to the following parties for their financial support:
 
-- **Tier 1**
-- **Tier 2**
-- **Tier 3**
-  - [WindArrow3d](https://github.com/WindArrow3d)
-- **Tier 4**
+| Tier 1 | Tier 2 | Tier 3 | Tier 4 |
+|--------|--------|--------|--------|
+|  |  | [WindArrow3d](https://github.com/WindArrow3d) |  |
+
 
 ## Contribute
 
