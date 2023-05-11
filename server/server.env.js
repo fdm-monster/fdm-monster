@@ -54,9 +54,9 @@ function ensureEnvNpmVersionSet() {
   if (!process.env[AppConstants.VERSION_KEY]) {
     process.env[AppConstants.VERSION_KEY] = packageJsonVersion;
     process.env[AppConstants.NON_NPM_MODE_KEY] = "true";
-    logger.info(`✓ Running ${AppConstants.titleShort} version ${process.env[AppConstants.VERSION_KEY]} in non-NPM mode!`);
+    logger.info(`✓ Running server version ${process.env[AppConstants.VERSION_KEY]} in non-NPM mode!`);
   } else {
-    logger.debug(`✓ Running ${AppConstants.titleShort} version ${process.env[AppConstants.VERSION_KEY]} in NPM mode!`);
+    logger.debug(`✓ Running server version ${process.env[AppConstants.VERSION_KEY]} in NPM mode!`);
   }
 
   if (process.env[AppConstants.VERSION_KEY] !== packageJsonVersion) {

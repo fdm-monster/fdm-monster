@@ -11,6 +11,7 @@ last_modified_at: 2023-10-05T14:00:00+02:00
 This section specifies the settings that can be changed once the FDM Monster server has been started.
 
 Please visit this page on FDM Monster:
+
 ![Image](../images/settings.png)
 
 ## Floors
