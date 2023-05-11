@@ -42,6 +42,7 @@ jobs:
         uses: HackerHappyHour/tagging-strategy@v3
         with:
           image_name: davidzwa/fdm-monster
+          tag_name: ${{ github.ref }}
           tags: |
             %X%
           extra_tags: |
