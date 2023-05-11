@@ -55,11 +55,11 @@ jobs:
             latest::${{ github.ref_type == "tag" && github.ref_slug != *"rc"* && github.ref_slug != *"unstable"* }}
             edge::${{ github.ref_type == "branch" && github.ref == "refs/heads/develop" }}
         run: echo "tags ${{ steps.tagging.outputs.tags }}"
-
       # Show docker tags to be (conditionally) pushed
       - name: "Show docker tags"
         run: |
           echo '${{ steps.tagging.outputs.tags }}'
+
       # Speed up the build next time
       - name: Cache Docker layers
         uses: actions/cache@v3
