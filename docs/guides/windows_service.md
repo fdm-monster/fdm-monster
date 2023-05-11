@@ -129,4 +129,4 @@ If things are working, you can open fdm monster with this URL: [http://localhost
 
 Documentation on how to create and place printers on the grid will follow asap!
 
-Please continue to [Environment configuration](env_config.md) to change environment configuration of the FDM Monster server.
+Please continue to [Environment configuration](../configuration/preconfiguration.md) to change environment configuration of the FDM Monster server.

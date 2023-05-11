@@ -63,7 +63,6 @@ function configureContainer() {
 
   container.register({
     // -- asValue/asFunction constants --
-    serverPageTitle: asValue(process.env[AppConstants.SERVER_SITE_TITLE_KEY]),
     [DITokens.serverTasks]: asValue(ServerTasks),
     [DITokens.defaultRole]: asValue(ROLES.ADMIN), // -- asFunction --
     [DITokens.serverVersion]: asFunction(() => {
