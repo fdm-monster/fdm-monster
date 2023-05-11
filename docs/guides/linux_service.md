@@ -53,7 +53,7 @@ Each configuration change requires you to run the update script:
 npm i
 ```
 
-Please read the [Environment configuration](env_config.md) section for adjusting the `.env` file.
+Please read the [Environment configuration](../configuration/preconfiguration.md) section for adjusting the `.env` file.
 
 # Updating the server
 
