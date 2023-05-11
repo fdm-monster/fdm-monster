@@ -12,14 +12,13 @@ jobs:
     outputs:
       labels: ${{ steps.metadata.outputs.labels }}
     steps:
-      -
-        id: metadata
+      - id: metadata
         uses: crazy-max/ghaction-docker-meta@v4
         with:
           images: davidzwa/fdm-monster
 
   docker:
-    needs: [meta]
+    needs: [ meta ]
     runs-on: ubuntu-latest
     name: "Docker build"
     steps:
@@ -54,7 +53,7 @@ jobs:
           extra_tags: |
             latest::${{ github.ref_type == "tag" && github.ref_slug != *"rc"* && github.ref_slug != *"unstable"* }}
             edge::${{ github.ref_type == "branch" && github.ref == "refs/heads/develop" }}
-        run: echo "tags ${{ steps.tagging.outputs.tags }}"
+
       # Show docker tags to be (conditionally) pushed
       - name: "Show docker tags"
         run: |
