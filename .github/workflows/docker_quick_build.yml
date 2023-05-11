@@ -46,7 +46,7 @@ jobs:
             %X%
           extra_tags: |
             main::${{ github.ref == 'refs/heads/main' || github.event.pull_request.base.ref == 'refs/heads/main' }}
-            develop::${{ github.ref == 'refs/heads/develop' || && github.event.pull_request.base.ref == 'refs/heads/develop' }}
+            develop::${{ github.ref == 'refs/heads/develop' || github.event.pull_request.base.ref == 'refs/heads/develop' }}
 
       # Show docker tags to be (conditionally) pushed
       - name: "Show docker tags"
