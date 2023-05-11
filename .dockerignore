@@ -1,11 +1,8 @@
 /.github
 /.idea
 .git
-.env
+/**/.env
 .gitignore
-*.env
-*docker-compose.yml
-*Dockerfile
 *.md
 *.txt
 /.build
