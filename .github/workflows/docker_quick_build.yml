@@ -63,19 +63,19 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
-      - # Clone the repo and build the image
-        - name: Build and push
-          id: docker_build
-          uses: docker/build-push-action@v4
-          with:
-            push: false
-            context: "{{defaultContext}}:server"
-            cache-from: type=local,src=/tmp/.buildx-cache
-            cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
-            file: ../docker/Dockerfile
-            tags: ${{ steps.tagging.outputs.tags }}
-            labels: ${{ needs.meta.outputs.labels }}
+      # Clone the repo and build the image
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v4
+        with:
+          push: false
+          context: "{{defaultContext}}:server"
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
+          file: ../docker/Dockerfile
+          tags: ${{ steps.tagging.outputs.tags }}
+          labels: ${{ needs.meta.outputs.labels }}
 
-        # Show image digest output
-        - name: Image digest
-          run: echo ${{ steps.docker_build.outputs.digest }}
+      # Show image digest output
+      - name: Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
