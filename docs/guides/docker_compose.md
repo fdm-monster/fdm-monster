@@ -3,26 +3,31 @@ layout: default
 title: Docker Compose
 parent: Installations
 nav_order: 2
-last_modified_at: 2023-09-05T10:012:00+02:00
+last_modified_at: 2023-10-05T14:00:00+02:00
 ---
 
-## Docker Compose for FDM Monster
+# Docker Compose for FDM Monster
 
-This is a guide on how to use Docker Compose to run FDM Monster. Please note that this page is a work in progress.
+This is a guide on how to use Docker Compose to run FDM Monster.
 
-### Prerequisites
+## Prerequisites
 
-Familiarity with Docker and Docker Compose is assumed. While these tools are beneficial, they may be unfamiliar to some users. Please note that we cannot support custom scenarios or setups. Therefore, it is essential to check your device's memory limits, architecture, and CPU power.
+Familiarity with Docker and Docker Compose is assumed. While these tools are beneficial, they may be unfamiliar to some users. 
+Please note that we cannot support custom scenarios or setups. Therefore, it is essential to check your device's memory limits, architecture, and CPU power.
 
-### Running FDM Monster with Docker Compose
+## Running FDM Monster with Docker Compose
 
-1. We provide `davidzwa/fdm-monster:latest`, `davidzwa/fdm-monster:alpine`, and `davidzwa/fdm-monster:monolithic`.
+In the next steps we will guide you through the process of running FDM Monster with Docker Compose.
+
+### Step 1) Selecting a FDM Monster image
+We provide `davidzwa/fdm-monster:latest`, `davidzwa/fdm-monster:alpine`, and `davidzwa/fdm-monster:monolithic`.
    - `latest` and `alpine` require you to run MongoDB or a MongoDB container (see compose below)
    - `monolithic` does not require a separate MongoDB, but we at FDM Monster personally like MongoDB to be separate (docker = isolation remember?).
 
-2. To use Docker Compose, create a file named `docker-compose.yml` and use the following contents (or look at [docker-compose.yml](../../docker-compose.yml)):
+### Step 2) Create a docker-compose.yml file
+To run a Docker Compose stack, create a file named `docker-compose.yml` and use the following contents (or look at [docker-compose.yml](../../docker-compose.yml)):
 
-```
+```yaml
 version: '3.4' 
 
 services:
@@ -50,11 +55,15 @@ services:
     # Volumes as local relative folders (validate with 'docker-compose config')
     - ./fdm-monster/media:/app/media
 ```
+_An example docker-compose.yml file with the mongodb and fdm-monster services in one stack._
 
-3. Execute this command to run the containers:
+### Step 3) Execute the docker-compose stack 
+Execute this command to run the containers:
 
 ```powershell
 docker-compose up -d
 ```
 
-Please note that FDM Monster requires a MongoDB database to function properly. When using the `latest` or `alpine` images, make sure to configure your root-user's username and password for MongoDB. Additionally, FDM Monster needs to access the `admin` table, which is the default table name for the authentication source.
+Please note that FDM Monster requires a MongoDB database to function properly. When using the `latest` or `alpine` images, 
+make sure to configure your root-user's username and password for MongoDB. 
+Additionally, FDM Monster needs to access the `admin` table, which is the default table name for the authentication source.
