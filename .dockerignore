@@ -3,9 +3,6 @@
 .git
 /**/.env
 .gitignore
-/**/*.env
-*docker-compose.yml
-*Dockerfile
 *.md
 *.txt
 /.build
