@@ -197,7 +197,6 @@ function setupEnvConfig(skipDotEnv = false) {
   setupSentry();
   ensureMongoDBConnectionStringSet();
   ensurePortSet();
-  ensurePageTitle();
 }
 
 /**
@@ -223,12 +222,6 @@ async function runMigrations(db, client) {
     logger.info(`Applied ${migrationResult.length} migrations successfully`, migrationResult);
   } else {
     logger.info("No migrations were run");
-  }
-}
-
-function ensurePageTitle() {
-  if (!process.env[AppConstants.SERVER_SITE_TITLE_KEY]) {
-    process.env[AppConstants.SERVER_SITE_TITLE_KEY] = AppConstants.defaultServerPageTitle?.toString();
   }
 }
 

@@ -7,9 +7,6 @@ const AppConstants = {
 
   pm2ServiceName: "FDM",
 
-  SERVER_SITE_TITLE_KEY: "SERVER_SITE_TITLE",
-  titleShort: "FDM",
-  defaultServerPageTitle: "FDM Monster",
   // @Deprecated: old storage path
   defaultFileStorageFolder: "./media",
   // New place for all downloads, files etc
