@@ -35,7 +35,6 @@ jobs:
       # if tag is a release tag, then build and push to dockerhub with that tag
       # if tag then XYZ, if the tag does not contain rc or unstable then X and XY tags
       # if tag is not rc/unstable, push to dockerhub with tag 'latest' (at the same time)
-      # if branch is develop => push to dockerhub with tag 'edge'
 
       - name: Tagging Strategy
         id: tagging

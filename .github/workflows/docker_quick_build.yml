@@ -34,10 +34,8 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       # New intended logic
-      # if tag is a release tag, then build and push to dockerhub with that tag
-      # if tag then XYZ, if the tag does not contain rc or unstable then X and XY tags
-      # if tag is not rc/unstable, push to dockerhub with tag 'latest' (at the same time)
-      # if branch is develop => push to dockerhub with tag 'edge'
+      # if branch is develop => push to dockerhub with tag 'develop'
+      # if branch is main => push to dockerhub with tag 'main'
 
       - name: Tagging Strategy
         id: tagging
@@ -47,8 +45,8 @@ jobs:
           tags: |
             %X%
           extra_tags: |
-            main::${{ github.ref_type == 'branch' && github.ref == 'refs/heads/main' }}
-            develop::${{ github.ref_type == 'branch' && github.ref == 'refs/heads/develop' }}
+            main::${{ (github.ref_type == 'branch' && github.ref == 'refs/heads/main') || (github.ref_type == 'pull_request' && github.event.pull_request.base.ref == 'refs/heads/main') }}
+            develop::${{ (github.ref_type == 'branch' && github.ref == 'refs/heads/develop') || (github.ref_type == 'pull_request' && github.event.pull_request.base.ref == 'refs/heads/develop') }}
 
       # Show docker tags to be (conditionally) pushed
       - name: "Show docker tags"
