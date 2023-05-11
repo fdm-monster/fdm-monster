@@ -52,6 +52,9 @@ jobs:
       # Show docker tags to be (conditionally) pushed
       - name: "Show docker tags"
         run: |
+          echo '${{ github.ref }}'
+          echo '${{ github.ref_type }}'
+          echo '${{ github.event.pull_request.base.ref }}'
           echo '${{ steps.tagging.outputs.tags }}'
 
       # Speed up the build next time
