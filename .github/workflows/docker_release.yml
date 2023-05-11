@@ -77,7 +77,7 @@ jobs:
           context: "{{defaultContext}}:server"
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
-          file: ../docker/Dockerfile
+          file: ./../docker/Dockerfile
           tags: ${{ steps.tagging.outputs.tags }}
           labels: ${{ needs.meta.outputs.labels }}
 
