@@ -22,7 +22,7 @@ Please ensure the following dependencies are installed and working:
 - git
 - yarn (npm package)
 - fdm-monster (github cloned source code)
-- node-windows (npm package)
+- node-linux (npm package)
 
 ## Installation of the service
 
@@ -32,7 +32,7 @@ Please ensure that:
 - Changed directory to [installations/fdm-monster-node-linux](../../installations/fdm-monster-node-linux)
 - MongoDB 4.4+ has been installed
 - `yarn` dependencies are installed in `fdm-monster/server/`
-- `yarn`/`npm` dependencies are installed in `fdm-monster-node-linux/`
+- `npm` dependencies are installed in `fdm-monster-node-linux/`
 
 Please ensure the service is installed (executed inside `fdm-monster-node-linux`):
 
