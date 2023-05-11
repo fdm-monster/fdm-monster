@@ -47,11 +47,11 @@ jobs:
           image_name: davidzwa/fdm-monster
           tag_name: ${{ github.ref }}
           tags: |
-            %X%::${{ github.ref_type == "tag" && github.ref_slug != *"rc"* && github.ref_slug != *"unstable"* }}
-            %X.Y%::${{ github.ref_type == "tag" && github.ref_slug != *"rc"* && github.ref_slug != *"unstable"* }}
+            %X%::${{ github.ref_type == "tag" && github.ref_slug !~ 'rc|unstable' }}
+            %X.Y%::${{ github.ref_type == "tag" && github.ref_slug !~ 'rc|unstable' }}
             %X.Y.Z%::${{ github.ref_type == "tag" }}
           extra_tags: |
-            latest::${{ github.ref_type == "tag" && github.ref_slug != *"rc"* && github.ref_slug != *"unstable"* }}
+            latest::${{ github.ref_type == "tag" && github.ref_slug !~ 'rc|unstable' }}
             edge::${{ github.ref_type == "branch" && github.ref == "refs/heads/develop" }}
 
       # Show docker tags to be (conditionally) pushed
