@@ -45,12 +45,15 @@ jobs:
           tags: |
             %X%
           extra_tags: |
-            main::${{ (github.ref_type == 'branch' && github.ref == 'refs/heads/main') || (github.ref_type == 'pull_request' && github.event.pull_request.base.ref == 'refs/heads/main') }}
-            develop::${{ (github.ref_type == 'branch' && github.ref == 'refs/heads/develop') || (github.ref_type == 'pull_request' && github.event.pull_request.base.ref == 'refs/heads/develop') }}
+            main::${{ github.ref == 'refs/heads/main' || github.event.pull_request.base.ref == 'refs/heads/main' }}
+            develop::${{ github.ref == 'refs/heads/develop' || && github.event.pull_request.base.ref == 'refs/heads/develop' }}
 
       # Show docker tags to be (conditionally) pushed
       - name: "Show docker tags"
         run: |
+          echo '${{ github.ref }}'
+          echo '${{ github.ref_type }}'
+          echo '${{ github.event.pull_request.base.ref }}'
           echo '${{ steps.tagging.outputs.tags }}'
 
       # Speed up the build next time
