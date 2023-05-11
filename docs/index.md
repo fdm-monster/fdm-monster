@@ -36,7 +36,7 @@ Look at the [Windows Service](guides/windows_service.md) section.
 > :warning: **This page is work in progress!**
 
 Linux service with `node-linux`.
-Look at the [Windows Service](guides/windows_service.md) section.
+Look at the [Linux Service](guides/linux_service.md) section.
 
 # Updating the client
 Please look at the [Updating Client Bundle](guides/updating_client_bundle.md) section.
