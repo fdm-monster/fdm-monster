@@ -12,6 +12,14 @@ const getDefaultServerSettings = () => ({
   loginRequired: false,
 });
 
+const frontendSettingKey = "frontend";
+const getDefaultFrontendSettings = () => ({
+  gridCols: 8,
+  gridRows: 8,
+  largeTiles: false,
+});
+
+const timeoutSettingKey = "timeout";
 const getDefaultTimeout = () => ({
   apiTimeout: 1000,
   apiRetryCutoff: 10000,
@@ -27,15 +35,19 @@ const getDefaultPrinterFileCleanSettings = () => ({
 });
 
 const getDefaultSettings = () => ({
-  server: getDefaultServerSettings(),
+  [serverSettingKey]: getDefaultServerSettings(),
   [printerFileCleanSettingKey]: getDefaultPrinterFileCleanSettings(),
-  timeout: getDefaultTimeout(),
+  [frontendSettingKey]: getDefaultFrontendSettings(),
+  [timeoutSettingKey]: getDefaultTimeout(),
 });
 
 module.exports = {
   serverSettingKey,
   getDefaultServerSettings,
+  timeoutSettingKey,
   getDefaultTimeout,
+  frontendSettingKey,
+  getDefaultFrontendSettings,
   printerFileCleanSettingKey,
   getDefaultWhitelistIpAddresses,
   getDefaultPrinterFileCleanSettings,
