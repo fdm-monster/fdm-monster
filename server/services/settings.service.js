@@ -1,7 +1,7 @@
 const SettingsModel = require("../models/ServerSettings.js");
 const Constants = require("../constants/server-settings.constants");
 const { validateInput } = require("../handlers/validators");
-const { serverSettingsUpdateRules, frontendSettingsUpdateRules } = require("./validators/server-settings-service.validation");
+const { serverSettingsUpdateRules, frontendSettingsUpdateRules } = require("./validators/settings-service.validation");
 const {
   printerFileCleanSettingKey,
   getDefaultPrinterFileCleanSettings,
