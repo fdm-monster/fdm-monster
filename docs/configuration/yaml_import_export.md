@@ -1,4 +1,10 @@
-
+---
+layout: default
+title: YAML Import and Export
+parent: Configuration
+nav_order: 4
+last_modified_at: 2023-12-05T14:00:00+02:00
+---
 
 # YAML Import/Export Function
 
