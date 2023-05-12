@@ -83,4 +83,4 @@ Please follow these steps to have your contribution considered by the maintainer
 
 ## License
 
-By contributing to FDM Monster, you agree that your contributions will be licensed under its MIT license.
+By contributing to FDM Monster, you agree that your contributions will be licensed under its AGPL v3 license.
