@@ -14,7 +14,7 @@ const {
 let request;
 let container;
 
-const defaultRoute = `${AppConstants.apiRoute}/settings`;
+const defaultRoute = `${AppConstants.apiRoute}/settings/server`;
 const frontendSettingsRoute = `${defaultRoute}/frontend`;
 const serverWhitelistRoute = `${defaultRoute}/whitelist`;
 

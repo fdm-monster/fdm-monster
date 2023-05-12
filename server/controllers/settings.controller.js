@@ -44,7 +44,7 @@ class SettingsController {
 module.exports = createController(SettingsController)
   .prefix(AppConstants.apiRoute + "/settings")
   .before([authenticate(), authorizeRoles([ROLES.ADMIN])])
-  .get("/", "getSettings")
-  .put("/", "updateSettings")
-  .put("/whitelist", "updateWhitelistSettings")
-  .put("/frontend", "updateFrontendSettings");
+  .get("/server", "getSettings")
+  .put("/server", "updateSettings")
+  .put("/server/whitelist", "updateWhitelistSettings")
+  .put("/server/frontend", "updateFrontendSettings");
