@@ -10,19 +10,19 @@ The following is a set of guidelines for contributing to FDM Monster and its pac
 
 [Get Started Quickly](#get-started-quickly)
 
-- [Im Stuck with a quick question!](#im-stuck-with-a-quick-question)
-- [FDM Monster and Packages](#fdm-monster-and-packages)
-- [FDM Monster Design Decisions](#design-decisions)
+-   [Im Stuck with a quick question!](#im-stuck-with-a-quick-question)
+-   [FDM Monster and Packages](#fdm-monster-and-packages)
+-   [FDM Monster Design Decisions](#design-decisions)
 
 [How Can I Contribute?](#how-can-i-contribute)
 
-- [Reporting Bugs](#reporting-bugs)
-- [Your First Code Contribution](#your-first-code-contribution)
-- [Pull Requests](#pull-requests)
+-   [Reporting Bugs](#reporting-bugs)
+-   [Your First Code Contribution](#your-first-code-contribution)
+-   [Pull Requests](#pull-requests)
 
 ## Code of Conduct
 
-This project and everyone participating in it is governed by the [FDM Monster Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to [davidzwa@gmail.com](mailto:davidzwa@gmail.com).
+This project and everyone participating in it is governed by the [FDM Monster Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to .
 
 ## Get Started Quickly
 
@@ -34,26 +34,26 @@ Sorry we do not have a documentation with F.A.Q. yet. Please visit us on discord
 
 FDM Monster currently consists of two active repositories:
 
-- [FDM Monster](https://github.com/fdm-monster/fdm-monster) - the server and client packed together as one
-- [FDM Connector](https://github.com/fdm-monster/fdm-connector) - the OctoPrint plugin
+-   [FDM Monster](https://github.com/fdm-monster/fdm-monster) - the server and client packed together as one
+-   [FDM Connector](https://github.com/fdm-monster/fdm-connector) - the OctoPrint plugin
 
 ### Design decisions
 
 Server design
 
-- **FDM Monster server** was chosen to be a NodeJS server. The backend is currently structured as a REST API. It might be surprising that we use `awilix` as Inversion-of-Control implementation, but if you study the resulting architecture it will show its fresh and quick-to-develop benefits rapidly.
-- **FDM Monster server** runs using MongoDB as database and Mongoose as ORM
-- **FDM Monster server** caches data in-memory using a self-written store/cache system between the database (no redis!)
-- **FDM Monster server** API is built up using `awilix-express` and uses `node-input-validation` as API validation
-- **FDM Monster server** is equipped with a task scheduler (ToadScheduler) which gives the capability to run workloads in the background.
+-   **FDM Monster server** was chosen to be a NodeJS server. The backend is currently structured as a REST API. It might be surprising that we use `awilix` as Inversion-of-Control implementation, but if you study the resulting architecture it will show its fresh and quick-to-develop benefits rapidly.
+-   **FDM Monster server** runs using MongoDB as database and Mongoose as ORM
+-   **FDM Monster server** caches data in-memory using a self-written store/cache system between the database (no redis!)
+-   **FDM Monster server** API is built up using `awilix-express` and uses `node-input-validation` as API validation
+-   **FDM Monster server** is equipped with a task scheduler (ToadScheduler) which gives the capability to run workloads in the background.
 
 Client design
 
-- Its web client is written using Typescript and Vue2
-- We intend to switch to Vue3 once Vuetify3 is released and stable
-- Vuetify is currently the package for Material UI and components
-- We use vue-class-component for maintaining class Vue components
-- Vuex serves as store and state management
+-   Its web client is written using Typescript and Vue2
+-   We intend to switch to Vue3 once Vuetify3 is released and stable
+-   Vuetify is currently the package for Material UI and components
+-   We use vue-class-component for maintaining class Vue components
+-   Vuex serves as store and state management
 
 Are you missing specific details here? Do create a Pull-Request.
 
@@ -69,9 +69,9 @@ Before creating bug reports, please check [this list](#before-submitting-a-bug-r
 
 #### Before Submitting A Bug Report
 
-- You might need to find the cause of the problem by debugging and fix things yourself. Most importantly, check if you can reproduce the problem in the latest version of FDM Monster which is always on the `main` branch of github
-- **Check the [discussions](https://github.com/fdm-monster/fdm-monster/discussions)** for a list of common questions and problems.
-- **Perform a [cursory search](https://github.com/search?q=+is%3Aissue+user%3Afdm-monster)** to see if the problem has already been reported. If it has **and the issue is still open**, add a comment to the existing issue instead of opening a new one.
+-   You might need to find the cause of the problem by debugging and fix things yourself. Most importantly, check if you can reproduce the problem in the latest version of FDM Monster which is always on the `main` branch of github
+-   **Check the [discussions](https://github.com/fdm-monster/fdm-monster/discussions)** for a list of common questions and problems.
+-   **Perform a [cursory search](https://github.com/search?q=+is%3Aissue+user%3Afdm-monster)** to see if the problem has already been reported. If it has **and the issue is still open**, add a comment to the existing issue instead of opening a new one.
 
 #### How Do I Submit A (Good) Bug Report?
 
@@ -79,56 +79,56 @@ Bugs are tracked as [GitHub issues](https://guides.github.com/features/issues/).
 
 Explain the problem and include additional details to help maintainers reproduce the problem:
 
-- **Use a clear and descriptive title** for the issue to identify the problem.
-- **Describe the exact steps which reproduce the problem** in as many details as possible. For example, start by explaining how you started FDM Monster, e.g. which command exactly you used to install it or start it, or how you started FDM Monster otherwise. When listing steps, **don't just say what you did, but explain how you did it**. For example, if you added an OctoPrint printer where did you get the URL for the OctoPrint server and which place did you get the API Key to make FDM Monster access you OctoPrint Server?
-- **Provide specific examples to demonstrate the steps**. Include links to files or GitHub projects, or copy/pasteable snippets, which you use in those examples. If you're providing snippets in the issue, use [Markdown code blocks](https://help.github.com/articles/markdown-basics/#multiple-lines).
-- **Describe the behavior you observed after following the steps** and point out what exactly is the problem with that behavior.
-- **Explain which behavior you expected to see instead and why.**
-- **Include screenshots and animated GIFs** which show you following the described steps and clearly demonstrate the problem. You can use [OBS Studio](https://obsproject.com/) to capture the screen or you can use [this tool](https://www.cockos.com/licecap/) to record GIFs on macOS and Windows, and [this tool](https://github.com/colinkeenan/silentcast) or [this tool](https://github.com/GNOME/byzanz) on Linux.
-- **If you're reporting that FDM Monster crashed**, include the `logs` subfolder contents (note that this might contain privacy-sensitive information).
-- **If the problem is related to performance, responsiveness/sluggishness or memory**, include a CPU/RAM usage screenshot with your report (Task Manager, htop, etc.).
-- **If the problem wasn't triggered by a specific action**, describe what you were doing before the problem happened and what action you think might have caused this.
+-   **Use a clear and descriptive title** for the issue to identify the problem.
+-   **Describe the exact steps which reproduce the problem** in as many details as possible. For example, start by explaining how you started FDM Monster, e.g. which command exactly you used to install it or start it, or how you started FDM Monster otherwise. When listing steps, **don't just say what you did, but explain how you did it**. For example, if you added an OctoPrint printer where did you get the URL for the OctoPrint server and which place did you get the API Key to make FDM Monster access you OctoPrint Server?
+-   **Provide specific examples to demonstrate the steps**. Include links to files or GitHub projects, or copy/pasteable snippets, which you use in those examples. If you're providing snippets in the issue, use [Markdown code blocks](https://help.github.com/articles/markdown-basics/#multiple-lines).
+-   **Describe the behavior you observed after following the steps** and point out what exactly is the problem with that behavior.
+-   **Explain which behavior you expected to see instead and why.**
+-   **Include screenshots and animated GIFs** which show you following the described steps and clearly demonstrate the problem. You can use [OBS Studio](https://obsproject.com/) to capture the screen or you can use [this tool](https://www.cockos.com/licecap/) to record GIFs on macOS and Windows, and [this tool](https://github.com/colinkeenan/silentcast) or [this tool](https://github.com/GNOME/byzanz) on Linux.
+-   **If you're reporting that FDM Monster crashed**, include the `logs` subfolder contents (note that this might contain privacy-sensitive information).
+-   **If the problem is related to performance, responsiveness/sluggishness or memory**, include a CPU/RAM usage screenshot with your report (Task Manager, htop, etc.).
+-   **If the problem wasn't triggered by a specific action**, describe what you were doing before the problem happened and what action you think might have caused this.
 
 ### Your First Code Contribution
 
 You might be delighted to know that the FDM Monster server was structured consistently for other developers to be able to work with it rapidly.
 
-1. Clone the repository from the development branch (git clone https://github.com/fdm-monster/fdm-monster.git)
-2. Ensure MongoDb (5+) and Node (v16) are installed
-3. Adjust/create a `.env` with NODE_ENV=development **inside the server folder**
-4. `npm install` **inside the server folder** to create the `node_modules` folder
-5. Run the server with `npm run dev` to let nodemon detect and apply any changes you make
+1.  Clone the repository from the development branch (git clone )
+2.  Ensure MongoDb (5+) and Node (v16) are installed
+3.  Adjust/create a `.env` with NODE_ENV=development **inside the server folder**
+4.  `npm install` **inside the server folder** to create the `node_modules` folder
+5.  Run the server with `npm run dev` to let nodemon detect and apply any changes you make
 
 Please make sure you understand the meaning of these files/folders:
 
-- package.json
-- index.mjs
-- container.js // container.tokens.js
-- server.core.js // server.host.js
-- tasks.js // tasks/... // tasks/boot.task.js
-- server.constants.js
-- constants
-- controllers (API)
-- exceptions
-- handlers
-- middleware
-- models (mongoose)
-- migrations (mongodb/mongoose)
-- services // services/octoprint/...
-- state // state/printer.state.js // state/files.store.js // state/data/...
-- tasks // tasks/boot.task.js // printer-websocket.task.js
-- test
-- utils
+-   package.json
+-   index.mjs
+-   container.js // container.tokens.js
+-   server.core.js // server.host.js
+-   tasks.js // tasks/... // tasks/boot.task.js
+-   server.constants.js
+-   constants
+-   controllers (API)
+-   exceptions
+-   handlers
+-   middleware
+-   models (mongoose)
+-   migrations (mongodb/mongoose)
+-   services // services/octoprint/...
+-   state // state/printer.state.js // state/files.store.js // state/data/...
+-   tasks // tasks/boot.task.js // printer-websocket.task.js
+-   test
+-   utils
 
 Please make sure you understand how to write tests. Take `user-controller.test.js` as template to get started with API tests.
 Take `user-service.test.js` as template to get started with application/domain tests.
 
 ### Pull Requests
 
-1. You'll fork the repository (skip this if you're a direct FMD Monster contributor)
-2. You'll made the changes and committed the changes in a branch of your fork according to [gitflow standard](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow)
-3. You'll make a pull-request from your fork to development (See example here: https://github.com/fdm-monster/fdm-monster/compare)
-4. All required Github Actions have completed successfully - you understand that as a fork not all actions may complete due to security
-5. You'll await pull-request approval of a FDM Monster owner
+1.  You'll fork the repository (skip this if you're a direct FMD Monster contributor)
+2.  You'll made the changes and committed the changes in a branch of your fork according to [gitflow standard](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow)
+3.  You'll make a pull-request from your fork to development (See example here: )
+4.  All required Github Actions have completed successfully - you understand that as a fork not all actions may complete due to security
+5.  You'll await pull-request approval of a FDM Monster owner
 
 If all goes well you're changes will be released to FDM Monster.
