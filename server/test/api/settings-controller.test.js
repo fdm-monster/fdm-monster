@@ -31,7 +31,7 @@ describe("SettingsController", () => {
   };
 
   it("should OK on GET settings", async () => {
-    const response = await request.get(serverRoute).send();
+    const response = await request.get(defaultRoute).send();
     expect(response.body).not.toBeNull();
     expect(response.body).toMatchObject(getDefaultSettings());
     expect(response.body[serverSettingKey].registration).toBeTruthy();
