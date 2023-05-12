@@ -3,6 +3,8 @@ const { AppConstants } = require("../server.constants");
 const {
   printerFileCleanSettingKey,
   serverSettingKey,
+  timeoutSettingKey,
+  frontendSettingKey,
 } = require("../constants/server-settings.constants");
 
 const ServerSettingsSchema = new mongoose.Schema({
@@ -54,7 +56,24 @@ const ServerSettingsSchema = new mongoose.Schema({
       required: true,
     },
   },
-  timeout: {
+  [frontendSettingKey]: {
+    gridCols: {
+      type: Number,
+      default: 8,
+      required: false,
+    },
+    gridRows: {
+      type: Number,
+      default: 8,
+      required: false,
+    },
+    largeTiles: {
+      type: Boolean,
+      default: false,
+      required: false,
+    },
+  },
+  [timeoutSettingKey]: {
     apiTimeout: {
       type: Number,
       default: 1000,

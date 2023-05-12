@@ -22,7 +22,7 @@ class ServerPublicController {
   }
 
   welcome(req, res) {
-    const serverSettings = this.#settingsStore.getServerSettings();
+    const serverSettings = this.#settingsStore.getSettings();
 
     if (serverSettings[serverSettingKey].loginRequired === false) {
       return res.send({

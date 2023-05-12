@@ -5,7 +5,7 @@ const {
 } = require("../constants/server-settings.constants");
 
 class SettingsStore {
-  #serverSettings;
+  #settings;
   #serverSettingsService;
 
   constructor({ serverSettingsService }) {
@@ -14,20 +14,20 @@ class SettingsStore {
 
   async loadSettings() {
     // Setup Settings as connection is established
-    this.#serverSettings = await this.#serverSettingsService.getOrCreate();
+    this.#settings = await this.#serverSettingsService.getOrCreate();
   }
 
   isRegistrationEnabled() {
-    if (!this.#serverSettings)
+    if (!this.#settings)
       throw new InternalServerException(
         "Could not check server settings (server settings not loaded"
       );
-    return this.#serverSettings[serverSettingKey].registration;
+    return this.#settings[serverSettingKey].registration;
   }
 
-  getServerSettings() {
+  getSettings() {
     return Object.freeze({
-      ...this.#serverSettings._doc,
+      ...this.#settings._doc,
     });
   }
 
@@ -36,31 +36,36 @@ class SettingsStore {
    * @returns {*}
    */
   getPrinterFileCleanSettings() {
-    return this.getServerSettings()[printerFileCleanSettingKey];
+    return this.getSettings()[printerFileCleanSettingKey];
   }
 
   isPreUploadFileCleanEnabled() {
-    return this.getServerSettings()[printerFileCleanSettingKey]?.autoRemoveOldFilesBeforeUpload;
+    return this.getSettings()[printerFileCleanSettingKey]?.autoRemoveOldFilesBeforeUpload;
   }
 
   async setRegistrationEnabled(enabled = true) {
-    this.#serverSettings = await this.#serverSettingsService.setRegistrationEnabled(enabled);
-    return this.getServerSettings();
+    this.#settings = await this.#serverSettingsService.setRegistrationEnabled(enabled);
+    return this.getSettings();
   }
 
   async setLoginRequired(enabled = true) {
-    this.#serverSettings = await this.#serverSettingsService.setLoginRequired(enabled);
-    return this.getServerSettings();
+    this.#settings = await this.#serverSettingsService.setLoginRequired(enabled);
+    return this.getSettings();
   }
 
   async setWhitelist(enabled = true, ipAddresses) {
-    this.#serverSettings = await this.#serverSettingsService.setWhitelist(enabled, ipAddresses);
-    return this.getServerSettings();
+    this.#settings = await this.#serverSettingsService.setWhitelist(enabled, ipAddresses);
+    return this.getSettings();
   }
 
-  async updateServerSettings(fullUpdate) {
-    this.#serverSettings = await this.#serverSettingsService.update(fullUpdate);
-    return this.getServerSettings();
+  async updateSettings(fullUpdate) {
+    this.#settings = await this.#serverSettingsService.update(fullUpdate);
+    return this.getSettings();
+  }
+
+  async updateFrontendSettings(frontendSettings) {
+    this.#settings = await this.#serverSettingsService.updateFrontendSettings(frontendSettings);
+    return this.getSettings();
   }
 }
 

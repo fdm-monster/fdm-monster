@@ -12,9 +12,9 @@ class SettingsController {
     this.#settingsStore = settingsStore;
   }
 
-  getServerSettings(req, res) {
-    const serverSettings = this.#settingsStore.getServerSettings();
-    res.send(serverSettings);
+  getSettings(req, res) {
+    const settings = this.#settingsStore.getSettings();
+    res.send(settings);
   }
 
   async updateWhitelistSettings(req, res) {
@@ -29,8 +29,13 @@ class SettingsController {
     res.send(result);
   }
 
-  async updateServerSettings(req, res) {
-    const result = await this.#settingsStore.updateServerSettings(req.body);
+  async updateFrontendSettings(req, res) {
+    const result = await this.#settingsStore.updateFrontendSettings(req.body);
+    res.send(result);
+  }
+
+  async updateSettings(req, res) {
+    const result = await this.#settingsStore.updateSettings(req.body);
     res.send(result);
   }
 }
@@ -39,6 +44,7 @@ class SettingsController {
 module.exports = createController(SettingsController)
   .prefix(AppConstants.apiRoute + "/settings")
   .before([authenticate(), authorizeRoles([ROLES.ADMIN])])
-  .get("/server", "getServerSettings")
-  .put("/server/whitelist", "updateWhitelistSettings")
-  .put("/server", "updateServerSettings");
+  .get("/", "getSettings")
+  .put("/", "updateSettings")
+  .put("/whitelist", "updateWhitelistSettings")
+  .put("/frontend", "updateFrontendSettings");
