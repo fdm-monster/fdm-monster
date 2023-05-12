@@ -1,28 +1,28 @@
-const ServerSettingsModel = require("../models/ServerSettings.js");
+const SettingsModel = require("../models/ServerSettings.js");
 const Constants = require("../constants/server-settings.constants");
 const { validateInput } = require("../handlers/validators");
-const { serverSettingsUpdateRules } = require("./validators/server-settings-service.validation");
+const { serverSettingsUpdateRules, frontendSettingsUpdateRules } = require("./validators/server-settings-service.validation");
 const {
   printerFileCleanSettingKey,
   getDefaultPrinterFileCleanSettings,
   getDefaultWhitelistIpAddresses,
-  serverSettingKey,
+  serverSettingKey, frontendSettingKey,
 } = require("../constants/server-settings.constants");
 
-class ServerSettingsService {
+class SettingsService {
   async getOrCreate() {
-    let settings = await ServerSettingsModel.findOne();
+    let settings = await SettingsModel.findOne();
     if (!settings) {
-      const defaultSystemSettings = new ServerSettingsModel(Constants.getDefaultSettings());
-      await defaultSystemSettings.save();
+      const defaultSettings = new SettingsModel(Constants.getDefaultSettings());
+      await defaultSettings.save();
 
       // Return to upper layer
-      return defaultSystemSettings;
+      return defaultSettings;
     } else {
       // Perform patch of settings
       settings = this.#migrateSettingsRuntime(settings);
 
-      return ServerSettingsModel.findOneAndUpdate({ _id: settings.id }, settings, { new: true });
+      return SettingsModel.findOneAndUpdate({ _id: settings.id }, settings, { new: true });
     }
   }
 
@@ -47,6 +47,9 @@ class ServerSettingsService {
     if (!doc.server.whitelistedIpAddresses?.length) {
       doc.server.whitelistedIpAddresses = getDefaultWhitelistIpAddresses();
     }
+    if (!doc.frontend) {
+      doc.frontend = Constants.getDefaultFrontendSettings();
+    }
 
     return knownSettings;
   }
@@ -55,7 +58,7 @@ class ServerSettingsService {
     const settingsDoc = await this.getOrCreate();
     settingsDoc.server.registration = enabled;
 
-    return ServerSettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
+    return SettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
       new: true,
     });
   }
@@ -64,7 +67,7 @@ class ServerSettingsService {
     const settingsDoc = await this.getOrCreate();
     settingsDoc[serverSettingKey].loginRequired = enabled;
 
-    return ServerSettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
+    return SettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
       new: true,
     });
   }
@@ -75,7 +78,18 @@ class ServerSettingsService {
     settings.whitelistEnabled = enabled;
     settings.whitelistedIpAddresses = ipAddresses;
 
-    return ServerSettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
+    return SettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
+      new: true,
+    });
+  }
+
+  async updateFrontendSettings(patchUpdate) {
+    const validatedInput = await validateInput({
+      [frontendSettingKey]: patchUpdate
+    }, frontendSettingsUpdateRules);
+    const settingsDoc = await this.getOrCreate();
+
+    return SettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, validatedInput, {
       new: true,
     });
   }
@@ -84,10 +98,10 @@ class ServerSettingsService {
     const validatedInput = await validateInput(patchUpdate, serverSettingsUpdateRules);
     const settingsDoc = await this.getOrCreate();
 
-    return ServerSettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, validatedInput, {
+    return SettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, validatedInput, {
       new: true,
     });
   }
 }
 
-module.exports = ServerSettingsService;
+module.exports = SettingsService;

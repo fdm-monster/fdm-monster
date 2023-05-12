@@ -20,7 +20,7 @@ function authorizePermission(permission) {
 module.exports = {
   authenticate: () =>
     inject(({ settingsStore }) => async (req, res, next) => {
-      const serverSettings = settingsStore.getServerSettings();
+      const serverSettings = settingsStore.getSettings();
 
       if (serverSettings && !serverSettings[serverSettingKey]?.loginRequired) {
         return next();

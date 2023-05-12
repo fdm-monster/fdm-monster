@@ -1,7 +1,4 @@
-const {
-  jsonContentType,
-  contentTypeHeaderKey,
-} = require("./constants/octoprint-service.constants");
+const { jsonContentType, contentTypeHeaderKey } = require("./constants/octoprint-service.constants");
 const { validatePrinter, constructHeaders } = require("./utils/api.utils");
 const { getDefaultTimeout } = require("../../constants/server-settings.constants");
 
@@ -65,15 +62,13 @@ class OctoPrintRoutes {
 
   pluginManagerPlugin = (pluginName) => `${this.pluginManager}/${pluginName}`;
 
-  pluginManagerRepository = (refresh = false) =>
-    `${this.pluginManager}/repository?refresh=${refresh}`;
+  pluginManagerRepository = (refresh = false) => `${this.pluginManager}/repository?refresh=${refresh}`;
 
   apiFile = (path) => `${this.apiFilesLocation}/${path}`;
 
   apiGetFiles = (recursive = false) => `${this.apiFiles}/local?recursive=${recursive}`;
 
-  apiSoftwareUpdateCheck = (force) =>
-    `${this.octoPrintBase}plugin/softwareupdate/check${force ? "?force=true" : ""}`;
+  apiSoftwareUpdateCheck = (force) => `${this.octoPrintBase}plugin/softwareupdate/check${force ? "?force=true" : ""}`;
 
   selectCommand(print = false) {
     return { command: "select", print };
@@ -115,7 +110,7 @@ class OctoPrintRoutes {
   }
 
   _ensureTimeoutSettingsLoaded() {
-    const serverSettings = this._settingsStore.getServerSettings();
+    const serverSettings = this._settingsStore.getSettings();
     this._timeouts = { ...serverSettings.timeout };
 
     if (!this._timeouts) {

@@ -5,7 +5,7 @@ const { AuthenticationError } = require("../exceptions/runtime.exceptions");
 module.exports = {
   validateWhitelistedIp: inject(({ settingsStore, loggerFactory }) => async (req, res, next) => {
     const logger = loggerFactory("validateWhitelistedIp");
-    const serverSettings = settingsStore.getServerSettings();
+    const serverSettings = settingsStore.getSettings();
     if (
       (!serverSettings && !serverSettings[serverSettingKey]) ||
       !serverSettings[serverSettingKey]?.whitelistEnabled
@@ -33,7 +33,7 @@ module.exports = {
     next();
   }),
   interceptRoles: inject(({ settingsStore, roleService }) => async (req, res, next) => {
-    const serverSettings = settingsStore.getServerSettings();
+    const serverSettings = settingsStore.getSettings();
 
     req.roles = req.user?.roles;
     if (serverSettings && !serverSettings[serverSettingKey]?.loginRequired && !req.user) {
