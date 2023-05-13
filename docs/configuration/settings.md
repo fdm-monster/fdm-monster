@@ -3,7 +3,8 @@ layout: default
 title: Settings
 parent: Configuration
 nav_order: 2
-last_modified_at: 2023-10-05T14:00:00+02:00
+has_children: true
+last_modified_at: 2023-13-05T14:00:00+02:00
 ---
 
 # Settings
@@ -13,6 +14,10 @@ This section specifies the settings that can be changed once the FDM Monster ser
 Please visit this page on FDM Monster:
 
 ![Image](../images/settings.png)
+
+## Grid Settings
+The Grid Settings section allows you to change the number of rows and columns in the grid, as well as enabling large tile mode. This can be useful if you want to reduce the amount of available printers in your farm.
+Read more about it on the [grid settings page](./settings/grid_settings.md).
 
 ## Floors
 
