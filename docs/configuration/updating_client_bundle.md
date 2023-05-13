@@ -3,7 +3,7 @@ layout: default
 title: Updating Client Bundle
 parent: Configuration
 nav_order: 3
-last_modified_at: 2023-10-05T14:00:00+02:00
+last_modified_at: 2023-05-10T14:00:00+02:00
 ---
 
 # Updating Client Bundle
