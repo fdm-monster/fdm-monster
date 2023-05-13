@@ -2,6 +2,7 @@
 layout: default
 title: Grid Settings
 parent: Settings
+grand_parent: Configuration
 nav_order: 1
 last_modified_at: 2023-05-13T11:00:00+02:00
 ---
