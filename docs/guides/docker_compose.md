@@ -3,7 +3,7 @@ layout: default
 title: Docker Compose
 parent: Installations
 nav_order: 2
-last_modified_at: 2023-10-05T14:00:00+02:00
+last_modified_at: 2023-05-10T14:00:00+02:00
 ---
 
 # Docker Compose for FDM Monster
