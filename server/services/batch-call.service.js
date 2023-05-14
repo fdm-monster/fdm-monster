@@ -1,5 +1,24 @@
+/**
+ * @typedef {Object} BatchSingletonModel
+ * @property {boolean} [success]
+ * @property {boolean} [failure]
+ * @property {string} printerId
+ * @property {number} time
+ * @property {string} [error]
+ */
+
+/**
+ * @typedef {Array<BatchSingletonModel>} BatchModel
+ */
+
 class BatchCallService {
+  /**
+   * @type {OctoPrintApiService}
+   */
   octoPrintApiService;
+  /**
+   * @type {PrinterStore}
+   */
   printerStore;
   jobsCache;
   filesStore;
@@ -11,6 +30,45 @@ class BatchCallService {
     this.filesStore = filesStore;
   }
 
+  /**
+   * @param {string[]} printerIds
+   * @returns {void}
+   */
+  batchConnectSocket(printerIds) {
+    for (const printerId of printerIds) {
+      this.printerStore.reconnectOctoPrint(printerId);
+    }
+  }
+
+  /**
+   * @param {string[]} printerIds
+   * @returns {Promise<Awaited<BatchModel>[]>}
+   */
+  async batchConnectUsb(printerIds) {
+    const promises = [];
+    for (const printerId of printerIds) {
+      const printerLogin = this.printerStore.getPrinterLogin(printerId);
+      const time = Date.now();
+
+      const command = this.octoPrintApiService.connectCommand;
+      const promise = this.octoPrintApiService
+        .sendConnectionCommand(printerLogin, command)
+        .then(() => {
+          return { success: true, printerId, time: Date.now() - time };
+        })
+        .catch((e) => {
+          return { failure: true, error: e.message, printerId, time: Date.now() - time };
+        });
+
+      promises.push(promise);
+    }
+    return await Promise.all(promises);
+  }
+
+  /**
+   * @param {string[]} printerIds
+   * @returns {Promise<Awaited<BatchModel>[]>}
+   */
   async batchReprintCalls(printerIds) {
     const promises = [];
     for (const printerId of printerIds) {

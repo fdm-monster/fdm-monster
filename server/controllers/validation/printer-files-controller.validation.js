@@ -23,7 +23,7 @@ const fileUploadCommandsRules = {
   print: "required|boolean",
 };
 
-const batchReprintRules = {
+const batchPrinterRules = {
   printerIds: "required|array",
   "printerIds.*": "required|mongoId",
 };
@@ -48,5 +48,5 @@ module.exports = {
   moveFileOrFolderRules,
   fileUploadCommandsRules,
   getFileRules,
-  batchReprintRules,
+  batchPrinterRules,
 };
