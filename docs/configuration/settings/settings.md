@@ -31,6 +31,11 @@ The User Management section allows you to view your current user and the time th
 
 The FDM Monster Settings section allows you to configure various settings related to the operation of your printer farm. You can automatically remove old print files before upload, remove old files when rebooting the server, clear file references, and bulk disable G-code analysis. These settings can help you manage the storage and performance of your printer farm.
 
-## Other
+## Emergency Commands
 
-The Other section currently allows you to restart the server, but we will continue to add new features in the future. Stay tuned for updates and new functionality to help you manage your printer farm more efficiently.
+The Emergency Commands section currently allows you to restart the server, but we will continue to add new features in the future. Stay tuned for updates and new functionality to help you manage your printer farm more efficiently.
+
+The following commands are available:
+- **Restart Server** - restart the server (pm2 mode only)
+- **Connect USBs** - connect all USBs that are disconnected
+- **Connect Sockets** - reset and connect all websockets, which will reconnect all clients and refresh their states

@@ -39,6 +39,15 @@ class ServerPublicController {
     res.send({
       batchReprintCalls: {
         available: true,
+        // API duplicated at /batch/reprint (deprecated but backwards compatible)
+        version: 2,
+      },
+      batchConnectSocketCalls: {
+        available: true,
+        version: 1,
+      },
+      batchConnectUsbCalls: {
+        available: true,
         version: 1,
       },
     });
