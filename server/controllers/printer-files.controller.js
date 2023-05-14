@@ -12,7 +12,7 @@ const {
   localFileUploadRules,
   moveFileOrFolderRules,
   createFolderRules,
-  batchReprintRules,
+  batchPrinterRules,
 } = require("./validation/printer-files-controller.validation");
 const { ValidationException, NotFoundException } = require("../exceptions/runtime.exceptions");
 const { printerResolveMiddleware } = require("../middleware/printer");
@@ -20,13 +20,33 @@ const { ROLES, PERMS } = require("../constants/authorization.constants");
 const { authorizeRoles } = require("../middleware/authenticate");
 
 class PrinterFilesController {
+  /**
+   * @type {FilesStore}
+   */
   #filesStore;
+  /**
+   * @type {SettingsStore}
+   */
   #settingsStore;
+  /**
+   * @type {OctoPrintApiService}
+   */
   #octoPrintApiService;
+  /**
+   * @type {BatchCallService}
+   */
   batchCallService;
+  /**
+   * @type {PrinterStore}
+   */
   #printerStore;
+  /**
+   * @type {MulterService}
+   */
   #multerService;
-
+  /**
+   * @type {PrinterFileCleanTask}
+   */
   #printerFileCleanTask;
 
   #logger;
@@ -148,8 +168,14 @@ class PrinterFilesController {
     res.send(result);
   }
 
+  /**
+   * @deprecated this API endpoint will be moved to /batch from BatchCallController in 1.4.0
+   * @param req
+   * @param res
+   * @returns {Promise<void>}
+   */
   async batchReprintFiles(req, res) {
-    const { printerIds } = await validateInput(req.body, batchReprintRules);
+    const { printerIds } = await validateInput(req.body, batchPrinterRules);
     const results = await this.batchCallService.batchReprintCalls(printerIds);
     res.send(results);
   }
@@ -258,6 +284,9 @@ module.exports = createController(PrinterFilesController)
   .before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR]), printerResolveMiddleware()])
   .post("/purge", "purgeIndexedFiles", withPermission(PERMS.PrinterFiles.Clear))
   .get("/tracked-uploads", "getTrackedUploads", withPermission(PERMS.PrinterFiles.Upload))
+  /**
+   * @deprecated will be moved to /batch in 1.4.0
+   */
   .post("/batch/reprint-files", "batchReprintFiles", withPermission(PERMS.PrinterFiles.Actions))
   .get("/:id", "getFiles", withPermission(PERMS.PrinterFiles.Get))
   .get("/:id/cache", "getFilesCache", withPermission(PERMS.PrinterFiles.Get))
