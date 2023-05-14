@@ -6,36 +6,36 @@ const { validateInput } = require("../handlers/validators");
 const { whitelistSettingRules } = require("./validation/setting.validation");
 
 class SettingsController {
-  #settingsStore;
+  /**
+   * @type {SettingsStore}
+   */
+  settingsStore;
 
   constructor({ settingsStore }) {
-    this.#settingsStore = settingsStore;
+    this.settingsStore = settingsStore;
   }
 
   getSettings(req, res) {
-    const settings = this.#settingsStore.getSettings();
+    const settings = this.settingsStore.getSettings();
     res.send(settings);
   }
 
   async updateWhitelistSettings(req, res) {
-    const { whitelistEnabled, whitelistedIpAddresses } = await validateInput(
-      req.body,
-      whitelistSettingRules
-    );
+    const { whitelistEnabled, whitelistedIpAddresses } = await validateInput(req.body, whitelistSettingRules);
     if (!whitelistedIpAddresses.includes("127.0.0.1")) {
       whitelistedIpAddresses.push("127.0.0.1");
     }
-    const result = await this.#settingsStore.setWhitelist(whitelistEnabled, whitelistedIpAddresses);
+    const result = await this.settingsStore.setWhitelist(whitelistEnabled, whitelistedIpAddresses);
     res.send(result);
   }
 
   async updateFrontendSettings(req, res) {
-    const result = await this.#settingsStore.updateFrontendSettings(req.body);
+    const result = await this.settingsStore.updateFrontendSettings(req.body);
     res.send(result);
   }
 
   async updateSettings(req, res) {
-    const result = await this.#settingsStore.updateSettings(req.body);
+    const result = await this.settingsStore.updateSettings(req.body);
     res.send(result);
   }
 }
