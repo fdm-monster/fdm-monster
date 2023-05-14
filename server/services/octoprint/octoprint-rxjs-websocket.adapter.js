@@ -28,6 +28,7 @@ class OctoprintRxjsWebsocketAdapter extends GenericWebsocketAdapter {
   #messageInputSubject;
   #messageOutput$;
 
+  lastMessageReceivedDate = null;
   // Current causes this
   #printerState = getDefaultPrinterState();
   // History and current update this
@@ -73,6 +74,7 @@ class OctoprintRxjsWebsocketAdapter extends GenericWebsocketAdapter {
       }),
       filter((msg) => !OP_WS_SKIP.includes(msg.header)),
       map((msg) => {
+        this.lastMessageReceivedDate = new Date();
         return this.#transformStatefulMessage(msg);
       }),
       catchError((error) => {
