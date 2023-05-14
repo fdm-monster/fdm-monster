@@ -165,6 +165,7 @@ class PrinterState {
       dateAdded: this.#entityData.dateAdded,
       printerName: this.#entityData.settingsAppearance?.name,
       webSocketURL: this.#websocketAdapter?.webSocketURL || this.#entityData.webSocketURL,
+      lastMessageReceivedDate: this.#websocketAdapter?.lastMessageReceivedDate,
       printerURL: this.#entityData.printerURL,
     });
   }
