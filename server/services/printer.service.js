@@ -12,9 +12,18 @@ const { getDefaultPrinterEntry } = require("../constants/service.constants");
 
 class PrinterService {
   /**
-   * Lists the printers present in the database.
+   * @type {EventEmitter2}
    */
   eventEmitter2;
+  /**
+   * @type {LoggerService}
+   */
+  logger;
+  constructor({ eventEmitter2, loggerFactory }) {
+    this.eventEmitter2 = eventEmitter2;
+    this.logger = loggerFactory("PrinterService");
+  }
+
   async list() {
     return Printer.find({}, null, {
       sort: { dateAdded: 1 },

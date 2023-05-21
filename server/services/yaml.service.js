@@ -13,6 +13,9 @@ class YamlService {
    * @type {PrinterService}
    */
   printerService;
+  /**
+   * @type {FloorService}
+   */
   floorService;
 
   /**

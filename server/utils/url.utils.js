@@ -3,6 +3,13 @@ function sanitizeURL(url) {
   return new URL(url).href;
 }
 
+function httpToWsUrl(url, protocol = "ws") {
+  const wsUrl = new URL("/sockjs/websocket", url.origin);
+  wsUrl.protocol = `${protocol}`;
+  wsUrl.pathname = "/sockjs/websocket";
+  return wsUrl;
+}
+
 function convertHttpUrlToWebsocket(url) {
   const urlInstance = new URL(url);
   const protocol = urlInstance.protocol;
@@ -17,5 +24,6 @@ function convertHttpUrlToWebsocket(url) {
 
 module.exports = {
   convertHttpUrlToWebsocket,
-  sanitizeURL
+  httpToWsUrl,
+  sanitizeURL,
 };

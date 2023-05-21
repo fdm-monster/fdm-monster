@@ -7,10 +7,22 @@ const { isLoginResponseGlobal } = require("../services/octoprint/constants/octop
 
 class PrinterWebsocketTask {
   #printerStore;
+  /**
+   * @type {SettingsStore}
+   */
   #settingsStore;
+  /**
+   * @type {OctoPrintApiService}
+   */
   #octoPrintService;
+  /**
+   * @type {TaskManagerService}
+   */
   #taskManagerService;
 
+  /**
+   * @type {LoggerService}
+   */
   #logger;
 
   #errorMaxThrows = 3;
