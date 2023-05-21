@@ -47,10 +47,10 @@ jobs:
         uses: actions/create-release@v1
         id: create_release
         with:
-          draft: false
+          draft: ${{ github.ref_name == 'develop' }}
           prerelease: ${{ github.ref_name != 'main' }}
-          release_name: "${{ env.SERVER_VERSION }} Speedy Rabbit Unstable 🐰"
-          tag_name: ${{ env.SERVER_VERSION }}
+          release_name: "${{ github.ref_name == 'develop' && join(['${{ env.SERVER_VERSION }}', '${{ github.run_number }}'], '-') || env.SERVER_VERSION }} Speedy Rabbit Unstable 🐰"
+          tag_name: ${{ github.ref_name == 'develop' && join(['${{ env.SERVER_VERSION }}', '${{ github.run_number }}'], '-') || env.SERVER_VERSION }}
           body: "Release notes not added" # ${{ steps.build_changelog.outputs.changelog }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
