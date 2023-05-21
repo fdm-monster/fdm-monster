@@ -42,7 +42,7 @@ class PrinterWebsocketPingTask {
     }
 
     const duration = Date.now() - startTime;
-    this.#logger.info(`Sent ${printerStates.length} websocket pings taking ${duration}ms.`);
+    this.#logger.log(`Sent ${printerStates.length} websocket pings taking ${duration}ms.`);
   }
 }
 

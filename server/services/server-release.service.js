@@ -71,7 +71,7 @@ class ServerReleaseService {
     this.#airGapped = !allGithubReleases;
     this.#includingPrerelease = includePrereleases;
     if (!allGithubReleases?.length) {
-      this.#logger.warning("Latest release check failed because releases from github empty");
+      this.#logger.warn("Latest release check failed because releases from github empty");
       return;
     }
 
@@ -114,7 +114,7 @@ class ServerReleaseService {
 
     const packageVersion = this.#serverVersion;
     if (!this.#installedReleaseFound) {
-      this.#logger.info(
+      this.#logger.log(
         `\x1b[36mCurrent release tag not found in github releases.\x1b[0m
     Here's github's latest released: \x1b[32m${latestReleaseTag}\x1b[0m
     Here's your release tag: \x1b[32m${packageVersion}\x1b[0m
@@ -123,7 +123,7 @@ class ServerReleaseService {
       return;
     }
     else {
-      this.#logger.info(
+      this.#logger.log(
         `\x1b[36mCurrent release was found in github releases.\x1b[0m
     Here's github's latest released: \x1b[32m${latestReleaseTag}\x1b[0m
     Here's your release tag: \x1b[32m${packageVersion}\x1b[0m
@@ -133,11 +133,11 @@ class ServerReleaseService {
 
     if (!!packageVersion && latestReleaseState.updateAvailable) {
       if (!!this.#airGapped) {
-        this.#logger.warning(
+        this.#logger.warn(
           `Installed release: ${packageVersion}. Skipping update check (air-gapped/disconnected from internet)`
         );
       } else {
-        this.#logger.info(
+        this.#logger.log(
           `Update available! New version: ${latestReleaseTag} (prerelease: ${latestRelease.prerelease})`
         );
       }
@@ -146,7 +146,7 @@ class ServerReleaseService {
         "Cant check release as package.json version environment variable is not set. Make sure FDM Server is run from a 'package.json' or NPM context."
       );
     } else {
-      return this.#logger.info(`Installed release: ${packageVersion}. You are up to date!`);
+      return this.#logger.log(`Installed release: ${packageVersion}. You are up to date!`);
     }
   }
 }

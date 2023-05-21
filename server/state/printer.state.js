@@ -381,7 +381,7 @@ class PrinterState {
       // We nullify the adapter here for ease, but we should aim not to
       this.#websocketAdapter = null;
 
-      this.#logger.warning("Reset printer websocket adapter.");
+      this.#logger.warn("Reset printer websocket adapter.");
     }
   }
 
@@ -416,7 +416,7 @@ class PrinterState {
   setApiAccessibility(accessible, retryable, reason) {
     if (!accessible) {
       if (!retryable && !isTestEnvironment())
-        this.#logger.warning(
+        this.#logger.warn(
           `Printer API '${this.getName()}' was marked as inaccessible. Reason: '${reason}'. Please check connection settings.`
         );
     }

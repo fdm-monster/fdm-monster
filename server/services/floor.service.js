@@ -56,7 +56,7 @@ class FloorService {
       if (removedPositionPrinterIds?.length) {
         floor.printers = floor.printers.filter((fp) => !removedPositionPrinterIds.includes(fp.printerId));
         await floor.save();
-        this.#logger.warning(
+        this.#logger.warn(
           `Found ${removedPositionPrinterIds} (floor printerIds) to be in need of removal for floor (duplicate position or non-existing printer)`
         );
       }

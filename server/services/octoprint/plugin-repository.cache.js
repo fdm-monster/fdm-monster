@@ -16,7 +16,7 @@ class PluginRepositoryCache {
   getPlugin(pluginName) {
     if (!this.wasCached) {
       if (!isTestEnvironment()) {
-        this.#logger.warning(`Could not check plugin '${pluginName}', as cache was not loaded.`);
+        this.#logger.warn(`Could not check plugin '${pluginName}', as cache was not loaded.`);
       }
       return;
     }
@@ -33,7 +33,7 @@ class PluginRepositoryCache {
     this.wasCached = true;
     this.lastQueried = Date.now();
 
-    this.#logger.info(`Plugin Cache filled with ${this.pluginCache?.length || "?"} plugins`);
+    this.#logger.log(`Plugin Cache filled with ${this.pluginCache?.length || "?"} plugins`);
 
     return this.getCache();
   }

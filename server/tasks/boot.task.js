@@ -9,14 +9,35 @@ class BootTask {
   #logger;
   #taskManagerService;
   #serverTasks;
+  /**
+   * @type {SettingsStore}
+   */
   settingsStore;
-  serverSettingsService;
+  /**
+   * @type {SettingsService}
+   */
+  settingsService;
   multerService;
   printerStore;
+  /**
+   * @type {FilesStore}
+   */
   filesStore;
+  /**
+   * @type {PermissionService}
+   */
   permissionService;
+  /**
+   * @type {RoleService}
+   */
   roleService;
+  /**
+   * @type {UserService}
+   */
   userService;
+  /**
+   * @type {PluginRepositoryCache}
+   */
   pluginRepositoryCache;
   floorStore;
   pluginFirmwareUpdateService;
@@ -25,7 +46,7 @@ class BootTask {
   constructor({
     loggerFactory,
     serverTasks,
-    serverSettingsService,
+    settingsService,
     settingsStore,
     multerService,
     printerStore,
@@ -40,7 +61,7 @@ class BootTask {
     clientBundleService,
   }) {
     this.#serverTasks = serverTasks;
-    this.serverSettingsService = serverSettingsService;
+    this.settingsService = settingsService;
     this.settingsStore = settingsStore;
     this.multerService = multerService;
     this.printerStore = printerStore;
@@ -84,16 +105,16 @@ class BootTask {
       this.#logger.error(`Error downloading latest client bundle: ${e.message} (${e.status})`);
     });
 
-    this.#logger.info("Loading Server settings.");
+    this.#logger.log("Loading Server settings.");
     await this.settingsStore.loadSettings();
 
-    this.#logger.info("Loading data cache and storage folders.");
+    this.#logger.log("Loading data cache and storage folders.");
     await this.multerService.clearUploadsFolder();
     await this.printerStore.loadPrinterStore();
     await this.filesStore.loadFilesStore();
     await this.floorStore.loadStore();
 
-    this.#logger.info("Synchronizing user permission and roles definition");
+    this.#logger.log("Synchronizing user permission and roles definition");
     await this.permissionService.syncPermissions();
     await this.roleService.syncRoles();
     await this.ensureAdminUserExists();
@@ -103,7 +124,7 @@ class BootTask {
         this.#taskManagerService.registerJobOrTask(task);
       });
     } else {
-      this.#logger.warning("Starting in safe mode due to SAFEMODE_ENABLED");
+      this.#logger.warn("Starting in safe mode due to SAFEMODE_ENABLED");
     }
 
     // Success so we disable this task
@@ -126,7 +147,7 @@ class BootTask {
         password: "fdm-root",
         roles: [adminRole.id],
       });
-      this.#logger.info("Created admin account as it was missing. Please consult the documentation for credentials.");
+      this.#logger.log("Created admin account as it was missing. Please consult the documentation for credentials.");
     }
   }
 

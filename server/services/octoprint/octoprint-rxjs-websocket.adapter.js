@@ -138,7 +138,7 @@ class OctoprintRxjsWebsocketAdapter extends GenericWebsocketAdapter {
         serverEvents.push({ type: PEVENTS.event, data });
         break;
       case OP_WS_MSG.reauthRequired:
-        this.#logger.warning("Re-authentication required - ", header);
+        this.#logger.warn("Re-authentication required - ", header);
         serverEvents.push({ type: PEVENTS.reauth, data });
         break;
       case OP_WS_MSG.plugin:
@@ -148,7 +148,7 @@ class OctoprintRxjsWebsocketAdapter extends GenericWebsocketAdapter {
         // this.#handlePluginMessage(header, data);
         break;
       default:
-        this.#logger.info("Unhandled Websocket message", data?.plugin);
+        this.#logger.log("Unhandled Websocket message", data?.plugin);
     }
 
     return serverEvents;

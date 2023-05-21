@@ -61,7 +61,7 @@ class PrinterTestTask {
   #stopRunning() {
     this.#lastTestRunTime = undefined;
     this.#taskManagerService.disableJob(DITokens.printerTestTask);
-    this.#logger.info("Printer test task has stopped running and is disabled.");
+    this.#logger.log("Printer test task has stopped running and is disabled.");
   }
 
   /**

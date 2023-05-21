@@ -46,7 +46,7 @@ class ServerPrivateController {
 
   async restartServer(req, res) {
     if (!isTestEnvironment()) {
-      this.#logger.warning("Server restart command fired. Expect the server to be unavailable for a moment");
+      this.#logger.warn("Server restart command fired. Expect the server to be unavailable for a moment");
     }
     const result = await this.#serverUpdateService.restartServer();
     res.send(result);

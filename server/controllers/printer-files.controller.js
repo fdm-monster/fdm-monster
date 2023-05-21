@@ -49,6 +49,9 @@ class PrinterFilesController {
    */
   #printerFileCleanTask;
 
+  /**
+   * @type {LoggerService}
+   */
   #logger;
 
   constructor({
@@ -85,7 +88,7 @@ class PrinterFilesController {
     const { currentPrinterId } = getScopedPrinter(req);
     const { recursive } = await validateInput(req.query, getFilesRules);
 
-    this.#logger.info("Refreshing file storage by eager load");
+    this.#logger.log("Refreshing file storage by eager load");
     const response = await this.#filesStore.eagerLoadPrinterFiles(currentPrinterId, recursive);
     this.#statusResponse(res, response);
   }
@@ -163,7 +166,7 @@ class PrinterFilesController {
     const result = await this.#octoPrintApiService.deleteFileOrFolder(printerLogin, path);
 
     await this.#filesStore.deleteFile(currentPrinterId, path, false);
-    this.#logger.info(`File reference removed, printerId ${currentPrinterId}`, path);
+    this.#logger.log(`File reference removed, printerId ${currentPrinterId}`, path);
 
     res.send(result);
   }

@@ -45,7 +45,7 @@ class FileUploadTrackerCache {
 
   addUploadTracker(multerFile) {
     const correlationToken = generateCorrelationToken();
-    this.#logger.info(`Starting upload session with token ${correlationToken}`);
+    this.#logger.log(`Starting upload session with token ${correlationToken}`);
 
     this.#eventEmitter2.on(uploadProgressEvent(correlationToken), this.progressCallback);
 
@@ -61,7 +61,7 @@ class FileUploadTrackerCache {
 
   updateUploadProgress(token, progress, reason) {
     if (progress.done || progress.percent === 1) {
-      this.#logger.info("Upload tracker completed");
+      this.#logger.log("Upload tracker completed");
       this.markUploadDone(token, true);
       this.#eventEmitter2.off(uploadProgressEvent(token), this.progressCallback);
     } else if (progress.failed) {
@@ -76,7 +76,7 @@ class FileUploadTrackerCache {
   markUploadDone(token, success, reason) {
     const trackedUploadIndex = this.#currentUploads.findIndex((cu) => cu.correlationToken === token);
     if (trackedUploadIndex === -1) {
-      this.#logger.warning(`Could not mark upload tracker with token '${token}' as done as it was not found.`);
+      this.#logger.warn(`Could not mark upload tracker with token '${token}' as done as it was not found.`);
       return;
     }
 

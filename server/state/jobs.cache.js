@@ -9,7 +9,13 @@ class JobsCache {
   // associative array per printer ID
   #cachedJobProgress = {};
 
+  /**
+   * @type {EventEmitter2}
+   */
   #eventEmitter2;
+  /**
+   * @type {LoggerService}
+   */
   #logger;
 
   constructor({ eventEmitter2, loggerFactory }) {
@@ -42,13 +48,13 @@ class JobsCache {
     const jobCacheEntry = this.#cachedJobProgress[printerId];
 
     if (!jobCacheEntry) {
-      this.#logger.warning("Did not remove printer Job Progress as it was not found");
+      this.#logger.warn("Did not remove printer Job Progress as it was not found");
       return;
     }
 
     delete this.#cachedJobProgress[printerId];
 
-    this.#logger.info(`Purged printerId '${printerId}' job progress cache`);
+    this.#logger.log(`Purged printerId '${printerId}' job progress cache`);
   }
 
   /**

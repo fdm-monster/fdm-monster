@@ -2,15 +2,22 @@ const { Server } = require("socket.io");
 const { socketIoConnectedEvent } = require("../constants/event.constants");
 
 class SocketIoGateway {
-  #logger;
-  #printerStore;
-  #eventEmitter2;
+  /**
+   * @type {LoggerService}
+   */
+  logger;
+  /**
+   * @type {EventEmitter2}
+   */
+  eventEmitter2;
+  /**
+   * @type {Server}
+   */
   io;
 
-  constructor({ loggerFactory, printerStore, eventEmitter2 }) {
-    this.#logger = loggerFactory(SocketIoGateway.name);
-    this.#printerStore = printerStore;
-    this.#eventEmitter2 = eventEmitter2;
+  constructor({ loggerFactory, eventEmitter2 }) {
+    this.logger = loggerFactory(SocketIoGateway.name);
+    this.eventEmitter2 = eventEmitter2;
   }
 
   attachServer(httpServer) {
@@ -20,18 +27,18 @@ class SocketIoGateway {
   }
 
   onConnect(socket) {
-    this.#logger.info("SocketIO Client connected", socket.id);
-    this.#eventEmitter2.emit(socketIoConnectedEvent, socket.id);
+    this.logger.log("SocketIO Client connected", socket.id);
+    this.eventEmitter2.emit(socketIoConnectedEvent, socket.id);
 
     socket.on("disconnect", () => {
-      this.#logger.info("SocketIO Client disconnected", socket.id);
+      this.logger.log("SocketIO Client disconnected", socket.id);
     });
   }
 
   send(event, serializedData) {
     // Legacy SSE replacement
     if (!this.io) {
-      this.#logger.debug("No io server setup yet");
+      this.logger.debug("No io server setup yet");
       return;
     }
 
