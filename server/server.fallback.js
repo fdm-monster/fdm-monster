@@ -18,7 +18,7 @@ function fetchServerPort() {
 
   let port = process.env[AppConstants.SERVER_PORT_KEY];
   if (Number.isNaN(parseInt(port))) {
-    logger.warning(
+    logger.warn(
       `~ The ${AppConstants.SERVER_PORT_KEY} setting was not a correct port number: >= 0 and < 65536. Actual value: ${port}.`
     );
 
@@ -33,7 +33,7 @@ function serveNode12Fallback(app) {
   const port = fetchServerPort();
   let listenerHttpServer = app.listen(port, "0.0.0.0", () => {
     const msg = `You have an old Node version: ${process.version}. This needs to be version 14.x or higher... open our webpage at http://127.0.0.1:${port} for tips`;
-    logger.info(msg);
+    logger.log(msg);
   });
 
   app

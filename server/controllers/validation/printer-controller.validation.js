@@ -18,11 +18,6 @@ const testPrinterApiRules = {
   webSocketURL: "wsurl",
 };
 
-const updateSortIndexRules = {
-  sortList: "required|array|minLength:1",
-  "sortList.*": "required|mongoId",
-};
-
 const updatePrinterDisabledReasonRules = {
   disabledReason: "string",
 };
@@ -42,7 +37,6 @@ module.exports = {
   feedRateRules,
   flowRateRules,
   testPrinterApiRules,
-  updateSortIndexRules,
   updatePrinterEnabledRule,
   updatePrinterConnectionSettingRules,
   updatePrinterDisabledReasonRules,

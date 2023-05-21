@@ -58,5 +58,5 @@ module.exports = {
   AuthorizationError,
   InternalServerException,
   ExternalServiceError,
-  ValidationException
+  ValidationException,
 };

@@ -57,7 +57,6 @@ class PrinterController {
 
   async sendSerialConnectCommand(req, res) {
     const { printerLogin } = getScopedPrinter(req);
-
     const command = this.#octoPrintApiService.connectCommand;
     await this.#octoPrintApiService.sendConnectionCommand(printerLogin, command);
     res.send({});
@@ -192,20 +191,11 @@ class PrinterController {
     });
   }
 
-  async updateSortIndex(req, res) {
-    const data = await validateMiddleware(req, updateSortIndexRules);
-
-    this.#logger.info("Sorting printers according to provided order", JSON.stringify(data));
-    await this.#printerStore.updateSortIndex(data.sortList);
-
-    res.send({});
-  }
-
   async updateEnabled(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
     const data = await validateMiddleware(req, updatePrinterEnabledRule);
 
-    this.#logger.info("Changing printer enabled setting", JSON.stringify(data));
+    this.#logger.log("Changing printer enabled setting", JSON.stringify(data));
     await this.#printerStore.updateEnabled(currentPrinterId, data.enabled);
 
     res.send({});
@@ -215,7 +205,7 @@ class PrinterController {
     const { currentPrinterId } = getScopedPrinter(req);
     const data = await validateMiddleware(req, updatePrinterDisabledReasonRules);
 
-    this.#logger.info("Changing printer disabled reason setting", JSON.stringify(data));
+    this.#logger.log("Changing printer disabled reason setting", JSON.stringify(data));
     await this.#printerStore.updateDisabledReason(currentPrinterId, data.disabledReason);
 
     res.send({});
@@ -286,7 +276,6 @@ module.exports = createController(PrinterController)
   .post("/", "create")
   .post("/batch", "importBatch")
   .post("/test-connection", "testConnection")
-  .post("/sort-index", "updateSortIndex")
   .get("/plugin-list", "getPluginList")
   .get("/:id", "getPrinter")
   .patch("/:id", "update")

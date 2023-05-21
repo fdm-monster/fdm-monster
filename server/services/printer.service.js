@@ -14,6 +14,7 @@ class PrinterService {
   /**
    * Lists the printers present in the database.
    */
+  eventEmitter2;
   async list() {
     return Printer.find({}, null, {
       sort: { dateAdded: 1 },
@@ -71,7 +72,6 @@ class PrinterService {
     const printer = await this.get(printerId);
 
     const { printerURL, webSocketURL, apiKey, enabled, settingsAppearance } = await validateInput(updateData, createPrinterRules);
-
     await this.get(printerId);
 
     printer.printerURL = printerURL;

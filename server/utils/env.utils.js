@@ -54,7 +54,7 @@ function writeVariableToEnvFile(absoluteEnvPath, variableKey, jsonObject) {
   }
   const latestDotEnvConfig = dotenv.config();
   if (latestDotEnvConfig?.error?.code === "ENOENT") {
-    logger.warning("Creating .env file for you as it was not found.");
+    logger.warn("Creating .env file for you as it was not found.");
   } else if (!!latestDotEnvConfig.error) {
     logger.error(JSON.stringify(latestDotEnvConfig.error));
     throw new Error(

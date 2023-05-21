@@ -204,14 +204,14 @@ class TaskManagerService {
       );
     }
     if (!schedulerOptions.disabled) {
-      this.#logger.info(
+      this.#logger.log(
         `Task '${taskId}' was scheduled (runImmediately: ${!!schedulerOptions.runImmediately}).`
       );
       const job = new SimpleIntervalJob(schedulerOptions, timedTask);
       taskState.job = job;
       this.jobScheduler.addSimpleIntervalJob(job);
     } else {
-      this.#logger.info(`Task '${taskId}' was marked as disabled (deferred execution).`);
+      this.#logger.log(`Task '${taskId}' was marked as disabled (deferred execution).`);
     }
   }
 
@@ -225,7 +225,7 @@ class TaskManagerService {
 
   runTimeoutTaskInstance(taskId, timeoutMs) {
     const taskState = this.getTaskState(taskId);
-    this.#logger.info(`Running delayed task ${taskId} in ${timeoutMs}ms`);
+    this.#logger.log(`Running delayed task ${taskId} in ${timeoutMs}ms`);
     setTimeout(() => taskState.timedTask.execute(), timeoutMs, taskId);
   }
 
@@ -249,7 +249,7 @@ class TaskManagerService {
     taskState.duration = Date.now() - taskState.started;
 
     if (taskState.options?.logFirstCompletion !== false && !taskState?.firstCompletion) {
-      this.#logger.info(`Task '${taskId}' first completion. Duration ${taskState.duration}ms`);
+      this.#logger.log(`Task '${taskId}' first completion. Duration ${taskState.duration}ms`);
       taskState.firstCompletion = Date.now();
     }
   }

@@ -58,7 +58,7 @@ describe("PrinterFilesController", () => {
     expectInvalidResponse(response, ["recursive"]);
   });
 
-  it(`should retrieve files on GET for existing printer`, async () => {
+  it("should retrieve files on GET for existing printer", async () => {
     const printer = await createTestPrinter(request);
     octoPrintApiService.storeResponse([], 200);
     const response = await request.get(getFilesRoute(printer.id, false)).send();

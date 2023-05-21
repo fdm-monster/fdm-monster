@@ -6,15 +6,15 @@ const {
 
 class SettingsStore {
   #settings;
-  #serverSettingsService;
+  #settingsService;
 
-  constructor({ serverSettingsService }) {
-    this.#serverSettingsService = serverSettingsService;
+  constructor({ settingsService }) {
+    this.#settingsService = settingsService;
   }
 
   async loadSettings() {
     // Setup Settings as connection is established
-    this.#settings = await this.#serverSettingsService.getOrCreate();
+    this.#settings = await this.#settingsService.getOrCreate();
   }
 
   isRegistrationEnabled() {
@@ -44,27 +44,27 @@ class SettingsStore {
   }
 
   async setRegistrationEnabled(enabled = true) {
-    this.#settings = await this.#serverSettingsService.setRegistrationEnabled(enabled);
+    this.#settings = await this.#settingsService.setRegistrationEnabled(enabled);
     return this.getSettings();
   }
 
   async setLoginRequired(enabled = true) {
-    this.#settings = await this.#serverSettingsService.setLoginRequired(enabled);
+    this.#settings = await this.#settingsService.setLoginRequired(enabled);
     return this.getSettings();
   }
 
   async setWhitelist(enabled = true, ipAddresses) {
-    this.#settings = await this.#serverSettingsService.setWhitelist(enabled, ipAddresses);
+    this.#settings = await this.#settingsService.setWhitelist(enabled, ipAddresses);
     return this.getSettings();
   }
 
   async updateSettings(fullUpdate) {
-    this.#settings = await this.#serverSettingsService.update(fullUpdate);
+    this.#settings = await this.#settingsService.update(fullUpdate);
     return this.getSettings();
   }
 
   async updateFrontendSettings(frontendSettings) {
-    this.#settings = await this.#serverSettingsService.updateFrontendSettings(frontendSettings);
+    this.#settings = await this.#settingsService.updateFrontendSettings(frontendSettings);
     return this.getSettings();
   }
 }

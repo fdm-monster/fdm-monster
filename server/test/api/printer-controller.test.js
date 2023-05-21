@@ -45,7 +45,6 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  console.log("End of printer controller tests");
   await Model.deleteMany({});
 });
 
@@ -65,7 +64,6 @@ describe("PrinterController", () => {
       printerURL: "http://url.com",
       apiKey: testApiKey,
       printerName: "test123",
-      tempTriggers: { heatingVariation: null },
     });
     const body = expectOkResponse(response, {
       printerURL: expect.any(String),

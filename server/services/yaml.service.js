@@ -9,9 +9,15 @@ const { dump, load } = require("js-yaml");
 class YamlService {
   printerStore;
   floorStore;
+  /**
+   * @type {PrinterService}
+   */
   printerService;
   floorService;
 
+  /**
+   * @type {LoggerService}
+   */
   #logger;
 
   constructor({ printerStore, printerService, floorStore, floorService, loggerFactory }) {
@@ -38,32 +44,32 @@ class YamlService {
       }
     }
 
-    this.#logger.info("Analysing printers for import");
+    this.#logger.log("Analysing printers for import");
     const { updateByPropertyPrinters, insertPrinters } = await this.analysePrintersUpsert(
       importData.printers,
       importData.config.printerComparisonStrategiesByPriority
     );
 
-    this.#logger.info("Analysing floors for import");
+    this.#logger.log("Analysing floors for import");
     const { updateByPropertyFloors, insertFloors } = await this.analyseFloorsUpsert(
       importData.floors,
       importData.config.floorComparisonStrategiesByPriority
     );
 
-    this.#logger.info(`Performing pure insert printers (${insertPrinters.length} printers)`);
+    this.#logger.log(`Performing pure insert printers (${insertPrinters.length} printers)`);
     const printerIdMap = {};
     for (const newPrinter of insertPrinters) {
       const state = await this.printerStore.addPrinter(newPrinter);
       printerIdMap[newPrinter.id] = state.id;
     }
-    this.#logger.info(`Performing update import printers (${updateByPropertyPrinters.length} printers)`);
+    this.#logger.log(`Performing update import printers (${updateByPropertyPrinters.length} printers)`);
     for (const updatePrinterSpec of updateByPropertyPrinters) {
       const updateId = updatePrinterSpec.printerId;
       const state = await this.printerStore.updatePrinter(updateId, updatePrinterSpec.value);
       printerIdMap[updatePrinterSpec.printerId] = state.id;
     }
 
-    this.#logger.info(`Performing pure create floors (${insertFloors.length} floors)`);
+    this.#logger.log(`Performing pure create floors (${insertFloors.length} floors)`);
     const floorIdMap = {};
     for (const newFloor of insertFloors) {
       // Replace printerIds with newly mapped IDs
@@ -84,7 +90,7 @@ class YamlService {
       floorIdMap[newFloor.id] = state.id;
     }
 
-    this.#logger.info(`Performing update of floors (${updateByPropertyFloors.length} floors)`);
+    this.#logger.log(`Performing update of floors (${updateByPropertyFloors.length} floors)`);
     for (const updateFloorSpec of updateByPropertyFloors) {
       const updateId = updateFloorSpec.floorId;
       const updatedFloor = updateFloorSpec.value;

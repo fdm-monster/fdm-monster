@@ -44,7 +44,7 @@ class PrintCompletionService {
     });
 
     if (!completionEntry) {
-      this.#logger.warning(
+      this.#logger.warn(
         `Print with correlationId ${correlationId} could not be updated with new context as it was not found`
       );
       return;

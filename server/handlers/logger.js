@@ -49,13 +49,13 @@ class LoggerService {
     });
   }
 
-  info(message, meta) {
+  log(message, meta) {
     this.logger.log("info", message, {
       meta,
     });
   }
 
-  warning(message, meta) {
+  warn(message, meta) {
     this.logger.log("warn", message, {
       meta,
     });
