@@ -22,7 +22,7 @@ The following is a set of guidelines for contributing to FDM Monster and its pac
 
 ## Code of Conduct
 
-This project and everyone participating in it is governed by the [FDM Monster Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to .
+This project and everyone participating in it is governed by the [FDM Monster Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to [davidzwa@gmail.com](mailto:davidzwa@gmail.com).
 
 ## Get Started Quickly
 
@@ -127,7 +127,7 @@ Take `user-service.test.js` as template to get started with application/domain t
 
 1.  You'll fork the repository (skip this if you're a direct FMD Monster contributor)
 2.  You'll made the changes and committed the changes in a branch of your fork according to [gitflow standard](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow)
-3.  You'll make a pull-request from your fork to development (See example here: )
+3.  You'll make a pull-request from your fork to development (See example here: https://github.com/fdm-monster/fdm-monster/compare)
 4.  All required Github Actions have completed successfully - you understand that as a fork not all actions may complete due to security
 5.  You'll await pull-request approval of a FDM Monster owner
 
