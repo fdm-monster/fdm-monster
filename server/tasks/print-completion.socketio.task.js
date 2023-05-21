@@ -35,7 +35,7 @@ class PrintCompletionSocketIoTask {
     // If not parsed well, skip log
     const printerId = fdmEvent.replace("octoprint.", "");
     if (!printerId) {
-      this.#logger.info(`Skipping print completion log for FDM event ${fdmEvent}`);
+      this.#logger.log(`Skipping print completion log for FDM event ${fdmEvent}`);
     }
 
     if (octoPrintEvent !== "event") {

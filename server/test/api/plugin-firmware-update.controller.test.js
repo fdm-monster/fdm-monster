@@ -38,7 +38,6 @@ describe("PluginFirmwareUpdateController", () => {
 
   it(`should be able to POST ${scanRoute} to perform scan`, async () => {
     await createTestPrinter(request);
-
     const response = await request.post(scanRoute).send();
     expectOkResponse(response);
   });

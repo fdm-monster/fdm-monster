@@ -91,7 +91,7 @@ class ServerHost {
 
     const hostOrFqdn = "0.0.0.0";
     const server = this.#appInstance.listen(port, hostOrFqdn, () => {
-      this.#logger.info(`Server started... open it at http://127.0.0.1:${port}`);
+      this.#logger.log(`Server started... open it at http://127.0.0.1:${port}`);
     });
     this.#socketIoGateway.attachServer(server);
   }

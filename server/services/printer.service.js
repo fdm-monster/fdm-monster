@@ -12,8 +12,18 @@ const { getDefaultPrinterEntry } = require("../constants/service.constants");
 
 class PrinterService {
   /**
-   * Lists the printers present in the database.
+   * @type {EventEmitter2}
    */
+  eventEmitter2;
+  /**
+   * @type {LoggerService}
+   */
+  logger;
+  constructor({ eventEmitter2, loggerFactory }) {
+    this.eventEmitter2 = eventEmitter2;
+    this.logger = loggerFactory("PrinterService");
+  }
+
   async list() {
     return Printer.find({}, null, {
       sort: { dateAdded: 1 },
@@ -71,7 +81,6 @@ class PrinterService {
     const printer = await this.get(printerId);
 
     const { printerURL, webSocketURL, apiKey, enabled, settingsAppearance } = await validateInput(updateData, createPrinterRules);
-
     await this.get(printerId);
 
     printer.printerURL = printerURL;
@@ -84,6 +93,16 @@ class PrinterService {
 
     await printer.save();
 
+    return printer;
+  }
+
+  async updateLastPrintedFile(printerId, lastPrintedFile) {
+    const update = { lastPrintedFile };
+    await this.get(printerId);
+    const printer = await Printer.findByIdAndUpdate(printerId, update, {
+      new: true,
+      useFindAndModify: false,
+    });
     return printer;
   }
 

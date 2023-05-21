@@ -78,7 +78,7 @@ class FileCache {
 
     if (totalFiles !== this.#totalFileCount) {
       this.#totalFileCount = totalFiles;
-      this.#logger.info(`Cache updated. ${this.#totalFileCount} file storage references cached.`);
+      this.#logger.log(`Cache updated. ${this.#totalFileCount} file storage references cached.`);
     }
 
     return totalFiles;
@@ -92,13 +92,13 @@ class FileCache {
     const fileStorage = this.#printerFileStorage[printerId];
 
     if (!fileStorage) {
-      this.#logger.warning("Did not remove printer File Storage as it was not found");
+      this.#logger.warn("Did not remove printer File Storage as it was not found");
       return;
     }
 
     delete this.#printerFileStorage[printerId];
 
-    this.#logger.info(`Purged printerId '${printerId}' file cache`);
+    this.#logger.log(`Purged printerId '${printerId}' file cache`);
   }
 
   purgeFile(printerId, filePath) {
@@ -107,16 +107,16 @@ class FileCache {
     const fileIndex = findFileIndex(fileList, filePath);
     if (fileIndex === -1) {
       // We can always choose to throw - if we trust the cache consistency
-      this.#logger.warning(
+      this.#logger.warn(
         `A file removal was ordered but this file was not found in files cache for printer Id ${printerId}`,
         filePath
       );
 
-      return this.#logger.info("File was not found in cached printer fileList");
+      return this.#logger.log("File was not found in cached printer fileList");
     }
 
     fileList.files.splice(fileIndex, 1);
-    this.#logger.info(`File ${filePath} was removed`);
+    this.#logger.log(`File ${filePath} was removed`);
   }
 }
 

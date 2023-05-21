@@ -16,7 +16,7 @@ class FloorStore {
     this.floors = await this.#floorService.list();
 
     if (!this.floors?.length) {
-      this.#logger.info("Creating default floor as non existed");
+      this.#logger.log("Creating default floor as non existed");
       const floor = await this.#floorService.createDefaultFloor();
       this.floors.push(floor);
     }

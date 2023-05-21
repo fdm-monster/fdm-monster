@@ -18,7 +18,7 @@ const DITokens = {
   printCompletionService: "printCompletionService",
   floorService: "floorService",
   yamlService: "yamlService",
-  serverSettingsService: "serverSettingsService",
+  settingsService: "settingsService",
   serverReleaseService: "serverReleaseService",
   monsterPiService: "monsterPiService",
   serverUpdateService: "serverUpdateService",

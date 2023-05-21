@@ -51,7 +51,6 @@ class FilesStore {
     });
 
     await this.updatePrinterFiles(printerId, response.data);
-
     return response;
   }
 
@@ -85,7 +84,7 @@ class FilesStore {
       }
     }
 
-    this.#logger.info(
+    this.#logger.log(
       `Deleted ${succeededFiles.length} successfully and ${failedFiles.length} with failure for printer ${printerName}.`
     );
     return {
@@ -97,28 +96,28 @@ class FilesStore {
   async purgePrinterFiles(printerId) {
     const printerState = this.#printerStore.getPrinterState(printerId);
 
-    this.#logger.info(`Purging files from printer ${printerId}`);
+    this.#logger.log(`Purging files from printer ${printerId}`);
     await this.#printerFilesService.clearFiles(printerState.id);
 
-    this.#logger.info(`Purging file cache from printer ${printerId}`);
+    this.#logger.log(`Purging file cache from printer ${printerId}`);
     this.#fileCache.purgePrinterId(printerState.id);
 
-    this.#logger.info(`Clearing printer files successful.`);
+    this.#logger.log(`Clearing printer files successful.`);
   }
 
   async purgeFiles() {
     const allPrinters = this.#printerStore.listPrinterStates(true);
 
-    this.#logger.info(`Purging files from ${allPrinters.length} printers`);
+    this.#logger.log(`Purging files from ${allPrinters.length} printers`);
     for (let printer of allPrinters) {
       await this.#printerFilesService.clearFiles(printer.id);
     }
 
-    this.#logger.info(`Purging files done. Clearing caches`);
+    this.#logger.log(`Purging files done. Clearing caches`);
     for (let printer of allPrinters) {
       this.#fileCache.purgePrinterId(printer.id);
     }
-    this.#logger.info(`Clearing caches successful.`);
+    this.#logger.log(`Clearing caches successful.`);
   }
 
   async updatePrinterFiles(printerId, files) {

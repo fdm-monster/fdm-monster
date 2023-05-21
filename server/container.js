@@ -6,7 +6,7 @@ const SimpleGitFactory = require("simple-git");
 const { Octokit } = require("octokit");
 const PrinterService = require("./services/printer.service");
 const SettingsStore = require("./state/settings.store");
-const ServerSettingsService = require("./services/settings.service");
+const { SettingsService } = require("./services/settings.service");
 const ServerReleaseService = require("./services/server-release.service");
 const TaskManagerService = require("./services/task-manager.service");
 const ServerUpdateService = require("./services/server-update.service");
@@ -73,7 +73,7 @@ function configureContainer() {
     // -- asClass --
     [DITokens.serverHost]: asClass(ServerHost).singleton(),
     [DITokens.settingsStore]: asClass(SettingsStore).singleton(),
-    [DITokens.serverSettingsService]: asClass(ServerSettingsService),
+    [DITokens.settingsService]: asClass(SettingsService),
     [DITokens.configService]: asClass(ConfigService),
     [DITokens.userService]: asClass(UserService),
     [DITokens.roleService]: asClass(RoleService).singleton(), // caches roles

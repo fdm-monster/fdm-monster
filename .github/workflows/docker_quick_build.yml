@@ -21,6 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     name: "Docker build"
     steps:
+      - uses: actions/checkout@v3
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
@@ -33,6 +34,13 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions
+      - name: get-server-version
+        working-directory: server
+        # https://gist.github.com/DarrenN/8c6a5b969481725a4413?permalink_comment_id=3863317#gistcomment-3863317
+        run: |
+          echo "SERVER_VERSION=$(npm pkg get version | sed 's/"//g')" >> $GITHUB_ENV
+
       # New intended logic
       # if branch is develop => push to dockerhub with tag 'develop'
       # if branch is main => push to dockerhub with tag 'main'
@@ -42,9 +50,9 @@ jobs:
         uses: HackerHappyHour/tagging-strategy@v3
         with:
           image_name: davidzwa/fdm-monster
-          tag_name: ${{ github.ref }}
+          tag_name: ${{ env.SERVER_VERSION }}-${{ github.run_number }}
           tags: |
-            %X%
+            %X.Y.Z%
           extra_tags: |
             main::${{ github.ref == 'refs/heads/main' || github.event.pull_request.base.ref == 'main' }}
             develop::${{ github.ref == 'refs/heads/develop' || github.event.pull_request.base.ref == 'develop' }}

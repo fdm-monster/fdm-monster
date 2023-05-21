@@ -60,7 +60,7 @@ class PrinterSocketIoTask {
     if (this.#aggregateSizeCounter >= this.#aggregateWindowLength) {
       const summedPayloadSize = this.#aggregateSizes.reduce((t, n) => (t += n));
       const averagePayloadSize = summedPayloadSize / 1000 / this.#aggregateWindowLength;
-      this.#logger.info(
+      this.#logger.log(
         `Printer SocketIO metrics ${averagePayloadSize.toFixed(this.#rounding)} kB [${this.#aggregateWindowLength} TX avg].`
       );
       this.#aggregateSizeCounter = 0;

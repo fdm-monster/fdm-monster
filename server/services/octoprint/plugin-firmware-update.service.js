@@ -58,7 +58,7 @@ class PluginFirmwareUpdateService extends PluginBaseService {
     if (!this.#prusaFirmwareReleases?.length) return [];
 
     this.#latestFirmware = this.#prusaFirmwareReleases[0];
-    this._logger.info(
+    this._logger.log(
       `Plugin Cache filled with ${this.#prusaFirmwareReleases?.length || "?"} firmware releases`,
       {
         url: this.#latestFirmware.url,
@@ -82,13 +82,13 @@ class PluginFirmwareUpdateService extends PluginBaseService {
     const firmwareAsset = latestFirmware.assets.find((asset) => asset.name.includes("MK3S_MK3S+"));
     const downloadUrl = firmwareAsset.browser_download_url;
     const downloadName = firmwareAsset.name;
-    this._logger.info(`Checking firmware ${downloadName}`);
+    this._logger.log(`Checking firmware ${downloadName}`);
     if (!this.#multerService.fileExists(downloadName, firmwareDownloadPath)) {
-      this._logger.info(`Downloading firmware from ${downloadUrl}`);
+      this._logger.log(`Downloading firmware from ${downloadUrl}`);
       await this.#multerService.downloadFile(downloadUrl, downloadName, firmwareDownloadPath);
-      this._logger.info(`Downloaded firmware ${downloadName}`);
+      this._logger.log(`Downloaded firmware ${downloadName}`);
     } else {
-      this._logger.info(`Found firmware ${downloadName}`);
+      this._logger.log(`Found firmware ${downloadName}`);
     }
   }
 

@@ -33,7 +33,7 @@ function ensureNodeEnvSet() {
   if (!environment || !AppConstants.knownEnvNames.includes(environment)) {
     const newEnvName = AppConstants.defaultProductionEnv;
     process.env[AppConstants.NODE_ENV_KEY] = newEnvName;
-    logger.warning(`NODE_ENV=${environment} was not set, or not known. Defaulting to NODE_ENV=${newEnvName}`);
+    logger.warn(`NODE_ENV=${environment} was not set, or not known. Defaulting to NODE_ENV=${newEnvName}`);
 
     // Avoid writing to .env in case of docker
     if (isDocker()) {
@@ -42,7 +42,7 @@ function ensureNodeEnvSet() {
 
     envUtils.writeVariableToEnvFile(path.resolve(dotEnvPath), AppConstants.NODE_ENV_KEY, newEnvName);
   } else {
-    logger.info(`✓ NODE_ENV variable correctly set (${environment})!`);
+    logger.log(`✓ NODE_ENV variable correctly set (${environment})!`);
   }
 }
 
@@ -54,7 +54,7 @@ function ensureEnvNpmVersionSet() {
   if (!process.env[AppConstants.VERSION_KEY]) {
     process.env[AppConstants.VERSION_KEY] = packageJsonVersion;
     process.env[AppConstants.NON_NPM_MODE_KEY] = "true";
-    logger.info(`✓ Running server version ${process.env[AppConstants.VERSION_KEY]} in non-NPM mode!`);
+    logger.log(`✓ Running server version ${process.env[AppConstants.VERSION_KEY]} in non-NPM mode!`);
   } else {
     logger.debug(`✓ Running server version ${process.env[AppConstants.VERSION_KEY]} in NPM mode!`);
   }
@@ -85,7 +85,7 @@ function setupPackageJsonVersionOrThrow() {
  * Print out instructions URL
  */
 function printInstructionsURL() {
-  logger.info(`Please make sure to read ${instructionsReferralURL} on how to configure your environment correctly.`);
+  logger.log(`Please make sure to read ${instructionsReferralURL} on how to configure your environment correctly.`);
 }
 
 function fetchMongoDBConnectionString(persistToEnv = false) {
@@ -114,7 +114,7 @@ function fetchServerPort() {
     // is not isDocker just to be sure, also checked in writeVariableToEnvFile
     if (!isDocker()) {
       envUtils.writeVariableToEnvFile(path.resolve(dotEnvPath), AppConstants.SERVER_PORT_KEY, AppConstants.defaultServerPort);
-      logger.info(`~ Written ${AppConstants.SERVER_PORT_KEY}=${AppConstants.defaultServerPort} setting to .env file.`);
+      logger.log(`~ Written ${AppConstants.SERVER_PORT_KEY}=${AppConstants.defaultServerPort} setting to .env file.`);
     }
 
     // Update config immediately
@@ -135,16 +135,16 @@ function ensureMongoDBConnectionStringSet() {
 
     fetchMongoDBConnectionString(persistDbString);
   } else {
-    logger.info(`✓ ${AppConstants.MONGO_KEY} environment variable set!`);
+    logger.log(`✓ ${AppConstants.MONGO_KEY} environment variable set!`);
   }
 }
 
 function setupSentry() {
   const sentryEnabled = getEnvOrDefault(AppConstants.sentryEnabledToken, AppConstants.sentryEnabledDefault) === "true";
   if (sentryEnabled) {
-    logger.warning("Sentry is enabled. You can change this by setting 'SENTRY_ENABLED=false'");
+    logger.warn("Sentry is enabled. You can change this by setting 'SENTRY_ENABLED=false'");
   } else if (isEnvProd()) {
-    logger.warning("Sentry is disabled. You can change this by setting 'SENTRY_ENABLED=true'");
+    logger.warn("Sentry is disabled. You can change this by setting 'SENTRY_ENABLED=true'");
   }
 
   const sentryDsnToken = getEnvOrDefault(AppConstants.sentryCustomDsnToken, AppConstants.sentryCustomDsnDefault);
@@ -172,7 +172,7 @@ function ensurePortSet() {
   fetchServerPort();
 
   if (!process.env[AppConstants.SERVER_PORT_KEY]) {
-    logger.info(
+    logger.log(
       `~ ${AppConstants.SERVER_PORT_KEY} environment variable is not set. Assuming default: ${AppConstants.SERVER_PORT_KEY}=${AppConstants.defaultServerPort}.`
     );
     printInstructionsURL();
@@ -188,7 +188,7 @@ function setupEnvConfig(skipDotEnv = false) {
   if (!skipDotEnv) {
     // This needs to be CWD of app.js, so be careful not to move this call.
     dotenv.config({ path: dotEnvPath });
-    logger.info("✓ Parsed environment and (optional) .env file");
+    logger.log("✓ Parsed environment and (optional) .env file");
   }
 
   ensureNodeEnvSet();
@@ -210,18 +210,18 @@ async function runMigrations(db, client) {
   const pendingMigrations = migrationsStatus.filter((m) => m.appliedAt === "PENDING");
 
   if (pendingMigrations.length) {
-    logger.info(
+    logger.log(
       `! MongoDB has ${pendingMigrations.length} migrations left to run (${migrationsStatus.length} migrations in total)`
     );
   } else {
-    logger.info(`✓ Mongo Database is up to date [${migrationsStatus.length} migration applied]`);
+    logger.log(`✓ Mongo Database is up to date [${migrationsStatus.length} migration applied]`);
   }
 
   const migrationResult = await up(db, client);
   if (migrationResult > 0) {
-    logger.info(`Applied ${migrationResult.length} migrations successfully`, migrationResult);
+    logger.log(`Applied ${migrationResult.length} migrations successfully`, migrationResult);
   } else {
-    logger.info("No migrations were run");
+    logger.log("No migrations were run");
   }
 }
 

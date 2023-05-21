@@ -13,6 +13,9 @@ class PrinterStore {
 
   #printerStates;
   #testPrinterState;
+  /**
+   * @type {LoggerService}
+   */
   #logger;
 
   constructor({ printerStateFactory, eventEmitter2, printerService, loggerFactory }) {
@@ -138,7 +141,7 @@ class PrinterStore {
       }
     }
 
-    this.#logger.info(`Loaded ${this.#printerStates.length} printer states`);
+    this.#logger.log(`Loaded ${this.#printerStates.length} printer states`);
   }
 
   async deleteTestPrinter() {
@@ -206,12 +209,12 @@ class PrinterStore {
   async batchImport(printers) {
     if (!printers?.length) return [];
 
-    this.#logger.info(`Validating ${printers.length} printer objects`);
+    this.#logger.log(`Validating ${printers.length} printer objects`);
     for (let printer of printers) {
       await this.#printerService.validateAndDefault(printer);
     }
 
-    this.#logger.info(`Validation passed. Adding ${printers.length} printers`);
+    this.#logger.log(`Validation passed. Adding ${printers.length} printers`);
 
     // We've passed validation completely - creation will likely succeed
     const states = [];
@@ -220,7 +223,7 @@ class PrinterStore {
       states.push(newState.toFlat());
     }
 
-    this.#logger.info(`Creation succeeded. Added ${printers.length} printers`);
+    this.#logger.log(`Creation succeeded. Added ${printers.length} printers`);
     return states;
   }
 
@@ -228,7 +231,7 @@ class PrinterStore {
     this._validateState();
 
     const newPrinterDoc = await this.#printerService.create(printer);
-    this.#logger.info(`Saved new Printer: ${newPrinterDoc.printerURL} with ID ${newPrinterDoc._id}`);
+    this.#logger.log(`Saved new Printer: ${newPrinterDoc.printerURL} with ID ${newPrinterDoc._id}`);
 
     const newPrinterState = await this.#printerStateFactory.create(newPrinterDoc);
     this.#printerStates.push(newPrinterState);
@@ -247,7 +250,7 @@ class PrinterStore {
     this._validateState();
 
     const updatedDoc = await this.#printerService.update(printerId, printer);
-    this.#logger.info(`Updated Printer: ${updatedDoc.printerURL} with ID ${updatedDoc._id}`);
+    this.#logger.log(`Updated Printer: ${updatedDoc.printerURL} with ID ${updatedDoc._id}`);
 
     const updatedPrinterState = await this.getPrinterState(printerId);
     updatedPrinterState.updateEntityData(updatedDoc, true);
@@ -266,7 +269,7 @@ class PrinterStore {
     validatedData.enabled = true;
 
     const newPrinterDoc = { _doc: validatedData };
-    this.#logger.info(`Stored test Printer: ${validatedData.printerURL} with ID ${validatedData.correlationToken}`);
+    this.#logger.log(`Stored test Printer: ${validatedData.printerURL} with ID ${validatedData.correlationToken}`);
 
     const newPrinterState = await this.#printerStateFactory.create(newPrinterDoc, true);
     if (this.#testPrinterState) {

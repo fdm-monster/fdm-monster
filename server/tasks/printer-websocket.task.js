@@ -7,10 +7,22 @@ const { isLoginResponseGlobal } = require("../services/octoprint/constants/octop
 
 class PrinterWebsocketTask {
   #printerStore;
+  /**
+   * @type {SettingsStore}
+   */
   #settingsStore;
+  /**
+   * @type {OctoPrintApiService}
+   */
   #octoPrintService;
+  /**
+   * @type {TaskManagerService}
+   */
   #taskManagerService;
 
+  /**
+   * @type {LoggerService}
+   */
   #logger;
 
   #errorMaxThrows = 3;
@@ -59,7 +71,7 @@ class PrinterWebsocketTask {
 
     const duration = Date.now() - startTime;
     if (newPrinterStates.length !== printerStates.length) {
-      this.#logger.info(
+      this.#logger.log(
         `Attempted websocket connections taking ${duration}ms. ${newPrinterStates.length} adapters need retry (before: ${printerStates.length}).`
       );
     }
@@ -67,7 +79,7 @@ class PrinterWebsocketTask {
     // Continue with delegate tasks
     const taskName = DITokens.printerSystemTask;
     if (this.#taskManagerService.isTaskDisabled(taskName)) {
-      this.#logger.info(`Triggered conditional task '${taskName}' to run`);
+      this.#logger.log(`Triggered conditional task '${taskName}' to run`);
       this.#taskManagerService.scheduleDisabledJob(taskName);
     }
   }

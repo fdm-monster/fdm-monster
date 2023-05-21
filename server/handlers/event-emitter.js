@@ -18,7 +18,7 @@ function configureEventEmitter() {
     maxListeners: 10,
 
     // show event name in memory leak message when more than maximum amount of listeners is assigned
-    verboseMemoryLeak: false,
+    verboseMemoryLeak: true,
 
     // disable throwing uncaughtException if an error event is emitted and it has no listeners
     ignoreErrors: false,

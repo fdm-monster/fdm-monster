@@ -28,7 +28,7 @@ class ClientBundleService {
   async downloadBundle() {
     if (this.configService.get(AppConstants.GITHUB_PAT)?.length) {
       await this.octokit.rest.users.getAuthenticated();
-      this.logger.info("Successfully authenticated to github using PersonalAccessToken (PAT)");
+      this.logger.log("Successfully authenticated to github using PersonalAccessToken (PAT)");
     }
 
     const owner = AppConstants.clientOrgName;
@@ -58,7 +58,7 @@ class ClientBundleService {
     const releaseTag = release.tag_name;
     const needsBundleDownload = this.checkClientUpdatable(releaseTag);
     if (!needsBundleDownload) {
-      this.logger.info(`Client bundle version is up to date with ${releaseTag}`);
+      this.logger.log(`Client bundle version is up to date with ${releaseTag}`);
       return;
     }
 
@@ -76,7 +76,7 @@ class ClientBundleService {
     // Store ZIP file in media zips folder
     const zipPath = join(superRootPath(), AppConstants.defaultClientBundleZipsStorage);
     ensureDirExists(zipPath);
-    this.logger.info(`Downloaded client bundle release ZIP to '${zipPath}'. Extracting ZIP archive now`);
+    this.logger.log(`Downloaded client bundle release ZIP to '${zipPath}'. Extracting ZIP archive now`);
     const path = join(zipPath, asset.name);
     writeFileSync(path, Buffer.from(attachmentResult.data));
 
@@ -93,7 +93,7 @@ class ClientBundleService {
     } catch (e) {
       this.logger.error(`Unzipping failed to complete ${e.message} ${e.stack}`);
     }
-    this.logger.info(`Successfully extracted client bundle to ${clientBundlePath}`);
+    this.logger.log(`Successfully extracted client bundle to ${clientBundlePath}`);
   }
 
   checkClientUpdatable(latestReleaseTag) {

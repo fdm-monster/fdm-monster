@@ -1,10 +1,31 @@
 name: Docker release
 on:
   push:
-    tags:
-      - '*'
+    branches:
+      - 'main'
 jobs:
+  checkversion:
+    runs-on: ubuntu-latest
+    outputs:
+      foundServerVersion: ${{ steps.init.outputs.foundServerVersion }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: get-client-version
+        working-directory: server
+        # https://gist.github.com/DarrenN/8c6a5b969481725a4413?permalink_comment_id=3863317#gistcomment-3863317
+        run: |
+          echo "SERVER_VERSION=$(npm pkg get version | sed 's/"//g')" >> $GITHUB_ENV
+      - uses: mukunku/tag-exists-action@v1.2.0
+        id: checkTag
+        with:
+          tag: ${{ env.SERVER_VERSION }}
+      - run: echo ${{ steps.checkTag.outputs.exists }}
+      - name: Environment variables to output
+        id: init
+        run: |
+          echo "foundServerVersion=${{ steps.checkTag.outputs.exists }}" >> $GITHUB_OUTPUT
   meta:
+    needs: [ checkversion ]
     runs-on: ubuntu-latest
     outputs:
       labels: ${{ steps.metadata.outputs.labels }}
@@ -15,10 +36,12 @@ jobs:
           images: davidzwa/fdm-monster
 
   docker:
-    needs: [ meta ]
+    needs: [ meta, checkversion ]
+    if: needs.checkversion.outputs.foundServerVersion == 'false'
     runs-on: ubuntu-latest
     name: "Docker build"
     steps:
+      - uses: actions/checkout@v3
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
@@ -31,6 +54,13 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions
+      - name: get-server-version
+        working-directory: server
+        # https://gist.github.com/DarrenN/8c6a5b969481725a4413?permalink_comment_id=3863317#gistcomment-3863317
+        run: |
+          echo "SERVER_VERSION=$(npm pkg get version | sed 's/"//g')" >> $GITHUB_ENV
+
       # New intended logic
       # if tag is a release tag, then build and push to dockerhub with that tag
       # if tag then XYZ, if the tag does not contain rc or unstable then X and XY tags
@@ -41,13 +71,13 @@ jobs:
         uses: HackerHappyHour/tagging-strategy@v3
         with:
           image_name: davidzwa/fdm-monster
-          tag_name: ${{ github.ref }}
+          tag_name: ${{ env.SERVER_VERSION }}
           tags: |
-            %X%::${{ github.ref_type == 'tag' && !contains(github.ref_slug, 'rc') && !contains(github.ref_slug, 'unstable') }}
-            %X.Y%::${{ github.ref_type == 'tag' && !contains(github.ref_slug, 'rc') && !contains(github.ref_slug, 'unstable') }}
-            %X.Y.Z%::${{ github.ref_type == 'tag' }}
+            %X%::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
+            %X.Y%::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
+            %X.Y.Z%
           extra_tags: |
-            latest::${{ github.ref_type == 'tag' && !contains(github.ref_slug, 'rc') && !contains(github.ref_slug, 'unstable') }}
+            latest::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
 
       # Show docker tags to be (conditionally) pushed
       - name: "Show docker tags"
