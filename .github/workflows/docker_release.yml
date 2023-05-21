@@ -1,10 +1,32 @@
 name: Docker release
 on:
   push:
-    tags:
-      - '*'
+    branches:
+      - 'main'
+      - 'develop'
 jobs:
+  checkversion:
+    runs-on: ubuntu-latest
+    outputs:
+      foundServerVersion: ${{ steps.init.outputs.foundServerVersion }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: get-client-version
+        working-directory: server
+        # https://gist.github.com/DarrenN/8c6a5b969481725a4413?permalink_comment_id=3863317#gistcomment-3863317
+        run: |
+          echo "SERVER_VERSION=$(npm pkg get version | sed 's/"//g')" >> $GITHUB_ENV
+      - uses: mukunku/tag-exists-action@v1.2.0
+        id: checkTag
+        with:
+          tag: ${{ env.SERVER_VERSION }}
+      - run: echo ${{ steps.checkTag.outputs.exists }}
+      - name: Environment variables to output
+        id: init
+        run: |
+          echo "foundServerVersion=${{ steps.checkTag.outputs.exists }}" >> $GITHUB_OUTPUT
   meta:
+    needs: [ checkversion ]
     runs-on: ubuntu-latest
     outputs:
       labels: ${{ steps.metadata.outputs.labels }}
@@ -15,7 +37,8 @@ jobs:
           images: davidzwa/fdm-monster
 
   docker:
-    needs: [ meta ]
+    needs: [ meta, checkversion ]
+    if: needs.checkversion.outputs.foundServerVersion == 'false'
     runs-on: ubuntu-latest
     name: "Docker build"
     steps:
