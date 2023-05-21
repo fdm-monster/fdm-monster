@@ -49,7 +49,7 @@ jobs:
         uses: HackerHappyHour/tagging-strategy@v3
         with:
           image_name: davidzwa/fdm-monster
-          tag_name: ${{ env.SERVER_VERSION + '-' + github.run_number }}
+          tag_name: ${{ env.SERVER_VERSION }}-${{ github.run_number }}
           tags: |
             %X.Y.Z%
           extra_tags: |
