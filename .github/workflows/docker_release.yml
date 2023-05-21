@@ -54,6 +54,13 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions
+      - name: get-server-version
+        working-directory: server
+        # https://gist.github.com/DarrenN/8c6a5b969481725a4413?permalink_comment_id=3863317#gistcomment-3863317
+        run: |
+          echo "SERVER_VERSION=$(npm pkg get version | sed 's/"//g')" >> $GITHUB_ENV
+
       # New intended logic
       # if tag is a release tag, then build and push to dockerhub with that tag
       # if tag then XYZ, if the tag does not contain rc or unstable then X and XY tags
@@ -64,13 +71,13 @@ jobs:
         uses: HackerHappyHour/tagging-strategy@v3
         with:
           image_name: davidzwa/fdm-monster
-          tag_name: ${{ github.ref }}
+          tag_name: ${{ env.SERVER_VERSION }}
           tags: |
-            %X%::${{ github.ref_type == 'tag' && !contains(github.ref_slug, 'rc') && !contains(github.ref_slug, 'unstable') }}
-            %X.Y%::${{ github.ref_type == 'tag' && !contains(github.ref_slug, 'rc') && !contains(github.ref_slug, 'unstable') }}
-            %X.Y.Z%::${{ github.ref_type == 'tag' }}
+            %X%::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
+            %X.Y%::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
+            %X.Y.Z%
           extra_tags: |
-            latest::${{ github.ref_type == 'tag' && !contains(github.ref_slug, 'rc') && !contains(github.ref_slug, 'unstable') }}
+            latest::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
 
       # Show docker tags to be (conditionally) pushed
       - name: "Show docker tags"
