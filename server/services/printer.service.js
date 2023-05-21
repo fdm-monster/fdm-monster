@@ -96,6 +96,16 @@ class PrinterService {
     return printer;
   }
 
+  async updateLastPrintedFile(printerId, lastPrintedFile) {
+    const update = { lastPrintedFile };
+    await this.get(printerId);
+    const printer = await Printer.findByIdAndUpdate(printerId, update, {
+      new: true,
+      useFindAndModify: false,
+    });
+    return printer;
+  }
+
   async updateFlowRate(printerId, flowRate) {
     const update = { flowRate };
     await this.get(printerId);
