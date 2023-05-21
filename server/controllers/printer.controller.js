@@ -27,6 +27,9 @@ class PrinterController {
   #pluginRepositoryCache;
   floorStore;
 
+  /**
+   * @type {LoggerService}
+   */
   #logger;
 
   constructor({ printerStore, taskManagerService, loggerFactory, octoPrintApiService, pluginRepositoryCache, floorStore }) {
@@ -94,7 +97,7 @@ class PrinterController {
     // As we dont generate a _id we generate a correlation token
     newPrinter.correlationToken = generateCorrelationToken();
 
-    this.#logger.info(`Testing printer with correlation token ${newPrinter.correlationToken}`);
+    this.#logger.log(`Testing printer with correlation token ${newPrinter.correlationToken}`);
 
     // Add printer with test=true
     const printerState = await this.#printerStore.setupTestPrinter(newPrinter);
@@ -123,7 +126,7 @@ class PrinterController {
     // Has internal validation, but might add some here above as well
     const printerState = await this.#printerStore.addPrinter(newPrinter);
 
-    this.#logger.info(`Created printer with ID ${printerState.id || printerState.correlationToken}`);
+    this.#logger.log(`Created printer with ID ${printerState.id || printerState.correlationToken}`);
 
     res.send(printerState.toFlat());
   }
@@ -214,7 +217,7 @@ class PrinterController {
   async reconnectOctoPrint(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
 
-    this.#logger.info("Refreshing OctoPrint API connection", currentPrinterId);
+    this.#logger.log("Refreshing OctoPrint API connection", currentPrinterId);
     this.#printerStore.reconnectOctoPrint(currentPrinterId);
 
     res.send({});

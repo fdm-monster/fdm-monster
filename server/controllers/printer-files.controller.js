@@ -49,6 +49,9 @@ class PrinterFilesController {
    */
   #printerFileCleanTask;
 
+  /**
+   * @type {LoggerService}
+   */
   #logger;
 
   constructor({

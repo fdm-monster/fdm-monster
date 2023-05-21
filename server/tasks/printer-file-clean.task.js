@@ -10,7 +10,7 @@ class PrinterFileCleanTask {
    * @type {FilesStore}
    */
   filesStore;
-  #octoPrintApiService;
+  #printerStore;
   /**
    * @type {SettingsStore}
    */
