@@ -1,0 +1,17 @@
+/.github
+/.idea
+.git
+.env
+.gitignore
+*.md
+*.txt
+*.env
+*.env.*
+/.build
+/.cache
+Makefile
+node_modules
+
+tools
+media
+logs

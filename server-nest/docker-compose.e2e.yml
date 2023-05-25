@@ -1,0 +1,23 @@
+version: "3.8"
+services:
+  db:
+    image: postgres:15.3-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5433:5432'
+    volumes:
+      - db:/var/lib/postgresql/data
+  fdm-monster-e2e:
+    build:
+      context: .
+      dockerfile: ./test/docker-e2e/e2e.Dockerfile
+    depends_on:
+      - db
+    environment:
+      POSTGRES_DATABASE_URL: postgres://postgres:postgres@db:5432/test
+volumes:
+  db:
+    driver: local

@@ -1,0 +1,35 @@
+{
+  "extends": ["config:base"],
+  "assignees": ["davidzwa"],
+  "labels": ["renovate"],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "extends": ["schedule:daily"]
+  },
+  "packageRules": [
+    {
+      "matchDatasources": ["docker"],
+      "matchUpdateTypes": ["major"],
+      "matchPackageNames": ["node"],
+      "enabled": false
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchUpdateTypes": ["minor", "patch", "bump", "digest", "rollback"],
+      "enabled": true
+    },
+    {
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest", "lockFileMaintenance"],
+      "enabled": true,
+      "automerge": true
+    },
+    {
+      "matchPackagePatterns": [
+        "@nestjs/*"
+      ],
+      "groupName": "nestjs",
+      "enabled": true,
+      "automerge": false
+    }
+  ]
+}
