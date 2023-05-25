@@ -2,6 +2,7 @@ const winston = require("winston");
 const { AppConstants } = require("../server.constants");
 const { superRootPath } = require("../utils/fs.utils");
 const { join } = require("path");
+const { DateTime } = require("luxon");
 
 const dtFormat = new Intl.DateTimeFormat("en-GB", {
   timeStyle: "medium",
@@ -22,6 +23,7 @@ class LoggerService {
       logFilterLevel = isProd || isTest ? "warn" : "info";
     }
 
+    const date = DateTime.now().toISODate();
     this.name = name;
     this.logger = winston.createLogger({
       transports: [
@@ -32,7 +34,11 @@ class LoggerService {
           ? [
               new winston.transports.File({
                 level: isTest ? "warn" : "info", // Irrespective of environment
-                filename: join(superRootPath(), AppConstants.defaultFileStorageFolder, `logs/${name}.log`),
+                filename: join(
+                  superRootPath(),
+                  AppConstants.defaultFileStorageFolder,
+                  `logs/${AppConstants.logAppName}-${date}.log`
+                ),
                 maxsize: "5000000",
                 maxFiles: 5,
               }),
