@@ -63,7 +63,7 @@ jobs:
           draft: ${{ github.ref_name == 'develop' }}
           prerelease: ${{ github.ref_name != 'main' }}
           tag_name: ${{ env.RELEASE_TAG }}
-          release_name: ${{ env.RELEASE_TAG }} Speedy Rabbit Unstable 🐰
+          release_name: ${{ env.RELEASE_TAG }} Tasmanian Devil Unstable 🐀
           body: "Release notes not added" # ${{ steps.build_changelog.outputs.changelog }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
