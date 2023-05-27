@@ -6,6 +6,7 @@ const AppConstants = {
   MONGO_KEY: "MONGO",
 
   pm2ServiceName: "FDM",
+  logAppName: "fdm-monster",
 
   // @Deprecated: old storage path
   defaultFileStorageFolder: "./media",
