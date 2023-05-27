@@ -1417,12 +1417,12 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@octokit/app@^13.1.3":
-  version "13.1.4"
-  resolved "https://registry.yarnpkg.com/@octokit/app/-/app-13.1.4.tgz#6a8f9ce466d3051064f1adea8ba5a1faca48cb19"
-  integrity sha512-DOssIBopEpXemC1VgQ8hFAU5FP+Mo0CCRjg5Rc7mahwSvqUp0c/AFPpOuSVP9eX2bO03EOVkdmAVqLp77m8CzA==
+"@octokit/app@^13.1.5":
+  version "13.1.5"
+  resolved "https://registry.yarnpkg.com/@octokit/app/-/app-13.1.5.tgz#5602fd5c893ecf00e4e9bcbd917e1376544b7386"
+  integrity sha512-6qTa24S+gdQUU66SCVfqTkyt2jAr9/ZeyPqJhnNI9PZ8Wum4lQy3bPS+voGlxABNOlzRKnxbSdYKoraMr3MqBA==
   dependencies:
-    "@octokit/auth-app" "^4.0.8"
+    "@octokit/auth-app" "^4.0.13"
     "@octokit/auth-unauthenticated" "^3.0.0"
     "@octokit/core" "^4.0.0"
     "@octokit/oauth-app" "^4.0.7"
@@ -1430,7 +1430,7 @@
     "@octokit/types" "^9.0.0"
     "@octokit/webhooks" "^10.0.0"
 
-"@octokit/auth-app@^4.0.8":
+"@octokit/auth-app@^4.0.13":
   version "4.0.13"
   resolved "https://registry.yarnpkg.com/@octokit/auth-app/-/auth-app-4.0.13.tgz#53323bee6bfefbb73ea544dd8e6a0144550e13e3"
   integrity sha512-NBQkmR/Zsc+8fWcVIFrwDgNXS7f4XDrkd9LHdi9DPQw1NdGHLviLzRO2ZBwTtepnwHXW5VTrVU9eFGijMUqllg==
@@ -5137,12 +5137,12 @@ object.values@^1.1.6:
     define-properties "^1.1.4"
     es-abstract "^1.20.4"
 
-octokit@2.0.18:
-  version "2.0.18"
-  resolved "https://registry.yarnpkg.com/octokit/-/octokit-2.0.18.tgz#38248db68972019c52aa2e2f8e61413514c44291"
-  integrity sha512-IR3l4RRBS7MSgMt8qngLt7URChtu1zf5MEb9SYa7Flw+jwwm7Ya4JQJ6leh/S5v1J0RV1Phmj3p+SH+jMCSrjw==
+octokit@2.0.19:
+  version "2.0.19"
+  resolved "https://registry.yarnpkg.com/octokit/-/octokit-2.0.19.tgz#924ede002302f965c2399eb582f23ee8c74660ba"
+  integrity sha512-hSloK4MK78QGbAuBrtIir0bsxMoRVZE5CkwKSbSRH9lqv2hx9EwhCxtPqEF+BtHqLXkXdfUaGkJMyMBotYno+A==
   dependencies:
-    "@octokit/app" "^13.1.3"
+    "@octokit/app" "^13.1.5"
     "@octokit/core" "^4.2.1"
     "@octokit/oauth-app" "^4.2.1"
     "@octokit/plugin-paginate-rest" "^6.1.0"
