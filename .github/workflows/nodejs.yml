@@ -28,3 +28,12 @@ jobs:
         with:
           flags: server-nodejs
           dry_run: ${{ matrix.node-version != '16.x' }}
+
+      - name: get-server-version
+        working-directory: server
+        run: |
+          echo "SERVER_VERSION=$(npm pkg get version | sed 's/"//g')" >> $GITHUB_ENV
+
+      - name: set-tag
+        run: |
+          echo "RELEASE_TAG=${{ github.ref_name == 'develop' && '${{ env.SERVER_VERSION }}-'${{ github.run_number }} || env.SERVER_VERSION }}" >> $GITHUB_ENV
