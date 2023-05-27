@@ -45,7 +45,7 @@ jobs:
 
       - name: set-tag
         run: |
-          echo "RELEASE_TAG=${{ github.ref_name == 'develop' && '${{ env.SERVER_VERSION }}-'${{ github.run_number }} || env.SERVER_VERSION }}" >> $GITHUB_ENV
+          echo "RELEASE_TAG=${{ github.ref_name == 'develop' && ${{ env.SERVER_VERSION }}'-'${{ github.run_number }} || env.SERVER_VERSION }}" >> $GITHUB_ENV
 
       - name: Create release
         uses: actions/create-release@v1
