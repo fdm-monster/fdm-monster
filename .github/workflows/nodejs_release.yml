@@ -45,10 +45,10 @@ jobs:
 
       - name: set-tag
         run: |
-          if [ "${{ github.ref_name }}" = "develop" ]; then
-            RELEASE_TAG="${{ env.SERVER_VERSION }}-${{ github.run_number }}"
-          else
+          if [ "${{ github.ref_name }}" = "main" ]; then
             RELEASE_TAG="${{ env.SERVER_VERSION }}"
+          else
+            RELEASE_TAG="${{ env.SERVER_VERSION }}-${{ github.ref_name }}-${{ github.run_number }}"
           fi
           echo "RELEASE_TAG=${RELEASE_TAG}" >> $GITHUB_ENV
 
