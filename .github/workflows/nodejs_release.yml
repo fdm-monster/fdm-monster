@@ -43,14 +43,27 @@ jobs:
         run: |
           echo "SERVER_VERSION=$(npm pkg get version | sed 's/"//g')" >> $GITHUB_ENV
 
+      - name: set-tag
+        run: |
+          if [ "${{ github.ref_name }}" = "main" ]; then
+            RELEASE_TAG="${{ env.SERVER_VERSION }}"
+          else
+            RELEASE_TAG="${{ env.SERVER_VERSION }}-${{ github.run_number }}"
+          fi
+          echo "RELEASE_TAG=${RELEASE_TAG}" >> $GITHUB_ENV
+
+      - name: print-tag
+        run: |
+          echo ${{ env.RELEASE_TAG }}
+
       - name: Create release
         uses: actions/create-release@v1
         id: create_release
         with:
           draft: ${{ github.ref_name == 'develop' }}
           prerelease: ${{ github.ref_name != 'main' }}
-          release_name: "${{ github.ref_name == 'develop' && join(['${{ env.SERVER_VERSION }}', '${{ github.run_number }}'], '-') || env.SERVER_VERSION }} Speedy Rabbit Unstable 🐰"
-          tag_name: ${{ github.ref_name == 'develop' && join(['${{ env.SERVER_VERSION }}', '${{ github.run_number }}'], '-') || env.SERVER_VERSION }}
+          tag_name: ${{ env.RELEASE_TAG }}
+          release_name: ${{ env.RELEASE_TAG }} Speedy Rabbit Unstable 🐰
           body: "Release notes not added" # ${{ steps.build_changelog.outputs.changelog }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
