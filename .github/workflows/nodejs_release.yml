@@ -48,9 +48,13 @@ jobs:
           if [ "${{ github.ref_name }}" = "main" ]; then
             RELEASE_TAG="${{ env.SERVER_VERSION }}"
           else
-            RELEASE_TAG="${{ env.SERVER_VERSION }}-${{ github.run_id }}"
+            RELEASE_TAG="${{ env.SERVER_VERSION }}-${{ github.run_number }}"
           fi
           echo "RELEASE_TAG=${RELEASE_TAG}" >> $GITHUB_ENV
+
+      - name: print-tag
+        run: |
+          echo ${{ env.RELEASE_TAG }}
 
       - name: Create release
         uses: actions/create-release@v1
