@@ -35,7 +35,7 @@ describe("ServerPrivateController", () => {
     const response = await request.get(defaultRoute).send();
     expectOkResponse(response, {
       includingPrerelease: false,
-      airGapped: true,
+      airGapped: false,
       latestRelease: null,
       installedRelease: null,
       serverVersion: process.env.npm_package_version,
