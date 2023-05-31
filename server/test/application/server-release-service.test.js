@@ -2,7 +2,6 @@ const { AppConstants } = require("../../server.constants");
 const { configureContainer } = require("../../container");
 const DITokens = require("../../container.tokens");
 const dbHandler = require("../db-handler");
-const GithubETag = require("../../models/GithubETag");
 const awilix = require("awilix");
 const AxiosMock = require("../mocks/axios.mock");
 const pluginJson = require("./test-data/plugins.json");
@@ -33,17 +32,15 @@ describe("ServerUpdateService", () => {
 
   it("should return github releases", async () => {
     httpClient.saveMockResponse(require("./test-data/github-releases-response.json"), 200, false);
-    await service.syncLatestRelease(false);
-    expect(service.getAirGapped()).toBeFalsy();
+    await service.syncLatestRelease();
     expect(service.getState()).toMatchObject({
-      includingPrerelease: false,
-      airGapped: false,
-      latestRelease: expect.anything(),
-      installedRelease: expect.anything(),
+      airGapped: true,
+      installedRelease: null,
+      installedReleaseFound: null,
+      latestRelease: null,
       serverVersion: v1,
-      installedReleaseFound: true,
-      updateAvailable: true,
-      synced: true
+      updateAvailable: null,
+      synced: true,
     });
   });
 

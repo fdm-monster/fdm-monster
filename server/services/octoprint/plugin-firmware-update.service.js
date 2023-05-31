@@ -42,7 +42,8 @@ class PluginFirmwareUpdateService extends PluginBaseService {
 
   async queryGithubPrusaFirmwareReleasesCache() {
     try {
-      this.#prusaFirmwareReleases = await this.githubService.getReleases(defaultRepos.prusaFirmare, false);
+      const response = await this.githubService.getReleases(defaultRepos.prusaFirmwareOwner, defaultRepos.prusaFirmwareRepo);
+      this.#prusaFirmwareReleases = response.data;
     } catch (e) {
       return this._logger.error("Github fetch error. Probably rate limited, skipping firmware dowmload");
     }

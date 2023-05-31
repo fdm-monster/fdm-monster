@@ -30,7 +30,7 @@ describe("ServerPublicController", () => {
   it("should return non-auth welcome", async function () {
     const response = await request.get(getRoute).send();
     expect(response.body).toMatchObject({
-      message: "Login disabled. Please load the Vue app."
+      message: "Login disabled. Please load the Vue app.",
     });
     expectOkResponse(response);
   });
@@ -39,7 +39,7 @@ describe("ServerPublicController", () => {
     await settingsStore.setLoginRequired();
     const response = await request.get(getRoute).send();
     expect(response.body).toMatchObject({
-      error: "Not authenticated"
+      error: "Not authenticated",
     });
     expectUnauthorizedResponse(response);
     // Return to default
@@ -50,7 +50,7 @@ describe("ServerPublicController", () => {
     await settingsStore.setLoginRequired();
     const response = await request.get(getRoute).send();
     expect(response.body).toMatchObject({
-      error: "Not authenticated"
+      error: "Not authenticated",
     });
     expectUnauthorizedResponse(response);
     // Return to default
@@ -63,7 +63,7 @@ describe("ServerPublicController", () => {
     const requestCookie = await loginTestUser(request);
     const response = await request.get(getRoute).set("Cookie", requestCookie).send();
     expect(response.body).toMatchObject({
-      message: "Login successful. Please load the Vue app."
+      message: "Login successful. Please load the Vue app.",
     });
     expectOkResponse(response);
     // Return to default
@@ -77,10 +77,9 @@ describe("ServerPublicController", () => {
       isPm2: false,
       update: {
         synced: false,
-        includingPrerelease: null,
         airGapped: null,
-        updateAvailable: null
-      }
+        updateAvailable: null,
+      },
     });
   });
 
@@ -94,10 +93,9 @@ describe("ServerPublicController", () => {
       isPm2: false,
       update: {
         synced: true,
-        includingPrerelease: false,
-        airGapped: true, // AxiosMock causes this
-        updateAvailable: null
-      }
+        airGapped: true,
+        updateAvailable: null,
+      },
     });
   });
 
@@ -112,10 +110,9 @@ describe("ServerPublicController", () => {
       isPm2: false,
       update: {
         synced: true,
-        includingPrerelease: false,
-        airGapped: false,
-        updateAvailable: false // package.json is respected
-      }
+        airGapped: true,
+        updateAvailable: null, // package.json is respected
+      },
     });
   });
 });

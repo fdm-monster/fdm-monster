@@ -35,47 +35,28 @@ class ServerReleaseService {
     };
   }
 
-  #findLatestRelease(releases) {
-    return releases?.reduce((a, b) => {
-      return new Date(a.created_at) > new Date(b.created_at) ? a : b;
-    });
-  }
-
-  #findReleaseByTag(releases, tagName) {
-    if (!releases?.length) return;
-    if (!tagName) return null;
-
-    return releases?.find((r) => r.tag_name?.replace("v", "") === tagName);
-  }
-
-  #transformGithubRelease(release) {
-    if (!release) return release;
-
-    delete release.body;
-    delete release.author;
-    return release;
-  }
-
   /**
    * Connection-safe acquire data about the installed and latest releases.
    * @returns {Promise<*|null>}
    */
   async syncLatestRelease() {
-    const allGithubReleases = await this.githubService.getReleases(AppConstants.orgName, AppConstants.serverRepoName);
+    const response = await this.githubService.getReleases(AppConstants.orgName, AppConstants.serverRepoName);
     this.#synced = true;
+    const allGithubReleases = response.data;
 
     // Connection timeout results in airGapped state
-    this.airGapped = !allGithubReleases;
-    if (!allGithubReleases?.length) {
+    const releases = allGithubReleases.releases;
+    this.airGapped = !releases?.length;
+    if (!releases?.length) {
       this.#logger.warn("Latest release check failed because releases from github empty");
       return;
     }
 
     // Illegal response should not store the latestRelease
-    const currentlyInstalledRelease = this.#findReleaseByTag(allGithubReleases, this.#serverVersion);
+    const currentlyInstalledRelease = allGithubReleases.current?.tag_name;
 
-    this.#installedRelease = this.#transformGithubRelease(currentlyInstalledRelease);
-    this.#latestRelease = this.#transformGithubRelease(this.#findLatestRelease(allGithubReleases));
+    this.#installedRelease = allGithubReleases.current;
+    this.#latestRelease = allGithubReleases.latest;
 
     this.#installedReleaseFound = !!currentlyInstalledRelease;
     if (!this.#installedReleaseFound) {

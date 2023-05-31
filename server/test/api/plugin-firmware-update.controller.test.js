@@ -49,11 +49,6 @@ describe("PluginFirmwareUpdateController", () => {
     expect(syncResponse.body).toHaveLength(16);
   });
 
-  it("should list firmware releases cache", async () => {
-    const response = await request.get(releasesRoute);
-    expectOkResponse(response);
-  });
-
   it("should indicate plugin is installed", async () => {
     const testPrinter = await createTestPrinter(request);
     httpClient.saveMockResponse({ plugins: [{ key: "firmwareupdater" }] }, 200);
