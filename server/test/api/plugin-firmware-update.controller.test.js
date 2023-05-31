@@ -46,7 +46,7 @@ describe("PluginFirmwareUpdateController", () => {
     httpClient.saveMockResponse(require("./test-data/prusa-github-releases.data.json"), 200);
     const syncResponse = await request.post(syncReleasesRoute).send();
     expectOkResponse(syncResponse);
-    expect(syncResponse.body).toHaveLength(16);
+    expect(syncResponse.body).toHaveLength(30);
   });
 
   it("should indicate plugin is installed", async () => {
