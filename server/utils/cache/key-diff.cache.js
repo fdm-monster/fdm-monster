@@ -55,11 +55,11 @@ class KeyDiffCache {
   }
 
   processStateDiffs() {
-    const updatedKes = [...this.updatedKeys];
+    const updatedKeys = [...this.updatedKeys];
     const deletedKeys = [...this.deletedKeys];
     this.resetDiffs();
     return {
-      updatedKes,
+      updatedKeys,
       deletedKeys,
     };
   }

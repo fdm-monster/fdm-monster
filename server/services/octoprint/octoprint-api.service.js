@@ -18,6 +18,10 @@ class OctoPrintApiService extends OctoPrintRoutes {
   _httpClient;
   _eventEmitter2;
 
+  /**
+   * @type {LoggerService}
+   * @private
+   */
   _logger;
 
   constructor({ settingsStore, httpClient, loggerFactory, eventEmitter2 }) {

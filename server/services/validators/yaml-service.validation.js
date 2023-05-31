@@ -16,6 +16,7 @@ const exportPrintersFloorsYamlRules = {
 };
 
 const importPrintersFloorsYamlRules = (importPrinters, importFloorGrid, importFloors) => ({
+  version: "required|string",
   config: "required|object",
   "config.exportPrinters": "required|boolean",
   "config.exportFloorGrid": "required|boolean",

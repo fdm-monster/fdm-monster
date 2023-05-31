@@ -4,17 +4,16 @@ const { expectOkResponse } = require("../../extensions");
 const printerRoute = AppConstants.apiRoute + "/printer";
 const testApiKey = "fdmonsterfdmonsterfdmonsterfdmon";
 
-async function createTestPrinter(request, groupName = "Row0_0") {
+async function createTestPrinter(request, enabled = false) {
   const createResponse = await request.post(printerRoute).send({
     printerURL: "http://url.com",
     apiKey: testApiKey,
-    enabled: false,
-    group: groupName,
+    enabled,
     settingsAppearance: {
       name: "testPrinter 123",
     },
   });
-  return expectOkResponse(createResponse, { enabled: false });
+  return expectOkResponse(createResponse, { enabled });
 }
 
 module.exports = {

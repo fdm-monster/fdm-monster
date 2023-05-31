@@ -1,16 +1,15 @@
 const { PluginBaseService } = require("./plugin-base.service");
 const { ValidationException } = require("../../exceptions/runtime.exceptions");
-const {
-  defaultFirmwareUpdaterSettings
-} = require("./constants/firmware-update-settings.constants");
+const { defaultFirmwareUpdaterSettings } = require("./constants/firmware-update-settings.constants");
 
 const config = {
   pluginName: "firmwareupdater",
-  pluginUrl: "https://github.com/OctoPrint/OctoPrint-FirmwareUpdater/archive/master.zip"
+  pluginUrl: "https://github.com/OctoPrint/OctoPrint-FirmwareUpdater/archive/master.zip",
 };
 
 const defaultRepos = {
-  prusaFirmare: "https://api.github.com/repos/prusa3d/Prusa-Firmware"
+  prusaFirmwareOwner: "prusa3d",
+  prusaFirmwareRepo: "Prusa-Firmware",
 };
 
 const connectivityProp = "connectivity.connection_ok";
@@ -18,62 +17,51 @@ const firmwareProp = "printer.firmware";
 const firmwareDownloadPath = "firmware-downloads";
 
 class PluginFirmwareUpdateService extends PluginBaseService {
-  #octoPrintApiService;
-  #githubApiService;
+  /**
+   * @type {OctoPrintApiService}
+   */
+  octoPrintApiService;
+  /**
+   * @type {GithubService}
+   */
+  githubService;
+  /**
+   * @type {MulterService}
+   */
   #multerService;
 
   #prusaFirmwareReleases;
   #latestFirmware;
 
-  constructor({
-    octoPrintApiService,
-    printerStore,
-    pluginRepositoryCache,
-    githubApiService,
-    multerService,
-    loggerFactory
-  }) {
-    super({ octoPrintApiService, printerStore, pluginRepositoryCache, loggerFactory }, config);
-    this.#octoPrintApiService = octoPrintApiService;
-    this.#githubApiService = githubApiService;
+  constructor({ octoPrintApiService, pluginRepositoryCache, githubService, multerService, loggerFactory }) {
+    super({ octoPrintApiService, pluginRepositoryCache, loggerFactory }, config);
+    this.octoPrintApiService = octoPrintApiService;
+    this.githubService = githubService;
     this.#multerService = multerService;
-  }
-
-  getFirmwareReleases() {
-    return this.#prusaFirmwareReleases;
   }
 
   async queryGithubPrusaFirmwareReleasesCache() {
     try {
-      this.#prusaFirmwareReleases = await this.#githubApiService.getRepoGithubReleases(
-        defaultRepos.prusaFirmare,
-        false
-      );
+      const response = await this.githubService.getReleases(defaultRepos.prusaFirmwareOwner, defaultRepos.prusaFirmwareRepo);
+      this.#prusaFirmwareReleases = response.data;
     } catch (e) {
-      return this._logger.error(
-        "Github fetch error. Probably rate limited, skipping firmware dowmload"
-      );
+      return this._logger.error("Github fetch error. Probably rate limited, skipping firmware dowmload");
     }
 
     if (!this.#prusaFirmwareReleases?.length) return [];
 
     this.#latestFirmware = this.#prusaFirmwareReleases[0];
-    this._logger.log(
-      `Plugin Cache filled with ${this.#prusaFirmwareReleases?.length || "?"} firmware releases`,
-      {
-        url: this.#latestFirmware.url,
-        tag_name: this.#latestFirmware.tag_name
-      }
-    );
+    this._logger.log(`Plugin Cache filled with ${this.#prusaFirmwareReleases?.length || "?"} firmware releases`, {
+      url: this.#latestFirmware.url,
+      tag_name: this.#latestFirmware.tag_name,
+    });
 
     return this.#prusaFirmwareReleases;
   }
 
   async downloadFirmware() {
     if (!this.#prusaFirmwareReleases?.length || !this.#latestFirmware) {
-      throw new ValidationException(
-        "No firmware releases were scanned. Download was not successful"
-      );
+      throw new ValidationException("No firmware releases were scanned. Download was not successful");
     }
 
     const latestFirmware = this.#prusaFirmwareReleases[0];
@@ -93,14 +81,11 @@ class PluginFirmwareUpdateService extends PluginBaseService {
   }
 
   async getPrinterFirmwareVersion(printerLogin) {
-    const response = await this.#octoPrintApiService.getSystemInfo(printerLogin);
+    const response = await this.octoPrintApiService.getSystemInfo(printerLogin);
     const systemInfo = response.systeminfo;
 
     // @todo If this fails, the printer most likely is not connected...
-    if (
-      !Object.keys(systemInfo).includes(connectivityProp) ||
-      !Object.keys(systemInfo).includes(firmwareProp)
-    ) {
+    if (!Object.keys(systemInfo).includes(connectivityProp) || !Object.keys(systemInfo).includes(firmwareProp)) {
       throw new ValidationException(
         "Could not retrieve printer firmware version as the OctoPrint response was not recognized. Is it connected?"
       );
@@ -108,9 +93,7 @@ class PluginFirmwareUpdateService extends PluginBaseService {
 
     const connected = systemInfo[connectivityProp];
     if (!connected) {
-      throw new ValidationException(
-        "OctoPrint printer is not connected and firmware cannot be checked"
-      );
+      throw new ValidationException("OctoPrint printer is not connected and firmware cannot be checked");
     }
 
     const firmware = systemInfo[firmwareProp];
@@ -122,27 +105,20 @@ class PluginFirmwareUpdateService extends PluginBaseService {
   }
 
   async getPluginFirmwareStatus(printerLogin) {
-    return await this.#octoPrintApiService.getPluginFirmwareUpdateStatus(printerLogin);
+    return await this.octoPrintApiService.getPluginFirmwareUpdateStatus(printerLogin);
   }
 
   async configureFirmwareUpdaterSettings(printerLogin) {
-    return await this.#octoPrintApiService.updateFirmwareUpdaterSettings(
-      printerLogin,
-      defaultFirmwareUpdaterSettings
-    );
+    return await this.octoPrintApiService.updateFirmwareUpdaterSettings(printerLogin, defaultFirmwareUpdaterSettings);
   }
 
   async flashPrusaFirmware(currentPrinterId, printerLogin) {
     const latestHexFilePath = this.#multerService.getNewestFile(firmwareDownloadPath);
     // todo setup BG task to track progress
-    return await this.#octoPrintApiService.postPluginFirmwareUpdateFlash(
-      currentPrinterId,
-      printerLogin,
-      latestHexFilePath
-    );
+    return await this.octoPrintApiService.postPluginFirmwareUpdateFlash(currentPrinterId, printerLogin, latestHexFilePath);
   }
 }
 
 module.exports = {
-  PluginFirmwareUpdateService
+  PluginFirmwareUpdateService,
 };

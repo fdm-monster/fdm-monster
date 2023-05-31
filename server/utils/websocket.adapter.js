@@ -7,6 +7,14 @@ class WebsocketAdapter {
    * @type { WebSocket|undefined }
    */
   socket;
+  /**
+   * @type { LoggerService }
+   */
+  #logger;
+
+  constructor({ loggerFactory }) {
+    this.#logger = loggerFactory("WebsocketAdapter");
+  }
 
   get isOpened() {
     return this.socket?.readyState === WebSocket.OPEN;
@@ -40,7 +48,10 @@ class WebsocketAdapter {
    * @returns {Promise<void>} A promise that resolves when the message is sent successfully.
    */
   async sendMessage(payload) {
-    if (!this.isOpened) return;
+    if (!this.isOpened) {
+      this.#logger.error("Websocket is not opened, cant send a message");
+      return;
+    }
     return await new Promise((resolve, reject) => {
       this.socket.send(payload, (error) => {
         if (error) reject(error);
@@ -56,7 +67,7 @@ class WebsocketAdapter {
    * @param {Event} error - The error event object.
    * @returns {Promise<void> | void} A promise that resolves when the error handling is complete, or void if no promise is returned.
    */
-  onError(error) {};
+  onError(error) {}
 
   /**
    * Handle after opened event.
@@ -65,7 +76,7 @@ class WebsocketAdapter {
    * @param {Event} event - The event object.
    * @returns {Promise<void> | void} A promise that resolves when the after opened handling is complete, or void if no promise is returned.
    */
-  afterOpened(event){};
+  afterOpened(event) {}
 
   /**
    * Handle after closed event.
@@ -74,7 +85,7 @@ class WebsocketAdapter {
    * @param {CloseEvent} event - The event object.
    * @returns {Promise<void> | void} A promise that resolves when the after closed handling is complete, or void if no promise is returned.
    */
-  afterClosed(event){};
+  afterClosed(event) {}
 
   /**
    * Handle message event.
@@ -83,7 +94,7 @@ class WebsocketAdapter {
    * @param {Data} event - The event object.
    * @returns {Promise<void> | void} A promise that resolves when the message handling is complete, or void if no promise is returned.
    */
-  onMessage(event){} ;
+  onMessage(event) {}
 
   /**
    * Handle open event.
@@ -108,4 +119,4 @@ class WebsocketAdapter {
 
 module.exports = {
   WebsocketAdapter,
-}
+};
