@@ -20,10 +20,6 @@ beforeAll(async () => {
   httpClient = container.resolve(DITokens.httpClient);
 });
 
-afterAll(async () => {
-  return GithubETag.deleteMany({});
-});
-
 describe("ServerUpdateService", () => {
   it("should know process version", () => {
     expect(process.env[AppConstants.VERSION_KEY]).toEqual(v1);
