@@ -22,7 +22,7 @@ class FilesStore {
    */
   #logger;
 
-  constructor({ printerCache, printerFilesService, fileCache, octoPrintApiService, loggerFactory }) {
+  constructor({ printerStore, printerFilesService, fileCache, octoPrintApiService, loggerFactory }) {
     this.#printerStore = printerStore;
     this.#printerFilesService = printerFilesService;
     this.#fileCache = fileCache;
