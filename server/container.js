@@ -7,10 +7,10 @@ const { Octokit } = require("octokit");
 const PrinterService = require("./services/printer.service");
 const SettingsStore = require("./state/settings.store");
 const { SettingsService } = require("./services/settings.service");
-const ServerReleaseService = require("./services/server-release.service");
+const { ServerReleaseService } = require("./services/server-release.service");
 const TaskManagerService = require("./services/task-manager.service");
 const ServerUpdateService = require("./services/server-update.service");
-const GithubApiService = require("./services/github-api.service");
+const { GithubService } = require("./services/github.service");
 const FileCache = require("./state/file.cache");
 const JobsCache = require("./state/jobs.cache");
 const PrinterWebsocketTask = require("./tasks/printer-websocket.task");
@@ -53,6 +53,7 @@ const PrinterStore = require("./state/printer.store");
 const { YamlService } = require("./services/yaml.service");
 const { MonsterPiService } = require("./services/monsterpi.service");
 const { BatchCallService } = require("./services/batch-call.service");
+const { ClientDistDownloadTask } = require("./tasks/client-bundle.task");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -86,7 +87,7 @@ function configureContainer() {
     [DITokens.serverReleaseService]: asClass(ServerReleaseService).singleton(),
     [DITokens.monsterPiService]: asClass(MonsterPiService).singleton(),
     [DITokens.serverUpdateService]: asClass(ServerUpdateService).singleton(),
-    [DITokens.githubApiService]: asClass(GithubApiService),
+    [DITokens.githubService]: asClass(GithubService),
     [DITokens.octokitService]: asFunction((cradle) => {
       const config = cradle.configService;
       // cradle.
@@ -130,8 +131,9 @@ function configureContainer() {
     [DITokens.influxDbV2BaseService]: asClass(InfluxDbV2BaseService),
 
     [DITokens.bootTask]: asClass(BootTask),
-    [DITokens.softwareUpdateTask]: asClass(SoftwareUpdateTask), // Provided SSE handlers (couplers) shared with controllers
+    [DITokens.softwareUpdateTask]: asClass(SoftwareUpdateTask),
     [DITokens.printerSocketIoTask]: asClass(PrinterSocketIoTask).singleton(), // This task is a quick task (~100ms per printer)
+    [DITokens.clientDistDownloadTask]: asClass(ClientDistDownloadTask).singleton(),
     [DITokens.printCompletionSocketIoTask]: asClass(PrintCompletionSocketIoTask).singleton(),
     [DITokens.printerWebsocketTask]: asClass(PrinterWebsocketTask).singleton(), // This task is a recurring heartbeat task
     [DITokens.printerWebsocketPingTask]: asClass(PrinterWebsocketPingTask).singleton(), // Task dependent on WS to fire - disabled at boot

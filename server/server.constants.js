@@ -11,12 +11,12 @@ const AppConstants = {
   // @Deprecated: old storage path
   defaultFileStorageFolder: "./media",
   // New place for all downloads, files etc
-  defaultMediaStorage: "./media",
   defaultClientBundleStorage: "./media/client-dist",
   defaultClientBundleZipsStorage: "./media/client-dist-zips",
   defaultServerPort: 4000,
   defaultMongoStringUnauthenticated: "mongodb://127.0.0.1:27017/fdm-monster",
   apiRoute: "/api",
+  enableClientDistAutoUpdateKey: "ENABLE_CLIENT_DIST_AUTO_UPDATE",
 
   defaultTestEnv: "test",
   defaultProductionEnv: "production",
@@ -24,7 +24,9 @@ const AppConstants = {
   GITHUB_PAT: "GITHUB_PAT",
   clientPackageName: "@fdm-monster/client",
   clientRepoName: "fdm-monster-client",
-  clientOrgName: "fdm-monster",
+  serverRepoName: "fdm-monster",
+  orgName: "fdm-monster",
+  defaultClientMinimum: "1.1.8",
   serverPath: "./",
 
   influxUrl: "INFLUX_URL",

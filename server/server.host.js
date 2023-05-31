@@ -10,9 +10,21 @@ const { AppConstants } = require("./server.constants");
 const { superRootPath, rootPath } = require("./utils/fs.utils");
 
 class ServerHost {
+  /**
+   * @type {LoggerService}
+   */
   #logger;
+  /**
+   * @type {BootTask}
+   */
   #bootTask;
+  /**
+   * @type {TaskManagerService}
+   */
   #taskManagerService;
+  /**
+   * @type {SocketIoGateway}
+   */
   #socketIoGateway;
   #appInstance = null;
 

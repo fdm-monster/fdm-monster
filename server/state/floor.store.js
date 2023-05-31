@@ -2,9 +2,17 @@
  * A generic cache for printer groups
  */
 class FloorStore {
+  /**
+   * @type {LoggerService}
+   */
   #logger;
+  /**
+   * @type {Floor[]}
+   */
   floors = [];
-
+  /**
+   * @type {FloorService}
+   */
   #floorService;
 
   constructor({ floorService, loggerFactory }) {

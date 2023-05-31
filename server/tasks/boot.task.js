@@ -41,6 +41,9 @@ class BootTask {
   pluginRepositoryCache;
   floorStore;
   pluginFirmwareUpdateService;
+  /**
+   * @type {ClientBundleService}
+   */
   clientBundleService;
 
   constructor({
@@ -100,10 +103,6 @@ class BootTask {
         }
       }
     }
-
-    await this.clientBundleService.downloadBundle().catch((e) => {
-      this.#logger.error(`Error downloading latest client bundle: ${e.message} (${e.status})`);
-    });
 
     this.#logger.log("Loading Server settings.");
     await this.settingsStore.loadSettings();

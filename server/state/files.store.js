@@ -5,13 +5,24 @@ const { ValidationException } = require("../exceptions/runtime.exceptions");
  */
 class FilesStore {
   #printerStore;
+  /*
+   * @type {PrinterFilesService}
+   */
   #printerFilesService;
+  /*
+   * @type {FileCache}
+   */
   #fileCache;
+  /*
+   * @type {OctoPrintApiService}
+   */
   #octoPrintApiService;
-
+  /*
+   * @type {LoggerService}
+   */
   #logger;
 
-  constructor({ printerStore, printerFilesService, fileCache, octoPrintApiService, loggerFactory }) {
+  constructor({ printerCache, printerFilesService, fileCache, octoPrintApiService, loggerFactory }) {
     this.#printerStore = printerStore;
     this.#printerFilesService = printerFilesService;
     this.#fileCache = fileCache;

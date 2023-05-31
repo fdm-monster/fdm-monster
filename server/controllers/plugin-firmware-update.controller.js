@@ -28,11 +28,6 @@ class PluginFirmwareUpdateController {
     res.send(result);
   }
 
-  async listFirmwareReleasesCache(req, res) {
-    const releases = this.#pluginFirmwareUpdateService.getFirmwareReleases();
-    res.send(releases);
-  }
-
   /**
    * Explicit query, use with care (to prevent Github rate limit)
    * @param req
@@ -40,8 +35,7 @@ class PluginFirmwareUpdateController {
    * @returns {Promise<void>}
    */
   async syncFirmwareReleasesCache(req, res) {
-    const releases =
-      await this.#pluginFirmwareUpdateService.queryGithubPrusaFirmwareReleasesCache();
+    const releases = await this.#pluginFirmwareUpdateService.queryGithubPrusaFirmwareReleasesCache();
     res.send(releases);
   }
 
@@ -82,9 +76,7 @@ class PluginFirmwareUpdateController {
 
   async configurePluginSettings(req, res) {
     const { printerLogin } = getScopedPrinter(req);
-    const response = await this.#pluginFirmwareUpdateService.configureFirmwareUpdaterSettings(
-      printerLogin
-    );
+    const response = await this.#pluginFirmwareUpdateService.configureFirmwareUpdaterSettings(printerLogin);
     res.send(response);
   }
 
@@ -135,11 +127,7 @@ class PluginFirmwareUpdateController {
 
 module.exports = createController(PluginFirmwareUpdateController)
   .prefix(AppConstants.apiRoute + "/plugin/firmware-update")
-  .before([
-    authenticate(),
-    authorizeRoles([ROLES.OPERATOR, ROLES.ADMIN]),
-    printerResolveMiddleware(),
-  ])
+  .before([authenticate(), authorizeRoles([ROLES.OPERATOR, ROLES.ADMIN]), printerResolveMiddleware()])
   .get("/", "listUpdateState")
   .get("/releases", "listFirmwareReleasesCache")
   .post("/releases/sync", "syncFirmwareReleasesCache")
