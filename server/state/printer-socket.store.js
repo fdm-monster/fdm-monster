@@ -348,7 +348,8 @@ class PrinterSocketStore {
       octoPrintEvent(Message.WS_ERROR),
     ];
     const listener = ({ event, payload }) => {
-      this.socketIoGateway.send(event, {
+      this.socketIoGateway.send("test-printer-state", {
+        event,
         payload,
         correlationToken,
       });
@@ -365,6 +366,7 @@ class PrinterSocketStore {
         testEvents.forEach((te) => {
           this.eventEmitter2.off(te, listener);
         });
+        // TODO this reject is not caught
         reject(e);
       });
       this.testSocket.open();
