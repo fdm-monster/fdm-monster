@@ -4,7 +4,7 @@ const { isNodemon, isNode, isPm2 } = require("../utils/env.utils");
 const { authenticate, withPermission } = require("../middleware/authenticate");
 const { PERMS } = require("../constants/authorization.constants");
 const { isDocker } = require("../utils/is-docker");
-const { serverSettingKey } = require("../constants/server-settings.constants");
+const { serverSettingsKey } = require("../constants/server-settings.constants");
 
 class ServerPublicController {
   #serverVersion;
@@ -24,7 +24,7 @@ class ServerPublicController {
   welcome(req, res) {
     const serverSettings = this.#settingsStore.getSettings();
 
-    if (serverSettings[serverSettingKey].loginRequired === false) {
+    if (serverSettings[serverSettingsKey].loginRequired === false) {
       return res.send({
         message: "Login disabled. Please load the Vue app.",
       });

@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const { AppConstants } = require("../server.constants");
 const {
   printerFileCleanSettingKey,
-  serverSettingKey,
+  serverSettingsKey,
   timeoutSettingKey,
   frontendSettingKey,
 } = require("../constants/server-settings.constants");
@@ -25,7 +25,7 @@ const ServerSettingsSchema = new mongoose.Schema({
       required: true,
     },
   },
-  [serverSettingKey]: {
+  [serverSettingsKey]: {
     uploadFolder: {
       type: String,
       default: AppConstants.defaultFileStorageFolder,

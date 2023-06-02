@@ -1,6 +1,6 @@
 const { inject } = require("awilix-express");
 const { AuthorizationError, AuthenticationError } = require("../exceptions/runtime.exceptions");
-const { serverSettingKey } = require("../constants/server-settings.constants");
+const { serverSettingsKey } = require("../constants/server-settings.constants");
 
 function authorizePermission(permission) {
   return inject(({ permissionService, roleService }) => async (req, res, next) => {
@@ -22,7 +22,7 @@ module.exports = {
     inject(({ settingsStore }) => async (req, res, next) => {
       const serverSettings = settingsStore.getSettings();
 
-      if (serverSettings && !serverSettings[serverSettingKey]?.loginRequired) {
+      if (serverSettings && !serverSettings[serverSettingsKey]?.loginRequired) {
         return next();
       }
       if (req.isAuthenticated()) {

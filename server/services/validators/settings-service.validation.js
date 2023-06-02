@@ -1,8 +1,21 @@
-const { printerFileCleanSettingKey, frontendSettingKey } = require("../../constants/server-settings.constants");
+const {
+  printerFileCleanSettingKey,
+  frontendSettingKey,
+  serverSettingsKey,
+} = require("../../constants/server-settings.constants");
+
 const serverSettingsUpdateRules = {
-  server: "object",
-  "server.registration": "boolean",
-  "server.loginRequired": "boolean",
+  registration: "boolean",
+  loginRequired: "boolean",
+  debugSettings: "object",
+  "debugSettings.debugSocketEvents": "boolean",
+  "debugSettings.debugSocketReconnect": "boolean",
+};
+
+const settingsUpdateRules = {
+  [serverSettingsKey]: "object",
+  [`${serverSettingsKey}.registration`]: "boolean",
+  [`${serverSettingsKey}.loginRequired`]: "boolean",
   [printerFileCleanSettingKey]: "object",
   [`${printerFileCleanSettingKey}.autoRemoveOldFilesBeforeUpload`]: "boolean",
   [`${printerFileCleanSettingKey}.autoRemoveOldFilesAtBoot`]: "boolean",
@@ -11,12 +24,13 @@ const serverSettingsUpdateRules = {
 
 const frontendSettingsUpdateRules = {
   [frontendSettingKey]: "object",
-  "frontend.gridCols": "integer|min:1",
-  "frontend.gridRows": "integer|min:1",
-  "frontend.largeTiles": "boolean",
+  [`${frontendSettingKey}.gridCols`]: "integer|min:1",
+  [`${frontendSettingKey}.gridRows`]: "integer|min:1",
+  [`${frontendSettingKey}.largeTiles`]: "boolean",
 };
 
 module.exports = {
+  settingsUpdateRules,
   serverSettingsUpdateRules,
   frontendSettingsUpdateRules,
 };
