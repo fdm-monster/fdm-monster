@@ -31,7 +31,6 @@ afterAll(async () => {
 describe("FilesStore", () => {
   const validNewPrinter = {
     apiKey: "asdasasdasdasdasdasdasdasdasdasd",
-    webSocketURL: "ws://asd.com/",
     printerURL: "https://asd.com:81",
   };
 

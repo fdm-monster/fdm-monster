@@ -295,7 +295,6 @@ class YamlService {
           settingsAppearance: {
             name: p.printerName,
           },
-          webSocketURL: p.webSocketURL,
           printerURL: p.printerURL,
           apiKey,
         };

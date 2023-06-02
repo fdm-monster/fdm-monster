@@ -11,7 +11,6 @@ const feedRateRules = {
 const testPrinterApiRules = {
   apiKey: `required|length:${UUID_LENGTH},${UUID_LENGTH}|alphaNumeric`,
   printerURL: "required|httpurl",
-  webSocketURL: "wsurl",
 };
 
 const updatePrinterDisabledReasonRules = {
@@ -24,7 +23,6 @@ const updatePrinterEnabledRule = {
 
 const updatePrinterConnectionSettingRules = {
   printerURL: "required|httpurl",
-  webSocketURL: "required|wsurl",
   apiKey: `required|minLength:${UUID_LENGTH}|maxLength:${UUID_LENGTH}`,
 };
 

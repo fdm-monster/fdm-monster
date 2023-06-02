@@ -28,7 +28,6 @@ const importPrintersFloorsYamlRules = (importPrinters, importFloorGrid, importFl
   "printers.*.id": "mongoId",
   "printers.*.apiKey": `required|length:${UUID_LENGTH},${UUID_LENGTH}|alphaNumeric`,
   "printers.*.printerURL": "required|httpurl",
-  "printers.*.webSocketURL": "required|wsurl",
   "printers.*.enabled": "boolean",
   "printers.*.settingsAppearance": "required|object",
   "printers.*.settingsAppearance.name": "required|string",

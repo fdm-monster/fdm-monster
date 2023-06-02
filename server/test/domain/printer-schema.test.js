@@ -6,7 +6,6 @@ describe("printer-schema", function () {
     const m = new Printer({
       apiKey: "asd",
       printerURL: "myawesomeprinter/",
-      webSocketURL: "myawesomeprinter/",
       settingsAppearance: {},
     });
 
@@ -20,24 +19,7 @@ describe("printer-schema", function () {
     const m = new Printer({});
 
     m.validate(function (err) {
-      expectValidationError(
-        err,
-        ["settingsAppearance", "webSocketURL", "printerURL", "apiKey"],
-        true
-      );
-      done();
-    });
-  });
-
-  it("should be invalid if printer misses webSocketURL", function (done) {
-    const m = new Printer({
-      printerURL: "myawesomeprinter/",
-      apiKey: "asd",
-      settingsAppearance: {}
-    });
-
-    m.validate(function (err) {
-      expectValidationError(err, ["webSocketURL"], true);
+      expectValidationError(err, ["settingsAppearance", "printerURL", "apiKey"], true);
       done();
     });
   });

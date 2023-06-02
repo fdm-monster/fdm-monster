@@ -129,9 +129,6 @@ class PrinterController {
 
   #adjustPrinterObject(printer) {
     // TODO move to service
-    if (!printer.webSocketURL) {
-      printer.webSocketURL = convertHttpUrlToWebsocket(printer.printerURL);
-    }
     printer.settingsAppearance = getSettingsAppearanceDefault();
     if (printer.printerName) {
       printer.settingsAppearance.name = printer.printerName;
@@ -194,7 +191,6 @@ class PrinterController {
     res.send({
       printerURL: newEntity.printerURL,
       apiKey: newEntity.apiKey,
-      webSocketURL: newEntity.webSocketURL,
     });
   }
 

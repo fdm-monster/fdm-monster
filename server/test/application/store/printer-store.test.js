@@ -36,19 +36,16 @@ afterAll(async () => {
 describe("PrinterSocketStore", () => {
   const invalidNewPrinterState = {
     apiKey: "asd",
-    webSocketURL: null,
     printerURL: null,
   };
 
   const weakNewPrinter = {
     apiKey: "asdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasd",
-    webSocketURL: "http://192.168.1.0:81",
     printerURL: "http://192.168.1.0",
   };
 
   const weakNewPrinter2 = {
     apiKey: "1C0KVOKWEAKWEAK8VBGAR",
-    webSocketURL: "http://192.168.1.0:81",
     printerURL: "http://192.168.1.0",
   };
 
@@ -58,9 +55,6 @@ describe("PrinterSocketStore", () => {
     expect(() => printerService.create(invalidNewPrinterState)).rejects.toHaveErrors({
       apiKey: {
         rule: "length",
-      },
-      webSocketURL: {
-        rule: "required",
       },
     });
 
@@ -104,53 +98,7 @@ describe("PrinterSocketStore", () => {
     expect(result.currentUser).toEqual(newApiUserName);
   });
 
-  it("should skip teardown test printer when already undefined", async () => {
-    await printerSocketStore.deleteTestPrinter();
-  });
-
   it("should get undefined test printer from store", async () => {
-    expect(printerSocketStore.getTestPrinter()).toBeUndefined();
+    expect(printerSocketStore.testSocket).toBeUndefined();
   });
-
-  // it("should get whether printerState is authed", async () => {
-  //   let printerState = await printerService.create(validNewPrinterState);
-  //
-  //   expect(printerState.isAdapterAuthed()).toBeFalsy();
-  // });
-  //
-  // it("should get printerState apiAccessibility", async () => {
-  //   let printerState = await printerService.create(validNewPrinterState);
-  //   expect(printerState.getApiAccessibility()).toMatchObject({
-  //     accessible: true,
-  //     retryable: true,
-  //     reason: null,
-  //   });
-  // });
-
-  // it("should get printerState api accessible and retryable", async () => {
-  //   let printerState = await printerService.create(validNewPrinterState);
-  //   expect(printerState.isApiAccessible()).toBeTruthy();
-  //   expect(printerState.isApiRetryable()).toBeTruthy();
-  //   expect(printerState.shouldRetryConnect()).toBeTruthy();
-  // });
-  //
-  // it("should get printerState octoprint undefined stored version when disconnected", async () => {
-  //   let printerState = await printerService.create(validNewPrinterState);
-  //   expect(printerState.getOctoPrintVersion()).toBeUndefined();
-  // });
-
-  // it("should get printerState url", async () => {
-  //   let printerState = await printerService.create(validNewPrinterState);
-  //   expect(printerState.getURL()).toBeTruthy();
-  // });
-  //
-  // it("should get printerState url", async () => {
-  //   let printerState = await printerService.create(validNewPrinterState);
-  //   expect(printerState.getStateCategory()).toEqual(CATEGORY.Offline);
-  // });
-  //
-  // it("should update printerState systemInfo", async () => {
-  //   let printerState = await printerService.create(validNewPrinterState);
-  //   expect(printerState.updateSystemInfo({})).toBeUndefined();
-  // });
 });

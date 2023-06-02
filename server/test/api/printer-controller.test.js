@@ -117,14 +117,13 @@ describe("PrinterController", () => {
 
   it("should invalidate to malformed singular printer json array", async () => {
     const response = await request.post(batchRoute).send([{}]);
-    expectInvalidResponse(response, ["printerURL", "apiKey", "webSocketURL"]);
+    expectInvalidResponse(response, ["printerURL", "apiKey"]);
   });
 
   it("should import to singular printer json array", async () => {
     const response = await request.post(batchRoute).send([
       {
         printerURL: "http://localhost/",
-        webSocketURL: "ws://localhost/",
         apiKey,
       },
     ]);
@@ -159,7 +158,6 @@ describe("PrinterController", () => {
     expect(printer.enabled).toBe(false);
 
     const patch = {
-      webSocketURL: "ws://google.com",
       printerURL: "https://test.com/",
       apiKey,
       enabled: false,
@@ -167,7 +165,6 @@ describe("PrinterController", () => {
     };
     const updatePatch = await request.patch(updateRoute(printer.id)).send(patch);
     expectOkResponse(updatePatch, {
-      webSocketURL: "ws://google.com",
       printerURL: "https://test.com/",
       enabled: false,
       printerName: "asd124",
@@ -178,12 +175,10 @@ describe("PrinterController", () => {
     const printer = await createTestPrinter(request);
 
     const updatePatch = await request.patch(connectionRoute(printer.id)).send({
-      webSocketURL: "ws://google.com",
       printerURL: "https://test.com/",
       apiKey,
     });
     expectOkResponse(updatePatch, {
-      webSocketURL: "ws://google.com/", // Sanitized
       printerURL: "https://test.com/",
       apiKey,
     });

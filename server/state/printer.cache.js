@@ -9,7 +9,6 @@ const { map } = require("../utils/mapper.utils");
  * @property {string} id - The id of the printer. (required)
  * @property {string} apiKey - The API key of the printer. (required)
  * @property {string} printerURL - The URL of the printer. (required)
- * @property {string} webSocketURL - The WebSocket URL of the printer. (required)
  * @property {boolean} enabled - Indicates if the printer is enabled. (default: true)
  * @property {string} disabledReason - The reason for disabling the printer.
  * @property {string} printerName - The name setting of the printer.

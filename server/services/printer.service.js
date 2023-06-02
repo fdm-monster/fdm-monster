@@ -1,6 +1,6 @@
 const { Printer } = require("../models/Printer");
 const { NotFoundException } = require("../exceptions/runtime.exceptions");
-const { sanitizeURL } = require("../utils/url.utils");
+const { sanitizeURL, httpToWsUrl } = require("../utils/url.utils");
 const { validateInput } = require("../handlers/validators");
 const {
   createPrinterRules,
@@ -10,7 +10,6 @@ const {
 } = require("./validators/printer-service.validation");
 const { getDefaultPrinterEntry } = require("../constants/service.constants");
 const { printerEvents } = require("../constants/event.constants");
-const { captureException } = require("@sentry/node");
 
 class PrinterService {
   /**
@@ -71,17 +70,10 @@ class PrinterService {
   async update(printerId, updateData) {
     const printer = await this.get(printerId);
 
-    const {
-      printerURL,
-      webSocketURL,
-      apiKey,
-      enabled,
-      settingsAppearance,
-    } = await validateInput(updateData, createPrinterRules);
+    const { printerURL, apiKey, enabled, settingsAppearance } = await validateInput(updateData, createPrinterRules);
     await this.get(printerId);
 
     printer.printerURL = printerURL;
-    printer.webSocketURL = webSocketURL;
     printer.apiKey = apiKey;
     if (enabled !== undefined) {
       printer.enabled = enabled;
@@ -180,10 +172,9 @@ class PrinterService {
     return printer;
   }
 
-  async updateConnectionSettings(printerId, { printerURL, webSocketURL, apiKey }) {
+  async updateConnectionSettings(printerId, { printerURL, apiKey }) {
     const update = {
       printerURL: sanitizeURL(printerURL),
-      webSocketURL: sanitizeURL(webSocketURL),
       apiKey,
     };
 
@@ -201,9 +192,9 @@ class PrinterService {
   async updateEnabled(printerId, enabled) {
     const update = enabled
       ? {
-        enabled,
-        disabledReason: null,
-      }
+          enabled,
+          disabledReason: null,
+        }
       : { enabled };
 
     await validateInput(update, updatePrinterEnabledRule);
@@ -257,10 +248,9 @@ class PrinterService {
    * @returns {Promise<Object>}
    */
   async validateAndDefault(printer) {
-    const defaultWebSocketURL = printer.printerURL?.replace("http://", "ws://").replace("https://", "wss://");
+    const url = new URL(printer.printerURL);
     const mergedPrinter = {
       ...getDefaultPrinterEntry(),
-      webSocketURL: defaultWebSocketURL,
       enabled: true,
       ...printer,
     };
