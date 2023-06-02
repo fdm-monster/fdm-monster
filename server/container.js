@@ -14,11 +14,10 @@ const { GithubService } = require("./services/github.service");
 const FileCache = require("./state/file.cache");
 const JobsCache = require("./state/jobs.cache");
 const PrinterWebsocketTask = require("./tasks/printer-websocket.task");
-const PrinterSocketIoTask = require("./tasks/printer-socketio.task");
+const { SocketIoTask } = require("./tasks/socketio.task");
 const PrinterSystemTask = require("./tasks/printer-system.task");
 const OctoPrintApiService = require("./services/octoprint/octoprint-api.service");
-const PrinterState = require("./state/printer.state");
-const PrinterStateFactory = require("./state/printer-state.factory");
+const { SocketFactory } = require("./services/octoprint/socket.factory");
 const FilesStore = require("./state/files.store");
 const { configureEventEmitter } = require("./handlers/event-emitter");
 const { AppConstants } = require("./server.constants");
@@ -49,11 +48,13 @@ const { SocketIoGateway } = require("./state/socket-io.gateway");
 const { ClientBundleService } = require("./services/client-bundle.service");
 const FloorService = require("./services/floor.service");
 const FloorStore = require("./state/floor.store");
-const PrinterStore = require("./state/printer.store");
 const { YamlService } = require("./services/yaml.service");
 const { MonsterPiService } = require("./services/monsterpi.service");
 const { BatchCallService } = require("./services/batch-call.service");
 const { ClientDistDownloadTask } = require("./tasks/client-bundle.task");
+const { OctoPrintSockIoAdapter } = require("./services/octoprint/octoprint-sockio.adapter");
+const { PrinterCache } = require("./state/printer.cache");
+const PrinterSocketStore = require("./state/printer-socket.store");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -68,7 +69,7 @@ function configureContainer() {
     [DITokens.serverVersion]: asFunction(() => {
       return process.env[AppConstants.VERSION_KEY];
     }),
-    [DITokens.printerStateFactory]: asFunction(PrinterStateFactory).transient(), // Factory function, transient on purpose!
+    [DITokens.socketFactory]: asClass(SocketFactory).transient(), // Factory function, transient on purpose!
 
     // -- asClass --
     [DITokens.serverHost]: asClass(ServerHost).singleton(),
@@ -117,22 +118,23 @@ function configureContainer() {
     [DITokens.batchCallService]: asClass(BatchCallService).singleton(),
     [DITokens.pluginFirmwareUpdateService]: asClass(PluginFirmwareUpdateService).singleton(),
 
-    [DITokens.printerState]: asClass(PrinterState).transient(), // Transient on purpose!
+    [DITokens.octoPrintSockIoAdapter]: asClass(OctoPrintSockIoAdapter).transient(), // Transient on purpose
     [DITokens.floorStore]: asClass(FloorStore).singleton(),
     [DITokens.jobsCache]: asClass(JobsCache).singleton(),
     [DITokens.pluginRepositoryCache]: asClass(PluginRepositoryCache).singleton(),
     [DITokens.fileCache]: asClass(FileCache).singleton(),
     [DITokens.fileUploadTrackerCache]: asClass(FileUploadTrackerCache).singleton(),
     [DITokens.filesStore]: asClass(FilesStore).singleton(),
-    [DITokens.printerStore]: asClass(PrinterStore).singleton(),
+    [DITokens.printerCache]: asClass(PrinterCache).singleton(),
+    [DITokens.printerSocketStore]: asClass(PrinterSocketStore).singleton(),
 
     // Extensibility and export
     [DITokens.customGCodeService]: asClass(CustomGCodeService),
     [DITokens.influxDbV2BaseService]: asClass(InfluxDbV2BaseService),
 
     [DITokens.bootTask]: asClass(BootTask),
-    [DITokens.softwareUpdateTask]: asClass(SoftwareUpdateTask),
-    [DITokens.printerSocketIoTask]: asClass(PrinterSocketIoTask).singleton(), // This task is a quick task (~100ms per printer)
+    [DITokens.softwareUpdateTask]: asClass(SoftwareUpdateTask), // Provided SSE handlers (couplers) shared with controllers
+    [DITokens.socketIoTask]: asClass(SocketIoTask).singleton(), // This task is a quick task (~100ms per printer)
     [DITokens.clientDistDownloadTask]: asClass(ClientDistDownloadTask).singleton(),
     [DITokens.printCompletionSocketIoTask]: asClass(PrintCompletionSocketIoTask).singleton(),
     [DITokens.printerWebsocketTask]: asClass(PrinterWebsocketTask).singleton(), // This task is a recurring heartbeat task

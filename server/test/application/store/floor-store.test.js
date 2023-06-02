@@ -4,14 +4,14 @@ const DITokens = require("../../../container.tokens");
 const { Floor } = require("../../../models/Floor");
 
 let container;
-let printerStore;
+let printerSocketStore;
 let floorStore;
 let Model = Floor;
 
 beforeAll(async () => {
   await dbHandler.connect();
   container = configureContainer();
-  printerStore = container.resolve(DITokens.printerStore);
+  printerSocketStore = container.resolve(DITokens.printerSocketStore);
   floorStore = container.resolve(DITokens.floorStore);
 });
 
@@ -23,13 +23,12 @@ describe(DITokens.floorStore, () => {
   it("should throw on getting non-existing floor", async function () {
     await expect(() => floorStore.getFloor("63452115122876ea11cd1656")).rejects.toBeDefined();
   });
+
   it("should delete floor", async function () {
-    await printerStore.loadPrinterStore();
     await floorStore.delete("63452115122876ea11cd1656");
   });
 
   it("should update floor", async () => {
-    await printerStore.loadPrinterStore();
     const floors = await floorStore.listCache();
     expect(floors).toHaveLength(1);
     await floorStore.update(floors[0], {

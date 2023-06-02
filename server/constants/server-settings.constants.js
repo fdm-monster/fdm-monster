@@ -5,6 +5,10 @@ const getDefaultWhitelistIpAddresses = () => ["::12", "127.0.0.1"];
 const serverSettingKey = "server";
 const getDefaultServerSettings = () => ({
   port: AppConstants.defaultServerPort,
+  debugSettings: {
+    debugSocketReconnect: false,
+    debugSocketEvents: false,
+  },
   uploadFolder: AppConstants.defaultFileStorageFolder,
   registration: true,
   whitelistEnabled: false,

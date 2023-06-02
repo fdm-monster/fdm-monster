@@ -17,15 +17,20 @@ class BatchCallService {
    */
   octoPrintApiService;
   /**
-   * @type {PrinterStore}
+   * @type {PrinterSocketStore}
    */
-  printerStore;
+  printerSocketStore;
+  /**
+   * @type {PrinterCache}
+   */
+  printerCache;
   jobsCache;
   filesStore;
 
-  constructor({ octoPrintApiService, printerStore, jobsCache, filesStore }) {
+  constructor({ octoPrintApiService, printerCache, printerSocketStore, jobsCache, filesStore }) {
     this.octoPrintApiService = octoPrintApiService;
-    this.printerStore = printerStore;
+    this.printerCache = printerCache;
+    this.printerSocketStore = printerSocketStore;
     this.jobsCache = jobsCache;
     this.filesStore = filesStore;
   }
@@ -36,7 +41,7 @@ class BatchCallService {
    */
   batchConnectSocket(printerIds) {
     for (const printerId of printerIds) {
-      this.printerStore.reconnectOctoPrint(printerId);
+      this.printerSocketStore.reconnectOctoPrint(printerId);
     }
   }
 
@@ -47,7 +52,7 @@ class BatchCallService {
   async batchConnectUsb(printerIds) {
     const promises = [];
     for (const printerId of printerIds) {
-      const printerLogin = this.printerStore.getPrinterLogin(printerId);
+      const printerLogin = this.printerCache.getLoginDto(printerId);
       const time = Date.now();
 
       const command = this.octoPrintApiService.connectCommand;
@@ -72,7 +77,7 @@ class BatchCallService {
   async batchReprintCalls(printerIds) {
     const promises = [];
     for (const printerId of printerIds) {
-      const printerLogin = this.printerStore.getPrinterLogin(printerId);
+      const printerLogin = this.printerCache.getLoginDto(printerId);
       const job = this.jobsCache.getPrinterJob(printerId);
       let reprintPath = job?.filePath;
       if (!reprintPath?.length) {

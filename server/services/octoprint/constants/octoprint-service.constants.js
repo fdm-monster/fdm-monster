@@ -1,8 +1,26 @@
-class OPClientErrors {
-  static filamentIdNotANumber = "FilamentID provided was not numeric";
-
-  static printerValidationErrorMessage = "printer apiKey or URL undefined";
-}
+// https://github.com/OctoPrint/OctoPrint/blob/161e21fe0f6344ec3b9b9b541e9b2c472087ba77/src/octoprint/util/comm.py#L913
+const OP_STATE = {
+  Offline: "Offline",
+  OpeningSerial: "Opening serial connection",
+  DetectingSerial: "Detecting serial connection",
+  Connecting: "Connecting",
+  Operational: "Operational",
+  StartingPrintFromSD: "Starting print from SD", // Starting
+  StartSendingPrintToSD: "Starting to send file to SD", // Starting
+  Starting: "Starting", // Starting
+  TransferringFileToSD: "Transferring file to SD", // Transferring
+  PrintingFromSD: "Printing from SD", // Printing
+  SendingFileToSD: "Sending file to SD", // Printing
+  Printing: "Printing", // Printing,
+  Cancelling: "Cancelling",
+  Pausing: "Pausing",
+  Paused: "Paused",
+  Resuming: "Resuming",
+  Finishing: "Finishing",
+  Error: "Error",
+  OfflineAfterError: "Offline after error",
+  UnknownState: "Unknown State ()", // Unknown State (...) needs proper parsing
+};
 
 const pluginManagerCommands = {
   install: {
@@ -54,7 +72,7 @@ function isLoginResponseGlobal(octoPrintResponse) {
 }
 
 module.exports = {
-  OPClientErrors,
+  OP_STATE,
   contentTypeHeaderKey,
   apiKeyHeaderKey,
   jsonContentType,

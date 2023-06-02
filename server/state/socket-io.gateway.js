@@ -15,9 +15,15 @@ class SocketIoGateway {
    */
   io;
 
-  constructor({ loggerFactory, eventEmitter2 }) {
+  /**
+   * @type {SettingsStore}
+   */
+  settingsStore;
+
+  constructor({ loggerFactory, eventEmitter2, settingsStore }) {
     this.logger = loggerFactory(SocketIoGateway.name);
     this.eventEmitter2 = eventEmitter2;
+    this.settingsStore = settingsStore;
   }
 
   attachServer(httpServer) {
@@ -42,6 +48,9 @@ class SocketIoGateway {
       return;
     }
 
+    if (this.settingsStore.getServerSettings().debugSettings?.debugSocketEvents) {
+      this.logger.log("Sending event", event);
+    }
     this.io.emit(event, serializedData);
   }
 }

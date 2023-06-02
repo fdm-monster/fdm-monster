@@ -10,7 +10,10 @@ class PrinterFileCleanTask {
    * @type {FilesStore}
    */
   filesStore;
-  #printerStore;
+  /**
+   * @type {PrinterCache}
+   */
+  printerCache;
   /**
    * @type {SettingsStore}
    */
@@ -25,14 +28,14 @@ class PrinterFileCleanTask {
   octoPrintApiService;
 
   constructor({
-    printerStore,
+    printerCache,
     filesStore,
     octoPrintApiService,
     taskManagerService,
     settingsStore,
     loggerFactory
   }) {
-    this.#printerStore = printerStore;
+    this.printerCache = printerCache;
     this.filesStore = filesStore;
     this.taskManagerService = taskManagerService;
     this.octoPrintApiService = octoPrintApiService;
@@ -49,7 +52,8 @@ class PrinterFileCleanTask {
   }
 
   async run() {
-    const printers = this.#printerStore.listPrinterStates(false);
+    // TODO filter disconnected printers
+    const printers = this.printerCache.listCachedPrinters();
     const fileCleanSettings = this.#getSettings();
     const autoCleanAtBootEnabled = fileCleanSettings.autoRemoveOldFilesAtBoot;
 
@@ -68,7 +72,7 @@ class PrinterFileCleanTask {
         if (!outdatedFiles?.length) continue;
 
         // Report
-        this.logger.log(`Found ${outdatedFiles?.length} old files of ${printer.name}`);
+        this.logger.log(`Found ${outdatedFiles?.length} old files of ${printer.printerName}`);
 
         if (autoCleanAtBootEnabled) {
           await this.cleanPrinterFiles(printer.id);

@@ -30,6 +30,18 @@ const ServerSettingsSchema = new mongoose.Schema({
       type: String,
       default: AppConstants.defaultFileStorageFolder,
     },
+    debugSettings: {
+      debugSocketEvents: {
+        type: Boolean,
+        default: false,
+        required: true,
+      },
+      debugSocketReconnect: {
+        type: Boolean,
+        default: false,
+        required: true,
+      },
+    },
     port: {
       type: Number,
       default: AppConstants.defaultServerPort,

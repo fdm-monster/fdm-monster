@@ -9,14 +9,14 @@ const { serverSettingKey } = require("../constants/server-settings.constants");
 class ServerPublicController {
   #serverVersion;
   #settingsStore;
-  #printerStore;
+  #printerSocketStore;
   #serverReleaseService;
   monsterPiService;
 
-  constructor({ settingsStore, printerStore, serverVersion, serverReleaseService, monsterPiService }) {
+  constructor({ settingsStore, printerSocketStore, serverVersion, serverReleaseService, monsterPiService }) {
     this.#settingsStore = settingsStore;
     this.#serverVersion = serverVersion;
-    this.#printerStore = printerStore;
+    this.#printerSocketStore = printerSocketStore;
     this.#serverReleaseService = serverReleaseService;
     this.monsterPiService = monsterPiService;
   }
@@ -50,6 +50,10 @@ class ServerPublicController {
         available: true,
         version: 1,
       },
+      newSockets: {
+        available: true,
+        version: 1,
+      }
     });
   }
 

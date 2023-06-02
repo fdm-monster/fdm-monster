@@ -4,7 +4,10 @@ const { ValidationException } = require("../exceptions/runtime.exceptions");
  * Generic store for synchronisation of files and storage information of printers.
  */
 class FilesStore {
-  #printerStore;
+  /**
+   * @type {PrinterCache}
+   */
+  printerCache;
   /*
    * @type {PrinterFilesService}
    */
@@ -22,8 +25,8 @@ class FilesStore {
    */
   #logger;
 
-  constructor({ printerStore, printerFilesService, fileCache, octoPrintApiService, loggerFactory }) {
-    this.#printerStore = printerStore;
+  constructor({ printerCache, printerFilesService, fileCache, octoPrintApiService, loggerFactory }) {
+    this.printerCache = printerCache;
     this.#printerFilesService = printerFilesService;
     this.#fileCache = fileCache;
     this.#octoPrintApiService = octoPrintApiService;
@@ -36,7 +39,7 @@ class FilesStore {
    * @returns {Promise<void>}
    */
   async loadFilesStore() {
-    const printers = this.#printerStore.listPrinterStates();
+    const printers = this.printerCache.listCachedPrinters(true);
     for (let printer of printers) {
       try {
         const printerFileStorage = await this.#printerFilesService.getPrinterFilesStorage(printer.id);
@@ -54,9 +57,8 @@ class FilesStore {
    * @returns {Promise<*>}
    */
   async eagerLoadPrinterFiles(printerId, recursive) {
-    const printer = this.#printerStore.getPrinterState(printerId);
-    const printerLogin = printer.getLoginDetails();
-    const response = await this.#octoPrintApiService.getFiles(printerLogin, recursive, {
+    const loginDto = this.printerCache.getLoginDto(printerId);
+    const response = await this.#octoPrintApiService.getFiles(loginDto, recursive, {
       unwrap: false,
       simple: true,
     });
@@ -83,8 +85,8 @@ class FilesStore {
     const succeededFiles = [];
 
     const nonRecursiveFiles = this.getOutdatedFiles(printerId, ageDaysMax);
-    const printerLogin = this.#printerStore.getPrinterLogin(printerId);
-    const printerName = this.#printerStore.getPrinterState(printerId).getName();
+    const printerLogin = this.printerCache.getLoginDto(printerId);
+    const printerName = this.printerCache.getCachedPrinter(printerId).printerName;
 
     for (let file of nonRecursiveFiles) {
       try {
@@ -105,7 +107,7 @@ class FilesStore {
   }
 
   async purgePrinterFiles(printerId) {
-    const printerState = this.#printerStore.getPrinterState(printerId);
+    const printerState = this.printerCache.getCachedPrinter(printerId);
 
     this.#logger.log(`Purging files from printer ${printerId}`);
     await this.#printerFilesService.clearFiles(printerState.id);
@@ -117,7 +119,7 @@ class FilesStore {
   }
 
   async purgeFiles() {
-    const allPrinters = this.#printerStore.listPrinterStates(true);
+    const allPrinters = this.printerCache.listCachedPrinters();
 
     this.#logger.log(`Purging files from ${allPrinters.length} printers`);
     for (let printer of allPrinters) {
@@ -132,7 +134,7 @@ class FilesStore {
   }
 
   async updatePrinterFiles(printerId, files) {
-    const printer = this.#printerStore.getPrinterState(printerId);
+    const printer = this.printerCache.getCachedPrinter(printerId);
 
     // Check printer in database and modify
     const printerFileList = await this.#printerFilesService.updateFiles(printer.id, files);
@@ -142,7 +144,7 @@ class FilesStore {
   }
 
   async appendOrSetPrinterFile(printerId, addedFile) {
-    const printer = this.#printerStore.getPrinterState(printerId);
+    const printer = this.printerCache.getCachedPrinter(printerId);
 
     // Check printer in database and modify
     const { fileList, lastPrintedFile } = await this.#printerFilesService.appendOrReplaceFile(printer.id, addedFile);
@@ -151,16 +153,11 @@ class FilesStore {
     await this.#fileCache.cachePrinterFiles(printer.id, fileList);
 
     // Update printer state with lastPrintedFile
-    printer.updateLastPrintedFile(lastPrintedFile);
+    await this.#printerFilesService.setPrinterLastPrintedFile(printer.id, lastPrintedFile.fileName);
   }
 
   async setExistingFileForPrint(printerId, filePath) {
-    const printer = this.#printerStore.getPrinterState(printerId);
-
-    const lastPrintedFile = await this.#printerFilesService.setPrinterLastPrintedFile(printerId, filePath);
-
-    // Update printer state with lastPrintedFile
-    printer.updateLastPrintedFile(lastPrintedFile);
+    await this.#printerFilesService.setPrinterLastPrintedFile(printerId, filePath);
   }
 
   /**

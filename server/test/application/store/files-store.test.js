@@ -5,7 +5,11 @@ const dbHandler = require("../../db-handler");
 let container;
 let filesStore;
 let printerFilesService;
-let printerStore;
+/**
+ * @type {PrinterService}
+ */
+let printerService;
+let printerCache;
 
 beforeAll(async () => {
   await dbHandler.connect();
@@ -16,7 +20,8 @@ beforeEach(async () => {
   container = configureContainer();
   filesStore = container.resolve(DITokens.filesStore);
   printerFilesService = container.resolve(DITokens.printerFilesService);
-  printerStore = container.resolve(DITokens.printerStore);
+  printerService = container.resolve(DITokens.printerService);
+  printerCache = container.resolve(DITokens.printerCache);
 });
 
 afterAll(async () => {
@@ -31,8 +36,8 @@ describe("FilesStore", () => {
   };
 
   it("old files - should deal with empty files cache correctly", async () => {
-    await printerStore.loadPrinterStore();
-    let testPrinterState = await printerStore.addPrinter(validNewPrinter);
+    await printerCache.loadCache();
+    let testPrinterState = await printerService.create(validNewPrinter);
     await filesStore.loadFilesStore();
 
     const filesCache = filesStore.getFiles(testPrinterState.id);
@@ -43,9 +48,8 @@ describe("FilesStore", () => {
   });
 
   it("old files - should keep new files correctly", async () => {
-    await printerStore.loadPrinterStore();
-    let testPrinterState = await printerStore.addPrinter(validNewPrinter);
-
+    await printerCache.loadCache();
+    let testPrinterState = await printerService.create(validNewPrinter);
     await printerFilesService.updateFiles(testPrinterState.id, {
       files: [
         {
@@ -66,8 +70,8 @@ describe("FilesStore", () => {
   });
 
   it("old files - should filter old files correctly", async () => {
-    await printerStore.loadPrinterStore();
-    let testPrinterState = await printerStore.addPrinter(validNewPrinter);
+    await printerCache.loadCache();
+    let testPrinterState = await printerService.create(validNewPrinter);
 
     await printerFilesService.updateFiles(testPrinterState.id, {
       files: [

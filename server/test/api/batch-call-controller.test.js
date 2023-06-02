@@ -43,8 +43,8 @@ describe("BatchCallController", () => {
     expectOkResponse(response);
   });
   it("should allow POST to batch connect printer sockets", async () => {
-    const printer = await createTestPrinter(request);
-    const printer2 = await createTestPrinter(request);
+    const printer = await createTestPrinter(request, true);
+    const printer2 = await createTestPrinter(request, true);
     const response = await request.post(batchConnectSocketRoute).send({
       printerIds: [printer.id, printer2.id],
     });

@@ -1,8 +1,5 @@
 const { InternalServerException } = require("../exceptions/runtime.exceptions");
-const {
-  printerFileCleanSettingKey,
-  serverSettingKey,
-} = require("../constants/server-settings.constants");
+const { printerFileCleanSettingKey, serverSettingKey } = require("../constants/server-settings.constants");
 
 class SettingsStore {
   #settings;
@@ -18,10 +15,7 @@ class SettingsStore {
   }
 
   isRegistrationEnabled() {
-    if (!this.#settings)
-      throw new InternalServerException(
-        "Could not check server settings (server settings not loaded"
-      );
+    if (!this.#settings) throw new InternalServerException("Could not check server settings (server settings not loaded");
     return this.#settings[serverSettingKey].registration;
   }
 
@@ -29,6 +23,10 @@ class SettingsStore {
     return Object.freeze({
       ...this.#settings._doc,
     });
+  }
+
+  getServerSettings() {
+    return this.getSettings()[serverSettingKey];
   }
 
   /**

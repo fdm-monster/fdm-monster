@@ -4,23 +4,47 @@ const Logger = require("../handlers/logger.js");
 const { AppConstants } = require("../server.constants");
 const { ROLES } = require("../constants/authorization.constants");
 const { isTestEnvironment } = require("../utils/env.utils");
-const { Printer } = require("../models");
 const { PassThrough } = require("stream");
 
 class ServerPrivateController {
   #logger = new Logger("Server-Private-API");
   #serverUpdateService;
   #serverReleaseService;
+  /**
+   * @type {ClientBundleService}
+   */
   clientBundleService;
-  printerStore;
+  /**
+   * @type {PrinterCache}
+   */
+  printerCache;
+  /**
+   * @type {PrinterService}
+   */
+  printerService;
+  /**
+   * @type {PrinterSocketStore}
+   */
+  printerSocketStore;
   yamlService;
   multerService;
 
-  constructor({ serverUpdateService, serverReleaseService, clientBundleService, printerStore, yamlService, multerService }) {
+  constructor({
+    serverUpdateService,
+    serverReleaseService,
+    printerCache,
+    printerService,
+    clientBundleService,
+    printerSocketStore,
+    yamlService,
+    multerService,
+  }) {
     this.#serverReleaseService = serverReleaseService;
     this.#serverUpdateService = serverUpdateService;
     this.clientBundleService = clientBundleService;
-    this.printerStore = printerStore;
+    this.printerSocketStore = printerSocketStore;
+    this.printerCache = printerCache;
+    this.printerService = printerService;
     this.yamlService = yamlService;
     this.multerService = multerService;
   }
@@ -76,8 +100,8 @@ class ServerPrivateController {
   }
 
   async deleteAllPrinters(req, res) {
-    await Printer.deleteMany({});
-    await this.printerStore.loadPrinterStore();
+    const printerIds = this.printerCache.listCachedPrinters(true).map((p) => p.id);
+    await this.printerService.deleteMany(printerIds);
     res.send();
   }
 }

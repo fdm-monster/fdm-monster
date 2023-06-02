@@ -9,13 +9,16 @@ const cacheKey = "firmware-state";
 
 class PluginFirmwareUpdateController {
   #cacheManager;
-  #printerStore;
+  /**
+   * @type {PrinterCache}
+   */
+  printerCache;
   #pluginFirmwareUpdateService;
   #logger;
 
-  constructor({ cacheManager, printerStore, pluginFirmwareUpdateService, loggerFactory }) {
+  constructor({ cacheManager, printerCache, pluginFirmwareUpdateService, loggerFactory }) {
     this.#cacheManager = cacheManager;
-    this.#printerStore = printerStore;
+    this.printerCache = printerCache;
     this.#pluginFirmwareUpdateService = pluginFirmwareUpdateService;
     this.#logger = loggerFactory("PluginFirmwareUpdateController");
   }
@@ -88,30 +91,30 @@ class PluginFirmwareUpdateController {
   }
 
   async #performScanOnPrinters() {
-    const printers = this.#printerStore.listPrinterStates();
+    const printers = this.printerCache.listCachedPrinters();
     const printerFirmwareStates = [];
     const failureStates = [];
     for (let printer of printers) {
       try {
-        const loginDetails = printer.getLoginDetails();
-        const isInstalled = await this.#pluginFirmwareUpdateService.isPluginInstalled(loginDetails);
+        const loginDto = this.printerCache.getLoginDto(printer.id);
+        const isInstalled = await this.#pluginFirmwareUpdateService.isPluginInstalled(loginDto);
 
         let version;
         if (isInstalled) {
-          version = await this.#pluginFirmwareUpdateService.getPrinterFirmwareVersion(loginDetails);
+          version = await this.#pluginFirmwareUpdateService.getPrinterFirmwareVersion(loginDto);
         }
 
         printerFirmwareStates.push({
           id: printer.id,
           firmware: version,
-          printerName: printer.getName(),
+          printerName: printer.name,
           pluginInstalled: isInstalled,
         });
       } catch (e) {
         this.#logger.warn("Firmware updater plugin scan failed", e);
         failureStates.push({
           id: printer.id,
-          printerName: printer.getName(),
+          printerName: printer.name,
           error: e,
         });
       }

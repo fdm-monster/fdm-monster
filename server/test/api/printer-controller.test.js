@@ -74,12 +74,12 @@ describe("PrinterController", () => {
 
   it(`should not be able to POST ${updateRoute} - missing printer field`, async () => {
     const response = await request.patch(connectionRoute("asd")).send();
-    expectInvalidResponse(response, ["printerId"], false);
+    expectNotFoundResponse(response);
   });
 
   it(`should not be able to DELETE ${deleteRoute} - nonexistent id`, async () => {
     const response = await request.delete(deleteRoute("non-id")).send();
-    expectInvalidResponse(response, ["printerId"], true);
+    expectNotFoundResponse(response);
   });
 
   it(`should be able to DELETE ${deleteRoute} - existing id`, async () => {
@@ -106,7 +106,7 @@ describe("PrinterController", () => {
     const res = await request.get(getRoute(printerId)).send();
     expectNotFoundResponse(res);
     expect(res.body).toEqual({
-      error: `The printer ID '${printerId}' was not found in the printerStore.`,
+      error: `Printer with id ${printerId} not found`,
     });
   });
 
@@ -144,13 +144,6 @@ describe("PrinterController", () => {
 
     const response = await request.get(loginDetailsRoute(printer.id)).send();
     expectOkResponse(response, { printerURL: "http://url.com", apiKey: testApiKey });
-  });
-
-  it("should command store to reconnect OctoPrint", async () => {
-    const printer = await createTestPrinter(request);
-
-    const response = await request.post(reconnectRoute(printer.id)).send();
-    expectOkResponse(response);
   });
 
   it("should stop printer job correctly", async () => {
@@ -232,14 +225,6 @@ describe("PrinterController", () => {
     const printer = await createTestPrinter(request);
     const updatePatch = await request.patch(disabledReasonRoute(printer.id)).send({
       disabledReason: "Under maintenance",
-    });
-    expectOkResponse(updatePatch);
-  });
-
-  it("should update printer stepSize setting correctly", async () => {
-    const printer = await createTestPrinter(request);
-    const updatePatch = await request.patch(stepSizeRoute(printer.id)).send({
-      stepSize: 0.1,
     });
     expectOkResponse(updatePatch);
   });

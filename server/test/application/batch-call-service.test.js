@@ -6,14 +6,17 @@ const awilix = require("awilix");
 const AxiosMock = require("../mocks/axios.mock");
 
 let batchCallService;
-let printerStore;
+/**
+ * @type {PrinterService}
+ */
+let printerService;
 let httpClient;
 
 beforeAll(async () => {
   await dbHandler.connect();
   const container = configureContainer();
   container.register(DITokens.httpClient, awilix.asClass(AxiosMock).singleton());
-  printerStore = container.resolve(DITokens.printerStore);
+  printerService = container.resolve(DITokens.printerService);
   batchCallService = container.resolve(DITokens.batchCallService);
   httpClient = container.resolve(DITokens.httpClient);
 });
@@ -30,9 +33,8 @@ beforeEach(() => {
 
 describe("BatchCallService ", () => {
   it("should call multiple printers ", async () => {
-    await printerStore.loadPrinterStore();
-    let printer = await printerStore.addPrinter(validNewPrinterState);
-    let printer2 = await printerStore.addPrinter(validNewPrinterState);
+    let printer = await printerService.create(validNewPrinterState);
+    let printer2 = await printerService.create(validNewPrinterState);
 
     const result = await batchCallService.batchReprintCalls([printer.id, printer2.id]);
     expect(result).toHaveLength(2);

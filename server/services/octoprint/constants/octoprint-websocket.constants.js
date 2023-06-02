@@ -1,61 +1,3 @@
-const { mapStateToColor, PSTATE } = require("../../../constants/state.constants");
-
-function getDefaultProgressState() {
-  return {
-    completion: undefined,
-    filepos: undefined,
-    printTime: undefined,
-    printTimeLeft: undefined,
-    printTimeLeftOrigin: undefined,
-  };
-}
-
-function getDefaultJobState() {
-  return {
-    file: undefined,
-    estimatedPrintTime: undefined,
-    averagePrintTime: undefined,
-    lastPrintTime: undefined,
-    filament: undefined,
-    user: undefined,
-  };
-}
-
-function getDefaultPrinterState() {
-  return {
-    updatedAt: null,
-    state: PSTATE.Offline,
-    flags: { operational: false },
-    desc: "Printer needs WebSocket connection first",
-    colour: mapStateToColor(PSTATE.Offline),
-  };
-}
-
-function getDefaultDisabledPrinterState() {
-  return {
-    updatedAt: Date.now(),
-    state: PSTATE.Disabled,
-    flags: { operational: false },
-    desc: "Printer is disabled",
-    colour: mapStateToColor(PSTATE.Disabled),
-  };
-}
-
-function getDefaultCurrentState() {
-  return {
-    state: undefined,
-    job: getDefaultJobState(),
-    progress: getDefaultProgressState(),
-    currentZ: undefined,
-    offsets: undefined,
-    temps: undefined,
-    logs: undefined,
-    messages: undefined,
-    resends: undefined,
-    plugins: undefined, // TODO might be better in different state
-  };
-}
-
 const EVENT_TYPES = {
   ClientAuthed: "ClientAuthed",
   ClientClosed: "ClientClosed",
@@ -120,11 +62,6 @@ const WS_STATE = {
 };
 
 module.exports = {
-  getDefaultProgressState,
-  getDefaultJobState,
-  getDefaultPrinterState,
-  getDefaultDisabledPrinterState,
-  getDefaultCurrentState,
   EVENT_TYPES,
   WS_STATE,
   OP_WS_MSG,

@@ -37,9 +37,9 @@ class PrinterFilesController {
    */
   batchCallService;
   /**
-   * @type {PrinterStore}
+   * @type {PrinterSocketStore}
    */
-  #printerStore;
+  #printerSocketStore;
   /**
    * @type {MulterService}
    */
@@ -58,7 +58,7 @@ class PrinterFilesController {
     filesStore,
     octoPrintApiService,
     batchCallService,
-    printerStore,
+    printerSocketStore,
     printerFileCleanTask,
     settingsStore,
     loggerFactory,
@@ -69,7 +69,7 @@ class PrinterFilesController {
     this.#printerFileCleanTask = printerFileCleanTask;
     this.#octoPrintApiService = octoPrintApiService;
     this.batchCallService = batchCallService;
-    this.#printerStore = printerStore;
+    this.#printerSocketStore = printerSocketStore;
     this.#multerService = multerService;
     this.#logger = loggerFactory("Server-API");
   }
