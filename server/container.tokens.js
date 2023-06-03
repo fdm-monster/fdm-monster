@@ -58,7 +58,6 @@ const DITokens = {
   clientDistDownloadTask: "clientDistDownloadTask",
   socketIoTask: "socketIoTask",
   printCompletionSocketIoTask: "printCompletionSocketIoTask",
-  printerTestTask: "printerTestTask",
   printerWebsocketTask: "printerWebsocketTask",
   printerWebsocketPingTask: "printerWebsocketPingTask",
   printerFileCleanTask: "printerFileCleanTask",

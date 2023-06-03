@@ -29,7 +29,6 @@ class ServerTasks {
     registerTask(DITokens.clientDistDownloadTask, TaskPresets.RUNONCE),
     registerTask(DITokens.socketIoTask, TaskPresets.PERIODIC, 500),
     registerTask(DITokens.printCompletionSocketIoTask, TaskPresets.RUNONCE),
-    registerTask(DITokens.printerTestTask, TaskPresets.PERIODIC_DISABLED, 2000, true),
     registerTask(DITokens.printerFileCleanTask, TaskPresets.RUNONCE, 60 * 1000, true),
     registerTask(DITokens.printerSystemTask, TaskPresets.PERIODIC_DISABLED, 6 * HOUR_MS, true),
     registerTask(DITokens.printerWebsocketTask, TaskPresets.PERIODIC, 2000, true),

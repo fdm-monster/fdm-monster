@@ -1,11 +1,7 @@
 const dbHandler = require("../db-handler");
 const { AppConstants } = require("../../server.constants");
 const { setupTestApp } = require("../test-server");
-const {
-  expectInvalidResponse,
-  expectOkResponse,
-  expectNotFoundResponse,
-} = require("../extensions");
+const { expectInvalidResponse, expectOkResponse, expectNotFoundResponse } = require("../extensions");
 const { Printer } = require("../../models/Printer");
 const { testApiKey, createTestPrinter } = require("./test-data/create-printer");
 const { TaskPresets } = require("../../task.presets");
@@ -190,22 +186,11 @@ describe("PrinterController", () => {
   });
 
   it("should test printer connection", async () => {
-    let ranTask = false;
-    const preset = TaskPresets.PERIODIC_DISABLED;
-    preset.milliseconds = 2000;
-    await taskManagerService.registerJobOrTask({
-      id: DITokens.printerTestTask,
-      task: () => {
-        ranTask = true;
-      },
-      preset,
-    });
     const res = await request.post(testPrinterRoute).send({
       apiKey,
       printerURL: "https://test.com/",
     });
     expectOkResponse(res);
-    expect(ranTask).toBeTruthy();
   });
 
   it("should update printer enabled setting correctly", async () => {

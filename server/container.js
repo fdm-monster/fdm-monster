@@ -24,7 +24,6 @@ const { AppConstants } = require("./server.constants");
 const PrinterFilesService = require("./services/printer-files.service");
 const SoftwareUpdateTask = require("./tasks/software-update.task");
 const LoggerFactory = require("./handlers/logger-factory");
-const PrinterTestTask = require("./tasks/printer-test.task");
 const MulterService = require("./services/multer.service");
 const FileUploadTrackerCache = require("./state/file-upload-tracker.cache");
 const ServerHost = require("./server.host");
@@ -140,7 +139,6 @@ function configureContainer() {
     [DITokens.printerWebsocketTask]: asClass(PrinterWebsocketTask).singleton(), // This task is a recurring heartbeat task
     [DITokens.printerWebsocketPingTask]: asClass(PrinterWebsocketPingTask).singleton(), // Task dependent on WS to fire - disabled at boot
     [DITokens.printerSystemTask]: asClass(PrinterSystemTask).singleton(), // Task dependent on test printer in store - disabled at boot
-    [DITokens.printerTestTask]: asClass(PrinterTestTask).singleton(), // Task to regularly clean printer files based on certain configuration settings
     [DITokens.printerFileCleanTask]: asClass(PrinterFileCleanTask).singleton(),
   });
 
