@@ -262,7 +262,12 @@ class PrinterController {
     this.#logger.log(`Testing printer with correlation token ${newPrinter.correlationToken}`);
 
     // Add printer with test=true
-    await this.#printerSocketStore.setupTestPrinter(newPrinter);
+    try {
+      await this.#printerSocketStore.setupTestPrinter(newPrinter);
+    } catch (e) {
+      res.send({ correlationToken: newPrinter.correlationToken, failure: true });
+      return;
+    }
     res.send({ correlationToken: newPrinter.correlationToken });
   }
 
