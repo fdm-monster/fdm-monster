@@ -1,12 +1,17 @@
 const SettingsModel = require("../models/ServerSettings.js");
 const Constants = require("../constants/server-settings.constants");
 const { validateInput } = require("../handlers/validators");
-const { serverSettingsUpdateRules, frontendSettingsUpdateRules } = require("./validators/settings-service.validation");
+const {
+  serverSettingsUpdateRules,
+  frontendSettingsUpdateRules,
+  settingsUpdateRules,
+} = require("./validators/settings-service.validation");
 const {
   printerFileCleanSettingKey,
   getDefaultPrinterFileCleanSettings,
   getDefaultWhitelistIpAddresses,
-  serverSettingKey, frontendSettingKey,
+  serverSettingsKey,
+  frontendSettingKey,
 } = require("../constants/server-settings.constants");
 
 class SettingsService {
@@ -65,7 +70,7 @@ class SettingsService {
 
   async setLoginRequired(enabled = true) {
     const settingsDoc = await this.getOrCreate();
-    settingsDoc[serverSettingKey].loginRequired = enabled;
+    settingsDoc[serverSettingsKey].loginRequired = enabled;
 
     return SettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
       new: true,
@@ -74,7 +79,7 @@ class SettingsService {
 
   async setWhitelist(enabled, ipAddresses) {
     const settingsDoc = await this.getOrCreate();
-    const settings = settingsDoc[serverSettingKey];
+    const settings = settingsDoc[serverSettingsKey];
     settings.whitelistEnabled = enabled;
     settings.whitelistedIpAddresses = ipAddresses;
 
@@ -84,9 +89,12 @@ class SettingsService {
   }
 
   async updateFrontendSettings(patchUpdate) {
-    const validatedInput = await validateInput({
-      [frontendSettingKey]: patchUpdate
-    }, frontendSettingsUpdateRules);
+    const validatedInput = await validateInput(
+      {
+        [frontendSettingKey]: patchUpdate,
+      },
+      frontendSettingsUpdateRules
+    );
     const settingsDoc = await this.getOrCreate();
 
     return SettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, validatedInput, {
@@ -94,8 +102,27 @@ class SettingsService {
     });
   }
 
-  async update(patchUpdate) {
+  async updateServerSettings(patchUpdate) {
     const validatedInput = await validateInput(patchUpdate, serverSettingsUpdateRules);
+    const settingsDoc = await this.getOrCreate();
+
+    return SettingsModel.findOneAndUpdate(
+      { _id: settingsDoc._id },
+      {
+        [serverSettingsKey]: validatedInput,
+      },
+      {
+        new: true,
+      }
+    );
+  }
+
+  /**
+   * @deprecated Use partial update methods instead
+   * @param patchUpdate
+   */
+  async update(patchUpdate) {
+    const validatedInput = await validateInput(patchUpdate, settingsUpdateRules);
     const settingsDoc = await this.getOrCreate();
 
     return SettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, validatedInput, {
@@ -105,5 +132,5 @@ class SettingsService {
 }
 
 module.exports = {
-  SettingsService
+  SettingsService,
 };

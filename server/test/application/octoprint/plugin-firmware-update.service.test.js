@@ -12,9 +12,15 @@ const pluginJson = require("../test-data/plugins.json");
 let octoPrintApi;
 let httpClient;
 let container;
-let printerStore;
+/**
+ * @type {PrinterCache}
+ */
+let printerCache;
+let printerService;
+let pluginCache;
 let pluginService;
-let printerState;
+let createdPrinter;
+let loginDto;
 
 beforeAll(async () => {
   await dbHandler.connect();
@@ -24,14 +30,15 @@ beforeAll(async () => {
 
   octoPrintApi = container.resolve(DITokens.octoPrintApiService);
   pluginService = container.resolve(DITokens.pluginFirmwareUpdateService);
-  printerStore = container.resolve(DITokens.printerStore);
+  printerCache = container.resolve(DITokens.printerCache);
+  printerService = container.resolve(DITokens.printerService);
   httpClient = container.resolve(DITokens.httpClient);
-  cache = container.resolve(DITokens.pluginRepositoryCache);
+  pluginCache = container.resolve(DITokens.pluginRepositoryCache);
 
-  await printerStore.loadPrinterStore();
-  printerState = await printerStore.addPrinter(validNewPrinterState);
+  createdPrinter = await printerService.create(validNewPrinterState);
+  loginDto = printerCache.getLoginDto(createdPrinter.id)
   httpClient.saveMockResponse(pluginJson, 200, false);
-  await cache.queryCache();
+  await pluginCache.queryCache();
 });
 
 afterEach(async () => {
@@ -49,33 +56,32 @@ describe("PluginFirmwareUpdateService", () => {
 
   it("should see that plugin is installed", async () => {
     httpClient.saveMockResponse(pmPluginsResponse, 200, false);
-    await pluginService.isPluginInstalled(printerState.getLoginDetails());
+    await pluginService.isPluginInstalled(loginDto);
   });
   it("should see that plugin is up-to-date", async () => {
     httpClient.saveMockResponse(pmFUPluginResponse, 200, false);
-    const result = await pluginService.isPluginUpToDate(printerState.getLoginDetails());
+    const result = await pluginService.isPluginUpToDate(loginDto);
     expect(result).toBeTruthy();
   });
   it("should update plugin", async () => {
     httpClient.saveMockResponse(pmFUPluginResponse, 200, false);
-    const result = await pluginService.updatePlugin(printerState.getLoginDetails());
+    const result = await pluginService.updatePlugin(loginDto);
     expect(result).toBeTruthy();
   });
   it("should be able to call install/uninstall plugin", async () => {
     httpClient.saveMockResponse(pmPluginsResponse, 200, false);
-    await pluginService.installPlugin(printerState.getLoginDetails());
-    await pluginService.uninstallPlugin(printerState.getLoginDetails());
+    await pluginService.installPlugin(loginDto);
+    await pluginService.uninstallPlugin(loginDto);
   });
   it("should be able to install plugin with system restart", async () => {
     httpClient.saveMockResponse(pmPluginsResponse, 200, false);
-    await pluginService.installPlugin(printerState.getLoginDetails(), true);
+    await pluginService.installPlugin(loginDto, true);
   });
   it("should be able to perform all plugin commands", async () => {
     httpClient.saveMockResponse(pmPluginsResponse, 200, false);
-    const printerLogin = printerState.getLoginDetails();
-    await pluginService.enablePlugin(printerLogin);
-    await pluginService.disablePlugin(printerLogin);
-    await pluginService.cleanupPlugin(printerLogin);
-    await pluginService.cleanupAllPlugins(printerLogin);
+    await pluginService.enablePlugin(loginDto);
+    await pluginService.disablePlugin(loginDto);
+    await pluginService.cleanupPlugin(loginDto);
+    await pluginService.cleanupAllPlugins(loginDto);
   });
 });

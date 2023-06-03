@@ -6,18 +6,16 @@ const { PrinterMockData } = require("./test-data/printer.data");
 
 let floorService;
 let printerService;
-let printerStore;
+let printerSocketStore;
 
 beforeAll(async () => {
   await dbHandler.connect();
   const container = configureContainer();
   printerService = container.resolve(DITokens.printerService);
-  printerStore = container.resolve(DITokens.printerStore);
+  printerSocketStore = container.resolve(DITokens.printerSocketStore);
   floorService = container.resolve(DITokens.floorService);
 });
-afterEach(async () => {
-  await dbHandler.clearDatabase();
-});
+
 afterAll(async () => {
   await dbHandler.closeDatabase();
 });
@@ -46,7 +44,7 @@ describe("floorService ", () => {
     // Create it
     const floor = await floorService.create({
       name: "TopFloor1",
-      floor: 1,
+      floor: 2,
       printers: [],
     });
 
@@ -59,12 +57,11 @@ describe("floorService ", () => {
     // Prepare the CRUD DTO
     const newPrinter = PrinterMockData.PrinterMock;
     const pg = await printerService.create(newPrinter);
-    await printerStore.loadPrinterStore();
 
     // Create it
     const floor = await floorService.create({
       name: "TopFloor1",
-      floor: 1,
+      floor: 3,
       printers: [],
     });
 
@@ -81,12 +78,11 @@ describe("floorService ", () => {
     // Prepare the CRUD DTO
     const newPrinter = PrinterMockData.PrinterMock;
     const printer = await printerService.create(newPrinter);
-    await printerStore.loadPrinterStore();
 
     // Create it
     const floor = await floorService.create({
       name: "TopFloor1",
-      floor: 1,
+      floor: 4,
       printers: [{ printerId: printer.id, x: 1, y: 1 }],
     });
 

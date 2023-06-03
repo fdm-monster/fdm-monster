@@ -6,12 +6,15 @@ const { exportYamlBuffer } = require("./test-data/yaml-import");
 
 let container;
 let yamlService;
-let printerStore;
+/**
+ * @type {PrinterCache}
+ */
+let printerCache;
 beforeAll(async () => {
   await dbHandler.connect();
   container = configureContainer();
   yamlService = container.resolve(DITokens.yamlService);
-  printerStore = container.resolve(DITokens.printerStore);
+  printerCache = container.resolve(DITokens.printerCache);
 });
 afterEach(async () => {
   await Printer.deleteMany();
@@ -22,7 +25,7 @@ afterAll(async () => {
 
 describe("YamlService", () => {
   it("should import yaml", async () => {
-    await printerStore.loadPrinterStore();
+    await printerCache.loadCache();
     await yamlService.importPrintersAndFloors(exportYamlBuffer);
   });
 });

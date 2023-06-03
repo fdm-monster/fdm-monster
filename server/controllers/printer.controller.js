@@ -2,9 +2,7 @@ const { authenticate, authorizeRoles } = require("../middleware/authenticate");
 const { createController } = require("awilix-express");
 const { validateMiddleware, getScopedPrinter } = require("../handlers/validators");
 const {
-  updateSortIndexRules,
   updatePrinterConnectionSettingRules,
-  stepSizeRules,
   flowRateRules,
   feedRateRules,
   updatePrinterEnabledRule,
@@ -12,7 +10,7 @@ const {
   updatePrinterDisabledReasonRules,
 } = require("./validation/printer-controller.validation");
 const { AppConstants } = require("../server.constants");
-const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
+const { convertHttpUrlToWebsocket, httpToWsUrl } = require("../utils/url.utils");
 const DITokens = require("../container.tokens");
 const { getSettingsAppearanceDefault } = require("../constants/service.constants");
 const { printerResolveMiddleware } = require("../middleware/printer");
@@ -21,7 +19,19 @@ const { ROLES } = require("../constants/authorization.constants");
 const { Floor } = require("../models/Floor");
 
 class PrinterController {
-  #printerStore;
+  /**
+   * @type {PrinterSocketStore}
+   */
+  #printerSocketStore;
+  /**
+   * @type {PrinterService}
+   */
+  printerService;
+  /**
+   * @type {PrinterCache}
+   */
+  printerCache;
+
   #taskManagerService;
   #octoPrintApiService;
   #pluginRepositoryCache;
@@ -32,18 +42,48 @@ class PrinterController {
    */
   #logger;
 
-  constructor({ printerStore, taskManagerService, loggerFactory, octoPrintApiService, pluginRepositoryCache, floorStore }) {
-    this.#logger = loggerFactory("Server-API");
-    this.#printerStore = printerStore;
+  constructor({
+    printerSocketStore,
+    printerService,
+    printerCache,
+    taskManagerService,
+    loggerFactory,
+    octoPrintApiService,
+    pluginRepositoryCache,
+    floorStore,
+  }) {
+    this.#logger = loggerFactory("PrinterController");
+    this.printerCache = printerCache;
+    this.printerService = printerService;
+    this.#printerSocketStore = printerSocketStore;
     this.#taskManagerService = taskManagerService;
     this.#octoPrintApiService = octoPrintApiService;
     this.#pluginRepositoryCache = pluginRepositoryCache;
     this.floorStore = floorStore;
   }
 
+  async list(req, res) {
+    const printers = this.printerCache.listCachedPrinters(true);
+    res.send(printers);
+  }
+
+  async listPrinterFloors(req, res) {
+    const { currentPrinterId } = getScopedPrinter(req);
+    const results = await Floor.find({
+      "printers.printerId": currentPrinterId,
+    });
+    res.send(results);
+  }
+
   async getPrinter(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
-    const foundPrinter = this.#printerStore.getPrinterFlat(currentPrinterId);
+    const foundPrinter = this.printerCache.getCachedPrinter(currentPrinterId);
+    res.send(foundPrinter);
+  }
+
+  async getPrinterSocketInfo(req, res) {
+    const { currentPrinterId } = getScopedPrinter(req);
+    const foundPrinter = this.#printerSocketStore.getPrinterSocketEvents(currentPrinterId);
     res.send(foundPrinter);
   }
 
@@ -87,29 +127,8 @@ class PrinterController {
     res.send({});
   }
 
-  async testConnection(req, res) {
-    const newPrinter = await validateMiddleware(req, testPrinterApiRules);
-
-    if (!newPrinter.webSocketURL) {
-      newPrinter.webSocketURL = convertHttpUrlToWebsocket(newPrinter.printerURL);
-    }
-
-    // As we dont generate a _id we generate a correlation token
-    newPrinter.correlationToken = generateCorrelationToken();
-
-    this.#logger.log(`Testing printer with correlation token ${newPrinter.correlationToken}`);
-
-    // Add printer with test=true
-    const printerState = await this.#printerStore.setupTestPrinter(newPrinter);
-
-    this.#taskManagerService.scheduleDisabledJob(DITokens.printerTestTask);
-    res.send(printerState.toFlat());
-  }
-
   #adjustPrinterObject(printer) {
-    if (!printer.webSocketURL) {
-      printer.webSocketURL = convertHttpUrlToWebsocket(printer.printerURL);
-    }
+    // TODO move to service
     printer.settingsAppearance = getSettingsAppearanceDefault();
     if (printer.printerName) {
       printer.settingsAppearance.name = printer.printerName;
@@ -124,37 +143,20 @@ class PrinterController {
     newPrinter = this.#adjustPrinterObject(newPrinter);
 
     // Has internal validation, but might add some here above as well
-    const printerState = await this.#printerStore.addPrinter(newPrinter);
-
-    this.#logger.log(`Created printer with ID ${printerState.id || printerState.correlationToken}`);
-
-    res.send(printerState.toFlat());
+    const createdPrinter = await this.printerService.create(newPrinter);
+    const printer = this.printerCache.getCachedPrinter(createdPrinter.id);
+    this.#logger.log(`Created printer with ID ${printer.id || printer.correlationToken}`);
+    res.send(printer);
   }
 
   async importBatch(req, res) {
-    const flattenedPrinters = await this.#printerStore.batchImport(req.body);
-
-    res.send(flattenedPrinters);
-  }
-
-  async list(req, res) {
-    const listedPrinters = this.#printerStore.listPrintersFlat();
-
-    res.send(listedPrinters);
-  }
-
-  async listPrinterFloors(req, res) {
-    const { currentPrinterId } = getScopedPrinter(req);
-    const results = await Floor.find({
-      "printers.printerId": currentPrinterId,
-    });
-
-    res.send(results);
+    const importResult = await this.printerService.batchImport(req.body);
+    res.send(importResult);
   }
 
   async delete(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
-    const result = await this.#printerStore.deletePrinter(currentPrinterId);
+    const result = await this.printerService.delete(currentPrinterId);
     await this.floorStore.removePrinterFromAnyFloor(currentPrinterId);
     res.send(result);
   }
@@ -169,9 +171,9 @@ class PrinterController {
     const { currentPrinterId } = getScopedPrinter(req);
     let updatedPrinter = req.body;
     updatedPrinter = this.#adjustPrinterObject(updatedPrinter);
+    await this.printerService.update(currentPrinterId, updatedPrinter);
 
-    const result = await this.#printerStore.updatePrinter(currentPrinterId, updatedPrinter);
-
+    const result = this.printerCache.getCachedPrinter(currentPrinterId);
     res.send(result);
   }
 
@@ -185,12 +187,10 @@ class PrinterController {
     const { currentPrinterId } = getScopedPrinter(req);
     const inputData = await validateMiddleware(req, updatePrinterConnectionSettingRules);
 
-    const newEntity = await this.#printerStore.updatePrinterConnectionSettings(currentPrinterId, inputData);
-
+    const newEntity = await this.printerService.updateConnectionSettings(currentPrinterId, inputData);
     res.send({
       printerURL: newEntity.printerURL,
       apiKey: newEntity.apiKey,
-      webSocketURL: newEntity.webSocketURL,
     });
   }
 
@@ -199,8 +199,7 @@ class PrinterController {
     const data = await validateMiddleware(req, updatePrinterEnabledRule);
 
     this.#logger.log("Changing printer enabled setting", JSON.stringify(data));
-    await this.#printerStore.updateEnabled(currentPrinterId, data.enabled);
-
+    await this.printerService.updateEnabled(currentPrinterId, data.enabled);
     res.send({});
   }
 
@@ -209,25 +208,7 @@ class PrinterController {
     const data = await validateMiddleware(req, updatePrinterDisabledReasonRules);
 
     this.#logger.log("Changing printer disabled reason setting", JSON.stringify(data));
-    await this.#printerStore.updateDisabledReason(currentPrinterId, data.disabledReason);
-
-    res.send({});
-  }
-
-  async reconnectOctoPrint(req, res) {
-    const { currentPrinterId } = getScopedPrinter(req);
-
-    this.#logger.log("Refreshing OctoPrint API connection", currentPrinterId);
-    this.#printerStore.reconnectOctoPrint(currentPrinterId);
-
-    res.send({});
-  }
-
-  async setStepSize(req, res) {
-    const { currentPrinterId } = getScopedPrinter(req);
-    const data = await validateMiddleware(req, stepSizeRules);
-
-    this.#printerStore.setPrinterStepSize(currentPrinterId, data.stepSize);
+    await this.printerService.updateDisabledReason(currentPrinterId, data.disabledReason);
     res.send({});
   }
 
@@ -235,7 +216,7 @@ class PrinterController {
     const { currentPrinterId } = getScopedPrinter(req);
     const data = await validateMiddleware(req, feedRateRules);
 
-    await this.#printerStore.setPrinterFeedRate(currentPrinterId, data.feedRate);
+    await this.printerService.updateFeedRate(currentPrinterId, data.feedRate);
     res.send({});
   }
 
@@ -243,7 +224,7 @@ class PrinterController {
     const { currentPrinterId } = getScopedPrinter(req);
     const data = await validateMiddleware(req, flowRateRules);
 
-    await this.#printerStore.setPrinterFlowRate(currentPrinterId, data.flowRate);
+    await this.printerService.updateFlowRate(currentPrinterId, data.flowRate);
     res.send({});
   }
 
@@ -269,6 +250,32 @@ class PrinterController {
     let pluginList = await this.#octoPrintApiService.getPluginManagerPlugins(printerLogin);
     res.send(pluginList);
   }
+
+  /**
+   * @param req
+   * @param res
+   * @returns {Promise<void>}
+   */
+  async testConnection(req, res) {
+    const newPrinter = await validateMiddleware(req, testPrinterApiRules);
+    newPrinter.correlationToken = generateCorrelationToken();
+    this.#logger.log(`Testing printer with correlation token ${newPrinter.correlationToken}`);
+
+    // Add printer with test=true
+    try {
+      await this.#printerSocketStore.setupTestPrinter(newPrinter);
+    } catch (e) {
+      res.send({ correlationToken: newPrinter.correlationToken, failure: true });
+      return;
+    }
+    res.send({ correlationToken: newPrinter.correlationToken });
+  }
+
+  async refreshPrinterSocket(req, res) {
+    const { currentPrinterId } = getScopedPrinter(req);
+    this.#printerSocketStore.reconnectOctoPrint(currentPrinterId);
+    res.send({});
+  }
 }
 
 // prettier-ignore
@@ -281,6 +288,7 @@ module.exports = createController(PrinterController)
   .post("/test-connection", "testConnection")
   .get("/plugin-list", "getPluginList")
   .get("/:id", "getPrinter")
+  .get("/:id/socket", "getPrinterSocketInfo")
   .patch("/:id", "update")
   .delete("/:id", "delete")
   .get("/:id/login-details", "getPrinterLoginDetails")
@@ -288,7 +296,7 @@ module.exports = createController(PrinterController)
   .post("/:id/serial-connect", "sendSerialConnectCommand")
   .post("/:id/serial-disconnect", "sendSerialDisconnectCommand")
   .post("/:id/job/stop", "stopPrintJob")
-  .post("/:id/reconnect", "reconnectOctoPrint")
+  .post("/:id/refresh-socket", "refreshPrinterSocket")
   .patch("/:id/enabled", "updateEnabled")
   .patch("/:id/connection", "updateConnectionSettings")
   .patch("/:id/step-size", "setStepSize")

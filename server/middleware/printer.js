@@ -7,18 +7,21 @@ const printerLoginToken = "printerLogin";
 
 const printerResolveMiddleware = (key = "id") => {
   return (req, res, next) => {
-    const printerStore = req.container.resolve(DITokens.printerStore);
+    const printerCache = req.container.resolve(DITokens.printerCache);
 
     let scopedPrinter = undefined;
+    let loginDto = undefined;
 
-    if (req.params[key]) {
-      scopedPrinter = printerStore.getPrinterState(req.params[key]);
+    const printerId = req.params[key];
+    if (printerId) {
+      scopedPrinter = printerCache.getCachedPrinter(printerId);
+      loginDto = printerCache.getLoginDto(printerId);
     }
 
     req.container.register({
       [currentPrinterToken]: asValue(scopedPrinter),
-      [printerLoginToken]: asValue(scopedPrinter?.getLoginDetails()),
-      [printerIdToken]: asValue(req.params[key])
+      [printerLoginToken]: asValue(loginDto),
+      [printerIdToken]: asValue(printerId),
     });
 
     next();
@@ -29,5 +32,5 @@ module.exports = {
   printerResolveMiddleware,
   currentPrinterToken,
   printerLoginToken,
-  printerIdToken
+  printerIdToken,
 };

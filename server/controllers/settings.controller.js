@@ -34,6 +34,11 @@ class SettingsController {
     res.send(result);
   }
 
+  async updateServerSettings(req, res) {
+    const result = await this.settingsStore.updateServerSettings(req.body);
+    res.send(result);
+  }
+
   async updateSettings(req, res) {
     const result = await this.settingsStore.updateSettings(req.body);
     res.send(result);
@@ -46,5 +51,6 @@ module.exports = createController(SettingsController)
   .before([authenticate(), authorizeRoles([ROLES.ADMIN])])
   .get("/server", "getSettings")
   .put("/server", "updateSettings")
+  .put("/server/server", "updateServerSettings")
   .put("/server/whitelist", "updateWhitelistSettings")
   .put("/server/frontend", "updateFrontendSettings");

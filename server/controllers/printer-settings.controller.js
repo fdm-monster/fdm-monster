@@ -7,14 +7,17 @@ const { setGcodeAnalysis } = require("./validation/printer-settings-controller.v
 const { PERMS } = require("../constants/authorization.constants");
 
 class PrinterSettingsController {
-  #printerStore;
+  /**
+   * @type {PrinterCache}
+   */
+  printerCache;
   #octoPrintApiService;
 
   #logger;
 
-  constructor({ printerStore, loggerFactory, octoPrintApiService }) {
+  constructor({ printerCache, loggerFactory, octoPrintApiService }) {
     this.#logger = loggerFactory(PrinterSettingsController.name);
-    this.#printerStore = printerStore;
+    this.printerCache = printerCache;
     this.#octoPrintApiService = octoPrintApiService;
   }
 
@@ -27,7 +30,7 @@ class PrinterSettingsController {
   async get(req, res) {
     const { id: printerId } = await validateInput(req.params, idRules);
 
-    const printerLogin = this.#printerStore.getPrinterLogin(printerId);
+    const printerLogin = this.printerCache.getLoginDto(printerId);
     const settings = await this.#octoPrintApiService.getSettings(printerLogin);
     res.send(settings);
   }
@@ -36,7 +39,7 @@ class PrinterSettingsController {
     const { id: printerId } = await validateInput(req.params, idRules);
     const input = await validateInput(req.body, setGcodeAnalysis);
 
-    const printerLogin = this.#printerStore.getPrinterLogin(printerId);
+    const printerLogin = this.printerCache.getLoginDto(printerId);
     const settings = await this.#octoPrintApiService.setGCodeAnalysis(printerLogin, input);
     res.send(settings);
   }
@@ -44,12 +47,11 @@ class PrinterSettingsController {
   async syncPrinterName(req, res) {
     const { id: printerId } = await validateInput(req.params, idRules);
 
-    const printerState = this.#printerStore.getPrinterState(printerId);
-    const printerLogin = printerState.getLoginDetails();
-    const printerName = printerState.getName();
+    const printerLogin = this.printerCache.getLoginDto(printerId);
+    const printerName = this.printerCache.getName(printerId);
     const settings = await this.#octoPrintApiService.updatePrinterNameSetting(
       printerLogin,
-      printerName
+      printerName,
     );
     res.send(settings);
   }

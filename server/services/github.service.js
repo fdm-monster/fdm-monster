@@ -19,6 +19,11 @@ class GithubService {
     this.octokitService = octokitService;
   }
 
+  async wasAuthenticated() {
+    const result = await this.octokitService.auth();
+    return result?.type === "token";
+  }
+
   async getAuthenticated() {
     return this.octokitService.rest.users.getAuthenticated();
   }

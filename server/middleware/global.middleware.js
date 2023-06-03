@@ -1,5 +1,5 @@
 const { inject } = require("awilix-express");
-const { serverSettingKey } = require("../constants/server-settings.constants");
+const { serverSettingsKey } = require("../constants/server-settings.constants");
 const { AuthenticationError } = require("../exceptions/runtime.exceptions");
 
 module.exports = {
@@ -7,14 +7,14 @@ module.exports = {
     const logger = loggerFactory("validateWhitelistedIp");
     const serverSettings = settingsStore.getSettings();
     if (
-      (!serverSettings && !serverSettings[serverSettingKey]) ||
-      !serverSettings[serverSettingKey]?.whitelistEnabled
+      (!serverSettings && !serverSettings[serverSettingsKey]) ||
+      !serverSettings[serverSettingsKey]?.whitelistEnabled
     ) {
       next();
       return;
     }
 
-    const whitelist = serverSettings[serverSettingKey].whitelistedIpAddresses;
+    const whitelist = serverSettings[serverSettingsKey].whitelistedIpAddresses;
     const ipAddress = req.connection.remoteAddress;
     // Empty whitelist is treated as disabled as well
     // Both ::ffff:127.0.0.1 and 127.0.0.1 will be accepted
@@ -36,7 +36,7 @@ module.exports = {
     const serverSettings = settingsStore.getSettings();
 
     req.roles = req.user?.roles;
-    if (serverSettings && !serverSettings[serverSettingKey]?.loginRequired && !req.user) {
+    if (serverSettings && !serverSettings[serverSettingsKey]?.loginRequired && !req.user) {
       req.roles = [roleService.getDefaultRole()];
     }
 

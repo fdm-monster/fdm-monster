@@ -4,7 +4,6 @@ const DITokens = require("../../container.tokens");
 const dbHandler = require("../db-handler");
 const awilix = require("awilix");
 const AxiosMock = require("../mocks/axios.mock");
-const pluginJson = require("./test-data/plugins.json");
 
 let container;
 let service;
@@ -30,13 +29,13 @@ describe("ServerUpdateService", () => {
     httpClient.saveMockResponse(require("./test-data/github-releases-response.json"), 200, false);
     await service.syncLatestRelease();
     expect(service.getState()).toMatchObject({
-      airGapped: true,
+      airGapped: null,
       installedRelease: null,
       installedReleaseFound: null,
       latestRelease: null,
       serverVersion: v1,
       updateAvailable: null,
-      synced: true,
+      synced: false,
     });
   });
 

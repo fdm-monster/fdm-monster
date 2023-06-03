@@ -7,10 +7,12 @@ class ServerReleaseService {
   airGapped = null; // Connection error
   #installedReleaseFound = null;
   #updateAvailable = null;
-
   #latestRelease = null;
   #installedRelease = null;
 
+  /**
+   * @type {LoggerService}
+   */
   #logger = new Logger("ServerReleaseService");
   #serverVersion;
   /*
@@ -40,23 +42,29 @@ class ServerReleaseService {
    * @returns {Promise<*|null>}
    */
   async syncLatestRelease() {
-    const response = await this.githubService.getReleases(AppConstants.orgName, AppConstants.serverRepoName);
+    if (!(await this.githubService.wasAuthenticated())) {
+      return;
+    }
+    const owner = AppConstants.orgName;
+    const repo = AppConstants.serverRepoName;
+    const response = await this.githubService.getReleases(owner, repo);
+    const latestResponse = await this.githubService.getLatestRelease(owner, repo);
     this.#synced = true;
-    const allGithubReleases = response.data;
+    const releases = response.data;
+    const latestRelease = latestResponse.data;
 
     // Connection timeout results in airGapped state
-    const releases = allGithubReleases.releases;
     this.airGapped = !releases?.length;
     if (!releases?.length) {
       this.#logger.warn("Latest release check failed because releases from github empty");
       return;
     }
 
-    // Illegal response should not store the latestRelease
-    const currentlyInstalledRelease = allGithubReleases.current?.tag_name;
-
-    this.#installedRelease = allGithubReleases.current;
-    this.#latestRelease = allGithubReleases.latest;
+    const currentlyInstalledRelease = this.#serverVersion;
+    this.#installedRelease = {
+      tag_name: currentlyInstalledRelease,
+    };
+    this.#latestRelease = latestRelease;
 
     this.#installedReleaseFound = !!currentlyInstalledRelease;
     if (!this.#installedReleaseFound) {

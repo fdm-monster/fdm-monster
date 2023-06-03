@@ -16,12 +16,12 @@ const updateNameRoute = (id) => `${getRoute(id)}/name`;
 const updateFloorNumberRoute = (id) => `${getRoute(id)}/floor-number`;
 
 let request;
-let printerStore;
+let printerSocketStore;
 
 beforeAll(async () => {
   await dbHandler.connect();
   ({ request, container } = await setupTestApp(true));
-  printerStore = container.resolve(DITokens.printerStore);
+  printerSocketStore = container.resolve(DITokens.printerSocketStore);
 });
 
 beforeEach(async () => {
@@ -132,7 +132,6 @@ describe("FloorController", () => {
     const printer = await createTestPrinter(request);
     const floor = await createTestFloor(request, "Floor123", 510);
     expect(floor).toMatchObject({ _id: expect.any(String) });
-    await printerStore.loadPrinterStore();
 
     const response = await request.post(addPrinterToFloorRoute(floor._id)).send({
       printerId: printer.id,

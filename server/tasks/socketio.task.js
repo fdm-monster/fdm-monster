@@ -2,12 +2,31 @@ const { byteCount } = require("../utils/benchmark.util");
 const { IO_MESSAGES } = require("../state/socket-io.gateway");
 const { socketIoConnectedEvent } = require("../constants/event.constants");
 
-class PrinterSocketIoTask {
-  #socketIoGateway;
-  #printerStore;
+class SocketIoTask {
+  /**
+   * @type {SocketIoGateway}
+   */
+  socketIoGateway;
+  /**
+   * @type {PrinterSocketStore}
+   */
+  printerSocketStore;
+  /**
+   * @type {FloorStore}
+   */
   floorStore;
-  #fileUploadTrackerCache;
-  #eventEmitter2;
+  /**
+   * @type {FileUploadTrackerCache}
+   */
+  fileUploadTrackerCache;
+  /**
+   * @type {EventEmitter2}
+   */
+  eventEmitter2;
+  /**
+   * @type {PrinterCache}
+   */
+  printerCache;
 
   #aggregateSizeCounter = 0;
   #aggregateWindowLength = 100;
@@ -18,19 +37,21 @@ class PrinterSocketIoTask {
   constructor({
     socketIoGateway,
     floorStore,
-    printerStore,
+    printerSocketStore,
+    printerCache,
     loggerFactory,
     fileUploadTrackerCache,
     eventEmitter2,
   }) {
-    this.#socketIoGateway = socketIoGateway;
-    this.#printerStore = printerStore;
-    this.#fileUploadTrackerCache = fileUploadTrackerCache;
+    this.socketIoGateway = socketIoGateway;
+    this.printerSocketStore = printerSocketStore;
+    this.fileUploadTrackerCache = fileUploadTrackerCache;
     this.floorStore = floorStore;
-    this.#logger = loggerFactory(PrinterSocketIoTask.name);
-    this.#eventEmitter2 = eventEmitter2;
+    this.#logger = loggerFactory(SocketIoTask.name);
+    this.eventEmitter2 = eventEmitter2;
+    this.printerCache = printerCache;
 
-    this.#eventEmitter2.on(socketIoConnectedEvent, async () => {
+    this.eventEmitter2.on(socketIoConnectedEvent, async () => {
       await this.sendUpdate();
     });
   }
@@ -41,11 +62,18 @@ class PrinterSocketIoTask {
 
   async sendUpdate() {
     const floors = await this.floorStore.listCache();
-    const printerStates = this.#printerStore.listPrintersFlat();
-    const trackedUploads = this.#fileUploadTrackerCache.getUploads(true);
+    const printers = this.printerCache.listCachedPrinters(true);
+    const socketStates = this.printerSocketStore.getSocketStatesById();
+    const printerEvents = this.printerSocketStore.printerEventsById;
+    const trackedUploads = this.fileUploadTrackerCache.getUploads(true);
+
+    // TODO use diff cache
+    const diffs = this.printerCache.processStateDiffs();
 
     const socketIoData = {
-      printers: printerStates,
+      printers,
+      socketStates,
+      printerEvents,
       floors,
       trackedUploads,
     };
@@ -53,7 +81,7 @@ class PrinterSocketIoTask {
     const serializedData = JSON.stringify(socketIoData);
     const transportDataSize = byteCount(serializedData);
     this.updateAggregator(transportDataSize);
-    this.#socketIoGateway.send(IO_MESSAGES.LegacyUpdate, serializedData);
+    this.socketIoGateway.send(IO_MESSAGES.LegacyUpdate, serializedData);
   }
 
   updateAggregator(transportDataLength) {
@@ -72,4 +100,4 @@ class PrinterSocketIoTask {
   }
 }
 
-module.exports = PrinterSocketIoTask;
+module.exports = { SocketIoTask };

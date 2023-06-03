@@ -18,7 +18,10 @@ class BootTask {
    */
   settingsService;
   multerService;
-  printerStore;
+  /**
+   * @type {PrinterSocketStore}
+   */
+  printerSocketStore;
   /**
    * @type {FilesStore}
    */
@@ -52,7 +55,7 @@ class BootTask {
     settingsService,
     settingsStore,
     multerService,
-    printerStore,
+    printerSocketStore,
     filesStore,
     permissionService,
     roleService,
@@ -67,7 +70,7 @@ class BootTask {
     this.settingsService = settingsService;
     this.settingsStore = settingsStore;
     this.multerService = multerService;
-    this.printerStore = printerStore;
+    this.printerSocketStore = printerSocketStore;
     this.filesStore = filesStore;
     this.permissionService = permissionService;
     this.roleService = roleService;
@@ -109,7 +112,7 @@ class BootTask {
 
     this.#logger.log("Loading data cache and storage folders.");
     await this.multerService.clearUploadsFolder();
-    await this.printerStore.loadPrinterStore();
+    await this.printerSocketStore.loadPrinterSockets(); // New sockets
     await this.filesStore.loadFilesStore();
     await this.floorStore.loadStore();
 

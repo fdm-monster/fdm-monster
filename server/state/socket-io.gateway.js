@@ -15,9 +15,15 @@ class SocketIoGateway {
    */
   io;
 
-  constructor({ loggerFactory, eventEmitter2 }) {
+  /**
+   * @type {SettingsStore}
+   */
+  settingsStore;
+
+  constructor({ loggerFactory, eventEmitter2, settingsStore }) {
     this.logger = loggerFactory(SocketIoGateway.name);
     this.eventEmitter2 = eventEmitter2;
+    this.settingsStore = settingsStore;
   }
 
   attachServer(httpServer) {
@@ -35,14 +41,16 @@ class SocketIoGateway {
     });
   }
 
-  send(event, serializedData) {
-    // Legacy SSE replacement
+  send(event, data) {
     if (!this.io) {
       this.logger.debug("No io server setup yet");
       return;
     }
 
-    this.io.emit(event, serializedData);
+    if (this.settingsStore.getServerSettings().debugSettings?.debugSocketEvents) {
+      this.logger.log(`Sending event ${event}`);
+    }
+    this.io.emit(event, data);
   }
 }
 
