@@ -1104,10 +1104,10 @@
   resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.42.0.tgz#484a1d638de2911e6f5a30c12f49c7e4a3270fb6"
   integrity sha512-6SWlXpWU5AvId8Ac7zjzmIOqMOba/JWY8XZ4A7q7Gn1Vlfg/SFFIlrtHXt9nPn4op9ZPAkl91Jao+QQv3r/ukw==
 
-"@fdm-monster/client@1.1.8":
-  version "1.1.8"
-  resolved "https://registry.yarnpkg.com/@fdm-monster/client/-/client-1.1.8.tgz#b15c7ea078229dc5522e0daec7c52dca2ebde21d"
-  integrity sha512-IZR6SJPGlDHfXJlksqWZztQU27Ue+mNdnEK7OEu+L7O1vF7qQdVCtazCfd8aT/MhlcezSuB1XJl2GrOiqd5wsw==
+"@fdm-monster/client@1.2.0-rc2":
+  version "1.2.0-rc2"
+  resolved "https://registry.yarnpkg.com/@fdm-monster/client/-/client-1.2.0-rc2.tgz#7c3181044f34345d518878eacffc47bf8d24a9cf"
+  integrity sha512-KmPIKIA0kOMRgPvNBVcgG5eMgm/IHtU/yP2yKIEBN0/8gCox3O5zQoUGR+H31+JoxZ6JHP/JUiRL8t5o/t7bnw==
 
 "@humanwhocodes/config-array@^0.11.10":
   version "0.11.10"
