@@ -248,7 +248,6 @@ class PrinterService {
    * @returns {Promise<Object>}
    */
   async validateAndDefault(printer) {
-    const url = new URL(printer.printerURL);
     const mergedPrinter = {
       ...getDefaultPrinterEntry(),
       enabled: true,

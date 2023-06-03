@@ -34,13 +34,13 @@ describe("ServerPrivateController", () => {
 
     const response = await request.get(defaultRoute).send();
     expectOkResponse(response, {
-      airGapped: true,
+      airGapped: null,
       latestRelease: null,
       installedRelease: null,
       serverVersion: process.env.npm_package_version,
       installedReleaseFound: null,
       updateAvailable: null,
-      synced: true,
+      synced: false,
     });
   });
 

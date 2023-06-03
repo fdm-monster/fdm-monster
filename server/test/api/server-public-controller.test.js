@@ -92,8 +92,8 @@ describe("ServerPublicController", () => {
       isDockerContainer: false,
       isPm2: false,
       update: {
-        synced: true,
-        airGapped: true,
+        synced: false,
+        airGapped: null,
         updateAvailable: null,
       },
     });
@@ -109,8 +109,8 @@ describe("ServerPublicController", () => {
       isDockerContainer: false,
       isPm2: false,
       update: {
-        synced: true,
-        airGapped: true,
+        airGapped: null,
+        synced: false,
         updateAvailable: null, // package.json is respected
       },
     });
