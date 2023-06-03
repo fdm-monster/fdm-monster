@@ -252,7 +252,6 @@ class PrinterController {
   }
 
   /**
-   * @todo work in progress
    * @param req
    * @param res
    * @returns {Promise<void>}
@@ -264,7 +263,7 @@ class PrinterController {
 
     // Add printer with test=true
     await this.#printerSocketStore.setupTestPrinter(newPrinter);
-    res.send({});
+    res.send({ correlationToken: newPrinter.correlationToken });
   }
 
   async refreshPrinterSocket(req, res) {

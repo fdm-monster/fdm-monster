@@ -41,17 +41,16 @@ class SocketIoGateway {
     });
   }
 
-  send(event, serializedData) {
-    // Legacy SSE replacement
+  send(event, data) {
     if (!this.io) {
       this.logger.debug("No io server setup yet");
       return;
     }
 
     if (this.settingsStore.getServerSettings().debugSettings?.debugSocketEvents) {
-      this.logger.log("Sending event", event);
+      this.logger.log(`Sending event ${event}`);
     }
-    this.io.emit(event, serializedData);
+    this.io.emit(event, data);
   }
 }
 

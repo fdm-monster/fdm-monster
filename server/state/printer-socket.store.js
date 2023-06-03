@@ -354,23 +354,13 @@ class PrinterSocketStore {
         correlationToken,
       });
     };
+    testEvents.forEach((te) => {
+      this.eventEmitter2.on(te, listener);
+    });
+    await this.testSocket.setupSocketSession();
 
     const promise = new Promise(async (resolve, reject) => {
-      testEvents.forEach((te) => {
-        this.eventEmitter2.on(te, listener);
-      });
-
-      await this.testSocket.setupSocketSession().catch((e) => {
-        this.testSocket.close();
-        delete this.testSocket;
-        testEvents.forEach((te) => {
-          this.eventEmitter2.off(te, listener);
-        });
-        // TODO this reject is not caught
-        reject(e);
-      });
       this.testSocket.open();
-
       for await (const startTime of setInterval(100)) {
         if (this.testSocket.socketState === SOCKET_STATE.authenticated) {
           resolve();
