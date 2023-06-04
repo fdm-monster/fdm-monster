@@ -11,10 +11,8 @@ last_modified_at: 2023-05-05T10:01:00+02:00
 
 MonsterPi is a Raspberry Pi image built using CustomPiOS. The repository is [to be found
 here](https://github.com/fdm-monster/MonsterPi).
-
 This raspberry pi image includes FDM Monster and MongoDB. 
-
-All versions can be downloaded from this Google Drive
+All released image versions can be downloaded from this Google Drive
 folder: [Google Drive folder MonsterPi images](https://drive.google.com/drive/folders/1jyifNu2oPVpQkTYa4zwtYVvr0GKAjP94?usp=sharing)
 
 ## Latest Version - MonsterPi 0.2.1
@@ -51,19 +49,14 @@ It ships with these contents:
 
 </details>
 
-[//]: # (## Unstable Version - MonsterPi 0.2.2-rc1)
+## Unstable Version - MonsterPi 0.2.2-rc1
 
-[//]: # ()
-[//]: # (**MonsterPi 0.2.2-rc1** can be downloaded from Google Drive: [MonsterPi 0.2.2-rc1 image]&#40;&#41;.)
+**MonsterPi 0.2.2-rc1** can be downloaded from Google Drive: [MonsterPi 0.2.2-rc1 image]().
 
-[//]: # (It ships with these contents:)
-
-[//]: # ()
-[//]: # (- MongoDB 4.4)
-
-[//]: # (- HAProxy)
-
-[//]: # (- FDM Monster 1.4.0-rc1)
+It ships with these contents:
+- MongoDB 4.4
+- HAProxy
+- FDM Monster 1.4.0-rc1
 
 ## Installing MonsterPi
 
