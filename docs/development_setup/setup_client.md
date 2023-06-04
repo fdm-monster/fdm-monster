@@ -34,21 +34,26 @@ git clone https://github.com/fdm-monster/fdm-monster-client.git
     ```bash
     cd fdm-monster-client
     ```
+   
 2) If yarn is not yet installed:
    ```bash
    npm install -g yarn
-   ```   
+   ```
+      
 3) Install the dependencies using Yarn:
    ```bash
    yarn install
    ```
+   
 4) Create a run configuration for the Vue development server in your IDE of choice (either VS Code or WebStorm):
     - VS Code: Create a run configuration that executes `yarn serve` as the command. (Refer to the VS Code Run
       Configuration section below for detailed steps.)
     - WebStorm: Create a run configuration that executes `yarn serve` as the command. (Refer to the WebStorm
       Run Configuration section below for detailed steps.)
+   
 5) Launch the Vue development server. Please note that the server will automatically reload if you make any changes to
    the source code. Please ensure that the FDM Monster server is running as well.
+
 6) Access the running server at http://localhost:8080 in your preferred web browser.
 
 ## VS Code Run Configuration
@@ -91,15 +96,25 @@ git clone https://github.com/fdm-monster/fdm-monster-client.git
 ## WebStorm NPM Configuration
 
 1) Open WebStorm and go to the "Run" menu.
+
 2) Click on "Edit Configurations..." to open the "Run/Debug Configurations" dialog.
+
 3) Click on the "+" icon to add a new configuration and select "NPM" from the dropdown.
+
 4) Provide a name for the configuration (e.g., `FDM Monster Vue Client (serve)`).
+
 5) Set the package.json to the one in the cloned repository root folder: fdm-monster-client/package.json.
+
 6) Set the Command to `run`.
+
 7) Set the Scripts to `serve`.
+
 8) Set the "Node interpreter" to the appropriate Node.js executable (v18.14.2 at the moment of writing).
+
 9) Click "OK" to save the configuration.
+
 10) In the top-right corner of WebStorm, select the created configuration from the dropdown.
+
 11) Click on the green play button or press Shift + F10 to launch the Vue development server without debugging.
 
 ## Next Steps
