@@ -1,3 +1,11 @@
+---
+layout: default
+title: Setup Server
+parent: Development Setup
+nav_order: 1
+last_modified_at: 2023-06-04T13:00:00+02:00
+---
+
 # FDM Monster Server Installation Guide
 
 This guide will walk you through the process of setting up the FDM Monster server.
