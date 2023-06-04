@@ -39,7 +39,7 @@ Linux service with `node-linux`.
 Look at the [Linux Service](guides/linux_service.md) section.
 
 # Development Setup
-Please visit the [Server Setup](development_setup/setup_server.md) and [Client Setup](development_setup/setup_client.md) sections.
+Please visit the [Development Setup](development_setup/development_setup.md) section.
 
 # Configuration and Settings
 Please visit the [Configuration](configuration/configuration.md) section.
