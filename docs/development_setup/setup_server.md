@@ -46,10 +46,12 @@ git clone https://github.com/fdm-monster/fdm-monster.git
     ```bash
     cd fdm-monster/server
     ```
+   
 2) If yarn is not yet installed:
    ```bash
    npm install -g yarn
-   ```   
+   ```
+      
 3) Install the dependencies using Yarn:
    ```bash
    yarn install
@@ -57,12 +59,15 @@ git clone https://github.com/fdm-monster/fdm-monster.git
   
 4) Configure the environment variables by creating a .env file in the project root directory.
    You can use the provided .env.template file as a template.
+
 5) Start the MongoDB server and make sure it is running.
+
 6) Launch the FDM Monster server:
     - VS Code: Create a run configuration that executes `yarn dev` as the command. (Refer to the VS Code Run
       Configuration section below for detailed steps.)
     - WebStorm: Create a run configuration that executes `yarn dev` as the command. (Refer to the WebStorm
       Run Configuration section below for detailed steps.)
+
 7) Access the running server at http://localhost:4000 in your preferred web browser.
 
 ## VS Code Run Configuration
