@@ -51,7 +51,7 @@ It ships with these contents:
 
 ## Unstable Version - MonsterPi 0.2.2-rc1
 
-**MonsterPi 0.2.2-rc1** can be downloaded from Google Drive: [MonsterPi 0.2.2-rc1 image]().
+**MonsterPi 0.2.2-rc1** can be downloaded from Google Drive: [MonsterPi 0.2.2-rc1 image](https://drive.google.com/file/d/1km_k_XYa9UxygJQg0g1X_jdQwQi12Mim/view?usp=drive_link).
 
 It ships with these contents:
 - MongoDB 4.4
