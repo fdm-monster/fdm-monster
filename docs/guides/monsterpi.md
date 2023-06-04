@@ -19,7 +19,7 @@ folder: [Google Drive folder MonsterPi images](https://drive.google.com/drive/fo
 
 ## Latest Version - MonsterPi 0.2.1
 
-**MonsterPi 0.2.1** can be downloaded from Google Drive: [MonsterPi 0.2.1 image]().
+**MonsterPi 0.2.1** can be downloaded from Google Drive: [MonsterPi 0.2.1 image](https://drive.google.com/file/d/1kk3DNYvJlFZA1yeBAiodqp6_PNh2X3Dn/view?usp=sharing).
 It ships with these contents:
 
 - MongoDB 4.4
