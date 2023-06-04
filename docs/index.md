@@ -38,5 +38,8 @@ Look at the [Windows Service](guides/windows_service.md) section.
 Linux service with `node-linux`.
 Look at the [Linux Service](guides/linux_service.md) section.
 
+# Development Setup
+Please visit the [Server Setup](development_setup/setup_server.md) and [Client Setup](development_setup/setup_client.md) sections.
+
 # Configuration and Settings
 Please visit the [Configuration](configuration/configuration.md) section.
