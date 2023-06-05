@@ -108,7 +108,7 @@ class PrinterSocketStore {
       }
     }
 
-    this.#logger.log(`Loaded ${this.printerSocketAdaptersById.length} printer OctoPrint sockets`);
+    this.#logger.log(`Loaded ${Object.keys(this.printerSocketAdaptersById).length} printer OctoPrint sockets`);
   }
 
   /**
