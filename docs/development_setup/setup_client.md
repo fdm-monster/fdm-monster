@@ -46,9 +46,9 @@ git clone https://github.com/fdm-monster/fdm-monster-client.git
    ```
    
 4) Create a run configuration for the Vue development server in your IDE of choice (either VS Code or WebStorm):
-    - VS Code: Create a run configuration that executes `yarn serve` as the command. (Refer to the VS Code Run
+    - VS Code: Create a run configuration that executes `yarn run serve` as the command. (Refer to the VS Code Run
       Configuration section below for detailed steps.)
-    - WebStorm: Create a run configuration that executes `yarn serve` as the command. (Refer to the WebStorm
+    - WebStorm: Create a run configuration that executes `yarn run serve` as the command. (Refer to the WebStorm
       Run Configuration section below for detailed steps.)
    
 5) Launch the Vue development server. Please note that the server will automatically reload if you make any changes to
