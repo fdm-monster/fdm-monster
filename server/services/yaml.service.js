@@ -293,7 +293,7 @@ class YamlService {
           enabled: p.enabled,
           dateAdded: p.dateAdded,
           settingsAppearance: {
-            name: p.printerName,
+            name: p.settingsAppearance.name,
           },
           printerURL: p.printerURL,
           apiKey,
