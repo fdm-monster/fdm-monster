@@ -1648,9 +1648,9 @@
     "@octokit/openapi-types" "^17.2.0"
 
 "@octokit/webhooks-methods@^3.0.0":
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/@octokit/webhooks-methods/-/webhooks-methods-3.0.2.tgz#cece91cc72714a1c83b35d121e04334f051e509c"
-  integrity sha512-Vlnv5WBscf07tyAvfDbp7pTkMZUwk7z7VwEF32x6HqI+55QRwBTcT+D7DDjZXtad/1dU9E32x0HmtDlF9VIRaQ==
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/@octokit/webhooks-methods/-/webhooks-methods-3.0.3.tgz#2648668d34fe44e437eca90c9031d0f3cb759c77"
+  integrity sha512-2vM+DCNTJ5vL62O5LagMru6XnYhV4fJslK+5YUkTa6rWlW2S+Tqs1lF9Wr9OGqHfVwpBj3TeztWfVON/eUoW1Q==
 
 "@octokit/webhooks-types@6.11.0":
   version "6.11.0"
@@ -1775,9 +1775,9 @@
   integrity sha512-OvjF+z51L3ov0OyAU0duzsYuvO01PH7x4t6DJx+guahgTnBHkhJdG7soQeTSFLWN3efnHyibZ4Z8l2EuWwJN3A==
 
 "@types/aws-lambda@^8.10.83":
-  version "8.10.115"
-  resolved "https://registry.yarnpkg.com/@types/aws-lambda/-/aws-lambda-8.10.115.tgz#0b5ba361c8e95430ce25fa8d67640c5ac6c857b6"
-  integrity sha512-kCZuFXKLV3y8NjSoaD5+qKTpRWvPz3uh3W/u1uwlw3Mg+MtaStg1NWgjAwUXo/VJDb6n6KF1ljykFNlNwEJ53Q==
+  version "8.10.116"
+  resolved "https://registry.yarnpkg.com/@types/aws-lambda/-/aws-lambda-8.10.116.tgz#fe687effddd8c55b182ee4e63f221c174e788be2"
+  integrity sha512-LSvIyxYCsIMOiBnb5D6HTf7JXLCh3KPiZWL6Pkn1MqV/v5OoP42GDqn5H4wHKGGKN0mJB+4y1r0oat1dLBAkuA==
 
 "@types/babel__core@^7.1.14":
   version "7.20.1"
@@ -2440,15 +2440,10 @@ camelcase@^6.2.0, camelcase@^6.3.0:
   resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-6.3.0.tgz#5685b95eb209ac9c0c177467778c9c84df58ba9a"
   integrity sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==
 
-caniuse-lite@1.0.30001495:
+caniuse-lite@1.0.30001495, caniuse-lite@^1.0.30001489:
   version "1.0.30001495"
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001495.tgz#64a0ccef1911a9dcff647115b4430f8eff1ef2d9"
   integrity sha512-F6x5IEuigtUfU5ZMQK2jsy5JqUUlEFRVZq8bO2a+ysq5K7jD6PPc9YXZj78xDNS3uNchesp1Jw47YXEqr+Viyg==
-
-caniuse-lite@^1.0.30001489:
-  version "1.0.30001494"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001494.tgz#3e56e04a48da7a79eae994559eb1ec02aaac862f"
-  integrity sha512-sY2B5Qyl46ZzfYDegrl8GBCzdawSLT4ThM9b9F+aDYUrAG2zCOyMbd2Tq34mS1g4ZKBfjRlzOohQMxx28x6wJg==
 
 chalk@^2.0.0:
   version "2.4.2"
@@ -2875,9 +2870,9 @@ ee-first@1.1.1:
   integrity sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==
 
 electron-to-chromium@^1.4.411:
-  version "1.4.419"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.419.tgz#6fbea1f3abb65bf46e8ad874b5c1f0816ce2f8ce"
-  integrity sha512-jdie3RiEgygvDTyS2sgjq71B36q2cDSBfPlwzUyuOrfYTNoYWyBxxjGJV/HAu3A2hB0Y+HesvCVkVAFoCKwCSw==
+  version "1.4.421"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.421.tgz#2b8c0ef98ba00d4aef4c664933d570922da52161"
+  integrity sha512-wZOyn3s/aQOtLGAwXMZfteQPN68kgls2wDAnYOA8kCjBvKVrW5RwmWVspxJYTqrcN7Y263XJVsC66VCIGzDO3g==
 
 emittery@^0.13.1:
   version "0.13.1"
