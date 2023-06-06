@@ -144,7 +144,7 @@ class ClientBundleService {
   async extractClientBundleZip(downloadedZipPath) {
     const zip = new AdmZip(downloadedZipPath);
 
-    const distPath = AppConstants.defaultClientBundleStorage;
+    const distPath = join(superRootPath(), AppConstants.defaultClientBundleStorage);
     ensureDirExists(distPath);
 
     this.logger.debug(`Clearing contents of ${distPath}`);
