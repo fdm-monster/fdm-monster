@@ -10,8 +10,6 @@ const {
   updatePrinterDisabledReasonRules,
 } = require("./validation/printer-controller.validation");
 const { AppConstants } = require("../server.constants");
-const { convertHttpUrlToWebsocket, httpToWsUrl } = require("../utils/url.utils");
-const DITokens = require("../container.tokens");
 const { getSettingsAppearanceDefault } = require("../constants/service.constants");
 const { printerResolveMiddleware } = require("../middleware/printer");
 const { generateCorrelationToken } = require("../utils/correlation-token.util");

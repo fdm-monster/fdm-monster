@@ -44,7 +44,7 @@ class PrinterSocketStore {
   /**
    * @type {LoggerService}
    */
-  #logger;
+  logger;
   /**
    * @type {ConfigService}
    */
@@ -55,7 +55,7 @@ class PrinterSocketStore {
     this.socketIoGateway = socketIoGateway;
     this.socketFactory = socketFactory;
     this.eventEmitter2 = eventEmitter2;
-    this.#logger = loggerFactory("PrinterSocketStore");
+    this.logger = loggerFactory("PrinterSocketStore");
     this.configService = configService;
 
     this.subscribeToEvents();
@@ -104,11 +104,11 @@ class PrinterSocketStore {
       try {
         await this.handlePrinterCreated({ printer: doc });
       } catch (e) {
-        this.#logger.error("SocketFactory failed to construct new OctoPrint socket.", errorSummary(e));
+        this.logger.error("SocketFactory failed to construct new OctoPrint socket.", errorSummary(e));
       }
     }
 
-    this.#logger.log(`Loaded ${Object.keys(this.printerSocketAdaptersById).length} printer OctoPrint sockets`);
+    this.logger.log(`Loaded ${Object.keys(this.printerSocketAdaptersById).length} printer OctoPrint sockets`);
   }
 
   /**
@@ -155,19 +155,19 @@ class PrinterSocketStore {
           await socket.reauthSession();
         }
       } catch (e) {
-        this.#logger.log("Failed to reauth printer socket", errorSummary(e));
+        this.logger.log("Failed to reauth printer socket", errorSummary(e));
         captureException(e);
       }
 
       try {
         if (socket.needsSetup() || socket.needsReopen()) {
-          this.#logger.log(`Reopening socket for printerId '${socket.printerId}'`);
+          this.logger.log(`Reopening socket for printerId '${socket.printerId}'`);
           socketSetupRequested++;
           await socket.setupSocketSession();
           socket.open();
         }
       } catch (e) {
-        this.#logger.log("Failed to setup printer socket", errorSummary(e));
+        this.logger.log("Failed to setup printer socket", errorSummary(e));
         captureException(e);
       }
 
@@ -206,7 +206,7 @@ class PrinterSocketStore {
     if (e.event !== "plugin" && e.event !== "event") {
       ref[e.event] = { payload: e.payload, receivedAt: Date.now() };
       if (this._debugMode) {
-        this.#logger.log(`Message '${e.event}' received`, e.printerId);
+        this.logger.log(`Message '${e.event}' received`, e.printerId);
       }
     } else if (e.event === "plugin") {
       if (!ref["plugin"][e.payload.type]) {
@@ -227,10 +227,10 @@ class PrinterSocketStore {
         receivedAt: Date.now(),
       };
       if (this._debugMode) {
-        this.#logger.log(`Event '${eventType}' received`, e.printerId);
+        this.logger.log(`Event '${eventType}' received`, e.printerId);
       }
     } else {
-      this.#logger.log(`Message '${e.event}' received`, e.printerId);
+      this.logger.log(`Message '${e.event}' received`, e.printerId);
     }
   }
 
@@ -255,6 +255,7 @@ class PrinterSocketStore {
    * @returns void
    */
   handlePrinterUpdated({ printer }) {
+    this.logger.log(`Printer '${printer.id}' updated. Updating socket.`);
     this.createOrUpdateSocket(printer);
   }
 
@@ -268,7 +269,7 @@ class PrinterSocketStore {
 
     // Delete the socket if the printer is disabled
     if (!enabled) {
-      this.#logger.log(`Printer '${id}' is disabled. Deleting socket.`);
+      this.logger.log(`Printer '${id}' is disabled. Deleting socket.`);
       this.deleteSocket(id);
       return;
     }
@@ -279,6 +280,7 @@ class PrinterSocketStore {
       this.printerSocketAdaptersById[id] = foundAdapter;
     } else {
       foundAdapter.close();
+      this.logger.log(`Closing printer '${id}' socket for update.`);
     }
 
     // Reset the socket credentials before (re-)connecting
@@ -290,6 +292,7 @@ class PrinterSocketStore {
       },
       protocol: "ws",
     });
+    foundAdapter.resetSocketState();
   }
 
   handlePrintersDeleted({ printerIds }) {
