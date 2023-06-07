@@ -37,14 +37,14 @@ class PrinterWebsocketRestoreTask {
      * @type {OctoPrintSockIoAdapter[]}
      */
     const existingSockets = this.printerSocketStore.listPrinterSockets();
-    const resetAdaptersClosedOrAborted = [];
-    const resetAdaptersSilentSocket = [];
+    const resetAdapterIds = [];
+    const silentSocketIds = [];
     for (const socket of existingSockets) {
       try {
         if (socket.isClosedOrAborted()) {
           socket.close();
           socket.resetSocketState();
-          resetAdaptersClosedOrAborted.push(socket.printerId);
+          resetAdapterIds.push(socket.printerId);
           continue;
         }
       } catch (e) {
@@ -60,6 +60,7 @@ class PrinterWebsocketRestoreTask {
         (!socket.apiState === API_STATE.unset && !socket.lastMessageReceivedTimestamp) ||
         Date.now() - socket.lastMessageReceivedTimestamp > 10 * 1000
       ) {
+        silentSocketIds.push(socket.printerId);
         // Produce logs for silent sockets
         try {
           const result = await this.octoPrintApiService.getConnection(socket.loginDto);
@@ -79,7 +80,7 @@ class PrinterWebsocketRestoreTask {
     const duration = Date.now() - startTime;
     if (this.settingsStore.getServerSettings()?.debugSettings?.debugSocketRetries) {
       this.logger.log(
-        `Reset ${resetAdaptersClosedOrAborted.length} closed/aborted and ${resetAdaptersSilentSocket.length} silent sockets (duration ${duration}ms)`
+        `Reset ${resetAdapterIds.length} closed/aborted sockets and detected ${silentSocketIds.length} silent sockets (duration ${duration}ms)`
       );
     }
   }
