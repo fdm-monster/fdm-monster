@@ -37,6 +37,7 @@ class PrinterSocketStore {
    * @type {Object.<string, PrinterEvents>}
    */
   printerEventsById = {};
+  lastMessageReceivedAt = null;
   /**
    * @type {OctoPrintSockIoAdapter}
    */
@@ -49,12 +50,17 @@ class PrinterSocketStore {
    * @type {ConfigService}
    */
   configService;
+  /**
+   * @type {SettingsStore}
+   */
+  settingsStore;
 
-  constructor({ socketFactory, socketIoGateway, eventEmitter2, printerCache, loggerFactory, configService }) {
+  constructor({ socketFactory, socketIoGateway, settingsStore, eventEmitter2, printerCache, loggerFactory, configService }) {
     this.printerCache = printerCache;
     this.socketIoGateway = socketIoGateway;
     this.socketFactory = socketFactory;
     this.eventEmitter2 = eventEmitter2;
+    this.settingsStore = settingsStore;
     this.logger = loggerFactory("PrinterSocketStore");
     this.configService = configService;
 
@@ -111,6 +117,10 @@ class PrinterSocketStore {
     this.logger.log(`Loaded ${Object.keys(this.printerSocketAdaptersById).length} printer OctoPrint sockets`);
   }
 
+  listPrinterSockets() {
+    return Object.values(this.printerSocketAdaptersById);
+  }
+
   /**
    * Reconnect the OctoPrint Websocket connection
    * @param id
@@ -155,19 +165,29 @@ class PrinterSocketStore {
           await socket.reauthSession();
         }
       } catch (e) {
-        this.logger.log("Failed to reauth printer socket", errorSummary(e));
+        if (this.settingsStore.getServerSettings().debugSettings?.debugSocketSetup) {
+          this.logger.log("Failed to reauth printer socket", errorSummary(e));
+        }
         captureException(e);
       }
 
       try {
         if (socket.needsSetup() || socket.needsReopen()) {
-          this.logger.log(`Reopening socket for printerId '${socket.printerId}'`);
+          if (this.settingsStore.getServerSettings().debugSettings?.debugSocketSetup) {
+            this.logger.log(
+              `Reopening socket for printerId '${
+                socket.printerId
+              }' (setup: ${socket.needsSetup()}, reopen: ${socket.needsReopen()})`
+            );
+          }
           socketSetupRequested++;
           await socket.setupSocketSession();
           socket.open();
         }
       } catch (e) {
-        this.logger.log("Failed to setup printer socket", errorSummary(e));
+        if (this.settingsStore.getServerSettings().debugSettings?.debugSocketSetup) {
+          this.logger.log(`Failed to setup printer socket ${errorSummary(e)}`);
+        }
         captureException(e);
       }
 

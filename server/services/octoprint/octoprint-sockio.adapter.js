@@ -117,6 +117,7 @@ class OctoPrintSockIoAdapter extends WebsocketAdapter {
   apiStateUpdated = false;
   apiStateUpdateTimestamp = null;
   apiState = API_STATE.unset;
+  lastMessageReceivedTimestamp = null;
   reauthRequired = false;
   reauthRequiredTimestamp = null;
 
@@ -144,6 +145,10 @@ class OctoPrintSockIoAdapter extends WebsocketAdapter {
 
   needsReath() {
     return this.reauthRequired;
+  }
+
+  isClosedOrAborted() {
+    return this.socketState === SOCKET_STATE.closed || this.socketState === SOCKET_STATE.aborted;
   }
 
   /**
@@ -277,6 +282,8 @@ class OctoPrintSockIoAdapter extends WebsocketAdapter {
    * @returns {Promise<void>}
    */
   async onMessage(message) {
+    this.lastMessageReceivedTimestamp = Date.now();
+
     if (this.socketState !== SOCKET_STATE.authenticated) {
       this.setSocketState(SOCKET_STATE.authenticated);
     }
