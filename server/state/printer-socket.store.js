@@ -37,6 +37,7 @@ class PrinterSocketStore {
    * @type {Object.<string, PrinterEvents>}
    */
   printerEventsById = {};
+  lastMessageReceivedAt = null;
   /**
    * @type {OctoPrintSockIoAdapter}
    */
@@ -109,6 +110,10 @@ class PrinterSocketStore {
     }
 
     this.logger.log(`Loaded ${Object.keys(this.printerSocketAdaptersById).length} printer OctoPrint sockets`);
+  }
+
+  listPrinterSockets() {
+    return Object.values(this.printerSocketAdaptersById);
   }
 
   /**

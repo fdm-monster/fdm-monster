@@ -1,7 +1,6 @@
-const { SOCKET_STATE } = require("../services/octoprint/octoprint-sockio.adapter");
 const { errorSummary } = require("../utils/error.utils");
 
-class PrinterWebsocketPingTask {
+class PrinterApiTestTask {
   /**
    * @type {SettingsStore}
    */
@@ -18,7 +17,9 @@ class PrinterWebsocketPingTask {
    * @type {TaskManagerService}
    */
   taskManagerService;
-
+  /**
+   * @type {LoggerService}
+   */
   logger;
 
   constructor({ printerSocketStore, octoPrintApiService, settingsStore, taskManagerService, loggerFactory }) {
@@ -29,21 +30,22 @@ class PrinterWebsocketPingTask {
     this.logger = loggerFactory("Printer-Websocket-Ping-Task");
   }
 
-  getOpenedSockets() {
-    return Object.values(this.printerSocketStore.printerSocketAdaptersById).filter((s) => s.socketState === SOCKET_STATE.opened);
-  }
-
   async run() {
     const startTime = Date.now();
 
     /**
      * @type {OctoPrintSockIoAdapter[]}
      */
-    const sockets = this.getOpenedSockets();
-    for (let socket of sockets) {
+    const existingSockets = this.printerSocketStore.listPrinterSockets();
+    for (const socket of existingSockets) {
       try {
-        // Pooling these promises with Promises.all or race is probably much faster
-        await socket.setupSocketSession();
+        if (socket.isClosedOrAborted()) {
+          socket.close();
+          socket.resetSocketState();
+        } else if (!socket.lastMessageReceivedTimestamp || Date.now() - socket.lastMessageReceivedTimestamp > 10 * 1000) {
+          socket.close();
+          socket.resetSocketState();
+        }
       } catch (e) {
         this.logger.error(
           `WebSocket authentication command failed for '${socket.printerId}' with error '${errorSummary(e)}'`,
@@ -53,8 +55,8 @@ class PrinterWebsocketPingTask {
     }
 
     const duration = Date.now() - startTime;
-    this.logger.log(`Sent ${sockets.length} websocket authentication pings taking ${duration}ms.`);
+    this.logger.log(`Sent ${existingSockets.length} websocket authentication pings taking ${duration}ms.`);
   }
 }
 
-module.exports = PrinterWebsocketPingTask;
+module.exports = { PrinterApiTestTask };

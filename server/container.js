@@ -15,7 +15,6 @@ const FileCache = require("./state/file.cache");
 const JobsCache = require("./state/jobs.cache");
 const PrinterWebsocketTask = require("./tasks/printer-websocket.task");
 const { SocketIoTask } = require("./tasks/socketio.task");
-const PrinterSystemTask = require("./tasks/printer-system.task");
 const OctoPrintApiService = require("./services/octoprint/octoprint-api.service");
 const { SocketFactory } = require("./services/octoprint/socket.factory");
 const FilesStore = require("./state/files.store");
@@ -35,7 +34,7 @@ const PermissionService = require("./services/authentication/permission.service"
 const PrinterFileCleanTask = require("./tasks/printer-file-clean.task");
 const { ROLES } = require("./constants/authorization.constants");
 const CustomGCodeService = require("./services/custom-gcode.service");
-const PrinterWebsocketPingTask = require("./tasks/printer-websocket-ping.task");
+const { PrinterApiTestTask } = require("./tasks/printer-api-test.task");
 const { PluginFirmwareUpdateService } = require("./services/octoprint/plugin-firmware-update.service");
 const { PluginRepositoryCache } = require("./services/octoprint/plugin-repository.cache");
 const { configureCacheManager } = require("./handlers/cache-manager");
@@ -137,8 +136,7 @@ function configureContainer() {
     [DITokens.clientDistDownloadTask]: asClass(ClientDistDownloadTask).singleton(),
     [DITokens.printCompletionSocketIoTask]: asClass(PrintCompletionSocketIoTask).singleton(),
     [DITokens.printerWebsocketTask]: asClass(PrinterWebsocketTask).singleton(), // This task is a recurring heartbeat task
-    [DITokens.printerWebsocketPingTask]: asClass(PrinterWebsocketPingTask).singleton(), // Task dependent on WS to fire - disabled at boot
-    [DITokens.printerSystemTask]: asClass(PrinterSystemTask).singleton(), // Task dependent on test printer in store - disabled at boot
+    [DITokens.printerApiTestTask]: asClass(PrinterApiTestTask).singleton(), // Task aimed at testing the printer API
     [DITokens.printerFileCleanTask]: asClass(PrinterFileCleanTask).singleton(),
   });
 

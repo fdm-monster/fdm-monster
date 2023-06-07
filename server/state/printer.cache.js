@@ -82,7 +82,6 @@ class PrinterCache extends KeyDiffCache {
   }
 
   /**
-   *
    * @returns {Printer[]}
    */
   listCachedPrinters(includeDisabled = false) {

@@ -53,13 +53,12 @@ const DITokens = {
   // Tasks
   serverTasks: "serverTasks",
   bootTask: "bootTask",
-  printerSystemTask: "printerSystemTask",
   softwareUpdateTask: "softwareUpdateTask",
   clientDistDownloadTask: "clientDistDownloadTask",
   socketIoTask: "socketIoTask",
   printCompletionSocketIoTask: "printCompletionSocketIoTask",
   printerWebsocketTask: "printerWebsocketTask",
-  printerWebsocketPingTask: "printerWebsocketPingTask",
+  printerApiTestTask: "printerApiTestTask",
   printerFileCleanTask: "printerFileCleanTask",
 };
 

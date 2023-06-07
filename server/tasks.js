@@ -20,8 +20,6 @@ function registerTask(task, preset, milliseconds = 0, runImmediately = false) {
   };
 }
 
-const HOUR_MS = 3600 * 1000;
-
 class ServerTasks {
   static SERVER_BOOT_TASK = registerTask(DITokens.bootTask, TaskPresets.PERIODIC_DISABLED, 5000, false);
   static BOOT_TASKS = [
@@ -30,10 +28,10 @@ class ServerTasks {
     registerTask(DITokens.socketIoTask, TaskPresets.PERIODIC, 500),
     registerTask(DITokens.printCompletionSocketIoTask, TaskPresets.RUNONCE),
     registerTask(DITokens.printerFileCleanTask, TaskPresets.RUNONCE, 60 * 1000, true),
-    registerTask(DITokens.printerSystemTask, TaskPresets.PERIODIC_DISABLED, 6 * HOUR_MS, true),
+    // Every 2 seconds
     registerTask(DITokens.printerWebsocketTask, TaskPresets.PERIODIC, 2000, true),
-    // Every 60 minutes
-    registerTask(DITokens.printerWebsocketPingTask, TaskPresets.PERIODIC, 60 * 60 * 1000, false),
+    // Every 15 seconds
+    registerTask(DITokens.printerApiTestTask, TaskPresets.PERIODIC, 15 * 1000, true),
   ];
 }
 
