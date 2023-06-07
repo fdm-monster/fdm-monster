@@ -41,6 +41,11 @@ const ServerSettingsSchema = new mongoose.Schema({
         default: false,
         required: true,
       },
+      debugSocketRetries: {
+        type: Boolean,
+        default: false,
+        required: true,
+      },
     },
     port: {
       type: Number,

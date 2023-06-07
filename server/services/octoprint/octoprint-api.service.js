@@ -247,8 +247,8 @@ class OctoPrintApiService extends OctoPrintRoutes {
     return processResponse(response, responseOptions);
   }
 
-  async getConnection(printer, responseOptions) {
-    const { url, options } = this._prepareRequest(printer, this.apiConnection);
+  async getConnection(login, responseOptions) {
+    const { url, options } = this._prepareRequest(login, this.apiConnection);
     const response = await this._httpClient.get(url, options);
     return processResponse(response, responseOptions);
   }

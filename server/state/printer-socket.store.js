@@ -172,7 +172,7 @@ class PrinterSocketStore {
           socket.open();
         }
       } catch (e) {
-        this.logger.log("Failed to setup printer socket", errorSummary(e));
+        this.logger.log(`Failed to setup printer socket ${errorSummary(e)}`);
         captureException(e);
       }
 

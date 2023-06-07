@@ -31,7 +31,7 @@ class ServerTasks {
     // Every 2 seconds
     registerTask(DITokens.printerWebsocketTask, TaskPresets.PERIODIC, 2000, true),
     // Every 15 seconds
-    registerTask(DITokens.printerApiTestTask, TaskPresets.PERIODIC, 15 * 1000, true),
+    registerTask(DITokens.printerWebsocketRestoreTask, TaskPresets.PERIODIC, 15 * 1000, false),
   ];
 }
 
