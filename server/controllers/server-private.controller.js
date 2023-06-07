@@ -5,6 +5,7 @@ const { AppConstants } = require("../server.constants");
 const { ROLES } = require("../constants/authorization.constants");
 const { isTestEnvironment } = require("../utils/env.utils");
 const { PassThrough } = require("stream");
+const { validateMiddleware } = require("../handlers/validators");
 
 class ServerPrivateController {
   #logger = new Logger("Server-Private-API");
@@ -49,11 +50,21 @@ class ServerPrivateController {
     this.multerService = multerService;
   }
 
+  async getClientReleases(req, res) {
+    const releaseSpec = await this.clientBundleService.getReleases();
+    res.send(releaseSpec);
+  }
+
   async updateClientBundleGithub(req, res) {
-    await this.clientBundleService.downloadBundle();
+    const inputRules = {
+      tag_name: "required|string",
+    };
+    const { tag_name } = await validateMiddleware(req, inputRules, res);
+    await this.clientBundleService.downloadClientUpdate(tag_name);
 
     res.send({
       executed: true,
+      installed: tag_name,
     });
   }
 
@@ -111,6 +122,7 @@ module.exports = createController(ServerPrivateController)
   .prefix(AppConstants.apiRoute + "/server")
   .before([authenticate(), authorizeRoles([ROLES.ADMIN])])
   .get("/", "getReleaseStateInfo")
+  .get("/client-releases", "getClientReleases")
   .post("/export-printers-floors-yaml", "exportPrintersAndFloorsYaml")
   .post("/import-printers-floors-yaml", "importPrintersAndFloorsYaml")
   .post("/git-update", "pullGitUpdates")
