@@ -27,7 +27,7 @@ class PrinterWebsocketRestoreTask {
     this.printerSocketStore = printerSocketStore;
     this.octoPrintApiService = octoPrintApiService;
     this.settingsStore = settingsStore;
-    this.logger = loggerFactory("Printer-Websocket-Ping-Task");
+    this.logger = loggerFactory("PrinterWebsocketRestoreTask");
   }
 
   async run() {
