@@ -24,10 +24,6 @@ class GithubService {
     return result?.type === "token";
   }
 
-  async getAuthenticated() {
-    return this.octokitService.rest.users.getAuthenticated();
-  }
-
   async getLatestRelease(/**string**/ owner, /**string**/ repo) {
     return await this.octokitService.rest.repos
       .getLatestRelease({

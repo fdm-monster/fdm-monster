@@ -33,7 +33,7 @@ yarn -v
 yarn install --production --pure-lockfile
 
 # Switch to the latest release tag of FDM Monster
-git fetch --prune
+git fetch --prune --tags
 git checkout $latestTagName
 
 # Go back and enable the Windows service
