@@ -29,9 +29,6 @@ class ClientDistDownloadTask {
 
     this.logger.log(`Client bundle update required. Reason for updating: ${result.reason}`);
 
-    await this.githubService.getAuthenticated();
-    this.logger.log(`Logged into Github successfully, checking client dist update`);
-
     await this.clientBundleService.downloadClientUpdate(AppConstants.defaultClientMinimum);
   }
 }
