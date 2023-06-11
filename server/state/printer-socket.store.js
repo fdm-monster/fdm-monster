@@ -341,10 +341,6 @@ class PrinterSocketStore {
     delete this.printerSocketAdaptersById[printerId];
     // TODO mark diff cache
   }
-
-  getId(value) {
-    return "";
-  }
 }
 
 module.exports = PrinterSocketStore;
