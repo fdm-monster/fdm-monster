@@ -217,40 +217,55 @@ class PrinterSocketStore {
       return;
     }
 
-    let ref = this.printerEventsById[e.printerId];
-    if (!ref) {
-      this.printerEventsById[e.printerId] = { current: null, history: null, timelapse: null, event: {}, plugin: {} };
-      ref = this.printerEventsById[e.printerId];
-    }
+    let ref = this.getOrCreateEvents(printerId);
     if (e.event !== "plugin" && e.event !== "event") {
-      ref[e.event] = { payload: e.payload, receivedAt: Date.now() };
+      this.setEvent(printerId, e.event, null, e.event === "history" ? this.pruneHistoryPayload(e.payload) : e.payload);
       if (this._debugMode) {
-        this.logger.log(`Message '${e.event}' received`, e.printerId);
+        this.logger.log(`Message '${e.event}' received, size ${formatKB(e.payload)}`, e.printerId);
       }
     } else if (e.event === "plugin") {
-      if (!ref["plugin"][e.payload.type]) {
-        ref["plugin"][e.payload.plugin] = {
-          payload: e.payload,
-          receivedAt: Date.now(),
-        };
-      } else {
-        ref["plugin"][e.payload.plugin] = {
-          payload: e.payload,
-          receivedAt: Date.now(),
-        };
-      }
+      this.setSubEvent(printerId, "plugin", e.payload.plugin, e.payload);
     } else if (e.event === "event") {
       const eventType = e.payload.type;
-      ref["event"][eventType] = {
-        payload: e.payload.payload,
-        receivedAt: Date.now(),
-      };
+      this.setSubEvent(printerId, "event", eventType, e.payload.payload);
       if (this._debugMode) {
         this.logger.log(`Event '${eventType}' received`, e.printerId);
       }
     } else {
       this.logger.log(`Message '${e.event}' received`, e.printerId);
     }
+  }
+
+  pruneHistoryPayload(payload) {
+    delete payload.logs;
+    delete payload.temps;
+    delete payload.messages;
+    return payload;
+  }
+
+  getOrCreateEvents(printerId) {
+    let ref = this.printerEventsById[printerId];
+    if (!ref) {
+      this.printerEventsById[printerId] = { current: null, history: null, timelapse: null, event: {}, plugin: {} };
+      ref = this.printerEventsById[printerId];
+    }
+    return ref;
+  }
+
+  setEvent(printerId, label, eventName, payload) {
+    const ref = this.getOrCreateEvents(printerId);
+    ref[label] = {
+      payload,
+      receivedAt: Date.now(),
+    };
+  }
+
+  setSubEvent(printerId, label, eventName, payload) {
+    const ref = this.getOrCreateEvents(printerId);
+    ref[label][eventName] = {
+      payload,
+      receivedAt: Date.now(),
+    };
   }
 
   handleBatchPrinterCreated({ printers }) {
