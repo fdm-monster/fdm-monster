@@ -79,6 +79,7 @@ class PrinterController {
 
   async listPrinterFloors(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
+    // TODO move to service?
     const results = await Floor.find({
       "printers.printerId": currentPrinterId,
     });
@@ -87,13 +88,13 @@ class PrinterController {
 
   async getPrinter(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
-    const foundPrinter = this.printerCache.getCachedPrinterOrThrowAsync(currentPrinterId);
+    const foundPrinter = await this.printerCache.getCachedPrinterOrThrowAsync(currentPrinterId);
     res.send(foundPrinter);
   }
 
   async getPrinterSocketInfo(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
-    const foundPrinter = this.printerEventsCache.getPrinterSocketEvents(currentPrinterId);
+    const foundPrinter = await this.printerEventsCache.getPrinterSocketEvents(currentPrinterId);
     res.send(foundPrinter);
   }
 

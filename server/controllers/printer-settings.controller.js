@@ -30,7 +30,7 @@ class PrinterSettingsController {
   async get(req, res) {
     const { id: printerId } = await validateInput(req.params, idRules);
 
-    const printerLogin = this.printerCache.getLoginDtoAsync(printerId);
+    const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
     const settings = await this.#octoPrintApiService.getSettings(printerLogin);
     res.send(settings);
   }

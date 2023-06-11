@@ -81,13 +81,12 @@ class BatchCallService {
     const promises = [];
     for (const printerId of printerIds) {
       const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
-
       const currentFilePath = await this.printerEventsCache.getPrinterSocketEvents(printerId)?.current?.job?.file?.path;
 
       // TODO test this
       let reprintPath = currentFilePath;
       if (!reprintPath?.length) {
-        const files = this.filesStore.getFiles(printerId)?.files;
+        const files = await this.filesStore.getFiles(printerId)?.files;
         if (files?.length) {
           files.sort((f1, f2) => {
             // Sort by date, newest first
