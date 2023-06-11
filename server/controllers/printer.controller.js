@@ -154,7 +154,7 @@ class PrinterController {
 
     // Has internal validation, but might add some here above as well
     const createdPrinter = await this.printerService.create(newPrinter);
-    const printer = this.printerCache.getCachedPrinterOrThrow(createdPrinter.id);
+    const printer = await this.printerCache.getCachedPrinterOrThrow(createdPrinter.id);
     this.#logger.log(`Created printer with ID ${printer.id || printer.correlationToken}`);
     res.send(printer);
   }

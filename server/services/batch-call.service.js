@@ -80,9 +80,9 @@ class BatchCallService {
   async batchReprintCalls(printerIds) {
     const promises = [];
     for (const printerId of printerIds) {
-      const printerLogin = this.printerCache.getLoginDto(printerId);
+      const printerLogin = await this.printerCache.getLoginDto(printerId);
 
-      const currentFilePath = this.printerEventsCache.getPrinterSocketEvents(printerId)?.current?.job?.file?.path;
+      const currentFilePath = await this.printerEventsCache.getPrinterSocketEvents(printerId)?.current?.job?.file?.path;
 
       // TODO test this
       let reprintPath = currentFilePath;

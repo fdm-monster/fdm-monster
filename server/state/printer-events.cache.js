@@ -65,8 +65,8 @@ class PrinterEventsCache extends KeyDiffCache {
    * @param {string} id
    * @returns {*}
    */
-  getPrinterSocketEvents(id) {
-    return this.printerEventsById[id];
+  async getPrinterSocketEvents(id) {
+    return this.keyValueStore[id];
   }
 
   async getOrCreateEvents(printerId) {

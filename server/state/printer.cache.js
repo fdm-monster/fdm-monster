@@ -104,12 +104,7 @@ class PrinterCache extends KeyDiffCache {
 
   async handlePrinterCreatedOrUpdated({ printer }) {
     const printerDto = this.map(printer);
-    if (this.printers.find((p) => p.id === printer.id)) {
-      this.printers = this.printers.map((p) => (p.id.toString() === printerDto.id ? printerDto : p));
-    } else {
-      this.printers = [...this.printers, printerDto];
-    }
-    await this.setValue(printerDto, true);
+    await this.setKeyValue(printerDto.id, printerDto, true);
   }
 
   async handlePrintersDeleted({ printerIds }) {
