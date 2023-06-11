@@ -1,6 +1,7 @@
 const { byteCount } = require("../utils/benchmark.util");
 const { IO_MESSAGES } = require("../state/socket-io.gateway");
 const { socketIoConnectedEvent } = require("../constants/event.constants");
+const { sizeKb, sizeKB, formatKB } = require("../utils/metric.utils");
 
 class SocketIoTask {
   /**
@@ -27,12 +28,19 @@ class SocketIoTask {
    * @type {PrinterCache}
    */
   printerCache;
+  /**
+   * @type {LoggerService}
+   */
+  logger;
+  /**
+   * @type {SettingsStore}
+   */
+  settingsStore;
 
   #aggregateSizeCounter = 0;
   #aggregateWindowLength = 10;
   #aggregateSizes = [];
   #rounding = 2;
-  #logger;
 
   constructor({
     socketIoGateway,
@@ -41,15 +49,17 @@ class SocketIoTask {
     printerCache,
     loggerFactory,
     fileUploadTrackerCache,
+    settingsStore,
     eventEmitter2,
   }) {
     this.socketIoGateway = socketIoGateway;
     this.printerSocketStore = printerSocketStore;
     this.fileUploadTrackerCache = fileUploadTrackerCache;
     this.floorStore = floorStore;
-    this.#logger = loggerFactory(SocketIoTask.name);
+    this.logger = loggerFactory(SocketIoTask.name);
     this.eventEmitter2 = eventEmitter2;
     this.printerCache = printerCache;
+    this.settingsStore = settingsStore;
 
     this.eventEmitter2.on(socketIoConnectedEvent, async () => {
       await this.sendUpdate();
@@ -61,22 +71,32 @@ class SocketIoTask {
   }
 
   async sendUpdate() {
-    const floorDiff = await this.floorStore.processStateDiffs();
-    const printers = await this.printerCache.processStateDiffs();
+    const floors = await this.floorStore.listCache();
+    const printers = await this.printerCache.listCachedPrinters(true);
     const socketStates = this.printerSocketStore.getSocketStatesById();
     const printerEvents = this.printerSocketStore.printerEventsById;
     const trackedUploads = this.fileUploadTrackerCache.getUploads(true);
 
     const socketIoData = {
       printers,
+      floors,
       socketStates,
       printerEvents,
-      floorDiff,
       trackedUploads,
     };
 
+    // Precise debugging
+    if (this.settingsStore.getServerSettings().debugSettings?.debugSocketIoBandwidth) {
+      const kbDataString = Object.entries(socketIoData)
+        .map(([id, state]) => {
+          return `${id} ${formatKB(state)}`;
+        })
+        .join(" ");
+      this.logger.log(kbDataString);
+    }
+
     const serializedData = JSON.stringify(socketIoData);
-    const transportDataSize = byteCount(serializedData);
+    const transportDataSize = sizeKB(serializedData);
     this.updateAggregator(transportDataSize);
     this.socketIoGateway.send(IO_MESSAGES.LegacyUpdate, serializedData);
   }
@@ -84,9 +104,9 @@ class SocketIoTask {
   updateAggregator(transportDataLength) {
     if (this.#aggregateSizeCounter >= this.#aggregateWindowLength) {
       const summedPayloadSize = this.#aggregateSizes.reduce((t, n) => (t += n));
-      const averagePayloadSize = summedPayloadSize / 1000 / this.#aggregateWindowLength;
-      this.#logger.log(
-        `Printer SocketIO metrics ${averagePayloadSize.toFixed(this.#rounding)} kB [${this.#aggregateWindowLength} TX avg].`
+      const averagePayloadSize = summedPayloadSize / this.#aggregateWindowLength;
+      this.logger.log(
+        `Printer SocketIO metrics ${averagePayloadSize.toFixed(this.#rounding)}kB [${this.#aggregateWindowLength} TX avg].`
       );
       this.#aggregateSizeCounter = 0;
       this.#aggregateSizes = [];
