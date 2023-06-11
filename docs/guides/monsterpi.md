@@ -27,6 +27,15 @@ It ships with these contents:
 <details>
 <summary>Older versions of MonsterPi</summary>
 
+MonsterPi 0.2.2-rc1
+
+**MonsterPi 0.2.2-rc1** can be downloaded from Google Drive: [MonsterPi 0.2.2-rc1 image](https://drive.google.com/file/d/1km_k_XYa9UxygJQg0g1X_jdQwQi12Mim/view?usp=drive_link).
+
+It ships with these contents:
+- MongoDB 4.4
+- HAProxy
+- FDM Monster 1.4.0-rc1
+- 
 **MonsterPi 0.2.0** can be downloaded from Google Drive: [MonsterPi 0.2.0 image](https://drive.google.com/file/d/1kBSJXcn7IROq-FrmCKkZLOrTXuiZC1Q6/view?usp=share_link). 
 It ships with these contents: 
 
@@ -49,14 +58,14 @@ It ships with these contents:
 
 </details>
 
-## Unstable Version - MonsterPi 0.2.2-rc1
+## Unstable Version - MonsterPi 0.2.2-rc2
 
-**MonsterPi 0.2.2-rc1** can be downloaded from Google Drive: [MonsterPi 0.2.2-rc1 image](https://drive.google.com/file/d/1km_k_XYa9UxygJQg0g1X_jdQwQi12Mim/view?usp=drive_link).
+**MonsterPi 0.2.2-rc2** can be downloaded from Google Drive: [MonsterPi 0.2.2-rc2 image](https://drive.google.com/file/d/1kyQAADcm6VtHct_NoOB34VNFShMX9EsU/view?usp=drive_link ).
 
 It ships with these contents:
 - MongoDB 4.4
 - HAProxy
-- FDM Monster 1.4.0-rc1
+- FDM Monster 1.4.0-rc3
 
 ## Installing MonsterPi
 
