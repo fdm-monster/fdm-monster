@@ -1,11 +1,6 @@
-const { validateInput } = require("../handlers/validators");
-const { createTestPrinterRules } = require("./validation/create-test-printer.validation");
 const { errorSummary } = require("../utils/error.utils");
 const { captureException } = require("@sentry/node");
 const { printerEvents } = require("../constants/event.constants");
-const { AppConstants } = require("../server.constants");
-const { setTimeout, setInterval } = require("timers/promises");
-const { Message, octoPrintEvent, SOCKET_STATE } = require("../services/octoprint/octoprint-sockio.adapter");
 
 class PrinterSocketStore {
   /**
@@ -34,15 +29,6 @@ class PrinterSocketStore {
    */
   printerSocketAdaptersById = {};
   /**
-   * @type {Object.<string, PrinterEvents>}
-   */
-  printerEventsById = {};
-  lastMessageReceivedAt = null;
-  /**
-   * @type {OctoPrintSockIoAdapter}
-   */
-  testSocket;
-  /**
    * @type {LoggerService}
    */
   logger;
@@ -67,15 +53,10 @@ class PrinterSocketStore {
     this.subscribeToEvents();
   }
 
-  get _debugMode() {
-    return this.configService.get(AppConstants.debugSocketMessagesKey, AppConstants.defaultDebugSocketMessages) === "true";
-  }
-
   /**
    * @private
    */
   subscribeToEvents() {
-    this.eventEmitter2.on("octoprint.*", (e) => this.onPrinterSocketMessage(e));
     this.eventEmitter2.on(printerEvents.printerCreated, this.handlePrinterCreated.bind(this));
     this.eventEmitter2.on(printerEvents.printersDeleted, this.handlePrintersDeleted.bind(this));
     this.eventEmitter2.on(printerEvents.printerUpdated, this.handlePrinterUpdated.bind(this));
@@ -101,7 +82,7 @@ class PrinterSocketStore {
   async loadPrinterSockets() {
     await this.printerCache.loadCache();
 
-    const printerDocs = this.printerCache.listCachedPrinters(false);
+    const printerDocs = await this.printerCache.listCachedPrinters(false);
     this.printerSocketAdaptersById = {};
     /**
      * @type {Printer}
@@ -139,14 +120,6 @@ class PrinterSocketStore {
    */
   getPrinterSocket(id) {
     return this.printerSocketAdaptersById[id];
-  }
-
-  /**
-   * @param {string} id
-   * @returns {*}
-   */
-  getPrinterSocketEvents(id) {
-    return this.printerEventsById[id];
   }
 
   /**
@@ -205,53 +178,6 @@ class PrinterSocketStore {
       socket: socketStates,
       api: apiStates,
     };
-  }
-
-  /**
-   * @private
-   * @param {OctoPrintEventDto} e
-   */
-  onPrinterSocketMessage(e) {
-    const printerId = e.printerId;
-    const socket = this.getPrinterSocket(printerId);
-    if (!socket) {
-      return;
-    }
-
-    let ref = this.printerEventsById[e.printerId];
-    if (!ref) {
-      this.printerEventsById[e.printerId] = { current: null, history: null, timelapse: null, event: {}, plugin: {} };
-      ref = this.printerEventsById[e.printerId];
-    }
-    if (e.event !== "plugin" && e.event !== "event") {
-      ref[e.event] = { payload: e.payload, receivedAt: Date.now() };
-      if (this._debugMode) {
-        this.logger.log(`Message '${e.event}' received`, e.printerId);
-      }
-    } else if (e.event === "plugin") {
-      if (!ref["plugin"][e.payload.type]) {
-        ref["plugin"][e.payload.plugin] = {
-          payload: e.payload,
-          receivedAt: Date.now(),
-        };
-      } else {
-        ref["plugin"][e.payload.plugin] = {
-          payload: e.payload,
-          receivedAt: Date.now(),
-        };
-      }
-    } else if (e.event === "event") {
-      const eventType = e.payload.type;
-      ref["event"][eventType] = {
-        payload: e.payload.payload,
-        receivedAt: Date.now(),
-      };
-      if (this._debugMode) {
-        this.logger.log(`Event '${eventType}' received`, e.printerId);
-      }
-    } else {
-      this.logger.log(`Message '${e.event}' received`, e.printerId);
-    }
   }
 
   handleBatchPrinterCreated({ printers }) {
@@ -330,74 +256,8 @@ class PrinterSocketStore {
     if (!!socket) {
       socket.close();
     }
-    delete this.printerEventsById[printerId];
-    delete this.printerSocketAdaptersById[printerId];
     // TODO mark diff cache
-  }
-
-  /**
-   * Sets up/recreates a printer to be tested quickly by running the standard checks
-   * @param printer
-   * @returns {Promise<*>}
-   */
-  async setupTestPrinter(printer) {
-    if (this.testSocket) {
-      this.testSocket.close();
-      this.testSocket = null;
-    }
-
-    const validatedData = await validateInput(printer, createTestPrinterRules);
-    validatedData.enabled = true;
-
-    // Create a new socket if it doesn't exist
-    const { correlationToken } = printer;
-    this.testSocket = this.socketFactory.createInstance();
-
-    // Reset the socket credentials before (re-)connecting
-    this.testSocket.registerCredentials({
-      printerId: correlationToken,
-      loginDto: {
-        apiKey: printer.apiKey,
-        printerURL: printer.printerURL,
-      },
-      protocol: "ws",
-    });
-
-    const testEvents = [
-      octoPrintEvent(Message.WS_STATE_UPDATED),
-      octoPrintEvent(Message.API_STATE_UPDATED),
-      octoPrintEvent(Message.WS_CLOSED),
-      octoPrintEvent(Message.WS_OPENED),
-      octoPrintEvent(Message.WS_ERROR),
-    ];
-    const listener = ({ event, payload }) => {
-      this.socketIoGateway.send("test-printer-state", {
-        event,
-        payload,
-        correlationToken,
-      });
-    };
-    testEvents.forEach((te) => {
-      this.eventEmitter2.on(te, listener);
-    });
-    await this.testSocket.setupSocketSession();
-
-    const promise = new Promise(async (resolve, reject) => {
-      this.testSocket.open();
-      for await (const startTime of setInterval(100)) {
-        if (this.testSocket.socketState === SOCKET_STATE.authenticated) {
-          resolve();
-          break;
-        }
-      }
-    });
-
-    await Promise.race([promise, setTimeout(AppConstants.defaultWebsocketHandshakeTimeout)]);
-    this.testSocket.close();
-    delete this.testSocket;
-    testEvents.forEach((te) => {
-      this.eventEmitter2.off(te, listener);
-    });
+    delete this.printerSocketAdaptersById[printerId];
   }
 }
 

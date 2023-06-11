@@ -30,7 +30,7 @@ class PrinterSettingsController {
   async get(req, res) {
     const { id: printerId } = await validateInput(req.params, idRules);
 
-    const printerLogin = this.printerCache.getLoginDto(printerId);
+    const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
     const settings = await this.#octoPrintApiService.getSettings(printerLogin);
     res.send(settings);
   }
@@ -39,7 +39,7 @@ class PrinterSettingsController {
     const { id: printerId } = await validateInput(req.params, idRules);
     const input = await validateInput(req.body, setGcodeAnalysis);
 
-    const printerLogin = this.printerCache.getLoginDto(printerId);
+    const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
     const settings = await this.#octoPrintApiService.setGCodeAnalysis(printerLogin, input);
     res.send(settings);
   }
@@ -47,8 +47,8 @@ class PrinterSettingsController {
   async syncPrinterName(req, res) {
     const { id: printerId } = await validateInput(req.params, idRules);
 
-    const printerLogin = this.printerCache.getLoginDto(printerId);
-    const printerName = this.printerCache.getName(printerId);
+    const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
+    const printerName = await this.printerCache.getNameAsync(printerId);
     const settings = await this.#octoPrintApiService.updatePrinterNameSetting(
       printerLogin,
       printerName,

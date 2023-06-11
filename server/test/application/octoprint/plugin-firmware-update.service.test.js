@@ -36,7 +36,7 @@ beforeAll(async () => {
   pluginCache = container.resolve(DITokens.pluginRepositoryCache);
 
   createdPrinter = await printerService.create(validNewPrinterState);
-  loginDto = printerCache.getLoginDto(createdPrinter.id)
+  loginDto = await printerCache.getLoginDtoAsync(createdPrinter.id)
   httpClient.saveMockResponse(pluginJson, 200, false);
   await pluginCache.queryCache();
 });

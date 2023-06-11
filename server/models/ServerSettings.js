@@ -31,7 +31,7 @@ const ServerSettingsSchema = new mongoose.Schema({
       default: AppConstants.defaultFileStorageFolder,
     },
     debugSettings: {
-      debugSocketEvents: {
+      debugSocketIoEvents: {
         type: Boolean,
         default: false,
         required: true,
@@ -49,6 +49,16 @@ const ServerSettingsSchema = new mongoose.Schema({
       debugSocketSetup: {
         type: Boolean,
         default: true,
+        required: true,
+      },
+      debugSocketMessages: {
+        type: Boolean,
+        default: false,
+        required: true,
+      },
+      debugSocketIoBandwidth: {
+        type: Boolean,
+        default: false,
         required: true,
       },
     },

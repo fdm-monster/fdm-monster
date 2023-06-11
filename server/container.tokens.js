@@ -41,13 +41,14 @@ const DITokens = {
   // Stores/states
   settingsStore: "settingsStore",
   printerCache: "printerCache",
+  printerEventsCache: "printerEventsCache",
   printerSocketStore: "printerSocketStore",
+  testPrinterSocketStore: "testPrinterSocketStore",
   octoPrintLogsCache: "printerTickerStore",
   filesStore: "filesStore",
   octoPrintSockIoAdapter: "octoPrintSockIoAdapter",
   // Caches
   floorStore: "floorStore",
-  jobsCache: "jobsCache",
   fileCache: "fileCache",
   fileUploadTrackerCache: "fileUploadTrackerCache",
   // Tasks

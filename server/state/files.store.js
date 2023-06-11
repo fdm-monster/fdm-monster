@@ -39,7 +39,7 @@ class FilesStore {
    * @returns {Promise<void>}
    */
   async loadFilesStore() {
-    const printers = this.printerCache.listCachedPrinters(true);
+    const printers = await this.printerCache.listCachedPrinters(true);
     for (let printer of printers) {
       try {
         const printerFileStorage = await this.#printerFilesService.getPrinterFilesStorage(printer.id);
@@ -57,7 +57,7 @@ class FilesStore {
    * @returns {Promise<*>}
    */
   async eagerLoadPrinterFiles(printerId, recursive) {
-    const loginDto = this.printerCache.getLoginDto(printerId);
+    const loginDto = await this.printerCache.getLoginDtoAsync(printerId);
     const response = await this.#octoPrintApiService.getFiles(loginDto, recursive, {
       unwrap: false,
       simple: true,
@@ -85,8 +85,8 @@ class FilesStore {
     const succeededFiles = [];
 
     const nonRecursiveFiles = this.getOutdatedFiles(printerId, ageDaysMax);
-    const printerLogin = this.printerCache.getLoginDto(printerId);
-    const printerName = this.printerCache.getCachedPrinter(printerId).printerName;
+    const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
+    const printerName = await this.printerCache.getCachedPrinterOrThrowAsync(printerId).printerName;
 
     for (let file of nonRecursiveFiles) {
       try {
@@ -107,7 +107,7 @@ class FilesStore {
   }
 
   async purgePrinterFiles(printerId) {
-    const printerState = this.printerCache.getCachedPrinter(printerId);
+    const printerState = await this.printerCache.getCachedPrinterOrThrowAsync(printerId);
 
     this.#logger.log(`Purging files from printer ${printerId}`);
     await this.#printerFilesService.clearFiles(printerState.id);
@@ -119,7 +119,7 @@ class FilesStore {
   }
 
   async purgeFiles() {
-    const allPrinters = this.printerCache.listCachedPrinters();
+    const allPrinters = await this.printerCache.listCachedPrinters();
 
     this.#logger.log(`Purging files from ${allPrinters.length} printers`);
     for (let printer of allPrinters) {
@@ -134,7 +134,7 @@ class FilesStore {
   }
 
   async updatePrinterFiles(printerId, files) {
-    const printer = this.printerCache.getCachedPrinter(printerId);
+    const printer = await this.printerCache.getCachedPrinterOrThrowAsync(printerId);
 
     // Check printer in database and modify
     const printerFileList = await this.#printerFilesService.updateFiles(printer.id, files);
@@ -144,7 +144,7 @@ class FilesStore {
   }
 
   async appendOrSetPrinterFile(printerId, addedFile) {
-    const printer = this.printerCache.getCachedPrinter(printerId);
+    const printer = await this.printerCache.getCachedPrinterOrThrowAsync(printerId);
 
     // Check printer in database and modify
     const { fileList, lastPrintedFile } = await this.#printerFilesService.appendOrReplaceFile(printer.id, addedFile);
@@ -172,7 +172,6 @@ class FilesStore {
 
     // Warning only
     const cacheActionResult = this.#fileCache.purgeFile(printerId, filePath);
-
     return { service: serviceActionResult, cache: cacheActionResult };
   }
 }

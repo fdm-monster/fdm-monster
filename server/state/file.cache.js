@@ -1,7 +1,6 @@
 const { findFileIndex } = require("../utils/find-predicate.utils");
-const { getFileCacheDefault } = require("../constants/cache.constants");
 const { ValidationException } = require("../exceptions/runtime.exceptions");
-const { getDefaultFileStatistics, Status } = require("../constants/service.constants");
+const { getFileListDefault } = require("../constants/service.constants");
 
 /**
  * A generic cache for file references, which will be abstracted in future to allow for proxy files and local files.
@@ -54,7 +53,10 @@ class FileCache {
 
     if (!fileStorage) {
       // A runtime thing only, repository handles it differently
-      fileStorage = this.#printerFileStorage[printerId] = getFileCacheDefault();
+      fileStorage = this.#printerFileStorage[printerId] = {
+        fileList: getFileListDefault(),
+        storage: undefined,
+      };
     }
 
     return fileStorage;

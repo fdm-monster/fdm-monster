@@ -24,14 +24,17 @@ class BatchCallService {
    * @type {PrinterCache}
    */
   printerCache;
-  jobsCache;
+  /**
+   * @type {PrinterEventsCache}
+   */
+  printerEventsCache;
   filesStore;
 
-  constructor({ octoPrintApiService, printerCache, printerSocketStore, jobsCache, filesStore }) {
+  constructor({ octoPrintApiService, printerCache, printerEventsCache, printerSocketStore, filesStore }) {
     this.octoPrintApiService = octoPrintApiService;
     this.printerCache = printerCache;
+    this.printerEventsCache = printerEventsCache;
     this.printerSocketStore = printerSocketStore;
-    this.jobsCache = jobsCache;
     this.filesStore = filesStore;
   }
 
@@ -52,7 +55,7 @@ class BatchCallService {
   async batchConnectUsb(printerIds) {
     const promises = [];
     for (const printerId of printerIds) {
-      const printerLogin = this.printerCache.getLoginDto(printerId);
+      const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
       const time = Date.now();
 
       const command = this.octoPrintApiService.connectCommand;
@@ -77,11 +80,13 @@ class BatchCallService {
   async batchReprintCalls(printerIds) {
     const promises = [];
     for (const printerId of printerIds) {
-      const printerLogin = this.printerCache.getLoginDto(printerId);
-      const job = this.jobsCache.getPrinterJob(printerId);
-      let reprintPath = job?.filePath;
+      const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
+      const currentFilePath = await this.printerEventsCache.getPrinterSocketEvents(printerId)?.current?.job?.file?.path;
+
+      // TODO test this
+      let reprintPath = currentFilePath;
       if (!reprintPath?.length) {
-        const files = this.filesStore.getFiles(printerId)?.files;
+        const files = await this.filesStore.getFiles(printerId)?.files;
         if (files?.length) {
           files.sort((f1, f2) => {
             // Sort by date, newest first

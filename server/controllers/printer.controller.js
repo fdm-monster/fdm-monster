@@ -20,7 +20,11 @@ class PrinterController {
   /**
    * @type {PrinterSocketStore}
    */
-  #printerSocketStore;
+  printerSocketStore;
+  /**
+   * @type {TestPrinterSocketStore}
+   */
+  testPrinterSocketStore;
   /**
    * @type {PrinterService}
    */
@@ -29,6 +33,10 @@ class PrinterController {
    * @type {PrinterCache}
    */
   printerCache;
+  /**
+   * @type {PrinterEventsCache}
+   */
+  printerEventsCache;
 
   #taskManagerService;
   #octoPrintApiService;
@@ -42,8 +50,10 @@ class PrinterController {
 
   constructor({
     printerSocketStore,
+    testPrinterSocketStore,
     printerService,
     printerCache,
+    printerEventsCache,
     taskManagerService,
     loggerFactory,
     octoPrintApiService,
@@ -52,8 +62,10 @@ class PrinterController {
   }) {
     this.#logger = loggerFactory("PrinterController");
     this.printerCache = printerCache;
+    this.printerEventsCache = printerEventsCache;
     this.printerService = printerService;
-    this.#printerSocketStore = printerSocketStore;
+    this.printerSocketStore = printerSocketStore;
+    this.testPrinterSocketStore = testPrinterSocketStore;
     this.#taskManagerService = taskManagerService;
     this.#octoPrintApiService = octoPrintApiService;
     this.#pluginRepositoryCache = pluginRepositoryCache;
@@ -61,12 +73,13 @@ class PrinterController {
   }
 
   async list(req, res) {
-    const printers = this.printerCache.listCachedPrinters(true);
+    const printers = await this.printerCache.listCachedPrinters(true);
     res.send(printers);
   }
 
   async listPrinterFloors(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
+    // TODO move to service?
     const results = await Floor.find({
       "printers.printerId": currentPrinterId,
     });
@@ -75,13 +88,13 @@ class PrinterController {
 
   async getPrinter(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
-    const foundPrinter = this.printerCache.getCachedPrinter(currentPrinterId);
+    const foundPrinter = await this.printerCache.getCachedPrinterOrThrowAsync(currentPrinterId);
     res.send(foundPrinter);
   }
 
   async getPrinterSocketInfo(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
-    const foundPrinter = this.#printerSocketStore.getPrinterSocketEvents(currentPrinterId);
+    const foundPrinter = await this.printerEventsCache.getPrinterSocketEvents(currentPrinterId);
     res.send(foundPrinter);
   }
 
@@ -142,7 +155,7 @@ class PrinterController {
 
     // Has internal validation, but might add some here above as well
     const createdPrinter = await this.printerService.create(newPrinter);
-    const printer = this.printerCache.getCachedPrinter(createdPrinter.id);
+    const printer = await this.printerCache.getCachedPrinterOrThrowAsync(createdPrinter.id);
     this.#logger.log(`Created printer with ID ${printer.id || printer.correlationToken}`);
     res.send(printer);
   }
@@ -171,7 +184,7 @@ class PrinterController {
     updatedPrinter = this.#adjustPrinterObject(updatedPrinter);
     await this.printerService.update(currentPrinterId, updatedPrinter);
 
-    const result = this.printerCache.getCachedPrinter(currentPrinterId);
+    const result = await this.printerCache.getCachedPrinterOrThrowAsync(currentPrinterId);
     res.send(result);
   }
 
@@ -261,7 +274,7 @@ class PrinterController {
 
     // Add printer with test=true
     try {
-      await this.#printerSocketStore.setupTestPrinter(newPrinter);
+      await this.testPrinterSocketStore.setupTestPrinter(newPrinter);
     } catch (e) {
       res.send({ correlationToken: newPrinter.correlationToken, failure: true });
       return;
@@ -271,7 +284,7 @@ class PrinterController {
 
   async refreshPrinterSocket(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
-    this.#printerSocketStore.reconnectOctoPrint(currentPrinterId);
+    this.printerSocketStore.reconnectOctoPrint(currentPrinterId);
     res.send({});
   }
 }

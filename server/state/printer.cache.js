@@ -36,11 +36,6 @@ class PrinterCache extends KeyDiffCache {
    * @type {PrinterService}
    */
   printerService;
-  /**
-   * @private
-   * @type {CachedPrinter[]}
-   */
-  printers = [];
 
   constructor({ printerService, eventEmitter2 }) {
     super();
@@ -53,11 +48,95 @@ class PrinterCache extends KeyDiffCache {
     this.eventEmitter2.on(printerEvents.printersDeleted, this.handlePrintersDeleted.bind(this));
   }
 
+  /**
+   * @returns {Promise<Printer>} semi-alike printer model
+   */
   async loadCache() {
     const printerDocs = await this.printerService.list();
-    this.printers = this.mapArray(printerDocs);
-    this.batchMarkUpdated(this.printers.map((printer) => printer.id));
-    return this.printers;
+    const dtos = this.mapArray(printerDocs);
+    const keyValues = dtos.map((p) => ({ key: this.getId(p), value: p }));
+    await this.setKeyValuesBatch(keyValues, true);
+    return dtos;
+  }
+
+  /**
+   * @returns {Promise<Printer[]>}
+   */
+  async listCachedPrinters(includeDisabled = false) {
+    const printers = await this.getAllValues();
+    if (!includeDisabled) {
+      return printers.filter((p) => p.enabled);
+    }
+    return printers;
+  }
+
+  /**
+   *
+   * @param {string} id
+   * @returns {Promise<?Printer>}
+   */
+  async getCachedPrinterOrThrowAsync(id) {
+    const printer = await this.getValue(id);
+    if (!printer) {
+      throw new NotFoundException(`Printer with id ${id} not found`);
+    }
+    return printer;
+  }
+
+  getCachedPrinterOrThrow(id) {
+    const printer = this.keyValueStore[id];
+    if (!printer) {
+      throw new NotFoundException(`Printer with id ${id} not found`);
+    }
+    return printer;
+  }
+
+  async getNameAsync(id) {
+    const printer = await this.getCachedPrinterOrThrowAsync(id);
+    return printer.name;
+  }
+
+  getName(id) {
+    const printer = this.getCachedPrinterOrThrow(id);
+    return printer.name;
+  }
+
+  async getLoginDtoAsync(id) {
+    const printer = await this.getCachedPrinterOrThrowAsync(id);
+    return {
+      printerURL: printer.printerURL,
+      apiKey: printer.apiKey,
+    };
+  }
+
+  getLoginDto(id) {
+    const printer = this.getCachedPrinterOrThrow(id);
+    return {
+      printerURL: printer.printerURL,
+      apiKey: printer.apiKey,
+    };
+  }
+
+  async handleBatchPrinterCreated({ printers }) {
+    const mappedPrinters = this.mapArray(printers);
+    const keyValues = mappedPrinters.map((p) => ({ key: this.getId(p), value: p }));
+    await this.setKeyValuesBatch(keyValues, true);
+  }
+
+  async handlePrinterCreatedOrUpdated({ printer }) {
+    const printerDto = this.map(printer);
+    await this.setKeyValue(printerDto.id, printerDto, true);
+  }
+
+  async handlePrintersDeleted({ printerIds }) {
+    await this.deleteKeysBatch(printerIds, true);
+  }
+
+  /**
+   * @private
+   */
+  getId(value) {
+    return value.id.toString();
   }
 
   /**
@@ -70,7 +149,7 @@ class PrinterCache extends KeyDiffCache {
   }
 
   /**
-   *
+   * @private
    * @param printerDoc
    * @returns {CachedPrinter}
    */
@@ -79,63 +158,6 @@ class PrinterCache extends KeyDiffCache {
     p.printerName = p.settingsAppearance.name;
     delete p.settingsAppearance;
     return p;
-  }
-
-  /**
-   * @returns {Printer[]}
-   */
-  listCachedPrinters(includeDisabled = false) {
-    if (!includeDisabled) {
-      return this.printers.filter((p) => p.enabled);
-    }
-    return this.printers;
-  }
-
-  /**
-   *
-   * @param {string} id
-   * @returns {?Printer}
-   */
-  getCachedPrinter(id) {
-    const printer = this.printers.find((printer) => printer.id === id);
-    if (!printer) {
-      throw new NotFoundException(`Printer with id ${id} not found`);
-    }
-    return printer;
-  }
-
-  getName(id) {
-    const printer = this.getCachedPrinter(id);
-    return printer.name;
-  }
-
-  getLoginDto(id) {
-    const printer = this.getCachedPrinter(id);
-    return {
-      printerURL: printer.printerURL,
-      apiKey: printer.apiKey,
-    };
-  }
-
-  handleBatchPrinterCreated({ printers }) {
-    const mappedPrinters = this.mapArray(printers);
-    this.printers = [...this.printers, ...mappedPrinters];
-    this.batchMarkUpdated(mappedPrinters);
-  }
-
-  handlePrinterCreatedOrUpdated({ printer }) {
-    const printerDto = this.map(printer);
-    if (this.printers.find((p) => p.id === printer.id)) {
-      this.printers = this.printers.map((p) => (p.id.toString() === printerDto.id ? printerDto : p));
-    } else {
-      this.printers = [...this.printers, printerDto];
-    }
-    this.markUpdated(printerDto.id.toString());
-  }
-
-  handlePrintersDeleted({ printerIds }) {
-    this.printers = this.printers.filter((p) => !printerIds.includes(p.id.toString()));
-    this.batchMarkDeleted(printerIds.map((id) => id.toString()));
   }
 }
 

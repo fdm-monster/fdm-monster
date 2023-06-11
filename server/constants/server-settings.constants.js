@@ -6,8 +6,12 @@ const serverSettingsKey = "server";
 const getDefaultServerSettings = () => ({
   port: AppConstants.defaultServerPort,
   debugSettings: {
+    debugSocketIoEvents: false,
     debugSocketReconnect: false,
-    debugSocketEvents: false,
+    debugSocketRetries: false,
+    debugSocketSetup: false,
+    debugSocketMessages: false,
+    debugSocketIoBandwidth: false,
   },
   uploadFolder: AppConstants.defaultFileStorageFolder,
   registration: true,
