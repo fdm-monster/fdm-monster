@@ -61,7 +61,7 @@ class PrinterController {
   }
 
   async list(req, res) {
-    const printers = this.printerCache.listCachedPrinters(true);
+    const printers = await this.printerCache.listCachedPrinters(true);
     res.send(printers);
   }
 

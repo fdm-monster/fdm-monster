@@ -37,7 +37,6 @@ class PrinterSocketStore {
    * @type {Object.<string, PrinterEvents>}
    */
   printerEventsById = {};
-  lastMessageReceivedAt = null;
   /**
    * @type {OctoPrintSockIoAdapter}
    */
@@ -101,7 +100,7 @@ class PrinterSocketStore {
   async loadPrinterSockets() {
     await this.printerCache.loadCache();
 
-    const printerDocs = this.printerCache.listCachedPrinters(false);
+    const printerDocs = await this.printerCache.listCachedPrinters(false);
     this.printerSocketAdaptersById = {};
     /**
      * @type {Printer}

@@ -36,11 +36,6 @@ class PrinterCache extends KeyDiffCache {
    * @type {PrinterService}
    */
   printerService;
-  /**
-   * @private
-   * @type {CachedPrinter[]}
-   */
-  printers = [];
 
   constructor({ printerService, eventEmitter2 }) {
     super();
@@ -53,11 +48,14 @@ class PrinterCache extends KeyDiffCache {
     this.eventEmitter2.on(printerEvents.printersDeleted, this.handlePrintersDeleted.bind(this));
   }
 
+  /**
+   * @returns {Promise<Printer>} semi-alike printer model
+   */
   async loadCache() {
     const printerDocs = await this.printerService.list();
-    this.printers = this.mapArray(printerDocs);
-    this.batchMarkUpdated(this.printers.map((printer) => printer.id));
-    return this.printers;
+    const dtos = this.mapArray(printerDocs);
+    await this.setValuesBatch(dtos, true);
+    return dtos;
   }
 
   /**
@@ -82,13 +80,14 @@ class PrinterCache extends KeyDiffCache {
   }
 
   /**
-   * @returns {Printer[]}
+   * @returns {Promise<Printer[]>}
    */
-  listCachedPrinters(includeDisabled = false) {
+  async listCachedPrinters(includeDisabled = false) {
+    const printers = await this.getAllValues();
     if (!includeDisabled) {
-      return this.printers.filter((p) => p.enabled);
+      return printers.filter((p) => p.enabled);
     }
-    return this.printers;
+    return printers;
   }
 
   /**
@@ -136,6 +135,10 @@ class PrinterCache extends KeyDiffCache {
   handlePrintersDeleted({ printerIds }) {
     this.printers = this.printers.filter((p) => !printerIds.includes(p.id.toString()));
     this.batchMarkDeleted(printerIds.map((id) => id.toString()));
+  }
+
+  getId(value) {
+    return value.id.toString();
   }
 }
 

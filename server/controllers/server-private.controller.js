@@ -111,7 +111,8 @@ class ServerPrivateController {
   }
 
   async deleteAllPrinters(req, res) {
-    const printerIds = this.printerCache.listCachedPrinters(true).map((p) => p.id);
+    const printers = await this.printerCache.listCachedPrinters(true);
+    const printerIds = printers.map((p) => p.id);
     await this.printerService.deleteMany(printerIds);
     res.send();
   }

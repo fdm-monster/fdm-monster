@@ -86,7 +86,7 @@ describe("PrinterSocketStore", () => {
     await printerService.create(validNewPrinterState);
     await printerCache.loadCache();
 
-    expect(printerCache.listCachedPrinters().length).toBeGreaterThan(0);
+    expect((await printerCache.listCachedPrinters()).length).toBeGreaterThan(0);
   });
 
   // TODO move to PrinterService tests

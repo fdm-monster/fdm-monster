@@ -39,7 +39,7 @@ class FilesStore {
    * @returns {Promise<void>}
    */
   async loadFilesStore() {
-    const printers = this.printerCache.listCachedPrinters(true);
+    const printers = await this.printerCache.listCachedPrinters(true);
     for (let printer of printers) {
       try {
         const printerFileStorage = await this.#printerFilesService.getPrinterFilesStorage(printer.id);
@@ -119,7 +119,7 @@ class FilesStore {
   }
 
   async purgeFiles() {
-    const allPrinters = this.printerCache.listCachedPrinters();
+    const allPrinters = await this.printerCache.listCachedPrinters();
 
     this.#logger.log(`Purging files from ${allPrinters.length} printers`);
     for (let printer of allPrinters) {

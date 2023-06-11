@@ -53,7 +53,7 @@ class PrinterFileCleanTask {
 
   async run() {
     // TODO filter disconnected printers
-    const printers = this.printerCache.listCachedPrinters();
+    const printers = await this.printerCache.listCachedPrinters(false);
     const fileCleanSettings = this.#getSettings();
     const autoCleanAtBootEnabled = fileCleanSettings.autoRemoveOldFilesAtBoot;
 

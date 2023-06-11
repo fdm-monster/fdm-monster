@@ -1,108 +1,104 @@
+const { KeyDiffCache } = require("../utils/cache/key-diff.cache");
+
 /**
  * A generic cache for printer groups
  */
-class FloorStore {
+class FloorStore extends KeyDiffCache {
   /**
    * @type {LoggerService}
    */
   #logger;
-  /**
-   * @type {Floor[]}
-   */
-  floors = [];
   /**
    * @type {FloorService}
    */
   #floorService;
 
   constructor({ floorService, loggerFactory }) {
+    super();
     this.#floorService = floorService;
     this.#logger = loggerFactory(FloorStore.name);
   }
 
   async loadStore() {
-    this.floors = await this.#floorService.list();
+    const floors = await this.#floorService.list();
 
-    if (!this.floors?.length) {
+    if (!floors?.length) {
       this.#logger.log("Creating default floor as non existed");
       const floor = await this.#floorService.createDefaultFloor();
-      this.floors.push(floor);
+      await this.setValue(floor, true);
+      return;
     }
+
+    await this.setValuesBatch(floors, true);
   }
 
   async listCache() {
-    if (!this.floors.length) {
+    const floors = await this.getAllValues();
+    if (!floors?.length) {
       await this.loadStore();
     }
     return this.floors;
   }
 
-  async create(input, reloadStore = true) {
+  async create(input) {
+    /** @type {Floor} **/
     const floor = await this.#floorService.create(input);
-    if (reloadStore) {
-      await this.loadStore();
-    }
-
+    await this.setValue(floor, true);
     return floor;
   }
 
-  async update(floorId, input, reloadStore = true) {
+  async update(floorId, input) {
     const floor = await this.#floorService.update(floorId, input);
-    if (reloadStore) {
-      await this.loadStore();
-    }
-
+    await this.setValue(floor, true);
     return floor;
   }
 
   async delete(floorId) {
     const deleteResult = await this.#floorService.delete(floorId);
-    await this.loadStore();
-
+    await this.deleteKeyValue(floorId);
     return deleteResult;
   }
 
   async getFloor(floorId) {
-    if (!this.floors.length) {
-      await this.loadStore();
-    }
-
-    const floor = this.floors.find((pf) => pf.id.toString() === floorId);
+    let floor = await this.getValue(floorId);
     if (!!floor) return floor;
 
-    return await this.#floorService.get(floorId);
+    floor = await this.#floorService.get(floorId);
+    await this.setValue(floor, true);
+    return floor;
   }
 
   async updateName(floorId, updateSpec) {
-    await this.#floorService.updateName(floorId, updateSpec);
-
-    const floor = await this.getFloor(floorId);
-    floor.name = updateSpec.name;
-
+    const floor = await this.#floorService.updateName(floorId, updateSpec);
+    await this.setValue(floor, true);
     return floor;
   }
 
   async updateFloorNumber(floorId, updateSpec) {
-    await this.#floorService.updateFloorNumber(floorId, updateSpec);
-    const floor = await this.getFloor(floorId);
-    floor.floor = updateSpec.floor;
+    const floor = await this.#floorService.updateFloorNumber(floorId, updateSpec);
+    await this.setValue(floor, true);
     return floor;
   }
 
   async addOrUpdatePrinter(floorId, printerInFloor) {
     const floor = await this.#floorService.addOrUpdatePrinter(floorId, printerInFloor);
-    await this.loadStore();
+    await this.setValue(floor, true);
     return floor;
   }
 
   async removePrinter(floorId, printerInFloor) {
     const floor = await this.#floorService.removePrinter(floorId, printerInFloor);
-    await this.loadStore();
+    await this.deleteKeyValue(floorId);
     return floor;
   }
 
   async removePrinterFromAnyFloor(printerId) {
+    // TODO cache update?
     return await this.#floorService.deletePrinterFromAnyFloor(printerId);
+  }
+
+  getId(value) {
+    return value._id?.toString();
   }
 }
 

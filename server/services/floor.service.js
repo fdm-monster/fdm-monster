@@ -26,7 +26,8 @@ class FloorService {
    * Lists the floors present in the database.
    */
   async list(patchPositions = true) {
-    const printerIds = this.printerCache.listCachedPrinters(true).map((p) => p.id);
+    const printers = await this.printerCache.listCachedPrinters(true);
+    const printerIds = printers.map((p) => p.id);
 
     const floors = await Floor.find({});
     if (!patchPositions) {
@@ -87,6 +88,7 @@ class FloorService {
   /**
    * Stores a new floor into the database.
    * @param {Object} floor object to create.
+   * @returns {Promise<Floor>}
    * @throws {Error} If the printer floor is not correctly provided.
    */
   async create(floor) {

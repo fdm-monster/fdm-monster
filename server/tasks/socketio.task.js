@@ -29,7 +29,7 @@ class SocketIoTask {
   printerCache;
 
   #aggregateSizeCounter = 0;
-  #aggregateWindowLength = 100;
+  #aggregateWindowLength = 10;
   #aggregateSizes = [];
   #rounding = 2;
   #logger;
@@ -61,20 +61,17 @@ class SocketIoTask {
   }
 
   async sendUpdate() {
-    const floors = await this.floorStore.listCache();
-    const printers = this.printerCache.listCachedPrinters(true);
+    const floorDiff = await this.floorStore.processStateDiffs();
+    const printers = await this.printerCache.processStateDiffs();
     const socketStates = this.printerSocketStore.getSocketStatesById();
     const printerEvents = this.printerSocketStore.printerEventsById;
     const trackedUploads = this.fileUploadTrackerCache.getUploads(true);
-
-    // TODO use diff cache
-    const diffs = this.printerCache.processStateDiffs();
 
     const socketIoData = {
       printers,
       socketStates,
       printerEvents,
-      floors,
+      floorDiff,
       trackedUploads,
     };
 

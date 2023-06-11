@@ -91,7 +91,7 @@ class PluginFirmwareUpdateController {
   }
 
   async #performScanOnPrinters() {
-    const printers = this.printerCache.listCachedPrinters();
+    const printers = await this.printerCache.listCachedPrinters();
     const printerFirmwareStates = [];
     const failureStates = [];
     for (let printer of printers) {
