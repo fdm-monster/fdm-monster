@@ -54,7 +54,8 @@ class PrinterCache extends KeyDiffCache {
   async loadCache() {
     const printerDocs = await this.printerService.list();
     const dtos = this.mapArray(printerDocs);
-    await this.setValuesBatch(dtos, true);
+    const keyValues = dtos.map((p) => ({ key: this.getId(p), value: p }));
+    await this.setKeyValuesBatch(keyValues, true);
     return dtos;
   }
 
@@ -97,7 +98,8 @@ class PrinterCache extends KeyDiffCache {
 
   async handleBatchPrinterCreated({ printers }) {
     const mappedPrinters = this.mapArray(printers);
-    await this.setValuesBatch(mappedPrinters, true);
+    const keyValues = mappedPrinters.map((p) => ({ key: this.getId(p), value: p }));
+    await this.setKeyValuesBatch(keyValues, true);
   }
 
   async handlePrinterCreatedOrUpdated({ printer }) {

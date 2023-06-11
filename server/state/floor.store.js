@@ -25,31 +25,31 @@ class FloorStore extends KeyDiffCache {
     if (!floors?.length) {
       this.#logger.log("Creating default floor as non existed");
       const floor = await this.#floorService.createDefaultFloor();
-      await this.setValue(floor, true);
+      await this.setKeyValue(floor._id, floor, true);
       return;
     }
 
-    await this.setValuesBatch(floors, true);
+    const keyValues = floors.map((floor) => ({
+      key: this.getId(floor),
+      value: floor,
+    }));
+    await this.setKeyValuesBatch(keyValues, true);
   }
 
   async listCache() {
     const floors = await this.getAllValues();
-    if (!floors?.length) {
-      await this.loadStore();
+    if (floors?.length) {
+      return floors;
     }
-    return this.floors;
+
+    await this.loadStore();
+    return await this.getAllValues();
   }
 
   async create(input) {
     /** @type {Floor} **/
     const floor = await this.#floorService.create(input);
-    await this.setValue(floor, true);
-    return floor;
-  }
-
-  async update(floorId, input) {
-    const floor = await this.#floorService.update(floorId, input);
-    await this.setValue(floor, true);
+    await this.setKeyValue(floor._id, floor, true);
     return floor;
   }
 
@@ -64,25 +64,31 @@ class FloorStore extends KeyDiffCache {
     if (!!floor) return floor;
 
     floor = await this.#floorService.get(floorId);
-    await this.setValue(floor, true);
+    await this.setKeyValue(floorId, floor, true);
+    return floor;
+  }
+
+  async update(floorId, input) {
+    const floor = await this.#floorService.update(floorId, input);
+    await this.setKeyValue(floorId, floor, true);
     return floor;
   }
 
   async updateName(floorId, updateSpec) {
     const floor = await this.#floorService.updateName(floorId, updateSpec);
-    await this.setValue(floor, true);
+    await this.setKeyValue(floorId, floor, true);
     return floor;
   }
 
   async updateFloorNumber(floorId, updateSpec) {
     const floor = await this.#floorService.updateFloorNumber(floorId, updateSpec);
-    await this.setValue(floor, true);
+    await this.setKeyValue(floorId, floor, true);
     return floor;
   }
 
   async addOrUpdatePrinter(floorId, printerInFloor) {
     const floor = await this.#floorService.addOrUpdatePrinter(floorId, printerInFloor);
-    await this.setValue(floor, true);
+    await this.setKeyValue(floorId, floor, true);
     return floor;
   }
 

@@ -14,42 +14,13 @@ class KeyDiffCache {
    */
   keyValueStore = {};
 
-  constructor() {
-    if (this.constructor === KeyDiffCache) {
-      throw new Error("KeyDiffCache is an abstract class");
-    }
-  }
-
-  /**
-   * @protected
-   * @abstract
-   * @param {T} value
-   * @returns {string}
-   */
-  getId(value) {
-    throw new Error("getId method not implemented, must be overridden");
-  }
-
-  /**
-   * @protected
-   * @param {Array<T>} values
-   * @param {boolean} [markUpdated=true]
-   */
-  async setValuesBatch(values, markUpdated = true) {
-    const keyValues = values.map((value) => ({
-      key: this.getId(value),
-      value,
-    }));
-    await this.setKeyValueBatch(keyValues, markUpdated);
-  }
-
   /**
    * @protected
    * @param {Array<{key: string, value: T}>} keyValues
    */
-  async setKeyValueBatch(keyValues, markUpdated = true) {
+  async setKeyValuesBatch(keyValues, markUpdated = true) {
     keyValues.forEach(({ key, value }) => {
-      this.storeKeyValue(key, value);
+      this.setKeyValue(key, value);
     });
     if (markUpdated) {
       const updatedKeys = keyValues.map(({ key }) => key);
@@ -77,6 +48,10 @@ class KeyDiffCache {
   async getAllValues() {
     const keys = Object.keys(this.keyValueStore);
     return this.getValuesBatch(keys);
+  }
+
+  async getAllKeyValues() {
+    return this.keyValueStore;
   }
 
   /**
@@ -113,24 +88,11 @@ class KeyDiffCache {
 
   /**
    * @protected
-   * @param {T} value
-   * @param {boolean} [markUpdated=true]
-   */
-  async setValue(value, markUpdated = true) {
-    const id = this.getId(value);
-    if (!id?.length) {
-      throw new Error("Id must be a non-empty serializable string");
-    }
-    await this.storeKeyValue(id, value, markUpdated);
-  }
-
-  /**
-   * @protected
    * @param {string} key
    * @param {T} value
    * @param {boolean} [markUpdated=true]
    */
-  async storeKeyValue(key, value, markUpdated = true) {
+  async setKeyValue(key, value, markUpdated = true) {
     const keyString = key?.toString();
     if (!keyString?.length) {
       throw new Error("Key must be a non-empty serializable string");

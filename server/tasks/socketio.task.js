@@ -13,6 +13,10 @@ class SocketIoTask {
    */
   printerSocketStore;
   /**
+   * @type {PrinterEventsCache}
+   */
+  printerEventsCache;
+  /**
    * @type {FloorStore}
    */
   floorStore;
@@ -46,6 +50,7 @@ class SocketIoTask {
     socketIoGateway,
     floorStore,
     printerSocketStore,
+    printerEventsCache,
     printerCache,
     loggerFactory,
     fileUploadTrackerCache,
@@ -54,6 +59,7 @@ class SocketIoTask {
   }) {
     this.socketIoGateway = socketIoGateway;
     this.printerSocketStore = printerSocketStore;
+    this.printerEventsCache = printerEventsCache;
     this.fileUploadTrackerCache = fileUploadTrackerCache;
     this.floorStore = floorStore;
     this.logger = loggerFactory(SocketIoTask.name);
@@ -74,7 +80,7 @@ class SocketIoTask {
     const floors = await this.floorStore.listCache();
     const printers = await this.printerCache.listCachedPrinters(true);
     const socketStates = this.printerSocketStore.getSocketStatesById();
-    const printerEvents = this.printerSocketStore.printerEventsById;
+    const printerEvents = await this.printerEventsCache.getAllKeyValues();
     const trackedUploads = this.fileUploadTrackerCache.getUploads(true);
 
     const socketIoData = {

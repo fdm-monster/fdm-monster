@@ -24,11 +24,16 @@ class BatchCallService {
    * @type {PrinterCache}
    */
   printerCache;
+  /**
+   * @type {PrinterEventsCache}
+   */
+  printerEventsCache;
   filesStore;
 
-  constructor({ octoPrintApiService, printerCache, printerSocketStore, filesStore }) {
+  constructor({ octoPrintApiService, printerCache, printerEventsCache, printerSocketStore, filesStore }) {
     this.octoPrintApiService = octoPrintApiService;
     this.printerCache = printerCache;
+    this.printerEventsCache = printerEventsCache;
     this.printerSocketStore = printerSocketStore;
     this.filesStore = filesStore;
   }
@@ -77,7 +82,7 @@ class BatchCallService {
     for (const printerId of printerIds) {
       const printerLogin = this.printerCache.getLoginDto(printerId);
 
-      const currentFilePath = this.printerSocketStore.getPrinterSocketEvents(printerId)?.current?.job?.file?.path;
+      const currentFilePath = this.printerEventsCache.getPrinterSocketEvents(printerId)?.current?.job?.file?.path;
 
       // TODO test this
       let reprintPath = currentFilePath;

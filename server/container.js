@@ -53,6 +53,7 @@ const { OctoPrintSockIoAdapter } = require("./services/octoprint/octoprint-socki
 const { PrinterCache } = require("./state/printer.cache");
 const PrinterSocketStore = require("./state/printer-socket.store");
 const { TestPrinterSocketStore } = require("./state/test-printer-socket.store");
+const { PrinterEventsCache } = require("./state/printer-events.cache");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -123,6 +124,7 @@ function configureContainer() {
     [DITokens.fileUploadTrackerCache]: asClass(FileUploadTrackerCache).singleton(),
     [DITokens.filesStore]: asClass(FilesStore).singleton(),
     [DITokens.printerCache]: asClass(PrinterCache).singleton(),
+    [DITokens.printerEventsCache]: asClass(PrinterEventsCache).singleton(),
     [DITokens.printerSocketStore]: asClass(PrinterSocketStore).singleton(),
     [DITokens.testPrinterSocketStore]: asClass(TestPrinterSocketStore).singleton(),
 

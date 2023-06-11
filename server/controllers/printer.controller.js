@@ -20,7 +20,7 @@ class PrinterController {
   /**
    * @type {PrinterSocketStore}
    */
-  #printerSocketStore;
+  printerSocketStore;
   /**
    * @type {TestPrinterSocketStore}
    */
@@ -33,6 +33,10 @@ class PrinterController {
    * @type {PrinterCache}
    */
   printerCache;
+  /**
+   * @type {PrinterEventsCache}
+   */
+  printerEventsCache;
 
   #taskManagerService;
   #octoPrintApiService;
@@ -49,6 +53,7 @@ class PrinterController {
     testPrinterSocketStore,
     printerService,
     printerCache,
+    printerEventsCache,
     taskManagerService,
     loggerFactory,
     octoPrintApiService,
@@ -57,8 +62,9 @@ class PrinterController {
   }) {
     this.#logger = loggerFactory("PrinterController");
     this.printerCache = printerCache;
+    this.printerEventsCache = printerEventsCache;
     this.printerService = printerService;
-    this.#printerSocketStore = printerSocketStore;
+    this.printerSocketStore = printerSocketStore;
     this.testPrinterSocketStore = testPrinterSocketStore;
     this.#taskManagerService = taskManagerService;
     this.#octoPrintApiService = octoPrintApiService;
@@ -87,7 +93,7 @@ class PrinterController {
 
   async getPrinterSocketInfo(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
-    const foundPrinter = this.#printerSocketStore.getPrinterSocketEvents(currentPrinterId);
+    const foundPrinter = this.printerEventsCache.getPrinterSocketEvents(currentPrinterId);
     res.send(foundPrinter);
   }
 
@@ -277,7 +283,7 @@ class PrinterController {
 
   async refreshPrinterSocket(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
-    this.#printerSocketStore.reconnectOctoPrint(currentPrinterId);
+    this.printerSocketStore.reconnectOctoPrint(currentPrinterId);
     res.send({});
   }
 }

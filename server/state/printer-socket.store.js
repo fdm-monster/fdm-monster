@@ -1,8 +1,6 @@
 const { errorSummary } = require("../utils/error.utils");
 const { captureException } = require("@sentry/node");
 const { printerEvents } = require("../constants/event.constants");
-const { AppConstants } = require("../server.constants");
-const { formatKB } = require("../utils/metric.utils");
 
 class PrinterSocketStore {
   /**
@@ -31,10 +29,6 @@ class PrinterSocketStore {
    */
   printerSocketAdaptersById = {};
   /**
-   * @type {Object.<string, PrinterEvents>}
-   */
-  printerEventsById = {};
-  /**
    * @type {LoggerService}
    */
   logger;
@@ -59,15 +53,10 @@ class PrinterSocketStore {
     this.subscribeToEvents();
   }
 
-  get _debugMode() {
-    return this.configService.get(AppConstants.debugSocketMessagesKey, AppConstants.defaultDebugSocketMessages) === "true";
-  }
-
   /**
    * @private
    */
   subscribeToEvents() {
-    this.eventEmitter2.on("octoprint.*", (e) => this.onPrinterSocketMessage(e));
     this.eventEmitter2.on(printerEvents.printerCreated, this.handlePrinterCreated.bind(this));
     this.eventEmitter2.on(printerEvents.printersDeleted, this.handlePrintersDeleted.bind(this));
     this.eventEmitter2.on(printerEvents.printerUpdated, this.handlePrinterUpdated.bind(this));
@@ -134,14 +123,6 @@ class PrinterSocketStore {
   }
 
   /**
-   * @param {string} id
-   * @returns {*}
-   */
-  getPrinterSocketEvents(id) {
-    return this.printerEventsById[id];
-  }
-
-  /**
    * Sets up the new WebSocket connections for all printers
    * @returns {Promise<void>}
    */
@@ -196,68 +177,6 @@ class PrinterSocketStore {
       socketSetup: socketSetupRequested,
       socket: socketStates,
       api: apiStates,
-    };
-  }
-
-  /**
-   * @private
-   * @param {OctoPrintEventDto} e
-   */
-  onPrinterSocketMessage(e) {
-    const printerId = e.printerId;
-    const socket = this.getPrinterSocket(printerId);
-    if (!socket) {
-      return;
-    }
-
-    let ref = this.getOrCreateEvents(printerId);
-    if (e.event !== "plugin" && e.event !== "event") {
-      this.setEvent(printerId, e.event, null, e.event === "history" ? this.pruneHistoryPayload(e.payload) : e.payload);
-      if (this._debugMode) {
-        this.logger.log(`Message '${e.event}' received, size ${formatKB(e.payload)}`, e.printerId);
-      }
-    } else if (e.event === "plugin") {
-      this.setSubEvent(printerId, "plugin", e.payload.plugin, e.payload);
-    } else if (e.event === "event") {
-      const eventType = e.payload.type;
-      this.setSubEvent(printerId, "event", eventType, e.payload.payload);
-      if (this._debugMode) {
-        this.logger.log(`Event '${eventType}' received`, e.printerId);
-      }
-    } else {
-      this.logger.log(`Message '${e.event}' received`, e.printerId);
-    }
-  }
-
-  pruneHistoryPayload(payload) {
-    delete payload.logs;
-    delete payload.temps;
-    delete payload.messages;
-    return payload;
-  }
-
-  getOrCreateEvents(printerId) {
-    let ref = this.printerEventsById[printerId];
-    if (!ref) {
-      this.printerEventsById[printerId] = { current: null, history: null, timelapse: null, event: {}, plugin: {} };
-      ref = this.printerEventsById[printerId];
-    }
-    return ref;
-  }
-
-  setEvent(printerId, label, eventName, payload) {
-    const ref = this.getOrCreateEvents(printerId);
-    ref[label] = {
-      payload,
-      receivedAt: Date.now(),
-    };
-  }
-
-  setSubEvent(printerId, label, eventName, payload) {
-    const ref = this.getOrCreateEvents(printerId);
-    ref[label][eventName] = {
-      payload,
-      receivedAt: Date.now(),
     };
   }
 
@@ -337,9 +256,8 @@ class PrinterSocketStore {
     if (!!socket) {
       socket.close();
     }
-    delete this.printerEventsById[printerId];
-    delete this.printerSocketAdaptersById[printerId];
     // TODO mark diff cache
+    delete this.printerSocketAdaptersById[printerId];
   }
 }
 
