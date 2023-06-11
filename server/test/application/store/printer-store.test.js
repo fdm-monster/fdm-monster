@@ -76,7 +76,7 @@ describe("PrinterSocketStore", () => {
     // Need the store in order to have files to refer to
     await filesStore.loadFilesStore();
 
-    const printerDto = printerCache.getCachedPrinterOrThrow(printerDoc.id);
+    const printerDto = await printerCache.getCachedPrinterOrThrow(printerDoc.id);
     expect(printerDto).toMatchObject({
       id: expect.any(String),
     });

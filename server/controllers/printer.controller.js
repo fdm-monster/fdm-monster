@@ -183,7 +183,7 @@ class PrinterController {
     updatedPrinter = this.#adjustPrinterObject(updatedPrinter);
     await this.printerService.update(currentPrinterId, updatedPrinter);
 
-    const result = this.printerCache.getCachedPrinterOrThrow(currentPrinterId);
+    const result = await this.printerCache.getCachedPrinterOrThrow(currentPrinterId);
     res.send(result);
   }
 

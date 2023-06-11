@@ -1,5 +1,6 @@
-const { bench, byteCount } = require("../../utils/benchmark.util");
+const { bench } = require("../../utils/benchmark.util");
 const { sleep } = require("../../utils/time.utils");
+const { sizeKB } = require("../../utils/metric.utils");
 
 describe("BenchUtil", () => {
   const cb = async () => {
@@ -33,7 +34,7 @@ describe("BenchUtil", () => {
   });
 
   it("bytecount should work", () => {
-    const length = byteCount("asd");
+    const length = sizeKB("asd");
     expect(length).not.toBe(0);
   });
 });

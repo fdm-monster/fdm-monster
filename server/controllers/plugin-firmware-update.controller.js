@@ -24,10 +24,7 @@ class PluginFirmwareUpdateController {
   }
 
   async listUpdateState(req, res) {
-    // let result = await this.#cacheManager.get(cacheKey);
-    // if (!result) {
     const result = await this.#performScanOnPrinters();
-    // }
     res.send(result);
   }
 
@@ -96,7 +93,7 @@ class PluginFirmwareUpdateController {
     const failureStates = [];
     for (let printer of printers) {
       try {
-        const loginDto = this.printerCache.getLoginDto(printer.id);
+        const loginDto = await this.printerCache.getLoginDto(printer.id);
         const isInstalled = await this.#pluginFirmwareUpdateService.isPluginInstalled(loginDto);
 
         let version;
