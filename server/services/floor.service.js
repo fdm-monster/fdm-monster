@@ -120,6 +120,10 @@ class FloorService {
     return await floor.save();
   }
 
+  async getFloorsOfPrinterId(printerId) {
+    return Floor.find({ printers: { $elemMatch: { printerId } } });
+  }
+
   async deletePrinterFromAnyFloor(printerId) {
     return Floor.updateMany(
       {},
