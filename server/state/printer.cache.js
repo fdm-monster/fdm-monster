@@ -59,27 +59,6 @@ class PrinterCache extends KeyDiffCache {
   }
 
   /**
-   * @private
-   */
-  mapArray(printerDocs) {
-    return printerDocs.map((p) => {
-      return this.map(p);
-    });
-  }
-
-  /**
-   *
-   * @param printerDoc
-   * @returns {CachedPrinter}
-   */
-  map(printerDoc) {
-    const p = map(printerDoc);
-    p.printerName = p.settingsAppearance.name;
-    delete p.settingsAppearance;
-    return p;
-  }
-
-  /**
    * @returns {Promise<Printer[]>}
    */
   async listCachedPrinters(includeDisabled = false) {
@@ -116,29 +95,51 @@ class PrinterCache extends KeyDiffCache {
     };
   }
 
-  handleBatchPrinterCreated({ printers }) {
+  async handleBatchPrinterCreated({ printers }) {
     const mappedPrinters = this.mapArray(printers);
-    this.printers = [...this.printers, ...mappedPrinters];
-    this.batchMarkUpdated(mappedPrinters);
+    await this.setValuesBatch(mappedPrinters, true);
   }
 
-  handlePrinterCreatedOrUpdated({ printer }) {
+  async handlePrinterCreatedOrUpdated({ printer }) {
     const printerDto = this.map(printer);
     if (this.printers.find((p) => p.id === printer.id)) {
       this.printers = this.printers.map((p) => (p.id.toString() === printerDto.id ? printerDto : p));
     } else {
       this.printers = [...this.printers, printerDto];
     }
-    this.markUpdated(printerDto.id.toString());
+    await this.setValue(printerDto, true);
   }
 
-  handlePrintersDeleted({ printerIds }) {
-    this.printers = this.printers.filter((p) => !printerIds.includes(p.id.toString()));
-    this.batchMarkDeleted(printerIds.map((id) => id.toString()));
+  async handlePrintersDeleted({ printerIds }) {
+    await this.deleteKeysBatch(printerIds, true);
   }
 
+  /**
+   * @private
+   */
   getId(value) {
     return value.id.toString();
+  }
+
+  /**
+   * @private
+   */
+  mapArray(printerDocs) {
+    return printerDocs.map((p) => {
+      return this.map(p);
+    });
+  }
+
+  /**
+   * @private
+   * @param printerDoc
+   * @returns {CachedPrinter}
+   */
+  map(printerDoc) {
+    const p = map(printerDoc);
+    p.printerName = p.settingsAppearance.name;
+    delete p.settingsAppearance;
+    return p;
   }
 }
 
