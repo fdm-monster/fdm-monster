@@ -48,7 +48,6 @@ const DITokens = {
   octoPrintSockIoAdapter: "octoPrintSockIoAdapter",
   // Caches
   floorStore: "floorStore",
-  jobsCache: "jobsCache",
   fileCache: "fileCache",
   fileUploadTrackerCache: "fileUploadTrackerCache",
   // Tasks

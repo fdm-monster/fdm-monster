@@ -12,7 +12,6 @@ const TaskManagerService = require("./services/task-manager.service");
 const ServerUpdateService = require("./services/server-update.service");
 const { GithubService } = require("./services/github.service");
 const FileCache = require("./state/file.cache");
-const JobsCache = require("./state/jobs.cache");
 const PrinterWebsocketTask = require("./tasks/printer-websocket.task");
 const { SocketIoTask } = require("./tasks/socketio.task");
 const OctoPrintApiService = require("./services/octoprint/octoprint-api.service");
@@ -119,7 +118,6 @@ function configureContainer() {
 
     [DITokens.octoPrintSockIoAdapter]: asClass(OctoPrintSockIoAdapter).transient(), // Transient on purpose
     [DITokens.floorStore]: asClass(FloorStore).singleton(),
-    [DITokens.jobsCache]: asClass(JobsCache).singleton(),
     [DITokens.pluginRepositoryCache]: asClass(PluginRepositoryCache).singleton(),
     [DITokens.fileCache]: asClass(FileCache).singleton(),
     [DITokens.fileUploadTrackerCache]: asClass(FileUploadTrackerCache).singleton(),
