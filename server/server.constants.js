@@ -37,10 +37,6 @@ const AppConstants = {
   // Websocket values
   defaultWebsocketHandshakeTimeout: 2000,
   defaultSocketThrottleRate: 1,
-  debugSocketStatesKey: "DEBUG_SOCKET_STATES",
-  defaultDebugSocketStates: "false",
-  debugSocketMessagesKey: "DEBUG_SOCKET_MESSAGES",
-  defaultDebugSocketMessages: "false",
 
   // Future experimental feature
   enableMqttAutoDiscoveryToken: "ENABLE_MQTT_AUTODISCOVERY",

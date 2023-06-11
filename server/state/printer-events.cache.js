@@ -1,7 +1,6 @@
 const { KeyDiffCache } = require("../utils/cache/key-diff.cache");
 const { formatKB } = require("../utils/metric.utils");
 const { printerEvents } = require("../constants/event.constants");
-const { AppConstants } = require("../server.constants");
 
 class PrinterEventsCache extends KeyDiffCache {
   /**
@@ -13,17 +12,17 @@ class PrinterEventsCache extends KeyDiffCache {
    */
   eventEmitter2;
   /**
-   * @type {ConfigService}
+   * @type {SettingsStore}
    */
-  configService;
+  settingsStore;
 
   get _debugMode() {
-    return this.configService.get(AppConstants.debugSocketMessagesKey, AppConstants.defaultDebugSocketMessages) === "true";
+    return this.settingsStore.getServerSettings().debugSettings?.debugSocketMessages;
   }
 
-  constructor({ eventEmitter2, loggerFactory, configService }) {
+  constructor({ eventEmitter2, loggerFactory, settingsStore }) {
     super();
-    this.configService = configService;
+    this.settingsStore = settingsStore;
     this.logger = loggerFactory("PrinterEventsCache");
     this.eventEmitter2 = eventEmitter2;
 
@@ -35,25 +34,25 @@ class PrinterEventsCache extends KeyDiffCache {
    */
   subscribeToEvents() {
     this.eventEmitter2.on("octoprint.*", (e) => this.onPrinterSocketMessage(e));
-    this.eventEmitter2.on(printerEvents.printersDeleted, (e) => this.handlePrintersDeleted(e));
+    this.eventEmitter2.on(printerEvents.printersDeleted, this.handlePrintersDeleted.bind(this));
   }
 
   /**
    * @private
    * @param {OctoPrintEventDto} e
    */
-  onPrinterSocketMessage(e) {
+  async onPrinterSocketMessage(e) {
     const printerId = e.printerId;
     if (e.event !== "plugin" && e.event !== "event") {
-      this.setEvent(printerId, e.event, null, e.event === "history" ? this.pruneHistoryPayload(e.payload) : e.payload);
+      await this.setEvent(printerId, e.event, null, e.event === "history" ? this.pruneHistoryPayload(e.payload) : e.payload);
       if (this._debugMode) {
         this.logger.log(`Message '${e.event}' received, size ${formatKB(e.payload)}`, e.printerId);
       }
     } else if (e.event === "plugin") {
-      this.setSubEvent(printerId, "plugin", e.payload.plugin, e.payload);
+      await this.setSubEvent(printerId, "plugin", e.payload.plugin, e.payload);
     } else if (e.event === "event") {
       const eventType = e.payload.type;
-      this.setSubEvent(printerId, "event", eventType, e.payload.payload);
+      await this.setSubEvent(printerId, "event", eventType, e.payload.payload);
       if (this._debugMode) {
         this.logger.log(`Event '${eventType}' received`, e.printerId);
       }
@@ -70,44 +69,43 @@ class PrinterEventsCache extends KeyDiffCache {
     return this.printerEventsById[id];
   }
 
-  getOrCreateEvents(printerId) {
-    let ref = this.printerEventsById[printerId];
+  async getOrCreateEvents(printerId) {
+    let ref = await this.getValue(printerId);
     if (!ref) {
-      this.printerEventsById[printerId] = { current: null, history: null, timelapse: null, event: {}, plugin: {} };
-      ref = this.printerEventsById[printerId];
+      ref = { current: null, history: null, timelapse: null, event: {}, plugin: {} };
+      await this.setKeyValue(printerId, ref);
     }
     return ref;
   }
 
-  setEvent(printerId, label, eventName, payload) {
-    const ref = this.getOrCreateEvents(printerId);
+  async setEvent(printerId, label, eventName, payload) {
+    const ref = await this.getOrCreateEvents(printerId);
     ref[label] = {
       payload,
       receivedAt: Date.now(),
     };
+    await this.setKeyValue(printerId, ref);
   }
 
-  setSubEvent(printerId, label, eventName, payload) {
-    const ref = this.getOrCreateEvents(printerId);
+  async setSubEvent(printerId, label, eventName, payload) {
+    const ref = await this.getOrCreateEvents(printerId);
     ref[label][eventName] = {
       payload,
       receivedAt: Date.now(),
     };
+    await this.setKeyValue(printerId, ref);
   }
 
-  async handlePrinterDeleted({ printerIds }) {
+  async handlePrintersDeleted({ printerIds }) {
     await this.deleteKeysBatch(printerIds);
   }
 
+  /** @private **/
   pruneHistoryPayload(payload) {
     delete payload.logs;
     delete payload.temps;
     delete payload.messages;
     return payload;
-  }
-
-  getId(value) {
-    return "";
   }
 }
 

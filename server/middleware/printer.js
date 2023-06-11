@@ -7,6 +7,7 @@ const printerLoginToken = "printerLogin";
 
 const printerResolveMiddleware = (key = "id") => {
   return (req, res, next) => {
+    /** @type {PrinterCache} */
     const printerCache = req.container.resolve(DITokens.printerCache);
 
     let scopedPrinter = undefined;
@@ -14,7 +15,7 @@ const printerResolveMiddleware = (key = "id") => {
 
     const printerId = req.params[key];
     if (printerId) {
-      scopedPrinter = printerCache.getCachedPrinter(printerId);
+      scopedPrinter = printerCache.getCachedPrinterOrThrow(printerId);
       loginDto = printerCache.getLoginDto(printerId);
     }
 

@@ -73,23 +73,23 @@ class PrinterCache extends KeyDiffCache {
   /**
    *
    * @param {string} id
-   * @returns {?Printer}
+   * @returns {Promise<?Printer>}
    */
-  getCachedPrinterOrThrow(id) {
-    const printer = this.getValue(id);
+  async getCachedPrinterOrThrow(id) {
+    const printer = await this.getValue(id);
     if (!printer) {
       throw new NotFoundException(`Printer with id ${id} not found`);
     }
     return printer;
   }
 
-  getName(id) {
-    const printer = this.getCachedPrinterOrThrow(id);
+  async getName(id) {
+    const printer = await this.getCachedPrinterOrThrow(id);
     return printer.name;
   }
 
-  getLoginDto(id) {
-    const printer = this.getCachedPrinterOrThrow(id);
+  async getLoginDto(id) {
+    const printer = await this.getCachedPrinterOrThrow(id);
     return {
       printerURL: printer.printerURL,
       apiKey: printer.apiKey,
