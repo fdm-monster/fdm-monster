@@ -81,7 +81,7 @@ class PrinterController {
 
   async getPrinter(req, res) {
     const { currentPrinterId } = getScopedPrinter(req);
-    const foundPrinter = this.printerCache.getCachedPrinter(currentPrinterId);
+    const foundPrinter = this.printerCache.getCachedPrinterOrThrow(currentPrinterId);
     res.send(foundPrinter);
   }
 
@@ -148,7 +148,7 @@ class PrinterController {
 
     // Has internal validation, but might add some here above as well
     const createdPrinter = await this.printerService.create(newPrinter);
-    const printer = this.printerCache.getCachedPrinter(createdPrinter.id);
+    const printer = this.printerCache.getCachedPrinterOrThrow(createdPrinter.id);
     this.#logger.log(`Created printer with ID ${printer.id || printer.correlationToken}`);
     res.send(printer);
   }
@@ -177,7 +177,7 @@ class PrinterController {
     updatedPrinter = this.#adjustPrinterObject(updatedPrinter);
     await this.printerService.update(currentPrinterId, updatedPrinter);
 
-    const result = this.printerCache.getCachedPrinter(currentPrinterId);
+    const result = this.printerCache.getCachedPrinterOrThrow(currentPrinterId);
     res.send(result);
   }
 

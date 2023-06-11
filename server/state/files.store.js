@@ -86,7 +86,7 @@ class FilesStore {
 
     const nonRecursiveFiles = this.getOutdatedFiles(printerId, ageDaysMax);
     const printerLogin = this.printerCache.getLoginDto(printerId);
-    const printerName = this.printerCache.getCachedPrinter(printerId).printerName;
+    const printerName = this.printerCache.getCachedPrinterOrThrow(printerId).printerName;
 
     for (let file of nonRecursiveFiles) {
       try {
@@ -107,7 +107,7 @@ class FilesStore {
   }
 
   async purgePrinterFiles(printerId) {
-    const printerState = this.printerCache.getCachedPrinter(printerId);
+    const printerState = this.printerCache.getCachedPrinterOrThrow(printerId);
 
     this.#logger.log(`Purging files from printer ${printerId}`);
     await this.#printerFilesService.clearFiles(printerState.id);
@@ -134,7 +134,7 @@ class FilesStore {
   }
 
   async updatePrinterFiles(printerId, files) {
-    const printer = this.printerCache.getCachedPrinter(printerId);
+    const printer = this.printerCache.getCachedPrinterOrThrow(printerId);
 
     // Check printer in database and modify
     const printerFileList = await this.#printerFilesService.updateFiles(printer.id, files);
@@ -144,7 +144,7 @@ class FilesStore {
   }
 
   async appendOrSetPrinterFile(printerId, addedFile) {
-    const printer = this.printerCache.getCachedPrinter(printerId);
+    const printer = this.printerCache.getCachedPrinterOrThrow(printerId);
 
     // Check printer in database and modify
     const { fileList, lastPrintedFile } = await this.#printerFilesService.appendOrReplaceFile(printer.id, addedFile);

@@ -140,7 +140,7 @@ class FloorService {
     const validInput = await validateInput(printerInFloor, printerInFloorRules);
 
     // Ensure printer exists
-    await this.printerCache.getCachedPrinter(validInput.printerId);
+    await this.printerCache.getCachedPrinterOrThrow(validInput.printerId);
 
     // Ensure position is not taken twice
     floor.printers = floor.printers.filter((pif) => !(pif.x === printerInFloor.x && pif.y === printerInFloor.y));
@@ -161,7 +161,7 @@ class FloorService {
     const validInput = await validateInput(input, removePrinterInFloorRules);
 
     // Ensure printer exists
-    await this.printerCache.getCachedPrinter(validInput.printerId);
+    await this.printerCache.getCachedPrinterOrThrow(validInput.printerId);
 
     const foundPrinterInFloorIndex = floor.printers.findIndex((pif) => pif.printerId.toString() === validInput.printerId);
     if (foundPrinterInFloorIndex === -1) return floor;

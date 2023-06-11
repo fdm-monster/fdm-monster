@@ -65,7 +65,7 @@ describe("PrinterSocketStore", () => {
 
   it("should be able to add and flatten new printer", async () => {
     let frozenObject = await printerService.create(validNewPrinterState);
-    const printerDto = printerCache.getCachedPrinter(frozenObject.id);
+    const printerDto = printerCache.getCachedPrinterOrThrow(frozenObject.id);
     expect(printerDto).toBeTruthy();
   });
 
@@ -76,7 +76,7 @@ describe("PrinterSocketStore", () => {
     // Need the store in order to have files to refer to
     await filesStore.loadFilesStore();
 
-    const printerDto = printerCache.getCachedPrinter(printerDoc.id);
+    const printerDto = printerCache.getCachedPrinterOrThrow(printerDoc.id);
     expect(printerDto).toMatchObject({
       id: expect.any(String),
     });
