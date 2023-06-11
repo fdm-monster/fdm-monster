@@ -17,6 +17,7 @@ class KeyDiffCache {
   /**
    * @protected
    * @param {Array<{key: string, value: T}>} keyValues
+   * @param {boolean} markUpdated
    */
   async setKeyValuesBatch(keyValues, markUpdated = true) {
     keyValues.forEach(({ key, value }) => {

@@ -30,7 +30,7 @@ class FloorStore extends KeyDiffCache {
     }
 
     const keyValues = floors.map((floor) => ({
-      key: this.getId(floor),
+      key: floor._id.toString(),
       value: floor,
     }));
     await this.setKeyValuesBatch(keyValues, true);
@@ -101,10 +101,6 @@ class FloorStore extends KeyDiffCache {
   async removePrinterFromAnyFloor(printerId) {
     // TODO cache update?
     return await this.#floorService.deletePrinterFromAnyFloor(printerId);
-  }
-
-  getId(value) {
-    return value._id?.toString();
   }
 }
 
