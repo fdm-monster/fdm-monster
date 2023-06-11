@@ -42,6 +42,7 @@ const DITokens = {
   settingsStore: "settingsStore",
   printerCache: "printerCache",
   printerSocketStore: "printerSocketStore",
+  testPrinterSocketStore: "testPrinterSocketStore",
   octoPrintLogsCache: "printerTickerStore",
   filesStore: "filesStore",
   octoPrintSockIoAdapter: "octoPrintSockIoAdapter",

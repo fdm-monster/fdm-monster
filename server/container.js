@@ -53,6 +53,7 @@ const { ClientDistDownloadTask } = require("./tasks/client-bundle.task");
 const { OctoPrintSockIoAdapter } = require("./services/octoprint/octoprint-sockio.adapter");
 const { PrinterCache } = require("./state/printer.cache");
 const PrinterSocketStore = require("./state/printer-socket.store");
+const { TestPrinterSocketStore } = require("./state/test-printer-socket.store");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -125,6 +126,7 @@ function configureContainer() {
     [DITokens.filesStore]: asClass(FilesStore).singleton(),
     [DITokens.printerCache]: asClass(PrinterCache).singleton(),
     [DITokens.printerSocketStore]: asClass(PrinterSocketStore).singleton(),
+    [DITokens.testPrinterSocketStore]: asClass(TestPrinterSocketStore).singleton(),
 
     // Extensibility and export
     [DITokens.customGCodeService]: asClass(CustomGCodeService),

@@ -172,7 +172,6 @@ class FilesStore {
 
     // Warning only
     const cacheActionResult = this.#fileCache.purgeFile(printerId, filePath);
-
     return { service: serviceActionResult, cache: cacheActionResult };
   }
 }

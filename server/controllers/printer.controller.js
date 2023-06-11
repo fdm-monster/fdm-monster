@@ -22,6 +22,10 @@ class PrinterController {
    */
   #printerSocketStore;
   /**
+   * @type {TestPrinterSocketStore}
+   */
+  testPrinterSocketStore;
+  /**
    * @type {PrinterService}
    */
   printerService;
@@ -42,6 +46,7 @@ class PrinterController {
 
   constructor({
     printerSocketStore,
+    testPrinterSocketStore,
     printerService,
     printerCache,
     taskManagerService,
@@ -54,6 +59,7 @@ class PrinterController {
     this.printerCache = printerCache;
     this.printerService = printerService;
     this.#printerSocketStore = printerSocketStore;
+    this.testPrinterSocketStore = testPrinterSocketStore;
     this.#taskManagerService = taskManagerService;
     this.#octoPrintApiService = octoPrintApiService;
     this.#pluginRepositoryCache = pluginRepositoryCache;
@@ -261,7 +267,7 @@ class PrinterController {
 
     // Add printer with test=true
     try {
-      await this.#printerSocketStore.setupTestPrinter(newPrinter);
+      await this.testPrinterSocketStore.setupTestPrinter(newPrinter);
     } catch (e) {
       res.send({ correlationToken: newPrinter.correlationToken, failure: true });
       return;

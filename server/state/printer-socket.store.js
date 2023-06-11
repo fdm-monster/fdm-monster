@@ -1,11 +1,8 @@
-const { validateInput } = require("../handlers/validators");
-const { createTestPrinterRules } = require("./validation/create-test-printer.validation");
 const { errorSummary } = require("../utils/error.utils");
 const { captureException } = require("@sentry/node");
 const { printerEvents } = require("../constants/event.constants");
 const { AppConstants } = require("../server.constants");
-const { setTimeout, setInterval } = require("timers/promises");
-const { Message, octoPrintEvent, SOCKET_STATE } = require("../services/octoprint/octoprint-sockio.adapter");
+const { formatKB } = require("../utils/metric.utils");
 
 class PrinterSocketStore {
   /**
@@ -37,10 +34,6 @@ class PrinterSocketStore {
    * @type {Object.<string, PrinterEvents>}
    */
   printerEventsById = {};
-  /**
-   * @type {OctoPrintSockIoAdapter}
-   */
-  testSocket;
   /**
    * @type {LoggerService}
    */
@@ -349,69 +342,8 @@ class PrinterSocketStore {
     // TODO mark diff cache
   }
 
-  /**
-   * Sets up/recreates a printer to be tested quickly by running the standard checks
-   * @param printer
-   * @returns {Promise<*>}
-   */
-  async setupTestPrinter(printer) {
-    if (this.testSocket) {
-      this.testSocket.close();
-      this.testSocket = null;
-    }
-
-    const validatedData = await validateInput(printer, createTestPrinterRules);
-    validatedData.enabled = true;
-
-    // Create a new socket if it doesn't exist
-    const { correlationToken } = printer;
-    this.testSocket = this.socketFactory.createInstance();
-
-    // Reset the socket credentials before (re-)connecting
-    this.testSocket.registerCredentials({
-      printerId: correlationToken,
-      loginDto: {
-        apiKey: printer.apiKey,
-        printerURL: printer.printerURL,
-      },
-      protocol: "ws",
-    });
-
-    const testEvents = [
-      octoPrintEvent(Message.WS_STATE_UPDATED),
-      octoPrintEvent(Message.API_STATE_UPDATED),
-      octoPrintEvent(Message.WS_CLOSED),
-      octoPrintEvent(Message.WS_OPENED),
-      octoPrintEvent(Message.WS_ERROR),
-    ];
-    const listener = ({ event, payload }) => {
-      this.socketIoGateway.send("test-printer-state", {
-        event,
-        payload,
-        correlationToken,
-      });
-    };
-    testEvents.forEach((te) => {
-      this.eventEmitter2.on(te, listener);
-    });
-    await this.testSocket.setupSocketSession();
-
-    const promise = new Promise(async (resolve, reject) => {
-      this.testSocket.open();
-      for await (const startTime of setInterval(100)) {
-        if (this.testSocket.socketState === SOCKET_STATE.authenticated) {
-          resolve();
-          break;
-        }
-      }
-    });
-
-    await Promise.race([promise, setTimeout(AppConstants.defaultWebsocketHandshakeTimeout)]);
-    this.testSocket.close();
-    delete this.testSocket;
-    testEvents.forEach((te) => {
-      this.eventEmitter2.off(te, listener);
-    });
+  getId(value) {
+    return "";
   }
 }
 
