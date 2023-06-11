@@ -93,7 +93,7 @@ class PluginFirmwareUpdateController {
     const failureStates = [];
     for (let printer of printers) {
       try {
-        const loginDto = await this.printerCache.getLoginDto(printer.id);
+        const loginDto = await this.printerCache.getLoginDtoAsync(printer.id);
         const isInstalled = await this.#pluginFirmwareUpdateService.isPluginInstalled(loginDto);
 
         let version;

@@ -285,7 +285,7 @@ class YamlService {
       const printers = await this.printerService.list();
       dumpedObject.printers = printers.map((p) => {
         const printerId = p.id;
-        const { apiKey } = this.printerCache.getLoginDto(printerId);
+        const { apiKey } = this.printerCache.getLoginDtoAsync(printerId);
         return {
           id: printerId,
           stepSize: p.stepSize,

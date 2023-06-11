@@ -57,7 +57,7 @@ class FilesStore {
    * @returns {Promise<*>}
    */
   async eagerLoadPrinterFiles(printerId, recursive) {
-    const loginDto = await this.printerCache.getLoginDto(printerId);
+    const loginDto = await this.printerCache.getLoginDtoAsync(printerId);
     const response = await this.#octoPrintApiService.getFiles(loginDto, recursive, {
       unwrap: false,
       simple: true,
@@ -85,8 +85,8 @@ class FilesStore {
     const succeededFiles = [];
 
     const nonRecursiveFiles = this.getOutdatedFiles(printerId, ageDaysMax);
-    const printerLogin = await this.printerCache.getLoginDto(printerId);
-    const printerName = await this.printerCache.getCachedPrinterOrThrow(printerId).printerName;
+    const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
+    const printerName = await this.printerCache.getCachedPrinterOrThrowAsync(printerId).printerName;
 
     for (let file of nonRecursiveFiles) {
       try {
@@ -107,7 +107,7 @@ class FilesStore {
   }
 
   async purgePrinterFiles(printerId) {
-    const printerState = await this.printerCache.getCachedPrinterOrThrow(printerId);
+    const printerState = await this.printerCache.getCachedPrinterOrThrowAsync(printerId);
 
     this.#logger.log(`Purging files from printer ${printerId}`);
     await this.#printerFilesService.clearFiles(printerState.id);
@@ -134,7 +134,7 @@ class FilesStore {
   }
 
   async updatePrinterFiles(printerId, files) {
-    const printer = await this.printerCache.getCachedPrinterOrThrow(printerId);
+    const printer = await this.printerCache.getCachedPrinterOrThrowAsync(printerId);
 
     // Check printer in database and modify
     const printerFileList = await this.#printerFilesService.updateFiles(printer.id, files);
@@ -144,7 +144,7 @@ class FilesStore {
   }
 
   async appendOrSetPrinterFile(printerId, addedFile) {
-    const printer = await this.printerCache.getCachedPrinterOrThrow(printerId);
+    const printer = await this.printerCache.getCachedPrinterOrThrowAsync(printerId);
 
     // Check printer in database and modify
     const { fileList, lastPrintedFile } = await this.#printerFilesService.appendOrReplaceFile(printer.id, addedFile);

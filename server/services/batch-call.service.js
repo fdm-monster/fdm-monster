@@ -55,7 +55,7 @@ class BatchCallService {
   async batchConnectUsb(printerIds) {
     const promises = [];
     for (const printerId of printerIds) {
-      const printerLogin = this.printerCache.getLoginDto(printerId);
+      const printerLogin = this.printerCache.getLoginDtoAsync(printerId);
       const time = Date.now();
 
       const command = this.octoPrintApiService.connectCommand;
@@ -80,7 +80,7 @@ class BatchCallService {
   async batchReprintCalls(printerIds) {
     const promises = [];
     for (const printerId of printerIds) {
-      const printerLogin = await this.printerCache.getLoginDto(printerId);
+      const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
 
       const currentFilePath = await this.printerEventsCache.getPrinterSocketEvents(printerId)?.current?.job?.file?.path;
 
