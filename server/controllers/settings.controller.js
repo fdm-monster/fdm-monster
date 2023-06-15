@@ -20,6 +20,11 @@ class SettingsController {
     res.send(settings);
   }
 
+  updateAnonymousDiagnosticsEnabled(req, res) {
+    const result = this.settingsStore.setAnonymousDiagnosticsEnabled(req.body);
+    res.send(result);
+  }
+
   async updateWhitelistSettings(req, res) {
     const { whitelistEnabled, whitelistedIpAddresses } = await validateInput(req.body, whitelistSettingRules);
     if (!whitelistedIpAddresses.includes("127.0.0.1")) {

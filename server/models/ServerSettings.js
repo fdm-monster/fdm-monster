@@ -30,6 +30,11 @@ const ServerSettingsSchema = new mongoose.Schema({
       type: String,
       default: AppConstants.defaultFileStorageFolder,
     },
+    anonymousDiagnosticsEnabled: {
+      type: Boolean,
+      default: true,
+      required: true,
+    },
     debugSettings: {
       debugSocketIoEvents: {
         type: Boolean,

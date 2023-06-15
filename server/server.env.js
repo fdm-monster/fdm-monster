@@ -6,7 +6,7 @@ const { AppConstants } = require("./server.constants");
 const { status, up } = require("migrate-mongo");
 const Logger = require("./handlers/logger.js");
 const { isDocker } = require("./utils/is-docker");
-const { getEnvOrDefault } = require("./utils/env.utils");
+const { getEnvOrDefault, isProductionEnvironment } = require("./utils/env.utils");
 const Sentry = require("@sentry/node");
 const { errorSummary } = require("./utils/error.utils");
 const logger = new Logger("FDM-Environment", false);
@@ -140,24 +140,16 @@ function ensureMongoDBConnectionStringSet() {
 }
 
 function setupSentry() {
-  const sentryEnabled = getEnvOrDefault(AppConstants.sentryEnabledToken, AppConstants.sentryEnabledDefault) === "true";
-  if (sentryEnabled) {
-    logger.warn("Sentry is enabled. You can change this by setting 'SENTRY_ENABLED=false'");
-  } else if (isEnvProd()) {
-    logger.warn("Sentry is disabled. You can change this by setting 'SENTRY_ENABLED=true'");
-  }
-
   const sentryDsnToken = getEnvOrDefault(AppConstants.sentryCustomDsnToken, AppConstants.sentryCustomDsnDefault);
 
   Sentry.init({
     dsn: sentryDsnToken,
     environment: process.env.NODE_ENV,
     release: process.env.npm_package_version,
-    enabled: sentryEnabled && !isEnvTest(),
-    // We recommend adjusting this value in production, or using tracesSampler
-    // for finer control
-    tracesSampleRate: 1.0,
+    enabled: !isEnvTest(),
+    tracesSampleRate: isProductionEnvironment() ? 0.25 : 1.0,
   });
+
 
   process.on("unhandledRejection", (e) => {
     const message = `Unhandled rejection error - ${errorSummary(e)}`;

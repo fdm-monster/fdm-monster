@@ -1,30 +1,46 @@
 const { InternalServerException } = require("../exceptions/runtime.exceptions");
 const { printerFileCleanSettingKey, serverSettingsKey } = require("../constants/server-settings.constants");
+const Sentry = require("@sentry/node");
+const SettingsModel = require("../models/ServerSettings");
 
 class SettingsStore {
-  #settings;
+  /**
+   * @private
+   * @type {ServerSettings}
+   */
+  settings;
   /**
    * @type {SettingsService}
    */
   settingsService;
+  /**
+   * @type {LoggerService}
+   */
+  logger;
 
-  constructor({ settingsService }) {
+  constructor({ settingsService, loggerFactory }) {
     this.settingsService = settingsService;
+    this.logger = loggerFactory("SettingsStore");
   }
 
   async loadSettings() {
     // Setup Settings as connection is established
-    this.#settings = await this.settingsService.getOrCreate();
+    this.settings = await this.settingsService.getOrCreate();
+    await this.updateSentryEnabled();
+  }
+
+  async getAnonymousDiagnosticsEnabled() {
+    return this.settings.server.anonymousDiagnosticsEnabled;
   }
 
   isRegistrationEnabled() {
-    if (!this.#settings) throw new InternalServerException("Could not check server settings (server settings not loaded");
-    return this.#settings[serverSettingsKey].registration;
+    if (!this.settings) throw new InternalServerException("Could not check server settings (server settings not loaded");
+    return this.settings[serverSettingsKey].registration;
   }
 
   getSettings() {
     return Object.freeze({
-      ...this.#settings._doc,
+      ...this.settings._doc,
     });
   }
 
@@ -45,32 +61,46 @@ class SettingsStore {
   }
 
   async updateSettings(fullUpdate) {
-    this.#settings = await this.settingsService.update(fullUpdate);
+    this.settings = await this.settingsService.update(fullUpdate);
     return this.getSettings();
   }
 
   async setRegistrationEnabled(enabled = true) {
-    this.#settings = await this.settingsService.setRegistrationEnabled(enabled);
+    this.settings = await this.settingsService.setRegistrationEnabled(enabled);
     return this.getSettings();
   }
 
   async setLoginRequired(enabled = true) {
-    this.#settings = await this.settingsService.setLoginRequired(enabled);
+    this.settings = await this.settingsService.setLoginRequired(enabled);
     return this.getSettings();
   }
 
   async setWhitelist(enabled = true, ipAddresses) {
-    this.#settings = await this.settingsService.setWhitelist(enabled, ipAddresses);
+    this.settings = await this.settingsService.setWhitelist(enabled, ipAddresses);
     return this.getSettings();
   }
 
   async updateServerSettings(serverSettings) {
-    this.#settings = await this.settingsService.updateServerSettings(serverSettings);
+    this.settings = await this.settingsService.updateServerSettings(serverSettings);
     return this.getSettings();
   }
 
+  async setAnonymousDiagnosticsEnabled(enabled) {
+    this.settings = await this.settingsService.setAnonymousDiagnosticsEnabled(enabled);
+    await this.updateSentryEnabled();
+    return this.getSettings();
+  }
+
+  async updateSentryEnabled() {
+    const sentryEnabled = await this.getAnonymousDiagnosticsEnabled();
+    if (sentryEnabled) {
+      this.logger.log("Enabling Sentry for anonymous diagnostics");
+    }
+    Sentry.getCurrentHub().getClient().getOptions().enabled = sentryEnabled;
+  }
+
   async updateFrontendSettings(frontendSettings) {
-    this.#settings = await this.settingsService.updateFrontendSettings(frontendSettings);
+    this.settings = await this.settingsService.updateFrontendSettings(frontendSettings);
     return this.getSettings();
   }
 }

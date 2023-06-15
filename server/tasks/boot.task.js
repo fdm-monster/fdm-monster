@@ -79,7 +79,7 @@ class BootTask {
     this.pluginRepositoryCache = pluginRepositoryCache;
     this.floorStore = floorStore;
     this.pluginFirmwareUpdateService = pluginFirmwareUpdateService;
-    this.#logger = loggerFactory("Server");
+    this.#logger = loggerFactory(BootTask.name);
     this.clientBundleService = clientBundleService;
   }
 
