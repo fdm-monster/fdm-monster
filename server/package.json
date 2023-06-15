@@ -74,7 +74,7 @@
     "semver": "7.5.1",
     "simple-git": "3.19.0",
     "socket.io": "4.6.2",
-    "toad-scheduler": "2.3.0",
+    "toad-scheduler": "3.0.0",
     "winston": "3.9.0",
     "ws": "8.13.0"
   },
