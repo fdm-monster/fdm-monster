@@ -130,7 +130,7 @@ function fetchServerPort() {
 function ensureMongoDBConnectionStringSet() {
   let dbConnectionString = process.env[AppConstants.MONGO_KEY];
   if (!dbConnectionString) {
-    // In docker we better not write to .env
+    // In docker, we better not write to .env
     const persistDbString = !isDocker();
 
     fetchMongoDBConnectionString(persistDbString);
@@ -149,7 +149,6 @@ function setupSentry() {
     enabled: !isEnvTest(),
     tracesSampleRate: isProductionEnvironment() ? 0.25 : 1.0,
   });
-
 
   process.on("unhandledRejection", (e) => {
     const message = `Unhandled rejection error - ${errorSummary(e)}`;
