@@ -6148,10 +6148,10 @@ to-regex-range@^5.0.1:
   dependencies:
     is-number "^7.0.0"
 
-toad-scheduler@2.3.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/toad-scheduler/-/toad-scheduler-2.3.0.tgz#f6d5c46fd5c7d3f50c3f6e763ff6f73d761cfeaa"
-  integrity sha512-Tl4+tr42ZpWBwKDIG5rdPjdx08TWt7B2UBsmzPuwcQ1uqJg/pY2spymYJJz1NmH/EgddxTppZzJtI+zZrzqDTA==
+toad-scheduler@3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/toad-scheduler/-/toad-scheduler-3.0.0.tgz#784c66fd6dc4a1611918a033c51500df1c5e9839"
+  integrity sha512-BYmrORvaGmjziir/ra8qD3qAKczJveqK5ZOO/wn7oS5qLI4iibOza3DBGgu+EwNp9zdlBTKSeZPmxZxzGy1dxw==
 
 toidentifier@1.0.1:
   version "1.0.1"
