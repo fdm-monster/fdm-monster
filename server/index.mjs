@@ -1,13 +1,14 @@
 import { setupEnvConfig } from "./server.env.js";
 import { setupServer } from "./server.core.js";
 import * as sentry from "@sentry/node";
+import DITokens from "./container.tokens.js";
 
 setupEnvConfig();
 
 const { httpServer, container } = setupServer();
 
 container
-  .resolve("serverHost")
+  .resolve(DITokens.serverHost)
   .boot(httpServer)
   .catch(async (e) => {
     console.error("Server has crashed unintentionally - please report this", e);

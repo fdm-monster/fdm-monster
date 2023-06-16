@@ -16,6 +16,10 @@ function isTestEnvironment() {
   return process.env.NODE_ENV === AppConstants.defaultTestEnv;
 }
 
+function isProductionEnvironment() {
+  return process.env.NODE_ENV === AppConstants.defaultProductionEnv;
+}
+
 function isPm2() {
   return "PM2_HOME" in process.env || "PM2_JSON_PROCESSING" in process.env || "PM2_CLI" in process.env;
 }
@@ -96,6 +100,7 @@ function verifyPackageJsonRequirements(rootPath) {
 
 module.exports = {
   isTestEnvironment,
+  isProductionEnvironment,
   isPm2,
   isNodemon,
   isNode,

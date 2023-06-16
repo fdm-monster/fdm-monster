@@ -13,6 +13,7 @@ const {
   serverSettingsKey,
   frontendSettingKey,
 } = require("../constants/server-settings.constants");
+const Sentry = require("@sentry/node");
 
 class SettingsService {
   async getOrCreate() {
@@ -59,9 +60,17 @@ class SettingsService {
     return knownSettings;
   }
 
+  async setAnonymousDiagnosticsEnabled(enabled) {
+    const settingsDoc = await this.getOrCreate();
+    settingsDoc[serverSettingsKey].anonymousDiagnostics = enabled;
+    return SettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
+      new: true,
+    });
+  }
+
   async setRegistrationEnabled(enabled = true) {
     const settingsDoc = await this.getOrCreate();
-    settingsDoc.server.registration = enabled;
+    settingsDoc[serverSettingsKey].registration = enabled;
 
     return SettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
       new: true,
