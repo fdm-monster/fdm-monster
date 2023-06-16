@@ -52,7 +52,7 @@
     "connect-history-api-fallback": "2.0.0",
     "cookie-parser": "1.4.6",
     "cors": "2.8.5",
-    "dotenv": "16.1.4",
+    "dotenv": "16.2.0",
     "eventemitter2": "6.4.9",
     "express": "4.18.2",
     "express-session": "1.17.3",
