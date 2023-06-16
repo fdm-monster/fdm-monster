@@ -20,9 +20,9 @@ class SettingsController {
     res.send(settings);
   }
 
-  async updateAnonymousDiagnosticsEnabled(req, res) {
+  async updateSentryDiagnosticsEnabled(req, res) {
     const { enabled } = await validateInput(req.body, anonymousDiagnosticsEnabledRules);
-    const result = this.settingsStore.setAnonymousDiagnosticsEnabled(enabled);
+    const result = this.settingsStore.setSentryDiagnosticsEnabled(enabled);
     res.send(result);
   }
 
@@ -58,6 +58,6 @@ module.exports = createController(SettingsController)
   .get("/server", "getSettings")
   .put("/server", "updateSettings")
   .put("/server/server", "updateServerSettings")
-  .patch("/server/anonymous-diagnostics", "updateAnonymousDiagnosticsEnabled")
+  .patch("/server/sentry-diagnostics", "updateSentryDiagnosticsEnabled")
   .put("/server/whitelist", "updateWhitelistSettings")
   .put("/server/frontend", "updateFrontendSettings");

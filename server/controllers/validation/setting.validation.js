@@ -4,7 +4,7 @@ module.exports = {
     "whitelistedIpAddresses.*": "required|string",
     whitelistEnabled: "required|boolean",
   },
-  anonymousDiagnosticsEnabledRules: {
+  sentryDiagnosticsEnabledRules: {
     enabled: "required|boolean",
   },
 };

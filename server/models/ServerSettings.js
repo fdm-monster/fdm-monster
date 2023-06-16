@@ -30,9 +30,9 @@ const ServerSettingsSchema = new mongoose.Schema({
       type: String,
       default: AppConstants.defaultFileStorageFolder,
     },
-    anonymousDiagnosticsEnabled: {
+    sentryDiagnosticsEnabled: {
       type: Boolean,
-      default: true,
+      default: false,
       required: true,
     },
     debugSettings: {

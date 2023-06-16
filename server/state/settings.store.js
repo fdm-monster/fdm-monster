@@ -86,8 +86,8 @@ class SettingsStore {
     return this.getSettings();
   }
 
-  async setAnonymousDiagnosticsEnabled(enabled) {
-    this.settings = await this.settingsService.setAnonymousDiagnosticsEnabled(enabled);
+  async setSentryDiagnosticsEnabled(enabled) {
+    this.settings = await this.settingsService.setSentryDiagnosticsEnabled(enabled);
     await this.processSentryEnabled();
     return this.getSettings();
   }
@@ -100,9 +100,9 @@ class SettingsStore {
     if (isTestEnvironment()) return;
     const sentryEnabled = await this.getAnonymousDiagnosticsEnabled();
     if (sentryEnabled) {
-      this.logger.log("Enabling Sentry for anonymous diagnostics");
+      this.logger.log("Enabling Sentry for remote diagnostics");
     } else {
-      this.logger.log("Disabling anonymous diagnostics");
+      this.logger.log("Disabling remote diagnostics");
     }
     Sentry.getCurrentHub().getClient().getOptions().enabled = sentryEnabled;
   }
