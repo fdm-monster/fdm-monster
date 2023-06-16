@@ -3,7 +3,7 @@ const { authenticate, authorizeRoles } = require("../middleware/authenticate");
 const { AppConstants } = require("../server.constants");
 const { ROLES } = require("../constants/authorization.constants");
 const { validateInput } = require("../handlers/validators");
-const { whitelistSettingRules } = require("./validation/setting.validation");
+const { whitelistSettingRules, anonymousDiagnosticsEnabledRules } = require("./validation/setting.validation");
 
 class SettingsController {
   /**
@@ -20,8 +20,9 @@ class SettingsController {
     res.send(settings);
   }
 
-  updateAnonymousDiagnosticsEnabled(req, res) {
-    const result = this.settingsStore.setAnonymousDiagnosticsEnabled(req.body);
+  async updateAnonymousDiagnosticsEnabled(req, res) {
+    const { enabled } = await validateInput(req.body, anonymousDiagnosticsEnabledRules);
+    const result = this.settingsStore.setAnonymousDiagnosticsEnabled(enabled);
     res.send(result);
   }
 
@@ -57,5 +58,6 @@ module.exports = createController(SettingsController)
   .get("/server", "getSettings")
   .put("/server", "updateSettings")
   .put("/server/server", "updateServerSettings")
+  .patch("/server/anonymous-diagnostics", "updateAnonymousDiagnosticsEnabled")
   .put("/server/whitelist", "updateWhitelistSettings")
   .put("/server/frontend", "updateFrontendSettings");

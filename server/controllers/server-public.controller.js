@@ -53,7 +53,11 @@ class ServerPublicController {
       newSockets: {
         available: true,
         version: 1,
-      }
+      },
+      anonymousDiagnosticsToggle: {
+        available: true,
+        version: 1,
+      },
     });
   }
 
