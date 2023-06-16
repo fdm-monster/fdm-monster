@@ -31,7 +31,7 @@ class SettingsStore {
   }
 
   async getAnonymousDiagnosticsEnabled() {
-    return this.settings.server.anonymousDiagnosticsEnabled;
+    return this.settings[serverSettingsKey].sentryDiagnosticsEnabled;
   }
 
   isRegistrationEnabled() {
