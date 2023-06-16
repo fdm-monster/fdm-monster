@@ -62,7 +62,7 @@ class SettingsService {
 
   async setAnonymousDiagnosticsEnabled(enabled) {
     const settingsDoc = await this.getOrCreate();
-    settingsDoc[serverSettingsKey].anonymousDiagnostics = enabled;
+    settingsDoc[serverSettingsKey].anonymousDiagnosticsEnabled = enabled;
     return SettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
       new: true,
     });
