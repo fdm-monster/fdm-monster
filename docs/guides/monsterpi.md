@@ -43,19 +43,6 @@ It ships with these contents:
 - HAProxy (untested)
 - FDM Monster 1.3.2
 
-**MonsterPi 0.1.1** can be downloaded from Google Drive [MonsterPi 0.1.1 image](https://drive.google.com/file/d/1Dw66rziFuSCXACrRE-mUpuC0QAFY9WGs/view?usp=share_link)
-It ships with these contents:
-- MongoDB 4.4
-- HAProxy (not setup yet)
-- FDM Monster 1.3.1-rc2
-
-**MonsterPi 0.1.0** can be downloaded with the
-URL [Google Drive MonsterPi 0.1.0 image](https://drive.google.com/file/d/1a4DLk2Yy8uvyv9BskA073DdTLCI6w4UT/view?usp=share_link)
-It ships with these contents:
-- MongoDB 4.4
-- HAProxy (not setup yet)
-- FDM Monster 1.3.0
-
 </details>
 
 ## Unstable Version - MonsterPi 0.2.2-rc3
