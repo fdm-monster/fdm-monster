@@ -130,6 +130,10 @@ class OctoPrintSockIoAdapter extends WebsocketAdapter {
     this.configService = configService;
   }
 
+  get _debugMode() {
+    return this.configService.get(AppConstants.debugSocketStatesKey, AppConstants.defaultDebugSocketStates) === "true";
+  }
+
   needsReopen() {
     const isApiOnline = this.apiState === API_STATE.responding;
     return isApiOnline && (this.socketState === SOCKET_STATE.closed || this.socketState === SOCKET_STATE.error);
@@ -145,10 +149,6 @@ class OctoPrintSockIoAdapter extends WebsocketAdapter {
 
   isClosedOrAborted() {
     return this.socketState === SOCKET_STATE.closed || this.socketState === SOCKET_STATE.aborted;
-  }
-
-  get _debugMode() {
-    return this.configService.get(AppConstants.debugSocketStatesKey, AppConstants.defaultDebugSocketStates) === "true";
   }
 
   /**
@@ -274,9 +274,6 @@ class OctoPrintSockIoAdapter extends WebsocketAdapter {
     this.setSocketState(SOCKET_STATE.opened);
     await this.sendAuth();
     await this.sendThrottle(AppConstants.defaultSocketThrottleRate);
-
-    // Announce the Socket state
-    await this.emitEvent(Message.WS_OPENED);
   }
 
   /**
