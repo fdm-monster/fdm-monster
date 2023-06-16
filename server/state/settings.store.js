@@ -2,6 +2,7 @@ const { InternalServerException } = require("../exceptions/runtime.exceptions");
 const { printerFileCleanSettingKey, serverSettingsKey } = require("../constants/server-settings.constants");
 const Sentry = require("@sentry/node");
 const SettingsModel = require("../models/ServerSettings");
+const { isTestEnvironment } = require("../utils/env.utils");
 
 class SettingsStore {
   /**
@@ -26,7 +27,7 @@ class SettingsStore {
   async loadSettings() {
     // Setup Settings as connection is established
     this.settings = await this.settingsService.getOrCreate();
-    await this.updateSentryEnabled();
+    await this.processSentryEnabled();
   }
 
   async getAnonymousDiagnosticsEnabled() {
@@ -87,11 +88,16 @@ class SettingsStore {
 
   async setAnonymousDiagnosticsEnabled(enabled) {
     this.settings = await this.settingsService.setAnonymousDiagnosticsEnabled(enabled);
-    await this.updateSentryEnabled();
+    await this.processSentryEnabled();
     return this.getSettings();
   }
 
-  async updateSentryEnabled() {
+  /**
+   * @private
+   * @returns {Promise<void>}
+   */
+  async processSentryEnabled() {
+    if (isTestEnvironment()) return;
     const sentryEnabled = await this.getAnonymousDiagnosticsEnabled();
     if (sentryEnabled) {
       this.logger.log("Enabling Sentry for anonymous diagnostics");
