@@ -130,10 +130,6 @@ class OctoPrintSockIoAdapter extends WebsocketAdapter {
     this.configService = configService;
   }
 
-  get _debugMode() {
-    return this.configService.get(AppConstants.debugSocketStatesKey, AppConstants.defaultDebugSocketStates) === "true";
-  }
-
   needsReopen() {
     const isApiOnline = this.apiState === API_STATE.responding;
     return isApiOnline && (this.socketState === SOCKET_STATE.closed || this.socketState === SOCKET_STATE.error);
@@ -274,6 +270,9 @@ class OctoPrintSockIoAdapter extends WebsocketAdapter {
     this.setSocketState(SOCKET_STATE.opened);
     await this.sendAuth();
     await this.sendThrottle(AppConstants.defaultSocketThrottleRate);
+    
+    // Announce the Socket state
+    await this.emitEvent(Message.WS_OPENED);
   }
 
   /**
@@ -299,7 +298,7 @@ class OctoPrintSockIoAdapter extends WebsocketAdapter {
     }
 
     // Emit the message to the event bus
-    await this.emitMessage(eventName, payload);
+    await this.emitEvent(eventName, payload);
   }
 
   /**
@@ -313,17 +312,18 @@ class OctoPrintSockIoAdapter extends WebsocketAdapter {
         auth: `${this.username}:${this.sessionDto.session}`,
       })
     );
+    // TODO what if bad auth? => pure silence right?
   }
 
   async afterClosed(event) {
     this.setSocketState(SOCKET_STATE.closed);
     delete this.socket;
-    await this.emitMessage(Message.WS_CLOSED);
+    await this.emitEvent(Message.WS_CLOSED);
   }
 
   async onError(error) {
     this.setSocketState(SOCKET_STATE.error);
-    await this.emitMessage(Message.WS_ERROR, error);
+    await this.emitEvent(Message.WS_ERROR, error);
   }
 
   setReauthRequired() {
@@ -352,7 +352,7 @@ class OctoPrintSockIoAdapter extends WebsocketAdapter {
     if (this._debugMode) {
       this.logger.log(`${this.printerId} API state updated to: ` + state);
     }
-    this.emitMessageSync(Message.API_STATE_UPDATED, state);
+    this.emitEventSync(Message.API_STATE_UPDATED, state);
   }
 
   /**
@@ -366,7 +366,7 @@ class OctoPrintSockIoAdapter extends WebsocketAdapter {
     if (this._debugMode) {
       this.logger.log(`${this.printerId} Socket state updated to: ` + state);
     }
-    this.emitMessageSync(Message.WS_STATE_UPDATED, state);
+    this.emitEventSync(Message.WS_STATE_UPDATED, state);
   }
 
   /**
@@ -374,7 +374,7 @@ class OctoPrintSockIoAdapter extends WebsocketAdapter {
    * @param {Message} event
    * @param {?Object} payload
    */
-  async emitMessage(event, payload) {
+  async emitEvent(event, payload) {
     /**
      * @type {OctoPrintEventDto}
      */
@@ -386,7 +386,7 @@ class OctoPrintSockIoAdapter extends WebsocketAdapter {
     await this.eventEmitter.emitAsync(octoPrintEvent(event), data);
   }
 
-  emitMessageSync(event, payload) {
+  emitEventSync(event, payload) {
     const data = {
       event,
       payload,
