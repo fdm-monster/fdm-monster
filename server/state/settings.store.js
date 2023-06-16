@@ -102,7 +102,7 @@ class SettingsStore {
     if (sentryEnabled) {
       this.logger.log("Enabling Sentry for remote diagnostics");
     } else {
-      this.logger.log("Disabling remote diagnostics");
+      this.logger.log("Disabling Sentry for remote diagnostics");
     }
     Sentry.getCurrentHub().getClient().getOptions().enabled = sentryEnabled;
   }
