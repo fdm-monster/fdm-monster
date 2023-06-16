@@ -58,14 +58,14 @@ It ships with these contents:
 
 </details>
 
-## Unstable Version - MonsterPi 0.2.2-rc2
+## Unstable Version - MonsterPi 0.2.2-rc3
 
-**MonsterPi 0.2.2-rc2** can be downloaded from Google Drive: [MonsterPi 0.2.2-rc2 image](https://drive.google.com/file/d/1kyQAADcm6VtHct_NoOB34VNFShMX9EsU/view?usp=drive_link ).
+**MonsterPi 0.2.2-rc3** can be downloaded from Google Drive: [MonsterPi 0.2.2-rc3 image](https://drive.google.com/file/d/1lxrSErC8ttZtVeJs8Ke7R4zr62AXc5dS/view?usp=drive_link).
 
 It ships with these contents:
 - MongoDB 4.4
 - HAProxy
-- FDM Monster 1.4.0-rc3
+- FDM Monster 1.4.0-rc4
 
 ## Installing MonsterPi
 
