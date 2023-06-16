@@ -5,7 +5,6 @@ const { setInterval, setTimeout } = require("timers/promises");
 const { AppConstants } = require("../server.constants");
 
 class TestPrinterSocketStore {
-
   /**
    * @type {OctoPrintSockIoAdapter}
    */
@@ -63,7 +62,10 @@ class TestPrinterSocketStore {
       octoPrintEvent(Message.WS_OPENED),
       octoPrintEvent(Message.WS_ERROR),
     ];
-    const listener = ({ event, payload }) => {
+    const listener = ({ event, payload, printerId }) => {
+      if (printerId !== correlationToken) {
+        return;
+      }
       this.socketIoGateway.send("test-printer-state", {
         event,
         payload,
