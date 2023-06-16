@@ -147,6 +147,10 @@ class OctoPrintSockIoAdapter extends WebsocketAdapter {
     return this.socketState === SOCKET_STATE.closed || this.socketState === SOCKET_STATE.aborted;
   }
 
+  get _debugMode() {
+    return this.configService.get(AppConstants.debugSocketStatesKey, AppConstants.defaultDebugSocketStates) === "true";
+  }
+
   /**
    * @param {CredentialsDto} socketLogin
    */
@@ -270,7 +274,7 @@ class OctoPrintSockIoAdapter extends WebsocketAdapter {
     this.setSocketState(SOCKET_STATE.opened);
     await this.sendAuth();
     await this.sendThrottle(AppConstants.defaultSocketThrottleRate);
-    
+
     // Announce the Socket state
     await this.emitEvent(Message.WS_OPENED);
   }

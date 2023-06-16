@@ -26,7 +26,7 @@ const AppConstants = {
   clientRepoName: "fdm-monster-client",
   serverRepoName: "fdm-monster",
   orgName: "fdm-monster",
-  defaultClientMinimum: "1.2.0-rc5",
+  defaultClientMinimum: "1.2.0-rc6",
   serverPath: "./",
 
   influxUrl: "INFLUX_URL",
@@ -37,6 +37,8 @@ const AppConstants = {
   // Websocket values
   defaultWebsocketHandshakeTimeout: 2000,
   defaultSocketThrottleRate: 1,
+  debugSocketStatesKey: "DEBUG_SOCKET_STATES",
+  defaultDebugSocketStates: "false",
 
   // Future experimental feature
   enableMqttAutoDiscoveryToken: "ENABLE_MQTT_AUTODISCOVERY",
