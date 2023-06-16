@@ -201,9 +201,8 @@ class OctoPrintSockIoAdapter extends WebsocketAdapter {
       .login(this.loginDto)
       .then((r) => {
         // Check response for red flags
-        if (r.name === "_api" || r.apikey === null) {
-          this.logger.warn("Detected _api/null as apiKey in OctoPrint login response, marking as Global Key");
-          this.setApiState(API_STATE.globalKey, false);
+        if (r.name === "_api") {
+          this.setApiState(API_STATE.globalKey);
           this.setSocketState(SOCKET_STATE.aborted);
           throw new AuthenticationError("Global API Key detected, aborting socket connection");
         } else if (r.needs?.group[0] === "guests") {
