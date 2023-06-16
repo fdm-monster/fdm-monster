@@ -3,7 +3,7 @@ const { authenticate, authorizeRoles } = require("../middleware/authenticate");
 const { AppConstants } = require("../server.constants");
 const { ROLES } = require("../constants/authorization.constants");
 const { validateInput } = require("../handlers/validators");
-const { whitelistSettingRules, anonymousDiagnosticsEnabledRules } = require("./validation/setting.validation");
+const { whitelistSettingRules, anonymousDiagnosticsEnabledRules, sentryDiagnosticsEnabledRules } = require("./validation/setting.validation");
 
 class SettingsController {
   /**
@@ -20,9 +20,9 @@ class SettingsController {
     res.send(settings);
   }
 
-  async updateAnonymousDiagnosticsEnabled(req, res) {
-    const { enabled } = await validateInput(req.body, anonymousDiagnosticsEnabledRules);
-    const result = this.settingsStore.setAnonymousDiagnosticsEnabled(enabled);
+  async updateSentryDiagnosticsEnabled(req, res) {
+    const { enabled } = await validateInput(req.body, sentryDiagnosticsEnabledRules);
+    const result = this.settingsStore.setSentryDiagnosticsEnabled(enabled);
     res.send(result);
   }
 
@@ -58,6 +58,6 @@ module.exports = createController(SettingsController)
   .get("/server", "getSettings")
   .put("/server", "updateSettings")
   .put("/server/server", "updateServerSettings")
-  .patch("/server/anonymous-diagnostics", "updateAnonymousDiagnosticsEnabled")
+  .patch("/server/sentry-diagnostics", "updateSentryDiagnosticsEnabled")
   .put("/server/whitelist", "updateWhitelistSettings")
   .put("/server/frontend", "updateFrontendSettings");

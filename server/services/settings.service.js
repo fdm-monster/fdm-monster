@@ -60,9 +60,9 @@ class SettingsService {
     return knownSettings;
   }
 
-  async setAnonymousDiagnosticsEnabled(enabled) {
+  async setSentryDiagnosticsEnabled(enabled) {
     const settingsDoc = await this.getOrCreate();
-    settingsDoc[serverSettingsKey].anonymousDiagnosticsEnabled = enabled;
+    settingsDoc[serverSettingsKey].sentryDiagnosticsEnabled = enabled;
     return SettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
       new: true,
     });
