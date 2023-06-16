@@ -101,6 +101,8 @@ class SettingsStore {
     const sentryEnabled = await this.getAnonymousDiagnosticsEnabled();
     if (sentryEnabled) {
       this.logger.log("Enabling Sentry for anonymous diagnostics");
+    } else {
+      this.logger.log("Disabling anonymous diagnostics");
     }
     Sentry.getCurrentHub().getClient().getOptions().enabled = sentryEnabled;
   }
