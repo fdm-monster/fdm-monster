@@ -1603,10 +1603,10 @@
     "@octokit/types" "^9.0.0"
     bottleneck "^2.15.3"
 
-"@octokit/plugin-throttling@^5.2.2":
-  version "5.2.3"
-  resolved "https://registry.yarnpkg.com/@octokit/plugin-throttling/-/plugin-throttling-5.2.3.tgz#9f552a14dcee5c7326dd9dee64a71ea76b108814"
-  integrity sha512-C9CFg9mrf6cugneKiaI841iG8DOv6P5XXkjmiNNut+swePxQ7RWEdAZRp5rJoE1hjsIqiYcKa/ZkOQ+ujPI39Q==
+"@octokit/plugin-throttling@^6.0.0":
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/@octokit/plugin-throttling/-/plugin-throttling-6.1.0.tgz#093275e6b542be371acb0631252a428f2f1b0615"
+  integrity sha512-JqMbTiPC0sUSTsLQsdq3JVx1mx8UtTo5mwR80YqPXE93+XhevvSyOR1rO2Z+NbO/r0TK4hqFJSSi/9oIZBxZTg==
   dependencies:
     "@octokit/types" "^9.0.0"
     bottleneck "^2.15.3"
@@ -1644,7 +1644,7 @@
   dependencies:
     "@octokit/openapi-types" "^18.0.0"
 
-"@octokit/types@^9.0.0", "@octokit/types@^9.2.2", "@octokit/types@^9.2.3":
+"@octokit/types@^9.0.0", "@octokit/types@^9.2.3":
   version "9.3.2"
   resolved "https://registry.yarnpkg.com/@octokit/types/-/types-9.3.2.tgz#3f5f89903b69f6a2d196d78ec35f888c0013cac5"
   integrity sha512-D4iHGTdAnEEVsB8fl95m1hiz7D5YiRdQ9b/OEb3BYRVwbLsGHcRVPz+u+BgRLNk0Q0/4iZCBqDN96j2XNxfXrA==
@@ -5161,10 +5161,10 @@ object.values@^1.1.6:
     define-properties "^1.1.4"
     es-abstract "^1.20.4"
 
-octokit@2.0.19:
-  version "2.0.19"
-  resolved "https://registry.yarnpkg.com/octokit/-/octokit-2.0.19.tgz#924ede002302f965c2399eb582f23ee8c74660ba"
-  integrity sha512-hSloK4MK78QGbAuBrtIir0bsxMoRVZE5CkwKSbSRH9lqv2hx9EwhCxtPqEF+BtHqLXkXdfUaGkJMyMBotYno+A==
+octokit@2.0.21:
+  version "2.0.21"
+  resolved "https://registry.yarnpkg.com/octokit/-/octokit-2.0.21.tgz#852cbab96f29b6264444a1970714de51f87bd3fe"
+  integrity sha512-EBHXf6mY22mtg8ZfmlkdbuOjqlo12S1SgF0B/L046iTfoQjazY9A2eA69iY13ts7mJM8tVOhW7dQIKOh5ztCRA==
   dependencies:
     "@octokit/app" "^13.1.5"
     "@octokit/core" "^4.2.1"
@@ -5172,8 +5172,8 @@ octokit@2.0.19:
     "@octokit/plugin-paginate-rest" "^6.1.0"
     "@octokit/plugin-rest-endpoint-methods" "^7.1.1"
     "@octokit/plugin-retry" "^4.1.3"
-    "@octokit/plugin-throttling" "^5.2.2"
-    "@octokit/types" "^9.2.2"
+    "@octokit/plugin-throttling" "^6.0.0"
+    "@octokit/types" "^10.0.0"
 
 on-finished@2.4.1:
   version "2.4.1"
