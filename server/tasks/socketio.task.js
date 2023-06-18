@@ -42,7 +42,7 @@ class SocketIoTask {
   settingsStore;
 
   #aggregateSizeCounter = 0;
-  #aggregateWindowLength = 10;
+  #aggregateWindowLength = 100;
   #aggregateSizes = [];
   #rounding = 2;
 

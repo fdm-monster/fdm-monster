@@ -58,6 +58,10 @@ class ServerPublicController {
         available: true,
         version: 1,
       },
+      pauseResumePrinterCommand: {
+        available: true,
+        version: 1,
+      },
     });
   }
 

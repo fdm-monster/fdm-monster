@@ -52,6 +52,14 @@ class OctoPrintRoutes {
     return { command: "cancel" };
   }
 
+  get pauseJobCommand() {
+    return { command: "pause", action: "pause" };
+  }
+
+  get resumeJobCommand() {
+    return { command: "pause", action: "resume" };
+  }
+
   get connectCommand() {
     return { command: "connect" };
   }
