@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "FDM Monster Server (dev)",
+        "type": "node",
+        "request": "launch",
+        "runtimeExecutable": "yarn",
+        "runtimeArgs": [
+          "run",
+          "dev"
+        ],
+        "cwd": "${workspaceFolder}/server",
+        "protocol": "inspector",
+        "restart": true,
+        "console": "integratedTerminal"
+      }
+    ]
+  }

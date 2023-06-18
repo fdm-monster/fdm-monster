@@ -16,7 +16,7 @@ class TaskManagerService {
 
   constructor(container) {
     this.#container = container;
-    this.#logger = container[DITokens.loggerFactory]("Server-TaskManager");
+    this.#logger = container[DITokens.loggerFactory](TaskManagerService.name);
     this.jobScheduler = container[DITokens.toadScheduler];
   }
 

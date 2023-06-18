@@ -1,16 +1,10 @@
 const fs = require("fs");
 const path = require("path");
-const {
-  multiPartContentType,
-  pluginRepositoryUrl,
-} = require("./constants/octoprint-service.constants");
+const { multiPartContentType, pluginRepositoryUrl } = require("./constants/octoprint-service.constants");
 const { processResponse, processGotResponse } = require("./utils/api.utils");
 const FormData = require("form-data");
 const got = require("got");
-const {
-  uploadProgressEvent,
-  firmwareFlashUploadEvent,
-} = require("../../constants/event.constants");
+const { uploadProgressEvent, firmwareFlashUploadEvent } = require("../../constants/event.constants");
 const { ExternalServiceError } = require("../../exceptions/runtime.exceptions");
 const OctoPrintRoutes = require("./octoprint-api.routes");
 
@@ -18,6 +12,10 @@ class OctoPrintApiService extends OctoPrintRoutes {
   _httpClient;
   _eventEmitter2;
 
+  /**
+   * @type {LoggerService}
+   * @private
+   */
   _logger;
 
   constructor({ settingsStore, httpClient, loggerFactory, eventEmitter2 }) {
@@ -27,30 +25,28 @@ class OctoPrintApiService extends OctoPrintRoutes {
     this._logger = loggerFactory("OctoPrint-API-Service");
   }
 
-  async login(printer, responseOptions) {
-    const { url, options } = this._prepareRequest(printer, this.apiLogin);
+  /**
+   *
+   * @param {LoginDto} printer
+   * @param responseOptions
+   * @returns {Promise<{data, status}|*>}
+   */
+  async login(login, responseOptions) {
+    const { url, options } = this._prepareRequest(login, this.apiLogin);
     const response = await this._httpClient.post(url, {}, options);
     return processResponse(response, responseOptions);
   }
 
   async sendConnectionCommand(printer, commandData, responseOptions) {
-    const { url, options, data } = this._prepareJsonRequest(
-      printer,
-      this.apiConnection,
-      commandData
-    );
+    const { url, options, data } = this._prepareJsonRequest(printer, this.apiConnection, commandData);
     const response = await this._httpClient.post(url, data, options);
     return processResponse(response, responseOptions);
   }
 
   async sendCustomGCodeCommand(printerLogin, commandString, responseOptions) {
-    const { url, options, data } = this._prepareJsonRequest(
-      printerLogin,
-      this.apiPrinterCustomCommand,
-      {
-        command: commandString,
-      }
-    );
+    const { url, options, data } = this._prepareJsonRequest(printerLogin, this.apiPrinterCustomCommand, {
+      command: commandString,
+    });
     const response = await this._httpClient.post(url, data, options);
     return processResponse(response, responseOptions);
   }
@@ -105,8 +101,12 @@ class OctoPrintApiService extends OctoPrintRoutes {
     return processResponse(response, responseOptions);
   }
 
-  async getAdminUserOrDefault(printer) {
-    const data = await this.getUsers(printer);
+  /**
+   * @param {LoginDto} login
+   * @returns {Promise<string>}
+   */
+  async getAdminUserOrDefault(login) {
+    const data = await this.getUsers(login);
 
     let opAdminUserName = "admin";
     if (!!data?.users && Array.isArray(data.users)) {
@@ -117,8 +117,13 @@ class OctoPrintApiService extends OctoPrintRoutes {
     return opAdminUserName;
   }
 
-  async getUsers(printer, responseOptions) {
-    const { url, options } = this._prepareRequest(printer, this.apiUsers);
+  /**
+   * @param  {LoginDto} login
+   * @param responseOptions
+   * @returns {Promise<{data, status}|*>}
+   */
+  async getUsers(login, responseOptions) {
+    const { url, options } = this._prepareRequest(login, this.apiUsers);
     const response = await this._httpClient.get(url, options);
     return processResponse(response, responseOptions);
   }
@@ -170,12 +175,7 @@ class OctoPrintApiService extends OctoPrintRoutes {
   }
 
   async uploadFileAsMultiPart(printer, fileStreamOrBuffer, commands, token, responseOptions) {
-    const { url, options } = this._prepareRequest(
-      printer,
-      this.apiFilesLocation,
-      null,
-      multiPartContentType
-    );
+    const { url, options } = this._prepareRequest(printer, this.apiFilesLocation, null, multiPartContentType);
 
     const formData = new FormData();
     if (commands.select) {
@@ -247,8 +247,8 @@ class OctoPrintApiService extends OctoPrintRoutes {
     return processResponse(response, responseOptions);
   }
 
-  async getConnection(printer, responseOptions) {
-    const { url, options } = this._prepareRequest(printer, this.apiConnection);
+  async getConnection(login, responseOptions) {
+    const { url, options } = this._prepareRequest(login, this.apiConnection);
     const response = await this._httpClient.get(url, options);
     return processResponse(response, responseOptions);
   }
@@ -304,12 +304,7 @@ class OctoPrintApiService extends OctoPrintRoutes {
   }
 
   async postPluginFirmwareUpdateFlash(currentPrinterId, printer, firmwarePath, responseOptions) {
-    const { url, options } = this._prepareRequest(
-      printer,
-      this.pluginFirmwareUpdaterFlash,
-      null,
-      multiPartContentType
-    );
+    const { url, options } = this._prepareRequest(printer, this.pluginFirmwareUpdaterFlash, null, multiPartContentType);
 
     const formData = new FormData();
     formData.append("port", "/dev/op2");
@@ -331,22 +326,13 @@ class OctoPrintApiService extends OctoPrintRoutes {
         })
         .on("uploadProgress", (p) => {
           if (currentPrinterId) {
-            this._eventEmitter2.emit(
-              `${firmwareFlashUploadEvent(currentPrinterId)}`,
-              currentPrinterId,
-              p
-            );
+            this._eventEmitter2.emit(`${firmwareFlashUploadEvent(currentPrinterId)}`, currentPrinterId, p);
           }
         });
 
       return await processGotResponse(response, responseOptions);
     } catch (e) {
-      this._eventEmitter2.emit(
-        `${uploadProgressEvent(currentPrinterId)}`,
-        currentPrinterId,
-        { failed: true },
-        e
-      );
+      this._eventEmitter2.emit(`${uploadProgressEvent(currentPrinterId)}`, currentPrinterId, { failed: true }, e);
       let data;
       try {
         data = JSON.parse(e.response?.body);

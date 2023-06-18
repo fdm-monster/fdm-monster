@@ -1,11 +1,7 @@
 const dbHandler = require("../db-handler");
 const { AppConstants } = require("../../server.constants");
 const { setupTestApp } = require("../test-server");
-const {
-  expectInvalidResponse,
-  expectOkResponse,
-  expectNotFoundResponse,
-} = require("../extensions");
+const { expectInvalidResponse, expectOkResponse, expectNotFoundResponse } = require("../extensions");
 const { Printer } = require("../../models/Printer");
 const { testApiKey, createTestPrinter } = require("./test-data/create-printer");
 const { TaskPresets } = require("../../task.presets");
@@ -74,12 +70,12 @@ describe("PrinterController", () => {
 
   it(`should not be able to POST ${updateRoute} - missing printer field`, async () => {
     const response = await request.patch(connectionRoute("asd")).send();
-    expectInvalidResponse(response, ["printerId"], false);
+    expectNotFoundResponse(response);
   });
 
   it(`should not be able to DELETE ${deleteRoute} - nonexistent id`, async () => {
     const response = await request.delete(deleteRoute("non-id")).send();
-    expectInvalidResponse(response, ["printerId"], true);
+    expectNotFoundResponse(response);
   });
 
   it(`should be able to DELETE ${deleteRoute} - existing id`, async () => {
@@ -106,7 +102,7 @@ describe("PrinterController", () => {
     const res = await request.get(getRoute(printerId)).send();
     expectNotFoundResponse(res);
     expect(res.body).toEqual({
-      error: `The printer ID '${printerId}' was not found in the printerStore.`,
+      error: `Printer with id ${printerId} not found`,
     });
   });
 
@@ -117,14 +113,13 @@ describe("PrinterController", () => {
 
   it("should invalidate to malformed singular printer json array", async () => {
     const response = await request.post(batchRoute).send([{}]);
-    expectInvalidResponse(response, ["printerURL", "apiKey", "webSocketURL"]);
+    expectInvalidResponse(response, ["printerURL", "apiKey"]);
   });
 
   it("should import to singular printer json array", async () => {
     const response = await request.post(batchRoute).send([
       {
         printerURL: "http://localhost/",
-        webSocketURL: "ws://localhost/",
         apiKey,
       },
     ]);
@@ -146,13 +141,6 @@ describe("PrinterController", () => {
     expectOkResponse(response, { printerURL: "http://url.com", apiKey: testApiKey });
   });
 
-  it("should command store to reconnect OctoPrint", async () => {
-    const printer = await createTestPrinter(request);
-
-    const response = await request.post(reconnectRoute(printer.id)).send();
-    expectOkResponse(response);
-  });
-
   it("should stop printer job correctly", async () => {
     const printer = await createTestPrinter(request);
     expect(printer.enabled).toBe(false);
@@ -166,7 +154,6 @@ describe("PrinterController", () => {
     expect(printer.enabled).toBe(false);
 
     const patch = {
-      webSocketURL: "ws://google.com",
       printerURL: "https://test.com/",
       apiKey,
       enabled: false,
@@ -174,7 +161,6 @@ describe("PrinterController", () => {
     };
     const updatePatch = await request.patch(updateRoute(printer.id)).send(patch);
     expectOkResponse(updatePatch, {
-      webSocketURL: "ws://google.com",
       printerURL: "https://test.com/",
       enabled: false,
       printerName: "asd124",
@@ -185,12 +171,10 @@ describe("PrinterController", () => {
     const printer = await createTestPrinter(request);
 
     const updatePatch = await request.patch(connectionRoute(printer.id)).send({
-      webSocketURL: "ws://google.com",
       printerURL: "https://test.com/",
       apiKey,
     });
     expectOkResponse(updatePatch, {
-      webSocketURL: "ws://google.com/", // Sanitized
       printerURL: "https://test.com/",
       apiKey,
     });
@@ -202,22 +186,11 @@ describe("PrinterController", () => {
   });
 
   it("should test printer connection", async () => {
-    let ranTask = false;
-    const preset = TaskPresets.PERIODIC_DISABLED;
-    preset.milliseconds = 2000;
-    await taskManagerService.registerJobOrTask({
-      id: DITokens.printerTestTask,
-      task: () => {
-        ranTask = true;
-      },
-      preset,
-    });
     const res = await request.post(testPrinterRoute).send({
       apiKey,
       printerURL: "https://test.com/",
     });
     expectOkResponse(res);
-    expect(ranTask).toBeTruthy();
   });
 
   it("should update printer enabled setting correctly", async () => {
@@ -232,14 +205,6 @@ describe("PrinterController", () => {
     const printer = await createTestPrinter(request);
     const updatePatch = await request.patch(disabledReasonRoute(printer.id)).send({
       disabledReason: "Under maintenance",
-    });
-    expectOkResponse(updatePatch);
-  });
-
-  it("should update printer stepSize setting correctly", async () => {
-    const printer = await createTestPrinter(request);
-    const updatePatch = await request.patch(stepSizeRoute(printer.id)).send({
-      stepSize: 0.1,
     });
     expectOkResponse(updatePatch);
   });

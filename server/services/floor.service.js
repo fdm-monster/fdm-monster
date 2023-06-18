@@ -11,11 +11,14 @@ const {
 } = require("./validators/floor-service.validation");
 
 class FloorService {
-  printerStore;
+  /**
+   * @type {PrinterCache}
+   */
+  printerCache;
   #logger;
 
-  constructor({ printerStore, loggerFactory }) {
-    this.printerStore = printerStore;
+  constructor({ printerCache, loggerFactory }) {
+    this.printerCache = printerCache;
     this.#logger = loggerFactory("PrinterFloorService");
   }
 
@@ -23,7 +26,8 @@ class FloorService {
    * Lists the floors present in the database.
    */
   async list(patchPositions = true) {
-    const printerIds = this.printerStore.listPrintersFlat(true).map((p) => p.id);
+    const printers = await this.printerCache.listCachedPrinters(true);
+    const printerIds = printers.map((p) => p.id);
 
     const floors = await Floor.find({});
     if (!patchPositions) {
@@ -84,6 +88,7 @@ class FloorService {
   /**
    * Stores a new floor into the database.
    * @param {Object} floor object to create.
+   * @returns {Promise<Floor>}
    * @throws {Error} If the printer floor is not correctly provided.
    */
   async create(floor) {
@@ -115,6 +120,10 @@ class FloorService {
     return await floor.save();
   }
 
+  async getFloorsOfPrinterId(printerId) {
+    return Floor.find({ printers: { $elemMatch: { printerId } } });
+  }
+
   async deletePrinterFromAnyFloor(printerId) {
     return Floor.updateMany(
       {},
@@ -135,7 +144,7 @@ class FloorService {
     const validInput = await validateInput(printerInFloor, printerInFloorRules);
 
     // Ensure printer exists
-    await this.printerStore.getPrinterFlat(validInput.printerId);
+    await this.printerCache.getCachedPrinterOrThrowAsync(validInput.printerId);
 
     // Ensure position is not taken twice
     floor.printers = floor.printers.filter((pif) => !(pif.x === printerInFloor.x && pif.y === printerInFloor.y));
@@ -156,7 +165,7 @@ class FloorService {
     const validInput = await validateInput(input, removePrinterInFloorRules);
 
     // Ensure printer exists
-    await this.printerStore.getPrinterFlat(validInput.printerId);
+    await this.printerCache.getCachedPrinterOrThrowAsync(validInput.printerId);
 
     const foundPrinterInFloorIndex = floor.printers.findIndex((pif) => pif.printerId.toString() === validInput.printerId);
     if (foundPrinterInFloorIndex === -1) return floor;

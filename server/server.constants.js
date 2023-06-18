@@ -11,12 +11,12 @@ const AppConstants = {
   // @Deprecated: old storage path
   defaultFileStorageFolder: "./media",
   // New place for all downloads, files etc
-  defaultMediaStorage: "./media",
   defaultClientBundleStorage: "./media/client-dist",
   defaultClientBundleZipsStorage: "./media/client-dist-zips",
   defaultServerPort: 4000,
   defaultMongoStringUnauthenticated: "mongodb://127.0.0.1:27017/fdm-monster",
   apiRoute: "/api",
+  enableClientDistAutoUpdateKey: "ENABLE_CLIENT_DIST_AUTO_UPDATE",
 
   defaultTestEnv: "test",
   defaultProductionEnv: "production",
@@ -24,13 +24,21 @@ const AppConstants = {
   GITHUB_PAT: "GITHUB_PAT",
   clientPackageName: "@fdm-monster/client",
   clientRepoName: "fdm-monster-client",
-  clientOrgName: "fdm-monster",
+  serverRepoName: "fdm-monster",
+  orgName: "fdm-monster",
+  defaultClientMinimum: "1.2.0",
   serverPath: "./",
 
   influxUrl: "INFLUX_URL",
   influxToken: "INFLUX_TOKEN",
   influxOrg: "INFLUX_ORG",
   influxBucket: "INFLUX_BUCKET",
+
+  // Websocket values
+  defaultWebsocketHandshakeTimeout: 2000,
+  defaultSocketThrottleRate: 1,
+  debugSocketStatesKey: "DEBUG_SOCKET_STATES",
+  defaultDebugSocketStates: "false",
 
   // Future experimental feature
   enableMqttAutoDiscoveryToken: "ENABLE_MQTT_AUTODISCOVERY",
@@ -42,8 +50,6 @@ const AppConstants = {
   mqttPasswordToken: "MQTT_PASSWORD",
 
   // Sentry
-  sentryEnabledToken: "SENTRY_ENABLED",
-  sentryEnabledDefault: "false",
   sentryCustomDsnToken: "SENTRY_CUSTOM_DSN",
   sentryCustomDsnDefault: "https://164b8028a8a745bba3dbcab991b84ae7@o4503975545733120.ingest.sentry.io/4505101598261248",
 };

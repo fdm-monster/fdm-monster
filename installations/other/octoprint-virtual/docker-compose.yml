@@ -1,23 +1,14 @@
 services:
-  # States MQTT plugin incompatible
   octoprint:
-    image: davidzwa/octoprint:1.8.7
-    container_name: op0
-    privileged: true
-    restart: unless-stopped
+    build:
+      context: ./default1.9.0
+      dockerfile: octoprint.Dockerfile
+    # image: 127.0.0.1:5000/octoprint-virtual:latest
+    image: octoprint/octoprint-virtual:1.9.0
+    # scale up to 5
+    deploy:
+      replicas: 5
+      restart_policy:
+        condition: on-failure
     ports:
-      - 80:80
-    volumes:
-      - /dev/:/dev/
-      - ./op0:/octoprint
-  # MQTT plugin works
-  octoprint2:
-    image: octoprint/octoprint:1.9.0
-    container_name: op1
-    privileged: true
-    restart: unless-stopped
-    ports:
-      - 81:80
-    volumes:
-      - /dev/:/dev/
-      - ./op1:/octoprint
+      - 80

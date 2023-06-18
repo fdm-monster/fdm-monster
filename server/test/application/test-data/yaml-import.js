@@ -27,7 +27,6 @@ const exportYamlBuffer =
   "    dateAdded: 1682880216989\n" +
   "    settingsAppearance:\n" +
   "      name: MyPrintah2\n" +
-  "    webSocketURL: ws://localhost:81/\n" +
   "    printerURL: http://localhost:81/\n" +
   "    apiKey: SOMEAWESOMEAPIKEYTHATOCTOPRINTLI\n" +
   "floors:\n" +

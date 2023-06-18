@@ -1,5 +1,8 @@
 class ConfigService {
-  get(key) {
+  get(key, defaultValue) {
+    if (!Object.keys(process.env).includes(key)) {
+      return defaultValue;
+    }
     return process.env[key];
   }
 

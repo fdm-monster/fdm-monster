@@ -2,25 +2,30 @@ const {
   jsonContentType,
   contentTypeHeaderKey,
   apiKeyHeaderKey,
-  OPClientErrors
+  OPClientErrors,
 } = require("../constants/octoprint-service.constants");
 const { ValidationException } = require("../../../exceptions/runtime.exceptions");
 
-function validatePrinter(printer) {
-  if (!printer.apiKey || !printer.printerURL) {
-    throw new ValidationException(OPClientErrors.printerValidationErrorMessage);
+/**
+ *
+ * @param {LoginDto} login
+ * @returns {{apiKey, printerURL}}
+ */
+function validateLogin(login) {
+  if (!login.apiKey || !login.printerURL) {
+    throw new ValidationException("printer apiKey or printerURL undefined");
   }
 
   return {
-    apiKey: printer.apiKey,
-    printerURL: printer.printerURL
+    apiKey: login.apiKey,
+    printerURL: login.printerURL,
   };
 }
 
 function constructHeaders(apiKey, contentType = jsonContentType) {
   return {
     [contentTypeHeaderKey]: contentType, // Can be overwritten without problem
-    [apiKeyHeaderKey]: apiKey
+    [apiKeyHeaderKey]: apiKey,
   };
 }
 
@@ -58,8 +63,8 @@ async function processGotResponse(response, options = { unwrap: true }) {
 }
 
 module.exports = {
-  validatePrinter,
+  validateLogin,
   constructHeaders,
   processResponse,
-  processGotResponse
+  processGotResponse,
 };

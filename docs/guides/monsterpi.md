@@ -11,14 +11,31 @@ last_modified_at: 2023-05-05T10:01:00+02:00
 
 MonsterPi is a Raspberry Pi image built using CustomPiOS. The repository is [to be found
 here](https://github.com/fdm-monster/MonsterPi).
-
 This raspberry pi image includes FDM Monster and MongoDB. 
-
-All versions can be downloaded from this Google Drive
+All released image versions can be downloaded from this Google Drive
 folder: [Google Drive folder MonsterPi images](https://drive.google.com/drive/folders/1jyifNu2oPVpQkTYa4zwtYVvr0GKAjP94?usp=sharing)
 
-## Latest Version - MonsterPi 0.2.0
+## Latest Version - MonsterPi 0.2.1
 
+**MonsterPi 0.2.1** can be downloaded from Google Drive: [MonsterPi 0.2.1 image](https://drive.google.com/file/d/1kk3DNYvJlFZA1yeBAiodqp6_PNh2X3Dn/view?usp=sharing).
+It ships with these contents:
+
+- MongoDB 4.4
+- HAProxy
+- FDM Monster 1.3.10
+
+<details>
+<summary>Older versions of MonsterPi</summary>
+
+MonsterPi 0.2.2-rc1
+
+**MonsterPi 0.2.2-rc1** can be downloaded from Google Drive: [MonsterPi 0.2.2-rc1 image](https://drive.google.com/file/d/1km_k_XYa9UxygJQg0g1X_jdQwQi12Mim/view?usp=drive_link).
+
+It ships with these contents:
+- MongoDB 4.4
+- HAProxy
+- FDM Monster 1.4.0-rc1
+- 
 **MonsterPi 0.2.0** can be downloaded from Google Drive: [MonsterPi 0.2.0 image](https://drive.google.com/file/d/1kBSJXcn7IROq-FrmCKkZLOrTXuiZC1Q6/view?usp=share_link). 
 It ships with these contents: 
 
@@ -26,23 +43,16 @@ It ships with these contents:
 - HAProxy (untested)
 - FDM Monster 1.3.2
 
-<details>
-<summary>Older versions of MonsterPi</summary>
-
-**MonsterPi 0.1.1** can be downloaded from Google Drive [MonsterPi 0.1.1 image](https://drive.google.com/file/d/1Dw66rziFuSCXACrRE-mUpuC0QAFY9WGs/view?usp=share_link)
-It ships with these contents:
-- MongoDB 4.4
-- HAProxy (not setup yet)
-- FDM Monster 1.3.1-rc2
-
-**MonsterPi 0.1.0** can be downloaded with the
-URL [Google Drive MonsterPi 0.1.0 image](https://drive.google.com/file/d/1a4DLk2Yy8uvyv9BskA073DdTLCI6w4UT/view?usp=share_link)
-It ships with these contents:
-- MongoDB 4.4
-- HAProxy (not setup yet)
-- FDM Monster 1.3.0
-
 </details>
+
+## Unstable Version - MonsterPi 0.2.2-rc3
+
+**MonsterPi 0.2.2-rc3** can be downloaded from Google Drive: [MonsterPi 0.2.2-rc3 image](https://drive.google.com/file/d/1lxrSErC8ttZtVeJs8Ke7R4zr62AXc5dS/view?usp=drive_link).
+
+It ships with these contents:
+- MongoDB 4.4
+- HAProxy
+- FDM Monster 1.4.0-rc4
 
 ## Installing MonsterPi
 

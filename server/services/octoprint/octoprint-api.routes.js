@@ -1,5 +1,5 @@
 const { jsonContentType, contentTypeHeaderKey } = require("./constants/octoprint-service.constants");
-const { validatePrinter, constructHeaders } = require("./utils/api.utils");
+const { validateLogin, constructHeaders } = require("./utils/api.utils");
 const { getDefaultTimeout } = require("../../constants/server-settings.constants");
 
 class OctoPrintRoutes {
@@ -50,6 +50,14 @@ class OctoPrintRoutes {
 
   get cancelJobCommand() {
     return { command: "cancel" };
+  }
+
+  get pauseJobCommand() {
+    return { command: "pause", action: "pause" };
+  }
+
+  get resumeJobCommand() {
+    return { command: "pause", action: "resume" };
   }
 
   get connectCommand() {
@@ -120,10 +128,19 @@ class OctoPrintRoutes {
     }
   }
 
-  _prepareRequest(printer, path, timeoutOverride, contentType = jsonContentType) {
+  /**
+   *
+   * @param {LoginDto} login
+   * @param {string} path
+   * @param {number|undefined} timeoutOverride
+   * @param {string} contentType
+   * @returns {{options: {headers: {"[apiKeyHeaderKey]": *, "[contentTypeHeaderKey]": string}, timeout: (number|{default: number, type: Number | NumberConstructor, required: boolean}|*)}, url: string}}
+   * @protected
+   */
+  _prepareRequest(login, path, timeoutOverride, contentType = jsonContentType) {
     this._ensureTimeoutSettingsLoaded();
 
-    const { apiKey, printerURL } = validatePrinter(printer);
+    const { apiKey, printerURL } = validateLogin(login);
 
     let headers = constructHeaders(apiKey, contentType);
 

@@ -6,7 +6,7 @@ const {
   printerFileCleanSettingKey,
   getDefaultPrinterFileCleanSettings,
   getDefaultSettings,
-  serverSettingKey,
+  serverSettingsKey,
   frontendSettingKey,
   getDefaultFrontendSettings,
 } = require("../../constants/server-settings.constants");
@@ -34,7 +34,7 @@ describe("SettingsController", () => {
     const response = await request.get(defaultRoute).send();
     expect(response.body).not.toBeNull();
     expect(response.body).toMatchObject(getDefaultSettings());
-    expect(response.body[serverSettingKey].registration).toBeTruthy();
+    expect(response.body[serverSettingsKey].registration).toBeTruthy();
     expect(response.body[frontendSettingKey]).toMatchObject(getDefaultFrontendSettings());
     expect(response.body[printerFileCleanSettingKey]).toMatchObject(getDefaultPrinterFileCleanSettings());
     expectOkResponse(response);
@@ -47,7 +47,7 @@ describe("SettingsController", () => {
     });
     expect(response.body).not.toBeNull();
     expect(response.body).toMatchObject({
-      [serverSettingKey]: {
+      [serverSettingsKey]: {
         whitelistEnabled: true,
         whitelistedIpAddresses: ["127.0.0", "192.178.168", "127.0.0.1"],
       },

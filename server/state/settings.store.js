@@ -1,34 +1,52 @@
 const { InternalServerException } = require("../exceptions/runtime.exceptions");
-const {
-  printerFileCleanSettingKey,
-  serverSettingKey,
-} = require("../constants/server-settings.constants");
+const { printerFileCleanSettingKey, serverSettingsKey } = require("../constants/server-settings.constants");
+const Sentry = require("@sentry/node");
+const SettingsModel = require("../models/ServerSettings");
+const { isTestEnvironment } = require("../utils/env.utils");
 
 class SettingsStore {
-  #settings;
-  #settingsService;
+  /**
+   * @private
+   * @type {ServerSettings}
+   */
+  settings;
+  /**
+   * @type {SettingsService}
+   */
+  settingsService;
+  /**
+   * @type {LoggerService}
+   */
+  logger;
 
-  constructor({ settingsService }) {
-    this.#settingsService = settingsService;
+  constructor({ settingsService, loggerFactory }) {
+    this.settingsService = settingsService;
+    this.logger = loggerFactory("SettingsStore");
   }
 
   async loadSettings() {
     // Setup Settings as connection is established
-    this.#settings = await this.#settingsService.getOrCreate();
+    this.settings = await this.settingsService.getOrCreate();
+    await this.processSentryEnabled();
+  }
+
+  async getAnonymousDiagnosticsEnabled() {
+    return this.settings[serverSettingsKey].sentryDiagnosticsEnabled;
   }
 
   isRegistrationEnabled() {
-    if (!this.#settings)
-      throw new InternalServerException(
-        "Could not check server settings (server settings not loaded"
-      );
-    return this.#settings[serverSettingKey].registration;
+    if (!this.settings) throw new InternalServerException("Could not check server settings (server settings not loaded");
+    return this.settings[serverSettingsKey].registration;
   }
 
   getSettings() {
     return Object.freeze({
-      ...this.#settings._doc,
+      ...this.settings._doc,
     });
+  }
+
+  getServerSettings() {
+    return this.getSettings()[serverSettingsKey];
   }
 
   /**
@@ -43,28 +61,54 @@ class SettingsStore {
     return this.getSettings()[printerFileCleanSettingKey]?.autoRemoveOldFilesBeforeUpload;
   }
 
+  async updateSettings(fullUpdate) {
+    this.settings = await this.settingsService.update(fullUpdate);
+    return this.getSettings();
+  }
+
   async setRegistrationEnabled(enabled = true) {
-    this.#settings = await this.#settingsService.setRegistrationEnabled(enabled);
+    this.settings = await this.settingsService.setRegistrationEnabled(enabled);
     return this.getSettings();
   }
 
   async setLoginRequired(enabled = true) {
-    this.#settings = await this.#settingsService.setLoginRequired(enabled);
+    this.settings = await this.settingsService.setLoginRequired(enabled);
     return this.getSettings();
   }
 
   async setWhitelist(enabled = true, ipAddresses) {
-    this.#settings = await this.#settingsService.setWhitelist(enabled, ipAddresses);
+    this.settings = await this.settingsService.setWhitelist(enabled, ipAddresses);
     return this.getSettings();
   }
 
-  async updateSettings(fullUpdate) {
-    this.#settings = await this.#settingsService.update(fullUpdate);
+  async updateServerSettings(serverSettings) {
+    this.settings = await this.settingsService.updateServerSettings(serverSettings);
     return this.getSettings();
+  }
+
+  async setSentryDiagnosticsEnabled(enabled) {
+    this.settings = await this.settingsService.setSentryDiagnosticsEnabled(enabled);
+    await this.processSentryEnabled();
+    return this.getSettings();
+  }
+
+  /**
+   * @private
+   * @returns {Promise<void>}
+   */
+  async processSentryEnabled() {
+    if (isTestEnvironment()) return;
+    const sentryEnabled = await this.getAnonymousDiagnosticsEnabled();
+    if (sentryEnabled) {
+      this.logger.log("Enabling Sentry for remote diagnostics");
+    } else {
+      this.logger.log("Disabling Sentry for remote diagnostics");
+    }
+    Sentry.getCurrentHub().getClient().getOptions().enabled = sentryEnabled;
   }
 
   async updateFrontendSettings(frontendSettings) {
-    this.#settings = await this.#settingsService.updateFrontendSettings(frontendSettings);
+    this.settings = await this.settingsService.updateFrontendSettings(frontendSettings);
     return this.getSettings();
   }
 }

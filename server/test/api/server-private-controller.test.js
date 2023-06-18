@@ -11,7 +11,7 @@ const { exportYamlBuffer } = require("../application/test-data/yaml-import");
 let request;
 let container;
 let settingsStore;
-let printerStore;
+let printerSocketStore;
 let floorStore;
 
 const defaultRoute = `${AppConstants.apiRoute}/server`;
@@ -24,7 +24,7 @@ beforeAll(async () => {
   await dbHandler.connect();
   ({ request, container } = await setupTestApp());
   settingsStore = container.resolve(DITokens.settingsStore);
-  printerStore = container.resolve(DITokens.printerStore);
+  printerSocketStore = container.resolve(DITokens.printerSocketStore);
   floorStore = container.resolve(DITokens.floorStore);
 });
 
@@ -34,14 +34,13 @@ describe("ServerPrivateController", () => {
 
     const response = await request.get(defaultRoute).send();
     expectOkResponse(response, {
-      includingPrerelease: false,
-      airGapped: true,
+      airGapped: null,
       latestRelease: null,
       installedRelease: null,
       serverVersion: process.env.npm_package_version,
       installedReleaseFound: null,
       updateAvailable: null,
-      synced: true,
+      synced: false,
     });
   });
 
@@ -73,7 +72,6 @@ describe("ServerPrivateController", () => {
   });
 
   it("should export YAML and return valid object", async () => {
-    await printerStore.loadPrinterStore();
     const response = await request.post(exportPrintersAndFloorsRoute).send({
       exportPrinters: true,
       exportFloorGrid: true,
@@ -89,7 +87,6 @@ describe("ServerPrivateController", () => {
   });
 
   test.skip("should import YAML and have data loaded", async () => {
-    await printerStore.loadPrinterStore();
     const response = await request.post(importPrintersAndFloorsRoute).attach("file", exportYamlBuffer);
     expectOkResponse(response);
   });

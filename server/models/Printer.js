@@ -9,10 +9,6 @@ const PrinterSchema = new Schema({
     type: String,
     required: true, // !
   },
-  webSocketURL: {
-    type: String,
-    required: true, // !
-  },
   enabled: {
     type: Boolean,
     required: true,

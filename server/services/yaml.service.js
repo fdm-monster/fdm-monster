@@ -7,33 +7,49 @@ const {
 const { dump, load } = require("js-yaml");
 
 class YamlService {
-  printerStore;
   floorStore;
   /**
    * @type {PrinterService}
    */
   printerService;
   /**
+   * @type {PrinterCache}
+   */
+  printerCache;
+  /**
    * @type {FloorService}
    */
   floorService;
-
   /**
    * @type {LoggerService}
    */
   #logger;
+  /**
+   * @type {string}
+   */
+  serverVersion;
 
-  constructor({ printerStore, printerService, floorStore, floorService, loggerFactory }) {
-    this.printerStore = printerStore;
+  constructor({ printerService, printerCache, floorStore, floorService, loggerFactory, serverVersion }) {
     this.floorStore = floorStore;
     this.printerService = printerService;
+    this.printerCache = printerCache;
     this.floorService = floorService;
+    this.serverVersion = serverVersion;
     this.#logger = loggerFactory("YamlService");
   }
 
   async importPrintersAndFloors(yamlBuffer) {
     const importSpec = await load(yamlBuffer);
     const { exportPrinters, exportFloorGrid, exportFloors } = importSpec?.config;
+
+    for (const printer of importSpec.printers) {
+      if (!printer.settingsAppearance?.name && printer.printerName) {
+        printer.settingsAppearance = {
+          name: printer.printerName,
+        };
+        delete printer.printerName;
+      }
+    }
 
     const importData = await validateInput(
       importSpec,
@@ -62,13 +78,13 @@ class YamlService {
     this.#logger.log(`Performing pure insert printers (${insertPrinters.length} printers)`);
     const printerIdMap = {};
     for (const newPrinter of insertPrinters) {
-      const state = await this.printerStore.addPrinter(newPrinter);
+      const state = await this.printerService.create(newPrinter);
       printerIdMap[newPrinter.id] = state.id;
     }
     this.#logger.log(`Performing update import printers (${updateByPropertyPrinters.length} printers)`);
     for (const updatePrinterSpec of updateByPropertyPrinters) {
       const updateId = updatePrinterSpec.printerId;
-      const state = await this.printerStore.updatePrinter(updateId, updatePrinterSpec.value);
+      const state = await this.printerService.update(updateId, updatePrinterSpec.value);
       printerIdMap[updatePrinterSpec.printerId] = state.id;
     }
 
@@ -266,10 +282,10 @@ class YamlService {
     };
 
     if (exportPrinters) {
-      const printers = await this.printerStore.listPrintersFlat(true);
+      const printers = await this.printerService.list();
       dumpedObject.printers = printers.map((p) => {
         const printerId = p.id;
-        const { apiKey } = this.printerStore.getPrinterLogin(printerId);
+        const { apiKey } = this.printerCache.getLoginDto(printerId);
         return {
           id: printerId,
           stepSize: p.stepSize,
@@ -277,9 +293,8 @@ class YamlService {
           enabled: p.enabled,
           dateAdded: p.dateAdded,
           settingsAppearance: {
-            name: p.printerName,
+            name: p.settingsAppearance.name,
           },
-          webSocketURL: p.webSocketURL,
           printerURL: p.printerURL,
           apiKey,
         };

@@ -22,19 +22,14 @@ async function bench(cb, report = false) {
   if (!!report) {
     return {
       result,
-      time: afterTime - beforeTime
+      time: afterTime - beforeTime,
     };
   } else return result;
-}
-
-function byteCount(s) {
-  return encodeURI(s).split(/%..|./).length - 1;
 }
 
 function noop() {}
 
 module.exports = {
   bench,
-  byteCount,
-  noop
+  noop,
 };

@@ -1,7 +1,4 @@
-const {
-  allPerms,
-  flattenPermissionDefinition,
-} = require("../../constants/authorization.constants");
+const { allPerms, flattenPermissionDefinition } = require("../../constants/authorization.constants");
 
 describe("authorization constants", () => {
   it("allPerms should throw for no permission group", async () => {

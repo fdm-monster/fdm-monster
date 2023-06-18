@@ -1,12 +1,3 @@
-const MATERIALS = {
-  CARBON: "CARBON",
-  PETG: "PETG",
-  PLA: "PLA",
-  BRONZE: "BRONZE",
-  COPPER: "COPPER",
-  FLEX: "FLEX",
-};
-
 const getSettingsAppearanceDefault = () => ({
   name: "",
 });
@@ -31,7 +22,6 @@ const UUID_LENGTH = 32;
 const minPrinterFloorNameLength = 3;
 
 module.exports = {
-  MATERIALS,
   getSettingsAppearanceDefault,
   getFileListDefault,
   getDefaultPrinterEntry,

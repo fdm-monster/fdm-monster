@@ -16,6 +16,7 @@ const exportPrintersFloorsYamlRules = {
 };
 
 const importPrintersFloorsYamlRules = (importPrinters, importFloorGrid, importFloors) => ({
+  version: "required|string",
   config: "required|object",
   "config.exportPrinters": "required|boolean",
   "config.exportFloorGrid": "required|boolean",
@@ -27,7 +28,6 @@ const importPrintersFloorsYamlRules = (importPrinters, importFloorGrid, importFl
   "printers.*.id": "mongoId",
   "printers.*.apiKey": `required|length:${UUID_LENGTH},${UUID_LENGTH}|alphaNumeric`,
   "printers.*.printerURL": "required|httpurl",
-  "printers.*.webSocketURL": "required|wsurl",
   "printers.*.enabled": "boolean",
   "printers.*.settingsAppearance": "required|object",
   "printers.*.settingsAppearance.name": "required|string",
