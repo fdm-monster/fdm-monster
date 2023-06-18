@@ -125,6 +125,34 @@ class PrinterController {
   }
 
   /**
+   * Pauses the current job
+   * @param req
+   * @param res
+   * @returns {Promise<void>}
+   */
+  async pausePrintJob(req, res) {
+    const { printerLogin } = getScopedPrinter(req);
+
+    const command = this.#octoPrintApiService.pauseJobCommand;
+    await this.#octoPrintApiService.sendJobCommand(printerLogin, command);
+    res.send({});
+  }
+
+  /**
+   * Pauses the current job
+   * @param req
+   * @param res
+   * @returns {Promise<void>}
+   */
+  async resumePrintJob(req, res) {
+    const { printerLogin } = getScopedPrinter(req);
+
+    const command = this.#octoPrintApiService.resumeJobCommand;
+    await this.#octoPrintApiService.sendJobCommand(printerLogin, command);
+    res.send({});
+  }
+
+  /**
    * Cancels the current job irrespective of file
    * @param req
    * @param res
@@ -307,6 +335,8 @@ module.exports = createController(PrinterController)
   .post("/:id/serial-connect", "sendSerialConnectCommand")
   .post("/:id/serial-disconnect", "sendSerialDisconnectCommand")
   .post("/:id/job/stop", "stopPrintJob")
+  .post("/:id/job/pause", "pausePrintJob")
+  .post("/:id/job/resume", "resumePrintJob")
   .post("/:id/refresh-socket", "refreshPrinterSocket")
   .patch("/:id/enabled", "updateEnabled")
   .patch("/:id/connection", "updateConnectionSettings")
