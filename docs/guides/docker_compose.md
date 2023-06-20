@@ -3,7 +3,7 @@ layout: default
 title: Docker Compose
 parent: Installations
 nav_order: 2
-last_modified_at: 2023-05-10T14:00:00+02:00
+last_modified_at: 2023-06-20T14:00:00+02:00
 ---
 
 # Docker Compose for FDM Monster
@@ -67,3 +67,5 @@ docker-compose up -d
 Please note that FDM Monster requires a MongoDB database to function properly. When using the `latest` or `alpine` images, 
 make sure to configure your root-user's username and password for MongoDB. 
 Additionally, FDM Monster needs to access the `admin` table, which is the default table name for the authentication source.
+
+Now you can access FDM Monster at `http://localhost:4000`, `http://127.0.0.1:4000` or `http://<your-ip>:4000`.
