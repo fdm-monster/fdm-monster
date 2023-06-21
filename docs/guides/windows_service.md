@@ -21,7 +21,7 @@ The installation scripts are available in [installations/fdm-monster-node-window
 
 The following steps will install:
 
-- nodejs 16+
+- nodejs 18
 - git
 - yarn (npm package)
 - fdm-monster (github cloned source code)
@@ -31,13 +31,13 @@ The following steps will install:
 
 - Internet access is required
 - Windows only (if you use Linux, please use Docker)
-- Pay attention to versions (e.g., Node 16 or 18, not Node 15/17)
+- Pay attention to versions (e.g., Node 18)
 - Understand PowerShell execution policy: `Set-ExecutionPolicy -ExecutionPolicy Unrestricted` will allow anything to run.
 
 ---
-### Step 1) Installing NodeJS 16+
+### Step 1) Installing NodeJS 18+
 
-Install NodeJS LTS (long-term support) from [https://nodejs.org/en/download](https://nodejs.org/en/download). At the time of writing, this is Node 18. The FDM Monster server requires NodeJS LTS 16 or higher.
+Install NodeJS LTS (long-term support) from [https://nodejs.org/en/download](https://nodejs.org/en/download). At the time of writing, this is Node 18. The FDM Monster server requires NodeJS 18 LTS or higher.
 
 To check whether Node is installed properly, execute this in Command Prompt or PowerShell:
 
