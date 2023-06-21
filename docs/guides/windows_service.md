@@ -77,11 +77,11 @@ Prepare the installation by ensuring you have Git installed. This will help you 
 ### Step 4) Downloading FDM Monster
 From now on we will be working inside the Powershell (preferred), or Command Prompt (CMD). You should **not** use Administrator mode.
 
-During first installation, it's required to run the powershell script download-fdm-monster-server.ps1 inside a powershell instance:
-
 ```powershell
-cd installations/fdm-monster-node-windows
+Invoke-WebRequest -Uri https://raw.githubusercontent.com/fdm-monster/fdm-monster/develop/installations/fdm-monster-node-windows/download-fdm-monster-server.ps1 -OutFile .\download-fdm-monster-server.ps1
 ```
+Please download this script in the preferred location where you want to install FDM Monster. For example, `C:\Users\User1\fdm-monster-service\`.
+
 Followed by:
 ```powershell
 ./download-fdm-monster-server.ps1
@@ -119,12 +119,32 @@ If things are working, you can open fdm monster with this URL: [http://localhost
 
 ---
 
+## Updating the service
+Updating the service is possible through a powershell, similar to the installation. Please open a Powershell window **without Administrator rights**. 
+
+```powershell
+Invoke-WebRequest -Uri https://raw.githubusercontent.com/fdm-monster/fdm-monster/develop/installations/fdm-monster-node-windows/update-fdm-monster.ps1 -OutFile .\update-fdm-monster.ps1
+```
+Please download this script in the preferred location where you have downloaded the installation script for installing FDM Monster previously. 
+For example, `C:\Users\User1\fdm-monster-service\`, but not `C:\Users\User1\fdm-monster-service\fdm-monster\`! 
+
+Followed by:
+```powershell
+./update-fdm-monster.ps1
+```
+
+The script should succeed with your FDM Monster server running again.
+
 ## Uninstalling the service
-Uninstalling the service is possible through a node script.
+Uninstalling the service is possible through a Powershell script.
+
+```powershell
+Invoke-WebRequest -Uri https://raw.githubusercontent.com/fdm-monster/fdm-monster/develop/installations/fdm-monster-node-windows/uninstall-fdm-monster.ps1 -OutFile .\uninstall-fdm-monster.ps1
+```
 
 Run the script as follows:
 ```powershell
-node ./uninstall-fdm-monster-service.js
+./uninstall-fdm-monster-service.ps1
 ```
 
 
