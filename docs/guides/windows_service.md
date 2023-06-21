@@ -87,24 +87,8 @@ Followed by:
 ./download-fdm-monster-server.ps1
 ```
 
-If no errors occurred, FDM Monster should be running! You're almost done.
-
----
-
-### Step 5) Updating the service
-The powershell script `download-update.ps1` has been created to update the service.
-
-Execute the update with:
-```powershell
-powershell ./download-update.ps1
-```
-
-This script will do the following things:
-- stop and uninstall the previous service
-- update fdm-monster
-- create a new service instance
-
-During these steps the server will not be available for a short while. Please check [Step 7](#Step-7-Checking-the-service) for verifying whether your service is running.
+During these steps the server will not be available for a short while. Please check [Step 6](#Step-6-Checking-the-service) for verifying whether your service is running.
+If no errors occurred, FDM Monster should be running!
 
 ---
 
@@ -133,7 +117,8 @@ Followed by:
 ./update-fdm-monster.ps1
 ```
 
-The script should succeed with your FDM Monster server running again.
+The script should succeed with your FDM Monster server running again. Please have patience, as the server will not be available for a short while.
+
 
 ## Uninstalling the service
 Uninstalling the service is possible through a Powershell script.
