@@ -108,17 +108,7 @@ During these steps the server will not be available for a short while. Please ch
 
 ---
 
-### Step 6) Uninstalling the service
-Uninstalling the service is possible through a node script.
-
-Run the script as follows:
-```powershell
-node ./uninstall-fdm-monster-service.js
-```
-
----
-
-### Step 7) Checking the service
+### Step 6) Checking the service
 
 You've installed `fdmmonster.exe` using node-windows. Great! You should be able to check the service `fdmmonster.exe` with description `FDM Monster` in Task Manager.
 The service should have Status: Running. If this is not the case, something went wrong. Reach out to us on for more help [Discord](https://discord.gg/mwA8uP8CMc)!
@@ -127,6 +117,15 @@ The service should have Status: Running. If this is not the case, something went
 
 If things are working, you can open fdm monster with this URL: [http://localhost:4000](http://localhost:4000) or [http://127.0.0.1:4000](http://127.0.0.1:4000).
 
-Documentation on how to create and place printers on the grid will follow asap!
+---
+
+## Uninstalling the service
+Uninstalling the service is possible through a node script.
+
+Run the script as follows:
+```powershell
+node ./uninstall-fdm-monster-service.js
+```
+
 
 Please continue to [Environment configuration](../configuration/preconfiguration.md) to change environment configuration of the FDM Monster server.
