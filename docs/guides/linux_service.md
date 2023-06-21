@@ -18,7 +18,7 @@ The scripts on this page are available in [installations/fdm-monster-node-linux]
 
 Please ensure the following dependencies are installed and working:
 
-- nodejs 16+
+- nodejs 18+
 - git
 - yarn (npm package)
 - fdm-monster (github cloned source code)
