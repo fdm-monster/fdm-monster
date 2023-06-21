@@ -1611,7 +1611,7 @@
     "@octokit/types" "^9.0.0"
     bottleneck "^2.15.3"
 
-"@octokit/request-error@^3.0.0", "@octokit/request-error@^3.0.3":
+"@octokit/request-error@^3.0.0", "@octokit/request-error@^3.0.3", "@octokit/request-error@^v3.0.3":
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/@octokit/request-error/-/request-error-3.0.3.tgz#ef3dd08b8e964e53e55d471acfe00baa892b9c69"
   integrity sha512-crqw3V5Iy2uOU5Np+8M/YexTlT8zxCfI+qu+LxUB7SZpje4Qmx3mub5DfEKSO8Ylyk0aogi6TYdf6kxzh2BguQ==
@@ -5166,10 +5166,10 @@ object.values@^1.1.6:
     define-properties "^1.1.4"
     es-abstract "^1.20.4"
 
-octokit@2.0.22:
-  version "2.0.22"
-  resolved "https://registry.yarnpkg.com/octokit/-/octokit-2.0.22.tgz#ce44c7bdbb546029e7f2e765764d5843125f6c90"
-  integrity sha512-QBgGSB+odZ5o3ysLy5d2Qvwwx5+GU1zLVgkgpy3o4XocmrD/YInaIVUCA6nR8jUmdf5lgyyiYPyxRt0UrNwqMQ==
+octokit@2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/octokit/-/octokit-2.1.0.tgz#93863ce6630d358327d3959ca5d08a97fd3606b2"
+  integrity sha512-Pxi6uKTjBRZWgAwsw1NgHdRlL+QASCN35OYS7X79o7PtBME0CLXEroZmPtEwlWZbPTP+iDbEy2wCbSOgm0uGIQ==
   dependencies:
     "@octokit/app" "^13.1.5"
     "@octokit/core" "^4.2.1"
@@ -5178,6 +5178,7 @@ octokit@2.0.22:
     "@octokit/plugin-rest-endpoint-methods" "^7.1.1"
     "@octokit/plugin-retry" "^4.1.3"
     "@octokit/plugin-throttling" "^5.2.2"
+    "@octokit/request-error" "^v3.0.3"
     "@octokit/types" "^9.2.2"
 
 on-finished@2.4.1:
