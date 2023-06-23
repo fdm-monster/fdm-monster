@@ -23,7 +23,7 @@ You can add printers to a floor with drag and drop. In order to do this, you nee
 
 _Printer Relocate Mode toggle._
 
-![img_2.png](../images/software-printer-relocate-mode.png)
+![img.png](../images/software-printer-relocate-mode.png)
 Printer Relocate Mode is now enabled. You can now drag and drop printers to a floor position.
 
 ## Removing printers from a floor
