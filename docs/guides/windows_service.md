@@ -129,7 +129,7 @@ Invoke-WebRequest -Uri https://raw.githubusercontent.com/fdm-monster/fdm-monster
 
 Run the script as follows:
 ```powershell
-./uninstall-fdm-monster-service.ps1
+./uninstall-fdm-monster.ps1
 ```
 
 
