@@ -72,7 +72,7 @@
     "passport": "0.6.0",
     "passport-local": "1.0.0",
     "semver": "7.5.3",
-    "simple-git": "3.19.0",
+    "simple-git": "3.19.1",
     "socket.io": "4.7.0",
     "toad-scheduler": "3.0.0",
     "winston": "3.9.0",
