@@ -12,6 +12,7 @@ services:
       - "21111:27017"
     volumes:
       - ./fdm-monster/mongodb-data:/data/db
+      - ./fdm-monster/mongoconfig:/data/configdb
     restart: unless-stopped
 
   fdm-monster:
@@ -25,4 +26,4 @@ services:
       - NODE_ENV=development
       - SERVER_PORT=4000
     volumes:
-      - ./fdm-monster/media/:/app/media
+      - ./fdm-monster/media/:/media
