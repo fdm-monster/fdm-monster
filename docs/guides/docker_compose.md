@@ -49,6 +49,7 @@ services:
     - "28017:27017"
     volumes:
     - ./mongodb-data:/data/db
+    - ./mongoconfig:/data/configdb
     restart: unless-stopped
 
   fdm-monster:
@@ -61,7 +62,7 @@ services:
     - MONGO=mongodb://mongodb:27017/fdm-monster?authSource=admin
     volumes:
     # Volumes as local relative folders (validate with 'docker-compose config')
-    - ./fdm-monster/media:/app/media
+    - ./fdm-monster/media:/media
 ```
 _An example docker-compose.yml file with the mongodb and fdm-monster services in one stack._
 
