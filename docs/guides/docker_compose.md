@@ -30,7 +30,6 @@ There are multiple tags available for the `davidzwa/fdm-monster` image.
 - `develop` - The latest development version of FDM Monster. This version is not recommended for production use.
 - `x.y.z-rc?-1234` - A specific release candidate of FDM Monster with a specific build number. For example, `1.4.0-rc1-1234`. These are development versions and are not recommended for production use.
 - `x.y.z-1234` - A specific version of FDM Monster with a specific build number. For example, `1.4.0-1234`. These are development versions and are not recommended for production use.
-   
 
 ### Step 2) Create a docker-compose.yml file
 To run a Docker Compose stack, create a file named `docker-compose.yml` and use the following contents (or look at [docker-compose.yml](../../docker-compose.yml)):

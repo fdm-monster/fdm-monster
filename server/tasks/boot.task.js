@@ -87,10 +87,10 @@ class BootTask {
     // To cope with retries after failures we register this task - disabled
     this.#taskManagerService.registerJobOrTask(this.#serverTasks.SERVER_BOOT_TASK);
 
-    await this.run(true);
+    await this.run();
   }
 
-  async run(bootTaskScheduler = false) {
+  async run() {
     try {
       await this.createConnection();
       await this.migrateDatabase();
@@ -98,8 +98,12 @@ class BootTask {
       if (e instanceof MongooseError) {
         // Tests should just continue
         if (!e.message.includes("Can't call `openUri()` on an active connection with different connection strings.")) {
+          // We are not in a test
           if (e.message.includes("ECONNREFUSED")) {
             this.#logger.error("Database connection timed-out. Retrying in 5000.");
+          }
+          else {
+            this.#logger.error(`Database connection error: ${e.message}`);
           }
           this.#taskManagerService.scheduleDisabledJob(DITokens.bootTask, false);
           return;
@@ -121,12 +125,13 @@ class BootTask {
     await this.roleService.syncRoles();
     await this.ensureAdminUserExists();
 
-    if (bootTaskScheduler && process.env.SAFEMODE_ENABLED !== "true") {
+    if (process.env.SAFEMODE_ENABLED === "true") {
+      this.#logger.warn("Starting in safe mode due to SAFEMODE_ENABLED");
+    }
+    else {
       this.#serverTasks.BOOT_TASKS.forEach((task) => {
         this.#taskManagerService.registerJobOrTask(task);
       });
-    } else {
-      this.#logger.warn("Starting in safe mode due to SAFEMODE_ENABLED");
     }
 
     // Success so we disable this task
