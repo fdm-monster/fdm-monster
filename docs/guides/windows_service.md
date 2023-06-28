@@ -21,7 +21,7 @@ The installation scripts are available in [installations/fdm-monster-node-window
 
 The following steps will install:
 
-- nodejs 16+
+- nodejs 18
 - git
 - yarn (npm package)
 - fdm-monster (github cloned source code)
@@ -31,13 +31,13 @@ The following steps will install:
 
 - Internet access is required
 - Windows only (if you use Linux, please use Docker)
-- Pay attention to versions (e.g., Node 16 or 18, not Node 15/17)
+- Pay attention to versions (e.g., Node 18)
 - Understand PowerShell execution policy: `Set-ExecutionPolicy -ExecutionPolicy Unrestricted` will allow anything to run.
 
 ---
-### Step 1) Installing NodeJS 16+
+### Step 1) Installing NodeJS 18+
 
-Install NodeJS LTS (long-term support) from [https://nodejs.org/en/download](https://nodejs.org/en/download). At the time of writing, this is Node 18. The FDM Monster server requires NodeJS LTS 16 or higher.
+Install NodeJS LTS (long-term support) from [https://nodejs.org/en/download](https://nodejs.org/en/download). At the time of writing, this is Node 18. The FDM Monster server requires NodeJS 18 LTS or higher.
 
 To check whether Node is installed properly, execute this in Command Prompt or PowerShell:
 
@@ -77,48 +77,22 @@ Prepare the installation by ensuring you have Git installed. This will help you 
 ### Step 4) Downloading FDM Monster
 From now on we will be working inside the Powershell (preferred), or Command Prompt (CMD). You should **not** use Administrator mode.
 
-During first installation, it's required to run the powershell script download-fdm-monster-server.ps1 inside a powershell instance:
-
 ```powershell
-cd installations/fdm-monster-node-windows
+Invoke-WebRequest -Uri https://raw.githubusercontent.com/fdm-monster/fdm-monster/develop/installations/fdm-monster-node-windows/download-fdm-monster-server.ps1 -OutFile .\download-fdm-monster-server.ps1
 ```
+Please download this script in the preferred location where you want to install FDM Monster. For example, `C:\Users\User1\fdm-monster-service\`.
+
 Followed by:
 ```powershell
 ./download-fdm-monster-server.ps1
 ```
 
-If no errors occurred, FDM Monster should be running! You're almost done.
+During these steps the server will not be available for a short while. Please check [Step 6](#Step-6-Checking-the-service) for verifying whether your service is running.
+If no errors occurred, FDM Monster should be running!
 
 ---
 
-### Step 5) Updating the service
-The powershell script `download-update.ps1` has been created to update the service.
-
-Execute the update with:
-```powershell
-powershell ./download-update.ps1
-```
-
-This script will do the following things:
-- stop and uninstall the previous service
-- update fdm-monster
-- create a new service instance
-
-During these steps the server will not be available for a short while. Please check [Step 7](#Step-7-Checking-the-service) for verifying whether your service is running.
-
----
-
-### Step 6) Uninstalling the service
-Uninstalling the service is possible through a node script.
-
-Run the script as follows:
-```powershell
-node ./uninstall-fdm-monster-service.js
-```
-
----
-
-### Step 7) Checking the service
+### Step 6) Checking the service
 
 You've installed `fdmmonster.exe` using node-windows. Great! You should be able to check the service `fdmmonster.exe` with description `FDM Monster` in Task Manager.
 The service should have Status: Running. If this is not the case, something went wrong. Reach out to us on for more help [Discord](https://discord.gg/mwA8uP8CMc)!
@@ -127,6 +101,36 @@ The service should have Status: Running. If this is not the case, something went
 
 If things are working, you can open fdm monster with this URL: [http://localhost:4000](http://localhost:4000) or [http://127.0.0.1:4000](http://127.0.0.1:4000).
 
-Documentation on how to create and place printers on the grid will follow asap!
+---
+
+## Updating the service
+Updating the service is possible through a powershell, similar to the installation. Please open a Powershell window **without Administrator rights**. 
+
+```powershell
+Invoke-WebRequest -Uri https://raw.githubusercontent.com/fdm-monster/fdm-monster/develop/installations/fdm-monster-node-windows/update-fdm-monster.ps1 -OutFile .\update-fdm-monster.ps1
+```
+Please download this script in the preferred location where you have downloaded the installation script for installing FDM Monster previously. 
+For example, `C:\Users\User1\fdm-monster-service\`, but not `C:\Users\User1\fdm-monster-service\fdm-monster\`! 
+
+Followed by:
+```powershell
+./update-fdm-monster.ps1
+```
+
+The script should succeed with your FDM Monster server running again. Please have patience, as the server will not be available for a short while.
+
+
+## Uninstalling the service
+Uninstalling the service is possible through a Powershell script.
+
+```powershell
+Invoke-WebRequest -Uri https://raw.githubusercontent.com/fdm-monster/fdm-monster/develop/installations/fdm-monster-node-windows/uninstall-fdm-monster.ps1 -OutFile .\uninstall-fdm-monster.ps1
+```
+
+Run the script as follows:
+```powershell
+./uninstall-fdm-monster.ps1
+```
+
 
 Please continue to [Environment configuration](../configuration/preconfiguration.md) to change environment configuration of the FDM Monster server.

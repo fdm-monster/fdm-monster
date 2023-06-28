@@ -8,15 +8,18 @@ services:
     environment:
       MONGO_INITDB_DATABASE: fdm-monster
     ports:
-      # default is 27017
       - "21111:27017"
     volumes:
       - ./fdm-monster/mongodb-data:/data/db
+      - ./fdm-monster/mongoconfig:/data/configdb
     restart: unless-stopped
 
   fdm-monster:
     container_name: fdm-monster
     image: davidzwa/fdm-monster:latest
+    build:
+      context: ./server
+      dockerfile: ./docker/Dockerfile
     restart: unless-stopped
     ports:
       - "4000:4000"
@@ -25,4 +28,4 @@ services:
       - NODE_ENV=development
       - SERVER_PORT=4000
     volumes:
-      - ./fdm-monster/media/:/app/media
+      - ./fdm-monster/media/:/media

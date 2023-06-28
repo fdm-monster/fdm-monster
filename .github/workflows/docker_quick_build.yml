@@ -1,10 +1,7 @@
 name: Docker
 on:
   pull_request:
-  push:
-    branches:
-      - 'main'
-      - 'develop'
+  workflow_dispatch:
 jobs:
   meta:
     runs-on: ubuntu-latest

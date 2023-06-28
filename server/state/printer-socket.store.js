@@ -4,11 +4,6 @@ const { printerEvents } = require("../constants/event.constants");
 
 class PrinterSocketStore {
   /**
-   * @private
-   * @type {PrinterService}
-   */
-  printerService;
-  /**
    * @type {SocketIoGateway}
    */
   socketIoGateway;
@@ -91,7 +86,7 @@ class PrinterSocketStore {
       try {
         await this.handlePrinterCreated({ printer: doc });
       } catch (e) {
-        this.logger.error("SocketFactory failed to construct new OctoPrint socket.", errorSummary(e));
+        this.logger.error("PrinterSocketStore failed to construct new OctoPrint socket.", errorSummary(e));
       }
     }
 
@@ -133,7 +128,7 @@ class PrinterSocketStore {
     const apiStates = {};
     for (const socket of Object.values(this.printerSocketAdaptersById)) {
       try {
-        if (socket.needsReath()) {
+        if (socket.needsReauth()) {
           reauthRequested++;
           await socket.reauthSession();
         }
