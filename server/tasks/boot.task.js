@@ -87,6 +87,7 @@ class BootTask {
     // To cope with retries after failures we register this task - disabled
     this.#taskManagerService.registerJobOrTask(this.#serverTasks.SERVER_BOOT_TASK);
 
+    this.#logger.log("Running boot task once.");
     await this.run();
   }
 
