@@ -57,7 +57,7 @@ class PrinterWebsocketRestoreTask {
 
       // Often due to USB disconnect, not interesting to reconnect unless we perform an API call for verification
       if (
-        (!socket.apiState === API_STATE.unset && !socket.lastMessageReceivedTimestamp) ||
+        (socket.apiState !== API_STATE.unset && !socket.lastMessageReceivedTimestamp) ||
         Date.now() - socket.lastMessageReceivedTimestamp > 10 * 1000
       ) {
         silentSocketIds.push(socket.printerId);

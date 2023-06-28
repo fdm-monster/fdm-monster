@@ -143,7 +143,7 @@ class OctoPrintSockIoAdapter extends WebsocketAdapter {
     return this.socketState === SOCKET_STATE.unopened;
   }
 
-  needsReath() {
+  needsReauth() {
     return this.reauthRequired;
   }
 
@@ -195,8 +195,7 @@ class OctoPrintSockIoAdapter extends WebsocketAdapter {
    * @returns {Promise<void>}
    */
   async setupSocketSession() {
-    this.setSocketState(SOCKET_STATE.unopened);
-    this.setApiState(API_STATE.unset);
+    this.resetSocketState();
     this.sessionDto = await this.octoPrintApiService
       .login(this.loginDto)
       .then((r) => {
