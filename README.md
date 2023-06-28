@@ -85,7 +85,7 @@ These are the people involved in the project:
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Dumnersm580"><img src="https://avatars.githubusercontent.com/u/80608783?v=4?s=80" width="80px;" alt="Dumnersm580"/><br /><sub><b>Dumnersm580</b></sub></a><br /><a href="https://github.com/fdm-monster/fdm-monster/commits?author=Dumnersm580" title="Documentation">📖</a> <a href="#ideas-Dumnersm580" title="Ideas, Planning, & Feedback">🤔</a></td>
     </tr>
     <tr>
-      <td align="center" valign="top" width="14.28%"><a href="http://www.tophattwaffle.com"><img src="https://avatars.githubusercontent.com/u/6774125?v=4?s=80" width="80px;" alt="tophattwaffle"/><br /><sub><b>tophattwaffle</b></sub></a><br /><a href="https://github.com/fdm-monster/fdm-monster/issues?q=author%3Atophattwaffle" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://www.tophattwaffle.com"><img src="https://avatars.githubusercontent.com/u/6774125?v=4?s=80" width="80px;" alt="tophattwaffle"/><br /><sub><b>tophattwaffle</b></sub></a><br /><a href="https://github.com/fdm-monster/fdm-monster/issues?q=author%3Atophattwaffle" title="Bug reports">🐛</a> <a href="#ideas-tophattwaffle" title="Ideas, Planning, & Feedback">🤔</a></td>
     </tr>
   </tbody>
 </table>
