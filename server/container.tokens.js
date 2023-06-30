@@ -25,6 +25,7 @@ const DITokens = {
   githubService: "githubService",
   octokitService: "octokitService",
   clientBundleService: "clientBundleService",
+  logDumpService: "logDumpService",
   userTokenService: "userTokenService",
   userService: "userService",
   permissionService: "permissionService",
