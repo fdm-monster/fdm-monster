@@ -29,6 +29,7 @@ class ServerPrivateController {
   printerSocketStore;
   yamlService;
   multerService;
+  logDumpService;
 
   constructor({
     serverUpdateService,
@@ -36,6 +37,7 @@ class ServerPrivateController {
     printerCache,
     printerService,
     clientBundleService,
+    logDumpService,
     printerSocketStore,
     yamlService,
     multerService,
@@ -43,6 +45,7 @@ class ServerPrivateController {
     this.#serverReleaseService = serverReleaseService;
     this.#serverUpdateService = serverUpdateService;
     this.clientBundleService = clientBundleService;
+    this.logDumpService = logDumpService;
     this.printerSocketStore = printerSocketStore;
     this.printerCache = printerCache;
     this.printerService = printerService;
@@ -104,7 +107,7 @@ class ServerPrivateController {
     const readStream = new PassThrough();
     readStream.end(fileContents);
 
-    const fileName = "export-fdm-monster-" + Date.now() + ".yaml";
+    const fileName = `export-${AppConstants.serverRepoName}-` + Date.now() + ".yaml";
     res.set("Content-disposition", "attachment; filename=" + fileName);
     res.set("Content-Type", "text/plain");
     readStream.pipe(res);
@@ -115,6 +118,12 @@ class ServerPrivateController {
     const printerIds = printers.map((p) => p.id);
     await this.printerService.deleteMany(printerIds);
     res.send();
+  }
+
+  async dumpLogZips(req, res) {
+    const filePath = await this.logDumpService.dumpZip();
+    res.sendFile(filePath);
+
   }
 }
 
@@ -129,4 +138,6 @@ module.exports = createController(ServerPrivateController)
   .post("/import-printers-floors-yaml", "importPrintersAndFloorsYaml")
   .post("/git-update", "pullGitUpdates")
   .post("/restart", "restartServer")
+  .get("/dump-fdm-monster-logs", "dumpLogZips")
+  .post("/dump-fdm-monster-logs", "dumpLogZips")
   .delete("/delete-all-printers", "deleteAllPrinters");
