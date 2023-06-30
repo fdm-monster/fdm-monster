@@ -10,6 +10,8 @@ const AppConstants = {
 
   // @Deprecated: old storage path
   defaultFileStorageFolder: "./media",
+  defaultLogsFolder: "./media/logs",
+  defaultLogZipsFolder: "./media/log-zips",
   // New place for all downloads, files etc
   defaultClientBundleStorage: "./media/client-dist",
   defaultClientBundleZipsStorage: "./media/client-dist-zips",
