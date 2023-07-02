@@ -1535,9 +1535,9 @@
     tslib "^2.5.0"
 
 "@smithy/middleware-endpoint@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@smithy/middleware-endpoint/-/middleware-endpoint-1.0.1.tgz#c1d047bd9de815cd08c5c9de7ed026754f68ac2c"
-  integrity sha512-XEHPq73PPm0sXul//5MRC8JKDwHTaNjV3myd9FJ5YoUT+QMJ27gqiwwAMVASJ6vC4ELHzgQdmoTZxVX83Jx17w==
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@smithy/middleware-endpoint/-/middleware-endpoint-1.0.2.tgz#6e8913e90bad7d73dc57f2a3dadfb0c4f045c9b5"
+  integrity sha512-F3CyXgjtDI4quGFkDmVNytt6KMwlzzeMxtopk6Edue4uKdKcMC1vUmoRS5xTbFzKDDp4XwpnEV7FshPaL3eCPw==
   dependencies:
     "@smithy/middleware-serde" "^1.0.1"
     "@smithy/types" "^1.1.0"
@@ -1546,15 +1546,15 @@
     tslib "^2.5.0"
 
 "@smithy/middleware-retry@^1.0.1", "@smithy/middleware-retry@^1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@smithy/middleware-retry/-/middleware-retry-1.0.2.tgz#2033f82fdbd210efe70f5a35b761b13fe570d7b2"
-  integrity sha512-Osj+XsqJ67RuX1MLc3+7LDtlRz8eNVqr/Pim9yPAjRa03Xberu6ST3a3oV3NqRpcUgMTifxuaKVIciuPE3rTWA==
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@smithy/middleware-retry/-/middleware-retry-1.0.3.tgz#95cac65da17a313c836c9f4a83aa348aad8625da"
+  integrity sha512-ZRsjG8adtxQ456FULPqPFmWtrW44Fq8IgdQvQB+rC2RSho3OUzS+TiEIwb5Zs6rf2IoewITKtfdtsUZcxXO0ng==
   dependencies:
     "@smithy/protocol-http" "^1.1.0"
-    "@smithy/service-error-classification" "^1.0.1"
+    "@smithy/service-error-classification" "^1.0.2"
     "@smithy/types" "^1.1.0"
     "@smithy/util-middleware" "^1.0.1"
-    "@smithy/util-retry" "^1.0.2"
+    "@smithy/util-retry" "^1.0.3"
     tslib "^2.5.0"
     uuid "^8.3.2"
 
@@ -1627,10 +1627,10 @@
     "@smithy/types" "^1.1.0"
     tslib "^2.5.0"
 
-"@smithy/service-error-classification@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@smithy/service-error-classification/-/service-error-classification-1.0.1.tgz#a8528087b5ac02ef7e0cd2190bed8399b78efa47"
-  integrity sha512-EcFVOHFv4YZHUrJ6161tpPKXNlQsTAQKoKorODxuOQW1my14mgoyiiMXrlnSMaYRF//oaONYfFOQ2EMAUTC5DQ==
+"@smithy/service-error-classification@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@smithy/service-error-classification/-/service-error-classification-1.0.2.tgz#9145b66b7935fbbde43e53c82853fc96a448a552"
+  integrity sha512-Q5CCuzYL5FGo6Rr/O+lZxXHm2hrRgbmMn8MgyjqZUWZg20COg20DuNtIbho2iht6CoB7jOpmpBqhWizLlzUZgg==
 
 "@smithy/shared-ini-file-loader@^1.0.1":
   version "1.0.1"
@@ -1753,12 +1753,12 @@
   dependencies:
     tslib "^2.5.0"
 
-"@smithy/util-retry@^1.0.1", "@smithy/util-retry@^1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@smithy/util-retry/-/util-retry-1.0.2.tgz#404ab400d3a1027acd3649b031f4108c148f10ba"
-  integrity sha512-LqzAy1QzeAHpSZpsd2LtKZRbco7F5gF+Zpoa4TuuFq9f+CGmH6OuTCIN3I13LPEBa4zs2AgvGnXljvMbUw5WGw==
+"@smithy/util-retry@^1.0.1", "@smithy/util-retry@^1.0.2", "@smithy/util-retry@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@smithy/util-retry/-/util-retry-1.0.3.tgz#c453af2ff19d0a51c9ea96f1d5d18625570f8073"
+  integrity sha512-gYQnZDD8I2XJFspVwUISyukjPWVikTzKR0IdG8hCWYPTpeULFl1o6yzXlT5SL63TBkuEYl0R1/93cdNtMiNnoA==
   dependencies:
-    "@smithy/service-error-classification" "^1.0.1"
+    "@smithy/service-error-classification" "^1.0.2"
     tslib "^2.5.0"
 
 "@smithy/util-stream@^1.0.1":
@@ -1923,9 +1923,9 @@
     "@types/node" "*"
 
 "@types/node@*", "@types/node@>=10.0.0":
-  version "20.3.2"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.3.2.tgz#fa6a90f2600e052a03c18b8cb3fd83dd4e599898"
-  integrity sha512-vOBLVQeCQfIcF/2Y7eKFTqrMnizK5lRNQ7ykML/5RuwVXVWxYkgwS7xbt4B6fKCUPgbSL5FSsjHQpaGQP/dQmw==
+  version "20.3.3"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.3.3.tgz#329842940042d2b280897150e023e604d11657d6"
+  integrity sha512-wheIYdr4NYML61AjC8MKj/2jrR/kDQri/CIpVoZwldwhnIrD/j9jIU5bJ8yBKuB2VhpFV7Ab6G2XkBjv9r9Zzw==
 
 "@types/prettier@^2.1.5":
   version "2.7.3"
@@ -2903,9 +2903,9 @@ ee-first@1.1.1:
   integrity sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==
 
 electron-to-chromium@^1.4.431:
-  version "1.4.446"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.446.tgz#c23fbc7884bfe43088d5eb908a858dbb35ab190b"
-  integrity sha512-4Gnw7ztEQ/E0eOt5JWfPn9jjeupfUlKoeW5ETKP9nLdWj+4spFoS3Stj19fqlKIaX28UQs0fNX+uKEyoLCBnkw==
+  version "1.4.447"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.447.tgz#ac69d3a7b3713e9ae94bb30ba65c3114e4d76a38"
+  integrity sha512-sxX0LXh+uL41hSJsujAN86PjhrV/6c79XmpY0TvjZStV6VxIgarf8SRkUoUTuYmFcZQTemsoqo8qXOGw5npWfw==
 
 emittery@^0.13.1:
   version "0.13.1"
@@ -3357,9 +3357,9 @@ fast-diff@^1.1.2:
   integrity sha512-VxPP4NqbUjj6MaAOafWeUn2cXWLcCtljklUtZf0Ind4XQ+QPtmA0b18zZy0jIQx+ExRVCR/ZQpBmik5lXshNsw==
 
 fast-glob@^3.2.12:
-  version "3.2.12"
-  resolved "https://registry.yarnpkg.com/fast-glob/-/fast-glob-3.2.12.tgz#7f39ec99c2e6ab030337142da9e0c18f37afae80"
-  integrity sha512-DVj4CQIYYow0BlaelwK1pHl5n5cRSJfM60UA0zK891sVInoPri2Ekj7+e1CT3/3qxXenpI+nBBmQAcJPJgaj4w==
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/fast-glob/-/fast-glob-3.3.0.tgz#7c40cb491e1e2ed5664749e87bfb516dbe8727c0"
+  integrity sha512-ChDuvbOypPuNjO8yIDf36x7BlZX1smcUMTTcyoIjycexOxd6DFsKsg21qVBzEmr3G7fUKIRy2/psii+CIUt7FA==
   dependencies:
     "@nodelib/fs.stat" "^2.0.2"
     "@nodelib/fs.walk" "^1.2.3"
