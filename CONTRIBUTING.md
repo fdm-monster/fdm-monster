@@ -36,7 +36,7 @@ FDM Monster currently consists of two active repositories:
 
 - [FDM Monster](https://github.com/fdm-monster/fdm-monster) - the server
 - [FDM Monster Client](https://github.com/fdm-monster/fdm-monster-client) - the client UI
-- [FDM Connector](https://github.com/fdm-monster/fdm-connector) - the OctoPrint plugin
+- [FDM Connector](https://github.com/fdm-monster/fdm-connector) - the OctoPrint plugin (not in use yet)
 
 ### Design decisions
 
@@ -53,8 +53,7 @@ Client design
 - Its web client is written using Typescript and Vue2
 - We intend to switch to Vue3 once Vuetify3 is released and stable
 - Vuetify is currently the package for Material UI and components
-- We use vue-class-component for maintaining class Vue components
-- Vuex serves as store and state management
+- Pinia serves as store and state management
 
 Are you missing specific details here? Do create a Pull-Request.
 
@@ -85,7 +84,7 @@ Explain the problem and include additional details to help maintainers reproduce
 - **Provide specific examples to demonstrate the steps**. Include links to files or GitHub projects, or copy/pasteable snippets, which you use in those examples. If you're providing snippets in the issue, use [Markdown code blocks](https://help.github.com/articles/markdown-basics/#multiple-lines).
 - **Describe the behavior you observed after following the steps** and point out what exactly is the problem with that behavior.
 - **Explain which behavior you expected to see instead and why.**
-- **Include screenshots and animated GIFs** which show you following the described steps and clearly demonstrate the problem. You can use [OBS Studio](https://obsproject.com/) to capture the screen or you can use [this tool](https://www.cockos.com/licecap/) to record GIFs on macOS and Windows, and [this tool](https://github.com/colinkeenan/silentcast) or [this tool](https://github.com/GNOME/byzanz) on Linux.
+- **Include screenshots and animated GIFs** which show you following the described steps and clearly demonstrate the problem. You can use [OBS Studio](https://obsproject.com/) to capture the screen or you can use [this tool](https://www.cockos.com/licecap/) to record GIFs on macOS and Windows.
 - **If you're reporting that FDM Monster crashed**, include the `logs` subfolder contents (note that this might contain privacy-sensitive information).
 - **If the problem is related to performance, responsiveness/sluggishness or memory**, include a CPU/RAM usage screenshot with your report (Task Manager, htop, etc.).
 - **If the problem wasn't triggered by a specific action**, describe what you were doing before the problem happened and what action you think might have caused this.
