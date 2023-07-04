@@ -36,7 +36,7 @@ FDM Monster currently consists of two active repositories:
 
 - [FDM Monster](https://github.com/fdm-monster/fdm-monster) - the server
 - [FDM Monster Client](https://github.com/fdm-monster/fdm-monster-client) - the client UI
-- [FDM Connector](https://github.com/fdm-monster/fdm-connector) - the OctoPrint plugin
+- [FDM Connector](https://github.com/fdm-monster/fdm-connector) - the OctoPrint plugin (not in use yet)
 
 ### Design decisions
 
