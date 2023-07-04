@@ -28,7 +28,7 @@ const AppConstants = {
   clientRepoName: "fdm-monster-client",
   serverRepoName: "fdm-monster",
   orgName: "fdm-monster",
-  defaultClientMinimum: "1.2.4",
+  defaultClientMinimum: "1.2.5",
   serverPath: "./",
 
   influxUrl: "INFLUX_URL",

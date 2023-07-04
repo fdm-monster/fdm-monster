@@ -62,6 +62,10 @@ class ServerPublicController {
         available: true,
         version: 1,
       },
+      logDumpZip: {
+        available: true,
+        version: 1,
+      },
     });
   }
 

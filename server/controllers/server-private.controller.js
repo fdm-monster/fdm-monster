@@ -123,7 +123,6 @@ class ServerPrivateController {
   async dumpLogZips(req, res) {
     const filePath = await this.logDumpService.dumpZip();
     res.sendFile(filePath);
-
   }
 }
 
