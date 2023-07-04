@@ -56,7 +56,7 @@ class KeyDiffCache {
   }
 
   /**
-   * @protected
+   * @public
    * @param {string} key
    * @returns {Promise<T>}
    */
