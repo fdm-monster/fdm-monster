@@ -13,7 +13,7 @@ The grid settings influence how many printers are shown in the grid.
 You can adjust the amount of rows and columns, as well as enable large tile mode.
 Both types of settings can be changed on the fly, without restarting the server.
 
-![Image](../../images/settings-grid-settings.png)
+![img.png](grid_settings.png)
 
 ## Grid Rows and Columns
 
@@ -26,4 +26,4 @@ The large tile mode can be enabled by clicking the toggle button.
 When enabled, the grid will show large tiles instead of small tiles.
 In large tile mode, the grid will show fewer printers, but more information about each printer.
 
-![Image](../../images/settings-grid-settings.png)
+![img.png](grid_settings_largetilemode.png)
