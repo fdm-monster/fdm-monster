@@ -29,13 +29,62 @@ class BatchCallService {
    */
   printerEventsCache;
   filesStore;
+  /**
+   * @type {PrinterService}
+   */
+  printerService;
 
-  constructor({ octoPrintApiService, printerCache, printerEventsCache, printerSocketStore, filesStore }) {
+  constructor({ octoPrintApiService, printerCache, printerEventsCache, printerSocketStore, filesStore, printerService }) {
     this.octoPrintApiService = octoPrintApiService;
     this.printerCache = printerCache;
     this.printerEventsCache = printerEventsCache;
     this.printerSocketStore = printerSocketStore;
     this.filesStore = filesStore;
+    this.printerService = printerService;
+  }
+
+  /**
+   * @param {string[]} printerIds
+   * @param {boolean} enabled
+   * @returns {void}
+   */
+  async batchTogglePrintersEnabled(printerIds, enabled) {
+    const promises = [];
+    for (const printerId of printerIds) {
+      let promise = Promise.resolve();
+      const printerDto = await this.printerCache.getValue(printerId);
+      if (!printerDto) continue;
+
+      const time = Date.now();
+      if (enabled) {
+        // If disabled, but not in maintenance, enable the printer
+        if (!printerDto.enabled && !printerDto.disabledReason?.length) {
+          promise = this.printerService
+            .updateEnabled(printerId, true)
+            .then(() => {
+              return { success: true, printerId, time: Date.now() - time };
+            })
+            .catch((e) => {
+              return { failure: true, error: e.message, printerId, time: Date.now() - time };
+            });
+        }
+      } else {
+        // If enabled, disable the printer
+        if (printerDto.enabled) {
+          promise = this.printerService
+            .updateEnabled(printerId, false)
+            .then(() => {
+              return { success: true, printerId, time: Date.now() - time };
+            })
+            .catch((e) => {
+              return { failure: true, error: e.message, printerId, time: Date.now() - time };
+            });
+        }
+      }
+      promises.push(promise);
+    }
+
+    return await Promise.all(promises);
   }
 
   /**
@@ -81,10 +130,9 @@ class BatchCallService {
     const promises = [];
     for (const printerId of printerIds) {
       const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
-      const currentFilePath = await this.printerEventsCache.getPrinterSocketEvents(printerId)?.current?.job?.file?.path;
 
       // TODO test this
-      let reprintPath = currentFilePath;
+      let reprintPath = await this.printerEventsCache.getPrinterSocketEvents(printerId)?.current?.job?.file?.path;
       if (!reprintPath?.length) {
         const files = await this.filesStore.getFiles(printerId)?.files;
         if (files?.length) {

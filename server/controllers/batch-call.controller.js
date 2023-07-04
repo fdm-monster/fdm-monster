@@ -1,5 +1,5 @@
 const { validateInput } = require("../handlers/validators");
-const { batchPrinterRules } = require("./validation/printer-files-controller.validation");
+const { batchPrinterRules, batchPrintersEnabledRules } = require("./validation/batch-controller.validation");
 const { createController } = require("awilix-express");
 const { AppConstants } = require("../server.constants");
 const { authenticate, authorizeRoles } = require("../middleware/authenticate");
@@ -23,14 +23,19 @@ class BatchCallController {
 
   async batchConnectSocket(req, res) {
     const { printerIds } = await validateInput(req.body, batchPrinterRules);
-    const results = await this.batchCallService.batchConnectSocket(printerIds);
-    res.send(results);
+    await this.batchCallService.batchConnectSocket(printerIds);
+    res.send({ });
   }
-
 
   async batchReprintFiles(req, res) {
     const { printerIds } = await validateInput(req.body, batchPrinterRules);
     const results = await this.batchCallService.batchReprintCalls(printerIds);
+    res.send(results);
+  }
+
+  async batchTogglePrintersEnabled(req, res) {
+    const { printerIds, enabled } = await validateInput(req.body, batchPrintersEnabledRules);
+    const results = await this.batchCallService.batchTogglePrintersEnabled(printerIds, enabled);
     res.send(results);
   }
 }
@@ -40,4 +45,5 @@ module.exports = createController(BatchCallController)
   .before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR])])
   .post("/connect/usb", "batchConnectUsb")
   .post("/connect/socket", "batchConnectSocket")
-  .post("/reprint", "batchReprintFiles");
+  .post("/reprint", "batchReprintFiles")
+  .post("/toggle-enabled", "batchTogglePrintersEnabled");

@@ -23,11 +23,6 @@ const fileUploadCommandsRules = {
   print: "required|boolean",
 };
 
-const batchPrinterRules = {
-  printerIds: "required|array",
-  "printerIds.*": "required|mongoId",
-};
-
 const selectAndPrintFileRules = {
   filePath: "required|string",
   print: "required|boolean",
@@ -48,5 +43,4 @@ module.exports = {
   moveFileOrFolderRules,
   fileUploadCommandsRules,
   getFileRules,
-  batchPrinterRules,
 };

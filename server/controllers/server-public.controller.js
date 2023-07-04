@@ -66,6 +66,10 @@ class ServerPublicController {
         available: true,
         version: 1,
       },
+      batchTogglePrinterEnabled: {
+        available: true,
+        version: 1,
+      },
     });
   }
 
