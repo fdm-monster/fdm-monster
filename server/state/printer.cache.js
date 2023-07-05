@@ -157,6 +157,7 @@ class PrinterCache extends KeyDiffCache {
     const p = map(printerDoc);
     p.printerName = p.settingsAppearance.name;
     delete p.settingsAppearance;
+    delete p.fileList;
     return p;
   }
 }
