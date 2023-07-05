@@ -24,6 +24,7 @@ services:
     ports:
       - "4000:4000"
     environment:
+#      - MONGO=mongodb://<username>:<password>@mongodb:27017/fdm-monster?authSource=admin
       - MONGO=mongodb://mongodb:27017/fdm-monster?readPreference=primary&ssl=false
       - NODE_ENV=development
       - SERVER_PORT=4000
