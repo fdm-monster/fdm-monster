@@ -51,9 +51,9 @@ services:
     container_name: mongodb
     environment:
       # MongoDB with authentication (optional)
-#      MONGO_INITDB_ROOT_USERNAME: YOUR_ROOT_NAME
-#      MONGO_INITDB_ROOT_PASSWORD: YOUR_ROOT_PASSWORD
-      MONGO_INITDB_DATABASE: fdm-monster
+#      - MONGO_INITDB_ROOT_USERNAME=YOUR_ROOT_NAME
+#      - MONGO_INITDB_ROOT_PASSWORD=YOUR_ROOT_PASSWORD
+      - MONGO_INITDB_DATABASE=fdm-monster
     ports:
       - "28017:27017"
     volumes:
