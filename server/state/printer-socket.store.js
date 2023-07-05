@@ -127,11 +127,14 @@ class PrinterSocketStore {
     const socketStates = {};
     const apiStates = {};
     const promisesReauth = [];
+    const failedSocketsReauth = [];
     for (const socket of Object.values(this.printerSocketAdaptersById)) {
       try {
         if (socket.needsReauth()) {
           reauthRequested++;
-          const promise = socket.reauthSession();
+          const promise = socket.reauthSession().catch((_) => {
+            failedSocketsReauth.push(socket.printerId);
+          });
           promisesReauth.push(promise);
         }
       } catch (e) {
@@ -145,6 +148,7 @@ class PrinterSocketStore {
     await Promise.all(promisesReauth);
 
     const promisesOpenSocket = [];
+    const failedSocketReopened = [];
     for (const socket of Object.values(this.printerSocketAdaptersById)) {
       try {
         if (socket.needsSetup() || socket.needsReopen()) {
@@ -156,9 +160,14 @@ class PrinterSocketStore {
             );
           }
           socketSetupRequested++;
-          const promise = socket.setupSocketSession().then(() => {
-            socket.open();
-          });
+          const promise = socket
+            .setupSocketSession()
+            .then(() => {
+              socket.open();
+            })
+            .catch((_) => {
+              failedSocketReopened.push(socket.printerId);
+            });
           promisesOpenSocket.push(promise);
         }
       } catch (e) {
@@ -180,6 +189,8 @@ class PrinterSocketStore {
 
     return {
       reauth: reauthRequested,
+      failedSocketReopened,
+      failedSocketsReauth,
       socketSetup: socketSetupRequested,
       socket: socketStates,
       api: apiStates,
