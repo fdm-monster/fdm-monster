@@ -23,36 +23,32 @@ class PrinterFilesController {
   /**
    * @type {FilesStore}
    */
-  #filesStore;
+  filesStore;
   /**
    * @type {SettingsStore}
    */
-  #settingsStore;
+  settingsStore;
   /**
    * @type {OctoPrintApiService}
    */
-  #octoPrintApiService;
+  octoPrintApiService;
   /**
    * @type {BatchCallService}
    */
   batchCallService;
   /**
-   * @type {PrinterSocketStore}
-   */
-  #printerSocketStore;
-  /**
    * @type {MulterService}
    */
-  #multerService;
+  multerService;
   /**
    * @type {PrinterFileCleanTask}
    */
-  #printerFileCleanTask;
+  printerFileCleanTask;
 
   /**
    * @type {LoggerService}
    */
-  #logger;
+  logger;
 
   constructor({
     filesStore,
@@ -64,14 +60,14 @@ class PrinterFilesController {
     loggerFactory,
     multerService,
   }) {
-    this.#filesStore = filesStore;
-    this.#settingsStore = settingsStore;
-    this.#printerFileCleanTask = printerFileCleanTask;
-    this.#octoPrintApiService = octoPrintApiService;
+    this.filesStore = filesStore;
+    this.settingsStore = settingsStore;
+    this.printerFileCleanTask = printerFileCleanTask;
+    this.octoPrintApiService = octoPrintApiService;
     this.batchCallService = batchCallService;
-    this.#printerSocketStore = printerSocketStore;
-    this.#multerService = multerService;
-    this.#logger = loggerFactory("Server-API");
+    this.printerSocketStore = printerSocketStore;
+    this.multerService = multerService;
+    this.logger = loggerFactory("Server-API");
   }
 
   #statusResponse(res, response) {
@@ -80,7 +76,7 @@ class PrinterFilesController {
   }
 
   getTrackedUploads(req, res) {
-    const sessions = this.#multerService.getSessions();
+    const sessions = this.multerService.getSessions();
     res.send(sessions);
   }
 
@@ -88,8 +84,8 @@ class PrinterFilesController {
     const { currentPrinterId } = getScopedPrinter(req);
     const { recursive } = await validateInput(req.query, getFilesRules);
 
-    this.#logger.log("Refreshing file storage by eager load");
-    const response = await this.#filesStore.eagerLoadPrinterFiles(currentPrinterId, recursive);
+    this.logger.log("Refreshing file storage by eager load");
+    const response = await this.filesStore.eagerLoadPrinterFiles(currentPrinterId, recursive);
     this.#statusResponse(res, response);
   }
 
@@ -102,28 +98,28 @@ class PrinterFilesController {
   async getFilesCache(req, res) {
     const { currentPrinter } = getScopedPrinter(req);
 
-    const filesCache = await this.#filesStore.getFiles(currentPrinter.id);
+    const filesCache = await this.filesStore.getFiles(currentPrinter.id);
     res.send(filesCache);
   }
 
   async clearPrinterFiles(req, res) {
     const { currentPrinterId, printerLogin } = getScopedPrinter(req);
 
-    const nonRecursiveFiles = await this.#octoPrintApiService.getFiles(printerLogin, false);
+    const nonRecursiveFiles = await this.octoPrintApiService.getFiles(printerLogin, false);
 
     const failedFiles = [];
     const succeededFiles = [];
 
     for (let file of nonRecursiveFiles.files) {
       try {
-        await this.#octoPrintApiService.deleteFileOrFolder(printerLogin, file.path);
+        await this.octoPrintApiService.deleteFileOrFolder(printerLogin, file.path);
         succeededFiles.push(file);
       } catch (e) {
         failedFiles.push(file);
       }
     }
 
-    await this.#filesStore.purgePrinterFiles(currentPrinterId);
+    await this.filesStore.purgePrinterFiles(currentPrinterId);
 
     res.send({
       failedFiles,
@@ -132,7 +128,7 @@ class PrinterFilesController {
   }
 
   async purgeIndexedFiles(req, res) {
-    await this.#filesStore.purgeFiles();
+    await this.filesStore.purgeFiles();
 
     res.send();
   }
@@ -141,7 +137,7 @@ class PrinterFilesController {
     const { printerLogin } = getScopedPrinter(req);
     const { filePath: path, destination } = await validateMiddleware(req, moveFileOrFolderRules);
 
-    const result = await this.#octoPrintApiService.moveFileOrFolder(printerLogin, path, destination);
+    const result = await this.octoPrintApiService.moveFileOrFolder(printerLogin, path, destination);
 
     // TODO Update file storage
 
@@ -152,7 +148,7 @@ class PrinterFilesController {
     const { printerLogin } = getScopedPrinter(req);
     const { path, foldername } = await validateMiddleware(req, createFolderRules);
 
-    const result = await this.#octoPrintApiService.createFolder(printerLogin, path, foldername);
+    const result = await this.octoPrintApiService.createFolder(printerLogin, path, foldername);
 
     // TODO Update file storage
 
@@ -163,10 +159,10 @@ class PrinterFilesController {
     const { currentPrinterId, printerLogin } = getScopedPrinter(req);
     const { path } = await validateInput(req.query, getFileRules);
 
-    const result = await this.#octoPrintApiService.deleteFileOrFolder(printerLogin, path);
+    const result = await this.octoPrintApiService.deleteFileOrFolder(printerLogin, path);
 
-    await this.#filesStore.deleteFile(currentPrinterId, path, false);
-    this.#logger.log(`File reference removed, printerId ${currentPrinterId}`, path);
+    await this.filesStore.deleteFile(currentPrinterId, path, false);
+    this.logger.log(`File reference removed, printerId ${currentPrinterId}`, path);
 
     res.send(result);
   }
@@ -187,9 +183,9 @@ class PrinterFilesController {
     const { currentPrinterId, printerLogin } = getScopedPrinter(req);
     const { filePath: path, print } = await validateInput(req.body, selectAndPrintFileRules);
 
-    const result = await this.#octoPrintApiService.selectPrintFile(printerLogin, path, print);
+    const result = await this.octoPrintApiService.selectPrintFile(printerLogin, path, print);
 
-    await this.#filesStore.setExistingFileForPrint(currentPrinterId, path);
+    await this.filesStore.setExistingFileForPrint(currentPrinterId, path);
     res.send(result);
   }
 
@@ -197,7 +193,7 @@ class PrinterFilesController {
     const { printerLogin, currentPrinterId } = getScopedPrinter(req);
     const {} = await validateInput(req.query, uploadFileRules);
 
-    const files = await this.#multerService.multerLoadFileAsync(req, res, ".gcode", true);
+    const files = await this.multerService.multerLoadFileAsync(req, res, ".gcode", true);
 
     if (!files?.length) {
       throw new ValidationException({
@@ -215,13 +211,13 @@ class PrinterFilesController {
     const uploadedFile = files[0];
 
     // Perform specific file clean if configured
-    const fileCleanEnabled = this.#settingsStore.isPreUploadFileCleanEnabled();
+    const fileCleanEnabled = this.settingsStore.isPreUploadFileCleanEnabled();
     if (fileCleanEnabled) {
-      await this.#printerFileCleanTask.cleanPrinterFiles(currentPrinterId);
+      await this.printerFileCleanTask.cleanPrinterFiles(currentPrinterId);
     }
 
-    const token = this.#multerService.startTrackingSession(files);
-    const response = await this.#octoPrintApiService.uploadFileAsMultiPart(
+    const token = this.multerService.startTrackingSession(files);
+    const response = await this.octoPrintApiService.uploadFileAsMultiPart(
       printerLogin,
       uploadedFile,
       {
@@ -233,7 +229,7 @@ class PrinterFilesController {
 
     if (response.success !== false) {
       const newOrUpdatedFile = response.files.local;
-      await this.#filesStore.appendOrSetPrinterFile(currentPrinterId, newOrUpdatedFile);
+      await this.filesStore.appendOrSetPrinterFile(currentPrinterId, newOrUpdatedFile);
     }
 
     res.send(response);
@@ -266,7 +262,7 @@ class PrinterFilesController {
     }
 
     const stream = fs.createReadStream(localLocation);
-    const response = await this.#octoPrintApiService.uploadFileAsMultiPart(printerLogin, stream, {
+    const response = await this.octoPrintApiService.uploadFileAsMultiPart(printerLogin, stream, {
       select,
       print,
     });
@@ -274,7 +270,7 @@ class PrinterFilesController {
     // TODO update file cache with files store
     if (response.success !== false) {
       const newOrUpdatedFile = response.files.local;
-      await this.#filesStore.appendOrSetPrinterFile(currentPrinterId, newOrUpdatedFile);
+      await this.filesStore.appendOrSetPrinterFile(currentPrinterId, newOrUpdatedFile);
     }
 
     res.send(response);
