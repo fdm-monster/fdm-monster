@@ -19,7 +19,7 @@ Please note that we cannot support custom scenarios or setups. Therefore, it is 
 
 In the next steps we will guide you through the process of running FDM Monster with Docker Compose.
 
-### Step 1) Selecting a FDM Monster image
+### Step 1) FDM Monster image and version tag
 We provide the `davidzwa/fdm-monster` image. This image requires you to run a MongoDB service, MongoDB Atlas (cloud offering) or a MongoDB docker container (see compose file below).
 Find it on [Docker Hub](https://hub.docker.com/r/davidzwa/fdm-monster/tags).
 
@@ -32,36 +32,48 @@ There are multiple tags available for the `davidzwa/fdm-monster` image.
 - `x.y.z-1234` - A specific version of FDM Monster with a specific build number. For example, `1.4.0-1234`. These are development versions and are not recommended for production use.
 
 ### Step 2) Create a docker-compose.yml file
-To run a Docker Compose stack, create a file named `docker-compose.yml` and use the following contents (or look at [docker-compose.yml](../../docker-compose.yml)):
+To run a Docker Compose stack, create a file named `docker-compose.yml` and use the file contents presented below. Note that an option has been added for adding MongoDB authentication. 
+If you choose not to use authentication, you can remove the `MONGO_INITDB_ROOT_USERNAME` and `MONGO_INITDB_ROOT_PASSWORD` environment variables.
+In that case you should leave out the `<username>:<password>@` part of the `MONGO` environment variable. 
+
+{: .warning }
+> It's important to protect your MongoDB database with authentication. If you choose not to use authentication, you should at least use a firewall to protect your database.
+> Do not simply expose your database over the internet without any protection! You have been warned.
+
+There is also a development (`NODE_ENV=development`) compose file here: [docker-compose.yml](../../docker-compose.yml)):
 
 ```yaml
-version: '3.4' 
+version: '3.4'
 
 services:
   mongodb:
     image: mongo:latest
     container_name: mongodb
     environment:
-      MONGO_INITDB_DATABASE: fdm-monster
+      # MongoDB with authentication (optional)
+#      - MONGO_INITDB_ROOT_USERNAME=YOUR_ROOT_NAME
+#      - MONGO_INITDB_ROOT_PASSWORD=YOUR_ROOT_PASSWORD
+      - MONGO_INITDB_DATABASE=fdm-monster
     ports:
-     # HOST:CONTAINER
-    - "28017:27017"
+      - "28017:27017"
     volumes:
-    - ./mongodb-data:/data/db
-    - ./mongoconfig:/data/configdb
+      - ./mongodb-data:/data/db
+      - ./mongoconfig:/data/configdb
     restart: unless-stopped
 
   fdm-monster:
-    container_name: fdm-monster    
+    container_name: fdm-monster
     image: davidzwa/fdm-monster:latest
     restart: unless-stopped
     ports:
-    - "4000:4000"
+      - "4000:4000"
     environment:
-    - MONGO=mongodb://mongodb:27017/fdm-monster?authSource=admin
+      # MongoDB with authentication (optional) - see MONGO_INITDB_ROOT_USERNAME and MONGO_INITDB_ROOT_PASSWORD above
+#      - MONGO=mongodb://<username>:<password>@mongodb:27017/fdm-monster?authSource=admin
+      # MongoDB without authentication
+      - MONGO=mongodb://mongodb:27017/fdm-monster?authSource=admin
     volumes:
-    # Volumes as local relative folders (validate with 'docker-compose config')
-    - ./fdm-monster/media:/media
+      - ./fdm-monster/media:/media
 ```
 _An example docker-compose.yml file with the mongodb and fdm-monster services in one stack._
 

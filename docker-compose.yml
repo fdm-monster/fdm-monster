@@ -6,7 +6,10 @@ services:
     image: mongo:latest
     container_name: mongodb
     environment:
-      MONGO_INITDB_DATABASE: fdm-monster
+      # MongoDB with authentication (optional)
+#      - MONGO_INITDB_ROOT_USERNAME=YOUR_ROOT_NAME
+#      - MONGO_INITDB_ROOT_PASSWORD=YOUR_ROOT_PASSWORD
+      - MONGO_INITDB_DATABASE=fdm-monster
     ports:
       - "21111:27017"
     volumes:
@@ -24,6 +27,7 @@ services:
     ports:
       - "4000:4000"
     environment:
+#      - MONGO=mongodb://<username>:<password>@mongodb:27017/fdm-monster?authSource=admin
       - MONGO=mongodb://mongodb:27017/fdm-monster?readPreference=primary&ssl=false
       - NODE_ENV=development
       - SERVER_PORT=4000
