@@ -126,11 +126,13 @@ class PrinterSocketStore {
     let socketSetupRequested = 0;
     const socketStates = {};
     const apiStates = {};
+    const promisesReauth = [];
     for (const socket of Object.values(this.printerSocketAdaptersById)) {
       try {
         if (socket.needsReauth()) {
           reauthRequested++;
-          await socket.reauthSession();
+          const promise = socket.reauthSession();
+          promisesReauth.push(promise);
         }
       } catch (e) {
         if (this.settingsStore.getServerSettings().debugSettings?.debugSocketSetup) {
@@ -138,7 +140,12 @@ class PrinterSocketStore {
         }
         captureException(e);
       }
+    }
 
+    await Promise.all(promisesReauth);
+
+    const promisesOpenSocket = [];
+    for (const socket of Object.values(this.printerSocketAdaptersById)) {
       try {
         if (socket.needsSetup() || socket.needsReopen()) {
           if (this.settingsStore.getServerSettings().debugSettings?.debugSocketSetup) {
@@ -149,8 +156,10 @@ class PrinterSocketStore {
             );
           }
           socketSetupRequested++;
-          await socket.setupSocketSession();
-          socket.open();
+          const promise = socket.setupSocketSession().then(() => {
+            socket.open();
+          });
+          promisesOpenSocket.push(promise);
         }
       } catch (e) {
         if (this.settingsStore.getServerSettings().debugSettings?.debugSocketSetup) {
@@ -166,6 +175,8 @@ class PrinterSocketStore {
       const valApi = apiStates[keyApi];
       apiStates[keyApi] = valApi ? valApi + 1 : 1;
     }
+
+    await Promise.all(promisesOpenSocket);
 
     return {
       reauth: reauthRequested,
