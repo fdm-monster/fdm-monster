@@ -64,7 +64,7 @@ Please join the discord, but stay professional and proactive!
 
 ## Contributors ✨
 
-These are the people involved in the project:
+These are the people involved in the project. Find the meaning of the emoji keys [here](https://allcontributors.org/docs/en/emoji-key).
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-8-orange.svg?style=flat-square)](#contributors-)
