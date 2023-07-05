@@ -244,10 +244,10 @@ class OctoPrintSockIoAdapter extends WebsocketAdapter {
       (e) => {
         const status = e.response?.status;
         if (status === HttpStatusCode.FORBIDDEN) {
-          this.setApiState(API_STATE.authFail, false);
+          this.setApiState(API_STATE.authFail);
           this.setSocketState(SOCKET_STATE.aborted);
         } else {
-          this.setApiState(API_STATE.authFail, true);
+          this.setApiState(API_STATE.authFail);
           this.setSocketState(SOCKET_STATE.aborted);
         }
         if (

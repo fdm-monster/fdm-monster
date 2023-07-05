@@ -71,6 +71,7 @@ const PrinterSchema = new Schema({
     },
     required: false,
   },
+  // Deprecated in v1.5.0
   fileList: {
     type: Object,
     default: {
