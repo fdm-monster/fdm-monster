@@ -20,12 +20,7 @@ folder: [Google Drive folder MonsterPi images](https://drive.google.com/drive/fo
 **MonsterPi 0.2.2** can be downloaded from Github Releases: [MonsterPi 0.2.2 release](https://github.com/fdm-monster/MonsterPi/releases/tag/0.2.2).
 Please unzip the file before flashing it to your SD card.
 
-<details>
-<summary>Older versions of MonsterPi</summary>
-
 Older **MonsterPi releases** can be downloaded Github Releases: [MonsterPi releases](https://github.com/fdm-monster/MonsterPi/releases). 
-
-</details>
 
 ## Installing MonsterPi
 
