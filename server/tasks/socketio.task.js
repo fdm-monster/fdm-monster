@@ -1,7 +1,6 @@
-const { byteCount } = require("../utils/benchmark.util");
 const { IO_MESSAGES } = require("../state/socket-io.gateway");
 const { socketIoConnectedEvent } = require("../constants/event.constants");
-const { sizeKb, sizeKB, formatKB } = require("../utils/metric.utils");
+const { sizeKB, formatKB } = require("../utils/metric.utils");
 
 class SocketIoTask {
   /**
