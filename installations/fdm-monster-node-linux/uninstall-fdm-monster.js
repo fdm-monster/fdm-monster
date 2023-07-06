@@ -9,7 +9,7 @@ const { Service } = require('node-linux');
 const { join } = require("path");
 
 // Create a new service object
-const rootPath = join(__dirname, "/pi/fdm-monster/server/");
+const rootPath = join("../../server/");
 const svc = new Service({
   name: 'FDM Monster',
   description: "The 3D Printer Farm server for managing your 100+ OctoPrints printers.",
