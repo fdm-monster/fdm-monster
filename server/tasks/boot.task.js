@@ -6,9 +6,9 @@ const MongooseError = require("mongoose/lib/error/mongooseError");
 const { ROLES } = require("../constants/authorization.constants");
 
 class BootTask {
-  #logger;
-  #taskManagerService;
-  #serverTasks;
+  logger;
+  taskManagerService;
+  serverTasks;
   /**
    * @type {SettingsStore}
    */
@@ -66,7 +66,7 @@ class BootTask {
     pluginFirmwareUpdateService,
     clientBundleService,
   }) {
-    this.#serverTasks = serverTasks;
+    this.serverTasks = serverTasks;
     this.settingsService = settingsService;
     this.settingsStore = settingsStore;
     this.multerService = multerService;
@@ -75,19 +75,19 @@ class BootTask {
     this.permissionService = permissionService;
     this.roleService = roleService;
     this.userService = userService;
-    this.#taskManagerService = taskManagerService;
+    this.taskManagerService = taskManagerService;
     this.pluginRepositoryCache = pluginRepositoryCache;
     this.floorStore = floorStore;
     this.pluginFirmwareUpdateService = pluginFirmwareUpdateService;
-    this.#logger = loggerFactory(BootTask.name);
+    this.logger = loggerFactory(BootTask.name);
     this.clientBundleService = clientBundleService;
   }
 
   async runOnce() {
     // To cope with retries after failures we register this task - disabled
-    this.#taskManagerService.registerJobOrTask(this.#serverTasks.SERVER_BOOT_TASK);
+    this.taskManagerService.registerJobOrTask(this.serverTasks.SERVER_BOOT_TASK);
 
-    this.#logger.log("Running boot task once.");
+    this.logger.log("Running boot task once.");
     await this.run();
   }
 
@@ -101,42 +101,42 @@ class BootTask {
         if (!e.message.includes("Can't call `openUri()` on an active connection with different connection strings.")) {
           // We are not in a test
           if (e.message.includes("ECONNREFUSED")) {
-            this.#logger.error("Database connection timed-out. Retrying in 5000.");
+            this.logger.error("Database connection timed-out. Retrying in 5000.");
           }
           else {
-            this.#logger.error(`Database connection error: ${e.message}`);
+            this.logger.error(`Database connection error: ${e.message}`);
           }
-          this.#taskManagerService.scheduleDisabledJob(DITokens.bootTask, false);
+          this.taskManagerService.scheduleDisabledJob(DITokens.bootTask, false);
           return;
         }
       }
     }
 
-    this.#logger.log("Loading Server settings.");
+    this.logger.log("Loading Server settings.");
     await this.settingsStore.loadSettings();
 
-    this.#logger.log("Loading data cache and storage folders.");
+    this.logger.log("Loading data cache and storage folders.");
     await this.multerService.clearUploadsFolder();
     await this.printerSocketStore.loadPrinterSockets(); // New sockets
     await this.filesStore.loadFilesStore();
     await this.floorStore.loadStore();
 
-    this.#logger.log("Synchronizing user permission and roles definition");
+    this.logger.log("Synchronizing user permission and roles definition");
     await this.permissionService.syncPermissions();
     await this.roleService.syncRoles();
     await this.ensureAdminUserExists();
 
     if (process.env.SAFEMODE_ENABLED === "true") {
-      this.#logger.warn("Starting in safe mode due to SAFEMODE_ENABLED");
+      this.logger.warn("Starting in safe mode due to SAFEMODE_ENABLED");
     }
     else {
-      this.#serverTasks.BOOT_TASKS.forEach((task) => {
-        this.#taskManagerService.registerJobOrTask(task);
+      this.serverTasks.BOOT_TASKS.forEach((task) => {
+        this.taskManagerService.registerJobOrTask(task);
       });
     }
 
     // Success so we disable this task
-    this.#taskManagerService.disableJob(DITokens.bootTask, false);
+    this.taskManagerService.disableJob(DITokens.bootTask, false);
   }
 
   async createConnection() {
@@ -155,7 +155,7 @@ class BootTask {
         password: "fdm-root",
         roles: [adminRole.id],
       });
-      this.#logger.log("Created admin account as it was missing. Please consult the documentation for credentials.");
+      this.logger.log("Created admin account as it was missing. Please consult the documentation for credentials.");
     }
   }
 

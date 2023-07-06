@@ -10,11 +10,11 @@ class PrinterWebsocketTask {
   /**
    * @type {OctoPrintApiService}
    */
-  #octoPrintService;
+  octoPrintApiService;
   /**
    * @type {TaskManagerService}
    */
-  #taskManagerService;
+  taskManagerService;
 
   /**
    * @type {LoggerService}
@@ -24,9 +24,9 @@ class PrinterWebsocketTask {
   constructor({ printerSocketStore, octoPrintApiService, settingsStore, taskManagerService, loggerFactory }) {
     this.printerSocketStore = printerSocketStore;
     this.settingsStore = settingsStore;
-    this.#octoPrintService = octoPrintApiService;
-    this.#taskManagerService = taskManagerService;
-    this.logger = loggerFactory("Printer-Websocket-Task");
+    this.octoPrintApiService = octoPrintApiService;
+    this.taskManagerService = taskManagerService;
+    this.logger = loggerFactory(PrinterWebsocketTask.name);
   }
 
   async run() {
