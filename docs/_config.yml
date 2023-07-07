@@ -41,3 +41,7 @@ callouts:
   warning:
     title: Warning
     color: red
+  note:
+    title: Note
+    opacity: 0.15
+    color: yellow
