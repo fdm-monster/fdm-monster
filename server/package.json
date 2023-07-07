@@ -71,7 +71,7 @@
     "octokit": "2.1.0",
     "passport": "0.6.0",
     "passport-local": "1.0.0",
-    "semver": "7.5.3",
+    "semver": "7.5.4",
     "simple-git": "3.19.1",
     "socket.io": "4.7.1",
     "toad-scheduler": "3.0.0",
