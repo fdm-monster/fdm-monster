@@ -2,12 +2,16 @@ title: FDM Monster
 description: FDM Monster Official Documentation
 search_enabled: true
 search.button: true
+
+baseurl: "/"
 url: "https://docs.fdm-monster.net"
 remote_theme: pmarsceill/just-the-docs
 color_scheme: "docs"
 aux_links:
   "GitHub":
     - "https://github.com/fdm-monster/fdm-monster"
+  "Demo":
+    - "https://demo.fdm-monster.net"
   "Main site":
     - "https://fdm-monster.net"
   "Discord":
