@@ -4,6 +4,7 @@ search_enabled: true
 search.button: true
 url: "https://docs.fdm-monster.net"
 remote_theme: pmarsceill/just-the-docs
+color_scheme: "docs"
 aux_links:
   "FDM Monster GitHub":
     - "https://github.com/fdm-monster/fdm-monster"
