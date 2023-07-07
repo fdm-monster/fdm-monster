@@ -16,6 +16,7 @@ Alternatively, and most commonly applied, the bundle is verified, downloaded, an
 ## Triggering Manual Update
 
 To update the FDM Monster client bundle manually, navigate to the Help page and click on the **VISIT UPGRADE SETTINGS** button.
+
 ![Screenshot of the Help page with the UPDATE CLIENT button highlighted](../images/5-software-upgrade.png)
 
 This will open the Software Upgrade page, where you can select the client version and click the **UPGRADE CLIENT** button to trigger the update.

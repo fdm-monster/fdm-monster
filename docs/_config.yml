@@ -27,3 +27,8 @@ plugins:
   - jemoji
   - jekyll-sitemap
   - jekyll-last-modified-at
+
+callouts:
+  warning:
+    title: Warning
+    color: red
