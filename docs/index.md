@@ -16,19 +16,19 @@ Please choose an installation type below to get started.
 **Skill level required: low**
 
 Raspberry Pi install using MonsterPi. 
-Read the [Setting up MonsterPi](guides/monsterpi.md) chapter for installing the MonsterPi Raspberry Pi image using Raspberry Pi imager.
+Read the [Setting up MonsterPi](installations/monsterpi.md) chapter for installing the MonsterPi Raspberry Pi image using Raspberry Pi imager.
 
 ## Getting started - Docker Compose
 **Skill level required: low**
 
 Docker-compose installation for both Windows and Linux.
-Look at the docker-compose instructions [Docker Compose](guides/docker_compose.md)
+Look at the docker-compose instructions [Docker Compose](installations/docker_compose.md)
 
 ## Getting started - Windows Service
 **Skill level required: medium**
 
 Windows service with `node-windows`.
-Look at the [Windows Service](guides/windows_service.md) section.
+Look at the [Windows Service](installations/windows_service.md) section.
 
 ## Getting started - Linux Service
 **Skill level required: medium**
@@ -36,7 +36,7 @@ Look at the [Windows Service](guides/windows_service.md) section.
 > :warning: **This page is work in progress!**
 
 Linux service with `node-linux`.
-Look at the [Linux Service](guides/linux_service.md) section.
+Look at the [Linux Service](installations/linux_service.md) section.
 
 # Development Setup
 Please visit the [Development Setup](development_setup/development_setup.md) section.
