@@ -14,16 +14,16 @@ Connect 100+ OctoPrint instances and manage your 3D Printing Farm with FDM Monst
 
 ![Image](./images/server-running.png)
 
-[Get Started](/installations){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 }
-
 Welcome to the FDM Monster documentation. You should find all the documentation required to setup your own FDM Monster
 server here.
 Please choose an installation type below to get started.
 
+[Get Started](/installations){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 }
+
 ## MonsterPi (Raspberry Pi image)
 
 {: .note }
-**Skill level required: low**
+> Skill level required: **low**
 
 Click the button below to learn
 how to install the MonsterPi Raspberry Pi image using Raspberry Pi imager.
@@ -33,7 +33,7 @@ how to install the MonsterPi Raspberry Pi image using Raspberry Pi imager.
 ## Docker Compose
 
 {: .note }
-**Skill level required: low**
+> Skill level required: **low**
 
 Click the button below to learn more about the docker-compose installation. 
 The docker-compose installation is suitable for both Windows and Linux.
@@ -43,7 +43,7 @@ The docker-compose installation is suitable for both Windows and Linux.
 ## Windows Service
 
 {: .note }
-> Skill level required: medium
+> Skill level required: **medium**
 
 Click the button below to get started with FDM Monster as a Windows Service, using `node-windows` under the hood.
 
@@ -52,9 +52,8 @@ Click the button below to get started with FDM Monster as a Windows Service, usi
 ## Linux Service
 
 {: .note }
-**Skill level required: medium**
-
-> :warning: **This page is work in progress!**
+> Skill level required: **high**
+> :warning: This page is work in progress!
 
 Click the button below to get started with FDM Monster as a Windows Service, using `node-linux` under the hood.
 
