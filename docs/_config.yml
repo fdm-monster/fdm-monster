@@ -6,13 +6,17 @@ url: "https://docs.fdm-monster.net"
 remote_theme: pmarsceill/just-the-docs
 color_scheme: "docs"
 aux_links:
-  "FDM Monster GitHub":
+  "GitHub":
     - "https://github.com/fdm-monster/fdm-monster"
-  "FDM Monster Home":
+  "Main site":
     - "https://fdm-monster.net"
-  "FDM Monster Discord":
+  "Discord":
     - "https://discord.gg/mwA8uP8CMc"
 aux_links_new_tab: true
+
+# Back to top link
+back_to_top: true
+back_to_top_text: "Back to top"
 
 footer_content: "Copyright &copy; 2023-now David Zwart. Distributed by an <a href=\"https://github.com/fdm-monster/fdm-monster/blob/main/LICENSE\">GNU AFFERO GENERAL PUBLIC LICENSE v3.0.</a>"
 

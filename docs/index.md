@@ -3,14 +3,15 @@ layout: default
 title: Home
 nav_order: 1
 permalink: /
-last_modified_at: 2023-07-04T21:50:00+02:00
+last_modified_at: 2023-07-07T08:00:00+02:00
 ---
 
-# FDM Monster - Connect 100+ OctoPrint instances
+# FDM Monster
 Welcome to the FDM Monster documentation. You should find all the documentation required to setup your own FDM Monster server here. 
 Please choose an installation type below to get started.
 
 ![Image](./images/server-running.png)
+_Connect 100+ OctoPrint instances and manage your 3D Printing Farm with FDM Monster!_
 
 ## Getting started - MonsterPi
 **Skill level required: low**
