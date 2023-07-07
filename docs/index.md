@@ -7,31 +7,42 @@ last_modified_at: 2023-07-07T08:00:00+02:00
 ---
 
 # FDM Monster
-Welcome to the FDM Monster documentation. You should find all the documentation required to setup your own FDM Monster server here. 
+
+{: .fs-9 }
+Connect 100+ OctoPrint instances and manage your 3D Printing Farm with FDM Monster!
+{: .fs-6 .fw-300 }
+
+Welcome to the FDM Monster documentation. You should find all the documentation required to setup your own FDM Monster
+server here.
 Please choose an installation type below to get started.
 
 ![Image](./images/server-running.png)
-_Connect 100+ OctoPrint instances and manage your 3D Printing Farm with FDM Monster!_
 
-## Getting started - MonsterPi
+[Get Started](/installations){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 }
+
+## MonsterPi (Raspberry Pi image)
+
 **Skill level required: low**
 
-Raspberry Pi install using MonsterPi. 
-Read the [Setting up MonsterPi](installations/monsterpi.md) chapter for installing the MonsterPi Raspberry Pi image using Raspberry Pi imager.
+Click [MonsterPi](installations/monsterpi.md){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 } to learn
+how to install the MonsterPi Raspberry Pi image using Raspberry Pi imager.
 
-## Getting started - Docker Compose
+## Docker Compose
 **Skill level required: low**
 
-Docker-compose installation for both Windows and Linux.
-Look at the docker-compose instructions [Docker Compose](installations/docker_compose.md)
+Click [Docker Compose](installations/docker_compose.md){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 } 
+to learn more about the docker-compose installation. 
+The docker-compose installation is suitable for both Windows and Linux.
 
-## Getting started - Windows Service
+## Windows Service
+
 **Skill level required: medium**
 
 Windows service with `node-windows`.
 Look at the [Windows Service](installations/windows_service.md) section.
 
-## Getting started - Linux Service
+## Linux Service
+
 **Skill level required: medium**
 
 > :warning: **This page is work in progress!**
@@ -40,7 +51,9 @@ Linux service with `node-linux`.
 Look at the [Linux Service](installations/linux_service.md) section.
 
 # Development Setup
-Please visit the [Development Setup](development_setup/development_setup.md) section.
+
+Please visit the [Development Setup](development_setup) section.
 
 # Configuration and Settings
-Please visit the [Configuration](configuration/configuration.md) section.
+
+Please visit the [Configuration](configuration) section.
