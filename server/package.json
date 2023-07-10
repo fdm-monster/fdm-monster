@@ -75,7 +75,7 @@
     "simple-git": "3.19.1",
     "socket.io": "4.7.1",
     "toad-scheduler": "3.0.0",
-    "winston": "3.9.0",
+    "winston": "3.10.0",
     "ws": "8.13.0"
   },
   "devDependencies": {
