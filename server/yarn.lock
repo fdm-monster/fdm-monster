@@ -808,10 +808,10 @@
   resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.44.0.tgz#961a5903c74139390478bdc808bcde3fc45ab7af"
   integrity sha512-Ag+9YM4ocKQx9AarydN0KY2j0ErMHNIocPDrVo8zAE44xLTjEtz81OdR68/cydGtk6m6jDb5Za3r2useMzYmSw==
 
-"@fdm-monster/client@1.2.7":
-  version "1.2.7"
-  resolved "https://registry.yarnpkg.com/@fdm-monster/client/-/client-1.2.7.tgz#b10212d90d586562ffbb25647031bfc55246cd19"
-  integrity sha512-oHjrRwGLJ3rlYdFxArkPSA6NBboFeXmnjDEaVV2PdfpXpSzBiVxFIYRGnU37hZaxXdIF959xLkW1CpIliUE1ww==
+"@fdm-monster/client@1.2.8":
+  version "1.2.8"
+  resolved "https://registry.yarnpkg.com/@fdm-monster/client/-/client-1.2.8.tgz#6f6fbe6c06c553c414e39d3f7b4a7ff4d76138cd"
+  integrity sha512-Hk1f8q+yT1izJiGzegSikaafXxmUVkl9VIWeXxL1LY0A2D4+OWwWZQZLwKXQg3hZ8MdfME4d8egHzQVdvRfyow==
 
 "@humanwhocodes/config-array@^0.11.10":
   version "0.11.10"
