@@ -145,7 +145,7 @@ class YamlService {
 
   /**
    *
-   * @param printers
+   * @param upsertPrinters
    * @param comparisonStrategies array of string types
    * @returns {Promise<object>}
    */
@@ -311,7 +311,7 @@ class YamlService {
         };
 
         if (exportFloorGrid) {
-          const printers = f.printers.map((p) => {
+          dumpedFloor.printers = f.printers.map((p) => {
             const fPrinterId = p.printerId.toString();
             return {
               printerId: fPrinterId,
@@ -319,7 +319,6 @@ class YamlService {
               y: p.y,
             };
           });
-          dumpedFloor.printers = printers;
         }
 
         return dumpedFloor;
