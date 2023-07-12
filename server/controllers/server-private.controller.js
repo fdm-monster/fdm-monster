@@ -120,6 +120,11 @@ class ServerPrivateController {
     res.send();
   }
 
+  async clearLogs(req, res) {
+    const counts = await this.logDumpService.deleteOlderThanWeekAndMismatchingLogFiles();
+    res.send(counts);
+  }
+
   async dumpLogZips(req, res) {
     const filePath = await this.logDumpService.dumpZip();
     res.sendFile(filePath);
@@ -139,4 +144,5 @@ module.exports = createController(ServerPrivateController)
   .post("/restart", "restartServer")
   .get("/dump-fdm-monster-logs", "dumpLogZips")
   .post("/dump-fdm-monster-logs", "dumpLogZips")
+  .delete("/clear-outdated-fdm-monster-logs", "clearLogs")
   .delete("/delete-all-printers", "deleteAllPrinters");
