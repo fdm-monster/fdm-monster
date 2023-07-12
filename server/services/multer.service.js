@@ -1,48 +1,56 @@
 const multer = require("multer");
 const { AppConstants } = require("../server.constants");
 const { join, extname } = require("path");
-const fs = require("fs");
+const { readdirSync, existsSync, lstatSync, unlink, mkdirSync, createWriteStream } = require("fs");
 const { superRootPath } = require("../utils/fs.utils");
 
 class MulterService {
-  #fileUploadTrackerCache;
-  #httpClient;
+  fileUploadTrackerCache;
+  httpClient;
 
   constructor({ fileUploadTrackerCache, httpClient }) {
-    this.#fileUploadTrackerCache = fileUploadTrackerCache;
-    this.#httpClient = httpClient;
+    this.fileUploadTrackerCache = fileUploadTrackerCache;
+    this.httpClient = httpClient;
   }
 
-  #orderRecentFiles = (dir) => {
-    return fs
-      .readdirSync(dir)
-      .filter((file) => fs.lstatSync(join(dir, file)).isFile())
-      .map((file) => ({ file, mtime: fs.lstatSync(join(dir, file)).mtime }))
+  /**
+   * @private
+   * @param dir
+   * @returns {{file: *, mtime: Date}[]}
+   */
+  orderRecentFiles = (dir) => {
+    return readdirSync(dir)
+      .filter((file) => lstatSync(join(dir, file)).isFile())
+      .map((file) => ({ file, mtime: lstatSync(join(dir, file)).mtime }))
       .sort((a, b) => b.mtime.getTime() - a.mtime.getTime());
   };
 
-  #collectionPath(collection) {
+  /**
+   * @private
+   * @param collection
+   * @returns {string}
+   */
+  collectionPath(collection) {
     return join(superRootPath(), AppConstants.defaultFileStorageFolder, collection);
   }
 
   getNewestFile(collection) {
-    const dirPath = this.#collectionPath(collection);
-    const files = this.#orderRecentFiles(dirPath);
+    const dirPath = this.collectionPath(collection);
+    const files = this.orderRecentFiles(dirPath);
     const latestFile = files.length ? files[0] : undefined;
     return latestFile ? join(dirPath, latestFile.file) : undefined;
   }
 
   clearUploadsFolder() {
     const fileStoragePath = join(superRootPath(), AppConstants.defaultFileStorageFolder);
-    if (!fs.existsSync(fileStoragePath)) return;
+    if (!existsSync(fileStoragePath)) return;
 
-    const files = fs
-      .readdirSync(fileStoragePath, { withFileTypes: true })
+    const files = readdirSync(fileStoragePath, { withFileTypes: true })
       .filter((item) => !item.isDirectory())
       .map((item) => item.name);
 
     for (const file of files) {
-      fs.unlink(join(fileStoragePath, file), (err) => {
+      unlink(join(fileStoragePath, file), (err) => {
         /* istanbul ignore next */
         if (err) throw err;
       });
@@ -51,18 +59,18 @@ class MulterService {
 
   fileExists(downloadFilename, collection) {
     const downloadPath = join(superRootPath(), AppConstants.defaultFileStorageFolder, collection, downloadFilename);
-    return fs.existsSync(downloadPath);
+    return existsSync(downloadPath);
   }
 
   async downloadFile(downloadUrl, downloadFilename, collection) {
     const downloadFolder = join(superRootPath(), AppConstants.defaultFileStorageFolder, collection);
-    if (!fs.existsSync(downloadFolder)) {
-      fs.mkdirSync(downloadFolder, { recursive: true });
+    if (!existsSync(downloadFolder)) {
+      mkdirSync(downloadFolder, { recursive: true });
     }
     const downloadPath = join(superRootPath(), AppConstants.defaultFileStorageFolder, collection, downloadFilename);
-    const fileStream = fs.createWriteStream(downloadPath);
+    const fileStream = createWriteStream(downloadPath);
 
-    const res = await this.#httpClient.get(downloadUrl);
+    const res = await this.httpClient.get(downloadUrl);
     return await new Promise((resolve, reject) => {
       fileStream.write(res.data);
       fileStream.on("error", (err) => {
@@ -82,7 +90,7 @@ class MulterService {
     return this.getMulterFileFilter(".gcode", storeAsFile);
   }
 
-  async multerLoadFileAsync(req, res, fileExtension, storeAsFile=true) {
+  async multerLoadFileAsync(req, res, fileExtension, storeAsFile = true) {
     return await new Promise((resolve, reject) =>
       this.getMulterFileFilter(fileExtension, storeAsFile)(req, res, (err) => {
         if (err) {
@@ -115,11 +123,11 @@ class MulterService {
   }
 
   startTrackingSession(multerFile) {
-    return this.#fileUploadTrackerCache.addUploadTracker(multerFile);
+    return this.fileUploadTrackerCache.addUploadTracker(multerFile);
   }
 
   getSessions() {
-    return this.#fileUploadTrackerCache.getUploads();
+    return this.fileUploadTrackerCache.getUploads();
   }
 }
 

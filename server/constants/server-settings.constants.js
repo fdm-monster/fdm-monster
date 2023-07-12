@@ -13,7 +13,6 @@ const getDefaultServerSettings = () => ({
     debugSocketMessages: false,
     debugSocketIoBandwidth: false,
   },
-  uploadFolder: AppConstants.defaultFileStorageFolder,
   registration: true,
   whitelistEnabled: false,
   whitelistedIpAddresses: getDefaultWhitelistIpAddresses(),
@@ -30,9 +29,6 @@ const getDefaultFrontendSettings = () => ({
 const timeoutSettingKey = "timeout";
 const getDefaultTimeout = () => ({
   apiTimeout: 1000,
-  apiRetryCutoff: 10000,
-  apiRetry: 30000,
-  webSocketRetry: 5000,
 });
 
 const printerFileCleanSettingKey = "printerFileClean";
