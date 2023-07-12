@@ -4,7 +4,6 @@ const getDefaultWhitelistIpAddresses = () => ["::12", "127.0.0.1"];
 
 const serverSettingsKey = "server";
 const getDefaultServerSettings = () => ({
-  port: AppConstants.defaultServerPort,
   debugSettings: {
     debugSocketIoEvents: false,
     debugSocketReconnect: false,
