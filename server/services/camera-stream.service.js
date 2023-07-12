@@ -8,8 +8,8 @@ const createCameraStreamRules = {
   settings: "required|object",
   "settings.aspectRatio": ["required", "string", ["in", "16:9", "4:3", "1:1"]],
   "settings.rotationClockwise": "required|integer|in:0,90,180,270",
-  "settings.flipHorizontally": "required|boolean",
-  "settings.flipVertically": "required|boolean",
+  "settings.flipHorizontal": "required|boolean",
+  "settings.flipVertical": "required|boolean",
 };
 
 class CameraStreamService {
@@ -43,7 +43,9 @@ class CameraStreamService {
 
   async create(data) {
     const input = await validateInput(data, createCameraStreamRules);
-    await this.printerCache.getCachedPrinterOrThrow(input.printerId);
+    if (input.printerId) {
+      await this.printerCache.getCachedPrinterOrThrow(input.printerId);
+    }
     return this.model.create(input);
   }
 
@@ -54,7 +56,9 @@ class CameraStreamService {
   async update(id, input) {
     await this.get(id);
     const updateInput = await validateInput(input, createCameraStreamRules);
-    await this.printerCache.getCachedPrinterOrThrow(input.printerId);
+    if (input.printerId) {
+      await this.printerCache.getCachedPrinterOrThrow(input.printerId);
+    }
     await this.model.updateOne({ id }, updateInput);
     return this.get(id);
   }
