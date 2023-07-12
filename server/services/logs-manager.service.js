@@ -3,6 +3,7 @@ const { join } = require("path");
 const { superRootPath } = require("../utils/fs.utils");
 const { AppConstants } = require("../server.constants");
 const { readdirSync, unlinkSync } = require("fs");
+const { isValidDate } = require("../utils/time.utils");
 
 class LogsManagerService {
   /**
@@ -17,7 +18,8 @@ class LogsManagerService {
   async deleteOlderThanWeekAndMismatchingLogFiles() {
     this.logger.log("Cleaning log files");
     const path = join(superRootPath(), AppConstants.defaultLogsFolder);
-    const files = readdirSync(path);
+    const dirEntries = readdirSync(path, { withFileTypes: true });
+    const files = dirEntries.filter((dirent) => dirent.isFile()).map((dirent) => dirent.name);
 
     // Filter only log files that are not in the format of logs/<app-name>-<date>.log
     const startingFormat = `${AppConstants.logAppName}-`;
@@ -28,6 +30,11 @@ class LogsManagerService {
 
       const strippedFilename = f.replace(".log", "").replace(startingFormat, "");
       const date = new Date(strippedFilename);
+      if (!isValidDate(date)) {
+        this.logger.warn(`Failed to parse date from log file ${f}, removing it as outdated`);
+        return true;
+      }
+
       const now = new Date();
       const diff = now.getTime() - date.getTime();
       const diffDays = diff / (1000 * 3600 * 24);
@@ -58,7 +65,7 @@ class LogsManagerService {
       }
     }
 
-    this.logger.log(`Removed ${removedWrongFormatFilesCount + removedOutdatedFilesCount} log files`);
+    this.logger.log(`Removed ${removedWrongFormatFilesCount + removedOutdatedFilesCount} log file(s)`);
     return {
       removedWrongFormatFilesCount,
       removedOutdatedFilesCount,
