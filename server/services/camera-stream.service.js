@@ -6,7 +6,7 @@ const createCameraStreamRules = {
   printerId: "mongoId",
   streamURL: "required|httpurl",
   settings: "required|object",
-  "settings.aspectRatio": "required|string",
+  "settings.aspectRatio": ["required", "string", ["in", "16:9", "4:3", "1:1"]],
   "settings.rotationClockwise": "required|integer|in:0,90,180,270",
   "settings.flipHorizontally": "required|boolean",
   "settings.flipVertically": "required|boolean",
@@ -55,7 +55,7 @@ class CameraStreamService {
     await this.get(id);
     const updateInput = await validateInput(input, createCameraStreamRules);
     await this.printerCache.getCachedPrinterOrThrow(input.printerId);
-    await this.model.updateOne(id, updateInput);
+    await this.model.updateOne({ id }, updateInput);
     return this.get(id);
   }
 }
