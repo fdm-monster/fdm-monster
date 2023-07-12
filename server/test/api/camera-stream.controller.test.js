@@ -32,12 +32,19 @@ describe("CameraStreamController", () => {
     rotationClockwise: 0,
   };
   const defaultTestURL = "https://test.url/stream";
-  const defaultCameraStreamInput = {
-    streamURL: defaultTestURL,
+  const defaultCameraStreamInput = (url) => ({
+    streamURL: url,
     printerId: null,
     settings: defaultSettings,
-  };
-  const createTestCameraStream = async () => await request.post(listRoute).send(defaultCameraStreamInput);
+  });
+  const matchedBody = (url) => ({
+    _id: expect.any(String),
+    __v: 0,
+    streamURL: url,
+    printerId: null,
+    settings: defaultSettings,
+  });
+  const createTestCameraStream = async (url) => await request.post(listRoute).send(defaultCameraStreamInput(url));
   const deleteTestCameraStream = async (id) => await request.delete(deleteRoute(id));
 
   it("should list streams", async () => {
@@ -47,25 +54,20 @@ describe("CameraStreamController", () => {
   });
 
   it("should create stream", async () => {
-    const res = await createTestCameraStream();
-    expectOkResponse(res.statusCode, {
-      _id: expect.any(String),
-      __v: 0,
-      streamURL: defaultTestURL,
-      printerId: null,
-      settings: defaultSettings,
-    });
+    const res = await createTestCameraStream(defaultTestURL);
+    expectOkResponse(res, matchedBody(defaultTestURL));
+  });
+
+  it("should create two streams with null printerId", async () => {
+    const res = await createTestCameraStream(defaultTestURL + "2");
+    expectOkResponse(res, matchedBody(defaultTestURL + "2"));
+    const res2 = await createTestCameraStream(defaultTestURL + "3");
+    expectOkResponse(res2, matchedBody(defaultTestURL + "3"));
   });
 
   it("should create and delete stream", async () => {
-    const res = await createTestCameraStream();
-    await expectOkResponse(res, {
-      _id: expect.any(String),
-      __v: 0,
-      streamURL: defaultTestURL,
-      printerId: null,
-      settings: defaultSettings,
-    });
+    const res = await createTestCameraStream(defaultTestURL + "4");
+    await expectOkResponse(res, matchedBody(defaultTestURL + "4"));
     const deleteResponse = await deleteTestCameraStream(res.body._id);
     await expectOkResponse(deleteResponse);
   });

@@ -3,13 +3,17 @@ const { Schema, model } = require("mongoose");
 const CameraStreamSchema = new Schema({
   streamURL: {
     type: String,
+    unique: true,
     required: true,
   },
   printerId: {
     type: Schema.Types.ObjectId,
     ref: "Printer",
     required: false,
-    unique: true,
+    index: {
+      unique: true,
+      partialFilterExpression: { printerId: { $type: Schema.Types.ObjectId } },
+    },
   },
   settings: {
     type: {
