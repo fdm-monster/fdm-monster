@@ -26,18 +26,19 @@ class SettingsService {
       return defaultSettings;
     } else {
       // Perform patch of settings
-      settings = this.#migrateSettingsRuntime(settings);
+      settings = this.migrateSettingsRuntime(settings);
 
       return SettingsModel.findOneAndUpdate({ _id: settings.id }, settings, { new: true });
     }
   }
 
   /**
+   * @private
    * Patch the given settings object manually - runtime migration strategy
    * @param knownSettings
    * @returns {*}
    */
-  #migrateSettingsRuntime(knownSettings) {
+  migrateSettingsRuntime(knownSettings) {
     const doc = knownSettings; // alias _doc also works
     if (!doc[printerFileCleanSettingKey]) {
       doc[printerFileCleanSettingKey] = getDefaultPrinterFileCleanSettings();

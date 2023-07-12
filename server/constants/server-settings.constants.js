@@ -4,7 +4,6 @@ const getDefaultWhitelistIpAddresses = () => ["::12", "127.0.0.1"];
 
 const serverSettingsKey = "server";
 const getDefaultServerSettings = () => ({
-  port: AppConstants.defaultServerPort,
   debugSettings: {
     debugSocketIoEvents: false,
     debugSocketReconnect: false,
@@ -13,7 +12,6 @@ const getDefaultServerSettings = () => ({
     debugSocketMessages: false,
     debugSocketIoBandwidth: false,
   },
-  uploadFolder: AppConstants.defaultFileStorageFolder,
   registration: true,
   whitelistEnabled: false,
   whitelistedIpAddresses: getDefaultWhitelistIpAddresses(),
@@ -30,9 +28,6 @@ const getDefaultFrontendSettings = () => ({
 const timeoutSettingKey = "timeout";
 const getDefaultTimeout = () => ({
   apiTimeout: 1000,
-  apiRetryCutoff: 10000,
-  apiRetry: 30000,
-  webSocketRetry: 5000,
 });
 
 const printerFileCleanSettingKey = "printerFileClean";
