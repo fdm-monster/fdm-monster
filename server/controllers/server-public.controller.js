@@ -74,6 +74,11 @@ class ServerPublicController {
         available: true,
         version: 1,
       },
+      cameraStream: {
+        available: true,
+        version: 1,
+        subFeatures: {},
+      },
     });
   }
 
