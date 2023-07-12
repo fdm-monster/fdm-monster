@@ -16,6 +16,7 @@ const updateNameRoute = (id) => `${getRoute(id)}/name`;
 const updateFloorNumberRoute = (id) => `${getRoute(id)}/floor-number`;
 
 let request;
+let container;
 let printerSocketStore;
 
 beforeAll(async () => {

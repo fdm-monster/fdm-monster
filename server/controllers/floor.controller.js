@@ -24,18 +24,18 @@ class FloorController {
   }
 
   async updateName(req, res) {
-    const { id: groupId } = await validateInput(req.params, idRules);
+    const { id: floorId } = await validateInput(req.params, idRules);
 
     // Has internal validation
-    const floor = await this.floorStore.updateName(groupId, req.body);
+    const floor = await this.floorStore.updateName(floorId, req.body);
     res.send(floor);
   }
 
   async updateFloorNumber(req, res) {
-    const { id: groupId } = await validateInput(req.params, idRules);
+    const { id: floorId } = await validateInput(req.params, idRules);
 
     // Has internal validation
-    const floor = await this.floorStore.updateFloorNumber(groupId, req.body);
+    const floor = await this.floorStore.updateFloorNumber(floorId, req.body);
     res.send(floor);
   }
 

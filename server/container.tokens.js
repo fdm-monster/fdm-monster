@@ -31,6 +31,7 @@ const DITokens = {
   permissionService: "permissionService",
   roleService: "roleService",
   octoPrintApiService: "octoPrintApiService",
+  cameraStreamService: "cameraStreamService",
   socketFactory: "socketFactory",
   batchCallService: "batchCallService",
   pluginRepositoryCache: "pluginRepositoryCache",
