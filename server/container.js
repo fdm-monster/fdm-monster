@@ -54,7 +54,8 @@ const { PrinterCache } = require("./state/printer.cache");
 const PrinterSocketStore = require("./state/printer-socket.store");
 const { TestPrinterSocketStore } = require("./state/test-printer-socket.store");
 const { PrinterEventsCache } = require("./state/printer-events.cache");
-const { LogDumpService } = require("./services/log-dump.service");
+const { LogDumpService } = require("./services/logs-manager.service");
+const { CameraStreamService } = require("./services/camera-stream.service");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -116,6 +117,7 @@ function configureContainer() {
     [DITokens.yamlService]: asClass(YamlService),
     [DITokens.printCompletionService]: asClass(PrintCompletionService).singleton(),
     [DITokens.octoPrintApiService]: asClass(OctoPrintApiService).singleton(),
+    [DITokens.cameraStreamService]: asClass(CameraStreamService),
     [DITokens.batchCallService]: asClass(BatchCallService).singleton(),
     [DITokens.pluginFirmwareUpdateService]: asClass(PluginFirmwareUpdateService).singleton(),
 

@@ -18,8 +18,7 @@ class MonsterPiService {
 
     try {
       const contents = readFileSync(this.#fileLocation);
-      const strippedContents = contents.toString().replaceAll(" ", "");
-      this.monsterPiVersion = strippedContents;
+      this.monsterPiVersion = contents.toString().replaceAll(" ", "");
       return this.monsterPiVersion;
 
     } catch (e) {

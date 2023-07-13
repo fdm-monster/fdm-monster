@@ -1,5 +1,4 @@
-const mongoose = require("mongoose");
-const { AppConstants } = require("../server.constants");
+const { Schema, model } = require("mongoose");
 const {
   printerFileCleanSettingKey,
   serverSettingsKey,
@@ -7,7 +6,7 @@ const {
   frontendSettingKey,
 } = require("../constants/server-settings.constants");
 
-const ServerSettingsSchema = new mongoose.Schema({
+const ServerSettingsSchema = new Schema({
   [printerFileCleanSettingKey]: {
     autoRemoveOldFilesBeforeUpload: {
       type: Boolean,
@@ -26,10 +25,6 @@ const ServerSettingsSchema = new mongoose.Schema({
     },
   },
   [serverSettingsKey]: {
-    uploadFolder: {
-      type: String,
-      default: AppConstants.defaultFileStorageFolder,
-    },
     sentryDiagnosticsEnabled: {
       type: Boolean,
       default: false,
@@ -67,16 +62,12 @@ const ServerSettingsSchema = new mongoose.Schema({
         required: true,
       },
     },
-    port: {
-      type: Number,
-      default: AppConstants.defaultServerPort,
-      required: true,
-    },
     loginRequired: {
       type: Boolean,
       default: false,
       required: true,
     },
+    // TODO: Feature not fully tested/implemented yet
     whitelistEnabled: {
       type: Boolean,
       default: false,
@@ -116,24 +107,9 @@ const ServerSettingsSchema = new mongoose.Schema({
       default: 1000,
       required: true,
     },
-    apiRetryCutoff: {
-      type: Number,
-      default: 10000,
-      required: true,
-    },
-    apiRetry: {
-      type: Number,
-      default: 30000,
-      required: true,
-    },
-    webSocketRetry: {
-      type: Number,
-      default: 5000,
-      required: true,
-    },
   },
 });
 
-const ServerSettings = mongoose.model("ServerSettings", ServerSettingsSchema);
+const ServerSettings = model("ServerSettings", ServerSettingsSchema);
 
 module.exports = ServerSettings;

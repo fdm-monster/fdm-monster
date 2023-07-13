@@ -64,4 +64,4 @@ services:
       - SERVER_PORT: 4000
 ```
 
-Please continue by reading the [Docker Compose section](../guides/docker_compose.md) for more information on how to setup FDM Monster and MongoDB with docker-compose.
+Please continue by reading the [Docker Compose section](../installations/docker_compose.md) for more information on how to setup FDM Monster and MongoDB with docker-compose.

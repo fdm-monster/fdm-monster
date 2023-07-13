@@ -24,7 +24,7 @@ fi
 ts=6 # total steps
 org=fdm-monster
 repo=fdm-monster
-server_path="../fdm-monster/server/"
+server_path="../../server/"
 repo_url="https://github.com/${org}/${repo}"
 
 # Step 1) Check latest release of FDM Monster

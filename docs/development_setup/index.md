@@ -13,5 +13,3 @@ The server can be run on a Raspberry Pi, Windows, Linux or Mac.
 The client can be run on any platform that supports a modern web browser.
 
 For Developing we advise to use a Windows or Linux machine with at least 8GB of RAM and a modern CPU.
-
-Please visit the [Server Setup](./setup_server.md) section, followed by the [Client Setup](./setup_client.md) section.

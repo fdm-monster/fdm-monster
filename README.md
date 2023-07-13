@@ -67,7 +67,7 @@ Please join the discord, but stay professional and proactive!
 These are the people involved in the project. Find the meaning of the emoji keys [here](https://allcontributors.org/docs/en/emoji-key).
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-8-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-9-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
@@ -86,6 +86,7 @@ These are the people involved in the project. Find the meaning of the emoji keys
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="http://www.tophattwaffle.com"><img src="https://avatars.githubusercontent.com/u/6774125?v=4?s=80" width="80px;" alt="tophattwaffle"/><br /><sub><b>tophattwaffle</b></sub></a><br /><a href="https://github.com/fdm-monster/fdm-monster/issues?q=author%3Atophattwaffle" title="Bug reports">🐛</a> <a href="#ideas-tophattwaffle" title="Ideas, Planning, & Feedback">🤔</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/rmhenn"><img src="https://avatars.githubusercontent.com/u/22482801?v=4?s=80" width="80px;" alt="rmhenn"/><br /><sub><b>rmhenn</b></sub></a><br /><a href="#ideas-rmhenn" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/fdm-monster/fdm-monster/issues?q=author%3Armhenn" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
