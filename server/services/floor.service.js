@@ -89,7 +89,7 @@ class FloorService {
    * Stores a new floor into the database.
    * @param {Object} floor object to create.
    * @returns {Promise<Floor>}
-   * @throws {Error} If the printer floor is not correctly provided.
+   * @throws {Error} If the floor is not correctly provided.
    */
   async create(floor) {
     const validatedInput = await validateInput(floor, createFloorRules);

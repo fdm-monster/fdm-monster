@@ -128,7 +128,7 @@ the [CONTRIBUTING](CONTRIBUTING.md) file.
 - [x] 🛡️ MongoDB 5 & 6 support
 - [x] :rocket: Quick copy paste of FDM Monster printers
 - [x] 🛡️ Complete API test coverage >80% (now at 80.5%)
-- [x] :rocket: Printer Floor management
+- [x] :rocket: Floor management
 - [x] Auto-clean old OctoPrint files (opt-in and configurable) 
 - [x] :rocket: Windows and Linux Service
 - [x] Printer completion/failure tracking (with statistics page)
