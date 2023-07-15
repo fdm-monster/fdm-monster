@@ -95,9 +95,6 @@ function configureContainer() {
       // cradle.
       return new Octokit({
         auth: config.get(AppConstants.GITHUB_PAT),
-        request: {
-          fetch: require("node-fetch"),
-        },
       });
     }),
     [DITokens.clientBundleService]: asClass(ClientBundleService),
