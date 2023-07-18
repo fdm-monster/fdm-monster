@@ -82,12 +82,9 @@ class AuthService {
     };
   }
 
-  async logoutUser(userId) {
-    if (!userId) {
-      this.logger.warn("Logout called without userId");
-    }
-
-    await this.deleteRefreshTokenAndBlacklistUserId(userId);
+  async logoutUserRefreshToken(refreshToken) {
+    const userRefreshToken = await this.getValidRefreshToken(refreshToken);
+    await this.deleteRefreshTokenAndBlacklistUserId(userRefreshToken.userId);
   }
 
   async renewLoginByRefreshToken(refreshToken) {

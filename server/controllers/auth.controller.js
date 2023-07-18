@@ -44,7 +44,9 @@ class AuthController {
     return res.send({ token: idToken });
   }
 
-  logout(req, res) {
+  async logoutRefreshToken(req, res) {
+    const refreshToken = req.body.refreshToken;
+    await this.authService.logoutUserRefreshToken(refreshToken);
     res.end();
   }
 
@@ -67,4 +69,4 @@ module.exports = createController(AuthController)
   .post("/register", "register")
   .post("/login", "login")
   .post("/refresh", "refreshLogin")
-  .post("/logout", "logout");
+  .post("/logout-refresh-token", "logoutRefreshToken");
