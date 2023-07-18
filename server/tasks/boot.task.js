@@ -142,7 +142,9 @@ class BootTask {
     await this.ensureRootUserExists();
 
     const overrideRootPassword = this.configService.get(AppConstants.OVERRIDE_ROOT_PASSWORD, undefined);
-    if (overrideRootPassword?.length) {
+    if (overrideRootPassword?.length > 0 && overrideRootPassword?.length < 5) {
+      this.logger.warn("Skipping root password override, its shorter than 5 characters");
+    } else if (overrideRootPassword?.length > 0) {
       this.logger.log("Applying root password override");
       await this.applyRootPasswordOverride(overrideRootPassword);
     }
