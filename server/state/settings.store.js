@@ -96,6 +96,10 @@ class SettingsStore {
     return this.getSettings();
   }
 
+  async getLoginRequired() {
+    return this.getServerSettings().loginRequired;
+  }
+
   async setLoginRequired(enabled = true) {
     this.settings = await this.settingsService.setLoginRequired(enabled);
     return this.getSettings();

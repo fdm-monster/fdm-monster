@@ -82,6 +82,10 @@ class AuthService {
     };
   }
 
+  async logoutUserId(userId) {
+    await this.deleteRefreshTokenAndBlacklistUserId(userId);
+  }
+
   async logoutUserRefreshToken(refreshToken) {
     const userRefreshToken = await this.getValidRefreshToken(refreshToken);
     await this.deleteRefreshTokenAndBlacklistUserId(userRefreshToken.userId);
@@ -191,7 +195,12 @@ class AuthService {
    * @return {Promise<void>}
    */
   async deleteRefreshTokenAndBlacklistUserId(userId) {
-    if (!userId) return;
+    if (!userId) {
+      throw new AuthorizationError("No user id provided");
+    }
+    if (this.isBlacklisted(userId)) {
+      throw new AuthorizationError("User is blacklisted, please login again");
+    }
 
     await this.deleteRefreshTokenByUserId(userId);
     this.addBlackListEntry(userId);
@@ -226,6 +235,10 @@ class AuthService {
     if (result.rowsAffected) {
       this.logger.debug(`Removed ${result.rowsAffected} login refresh tokens`);
     }
+  }
+
+  isBlacklisted(userId) {
+    return this.blacklistedCache[userId] === true;
   }
 
   /**

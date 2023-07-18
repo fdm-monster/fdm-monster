@@ -19,13 +19,16 @@ function authorizePermission(permission) {
 
 module.exports = {
   authenticate: () =>
-    inject(({ settingsStore }) => async (req, res, next) => {
+    inject(({ settingsStore, authService }) => async (req, res, next) => {
       const serverSettings = settingsStore.getSettings();
 
       if (serverSettings && !serverSettings[serverSettingsKey]?.loginRequired) {
         return next();
       }
-      if (req.isAuthenticated()) {
+
+      // Check if a logout was called
+      const isJwtBlacklisted = await authService.isBlacklisted(req.user.id);
+      if (req.isAuthenticated() && !isJwtBlacklisted) {
         return next();
       }
 

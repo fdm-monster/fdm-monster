@@ -79,7 +79,7 @@ function configureContainer() {
     [DITokens.settingsStore]: asClass(SettingsStore).singleton(),
     [DITokens.settingsService]: asClass(SettingsService),
     [DITokens.configService]: asClass(ConfigService),
-    [DITokens.authService]: asClass(AuthService),
+    [DITokens.authService]: asClass(AuthService).singleton(),
     [DITokens.userService]: asClass(UserService),
     [DITokens.roleService]: asClass(RoleService).singleton(), // caches roles
     [DITokens.permissionService]: asClass(PermissionService).singleton(),
