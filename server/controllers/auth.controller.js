@@ -5,6 +5,7 @@ const { validateMiddleware } = require("../handlers/validators");
 const { registerUserRules } = require("./validation/user-controller.validation");
 const { logoutRefreshTokenRules } = require("./validation/auth-controller.validation");
 const { authenticate } = require("../middleware/authenticate");
+const { serverSettingsKey } = require("../constants/server-settings.constants");
 
 class AuthController {
   /**
@@ -42,6 +43,17 @@ class AuthController {
 
   async verifyLogin(req, res) {
     return res.send({ success: true });
+  }
+
+  async needsPasswordChange(req, res) {
+    const isLoginRequired = this.settingsStore.getLoginRequired();
+    if (!isLoginRequired) {
+      return res.send({ needsPasswordChange: false, authenticated: true });
+    }
+    if (req.isAuthenticated()) {
+      return res.send({ needsPasswordChange: req.user?.needsPasswordChange, authenticated: true });
+    }
+    return res.send({ authenticated: false });
   }
 
   async refreshLogin(req, res) {
@@ -90,6 +102,7 @@ module.exports = createController(AuthController)
   .post("/verify", "verifyLogin", {
     before: [authenticate()],
   })
+  .post("/needs-password-change", "needsPasswordChange")
   .post("/refresh", "refreshLogin")
   .post("/logout", "logout", {
     before: [authenticate()],

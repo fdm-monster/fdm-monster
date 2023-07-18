@@ -1,7 +1,7 @@
 require("../utils/env.utils");
 jest.mock("../utils/env.utils", () => ({
   ...jest.requireActual("../utils/env.utils"),
-  writeVariableToEnvFile: jest.fn()
+  writeVariableToEnvFile: jest.fn(),
 }));
 const supertest = require("supertest");
 const { asClass, asValue } = require("awilix");
@@ -11,6 +11,7 @@ const { setupEnvConfig } = require("../server.env");
 const AxiosMock = require("./mocks/axios.mock");
 const OctoPrintApiMock = require("./mocks/octoprint-api.mock");
 const { ROLES } = require("../constants/authorization.constants");
+const { AppConstants } = require("../server.constants");
 
 /**
  * Setup the application without hassle
@@ -26,17 +27,20 @@ async function setupTestApp(loadPrinterStore = false, mocks = undefined, quick_b
   container.register({
     [DITokens.octoPrintApiService]: asClass(OctoPrintApiMock).singleton(),
     [DITokens.httpClient]: asClass(AxiosMock).singleton(),
-    [DITokens.defaultRole]: asValue(ROLES.ADMIN)
+    [DITokens.defaultRole]: asValue(ROLES.ADMIN),
   });
 
   // Overrides get last pick
   if (mocks) container.register(mocks);
 
   // Setup
-  await container.resolve(DITokens.settingsStore).loadSettings();
+  const settingsStore = container.resolve(DITokens.settingsStore);
+  await settingsStore.loadSettings();
+
   const serverHost = container.resolve(DITokens.serverHost);
   await serverHost.boot(httpServer, quick_boot, false);
 
+  await settingsStore.setLoginRequired(false);
   await container.resolve(DITokens.permissionService).syncPermissions();
   await container.resolve(DITokens.roleService).syncRoles();
 
@@ -52,10 +56,10 @@ async function setupTestApp(loadPrinterStore = false, mocks = undefined, quick_b
     container,
     [DITokens.httpClient]: container.resolve(DITokens.httpClient),
     [DITokens.octoPrintApiService]: container.resolve(DITokens.octoPrintApiService),
-    [DITokens.taskManagerService]: container.resolve(DITokens.taskManagerService)
+    [DITokens.taskManagerService]: container.resolve(DITokens.taskManagerService),
   };
 }
 
 module.exports = {
-  setupTestApp
+  setupTestApp,
 };

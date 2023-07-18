@@ -76,7 +76,10 @@ class UserService {
   async updatePasswordUnsafe(username, newPassword) {
     const passwordHash = hashPassword(newPassword);
     const user = await this.findRawByUsername(username);
+    if (!user) throw new NotFoundException("User not found");
+
     user.passwordHash = passwordHash;
+    user.needsPasswordChange = false;
     return await user.save();
   }
 
