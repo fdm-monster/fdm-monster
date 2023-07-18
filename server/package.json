@@ -60,7 +60,7 @@
     "got": "11.8.6",
     "helmet": "7.0.0",
     "js-yaml": "4.1.0",
-    "jsonwebtoken": "9.0.0",
+    "jsonwebtoken": "9.0.1",
     "lodash": "4.17.21",
     "luxon": "3.3.0",
     "migrate-mongo": "10.0.0",
