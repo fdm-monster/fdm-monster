@@ -26,9 +26,18 @@ module.exports = {
         return next();
       }
 
+      // Check if a password change is required
+      if (req.user?.needsPasswordChange) {
+        throw new AuthenticationError("Password change required", 401);
+      }
+
       // Check if a logout was called
-      const isJwtBlacklisted = await authService.isBlacklisted(req.user.id);
-      if (req.isAuthenticated() && !isJwtBlacklisted) {
+      const isJwtBlacklisted = await authService.isBlacklisted(req.user?.id);
+      if (isJwtBlacklisted) {
+        throw new AuthenticationError("Not authenticated", 401);
+      }
+
+      if (req.isAuthenticated()) {
         return next();
       }
 
