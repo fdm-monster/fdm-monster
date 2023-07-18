@@ -56,6 +56,8 @@ const { TestPrinterSocketStore } = require("./state/test-printer-socket.store");
 const { PrinterEventsCache } = require("./state/printer-events.cache");
 const { LogDumpService } = require("./services/logs-manager.service");
 const { CameraStreamService } = require("./services/camera-stream.service");
+const { JwtService } = require("./services/authentication/jwt.service");
+const { AuthService } = require("./services/authentication/auth.service");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -77,9 +79,11 @@ function configureContainer() {
     [DITokens.settingsStore]: asClass(SettingsStore).singleton(),
     [DITokens.settingsService]: asClass(SettingsService),
     [DITokens.configService]: asClass(ConfigService),
+    [DITokens.authService]: asClass(AuthService),
     [DITokens.userService]: asClass(UserService),
     [DITokens.roleService]: asClass(RoleService).singleton(), // caches roles
     [DITokens.permissionService]: asClass(PermissionService).singleton(),
+    [DITokens.jwtService]: asClass(JwtService).singleton(),
 
     [DITokens.loggerFactory]: asFunction(LoggerFactory).transient(),
     [DITokens.taskManagerService]: asClass(TaskManagerService).singleton(),

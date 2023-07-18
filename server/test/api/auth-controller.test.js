@@ -26,7 +26,7 @@ beforeAll(async () => {
 describe("AuthController", () => {
   it("should fail login without creds", async () => {
     const response = await request.post(loginRoute).send();
-    expectInvalidResponse(response);
+    expectUnauthorizedResponse(response);
   });
 
   it("should not authorize unknown credentials", async () => {

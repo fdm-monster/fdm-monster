@@ -8,13 +8,12 @@ const cors = require("cors");
 const helmet = require("helmet");
 const { interceptDatabaseError } = require("./middleware/database");
 const { validateWhitelistedIp, interceptRoles } = require("./middleware/global.middleware");
-const passportMiddleware = require("./middleware/passport");
+const { initializePassportStrategies } = require("./middleware/passport");
 
 function setupServer() {
   const httpServer = express();
   const container = configureContainer();
-
-  passportMiddleware(passport);
+  initializePassportStrategies(passport, container);
 
   httpServer
     .use(
@@ -29,7 +28,6 @@ function setupServer() {
       })
     )
     .use(express.json({ limit: "10mb" }))
-    .use("/images", express.static("./images"))
     .use(cookieParser())
     .use(express.urlencoded({ extended: false }))
     .use(
@@ -40,7 +38,7 @@ function setupServer() {
       })
     )
     .use(passport.initialize())
-    .use(passport.session())
+    .use(passport.authenticate(["jwt", "anonymous"], { session: false }))
     .use(scopePerRequest(container))
     .use(interceptDatabaseError)
     // Global guards

@@ -20,6 +20,28 @@ const AppConstants = {
   apiRoute: "/api",
   enableClientDistAutoUpdateKey: "ENABLE_CLIENT_DIST_AUTO_UPDATE",
 
+  // Boolean string (true/false), persisted always
+  OVERRIDE_LOGIN_REQUIRED: "OVERRIDE_LOGIN_REQUIRED",
+  // String, persisted always
+  OVERRIDE_ROOT_PASSWORD: "OVERRIDE_ROOT_PASSWORD",
+  DEFAULT_ROOT_PASSWORD: "fdm-monster-root",
+  DEFAULT_ROOT_USERNAME: "root",
+  // String, persisted always
+  OVERRIDE_JWT_SECRET: "OVERRIDE_JWT_SECRET",
+  // Number, Seconds, persisted always
+  OVERRIDE_JWT_EXPIRES_IN: "OVERRIDE_JWT_EXPIRES_IN",
+  DEFAULT_JWT_EXPIRES_IN: 60 * 60, // 1 hour
+  // Number, persisted once
+  DEFAULT_REFRESH_TOKEN_ATTEMPTS: 50, // 50 attempts, 50 hours
+  // Number, Milli-seconds, persisted once
+  DEFAULT_REFRESH_TOKEN_EXPIRY: 1000 * 60 * 60 * 24 * 14, // 14 days (in ms)
+  // String, not persisted
+  OVERRIDE_JWT_ISSUER: "OVERRIDE_JWT_ISSUER",
+  DEFAULT_JWT_ISSUER: "fdm-monster-server",
+  // String, not persisted
+  OVERRIDE_JWT_AUDIENCE: "OVERRIDE_JWT_AUDIENCE",
+  DEFAULT_JWT_AUDIENCE: "fdm-monster-client",
+
   defaultTestEnv: "test",
   defaultProductionEnv: "production",
   knownEnvNames: ["development", "production", "test"],

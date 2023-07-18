@@ -1,42 +1,44 @@
-const LocalStrategy = require("passport-local").Strategy;
-const bcrypt = require("bcryptjs");
+const { Strategy: JwtStrategy, ExtractJwt } = require("passport-jwt");
+const { Strategy: AnonymousStrategy } = require("passport-anonymous");
 const User = require("../models/Auth/User.js");
-const AuthenticationError = require("passport");
+const DITokens = require("../container.tokens");
+const { AppConstants } = require("../server.constants");
 
-module.exports = function (passport) {
+/**
+ * @param {Authenticator} passport
+ * @param {AwilixContainer<any>} container
+ * @returns {Authenticator}
+ */
+function initializePassportStrategies(passport, container) {
+  const opts = {};
+  /** @type {SettingsStore} **/
+  const settingsStore = container.resolve(DITokens.settingsStore);
+  opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
+  opts.secretOrKeyProvider = async (req, token, done) => {
+    const { jwtSecret } = await settingsStore.getCredentialSettings();
+    return done(null, jwtSecret);
+  };
+  opts.audience = AppConstants.DEFAULT_JWT_AUDIENCE;
+  opts.issuer = AppConstants.DEFAULT_JWT_ISSUER;
+
   passport.use(
-    new LocalStrategy({ usernameField: "username" }, (username, password, done) => {
-      User.findOne({ username })
-        .then((user) => {
-          if (!user) {
-            return done(null, false, {
-              message: "That username is not registered"
-            });
-          }
-
-          // Match password
-          bcrypt.compare(password, user.passwordHash, (err, isMatch) => {
-            if (err) throw err;
-
-            if (isMatch) {
-              return done(null, user);
-            }
-            return done(null, false, { message: "Password incorrect" });
-          });
-        })
-        .catch((err) => {
-          throw new AuthenticationError(err);
-        });
+    new JwtStrategy(opts, function (jwt_payload, done) {
+      User.findOne({ id: jwt_payload.sub }, function (err, user) {
+        if (err) {
+          return done(err, false);
+        }
+        if (user) {
+          return done(null, user);
+        } else {
+          return done(null, false);
+        }
+      });
     })
   );
+  passport.use(new AnonymousStrategy());
+  return passport;
+}
 
-  passport.serializeUser((user, done) => {
-    done(null, user.id);
-  });
-
-  passport.deserializeUser((id, done) => {
-    User.findById(id, (err, user) => {
-      done(err, user);
-    });
-  });
+module.exports = {
+  initializePassportStrategies,
 };

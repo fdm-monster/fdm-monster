@@ -1,13 +1,14 @@
 const { Schema, model } = require("mongoose");
 const {
-  printerFileCleanSettingKey,
+  fileCleanSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
   frontendSettingKey,
+  credentialSettingsKey,
 } = require("../constants/server-settings.constants");
 
 const ServerSettingsSchema = new Schema({
-  [printerFileCleanSettingKey]: {
+  [fileCleanSettingKey]: {
     autoRemoveOldFilesBeforeUpload: {
       type: Boolean,
       default: false,
@@ -23,6 +24,39 @@ const ServerSettingsSchema = new Schema({
       default: 14,
       required: true,
     },
+  },
+  [credentialSettingsKey]: {
+    type: {
+      jwtSecret: {
+        type: String,
+        minlength: 10,
+        trim: true,
+        required: true,
+      },
+      jwtExpiresIn: {
+        type: Number,
+        required: true,
+      },
+      refreshTokenAttempts: {
+        type: Number,
+        required: true,
+      },
+      refreshTokenExpiry: {
+        type: Number,
+        required: true,
+      },
+      createdAt: {
+        type: Date,
+        default: Date.now,
+        required: true,
+      },
+      updatedAt: {
+        type: Date,
+        default: Date.now,
+        required: true,
+      },
+    },
+    required: true,
   },
   [serverSettingsKey]: {
     sentryDiagnosticsEnabled: {

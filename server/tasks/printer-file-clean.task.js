@@ -44,7 +44,7 @@ class PrinterFileCleanTask {
   }
 
   #getSettings() {
-    return this.settingsStore.getPrinterFileCleanSettings();
+    return this.settingsStore.getFileCleanSettings();
   }
 
   get #ageDaysMaxSetting() {

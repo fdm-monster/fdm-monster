@@ -4,6 +4,7 @@ const { fetchMongoDBConnectionString, runMigrations } = require("../server.env")
 const DITokens = require("../container.tokens");
 const MongooseError = require("mongoose/lib/error/mongooseError");
 const { ROLES } = require("../constants/authorization.constants");
+const { AppConstants } = require("../server.constants");
 
 class BootTask {
   logger;
@@ -48,6 +49,10 @@ class BootTask {
    * @type {ClientBundleService}
    */
   clientBundleService;
+  /**
+   * @type {ConfigService}
+   */
+  configService;
 
   constructor({
     loggerFactory,
@@ -65,6 +70,7 @@ class BootTask {
     floorStore,
     pluginFirmwareUpdateService,
     clientBundleService,
+    configService,
   }) {
     this.serverTasks = serverTasks;
     this.settingsService = settingsService;
@@ -81,6 +87,7 @@ class BootTask {
     this.pluginFirmwareUpdateService = pluginFirmwareUpdateService;
     this.logger = loggerFactory(BootTask.name);
     this.clientBundleService = clientBundleService;
+    this.configService = configService;
   }
 
   async runOnce() {
@@ -102,8 +109,7 @@ class BootTask {
           // We are not in a test
           if (e.message.includes("ECONNREFUSED")) {
             this.logger.error("Database connection timed-out. Retrying in 5000.");
-          }
-          else {
+          } else {
             this.logger.error(`Database connection error: ${e.message}`);
           }
           this.taskManagerService.scheduleDisabledJob(DITokens.bootTask, false);
@@ -112,24 +118,38 @@ class BootTask {
       }
     }
 
-    this.logger.log("Loading Server settings.");
+    this.logger.log("Loading and synchronizing Server Settings");
     await this.settingsStore.loadSettings();
+    const loginRequired = this.configService.get(AppConstants.OVERRIDE_LOGIN_REQUIRED, "false") === "true";
+    await this.settingsStore.setLoginRequired(loginRequired);
 
-    this.logger.log("Loading data cache and storage folders.");
+    const overrideJwtSecret = this.configService.get(AppConstants.OVERRIDE_JWT_SECRET, undefined);
+    const overrideJwtExpiresIn = this.configService.get(AppConstants.OVERRIDE_JWT_EXPIRES_IN, undefined);
+    await this.settingsStore.persistOptionalCredentialSettings(overrideJwtSecret, overrideJwtExpiresIn);
+
+    this.logger.log("Clearing upload folder");
     await this.multerService.clearUploadsFolder();
+    this.logger.log("Loading printer sockets");
     await this.printerSocketStore.loadPrinterSockets(); // New sockets
+    this.logger.log("Loading files store");
     await this.filesStore.loadFilesStore();
+    this.logger.log("Loading floor store");
     await this.floorStore.loadStore();
 
     this.logger.log("Synchronizing user permission and roles definition");
     await this.permissionService.syncPermissions();
     await this.roleService.syncRoles();
-    await this.ensureAdminUserExists();
+    await this.ensureRootUserExists();
+
+    const overrideRootPassword = this.configService.get(AppConstants.OVERRIDE_ROOT_PASSWORD, undefined);
+    if (overrideRootPassword?.length) {
+      this.logger.log("Applying root password override");
+      await this.applyRootPasswordOverride(overrideRootPassword);
+    }
 
     if (process.env.SAFEMODE_ENABLED === "true") {
       this.logger.warn("Starting in safe mode due to SAFEMODE_ENABLED");
-    }
-    else {
+    } else {
       this.serverTasks.BOOT_TASKS.forEach((task) => {
         this.taskManagerService.registerJobOrTask(task);
       });
@@ -145,18 +165,23 @@ class BootTask {
     });
   }
 
-  async ensureAdminUserExists() {
+  async ensureRootUserExists() {
     const adminRole = this.roleService.getRoleByName(ROLES.ADMIN);
-    const administrators = await this.userService.findByRoleId(adminRole.id);
-    if (!administrators?.length) {
+    const rootUser = await this.userService.findRawByUsername(AppConstants.DEFAULT_ROOT_USERNAME);
+    if (!rootUser) {
       await this.userService.register({
-        username: "root",
-        name: "Admin",
-        password: "fdm-root",
+        username: AppConstants.DEFAULT_ROOT_USERNAME,
+        password: AppConstants.DEFAULT_ROOT_PASSWORD,
+        needsPasswordChange: true,
         roles: [adminRole.id],
       });
-      this.logger.log("Created admin account as it was missing. Please consult the documentation for credentials.");
+      this.logger.log("Created admin account as it was missing.");
     }
+  }
+
+  async applyRootPasswordOverride(passwordOverride) {
+    await this.userService.updatePasswordUnsafe(AppConstants.DEFAULT_ROOT_USERNAME, passwordOverride);
+    this.logger.log(`Updated ${AppConstants.DEFAULT_ROOT_USERNAME} user password due to override`);
   }
 
   async migrateDatabase() {
