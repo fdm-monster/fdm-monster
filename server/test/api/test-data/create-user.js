@@ -3,39 +3,37 @@ const bcrypt = require("bcryptjs");
 
 function getUserData(username = "tester", password = "testpassword") {
   return {
-    name: "Tester",
     username,
-    password
+    password,
   };
 }
 
-async function ensureTestUserCreated(usernameIn = "test", passwordIn = "test") {
+async function ensureTestUserCreated(usernameIn = "test", passwordIn = "test", needsPasswordChange = false) {
   const foundUser = await User.findOne({ username: usernameIn });
   if (foundUser)
     return {
       id: foundUser.id,
       username: foundUser.username,
-      name: foundUser.name
     };
 
-  const { name, username, password } = getUserData(usernameIn, passwordIn);
+  const { username, password } = getUserData(usernameIn, passwordIn);
   const salt = await bcrypt.genSaltSync(10);
   const hash = await bcrypt.hash(password, salt);
 
   const user = await User.create({
-    name,
     username,
-    passwordHash: hash
+    passwordHash: hash,
+    needsPasswordChange,
   });
 
   return {
     id: user.id,
     username: user.username,
-    name: user.name
+    needsPasswordChange: user.needsPasswordChange,
   };
 }
 
 module.exports = {
   ensureTestUserCreated,
-  getUserData
+  getUserData,
 };

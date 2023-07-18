@@ -1,7 +1,11 @@
 const { InternalServerException } = require("../exceptions/runtime.exceptions");
-const { printerFileCleanSettingKey, serverSettingsKey } = require("../constants/server-settings.constants");
+const {
+  fileCleanSettingKey,
+  serverSettingsKey,
+  credentialSettingsKey,
+  frontendSettingKey, timeoutSettingKey,
+} = require("../constants/server-settings.constants");
 const Sentry = require("@sentry/node");
-const SettingsModel = require("../models/ServerSettings");
 const { isTestEnvironment } = require("../utils/env.utils");
 
 class SettingsStore {
@@ -21,7 +25,17 @@ class SettingsStore {
 
   constructor({ settingsService, loggerFactory }) {
     this.settingsService = settingsService;
-    this.logger = loggerFactory("SettingsStore");
+    this.logger = loggerFactory(SettingsStore.name);
+  }
+
+  getSettings() {
+    const settings = this.settings._doc;
+    return Object.freeze({
+      [frontendSettingKey]: settings[frontendSettingKey],
+      [serverSettingsKey]: settings[serverSettingsKey],
+      [fileCleanSettingKey]: settings[fileCleanSettingKey],
+      [timeoutSettingKey] : settings[timeoutSettingKey],
+    });
   }
 
   async loadSettings() {
@@ -30,19 +44,30 @@ class SettingsStore {
     await this.processSentryEnabled();
   }
 
+  async getCredentialSettings() {
+    return this.settings[credentialSettingsKey];
+  }
+
   async getAnonymousDiagnosticsEnabled() {
     return this.settings[serverSettingsKey].sentryDiagnosticsEnabled;
+  }
+
+  async persistOptionalCredentialSettings(overrideJwtSecret, overrideJwtExpiresIn) {
+    if (overrideJwtSecret) {
+      await this.updateCredentialSettings({
+        jwtSecret: overrideJwtSecret,
+      });
+    }
+    if (overrideJwtExpiresIn) {
+      await this.updateCredentialSettings({
+        jwtExpiresIn: overrideJwtExpiresIn,
+      });
+    }
   }
 
   isRegistrationEnabled() {
     if (!this.settings) throw new InternalServerException("Could not check server settings (server settings not loaded");
     return this.settings[serverSettingsKey].registration;
-  }
-
-  getSettings() {
-    return Object.freeze({
-      ...this.settings._doc,
-    });
   }
 
   getServerSettings() {
@@ -53,12 +78,12 @@ class SettingsStore {
    * Cross-cutting concern for file clean operation
    * @returns {*}
    */
-  getPrinterFileCleanSettings() {
-    return this.getSettings()[printerFileCleanSettingKey];
+  getFileCleanSettings() {
+    return this.getSettings()[fileCleanSettingKey];
   }
 
   isPreUploadFileCleanEnabled() {
-    return this.getSettings()[printerFileCleanSettingKey]?.autoRemoveOldFilesBeforeUpload;
+    return this.getSettings()[fileCleanSettingKey]?.autoRemoveOldFilesBeforeUpload;
   }
 
   async updateSettings(fullUpdate) {
@@ -69,6 +94,10 @@ class SettingsStore {
   async setRegistrationEnabled(enabled = true) {
     this.settings = await this.settingsService.setRegistrationEnabled(enabled);
     return this.getSettings();
+  }
+
+  async getLoginRequired() {
+    return this.getServerSettings().loginRequired;
   }
 
   async setLoginRequired(enabled = true) {
@@ -83,6 +112,11 @@ class SettingsStore {
 
   async updateServerSettings(serverSettings) {
     this.settings = await this.settingsService.updateServerSettings(serverSettings);
+    return this.getSettings();
+  }
+
+  async updateCredentialSettings(credentialSettings) {
+    this.settings = await this.settingsService.updateCredentialSettings(credentialSettings);
     return this.getSettings();
   }
 

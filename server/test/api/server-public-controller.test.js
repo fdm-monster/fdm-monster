@@ -60,8 +60,8 @@ describe("ServerPublicController", () => {
   it("should get welcome message", async function () {
     await settingsStore.setLoginRequired();
 
-    const requestCookie = await loginTestUser(request);
-    const response = await request.get(getRoute).set("Cookie", requestCookie).send();
+    const { token } = await loginTestUser(request);
+    const response = await request.get(getRoute).set("Authorization", `Bearer ${token}`).send();
     expect(response.body).toMatchObject({
       message: "Login successful. Please load the Vue app.",
     });

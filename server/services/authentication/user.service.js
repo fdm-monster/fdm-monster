@@ -1,44 +1,56 @@
 const UserModel = require("../../models/Auth/User");
-const {
-  NotFoundException,
-  InternalServerException
-} = require("../../exceptions/runtime.exceptions");
+const { NotFoundException, InternalServerException } = require("../../exceptions/runtime.exceptions");
 const { validateInput } = require("../../handlers/validators");
 const { registerUserRules } = require("../validators/user-service.validation");
 const bcrypt = require("bcryptjs");
 const { ROLES } = require("../../constants/authorization.constants");
+const { hashPassword } = require("../../utils/crypto.utils");
 
 class UserService {
-  #roleService;
+  /**
+   * @type {RoleService}
+   */
+  roleService;
 
   constructor({ roleService }) {
-    this.#roleService = roleService;
+    this.roleService = roleService;
   }
 
-  #toDto(user) {
+  /**
+   * @private
+   * @param user
+   * @returns {{createdAt, roles, name, id, username}}
+   */
+  toDto(user) {
     return {
       id: user.id,
       createdAt: user.createdAt,
       username: user.username,
       name: user.name,
-      roles: user.roles
+      roles: user.roles,
     };
   }
 
   async listUsers(limit = 10) {
     const userDocs = await UserModel.find().limit(limit);
-    return userDocs.map((u) => this.#toDto(u));
+    return userDocs.map((u) => this.toDto(u));
   }
 
-  async findByRoleId(roleId) {
+  async findRawByRoleId(roleId) {
     return UserModel.find({ roles: { $in: [roleId] } });
+  }
+
+  async findRawByUsername(username) {
+    return UserModel.findOne({
+      username,
+    });
   }
 
   async getUser(userId) {
     const user = await UserModel.findById(userId);
     if (!user) throw new NotFoundException("User not found");
 
-    return this.#toDto(user);
+    return this.toDto(user);
   }
 
   async getUserRoles(userId) {
@@ -49,10 +61,10 @@ class UserService {
   async deleteUser(userId) {
     // Validate
     const user = await this.getUser(userId);
-    const role = this.#roleService.getRoleByName(ROLES.ADMIN);
+    const role = this.roleService.getRoleByName(ROLES.ADMIN);
 
     if (user.roles.includes(role.id)) {
-      const administrators = await this.findByRoleId(role.id);
+      const administrators = await this.findRawByRoleId(role.id);
       if (administrators?.length === 1) {
         throw new InternalServerException("Cannot delete the last user with ADMIN role.");
       }
@@ -61,20 +73,27 @@ class UserService {
     await UserModel.findByIdAndDelete(user.id);
   }
 
+  async updatePasswordUnsafe(username, newPassword) {
+    const passwordHash = hashPassword(newPassword);
+    const user = await this.findRawByUsername(username);
+    if (!user) throw new NotFoundException("User not found");
+
+    user.passwordHash = passwordHash;
+    user.needsPasswordChange = false;
+    return await user.save();
+  }
+
   async register(input) {
-    const { username, name, password, roles } = await validateInput(input, registerUserRules);
+    const { username, password, roles } = await validateInput(input, registerUserRules);
 
-    const salt = await bcrypt.genSaltSync(10);
-    const hash = await bcrypt.hash(password, salt);
-
+    const passwordHash = hashPassword(password);
     const userDoc = await UserModel.create({
       username,
-      passwordHash: hash,
-      name,
-      roles
+      passwordHash,
+      roles,
     });
 
-    return this.#toDto(userDoc);
+    return this.toDto(userDoc);
   }
 }
 

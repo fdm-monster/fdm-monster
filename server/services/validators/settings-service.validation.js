@@ -1,7 +1,7 @@
 const {
-  printerFileCleanSettingKey,
+  fileCleanSettingKey,
   frontendSettingKey,
-  serverSettingsKey,
+  serverSettingsKey, credentialSettingsKey,
 } = require("../../constants/server-settings.constants");
 
 const serverSettingsUpdateRules = {
@@ -16,10 +16,10 @@ const settingsUpdateRules = {
   [serverSettingsKey]: "object",
   [`${serverSettingsKey}.registration`]: "boolean",
   [`${serverSettingsKey}.loginRequired`]: "boolean",
-  [printerFileCleanSettingKey]: "object",
-  [`${printerFileCleanSettingKey}.autoRemoveOldFilesBeforeUpload`]: "boolean",
-  [`${printerFileCleanSettingKey}.autoRemoveOldFilesAtBoot`]: "boolean",
-  [`${printerFileCleanSettingKey}.autoRemoveOldFilesCriteriumDays`]: "integer|min:0",
+  [fileCleanSettingKey]: "object",
+  [`${fileCleanSettingKey}.autoRemoveOldFilesBeforeUpload`]: "boolean",
+  [`${fileCleanSettingKey}.autoRemoveOldFilesAtBoot`]: "boolean",
+  [`${fileCleanSettingKey}.autoRemoveOldFilesCriteriumDays`]: "integer|min:0",
 };
 
 const frontendSettingsUpdateRules = {
@@ -29,8 +29,17 @@ const frontendSettingsUpdateRules = {
   [`${frontendSettingKey}.largeTiles`]: "boolean",
 };
 
+const credentialSettingUpdateRules = {
+  [credentialSettingsKey]: "object",
+  [`${credentialSettingsKey}.jwtSecret`]: "required|string",
+  [`${credentialSettingsKey}.jwtExpiresIn`]: "required|integer|min:120",
+  [`${credentialSettingsKey}.refreshTokenAttempts`]: "required|integer|min:-1",
+  [`${credentialSettingsKey}.refreshTokenExpiry`]: "required|integer|min:0",
+};
+
 module.exports = {
   settingsUpdateRules,
   serverSettingsUpdateRules,
   frontendSettingsUpdateRules,
+  credentialSettingUpdateRules,
 };

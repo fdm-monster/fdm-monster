@@ -8,9 +8,9 @@ async function loginTestUser(request, usernameIn = "default", password = "testFD
   const { username } = await ensureTestUserCreated(usernameIn, password);
   const response = await request.post(loginRoute).send({ username, password });
 
-  return response.headers["set-cookie"];
+  return response.body;
 }
 
 module.exports = {
-  loginTestUser
+  loginTestUser,
 };

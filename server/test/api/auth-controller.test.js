@@ -5,7 +5,7 @@ const {
   expectOkResponse,
   expectInvalidResponse,
   expectUnauthorizedResponse,
-  expectInternalServerError
+  expectInternalServerError,
 } = require("../extensions");
 const { getUserData, ensureTestUserCreated } = require("./test-data/create-user");
 const DITokens = require("../../container.tokens");
@@ -26,7 +26,7 @@ beforeAll(async () => {
 describe("AuthController", () => {
   it("should fail login without creds", async () => {
     const response = await request.post(loginRoute).send();
-    expectInvalidResponse(response);
+    expectUnauthorizedResponse(response);
   });
 
   it("should not authorize unknown credentials", async () => {
@@ -37,12 +37,11 @@ describe("AuthController", () => {
   it("should register new user", async () => {
     const password = "registeredPassword";
 
-    const { username, name } = getUserData("default1", password);
+    const { username } = getUserData("default1", password);
     const response = await request.post(registerRoute).send({
       username,
-      name,
       password,
-      password2: password
+      password2: password,
     });
     expectOkResponse(response);
   });

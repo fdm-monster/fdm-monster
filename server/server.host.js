@@ -13,37 +13,37 @@ class ServerHost {
   /**
    * @type {LoggerService}
    */
-  #logger;
+  logger;
   /**
    * @type {BootTask}
    */
-  #bootTask;
+  bootTask;
   /**
    * @type {TaskManagerService}
    */
-  #taskManagerService;
+  taskManagerService;
   /**
    * @type {SocketIoGateway}
    */
-  #socketIoGateway;
-  #appInstance = null;
+  socketIoGateway;
+  appInstance = null;
 
   constructor({ loggerFactory, bootTask, taskManagerService, socketIoGateway }) {
-    this.#logger = loggerFactory("Server");
-    this.#bootTask = bootTask;
-    this.#taskManagerService = taskManagerService;
-    this.#socketIoGateway = socketIoGateway;
+    this.logger = loggerFactory("Server");
+    this.bootTask = bootTask;
+    this.taskManagerService = taskManagerService;
+    this.socketIoGateway = socketIoGateway;
   }
 
   async boot(app, quick_boot = false, listenRequests = true) {
     // Enforce models to be strictly applied, any unknown property will not be persisted
     mongoose.set('strictQuery', true);
 
-    this.#appInstance = app;
-    this.serveControllerRoutes(this.#appInstance);
+    this.appInstance = app;
+    this.serveControllerRoutes(this.appInstance);
 
     if (!quick_boot) {
-      await this.#bootTask.runOnce();
+      await this.bootTask.runOnce();
     }
 
     if (listenRequests) return this.httpListen();
@@ -85,7 +85,7 @@ class ServerHost {
           resource = "client-bundle";
         }
 
-        this.#logger.error(`${resource} resource at '${path}' was not found`);
+        this.logger.error(`${resource} resource at '${path}' was not found`);
 
         if (!path.startsWith("/socket.io")) {
           throw new NotFoundException(`${resource} resource was not found`, path);
@@ -102,10 +102,10 @@ class ServerHost {
     }
 
     const hostOrFqdn = "0.0.0.0";
-    const server = this.#appInstance.listen(port, hostOrFqdn, () => {
-      this.#logger.log(`Server started... open it at http://127.0.0.1:${port}`);
+    const server = this.appInstance.listen(port, hostOrFqdn, () => {
+      this.logger.log(`Server started... open it at http://127.0.0.1:${port}`);
     });
-    this.#socketIoGateway.attachServer(server);
+    this.socketIoGateway.attachServer(server);
   }
 }
 

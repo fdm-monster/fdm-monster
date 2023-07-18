@@ -5,13 +5,14 @@ const {
   serverSettingsUpdateRules,
   frontendSettingsUpdateRules,
   settingsUpdateRules,
+  credentialSettingUpdateRules,
 } = require("./validators/settings-service.validation");
 const {
-  printerFileCleanSettingKey,
-  getDefaultPrinterFileCleanSettings,
-  getDefaultWhitelistIpAddresses,
+  fileCleanSettingKey,
   serverSettingsKey,
   frontendSettingKey,
+  credentialSettingsKey,
+  timeoutSettingKey,
 } = require("../constants/server-settings.constants");
 const Sentry = require("@sentry/node");
 
@@ -40,22 +41,25 @@ class SettingsService {
    */
   migrateSettingsRuntime(knownSettings) {
     const doc = knownSettings; // alias _doc also works
-    if (!doc[printerFileCleanSettingKey]) {
-      doc[printerFileCleanSettingKey] = getDefaultPrinterFileCleanSettings();
+    if (!doc[fileCleanSettingKey]) {
+      doc[fileCleanSettingKey] = Constants.getDefaultFileCleanSettings();
     }
 
     // Server settings exist, but need updating with new ones if they don't exist.
-    if (!doc.timeout) {
-      doc.timeout = Constants.getDefaultTimeout();
+    if (!doc[timeoutSettingKey]) {
+      doc[timeoutSettingKey] = Constants.getDefaultTimeout();
     }
-    if (!doc.server) {
-      doc.server = Constants.getDefaultServerSettings();
+    if (!doc[serverSettingsKey]) {
+      doc[serverSettingsKey] = Constants.getDefaultServerSettings();
+    }
+    if (!doc[credentialSettingsKey]) {
+      doc[credentialSettingsKey] = Constants.getDefaultCredentialSettings();
     }
     if (!doc.server.whitelistedIpAddresses?.length) {
-      doc.server.whitelistedIpAddresses = getDefaultWhitelistIpAddresses();
+      doc.server.whitelistedIpAddresses = Constants.getDefaultWhitelistIpAddresses();
     }
-    if (!doc.frontend) {
-      doc.frontend = Constants.getDefaultFrontendSettings();
+    if (!doc[frontendSettingKey]) {
+      doc[frontendSettingKey] = Constants.getDefaultFrontendSettings();
     }
 
     return knownSettings;
@@ -106,6 +110,23 @@ class SettingsService {
       frontendSettingsUpdateRules
     );
     const settingsDoc = await this.getOrCreate();
+
+    return SettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, validatedInput, {
+      new: true,
+    });
+  }
+
+  async updateCredentialSettings(patchUpdate) {
+    const settingsDoc = await this.getOrCreate();
+    const credentialSettings = settingsDoc[credentialSettingsKey]._doc;
+
+    Object.assign(credentialSettings, patchUpdate);
+    const validatedInput = await validateInput(
+      {
+        [credentialSettingsKey]: credentialSettings,
+      },
+      credentialSettingUpdateRules
+    );
 
     return SettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, validatedInput, {
       new: true,

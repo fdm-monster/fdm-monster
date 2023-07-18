@@ -3,7 +3,12 @@ const { authenticate, authorizeRoles } = require("../middleware/authenticate");
 const { AppConstants } = require("../server.constants");
 const { ROLES } = require("../constants/authorization.constants");
 const { validateInput } = require("../handlers/validators");
-const { whitelistSettingRules, anonymousDiagnosticsEnabledRules, sentryDiagnosticsEnabledRules } = require("./validation/setting.validation");
+const {
+  whitelistSettingRules,
+  anonymousDiagnosticsEnabledRules,
+  sentryDiagnosticsEnabledRules,
+} = require("./validation/setting.validation");
+const { credentialSettingsKey } = require("../constants/server-settings.constants");
 
 class SettingsController {
   /**

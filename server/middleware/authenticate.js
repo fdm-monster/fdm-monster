@@ -19,12 +19,23 @@ function authorizePermission(permission) {
 
 module.exports = {
   authenticate: () =>
-    inject(({ settingsStore }) => async (req, res, next) => {
-      const serverSettings = settingsStore.getSettings();
-
-      if (serverSettings && !serverSettings[serverSettingsKey]?.loginRequired) {
+    inject(({ settingsStore, authService }) => async (req, res, next) => {
+      const isLoginRequired = await settingsStore.getLoginRequired();
+      if (!isLoginRequired) {
         return next();
       }
+
+      // Check if a password change is required
+      if (req.user?.needsPasswordChange) {
+        throw new AuthenticationError("Password change required", 401);
+      }
+
+      // Check if a logout was called
+      const isJwtBlacklisted = await authService.isBlacklisted(req.user?.id);
+      if (isJwtBlacklisted) {
+        throw new AuthenticationError("Not authenticated", 401);
+      }
+
       if (req.isAuthenticated()) {
         return next();
       }

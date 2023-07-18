@@ -3,12 +3,12 @@ const { setupTestApp } = require("../test-server");
 const { AppConstants } = require("../../server.constants");
 const { expectOkResponse } = require("../extensions");
 const {
-  printerFileCleanSettingKey,
-  getDefaultPrinterFileCleanSettings,
+  fileCleanSettingKey,
+  getDefaultFileCleanSettings,
   getDefaultSettings,
   serverSettingsKey,
   frontendSettingKey,
-  getDefaultFrontendSettings,
+  getDefaultFrontendSettings, credentialSettingsKey,
 } = require("../../constants/server-settings.constants");
 
 let request;
@@ -25,7 +25,7 @@ beforeAll(async () => {
 
 describe("SettingsController", () => {
   const newSettings = {
-    [printerFileCleanSettingKey]: {
+    [fileCleanSettingKey]: {
       autoRemoveOldFilesBeforeUpload: true,
     },
   };
@@ -33,10 +33,13 @@ describe("SettingsController", () => {
   it("should OK on GET settings", async () => {
     const response = await request.get(defaultRoute).send();
     expect(response.body).not.toBeNull();
-    expect(response.body).toMatchObject(getDefaultSettings());
+    const defaultSettings = getDefaultSettings();
+    delete defaultSettings[credentialSettingsKey];
+    expect(response.body).toMatchObject(defaultSettings);
+    expect(response.body[credentialSettingsKey]).toBeFalsy();
     expect(response.body[serverSettingsKey].registration).toBeTruthy();
     expect(response.body[frontendSettingKey]).toMatchObject(getDefaultFrontendSettings());
-    expect(response.body[printerFileCleanSettingKey]).toMatchObject(getDefaultPrinterFileCleanSettings());
+    expect(response.body[fileCleanSettingKey]).toMatchObject(getDefaultFileCleanSettings());
     expectOkResponse(response);
   });
 
