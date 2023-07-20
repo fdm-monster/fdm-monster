@@ -2,7 +2,6 @@ const {
   jsonContentType,
   contentTypeHeaderKey,
   apiKeyHeaderKey,
-  OPClientErrors,
 } = require("../constants/octoprint-service.constants");
 const { ValidationException } = require("../../../exceptions/runtime.exceptions");
 
@@ -37,7 +36,7 @@ function constructHeaders(apiKey, contentType = jsonContentType) {
  */
 function processResponse(response, options = { unwrap: true }) {
   if (options.unwrap) {
-    return response.data;
+    return response?.data;
   }
   if (options.simple) {
     return { status: response.status, data: response.data };

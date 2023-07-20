@@ -3,7 +3,6 @@ const { AppConstants } = require("../../server.constants");
 const { setupTestApp } = require("../test-server");
 const {
   expectOkResponse,
-  expectInvalidResponse,
   expectUnauthorizedResponse,
   expectInternalServerError,
 } = require("../extensions");

@@ -26,6 +26,15 @@ const updatePrinterConnectionSettingRules = {
   apiKey: `required|minLength:${UUID_LENGTH}|maxLength:${UUID_LENGTH}`,
 };
 
+const createOctoPrintBackupRules = {
+  exclude: "array",
+  "exclude.*": "string",
+};
+
+const getOctoPrintBackupRules = {
+  fileName: "required|string",
+};
+
 module.exports = {
   feedRateRules,
   flowRateRules,
@@ -33,4 +42,6 @@ module.exports = {
   updatePrinterEnabledRule,
   updatePrinterConnectionSettingRules,
   updatePrinterDisabledReasonRules,
+  createOctoPrintBackupRules,
+  getOctoPrintBackupRules,
 };

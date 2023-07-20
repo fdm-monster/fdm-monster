@@ -25,7 +25,7 @@ const stepSizeRoute = (id) => `${updateRoute(id)}/step-size`;
 const feedRateRoute = (id) => `${updateRoute(id)}/feed-rate`;
 const flowRateRoute = (id) => `${updateRoute(id)}/flow-rate`;
 const printerPluginListRoute = (id) => `${getRoute(id)}/plugin-list`;
-const restartOctoPrintRoute = (id) => `${getRoute(id)}/restart-octoprint`;
+const restartOctoPrintRoute = (id) => `${getRoute(id)}/octoprint/system/restart`;
 const serialConnectCommandRoute = (id) => `${getRoute(id)}/serial-connect`;
 const serialDisconnectCommandRoute = (id) => `${getRoute(id)}/serial-disconnect`;
 const batchRoute = `${defaultRoute}/batch`;

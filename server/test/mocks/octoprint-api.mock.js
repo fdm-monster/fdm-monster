@@ -7,11 +7,11 @@ class OctoPrintApiMock extends OctoPrintApiService {
   constructor({ settingsStore, httpClient, loggerFactory, eventEmitter2 }) {
     super({ settingsStore, httpClient, loggerFactory, eventEmitter2 });
     this.#eventEmitter2 = eventEmitter2;
-    this._logger = loggerFactory("OctoPrint-API-Service", false);
+    this.logger = loggerFactory("OctoPrint-API-Service", false);
   }
 
   storeResponse(storedResponse, storedStatusCode) {
-    this._httpClient.saveMockResponse(storedResponse, storedStatusCode);
+    this.axiosClient.saveMockResponse(storedResponse, storedStatusCode);
   }
 }
 
