@@ -33,6 +33,11 @@ class OctoPrintRoutes {
   pluginFirmwareUpdater = `${this.pluginsBase}/firmwareupdater`;
   pluginFirmwareUpdaterStatus = `${this.pluginsBase}/firmwareupdater/status`; // GET
   pluginFirmwareUpdaterFlash = `${this.pluginsBase}/firmwareupdater/flash`; // POST
+  pluginBackupIndex = `${this.pluginsBase}/backup`;
+  pluginBackupEndpoint = `${this.pluginsBase}/backup/backup`;
+  pluginBackupFile = (filename) => `${this.pluginsBase}/backup/backup/${filename}`;
+  pluginBackupFileDownload = (filename) => `${this.pluginsBase}/backup/download/${filename}`;
+  // pluginBackupRestore = `${this.pluginsBase}/backup/restore`; // Upload a backup on the fly
   pluginManager = `${this.pluginsBase}/pluginmanager`;
   pluginManagerPlugins = `${this.pluginManager}/plugins`; // Fast
   pluginManagerExport = `${this.pluginManager}/export`;
