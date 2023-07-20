@@ -7,7 +7,6 @@ const got = require("got");
 const { uploadProgressEvent, firmwareFlashUploadEvent } = require("../../constants/event.constants");
 const { ExternalServiceError } = require("../../exceptions/runtime.exceptions");
 const OctoPrintRoutes = require("./octoprint-api.routes");
-const { errorSummary } = require("../../utils/error.utils");
 
 class OctoPrintApiService extends OctoPrintRoutes {
   /**
@@ -464,6 +463,29 @@ class OctoPrintApiService extends OctoPrintRoutes {
         });
       });
     return response.data;
+  }
+
+  async forwardRestoreBackupFileStream(login, buffer) {
+    const { url, options } = this._prepareRequest(login, this.pluginBackupFileRestore, null, multiPartContentType);
+    const formData = new FormData();
+    formData.append("file", buffer, { filename: "op-fdmm-restore.zip" });
+    const response = await this.axiosClient
+      .post(url, formData, {
+        headers: {
+          ...options.headers,
+          ...formData.getHeaders(),
+          // "Content-Type": "application/octet-stream",
+        },
+      })
+      .catch((e) => {
+        throw new ExternalServiceError({
+          error: e.message,
+          statusCode: e.response?.statusCode,
+          success: false,
+          stack: e.stack,
+        });
+      });
+    return processResponse(response);
   }
 
   async deleteBackup(login, filename, responseOptions) {

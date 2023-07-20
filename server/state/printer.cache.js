@@ -36,6 +36,10 @@ class PrinterCache extends KeyDiffCache {
    * @type {PrinterService}
    */
   printerService;
+  /**
+   * @type {EventEmitter2}
+   */
+  eventEmitter2;
 
   constructor({ printerService, eventEmitter2 }) {
     super();

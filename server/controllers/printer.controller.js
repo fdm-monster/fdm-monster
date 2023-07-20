@@ -56,6 +56,10 @@ class PrinterController {
    */
   floorStore;
   /**
+   * @type {MulterService}
+   */
+  multerService;
+  /**
    * @type {LoggerService}
    */
   logger;
@@ -71,8 +75,9 @@ class PrinterController {
     octoPrintApiService,
     pluginRepositoryCache,
     floorStore,
+    multerService,
   }) {
-    this.logger = loggerFactory("PrinterController");
+    this.logger = loggerFactory(PrinterController.name);
     this.printerCache = printerCache;
     this.printerEventsCache = printerEventsCache;
     this.printerService = printerService;
@@ -82,6 +87,7 @@ class PrinterController {
     this.octoPrintApiService = octoPrintApiService;
     this.pluginRepositoryCache = pluginRepositoryCache;
     this.floorStore = floorStore;
+    this.multerService = multerService;
   }
 
   async list(req, res) {
@@ -360,6 +366,13 @@ class PrinterController {
     dataStream.pipe(res);
   }
 
+  async restoreOctoPrintBackup(req, res) {
+    const { printerLogin } = getScopedPrinter(req);
+    const files = await this.multerService.multerLoadFileAsync(req, res, null, false);
+    const response = await this.octoPrintApiService.forwardRestoreBackupFileStream(printerLogin, files[0].buffer);
+    res.send(response.data);
+  }
+
   async deleteOctoPrintBackup(req, res) {
     const { printerLogin } = getScopedPrinter(req);
     const { fileName } = await validateMiddleware(req, getOctoPrintBackupRules);
@@ -401,5 +414,6 @@ module.exports = createController(PrinterController)
   .get("/:id/octoprint/backup", "getOctoPrintBackupOverview")
   .get("/:id/octoprint/backup/list", "listOctoPrintBackups")
   .post("/:id/octoprint/backup/download", "downloadOctoPrintBackup")
+  .post("/:id/octoprint/backup/restore", "restoreOctoPrintBackup")
   .post("/:id/octoprint/backup/create", "createOctoPrintBackup")
   .delete("/:id/octoprint/backup/delete", "deleteOctoPrintBackup");

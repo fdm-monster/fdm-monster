@@ -37,7 +37,7 @@ class OctoPrintRoutes {
   pluginBackupEndpoint = `${this.pluginsBase}/backup/backup`;
   pluginBackupFile = (filename) => `${this.pluginsBase}/backup/backup/${filename}`;
   pluginBackupFileDownload = (filename) => `${this.pluginsBase}/backup/download/${filename}`;
-  // pluginBackupRestore = `${this.pluginsBase}/backup/restore`; // Upload a backup on the fly
+  pluginBackupFileRestore = `${this.pluginsBase}/backup/restore`; // Upload a backup on the fly
   pluginManager = `${this.pluginsBase}/pluginmanager`;
   pluginManagerPlugins = `${this.pluginManager}/plugins`; // Fast
   pluginManagerExport = `${this.pluginManager}/export`;

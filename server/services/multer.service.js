@@ -115,8 +115,8 @@ class MulterService {
   multerFileFilter(extension) {
     return (req, file, callback) => {
       const ext = extname(file.originalname);
-      if (ext !== extension) {
-        return callback(new Error("Only .gcode files are allowed"));
+      if (extension?.length && ext !== extension) {
+        return callback(new Error(`Only files with extension ${extension} are allowed`));
       }
       return callback(null, true);
     };
