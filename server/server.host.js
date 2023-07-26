@@ -29,7 +29,7 @@ class ServerHost {
   appInstance = null;
 
   constructor({ loggerFactory, bootTask, taskManagerService, socketIoGateway }) {
-    this.logger = loggerFactory("Server");
+    this.logger = loggerFactory(ServerHost.name);
     this.bootTask = bootTask;
     this.taskManagerService = taskManagerService;
     this.socketIoGateway = socketIoGateway;

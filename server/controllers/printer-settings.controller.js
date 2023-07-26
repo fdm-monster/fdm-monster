@@ -49,10 +49,7 @@ class PrinterSettingsController {
 
     const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
     const printerName = await this.printerCache.getNameAsync(printerId);
-    const settings = await this.#octoPrintApiService.updatePrinterNameSetting(
-      printerLogin,
-      printerName,
-    );
+    const settings = await this.#octoPrintApiService.updatePrinterNameSetting(printerLogin, printerName);
     res.send(settings);
   }
 }
