@@ -3,5 +3,5 @@ function generateCorrelationToken() {
 }
 
 module.exports = {
-  generateCorrelationToken
+  generateCorrelationToken,
 };
