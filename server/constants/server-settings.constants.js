@@ -1,5 +1,5 @@
 const { AppConstants } = require("../server.constants");
-const { generateCorrelationToken } = require("../utils/correlation-token.util");
+const { v4: uuidv4 } = require("uuid");
 
 const getDefaultWhitelistIpAddresses = () => ["::12", "127.0.0.1"];
 
@@ -23,7 +23,7 @@ const credentialSettingsKey = "credentials";
 
 const getDefaultCredentialSettings = () => ({
   // Verification and signing of JWT tokens, can be changed on the fly
-  jwtSecret: generateCorrelationToken(),
+  jwtSecret: uuidv4(),
   // Signing only, verification is automatic
   jwtExpiresIn: AppConstants.DEFAULT_JWT_EXPIRES_IN,
   // Verification only, bringing into effect requires updating all stored refresh tokens
