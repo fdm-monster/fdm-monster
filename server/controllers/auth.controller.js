@@ -5,9 +5,8 @@ const { validateMiddleware } = require("../handlers/validators");
 const { registerUserRules } = require("./validation/user-controller.validation");
 const { logoutRefreshTokenRules } = require("./validation/auth-controller.validation");
 const { authenticate } = require("../middleware/authenticate");
-const { serverSettingsKey } = require("../constants/server-settings.constants");
 
-class AuthController {
+class AuthController {0
   /**
    * @type {AuthService}
    */
@@ -41,6 +40,11 @@ class AuthController {
     return res.send(tokens);
   }
 
+  async getLoginRequired(req, res) {
+    const isLoginRequired = await this.settingsStore.getLoginRequired();
+    return res.send({ loginRequired: isLoginRequired });
+  }
+
   async verifyLogin(req, res) {
     return res.send({ success: true });
   }
@@ -48,12 +52,16 @@ class AuthController {
   async needsPasswordChange(req, res) {
     const isLoginRequired = this.settingsStore.getLoginRequired();
     if (!isLoginRequired) {
-      return res.send({ needsPasswordChange: false, authenticated: true });
+      return res.send({ loginRequired: isLoginRequired, needsPasswordChange: false, authenticated: true });
     }
     if (req.isAuthenticated()) {
-      return res.send({ needsPasswordChange: req.user?.needsPasswordChange, authenticated: true });
+      return res.send({
+        loginRequired: isLoginRequired,
+        needsPasswordChange: req.user?.needsPasswordChange,
+        authenticated: true,
+      });
     }
-    return res.send({ authenticated: false });
+    return res.send({ loginRequired: isLoginRequired, authenticated: false });
   }
 
   async refreshLogin(req, res) {
@@ -75,12 +83,6 @@ class AuthController {
     res.end();
   }
 
-  async logoutRefreshToken(req, res) {
-    const { refreshToken } = await validateMiddleware(req, logoutRefreshTokenRules);
-    await this.authService.logoutUserRefreshToken(refreshToken);
-    res.end();
-  }
-
   async register(req, res) {
     let registrationEnabled = this.settingsStore.isRegistrationEnabled();
     if (!registrationEnabled) {
@@ -99,12 +101,12 @@ module.exports = createController(AuthController)
   .prefix(AppConstants.apiRoute + "/auth")
   .post("/register", "register")
   .post("/login", "login")
+  .get("/login-required", "getLoginRequired")
+  .post("/needs-password-change", "needsPasswordChange")
+  .post("/refresh", "refreshLogin")
   .post("/verify", "verifyLogin", {
     before: [authenticate()],
   })
-  .post("/needs-password-change", "needsPasswordChange")
-  .post("/refresh", "refreshLogin")
   .post("/logout", "logout", {
     before: [authenticate()],
-  })
-  .post("/logout-refresh-token", "logoutRefreshToken");
+  });
