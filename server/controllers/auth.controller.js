@@ -83,13 +83,6 @@ class AuthController {0
     res.end();
   }
 
-  // Public so malicious intent is possible, deprecated
-  async logoutRefreshToken(req, res) {
-    const { refreshToken } = await validateMiddleware(req, logoutRefreshTokenRules);
-    await this.authService.logoutUserRefreshToken(refreshToken);
-    res.end();
-  }
-
   async register(req, res) {
     let registrationEnabled = this.settingsStore.isRegistrationEnabled();
     if (!registrationEnabled) {
@@ -111,7 +104,6 @@ module.exports = createController(AuthController)
   .get("/login-required", "getLoginRequired")
   .post("/needs-password-change", "needsPasswordChange")
   .post("/refresh", "refreshLogin")
-  // .post("/logout-refresh-token", "logoutRefreshToken")
   .post("/verify", "verifyLogin", {
     before: [authenticate()],
   })
