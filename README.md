@@ -40,12 +40,6 @@ This server is has been battle-tested in the field for 100+ printers, so give it
 - Import printers from OctoFarm
 - [Raspberry Pi image MonsterPi](https://docs.fdm-monster.net/guides/monsterpi)
 
-#### Current work:
-
-- Adjusting the grid sizes
-- Maintenance repair log page
-- MQTT autodiscovery
-
 ![Image](docs/images/server-running.png)
 _The FDM Monster grid after placing one OctoPrint instance._
 
