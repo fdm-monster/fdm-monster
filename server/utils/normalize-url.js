@@ -65,6 +65,12 @@ const normalizeDataURL = (urlString, { stripHash }) => {
   return `data:${normalizedMediaType.join(";")},${isBase64 ? data.trim() : data}${hash ? `#${hash}` : ""}`;
 };
 
+/**
+ * https://github.com/sindresorhus/normalize-url v8.0.0 downloaded at 13/08/2023
+ * @param urlString
+ * @param options
+ * @return {*|string}
+ */
 function normalizeUrl(urlString, options) {
   options = {
     defaultProtocol: "http",
