@@ -161,7 +161,7 @@ describe("PrinterController", () => {
     };
     const updatePatch = await request.patch(updateRoute(printer.id)).send(patch);
     expectOkResponse(updatePatch, {
-      printerURL: "https://test.com/",
+      printerURL: "https://test.com",
       enabled: false,
       printerName: "asd124",
     });
@@ -175,7 +175,7 @@ describe("PrinterController", () => {
       apiKey,
     });
     expectOkResponse(updatePatch, {
-      printerURL: "https://test.com/",
+      printerURL: "https://test.com",
       apiKey,
     });
   });

@@ -6,14 +6,22 @@ const { normalizeUrl } = require("../utils/normalize-url");
 function getExtendedValidator() {
   nodeInputValidator.extend("wsurl", ({ value, args }, validator) => {
     if (!value) return false;
-    const url = normalizeUrl(value);
-    return url.startsWith("ws://") || url.startsWith("wss://");
+    try {
+      const url = normalizeUrl(value);
+      return url.startsWith("ws://") || url.startsWith("wss://");
+    } catch (e) {
+      return false;
+    }
   });
   nodeInputValidator.extend("httpurl", ({ value, args }, validator) => {
     if (!value) return false;
 
-    const url = normalizeUrl(value);
-    return url.startsWith("http://") || url.startsWith("https://");
+    try {
+      const url = normalizeUrl(value);
+      return url.startsWith("http://") || url.startsWith("https://");
+    } catch (e) {
+      return false;
+    }
   });
   nodeInputValidator.extend("not", ({ value, args }, validator) => {
     return !value && value !== false;

@@ -252,7 +252,6 @@ class PrinterService {
       ...getDefaultPrinterEntry(),
       enabled: true,
       ...printer,
-      printerURL: normalizeUrl(printer.printerURL),
     };
     return await validateInput(mergedPrinter, createPrinterRules);
   }
