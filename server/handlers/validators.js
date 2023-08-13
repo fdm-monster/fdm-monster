@@ -1,17 +1,19 @@
 const nodeInputValidator = require("node-input-validator");
 const { ValidationException, InternalServerException } = require("../exceptions/runtime.exceptions");
 const { printerLoginToken, currentPrinterToken, printerIdToken } = require("../middleware/printer");
+const { normalizeUrl } = require("../utils/normalize-url");
 
 function getExtendedValidator() {
   nodeInputValidator.extend("wsurl", ({ value, args }, validator) => {
     if (!value) return false;
-    const url = new URL(value).href;
-    return url.includes("ws://") || url.includes("wss://");
+    const url = normalizeUrl(value);
+    return url.startsWith("ws://") || url.startsWith("wss://");
   });
   nodeInputValidator.extend("httpurl", ({ value, args }, validator) => {
     if (!value) return false;
-    const url = new URL(value).href;
-    return url.includes("http://") || url.includes("https://");
+
+    const url = normalizeUrl(value);
+    return url.startsWith("http://") || url.startsWith("https://");
   });
   nodeInputValidator.extend("not", ({ value, args }, validator) => {
     return !value && value !== false;

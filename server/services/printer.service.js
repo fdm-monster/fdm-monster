@@ -1,6 +1,5 @@
 const { Printer } = require("../models/Printer");
 const { NotFoundException } = require("../exceptions/runtime.exceptions");
-const { sanitizeURL, httpToWsUrl } = require("../utils/url.utils");
 const { validateInput } = require("../handlers/validators");
 const {
   createPrinterRules,
@@ -10,6 +9,7 @@ const {
 } = require("./validators/printer-service.validation");
 const { getDefaultPrinterEntry } = require("../constants/service.constants");
 const { printerEvents } = require("../constants/event.constants");
+const { normalizeUrl } = require("../utils/normalize-url");
 
 class PrinterService {
   /**
@@ -73,7 +73,7 @@ class PrinterService {
     const { printerURL, apiKey, enabled, settingsAppearance } = await validateInput(updateData, createPrinterRules);
     await this.get(printerId);
 
-    printer.printerURL = printerURL;
+    printer.printerURL = normalizeUrl(printerURL);
     printer.apiKey = apiKey;
     if (enabled !== undefined) {
       printer.enabled = enabled;
@@ -174,7 +174,7 @@ class PrinterService {
 
   async updateConnectionSettings(printerId, { printerURL, apiKey }) {
     const update = {
-      printerURL: sanitizeURL(printerURL),
+      printerURL: normalizeUrl(printerURL),
       apiKey,
     };
 
@@ -252,6 +252,7 @@ class PrinterService {
       ...getDefaultPrinterEntry(),
       enabled: true,
       ...printer,
+      printerURL: normalizeUrl(printer.printerURL),
     };
     return await validateInput(mergedPrinter, createPrinterRules);
   }

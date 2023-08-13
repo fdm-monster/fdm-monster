@@ -328,7 +328,7 @@ class PrinterController {
     try {
       await this.testPrinterSocketStore.setupTestPrinter(newPrinter);
     } catch (e) {
-      res.send({ correlationToken: newPrinter.correlationToken, failure: true });
+      res.send({ correlationToken: newPrinter.correlationToken, failure: true, error: e.toString() });
       return;
     }
     res.send({ correlationToken: newPrinter.correlationToken });

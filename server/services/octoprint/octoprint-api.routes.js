@@ -1,6 +1,7 @@
 const { jsonContentType, contentTypeHeaderKey } = require("./constants/octoprint-service.constants");
 const { validateLogin, constructHeaders } = require("./utils/api.utils");
 const { getDefaultTimeout } = require("../../constants/server-settings.constants");
+const { normalizeUrl } = require("../../utils/normalize-url");
 
 class OctoPrintRoutes {
   octoPrintBase = "/";
@@ -155,7 +156,7 @@ class OctoPrintRoutes {
     }
 
     return {
-      url: new URL(path, printerURL).href,
+      url: new URL(path, normalizeUrl(printerURL)).href,
       options: {
         headers,
         timeout,

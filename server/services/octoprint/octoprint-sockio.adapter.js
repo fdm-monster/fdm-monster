@@ -3,6 +3,7 @@ const HttpStatusCode = require("../../constants/http-status-codes.constants");
 const { AppConstants } = require("../../server.constants");
 const { AuthenticationError } = require("../../exceptions/runtime.exceptions");
 const { httpToWsUrl } = require("../../utils/url.utils");
+const { normalizeUrl } = require("../../utils/normalize-url");
 
 /**
  * @typedef {1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10} ThrottleRate
@@ -18,7 +19,7 @@ const { httpToWsUrl } = require("../../utils/url.utils");
  * @typedef {Object} CredentialsDto
  * @property {LoginDto} loginDto
  * @property {string} printerId
- * @property {'ws'|'wss'} protocol
+ * @property {"ws"|"wss"} protocol
  */
 
 /**
@@ -159,7 +160,7 @@ class OctoPrintSockIoAdapter extends WebsocketAdapter {
     this.printerId = printerId;
     this.loginDto = loginDto;
 
-    const httpUrl = new URL(this.loginDto.printerURL);
+    const httpUrl = normalizeUrl(this.loginDto.printerURL);
     const wsUrl = httpToWsUrl(httpUrl, protocol);
     wsUrl.pathname = "/sockjs/websocket";
     this.socketURL = wsUrl;
