@@ -17,6 +17,7 @@ const { printerResolveMiddleware } = require("../middleware/printer");
 const { generateCorrelationToken } = require("../utils/correlation-token.util");
 const { ROLES } = require("../constants/authorization.constants");
 const { Floor } = require("../models/Floor");
+const PrinterService = require("../services/printer.service");
 
 class PrinterController {
   /**
@@ -320,6 +321,9 @@ class PrinterController {
    * @returns {Promise<void>}
    */
   async testConnection(req, res) {
+    if (req.body.printerURL?.length) {
+      req.body.printerURL = PrinterService.normalizeURLWithProtocol(req.body.printerURL);
+    }
     const newPrinter = await validateMiddleware(req, testPrinterApiRules);
     newPrinter.correlationToken = generateCorrelationToken();
     this.logger.log(`Testing printer with correlation token ${newPrinter.correlationToken}`);
@@ -328,7 +332,7 @@ class PrinterController {
     try {
       await this.testPrinterSocketStore.setupTestPrinter(newPrinter);
     } catch (e) {
-      res.send({ correlationToken: newPrinter.correlationToken, failure: true });
+      res.send({ correlationToken: newPrinter.correlationToken, failure: true, error: e.toString() });
       return;
     }
     res.send({ correlationToken: newPrinter.correlationToken });

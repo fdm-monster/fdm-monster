@@ -1,6 +1,5 @@
 const { Printer } = require("../models/Printer");
 const { NotFoundException } = require("../exceptions/runtime.exceptions");
-const { sanitizeURL, httpToWsUrl } = require("../utils/url.utils");
 const { validateInput } = require("../handlers/validators");
 const {
   createPrinterRules,
@@ -10,6 +9,7 @@ const {
 } = require("./validators/printer-service.validation");
 const { getDefaultPrinterEntry } = require("../constants/service.constants");
 const { printerEvents } = require("../constants/event.constants");
+const { normalizeUrl } = require("../utils/normalize-url");
 
 class PrinterService {
   /**
@@ -70,6 +70,7 @@ class PrinterService {
   async update(printerId, updateData) {
     const printer = await this.get(printerId);
 
+    updateData.printerURL = PrinterService.normalizeURLWithProtocol(updateData.printerURL);
     const { printerURL, apiKey, enabled, settingsAppearance } = await validateInput(updateData, createPrinterRules);
     await this.get(printerId);
 
@@ -174,7 +175,7 @@ class PrinterService {
 
   async updateConnectionSettings(printerId, { printerURL, apiKey }) {
     const update = {
-      printerURL: sanitizeURL(printerURL),
+      printerURL: PrinterService.normalizeURLWithProtocol(printerURL),
       apiKey,
     };
 
@@ -253,7 +254,18 @@ class PrinterService {
       enabled: true,
       ...printer,
     };
+    if (mergedPrinter.printerURL?.length) {
+      mergedPrinter.printerURL = PrinterService.normalizeURLWithProtocol(mergedPrinter.printerURL);
+    }
     return await validateInput(mergedPrinter, createPrinterRules);
+  }
+
+  static normalizeURLWithProtocol(printerURL) {
+    if (!printerURL.startsWith("http://") && !printerURL.startsWith("https://")) {
+      printerURL = `http://${printerURL}`;
+    }
+
+    return normalizeUrl(printerURL);
   }
 }
 

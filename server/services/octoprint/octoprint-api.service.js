@@ -32,7 +32,7 @@ class OctoPrintApiService extends OctoPrintRoutes {
 
   /**
    *
-   * @param {LoginDto} printer
+   * @param {LoginDto} login
    * @param responseOptions
    * @returns {Promise<{data, status}|*>}
    */
