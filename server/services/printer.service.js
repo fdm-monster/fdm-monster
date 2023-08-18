@@ -261,7 +261,7 @@ class PrinterService {
   }
 
   static normalizeURLWithProtocol(printerURL) {
-    if (!printerURL.startsWith("http") || !printerURL.startsWith("https")) {
+    if (!printerURL.startsWith("http://") && !printerURL.startsWith("https://")) {
       printerURL = `http://${printerURL}`;
     }
 
