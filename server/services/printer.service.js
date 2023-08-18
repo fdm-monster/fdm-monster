@@ -70,10 +70,11 @@ class PrinterService {
   async update(printerId, updateData) {
     const printer = await this.get(printerId);
 
+    updateData.printerURL = PrinterService.normalizeURLWithProtocol(updateData.printerURL);
     const { printerURL, apiKey, enabled, settingsAppearance } = await validateInput(updateData, createPrinterRules);
     await this.get(printerId);
 
-    printer.printerURL = normalizeUrl(printerURL);
+    printer.printerURL = printerURL;
     printer.apiKey = apiKey;
     if (enabled !== undefined) {
       printer.enabled = enabled;
@@ -174,7 +175,7 @@ class PrinterService {
 
   async updateConnectionSettings(printerId, { printerURL, apiKey }) {
     const update = {
-      printerURL: normalizeUrl(printerURL),
+      printerURL: PrinterService.normalizeURLWithProtocol(printerURL),
       apiKey,
     };
 
@@ -253,7 +254,18 @@ class PrinterService {
       enabled: true,
       ...printer,
     };
+    if (mergedPrinter.printerURL?.length) {
+      mergedPrinter.printerURL = PrinterService.normalizeURLWithProtocol(mergedPrinter.printerURL);
+    }
     return await validateInput(mergedPrinter, createPrinterRules);
+  }
+
+  static normalizeURLWithProtocol(printerURL) {
+    if (!printerURL.startsWith("http") || !printerURL.startsWith("https")) {
+      printerURL = `http://${printerURL}`;
+    }
+
+    return normalizeUrl(printerURL);
   }
 }
 

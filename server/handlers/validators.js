@@ -17,8 +17,10 @@ function getExtendedValidator() {
     if (!value) return false;
 
     try {
-      const url = normalizeUrl(value);
-      return url.startsWith("http://") || url.startsWith("https://");
+      if (!value.startsWith("http://") && !value.startsWith("https://")) {
+        return false;
+      }
+      return new URL(normalizeUrl(value));
     } catch (e) {
       return false;
     }
