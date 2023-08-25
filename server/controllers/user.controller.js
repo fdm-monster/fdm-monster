@@ -16,7 +16,12 @@ class UserController {
   }
 
   async profile(req, res) {
-    const user = await this.userService.getUser(req.user.id);
+    if (!req.user?.id) {
+      res.send({});
+      return;
+    }
+
+    const user = await this.userService.getUser(req.user?.id);
     res.send(user);
   }
 
