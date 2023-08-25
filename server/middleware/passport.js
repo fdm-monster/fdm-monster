@@ -13,13 +13,14 @@ function initializePassportStrategies(passport, container) {
   const opts = {};
   /** @type {SettingsStore} **/
   const settingsStore = container.resolve(DITokens.settingsStore);
+  const configService = container.resolve(DITokens.configService);
   opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
   opts.secretOrKeyProvider = async (req, token, done) => {
     const { jwtSecret } = await settingsStore.getCredentialSettings();
     return done(null, jwtSecret);
   };
-  opts.audience = AppConstants.DEFAULT_JWT_AUDIENCE;
-  opts.issuer = AppConstants.DEFAULT_JWT_ISSUER;
+  opts.audience = this.configService.get(AppConstants.OVERRIDE_JWT_AUDIENCE, AppConstants.DEFAULT_JWT_AUDIENCE);
+  opts.issuer = this.configService.get(AppConstants.OVERRIDE_JWT_ISSUER, AppConstants.DEFAULT_JWT_ISSUER);
 
   passport.use(
     new JwtStrategy(opts, function (jwt_payload, done) {
