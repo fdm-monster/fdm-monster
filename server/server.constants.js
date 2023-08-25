@@ -31,9 +31,9 @@ const AppConstants = {
   // Number, Seconds, persisted always
   OVERRIDE_JWT_EXPIRES_IN: "OVERRIDE_JWT_EXPIRES_IN",
   DEFAULT_JWT_EXPIRES_IN: 60 * 60, // 1 hour
-  // Number, persisted once
+  // Number
   DEFAULT_REFRESH_TOKEN_ATTEMPTS: 50, // 50 attempts, 50 hours
-  // Number, Milli-seconds, persisted once
+  // Number, Milli-seconds
   DEFAULT_REFRESH_TOKEN_EXPIRY: 1000 * 60 * 60 * 24 * 14, // 14 days (in ms)
   // String, not persisted
   OVERRIDE_JWT_ISSUER: "OVERRIDE_JWT_ISSUER",
@@ -50,7 +50,7 @@ const AppConstants = {
   clientRepoName: "fdm-monster-client",
   serverRepoName: "fdm-monster",
   orgName: "fdm-monster",
-  defaultClientMinimum: "1.2.12",
+  defaultClientMinimum: "1.3.0",
   serverPath: "./",
 
   influxUrl: "INFLUX_URL",
