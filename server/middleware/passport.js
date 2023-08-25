@@ -19,8 +19,8 @@ function initializePassportStrategies(passport, container) {
     const { jwtSecret } = await settingsStore.getCredentialSettings();
     return done(null, jwtSecret);
   };
-  opts.audience = this.configService.get(AppConstants.OVERRIDE_JWT_AUDIENCE, AppConstants.DEFAULT_JWT_AUDIENCE);
-  opts.issuer = this.configService.get(AppConstants.OVERRIDE_JWT_ISSUER, AppConstants.DEFAULT_JWT_ISSUER);
+  opts.audience = configService.get(AppConstants.OVERRIDE_JWT_AUDIENCE, AppConstants.DEFAULT_JWT_AUDIENCE);
+  opts.issuer = configService.get(AppConstants.OVERRIDE_JWT_ISSUER, AppConstants.DEFAULT_JWT_ISSUER);
 
   passport.use(
     new JwtStrategy(opts, function (jwt_payload, done) {
