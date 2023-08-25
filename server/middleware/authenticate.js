@@ -1,6 +1,5 @@
 const { inject } = require("awilix-express");
 const { AuthorizationError, AuthenticationError } = require("../exceptions/runtime.exceptions");
-const { serverSettingsKey } = require("../constants/server-settings.constants");
 
 function authorizePermission(permission) {
   return inject(({ permissionService, roleService }) => async (req, res, next) => {
