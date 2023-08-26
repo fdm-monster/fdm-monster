@@ -4,7 +4,7 @@ const {
   InternalServerException,
   ExternalServiceError,
   AuthenticationError,
-  AuthorizationError
+  AuthorizationError,
 } = require("../exceptions/runtime.exceptions");
 const { AppConstants } = require("../server.constants");
 
@@ -18,7 +18,7 @@ function exceptionHandler(err, req, res, next) {
     return res.status(code).send({
       error: "External API call failed",
       type: "axios-error",
-      data: err.response?.data
+      data: err.response?.data,
     });
   }
   if (err instanceof AuthenticationError) {
@@ -27,7 +27,11 @@ function exceptionHandler(err, req, res, next) {
   }
   if (err instanceof AuthorizationError) {
     const code = err.statusCode || 403;
-    return res.status(code).send({ error: err.message });
+    const permissions = err.permissions;
+    const roles = err.roles;
+    const error = err.message || "You lack permission to this resource";
+    const reason = err.reason;
+    return res.status(code).send({ error, reason, permissions, roles });
   }
   if (err instanceof NotFoundException) {
     const code = err.statusCode || 404;
@@ -38,7 +42,7 @@ function exceptionHandler(err, req, res, next) {
     return res.status(code).send({
       error: "API could not accept this input",
       type: err.name,
-      errors: err.errors
+      errors: err.errors,
     });
   }
   if (err instanceof InternalServerException) {
@@ -46,7 +50,7 @@ function exceptionHandler(err, req, res, next) {
     return res.status(code).send({
       error: err.message,
       type: err.name,
-      stack: err.stack
+      stack: err.stack,
     });
   }
   if (err instanceof ExternalServiceError) {
@@ -58,7 +62,7 @@ function exceptionHandler(err, req, res, next) {
     return res.status(code).send({
       error: "Server experienced an internal error",
       type: err.name,
-      stack: err.stack
+      stack: err.stack,
     });
   }
 
