@@ -92,7 +92,7 @@ class AuthService {
   }
 
   async renewLoginByRefreshToken(refreshToken) {
-    const userRefreshToken = await this.getValidRefreshToken(refreshToken);
+    const userRefreshToken = await this.getValidRefreshToken(refreshToken, false);
     if (!userRefreshToken) {
       throw new AuthorizationError("The refresh token was invalid or expired, could not refresh user token");
     }
@@ -146,8 +146,11 @@ class AuthService {
     const userRefreshToken = await this.RefreshTokenModel.findOne({
       refreshToken,
     });
-    if (!userRefreshToken && throwNotFoundError) {
-      throw new NotFoundException("The refresh token was not found");
+    if (!userRefreshToken) {
+      if (throwNotFoundError) {
+        throw new NotFoundException("The refresh token was not found");
+      }
+      return null;
     }
 
     if (Date.now() > userRefreshToken.expiresAt) {
