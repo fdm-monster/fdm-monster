@@ -93,6 +93,12 @@ class PrinterController {
 
   async list(req, res) {
     const printers = await this.printerCache.listCachedPrinters(true);
+    // Test transient authentication error
+    // throw new AuthenticationError();
+    // Test transient authorization error
+    // throw new AuthorizationError({
+    //   roles: ["ADMIN"],
+    // });
     res.send(printers);
   }
 

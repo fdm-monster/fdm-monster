@@ -9,7 +9,7 @@ function authorizePermission(permission) {
 
     const assignedPermissions = roleService.getRolesPermissions(req.roles);
     if (!permissionService.authorizePermission(permission, assignedPermissions)) {
-      throw new AuthorizationError(permission);
+      throw new AuthorizationError({ permission });
     }
 
     next();
@@ -44,7 +44,7 @@ module.exports = {
   authorizeRoles: (roles, subset = true) =>
     inject(({ roleService }) => async (req, res, next) => {
       if (!roleService.authorizeRoles(roles, req.roles, subset)) {
-        throw new AuthorizationError(roles);
+        throw new AuthorizationError({ roles });
       }
 
       next();
