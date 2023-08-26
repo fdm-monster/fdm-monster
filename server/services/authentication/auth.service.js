@@ -1,5 +1,5 @@
 const { RefreshToken } = require("../../models/Auth/RefreshToken");
-const { NotFoundException, AuthorizationError, AuthenticationError } = require("../../exceptions/runtime.exceptions");
+const { AuthenticationError } = require("../../exceptions/runtime.exceptions");
 const { comparePasswordHash } = require("../../utils/crypto.utils");
 const { v4: uuidv4 } = require("uuid");
 const { AppConstants } = require("../../server.constants");
@@ -92,9 +92,9 @@ class AuthService {
   }
 
   async renewLoginByRefreshToken(refreshToken) {
-    const userRefreshToken = await this.getValidRefreshToken(refreshToken);
+    const userRefreshToken = await this.getValidRefreshToken(refreshToken, false);
     if (!userRefreshToken) {
-      throw new AuthorizationError("The refresh token was invalid or expired, could not refresh user token");
+      throw new AuthenticationError("The refresh token was invalid or expired, could not refresh user token");
     }
 
     const userId = userRefreshToken.userId;
@@ -140,19 +140,22 @@ class AuthService {
    * @private
    * @param {string} refreshToken
    * @param {boolean} throwNotFoundError throws when refresh token expired
-   * @returns {Promise<RefreshToken>}
+   * @returns {Promise<RefreshToken|null>}
    */
   async getValidRefreshToken(refreshToken, throwNotFoundError = true) {
     const userRefreshToken = await this.RefreshTokenModel.findOne({
       refreshToken,
     });
-    if (!userRefreshToken && throwNotFoundError) {
-      throw new NotFoundException("The refresh token was not found");
+    if (!userRefreshToken) {
+      if (throwNotFoundError) {
+        throw new AuthenticationError("The refresh token was not found");
+      }
+      return null;
     }
 
     if (Date.now() > userRefreshToken.expiresAt) {
       await this.deleteRefreshTokenAndBlacklistUserId(userRefreshToken.userId);
-      throw new AuthorizationError("Refresh token expired, login required");
+      throw new AuthenticationError("Refresh token expired, login required");
     }
     return userRefreshToken;
   }
@@ -172,7 +175,7 @@ class AuthService {
     const attemptsUsed = userRefreshToken.refreshAttemptsUsed;
     if (attemptsUsed >= refreshTokenAttempts) {
       await this.deleteRefreshTokenAndBlacklistUserId(userRefreshToken.userId);
-      throw new AuthorizationError("Refresh token attempts exceeded, login required");
+      throw new AuthenticationError("Refresh token attempts exceeded, login required");
     }
 
     const result = await this.RefreshTokenModel.findOneAndUpdate(
@@ -196,10 +199,10 @@ class AuthService {
    */
   async deleteRefreshTokenAndBlacklistUserId(userId) {
     if (!userId) {
-      throw new AuthorizationError("No user id provided");
+      throw new AuthenticationError("No user id provided");
     }
     if (this.isBlacklisted(userId)) {
-      throw new AuthorizationError("User is blacklisted, please login again");
+      throw new AuthenticationError("User is blacklisted, please login again");
     }
 
     await this.deleteRefreshTokenByUserId(userId);
