@@ -9,8 +9,8 @@ overrides:
 
 dependencies:
   '@fdm-monster/client':
-    specifier: 1.3.2
-    version: 1.3.2
+    specifier: 1.3.3
+    version: 1.3.3
   '@influxdata/influxdb-client':
     specifier: 1.33.2
     version: 1.33.2
@@ -1076,8 +1076,8 @@ packages:
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dev: true
 
-  /@fdm-monster/client@1.3.2:
-    resolution: {integrity: sha512-jKI7nsM9euCScQDh/Bng8r0KEZQQEiHBlbaT0dBufzOJVlA3jdU/auRoRLEImDXC4gt1cv7L0uBR+8WkylMTQg==}
+  /@fdm-monster/client@1.3.3:
+    resolution: {integrity: sha512-NMRaR3M7mAO3/cb24Oh2PRnPTA8vMQ9N/+DLvfUwiBOPlo0gfW8MbC7ZmGg2K6OHFETRvyBMY7kHRnhlFjtJMg==}
     dev: false
 
   /@humanwhocodes/config-array@0.11.10:
