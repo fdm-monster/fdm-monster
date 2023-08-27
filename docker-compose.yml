@@ -35,3 +35,4 @@ services:
       - SERVER_PORT=4000
     volumes:
       - ./fdm-monster/media/:/media
+      - ./fdm-monster/pm2-logs:/app/logs
