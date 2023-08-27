@@ -1,11 +1,16 @@
-FROM node:18-bullseye-slim
+FROM node:18-bullseye-slim as base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+COPY . ./app
 WORKDIR /app
 
-RUN npm i -g pnpm
+FROM base AS prod-deps
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
 RUN pnpm add -g pm2
 
-COPY . .
-RUN pnpm install --prod
+FROM base
+COPY --from=prod-deps /app/node_modules /app/node_modules
 
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
