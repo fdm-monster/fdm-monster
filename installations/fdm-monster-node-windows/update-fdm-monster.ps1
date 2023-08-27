@@ -32,9 +32,9 @@ Pop-Location
 Push-Location $serverPath
 
 # Perform package updates
-npm i -g yarn
-yarn -v
-yarn install --production --pure-lockfile
+npm i -g pnpm
+pnpm -v
+pnpm install --production --pure-lockfile
 
 # Switch to the latest release tag of FDM Monster
 git fetch --prune --tags
@@ -44,6 +44,6 @@ git checkout $latestTag
 Pop-Location
 Push-Location $installationPath
 
-yarn install --production
+pnpm install --production
 
 Pop-Location

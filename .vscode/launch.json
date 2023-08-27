@@ -5,7 +5,7 @@
         "name": "FDM Monster Server (dev)",
         "type": "node",
         "request": "launch",
-        "runtimeExecutable": "yarn",
+        "runtimeExecutable": "pnpm",
         "runtimeArgs": [
           "run",
           "dev"

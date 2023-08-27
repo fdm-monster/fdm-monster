@@ -9,7 +9,7 @@ services:
     ports:
       - "21111:27017"
     volumes:
-      - ./fdm-monster:/data
+      - ./fdm-monster/mongodb:/data
     restart: unless-stopped
 
   fdm-monster:

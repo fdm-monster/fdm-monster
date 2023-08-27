@@ -110,7 +110,7 @@
   "engines": {
     "node": ">= 18.0.0",
     "npm": ">= 8.1.4",
-    "yarn": ">= 1.22.10"
+    "pnpm": ">= 8.0.0"
   },
   "nodemonConfig": {
     "verbose": false,

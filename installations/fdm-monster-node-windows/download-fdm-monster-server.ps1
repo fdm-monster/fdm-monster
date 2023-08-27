@@ -36,15 +36,15 @@ git clone $repoUrl --branch $latestTag
 Push-Location $serverPath
 
 # Perform package updates
-npm i -g yarn
-yarn -v
-yarn install --production --pure-lockfile
+npm i -g pnpm
+pnpm -v
+pnpm install --production --pure-lockfile
 
 # Move to the service installation folder
 Pop-Location
 Push-Location $installationPath
 
 # Install node-windows and the FDM Monster service
-yarn install --production
+pnpm install --production
 
 Pop-Location

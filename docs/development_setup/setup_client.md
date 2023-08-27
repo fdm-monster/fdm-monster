@@ -17,7 +17,7 @@ If you haven't set up the FDM Monster server yet, please refer to the [Server In
 Before you begin, ensure that you have the following tools installed on your system:
 
 - Node.js 18 LTS
-- Yarn 1.22.0 or higher
+- pnpm 8 or higher
 - VS Code or WebStorm (your choice of IDE)
 
 ## Clone the Repository
@@ -35,20 +35,20 @@ git clone https://github.com/fdm-monster/fdm-monster-client.git
     cd fdm-monster-client
     ```
    
-2) If yarn is not yet installed:
+2) If pnpm is not yet installed:
    ```bash
-   npm install -g yarn
+   npm install -g pnpm
    ```
       
-3) Install the dependencies using Yarn:
+3) Install the dependencies using pnpm:
    ```bash
-   yarn install
+   pnpm install
    ```
    
 4) Create a run configuration for the Vue development server in your IDE of choice (either VS Code or WebStorm):
-    - VS Code: Create a run configuration that executes `yarn run serve` as the command. (Refer to the VS Code Run
+    - VS Code: Create a run configuration that executes `pnpm run serve` as the command. (Refer to the VS Code Run
       Configuration section below for detailed steps.)
-    - WebStorm: Create a run configuration that executes `yarn run serve` as the command. (Refer to the WebStorm
+    - WebStorm: Create a run configuration that executes `pnpm run serve` as the command. (Refer to the WebStorm
       Run Configuration section below for detailed steps.)
    
 5) Launch the Vue development server. Please note that the server will automatically reload if you make any changes to
@@ -73,7 +73,7 @@ git clone https://github.com/fdm-monster/fdm-monster-client.git
          "name": "FDM Monster Vue Client (serve)",
          "type": "node",
          "request": "launch",
-         "runtimeExecutable": "yarn",
+         "runtimeExecutable": "pnpm",
          "runtimeArgs": [
            "run",
            "serve"

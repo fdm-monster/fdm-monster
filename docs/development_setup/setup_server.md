@@ -26,7 +26,7 @@ and create an issue before submitting a pull request.
 Before you begin, ensure that you have the following tools installed on your system:
 
 - Node.js 18 LTS
-- Yarn 1.22.0 or higher
+- pnpm 8 or higher
 - MongoDB 5 or higher
 - MongoDB Compass
 - VS Code or WebStorm (your choice of IDE)
@@ -47,14 +47,14 @@ git clone https://github.com/fdm-monster/fdm-monster.git
     cd fdm-monster/server
     ```
    
-2) If yarn is not yet installed:
+2) If pnpm is not yet installed:
    ```bash
-   npm install -g yarn
+   npm install -g pnpm
    ```
       
-3) Install the dependencies using Yarn:
+3) Install the dependencies using pnpm:
    ```bash
-   yarn install
+   pnpm install
    ```
   
 4) Configure the environment variables by creating a .env file in the project root directory.
@@ -63,9 +63,9 @@ git clone https://github.com/fdm-monster/fdm-monster.git
 5) Start the MongoDB server and make sure it is running.
 
 6) Launch the FDM Monster server:
-    - VS Code: Create a run configuration that executes `yarn run dev` as the command. (Refer to the VS Code Run
+    - VS Code: Create a run configuration that executes `pnpm run dev` as the command. (Refer to the VS Code Run
       Configuration section below for detailed steps.)
-    - WebStorm: Create a run configuration that executes `yarn run dev` as the command. (Refer to the WebStorm
+    - WebStorm: Create a run configuration that executes `pnpm run dev` as the command. (Refer to the WebStorm
       Run Configuration section below for detailed steps.)
 
 7) Access the running server at http://localhost:4000 in your preferred web browser.
@@ -88,7 +88,7 @@ To create a run configuration in VS Code for running the FDM Monster server, fol
          "name": "FDM Monster Server (dev)",
          "type": "node",
          "request": "launch",
-         "runtimeExecutable": "yarn",
+         "runtimeExecutable": "pnpm",
          "runtimeArgs": [
            "run",
            "dev"

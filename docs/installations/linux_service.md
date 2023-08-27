@@ -20,7 +20,7 @@ Please ensure the following dependencies are installed and working:
 
 - nodejs 18+
 - git
-- yarn (npm package)
+- pnpm (npm package)
 - fdm-monster (github cloned source code)
 - node-linux (npm package)
 
@@ -31,7 +31,7 @@ Please ensure that:
 - You've cloned the repository
 - Changed directory to [installations/fdm-monster-node-linux](../../installations/fdm-monster-node-linux)
 - MongoDB 4.4+ has been installed
-- `yarn` dependencies are installed in `fdm-monster/server/`
+- `pnpm` dependencies are installed in `fdm-monster/server/`
 - `npm` dependencies are installed in `fdm-monster-node-linux/`
 
 Please ensure the service is installed (executed inside `fdm-monster-node-linux`):

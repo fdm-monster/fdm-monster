@@ -23,7 +23,7 @@ The following steps will install:
 
 - nodejs 18
 - git
-- yarn (npm package)
+- pnpm (npm package)
 - fdm-monster (github cloned source code)
 - node-windows (npm package)
 

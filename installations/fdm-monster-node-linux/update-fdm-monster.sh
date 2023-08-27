@@ -60,12 +60,12 @@ echo "[3/${ts}] Finding the latest version of FDM Monster from Github"
 git fetch --prune --tags
 git checkout "${tag}"
 
-# Step 4a) Ensure yarn is new, (optional)
-# npm i -g yarn
+# Step 4a) Ensure pnpm is new, (optional)
+npm i -g pnpm
 
-# Step 4) Ensure the required packages are present with yarn (which is already installed, we're just keeping it fresh)
+# Step 4) Ensure the required packages are present with pnpm (which is already installed, we're just keeping it fresh)
 echo "[4/${ts}] Updating the necessary modules of FDM Monster"
-yarn install --production --pure-lockfile
+pnpm install --production --pure-lockfile
 
 # Step 5) Run the service
 popd

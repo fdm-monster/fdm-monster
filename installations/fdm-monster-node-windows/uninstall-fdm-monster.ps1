@@ -11,7 +11,7 @@ $ErrorActionPreference = "Stop"
 $installationPath = "./fdm-monster/installations/fdm-monster-node-windows"
 
 Push-Location $installationPath
-yarn uninstall --production
+pnpm uninstall --production
 Pop-Location
 
 "Uninstalling the FDM Monster service complete. Please remove the folder fdm-monster manually."
