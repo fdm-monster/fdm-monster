@@ -5,7 +5,7 @@ import DITokens from "./container.tokens.js";
 
 setupEnvConfig();
 
-const { httpServer, container } = setupServer();
+const { httpServer, container } = await setupServer();
 
 container
   .resolve(DITokens.serverHost)

@@ -2,6 +2,9 @@ const DITokens = {
   // Values
   serverVersion: "serverVersion",
   defaultRole: "defaultRole",
+  // Dynamically registered
+  orm: "orm",
+  em: "em",
   // Instances
   serverHost: "serverHost",
   loggerFactory: "loggerFactory",
