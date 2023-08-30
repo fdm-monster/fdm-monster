@@ -11,7 +11,6 @@ const { setupEnvConfig } = require("../server.env");
 const AxiosMock = require("./mocks/axios.mock");
 const OctoPrintApiMock = require("./mocks/octoprint-api.mock");
 const { ROLES } = require("../constants/authorization.constants");
-const { AppConstants } = require("../server.constants");
 
 /**
  * Setup the application without hassle
@@ -23,7 +22,7 @@ const { AppConstants } = require("../server.constants");
 async function setupTestApp(loadPrinterStore = false, mocks = undefined, quick_boot = true) {
   setupEnvConfig(true);
 
-  const { httpServer, container } = setupServer();
+  const { httpServer, container } = await setupServer();
   container.register({
     [DITokens.octoPrintApiService]: asClass(OctoPrintApiMock).singleton(),
     [DITokens.httpClient]: asClass(AxiosMock).singleton(),

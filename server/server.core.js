@@ -10,7 +10,7 @@ const { interceptDatabaseError } = require("./middleware/database");
 const { validateWhitelistedIp, interceptRoles } = require("./middleware/global.middleware");
 const { initializePassportStrategies } = require("./middleware/passport");
 
-function setupServer() {
+async function setupServer() {
   const httpServer = express();
   const container = configureContainer();
   initializePassportStrategies(passport, container);
