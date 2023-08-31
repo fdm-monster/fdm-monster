@@ -1987,6 +1987,14 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-20.5.7.tgz#4b8ecac87fbefbc92f431d09c30e176fc0a7c377"
   integrity sha512-dP7f3LdZIysZnmvP3ANJYTSwg+wLLl8p7RqniVlV7j+oXSXAbt9h0WIBFmJy5inWZoX9wZN6eXx+YXd9Rh3RBA==
 
+"@types/readable-stream@^4.0.1":
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/@types/readable-stream/-/readable-stream-4.0.2.tgz#5199cfeef35ea16d0e85076b1c6daa15766634c0"
+  integrity sha512-hhzOsMEISZ+mX1l+01F0duYt9wHEbCGmjARed0PcQoVS5zAdu7u5YbWYuNGhw09M1MgGr3kfsto+ut/MnAdKqA==
+  dependencies:
+    "@types/node" "*"
+    safe-buffer "~5.1.1"
+
 "@types/responselike@^1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@types/responselike/-/responselike-1.0.0.tgz#251f4fe7d154d2bad125abe1b429b23afd262e29"
@@ -2016,6 +2024,13 @@
   dependencies:
     "@types/node" "*"
     "@types/webidl-conversions" "*"
+
+"@types/ws@^8.5.5":
+  version "8.5.5"
+  resolved "https://registry.yarnpkg.com/@types/ws/-/ws-8.5.5.tgz#af587964aa06682702ee6dcbc7be41a80e4b28eb"
+  integrity sha512-lwhs8hktwxSjf9UaZ9tG5M03PGogvFaH8gUgLNbN9HKIg0dvv6q+gkSuJ8HN4/VbyxkuLzCjlN7GquQ0gUJfIg==
+  dependencies:
+    "@types/node" "*"
 
 "@types/yargs-parser@*":
   version "21.0.0"
@@ -5336,11 +5351,13 @@ mqtt-packet@^8.2.0:
     debug "^4.1.1"
     process-nextick-args "^2.0.1"
 
-mqtt@5.0.3:
-  version "5.0.3"
-  resolved "https://registry.yarnpkg.com/mqtt/-/mqtt-5.0.3.tgz#dd64ba92079bb592ba4caa729de8ed243b58a53d"
-  integrity sha512-XyCzdCNFm4XXBUV7HQPd1qXYdu7GC/H+wXr+RfaztwZ72/c3sD8yRivOBdh8iKWHc+EGawSeDIvXCnvEykcJVA==
+mqtt@5.0.4:
+  version "5.0.4"
+  resolved "https://registry.yarnpkg.com/mqtt/-/mqtt-5.0.4.tgz#b8ee0dd53219d19e689105a2de4fdb7011a80f6f"
+  integrity sha512-Ao+DA4QYzIFXTQPIF0WKJfeHM2BV0kbP1xt/POPyJY2dQ02dscUJonh94NG9/aw0Fbk2L8Ex0YxobDSKUyQvcQ==
   dependencies:
+    "@types/readable-stream" "^4.0.1"
+    "@types/ws" "^8.5.5"
     commist "^3.2.0"
     concat-stream "^2.0.0"
     debug "^4.3.4"
