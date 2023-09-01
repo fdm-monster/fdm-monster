@@ -22,13 +22,13 @@ describe("User:Schema", function () {
       name: "testname",
       username: "SAMENAME",
       passwordHash: "pwpwpwpw123",
-      group: "User"
+      group: "User",
     });
     const newUser2 = new User({
       name: "testname2",
       username: "SAMENAME",
       passwordHash: "pwpwpwpw123",
-      group: "User"
+      group: "User",
     });
 
     // Hash Password
