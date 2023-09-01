@@ -1523,13 +1523,13 @@
     "@smithy/util-middleware" "^2.0.0"
     tslib "^2.5.0"
 
-"@smithy/credential-provider-imds@^2.0.0", "@smithy/credential-provider-imds@^2.0.5":
-  version "2.0.5"
-  resolved "https://registry.yarnpkg.com/@smithy/credential-provider-imds/-/credential-provider-imds-2.0.5.tgz#59e6f8d30beed9e966d418f47108bb4da371bbae"
-  integrity sha512-KFcf/e0meFkQNyteJ65f1G19sgUEY1e5zL7hyAEUPz2SEfBmC9B37WyRq87G3MEEsvmAWwCRu7nFFYUKtR3svQ==
+"@smithy/credential-provider-imds@^2.0.0", "@smithy/credential-provider-imds@^2.0.7":
+  version "2.0.7"
+  resolved "https://registry.yarnpkg.com/@smithy/credential-provider-imds/-/credential-provider-imds-2.0.7.tgz#1e0bc01f348cd559b28fd4673f51e3d4c6c44cbb"
+  integrity sha512-XivkZj/pipzpQPxgleE1odwJQ6oDsVViB4VUO/HRDI4EdEfZjud44USupOUOa/xOjS39/75DYB4zgTbyV+totw==
   dependencies:
-    "@smithy/node-config-provider" "^2.0.5"
-    "@smithy/property-provider" "^2.0.5"
+    "@smithy/node-config-provider" "^2.0.7"
+    "@smithy/property-provider" "^2.0.6"
     "@smithy/types" "^2.2.2"
     "@smithy/url-parser" "^2.0.5"
     tslib "^2.5.0"
@@ -1628,13 +1628,13 @@
   dependencies:
     tslib "^2.5.0"
 
-"@smithy/node-config-provider@^2.0.5":
-  version "2.0.5"
-  resolved "https://registry.yarnpkg.com/@smithy/node-config-provider/-/node-config-provider-2.0.5.tgz#239a6281e1d0bc2a0dd8fdab7826bacd25dfbf00"
-  integrity sha512-LRtjV9WkhONe2lVy+ipB/l1GX60ybzBmFyeRUoLUXWKdnZ3o81jsnbKzMK8hKq8eFSWPk+Lmyx6ZzCQabGeLxg==
+"@smithy/node-config-provider@^2.0.5", "@smithy/node-config-provider@^2.0.7":
+  version "2.0.7"
+  resolved "https://registry.yarnpkg.com/@smithy/node-config-provider/-/node-config-provider-2.0.7.tgz#2333df040d55f9d8dea850d31deda8e39b923b4b"
+  integrity sha512-GuLxhnf0aVQsfQp4ZWaM1TRCIndpQjAswyFcmDFRNf4yFqpxpLPDeV540+O0Z21Hmu3deoQm/dCPXbVn90PYzg==
   dependencies:
-    "@smithy/property-provider" "^2.0.5"
-    "@smithy/shared-ini-file-loader" "^2.0.5"
+    "@smithy/property-provider" "^2.0.6"
+    "@smithy/shared-ini-file-loader" "^2.0.6"
     "@smithy/types" "^2.2.2"
     tslib "^2.5.0"
 
@@ -1649,10 +1649,10 @@
     "@smithy/types" "^2.2.2"
     tslib "^2.5.0"
 
-"@smithy/property-provider@^2.0.0", "@smithy/property-provider@^2.0.5":
-  version "2.0.5"
-  resolved "https://registry.yarnpkg.com/@smithy/property-provider/-/property-provider-2.0.5.tgz#7cc88bc56706a4758076754a71c6a9ebf5daa8a7"
-  integrity sha512-cAFSUhX6aiHcmpWfrCLKvwBtgN1F6A0N8qY/8yeSi0LRLmhGqsY1/YTxFE185MCVzYbqBGXVr9TBv4RUcIV4rA==
+"@smithy/property-provider@^2.0.0", "@smithy/property-provider@^2.0.6":
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/@smithy/property-provider/-/property-provider-2.0.6.tgz#2dbf4b4064b6936f97052a29e75144c5c538a5b5"
+  integrity sha512-CVem6ZkkWxbTnhjDLyLESY0oLA6IUZYtdqrCpGQKUXaFBOuc/izjm7fIFGBxEbjZ1EGcH9hHxrjqX36RWULNRg==
   dependencies:
     "@smithy/types" "^2.2.2"
     tslib "^2.5.0"
@@ -1687,10 +1687,10 @@
   resolved "https://registry.yarnpkg.com/@smithy/service-error-classification/-/service-error-classification-2.0.0.tgz#bbce07c9c529d9333d40db881fd4a1795dd84892"
   integrity sha512-2z5Nafy1O0cTf69wKyNjGW/sNVMiqDnb4jgwfMG8ye8KnFJ5qmJpDccwIbJNhXIfbsxTg9SEec2oe1cexhMJvw==
 
-"@smithy/shared-ini-file-loader@^2.0.0", "@smithy/shared-ini-file-loader@^2.0.5":
-  version "2.0.5"
-  resolved "https://registry.yarnpkg.com/@smithy/shared-ini-file-loader/-/shared-ini-file-loader-2.0.5.tgz#c2b28b499f2b9928e892a80fcdeb259b2938475c"
-  integrity sha512-Mvtk6FwMtfbKRC4YuSsIqRYp9WTxsSUJVVo2djgyhcacKGMqicHDWSAmgy3sDrKv+G/G6xTZCPwm6pJARtdxVg==
+"@smithy/shared-ini-file-loader@^2.0.0", "@smithy/shared-ini-file-loader@^2.0.6":
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/@smithy/shared-ini-file-loader/-/shared-ini-file-loader-2.0.6.tgz#95dbc455e56a261ffe0b32bb3e640292b2f31798"
+  integrity sha512-NO6dHqho6APbVR0DxPtYoL4KXBqUeSM3Slsd103MOgL50YbzzsQmMLtDMZ87W8MlvvCN0tuiq+OrAO/rM7hTQg==
   dependencies:
     "@smithy/types" "^2.2.2"
     tslib "^2.5.0"
@@ -1773,24 +1773,24 @@
     tslib "^2.5.0"
 
 "@smithy/util-defaults-mode-browser@^2.0.5":
-  version "2.0.5"
-  resolved "https://registry.yarnpkg.com/@smithy/util-defaults-mode-browser/-/util-defaults-mode-browser-2.0.5.tgz#36d5424749d324bd69f37c74ea20a183f8c2286e"
-  integrity sha512-yciP6TPttLsj731aHTvekgyuCGXQrEAJibEwEWAh3kzaDsfGAVCuZSBlyvC2Dl3TZmHKCOQwHV8mIE7KQCTPuQ==
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/@smithy/util-defaults-mode-browser/-/util-defaults-mode-browser-2.0.6.tgz#486279f7adff65db6d09c294b2e8a9641076c3a6"
+  integrity sha512-h8xyKTZIIom62DN4xbPUmL+RL1deZcK1qJGmCr4c2yXjOrs5/iZ1VtQQcl+xP78620ga/565AikZE1sktdg2yA==
   dependencies:
-    "@smithy/property-provider" "^2.0.5"
+    "@smithy/property-provider" "^2.0.6"
     "@smithy/types" "^2.2.2"
     bowser "^2.11.0"
     tslib "^2.5.0"
 
 "@smithy/util-defaults-mode-node@^2.0.5":
-  version "2.0.5"
-  resolved "https://registry.yarnpkg.com/@smithy/util-defaults-mode-node/-/util-defaults-mode-node-2.0.5.tgz#504dd39a603fd2d67e53537c794dd57e6541baae"
-  integrity sha512-M07t99rWasXt+IaDZDyP3BkcoEm/mgIE1RIMASrE49LKSNxaVN7PVcgGc77+4uu2kzBAyqJKy79pgtezuknyjQ==
+  version "2.0.7"
+  resolved "https://registry.yarnpkg.com/@smithy/util-defaults-mode-node/-/util-defaults-mode-node-2.0.7.tgz#ec47bf7d717e954f25c4d462b614fdb00990826e"
+  integrity sha512-2C1YfmYJj9bpM/cRAgQppYNzPd8gDEXZ5XIVDuEQg3TmmIiinZaFf/HsHYo9NK/PMy5oawJVdIuR7SVriIo1AQ==
   dependencies:
     "@smithy/config-resolver" "^2.0.5"
-    "@smithy/credential-provider-imds" "^2.0.5"
-    "@smithy/node-config-provider" "^2.0.5"
-    "@smithy/property-provider" "^2.0.5"
+    "@smithy/credential-provider-imds" "^2.0.7"
+    "@smithy/node-config-provider" "^2.0.7"
+    "@smithy/property-provider" "^2.0.6"
     "@smithy/types" "^2.2.2"
     tslib "^2.5.0"
 
@@ -2622,15 +2622,10 @@ camelcase@^6.2.0, camelcase@^6.3.0:
   resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-6.3.0.tgz#5685b95eb209ac9c0c177467778c9c84df58ba9a"
   integrity sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==
 
-caniuse-lite@1.0.30001525:
+caniuse-lite@1.0.30001525, caniuse-lite@^1.0.30001517:
   version "1.0.30001525"
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001525.tgz#d2e8fdec6116ffa36284ca2c33ef6d53612fe1c8"
   integrity sha512-/3z+wB4icFt3r0USMwxujAqRvaD/B7rvGTsKhbhSQErVrJvkZCLhgNLJxU8MevahQVH6hCU9FsHdNUFbiwmE7Q==
-
-caniuse-lite@^1.0.30001517:
-  version "1.0.30001524"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001524.tgz#1e14bce4f43c41a7deaeb5ebfe86664fe8dadb80"
-  integrity sha512-Jj917pJtYg9HSJBF95HVX3Cdr89JUyLT4IZ8SvM5aDRni95swKgYi3TgYLH5hnGfPE/U1dg6IfZ50UsIlLkwSA==
 
 chalk@^2.4.2:
   version "2.4.2"
@@ -3091,9 +3086,9 @@ ee-first@1.1.1:
   integrity sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==
 
 electron-to-chromium@^1.4.477:
-  version "1.4.506"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.506.tgz#59f64a211102db4c3ebae2f39cc0e8e1b12b3a07"
-  integrity sha512-xxGct4GPAKSRlrLBtJxJFYy74W11zX6PO9GyHgl/U+2s3Dp0ZEwAklDfNHXOWcvH7zWMpsmgbR0ggEuaYAVvHA==
+  version "1.4.507"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.507.tgz#e99d87fcfaa6887edc18edc5dd46835df1a71f22"
+  integrity sha512-brvPFnO1lu3UYBpBht2qWw9qqhdG4htTjT90/9oOJmxQ77VvTxL9+ghErFqQzgj7n8268ONAmlebqjBR/S+qgA==
 
 emittery@^0.12.1:
   version "0.12.1"
