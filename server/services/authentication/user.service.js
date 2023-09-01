@@ -73,6 +73,21 @@ class UserService {
     await UserModel.findByIdAndDelete(user.id);
   }
 
+  async updatePasswordById(userId, oldPassword, newPassword) {
+    const oldPasswordHash = hashPassword(oldPassword);
+    const newPasswordHash = hashPassword(newPassword);
+    const user = await UserModel.findById(userId);
+    if (!user) throw new NotFoundException("User not found");
+
+    if (user.passwordHash !== oldPasswordHash) {
+      throw new NotFoundException("User old password incorrect");
+    }
+
+    user.passwordHash = newPasswordHash;
+    user.needsPasswordChange = false;
+    return await user.save();
+  }
+
   async updatePasswordUnsafe(username, newPassword) {
     const passwordHash = hashPassword(newPassword);
     const user = await this.findRawByUsername(username);
