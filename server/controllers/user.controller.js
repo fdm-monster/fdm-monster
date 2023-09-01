@@ -43,6 +43,20 @@ class UserController {
     res.send(users);
   }
 
+  async changeUsername(req, res) {
+    const { id } = await validateInput(req.params, idRules);
+
+    if (req.user?.id !== id) {
+      throw new InternalServerException("Not allowed to change username of other users");
+    }
+
+    const { username } = await validateInput(req.body, {
+      username: "required|string",
+    });
+    await this.userService.updateUsernameById(id, username);
+    res.send();
+  }
+
   async changePassword(req, res) {
     const { id } = await validateInput(req.params, idRules);
 
@@ -66,4 +80,5 @@ module.exports = createController(UserController)
   .get("/profile", "profile")
   .get("/:id", "get")
   .delete("/:id", "delete")
+  .post("/:id/change-username", "changeUsername")
   .post("/:id/change-password", "changePassword");
