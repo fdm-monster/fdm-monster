@@ -2,9 +2,8 @@ const UserModel = require("../../models/Auth/User");
 const { NotFoundException, InternalServerException } = require("../../exceptions/runtime.exceptions");
 const { validateInput } = require("../../handlers/validators");
 const { registerUserRules } = require("../validators/user-service.validation");
-const bcrypt = require("bcryptjs");
 const { ROLES } = require("../../constants/authorization.constants");
-const { hashPassword } = require("../../utils/crypto.utils");
+const { hashPassword, comparePasswordHash } = require("../../utils/crypto.utils");
 
 class UserService {
   /**
@@ -77,17 +76,16 @@ class UserService {
     const user = await UserModel.findById(userId);
     if (!user) throw new NotFoundException("User not found");
 
-    user.newUsername = newUsername;
+    user.username = newUsername;
     return await user.save();
   }
 
   async updatePasswordById(userId, oldPassword, newPassword) {
-    const oldPasswordHash = hashPassword(oldPassword);
     const newPasswordHash = hashPassword(newPassword);
     const user = await UserModel.findById(userId);
     if (!user) throw new NotFoundException("User not found");
 
-    if (user.passwordHash !== oldPasswordHash) {
+    if (!comparePasswordHash(oldPassword, user.passwordHash)) {
       throw new NotFoundException("User old password incorrect");
     }
 
