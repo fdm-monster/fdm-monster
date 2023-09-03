@@ -112,6 +112,7 @@ class UserService {
       username,
       passwordHash,
       roles,
+      needsPasswordChange: true,
     });
 
     return this.toDto(userDoc);

@@ -1,9 +1,4 @@
-const {
-  fileCleanSettingKey,
-  frontendSettingKey,
-  serverSettingsKey,
-  credentialSettingsKey,
-} = require("../../constants/server-settings.constants");
+const { frontendSettingKey, credentialSettingsKey } = require("../../constants/server-settings.constants");
 
 const serverSettingsUpdateRules = {
   registration: "boolean",

@@ -25,6 +25,13 @@ class AuthorizationError extends Error {
   }
 }
 
+class BadRequestException extends Error {
+  constructor(message) {
+    super(message);
+    this.name = BadRequestException.name;
+  }
+}
+
 class NotFoundException extends Error {
   constructor(message, path) {
     super(message);
@@ -59,6 +66,7 @@ class InternalServerException extends Error {
 
 module.exports = {
   NotImplementedException,
+  BadRequestException,
   NotFoundException,
   AuthenticationError,
   AuthorizationError,

@@ -2,27 +2,49 @@ const { createController } = require("awilix-express");
 const { AppConstants } = require("../server.constants");
 const { isNodemon, isNode, isPm2 } = require("../utils/env.utils");
 const { authenticate, withPermission } = require("../middleware/authenticate");
-const { PERMS } = require("../constants/authorization.constants");
+const { PERMS, ROLES } = require("../constants/authorization.constants");
 const { isDocker } = require("../utils/is-docker");
 const { serverSettingsKey } = require("../constants/server-settings.constants");
+const { BadRequestException } = require("../exceptions/runtime.exceptions");
+const { validateMiddleware } = require("../handlers/validators");
+const { wizardSettingsRules } = require("./validation/setting.validation");
 
 class ServerPublicController {
-  #serverVersion;
-  #settingsStore;
-  #printerSocketStore;
-  #serverReleaseService;
+  /**
+   * @type {string}
+   */
+  serverVersion;
+  /**
+   * @type {SettingsStore}
+   */
+  settingsStore;
+  /**
+   * @type {PrinterSocketStore}
+   */
+  printerSocketStore;
+  /**
+   * @type {ServerReleaseService}
+   */
+  serverReleaseService;
+  /**
+   * @type {MonsterPiService}
+   */
   monsterPiService;
+  /**
+   * @type {UserService}
+   */
+  userService;
 
   constructor({ settingsStore, printerSocketStore, serverVersion, serverReleaseService, monsterPiService }) {
-    this.#settingsStore = settingsStore;
-    this.#serverVersion = serverVersion;
-    this.#printerSocketStore = printerSocketStore;
-    this.#serverReleaseService = serverReleaseService;
+    this.settingsStore = settingsStore;
+    this.serverVersion = serverVersion;
+    this.printerSocketStore = printerSocketStore;
+    this.serverReleaseService = serverReleaseService;
     this.monsterPiService = monsterPiService;
   }
 
   welcome(req, res) {
-    const serverSettings = this.#settingsStore.getSettings();
+    const serverSettings = this.settingsStore.getSettings();
 
     if (serverSettings[serverSettingsKey].loginRequired === false) {
       return res.send({
@@ -33,6 +55,23 @@ class ServerPublicController {
     return res.send({
       message: "Login successful. Please load the Vue app.",
     });
+  }
+
+  async completeWizard(req, res) {
+    if (this.settingsStore.isWizardCompleted()) {
+      throw new BadRequestException("Wizard already completed");
+    }
+
+    // TODO deal with loginRequired and admin user env vars when wizard is completed
+    const { loginRequired, registration, rootUsername, rootPassword } = await validateMiddleware(req, wizardSettingsRules);
+    await this.userService.register({
+      username: rootUsername,
+      password: rootPassword,
+      roles: [ROLES.ADMIN],
+    });
+    await this.settingsStore.setLoginRequired(loginRequired);
+    await this.settingsStore.setRegistrationEnabled(registration);
+    await this.settingsStore.setWizardCompleted();
   }
 
   getFeatures(req, res) {
@@ -83,11 +122,11 @@ class ServerPublicController {
   }
 
   async getVersion(req, res) {
-    let updateState = this.#serverReleaseService.getState();
+    let updateState = this.serverReleaseService.getState();
     const monsterPiVersion = this.monsterPiService.getMonsterPiVersionSafe();
 
     res.json({
-      version: this.#serverVersion,
+      version: this.serverVersion,
       isDockerContainer: isDocker(),
       isNodemon: isNodemon(),
       isNode: isNode(),
@@ -110,4 +149,5 @@ module.exports = createController(ServerPublicController)
   .before([authenticate()])
   .get("", "welcome")
   .get("features", "getFeatures")
-  .get("version", "getVersion", withPermission(PERMS.ServerInfo.Get));
+  .get("version", "getVersion", withPermission(PERMS.ServerInfo.Get))
+  .post("complete-wizard", "completeWizard");

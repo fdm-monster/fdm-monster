@@ -1,6 +1,5 @@
 module.exports = {
   wizardSettingsRules: {
-    wizardVersion: "required|number",
     loginRequired: "required|boolean",
     registration: "required|boolean",
     rootUsername: "required|string",
