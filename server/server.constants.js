@@ -25,6 +25,7 @@ const AppConstants = {
   // String, persisted always
   OVERRIDE_ROOT_PASSWORD: "OVERRIDE_ROOT_PASSWORD",
   DEFAULT_ROOT_PASSWORD: "fdm-monster-root",
+  OVERRIDE_ROOT_USERNAME: "OVERRIDE_ROOT_USERNAME",
   DEFAULT_ROOT_USERNAME: "root",
   // String, persisted always
   OVERRIDE_JWT_SECRET: "OVERRIDE_JWT_SECRET",

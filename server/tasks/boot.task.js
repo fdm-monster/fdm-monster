@@ -168,11 +168,12 @@ class BootTask {
   }
 
   async ensureRootUserExists() {
+    const rootUsername = this.configService.get(AppConstants.OVERRIDE_ROOT_USERNAME, AppConstants.DEFAULT_ROOT_USERNAME);
     const adminRole = this.roleService.getRoleByName(ROLES.ADMIN);
-    const rootUser = await this.userService.findRawByUsername(AppConstants.DEFAULT_ROOT_USERNAME);
+    const rootUser = await this.userService.findRawByUsername(rootUsername);
     if (!rootUser) {
       await this.userService.register({
-        username: AppConstants.DEFAULT_ROOT_USERNAME,
+        username: rootUsername,
         password: AppConstants.DEFAULT_ROOT_PASSWORD,
         needsPasswordChange: true,
         roles: [adminRole.id],
@@ -182,8 +183,9 @@ class BootTask {
   }
 
   async applyRootPasswordOverride(passwordOverride) {
-    await this.userService.updatePasswordUnsafe(AppConstants.DEFAULT_ROOT_USERNAME, passwordOverride);
-    this.logger.log(`Updated ${AppConstants.DEFAULT_ROOT_USERNAME} user password due to override`);
+    const rootUsername = this.configService.get(AppConstants.OVERRIDE_ROOT_USERNAME, AppConstants.DEFAULT_ROOT_USERNAME);
+    await this.userService.updatePasswordUnsafe(rootUsername, passwordOverride);
+    this.logger.log(`Updated ${rootUsername} user password due to override`);
   }
 
   async migrateDatabase() {

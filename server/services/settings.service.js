@@ -14,7 +14,6 @@ const {
   credentialSettingsKey,
   timeoutSettingKey,
 } = require("../constants/server-settings.constants");
-const Sentry = require("@sentry/node");
 
 class SettingsService {
   async getOrCreate() {

@@ -34,7 +34,7 @@ class SettingsStore {
       [frontendSettingKey]: settings[frontendSettingKey],
       [serverSettingsKey]: settings[serverSettingsKey],
       [fileCleanSettingKey]: settings[fileCleanSettingKey],
-      [timeoutSettingKey] : settings[timeoutSettingKey],
+      [timeoutSettingKey]: settings[timeoutSettingKey],
     });
   }
 
