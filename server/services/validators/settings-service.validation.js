@@ -1,7 +1,8 @@
 const {
   fileCleanSettingKey,
   frontendSettingKey,
-  serverSettingsKey, credentialSettingsKey,
+  serverSettingsKey,
+  credentialSettingsKey,
 } = require("../../constants/server-settings.constants");
 
 const serverSettingsUpdateRules = {
@@ -10,16 +11,6 @@ const serverSettingsUpdateRules = {
   debugSettings: "object",
   "debugSettings.debugSocketEvents": "boolean",
   "debugSettings.debugSocketReconnect": "boolean",
-};
-
-const settingsUpdateRules = {
-  [serverSettingsKey]: "object",
-  [`${serverSettingsKey}.registration`]: "boolean",
-  [`${serverSettingsKey}.loginRequired`]: "boolean",
-  [fileCleanSettingKey]: "object",
-  [`${fileCleanSettingKey}.autoRemoveOldFilesBeforeUpload`]: "boolean",
-  [`${fileCleanSettingKey}.autoRemoveOldFilesAtBoot`]: "boolean",
-  [`${fileCleanSettingKey}.autoRemoveOldFilesCriteriumDays`]: "integer|min:0",
 };
 
 const frontendSettingsUpdateRules = {
@@ -38,7 +29,6 @@ const credentialSettingUpdateRules = {
 };
 
 module.exports = {
-  settingsUpdateRules,
   serverSettingsUpdateRules,
   frontendSettingsUpdateRules,
   credentialSettingUpdateRules,

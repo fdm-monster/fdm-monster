@@ -5,13 +5,30 @@ const { union } = require("lodash");
 
 class RoleService {
   #roles = [];
-  #logger;
+  /**
+   * @type {LoggerService}
+   */
+  logger;
+  /**
+   * @type {SettingsStore}
+   */
+  settingsStore;
 
-  #defaultRole;
+  #appDefaultRole;
+  #appDefaultRoleNoLogin;
 
-  constructor({ loggerFactory, defaultRole }) {
-    this.#logger = loggerFactory("RoleService");
-    this.#defaultRole = defaultRole;
+  constructor({ loggerFactory, appDefaultRole, appDefaultRoleNoLogin, settingsStore }) {
+    this.logger = loggerFactory(RoleService.name);
+    this.settingsStore = settingsStore;
+    this.appDefaultRole = appDefaultRole;
+    this.appDefaultRoleNoLogin = appDefaultRoleNoLogin;
+  }
+
+  async getAppDefaultRole() {
+    if (await this.settingsStore.getLoginRequired()) {
+      return this.#appDefaultRole;
+    }
+    return this.#appDefaultRoleNoLogin;
   }
 
   get roles() {
@@ -36,16 +53,12 @@ class RoleService {
     return ROLE_PERMS[normalizedRole];
   }
 
-  getDefaultRole() {
-    return this.#defaultRole;
-  }
-
-  async getDefaultRolesId() {
+  async getAppDefaultRolesId() {
     if (!this.#roles?.length) {
       await this.syncRoles();
     }
 
-    const guestRole = await this.getRoleByName(this.getDefaultRole());
+    const guestRole = await this.getRoleByName(await this.getAppDefaultRole());
     return [guestRole.id];
   }
 
@@ -100,7 +113,7 @@ class RoleService {
       const storedRole = await RoleModel.findOne({ name: roleName });
       if (!storedRole) {
         const newRole = await RoleModel.create({
-          name: roleName
+          name: roleName,
         });
         this.#roles.push(newRole);
       } else {

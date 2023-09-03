@@ -75,10 +75,16 @@ class UserController {
 
 module.exports = createController(UserController)
   .prefix(AppConstants.apiRoute + "/user")
-  .before([authenticate(), authorizeRoles([ROLES.ADMIN])])
-  .get("/", "list")
+  .before([authenticate()])
+  .get("/", "list", {
+    before: [authorizeRoles([ROLES.ADMIN])],
+  })
+  .get("/:id", "get", {
+    before: [authorizeRoles([ROLES.ADMIN])],
+  })
+  .delete("/:id", "delete", {
+    before: [authorizeRoles([ROLES.ADMIN])],
+  })
   .get("/profile", "profile")
-  .get("/:id", "get")
-  .delete("/:id", "delete")
   .post("/:id/change-username", "changeUsername")
   .post("/:id/change-password", "changePassword");

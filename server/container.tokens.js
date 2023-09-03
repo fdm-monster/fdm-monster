@@ -1,7 +1,8 @@
 const DITokens = {
   // Values
   serverVersion: "serverVersion",
-  defaultRole: "defaultRole",
+  appDefaultRole: "appDefaultRole",
+  appDefaultRoleNoLogin: "appDefaultRoleNoLogin",
   // Dynamically registered
   orm: "orm",
   em: "em",

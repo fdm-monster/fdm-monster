@@ -26,7 +26,7 @@ async function setupTestApp(loadPrinterStore = false, mocks = undefined, quick_b
   container.register({
     [DITokens.octoPrintApiService]: asClass(OctoPrintApiMock).singleton(),
     [DITokens.httpClient]: asClass(AxiosMock).singleton(),
-    [DITokens.defaultRole]: asValue(ROLES.ADMIN),
+    [DITokens.appDefaultRole]: asValue(ROLES.ADMIN),
   });
 
   // Overrides get last pick
