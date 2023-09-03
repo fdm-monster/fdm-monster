@@ -1,4 +1,11 @@
 module.exports = {
+  wizardSettingsRules: {
+    wizardVersion: "required|number",
+    loginRequired: "required|boolean",
+    registration: "required|boolean",
+    rootUsername: "required|string",
+    rootPassword: "required|string",
+  },
   whitelistSettingRules: {
     whitelistedIpAddresses: "required|array|minLength:1",
     "whitelistedIpAddresses.*": "required|string",

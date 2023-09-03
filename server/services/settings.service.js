@@ -4,7 +4,6 @@ const { validateInput } = require("../handlers/validators");
 const {
   serverSettingsUpdateRules,
   frontendSettingsUpdateRules,
-  settingsUpdateRules,
   credentialSettingUpdateRules,
 } = require("./validators/settings-service.validation");
 const {
@@ -13,6 +12,7 @@ const {
   frontendSettingKey,
   credentialSettingsKey,
   timeoutSettingKey,
+  wizardSettingKey,
 } = require("../constants/server-settings.constants");
 
 class SettingsService {
@@ -45,6 +45,9 @@ class SettingsService {
     }
 
     // Server settings exist, but need updating with new ones if they don't exist.
+    if (!doc[wizardSettingKey]) {
+      doc[wizardSettingKey] = Constants.getDefaultWizardSettings();
+    }
     if (!doc[timeoutSettingKey]) {
       doc[timeoutSettingKey] = Constants.getDefaultTimeout();
     }
@@ -145,19 +148,6 @@ class SettingsService {
         new: true,
       }
     );
-  }
-
-  /**
-   * @deprecated Use partial update methods instead
-   * @param patchUpdate
-   */
-  async update(patchUpdate) {
-    const validatedInput = await validateInput(patchUpdate, settingsUpdateRules);
-    const settingsDoc = await this.getOrCreate();
-
-    return SettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, validatedInput, {
-      new: true,
-    });
   }
 }
 

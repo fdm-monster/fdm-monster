@@ -1,9 +1,11 @@
 const { InternalServerException } = require("../exceptions/runtime.exceptions");
 const {
+  wizardSettingKey,
   fileCleanSettingKey,
   serverSettingsKey,
   credentialSettingsKey,
-  frontendSettingKey, timeoutSettingKey,
+  frontendSettingKey,
+  timeoutSettingKey,
 } = require("../constants/server-settings.constants");
 const Sentry = require("@sentry/node");
 const { isTestEnvironment } = require("../utils/env.utils");
@@ -31,6 +33,7 @@ class SettingsStore {
   getSettings() {
     const settings = this.settings._doc;
     return Object.freeze({
+      [wizardSettingKey]: settings[wizardSettingKey],
       [frontendSettingKey]: settings[frontendSettingKey],
       [serverSettingsKey]: settings[serverSettingsKey],
       [fileCleanSettingKey]: settings[fileCleanSettingKey],
@@ -65,6 +68,14 @@ class SettingsStore {
     }
   }
 
+  isWizardCompleted() {
+    return this.settings[wizardSettingKey].wizardCompleted;
+  }
+
+  getWizardSettings() {
+    return this.settings[wizardSettingKey];
+  }
+
   isRegistrationEnabled() {
     if (!this.settings) throw new InternalServerException("Could not check server settings (server settings not loaded");
     return this.settings[serverSettingsKey].registration;
@@ -86,8 +97,8 @@ class SettingsStore {
     return this.getSettings()[fileCleanSettingKey]?.autoRemoveOldFilesBeforeUpload;
   }
 
-  async updateSettings(fullUpdate) {
-    this.settings = await this.settingsService.update(fullUpdate);
+  async setWizardCompleted() {
+    this.settings = await this.settingsService.setWizardCompleted();
     return this.getSettings();
   }
 

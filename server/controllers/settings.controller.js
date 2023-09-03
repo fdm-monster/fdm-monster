@@ -3,12 +3,7 @@ const { authenticate, authorizeRoles } = require("../middleware/authenticate");
 const { AppConstants } = require("../server.constants");
 const { ROLES } = require("../constants/authorization.constants");
 const { validateInput } = require("../handlers/validators");
-const {
-  whitelistSettingRules,
-  anonymousDiagnosticsEnabledRules,
-  sentryDiagnosticsEnabledRules,
-} = require("./validation/setting.validation");
-const { credentialSettingsKey } = require("../constants/server-settings.constants");
+const { whitelistSettingRules, sentryDiagnosticsEnabledRules } = require("./validation/setting.validation");
 
 class SettingsController {
   /**
@@ -23,6 +18,12 @@ class SettingsController {
   getSettings(req, res) {
     const settings = this.settingsStore.getSettings();
     res.send(settings);
+  }
+
+  async updateWizardSettings(req, res) {
+    const { enabled } = await validateInput(req.body, sentryDiagnosticsEnabledRules);
+    const result = await this.settingsStore.updateWizardSettings(req.body);
+    res.send(result);
   }
 
   async updateSentryDiagnosticsEnabled(req, res) {
@@ -49,11 +50,6 @@ class SettingsController {
     const result = await this.settingsStore.updateServerSettings(req.body);
     res.send(result);
   }
-
-  async updateSettings(req, res) {
-    const result = await this.settingsStore.updateSettings(req.body);
-    res.send(result);
-  }
 }
 
 // prettier-ignore
@@ -61,7 +57,6 @@ module.exports = createController(SettingsController)
   .prefix(AppConstants.apiRoute + "/settings")
   .before([authenticate(), authorizeRoles([ROLES.ADMIN])])
   .get("/server", "getSettings")
-  .put("/server", "updateSettings")
   .put("/server/server", "updateServerSettings")
   .patch("/server/sentry-diagnostics", "updateSentryDiagnosticsEnabled")
   .put("/server/whitelist", "updateWhitelistSettings")

@@ -3,6 +3,13 @@ const { v4: uuidv4 } = require("uuid");
 
 const getDefaultWhitelistIpAddresses = () => ["::12", "127.0.0.1"];
 
+const wizardSettingKey = "wizard";
+const getDefaultWizardSettings = () => ({
+  wizardCompleted: false,
+  wizardCompletedAt: null,
+  wizardVersion: 0,
+});
+
 const serverSettingsKey = "server";
 const getDefaultServerSettings = () => ({
   debugSettings: {
@@ -52,6 +59,7 @@ const getDefaultFileCleanSettings = () => ({
 });
 
 const getDefaultSettings = () => ({
+  [wizardSettingKey]: getDefaultWizardSettings(),
   [credentialSettingsKey]: getDefaultCredentialSettings(),
   [serverSettingsKey]: getDefaultServerSettings(),
   [fileCleanSettingKey]: getDefaultFileCleanSettings(),
@@ -60,6 +68,8 @@ const getDefaultSettings = () => ({
 });
 
 module.exports = {
+  wizardSettingKey,
+  getDefaultWizardSettings,
   serverSettingsKey,
   getDefaultServerSettings,
   timeoutSettingKey,
