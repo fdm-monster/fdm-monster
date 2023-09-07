@@ -1,7 +1,7 @@
 const UserModel = require("../../models/Auth/User");
 const { NotFoundException, InternalServerException } = require("../../exceptions/runtime.exceptions");
 const { validateInput } = require("../../handlers/validators");
-const { registerUserRules } = require("../validators/user-service.validation");
+const { registerUserRules, newPasswordRules } = require("../validators/user-service.validation");
 const { ROLES } = require("../../constants/authorization.constants");
 const { hashPassword, comparePasswordHash } = require("../../utils/crypto.utils");
 
@@ -81,7 +81,6 @@ class UserService {
   }
 
   async updatePasswordById(userId, oldPassword, newPassword) {
-    const newPasswordHash = hashPassword(newPassword);
     const user = await UserModel.findById(userId);
     if (!user) throw new NotFoundException("User not found");
 
@@ -89,13 +88,17 @@ class UserService {
       throw new NotFoundException("User old password incorrect");
     }
 
+    const { password } = await validateInput({ password: newPassword }, newPasswordRules);
+    const newPasswordHash = hashPassword(password);
+
     user.passwordHash = newPasswordHash;
     user.needsPasswordChange = false;
     return await user.save();
   }
 
   async updatePasswordUnsafe(username, newPassword) {
-    const passwordHash = hashPassword(newPassword);
+    const { password } = await validateInput({ password: newPassword }, newPasswordRules);
+    const passwordHash = hashPassword(password);
     const user = await this.findRawByUsername(username);
     if (!user) throw new NotFoundException("User not found");
 

@@ -92,7 +92,6 @@ class AuthController {
 
     const roles = await this.roleService.getAppDefaultRolesId();
     const result = await this.userService.register({ username, password, roles });
-
     res.send(result);
   }
 }
