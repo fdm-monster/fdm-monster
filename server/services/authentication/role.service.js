@@ -62,6 +62,18 @@ class RoleService {
     return [guestRole.id];
   }
 
+  /**
+   * @param roleName {string}
+   * @return {Promise<*>}
+   */
+  async getSynchronizedRoleByName(roleName) {
+    if (!this.#roles?.length) {
+      await this.syncRoles();
+    }
+
+    return this.getRoleByName(roleName);
+  }
+
   #normalizeRole(assignedRole) {
     const roleInstance = this.roles.find((r) => r.id === assignedRole || r.name === assignedRole);
 

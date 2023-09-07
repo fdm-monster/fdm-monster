@@ -1,11 +1,11 @@
 const { createController } = require("awilix-express");
 const { AppConstants } = require("../server.constants");
 const { isNodemon, isNode, isPm2 } = require("../utils/env.utils");
-const { authenticate, withPermission } = require("../middleware/authenticate");
+const { authenticate, withPermission, authorizePermission } = require("../middleware/authenticate");
 const { PERMS, ROLES } = require("../constants/authorization.constants");
 const { isDocker } = require("../utils/is-docker");
 const { serverSettingsKey } = require("../constants/server-settings.constants");
-const { BadRequestException } = require("../exceptions/runtime.exceptions");
+const { BadRequestException, AuthorizationError } = require("../exceptions/runtime.exceptions");
 const { validateMiddleware } = require("../handlers/validators");
 const { wizardSettingsRules } = require("./validation/setting.validation");
 
@@ -34,13 +34,27 @@ class ServerPublicController {
    * @type {UserService}
    */
   userService;
+  /**
+   * @type {RoleService}
+   */
+  roleService;
 
-  constructor({ settingsStore, printerSocketStore, serverVersion, serverReleaseService, monsterPiService }) {
+  constructor({
+    settingsStore,
+    printerSocketStore,
+    serverVersion,
+    serverReleaseService,
+    monsterPiService,
+    userService,
+    roleService,
+  }) {
     this.settingsStore = settingsStore;
     this.serverVersion = serverVersion;
     this.printerSocketStore = printerSocketStore;
     this.serverReleaseService = serverReleaseService;
     this.monsterPiService = monsterPiService;
+    this.userService = userService;
+    this.roleService = roleService;
   }
 
   welcome(req, res) {
@@ -59,19 +73,28 @@ class ServerPublicController {
 
   async completeWizard(req, res) {
     if (this.settingsStore.isWizardCompleted()) {
-      throw new BadRequestException("Wizard already completed");
+      throw new AuthorizationError("Wizard already completed");
     }
 
     // TODO deal with loginRequired and admin user env vars when wizard is completed
     const { loginRequired, registration, rootUsername, rootPassword } = await validateMiddleware(req, wizardSettingsRules);
+    const role = await this.roleService.getSynchronizedRoleByName(ROLES.ADMIN);
+
+    const user = await this.userService.findRawByUsername(rootUsername?.toLowerCase());
+    if (!!user) {
+      throw new BadRequestException("This user already exists");
+    }
+
     await this.userService.register({
       username: rootUsername,
       password: rootPassword,
-      roles: [ROLES.ADMIN],
+      roles: [role.id],
     });
     await this.settingsStore.setLoginRequired(loginRequired);
     await this.settingsStore.setRegistrationEnabled(registration);
-    await this.settingsStore.setWizardCompleted();
+    await this.settingsStore.setWizardCompleted(AppConstants.currentWizardVersion);
+
+    return res.send();
   }
 
   getFeatures(req, res) {
@@ -145,9 +168,8 @@ class ServerPublicController {
 
 // prettier-ignore
 module.exports = createController(ServerPublicController)
-  .prefix(AppConstants.apiRoute + "/")
-  .before([authenticate()])
-  .get("", "welcome")
-  .get("features", "getFeatures")
-  .get("version", "getVersion", withPermission(PERMS.ServerInfo.Get))
-  .post("complete-wizard", "completeWizard");
+    .prefix(AppConstants.apiRoute + "/")
+    .post("complete-wizard", "completeWizard")
+    .get("", "welcome", { before: [authenticate(), authorizePermission(PERMS.ServerInfo.Get)] })
+    .get("features", "getFeatures", { before: [authenticate(), authorizePermission(PERMS.ServerInfo.Get)] })
+    .get("version", "getVersion", { before: [authenticate(), authorizePermission(PERMS.ServerInfo.Get)] });
