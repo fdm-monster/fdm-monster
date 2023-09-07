@@ -88,7 +88,7 @@
     "@lcov-viewer/istanbul-report": "1.4.0",
     "@mikro-orm/cli": "5.7.14",
     "@mikro-orm/migrations": "5.7.14",
-    "caniuse-lite": "1.0.30001527",
+    "caniuse-lite": "1.0.30001528",
     "eslint": "8.48.0",
     "eslint-config-airbnb-base": "15.0.0",
     "eslint-config-prettier": "9.0.0",
