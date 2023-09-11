@@ -22,7 +22,7 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           flags: server-nodejs
-          dry_run: ${{ matrix.node-version != '16.x' }}
+          dry_run: false
 
       # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions
       - name: get-server-version

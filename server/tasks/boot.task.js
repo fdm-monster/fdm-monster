@@ -120,8 +120,25 @@ class BootTask {
 
     this.logger.log("Loading and synchronizing Server Settings");
     await this.settingsStore.loadSettings();
+
+    this.logger.log("Synchronizing user permission and roles definition");
+    await this.permissionService.syncPermissions();
+    await this.roleService.syncRoles();
+
+    const isDemoMode = this.configService.get(AppConstants.OVERRIDE_IS_DEMO_MODE, "false") === "true";
+    if (isDemoMode) {
+      this.logger.warn("Starting in demo mode due to OVERRIDE_IS_DEMO_MODE");
+      await this.createOrUpdateDemoAccount();
+    }
+
     const loginRequired = this.configService.get(AppConstants.OVERRIDE_LOGIN_REQUIRED, "false") === "true";
     await this.settingsStore.setLoginRequired(loginRequired);
+
+    // If we are in demo mode, do not allow registration
+    const registrationEnabled = isDemoMode
+      ? false
+      : this.configService.get(AppConstants.OVERRIDE_REGISTRATION_ENABLED, "false") === "true";
+    await this.settingsStore.setRegistrationEnabled(registrationEnabled);
 
     const overrideJwtSecret = this.configService.get(AppConstants.OVERRIDE_JWT_SECRET, undefined);
     const overrideJwtExpiresIn = this.configService.get(AppConstants.OVERRIDE_JWT_EXPIRES_IN, undefined);
@@ -136,19 +153,6 @@ class BootTask {
     this.logger.log("Loading floor store");
     await this.floorStore.loadStore();
 
-    this.logger.log("Synchronizing user permission and roles definition");
-    await this.permissionService.syncPermissions();
-    await this.roleService.syncRoles();
-    await this.ensureRootUserExists();
-
-    const overrideRootPassword = this.configService.get(AppConstants.OVERRIDE_ROOT_PASSWORD, undefined);
-    if (overrideRootPassword?.length > 0 && overrideRootPassword?.length < 5) {
-      this.logger.warn("Skipping root password override, its shorter than 5 characters");
-    } else if (overrideRootPassword?.length > 0) {
-      this.logger.log("Applying root password override");
-      await this.applyRootPasswordOverride(overrideRootPassword);
-    }
-
     if (process.env.SAFEMODE_ENABLED === "true") {
       this.logger.warn("Starting in safe mode due to SAFEMODE_ENABLED");
     } else {
@@ -161,29 +165,36 @@ class BootTask {
     this.taskManagerService.disableJob(DITokens.bootTask, false);
   }
 
+  async createOrUpdateDemoAccount() {
+    const demoUsername = this.configService.get(AppConstants.OVERRIDE_DEMO_USERNAME, AppConstants.DEFAULT_DEMO_USERNAME);
+    const demoPassword = this.configService.get(AppConstants.OVERRIDE_DEMO_PASSWORD, AppConstants.DEFAULT_DEMO_PASSWORD);
+    const demoRole = this.configService.get(AppConstants.OVERRIDE_DEMO_ROLE, AppConstants.DEFAULT_DEMO_ROLE);
+    const adminRole = this.roleService.getRoleByName(demoRole);
+
+    const demoUserId = await this.userService.getDemoUserId();
+    if (!demoUserId) {
+      await this.userService.register({
+        username: demoUsername,
+        password: demoPassword,
+        isDemoUser: true,
+        needsPasswordChange: false,
+        roles: [adminRole.id],
+      });
+      this.logger.log("Created demo account");
+    } else {
+      await this.userService.updatePasswordUnsafe(demoUsername, demoPassword);
+      await this.userService.setUserRoleIds(demoUserId, [adminRole.id]);
+      this.logger.log("Updated demo account");
+    }
+
+    await this.settingsStore.isWizardCompleted();
+    await this.settingsStore.setWizardCompleted(1);
+  }
+
   async createConnection() {
     await mongoose.connect(fetchMongoDBConnectionString(), {
       serverSelectionTimeoutMS: 1500,
     });
-  }
-
-  async ensureRootUserExists() {
-    const adminRole = this.roleService.getRoleByName(ROLES.ADMIN);
-    const rootUser = await this.userService.findRawByUsername(AppConstants.DEFAULT_ROOT_USERNAME);
-    if (!rootUser) {
-      await this.userService.register({
-        username: AppConstants.DEFAULT_ROOT_USERNAME,
-        password: AppConstants.DEFAULT_ROOT_PASSWORD,
-        needsPasswordChange: true,
-        roles: [adminRole.id],
-      });
-      this.logger.log("Created admin account as it was missing.");
-    }
-  }
-
-  async applyRootPasswordOverride(passwordOverride) {
-    await this.userService.updatePasswordUnsafe(AppConstants.DEFAULT_ROOT_USERNAME, passwordOverride);
-    this.logger.log(`Updated ${AppConstants.DEFAULT_ROOT_USERNAME} user password due to override`);
   }
 
   async migrateDatabase() {

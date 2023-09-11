@@ -1,5 +1,6 @@
 const { Schema, model } = require("mongoose");
 const {
+  wizardSettingKey,
   fileCleanSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
@@ -8,6 +9,23 @@ const {
 } = require("../constants/server-settings.constants");
 
 const ServerSettingsSchema = new Schema({
+  [wizardSettingKey]: {
+    wizardCompleted: {
+      type: Boolean,
+      default: false,
+      required: true,
+    },
+    wizardCompletedAt: {
+      type: Date,
+      default: null,
+      required: false,
+    },
+    wizardVersion: {
+      type: Number,
+      default: 0,
+      required: true,
+    },
+  },
   [fileCleanSettingKey]: {
     autoRemoveOldFilesBeforeUpload: {
       type: Boolean,
@@ -98,6 +116,11 @@ const ServerSettingsSchema = new Schema({
     },
     loginRequired: {
       type: Boolean,
+      default: true,
+      required: true,
+    },
+    registration: {
+      type: Boolean,
       default: false,
       required: true,
     },
@@ -112,11 +135,6 @@ const ServerSettingsSchema = new Schema({
         type: String,
       },
     ],
-    registration: {
-      type: Boolean,
-      default: true,
-      required: true,
-    },
   },
   [frontendSettingKey]: {
     gridCols: {

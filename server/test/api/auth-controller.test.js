@@ -5,6 +5,7 @@ const {
   expectOkResponse,
   expectUnauthorizedResponse,
   expectInternalServerError,
+  expectBadRequestError,
 } = require("../extensions");
 const { getUserData, ensureTestUserCreated } = require("./test-data/create-user");
 const DITokens = require("../../container.tokens");
@@ -48,7 +49,7 @@ describe("AuthController", () => {
   it("should fail new user registration when server:registration is disabled", async () => {
     await container.resolve(DITokens.settingsStore).setRegistrationEnabled(false);
     const response = await request.post(registerRoute).send();
-    expectInternalServerError(response);
+    expectBadRequestError(response);
   });
 
   it("should authorize known user", async () => {

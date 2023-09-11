@@ -1,8 +1,9 @@
 const dbHandler = require("../db-handler");
 const { AppConstants } = require("../../server.constants");
 const { setupTestApp } = require("../test-server");
-const { expectOkResponse, expectNotFoundResponse } = require("../extensions");
+const { expectOkResponse, expectNotFoundResponse, expectInternalServerError } = require("../extensions");
 const { ensureTestUserCreated } = require("./test-data/create-user");
+const { ROLES } = require("../../constants/authorization.constants");
 
 const defaultRoute = `${AppConstants.apiRoute}/user`;
 const getRoute = (id) => `${defaultRoute}/${id}`;
@@ -34,11 +35,20 @@ describe("UserController", () => {
   });
 
   it("should delete existing user", async function () {
-    const user = await ensureTestUserCreated();
+    const user = await ensureTestUserCreated("test", "user", false, ROLES.OPERATOR);
     const response = await request.delete(deleteRoute(user.id)).send();
     expectOkResponse(response);
 
     const responseVerification = await request.get(getRoute(user.id)).send();
     expectNotFoundResponse(responseVerification);
+  });
+
+  it("should not delete last admin user", async function () {
+    const user = await ensureTestUserCreated("test", "user", false, ROLES.ADMIN);
+    const response = await request.delete(deleteRoute(user.id)).send();
+    expectInternalServerError(response);
+
+    const responseVerification = await request.get(getRoute(user.id)).send();
+    expectOkResponse(responseVerification);
   });
 });

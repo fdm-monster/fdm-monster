@@ -22,10 +22,10 @@ const AppConstants = {
 
   // Boolean string (true/false), persisted always
   OVERRIDE_LOGIN_REQUIRED: "OVERRIDE_LOGIN_REQUIRED",
-  // String, persisted always
-  OVERRIDE_ROOT_PASSWORD: "OVERRIDE_ROOT_PASSWORD",
-  DEFAULT_ROOT_PASSWORD: "fdm-monster-root",
-  DEFAULT_ROOT_USERNAME: "root",
+  // Boolean string (true/false), persisted always
+  OVERRIDE_REGISTRATION_ENABLED: "OVERRIDE_REGISTRATION_ENABLED",
+  // Number
+  DEFAULT_PASSWORD_MINLEN: 8,
   // String, persisted always
   OVERRIDE_JWT_SECRET: "OVERRIDE_JWT_SECRET",
   // Number, Seconds, persisted always
@@ -42,6 +42,14 @@ const AppConstants = {
   OVERRIDE_JWT_AUDIENCE: "OVERRIDE_JWT_AUDIENCE",
   DEFAULT_JWT_AUDIENCE: "fdm-monster-client",
 
+  OVERRIDE_IS_DEMO_MODE: "OVERRIDE_IS_DEMO_MODE",
+  OVERRIDE_DEMO_USERNAME: "OVERRIDE_DEMO_USERNAME",
+  DEFAULT_DEMO_USERNAME: "demo",
+  OVERRIDE_DEMO_PASSWORD: "OVERRIDE_DEMO_PASSWORD",
+  DEFAULT_DEMO_PASSWORD: "demo2023",
+  OVERRIDE_DEMO_ROLE: "OVERRIDE_DEMO_ROLE",
+  DEFAULT_DEMO_ROLE: "ADMIN",
+
   defaultTestEnv: "test",
   defaultProductionEnv: "production",
   knownEnvNames: ["development", "production", "test"],
@@ -50,6 +58,8 @@ const AppConstants = {
   clientRepoName: "fdm-monster-client",
   serverRepoName: "fdm-monster",
   orgName: "fdm-monster",
+  // Wizard version changes will trigger a re-run of the wizard
+  currentWizardVersion: 1,
   defaultClientMinimum: "1.3.1",
   serverPath: "./",
 

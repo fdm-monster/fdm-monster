@@ -68,7 +68,8 @@ function configureContainer() {
   container.register({
     // -- asValue/asFunction constants --
     [DITokens.serverTasks]: asValue(ServerTasks),
-    [DITokens.defaultRole]: asValue(ROLES.ADMIN), // -- asFunction --
+    [DITokens.appDefaultRole]: asValue(ROLES.GUEST),
+    [DITokens.appDefaultRoleNoLogin]: asValue(ROLES.ADMIN),
     [DITokens.serverVersion]: asFunction(() => {
       return process.env[AppConstants.VERSION_KEY];
     }),

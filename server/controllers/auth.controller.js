@@ -1,12 +1,12 @@
 const { createController } = require("awilix-express");
-const { InternalServerException } = require("../exceptions/runtime.exceptions");
+const { InternalServerException, BadRequestException } = require("../exceptions/runtime.exceptions");
 const { AppConstants } = require("../server.constants");
 const { validateMiddleware } = require("../handlers/validators");
 const { registerUserRules } = require("./validation/user-controller.validation");
 const { logoutRefreshTokenRules } = require("./validation/auth-controller.validation");
 const { authenticate } = require("../middleware/authenticate");
 
-class AuthController {0
+class AuthController {
   /**
    * @type {AuthService}
    */
@@ -86,13 +86,12 @@ class AuthController {0
   async register(req, res) {
     let registrationEnabled = this.settingsStore.isRegistrationEnabled();
     if (!registrationEnabled) {
-      throw new InternalServerException("Registration is disabled. Cant register user");
+      throw new BadRequestException("Registration is disabled. Cant register user");
     }
     const { username, password } = await validateMiddleware(req, registerUserRules);
 
-    const roles = await this.roleService.getDefaultRolesId();
+    const roles = await this.roleService.getAppDefaultRolesId();
     const result = await this.userService.register({ username, password, roles });
-
     res.send(result);
   }
 }

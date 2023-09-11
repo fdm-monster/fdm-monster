@@ -1,12 +1,15 @@
 const { InternalServerException } = require("../exceptions/runtime.exceptions");
 const {
+  wizardSettingKey,
   fileCleanSettingKey,
   serverSettingsKey,
   credentialSettingsKey,
-  frontendSettingKey, timeoutSettingKey,
+  frontendSettingKey,
+  timeoutSettingKey,
 } = require("../constants/server-settings.constants");
 const Sentry = require("@sentry/node");
 const { isTestEnvironment } = require("../utils/env.utils");
+const { AppConstants } = require("../server.constants");
 
 class SettingsStore {
   /**
@@ -31,10 +34,11 @@ class SettingsStore {
   getSettings() {
     const settings = this.settings._doc;
     return Object.freeze({
+      [wizardSettingKey]: settings[wizardSettingKey],
       [frontendSettingKey]: settings[frontendSettingKey],
       [serverSettingsKey]: settings[serverSettingsKey],
       [fileCleanSettingKey]: settings[fileCleanSettingKey],
-      [timeoutSettingKey] : settings[timeoutSettingKey],
+      [timeoutSettingKey]: settings[timeoutSettingKey],
     });
   }
 
@@ -65,6 +69,17 @@ class SettingsStore {
     }
   }
 
+  isWizardCompleted() {
+    return (
+      this.settings[wizardSettingKey].wizardCompleted &&
+      this.settings[wizardSettingKey].wizardVersion === AppConstants.currentWizardVersion
+    );
+  }
+
+  getWizardSettings() {
+    return this.settings[wizardSettingKey];
+  }
+
   isRegistrationEnabled() {
     if (!this.settings) throw new InternalServerException("Could not check server settings (server settings not loaded");
     return this.settings[serverSettingsKey].registration;
@@ -86,11 +101,17 @@ class SettingsStore {
     return this.getSettings()[fileCleanSettingKey]?.autoRemoveOldFilesBeforeUpload;
   }
 
-  async updateSettings(fullUpdate) {
-    this.settings = await this.settingsService.update(fullUpdate);
+  /**
+   * @param version {number}
+   */
+  async setWizardCompleted(version) {
+    this.settings = await this.settingsService.setWizardCompleted(version);
     return this.getSettings();
   }
 
+  /**
+   * @param {Boolean} enabled
+   */
   async setRegistrationEnabled(enabled = true) {
     this.settings = await this.settingsService.setRegistrationEnabled(enabled);
     return this.getSettings();
@@ -100,6 +121,9 @@ class SettingsStore {
     return this.getServerSettings().loginRequired;
   }
 
+  /**
+   * @param {Boolean} enabled
+   */
   async setLoginRequired(enabled = true) {
     this.settings = await this.settingsService.setLoginRequired(enabled);
     return this.getSettings();

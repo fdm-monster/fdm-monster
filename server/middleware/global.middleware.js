@@ -6,10 +6,7 @@ module.exports = {
   validateWhitelistedIp: inject(({ settingsStore, loggerFactory }) => async (req, res, next) => {
     const logger = loggerFactory("validateWhitelistedIp");
     const serverSettings = settingsStore.getSettings();
-    if (
-      (!serverSettings && !serverSettings[serverSettingsKey]) ||
-      !serverSettings[serverSettingsKey]?.whitelistEnabled
-    ) {
+    if ((!serverSettings && !serverSettings[serverSettingsKey]) || !serverSettings[serverSettingsKey]?.whitelistEnabled) {
       next();
       return;
     }
@@ -33,11 +30,14 @@ module.exports = {
     next();
   }),
   interceptRoles: inject(({ settingsStore, roleService }) => async (req, res, next) => {
-    const serverSettings = settingsStore.getSettings();
+    const serverSettings = await settingsStore.getSettings();
 
     req.roles = req.user?.roles;
-    if (serverSettings && !serverSettings[serverSettingsKey]?.loginRequired && !req.user) {
-      req.roles = [roleService.getDefaultRole()];
+
+    // If server settings are not set, we can't determine the default role
+    if (serverSettings && !req.user) {
+      const roleName = await roleService.getAppDefaultRole();
+      req.roles = [roleName];
     }
 
     next();

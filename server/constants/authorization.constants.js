@@ -5,18 +5,14 @@ function serializePerm(group, perm) {
 }
 
 const PERM_GROUP = {
-  Alerts: "Alerts",
   PrinterFiles: "PrinterFiles",
   PrinterSettings: "PrinterSettings",
-  PrinterFloors: "PrinterFloors", // TODO rename in migration or seed
+  Floors: "PrinterFloors", // TODO rename in migration or seed
   PrintCompletion: "PrintCompletion",
   ServerInfo: "ServerInfo",
 };
 
 const PERMS = {
-  Alerts: {
-    Test: serializePerm(PERM_GROUP.Alerts, "Test"),
-  },
   [PERM_GROUP.PrinterFiles]: {
     Default: serializePerm(PERM_GROUP.PrinterFiles, "Default"),
     Get: serializePerm(PERM_GROUP.PrinterFiles, "Get"),
@@ -29,13 +25,13 @@ const PERMS = {
     Default: serializePerm(PERM_GROUP.PrintCompletion, "Default"),
     List: serializePerm(PERM_GROUP.PrintCompletion, "List"),
   },
-  [PERM_GROUP.PrinterFloors]: {
-    Default: serializePerm(PERM_GROUP.PrinterFloors, "Default"),
-    List: serializePerm(PERM_GROUP.PrinterFloors, "List"),
-    Get: serializePerm(PERM_GROUP.PrinterFloors, "Get"),
-    Create: serializePerm(PERM_GROUP.PrinterFloors, "Create"),
-    Update: serializePerm(PERM_GROUP.PrinterFloors, "Update"),
-    Delete: serializePerm(PERM_GROUP.PrinterFloors, "Delete"),
+  [PERM_GROUP.Floors]: {
+    Default: serializePerm(PERM_GROUP.Floors, "Default"),
+    List: serializePerm(PERM_GROUP.Floors, "List"),
+    Get: serializePerm(PERM_GROUP.Floors, "Get"),
+    Create: serializePerm(PERM_GROUP.Floors, "Create"),
+    Update: serializePerm(PERM_GROUP.Floors, "Update"),
+    Delete: serializePerm(PERM_GROUP.Floors, "Delete"),
   },
   [PERM_GROUP.PrinterSettings]: {
     Default: serializePerm(PERM_GROUP.PrinterSettings, "Default"),
@@ -71,19 +67,14 @@ const ROLES = {
 
 const ROLE_PERMS = {
   [ROLES.ADMIN]: union(
-    allPerms(PERM_GROUP.Alerts),
-    allPerms(PERM_GROUP.PrinterFloors),
+    allPerms(PERM_GROUP.Floors),
     allPerms(PERM_GROUP.PrinterFiles),
     allPerms(PERM_GROUP.PrintCompletion),
     allPerms(PERM_GROUP.PrinterSettings),
     allPerms(PERM_GROUP.ServerInfo)
   ),
-  [ROLES.OPERATOR]: union(
-    allPerms(PERM_GROUP.PrinterFiles),
-    allPerms(PERM_GROUP.PrintCompletion),
-    allPerms(PERM_GROUP.PrinterFloors)
-  ),
-  [ROLES.GUEST]: [PERMS.PrinterFiles.Default, PERMS.PrinterFiles.Upload],
+  [ROLES.OPERATOR]: union(allPerms(PERM_GROUP.PrinterFiles), allPerms(PERM_GROUP.PrintCompletion), allPerms(PERM_GROUP.Floors)),
+  [ROLES.GUEST]: [],
 };
 
 module.exports = {

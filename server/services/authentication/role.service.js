@@ -5,17 +5,34 @@ const { union } = require("lodash");
 
 class RoleService {
   #roles = [];
-  #logger;
+  /**
+   * @type {LoggerService}
+   */
+  logger;
+  /**
+   * @type {SettingsStore}
+   */
+  settingsStore;
 
-  #defaultRole;
+  appDefaultRole;
+  appDefaultRoleNoLogin;
 
-  constructor({ loggerFactory, defaultRole }) {
-    this.#logger = loggerFactory("RoleService");
-    this.#defaultRole = defaultRole;
+  constructor({ loggerFactory, appDefaultRole, appDefaultRoleNoLogin, settingsStore }) {
+    this.logger = loggerFactory(RoleService.name);
+    this.settingsStore = settingsStore;
+    this.appDefaultRole = appDefaultRole;
+    this.appDefaultRoleNoLogin = appDefaultRoleNoLogin;
   }
 
   get roles() {
     return this.#roles;
+  }
+
+  async getAppDefaultRole() {
+    if (await this.settingsStore.getLoginRequired()) {
+      return this.appDefaultRole;
+    }
+    return this.appDefaultRoleNoLogin;
   }
 
   getRolesPermissions(roles) {
@@ -36,17 +53,25 @@ class RoleService {
     return ROLE_PERMS[normalizedRole];
   }
 
-  getDefaultRole() {
-    return this.#defaultRole;
-  }
-
-  async getDefaultRolesId() {
+  async getAppDefaultRolesId() {
     if (!this.#roles?.length) {
       await this.syncRoles();
     }
 
-    const guestRole = await this.getRoleByName(this.getDefaultRole());
+    const guestRole = this.getRoleByName(await this.getAppDefaultRole());
     return [guestRole.id];
+  }
+
+  /**
+   * @param roleName {string}
+   * @return {Promise<*>}
+   */
+  async getSynchronizedRoleByName(roleName) {
+    if (!this.#roles?.length) {
+      await this.syncRoles();
+    }
+
+    return this.getRoleByName(roleName);
   }
 
   #normalizeRole(assignedRole) {
@@ -82,11 +107,23 @@ class RoleService {
 
   getRoleByName(roleName) {
     const role = this.#roles.find((r) => r.name === roleName);
-    if (!role) throw new NotFoundException("Role not found");
+    if (!role) throw new NotFoundException(`Role by name ${roleName} not found`);
 
     return role;
   }
 
+  /**
+   * @param roleId {string[]}
+   * @return {*[]}
+   */
+  getManyRoles(roleIds) {
+    return roleIds.map((roleId) => this.getRole(roleId));
+  }
+
+  /**
+   * @param roleId {string}
+   * @return {*}
+   */
   getRole(roleId) {
     const role = this.#roles.find((r) => r.id === roleId);
     if (!role) throw new NotFoundException(`Role Id '${roleId}' not found`);
@@ -100,7 +137,7 @@ class RoleService {
       const storedRole = await RoleModel.findOne({ name: roleName });
       if (!storedRole) {
         const newRole = await RoleModel.create({
-          name: roleName
+          name: roleName,
         });
         this.#roles.push(newRole);
       } else {

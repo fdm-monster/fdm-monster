@@ -11,9 +11,14 @@ class UserController {
    * @type {UserService}
    */
   userService;
+  /**
+   * @type {ConfigService}
+   */
+  configService;
 
-  constructor({ userService }) {
+  constructor({ userService, configService }) {
     this.userService = userService;
+    this.configService = configService;
   }
 
   async profile(req, res) {
@@ -32,7 +37,17 @@ class UserController {
   }
 
   async delete(req, res) {
+    this.throwIfDemoMode();
+
     const { id } = await validateInput(req.params, idRules);
+
+    if (this.isDemoMode()) {
+      const demoUserId = await this.userService.getDemoUserId();
+      if (id === demoUserId) {
+        this.throwIfDemoMode();
+      }
+    }
+
     await this.userService.deleteUser(id);
     res.send();
   }
@@ -44,6 +59,8 @@ class UserController {
   }
 
   async changeUsername(req, res) {
+    this.throwIfDemoMode();
+
     const { id } = await validateInput(req.params, idRules);
 
     if (req.user?.id !== id) {
@@ -58,6 +75,8 @@ class UserController {
   }
 
   async changePassword(req, res) {
+    this.throwIfDemoMode();
+
     const { id } = await validateInput(req.params, idRules);
 
     if (req.user?.id !== id) {
@@ -71,14 +90,31 @@ class UserController {
     await this.userService.updatePasswordById(id, oldPassword, newPassword);
     res.send();
   }
+
+  isDemoMode() {
+    return this.configService.get(AppConstants.OVERRIDE_IS_DEMO_MODE, "false") === "true";
+  }
+
+  throwIfDemoMode() {
+    const isDemoMode = this.isDemoMode();
+    if (isDemoMode) {
+      throw new InternalServerException("Not allowed in demo mode");
+    }
+  }
 }
 
 module.exports = createController(UserController)
   .prefix(AppConstants.apiRoute + "/user")
-  .before([authenticate(), authorizeRoles([ROLES.ADMIN])])
-  .get("/", "list")
+  .before([authenticate()])
+  .get("/", "list", {
+    before: [authorizeRoles([ROLES.ADMIN])],
+  })
+  .get("/:id", "get", {
+    before: [authorizeRoles([ROLES.ADMIN])],
+  })
+  .delete("/:id", "delete", {
+    before: [authorizeRoles([ROLES.ADMIN])],
+  })
   .get("/profile", "profile")
-  .get("/:id", "get")
-  .delete("/:id", "delete")
   .post("/:id/change-username", "changeUsername")
   .post("/:id/change-password", "changePassword");

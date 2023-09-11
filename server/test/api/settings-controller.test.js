@@ -8,7 +8,8 @@ const {
   getDefaultSettings,
   serverSettingsKey,
   frontendSettingKey,
-  getDefaultFrontendSettings, credentialSettingsKey,
+  getDefaultFrontendSettings,
+  credentialSettingsKey,
 } = require("../../constants/server-settings.constants");
 
 let request;
@@ -58,7 +59,8 @@ describe("SettingsController", () => {
     expectOkResponse(response);
   });
 
-  it("should OK on PUT settings", async () => {
+  // Removed in 1.5.0
+  test.skip("should OK on PUT settings", async () => {
     const response = await request.put(defaultRoute).send(newSettings);
     expect(response.body).not.toBeNull();
     expect(response.body).toMatchObject(newSettings);

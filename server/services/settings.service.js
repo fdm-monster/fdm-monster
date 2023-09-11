@@ -4,7 +4,6 @@ const { validateInput } = require("../handlers/validators");
 const {
   serverSettingsUpdateRules,
   frontendSettingsUpdateRules,
-  settingsUpdateRules,
   credentialSettingUpdateRules,
 } = require("./validators/settings-service.validation");
 const {
@@ -13,8 +12,9 @@ const {
   frontendSettingKey,
   credentialSettingsKey,
   timeoutSettingKey,
+  wizardSettingKey,
 } = require("../constants/server-settings.constants");
-const Sentry = require("@sentry/node");
+const { AppConstants } = require("../server.constants");
 
 class SettingsService {
   async getOrCreate() {
@@ -46,6 +46,9 @@ class SettingsService {
     }
 
     // Server settings exist, but need updating with new ones if they don't exist.
+    if (!doc[wizardSettingKey]) {
+      doc[wizardSettingKey] = Constants.getDefaultWizardSettings();
+    }
     if (!doc[timeoutSettingKey]) {
       doc[timeoutSettingKey] = Constants.getDefaultTimeout();
     }
@@ -68,6 +71,21 @@ class SettingsService {
   async setSentryDiagnosticsEnabled(enabled) {
     const settingsDoc = await this.getOrCreate();
     settingsDoc[serverSettingsKey].sentryDiagnosticsEnabled = enabled;
+    return SettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
+      new: true,
+    });
+  }
+
+  /**
+   * @param version {number}
+   * @return {Promise<any>}
+   */
+  async setWizardCompleted(version) {
+    const settingsDoc = await this.getOrCreate();
+    settingsDoc[wizardSettingKey].wizardCompleted = true;
+    settingsDoc[wizardSettingKey].wizardCompletedAt = new Date();
+    settingsDoc[wizardSettingKey].wizardVersion = version;
+
     return SettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
       new: true,
     });
@@ -146,19 +164,6 @@ class SettingsService {
         new: true,
       }
     );
-  }
-
-  /**
-   * @deprecated Use partial update methods instead
-   * @param patchUpdate
-   */
-  async update(patchUpdate) {
-    const validatedInput = await validateInput(patchUpdate, settingsUpdateRules);
-    const settingsDoc = await this.getOrCreate();
-
-    return SettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, validatedInput, {
-      new: true,
-    });
   }
 }
 

@@ -1,7 +1,7 @@
 const UserModel = require("../../models/Auth/User");
 const { NotFoundException, InternalServerException } = require("../../exceptions/runtime.exceptions");
 const { validateInput } = require("../../handlers/validators");
-const { registerUserRules } = require("../validators/user-service.validation");
+const { registerUserRules, newPasswordRules } = require("../validators/user-service.validation");
 const { ROLES } = require("../../constants/authorization.constants");
 const { hashPassword, comparePasswordHash } = require("../../utils/crypto.utils");
 
@@ -39,6 +39,10 @@ class UserService {
     return UserModel.find({ roles: { $in: [roleId] } });
   }
 
+  async getDemoUserId() {
+    return (await UserModel.findOne({ isDemoUser: true }))?._id;
+  }
+
   async findRawByUsername(username) {
     return UserModel.findOne({
       username,
@@ -55,6 +59,22 @@ class UserService {
   async getUserRoles(userId) {
     const user = await this.getUser(userId);
     return user.roles;
+  }
+
+  /**
+   * @param userId {string}
+   * @param roleId {string[]}
+   * @return {Promise<*>}
+   */
+  async setUserRoleIds(userId, roleIds) {
+    const user = await UserModel.findById(userId);
+    if (!user) throw new NotFoundException("User not found");
+    const roles = this.roleService.getManyRoles(roleIds);
+
+    user.roles = roles.map((r) => r.id);
+    user.roles = Array.from(new Set(user.roles));
+
+    return await user.save();
   }
 
   async deleteUser(userId) {
@@ -81,7 +101,6 @@ class UserService {
   }
 
   async updatePasswordById(userId, oldPassword, newPassword) {
-    const newPasswordHash = hashPassword(newPassword);
     const user = await UserModel.findById(userId);
     if (!user) throw new NotFoundException("User not found");
 
@@ -89,13 +108,15 @@ class UserService {
       throw new NotFoundException("User old password incorrect");
     }
 
-    user.passwordHash = newPasswordHash;
+    const { password } = await validateInput({ password: newPassword }, newPasswordRules);
+    user.passwordHash = hashPassword(password);
     user.needsPasswordChange = false;
     return await user.save();
   }
 
   async updatePasswordUnsafe(username, newPassword) {
-    const passwordHash = hashPassword(newPassword);
+    const { password } = await validateInput({ password: newPassword }, newPasswordRules);
+    const passwordHash = hashPassword(password);
     const user = await this.findRawByUsername(username);
     if (!user) throw new NotFoundException("User not found");
 
@@ -105,13 +126,19 @@ class UserService {
   }
 
   async register(input) {
-    const { username, password, roles } = await validateInput(input, registerUserRules);
+    const { username, password, roles, isDemoUser, isRootUser, needsPasswordChange } = await validateInput(
+      input,
+      registerUserRules
+    );
 
     const passwordHash = hashPassword(password);
     const userDoc = await UserModel.create({
       username,
       passwordHash,
       roles,
+      isDemoUser: isDemoUser ?? false,
+      isRootUser: isRootUser ?? false,
+      needsPasswordChange: needsPasswordChange ?? true,
     });
 
     return this.toDto(userDoc);

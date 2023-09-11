@@ -1,6 +1,6 @@
 const { authenticate, withPermission } = require("../middleware/authenticate");
 const { createController } = require("awilix-express");
-const { validateInput } = require("../handlers/validators");
+const { validateInput, validateMiddleware } = require("../handlers/validators");
 const { AppConstants } = require("../server.constants");
 const { idRules } = require("./validation/generic.validation");
 const { setGcodeAnalysis } = require("./validation/printer-settings-controller.validation");
@@ -11,14 +11,17 @@ class PrinterSettingsController {
    * @type {PrinterCache}
    */
   printerCache;
-  #octoPrintApiService;
+  /**
+   * @type {OctoPrintApiService}
+   */
+  octoPrintApiService;
 
   #logger;
 
   constructor({ printerCache, loggerFactory, octoPrintApiService }) {
     this.#logger = loggerFactory(PrinterSettingsController.name);
     this.printerCache = printerCache;
-    this.#octoPrintApiService = octoPrintApiService;
+    this.octoPrintApiService = octoPrintApiService;
   }
 
   /**
@@ -31,16 +34,16 @@ class PrinterSettingsController {
     const { id: printerId } = await validateInput(req.params, idRules);
 
     const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
-    const settings = await this.#octoPrintApiService.getSettings(printerLogin);
+    const settings = await this.octoPrintApiService.getSettings(printerLogin);
     res.send(settings);
   }
 
   async setGCodeAnalysis(req, res) {
     const { id: printerId } = await validateInput(req.params, idRules);
-    const input = await validateInput(req.body, setGcodeAnalysis);
+    const input = await validateMiddleware(req, setGcodeAnalysis);
 
     const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
-    const settings = await this.#octoPrintApiService.setGCodeAnalysis(printerLogin, input);
+    const settings = await this.octoPrintApiService.setGCodeAnalysis(printerLogin, input);
     res.send(settings);
   }
 
@@ -49,7 +52,7 @@ class PrinterSettingsController {
 
     const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
     const printerName = await this.printerCache.getNameAsync(printerId);
-    const settings = await this.#octoPrintApiService.updatePrinterNameSetting(printerLogin, printerName);
+    const settings = await this.octoPrintApiService.updatePrinterNameSetting(printerLogin, printerName);
     res.send(settings);
   }
 }

@@ -5,6 +5,7 @@ const {
   ExternalServiceError,
   AuthenticationError,
   AuthorizationError,
+  BadRequestException,
 } = require("../exceptions/runtime.exceptions");
 const { AppConstants } = require("../server.constants");
 
@@ -35,6 +36,10 @@ function exceptionHandler(err, req, res, next) {
   }
   if (err instanceof NotFoundException) {
     const code = err.statusCode || 404;
+    return res.status(code).send({ error: err.message });
+  }
+  if (err instanceof BadRequestException) {
+    const code = err.statusCode || 400;
     return res.status(code).send({ error: err.message });
   }
   if (err instanceof ValidationException) {
