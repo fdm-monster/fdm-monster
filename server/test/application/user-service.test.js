@@ -24,6 +24,7 @@ afterAll(async () => {
 
 describe("UserService", () => {
   it("should get user ", async () => {
+    await roleService.syncRoles();
     const { id } = await ensureTestUserCreated();
     await userService.getUser(id);
   });
@@ -42,8 +43,9 @@ describe("UserService", () => {
   });
 
   it("should get user roles", async () => {
+    await roleService.syncRoles();
     const { id } = await ensureTestUserCreated();
     const userRoles = await userService.getUserRoles(id);
-    expect(userRoles).toEqual([]);
+    expect(userRoles).toHaveLength(1);
   });
 });

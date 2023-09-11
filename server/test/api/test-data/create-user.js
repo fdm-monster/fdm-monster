@@ -27,7 +27,7 @@ async function ensureTestUserCreated(usernameIn = "test", passwordIn = "test", n
   const user = await User.create({
     username,
     passwordHash: hash,
-    roles: [roleId.toString()],
+    roles: [roleId?.toString()],
     isRootUser: true,
     needsPasswordChange,
   });
