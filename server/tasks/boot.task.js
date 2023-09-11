@@ -122,6 +122,8 @@ class BootTask {
     await this.settingsStore.loadSettings();
     const loginRequired = this.configService.get(AppConstants.OVERRIDE_LOGIN_REQUIRED, "false") === "true";
     await this.settingsStore.setLoginRequired(loginRequired);
+    const registrationEnabled = this.configService.get(AppConstants.OVERRIDE_REGISTRATION_ENABLED, "false") === "true";
+    await this.settingsStore.setRegistrationEnabled(registrationEnabled);
 
     const overrideJwtSecret = this.configService.get(AppConstants.OVERRIDE_JWT_SECRET, undefined);
     const overrideJwtExpiresIn = this.configService.get(AppConstants.OVERRIDE_JWT_EXPIRES_IN, undefined);
@@ -139,15 +141,6 @@ class BootTask {
     this.logger.log("Synchronizing user permission and roles definition");
     await this.permissionService.syncPermissions();
     await this.roleService.syncRoles();
-    await this.ensureRootUserExists();
-
-    const overrideRootPassword = this.configService.get(AppConstants.OVERRIDE_ROOT_PASSWORD, undefined);
-    if (overrideRootPassword?.length > 0 && overrideRootPassword?.length < 5) {
-      this.logger.warn("Skipping root password override, its shorter than 5 characters");
-    } else if (overrideRootPassword?.length > 0) {
-      this.logger.log("Applying root password override");
-      await this.applyRootPasswordOverride(overrideRootPassword);
-    }
 
     if (process.env.SAFEMODE_ENABLED === "true") {
       this.logger.warn("Starting in safe mode due to SAFEMODE_ENABLED");
@@ -165,27 +158,6 @@ class BootTask {
     await mongoose.connect(fetchMongoDBConnectionString(), {
       serverSelectionTimeoutMS: 1500,
     });
-  }
-
-  async ensureRootUserExists() {
-    const rootUsername = this.configService.get(AppConstants.OVERRIDE_ROOT_USERNAME, AppConstants.DEFAULT_ROOT_USERNAME);
-    const adminRole = this.roleService.getRoleByName(ROLES.ADMIN);
-    const rootUser = await this.userService.findRawByUsername(rootUsername);
-    if (!rootUser) {
-      await this.userService.register({
-        username: rootUsername,
-        password: AppConstants.DEFAULT_ROOT_PASSWORD,
-        needsPasswordChange: true,
-        roles: [adminRole.id],
-      });
-      this.logger.log("Created admin account as it was missing.");
-    }
-  }
-
-  async applyRootPasswordOverride(passwordOverride) {
-    const rootUsername = this.configService.get(AppConstants.OVERRIDE_ROOT_USERNAME, AppConstants.DEFAULT_ROOT_USERNAME);
-    await this.userService.updatePasswordUnsafe(rootUsername, passwordOverride);
-    this.logger.log(`Updated ${rootUsername} user password due to override`);
   }
 
   async migrateDatabase() {

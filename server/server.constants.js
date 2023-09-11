@@ -22,11 +22,8 @@ const AppConstants = {
 
   // Boolean string (true/false), persisted always
   OVERRIDE_LOGIN_REQUIRED: "OVERRIDE_LOGIN_REQUIRED",
-  // String, persisted always
-  OVERRIDE_ROOT_PASSWORD: "OVERRIDE_ROOT_PASSWORD",
-  DEFAULT_ROOT_PASSWORD: "fdm-monster-root",
-  OVERRIDE_ROOT_USERNAME: "OVERRIDE_ROOT_USERNAME",
-  DEFAULT_ROOT_USERNAME: "root",
+  // Boolean string (true/false), persisted always
+  OVERRIDE_REGISTRATION_ENABLED: "OVERRIDE_REGISTRATION_ENABLED",
   DEFAULT_PASSWORD_MINLEN: 8,
   // String, persisted always
   OVERRIDE_JWT_SECRET: "OVERRIDE_JWT_SECRET",

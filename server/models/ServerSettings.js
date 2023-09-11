@@ -116,6 +116,11 @@ const ServerSettingsSchema = new Schema({
     },
     loginRequired: {
       type: Boolean,
+      default: true,
+      required: true,
+    },
+    registration: {
+      type: Boolean,
       default: false,
       required: true,
     },
@@ -130,11 +135,6 @@ const ServerSettingsSchema = new Schema({
         type: String,
       },
     ],
-    registration: {
-      type: Boolean,
-      default: true,
-      required: true,
-    },
   },
   [frontendSettingKey]: {
     gridCols: {
