@@ -36,7 +36,8 @@ module.exports = {
 
     // If server settings are not set, we can't determine the default role
     if (serverSettings && !req.user) {
-      req.roles = [await roleService.getAppDefaultRole()];
+      const roleName = await roleService.getAppDefaultRole();
+      req.roles = [roleName];
     }
 
     next();

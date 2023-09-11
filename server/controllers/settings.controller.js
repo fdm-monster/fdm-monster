@@ -20,12 +20,6 @@ class SettingsController {
     res.send(settings);
   }
 
-  async updateWizardSettings(req, res) {
-    const { enabled } = await validateInput(req.body, sentryDiagnosticsEnabledRules);
-    const result = await this.settingsStore.updateWizardSettings(req.body);
-    res.send(result);
-  }
-
   async updateSentryDiagnosticsEnabled(req, res) {
     const { enabled } = await validateInput(req.body, sentryDiagnosticsEnabledRules);
     const result = this.settingsStore.setSentryDiagnosticsEnabled(enabled);

@@ -180,7 +180,7 @@ class BootTask {
         needsPasswordChange: false,
         roles: [adminRole.id],
       });
-      this.logger.log("Created demo user");
+      this.logger.log("Created demo account");
     } else {
       await this.userService.updatePasswordUnsafe(demoUsername, demoPassword);
       await this.userService.setUserRoleIds(demoUserId, [adminRole.id]);

@@ -6,6 +6,7 @@ const { expectOkResponse } = require("../../extensions");
 
 let container;
 let serverHost;
+let request;
 
 beforeAll(async () => {
   await dbHandler.connect();

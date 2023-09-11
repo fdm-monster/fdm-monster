@@ -18,6 +18,7 @@ class UserController {
 
   constructor({ userService, configService }) {
     this.userService = userService;
+    this.configService = configService;
   }
 
   async profile(req, res) {

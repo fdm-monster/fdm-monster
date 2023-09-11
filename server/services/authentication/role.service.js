@@ -14,8 +14,8 @@ class RoleService {
    */
   settingsStore;
 
-  #appDefaultRole;
-  #appDefaultRoleNoLogin;
+  appDefaultRole;
+  appDefaultRoleNoLogin;
 
   constructor({ loggerFactory, appDefaultRole, appDefaultRoleNoLogin, settingsStore }) {
     this.logger = loggerFactory(RoleService.name);
@@ -30,9 +30,9 @@ class RoleService {
 
   async getAppDefaultRole() {
     if (await this.settingsStore.getLoginRequired()) {
-      return this.#appDefaultRole;
+      return this.appDefaultRole;
     }
-    return this.#appDefaultRoleNoLogin;
+    return this.appDefaultRoleNoLogin;
   }
 
   getRolesPermissions(roles) {

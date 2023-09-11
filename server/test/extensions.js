@@ -37,6 +37,10 @@ function expectValidationError(object, keys, exact = false) {
   }
 }
 
+function expectBadRequestError(response) {
+  expect(response.statusCode).toEqual(400);
+}
+
 function expectInternalServerError(response) {
   expect(response.statusCode).toEqual(500);
 }
@@ -64,6 +68,7 @@ function expectNotFoundResponse(response) {
 module.exports = {
   expectEmptyResponse,
   expectRedirectResponse,
+  expectBadRequestError,
   expectOkResponse,
   expectValidationError,
   expectUnauthorizedResponse,

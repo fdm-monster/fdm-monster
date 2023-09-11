@@ -1,5 +1,7 @@
 const User = require("../../../models/Auth/User");
 const bcrypt = require("bcryptjs");
+const { ROLES } = require("../../../constants/authorization.constants");
+const { Role } = require("../../../models");
 
 function getUserData(username = "tester", password = "testpassword") {
   return {
@@ -8,13 +10,15 @@ function getUserData(username = "tester", password = "testpassword") {
   };
 }
 
-async function ensureTestUserCreated(usernameIn = "test", passwordIn = "test", needsPasswordChange = false) {
+async function ensureTestUserCreated(usernameIn = "test", passwordIn = "test", needsPasswordChange = false, role = ROLES.ADMIN) {
   const foundUser = await User.findOne({ username: usernameIn });
   if (foundUser)
     return {
       id: foundUser.id,
       username: foundUser.username,
     };
+
+  const roleId = (await Role.findOne({ name: role }))?._id;
 
   const { username, password } = getUserData(usernameIn, passwordIn);
   const salt = await bcrypt.genSaltSync(10);
@@ -23,6 +27,8 @@ async function ensureTestUserCreated(usernameIn = "test", passwordIn = "test", n
   const user = await User.create({
     username,
     passwordHash: hash,
+    roles: [roleId.toString()],
+    isRootUser: true,
     needsPasswordChange,
   });
 
