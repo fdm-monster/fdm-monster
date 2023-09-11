@@ -1,5 +1,4 @@
 const User = require("../../../models/Auth/User");
-const bcrypt = require("bcryptjs");
 const { ROLES } = require("../../../constants/authorization.constants");
 const { Role } = require("../../../models");
 const { hashPassword } = require("../../../utils/crypto.utils");
