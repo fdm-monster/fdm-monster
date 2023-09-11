@@ -9,6 +9,7 @@ const {
 } = require("../constants/server-settings.constants");
 const Sentry = require("@sentry/node");
 const { isTestEnvironment } = require("../utils/env.utils");
+const { AppConstants } = require("../server.constants");
 
 class SettingsStore {
   /**
@@ -69,7 +70,10 @@ class SettingsStore {
   }
 
   isWizardCompleted() {
-    return this.settings[wizardSettingKey].wizardCompleted;
+    return (
+      this.settings[wizardSettingKey].wizardCompleted &&
+      this.settings[wizardSettingKey].wizardVersion === AppConstants.currentWizardVersion
+    );
   }
 
   getWizardSettings() {

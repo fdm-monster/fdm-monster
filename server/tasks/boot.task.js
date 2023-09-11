@@ -120,9 +120,24 @@ class BootTask {
 
     this.logger.log("Loading and synchronizing Server Settings");
     await this.settingsStore.loadSettings();
+
+    this.logger.log("Synchronizing user permission and roles definition");
+    await this.permissionService.syncPermissions();
+    await this.roleService.syncRoles();
+
+    const isDemoMode = this.configService.get(AppConstants.OVERRIDE_IS_DEMO_MODE, "false") === "true";
+    if (isDemoMode) {
+      this.logger.warn("Starting in demo mode due to OVERRIDE_IS_DEMO_MODE");
+      await this.createOrUpdateDemoAccount();
+    }
+
     const loginRequired = this.configService.get(AppConstants.OVERRIDE_LOGIN_REQUIRED, "false") === "true";
     await this.settingsStore.setLoginRequired(loginRequired);
-    const registrationEnabled = this.configService.get(AppConstants.OVERRIDE_REGISTRATION_ENABLED, "false") === "true";
+
+    // If we are in demo mode, do not allow registration
+    const registrationEnabled = isDemoMode
+      ? false
+      : this.configService.get(AppConstants.OVERRIDE_REGISTRATION_ENABLED, "false") === "true";
     await this.settingsStore.setRegistrationEnabled(registrationEnabled);
 
     const overrideJwtSecret = this.configService.get(AppConstants.OVERRIDE_JWT_SECRET, undefined);
@@ -138,10 +153,6 @@ class BootTask {
     this.logger.log("Loading floor store");
     await this.floorStore.loadStore();
 
-    this.logger.log("Synchronizing user permission and roles definition");
-    await this.permissionService.syncPermissions();
-    await this.roleService.syncRoles();
-
     if (process.env.SAFEMODE_ENABLED === "true") {
       this.logger.warn("Starting in safe mode due to SAFEMODE_ENABLED");
     } else {
@@ -152,6 +163,32 @@ class BootTask {
 
     // Success so we disable this task
     this.taskManagerService.disableJob(DITokens.bootTask, false);
+  }
+
+  async createOrUpdateDemoAccount() {
+    const demoUsername = this.configService.get(AppConstants.OVERRIDE_DEMO_USERNAME, AppConstants.DEFAULT_DEMO_USERNAME);
+    const demoPassword = this.configService.get(AppConstants.OVERRIDE_DEMO_PASSWORD, AppConstants.DEFAULT_DEMO_PASSWORD);
+    const demoRole = this.configService.get(AppConstants.OVERRIDE_DEMO_ROLE, AppConstants.DEFAULT_DEMO_ROLE);
+    const adminRole = this.roleService.getRoleByName(demoRole);
+
+    const demoUserId = await this.userService.getDemoUserId();
+    if (!demoUserId) {
+      await this.userService.register({
+        username: demoUsername,
+        password: demoPassword,
+        isDemoUser: true,
+        needsPasswordChange: false,
+        roles: [adminRole.id],
+      });
+      this.logger.log("Created demo user");
+    } else {
+      await this.userService.updatePasswordUnsafe(demoUsername, demoPassword);
+      await this.userService.setUserRoleIds(demoUserId, [adminRole.id]);
+      this.logger.log("Updated demo account");
+    }
+
+    await this.settingsStore.isWizardCompleted();
+    await this.settingsStore.setWizardCompleted(1);
   }
 
   async createConnection() {

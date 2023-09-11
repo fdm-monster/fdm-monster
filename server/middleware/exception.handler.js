@@ -39,7 +39,7 @@ function exceptionHandler(err, req, res, next) {
     return res.status(code).send({ error: err.message });
   }
   if (err instanceof BadRequestException) {
-    const code = err.statusCode || 404;
+    const code = err.statusCode || 400;
     return res.status(code).send({ error: err.message });
   }
   if (err instanceof ValidationException) {

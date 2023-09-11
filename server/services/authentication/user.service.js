@@ -39,6 +39,10 @@ class UserService {
     return UserModel.find({ roles: { $in: [roleId] } });
   }
 
+  async getDemoUserId() {
+    return (await UserModel.findOne({ isDemoUser: true }))?._id;
+  }
+
   async findRawByUsername(username) {
     return UserModel.findOne({
       username,
@@ -55,6 +59,22 @@ class UserService {
   async getUserRoles(userId) {
     const user = await this.getUser(userId);
     return user.roles;
+  }
+
+  /**
+   * @param userId {string}
+   * @param roleId {string[]}
+   * @return {Promise<*>}
+   */
+  async setUserRoleIds(userId, roleIds) {
+    const user = await UserModel.findById(userId);
+    if (!user) throw new NotFoundException("User not found");
+    const roles = this.roleService.getManyRoles(roleIds);
+
+    user.roles = roles.map((r) => r.id);
+    user.roles = Array.from(new Set(user.roles));
+
+    return await user.save();
   }
 
   async deleteUser(userId) {
@@ -89,9 +109,7 @@ class UserService {
     }
 
     const { password } = await validateInput({ password: newPassword }, newPasswordRules);
-    const newPasswordHash = hashPassword(password);
-
-    user.passwordHash = newPasswordHash;
+    user.passwordHash = hashPassword(password);
     user.needsPasswordChange = false;
     return await user.save();
   }
@@ -108,14 +126,19 @@ class UserService {
   }
 
   async register(input) {
-    const { username, password, roles } = await validateInput(input, registerUserRules);
+    const { username, password, roles, isDemoUser, isRootUser, needsPasswordChange } = await validateInput(
+      input,
+      registerUserRules
+    );
 
     const passwordHash = hashPassword(password);
     const userDoc = await UserModel.create({
       username,
       passwordHash,
       roles,
-      needsPasswordChange: true,
+      isDemoUser: isDemoUser ?? false,
+      isRootUser: isRootUser ?? false,
+      needsPasswordChange: needsPasswordChange ?? true,
     });
 
     return this.toDto(userDoc);

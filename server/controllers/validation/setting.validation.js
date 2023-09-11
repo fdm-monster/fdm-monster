@@ -1,4 +1,5 @@
 module.exports = {
+  // Wizard version 1
   wizardSettingsRules: {
     loginRequired: "required|boolean",
     registration: "required|boolean",

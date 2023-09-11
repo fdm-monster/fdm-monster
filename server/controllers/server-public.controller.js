@@ -1,7 +1,7 @@
 const { createController } = require("awilix-express");
 const { AppConstants } = require("../server.constants");
 const { isNodemon, isNode, isPm2 } = require("../utils/env.utils");
-const { authenticate, withPermission, authorizePermission } = require("../middleware/authenticate");
+const { authenticate, authorizePermission } = require("../middleware/authenticate");
 const { PERMS, ROLES } = require("../constants/authorization.constants");
 const { isDocker } = require("../utils/is-docker");
 const { serverSettingsKey } = require("../constants/server-settings.constants");
@@ -72,12 +72,12 @@ class ServerPublicController {
   }
 
   async completeWizard(req, res) {
+    const { loginRequired, registration, rootUsername, rootPassword } = await validateMiddleware(req, wizardSettingsRules);
+
     if (this.settingsStore.isWizardCompleted()) {
       throw new AuthorizationError("Wizard already completed");
     }
 
-    // TODO deal with loginRequired and admin user env vars when wizard is completed
-    const { loginRequired, registration, rootUsername, rootPassword } = await validateMiddleware(req, wizardSettingsRules);
     const role = await this.roleService.getSynchronizedRoleByName(ROLES.ADMIN);
 
     const user = await this.userService.findRawByUsername(rootUsername?.toLowerCase());
@@ -89,6 +89,7 @@ class ServerPublicController {
       username: rootUsername,
       password: rootPassword,
       roles: [role.id],
+      isRootUser: true,
     });
     await this.settingsStore.setLoginRequired(loginRequired);
     await this.settingsStore.setRegistrationEnabled(registration);

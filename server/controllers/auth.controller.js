@@ -1,5 +1,5 @@
 const { createController } = require("awilix-express");
-const { InternalServerException } = require("../exceptions/runtime.exceptions");
+const { InternalServerException, BadRequestException } = require("../exceptions/runtime.exceptions");
 const { AppConstants } = require("../server.constants");
 const { validateMiddleware } = require("../handlers/validators");
 const { registerUserRules } = require("./validation/user-controller.validation");
@@ -86,7 +86,7 @@ class AuthController {
   async register(req, res) {
     let registrationEnabled = this.settingsStore.isRegistrationEnabled();
     if (!registrationEnabled) {
-      throw new InternalServerException("Registration is disabled. Cant register user");
+      throw new BadRequestException("Registration is disabled. Cant register user");
     }
     const { username, password } = await validateMiddleware(req, registerUserRules);
 

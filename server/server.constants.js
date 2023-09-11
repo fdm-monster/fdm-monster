@@ -42,6 +42,14 @@ const AppConstants = {
   OVERRIDE_JWT_AUDIENCE: "OVERRIDE_JWT_AUDIENCE",
   DEFAULT_JWT_AUDIENCE: "fdm-monster-client",
 
+  OVERRIDE_IS_DEMO_MODE: "OVERRIDE_IS_DEMO_MODE",
+  OVERRIDE_DEMO_USERNAME: "OVERRIDE_DEMO_USERNAME",
+  DEFAULT_DEMO_USERNAME: "demo",
+  OVERRIDE_DEMO_PASSWORD: "OVERRIDE_DEMO_PASSWORD",
+  DEFAULT_DEMO_PASSWORD: "demo2023",
+  OVERRIDE_DEMO_ROLE: "OVERRIDE_DEMO_ROLE",
+  DEFAULT_DEMO_ROLE: "ADMIN",
+
   defaultTestEnv: "test",
   defaultProductionEnv: "production",
   knownEnvNames: ["development", "production", "test"],

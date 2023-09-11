@@ -24,15 +24,15 @@ class RoleService {
     this.appDefaultRoleNoLogin = appDefaultRoleNoLogin;
   }
 
+  get roles() {
+    return this.#roles;
+  }
+
   async getAppDefaultRole() {
     if (await this.settingsStore.getLoginRequired()) {
       return this.#appDefaultRole;
     }
     return this.#appDefaultRoleNoLogin;
-  }
-
-  get roles() {
-    return this.#roles;
   }
 
   getRolesPermissions(roles) {
@@ -58,7 +58,7 @@ class RoleService {
       await this.syncRoles();
     }
 
-    const guestRole = await this.getRoleByName(await this.getAppDefaultRole());
+    const guestRole = this.getRoleByName(await this.getAppDefaultRole());
     return [guestRole.id];
   }
 
@@ -107,11 +107,23 @@ class RoleService {
 
   getRoleByName(roleName) {
     const role = this.#roles.find((r) => r.name === roleName);
-    if (!role) throw new NotFoundException("Role not found");
+    if (!role) throw new NotFoundException(`Role by name ${roleName} not found`);
 
     return role;
   }
 
+  /**
+   * @param roleId {string[]}
+   * @return {*[]}
+   */
+  getManyRoles(roleIds) {
+    return roleIds.map((roleId) => this.getRole(roleId));
+  }
+
+  /**
+   * @param roleId {string}
+   * @return {*}
+   */
   getRole(roleId) {
     const role = this.#roles.find((r) => r.id === roleId);
     if (!role) throw new NotFoundException(`Role Id '${roleId}' not found`);
