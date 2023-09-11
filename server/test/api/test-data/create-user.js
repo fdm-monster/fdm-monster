@@ -32,7 +32,7 @@ async function ensureTestUserCreated(usernameIn = "test", passwordIn = "test", n
     username,
     passwordHash: hash,
     roles,
-    isRootUser: true,
+    isRootUser: role === ROLES.ADMIN,
     needsPasswordChange,
   });
 
