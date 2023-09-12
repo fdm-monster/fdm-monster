@@ -9,7 +9,7 @@ jobs:
       labels: ${{ steps.metadata.outputs.labels }}
     steps:
       - id: metadata
-        uses: crazy-max/ghaction-docker-meta@v4
+        uses: crazy-max/ghaction-docker-meta@v5
         with:
           images: davidzwa/fdm-monster
 
