@@ -1,4 +1,4 @@
-import { Body, CacheTTL, Controller, Get, Param, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { ApiBody, ApiCreatedResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { UpdateUserDto } from "@/users/dto/update-user.dto";
@@ -11,6 +11,7 @@ import { Roles } from "@/shared/decorators/role.decorator";
 import { Role } from "@/users/user.constants";
 import { UsersAndRolesDto } from "@/users/dto/users-and-roles.dto";
 import { UserRoleCache } from "@/users/user-role.cache";
+import { CacheTTL } from "@nestjs/common/cache";
 
 class QueryDto {}
 

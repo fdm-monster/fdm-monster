@@ -1,6 +1,5 @@
 import { Body, Controller, Get, Logger, Patch, Req } from "@nestjs/common";
 import { ApiOkResponse, ApiTags } from "@nestjs/swagger";
-import { Settings } from "@/settings/entities/settings.entity";
 import { SettingsDto, SettingsWithConnectionDto } from "@/settings/dto/settings.dto";
 import { SettingsCache } from "@/settings/settings.cache";
 import { Roles } from "@/shared/decorators/role.decorator";
@@ -10,7 +9,6 @@ import { UpdateClientSettingsDto } from "@/settings/dto/update-client.settings.d
 import { Request } from "express";
 import { address } from "ip";
 import { SentryService } from "@ntegral/nestjs-sentry";
-import { version } from "@/../package.json";
 
 @Controller("settings")
 @ApiTags("Settings")
@@ -42,7 +40,6 @@ export class SettingsController {
       connection = {
         clientIp: req.socket?.remoteAddress,
         ip: serverIp,
-        version,
       };
     } catch (e) {
       this.sentry.instance().captureException(e);

@@ -4,6 +4,8 @@
   "sourceRoot": "src",
   "compilerOptions": {
     "deleteOutDir": false,
+    "builder": "swc",
+    "typeCheck": true,
     "plugins": [
       {
         "name": "@nestjs/swagger",
