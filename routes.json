@@ -1,0 +1,470 @@
+[
+  {
+    "method": "POST",
+    "path": "\\\\api\\auth\\register"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\auth\\login"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\auth\\login-required"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\auth\\needs-password-change"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\auth\\refresh"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\auth\\verify"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\auth\\logout"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\batch\\connect\\usb"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\batch\\connect\\socket"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\batch\\reprint"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\batch\\toggle-enabled"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\camera-stream\\"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\camera-stream\\:id"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\camera-stream\\"
+  },
+  {
+    "method": "DELETE",
+    "path": "\\\\api\\camera-stream\\:id"
+  },
+  {
+    "method": "PATCH",
+    "path": "\\\\api\\camera-stream\\:id"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\custom-gcode\\"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\custom-gcode\\:id"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\custom-gcode\\"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\custom-gcode\\send-emergency-m112\\:printerId"
+  },
+  {
+    "method": "DELETE",
+    "path": "\\\\api\\custom-gcode\\:id"
+  },
+  {
+    "method": "PUT",
+    "path": "\\\\api\\custom-gcode\\:id"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\first-time-setup\\"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\floor\\"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\floor\\:id"
+  },
+  {
+    "method": "PATCH",
+    "path": "\\\\api\\floor\\:id\\name"
+  },
+  {
+    "method": "PATCH",
+    "path": "\\\\api\\floor\\:id\\floor-number"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\floor\\:id\\printer"
+  },
+  {
+    "method": "DELETE",
+    "path": "\\\\api\\floor\\:id\\printer"
+  },
+  {
+    "method": "DELETE",
+    "path": "\\\\api\\floor\\:id"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\floor\\"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\plugin\\firmware-update\\"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\plugin\\firmware-update\\releases\\sync"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\plugin\\firmware-update\\scan"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\plugin\\firmware-update\\download-firmware"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\plugin\\firmware-update\\:id\\install-firmware-update-plugin"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\plugin\\firmware-update\\:id\\is-plugin-installed"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\plugin\\firmware-update\\:id\\configure-plugin-settings"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\plugin\\firmware-update\\:id\\status"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\plugin\\firmware-update\\:id\\flash-firmware"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\print-completion\\"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\print-completion\\test"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\print-completion\\contexts"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\print-completion\\:correlationId"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\printer-files\\purge"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\printer-files\\tracked-uploads"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\printer-files\\batch\\reprint-files"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\printer-files\\:id"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\printer-files\\:id\\cache"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\printer-files\\:id\\local-upload"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\printer-files\\:id\\upload"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\printer-files\\:id\\create-folder"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\printer-files\\:id\\select"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\printer-files\\:id\\move"
+  },
+  {
+    "method": "DELETE",
+    "path": "\\\\api\\printer-files\\:id"
+  },
+  {
+    "method": "DELETE",
+    "path": "\\\\api\\printer-files\\:id\\clear"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\printer-settings\\:id"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\printer-settings\\:id\\gcode-analysis"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\printer-settings\\:id\\sync-printername"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\printer\\"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\printer\\"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\printer\\batch"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\printer\\test-connection"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\printer\\plugin-list"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\printer\\:id"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\printer\\:id\\socket"
+  },
+  {
+    "method": "PATCH",
+    "path": "\\\\api\\printer\\:id"
+  },
+  {
+    "method": "DELETE",
+    "path": "\\\\api\\printer\\:id"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\printer\\:id\\login-details"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\printer\\:id\\serial-connect"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\printer\\:id\\serial-disconnect"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\printer\\:id\\job\\stop"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\printer\\:id\\job\\pause"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\printer\\:id\\job\\resume"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\printer\\:id\\refresh-socket"
+  },
+  {
+    "method": "PATCH",
+    "path": "\\\\api\\printer\\:id\\enabled"
+  },
+  {
+    "method": "PATCH",
+    "path": "\\\\api\\printer\\:id\\connection"
+  },
+  {
+    "method": "PATCH",
+    "path": "\\\\api\\printer\\:id\\step-size"
+  },
+  {
+    "method": "PATCH",
+    "path": "\\\\api\\printer\\:id\\flow-rate"
+  },
+  {
+    "method": "PATCH",
+    "path": "\\\\api\\printer\\:id\\feed-rate"
+  },
+  {
+    "method": "PATCH",
+    "path": "\\\\api\\printer\\:id\\disabled-reason"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\printer\\:id\\list-printer-floors"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\printer\\:id\\plugin-list"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\printer\\:id\\octoprint\\system\\"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\printer\\:id\\octoprint\\system\\restart"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\printer\\:id\\octoprint\\backup"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\printer\\:id\\octoprint\\backup\\list"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\printer\\:id\\octoprint\\backup\\download"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\printer\\:id\\octoprint\\backup\\restore"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\printer\\:id\\octoprint\\backup\\create"
+  },
+  {
+    "method": "DELETE",
+    "path": "\\\\api\\printer\\:id\\octoprint\\backup\\delete"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\server\\"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\server\\client-releases"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\server\\update-client-bundle-github"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\server\\export-printers-floors-yaml"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\server\\import-printers-floors-yaml"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\server\\git-update"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\server\\restart"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\server\\dump-fdm-monster-logs"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\server\\dump-fdm-monster-logs"
+  },
+  {
+    "method": "DELETE",
+    "path": "\\\\api\\server\\clear-outdated-fdm-monster-logs"
+  },
+  {
+    "method": "DELETE",
+    "path": "\\\\api\\server\\delete-all-printers"
+  },
+  {
+    "method": "GET",
+    "path": "\\api\\"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\features\\"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\version\\"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\settings\\server"
+  },
+  {
+    "method": "PUT",
+    "path": "\\\\api\\settings\\server\\server"
+  },
+  {
+    "method": "PATCH",
+    "path": "\\\\api\\settings\\server\\sentry-diagnostics"
+  },
+  {
+    "method": "PUT",
+    "path": "\\\\api\\settings\\server\\whitelist"
+  },
+  {
+    "method": "PUT",
+    "path": "\\\\api\\settings\\server\\frontend"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\user\\"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\user\\:id"
+  },
+  {
+    "method": "DELETE",
+    "path": "\\\\api\\user\\:id"
+  },
+  {
+    "method": "GET",
+    "path": "\\\\api\\user\\profile"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\user\\:id\\change-username"
+  },
+  {
+    "method": "POST",
+    "path": "\\\\api\\user\\:id\\change-password"
+  },
+  {
+    "method": "GET",
+    "path": "*"
+  }
+]

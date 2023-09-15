@@ -69,6 +69,14 @@ class SettingsStore {
     }
   }
 
+  getWizardState() {
+    return {
+      wizardCompleted: this.settings[wizardSettingKey].wizardCompleted,
+      wizardVersion: this.settings[wizardSettingKey].wizardVersion,
+      latestWizardVersion: AppConstants.currentWizardVersion,
+    };
+  }
+
   isWizardCompleted() {
     return (
       this.settings[wizardSettingKey].wizardCompleted &&
