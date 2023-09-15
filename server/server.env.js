@@ -183,8 +183,8 @@ function setupEnvConfig(skipDotEnv = false) {
   }
 
   ensureNodeEnvSet();
-  setupPackageJsonVersionOrThrow();
-  ensureEnvNpmVersionSet();
+  // setupPackageJsonVersionOrThrow();
+  // ensureEnvNpmVersionSet();
   setupSentry();
   ensureMongoDBConnectionStringSet();
   ensurePortSet();

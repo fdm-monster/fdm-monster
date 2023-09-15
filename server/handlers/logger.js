@@ -10,7 +10,7 @@ const dtFormat = new Intl.DateTimeFormat("en-GB", {
   timeZone: "UTC",
 });
 
-dateFormat = () => {
+const dateFormat = () => {
   return dtFormat.format(new Date());
 };
 
