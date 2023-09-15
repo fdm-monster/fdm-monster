@@ -55,4 +55,4 @@ class FirstTimeSetupController {
 
 module.exports = createController(FirstTimeSetupController)
   .prefix(AppConstants.apiRoute + "/first-time-setup")
-  .get("/", "getFirstTimeSetup");
+  .post("/", "completeWizard");

@@ -3372,6 +3372,11 @@ expect@^29.7.0:
     jest-message-util "^29.7.0"
     jest-util "^29.7.0"
 
+express-list-routes@^1.1.5:
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/express-list-routes/-/express-list-routes-1.1.5.tgz#bcc9878a7e0d34dd61bad7cee2c431568f5a3399"
+  integrity sha512-DUqJE9lxUmRSuw2Od/5C0vhlzvzcHFVo4fXat12fk6agAuxXGgO6cOQeq1/1sFBKzbjgSfMilT2CRJdYpcBh4g==
+
 express-session@1.17.3:
   version "1.17.3"
   resolved "https://registry.yarnpkg.com/express-session/-/express-session-1.17.3.tgz#14b997a15ed43e5949cb1d073725675dd2777f36"
