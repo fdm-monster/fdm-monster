@@ -7,10 +7,6 @@ const { ROLES } = require("../constants/authorization.constants");
 
 class FirstTimeSetupController {
   /**
-   * @type {string}
-   */
-  serverVersion;
-  /**
    * @type {UserService}
    */
   userService;
@@ -18,6 +14,10 @@ class FirstTimeSetupController {
    * @type {RoleService}
    */
   roleService;
+  /**
+   * @type {SettingsStore}
+   */
+  settingsStore;
 
   constructor({ settingsStore, roleService, userService }) {
     this.settingsStore = settingsStore;
