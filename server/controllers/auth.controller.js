@@ -42,7 +42,8 @@ class AuthController {
 
   async getLoginRequired(req, res) {
     const isLoginRequired = await this.settingsStore.getLoginRequired();
-    return res.send({ loginRequired: isLoginRequired });
+    const wizardState = this.settingsStore.getWizardState();
+    return res.send({ loginRequired: isLoginRequired, wizardState });
   }
 
   async verifyLogin(req, res) {

@@ -5,9 +5,6 @@ const { authenticate, authorizePermission } = require("../middleware/authenticat
 const { PERMS, ROLES } = require("../constants/authorization.constants");
 const { isDocker } = require("../utils/is-docker");
 const { serverSettingsKey } = require("../constants/server-settings.constants");
-const { BadRequestException, AuthorizationError } = require("../exceptions/runtime.exceptions");
-const { validateMiddleware } = require("../handlers/validators");
-const { wizardSettingsRules } = require("./validation/setting.validation");
 
 class ServerPublicController {
   /**
@@ -69,33 +66,6 @@ class ServerPublicController {
     return res.send({
       message: "Login successful. Please load the Vue app.",
     });
-  }
-
-  async completeWizard(req, res) {
-    const { loginRequired, registration, rootUsername, rootPassword } = await validateMiddleware(req, wizardSettingsRules);
-
-    if (this.settingsStore.isWizardCompleted()) {
-      throw new AuthorizationError("Wizard already completed");
-    }
-
-    const role = await this.roleService.getSynchronizedRoleByName(ROLES.ADMIN);
-
-    const user = await this.userService.findRawByUsername(rootUsername?.toLowerCase());
-    if (!!user) {
-      throw new BadRequestException("This user already exists");
-    }
-
-    await this.userService.register({
-      username: rootUsername,
-      password: rootPassword,
-      roles: [role.id],
-      isRootUser: true,
-    });
-    await this.settingsStore.setLoginRequired(loginRequired);
-    await this.settingsStore.setRegistrationEnabled(registration);
-    await this.settingsStore.setWizardCompleted(AppConstants.currentWizardVersion);
-
-    return res.send();
   }
 
   getFeatures(req, res) {
@@ -169,8 +139,8 @@ class ServerPublicController {
 
 // prettier-ignore
 module.exports = createController(ServerPublicController)
-    .prefix(AppConstants.apiRoute + "/")
-    .post("complete-wizard", "completeWizard")
-    .get("", "welcome", { before: [authenticate(), authorizePermission(PERMS.ServerInfo.Get)] })
-    .get("features", "getFeatures", { before: [authenticate(), authorizePermission(PERMS.ServerInfo.Get)] })
-    .get("version", "getVersion", { before: [authenticate(), authorizePermission(PERMS.ServerInfo.Get)] });
+  .prefix(AppConstants.apiRoute + "/")
+  .before([authenticate()])
+  .get("", "welcome", { before: [authorizePermission(PERMS.ServerInfo.Get)] })
+  .get("features", "getFeatures", { before: [authorizePermission(PERMS.ServerInfo.Get)] })
+  .get("version", "getVersion", { before: [authorizePermission(PERMS.ServerInfo.Get)] });
