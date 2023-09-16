@@ -1,4 +1,4 @@
-import mongoose, { connect, MongooseError } from "mongoose";
+import mongoose, { connect } from "mongoose";
 import { fetchMongoDBConnectionString, runMigrations } from "@/server.env";
 import { DITokens } from "@/container.tokens";
 import { AppConstants } from "@/server.constants";
@@ -86,7 +86,7 @@ export class BootTask {
       await this.createConnection();
       await this.migrateDatabase();
     } catch (e) {
-      if (e instanceof MongooseError) {
+      if (e instanceof mongoose.Error) {
         // Tests should just continue
         if (!e.message.includes("Can't call `openUri()` on an active connection with different connection strings.")) {
           // We are not in a test

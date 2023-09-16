@@ -6,7 +6,7 @@ module.exports = {
   testTimeout: 2500,
   rootDir: ".",
   moduleNameMapper: {
-    "^@/(.*)$": "<rootDir>/../server/$1",
+    "^@/(.*)$": "<rootDir>/server/$1",
   },
   modulePathIgnorePatterns: [
     "server/migrate-mongo-config.js",
