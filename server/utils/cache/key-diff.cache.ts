@@ -1,4 +1,4 @@
-class KeyDiffCache {
+export class KeyDiffCache {
   /**
    * @type {string[]}
    */

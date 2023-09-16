@@ -4,7 +4,7 @@ const { join, extname } = require("path");
 const { readdirSync, existsSync, lstatSync, unlink, mkdirSync, createWriteStream } = require("fs");
 const { superRootPath } = require("../utils/fs.utils");
 
-class MulterService {
+export class MulterService {
   fileUploadTrackerCache;
   httpClient;
 

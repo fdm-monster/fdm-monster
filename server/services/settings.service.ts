@@ -16,7 +16,7 @@ const {
 } = require("../constants/server-settings.constants");
 const { AppConstants } = require("../server.constants");
 
-class SettingsService {
+export class SettingsService {
   async getOrCreate() {
     let settings = await SettingsModel.findOne();
     if (!settings) {

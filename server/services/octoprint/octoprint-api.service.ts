@@ -8,7 +8,7 @@ const { uploadProgressEvent, firmwareFlashUploadEvent } = require("../../constan
 const { ExternalServiceError } = require("../../exceptions/runtime.exceptions");
 const OctoPrintRoutes = require("./octoprint-api.routes");
 
-class OctoPrintApiService extends OctoPrintRoutes {
+export class OctoPrintApiService extends OctoPrintRoutes {
   /**
    * @type {AxiosInstance}
    */
@@ -494,5 +494,3 @@ class OctoPrintApiService extends OctoPrintRoutes {
     return processResponse(response, responseOptions);
   }
 }
-
-module.exports = OctoPrintApiService;

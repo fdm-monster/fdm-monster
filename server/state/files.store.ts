@@ -1,9 +1,9 @@
-const { ValidationException } = require("../exceptions/runtime.exceptions");
+import { ValidationException } from "../exceptions/runtime.exceptions";
 
 /**
  * Generic store for synchronisation of files and storage information of printers.
  */
-class FilesStore {
+export class FilesStore {
   /**
    * @type {PrinterCache}
    */
@@ -175,5 +175,3 @@ class FilesStore {
     return { service: serviceActionResult, cache: cacheActionResult };
   }
 }
-
-module.exports = FilesStore;

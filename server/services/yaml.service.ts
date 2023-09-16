@@ -6,7 +6,7 @@ const {
 } = require("./validators/yaml-service.validation");
 const { dump, load } = require("js-yaml");
 
-class YamlService {
+export class YamlService {
   floorStore;
   /**
    * @type {PrinterService}

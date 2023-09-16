@@ -1,6 +1,6 @@
 const { AppConstants } = require("../server.constants");
 
-class ClientDistDownloadTask {
+export class ClientDistDownloadTask {
   /**
    * @type {ClientBundleService}
    */

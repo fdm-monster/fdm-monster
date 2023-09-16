@@ -31,7 +31,7 @@ const { map } = require("../utils/mapper.utils");
  * @property {number} flowRate - The flow rate of the printer.
  */
 
-class PrinterCache extends KeyDiffCache {
+export class PrinterCache extends KeyDiffCache {
   /**
    * @type {PrinterService}
    */

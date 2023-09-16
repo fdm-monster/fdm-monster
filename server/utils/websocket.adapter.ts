@@ -1,7 +1,7 @@
 const { AppConstants } = require("../server.constants");
 const { WebSocket } = require("ws");
 
-class WebsocketAdapter {
+export class WebsocketAdapter {
   /**
    * WebSocket
    * @type { WebSocket|undefined }

@@ -3,7 +3,7 @@ const { validateLogin, constructHeaders } = require("./utils/api.utils");
 const { getDefaultTimeout } = require("../../constants/server-settings.constants");
 const { normalizeUrl } = require("../../utils/normalize-url");
 
-class OctoPrintRoutes {
+export class OctoPrintRoutes {
   octoPrintBase = "/";
   apiBase = `${this.octoPrintBase}api`;
   apiSettingsPart = `${this.apiBase}/settings`;

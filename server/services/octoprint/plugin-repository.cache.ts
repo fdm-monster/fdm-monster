@@ -1,6 +1,6 @@
 const { isTestEnvironment } = require("../../utils/env.utils");
 
-class PluginRepositoryCache {
+export class PluginRepositoryCache {
   #octoPrintApiService;
   #logger;
 

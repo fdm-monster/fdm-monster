@@ -5,7 +5,7 @@ const { AppConstants } = require("../server.constants");
 const { authenticate, authorizeRoles } = require("../middleware/authenticate");
 const { ROLES } = require("../constants/authorization.constants");
 
-class BatchCallController {
+export class BatchCallController {
   /**
    * @type {BatchCallService}
    */
@@ -24,7 +24,7 @@ class BatchCallController {
   async batchConnectSocket(req, res) {
     const { printerIds } = await validateInput(req.body, batchPrinterRules);
     await this.batchCallService.batchConnectSocket(printerIds);
-    res.send({ });
+    res.send({});
   }
 
   async batchReprintFiles(req, res) {

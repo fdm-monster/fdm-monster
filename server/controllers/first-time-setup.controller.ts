@@ -5,7 +5,7 @@ const { wizardSettingsRules } = require("./validation/setting.validation");
 const { AuthorizationError, BadRequestException } = require("../exceptions/runtime.exceptions");
 const { ROLES } = require("../constants/authorization.constants");
 
-class FirstTimeSetupController {
+export class FirstTimeSetupController {
   /**
    * @type {UserService}
    */

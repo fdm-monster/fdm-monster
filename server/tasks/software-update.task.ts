@@ -1,4 +1,4 @@
-class SoftwareUpdateTask {
+export class SoftwareUpdateTask {
   /**
    * @type {ServerReleaseService}
    */

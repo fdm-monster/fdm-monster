@@ -4,7 +4,7 @@ const { NotFoundException } = require("../exceptions/runtime.exceptions");
  * @typedef { import("octokit").Octokit } Octokit
  */
 
-class GithubService {
+export class GithubService {
   /**
    * @type {Octokit}
    */

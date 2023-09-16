@@ -1,4 +1,4 @@
-class PrinterWebsocketTask {
+export class PrinterWebsocketTask {
   /**
    * @type {PrinterSocketStore}
    */
@@ -37,5 +37,3 @@ class PrinterWebsocketTask {
     }
   }
 }
-
-module.exports = PrinterWebsocketTask;

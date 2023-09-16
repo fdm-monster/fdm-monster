@@ -12,7 +12,7 @@ const createCameraStreamRules = {
   "settings.flipVertical": "required|boolean",
 };
 
-class CameraStreamService {
+export class CameraStreamService {
   model = CameraStream;
   /**
    * @type {PrinterCache}

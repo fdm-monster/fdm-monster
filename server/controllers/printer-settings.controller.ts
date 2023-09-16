@@ -6,7 +6,7 @@ const { idRules } = require("./validation/generic.validation");
 const { setGcodeAnalysis } = require("./validation/printer-settings-controller.validation");
 const { PERMS } = require("../constants/authorization.constants");
 
-class PrinterSettingsController {
+export class PrinterSettingsController {
   /**
    * @type {PrinterCache}
    */

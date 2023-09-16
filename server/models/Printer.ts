@@ -1,6 +1,6 @@
-const { Schema, model } = require("mongoose");
+import { Schema, model } from "mongoose";
 
-const PrinterSchema = new Schema({
+export const PrinterSchema = new Schema({
   apiKey: {
     type: String,
     required: true, // !
@@ -92,9 +92,4 @@ const PrinterSchema = new Schema({
   },
 });
 
-const Printer = model("Printer", PrinterSchema);
-
-module.exports = {
-  Printer,
-  PrinterSchema,
-};
+export const Printer = model("Printer", PrinterSchema);

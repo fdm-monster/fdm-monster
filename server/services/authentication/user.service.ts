@@ -5,7 +5,7 @@ const { registerUserRules, newPasswordRules } = require("../validators/user-serv
 const { ROLES } = require("../../constants/authorization.constants");
 const { hashPassword, comparePasswordHash } = require("../../utils/crypto.utils");
 
-class UserService {
+export class UserService {
   /**
    * @type {RoleService}
    */

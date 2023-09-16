@@ -1,18 +1,18 @@
-class NotImplementedException extends Error {
+export class NotImplementedException extends Error {
   constructor(message) {
     super(message);
     this.name = NotImplementedException.name;
   }
 }
 
-class AuthenticationError extends Error {
+export class AuthenticationError extends Error {
   constructor(error) {
     super(error);
     this.name = AuthenticationError.name;
   }
 }
 
-class AuthorizationError extends Error {
+export class AuthorizationError extends Error {
   permissions = [];
   roles = [];
 
@@ -25,14 +25,14 @@ class AuthorizationError extends Error {
   }
 }
 
-class BadRequestException extends Error {
+export class BadRequestException extends Error {
   constructor(message) {
     super(message);
     this.name = BadRequestException.name;
   }
 }
 
-class NotFoundException extends Error {
+export class NotFoundException extends Error {
   constructor(message, path) {
     super(message);
     this.name = NotFoundException.name;
@@ -40,7 +40,7 @@ class NotFoundException extends Error {
   }
 }
 
-class ValidationException extends Error {
+export class ValidationException extends Error {
   constructor(validationObject) {
     super(JSON.stringify(validationObject));
     this.name = ValidationException.name;
@@ -48,7 +48,7 @@ class ValidationException extends Error {
   }
 }
 
-class ExternalServiceError extends Error {
+export class ExternalServiceError extends Error {
   constructor(responseObject) {
     super(JSON.stringify(responseObject));
     this.name = ExternalServiceError.name;
@@ -56,7 +56,7 @@ class ExternalServiceError extends Error {
   }
 }
 
-class InternalServerException extends Error {
+export class InternalServerException extends Error {
   constructor(message, stack) {
     super(message);
     this.name = InternalServerException.name;

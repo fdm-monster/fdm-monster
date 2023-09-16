@@ -2,7 +2,7 @@ const { IO_MESSAGES } = require("../state/socket-io.gateway");
 const { socketIoConnectedEvent } = require("../constants/event.constants");
 const { sizeKB, formatKB } = require("../utils/metric.utils");
 
-class SocketIoTask {
+export class SocketIoTask {
   /**
    * @type {SocketIoGateway}
    */

@@ -1,9 +1,11 @@
-const nodeInputValidator = require("node-input-validator");
-const { ValidationException, InternalServerException } = require("../exceptions/runtime.exceptions");
-const { printerLoginToken, currentPrinterToken, printerIdToken } = require("../middleware/printer");
-const { normalizeUrl } = require("../utils/normalize-url");
+import { Request } from "express";
+import { InternalServerException, ValidationException } from "../exceptions/runtime.exceptions";
+import { currentPrinterToken, printerIdToken, printerLoginToken } from "../middleware/printer";
+import { normalizeUrl } from "../utils/normalize-url";
 
-function getExtendedValidator() {
+const nodeInputValidator = require("node-input-validator");
+
+export function getExtendedValidator() {
   nodeInputValidator.extend("wsurl", ({ value, args }, validator) => {
     if (!value) return false;
     try {
@@ -31,7 +33,7 @@ function getExtendedValidator() {
   return nodeInputValidator;
 }
 
-function getScopedPrinter(req) {
+export function getScopedPrinter(req) {
   const tokens = [printerLoginToken, currentPrinterToken, printerIdToken];
   let resolvedDependencies = {};
   let errors = [];
@@ -62,7 +64,7 @@ function getScopedPrinter(req) {
  * @param rules
  * @returns {Promise<object>}
  */
-async function validateInput(data, rules) {
+export async function validateInput(data: any, rules: object) {
   const localNIV = getExtendedValidator();
 
   const v = new localNIV.Validator(data, rules);
@@ -76,16 +78,7 @@ async function validateInput(data, rules) {
 
 /**
  * Handle API input validation
- * @param req
- * @param rules
- * @returns {Promise<boolean|any>}
  */
-async function validateMiddleware(req, rules) {
+export async function validateMiddleware(req: Request, rules: object): Promise<any> {
   return validateInput(req.body, rules);
 }
-
-module.exports = {
-  validateMiddleware,
-  validateInput,
-  getScopedPrinter,
-};

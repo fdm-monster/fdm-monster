@@ -6,7 +6,7 @@ const { registerUserRules } = require("./validation/user-controller.validation")
 const { logoutRefreshTokenRules } = require("./validation/auth-controller.validation");
 const { authenticate } = require("../middleware/authenticate");
 
-class AuthController {
+export class AuthController {
   /**
    * @type {AuthService}
    */

@@ -1,7 +1,7 @@
 const { sign } = require("jsonwebtoken");
 const { AppConstants } = require("../../server.constants");
 
-class JwtService {
+export class JwtService {
   /**
    * @type {SettingsStore}
    */

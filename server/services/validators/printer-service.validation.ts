@@ -1,6 +1,6 @@
-const { UUID_LENGTH } = require("../../constants/service.constants");
+import { UUID_LENGTH } from "../../constants/service.constants";
 
-const createPrinterRules = {
+export const createPrinterRules = {
   _id: "not",
   apiKey: `required|length:${UUID_LENGTH},${UUID_LENGTH}|alphaNumeric`,
   printerURL: "required|httpurl",
@@ -9,22 +9,15 @@ const createPrinterRules = {
   "settingsAppearance.name": "string",
 };
 
-const updatePrinterEnabledRule = {
+export const updatePrinterEnabledRule = {
   enabled: "required|boolean",
 };
 
-const updateApiUsernameRule = {
+export const updateApiUsernameRule = {
   currentUser: "required|string",
 };
 
-const updatePrinterDisabledReasonRule = {
+export const updatePrinterDisabledReasonRule = {
   disabledReason: "required|nullable|string",
   enabled: "boolean",
-};
-
-module.exports = {
-  createPrinterRules,
-  updatePrinterEnabledRule,
-  updateApiUsernameRule,
-  updatePrinterDisabledReasonRule,
 };

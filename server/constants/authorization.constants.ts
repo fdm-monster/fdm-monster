@@ -1,10 +1,10 @@
 const { union } = require("lodash");
 
-function serializePerm(group, perm) {
+export function serializePerm(group: string, perm: string) {
   return `${group}.${perm}`;
 }
 
-const PERM_GROUP = {
+export const PERM_GROUP = {
   PrinterFiles: "PrinterFiles",
   PrinterSettings: "PrinterSettings",
   Floors: "PrinterFloors", // TODO rename in migration or seed
@@ -12,7 +12,7 @@ const PERM_GROUP = {
   ServerInfo: "ServerInfo",
 };
 
-const PERMS = {
+export const PERMS = {
   [PERM_GROUP.PrinterFiles]: {
     Default: serializePerm(PERM_GROUP.PrinterFiles, "Default"),
     Get: serializePerm(PERM_GROUP.PrinterFiles, "Get"),
@@ -43,7 +43,7 @@ const PERMS = {
   },
 };
 
-function flattenPermissionDefinition() {
+export function flattenPermissionDefinition() {
   const permissions = [];
   for (let key of Object.values(PERM_GROUP)) {
     for (let permissionName of Object.values(PERMS[key])) {
@@ -54,18 +54,18 @@ function flattenPermissionDefinition() {
   return permissions;
 }
 
-function allPerms(group) {
+export function allPerms(group: string) {
   if (!group || !PERMS[group]) throw new Error(`Permission group name '${group}' was not found`);
   return Object.values(PERMS[group]);
 }
 
-const ROLES = {
+export const ROLES = {
   ADMIN: "ADMIN",
   OPERATOR: "OPERATOR",
   GUEST: "GUEST",
 };
 
-const ROLE_PERMS = {
+export const ROLE_PERMS = {
   [ROLES.ADMIN]: union(
     allPerms(PERM_GROUP.Floors),
     allPerms(PERM_GROUP.PrinterFiles),
@@ -75,12 +75,4 @@ const ROLE_PERMS = {
   ),
   [ROLES.OPERATOR]: union(allPerms(PERM_GROUP.PrinterFiles), allPerms(PERM_GROUP.PrintCompletion), allPerms(PERM_GROUP.Floors)),
   [ROLES.GUEST]: [],
-};
-
-module.exports = {
-  ROLES,
-  PERMS,
-  flattenPermissionDefinition,
-  allPerms,
-  ROLE_PERMS,
 };

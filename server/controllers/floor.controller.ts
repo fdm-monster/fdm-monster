@@ -5,7 +5,7 @@ const { validateInput } = require("../handlers/validators");
 const { idRules } = require("./validation/generic.validation");
 const { PERMS } = require("../constants/authorization.constants");
 
-class FloorController {
+export class FloorController {
   #printerService;
   floorStore;
 

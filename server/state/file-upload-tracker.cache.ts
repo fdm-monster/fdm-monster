@@ -1,10 +1,10 @@
-const { generateCorrelationToken } = require("../utils/correlation-token.util");
-const { uploadProgressEvent } = require("../constants/event.constants");
+import { generateCorrelationToken } from "../utils/correlation-token.util";
+import { uploadProgressEvent } from "../constants/event.constants";
 
 /**
  * A generic cache for file upload progress
  */
-class FileUploadTrackerCache {
+export class FileUploadTrackerCache {
   #currentUploads = [];
   #uploadsDone = [];
   #uploadsFailed = [];

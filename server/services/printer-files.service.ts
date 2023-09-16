@@ -4,7 +4,7 @@ const { findFileIndex } = require("../utils/find-predicate.utils");
 /**
  * An extension repository for managing printer files in database
  */
-class PrinterFilesService {
+export class PrinterFilesService {
   /**
    * @type {PrinterService}
    */

@@ -7,7 +7,7 @@ const { getScopedPrinter } = require("../handlers/validators");
 
 const cacheKey = "firmware-state";
 
-class PluginFirmwareUpdateController {
+export class PluginFirmwareUpdateController {
   #cacheManager;
   /**
    * @type {PrinterCache}

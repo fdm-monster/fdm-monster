@@ -10,7 +10,7 @@ const {
   updateFloorRules,
 } = require("./validators/floor-service.validation");
 
-class FloorService {
+export class FloorService {
   /**
    * @type {PrinterCache}
    */

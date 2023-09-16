@@ -1,7 +1,7 @@
 const { InfluxDB } = require("@influxdata/influxdb-client");
 const { AppConstants } = require("../../server.constants");
 
-class InfluxDbV2BaseService {
+export class InfluxDbV2BaseService {
   configService;
   logger;
 

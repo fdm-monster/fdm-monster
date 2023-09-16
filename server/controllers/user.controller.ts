@@ -6,7 +6,7 @@ const { validateInput } = require("../handlers/validators");
 const { idRules } = require("./validation/generic.validation");
 const { InternalServerException } = require("../exceptions/runtime.exceptions");
 
-class UserController {
+export class UserController {
   /**
    * @type {UserService}
    */

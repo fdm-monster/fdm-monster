@@ -1,7 +1,7 @@
 const Model = require("../models/CustomGCode");
 const { NotFoundException } = require("../exceptions/runtime.exceptions");
 
-class CustomGCodeService {
+export class CustomGCodeService {
   async get(gcodeScriptId) {
     const document = await Model.findById(gcodeScriptId);
     if (!document) throw new NotFoundException(`Custom GCode script with id ${gcodeScriptId} does not exist.`);

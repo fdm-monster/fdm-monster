@@ -19,7 +19,7 @@ const { ROLES } = require("../constants/authorization.constants");
 const { Floor } = require("../models/Floor");
 const PrinterService = require("../services/printer.service");
 
-class PrinterController {
+export class PrinterController {
   /**
    * @type {PrinterSocketStore}
    */

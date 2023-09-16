@@ -5,7 +5,7 @@ const { ROLES } = require("../constants/authorization.constants");
 const { validateInput } = require("../handlers/validators");
 const { whitelistSettingRules, sentryDiagnosticsEnabledRules } = require("./validation/setting.validation");
 
-class SettingsController {
+export class SettingsController {
   /**
    * @type {SettingsStore}
    */

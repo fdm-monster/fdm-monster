@@ -3,7 +3,7 @@ const { EVENT_TYPES } = require("../services/octoprint/constants/octoprint-webso
 const { generateCorrelationToken } = require("../utils/correlation-token.util");
 const { IO_MESSAGES } = require("../state/socket-io.gateway");
 
-class PrintCompletionSocketIoTask {
+export class PrintCompletionSocketIoTask {
   /**
    * @type {EventEmitter2}
    */

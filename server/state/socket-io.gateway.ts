@@ -1,7 +1,7 @@
 const { Server } = require("socket.io");
 const { socketIoConnectedEvent } = require("../constants/event.constants");
 
-class SocketIoGateway {
+export class SocketIoGateway {
   /**
    * @type {LoggerService}
    */

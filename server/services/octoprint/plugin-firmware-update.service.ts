@@ -16,7 +16,7 @@ const connectivityProp = "connectivity.connection_ok";
 const firmwareProp = "printer.firmware";
 const firmwareDownloadPath = "firmware-downloads";
 
-class PluginFirmwareUpdateService extends PluginBaseService {
+export class PluginFirmwareUpdateService extends PluginBaseService {
   /**
    * @type {OctoPrintApiService}
    */

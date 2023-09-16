@@ -4,7 +4,7 @@ const { authenticate } = require("../middleware/authenticate");
 const { validateInput } = require("../handlers/validators");
 const { idRules } = require("./validation/generic.validation");
 
-class CameraStreamController {
+export class CameraStreamController {
   /**
    * @type {CameraStreamService}
    */

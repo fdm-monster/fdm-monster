@@ -11,7 +11,7 @@
  * @typedef {Array<BatchSingletonModel>} BatchModel
  */
 
-class BatchCallService {
+export class BatchCallService {
   /**
    * @type {OctoPrintApiService}
    */

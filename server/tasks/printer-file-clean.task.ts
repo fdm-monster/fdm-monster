@@ -4,7 +4,7 @@ const { DITokens } = require("../container.tokens");
  * Task which regularly cleans all printer files based on a configured predicate
  * This could be "older than 2 weeks". More options to be added on request.
  */
-class PrinterFileCleanTask {
+export class PrinterFileCleanTask {
   logger;
   /**
    * @type {FilesStore}

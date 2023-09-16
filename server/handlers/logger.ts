@@ -14,7 +14,7 @@ const dateFormat = () => {
   return dtFormat.format(new Date());
 };
 
-class LoggerService {
+export class LoggerService {
   constructor(name, enableFileLogs = true, logFilterLevel) {
     const isProd = process.env[AppConstants.NODE_ENV_KEY] === AppConstants.defaultProductionEnv;
     const isTest = process.env[AppConstants.NODE_ENV_KEY] === AppConstants.defaultTestEnv;

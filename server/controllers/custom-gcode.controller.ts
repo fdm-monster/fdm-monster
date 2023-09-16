@@ -6,7 +6,7 @@ const { validateInput, getScopedPrinter } = require("../handlers/validators");
 const { idRules } = require("./validation/generic.validation");
 const { printerResolveMiddleware } = require("../middleware/printer");
 
-class CustomGCodeController {
+export class CustomGCodeController {
   #logger;
   #settingsStore;
   #octoPrintApiService;

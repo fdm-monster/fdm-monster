@@ -4,7 +4,7 @@ const { octoPrintEvent, Message, SOCKET_STATE } = require("../services/octoprint
 const { setInterval, setTimeout } = require("timers/promises");
 const { AppConstants } = require("../server.constants");
 
-class TestPrinterSocketStore {
+export class TestPrinterSocketStore {
   /**
    * @type {OctoPrintSockIoAdapter}
    */

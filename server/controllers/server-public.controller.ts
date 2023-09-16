@@ -6,7 +6,7 @@ const { PERMS, ROLES } = require("../constants/authorization.constants");
 const { isDocker } = require("../utils/is-docker");
 const { serverSettingsKey } = require("../constants/server-settings.constants");
 
-class ServerPublicController {
+export class ServerPublicController {
   /**
    * @type {string}
    */

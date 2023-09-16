@@ -2,7 +2,7 @@ const { errorSummary } = require("../utils/error.utils");
 const { captureException } = require("@sentry/node");
 const { printerEvents } = require("../constants/event.constants");
 
-class PrinterSocketStore {
+export class PrinterSocketStore {
   /**
    * @type {SocketIoGateway}
    */

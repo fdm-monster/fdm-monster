@@ -1,7 +1,7 @@
 const { errorSummary } = require("../utils/error.utils");
 const { API_STATE } = require("../services/octoprint/octoprint-sockio.adapter");
 
-class PrinterWebsocketRestoreTask {
+export class PrinterWebsocketRestoreTask {
   /**
    * @type {SettingsStore}
    */

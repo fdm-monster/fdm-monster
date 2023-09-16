@@ -1,8 +1,8 @@
-const getSettingsAppearanceDefault = () => ({
+export const getSettingsAppearanceDefault = () => ({
   name: "",
 });
 
-function getFileListDefault() {
+export function getFileListDefault() {
   return {
     files: [],
     folders: [],
@@ -11,20 +11,12 @@ function getFileListDefault() {
   };
 }
 
-function getDefaultPrinterEntry() {
+export function getDefaultPrinterEntry() {
   return {
     settingsAppearance: getSettingsAppearanceDefault(),
     fileList: getFileListDefault(),
   };
 }
 
-const UUID_LENGTH = 32;
-const minPrinterFloorNameLength = 3;
-
-module.exports = {
-  getSettingsAppearanceDefault,
-  getFileListDefault,
-  getDefaultPrinterEntry,
-  UUID_LENGTH,
-  minPrinterFloorNameLength,
-};
+export const UUID_LENGTH = 32;
+export const minPrinterFloorNameLength = 3;

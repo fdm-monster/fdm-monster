@@ -10,38 +10,38 @@
 //   PERIODIC_TASK_PRESET_2500MS
 // );
 
-class TASK_PRESETS {
+export class TASK_PRESETS {
   static PERIODIC = {
     periodic: true,
     logFirstCompletion: true,
-    runImmediately: false // Just like setInterval
+    runImmediately: false, // Just like setInterval
   };
 
   static PERIODIC_DISABLED = {
     ...this.PERIODIC,
     runImmediately: true,
-    disabled: true // Something else will trigger it
+    disabled: true, // Something else will trigger it
   };
 
   static PERIODIC_2500MS = {
     ...this.PERIODIC,
-    milliseconds: 2500
+    milliseconds: 2500,
   };
 
   static RUNONCE = {
     runOnce: true, // not optional
     logFirstCompletion: true,
-    runImmediately: true
+    runImmediately: true,
   };
 
   static RUNDELAYED = {
     runDelayed: true, // not optional
     logFirstCompletion: true,
     runImmediately: false,
-    seconds: 0 // other timing units will be ignored (by design)
+    seconds: 0, // other timing units will be ignored (by design)
   };
 }
 
 module.exports = {
-  TaskPresets: TASK_PRESETS
+  TaskPresets: TASK_PRESETS,
 };

@@ -3,7 +3,7 @@ const { KeyDiffCache } = require("../utils/cache/key-diff.cache");
 /**
  * A generic cache for printer groups
  */
-class FloorStore extends KeyDiffCache {
+export class FloorStore extends KeyDiffCache {
   /**
    * @type {LoggerService}
    */

@@ -1,12 +1,12 @@
 const { existsSync, readFileSync } = require("fs");
 const { captureException } = require("@sentry/node");
 
-class MonsterPiService {
+export class MonsterPiService {
   #fileLocation = "/etc/monsterpi_version";
   monsterPiVersion = null;
   logger;
 
-  constructor({loggerFactory}) {
+  constructor({ loggerFactory }) {
     this.logger = loggerFactory("MonsterPiService");
   }
 
@@ -20,7 +20,6 @@ class MonsterPiService {
       const contents = readFileSync(this.#fileLocation);
       this.monsterPiVersion = contents.toString().replaceAll(" ", "");
       return this.monsterPiVersion;
-
     } catch (e) {
       this.logger.warn("Error checking MonsterPi version");
       captureException(e);

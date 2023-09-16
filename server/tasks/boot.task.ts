@@ -5,7 +5,7 @@ const { DITokens } = require("../container.tokens");
 const MongooseError = require("mongoose/lib/error/mongooseError");
 const { AppConstants } = require("../server.constants");
 
-class BootTask {
+export class BootTask {
   logger;
   taskManagerService;
   serverTasks;

@@ -1,6 +1,6 @@
 const { DITokens } = require("../../container.tokens");
 
-class SocketFactory {
+export class SocketFactory {
   /**
    * @type {Cradle}
    */

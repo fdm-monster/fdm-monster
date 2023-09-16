@@ -4,7 +4,7 @@ const { comparePasswordHash } = require("../../utils/crypto.utils");
 const { v4: uuidv4 } = require("uuid");
 const { AppConstants } = require("../../server.constants");
 
-class AuthService {
+export class AuthService {
   /**
    * @type {LoggerService}
    */

@@ -6,7 +6,7 @@ const { DITokens } = require("../container.tokens");
 /**
  * Manage immediate or delayed tasks and recurring jobs.
  */
-class TaskManagerService {
+export class TaskManagerService {
   jobScheduler;
   taskStates = {};
 

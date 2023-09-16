@@ -19,7 +19,7 @@ const { printerResolveMiddleware } = require("../middleware/printer");
 const { ROLES, PERMS } = require("../constants/authorization.constants");
 const { authorizeRoles } = require("../middleware/authenticate");
 
-class PrinterFilesController {
+export class PrinterFilesController {
   /**
    * @type {FilesStore}
    */

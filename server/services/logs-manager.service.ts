@@ -5,7 +5,7 @@ const { AppConstants } = require("../server.constants");
 const { readdirSync, unlinkSync } = require("fs");
 const { isValidDate } = require("../utils/time.utils");
 
-class LogsManagerService {
+export class LogsManagerService {
   /**
    * @type {LoggerService}
    */

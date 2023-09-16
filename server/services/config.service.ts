@@ -1,4 +1,4 @@
-class ConfigService {
+export class ConfigService {
   get(key, defaultValue) {
     if (!Object.keys(process.env).includes(key) || !process.env[key]?.length) {
       return defaultValue;

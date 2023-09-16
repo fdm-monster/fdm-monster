@@ -6,7 +6,7 @@ const { readdir, rm } = require("node:fs/promises");
 const { ensureDirExists, superRootPath } = require("../utils/fs.utils");
 const { checkVersionSatisfiesMinimum } = require("../utils/semver.utils");
 
-class ClientBundleService {
+export class ClientBundleService {
   githubService;
   configService;
   logger;

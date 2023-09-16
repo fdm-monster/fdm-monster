@@ -1,25 +1,27 @@
-const { Printer } = require("../models/Printer");
-const { NotFoundException } = require("../exceptions/runtime.exceptions");
-const { validateInput } = require("../handlers/validators");
-const {
+import { normalizeUrl } from "../utils/normalize-url";
+import { Printer } from "../models/Printer";
+import { NotFoundException } from "../exceptions/runtime.exceptions";
+import { validateInput } from "../handlers/validators";
+import {
   createPrinterRules,
   updatePrinterEnabledRule,
   updateApiUsernameRule,
   updatePrinterDisabledReasonRule,
-} = require("./validators/printer-service.validation");
-const { getDefaultPrinterEntry } = require("../constants/service.constants");
-const { printerEvents } = require("../constants/event.constants");
-const { normalizeUrl } = require("../utils/normalize-url");
+} from "./validators/printer-service.validation";
+import { getDefaultPrinterEntry } from "../constants/service.constants";
+import { printerEvents } from "../constants/event.constants";
+import EventEmitter2 from "eventemitter2";
+import { LoggerService } from "../handlers/logger";
 
-class PrinterService {
+export class PrinterService {
   /**
    * @type {EventEmitter2}
    */
-  eventEmitter2;
+  eventEmitter2: EventEmitter2;
   /**
    * @type {LoggerService}
    */
-  logger;
+  logger: LoggerService;
 
   constructor({ eventEmitter2, loggerFactory }) {
     this.eventEmitter2 = eventEmitter2;
@@ -141,16 +143,6 @@ class PrinterService {
     return printer;
   }
 
-  async updateLastPrintedFile(printerId, lastPrintedFile) {
-    const update = { lastPrintedFile };
-    await this.get(printerId);
-    const printer = await Printer.findByIdAndUpdate(printerId, update, {
-      new: true,
-      useFindAndModify: false,
-    });
-    return printer;
-  }
-
   async updateFlowRate(printerId, flowRate) {
     const update = { flowRate };
     await this.get(printerId);
@@ -268,5 +260,3 @@ class PrinterService {
     return normalizeUrl(printerURL);
   }
 }
-
-module.exports = PrinterService;

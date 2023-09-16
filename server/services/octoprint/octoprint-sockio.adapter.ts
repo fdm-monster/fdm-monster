@@ -73,7 +73,7 @@ const API_STATE = {
 
 const octoPrintEvent = (event) => `octoprint.${event}`;
 
-class OctoPrintSockIoAdapter extends WebsocketAdapter {
+export class OctoPrintSockIoAdapter extends WebsocketAdapter {
   /**
    * @type {string|undefined}
    */

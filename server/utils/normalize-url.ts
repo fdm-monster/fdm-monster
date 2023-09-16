@@ -71,7 +71,7 @@ const normalizeDataURL = (urlString, { stripHash }) => {
  * @param options
  * @return {*|string}
  */
-function normalizeUrl(urlString, options) {
+export function normalizeUrl(urlString: string, options: any): string {
   options = {
     defaultProtocol: "http",
     normalizeProtocol: true,
@@ -281,7 +281,3 @@ function normalizeUrl(urlString, options) {
 
   return urlString;
 }
-
-module.exports = {
-  normalizeUrl,
-};

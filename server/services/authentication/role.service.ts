@@ -3,7 +3,7 @@ const RoleModel = require("../../models/Auth/Role");
 const { NotFoundException } = require("../../exceptions/runtime.exceptions");
 const { union } = require("lodash");
 
-class RoleService {
+export class RoleService {
   #roles = [];
   /**
    * @type {LoggerService}

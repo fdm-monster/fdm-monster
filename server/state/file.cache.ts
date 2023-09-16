@@ -1,11 +1,11 @@
-const { findFileIndex } = require("../utils/find-predicate.utils");
-const { ValidationException } = require("../exceptions/runtime.exceptions");
-const { getFileListDefault } = require("../constants/service.constants");
+import { findFileIndex } from "../utils/find-predicate.utils";
+import { ValidationException } from "../exceptions/runtime.exceptions";
+import { getFileListDefault } from "../constants/service.constants";
 
 /**
  * A generic cache for file references, which will be abstracted in future to allow for proxy files and local files.
  */
-class FileCache {
+export class FileCache {
   // Associative array
   #printerFileStorage = {}; // Ass. array [Id] : { fileList, storage }
   #totalFileCount = 0;
@@ -121,5 +121,3 @@ class FileCache {
     this.#logger.log(`File ${filePath} was removed`);
   }
 }
-
-module.exports = FileCache;

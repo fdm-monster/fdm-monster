@@ -11,7 +11,7 @@ const Sentry = require("@sentry/node");
 const { isTestEnvironment } = require("../utils/env.utils");
 const { AppConstants } = require("../server.constants");
 
-class SettingsStore {
+export class SettingsStore {
   /**
    * @private
    * @type {ServerSettings}
@@ -178,5 +178,3 @@ class SettingsStore {
     return this.getSettings();
   }
 }
-
-module.exports = SettingsStore;

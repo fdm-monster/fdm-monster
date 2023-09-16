@@ -2,7 +2,7 @@ const Logger = require("../handlers/logger.js");
 const semver = require("semver");
 const { AppConstants } = require("../server.constants");
 
-class ServerReleaseService {
+export class ServerReleaseService {
   #synced = false;
   airGapped = null; // Connection error
   #installedReleaseFound = null;

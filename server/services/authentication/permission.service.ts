@@ -2,7 +2,7 @@ const { flattenPermissionDefinition } = require("../../constants/authorization.c
 const PermissionModel = require("../../models/Auth/Permission");
 const { NotFoundException } = require("../../exceptions/runtime.exceptions");
 
-class PermissionService {
+export class PermissionService {
   #permissions = {};
   #logger;
 
@@ -15,9 +15,7 @@ class PermissionService {
   }
 
   #normalizePermission(assignedPermission) {
-    const permissionInstance = this.permissions.find(
-      (r) => r.id === assignedPermission || r.name === assignedPermission
-    );
+    const permissionInstance = this.permissions.find((r) => r.id === assignedPermission || r.name === assignedPermission);
     if (!permissionInstance) {
       console.warn(`The permission by ID ${assignedPermission} did not exist. Skipping.`);
       return;
@@ -55,7 +53,7 @@ class PermissionService {
       const storedPermission = await PermissionModel.findOne({ name: permission });
       if (!storedPermission) {
         const newPermission = await PermissionModel.create({
-          name: permission
+          name: permission,
         });
         this.#permissions.push(newPermission);
       } else {

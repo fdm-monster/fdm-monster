@@ -7,7 +7,7 @@ const { isTestEnvironment } = require("../utils/env.utils");
 const { PassThrough } = require("stream");
 const { validateMiddleware } = require("../handlers/validators");
 
-class ServerPrivateController {
+export class ServerPrivateController {
   #logger = new Logger("Server-Private-API");
   #serverUpdateService;
   #serverReleaseService;
