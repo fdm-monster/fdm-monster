@@ -1,9 +1,9 @@
-const { WebsocketAdapter } = require("../../utils/websocket.adapter");
-const HttpStatusCode = require("../../constants/http-status-codes.constants");
-const { AppConstants } = require("../../server.constants");
-const { AuthenticationError } = require("../../exceptions/runtime.exceptions");
-const { httpToWsUrl } = require("../../utils/url.utils");
-const { normalizeUrl } = require("../../utils/normalize-url");
+import { WebsocketAdapter } from "../../utils/websocket.adapter";
+import { HttpStatusCode } from "../../constants/http-status-codes.constants";
+import { AppConstants } from "../../server.constants";
+import { AuthenticationError } from "../../exceptions/runtime.exceptions";
+import { httpToWsUrl } from "../../utils/url.utils";
+import { normalizeUrl } from "../../utils/normalize-url";
 
 /**
  * @typedef {1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10} ThrottleRate
@@ -34,7 +34,7 @@ const { normalizeUrl } = require("../../utils/normalize-url");
  * @property {string} payload
  */
 
-const Message = {
+export const Message = {
   connected: "connected",
   reauthRequired: "reauthRequired",
   current: "current",
@@ -52,7 +52,7 @@ const Message = {
   WS_STATE_UPDATED: "WS_STATE_UPDATED",
 };
 
-const SOCKET_STATE = {
+export const SOCKET_STATE = {
   unopened: "unopened",
   opening: "opening",
   authenticating: "authenticating",
@@ -63,7 +63,7 @@ const SOCKET_STATE = {
   closed: "closed",
 };
 
-const API_STATE = {
+export const API_STATE = {
   unset: "unset",
   noResponse: "noResponse",
   globalKey: "globalKey",
@@ -71,7 +71,7 @@ const API_STATE = {
   responding: "responding",
 };
 
-const octoPrintEvent = (event) => `octoprint.${event}`;
+export const octoPrintEvent = (event) => `octoprint.${event}`;
 
 export class OctoPrintSockIoAdapter extends WebsocketAdapter {
   /**
@@ -396,11 +396,3 @@ export class OctoPrintSockIoAdapter extends WebsocketAdapter {
     this.eventEmitter.emit(octoPrintEvent(event), data);
   }
 }
-
-module.exports = {
-  OctoPrintSockIoAdapter,
-  octoPrintEvent,
-  Message,
-  SOCKET_STATE,
-  API_STATE,
-};

@@ -1,10 +1,10 @@
-const { AppConstants } = require("../server.constants");
-const AdmZip = require("adm-zip");
-const { join } = require("path");
-const { existsSync, writeFileSync } = require("node:fs");
-const { readdir, rm } = require("node:fs/promises");
-const { ensureDirExists, superRootPath } = require("../utils/fs.utils");
-const { checkVersionSatisfiesMinimum } = require("../utils/semver.utils");
+import AdmZip from "adm-zip";
+import { join } from "path";
+import { existsSync, writeFileSync } from "node:fs";
+import { readdir, rm } from "node:fs/promises";
+import { ensureDirExists, superRootPath } from "../utils/fs.utils";
+import { checkVersionSatisfiesMinimum } from "../utils/semver.utils";
+import { AppConstants } from "../server.constants";
 
 export class ClientBundleService {
   githubService;
@@ -192,7 +192,3 @@ export class ClientBundleService {
     return json?.version;
   }
 }
-
-module.exports = {
-  ClientBundleService,
-};

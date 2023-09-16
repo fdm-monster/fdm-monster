@@ -1,11 +1,7 @@
-const _ = require("lodash");
+import { findIndex } from "lodash";
 
-const findFileIndex = (fileList, filePath) => {
-  return _.findIndex(fileList.files, (f) => {
+export const findFileIndex = (fileList, filePath) => {
+  return findIndex(fileList.files, (f) => {
     return f.path === filePath;
   });
-};
-
-module.exports = {
-  findFileIndex,
 };

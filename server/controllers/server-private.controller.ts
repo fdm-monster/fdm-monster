@@ -132,7 +132,7 @@ export class ServerPrivateController {
 }
 
 // prettier-ignore
-module.exports = createController(ServerPrivateController)
+export default createController(ServerPrivateController)
   .prefix(AppConstants.apiRoute + "/server")
   .before([authenticate(), authorizeRoles([ROLES.ADMIN])])
   .get("/", "getReleaseStateInfo")

@@ -1,6 +1,6 @@
-const { CameraStream } = require("../models/CameraStream");
-const { validateInput } = require("../handlers/validators");
-const { NotFoundException } = require("../exceptions/runtime.exceptions");
+import { CameraStream } from "../models";
+import { validateInput } from "../handlers/validators";
+import { NotFoundException } from "../exceptions/runtime.exceptions";
 
 const createCameraStreamRules = {
   printerId: "mongoId",
@@ -18,6 +18,7 @@ export class CameraStreamService {
    * @type {PrinterCache}
    */
   printerCache;
+
   constructor({ printerCache }) {
     this.printerCache = printerCache;
   }
@@ -35,7 +36,7 @@ export class CameraStreamService {
   async get(id, throwError = true) {
     const cameraStream = await this.model.findById(id);
     if (!cameraStream && throwError) {
-      throw new NotFoundException(`Floor with id ${id} does not exist.`);
+      throw new NotFoundException(`Floor with id ${id} does not exist.`, "CameraStream");
     }
 
     return cameraStream;
@@ -63,7 +64,3 @@ export class CameraStreamService {
     return this.get(id);
   }
 }
-
-module.exports = {
-  CameraStreamService,
-};

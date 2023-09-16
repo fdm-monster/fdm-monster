@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   // Wizard version 1
   wizardSettingsRules: {
     loginRequired: "required|boolean",

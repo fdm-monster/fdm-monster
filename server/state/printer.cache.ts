@@ -1,7 +1,7 @@
-const { KeyDiffCache } = require("../utils/cache/key-diff.cache");
-const { printerEvents } = require("../constants/event.constants");
-const { NotFoundException } = require("../exceptions/runtime.exceptions");
-const { map } = require("../utils/mapper.utils");
+import { KeyDiffCache } from "../utils/cache/key-diff.cache";
+import { printerEvents } from "../constants/event.constants";
+import { NotFoundException } from "../exceptions/runtime.exceptions";
+import { map } from "../utils/mapper.utils";
 
 // Generate the JSDoc typedef for Printer model
 /**
@@ -165,7 +165,3 @@ export class PrinterCache extends KeyDiffCache {
     return p;
   }
 }
-
-module.exports = {
-  PrinterCache,
-};

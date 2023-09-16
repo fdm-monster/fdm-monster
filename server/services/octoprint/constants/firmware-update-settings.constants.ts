@@ -1,4 +1,4 @@
-const defaultFirmwareUpdaterSettings = {
+export const defaultFirmwareUpdaterSettings = {
   disable_filefilter: false,
   enable_navbar: true,
   enable_profiles: false,
@@ -18,8 +18,4 @@ const defaultFirmwareUpdaterSettings = {
     },
   ],
   save_url: false,
-};
-
-module.exports = {
-  defaultFirmwareUpdaterSettings,
 };

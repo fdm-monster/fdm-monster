@@ -1,9 +1,9 @@
-const { createController } = require("awilix-express");
-const { AppConstants } = require("../server.constants");
-const { authenticate, authorizeRoles } = require("../middleware/authenticate");
-const { ROLES } = require("../constants/authorization.constants");
-const { printerResolveMiddleware } = require("../middleware/printer");
-const { getScopedPrinter } = require("../handlers/validators");
+import { createController } from "awilix-express";
+import { AppConstants } from "../server.constants";
+import { authenticate, authorizeRoles } from "../middleware/authenticate";
+import { ROLES } from "../constants/authorization.constants";
+import { printerResolveMiddleware } from "../middleware/printer";
+import { getScopedPrinter } from "../handlers/validators";
 
 const cacheKey = "firmware-state";
 
@@ -125,7 +125,7 @@ export class PluginFirmwareUpdateController {
   }
 }
 
-module.exports = createController(PluginFirmwareUpdateController)
+export default createController(PluginFirmwareUpdateController)
   .prefix(AppConstants.apiRoute + "/plugin/firmware-update")
   .before([authenticate(), authorizeRoles([ROLES.OPERATOR, ROLES.ADMIN]), printerResolveMiddleware()])
   .get("/", "listUpdateState")

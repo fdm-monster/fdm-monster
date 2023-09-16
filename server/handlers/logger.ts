@@ -1,8 +1,8 @@
-const winston = require("winston");
-const { AppConstants } = require("../server.constants");
-const { superRootPath } = require("../utils/fs.utils");
-const { join } = require("path");
-const { DateTime } = require("luxon");
+import winston from "winston";
+import { AppConstants } from "../server.constants";
+import { superRootPath } from "../utils/fs.utils";
+import { join } from "path";
+import { DateTime } from "luxon";
 
 const dtFormat = new Intl.DateTimeFormat("en-GB", {
   timeStyle: "medium",
@@ -15,7 +15,10 @@ const dateFormat = () => {
 };
 
 export class LoggerService {
-  constructor(name, enableFileLogs = true, logFilterLevel) {
+  name: string;
+  logger: winston.Logger;
+
+  constructor(name: string, enableFileLogs = true, logFilterLevel: string = "") {
     const isProd = process.env[AppConstants.NODE_ENV_KEY] === AppConstants.defaultProductionEnv;
     const isTest = process.env[AppConstants.NODE_ENV_KEY] === AppConstants.defaultTestEnv;
 
@@ -35,7 +38,7 @@ export class LoggerService {
               new winston.transports.File({
                 level: isTest ? "warn" : "info", // Irrespective of environment
                 filename: join(superRootPath(), AppConstants.defaultLogsFolder, `${AppConstants.logAppName}-${date}.log`),
-                maxsize: "5000000",
+                maxsize: 5000000,
                 maxFiles: 5,
               }),
             ]
@@ -51,27 +54,25 @@ export class LoggerService {
     });
   }
 
-  log(message, meta) {
+  log(message: string, meta?: any) {
     this.logger.log("info", message, {
       meta,
     });
   }
 
-  warn(message, meta) {
+  warn(message: string, meta?: any) {
     this.logger.log("warn", message, {
       meta,
     });
   }
 
-  debug(message, meta) {
+  debug(message: string, meta?: any) {
     this.logger.log("debug", message, {
       meta,
     });
   }
 
-  error(message, meta) {
+  error(message: string, meta?: any) {
     this.logger.log("error", message, { meta });
   }
 }
-
-module.exports = LoggerService;

@@ -1,17 +1,17 @@
-const { AppConstants } = require("../server.constants");
-const { v4: uuidv4 } = require("uuid");
+import { AppConstants } from "../server.constants";
+import { v4 as uuidv4 } from "uuid";
 
-const getDefaultWhitelistIpAddresses = () => ["::12", "127.0.0.1"];
+export const getDefaultWhitelistIpAddresses = () => ["::12", "127.0.0.1"];
 
-const wizardSettingKey = "wizard";
-const getDefaultWizardSettings = () => ({
+export const wizardSettingKey = "wizard";
+export const getDefaultWizardSettings = () => ({
   wizardCompleted: false,
   wizardCompletedAt: null,
   wizardVersion: 0,
 });
 
-const serverSettingsKey = "server";
-const getDefaultServerSettings = () => ({
+export const serverSettingsKey = "server";
+export const getDefaultServerSettings = () => ({
   debugSettings: {
     debugSocketIoEvents: false,
     debugSocketReconnect: false,
@@ -26,9 +26,8 @@ const getDefaultServerSettings = () => ({
   loginRequired: false,
 });
 
-const credentialSettingsKey = "credentials";
-
-const getDefaultCredentialSettings = () => ({
+export const credentialSettingsKey = "credentials";
+export const getDefaultCredentialSettings = () => ({
   // Verification and signing of JWT tokens, can be changed on the fly
   jwtSecret: uuidv4(),
   // Signing only, verification is automatic
@@ -39,26 +38,26 @@ const getDefaultCredentialSettings = () => ({
   refreshTokenExpiry: AppConstants.DEFAULT_REFRESH_TOKEN_EXPIRY,
 });
 
-const frontendSettingKey = "frontend";
-const getDefaultFrontendSettings = () => ({
+export const frontendSettingKey = "frontend";
+export const getDefaultFrontendSettings = () => ({
   gridCols: 8,
   gridRows: 8,
   largeTiles: false,
 });
 
-const timeoutSettingKey = "timeout";
-const getDefaultTimeout = () => ({
+export const timeoutSettingKey = "timeout";
+export const getDefaultTimeout = () => ({
   apiTimeout: 1000,
 });
 
-const fileCleanSettingKey = "printerFileClean";
-const getDefaultFileCleanSettings = () => ({
+export const fileCleanSettingKey = "printerFileClean";
+export const getDefaultFileCleanSettings = () => ({
   autoRemoveOldFilesBeforeUpload: false,
   autoRemoveOldFilesAtBoot: false,
   autoRemoveOldFilesCriteriumDays: 7,
 });
 
-const getDefaultSettings = () => ({
+export const getDefaultSettings = () => ({
   [wizardSettingKey]: getDefaultWizardSettings(),
   [credentialSettingsKey]: getDefaultCredentialSettings(),
   [serverSettingsKey]: getDefaultServerSettings(),
@@ -66,20 +65,3 @@ const getDefaultSettings = () => ({
   [frontendSettingKey]: getDefaultFrontendSettings(),
   [timeoutSettingKey]: getDefaultTimeout(),
 });
-
-module.exports = {
-  wizardSettingKey,
-  getDefaultWizardSettings,
-  serverSettingsKey,
-  getDefaultServerSettings,
-  timeoutSettingKey,
-  getDefaultTimeout,
-  frontendSettingKey,
-  getDefaultFrontendSettings,
-  getDefaultWhitelistIpAddresses,
-  credentialSettingsKey,
-  getDefaultCredentialSettings,
-  fileCleanSettingKey,
-  getDefaultFileCleanSettings,
-  getDefaultSettings,
-};

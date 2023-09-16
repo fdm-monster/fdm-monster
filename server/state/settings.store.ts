@@ -1,15 +1,15 @@
-const { InternalServerException } = require("../exceptions/runtime.exceptions");
-const {
-  wizardSettingKey,
-  fileCleanSettingKey,
-  serverSettingsKey,
+import { InternalServerException } from "../exceptions/runtime.exceptions";
+import {
   credentialSettingsKey,
+  fileCleanSettingKey,
   frontendSettingKey,
+  serverSettingsKey,
   timeoutSettingKey,
-} = require("../constants/server-settings.constants");
-const Sentry = require("@sentry/node");
-const { isTestEnvironment } = require("../utils/env.utils");
-const { AppConstants } = require("../server.constants");
+  wizardSettingKey,
+} from "../constants/server-settings.constants";
+import { getCurrentHub } from "@sentry/node";
+import { isTestEnvironment } from "../utils/env.utils";
+import { AppConstants } from "../server.constants";
 
 export class SettingsStore {
   /**
@@ -170,7 +170,7 @@ export class SettingsStore {
     } else {
       this.logger.log("Disabling Sentry for remote diagnostics");
     }
-    Sentry.getCurrentHub().getClient().getOptions().enabled = sentryEnabled;
+    getCurrentHub().getClient()!.getOptions().enabled = sentryEnabled;
   }
 
   async updateFrontendSettings(frontendSettings) {

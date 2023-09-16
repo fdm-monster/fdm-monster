@@ -1,6 +1,6 @@
-const { PluginBaseService } = require("./plugin-base.service");
-const { ValidationException } = require("../../exceptions/runtime.exceptions");
-const { defaultFirmwareUpdaterSettings } = require("./constants/firmware-update-settings.constants");
+import { PluginBaseService } from "./plugin-base.service";
+import { ValidationException } from "../../exceptions/runtime.exceptions";
+import { defaultFirmwareUpdaterSettings } from "./constants/firmware-update-settings.constants";
 
 const config = {
   pluginName: "firmwareupdater",
@@ -118,7 +118,3 @@ export class PluginFirmwareUpdateService extends PluginBaseService {
     return await this.octoPrintApiService.postPluginFirmwareUpdateFlash(currentPrinterId, printerLogin, latestHexFilePath);
   }
 }
-
-module.exports = {
-  PluginFirmwareUpdateService,
-};

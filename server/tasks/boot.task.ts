@@ -1,9 +1,8 @@
-const mongoose = require("mongoose");
-
-const { fetchMongoDBConnectionString, runMigrations } = require("../server.env");
-const { DITokens } = require("../container.tokens");
+import mongoose, { connect } from "mongoose";
+import { fetchMongoDBConnectionString, runMigrations } from "../server.env";
+import { DITokens } from "../container.tokens";
+import { AppConstants } from "../server.constants";
 const MongooseError = require("mongoose/lib/error/mongooseError");
-const { AppConstants } = require("../server.constants");
 
 export class BootTask {
   logger;
@@ -191,7 +190,7 @@ export class BootTask {
   }
 
   async createConnection() {
-    await mongoose.connect(fetchMongoDBConnectionString(), {
+    await connect(fetchMongoDBConnectionString(), {
       serverSelectionTimeoutMS: 1500,
     });
   }
@@ -200,5 +199,3 @@ export class BootTask {
     await runMigrations(mongoose.connection.db, mongoose.connection.getClient());
   }
 }
-
-module.exports = BootTask;

@@ -1,22 +1,16 @@
-const { existsSync, mkdirSync } = require("node:fs");
-const { join } = require("path");
+import { existsSync, mkdirSync } from "node:fs";
+import { join } from "path";
 
-function superRootPath() {
+export function superRootPath() {
   return join(__dirname, "../..");
 }
 
-function rootPath() {
+export function rootPath() {
   return join(__dirname, "..");
 }
 
-function ensureDirExists(dir) {
+export function ensureDirExists(dir: string) {
   if (!existsSync(dir)) {
     mkdirSync(dir, { recursive: true });
   }
 }
-
-module.exports = {
-  ensureDirExists,
-  superRootPath,
-  rootPath,
-};

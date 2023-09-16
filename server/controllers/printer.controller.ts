@@ -392,7 +392,7 @@ export class PrinterController {
 }
 
 // prettier-ignore
-module.exports = createController(PrinterController)
+export default createController(PrinterController)
   .prefix(AppConstants.apiRoute + "/printer")
   .before([authenticate(), authorizeRoles([ROLES.OPERATOR, ROLES.ADMIN]), printerResolveMiddleware()])
   .get("/", "list")

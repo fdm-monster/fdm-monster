@@ -1,4 +1,4 @@
-const { DITokens } = require("../../container.tokens");
+import { DITokens } from "../../container.tokens";
 
 export class SocketFactory {
   /**
@@ -16,7 +16,3 @@ export class SocketFactory {
     return this.cradle[DITokens.octoPrintSockIoAdapter];
   }
 }
-
-module.exports = {
-  SocketFactory,
-};

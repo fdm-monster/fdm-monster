@@ -1,7 +1,7 @@
-const { ROLES, ROLE_PERMS } = require("../../constants/authorization.constants");
-const RoleModel = require("../../models/Auth/Role");
-const { NotFoundException } = require("../../exceptions/runtime.exceptions");
-const { union } = require("lodash");
+import { union } from "lodash";
+import { ROLES, ROLE_PERMS } from "../../constants/authorization.constants";
+import { Role } from "../../models";
+import { NotFoundException } from "../../exceptions/runtime.exceptions";
 
 export class RoleService {
   #roles = [];
@@ -134,9 +134,9 @@ export class RoleService {
   async syncRoles() {
     this.#roles = [];
     for (let roleName of Object.values(ROLES)) {
-      const storedRole = await RoleModel.findOne({ name: roleName });
+      const storedRole = await Role.findOne({ name: roleName });
       if (!storedRole) {
-        const newRole = await RoleModel.create({
+        const newRole = await Role.create({
           name: roleName,
         });
         this.#roles.push(newRole);
@@ -146,5 +146,3 @@ export class RoleService {
     }
   }
 }
-
-module.exports = RoleService;

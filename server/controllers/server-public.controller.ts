@@ -137,8 +137,7 @@ export class ServerPublicController {
   }
 }
 
-// prettier-ignore
-module.exports = createController(ServerPublicController)
+export default createController(ServerPublicController)
   .prefix(AppConstants.apiRoute + "/")
   .before([authenticate()])
   .get("", "welcome", { before: [authorizePermission(PERMS.ServerInfo.Get)] })

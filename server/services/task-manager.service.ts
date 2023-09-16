@@ -242,5 +242,3 @@ export class TaskManagerService {
     this.jobScheduler.stop();
   }
 }
-
-module.exports = { TaskManagerService };

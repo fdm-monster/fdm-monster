@@ -2,11 +2,10 @@ import { Request } from "express";
 import { InternalServerException, ValidationException } from "../exceptions/runtime.exceptions";
 import { currentPrinterToken, printerIdToken, printerLoginToken } from "../middleware/printer";
 import { normalizeUrl } from "../utils/normalize-url";
-
-const nodeInputValidator = require("node-input-validator");
+import nodeInputValidator, { extend } from "node-input-validator";
 
 export function getExtendedValidator() {
-  nodeInputValidator.extend("wsurl", ({ value, args }, validator) => {
+  extend("wsurl", ({ value, args }, validator) => {
     if (!value) return false;
     try {
       const url = normalizeUrl(value);
@@ -15,7 +14,7 @@ export function getExtendedValidator() {
       return false;
     }
   });
-  nodeInputValidator.extend("httpurl", ({ value, args }, validator) => {
+  extend("httpurl", ({ value, args }, validator) => {
     if (!value) return false;
 
     try {
@@ -27,7 +26,7 @@ export function getExtendedValidator() {
       return false;
     }
   });
-  nodeInputValidator.extend("not", ({ value, args }, validator) => {
+  extend("not", ({ value, args }, validator) => {
     return !value && value !== false;
   });
   return nodeInputValidator;
@@ -60,11 +59,8 @@ export function getScopedPrinter(req) {
 
 /**
  * Validate input based on rules
- * @param data
- * @param rules
- * @returns {Promise<object>}
  */
-export async function validateInput(data: any, rules: object) {
+export async function validateInput(data: any, rules: object): Promise<object> {
   const localNIV = getExtendedValidator();
 
   const v = new localNIV.Validator(data, rules);

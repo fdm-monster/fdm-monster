@@ -1,4 +1,4 @@
-const PrintCompletionModel = require("../models/PrintCompletion");
+const { PrintCompletion } = require("../models/PrintCompletion");
 const { createPrintCompletionRules } = require("./validators/print-completion-service.validation");
 const { validateInput } = require("../handlers/validators");
 const { groupArrayBy } = require("../utils/array.util");
@@ -14,7 +14,7 @@ export class PrintCompletionService {
   async create(input) {
     const { printerId, fileName, completionLog, status, context } = await validateInput(input, createPrintCompletionRules);
 
-    return PrintCompletionModel.create({
+    return PrintCompletion.create({
       printerId,
       fileName,
       completionLog,
@@ -25,17 +25,17 @@ export class PrintCompletionService {
   }
 
   async list() {
-    return PrintCompletionModel.find({});
+    return PrintCompletion.find({});
   }
 
   async findPrintCompletion(correlationId) {
-    return PrintCompletionModel.find({
+    return PrintCompletion.find({
       "context.correlationId": correlationId,
     });
   }
 
   async updateContext(correlationId, context) {
-    const completionEntry = await PrintCompletionModel.findOne({
+    const completionEntry = await PrintCompletion.findOne({
       "context.correlationId": correlationId,
       status: EVENT_TYPES.PrintStarted,
     });
@@ -49,7 +49,7 @@ export class PrintCompletionService {
   }
 
   async loadPrintContexts() {
-    const contexts = await PrintCompletionModel.aggregate([
+    const contexts = await PrintCompletion.aggregate([
       { $sort: { printerId: 1, createdAt: -1 } },
       {
         $group: {
@@ -79,7 +79,7 @@ export class PrintCompletionService {
   }
 
   async listGroupByPrinterStatus() {
-    const printCompletionsAggr = await PrintCompletionModel.aggregate([
+    const printCompletionsAggr = await PrintCompletion.aggregate([
       {
         $group: {
           _id: "$printerId",

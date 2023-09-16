@@ -1,26 +1,19 @@
-const { flattenPermissionDefinition } = require("../../constants/authorization.constants");
-const PermissionModel = require("../../models/Auth/Permission");
-const { NotFoundException } = require("../../exceptions/runtime.exceptions");
+import { Permission } from "../../models";
+import { flattenPermissionDefinition } from "../../constants/authorization.constants";
+import { NotFoundException } from "../../exceptions/runtime.exceptions";
+import { LoggerService } from "../../handlers/logger";
 
 export class PermissionService {
-  #permissions = {};
-  #logger;
+  private logger: LoggerService;
 
   constructor({ loggerFactory }) {
-    this.#logger = loggerFactory("RoleService");
+    this.logger = loggerFactory(PermissionService.name);
   }
+
+  private _permissions: { [k: string]: any } = {};
 
   get permissions() {
-    return this.#permissions;
-  }
-
-  #normalizePermission(assignedPermission) {
-    const permissionInstance = this.permissions.find((r) => r.id === assignedPermission || r.name === assignedPermission);
-    if (!permissionInstance) {
-      console.warn(`The permission by ID ${assignedPermission} did not exist. Skipping.`);
-      return;
-    }
-    return permissionInstance.name;
+    return this._permissions;
   }
 
   authorizePermission(requiredPermission, assignedPermissions) {
@@ -46,21 +39,28 @@ export class PermissionService {
   }
 
   async syncPermissions() {
-    this.#permissions = [];
+    this._permissions = [];
 
     const permissionDefinition = flattenPermissionDefinition();
     for (let permission of permissionDefinition) {
-      const storedPermission = await PermissionModel.findOne({ name: permission });
+      const storedPermission = await Permission.findOne({ name: permission });
       if (!storedPermission) {
-        const newPermission = await PermissionModel.create({
+        const newPermission = await Permission.create({
           name: permission,
         });
-        this.#permissions.push(newPermission);
+        this._permissions.push(newPermission);
       } else {
-        this.#permissions.push(storedPermission);
+        this._permissions.push(storedPermission);
       }
     }
   }
-}
 
-module.exports = PermissionService;
+  #normalizePermission(assignedPermission) {
+    const permissionInstance = this.permissions.find((r) => r.id === assignedPermission || r.name === assignedPermission);
+    if (!permissionInstance) {
+      this.logger.warn(`The permission by ID ${assignedPermission} did not exist. Skipping.`);
+      return;
+    }
+    return permissionInstance.name;
+  }
+}

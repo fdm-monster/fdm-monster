@@ -1,9 +1,7 @@
-const LoggerService = require("./logger");
+import { LoggerService } from "./logger";
 
-function LoggerFactory(_) {
-  return (name, logToFile, logLevel) => {
+export function LoggerFactory() {
+  return (name: string, logToFile: boolean, logLevel: string) => {
     return new LoggerService(name, logToFile, logLevel);
   };
 }
-
-module.exports = LoggerFactory;

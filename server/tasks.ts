@@ -1,5 +1,5 @@
-const { TaskPresets } = require("./task.presets");
-const { DITokens } = require("./container.tokens");
+import { TASK_PRESETS as TaskPresets } from "./task.presets";
+import { DITokens } from "./container.tokens";
 
 /**
  * Register a task with a preset and timing (run immediate does not retry in case of failure)

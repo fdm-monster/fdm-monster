@@ -189,5 +189,3 @@ export class KeyDiffCache {
     this.updatedKeys = [];
   }
 }
-
-module.exports = { KeyDiffCache };

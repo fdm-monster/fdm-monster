@@ -1,5 +1,6 @@
-const { UUID_LENGTH } = require("../../constants/service.constants");
-const exportPrintersFloorsYamlRules = {
+import { UUID_LENGTH } from "../../constants/service.constants";
+
+export const exportPrintersFloorsYamlRules = {
   // Used to export
   exportPrinters: "required|boolean",
   exportFloorGrid: "required|boolean",
@@ -15,7 +16,7 @@ const exportPrintersFloorsYamlRules = {
   // dropFloorIds: "required|boolean", // optional idea for future
 };
 
-const importPrintersFloorsYamlRules = (importPrinters, importFloorGrid, importFloors) => ({
+export const importPrintersFloorsYamlRules = (importPrinters, importFloorGrid, importFloors) => ({
   version: "required|string",
   config: "required|object",
   "config.exportPrinters": "required|boolean",
@@ -37,11 +38,9 @@ const importPrintersFloorsYamlRules = (importPrinters, importFloorGrid, importFl
   "floors.*.name": "required|string",
 });
 
-const importPrinterPositionsRules = {
+export const importPrinterPositionsRules = {
   printers: "array|minLength:0",
   "printers.*.printerId": "required|mongoId",
   "printers.*.x": "required|integer|min:0|max:12",
   "printers.*.y": "required|integer|min:0|max:12",
 };
-
-module.exports = { exportPrintersFloorsYamlRules, importPrintersFloorsYamlRules, importPrinterPositionsRules };

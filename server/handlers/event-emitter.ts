@@ -1,6 +1,6 @@
-const { EventEmitter2 } = require("eventemitter2");
+import { EventEmitter2 } from "eventemitter2";
 
-function configureEventEmitter() {
+export function configureEventEmitter() {
   return new EventEmitter2({
     // set this to `true` to use wildcards
     wildcard: true,
@@ -24,7 +24,3 @@ function configureEventEmitter() {
     ignoreErrors: false,
   });
 }
-
-module.exports = {
-  configureEventEmitter,
-};

@@ -1,5 +1,5 @@
-const { Server } = require("socket.io");
-const { socketIoConnectedEvent } = require("../constants/event.constants");
+import { Server } from "socket.io";
+import { socketIoConnectedEvent } from "../constants/event.constants";
 
 export class SocketIoGateway {
   /**
@@ -54,13 +54,10 @@ export class SocketIoGateway {
   }
 }
 
-module.exports = {
-  SocketIoGateway,
-  IO_MESSAGES: {
-    LegacyUpdate: "legacy-update",
-    LegacyPrinterTest: "legacy-printer-test",
-    CompletionEvent: "completion-event",
-    HostState: "host-state",
-    ApiAccessibility: "api-accessibility",
-  },
+export const IO_MESSAGES = {
+  LegacyUpdate: "legacy-update",
+  LegacyPrinterTest: "legacy-printer-test",
+  CompletionEvent: "completion-event",
+  HostState: "host-state",
+  ApiAccessibility: "api-accessibility",
 };

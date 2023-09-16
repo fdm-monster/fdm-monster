@@ -1,5 +1,5 @@
-const { sign } = require("jsonwebtoken");
-const { AppConstants } = require("../../server.constants");
+import { sign } from "jsonwebtoken";
+import { AppConstants } from "../../server.constants";
 
 export class JwtService {
   /**
@@ -26,7 +26,3 @@ export class JwtService {
     });
   }
 }
-
-module.exports = {
-  JwtService,
-};

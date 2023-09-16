@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
+import { model, Schema } from "mongoose";
 
-const CustomGCodeSchema = new mongoose.Schema({
+const CustomGCodeSchema = new Schema({
   name: {
     type: String,
     required: true,
@@ -15,6 +15,4 @@ const CustomGCodeSchema = new mongoose.Schema({
   },
 });
 
-const CustomGCode = mongoose.model("CustomGCode", CustomGCodeSchema);
-
-module.exports = CustomGCode;
+export const CustomGCode = model("CustomGCode", CustomGCodeSchema);

@@ -4,7 +4,3 @@ export class JobValidationException extends Error {
     this.name = `JobValidationError [${taskId || "anonymous"}]`;
   }
 }
-
-module.exports = {
-  JobValidationException,
-};

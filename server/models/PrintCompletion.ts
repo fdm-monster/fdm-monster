@@ -1,5 +1,4 @@
-const mongoose = require("mongoose");
-const { Schema } = require("mongoose");
+import { model, Schema } from "mongoose";
 
 const PrintCompletionSchema = new Schema({
   fileName: {
@@ -28,6 +27,4 @@ const PrintCompletionSchema = new Schema({
   },
 });
 
-const PrintCompletion = mongoose.model("PrintCompletion", PrintCompletionSchema);
-
-module.exports = PrintCompletion;
+export const PrintCompletion = model("PrintCompletion", PrintCompletionSchema);

@@ -1,6 +1,6 @@
-const { KeyDiffCache } = require("../utils/cache/key-diff.cache");
-const { formatKB } = require("../utils/metric.utils");
-const { printerEvents } = require("../constants/event.constants");
+import { KeyDiffCache } from "../utils/cache/key-diff.cache";
+import { formatKB } from "../utils/metric.utils";
+import { printerEvents } from "@/constants/event.constants";
 
 export class PrinterEventsCache extends KeyDiffCache {
   /**
@@ -108,5 +108,3 @@ export class PrinterEventsCache extends KeyDiffCache {
     return payload;
   }
 }
-
-module.exports = { PrinterEventsCache };

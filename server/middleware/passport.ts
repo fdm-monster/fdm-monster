@@ -1,15 +1,17 @@
-const { Strategy: JwtStrategy, ExtractJwt } = require("passport-jwt");
-const { Strategy: AnonymousStrategy } = require("passport-anonymous");
-const User = require("../models/Auth/User.js");
-const { DITokens } = require("../container.tokens");
-const { AppConstants } = require("../server.constants");
+import { ExtractJwt, Strategy as JwtStrategy } from "passport-jwt";
+import { Strategy as AnonymousStrategy } from "passport-anonymous";
+import { User } from "../models";
+import { DITokens } from "../container.tokens";
+import { AppConstants } from "../server.constants";
+import { AwilixContainer } from "awilix";
+import { Authenticator } from "passport";
 
 /**
  * @param {Authenticator} passport
  * @param {AwilixContainer<any>} container
  * @returns {Authenticator}
  */
-function initializePassportStrategies(passport, container) {
+export function initializePassportStrategies(passport: Authenticator, container: AwilixContainer<any>): Authenticator {
   const opts = {};
   /** @type {SettingsStore} **/
   const settingsStore = container.resolve(DITokens.settingsStore);
@@ -39,7 +41,3 @@ function initializePassportStrategies(passport, container) {
   passport.use(new AnonymousStrategy());
   return passport;
 }
-
-module.exports = {
-  initializePassportStrategies,
-};

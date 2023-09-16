@@ -1,9 +1,9 @@
-const UserModel = require("../../models/Auth/User");
-const { NotFoundException, InternalServerException } = require("../../exceptions/runtime.exceptions");
-const { validateInput } = require("../../handlers/validators");
-const { registerUserRules, newPasswordRules } = require("../validators/user-service.validation");
-const { ROLES } = require("../../constants/authorization.constants");
-const { hashPassword, comparePasswordHash } = require("../../utils/crypto.utils");
+import { User } from "../../models";
+import { NotFoundException, InternalServerException } from "../../exceptions/runtime.exceptions";
+import { validateInput } from "../../handlers/validators";
+import { registerUserRules, newPasswordRules } from "../validators/user-service.validation";
+import { ROLES } from "../../constants/authorization.constants";
+import { hashPassword, comparePasswordHash } from "../../utils/crypto.utils";
 
 export class UserService {
   /**
@@ -31,26 +31,26 @@ export class UserService {
   }
 
   async listUsers(limit = 10) {
-    const userDocs = await UserModel.find().limit(limit);
+    const userDocs = await User.find().limit(limit);
     return userDocs.map((u) => this.toDto(u));
   }
 
   async findRawByRoleId(roleId) {
-    return UserModel.find({ roles: { $in: [roleId] } });
+    return User.find({ roles: { $in: [roleId] } });
   }
 
   async getDemoUserId() {
-    return (await UserModel.findOne({ isDemoUser: true }))?._id;
+    return (await User.findOne({ isDemoUser: true }))?._id;
   }
 
   async findRawByUsername(username) {
-    return UserModel.findOne({
+    return User.findOne({
       username,
     });
   }
 
   async getUser(userId) {
-    const user = await UserModel.findById(userId);
+    const user = await User.findById(userId);
     if (!user) throw new NotFoundException("User not found");
 
     return this.toDto(user);
@@ -61,13 +61,8 @@ export class UserService {
     return user.roles;
   }
 
-  /**
-   * @param userId {string}
-   * @param roleId {string[]}
-   * @return {Promise<*>}
-   */
-  async setUserRoleIds(userId, roleIds) {
-    const user = await UserModel.findById(userId);
+  async setUserRoleIds(userId: string, roleIds): Promise<any> {
+    const user = await User.findById(userId);
     if (!user) throw new NotFoundException("User not found");
     const roles = this.roleService.getManyRoles(roleIds);
 
@@ -89,11 +84,11 @@ export class UserService {
       }
     }
 
-    await UserModel.findByIdAndDelete(user.id);
+    await User.findByIdAndDelete(user.id);
   }
 
   async updateUsernameById(userId, newUsername) {
-    const user = await UserModel.findById(userId);
+    const user = await User.findById(userId);
     if (!user) throw new NotFoundException("User not found");
 
     user.username = newUsername;
@@ -101,7 +96,7 @@ export class UserService {
   }
 
   async updatePasswordById(userId, oldPassword, newPassword) {
-    const user = await UserModel.findById(userId);
+    const user = await User.findById(userId);
     if (!user) throw new NotFoundException("User not found");
 
     if (!comparePasswordHash(oldPassword, user.passwordHash)) {
@@ -132,7 +127,7 @@ export class UserService {
     );
 
     const passwordHash = hashPassword(password);
-    const userDoc = await UserModel.create({
+    const userDoc = await User.create({
       username,
       passwordHash,
       roles,
@@ -144,5 +139,3 @@ export class UserService {
     return this.toDto(userDoc);
   }
 }
-
-module.exports = UserService;

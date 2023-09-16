@@ -1,11 +1,11 @@
-const { DITokens } = require("../container.tokens");
-const { asValue } = require("awilix");
+import { asValue } from "awilix";
+import { DITokens } from "../container.tokens";
 
-const printerIdToken = "currentPrinterId";
-const currentPrinterToken = "currentPrinter";
-const printerLoginToken = "printerLogin";
+export const printerIdToken = "currentPrinterId";
+export const currentPrinterToken = "currentPrinter";
+export const printerLoginToken = "printerLogin";
 
-const printerResolveMiddleware = (key = "id") => {
+export const printerResolveMiddleware = (key = "id") => {
   return (req, res, next) => {
     /** @type {PrinterCache} */
     const printerCache = req.container.resolve(DITokens.printerCache);
@@ -27,11 +27,4 @@ const printerResolveMiddleware = (key = "id") => {
 
     next();
   };
-};
-
-module.exports = {
-  printerResolveMiddleware,
-  currentPrinterToken,
-  printerLoginToken,
-  printerIdToken,
 };

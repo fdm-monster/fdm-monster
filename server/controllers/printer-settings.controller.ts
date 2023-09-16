@@ -58,7 +58,7 @@ export class PrinterSettingsController {
 }
 
 // prettier-ignore
-module.exports = createController(PrinterSettingsController)
+export default createController(PrinterSettingsController)
   .prefix(AppConstants.apiRoute + "/printer-settings")
   .before([authenticate()])
   .get("/:id", "get", withPermission(PERMS.PrinterSettings.Get))

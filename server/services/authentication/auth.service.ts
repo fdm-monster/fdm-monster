@@ -1,8 +1,8 @@
-const { RefreshToken } = require("../../models/Auth/RefreshToken");
-const { AuthenticationError } = require("../../exceptions/runtime.exceptions");
-const { comparePasswordHash } = require("../../utils/crypto.utils");
-const { v4: uuidv4 } = require("uuid");
-const { AppConstants } = require("../../server.constants");
+import { v4 as uuidv4 } from "uuid";
+import { RefreshToken } from "../../models";
+import { AuthenticationError } from "../../exceptions/runtime.exceptions";
+import { comparePasswordHash } from "../../utils/crypto.utils";
+import { AppConstants } from "../../server.constants";
 
 export class AuthService {
   /**
@@ -12,28 +12,28 @@ export class AuthService {
   /**
    * @private
    */
-  RefreshTokenModel = RefreshToken;
+  private RefreshTokenModel = RefreshToken;
   /**
    * @private
    * @type {UserService}
    */
-  userService;
+  private userService;
   /**
    * @private
    * @type {JwtService}
    */
-  jwtService;
+  private jwtService;
   /**
    * @private
    * @type {SettingsStore}
    */
-  settingsStore;
+  private settingsStore;
   /**
    *  When users are blacklisted at runtime, this cache can make quick work of rejecting them
    * @private
    * @type {{}}
    */
-  blacklistedCache = {};
+  private blacklistedCache = {};
 
   /**
    * loginUser: starts new session: id-token, refresh, removing any old refresh
@@ -260,7 +260,3 @@ export class AuthService {
     delete this.blacklistedCache[userId];
   }
 }
-
-module.exports = {
-  AuthService,
-};

@@ -1,12 +1,12 @@
-const { Schema, model } = require("mongoose");
-const {
-  wizardSettingKey,
+import { model, Schema } from "mongoose";
+import {
+  credentialSettingsKey,
   fileCleanSettingKey,
+  frontendSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
-  frontendSettingKey,
-  credentialSettingsKey,
-} = require("../constants/server-settings.constants");
+  wizardSettingKey,
+} from "../constants/server-settings.constants";
 
 const ServerSettingsSchema = new Schema({
   [wizardSettingKey]: {
@@ -162,6 +162,4 @@ const ServerSettingsSchema = new Schema({
   },
 });
 
-const ServerSettings = model("ServerSettings", ServerSettingsSchema);
-
-module.exports = ServerSettings;
+export const ServerSettings = model("ServerSettings", ServerSettingsSchema);

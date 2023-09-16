@@ -5,14 +5,14 @@ const { AppConstants } = require("../server.constants");
 const { readdirSync, unlinkSync } = require("fs");
 const { isValidDate } = require("../utils/time.utils");
 
-export class LogsManagerService {
+export class LogDumpService {
   /**
    * @type {LoggerService}
    */
   logger;
 
   constructor({ loggerFactory }) {
-    this.logger = loggerFactory(LogsManagerService.name);
+    this.logger = loggerFactory(LogDumpService.name);
   }
 
   async deleteOlderThanWeekAndMismatchingLogFiles() {
@@ -83,7 +83,3 @@ export class LogsManagerService {
     return outputPath;
   }
 }
-
-module.exports = {
-  LogDumpService: LogsManagerService,
-};

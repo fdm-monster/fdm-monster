@@ -1,5 +1,5 @@
-const { InfluxDB } = require("@influxdata/influxdb-client");
-const { AppConstants } = require("../../server.constants");
+import { InfluxDB } from "@influxdata/influxdb-client";
+import { AppConstants } from "../../server.constants";
 
 export class InfluxDbV2BaseService {
   configService;
@@ -34,7 +34,3 @@ export class InfluxDbV2BaseService {
     return this.#getClient().getQueryApi(org);
   }
 }
-
-module.exports = {
-  InfluxDbV2BaseService,
-};

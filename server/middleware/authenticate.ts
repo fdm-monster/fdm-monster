@@ -1,5 +1,5 @@
-const { inject } = require("awilix-express");
-const { AuthorizationError, AuthenticationError } = require("../exceptions/runtime.exceptions");
+import { inject } from "awilix-express";
+import { AuthorizationError, AuthenticationError } from "../exceptions/runtime.exceptions";
 
 export function authorizePermission(permission) {
   return inject(({ permissionService, roleService }) => async (req, res, next) => {

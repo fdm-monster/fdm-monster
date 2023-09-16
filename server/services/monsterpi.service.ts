@@ -27,7 +27,3 @@ export class MonsterPiService {
     return null;
   }
 }
-
-module.exports = {
-  MonsterPiService,
-};

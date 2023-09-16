@@ -1,16 +1,14 @@
-import LoggerService from "./handlers/logger";
-
 import express from "express";
 import mongoose from "mongoose";
 import history from "connect-history-api-fallback";
+import { LoggerService } from "./handlers/logger";
 import { loadControllers } from "awilix-express";
 import { join } from "path";
-
-const exceptionHandler = require("./middleware/exception.handler");
-const { fetchServerPort } = require("./server.env");
-const { NotFoundException } = require("./exceptions/runtime.exceptions");
-const { AppConstants } = require("./server.constants");
-const { superRootPath, rootPath } = require("./utils/fs.utils");
+import { exceptionHandler } from "./middleware/exception.handler";
+import { fetchServerPort } from "./server.env";
+import { NotFoundException } from "./exceptions/runtime.exceptions";
+import { AppConstants } from "./server.constants";
+import { superRootPath, rootPath } from "./utils/fs.utils";
 
 export class ServerHost {
   /**

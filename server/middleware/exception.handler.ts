@@ -1,4 +1,4 @@
-const {
+import {
   ValidationException,
   NotFoundException,
   InternalServerException,
@@ -6,10 +6,10 @@ const {
   AuthenticationError,
   AuthorizationError,
   BadRequestException,
-} = require("../exceptions/runtime.exceptions");
-const { AppConstants } = require("../server.constants");
+} from "../exceptions/runtime.exceptions";
+import { AppConstants } from "../server.constants";
 
-function exceptionHandler(err, req, res, next) {
+export function exceptionHandler(err, req, res, next) {
   const isTest = process.env.NODE_ENV === AppConstants.defaultTestEnv;
   if (!isTest) {
     console.error("[API Exception Handler]", err.stack || err?.response?.data);
@@ -74,5 +74,3 @@ function exceptionHandler(err, req, res, next) {
   // Will result in not found on API level
   next();
 }
-
-module.exports = exceptionHandler;

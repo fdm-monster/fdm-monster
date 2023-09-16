@@ -13,5 +13,3 @@ export class SoftwareUpdateTask {
     this.serverReleaseService.logServerVersionState();
   }
 }
-
-module.exports = SoftwareUpdateTask;

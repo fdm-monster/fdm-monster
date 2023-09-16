@@ -1,4 +1,4 @@
-function mapArray(docs) {
+export function mapArray(docs) {
   if (!docs?.length) return [];
 
   return docs.map(map);
@@ -8,7 +8,7 @@ function mapArray(docs) {
  * @param doc
  * @returns {any}
  */
-function map(doc) {
+export function map(doc) {
   if (!doc) return;
 
   const data = doc.toJSON();
@@ -18,8 +18,3 @@ function map(doc) {
   data.id = id;
   return data;
 }
-
-module.exports = {
-  mapArray,
-  map,
-};

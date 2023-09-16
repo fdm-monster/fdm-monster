@@ -1,5 +1,5 @@
-const { ValidationException, InternalServerException } = require("../../exceptions/runtime.exceptions");
-const { pluginManagerCommands } = require("./constants/octoprint-service.constants");
+import { ValidationException, InternalServerException } from "../../exceptions/runtime.exceptions";
+import { pluginManagerCommands } from "./constants/octoprint-service.constants";
 
 export class PluginBaseService {
   // https://github.com/OctoPrint/OctoPrint/blob/76e87ba81329e6ce761c9307d3e80c291000871e/src/octoprint/plugins/pluginmanager/__init__.py#L609
@@ -113,7 +113,3 @@ export class PluginBaseService {
     await this.octoPrintApiService.postSystemRestartCommand(printerLogin);
   }
 }
-
-module.exports = {
-  PluginBaseService,
-};

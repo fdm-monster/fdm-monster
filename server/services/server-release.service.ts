@@ -1,24 +1,23 @@
-const Logger = require("../handlers/logger.js");
-const semver = require("semver");
-const { AppConstants } = require("../server.constants");
+import semver from "semver";
+import { LoggerService } from "@/handlers/logger";
+import { AppConstants } from "../server.constants";
 
 export class ServerReleaseService {
-  #synced = false;
   airGapped = null; // Connection error
-  #installedReleaseFound = null;
-  #updateAvailable = null;
-  #latestRelease = null;
-  #installedRelease = null;
-
-  /**
-   * @type {LoggerService}
-   */
-  #logger = new Logger("ServerReleaseService");
-  #serverVersion;
   /*
    * @type {GithubService}
    */
   githubService;
+  #synced = false;
+  #installedReleaseFound = null;
+  #updateAvailable = null;
+  #latestRelease = null;
+  #installedRelease = null;
+  /**
+   * @type {LoggerService}
+   */
+  #logger = new LoggerService("ServerReleaseService");
+  #serverVersion;
 
   constructor({ serverVersion, githubService }) {
     this.#serverVersion = serverVersion;
@@ -41,7 +40,7 @@ export class ServerReleaseService {
    * Connection-safe acquire data about the installed and latest releases.
    * @returns {Promise<*|null>}
    */
-  async syncLatestRelease() {
+  async syncLatestRelease(): Promise<any | null> {
     if (!(await this.githubService.wasAuthenticated())) {
       return;
     }
@@ -123,5 +122,3 @@ export class ServerReleaseService {
     }
   }
 }
-
-module.exports = { ServerReleaseService };

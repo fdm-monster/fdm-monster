@@ -1,4 +1,4 @@
-const EVENT_TYPES = {
+export const EVENT_TYPES = {
   ClientAuthed: "ClientAuthed",
   ClientClosed: "ClientClosed",
   ClientOpened: "ClientOpened",
@@ -39,7 +39,7 @@ const EVENT_TYPES = {
   ZChange: "ZChange",
 };
 
-const OP_WS_MSG = {
+export const OP_WS_MSG = {
   connected: "connected",
   reauthRequired: "reauthRequired",
   current: "current",
@@ -50,20 +50,13 @@ const OP_WS_MSG = {
   slicingProgress: "slicingProgress",
 };
 
-const OP_WS_SKIP = [OP_WS_MSG.slicingProgress, OP_WS_MSG.timelapse];
+export const OP_WS_SKIP = [OP_WS_MSG.slicingProgress, OP_WS_MSG.timelapse];
 
-const WS_STATE = {
+export const WS_STATE = {
   unopened: "unopened",
   opening: "opening",
   connected: "connected",
   authed: "authed",
   errored: "errored", // Not a disconnect error
   closed: "closed", // Closing error received
-};
-
-module.exports = {
-  EVENT_TYPES,
-  WS_STATE,
-  OP_WS_MSG,
-  OP_WS_SKIP,
 };

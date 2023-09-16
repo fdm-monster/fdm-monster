@@ -108,5 +108,3 @@ export class PrinterFilesService {
     await printer.save();
   }
 }
-
-module.exports = PrinterFilesService;

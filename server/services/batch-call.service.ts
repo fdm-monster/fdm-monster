@@ -165,5 +165,3 @@ export class BatchCallService {
     return await Promise.all(promises);
   }
 }
-
-module.exports = { BatchCallService };

@@ -1,6 +1,6 @@
-const fs = require("fs");
+import fs from "fs";
 
-let isDockerCached;
+let isDockerCached: boolean | undefined = undefined;
 
 function hasDockerEnv() {
   try {
@@ -19,14 +19,10 @@ function hasDockerCGroup() {
   }
 }
 
-function isDocker() {
+export function isDocker() {
   if (isDockerCached === undefined) {
     isDockerCached = hasDockerEnv() || hasDockerCGroup();
   }
 
   return isDockerCached;
 }
-
-module.exports = {
-  isDocker,
-};

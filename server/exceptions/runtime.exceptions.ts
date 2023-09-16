@@ -1,12 +1,12 @@
 export class NotImplementedException extends Error {
-  constructor(message) {
+  constructor(message?: string) {
     super(message);
     this.name = NotImplementedException.name;
   }
 }
 
 export class AuthenticationError extends Error {
-  constructor(error) {
+  constructor(error?: string) {
     super(error);
     this.name = AuthenticationError.name;
   }
@@ -15,6 +15,7 @@ export class AuthenticationError extends Error {
 export class AuthorizationError extends Error {
   permissions = [];
   roles = [];
+  reason: string;
 
   constructor({ permissions, roles, reason }) {
     super("Authorization failed");
@@ -33,7 +34,9 @@ export class BadRequestException extends Error {
 }
 
 export class NotFoundException extends Error {
-  constructor(message, path) {
+  path: string;
+
+  constructor(message: string, path: string) {
     super(message);
     this.name = NotFoundException.name;
     this.path = path;
@@ -41,7 +44,9 @@ export class NotFoundException extends Error {
 }
 
 export class ValidationException extends Error {
-  constructor(validationObject) {
+  errors: any;
+
+  constructor(validationObject: any) {
     super(JSON.stringify(validationObject));
     this.name = ValidationException.name;
     this.errors = validationObject;
@@ -49,7 +54,9 @@ export class ValidationException extends Error {
 }
 
 export class ExternalServiceError extends Error {
-  constructor(responseObject) {
+  error: any;
+
+  constructor(responseObject: any) {
     super(JSON.stringify(responseObject));
     this.name = ExternalServiceError.name;
     this.error = responseObject;
@@ -57,20 +64,9 @@ export class ExternalServiceError extends Error {
 }
 
 export class InternalServerException extends Error {
-  constructor(message, stack) {
+  constructor(message: string, stack?: any) {
     super(message);
     this.name = InternalServerException.name;
     this.stack = stack;
   }
 }
-
-module.exports = {
-  NotImplementedException,
-  BadRequestException,
-  NotFoundException,
-  AuthenticationError,
-  AuthorizationError,
-  InternalServerException,
-  ExternalServiceError,
-  ValidationException,
-};

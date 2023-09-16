@@ -74,7 +74,7 @@ export class FloorController {
 }
 
 // prettier-ignore
-module.exports = createController(FloorController)
+export default createController(FloorController)
   .prefix(AppConstants.apiRoute + "/floor")
   .before([authenticate()])
   .get("/", "list", withPermission(PERMS.PrinterFloors.List))

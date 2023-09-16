@@ -1,7 +1,7 @@
-const { jsonContentType, contentTypeHeaderKey } = require("./constants/octoprint-service.constants");
-const { validateLogin, constructHeaders } = require("./utils/api.utils");
-const { getDefaultTimeout } = require("../../constants/server-settings.constants");
-const { normalizeUrl } = require("../../utils/normalize-url");
+import { jsonContentType, contentTypeHeaderKey } from "./constants/octoprint-service.constants";
+import { validateLogin, constructHeaders } from "./utils/api.utils";
+import { getDefaultTimeout } from "../../constants/server-settings.constants";
+import { normalizeUrl } from "../../utils/normalize-url";
 
 export class OctoPrintRoutes {
   octoPrintBase = "/";
@@ -199,5 +199,3 @@ export class OctoPrintRoutes {
     };
   }
 }
-
-module.exports = OctoPrintRoutes;

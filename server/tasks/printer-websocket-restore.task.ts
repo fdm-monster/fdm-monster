@@ -85,5 +85,3 @@ export class PrinterWebsocketRestoreTask {
     }
   }
 }
-
-module.exports = { PrinterWebsocketRestoreTask };

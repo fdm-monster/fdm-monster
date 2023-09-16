@@ -1,19 +1,13 @@
-const { AppConstants } = require("../server.constants");
-const { WebSocket } = require("ws");
+import { AppConstants } from "../server.constants";
+import { CloseEvent, Data, WebSocket, Event as WsEvent, ErrorEvent } from "ws";
+import { LoggerService } from "../handlers/logger";
 
 export class WebsocketAdapter {
-  /**
-   * WebSocket
-   * @type { WebSocket|undefined }
-   */
-  socket;
-  /**
-   * @type { LoggerService }
-   */
-  #logger;
+  socket?: WebSocket;
+  #logger: LoggerService;
 
   constructor({ loggerFactory }) {
-    this.#logger = loggerFactory("WebsocketAdapter");
+    this.#logger = loggerFactory(WebsocketAdapter.name);
   }
 
   get isOpened() {
@@ -29,10 +23,10 @@ export class WebsocketAdapter {
    * @protected
    * Open a WebSocket connection.
    *
-   * @param {URL} url - The URL to connect to.
+   * @param {string|URL} url - The URL to connect to.
    * @returns {void}
    */
-  open(url) {
+  open(url: string | URL): void {
     this.socket = new WebSocket(url, { handshakeTimeout: AppConstants.defaultWebsocketHandshakeTimeout });
     this.socket.onopen = (event) => this.onOpen(event);
     this.socket.onerror = (error) => this.onError(error);
@@ -47,13 +41,13 @@ export class WebsocketAdapter {
    * @param {string} payload - The message payload to send.
    * @returns {Promise<void>} A promise that resolves when the message is sent successfully.
    */
-  async sendMessage(payload) {
-    if (!this.isOpened) {
+  async sendMessage(payload: string): Promise<void> {
+    if (!this.isOpened || !this.socket) {
       this.#logger.error("Websocket is not opened, cant send a message");
       return;
     }
     return await new Promise((resolve, reject) => {
-      this.socket.send(payload, (error) => {
+      this.socket!.send(payload, (error) => {
         if (error) reject(error);
         resolve();
       });
@@ -67,7 +61,7 @@ export class WebsocketAdapter {
    * @param {Event} error - The error event object.
    * @returns {Promise<void> | void} A promise that resolves when the error handling is complete, or void if no promise is returned.
    */
-  onError(error) {}
+  onError(error: ErrorEvent): Promise<void> | void {}
 
   /**
    * Handle after opened event.
@@ -76,7 +70,7 @@ export class WebsocketAdapter {
    * @param {Event} event - The event object.
    * @returns {Promise<void> | void} A promise that resolves when the after opened handling is complete, or void if no promise is returned.
    */
-  afterOpened(event) {}
+  afterOpened(event: WsEvent): Promise<void> | void {}
 
   /**
    * Handle after closed event.
@@ -85,7 +79,7 @@ export class WebsocketAdapter {
    * @param {CloseEvent} event - The event object.
    * @returns {Promise<void> | void} A promise that resolves when the after closed handling is complete, or void if no promise is returned.
    */
-  afterClosed(event) {}
+  afterClosed(event: CloseEvent): Promise<void> | void {}
 
   /**
    * Handle message event.
@@ -94,7 +88,7 @@ export class WebsocketAdapter {
    * @param {Data} event - The event object.
    * @returns {Promise<void> | void} A promise that resolves when the message handling is complete, or void if no promise is returned.
    */
-  onMessage(event) {}
+  onMessage(event: Data): Promise<void> | void {}
 
   /**
    * Handle open event.
@@ -102,7 +96,7 @@ export class WebsocketAdapter {
    * @param {Event} event - The event object.
    * @returns {Promise<void>} A promise that resolves when the open handling is complete.
    */
-  async onOpen(event) {
+  async onOpen(event: WsEvent): Promise<void> {
     await this.afterOpened(event);
   }
 
@@ -112,11 +106,7 @@ export class WebsocketAdapter {
    * @param {CloseEvent} event - The event object.
    * @returns {Promise<void>} A promise that resolves when the close handling is complete.
    */
-  async onClose(event) {
+  async onClose(event: CloseEvent): Promise<void> {
     await this.afterClosed(event);
   }
 }
-
-module.exports = {
-  WebsocketAdapter,
-};

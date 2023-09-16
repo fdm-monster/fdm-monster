@@ -1,5 +1,6 @@
-const { AppConstants } = require("../../server.constants");
-const registerUserRules = {
+import { AppConstants } from "../../server.constants";
+
+export const registerUserRules = {
   username: "required|string",
   password: `required|string|minLength:${AppConstants.DEFAULT_PASSWORD_MINLEN}`,
   needsPasswordChange: "boolean",
@@ -9,11 +10,6 @@ const registerUserRules = {
   "roles.*": "required|mongoId",
 };
 
-const newPasswordRules = {
+export const newPasswordRules = {
   password: `required|string|minLength:${AppConstants.DEFAULT_PASSWORD_MINLEN}`,
-};
-
-module.exports = {
-  registerUserRules,
-  newPasswordRules,
 };

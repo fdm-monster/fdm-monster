@@ -1,46 +1,35 @@
-const getFilesRules = {
+export const getFilesRules = {
   recursive: "required|boolean",
 };
 
-const uploadFileRules = {};
+export const uploadFileRules = {};
 
-const getFileRules = {
+export const getFileRules = {
   path: "required|string",
 };
 
-const createFolderRules = {
+export const createFolderRules = {
   foldername: "required|string",
   path: "required|string",
 };
 
-const moveFileOrFolderRules = {
+export const moveFileOrFolderRules = {
   filePath: "required|string",
   destination: "required|string",
 };
 
-const fileUploadCommandsRules = {
+export const fileUploadCommandsRules = {
   select: "boolean",
   print: "required|boolean",
 };
 
-const selectAndPrintFileRules = {
+export const selectAndPrintFileRules = {
   filePath: "required|string",
   print: "required|boolean",
 };
 
-const localFileUploadRules = {
+export const localFileUploadRules = {
   localLocation: "required",
   select: "boolean",
   print: "boolean",
-};
-
-module.exports = {
-  getFilesRules,
-  selectAndPrintFileRules,
-  localFileUploadRules,
-  uploadFileRules,
-  createFolderRules,
-  moveFileOrFolderRules,
-  fileUploadCommandsRules,
-  getFileRules,
 };

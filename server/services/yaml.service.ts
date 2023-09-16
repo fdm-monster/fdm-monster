@@ -1,10 +1,10 @@
-const { validateInput } = require("../handlers/validators");
-const {
+import { validateInput } from "../handlers/validators";
+import {
   exportPrintersFloorsYamlRules,
-  importPrintersFloorsYamlRules,
   importPrinterPositionsRules,
-} = require("./validators/yaml-service.validation");
-const { dump, load } = require("js-yaml");
+  importPrintersFloorsYamlRules,
+} from "./validators/yaml-service.validation";
+import { dump, load } from "js-yaml";
 
 export class YamlService {
   floorStore;
@@ -328,7 +328,3 @@ export class YamlService {
     return dump(dumpedObject, {});
   }
 }
-
-module.exports = {
-  YamlService,
-};

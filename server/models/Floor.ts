@@ -1,6 +1,5 @@
-const mongoose = require("mongoose");
-const { Schema } = require("mongoose");
-const { PrinterInFloorSchema } = require("./FloorPrinter");
+import { model, Schema } from "mongoose";
+import { PrinterInFloorSchema } from "./FloorPrinter";
 
 const FloorSchema = new Schema({
   name: {
@@ -16,8 +15,4 @@ const FloorSchema = new Schema({
   printers: [PrinterInFloorSchema],
 });
 
-const Floor = mongoose.model("Floor", FloorSchema);
-
-module.exports = {
-  Floor,
-};
+export const Floor = model("Floor", FloorSchema);

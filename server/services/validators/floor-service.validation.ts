@@ -1,24 +1,24 @@
-const { minPrinterFloorNameLength } = require("../../constants/service.constants");
+import { minPrinterFloorNameLength } from "../../constants/service.constants";
 
-const removePrinterInFloorRules = {
+export const removePrinterInFloorRules = {
   printerId: "required|mongoId",
 };
 
-const printerInFloorRules = {
+export const printerInFloorRules = {
   printerId: "required|mongoId",
   x: "required|integer|between:0,12",
   y: "required|integer|between:0,12",
 };
 
-const updateFloorNameRules = {
+export const updateFloorNameRules = {
   name: `required|minLength:${minPrinterFloorNameLength}`,
 };
 
-const updateFloorNumberRules = {
+export const updateFloorNumberRules = {
   floor: "required|integer",
 };
 
-const updateFloorRules = {
+export const updateFloorRules = {
   name: `required|minLength:${minPrinterFloorNameLength}`,
   floor: "required|integer",
   printers: "array",
@@ -27,17 +27,8 @@ const updateFloorRules = {
   "printer.*.y": "required|integer|between:0,12",
 };
 
-const createFloorRules = {
+export const createFloorRules = {
   name: `required|minLength:${minPrinterFloorNameLength}`,
   floor: "required|integer",
   printers: "array",
-};
-
-module.exports = {
-  printerInFloorRules,
-  removePrinterInFloorRules,
-  updateFloorRules,
-  updateFloorNameRules,
-  updateFloorNumberRules,
-  createFloorRules,
 };

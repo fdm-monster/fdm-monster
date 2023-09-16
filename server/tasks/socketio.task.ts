@@ -1,6 +1,6 @@
-const { IO_MESSAGES } = require("../state/socket-io.gateway");
-const { socketIoConnectedEvent } = require("../constants/event.constants");
-const { sizeKB, formatKB } = require("../utils/metric.utils");
+import { IO_MESSAGES } from "../state/socket-io.gateway";
+import { socketIoConnectedEvent } from "../constants/event.constants";
+import { sizeKB, formatKB } from "../utils/metric.utils";
 
 export class SocketIoTask {
   /**
@@ -121,5 +121,3 @@ export class SocketIoTask {
     ++this.#aggregateSizeCounter;
   }
 }
-
-module.exports = { SocketIoTask };

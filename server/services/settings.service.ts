@@ -1,26 +1,34 @@
-const SettingsModel = require("../models/ServerSettings.js");
-const Constants = require("../constants/server-settings.constants");
-const { validateInput } = require("../handlers/validators");
-const {
+import { ServerSettings } from "../models/ServerSettings.js";
+import {
+  getDefaultCredentialSettings,
+  getDefaultFileCleanSettings,
+  getDefaultFrontendSettings,
+  getDefaultServerSettings,
+  getDefaultSettings,
+  getDefaultTimeout,
+  getDefaultWhitelistIpAddresses,
+  getDefaultWizardSettings,
+} from "../constants/server-settings.constants";
+import { validateInput } from "../handlers/validators";
+import {
   serverSettingsUpdateRules,
   frontendSettingsUpdateRules,
   credentialSettingUpdateRules,
-} = require("./validators/settings-service.validation");
-const {
+} from "./validators/settings-service.validation";
+import {
   fileCleanSettingKey,
   serverSettingsKey,
   frontendSettingKey,
   credentialSettingsKey,
   timeoutSettingKey,
   wizardSettingKey,
-} = require("../constants/server-settings.constants");
-const { AppConstants } = require("../server.constants");
+} from "../constants/server-settings.constants";
 
 export class SettingsService {
   async getOrCreate() {
-    let settings = await SettingsModel.findOne();
+    let settings = await ServerSettings.findOne();
     if (!settings) {
-      const defaultSettings = new SettingsModel(Constants.getDefaultSettings());
+      const defaultSettings = new ServerSettings(getDefaultSettings());
       await defaultSettings.save();
 
       // Return to upper layer
@@ -29,7 +37,7 @@ export class SettingsService {
       // Perform patch of settings
       settings = this.migrateSettingsRuntime(settings);
 
-      return SettingsModel.findOneAndUpdate({ _id: settings.id }, settings, { new: true });
+      return ServerSettings.findOneAndUpdate({ _id: settings.id }, settings, { new: true });
     }
   }
 
@@ -42,27 +50,27 @@ export class SettingsService {
   migrateSettingsRuntime(knownSettings) {
     const doc = knownSettings; // alias _doc also works
     if (!doc[fileCleanSettingKey]) {
-      doc[fileCleanSettingKey] = Constants.getDefaultFileCleanSettings();
+      doc[fileCleanSettingKey] = getDefaultFileCleanSettings();
     }
 
     // Server settings exist, but need updating with new ones if they don't exist.
     if (!doc[wizardSettingKey]) {
-      doc[wizardSettingKey] = Constants.getDefaultWizardSettings();
+      doc[wizardSettingKey] = getDefaultWizardSettings();
     }
     if (!doc[timeoutSettingKey]) {
-      doc[timeoutSettingKey] = Constants.getDefaultTimeout();
+      doc[timeoutSettingKey] = getDefaultTimeout();
     }
     if (!doc[serverSettingsKey]) {
-      doc[serverSettingsKey] = Constants.getDefaultServerSettings();
+      doc[serverSettingsKey] = getDefaultServerSettings();
     }
     if (!doc[credentialSettingsKey]) {
-      doc[credentialSettingsKey] = Constants.getDefaultCredentialSettings();
+      doc[credentialSettingsKey] = getDefaultCredentialSettings();
     }
     if (!doc.server.whitelistedIpAddresses?.length) {
-      doc.server.whitelistedIpAddresses = Constants.getDefaultWhitelistIpAddresses();
+      doc.server.whitelistedIpAddresses = getDefaultWhitelistIpAddresses();
     }
     if (!doc[frontendSettingKey]) {
-      doc[frontendSettingKey] = Constants.getDefaultFrontendSettings();
+      doc[frontendSettingKey] = getDefaultFrontendSettings();
     }
 
     return knownSettings;
@@ -71,7 +79,7 @@ export class SettingsService {
   async setSentryDiagnosticsEnabled(enabled) {
     const settingsDoc = await this.getOrCreate();
     settingsDoc[serverSettingsKey].sentryDiagnosticsEnabled = enabled;
-    return SettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
+    return ServerSettings.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
       new: true,
     });
   }
@@ -86,7 +94,7 @@ export class SettingsService {
     settingsDoc[wizardSettingKey].wizardCompletedAt = new Date();
     settingsDoc[wizardSettingKey].wizardVersion = version;
 
-    return SettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
+    return ServerSettings.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
       new: true,
     });
   }
@@ -95,7 +103,7 @@ export class SettingsService {
     const settingsDoc = await this.getOrCreate();
     settingsDoc[serverSettingsKey].registration = enabled;
 
-    return SettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
+    return ServerSettings.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
       new: true,
     });
   }
@@ -104,7 +112,7 @@ export class SettingsService {
     const settingsDoc = await this.getOrCreate();
     settingsDoc[serverSettingsKey].loginRequired = enabled;
 
-    return SettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
+    return ServerSettings.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
       new: true,
     });
   }
@@ -115,7 +123,7 @@ export class SettingsService {
     settings.whitelistEnabled = enabled;
     settings.whitelistedIpAddresses = ipAddresses;
 
-    return SettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
+    return ServerSettings.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
       new: true,
     });
   }
@@ -129,7 +137,7 @@ export class SettingsService {
     );
     const settingsDoc = await this.getOrCreate();
 
-    return SettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, validatedInput, {
+    return ServerSettings.findOneAndUpdate({ _id: settingsDoc._id }, validatedInput, {
       new: true,
     });
   }
@@ -146,7 +154,7 @@ export class SettingsService {
       credentialSettingUpdateRules
     );
 
-    return SettingsModel.findOneAndUpdate({ _id: settingsDoc._id }, validatedInput, {
+    return ServerSettings.findOneAndUpdate({ _id: settingsDoc._id }, validatedInput, {
       new: true,
     });
   }
@@ -155,7 +163,7 @@ export class SettingsService {
     const validatedInput = await validateInput(patchUpdate, serverSettingsUpdateRules);
     const settingsDoc = await this.getOrCreate();
 
-    return SettingsModel.findOneAndUpdate(
+    return ServerSettings.findOneAndUpdate(
       { _id: settingsDoc._id },
       {
         [serverSettingsKey]: validatedInput,
@@ -166,7 +174,3 @@ export class SettingsService {
     );
   }
 }
-
-module.exports = {
-  SettingsService,
-};

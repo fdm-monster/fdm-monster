@@ -1,4 +1,4 @@
-const { isTestEnvironment } = require("../../utils/env.utils");
+import { isTestEnvironment } from "../../utils/env.utils";
 
 export class PluginRepositoryCache {
   #octoPrintApiService;
@@ -38,5 +38,3 @@ export class PluginRepositoryCache {
     return this.getCache();
   }
 }
-
-module.exports = { PluginRepositoryCache };

@@ -1,4 +1,4 @@
-const { Schema, model } = require("mongoose");
+import { model, Schema } from "mongoose";
 
 const CameraStreamSchema = new Schema({
   streamURL: {
@@ -42,6 +42,4 @@ const CameraStreamSchema = new Schema({
   },
 });
 
-module.exports = {
-  CameraStream: model("CameraStream", CameraStreamSchema),
-};
+export const CameraStream = model("CameraStream", CameraStreamSchema);

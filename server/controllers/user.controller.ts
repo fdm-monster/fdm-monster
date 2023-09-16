@@ -103,7 +103,7 @@ export class UserController {
   }
 }
 
-module.exports = createController(UserController)
+export default createController(UserController)
   .prefix(AppConstants.apiRoute + "/user")
   .before([authenticate()])
   .get("/", "list", {

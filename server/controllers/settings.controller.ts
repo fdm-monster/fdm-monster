@@ -47,7 +47,7 @@ export class SettingsController {
 }
 
 // prettier-ignore
-module.exports = createController(SettingsController)
+export default createController(SettingsController)
   .prefix(AppConstants.apiRoute + "/settings")
   .before([authenticate(), authorizeRoles([ROLES.ADMIN])])
   .get("/server", "getSettings")

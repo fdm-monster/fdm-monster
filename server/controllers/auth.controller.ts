@@ -97,7 +97,7 @@ export class AuthController {
   }
 }
 
-module.exports = createController(AuthController)
+export default createController(AuthController)
   .prefix(AppConstants.apiRoute + "/auth")
   .post("/register", "register")
   .post("/login", "login")

@@ -1,8 +1,8 @@
-const { validateInput } = require("../handlers/validators");
-const { createTestPrinterRules } = require("./validation/create-test-printer.validation");
-const { octoPrintEvent, Message, SOCKET_STATE } = require("../services/octoprint/octoprint-sockio.adapter");
-const { setInterval, setTimeout } = require("timers/promises");
-const { AppConstants } = require("../server.constants");
+import { setInterval, setTimeout } from "timers/promises";
+import { validateInput } from "../handlers/validators";
+import { createTestPrinterRules } from "./validation/create-test-printer.validation";
+import { octoPrintEvent, Message, SOCKET_STATE } from "../services/octoprint/octoprint-sockio.adapter";
+import { AppConstants } from "../server.constants";
 
 export class TestPrinterSocketStore {
   /**
@@ -95,5 +95,3 @@ export class TestPrinterSocketStore {
     });
   }
 }
-
-module.exports = { TestPrinterSocketStore };

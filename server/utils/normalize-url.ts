@@ -2,12 +2,12 @@
 const DATA_URL_DEFAULT_MIME_TYPE = "text/plain";
 const DATA_URL_DEFAULT_CHARSET = "us-ascii";
 
-const testParameter = (name, filters) =>
+const testParameter = (name: string, filters: (RegExp | any)[]) =>
   filters.some((filter) => (filter instanceof RegExp ? filter.test(name) : filter === name));
 
 const supportedProtocols = new Set(["https:", "http:", "file:"]);
 
-const hasCustomProtocol = (urlString) => {
+const hasCustomProtocol = (urlString: string) => {
   try {
     const { protocol } = new URL(urlString);
     return protocol.endsWith(":") && !supportedProtocols.has(protocol);
@@ -16,14 +16,14 @@ const hasCustomProtocol = (urlString) => {
   }
 };
 
-const normalizeDataURL = (urlString, { stripHash }) => {
+const normalizeDataURL = (urlString: string, { stripHash }: { stripHash: boolean }) => {
   const match = /^data:(?<type>[^,]*?),(?<data>[^#]*?)(?:#(?<hash>.*))?$/.exec(urlString);
 
   if (!match) {
     throw new Error(`Invalid URL: ${urlString}`);
   }
 
-  let { type, data, hash } = match.groups;
+  let { type, data, hash } = match.groups as any;
   const mediaType = type.split(";");
   hash = stripHash ? "" : hash;
 

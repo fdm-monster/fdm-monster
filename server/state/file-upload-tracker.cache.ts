@@ -93,5 +93,3 @@ export class FileUploadTrackerCache {
     this.#currentUploads.splice(trackedUploadIndex, 1);
   }
 }
-
-module.exports = FileUploadTrackerCache;

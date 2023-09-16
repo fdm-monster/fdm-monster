@@ -1,6 +1,6 @@
-const { Schema } = require("mongoose");
+import { Schema } from "mongoose";
 
-const PrinterInFloorSchema = new Schema({
+export const PrinterInFloorSchema = new Schema({
   printerId: {
     type: Schema.Types.ObjectId,
     ref: "Printer",
@@ -16,7 +16,3 @@ const PrinterInFloorSchema = new Schema({
   }, // No metadata needed yet
   _id: false,
 });
-
-module.exports = {
-  PrinterInFloorSchema,
-};

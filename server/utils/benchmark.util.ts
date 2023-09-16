@@ -1,6 +1,6 @@
-const Logger = require("../handlers/logger.js");
+import { LoggerService } from "../handlers/logger.js";
 
-const logger = new Logger("Server");
+const logger = new LoggerService("Benchmark");
 
 /**
  * Timing benchmark function, DO NOT USE IN PRODUCTION - just use it once and remove after.
@@ -9,7 +9,7 @@ const logger = new Logger("Server");
  * @param report
  * @returns {Promise<*|{result: *, time: number}>}
  */
-async function bench(cb, report = false) {
+export async function bench(cb, report = false) {
   const beforeTime = Date.now();
   let result;
   try {
@@ -27,9 +27,4 @@ async function bench(cb, report = false) {
   } else return result;
 }
 
-function noop() {}
-
-module.exports = {
-  bench,
-  noop,
-};
+export function noop() {}

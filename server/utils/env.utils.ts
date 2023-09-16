@@ -1,10 +1,10 @@
-const fs = require("fs");
-const Logger = require("../handlers/logger.js");
-const dotenv = require("dotenv");
-const { isDocker } = require("./is-docker");
-const { AppConstants } = require("../server.constants");
+import fs from "fs";
+import dotenv from "dotenv";
+import { LoggerService } from "../handlers/logger.js";
+import { isDocker } from "./is-docker";
+import { AppConstants } from "../server.constants";
 
-const logger = new Logger("Utils-Env", false);
+const logger = new LoggerService("Utils-Env", false);
 
 export function getEnvOrDefault(key: any, defaultVal: any) {
   const val = process.env[key];

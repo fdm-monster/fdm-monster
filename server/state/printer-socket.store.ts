@@ -1,6 +1,6 @@
-const { errorSummary } = require("../utils/error.utils");
-const { captureException } = require("@sentry/node");
-const { printerEvents } = require("../constants/event.constants");
+import { captureException } from "@sentry/node";
+import { errorSummary } from "../utils/error.utils";
+import { printerEvents } from "../constants/event.constants";
 
 export class PrinterSocketStore {
   /**
@@ -277,5 +277,3 @@ export class PrinterSocketStore {
     delete this.printerSocketAdaptersById[printerId];
   }
 }
-
-module.exports = PrinterSocketStore;

@@ -1,7 +1,7 @@
-const { octoPrintWebsocketEvent, fdmMonsterPrinterStoppedEvent } = require("../constants/event.constants");
-const { EVENT_TYPES } = require("../services/octoprint/constants/octoprint-websocket.constants");
-const { generateCorrelationToken } = require("../utils/correlation-token.util");
-const { IO_MESSAGES } = require("../state/socket-io.gateway");
+import { octoPrintWebsocketEvent, fdmMonsterPrinterStoppedEvent } from "../constants/event.constants";
+import { EVENT_TYPES } from "../services/octoprint/constants/octoprint-websocket.constants";
+import { generateCorrelationToken } from "../utils/correlation-token.util";
+import { IO_MESSAGES } from "../state/socket-io.gateway";
 
 export class PrintCompletionSocketIoTask {
   /**
@@ -106,7 +106,3 @@ export class PrintCompletionSocketIoTask {
     this.contextCache = await this.printCompletionService.loadPrintContexts();
   }
 }
-
-module.exports = {
-  PrintCompletionSocketIoTask,
-};

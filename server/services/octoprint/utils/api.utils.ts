@@ -1,12 +1,12 @@
-const { jsonContentType, contentTypeHeaderKey, apiKeyHeaderKey } = require("../constants/octoprint-service.constants");
-const { ValidationException } = require("../../../exceptions/runtime.exceptions");
+import { jsonContentType, contentTypeHeaderKey, apiKeyHeaderKey } from "../constants/octoprint-service.constants";
+import { ValidationException } from "../../../exceptions/runtime.exceptions";
 
 /**
  *
  * @param {LoginDto} login
  * @returns {{apiKey, printerURL}}
  */
-function validateLogin(login) {
+export function validateLogin(login) {
   if (!login.apiKey || !login.printerURL) {
     throw new ValidationException("printer apiKey or printerURL undefined");
   }
@@ -17,7 +17,7 @@ function validateLogin(login) {
   };
 }
 
-function constructHeaders(apiKey, contentType = jsonContentType) {
+export function constructHeaders(apiKey, contentType = jsonContentType) {
   return {
     [contentTypeHeaderKey]: contentType, // Can be overwritten without problem
     [apiKeyHeaderKey]: apiKey,
@@ -30,7 +30,7 @@ function constructHeaders(apiKey, contentType = jsonContentType) {
  * @param options
  * @returns {{data, status}|*}
  */
-function processResponse(response, options = { unwrap: true }) {
+export function processResponse(response, options = { unwrap: true }) {
   if (options.unwrap) {
     return response?.data;
   }
@@ -46,7 +46,7 @@ function processResponse(response, options = { unwrap: true }) {
  * @param options
  * @returns {{data, status}|*}
  */
-async function processGotResponse(response, options = { unwrap: true }) {
+export async function processGotResponse(response, options = { unwrap: true }) {
   if (options.unwrap) {
     return JSON.parse(response.body);
   }
@@ -56,10 +56,3 @@ async function processGotResponse(response, options = { unwrap: true }) {
   }
   return response;
 }
-
-module.exports = {
-  validateLogin,
-  constructHeaders,
-  processResponse,
-  processGotResponse,
-};

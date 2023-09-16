@@ -7,12 +7,10 @@ import { validateInput } from "../handlers/validators";
 export class PrintCompletionController {
   private printCompletionService;
   private printCompletionSocketIoTask;
-  private logger;
 
   constructor({ printCompletionService, loggerFactory, printCompletionSocketIoTask }) {
     this.printCompletionService = printCompletionService;
     this.printCompletionSocketIoTask = printCompletionSocketIoTask;
-    this.logger = loggerFactory(PrintCompletionController.name);
   }
 
   /**

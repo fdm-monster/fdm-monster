@@ -2,7 +2,7 @@
  * Hypertext Transfer Protocol (HTTP) response status codes.
  * @see {@link https://en.wikipedia.org/wiki/List_of_HTTP_status_codes}
  */
-const HttpStatusCode = {
+export const HttpStatusCode = {
   /**
    * The server has received the request headers and the client should proceed to send the request body
    * (in the case of a request for which a body needs to be sent; for example, a POST request).
@@ -376,5 +376,3 @@ const HttpStatusCode = {
    */
   NETWORK_AUTHENTICATION_REQUIRED: 511,
 };
-
-module.exports = HttpStatusCode;

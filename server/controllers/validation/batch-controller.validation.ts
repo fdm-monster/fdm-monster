@@ -1,15 +1,10 @@
-const batchPrinterRules = {
+export const batchPrinterRules = {
   printerIds: "required|array",
   "printerIds.*": "required|mongoId",
 };
 
-const batchPrintersEnabledRules = {
+export const batchPrintersEnabledRules = {
   printerIds: "required|array",
   "printerIds.*": "required|mongoId",
   enabled: "required|boolean",
-};
-
-module.exports = {
-  batchPrinterRules,
-  batchPrintersEnabledRules,
 };

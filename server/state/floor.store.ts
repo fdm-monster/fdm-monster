@@ -1,4 +1,4 @@
-const { KeyDiffCache } = require("../utils/cache/key-diff.cache");
+import { KeyDiffCache } from "../utils/cache/key-diff.cache";
 
 /**
  * A generic cache for printer groups
@@ -105,5 +105,3 @@ export class FloorStore extends KeyDiffCache {
     await this.loadStore();
   }
 }
-
-module.exports = FloorStore;

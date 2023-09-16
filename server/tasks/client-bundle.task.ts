@@ -1,4 +1,4 @@
-const { AppConstants } = require("../server.constants");
+import { AppConstants } from "../server.constants";
 
 export class ClientDistDownloadTask {
   /**
@@ -32,7 +32,3 @@ export class ClientDistDownloadTask {
     await this.clientBundleService.downloadClientUpdate(AppConstants.defaultClientMinimum);
   }
 }
-
-module.exports = {
-  ClientDistDownloadTask,
-};

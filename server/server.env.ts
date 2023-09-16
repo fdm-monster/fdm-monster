@@ -3,19 +3,17 @@ import path from "path";
 import { execSync } from "child_process";
 import * as Sentry from "@sentry/node";
 import { config } from "dotenv";
-
-const envUtils = require("./utils/env.utils");
-const { AppConstants } = require("./server.constants");
-const Logger = require("./handlers/logger");
-const { isDocker } = require("./utils/is-docker");
-const {
+import { AppConstants } from "./server.constants";
+import { LoggerService as Logger } from "./handlers/logger";
+import { isDocker } from "./utils/is-docker";
+import {
   getEnvOrDefault,
   isProductionEnvironment,
   writeVariableToEnvFile,
   verifyPackageJsonRequirements,
   isPm2,
-} = require("./utils/env.utils");
-const { errorSummary } = require("./utils/error.utils");
+} from "./utils/env.utils";
+import { errorSummary } from "./utils/error.utils";
 
 const logger = new Logger("FDM-Environment", false);
 
@@ -117,7 +115,7 @@ export function fetchServerPort() {
   if (Number.isNaN(parseInt(port))) {
     // is not isDocker just to be sure, also checked in writeVariableToEnvFile
     if (!isDocker()) {
-      envUtils.writeVariableToEnvFile(path.resolve(dotEnvPath), AppConstants.SERVER_PORT_KEY, AppConstants.defaultServerPort);
+      writeVariableToEnvFile(path.resolve(dotEnvPath), AppConstants.SERVER_PORT_KEY, AppConstants.defaultServerPort);
       logger.log(`~ Written ${AppConstants.SERVER_PORT_KEY}=${AppConstants.defaultServerPort} setting to .env file.`);
     }
 
@@ -197,7 +195,7 @@ export function setupEnvConfig(skipDotEnv = false) {
 /**
  * Checks and runs database migrations
  **/
-export async function runMigrations(db: string, client: string): Promise<void> {
+export async function runMigrations(db, client: string): Promise<void> {
   const migrationsStatus = await status(db);
   const pendingMigrations = migrationsStatus.filter((m) => m.appliedAt === "PENDING");
 

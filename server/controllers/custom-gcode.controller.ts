@@ -61,7 +61,7 @@ export class CustomGCodeController {
 }
 
 // prettier-ignore
-module.exports = createController(CustomGCodeController)
+export default createController(CustomGCodeController)
   .prefix(`${AppConstants.apiRoute}/custom-gcode`)
   .before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR])])
   .get("/", "list")

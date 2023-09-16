@@ -1,12 +1,8 @@
-const { normalizeUrl } = require("./normalize-url");
+import { normalizeUrl } from "./normalize-url";
 
-function httpToWsUrl(url, protocol = "ws") {
+export function httpToWsUrl(url, protocol = "ws") {
   const wsUrl = new URL("/sockjs/websocket", normalizeUrl(url));
   wsUrl.protocol = `${protocol}`;
   wsUrl.pathname = "/sockjs/websocket";
   return wsUrl;
 }
-
-module.exports = {
-  httpToWsUrl,
-};

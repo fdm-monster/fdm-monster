@@ -278,7 +278,7 @@ export class PrinterFilesController {
 }
 
 // prettier-ignore
-module.exports = createController(PrinterFilesController)
+export default createController(PrinterFilesController)
   .prefix(AppConstants.apiRoute + "/printer-files")
   .before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR]), printerResolveMiddleware()])
   .post("/purge", "purgeIndexedFiles", withPermission(PERMS.PrinterFiles.Clear))

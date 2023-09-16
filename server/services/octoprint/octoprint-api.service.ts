@@ -1,12 +1,12 @@
-const fs = require("fs");
-const path = require("path");
-const { multiPartContentType, pluginRepositoryUrl } = require("./constants/octoprint-service.constants");
-const { processResponse, processGotResponse } = require("./utils/api.utils");
-const FormData = require("form-data");
-const got = require("got");
-const { uploadProgressEvent, firmwareFlashUploadEvent } = require("../../constants/event.constants");
-const { ExternalServiceError } = require("../../exceptions/runtime.exceptions");
-const OctoPrintRoutes = require("./octoprint-api.routes");
+import fs from "fs";
+import path from "path";
+import FormData from "form-data";
+import got from "got";
+import { multiPartContentType, pluginRepositoryUrl } from "./constants/octoprint-service.constants";
+import { processResponse, processGotResponse } from "./utils/api.utils";
+import { uploadProgressEvent, firmwareFlashUploadEvent } from "../../constants/event.constants";
+import { ExternalServiceError } from "../../exceptions/runtime.exceptions";
+import { OctoPrintRoutes } from "./octoprint-api.routes";
 
 export class OctoPrintApiService extends OctoPrintRoutes {
   /**

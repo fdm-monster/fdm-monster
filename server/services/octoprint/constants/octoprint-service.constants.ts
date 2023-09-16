@@ -1,5 +1,5 @@
 // https://github.com/OctoPrint/OctoPrint/blob/161e21fe0f6344ec3b9b9b541e9b2c472087ba77/src/octoprint/util/comm.py#L913
-const OP_STATE = {
+export const OP_STATE = {
   Offline: "Offline",
   OpeningSerial: "Opening serial connection",
   DetectingSerial: "Detecting serial connection",
@@ -22,7 +22,7 @@ const OP_STATE = {
   UnknownState: "Unknown State ()", // Unknown State (...) needs proper parsing
 };
 
-const pluginManagerCommands = {
+export const pluginManagerCommands = {
   install: {
     name: "install",
     param: "url",
@@ -53,31 +53,18 @@ const pluginManagerCommands = {
   },
 };
 
-const pluginRepositoryUrl = "https://plugins.octoprint.org/plugins.json";
+export const pluginRepositoryUrl = "https://plugins.octoprint.org/plugins.json";
 
-const contentTypeHeaderKey = "content-type";
-const apiKeyHeaderKey = "x-api-key";
-const jsonContentType = "application/json";
-const multiPartContentType = "multipart/form-data";
+export const contentTypeHeaderKey = "content-type";
+export const apiKeyHeaderKey = "x-api-key";
+export const jsonContentType = "application/json";
+export const multiPartContentType = "multipart/form-data";
 
 /**
  * Predicate to check whether login is global type (Global API Key) which would be problematic
- * @param octoPrintResponse
- * @returns {boolean}
  */
-function isLoginResponseGlobal(octoPrintResponse) {
+export function isLoginResponseGlobal(octoPrintResponse): boolean {
   // Explicit nullability check serves to let an unconnected printer fall through as well as incorrect apiKey
   // Note: 'apikey' property is conform OctoPrint response (and not FDM Monster printer model's 'apiKey')
   return !!octoPrintResponse && octoPrintResponse.name === "_api";
 }
-
-module.exports = {
-  OP_STATE,
-  contentTypeHeaderKey,
-  apiKeyHeaderKey,
-  jsonContentType,
-  pluginRepositoryUrl,
-  multiPartContentType,
-  pluginManagerCommands,
-  isLoginResponseGlobal,
-};

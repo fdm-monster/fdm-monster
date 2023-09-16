@@ -1,63 +1,63 @@
-const axios = require("axios");
-const { asFunction, asClass, asValue, createContainer, InjectionMode } = require("awilix");
-const { ToadScheduler } = require("toad-scheduler");
-const { DITokens } = require("./container.tokens");
-const SimpleGitFactory = require("simple-git");
-const { Octokit } = require("octokit");
-const { PrinterService } = require("./services/printer.service");
-const { SettingsStore } = require("./state/settings.store");
-const { SettingsService } = require("./services/settings.service");
-const { ServerReleaseService } = require("./services/server-release.service");
-const { TaskManagerService } = require("./services/task-manager.service");
-const { ServerUpdateService } = require("./services/server-update.service");
-const { GithubService } = require("./services/github.service");
-const { FileCache } = require("./state/file.cache");
-const { PrinterWebsocketTask } = require("./tasks/printer-websocket.task");
-const { SocketIoTask } = require("./tasks/socketio.task");
-const { OctoPrintApiService } = require("./services/octoprint/octoprint-api.service");
-const { SocketFactory } = require("./services/octoprint/socket.factory");
-const { FilesStore } = require("./state/files.store");
-const { configureEventEmitter } = require("./handlers/event-emitter");
-const { AppConstants } = require("./server.constants");
-const PrinterFilesService = require("./services/printer-files.service");
-const SoftwareUpdateTask = require("./tasks/software-update.task");
-const LoggerFactory = require("./handlers/logger-factory");
-const MulterService = require("./services/multer.service");
-const FileUploadTrackerCache = require("./state/file-upload-tracker.cache");
-const { ServerHost } = require("./server.host");
-const BootTask = require("./tasks/boot.task");
-const UserService = require("./services/authentication/user.service");
-const RoleService = require("./services/authentication/role.service");
-const { ServerTasks } = require("./tasks");
-const PermissionService = require("./services/authentication/permission.service");
-const PrinterFileCleanTask = require("./tasks/printer-file-clean.task");
-const { ROLES } = require("./constants/authorization.constants");
-const CustomGCodeService = require("./services/custom-gcode.service");
-const { PrinterWebsocketRestoreTask } = require("./tasks/printer-websocket-restore.task");
-const { PluginFirmwareUpdateService } = require("./services/octoprint/plugin-firmware-update.service");
-const { PluginRepositoryCache } = require("./services/octoprint/plugin-repository.cache");
-const { configureCacheManager } = require("./handlers/cache-manager");
-const { InfluxDbV2BaseService } = require("./services/influxdb-v2/influx-db-v2-base.service");
-const { ConfigService } = require("./services/config.service");
-const { PrintCompletionSocketIoTask } = require("./tasks/print-completion.socketio.task");
-const { PrintCompletionService } = require("./services/print-completion.service");
-const { SocketIoGateway } = require("./state/socket-io.gateway");
-const { ClientBundleService } = require("./services/client-bundle.service");
-const FloorService = require("./services/floor.service");
-const FloorStore = require("./state/floor.store");
-const { YamlService } = require("./services/yaml.service");
-const { MonsterPiService } = require("./services/monsterpi.service");
-const { BatchCallService } = require("./services/batch-call.service");
-const { ClientDistDownloadTask } = require("./tasks/client-bundle.task");
-const { OctoPrintSockIoAdapter } = require("./services/octoprint/octoprint-sockio.adapter");
-const { PrinterCache } = require("./state/printer.cache");
-const PrinterSocketStore = require("./state/printer-socket.store");
-const { TestPrinterSocketStore } = require("./state/test-printer-socket.store");
-const { PrinterEventsCache } = require("./state/printer-events.cache");
-const { LogDumpService } = require("./services/logs-manager.service");
-const { CameraStreamService } = require("./services/camera-stream.service");
-const { JwtService } = require("./services/authentication/jwt.service");
-const { AuthService } = require("./services/authentication/auth.service");
+import axios from "axios";
+import { simpleGit } from "simple-git";
+import { Octokit } from "octokit";
+import { asFunction, asClass, asValue, createContainer, InjectionMode } from "awilix";
+import { ToadScheduler } from "toad-scheduler";
+import { DITokens } from "./container.tokens";
+import { PrinterService } from "./services/printer.service";
+import { SettingsStore } from "./state/settings.store";
+import { SettingsService } from "./services/settings.service";
+import { ServerReleaseService } from "./services/server-release.service";
+import { TaskManagerService } from "./services/task-manager.service";
+import { ServerUpdateService } from "./services/server-update.service";
+import { GithubService } from "./services/github.service";
+import { FileCache } from "./state/file.cache";
+import { PrinterWebsocketTask } from "./tasks/printer-websocket.task";
+import { SocketIoTask } from "./tasks/socketio.task";
+import { OctoPrintApiService } from "./services/octoprint/octoprint-api.service";
+import { SocketFactory } from "./services/octoprint/socket.factory";
+import { FilesStore } from "./state/files.store";
+import { configureEventEmitter } from "./handlers/event-emitter";
+import { AppConstants } from "./server.constants";
+import { PrinterFilesService } from "./services/printer-files.service";
+import { SoftwareUpdateTask } from "./tasks/software-update.task";
+import { LoggerFactory } from "./handlers/logger-factory";
+import { MulterService } from "./services/multer.service";
+import { FileUploadTrackerCache } from "./state/file-upload-tracker.cache";
+import { ServerHost } from "./server.host";
+import { BootTask } from "./tasks/boot.task";
+import { UserService } from "./services/authentication/user.service";
+import { RoleService } from "./services/authentication/role.service";
+import { ServerTasks } from "./tasks";
+import { PermissionService } from "./services/authentication/permission.service";
+import { PrinterFileCleanTask } from "./tasks/printer-file-clean.task";
+import { ROLES } from "./constants/authorization.constants";
+import { CustomGCodeService } from "./services/custom-gcode.service";
+import { PrinterWebsocketRestoreTask } from "./tasks/printer-websocket-restore.task";
+import { PluginFirmwareUpdateService } from "./services/octoprint/plugin-firmware-update.service";
+import { PluginRepositoryCache } from "./services/octoprint/plugin-repository.cache";
+import { configureCacheManager } from "./handlers/cache-manager";
+import { InfluxDbV2BaseService } from "./services/influxdb-v2/influx-db-v2-base.service";
+import { ConfigService } from "./services/config.service";
+import { PrintCompletionSocketIoTask } from "./tasks/print-completion.socketio.task";
+import { PrintCompletionService } from "./services/print-completion.service";
+import { SocketIoGateway } from "./state/socket-io.gateway";
+import { ClientBundleService } from "./services/client-bundle.service";
+import { FloorService } from "./services/floor.service";
+import { FloorStore } from "./state/floor.store";
+import { YamlService } from "./services/yaml.service";
+import { MonsterPiService } from "./services/monsterpi.service";
+import { BatchCallService } from "./services/batch-call.service";
+import { ClientDistDownloadTask } from "./tasks/client-bundle.task";
+import { OctoPrintSockIoAdapter } from "./services/octoprint/octoprint-sockio.adapter";
+import { PrinterCache } from "./state/printer.cache";
+import { PrinterSocketStore } from "./state/printer-socket.store";
+import { TestPrinterSocketStore } from "./state/test-printer-socket.store";
+import { PrinterEventsCache } from "./state/printer-events.cache";
+import { LogDumpService } from "./services/logs-manager.service";
+import { CameraStreamService } from "./services/camera-stream.service";
+import { JwtService } from "./services/authentication/jwt.service";
+import { AuthService } from "./services/authentication/auth.service";
 
 export function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -104,13 +104,14 @@ export function configureContainer() {
     }),
     [DITokens.clientBundleService]: asClass(ClientBundleService),
     [DITokens.logDumpService]: asClass(LogDumpService),
-    [DITokens.simpleGitService]: asValue(SimpleGitFactory()),
+    [DITokens.simpleGitService]: asValue(simpleGit()),
     [DITokens.httpClient]: asValue(
       axios.create({
         maxBodyLength: 1000 * 1000 * 1000, // 1GB
         maxContentLength: 1000 * 1000 * 1000, // 1GB
       })
     ),
+
     [DITokens.socketIoGateway]: asClass(SocketIoGateway).singleton(),
     [DITokens.multerService]: asClass(MulterService).singleton(),
     [DITokens.printerService]: asClass(PrinterService),
@@ -122,10 +123,10 @@ export function configureContainer() {
     [DITokens.cameraStreamService]: asClass(CameraStreamService),
     [DITokens.batchCallService]: asClass(BatchCallService).singleton(),
     [DITokens.pluginFirmwareUpdateService]: asClass(PluginFirmwareUpdateService).singleton(),
-
     [DITokens.octoPrintSockIoAdapter]: asClass(OctoPrintSockIoAdapter).transient(), // Transient on purpose
     [DITokens.floorStore]: asClass(FloorStore).singleton(),
     [DITokens.pluginRepositoryCache]: asClass(PluginRepositoryCache).singleton(),
+
     [DITokens.fileCache]: asClass(FileCache).singleton(),
     [DITokens.fileUploadTrackerCache]: asClass(FileUploadTrackerCache).singleton(),
     [DITokens.filesStore]: asClass(FilesStore).singleton(),

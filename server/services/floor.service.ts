@@ -1,14 +1,14 @@
-const { Floor } = require("../models/Floor");
-const { validateInput } = require("../handlers/validators");
-const { NotFoundException } = require("../exceptions/runtime.exceptions");
-const {
+import { Floor } from "../models";
+import { validateInput } from "../handlers/validators";
+import { NotFoundException } from "../exceptions/runtime.exceptions";
+import {
   createFloorRules,
   updateFloorNameRules,
   updateFloorNumberRules,
   printerInFloorRules,
   removePrinterInFloorRules,
   updateFloorRules,
-} = require("./validators/floor-service.validation");
+} from "./validators/floor-service.validation";
 
 export class FloorService {
   /**
@@ -178,5 +178,3 @@ export class FloorService {
     return Floor.deleteOne({ _id: floorId });
   }
 }
-
-module.exports = FloorService;

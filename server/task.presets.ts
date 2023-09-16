@@ -41,7 +41,3 @@ export class TASK_PRESETS {
     seconds: 0, // other timing units will be ignored (by design)
   };
 }
-
-module.exports = {
-  TaskPresets: TASK_PRESETS,
-};

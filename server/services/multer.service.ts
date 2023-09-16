@@ -1,8 +1,8 @@
-const multer = require("multer");
-const { AppConstants } = require("../server.constants");
-const { join, extname } = require("path");
-const { readdirSync, existsSync, lstatSync, unlink, mkdirSync, createWriteStream } = require("fs");
-const { superRootPath } = require("../utils/fs.utils");
+import multer from "multer";
+import { join, extname } from "path";
+import { readdirSync, existsSync, lstatSync, unlink, mkdirSync, createWriteStream } from "fs";
+import { superRootPath } from "../utils/fs.utils";
+import { AppConstants } from "../server.constants";
 
 export class MulterService {
   fileUploadTrackerCache;
@@ -130,5 +130,3 @@ export class MulterService {
     return this.fileUploadTrackerCache.getUploads();
   }
 }
-
-module.exports = MulterService;

@@ -40,7 +40,7 @@ export class BatchCallController {
   }
 }
 
-module.exports = createController(BatchCallController)
+export default createController(BatchCallController)
   .prefix(AppConstants.apiRoute + "/batch")
   .before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR])])
   .post("/connect/usb", "batchConnectUsb")

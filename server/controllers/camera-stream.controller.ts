@@ -1,17 +1,19 @@
-const { createController } = require("awilix-express");
-const { AppConstants } = require("../server.constants");
-const { authenticate } = require("../middleware/authenticate");
-const { validateInput } = require("../handlers/validators");
-const { idRules } = require("./validation/generic.validation");
+import { createController } from "awilix-express";
+import { AppConstants } from "../server.constants";
+import { validateInput } from "../handlers/validators";
+import { idRules } from "./validation/generic.validation";
+import { authenticate } from "../middleware/authenticate";
 
 export class CameraStreamController {
   /**
    * @type {CameraStreamService}
    */
   cameraStreamService;
+
   constructor({ cameraStreamService }) {
     this.cameraStreamService = cameraStreamService;
   }
+
   async list(req, res) {
     const result = await this.cameraStreamService.list();
     res.send(result);
@@ -41,7 +43,7 @@ export class CameraStreamController {
   }
 }
 
-module.exports = createController(CameraStreamController)
+export default createController(CameraStreamController)
   .prefix(AppConstants.apiRoute + "/camera-stream")
   .before([authenticate()])
   .get("/", "list")

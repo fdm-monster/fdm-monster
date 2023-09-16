@@ -1,5 +1,3 @@
-const { DITokens } = require("../container.tokens");
-
 /**
  * Task which regularly cleans all printer files based on a configured predicate
  * This could be "older than 2 weeks". More options to be added on request.
@@ -91,5 +89,3 @@ export class PrinterFileCleanTask {
     return this.filesStore.getOutdatedFiles(printer.id, ageDaysMax);
   }
 }
-
-module.exports = PrinterFileCleanTask;
