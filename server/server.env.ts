@@ -1,5 +1,5 @@
 import { status, up } from "migrate-mongo";
-import path from "path";
+import path, { join } from "path";
 import { execSync } from "child_process";
 import * as Sentry from "@sentry/node";
 import { config } from "dotenv";
@@ -8,19 +8,20 @@ import { LoggerService as Logger } from "./handlers/logger";
 import { isDocker } from "./utils/is-docker";
 import {
   getEnvOrDefault,
-  isProductionEnvironment,
-  writeVariableToEnvFile,
-  verifyPackageJsonRequirements,
   isPm2,
+  isProductionEnvironment,
+  verifyPackageJsonRequirements,
+  writeVariableToEnvFile,
 } from "./utils/env.utils";
 import { errorSummary } from "./utils/error.utils";
+import { superRootPath } from "@/utils/fs.utils";
 
 const logger = new Logger("FDM-Environment", false);
 
 // Constants and definition
 const instructionsReferralURL = "https://github.com/fdm-monster/fdm-monster/blob/master/README.md";
-const packageJsonPath = path.join(__dirname, "./package.json");
-const dotEnvPath = path.join(__dirname, "./.env");
+const packageJsonPath = join(superRootPath(), "./package.json");
+const dotEnvPath = join(superRootPath(), "./.env");
 
 function isEnvTest() {
   return process.env[AppConstants.NODE_ENV_KEY] === AppConstants.defaultTestEnv;
@@ -77,7 +78,7 @@ function removePm2Service(reason: string) {
 }
 
 function setupPackageJsonVersionOrThrow() {
-  const result = verifyPackageJsonRequirements(path.join(__dirname, AppConstants.serverPath));
+  const result = verifyPackageJsonRequirements(superRootPath());
   if (!result) {
     if (isPm2()) {
       // TODO test this works under docker as well
@@ -185,8 +186,8 @@ export function setupEnvConfig(skipDotEnv = false) {
   }
 
   ensureNodeEnvSet();
-  // setupPackageJsonVersionOrThrow();
-  // ensureEnvNpmVersionSet();
+  setupPackageJsonVersionOrThrow();
+  ensureEnvNpmVersionSet();
   setupSentry();
   ensureMongoDBConnectionStringSet();
   ensurePortSet();

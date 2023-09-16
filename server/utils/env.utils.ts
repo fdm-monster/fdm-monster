@@ -52,7 +52,7 @@ function stringifyDotEnv(obj: any) {
  * Write a new key-value to .env file
  * Note: assumes in Nodemon, pm2 or PKG mode.
  */
-export function writeVariableToEnvFile(absoluteEnvPath: any, variableKey: any, jsonObject: any) {
+export function writeVariableToEnvFile(absoluteEnvPath: string, variableKey: string, jsonObject: any) {
   if (isDocker()) {
     logger.error("Tried to persist setting to .env in docker mode. Avoided that.");
     return;

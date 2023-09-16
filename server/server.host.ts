@@ -13,6 +13,7 @@ import expressListRoutes from "express-list-routes";
 import { SocketIoGateway } from "@/state/socket-io.gateway";
 import { BootTask } from "./tasks/boot.task";
 import { TaskManagerService } from "@/services/task-manager.service";
+import { isProductionEnvironment } from "@/utils/env.utils";
 
 export class ServerHost {
   bootTask: BootTask;
@@ -93,7 +94,10 @@ export class ServerHost {
 
   async httpListen() {
     const port = fetchServerPort();
-    expressListRoutes(this.appInstance!, { prefix: "/" });
+    if (!isProductionEnvironment()) {
+      expressListRoutes(this.appInstance!, { prefix: "/" });
+    }
+
     if (!port || Number.isNaN(parseInt(port))) {
       throw new Error("The FDM Server requires a numeric port input argument to run");
     }
