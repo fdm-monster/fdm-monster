@@ -1,3 +1,5 @@
+import { normalizeURLWithProtocol } from "@/utils/url.utils";
+
 const { authenticate, authorizeRoles } = require("../middleware/authenticate");
 const { createController } = require("awilix-express");
 const { validateMiddleware, getScopedPrinter } = require("../handlers/validators");
@@ -328,7 +330,7 @@ export class PrinterController {
    */
   async testConnection(req, res) {
     if (req.body.printerURL?.length) {
-      req.body.printerURL = PrinterService.normalizeURLWithProtocol(req.body.printerURL);
+      req.body.printerURL = normalizeURLWithProtocol(req.body.printerURL);
     }
     const newPrinter = await validateMiddleware(req, testPrinterApiRules);
     newPrinter.correlationToken = generateCorrelationToken();

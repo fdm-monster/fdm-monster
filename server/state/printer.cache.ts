@@ -2,6 +2,7 @@ import { KeyDiffCache } from "../utils/cache/key-diff.cache";
 import { printerEvents } from "../constants/event.constants";
 import { NotFoundException } from "../exceptions/runtime.exceptions";
 import { map } from "../utils/mapper.utils";
+import { PrinterService } from "@/services/printer.service";
 
 // Generate the JSDoc typedef for Printer model
 /**
@@ -32,10 +33,7 @@ import { map } from "../utils/mapper.utils";
  */
 
 export class PrinterCache extends KeyDiffCache {
-  /**
-   * @type {PrinterService}
-   */
-  printerService;
+  printerService: PrinterService;
   /**
    * @type {EventEmitter2}
    */

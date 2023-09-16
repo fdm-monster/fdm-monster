@@ -1,4 +1,4 @@
-import { ServerSettings } from "../models/ServerSettings.js";
+import { ServerSettings } from "@/models";
 import {
   getDefaultCredentialSettings,
   getDefaultFileCleanSettings,
@@ -8,8 +8,8 @@ import {
   getDefaultTimeout,
   getDefaultWhitelistIpAddresses,
   getDefaultWizardSettings,
-} from "../constants/server-settings.constants";
-import { validateInput } from "../handlers/validators";
+} from "@/constants/server-settings.constants";
+import { validateInput } from "@/handlers/validators";
 import {
   serverSettingsUpdateRules,
   frontendSettingsUpdateRules,
@@ -22,7 +22,7 @@ import {
   credentialSettingsKey,
   timeoutSettingKey,
   wizardSettingKey,
-} from "../constants/server-settings.constants";
+} from "@/constants/server-settings.constants";
 
 export class SettingsService {
   async getOrCreate() {

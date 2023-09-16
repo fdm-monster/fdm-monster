@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Application } from "express";
 import mongoose from "mongoose";
 import history from "connect-history-api-fallback";
 import { LoggerService } from "./handlers/logger";
@@ -8,26 +8,21 @@ import { exceptionHandler } from "./middleware/exception.handler";
 import { fetchServerPort } from "./server.env";
 import { NotFoundException } from "./exceptions/runtime.exceptions";
 import { AppConstants } from "./server.constants";
-import { superRootPath, rootPath } from "./utils/fs.utils";
+import { rootPath, superRootPath } from "./utils/fs.utils";
+import expressListRoutes from "express-list-routes";
+import { SocketIoGateway } from "@/state/socket-io.gateway";
+import { BootTask } from "./tasks/boot.task";
+import { TaskManagerService } from "@/services/task-manager.service";
 
 export class ServerHost {
+  bootTask: BootTask;
+  taskManagerService: TaskManagerService;
+  socketIoGateway: SocketIoGateway;
+  appInstance: Application | null = null;
   /**
    * @type {LoggerService}
    */
   private logger: LoggerService;
-  /**
-   * @type {BootTask}
-   */
-  bootTask;
-  /**
-   * @type {TaskManagerService}
-   */
-  taskManagerService;
-  /**
-   * @type {SocketIoGateway}
-   */
-  socketIoGateway;
-  appInstance = null;
 
   constructor({ loggerFactory, bootTask, taskManagerService, socketIoGateway }) {
     this.logger = loggerFactory(ServerHost.name);
@@ -36,7 +31,7 @@ export class ServerHost {
     this.socketIoGateway = socketIoGateway;
   }
 
-  async boot(app, quick_boot = false, listenRequests = true) {
+  async boot(app: Application, quick_boot = false, listenRequests = true) {
     // Enforce models to be strictly applied, any unknown property will not be persisted
     mongoose.set("strictQuery", true);
 
@@ -54,7 +49,7 @@ export class ServerHost {
     return mongoose.connections[0].readyState;
   }
 
-  serveControllerRoutes(app) {
+  serveControllerRoutes(app: Application) {
     const routePath = "./controllers";
 
     // Catches any HTML request to paths like / or file/ as long as its text/html
@@ -66,7 +61,7 @@ export class ServerHost {
           next();
         }
       })
-      .use(loadControllers(`${routePath}/*.controller.js`, { cwd: __dirname }))
+      .use(loadControllers(`${routePath}/*.controller.*`, { cwd: __dirname }))
       .use(exceptionHandler);
 
     // Serve the files for our frontend - do this later than the controllers
@@ -97,13 +92,13 @@ export class ServerHost {
 
   async httpListen() {
     const port = fetchServerPort();
-
+    expressListRoutes(this.appInstance!, { prefix: "/" });
     if (!port || Number.isNaN(parseInt(port))) {
       throw new Error("The FDM Server requires a numeric port input argument to run");
     }
 
     const hostOrFqdn = "0.0.0.0";
-    const server = this.appInstance.listen(port, hostOrFqdn, () => {
+    const server = this.appInstance!.listen(port, hostOrFqdn, () => {
       this.logger.log(`Server started... open it at http://127.0.0.1:${port}`);
     });
     this.socketIoGateway.attachServer(server);

@@ -1,40 +1,26 @@
 import { captureException } from "@sentry/node";
-import { errorSummary } from "../utils/error.utils";
-import { printerEvents } from "../constants/event.constants";
+import { errorSummary } from "@/utils/error.utils";
+import { printerEvents } from "@/constants/event.constants";
+import EventEmitter2 from "eventemitter2";
+import { SocketFactory } from "@/services/octoprint/socket.factory";
+import { PrinterCache } from "@/state/printer.cache";
+import { OctoPrintSockIoAdapter } from "@/services/octoprint/octoprint-sockio.adapter";
+import { LoggerService } from "@/handlers/logger";
+import { ConfigService } from "@/services/config.service";
+import { SettingsStore } from "@/state/settings.store";
+import { SocketIoGateway } from "@/state/socket-io.gateway";
 
 export class PrinterSocketStore {
-  /**
-   * @type {SocketIoGateway}
-   */
-  socketIoGateway;
-  /**
-   * @type {SocketFactory}
-   */
-  socketFactory;
-  /**
-   * @type {EventEmitter2}
-   */
-  eventEmitter2;
-  /**
-   * @type{PrinterCache}
-   **/
-  printerCache;
-  /**
-   * @type {Object.<string, OctoPrintSockIoAdapter>}
-   */
-  printerSocketAdaptersById = {};
-  /**
-   * @type {LoggerService}
-   */
-  logger;
-  /**
-   * @type {ConfigService}
-   */
-  configService;
-  /**
-   * @type {SettingsStore}
-   */
-  settingsStore;
+  socketIoGateway: SocketIoGateway;
+  socketFactory: SocketFactory;
+  eventEmitter2: EventEmitter2;
+  printerCache: PrinterCache;
+  printerSocketAdaptersById: {
+    [s: string]: OctoPrintSockIoAdapter;
+  } = {};
+  logger: LoggerService;
+  configService: ConfigService;
+  settingsStore: SettingsStore;
 
   constructor({ socketFactory, socketIoGateway, settingsStore, eventEmitter2, printerCache, loggerFactory, configService }) {
     this.printerCache = printerCache;
@@ -264,11 +250,7 @@ export class PrinterSocketStore {
     });
   }
 
-  /**
-   * @private
-   * @param {string} printerId
-   */
-  deleteSocket(printerId) {
+  private deleteSocket(printerId: string) {
     const socket = this.printerSocketAdaptersById[printerId];
     if (!!socket) {
       socket.close();

@@ -1,8 +1,8 @@
-const { PrintCompletion } = require("../models/PrintCompletion");
-const { createPrintCompletionRules } = require("./validators/print-completion-service.validation");
-const { validateInput } = require("../handlers/validators");
-const { groupArrayBy } = require("../utils/array.util");
-const { EVENT_TYPES } = require("./octoprint/constants/octoprint-websocket.constants");
+import { PrintCompletion } from "@/models";
+import { createPrintCompletionRules } from "./validators/print-completion-service.validation";
+import { validateInput } from "@/handlers/validators";
+import { groupArrayBy } from "@/utils/array.util";
+import { EVENT_TYPES } from "./octoprint/constants/octoprint-websocket.constants";
 
 export class PrintCompletionService {
   logger;

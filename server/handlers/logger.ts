@@ -1,8 +1,8 @@
 import winston from "winston";
-import { AppConstants } from "../server.constants";
-import { superRootPath } from "../utils/fs.utils";
 import { join } from "path";
 import { DateTime } from "luxon";
+import { AppConstants } from "@/server.constants";
+import { superRootPath } from "@/utils/fs.utils";
 
 const dtFormat = new Intl.DateTimeFormat("en-GB", {
   timeStyle: "medium",

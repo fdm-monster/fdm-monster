@@ -1,7 +1,7 @@
-const { isPm2, isNodemon } = require("../utils/env.utils");
-const { AppConstants } = require("../server.constants");
-const { execSync } = require("child_process");
-const { InternalServerException, ValidationException } = require("../exceptions/runtime.exceptions");
+import { isNodemon, isPm2 } from "@/utils/env.utils";
+import { AppConstants } from "@/server.constants";
+import { execSync } from "child_process";
+import { InternalServerException, ValidationException } from "@/exceptions/runtime.exceptions";
 
 export class ServerUpdateService {
   #simpleGitService;

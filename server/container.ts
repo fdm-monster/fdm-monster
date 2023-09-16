@@ -1,5 +1,5 @@
 import axios from "axios";
-import { simpleGit } from "simple-git";
+import simpleGit from "simple-git";
 import { Octokit } from "octokit";
 import { asFunction, asClass, asValue, createContainer, InjectionMode } from "awilix";
 import { ToadScheduler } from "toad-scheduler";

@@ -27,7 +27,7 @@ export class AuthorizationError extends Error {
 }
 
 export class BadRequestException extends Error {
-  constructor(message) {
+  constructor(message: string) {
     super(message);
     this.name = BadRequestException.name;
   }
@@ -36,7 +36,7 @@ export class BadRequestException extends Error {
 export class NotFoundException extends Error {
   path: string;
 
-  constructor(message: string, path: string) {
+  constructor(message: string, path?: string) {
     super(message);
     this.name = NotFoundException.name;
     this.path = path;

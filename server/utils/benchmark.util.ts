@@ -1,4 +1,4 @@
-import { LoggerService } from "../handlers/logger.js";
+import { LoggerService } from "../handlers/logger";
 
 const logger = new LoggerService("Benchmark");
 

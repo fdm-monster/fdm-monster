@@ -6,7 +6,7 @@
       "decorators": true,
       "dynamicImport": true
     },
-    "target": "es2020",
+    "target": "es2022",
     "baseUrl": "./server",
     "paths": {
       "@/*": ["./*"]

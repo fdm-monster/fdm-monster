@@ -1,26 +1,20 @@
-import { normalizeUrl } from "../utils/normalize-url";
-import { Printer } from "../models/Printer";
-import { NotFoundException } from "../exceptions/runtime.exceptions";
-import { validateInput } from "../handlers/validators";
+import EventEmitter2 from "eventemitter2";
+import { Printer } from "@/models";
+import { NotFoundException } from "@/exceptions/runtime.exceptions";
+import { validateInput } from "@/handlers/validators";
 import {
   createPrinterRules,
-  updatePrinterEnabledRule,
   updateApiUsernameRule,
   updatePrinterDisabledReasonRule,
+  updatePrinterEnabledRule,
 } from "./validators/printer-service.validation";
-import { getDefaultPrinterEntry } from "../constants/service.constants";
-import { printerEvents } from "../constants/event.constants";
-import EventEmitter2 from "eventemitter2";
-import { LoggerService } from "../handlers/logger";
+import { getDefaultPrinterEntry } from "@/constants/service.constants";
+import { printerEvents } from "@/constants/event.constants";
+import { LoggerService } from "@/handlers/logger";
+import { normalizeURLWithProtocol } from "@/utils/url.utils";
 
 export class PrinterService {
-  /**
-   * @type {EventEmitter2}
-   */
   eventEmitter2: EventEmitter2;
-  /**
-   * @type {LoggerService}
-   */
   logger: LoggerService;
 
   constructor({ eventEmitter2, loggerFactory }) {
@@ -72,7 +66,7 @@ export class PrinterService {
   async update(printerId, updateData) {
     const printer = await this.get(printerId);
 
-    updateData.printerURL = PrinterService.normalizeURLWithProtocol(updateData.printerURL);
+    updateData.printerURL = normalizeURLWithProtocol(updateData.printerURL);
     const { printerURL, apiKey, enabled, settingsAppearance } = await validateInput(updateData, createPrinterRules);
     await this.get(printerId);
 
@@ -167,7 +161,7 @@ export class PrinterService {
 
   async updateConnectionSettings(printerId, { printerURL, apiKey }) {
     const update = {
-      printerURL: PrinterService.normalizeURLWithProtocol(printerURL),
+      printerURL: normalizeURLWithProtocol(printerURL),
       apiKey,
     };
 
@@ -247,16 +241,8 @@ export class PrinterService {
       ...printer,
     };
     if (mergedPrinter.printerURL?.length) {
-      mergedPrinter.printerURL = PrinterService.normalizeURLWithProtocol(mergedPrinter.printerURL);
+      mergedPrinter.printerURL = normalizeURLWithProtocol(mergedPrinter.printerURL);
     }
     return await validateInput(mergedPrinter, createPrinterRules);
-  }
-
-  static normalizeURLWithProtocol(printerURL) {
-    if (!printerURL.startsWith("http://") && !printerURL.startsWith("https://")) {
-      printerURL = `http://${printerURL}`;
-    }
-
-    return normalizeUrl(printerURL);
   }
 }

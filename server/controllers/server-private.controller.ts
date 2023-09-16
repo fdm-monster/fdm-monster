@@ -1,35 +1,32 @@
-const { createController } = require("awilix-express");
-const { authenticate, authorizeRoles } = require("../middleware/authenticate");
-const Logger = require("../handlers/logger.js");
-const { AppConstants } = require("../server.constants");
-const { ROLES } = require("../constants/authorization.constants");
-const { isTestEnvironment } = require("../utils/env.utils");
-const { PassThrough } = require("stream");
-const { validateMiddleware } = require("../handlers/validators");
+import { PassThrough } from "stream";
+import { createController, updateState } from "awilix-express";
+import { authenticate, authorizeRoles } from "@/middleware/authenticate";
+import { LoggerService as Logger } from "../handlers/logger";
+import { AppConstants } from "@/server.constants";
+import { ROLES } from "@/constants/authorization.constants";
+import { isTestEnvironment } from "@/utils/env.utils";
+import { validateMiddleware } from "@/handlers/validators";
+import { ServerReleaseService } from "@/services/server-release.service";
+import { ClientBundleService } from "@/services/client-bundle.service";
+import { ServerUpdateService } from "@/services/server-update.service";
+import { PrinterService } from "@/services/printer.service";
+import { PrinterSocketStore } from "@/state/printer-socket.store";
+import { PrinterCache } from "@/state/printer.cache";
+import { YamlService } from "@/services/yaml.service";
+import { MulterService } from "@/services/multer.service";
+import { LogDumpService } from "@/services/logs-manager.service";
 
 export class ServerPrivateController {
-  #logger = new Logger("Server-Private-API");
-  #serverUpdateService;
-  #serverReleaseService;
-  /**
-   * @type {ClientBundleService}
-   */
-  clientBundleService;
-  /**
-   * @type {PrinterCache}
-   */
-  printerCache;
-  /**
-   * @type {PrinterService}
-   */
-  printerService;
-  /**
-   * @type {PrinterSocketStore}
-   */
-  printerSocketStore;
-  yamlService;
-  multerService;
-  logDumpService;
+  clientBundleService: ClientBundleService;
+  printerCache: PrinterCache;
+  printerService: PrinterService;
+  printerSocketStore: PrinterSocketStore;
+  yamlService: YamlService;
+  multerService: MulterService;
+  logDumpService: LogDumpService;
+  private logger = new Logger(ServerPrivateController.name);
+  private serverUpdateService: ServerUpdateService;
+  private serverReleaseService: ServerReleaseService;
 
   constructor({
     serverUpdateService,
@@ -42,8 +39,8 @@ export class ServerPrivateController {
     yamlService,
     multerService,
   }) {
-    this.#serverReleaseService = serverReleaseService;
-    this.#serverUpdateService = serverUpdateService;
+    this.serverReleaseService = serverReleaseService;
+    this.serverUpdateService = serverUpdateService;
     this.clientBundleService = clientBundleService;
     this.logDumpService = logDumpService;
     this.printerSocketStore = printerSocketStore;
@@ -72,21 +69,21 @@ export class ServerPrivateController {
   }
 
   async getReleaseStateInfo(req, res) {
-    await this.#serverReleaseService.syncLatestRelease(false);
-    const updateState = this.#serverReleaseService.getState();
+    await this.serverReleaseService.syncLatestRelease(false);
+    const updateState = this.serverReleaseService.getState();
     res.send(updateState);
   }
 
   async pullGitUpdates(req, res) {
-    const result = await this.#serverUpdateService.checkGitUpdates();
+    const result = await this.serverUpdateService.checkGitUpdates();
     res.send(result);
   }
 
   async restartServer(req, res) {
     if (!isTestEnvironment()) {
-      this.#logger.warn("Server restart command fired. Expect the server to be unavailable for a moment");
+      this.logger.warn("Server restart command fired. Expect the server to be unavailable for a moment");
     }
-    const result = await this.#serverUpdateService.restartServer();
+    const result = await this.serverUpdateService.restartServer();
     res.send(result);
   }
 

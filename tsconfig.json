@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es2020",
-    "module": "es2020",
+    "target": "es2022",
+    "module": "es2022",
     "allowJs": true,
     "removeComments": true,
     "resolveJsonModule": true,
@@ -9,15 +9,18 @@
     "sourceMap": true,
     "outDir": "dist",
     "strict": true,
-    "lib": ["es2020"],
+    "lib": ["es2022"],
     "baseUrl": "./server",
     "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "moduleResolution": "Node",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "paths": {
+      "@/*": ["./*"]
+    }
   },
-  "include": ["server/**/*"],
+  "include": ["server/**/*", "test/**/*"],
   "exclude": ["node_modules"]
 }

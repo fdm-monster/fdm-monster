@@ -1,8 +1,8 @@
 import fs from "fs";
 import dotenv from "dotenv";
-import { LoggerService } from "../handlers/logger.js";
+import { LoggerService } from "@/handlers/logger";
 import { isDocker } from "./is-docker";
-import { AppConstants } from "../server.constants";
+import { AppConstants } from "@/server.constants";
 
 const logger = new LoggerService("Utils-Env", false);
 

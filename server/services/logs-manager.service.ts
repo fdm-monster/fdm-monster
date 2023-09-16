@@ -1,9 +1,9 @@
-const AdmZip = require("adm-zip");
-const { join } = require("path");
-const { superRootPath } = require("../utils/fs.utils");
-const { AppConstants } = require("../server.constants");
-const { readdirSync, unlinkSync } = require("fs");
-const { isValidDate } = require("../utils/time.utils");
+import AdmZip from "adm-zip";
+import { join } from "path";
+import { readdirSync, unlinkSync } from "fs";
+import { superRootPath } from "@/utils/fs.utils";
+import { AppConstants } from "@/server.constants";
+import { isValidDate } from "@/utils/time.utils";
 
 export class LogDumpService {
   /**

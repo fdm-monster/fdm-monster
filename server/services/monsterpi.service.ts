@@ -1,9 +1,9 @@
-const { existsSync, readFileSync } = require("fs");
-const { captureException } = require("@sentry/node");
+import { captureException } from "@sentry/node";
+import { existsSync, readFileSync } from "fs";
 
 export class MonsterPiService {
   #fileLocation = "/etc/monsterpi_version";
-  monsterPiVersion = null;
+  monsterPiVersion: string | null = null;
   logger;
 
   constructor({ loggerFactory }) {
