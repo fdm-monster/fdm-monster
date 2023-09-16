@@ -5,16 +5,12 @@ import { ROLES } from "@/constants/authorization.constants";
 import { validateInput } from "@/handlers/validators";
 import { idRules } from "./validation/generic.validation";
 import { InternalServerException } from "@/exceptions/runtime.exceptions";
+import { UserService } from "@/services/authentication/user.service";
+import { ConfigService } from "@/services/config.service";
 
 export class UserController {
-  /**
-   * @type {UserService}
-   */
-  userService;
-  /**
-   * @type {ConfigService}
-   */
-  configService;
+  userService: UserService;
+  configService: ConfigService;
 
   constructor({ userService, configService }) {
     this.userService = userService;
@@ -109,12 +105,12 @@ export default createController(UserController)
   .get("/", "list", {
     before: [authorizeRoles([ROLES.ADMIN])],
   })
+  .get("/profile", "profile")
   .get("/:id", "get", {
     before: [authorizeRoles([ROLES.ADMIN])],
   })
   .delete("/:id", "delete", {
     before: [authorizeRoles([ROLES.ADMIN])],
   })
-  .get("/profile", "profile")
   .post("/:id/change-username", "changeUsername")
   .post("/:id/change-password", "changePassword");

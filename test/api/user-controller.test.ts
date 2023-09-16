@@ -7,6 +7,7 @@ import { ROLES } from "@/constants/authorization.constants";
 import supertest from "supertest";
 
 const defaultRoute = `${AppConstants.apiRoute}/user`;
+const profileRoute = `${defaultRoute}/profile`;
 const getRoute = (id: string) => `${defaultRoute}/${id}`;
 const deleteRoute = (id: string) => `${defaultRoute}/${id}`;
 
@@ -18,6 +19,12 @@ beforeAll(async () => {
 });
 
 describe("UserController", () => {
+  it("GET profile", async () => {
+    await ensureTestUserCreated();
+    const response = await request.get(profileRoute).send();
+    expectOkResponse(response);
+  });
+
   it("should return user list", async function () {
     await ensureTestUserCreated();
     const response = await request.get(defaultRoute).send();

@@ -1,9 +1,9 @@
 import { createController } from "awilix-express";
-import { AppConstants } from "../server.constants";
-import { authenticate, authorizeRoles } from "../middleware/authenticate";
-import { ROLES } from "../constants/authorization.constants";
-import { printerResolveMiddleware } from "../middleware/printer";
-import { getScopedPrinter } from "../handlers/validators";
+import { AppConstants } from "@/server.constants";
+import { authenticate, authorizeRoles } from "@/middleware/authenticate";
+import { ROLES } from "@/constants/authorization.constants";
+import { printerResolveMiddleware } from "@/middleware/printer";
+import { getScopedPrinter } from "@/handlers/validators";
 
 const cacheKey = "firmware-state";
 
