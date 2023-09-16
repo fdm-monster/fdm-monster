@@ -6,9 +6,9 @@
   "description": "FDM Monster is a bulk OctoPrint manager to set up, configure and monitor 3D printers. Our aim is to provide extremely optimized websocket performance and reliability.",
   "scripts": {
     "dev": "concurrently \"npm run watch-compile\" \"npm run watch-dev\"",
-    "watch-compile": "swc src -w --out-dir dist",
+    "watch-compile": "swc server -w --out-dir dist",
     "watch-dev": "cross-env NODE_ENV=development nodemon --watch \"dist/**/*\" -e js ./dist/index.js",
-    "build": "swc src -d dist",
+    "build": "swc server -d dist",
     "start": "cross-env NODE_ENV=production node dist/index.js"
   },
   "repository": {
@@ -109,16 +109,12 @@
     "verbose": false,
     "ignore": [
       ".github/*",
-      ".docs/*",
-      "./coverage/*",
-      "file-uploads",
-      "logs/*",
+      "docs/*",
+      "media",
       "test/*",
-      "images/*",
       "views/*",
-      "docker/*",
-      "client-vue/*"
+      "docker/*"
     ],
-    "delay": 2000
+    "delay": 100
   }
 }

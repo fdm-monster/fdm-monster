@@ -7,7 +7,7 @@
       "dynamicImport": true
     },
     "target": "es2020",
-    "baseUrl": "./",
+    "baseUrl": "./server",
   },
   "module": {
     "type": "commonjs",

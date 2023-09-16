@@ -1,4 +1,4 @@
-const AppConstants = {
+export const AppConstants = {
   NON_NPM_MODE_KEY: "NON_NPM_MODE",
   NODE_ENV_KEY: "NODE_ENV",
   VERSION_KEY: "npm_package_version",
@@ -86,8 +86,4 @@ const AppConstants = {
   // Sentry
   sentryCustomDsnToken: "SENTRY_CUSTOM_DSN",
   sentryCustomDsnDefault: "https://164b8028a8a745bba3dbcab991b84ae7@o4503975545733120.ingest.sentry.io/4505101598261248",
-};
-
-module.exports = {
-  AppConstants,
 };

@@ -1,14 +1,16 @@
-const path = require("path");
-const { execSync } = require("child_process");
+import { status, up } from "migrate-mongo";
+import path from "path";
+import { execSync } from "child_process";
+import * as Sentry from "@sentry/node";
+import { config } from "dotenv";
+
 const envUtils = require("./utils/env.utils");
-const dotenv = require("dotenv");
 const { AppConstants } = require("./server.constants");
-const { status, up } = require("migrate-mongo");
 const Logger = require("./handlers/logger.js");
 const { isDocker } = require("./utils/is-docker");
 const { getEnvOrDefault, isProductionEnvironment } = require("./utils/env.utils");
-const Sentry = require("@sentry/node");
 const { errorSummary } = require("./utils/error.utils");
+
 const logger = new Logger("FDM-Environment", false);
 
 // Constants and definition
@@ -20,7 +22,7 @@ function isEnvTest() {
   return process.env[AppConstants.NODE_ENV_KEY] === AppConstants.defaultTestEnv;
 }
 
-function isEnvProd() {
+export function isEnvProd() {
   return process.env[AppConstants.NODE_ENV_KEY] === AppConstants.defaultProductionEnv;
 }
 
@@ -88,7 +90,7 @@ function printInstructionsURL() {
   logger.log(`Please make sure to read ${instructionsReferralURL} on how to configure your environment correctly.`);
 }
 
-function fetchMongoDBConnectionString(persistToEnv = false) {
+export function fetchMongoDBConnectionString(persistToEnv = false) {
   if (!process.env[AppConstants.MONGO_KEY]) {
     logger.debug(
       `~ ${AppConstants.MONGO_KEY} environment variable is not set. Assuming default: ${AppConstants.MONGO_KEY}=${AppConstants.defaultMongoStringUnauthenticated}`
@@ -108,7 +110,7 @@ function fetchMongoDBConnectionString(persistToEnv = false) {
   return process.env[AppConstants.MONGO_KEY];
 }
 
-function fetchServerPort() {
+export function fetchServerPort() {
   let port = process.env[AppConstants.SERVER_PORT_KEY];
   if (Number.isNaN(parseInt(port))) {
     // is not isDocker just to be sure, also checked in writeVariableToEnvFile
@@ -127,7 +129,7 @@ function fetchServerPort() {
 /**
  * Make sure that we have a valid MongoDB connection string to work with.
  */
-function ensureMongoDBConnectionStringSet() {
+export function ensureMongoDBConnectionStringSet() {
   let dbConnectionString = process.env[AppConstants.MONGO_KEY];
   if (!dbConnectionString) {
     // In docker, we better not write to .env
@@ -139,7 +141,7 @@ function ensureMongoDBConnectionStringSet() {
   }
 }
 
-function setupSentry() {
+export function setupSentry() {
   const sentryDsnToken = getEnvOrDefault(AppConstants.sentryCustomDsnToken, AppConstants.sentryCustomDsnDefault);
 
   Sentry.init({
@@ -159,7 +161,7 @@ function setupSentry() {
   });
 }
 
-function ensurePortSet() {
+export function ensurePortSet() {
   fetchServerPort();
 
   if (!process.env[AppConstants.SERVER_PORT_KEY]) {
@@ -175,10 +177,10 @@ function ensurePortSet() {
  * Parse and consume the .env file. Validate everything before starting the server.
  * Later this will switch to parsing a `config.yaml` file.
  */
-function setupEnvConfig(skipDotEnv = false) {
+export function setupEnvConfig(skipDotEnv = false) {
   if (!skipDotEnv) {
     // This needs to be CWD of app.js, so be careful not to move this call.
-    dotenv.config({ path: dotEnvPath });
+    config({ path: dotEnvPath });
     logger.log("✓ Parsed environment and (optional) .env file");
   }
 
@@ -192,11 +194,11 @@ function setupEnvConfig(skipDotEnv = false) {
 
 /**
  * Checks and runs database migrations
- * @param db
- * @param client
+ * @param db {string}
+ * @param client {string}
  * @returns {Promise<void>}
  */
-async function runMigrations(db, client) {
+export async function runMigrations(db: string, client: string) {
   const migrationsStatus = await status(db);
   const pendingMigrations = migrationsStatus.filter((m) => m.appliedAt === "PENDING");
 
@@ -215,11 +217,3 @@ async function runMigrations(db, client) {
     logger.log("No migrations were run");
   }
 }
-
-module.exports = {
-  isEnvProd,
-  setupEnvConfig,
-  runMigrations,
-  fetchMongoDBConnectionString,
-  fetchServerPort,
-};

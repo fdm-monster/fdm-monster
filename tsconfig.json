@@ -18,6 +18,6 @@
     "moduleResolution": "Node",
     "skipLibCheck": true
   },
-  "include": ["src/**/*"],
+  "include": ["server/**/*"],
   "exclude": ["node_modules"]
 }
