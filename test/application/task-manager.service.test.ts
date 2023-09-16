@@ -1,7 +1,6 @@
-import { beforeAll, describe, expect, it } from "@jest/globals";
 import { AwilixContainer } from "awilix";
-import { TaskManagerService } from "../../server/services/task-manager.service";
-import dbHandler = require("../db-handler");
+import { TaskManagerService } from "@/services/task-manager.service";
+import { connect } from "../db-handler";
 import { configureContainer } from "@/container";
 import { DITokens } from "@/container.tokens";
 import { JobValidationException } from "@/exceptions/job.exceptions";
@@ -10,7 +9,7 @@ let container: AwilixContainer;
 let taskManagerService: TaskManagerService;
 
 beforeAll(async () => {
-  await dbHandler.connect();
+  await connect();
   container = configureContainer();
   taskManagerService = container.resolve(DITokens.taskManagerService);
 });

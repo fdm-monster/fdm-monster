@@ -1,10 +1,9 @@
-import { beforeAll, describe, expect, it, jest } from "@jest/globals";
+import { beforeAll, describe, expect, it } from "@jest/globals";
+const fs = require("fs");
+jest.mock("fs");
 import { configureContainer } from "@/container";
 import { DITokens } from "@/container.tokens";
 import { MulterService } from "@/services/multer.service";
-
-import fs from "fs";
-jest.mock("fs");
 
 let container;
 let multerService: MulterService;

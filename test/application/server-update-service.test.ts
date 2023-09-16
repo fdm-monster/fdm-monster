@@ -1,4 +1,8 @@
-import { beforeAll, beforeEach, describe, expect, it, jest } from "@jest/globals";
+import { AwilixContainer } from "awilix";
+import { ServerUpdateService } from "@/services/server-update.service";
+import { configureContainer } from "@/container";
+import { DITokens } from "@/container.tokens";
+
 jest.mock("child_process", () => {
   return {
     exec: () => Promise.resolve(),
@@ -6,23 +10,17 @@ jest.mock("child_process", () => {
   };
 });
 jest.mock("simple-git");
-import { asValue, AwilixContainer } from "awilix";
-import { ServerUpdateService } from "@/services/server-update.service";
-import simpleGitMock from "./__mocks__/simple-git";
-const mockedSimpleGit = simpleGitMock();
-import { configureContainer } from "@/container";
-import { DITokens } from "@/container.tokens";
+import { SimpleGit } from "simple-git";
 
 describe("ServerUpdateService", () => {
   let container: AwilixContainer;
   let serverUpdateService: ServerUpdateService;
+  let mockedSimpleGit: SimpleGit;
 
   beforeAll(() => {
     container = configureContainer();
-    container.register({
-      [DITokens.simpleGitService]: asValue(mockedSimpleGit),
-    });
     serverUpdateService = container.resolve(DITokens.serverUpdateService);
+    mockedSimpleGit = container.resolve(DITokens.simpleGitService);
   });
 
   describe("package updates, modifications and pull", () => {

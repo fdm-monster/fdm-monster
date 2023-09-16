@@ -31,7 +31,7 @@ export function expectOkResponse(response: Response, matchedBody?: any) {
   return response.body;
 }
 
-export function expectValidationError(object, keys, exact = false) {
+export function expectValidationError(object: any, keys: string[], exact = false) {
   const objectErrors = Object.keys(object.errors);
   if (!exact) {
     keys.forEach((key) => expect(objectErrors).toContain(key));
@@ -56,7 +56,7 @@ export function expectUnauthorizedResponse(response: Response) {
   expect(response.statusCode).toEqual(401);
 }
 
-export function expectInvalidResponse(response: Response, keys, exact = false) {
+export function expectInvalidResponse(response: Response, keys?: string[], exact = false) {
   expect(response.statusCode).toEqual(400);
 
   if (!keys) return;

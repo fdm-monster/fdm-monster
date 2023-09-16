@@ -8,7 +8,7 @@ export class AxiosMock {
   timeout = null;
   streamRejectPayload: any;
 
-  constructor(timeoutSettings) {
+  constructor(timeoutSettings: any) {
     this.timeout = timeoutSettings;
   }
 

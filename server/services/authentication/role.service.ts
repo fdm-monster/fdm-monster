@@ -1,21 +1,15 @@
 import { union } from "lodash";
-import { ROLES, ROLE_PERMS } from "../../constants/authorization.constants";
-import { Role } from "../../models";
-import { NotFoundException } from "../../exceptions/runtime.exceptions";
+import { ROLE_PERMS, ROLES } from "@/constants/authorization.constants";
+import { Role } from "@/models";
+import { NotFoundException } from "@/exceptions/runtime.exceptions";
+import { LoggerService } from "@/handlers/logger";
+import { SettingsStore } from "@/state/settings.store";
 
 export class RoleService {
-  #roles = [];
-  /**
-   * @type {LoggerService}
-   */
-  logger;
-  /**
-   * @type {SettingsStore}
-   */
-  settingsStore;
-
-  appDefaultRole;
-  appDefaultRoleNoLogin;
+  private logger: LoggerService;
+  settingsStore: SettingsStore;
+  appDefaultRole: string;
+  appDefaultRoleNoLogin: string;
 
   constructor({ loggerFactory, appDefaultRole, appDefaultRoleNoLogin, settingsStore }) {
     this.logger = loggerFactory(RoleService.name);
@@ -24,8 +18,10 @@ export class RoleService {
     this.appDefaultRoleNoLogin = appDefaultRoleNoLogin;
   }
 
+  private _roles: any[] = [];
+
   get roles() {
-    return this.#roles;
+    return this._roles;
   }
 
   async getAppDefaultRole() {
@@ -35,8 +31,8 @@ export class RoleService {
     return this.appDefaultRoleNoLogin;
   }
 
-  getRolesPermissions(roles) {
-    let permissions = [];
+  getRolesPermissions(roles: string[]) {
+    let permissions: string[] = [];
     if (!roles?.length) return [];
 
     for (let role of roles) {
@@ -48,13 +44,13 @@ export class RoleService {
     return permissions;
   }
 
-  getRolePermissions(role) {
+  getRolePermissions(role: string) {
     const normalizedRole = this.#normalizeRole(role);
     return ROLE_PERMS[normalizedRole];
   }
 
   async getAppDefaultRolesId() {
-    if (!this.#roles?.length) {
+    if (!this._roles?.length) {
       await this.syncRoles();
     }
 
@@ -66,26 +62,15 @@ export class RoleService {
    * @param roleName {string}
    * @return {Promise<*>}
    */
-  async getSynchronizedRoleByName(roleName) {
-    if (!this.#roles?.length) {
+  async getSynchronizedRoleByName(roleName: string) {
+    if (!this._roles?.length) {
       await this.syncRoles();
     }
 
     return this.getRoleByName(roleName);
   }
 
-  #normalizeRole(assignedRole) {
-    const roleInstance = this.roles.find((r) => r.id === assignedRole || r.name === assignedRole);
-
-    if (!roleInstance) {
-      console.warn(`The role by ID '${assignedRole}' did not exist in definition. Skipping.`);
-      return;
-    }
-
-    return roleInstance.name;
-  }
-
-  authorizeRole(requiredRole, assignedRoles) {
+  authorizeRole(requiredRole: string, assignedRoles: string[]) {
     return !!assignedRoles.find((ar) => {
       const normalizedRole = this.#normalizeRole(ar);
       if (!normalizedRole) return false;
@@ -93,7 +78,7 @@ export class RoleService {
     });
   }
 
-  authorizeRoles(requiredRoles, assignedRoles, subset = true) {
+  authorizeRoles(requiredRoles: string[], assignedRoles: string[], subset = true) {
     let isAuthorized = false;
 
     if (!requiredRoles?.length) return true;
@@ -105,44 +90,47 @@ export class RoleService {
     return isAuthorized;
   }
 
-  getRoleByName(roleName) {
-    const role = this.#roles.find((r) => r.name === roleName);
+  getRoleByName(roleName: string) {
+    const role = this._roles.find((r) => r.name === roleName);
     if (!role) throw new NotFoundException(`Role by name ${roleName} not found`);
 
     return role;
   }
 
-  /**
-   * @param roleId {string[]}
-   * @return {*[]}
-   */
-  getManyRoles(roleIds) {
+  getManyRoles(roleIds: string[]): any[] {
     return roleIds.map((roleId) => this.getRole(roleId));
   }
 
-  /**
-   * @param roleId {string}
-   * @return {*}
-   */
-  getRole(roleId) {
-    const role = this.#roles.find((r) => r.id === roleId);
+  getRole(roleId: string) {
+    const role = this._roles.find((r) => r.id === roleId);
     if (!role) throw new NotFoundException(`Role Id '${roleId}' not found`);
 
     return role;
   }
 
   async syncRoles() {
-    this.#roles = [];
+    this._roles = [];
     for (let roleName of Object.values(ROLES)) {
       const storedRole = await Role.findOne({ name: roleName });
       if (!storedRole) {
         const newRole = await Role.create({
           name: roleName,
         });
-        this.#roles.push(newRole);
+        this._roles.push(newRole);
       } else {
-        this.#roles.push(storedRole);
+        this._roles.push(storedRole);
       }
     }
+  }
+
+  #normalizeRole(assignedRole: string) {
+    const roleInstance = this.roles.find((r) => r.id === assignedRole || r.name === assignedRole);
+
+    if (!roleInstance) {
+      console.warn(`The role by ID '${assignedRole}' did not exist in definition. Skipping.`);
+      return;
+    }
+
+    return roleInstance.name;
   }
 }

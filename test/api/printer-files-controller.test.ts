@@ -1,31 +1,35 @@
-import { beforeAll, beforeEach, describe, expect, it } from "@jest/globals";
-import dbHandler = require("../db-handler");
+import { beforeAll, beforeEach, describe, expect, it, test } from "@jest/globals";
 import { setupTestApp } from "../test-server";
 import { createTestPrinter } from "./test-data/create-printer";
-import { expectOkResponse, expectInvalidResponse, expectNotFoundResponse } from "../extensions";
+import { expectInvalidResponse, expectNotFoundResponse, expectOkResponse } from "../extensions";
 import { AppConstants } from "@/server.constants";
 import { Printer as Model } from "@/models";
 import nock from "nock";
+import supertest from "supertest";
+import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
+import { connect } from "../db-handler";
+import { OctoPrintApiMock } from "../mocks/octoprint-api.mock";
+
 const defaultRoute = AppConstants.apiRoute + "/printer-files";
 const trackedUploadsRoute = `${defaultRoute}/tracked-uploads`;
 const purgeIndexedFilesRoute = `${defaultRoute}/purge`;
 const batchReprintRoute = `${defaultRoute}/batch/reprint-files`;
-const getRoute = (id) => `${defaultRoute}/${id}`;
-const clearFilesRoute = (id) => `${getRoute(id)}/clear`;
-const moveFileOrFolderRoute = (id) => `${getRoute(id)}/move`;
-const deleteFileOrFolderRoute = (id, path) => `${getRoute(id)}?path=${path}`;
-const selectAndPrintRoute = (id) => `${getRoute(id)}/select`;
-const uploadFileRoute = (id) => `${getRoute(id)}/upload`;
-const localUploadFileRoute = (id) => `${getRoute(id)}/local-upload`;
-const createFolderRoute = (id) => `${getRoute(id)}/create-folder`;
-const getFilesRoute = (id, recursive) => `${getRoute(id)}?recursive=${recursive}`;
-const getCacheRoute = (id) => `${getRoute(id)}/cache`;
+const getRoute = (id: string) => `${defaultRoute}/${id}`;
+const clearFilesRoute = (id: string) => `${getRoute(id)}/clear`;
+const moveFileOrFolderRoute = (id: string) => `${getRoute(id)}/move`;
+const deleteFileOrFolderRoute = (id: string, path: string) => `${getRoute(id)}?path=${path}`;
+const selectAndPrintRoute = (id: string) => `${getRoute(id)}/select`;
+const uploadFileRoute = (id: string) => `${getRoute(id)}/upload`;
+const localUploadFileRoute = (id: string) => `${getRoute(id)}/local-upload`;
+const createFolderRoute = (id: string) => `${getRoute(id)}/create-folder`;
+const getFilesRoute = (id: string, recursive: boolean) => `${getRoute(id)}?recursive=${recursive}`;
+const getCacheRoute = (id: string) => `${getRoute(id)}/cache`;
 
-let request;
-let octoPrintApiService;
+let request: supertest.SuperTest<supertest.Test>;
+let octoPrintApiService: OctoPrintApiMock;
 
 beforeAll(async () => {
-  await dbHandler.connect();
+  await connect();
   ({ request, octoPrintApiService } = await setupTestApp(true));
 });
 

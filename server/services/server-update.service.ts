@@ -2,17 +2,16 @@ import { isNodemon, isPm2 } from "@/utils/env.utils";
 import { AppConstants } from "@/server.constants";
 import { execSync } from "child_process";
 import { InternalServerException, ValidationException } from "@/exceptions/runtime.exceptions";
+import { LoggerService } from "@/handlers/logger";
+import { PullResult, SimpleGit } from "simple-git";
 
 export class ServerUpdateService {
-  #simpleGitService;
-  /**
-   * @type {LoggerService}
-   */
-  #logger;
+  private simpleGitService: SimpleGit;
+  private logger: LoggerService;
 
   constructor({ simpleGitService, loggerFactory }) {
-    this.#simpleGitService = simpleGitService;
-    this.#logger = loggerFactory("ServerUpdateService");
+    this.simpleGitService = simpleGitService;
+    this.logger = loggerFactory(ServerUpdateService.name);
   }
 
   async restartServer() {
@@ -33,13 +32,13 @@ export class ServerUpdateService {
   }
 
   async checkGitUpdates() {
-    let isValidGitRepo = this.#simpleGitService.checkIsRepo();
+    let isValidGitRepo = this.simpleGitService.checkIsRepo();
     if (!isValidGitRepo) {
       throw new ValidationException("Server update could not proceed as the server had no .git repository folder");
     }
 
-    await this.#simpleGitService.fetch();
-    const localRepoStatus = await this.#simpleGitService.status();
+    await this.simpleGitService.fetch();
+    const localRepoStatus = await this.simpleGitService.status();
 
     if (!localRepoStatus) return;
 
@@ -49,6 +48,8 @@ export class ServerUpdateService {
       commitsBehind: localRepoStatus.behind,
       commitsAhead: localRepoStatus.ahead,
       filesModified: localRepoStatus.modified?.length,
+      status: "",
+      pullStatus: null as PullResult | null,
     };
 
     if (localRepoStatus?.behind === 0) {
@@ -62,9 +63,9 @@ export class ServerUpdateService {
       return result;
     }
 
-    this.#logger.warn("Pulling git to get the latest server updates");
+    this.logger.warn("Pulling git to get the latest server updates");
 
-    const pullDetails = await this.#simpleGitService.pull();
+    const pullDetails = await this.simpleGitService.pull();
     result.status = "Pull action completed";
     result.pullStatus = pullDetails;
     return result;

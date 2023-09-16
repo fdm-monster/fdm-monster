@@ -1,7 +1,7 @@
-const { AwilixResolutionError } = require("awilix");
-const { JobValidationException } = require("../exceptions/job.exceptions");
-const { SimpleIntervalJob, AsyncTask } = require("toad-scheduler");
-const { DITokens } = require("../container.tokens");
+import { SimpleIntervalJob, AsyncTask } from "toad-scheduler";
+import { AwilixResolutionError } from "awilix";
+import { JobValidationException } from "@/exceptions/job.exceptions";
+import { DITokens } from "@/container.tokens";
 
 /**
  * Manage immediate or delayed tasks and recurring jobs.
@@ -20,7 +20,7 @@ export class TaskManagerService {
     this.jobScheduler = container[DITokens.toadScheduler];
   }
 
-  validateInput(taskId, workload, schedulerOptions) {
+  validateInput(taskId: string, workload, schedulerOptions) {
     if (!taskId) {
       throw new JobValidationException("Task ID was not provided. Cant register task or schedule job.");
     }
@@ -160,28 +160,6 @@ export class TaskManagerService {
     this.jobScheduler.removeById(taskId);
   }
 
-  #scheduleEnabledPeriodicJob(taskId) {
-    const taskState = this.getTaskState(taskId);
-    if (!taskState?.timedTask || !taskState?.options) {
-      throw new JobValidationException(
-        `The requested task with ID ${taskId} was not registered properly ('timedTask' or 'options' missing).`
-      );
-    }
-    const schedulerOptions = taskState?.options;
-    const timedTask = taskState.timedTask;
-    if (!schedulerOptions?.periodic) {
-      throw new JobValidationException(`The requested task with ID ${taskId} is not periodic and cannot be enabled.`);
-    }
-    if (!schedulerOptions.disabled) {
-      this.#logger.log(`Task '${taskId}' was scheduled (runImmediately: ${!!schedulerOptions.runImmediately}).`);
-      const job = new SimpleIntervalJob(schedulerOptions, timedTask);
-      taskState.job = job;
-      this.jobScheduler.addSimpleIntervalJob(job);
-    } else {
-      this.#logger.log(`Task '${taskId}' was marked as disabled (deferred execution).`);
-    }
-  }
-
   getTaskState(taskId) {
     const taskState = this.taskStates[taskId];
     if (!taskState) {
@@ -240,5 +218,27 @@ export class TaskManagerService {
    */
   stopSchedulerTasks() {
     this.jobScheduler.stop();
+  }
+
+  #scheduleEnabledPeriodicJob(taskId) {
+    const taskState = this.getTaskState(taskId);
+    if (!taskState?.timedTask || !taskState?.options) {
+      throw new JobValidationException(
+        `The requested task with ID ${taskId} was not registered properly ('timedTask' or 'options' missing).`
+      );
+    }
+    const schedulerOptions = taskState?.options;
+    const timedTask = taskState.timedTask;
+    if (!schedulerOptions?.periodic) {
+      throw new JobValidationException(`The requested task with ID ${taskId} is not periodic and cannot be enabled.`);
+    }
+    if (!schedulerOptions.disabled) {
+      this.#logger.log(`Task '${taskId}' was scheduled (runImmediately: ${!!schedulerOptions.runImmediately}).`);
+      const job = new SimpleIntervalJob(schedulerOptions, timedTask);
+      taskState.job = job;
+      this.jobScheduler.addSimpleIntervalJob(job);
+    } else {
+      this.#logger.log(`Task '${taskId}' was marked as disabled (deferred execution).`);
+    }
   }
 }

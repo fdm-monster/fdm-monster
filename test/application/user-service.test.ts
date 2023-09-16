@@ -35,7 +35,7 @@ describe("UserService", () => {
 
   it("should find no user by role id ", async () => {
     await roleService.syncRoles();
-    const role = await roleService.getRoleByName(ROLES.ADMIN);
+    const role = roleService.getRoleByName(ROLES.ADMIN);
     const result = await userService.findRawByRoleId(role.id);
     expect(result?.length).toBeFalsy();
   });
