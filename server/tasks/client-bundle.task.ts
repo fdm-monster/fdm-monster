@@ -1,4 +1,4 @@
-import { AppConstants } from "../server.constants";
+import { AppConstants } from "@/server.constants";
 
 export class ClientDistDownloadTask {
   /**

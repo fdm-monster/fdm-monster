@@ -1,15 +1,18 @@
-import dbHandler = require("../../db-handler");
+import { AwilixContainer } from "awilix";
+import supertest from "supertest";
+import { connect } from "../../db-handler";
 import { setupTestApp } from "../../test-server";
 import { expectOkResponse } from "../../extensions";
 import { DITokens } from "@/container.tokens";
 import { AppConstants } from "@/server.constants";
+import { ServerHost } from "@/server.host";
 
-let container;
-let serverHost;
-let request;
+let container: AwilixContainer;
+let serverHost: ServerHost;
+let request: supertest.SuperTest<supertest.Test>;
 
 beforeAll(async () => {
-  await dbHandler.connect();
+  await connect();
   ({ container, request } = await setupTestApp(true, undefined, false));
   serverHost = container.resolve(DITokens.serverHost);
 });
