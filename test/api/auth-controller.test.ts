@@ -1,14 +1,14 @@
-import { beforeAll, describe, it } from "@jest/globals";
-
-import dbHandler = require("../db-handler");
 import { AppConstants } from "@/server.constants";
 import { setupTestApp } from "../test-server";
 import { expectOkResponse, expectUnauthorizedResponse, expectBadRequestError } from "../extensions";
 import { getUserData, ensureTestUserCreated } from "./test-data/create-user";
 import { DITokens } from "@/container.tokens";
+import { connect } from "../db-handler";
+import { AwilixContainer } from "awilix";
+import supertest from "supertest";
 
-let request;
-let container;
+let request: supertest.SuperTest<supertest.Test>;
+let container: AwilixContainer;
 
 const baseRoute = AppConstants.apiRoute + "/auth";
 const loginRoute = `${baseRoute}/login`;
@@ -16,7 +16,7 @@ const registerRoute = `${baseRoute}/register`;
 const logoutRoute = `${baseRoute}/logout`;
 
 beforeAll(async () => {
-  await dbHandler.connect();
+  await connect();
   ({ request, container } = await setupTestApp(true));
 });
 

@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import { LoggerService } from "@/handlers/logger";
 import { isDocker } from "./is-docker";
 import { AppConstants } from "@/server.constants";
+import { join } from "path";
 
 const logger = new LoggerService("Utils-Env", false);
 
@@ -75,25 +76,28 @@ export function writeVariableToEnvFile(absoluteEnvPath: any, variableKey: any, j
   fs.writeFileSync(absoluteEnvPath, dotEnvResult);
 }
 
-export function verifyPackageJsonRequirements(rootPath: any) {
+export function verifyPackageJsonRequirements(rootPath: string) {
   const dirConts = fs.readdirSync(rootPath);
   const hasPackageJson = dirConts.includes("package.json");
   if (!hasPackageJson) {
     logger.error(`FAILURE. Could not find 'package.json' in root folder ${rootPath}`);
     return false;
-  } else {
-    logger.debug("✓ found 'package.json'");
-    const packageName = require("../package.json").name;
-    if (!packageName) {
-      logger.error("X Could not find 'name' property in package.json file. Aborting FDM Server.");
-      return false;
-    } else if (packageName.toLowerCase() !== "fdm-monster") {
-      logger.error(
-        `X property 'name' in package.json file didnt equal 'fdm-monster' (found: ${packageName.toLowerCase()}). Aborting FDM Server.`
-      );
-      return false;
-    }
   }
+
+  logger.debug("✓ found 'package.json'");
+  const packageName = require(join(rootPath, "package.json")).name;
+  if (!packageName) {
+    logger.error("X Could not find 'name' property in package.json file. Aborting FDM Server.");
+    return false;
+  }
+
+  if (packageName.toLowerCase() !== "fdm-monster") {
+    logger.error(
+      `X property 'name' in package.json file didnt equal 'fdm-monster' (found: ${packageName.toLowerCase()}). Aborting FDM Server.`
+    );
+    return false;
+  }
+
   logger.debug("✓ Correctly validated FDM package.json file!");
   return true;
 }

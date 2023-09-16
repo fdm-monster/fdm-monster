@@ -4,9 +4,11 @@ import { join } from "path";
 
 describe("Env util", () => {
   it("should pass validation", () => {
-    expect(verifyPackageJsonRequirements(__dirname)).toEqual(false);
+    const path = __dirname;
+    expect(verifyPackageJsonRequirements(path)).toEqual(false);
 
-    expect(verifyPackageJsonRequirements(join(__dirname, "test-data"))).toEqual(true);
+    const path2 = join(__dirname, "test-data");
+    expect(verifyPackageJsonRequirements(path2)).toEqual(true);
   });
 
   it("environment should be test", () => {
