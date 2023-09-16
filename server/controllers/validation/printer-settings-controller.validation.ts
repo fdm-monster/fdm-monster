@@ -1,5 +1,5 @@
 const setGcodeAnalysis = {
-  enabled: "required|boolean"
+  enabled: "required|boolean",
 };
 
 module.exports = { setGcodeAnalysis };

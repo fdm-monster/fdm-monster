@@ -5,8 +5,8 @@ module.exports = {
       // Safety first
       await session.withTransaction(async () => {
         // Do the migration
-        const dbCollection = db.collection("users");
-        await dbCollection.updateMany({}, { $rename: { password: "passwordHash" } });
+        const dbCollection = db.collection("printers");
+        await dbCollection.updateMany({}, { $set: { enabled: true } });
       });
     } finally {
       await session.endSession();
@@ -18,12 +18,12 @@ module.exports = {
     try {
       // Safety first
       await session.withTransaction(async () => {
-        // Do the migration
-        const dbCollection = db.collection("users");
-        await dbCollection.updateMany({}, { $rename: { passwordHash: "password" } });
+        // Do the migration (destructive!)
+        const dbCollection = db.collection("printers");
+        await dbCollection.updateMany({}, { unset: { enabled: "" } });
       });
     } finally {
       await session.endSession();
     }
-  }
+  },
 };

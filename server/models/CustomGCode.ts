@@ -3,16 +3,16 @@ const mongoose = require("mongoose");
 const CustomGCodeSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true
+    required: true,
   },
   description: {
     type: String,
-    required: false
+    required: false,
   },
   gcode: {
     type: Array,
-    required: true
-  }
+    required: true,
+  },
 });
 
 const CustomGCode = mongoose.model("CustomGCode", CustomGCodeSchema);

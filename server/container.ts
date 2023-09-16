@@ -95,7 +95,7 @@ export function configureContainer() {
     [DITokens.monsterPiService]: asClass(MonsterPiService).singleton(),
     [DITokens.serverUpdateService]: asClass(ServerUpdateService).singleton(),
     [DITokens.githubService]: asClass(GithubService),
-    [DITokens.octokitService]: asFunction((cradle) => {
+    [DITokens.octokitService]: asFunction((cradle: any) => {
       const config = cradle.configService;
       // cradle.
       return new Octokit({

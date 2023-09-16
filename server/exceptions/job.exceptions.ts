@@ -6,5 +6,5 @@ class JobValidationException extends Error {
 }
 
 module.exports = {
-  JobValidationException
+  JobValidationException,
 };

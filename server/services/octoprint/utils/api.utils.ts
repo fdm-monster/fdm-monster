@@ -1,8 +1,4 @@
-const {
-  jsonContentType,
-  contentTypeHeaderKey,
-  apiKeyHeaderKey,
-} = require("../constants/octoprint-service.constants");
+const { jsonContentType, contentTypeHeaderKey, apiKeyHeaderKey } = require("../constants/octoprint-service.constants");
 const { ValidationException } = require("../../../exceptions/runtime.exceptions");
 
 /**

@@ -8,7 +8,13 @@ const envUtils = require("./utils/env.utils");
 const { AppConstants } = require("./server.constants");
 const Logger = require("./handlers/logger");
 const { isDocker } = require("./utils/is-docker");
-const { getEnvOrDefault, isProductionEnvironment, writeVariableToEnvFile } = require("./utils/env.utils");
+const {
+  getEnvOrDefault,
+  isProductionEnvironment,
+  writeVariableToEnvFile,
+  verifyPackageJsonRequirements,
+  isPm2,
+} = require("./utils/env.utils");
 const { errorSummary } = require("./utils/error.utils");
 
 const logger = new Logger("FDM-Environment", false);

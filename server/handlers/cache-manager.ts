@@ -5,5 +5,5 @@ function configureCacheManager() {
 }
 
 module.exports = {
-  configureCacheManager
+  configureCacheManager,
 };

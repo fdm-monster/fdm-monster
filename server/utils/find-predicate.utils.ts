@@ -7,5 +7,5 @@ const findFileIndex = (fileList, filePath) => {
 };
 
 module.exports = {
-  findFileIndex
+  findFileIndex,
 };

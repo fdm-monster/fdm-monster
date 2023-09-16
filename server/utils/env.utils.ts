@@ -6,7 +6,7 @@ const { AppConstants } = require("../server.constants");
 
 const logger = new Logger("Utils-Env", false);
 
-export function getEnvOrDefault(key, defaultVal) {
+export function getEnvOrDefault(key: any, defaultVal: any) {
   const val = process.env[key];
   if (!val?.length) return defaultVal;
   return val;
@@ -36,7 +36,7 @@ export function isNode() {
  * Turn an object into an envfile string
  * Copied from https://github.com/bevry/envfile
  */
-function stringifyDotEnv(obj) {
+function stringifyDotEnv(obj: any) {
   let result = "";
   for (const [key, value] of Object.entries(obj)) {
     if (key) {
@@ -51,7 +51,7 @@ function stringifyDotEnv(obj) {
  * Write a new key-value to .env file
  * Note: assumes in Nodemon, pm2 or PKG mode.
  */
-export function writeVariableToEnvFile(absoluteEnvPath, variableKey, jsonObject) {
+export function writeVariableToEnvFile(absoluteEnvPath: any, variableKey: any, jsonObject: any) {
   if (isDocker()) {
     logger.error("Tried to persist setting to .env in docker mode. Avoided that.");
     return;
@@ -75,7 +75,7 @@ export function writeVariableToEnvFile(absoluteEnvPath, variableKey, jsonObject)
   fs.writeFileSync(absoluteEnvPath, dotEnvResult);
 }
 
-export function verifyPackageJsonRequirements(rootPath) {
+export function verifyPackageJsonRequirements(rootPath: any) {
   const dirConts = fs.readdirSync(rootPath);
   const hasPackageJson = dirConts.includes("package.json");
   if (!hasPackageJson) {

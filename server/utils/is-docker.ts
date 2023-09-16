@@ -28,5 +28,5 @@ function isDocker() {
 }
 
 module.exports = {
-  isDocker
+  isDocker,
 };
