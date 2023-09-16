@@ -6,9 +6,9 @@ import { config } from "dotenv";
 
 const envUtils = require("./utils/env.utils");
 const { AppConstants } = require("./server.constants");
-const Logger = require("./handlers/logger.js");
+const Logger = require("./handlers/logger");
 const { isDocker } = require("./utils/is-docker");
-const { getEnvOrDefault, isProductionEnvironment } = require("./utils/env.utils");
+const { getEnvOrDefault, isProductionEnvironment, writeVariableToEnvFile } = require("./utils/env.utils");
 const { errorSummary } = require("./utils/error.utils");
 
 const logger = new Logger("FDM-Environment", false);
@@ -42,7 +42,7 @@ function ensureNodeEnvSet() {
       return false;
     }
 
-    envUtils.writeVariableToEnvFile(path.resolve(dotEnvPath), AppConstants.NODE_ENV_KEY, newEnvName);
+    writeVariableToEnvFile(path.resolve(dotEnvPath), AppConstants.NODE_ENV_KEY, newEnvName);
   } else {
     logger.log(`✓ NODE_ENV variable correctly set (${environment})!`);
   }
@@ -67,15 +67,15 @@ function ensureEnvNpmVersionSet() {
   }
 }
 
-function removePm2Service(reason) {
+function removePm2Service(reason: string) {
   logger.error(`Removing PM2 service as Server failed to start: ${reason}`);
   execSync(`pm2 delete ${AppConstants.pm2ServiceName}`);
 }
 
 function setupPackageJsonVersionOrThrow() {
-  const result = envUtils.verifyPackageJsonRequirements(path.join(__dirname, AppConstants.serverPath));
+  const result = verifyPackageJsonRequirements(path.join(__dirname, AppConstants.serverPath));
   if (!result) {
-    if (envUtils.isPm2()) {
+    if (isPm2()) {
       // TODO test this works under docker as well
       removePm2Service("didnt pass startup validation (package.json)");
     }
@@ -100,11 +100,7 @@ export function fetchMongoDBConnectionString(persistToEnv = false) {
 
     // is not isDocker just to be sure, also checked in writeVariableToEnvFile
     if (persistToEnv && !isDocker()) {
-      envUtils.writeVariableToEnvFile(
-        path.resolve(dotEnvPath),
-        AppConstants.MONGO_KEY,
-        AppConstants.defaultMongoStringUnauthenticated
-      );
+      writeVariableToEnvFile(path.resolve(dotEnvPath), AppConstants.MONGO_KEY, AppConstants.defaultMongoStringUnauthenticated);
     }
   }
   return process.env[AppConstants.MONGO_KEY];
@@ -194,11 +190,8 @@ export function setupEnvConfig(skipDotEnv = false) {
 
 /**
  * Checks and runs database migrations
- * @param db {string}
- * @param client {string}
- * @returns {Promise<void>}
- */
-export async function runMigrations(db: string, client: string) {
+ **/
+export async function runMigrations(db: string, client: string): Promise<void> {
   const migrationsStatus = await status(db);
   const pendingMigrations = migrationsStatus.filter((m) => m.appliedAt === "PENDING");
 

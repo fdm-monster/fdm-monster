@@ -4,18 +4,15 @@ const { validateInput } = require("../handlers/validators");
 const { groupArrayBy } = require("../utils/array.util");
 const { EVENT_TYPES } = require("./octoprint/constants/octoprint-websocket.constants");
 
-class PrintCompletionService {
-  #logger;
+export class PrintCompletionService {
+  logger;
 
   constructor({ loggerFactory }) {
-    this.#logger = loggerFactory(PrintCompletionService.name);
+    this.logger = loggerFactory(PrintCompletionService.name);
   }
 
   async create(input) {
-    const { printerId, fileName, completionLog, status, context } = await validateInput(
-      input,
-      createPrintCompletionRules
-    );
+    const { printerId, fileName, completionLog, status, context } = await validateInput(input, createPrintCompletionRules);
 
     return PrintCompletionModel.create({
       printerId,
@@ -44,9 +41,7 @@ class PrintCompletionService {
     });
 
     if (!completionEntry) {
-      this.#logger.warn(
-        `Print with correlationId ${correlationId} could not be updated with new context as it was not found`
-      );
+      this.logger.warn(`Print with correlationId ${correlationId} could not be updated with new context as it was not found`);
       return;
     }
     completionEntry.context = context;
@@ -123,45 +118,27 @@ class PrintCompletionService {
       pc.correlationIds = pc.printJobs.map((j) => j.correlationId);
       pc.printCount = pc.correlationIds?.length;
 
-      const mappedEvents = pc.printEvents.map(
-        ({ status, createdAt, fileName, context, completionLog }) => ({
-          status,
-          createdAt,
-          fileName,
-          context,
-          completionLog,
-        })
-      );
+      const mappedEvents = pc.printEvents.map(({ status, createdAt, fileName, context, completionLog }) => ({
+        status,
+        createdAt,
+        fileName,
+        context,
+        completionLog,
+      }));
 
       const failureEvents = mappedEvents.filter((e) => e.status === EVENT_TYPES.PrintFailed);
       pc.failureCount = failureEvents?.length;
-      pc.lastFailure = failureEvents?.length
-        ? failureEvents.reduce((j1, j2) => (j1.createdAt > j2.createdAt ? j1 : j2))
-        : null;
-      pc.failureEventsLastWeek = failureEvents.filter(
-        (e) => e.createdAt > Date.now() - 7 * durationDayMSec
-      )?.length;
-      pc.failureEventsLast48H = failureEvents.filter(
-        (e) => e.createdAt > Date.now() - 2 * durationDayMSec
-      )?.length;
-      pc.failureEventsLast24H = failureEvents.filter(
-        (e) => e.createdAt > Date.now() - durationDayMSec
-      )?.length;
+      pc.lastFailure = failureEvents?.length ? failureEvents.reduce((j1, j2) => (j1.createdAt > j2.createdAt ? j1 : j2)) : null;
+      pc.failureEventsLastWeek = failureEvents.filter((e) => e.createdAt > Date.now() - 7 * durationDayMSec)?.length;
+      pc.failureEventsLast48H = failureEvents.filter((e) => e.createdAt > Date.now() - 2 * durationDayMSec)?.length;
+      pc.failureEventsLast24H = failureEvents.filter((e) => e.createdAt > Date.now() - durationDayMSec)?.length;
 
       const successEvents = mappedEvents.filter((e) => e.status === EVENT_TYPES.PrintDone);
       pc.successCount = successEvents?.length;
-      pc.lastSuccess = successEvents?.length
-        ? successEvents?.reduce((j1, j2) => (j1.createdAt > j2.createdAt ? j1 : j2))
-        : null;
-      pc.successEventsLastWeek = successEvents.filter(
-        (e) => e.createdAt > Date.now() - 7 * durationDayMSec
-      )?.length;
-      pc.successEventsLast48H = successEvents.filter(
-        (e) => e.createdAt > Date.now() - 2 * durationDayMSec
-      )?.length;
-      pc.successEventsLast24H = successEvents.filter(
-        (e) => e.createdAt > Date.now() - durationDayMSec
-      )?.length;
+      pc.lastSuccess = successEvents?.length ? successEvents?.reduce((j1, j2) => (j1.createdAt > j2.createdAt ? j1 : j2)) : null;
+      pc.successEventsLastWeek = successEvents.filter((e) => e.createdAt > Date.now() - 7 * durationDayMSec)?.length;
+      pc.successEventsLast48H = successEvents.filter((e) => e.createdAt > Date.now() - 2 * durationDayMSec)?.length;
+      pc.successEventsLast24H = successEvents.filter((e) => e.createdAt > Date.now() - durationDayMSec)?.length;
 
       // Explodes in size quickly, remove the event timeline
       delete pc.printEvents;
@@ -170,7 +147,3 @@ class PrintCompletionService {
     });
   }
 }
-
-module.exports = {
-  PrintCompletionService,
-};

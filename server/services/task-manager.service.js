@@ -276,4 +276,4 @@ class TaskManagerService {
   }
 }
 
-module.exports = TaskManagerService;
+module.exports = { TaskManagerService };

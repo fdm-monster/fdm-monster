@@ -24,7 +24,7 @@ function isPm2() {
   return "PM2_HOME" in process.env || "PM2_JSON_PROCESSING" in process.env || "PM2_CLI" in process.env;
 }
 
-function isNodemon() {
+export function isNodemon() {
   return "npm_lifecycle_script" in process.env && process.env.npm_lifecycle_script.includes("nodemon");
 }
 
@@ -98,13 +98,12 @@ function verifyPackageJsonRequirements(rootPath) {
   return true;
 }
 
-module.exports = {
+export {
   isTestEnvironment,
   isProductionEnvironment,
   isPm2,
-  isNodemon,
   isNode,
   writeVariableToEnvFile,
   verifyPackageJsonRequirements,
-  getEnvOrDefault
+  getEnvOrDefault,
 };

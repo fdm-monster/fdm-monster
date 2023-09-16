@@ -1,10 +1,9 @@
-const { isPm2 } = require("../utils/env.utils.js");
-const { isNodemon } = require("../utils/env.utils.js");
+const { isPm2, isNodemon } = require("../utils/env.utils");
 const { AppConstants } = require("../server.constants");
 const { execSync } = require("child_process");
 const { InternalServerException, ValidationException } = require("../exceptions/runtime.exceptions");
 
-class ServerUpdateService {
+export class ServerUpdateService {
   #simpleGitService;
   /**
    * @type {LoggerService}
@@ -71,5 +70,3 @@ class ServerUpdateService {
     return result;
   }
 }
-
-module.exports = ServerUpdateService;
