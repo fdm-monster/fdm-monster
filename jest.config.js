@@ -4,12 +4,12 @@ module.exports = {
   },
   testEnvironment: "node",
   testTimeout: 2500,
-  rootDir: "./test",
+  rootDir: ".",
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/../server/$1",
   },
   modulePathIgnorePatterns: [
-    "server/migrate-mongo-config.ts",
+    "server/migrate-mongo-config.js",
     ".eslintrc.js",
     "server/assets",
     "coverage",
@@ -18,9 +18,9 @@ module.exports = {
     "media",
     "installations",
   ],
-  globalSetup: "./setup-global.ts",
-  setupFilesAfterEnv: ["jest-27-expect-message", "./setup-after-env.ts"],
-  collectCoverageFrom: ["server/**/*.js", "server/**/*.ts"],
-  coveragePathIgnorePatterns: ["installations", "node_modules", "test"],
+  globalSetup: "./test/setup-global.ts",
+  setupFilesAfterEnv: ["jest-27-expect-message", "./test/setup-after-env.ts"],
+  collectCoverageFrom: ["./server/**/*"],
+  // coveragePathIgnorePatterns: ["installations", "node_modules", "test"],
   coverageReporters: ["clover", "json", "lcov", "text", "@lcov-viewer/istanbul-report"],
 };

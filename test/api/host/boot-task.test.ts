@@ -1,16 +1,18 @@
-import { beforeAll, describe, expect, it } from "@jest/globals";
+import { connect } from "../../db-handler";
+import { setupTestApp } from "../../test-server";
+import { DITokens } from "@/container.tokens";
+import { AwilixContainer } from "awilix";
+import { TaskManagerService } from "@/services/task-manager.service";
+import { ServerTasks } from "@/tasks";
+import { BootTask } from "@/tasks/boot.task";
 
-const dbHandler = require("../../db-handler");
-const { setupTestApp } = require("../../test-server");
-const { DITokens } = require("@/container.tokens");
-
-let container;
-let taskManager;
-let serverTasks;
-let task;
+let container: AwilixContainer;
+let taskManager: TaskManagerService;
+let serverTasks: ServerTasks;
+let task: BootTask;
 
 beforeAll(async () => {
-  await dbHandler.connect();
+  await connect();
   ({ container } = await setupTestApp(true));
   taskManager = container.resolve(DITokens.taskManagerService);
   task = container.resolve(DITokens.bootTask);

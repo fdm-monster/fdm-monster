@@ -3,10 +3,9 @@ import { setupTestApp } from "../test-server";
 import { createTestPrinter } from "./test-data/create-printer";
 import { expectInvalidResponse, expectNotFoundResponse, expectOkResponse } from "../extensions";
 import { AppConstants } from "@/server.constants";
-import { Printer as Model } from "@/models";
+import { Printer } from "@/models";
 import nock from "nock";
 import supertest from "supertest";
-import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
 import { connect } from "../db-handler";
 import { OctoPrintApiMock } from "../mocks/octoprint-api.mock";
 
@@ -34,7 +33,7 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  Model.deleteMany({});
+  Printer.deleteMany({});
   octoPrintApiService.storeResponse(undefined, undefined);
 });
 

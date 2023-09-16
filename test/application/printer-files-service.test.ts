@@ -1,6 +1,5 @@
-import { PrinterService } from "../../server/services/printer.service";
-import { PrinterFilesService } from "../../server/services/printer-files.service";
-import { afterAll, beforeAll, describe, expect, it } from "@jest/globals";
+import { PrinterService } from "@/services/printer.service";
+import { PrinterFilesService } from "@/services/printer-files.service";
 import { connect } from "../db-handler";
 import { configureContainer } from "@/container";
 import { Printer } from "@/models";

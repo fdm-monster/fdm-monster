@@ -1,9 +1,9 @@
-import { beforeAll, describe, expect, it } from "@jest/globals";
-const dbHandler = require("../db-handler");
-const { setupTestApp } = require("../test-server");
-const { expectOkResponse } = require("../extensions");
-const { AppConstants } = require("@/server.constants");
-const {
+import supertest from "supertest";
+import { connect } from "../db-handler";
+import { setupTestApp } from "../test-server";
+import { expectOkResponse } from "../extensions";
+import { AppConstants } from "@/server.constants";
+import {
   fileCleanSettingKey,
   getDefaultFileCleanSettings,
   getDefaultSettings,
@@ -11,16 +11,16 @@ const {
   frontendSettingKey,
   getDefaultFrontendSettings,
   credentialSettingsKey,
-} = require("@/constants/server-settings.constants");
+} from "@/constants/server-settings.constants";
 
-let request;
+let request: supertest.SuperTest<supertest.Test>;
 
 const defaultRoute = `${AppConstants.apiRoute}/settings/server`;
 const frontendSettingsRoute = `${defaultRoute}/frontend`;
 const serverWhitelistRoute = `${defaultRoute}/whitelist`;
 
 beforeAll(async () => {
-  await dbHandler.connect();
+  await connect();
   ({ request } = await setupTestApp(true));
 });
 

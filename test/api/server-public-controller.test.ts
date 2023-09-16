@@ -1,26 +1,28 @@
-import { beforeAll, describe, expect, it } from "@jest/globals";
 import { AwilixContainer } from "awilix";
-
-const dbHandler = require("../db-handler");
-const { setupTestApp } = require("../test-server");
-const { expectOkResponse, expectUnauthorizedResponse } = require("../extensions");
-const { AppConstants } = require("@/server.constants");
-const { DITokens } = require("@/container.tokens");
-const { loginTestUser } = require("./auth/login-test-user");
-const githubReleasesResponse = require("./test-data/github-releases.data.json");
+import { connect } from "../db-handler";
+import { setupTestApp } from "../test-server";
+import { expectOkResponse, expectUnauthorizedResponse } from "../extensions";
+import { AppConstants } from "@/server.constants";
+import { DITokens } from "@/container.tokens";
+import { loginTestUser } from "./auth/login-test-user";
+import githubReleasesResponse from "./test-data/github-releases.data.json";
+import { ServerReleaseService } from "@/services/server-release.service";
+import { SettingsStore } from "@/state/settings.store";
+import { AxiosMock } from "../mocks/axios.mock";
+import supertest from "supertest";
 
 let container: AwilixContainer;
-let releaseService;
-let settingsStore;
-let mockedHttpClient;
-let request;
+let releaseService: ServerReleaseService;
+let settingsStore: SettingsStore;
+let mockedHttpClient: AxiosMock;
+let request: supertest.SuperTest<supertest.Test>;
 
 const welcomeRoute = AppConstants.apiRoute;
 const getRoute = welcomeRoute;
 const versionRoute = `${welcomeRoute}/version`;
 
 beforeAll(async () => {
-  await dbHandler.connect();
+  await connect();
   ({ request, container } = await setupTestApp(true));
   releaseService = container.resolve(DITokens.serverReleaseService);
   settingsStore = container.resolve(DITokens.settingsStore);

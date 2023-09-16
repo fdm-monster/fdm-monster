@@ -4,7 +4,6 @@ import { setupTestApp } from "../test-server";
 import { expectInternalServerError, expectNotFoundResponse, expectOkResponse } from "../extensions";
 import { ensureTestUserCreated } from "./test-data/create-user";
 import { ROLES } from "@/constants/authorization.constants";
-import { beforeAll, describe, expect, it } from "@jest/globals";
 
 const defaultRoute = `${AppConstants.apiRoute}/user`;
 const getRoute = (id) => `${defaultRoute}/${id}`;

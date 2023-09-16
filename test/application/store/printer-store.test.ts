@@ -1,28 +1,26 @@
-import { afterAll, beforeAll, describe, expect, it, jest } from "@jest/globals";
 import { validNewPrinterState } from "../test-data/printer.data";
 import { PrinterService } from "@/services/printer.service";
 import { PrinterCache } from "@/state/printer.cache";
-import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { FilesStore } from "@/state/files.store";
 import { AwilixContainer } from "awilix";
-
-jest.mock("@/services/octoprint/octoprint-api.service");
+jest.mock("../../../server/services/octoprint/octoprint-api.service");
 import { connect, closeDatabase } from "../../db-handler";
 import { DITokens } from "@/container.tokens";
 import { configureContainer } from "@/container";
 import { ValidationException } from "@/exceptions/runtime.exceptions";
+import { TestPrinterSocketStore } from "@/state/test-printer-socket.store";
 
 let container: AwilixContainer;
 let printerService: PrinterService;
 let printerCache: PrinterCache;
-let printerSocketStore: PrinterSocketStore;
+let testPrinterSocketStore: TestPrinterSocketStore;
 let filesStore: FilesStore;
 
 beforeAll(async () => {
   await connect();
   container = configureContainer();
   await container.resolve(DITokens.settingsStore).loadSettings();
-  printerSocketStore = container.resolve(DITokens.printerSocketStore);
+  testPrinterSocketStore = container.resolve(DITokens.testPrinterSocketStore);
   printerCache = container.resolve(DITokens.printerCache);
   printerService = container.resolve(DITokens.printerService);
   filesStore = container.resolve(DITokens.filesStore);
@@ -99,6 +97,6 @@ describe("PrinterSocketStore", () => {
   });
 
   it("should get undefined test printer from store", async () => {
-    expect(printerSocketStore.testSocket).toBeUndefined();
+    expect(testPrinterSocketStore.testSocket).toBeUndefined();
   });
 });

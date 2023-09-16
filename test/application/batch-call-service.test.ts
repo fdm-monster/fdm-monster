@@ -4,8 +4,6 @@ import { DITokens } from "@/container.tokens";
 import { validNewPrinterState } from "./test-data/printer.data";
 import { asClass } from "awilix";
 import { AxiosMock } from "../mocks/axios.mock";
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from "@jest/globals";
-import { afterEach } from "node:test";
 import { BatchCallService } from "@/services/batch-call.service";
 import { SettingsStore } from "@/state/settings.store";
 import { PrinterService } from "@/services/printer.service";

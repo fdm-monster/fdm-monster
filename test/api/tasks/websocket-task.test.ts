@@ -1,14 +1,13 @@
-import { beforeAll, describe, expect, it } from "@jest/globals";
-const dbHandler = require("../../db-handler");
-const { setupTestApp } = require("../../test-server");
+import { connect } from "../../db-handler";
+import { setupTestApp } from "../../test-server";
 import { PrinterWebsocketTask } from "@/tasks/printer-websocket.task";
-const { DITokens } = require("@/container.tokens");
+import { DITokens } from "@/container.tokens";
 
 let container;
 let task: PrinterWebsocketTask;
 
 beforeAll(async () => {
-  await dbHandler.connect();
+  await connect();
   ({ container } = await setupTestApp(true));
   task = container.resolve(DITokens.printerWebsocketTask);
 });

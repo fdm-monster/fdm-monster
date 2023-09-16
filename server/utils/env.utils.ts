@@ -26,7 +26,7 @@ export function isPm2() {
 }
 
 export function isNodemon() {
-  return "npm_lifecycle_script" in process.env && process.env.npm_lifecycle_script.includes("nodemon");
+  return "npm_lifecycle_script" in process.env && process.env.npm_lifecycle_script!.includes("nodemon");
 }
 
 export function isNode() {

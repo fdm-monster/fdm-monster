@@ -4,18 +4,23 @@
   "license": "AGPL-3.0-or-later",
   "version": "1.4.5",
   "description": "FDM Monster is a bulk OctoPrint manager to set up, configure and monitor 3D printers. Our aim is to provide extremely optimized websocket performance and reliability.",
+  "main": "./server/index.js",
   "scripts": {
     "dev": "concurrently \"npm run watch-compile\" \"npm run watch-dev\"",
     "watch-compile": "swc server -w --out-dir dist",
     "watch-dev": "cross-env NODE_ENV=development nodemon --watch \"dist/**/*\" -e js ./dist/index.js",
     "build": "swc server -d dist",
     "start": "cross-env NODE_ENV=production node dist/index.js",
-    "test": "jest --verbose"
+    "migration:create": "migrate-mongo create printer-remove-sortindex",
+    "migration:up": "migrate-mongo up",
+    "migration:down": "migrate-mongo down",
+    "migration:status": "migrate-mongo status",
+    "format": "prettier --write \"src/**/*.js\" \"test/**/*.js\"",
+    "test": "jest --forceExist",
+    "test:cov": "jest --forceExit --coverage",
+    "cov:show": "./coverage/lcov-report/index.html"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/fdm-monster/fdm-monster"
-  },
+  "repository": "https://github.com/fdm-monster/fdm-monster",
   "keywords": [
     "fdm-monster",
     "fdm-connector",

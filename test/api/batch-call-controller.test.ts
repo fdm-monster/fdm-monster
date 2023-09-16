@@ -1,11 +1,11 @@
-import { beforeAll, beforeEach, describe, it } from "@jest/globals";
-
 import { connect } from "../db-handler";
 import { AppConstants } from "@/server.constants";
 import { setupTestApp } from "../test-server";
 import { Printer } from "@/models";
 import { createTestPrinter } from "./test-data/create-printer";
 import { expectOkResponse } from "../extensions";
+import { OctoPrintApiMock } from "../mocks/octoprint-api.mock";
+import supertest from "supertest";
 
 let Model = Printer;
 const defaultRoute = AppConstants.apiRoute + "/batch";
@@ -13,8 +13,8 @@ const batchConnectUsbRoute = `${defaultRoute}/connect/usb`;
 const batchConnectSocketRoute = `${defaultRoute}/connect/socket`;
 const batchReprintRoute = `${defaultRoute}/reprint`;
 
-let request;
-let octoPrintApiService;
+let request: supertest.SuperTest<supertest.Test>;
+let octoPrintApiService: OctoPrintApiMock;
 
 beforeAll(async () => {
   await connect();

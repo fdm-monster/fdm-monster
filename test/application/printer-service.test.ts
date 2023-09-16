@@ -2,11 +2,12 @@ import { connect } from "../db-handler";
 import { configureContainer } from "@/container";
 import { Printer } from "@/models";
 import { DITokens } from "@/container.tokens";
-import { afterAll, beforeAll, describe, expect, it } from "@jest/globals";
 import { testPrinterData } from "./test-data/printer.data";
+import { AwilixContainer } from "awilix";
+import { PrinterService } from "@/services/printer.service";
 
-let container;
-let printerService;
+let container: AwilixContainer;
+let printerService: PrinterService;
 
 beforeAll(async () => {
   await connect();

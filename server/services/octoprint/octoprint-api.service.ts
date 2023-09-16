@@ -4,8 +4,8 @@ import FormData from "form-data";
 import got from "got";
 import { multiPartContentType, pluginRepositoryUrl } from "./constants/octoprint-service.constants";
 import { processResponse, processGotResponse } from "./utils/api.utils";
-import { uploadProgressEvent, firmwareFlashUploadEvent } from "../../constants/event.constants";
-import { ExternalServiceError } from "../../exceptions/runtime.exceptions";
+import { uploadProgressEvent, firmwareFlashUploadEvent } from "@/constants/event.constants";
+import { ExternalServiceError } from "@/exceptions/runtime.exceptions";
 import { OctoPrintRoutes } from "./octoprint-api.routes";
 
 export class OctoPrintApiService extends OctoPrintRoutes {

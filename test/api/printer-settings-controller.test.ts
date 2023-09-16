@@ -2,7 +2,7 @@ import { setupTestApp } from "../test-server";
 import { expectOkResponse } from "../extensions";
 import { createTestPrinter } from "./test-data/create-printer";
 import { AppConstants } from "@/server.constants";
-import { beforeAll, describe, expect, it } from "@jest/globals";
+
 import { connect } from "../db-handler";
 
 const defaultRoute = `${AppConstants.apiRoute}/printer-settings`;
