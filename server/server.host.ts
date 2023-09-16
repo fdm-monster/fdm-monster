@@ -68,7 +68,8 @@ export class ServerHost {
     const bundleDistPath = join(superRootPath(), AppConstants.defaultClientBundleStorage, "dist");
     app.use(express.static(bundleDistPath));
     // Backup client in node_modules
-    app.use(express.static(join(rootPath(), "node_modules", AppConstants.clientPackageName, "dist")));
+    const backupClientPath = join(superRootPath(), "node_modules", AppConstants.clientPackageName, "dist");
+    app.use(express.static(backupClientPath));
 
     app
       .get("*", (req, res) => {
