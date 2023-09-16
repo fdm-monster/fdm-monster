@@ -4,14 +4,9 @@ import { User } from "../models";
 import { DITokens } from "../container.tokens";
 import { AppConstants } from "../server.constants";
 import { AwilixContainer } from "awilix";
-import { Authenticator } from "passport";
+import { PassportStatic } from "passport";
 
-/**
- * @param {Authenticator} passport
- * @param {AwilixContainer<any>} container
- * @returns {Authenticator}
- */
-export function initializePassportStrategies(passport: Authenticator, container: AwilixContainer<any>): Authenticator {
+export function initializePassportStrategies(passport: PassportStatic, container: AwilixContainer<any>): PassportStatic {
   const opts = {};
   /** @type {SettingsStore} **/
   const settingsStore = container.resolve(DITokens.settingsStore);
