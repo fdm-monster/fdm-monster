@@ -1,9 +1,8 @@
+import { createController } from "awilix-express";
 import { normalizeURLWithProtocol } from "@/utils/url.utils";
-
-const { authenticate, authorizeRoles } = require("../middleware/authenticate");
-const { createController } = require("awilix-express");
-const { validateMiddleware, getScopedPrinter } = require("../handlers/validators");
-const {
+import { authenticate, authorizeRoles } from "@/middleware/authenticate";
+import { validateMiddleware, getScopedPrinter } from "@/handlers/validators";
+import {
   updatePrinterConnectionSettingRules,
   flowRateRules,
   feedRateRules,
@@ -12,60 +11,46 @@ const {
   updatePrinterDisabledReasonRules,
   createOctoPrintBackupRules,
   getOctoPrintBackupRules,
-} = require("./validation/printer-controller.validation");
-const { AppConstants } = require("../server.constants");
-const { getSettingsAppearanceDefault } = require("../constants/service.constants");
-const { printerResolveMiddleware } = require("../middleware/printer");
-const { generateCorrelationToken } = require("../utils/correlation-token.util");
-const { ROLES } = require("../constants/authorization.constants");
-const { Floor } = require("../models/Floor");
-const PrinterService = require("../services/printer.service");
+} from "./validation/printer-controller.validation";
+import { AppConstants } from "@/server.constants";
+import { getSettingsAppearanceDefault } from "@/constants/service.constants";
+import { printerResolveMiddleware } from "@/middleware/printer";
+import { generateCorrelationToken } from "@/utils/correlation-token.util";
+import { ROLES } from "@/constants/authorization.constants";
+import { Floor } from "@/models";
+import { PrinterService } from "@/services/printer.service";
+import { PrinterSocketStore } from "@/state/printer-socket.store";
+import { TestPrinterSocketStore } from "@/state/test-printer-socket.store";
+import { PrinterCache } from "@/state/printer.cache";
+import { LoggerService } from "@/handlers/logger";
+import { PrinterEventsCache } from "@/state/printer-events.cache";
+import { TaskManagerService } from "@/services/task-manager.service";
+import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
+import { PluginRepositoryCache } from "@/services/octoprint/plugin-repository.cache";
+import { FloorStore } from "@/state/floor.store";
+import { MulterService } from "@/services/multer.service";
 
 export class PrinterController {
   /**
-   * @type {PrinterSocketStore}
+   * @type {}
    */
-  printerSocketStore;
+  printerSocketStore: PrinterSocketStore;
   /**
-   * @type {TestPrinterSocketStore}
+   * @type {}
    */
-  testPrinterSocketStore;
+  testPrinterSocketStore: TestPrinterSocketStore;
   /**
-   * @type {PrinterService}
+   * @type {}
    */
-  printerService;
-  /**
-   * @type {PrinterCache}
-   */
-  printerCache;
-  /**
-   * @type {PrinterEventsCache}
-   */
-  printerEventsCache;
-  /**
-   * @type {TaskManagerService}
-   */
-  taskManagerService;
-  /**
-   * @type {OctoPrintApiService}
-   */
-  octoPrintApiService;
-  /**
-   * @type {PluginRepositoryCache}
-   */
-  pluginRepositoryCache;
-  /**
-   * @type {FloorStore}
-   */
-  floorStore;
-  /**
-   * @type {MulterService}
-   */
-  multerService;
-  /**
-   * @type {LoggerService}
-   */
-  logger;
+  printerService: PrinterService;
+  printerCache: PrinterCache;
+  printerEventsCache: PrinterEventsCache;
+  taskManagerService: TaskManagerService;
+  octoPrintApiService: OctoPrintApiService;
+  pluginRepositoryCache: PluginRepositoryCache;
+  floorStore: FloorStore;
+  multerService: MulterService;
+  logger: LoggerService;
 
   constructor({
     printerSocketStore,
@@ -415,7 +400,6 @@ export default createController(PrinterController)
   .post("/:id/refresh-socket", "refreshPrinterSocket")
   .patch("/:id/enabled", "updateEnabled")
   .patch("/:id/connection", "updateConnectionSettings")
-  .patch("/:id/step-size", "setStepSize")
   .patch("/:id/flow-rate", "setFlowRate")
   .patch("/:id/feed-rate", "setFeedRate")
   .patch("/:id/disabled-reason", "updatePrinterDisabledReason")

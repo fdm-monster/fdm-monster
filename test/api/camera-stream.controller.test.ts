@@ -1,18 +1,19 @@
-import dbHandler = require("../db-handler");
+import { connect } from "../db-handler";
 import { setupTestApp } from "../test-server";
 import { expectOkResponse } from "../extensions";
 import { AppConstants } from "@/server.constants";
 import { CameraStream as Model } from "@/models";
-import { beforeAll, beforeEach, describe, expect, it } from "@jest/globals";
+import supertest from "supertest";
 
 const listRoute = `${AppConstants.apiRoute}/camera-stream`;
-const getRoute = (id) => `${listRoute}/${id}`;
-const deleteRoute = (id) => `${listRoute}/${id}`;
-const updateRoute = (id) => `${getRoute(id)}`;
+const getRoute = (id: string) => `${listRoute}/${id}`;
+const deleteRoute = (id: string) => `${listRoute}/${id}`;
+const updateRoute = (id: string) => `${getRoute(id)}`;
 
-let request;
+let request: supertest.SuperTest<supertest.Test>;
+
 beforeAll(async () => {
-  await dbHandler.connect();
+  await connect();
   ({ request } = await setupTestApp(true));
 });
 
@@ -28,20 +29,20 @@ describe("CameraStreamController", () => {
     rotationClockwise: 0,
   };
   const defaultTestURL = "https://test.url/stream";
-  const defaultCameraStreamInput = (url) => ({
+  const defaultCameraStreamInput = (url: string) => ({
     streamURL: url,
     printerId: null,
     settings: defaultSettings,
   });
-  const matchedBody = (url) => ({
+  const matchedBody = (url: string) => ({
     _id: expect.any(String),
     __v: 0,
     streamURL: url,
     printerId: null,
     settings: defaultSettings,
   });
-  const createTestCameraStream = async (url) => await request.post(listRoute).send(defaultCameraStreamInput(url));
-  const deleteTestCameraStream = async (id) => await request.delete(deleteRoute(id));
+  const createTestCameraStream = async (url: string) => await request.post(listRoute).send(defaultCameraStreamInput(url));
+  const deleteTestCameraStream = async (id: string) => await request.delete(deleteRoute(id));
 
   it("should list streams", async () => {
     const res = await request.get(listRoute);

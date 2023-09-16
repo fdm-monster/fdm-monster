@@ -1,15 +1,15 @@
 import { inject } from "awilix-express";
-import { AuthorizationError, AuthenticationError } from "../exceptions/runtime.exceptions";
+import { AuthenticationError, AuthorizationError } from "@/exceptions/runtime.exceptions";
 
-export function authorizePermission(permission) {
+export function authorizePermission(permission: string) {
   return inject(({ permissionService, roleService }) => async (req, res, next) => {
     if (!req.roles?.length) {
-      throw new AuthorizationError(permission);
+      throw new AuthorizationError({ permissions: [permission] });
     }
 
     const assignedPermissions = roleService.getRolesPermissions(req.roles);
     if (!permissionService.authorizePermission(permission, assignedPermissions)) {
-      throw new AuthorizationError({ permission });
+      throw new AuthorizationError({ permissions: [permission] });
     }
 
     next();

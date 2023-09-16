@@ -1,4 +1,4 @@
-const { union } = require("lodash");
+import { union } from "lodash";
 
 export function serializePerm(group: string, perm: string) {
   return `${group}.${perm}`;

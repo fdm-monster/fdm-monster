@@ -1,25 +1,18 @@
-const { authenticate, withPermission } = require("../middleware/authenticate");
-const { createController } = require("awilix-express");
-const { validateInput, validateMiddleware } = require("../handlers/validators");
-const { AppConstants } = require("../server.constants");
-const { idRules } = require("./validation/generic.validation");
-const { setGcodeAnalysis } = require("./validation/printer-settings-controller.validation");
-const { PERMS } = require("../constants/authorization.constants");
+import { createController } from "awilix-express";
+import { authenticate, withPermission } from "@/middleware/authenticate";
+import { validateInput, validateMiddleware } from "@/handlers/validators";
+import { AppConstants } from "@/server.constants";
+import { idRules } from "./validation/generic.validation";
+import { setGcodeAnalysis } from "./validation/printer-settings-controller.validation";
+import { PERMS } from "@/constants/authorization.constants";
+import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
+import { PrinterCache } from "@/state/printer.cache";
 
 export class PrinterSettingsController {
-  /**
-   * @type {PrinterCache}
-   */
-  printerCache;
-  /**
-   * @type {OctoPrintApiService}
-   */
-  octoPrintApiService;
+  printerCache: PrinterCache;
+  octoPrintApiService: OctoPrintApiService;
 
-  #logger;
-
-  constructor({ printerCache, loggerFactory, octoPrintApiService }) {
-    this.#logger = loggerFactory(PrinterSettingsController.name);
+  constructor({ printerCache, octoPrintApiService }) {
     this.printerCache = printerCache;
     this.octoPrintApiService = octoPrintApiService;
   }
@@ -57,7 +50,6 @@ export class PrinterSettingsController {
   }
 }
 
-// prettier-ignore
 export default createController(PrinterSettingsController)
   .prefix(AppConstants.apiRoute + "/printer-settings")
   .before([authenticate()])

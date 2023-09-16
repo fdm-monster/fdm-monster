@@ -1,15 +1,13 @@
-const { validateInput } = require("../handlers/validators");
-const { batchPrinterRules, batchPrintersEnabledRules } = require("./validation/batch-controller.validation");
-const { createController } = require("awilix-express");
-const { AppConstants } = require("../server.constants");
-const { authenticate, authorizeRoles } = require("../middleware/authenticate");
-const { ROLES } = require("../constants/authorization.constants");
+import { createController } from "awilix-express";
+import { validateInput } from "@/handlers/validators";
+import { batchPrinterRules, batchPrintersEnabledRules } from "./validation/batch-controller.validation";
+import { AppConstants } from "@/server.constants";
+import { authenticate, authorizeRoles } from "@/middleware/authenticate";
+import { ROLES } from "@/constants/authorization.constants";
+import { BatchCallService } from "@/services/batch-call.service";
 
 export class BatchCallController {
-  /**
-   * @type {BatchCallService}
-   */
-  batchCallService;
+  batchCallService: BatchCallService;
 
   constructor({ batchCallService }) {
     this.batchCallService = batchCallService;

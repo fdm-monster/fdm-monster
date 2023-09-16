@@ -1,10 +1,10 @@
-const { createController } = require("awilix-express");
-const { AppConstants } = require("../server.constants");
-const { authenticate, authorizeRoles } = require("../middleware/authenticate");
-const { ROLES } = require("../constants/authorization.constants");
-const { validateInput } = require("../handlers/validators");
-const { idRules } = require("./validation/generic.validation");
-const { InternalServerException } = require("../exceptions/runtime.exceptions");
+import { createController } from "awilix-express";
+import { AppConstants } from "@/server.constants";
+import { authenticate, authorizeRoles } from "@/middleware/authenticate";
+import { ROLES } from "@/constants/authorization.constants";
+import { validateInput } from "@/handlers/validators";
+import { idRules } from "./validation/generic.validation";
+import { InternalServerException } from "@/exceptions/runtime.exceptions";
 
 export class UserController {
   /**

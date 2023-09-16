@@ -13,11 +13,11 @@ export class AuthenticationError extends Error {
 }
 
 export class AuthorizationError extends Error {
-  permissions = [];
-  roles = [];
-  reason: string;
+  permissions?: string[] = [];
+  roles?: string[] = [];
+  reason?: string;
 
-  constructor({ permissions, roles, reason }) {
+  constructor({ permissions, roles, reason }: { permissions?: string[]; roles?: string[]; reason?: string }) {
     super("Authorization failed");
     this.name = AuthorizationError.name;
     this.reason = reason;
@@ -34,7 +34,7 @@ export class BadRequestException extends Error {
 }
 
 export class NotFoundException extends Error {
-  path: string;
+  path?: string;
 
   constructor(message: string, path?: string) {
     super(message);

@@ -1,27 +1,15 @@
-const { errorSummary } = require("../utils/error.utils");
-const { API_STATE } = require("../services/octoprint/octoprint-sockio.adapter");
+import { errorSummary } from "@/utils/error.utils";
+import { API_STATE } from "@/services/octoprint/octoprint-sockio.adapter";
+import { SettingsStore } from "@/state/settings.store";
+import { PrinterSocketStore } from "@/state/printer-socket.store";
+import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
+import { LoggerService } from "@/handlers/logger";
 
 export class PrinterWebsocketRestoreTask {
-  /**
-   * @type {SettingsStore}
-   */
-  settingsStore;
-  /**
-   * @type {PrinterSocketStore}
-   */
-  printerSocketStore;
-  /**
-   * @type {OctoPrintApiService}
-   */
-  octoPrintApiService;
-  /**
-   * @type {TaskManagerService}
-   */
-  taskManagerService;
-  /**
-   * @type {LoggerService}
-   */
-  logger;
+  settingsStore: SettingsStore;
+  printerSocketStore: PrinterSocketStore;
+  octoPrintApiService: OctoPrintApiService;
+  logger: LoggerService;
 
   constructor({ printerSocketStore, octoPrintApiService, settingsStore, loggerFactory }) {
     this.printerSocketStore = printerSocketStore;

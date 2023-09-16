@@ -1,23 +1,17 @@
-const { createController } = require("awilix-express");
-const { AppConstants } = require("../server.constants");
-const { validateMiddleware } = require("../handlers/validators");
-const { wizardSettingsRules } = require("./validation/setting.validation");
-const { AuthorizationError, BadRequestException } = require("../exceptions/runtime.exceptions");
-const { ROLES } = require("../constants/authorization.constants");
+import { createController } from "awilix-express";
+import { AppConstants } from "@/server.constants";
+import { validateMiddleware } from "@/handlers/validators";
+import { wizardSettingsRules } from "./validation/setting.validation";
+import { AuthorizationError, BadRequestException } from "@/exceptions/runtime.exceptions";
+import { ROLES } from "@/constants/authorization.constants";
+import { UserService } from "@/services/authentication/user.service";
+import { RoleService } from "@/services/authentication/role.service";
+import { SettingsStore } from "@/state/settings.store";
 
 export class FirstTimeSetupController {
-  /**
-   * @type {UserService}
-   */
-  userService;
-  /**
-   * @type {RoleService}
-   */
-  roleService;
-  /**
-   * @type {SettingsStore}
-   */
-  settingsStore;
+  userService: UserService;
+  roleService: RoleService;
+  settingsStore: SettingsStore;
 
   constructor({ settingsStore, roleService, userService }) {
     this.settingsStore = settingsStore;
@@ -29,7 +23,7 @@ export class FirstTimeSetupController {
     const { loginRequired, registration, rootUsername, rootPassword } = await validateMiddleware(req, wizardSettingsRules);
 
     if (this.settingsStore.isWizardCompleted()) {
-      throw new AuthorizationError("Wizard already completed");
+      throw new AuthorizationError({ reason: "Wizard already completed" });
     }
 
     const role = await this.roleService.getSynchronizedRoleByName(ROLES.ADMIN);

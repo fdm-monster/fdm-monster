@@ -1,9 +1,9 @@
-const { createController } = require("awilix-express");
-const { authenticate, authorizeRoles } = require("../middleware/authenticate");
-const { AppConstants } = require("../server.constants");
-const { ROLES } = require("../constants/authorization.constants");
-const { validateInput } = require("../handlers/validators");
-const { whitelistSettingRules, sentryDiagnosticsEnabledRules } = require("./validation/setting.validation");
+import { createController } from "awilix-express";
+import { authenticate, authorizeRoles } from "@/middleware/authenticate";
+import { AppConstants } from "@/server.constants";
+import { ROLES } from "@/constants/authorization.constants";
+import { validateInput } from "@/handlers/validators";
+import { whitelistSettingRules, sentryDiagnosticsEnabledRules } from "./validation/setting.validation";
 
 export class SettingsController {
   /**

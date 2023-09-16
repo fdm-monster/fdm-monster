@@ -1,40 +1,25 @@
-const { createController } = require("awilix-express");
-const { AppConstants } = require("../server.constants");
-const { isNodemon, isNode, isPm2 } = require("../utils/env.utils");
-const { authenticate, authorizePermission } = require("../middleware/authenticate");
-const { PERMS, ROLES } = require("../constants/authorization.constants");
-const { isDocker } = require("../utils/is-docker");
-const { serverSettingsKey } = require("../constants/server-settings.constants");
+import { createController } from "awilix-express";
+import { AppConstants } from "@/server.constants";
+import { isNodemon, isNode, isPm2 } from "@/utils/env.utils";
+import { authenticate, authorizePermission } from "@/middleware/authenticate";
+import { PERMS } from "@/constants/authorization.constants";
+import { isDocker } from "@/utils/is-docker";
+import { serverSettingsKey } from "@/constants/server-settings.constants";
+import { RoleService } from "@/services/authentication/role.service";
+import { SettingsStore } from "@/state/settings.store";
+import { PrinterSocketStore } from "@/state/printer-socket.store";
+import { ServerReleaseService } from "@/services/server-release.service";
+import { MonsterPiService } from "@/services/monsterpi.service";
+import { UserService } from "@/services/authentication/user.service";
 
 export class ServerPublicController {
-  /**
-   * @type {string}
-   */
-  serverVersion;
-  /**
-   * @type {SettingsStore}
-   */
-  settingsStore;
-  /**
-   * @type {PrinterSocketStore}
-   */
-  printerSocketStore;
-  /**
-   * @type {ServerReleaseService}
-   */
-  serverReleaseService;
-  /**
-   * @type {MonsterPiService}
-   */
-  monsterPiService;
-  /**
-   * @type {UserService}
-   */
-  userService;
-  /**
-   * @type {RoleService}
-   */
-  roleService;
+  serverVersion: string;
+  settingsStore: SettingsStore;
+  printerSocketStore: PrinterSocketStore;
+  serverReleaseService: ServerReleaseService;
+  monsterPiService: MonsterPiService;
+  userService: UserService;
+  roleService: RoleService;
 
   constructor({
     settingsStore,
@@ -130,7 +115,6 @@ export class ServerPublicController {
       update: {
         synced: updateState.synced,
         updateAvailable: updateState.updateAvailable,
-        includingPrerelease: updateState.includingPrerelease,
         airGapped: updateState.airGapped,
       },
     });

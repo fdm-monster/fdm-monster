@@ -1,20 +1,15 @@
-const { authenticate, withPermission } = require("../middleware/authenticate");
-const { createController } = require("awilix-express");
-const { AppConstants } = require("../server.constants");
-const { validateInput } = require("../handlers/validators");
-const { idRules } = require("./validation/generic.validation");
-const { PERMS } = require("../constants/authorization.constants");
+import { createController } from "awilix-express";
+import { authenticate, withPermission } from "@/middleware/authenticate";
+import { AppConstants } from "@/server.constants";
+import { validateInput } from "@/handlers/validators";
+import { idRules } from "./validation/generic.validation";
+import { PERMS } from "@/constants/authorization.constants";
 
 export class FloorController {
-  #printerService;
-  floorStore;
+  private floorStore;
 
-  #logger;
-
-  constructor({ printerService, floorStore, loggerFactory }) {
-    this.#printerService = printerService;
+  constructor({ floorStore }) {
     this.floorStore = floorStore;
-    this.#logger = loggerFactory("Server-API");
   }
 
   async create(req, res) {
@@ -73,7 +68,6 @@ export class FloorController {
   }
 }
 
-// prettier-ignore
 export default createController(FloorController)
   .prefix(AppConstants.apiRoute + "/floor")
   .before([authenticate()])

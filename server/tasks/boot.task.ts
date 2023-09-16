@@ -1,56 +1,41 @@
-import mongoose, { connect } from "mongoose";
-import { fetchMongoDBConnectionString, runMigrations } from "../server.env";
-import { DITokens } from "../container.tokens";
-import { AppConstants } from "../server.constants";
-const MongooseError = require("mongoose/lib/error/mongooseError");
+import mongoose, { connect, MongooseError } from "mongoose";
+import { fetchMongoDBConnectionString, runMigrations } from "@/server.env";
+import { DITokens } from "@/container.tokens";
+import { AppConstants } from "@/server.constants";
+import { LoggerService } from "@/handlers/logger";
+import { TaskManagerService } from "@/services/task-manager.service";
+import { ServerTasks } from "@/tasks";
+import { MulterService } from "@/services/multer.service";
+import { SettingsService } from "@/services/settings.service";
+import { SettingsStore } from "@/state/settings.store";
+import { FloorStore } from "@/state/floor.store";
+import { PluginFirmwareUpdateService } from "@/services/octoprint/plugin-firmware-update.service";
+import { ConfigService } from "@/services/config.service";
+import { PrinterSocketStore } from "@/state/printer-socket.store";
+import { FilesStore } from "@/state/files.store";
+import { PermissionService } from "@/services/authentication/permission.service";
+import { RoleService } from "@/services/authentication/role.service";
+import { UserService } from "@/services/authentication/user.service";
+import { PluginRepositoryCache } from "@/services/octoprint/plugin-repository.cache";
+import { ClientBundleService } from "@/services/client-bundle.service";
 
 export class BootTask {
-  logger;
-  taskManagerService;
-  serverTasks;
-  /**
-   * @type {SettingsStore}
-   */
-  settingsStore;
-  /**
-   * @type {SettingsService}
-   */
-  settingsService;
-  multerService;
-  /**
-   * @type {PrinterSocketStore}
-   */
-  printerSocketStore;
-  /**
-   * @type {FilesStore}
-   */
-  filesStore;
-  /**
-   * @type {PermissionService}
-   */
-  permissionService;
-  /**
-   * @type {RoleService}
-   */
-  roleService;
-  /**
-   * @type {UserService}
-   */
-  userService;
-  /**
-   * @type {PluginRepositoryCache}
-   */
-  pluginRepositoryCache;
-  floorStore;
-  pluginFirmwareUpdateService;
-  /**
-   * @type {ClientBundleService}
-   */
-  clientBundleService;
-  /**
-   * @type {ConfigService}
-   */
-  configService;
+  logger: LoggerService;
+  taskManagerService: TaskManagerService;
+  serverTasks: ServerTasks;
+  settingsStore: SettingsStore;
+  settingsService: SettingsService;
+  multerService: MulterService;
+  printerSocketStore: PrinterSocketStore;
+  filesStore: FilesStore;
+  permissionService: PermissionService;
+  roleService: RoleService;
+  userService: UserService;
+  pluginRepositoryCache: PluginRepositoryCache;
+  floorStore: FloorStore;
+  pluginFirmwareUpdateService: PluginFirmwareUpdateService;
+  clientBundleService: ClientBundleService;
+  configService: ConfigService;
 
   constructor({
     loggerFactory,

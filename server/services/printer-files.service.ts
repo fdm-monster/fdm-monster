@@ -1,20 +1,18 @@
-const { NotFoundException } = require("../exceptions/runtime.exceptions");
-const { findFileIndex } = require("../utils/find-predicate.utils");
+import { NotFoundException } from "@/exceptions/runtime.exceptions";
+import { findFileIndex } from "@/utils/find-predicate.utils";
+import { LoggerService } from "@/handlers/logger";
+import { PrinterService } from "@/services/printer.service";
 
 /**
  * An extension repository for managing printer files in database
  */
 export class PrinterFilesService {
-  /**
-   * @type {PrinterService}
-   */
-  printerService;
-
-  #logger;
+  printerService: PrinterService;
+  private logger: LoggerService;
 
   constructor({ printerService, loggerFactory }) {
     this.printerService = printerService;
-    this.#logger = loggerFactory("PrinterFilesService");
+    this.logger = loggerFactory(PrinterFilesService.name);
   }
 
   async getPrinterFilesStorage(printerId) {
@@ -56,7 +54,7 @@ export class PrinterFilesService {
     try {
       lastPrintedFile = await this.setPrinterLastPrintedFile(printerId, addedFile.name);
     } catch (e) {
-      this.#logger.warn(`Parsing printer file did not succeed. Filename: ${addedFile}`);
+      this.logger.warn(`Parsing printer file did not succeed. Filename: ${addedFile}`);
     }
 
     return { fileList: printer.fileList, lastPrintedFile };
@@ -69,7 +67,7 @@ export class PrinterFilesService {
       editTimestamp: Date.now(),
     };
     const printer = await this.printerService.updateLastPrintedFile(printerId, lastPrintedFile);
-    this.#logger.log("Parsed and updated printer file", printer.lastPrintedFile);
+    this.logger.log("Parsed and updated printer file", printer.lastPrintedFile);
     return printer.lastPrintedFile;
   }
 
@@ -99,7 +97,7 @@ export class PrinterFilesService {
           filePath
         );
       } else {
-        this.#logger.warn("File was not found in printer fileList");
+        this.logger.warn("File was not found in printer fileList");
       }
     }
 

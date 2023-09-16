@@ -1,28 +1,20 @@
-const { createController } = require("awilix-express");
-const { InternalServerException, BadRequestException } = require("../exceptions/runtime.exceptions");
-const { AppConstants } = require("../server.constants");
-const { validateMiddleware } = require("../handlers/validators");
-const { registerUserRules } = require("./validation/user-controller.validation");
-const { logoutRefreshTokenRules } = require("./validation/auth-controller.validation");
-const { authenticate } = require("../middleware/authenticate");
+import { createController } from "awilix-express";
+import { BadRequestException } from "@/exceptions/runtime.exceptions";
+import { AppConstants } from "@/server.constants";
+import { validateMiddleware } from "@/handlers/validators";
+import { registerUserRules } from "./validation/user-controller.validation";
+import { logoutRefreshTokenRules } from "./validation/auth-controller.validation";
+import { authenticate } from "@/middleware/authenticate";
+import { RoleService } from "@/services/authentication/role.service";
+import { AuthService } from "@/services/authentication/auth.service";
+import { SettingsStore } from "@/state/settings.store";
+import { UserService } from "@/services/authentication/user.service";
 
 export class AuthController {
-  /**
-   * @type {AuthService}
-   */
-  authService;
-  /**
-   * @type {SettingsStore}
-   */
-  settingsStore;
-  /**
-   * @type {UserService}
-   */
-  userService;
-  /**
-   * @type {RoleService}
-   */
-  roleService;
+  authService: AuthService;
+  settingsStore: SettingsStore;
+  userService: UserService;
+  roleService: RoleService;
 
   logger;
 

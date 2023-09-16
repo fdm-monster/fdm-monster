@@ -1,60 +1,43 @@
-const fs = require("fs");
-const { authenticate, withPermission } = require("../middleware/authenticate");
-const { createController } = require("awilix-express");
-const { validateInput, getScopedPrinter, validateMiddleware } = require("../handlers/validators");
-const { AppConstants } = require("../server.constants");
-const {
-  getFilesRules,
-  getFileRules,
-  uploadFileRules,
+import fs from "fs";
+import { createController } from "awilix-express";
+import { authenticate, authorizeRoles, withPermission } from "@/middleware/authenticate";
+import { getScopedPrinter, validateInput, validateMiddleware } from "@/handlers/validators";
+import { AppConstants } from "@/server.constants";
+import {
+  createFolderRules,
   fileUploadCommandsRules,
-  selectAndPrintFileRules,
+  getFileRules,
+  getFilesRules,
   localFileUploadRules,
   moveFileOrFolderRules,
-  createFolderRules,
-  batchPrinterRules,
-} = require("./validation/printer-files-controller.validation");
-const { ValidationException, NotFoundException } = require("../exceptions/runtime.exceptions");
-const { printerResolveMiddleware } = require("../middleware/printer");
-const { ROLES, PERMS } = require("../constants/authorization.constants");
-const { authorizeRoles } = require("../middleware/authenticate");
+  selectAndPrintFileRules,
+  uploadFileRules,
+} from "./validation/printer-files-controller.validation";
+import { batchPrinterRules } from "@/controllers/validation/batch-controller.validation";
+import { NotFoundException, ValidationException } from "@/exceptions/runtime.exceptions";
+import { printerResolveMiddleware } from "@/middleware/printer";
+import { PERMS, ROLES } from "@/constants/authorization.constants";
+import { FilesStore } from "@/state/files.store";
+import { SettingsStore } from "@/state/settings.store";
+import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
+import { BatchCallService } from "@/services/batch-call.service";
+import { MulterService } from "@/services/multer.service";
+import { PrinterFileCleanTask } from "@/tasks/printer-file-clean.task";
+import { LoggerService } from "@/handlers/logger";
 
 export class PrinterFilesController {
-  /**
-   * @type {FilesStore}
-   */
-  filesStore;
-  /**
-   * @type {SettingsStore}
-   */
-  settingsStore;
-  /**
-   * @type {OctoPrintApiService}
-   */
-  octoPrintApiService;
-  /**
-   * @type {BatchCallService}
-   */
-  batchCallService;
-  /**
-   * @type {MulterService}
-   */
-  multerService;
-  /**
-   * @type {PrinterFileCleanTask}
-   */
-  printerFileCleanTask;
-
-  /**
-   * @type {LoggerService}
-   */
-  logger;
+  filesStore: FilesStore;
+  settingsStore: SettingsStore;
+  octoPrintApiService: OctoPrintApiService;
+  batchCallService: BatchCallService;
+  multerService: MulterService;
+  printerFileCleanTask: PrinterFileCleanTask;
+  logger: LoggerService;
 
   constructor({
     filesStore,
     octoPrintApiService,
     batchCallService,
-    printerSocketStore,
     printerFileCleanTask,
     settingsStore,
     loggerFactory,
@@ -65,14 +48,8 @@ export class PrinterFilesController {
     this.printerFileCleanTask = printerFileCleanTask;
     this.octoPrintApiService = octoPrintApiService;
     this.batchCallService = batchCallService;
-    this.printerSocketStore = printerSocketStore;
     this.multerService = multerService;
-    this.logger = loggerFactory("Server-API");
-  }
-
-  #statusResponse(res, response) {
-    res.statusCode = response.status;
-    res.send(response.data);
+    this.logger = loggerFactory(PrinterFilesController.name);
   }
 
   getTrackedUploads(req, res) {
@@ -274,6 +251,11 @@ export class PrinterFilesController {
     }
 
     res.send(response);
+  }
+
+  #statusResponse(res, response) {
+    res.statusCode = response.status;
+    res.send(response.data);
   }
 }
 

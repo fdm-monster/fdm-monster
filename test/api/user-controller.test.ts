@@ -1,18 +1,19 @@
-import dbHandler = require("../db-handler");
+import { connect } from "../db-handler";
 import { AppConstants } from "@/server.constants";
 import { setupTestApp } from "../test-server";
 import { expectInternalServerError, expectNotFoundResponse, expectOkResponse } from "../extensions";
 import { ensureTestUserCreated } from "./test-data/create-user";
 import { ROLES } from "@/constants/authorization.constants";
+import supertest from "supertest";
 
 const defaultRoute = `${AppConstants.apiRoute}/user`;
-const getRoute = (id) => `${defaultRoute}/${id}`;
-const deleteRoute = (id) => `${defaultRoute}/${id}`;
+const getRoute = (id: string) => `${defaultRoute}/${id}`;
+const deleteRoute = (id: string) => `${defaultRoute}/${id}`;
 
-let request;
+let request: supertest.SuperTest<supertest.Test>;
 
 beforeAll(async () => {
-  await dbHandler.connect();
+  await connect();
   ({ request } = await setupTestApp(true));
 });
 

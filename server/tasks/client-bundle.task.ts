@@ -1,18 +1,12 @@
 import { AppConstants } from "@/server.constants";
+import { ClientBundleService } from "@/services/client-bundle.service";
+import { GithubService } from "@/services/github.service";
+import { LoggerService } from "@/handlers/logger";
 
 export class ClientDistDownloadTask {
-  /**
-   * @type {ClientBundleService}
-   */
-  clientBundleService;
-  /**
-   * @type {GithubService}
-   */
-  githubService;
-  /**
-   * @type {LoggerService}
-   */
-  logger;
+  clientBundleService: ClientBundleService;
+  githubService: GithubService;
+  logger: LoggerService;
 
   constructor({ clientBundleService, loggerFactory, githubService }) {
     this.githubService = githubService;
