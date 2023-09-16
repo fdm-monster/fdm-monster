@@ -5,7 +5,7 @@ const { expectOkResponse, expectInternalServerError, expectNotFoundResponse, exp
 const { createTestPrinter } = require("./test-data/create-printer");
 const { createTestFloor, floorRoute } = require("./test-data/create-printer-floor");
 const { Floor } = require("../../models/Floor");
-const DITokens = require("../../container.tokens");
+const { DITokens } = require("../../container.tokens");
 
 let Model = Floor;
 const listRoute = `${AppConstants.apiRoute}/floor`;

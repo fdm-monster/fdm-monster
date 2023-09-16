@@ -1,6 +1,6 @@
 const dbHandler = require("../db-handler");
 const { configureContainer } = require("../../container");
-const DITokens = require("../../container.tokens");
+const { DITokens } = require("../../container.tokens");
 const UserModel = require("../../models/Auth/User");
 const { ensureTestUserCreated } = require("../api/test-data/create-user");
 const { ROLES } = require("../../constants/authorization.constants");

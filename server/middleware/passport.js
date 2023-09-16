@@ -1,7 +1,7 @@
 const { Strategy: JwtStrategy, ExtractJwt } = require("passport-jwt");
 const { Strategy: AnonymousStrategy } = require("passport-anonymous");
 const User = require("../models/Auth/User.js");
-const DITokens = require("../container.tokens");
+const { DITokens } = require("../container.tokens");
 const { AppConstants } = require("../server.constants");
 
 /**

@@ -1,5 +1,5 @@
 const { TaskPresets } = require("./task.presets");
-const DITokens = require("./container.tokens");
+const { DITokens } = require("./container.tokens");
 
 /**
  * Register a task with a preset and timing (run immediate does not retry in case of failure)
@@ -9,7 +9,7 @@ const DITokens = require("./container.tokens");
  * @param runImmediately
  * @returns {{task, id, preset}}
  */
-function registerTask(task, preset, milliseconds = 0, runImmediately = false) {
+export function registerTask(task, preset, milliseconds = 0, runImmediately = false) {
   let timingPreset = { ...preset };
   timingPreset.milliseconds = preset.milliseconds || milliseconds;
   timingPreset.runImmediately = runImmediately | false;
@@ -20,7 +20,7 @@ function registerTask(task, preset, milliseconds = 0, runImmediately = false) {
   };
 }
 
-class ServerTasks {
+export class ServerTasks {
   static SERVER_BOOT_TASK = registerTask(DITokens.bootTask, TaskPresets.PERIODIC_DISABLED, 5000, false);
   static BOOT_TASKS = [
     registerTask(DITokens.softwareUpdateTask, TaskPresets.RUNDELAYED, 1500),
@@ -34,7 +34,3 @@ class ServerTasks {
     registerTask(DITokens.printerWebsocketRestoreTask, TaskPresets.PERIODIC, 15 * 1000, false),
   ];
 }
-
-module.exports = {
-  ServerTasks,
-};

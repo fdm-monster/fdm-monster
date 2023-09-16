@@ -1,4 +1,4 @@
-const DITokens = require("../../container.tokens");
+const { DITokens } = require("../../container.tokens");
 
 class SocketFactory {
   /**

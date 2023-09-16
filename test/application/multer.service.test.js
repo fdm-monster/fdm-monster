@@ -1,7 +1,7 @@
 const fs = require("fs");
 jest.mock("fs");
 const { configureContainer } = require("../../container");
-const DITokens = require("../../container.tokens");
+const { DITokens } = require("../../container.tokens");
 
 let container;
 let multerService;
@@ -21,8 +21,8 @@ describe("MulterService", () => {
     fs.readdirSync.mockReturnValue([
       {
         name: "somefile.gcode",
-        isDirectory: () => false
-      }
+        isDirectory: () => false,
+      },
     ]);
     multerService.clearUploadsFolder();
   });

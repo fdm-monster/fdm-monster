@@ -2,7 +2,7 @@ const dbHandler = require("../db-handler");
 const { AppConstants } = require("../../server.constants");
 const { setupTestApp } = require("../test-server");
 const { expectOkResponse, expectUnauthorizedResponse } = require("../extensions");
-const DITokens = require("../../container.tokens");
+const { DITokens } = require("../../container.tokens");
 const { loginTestUser } = require("./auth/login-test-user");
 const githubReleasesResponse = require("./test-data/github-releases.data.json");
 

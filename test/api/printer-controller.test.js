@@ -5,7 +5,7 @@ const { expectInvalidResponse, expectOkResponse, expectNotFoundResponse } = requ
 const { Printer } = require("../../models/Printer");
 const { testApiKey, createTestPrinter } = require("./test-data/create-printer");
 const { TaskPresets } = require("../../task.presets");
-const DITokens = require("../../container.tokens");
+const { DITokens } = require("../../container.tokens");
 
 let Model = Printer;
 const defaultRoute = AppConstants.apiRoute + "/printer";

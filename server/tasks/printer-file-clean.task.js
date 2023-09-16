@@ -1,4 +1,4 @@
-const DITokens = require("../container.tokens");
+const { DITokens } = require("../container.tokens");
 
 /**
  * Task which regularly cleans all printer files based on a configured predicate
@@ -27,14 +27,7 @@ class PrinterFileCleanTask {
    */
   octoPrintApiService;
 
-  constructor({
-    printerCache,
-    filesStore,
-    octoPrintApiService,
-    taskManagerService,
-    settingsStore,
-    loggerFactory
-  }) {
+  constructor({ printerCache, filesStore, octoPrintApiService, taskManagerService, settingsStore, loggerFactory }) {
     this.printerCache = printerCache;
     this.filesStore = filesStore;
     this.taskManagerService = taskManagerService;
@@ -59,9 +52,7 @@ class PrinterFileCleanTask {
 
     try {
       if (autoCleanAtBootEnabled) {
-        this.logger.log(
-          `Cleaning files of ${printers.length} active printers [printerFileClean:autoRemoveOldFilesAtBoot].`
-        );
+        this.logger.log(`Cleaning files of ${printers.length} active printers [printerFileClean:autoRemoveOldFilesAtBoot].`);
       } else {
         this.logger.log(`Reporting about old files of ${printers.length} printers.`);
       }

@@ -4,7 +4,7 @@ const { setupTestApp } = require("../test-server");
 const { expectOkResponse } = require("../extensions");
 const PrintCompletion = require("../../models/PrintCompletion");
 const { EVENT_TYPES } = require("../../services/octoprint/constants/octoprint-websocket.constants");
-const DITokens = require("../../container.tokens");
+const { DITokens } = require("../../container.tokens");
 
 let Model = PrintCompletion;
 let printCompletionService;

@@ -1,4 +1,4 @@
-const DITokens = {
+export const DITokens = {
   // Values
   serverVersion: "serverVersion",
   appDefaultRole: "appDefaultRole",
@@ -70,5 +70,3 @@ const DITokens = {
   printerWebsocketRestoreTask: "printerWebsocketRestoreTask",
   printerFileCleanTask: "printerFileCleanTask",
 };
-
-module.exports = DITokens;

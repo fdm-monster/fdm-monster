@@ -1,7 +1,7 @@
 import { captureException, flush } from "@sentry/node";
-const { setupEnvConfig } = require("./server.env");
-const { setupServer } = require("./server.core");
-const DITokens = require("./container.tokens");
+import { setupEnvConfig } from "./server.env";
+import { setupServer } from "./server.core";
+import { DITokens } from "./container.tokens";
 
 setupEnvConfig();
 
@@ -9,7 +9,7 @@ setupServer().then(({ httpServer, container }) => {
   container
     .resolve(DITokens.serverHost)
     .boot(httpServer)
-    .catch(async (e) => {
+    .catch(async (e: any | Error) => {
       console.error("Server has crashed unintentionally - please report this", e);
 
       captureException(e);

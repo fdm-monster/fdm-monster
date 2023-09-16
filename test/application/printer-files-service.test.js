@@ -1,7 +1,7 @@
 const dbHandler = require("../db-handler");
 const { configureContainer } = require("../../container");
 const { Printer } = require("../../models/Printer");
-const DITokens = require("../../container.tokens");
+const { DITokens } = require("../../container.tokens");
 const { testPrinterData } = require("./test-data/printer.data");
 
 let container;

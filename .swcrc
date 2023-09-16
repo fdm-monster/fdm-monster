@@ -8,6 +8,9 @@
     },
     "target": "es2020",
     "baseUrl": "./server",
+    "paths": {
+      "@/*": ["./*"]
+    },
   },
   "module": {
     "type": "commonjs",

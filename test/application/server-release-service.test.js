@@ -1,6 +1,6 @@
 const { AppConstants } = require("../../server.constants");
 const { configureContainer } = require("../../container");
-const DITokens = require("../../container.tokens");
+const { DITokens } = require("../../container.tokens");
 const dbHandler = require("../db-handler");
 const awilix = require("awilix");
 const AxiosMock = require("../mocks/axios.mock");

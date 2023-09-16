@@ -1,6 +1,6 @@
 const dbHandler = require("../../db-handler");
 const { setupTestApp } = require("../../test-server");
-const DITokens = require("../../../container.tokens");
+const { DITokens } = require("../../../container.tokens");
 
 let container;
 let taskManager;

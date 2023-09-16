@@ -1,7 +1,7 @@
 jest.mock("child_process", () => {
   return {
     exec: () => Promise.resolve(),
-    execSync: () => Promise.resolve()
+    execSync: () => Promise.resolve(),
   };
 });
 jest.mock("simple-git");
@@ -9,7 +9,7 @@ const SimpleGit = require("simple-git");
 const mockedSimpleGit = SimpleGit();
 
 const { configureContainer } = require("../../container");
-const DITokens = require("../../container.tokens");
+const { DITokens } = require("../../container.tokens");
 
 describe("ServerUpdateService", () => {
   let container;
@@ -24,60 +24,60 @@ describe("ServerUpdateService", () => {
     const scenarioModifiedOutput = {
       modified: ["package-lock.json", "package.json", "server/lib/serverCommands.js"],
       ahead: 0,
-      behind: 0
+      behind: 0,
     };
 
     const scenarioModifiedBehindOutput = {
       modified: ["package-lock.json", "package.json", "server/lib/serverCommands.js"],
       ahead: 0,
-      behind: 1
+      behind: 1,
     };
 
     const scenarioModifiedAheadOutput = {
       modified: ["package-lock.json", "package.json", "server/lib/serverCommands.js"],
       ahead: 1,
-      behind: 0
+      behind: 0,
     };
 
     const scenarioAheadOutput = {
       modified: [],
       ahead: 1,
-      behind: 0
+      behind: 0,
     };
 
     const scenarioBehindOutput = {
       modified: [],
       ahead: 0,
-      behind: 1
+      behind: 1,
     };
 
     const scenarioUpToDate = {
       modified: [],
       ahead: 0,
-      behind: 0
+      behind: 0,
     };
 
     const scenarioOutcomes = [
       {
         name: "modified files",
-        scenario: scenarioModifiedOutput
+        scenario: scenarioModifiedOutput,
       },
       {
         name: "modified files behind",
-        scenario: scenarioModifiedBehindOutput
+        scenario: scenarioModifiedBehindOutput,
       },
       {
         name: "ahead",
-        scenario: scenarioAheadOutput
+        scenario: scenarioAheadOutput,
       },
       {
         name: "modified files ahead",
-        scenario: scenarioModifiedAheadOutput
+        scenario: scenarioModifiedAheadOutput,
       },
       {
         name: "behind",
-        scenario: scenarioBehindOutput
-      }
+        scenario: scenarioBehindOutput,
+      },
     ];
 
     beforeEach(() => {
@@ -121,9 +121,7 @@ describe("ServerUpdateService", () => {
   describe("Reboot command", () => {
     it("should not reboot FDM in unknown mode", async () => {
       await serverUpdateService.restartServer().catch((e) => {
-        expect(e.message).toBe(
-          "Restart requested, but no daemon was available to perform this action"
-        );
+        expect(e.message).toBe("Restart requested, but no daemon was available to perform this action");
       });
     });
 

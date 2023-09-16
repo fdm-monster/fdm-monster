@@ -1,7 +1,7 @@
 const testPath = "../../";
 const dbHandler = require(testPath + "db-handler");
 const { configureContainer } = require("../../../container");
-const DITokens = require("../../../container.tokens");
+const { DITokens } = require("../../../container.tokens");
 const AxiosMock = require("../../mocks/axios.mock");
 const awilix = require("awilix");
 const pmPluginsResponse = require("../test-data/plugin-manager-plugins.response.json");
@@ -36,7 +36,7 @@ beforeAll(async () => {
   pluginCache = container.resolve(DITokens.pluginRepositoryCache);
 
   createdPrinter = await printerService.create(validNewPrinterState);
-  loginDto = await printerCache.getLoginDtoAsync(createdPrinter.id)
+  loginDto = await printerCache.getLoginDtoAsync(createdPrinter.id);
   httpClient.saveMockResponse(pluginJson, 200, false);
   await pluginCache.queryCache();
 });

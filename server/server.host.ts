@@ -1,19 +1,22 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const history = require("connect-history-api-fallback");
-const { loadControllers } = require("awilix-express");
+import LoggerService from "./handlers/logger";
+
+import express from "express";
+import mongoose from "mongoose";
+import history from "connect-history-api-fallback";
+import { loadControllers } from "awilix-express";
+import { join } from "path";
+
 const exceptionHandler = require("./middleware/exception.handler");
 const { fetchServerPort } = require("./server.env");
-const { join } = require("path");
 const { NotFoundException } = require("./exceptions/runtime.exceptions");
 const { AppConstants } = require("./server.constants");
 const { superRootPath, rootPath } = require("./utils/fs.utils");
 
-class ServerHost {
+export class ServerHost {
   /**
    * @type {LoggerService}
    */
-  logger;
+  private logger: LoggerService;
   /**
    * @type {BootTask}
    */
@@ -37,7 +40,7 @@ class ServerHost {
 
   async boot(app, quick_boot = false, listenRequests = true) {
     // Enforce models to be strictly applied, any unknown property will not be persisted
-    mongoose.set('strictQuery', true);
+    mongoose.set("strictQuery", true);
 
     this.appInstance = app;
     this.serveControllerRoutes(this.appInstance);
@@ -108,5 +111,3 @@ class ServerHost {
     this.socketIoGateway.attachServer(server);
   }
 }
-
-module.exports = ServerHost;

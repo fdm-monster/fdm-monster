@@ -1,6 +1,6 @@
 const dbHandler = require("../../db-handler");
 const { configureContainer } = require("../../../container");
-const DITokens = require("../../../container.tokens");
+const { DITokens } = require("../../../container.tokens");
 const { Floor } = require("../../../models/Floor");
 
 let container;

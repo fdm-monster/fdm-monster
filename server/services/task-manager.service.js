@@ -1,7 +1,7 @@
 const { AwilixResolutionError } = require("awilix");
 const { JobValidationException } = require("../exceptions/job.exceptions");
 const { SimpleIntervalJob, AsyncTask } = require("toad-scheduler");
-const DITokens = require("../container.tokens");
+const { DITokens } = require("../container.tokens");
 
 /**
  * Manage immediate or delayed tasks and recurring jobs.
@@ -22,16 +22,11 @@ class TaskManagerService {
 
   validateInput(taskId, workload, schedulerOptions) {
     if (!taskId) {
-      throw new JobValidationException(
-        "Task ID was not provided. Cant register task or schedule job."
-      );
+      throw new JobValidationException("Task ID was not provided. Cant register task or schedule job.");
     }
     const prefix = `Job '${workload?.name || "anonymous"}' with ID '${taskId}'`;
     if (!!this.taskStates[taskId]) {
-      throw new JobValidationException(
-        `${prefix} was already registered. Cant register a key twice.`,
-        taskId
-      );
+      throw new JobValidationException(`${prefix} was already registered. Cant register a key twice.`, taskId);
     }
 
     if (typeof workload !== "function") {
@@ -54,47 +49,26 @@ class TaskManagerService {
           );
         } else {
           throw new JobValidationException(
-            `${prefix} is not a registered awilix dependency. It can't be scheduled. Error:\n` +
-              e.stack,
+            `${prefix} is not a registered awilix dependency. It can't be scheduled. Error:\n` + e.stack,
             taskId
           );
         }
       }
 
       if (typeof resolvedService?.run !== "function") {
-        throw new JobValidationException(
-          `${prefix} was resolved but it doesn't have a 'run(..)' method to call.`,
-          taskId
-        );
+        throw new JobValidationException(`${prefix} was resolved but it doesn't have a 'run(..)' method to call.`, taskId);
       }
     }
 
-    if (
-      !schedulerOptions?.periodic &&
-      !schedulerOptions?.runOnce &&
-      !schedulerOptions?.runDelayed
-    ) {
-      throw new JobValidationException(
-        `Provide 'periodic' or 'runOnce' or 'runDelayed' option'.`,
-        taskId
-      );
+    if (!schedulerOptions?.periodic && !schedulerOptions?.runOnce && !schedulerOptions?.runDelayed) {
+      throw new JobValidationException(`Provide 'periodic' or 'runOnce' or 'runDelayed' option'.`, taskId);
     }
     if (!schedulerOptions?.periodic && !!schedulerOptions.disabled) {
-      throw new JobValidationException(
-        `Only tasks of type 'periodic' can be disabled at boot.`,
-        taskId
-      );
+      throw new JobValidationException(`Only tasks of type 'periodic' can be disabled at boot.`, taskId);
     }
-    if (
-      schedulerOptions?.runDelayed &&
-      !schedulerOptions.milliseconds &&
-      !schedulerOptions.seconds
-    ) {
+    if (schedulerOptions?.runDelayed && !schedulerOptions.milliseconds && !schedulerOptions.seconds) {
       // Require milliseconds, minutes, hours or days
-      throw new JobValidationException(
-        `Provide a delayed timing parameter (milliseconds|seconds)'`,
-        taskId
-      );
+      throw new JobValidationException(`Provide a delayed timing parameter (milliseconds|seconds)'`, taskId);
     }
     if (
       schedulerOptions?.periodic &&
@@ -105,10 +79,7 @@ class TaskManagerService {
       !schedulerOptions.days
     ) {
       // Require milliseconds, minutes, hours or days
-      throw new JobValidationException(
-        `Provide a periodic timing parameter (milliseconds|seconds|minutes|hours|days)'`,
-        taskId
-      );
+      throw new JobValidationException(`Provide a periodic timing parameter (milliseconds|seconds|minutes|hours|days)'`, taskId);
     }
   }
 
@@ -199,14 +170,10 @@ class TaskManagerService {
     const schedulerOptions = taskState?.options;
     const timedTask = taskState.timedTask;
     if (!schedulerOptions?.periodic) {
-      throw new JobValidationException(
-        `The requested task with ID ${taskId} is not periodic and cannot be enabled.`
-      );
+      throw new JobValidationException(`The requested task with ID ${taskId} is not periodic and cannot be enabled.`);
     }
     if (!schedulerOptions.disabled) {
-      this.#logger.log(
-        `Task '${taskId}' was scheduled (runImmediately: ${!!schedulerOptions.runImmediately}).`
-      );
+      this.#logger.log(`Task '${taskId}' was scheduled (runImmediately: ${!!schedulerOptions.runImmediately}).`);
       const job = new SimpleIntervalJob(schedulerOptions, timedTask);
       taskState.job = job;
       this.jobScheduler.addSimpleIntervalJob(job);

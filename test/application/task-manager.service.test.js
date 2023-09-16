@@ -1,6 +1,6 @@
 const dbHandler = require("../db-handler");
 const { configureContainer } = require("../../container");
-const DITokens = require("../../container.tokens");
+const { DITokens } = require("../../container.tokens");
 const { JobValidationException } = require("../../exceptions/job.exceptions");
 
 let container;
@@ -57,7 +57,7 @@ describe("TaskManagerService", () => {
       {
         disabled: true,
         periodic: true,
-        milliseconds: 1000
+        milliseconds: 1000,
       }
     );
 

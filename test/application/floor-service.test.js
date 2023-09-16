@@ -1,6 +1,6 @@
 const { Floor } = require("../../models/Floor");
 const dbHandler = require("../db-handler");
-const DITokens = require("../../container.tokens");
+const { DITokens } = require("../../container.tokens");
 const { configureContainer } = require("../../container");
 const { PrinterMockData } = require("./test-data/printer.data");
 

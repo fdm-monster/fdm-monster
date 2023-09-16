@@ -1,5 +1,5 @@
 const dbHandler = require("../db-handler");
-const DITokens = require("../../container.tokens");
+const { DITokens } = require("../../container.tokens");
 const { configureContainer } = require("../../container");
 const { PrintCompletionService } = require("../../services/print-completion.service");
 const { EVENT_TYPES } = require("../../services/octoprint/constants/octoprint-websocket.constants");

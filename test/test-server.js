@@ -5,7 +5,7 @@ jest.mock("../utils/env.utils", () => ({
 }));
 const supertest = require("supertest");
 const { asClass, asValue } = require("awilix");
-const DITokens = require("../container.tokens");
+const { DITokens } = require("../container.tokens");
 const { setupServer } = require("../server.core");
 const { setupEnvConfig } = require("../server.env");
 const AxiosMock = require("./mocks/axios.mock");

@@ -1,7 +1,7 @@
 const axios = require("axios");
 const { asFunction, asClass, asValue, createContainer, InjectionMode } = require("awilix");
 const { ToadScheduler } = require("toad-scheduler");
-const DITokens = require("./container.tokens");
+const { DITokens } = require("./container.tokens");
 const SimpleGitFactory = require("simple-git");
 const { Octokit } = require("octokit");
 const PrinterService = require("./services/printer.service");
@@ -24,7 +24,7 @@ const SoftwareUpdateTask = require("./tasks/software-update.task");
 const LoggerFactory = require("./handlers/logger-factory");
 const MulterService = require("./services/multer.service");
 const FileUploadTrackerCache = require("./state/file-upload-tracker.cache");
-const ServerHost = require("./server.host");
+const { ServerHost } = require("./server.host");
 const BootTask = require("./tasks/boot.task");
 const UserService = require("./services/authentication/user.service");
 const RoleService = require("./services/authentication/role.service");
@@ -59,7 +59,7 @@ const { CameraStreamService } = require("./services/camera-stream.service");
 const { JwtService } = require("./services/authentication/jwt.service");
 const { AuthService } = require("./services/authentication/auth.service");
 
-function configureContainer() {
+export function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
   const container = createContainer({
     injectionMode: InjectionMode.PROXY,
@@ -150,7 +150,3 @@ function configureContainer() {
 
   return container;
 }
-
-module.exports = {
-  configureContainer,
-};

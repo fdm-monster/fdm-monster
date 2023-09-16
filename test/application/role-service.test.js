@@ -1,6 +1,6 @@
 const dbHandler = require("../db-handler");
 const { configureContainer } = require("../../container");
-const DITokens = require("../../container.tokens");
+const { DITokens } = require("../../container.tokens");
 const RoleModel = require("../../models/Auth/Role");
 const { ROLES } = require("../../constants/authorization.constants");
 

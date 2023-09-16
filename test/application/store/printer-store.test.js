@@ -1,6 +1,6 @@
 jest.mock("../../../services/octoprint/octoprint-api.service");
 const dbHandler = require("../../db-handler");
-const DITokens = require("../../../container.tokens");
+const { DITokens } = require("../../../container.tokens");
 const { configureContainer } = require("../../../container");
 const { ValidationException } = require("../../../exceptions/runtime.exceptions");
 const { validNewPrinterState } = require("../test-data/printer.data");

@@ -1,16 +1,16 @@
-const express = require("express");
-const session = require("express-session");
-const cookieParser = require("cookie-parser");
-const passport = require("passport");
-const { configureContainer } = require("./container");
-const { scopePerRequest } = require("awilix-express");
-const cors = require("cors");
-const helmet = require("helmet");
-const { interceptDatabaseError } = require("./middleware/database");
-const { validateWhitelistedIp, interceptRoles } = require("./middleware/global.middleware");
-const { initializePassportStrategies } = require("./middleware/passport");
+import express from "express";
+import session from "express-session";
+import cookieParser from "cookie-parser";
+import passport from "passport";
+import { scopePerRequest } from "awilix-express";
+import cors from "cors";
+import helmet from "helmet";
+import { configureContainer } from "./container";
+import { interceptDatabaseError } from "./middleware/database";
+import { validateWhitelistedIp, interceptRoles } from "./middleware/global.middleware";
+import { initializePassportStrategies } from "./middleware/passport";
 
-async function setupServer() {
+export async function setupServer() {
   const httpServer = express();
   const container = configureContainer();
   initializePassportStrategies(passport, container);
@@ -50,7 +50,3 @@ async function setupServer() {
     container,
   };
 }
-
-module.exports = {
-  setupServer,
-};

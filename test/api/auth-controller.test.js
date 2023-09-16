@@ -8,7 +8,7 @@ const {
   expectBadRequestError,
 } = require("../extensions");
 const { getUserData, ensureTestUserCreated } = require("./test-data/create-user");
-const DITokens = require("../../container.tokens");
+const { DITokens } = require("../../container.tokens");
 
 let request;
 let container;

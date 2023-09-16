@@ -1,9 +1,8 @@
 const mongoose = require("mongoose");
 
 const { fetchMongoDBConnectionString, runMigrations } = require("../server.env");
-const DITokens = require("../container.tokens");
+const { DITokens } = require("../container.tokens");
 const MongooseError = require("mongoose/lib/error/mongooseError");
-const { ROLES } = require("../constants/authorization.constants");
 const { AppConstants } = require("../server.constants");
 
 class BootTask {

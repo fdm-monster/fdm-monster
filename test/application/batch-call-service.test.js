@@ -1,6 +1,6 @@
 const dbHandler = require("../db-handler");
 const { configureContainer } = require("../../container");
-const DITokens = require("../../container.tokens");
+const { DITokens } = require("../../container.tokens");
 const { validNewPrinterState } = require("./test-data/printer.data");
 const awilix = require("awilix");
 const AxiosMock = require("../mocks/axios.mock");
