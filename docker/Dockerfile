@@ -16,7 +16,6 @@ RUN yarn install --production --frozen-lockfile
 
 COPY .env.template \
     migrate-mongo-config.js \
-    nodemon_restart_trigger.js \
     tsconfig.json \
     README.md \
     LICENSE CODE_OF_CONDUCT.md CONTRIBUTING.md \

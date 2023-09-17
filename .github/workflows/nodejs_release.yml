@@ -82,7 +82,6 @@ jobs:
             package.json \
             yarn.lock \
             migrate-mongo-config.js \
-            nodemon_restart_trigger.js \
             tsconfig.json \ 
             README.md \
             LICENSE \
