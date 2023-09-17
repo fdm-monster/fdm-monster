@@ -16,16 +16,12 @@ require("../server/utils/env.utils");
 
 /**
  * Setup the application without hassle
- * @param loadPrinterStore (default: false) setup printer store with database connection
- * @param mocks allows overriding IoC container
- * @param quick_boot skip tasks
- * @returns {Promise<{container: AwilixContainer<any>, server: Server}>}
  */
 export async function setupTestApp(
   loadPrinterStore = false,
   mocks = undefined,
   quick_boot = true
-): Promise<{ container: AwilixContainer<any>; server: Server }> {
+): Promise<{ container: AwilixContainer; httpServer: Server; request: supertest.SuperTest<supertest.Test> }> {
   setupEnvConfig(true);
 
   const { httpServer, container } = await setupServer();

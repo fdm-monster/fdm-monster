@@ -1,4 +1,5 @@
 import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
+import { AxiosMock } from "./axios.mock";
 
 export class OctoPrintApiMock extends OctoPrintApiService {
   eventEmitter2;
@@ -10,6 +11,6 @@ export class OctoPrintApiMock extends OctoPrintApiService {
   }
 
   storeResponse(storedResponse: any, storedStatusCode: number) {
-    this.axiosClient.saveMockResponse(storedResponse, storedStatusCode);
+    (this.axiosClient as unknown as AxiosMock).saveMockResponse(storedResponse, storedStatusCode);
   }
 }

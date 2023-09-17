@@ -43,7 +43,7 @@ export class AxiosMock {
     });
 
     if (this.willThrow) {
-      throw new AxiosError(this.mockResponse, this.mockStatus);
+      throw new AxiosError(this.mockResponse, this.mockStatus?.toString());
     }
     return result;
   }

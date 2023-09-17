@@ -12,7 +12,7 @@ import EventEmitter2 from "eventemitter2";
 import { LoggerService } from "@/handlers/logger";
 
 export class OctoPrintApiService extends OctoPrintRoutes {
-  axiosClient: AxiosStatic;
+  protected axiosClient: AxiosStatic;
   eventEmitter2: EventEmitter2;
   protected logger: LoggerService;
 
