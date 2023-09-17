@@ -11,8 +11,9 @@
 
 # Runtime and non-production folders
 /coverage
-/docs
 /dist
+/docs
 /fdm-monster
 /installations
 /media
+/server-nest

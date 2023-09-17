@@ -1,5 +1,5 @@
 {
-  "name": "fdm-monster",
+  "name": "@fdm-monster/server",
   "author": "David Zwart",
   "license": "AGPL-3.0-or-later",
   "version": "1.4.5",

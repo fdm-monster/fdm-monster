@@ -98,3 +98,9 @@ jobs:
           asset_path: dist-server-${{ env.SERVER_VERSION }}.zip
           asset_name: dist-server-${{ env.SERVER_VERSION }}.zip
           asset_content_type: application/zip
+
+      # Publish to NPM
+      - uses: JS-DevTools/npm-publish@v2
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
+          package: package.json
