@@ -1,4 +1,6 @@
 {
+  "sourceMaps": true,
+  "inlineSourcesContent": false,
   "jsc": {
     "parser": {
       "syntax": "typescript",
@@ -10,7 +12,7 @@
     "baseUrl": "./server",
     "paths": {
       "@/*": ["./*"]
-    },
+    }
   },
   "module": {
     "type": "commonjs",

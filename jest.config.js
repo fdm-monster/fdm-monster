@@ -20,7 +20,7 @@ module.exports = {
   ],
   globalSetup: "./test/setup-global.ts",
   setupFilesAfterEnv: ["jest-27-expect-message", "./test/setup-after-env.ts"],
-  collectCoverageFrom: ["./server/**/*", "./server/mongo-migrations/"],
-  coveragePathIgnorePatterns: ["installations", "node_modules", "test"],
+  collectCoverageFrom: ["./server/**/*.ts"],
+  coveragePathIgnorePatterns: ["installations", "node_modules", "test", "server/mongo-migrations"],
   coverageReporters: ["clover", "json", "lcov", "text", "@lcov-viewer/istanbul-report"],
 };
