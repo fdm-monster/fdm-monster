@@ -41,3 +41,10 @@ jobs:
       - name: print-tag
         run: |
           echo ${{ env.RELEASE_TAG }}
+
+      # Publish to NPM
+      - uses: JS-DevTools/npm-publish@v2
+        with:
+          dry-run: true
+          token: ${{ secrets.NPM_TOKEN }}
+          package: package.json
