@@ -1,18 +1,12 @@
 import { status, up } from "migrate-mongo";
-import path, { join } from "path";
+import { join } from "path";
 import { execSync } from "child_process";
 import * as Sentry from "@sentry/node";
 import { config } from "dotenv";
 import { AppConstants } from "./server.constants";
 import { LoggerService as Logger } from "./handlers/logger";
 import { isDocker } from "./utils/is-docker";
-import {
-  getEnvOrDefault,
-  isPm2,
-  isProductionEnvironment,
-  verifyPackageJsonRequirements,
-  writeVariableToEnvFile,
-} from "./utils/env.utils";
+import { getEnvOrDefault, isPm2, isProductionEnvironment, verifyPackageJsonRequirements } from "./utils/env.utils";
 import { errorSummary } from "./utils/error.utils";
 import { superRootPath } from "@/utils/fs.utils";
 
@@ -46,8 +40,6 @@ function ensureNodeEnvSet() {
     if (isDocker()) {
       return false;
     }
-
-    writeVariableToEnvFile(path.resolve(dotEnvPath), AppConstants.NODE_ENV_KEY, newEnvName);
   } else {
     logger.log(`✓ NODE_ENV variable correctly set (${environment})!`);
   }
@@ -95,31 +87,20 @@ function printInstructionsURL() {
   logger.log(`Please make sure to read ${instructionsReferralURL} on how to configure your environment correctly.`);
 }
 
-export function fetchMongoDBConnectionString(persistToEnv = false) {
+export function fetchMongoDBConnectionString() {
   if (!process.env[AppConstants.MONGO_KEY]) {
     logger.debug(
       `~ ${AppConstants.MONGO_KEY} environment variable is not set. Assuming default: ${AppConstants.MONGO_KEY}=${AppConstants.defaultMongoStringUnauthenticated}`
     );
     printInstructionsURL();
     process.env[AppConstants.MONGO_KEY] = AppConstants.defaultMongoStringUnauthenticated;
-
-    // is not isDocker just to be sure, also checked in writeVariableToEnvFile
-    if (persistToEnv && !isDocker()) {
-      writeVariableToEnvFile(path.resolve(dotEnvPath), AppConstants.MONGO_KEY, AppConstants.defaultMongoStringUnauthenticated);
-    }
   }
   return process.env[AppConstants.MONGO_KEY];
 }
 
 export function fetchServerPort() {
   let port = process.env[AppConstants.SERVER_PORT_KEY];
-  if (Number.isNaN(parseInt(port))) {
-    // is not isDocker just to be sure, also checked in writeVariableToEnvFile
-    if (!isDocker()) {
-      writeVariableToEnvFile(path.resolve(dotEnvPath), AppConstants.SERVER_PORT_KEY, AppConstants.defaultServerPort);
-      logger.log(`~ Written ${AppConstants.SERVER_PORT_KEY}=${AppConstants.defaultServerPort} setting to .env file.`);
-    }
-
+  if (Number.isNaN(parseInt(port!))) {
     // Update config immediately
     process.env[AppConstants.SERVER_PORT_KEY] = AppConstants.defaultServerPort.toString();
     port = process.env[AppConstants.SERVER_PORT_KEY];
@@ -133,10 +114,7 @@ export function fetchServerPort() {
 export function ensureMongoDBConnectionStringSet() {
   let dbConnectionString = process.env[AppConstants.MONGO_KEY];
   if (!dbConnectionString) {
-    // In docker, we better not write to .env
-    const persistDbString = !isDocker();
-
-    fetchMongoDBConnectionString(persistDbString);
+    fetchMongoDBConnectionString();
   } else {
     logger.log(`✓ ${AppConstants.MONGO_KEY} environment variable set!`);
   }
@@ -196,7 +174,7 @@ export function setupEnvConfig(skipDotEnv = false) {
 /**
  * Checks and runs database migrations
  **/
-export async function runMigrations(db, client: string): Promise<void> {
+export async function runMigrations(db: any, client: any): Promise<void> {
   const migrationsStatus = await status(db);
   const pendingMigrations = migrationsStatus.filter((m) => m.appliedAt === "PENDING");
 
@@ -209,7 +187,7 @@ export async function runMigrations(db, client: string): Promise<void> {
   }
 
   const migrationResult = await up(db, client);
-  if (migrationResult > 0) {
+  if (migrationResult?.length > 0) {
     logger.log(`Applied ${migrationResult.length} migrations successfully`, migrationResult);
   } else {
     logger.log("No migrations were run");
