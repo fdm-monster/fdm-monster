@@ -1,4 +1,3 @@
-import { afterAll, afterEach, beforeAll, describe, expect, it } from "@jest/globals";
 import { AxiosMock } from "../../mocks/axios.mock";
 import { AwilixContainer } from "awilix";
 import { PluginRepositoryCache } from "@/services/octoprint/plugin-repository.cache";

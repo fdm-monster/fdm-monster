@@ -1,6 +1,5 @@
 import { AppConstants } from "@/server.constants";
 import { expectOkResponse } from "../../extensions";
-import { expect } from "@jest/globals";
 
 export const floorRoute = AppConstants.apiRoute + "/floor";
 

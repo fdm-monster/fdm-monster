@@ -1,7 +1,6 @@
 import { connect, closeDatabase } from "../db-handler";
 import { hashPassword } from "@/utils/crypto.utils";
 import { User } from "@/models";
-import { afterAll, beforeAll, describe, expect, it } from "@jest/globals";
 
 /**
  * Connect to a new in-memory database before running any tests.

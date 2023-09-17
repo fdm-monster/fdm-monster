@@ -1,10 +1,10 @@
 import { AxiosError } from "axios";
 
 export class AxiosMock {
-  mockStatus = undefined;
+  mockStatus?: number = undefined;
   mockResponse = undefined;
-  isStream = undefined;
-  willThrow = undefined;
+  isStream?: boolean = undefined;
+  willThrow?: boolean = undefined;
   timeout = null;
   streamRejectPayload: any;
 
@@ -16,7 +16,7 @@ export class AxiosMock {
     this.streamRejectPayload = rejectPayload;
   }
 
-  saveMockResponse(response, status, isStream = false, throws = false) {
+  saveMockResponse(response: any, status: number, isStream = false, throws = false) {
     this.mockStatus = status;
     this.mockResponse = response;
     this.isStream = isStream;
@@ -43,7 +43,7 @@ export class AxiosMock {
     });
 
     if (this.willThrow) {
-      throw new AxiosError(this.mockResponse, this.mockStatus);
+      throw new AxiosError(this.mockResponse, this.mockStatus?.toString());
     }
     return result;
   }

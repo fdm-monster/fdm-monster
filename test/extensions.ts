@@ -1,9 +1,8 @@
-import { expect } from "@jest/globals";
 import { Response } from "supertest";
 
 export function getExpectExtensions() {
   return {
-    toHaveErrors(received, keys) {
+    toHaveErrors(received: { errors: string[] }, keys: string[]) {
       expect(received.errors).toMatchObject(keys);
 
       return {

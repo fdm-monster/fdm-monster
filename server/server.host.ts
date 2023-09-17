@@ -9,7 +9,6 @@ import { fetchServerPort } from "./server.env";
 import { NotFoundException } from "./exceptions/runtime.exceptions";
 import { AppConstants } from "./server.constants";
 import { superRootPath } from "./utils/fs.utils";
-import expressListRoutes from "express-list-routes";
 import { SocketIoGateway } from "@/state/socket-io.gateway";
 import { BootTask } from "./tasks/boot.task";
 import { TaskManagerService } from "@/services/task-manager.service";
@@ -95,6 +94,7 @@ export class ServerHost {
   async httpListen() {
     const port = fetchServerPort();
     if (!isProductionEnvironment()) {
+      const expressListRoutes = require("express-list-routes");
       expressListRoutes(this.appInstance!, { prefix: "/" });
     }
 

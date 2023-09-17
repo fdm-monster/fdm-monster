@@ -1,5 +1,4 @@
 import { isTestEnvironment, verifyPackageJsonRequirements } from "@/utils/env.utils";
-import { describe, expect, it } from "@jest/globals";
 import { join } from "path";
 
 describe("Env util", () => {

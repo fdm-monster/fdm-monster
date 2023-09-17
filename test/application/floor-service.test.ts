@@ -1,4 +1,3 @@
-import { afterAll, beforeAll, describe, expect, it } from "@jest/globals";
 import { closeDatabase, connect } from "../db-handler";
 import { PrinterMockData } from "./test-data/printer.data";
 import { Floor } from "@/models";

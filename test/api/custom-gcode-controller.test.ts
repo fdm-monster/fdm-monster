@@ -1,25 +1,24 @@
 import { AppConstants } from "@/server.constants";
 import { connect } from "../db-handler";
 import { setupTestApp } from "../test-server";
-import { expectOkResponse, expectInvalidResponse, expectNotFoundResponse } from "../extensions";
+import { expectInvalidResponse, expectNotFoundResponse, expectOkResponse } from "../extensions";
 import { CustomGCode } from "@/models";
 import { createTestPrinter } from "./test-data/create-printer";
-import { beforeAll, beforeEach, describe, expect, it } from "@jest/globals";
+import supertest from "supertest";
 
 let Model = CustomGCode;
 const defaultRoute = `${AppConstants.apiRoute}/custom-gcode`;
 const createRoute = defaultRoute;
-const emergencyGCodeRoute = (printerId) => `${defaultRoute}/send-emergency-m112/${printerId}`;
-const getRoute = (id) => `${defaultRoute}/${id}`;
-const deleteRoute = (id) => `${defaultRoute}/${id}`;
-const updateRoute = (id) => `${defaultRoute}/${id}`;
+const emergencyGCodeRoute = (printerId: string) => `${defaultRoute}/send-emergency-m112/${printerId}`;
+const getRoute = (id: string) => `${defaultRoute}/${id}`;
+const deleteRoute = (id: string) => `${defaultRoute}/${id}`;
+const updateRoute = (id: string) => `${defaultRoute}/${id}`;
 
-let container;
-let request;
+let request: supertest.SuperTest<supertest.Test>;
 
 beforeAll(async () => {
   await connect();
-  ({ request, container } = await setupTestApp(true));
+  ({ request } = await setupTestApp(true));
 });
 
 beforeEach(async () => {

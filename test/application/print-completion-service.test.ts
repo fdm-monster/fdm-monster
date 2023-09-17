@@ -1,11 +1,10 @@
-import { afterEach, afterAll, beforeAll, describe, expect, it } from "@jest/globals";
 import { connect, clearDatabase, closeDatabase } from "../db-handler";
 import { DITokens } from "@/container.tokens";
 import { configureContainer } from "@/container";
 import { PrintCompletionService } from "@/services/print-completion.service";
 import { EVENT_TYPES } from "@/services/octoprint/constants/octoprint-websocket.constants";
 
-let printCompletionService;
+let printCompletionService: PrintCompletionService;
 
 beforeAll(async () => {
   await connect();

@@ -1,4 +1,3 @@
-import { describe, expect, it } from "@jest/globals";
 import { firmwareFlashUploadEvent } from "@/constants/event.constants";
 
 describe("event-constants", () => {

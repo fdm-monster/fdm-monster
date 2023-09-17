@@ -18,6 +18,7 @@ describe("TaskManagerService", () => {
   it("should invalidate wrong task spec", () => {
     let caught = false;
     try {
+      // @ts-ignore
       taskManagerService.validateInput();
     } catch (e) {
       expect(e instanceof JobValidationException).toBeTruthy();
@@ -29,6 +30,7 @@ describe("TaskManagerService", () => {
   it("should invalidate nonexisting task spec", () => {
     let caught = false;
     try {
+      // @ts-ignore
       taskManagerService.validateInput("name");
     } catch (e) {
       expect(e instanceof JobValidationException).toBeTruthy();
@@ -40,6 +42,7 @@ describe("TaskManagerService", () => {
   it("should invalidate wrong workload - missing run", () => {
     let caught = false;
     try {
+      // @ts-ignore
       taskManagerService.validateInput("name", () => {});
     } catch (e) {
       expect(e instanceof JobValidationException).toBeTruthy();
