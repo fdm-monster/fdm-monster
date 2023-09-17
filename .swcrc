@@ -9,7 +9,7 @@
       "dynamicImport": true
     },
     "target": "es2022",
-    "baseUrl": "./server",
+    "baseUrl": "./src",
     "paths": {
       "@/*": ["./*"]
     }
