@@ -25,19 +25,19 @@ describe("ServerUpdateService", () => {
 
   describe("package updates, modifications and pull", () => {
     const scenarioModifiedOutput = {
-      modified: ["package-lock.json", "package.json", "server/lib/serverCommands.js"],
+      modified: ["package-lock.json", "package.json", "src/index.js"],
       ahead: 0,
       behind: 0,
     };
 
     const scenarioModifiedBehindOutput = {
-      modified: ["package-lock.json", "package.json", "server/lib/serverCommands.js"],
+      modified: ["package-lock.json", "package.json", "src/index.js"],
       ahead: 0,
       behind: 1,
     };
 
     const scenarioModifiedAheadOutput = {
-      modified: ["package-lock.json", "package.json", "server/lib/serverCommands.js"],
+      modified: ["package-lock.json", "package.json", "src/index.js"],
       ahead: 1,
       behind: 0,
     };

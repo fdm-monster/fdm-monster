@@ -1,8 +1,8 @@
 import { isDocker } from "@/utils/is-docker";
-jest.mock("../../../server/utils/is-docker");
+jest.mock("../../../src/utils/is-docker");
 import * as envUtils from "@/utils/env.utils";
-jest.mock("../../../server/utils/env.utils", () => ({
-  ...jest.requireActual("../../../server/utils/env.utils"),
+jest.mock("../../../src/utils/env.utils", () => ({
+  ...jest.requireActual("../../../src/utils/env.utils"),
   writeVariableToEnvFile: jest.fn(),
 }));
 

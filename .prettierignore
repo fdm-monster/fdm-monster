@@ -4,7 +4,7 @@
 **/logs
 **/coverage
 **/.github
-server/docker
+docker
 **/docs
 **/images
 **/fdm-monster

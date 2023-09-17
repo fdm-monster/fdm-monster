@@ -8,11 +8,11 @@ import { ROLES } from "@/constants/authorization.constants";
 import supertest from "supertest";
 import { Server } from "socket.io";
 
-jest.mock("../server/utils/env.utils", () => ({
-  ...jest.requireActual("../server/utils/env.utils"),
+jest.mock("../src/utils/env.utils", () => ({
+  ...jest.requireActual("../src/utils/env.utils"),
   writeVariableToEnvFile: jest.fn(),
 }));
-require("../server/utils/env.utils");
+require("../src/utils/env.utils");
 
 /**
  * Setup the application without hassle

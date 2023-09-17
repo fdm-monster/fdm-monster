@@ -3,7 +3,7 @@ import { PrinterService } from "@/services/printer.service";
 import { PrinterCache } from "@/state/printer.cache";
 import { FilesStore } from "@/state/files.store";
 import { AwilixContainer } from "awilix";
-jest.mock("../../../server/services/octoprint/octoprint-api.service");
+jest.mock("../../../src/services/octoprint/octoprint-api.service");
 import { connect, closeDatabase } from "../../db-handler";
 import { DITokens } from "@/container.tokens";
 import { configureContainer } from "@/container";

@@ -3,7 +3,7 @@ WORKDIR /build
 
 COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
-COPY server/ ./server/
+COPY src/ ./src/
 RUN yarn build
 
 FROM node:18-bookworm-slim as production
