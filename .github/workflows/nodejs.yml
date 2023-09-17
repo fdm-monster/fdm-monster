@@ -15,6 +15,8 @@ jobs:
 
       - run: yarn install --frozen-lockfile
         working-directory: server
+      - run: yarn run build
+        working-directory: server
       - run: yarn run test:cov
         working-directory: server
 
