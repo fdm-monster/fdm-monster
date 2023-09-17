@@ -48,34 +48,6 @@ function stringifyDotEnv(obj: any) {
   return result;
 }
 
-/**
- * Write a new key-value to .env file
- * Note: assumes in Nodemon, pm2 or PKG mode.
- */
-export function writeVariableToEnvFile(absoluteEnvPath: string, variableKey: string, jsonObject: any) {
-  if (isDocker()) {
-    logger.error("Tried to persist setting to .env in docker mode. Avoided that.");
-    return;
-  }
-  const latestDotEnvConfig = dotenv.config();
-  if (latestDotEnvConfig?.error?.code === "ENOENT") {
-    logger.warn("Creating .env file for you as it was not found.");
-  } else if (!!latestDotEnvConfig.error) {
-    logger.error(JSON.stringify(latestDotEnvConfig.error));
-    throw new Error(
-      "Could not parse current .env file. Please ensure the file contains lines with each looking like 'MONGO=http://mongo/3pdf' and 'SERVER_PORT=4000' and so on."
-    );
-  }
-
-  const newDotEnv = {
-    ...latestDotEnvConfig.parsed,
-    [variableKey]: jsonObject,
-  };
-
-  const dotEnvResult = stringifyDotEnv(newDotEnv);
-  fs.writeFileSync(absoluteEnvPath, dotEnvResult);
-}
-
 export function verifyPackageJsonRequirements(rootPath: string) {
   const dirConts = fs.readdirSync(rootPath);
   const hasPackageJson = dirConts.includes("package.json");
