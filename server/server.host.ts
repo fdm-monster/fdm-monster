@@ -62,7 +62,7 @@ export class ServerHost {
           next();
         }
       })
-      .use(loadControllers(`${routePath}/*.controller.js`, { cwd: __dirname }))
+      .use(loadControllers(`${routePath}/*.controller.*`, { cwd: __dirname, ignore: "**/*.map" }))
       .use(exceptionHandler);
 
     // Serve the files for our frontend - do this later than the controllers
