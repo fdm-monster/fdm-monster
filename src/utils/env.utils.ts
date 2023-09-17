@@ -91,7 +91,7 @@ export function verifyPackageJsonRequirements(rootPath: string) {
     return false;
   }
 
-  if (packageName.toLowerCase() !== "fdm-monster") {
+  if (packageName.toLowerCase() !== AppConstants.serverPackageName) {
     logger.error(
       `X property 'name' in package.json file didnt equal 'fdm-monster' (found: ${packageName.toLowerCase()}). Aborting FDM Server.`
     );

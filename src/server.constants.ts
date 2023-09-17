@@ -54,6 +54,7 @@ export const AppConstants = {
   defaultProductionEnv: "production",
   knownEnvNames: ["development", "production", "test"],
   GITHUB_PAT: "GITHUB_PAT",
+  serverPackageName: "@fdm-monster/server",
   clientPackageName: "@fdm-monster/client",
   clientRepoName: "fdm-monster-client",
   serverRepoName: "fdm-monster",
