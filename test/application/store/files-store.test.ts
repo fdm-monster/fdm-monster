@@ -5,7 +5,6 @@ import { PrinterFilesService } from "@/services/printer-files.service";
 import { FilesStore } from "@/state/files.store";
 import { AwilixContainer } from "awilix";
 import { closeDatabase, connect } from "../../db-handler";
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from "@jest/globals";
 import { PrinterService } from "@/services/printer.service";
 
 let container: AwilixContainer;

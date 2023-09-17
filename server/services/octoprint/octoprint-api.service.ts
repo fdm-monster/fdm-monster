@@ -3,25 +3,18 @@ import path from "path";
 import FormData from "form-data";
 import got from "got";
 import { multiPartContentType, pluginRepositoryUrl } from "./constants/octoprint-service.constants";
-import { processResponse, processGotResponse } from "./utils/api.utils";
-import { uploadProgressEvent, firmwareFlashUploadEvent } from "@/constants/event.constants";
+import { processGotResponse, processResponse } from "./utils/api.utils";
+import { firmwareFlashUploadEvent, uploadProgressEvent } from "@/constants/event.constants";
 import { ExternalServiceError } from "@/exceptions/runtime.exceptions";
 import { OctoPrintRoutes } from "./octoprint-api.routes";
+import { AxiosStatic } from "axios";
+import EventEmitter2 from "eventemitter2";
+import { LoggerService } from "@/handlers/logger";
 
 export class OctoPrintApiService extends OctoPrintRoutes {
-  /**
-   * @type {AxiosInstance}
-   */
-  axiosClient;
-  /**
-   * @type {EventEmitter2}
-   */
-  eventEmitter2;
-  /**
-   * @type {LoggerService}
-   * @private
-   */
-  logger;
+  axiosClient: AxiosStatic;
+  eventEmitter2: EventEmitter2;
+  protected logger: LoggerService;
 
   constructor({ settingsStore, httpClient, loggerFactory, eventEmitter2 }) {
     super({ settingsStore });

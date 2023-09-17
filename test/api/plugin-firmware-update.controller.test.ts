@@ -4,7 +4,6 @@ import { AppConstants } from "@/server.constants";
 import { setupTestApp } from "../test-server";
 import { expectOkResponse, expectInternalServerError } from "../extensions";
 import { createTestPrinter } from "./test-data/create-printer";
-import { beforeAll, describe, expect, it, afterAll, test } from "@jest/globals";
 import supertest from "supertest";
 import { AxiosMock } from "../mocks/axios.mock";
 

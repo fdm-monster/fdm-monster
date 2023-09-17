@@ -1,6 +1,5 @@
 import { connect, closeDatabase } from "../db-handler";
 import { ensureTestUserCreated } from "../api/test-data/create-user";
-import { afterAll, afterEach, beforeAll, describe, expect, it } from "@jest/globals";
 import { configureContainer } from "@/container";
 import { DITokens } from "@/container.tokens";
 import { User } from "@/models";

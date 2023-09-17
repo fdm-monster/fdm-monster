@@ -1,10 +1,10 @@
-import { connect, clearDatabase, closeDatabase } from "../db-handler";
+import { clearDatabase, closeDatabase, connect } from "../db-handler";
 import { configureContainer } from "@/container";
 import { DITokens } from "@/container.tokens";
-import { afterAll, beforeAll, describe, expect, it } from "@jest/globals";
 import { afterEach } from "node:test";
+import { MonsterPiService } from "@/services/monsterpi.service";
 
-let monsterPiService;
+let monsterPiService: MonsterPiService;
 
 beforeAll(async () => {
   await connect();

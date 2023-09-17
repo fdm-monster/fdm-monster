@@ -5,18 +5,16 @@ import { createTestPrinter } from "./test-data/create-printer";
 import { createTestFloor, floorRoute } from "./test-data/create-printer-floor";
 import { Floor } from "@/models";
 import { AppConstants } from "@/server.constants";
-import { beforeAll, beforeEach, describe, expect, it } from "@jest/globals";
-import { Request } from "supertest";
+import supertest from "supertest";
 
-let Model = Floor;
 const listRoute = `${AppConstants.apiRoute}/floor`;
-const getRoute = (id) => `${listRoute}/${id}`;
-const addPrinterToFloorRoute = (id) => `${listRoute}/${id}/printer`;
-const deleteRoute = (id) => `${listRoute}/${id}`;
-const updateNameRoute = (id) => `${getRoute(id)}/name`;
-const updateFloorNumberRoute = (id) => `${getRoute(id)}/floor-number`;
+const getRoute = (id: string) => `${listRoute}/${id}`;
+const addPrinterToFloorRoute = (id: string) => `${listRoute}/${id}/printer`;
+const deleteRoute = (id: string) => `${listRoute}/${id}`;
+const updateNameRoute = (id: string) => `${getRoute(id)}/name`;
+const updateFloorNumberRoute = (id: string) => `${getRoute(id)}/floor-number`;
 
-let request: Request;
+let request: supertest.SuperTest<supertest.Test>;
 
 beforeAll(async () => {
   await connect();
@@ -24,7 +22,7 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  Model.deleteMany({});
+  Floor.deleteMany({});
 });
 
 describe("FloorController", () => {

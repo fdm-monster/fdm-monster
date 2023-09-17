@@ -1,9 +1,9 @@
-import { beforeEach, describe, expect, it } from "@jest/globals";
 import { FileCache } from "@/state/file.cache";
 import { configureContainer } from "@/container";
 import { DITokens } from "@/container.tokens";
+import { AwilixContainer } from "awilix";
 
-let container;
+let container: AwilixContainer;
 let fileCache: FileCache;
 
 beforeEach(() => {

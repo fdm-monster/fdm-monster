@@ -1,8 +1,8 @@
-import { describe, expect, it } from "@jest/globals";
 import { allPerms, flattenPermissionDefinition } from "@/constants/authorization.constants";
 
 describe("authorization constants", () => {
   it("allPerms should throw for no permission group", async () => {
+    // @ts-ignore
     expect(() => allPerms()).toThrow(`Permission group name 'undefined' was not found`);
   });
 

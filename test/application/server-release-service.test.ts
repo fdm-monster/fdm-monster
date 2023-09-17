@@ -2,12 +2,13 @@ import { AppConstants } from "@/server.constants";
 import { configureContainer } from "@/container";
 import { DITokens } from "@/container.tokens";
 import { connect } from "../db-handler";
-import { asClass } from "awilix";
+import { asClass, AwilixContainer } from "awilix";
 import { AxiosMock } from "../mocks/axios.mock";
+import { ServerReleaseService } from "@/services/server-release.service";
 
-let container;
-let service;
-let httpClient;
+let container: AwilixContainer;
+let service: ServerReleaseService;
+let httpClient: AxiosMock;
 const v1 = "1.0.0";
 
 beforeAll(async () => {

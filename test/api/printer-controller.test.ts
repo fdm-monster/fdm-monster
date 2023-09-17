@@ -4,7 +4,6 @@ import { expectInvalidResponse, expectNotFoundResponse, expectOkResponse } from 
 import { AppConstants } from "@/server.constants";
 import { Printer } from "@/models";
 import { createTestPrinter, testApiKey } from "./test-data/create-printer";
-import { afterAll, beforeAll, describe, expect, it } from "@jest/globals";
 import supertest, { Request, SuperTest } from "supertest";
 import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
 

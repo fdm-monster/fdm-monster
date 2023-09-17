@@ -1,4 +1,3 @@
-import { beforeAll, beforeEach, describe, expect, it, test } from "@jest/globals";
 import { setupTestApp } from "../test-server";
 import { createTestPrinter } from "./test-data/create-printer";
 import { expectInvalidResponse, expectNotFoundResponse, expectOkResponse } from "../extensions";

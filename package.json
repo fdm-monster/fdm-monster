@@ -17,6 +17,7 @@
     "migration:status": "migrate-mongo status",
     "format": "prettier --write \"src/**/*.js\" \"test/**/*.js\"",
     "swc": "swc",
+    "tsc": "tsc --noEmit",
     "test": "jest --forceExist",
     "test:cov": "jest --forceExit --coverage",
     "cov:show": "./coverage/lcov-report/index.html"

@@ -2,7 +2,6 @@ import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service"
 
 export class OctoPrintApiMock extends OctoPrintApiService {
   eventEmitter2;
-  _logger;
 
   constructor({ settingsStore, httpClient, loggerFactory, eventEmitter2 }) {
     super({ settingsStore, httpClient, loggerFactory, eventEmitter2 });
@@ -10,7 +9,7 @@ export class OctoPrintApiMock extends OctoPrintApiService {
     this.logger = loggerFactory(OctoPrintApiMock.name, false);
   }
 
-  storeResponse(storedResponse, storedStatusCode) {
+  storeResponse(storedResponse: any, storedStatusCode: number) {
     this.axiosClient.saveMockResponse(storedResponse, storedStatusCode);
   }
 }

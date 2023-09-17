@@ -1,8 +1,6 @@
-import { beforeAll, describe, it } from "@jest/globals";
-
 import { connect } from "../db-handler";
 import { setupTestApp } from "../test-server";
-import { expectOkResponse, expectInternalServerError, expectUnauthorizedResponse } from "../extensions";
+import { expectInternalServerError, expectOkResponse, expectUnauthorizedResponse } from "../extensions";
 import { load } from "js-yaml";
 import { exportYamlBuffer } from "../application/test-data/yaml-import";
 import { AppConstants } from "@/server.constants";
@@ -11,10 +9,12 @@ import { validateInput } from "@/handlers/validators";
 import { importPrintersFloorsYamlRules } from "@/services/validators/yaml-service.validation";
 import { asFunction, AwilixContainer } from "awilix";
 import simpleGitMock from "../application/__mocks__/simple-git";
+import supertest from "supertest";
+import { SettingsStore } from "@/state/settings.store";
 
-let request;
-let container: AwilixContainer<any>;
-let settingsStore;
+let request: supertest.SuperTest<supertest.Test>;
+let container: AwilixContainer;
+let settingsStore: SettingsStore;
 
 const defaultRoute = `${AppConstants.apiRoute}/server`;
 const gitUpdateRoute = `${defaultRoute}/git-update`;
