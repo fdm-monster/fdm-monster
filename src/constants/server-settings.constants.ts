@@ -1,4 +1,4 @@
-import { AppConstants } from "../server.constants";
+import { AppConstants } from "@/server.constants";
 import { v4 as uuidv4 } from "uuid";
 
 export const getDefaultWhitelistIpAddresses = () => ["::12", "127.0.0.1"];
@@ -20,10 +20,11 @@ export const getDefaultServerSettings = () => ({
     debugSocketMessages: false,
     debugSocketIoBandwidth: false,
   },
-  registration: true,
+  sentryDiagnosticsEnabled: false,
+  loginRequired: true,
+  registration: false,
   whitelistEnabled: false,
   whitelistedIpAddresses: getDefaultWhitelistIpAddresses(),
-  loginRequired: false,
 });
 
 export const credentialSettingsKey = "credentials";
@@ -58,9 +59,9 @@ export const getDefaultFileCleanSettings = () => ({
 });
 
 export const getDefaultSettings = () => ({
+  [serverSettingsKey]: getDefaultServerSettings(),
   [wizardSettingKey]: getDefaultWizardSettings(),
   [credentialSettingsKey]: getDefaultCredentialSettings(),
-  [serverSettingsKey]: getDefaultServerSettings(),
   [fileCleanSettingKey]: getDefaultFileCleanSettings(),
   [frontendSettingKey]: getDefaultFrontendSettings(),
   [timeoutSettingKey]: getDefaultTimeout(),

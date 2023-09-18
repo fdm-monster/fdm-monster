@@ -1,8 +1,8 @@
 import multer from "multer";
 import { join, extname } from "path";
 import { readdirSync, existsSync, lstatSync, unlink, mkdirSync, createWriteStream } from "fs";
-import { superRootPath } from "../utils/fs.utils";
-import { AppConstants } from "../server.constants";
+import { superRootPath } from "@/utils/fs.utils";
+import { AppConstants } from "@/server.constants";
 
 export class MulterService {
   fileUploadTrackerCache;

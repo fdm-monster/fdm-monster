@@ -1,7 +1,7 @@
-import { KeyDiffCache } from "../utils/cache/key-diff.cache";
-import { printerEvents } from "../constants/event.constants";
-import { NotFoundException } from "../exceptions/runtime.exceptions";
-import { map } from "../utils/mapper.utils";
+import { KeyDiffCache } from "@/utils/cache/key-diff.cache";
+import { printerEvents } from "@/constants/event.constants";
+import { NotFoundException } from "@/exceptions/runtime.exceptions";
+import { map } from "@/utils/mapper.utils";
 import { PrinterService } from "@/services/printer.service";
 
 // Generate the JSDoc typedef for Printer model
@@ -13,7 +13,6 @@ import { PrinterService } from "@/services/printer.service";
  * @property {boolean} enabled - Indicates if the printer is enabled. (default: true)
  * @property {string} disabledReason - The reason for disabling the printer.
  * @property {string} printerName - The name setting of the printer.
- * @property {string} currentUser - The current user of the printer.
  * @property {number} dateAdded - The date when the printer was added.
  * @property {Object} lastPrintedFile - The details of the last printed file (deprecated).
  * @property {string} lastPrintedFile.fileName - The name of the last printed file.
