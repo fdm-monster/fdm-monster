@@ -35,10 +35,11 @@ describe("SettingsController", () => {
     const response = await request.get(defaultRoute).send();
     expect(response.body).not.toBeNull();
     const defaultSettings = getDefaultSettings();
+    defaultSettings[serverSettingsKey].loginRequired = false; // Test override
     delete defaultSettings[credentialSettingsKey];
     expect(response.body).toMatchObject(defaultSettings);
     expect(response.body[credentialSettingsKey]).toBeFalsy();
-    expect(response.body[serverSettingsKey].registration).toBeTruthy();
+    expect(response.body[serverSettingsKey].registration).toBeFalsy();
     expect(response.body[frontendSettingKey]).toMatchObject(getDefaultFrontendSettings());
     expect(response.body[fileCleanSettingKey]).toMatchObject(getDefaultFileCleanSettings());
     expectOkResponse(response);
