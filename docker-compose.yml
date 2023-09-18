@@ -34,4 +34,4 @@ services:
       - NODE_ENV=development
       - SERVER_PORT=4000
     volumes:
-      - ./fdm-monster/media/:/media
+      - ./fdm-monster/media/:/app/media

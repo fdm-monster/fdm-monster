@@ -1,26 +1,25 @@
 FROM node:18-bookworm-slim as build
 WORKDIR /build
 
-COPY package.json yarn.lock ./
+COPY .swcrc tsconfig.json package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
 COPY src/ ./src/
-RUN yarn build
+RUN yarn run build
 
 FROM node:18-bookworm-slim as production
 WORKDIR /app
 
 RUN yarn global add pm2
 
-COPY package.json yarn.lock ./
+COPY .swcrc tsconfig.json package.json yarn.lock ./
 RUN yarn install --production --frozen-lockfile
 
 COPY .env.template \
     migrate-mongo-config.js \
-    tsconfig.json \
     README.md \
-    LICENSE CODE_OF_CONDUCT.md CONTRIBUTING.md \
+    LICENSE CODE_OF_CONDUCT.md \
+    CONTRIBUTING.md \
     SECURITY.md \
-    .swcrc \
     .dockerignore ./
 COPY --from=build /build/dist/ ./dist/
 

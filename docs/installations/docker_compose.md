@@ -72,7 +72,7 @@ services:
       # MongoDB without authentication
 #      - MONGO=mongodb://mongodb:27017/fdm-monster?authSource=admin
     volumes:
-      - ./fdm-monster/media:/media
+      - ./fdm-monster/media:/app/media
 ```
 _An example docker-compose.yml file with the mongodb and fdm-monster services in one stack._
 
