@@ -1,4 +1,4 @@
-import { InternalServerException } from "../exceptions/runtime.exceptions";
+import { InternalServerException } from "@/exceptions/runtime.exceptions";
 import {
   credentialSettingsKey,
   fileCleanSettingKey,
@@ -6,10 +6,10 @@ import {
   serverSettingsKey,
   timeoutSettingKey,
   wizardSettingKey,
-} from "../constants/server-settings.constants";
+} from "@/constants/server-settings.constants";
 import { getCurrentHub } from "@sentry/node";
-import { isTestEnvironment } from "../utils/env.utils";
-import { AppConstants } from "../server.constants";
+import { isTestEnvironment } from "@/utils/env.utils";
+import { AppConstants } from "@/server.constants";
 
 export class SettingsStore {
   /**
@@ -34,9 +34,9 @@ export class SettingsStore {
   getSettings() {
     const settings = this.settings._doc;
     return Object.freeze({
+      [serverSettingsKey]: settings[serverSettingsKey],
       [wizardSettingKey]: settings[wizardSettingKey],
       [frontendSettingKey]: settings[frontendSettingKey],
-      [serverSettingsKey]: settings[serverSettingsKey],
       [fileCleanSettingKey]: settings[fileCleanSettingKey],
       [timeoutSettingKey]: settings[timeoutSettingKey],
     });
@@ -56,7 +56,7 @@ export class SettingsStore {
     return this.settings[serverSettingsKey].sentryDiagnosticsEnabled;
   }
 
-  async persistOptionalCredentialSettings(overrideJwtSecret, overrideJwtExpiresIn) {
+  async persistOptionalCredentialSettings(overrideJwtSecret: string, overrideJwtExpiresIn) {
     if (overrideJwtSecret) {
       await this.updateCredentialSettings({
         jwtSecret: overrideJwtSecret,

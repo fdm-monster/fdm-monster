@@ -6,7 +6,7 @@ import {
   serverSettingsKey,
   timeoutSettingKey,
   wizardSettingKey,
-} from "../constants/server-settings.constants";
+} from "@/constants/server-settings.constants";
 
 const ServerSettingsSchema = new Schema({
   [wizardSettingKey]: {

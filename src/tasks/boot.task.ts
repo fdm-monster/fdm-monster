@@ -128,7 +128,7 @@ export class BootTask {
     await this.settingsStore.persistOptionalCredentialSettings(overrideJwtSecret, overrideJwtExpiresIn);
 
     this.logger.log("Clearing upload folder");
-    await this.multerService.clearUploadsFolder();
+    this.multerService.clearUploadsFolder();
     this.logger.log("Loading printer sockets");
     await this.printerSocketStore.loadPrinterSockets(); // New sockets
     this.logger.log("Loading files store");
@@ -170,7 +170,6 @@ export class BootTask {
       this.logger.log("Updated demo account");
     }
 
-    await this.settingsStore.isWizardCompleted();
     await this.settingsStore.setWizardCompleted(1);
   }
 

@@ -42,12 +42,11 @@ export class SettingsService {
   }
 
   /**
-   * @private
    * Patch the given settings object manually - runtime migration strategy
    * @param knownSettings
    * @returns {*}
    */
-  migrateSettingsRuntime(knownSettings) {
+  private migrateSettingsRuntime(knownSettings) {
     const doc = knownSettings; // alias _doc also works
     if (!doc[fileCleanSettingKey]) {
       doc[fileCleanSettingKey] = getDefaultFileCleanSettings();

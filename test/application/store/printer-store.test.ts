@@ -87,15 +87,6 @@ describe("PrinterSocketStore", () => {
     expect((await printerCache.listCachedPrinters()).length).toBeGreaterThan(0);
   });
 
-  // TODO move to PrinterService tests
-  it("should update api user from PrinterService", async () => {
-    const newApiUserName = "testname";
-    const newPrinter = await printerService.create(validNewPrinterState);
-    const result = await printerService.updateApiUsername(newPrinter.id, newApiUserName);
-    // Should not return currentUser
-    expect(result.currentUser).toEqual(newApiUserName);
-  });
-
   it("should get undefined test printer from store", async () => {
     expect(testPrinterSocketStore.testSocket).toBeUndefined();
   });

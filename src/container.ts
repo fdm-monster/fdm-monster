@@ -1,7 +1,7 @@
 import axios from "axios";
 import simpleGit from "simple-git";
 import { Octokit } from "octokit";
-import { asFunction, asClass, asValue, createContainer, InjectionMode } from "awilix";
+import { asClass, asFunction, asValue, createContainer, InjectionMode } from "awilix";
 import { ToadScheduler } from "toad-scheduler";
 import { DITokens } from "./container.tokens";
 import { PrinterService } from "./services/printer.service";

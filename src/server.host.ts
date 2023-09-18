@@ -13,22 +13,22 @@ import { SocketIoGateway } from "@/state/socket-io.gateway";
 import { BootTask } from "./tasks/boot.task";
 import { TaskManagerService } from "@/services/task-manager.service";
 import { isProductionEnvironment } from "@/utils/env.utils";
+import { ConfigService } from "@/services/config.service";
 
 export class ServerHost {
   bootTask: BootTask;
   taskManagerService: TaskManagerService;
   socketIoGateway: SocketIoGateway;
   appInstance: Application | null = null;
-  /**
-   * @type {LoggerService}
-   */
+  configService: ConfigService;
   private logger: LoggerService;
 
-  constructor({ loggerFactory, bootTask, taskManagerService, socketIoGateway }) {
+  constructor({ loggerFactory, bootTask, taskManagerService, socketIoGateway, configService }) {
     this.logger = loggerFactory(ServerHost.name);
     this.bootTask = bootTask;
     this.taskManagerService = taskManagerService;
     this.socketIoGateway = socketIoGateway;
+    this.configService = configService;
   }
 
   async boot(app: Application, quick_boot = false, listenRequests = true) {
@@ -93,7 +93,7 @@ export class ServerHost {
 
   async httpListen() {
     const port = fetchServerPort();
-    if (!isProductionEnvironment()) {
+    if (!isProductionEnvironment() && this.configService.get(AppConstants.debugRoutesKey, "false") === "true") {
       const expressListRoutes = require("express-list-routes");
       expressListRoutes(this.appInstance!, { prefix: "/" });
     }
