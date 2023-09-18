@@ -3,7 +3,6 @@ import cookieParser from "cookie-parser";
 import passport from "passport";
 import cors from "cors";
 import helmet from "helmet";
-import { asValue } from "awilix";
 import { scopePerRequest } from "awilix-express";
 import { configureContainer } from "./container";
 import { interceptDatabaseError } from "./middleware/database";

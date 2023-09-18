@@ -6,9 +6,11 @@ import { DITokens } from "@/container.tokens";
 import { connect } from "../db-handler";
 import { AwilixContainer } from "awilix";
 import supertest from "supertest";
+import { SettingsStore } from "@/state/settings.store";
 
 let request: supertest.SuperTest<supertest.Test>;
 let container: AwilixContainer;
+let settingsStore: SettingsStore;
 
 const baseRoute = AppConstants.apiRoute + "/auth";
 const loginRoute = `${baseRoute}/login`;
@@ -18,6 +20,7 @@ const logoutRoute = `${baseRoute}/logout`;
 beforeAll(async () => {
   await connect();
   ({ request, container } = await setupTestApp(true));
+  settingsStore = container.resolve(DITokens.settingsStore);
 });
 
 describe("AuthController", () => {
@@ -31,7 +34,21 @@ describe("AuthController", () => {
     expectUnauthorizedResponse(response);
   });
 
+  it("should not register new user when registration==false", async () => {
+    await settingsStore.setRegistrationEnabled(false);
+    const password = "registeredPassword";
+
+    const { username } = getUserData("default1", password);
+    const response = await request.post(registerRoute).send({
+      username,
+      password,
+      password2: password,
+    });
+    expectBadRequestError(response);
+  });
+
   it("should register new user", async () => {
+    await settingsStore.setRegistrationEnabled(true);
     const password = "registeredPassword";
 
     const { username } = getUserData("default1", password);
