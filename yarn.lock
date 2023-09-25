@@ -5438,10 +5438,10 @@ micromatch@^4.0.4:
     braces "^3.0.2"
     picomatch "^2.3.1"
 
-migrate-mongo@10.0.0:
-  version "10.0.0"
-  resolved "https://registry.yarnpkg.com/migrate-mongo/-/migrate-mongo-10.0.0.tgz#c29c7e80dcbdb548e172c7395ccc439cdece1bc6"
-  integrity sha512-QA/bBKNMq/FmuK3fDbgwfNoW2riiU1wLDWGXv/tGhUItPLGqcciPPmu29SrnYAzRKMOVaGEXxzmrBs1zp5cQ7Q==
+migrate-mongo@11.0.0:
+  version "11.0.0"
+  resolved "https://registry.yarnpkg.com/migrate-mongo/-/migrate-mongo-11.0.0.tgz#d1b2291624fe8e134a0666ca77ad2fa18f42e337"
+  integrity sha512-GB/gHzUwp/fL1w6ksNGihTyb+cSrm6NbVLlz1OSkQKaLlzAXMwH7iKK2ZS7W5v+I8vXiY2rL58WTUZSAL6QR+A==
   dependencies:
     cli-table3 "^0.6.1"
     commander "^9.1.0"
