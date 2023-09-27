@@ -1,7 +1,7 @@
 import { Request } from "express";
-import { InternalServerException, ValidationException } from "../exceptions/runtime.exceptions";
-import { currentPrinterToken, printerIdToken, printerLoginToken } from "../middleware/printer";
-import { normalizeUrl } from "../utils/normalize-url";
+import { InternalServerException, ValidationException } from "@/exceptions/runtime.exceptions";
+import { currentPrinterToken, printerIdToken, printerLoginToken } from "@/middleware/printer";
+import { normalizeUrl } from "@/utils/normalize-url";
 import nodeInputValidator, { extend } from "node-input-validator";
 
 export function getExtendedValidator() {
