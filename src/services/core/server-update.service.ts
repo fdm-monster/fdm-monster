@@ -9,7 +9,13 @@ export class ServerUpdateService {
   private simpleGitService: SimpleGit;
   private logger: LoggerService;
 
-  constructor({ simpleGitService, loggerFactory }) {
+  constructor({
+    simpleGitService,
+    loggerFactory,
+  }: {
+    simpleGitService: SimpleGit;
+    loggerFactory: (name: string) => LoggerService;
+  }) {
     this.simpleGitService = simpleGitService;
     this.logger = loggerFactory(ServerUpdateService.name);
   }

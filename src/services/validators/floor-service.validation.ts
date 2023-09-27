@@ -1,4 +1,4 @@
-import { minPrinterFloorNameLength } from "../../constants/service.constants";
+import { minPrinterFloorNameLength } from "@/constants/service.constants";
 
 export const removePrinterInFloorRules = {
   printerId: "required|mongoId",

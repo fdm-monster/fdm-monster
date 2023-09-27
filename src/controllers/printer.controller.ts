@@ -24,11 +24,11 @@ import { TestPrinterSocketStore } from "@/state/test-printer-socket.store";
 import { PrinterCache } from "@/state/printer.cache";
 import { LoggerService } from "@/handlers/logger";
 import { PrinterEventsCache } from "@/state/printer-events.cache";
-import { TaskManagerService } from "@/services/task-manager.service";
+import { TaskManagerService } from "@/services/core/task-manager.service";
 import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
 import { PluginRepositoryCache } from "@/services/octoprint/plugin-repository.cache";
 import { FloorStore } from "@/state/floor.store";
-import { MulterService } from "@/services/multer.service";
+import { MulterService } from "@/services/core/multer.service";
 
 export class PrinterController {
   /**

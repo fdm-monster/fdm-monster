@@ -6,7 +6,7 @@ import { validateInput } from "@/handlers/validators";
 import { idRules } from "./validation/generic.validation";
 import { InternalServerException } from "@/exceptions/runtime.exceptions";
 import { UserService } from "@/services/authentication/user.service";
-import { ConfigService } from "@/services/config.service";
+import { ConfigService } from "@/services/core/config.service";
 
 export class UserController {
   userService: UserService;

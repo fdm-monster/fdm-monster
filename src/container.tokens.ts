@@ -4,8 +4,6 @@ export const DITokens = {
   appDefaultRole: "appDefaultRole",
   appDefaultRoleNoLogin: "appDefaultRoleNoLogin",
   // Dynamically registered
-  orm: "orm",
-  em: "em",
   // Instances
   serverHost: "serverHost",
   loggerFactory: "loggerFactory",

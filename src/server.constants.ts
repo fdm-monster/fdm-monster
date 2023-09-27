@@ -83,6 +83,9 @@ export const AppConstants = {
   mqttUsernameToken: "MQTT_USERNAME",
   mqttPasswordToken: "MQTT_PASSWORD",
 
+  // MonsterPi
+  monsterPiFilePath: "/etc/monsterpi_version",
+
   // Sentry
   sentryCustomDsnToken: "SENTRY_CUSTOM_DSN",
   sentryCustomDsnDefault: "https://164b8028a8a745bba3dbcab991b84ae7@o4503975545733120.ingest.sentry.io/4505101598261248",

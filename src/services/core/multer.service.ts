@@ -3,12 +3,20 @@ import { join, extname } from "path";
 import { readdirSync, existsSync, lstatSync, unlink, mkdirSync, createWriteStream } from "fs";
 import { superRootPath } from "@/utils/fs.utils";
 import { AppConstants } from "@/server.constants";
+import { AxiosStatic } from "axios";
+import { FileUploadTrackerCache } from "@/state/file-upload-tracker.cache";
 
 export class MulterService {
-  fileUploadTrackerCache;
-  httpClient;
+  fileUploadTrackerCache: FileUploadTrackerCache;
+  httpClient: AxiosStatic;
 
-  constructor({ fileUploadTrackerCache, httpClient }) {
+  constructor({
+    fileUploadTrackerCache,
+    httpClient,
+  }: {
+    fileUploadTrackerCache: FileUploadTrackerCache;
+    httpClient: AxiosStatic;
+  }) {
     this.fileUploadTrackerCache = fileUploadTrackerCache;
     this.httpClient = httpClient;
   }
@@ -25,12 +33,7 @@ export class MulterService {
       .sort((a, b) => b.mtime.getTime() - a.mtime.getTime());
   };
 
-  /**
-   * @private
-   * @param collection
-   * @returns {string}
-   */
-  collectionPath(collection) {
+  private collectionPath(collection): string {
     return join(superRootPath(), AppConstants.defaultFileStorageFolder, collection);
   }
 

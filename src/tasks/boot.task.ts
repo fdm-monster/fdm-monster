@@ -3,21 +3,21 @@ import { fetchMongoDBConnectionString, runMigrations } from "@/server.env";
 import { DITokens } from "@/container.tokens";
 import { AppConstants } from "@/server.constants";
 import { LoggerService } from "@/handlers/logger";
-import { TaskManagerService } from "@/services/task-manager.service";
+import { TaskManagerService } from "@/services/core/task-manager.service";
 import { ServerTasks } from "@/tasks";
-import { MulterService } from "@/services/multer.service";
+import { MulterService } from "@/services/core/multer.service";
 import { SettingsService } from "@/services/settings.service";
 import { SettingsStore } from "@/state/settings.store";
 import { FloorStore } from "@/state/floor.store";
 import { PluginFirmwareUpdateService } from "@/services/octoprint/plugin-firmware-update.service";
-import { ConfigService } from "@/services/config.service";
+import { ConfigService } from "@/services/core/config.service";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { FilesStore } from "@/state/files.store";
 import { PermissionService } from "@/services/authentication/permission.service";
 import { RoleService } from "@/services/authentication/role.service";
 import { UserService } from "@/services/authentication/user.service";
 import { PluginRepositoryCache } from "@/services/octoprint/plugin-repository.cache";
-import { ClientBundleService } from "@/services/client-bundle.service";
+import { ClientBundleService } from "@/services/core/client-bundle.service";
 
 export class BootTask {
   logger: LoggerService;

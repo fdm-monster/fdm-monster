@@ -4,14 +4,12 @@ import { readdirSync, unlinkSync } from "fs";
 import { superRootPath } from "@/utils/fs.utils";
 import { AppConstants } from "@/server.constants";
 import { isValidDate } from "@/utils/time.utils";
+import { LoggerService } from "@/handlers/logger";
 
 export class LogDumpService {
-  /**
-   * @type {LoggerService}
-   */
-  logger;
+  logger: LoggerService;
 
-  constructor({ loggerFactory }) {
+  constructor({ loggerFactory }: { loggerFactory: (name: string) => LoggerService }) {
     this.logger = loggerFactory(LogDumpService.name);
   }
 

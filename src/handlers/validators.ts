@@ -32,7 +32,7 @@ export function getExtendedValidator() {
   return nodeInputValidator;
 }
 
-export function getScopedPrinter(req) {
+export function getScopedPrinter(req: Request) {
   const tokens = [printerLoginToken, currentPrinterToken, printerIdToken];
   let resolvedDependencies = {};
   let errors = [];

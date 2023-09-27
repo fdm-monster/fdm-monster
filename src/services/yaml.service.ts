@@ -5,40 +5,44 @@ import {
   importPrintersFloorsYamlRules,
 } from "./validators/yaml-service.validation";
 import { dump, load } from "js-yaml";
+import { LoggerService } from "@/handlers/logger";
+import { PrinterService } from "@/services/printer.service";
+import { PrinterCache } from "@/state/printer.cache";
+import { FloorService } from "@/services/floor.service";
+import { FloorStore } from "@/state/floor.store";
 
 export class YamlService {
   floorStore;
-  /**
-   * @type {PrinterService}
-   */
-  printerService;
-  /**
-   * @type {PrinterCache}
-   */
-  printerCache;
-  /**
-   * @type {FloorService}
-   */
-  floorService;
-  /**
-   * @type {LoggerService}
-   */
-  #logger;
-  /**
-   * @type {string}
-   */
-  serverVersion;
+  printerService: PrinterService;
+  printerCache: PrinterCache;
+  floorService: FloorService;
+  serverVersion: string;
+  private logger: LoggerService;
 
-  constructor({ printerService, printerCache, floorStore, floorService, loggerFactory, serverVersion }) {
+  constructor({
+    printerService,
+    printerCache,
+    floorStore,
+    floorService,
+    loggerFactory,
+    serverVersion,
+  }: {
+    printerService: PrinterService;
+    printerCache: PrinterCache;
+    floorStore: FloorStore;
+    floorService: FloorService;
+    loggerFactory: (name: string) => LoggerService;
+    serverVersion: string;
+  }) {
     this.floorStore = floorStore;
     this.printerService = printerService;
     this.printerCache = printerCache;
     this.floorService = floorService;
     this.serverVersion = serverVersion;
-    this.#logger = loggerFactory("YamlService");
+    this.logger = loggerFactory(YamlService.name);
   }
 
-  async importPrintersAndFloors(yamlBuffer) {
+  async importPrintersAndFloors(yamlBuffer: string) {
     const importSpec = await load(yamlBuffer);
     const { exportPrinters, exportFloorGrid, exportFloors } = importSpec?.config;
 
@@ -63,32 +67,32 @@ export class YamlService {
       }
     }
 
-    this.#logger.log("Analysing printers for import");
+    this.logger.log("Analysing printers for import");
     const { updateByPropertyPrinters, insertPrinters } = await this.analysePrintersUpsert(
       importData.printers,
       importData.config.printerComparisonStrategiesByPriority
     );
 
-    this.#logger.log("Analysing floors for import");
+    this.logger.log("Analysing floors for import");
     const { updateByPropertyFloors, insertFloors } = await this.analyseFloorsUpsert(
       importData.floors,
       importData.config.floorComparisonStrategiesByPriority
     );
 
-    this.#logger.log(`Performing pure insert printers (${insertPrinters.length} printers)`);
+    this.logger.log(`Performing pure insert printers (${insertPrinters.length} printers)`);
     const printerIdMap = {};
     for (const newPrinter of insertPrinters) {
       const state = await this.printerService.create(newPrinter);
       printerIdMap[newPrinter.id] = state.id;
     }
-    this.#logger.log(`Performing update import printers (${updateByPropertyPrinters.length} printers)`);
+    this.logger.log(`Performing update import printers (${updateByPropertyPrinters.length} printers)`);
     for (const updatePrinterSpec of updateByPropertyPrinters) {
       const updateId = updatePrinterSpec.printerId;
       const state = await this.printerService.update(updateId, updatePrinterSpec.value);
       printerIdMap[updatePrinterSpec.printerId] = state.id;
     }
 
-    this.#logger.log(`Performing pure create floors (${insertFloors.length} floors)`);
+    this.logger.log(`Performing pure create floors (${insertFloors.length} floors)`);
     const floorIdMap = {};
     for (const newFloor of insertFloors) {
       // Replace printerIds with newly mapped IDs
@@ -109,7 +113,7 @@ export class YamlService {
       floorIdMap[newFloor.id] = state.id;
     }
 
-    this.#logger.log(`Performing update of floors (${updateByPropertyFloors.length} floors)`);
+    this.logger.log(`Performing update of floors (${updateByPropertyFloors.length} floors)`);
     for (const updateFloorSpec of updateByPropertyFloors) {
       const updateId = updateFloorSpec.floorId;
       const updatedFloor = updateFloorSpec.value;

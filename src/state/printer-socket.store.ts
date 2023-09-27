@@ -6,7 +6,7 @@ import { SocketFactory } from "@/services/octoprint/socket.factory";
 import { PrinterCache } from "@/state/printer.cache";
 import { OctoPrintSockIoAdapter } from "@/services/octoprint/octoprint-sockio.adapter";
 import { LoggerService } from "@/handlers/logger";
-import { ConfigService } from "@/services/config.service";
+import { ConfigService } from "@/services/core/config.service";
 import { SettingsStore } from "@/state/settings.store";
 import { SocketIoGateway } from "@/state/socket-io.gateway";
 

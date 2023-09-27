@@ -4,21 +4,23 @@ import { AppConstants } from "@/server.constants";
 import { validateInput } from "@/handlers/validators";
 import { idRules } from "./validation/generic.validation";
 import { PERMS } from "@/constants/authorization.constants";
+import { FloorStore } from "@/state/floor.store";
+import { Request, Response } from "express";
 
 export class FloorController {
-  private floorStore;
+  private floorStore: FloorStore;
 
-  constructor({ floorStore }) {
+  constructor({ floorStore }: { floorStore: FloorStore }) {
     this.floorStore = floorStore;
   }
 
-  async create(req, res) {
+  async create(req: Request, res: Response) {
     // Has internal validation
     const floor = await this.floorStore.create(req.body);
     res.send(floor);
   }
 
-  async updateName(req, res) {
+  async updateName(req: Request, res: Response) {
     const { id: floorId } = await validateInput(req.params, idRules);
 
     // Has internal validation
@@ -26,7 +28,7 @@ export class FloorController {
     res.send(floor);
   }
 
-  async updateFloorNumber(req, res) {
+  async updateFloorNumber(req: Request, res: Response) {
     const { id: floorId } = await validateInput(req.params, idRules);
 
     // Has internal validation
@@ -34,7 +36,7 @@ export class FloorController {
     res.send(floor);
   }
 
-  async addPrinterToFloor(req, res) {
+  async addPrinterToFloor(req: Request, res: Response) {
     const { id: floorId } = await validateInput(req.params, idRules);
 
     // Has internal validation
@@ -42,7 +44,7 @@ export class FloorController {
     res.send(floor);
   }
 
-  async removePrinterFromFloor(req, res) {
+  async removePrinterFromFloor(req: Request, res: Response) {
     const { id: floorId } = await validateInput(req.params, idRules);
 
     // Has internal validation
@@ -50,19 +52,19 @@ export class FloorController {
     res.send(floor);
   }
 
-  async list(req, res) {
+  async list(req: Request, res: Response) {
     const floors = await this.floorStore.listCache();
     res.send(floors);
   }
 
-  async get(req, res) {
+  async get(req: Request, res: Response) {
     const { id: floorId } = await validateInput(req.params, idRules);
     const floor = await this.floorStore.getFloor(floorId);
     res.send(floor);
   }
 
-  async delete(req, res) {
-    const { id: floorId } = await validateInput(req.params, idRules);
+  async delete(req: Request, res: Response) {
+    const { id: floorId } = await validateInput<{ id: number }>(req.params, idRules);
     const result = await this.floorStore.delete(floorId);
     res.json(result);
   }

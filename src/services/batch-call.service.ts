@@ -1,40 +1,43 @@
-/**
- * @typedef {Object} BatchSingletonModel
- * @property {boolean} [success]
- * @property {boolean} [failure]
- * @property {string} printerId
- * @property {number} time
- * @property {string} [error]
- */
+interface BatchSingletonModel {
+  success?: boolean;
+  failure?: boolean;
+  printerId: string;
+  time: number;
+  error?: string;
+}
 
-/**
- * @typedef {Array<BatchSingletonModel>} BatchModel
- */
+import { FilesStore } from "@/state/files.store";
+import { PrinterService } from "@/services/printer.service";
+import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
+import { PrinterSocketStore } from "@/state/printer-socket.store";
+import { PrinterCache } from "@/state/printer.cache";
+import { PrinterEventsCache } from "@/state/printer-events.cache";
+
+type BatchModel = Array<BatchSingletonModel>;
 
 export class BatchCallService {
-  /**
-   * @type {OctoPrintApiService}
-   */
-  octoPrintApiService;
-  /**
-   * @type {PrinterSocketStore}
-   */
-  printerSocketStore;
-  /**
-   * @type {PrinterCache}
-   */
-  printerCache;
-  /**
-   * @type {PrinterEventsCache}
-   */
-  printerEventsCache;
-  filesStore;
-  /**
-   * @type {PrinterService}
-   */
-  printerService;
+  octoPrintApiService: OctoPrintApiService;
+  printerSocketStore: PrinterSocketStore;
+  printerCache: PrinterCache;
+  printerEventsCache: PrinterEventsCache;
+  filesStore: FilesStore;
+  printerService: PrinterService;
 
-  constructor({ octoPrintApiService, printerCache, printerEventsCache, printerSocketStore, filesStore, printerService }) {
+  constructor({
+    octoPrintApiService,
+    printerCache,
+    printerEventsCache,
+    printerSocketStore,
+    filesStore,
+    printerService,
+  }: {
+    octoPrintApiService: OctoPrintApiService;
+    printerCache: PrinterCache;
+    printerEventsCache: PrinterEventsCache;
+    printerSocketStore: PrinterSocketStore;
+    filesStore: FilesStore;
+    printerService: PrinterService;
+  }) {
     this.octoPrintApiService = octoPrintApiService;
     this.printerCache = printerCache;
     this.printerEventsCache = printerEventsCache;
@@ -43,12 +46,7 @@ export class BatchCallService {
     this.printerService = printerService;
   }
 
-  /**
-   * @param {string[]} printerIds
-   * @param {boolean} enabled
-   * @returns {void}
-   */
-  async batchTogglePrintersEnabled(printerIds, enabled) {
+  async batchTogglePrintersEnabled(printerIds: string[], enabled: boolean): Promise<void[]> {
     const promises = [];
     for (const printerId of printerIds) {
       let promise = Promise.resolve();
@@ -87,21 +85,13 @@ export class BatchCallService {
     return await Promise.all(promises);
   }
 
-  /**
-   * @param {string[]} printerIds
-   * @returns {void}
-   */
-  batchConnectSocket(printerIds) {
+  batchConnectSocket(printerIds: string[]): void {
     for (const printerId of printerIds) {
       this.printerSocketStore.reconnectOctoPrint(printerId);
     }
   }
 
-  /**
-   * @param {string[]} printerIds
-   * @returns {Promise<Awaited<BatchModel>[]>}
-   */
-  async batchConnectUsb(printerIds) {
+  async batchConnectUsb(printerIds: string[]): Promise<Awaited<BatchModel>[]> {
     const promises = [];
     for (const printerId of printerIds) {
       const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
@@ -122,11 +112,7 @@ export class BatchCallService {
     return await Promise.all(promises);
   }
 
-  /**
-   * @param {string[]} printerIds
-   * @returns {Promise<Awaited<BatchModel>[]>}
-   */
-  async batchReprintCalls(printerIds) {
+  async batchReprintCalls(printerIds: string[]): Promise<Awaited<BatchModel>[]> {
     const promises = [];
     for (const printerId of printerIds) {
       const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);

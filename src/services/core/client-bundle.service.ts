@@ -2,19 +2,30 @@ import AdmZip from "adm-zip";
 import { join } from "path";
 import { existsSync, writeFileSync } from "node:fs";
 import { readdir, rm } from "node:fs/promises";
-import { ensureDirExists, superRootPath } from "../utils/fs.utils";
-import { checkVersionSatisfiesMinimum } from "../utils/semver.utils";
-import { AppConstants } from "../server.constants";
+import { ensureDirExists, superRootPath } from "@/utils/fs.utils";
+import { checkVersionSatisfiesMinimum } from "@/utils/semver.utils";
+import { AppConstants } from "@/server.constants";
+import { GithubService } from "@/services/core/github.service";
+import { ConfigService } from "@/services/core/config.service";
+import { LoggerService } from "@/handlers/logger";
 
 export class ClientBundleService {
-  githubService;
-  configService;
-  logger;
+  githubService: GithubService;
+  configService: ConfigService;
+  logger: LoggerService;
 
-  constructor({ githubService, configService, loggerFactory }) {
+  constructor({
+    githubService,
+    configService,
+    loggerFactory,
+  }: {
+    githubService: GithubService;
+    configService: ConfigService;
+    loggerFactory: (name: string) => LoggerService;
+  }) {
     this.githubService = githubService;
     this.configService = configService;
-    this.logger = loggerFactory("ClientBundleService");
+    this.logger = loggerFactory(ClientBundleService.name);
   }
 
   get clientPackageJsonPath() {
@@ -42,13 +53,10 @@ export class ClientBundleService {
     };
   }
 
-  /**
-   *
-   * @param {boolean} overrideAutoUpdate
-   * @param {string} minimumVersion
-   * @returns {Promise<{reason: string, shouldUpdate: boolean}>}
-   */
-  async shouldUpdateWithReason(overrideAutoUpdate, minimumVersion) {
+  async shouldUpdateWithReason(
+    overrideAutoUpdate: boolean,
+    minimumVersion: string
+  ): Promise<{ reason: string; shouldUpdate: boolean }> {
     const clientAutoUpdate = AppConstants.enableClientDistAutoUpdateKey;
     if (!clientAutoUpdate && !overrideAutoUpdate) {
       return {
@@ -88,11 +96,7 @@ export class ClientBundleService {
     };
   }
 
-  /**
-   * @param {string} releaseTag
-   * @returns {Promise<void>}
-   */
-  async downloadClientUpdate(releaseTag) {
+  async downloadClientUpdate(releaseTag: string): Promise<void> {
     const release = await this.getClientBundleRelease(releaseTag);
     this.logger.log(
       `Retrieved ${release.assets.length} assets from release '${release.name}': ${release.assets.map((a) => a.name)}`
@@ -104,12 +108,7 @@ export class ClientBundleService {
     await this.extractClientBundleZip(downloadPath);
   }
 
-  /**
-   * @private
-   * @param {string} releaseTag
-   * @returns {Promise<{data:any}>}
-   */
-  async getClientBundleRelease(releaseTag) {
+  private async getClientBundleRelease(releaseTag: string): Promise<{ assets: any[] }> {
     const githubOwner = AppConstants.orgName;
     const githubRepo = AppConstants.clientRepoName;
 
@@ -117,13 +116,7 @@ export class ClientBundleService {
     return result.data;
   }
 
-  /**
-   * @private
-   * @param {any} assetId
-   * @param {string} assetName
-   * @returns {Promise<string | *>}
-   */
-  async downloadClientBundleZip(assetId, assetName) {
+  private async downloadClientBundleZip(assetId: any, assetName: string): Promise<string | any> {
     const githubOwner = AppConstants.orgName;
     const githubRepo = AppConstants.clientRepoName;
     const assetResult = await this.githubService.requestAsset(githubOwner, githubRepo, assetId);
@@ -136,12 +129,7 @@ export class ClientBundleService {
     return path;
   }
 
-  /**
-   * @private
-   * @param {string} downloadedZipPath
-   * @returns {Promise<void>}
-   */
-  async extractClientBundleZip(downloadedZipPath) {
+  private async extractClientBundleZip(downloadedZipPath: string): Promise<void> {
     const zip = new AdmZip(downloadedZipPath);
 
     const distPath = join(superRootPath(), AppConstants.defaultClientBundleStorage);
@@ -166,20 +154,12 @@ export class ClientBundleService {
     this.logger.log(`Successfully extracted client dist to ${distPath}`);
   }
 
-  /**
-   * @private
-   * @returns {boolean}
-   */
-  doesClientIndexHtmlExist() {
+  private doesClientIndexHtmlExist(): boolean {
     const indexHtmlPath = this.clientIndexHtmlPath;
     return existsSync(indexHtmlPath);
   }
 
-  /**
-   * @private
-   * @returns {?string}
-   */
-  getClientVersion() {
+  private getClientVersion(): string | null {
     const packageJsonPath = this.clientPackageJsonPath;
     const packageJsonFound = existsSync(packageJsonPath);
     // If no package.json found, we should update to latest/minimum

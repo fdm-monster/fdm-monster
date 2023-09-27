@@ -1,5 +1,5 @@
 import { AwilixContainer } from "awilix";
-import { ServerUpdateService } from "@/services/server-update.service";
+import { ServerUpdateService } from "@/services/core/server-update.service";
 import { configureContainer } from "@/container";
 import { DITokens } from "@/container.tokens";
 

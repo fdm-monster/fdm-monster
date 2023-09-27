@@ -1,21 +1,13 @@
-import { NotFoundException } from "../exceptions/runtime.exceptions";
-
-/**
- * @typedef { import("octokit").Octokit } Octokit
- */
+import { NotFoundException } from "@/exceptions/runtime.exceptions";
+import { Octokit } from "octokit";
+import { LoggerService } from "@/handlers/logger";
 
 export class GithubService {
-  /**
-   * @type {Octokit}
-   */
-  octokitService;
-  /**
-   * @type {LoggerService}
-   */
-  logger;
+  octokitService: Octokit;
+  logger: LoggerService;
 
-  constructor({ loggerFactory, octokitService }) {
-    this.logger = loggerFactory("GithubService", false);
+  constructor({ loggerFactory, octokitService }: { loggerFactory: any; octokitService: Octokit }) {
+    this.logger = loggerFactory(GithubService.name, false);
     this.octokitService = octokitService;
   }
 
@@ -24,7 +16,7 @@ export class GithubService {
     return result?.type === "token";
   }
 
-  async getLatestRelease(/**string**/ owner, /**string**/ repo) {
+  async getLatestRelease(owner: string, repo: string) {
     return await this.octokitService.rest.repos
       .getLatestRelease({
         owner,
@@ -39,7 +31,7 @@ export class GithubService {
       });
   }
 
-  async getReleases(/**string**/ owner, /**string**/ repo) {
+  async getReleases(owner: string, repo: string) {
     return await this.octokitService.rest.repos
       .listReleases({
         owner,
@@ -54,7 +46,7 @@ export class GithubService {
       });
   }
 
-  async getReleaseByTag(/**string**/ owner, /**string**/ repo, /**string**/ tag) {
+  async getReleaseByTag(owner: string, repo: string, tag: string) {
     return await this.octokitService.rest.repos
       .getReleaseByTag({
         owner,
@@ -70,7 +62,7 @@ export class GithubService {
       });
   }
 
-  async requestAsset(/**string**/ owner, /**string**/ repo, /**any*/ assetId) {
+  async requestAsset(owner: string, repo: string, assetId: any) {
     return await this.octokitService
       .request("GET /repos/:owner/:repo/releases/assets/:asset_id", {
         headers: {

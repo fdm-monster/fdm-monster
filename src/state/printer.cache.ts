@@ -3,6 +3,7 @@ import { printerEvents } from "@/constants/event.constants";
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import { map } from "@/utils/mapper.utils";
 import { PrinterService } from "@/services/printer.service";
+import EventEmitter2 from "eventemitter2";
 
 // Generate the JSDoc typedef for Printer model
 /**
