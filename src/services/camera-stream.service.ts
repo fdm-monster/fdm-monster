@@ -1,6 +1,7 @@
-import { CameraStream } from "../models";
-import { validateInput } from "../handlers/validators";
-import { NotFoundException } from "../exceptions/runtime.exceptions";
+import { CameraStream } from "@/models";
+import { validateInput } from "@/handlers/validators";
+import { NotFoundException } from "@/exceptions/runtime.exceptions";
+import { PrinterCache } from "@/state/printer.cache";
 
 const createCameraStreamRules = {
   printerId: "mongoId",
@@ -14,12 +15,9 @@ const createCameraStreamRules = {
 
 export class CameraStreamService {
   model = CameraStream;
-  /**
-   * @type {PrinterCache}
-   */
-  printerCache;
+  printerCache: PrinterCache;
 
-  constructor({ printerCache }) {
+  constructor({ printerCache }: { printerCache: PrinterCache }) {
     this.printerCache = printerCache;
   }
 

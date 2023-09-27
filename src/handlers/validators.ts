@@ -1,7 +1,7 @@
 import { Request } from "express";
-import { InternalServerException, ValidationException } from "../exceptions/runtime.exceptions";
-import { currentPrinterToken, printerIdToken, printerLoginToken } from "../middleware/printer";
-import { normalizeUrl } from "../utils/normalize-url";
+import { InternalServerException, ValidationException } from "@/exceptions/runtime.exceptions";
+import { currentPrinterToken, printerIdToken, printerLoginToken } from "@/middleware/printer";
+import { normalizeUrl } from "@/utils/normalize-url";
 import nodeInputValidator, { extend } from "node-input-validator";
 
 export function getExtendedValidator() {
@@ -32,7 +32,7 @@ export function getExtendedValidator() {
   return nodeInputValidator;
 }
 
-export function getScopedPrinter(req) {
+export function getScopedPrinter(req: Request) {
   const tokens = [printerLoginToken, currentPrinterToken, printerIdToken];
   let resolvedDependencies = {};
   let errors = [];

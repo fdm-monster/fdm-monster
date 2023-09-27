@@ -10,6 +10,7 @@ import {
 import { getCurrentHub } from "@sentry/node";
 import { isTestEnvironment } from "@/utils/env.utils";
 import { AppConstants } from "@/server.constants";
+import { LoggerService } from "@/handlers/logger";
 
 export class SettingsStore {
   /**

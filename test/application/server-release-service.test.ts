@@ -4,7 +4,7 @@ import { DITokens } from "@/container.tokens";
 import { connect } from "../db-handler";
 import { asClass, AwilixContainer } from "awilix";
 import { AxiosMock } from "../mocks/axios.mock";
-import { ServerReleaseService } from "@/services/server-release.service";
+import { ServerReleaseService } from "@/services/core/server-release.service";
 
 let container: AwilixContainer;
 let service: ServerReleaseService;

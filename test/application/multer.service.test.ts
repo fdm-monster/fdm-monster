@@ -2,7 +2,7 @@ const fs = require("fs");
 jest.mock("fs");
 import { configureContainer } from "@/container";
 import { DITokens } from "@/container.tokens";
-import { MulterService } from "@/services/multer.service";
+import { MulterService } from "@/services/core/multer.service";
 
 let container;
 let multerService: MulterService;

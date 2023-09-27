@@ -2,6 +2,7 @@ import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import { findFileIndex } from "@/utils/find-predicate.utils";
 import { LoggerService } from "@/handlers/logger";
 import { PrinterService } from "@/services/printer.service";
+import { MongoIdType } from "@/shared.constants";
 
 /**
  * An extension repository for managing printer files in database
@@ -10,12 +11,18 @@ export class PrinterFilesService {
   printerService: PrinterService;
   private logger: LoggerService;
 
-  constructor({ printerService, loggerFactory }) {
+  constructor({
+    printerService,
+    loggerFactory,
+  }: {
+    printerService: PrinterService;
+    loggerFactory: (name: string) => LoggerService;
+  }) {
     this.printerService = printerService;
     this.logger = loggerFactory(PrinterFilesService.name);
   }
 
-  async getPrinterFilesStorage(printerId) {
+  async getPrinterFilesStorage(printerId: MongoIdType) {
     const printer = await this.printerService.get(printerId);
 
     return {
@@ -24,7 +31,7 @@ export class PrinterFilesService {
     };
   }
 
-  async updateFiles(printerId, fileList) {
+  async updateFiles(printerId: MongoIdType, fileList) {
     const printer = await this.printerService.get(printerId);
 
     printer.fileList = fileList;
@@ -35,7 +42,7 @@ export class PrinterFilesService {
     return printer.fileList;
   }
 
-  async appendOrReplaceFile(printerId, addedFile) {
+  async appendOrReplaceFile(printerId: MongoIdType, addedFile) {
     const printer = await this.printerService.get(printerId);
 
     // TODO replace with file storage
@@ -60,7 +67,7 @@ export class PrinterFilesService {
     return { fileList: printer.fileList, lastPrintedFile };
   }
 
-  async setPrinterLastPrintedFile(printerId, fileName) {
+  async setPrinterLastPrintedFile(printerId: MongoIdType, fileName) {
     await this.printerService.get(printerId);
     const lastPrintedFile = {
       fileName,
@@ -71,7 +78,7 @@ export class PrinterFilesService {
     return printer.lastPrintedFile;
   }
 
-  async clearFiles(printerId) {
+  async clearFiles(printerId: MongoIdType) {
     const printer = await this.printerService.get(printerId);
     printer.fileList.files = [];
     printer.markModified("fileList");
@@ -80,12 +87,8 @@ export class PrinterFilesService {
 
   /**
    * Perform delete action on database
-   * @param printerId
-   * @param filePath
-   * @param throwError when false no error will be thrown for a missing file
-   * @returns {Promise<*>}
-   */
-  async deleteFile(printerId, filePath, throwError = true) {
+   **/
+  async deleteFile(printerId: MongoIdType, filePath: string, throwError = true) {
     const printer = await this.printerService.get(printerId);
 
     const fileIndex = findFileIndex(printer.fileList, filePath);

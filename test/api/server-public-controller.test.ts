@@ -6,7 +6,7 @@ import { AppConstants } from "@/server.constants";
 import { DITokens } from "@/container.tokens";
 import { loginTestUser } from "./auth/login-test-user";
 import githubReleasesResponse from "./test-data/github-releases.data.json";
-import { ServerReleaseService } from "@/services/server-release.service";
+import { ServerReleaseService } from "@/services/core/server-release.service";
 import { SettingsStore } from "@/state/settings.store";
 import { AxiosMock } from "../mocks/axios.mock";
 import supertest from "supertest";

@@ -6,10 +6,11 @@
   "description": "FDM Monster is a bulk OctoPrint manager to set up, configure and monitor 3D printers. Our aim is to provide extremely optimized websocket performance and reliability.",
   "main": "src/index.ts",
   "scripts": {
-    "dev": "concurrently \"npm run watch-compile\" \"npm run watch-dev\"",
-    "watch-compile": "swc src -w --out-dir dist",
+    "dev": "concurrently \"yarn build:watch\" \"yarn watch-dev\"",
     "watch-dev": "cross-env NODE_ENV=development nodemon --watch \"dist/**/*\" -e js ./dist/index.js",
     "build": "swc src -d dist",
+    "build:watch": "swc src -w -d dist",
+    "start:dev": "ts-node src/index.ts",
     "start": "cross-env NODE_ENV=production node dist/index.js",
     "migration:create": "migrate-mongo create printer-remove-sortindex",
     "migration:up": "migrate-mongo up",
@@ -43,6 +44,7 @@
     "axios": "1.5.1",
     "bcryptjs": "2.4.3",
     "cache-manager": "4.1.0",
+    "class-validator": "0.14.0",
     "connect-history-api-fallback": "2.0.0",
     "cookie-parser": "1.4.6",
     "cors": "2.8.5",
@@ -66,6 +68,7 @@
     "passport": "0.6.0",
     "passport-anonymous": "1.0.1",
     "passport-jwt": "4.0.1",
+    "reflect-metadata": "0.1.13",
     "semver": "7.5.4",
     "simple-git": "3.20.0",
     "socket.io": "4.7.2",
@@ -117,7 +120,8 @@
     "nock": "13.3.3",
     "prettier": "2.8.8",
     "supertest": "6.3.3",
-    "typescript": "5.2.2"
+    "ts-node": "10.7.0",
+    "typescript": "4.5.2"
   },
   "resolutions": {
     "got": "11.8.6"

@@ -1,6 +1,6 @@
 import { AppConstants } from "@/server.constants";
-import { ClientBundleService } from "@/services/client-bundle.service";
-import { GithubService } from "@/services/github.service";
+import { ClientBundleService } from "@/services/core/client-bundle.service";
+import { GithubService } from "@/services/core/github.service";
 import { LoggerService } from "@/handlers/logger";
 
 export class ClientDistDownloadTask {

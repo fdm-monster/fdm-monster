@@ -12,6 +12,10 @@
       "legacyDecorator": true,
       "decoratorMetadata": true
     },
+    "minify": {
+      "compress": false,
+      "mangle": false
+    },
     "target": "es2022",
     "baseUrl": "./src",
     "paths": {

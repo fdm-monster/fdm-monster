@@ -21,7 +21,7 @@ import { FilesStore } from "@/state/files.store";
 import { SettingsStore } from "@/state/settings.store";
 import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
 import { BatchCallService } from "@/services/batch-call.service";
-import { MulterService } from "@/services/multer.service";
+import { MulterService } from "@/services/core/multer.service";
 import { PrinterFileCleanTask } from "@/tasks/printer-file-clean.task";
 import { LoggerService } from "@/handlers/logger";
 

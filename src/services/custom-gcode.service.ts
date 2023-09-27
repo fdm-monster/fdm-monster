@@ -1,8 +1,15 @@
-import { CustomGCode } from "../models";
-import { NotFoundException } from "../exceptions/runtime.exceptions";
+import { CustomGCode } from "@/models";
+import { NotFoundException } from "@/exceptions/runtime.exceptions";
+import { MongoIdType } from "@/shared.constants";
+
+class CustomGCodeDto {
+  name: string;
+  description: string;
+  gcode: string[];
+}
 
 export class CustomGCodeService {
-  async get(gcodeScriptId) {
+  async get(gcodeScriptId: MongoIdType) {
     const document = await CustomGCode.findById(gcodeScriptId);
     if (!document) throw new NotFoundException(`Custom GCode script with id ${gcodeScriptId} does not exist.`);
 
@@ -13,16 +20,16 @@ export class CustomGCodeService {
     return CustomGCode.find();
   }
 
-  async create(gcodeScript) {
+  async create(gcodeScript: CustomGCodeDto) {
     return CustomGCode.create(gcodeScript);
   }
 
-  async delete(gcodeScriptId) {
+  async delete(gcodeScriptId: MongoIdType) {
     const gcode = await this.get(gcodeScriptId);
     return CustomGCode.findByIdAndDelete(gcode.id);
   }
 
-  async update(gcodeScriptId, updatedData) {
+  async update(gcodeScriptId: MongoIdType, updatedData: CustomGCodeDto) {
     const customGcode = await this.get(gcodeScriptId);
     customGcode.name = updatedData.name;
     customGcode.description = updatedData.description;

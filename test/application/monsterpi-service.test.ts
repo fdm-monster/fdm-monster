@@ -2,7 +2,7 @@ import { clearDatabase, closeDatabase, connect } from "../db-handler";
 import { configureContainer } from "@/container";
 import { DITokens } from "@/container.tokens";
 import { afterEach } from "node:test";
-import { MonsterPiService } from "@/services/monsterpi.service";
+import { MonsterPiService } from "@/services/core/monsterpi.service";
 
 let monsterPiService: MonsterPiService;
 

@@ -3,11 +3,12 @@ import { createPrintCompletionRules } from "./validators/print-completion-servic
 import { validateInput } from "@/handlers/validators";
 import { groupArrayBy } from "@/utils/array.util";
 import { EVENT_TYPES } from "./octoprint/constants/octoprint-websocket.constants";
+import { LoggerService } from "@/handlers/logger";
 
 export class PrintCompletionService {
-  logger;
+  logger: LoggerService;
 
-  constructor({ loggerFactory }) {
+  constructor({ loggerFactory }: { loggerFactory: (name: string) => LoggerService }) {
     this.logger = loggerFactory(PrintCompletionService.name);
   }
 

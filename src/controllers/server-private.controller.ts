@@ -6,15 +6,15 @@ import { AppConstants } from "@/server.constants";
 import { ROLES } from "@/constants/authorization.constants";
 import { isTestEnvironment } from "@/utils/env.utils";
 import { validateMiddleware } from "@/handlers/validators";
-import { ServerReleaseService } from "@/services/server-release.service";
-import { ClientBundleService } from "@/services/client-bundle.service";
-import { ServerUpdateService } from "@/services/server-update.service";
+import { ServerReleaseService } from "@/services/core/server-release.service";
+import { ClientBundleService } from "@/services/core/client-bundle.service";
+import { ServerUpdateService } from "@/services/core/server-update.service";
 import { PrinterService } from "@/services/printer.service";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { PrinterCache } from "@/state/printer.cache";
 import { YamlService } from "@/services/yaml.service";
-import { MulterService } from "@/services/multer.service";
-import { LogDumpService } from "@/services/logs-manager.service";
+import { MulterService } from "@/services/core/multer.service";
+import { LogDumpService } from "@/services/core/logs-manager.service";
 
 export class ServerPrivateController {
   clientBundleService: ClientBundleService;

@@ -1,22 +1,22 @@
-import { SimpleIntervalJob, AsyncTask } from "toad-scheduler";
+import { AsyncTask, SimpleIntervalJob, ToadScheduler } from "toad-scheduler";
 import { AwilixResolutionError } from "awilix";
 import { JobValidationException } from "@/exceptions/job.exceptions";
 import { DITokens } from "@/container.tokens";
+import { LoggerService } from "@/handlers/logger";
 
 /**
  * Manage immediate or delayed tasks and recurring jobs.
  */
 export class TaskManagerService {
-  jobScheduler;
+  jobScheduler: ToadScheduler;
   taskStates = {};
 
-  #container;
+  private cradle: any;
+  private logger: LoggerService;
 
-  #logger;
-
-  constructor(container) {
-    this.#container = container;
-    this.#logger = container[DITokens.loggerFactory](TaskManagerService.name);
+  constructor(container: any) {
+    this.cradle = container;
+    this.logger = container[DITokens.loggerFactory](TaskManagerService.name);
     this.jobScheduler = container[DITokens.toadScheduler];
   }
 
@@ -39,7 +39,7 @@ export class TaskManagerService {
 
       let resolvedService;
       try {
-        resolvedService = this.#container[workload];
+        resolvedService = this.cradle[workload];
       } catch (e) {
         if (e instanceof AwilixResolutionError) {
           throw new JobValidationException(
@@ -91,7 +91,7 @@ export class TaskManagerService {
     try {
       this.validateInput(taskId, asyncTaskCallbackOrToken, schedulerOptions);
     } catch (e) {
-      this.#logger.error(e.stack, schedulerOptions);
+      this.logger.error(e.stack, schedulerOptions);
       return;
     }
 
@@ -170,7 +170,7 @@ export class TaskManagerService {
 
   runTimeoutTaskInstance(taskId, timeoutMs) {
     const taskState = this.getTaskState(taskId);
-    this.#logger.log(`Running delayed task ${taskId} in ${timeoutMs}ms`);
+    this.logger.log(`Running delayed task ${taskId} in ${timeoutMs}ms`);
     setTimeout(() => taskState.timedTask.execute(), timeoutMs, taskId);
   }
 
@@ -186,7 +186,7 @@ export class TaskManagerService {
     let taskState = this.taskStates[taskId];
     taskState.started = Date.now();
     if (typeof handler === "string") {
-      const taskService = this.#container[handler];
+      const taskService = this.cradle[handler];
       await taskService.run();
     } else {
       await handler();
@@ -194,7 +194,7 @@ export class TaskManagerService {
     taskState.duration = Date.now() - taskState.started;
 
     if (taskState.options?.logFirstCompletion !== false && !taskState?.firstCompletion) {
-      this.#logger.log(`Task '${taskId}' first completion. Duration ${taskState.duration}ms`);
+      this.logger.log(`Task '${taskId}' first completion. Duration ${taskState.duration}ms`);
       taskState.firstCompletion = Date.now();
     }
   }
@@ -209,7 +209,7 @@ export class TaskManagerService {
           error,
         };
 
-      this.#logger.error(`Task '${taskId}' threw an exception:` + error.stack);
+      this.logger.error(`Task '${taskId}' threw an exception:` + error.stack);
     };
   }
 
@@ -233,12 +233,12 @@ export class TaskManagerService {
       throw new JobValidationException(`The requested task with ID ${taskId} is not periodic and cannot be enabled.`);
     }
     if (!schedulerOptions.disabled) {
-      this.#logger.log(`Task '${taskId}' was scheduled (runImmediately: ${!!schedulerOptions.runImmediately}).`);
+      this.logger.log(`Task '${taskId}' was scheduled (runImmediately: ${!!schedulerOptions.runImmediately}).`);
       const job = new SimpleIntervalJob(schedulerOptions, timedTask);
       taskState.job = job;
       this.jobScheduler.addSimpleIntervalJob(job);
     } else {
-      this.#logger.log(`Task '${taskId}' was marked as disabled (deferred execution).`);
+      this.logger.log(`Task '${taskId}' was marked as disabled (deferred execution).`);
     }
   }
 }

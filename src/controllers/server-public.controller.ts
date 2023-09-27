@@ -8,8 +8,8 @@ import { serverSettingsKey } from "@/constants/server-settings.constants";
 import { RoleService } from "@/services/authentication/role.service";
 import { SettingsStore } from "@/state/settings.store";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
-import { ServerReleaseService } from "@/services/server-release.service";
-import { MonsterPiService } from "@/services/monsterpi.service";
+import { ServerReleaseService } from "@/services/core/server-release.service";
+import { MonsterPiService } from "@/services/core/monsterpi.service";
 import { UserService } from "@/services/authentication/user.service";
 
 export class ServerPublicController {

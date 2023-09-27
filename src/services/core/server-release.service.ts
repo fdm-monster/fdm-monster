@@ -1,25 +1,23 @@
 import semver from "semver";
 import { LoggerService } from "@/handlers/logger";
-import { AppConstants } from "../server.constants";
+import { AppConstants } from "@/server.constants";
+import { GithubService } from "@/services/core/github.service";
 
 export class ServerReleaseService {
-  airGapped = null; // Connection error
-  /*
-   * @type {GithubService}
-   */
-  githubService;
-  #synced = false;
-  #installedReleaseFound = null;
-  #updateAvailable = null;
-  #latestRelease = null;
-  #installedRelease = null;
+  airGapped: null | boolean = null; // Connection error
+  githubService: GithubService;
+  private synced = false;
+  private installedReleaseFound: null | boolean = null;
+  private updateAvailable: null | boolean = null;
+  private latestRelease: null | boolean = null;
+  private installedRelease: null | boolean = null;
   /**
    * @type {LoggerService}
    */
-  #logger = new LoggerService("ServerReleaseService");
+  #logger = new LoggerService(ServerReleaseService.name);
   #serverVersion;
 
-  constructor({ serverVersion, githubService }) {
+  constructor({ serverVersion, githubService }: { serverVersion: string; githubService: GithubService }) {
     this.#serverVersion = serverVersion;
     this.githubService = githubService;
   }
@@ -27,18 +25,17 @@ export class ServerReleaseService {
   getState() {
     return {
       airGapped: this.airGapped,
-      latestRelease: this.#latestRelease,
-      installedRelease: this.#installedRelease,
+      latestRelease: this.latestRelease,
+      installedRelease: this.installedRelease,
       serverVersion: this.#serverVersion,
-      installedReleaseFound: this.#installedReleaseFound,
-      updateAvailable: this.#updateAvailable,
-      synced: this.#synced,
+      installedReleaseFound: this.installedReleaseFound,
+      updateAvailable: this.updateAvailable,
+      synced: this.synced,
     };
   }
 
   /**
    * Connection-safe acquire data about the installed and latest releases.
-   * @returns {Promise<*|null>}
    */
   async syncLatestRelease(): Promise<any | null> {
     if (!(await this.githubService.wasAuthenticated())) {
@@ -48,7 +45,7 @@ export class ServerReleaseService {
     const repo = AppConstants.serverRepoName;
     const response = await this.githubService.getReleases(owner, repo);
     const latestResponse = await this.githubService.getLatestRelease(owner, repo);
-    this.#synced = true;
+    this.synced = true;
     const releases = response.data;
     const latestRelease = latestResponse.data;
 
@@ -60,20 +57,20 @@ export class ServerReleaseService {
     }
 
     const currentlyInstalledRelease = this.#serverVersion;
-    this.#installedRelease = {
+    this.installedRelease = {
       tag_name: currentlyInstalledRelease,
     };
-    this.#latestRelease = latestRelease;
+    this.latestRelease = latestRelease;
 
-    this.#installedReleaseFound = !!currentlyInstalledRelease;
-    if (!this.#installedReleaseFound) {
-      this.#updateAvailable = false;
+    this.installedReleaseFound = !!currentlyInstalledRelease;
+    if (!this.installedReleaseFound) {
+      this.updateAvailable = false;
       return;
     }
 
     // If the installed release is unknown/unstable, no update should be triggered
-    const lastTagIsNewer = semver.gt(this.#latestRelease.tag_name, this.#installedRelease.tag_name, true);
-    this.#updateAvailable = this.#installedReleaseFound && lastTagIsNewer;
+    const lastTagIsNewer = semver.gt(this.latestRelease.tag_name, this.installedRelease.tag_name, true);
+    this.updateAvailable = this.installedReleaseFound && lastTagIsNewer;
   }
 
   /**
@@ -90,7 +87,7 @@ export class ServerReleaseService {
     }
 
     const packageVersion = this.#serverVersion;
-    if (!this.#installedReleaseFound) {
+    if (!this.installedReleaseFound) {
       this.#logger.log(
         `\x1b[36mCurrent release tag not found in github releases.\x1b[0m
     Here's github's latest released: \x1b[32m${latestReleaseTag}\x1b[0m

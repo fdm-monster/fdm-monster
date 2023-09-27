@@ -14,7 +14,7 @@ services:
 
   fdm-monster:
     container_name: fdm-monster
-    image: davidzwa/fdm-monster:latest
+    image: davidzwa/fdm-monster:develop
     build:
       context: .
       dockerfile: docker/Dockerfile
