@@ -1,41 +1,47 @@
-import { authenticate, withPermission } from "../middleware/authenticate";
+import { authenticate, withPermission } from "@/middleware/authenticate";
 import { createController } from "awilix-express";
-import { AppConstants } from "../server.constants";
-import { PERMS } from "../constants/authorization.constants";
-import { validateInput } from "../handlers/validators";
+import { AppConstants } from "@/server.constants";
+import { PERMS } from "@/constants/authorization.constants";
+import { validateInput } from "@/handlers/validators";
+import { PrintCompletionService } from "@/services/print-completion.service";
+import { PrintCompletionSocketIoTask } from "@/tasks/print-completion.socketio.task";
+import { Request, Response } from "express";
 
 export class PrintCompletionController {
-  private printCompletionService;
-  private printCompletionSocketIoTask;
+  private printCompletionService: PrintCompletionService;
+  private printCompletionSocketIoTask: PrintCompletionSocketIoTask;
 
-  constructor({ printCompletionService, loggerFactory, printCompletionSocketIoTask }) {
+  constructor({
+    printCompletionService,
+    printCompletionSocketIoTask,
+  }: {
+    printCompletionService: PrintCompletionService;
+    printCompletionSocketIoTask: PrintCompletionSocketIoTask;
+  }) {
     this.printCompletionService = printCompletionService;
     this.printCompletionSocketIoTask = printCompletionSocketIoTask;
   }
 
   /**
    * Not a production ready call, just for testing.
-   * @param req
-   * @param res
-   * @returns {Promise<void>}
    */
-  async test(req, res) {
+  async test(req: Request, res: Response) {
     const result = await this.printCompletionService.loadPrintContexts();
     res.send(result);
   }
 
-  contexts(req, res) {
+  contexts(req: Request, res: Response) {
     const contexts = this.printCompletionSocketIoTask.contexts;
     res.send(contexts);
   }
 
-  async findCorrelatedEntries(req, res) {
+  async findCorrelatedEntries(req: Request, res: Response) {
     const { correlationId } = await validateInput(req.params, { correlationId: "required|string" });
     const result = await this.printCompletionService.findPrintCompletion(correlationId);
     res.send(result);
   }
 
-  async list(req, res) {
+  async list(req: Request, res: Response) {
     const completions = await this.printCompletionService.listGroupByPrinterStatus();
     res.send(completions);
   }

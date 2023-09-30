@@ -4,63 +4,73 @@ import { authenticate, authorizeRoles } from "@/middleware/authenticate";
 import { ROLES } from "@/constants/authorization.constants";
 import { printerResolveMiddleware } from "@/middleware/printer";
 import { getScopedPrinter } from "@/handlers/validators";
+import { Cache } from "cache-manager";
+import { PrinterCache } from "@/state/printer.cache";
+import { ILoggerFactory } from "@/handlers/logger-factory";
+import { Request, Response } from "express";
+import { PluginFirmwareUpdateService } from "@/services/octoprint/plugin-firmware-update.service";
+import { LoggerService } from "@/handlers/logger";
 
 const cacheKey = "firmware-state";
 
 export class PluginFirmwareUpdateController {
-  #cacheManager;
-  /**
-   * @type {PrinterCache}
-   */
-  printerCache;
-  #pluginFirmwareUpdateService;
-  #logger;
+  private cacheManager: Cache;
+  private printerCache: PrinterCache;
+  private pluginFirmwareUpdateService: PluginFirmwareUpdateService;
+  private logger: LoggerService;
 
-  constructor({ cacheManager, printerCache, pluginFirmwareUpdateService, loggerFactory }) {
-    this.#cacheManager = cacheManager;
+  constructor({
+    cacheManager,
+    printerCache,
+    pluginFirmwareUpdateService,
+    loggerFactory,
+  }: {
+    cacheManager: Cache;
+    printerCache: PrinterCache;
+    pluginFirmwareUpdateService: PluginFirmwareUpdateService;
+    loggerFactory: ILoggerFactory;
+  }) {
+    this.cacheManager = cacheManager;
     this.printerCache = printerCache;
-    this.#pluginFirmwareUpdateService = pluginFirmwareUpdateService;
-    this.#logger = loggerFactory("PluginFirmwareUpdateController");
+    this.pluginFirmwareUpdateService = pluginFirmwareUpdateService;
+    this.logger = loggerFactory(PluginFirmwareUpdateController.name);
   }
 
-  async listUpdateState(req, res) {
+  async listUpdateState(req: Request, res: Response) {
     const result = await this.#performScanOnPrinters();
     res.send(result);
   }
 
   /**
    * Explicit query, use with care (to prevent Github rate limit)
-   * @param req
-   * @param res
-   * @returns {Promise<void>}
    */
-  async syncFirmwareReleasesCache(req, res) {
-    const releases = await this.#pluginFirmwareUpdateService.queryGithubPrusaFirmwareReleasesCache();
+  async syncFirmwareReleasesCache(req: Request, res: Response) {
+    const releases = await this.pluginFirmwareUpdateService.queryGithubPrusaFirmwareReleasesCache();
     res.send(releases);
   }
 
-  async downloadFirmware(req, res) {
-    await this.#pluginFirmwareUpdateService.downloadFirmware();
+  async downloadFirmware(req: Request, res: Response) {
+    await this.pluginFirmwareUpdateService.downloadFirmware();
     res.send({});
   }
 
-  async scanPrinterFirmwareVersions(req, res) {
+  async scanPrinterFirmwareVersions(req: Request, res: Response) {
     const result = await this.#performScanOnPrinters();
     res.send(result);
   }
 
-  async isPluginInstalled(req, res) {
+  async isPluginInstalled(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
-    const isInstalled = await this.#pluginFirmwareUpdateService.isPluginInstalled(printerLogin);
+    const isInstalled = await this.pluginFirmwareUpdateService.isPluginInstalled(printerLogin);
     res.send({ isInstalled });
   }
 
-  async installFirmwareUpdatePlugin(req, res) {
+  async installFirmwareUpdatePlugin(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
-    const isInstalled = await this.#pluginFirmwareUpdateService.isPluginInstalled(printerLogin);
+    const isInstalled = await this.pluginFirmwareUpdateService.isPluginInstalled(printerLogin);
     if (!isInstalled) {
-      this.#logger.log("Installing firmware-update plugin");
-      await this.#pluginFirmwareUpdateService.installPlugin(printerLogin);
+      this.logger.log("Installing firmware-update plugin");
+      await this.pluginFirmwareUpdateService.installPlugin(printerLogin);
       res.send({ isInstalled, installing: true });
       return;
     }
@@ -68,21 +78,21 @@ export class PluginFirmwareUpdateController {
     res.send({ isInstalled, installing: false });
   }
 
-  async getFirmwareUpdaterStatus(req, res) {
+  async getFirmwareUpdaterStatus(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
-    const status = await this.#pluginFirmwareUpdateService.getPluginFirmwareStatus(printerLogin);
+    const status = await this.pluginFirmwareUpdateService.getPluginFirmwareStatus(printerLogin);
     res.send(status);
   }
 
-  async configurePluginSettings(req, res) {
+  async configurePluginSettings(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
-    const response = await this.#pluginFirmwareUpdateService.configureFirmwareUpdaterSettings(printerLogin);
+    const response = await this.pluginFirmwareUpdateService.configureFirmwareUpdaterSettings(printerLogin);
     res.send(response);
   }
 
-  async flashFirmware(req, res) {
+  async flashFirmware(req: Request, res: Response) {
     const { printerLogin, currentPrinterId } = getScopedPrinter(req);
-    await this.#pluginFirmwareUpdateService.flashPrusaFirmware(currentPrinterId, printerLogin);
+    await this.pluginFirmwareUpdateService.flashPrusaFirmware(currentPrinterId, printerLogin);
 
     res.send({});
   }
@@ -94,11 +104,11 @@ export class PluginFirmwareUpdateController {
     for (let printer of printers) {
       try {
         const loginDto = await this.printerCache.getLoginDtoAsync(printer.id);
-        const isInstalled = await this.#pluginFirmwareUpdateService.isPluginInstalled(loginDto);
+        const isInstalled = await this.pluginFirmwareUpdateService.isPluginInstalled(loginDto);
 
         let version;
         if (isInstalled) {
-          version = await this.#pluginFirmwareUpdateService.getPrinterFirmwareVersion(loginDto);
+          version = await this.pluginFirmwareUpdateService.getPrinterFirmwareVersion(loginDto);
         }
 
         printerFirmwareStates.push({
@@ -108,7 +118,7 @@ export class PluginFirmwareUpdateController {
           pluginInstalled: isInstalled,
         });
       } catch (e) {
-        this.#logger.warn("Firmware updater plugin scan failed", e);
+        this.logger.warn("Firmware updater plugin scan failed", e);
         failureStates.push({
           id: printer.id,
           printerName: printer.name,
@@ -120,7 +130,7 @@ export class PluginFirmwareUpdateController {
       firmwareStates: printerFirmwareStates,
       failures: failureStates,
     };
-    this.#cacheManager.set(cacheKey, result, { ttl: 3600 * 4 });
+    await this.cacheManager.set(cacheKey, result, { ttl: 3600 * 4 });
     return result;
   }
 }

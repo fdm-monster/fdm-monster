@@ -1,15 +1,16 @@
 import {
-  ValidationException,
-  NotFoundException,
-  InternalServerException,
-  ExternalServiceError,
   AuthenticationError,
   AuthorizationError,
   BadRequestException,
-} from "../exceptions/runtime.exceptions";
-import { AppConstants } from "../server.constants";
+  ExternalServiceError,
+  InternalServerException,
+  NotFoundException,
+  ValidationException,
+} from "@/exceptions/runtime.exceptions";
+import { AppConstants } from "@/server.constants";
+import { NextFunction, Request, Response } from "express";
 
-export function exceptionHandler(err, req, res, next) {
+export function exceptionHandler(err, req: Request, res: Response, next: NextFunction) {
   const isTest = process.env.NODE_ENV === AppConstants.defaultTestEnv;
   if (!isTest) {
     console.error("[API Exception Handler]", err.stack || err?.response?.data);

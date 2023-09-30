@@ -1,6 +1,6 @@
 import { Floor } from "./Floor";
 import { Printer } from "./Printer";
-import { ServerSettings } from "./ServerSettings";
+import { Settings } from "./Settings";
 import { User } from "./Auth/User";
 import { Role } from "./Auth/Role";
 import { Permission } from "./Auth/Permission";
@@ -9,4 +9,4 @@ import { RefreshToken } from "./Auth/RefreshToken";
 import { CameraStream } from "./CameraStream";
 import { CustomGCode } from "./CustomGCode";
 
-export { Printer, Floor, PrintCompletion, CustomGCode, ServerSettings, User, Role, Permission, RefreshToken, CameraStream };
+export { Printer, Floor, PrintCompletion, CustomGCode, Settings, User, Role, Permission, RefreshToken, CameraStream };

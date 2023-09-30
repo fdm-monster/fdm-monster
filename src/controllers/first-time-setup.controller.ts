@@ -7,19 +7,28 @@ import { ROLES } from "@/constants/authorization.constants";
 import { UserService } from "@/services/authentication/user.service";
 import { RoleService } from "@/services/authentication/role.service";
 import { SettingsStore } from "@/state/settings.store";
+import { Request, Response } from "express";
 
 export class FirstTimeSetupController {
   userService: UserService;
   roleService: RoleService;
   settingsStore: SettingsStore;
 
-  constructor({ settingsStore, roleService, userService }) {
+  constructor({
+    settingsStore,
+    roleService,
+    userService,
+  }: {
+    settingsStore: SettingsStore;
+    roleService: RoleService;
+    userService: UserService;
+  }) {
     this.settingsStore = settingsStore;
     this.roleService = roleService;
     this.userService = userService;
   }
 
-  async completeWizard(req, res) {
+  async completeWizard(req: Request, res: Response) {
     const { loginRequired, registration, rootUsername, rootPassword } = await validateMiddleware(req, wizardSettingsRules);
 
     if (this.settingsStore.isWizardCompleted()) {

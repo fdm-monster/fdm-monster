@@ -11,11 +11,9 @@ import { getCurrentHub } from "@sentry/node";
 import { isTestEnvironment } from "@/utils/env.utils";
 import { AppConstants } from "@/server.constants";
 import { LoggerService } from "@/handlers/logger";
-import { Settings } from "@/entities";
-import { SettingsService2 } from "@/services/orm/settings.service";
 
 export class SettingsStore {
-  settingsService: SettingsService2;
+  settingsService: ISettingsService;
   logger: LoggerService;
   private settings: Settings | null = null;
 
@@ -23,7 +21,7 @@ export class SettingsStore {
     settingsService,
     loggerFactory,
   }: {
-    settingsService: SettingsService2;
+    settingsService: ISettingsService;
     loggerFactory: (context: string) => LoggerService;
   }) {
     this.settingsService = settingsService;
@@ -118,7 +116,7 @@ export class SettingsStore {
   }
 
   async setRegistrationEnabled(registration = true) {
-    this.settings = await this.settingsService.patchServerSettings({
+    this.settings = await this.settingsService.({
       registration,
     });
     return this.getSettings();

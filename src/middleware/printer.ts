@@ -1,14 +1,15 @@
 import { asValue } from "awilix";
-import { DITokens } from "../container.tokens";
+import { DITokens } from "@/container.tokens";
+import { NextFunction, Request, Response } from "express";
+import { PrinterCache } from "@/state/printer.cache";
 
 export const printerIdToken = "currentPrinterId";
 export const currentPrinterToken = "currentPrinter";
 export const printerLoginToken = "printerLogin";
 
 export const printerResolveMiddleware = (key = "id") => {
-  return (req, res, next) => {
-    /** @type {PrinterCache} */
-    const printerCache = req.container.resolve(DITokens.printerCache);
+  return (req: Request, res: Response, next: NextFunction) => {
+    const printerCache: PrinterCache = req.container.resolve(DITokens.printerCache);
 
     let scopedPrinter = undefined;
     let loginDto = undefined;

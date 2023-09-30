@@ -8,7 +8,51 @@ import {
   wizardSettingKey,
 } from "@/constants/server-settings.constants";
 
-const ServerSettingsSchema = new Schema({
+export interface ISettings {
+  [wizardSettingKey]: {
+    wizardCompleted: boolean;
+    wizardCompletedAt: Date | null;
+    wizardVersion: number;
+  };
+  [fileCleanSettingKey]: {
+    autoRemoveOldFilesBeforeUpload: boolean;
+    autoRemoveOldFilesAtBoot: boolean;
+    autoRemoveOldFilesCriteriumDays: number;
+  };
+  [credentialSettingsKey]: {
+    jwtSecret: string;
+    jwtExpiresIn: number;
+    refreshTokenAttempts: number;
+    refreshTokenExpiry: number;
+    createdAt: Date;
+    updatedAt: Date;
+  };
+  [serverSettingsKey]: {
+    sentryDiagnosticsEnabled: boolean;
+    debugSettings: {
+      debugSocketIoEvents: boolean;
+      debugSocketReconnect: boolean;
+      debugSocketRetries: boolean;
+      debugSocketSetup: boolean;
+      debugSocketMessages: boolean;
+      debugSocketIoBandwidth: boolean;
+    };
+    loginRequired: boolean;
+    registration: boolean;
+    whitelistEnabled: boolean;
+    whitelistedIpAddresses: string[];
+  };
+  [frontendSettingKey]: {
+    gridCols: number;
+    gridRows: number;
+    largeTiles: boolean;
+  };
+  [timeoutSettingKey]: {
+    apiTimeout: number;
+  };
+}
+
+const SettingsSchema = new Schema<ISettings>({
   [wizardSettingKey]: {
     wizardCompleted: {
       type: Boolean,
@@ -162,4 +206,4 @@ const ServerSettingsSchema = new Schema({
   },
 });
 
-export const ServerSettings = model("ServerSettings", ServerSettingsSchema);
+export const Settings = model("ServerSettings", SettingsSchema);

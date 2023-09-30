@@ -1,7 +1,7 @@
 import { jsonContentType, contentTypeHeaderKey } from "./constants/octoprint-service.constants";
 import { validateLogin, constructHeaders } from "./utils/api.utils";
-import { getDefaultTimeout } from "../../constants/server-settings.constants";
-import { normalizeUrl } from "../../utils/normalize-url";
+import { getDefaultTimeout } from "@/constants/server-settings.constants";
+import { normalizeUrl } from "@/utils/normalize-url";
 
 export class OctoPrintRoutes {
   octoPrintBase = "/";
@@ -129,7 +129,7 @@ export class OctoPrintRoutes {
 
     if (!this._timeouts) {
       throw new Error(
-        "OctoPrint API Service could not load timeout settings. settingsStore:ServerSettings:timeout didnt return anything"
+        "OctoPrint API Service could not load timeout settings. settingsStore:Settings:timeout didnt return anything"
       );
     }
   }

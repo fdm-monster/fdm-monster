@@ -1,37 +1,22 @@
 import { v4 as uuidv4 } from "uuid";
-import { RefreshToken } from "../../models";
-import { AuthenticationError } from "../../exceptions/runtime.exceptions";
-import { comparePasswordHash } from "../../utils/crypto.utils";
-import { AppConstants } from "../../server.constants";
+import { RefreshToken } from "@/models";
+import { AuthenticationError } from "@/exceptions/runtime.exceptions";
+import { comparePasswordHash } from "@/utils/crypto.utils";
+import { AppConstants } from "@/server.constants";
+import { SettingsStore } from "@/state/settings.store";
+import { LoggerService } from "@/handlers/logger";
+import { UserService } from "@/services/authentication/user.service";
+import { JwtService } from "@/services/authentication/jwt.service";
+import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class AuthService {
-  /**
-   * @type {LoggerService}
-   */
-  logger;
-  /**
-   * @private
-   */
+  private logger: LoggerService;
   private RefreshTokenModel = RefreshToken;
-  /**
-   * @private
-   * @type {UserService}
-   */
-  private userService;
-  /**
-   * @private
-   * @type {JwtService}
-   */
-  private jwtService;
-  /**
-   * @private
-   * @type {SettingsStore}
-   */
-  private settingsStore;
+  private userService: UserService;
+  private jwtService: JwtService;
+  private settingsStore: SettingsStore;
   /**
    *  When users are blacklisted at runtime, this cache can make quick work of rejecting them
-   * @private
-   * @type {{}}
    */
   private blacklistedCache = {};
 
@@ -53,14 +38,24 @@ export class AuthService {
    * refreshAttempts => integer in setting with cap?
    */
 
-  constructor({ userService, jwtService, loggerFactory, settingsStore }) {
+  constructor({
+    userService,
+    jwtService,
+    loggerFactory,
+    settingsStore,
+  }: {
+    userService: UserService;
+    jwtService: JwtService;
+    loggerFactory: ILoggerFactory;
+    settingsStore: SettingsStore;
+  }) {
     this.userService = userService;
     this.jwtService = jwtService;
     this.logger = loggerFactory(AuthService.name);
     this.settingsStore = settingsStore;
   }
 
-  async loginUser(username, password) {
+  async loginUser(username: string, password: string) {
     const userDoc = await this.userService.findRawByUsername(username);
     if (!userDoc) {
       throw new AuthenticationError("Login incorrect");
@@ -86,12 +81,12 @@ export class AuthService {
     await this.deleteRefreshTokenAndBlacklistUserId(userId);
   }
 
-  async logoutUserRefreshToken(refreshToken) {
+  async logoutUserRefreshToken(refreshToken: string) {
     const userRefreshToken = await this.getValidRefreshToken(refreshToken);
     await this.deleteRefreshTokenAndBlacklistUserId(userRefreshToken.userId);
   }
 
-  async renewLoginByRefreshToken(refreshToken) {
+  async renewLoginByRefreshToken(refreshToken: string) {
     const userRefreshToken = await this.getValidRefreshToken(refreshToken, false);
     if (!userRefreshToken) {
       throw new AuthenticationError("The refresh token was invalid or expired, could not refresh user token");
@@ -103,26 +98,22 @@ export class AuthService {
   }
 
   /**
-   * @private
    * @param {string} userId
-   * @returns {Promise<string>}
    */
-  async signJwtToken(userId) {
+  private async signJwtToken(userId): Promise<string> {
     const user = await this.userService.getUser(userId);
     return this.jwtService.signJwtToken(userId, user.username);
   }
 
   /**
-   * @private
    * @param userId
-   * @return {Promise<string>}
    */
-  async createRefreshToken(userId) {
+  private async createRefreshToken(userId): Promise<string> {
     const { refreshTokenExpiry } = await this.settingsStore.getCredentialSettings();
     const refreshToken = uuidv4();
 
     if (!refreshTokenExpiry) {
-      this.logger.warn("Refresh token expiry not set in ServerSettings:credentials, using default");
+      this.logger.warn("Refresh token expiry not set in Settings:credentials, using default");
     }
 
     const timespan = refreshTokenExpiry ?? AppConstants.DEFAULT_REFRESH_TOKEN_EXPIRY;
@@ -137,12 +128,9 @@ export class AuthService {
   }
 
   /**
-   * @private
-   * @param {string} refreshToken
-   * @param {boolean} throwNotFoundError throws when refresh token expired
    * @returns {Promise<RefreshToken|null>}
    */
-  async getValidRefreshToken(refreshToken, throwNotFoundError = true) {
+  private async getValidRefreshToken(refreshToken: string, throwNotFoundError: boolean = true) {
     const userRefreshToken = await this.RefreshTokenModel.findOne({
       refreshToken,
     });
@@ -160,12 +148,7 @@ export class AuthService {
     return userRefreshToken;
   }
 
-  /**
-   * @private
-   * @param refreshToken
-   * @return {Promise<void>}
-   */
-  async increaseRefreshTokenAttemptsUsed(refreshToken) {
+  private async increaseRefreshTokenAttemptsUsed(refreshToken: string): Promise<void> {
     const { refreshTokenAttempts } = await this.settingsStore.getCredentialSettings();
     const userRefreshToken = await this.getValidRefreshToken(refreshToken);
 
@@ -178,7 +161,7 @@ export class AuthService {
       throw new AuthenticationError("Refresh token attempts exceeded, login required");
     }
 
-    const result = await this.RefreshTokenModel.findOneAndUpdate(
+    return this.RefreshTokenModel.findOneAndUpdate(
       {
         refreshToken,
       },
@@ -189,15 +172,12 @@ export class AuthService {
         new: true,
       }
     );
-    return result;
   }
 
   /**
-   * @private
    * @param {string} userId
-   * @return {Promise<void>}
    */
-  async deleteRefreshTokenAndBlacklistUserId(userId) {
+  private async deleteRefreshTokenAndBlacklistUserId(userId): Promise<void> {
     if (!userId) {
       throw new AuthenticationError("No user id provided");
     }
@@ -210,11 +190,9 @@ export class AuthService {
   }
 
   /**
-   * @private
    * @param userId
-   * @return {Promise<void>}
    */
-  async deleteRefreshTokenByUserId(userId) {
+  private async deleteRefreshTokenByUserId(userId): Promise<void> {
     const result = await this.RefreshTokenModel.deleteMany({
       userId,
     });
@@ -224,12 +202,7 @@ export class AuthService {
     }
   }
 
-  /**
-   * @private
-   * @param refreshToken
-   * @return {Promise<void>}
-   */
-  async deleteRefreshToken(refreshToken) {
+  private async deleteRefreshToken(refreshToken: string): Promise<void> {
     const result = await this.RefreshTokenModel.deleteOne({
       refreshToken,
     });
@@ -245,18 +218,16 @@ export class AuthService {
   }
 
   /**
-   * @private
    * @param {string} userId
    */
-  addBlackListEntry(userId) {
+  private addBlackListEntry(userId) {
     this.blacklistedCache[userId] = true;
   }
 
   /**
-   * @private
    * @param userId
    */
-  removeBlacklistEntry(userId) {
+  private removeBlacklistEntry(userId) {
     delete this.blacklistedCache[userId];
   }
 }

@@ -1,18 +1,14 @@
-import { DITokens } from "../../container.tokens";
+import { DITokens } from "@/container.tokens";
+import { OctoPrintSockIoAdapter } from "@/services/octoprint/octoprint-sockio.adapter";
 
 export class SocketFactory {
-  /**
-   * @type {Cradle}
-   */
-  cradle;
-  constructor(cradle) {
+  cradle: any;
+
+  constructor(cradle: {}) {
     this.cradle = cradle;
   }
 
-  /**
-   * @returns {OctoPrintSockIoAdapter}
-   */
-  createInstance() {
+  createInstance(): OctoPrintSockIoAdapter {
     return this.cradle[DITokens.octoPrintSockIoAdapter];
   }
 }
