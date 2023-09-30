@@ -7,6 +7,7 @@ import nock from "nock";
 import supertest from "supertest";
 import { connect } from "../db-handler";
 import { OctoPrintApiMock } from "../mocks/octoprint-api.mock";
+import { PrinterFilesController } from "@/controllers/printer-files.controller";
 
 const defaultRoute = AppConstants.apiRoute + "/printer-files";
 const trackedUploadsRoute = `${defaultRoute}/tracked-uploads`;
@@ -36,7 +37,7 @@ beforeEach(async () => {
   octoPrintApiService.storeResponse(undefined, undefined);
 });
 
-describe("PrinterFilesController", () => {
+describe(PrinterFilesController.name, () => {
   const gcodePath = "test/api/test-data/sample.gcode";
   const invalidGcodePath = "test/api/test-data/sample.gco";
   const nockResponse = {

@@ -26,6 +26,7 @@ import { PrinterFileCleanTask } from "@/tasks/printer-file-clean.task";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { Request, Response } from "express";
+import { AxiosResponse } from "axios";
 
 export class PrinterFilesController {
   filesStore: FilesStore;
@@ -73,7 +74,7 @@ export class PrinterFilesController {
 
     this.logger.log("Refreshing file storage by eager load");
     const response = await this.filesStore.eagerLoadPrinterFiles(currentPrinterId, recursive);
-    this.#statusResponse(res, response);
+    this.statusResponse(res, response);
   }
 
   /**
@@ -254,9 +255,9 @@ export class PrinterFilesController {
     res.send(response);
   }
 
-  #statusResponse(req: Request, res: Response) {
-    res.statusCode = res.status;
-    res.send(res.data);
+  private statusResponse(res: Response, response: AxiosResponse) {
+    res.statusCode = response.status;
+    res.send(response.data);
   }
 }
 
