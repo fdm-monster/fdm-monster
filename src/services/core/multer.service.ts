@@ -1,6 +1,6 @@
 import multer from "multer";
-import { join, extname } from "path";
-import { readdirSync, existsSync, lstatSync, unlink, mkdirSync, createWriteStream } from "fs";
+import { extname, join } from "path";
+import { createWriteStream, existsSync, lstatSync, mkdirSync, readdirSync, unlink } from "fs";
 import { superRootPath } from "@/utils/fs.utils";
 import { AppConstants } from "@/server.constants";
 import { AxiosStatic } from "axios";
@@ -19,22 +19,6 @@ export class MulterService {
   }) {
     this.fileUploadTrackerCache = fileUploadTrackerCache;
     this.httpClient = httpClient;
-  }
-
-  /**
-   * @private
-   * @param dir
-   * @returns {{file: *, mtime: Date}[]}
-   */
-  orderRecentFiles = (dir) => {
-    return readdirSync(dir)
-      .filter((file) => lstatSync(join(dir, file)).isFile())
-      .map((file) => ({ file, mtime: lstatSync(join(dir, file)).mtime }))
-      .sort((a, b) => b.mtime.getTime() - a.mtime.getTime());
-  };
-
-  private collectionPath(collection): string {
-    return join(superRootPath(), AppConstants.defaultFileStorageFolder, collection);
   }
 
   getNewestFile(collection) {
@@ -131,5 +115,20 @@ export class MulterService {
 
   getSessions() {
     return this.fileUploadTrackerCache.getUploads();
+  }
+
+  /**
+   *@param dir
+   * @returns {{file: *, mtime: Date}[]}
+   */
+  private orderRecentFiles = (dir) => {
+    return readdirSync(dir)
+      .filter((file) => lstatSync(join(dir, file)).isFile())
+      .map((file) => ({ file, mtime: lstatSync(join(dir, file)).mtime }))
+      .sort((a, b) => b.mtime.getTime() - a.mtime.getTime());
+  };
+
+  private collectionPath(collection): string {
+    return join(superRootPath(), AppConstants.defaultFileStorageFolder, collection);
   }
 }

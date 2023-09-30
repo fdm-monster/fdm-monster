@@ -1,5 +1,12 @@
 import { model, Schema } from "mongoose";
 
+export interface ICustomGCode {
+  id: string;
+  name: string;
+  description: string;
+  gcode: string[];
+}
+
 const CustomGCodeSchema = new Schema({
   name: {
     type: String,

@@ -2,13 +2,14 @@ import { captureException } from "@sentry/node";
 import { existsSync, readFileSync } from "fs";
 import { LoggerService } from "@/handlers/logger";
 import { AppConstants } from "@/server.constants";
+import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class MonsterPiService {
   private fileLocation = AppConstants.monsterPiFilePath;
   monsterPiVersion: string | null = null;
   logger;
 
-  constructor({ loggerFactory }: { loggerFactory: (name: string) => LoggerService }) {
+  constructor({ loggerFactory }: { loggerFactory: ILoggerFactory }) {
     this.logger = loggerFactory(MonsterPiService.name);
   }
 

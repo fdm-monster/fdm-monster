@@ -2,16 +2,25 @@ import { AppConstants } from "@/server.constants";
 import { ClientBundleService } from "@/services/core/client-bundle.service";
 import { GithubService } from "@/services/core/github.service";
 import { LoggerService } from "@/handlers/logger";
+import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class ClientDistDownloadTask {
   clientBundleService: ClientBundleService;
   githubService: GithubService;
   logger: LoggerService;
 
-  constructor({ clientBundleService, loggerFactory, githubService }) {
+  constructor({
+    clientBundleService,
+    loggerFactory,
+    githubService,
+  }: {
+    clientBundleService: ClientBundleService;
+    loggerFactory: ILoggerFactory;
+    githubService: GithubService;
+  }) {
     this.githubService = githubService;
     this.clientBundleService = clientBundleService;
-    this.logger = loggerFactory("ClientDistDownloadTask");
+    this.logger = loggerFactory(ClientDistDownloadTask.name);
   }
 
   async run() {

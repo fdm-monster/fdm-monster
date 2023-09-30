@@ -1,37 +1,32 @@
 import { closeDatabase, connect } from "../db-handler";
 import { PrinterMockData } from "./test-data/printer.data";
-import { Floor } from "@/models";
+import { Floor } from "@/models/Floor";
 import { DITokens } from "@/container.tokens";
 import { configureContainer } from "@/container";
 import { FloorService } from "@/services/floor.service";
 import { PrinterService } from "@/services/printer.service";
+import { IFloorService } from "@/services/interfaces/floor.service.interface";
 
-let floorService: FloorService;
+let floorService: IFloorService;
 let printerService: PrinterService;
 
 beforeAll(async () => {
   await connect();
   const container = configureContainer();
-  printerService = container.resolve(DITokens.printerService);
-  floorService = container.resolve(DITokens.floorService);
+  printerService = container.resolve<PrinterService>(DITokens.printerService);
+  floorService = container.resolve<IFloorService>(DITokens.floorService);
 });
 
 afterAll(async () => {
   await closeDatabase();
 });
 
-/**
- * floorService test suite.
- */
-describe("floorService ", () => {
-  /**
-   * Tests that a valid printer group can be created through the printerGrouoService without throwing any errors.
-   */
-  it("can be created correctly without printer group", async () => {
+describe(FloorService.name, () => {
+  it("can be created correctly without printers", async () => {
     // Create it
     await floorService.create({
       name: "TopFloor1",
-      floor: 1,
+      level: 1,
       printers: [],
     });
 
@@ -40,11 +35,22 @@ describe("floorService ", () => {
     expect(floor).toBeTruthy();
   });
 
+  it("dto mapping floor", async () => {
+    const floor = await floorService.create({
+      name: "TopFloor1",
+      floor: 11,
+      printers: [],
+    });
+    const dto = floorService.toDto(floor);
+    expect(dto).toBeTruthy();
+    expect(typeof dto.id).toBe("string");
+  });
+
   it("can delete existing floor", async () => {
     // Create it
     const floor = await floorService.create({
       name: "TopFloor1",
-      floor: 2,
+      level: 2,
       printers: [],
     });
 
@@ -56,7 +62,7 @@ describe("floorService ", () => {
   it("can not add printer to floor", async () => {
     // Prepare the CRUD DTO
     const newPrinter = PrinterMockData.PrinterMock;
-    const pg = await printerService.create(newPrinter);
+    const pos = await printerService.create(newPrinter);
 
     // Create it
     const floor = await floorService.create({
@@ -67,7 +73,7 @@ describe("floorService ", () => {
 
     expect(floorService.get(floor.id)).toBeTruthy();
     const newFloor = await floorService.addOrUpdatePrinter(floor.id, {
-      printerId: pg.id,
+      printerId: pos.id,
       x: 1,
       y: 1,
     });

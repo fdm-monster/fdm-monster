@@ -1,7 +1,15 @@
-import { model, Schema } from "mongoose";
-import { PrinterInFloorSchema } from "./FloorPrinter";
+import { model, Schema, Types } from "mongoose";
+import { IPrinterInFloor, PrinterInFloorSchema } from "./FloorPrinter";
 
-const FloorSchema = new Schema({
+export interface IFloor {
+  _id: Types.ObjectId;
+  id: string;
+  name: string;
+  floor: number;
+  printers: IPrinterInFloor[];
+}
+
+const FloorSchema = new Schema<IFloor>({
   name: {
     type: String,
     required: true,

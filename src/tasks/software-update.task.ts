@@ -1,10 +1,9 @@
-export class SoftwareUpdateTask {
-  /**
-   * @type {ServerReleaseService}
-   */
-  serverReleaseService;
+import { ServerReleaseService } from "@/services/core/server-release.service";
 
-  constructor({ serverReleaseService }) {
+export class SoftwareUpdateTask {
+  serverReleaseService: ServerReleaseService;
+
+  constructor({ serverReleaseService }: { serverReleaseService: ServerReleaseService }) {
     this.serverReleaseService = serverReleaseService;
   }
 

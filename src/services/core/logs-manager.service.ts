@@ -5,11 +5,12 @@ import { superRootPath } from "@/utils/fs.utils";
 import { AppConstants } from "@/server.constants";
 import { isValidDate } from "@/utils/time.utils";
 import { LoggerService } from "@/handlers/logger";
+import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class LogDumpService {
   logger: LoggerService;
 
-  constructor({ loggerFactory }: { loggerFactory: (name: string) => LoggerService }) {
+  constructor({ loggerFactory }: { loggerFactory: ILoggerFactory }) {
     this.logger = loggerFactory(LogDumpService.name);
   }
 

@@ -1,29 +1,31 @@
-import { octoPrintWebsocketEvent, fdmMonsterPrinterStoppedEvent } from "../constants/event.constants";
-import { EVENT_TYPES } from "../services/octoprint/constants/octoprint-websocket.constants";
-import { generateCorrelationToken } from "../utils/correlation-token.util";
-import { IO_MESSAGES } from "../state/socket-io.gateway";
+import { octoPrintWebsocketEvent, fdmMonsterPrinterStoppedEvent } from "@/constants/event.constants";
+import { EVENT_TYPES } from "@/services/octoprint/constants/octoprint-websocket.constants";
+import { generateCorrelationToken } from "@/utils/correlation-token.util";
+import { IO_MESSAGES, SocketIoGateway } from "@/state/socket-io.gateway";
+import EventEmitter2 from "eventemitter2";
+import { LoggerService } from "@/handlers/logger";
+import { PrintCompletionService } from "@/services/print-completion.service";
+import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class PrintCompletionSocketIoTask {
-  /**
-   * @type {EventEmitter2}
-   */
-  eventEmitter2;
-  /**
-   * @type {SocketIoGateway}
-   */
-  socketIoGateway;
-  /**
-   * @type {LoggerService}
-   */
-  logger;
-  /**
-   * @type {PrintCompletionService}
-   */
-  printCompletionService;
+  eventEmitter2: EventEmitter2;
+  socketIoGateway: SocketIoGateway;
+  logger: LoggerService;
+  printCompletionService: PrintCompletionService;
 
   contextCache = {};
 
-  constructor({ eventEmitter2, socketIoGateway, printCompletionService, loggerFactory }) {
+  constructor({
+    eventEmitter2,
+    socketIoGateway,
+    printCompletionService,
+    loggerFactory,
+  }: {
+    eventEmitter2: EventEmitter2;
+    socketIoGateway: SocketIoGateway;
+    printCompletionService: PrintCompletionService;
+    loggerFactory: ILoggerFactory;
+  }) {
     this.eventEmitter2 = eventEmitter2;
     this.socketIoGateway = socketIoGateway;
     this.printCompletionService = printCompletionService;

@@ -18,6 +18,7 @@ import { RoleService } from "@/services/authentication/role.service";
 import { UserService } from "@/services/authentication/user.service";
 import { PluginRepositoryCache } from "@/services/octoprint/plugin-repository.cache";
 import { ClientBundleService } from "@/services/core/client-bundle.service";
+import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class BootTask {
   logger: LoggerService;
@@ -54,7 +55,25 @@ export class BootTask {
     pluginFirmwareUpdateService,
     clientBundleService,
     configService,
+  }: {
+    loggerFactory: ILoggerFactory;
+    serverTasks: ServerTasks;
+    settingsService: SettingsService2;
+    settingsStore: SettingsStore;
+    multerService: MulterService;
+    printerSocketStore: PrinterSocketStore;
+    filesStore: FilesStore;
+    permissionService: PermissionService;
+    roleService: RoleService;
+    userService: UserService;
+    taskManagerService: TaskManagerService;
+    pluginRepositoryCache: PluginRepositoryCache;
+    floorStore: FloorStore;
+    pluginFirmwareUpdateService: PluginFirmwareUpdateService;
+    clientBundleService: ClientBundleService;
+    configService: ConfigService;
   }) {
+    this.logger = loggerFactory(BootTask.name);
     this.serverTasks = serverTasks;
     this.settingsService = settingsService;
     this.settingsStore = settingsStore;
@@ -68,7 +87,6 @@ export class BootTask {
     this.pluginRepositoryCache = pluginRepositoryCache;
     this.floorStore = floorStore;
     this.pluginFirmwareUpdateService = pluginFirmwareUpdateService;
-    this.logger = loggerFactory(BootTask.name);
     this.clientBundleService = clientBundleService;
     this.configService = configService;
   }

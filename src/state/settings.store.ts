@@ -11,29 +11,27 @@ import { getCurrentHub } from "@sentry/node";
 import { isTestEnvironment } from "@/utils/env.utils";
 import { AppConstants } from "@/server.constants";
 import { LoggerService } from "@/handlers/logger";
+import { Settings } from "@/entities";
+import { SettingsService2 } from "@/services/orm/settings.service";
 
 export class SettingsStore {
-  /**
-   * @private
-   * @type {ServerSettings}
-   */
-  settings;
-  /**
-   * @type {SettingsService}
-   */
-  settingsService;
-  /**
-   * @type {LoggerService}
-   */
-  logger;
+  settingsService: SettingsService2;
+  logger: LoggerService;
+  private settings: Settings | null = null;
 
-  constructor({ settingsService, loggerFactory }) {
+  constructor({
+    settingsService,
+    loggerFactory,
+  }: {
+    settingsService: SettingsService2;
+    loggerFactory: (context: string) => LoggerService;
+  }) {
     this.settingsService = settingsService;
     this.logger = loggerFactory(SettingsStore.name);
   }
 
   getSettings() {
-    const settings = this.settings._doc;
+    const settings = this.settings!;
     return Object.freeze({
       [serverSettingsKey]: settings[serverSettingsKey],
       [wizardSettingKey]: settings[wizardSettingKey],
@@ -110,19 +108,19 @@ export class SettingsStore {
     return this.getSettings()[fileCleanSettingKey]?.autoRemoveOldFilesBeforeUpload;
   }
 
-  /**
-   * @param version {number}
-   */
-  async setWizardCompleted(version) {
-    this.settings = await this.settingsService.setWizardCompleted(version);
+  async setWizardCompleted(version: number) {
+    this.settings = await this.settingsService.patchWizardSettings({
+      wizardCompleted: true,
+      wizardCompletedAt: new Date(),
+      wizardVersion: version,
+    });
     return this.getSettings();
   }
 
-  /**
-   * @param {Boolean} enabled
-   */
-  async setRegistrationEnabled(enabled = true) {
-    this.settings = await this.settingsService.setRegistrationEnabled(enabled);
+  async setRegistrationEnabled(registration = true) {
+    this.settings = await this.settingsService.patchServerSettings({
+      registration,
+    });
     return this.getSettings();
   }
 
@@ -130,21 +128,23 @@ export class SettingsStore {
     return this.getServerSettings().loginRequired;
   }
 
-  /**
-   * @param {Boolean} enabled
-   */
-  async setLoginRequired(enabled = true) {
-    this.settings = await this.settingsService.setLoginRequired(enabled);
+  async setLoginRequired(loginRequired = true) {
+    this.settings = await this.settingsService.patchServerSettings({
+      loginRequired,
+    });
     return this.getSettings();
   }
 
-  async setWhitelist(enabled = true, ipAddresses) {
-    this.settings = await this.settingsService.setWhitelist(enabled, ipAddresses);
+  async setWhitelist(whiteListEnabled = true, whiteListIpAddresses) {
+    this.settings = await this.settingsService.patchServerSettings({
+      whiteListEnabled,
+      whiteListIpAddresses,
+    });
     return this.getSettings();
   }
 
   async updateServerSettings(serverSettings) {
-    this.settings = await this.settingsService.updateServerSettings(serverSettings);
+    this.settings = await this.settingsService.patchServerSettings(serverSettings);
     return this.getSettings();
   }
 
@@ -153,17 +153,20 @@ export class SettingsStore {
     return this.getSettings();
   }
 
-  async setSentryDiagnosticsEnabled(enabled) {
-    this.settings = await this.settingsService.setSentryDiagnosticsEnabled(enabled);
+  async setSentryDiagnosticsEnabled(sentryDiagnosticsEnabled: boolean) {
+    this.settings = await this.settingsService.patchServerSettings({
+      sentryDiagnosticsEnabled,
+    });
     await this.processSentryEnabled();
     return this.getSettings();
   }
 
-  /**
-   * @private
-   * @returns {Promise<void>}
-   */
-  async processSentryEnabled() {
+  async updateFrontendSettings(frontendSettings) {
+    this.settings = await this.settingsService.updateFrontendSettings(frontendSettings);
+    return this.getSettings();
+  }
+
+  private async processSentryEnabled() {
     if (isTestEnvironment()) return;
     const sentryEnabled = await this.getAnonymousDiagnosticsEnabled();
     if (sentryEnabled) {
@@ -172,10 +175,5 @@ export class SettingsStore {
       this.logger.log("Disabling Sentry for remote diagnostics");
     }
     getCurrentHub().getClient()!.getOptions().enabled = sentryEnabled;
-  }
-
-  async updateFrontendSettings(frontendSettings) {
-    this.settings = await this.settingsService.updateFrontendSettings(frontendSettings);
-    return this.getSettings();
   }
 }

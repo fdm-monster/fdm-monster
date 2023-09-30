@@ -14,6 +14,7 @@ import { BootTask } from "./tasks/boot.task";
 import { TaskManagerService } from "@/services/core/task-manager.service";
 import { isProductionEnvironment } from "@/utils/env.utils";
 import { ConfigService } from "@/services/core/config.service";
+import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class ServerHost {
   bootTask: BootTask;
@@ -30,7 +31,7 @@ export class ServerHost {
     socketIoGateway,
     configService,
   }: {
-    loggerFactory: (context: string) => LoggerService;
+    loggerFactory: ILoggerFactory;
     bootTask: BootTask;
     taskManagerService: TaskManagerService;
     socketIoGateway: SocketIoGateway;

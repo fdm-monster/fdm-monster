@@ -45,7 +45,7 @@ import { SocketIoGateway } from "./state/socket-io.gateway";
 import { ClientBundleService } from "./services/core/client-bundle.service";
 import { FloorService } from "./services/floor.service";
 import { FloorStore } from "./state/floor.store";
-import { YamlService } from "./services/yaml.service";
+import { YamlService } from "./services/core/yaml.service";
 import { MonsterPiService } from "./services/core/monsterpi.service";
 import { BatchCallService } from "./services/batch-call.service";
 import { ClientDistDownloadTask } from "./tasks/client-bundle.task";

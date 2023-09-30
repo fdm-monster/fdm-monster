@@ -1,6 +1,12 @@
-import { Schema } from "mongoose";
+import { Schema, Types } from "mongoose";
 
-export const PrinterInFloorSchema = new Schema({
+export interface IPrinterInFloor {
+  x: number;
+  y: number;
+  printerId: Types.ObjectId;
+}
+
+export const PrinterInFloorSchema = new Schema<IPrinterInFloor>({
   printerId: {
     type: Schema.Types.ObjectId,
     ref: "Printer",

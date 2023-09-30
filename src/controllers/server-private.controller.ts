@@ -12,7 +12,7 @@ import { ServerUpdateService } from "@/services/core/server-update.service";
 import { PrinterService } from "@/services/printer.service";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { PrinterCache } from "@/state/printer.cache";
-import { YamlService } from "@/services/yaml.service";
+import { YamlService } from "@/services/core/yaml.service";
 import { MulterService } from "@/services/core/multer.service";
 import { LogDumpService } from "@/services/core/logs-manager.service";
 

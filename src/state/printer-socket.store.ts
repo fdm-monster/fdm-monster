@@ -9,39 +9,45 @@ import { LoggerService } from "@/handlers/logger";
 import { ConfigService } from "@/services/core/config.service";
 import { SettingsStore } from "@/state/settings.store";
 import { SocketIoGateway } from "@/state/socket-io.gateway";
+import { ILoggerFactory } from "@/handlers/logger-factory";
+import { IdType } from "@/shared.constants";
 
 export class PrinterSocketStore {
   socketIoGateway: SocketIoGateway;
   socketFactory: SocketFactory;
   eventEmitter2: EventEmitter2;
   printerCache: PrinterCache;
-  printerSocketAdaptersById: {
-    [s: string]: OctoPrintSockIoAdapter;
-  } = {};
+  printerSocketAdaptersById: Record<string, OctoPrintSockIoAdapter> = {};
   logger: LoggerService;
   configService: ConfigService;
   settingsStore: SettingsStore;
 
-  constructor({ socketFactory, socketIoGateway, settingsStore, eventEmitter2, printerCache, loggerFactory, configService }) {
+  constructor({
+    socketFactory,
+    socketIoGateway,
+    settingsStore,
+    eventEmitter2,
+    printerCache,
+    loggerFactory,
+    configService,
+  }: {
+    socketFactory: SocketFactory;
+    socketIoGateway: SocketIoGateway;
+    settingsStore: SettingsStore;
+    eventEmitter2: EventEmitter2;
+    printerCache: PrinterCache;
+    loggerFactory: ILoggerFactory;
+    configService: ConfigService;
+  }) {
     this.printerCache = printerCache;
     this.socketIoGateway = socketIoGateway;
     this.socketFactory = socketFactory;
     this.eventEmitter2 = eventEmitter2;
     this.settingsStore = settingsStore;
-    this.logger = loggerFactory("PrinterSocketStore");
+    this.logger = loggerFactory(PrinterSocketStore.name);
     this.configService = configService;
 
     this.subscribeToEvents();
-  }
-
-  /**
-   * @private
-   */
-  subscribeToEvents() {
-    this.eventEmitter2.on(printerEvents.printerCreated, this.handlePrinterCreated.bind(this));
-    this.eventEmitter2.on(printerEvents.printersDeleted, this.handlePrintersDeleted.bind(this));
-    this.eventEmitter2.on(printerEvents.printerUpdated, this.handlePrinterUpdated.bind(this));
-    this.eventEmitter2.on(printerEvents.batchPrinterCreated, this.handleBatchPrinterCreated.bind(this));
   }
 
   getSocketStatesById() {
@@ -85,9 +91,8 @@ export class PrinterSocketStore {
 
   /**
    * Reconnect the OctoPrint Websocket connection
-   * @param id
    */
-  reconnectOctoPrint(id) {
+  reconnectOctoPrint(id: IdType) {
     const socket = this.getPrinterSocket(id);
     socket.close();
 
@@ -95,19 +100,14 @@ export class PrinterSocketStore {
     socket.resetSocketState();
   }
 
-  /**
-   * @param {string} id
-   * @returns {OctoPrintSockIoAdapter}
-   */
-  getPrinterSocket(id) {
+  getPrinterSocket(id: IdType): OctoPrintSockIoAdapter {
     return this.printerSocketAdaptersById[id];
   }
 
   /**
    * Sets up the new WebSocket connections for all printers
-   * @returns {Promise<void>}
    */
-  async reconnectPrinterSockets() {
+  async reconnectPrinterSockets(): Promise<void> {
     let reauthRequested = 0;
     let socketSetupRequested = 0;
     const socketStates = {};
@@ -183,7 +183,7 @@ export class PrinterSocketStore {
     };
   }
 
-  handleBatchPrinterCreated({ printers }) {
+  private handleBatchPrinterCreated({ printers }) {
     for (const p of printers) {
       this.handlePrinterCreated({ printer: p });
     }
@@ -194,7 +194,7 @@ export class PrinterSocketStore {
    * @param { printer: Printer } printer
    * @returns void
    */
-  handlePrinterCreated({ printer }) {
+  private handlePrinterCreated({ printer }) {
     this.createOrUpdateSocket(printer);
   }
 
@@ -203,7 +203,7 @@ export class PrinterSocketStore {
    * @param { printer: Printer } printer
    * @returns void
    */
-  handlePrinterUpdated({ printer }) {
+  private handlePrinterUpdated({ printer }) {
     this.logger.log(`Printer '${printer.id}' updated. Updating socket.`);
     this.createOrUpdateSocket(printer);
   }
@@ -244,10 +244,17 @@ export class PrinterSocketStore {
     foundAdapter.resetSocketState();
   }
 
-  handlePrintersDeleted({ printerIds }) {
+  private handlePrintersDeleted({ printerIds }) {
     printerIds.forEach((id) => {
       this.deleteSocket(id);
     });
+  }
+
+  private subscribeToEvents() {
+    this.eventEmitter2.on(printerEvents.printerCreated, this.handlePrinterCreated.bind(this));
+    this.eventEmitter2.on(printerEvents.printersDeleted, this.handlePrintersDeleted.bind(this));
+    this.eventEmitter2.on(printerEvents.printerUpdated, this.handlePrinterUpdated.bind(this));
+    this.eventEmitter2.on(printerEvents.batchPrinterCreated, this.handleBatchPrinterCreated.bind(this));
   }
 
   private deleteSocket(printerId: string) {

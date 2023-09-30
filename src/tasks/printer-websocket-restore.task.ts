@@ -4,6 +4,7 @@ import { SettingsStore } from "@/state/settings.store";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
 import { LoggerService } from "@/handlers/logger";
+import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class PrinterWebsocketRestoreTask {
   settingsStore: SettingsStore;
@@ -11,7 +12,17 @@ export class PrinterWebsocketRestoreTask {
   octoPrintApiService: OctoPrintApiService;
   logger: LoggerService;
 
-  constructor({ printerSocketStore, octoPrintApiService, settingsStore, loggerFactory }) {
+  constructor({
+    printerSocketStore,
+    octoPrintApiService,
+    settingsStore,
+    loggerFactory,
+  }: {
+    printerSocketStore: PrinterSocketStore;
+    octoPrintApiService: OctoPrintApiService;
+    settingsStore: SettingsStore;
+    loggerFactory: ILoggerFactory;
+  }) {
     this.printerSocketStore = printerSocketStore;
     this.octoPrintApiService = octoPrintApiService;
     this.settingsStore = settingsStore;

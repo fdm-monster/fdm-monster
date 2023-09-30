@@ -20,7 +20,7 @@ afterAll(async () => {
 
 describe(PrintCompletionService.name, () => {
   /**
-   * Tests that a valid printer group can be created through the printerGrouoService without throwing any errors.
+   * Tests that a valid completion can be created through the service without throwing any errors.
    */
   it("can add a print failure with or without log", async () => {
     const completionEntry = await printCompletionService.create({

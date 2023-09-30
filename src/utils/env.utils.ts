@@ -1,7 +1,5 @@
 import fs from "fs";
-import dotenv from "dotenv";
 import { LoggerService } from "@/handlers/logger";
-import { isDocker } from "./is-docker";
 import { AppConstants } from "@/server.constants";
 import { join } from "path";
 

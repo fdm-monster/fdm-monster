@@ -1,38 +1,39 @@
-import { Server } from "socket.io";
-import { socketIoConnectedEvent } from "../constants/event.constants";
+import { Server, Socket } from "socket.io";
+import { socketIoConnectedEvent } from "@/constants/event.constants";
+import { SettingsStore } from "@/state/settings.store";
+import EventEmitter2 from "eventemitter2";
+import { LoggerService } from "@/handlers/logger";
+import { ILoggerFactory } from "@/handlers/logger-factory";
+import * as http from "http";
 
 export class SocketIoGateway {
-  /**
-   * @type {LoggerService}
-   */
-  logger;
-  /**
-   * @type {EventEmitter2}
-   */
-  eventEmitter2;
-  /**
-   * @type {Server}
-   */
-  io;
+  logger: LoggerService;
+  eventEmitter2: EventEmitter2;
+  io: Server;
 
-  /**
-   * @type {SettingsStore}
-   */
-  settingsStore;
+  settingsStore: SettingsStore;
 
-  constructor({ loggerFactory, eventEmitter2, settingsStore }) {
+  constructor({
+    loggerFactory,
+    eventEmitter2,
+    settingsStore,
+  }: {
+    loggerFactory: ILoggerFactory;
+    eventEmitter2: EventEmitter2;
+    settingsStore: SettingsStore;
+  }) {
     this.logger = loggerFactory(SocketIoGateway.name);
     this.eventEmitter2 = eventEmitter2;
     this.settingsStore = settingsStore;
   }
 
-  attachServer(httpServer) {
+  attachServer(httpServer: http.Server) {
     this.io = new Server(httpServer, { cors: { origin: "*" } });
     const that = this;
     this.io.on("connection", (socket) => this.onConnect.bind(that)(socket));
   }
 
-  onConnect(socket) {
+  onConnect(socket: Socket) {
     this.logger.log("SocketIO Client connected", socket.id);
     this.eventEmitter2.emit(socketIoConnectedEvent, socket.id);
 
@@ -41,7 +42,7 @@ export class SocketIoGateway {
     });
   }
 
-  send(event, data) {
+  send<T>(event: string, data: T) {
     if (!this.io) {
       this.logger.debug("No io server setup yet");
       return;
