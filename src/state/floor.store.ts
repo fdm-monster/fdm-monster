@@ -85,13 +85,13 @@ export class FloorStore extends KeyDiffCache<CachedFloor> {
   }
 
   async updateName(floorId: IdType, updateSpec) {
-    const floor = await this.floorService.updateName(floorId, updateSpec);
+    const floor = await this.floorService.updateName(floorId, updateSpec.name);
     await this.setKeyValue(floorId, floor, true);
     return floor;
   }
 
   async updateFloorNumber(floorId: IdType, updateSpec) {
-    const floor = await this.floorService.updateLevel(floorId, updateSpec);
+    const floor = await this.floorService.updateLevel(floorId, updateSpec.floor);
     await this.setKeyValue(floorId, floor, true);
     return floor;
   }

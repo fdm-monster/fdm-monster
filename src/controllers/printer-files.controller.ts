@@ -268,7 +268,7 @@ export default createController(PrinterFilesController)
   .post("/purge", "purgeIndexedFiles", withPermission(PERMS.PrinterFiles.Clear))
   .get("/tracked-uploads", "getTrackedUploads", withPermission(PERMS.PrinterFiles.Upload))
   /**
-   * @deprecated will be moved to /batch in 1.4.0
+   * @deprecated will be moved to /batch in 1.6.0
    */
   .post("/batch/reprint-files", "batchReprintFiles", withPermission(PERMS.PrinterFiles.Actions))
   .get("/:id", "getFiles", withPermission(PERMS.PrinterFiles.Get))

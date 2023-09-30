@@ -128,7 +128,7 @@ export class FloorService implements IFloorService<MongoIdType> {
 
   async updateName(floorId: MongoIdType, floorName: string) {
     const floor = await this.get(floorId);
-    const { name } = await validateInput(floorName, updateFloorNameRules);
+    const { name } = await validateInput({ name: floorName }, updateFloorNameRules);
     floor.name = name;
     return await floor.save();
   }
