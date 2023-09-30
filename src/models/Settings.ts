@@ -8,48 +8,62 @@ import {
   wizardSettingKey,
 } from "@/constants/server-settings.constants";
 
+export interface IWizardSettings {
+  wizardCompleted: boolean;
+  wizardCompletedAt: Date | null;
+  wizardVersion: number;
+}
+
+export interface IFileCleanSettings {
+  autoRemoveOldFilesBeforeUpload: boolean;
+  autoRemoveOldFilesAtBoot: boolean;
+  autoRemoveOldFilesCriteriumDays: number;
+}
+
+export interface ICredentialSettings {
+  jwtSecret: string;
+  jwtExpiresIn: number;
+  refreshTokenAttempts: number;
+  refreshTokenExpiry: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface IDebugSettings {
+  debugSocketIoEvents: boolean;
+  debugSocketReconnect: boolean;
+  debugSocketRetries: boolean;
+  debugSocketSetup: boolean;
+  debugSocketMessages: boolean;
+  debugSocketIoBandwidth: boolean;
+}
+
+export interface IServerSettings {
+  sentryDiagnosticsEnabled: boolean;
+  debugSettings: IDebugSettings;
+  loginRequired: boolean;
+  registration: boolean;
+  whitelistEnabled: boolean;
+  whitelistedIpAddresses: string[];
+}
+
+export interface IFrontendSettings {
+  gridCols: number;
+  gridRows: number;
+  largeTiles: boolean;
+}
+
+export interface ITimeoutSettings {
+  apiTimeout: number;
+}
+
 export interface ISettings {
-  [wizardSettingKey]: {
-    wizardCompleted: boolean;
-    wizardCompletedAt: Date | null;
-    wizardVersion: number;
-  };
-  [fileCleanSettingKey]: {
-    autoRemoveOldFilesBeforeUpload: boolean;
-    autoRemoveOldFilesAtBoot: boolean;
-    autoRemoveOldFilesCriteriumDays: number;
-  };
-  [credentialSettingsKey]: {
-    jwtSecret: string;
-    jwtExpiresIn: number;
-    refreshTokenAttempts: number;
-    refreshTokenExpiry: number;
-    createdAt: Date;
-    updatedAt: Date;
-  };
-  [serverSettingsKey]: {
-    sentryDiagnosticsEnabled: boolean;
-    debugSettings: {
-      debugSocketIoEvents: boolean;
-      debugSocketReconnect: boolean;
-      debugSocketRetries: boolean;
-      debugSocketSetup: boolean;
-      debugSocketMessages: boolean;
-      debugSocketIoBandwidth: boolean;
-    };
-    loginRequired: boolean;
-    registration: boolean;
-    whitelistEnabled: boolean;
-    whitelistedIpAddresses: string[];
-  };
-  [frontendSettingKey]: {
-    gridCols: number;
-    gridRows: number;
-    largeTiles: boolean;
-  };
-  [timeoutSettingKey]: {
-    apiTimeout: number;
-  };
+  [wizardSettingKey]: IWizardSettings;
+  [fileCleanSettingKey]: IFileCleanSettings;
+  [credentialSettingsKey]: ICredentialSettings;
+  [serverSettingsKey]: IServerSettings;
+  [frontendSettingKey]: IFrontendSettings;
+  [timeoutSettingKey]: ITimeoutSettings;
 }
 
 const SettingsSchema = new Schema<ISettings>({

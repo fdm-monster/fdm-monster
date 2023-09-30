@@ -22,6 +22,7 @@ import {
   serverSettingsUpdateRules,
 } from "./validators/settings-service.validation";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
+import { ICredentialSettings, IFrontendSettings, IServerSettings, IWizardSettings } from "@/models/Settings";
 
 export class SettingsService implements ISettingsService {
   async getOrCreate() {
@@ -80,11 +81,9 @@ export class SettingsService implements ISettingsService {
     });
   }
 
-  async setWizardCompleted(version: number) {
+  async patchWizardSettings(patchUpdate: Partial<IWizardSettings>) {
     const settingsDoc = await this.getOrCreate();
-    settingsDoc[wizardSettingKey].wizardCompleted = true;
-    settingsDoc[wizardSettingKey].wizardCompletedAt = new Date();
-    settingsDoc[wizardSettingKey].wizardVersion = version;
+    settingsDoc[wizardSettingKey] = Object.assign(settingsDoc[wizardSettingKey], patchUpdate);
 
     return Settings.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
       new: true,
@@ -120,7 +119,7 @@ export class SettingsService implements ISettingsService {
     });
   }
 
-  async updateFrontendSettings(patchUpdate) {
+  async updateFrontendSettings(patchUpdate: IFrontendSettings) {
     const validatedInput = await validateInput(
       {
         [frontendSettingKey]: patchUpdate,
@@ -134,9 +133,9 @@ export class SettingsService implements ISettingsService {
     });
   }
 
-  async updateCredentialSettings(patchUpdate) {
+  async patchCredentialSettings(patchUpdate: Partial<ICredentialSettings>) {
     const settingsDoc = await this.getOrCreate();
-    const credentialSettings = settingsDoc[credentialSettingsKey]._doc;
+    const credentialSettings = settingsDoc[credentialSettingsKey];
 
     Object.assign(credentialSettings, patchUpdate);
     const validatedInput = await validateInput(
@@ -151,7 +150,7 @@ export class SettingsService implements ISettingsService {
     });
   }
 
-  async updateServerSettings(patchUpdate) {
+  async patchServerSettings(patchUpdate: Partial<IServerSettings>) {
     const validatedInput = await validateInput(patchUpdate, serverSettingsUpdateRules);
     const settingsDoc = await this.getOrCreate();
 

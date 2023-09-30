@@ -6,6 +6,7 @@ import { createTestPrinter } from "./test-data/create-printer";
 import { expectOkResponse } from "../extensions";
 import { OctoPrintApiMock } from "../mocks/octoprint-api.mock";
 import supertest from "supertest";
+import { BatchCallController } from "@/controllers/batch-call.controller";
 
 let Model = Printer;
 const defaultRoute = AppConstants.apiRoute + "/batch";
@@ -26,7 +27,7 @@ beforeEach(async () => {
   octoPrintApiService.storeResponse(undefined, undefined);
 });
 
-describe("BatchCallController", () => {
+describe(BatchCallController.name, () => {
   it("should allow POST to batch reprint many printer files", async () => {
     const printer = await createTestPrinter(request);
     const printer2 = await createTestPrinter(request);

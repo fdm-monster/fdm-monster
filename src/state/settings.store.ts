@@ -11,11 +11,14 @@ import { getCurrentHub } from "@sentry/node";
 import { isTestEnvironment } from "@/utils/env.utils";
 import { AppConstants } from "@/server.constants";
 import { LoggerService } from "@/handlers/logger";
+import { ISettingsService } from "@/services/interfaces/settings.service.interface";
+import { ISettings } from "@/models/Settings";
+import { CredentialSettingsDto, FrontendSettingsDto, ServerSettingsDto } from "@/services/interfaces/settings.dto";
 
 export class SettingsStore {
   settingsService: ISettingsService;
   logger: LoggerService;
-  private settings: Settings | null = null;
+  private settings: ISettings | null = null;
 
   constructor({
     settingsService,
@@ -53,7 +56,7 @@ export class SettingsStore {
     return this.settings[serverSettingsKey].sentryDiagnosticsEnabled;
   }
 
-  async persistOptionalCredentialSettings(overrideJwtSecret: string, overrideJwtExpiresIn) {
+  async persistOptionalCredentialSettings(overrideJwtSecret: string, overrideJwtExpiresIn: string) {
     if (overrideJwtSecret) {
       await this.updateCredentialSettings({
         jwtSecret: overrideJwtSecret,
@@ -61,7 +64,7 @@ export class SettingsStore {
     }
     if (overrideJwtExpiresIn) {
       await this.updateCredentialSettings({
-        jwtExpiresIn: overrideJwtExpiresIn,
+        jwtExpiresIn: parseInt(overrideJwtExpiresIn),
       });
     }
   }
@@ -116,7 +119,7 @@ export class SettingsStore {
   }
 
   async setRegistrationEnabled(registration = true) {
-    this.settings = await this.settingsService.({
+    this.settings = await this.settingsService.patchServerSettings({
       registration,
     });
     return this.getSettings();
@@ -133,21 +136,21 @@ export class SettingsStore {
     return this.getSettings();
   }
 
-  async setWhitelist(whiteListEnabled = true, whiteListIpAddresses) {
+  async setWhitelist(whitelistEnabled = true, whitelistedIpAddresses: string[]) {
     this.settings = await this.settingsService.patchServerSettings({
-      whiteListEnabled,
-      whiteListIpAddresses,
+      whitelistEnabled,
+      whitelistedIpAddresses,
     });
     return this.getSettings();
   }
 
-  async updateServerSettings(serverSettings) {
+  async updateServerSettings(serverSettings: Partial<ServerSettingsDto>) {
     this.settings = await this.settingsService.patchServerSettings(serverSettings);
     return this.getSettings();
   }
 
-  async updateCredentialSettings(credentialSettings) {
-    this.settings = await this.settingsService.updateCredentialSettings(credentialSettings);
+  async updateCredentialSettings(credentialSettings: Partial<CredentialSettingsDto>) {
+    this.settings = await this.settingsService.patchCredentialSettings(credentialSettings);
     return this.getSettings();
   }
 
@@ -159,7 +162,7 @@ export class SettingsStore {
     return this.getSettings();
   }
 
-  async updateFrontendSettings(frontendSettings) {
+  async updateFrontendSettings(frontendSettings: FrontendSettingsDto) {
     this.settings = await this.settingsService.updateFrontendSettings(frontendSettings);
     return this.getSettings();
   }
