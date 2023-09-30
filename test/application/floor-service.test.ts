@@ -26,7 +26,7 @@ describe(FloorService.name, () => {
     // Create it
     await floorService.create({
       name: "TopFloor1",
-      level: 1,
+      floor: 1,
       printers: [],
     });
 
@@ -50,7 +50,7 @@ describe(FloorService.name, () => {
     // Create it
     const floor = await floorService.create({
       name: "TopFloor1",
-      level: 2,
+      floor: 2,
       printers: [],
     });
 
