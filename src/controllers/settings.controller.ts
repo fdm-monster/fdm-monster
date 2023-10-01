@@ -6,6 +6,7 @@ import { validateInput } from "@/handlers/validators";
 import { whitelistSettingRules, sentryDiagnosticsEnabledRules } from "./validation/setting.validation";
 import { SettingsStore } from "@/state/settings.store";
 import { Request, Response } from "express";
+import { IpWhitelistSettingsDto } from "@/services/interfaces/settings.dto";
 
 export class SettingsController {
   settingsStore: SettingsStore;
@@ -26,7 +27,10 @@ export class SettingsController {
   }
 
   async updateWhitelistSettings(req: Request, res: Response) {
-    const { whitelistEnabled, whitelistedIpAddresses } = await validateInput(req.body, whitelistSettingRules);
+    const { whitelistEnabled, whitelistedIpAddresses } = await validateInput<IpWhitelistSettingsDto>(
+      req.body,
+      whitelistSettingRules
+    );
     if (!whitelistedIpAddresses.includes("127.0.0.1")) {
       whitelistedIpAddresses.push("127.0.0.1");
     }

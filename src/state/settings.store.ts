@@ -34,6 +34,7 @@ export class SettingsStore {
   getSettings() {
     const settings = this.settings!;
     return Object.freeze({
+      // Credential settings are not shared with the client
       [serverSettingsKey]: settings[serverSettingsKey],
       [wizardSettingKey]: settings[wizardSettingKey],
       [frontendSettingKey]: settings[frontendSettingKey],

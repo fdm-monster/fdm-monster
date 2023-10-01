@@ -16,6 +16,11 @@ export interface DebugSettingsDto {
   debugSocketIoBandwidth: boolean;
 }
 
+export class IpWhitelistSettingsDto {
+  whitelistedIpAddresses: string[];
+  whitelistEnabled: boolean;
+}
+
 export interface ServerSettingsDto {
   sentryDiagnosticsEnabled: boolean;
   registration: boolean;

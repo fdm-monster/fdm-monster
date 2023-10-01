@@ -158,7 +158,7 @@ const SettingsSchema = new Schema<ISettings>({
       },
       debugSocketSetup: {
         type: Boolean,
-        default: true,
+        default: false,
         required: true,
       },
       debugSocketMessages: {

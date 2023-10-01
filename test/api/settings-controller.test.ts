@@ -12,6 +12,7 @@ import {
   getDefaultFrontendSettings,
   credentialSettingsKey,
 } from "@/constants/server-settings.constants";
+import { SettingsController } from "@/controllers/settings.controller";
 
 let request: supertest.SuperTest<supertest.Test>;
 
@@ -24,7 +25,7 @@ beforeAll(async () => {
   ({ request } = await setupTestApp(true));
 });
 
-describe("SettingsController", () => {
+describe(SettingsController.name, () => {
   const newSettings = {
     [fileCleanSettingKey]: {
       autoRemoveOldFilesBeforeUpload: true,

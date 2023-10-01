@@ -2,7 +2,7 @@ import { Floor } from "@/entities";
 import { IFloor } from "@/models/Floor";
 import { IdType } from "@/shared.constants";
 import { DeleteResult, FindManyOptions } from "typeorm";
-import { FloorDto, PositionDto } from "@/services/interfaces/floor.dto";
+import { FloorDto, PositionDto, PrinterInFloorDto } from "@/services/interfaces/floor.dto";
 
 export interface IFloorService<KeyType = IdType> {
   toDto(floor: Floor | IFloor): FloorDto;
@@ -23,7 +23,7 @@ export interface IFloorService<KeyType = IdType> {
 
   updateLevel(floorId: KeyType, level: number): Promise<Floor>;
 
-  addOrUpdatePrinter(floorId: KeyType, position: PositionDto): Promise<Floor>;
+  addOrUpdatePrinter(floorId: KeyType, position: PositionDto | PrinterInFloorDto): Promise<Floor>;
 
   removePrinter(floorId: KeyType, printerId: KeyType): Promise<Floor>;
 }
