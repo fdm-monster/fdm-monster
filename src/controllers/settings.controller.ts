@@ -3,7 +3,7 @@ import { authenticate, authorizeRoles } from "@/middleware/authenticate";
 import { AppConstants } from "@/server.constants";
 import { ROLES } from "@/constants/authorization.constants";
 import { validateInput } from "@/handlers/validators";
-import { whitelistSettingRules, sentryDiagnosticsEnabledRules } from "@/services/validators/settings-service.validation";
+import { whitelistSettingUpdateRules, sentryDiagnosticsEnabledRules } from "@/services/validators/settings-service.validation";
 import { SettingsStore } from "@/state/settings.store";
 import { Request, Response } from "express";
 import { IpWhitelistSettingsDto } from "@/services/interfaces/settings.dto";
@@ -29,7 +29,7 @@ export class SettingsController {
   async updateWhitelistSettings(req: Request, res: Response) {
     const { whitelistEnabled, whitelistedIpAddresses } = await validateInput<IpWhitelistSettingsDto>(
       req.body,
-      whitelistSettingRules
+      whitelistSettingUpdateRules
     );
     if (!whitelistedIpAddresses.includes("127.0.0.1")) {
       whitelistedIpAddresses.push("127.0.0.1");

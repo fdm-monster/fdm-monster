@@ -14,19 +14,14 @@ import { LoggerService } from "@/handlers/logger";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
 import { ISettings } from "@/models/Settings";
 import { CredentialSettingsDto, FrontendSettingsDto, ServerSettingsDto } from "@/services/interfaces/settings.dto";
+import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class SettingsStore {
   settingsService: ISettingsService;
   logger: LoggerService;
   private settings: ISettings | null = null;
 
-  constructor({
-    settingsService,
-    loggerFactory,
-  }: {
-    settingsService: ISettingsService;
-    loggerFactory: (context: string) => LoggerService;
-  }) {
+  constructor({ settingsService, loggerFactory }: { settingsService: ISettingsService; loggerFactory: ILoggerFactory }) {
     this.settingsService = settingsService;
     this.logger = loggerFactory(SettingsStore.name);
   }

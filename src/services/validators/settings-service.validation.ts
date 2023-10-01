@@ -19,7 +19,7 @@ export const credentialSettingUpdateRules = {
   refreshTokenExpiry: "required|integer|min:0",
 };
 
-export const whitelistSettingRules = {
+export const whitelistSettingUpdateRules = {
   whitelistedIpAddresses: "required|array|minLength:1",
   "whitelistedIpAddresses.*": "required|string",
   whitelistEnabled: "required|boolean",
