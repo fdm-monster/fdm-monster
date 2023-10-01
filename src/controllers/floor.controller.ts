@@ -49,7 +49,7 @@ export class FloorController {
     const { id: floorId } = await validateInput(req.params, idRules);
 
     // Has internal validation
-    const floor = await this.floorStore.removePrinter(floorId, req.body);
+    const floor = await this.floorStore.removePrinter(floorId, req.body.printerId);
     res.send(floor);
   }
 

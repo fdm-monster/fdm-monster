@@ -5,6 +5,7 @@ import { IdType } from "@/shared.constants";
 import { IFloor } from "@/models/Floor";
 import { Floor } from "@/entities";
 import { ILoggerFactory } from "@/handlers/logger-factory";
+import { PositionDto } from "@/services/interfaces/floor.dto";
 
 interface CachedFloor {
   id: IdType;
@@ -96,14 +97,14 @@ export class FloorStore extends KeyDiffCache<CachedFloor> {
     return floor;
   }
 
-  async addOrUpdatePrinter(floorId: IdType, printerInFloor) {
-    const floor = await this.floorService.addOrUpdatePrinter(floorId, printerInFloor);
+  async addOrUpdatePrinter(floorId: IdType, position: PositionDto) {
+    const floor = await this.floorService.addOrUpdatePrinter(floorId, position);
     await this.setKeyValue(floorId, floor, true);
     return floor;
   }
 
-  async removePrinter(floorId: IdType, printerInFloor) {
-    const floor = await this.floorService.removePrinter(floorId, printerInFloor);
+  async removePrinter(floorId: IdType, printerId: IdType) {
+    const floor = await this.floorService.removePrinter(floorId, printerId);
     await this.deleteKeyValue(floorId);
     return floor;
   }
