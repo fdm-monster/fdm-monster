@@ -27,7 +27,7 @@ export function isEnvProd() {
 
 /**
  * Set and write the environment name to file, if applicable
- * @returns {*}
+
  */
 function ensureNodeEnvSet() {
   const environment = process.env[AppConstants.NODE_ENV_KEY];
@@ -35,11 +35,6 @@ function ensureNodeEnvSet() {
     const newEnvName = AppConstants.defaultProductionEnv;
     process.env[AppConstants.NODE_ENV_KEY] = newEnvName;
     logger.warn(`NODE_ENV=${environment} was not set, or not known. Defaulting to NODE_ENV=${newEnvName}`);
-
-    // Avoid writing to .env in case of docker
-    if (isDocker()) {
-      return false;
-    }
   } else {
     logger.log(`✓ NODE_ENV variable correctly set (${environment})!`);
   }

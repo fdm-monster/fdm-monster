@@ -9,16 +9,30 @@ import { RoleService } from "@/services/authentication/role.service";
 import { AuthService } from "@/services/authentication/auth.service";
 import { SettingsStore } from "@/state/settings.store";
 import { UserService } from "@/services/authentication/user.service";
+import { ILoggerFactory } from "@/handlers/logger-factory";
+import { LoggerService } from "@/handlers/logger";
+import { Request, Response } from "express";
 
 export class AuthController {
   authService: AuthService;
   settingsStore: SettingsStore;
   userService: UserService;
   roleService: RoleService;
+  logger: LoggerService;
 
-  logger;
-
-  constructor({ authService, settingsStore, userService, roleService, loggerFactory }) {
+  constructor({
+    authService,
+    settingsStore,
+    userService,
+    roleService,
+    loggerFactory,
+  }: {
+    authService: AuthService;
+    settingsStore: SettingsStore;
+    userService: UserService;
+    roleService: RoleService;
+    loggerFactory: ILoggerFactory;
+  }) {
     this.authService = authService;
     this.settingsStore = settingsStore;
     this.userService = userService;
@@ -26,23 +40,23 @@ export class AuthController {
     this.logger = loggerFactory(AuthController.name);
   }
 
-  async login(req, res) {
+  async login(req: Request, res: Response) {
     this.logger.log(`Login attempt from IP ${req.ip} and user-agent ${req.headers["user-agent"]}`);
     const tokens = await this.authService.loginUser(req.body.username, req.body.password);
     return res.send(tokens);
   }
 
-  async getLoginRequired(req, res) {
+  async getLoginRequired(req: Request, res: Response) {
     const isLoginRequired = await this.settingsStore.getLoginRequired();
     const wizardState = this.settingsStore.getWizardState();
     return res.send({ loginRequired: isLoginRequired, wizardState });
   }
 
-  async verifyLogin(req, res) {
+  async verifyLogin(req: Request, res: Response) {
     return res.send({ success: true });
   }
 
-  async needsPasswordChange(req, res) {
+  async needsPasswordChange(req: Request, res: Response) {
     const isLoginRequired = this.settingsStore.getLoginRequired();
     if (!isLoginRequired) {
       return res.send({ loginRequired: isLoginRequired, needsPasswordChange: false, authenticated: true });
@@ -57,7 +71,7 @@ export class AuthController {
     return res.send({ loginRequired: isLoginRequired, authenticated: false });
   }
 
-  async refreshLogin(req, res) {
+  async refreshLogin(req: Request, res: Response) {
     const { refreshToken } = await validateMiddleware(req, logoutRefreshTokenRules);
 
     this.logger.log(`Refresh login attempt from IP ${req.ip} and user-agent ${req.headers["user-agent"]}`);
@@ -65,7 +79,7 @@ export class AuthController {
     return res.send({ token: idToken });
   }
 
-  async logout(req, res) {
+  async logout(req: Request, res: Response) {
     const isLoginRequired = await this.settingsStore.getLoginRequired();
     if (!isLoginRequired) {
       return res.end();
@@ -76,7 +90,7 @@ export class AuthController {
     res.end();
   }
 
-  async register(req, res) {
+  async register(req: Request, res: Response) {
     let registrationEnabled = this.settingsStore.isRegistrationEnabled();
     if (!registrationEnabled) {
       throw new BadRequestException("Registration is disabled. Cant register user");

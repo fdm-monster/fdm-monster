@@ -14,15 +14,6 @@ describe("ServerEnv", () => {
     expect(isEnvProd()).toBe(false);
   });
 
-  it("Expect env utils to not create .env when in docker mode", () => {
-    const before = isDocker.mock.calls.length;
-    process.env[AppConstants.NODE_ENV_KEY] = "ILLEGAL_MODE";
-    isDocker.mockReturnValueOnce(true);
-    expect(setupEnvConfig()).toBeUndefined();
-    // In CI we dont have .env and it will trigger 4 times
-    expect(isDocker.mock.calls.length - before).toBeGreaterThanOrEqual(1);
-  });
-
   it("Should patch node env when in non-docker mode", () => {
     process.env[AppConstants.NODE_ENV_KEY] = "ILLEGAL_MODE";
     isDocker.mockReturnValueOnce(false);

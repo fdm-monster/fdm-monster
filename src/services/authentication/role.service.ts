@@ -4,6 +4,7 @@ import { Role } from "@/models";
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import { LoggerService } from "@/handlers/logger";
 import { SettingsStore } from "@/state/settings.store";
+import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class RoleService {
   private logger: LoggerService;
@@ -11,7 +12,17 @@ export class RoleService {
   appDefaultRole: string;
   appDefaultRoleNoLogin: string;
 
-  constructor({ loggerFactory, appDefaultRole, appDefaultRoleNoLogin, settingsStore }) {
+  constructor({
+    loggerFactory,
+    appDefaultRole,
+    appDefaultRoleNoLogin,
+    settingsStore,
+  }: {
+    loggerFactory: ILoggerFactory;
+    appDefaultRole: string;
+    appDefaultRoleNoLogin: string;
+    settingsStore: SettingsStore;
+  }) {
     this.logger = loggerFactory(RoleService.name);
     this.settingsStore = settingsStore;
     this.appDefaultRole = appDefaultRole;

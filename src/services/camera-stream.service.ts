@@ -2,6 +2,10 @@ import { CameraStream } from "@/models";
 import { validateInput } from "@/handlers/validators";
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import { PrinterCache } from "@/state/printer.cache";
+import { MongoIdType } from "@/shared.constants";
+import { ICameraStreamService } from "@/services/interfaces/camera-stream.service.interface";
+import { ICameraStream } from "@/models/CameraStream";
+import { CameraStreamDto } from "@/services/interfaces/camera-stream.dto";
 
 const createCameraStreamRules = {
   printerId: "mongoId",
@@ -13,7 +17,7 @@ const createCameraStreamRules = {
   "settings.flipVertical": "required|boolean",
 };
 
-export class CameraStreamService {
+export class CameraStreamService implements ICameraStreamService<MongoIdType> {
   model = CameraStream;
   printerCache: PrinterCache;
 
@@ -25,13 +29,7 @@ export class CameraStreamService {
     return this.model.find();
   }
 
-  /**
-   * Get a camera stream by id
-   * @param id
-   * @param throwError
-   * @returns {Promise<CameraStream>}
-   */
-  async get(id, throwError = true) {
+  async get(id: MongoIdType, throwError = true) {
     const cameraStream = await this.model.findById(id);
     if (!cameraStream && throwError) {
       throw new NotFoundException(`Floor with id ${id} does not exist.`, "CameraStream");
@@ -48,11 +46,11 @@ export class CameraStreamService {
     return this.model.create(input);
   }
 
-  async delete(id) {
+  async delete(id: MongoIdType) {
     return this.model.findByIdAndDelete(id);
   }
 
-  async update(id, input) {
+  async update(id: MongoIdType, input) {
     await this.get(id);
     const updateInput = await validateInput(input, createCameraStreamRules);
     if (input.printerId) {
@@ -60,5 +58,14 @@ export class CameraStreamService {
     }
     await this.model.updateOne({ id }, updateInput);
     return this.get(id);
+  }
+
+  toDto(entity: ICameraStream): CameraStreamDto<MongoIdType> {
+    return {
+      id: entity.id,
+      streamURL: entity.streamURL,
+      printerId: entity.printerId?.toString(),
+      settings: entity.settings,
+    };
   }
 }

@@ -1,49 +1,31 @@
-import { IO_MESSAGES } from "../state/socket-io.gateway";
-import { socketIoConnectedEvent } from "../constants/event.constants";
-import { sizeKB, formatKB } from "../utils/metric.utils";
+import { IO_MESSAGES, SocketIoGateway } from "@/state/socket-io.gateway";
+import { socketIoConnectedEvent } from "@/constants/event.constants";
+import { formatKB, sizeKB } from "@/utils/metric.utils";
+import { SettingsStore } from "@/state/settings.store";
+import { PrinterSocketStore } from "@/state/printer-socket.store";
+import { PrinterEventsCache } from "@/state/printer-events.cache";
+import { FloorStore } from "@/state/floor.store";
+import { FileUploadTrackerCache } from "@/state/file-upload-tracker.cache";
+import EventEmitter2 from "eventemitter2";
+import { PrinterCache } from "@/state/printer.cache";
+import { LoggerService } from "@/handlers/logger";
+import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class SocketIoTask {
-  /**
-   * @type {SocketIoGateway}
-   */
-  socketIoGateway;
-  /**
-   * @type {PrinterSocketStore}
-   */
-  printerSocketStore;
-  /**
-   * @type {PrinterEventsCache}
-   */
-  printerEventsCache;
-  /**
-   * @type {FloorStore}
-   */
-  floorStore;
-  /**
-   * @type {FileUploadTrackerCache}
-   */
-  fileUploadTrackerCache;
-  /**
-   * @type {EventEmitter2}
-   */
-  eventEmitter2;
-  /**
-   * @type {PrinterCache}
-   */
-  printerCache;
-  /**
-   * @type {LoggerService}
-   */
-  logger;
-  /**
-   * @type {SettingsStore}
-   */
-  settingsStore;
+  socketIoGateway: SocketIoGateway;
+  printerSocketStore: PrinterSocketStore;
+  printerEventsCache: PrinterEventsCache;
+  floorStore: FloorStore;
+  fileUploadTrackerCache: FileUploadTrackerCache;
+  eventEmitter2: EventEmitter2;
+  printerCache: PrinterCache;
+  logger: LoggerService;
+  settingsStore: SettingsStore;
 
-  #aggregateSizeCounter = 0;
-  #aggregateWindowLength = 100;
-  #aggregateSizes = [];
-  #rounding = 2;
+  private aggregateSizeCounter = 0;
+  private aggregateWindowLength = 100;
+  private aggregateSizes: number[] = [];
+  private rounding = 2;
 
   constructor({
     socketIoGateway,
@@ -55,6 +37,16 @@ export class SocketIoTask {
     fileUploadTrackerCache,
     settingsStore,
     eventEmitter2,
+  }: {
+    socketIoGateway: SocketIoGateway;
+    floorStore: FloorStore;
+    printerSocketStore: PrinterSocketStore;
+    printerEventsCache: PrinterEventsCache;
+    printerCache: PrinterCache;
+    loggerFactory: ILoggerFactory;
+    fileUploadTrackerCache: FileUploadTrackerCache;
+    settingsStore: SettingsStore;
+    eventEmitter2: EventEmitter2;
   }) {
     this.socketIoGateway = socketIoGateway;
     this.printerSocketStore = printerSocketStore;
@@ -106,18 +98,18 @@ export class SocketIoTask {
     this.socketIoGateway.send(IO_MESSAGES.LegacyUpdate, serializedData);
   }
 
-  updateAggregator(transportDataLength) {
-    if (this.#aggregateSizeCounter >= this.#aggregateWindowLength) {
-      const summedPayloadSize = this.#aggregateSizes.reduce((t, n) => (t += n));
-      const averagePayloadSize = summedPayloadSize / this.#aggregateWindowLength;
+  updateAggregator(transportDataLength: number) {
+    if (this.aggregateSizeCounter >= this.aggregateWindowLength) {
+      const summedPayloadSize = this.aggregateSizes.reduce((t, n) => (t += n));
+      const averagePayloadSize = summedPayloadSize / this.aggregateWindowLength;
       this.logger.log(
-        `Printer SocketIO metrics ${averagePayloadSize.toFixed(this.#rounding)}kB [${this.#aggregateWindowLength} TX avg].`
+        `Printer SocketIO metrics ${averagePayloadSize.toFixed(this.rounding)}kB [${this.aggregateWindowLength} TX avg].`
       );
-      this.#aggregateSizeCounter = 0;
-      this.#aggregateSizes = [];
+      this.aggregateSizeCounter = 0;
+      this.aggregateSizes = [];
     }
 
-    this.#aggregateSizes.push(transportDataLength);
-    ++this.#aggregateSizeCounter;
+    this.aggregateSizes.push(transportDataLength);
+    ++this.aggregateSizeCounter;
   }
 }

@@ -60,21 +60,21 @@ export function getScopedPrinter(req: Request) {
 /**
  * Validate input based on rules
  */
-export async function validateInput(data: any, rules: object): Promise<object> {
+export async function validateInput<T>(data: any, rules: T): Promise<T> {
   const localNIV = getExtendedValidator();
 
-  const v = new localNIV.Validator(data, rules);
+  const v = new localNIV.Validator(data, rules as object);
 
   const matched = await v.check();
   if (!matched) {
     throw new ValidationException(v.errors);
   }
-  return v.inputs;
+  return v.inputs as T;
 }
 
 /**
  * Handle API input validation
  */
-export async function validateMiddleware(req: Request, rules: object): Promise<any> {
+export async function validateMiddleware<T>(req: Request, rules: T): Promise<any> {
   return validateInput(req.body, rules);
 }

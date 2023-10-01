@@ -7,23 +7,18 @@ import { setGcodeAnalysis } from "./validation/printer-settings-controller.valid
 import { PERMS } from "@/constants/authorization.constants";
 import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
 import { PrinterCache } from "@/state/printer.cache";
+import { Request, Response } from "express";
 
 export class PrinterSettingsController {
   printerCache: PrinterCache;
   octoPrintApiService: OctoPrintApiService;
 
-  constructor({ printerCache, octoPrintApiService }) {
+  constructor({ printerCache, octoPrintApiService }: { printerCache: PrinterCache; octoPrintApiService: OctoPrintApiService }) {
     this.printerCache = printerCache;
     this.octoPrintApiService = octoPrintApiService;
   }
 
-  /**
-   * Previous printerInfo action (not a list function)
-   * @param req
-   * @param res
-   * @returns {Promise<void>}
-   */
-  async get(req, res) {
+  async get(req: Request, res: Response) {
     const { id: printerId } = await validateInput(req.params, idRules);
 
     const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
@@ -31,7 +26,7 @@ export class PrinterSettingsController {
     res.send(settings);
   }
 
-  async setGCodeAnalysis(req, res) {
+  async setGCodeAnalysis(req: Request, res: Response) {
     const { id: printerId } = await validateInput(req.params, idRules);
     const input = await validateMiddleware(req, setGcodeAnalysis);
 
@@ -40,7 +35,7 @@ export class PrinterSettingsController {
     res.send(settings);
   }
 
-  async syncPrinterName(req, res) {
+  async syncPrinterName(req: Request, res: Response) {
     const { id: printerId } = await validateInput(req.params, idRules);
 
     const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);

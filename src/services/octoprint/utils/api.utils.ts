@@ -1,5 +1,9 @@
-import { jsonContentType, contentTypeHeaderKey, apiKeyHeaderKey } from "../constants/octoprint-service.constants";
-import { ValidationException } from "../../../exceptions/runtime.exceptions";
+import {
+  jsonContentType,
+  contentTypeHeaderKey,
+  apiKeyHeaderKey,
+} from "@/services/octoprint/constants/octoprint-service.constants";
+import { ValidationException } from "@/exceptions/runtime.exceptions";
 
 /**
  *

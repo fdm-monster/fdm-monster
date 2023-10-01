@@ -1,6 +1,6 @@
-import { LoggerService } from "../handlers/logger";
+import { LoggerService } from "@/handlers/logger";
 
-const logger = new LoggerService("Benchmark");
+const logger = new LoggerService("BenchmarkUtil");
 
 /**
  * Timing benchmark function, DO NOT USE IN PRODUCTION - just use it once and remove after.

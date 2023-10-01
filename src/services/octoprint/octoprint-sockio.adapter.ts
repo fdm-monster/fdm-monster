@@ -1,38 +1,38 @@
-import { WebsocketAdapter } from "../../utils/websocket.adapter";
-import { HttpStatusCode } from "../../constants/http-status-codes.constants";
-import { AppConstants } from "../../server.constants";
-import { AuthenticationError } from "../../exceptions/runtime.exceptions";
-import { httpToWsUrl } from "../../utils/url.utils";
-import { normalizeUrl } from "../../utils/normalize-url";
+import { WebsocketAdapter } from "@/utils/websocket.adapter";
+import { HttpStatusCode } from "@/constants/http-status-codes.constants";
+import { AppConstants } from "@/server.constants";
+import { AuthenticationError } from "@/exceptions/runtime.exceptions";
+import { httpToWsUrl } from "@/utils/url.utils";
+import { normalizeUrl } from "@/utils/normalize-url";
+import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
+import EventEmitter2 from "eventemitter2";
+import { LoggerService } from "@/handlers/logger";
+import { ConfigService } from "@/services/core/config.service";
+import { IdType } from "@/shared.constants";
+import { ILoggerFactory } from "@/handlers/logger-factory";
 
-/**
- * @typedef {1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10} ThrottleRate
- */
+type ThrottleRate = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 
-/**
- * @typedef {Object} LoginDto
- * @property {string} printerURL
- * @property {string} apiKey
- */
+interface LoginDto {
+  printerURL: string;
+  apiKey: string;
+}
 
-/**
- * @typedef {Object} CredentialsDto
- * @property {LoginDto} loginDto
- * @property {string} printerId
- * @property {"ws"|"wss"} protocol
- */
+interface CredentialsDto {
+  loginDto: LoginDto;
+  printerId: string;
+  protocol: "ws" | "wss";
+}
 
-/**
- * @typedef {Object} SessionDto
- * @property {string} session
- */
+interface SessionDto {
+  session: string;
+}
 
-/**
- * @typedef {Object} OctoPrintEventDto
- * @property {string} event
- * @property {string} printerId
- * @property {string} payload
- */
+interface OctoPrintEventDto {
+  event: string;
+  printerId: string;
+  payload: string;
+}
 
 export const Message = {
   connected: "connected",
@@ -71,61 +71,43 @@ export const API_STATE = {
   responding: "responding",
 };
 
-export const octoPrintEvent = (event) => `octoprint.${event}`;
+export const octoPrintEvent = (event: string) => `octoprint.${event}`;
 
 export class OctoPrintSockIoAdapter extends WebsocketAdapter {
-  /**
-   * @type {string|undefined}
-   */
-  printerId;
-  /**
-   * @type {LoginDto|undefined}
-   */
-  loginDto;
-  /**
-   * @type {URL|undefined}
-   */
-  socketURL;
-  /**
-   * @type {SessionDto}
-   */
-  sessionDto;
-  /**
-   * @type {string}
-   */
-  username;
-
-  /**
-   * @type {OctoPrintApiService}
-   */
-  octoPrintApiService;
-  /**
-   * @type {EventEmitter2}
-   */
-  eventEmitter;
-  /**
-   * @type {LoggerService}
-   */
-  logger;
-  /**
-   * @type {ConfigService}
-   */
-  configService;
+  printerId: IdType;
+  loginDto: LoginDto;
+  socketURL?: URL;
+  sessionDto: SessionDto;
+  username: string;
+  octoPrintApiService: OctoPrintApiService;
+  eventEmitter: EventEmitter2;
+  logger: LoggerService;
+  configService: ConfigService;
 
   stateUpdated = false;
-  stateUpdateTimestamp = null;
+  stateUpdateTimestamp: null | number = null;
   socketState = SOCKET_STATE.unopened;
   apiStateUpdated = false;
-  apiStateUpdateTimestamp = null;
+  apiStateUpdateTimestamp: null | number = null;
   apiState = API_STATE.unset;
-  lastMessageReceivedTimestamp = null;
+  lastMessageReceivedTimestamp: null | number = null;
   reauthRequired = false;
-  reauthRequiredTimestamp = null;
+  reauthRequiredTimestamp: null | number = null;
 
-  constructor({ loggerFactory, octoPrintApiService, eventEmitter2, configService }) {
+  constructor({
+    loggerFactory,
+    octoPrintApiService,
+    eventEmitter2,
+    configService,
+  }: {
+    loggerFactory: ILoggerFactory;
+    octoPrintApiService: OctoPrintApiService;
+    eventEmitter2: EventEmitter2;
+    configService: ConfigService;
+  }) {
     super({ loggerFactory });
 
-    this.logger = loggerFactory("OctoPrintSockIoAdapter");
+    this.logger = loggerFactory(OctoPrintSockIoAdapter.name);
     this.octoPrintApiService = octoPrintApiService;
     this.eventEmitter = eventEmitter2;
     this.configService = configService;
@@ -177,11 +159,7 @@ export class OctoPrintSockIoAdapter extends WebsocketAdapter {
     super.close();
   }
 
-  /**
-   * @param {ThrottleRate} throttle
-   * @returns {Promise<void>}
-   */
-  async sendThrottle(throttle = AppConstants.defaultSocketThrottleRate) {
+  async sendThrottle(throttle: ThrottleRate = AppConstants.defaultSocketThrottleRate): Promise<void> {
     return await this.sendMessage(JSON.stringify({ throttle }));
   }
 

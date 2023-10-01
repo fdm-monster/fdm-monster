@@ -11,6 +11,7 @@ import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { ServerReleaseService } from "@/services/core/server-release.service";
 import { MonsterPiService } from "@/services/core/monsterpi.service";
 import { UserService } from "@/services/authentication/user.service";
+import { Request, Response } from "express";
 
 export class ServerPublicController {
   serverVersion: string;
@@ -29,6 +30,14 @@ export class ServerPublicController {
     monsterPiService,
     userService,
     roleService,
+  }: {
+    settingsStore: SettingsStore;
+    printerSocketStore: PrinterSocketStore;
+    serverVersion: string;
+    serverReleaseService: ServerReleaseService;
+    monsterPiService: MonsterPiService;
+    userService: UserService;
+    roleService: RoleService;
   }) {
     this.settingsStore = settingsStore;
     this.serverVersion = serverVersion;
@@ -39,7 +48,7 @@ export class ServerPublicController {
     this.roleService = roleService;
   }
 
-  welcome(req, res) {
+  welcome(req: Request, res: Response) {
     const serverSettings = this.settingsStore.getSettings();
 
     if (serverSettings[serverSettingsKey].loginRequired === false) {
@@ -53,7 +62,7 @@ export class ServerPublicController {
     });
   }
 
-  getFeatures(req, res) {
+  getFeatures(req: Request, res: Response) {
     res.send({
       batchReprintCalls: {
         available: true,
@@ -100,7 +109,7 @@ export class ServerPublicController {
     });
   }
 
-  async getVersion(req, res) {
+  async getVersion(req: Request, res: Response) {
     let updateState = this.serverReleaseService.getState();
     const monsterPiVersion = this.monsterPiService.getMonsterPiVersionSafe();
 

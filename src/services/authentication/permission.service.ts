@@ -1,22 +1,23 @@
-import { Permission } from "../../models";
-import { flattenPermissionDefinition } from "../../constants/authorization.constants";
-import { NotFoundException } from "../../exceptions/runtime.exceptions";
-import { LoggerService } from "../../handlers/logger";
+import { Permission } from "@/models";
+import { flattenPermissionDefinition } from "@/constants/authorization.constants";
+import { NotFoundException } from "@/exceptions/runtime.exceptions";
+import { LoggerService } from "@/handlers/logger";
+import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class PermissionService {
   private logger: LoggerService;
 
-  constructor({ loggerFactory }) {
+  constructor({ loggerFactory }: { loggerFactory: ILoggerFactory }) {
     this.logger = loggerFactory(PermissionService.name);
   }
 
-  private _permissions: { [k: string]: any } = {};
+  private _permissions: Record<string, any> = {};
 
   get permissions() {
     return this._permissions;
   }
 
-  authorizePermission(requiredPermission, assignedPermissions) {
+  authorizePermission(requiredPermission: string, assignedPermissions: string[]) {
     return !!assignedPermissions.find((assignedPermission) => {
       const normalizePermission = this.#normalizePermission(assignedPermission);
       if (!normalizePermission) return false;
@@ -24,7 +25,7 @@ export class PermissionService {
     });
   }
 
-  async getPermissionByName(permissionName) {
+  async getPermissionByName(permissionName: string) {
     const permission = await this.permissions.find((r) => r.name === permissionName);
     if (!permission) throw new NotFoundException("Permission not found");
 
@@ -55,7 +56,7 @@ export class PermissionService {
     }
   }
 
-  #normalizePermission(assignedPermission) {
+  #normalizePermission(assignedPermission: string) {
     const permissionInstance = this.permissions.find((r) => r.id === assignedPermission || r.name === assignedPermission);
     if (!permissionInstance) {
       this.logger.warn(`The permission by ID ${assignedPermission} did not exist. Skipping.`);

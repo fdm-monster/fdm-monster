@@ -1,27 +1,26 @@
 import { setInterval, setTimeout } from "timers/promises";
-import { validateInput } from "../handlers/validators";
+import { validateInput } from "@/handlers/validators";
 import { createTestPrinterRules } from "./validation/create-test-printer.validation";
-import { octoPrintEvent, Message, SOCKET_STATE } from "../services/octoprint/octoprint-sockio.adapter";
-import { AppConstants } from "../server.constants";
+import { octoPrintEvent, Message, SOCKET_STATE, OctoPrintSockIoAdapter } from "@/services/octoprint/octoprint-sockio.adapter";
+import { AppConstants } from "@/server.constants";
+import { SocketIoGateway } from "@/state/socket-io.gateway";
+import { SocketFactory } from "@/services/octoprint/socket.factory";
+import EventEmitter2 from "eventemitter2";
 
 export class TestPrinterSocketStore {
-  /**
-   * @type {OctoPrintSockIoAdapter}
-   */
-  testSocket;
-  /**
-   * @type {SocketIoGateway}
-   */
-  socketIoGateway;
-  /**
-   * @type {SocketFactory}
-   */
-  socketFactory;
-  /**
-   * @type {EventEmitter2}
-   */
-  eventEmitter2;
-  constructor({ socketFactory, socketIoGateway, eventEmitter2 }) {
+  testSocket: OctoPrintSockIoAdapter;
+  socketIoGateway: SocketIoGateway;
+  socketFactory: SocketFactory;
+  eventEmitter2: EventEmitter2;
+  constructor({
+    socketFactory,
+    socketIoGateway,
+    eventEmitter2,
+  }: {
+    socketFactory: SocketFactory;
+    socketIoGateway: SocketIoGateway;
+    eventEmitter2: EventEmitter2;
+  }) {
     this.socketFactory = socketFactory;
     this.socketIoGateway = socketIoGateway;
     this.eventEmitter2 = eventEmitter2;

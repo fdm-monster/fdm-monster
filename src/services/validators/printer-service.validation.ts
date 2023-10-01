@@ -1,12 +1,19 @@
 import { UUID_LENGTH } from "@/constants/service.constants";
 
-export const createPrinterRules = {
+export const createMongoPrinterRules = {
   _id: "not",
   apiKey: `required|length:${UUID_LENGTH},${UUID_LENGTH}|alphaNumeric`,
   printerURL: "required|httpurl",
   enabled: "boolean",
   settingsAppearance: "object",
   "settingsAppearance.name": "string",
+};
+
+export const createPrinterRules = {
+  apiKey: `required|length:${UUID_LENGTH},${UUID_LENGTH}|alphaNumeric`,
+  printerUrl: "required|httpurl",
+  enabled: "boolean",
+  name: "required|string",
 };
 
 export const updatePrinterEnabledRule = {

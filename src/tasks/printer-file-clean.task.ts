@@ -1,41 +1,44 @@
+import { LoggerService } from "@/handlers/logger";
+import { ILoggerFactory } from "@/handlers/logger-factory";
+import { FilesStore } from "@/state/files.store";
+import { PrinterCache } from "@/state/printer.cache";
+import { SettingsStore } from "@/state/settings.store";
+import { TaskManagerService } from "@/services/core/task-manager.service";
+import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
+
 /**
  * Task which regularly cleans all printer files based on a configured predicate
  * This could be "older than 2 weeks". More options to be added on request.
  */
 export class PrinterFileCleanTask {
-  logger;
-  /**
-   * @type {FilesStore}
-   */
-  filesStore;
-  /**
-   * @type {PrinterCache}
-   */
-  printerCache;
-  /**
-   * @type {SettingsStore}
-   */
-  settingsStore;
-  /**
-   * @type {TaskManagerService}
-   */
-  taskManagerService;
-  /**
-   * @type {OctoPrintApiService}
-   */
-  octoPrintApiService;
+  logger: LoggerService;
+  filesStore: FilesStore;
+  printerCache: PrinterCache;
+  settingsStore: SettingsStore;
+  taskManagerService: TaskManagerService;
+  octoPrintApiService: OctoPrintApiService;
 
-  constructor({ printerCache, filesStore, octoPrintApiService, taskManagerService, settingsStore, loggerFactory }) {
+  constructor({
+    printerCache,
+    filesStore,
+    octoPrintApiService,
+    taskManagerService,
+    settingsStore,
+    loggerFactory,
+  }: {
+    printerCache: PrinterCache;
+    filesStore: FilesStore;
+    octoPrintApiService: OctoPrintApiService;
+    taskManagerService: TaskManagerService;
+    settingsStore: SettingsStore;
+    loggerFactory: ILoggerFactory;
+  }) {
     this.printerCache = printerCache;
     this.filesStore = filesStore;
     this.taskManagerService = taskManagerService;
     this.octoPrintApiService = octoPrintApiService;
     this.settingsStore = settingsStore;
-    this.logger = loggerFactory("Printer-FileClean-task");
-  }
-
-  #getSettings() {
-    return this.settingsStore.getFileCleanSettings();
+    this.logger = loggerFactory(PrinterFileCleanTask.name);
   }
 
   get #ageDaysMaxSetting() {
@@ -87,5 +90,9 @@ export class PrinterFileCleanTask {
   getPrinterOutdatedFiles(printer) {
     const ageDaysMax = this.#ageDaysMaxSetting;
     return this.filesStore.getOutdatedFiles(printer.id, ageDaysMax);
+  }
+
+  #getSettings() {
+    return this.settingsStore.getFileCleanSettings();
   }
 }

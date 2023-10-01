@@ -1,4 +1,4 @@
-import { YamlService } from "@/services/yaml.service";
+import { YamlService } from "@/services/core/yaml.service";
 import { PrinterCache } from "@/state/printer.cache";
 import { AwilixContainer } from "awilix";
 import { connect, closeDatabase } from "../db-handler";

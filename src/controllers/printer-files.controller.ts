@@ -24,6 +24,9 @@ import { BatchCallService } from "@/services/batch-call.service";
 import { MulterService } from "@/services/core/multer.service";
 import { PrinterFileCleanTask } from "@/tasks/printer-file-clean.task";
 import { LoggerService } from "@/handlers/logger";
+import { ILoggerFactory } from "@/handlers/logger-factory";
+import { Request, Response } from "express";
+import { AxiosResponse } from "axios";
 
 export class PrinterFilesController {
   filesStore: FilesStore;
@@ -42,6 +45,14 @@ export class PrinterFilesController {
     settingsStore,
     loggerFactory,
     multerService,
+  }: {
+    filesStore: FilesStore;
+    octoPrintApiService: OctoPrintApiService;
+    batchCallService: BatchCallService;
+    printerFileCleanTask: PrinterFileCleanTask;
+    settingsStore: SettingsStore;
+    loggerFactory: ILoggerFactory;
+    multerService: MulterService;
   }) {
     this.filesStore = filesStore;
     this.settingsStore = settingsStore;
@@ -52,34 +63,31 @@ export class PrinterFilesController {
     this.logger = loggerFactory(PrinterFilesController.name);
   }
 
-  getTrackedUploads(req, res) {
+  getTrackedUploads(req: Request, res: Response) {
     const sessions = this.multerService.getSessions();
     res.send(sessions);
   }
 
-  async getFiles(req, res) {
+  async getFiles(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
     const { recursive } = await validateInput(req.query, getFilesRules);
 
     this.logger.log("Refreshing file storage by eager load");
     const response = await this.filesStore.eagerLoadPrinterFiles(currentPrinterId, recursive);
-    this.#statusResponse(res, response);
+    this.statusResponse(res, response);
   }
 
   /**
    * When the printer host is not reachable or is disabled the cache is still accessible
-   * @param req
-   * @param res
-   * @returns {Promise<void>}
    */
-  async getFilesCache(req, res) {
+  async getFilesCache(req: Request, res: Response) {
     const { currentPrinter } = getScopedPrinter(req);
 
     const filesCache = await this.filesStore.getFiles(currentPrinter.id);
     res.send(filesCache);
   }
 
-  async clearPrinterFiles(req, res) {
+  async clearPrinterFiles(req: Request, res: Response) {
     const { currentPrinterId, printerLogin } = getScopedPrinter(req);
 
     const nonRecursiveFiles = await this.octoPrintApiService.getFiles(printerLogin, false);
@@ -104,13 +112,13 @@ export class PrinterFilesController {
     });
   }
 
-  async purgeIndexedFiles(req, res) {
+  async purgeIndexedFiles(req: Request, res: Response) {
     await this.filesStore.purgeFiles();
 
     res.send();
   }
 
-  async moveFileOrFolder(req, res) {
+  async moveFileOrFolder(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
     const { filePath: path, destination } = await validateMiddleware(req, moveFileOrFolderRules);
 
@@ -121,7 +129,7 @@ export class PrinterFilesController {
     res.send(result);
   }
 
-  async createFolder(req, res) {
+  async createFolder(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
     const { path, foldername } = await validateMiddleware(req, createFolderRules);
 
@@ -132,7 +140,7 @@ export class PrinterFilesController {
     res.send(result);
   }
 
-  async deleteFileOrFolder(req, res) {
+  async deleteFileOrFolder(req: Request, res: Response) {
     const { currentPrinterId, printerLogin } = getScopedPrinter(req);
     const { path } = await validateInput(req.query, getFileRules);
 
@@ -145,18 +153,15 @@ export class PrinterFilesController {
   }
 
   /**
-   * @deprecated this API endpoint will be moved to /batch from BatchCallController in 1.4.0
-   * @param req
-   * @param res
-   * @returns {Promise<void>}
+   * @deprecated this API endpoint will be moved to /batch from BatchCallController in 1.6.0
    */
-  async batchReprintFiles(req, res) {
+  async batchReprintFiles(req: Request, res: Response) {
     const { printerIds } = await validateInput(req.body, batchPrinterRules);
     const results = await this.batchCallService.batchReprintCalls(printerIds);
     res.send(results);
   }
 
-  async selectAndPrintFile(req, res) {
+  async selectAndPrintFile(req: Request, res: Response) {
     const { currentPrinterId, printerLogin } = getScopedPrinter(req);
     const { filePath: path, print } = await validateInput(req.body, selectAndPrintFileRules);
 
@@ -166,7 +171,7 @@ export class PrinterFilesController {
     res.send(result);
   }
 
-  async uploadFile(req, res) {
+  async uploadFile(req: Request, res: Response) {
     const { printerLogin, currentPrinterId } = getScopedPrinter(req);
     const {} = await validateInput(req.query, uploadFileRules);
 
@@ -214,11 +219,8 @@ export class PrinterFilesController {
 
   /**
    * This endpoint is not actively used. Its better to introduce a virtual file system (VFS) to be able to manage centralized uploads.
-   * @param req
-   * @param res
-   * @returns {Promise<void>}
    */
-  async localUploadFile(req, res) {
+  async localUploadFile(req: Request, res: Response) {
     const { currentPrinterId, printerLogin } = getScopedPrinter(req);
     const { select, print, localLocation } = await validateInput(req.body, localFileUploadRules);
 
@@ -253,7 +255,7 @@ export class PrinterFilesController {
     res.send(response);
   }
 
-  #statusResponse(res, response) {
+  private statusResponse(res: Response, response: AxiosResponse) {
     res.statusCode = response.status;
     res.send(response.data);
   }
@@ -266,7 +268,7 @@ export default createController(PrinterFilesController)
   .post("/purge", "purgeIndexedFiles", withPermission(PERMS.PrinterFiles.Clear))
   .get("/tracked-uploads", "getTrackedUploads", withPermission(PERMS.PrinterFiles.Upload))
   /**
-   * @deprecated will be moved to /batch in 1.4.0
+   * @deprecated will be moved to /batch in 1.6.0
    */
   .post("/batch/reprint-files", "batchReprintFiles", withPermission(PERMS.PrinterFiles.Actions))
   .get("/:id", "getFiles", withPermission(PERMS.PrinterFiles.Get))

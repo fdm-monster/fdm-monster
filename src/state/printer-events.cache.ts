@@ -1,47 +1,90 @@
-import { KeyDiffCache } from "../utils/cache/key-diff.cache";
-import { formatKB } from "../utils/metric.utils";
+import { KeyDiffCache } from "@/utils/cache/key-diff.cache";
+import { formatKB } from "@/utils/metric.utils";
 import { printerEvents } from "@/constants/event.constants";
+import { SettingsStore } from "@/state/settings.store";
+import EventEmitter2 from "eventemitter2";
+import { ILoggerFactory } from "@/handlers/logger-factory";
+import { IdType } from "@/shared.constants";
+import { LoggerService } from "@/handlers/logger";
 
-export class PrinterEventsCache extends KeyDiffCache {
-  /**
-   * @type {LoggerService}
-   */
-  logger;
-  /**
-   * @type {EventEmitter2}
-   */
-  eventEmitter2;
-  /**
-   * @type {SettingsStore}
-   */
-  settingsStore;
+export interface PrinterEventsCacheDto {
+  current: any;
+  history: any;
+  timelapse: any;
+  event: any;
+  plugin: any;
+}
 
-  get _debugMode() {
-    return this.settingsStore.getServerSettings().debugSettings?.debugSocketMessages;
-  }
+export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
+  logger: LoggerService;
+  eventEmitter2: EventEmitter2;
+  settingsStore: SettingsStore;
 
-  constructor({ eventEmitter2, loggerFactory, settingsStore }) {
+  constructor({
+    eventEmitter2,
+    loggerFactory,
+    settingsStore,
+  }: {
+    eventEmitter2: EventEmitter2;
+    loggerFactory: ILoggerFactory;
+    settingsStore: SettingsStore;
+  }) {
     super();
     this.settingsStore = settingsStore;
-    this.logger = loggerFactory("PrinterEventsCache");
+    this.logger = loggerFactory(PrinterEventsCache.name);
     this.eventEmitter2 = eventEmitter2;
 
     this.subscribeToEvents();
   }
 
-  /**
-   * @private
-   */
-  subscribeToEvents() {
+  get _debugMode() {
+    return this.settingsStore.getServerSettings().debugSettings?.debugSocketMessages;
+  }
+
+  async getPrinterSocketEvents(id: IdType) {
+    return this.keyValueStore[id];
+  }
+
+  async getOrCreateEvents(printerId: IdType) {
+    let ref = await this.getValue(printerId);
+    if (!ref) {
+      ref = { current: null, history: null, timelapse: null, event: {}, plugin: {} };
+      await this.setKeyValue(printerId, ref);
+    }
+    return ref;
+  }
+
+  async setEvent(printerId: IdType, label: string, eventName: string, payload) {
+    const ref = await this.getOrCreateEvents(printerId);
+    ref[label] = {
+      payload,
+      receivedAt: Date.now(),
+    };
+    await this.setKeyValue(printerId, ref);
+  }
+
+  async setSubEvent(printerId: IdType, label: string, eventName: string, payload) {
+    const ref = await this.getOrCreateEvents(printerId);
+    ref[label][eventName] = {
+      payload,
+      receivedAt: Date.now(),
+    };
+    await this.setKeyValue(printerId, ref);
+  }
+
+  async handlePrintersDeleted({ printerIds }: { printerIds: IdType[] }) {
+    await this.deleteKeysBatch(printerIds);
+  }
+
+  private subscribeToEvents() {
     this.eventEmitter2.on("octoprint.*", (e) => this.onPrinterSocketMessage(e));
     this.eventEmitter2.on(printerEvents.printersDeleted, this.handlePrintersDeleted.bind(this));
   }
 
   /**
-   * @private
    * @param {OctoPrintEventDto} e
    */
-  async onPrinterSocketMessage(e) {
+  private async onPrinterSocketMessage(e) {
     const printerId = e.printerId;
     if (e.event !== "plugin" && e.event !== "event") {
       await this.setEvent(printerId, e.event, null, e.event === "history" ? this.pruneHistoryPayload(e.payload) : e.payload);
@@ -61,47 +104,7 @@ export class PrinterEventsCache extends KeyDiffCache {
     }
   }
 
-  /**
-   * @param {string} id
-   * @returns {*}
-   */
-  async getPrinterSocketEvents(id) {
-    return this.keyValueStore[id];
-  }
-
-  async getOrCreateEvents(printerId) {
-    let ref = await this.getValue(printerId);
-    if (!ref) {
-      ref = { current: null, history: null, timelapse: null, event: {}, plugin: {} };
-      await this.setKeyValue(printerId, ref);
-    }
-    return ref;
-  }
-
-  async setEvent(printerId, label, eventName, payload) {
-    const ref = await this.getOrCreateEvents(printerId);
-    ref[label] = {
-      payload,
-      receivedAt: Date.now(),
-    };
-    await this.setKeyValue(printerId, ref);
-  }
-
-  async setSubEvent(printerId, label, eventName, payload) {
-    const ref = await this.getOrCreateEvents(printerId);
-    ref[label][eventName] = {
-      payload,
-      receivedAt: Date.now(),
-    };
-    await this.setKeyValue(printerId, ref);
-  }
-
-  async handlePrintersDeleted({ printerIds }) {
-    await this.deleteKeysBatch(printerIds);
-  }
-
-  /** @private **/
-  pruneHistoryPayload(payload) {
+  private pruneHistoryPayload(payload) {
     delete payload.logs;
     delete payload.temps;
     delete payload.messages;

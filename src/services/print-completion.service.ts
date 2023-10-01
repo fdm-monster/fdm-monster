@@ -4,11 +4,12 @@ import { validateInput } from "@/handlers/validators";
 import { groupArrayBy } from "@/utils/array.util";
 import { EVENT_TYPES } from "./octoprint/constants/octoprint-websocket.constants";
 import { LoggerService } from "@/handlers/logger";
+import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class PrintCompletionService {
   logger: LoggerService;
 
-  constructor({ loggerFactory }: { loggerFactory: (name: string) => LoggerService }) {
+  constructor({ loggerFactory }: { loggerFactory: ILoggerFactory }) {
     this.logger = loggerFactory(PrintCompletionService.name);
   }
 

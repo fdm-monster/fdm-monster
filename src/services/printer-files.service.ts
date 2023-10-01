@@ -3,6 +3,7 @@ import { findFileIndex } from "@/utils/find-predicate.utils";
 import { LoggerService } from "@/handlers/logger";
 import { PrinterService } from "@/services/printer.service";
 import { MongoIdType } from "@/shared.constants";
+import { ILoggerFactory } from "@/handlers/logger-factory";
 
 /**
  * An extension repository for managing printer files in database
@@ -11,13 +12,7 @@ export class PrinterFilesService {
   printerService: PrinterService;
   private logger: LoggerService;
 
-  constructor({
-    printerService,
-    loggerFactory,
-  }: {
-    printerService: PrinterService;
-    loggerFactory: (name: string) => LoggerService;
-  }) {
+  constructor({ printerService, loggerFactory }: { printerService: PrinterService; loggerFactory: ILoggerFactory }) {
     this.printerService = printerService;
     this.logger = loggerFactory(PrinterFilesService.name);
   }

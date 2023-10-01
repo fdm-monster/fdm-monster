@@ -8,7 +8,65 @@ import {
   wizardSettingKey,
 } from "@/constants/server-settings.constants";
 
-const ServerSettingsSchema = new Schema({
+export interface IWizardSettings {
+  wizardCompleted: boolean;
+  wizardCompletedAt: Date | null;
+  wizardVersion: number;
+}
+
+export interface IFileCleanSettings {
+  autoRemoveOldFilesBeforeUpload: boolean;
+  autoRemoveOldFilesAtBoot: boolean;
+  autoRemoveOldFilesCriteriumDays: number;
+}
+
+export interface ICredentialSettings {
+  jwtSecret: string;
+  jwtExpiresIn: number;
+  refreshTokenAttempts: number;
+  refreshTokenExpiry: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface IDebugSettings {
+  debugSocketIoEvents: boolean;
+  debugSocketReconnect: boolean;
+  debugSocketRetries: boolean;
+  debugSocketSetup: boolean;
+  debugSocketMessages: boolean;
+  debugSocketIoBandwidth: boolean;
+}
+
+export interface IServerSettings {
+  sentryDiagnosticsEnabled: boolean;
+  debugSettings: IDebugSettings;
+  loginRequired: boolean;
+  registration: boolean;
+  whitelistEnabled: boolean;
+  whitelistedIpAddresses: string[];
+}
+
+export interface IFrontendSettings {
+  gridCols: number;
+  gridRows: number;
+  largeTiles: boolean;
+}
+
+export interface ITimeoutSettings {
+  apiTimeout: number;
+}
+
+export interface ISettings {
+  [wizardSettingKey]: IWizardSettings;
+  [fileCleanSettingKey]: IFileCleanSettings;
+  [credentialSettingsKey]: ICredentialSettings;
+  [serverSettingsKey]: IServerSettings;
+  [frontendSettingKey]: IFrontendSettings;
+  [timeoutSettingKey]: ITimeoutSettings;
+}
+
+const SettingsSchema = new Schema<ISettings>({
   [wizardSettingKey]: {
     wizardCompleted: {
       type: Boolean,
@@ -100,7 +158,7 @@ const ServerSettingsSchema = new Schema({
       },
       debugSocketSetup: {
         type: Boolean,
-        default: true,
+        default: false,
         required: true,
       },
       debugSocketMessages: {
@@ -162,4 +220,4 @@ const ServerSettingsSchema = new Schema({
   },
 });
 
-export const ServerSettings = model("ServerSettings", ServerSettingsSchema);
+export const Settings = model("ServerSettings", SettingsSchema);

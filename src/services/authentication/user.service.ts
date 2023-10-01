@@ -1,26 +1,23 @@
-import { User } from "../../models";
-import { NotFoundException, InternalServerException } from "../../exceptions/runtime.exceptions";
-import { validateInput } from "../../handlers/validators";
+import { User } from "@/models";
+import { NotFoundException, InternalServerException } from "@/exceptions/runtime.exceptions";
+import { validateInput } from "@/handlers/validators";
 import { registerUserRules, newPasswordRules } from "../validators/user-service.validation";
-import { ROLES } from "../../constants/authorization.constants";
-import { hashPassword, comparePasswordHash } from "../../utils/crypto.utils";
+import { ROLES } from "@/constants/authorization.constants";
+import { hashPassword, comparePasswordHash } from "@/utils/crypto.utils";
+import { RoleService } from "@/services/authentication/role.service";
 
 export class UserService {
-  /**
-   * @type {RoleService}
-   */
-  roleService;
+  roleService: RoleService;
 
-  constructor({ roleService }) {
+  constructor({ roleService }: { roleService: RoleService }) {
     this.roleService = roleService;
   }
 
   /**
-   * @private
    * @param user
    * @returns {{createdAt, roles, name, id, username}}
    */
-  toDto(user) {
+  private toDto(user) {
     return {
       id: user.id,
       createdAt: user.createdAt,
@@ -40,10 +37,10 @@ export class UserService {
   }
 
   async getDemoUserId() {
-    return (await User.findOne({ isDemoUser: true }))?._id;
+    return (await User.findOne({ isDemoUser: true }))?.id;
   }
 
-  async findRawByUsername(username) {
+  async findRawByUsername(username: string) {
     return User.findOne({
       username,
     });
@@ -87,7 +84,7 @@ export class UserService {
     await User.findByIdAndDelete(user.id);
   }
 
-  async updateUsernameById(userId, newUsername) {
+  async updateUsernameById(userId, newUsername: string) {
     const user = await User.findById(userId);
     if (!user) throw new NotFoundException("User not found");
 
@@ -95,7 +92,7 @@ export class UserService {
     return await user.save();
   }
 
-  async updatePasswordById(userId, oldPassword, newPassword) {
+  async updatePasswordById(userId, oldPassword: string, newPassword: string) {
     const user = await User.findById(userId);
     if (!user) throw new NotFoundException("User not found");
 
@@ -109,7 +106,7 @@ export class UserService {
     return await user.save();
   }
 
-  async updatePasswordUnsafe(username, newPassword) {
+  async updatePasswordUnsafe(username: string, newPassword: string) {
     const { password } = await validateInput({ password: newPassword }, newPasswordRules);
     const passwordHash = hashPassword(password);
     const user = await this.findRawByUsername(username);

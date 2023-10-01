@@ -1,13 +1,10 @@
-import { DITokens } from "../container.tokens";
+import { DITokens } from "@/container.tokens";
+import { NextFunction, Request, Response } from "express";
 
 /**
  * 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting
- * @param req
- * @param res
- * @param next
- * @returns {Promise<void>}
  */
-export async function interceptDatabaseError(req, res, next) {
+export async function interceptDatabaseError(req: Request, res: Response, next: NextFunction) {
   const serverHost = req.container.resolve(DITokens.serverHost);
 
   const databaseReadyState = serverHost.hasConnected();

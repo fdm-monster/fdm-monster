@@ -1,12 +1,13 @@
-import { AppConstants } from "../server.constants";
+import { AppConstants } from "@/server.constants";
 import { CloseEvent, Data, WebSocket, Event as WsEvent, ErrorEvent } from "ws";
-import { LoggerService } from "../handlers/logger";
+import { LoggerService } from "@/handlers/logger";
+import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class WebsocketAdapter {
   socket?: WebSocket;
   #logger: LoggerService;
 
-  constructor({ loggerFactory }) {
+  constructor({ loggerFactory }: { loggerFactory: ILoggerFactory }) {
     this.#logger = loggerFactory(WebsocketAdapter.name);
   }
 

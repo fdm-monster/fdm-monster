@@ -7,17 +7,18 @@ import { idRules } from "./validation/generic.validation";
 import { InternalServerException } from "@/exceptions/runtime.exceptions";
 import { UserService } from "@/services/authentication/user.service";
 import { ConfigService } from "@/services/core/config.service";
+import { Request, Response } from "express";
 
 export class UserController {
   userService: UserService;
   configService: ConfigService;
 
-  constructor({ userService, configService }) {
+  constructor({ userService, configService }: { userService: UserService; configService: ConfigService }) {
     this.userService = userService;
     this.configService = configService;
   }
 
-  async profile(req, res) {
+  async profile(req: Request, res: Response) {
     if (!req.user?.id) {
       res.send({});
       return;
@@ -27,12 +28,12 @@ export class UserController {
     res.send(user);
   }
 
-  async list(req, res) {
+  async list(req: Request, res: Response) {
     const users = await this.userService.listUsers();
     res.send(users);
   }
 
-  async delete(req, res) {
+  async delete(req: Request, res: Response) {
     this.throwIfDemoMode();
 
     const { id } = await validateInput(req.params, idRules);
@@ -48,13 +49,13 @@ export class UserController {
     res.send();
   }
 
-  async get(req, res) {
+  async get(req: Request, res: Response) {
     const { id } = await validateInput(req.params, idRules);
     const users = await this.userService.getUser(id);
     res.send(users);
   }
 
-  async changeUsername(req, res) {
+  async changeUsername(req: Request, res: Response) {
     this.throwIfDemoMode();
 
     const { id } = await validateInput(req.params, idRules);
@@ -70,7 +71,7 @@ export class UserController {
     res.send();
   }
 
-  async changePassword(req, res) {
+  async changePassword(req: Request, res: Response) {
     this.throwIfDemoMode();
 
     const { id } = await validateInput(req.params, idRules);

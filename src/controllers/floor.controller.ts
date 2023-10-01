@@ -6,6 +6,7 @@ import { idRules } from "./validation/generic.validation";
 import { PERMS } from "@/constants/authorization.constants";
 import { FloorStore } from "@/state/floor.store";
 import { Request, Response } from "express";
+import { IdType } from "@/shared.constants";
 
 export class FloorController {
   private floorStore: FloorStore;
@@ -48,7 +49,7 @@ export class FloorController {
     const { id: floorId } = await validateInput(req.params, idRules);
 
     // Has internal validation
-    const floor = await this.floorStore.removePrinter(floorId, req.body);
+    const floor = await this.floorStore.removePrinter(floorId, req.body.printerId);
     res.send(floor);
   }
 
@@ -64,7 +65,7 @@ export class FloorController {
   }
 
   async delete(req: Request, res: Response) {
-    const { id: floorId } = await validateInput<{ id: number }>(req.params, idRules);
+    const { id: floorId } = await validateInput<{ id: IdType }>(req.params, idRules);
     const result = await this.floorStore.delete(floorId);
     res.json(result);
   }

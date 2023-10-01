@@ -16,7 +16,17 @@ export class OctoPrintApiService extends OctoPrintRoutes {
   eventEmitter2: EventEmitter2;
   protected logger: LoggerService;
 
-  constructor({ settingsStore, httpClient, loggerFactory, eventEmitter2 }) {
+  constructor({
+    settingsStore,
+    httpClient,
+    loggerFactory,
+    eventEmitter2,
+  }: {
+    settingsStore: any;
+    httpClient: AxiosStatic;
+    loggerFactory: any;
+    eventEmitter2: EventEmitter2;
+  }) {
     super({ settingsStore });
     this.axiosClient = httpClient;
     this.eventEmitter2 = eventEmitter2;
@@ -29,19 +39,19 @@ export class OctoPrintApiService extends OctoPrintRoutes {
    * @param responseOptions
    * @returns {Promise<{data, status}|*>}
    */
-  async login(login, responseOptions) {
+  async login(login, responseOptions?: any) {
     const { url, options } = this._prepareRequest(login, this.apiLogin);
     const response = await this.axiosClient.post(url, {}, options);
     return processResponse(response, responseOptions);
   }
 
-  async sendConnectionCommand(printer, commandData, responseOptions) {
+  async sendConnectionCommand(printer, commandData, responseOptions?: any) {
     const { url, options, data } = this._prepareJsonRequest(printer, this.apiConnection, commandData);
     const response = await this.axiosClient.post(url, data, options);
     return processResponse(response, responseOptions);
   }
 
-  async sendCustomGCodeCommand(printerLogin, commandString, responseOptions) {
+  async sendCustomGCodeCommand(printerLogin, commandString, responseOptions?: any) {
     const { url, options, data } = this._prepareJsonRequest(printerLogin, this.apiPrinterCustomCommand, {
       command: commandString,
     });
@@ -56,13 +66,13 @@ export class OctoPrintApiService extends OctoPrintRoutes {
    * @param responseOptions
    * @returns {Promise<*|{data: *, status: *}>}
    */
-  async sendJobCommand(printerLogin, commandData, responseOptions) {
+  async sendJobCommand(printerLogin, commandData, responseOptions?: any) {
     const { url, options, data } = this._prepareJsonRequest(printerLogin, this.apiJob, commandData);
     const response = await this.axiosClient.post(url, data, options);
     return processResponse(response, responseOptions);
   }
 
-  async sendBedTempCommand(printerLogin, targetTemp, responseOptions) {
+  async sendBedTempCommand(printerLogin, targetTemp, responseOptions?: any) {
     const { url, options, data } = this._prepareJsonRequest(
       printerLogin,
       this.apiPrinterBed,
@@ -72,27 +82,27 @@ export class OctoPrintApiService extends OctoPrintRoutes {
     return processResponse(response, responseOptions);
   }
 
-  async getSettings(printerLogin, responseOptions) {
+  async getSettings(printerLogin, responseOptions?: any) {
     const { url, options } = this._prepareRequest(printerLogin, this.apiSettingsPart);
     const response = await this.axiosClient.get(url, options);
     return processResponse(response, responseOptions);
   }
 
-  async updatePrinterNameSetting(printerLogin, printerName, responseOptions) {
+  async updatePrinterNameSetting(printerLogin, printerName, responseOptions?: any) {
     const { url, options } = this._prepareRequest(printerLogin, this.apiSettingsPart);
     const settingPatch = this.printerNameSetting(printerName);
     const response = await this.axiosClient.post(url, settingPatch, options);
     return processResponse(response, responseOptions);
   }
 
-  async updateFirmwareUpdaterSettings(printer, firmwareUpdateConfig, responseOptions) {
+  async updateFirmwareUpdaterSettings(printer, firmwareUpdateConfig, responseOptions?: any) {
     const { url, options } = this._prepareRequest(printer, this.apiSettingsPart);
     const settingPatch = this.pluginFirmwareUpdaterSettings(firmwareUpdateConfig);
     const response = await this.axiosClient.post(url, settingPatch, options);
     return processResponse(response, responseOptions);
   }
 
-  async setGCodeAnalysis(printer, { enabled }, responseOptions) {
+  async setGCodeAnalysis(printer, { enabled }, responseOptions?: any) {
     const { url, options } = this._prepareRequest(printer, this.apiSettingsPart);
     const settingPatch = this.gcodeAnalysisSetting(enabled);
     const response = await this.axiosClient.post(url, settingPatch, options);
@@ -120,25 +130,25 @@ export class OctoPrintApiService extends OctoPrintRoutes {
    * @param responseOptions
    * @returns {Promise<{data, status}|*>}
    */
-  async getUsers(login, responseOptions) {
+  async getUsers(login, responseOptions?: any) {
     const { url, options } = this._prepareRequest(login, this.apiUsers);
     const response = await this.axiosClient.get(url, options);
     return processResponse(response, responseOptions);
   }
 
-  async getFiles(printer, recursive = false, responseOptions) {
+  async getFiles(printer, recursive = false, responseOptions?: any) {
     const { url, options } = this._prepareRequest(printer, this.apiGetFiles(recursive));
     const response = await this.axiosClient.get(url, options);
     return processResponse(response, responseOptions);
   }
 
-  async getFile(printer, path, responseOptions) {
+  async getFile(printer, path, responseOptions?: any) {
     const { url, options } = this._prepareRequest(printer, this.apiFile(path));
     const response = await this.axiosClient.get(url, options);
     return processResponse(response, responseOptions);
   }
 
-  async createFolder(printer, path, foldername, responseOptions) {
+  async createFolder(printer, path, foldername, responseOptions?: any) {
     const { url, options } = this._prepareRequest(printer, this.apiFilesLocation);
 
     const formData = new FormData();
@@ -158,21 +168,21 @@ export class OctoPrintApiService extends OctoPrintRoutes {
     return processResponse(response, responseOptions);
   }
 
-  async moveFileOrFolder(printer, path, destination, responseOptions) {
+  async moveFileOrFolder(printer, path, destination, responseOptions?: any) {
     const { url, options } = this._prepareRequest(printer, this.apiFile(path));
     const command = this.moveFileCommand(destination);
     const response = await this.axiosClient.post(url, command, options);
     return processResponse(response, responseOptions);
   }
 
-  async selectPrintFile(printer, path, print, responseOptions) {
+  async selectPrintFile(printer, path, print, responseOptions?: any) {
     const { url, options } = this._prepareRequest(printer, this.apiFile(path));
     const command = this.selectCommand(print);
     const response = await this.axiosClient.post(url, command, options);
     return processResponse(response, responseOptions);
   }
 
-  async uploadFileAsMultiPart(printer, fileStreamOrBuffer, commands, token, responseOptions) {
+  async uploadFileAsMultiPart(printer, fileStreamOrBuffer, commands, token, responseOptions?: any) {
     const { url, options } = this._prepareRequest(printer, this.apiFilesLocation, null, multiPartContentType);
 
     const formData = new FormData();
@@ -239,19 +249,19 @@ export class OctoPrintApiService extends OctoPrintRoutes {
   //   return processResponse(response, responseOptions);
   // }
 
-  async deleteFileOrFolder(printer, path, responseOptions) {
+  async deleteFileOrFolder(printer, path: string, responseOptions?: any) {
     const { url, options } = this._prepareRequest(printer, this.apiFile(path));
     const response = await this.axiosClient.delete(url, options);
     return processResponse(response, responseOptions);
   }
 
-  async getConnection(login, responseOptions) {
+  async getConnection(login, responseOptions?: any) {
     const { url, options } = this._prepareRequest(login, this.apiConnection);
     const response = await this.axiosClient.get(url, options);
     return processResponse(response, responseOptions);
   }
 
-  async getPrinterProfiles(printer, responseOptions) {
+  async getPrinterProfiles(printer, responseOptions?: any) {
     const { url, options } = this._prepareRequest(printer, this.apiPrinterProfiles);
     const response = await this.axiosClient.get(url, options);
     return processResponse(response, responseOptions);
@@ -264,7 +274,7 @@ export class OctoPrintApiService extends OctoPrintRoutes {
    * @param responseOptions
    * @returns {Promise<{data, status}|*>}
    */
-  async postSoftwareUpdate(printer, targets, responseOptions) {
+  async postSoftwareUpdate(printer, targets, responseOptions?: any) {
     const { url, options } = this._prepareJsonRequest(printer, this.pluginSoftwareUpdateUpdate, {
       targets,
     });
@@ -279,21 +289,21 @@ export class OctoPrintApiService extends OctoPrintRoutes {
    * @param responseOptions
    * @returns {Promise<{data, status}|*>}
    */
-  async getPluginManagerPlugins(printer, responseOptions) {
+  async getPluginManagerPlugins(printer, responseOptions?: any) {
     const { url, options } = this._prepareRequest(printer, this.pluginManagerPlugins);
 
     const response = await this.axiosClient.get(url, options);
     return processResponse(response, responseOptions);
   }
 
-  async getPluginManagerPlugin(printer, pluginName, responseOptions) {
+  async getPluginManagerPlugin(printer, pluginName, responseOptions?: any) {
     const { url, options } = this._prepareRequest(printer, this.pluginManagerPlugin(pluginName));
 
     const response = await this.axiosClient.get(url, options);
     return processResponse(response, responseOptions);
   }
 
-  async postApiPluginManagerCommand(printer, pluginCommand, pluginUrl, responseOptions) {
+  async postApiPluginManagerCommand(printer, pluginCommand, pluginUrl, responseOptions?: any) {
     const { url, options } = this._prepareRequest(printer, this.apiPluginManager);
     const command = this.pluginManagerCommand(pluginCommand, pluginUrl);
 
@@ -301,7 +311,7 @@ export class OctoPrintApiService extends OctoPrintRoutes {
     return processResponse(response, responseOptions);
   }
 
-  async postPluginFirmwareUpdateFlash(currentPrinterId, printer, firmwarePath, responseOptions) {
+  async postPluginFirmwareUpdateFlash(currentPrinterId, printer, firmwarePath, responseOptions?: any) {
     const { url, options } = this._prepareRequest(printer, this.pluginFirmwareUpdaterFlash, null, multiPartContentType);
 
     const formData = new FormData();
@@ -347,7 +357,7 @@ export class OctoPrintApiService extends OctoPrintRoutes {
     }
   }
 
-  async getPluginFirmwareUpdateStatus(printer, responseOptions) {
+  async getPluginFirmwareUpdateStatus(printer, responseOptions?: any) {
     const { url, options } = this._prepareRequest(printer, this.pluginFirmwareUpdaterStatus);
 
     const response = await this.axiosClient.get(url, options);
@@ -359,76 +369,76 @@ export class OctoPrintApiService extends OctoPrintRoutes {
    * @param responseOptions
    * @returns {Promise<{data, status}|*>}
    */
-  async fetchOctoPrintPlugins(responseOptions) {
+  async fetchOctoPrintPlugins(responseOptions?: any) {
     const { url, options } = this._prepareAnonymousRequest(pluginRepositoryUrl);
 
     const response = await this.axiosClient.get(url, options);
     return processResponse(response, responseOptions);
   }
 
-  async getSystemInfo(printer, responseOptions) {
+  async getSystemInfo(printer, responseOptions?: any) {
     const { url, options } = this._prepareRequest(printer, this.apiSystemInfo);
     const response = await this.axiosClient.get(url, options);
     return processResponse(response, responseOptions);
   }
 
-  async getSystemCommands(printer, responseOptions) {
+  async getSystemCommands(printer, responseOptions?: any) {
     const { url, options } = this._prepareRequest(printer, this.apiSystemCommands);
     const response = await this.axiosClient.get(url, options);
     return processResponse(response, responseOptions);
   }
 
-  async postSystemRestartCommand(printer, responseOptions) {
+  async postSystemRestartCommand(printer, responseOptions?: any) {
     const { url, options } = this._prepareRequest(printer, this.apiSystemRestartCommand);
     const response = await this.axiosClient.post(url, {}, options);
     return processResponse(response, responseOptions);
   }
 
-  async getSoftwareUpdateCheck(printer, force, responseOptions) {
+  async getSoftwareUpdateCheck(printer, force, responseOptions?: any) {
     const { url, options } = this._prepareRequest(printer, this.apiSoftwareUpdateCheck(force));
     const response = await this.axiosClient.get(url, options);
     return processResponse(response, responseOptions);
   }
 
-  async getPluginPiSupport(printer, responseOptions) {
+  async getPluginPiSupport(printer, responseOptions?: any) {
     const { url, options } = this._prepareRequest(printer, this.apiPluginPiSupport);
     const response = await this.axiosClient.get(url, options);
     return processResponse(response, responseOptions);
   }
 
-  async deleteTimeLapse(printer, fileName, responseOptions) {
+  async deleteTimeLapse(printer, fileName, responseOptions?: any) {
     const path = `${this.apiTimelapse}/${fileName}`;
     const { url, options } = this._prepareRequest(printer, path);
     const response = await this.axiosClient.delete(url, options);
     return processResponse(response, responseOptions);
   }
 
-  async listUnrenderedTimeLapses(printer, responseOptions) {
+  async listUnrenderedTimeLapses(printer, responseOptions?: any) {
     const path = `${this.apiTimelapse}?unrendered=true`;
     const { url, options } = this._prepareRequest(printer, path);
     const response = await this.axiosClient.get(url, options);
     return processResponse(response, responseOptions);
   }
 
-  async listProfiles(printer, responseOptions) {
+  async listProfiles(printer, responseOptions?: any) {
     const { url, options } = this._prepareRequest(printer, this.apiProfiles);
     const response = await this.axiosClient.get(url, options);
     return processResponse(response, responseOptions);
   }
 
-  async getBackupOverview(login, responseOptions) {
+  async getBackupOverview(login, responseOptions?: any) {
     const { url, options } = this._prepareRequest(login, this.pluginBackupIndex);
     const response = await this.axiosClient.get(url, options);
     return processResponse(response, responseOptions);
   }
 
-  async getBackups(login, responseOptions) {
+  async getBackups(login, responseOptions?: any) {
     const { url, options } = this._prepareRequest(login, this.pluginBackupEndpoint);
     const response = await this.axiosClient.get(url, options);
     return processResponse(response, responseOptions);
   }
 
-  async createBackup(login, excludeArray, responseOptions) {
+  async createBackup(login, excludeArray, responseOptions?: any) {
     const { url, options } = this._prepareRequest(login, this.pluginBackupEndpoint);
     const response = await this.axiosClient.post(
       url,
@@ -440,7 +450,7 @@ export class OctoPrintApiService extends OctoPrintRoutes {
     return processResponse(response, responseOptions);
   }
 
-  async getDownloadBackupStream(login, filename, responseOptions) {
+  async getDownloadBackupStream(login, filename) {
     const { url, options } = this._prepareRequest(login, this.pluginBackupFileDownload(filename));
     const response = await this.axiosClient
       .get(url, {
@@ -481,7 +491,7 @@ export class OctoPrintApiService extends OctoPrintRoutes {
     return processResponse(response);
   }
 
-  async deleteBackup(login, filename, responseOptions) {
+  async deleteBackup(login, filename, responseOptions?: any) {
     const { url, options } = this._prepareRequest(login, this.pluginBackupFile(filename));
     const response = await this.axiosClient.delete(url, options);
     return processResponse(response, responseOptions);

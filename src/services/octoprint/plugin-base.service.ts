@@ -1,23 +1,38 @@
-import { ValidationException, InternalServerException } from "../../exceptions/runtime.exceptions";
-import { pluginManagerCommands } from "./constants/octoprint-service.constants";
+import { ValidationException, InternalServerException } from "@/exceptions/runtime.exceptions";
+import { pluginManagerCommands } from "@/services/octoprint/constants/octoprint-service.constants";
+import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
+import { PluginRepositoryCache } from "@/services/octoprint/plugin-repository.cache";
+import { LoggerService } from "@/handlers/logger";
+import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class PluginBaseService {
   // https://github.com/OctoPrint/OctoPrint/blob/76e87ba81329e6ce761c9307d3e80c291000871e/src/octoprint/plugins/pluginmanager/__init__.py#L609
-  octoPrintApiService;
-  pluginRepositoryCache;
-  #pluginName;
-  #pluginUrl;
+  octoPrintApiService: OctoPrintApiService;
+  pluginRepositoryCache: PluginRepositoryCache;
+  private _pluginName: string;
+  private _pluginUrl: string;
 
-  _logger;
+  protected logger: LoggerService;
 
-  constructor({ octoPrintApiService, pluginRepositoryCache, loggerFactory }, { pluginName, pluginUrl }) {
+  constructor(
+    {
+      octoPrintApiService,
+      pluginRepositoryCache,
+      loggerFactory,
+    }: {
+      octoPrintApiService: OctoPrintApiService;
+      pluginRepositoryCache: PluginRepositoryCache;
+      loggerFactory: ILoggerFactory;
+    },
+    { pluginName, pluginUrl }: { pluginName: string; pluginUrl?: string }
+  ) {
     this.octoPrintApiService = octoPrintApiService;
     this.pluginRepositoryCache = pluginRepositoryCache;
-    this.#pluginName = pluginName;
-    this._logger = loggerFactory(`Plugin-${pluginName}`);
+    this._pluginName = pluginName;
+    this.logger = loggerFactory(`Plugin-${pluginName}`);
 
     const pluginReference = pluginRepositoryCache.getPlugin(pluginName);
-    this.#pluginUrl = pluginUrl || pluginReference.archive;
+    this._pluginUrl = pluginUrl || pluginReference.archive;
 
     if (!pluginName || !pluginUrl) {
       throw new ValidationException("OctoPrint Plugin not configured correctly");
@@ -25,7 +40,7 @@ export class PluginBaseService {
   }
 
   get pluginName() {
-    return this.#pluginName;
+    return this._pluginName;
   }
 
   async isPluginUpToDate(printerLogin) {
@@ -61,7 +76,7 @@ export class PluginBaseService {
   }
 
   async updatePlugin(printerLogin) {
-    return await this.octoPrintApiService.postSoftwareUpdate(printerLogin, [this.pluginName], this.#pluginUrl);
+    return await this.octoPrintApiService.postSoftwareUpdate(printerLogin, [this.pluginName], this._pluginUrl);
   }
 
   async installPlugin(printerLogin, restartAfter = false) {

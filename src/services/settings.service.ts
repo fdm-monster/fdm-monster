@@ -1,5 +1,8 @@
-import { ServerSettings } from "@/models";
+import { Settings } from "@/models";
 import {
+  credentialSettingsKey,
+  fileCleanSettingKey,
+  frontendSettingKey,
   getDefaultCredentialSettings,
   getDefaultFileCleanSettings,
   getDefaultFrontendSettings,
@@ -8,27 +11,26 @@ import {
   getDefaultTimeout,
   getDefaultWhitelistIpAddresses,
   getDefaultWizardSettings,
-} from "@/constants/server-settings.constants";
-import { validateInput } from "@/handlers/validators";
-import {
-  serverSettingsUpdateRules,
-  frontendSettingsUpdateRules,
-  credentialSettingUpdateRules,
-} from "./validators/settings-service.validation";
-import {
-  fileCleanSettingKey,
   serverSettingsKey,
-  frontendSettingKey,
-  credentialSettingsKey,
   timeoutSettingKey,
   wizardSettingKey,
 } from "@/constants/server-settings.constants";
+import { validateInput } from "@/handlers/validators";
+import {
+  credentialSettingUpdateRules,
+  frontendSettingsUpdateRules,
+  serverSettingsUpdateRules,
+  whitelistUpdateRules,
+  wizardUpdateRules,
+} from "./validators/settings-service.validation";
+import { ISettingsService } from "@/services/interfaces/settings.service.interface";
+import { ICredentialSettings, IFrontendSettings, IServerSettings, IWizardSettings } from "@/models/Settings";
 
-export class SettingsService {
+export class SettingsService implements ISettingsService {
   async getOrCreate() {
-    let settings = await ServerSettings.findOne();
+    let settings = await Settings.findOne();
     if (!settings) {
-      const defaultSettings = new ServerSettings(getDefaultSettings());
+      const defaultSettings = new Settings(getDefaultSettings());
       await defaultSettings.save();
 
       // Return to upper layer
@@ -37,16 +39,14 @@ export class SettingsService {
       // Perform patch of settings
       settings = this.migrateSettingsRuntime(settings);
 
-      return ServerSettings.findOneAndUpdate({ _id: settings.id }, settings, { new: true });
+      return Settings.findOneAndUpdate({ _id: settings.id }, settings, { new: true });
     }
   }
 
   /**
    * Patch the given settings object manually - runtime migration strategy
-   * @param knownSettings
-   * @returns {*}
    */
-  private migrateSettingsRuntime(knownSettings) {
+  migrateSettingsRuntime(knownSettings) {
     const doc = knownSettings; // alias _doc also works
     if (!doc[fileCleanSettingKey]) {
       doc[fileCleanSettingKey] = getDefaultFileCleanSettings();
@@ -75,25 +75,21 @@ export class SettingsService {
     return knownSettings;
   }
 
-  async setSentryDiagnosticsEnabled(enabled) {
+  async setSentryDiagnosticsEnabled(enabled: boolean) {
     const settingsDoc = await this.getOrCreate();
     settingsDoc[serverSettingsKey].sentryDiagnosticsEnabled = enabled;
-    return ServerSettings.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
+
+    return Settings.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
       new: true,
     });
   }
 
-  /**
-   * @param version {number}
-   * @return {Promise<any>}
-   */
-  async setWizardCompleted(version) {
-    const settingsDoc = await this.getOrCreate();
-    settingsDoc[wizardSettingKey].wizardCompleted = true;
-    settingsDoc[wizardSettingKey].wizardCompletedAt = new Date();
-    settingsDoc[wizardSettingKey].wizardVersion = version;
+  async patchWizardSettings(patchUpdate: Partial<IWizardSettings>) {
+    const validatedInput = validateInput(patchUpdate, wizardUpdateRules);
 
-    return ServerSettings.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
+    const settingsDoc = await this.getOrCreate();
+    settingsDoc[wizardSettingKey] = Object.assign(settingsDoc[wizardSettingKey], validatedInput);
+    return Settings.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
       new: true,
     });
   }
@@ -102,7 +98,7 @@ export class SettingsService {
     const settingsDoc = await this.getOrCreate();
     settingsDoc[serverSettingsKey].registration = enabled;
 
-    return ServerSettings.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
+    return Settings.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
       new: true,
     });
   }
@@ -111,65 +107,58 @@ export class SettingsService {
     const settingsDoc = await this.getOrCreate();
     settingsDoc[serverSettingsKey].loginRequired = enabled;
 
-    return ServerSettings.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
+    return Settings.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
       new: true,
     });
   }
 
-  async setWhitelist(enabled, ipAddresses) {
+  async setWhitelist(enabled: boolean, ipAddresses: string[]) {
+    await validateInput(
+      {
+        enabled,
+        ipAddresses,
+      },
+      whitelistUpdateRules
+    );
     const settingsDoc = await this.getOrCreate();
     const settings = settingsDoc[serverSettingsKey];
     settings.whitelistEnabled = enabled;
     settings.whitelistedIpAddresses = ipAddresses;
-
-    return ServerSettings.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
+    return Settings.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
       new: true,
     });
   }
 
-  async updateFrontendSettings(patchUpdate) {
-    const validatedInput = await validateInput(
-      {
-        [frontendSettingKey]: patchUpdate,
-      },
-      frontendSettingsUpdateRules
-    );
+  async updateFrontendSettings(patchUpdate: IFrontendSettings) {
+    const validatedInput = await validateInput(patchUpdate, frontendSettingsUpdateRules);
+
     const settingsDoc = await this.getOrCreate();
-
-    return ServerSettings.findOneAndUpdate({ _id: settingsDoc._id }, validatedInput, {
+    const frontendSettings = settingsDoc[frontendSettingKey];
+    Object.assign(frontendSettings, validatedInput);
+    return Settings.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
       new: true,
     });
   }
 
-  async updateCredentialSettings(patchUpdate) {
+  async patchCredentialSettings(patchUpdate: Partial<ICredentialSettings>) {
+    const validatedInput = await validateInput(patchUpdate, credentialSettingUpdateRules);
+
     const settingsDoc = await this.getOrCreate();
-    const credentialSettings = settingsDoc[credentialSettingsKey]._doc;
-
-    Object.assign(credentialSettings, patchUpdate);
-    const validatedInput = await validateInput(
-      {
-        [credentialSettingsKey]: credentialSettings,
-      },
-      credentialSettingUpdateRules
-    );
-
-    return ServerSettings.findOneAndUpdate({ _id: settingsDoc._id }, validatedInput, {
+    const credentialSettings = settingsDoc[credentialSettingsKey];
+    Object.assign(credentialSettings, validatedInput);
+    return Settings.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
       new: true,
     });
   }
 
-  async updateServerSettings(patchUpdate) {
+  async patchServerSettings(patchUpdate: Partial<IServerSettings>) {
     const validatedInput = await validateInput(patchUpdate, serverSettingsUpdateRules);
-    const settingsDoc = await this.getOrCreate();
 
-    return ServerSettings.findOneAndUpdate(
-      { _id: settingsDoc._id },
-      {
-        [serverSettingsKey]: validatedInput,
-      },
-      {
-        new: true,
-      }
-    );
+    const settingsDoc = await this.getOrCreate();
+    const serverSettings = settingsDoc[serverSettingsKey];
+    Object.assign(serverSettings, validatedInput);
+    return Settings.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
+      new: true,
+    });
   }
 }

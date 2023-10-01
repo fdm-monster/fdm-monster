@@ -3,7 +3,7 @@ import { Printer } from "@/models";
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import { validateInput } from "@/handlers/validators";
 import {
-  createPrinterRules,
+  createMongoPrinterRules,
   updatePrinterDisabledReasonRule,
   updatePrinterEnabledRule,
 } from "./validators/printer-service.validation";
@@ -12,18 +12,15 @@ import { printerEvents } from "@/constants/event.constants";
 import { LoggerService } from "@/handlers/logger";
 import { normalizeURLWithProtocol } from "@/utils/url.utils";
 import { MongoIdType } from "@/shared.constants";
+import { IPrinterService } from "@/services/interfaces/printer.service.interface";
+import { Type } from "@/services/orm/base.interface";
+import { ILoggerFactory } from "@/handlers/logger-factory";
 
-export class PrinterService {
+export class PrinterService implements IPrinterService<MongoIdType> {
   eventEmitter2: EventEmitter2;
   logger: LoggerService;
 
-  constructor({
-    eventEmitter2,
-    loggerFactory,
-  }: {
-    eventEmitter2: EventEmitter2;
-    loggerFactory: (name: string) => LoggerService;
-  }) {
+  constructor({ eventEmitter2, loggerFactory }: { eventEmitter2: EventEmitter2; loggerFactory: ILoggerFactory }) {
     this.eventEmitter2 = eventEmitter2;
     this.logger = loggerFactory(PrinterService.name);
   }
@@ -71,10 +68,8 @@ export class PrinterService {
    */
   async update(printerId: MongoIdType, updateData) {
     const printer = await this.get(printerId);
-
     updateData.printerURL = normalizeURLWithProtocol(updateData.printerURL);
-    const { printerURL, apiKey, enabled, settingsAppearance } = await validateInput(updateData, createPrinterRules);
-    await this.get(printerId);
+    const { printerURL, apiKey, enabled, settingsAppearance } = await validateInput(updateData, createMongoPrinterRules);
 
     printer.printerURL = printerURL;
     printer.apiKey = apiKey;
@@ -103,7 +98,7 @@ export class PrinterService {
     }
   }
 
-  async batchImport(printers) {
+  async batchImport(printers: Partial<typeof Printer>[]) {
     if (!printers?.length) return [];
 
     this.logger.log(`Validating ${printers.length} printer objects`);
@@ -164,7 +159,7 @@ export class PrinterService {
       apiKey,
     };
 
-    await validateInput(update, createPrinterRules);
+    await validateInput(update, createMongoPrinterRules);
     await this.get(printerId);
 
     const printer = await Printer.findByIdAndUpdate(printerId, update, {
@@ -175,7 +170,7 @@ export class PrinterService {
     return printer;
   }
 
-  async updateEnabled(printerId: MongoIdType, enabled) {
+  async updateEnabled(printerId: MongoIdType, enabled: boolean) {
     const update = enabled
       ? {
           enabled,
@@ -221,6 +216,6 @@ export class PrinterService {
     if (mergedPrinter.printerURL?.length) {
       mergedPrinter.printerURL = normalizeURLWithProtocol(mergedPrinter.printerURL);
     }
-    return await validateInput(mergedPrinter, createPrinterRules);
+    return await validateInput(mergedPrinter, createMongoPrinterRules);
   }
 }

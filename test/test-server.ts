@@ -6,7 +6,7 @@ import { AxiosMock } from "./mocks/axios.mock";
 import { OctoPrintApiMock } from "./mocks/octoprint-api.mock";
 import { ROLES } from "@/constants/authorization.constants";
 import supertest from "supertest";
-import { Server } from "socket.io";
+import { Express } from "express";
 
 jest.mock("../src/utils/env.utils", () => ({
   ...jest.requireActual("../src/utils/env.utils"),
@@ -19,9 +19,9 @@ require("../src/utils/env.utils");
  */
 export async function setupTestApp(
   loadPrinterStore = false,
-  mocks = undefined,
+  mocks: any = undefined,
   quick_boot = true
-): Promise<{ container: AwilixContainer; httpServer: Server; request: supertest.SuperTest<supertest.Test> }> {
+): Promise<{ container: AwilixContainer; httpServer: Express; request: supertest.SuperTest<supertest.Test> }> {
   setupEnvConfig(true);
 
   const { httpServer, container } = await setupServer();

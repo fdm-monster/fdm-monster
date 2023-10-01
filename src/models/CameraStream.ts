@@ -1,6 +1,19 @@
-import { model, Schema } from "mongoose";
+import { model, Schema, Types } from "mongoose";
 
-const CameraStreamSchema = new Schema({
+export interface ICameraStream {
+  _id: Types.ObjectId;
+  id: string;
+  streamURL: string;
+  printerId?: Types.ObjectId;
+  settings: {
+    aspectRatio: string;
+    rotationClockwise: number;
+    flipHorizontal: boolean;
+    flipVertical: boolean;
+  };
+}
+
+const CameraStreamSchema = new Schema<ICameraStream>({
   streamURL: {
     type: String,
     unique: true,

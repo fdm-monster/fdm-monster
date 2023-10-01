@@ -1,8 +1,8 @@
 import { ExtractJwt, Strategy as JwtStrategy } from "passport-jwt";
 import { Strategy as AnonymousStrategy } from "passport-anonymous";
-import { User } from "../models";
-import { DITokens } from "../container.tokens";
-import { AppConstants } from "../server.constants";
+import { User } from "@/models";
+import { DITokens } from "@/container.tokens";
+import { AppConstants } from "@/server.constants";
 import { AwilixContainer } from "awilix";
 import { PassportStatic } from "passport";
 

@@ -1,8 +1,10 @@
 import { createController } from "awilix-express";
-import { AppConstants } from "../server.constants";
-import { validateInput } from "../handlers/validators";
+import { AppConstants } from "@/server.constants";
+import { validateInput } from "@/handlers/validators";
 import { idRules } from "./validation/generic.validation";
-import { authenticate } from "../middleware/authenticate";
+import { authenticate } from "@/middleware/authenticate";
+import { Request, Response } from "express";
+import { CameraStreamService } from "@/services/camera-stream.service";
 
 export class CameraStreamController {
   /**
@@ -10,33 +12,33 @@ export class CameraStreamController {
    */
   cameraStreamService;
 
-  constructor({ cameraStreamService }) {
+  constructor({ cameraStreamService }: { cameraStreamService: CameraStreamService }) {
     this.cameraStreamService = cameraStreamService;
   }
 
-  async list(req, res) {
+  async list(req: Request, res: Response) {
     const result = await this.cameraStreamService.list();
     res.send(result);
   }
 
-  async get(req, res) {
+  async get(req: Request, res: Response) {
     const { id } = await validateInput(req.params, idRules);
     const result = await this.cameraStreamService.get(id);
     res.send(result);
   }
 
-  async create(req, res) {
+  async create(req: Request, res: Response) {
     const result = await this.cameraStreamService.create(req.body);
     res.send(result);
   }
 
-  async update(req, res) {
+  async update(req: Request, res: Response) {
     const { id } = await validateInput(req.params, idRules);
     const result = await this.cameraStreamService.update(id, req.body);
     res.send(result);
   }
 
-  async delete(req, res) {
+  async delete(req: Request, res: Response) {
     const { id } = await validateInput(req.params, idRules);
     await this.cameraStreamService.delete(id);
     res.send({});

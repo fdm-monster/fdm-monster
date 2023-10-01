@@ -1,14 +1,14 @@
-export function mapArray(docs) {
+export function mapMongoDbArray(docs) {
   if (!docs?.length) return [];
 
-  return docs.map(map);
+  return docs.map(mapMongoDb);
 }
 
 /**
  * @param doc
  * @returns {any}
  */
-export function map(doc) {
+export function mapMongoDb(doc: any) {
   if (!doc) return;
 
   const data = doc.toJSON();

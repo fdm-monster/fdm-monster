@@ -8,6 +8,7 @@ import { AppConstants } from "@/server.constants";
 import { GithubService } from "@/services/core/github.service";
 import { ConfigService } from "@/services/core/config.service";
 import { LoggerService } from "@/handlers/logger";
+import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class ClientBundleService {
   githubService: GithubService;
@@ -21,7 +22,7 @@ export class ClientBundleService {
   }: {
     githubService: GithubService;
     configService: ConfigService;
-    loggerFactory: (name: string) => LoggerService;
+    loggerFactory: ILoggerFactory;
   }) {
     this.githubService = githubService;
     this.configService = configService;

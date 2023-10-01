@@ -1,18 +1,19 @@
-import { validateInput } from "../handlers/validators";
+import { validateInput } from "@/handlers/validators";
 import {
   exportPrintersFloorsYamlRules,
   importPrinterPositionsRules,
   importPrintersFloorsYamlRules,
-} from "./validators/yaml-service.validation";
+} from "../validators/yaml-service.validation";
 import { dump, load } from "js-yaml";
 import { LoggerService } from "@/handlers/logger";
 import { PrinterService } from "@/services/printer.service";
 import { PrinterCache } from "@/state/printer.cache";
 import { FloorService } from "@/services/floor.service";
 import { FloorStore } from "@/state/floor.store";
+import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class YamlService {
-  floorStore;
+  floorStore: FloorStore;
   printerService: PrinterService;
   printerCache: PrinterCache;
   floorService: FloorService;
@@ -31,7 +32,7 @@ export class YamlService {
     printerCache: PrinterCache;
     floorStore: FloorStore;
     floorService: FloorService;
-    loggerFactory: (name: string) => LoggerService;
+    loggerFactory: ILoggerFactory;
     serverVersion: string;
   }) {
     this.floorStore = floorStore;

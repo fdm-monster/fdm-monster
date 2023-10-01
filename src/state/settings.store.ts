@@ -11,30 +11,30 @@ import { getCurrentHub } from "@sentry/node";
 import { isTestEnvironment } from "@/utils/env.utils";
 import { AppConstants } from "@/server.constants";
 import { LoggerService } from "@/handlers/logger";
+import { ISettingsService } from "@/services/interfaces/settings.service.interface";
+import { ISettings } from "@/models/Settings";
+import { CredentialSettingsDto, FrontendSettingsDto, ServerSettingsDto } from "@/services/interfaces/settings.dto";
 
 export class SettingsStore {
-  /**
-   * @private
-   * @type {ServerSettings}
-   */
-  settings;
-  /**
-   * @type {SettingsService}
-   */
-  settingsService;
-  /**
-   * @type {LoggerService}
-   */
-  logger;
+  settingsService: ISettingsService;
+  logger: LoggerService;
+  private settings: ISettings | null = null;
 
-  constructor({ settingsService, loggerFactory }) {
+  constructor({
+    settingsService,
+    loggerFactory,
+  }: {
+    settingsService: ISettingsService;
+    loggerFactory: (context: string) => LoggerService;
+  }) {
     this.settingsService = settingsService;
     this.logger = loggerFactory(SettingsStore.name);
   }
 
   getSettings() {
-    const settings = this.settings._doc;
+    const settings = this.settings!;
     return Object.freeze({
+      // Credential settings are not shared with the client
       [serverSettingsKey]: settings[serverSettingsKey],
       [wizardSettingKey]: settings[wizardSettingKey],
       [frontendSettingKey]: settings[frontendSettingKey],
@@ -57,7 +57,7 @@ export class SettingsStore {
     return this.settings[serverSettingsKey].sentryDiagnosticsEnabled;
   }
 
-  async persistOptionalCredentialSettings(overrideJwtSecret: string, overrideJwtExpiresIn) {
+  async persistOptionalCredentialSettings(overrideJwtSecret: string, overrideJwtExpiresIn: string) {
     if (overrideJwtSecret) {
       await this.updateCredentialSettings({
         jwtSecret: overrideJwtSecret,
@@ -65,7 +65,7 @@ export class SettingsStore {
     }
     if (overrideJwtExpiresIn) {
       await this.updateCredentialSettings({
-        jwtExpiresIn: overrideJwtExpiresIn,
+        jwtExpiresIn: parseInt(overrideJwtExpiresIn),
       });
     }
   }
@@ -100,7 +100,6 @@ export class SettingsStore {
 
   /**
    * Cross-cutting concern for file clean operation
-   * @returns {*}
    */
   getFileCleanSettings() {
     return this.getSettings()[fileCleanSettingKey];
@@ -110,19 +109,19 @@ export class SettingsStore {
     return this.getSettings()[fileCleanSettingKey]?.autoRemoveOldFilesBeforeUpload;
   }
 
-  /**
-   * @param version {number}
-   */
-  async setWizardCompleted(version) {
-    this.settings = await this.settingsService.setWizardCompleted(version);
+  async setWizardCompleted(version: number) {
+    this.settings = await this.settingsService.patchWizardSettings({
+      wizardCompleted: true,
+      wizardCompletedAt: new Date(),
+      wizardVersion: version,
+    });
     return this.getSettings();
   }
 
-  /**
-   * @param {Boolean} enabled
-   */
-  async setRegistrationEnabled(enabled = true) {
-    this.settings = await this.settingsService.setRegistrationEnabled(enabled);
+  async setRegistrationEnabled(registration = true) {
+    this.settings = await this.settingsService.patchServerSettings({
+      registration,
+    });
     return this.getSettings();
   }
 
@@ -130,40 +129,45 @@ export class SettingsStore {
     return this.getServerSettings().loginRequired;
   }
 
-  /**
-   * @param {Boolean} enabled
-   */
-  async setLoginRequired(enabled = true) {
-    this.settings = await this.settingsService.setLoginRequired(enabled);
+  async setLoginRequired(loginRequired = true) {
+    this.settings = await this.settingsService.patchServerSettings({
+      loginRequired,
+    });
     return this.getSettings();
   }
 
-  async setWhitelist(enabled = true, ipAddresses) {
-    this.settings = await this.settingsService.setWhitelist(enabled, ipAddresses);
+  async setWhitelist(whitelistEnabled = true, whitelistedIpAddresses: string[]) {
+    this.settings = await this.settingsService.patchServerSettings({
+      whitelistEnabled,
+      whitelistedIpAddresses,
+    });
     return this.getSettings();
   }
 
-  async updateServerSettings(serverSettings) {
-    this.settings = await this.settingsService.updateServerSettings(serverSettings);
+  async updateServerSettings(serverSettings: Partial<ServerSettingsDto>) {
+    this.settings = await this.settingsService.patchServerSettings(serverSettings);
     return this.getSettings();
   }
 
-  async updateCredentialSettings(credentialSettings) {
-    this.settings = await this.settingsService.updateCredentialSettings(credentialSettings);
+  async updateCredentialSettings(credentialSettings: Partial<CredentialSettingsDto>) {
+    this.settings = await this.settingsService.patchCredentialSettings(credentialSettings);
     return this.getSettings();
   }
 
-  async setSentryDiagnosticsEnabled(enabled) {
-    this.settings = await this.settingsService.setSentryDiagnosticsEnabled(enabled);
+  async setSentryDiagnosticsEnabled(sentryDiagnosticsEnabled: boolean) {
+    this.settings = await this.settingsService.patchServerSettings({
+      sentryDiagnosticsEnabled,
+    });
     await this.processSentryEnabled();
     return this.getSettings();
   }
 
-  /**
-   * @private
-   * @returns {Promise<void>}
-   */
-  async processSentryEnabled() {
+  async updateFrontendSettings(frontendSettings: FrontendSettingsDto) {
+    this.settings = await this.settingsService.updateFrontendSettings(frontendSettings);
+    return this.getSettings();
+  }
+
+  private async processSentryEnabled() {
     if (isTestEnvironment()) return;
     const sentryEnabled = await this.getAnonymousDiagnosticsEnabled();
     if (sentryEnabled) {
@@ -172,10 +176,5 @@ export class SettingsStore {
       this.logger.log("Disabling Sentry for remote diagnostics");
     }
     getCurrentHub().getClient()!.getOptions().enabled = sentryEnabled;
-  }
-
-  async updateFrontendSettings(frontendSettings) {
-    this.settings = await this.settingsService.updateFrontendSettings(frontendSettings);
-    return this.getSettings();
   }
 }
