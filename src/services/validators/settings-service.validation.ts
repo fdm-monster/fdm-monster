@@ -1,5 +1,3 @@
-import { frontendSettingKey, credentialSettingsKey } from "../../constants/server-settings.constants";
-
 export const serverSettingsUpdateRules = {
   registration: "boolean",
   loginRequired: "boolean",
@@ -9,16 +7,26 @@ export const serverSettingsUpdateRules = {
 };
 
 export const frontendSettingsUpdateRules = {
-  [frontendSettingKey]: "object",
-  [`${frontendSettingKey}.gridCols`]: "integer|min:1",
-  [`${frontendSettingKey}.gridRows`]: "integer|min:1",
-  [`${frontendSettingKey}.largeTiles`]: "boolean",
+  gridCols: "integer|min:1",
+  gridRows: "integer|min:1",
+  largeTiles: "boolean",
 };
 
 export const credentialSettingUpdateRules = {
-  [credentialSettingsKey]: "object",
-  [`${credentialSettingsKey}.jwtSecret`]: "required|string",
-  [`${credentialSettingsKey}.jwtExpiresIn`]: "required|integer|min:120",
-  [`${credentialSettingsKey}.refreshTokenAttempts`]: "required|integer|min:-1",
-  [`${credentialSettingsKey}.refreshTokenExpiry`]: "required|integer|min:0",
+  jwtSecret: "required|string",
+  jwtExpiresIn: "required|integer|min:120",
+  refreshTokenAttempts: "required|integer|min:-1",
+  refreshTokenExpiry: "required|integer|min:0",
+};
+
+export const whitelistUpdateRules = {
+  whitelistEnabled: "boolean",
+  whitelistedIpAddresses: "array",
+  "whitelistedIpAddresses.*": "string",
+};
+
+export const wizardUpdateRules = {
+  wizardCompleted: "required|boolean",
+  wizardCompletedAt: "required|date",
+  wizardVersion: "required|integer|min:0",
 };

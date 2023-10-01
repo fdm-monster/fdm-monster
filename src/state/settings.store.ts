@@ -100,7 +100,6 @@ export class SettingsStore {
 
   /**
    * Cross-cutting concern for file clean operation
-   * @returns {*}
    */
   getFileCleanSettings() {
     return this.getSettings()[fileCleanSettingKey];
