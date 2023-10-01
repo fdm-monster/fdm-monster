@@ -53,13 +53,13 @@ export class PluginFirmwareUpdateService extends PluginBaseService {
       const response = await this.githubService.getReleases(defaultRepos.prusaFirmwareOwner, defaultRepos.prusaFirmwareRepo);
       this.prusaFirmwareReleases = response.data;
     } catch (e) {
-      return this._logger.error("Github fetch error. Probably rate limited, skipping firmware dowmload");
+      return this.logger.error("Github fetch error. Probably rate limited, skipping firmware dowmload");
     }
 
     if (!this.prusaFirmwareReleases?.length) return [];
 
     this.latestFirmware = this.prusaFirmwareReleases[0];
-    this._logger.log(`Plugin Cache filled with ${this.prusaFirmwareReleases?.length || "?"} firmware releases`, {
+    this.logger.log(`Plugin Cache filled with ${this.prusaFirmwareReleases?.length || "?"} firmware releases`, {
       url: this.latestFirmware.url,
       tag_name: this.latestFirmware.tag_name,
     });
@@ -78,13 +78,13 @@ export class PluginFirmwareUpdateService extends PluginBaseService {
     const firmwareAsset = latestFirmware.assets.find((asset) => asset.name.includes("MK3S_MK3S+"));
     const downloadUrl = firmwareAsset.browser_download_url;
     const downloadName = firmwareAsset.name;
-    this._logger.log(`Checking firmware ${downloadName}`);
+    this.logger.log(`Checking firmware ${downloadName}`);
     if (!this.multerService.fileExists(downloadName, firmwareDownloadPath)) {
-      this._logger.log(`Downloading firmware from ${downloadUrl}`);
+      this.logger.log(`Downloading firmware from ${downloadUrl}`);
       await this.multerService.downloadFile(downloadUrl, downloadName, firmwareDownloadPath);
-      this._logger.log(`Downloaded firmware ${downloadName}`);
+      this.logger.log(`Downloaded firmware ${downloadName}`);
     } else {
-      this._logger.log(`Found firmware ${downloadName}`);
+      this.logger.log(`Found firmware ${downloadName}`);
     }
   }
 

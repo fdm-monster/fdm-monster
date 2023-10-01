@@ -12,7 +12,7 @@ export class PluginBaseService {
   private _pluginName: string;
   private _pluginUrl: string;
 
-  private logger: LoggerService;
+  protected logger: LoggerService;
 
   constructor(
     {
