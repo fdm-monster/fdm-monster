@@ -5,11 +5,3 @@ export const wizardSettingsRules = {
   rootUsername: "required|string",
   rootPassword: "required|string",
 };
-export const whitelistSettingRules = {
-  whitelistedIpAddresses: "required|array|minLength:1",
-  "whitelistedIpAddresses.*": "required|string",
-  whitelistEnabled: "required|boolean",
-};
-export const sentryDiagnosticsEnabledRules = {
-  enabled: "required|boolean",
-};

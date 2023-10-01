@@ -19,14 +19,18 @@ export const credentialSettingUpdateRules = {
   refreshTokenExpiry: "required|integer|min:0",
 };
 
-export const whitelistUpdateRules = {
-  whitelistEnabled: "boolean",
-  whitelistedIpAddresses: "array",
-  "whitelistedIpAddresses.*": "string",
+export const whitelistSettingRules = {
+  whitelistedIpAddresses: "required|array|minLength:1",
+  "whitelistedIpAddresses.*": "required|string",
+  whitelistEnabled: "required|boolean",
 };
 
 export const wizardUpdateRules = {
   wizardCompleted: "required|boolean",
   wizardCompletedAt: "required|date",
   wizardVersion: "required|integer|min:0",
+};
+
+export const sentryDiagnosticsEnabledRules = {
+  enabled: "required|boolean",
 };

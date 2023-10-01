@@ -4,21 +4,23 @@ import { setupTestApp } from "../test-server";
 import { expectOkResponse } from "../extensions";
 import { AppConstants } from "@/server.constants";
 import {
+  credentialSettingsKey,
   fileCleanSettingKey,
+  frontendSettingKey,
   getDefaultFileCleanSettings,
+  getDefaultFrontendSettings,
   getDefaultSettings,
   serverSettingsKey,
-  frontendSettingKey,
-  getDefaultFrontendSettings,
-  credentialSettingsKey,
 } from "@/constants/server-settings.constants";
 import { SettingsController } from "@/controllers/settings.controller";
 
 let request: supertest.SuperTest<supertest.Test>;
 
-const defaultRoute = `${AppConstants.apiRoute}/settings/server`;
+const defaultRoute = `${AppConstants.apiRoute}/settings`;
+const serverSettingsRoute = `${defaultRoute}/server`;
 const frontendSettingsRoute = `${defaultRoute}/frontend`;
 const serverWhitelistRoute = `${defaultRoute}/whitelist`;
+const sentryDiagnosticsRoute = `${defaultRoute}/sentry-diagnostics`;
 
 beforeAll(async () => {
   await connect();
@@ -46,7 +48,22 @@ describe(SettingsController.name, () => {
     expectOkResponse(response);
   });
 
-  it("should OK on PUT whitelist server-settings ", async () => {
+  it("should OK on PUT server settings ", async () => {
+    const response = await request.put(serverSettingsRoute).send({
+      registration: true,
+      loginRequired: true,
+    });
+    expectOkResponse(response);
+  });
+
+  it("should OK on PATCH sentry diagnostics ", async () => {
+    const response = await request.patch(sentryDiagnosticsRoute).send({
+      enabled: true,
+    });
+    expectOkResponse(response);
+  });
+
+  it("should OK on PUT whitelist settings ", async () => {
     const response = await request.put(serverWhitelistRoute).send({
       whitelistEnabled: true,
       whitelistedIpAddresses: ["127.0.0", "192.178.168"],
@@ -58,14 +75,6 @@ describe(SettingsController.name, () => {
         whitelistedIpAddresses: ["127.0.0", "192.178.168", "127.0.0.1"],
       },
     });
-    expectOkResponse(response);
-  });
-
-  // Removed in 1.5.0
-  test.skip("should OK on PUT settings", async () => {
-    const response = await request.put(defaultRoute).send(newSettings);
-    expect(response.body).not.toBeNull();
-    expect(response.body).toMatchObject(newSettings);
     expectOkResponse(response);
   });
 
