@@ -51,7 +51,7 @@ describe(SettingsController.name, () => {
   it("should OK on PUT server settings ", async () => {
     const response = await request.put(serverSettingsRoute).send({
       registration: true,
-      loginRequired: true,
+      loginRequired: false,
     });
     expectOkResponse(response);
   });
