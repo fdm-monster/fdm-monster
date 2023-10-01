@@ -5,8 +5,9 @@ import { PrinterCache } from "@/state/printer.cache";
 import { MongoIdType } from "@/shared.constants";
 import { ICameraStreamService } from "@/services/interfaces/camera-stream.service.interface";
 import { ICameraStream } from "@/models/CameraStream";
-import { CameraStreamDto } from "@/services/interfaces/camera-stream.dto";
+import { CameraStreamDto, CreateCameraStreamDto, UpdateCameraStreamDto } from "@/services/interfaces/camera-stream.dto";
 
+// TODO switch to class-validator DTO validation
 const createCameraStreamRules = {
   printerId: "mongoId",
   streamURL: "required|httpurl",
@@ -38,7 +39,7 @@ export class CameraStreamService implements ICameraStreamService<MongoIdType> {
     return cameraStream;
   }
 
-  async create(data) {
+  async create(data: CreateCameraStreamDto<MongoIdType>) {
     const input = await validateInput(data, createCameraStreamRules);
     if (input.printerId) {
       await this.printerCache.getCachedPrinterOrThrow(input.printerId);
@@ -50,7 +51,7 @@ export class CameraStreamService implements ICameraStreamService<MongoIdType> {
     return this.model.findByIdAndDelete(id);
   }
 
-  async update(id: MongoIdType, input) {
+  async update(id: MongoIdType, input: UpdateCameraStreamDto<MongoIdType>) {
     await this.get(id);
     const updateInput = await validateInput(input, createCameraStreamRules);
     if (input.printerId) {

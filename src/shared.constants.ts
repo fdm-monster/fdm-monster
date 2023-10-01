@@ -4,6 +4,6 @@ export type MongoIdType = string;
 
 export type IdType = SqliteIdType | MongoIdType;
 
-export class IdDto {
-  id: IdType;
+export class IdDto<KeyType = IdType> {
+  id: KeyType;
 }

@@ -6,7 +6,6 @@ import { LoggerService } from "@/handlers/logger";
 import { TaskManagerService } from "@/services/core/task-manager.service";
 import { ServerTasks } from "@/tasks";
 import { MulterService } from "@/services/core/multer.service";
-import { SettingsService } from "@/services/settings.service";
 import { SettingsStore } from "@/state/settings.store";
 import { FloorStore } from "@/state/floor.store";
 import { PluginFirmwareUpdateService } from "@/services/octoprint/plugin-firmware-update.service";
@@ -19,13 +18,14 @@ import { UserService } from "@/services/authentication/user.service";
 import { PluginRepositoryCache } from "@/services/octoprint/plugin-repository.cache";
 import { ClientBundleService } from "@/services/core/client-bundle.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
+import { ISettingsService } from "@/services/interfaces/settings.service.interface";
 
 export class BootTask {
   logger: LoggerService;
   taskManagerService: TaskManagerService;
   serverTasks: ServerTasks;
   settingsStore: SettingsStore;
-  settingsService: SettingsService;
+  settingsService: ISettingsService;
   multerService: MulterService;
   printerSocketStore: PrinterSocketStore;
   filesStore: FilesStore;
@@ -58,7 +58,7 @@ export class BootTask {
   }: {
     loggerFactory: ILoggerFactory;
     serverTasks: ServerTasks;
-    settingsService: SettingsService2;
+    settingsService: ISettingsService;
     settingsStore: SettingsStore;
     multerService: MulterService;
     printerSocketStore: PrinterSocketStore;

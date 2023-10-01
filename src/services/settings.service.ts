@@ -20,7 +20,7 @@ import {
   credentialSettingUpdateRules,
   frontendSettingsUpdateRules,
   serverSettingsUpdateRules,
-  whitelistUpdateRules,
+  whitelistSettingUpdateRules,
   wizardUpdateRules,
 } from "./validators/settings-service.validation";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
@@ -118,7 +118,7 @@ export class SettingsService implements ISettingsService {
         enabled,
         ipAddresses,
       },
-      whitelistUpdateRules
+      whitelistSettingUpdateRules
     );
     const settingsDoc = await this.getOrCreate();
     const settings = settingsDoc[serverSettingsKey];
