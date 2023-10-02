@@ -1,3 +1,5 @@
+import { IdType } from "@/shared.constants";
+
 interface BatchSingletonModel {
   success?: boolean;
   failure?: boolean;
@@ -12,6 +14,7 @@ import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service"
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { PrinterCache } from "@/state/printer.cache";
 import { PrinterEventsCache } from "@/state/printer-events.cache";
+import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 
 type BatchModel = Array<BatchSingletonModel>;
 
@@ -21,7 +24,7 @@ export class BatchCallService {
   printerCache: PrinterCache;
   printerEventsCache: PrinterEventsCache;
   filesStore: FilesStore;
-  printerService: PrinterService;
+  printerService: IPrinterService<IdType>;
 
   constructor({
     octoPrintApiService,
@@ -36,7 +39,7 @@ export class BatchCallService {
     printerEventsCache: PrinterEventsCache;
     printerSocketStore: PrinterSocketStore;
     filesStore: FilesStore;
-    printerService: PrinterService;
+    printerService: IPrinterService<IdType>;
   }) {
     this.octoPrintApiService = octoPrintApiService;
     this.printerCache = printerCache;

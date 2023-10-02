@@ -4,15 +4,12 @@ import { validateInput } from "@/handlers/validators";
 import { idRules } from "./validation/generic.validation";
 import { authenticate } from "@/middleware/authenticate";
 import { Request, Response } from "express";
-import { CameraStreamService } from "@/services/camera-stream.service";
+import { ICameraStreamService } from "@/services/interfaces/camera-stream.service.interface";
 
 export class CameraStreamController {
-  /**
-   * @type {CameraStreamService}
-   */
-  cameraStreamService;
+  cameraStreamService: ICameraStreamService;
 
-  constructor({ cameraStreamService }: { cameraStreamService: CameraStreamService }) {
+  constructor({ cameraStreamService }: { cameraStreamService: ICameraStreamService }) {
     this.cameraStreamService = cameraStreamService;
   }
 

@@ -6,6 +6,7 @@ import {
   timeoutSettingKey,
   wizardSettingKey,
 } from "@/constants/server-settings.constants";
+import { IdDto, IdType } from "@/shared.constants";
 
 export interface DebugSettingsDto {
   debugSocketIoEvents: boolean;
@@ -53,15 +54,13 @@ export interface CredentialSettingsDto {
   jwtExpiresIn: number;
   refreshTokenAttempts: number;
   refreshTokenExpiry: number;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 export interface TimeoutSettingsDto {
   apiTimeout: number;
 }
 
-export interface SettingsDto {
+export class SettingsDto<KeyType> extends IdDto<KeyType> {
   [serverSettingsKey]: ServerSettingsDto;
   [wizardSettingKey]: WizardSettingsDto;
   [frontendSettingKey]: FrontendSettingsDto;
