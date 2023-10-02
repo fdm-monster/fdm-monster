@@ -51,7 +51,7 @@ export const getDefaultTimeout = () => ({
   apiTimeout: 1000,
 });
 
-export const fileCleanSettingKey = "printerFileClean";
+export const fileCleanSettingKey = "fileClean";
 export const getDefaultFileCleanSettings = () => ({
   autoRemoveOldFilesBeforeUpload: false,
   autoRemoveOldFilesAtBoot: false,

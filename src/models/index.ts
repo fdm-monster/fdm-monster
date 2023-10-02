@@ -1,5 +1,5 @@
-import { Floor } from "./Floor";
 import { Printer } from "./Printer";
+import { Floor } from "./Floor";
 import { Settings } from "./Settings";
 import { User } from "./Auth/User";
 import { Role } from "./Auth/Role";

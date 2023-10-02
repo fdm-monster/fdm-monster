@@ -8,7 +8,7 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 /**
  * An extension repository for managing printer files in database
  */
-export class PrinterFilesService {
+export class PrinterFilesService implements IPrinterFilesService {
   printerService: PrinterService;
   private logger: LoggerService;
 

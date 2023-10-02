@@ -128,10 +128,17 @@ export class ServerPublicController {
       },
     });
   }
+
+  async test(req: Request, res: Response) {
+    res.send({
+      message: "Test successful. Please load the Vue app.",
+    });
+  }
 }
 
 export default createController(ServerPublicController)
   .prefix(AppConstants.apiRoute + "/")
+  .get("test", "test")
   .before([authenticate()])
   .get("", "welcome", { before: [authorizePermission(PERMS.ServerInfo.Get)] })
   .get("features", "getFeatures", { before: [authorizePermission(PERMS.ServerInfo.Get)] })
