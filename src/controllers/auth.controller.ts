@@ -57,13 +57,15 @@ export class AuthController {
   }
 
   async needsPasswordChange(req: Request, res: Response) {
+    const registration = this.settingsStore.isRegistrationEnabled();
     const isLoginRequired = this.settingsStore.getLoginRequired();
     if (!isLoginRequired) {
-      return res.send({ loginRequired: isLoginRequired, needsPasswordChange: false, authenticated: true });
+      return res.send({ loginRequired: isLoginRequired, registration, needsPasswordChange: false, authenticated: true });
     }
     if (req.isAuthenticated()) {
       return res.send({
         loginRequired: isLoginRequired,
+        registration,
         needsPasswordChange: req.user?.needsPasswordChange,
         authenticated: true,
       });
