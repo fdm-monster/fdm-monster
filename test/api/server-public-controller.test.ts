@@ -34,7 +34,7 @@ describe("ServerPublicController", () => {
   it("should return auth-based welcome", async function () {
     const response = await request.get(getRoute).send();
     expect(response.body).toMatchObject({
-      message: "Welcome. Please load the Vue app.",
+      message: "Login required. Please load the Vue app.",
     });
     expectOkResponse(response);
   });
