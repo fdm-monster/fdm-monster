@@ -1,6 +1,14 @@
-import { model, Schema } from "mongoose";
+import { model, Schema, Types } from "mongoose";
 
-const RefreshTokenSchema = new Schema({
+export interface IRefreshToken {
+  userId: Types.ObjectId;
+  createdAt: Date;
+  expiresAt: number;
+  refreshToken: string;
+  refreshAttemptsUsed: number;
+}
+
+const RefreshTokenSchema = new Schema<IRefreshToken>({
   userId: {
     type: Schema.Types.ObjectId,
     ref: "User",

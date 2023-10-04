@@ -1,10 +1,9 @@
-import { createController } from "awilix-express";
+import { createController, inject } from "awilix-express";
 import { AppConstants } from "@/server.constants";
-import { isNodemon, isNode, isPm2 } from "@/utils/env.utils";
+import { isNode, isNodemon, isPm2 } from "@/utils/env.utils";
 import { authenticate, authorizePermission } from "@/middleware/authenticate";
 import { PERMS } from "@/constants/authorization.constants";
 import { isDocker } from "@/utils/is-docker";
-import { serverSettingsKey } from "@/constants/server-settings.constants";
 import { RoleService } from "@/services/authentication/role.service";
 import { SettingsStore } from "@/state/settings.store";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
@@ -51,14 +50,14 @@ export class ServerPublicController {
   welcome(req: Request, res: Response) {
     const serverSettings = this.settingsStore.getSettings();
 
-    if (serverSettings[serverSettingsKey].loginRequired === false) {
+    if (!this.settingsStore.getLoginRequired()) {
       return res.send({
         message: "Login disabled. Please load the Vue app.",
       });
     }
 
     return res.send({
-      message: "Login successful. Please load the Vue app.",
+      message: "Login required. Please load the Vue app.",
     });
   }
 
@@ -138,8 +137,7 @@ export class ServerPublicController {
 
 export default createController(ServerPublicController)
   .prefix(AppConstants.apiRoute + "/")
+  .get("", "welcome", { before: [authenticate(), authorizePermission(PERMS.ServerInfo.Get)] })
   .get("test", "test")
-  .before([authenticate()])
-  .get("", "welcome", { before: [authorizePermission(PERMS.ServerInfo.Get)] })
-  .get("features", "getFeatures", { before: [authorizePermission(PERMS.ServerInfo.Get)] })
-  .get("version", "getVersion", { before: [authorizePermission(PERMS.ServerInfo.Get)] });
+  .get("features", "getFeatures", { before: [authenticate(), authorizePermission(PERMS.ServerInfo.Get)] })
+  .get("version", "getVersion", { before: [authenticate(), authorizePermission(PERMS.ServerInfo.Get)] });

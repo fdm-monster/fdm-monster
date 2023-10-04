@@ -1,4 +1,5 @@
 import { ICredentialSettings, IFrontendSettings, IServerSettings, ISettings, IWizardSettings } from "@/models/Settings";
+import { FileCleanSettingsDto } from "@/services/interfaces/settings.dto";
 
 export interface ISettingsService {
   getOrCreate(): Promise<ISettings>;
@@ -6,6 +7,8 @@ export interface ISettingsService {
   migrateSettingsRuntime(knownSettings: Partial<ISettings>): any;
 
   setSentryDiagnosticsEnabled(enabled: boolean): Promise<ISettings>;
+
+  patchFileCleanSettings(fileClean: Partial<FileCleanSettingsDto>): Promise<ISettings>;
 
   patchWizardSettings(patch: Partial<IWizardSettings>): Promise<ISettings>;
 

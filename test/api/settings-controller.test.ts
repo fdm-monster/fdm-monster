@@ -19,6 +19,7 @@ let request: supertest.SuperTest<supertest.Test>;
 const defaultRoute = `${AppConstants.apiRoute}/settings`;
 const serverSettingsRoute = `${defaultRoute}/server`;
 const frontendSettingsRoute = `${defaultRoute}/frontend`;
+const fileCleanSettingsRoute = `${defaultRoute}/file-clean`;
 const serverWhitelistRoute = `${defaultRoute}/whitelist`;
 const sentryDiagnosticsRoute = `${defaultRoute}/sentry-diagnostics`;
 
@@ -88,6 +89,20 @@ describe(SettingsController.name, () => {
     expect(response.body).not.toBeNull();
     expect(response.body).toMatchObject({
       [frontendSettingKey]: newFrontendSettings,
+    });
+    expectOkResponse(response);
+  });
+
+  it("should OK on PUT fileClean settings", async () => {
+    const newFileCleanSettings = {
+      autoRemoveOldFilesBeforeUpload: true,
+      autoRemoveOldFilesAtBoot: true,
+      autoRemoveOldFilesCriteriumDays: 30,
+    };
+    const response = await request.put(fileCleanSettingsRoute).send(newFileCleanSettings);
+    expect(response.body).not.toBeNull();
+    expect(response.body).toMatchObject({
+      [fileCleanSettingKey]: newFileCleanSettings,
     });
     expectOkResponse(response);
   });

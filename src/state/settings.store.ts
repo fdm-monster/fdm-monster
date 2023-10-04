@@ -13,7 +13,12 @@ import { AppConstants } from "@/server.constants";
 import { LoggerService } from "@/handlers/logger";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
 import { ISettings } from "@/models/Settings";
-import { CredentialSettingsDto, FrontendSettingsDto, ServerSettingsDto } from "@/services/interfaces/settings.dto";
+import {
+  CredentialSettingsDto,
+  FileCleanSettingsDto,
+  FrontendSettingsDto,
+  ServerSettingsDto,
+} from "@/services/interfaces/settings.dto";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class SettingsStore {
@@ -93,6 +98,10 @@ export class SettingsStore {
     return this.getSettings()[serverSettingsKey];
   }
 
+  getFrontendSettings() {
+    return this.getSettings()[frontendSettingKey];
+  }
+
   /**
    * Cross-cutting concern for file clean operation
    */
@@ -141,6 +150,11 @@ export class SettingsStore {
 
   async updateServerSettings(serverSettings: Partial<ServerSettingsDto>) {
     this.settings = await this.settingsService.patchServerSettings(serverSettings);
+    return this.getSettings();
+  }
+
+  async patchFileCleanSettings(fileClean: Partial<FileCleanSettingsDto>) {
+    this.settings = await this.settingsService.patchFileCleanSettings(fileClean);
     return this.getSettings();
   }
 

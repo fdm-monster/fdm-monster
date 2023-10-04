@@ -17,14 +17,17 @@ import {
 } from "@/constants/server-settings.constants";
 import { validateInput } from "@/handlers/validators";
 import {
-  credentialSettingUpdateRules,
+  credentialSettingPatchRules,
+  fileCleanSettingsUpdateRules,
   frontendSettingsUpdateRules,
   serverSettingsUpdateRules,
   whitelistSettingUpdateRules,
   wizardUpdateRules,
 } from "./validators/settings-service.validation";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
-import { ICredentialSettings, IFrontendSettings, IServerSettings, IWizardSettings } from "@/models/Settings";
+import { ICredentialSettings, IFileCleanSettings, IFrontendSettings, IServerSettings, IWizardSettings } from "@/models/Settings";
+import { SettingsDto } from "@/services/interfaces/settings.dto";
+import { MongoIdType } from "@/shared.constants";
 
 export class SettingsService implements ISettingsService {
   async getOrCreate() {
@@ -46,7 +49,7 @@ export class SettingsService implements ISettingsService {
   /**
    * Patch the given settings object manually - runtime migration strategy
    */
-  migrateSettingsRuntime(knownSettings) {
+  migrateSettingsRuntime(knownSettings: Partial<SettingsDto<MongoIdType>>) {
     const doc = knownSettings; // alias _doc also works
     if (!doc[fileCleanSettingKey]) {
       doc[fileCleanSettingKey] = getDefaultFileCleanSettings();
@@ -84,8 +87,18 @@ export class SettingsService implements ISettingsService {
     });
   }
 
+  async patchFileCleanSettings(patchUpdate: Partial<IFileCleanSettings>) {
+    const validatedInput = await validateInput(patchUpdate, fileCleanSettingsUpdateRules);
+
+    const settingsDoc = await this.getOrCreate();
+    settingsDoc[fileCleanSettingKey] = Object.assign(settingsDoc[fileCleanSettingKey], validatedInput);
+    return Settings.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
+      new: true,
+    });
+  }
+
   async patchWizardSettings(patchUpdate: Partial<IWizardSettings>) {
-    const validatedInput = validateInput(patchUpdate, wizardUpdateRules);
+    const validatedInput = await validateInput(patchUpdate, wizardUpdateRules);
 
     const settingsDoc = await this.getOrCreate();
     settingsDoc[wizardSettingKey] = Object.assign(settingsDoc[wizardSettingKey], validatedInput);
@@ -141,7 +154,7 @@ export class SettingsService implements ISettingsService {
   }
 
   async patchCredentialSettings(patchUpdate: Partial<ICredentialSettings>) {
-    const validatedInput = await validateInput(patchUpdate, credentialSettingUpdateRules);
+    const validatedInput = await validateInput(patchUpdate, credentialSettingPatchRules);
 
     const settingsDoc = await this.getOrCreate();
     const credentialSettings = settingsDoc[credentialSettingsKey];

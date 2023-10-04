@@ -126,20 +126,26 @@ export class BootTask {
     await this.permissionService.syncPermissions();
     await this.roleService.syncRoles();
 
-    const isDemoMode = this.configService.get(AppConstants.OVERRIDE_IS_DEMO_MODE, "false") === "true";
+    const isDemoMode = this.configService.get(AppConstants.OVERRIDE_IS_DEMO_MODE, null) === "true";
     if (isDemoMode) {
-      this.logger.warn("Starting in demo mode due to OVERRIDE_IS_DEMO_MODE");
+      this.logger.warn(`Starting in demo mode due to ${AppConstants.OVERRIDE_IS_DEMO_MODE}`);
       await this.createOrUpdateDemoAccount();
     }
 
-    const loginRequired = this.configService.get(AppConstants.OVERRIDE_LOGIN_REQUIRED, "false") === "true";
-    await this.settingsStore.setLoginRequired(loginRequired);
+    const loginRequired = this.configService.get(AppConstants.OVERRIDE_LOGIN_REQUIRED, null);
+    if (loginRequired !== null) {
+      this.logger.warn(`Setting login required due to ${AppConstants.OVERRIDE_LOGIN_REQUIRED}`);
+      await this.settingsStore.setLoginRequired(loginRequired);
+    }
 
     // If we are in demo mode, do not allow registration
-    const registrationEnabled = isDemoMode
-      ? false
-      : this.configService.get(AppConstants.OVERRIDE_REGISTRATION_ENABLED, "false") === "true";
-    await this.settingsStore.setRegistrationEnabled(registrationEnabled);
+    if (!isDemoMode) {
+      const registrationEnabled = this.configService.get(AppConstants.OVERRIDE_REGISTRATION_ENABLED, null);
+      if (registrationEnabled !== null) {
+        this.logger.warn(`Setting registration enabled due to ${AppConstants.OVERRIDE_REGISTRATION_ENABLED}`);
+        await this.settingsStore.setRegistrationEnabled(registrationEnabled);
+      }
+    }
 
     const overrideJwtSecret = this.configService.get(AppConstants.OVERRIDE_JWT_SECRET, undefined);
     const overrideJwtExpiresIn = this.configService.get(AppConstants.OVERRIDE_JWT_EXPIRES_IN, undefined);

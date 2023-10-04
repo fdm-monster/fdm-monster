@@ -10,6 +10,7 @@ import { ServerReleaseService } from "@/services/core/server-release.service";
 import { SettingsStore } from "@/state/settings.store";
 import { AxiosMock } from "../mocks/axios.mock";
 import supertest from "supertest";
+import { ServerPublicController } from "@/controllers/server-public.controller";
 
 let container: AwilixContainer;
 let releaseService: ServerReleaseService;
@@ -19,6 +20,7 @@ let request: supertest.SuperTest<supertest.Test>;
 
 const welcomeRoute = AppConstants.apiRoute;
 const getRoute = welcomeRoute;
+const testRoute = `${welcomeRoute}/test`;
 const versionRoute = `${welcomeRoute}/version`;
 
 beforeAll(async () => {
@@ -29,16 +31,25 @@ beforeAll(async () => {
   mockedHttpClient = container.resolve(DITokens.httpClient);
 });
 
-describe("ServerPublicController", () => {
-  it("should return non-auth welcome", async function () {
+describe(ServerPublicController.name, () => {
+  it("should return auth-based welcome", async function () {
     const response = await request.get(getRoute).send();
     expect(response.body).toMatchObject({
-      message: "Login disabled. Please load the Vue app.",
+      message: "Login required. Please load the Vue app.",
     });
     expectOkResponse(response);
   });
 
-  it("should not be authorized", async function () {
+  it("test should work for loginRequired true/false /", async function () {
+    await settingsStore.setLoginRequired();
+    const response = await request.get(testRoute).send();
+    expectOkResponse(response);
+    await settingsStore.setLoginRequired(false);
+    const response2 = await request.get(testRoute).send();
+    expectOkResponse(response2);
+  });
+
+  it("should not be authorized on /", async function () {
     await settingsStore.setLoginRequired();
     const response = await request.get(getRoute).send();
     expect(response.body).toMatchObject({
@@ -66,7 +77,7 @@ describe("ServerPublicController", () => {
     const { token } = await loginTestUser(request);
     const response = await request.get(getRoute).set("Authorization", `Bearer ${token}`).send();
     expect(response.body).toMatchObject({
-      message: "Login successful. Please load the Vue app.",
+      message: "Login required. Please load the Vue app.",
     });
     expectOkResponse(response);
     // Return to default

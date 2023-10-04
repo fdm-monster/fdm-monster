@@ -47,6 +47,7 @@ export class FirstTimeSetupController {
       password: rootPassword,
       roles: [role.id],
       isRootUser: true,
+      needsPasswordChange: false,
     });
     await this.settingsStore.setLoginRequired(loginRequired);
     await this.settingsStore.setRegistrationEnabled(registration);
@@ -58,4 +59,4 @@ export class FirstTimeSetupController {
 
 export default createController(FirstTimeSetupController)
   .prefix(AppConstants.apiRoute + "/first-time-setup")
-  .post("/", "completeWizard");
+  .post("/complete", "completeWizard");

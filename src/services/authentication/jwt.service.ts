@@ -12,11 +12,12 @@ export class JwtService {
     this.configService = configService;
   }
 
-  async signJwtToken(userId, username: string) {
+  async signJwtToken(userId: string, username: string) {
     const { jwtSecret, jwtExpiresIn } = await this.settingsStore.getCredentialSettings();
 
     return sign({ userId, username }, jwtSecret, {
       expiresIn: jwtExpiresIn,
+      subject: userId,
       audience: this.configService.get(AppConstants.OVERRIDE_JWT_AUDIENCE, AppConstants.DEFAULT_JWT_AUDIENCE),
       issuer: this.configService.get(AppConstants.OVERRIDE_JWT_ISSUER, AppConstants.DEFAULT_JWT_ISSUER),
     });
