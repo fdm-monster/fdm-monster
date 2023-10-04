@@ -57,7 +57,7 @@ export class ServerPublicController {
     }
 
     return res.send({
-      message: "Welcome. Please load the Vue app.",
+      message: "Login required. Please load the Vue app.",
     });
   }
 
@@ -145,7 +145,7 @@ export class ServerPublicController {
 
 export default createController(ServerPublicController)
   .prefix(AppConstants.apiRoute + "/")
+  .get("", "welcome", { before: [authenticate(), authorizePermission(PERMS.ServerInfo.Get)] })
   .get("test", "test")
-  .get("", "welcome", { before: [authorizePermission(PERMS.ServerInfo.Get)] })
   .get("features", "getFeatures", { before: [authenticate(), authorizePermission(PERMS.ServerInfo.Get)] })
   .get("version", "getVersion", { before: [authenticate(), authorizePermission(PERMS.ServerInfo.Get)] });
