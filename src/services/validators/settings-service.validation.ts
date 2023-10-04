@@ -32,9 +32,9 @@ export const wizardUpdateRules = {
 };
 
 export const fileCleanSettingsUpdateRules = {
-  fileCleanEnabled: "required|boolean",
-  fileCleanInterval: "required|integer|min:0",
-  fileCleanThreshold: "required|integer|min:0",
+  autoRemoveOldFilesBeforeUpload: "required|boolean",
+  autoRemoveOldFilesAtBoot: "required|boolean",
+  autoRemoveOldFilesCriteriumDays: "required|integer|min:0",
 };
 
 export const sentryDiagnosticsEnabledRules = {
