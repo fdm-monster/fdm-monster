@@ -57,10 +57,10 @@ export class SettingsController {
 // prettier-ignore
 export default createController(SettingsController)
   .prefix(AppConstants.apiRoute + "/settings")
-  .get("/", "getSettings", { before: [authenticate()] })
   .before([authenticate(), authorizeRoles([ROLES.ADMIN])])
-  .put("/server", "updateServerSettings")
-  .put("/file-clean", "updateFileCleanSettings")
+  .get("/", "getSettings")
   .patch("/sentry-diagnostics", "updateSentryDiagnosticsEnabled")
-  .put("/whitelist", "updateWhitelistSettings")
-  .put("/frontend", "updateFrontendSettings");
+  .put("/server", "updateServerSettings", { before: [authorizeRoles([ROLES.ADMIN])] })
+  .put("/file-clean", "updateFileCleanSettings", { before: [authorizeRoles([ROLES.ADMIN])] })
+  .put("/whitelist", "updateWhitelistSettings", { before: [authorizeRoles([ROLES.ADMIN])] })
+  .put("/frontend", "updateFrontendSettings", { before: [authorizeRoles([ROLES.ADMIN])] });

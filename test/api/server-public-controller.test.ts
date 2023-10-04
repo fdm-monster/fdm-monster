@@ -30,10 +30,10 @@ beforeAll(async () => {
 });
 
 describe("ServerPublicController", () => {
-  it("should return non-auth welcome", async function () {
+  it("should return auth-based welcome", async function () {
     const response = await request.get(getRoute).send();
     expect(response.body).toMatchObject({
-      message: "Login disabled. Please load the Vue app.",
+      message: "Welcome. Please load the Vue app.",
     });
     expectOkResponse(response);
   });
