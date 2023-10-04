@@ -1,5 +1,5 @@
 import { createController } from "awilix-express";
-import { BadRequestException } from "@/exceptions/runtime.exceptions";
+import { AuthenticationError, BadRequestException } from "@/exceptions/runtime.exceptions";
 import { AppConstants } from "@/server.constants";
 import { validateMiddleware } from "@/handlers/validators";
 import { registerUserRules } from "./validation/user-controller.validation";
@@ -59,10 +59,11 @@ export class AuthController {
 
   async needsPasswordChange(req: Request, res: Response) {
     const registration = this.settingsStore.isRegistrationEnabled();
-    const isLoginRequired = this.settingsStore.getLoginRequired();
+    const isLoginRequired = await this.settingsStore.getLoginRequired();
     if (!isLoginRequired) {
       return res.send({ loginRequired: isLoginRequired, registration, needsPasswordChange: false, authenticated: true });
     }
+
     if (req.isAuthenticated()) {
       return res.send({
         loginRequired: isLoginRequired,
@@ -71,7 +72,8 @@ export class AuthController {
         authenticated: true,
       });
     }
-    return res.send({ loginRequired: isLoginRequired, authenticated: false });
+
+    return res.send({ loginRequired: isLoginRequired, needsPasswordChange: null, authenticated: false });
   }
 
   async refreshLogin(req: Request, res: Response) {
@@ -99,10 +101,10 @@ export class AuthController {
       throw new BadRequestException("Registration is disabled. Cant register user");
     }
     const { username, password } = await validateMiddleware(req, registerUserRules);
-    if (username.toLowerCase() === "admin") {
+    if (username.toLowerCase().includes("admin")) {
       throw new BadRequestException("Username 'admin' is not allowed");
     }
-    if (username.toLowerCase() === "root") {
+    if (username.toLowerCase().includes("root")) {
       throw new BadRequestException("Username 'root' is not allowed");
     }
     if (username.toLowerCase() === "demo") {
