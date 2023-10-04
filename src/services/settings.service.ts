@@ -17,7 +17,7 @@ import {
 } from "@/constants/server-settings.constants";
 import { validateInput } from "@/handlers/validators";
 import {
-  credentialSettingUpdateRules,
+  credentialSettingPatchRules,
   fileCleanSettingsUpdateRules,
   frontendSettingsUpdateRules,
   serverSettingsUpdateRules,
@@ -154,7 +154,7 @@ export class SettingsService implements ISettingsService {
   }
 
   async patchCredentialSettings(patchUpdate: Partial<ICredentialSettings>) {
-    const validatedInput = await validateInput(patchUpdate, credentialSettingUpdateRules);
+    const validatedInput = await validateInput(patchUpdate, credentialSettingPatchRules);
 
     const settingsDoc = await this.getOrCreate();
     const credentialSettings = settingsDoc[credentialSettingsKey];

@@ -12,11 +12,11 @@ export const frontendSettingsUpdateRules = {
   largeTiles: "boolean",
 };
 
-export const credentialSettingUpdateRules = {
-  jwtSecret: "required|string",
-  jwtExpiresIn: "required|integer|min:120",
-  refreshTokenAttempts: "required|integer|min:-1",
-  refreshTokenExpiry: "required|integer|min:0",
+export const credentialSettingPatchRules = {
+  jwtSecret: "string",
+  jwtExpiresIn: "integer|min:120",
+  refreshTokenAttempts: "integer|min:-1",
+  refreshTokenExpiry: "integer|min:0",
 };
 
 export const whitelistSettingUpdateRules = {
