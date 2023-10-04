@@ -18,7 +18,7 @@ export class AuthService {
   /**
    *  When users are blacklisted at runtime, this cache can make quick work of rejecting them
    */
-  private blacklistedCache = {};
+  private blacklistedCache: Record<string, boolean> = {};
 
   /**
    * loginUser: starts new session: id-token, refresh, removing any old refresh
@@ -77,13 +77,13 @@ export class AuthService {
     };
   }
 
-  async logoutUserId(userId) {
+  async logoutUserId(userId: string) {
     await this.deleteRefreshTokenAndBlacklistUserId(userId);
   }
 
   async logoutUserRefreshToken(refreshToken: string) {
     const userRefreshToken = await this.getValidRefreshToken(refreshToken);
-    await this.deleteRefreshTokenAndBlacklistUserId(userRefreshToken.userId);
+    await this.deleteRefreshTokenAndBlacklistUserId(userRefreshToken.userId.toString());
   }
 
   async renewLoginByRefreshToken(refreshToken: string) {
@@ -92,23 +92,17 @@ export class AuthService {
       throw new AuthenticationError("The refresh token was invalid or expired, could not refresh user token");
     }
 
-    const userId = userRefreshToken.userId;
+    const userId = userRefreshToken.userId.toString();
     await this.increaseRefreshTokenAttemptsUsed(userRefreshToken.refreshToken);
     return this.signJwtToken(userId);
   }
 
-  /**
-   * @param {string} userId
-   */
-  private async signJwtToken(userId): Promise<string> {
+  private async signJwtToken(userId: string): Promise<string> {
     const user = await this.userService.getUser(userId);
     return this.jwtService.signJwtToken(userId, user.username);
   }
 
-  /**
-   * @param userId
-   */
-  private async createRefreshToken(userId): Promise<string> {
+  private async createRefreshToken(userId: string): Promise<string> {
     const { refreshTokenExpiry } = await this.settingsStore.getCredentialSettings();
     const refreshToken = uuidv4();
 
@@ -142,7 +136,7 @@ export class AuthService {
     }
 
     if (Date.now() > userRefreshToken.expiresAt) {
-      await this.deleteRefreshTokenAndBlacklistUserId(userRefreshToken.userId);
+      await this.deleteRefreshTokenAndBlacklistUserId(userRefreshToken.userId.toString());
       throw new AuthenticationError("Refresh token expired, login required");
     }
     return userRefreshToken;
@@ -157,7 +151,7 @@ export class AuthService {
 
     const attemptsUsed = userRefreshToken.refreshAttemptsUsed;
     if (attemptsUsed >= refreshTokenAttempts) {
-      await this.deleteRefreshTokenAndBlacklistUserId(userRefreshToken.userId);
+      await this.deleteRefreshTokenAndBlacklistUserId(userRefreshToken.userId.toString());
       throw new AuthenticationError("Refresh token attempts exceeded, login required");
     }
 
@@ -174,10 +168,7 @@ export class AuthService {
     );
   }
 
-  /**
-   * @param {string} userId
-   */
-  private async deleteRefreshTokenAndBlacklistUserId(userId): Promise<void> {
+  private async deleteRefreshTokenAndBlacklistUserId(userId: string): Promise<void> {
     if (!userId) {
       throw new AuthenticationError("No user id provided");
     }
@@ -189,16 +180,13 @@ export class AuthService {
     this.addBlackListEntry(userId);
   }
 
-  /**
-   * @param userId
-   */
-  private async deleteRefreshTokenByUserId(userId): Promise<void> {
+  private async deleteRefreshTokenByUserId(userId: string): Promise<void> {
     const result = await this.RefreshTokenModel.deleteMany({
       userId,
     });
 
-    if (result.rowsAffected) {
-      this.logger.debug(`Removed ${result.rowsAffected} login refresh tokens`);
+    if (result.deletedCount) {
+      this.logger.debug(`Removed ${result.deletedCount} login refresh tokens`);
     }
   }
 
@@ -208,26 +196,20 @@ export class AuthService {
     });
 
     // TODO audit result
-    if (result.rowsAffected) {
-      this.logger.debug(`Removed ${result.rowsAffected} login refresh tokens`);
+    if (result.deletedCount) {
+      this.logger.debug(`Removed ${result.deletedCount} login refresh tokens`);
     }
   }
 
-  isBlacklisted(userId) {
+  isBlacklisted(userId: string) {
     return this.blacklistedCache[userId] === true;
   }
 
-  /**
-   * @param {string} userId
-   */
-  private addBlackListEntry(userId) {
+  private addBlackListEntry(userId: string) {
     this.blacklistedCache[userId] = true;
   }
 
-  /**
-   * @param userId
-   */
-  private removeBlacklistEntry(userId) {
+  private removeBlacklistEntry(userId: string) {
     delete this.blacklistedCache[userId];
   }
 }
