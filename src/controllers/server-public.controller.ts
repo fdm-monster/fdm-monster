@@ -51,7 +51,7 @@ export class ServerPublicController {
   welcome(req: Request, res: Response) {
     const serverSettings = this.settingsStore.getSettings();
 
-    if (serverSettings[serverSettingsKey].loginRequired === false) {
+    if (!this.settingsStore.getLoginRequired()) {
       return res.send({
         message: "Login disabled. Please load the Vue app.",
       });

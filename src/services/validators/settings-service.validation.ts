@@ -31,6 +31,12 @@ export const wizardUpdateRules = {
   wizardVersion: "required|integer|min:0",
 };
 
+export const fileCleanSettingsUpdateRules = {
+  fileCleanEnabled: "required|boolean",
+  fileCleanInterval: "required|integer|min:0",
+  fileCleanThreshold: "required|integer|min:0",
+};
+
 export const sentryDiagnosticsEnabledRules = {
   enabled: "required|boolean",
 };

@@ -3,7 +3,7 @@ import { authenticate, authorizeRoles } from "@/middleware/authenticate";
 import { AppConstants } from "@/server.constants";
 import { ROLES } from "@/constants/authorization.constants";
 import { validateInput } from "@/handlers/validators";
-import { whitelistSettingUpdateRules, sentryDiagnosticsEnabledRules } from "@/services/validators/settings-service.validation";
+import { sentryDiagnosticsEnabledRules, whitelistSettingUpdateRules } from "@/services/validators/settings-service.validation";
 import { SettingsStore } from "@/state/settings.store";
 import { Request, Response } from "express";
 import { IpWhitelistSettingsDto } from "@/services/interfaces/settings.dto";
@@ -47,14 +47,20 @@ export class SettingsController {
     const result = await this.settingsStore.updateServerSettings(req.body);
     res.send(result);
   }
+
+  async updateFileCleanSettings(req: Request, res: Response) {
+    const result = await this.settingsStore.patchFileCleanSettings(req.body);
+    res.send(result);
+  }
 }
 
 // prettier-ignore
 export default createController(SettingsController)
   .prefix(AppConstants.apiRoute + "/settings")
+  .get("/", "getSettings", { before: [authenticate()] })
   .before([authenticate(), authorizeRoles([ROLES.ADMIN])])
-  .get("/", "getSettings")
   .put("/server", "updateServerSettings")
+  .put("/file-clean", "updateFileCleanSettings")
   .patch("/sentry-diagnostics", "updateSentryDiagnosticsEnabled")
   .put("/whitelist", "updateWhitelistSettings")
   .put("/frontend", "updateFrontendSettings");

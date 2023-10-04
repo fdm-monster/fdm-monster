@@ -48,8 +48,9 @@ export class AuthController {
 
   async getLoginRequired(req: Request, res: Response) {
     const isLoginRequired = await this.settingsStore.getLoginRequired();
+    const registration = this.settingsStore.isRegistrationEnabled();
     const wizardState = this.settingsStore.getWizardState();
-    return res.send({ loginRequired: isLoginRequired, wizardState });
+    return res.send({ loginRequired: isLoginRequired, registration, wizardState });
   }
 
   async verifyLogin(req: Request, res: Response) {
@@ -98,6 +99,15 @@ export class AuthController {
       throw new BadRequestException("Registration is disabled. Cant register user");
     }
     const { username, password } = await validateMiddleware(req, registerUserRules);
+    if (username.toLowerCase() === "admin") {
+      throw new BadRequestException("Username 'admin' is not allowed");
+    }
+    if (username.toLowerCase() === "root") {
+      throw new BadRequestException("Username 'root' is not allowed");
+    }
+    if (username.toLowerCase() === "demo") {
+      throw new BadRequestException("Username 'demo' is not allowed");
+    }
 
     const roles = await this.roleService.getAppDefaultRolesId();
     const result = await this.userService.register({ username, password, roles });
