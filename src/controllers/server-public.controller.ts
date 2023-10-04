@@ -61,14 +61,6 @@ export class ServerPublicController {
     });
   }
 
-  getPublicSettings(req: Request, res: Response) {
-    res.send({
-      serverSettings: this.settingsStore.getServerSettings(),
-      frontendSettings: this.settingsStore.getFrontendSettings(),
-      wizardSettings: this.settingsStore.getWizardSettings(),
-    });
-  }
-
   getFeatures(req: Request, res: Response) {
     res.send({
       batchReprintCalls: {

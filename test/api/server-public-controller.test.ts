@@ -10,6 +10,7 @@ import { ServerReleaseService } from "@/services/core/server-release.service";
 import { SettingsStore } from "@/state/settings.store";
 import { AxiosMock } from "../mocks/axios.mock";
 import supertest from "supertest";
+import { ServerPublicController } from "@/controllers/server-public.controller";
 
 let container: AwilixContainer;
 let releaseService: ServerReleaseService;
@@ -30,7 +31,7 @@ beforeAll(async () => {
   mockedHttpClient = container.resolve(DITokens.httpClient);
 });
 
-describe("ServerPublicController", () => {
+describe(ServerPublicController.name, () => {
   it("should return auth-based welcome", async function () {
     const response = await request.get(getRoute).send();
     expect(response.body).toMatchObject({

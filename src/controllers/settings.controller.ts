@@ -57,7 +57,7 @@ export class SettingsController {
 // prettier-ignore
 export default createController(SettingsController)
   .prefix(AppConstants.apiRoute + "/settings")
-  .before([authenticate(), authorizeRoles([ROLES.ADMIN])])
+  .before([authenticate()])
   .get("/", "getSettings")
   .patch("/sentry-diagnostics", "updateSentryDiagnosticsEnabled")
   .put("/server", "updateServerSettings", { before: [authorizeRoles([ROLES.ADMIN])] })
