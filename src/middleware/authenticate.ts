@@ -1,5 +1,5 @@
 import { inject } from "awilix-express";
-import { AuthenticationError, AuthorizationError } from "@/exceptions/runtime.exceptions";
+import { AuthenticationError, AuthorizationError, PasswordChangeRequiredError } from "@/exceptions/runtime.exceptions";
 
 export function authorizePermission(permission: string) {
   return inject(({ permissionService, roleService }) => async (req, res, next) => {
@@ -25,7 +25,7 @@ export const authenticate = () =>
 
     // Check if a password change is required
     if (req.user?.needsPasswordChange) {
-      throw new AuthenticationError("Password change required", 401);
+      throw new PasswordChangeRequiredError();
     }
 
     // Check if a logout was called

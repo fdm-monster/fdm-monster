@@ -1,6 +1,16 @@
-import { model, Schema } from "mongoose";
+import { AnyArray, model, ObjectIdSchemaDefinition, Schema } from "mongoose";
 
-const UserSchema = new Schema({
+export interface IUser {
+  username: string;
+  isDemoUser: boolean;
+  isRootUser: boolean;
+  needsPasswordChange: boolean;
+  passwordHash: string;
+  createdAt: Date;
+  roles: AnyArray<ObjectIdSchemaDefinition>;
+}
+
+const UserSchema = new Schema<IUser>({
   username: {
     type: String,
     required: true,

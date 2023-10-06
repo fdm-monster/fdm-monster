@@ -13,7 +13,6 @@ import { LoggerService } from "@/handlers/logger";
 import { normalizeURLWithProtocol } from "@/utils/url.utils";
 import { MongoIdType } from "@/shared.constants";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
-import { Type } from "@/services/orm/base.interface";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class PrinterService implements IPrinterService<MongoIdType> {
