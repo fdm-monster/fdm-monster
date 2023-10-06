@@ -7,7 +7,7 @@ import { comparePasswordHash, hashPassword } from "@/utils/crypto.utils";
 import { RoleService } from "@/services/authentication/role.service";
 import { IUserService } from "@/services/interfaces/user-service.interface";
 import { MongoIdType } from "@/shared.constants";
-import { IUser } from "@/models/Auth/User";
+import { UserDto } from "@/services/interfaces/user.dto";
 
 export class UserService implements IUserService<MongoIdType> {
   roleService: RoleService;
@@ -16,7 +16,7 @@ export class UserService implements IUserService<MongoIdType> {
     this.roleService = roleService;
   }
 
-  toDto(user) {
+  toDto(user): UserDto {
     return {
       id: user.id,
       createdAt: user.createdAt,
@@ -45,7 +45,7 @@ export class UserService implements IUserService<MongoIdType> {
     });
   }
 
-  async getUser(userId: MongoIdType): Promise<IUser> {
+  async getUser(userId: MongoIdType): Promise<UserDto> {
     const user = await User.findById(userId);
     if (!user) throw new NotFoundException("User not found");
 
@@ -114,6 +114,13 @@ export class UserService implements IUserService<MongoIdType> {
     user.passwordHash = passwordHash;
     user.needsPasswordChange = false;
     return await user.save();
+  }
+
+  async setVerifiedById(userId: MongoIdType, isVerified: boolean) {
+    const user = await User.findById(userId);
+    if (!user) throw new NotFoundException("User not found");
+    user.isVerified = isVerified;
+    await user.save();
   }
 
   async register(input) {

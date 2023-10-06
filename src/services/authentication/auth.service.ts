@@ -107,6 +107,9 @@ export class AuthService {
     if (user.needsPasswordChange) {
       throw new PasswordChangeRequiredError();
     }
+    if (!user.isVerified) {
+      throw new AuthenticationError("User is not verified yet");
+    }
     return this.jwtService.signJwtToken(userId, user.username);
   }
 

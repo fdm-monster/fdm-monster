@@ -1,4 +1,4 @@
-import { IdType } from "@/shared.constants";
+import { IdType, MongoIdType } from "@/shared.constants";
 import { IUser } from "@/models/Auth/User";
 import { UserDto } from "@/services/interfaces/user.dto";
 
@@ -26,6 +26,8 @@ export interface IUserService<KeyType = IdType> {
   updatePasswordById(userId: KeyType, oldPassword: string, newPassword: string): Promise<any>;
 
   updatePasswordUnsafe(username: string, newPassword: string): Promise<any>;
+
+  setVerifiedById(userId: MongoIdType, isVerified: boolean): Promise<void>;
 
   register(input: Partial<UserDto>): Promise<IUser>;
 }

@@ -5,15 +5,15 @@ import { ROLES } from "@/constants/authorization.constants";
 import { validateInput } from "@/handlers/validators";
 import { idRules } from "./validation/generic.validation";
 import { InternalServerException } from "@/exceptions/runtime.exceptions";
-import { UserService } from "@/services/authentication/user.service";
 import { ConfigService } from "@/services/core/config.service";
 import { Request, Response } from "express";
+import { IUserService } from "@/services/interfaces/user-service.interface";
 
 export class UserController {
-  userService: UserService;
+  userService: IUserService;
   configService: ConfigService;
 
-  constructor({ userService, configService }: { userService: UserService; configService: ConfigService }) {
+  constructor({ userService, configService }: { userService: IUserService; configService: ConfigService }) {
     this.userService = userService;
     this.configService = configService;
   }
@@ -88,6 +88,18 @@ export class UserController {
     res.send();
   }
 
+  async setVerified(req: Request, res: Response) {
+    this.throwIfDemoMode();
+
+    const { id } = await validateInput(req.params, idRules);
+
+    const { isVerified } = await validateInput(req.body, {
+      isVerified: "required|boolean",
+    });
+    await this.userService.setVerifiedById(id, isVerified);
+    res.send();
+  }
+
   isDemoMode() {
     return this.configService.get(AppConstants.OVERRIDE_IS_DEMO_MODE, "false") === "true";
   }
@@ -111,6 +123,9 @@ export default createController(UserController)
     before: [authorizeRoles([ROLES.ADMIN])],
   })
   .delete("/:id", "delete", {
+    before: [authorizeRoles([ROLES.ADMIN])],
+  })
+  .post("/:id/set-verified", "setVerified", {
     before: [authorizeRoles([ROLES.ADMIN])],
   })
   .post("/:id/change-username", "changeUsername")

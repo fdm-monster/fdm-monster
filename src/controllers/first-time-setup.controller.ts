@@ -48,6 +48,7 @@ export class FirstTimeSetupController {
       roles: [role.id],
       isRootUser: true,
       needsPasswordChange: false,
+      isVerified: true,
     });
     await this.settingsStore.setLoginRequired(loginRequired);
     await this.settingsStore.setRegistrationEnabled(registration);

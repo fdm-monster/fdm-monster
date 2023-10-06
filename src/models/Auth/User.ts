@@ -4,6 +4,7 @@ export interface IUser {
   username: string;
   isDemoUser: boolean;
   isRootUser: boolean;
+  isVerified: boolean;
   needsPasswordChange: boolean;
   passwordHash: string;
   createdAt: Date;
@@ -29,6 +30,10 @@ const UserSchema = new Schema<IUser>({
   needsPasswordChange: {
     type: Boolean,
     default: true,
+  },
+  isVerified: {
+    type: Boolean,
+    default: false,
   },
   passwordHash: {
     type: String,
