@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { RefreshToken } from "@/models";
-import { AuthenticationError } from "@/exceptions/runtime.exceptions";
+import { AuthenticationError, PasswordChangeRequiredError } from "@/exceptions/runtime.exceptions";
 import { comparePasswordHash } from "@/utils/crypto.utils";
 import { AppConstants } from "@/server.constants";
 import { SettingsStore } from "@/state/settings.store";
@@ -86,19 +86,27 @@ export class AuthService {
     await this.deleteRefreshTokenAndBlacklistUserId(userRefreshToken.userId.toString());
   }
 
-  async renewLoginByRefreshToken(refreshToken: string) {
+  async renewLoginByRefreshToken(refreshToken: string): Promise<string> {
     const userRefreshToken = await this.getValidRefreshToken(refreshToken, false);
     if (!userRefreshToken) {
       throw new AuthenticationError("The refresh token was invalid or expired, could not refresh user token");
     }
 
     const userId = userRefreshToken.userId.toString();
+    const token = await this.signJwtToken(userId);
     await this.increaseRefreshTokenAttemptsUsed(userRefreshToken.refreshToken);
-    return this.signJwtToken(userId);
+    return token;
   }
 
-  private async signJwtToken(userId: string): Promise<string> {
+  isBlacklisted(userId: string) {
+    return this.blacklistedCache[userId] === true;
+  }
+
+  private async signJwtToken(userId: string) {
     const user = await this.userService.getUser(userId);
+    if (user.needsPasswordChange) {
+      throw new PasswordChangeRequiredError();
+    }
     return this.jwtService.signJwtToken(userId, user.username);
   }
 
@@ -199,10 +207,6 @@ export class AuthService {
     if (result.deletedCount) {
       this.logger.debug(`Removed ${result.deletedCount} login refresh tokens`);
     }
-  }
-
-  isBlacklisted(userId: string) {
-    return this.blacklistedCache[userId] === true;
   }
 
   private addBlackListEntry(userId: string) {

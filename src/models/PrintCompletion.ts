@@ -1,6 +1,15 @@
 import { model, Schema } from "mongoose";
 
-const PrintCompletionSchema = new Schema({
+export interface IPrintCompletion {
+  fileName: string;
+  createdAt: number;
+  status: string;
+  printerId: Schema.Types.ObjectId;
+  completionLog: string;
+  context: object;
+}
+
+const PrintCompletionSchema = new Schema<IPrintCompletion>({
   fileName: {
     type: String,
     required: true,

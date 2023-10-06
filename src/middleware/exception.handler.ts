@@ -5,10 +5,12 @@ import {
   ExternalServiceError,
   InternalServerException,
   NotFoundException,
+  PasswordChangeRequiredError,
   ValidationException,
 } from "@/exceptions/runtime.exceptions";
 import { AppConstants } from "@/server.constants";
 import { NextFunction, Request, Response } from "express";
+import { HttpStatusCode } from "@/constants/http-status-codes.constants";
 
 export function exceptionHandler(err, req: Request, res: Response, next: NextFunction) {
   const isTest = process.env.NODE_ENV === AppConstants.defaultTestEnv;
@@ -34,6 +36,10 @@ export function exceptionHandler(err, req: Request, res: Response, next: NextFun
     const error = err.message || "You lack permission to this resource";
     const reason = err.reason;
     return res.status(code).send({ error, reason, permissions, roles });
+  }
+  if (err instanceof PasswordChangeRequiredError) {
+    const code = err.statusCode || HttpStatusCode.CONFLICT;
+    return res.status(code).send({ error: err.message });
   }
   if (err instanceof NotFoundException) {
     const code = err.statusCode || 404;

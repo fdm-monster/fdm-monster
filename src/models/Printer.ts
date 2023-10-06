@@ -1,6 +1,35 @@
-import { Schema, model } from "mongoose";
+import { model, Schema } from "mongoose";
 
-export const PrinterSchema = new Schema({
+export interface IPrinter {
+  apiKey: string;
+  printerURL: string;
+  enabled: boolean;
+  disabledReason: string;
+  settingsAppearance: {
+    name: string;
+  };
+  currentUser: string;
+  dateAdded: number;
+  lastPrintedFile: {
+    fileName: string;
+    editTimestamp: number;
+    parsedColor: string;
+    parsedVisualizationRAL: number;
+    parsedAmount: number;
+    parsedMaterial: string;
+    parsedOrderCode: string;
+  };
+  fileList: {
+    files: string[];
+    folders: string[];
+    free: number;
+    total: number;
+  };
+  feedRate: number;
+  flowRate: number;
+}
+
+export const PrinterSchema = new Schema<IPrinter>({
   apiKey: {
     type: String,
     required: true, // !

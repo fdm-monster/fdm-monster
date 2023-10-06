@@ -12,6 +12,13 @@ export class AuthenticationError extends Error {
   }
 }
 
+export class PasswordChangeRequiredError extends Error {
+  constructor() {
+    super("Password change required");
+    this.name = PasswordChangeRequiredError.name;
+  }
+}
+
 export class AuthorizationError extends Error {
   permissions?: string[] = [];
   roles?: string[] = [];

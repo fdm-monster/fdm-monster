@@ -1,23 +1,22 @@
 import { User } from "@/models";
-import { NotFoundException, InternalServerException } from "@/exceptions/runtime.exceptions";
+import { InternalServerException, NotFoundException } from "@/exceptions/runtime.exceptions";
 import { validateInput } from "@/handlers/validators";
-import { registerUserRules, newPasswordRules } from "../validators/user-service.validation";
+import { newPasswordRules, registerUserRules } from "../validators/user-service.validation";
 import { ROLES } from "@/constants/authorization.constants";
-import { hashPassword, comparePasswordHash } from "@/utils/crypto.utils";
+import { comparePasswordHash, hashPassword } from "@/utils/crypto.utils";
 import { RoleService } from "@/services/authentication/role.service";
+import { IUserService } from "@/services/interfaces/user-service.interface";
+import { MongoIdType } from "@/shared.constants";
+import { IUser } from "@/models/Auth/User";
 
-export class UserService {
+export class UserService implements IUserService<MongoIdType> {
   roleService: RoleService;
 
   constructor({ roleService }: { roleService: RoleService }) {
     this.roleService = roleService;
   }
 
-  /**
-   * @param user
-   * @returns {{createdAt, roles, name, id, username}}
-   */
-  private toDto(user) {
+  toDto(user) {
     return {
       id: user.id,
       createdAt: user.createdAt,
@@ -32,7 +31,7 @@ export class UserService {
     return userDocs.map((u) => this.toDto(u));
   }
 
-  async findRawByRoleId(roleId) {
+  async findRawByRoleId(roleId: MongoIdType) {
     return User.find({ roles: { $in: [roleId] } });
   }
 
@@ -46,19 +45,19 @@ export class UserService {
     });
   }
 
-  async getUser(userId) {
+  async getUser(userId: MongoIdType): Promise<IUser> {
     const user = await User.findById(userId);
     if (!user) throw new NotFoundException("User not found");
 
     return this.toDto(user);
   }
 
-  async getUserRoles(userId) {
+  async getUserRoles(userId: MongoIdType) {
     const user = await this.getUser(userId);
     return user.roles;
   }
 
-  async setUserRoleIds(userId: string, roleIds): Promise<any> {
+  async setUserRoleIds(userId: MongoIdType, roleIds: MongoIdType[]): Promise<any> {
     const user = await User.findById(userId);
     if (!user) throw new NotFoundException("User not found");
     const roles = this.roleService.getManyRoles(roleIds);
@@ -69,7 +68,7 @@ export class UserService {
     return await user.save();
   }
 
-  async deleteUser(userId) {
+  async deleteUser(userId: MongoIdType) {
     // Validate
     const user = await this.getUser(userId);
     const role = this.roleService.getRoleByName(ROLES.ADMIN);
@@ -84,7 +83,7 @@ export class UserService {
     await User.findByIdAndDelete(user.id);
   }
 
-  async updateUsernameById(userId, newUsername: string) {
+  async updateUsernameById(userId: MongoIdType, newUsername: string) {
     const user = await User.findById(userId);
     if (!user) throw new NotFoundException("User not found");
 
@@ -92,7 +91,7 @@ export class UserService {
     return await user.save();
   }
 
-  async updatePasswordById(userId, oldPassword: string, newPassword: string) {
+  async updatePasswordById(userId: MongoIdType, oldPassword: string, newPassword: string) {
     const user = await User.findById(userId);
     if (!user) throw new NotFoundException("User not found");
 
