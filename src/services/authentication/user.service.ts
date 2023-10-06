@@ -72,7 +72,6 @@ export class UserService implements IUserService<MongoIdType> {
     // Validate
     const user = await this.getUser(userId);
     const role = this.roleService.getRoleByName(ROLES.ADMIN);
-
     if (user.roles.includes(role.id)) {
       const administrators = await this.findRawByRoleId(role.id);
       if (administrators?.length === 1) {
@@ -119,6 +118,14 @@ export class UserService implements IUserService<MongoIdType> {
   async setVerifiedById(userId: MongoIdType, isVerified: boolean) {
     const user = await User.findById(userId);
     if (!user) throw new NotFoundException("User not found");
+
+    if (!isVerified) {
+      const role = this.roleService.getRoleByName(ROLES.ADMIN);
+      if (user.roles.includes(role.id)) {
+        throw new InternalServerException("Cannot set a user with ADMIN role to unverified.");
+      }
+    }
+
     user.isVerified = isVerified;
     await user.save();
   }
