@@ -64,7 +64,7 @@ describe("CameraStreamController", () => {
   it("should create and delete stream", async () => {
     const res = await createTestCameraStream(defaultTestURL + "4");
     await expectOkResponse(res, matchedBody(defaultTestURL + "4"));
-    const deleteResponse = await deleteTestCameraStream(res.body._id);
+    const deleteResponse = await deleteTestCameraStream(res.body.id);
     await expectOkResponse(deleteResponse);
   });
 });

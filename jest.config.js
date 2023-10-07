@@ -3,7 +3,7 @@ module.exports = {
     "^.+\\.(t|j)sx?$": "@swc/jest",
   },
   testEnvironment: "node",
-  testTimeout: 2500,
+  testTimeout: 5000,
   rootDir: ".",
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",

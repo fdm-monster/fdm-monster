@@ -26,6 +26,7 @@ export async function setupTestApp(
   httpServer: Express;
   httpClient: AxiosMock;
   request: supertest.SuperTest<supertest.Test>;
+  [k: string]: any;
 }> {
   setupEnvConfig(true);
 
