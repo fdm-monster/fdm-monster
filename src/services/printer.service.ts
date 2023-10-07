@@ -14,6 +14,7 @@ import { normalizeURLWithProtocol } from "@/utils/url.utils";
 import { MongoIdType } from "@/shared.constants";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { ILoggerFactory } from "@/handlers/logger-factory";
+import { LoginDto } from "@/services/interfaces/login.dto";
 
 export class PrinterService implements IPrinterService<MongoIdType> {
   eventEmitter2: EventEmitter2;
@@ -152,7 +153,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
     return printer;
   }
 
-  async updateConnectionSettings(printerId: MongoIdType, { printerURL, apiKey }) {
+  async updateConnectionSettings(printerId: MongoIdType, { printerURL, apiKey }: LoginDto) {
     const update = {
       printerURL: normalizeURLWithProtocol(printerURL),
       apiKey,

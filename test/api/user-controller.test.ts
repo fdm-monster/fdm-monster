@@ -5,6 +5,7 @@ import { expectInternalServerError, expectNotFoundResponse, expectOkResponse } f
 import { ensureTestUserCreated } from "./test-data/create-user";
 import { ROLES } from "@/constants/authorization.constants";
 import supertest from "supertest";
+import { User } from "@/models";
 
 const defaultRoute = `${AppConstants.apiRoute}/user`;
 const profileRoute = `${defaultRoute}/profile`;
@@ -63,6 +64,7 @@ describe("UserController", () => {
   });
 
   it("should not delete last admin user", async function () {
+    await User.deleteMany({});
     const user = await ensureTestUserCreated("test", "user", false, ROLES.ADMIN);
     const response = await request.delete(deleteRoute(user.id)).send();
     expectInternalServerError(response);

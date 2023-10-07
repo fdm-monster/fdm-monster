@@ -82,7 +82,7 @@ export class SettingsService implements ISettingsService {
     const settingsDoc = await this.getOrCreate();
     settingsDoc[serverSettingsKey].sentryDiagnosticsEnabled = enabled;
 
-    return Settings.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
+    return Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
       new: true,
     });
   }
@@ -92,7 +92,7 @@ export class SettingsService implements ISettingsService {
 
     const settingsDoc = await this.getOrCreate();
     settingsDoc[fileCleanSettingKey] = Object.assign(settingsDoc[fileCleanSettingKey], validatedInput);
-    return Settings.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
+    return Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
       new: true,
     });
   }
@@ -102,7 +102,7 @@ export class SettingsService implements ISettingsService {
 
     const settingsDoc = await this.getOrCreate();
     settingsDoc[wizardSettingKey] = Object.assign(settingsDoc[wizardSettingKey], validatedInput);
-    return Settings.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
+    return Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
       new: true,
     });
   }
@@ -111,7 +111,7 @@ export class SettingsService implements ISettingsService {
     const settingsDoc = await this.getOrCreate();
     settingsDoc[serverSettingsKey].registration = enabled;
 
-    return Settings.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
+    return Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
       new: true,
     });
   }
@@ -120,7 +120,7 @@ export class SettingsService implements ISettingsService {
     const settingsDoc = await this.getOrCreate();
     settingsDoc[serverSettingsKey].loginRequired = enabled;
 
-    return Settings.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
+    return Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
       new: true,
     });
   }
@@ -137,7 +137,7 @@ export class SettingsService implements ISettingsService {
     const settings = settingsDoc[serverSettingsKey];
     settings.whitelistEnabled = enabled;
     settings.whitelistedIpAddresses = ipAddresses;
-    return Settings.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
+    return Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
       new: true,
     });
   }
@@ -148,7 +148,7 @@ export class SettingsService implements ISettingsService {
     const settingsDoc = await this.getOrCreate();
     const frontendSettings = settingsDoc[frontendSettingKey];
     Object.assign(frontendSettings, validatedInput);
-    return Settings.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
+    return Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
       new: true,
     });
   }
@@ -159,7 +159,7 @@ export class SettingsService implements ISettingsService {
     const settingsDoc = await this.getOrCreate();
     const credentialSettings = settingsDoc[credentialSettingsKey];
     Object.assign(credentialSettings, validatedInput);
-    return Settings.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
+    return Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
       new: true,
     });
   }
@@ -170,7 +170,7 @@ export class SettingsService implements ISettingsService {
     const settingsDoc = await this.getOrCreate();
     const serverSettings = settingsDoc[serverSettingsKey];
     Object.assign(serverSettings, validatedInput);
-    return Settings.findOneAndUpdate({ _id: settingsDoc._id }, settingsDoc, {
+    return Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
       new: true,
     });
   }

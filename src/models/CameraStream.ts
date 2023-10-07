@@ -1,7 +1,6 @@
 import { model, Schema, Types } from "mongoose";
 
 export interface ICameraStream {
-  _id: Types.ObjectId;
   id: string;
   streamURL: string;
   printerId?: Types.ObjectId;
