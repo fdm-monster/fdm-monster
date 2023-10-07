@@ -8,10 +8,12 @@ import { AwilixContainer } from "awilix";
 import supertest from "supertest";
 import { SettingsStore } from "@/state/settings.store";
 import { loginTestUser } from "./auth/login-test-user";
+import { AuthService } from "@/services/authentication/auth.service";
 
 let request: supertest.SuperTest<supertest.Test>;
 let container: AwilixContainer;
 let settingsStore: SettingsStore;
+let authService: AuthService;
 
 const baseRoute = AppConstants.apiRoute + "/auth";
 const loginRoute = `${baseRoute}/login`;
@@ -23,6 +25,7 @@ beforeAll(async () => {
   await connect();
   ({ request, container } = await setupTestApp(true));
   settingsStore = container.resolve(DITokens.settingsStore);
+  authService = container.resolve<AuthService>(DITokens.authService);
 });
 
 describe("AuthController", () => {
@@ -107,6 +110,21 @@ describe("AuthController", () => {
   it("should succeed logout", async () => {
     const response = await request.post(logoutRoute).send();
     expectOkResponse(response);
+  });
+
+  it("should fail logout when server:loginRequired is true", async () => {
+    await settingsStore.setLoginRequired(true);
+    const response = await request.post(logoutRoute).send();
+    expectUnauthenticatedResponse(response);
+  });
+
+  it("should do auth logout when server:loginRequired is true", async () => {
+    await settingsStore.setLoginRequired(true);
+    const { token, refreshToken } = await loginTestUser(request);
+    expect(authService.isJwtTokenBlacklisted(token)).toBeFalsy();
+    const response = await request.post(logoutRoute).set("Authorization", `Bearer ${token}`).send();
+    expectOkResponse(response);
+    expect(authService.isJwtTokenBlacklisted(token)).toBeTruthy();
   });
 
   it("should get loginRequired", async () => {

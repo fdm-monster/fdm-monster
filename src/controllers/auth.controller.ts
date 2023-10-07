@@ -3,7 +3,7 @@ import { BadRequestException } from "@/exceptions/runtime.exceptions";
 import { AppConstants } from "@/server.constants";
 import { validateMiddleware } from "@/handlers/validators";
 import { registerUserRules } from "./validation/user-controller.validation";
-import { logoutRefreshTokenRules } from "./validation/auth-controller.validation";
+import { refreshTokenRules } from "./validation/auth-controller.validation";
 import { authenticate } from "@/middleware/authenticate";
 import { SettingsStore } from "@/state/settings.store";
 import { ILoggerFactory } from "@/handlers/logger-factory";
@@ -77,8 +77,7 @@ export class AuthController {
   }
 
   async refreshLogin(req: Request, res: Response) {
-    const { refreshToken } = await validateMiddleware(req, logoutRefreshTokenRules);
-
+    const { refreshToken } = await validateMiddleware(req, refreshTokenRules);
     this.logger.log(`Refresh login attempt from IP ${req.ip} and user-agent ${req.headers["user-agent"]}`);
     const idToken = await this.authService.renewLoginByRefreshToken(refreshToken);
     return res.send({ token: idToken });
@@ -90,8 +89,10 @@ export class AuthController {
       return res.end();
     }
 
+    // Get token from header
+    const jwtToken = req.headers.authorization?.replace("Bearer ", "") || undefined;
     const userId = req.user.id;
-    await this.authService.logoutUserId(userId);
+    await this.authService.logoutUserId(userId, jwtToken);
     res.end();
   }
 

@@ -14,8 +14,7 @@ const RefreshTokenSchema = new Schema<IRefreshToken>({
     type: Schema.Types.ObjectId,
     ref: "User",
     required: true,
-    // TODO check uniqueness works
-    unique: true,
+    unique: false,
   },
   createdAt: {
     required: true,
