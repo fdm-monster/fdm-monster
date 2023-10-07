@@ -21,7 +21,13 @@ export async function setupTestApp(
   loadPrinterStore = false,
   mocks: any = undefined,
   quick_boot = true
-): Promise<{ container: AwilixContainer; httpServer: Express; request: supertest.SuperTest<supertest.Test> }> {
+): Promise<{
+  container: AwilixContainer;
+  httpServer: Express;
+  httpClient: AxiosMock;
+  request: supertest.SuperTest<supertest.Test>;
+  [k: string]: any;
+}> {
   setupEnvConfig(true);
 
   const { httpServer, container } = await setupServer();
@@ -56,7 +62,7 @@ export async function setupTestApp(
     httpServer,
     request: supertest(httpServer),
     container,
-    [DITokens.httpClient]: container.resolve(DITokens.httpClient),
+    httpClient: container.resolve<AxiosMock>(DITokens.httpClient),
     [DITokens.octoPrintApiService]: container.resolve(DITokens.octoPrintApiService),
     [DITokens.taskManagerService]: container.resolve(DITokens.taskManagerService),
   };

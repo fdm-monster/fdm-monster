@@ -1,29 +1,29 @@
-import { Floor } from "@/entities";
 import { IFloor } from "@/models/Floor";
-import { IdType } from "@/shared.constants";
-import { DeleteResult, FindManyOptions } from "typeorm";
+import { IdType, MongoIdType } from "@/shared.constants";
 import { FloorDto, PositionDto, PrinterInFloorDto } from "@/services/interfaces/floor.dto";
 
-export interface IFloorService<KeyType = IdType> {
-  toDto(floor: Floor | IFloor): FloorDto;
+export interface IFloorService<KeyType = IdType, Entity = IFloor> {
+  toDto(floor: Entity): FloorDto<KeyType>;
 
-  list(options?: FindManyOptions<Floor>): Promise<Floor[]>;
+  list(): Promise<Entity[]>;
 
-  create(input: Partial<IFloor | Floor>): Promise<Floor>;
+  create(input: Partial<Entity>): Promise<Entity>;
 
-  createDefaultFloor(): Promise<Floor>;
+  createDefaultFloor(): Promise<Entity>;
 
-  delete(floorId: KeyType): Promise<DeleteResult | boolean>;
+  delete(floorId: KeyType): Promise<void>;
 
-  get(floorId: KeyType): Promise<Floor>;
+  get(floorId: KeyType): Promise<Entity>;
 
-  update(floorId: KeyType, input: Floor): Promise<Floor>;
+  update(floorId: KeyType, input: Entity): Promise<Entity>;
 
-  updateName(floorId: KeyType, name: string): Promise<Floor>;
+  updateName(floorId: KeyType, name: string): Promise<Entity>;
 
-  updateLevel(floorId: KeyType, level: number): Promise<Floor>;
+  updateLevel(floorId: KeyType, level: number): Promise<Entity>;
 
-  addOrUpdatePrinter(floorId: KeyType, position: PositionDto | PrinterInFloorDto): Promise<Floor>;
+  deletePrinterFromAnyFloor(printerId: KeyType): Promise<void>;
 
-  removePrinter(floorId: KeyType, printerId: KeyType): Promise<Floor>;
+  addOrUpdatePrinter(floorId: KeyType, position: PositionDto | PrinterInFloorDto): Promise<Entity>;
+
+  removePrinter(floorId: KeyType, printerId: KeyType): Promise<Entity>;
 }

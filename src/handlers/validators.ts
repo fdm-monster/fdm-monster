@@ -3,6 +3,7 @@ import { InternalServerException, ValidationException } from "@/exceptions/runti
 import { currentPrinterToken, printerIdToken, printerLoginToken } from "@/middleware/printer";
 import { normalizeUrl } from "@/utils/normalize-url";
 import nodeInputValidator, { extend } from "node-input-validator";
+import { IdType } from "@/shared.constants";
 
 export function getExtendedValidator() {
   extend("wsurl", ({ value, args }, validator) => {
@@ -34,8 +35,11 @@ export function getExtendedValidator() {
 
 export function getScopedPrinter(req: Request) {
   const tokens = [printerLoginToken, currentPrinterToken, printerIdToken];
-  let resolvedDependencies = {};
-  let errors = [];
+  let resolvedDependencies: Record<
+    string,
+    { [printerLoginToken]: IdType; [currentPrinterToken]: any; [printerIdToken]: IdType }
+  > = {};
+  let errors: any[] = [];
   tokens.forEach((t) => {
     try {
       const dependency = req.container.resolve(t);

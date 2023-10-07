@@ -1,6 +1,6 @@
 import { AppConstants } from "@/server.constants";
 import { setupTestApp } from "../test-server";
-import { expectBadRequestError, expectOkResponse, expectUnauthorizedResponse } from "../extensions";
+import { expectBadRequestError, expectOkResponse, expectUnauthenticatedResponse } from "../extensions";
 import { ensureTestUserCreated, getUserData } from "./test-data/create-user";
 import { DITokens } from "@/container.tokens";
 import { connect } from "../db-handler";
@@ -28,12 +28,12 @@ beforeAll(async () => {
 describe("AuthController", () => {
   it("should fail login without creds", async () => {
     const response = await request.post(loginRoute).send();
-    expectUnauthorizedResponse(response);
+    expectUnauthenticatedResponse(response);
   });
 
   it("should not authorize unknown credentials", async () => {
     const response = await request.post(loginRoute).send({ username: "test", password: "test" });
-    expectUnauthorizedResponse(response);
+    expectUnauthenticatedResponse(response);
   });
 
   it("should not register new user when registration==false", async () => {
@@ -122,7 +122,7 @@ describe("AuthController", () => {
   it("should get verifyLogin", async () => {
     await settingsStore.setLoginRequired();
     const response = await request.post(verifyLoginRoute).send();
-    expectUnauthorizedResponse(response);
+    expectUnauthenticatedResponse(response);
 
     await settingsStore.setLoginRequired(false);
     const response2 = await request.post(verifyLoginRoute).send();

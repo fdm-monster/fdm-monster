@@ -32,7 +32,7 @@ import { ServerTasks } from "./tasks";
 import { PermissionService } from "./services/authentication/permission.service";
 import { PrinterFileCleanTask } from "./tasks/printer-file-clean.task";
 import { ROLES } from "./constants/authorization.constants";
-import { CustomGCodeService } from "./services/custom-gcode.service";
+import { CustomGcodeService } from "./services/custom-gcode.service";
 import { PrinterWebsocketRestoreTask } from "./tasks/printer-websocket-restore.task";
 import { PluginFirmwareUpdateService } from "./services/octoprint/plugin-firmware-update.service";
 import { PluginRepositoryCache } from "./services/octoprint/plugin-repository.cache";
@@ -58,6 +58,7 @@ import { LogDumpService } from "./services/core/logs-manager.service";
 import { CameraStreamService } from "./services/camera-stream.service";
 import { JwtService } from "./services/authentication/jwt.service";
 import { AuthService } from "./services/authentication/auth.service";
+import { RefreshTokenService } from "@/services/authentication/refresh-token.service";
 
 export function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -81,6 +82,7 @@ export function configureContainer() {
     [DITokens.settingsService]: asClass(SettingsService),
     [DITokens.configService]: asClass(ConfigService),
     [DITokens.authService]: asClass(AuthService).singleton(),
+    [DITokens.refreshTokenService]: asClass(RefreshTokenService).singleton(),
     [DITokens.userService]: asClass(UserService),
     [DITokens.roleService]: asClass(RoleService).singleton(), // caches roles
     [DITokens.permissionService]: asClass(PermissionService).singleton(),
@@ -136,7 +138,7 @@ export function configureContainer() {
     [DITokens.testPrinterSocketStore]: asClass(TestPrinterSocketStore).singleton(),
 
     // Extensibility and export
-    [DITokens.customGCodeService]: asClass(CustomGCodeService),
+    [DITokens.customGCodeService]: asClass(CustomGcodeService),
     [DITokens.influxDbV2BaseService]: asClass(InfluxDbV2BaseService),
 
     [DITokens.bootTask]: asClass(BootTask),

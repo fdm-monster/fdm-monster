@@ -5,11 +5,14 @@ import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import { LoggerService } from "@/handlers/logger";
 import { SettingsStore } from "@/state/settings.store";
 import { ILoggerFactory } from "@/handlers/logger-factory";
+import { IRole } from "@/models/Auth/Role";
+import { MongoIdType } from "@/shared.constants";
+import { IRoleService } from "@/services/interfaces/role-service.interface";
 
-export class RoleService {
+export class RoleService implements IRoleService<MongoIdType> {
   private logger: LoggerService;
   settingsStore: SettingsStore;
-  appDefaultRole: string;
+  appDefaultRole!: string;
   appDefaultRoleNoLogin: string;
 
   constructor({
@@ -29,7 +32,7 @@ export class RoleService {
     this.appDefaultRoleNoLogin = appDefaultRoleNoLogin;
   }
 
-  private _roles: any[] = [];
+  private _roles: IRole[] = [];
 
   get roles() {
     return this._roles;
@@ -47,7 +50,7 @@ export class RoleService {
     if (!roles?.length) return [];
 
     for (let role of roles) {
-      const normalizedRole = this.#normalizeRole(role);
+      const normalizedRole = this.normalizeRoleIdOrName(role);
       const rolePermissions = this.getRolePermissions(normalizedRole);
       permissions = union(permissions, rolePermissions);
     }
@@ -56,23 +59,19 @@ export class RoleService {
   }
 
   getRolePermissions(role: string) {
-    const normalizedRole = this.#normalizeRole(role);
+    const normalizedRole = this.normalizeRoleIdOrName(role);
     return ROLE_PERMS[normalizedRole];
   }
 
-  async getAppDefaultRolesId() {
+  async getAppDefaultRoleIds() {
     if (!this._roles?.length) {
       await this.syncRoles();
     }
 
     const guestRole = this.getRoleByName(await this.getAppDefaultRole());
-    return [guestRole.id];
+    return [guestRole.id] as string[];
   }
 
-  /**
-   * @param roleName {string}
-   * @return {Promise<*>}
-   */
   async getSynchronizedRoleByName(roleName: string) {
     if (!this._roles?.length) {
       await this.syncRoles();
@@ -83,7 +82,7 @@ export class RoleService {
 
   authorizeRole(requiredRole: string, assignedRoles: string[]) {
     return !!assignedRoles.find((ar) => {
-      const normalizedRole = this.#normalizeRole(ar);
+      const normalizedRole = this.normalizeRoleIdOrName(ar);
       if (!normalizedRole) return false;
       return normalizedRole === requiredRole;
     });
@@ -134,9 +133,8 @@ export class RoleService {
     }
   }
 
-  #normalizeRole(assignedRole: string) {
+  normalizeRoleIdOrName(assignedRole: string | MongoIdType) {
     const roleInstance = this.roles.find((r) => r.id === assignedRole || r.name === assignedRole);
-
     if (!roleInstance) {
       console.warn(`The role by ID '${assignedRole}' did not exist in definition. Skipping.`);
       return;

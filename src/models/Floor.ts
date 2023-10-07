@@ -2,7 +2,6 @@ import { model, Schema, Types } from "mongoose";
 import { IPrinterInFloor, PrinterInFloorSchema } from "./FloorPrinter";
 
 export interface IFloor {
-  _id: Types.ObjectId;
   id: string;
   name: string;
   floor: number;

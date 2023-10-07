@@ -25,7 +25,7 @@ export class FloorController {
     const { id: floorId } = await validateInput(req.params, idRules);
 
     // Has internal validation
-    const floor = await this.floorStore.updateName(floorId, req.body);
+    const floor = await this.floorStore.updateName(floorId, req.body.name);
     res.send(floor);
   }
 
@@ -33,7 +33,7 @@ export class FloorController {
     const { id: floorId } = await validateInput(req.params, idRules);
 
     // Has internal validation
-    const floor = await this.floorStore.updateFloorNumber(floorId, req.body);
+    const floor = await this.floorStore.updateFloorNumber(floorId, req.body.floor);
     res.send(floor);
   }
 
@@ -66,8 +66,8 @@ export class FloorController {
 
   async delete(req: Request, res: Response) {
     const { id: floorId } = await validateInput<{ id: IdType }>(req.params, idRules);
-    const result = await this.floorStore.delete(floorId);
-    res.json(result);
+    await this.floorStore.delete(floorId);
+    res.send();
   }
 }
 

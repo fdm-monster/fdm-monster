@@ -32,7 +32,7 @@ describe("FloorController", () => {
     expect(data).toHaveLength(1);
     expect(data[0].name).toBe("Default Floor");
 
-    const getResponse = await request.get(getRoute(data[0]._id));
+    const getResponse = await request.get(getRoute(data[0].id));
     expectOkResponse(getResponse);
   });
 
@@ -62,7 +62,7 @@ describe("FloorController", () => {
 
   it("should be able to get floor", async () => {
     const floor = await createTestFloor(request, "Floor123", 506);
-    const response = await request.get(getRoute(floor._id)).send();
+    const response = await request.get(getRoute(floor.id)).send();
     expectOkResponse(response, { name: "Floor123" });
   });
 
@@ -73,7 +73,7 @@ describe("FloorController", () => {
 
   it("should be able to update floor name", async () => {
     const floor = await createTestFloor(request, "Floor123", 507);
-    const response = await request.patch(updateNameRoute(floor._id)).send({
+    const response = await request.patch(updateNameRoute(floor.id)).send({
       name: "newName",
     });
     expectOkResponse(response, { name: "newName" });
@@ -81,7 +81,7 @@ describe("FloorController", () => {
 
   it("should be able to update floor number", async () => {
     const floor = await createTestFloor(request, "Floor123", 5070);
-    const response = await request.patch(updateFloorNumberRoute(floor._id)).send({
+    const response = await request.patch(updateFloorNumberRoute(floor.id)).send({
       floor: 5071,
     });
     expectOkResponse(response, { name: "Floor123", floor: 5071 });
@@ -89,7 +89,7 @@ describe("FloorController", () => {
 
   it("should be able to delete floor", async () => {
     const floor = await createTestFloor(request, "Floor123", 508);
-    const response = await request.delete(deleteRoute(floor._id)).send();
+    const response = await request.delete(deleteRoute(floor.id)).send();
     expectOkResponse(response);
   });
 
@@ -107,9 +107,9 @@ describe("FloorController", () => {
   it("should be able to add printer to floor", async () => {
     const printer = await createTestPrinter(request);
     const floor = await createTestFloor(request, "Floor123", 509);
-    expect(floor).toMatchObject({ _id: expect.any(String) });
+    expect(floor).toMatchObject({ id: expect.any(String) });
 
-    const response = await request.post(addPrinterToFloorRoute(floor._id)).send({
+    const response = await request.post(addPrinterToFloorRoute(floor.id)).send({
       printerId: printer.id,
       x: 1,
       y: 1,
@@ -117,7 +117,7 @@ describe("FloorController", () => {
     expectOkResponse(response);
 
     // Sadly no distinctness criterium yet
-    const response2 = await request.post(addPrinterToFloorRoute(floor._id)).send({
+    const response2 = await request.post(addPrinterToFloorRoute(floor.id)).send({
       printerId: printer.id,
       x: 1,
       y: 1,
@@ -128,21 +128,21 @@ describe("FloorController", () => {
   it("should be able to remove printer from floor", async () => {
     const printer = await createTestPrinter(request);
     const floor = await createTestFloor(request, "Floor123", 510);
-    expect(floor).toMatchObject({ _id: expect.any(String) });
+    expect(floor).toMatchObject({ id: expect.any(String) });
 
-    const response = await request.post(addPrinterToFloorRoute(floor._id)).send({
+    const response = await request.post(addPrinterToFloorRoute(floor.id)).send({
       printerId: printer.id,
       x: 1,
       y: 1,
     });
     expectOkResponse(response);
 
-    const deleteResponse = await request.delete(addPrinterToFloorRoute(floor._id)).send({
+    const deleteResponse = await request.delete(addPrinterToFloorRoute(floor.id)).send({
       printerId: printer.id,
     });
     expectOkResponse(deleteResponse);
 
-    const deleteResponse2 = await request.delete(addPrinterToFloorRoute(floor._id)).send({
+    const deleteResponse2 = await request.delete(addPrinterToFloorRoute(floor.id)).send({
       printerId: "63452115122876ea11cd1656",
     });
     expectNotFoundResponse(deleteResponse2);

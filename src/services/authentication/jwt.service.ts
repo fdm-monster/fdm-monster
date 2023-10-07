@@ -1,13 +1,15 @@
 import { sign } from "jsonwebtoken";
 import { AppConstants } from "@/server.constants";
-import { ConfigService } from "@/services/core/config.service";
+import { IConfigService } from "@/services/core/config.service";
 import { SettingsStore } from "@/state/settings.store";
+import { MongoIdType } from "@/shared.constants";
+import { IJwtService } from "@/services/interfaces/jwt.service.interface";
 
-export class JwtService {
+export class JwtService implements IJwtService<MongoIdType> {
   settingsStore: SettingsStore;
-  configService: ConfigService;
+  configService: IConfigService;
 
-  constructor({ settingsStore, configService }: { settingsStore: SettingsStore; configService: ConfigService }) {
+  constructor({ settingsStore, configService }: { settingsStore: SettingsStore; configService: IConfigService }) {
     this.settingsStore = settingsStore;
     this.configService = configService;
   }

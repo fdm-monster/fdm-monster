@@ -12,6 +12,7 @@ let Model = Printer;
 const defaultRoute = AppConstants.apiRoute + "/batch";
 const batchConnectUsbRoute = `${defaultRoute}/connect/usb`;
 const batchConnectSocketRoute = `${defaultRoute}/connect/socket`;
+const batchToggleEnabledRoute = `${defaultRoute}/toggle-enabled`;
 const batchReprintRoute = `${defaultRoute}/reprint`;
 
 let request: supertest.SuperTest<supertest.Test>;
@@ -51,5 +52,19 @@ describe(BatchCallController.name, () => {
       printerIds: [printer.id, printer2.id],
     });
     expectOkResponse(response);
+  });
+  it("should allow POST to batch toggle enabled", async () => {
+    const printer = await createTestPrinter(request, true);
+    const printer2 = await createTestPrinter(request, true);
+    const response = await request.post(batchToggleEnabledRoute).send({
+      printerIds: [printer.id, printer2.id],
+      enabled: true,
+    });
+    expectOkResponse(response);
+    const response2 = await request.post(batchToggleEnabledRoute).send({
+      printerIds: [printer.id, printer2.id],
+      enabled: false,
+    });
+    expectOkResponse(response2);
   });
 });

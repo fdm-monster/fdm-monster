@@ -30,6 +30,7 @@ export const DITokens = {
   logDumpService: "logDumpService",
   userTokenService: "userTokenService",
   authService: "authService",
+  refreshTokenService: "refreshTokenService",
   userService: "userService",
   permissionService: "permissionService",
   jwtService: "jwtService",

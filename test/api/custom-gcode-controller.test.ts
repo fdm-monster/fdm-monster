@@ -2,11 +2,13 @@ import { AppConstants } from "@/server.constants";
 import { connect } from "../db-handler";
 import { setupTestApp } from "../test-server";
 import { expectInvalidResponse, expectNotFoundResponse, expectOkResponse } from "../extensions";
-import { CustomGCode } from "@/models";
+import { CustomGcode } from "@/models";
 import { createTestPrinter } from "./test-data/create-printer";
 import supertest from "supertest";
+import { CustomGcodeDto } from "@/services/interfaces/custom-gcode.dto";
+import { MongoIdType } from "@/shared.constants";
 
-let Model = CustomGCode;
+let Model = CustomGcode;
 const defaultRoute = `${AppConstants.apiRoute}/custom-gcode`;
 const createRoute = defaultRoute;
 const emergencyGCodeRoute = (printerId: string) => `${defaultRoute}/send-emergency-m112/${printerId}`;
@@ -32,17 +34,17 @@ function getGCodeScript() {
   };
 }
 
-async function createNormalGCodeScript(request) {
+async function createNormalGcodeScript(request: supertest.SuperTest<supertest.Test>) {
   const response = await request.post(createRoute).send(getGCodeScript());
   expectOkResponse(response);
-  return response.body;
+  return response.body as CustomGcodeDto<MongoIdType>;
 }
 
 describe("CustomGCodeController", () => {
   it("should send emergency gcode command", async function () {
     const printer = await createTestPrinter(request);
     const response = await request.post(emergencyGCodeRoute(printer.id)).send();
-    expectOkResponse(response, null, response.body);
+    expectOkResponse(response, null);
   });
 
   it("should return empty gcode script list", async function () {
@@ -52,25 +54,25 @@ describe("CustomGCodeController", () => {
   });
 
   it("should create new gcode script", async function () {
-    await createNormalGCodeScript(request);
+    await createNormalGcodeScript(request);
   });
 
   it("should update existing gcode script", async function () {
-    const existingScript = await createNormalGCodeScript(request);
+    const existingScript = await createNormalGcodeScript(request);
 
     const data = {
       ...existingScript,
       name: "newName",
     };
-    const response = await request.put(updateRoute(existingScript._id)).send(data);
+    const response = await request.put(updateRoute(existingScript.id)).send(data);
     expectOkResponse(response, {
       name: "newName",
     });
   });
 
   it("should delete existing gcode script", async () => {
-    const gcodeScript = await createNormalGCodeScript(request);
-    const response = await request.delete(updateRoute(gcodeScript._id)).send();
+    const gcodeScript = await createNormalGcodeScript(request);
+    const response = await request.delete(updateRoute(gcodeScript.id)).send();
     expectOkResponse(response);
   });
 
@@ -85,9 +87,9 @@ describe("CustomGCodeController", () => {
   });
 
   it("should create new gcode script", async function () {
-    const script = await createNormalGCodeScript(request);
+    const script = await createNormalGcodeScript(request);
 
-    const response = await request.get(getRoute(script._id)).send();
+    const response = await request.get(getRoute(script.id)).send();
     expectOkResponse(response);
   });
 });

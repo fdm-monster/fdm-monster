@@ -1,6 +1,11 @@
 import { model, Schema } from "mongoose";
 
-const PermissionSchema = new Schema({
+export interface IPermission {
+  id: string;
+  name: string;
+}
+
+const PermissionSchema = new Schema<IPermission>({
   name: {
     type: String,
     required: true,

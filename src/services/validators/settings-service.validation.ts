@@ -27,7 +27,7 @@ export const whitelistSettingUpdateRules = {
 
 export const wizardUpdateRules = {
   wizardCompleted: "required|boolean",
-  wizardCompletedAt: "required|date",
+  wizardCompletedAt: "required|date|nullable",
   wizardVersion: "required|integer|min:0",
 };
 

@@ -12,7 +12,7 @@ export const PERM_GROUP = {
   ServerInfo: "ServerInfo",
 };
 
-export const PERMS = {
+export const PERMS: Record<string, Record<string, string>> = {
   [PERM_GROUP.PrinterFiles]: {
     Default: serializePerm(PERM_GROUP.PrinterFiles, "Default"),
     Get: serializePerm(PERM_GROUP.PrinterFiles, "Get"),
@@ -65,7 +65,7 @@ export const ROLES = {
   GUEST: "GUEST",
 };
 
-export const ROLE_PERMS = {
+export const ROLE_PERMS: Record<string, string[]> = {
   [ROLES.ADMIN]: union(
     allPerms(PERM_GROUP.Floors),
     allPerms(PERM_GROUP.PrinterFiles),

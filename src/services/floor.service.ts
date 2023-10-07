@@ -25,12 +25,12 @@ export class FloorService implements IFloorService<MongoIdType> {
     this.logger = loggerFactory(FloorService.name);
   }
 
-  toDto(floor: IFloor): FloorDto {
+  toDto(floor: IFloor): FloorDto<MongoIdType> {
     return {
       id: floor.id,
       name: floor.name,
-      level: floor.floor,
-      positions: floor.printers.map((p) => ({
+      floor: floor.floor,
+      printers: floor.printers.map((p) => ({
         x: p.x,
         y: p.y,
         printerId: p.printerId.toString(),
@@ -145,7 +145,7 @@ export class FloorService implements IFloorService<MongoIdType> {
   }
 
   async deletePrinterFromAnyFloor(printerId: MongoIdType) {
-    return Floor.updateMany(
+    await Floor.updateMany(
       {},
       {
         $pull: {
@@ -201,6 +201,7 @@ export class FloorService implements IFloorService<MongoIdType> {
   }
 
   async delete(floorId: MongoIdType) {
-    return Floor.deleteOne({ _id: floorId });
+    await this.get(floorId, true);
+    await Floor.deleteOne({ _id: floorId });
   }
 }

@@ -25,11 +25,22 @@ describe("UserController", () => {
     expectOkResponse(response);
   });
 
-  it("should return user list", async function () {
+  it("GET user should not expose passwordHash", async () => {
+    const user = await ensureTestUserCreated();
+    const response = await request.get(getRoute(user.id)).send();
+    expectOkResponse(response);
+    expect(response.body.passwordHash).toBeUndefined();
+  });
+
+  it("should return user list not exposing passwordHash", async function () {
     await ensureTestUserCreated();
     const response = await request.get(defaultRoute).send();
-    expect(response.body?.length).toBeGreaterThanOrEqual(1);
     expectOkResponse(response);
+    expect(response.body?.length).toBeGreaterThanOrEqual(1);
+
+    for (const user of response.body) {
+      expect(user.passwordHash).toBeUndefined();
+    }
   });
 
   it("should get user without passwordHash", async function () {
@@ -39,6 +50,7 @@ describe("UserController", () => {
 
     // Password hash should not be sent
     expect(response.body.passwordHash).toBeUndefined();
+    expect(response.body.roles).toHaveLength(1);
   });
 
   it("should delete existing user", async function () {

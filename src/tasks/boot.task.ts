@@ -19,6 +19,7 @@ import { PluginRepositoryCache } from "@/services/octoprint/plugin-repository.ca
 import { ClientBundleService } from "@/services/core/client-bundle.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
+import { ROLES } from "@/constants/authorization.constants";
 
 export class BootTask {
   logger: LoggerService;
@@ -184,11 +185,15 @@ export class BootTask {
         username: demoUsername,
         password: demoPassword,
         isDemoUser: true,
+        isVerified: true,
+        isRootUser: true,
         needsPasswordChange: false,
         roles: [adminRole.id],
       });
       this.logger.log("Created demo account");
     } else {
+      await this.userService.setVerifiedById(demoUserId, true);
+      await this.userService.setIsRootUserById(demoUserId, true);
       await this.userService.updatePasswordUnsafe(demoUsername, demoPassword);
       await this.userService.setUserRoleIds(demoUserId, [adminRole.id]);
       this.logger.log("Updated demo account");

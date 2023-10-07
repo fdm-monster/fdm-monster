@@ -1,12 +1,13 @@
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import { Octokit } from "octokit";
 import { LoggerService } from "@/handlers/logger";
+import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class GithubService {
   octokitService: Octokit;
   logger: LoggerService;
 
-  constructor({ loggerFactory, octokitService }: { loggerFactory: any; octokitService: Octokit }) {
+  constructor({ loggerFactory, octokitService }: { loggerFactory: ILoggerFactory; octokitService: Octokit }) {
     this.logger = loggerFactory(GithubService.name, false);
     this.octokitService = octokitService;
   }

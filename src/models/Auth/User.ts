@@ -1,13 +1,15 @@
-import { AnyArray, model, ObjectIdSchemaDefinition, Schema } from "mongoose";
+import { AnyArray, model, Schema } from "mongoose";
 
 export interface IUser {
+  id: string;
   username: string;
   isDemoUser: boolean;
   isRootUser: boolean;
+  isVerified: boolean;
   needsPasswordChange: boolean;
   passwordHash: string;
   createdAt: Date;
-  roles: AnyArray<ObjectIdSchemaDefinition>;
+  roles: AnyArray<string>;
 }
 
 const UserSchema = new Schema<IUser>({
@@ -29,6 +31,10 @@ const UserSchema = new Schema<IUser>({
   needsPasswordChange: {
     type: Boolean,
     default: true,
+  },
+  isVerified: {
+    type: Boolean,
+    default: false,
   },
   passwordHash: {
     type: String,

@@ -5,7 +5,7 @@
     "allowJs": true,
     "removeComments": true,
     "resolveJsonModule": true,
-    "typeRoots": ["./node_modules/@types"],
+    "typeRoots": ["./node_modules/@types", "./src/types"],
     "sourceMap": true,
     "outDir": "dist",
     "strict": true,
@@ -23,7 +23,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": [
-    "src/**/*", "test/**/*"],
+  "include": ["src/**/*", "test/**/*"],
   "exclude": ["node_modules"]
 }

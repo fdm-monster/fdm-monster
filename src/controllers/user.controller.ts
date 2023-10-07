@@ -5,15 +5,15 @@ import { ROLES } from "@/constants/authorization.constants";
 import { validateInput } from "@/handlers/validators";
 import { idRules } from "./validation/generic.validation";
 import { InternalServerException } from "@/exceptions/runtime.exceptions";
-import { UserService } from "@/services/authentication/user.service";
-import { ConfigService } from "@/services/core/config.service";
+import { IConfigService } from "@/services/core/config.service";
+import { IUserService } from "@/services/interfaces/user-service.interface";
 import { Request, Response } from "express";
 
 export class UserController {
-  userService: UserService;
-  configService: ConfigService;
+  userService: IUserService;
+  configService: IConfigService;
 
-  constructor({ userService, configService }: { userService: UserService; configService: ConfigService }) {
+  constructor({ userService, configService }: { userService: IUserService; configService: IConfigService }) {
     this.userService = userService;
     this.configService = configService;
   }
@@ -25,18 +25,22 @@ export class UserController {
     }
 
     const user = await this.userService.getUser(req.user?.id);
-    res.send(user);
+    res.send(this.userService.toDto(user));
   }
 
   async list(req: Request, res: Response) {
     const users = await this.userService.listUsers();
-    res.send(users);
+    res.send(users.map((u) => this.userService.toDto(u)));
   }
 
   async delete(req: Request, res: Response) {
     this.throwIfDemoMode();
 
     const { id } = await validateInput(req.params, idRules);
+
+    if (req.user?.id === id) {
+      throw new InternalServerException("Not allowed to delete your own account");
+    }
 
     if (this.isDemoMode()) {
       const demoUserId = await this.userService.getDemoUserId();
@@ -51,8 +55,8 @@ export class UserController {
 
   async get(req: Request, res: Response) {
     const { id } = await validateInput(req.params, idRules);
-    const users = await this.userService.getUser(id);
-    res.send(users);
+    const user = await this.userService.getUser(id);
+    res.send(this.userService.toDto(user));
   }
 
   async changeUsername(req: Request, res: Response) {
@@ -88,6 +92,18 @@ export class UserController {
     res.send();
   }
 
+  async setVerified(req: Request, res: Response) {
+    this.throwIfDemoMode();
+
+    const { id } = await validateInput(req.params, idRules);
+
+    const { isVerified } = await validateInput(req.body, {
+      isVerified: "required|boolean",
+    });
+    await this.userService.setVerifiedById(id, isVerified);
+    res.send();
+  }
+
   isDemoMode() {
     return this.configService.get(AppConstants.OVERRIDE_IS_DEMO_MODE, "false") === "true";
   }
@@ -111,6 +127,9 @@ export default createController(UserController)
     before: [authorizeRoles([ROLES.ADMIN])],
   })
   .delete("/:id", "delete", {
+    before: [authorizeRoles([ROLES.ADMIN])],
+  })
+  .post("/:id/set-verified", "setVerified", {
     before: [authorizeRoles([ROLES.ADMIN])],
   })
   .post("/:id/change-username", "changeUsername")

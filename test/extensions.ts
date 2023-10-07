@@ -51,8 +51,12 @@ export function expectRedirectResponse(response: Response) {
   expect(response.statusCode).toEqual(302);
 }
 
-export function expectUnauthorizedResponse(response: Response) {
+export function expectUnauthenticatedResponse(response: Response) {
   expect(response.statusCode).toEqual(401);
+}
+
+export function expectUnauthorizedResponse(response: Response) {
+  expect(response.statusCode).toEqual(403);
 }
 
 export function expectInvalidResponse(response: Response, keys?: string[], exact = false) {
