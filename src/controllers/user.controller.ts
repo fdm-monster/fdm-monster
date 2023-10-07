@@ -25,12 +25,12 @@ export class UserController {
     }
 
     const user = await this.userService.getUser(req.user?.id);
-    res.send(user);
+    res.send(this.userService.toDto(user));
   }
 
   async list(req: Request, res: Response) {
     const users = await this.userService.listUsers();
-    res.send(users);
+    res.send(users.map((u) => this.userService.toDto(u)));
   }
 
   async delete(req: Request, res: Response) {
@@ -55,8 +55,8 @@ export class UserController {
 
   async get(req: Request, res: Response) {
     const { id } = await validateInput(req.params, idRules);
-    const users = await this.userService.getUser(id);
-    res.send(users);
+    const user = await this.userService.getUser(id);
+    res.send(this.userService.toDto(user));
   }
 
   async changeUsername(req: Request, res: Response) {
