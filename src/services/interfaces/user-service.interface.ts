@@ -1,6 +1,6 @@
 import { IdType, MongoIdType } from "@/shared.constants";
 import { IUser } from "@/models/Auth/User";
-import { UserDto } from "@/services/interfaces/user.dto";
+import { RegisterUserDto, UserDto } from "@/services/interfaces/user.dto";
 
 export interface IUserService<KeyType = IdType> {
   toDto(user: IUser): UserDto;
@@ -29,5 +29,5 @@ export interface IUserService<KeyType = IdType> {
 
   setVerifiedById(userId: MongoIdType, isVerified: boolean): Promise<void>;
 
-  register(input: Partial<UserDto>): Promise<IUser>;
+  register(input: RegisterUserDto<KeyType>): Promise<IUser>;
 }

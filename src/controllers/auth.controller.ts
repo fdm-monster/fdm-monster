@@ -5,19 +5,19 @@ import { validateMiddleware } from "@/handlers/validators";
 import { registerUserRules } from "./validation/user-controller.validation";
 import { logoutRefreshTokenRules } from "./validation/auth-controller.validation";
 import { authenticate } from "@/middleware/authenticate";
-import { RoleService } from "@/services/authentication/role.service";
-import { AuthService } from "@/services/authentication/auth.service";
 import { SettingsStore } from "@/state/settings.store";
-import { UserService } from "@/services/authentication/user.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 import { Request, Response } from "express";
+import { IUserService } from "@/services/interfaces/user-service.interface";
+import { IAuthService } from "@/services/interfaces/auth.service.interface";
+import { IRoleService } from "@/services/interfaces/role-service.interface";
 
 export class AuthController {
-  authService: AuthService;
+  authService: IAuthService;
   settingsStore: SettingsStore;
-  userService: UserService;
-  roleService: RoleService;
+  userService: IUserService;
+  roleService: IRoleService;
   logger: LoggerService;
 
   constructor({
@@ -27,10 +27,10 @@ export class AuthController {
     roleService,
     loggerFactory,
   }: {
-    authService: AuthService;
+    authService: IAuthService;
     settingsStore: SettingsStore;
-    userService: UserService;
-    roleService: RoleService;
+    userService: IUserService;
+    roleService: IRoleService;
     loggerFactory: ILoggerFactory;
   }) {
     this.authService = authService;

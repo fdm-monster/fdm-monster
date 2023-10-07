@@ -4,14 +4,14 @@ import { validateMiddleware } from "@/handlers/validators";
 import { wizardSettingsRules } from "./validation/setting.validation";
 import { AuthorizationError, BadRequestException } from "@/exceptions/runtime.exceptions";
 import { ROLES } from "@/constants/authorization.constants";
-import { UserService } from "@/services/authentication/user.service";
-import { RoleService } from "@/services/authentication/role.service";
 import { SettingsStore } from "@/state/settings.store";
 import { Request, Response } from "express";
+import { IUserService } from "@/services/interfaces/user-service.interface";
+import { IRoleService } from "@/services/interfaces/role-service.interface";
 
 export class FirstTimeSetupController {
-  userService: UserService;
-  roleService: RoleService;
+  userService: IUserService;
+  roleService: IRoleService;
   settingsStore: SettingsStore;
 
   constructor({
@@ -20,8 +20,8 @@ export class FirstTimeSetupController {
     userService,
   }: {
     settingsStore: SettingsStore;
-    roleService: RoleService;
-    userService: UserService;
+    roleService: IRoleService;
+    userService: IUserService;
   }) {
     this.settingsStore = settingsStore;
     this.roleService = roleService;
@@ -47,8 +47,9 @@ export class FirstTimeSetupController {
       password: rootPassword,
       roles: [role.id],
       isRootUser: true,
-      needsPasswordChange: false,
       isVerified: true,
+      isDemoUser: false,
+      needsPasswordChange: false,
     });
     await this.settingsStore.setLoginRequired(loginRequired);
     await this.settingsStore.setRegistrationEnabled(registration);

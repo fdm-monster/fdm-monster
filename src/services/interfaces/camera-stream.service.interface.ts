@@ -8,11 +8,11 @@ export interface ICameraStreamService<KeyType = IdType> {
 
   list(): Promise<CameraStream[]>;
 
-  get(id: KeyType, throwError?: boolean): Promise<CameraStream>;
+  get(id: KeyType, throwError?: boolean): Promise<CameraStream<KeyType>>;
 
-  create(data: CreateCameraStreamDto<IdType>): Promise<CameraStream>;
+  create(data: CreateCameraStreamDto<IdType>): Promise<CameraStream<KeyType>>;
 
   delete(id: KeyType): Promise<void>;
 
-  update(id: KeyType, input: CreateCameraStreamDto<KeyType>): Promise<CameraStream>;
+  update(id: KeyType, input: CreateCameraStreamDto<KeyType>): Promise<CameraStream<KeyType>>;
 }

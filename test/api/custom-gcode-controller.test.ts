@@ -4,9 +4,7 @@ import { setupTestApp } from "../test-server";
 import { expectInvalidResponse, expectNotFoundResponse, expectOkResponse } from "../extensions";
 import { CustomGcode } from "@/models";
 import { createTestPrinter } from "./test-data/create-printer";
-import supertest, { SuperTest } from "supertest";
-import { Request } from "express";
-import { ICustomGcode } from "@/models/CustomGcode";
+import supertest from "supertest";
 import { CustomGcodeDto } from "@/services/interfaces/custom-gcode.dto";
 import { MongoIdType } from "@/shared.constants";
 

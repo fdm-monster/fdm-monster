@@ -145,7 +145,7 @@ export class FloorService implements IFloorService<MongoIdType> {
   }
 
   async deletePrinterFromAnyFloor(printerId: MongoIdType) {
-    return Floor.updateMany(
+    await Floor.updateMany(
       {},
       {
         $pull: {
@@ -201,6 +201,7 @@ export class FloorService implements IFloorService<MongoIdType> {
   }
 
   async delete(floorId: MongoIdType) {
-    return Floor.deleteOne({ _id: floorId });
+    await this.get(floorId, true);
+    await Floor.deleteOne({ _id: floorId });
   }
 }
