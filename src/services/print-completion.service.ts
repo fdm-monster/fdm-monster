@@ -30,13 +30,13 @@ export class PrintCompletionService {
     return PrintCompletion.find({});
   }
 
-  async findPrintCompletion(correlationId) {
+  async findPrintCompletion(correlationId: string) {
     return PrintCompletion.find({
       "context.correlationId": correlationId,
     });
   }
 
-  async updateContext(correlationId, context) {
+  async updateContext(correlationId: string, context) {
     const completionEntry = await PrintCompletion.findOne({
       "context.correlationId": correlationId,
       status: EVENT_TYPES.PrintStarted,

@@ -21,17 +21,17 @@ export class PrinterSettingsController {
   async get(req: Request, res: Response) {
     const { id: printerId } = await validateInput(req.params, idRules);
 
-    const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
-    const settings = await this.octoPrintApiService.getSettings(printerLogin);
+    const loginDto = await this.printerCache.getLoginDtoAsync(printerId);
+    const settings = await this.octoPrintApiService.getSettings(loginDto);
     res.send(settings);
   }
 
   async setGCodeAnalysis(req: Request, res: Response) {
     const { id: printerId } = await validateInput(req.params, idRules);
-    const input = await validateMiddleware(req, setGcodeAnalysis);
+    const { enabled } = await validateMiddleware(req, setGcodeAnalysis);
 
     const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
-    const settings = await this.octoPrintApiService.setGCodeAnalysis(printerLogin, input);
+    const settings = await this.octoPrintApiService.setGCodeAnalysis(printerLogin, enabled);
     res.send(settings);
   }
 

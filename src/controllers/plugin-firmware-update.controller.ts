@@ -37,7 +37,7 @@ export class PluginFirmwareUpdateController {
   }
 
   async listUpdateState(req: Request, res: Response) {
-    const result = await this.#performScanOnPrinters();
+    const result = await this.performScanOnPrinters();
     res.send(result);
   }
 
@@ -55,7 +55,7 @@ export class PluginFirmwareUpdateController {
   }
 
   async scanPrinterFirmwareVersions(req: Request, res: Response) {
-    const result = await this.#performScanOnPrinters();
+    const result = await this.performScanOnPrinters();
     res.send(result);
   }
 
@@ -97,7 +97,7 @@ export class PluginFirmwareUpdateController {
     res.send({});
   }
 
-  async #performScanOnPrinters() {
+  async performScanOnPrinters() {
     const printers = await this.printerCache.listCachedPrinters();
     const printerFirmwareStates = [];
     const failureStates = [];
