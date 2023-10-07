@@ -1,6 +1,7 @@
 import { AnyArray, model, ObjectIdSchemaDefinition, Schema } from "mongoose";
 
 export interface IUser {
+  id: string;
   username: string;
   isDemoUser: boolean;
   isRootUser: boolean;

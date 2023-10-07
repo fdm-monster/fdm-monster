@@ -1,5 +1,11 @@
-export class ConfigService {
-  get(key: string, defaultValue?: any) {
+export interface IConfigService {
+  get(key: string, defaultValue?: string): string | undefined;
+
+  getOrThrow(key: string): void;
+}
+
+export class ConfigService implements IConfigService {
+  get(key: string, defaultValue?: string) {
     if (!Object.keys(process.env).includes(key) || !process.env[key]?.length) {
       return defaultValue;
     }

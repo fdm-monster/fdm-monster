@@ -9,7 +9,7 @@ export const printerLoginToken = "printerLogin";
 
 export const printerResolveMiddleware = (key = "id") => {
   return (req: Request, res: Response, next: NextFunction) => {
-    const printerCache: PrinterCache = req.container.resolve(DITokens.printerCache);
+    const printerCache = req.container.resolve<PrinterCache>(DITokens.printerCache);
 
     let scopedPrinter = undefined;
     let loginDto = undefined;
