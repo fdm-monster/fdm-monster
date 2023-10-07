@@ -1,6 +1,6 @@
 import { connect } from "../db-handler";
 import { setupTestApp } from "../test-server";
-import { expectInternalServerError, expectOkResponse, expectUnauthorizedResponse } from "../extensions";
+import { expectInternalServerError, expectOkResponse, expectUnauthenticatedResponse } from "../extensions";
 import { load } from "js-yaml";
 import { exportYamlBuffer } from "../application/test-data/yaml-import";
 import { AppConstants } from "@/server.constants";
@@ -60,7 +60,7 @@ describe("ServerPrivateController", () => {
   it("should not allow unauthenticated server restart", async function () {
     await settingsStore.setLoginRequired();
     const response = await request.post(restartRoute).send();
-    expectUnauthorizedResponse(response);
+    expectUnauthenticatedResponse(response);
     await settingsStore.setLoginRequired(false);
   });
 

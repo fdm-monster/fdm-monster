@@ -5,6 +5,7 @@ import { AppConstants } from "@/server.constants";
 import { CameraStream as Model } from "@/models";
 import supertest from "supertest";
 import { createTestPrinter } from "./test-data/create-printer";
+import { CameraStreamController } from "@/controllers/camera-stream.controller";
 
 const listRoute = `${AppConstants.apiRoute}/camera-stream`;
 const getRoute = (id: string) => `${listRoute}/${id}`;
@@ -22,7 +23,7 @@ beforeEach(async () => {
   Model.deleteMany({});
 });
 
-describe("CameraStreamController", () => {
+describe(CameraStreamController.name, () => {
   const defaultSettings = {
     flipHorizontal: false,
     flipVertical: false,
@@ -45,7 +46,7 @@ describe("CameraStreamController", () => {
   const createTestCameraStream = async (url: string) => await request.post(listRoute).send(defaultCameraStreamInput(url));
   const deleteTestCameraStream = async (id: string) => await request.delete(deleteRoute(id));
   const updateTestCameraStream = async (id: string, url: string, printerId: string | null) =>
-    await request.delete(updateRoute(id)).send(defaultCameraStreamInput(url));
+    await request.put(updateRoute(id)).send(defaultCameraStreamInput(url));
 
   it("should list streams", async () => {
     const res = await request.get(listRoute);

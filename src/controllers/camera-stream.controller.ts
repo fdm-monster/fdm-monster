@@ -49,4 +49,4 @@ export default createController(CameraStreamController)
   .get("/:id", "get")
   .post("/", "create")
   .delete("/:id", "delete")
-  .patch("/:id", "update");
+  .put("/:id", "update");

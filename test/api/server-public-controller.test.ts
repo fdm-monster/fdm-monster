@@ -1,7 +1,7 @@
 import { AwilixContainer } from "awilix";
 import { connect } from "../db-handler";
 import { setupTestApp } from "../test-server";
-import { expectOkResponse, expectUnauthorizedResponse } from "../extensions";
+import { expectOkResponse, expectUnauthenticatedResponse } from "../extensions";
 import { AppConstants } from "@/server.constants";
 import { DITokens } from "@/container.tokens";
 import { loginTestUser } from "./auth/login-test-user";
@@ -55,7 +55,7 @@ describe(ServerPublicController.name, () => {
     expect(response.body).toMatchObject({
       error: "Not authenticated",
     });
-    expectUnauthorizedResponse(response);
+    expectUnauthenticatedResponse(response);
     // Return to default
     await settingsStore.setLoginRequired(false);
   });
@@ -66,7 +66,7 @@ describe(ServerPublicController.name, () => {
     expect(response.body).toMatchObject({
       error: "Not authenticated",
     });
-    expectUnauthorizedResponse(response);
+    expectUnauthenticatedResponse(response);
     // Return to default
     await settingsStore.setLoginRequired(false);
   });
