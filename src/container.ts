@@ -32,7 +32,7 @@ import { ServerTasks } from "./tasks";
 import { PermissionService } from "./services/authentication/permission.service";
 import { PrinterFileCleanTask } from "./tasks/printer-file-clean.task";
 import { ROLES } from "./constants/authorization.constants";
-import { CustomGCodeService } from "./services/custom-gcode.service";
+import { CustomGcodeService } from "./services/custom-gcode.service";
 import { PrinterWebsocketRestoreTask } from "./tasks/printer-websocket-restore.task";
 import { PluginFirmwareUpdateService } from "./services/octoprint/plugin-firmware-update.service";
 import { PluginRepositoryCache } from "./services/octoprint/plugin-repository.cache";
@@ -136,7 +136,7 @@ export function configureContainer() {
     [DITokens.testPrinterSocketStore]: asClass(TestPrinterSocketStore).singleton(),
 
     // Extensibility and export
-    [DITokens.customGCodeService]: asClass(CustomGCodeService),
+    [DITokens.customGCodeService]: asClass(CustomGcodeService),
     [DITokens.influxDbV2BaseService]: asClass(InfluxDbV2BaseService),
 
     [DITokens.bootTask]: asClass(BootTask),

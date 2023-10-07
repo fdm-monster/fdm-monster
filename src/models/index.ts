@@ -7,6 +7,6 @@ import { Permission } from "./Auth/Permission";
 import { PrintCompletion } from "./PrintCompletion";
 import { RefreshToken } from "./Auth/RefreshToken";
 import { CameraStream } from "./CameraStream";
-import { CustomGCode } from "./CustomGCode";
+import { CustomGcode } from "./CustomGcode";
 
-export { Printer, Floor, PrintCompletion, CustomGCode, Settings, User, Role, Permission, RefreshToken, CameraStream };
+export { Printer, Floor, PrintCompletion, CustomGcode, Settings, User, Role, Permission, RefreshToken, CameraStream };

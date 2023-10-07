@@ -5,19 +5,19 @@ import { ROLES } from "@/constants/authorization.constants";
 import { getScopedPrinter, validateInput } from "@/handlers/validators";
 import { idRules } from "./validation/generic.validation";
 import { printerResolveMiddleware } from "@/middleware/printer";
-import { CustomGCodeService } from "@/services/custom-gcode.service";
 import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
 import { Request, Response } from "express";
+import { ICustomGcodeService } from "@/services/interfaces/custom-gcode.service.interface";
 
 export class CustomGCodeController {
   private octoPrintApiService: OctoPrintApiService;
-  private customGCodeService: CustomGCodeService;
+  private customGCodeService: ICustomGcodeService;
 
   constructor({
     customGCodeService,
     octoPrintApiService,
   }: {
-    customGCodeService: CustomGCodeService;
+    customGCodeService: ICustomGcodeService;
     octoPrintApiService: OctoPrintApiService;
   }) {
     this.customGCodeService = customGCodeService;
@@ -26,13 +26,13 @@ export class CustomGCodeController {
 
   async list(req: Request, res: Response) {
     const entities = await this.customGCodeService.list();
-    res.send(entities);
+    res.send(entities.map((e) => this.customGCodeService.toDto(e)));
   }
 
   async get(req: Request, res: Response) {
     const { id } = await validateInput(req.params, idRules);
     const entity = await this.customGCodeService.get(id);
-    res.send(entity);
+    res.send(this.customGCodeService.toDto(entity));
   }
 
   /**
@@ -45,8 +45,8 @@ export class CustomGCodeController {
   }
 
   async create(req: Request, res: Response) {
-    const createdScript = await this.customGCodeService.create(req.body);
-    res.send(createdScript);
+    const entity = await this.customGCodeService.create(req.body);
+    res.send(this.customGCodeService.toDto(entity));
   }
 
   async delete(req: Request, res: Response) {
@@ -58,7 +58,7 @@ export class CustomGCodeController {
   async update(req: Request, res: Response) {
     const { id } = await validateInput(req.params, idRules);
     const updatedScript = await this.customGCodeService.update(id, req.body);
-    res.send(updatedScript);
+    res.send(this.customGCodeService.toDto(updatedScript));
   }
 }
 

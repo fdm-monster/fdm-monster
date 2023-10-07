@@ -2,11 +2,11 @@ import { AppConstants } from "@/server.constants";
 import { connect } from "../db-handler";
 import { setupTestApp } from "../test-server";
 import { expectInvalidResponse, expectNotFoundResponse, expectOkResponse } from "../extensions";
-import { CustomGCode } from "@/models";
+import { CustomGcode } from "@/models";
 import { createTestPrinter } from "./test-data/create-printer";
 import supertest from "supertest";
 
-let Model = CustomGCode;
+let Model = CustomGcode;
 const defaultRoute = `${AppConstants.apiRoute}/custom-gcode`;
 const createRoute = defaultRoute;
 const emergencyGCodeRoute = (printerId: string) => `${defaultRoute}/send-emergency-m112/${printerId}`;
