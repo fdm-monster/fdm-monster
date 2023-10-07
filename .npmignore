@@ -21,12 +21,12 @@ npm-debug.log
 .eslintignore
 .eslintrc.js
 .prettierrc.json
-.prettieriignore
+.prettierignore
 .whitesource
 renovate.json
 jest.config.js
 docker-compose.yml
-GitReleaseManager.yml
+GitReleaseManager.yaml
 
 # Custom
 *.ps1
