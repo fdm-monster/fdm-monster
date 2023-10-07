@@ -18,7 +18,7 @@ export async function ensureTestUserCreated(
   role = ROLES.ADMIN,
   isVerified = true
 ) {
-  const roleId = (await Role.findOne({ name: role }))?._id;
+  const roleId = (await Role.findOne({ name: role }))?.id;
   const roles = roleId ? [roleId.toString()] : [];
 
   const foundUser = await User.findOne({ username: usernameIn });

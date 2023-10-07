@@ -108,9 +108,6 @@ export class FloorService implements IFloorService<MongoIdType> {
 
   /**
    * Stores a new floor into the database.
-   * @param {Object} floor object to create.
-   * @returns {Promise<Floor>}
-   * @throws {Error} If the floor is not correctly provided.
    */
   async create(floor: CreateFloorDto) {
     const validatedInput = await validateInput(floor, createFloorRules);
