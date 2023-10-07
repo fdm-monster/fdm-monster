@@ -35,8 +35,11 @@ export function getExtendedValidator() {
 
 export function getScopedPrinter(req: Request) {
   const tokens = [printerLoginToken, currentPrinterToken, printerIdToken];
-  let resolvedDependencies: Record<string, {[printerLoginToken]:IdType, [currentPrinterToken]:any, [printerIdToken]: IdType} extends any> = {};
-  let errors = [];
+  let resolvedDependencies: Record<
+    string,
+    { [printerLoginToken]: IdType; [currentPrinterToken]: any; [printerIdToken]: IdType }
+  > = {};
+  let errors: any[] = [];
   tokens.forEach((t) => {
     try {
       const dependency = req.container.resolve(t);
