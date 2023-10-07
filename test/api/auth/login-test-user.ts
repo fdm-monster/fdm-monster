@@ -15,5 +15,5 @@ export async function loginTestUser(
   const { username } = await ensureTestUserCreated(usernameIn, password, false, role);
   const response = await request.post(loginRoute).send({ username, password });
 
-  return response.body;
+  return response.body as { token: string; refreshToken: string };
 }
