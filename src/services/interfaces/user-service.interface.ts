@@ -27,6 +27,8 @@ export interface IUserService<KeyType = IdType> {
 
   updatePasswordUnsafe(username: string, newPassword: string): Promise<IUser>;
 
+  setIsRootUserById(userId: MongoIdType, isRootUser: boolean): Promise<void>;
+
   setVerifiedById(userId: MongoIdType, isVerified: boolean): Promise<void>;
 
   register(input: RegisterUserDto<KeyType>): Promise<IUser>;

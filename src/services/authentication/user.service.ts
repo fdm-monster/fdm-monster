@@ -120,6 +120,21 @@ export class UserService implements IUserService<MongoIdType> {
     return await user.save();
   }
 
+  async setIsRootUserById(userId: MongoIdType, isRootUser: boolean) {
+    const user = await User.findById(userId);
+    if (!user) throw new NotFoundException("User not found");
+
+    if (!isRootUser) {
+      const role = this.roleService.getRoleByName(ROLES.ADMIN);
+      if (user.roles.includes(role.id)) {
+        throw new InternalServerException("Cannot set a root user with isRootUser: false as that makes no sense");
+      }
+    }
+
+    user.isRootUser = isRootUser;
+    await user.save();
+  }
+
   async setVerifiedById(userId: MongoIdType, isVerified: boolean) {
     const user = await User.findById(userId);
     if (!user) throw new NotFoundException("User not found");
