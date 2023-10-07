@@ -23,17 +23,21 @@ describe(DITokens.floorStore, () => {
     await expect(() => floorStore.getFloor("63452115122876ea11cd1656")).rejects.toBeDefined();
   });
 
-  it("should delete floor", async function () {
-    await floorStore.delete("63452115122876ea11cd1656");
+  it("should delete existing floor", async function () {
+    const floors = await floorStore.listCache();
+    expect(floors).toHaveLength(1);
+    await floorStore.delete(floors[0].id);
   });
 
   it("should update floor", async () => {
     const floors = await floorStore.listCache();
     expect(floors).toHaveLength(1);
-    await floorStore.update(floors[0], {
+    await floorStore.update(floors[0].id, {
       name: "flo",
       floor: 1,
       printers: [],
     });
+    const floors2 = await floorStore.listCache();
+    expect(floors2).toHaveLength(1);
   });
 });

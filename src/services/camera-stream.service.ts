@@ -65,7 +65,7 @@ export class CameraStreamService implements ICameraStreamService<MongoIdType> {
     return {
       id: entity.id,
       streamURL: entity.streamURL,
-      printerId: entity.printerId?.toString(),
+      printerId: entity.printerId === null ? null : entity.printerId?.toString(),
       settings: entity.settings,
     };
   }
