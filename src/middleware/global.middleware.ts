@@ -14,7 +14,7 @@ export const validateWhitelistedIp = inject(
       }
 
       const whitelist = serverSettings[serverSettingsKey].whitelistedIpAddresses;
-      const ipAddress = req.connection.remoteAddress;
+      const ipAddress = req.socket.remoteAddress;
       // Empty whitelist is treated as disabled as well
       // Both ::ffff:127.0.0.1 and 127.0.0.1 will be accepted
       if (whitelist?.length && !whitelist.includes(ipAddress) && ipAddress !== "::ffff:127.0.0.1") {
@@ -24,8 +24,8 @@ export const validateWhitelistedIp = inject(
         });
 
         if (!subnextMatched) {
-          logger.error("IP did not match whitelist filters", req.connection.remoteAddress);
-          throw new AuthenticationError("Bad IP: " + req.connection.remoteAddress);
+          logger.error("IP did not match whitelist filters", req.socket.remoteAddress);
+          throw new AuthenticationError("Bad IP: " + req.socket.remoteAddress);
         }
       }
 
@@ -33,16 +33,19 @@ export const validateWhitelistedIp = inject(
     }
 );
 
-export const interceptRoles = inject(({ settingsStore, roleService }) => async (req, res, next) => {
-  const serverSettings = await settingsStore.getSettings();
+export const interceptRoles = inject(
+  ({ settingsStore, roleService }) =>
+    async (req: Request, res: Response, next: NextFunction) => {
+      const serverSettings = await settingsStore.getSettings();
 
-  req.roles = req.user?.roles;
+      req.roles = req.user?.roles;
 
-  // If server settings are not set, we can't determine the default role
-  if (serverSettings && !req.user) {
-    const roleName = await roleService.getAppDefaultRole();
-    req.roles = [roleName];
-  }
+      // If server settings are not set, we can't determine the default role
+      if (serverSettings && !req.user) {
+        const roleName = await roleService.getAppDefaultRole();
+        req.roles = [roleName];
+      }
 
-  next();
-});
+      next();
+    }
+);
