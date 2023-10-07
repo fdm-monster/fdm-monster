@@ -14,6 +14,17 @@ CVS
 npm-debug.log
 *.tgz
 
+# Repo related
+.all-contributorsrc
+.dockerignore
+.editorconfig
+.eslintignore
+.eslintrc.js
+.prettierrc.json
+.prettieriignore
+.whitesource
+GitReleaseManager.yml
+
 # Custom
 *.ps1
 coverage
@@ -22,11 +33,15 @@ docs
 fdm-monster
 installations
 media
-src
-server-nest
+src/**/*
+test/**/*
 test
 .github
 **/*.sqlite
+**/*.sqlite-shm
+**/*.sqlite-wal
+**/*.log
+**/*.zip
 !dist/**/*
 !*.md
 !.env.template
