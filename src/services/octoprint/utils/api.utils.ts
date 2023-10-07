@@ -4,13 +4,9 @@ import {
   apiKeyHeaderKey,
 } from "@/services/octoprint/constants/octoprint-service.constants";
 import { ValidationException } from "@/exceptions/runtime.exceptions";
+import { LoginDto } from "@/services/interfaces/login.dto";
 
-/**
- *
- * @param {LoginDto} login
- * @returns {{apiKey, printerURL}}
- */
-export function validateLogin(login) {
+export function validateLogin(login: LoginDto) {
   if (!login.apiKey || !login.printerURL) {
     throw new ValidationException("printer apiKey or printerURL undefined");
   }
@@ -21,7 +17,7 @@ export function validateLogin(login) {
   };
 }
 
-export function constructHeaders(apiKey, contentType = jsonContentType) {
+export function constructHeaders(apiKey: string, contentType = jsonContentType) {
   return {
     [contentTypeHeaderKey]: contentType, // Can be overwritten without problem
     [apiKeyHeaderKey]: apiKey,

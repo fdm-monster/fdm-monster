@@ -1,5 +1,5 @@
 import { createController } from "awilix-express";
-import { AuthenticationError, BadRequestException } from "@/exceptions/runtime.exceptions";
+import { BadRequestException } from "@/exceptions/runtime.exceptions";
 import { AppConstants } from "@/server.constants";
 import { validateMiddleware } from "@/handlers/validators";
 import { registerUserRules } from "./validation/user-controller.validation";
@@ -111,9 +111,19 @@ export class AuthController {
       throw new BadRequestException("Username 'demo' is not allowed");
     }
 
-    const roles = await this.roleService.getAppDefaultRolesId();
-    const result = await this.userService.register({ username, password, roles, needsPasswordChange: false });
-    res.send(result);
+    const roles = await this.roleService.getAppDefaultRoleIds();
+    const result = await this.userService.register({
+      username,
+      password,
+      roles,
+      needsPasswordChange: false,
+      isDemoUser: false,
+      isRootUser: false,
+      // An admin needs to verify the user first
+      isVerified: false,
+    });
+    const userDto = this.userService.toDto(result);
+    res.send(userDto);
   }
 }
 
