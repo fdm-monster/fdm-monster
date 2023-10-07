@@ -1,7 +1,12 @@
 {
   "name": "@fdm-monster/server",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fdm-monster/fdm-monster"
+  },
   "author": "David Zwart",
   "license": "AGPL-3.0-or-later",
+  "private": false,
   "version": "1.5.0-rc1",
   "description": "FDM Monster is a bulk OctoPrint manager to set up, configure and monitor 3D printers. Our aim is to provide extremely optimized websocket performance and reliability.",
   "main": "src/index.ts",
@@ -23,7 +28,6 @@
     "test:cov": "jest --forceExit --coverage",
     "cov:show": "./coverage/lcov-report/index.html"
   },
-  "repository": "https://github.com/fdm-monster/fdm-monster",
   "keywords": [
     "fdm-monster",
     "fdm-connector",
