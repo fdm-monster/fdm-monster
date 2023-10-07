@@ -25,12 +25,12 @@ export class FloorService implements IFloorService<MongoIdType> {
     this.logger = loggerFactory(FloorService.name);
   }
 
-  toDto(floor: IFloor): FloorDto {
+  toDto(floor: IFloor): FloorDto<MongoIdType> {
     return {
       id: floor.id,
       name: floor.name,
-      level: floor.floor,
-      positions: floor.printers.map((p) => ({
+      floor: floor.floor,
+      printers: floor.printers.map((p) => ({
         x: p.x,
         y: p.y,
         printerId: p.printerId.toString(),

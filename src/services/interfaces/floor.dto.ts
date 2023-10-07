@@ -1,23 +1,25 @@
-import { IdDto, IdType } from "@/shared.constants";
+import { IdType } from "@/shared.constants";
 
-export class PositionDto {
+export class PositionDto<KeyType = IdType> {
   x: number;
   y: number;
-  printerId: IdType;
-  floorId: IdType;
+  printerId: KeyType;
+  floorId: KeyType;
 }
 
 // MongoDB version
-export class PrinterInFloorDto extends IdDto {
+export class PrinterInFloorDto<KeyType = IdType> {
+  id: KeyType;
   x: number;
   y: number;
   printerId: IdType;
 }
 
-export class FloorDto extends IdDto {
+export class FloorDto<KeyType = IdType> {
+  id: KeyType;
   name: string;
-  level: number;
-  positions: PositionDto[];
+  floor: number;
+  printers: PositionDto[];
 }
 
 export class CreateFloorDto {
@@ -30,6 +32,6 @@ export class UpdateFloorDto {
   floor?: number;
 }
 
-export class AddOrUpdatePrinterDto {
-  printerId: IdType;
+export class AddOrUpdatePrinterDto<KeyType = IdType> {
+  printerId: KeyType;
 }

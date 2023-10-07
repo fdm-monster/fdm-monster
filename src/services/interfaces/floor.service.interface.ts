@@ -3,7 +3,7 @@ import { IdType, MongoIdType } from "@/shared.constants";
 import { FloorDto, PositionDto, PrinterInFloorDto } from "@/services/interfaces/floor.dto";
 
 export interface IFloorService<KeyType = IdType, Entity = IFloor> {
-  toDto(floor: Entity): FloorDto;
+  toDto(floor: Entity): FloorDto<KeyType>;
 
   list(): Promise<Entity[]>;
 
