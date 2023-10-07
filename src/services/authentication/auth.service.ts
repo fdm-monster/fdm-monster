@@ -18,7 +18,7 @@ export class AuthService implements IAuthService<MongoIdType> {
   /**
    *  When users are blacklisted at runtime, this cache can make quick work of rejecting them
    */
-  private blacklistedJwtCache: Record<string, MongoIdType> = {};
+  private blacklistedJwtCache: Record<string, { userId: MongoIdType; createdAt: number }> = {};
 
   /**
    * loginUser: starts new session: id-token, refresh, removing any old refresh
@@ -72,6 +72,7 @@ export class AuthService implements IAuthService<MongoIdType> {
     const token = await this.signJwtToken(userId);
 
     await this.refreshTokenService.purgeOutdatedRefreshTokensByUserId(userId);
+    await this.purgeBlacklistedJwtCache();
 
     const refreshToken = await this.refreshTokenService.createRefreshTokenForUserId(userId);
     return {
@@ -82,8 +83,25 @@ export class AuthService implements IAuthService<MongoIdType> {
 
   async logoutUserId(userId: MongoIdType, jwtToken?: string) {
     await this.refreshTokenService.deleteRefreshTokenByUserId(userId);
-    if (jwtToken) {
-      this.blacklistedJwtCache[jwtToken] = userId;
+    if (jwtToken?.length) {
+      this.blacklistedJwtCache[jwtToken] = { userId, createdAt: Date.now() };
+      await this.purgeBlacklistedJwtCache();
+    }
+  }
+
+  async purgeBlacklistedJwtCache() {
+    try {
+      const { jwtExpiresIn } = await this.settingsStore.getCredentialSettings();
+      const now = Date.now();
+      const keys = Object.keys(this.blacklistedJwtCache);
+      for (const key of keys) {
+        const { createdAt } = this.blacklistedJwtCache[key];
+        if (now - createdAt > jwtExpiresIn) {
+          delete this.blacklistedJwtCache[key];
+        }
+      }
+    } catch (err) {
+      this.logger.error("Failed to purge blacklisted jwt cache", err);
     }
   }
 
