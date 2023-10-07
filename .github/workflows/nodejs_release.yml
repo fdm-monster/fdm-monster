@@ -65,7 +65,7 @@ jobs:
           draft: ${{ github.ref_name == 'develop' }}
           prerelease: ${{ contains(env.SERVER_VERSION, 'rc') || contains(env.SERVER_VERSION, 'unstable') }}
           tag_name: ${{ env.RELEASE_TAG }}
-          release_name: ${{ env.RELEASE_TAG }} Tasmanian Devil Unstable 🐀
+          release_name: ${{ env.RELEASE_TAG }} Awesome Axolotl 😃
           body: "Release notes not added" # ${{ steps.build_changelog.outputs.changelog }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -74,20 +74,7 @@ jobs:
         uses: montudor/action-zip@v1.0.0
         with:
           args: | 
-            zip -qq -r dist-server-${{ env.SERVER_VERSION }}.zip \
-            dist \
-            .env.template \
-            package.json \
-            yarn.lock \
-            migrate-mongo-config.js \
-            tsconfig.json \ 
-            README.md \
-            LICENSE \
-            CODE_OF_CONDUCT.md \
-            CONTRIBUTING.md \
-            SECURITY.md \
-            .swcrc \
-            .dockerignore            
+            zip -qq -r dist-server-${{ env.SERVER_VERSION }}.zip dist .env.template package.json yarn.lock migrate-mongo-config.js tsconfig.json README.md LICENSE CODE_OF_CONDUCT.md CONTRIBUTING.md SECURITY.md .swcrc .dockerignore            
 
       - name: Upload server bundle zip
         uses: actions/upload-release-asset@v1
