@@ -4,6 +4,7 @@ import { expectOkResponse } from "../extensions";
 import { AppConstants } from "@/server.constants";
 import { CameraStream as Model } from "@/models";
 import supertest from "supertest";
+import { createTestPrinter } from "./test-data/create-printer";
 
 const listRoute = `${AppConstants.apiRoute}/camera-stream`;
 const getRoute = (id: string) => `${listRoute}/${id}`;
@@ -40,8 +41,11 @@ describe("CameraStreamController", () => {
     printerId: null,
     settings: defaultSettings,
   });
+  const getTestCameraStream = async (id: string) => await request.get(getRoute(id));
   const createTestCameraStream = async (url: string) => await request.post(listRoute).send(defaultCameraStreamInput(url));
   const deleteTestCameraStream = async (id: string) => await request.delete(deleteRoute(id));
+  const updateTestCameraStream = async (id: string, url: string, printerId: string | null) =>
+    await request.delete(updateRoute(id)).send(defaultCameraStreamInput(url));
 
   it("should list streams", async () => {
     const res = await request.get(listRoute);
@@ -52,6 +56,7 @@ describe("CameraStreamController", () => {
   it("should create stream", async () => {
     const res = await createTestCameraStream(defaultTestURL);
     expectOkResponse(res, matchedBody(defaultTestURL));
+    expectOkResponse(await getTestCameraStream(res.body.id), matchedBody(defaultTestURL));
   });
 
   it("should create two streams with null printerId", async () => {
@@ -66,5 +71,13 @@ describe("CameraStreamController", () => {
     await expectOkResponse(res, matchedBody(defaultTestURL + "4"));
     const deleteResponse = await deleteTestCameraStream(res.body.id);
     await expectOkResponse(deleteResponse);
+  });
+
+  it("should create and update stream", async () => {
+    const res = await createTestCameraStream(defaultTestURL + "5");
+    await expectOkResponse(res, matchedBody(defaultTestURL + "5"));
+    const printer = await createTestPrinter(request, true);
+    const updateResponse = await updateTestCameraStream(res.body.id, defaultTestURL + "6", printer.id);
+    await expectOkResponse(updateResponse);
   });
 });
