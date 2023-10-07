@@ -8,25 +8,23 @@ jobs:
   nodejs-build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4
       - uses: actions/setup-node@v3
         with:
           node-version: 18.x
 
       - run: yarn install --frozen-lockfile
-        working-directory: server
+      - run: yarn run build
       - run: yarn run test:cov
-        working-directory: server
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
           flags: server-nodejs
-          dry_run: ${{ matrix.node-version != '16.x' }}
+          dry_run: false
 
       # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions
       - name: get-server-version
-        working-directory: server
         # https://gist.github.com/DarrenN/8c6a5b969481725a4413?permalink_comment_id=3863317#gistcomment-3863317
         run: |
           echo "SERVER_VERSION=$(npm pkg get version | sed 's/"//g')" >> $GITHUB_ENV
@@ -43,3 +41,10 @@ jobs:
       - name: print-tag
         run: |
           echo ${{ env.RELEASE_TAG }}
+
+      # Publish to NPM
+      - uses: JS-DevTools/npm-publish@v2
+        with:
+          dry-run: true
+          token: ${{ secrets.NPM_TOKEN }}
+          package: package.json

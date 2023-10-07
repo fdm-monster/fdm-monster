@@ -1,35 +1,38 @@
-volumes:
-  mongodb-data:
-
 services:
   mongodb:
-    image: mongo:latest
+    image: mongo:7
     container_name: mongodb
     environment:
-      # MongoDB with authentication (optional)
-#      - MONGO_INITDB_ROOT_USERNAME=YOUR_ROOT_NAME
-#      - MONGO_INITDB_ROOT_PASSWORD=YOUR_ROOT_PASSWORD
-      - MONGO_INITDB_DATABASE=fdm-monster
+      # Authenticated variant, comment out for non-authenticated variant:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=fdm-root
     ports:
       - "21111:27017"
     volumes:
-      - ./fdm-monster/mongodb-data:/data/db
-      - ./fdm-monster/mongoconfig:/data/configdb
+      - ./fdm-monster:/data
     restart: unless-stopped
 
+  # docker build --platform linux/amd64,linux/arm64 -t 1.5.0-alpha . -f .\docker\Dockerfile
   fdm-monster:
     container_name: fdm-monster
-    image: davidzwa/fdm-monster:latest
+    image: davidzwa/fdm-monster:develop
     build:
-      context: ./server
-      dockerfile: ./docker/Dockerfile
+      context: .
+      dockerfile: docker/Dockerfile
     restart: unless-stopped
+    deploy:
+      restart_policy:
+        delay: 5s
+        max_attempts: 3
+        window: 120s
     ports:
       - "4000:4000"
     environment:
-#      - MONGO=mongodb://<username>:<password>@mongodb:27017/fdm-monster?authSource=admin
-      - MONGO=mongodb://mongodb:27017/fdm-monster?readPreference=primary&ssl=false
+      # Non-authenticated variant:
+#      - MONGO=mongodb://mongodb:27017/fdm-monster
+      # Authenticated variant:
+      - MONGO=mongodb://root:fdm-root@mongodb:27017/fdm-monster?authSource=admin
       - NODE_ENV=development
       - SERVER_PORT=4000
     volumes:
-      - ./fdm-monster/media/:/media
+      - ./fdm-monster/media/:/app/media

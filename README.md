@@ -40,12 +40,6 @@ This server is has been battle-tested in the field for 100+ printers, so give it
 - Import printers from OctoFarm
 - [Raspberry Pi image MonsterPi](https://docs.fdm-monster.net/guides/monsterpi)
 
-#### Current work:
-
-- Adjusting the grid sizes
-- Maintenance repair log page
-- MQTT autodiscovery
-
 ![Image](docs/images/server-running.png)
 _The FDM Monster grid after placing one OctoPrint instance._
 
@@ -112,9 +106,9 @@ Please consider sponsoring FDM Monster to help this project! You can find the [G
 
 Thanks to the following parties for their financial support:
 
-| Tier 1 | Tier 2 | Tier 3 | Tier 4 |
-|--------|--------|--------|--------|
-|  |  | [WindArrow3d](https://github.com/WindArrow3d) |  |
+| Tier 4 | Tier 3 | Tier 2 | Tier 1 | One Time |
+|--------|--------|--------|--------|-----------|
+|  | [WindArrow3d](https://github.com/WindArrow3d) | [3Dsauber](https://github.com/3Dsauber)  | [doucettom](https://github.com/doucettom) | [th3dstudio](https://github.com/th3dstudio) |
 
 
 ## Contribute
@@ -128,7 +122,7 @@ the [CONTRIBUTING](CONTRIBUTING.md) file.
 - [x] 🛡️ MongoDB 5 & 6 support
 - [x] :rocket: Quick copy paste of FDM Monster printers
 - [x] 🛡️ Complete API test coverage >80% (now at 80.5%)
-- [x] :rocket: Printer Floor management
+- [x] :rocket: Floor management
 - [x] Auto-clean old OctoPrint files (opt-in and configurable) 
 - [x] :rocket: Windows and Linux Service
 - [x] Printer completion/failure tracking (with statistics page)

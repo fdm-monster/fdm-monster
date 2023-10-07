@@ -3,20 +3,17 @@
 .git
 /**/.env
 .gitignore
-*.md
 *.txt
 /.build
 /.cache
+/.vscode
 /**/node_modules
 
 # Runtime and non-production folders
-/**/fdm-monster
-/client-npm
-/client-vue
 /coverage
+/dist
 /docs
-/**/file-storage
-/**/images
-/**/logs
-/**/test
-/**/views
+/fdm-monster
+/installations
+/media
+/server-nest

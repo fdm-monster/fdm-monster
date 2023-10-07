@@ -51,9 +51,8 @@ services:
     container_name: mongodb
     environment:
       # MongoDB with authentication (optional)
-#      - MONGO_INITDB_ROOT_USERNAME=YOUR_ROOT_NAME
-#      - MONGO_INITDB_ROOT_PASSWORD=YOUR_ROOT_PASSWORD
-      - MONGO_INITDB_DATABASE=fdm-monster
+      - MONGO_INITDB_ROOT_USERNAME=YOUR_ROOT_NAME
+      - MONGO_INITDB_ROOT_PASSWORD=YOUR_ROOT_PASSWORD
     ports:
       - "28017:27017"
     volumes:
@@ -69,11 +68,11 @@ services:
       - "4000:4000"
     environment:
       # MongoDB with authentication (optional) - see MONGO_INITDB_ROOT_USERNAME and MONGO_INITDB_ROOT_PASSWORD above
-#      - MONGO=mongodb://<username>:<password>@mongodb:27017/fdm-monster?authSource=admin
+      - MONGO=mongodb://YOUR_ROOT_NAME:YOUR_ROOT_PASSWORD@mongodb:27017/fdm-monster?authSource=admin
       # MongoDB without authentication
-      - MONGO=mongodb://mongodb:27017/fdm-monster?authSource=admin
+#      - MONGO=mongodb://mongodb:27017/fdm-monster?authSource=admin
     volumes:
-      - ./fdm-monster/media:/media
+      - ./fdm-monster/media:/app/media
 ```
 _An example docker-compose.yml file with the mongodb and fdm-monster services in one stack._
 

@@ -9,7 +9,7 @@ jobs:
       labels: ${{ steps.metadata.outputs.labels }}
     steps:
       - id: metadata
-        uses: crazy-max/ghaction-docker-meta@v4
+        uses: crazy-max/ghaction-docker-meta@v5
         with:
           images: davidzwa/fdm-monster
 
@@ -18,14 +18,14 @@ jobs:
     runs-on: ubuntu-latest
     name: "Docker build"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
       # Login to DockerHub with environment variables
       - name: Login to DockerHub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         if: github.event_name != 'pull_request'
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -33,7 +33,6 @@ jobs:
 
       # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions
       - name: get-server-version
-        working-directory: server
         # https://gist.github.com/DarrenN/8c6a5b969481725a4413?permalink_comment_id=3863317#gistcomment-3863317
         run: |
           echo "SERVER_VERSION=$(npm pkg get version | sed 's/"//g')" >> $GITHUB_ENV
@@ -74,10 +73,10 @@ jobs:
       # Clone the repo and build the image
       - name: Build and push
         id: docker_build
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           push: ${{ github.event_name != 'pull_request' }}
-          context: "{{defaultContext}}:server"
+          context: "{{defaultContext}}"
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
           file: ./docker/Dockerfile

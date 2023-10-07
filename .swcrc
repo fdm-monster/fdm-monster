@@ -1,0 +1,33 @@
+{
+  "sourceMaps": true,
+  "inlineSourcesContent": false,
+  "jsc": {
+    "parser": {
+      "syntax": "typescript",
+      "tsx": false,
+      "decorators": true,
+      "dynamicImport": true
+    },
+    "transform": {
+      "legacyDecorator": true,
+      "decoratorMetadata": true
+    },
+    "minify": {
+      "compress": false,
+      "mangle": false
+    },
+    "target": "es2022",
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "module": {
+    "type": "commonjs",
+    // These are defaults.
+    "strict": true,
+    "strictMode": true,
+    "lazy": false,
+    "noInterop": false
+  }
+}

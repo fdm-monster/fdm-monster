@@ -10,13 +10,12 @@ jobs:
     outputs:
       foundServerVersion: ${{ steps.init.outputs.foundServerVersion }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4
       - name: get-client-version
-        working-directory: server
         # https://gist.github.com/DarrenN/8c6a5b969481725a4413?permalink_comment_id=3863317#gistcomment-3863317
         run: |
           echo "SERVER_VERSION=$(npm pkg get version | sed 's/"//g')" >> $GITHUB_ENV
-      - uses: mukunku/tag-exists-action@v1.2.0
+      - uses: mukunku/tag-exists-action@v1.4.0
         id: checkTag
         with:
           tag: ${{ env.SERVER_VERSION }}
@@ -31,14 +30,13 @@ jobs:
     runs-on: ubuntu-latest
     if: needs.checkversion.outputs.foundServerVersion == 'false'
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4
       - uses: actions/setup-node@v3
         with:
           node-version: 18.x
 
       # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions
       - name: get-server-version
-        working-directory: server
         # https://gist.github.com/DarrenN/8c6a5b969481725a4413?permalink_comment_id=3863317#gistcomment-3863317
         run: |
           echo "SERVER_VERSION=$(npm pkg get version | sed 's/"//g')" >> $GITHUB_ENV
@@ -56,6 +54,10 @@ jobs:
         run: |
           echo ${{ env.RELEASE_TAG }}
 
+      # Build dist folder
+      - run: yarn install --immutable --immutable-cache --check-cache
+      - run: yarn build
+
       - name: Create release
         uses: actions/create-release@v1
         id: create_release
@@ -63,7 +65,30 @@ jobs:
           draft: ${{ github.ref_name == 'develop' }}
           prerelease: ${{ contains(env.SERVER_VERSION, 'rc') || contains(env.SERVER_VERSION, 'unstable') }}
           tag_name: ${{ env.RELEASE_TAG }}
-          release_name: ${{ env.RELEASE_TAG }} Tasmanian Devil Unstable 🐀
+          release_name: ${{ env.RELEASE_TAG }} Awesome Axolotl 😃
           body: "Release notes not added" # ${{ steps.build_changelog.outputs.changelog }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
+
+      - name: action-zip
+        uses: montudor/action-zip@v1.0.0
+        with:
+          args: | 
+            zip -qq -r dist-server-${{ env.SERVER_VERSION }}.zip dist .env.template package.json yarn.lock migrate-mongo-config.js tsconfig.json README.md LICENSE CODE_OF_CONDUCT.md CONTRIBUTING.md SECURITY.md .swcrc .dockerignore            
+
+      - name: Upload server bundle zip
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dist-server-${{ env.SERVER_VERSION }}.zip
+          asset_name: dist-server-${{ env.SERVER_VERSION }}.zip
+          asset_content_type: application/zip
+
+      # Publish to NPM
+      - uses: JS-DevTools/npm-publish@v2
+        with:
+          dry-run: ${{ github.ref_name == 'develop' }}
+          token: ${{ secrets.NPM_TOKEN }}
+          package: package.json
