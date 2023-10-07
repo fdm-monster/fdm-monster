@@ -23,6 +23,9 @@ npm-debug.log
 .prettierrc.json
 .prettieriignore
 .whitesource
+renovate.json
+jest.config.js
+docker-compose.yml
 GitReleaseManager.yml
 
 # Custom
