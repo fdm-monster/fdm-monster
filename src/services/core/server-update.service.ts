@@ -4,6 +4,7 @@ import { execSync } from "child_process";
 import { InternalServerException, ValidationException } from "@/exceptions/runtime.exceptions";
 import { LoggerService } from "@/handlers/logger";
 import { PullResult, SimpleGit } from "simple-git";
+import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class ServerUpdateService {
   private simpleGitService: SimpleGit;

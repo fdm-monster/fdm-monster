@@ -11,12 +11,15 @@ import { PrinterCache } from "@/state/printer.cache";
 import { FloorService } from "@/services/floor.service";
 import { FloorStore } from "@/state/floor.store";
 import { ILoggerFactory } from "@/handlers/logger-factory";
+import { IPrinterService } from "@/services/interfaces/printer.service.interface";
+import { IFloorService } from "@/services/interfaces/floor.service.interface";
+import { MongoIdType } from "@/shared.constants";
 
 export class YamlService {
   floorStore: FloorStore;
-  printerService: PrinterService;
+  floorService: IFloorService<MongoIdType>;
+  printerService: IPrinterService<MongoIdType>;
   printerCache: PrinterCache;
-  floorService: FloorService;
   serverVersion: string;
   private logger: LoggerService;
 
@@ -28,10 +31,10 @@ export class YamlService {
     loggerFactory,
     serverVersion,
   }: {
-    printerService: PrinterService;
+    printerService: IPrinterService<MongoIdType>;
     printerCache: PrinterCache;
     floorStore: FloorStore;
-    floorService: FloorService;
+    floorService: IFloorService<MongoIdType>;
     loggerFactory: ILoggerFactory;
     serverVersion: string;
   }) {

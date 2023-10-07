@@ -1,27 +1,28 @@
-import { Printer } from "@/entities";
+import { IPrinter } from "@/models/Printer";
+import { IdType } from "@/shared.constants";
 
-export interface IPrinterService<KeyType> {
-  list(): Promise<Printer[]>;
+export interface IPrinterService<KeyType = IdType> {
+  list(): Promise<IPrinter[]>;
 
-  get(printerId: KeyType): Promise<Printer>;
+  get(printerId: KeyType): Promise<IPrinter>;
 
-  create(printer: Partial<Printer>, emitEvent: boolean): Promise<Printer>;
+  create(printer: Partial<IPrinter>, emitEvent: boolean): Promise<IPrinter>;
 
-  update(printerId: KeyType, printer: Partial<Printer>): Promise<Printer>;
+  update(printerId: KeyType, printer: Partial<IPrinter>): Promise<IPrinter>;
 
   delete(printerId: KeyType): Promise<any>;
 
   deleteMany(printerIds: KeyType[]): Promise<any | void>;
 
-  batchImport(printers: Partial<Printer>[]): Promise<Printer[]>;
+  batchImport(printers: Partial<IPrinter>[]): Promise<IPrinter[]>;
 
-  updateConnectionSettings(printerId: KeyType, partial: { printerUrl: string; apiKey: string }): Promise<Printer>;
+  updateConnectionSettings(printerId: KeyType, partial: { printerUrl: string; apiKey: string }): Promise<IPrinter>;
 
-  updateEnabled(printerId: KeyType, enabled: boolean): Promise<Printer>;
+  updateEnabled(printerId: KeyType, enabled: boolean): Promise<IPrinter>;
 
-  updateFeedRate(printerId: KeyType, feedRate: number): Promise<Printer>;
+  updateFeedRate(printerId: KeyType, feedRate: number): Promise<IPrinter>;
 
-  updateFlowRate(printerId: KeyType, flowRate: number): Promise<Printer>;
+  updateFlowRate(printerId: KeyType, flowRate: number): Promise<IPrinter>;
 
-  updateDisabledReason(printerId: KeyType, disabledReason: string): Promise<Printer>;
+  updateDisabledReason(printerId: KeyType, disabledReason: string): Promise<IPrinter>;
 }
