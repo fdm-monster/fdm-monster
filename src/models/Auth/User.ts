@@ -1,4 +1,4 @@
-import { AnyArray, model, ObjectIdSchemaDefinition, Schema } from "mongoose";
+import { AnyArray, model, Schema } from "mongoose";
 
 export interface IUser {
   id: string;
@@ -9,7 +9,7 @@ export interface IUser {
   needsPasswordChange: boolean;
   passwordHash: string;
   createdAt: Date;
-  roles: AnyArray<ObjectIdSchemaDefinition>;
+  roles: AnyArray<string>;
 }
 
 const UserSchema = new Schema<IUser>({

@@ -1,6 +1,7 @@
 import { model, Schema, Types } from "mongoose";
 
 export interface IRefreshToken {
+  id: string;
   userId: Types.ObjectId;
   createdAt: Date;
   expiresAt: number;

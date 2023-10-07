@@ -3,37 +3,47 @@ import { flattenPermissionDefinition } from "@/constants/authorization.constants
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
+import { MongoIdType } from "@/shared.constants";
+import { IPermission } from "@/models/Auth/Permission";
+import { IPermissionService } from "@/services/interfaces/permission.service.interface";
 
-export class PermissionService {
+export class PermissionService implements IPermissionService<MongoIdType> {
   private logger: LoggerService;
 
   constructor({ loggerFactory }: { loggerFactory: ILoggerFactory }) {
     this.logger = loggerFactory(PermissionService.name);
   }
 
-  private _permissions: Record<string, any> = {};
+  private _permissions: IPermission[] = [];
 
   get permissions() {
     return this._permissions;
   }
 
+  toDto(permission: IPermission) {
+    return {
+      id: permission.id,
+      name: permission.name,
+    };
+  }
+
   authorizePermission(requiredPermission: string, assignedPermissions: string[]) {
     return !!assignedPermissions.find((assignedPermission) => {
-      const normalizePermission = this.#normalizePermission(assignedPermission);
+      const normalizePermission = this.normalizePermission(assignedPermission);
       if (!normalizePermission) return false;
       return normalizePermission === requiredPermission;
     });
   }
 
   async getPermissionByName(permissionName: string) {
-    const permission = await this.permissions.find((r) => r.name === permissionName);
+    const permission = this.permissions.find((r) => r.name === permissionName);
     if (!permission) throw new NotFoundException("Permission not found");
 
     return permission;
   }
 
-  async getPermission(permissionId) {
-    const permission = await this.permissions.find((r) => r.id === permissionId);
+  async getPermission(permissionId: MongoIdType) {
+    const permission = this.permissions.find((r) => r.id === permissionId);
     if (!permission) throw new NotFoundException(`Permission Id '${permissionId}' not found`);
 
     return permission;
@@ -56,7 +66,7 @@ export class PermissionService {
     }
   }
 
-  #normalizePermission(assignedPermission: string) {
+  normalizePermission(assignedPermission: string) {
     const permissionInstance = this.permissions.find((r) => r.id === assignedPermission || r.name === assignedPermission);
     if (!permissionInstance) {
       this.logger.warn(`The permission by ID ${assignedPermission} did not exist. Skipping.`);
