@@ -1,8 +1,9 @@
 import { inject } from "awilix-express";
 import { AuthenticationError, AuthorizationError, PasswordChangeRequiredError } from "@/exceptions/runtime.exceptions";
+import { NextFunction, Request, Response } from "express";
 
 export function authorizePermission(permission: string) {
-  return inject(({ permissionService, roleService }) => async (req, res, next) => {
+  return inject(({ permissionService, roleService }) => async (req: Request, res: Response, next: NextFunction) => {
     if (!req.roles?.length) {
       throw new AuthorizationError({ permissions: [permission] });
     }
@@ -17,7 +18,7 @@ export function authorizePermission(permission: string) {
 }
 
 export const authenticate = () =>
-  inject(({ settingsStore, authService }) => async (req, res, next) => {
+  inject(({ settingsStore, authService }) => async (req: Request, res: Response, next: NextFunction) => {
     const isLoginRequired = await settingsStore.getLoginRequired();
     if (!isLoginRequired) {
       return next();
@@ -40,8 +41,8 @@ export const authenticate = () =>
 
     throw new AuthenticationError("Not authenticated", 401);
   });
-export const authorizeRoles = (roles, subset = true) =>
-  inject(({ roleService }) => async (req, res, next) => {
+export const authorizeRoles = (roles: string[], subset = true) =>
+  inject(({ roleService }) => async (req: Request, res: Response, next: NextFunction) => {
     if (!roleService.authorizeRoles(roles, req.roles, subset)) {
       throw new AuthorizationError({ roles });
     }
@@ -49,7 +50,7 @@ export const authorizeRoles = (roles, subset = true) =>
     next();
   });
 
-export function withPermission(permission) {
+export function withPermission(permission: string) {
   return {
     before: [authorizePermission(permission)],
   };

@@ -5,15 +5,15 @@ import { ROLES } from "@/constants/authorization.constants";
 import { validateInput } from "@/handlers/validators";
 import { idRules } from "./validation/generic.validation";
 import { InternalServerException } from "@/exceptions/runtime.exceptions";
-import { ConfigService } from "@/services/core/config.service";
-import { Request, Response } from "express";
+import { IConfigService } from "@/services/core/config.service";
 import { IUserService } from "@/services/interfaces/user-service.interface";
+import { Request, Response } from "express";
 
 export class UserController {
   userService: IUserService;
-  configService: ConfigService;
+  configService: IConfigService;
 
-  constructor({ userService, configService }: { userService: IUserService; configService: ConfigService }) {
+  constructor({ userService, configService }: { userService: IUserService; configService: IConfigService }) {
     this.userService = userService;
     this.configService = configService;
   }
@@ -37,6 +37,10 @@ export class UserController {
     this.throwIfDemoMode();
 
     const { id } = await validateInput(req.params, idRules);
+
+    if (req.user?.id === id) {
+      throw new InternalServerException("Not allowed to delete your own account");
+    }
 
     if (this.isDemoMode()) {
       const demoUserId = await this.userService.getDemoUserId();
