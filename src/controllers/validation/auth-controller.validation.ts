@@ -1,3 +1,3 @@
-export const logoutRefreshTokenRules = {
+export const refreshTokenRules = {
   refreshToken: "required|string",
 };

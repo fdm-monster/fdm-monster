@@ -30,16 +30,17 @@ export const authenticate = () =>
     }
 
     // Check if a logout was called
-    const isJwtBlacklisted = await authService.isBlacklisted(req.user?.id);
-    if (isJwtBlacklisted) {
-      throw new AuthenticationError("Not authenticated", 401);
+    const bearer = req.headers.authorization?.replace("Bearer ", "") || undefined;
+    const isJwtBlacklisted = authService.isJwtTokenBlacklisted(bearer);
+    if (!!bearer?.length && isJwtBlacklisted) {
+      throw new AuthenticationError("Not authenticated");
     }
 
     if (req.isAuthenticated()) {
       return next();
     }
 
-    throw new AuthenticationError("Not authenticated", 401);
+    throw new AuthenticationError("Not authenticated");
   });
 export const authorizeRoles = (roles: string[], subset = true) =>
   inject(({ roleService }) => async (req: Request, res: Response, next: NextFunction) => {

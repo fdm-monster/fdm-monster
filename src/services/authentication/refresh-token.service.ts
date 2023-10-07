@@ -13,6 +13,8 @@ export interface IRefreshTokenService<KeyType = IdType> {
   createRefreshTokenForUserId(userId: KeyType): Promise<string>;
   updateRefreshTokenAttempts(refreshToken: string, refreshAttemptsUsed: number): Promise<void>;
   deleteRefreshTokenByUserId(userId: MongoIdType): Promise<void>;
+  purgeOutdatedRefreshTokensByUserId(userId: MongoIdType): Promise<void>;
+  purgeAllOutdatedRefreshTokens(): Promise<void>;
   deleteRefreshToken(refreshToken: string): Promise<void>;
 }
 
@@ -70,6 +72,31 @@ export class RefreshTokenService implements IRefreshTokenService<MongoIdType> {
         new: true,
       }
     );
+  }
+
+  async purgeOutdatedRefreshTokensByUserId(userId: MongoIdType) {
+    const result = await RefreshToken.deleteMany({
+      userId,
+      expiresAt: {
+        $lt: Date.now(),
+      },
+    });
+
+    if (result.deletedCount) {
+      this.logger.debug(`Removed ${result.deletedCount} outdated login refresh tokens for user ${userId}`);
+    }
+  }
+
+  async purgeAllOutdatedRefreshTokens() {
+    const result = await RefreshToken.deleteMany({
+      expiresAt: {
+        $lt: Date.now(),
+      },
+    });
+
+    if (result.deletedCount) {
+      this.logger.debug(`Removed ${result.deletedCount} outdated login refresh tokens`);
+    }
   }
 
   async deleteRefreshTokenByUserId(userId: MongoIdType): Promise<void> {
