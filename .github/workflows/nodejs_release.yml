@@ -89,5 +89,6 @@ jobs:
       # Publish to NPM
       - uses: JS-DevTools/npm-publish@v2
         with:
+          dry-run: ${{ github.ref_name == 'develop' }}
           token: ${{ secrets.NPM_TOKEN }}
           package: package.json
