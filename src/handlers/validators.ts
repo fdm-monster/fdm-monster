@@ -4,6 +4,7 @@ import { currentPrinterToken, printerIdToken, printerLoginToken } from "@/middle
 import { normalizeUrl } from "@/utils/normalize-url";
 import nodeInputValidator, { extend } from "node-input-validator";
 import { IdType } from "@/shared.constants";
+import { LoginDto } from "@/services/interfaces/login.dto";
 
 export function getExtendedValidator() {
   extend("wsurl", ({ value, args }, validator) => {
@@ -35,10 +36,7 @@ export function getExtendedValidator() {
 
 export function getScopedPrinter(req: Request) {
   const tokens = [printerLoginToken, currentPrinterToken, printerIdToken];
-  let resolvedDependencies: Record<
-    string,
-    { [printerLoginToken]: IdType; [currentPrinterToken]: any; [printerIdToken]: IdType }
-  > = {};
+  let resolvedDependencies: { [printerLoginToken]: LoginDto; [currentPrinterToken]: any; [printerIdToken]: IdType } = {};
   let errors: any[] = [];
   tokens.forEach((t) => {
     try {

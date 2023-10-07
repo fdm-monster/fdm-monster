@@ -6,6 +6,8 @@ import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service"
 import { GithubService } from "@/services/core/github.service";
 import { PluginRepositoryCache } from "@/services/octoprint/plugin-repository.cache";
 import { ILoggerFactory } from "@/handlers/logger-factory";
+import { LoginDto } from "../interfaces/login.dto";
+import { IdType } from "@/shared.constants";
 
 const config = {
   pluginName: "firmwareupdater",
@@ -88,7 +90,7 @@ export class PluginFirmwareUpdateService extends PluginBaseService {
     }
   }
 
-  async getPrinterFirmwareVersion(printerLogin) {
+  async getPrinterFirmwareVersion(printerLogin: LoginDto) {
     const response = await this.octoPrintApiService.getSystemInfo(printerLogin);
     const systemInfo = response.systeminfo;
 
@@ -112,15 +114,15 @@ export class PluginFirmwareUpdateService extends PluginBaseService {
     return firmware;
   }
 
-  async getPluginFirmwareStatus(printerLogin) {
+  async getPluginFirmwareStatus(printerLogin: LoginDto) {
     return await this.octoPrintApiService.getPluginFirmwareUpdateStatus(printerLogin);
   }
 
-  async configureFirmwareUpdaterSettings(printerLogin) {
+  async configureFirmwareUpdaterSettings(printerLogin: LoginDto) {
     return await this.octoPrintApiService.updateFirmwareUpdaterSettings(printerLogin, defaultFirmwareUpdaterSettings);
   }
 
-  async flashPrusaFirmware(currentPrinterId, printerLogin) {
+  async flashPrusaFirmware(currentPrinterId: IdType, printerLogin: LoginDto) {
     const latestHexFilePath = this.multerService.getNewestFile(firmwareDownloadPath);
     // todo setup BG task to track progress
     return await this.octoPrintApiService.postPluginFirmwareUpdateFlash(currentPrinterId, printerLogin, latestHexFilePath);
