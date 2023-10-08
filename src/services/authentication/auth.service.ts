@@ -128,6 +128,9 @@ export class AuthService implements IAuthService<MongoIdType> {
 
   async getValidRefreshToken(refreshToken: string, throwNotFoundError: boolean = true) {
     const userRefreshToken = await this.refreshTokenService.getRefreshToken(refreshToken, throwNotFoundError);
+    if (!userRefreshToken) {
+      return null;
+    }
     if (Date.now() > userRefreshToken.expiresAt) {
       await this.refreshTokenService.deleteRefreshTokenByUserId(userRefreshToken.userId.toString());
       throw new AuthenticationError("Refresh token expired, login required");
