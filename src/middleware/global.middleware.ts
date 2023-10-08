@@ -15,7 +15,12 @@ export const validateWizardCompleted = inject(
         return;
       }
 
-      const allowedPaths = ["/api/first-time-setup/complete", "/api/first-time-setup/validate", "/api/test"];
+      const allowedPaths = [
+        "/api/first-time-setup/complete",
+        "/api/first-time-setup/validate",
+        "/api/test",
+        "/api/auth/login-required",
+      ];
       if (allowedPaths.includes(req.path)) {
         next();
         return;
