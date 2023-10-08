@@ -1,4 +1,4 @@
-import { AppConstants } from "../../server.constants";
+import { AppConstants } from "@/server.constants";
 
 export const registerUserRules = {
   username: "required|string",
@@ -8,6 +8,7 @@ export const registerUserRules = {
   isDemoUser: "boolean",
   isRootUser: "boolean",
   "roles.*": "required|mongoId",
+  isVerified: "boolean",
 };
 
 export const newPasswordRules = {
