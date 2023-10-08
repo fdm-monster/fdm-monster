@@ -4,19 +4,10 @@ import { RefreshToken } from "@/models";
 import { v4 as uuidv4 } from "uuid";
 import { AppConstants } from "@/server.constants";
 import { SettingsStore } from "@/state/settings.store";
-import { IdType, MongoIdType } from "@/shared.constants";
+import { MongoIdType } from "@/shared.constants";
 import { IRefreshToken } from "@/models/Auth/RefreshToken";
 import { AuthenticationError } from "@/exceptions/runtime.exceptions";
-
-export interface IRefreshTokenService<KeyType = IdType> {
-  getRefreshToken(refreshToken: string, throwNotFoundError?: boolean): Promise<IRefreshToken | null>;
-  createRefreshTokenForUserId(userId: KeyType): Promise<string>;
-  updateRefreshTokenAttempts(refreshToken: string, refreshAttemptsUsed: number): Promise<void>;
-  deleteRefreshTokenByUserId(userId: MongoIdType): Promise<void>;
-  purgeOutdatedRefreshTokensByUserId(userId: MongoIdType): Promise<void>;
-  purgeAllOutdatedRefreshTokens(): Promise<void>;
-  deleteRefreshToken(refreshToken: string): Promise<void>;
-}
+import { IRefreshTokenService } from "@/services/authentication/refresh-token.service.interface";
 
 export class RefreshTokenService implements IRefreshTokenService<MongoIdType> {
   private settingsStore: SettingsStore;

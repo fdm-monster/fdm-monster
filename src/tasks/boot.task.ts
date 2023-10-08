@@ -1,4 +1,4 @@
-import mongoose, { connect } from "mongoose";
+import mongoose, { connect, syncIndexes } from "mongoose";
 import { fetchMongoDBConnectionString, runMigrations } from "@/server.env";
 import { DITokens } from "@/container.tokens";
 import { AppConstants } from "@/server.constants";
@@ -207,6 +207,7 @@ export class BootTask {
     await connect(fetchMongoDBConnectionString(), {
       serverSelectionTimeoutMS: 1500,
     });
+    await syncIndexes();
   }
 
   async migrateDatabase() {
