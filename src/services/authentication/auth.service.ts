@@ -5,9 +5,9 @@ import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IUserService } from "@/services/interfaces/user-service.interface";
 import { IJwtService } from "@/services/interfaces/jwt.service.interface";
-import { IRefreshTokenService } from "@/services/authentication/refresh-token.service";
 import { MongoIdType } from "@/shared.constants";
 import { IAuthService } from "@/services/interfaces/auth.service.interface";
+import { IRefreshTokenService } from "@/services/interfaces/refresh-token.service.interface";
 
 export class AuthService implements IAuthService<MongoIdType> {
   private logger: LoggerService;
