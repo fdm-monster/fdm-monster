@@ -136,7 +136,7 @@ export class BootTask {
       const loginRequired = this.configService.get(AppConstants.OVERRIDE_LOGIN_REQUIRED, null);
       if (loginRequired !== null) {
         this.logger.warn(`Setting login required due to ${AppConstants.OVERRIDE_LOGIN_REQUIRED}`);
-        await this.settingsStore.setLoginRequired(loginRequired);
+        await this.settingsStore.setLoginRequired(loginRequired === "true");
       }
     }
 
@@ -145,7 +145,7 @@ export class BootTask {
       const registrationEnabled = this.configService.get(AppConstants.OVERRIDE_REGISTRATION_ENABLED, null);
       if (registrationEnabled !== null) {
         this.logger.warn(`Setting registration enabled due to ${AppConstants.OVERRIDE_REGISTRATION_ENABLED}`);
-        await this.settingsStore.setRegistrationEnabled(registrationEnabled);
+        await this.settingsStore.setRegistrationEnabled(registrationEnabled === "true");
       }
     }
 
