@@ -1,6 +1,6 @@
 import { inject } from "awilix-express";
 import { serverSettingsKey } from "@/constants/server-settings.constants";
-import { AuthenticationError } from "@/exceptions/runtime.exceptions";
+import { AuthenticationError, ForbiddenError } from "@/exceptions/runtime.exceptions";
 import { NextFunction, Request, Response } from "express";
 
 export const validateWhitelistedIp = inject(
@@ -25,7 +25,7 @@ export const validateWhitelistedIp = inject(
 
         if (!subnextMatched) {
           logger.error("IP did not match whitelist filters", req.socket.remoteAddress);
-          throw new AuthenticationError("Bad IP: " + req.socket.remoteAddress);
+          throw new ForbiddenError("Bad IP: " + req.socket.remoteAddress);
         }
       }
 
