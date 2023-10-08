@@ -19,7 +19,6 @@ import { PluginRepositoryCache } from "@/services/octoprint/plugin-repository.ca
 import { ClientBundleService } from "@/services/core/client-bundle.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
-import { ROLES } from "@/constants/authorization.constants";
 
 export class BootTask {
   logger: LoggerService;
@@ -131,12 +130,14 @@ export class BootTask {
     if (isDemoMode) {
       this.logger.warn(`Starting in demo mode due to ${AppConstants.OVERRIDE_IS_DEMO_MODE}`);
       await this.createOrUpdateDemoAccount();
-    }
-
-    const loginRequired = this.configService.get(AppConstants.OVERRIDE_LOGIN_REQUIRED, null);
-    if (loginRequired !== null) {
-      this.logger.warn(`Setting login required due to ${AppConstants.OVERRIDE_LOGIN_REQUIRED}`);
-      await this.settingsStore.setLoginRequired(loginRequired);
+      this.logger.warn(`Setting login required due to ${AppConstants.OVERRIDE_IS_DEMO_MODE}`);
+      await this.settingsStore.setLoginRequired(true);
+    } else {
+      const loginRequired = this.configService.get(AppConstants.OVERRIDE_LOGIN_REQUIRED, null);
+      if (loginRequired !== null) {
+        this.logger.warn(`Setting login required due to ${AppConstants.OVERRIDE_LOGIN_REQUIRED}`);
+        await this.settingsStore.setLoginRequired(loginRequired === "true");
+      }
     }
 
     // If we are in demo mode, do not allow registration
@@ -144,7 +145,7 @@ export class BootTask {
       const registrationEnabled = this.configService.get(AppConstants.OVERRIDE_REGISTRATION_ENABLED, null);
       if (registrationEnabled !== null) {
         this.logger.warn(`Setting registration enabled due to ${AppConstants.OVERRIDE_REGISTRATION_ENABLED}`);
-        await this.settingsStore.setRegistrationEnabled(registrationEnabled);
+        await this.settingsStore.setRegistrationEnabled(registrationEnabled === "true");
       }
     }
 
