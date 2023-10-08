@@ -1,3 +1,5 @@
+import { isProductionEnvironment } from "@/utils/env.utils";
+
 export const serverSettingsUpdateRules = {
   registration: "boolean",
   loginRequired: "boolean",
@@ -14,7 +16,7 @@ export const frontendSettingsUpdateRules = {
 
 export const credentialSettingPatchRules = {
   jwtSecret: "string",
-  jwtExpiresIn: "integer|min:120",
+  jwtExpiresIn: isProductionEnvironment() ? "integer|min:120" : "integer|min:0",
   refreshTokenAttempts: "integer|min:-1",
   refreshTokenExpiry: "integer|min:0",
 };
