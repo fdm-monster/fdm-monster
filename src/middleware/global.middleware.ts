@@ -1,14 +1,37 @@
 import { inject } from "awilix-express";
 import { serverSettingsKey } from "@/constants/server-settings.constants";
-import { AuthenticationError, ForbiddenError } from "@/exceptions/runtime.exceptions";
+import { ForbiddenError } from "@/exceptions/runtime.exceptions";
 import { NextFunction, Request, Response } from "express";
+import { SettingsStore } from "@/state/settings.store";
+import { ILoggerFactory } from "@/handlers/logger-factory";
+
+export const validateWizardCompleted = inject(
+  ({ settingsStore, loggerFactory }: { settingsStore: SettingsStore; loggerFactory: ILoggerFactory }) =>
+    async (req: Request, res: Response, next: NextFunction) => {
+      const logger = loggerFactory(validateWhitelistedIp.name);
+      const serverSettings = settingsStore.getSettings();
+      if (!!settingsStore.getWizardSettings()?.wizardCompleted) {
+        next();
+        return;
+      }
+
+      const allowedPaths = ["/api/first-time-setup/complete", "/api/first-time-setup/validate", "/api/test"];
+      if (allowedPaths.includes(req.path)) {
+        next();
+        return;
+      } else {
+        logger.error("Wizard not completed", req.path);
+        throw new ForbiddenError("Wizard not completed");
+      }
+    }
+);
 
 export const validateWhitelistedIp = inject(
-  ({ settingsStore, loggerFactory }) =>
+  ({ settingsStore, loggerFactory }: { settingsStore: SettingsStore; loggerFactory: ILoggerFactory }) =>
     async (req: Request, res: Response, next: NextFunction) => {
-      const logger = loggerFactory("validateWhitelistedIp");
+      const logger = loggerFactory(validateWhitelistedIp.name);
       const serverSettings = settingsStore.getSettings();
-      if ((!serverSettings && !serverSettings[serverSettingsKey]) || !serverSettings[serverSettingsKey]?.whitelistEnabled) {
+      if ((!serverSettings && !settingsStore.getServerSettings()) || !settingsStore.getServerSettings()?.whitelistEnabled) {
         next();
         return;
       }

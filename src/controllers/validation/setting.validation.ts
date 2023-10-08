@@ -3,5 +3,5 @@ export const wizardSettingsRules = {
   loginRequired: "required|boolean",
   registration: "required|boolean",
   rootUsername: "required|string",
-  rootPassword: "required|string",
+  rootPassword: "required|string|minLength:8",
 };
