@@ -38,4 +38,3 @@ const RefreshTokenSchema = new Schema<IRefreshToken>({
 });
 
 export const RefreshToken = model("RefreshToken", RefreshTokenSchema);
-RefreshToken.syncIndexes();
