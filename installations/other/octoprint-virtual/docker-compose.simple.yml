@@ -12,7 +12,7 @@ services:
       - ./op0:/octoprint
   # MQTT plugin works
   octoprint2:
-    image: octoprint/octoprint:1.9.2
+    image: octoprint/octoprint:1.9.3
     container_name: op1
     privileged: true
     restart: unless-stopped
