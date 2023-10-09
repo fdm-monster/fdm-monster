@@ -5691,19 +5691,19 @@ mpath@0.9.0:
   resolved "https://registry.yarnpkg.com/mpath/-/mpath-0.9.0.tgz#0c122fe107846e31fc58c75b09c35514b3871904"
   integrity sha512-ikJRQTk8hw5DEoFVxHG1Gn9T/xcjtdnOKIU1JTmGjZZlg9LST2mBLmcX3/ICIbgJydT2GOc15RnNy5mHmzfSew==
 
-mqtt-packet@^8.2.0:
-  version "8.2.0"
-  resolved "https://registry.yarnpkg.com/mqtt-packet/-/mqtt-packet-8.2.0.tgz#07cfdf72771f2c17c5689183162d1e4ad613438f"
-  integrity sha512-21Vo7XdRXUw2qhdTfk8GeOl2jtb8Dkwd4dKxn/epvf37mxTxHodvBJoozTPZGVwh57JXlsh2ChsaxMsAfqxp+A==
+mqtt-packet@^8.2.1:
+  version "8.2.1"
+  resolved "https://registry.yarnpkg.com/mqtt-packet/-/mqtt-packet-8.2.1.tgz#f0875df12be5af3fdd994a81b104570bd45fc7c7"
+  integrity sha512-vrHHjwhmuxzQIe3fJWoOLQHF4H5FETUrQGYD5g1qGfEmpjkQUkPONfygA0cI8Wtb3IUCfu66WmZiVSCgGm8oUw==
   dependencies:
     bl "^5.0.0"
     debug "^4.1.1"
     process-nextick-args "^2.0.1"
 
-mqtt@5.1.0:
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/mqtt/-/mqtt-5.1.0.tgz#bf2bf359678cfb47791f2424f41a95e09ebfc9db"
-  integrity sha512-diOpTxlECz1/ld6NNN2T7ZlNqNwGCo8KfROyXMeBX/ZMULdAo6VvWUDXY8Esh5DhMWR/wM+lfSYXv4OHJ8MUiw==
+mqtt@5.1.1:
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/mqtt/-/mqtt-5.1.1.tgz#af8c4a93db74cc1ad75f9d51e3eccf33fac667fa"
+  integrity sha512-zxweJazp2zwGbGE/YaSjSvDDFozGhkKPQHqqsOyPb6gsMtXhBNzVKVNajKM2TdIPkV2PUl9vPQkGqwJ6+WRwUw==
   dependencies:
     "@types/readable-stream" "^4.0.1"
     "@types/ws" "^8.5.5"
@@ -5714,7 +5714,7 @@ mqtt@5.1.0:
     help-me "^4.2.0"
     lru-cache "^7.18.3"
     minimist "^1.2.8"
-    mqtt-packet "^8.2.0"
+    mqtt-packet "^8.2.1"
     number-allocator "^1.0.14"
     readable-stream "^4.4.2"
     reinterval "^1.1.0"
