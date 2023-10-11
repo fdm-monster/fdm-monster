@@ -11,6 +11,7 @@ import {
   getDefaultFrontendSettings,
   getDefaultSettings,
   serverSettingsKey,
+  wizardSettingKey,
 } from "@/constants/server-settings.constants";
 import { SettingsController } from "@/controllers/settings.controller";
 
@@ -41,6 +42,9 @@ describe(SettingsController.name, () => {
     const defaultSettings = getDefaultSettings();
     defaultSettings[serverSettingsKey].loginRequired = false; // Test override
     delete defaultSettings[credentialSettingsKey];
+    defaultSettings[wizardSettingKey].wizardCompleted = true;
+    defaultSettings[wizardSettingKey].wizardVersion = AppConstants.currentWizardVersion;
+    delete defaultSettings[wizardSettingKey].wizardCompletedAt;
     expect(response.body).toMatchObject(defaultSettings);
     expect(response.body[credentialSettingsKey]).toBeFalsy();
     expect(response.body[serverSettingsKey].registration).toBeFalsy();

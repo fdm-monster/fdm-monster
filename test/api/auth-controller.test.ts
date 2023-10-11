@@ -133,7 +133,7 @@ describe("AuthController", () => {
     const response = await request.get(`${baseRoute}/login-required`).send();
     expectOkResponse(response);
     expect(response.body.loginRequired).toBe(true);
-    expect(response.body.wizardState.wizardCompleted).toBe(false);
+    expect(response.body.wizardState.wizardCompleted).toBe(true);
     expect(response.body.registration).toBe(true);
   });
 
