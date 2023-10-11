@@ -32,7 +32,8 @@ export class SettingsStore {
   }
 
   getSettings() {
-    const settings = this.settings!;
+    const settings = this.settings;
+    if (!settings) throw new InternalServerException("Could not check server settings (server settings not loaded");
     return Object.freeze({
       // Credential settings are not shared with the client
       [serverSettingsKey]: settings[serverSettingsKey],

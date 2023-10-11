@@ -12,6 +12,13 @@ export class AuthenticationError extends Error {
   }
 }
 
+export class ForbiddenError extends Error {
+  constructor(error?: string) {
+    super(error);
+    this.name = ForbiddenError.name;
+  }
+}
+
 export class PasswordChangeRequiredError extends Error {
   constructor() {
     super("Password change required");
