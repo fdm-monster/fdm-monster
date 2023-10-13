@@ -83,6 +83,11 @@ export class SettingsController {
     res.send(result);
   }
 
+  async updateCredentialSettings(req: Request, res: Response) {
+    await this.settingsStore.updateCredentialSettings(req.body);
+    res.send();
+  }
+
   async updateFileCleanSettings(req: Request, res: Response) {
     const result = await this.settingsStore.patchFileCleanSettings(req.body);
     res.send(result);
@@ -104,6 +109,7 @@ export default createController(SettingsController)
     .put("/server", "updateServerSettings", { before: [authorizeRoles([ROLES.ADMIN])] })
     .put("/login-required", "updateLoginRequiredSettings", { before: [authorizeRoles([ROLES.ADMIN])] })
     .put("/registration-enabled", "updateRegistrationEnabledSettings", { before: [authorizeRoles([ROLES.ADMIN])] })
+    .put("/credential", "updateCredentialSettings", { before: [authorizeRoles([ROLES.ADMIN])] })
     .put("/file-clean", "updateFileCleanSettings", { before: [authorizeRoles([ROLES.ADMIN])] })
     .put("/whitelist", "updateWhitelistSettings", { before: [authorizeRoles([ROLES.ADMIN])] })
     .put("/frontend", "updateFrontendSettings", { before: [authorizeRoles([ROLES.ADMIN])] })
