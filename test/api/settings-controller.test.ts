@@ -18,6 +18,7 @@ import { SettingsController } from "@/controllers/settings.controller";
 let request: supertest.SuperTest<supertest.Test>;
 
 const defaultRoute = `${AppConstants.apiRoute}/settings`;
+const sensitiveSettingsRoute = `${defaultRoute}/sensitive`;
 const serverSettingsRoute = `${defaultRoute}/server`;
 const frontendSettingsRoute = `${defaultRoute}/frontend`;
 const fileCleanSettingsRoute = `${defaultRoute}/file-clean`;
@@ -41,15 +42,25 @@ describe(SettingsController.name, () => {
     expect(response.body).not.toBeNull();
     const defaultSettings = getDefaultSettings();
     defaultSettings[serverSettingsKey].loginRequired = false; // Test override
+    delete defaultSettings[serverSettingsKey].whitelistEnabled;
+    delete defaultSettings[serverSettingsKey].whitelistedIpAddresses;
+    delete defaultSettings[serverSettingsKey].debugSettings;
     delete defaultSettings[credentialSettingsKey];
     defaultSettings[wizardSettingKey].wizardCompleted = true;
     defaultSettings[wizardSettingKey].wizardVersion = AppConstants.currentWizardVersion;
     delete defaultSettings[wizardSettingKey].wizardCompletedAt;
     expect(response.body).toMatchObject(defaultSettings);
     expect(response.body[credentialSettingsKey]).toBeFalsy();
-    expect(response.body[serverSettingsKey].registration).toBeFalsy();
+    expect(response.body[serverSettingsKey].loginRequired).toBe(false);
+    expect(response.body[serverSettingsKey].registration).toBe(false);
     expect(response.body[frontendSettingKey]).toMatchObject(getDefaultFrontendSettings());
     expect(response.body[fileCleanSettingKey]).toMatchObject(getDefaultFileCleanSettings());
+    expectOkResponse(response);
+  });
+
+  it("should OK on GET sensitive settings", async () => {
+    const response = await request.get(sensitiveSettingsRoute).send();
+    expect(response.body).not.toBeNull();
     expectOkResponse(response);
   });
 
@@ -73,8 +84,10 @@ describe(SettingsController.name, () => {
       whitelistEnabled: true,
       whitelistedIpAddresses: ["127.0.0", "192.178.168"],
     });
-    expect(response.body).not.toBeNull();
-    expect(response.body).toMatchObject({
+    expect(response.body).toStrictEqual({});
+
+    const sensitiveSettings = await request.get(sensitiveSettingsRoute).send();
+    expect(sensitiveSettings.body).toMatchObject({
       [serverSettingsKey]: {
         whitelistEnabled: true,
         whitelistedIpAddresses: ["127.0.0", "192.178.168", "127.0.0.1"],

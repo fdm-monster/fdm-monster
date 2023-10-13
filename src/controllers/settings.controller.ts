@@ -57,8 +57,8 @@ export class SettingsController {
     if (!whitelistedIpAddresses.includes("127.0.0.1")) {
       whitelistedIpAddresses.push("127.0.0.1");
     }
-    const result = await this.settingsStore.setWhitelist(whitelistEnabled, whitelistedIpAddresses);
-    res.send(result);
+    await this.settingsStore.setWhitelist(whitelistEnabled, whitelistedIpAddresses);
+    res.send();
   }
 
   async updateFrontendSettings(req: Request, res: Response) {

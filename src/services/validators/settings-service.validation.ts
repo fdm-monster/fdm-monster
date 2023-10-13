@@ -6,8 +6,9 @@ export const serverSettingsUpdateRules = (whitelistFeatureEnabled: boolean) => (
   debugSettings: "object",
   "debugSettings.debugSocketEvents": "boolean",
   "debugSettings.debugSocketReconnect": "boolean",
-  whitelistEnabled: whitelistFeatureEnabled ? "required|boolean" : "not",
-  whitelistedIpAddresses: whitelistFeatureEnabled ? "required|array|minLength:1" : "not",
+  whitelistEnabled: whitelistFeatureEnabled ? "boolean" : "not",
+  whitelistedIpAddresses: whitelistFeatureEnabled ? "array|minLength:1" : "not",
+  "whitelistedIpAddresses.*": whitelistFeatureEnabled ? "required|string" : "not",
 });
 
 export const timeoutSettingsUpdateRules = {
