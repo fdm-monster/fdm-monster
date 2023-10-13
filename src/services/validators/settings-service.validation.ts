@@ -1,12 +1,14 @@
 import { isProductionEnvironment } from "@/utils/env.utils";
 
-export const serverSettingsUpdateRules = {
+export const serverSettingsUpdateRules = (whitelistFeatureEnabled: boolean) => ({
   registration: "boolean",
   loginRequired: "boolean",
   debugSettings: "object",
   "debugSettings.debugSocketEvents": "boolean",
   "debugSettings.debugSocketReconnect": "boolean",
-};
+  whitelistEnabled: whitelistFeatureEnabled ? "required|boolean" : "not",
+  whitelistedIpAddresses: whitelistFeatureEnabled ? "required|array|minLength:1" : "not",
+});
 
 export const timeoutSettingsUpdateRules = {
   apiTimeout: "integer|min:1000",

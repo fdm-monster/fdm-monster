@@ -37,8 +37,16 @@ import {
 } from "@/models/Settings";
 import { SettingsDto } from "@/services/interfaces/settings.dto";
 import { MongoIdType } from "@/shared.constants";
+import { AppConstants } from "@/server.constants";
+import { ConfigService } from "@/services/core/config.service";
+import { BadRequestException } from "@/exceptions/runtime.exceptions";
 
 export class SettingsService implements ISettingsService<MongoIdType, ISettings> {
+  configService: ConfigService;
+  constructor({ configService }: { configService: ConfigService }) {
+    this.configService = configService;
+  }
+
   toDto(entity: ISettings): SettingsDto<MongoIdType> {
     return {
       // Credential settings are not shared with the client
@@ -88,7 +96,10 @@ export class SettingsService implements ISettingsService<MongoIdType, ISettings>
     if (!doc[credentialSettingsKey]) {
       doc[credentialSettingsKey] = getDefaultCredentialSettings();
     }
-    if (!doc.server.whitelistedIpAddresses?.length) {
+    if (!this.isWhiteListSettingEnabled()) {
+      doc.server.whitelistEnabled = false;
+      doc.server.whitelistedIpAddresses = getDefaultWhitelistIpAddresses();
+    } else if (!doc.server.whitelistedIpAddresses?.length) {
       doc.server.whitelistedIpAddresses = getDefaultWhitelistIpAddresses();
     }
     if (!doc[frontendSettingKey]) {
@@ -146,6 +157,10 @@ export class SettingsService implements ISettingsService<MongoIdType, ISettings>
   }
 
   async setWhitelist(enabled: boolean, ipAddresses: string[]) {
+    if (!this.isWhiteListSettingEnabled()) {
+      throw new BadRequestException("Whitelist settings are not enabled");
+    }
+
     await validateInput(
       {
         enabled,
@@ -185,7 +200,7 @@ export class SettingsService implements ISettingsService<MongoIdType, ISettings>
   }
 
   async patchServerSettings(patchUpdate: Partial<IServerSettings>) {
-    const validatedInput = await validateInput(patchUpdate, serverSettingsUpdateRules);
+    const validatedInput = await validateInput(patchUpdate, serverSettingsUpdateRules(this.isWhiteListSettingEnabled()));
 
     const settingsDoc = await this.getOrCreate();
     const serverSettings = settingsDoc[serverSettingsKey];
@@ -204,5 +219,9 @@ export class SettingsService implements ISettingsService<MongoIdType, ISettings>
     return Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
       new: true,
     });
+  }
+
+  isWhiteListSettingEnabled() {
+    return this.configService.get(AppConstants.ENABLE_EXPERIMENTAL_WHITELIST_SETTINGS, "false") === "true";
   }
 }
