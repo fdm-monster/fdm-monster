@@ -72,7 +72,7 @@ export const AppConstants = {
   influxBucket: "INFLUX_BUCKET",
 
   // Websocket values
-  defaultWebsocketHandshakeTimeout: 2000,
+  defaultWebsocketHandshakeTimeout: 3000,
   defaultSocketThrottleRate: 1,
   debugSocketStatesKey: "DEBUG_SOCKET_STATES",
   defaultDebugSocketStates: "false",

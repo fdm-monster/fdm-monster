@@ -79,6 +79,9 @@ export class TestPrinterSocketStore {
     const promise = new Promise(async (resolve, reject) => {
       this.testSocket.open();
       for await (const startTime of setInterval(100)) {
+        if (!this.testSocket) {
+          return;
+        }
         if (this.testSocket.socketState === SOCKET_STATE.authenticated) {
           resolve();
           break;
