@@ -52,6 +52,7 @@ export const AppConstants = {
   OVERRIDE_DEMO_ROLE: "OVERRIDE_DEMO_ROLE",
   DEFAULT_DEMO_ROLE: "ADMIN",
 
+  defaultDevelopmentEnv: "development",
   defaultTestEnv: "test",
   defaultProductionEnv: "production",
   knownEnvNames: ["development", "production", "test"],
