@@ -34,7 +34,7 @@ export const AppConstants = {
   // Number
   DEFAULT_REFRESH_TOKEN_ATTEMPTS: -1, // 50 attempts, 50 hours
   // Number, Milli-seconds
-  DEFAULT_REFRESH_TOKEN_EXPIRY: 1000 * 60 * 60 * 24 * 14, // 14 days (in ms)
+  DEFAULT_REFRESH_TOKEN_EXPIRY: 60 * 60 * 24 * 14, // 14 days (in ms)
   // String, not persisted
   OVERRIDE_JWT_ISSUER: "OVERRIDE_JWT_ISSUER",
   DEFAULT_JWT_ISSUER: "fdm-monster-server",

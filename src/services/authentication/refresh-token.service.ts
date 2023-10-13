@@ -34,14 +34,14 @@ export class RefreshTokenService implements IRefreshTokenService<MongoIdType> {
     const { refreshTokenExpiry } = await this.settingsStore.getCredentialSettings();
     const refreshToken = uuidv4();
 
+    const timespan = refreshTokenExpiry ?? AppConstants.DEFAULT_REFRESH_TOKEN_EXPIRY;
     if (!refreshTokenExpiry) {
-      this.logger.warn("Refresh token expiry not set in Settings:credentials, using default");
+      this.logger.warn(`Refresh token expiry not set in Settings:credentials, using default ${timespan} seconds}`);
     }
 
-    const timespan = refreshTokenExpiry ?? AppConstants.DEFAULT_REFRESH_TOKEN_EXPIRY;
     await RefreshToken.create({
       userId,
-      expiresAt: Date.now() + timespan,
+      expiresAt: Date.now() + timespan * 1000,
       refreshToken,
       refreshAttemptsUsed: 0,
     });
