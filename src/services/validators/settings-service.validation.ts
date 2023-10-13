@@ -23,7 +23,7 @@ export const frontendSettingsUpdateRules = {
 
 export const credentialSettingPatchRules = {
   jwtSecret: "string",
-  jwtExpiresIn: isProductionEnvironment() ? "integer|min:120" : "integer|min:0",
+  jwtExpiresIn: isProductionEnvironment() ? "integer|min:120|max:7200" : "integer|min:0",
   refreshTokenAttempts: "integer|min:-1",
   refreshTokenExpiry: isProductionEnvironment() ? "integer|min:240" : "integer|min:0",
 };
