@@ -19,6 +19,7 @@ let request: supertest.SuperTest<supertest.Test>;
 
 const defaultRoute = `${AppConstants.apiRoute}/settings`;
 const sensitiveSettingsRoute = `${defaultRoute}/sensitive`;
+const credentialSettingsRoute = `${defaultRoute}/credential`;
 const serverSettingsRoute = `${defaultRoute}/server`;
 const frontendSettingsRoute = `${defaultRoute}/frontend`;
 const fileCleanSettingsRoute = `${defaultRoute}/file-clean`;
@@ -120,6 +121,39 @@ describe(SettingsController.name, () => {
     expect(response.body).not.toBeNull();
     expect(response.body).toMatchObject({
       [fileCleanSettingKey]: newFileCleanSettings,
+    });
+    expectOkResponse(response);
+  });
+
+  it("should OK on PUT credentials settings", async () => {
+    const newCredentialsSettings = {
+      jwtExpiresIn: 120,
+      refreshTokenAttempts: -1,
+      refreshTokenExpiry: 3600,
+    };
+
+    const response = await request.put(credentialSettingsRoute).send(newCredentialsSettings);
+    expect(response.body).toStrictEqual({});
+    expectOkResponse(response);
+  });
+
+  it("should OK on PUT login-required", async () => {
+    const response = await request.put(`${defaultRoute}/login-required`).send({
+      loginRequired: false,
+    });
+    expectOkResponse(response);
+  });
+
+  it("should OK on PUT registration-enabled", async () => {
+    const response = await request.put(`${defaultRoute}/registration-enabled`).send({
+      registrationEnabled: true,
+    });
+    expectOkResponse(response);
+  });
+
+  it("should OK on PUT timeout", async () => {
+    const response = await request.put(`${defaultRoute}/timeout`).send({
+      apiTimeout: 1000,
     });
     expectOkResponse(response);
   });

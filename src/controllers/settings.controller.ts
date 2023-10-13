@@ -73,13 +73,13 @@ export class SettingsController {
   }
 
   async updateLoginRequiredSettings(req: Request, res: Response) {
-    const { loginRequired } = await validateInput(req.body, { loginRequired: "boolean" });
+    const { loginRequired } = await validateInput(req.body, { loginRequired: "required|boolean" });
     const result = await this.settingsStore.setLoginRequired(loginRequired);
     res.send(result);
   }
 
   async updateRegistrationEnabledSettings(req: Request, res: Response) {
-    const { registrationEnabled } = await validateInput(req.body, { registrationEnabled: "boolean" });
+    const { registrationEnabled } = await validateInput(req.body, { registrationEnabled: "required|boolean" });
     const result = await this.settingsStore.setRegistrationEnabled(registrationEnabled);
     res.send(result);
   }

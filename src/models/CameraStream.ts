@@ -2,6 +2,7 @@ import { model, Schema, Types } from "mongoose";
 
 export interface ICameraStream {
   id: string;
+  name?: string;
   streamURL: string;
   printerId?: Types.ObjectId;
   settings: {
@@ -17,6 +18,10 @@ const CameraStreamSchema = new Schema<ICameraStream>({
     type: String,
     unique: true,
     required: true,
+  },
+  name: {
+    type: String,
+    required: false,
   },
   printerId: {
     type: Schema.Types.ObjectId,
@@ -50,7 +55,7 @@ const CameraStreamSchema = new Schema<ICameraStream>({
         default: false,
       },
     },
-    required: true,
+    required: false,
   },
 });
 
