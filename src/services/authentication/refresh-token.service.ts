@@ -4,19 +4,10 @@ import { RefreshToken } from "@/models";
 import { v4 as uuidv4 } from "uuid";
 import { AppConstants } from "@/server.constants";
 import { SettingsStore } from "@/state/settings.store";
-import { IdType, MongoIdType } from "@/shared.constants";
+import { MongoIdType } from "@/shared.constants";
 import { IRefreshToken } from "@/models/Auth/RefreshToken";
 import { AuthenticationError } from "@/exceptions/runtime.exceptions";
-
-export interface IRefreshTokenService<KeyType = IdType> {
-  getRefreshToken(refreshToken: string, throwNotFoundError?: boolean): Promise<IRefreshToken | null>;
-  createRefreshTokenForUserId(userId: KeyType): Promise<string>;
-  updateRefreshTokenAttempts(refreshToken: string, refreshAttemptsUsed: number): Promise<void>;
-  deleteRefreshTokenByUserId(userId: MongoIdType): Promise<void>;
-  purgeOutdatedRefreshTokensByUserId(userId: MongoIdType): Promise<void>;
-  purgeAllOutdatedRefreshTokens(): Promise<void>;
-  deleteRefreshToken(refreshToken: string): Promise<void>;
-}
+import { IRefreshTokenService } from "@/services/interfaces/refresh-token.service.interface";
 
 export class RefreshTokenService implements IRefreshTokenService<MongoIdType> {
   private settingsStore: SettingsStore;
@@ -43,14 +34,14 @@ export class RefreshTokenService implements IRefreshTokenService<MongoIdType> {
     const { refreshTokenExpiry } = await this.settingsStore.getCredentialSettings();
     const refreshToken = uuidv4();
 
+    const timespan = refreshTokenExpiry ?? AppConstants.DEFAULT_REFRESH_TOKEN_EXPIRY;
     if (!refreshTokenExpiry) {
-      this.logger.warn("Refresh token expiry not set in Settings:credentials, using default");
+      this.logger.warn(`Refresh token expiry not set in Settings:credentials, using default ${timespan} seconds}`);
     }
 
-    const timespan = refreshTokenExpiry ?? AppConstants.DEFAULT_REFRESH_TOKEN_EXPIRY;
     await RefreshToken.create({
       userId,
-      expiresAt: Date.now() + timespan,
+      expiresAt: Date.now() + timespan * 1000,
       refreshToken,
       refreshAttemptsUsed: 0,
     });

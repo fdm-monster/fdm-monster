@@ -1,7 +1,11 @@
+import { AppConstants } from "@/server.constants";
+
 export interface IConfigService {
   get(key: string, defaultValue?: string): string | undefined;
 
   getOrThrow(key: string): void;
+
+  isDemoMode(): boolean;
 }
 
 export class ConfigService implements IConfigService {
@@ -17,5 +21,9 @@ export class ConfigService implements IConfigService {
     if (!val) {
       throw Error(`Environment variable with key ${key} was not defined.`);
     }
+  }
+
+  isDemoMode() {
+    return this.get(AppConstants.OVERRIDE_IS_DEMO_MODE, "false") === "true";
   }
 }

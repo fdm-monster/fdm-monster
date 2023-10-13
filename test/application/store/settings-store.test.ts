@@ -38,6 +38,6 @@ describe(SettingsStore.name, () => {
     await settingsStore.persistOptionalCredentialSettings("123123123", "123d");
     const creds = await settingsStore.getCredentialSettings();
     expect(creds.jwtExpiresIn).toBe(123);
-    expect(creds.refreshTokenAttempts).toBe(50);
+    expect(creds.refreshTokenAttempts).toBe(-1);
   });
 });

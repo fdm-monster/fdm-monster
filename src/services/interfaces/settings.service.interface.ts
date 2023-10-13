@@ -1,26 +1,31 @@
 import { ICredentialSettings, IFrontendSettings, IServerSettings, ISettings, IWizardSettings } from "@/models/Settings";
-import { FileCleanSettingsDto } from "@/services/interfaces/settings.dto";
+import { FileCleanSettingsDto, SettingsDto, TimeoutSettingsDto } from "@/services/interfaces/settings.dto";
+import { IdType } from "@/shared.constants";
 
-export interface ISettingsService {
-  getOrCreate(): Promise<ISettings>;
+export interface ISettingsService<KeyType = IdType, Entity = ISettings> {
+  toDto(entity: Entity): SettingsDto<KeyType>;
 
-  migrateSettingsRuntime(knownSettings: Partial<ISettings>): any;
+  getOrCreate(): Promise<Entity>;
 
-  setSentryDiagnosticsEnabled(enabled: boolean): Promise<ISettings>;
+  migrateSettingsRuntime(knownSettings: Partial<Entity>): any;
 
-  patchFileCleanSettings(fileClean: Partial<FileCleanSettingsDto>): Promise<ISettings>;
+  setSentryDiagnosticsEnabled(enabled: boolean): Promise<Entity>;
 
-  patchWizardSettings(patch: Partial<IWizardSettings>): Promise<ISettings>;
+  patchFileCleanSettings(fileClean: Partial<FileCleanSettingsDto>): Promise<Entity>;
 
-  setRegistrationEnabled(enabled: boolean): Promise<ISettings>;
+  patchWizardSettings(patch: Partial<IWizardSettings>): Promise<Entity>;
 
-  setLoginRequired(enabled: boolean): Promise<ISettings>;
+  setRegistrationEnabled(enabled: boolean): Promise<Entity>;
 
-  setWhitelist(enabled: boolean, ipAddresses: string[]): Promise<ISettings>;
+  setLoginRequired(enabled: boolean): Promise<Entity>;
 
-  updateFrontendSettings(patchUpdate: IFrontendSettings): Promise<ISettings>;
+  setWhitelist(enabled: boolean, ipAddresses: string[]): Promise<Entity>;
 
-  patchCredentialSettings(patchUpdate: Partial<ICredentialSettings>): Promise<ISettings>;
+  updateFrontendSettings(patchUpdate: IFrontendSettings): Promise<Entity>;
 
-  patchServerSettings(patchUpdate: Partial<IServerSettings>): Promise<ISettings>;
+  patchCredentialSettings(patchUpdate: Partial<ICredentialSettings>): Promise<Entity>;
+
+  patchServerSettings(patchUpdate: Partial<IServerSettings>): Promise<Entity>;
+
+  updateTimeoutSettings(patchUpdate: TimeoutSettingsDto): Promise<Entity>;
 }

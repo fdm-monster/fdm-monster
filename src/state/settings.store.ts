@@ -18,6 +18,7 @@ import {
   FileCleanSettingsDto,
   FrontendSettingsDto,
   ServerSettingsDto,
+  TimeoutSettingsDto,
 } from "@/services/interfaces/settings.dto";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 
@@ -32,14 +33,36 @@ export class SettingsStore {
   }
 
   getSettings() {
-    const settings = this.settings!;
+    const settings = this.settings;
+    if (!settings) throw new InternalServerException("Could not check server settings (server settings not loaded");
     return Object.freeze({
       // Credential settings are not shared with the client
-      [serverSettingsKey]: settings[serverSettingsKey],
+      [serverSettingsKey]: {
+        loginRequired: settings[serverSettingsKey].loginRequired,
+        registration: settings[serverSettingsKey].registration,
+        sentryDiagnosticsEnabled: settings[serverSettingsKey].sentryDiagnosticsEnabled,
+      },
       [wizardSettingKey]: settings[wizardSettingKey],
       [frontendSettingKey]: settings[frontendSettingKey],
       [fileCleanSettingKey]: settings[fileCleanSettingKey],
       [timeoutSettingKey]: settings[timeoutSettingKey],
+    });
+  }
+
+  getSettingsSensitive() {
+    const settings = this.settings;
+    if (!settings) throw new InternalServerException("Could not check server settings (server settings not loaded");
+    return Object.freeze({
+      [credentialSettingsKey]: {
+        jwtExpiresIn: settings[credentialSettingsKey].jwtExpiresIn,
+        refreshTokenAttempts: settings[credentialSettingsKey].refreshTokenAttempts,
+        refreshTokenExpiry: settings[credentialSettingsKey].refreshTokenExpiry,
+      },
+      [serverSettingsKey]: {
+        debugSettings: settings[serverSettingsKey].debugSettings,
+        whitelistEnabled: settings[serverSettingsKey].whitelistEnabled,
+        whitelistedIpAddresses: settings[serverSettingsKey].whitelistedIpAddresses,
+      },
     });
   }
 
@@ -102,9 +125,6 @@ export class SettingsStore {
     return this.getSettings()[frontendSettingKey];
   }
 
-  /**
-   * Cross-cutting concern for file clean operation
-   */
   getFileCleanSettings() {
     return this.getSettings()[fileCleanSettingKey];
   }
@@ -150,6 +170,11 @@ export class SettingsStore {
 
   async updateServerSettings(serverSettings: Partial<ServerSettingsDto>) {
     this.settings = await this.settingsService.patchServerSettings(serverSettings);
+    return this.getSettings();
+  }
+
+  async updateTimeoutSettings(timeoutSettings: TimeoutSettingsDto) {
+    this.settings = await this.settingsService.updateTimeoutSettings(timeoutSettings);
     return this.getSettings();
   }
 

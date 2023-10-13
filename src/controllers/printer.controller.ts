@@ -31,11 +31,12 @@ import { FloorStore } from "@/state/floor.store";
 import { MulterService } from "@/services/core/multer.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { Request, Response } from "express";
+import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 
 export class PrinterController {
   printerSocketStore: PrinterSocketStore;
   testPrinterSocketStore: TestPrinterSocketStore;
-  printerService: PrinterService;
+  printerService: IPrinterService;
   printerCache: PrinterCache;
   printerEventsCache: PrinterEventsCache;
   taskManagerService: TaskManagerService;
@@ -60,7 +61,7 @@ export class PrinterController {
   }: {
     printerSocketStore: PrinterSocketStore;
     testPrinterSocketStore: TestPrinterSocketStore;
-    printerService: PrinterService;
+    printerService: IPrinterService;
     printerCache: PrinterCache;
     printerEventsCache: PrinterEventsCache;
     taskManagerService: TaskManagerService;

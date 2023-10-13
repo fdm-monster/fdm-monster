@@ -17,7 +17,7 @@ beforeAll(async () => {
   serverHost = container.resolve(DITokens.serverHost);
 });
 
-describe("ServerHost", () => {
+describe(ServerHost.name, () => {
   it("should be connected to mongo", () => {
     expect(serverHost.hasConnected()).toBeTruthy();
   });

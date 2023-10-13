@@ -5,9 +5,9 @@ import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IUserService } from "@/services/interfaces/user-service.interface";
 import { IJwtService } from "@/services/interfaces/jwt.service.interface";
-import { IRefreshTokenService } from "@/services/authentication/refresh-token.service";
 import { MongoIdType } from "@/shared.constants";
 import { IAuthService } from "@/services/interfaces/auth.service.interface";
+import { IRefreshTokenService } from "@/services/interfaces/refresh-token.service.interface";
 
 export class AuthService implements IAuthService<MongoIdType> {
   private logger: LoggerService;
@@ -128,6 +128,9 @@ export class AuthService implements IAuthService<MongoIdType> {
 
   async getValidRefreshToken(refreshToken: string, throwNotFoundError: boolean = true) {
     const userRefreshToken = await this.refreshTokenService.getRefreshToken(refreshToken, throwNotFoundError);
+    if (!userRefreshToken) {
+      return null;
+    }
     if (Date.now() > userRefreshToken.expiresAt) {
       await this.refreshTokenService.deleteRefreshTokenByUserId(userRefreshToken.userId.toString());
       throw new AuthenticationError("Refresh token expired, login required");

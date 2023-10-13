@@ -2,7 +2,7 @@ import { Request } from "express";
 import { InternalServerException, ValidationException } from "@/exceptions/runtime.exceptions";
 import { currentPrinterToken, printerIdToken, printerLoginToken } from "@/middleware/printer";
 import { normalizeUrl } from "@/utils/normalize-url";
-import nodeInputValidator, { extend } from "node-input-validator";
+import nodeInputValidator, { extend, extendMessages } from "node-input-validator";
 import { IdType } from "@/shared.constants";
 import { LoginDto } from "@/services/interfaces/login.dto";
 
@@ -30,6 +30,9 @@ export function getExtendedValidator() {
   });
   extend("not", ({ value, args }, validator) => {
     return !value && value !== false;
+  });
+  extendMessages({
+    not: "The :attribute field may not be present.",
   });
   return nodeInputValidator;
 }

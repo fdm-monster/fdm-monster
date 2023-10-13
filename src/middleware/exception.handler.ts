@@ -3,6 +3,7 @@ import {
   AuthorizationError,
   BadRequestException,
   ExternalServiceError,
+  ForbiddenError,
   InternalServerException,
   NotFoundException,
   PasswordChangeRequiredError,
@@ -30,12 +31,16 @@ export function exceptionHandler(err, req: Request, res: Response, next: NextFun
     return res.status(code).send({ error: err.message });
   }
   if (err instanceof AuthorizationError) {
-    const code = err.statusCode || 403;
+    const code = err.statusCode || HttpStatusCode.FORBIDDEN;
     const permissions = err.permissions;
     const roles = err.roles;
     const error = err.message || "You lack permission to this resource";
     const reason = err.reason;
     return res.status(code).send({ error, reason, permissions, roles });
+  }
+  if (err instanceof ForbiddenError) {
+    const code = err.statusCode || HttpStatusCode.FORBIDDEN;
+    return res.status(code).send({ error: err.message });
   }
   if (err instanceof PasswordChangeRequiredError) {
     const code = err.statusCode || HttpStatusCode.CONFLICT;

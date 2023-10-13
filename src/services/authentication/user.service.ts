@@ -151,7 +151,7 @@ export class UserService implements IUserService<MongoIdType> {
   }
 
   async register(input: RegisterUserDto<MongoIdType>) {
-    const { username, password, roles, isDemoUser, isRootUser, needsPasswordChange } = await validateInput(
+    const { username, password, roles, isDemoUser, isRootUser, needsPasswordChange, isVerified } = await validateInput(
       input,
       registerUserRules
     );
@@ -161,6 +161,7 @@ export class UserService implements IUserService<MongoIdType> {
       username,
       passwordHash,
       roles,
+      isVerified: isVerified ?? false,
       isDemoUser: isDemoUser ?? false,
       isRootUser: isRootUser ?? false,
       needsPasswordChange: needsPasswordChange ?? true,

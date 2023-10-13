@@ -7,6 +7,7 @@ import { OctoPrintApiMock } from "./mocks/octoprint-api.mock";
 import { ROLES } from "@/constants/authorization.constants";
 import supertest from "supertest";
 import { Express } from "express";
+import { AppConstants } from "@/server.constants";
 
 jest.mock("../src/utils/env.utils", () => ({
   ...jest.requireActual("../src/utils/env.utils"),
@@ -48,6 +49,7 @@ export async function setupTestApp(
   const serverHost = container.resolve(DITokens.serverHost);
   await serverHost.boot(httpServer, quick_boot, false);
 
+  await settingsStore.setWizardCompleted(AppConstants.currentWizardVersion);
   await settingsStore.setLoginRequired(false);
   await container.resolve(DITokens.permissionService).syncPermissions();
   await container.resolve(DITokens.roleService).syncRoles();

@@ -11,11 +11,7 @@ import { CameraStreamDto, CreateCameraStreamDto, UpdateCameraStreamDto } from "@
 const createCameraStreamRules = {
   printerId: "mongoId",
   streamURL: "required|httpurl",
-  settings: "required|object",
-  "settings.aspectRatio": ["required", "string", ["in", "16:9", "4:3", "1:1"]],
-  "settings.rotationClockwise": "required|integer|in:0,90,180,270",
-  "settings.flipHorizontal": "required|boolean",
-  "settings.flipVertical": "required|boolean",
+  name: "required|string",
 };
 
 export class CameraStreamService implements ICameraStreamService<MongoIdType> {
@@ -66,7 +62,7 @@ export class CameraStreamService implements ICameraStreamService<MongoIdType> {
       id: entity.id,
       streamURL: entity.streamURL,
       printerId: entity.printerId === null ? null : entity.printerId?.toString(),
-      settings: entity.settings,
+      name: entity.name,
     };
   }
 }

@@ -8,6 +8,7 @@ import { InternalServerException } from "@/exceptions/runtime.exceptions";
 import { IConfigService } from "@/services/core/config.service";
 import { IUserService } from "@/services/interfaces/user-service.interface";
 import { Request, Response } from "express";
+import { demoUserNotAllowed, demoUserNotAllowedInterceptor } from "@/middleware/demo.middleware";
 
 export class UserController {
   userService: IUserService;
@@ -34,15 +35,13 @@ export class UserController {
   }
 
   async delete(req: Request, res: Response) {
-    this.throwIfDemoMode();
-
     const { id } = await validateInput(req.params, idRules);
 
     if (req.user?.id === id) {
       throw new InternalServerException("Not allowed to delete your own account");
     }
 
-    if (this.isDemoMode()) {
+    if (this.configService.isDemoMode()) {
       const demoUserId = await this.userService.getDemoUserId();
       if (id === demoUserId) {
         this.throwIfDemoMode();
@@ -60,8 +59,6 @@ export class UserController {
   }
 
   async changeUsername(req: Request, res: Response) {
-    this.throwIfDemoMode();
-
     const { id } = await validateInput(req.params, idRules);
 
     if (req.user?.id !== id) {
@@ -76,8 +73,6 @@ export class UserController {
   }
 
   async changePassword(req: Request, res: Response) {
-    this.throwIfDemoMode();
-
     const { id } = await validateInput(req.params, idRules);
 
     if (req.user?.id !== id) {
@@ -93,8 +88,6 @@ export class UserController {
   }
 
   async setVerified(req: Request, res: Response) {
-    this.throwIfDemoMode();
-
     const { id } = await validateInput(req.params, idRules);
 
     const { isVerified } = await validateInput(req.body, {
@@ -104,12 +97,8 @@ export class UserController {
     res.send();
   }
 
-  isDemoMode() {
-    return this.configService.get(AppConstants.OVERRIDE_IS_DEMO_MODE, "false") === "true";
-  }
-
   throwIfDemoMode() {
-    const isDemoMode = this.isDemoMode();
+    const isDemoMode = this.configService.isDemoMode();
     if (isDemoMode) {
       throw new InternalServerException("Not allowed in demo mode");
     }
@@ -127,10 +116,10 @@ export default createController(UserController)
     before: [authorizeRoles([ROLES.ADMIN])],
   })
   .delete("/:id", "delete", {
-    before: [authorizeRoles([ROLES.ADMIN])],
+    before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed],
   })
   .post("/:id/set-verified", "setVerified", {
-    before: [authorizeRoles([ROLES.ADMIN])],
+    before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed],
   })
-  .post("/:id/change-username", "changeUsername")
-  .post("/:id/change-password", "changePassword");
+  .post("/:id/change-username", "changeUsername", demoUserNotAllowedInterceptor)
+  .post("/:id/change-password", "changePassword", demoUserNotAllowedInterceptor);

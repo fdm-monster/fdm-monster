@@ -1,17 +1,25 @@
 import { AppConstants } from "@/server.constants";
 import { v4 as uuidv4 } from "uuid";
+import {
+  CredentialSettingsDto,
+  FileCleanSettingsDto,
+  FrontendSettingsDto,
+  ServerSettingsDto,
+  TimeoutSettingsDto,
+  WizardSettingsDto,
+} from "@/services/interfaces/settings.dto";
 
 export const getDefaultWhitelistIpAddresses = () => ["::12", "127.0.0.1"];
 
 export const wizardSettingKey = "wizard";
-export const getDefaultWizardSettings = () => ({
+export const getDefaultWizardSettings = (): WizardSettingsDto => ({
   wizardCompleted: false,
   wizardCompletedAt: null,
   wizardVersion: 0,
 });
 
 export const serverSettingsKey = "server";
-export const getDefaultServerSettings = () => ({
+export const getDefaultServerSettings = (): ServerSettingsDto => ({
   debugSettings: {
     debugSocketIoEvents: false,
     debugSocketReconnect: false,
@@ -28,7 +36,7 @@ export const getDefaultServerSettings = () => ({
 });
 
 export const credentialSettingsKey = "credentials";
-export const getDefaultCredentialSettings = () => ({
+export const getDefaultCredentialSettings = (): CredentialSettingsDto => ({
   // Verification and signing of JWT tokens, can be changed on the fly
   jwtSecret: uuidv4(),
   // Signing only, verification is automatic
@@ -40,19 +48,19 @@ export const getDefaultCredentialSettings = () => ({
 });
 
 export const frontendSettingKey = "frontend";
-export const getDefaultFrontendSettings = () => ({
+export const getDefaultFrontendSettings = (): FrontendSettingsDto => ({
   gridCols: 8,
   gridRows: 8,
   largeTiles: false,
 });
 
 export const timeoutSettingKey = "timeout";
-export const getDefaultTimeout = () => ({
+export const getDefaultTimeout = (): TimeoutSettingsDto => ({
   apiTimeout: 1000,
 });
 
 export const fileCleanSettingKey = "printerFileClean";
-export const getDefaultFileCleanSettings = () => ({
+export const getDefaultFileCleanSettings = (): FileCleanSettingsDto => ({
   autoRemoveOldFilesBeforeUpload: false,
   autoRemoveOldFilesAtBoot: false,
   autoRemoveOldFilesCriteriumDays: 7,

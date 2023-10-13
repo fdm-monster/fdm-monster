@@ -28,6 +28,18 @@ export class FirstTimeSetupController {
     this.userService = userService;
   }
 
+  async validateWizard(req: Request, res: Response) {
+    const { loginRequired, registration, rootUsername, rootPassword } = await validateMiddleware(req, wizardSettingsRules);
+
+    const role = await this.roleService.getSynchronizedRoleByName(ROLES.ADMIN);
+    const user = await this.userService.findRawByUsername(rootUsername?.toLowerCase());
+    if (!!user) {
+      throw new BadRequestException("This user already exists");
+    }
+
+    return res.send();
+  }
+
   async completeWizard(req: Request, res: Response) {
     const { loginRequired, registration, rootUsername, rootPassword } = await validateMiddleware(req, wizardSettingsRules);
 
@@ -61,4 +73,5 @@ export class FirstTimeSetupController {
 
 export default createController(FirstTimeSetupController)
   .prefix(AppConstants.apiRoute + "/first-time-setup")
+  .post("/validate", "validateWizard")
   .post("/complete", "completeWizard");

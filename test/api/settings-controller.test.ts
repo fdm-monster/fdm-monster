@@ -11,12 +11,15 @@ import {
   getDefaultFrontendSettings,
   getDefaultSettings,
   serverSettingsKey,
+  wizardSettingKey,
 } from "@/constants/server-settings.constants";
 import { SettingsController } from "@/controllers/settings.controller";
 
 let request: supertest.SuperTest<supertest.Test>;
 
 const defaultRoute = `${AppConstants.apiRoute}/settings`;
+const sensitiveSettingsRoute = `${defaultRoute}/sensitive`;
+const credentialSettingsRoute = `${defaultRoute}/credential`;
 const serverSettingsRoute = `${defaultRoute}/server`;
 const frontendSettingsRoute = `${defaultRoute}/frontend`;
 const fileCleanSettingsRoute = `${defaultRoute}/file-clean`;
@@ -40,12 +43,25 @@ describe(SettingsController.name, () => {
     expect(response.body).not.toBeNull();
     const defaultSettings = getDefaultSettings();
     defaultSettings[serverSettingsKey].loginRequired = false; // Test override
+    delete defaultSettings[serverSettingsKey].whitelistEnabled;
+    delete defaultSettings[serverSettingsKey].whitelistedIpAddresses;
+    delete defaultSettings[serverSettingsKey].debugSettings;
     delete defaultSettings[credentialSettingsKey];
+    defaultSettings[wizardSettingKey].wizardCompleted = true;
+    defaultSettings[wizardSettingKey].wizardVersion = AppConstants.currentWizardVersion;
+    delete defaultSettings[wizardSettingKey].wizardCompletedAt;
     expect(response.body).toMatchObject(defaultSettings);
     expect(response.body[credentialSettingsKey]).toBeFalsy();
-    expect(response.body[serverSettingsKey].registration).toBeFalsy();
+    expect(response.body[serverSettingsKey].loginRequired).toBe(false);
+    expect(response.body[serverSettingsKey].registration).toBe(false);
     expect(response.body[frontendSettingKey]).toMatchObject(getDefaultFrontendSettings());
     expect(response.body[fileCleanSettingKey]).toMatchObject(getDefaultFileCleanSettings());
+    expectOkResponse(response);
+  });
+
+  it("should OK on GET sensitive settings", async () => {
+    const response = await request.get(sensitiveSettingsRoute).send();
+    expect(response.body).not.toBeNull();
     expectOkResponse(response);
   });
 
@@ -69,8 +85,10 @@ describe(SettingsController.name, () => {
       whitelistEnabled: true,
       whitelistedIpAddresses: ["127.0.0", "192.178.168"],
     });
-    expect(response.body).not.toBeNull();
-    expect(response.body).toMatchObject({
+    expect(response.body).toStrictEqual({});
+
+    const sensitiveSettings = await request.get(sensitiveSettingsRoute).send();
+    expect(sensitiveSettings.body).toMatchObject({
       [serverSettingsKey]: {
         whitelistEnabled: true,
         whitelistedIpAddresses: ["127.0.0", "192.178.168", "127.0.0.1"],
@@ -103,6 +121,39 @@ describe(SettingsController.name, () => {
     expect(response.body).not.toBeNull();
     expect(response.body).toMatchObject({
       [fileCleanSettingKey]: newFileCleanSettings,
+    });
+    expectOkResponse(response);
+  });
+
+  it("should OK on PUT credentials settings", async () => {
+    const newCredentialsSettings = {
+      jwtExpiresIn: 120,
+      refreshTokenAttempts: -1,
+      refreshTokenExpiry: 3600,
+    };
+
+    const response = await request.put(credentialSettingsRoute).send(newCredentialsSettings);
+    expect(response.body).toStrictEqual({});
+    expectOkResponse(response);
+  });
+
+  it("should OK on PUT login-required", async () => {
+    const response = await request.put(`${defaultRoute}/login-required`).send({
+      loginRequired: false,
+    });
+    expectOkResponse(response);
+  });
+
+  it("should OK on PUT registration-enabled", async () => {
+    const response = await request.put(`${defaultRoute}/registration-enabled`).send({
+      registrationEnabled: true,
+    });
+    expectOkResponse(response);
+  });
+
+  it("should OK on PUT timeout", async () => {
+    const response = await request.put(`${defaultRoute}/timeout`).send({
+      apiTimeout: 1000,
     });
     expectOkResponse(response);
   });

@@ -91,4 +91,5 @@ jobs:
         with:
           dry-run: ${{ github.ref_name == 'develop' }}
           token: ${{ secrets.NPM_TOKEN }}
+          access: public
           package: package.json

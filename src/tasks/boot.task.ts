@@ -1,4 +1,4 @@
-import mongoose, { connect } from "mongoose";
+import mongoose, { connect, syncIndexes } from "mongoose";
 import { fetchMongoDBConnectionString, runMigrations } from "@/server.env";
 import { DITokens } from "@/container.tokens";
 import { AppConstants } from "@/server.constants";
@@ -19,7 +19,6 @@ import { PluginRepositoryCache } from "@/services/octoprint/plugin-repository.ca
 import { ClientBundleService } from "@/services/core/client-bundle.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
-import { ROLES } from "@/constants/authorization.constants";
 
 export class BootTask {
   logger: LoggerService;
@@ -127,24 +126,24 @@ export class BootTask {
     await this.permissionService.syncPermissions();
     await this.roleService.syncRoles();
 
-    const isDemoMode = this.configService.get(AppConstants.OVERRIDE_IS_DEMO_MODE, null) === "true";
+    const isDemoMode = this.configService.isDemoMode();
     if (isDemoMode) {
       this.logger.warn(`Starting in demo mode due to ${AppConstants.OVERRIDE_IS_DEMO_MODE}`);
       await this.createOrUpdateDemoAccount();
-    }
+      this.logger.warn(`Setting loginRequired=true and registration=false due to ${AppConstants.OVERRIDE_IS_DEMO_MODE}`);
+      await this.settingsStore.setLoginRequired(true);
+      await this.settingsStore.setRegistrationEnabled(false);
+    } else {
+      const loginRequired = this.configService.get(AppConstants.OVERRIDE_LOGIN_REQUIRED, null);
+      if (loginRequired !== null) {
+        this.logger.warn(`Setting login required due to ${AppConstants.OVERRIDE_LOGIN_REQUIRED}`);
+        await this.settingsStore.setLoginRequired(loginRequired === "true");
+      }
 
-    const loginRequired = this.configService.get(AppConstants.OVERRIDE_LOGIN_REQUIRED, null);
-    if (loginRequired !== null) {
-      this.logger.warn(`Setting login required due to ${AppConstants.OVERRIDE_LOGIN_REQUIRED}`);
-      await this.settingsStore.setLoginRequired(loginRequired);
-    }
-
-    // If we are in demo mode, do not allow registration
-    if (!isDemoMode) {
       const registrationEnabled = this.configService.get(AppConstants.OVERRIDE_REGISTRATION_ENABLED, null);
       if (registrationEnabled !== null) {
         this.logger.warn(`Setting registration enabled due to ${AppConstants.OVERRIDE_REGISTRATION_ENABLED}`);
-        await this.settingsStore.setRegistrationEnabled(registrationEnabled);
+        await this.settingsStore.setRegistrationEnabled(registrationEnabled === "true");
       }
     }
 
@@ -206,6 +205,7 @@ export class BootTask {
     await connect(fetchMongoDBConnectionString(), {
       serverSelectionTimeoutMS: 1500,
     });
+    await syncIndexes();
   }
 
   async migrateDatabase() {
