@@ -13,7 +13,7 @@ const deleteRoute = (id: string) => `${listRoute}/${id}`;
 const updateRoute = (id: string) => `${getRoute(id)}`;
 
 let request: supertest.SuperTest<supertest.Test>;
-
+let idType: typeof Number | typeof String;
 beforeAll(async () => {
   await connect();
   ({ request } = await setupTestApp(true));
@@ -24,23 +24,17 @@ beforeEach(async () => {
 });
 
 describe(CameraStreamController.name, () => {
-  const defaultSettings = {
-    flipHorizontal: false,
-    flipVertical: false,
-    aspectRatio: "16:9",
-    rotationClockwise: 0,
-  };
   const defaultTestURL = "https://test.url/stream";
   const defaultCameraStreamInput = (url: string) => ({
     streamURL: url,
+    name: "Tester",
     printerId: null,
-    settings: defaultSettings,
   });
   const matchedBody = (url: string) => ({
     id: expect.any(String),
     streamURL: url,
+    name: "Tester",
     printerId: null,
-    settings: defaultSettings,
   });
   const getTestCameraStream = async (id: string) => await request.get(getRoute(id));
   const createTestCameraStream = async (url: string) => await request.post(listRoute).send(defaultCameraStreamInput(url));

@@ -16,6 +16,7 @@ import { YamlService } from "@/services/core/yaml.service";
 import { MulterService } from "@/services/core/multer.service";
 import { LogDumpService } from "@/services/core/logs-manager.service";
 import { Request, Response } from "express";
+import { demoUserNotAllowed } from "@/middleware/demo.middleware";
 
 export class ServerPrivateController {
   clientBundleService: ClientBundleService;
@@ -142,7 +143,7 @@ export class ServerPrivateController {
 // prettier-ignore
 export default createController(ServerPrivateController)
   .prefix(AppConstants.apiRoute + "/server")
-  .before([authenticate(), authorizeRoles([ROLES.ADMIN])])
+  .before([authenticate(), authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
   .get("/", "getReleaseStateInfo")
   .get("/client-releases", "getClientReleases")
   .post("/update-client-bundle-github", "updateClientBundleGithub")

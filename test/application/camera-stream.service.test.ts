@@ -22,12 +22,7 @@ describe(CameraStreamService.name, () => {
     const stream = await cameraStreamService.create({
       printerId: undefined,
       streamURL: "http://localhost:8080",
-      settings: {
-        aspectRatio: "16:9",
-        rotationClockwise: 0,
-        flipHorizontal: false,
-        flipVertical: false,
-      },
+      name: "Test",
     });
     expect(stream).toBeTruthy();
 

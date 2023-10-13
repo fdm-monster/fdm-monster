@@ -7,7 +7,7 @@ import { SettingsStore } from "@/state/settings.store";
 import { MongoIdType } from "@/shared.constants";
 import { IRefreshToken } from "@/models/Auth/RefreshToken";
 import { AuthenticationError } from "@/exceptions/runtime.exceptions";
-import { IRefreshTokenService } from "@/services/authentication/refresh-token.service.interface";
+import { IRefreshTokenService } from "@/services/interfaces/refresh-token.service.interface";
 
 export class RefreshTokenService implements IRefreshTokenService<MongoIdType> {
   private settingsStore: SettingsStore;
@@ -34,14 +34,14 @@ export class RefreshTokenService implements IRefreshTokenService<MongoIdType> {
     const { refreshTokenExpiry } = await this.settingsStore.getCredentialSettings();
     const refreshToken = uuidv4();
 
+    const timespan = refreshTokenExpiry ?? AppConstants.DEFAULT_REFRESH_TOKEN_EXPIRY;
     if (!refreshTokenExpiry) {
-      this.logger.warn("Refresh token expiry not set in Settings:credentials, using default");
+      this.logger.warn(`Refresh token expiry not set in Settings:credentials, using default ${timespan} seconds}`);
     }
 
-    const timespan = refreshTokenExpiry ?? AppConstants.DEFAULT_REFRESH_TOKEN_EXPIRY;
     await RefreshToken.create({
       userId,
-      expiresAt: Date.now() + timespan,
+      expiresAt: Date.now() + timespan * 1000,
       refreshToken,
       refreshAttemptsUsed: 0,
     });

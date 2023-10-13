@@ -11,6 +11,10 @@ export function getEnvOrDefault(key: any, defaultVal: any) {
   return val;
 }
 
+export function isDevelopmentEnvironment() {
+  return process.env.NODE_ENV === AppConstants.defaultDevelopmentEnv;
+}
+
 export function isTestEnvironment() {
   return process.env.NODE_ENV === AppConstants.defaultTestEnv;
 }

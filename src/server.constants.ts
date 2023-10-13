@@ -20,6 +20,8 @@ export const AppConstants = {
   apiRoute: "/api",
   enableClientDistAutoUpdateKey: "ENABLE_CLIENT_DIST_AUTO_UPDATE",
 
+  // This whitelist feature is experimental and may be removed or altered in the future
+  ENABLE_EXPERIMENTAL_WHITELIST_SETTINGS: "ENABLE_EXPERIMENTAL_WHITELIST_SETTINGS",
   // Boolean string (true/false), persisted always
   OVERRIDE_LOGIN_REQUIRED: "OVERRIDE_LOGIN_REQUIRED",
   // Boolean string (true/false), persisted always
@@ -32,9 +34,9 @@ export const AppConstants = {
   OVERRIDE_JWT_EXPIRES_IN: "OVERRIDE_JWT_EXPIRES_IN",
   DEFAULT_JWT_EXPIRES_IN: 60 * 60, // 1 hour
   // Number
-  DEFAULT_REFRESH_TOKEN_ATTEMPTS: 50, // 50 attempts, 50 hours
+  DEFAULT_REFRESH_TOKEN_ATTEMPTS: -1, // 50 attempts, 50 hours
   // Number, Milli-seconds
-  DEFAULT_REFRESH_TOKEN_EXPIRY: 1000 * 60 * 60 * 24 * 14, // 14 days (in ms)
+  DEFAULT_REFRESH_TOKEN_EXPIRY: 60 * 60 * 24 * 14, // 14 days (in ms)
   // String, not persisted
   OVERRIDE_JWT_ISSUER: "OVERRIDE_JWT_ISSUER",
   DEFAULT_JWT_ISSUER: "fdm-monster-server",
@@ -50,6 +52,7 @@ export const AppConstants = {
   OVERRIDE_DEMO_ROLE: "OVERRIDE_DEMO_ROLE",
   DEFAULT_DEMO_ROLE: "ADMIN",
 
+  defaultDevelopmentEnv: "development",
   defaultTestEnv: "test",
   defaultProductionEnv: "production",
   knownEnvNames: ["development", "production", "test"],
@@ -61,7 +64,7 @@ export const AppConstants = {
   orgName: "fdm-monster",
   // Wizard version changes will trigger a re-run of the wizard
   currentWizardVersion: 1,
-  defaultClientMinimum: "1.3.9",
+  defaultClientMinimum: "1.3.10",
 
   influxUrl: "INFLUX_URL",
   influxToken: "INFLUX_TOKEN",
@@ -69,7 +72,7 @@ export const AppConstants = {
   influxBucket: "INFLUX_BUCKET",
 
   // Websocket values
-  defaultWebsocketHandshakeTimeout: 2000,
+  defaultWebsocketHandshakeTimeout: 3000,
   defaultSocketThrottleRate: 1,
   debugSocketStatesKey: "DEBUG_SOCKET_STATES",
   defaultDebugSocketStates: "false",

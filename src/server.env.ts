@@ -5,7 +5,6 @@ import * as Sentry from "@sentry/node";
 import { config } from "dotenv";
 import { AppConstants } from "./server.constants";
 import { LoggerService as Logger } from "./handlers/logger";
-import { isDocker } from "./utils/is-docker";
 import { getEnvOrDefault, isPm2, isProductionEnvironment, verifyPackageJsonRequirements } from "./utils/env.utils";
 import { errorSummary } from "./utils/error.utils";
 import { superRootPath } from "@/utils/fs.utils";

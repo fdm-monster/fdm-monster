@@ -1,5 +1,5 @@
 import { IFloor } from "@/models/Floor";
-import { IdType, MongoIdType } from "@/shared.constants";
+import { IdType } from "@/shared.constants";
 import { FloorDto, PositionDto, PrinterInFloorDto } from "@/services/interfaces/floor.dto";
 
 export interface IFloorService<KeyType = IdType, Entity = IFloor> {
@@ -11,7 +11,7 @@ export interface IFloorService<KeyType = IdType, Entity = IFloor> {
 
   createDefaultFloor(): Promise<Entity>;
 
-  delete(floorId: KeyType): Promise<void>;
+  delete(floorId: KeyType): Promise<any | void>;
 
   get(floorId: KeyType): Promise<Entity>;
 

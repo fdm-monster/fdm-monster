@@ -1,11 +1,18 @@
 import { isProductionEnvironment } from "@/utils/env.utils";
 
-export const serverSettingsUpdateRules = {
+export const serverSettingsUpdateRules = (whitelistFeatureEnabled: boolean) => ({
   registration: "boolean",
   loginRequired: "boolean",
   debugSettings: "object",
   "debugSettings.debugSocketEvents": "boolean",
   "debugSettings.debugSocketReconnect": "boolean",
+  whitelistEnabled: whitelistFeatureEnabled ? "boolean" : "not",
+  whitelistedIpAddresses: whitelistFeatureEnabled ? "array|minLength:1" : "not",
+  "whitelistedIpAddresses.*": whitelistFeatureEnabled ? "required|string" : "not",
+});
+
+export const timeoutSettingsUpdateRules = {
+  apiTimeout: "integer|min:1000",
 };
 
 export const frontendSettingsUpdateRules = {
@@ -16,9 +23,9 @@ export const frontendSettingsUpdateRules = {
 
 export const credentialSettingPatchRules = {
   jwtSecret: "string",
-  jwtExpiresIn: isProductionEnvironment() ? "integer|min:120" : "integer|min:0",
+  jwtExpiresIn: isProductionEnvironment() ? "integer|min:120|max:7200" : "integer|min:0",
   refreshTokenAttempts: "integer|min:-1",
-  refreshTokenExpiry: "integer|min:0",
+  refreshTokenExpiry: isProductionEnvironment() ? "integer|min:240" : "integer|min:0",
 };
 
 export const whitelistSettingUpdateRules = {

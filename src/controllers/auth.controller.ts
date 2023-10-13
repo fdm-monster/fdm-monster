@@ -12,6 +12,7 @@ import { Request, Response } from "express";
 import { IUserService } from "@/services/interfaces/user-service.interface";
 import { IAuthService } from "@/services/interfaces/auth.service.interface";
 import { IRoleService } from "@/services/interfaces/role-service.interface";
+import { demoUserNotAllowedInterceptor } from "@/middleware/demo.middleware";
 
 export class AuthController {
   authService: IAuthService;
@@ -130,7 +131,7 @@ export class AuthController {
 
 export default createController(AuthController)
   .prefix(AppConstants.apiRoute + "/auth")
-  .post("/register", "register")
+  .post("/register", "register", demoUserNotAllowedInterceptor)
   .post("/login", "login")
   .get("/login-required", "getLoginRequired")
   .post("/needs-password-change", "needsPasswordChange")
