@@ -7,7 +7,7 @@ import { SettingsStore } from "@/state/settings.store";
 import { MongoIdType } from "@/shared.constants";
 import { IRefreshToken } from "@/models/Auth/RefreshToken";
 import { AuthenticationError } from "@/exceptions/runtime.exceptions";
-import { IRefreshTokenService } from "@/services/authentication/refresh-token.service.interface";
+import { IRefreshTokenService } from "@/services/interfaces/refresh-token.service.interface";
 
 export class RefreshTokenService implements IRefreshTokenService<MongoIdType> {
   private settingsStore: SettingsStore;
