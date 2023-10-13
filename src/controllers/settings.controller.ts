@@ -11,6 +11,7 @@ import { version } from "@/../package.json";
 import { IpWhitelistSettingsDto } from "@/services/interfaces/settings.dto";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
+import { demoUserNotAllowed, demoUserNotAllowedInterceptor } from "@/middleware/demo.middleware";
 
 export class SettingsController {
   settingsStore: SettingsStore;
@@ -104,13 +105,13 @@ export default createController(SettingsController)
     .prefix(AppConstants.apiRoute + "/settings")
     .before([authenticate()])
     .get("/", "getSettings")
-    .get("/sensitive", "getSettingsSensitive", { before: [authorizeRoles([ROLES.ADMIN])] })
-    .patch("/sentry-diagnostics", "updateSentryDiagnosticsEnabled")
-    .put("/server", "updateServerSettings", { before: [authorizeRoles([ROLES.ADMIN])] })
-    .put("/login-required", "updateLoginRequiredSettings", { before: [authorizeRoles([ROLES.ADMIN])] })
-    .put("/registration-enabled", "updateRegistrationEnabledSettings", { before: [authorizeRoles([ROLES.ADMIN])] })
-    .put("/credential", "updateCredentialSettings", { before: [authorizeRoles([ROLES.ADMIN])] })
-    .put("/file-clean", "updateFileCleanSettings", { before: [authorizeRoles([ROLES.ADMIN])] })
-    .put("/whitelist", "updateWhitelistSettings", { before: [authorizeRoles([ROLES.ADMIN])] })
+    .get("/sensitive", "getSettingsSensitive", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
+    .patch("/sentry-diagnostics", "updateSentryDiagnosticsEnabled", demoUserNotAllowedInterceptor)
+    .put("/server", "updateServerSettings", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
+    .put("/login-required", "updateLoginRequiredSettings", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
+    .put("/registration-enabled", "updateRegistrationEnabledSettings", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
+    .put("/credential", "updateCredentialSettings", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
+    .put("/file-clean", "updateFileCleanSettings", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
+    .put("/whitelist", "updateWhitelistSettings", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
     .put("/frontend", "updateFrontendSettings", { before: [authorizeRoles([ROLES.ADMIN])] })
-    .put("/timeout", "updateTimeoutSettings", { before: [authorizeRoles([ROLES.ADMIN])] });
+    .put("/timeout", "updateTimeoutSettings", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] });
