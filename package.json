@@ -43,7 +43,7 @@
     "@influxdata/influxdb-client": "1.33.2",
     "@sentry/node": "7.73.0",
     "adm-zip": "0.5.10",
-    "awilix": "8.0.1",
+    "awilix": "9.0.0",
     "awilix-express": "8.0.0",
     "axios": "1.5.1",
     "bcryptjs": "2.4.3",
