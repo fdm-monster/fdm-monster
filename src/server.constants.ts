@@ -32,7 +32,7 @@ export const AppConstants = {
   OVERRIDE_JWT_EXPIRES_IN: "OVERRIDE_JWT_EXPIRES_IN",
   DEFAULT_JWT_EXPIRES_IN: 60 * 60, // 1 hour
   // Number
-  DEFAULT_REFRESH_TOKEN_ATTEMPTS: 50, // 50 attempts, 50 hours
+  DEFAULT_REFRESH_TOKEN_ATTEMPTS: -1, // 50 attempts, 50 hours
   // Number, Milli-seconds
   DEFAULT_REFRESH_TOKEN_EXPIRY: 1000 * 60 * 60 * 24 * 14, // 14 days (in ms)
   // String, not persisted

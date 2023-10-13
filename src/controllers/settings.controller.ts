@@ -71,6 +71,18 @@ export class SettingsController {
     res.send(result);
   }
 
+  async updateLoginRequiredSettings(req: Request, res: Response) {
+    const { loginRequired } = await validateInput(req.body, { loginRequired: "boolean" });
+    const result = await this.settingsStore.setLoginRequired(loginRequired);
+    res.send(result);
+  }
+
+  async updateRegistrationEnabledSettings(req: Request, res: Response) {
+    const { registrationEnabled } = await validateInput(req.body, { registrationEnabled: "boolean" });
+    const result = await this.settingsStore.setRegistrationEnabled(registrationEnabled);
+    res.send(result);
+  }
+
   async updateFileCleanSettings(req: Request, res: Response) {
     const result = await this.settingsStore.patchFileCleanSettings(req.body);
     res.send(result);
@@ -90,6 +102,8 @@ export default createController(SettingsController)
     .get("/sensitive", "getSettingsSensitive", { before: [authorizeRoles([ROLES.ADMIN])] })
     .patch("/sentry-diagnostics", "updateSentryDiagnosticsEnabled")
     .put("/server", "updateServerSettings", { before: [authorizeRoles([ROLES.ADMIN])] })
+    .put("/login-required", "updateLoginRequiredSettings", { before: [authorizeRoles([ROLES.ADMIN])] })
+    .put("/registration-enabled", "updateRegistrationEnabledSettings", { before: [authorizeRoles([ROLES.ADMIN])] })
     .put("/file-clean", "updateFileCleanSettings", { before: [authorizeRoles([ROLES.ADMIN])] })
     .put("/whitelist", "updateWhitelistSettings", { before: [authorizeRoles([ROLES.ADMIN])] })
     .put("/frontend", "updateFrontendSettings", { before: [authorizeRoles([ROLES.ADMIN])] })
