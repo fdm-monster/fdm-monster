@@ -11,6 +11,7 @@ import { asFunction, AwilixContainer } from "awilix";
 import simpleGitMock from "../application/__mocks__/simple-git";
 import supertest from "supertest";
 import { SettingsStore } from "@/state/settings.store";
+import { ServerPrivateController } from "@/controllers/server-private.controller";
 
 let request: supertest.SuperTest<supertest.Test>;
 let container: AwilixContainer;
@@ -31,7 +32,7 @@ beforeAll(async () => {
   settingsStore = container.resolve(DITokens.settingsStore);
 });
 
-describe("ServerPrivateController", () => {
+describe(ServerPrivateController.name, () => {
   it("should get update info", async function () {
     process.env[AppConstants.VERSION_KEY] = require("../../package.json").version;
 

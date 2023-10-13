@@ -8,6 +8,10 @@ export const serverSettingsUpdateRules = {
   "debugSettings.debugSocketReconnect": "boolean",
 };
 
+export const timeoutSettingsUpdateRules = {
+  apiTimeout: "integer|min:1000",
+};
+
 export const frontendSettingsUpdateRules = {
   gridCols: "integer|min:1",
   gridRows: "integer|min:1",

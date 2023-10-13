@@ -2,17 +2,19 @@ import { connect } from "../db-handler";
 import { setupTestApp } from "../test-server";
 import { expectInternalServerError, expectInvalidResponse, expectNotFoundResponse, expectOkResponse } from "../extensions";
 import { createTestPrinter } from "./test-data/create-printer";
-import { createTestFloor, floorRoute } from "./test-data/create-printer-floor";
+import { createTestFloor, floorRoute } from "./test-data/create-floor";
 import { Floor } from "@/models";
 import { AppConstants } from "@/server.constants";
 import supertest from "supertest";
+import { FloorController } from "@/controllers/floor.controller";
+import { IdType } from "@/shared.constants";
 
 const listRoute = `${AppConstants.apiRoute}/floor`;
-const getRoute = (id: string) => `${listRoute}/${id}`;
-const addPrinterToFloorRoute = (id: string) => `${listRoute}/${id}/printer`;
-const deleteRoute = (id: string) => `${listRoute}/${id}`;
-const updateNameRoute = (id: string) => `${getRoute(id)}/name`;
-const updateFloorNumberRoute = (id: string) => `${getRoute(id)}/floor-number`;
+const getRoute = (id: IdType) => `${listRoute}/${id}`;
+const addPrinterToFloorRoute = (id: IdType) => `${listRoute}/${id}/printer`;
+const deleteRoute = (id: IdType) => `${listRoute}/${id}`;
+const updateNameRoute = (id: IdType) => `${getRoute(id)}/name`;
+const updateFloorNumberRoute = (id: IdType) => `${getRoute(id)}/floor-number`;
 
 let request: supertest.SuperTest<supertest.Test>;
 
@@ -25,7 +27,7 @@ beforeEach(async () => {
   Floor.deleteMany({});
 });
 
-describe("FloorController", () => {
+describe(FloorController.name, () => {
   it("should return non-empty floor list", async () => {
     const response = await request.get(listRoute).send();
     const data = expectOkResponse(response);

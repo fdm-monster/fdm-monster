@@ -13,7 +13,7 @@ const deleteRoute = (id: string) => `${listRoute}/${id}`;
 const updateRoute = (id: string) => `${getRoute(id)}`;
 
 let request: supertest.SuperTest<supertest.Test>;
-
+let idType: typeof Number | typeof String;
 beforeAll(async () => {
   await connect();
   ({ request } = await setupTestApp(true));

@@ -60,11 +60,11 @@ export interface TimeoutSettingsDto {
   apiTimeout: number;
 }
 
-export class SettingsDto<KeyType> extends IdDto<KeyType> {
+export class SettingsDto<KeyType> {
   [serverSettingsKey]: ServerSettingsDto;
   [wizardSettingKey]: WizardSettingsDto;
   [frontendSettingKey]: FrontendSettingsDto;
-  [credentialSettingsKey]: CredentialSettingsDto;
+  // [credentialSettingsKey]: CredentialSettingsDto;
   [fileCleanSettingKey]: FileCleanSettingsDto;
   [timeoutSettingKey]: TimeoutSettingsDto;
 }

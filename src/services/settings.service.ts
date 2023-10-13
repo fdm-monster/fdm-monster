@@ -21,15 +21,35 @@ import {
   fileCleanSettingsUpdateRules,
   frontendSettingsUpdateRules,
   serverSettingsUpdateRules,
+  timeoutSettingsUpdateRules,
   whitelistSettingUpdateRules,
   wizardUpdateRules,
 } from "./validators/settings-service.validation";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
-import { ICredentialSettings, IFileCleanSettings, IFrontendSettings, IServerSettings, IWizardSettings } from "@/models/Settings";
+import {
+  ICredentialSettings,
+  IFileCleanSettings,
+  IFrontendSettings,
+  IServerSettings,
+  ISettings,
+  ITimeoutSettings,
+  IWizardSettings,
+} from "@/models/Settings";
 import { SettingsDto } from "@/services/interfaces/settings.dto";
 import { MongoIdType } from "@/shared.constants";
 
-export class SettingsService implements ISettingsService {
+export class SettingsService implements ISettingsService<MongoIdType, ISettings> {
+  toDto(entity: ISettings): SettingsDto<MongoIdType> {
+    return {
+      // Credential settings are not shared with the client
+      [serverSettingsKey]: entity[serverSettingsKey],
+      [wizardSettingKey]: entity[wizardSettingKey],
+      [frontendSettingKey]: entity[frontendSettingKey],
+      [fileCleanSettingKey]: entity[fileCleanSettingKey],
+      [timeoutSettingKey]: entity[timeoutSettingKey],
+    };
+  }
+
   async getOrCreate() {
     let settings = await Settings.findOne();
     if (!settings) {
@@ -170,6 +190,17 @@ export class SettingsService implements ISettingsService {
     const settingsDoc = await this.getOrCreate();
     const serverSettings = settingsDoc[serverSettingsKey];
     Object.assign(serverSettings, validatedInput);
+    return Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
+      new: true,
+    });
+  }
+
+  async updateTimeoutSettings(patchUpdate: Partial<ITimeoutSettings>) {
+    const validatedInput = await validateInput(patchUpdate, timeoutSettingsUpdateRules);
+
+    const settingsDoc = await this.getOrCreate();
+    const timeoutSettings = settingsDoc[timeoutSettingKey];
+    Object.assign(timeoutSettings, validatedInput);
     return Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
       new: true,
     });
