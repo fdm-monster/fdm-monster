@@ -108,7 +108,8 @@ describe(AuthController.name, () => {
     expectOkResponse(response);
   });
 
-  it("should succeed logout", async () => {
+  it("should succeed logout without loginRequired", async () => {
+    await settingsStore.setLoginRequired(false);
     const response = await request.post(logoutRoute).send();
     expectOkResponse(response);
   });
@@ -117,6 +118,13 @@ describe(AuthController.name, () => {
     await settingsStore.setLoginRequired(true);
     const response = await request.post(logoutRoute).send();
     expectUnauthenticatedResponse(response);
+  });
+
+  it("should succeed logout when server:loginRequired is true and bearer valid", async () => {
+    await settingsStore.setLoginRequired(true);
+    const { token, refreshToken } = await loginTestUser(request);
+    const response = await request.post(logoutRoute).set("Authorization", `Bearer ${token}`).send();
+    expectOkResponse(response);
   });
 
   it("should do auth logout when server:loginRequired is true", async () => {
@@ -168,9 +176,31 @@ describe(AuthController.name, () => {
   });
 
   it("should refresh login", async () => {
-    const { refreshToken, token } = await loginTestUser(request);
-    const response = await request.post(`${baseRoute}/refresh`).set("Authorization", `Bearer ${token}`).send({ refreshToken });
+    await settingsStore.setLoginRequired(true);
+    await settingsStore.updateCredentialSettings({
+      refreshTokenAttempts: 1,
+    });
+    const { refreshToken } = await loginTestUser(request);
+    const response = await request.post(`${baseRoute}/refresh`).send({ refreshToken });
     expectOkResponse(response);
     expect(response.body.token).toBeTruthy();
+    const response2 = await request.post(`${baseRoute}/refresh`).send({ refreshToken });
+    expectUnauthenticatedResponse(response2);
+  });
+
+  it("should not tolerate expired refresh token", async () => {
+    await settingsStore.setLoginRequired(true);
+    await settingsStore.updateCredentialSettings({
+      refreshTokenAttempts: 1,
+      refreshTokenExpiry: 0,
+    });
+    const { refreshToken } = await loginTestUser(request);
+    const response = await request.post(`${baseRoute}/refresh`).send({ refreshToken });
+    expectUnauthenticatedResponse(response);
+  });
+
+  it("should not tolerate non-existing refresh token", async () => {
+    const response = await request.post(`${baseRoute}/refresh`).send({ refreshToken: "fake123" });
+    expectUnauthenticatedResponse(response);
   });
 });
