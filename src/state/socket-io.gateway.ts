@@ -5,36 +5,85 @@ import EventEmitter2 from "eventemitter2";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import * as http from "http";
+import { AuthService } from "@/services/authentication/auth.service";
+import { getPassportJwtOptions, verifyUserCallback } from "@/middleware/passport";
+import { IConfigService } from "@/services/core/config.service";
+import { Strategy as JwtStrategy, StrategyOptions, VerifiedCallback } from "passport-jwt";
+import { DefaultEventsMap } from "socket.io/dist/typed-events";
+import { ExtendedError } from "socket.io/dist/namespace";
+import { IUserService } from "@/services/interfaces/user-service.interface";
+
+const authorize = (
+  settingsStore: SettingsStore,
+  options: StrategyOptions,
+  verify: (jwt_payload: any, done: VerifiedCallback) => void
+) => {
+  const strategy = new JwtStrategy(options, verify);
+
+  return async function authorizeCallback(
+    socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
+    next: (err?: ExtendedError) => void
+  ) {
+    if (!(await settingsStore.getLoginRequired())) {
+      // No login required, so we can skip the authentication
+      return next();
+    }
+    // --- Begin strategy augmentation ala passport
+    strategy.success = function success(user) {
+      socket.handshake.user = user;
+      next();
+    };
+    strategy.fail = (info) => next(new Error(info));
+    strategy.error = (error) => next(error);
+
+    strategy.authenticate(socket, {});
+  };
+};
 
 export class SocketIoGateway {
   logger: LoggerService;
   eventEmitter2: EventEmitter2;
   io: Server;
 
+  authService: AuthService;
   settingsStore: SettingsStore;
+  configService: IConfigService;
+  userService: IUserService;
 
   constructor({
     loggerFactory,
     eventEmitter2,
     settingsStore,
+    authService,
+    configService,
+    userService,
   }: {
     loggerFactory: ILoggerFactory;
     eventEmitter2: EventEmitter2;
     settingsStore: SettingsStore;
+    authService: AuthService;
+    userService: IUserService;
+    configService: IConfigService;
   }) {
     this.logger = loggerFactory(SocketIoGateway.name);
     this.eventEmitter2 = eventEmitter2;
     this.settingsStore = settingsStore;
+    this.authService = authService;
+    this.userService = userService;
+    this.configService = configService;
   }
 
   attachServer(httpServer: http.Server) {
     this.io = new Server(httpServer, { cors: { origin: "*" } });
-    const that = this;
-    this.io.on("connection", (socket) => this.onConnect.bind(that)(socket));
+    const opts = getPassportJwtOptions(this.settingsStore, this.configService, (value: Socket) => value.handshake.auth.token);
+    const verify = verifyUserCallback(this.userService);
+    this.io.use(authorize(this.settingsStore, opts, verify));
+    this.io.on("connection", (socket) => this.onConnect.bind(this)(socket));
   }
 
   onConnect(socket: Socket) {
     this.logger.log("SocketIO Client connected", socket.id);
+
     this.eventEmitter2.emit(socketIoConnectedEvent, socket.id);
 
     socket.on("disconnect", () => {
