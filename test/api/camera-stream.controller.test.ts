@@ -14,9 +14,10 @@ const updateRoute = (id: string) => `${getRoute(id)}`;
 
 let request: supertest.SuperTest<supertest.Test>;
 let idType: typeof Number | typeof String;
+let isTypeormMode: boolean;
 beforeAll(async () => {
   await connect();
-  ({ request } = await setupTestApp(true));
+  ({ idType, isTypeormMode, request } = await setupTestApp(true));
 });
 
 beforeEach(async () => {
@@ -25,13 +26,22 @@ beforeEach(async () => {
 
 describe(CameraStreamController.name, () => {
   const defaultTestURL = "https://test.url/stream";
-  const defaultCameraStreamInput = (url: string) => ({
-    streamURL: url,
-    name: "Tester",
-    printerId: null,
-  });
+  const defaultCameraStreamInput = (url: string) =>
+    isTypeormMode
+      ? {
+          streamURL: url,
+          printerId: null,
+          name: "Tester",
+          ...defaultSettings,
+        }
+      : {
+          streamURL: url,
+          printerId: null,
+          name: "Tester",
+          settings: defaultSettings,
+        };
   const matchedBody = (url: string) => ({
-    id: expect.any(String),
+    id: expect.any(idType),
     streamURL: url,
     name: "Tester",
     printerId: null,

@@ -8,6 +8,7 @@ import { ROLES } from "@/constants/authorization.constants";
 import supertest from "supertest";
 import { Express } from "express";
 import { AppConstants } from "@/server.constants";
+import { TypeormService } from "@/services/typeorm/typeorm.service";
 
 jest.mock("../src/utils/env.utils", () => ({
   ...jest.requireActual("../src/utils/env.utils"),
@@ -42,6 +43,10 @@ export async function setupTestApp(
   // Overrides get last pick
   if (mocks) container.register(mocks);
 
+  // Setup database in memory - needed for loading settings etc
+  const typeormService = container.resolve<TypeormService>(DITokens.typeormService);
+  await typeormService.createConnection();
+
   // Setup
   const settingsStore = container.resolve(DITokens.settingsStore);
   await settingsStore.loadSettings();
@@ -60,7 +65,10 @@ export async function setupTestApp(
     await printerSocketStore.loadPrinterSockets();
   }
 
+  const isTypeormMode = container.resolve(DITokens.isTypeormMode);
   return {
+    idType: Number,
+    isTypeormMode,
     httpServer,
     request: supertest(httpServer),
     container,

@@ -12,6 +12,7 @@ import {
 import { AppConstants } from "@/server.constants";
 import { NextFunction, Request, Response } from "express";
 import { HttpStatusCode } from "@/constants/http-status-codes.constants";
+import { EntityNotFoundError } from "typeorm";
 
 export function exceptionHandler(err, req: Request, res: Response, next: NextFunction) {
   const isTest = process.env.NODE_ENV === AppConstants.defaultTestEnv;
@@ -46,7 +47,7 @@ export function exceptionHandler(err, req: Request, res: Response, next: NextFun
     const code = err.statusCode || HttpStatusCode.CONFLICT;
     return res.status(code).send({ error: err.message });
   }
-  if (err instanceof NotFoundException) {
+  if (err instanceof NotFoundException || err instanceof EntityNotFoundError) {
     const code = err.statusCode || 404;
     return res.status(code).send({ error: err.message });
   }

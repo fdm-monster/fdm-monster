@@ -17,6 +17,7 @@ import { RoleService } from "@/services/authentication/role.service";
 import { UserService } from "@/services/authentication/user.service";
 import { PluginRepositoryCache } from "@/services/octoprint/plugin-repository.cache";
 import { ClientBundleService } from "@/services/core/client-bundle.service";
+import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
 
@@ -37,6 +38,7 @@ export class BootTask {
   pluginFirmwareUpdateService: PluginFirmwareUpdateService;
   clientBundleService: ClientBundleService;
   configService: ConfigService;
+  typeormService: TypeormService;
 
   constructor({
     loggerFactory,
@@ -55,6 +57,7 @@ export class BootTask {
     pluginFirmwareUpdateService,
     clientBundleService,
     configService,
+    typeormService,
   }: {
     loggerFactory: ILoggerFactory;
     serverTasks: ServerTasks;
@@ -72,6 +75,7 @@ export class BootTask {
     pluginFirmwareUpdateService: PluginFirmwareUpdateService;
     clientBundleService: ClientBundleService;
     configService: ConfigService;
+    typeormService: TypeormService;
   }) {
     this.logger = loggerFactory(BootTask.name);
     this.serverTasks = serverTasks;
@@ -89,6 +93,7 @@ export class BootTask {
     this.pluginFirmwareUpdateService = pluginFirmwareUpdateService;
     this.clientBundleService = clientBundleService;
     this.configService = configService;
+    this.typeormService = typeormService;
   }
 
   async runOnce() {
@@ -100,6 +105,12 @@ export class BootTask {
   }
 
   async run() {
+    if (
+      this.configService.get(AppConstants.enableExperimentalTypeormKey, AppConstants.enableExperimentalTypeormDefault) === "true"
+    ) {
+      await this.typeormService.createConnection();
+    }
+
     try {
       await this.createConnection();
       await this.migrateDatabase();

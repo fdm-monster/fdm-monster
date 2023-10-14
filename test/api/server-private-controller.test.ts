@@ -22,10 +22,11 @@ const gitUpdateRoute = `${defaultRoute}/git-update`;
 const exportPrintersAndFloorsRoute = `${defaultRoute}/export-printers-floors-yaml`;
 const importPrintersAndFloorsRoute = `${defaultRoute}/import-printers-floors-yaml`;
 const restartRoute = `${defaultRoute}/restart`;
+let isTypeormMode: boolean;
 
 beforeAll(async () => {
   await connect();
-  ({ request, container } = await setupTestApp());
+  ({ request, container, isTypeormMode } = await setupTestApp());
   container.register({
     [DITokens.simpleGitService]: asFunction(simpleGitMock),
   });
@@ -87,7 +88,7 @@ describe(ServerPrivateController.name, () => {
     expectOkResponse(response);
 
     const yamlObject = load(response.text);
-    await validateInput(yamlObject, importPrintersFloorsYamlRules(true, true, true));
+    await validateInput(yamlObject, importPrintersFloorsYamlRules(true, true, true, isTypeormMode));
   });
 
   test.skip("should import YAML and have data loaded", async () => {

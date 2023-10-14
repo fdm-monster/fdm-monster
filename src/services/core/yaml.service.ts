@@ -20,6 +20,7 @@ export class YamlService {
   printerCache: PrinterCache;
   serverVersion: string;
   private logger: LoggerService;
+  private readonly isTypeormMode: boolean;
 
   constructor({
     printerService,
@@ -28,6 +29,7 @@ export class YamlService {
     floorService,
     loggerFactory,
     serverVersion,
+    isTypeormMode,
   }: {
     printerService: IPrinterService<MongoIdType>;
     printerCache: PrinterCache;
@@ -35,6 +37,7 @@ export class YamlService {
     floorService: IFloorService<MongoIdType>;
     loggerFactory: ILoggerFactory;
     serverVersion: string;
+    isTypeormMode: boolean;
   }) {
     this.floorStore = floorStore;
     this.printerService = printerService;
@@ -42,6 +45,7 @@ export class YamlService {
     this.floorService = floorService;
     this.serverVersion = serverVersion;
     this.logger = loggerFactory(YamlService.name);
+    this.isTypeormMode = isTypeormMode;
   }
 
   async importPrintersAndFloors(yamlBuffer: string) {
@@ -59,7 +63,7 @@ export class YamlService {
 
     const importData = await validateInput(
       importSpec,
-      importPrintersFloorsYamlRules(exportPrinters, exportFloorGrid, exportFloors)
+      importPrintersFloorsYamlRules(exportPrinters, exportFloorGrid, exportFloors, this.isTypeormMode)
     );
 
     // Nested validation is manual (for now)

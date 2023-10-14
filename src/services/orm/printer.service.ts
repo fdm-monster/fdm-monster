@@ -1,0 +1,142 @@
+import { LoggerService } from "@/handlers/logger";
+import { PrinterDto } from "@/services/interfaces/floor.service.interface";
+import { Printer } from "@/entities/printer.entity";
+import { BaseService } from "@/services/orm/base.service";
+import { TypeormService } from "@/services/typeorm/typeorm.service";
+import { IPrinterService } from "@/services/interfaces/printer.service.interface";
+import { SqliteIdType } from "@/shared.constants";
+import { getDefaultPrinterEntry } from "@/constants/service.constants";
+import { normalizeURLWithProtocol } from "@/utils/url.utils";
+import { validateInput } from "@/handlers/validators";
+import { createMongoPrinterRules, createPrinterRules } from "@/services/validators/printer-service.validation";
+import { printerEvents } from "@/constants/event.constants";
+import EventEmitter2 from "eventemitter2";
+import { DeleteResult } from "typeorm";
+import { ILoggerFactory } from "@/handlers/logger-factory";
+
+export class PrinterService extends BaseService(Printer, PrinterDto) implements IPrinterService<SqliteIdType> {
+  logger: LoggerService;
+  eventEmitter2: EventEmitter2;
+
+  constructor({
+    loggerFactory,
+    typeormService,
+    eventEmitter2,
+  }: {
+    loggerFactory: ILoggerFactory;
+    typeormService: TypeormService;
+    eventEmitter2: EventEmitter2;
+  }) {
+    super({ typeormService });
+    this.logger = loggerFactory(PrinterService.name);
+    this.eventEmitter2 = eventEmitter2;
+  }
+
+  toDto(entity: Printer): PrinterDto {
+    return {
+      id: entity.id,
+      name: entity.name,
+      // url: entity.url,
+      disabledReason: entity.disabledReason,
+      dateAdded: entity.dateAdded,
+    };
+  }
+
+  async list(): Promise<Printer[]> {
+    return this.repository.find({
+      order: {
+        dateAdded: "ASC",
+      },
+    });
+  }
+
+  /**
+   * Stores a new printer into the database.
+   */
+  async create(newPrinter: Partial<Printer>, emitEvent = true): Promise<Printer> {
+    const mergedPrinter = await this.validateAndDefault(newPrinter);
+    mergedPrinter.dateAdded = Date.now();
+    const printer = await this.create(mergedPrinter);
+    if (emitEvent) {
+      this.eventEmitter2.emit(printerEvents.printerCreated, { printer });
+    }
+    return printer;
+  }
+
+  /**
+   * Explicit patching of printer document
+   */
+  async update(printerId: SqliteIdType, partial: Partial<Printer>): Promise<Printer> {
+    const printer = await this.get(printerId);
+    partial.printerUrl = normalizeURLWithProtocol(partial.printerUrl);
+    const { printerUrl, apiKey, enabled, name } = await validateInput(partial, createPrinterRules);
+
+    const updatedPrinter = await this.update(printerId, {
+      printerUrl,
+      name,
+      apiKey,
+      enabled,
+    });
+    this.eventEmitter2.emit(printerEvents.printerUpdated, { printer, updatedPrinter });
+    return updatedPrinter;
+  }
+
+  async batchImport(printers: Partial<Printer>[]): Promise<Printer[]> {
+    if (!printers?.length) return [];
+
+    this.logger.log(`Validating ${printers.length} printer objects`);
+    for (let printer of printers) {
+      await this.validateAndDefault(printer);
+    }
+
+    // We've passed validation completely - creation will likely succeed
+    const newPrinters = [];
+    for (let printer of printers) {
+      const createdPrinter = await this.create(printer, false);
+      newPrinters.push(createdPrinter);
+    }
+
+    this.logger.log(`Successfully created ${printers.length} printers`);
+    this.eventEmitter2.emit(printerEvents.batchPrinterCreated, { printers: newPrinters });
+    return newPrinters;
+  }
+
+  async deleteMany(printerIds: SqliteIdType[], emitEvent = true): Promise<DeleteResult> {
+    const result = await this.repository.delete(printerIds);
+    if (emitEvent) {
+      this.eventEmitter2.emit(printerEvents.printersDeleted, { printerIds });
+    }
+    return result;
+  }
+
+  updateConnectionSettings(printerId: SqliteIdType, partial: { printerUrl: string; apiKey: string }): Promise<Printer> {
+    return this.update(printerId, partial);
+  }
+
+  updateDisabledReason(printerId: SqliteIdType, disabledReason: string): Promise<Printer> {
+    return this.update(printerId, { disabledReason });
+  }
+
+  updateEnabled(printerId: SqliteIdType, enabled: boolean): Promise<Printer> {
+    return this.update(printerId, { enabled });
+  }
+
+  updateFeedRate(printerId: SqliteIdType, feedRate: number): Promise<Printer> {
+    return this.update(printerId, { feedRate });
+  }
+
+  updateFlowRate(printerId: SqliteIdType, flowRate: number): Promise<Printer> {
+    return this.update(printerId, { flowRate });
+  }
+
+  private async validateAndDefault(printer: Printer): Promise<Printer> {
+    const mergedPrinter = {
+      enabled: true,
+      ...printer,
+    };
+    if (mergedPrinter.printerUrl?.length) {
+      mergedPrinter.printerUrl = normalizeURLWithProtocol(mergedPrinter.printerUrl);
+    }
+    return await validateInput(mergedPrinter, createPrinterRules);
+  }
+}

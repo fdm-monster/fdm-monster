@@ -5,6 +5,7 @@ import { asClass, asFunction, asValue, createContainer, InjectionMode } from "aw
 import { ToadScheduler } from "toad-scheduler";
 import { DITokens } from "./container.tokens";
 import { PrinterService } from "./services/printer.service";
+import { PrinterService as PrinterService2 } from "./services/orm/printer.service";
 import { SettingsStore } from "./state/settings.store";
 import { SettingsService } from "./services/settings.service";
 import { ServerReleaseService } from "./services/core/server-release.service";
@@ -56,11 +57,16 @@ import { TestPrinterSocketStore } from "./state/test-printer-socket.store";
 import { PrinterEventsCache } from "./state/printer-events.cache";
 import { LogDumpService } from "./services/core/logs-manager.service";
 import { CameraStreamService } from "./services/camera-stream.service";
+import { CameraStreamService as CameraStreamService2 } from "./services/orm/camera-stream.service";
 import { JwtService } from "./services/authentication/jwt.service";
 import { AuthService } from "./services/authentication/auth.service";
 import { RefreshTokenService } from "@/services/authentication/refresh-token.service";
+import { SettingsService2 } from "@/services/orm/settings.service";
+import { FloorService as FloorService2 } from "@/services/orm/floor.service";
+import { FloorPositionService } from "@/services/orm/floor-position.service";
+import { TypeormService } from "@/services/typeorm/typeorm.service";
 
-export function configureContainer() {
+export function configureContainer(experimentalOrm: boolean = false) {
   // Create the container and set the injectionMode to PROXY (which is also the default).
   const container = createContainer({
     injectionMode: InjectionMode.PROXY,
@@ -69,17 +75,27 @@ export function configureContainer() {
   container.register({
     // -- asValue/asFunction constants --
     [DITokens.serverTasks]: asValue(ServerTasks),
+    [DITokens.isTypeormMode]: asValue(experimentalOrm),
     [DITokens.appDefaultRole]: asValue(ROLES.GUEST),
     [DITokens.appDefaultRoleNoLogin]: asValue(ROLES.ADMIN),
     [DITokens.serverVersion]: asFunction(() => {
       return process.env[AppConstants.VERSION_KEY];
     }),
     [DITokens.socketFactory]: asClass(SocketFactory).transient(), // Factory function, transient on purpose!
+    [DITokens.typeormService]: asClass(TypeormService).singleton(),
+
+    // V1.6.0 capable services
+    [DITokens.settingsService]: experimentalOrm ? asClass(SettingsService2) : asClass(SettingsService),
+    [DITokens.floorService]: experimentalOrm ? asClass(FloorService2).singleton() : asClass(FloorService).singleton(),
+    [DITokens.floorPositionService]: experimentalOrm ? asClass(FloorPositionService).singleton() : asValue(null),
+    [DITokens.cameraStreamService]: experimentalOrm
+      ? asClass(CameraStreamService2).singleton()
+      : asClass(CameraStreamService).singleton(),
+    [DITokens.printerService]: experimentalOrm ? asClass(PrinterService2) : asClass(PrinterService),
 
     // -- asClass --
     [DITokens.serverHost]: asClass(ServerHost).singleton(),
     [DITokens.settingsStore]: asClass(SettingsStore).singleton(),
-    [DITokens.settingsService]: asClass(SettingsService),
     [DITokens.configService]: asClass(ConfigService),
     [DITokens.authService]: asClass(AuthService).singleton(),
     [DITokens.refreshTokenService]: asClass(RefreshTokenService).singleton(),
@@ -116,13 +132,10 @@ export function configureContainer() {
 
     [DITokens.socketIoGateway]: asClass(SocketIoGateway).singleton(),
     [DITokens.multerService]: asClass(MulterService).singleton(),
-    [DITokens.printerService]: asClass(PrinterService),
     [DITokens.printerFilesService]: asClass(PrinterFilesService),
-    [DITokens.floorService]: asClass(FloorService).singleton(),
     [DITokens.yamlService]: asClass(YamlService),
     [DITokens.printCompletionService]: asClass(PrintCompletionService).singleton(),
     [DITokens.octoPrintApiService]: asClass(OctoPrintApiService).singleton(),
-    [DITokens.cameraStreamService]: asClass(CameraStreamService),
     [DITokens.batchCallService]: asClass(BatchCallService).singleton(),
     [DITokens.pluginFirmwareUpdateService]: asClass(PluginFirmwareUpdateService).singleton(),
     [DITokens.octoPrintSockIoAdapter]: asClass(OctoPrintSockIoAdapter).transient(), // Transient on purpose
