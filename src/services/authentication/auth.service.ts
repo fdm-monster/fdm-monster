@@ -126,14 +126,6 @@ export class AuthService implements IAuthService<MongoIdType> {
     return this.blacklistedJwtCache[jwtToken];
   }
 
-  private async signJwtToken(userId: string) {
-    const user = await this.userService.getUser(userId);
-    if (user.needsPasswordChange) {
-      throw new PasswordChangeRequiredError();
-    }
-    return this.jwtService.signJwtToken(userId, user.username);
-  }
-
   async getValidRefreshToken(refreshToken: string, throwNotFoundError: boolean = true) {
     const userRefreshToken = await this.refreshTokenService.getRefreshToken(refreshToken, throwNotFoundError);
     if (!userRefreshToken) {
