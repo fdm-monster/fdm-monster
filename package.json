@@ -24,8 +24,8 @@
     "format": "prettier --write \"src/**/*.js\" \"test/**/*.js\"",
     "swc": "swc",
     "tsc": "tsc --noEmit",
-    "test": "jest --forceExit --runInBand",
-    "test:cov": "jest --forceExit --coverage --runInBand",
+    "test": "jest --forceExit  --maxConcurrency=8 --runInBand ",
+    "test:cov": "jest --forceExit --coverage  --maxConcurrency=8 --runInBand ",
     "cov:show": "./coverage/lcov-report/index.html"
   },
   "keywords": [
