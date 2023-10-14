@@ -15,10 +15,6 @@ export const timeoutSettingsUpdateRules = {
   apiTimeout: "integer|min:1000",
 };
 
-export const timeoutSettingsUpdateRules = {
-  apiTimeout: "integer|min:1000",
-};
-
 export const frontendSettingsUpdateRules = {
   gridCols: "integer|min:1",
   gridRows: "integer|min:1",
