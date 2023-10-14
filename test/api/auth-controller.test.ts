@@ -29,6 +29,13 @@ beforeAll(async () => {
   authService = container.resolve<AuthService>(DITokens.authService);
 });
 
+beforeEach(async () => {
+  await settingsStore.updateCredentialSettings({
+    refreshTokenAttempts: 1000,
+    refreshTokenExpiry: 1000,
+  });
+});
+
 describe(AuthController.name, () => {
   it("should fail login without creds", async () => {
     const response = await request.post(loginRoute).send();
