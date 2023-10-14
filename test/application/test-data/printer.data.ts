@@ -1,7 +1,7 @@
 const groupName = "Row0_0";
 const testApiKey = "fdmonsterfdmonsterfdmonsterfdmon";
 
-const testPrinterData = {
+export const testPrinterData = {
   printerURL: "http://url.com",
   webSocketURL: "ws://url.com",
   apiKey: testApiKey,
@@ -12,7 +12,7 @@ const testPrinterData = {
   },
 };
 
-const validNewPrinterState = {
+export const validNewPrinterState = {
   apiKey: "asdasasdasdasdasdasdasdasdasdasd",
   webSocketURL: "ws://asd.com/",
   printerURL: "https://asd.com:81",
@@ -21,7 +21,7 @@ const validNewPrinterState = {
 /**
  * Mock data
  */
-class PrinterMockData {
+export class PrinterMockData {
   static get PrinterMock() {
     return {
       name: "Printuh",
@@ -41,9 +41,3 @@ class PrinterMockData {
     };
   }
 }
-
-module.exports = {
-  testPrinterData,
-  PrinterMockData,
-  validNewPrinterState,
-};

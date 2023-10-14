@@ -12,6 +12,7 @@ import { IRefreshTokenService } from "@/services/interfaces/refresh-token.servic
 export class RefreshTokenService implements IRefreshTokenService<MongoIdType> {
   private settingsStore: SettingsStore;
   private logger: LoggerService;
+
   constructor({ loggerFactory, settingsStore }: { loggerFactory: ILoggerFactory; settingsStore: SettingsStore }) {
     this.logger = loggerFactory(RefreshTokenService.name);
     this.settingsStore = settingsStore;
@@ -50,7 +51,7 @@ export class RefreshTokenService implements IRefreshTokenService<MongoIdType> {
   }
 
   async updateRefreshTokenAttempts(refreshToken: string, refreshAttemptsUsed: number) {
-    await this.getRefreshToken(refreshToken);
+    await this.getRefreshToken(refreshToken, true);
 
     await RefreshToken.updateOne(
       {

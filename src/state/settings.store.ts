@@ -202,13 +202,14 @@ export class SettingsStore {
   }
 
   private async processSentryEnabled() {
-    if (isTestEnvironment()) return;
     const sentryEnabled = await this.getAnonymousDiagnosticsEnabled();
     if (sentryEnabled) {
       this.logger.log("Enabling Sentry for remote diagnostics");
     } else {
       this.logger.log("Disabling Sentry for remote diagnostics");
     }
+
+    if (isTestEnvironment()) return;
     getCurrentHub().getClient()!.getOptions().enabled = sentryEnabled;
   }
 }

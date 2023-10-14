@@ -9,6 +9,7 @@ import supertest from "supertest";
 import { SettingsStore } from "@/state/settings.store";
 import { loginTestUser } from "./auth/login-test-user";
 import { AuthService } from "@/services/authentication/auth.service";
+import { AuthController } from "@/controllers/auth.controller";
 
 let request: supertest.SuperTest<supertest.Test>;
 let container: AwilixContainer;
@@ -28,7 +29,14 @@ beforeAll(async () => {
   authService = container.resolve<AuthService>(DITokens.authService);
 });
 
-describe("AuthController", () => {
+beforeEach(async () => {
+  await settingsStore.updateCredentialSettings({
+    refreshTokenAttempts: 1000,
+    refreshTokenExpiry: 1000,
+  });
+});
+
+describe(AuthController.name, () => {
   it("should fail login without creds", async () => {
     const response = await request.post(loginRoute).send();
     expectUnauthenticatedResponse(response);
@@ -107,7 +115,8 @@ describe("AuthController", () => {
     expectOkResponse(response);
   });
 
-  it("should succeed logout", async () => {
+  it("should succeed logout without loginRequired", async () => {
+    await settingsStore.setLoginRequired(false);
     const response = await request.post(logoutRoute).send();
     expectOkResponse(response);
   });
@@ -118,9 +127,16 @@ describe("AuthController", () => {
     expectUnauthenticatedResponse(response);
   });
 
-  it("should do auth logout when server:loginRequired is true", async () => {
+  it("should succeed logout when server:loginRequired is true and bearer valid", async () => {
     await settingsStore.setLoginRequired(true);
     const { token, refreshToken } = await loginTestUser(request);
+    const response = await request.post(logoutRoute).set("Authorization", `Bearer ${token}`).send();
+    expectOkResponse(response);
+  });
+
+  it("should do auth logout when server:loginRequired is true", async () => {
+    await settingsStore.setLoginRequired(true);
+    const { token, refreshToken } = await loginTestUser(request, "fakeuser");
     expect(authService.isJwtTokenBlacklisted(token)).toBeFalsy();
     const response = await request.post(logoutRoute).set("Authorization", `Bearer ${token}`).send();
     expectOkResponse(response);
@@ -167,9 +183,31 @@ describe("AuthController", () => {
   });
 
   it("should refresh login", async () => {
-    const { refreshToken, token } = await loginTestUser(request);
-    const response = await request.post(`${baseRoute}/refresh`).set("Authorization", `Bearer ${token}`).send({ refreshToken });
+    await settingsStore.setLoginRequired(true);
+    await settingsStore.updateCredentialSettings({
+      refreshTokenAttempts: 1,
+    });
+    const { refreshToken } = await loginTestUser(request);
+    const response = await request.post(`${baseRoute}/refresh`).send({ refreshToken });
     expectOkResponse(response);
     expect(response.body.token).toBeTruthy();
+    const response2 = await request.post(`${baseRoute}/refresh`).send({ refreshToken });
+    expectUnauthenticatedResponse(response2);
+  });
+
+  it("should not tolerate expired refresh token", async () => {
+    await settingsStore.setLoginRequired(true);
+    await settingsStore.updateCredentialSettings({
+      refreshTokenAttempts: 1,
+      refreshTokenExpiry: 0,
+    });
+    const { refreshToken } = await loginTestUser(request);
+    const response = await request.post(`${baseRoute}/refresh`).send({ refreshToken });
+    expectUnauthenticatedResponse(response);
+  });
+
+  it("should not tolerate non-existing refresh token", async () => {
+    const response = await request.post(`${baseRoute}/refresh`).send({ refreshToken: "fake123" });
+    expectUnauthenticatedResponse(response);
   });
 });

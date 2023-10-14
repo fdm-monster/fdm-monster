@@ -55,7 +55,7 @@ export class UserService implements IUserService<MongoIdType> {
     return user;
   }
 
-  async getUserRoles(userId: MongoIdType) {
+  async getUserRoleIds(userId: MongoIdType) {
     const user = await this.getUser(userId);
     return user.roles?.map((r) => r.toString());
   }
@@ -109,7 +109,7 @@ export class UserService implements IUserService<MongoIdType> {
     return await user.save();
   }
 
-  async updatePasswordUnsafe(username: string, newPassword: string) {
+  async updatePasswordUnsafeByUsername(username: string, newPassword: string) {
     const { password } = await validateInput({ password: newPassword }, newPasswordRules);
     const passwordHash = hashPassword(password);
     const user = await this.findRawByUsername(username);

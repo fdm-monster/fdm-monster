@@ -1,4 +1,4 @@
-import { UUID_LENGTH } from "../../constants/service.constants";
+import { UUID_LENGTH } from "@/constants/service.constants";
 
 export const exportPrintersFloorsYamlRules = {
   // Used to export
