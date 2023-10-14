@@ -1,4 +1,5 @@
 import { Response } from "supertest";
+import CustomMatcherResult = jest.CustomMatcherResult;
 
 export function getExpectExtensions() {
   return {
@@ -7,7 +8,7 @@ export function getExpectExtensions() {
 
       return {
         pass: true,
-      };
+      } as CustomMatcherResult;
     },
   };
 }

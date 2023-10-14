@@ -9,6 +9,7 @@ import supertest from "supertest";
 import { SettingsStore } from "@/state/settings.store";
 import { loginTestUser } from "./auth/login-test-user";
 import { AuthService } from "@/services/authentication/auth.service";
+import { AuthController } from "@/controllers/auth.controller";
 
 let request: supertest.SuperTest<supertest.Test>;
 let container: AwilixContainer;
@@ -28,7 +29,7 @@ beforeAll(async () => {
   authService = container.resolve<AuthService>(DITokens.authService);
 });
 
-describe("AuthController", () => {
+describe(AuthController.name, () => {
   it("should fail login without creds", async () => {
     const response = await request.post(loginRoute).send();
     expectUnauthenticatedResponse(response);

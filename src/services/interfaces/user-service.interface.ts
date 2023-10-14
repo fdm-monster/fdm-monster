@@ -1,35 +1,36 @@
-import { IdType, MongoIdType } from "@/shared.constants";
+import { IdType, MongoIdType, SqliteIdType } from "@/shared.constants";
 import { IUser } from "@/models/Auth/User";
 import { RegisterUserDto, UserDto } from "@/services/interfaces/user.dto";
+import { DeleteResult } from "typeorm";
 
-export interface IUserService<KeyType = IdType> {
-  toDto(user: IUser): UserDto;
+export interface IUserService<KeyType = IdType, Entity = IUser> {
+  toDto(user: Entity): UserDto;
 
-  listUsers(limit?: number): Promise<IUser[]>;
+  listUsers(limit?: number): Promise<Entity[]>;
 
-  findUserByRoleId(roleId: KeyType): Promise<IUser[]>;
+  findUserByRoleId(roleId: KeyType): Promise<Entity[]>;
 
   getDemoUserId(): Promise<KeyType>;
 
-  findRawByUsername(username: string): Promise<IUser>;
+  findRawByUsername(username: string): Promise<Entity>;
 
-  getUser(userId: KeyType): Promise<IUser>;
+  getUser(userId: KeyType): Promise<Entity>;
 
-  getUserRoles(userId: KeyType): Promise<string[]>;
+  getUserRoleIds(userId: KeyType): Promise<KeyType[]>;
 
-  setUserRoleIds(userId: KeyType, roleIds: KeyType[]): Promise<IUser>;
+  setUserRoleIds(userId: KeyType, roleIds: KeyType[]): Promise<Entity>;
 
-  deleteUser(userId: KeyType): Promise<void>;
+  deleteUser(userId: KeyType): Promise<DeleteResult | void>;
 
-  updateUsernameById(userId: KeyType, newUsername: string): Promise<IUser>;
+  updateUsernameById(userId: KeyType, newUsername: string): Promise<Entity>;
 
-  updatePasswordById(userId: KeyType, oldPassword: string, newPassword: string): Promise<IUser>;
+  updatePasswordById(userId: KeyType, oldPassword: string, newPassword: string): Promise<Entity>;
 
-  updatePasswordUnsafe(username: string, newPassword: string): Promise<IUser>;
+  updatePasswordUnsafeByUsername(username: string, newPassword: string): Promise<Entity>;
 
-  setIsRootUserById(userId: MongoIdType, isRootUser: boolean): Promise<void>;
+  setIsRootUserById(userId: KeyType, isRootUser: boolean): Promise<void>;
 
-  setVerifiedById(userId: MongoIdType, isVerified: boolean): Promise<void>;
+  setVerifiedById(userId: KeyType, isVerified: boolean): Promise<void>;
 
-  register(input: RegisterUserDto<KeyType>): Promise<IUser>;
+  register(input: RegisterUserDto<KeyType>): Promise<Entity>;
 }

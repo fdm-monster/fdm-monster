@@ -4,6 +4,8 @@ export const AppConstants = {
   VERSION_KEY: "npm_package_version",
   SERVER_PORT_KEY: "SERVER_PORT",
   MONGO_KEY: "MONGO",
+  DATABASE_PATH: "DATABASE_PATH",
+  DATABASE_FILE: "DATABASE_FILE",
 
   pm2ServiceName: "FDM",
   logAppName: "fdm-monster",
@@ -94,4 +96,7 @@ export const AppConstants = {
   sentryCustomDsnDefault: "https://164b8028a8a745bba3dbcab991b84ae7@o4503975545733120.ingest.sentry.io/4505101598261248",
 
   debugRoutesKey: "DEBUG_ROUTES",
+
+  enableExperimentalTypeormKey: "ENABLE_EXPERIMENTAL_TYPEORM",
+  enableExperimentalTypeormDefault: "false",
 };
