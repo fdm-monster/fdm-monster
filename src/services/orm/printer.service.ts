@@ -1,20 +1,19 @@
 import { LoggerService } from "@/handlers/logger";
-import { PrinterDto } from "@/services/interfaces/floor.service.interface";
+import { PrinterDto } from "@/services/interfaces/printer.dto";
 import { Printer } from "@/entities/printer.entity";
 import { BaseService } from "@/services/orm/base.service";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { SqliteIdType } from "@/shared.constants";
-import { getDefaultPrinterEntry } from "@/constants/service.constants";
 import { normalizeURLWithProtocol } from "@/utils/url.utils";
 import { validateInput } from "@/handlers/validators";
-import { createMongoPrinterRules, createPrinterRules } from "@/services/validators/printer-service.validation";
+import { createPrinterRules } from "@/services/validators/printer-service.validation";
 import { printerEvents } from "@/constants/event.constants";
 import EventEmitter2 from "eventemitter2";
 import { DeleteResult } from "typeorm";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 
-export class PrinterService extends BaseService(Printer, PrinterDto) implements IPrinterService<SqliteIdType> {
+export class PrinterService extends BaseService(Printer, PrinterDto<SqliteIdType>) implements IPrinterService<SqliteIdType> {
   logger: LoggerService;
   eventEmitter2: EventEmitter2;
 
@@ -32,7 +31,7 @@ export class PrinterService extends BaseService(Printer, PrinterDto) implements 
     this.eventEmitter2 = eventEmitter2;
   }
 
-  toDto(entity: Printer): PrinterDto {
+  toDto(entity: Printer): PrinterDto<SqliteIdType> {
     return {
       id: entity.id,
       name: entity.name,
@@ -53,7 +52,7 @@ export class PrinterService extends BaseService(Printer, PrinterDto) implements 
   /**
    * Stores a new printer into the database.
    */
-  async create(newPrinter: Partial<Printer>, emitEvent = true): Promise<Printer> {
+  async create(newPrinter: PrinterDto<SqliteIdType>, emitEvent = true): Promise<Printer> {
     const mergedPrinter = await this.validateAndDefault(newPrinter);
     mergedPrinter.dateAdded = Date.now();
     const printer = await this.create(mergedPrinter);
@@ -68,11 +67,11 @@ export class PrinterService extends BaseService(Printer, PrinterDto) implements 
    */
   async update(printerId: SqliteIdType, partial: Partial<Printer>): Promise<Printer> {
     const printer = await this.get(printerId);
-    partial.printerUrl = normalizeURLWithProtocol(partial.printerUrl);
-    const { printerUrl, apiKey, enabled, name } = await validateInput(partial, createPrinterRules);
+    partial.printerURL = normalizeURLWithProtocol(partial.printerURL);
+    const { printerURL, apiKey, enabled, name } = await validateInput(partial, createPrinterRules);
 
     const updatedPrinter = await this.update(printerId, {
-      printerUrl,
+      printerURL,
       name,
       apiKey,
       enabled,
@@ -134,8 +133,8 @@ export class PrinterService extends BaseService(Printer, PrinterDto) implements 
       enabled: true,
       ...printer,
     };
-    if (mergedPrinter.printerUrl?.length) {
-      mergedPrinter.printerUrl = normalizeURLWithProtocol(mergedPrinter.printerUrl);
+    if (mergedPrinter.printerURL?.length) {
+      mergedPrinter.printerURL = normalizeURLWithProtocol(mergedPrinter.printerURL);
     }
     return await validateInput(mergedPrinter, createPrinterRules);
   }

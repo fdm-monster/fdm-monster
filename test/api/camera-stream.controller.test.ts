@@ -32,13 +32,11 @@ describe(CameraStreamController.name, () => {
           streamURL: url,
           printerId: null,
           name: "Tester",
-          ...defaultSettings,
         }
       : {
           streamURL: url,
           printerId: null,
           name: "Tester",
-          settings: defaultSettings,
         };
   const matchedBody = (url: string) => ({
     id: expect.any(idType),

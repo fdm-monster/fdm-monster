@@ -13,13 +13,14 @@ export class CameraStreamService
     return {
       id: entity.id,
       streamURL: entity.streamURL,
+      name: entity.name,
       printerId: entity.printerId,
-      settings: {
-        aspectRatio: entity.aspectRatio,
-        rotationClockwise: entity.rotationClockwise,
-        flipHorizontal: entity.flipHorizontal,
-        flipVertical: entity.flipVertical,
-      },
+      // settings: {
+      //   aspectRatio: entity.aspectRatio,
+      //   rotationClockwise: entity.rotationClockwise,
+      //   flipHorizontal: entity.flipHorizontal,
+      //   flipVertical: entity.flipVertical,
+      // },
     };
   }
 }

@@ -57,7 +57,7 @@ describe("PrinterController", () => {
     const response = await request.post(createRoute).send({
       printerURL: "http://url.com",
       apiKey: testApiKey,
-      printerName: "test123",
+      name: "test123",
     });
     const body = expectOkResponse(response, {
       printerURL: expect.any(String),

@@ -10,6 +10,9 @@ export class CameraStream extends BaseEntity {
   @Column()
   streamURL!: string;
 
+  @Column()
+  name!: string;
+
   @OneToOne(() => Printer, { nullable: true })
   @JoinColumn({ name: "printerId" })
   printer?: Relation<Printer>;

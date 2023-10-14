@@ -14,7 +14,7 @@ export class Printer extends BaseEntity {
   name!: string;
 
   @Column()
-  printerUrl!: string;
+  printerURL!: string;
 
   @Column()
   @IsAlphanumeric()
