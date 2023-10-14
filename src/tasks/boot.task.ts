@@ -193,7 +193,7 @@ export class BootTask {
     } else {
       await this.userService.setVerifiedById(demoUserId, true);
       await this.userService.setIsRootUserById(demoUserId, true);
-      await this.userService.updatePasswordUnsafe(demoUsername, demoPassword);
+      await this.userService.updatePasswordUnsafeByUsername(demoUsername, demoPassword);
       await this.userService.setUserRoleIds(demoUserId, [adminRole.id]);
       this.logger.log("Updated demo account");
     }
