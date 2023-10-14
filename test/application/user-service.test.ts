@@ -1,28 +1,23 @@
-import { connect, closeDatabase } from "../db-handler";
 import { ensureTestUserCreated } from "../api/test-data/create-user";
 import { configureContainer } from "@/container";
 import { DITokens } from "@/container.tokens";
-import { User } from "@/models";
 import { ROLES } from "@/constants/authorization.constants";
 import { AwilixContainer } from "awilix";
 import { UserService } from "@/services/authentication/user.service";
 import { RoleService } from "@/services/authentication/role.service";
+import { TypeormService } from "@/services/typeorm/typeorm.service";
 
 let container: AwilixContainer;
 let userService: UserService;
 let roleService: RoleService;
 
 beforeAll(async () => {
-  await connect();
-  container = configureContainer();
+  container = configureContainer(true);
   userService = container.resolve(DITokens.userService);
   roleService = container.resolve(DITokens.roleService);
-});
-afterEach(async () => {
-  await User.deleteMany();
-});
-afterAll(async () => {
-  await closeDatabase();
+
+  let typeorm = container.resolve<TypeormService>(DITokens.typeormService);
+  await typeorm.createConnection();
 });
 
 describe(UserService.name, () => {

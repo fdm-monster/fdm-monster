@@ -1,7 +1,7 @@
 import axios from "axios";
 import simpleGit from "simple-git";
 import { Octokit } from "octokit";
-import { asClass, asFunction, asValue, createContainer, InjectionMode } from "awilix";
+import { asClass, asFunction, asValue, createContainer, InjectionMode, Resolver } from "awilix";
 import { ToadScheduler } from "toad-scheduler";
 import { DITokens } from "./container.tokens";
 import { PrinterService } from "./services/printer.service";
@@ -28,9 +28,12 @@ import { FileUploadTrackerCache } from "./state/file-upload-tracker.cache";
 import { ServerHost } from "./server.host";
 import { BootTask } from "./tasks/boot.task";
 import { UserService } from "./services/authentication/user.service";
+import { UserService as UserService2 } from "./services/orm/user.service";
 import { RoleService } from "./services/authentication/role.service";
+import { RoleService as RoleService2 } from "./services/orm/role.service";
 import { ServerTasks } from "./tasks";
 import { PermissionService } from "./services/authentication/permission.service";
+import { PermissionService as PermissionService2 } from "./services/orm/permission.service";
 import { PrinterFileCleanTask } from "./tasks/printer-file-clean.task";
 import { ROLES } from "./constants/authorization.constants";
 import { CustomGcodeService } from "./services/custom-gcode.service";
@@ -56,112 +59,125 @@ import { PrinterSocketStore } from "./state/printer-socket.store";
 import { TestPrinterSocketStore } from "./state/test-printer-socket.store";
 import { PrinterEventsCache } from "./state/printer-events.cache";
 import { LogDumpService } from "./services/core/logs-manager.service";
-import { CameraStreamService } from "./services/camera-stream.service";
-import { CameraStreamService as CameraStreamService2 } from "./services/orm/camera-stream.service";
+import { CameraStreamService as CameraService } from "./services/camera-stream.service";
+import { CameraStreamService as CameraService2 } from "./services/orm/camera-stream.service";
 import { JwtService } from "./services/authentication/jwt.service";
 import { AuthService } from "./services/authentication/auth.service";
 import { RefreshTokenService } from "@/services/authentication/refresh-token.service";
+import { RefreshTokenService as RefreshToken2 } from "@/services/orm/refresh-token.service";
 import { SettingsService2 } from "@/services/orm/settings.service";
 import { FloorService as FloorService2 } from "@/services/orm/floor.service";
 import { FloorPositionService } from "@/services/orm/floor-position.service";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
+import { BuildResolver, DisposableResolver } from "awilix/lib/resolvers";
 
-export function configureContainer(experimentalOrm: boolean = false) {
+export function config<T1, T2>(
+  key: string,
+  experimentalMode: boolean,
+  serviceTypeorm: BuildResolver<T2> & DisposableResolver<T2>,
+  serviceMongoose?: (BuildResolver<T1> & DisposableResolver<T1>) | Resolver<T1>
+) {
+  return {
+    [key]: experimentalMode ? serviceTypeorm : serviceMongoose,
+  };
+}
+
+export function configureContainer(isSqlite: boolean = false) {
   // Create the container and set the injectionMode to PROXY (which is also the default).
   const container = createContainer({
     injectionMode: InjectionMode.PROXY,
   });
 
+  const di = DITokens;
+
   container.register({
     // -- asValue/asFunction constants --
-    [DITokens.serverTasks]: asValue(ServerTasks),
-    [DITokens.isTypeormMode]: asValue(experimentalOrm),
-    [DITokens.appDefaultRole]: asValue(ROLES.GUEST),
-    [DITokens.appDefaultRoleNoLogin]: asValue(ROLES.ADMIN),
-    [DITokens.serverVersion]: asFunction(() => {
+    [di.serverTasks]: asValue(ServerTasks),
+    [di.isTypeormMode]: asValue(isSqlite),
+    [di.appDefaultRole]: asValue(ROLES.GUEST),
+    [di.appDefaultRoleNoLogin]: asValue(ROLES.ADMIN),
+    [di.serverVersion]: asFunction(() => {
       return process.env[AppConstants.VERSION_KEY];
     }),
-    [DITokens.socketFactory]: asClass(SocketFactory).transient(), // Factory function, transient on purpose!
-    [DITokens.typeormService]: asClass(TypeormService).singleton(),
+    [di.socketFactory]: asClass(SocketFactory).transient(), // Factory function, transient on purpose!
 
     // V1.6.0 capable services
-    [DITokens.settingsService]: experimentalOrm ? asClass(SettingsService2) : asClass(SettingsService),
-    [DITokens.floorService]: experimentalOrm ? asClass(FloorService2).singleton() : asClass(FloorService).singleton(),
-    [DITokens.floorPositionService]: experimentalOrm ? asClass(FloorPositionService).singleton() : asValue(null),
-    [DITokens.cameraStreamService]: experimentalOrm
-      ? asClass(CameraStreamService2).singleton()
-      : asClass(CameraStreamService).singleton(),
-    [DITokens.printerService]: experimentalOrm ? asClass(PrinterService2) : asClass(PrinterService),
+    ...config(di.typeormService, isSqlite, asClass(TypeormService).singleton(), asValue(null)),
+    ...config(di.settingsService, isSqlite, asClass(SettingsService2), asClass(SettingsService)),
+    ...config(di.floorService, isSqlite, asClass(FloorService2).singleton(), asClass(FloorService).singleton()),
+    ...config(di.floorPositionService, isSqlite, asClass(FloorPositionService).singleton(), asValue(null)),
+    ...config(di.cameraStreamService, isSqlite, asClass(CameraService2).singleton(), asClass(CameraService).singleton()),
+    ...config(di.printerService, isSqlite, asClass(PrinterService2), asClass(PrinterService)),
+    ...config(di.refreshTokenService, isSqlite, asClass(RefreshToken2).singleton(), asClass(RefreshTokenService).singleton()),
+    ...config(di.userService, isSqlite, asClass(UserService2).singleton(), asClass(UserService).singleton()),
+    ...config(di.roleService, isSqlite, asClass(RoleService2).singleton(), asClass(RoleService).singleton()), // caches roles
+    ...config(di.permissionService, isSqlite, asClass(PermissionService2).singleton(), asClass(PermissionService).singleton()), // caches roles
 
     // -- asClass --
-    [DITokens.serverHost]: asClass(ServerHost).singleton(),
-    [DITokens.settingsStore]: asClass(SettingsStore).singleton(),
-    [DITokens.configService]: asClass(ConfigService),
-    [DITokens.authService]: asClass(AuthService).singleton(),
-    [DITokens.refreshTokenService]: asClass(RefreshTokenService).singleton(),
-    [DITokens.userService]: asClass(UserService),
-    [DITokens.roleService]: asClass(RoleService).singleton(), // caches roles
-    [DITokens.permissionService]: asClass(PermissionService).singleton(),
-    [DITokens.jwtService]: asClass(JwtService).singleton(),
+    [di.serverHost]: asClass(ServerHost).singleton(),
+    [di.settingsStore]: asClass(SettingsStore).singleton(),
+    [di.configService]: asClass(ConfigService),
+    [di.authService]: asClass(AuthService).singleton(),
+    [di.jwtService]: asClass(JwtService).singleton(),
 
-    [DITokens.loggerFactory]: asFunction(LoggerFactory).transient(),
-    [DITokens.taskManagerService]: asClass(TaskManagerService).singleton(),
-    [DITokens.toadScheduler]: asClass(ToadScheduler).singleton(),
-    [DITokens.eventEmitter2]: asFunction(configureEventEmitter).singleton(),
-    [DITokens.cacheManager]: asFunction(configureCacheManager).singleton(),
-    [DITokens.serverReleaseService]: asClass(ServerReleaseService).singleton(),
-    [DITokens.monsterPiService]: asClass(MonsterPiService).singleton(),
-    [DITokens.serverUpdateService]: asClass(ServerUpdateService).singleton(),
-    [DITokens.githubService]: asClass(GithubService),
-    [DITokens.octokitService]: asFunction((cradle: any) => {
+    [di.loggerFactory]: asFunction(LoggerFactory).transient(),
+    [di.taskManagerService]: asClass(TaskManagerService).singleton(),
+    [di.toadScheduler]: asClass(ToadScheduler).singleton(),
+    [di.eventEmitter2]: asFunction(configureEventEmitter).singleton(),
+    [di.cacheManager]: asFunction(configureCacheManager).singleton(),
+    [di.serverReleaseService]: asClass(ServerReleaseService).singleton(),
+    [di.monsterPiService]: asClass(MonsterPiService).singleton(),
+    [di.serverUpdateService]: asClass(ServerUpdateService).singleton(),
+    [di.githubService]: asClass(GithubService),
+    [di.octokitService]: asFunction((cradle: any) => {
       const config = cradle.configService;
       // cradle.
       return new Octokit({
         auth: config.get(AppConstants.GITHUB_PAT),
       });
     }),
-    [DITokens.clientBundleService]: asClass(ClientBundleService),
-    [DITokens.logDumpService]: asClass(LogDumpService),
-    [DITokens.simpleGitService]: asValue(simpleGit()),
-    [DITokens.httpClient]: asValue(
+    [di.clientBundleService]: asClass(ClientBundleService),
+    [di.logDumpService]: asClass(LogDumpService),
+    [di.simpleGitService]: asValue(simpleGit()),
+    [di.httpClient]: asValue(
       axios.create({
         maxBodyLength: 1000 * 1000 * 1000, // 1GB
         maxContentLength: 1000 * 1000 * 1000, // 1GB
       })
     ),
 
-    [DITokens.socketIoGateway]: asClass(SocketIoGateway).singleton(),
-    [DITokens.multerService]: asClass(MulterService).singleton(),
-    [DITokens.printerFilesService]: asClass(PrinterFilesService),
-    [DITokens.yamlService]: asClass(YamlService),
-    [DITokens.printCompletionService]: asClass(PrintCompletionService).singleton(),
-    [DITokens.octoPrintApiService]: asClass(OctoPrintApiService).singleton(),
-    [DITokens.batchCallService]: asClass(BatchCallService).singleton(),
-    [DITokens.pluginFirmwareUpdateService]: asClass(PluginFirmwareUpdateService).singleton(),
-    [DITokens.octoPrintSockIoAdapter]: asClass(OctoPrintSockIoAdapter).transient(), // Transient on purpose
-    [DITokens.floorStore]: asClass(FloorStore).singleton(),
-    [DITokens.pluginRepositoryCache]: asClass(PluginRepositoryCache).singleton(),
+    [di.socketIoGateway]: asClass(SocketIoGateway).singleton(),
+    [di.multerService]: asClass(MulterService).singleton(),
+    [di.printerFilesService]: asClass(PrinterFilesService),
+    [di.yamlService]: asClass(YamlService),
+    [di.printCompletionService]: asClass(PrintCompletionService).singleton(),
+    [di.octoPrintApiService]: asClass(OctoPrintApiService).singleton(),
+    [di.batchCallService]: asClass(BatchCallService).singleton(),
+    [di.pluginFirmwareUpdateService]: asClass(PluginFirmwareUpdateService).singleton(),
+    [di.octoPrintSockIoAdapter]: asClass(OctoPrintSockIoAdapter).transient(), // Transient on purpose
+    [di.floorStore]: asClass(FloorStore).singleton(),
+    [di.pluginRepositoryCache]: asClass(PluginRepositoryCache).singleton(),
 
-    [DITokens.fileCache]: asClass(FileCache).singleton(),
-    [DITokens.fileUploadTrackerCache]: asClass(FileUploadTrackerCache).singleton(),
-    [DITokens.filesStore]: asClass(FilesStore).singleton(),
-    [DITokens.printerCache]: asClass(PrinterCache).singleton(),
-    [DITokens.printerEventsCache]: asClass(PrinterEventsCache).singleton(),
-    [DITokens.printerSocketStore]: asClass(PrinterSocketStore).singleton(),
-    [DITokens.testPrinterSocketStore]: asClass(TestPrinterSocketStore).singleton(),
+    [di.fileCache]: asClass(FileCache).singleton(),
+    [di.fileUploadTrackerCache]: asClass(FileUploadTrackerCache).singleton(),
+    [di.filesStore]: asClass(FilesStore).singleton(),
+    [di.printerCache]: asClass(PrinterCache).singleton(),
+    [di.printerEventsCache]: asClass(PrinterEventsCache).singleton(),
+    [di.printerSocketStore]: asClass(PrinterSocketStore).singleton(),
+    [di.testPrinterSocketStore]: asClass(TestPrinterSocketStore).singleton(),
 
     // Extensibility and export
-    [DITokens.customGCodeService]: asClass(CustomGcodeService),
-    [DITokens.influxDbV2BaseService]: asClass(InfluxDbV2BaseService),
+    [di.customGCodeService]: asClass(CustomGcodeService),
+    [di.influxDbV2BaseService]: asClass(InfluxDbV2BaseService),
 
-    [DITokens.bootTask]: asClass(BootTask),
-    [DITokens.softwareUpdateTask]: asClass(SoftwareUpdateTask), // Provided SSE handlers (couplers) shared with controllers
-    [DITokens.socketIoTask]: asClass(SocketIoTask).singleton(), // This task is a quick task (~100ms per printer)
-    [DITokens.clientDistDownloadTask]: asClass(ClientDistDownloadTask).singleton(),
-    [DITokens.printCompletionSocketIoTask]: asClass(PrintCompletionSocketIoTask).singleton(),
-    [DITokens.printerWebsocketTask]: asClass(PrinterWebsocketTask).singleton(), // This task is a recurring heartbeat task
-    [DITokens.printerWebsocketRestoreTask]: asClass(PrinterWebsocketRestoreTask).singleton(), // Task aimed at testing the printer API
-    [DITokens.printerFileCleanTask]: asClass(PrinterFileCleanTask).singleton(),
+    [di.bootTask]: asClass(BootTask),
+    [di.softwareUpdateTask]: asClass(SoftwareUpdateTask), // Provided SSE handlers (couplers) shared with controllers
+    [di.socketIoTask]: asClass(SocketIoTask).singleton(), // This task is a quick task (~100ms per printer)
+    [di.clientDistDownloadTask]: asClass(ClientDistDownloadTask).singleton(),
+    [di.printCompletionSocketIoTask]: asClass(PrintCompletionSocketIoTask).singleton(),
+    [di.printerWebsocketTask]: asClass(PrinterWebsocketTask).singleton(), // This task is a recurring heartbeat task
+    [di.printerWebsocketRestoreTask]: asClass(PrinterWebsocketRestoreTask).singleton(), // Task aimed at testing the printer API
+    [di.printerFileCleanTask]: asClass(PrinterFileCleanTask).singleton(),
   });
 
   return container;

@@ -3,6 +3,7 @@ import { ROLES } from "@/constants/authorization.constants";
 import { hashPassword } from "@/utils/crypto.utils";
 import { UserDto } from "@/services/interfaces/user.dto";
 import { MongoIdType } from "@/shared.constants";
+import { getDatasource } from "../../typeorm.manager";
 
 export function getUserData(username = "tester", password = "testpassword") {
   return {
@@ -18,15 +19,18 @@ export async function ensureTestUserCreated(
   role = ROLES.ADMIN,
   isVerified = true
 ) {
-  const roleId = (await Role.findOne({ name: role }))?.id;
+  const roleRepo = getDatasource().getRepository(Role);
+  const userRepo = getDatasource().getRepository(User);
+
+  const roleId = (await roleRepo.findOneBy({ name: role }))?.id;
   const roles = roleId ? [roleId.toString()] : [];
 
-  const foundUser = await User.findOne({ username: usernameIn });
+  const foundUser = await userRepo.findOneBy({ username: usernameIn });
   const { username, password } = getUserData(usernameIn, passwordIn);
   const hash = hashPassword(password);
 
   if (foundUser) {
-    await User.updateOne({ _id: foundUser.id }, { passwordHash: hash, needsPasswordChange, roles, isVerified });
+    await userRepo.update({ id: foundUser.id }, { passwordHash: hash, needsPasswordChange, roles, isVerified });
     return {
       id: foundUser.id,
       isVerified,
@@ -38,7 +42,7 @@ export async function ensureTestUserCreated(
     } as UserDto<MongoIdType>;
   }
 
-  const user = await User.create({
+  const userr = await userRepo.create({
     username,
     passwordHash: hash,
     roles,
@@ -48,6 +52,9 @@ export async function ensureTestUserCreated(
     needsPasswordChange,
   });
 
+  await userRepo.insert(userr);
+
+  const user = userRepo.find(userr);
   return {
     id: user.id,
     username: user.username,

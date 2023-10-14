@@ -37,6 +37,7 @@ export const importPrintersFloorsYamlRules = (
     "printers.*.apiKey": `required|length:${UUID_LENGTH},${UUID_LENGTH}|alphaNumeric`,
     "printers.*.printerURL": "required|httpurl",
     "printers.*.enabled": "boolean",
+    "printers.*.name": "required|string",
     "printers.*.settingsAppearance": "required|object",
     "printers.*.settingsAppearance.name": "required|string",
     floors: `${!!importFloors ? "array|minLength:0" : "not"}`,

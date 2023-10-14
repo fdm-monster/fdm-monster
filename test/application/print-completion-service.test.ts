@@ -7,15 +7,8 @@ import { EVENT_TYPES } from "@/services/octoprint/constants/octoprint-websocket.
 let printCompletionService: PrintCompletionService;
 
 beforeAll(async () => {
-  await connect();
   const container = configureContainer();
   printCompletionService = container.resolve(DITokens.printCompletionService);
-});
-afterEach(async () => {
-  await clearDatabase();
-});
-afterAll(async () => {
-  await closeDatabase();
 });
 
 describe(PrintCompletionService.name, () => {

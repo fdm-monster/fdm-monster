@@ -1,7 +1,7 @@
 import { closeDatabase, connect } from "../db-handler";
 import { configureContainer } from "@/container";
 import { DITokens } from "@/container.tokens";
-import { CameraStreamService } from "@/services/camera-stream.service";
+import { CameraService } from "@/services/camera-stream.service";
 import { ICameraStreamService } from "@/services/interfaces/camera-stream.service.interface";
 import { MongoIdType } from "@/shared.constants";
 
@@ -17,7 +17,7 @@ afterAll(async () => {
   await closeDatabase();
 });
 
-describe(CameraStreamService.name, () => {
+describe(CameraService.name, () => {
   it("can create stream", async () => {
     const stream = await cameraStreamService.create({
       printerId: undefined,

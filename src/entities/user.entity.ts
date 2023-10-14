@@ -36,8 +36,9 @@ export class User extends BaseEntity {
   @Column()
   createdAt!: Date;
 
+  // TODO should be foreign key
   @Column({ type: "simple-array" })
-  roles!: string[];
+  roles!: number[];
 
   @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user)
   refreshTokens!: RefreshToken[];

@@ -1,13 +1,24 @@
 import { BaseService } from "@/services/orm/base.service";
 import { RegisterUserDto, UserDto } from "@/services/interfaces/user.dto";
 import { User } from "@/entities";
-import { MongoIdType, SqliteIdType } from "@/shared.constants";
+import { SqliteIdType } from "@/shared.constants";
 import { IUserService } from "@/services/interfaces/user-service.interface";
 import { DeleteResult } from "typeorm";
-import { NotImplementedException } from "@/exceptions/runtime.exceptions";
+import { NotFoundException } from "@/exceptions/runtime.exceptions";
+import { ArrayIn } from "@/services/typeorm/operators";
+import { validateInput } from "@/handlers/validators";
+import { newPasswordRules, registerUserRules } from "@/services/validators/user-service.validation";
+import { comparePasswordHash, hashPassword } from "@/utils/crypto.utils";
+import { TypeormService } from "@/services/typeorm/typeorm.service";
 
-export class UserService extends BaseService(User, UserDto) implements IUserService<SqliteIdType, User> {
-  toDto(user: User): UserDto {
+export class UserService extends BaseService(User, UserDto<SqliteIdType>) implements IUserService<SqliteIdType, User> {
+  typeormService: TypeormService;
+
+  constructor({ typeormService }: { typeormService: TypeormService }) {
+    super({ typeormService });
+  }
+
+  toDto(user: User): UserDto<SqliteIdType> {
     return {
       id: user.id,
       createdAt: user.createdAt,
@@ -16,7 +27,7 @@ export class UserService extends BaseService(User, UserDto) implements IUserServ
       isRootUser: user.isRootUser,
       username: user.username,
       needsPasswordChange: user.needsPasswordChange,
-      roles: user.roles.map((r) => r.toString()),
+      roles: user.roles,
     };
   }
 
@@ -28,7 +39,7 @@ export class UserService extends BaseService(User, UserDto) implements IUserServ
     return this.get(userId, true);
   }
 
-  async getUserRoles(userId: SqliteIdType): Promise<string[]> {
+  async getUserRoleIds(userId: SqliteIdType): Promise<SqliteIdType[]> {
     return (await this.getUser(userId)).roles;
   }
 
@@ -41,39 +52,62 @@ export class UserService extends BaseService(User, UserDto) implements IUserServ
   }
 
   findUserByRoleId(roleId: SqliteIdType): Promise<User[]> {
-    throw new NotImplementedException();
+    return this.repository.findBy({ roles: ArrayIn([roleId]) });
   }
 
   async getDemoUserId(): Promise<SqliteIdType> {
     return (await this.repository.findOneBy({ isDemoUser: true }))?.id;
   }
 
-  register(input: RegisterUserDto<SqliteIdType>): Promise<User> {
-    return Promise.resolve(undefined);
-  }
-
-  setIsRootUserById(userId: MongoIdType, isRootUser: boolean): Promise<void> {
-    return Promise.resolve(undefined);
+  async setIsRootUserById(userId: SqliteIdType, isRootUser: boolean): Promise<void> {
+    await this.update(userId, { isRootUser });
   }
 
   async setUserRoleIds(userId: SqliteIdType, roleIds: SqliteIdType[]): Promise<User> {
+    return await this.update(userId, { roles: roleIds });
+  }
+
+  async setVerifiedById(userId: SqliteIdType, isVerified: boolean): Promise<void> {
+    await this.update(userId, { isVerified });
+  }
+
+  async updatePasswordById(userId: SqliteIdType, oldPassword: string, newPassword: string): Promise<User> {
     const user = await this.getUser(userId);
-    return Promise.resolve(undefined);
+    if (!comparePasswordHash(oldPassword, user.passwordHash)) {
+      throw new NotFoundException("User old password incorrect");
+    }
+
+    const { password } = await validateInput({ password: newPassword }, newPasswordRules);
+    const passwordHash = hashPassword(password);
+    return await this.update(userId, { passwordHash, needsPasswordChange: false });
   }
 
-  setVerifiedById(userId: MongoIdType, isVerified: boolean): Promise<void> {
-    return Promise.resolve(undefined);
-  }
-
-  updatePasswordById(userId: SqliteIdType, oldPassword: string, newPassword: string): Promise<User> {
-    return Promise.resolve(undefined);
-  }
-
-  updatePasswordUnsafe(username: string, newPassword: string): Promise<User> {
-    return Promise.resolve(undefined);
+  async updatePasswordUnsafeByUsername(username: string, newPassword: string): Promise<User> {
+    const { password } = await validateInput({ password: newPassword }, newPasswordRules);
+    const passwordHash = hashPassword(password);
+    const user = await this.findRawByUsername(username);
+    return await this.update(user.id, { passwordHash, needsPasswordChange: false });
   }
 
   updateUsernameById(userId: SqliteIdType, newUsername: string): Promise<User> {
-    return Promise.resolve(undefined);
+    return this.update(userId, { username: newUsername });
+  }
+
+  async register(input: RegisterUserDto<SqliteIdType>): Promise<User> {
+    const { username, password, roles, isDemoUser, isRootUser, needsPasswordChange, isVerified } = (await validateInput(
+      input,
+      registerUserRules
+    )) as RegisterUserDto<SqliteIdType>;
+
+    const passwordHash = hashPassword(password);
+    return await this.create({
+      username,
+      passwordHash,
+      roles,
+      isVerified: isVerified ?? false,
+      isDemoUser: isDemoUser ?? false,
+      isRootUser: isRootUser ?? false,
+      needsPasswordChange: needsPasswordChange ?? true,
+    });
   }
 }
