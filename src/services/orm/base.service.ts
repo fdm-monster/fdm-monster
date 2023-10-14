@@ -1,15 +1,7 @@
 import { IBaseService, Type } from "@/services/orm/base.interface";
 import { SqliteIdType } from "@/shared.constants";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
-import {
-  DeepPartial,
-  DeleteResult,
-  EntityNotFoundError,
-  EntityTarget,
-  FindManyOptions,
-  FindOneOptions,
-  Repository,
-} from "typeorm";
+import { DeepPartial, DeleteResult, EntityNotFoundError, EntityTarget, FindManyOptions, Repository } from "typeorm";
 import { validate } from "class-validator";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import { BaseEntity } from "@/entities/base.entity";
