@@ -136,7 +136,7 @@ describe(AuthController.name, () => {
 
   it("should do auth logout when server:loginRequired is true", async () => {
     await settingsStore.setLoginRequired(true);
-    const { token, refreshToken } = await loginTestUser(request);
+    const { token, refreshToken } = await loginTestUser(request, "fakeuser");
     expect(authService.isJwtTokenBlacklisted(token)).toBeFalsy();
     const response = await request.post(logoutRoute).set("Authorization", `Bearer ${token}`).send();
     expectOkResponse(response);
