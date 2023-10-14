@@ -10,13 +10,24 @@ export class User extends BaseEntity {
   @Column()
   username!: string;
 
-  @Column()
+  @Column({
+    default: false,
+  })
   isDemoUser!: boolean;
 
-  @Column()
+  @Column({
+    default: false,
+  })
   isRootUser!: boolean;
 
-  @Column()
+  @Column({
+    default: false,
+  })
+  isVerified!: boolean;
+
+  @Column({
+    default: true,
+  })
   needsPasswordChange!: boolean;
 
   @Column()

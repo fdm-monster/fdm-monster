@@ -31,6 +31,7 @@ import { PrinterFileCleanRename1696688258437 } from "@/migrations/1696688258437-
 import { RenameLevelFloorPositionsPrinters1697054722968 } from "@/migrations/1697054722968-RenameLevelFloorPositionsPrinters";
 import { RenamePrinterPrinterURL1697271606198 } from "@/migrations/1697271606198-RenamePrinterPrinterURL";
 import { CameraName1697272135029 } from "@/migrations/1697272135029-CameraName";
+import { UserPropertyDefaultsAndIsVerified1697275970026 } from "@/migrations/1697275970026-UserPropertyDefaultsAndIsVerified";
 
 dotenv.config({
   path: join(superRootPath(), ".env"),
@@ -82,6 +83,7 @@ export const AppDataSource = new DataSource({
     RenameLevelFloorPositionsPrinters1697054722968,
     RenamePrinterPrinterURL1697271606198,
     CameraName1697272135029,
+    UserPropertyDefaultsAndIsVerified1697275970026,
   ],
   subscribers: [],
 });

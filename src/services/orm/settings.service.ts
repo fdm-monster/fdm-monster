@@ -26,9 +26,8 @@ import {
 } from "../interfaces/settings.dto";
 import { SqliteIdType } from "@/shared.constants";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
-import { Error, Promise } from "mongoose";
 import { ICredentialSettings } from "@/models/Settings";
-import { BadRequestException, NotImplementedException } from "@/exceptions/runtime.exceptions";
+import { BadRequestException } from "@/exceptions/runtime.exceptions";
 import { AppConstants } from "@/server.constants";
 import { IConfigService } from "@/services/core/config.service";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
