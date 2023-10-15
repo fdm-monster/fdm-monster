@@ -60,9 +60,9 @@ export class UserService implements IUserService<MongoIdType> {
     });
   }
 
-  async getUser(userId: MongoIdType): Promise<IUser> {
+  async getUser(userId: MongoIdType, throwNotFoundError: boolean = true): Promise<IUser> {
     const user = await User.findById(userId);
-    if (!user) throw new NotFoundException("User not found");
+    if (!user && throwNotFoundError) throw new NotFoundException("User not found");
 
     return user;
   }

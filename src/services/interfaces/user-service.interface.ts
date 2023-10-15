@@ -20,7 +20,7 @@ export interface IUserService<KeyType = IdType, Entity = IUser> {
 
   findRawByUsername(username: string): Promise<Entity>;
 
-  getUser(userId: KeyType): Promise<Entity>;
+  getUser(userId: KeyType, throwNotFoundError?: boolean): Promise<Entity>;
 
   getUserRoleIds(userId: KeyType): Promise<KeyType[]>;
 

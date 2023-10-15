@@ -71,7 +71,6 @@ export class AuthService implements IAuthService<MongoIdType> {
 
     const userId = userDoc.id.toString();
     const token = await this.signJwtToken(userId);
-
     await this.refreshTokenService.purgeOutdatedRefreshTokensByUserId(userId);
     await this.purgeOutdatedBlacklistedJwtCache();
 
@@ -121,6 +120,13 @@ export class AuthService implements IAuthService<MongoIdType> {
     }
 
     const userId = userRefreshToken.userId.toString();
+    const user = await this.userService.getUser(userId, false);
+    if (!user) {
+      await this.refreshTokenService.deleteRefreshToken(refreshToken);
+      throw new AuthenticationError("User not found", AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken);
+    }
+
+    // If the user is not found at this point, then the user was deleted
     const token = await this.signJwtToken(userId);
     await this.increaseRefreshTokenAttemptsUsed(userRefreshToken.refreshToken);
     return token;
@@ -162,7 +168,10 @@ export class AuthService implements IAuthService<MongoIdType> {
   }
 
   async signJwtToken(userId: MongoIdType) {
-    const user = await this.userService.getUser(userId);
+    const user = await this.userService.getUser(userId, false);
+    if (!user) {
+      throw new AuthenticationError("User not found", AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken);
+    }
     if (user.needsPasswordChange) {
       throw new AuthenticationError("Password change required", AUTH_ERROR_REASON.PasswordChangeRequired);
     }
