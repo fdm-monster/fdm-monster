@@ -14,18 +14,21 @@ import { IAuthService } from "@/services/interfaces/auth.service.interface";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { errorSummary } from "@/utils/error.utils";
+import { SettingsStore } from "@/state/settings.store";
 
 export class UserController {
   userService: IUserService;
   roleService: IRoleService;
   configService: IConfigService;
   authService: IAuthService;
+  settingsStore: SettingsStore;
   logger: LoggerService;
 
   constructor({
     userService,
     configService,
     roleService,
+    settingsStore,
     authService,
     loggerFactory,
   }: {
@@ -33,12 +36,14 @@ export class UserController {
     configService: IConfigService;
     roleService: IRoleService;
     authService: IAuthService;
+    settingsStore: SettingsStore;
     loggerFactory: ILoggerFactory;
   }) {
     this.userService = userService;
     this.configService = configService;
     this.roleService = roleService;
     this.authService = authService;
+    this.settingsStore = settingsStore;
     this.logger = loggerFactory(UserController.name);
   }
 
@@ -104,7 +109,7 @@ export class UserController {
   async changeUsername(req: Request, res: Response) {
     const { id } = await validateInput(req.params, idRules);
 
-    if (req.user?.id !== id) {
+    if (req.user?.id !== id && (await this.settingsStore.getLoginRequired())) {
       throw new ForbiddenError("Not allowed to change username of other users");
     }
 
@@ -118,7 +123,7 @@ export class UserController {
   async changePassword(req: Request, res: Response) {
     const { id } = await validateInput(req.params, idRules);
 
-    if (req.user?.id !== id) {
+    if (req.user?.id !== id && (await this.settingsStore.getLoginRequired())) {
       throw new ForbiddenError("Not allowed to change password of other users");
     }
 

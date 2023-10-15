@@ -87,6 +87,10 @@ export class UserService implements IUserService<MongoIdType> {
     // Validate
     const user = await this.getUser(userId);
 
+    if (user.isRootUser) {
+      throw new InternalServerException("Cannot delete a root user.");
+    }
+
     // Check if the user is the last admin
     const role = this.roleService.getRoleByName(ROLES.ADMIN);
     if (user.roles.includes(role.id)) {

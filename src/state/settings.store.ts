@@ -23,8 +23,8 @@ import {
 import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class SettingsStore {
-  settingsService: ISettingsService;
-  logger: LoggerService;
+  private settingsService: ISettingsService;
+  private logger: LoggerService;
   private settings: ISettings | null = null;
 
   constructor({ settingsService, loggerFactory }: { settingsService: ISettingsService; loggerFactory: ILoggerFactory }) {
