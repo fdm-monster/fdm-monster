@@ -4,6 +4,14 @@ export function serializePerm(group: string, perm: string) {
   return `${group}.${perm}`;
 }
 
+export const AUTH_ERROR_REASON = {
+  IncorrectCredentials: "IncorrectCredentials",
+  InvalidOrExpiredRefreshToken: "InvalidOrExpiredRefreshToken",
+  PasswordChangeRequired: "PasswordChangeRequired",
+  LoginRequired: "LoginRequired",
+  AccountNotVerified: "AccountNotVerified",
+};
+
 export const PERM_GROUP = {
   PrinterFiles: "PrinterFiles",
   PrinterSettings: "PrinterSettings",

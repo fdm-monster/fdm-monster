@@ -1,4 +1,4 @@
-import { AuthenticationError, PasswordChangeRequiredError } from "@/exceptions/runtime.exceptions";
+import { AuthenticationError } from "@/exceptions/runtime.exceptions";
 import { comparePasswordHash } from "@/utils/crypto.utils";
 import { SettingsStore } from "@/state/settings.store";
 import { LoggerService } from "@/handlers/logger";
@@ -8,6 +8,7 @@ import { IJwtService } from "@/services/interfaces/jwt.service.interface";
 import { MongoIdType } from "@/shared.constants";
 import { IAuthService } from "@/services/interfaces/auth.service.interface";
 import { IRefreshTokenService } from "@/services/interfaces/refresh-token.service.interface";
+import { AUTH_ERROR_REASON } from "@/constants/authorization.constants";
 
 export class AuthService implements IAuthService<MongoIdType> {
   private logger: LoggerService;
@@ -61,18 +62,18 @@ export class AuthService implements IAuthService<MongoIdType> {
   async loginUser(username: string, password: string) {
     const userDoc = await this.userService.findRawByUsername(username);
     if (!userDoc) {
-      throw new AuthenticationError("Login incorrect");
+      throw new AuthenticationError("Login incorrect", AUTH_ERROR_REASON.IncorrectCredentials);
     }
     const result = comparePasswordHash(password, userDoc.passwordHash);
     if (!result) {
-      throw new AuthenticationError("Login incorrect");
+      throw new AuthenticationError("Login incorrect", AUTH_ERROR_REASON.IncorrectCredentials);
     }
 
     const userId = userDoc.id.toString();
     const token = await this.signJwtToken(userId);
 
     await this.refreshTokenService.purgeOutdatedRefreshTokensByUserId(userId);
-    await this.purgeBlacklistedJwtCache();
+    await this.purgeOutdatedBlacklistedJwtCache();
 
     const refreshToken = await this.refreshTokenService.createRefreshTokenForUserId(userId);
     return {
@@ -85,11 +86,11 @@ export class AuthService implements IAuthService<MongoIdType> {
     await this.refreshTokenService.deleteRefreshTokenByUserId(userId);
     if (jwtToken?.length) {
       this.blacklistedJwtCache[jwtToken] = { userId, createdAt: Date.now() };
-      await this.purgeBlacklistedJwtCache();
+      await this.purgeOutdatedBlacklistedJwtCache();
     }
   }
 
-  async purgeBlacklistedJwtCache() {
+  async purgeOutdatedBlacklistedJwtCache() {
     try {
       const { jwtExpiresIn } = await this.settingsStore.getCredentialSettings();
       const now = Date.now();
@@ -113,7 +114,10 @@ export class AuthService implements IAuthService<MongoIdType> {
   async renewLoginByRefreshToken(refreshToken: string): Promise<string> {
     const userRefreshToken = await this.getValidRefreshToken(refreshToken, false);
     if (!userRefreshToken) {
-      throw new AuthenticationError("The refresh token was invalid or expired, could not refresh user token");
+      throw new AuthenticationError(
+        "The refresh token was invalid or expired, could not refresh user token",
+        AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken
+      );
     }
 
     const userId = userRefreshToken.userId.toString();
@@ -133,7 +137,7 @@ export class AuthService implements IAuthService<MongoIdType> {
     }
     if (Date.now() > userRefreshToken.expiresAt) {
       await this.refreshTokenService.deleteRefreshTokenByUserId(userRefreshToken.userId.toString());
-      throw new AuthenticationError("Refresh token expired, login required");
+      throw new AuthenticationError("Refresh token expired, login required", AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken);
     }
     return userRefreshToken;
   }
@@ -148,7 +152,10 @@ export class AuthService implements IAuthService<MongoIdType> {
     const attemptsUsed = userRefreshToken.refreshAttemptsUsed;
     if (attemptsUsed >= refreshTokenAttempts) {
       await this.refreshTokenService.deleteRefreshTokenByUserId(userRefreshToken.userId.toString());
-      throw new AuthenticationError("Refresh token attempts exceeded, login required");
+      throw new AuthenticationError(
+        "Refresh token attempts exceeded, login required",
+        AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken
+      );
     }
 
     await this.refreshTokenService.updateRefreshTokenAttempts(refreshToken, attemptsUsed + 1);
@@ -157,10 +164,10 @@ export class AuthService implements IAuthService<MongoIdType> {
   async signJwtToken(userId: MongoIdType) {
     const user = await this.userService.getUser(userId);
     if (user.needsPasswordChange) {
-      throw new PasswordChangeRequiredError();
+      throw new AuthenticationError("Password change required", AUTH_ERROR_REASON.PasswordChangeRequired);
     }
     if (!user.isVerified) {
-      throw new AuthenticationError("User is not verified yet");
+      throw new AuthenticationError("User is not verified yet", AUTH_ERROR_REASON.AccountNotVerified);
     }
     return this.jwtService.signJwtToken(userId, user.username);
   }

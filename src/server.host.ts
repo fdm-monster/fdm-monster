@@ -4,7 +4,7 @@ import history from "connect-history-api-fallback";
 import { LoggerService } from "./handlers/logger";
 import { loadControllers } from "awilix-express";
 import { join } from "path";
-import { exceptionHandler } from "./middleware/exception.handler";
+import { exceptionFilter } from "./middleware/exception.filter";
 import { fetchServerPort } from "./server.env";
 import { NotFoundException } from "./exceptions/runtime.exceptions";
 import { AppConstants } from "./server.constants";
@@ -75,7 +75,7 @@ export class ServerHost {
         }
       })
       .use(loadControllers(`${routePath}/*.controller.*`, { cwd: __dirname, ignore: "**/*.map" }))
-      .use(exceptionHandler);
+      .use(exceptionFilter);
 
     // Serve the files for our frontend - do this later than the controllers
     const bundleDistPath = join(superRootPath(), AppConstants.defaultClientBundleStorage, "dist");
@@ -101,7 +101,7 @@ export class ServerHost {
           throw new NotFoundException(`${resource} resource was not found`, path);
         }
       })
-      .use(exceptionHandler);
+      .use(exceptionFilter);
   }
 
   async httpListen() {
