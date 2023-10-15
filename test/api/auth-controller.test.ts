@@ -151,6 +151,7 @@ describe(AuthController.name, () => {
     expect(response.body.loginRequired).toBe(true);
     expect(response.body.wizardState.wizardCompleted).toBe(true);
     expect(response.body.registration).toBe(true);
+    expect(response.body.isDemoMode).toBe(false);
   });
 
   it("should get verifyLogin", async () => {
