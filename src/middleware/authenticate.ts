@@ -41,7 +41,7 @@ export const authenticate = () =>
       return next();
     }
 
-    throw new AuthenticationError("Not authenticated", AUTH_ERROR_REASON.LoginRequired);
+    throw new AuthenticationError("Not authenticated", AUTH_ERROR_REASON.InvalidOrExpiredAuthToken);
   });
 export const authorizeRoles = (roles: string[], subset = true) =>
   inject(({ roleService }) => async (req: Request, res: Response, next: NextFunction) => {

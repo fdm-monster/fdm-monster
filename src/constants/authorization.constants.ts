@@ -5,8 +5,10 @@ export function serializePerm(group: string, perm: string) {
 }
 
 export const AUTH_ERROR_REASON = {
+  // Before login
   IncorrectCredentials: "IncorrectCredentials",
   InvalidOrExpiredRefreshToken: "InvalidOrExpiredRefreshToken",
+  InvalidOrExpiredAuthToken: "InvalidOrExpiredAuthToken",
   PasswordChangeRequired: "PasswordChangeRequired",
   LoginRequired: "LoginRequired",
   AccountNotVerified: "AccountNotVerified",
