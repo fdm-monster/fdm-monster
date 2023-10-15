@@ -4,10 +4,11 @@ import { ROLES } from "@/constants/authorization.constants";
 import { DITokens } from "@/container.tokens";
 import { RoleService } from "@/services/authentication/role.service";
 import { AwilixContainer } from "awilix";
-import { connect, closeDatabase } from "../db-handler";
+import { closeDatabase, connect } from "../db-handler";
+import { IRoleService } from "@/services/interfaces/role-service.interface";
 
 let container: AwilixContainer;
-let roleService: RoleService;
+let roleService: IRoleService;
 
 beforeAll(async () => {
   await connect();

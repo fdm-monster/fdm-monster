@@ -9,14 +9,25 @@ import { IConfigService } from "@/services/core/config.service";
 import { IUserService } from "@/services/interfaces/user-service.interface";
 import { Request, Response } from "express";
 import { demoUserNotAllowed, demoUserNotAllowedInterceptor } from "@/middleware/demo.middleware";
+import { IRoleService } from "@/services/interfaces/role-service.interface";
 
 export class UserController {
   userService: IUserService;
+  roleService: IRoleService;
   configService: IConfigService;
 
-  constructor({ userService, configService }: { userService: IUserService; configService: IConfigService }) {
+  constructor({
+    userService,
+    configService,
+    roleService,
+  }: {
+    userService: IUserService;
+    configService: IConfigService;
+    roleService: IRoleService;
+  }) {
     this.userService = userService;
     this.configService = configService;
+    this.roleService = roleService;
   }
 
   async profile(req: Request, res: Response) {
@@ -32,6 +43,11 @@ export class UserController {
   async list(req: Request, res: Response) {
     const users = await this.userService.listUsers();
     res.send(users.map((u) => this.userService.toDto(u)));
+  }
+
+  async listRoles(req: Request, res: Response) {
+    const roleDtos = this.roleService.roles.map((r) => this.roleService.toDto(r));
+    res.send(roleDtos);
   }
 
   async delete(req: Request, res: Response) {
@@ -111,6 +127,7 @@ export default createController(UserController)
   .get("/", "list", {
     before: [authorizeRoles([ROLES.ADMIN])],
   })
+  .get("/roles", "listRoles", {})
   .get("/profile", "profile")
   .get("/:id", "get", {
     before: [authorizeRoles([ROLES.ADMIN])],
