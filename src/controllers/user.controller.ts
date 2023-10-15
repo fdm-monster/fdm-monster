@@ -65,6 +65,13 @@ export class UserController {
     }
 
     await this.userService.deleteUser(id);
+
+    try {
+      await this.authService.logoutUserId(id);
+    } catch (e) {
+      this.logger.error(errorSummary(e));
+    }
+
     res.send();
   }
 
@@ -121,6 +128,15 @@ export class UserController {
       isVerified: "required|boolean",
     });
     await this.userService.setVerifiedById(id, isVerified);
+
+    if (!isVerified) {
+      try {
+        await this.authService.logoutUserId(id);
+      } catch (e) {
+        this.logger.error(errorSummary(e));
+      }
+    }
+
     res.send();
   }
 
