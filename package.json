@@ -7,7 +7,7 @@
   "author": "David Zwart",
   "license": "AGPL-3.0-or-later",
   "private": false,
-  "version": "1.5.0-rc2",
+  "version": "1.5.0",
   "description": "FDM Monster is a bulk OctoPrint manager to set up, configure and monitor 3D printers. Our aim is to provide extremely optimized websocket performance and reliability.",
   "main": "src/index.ts",
   "scripts": {
@@ -39,7 +39,7 @@
     "vue"
   ],
   "dependencies": {
-    "@fdm-monster/client": "1.3.14",
+    "@fdm-monster/client": "1.4.0",
     "@influxdata/influxdb-client": "1.33.2",
     "@sentry/node": "7.74.0",
     "adm-zip": "0.5.10",
