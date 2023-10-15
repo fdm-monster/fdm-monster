@@ -28,6 +28,9 @@ let container: AwilixContainer;
 beforeAll(async () => {
   await connect();
   ({ request, container } = await setupTestApp(true));
+});
+
+beforeEach(async () => {
   await container.resolve<SettingsStore>(DITokens.settingsStore).setLoginRequired(false);
 });
 
