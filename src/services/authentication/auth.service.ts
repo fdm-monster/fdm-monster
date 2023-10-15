@@ -145,17 +145,17 @@ export class AuthService implements IAuthService<MongoIdType> {
   async increaseRefreshTokenAttemptsUsed(refreshToken: string): Promise<void> {
     const { refreshTokenAttempts } = await this.settingsStore.getCredentialSettings();
     const userRefreshToken = await this.getValidRefreshToken(refreshToken);
+    const attemptsUsed = userRefreshToken.refreshAttemptsUsed;
 
     // If no attempts are set, then we don't care about attempts
-    if (refreshTokenAttempts < 0) return;
-
-    const attemptsUsed = userRefreshToken.refreshAttemptsUsed;
-    if (attemptsUsed >= refreshTokenAttempts) {
-      await this.refreshTokenService.deleteRefreshTokenByUserId(userRefreshToken.userId.toString());
-      throw new AuthenticationError(
-        "Refresh token attempts exceeded, login required",
-        AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken
-      );
+    if (refreshTokenAttempts !== -1) {
+      if (attemptsUsed >= refreshTokenAttempts) {
+        await this.refreshTokenService.deleteRefreshTokenByUserId(userRefreshToken.userId.toString());
+        throw new AuthenticationError(
+          "Refresh token attempts exceeded, login required",
+          AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken
+        );
+      }
     }
 
     await this.refreshTokenService.updateRefreshTokenAttempts(refreshToken, attemptsUsed + 1);
