@@ -1,5 +1,5 @@
 import { inject } from "awilix-express";
-import { AuthenticationError, AuthorizationError, PasswordChangeRequiredError } from "@/exceptions/runtime.exceptions";
+import { AuthenticationError, AuthorizationError } from "@/exceptions/runtime.exceptions";
 import { NextFunction, Request, Response } from "express";
 import { AUTH_ERROR_REASON } from "@/constants/authorization.constants";
 
