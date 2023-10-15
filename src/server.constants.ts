@@ -29,6 +29,8 @@ export const AppConstants = {
   // Boolean string (true/false), persisted always
   OVERRIDE_REGISTRATION_ENABLED: "OVERRIDE_REGISTRATION_ENABLED",
   // Number
+  DEFAULT_USERNAME_MINLEN: 3,
+  // Number
   DEFAULT_PASSWORD_MINLEN: 8,
   // String, persisted always
   OVERRIDE_JWT_SECRET: "OVERRIDE_JWT_SECRET",

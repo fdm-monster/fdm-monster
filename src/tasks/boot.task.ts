@@ -185,14 +185,14 @@ export class BootTask {
         password: demoPassword,
         isDemoUser: true,
         isVerified: true,
-        isRootUser: true,
+        isRootUser: false,
         needsPasswordChange: false,
         roles: [adminRole.id],
       });
       this.logger.log("Created demo account");
     } else {
       await this.userService.setVerifiedById(demoUserId, true);
-      await this.userService.setIsRootUserById(demoUserId, true);
+      await this.userService.setIsRootUserById(demoUserId, false);
       await this.userService.updatePasswordUnsafeByUsername(demoUsername, demoPassword);
       await this.userService.setUserRoleIds(demoUserId, [adminRole.id]);
       this.logger.log("Updated demo account");

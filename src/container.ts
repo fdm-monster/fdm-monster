@@ -69,7 +69,8 @@ export function configureContainer() {
   container.register({
     // -- asValue/asFunction constants --
     [DITokens.serverTasks]: asValue(ServerTasks),
-    [DITokens.appDefaultRole]: asValue(ROLES.GUEST),
+    // TODO change the role to a non-admin role in the future once GUEST/OPERATOR have more meaningful permissions
+    [DITokens.appDefaultRole]: asValue(ROLES.ADMIN),
     [DITokens.appDefaultRoleNoLogin]: asValue(ROLES.ADMIN),
     [DITokens.serverVersion]: asFunction(() => {
       return process.env[AppConstants.VERSION_KEY];

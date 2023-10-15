@@ -9,6 +9,8 @@ import { ConfigService } from "@/services/core/config.service";
 import { IUser } from "@/models/Auth/User";
 import { IUserService } from "@/services/interfaces/user-service.interface";
 import { Socket } from "socket.io";
+import { AuthenticationError } from "@/exceptions/runtime.exceptions";
+import { AUTH_ERROR_REASON } from "@/constants/authorization.constants";
 
 export interface JwtFromSocketFunction {
   (socket: Socket): string | null;
@@ -35,11 +37,19 @@ export function verifyUserCallback(userService: IUserService) {
     userService
       .getUser(jwt_payload.userId)
       .then((user: IUser) => {
-        if (user) {
+        if (user && user.isVerified && !user.needsPasswordChange) {
           return done(null, user);
-        } else {
-          return done(null, false);
         }
+        if (user && user.needsPasswordChange) {
+          console.log("Needs password change");
+          return done(new AuthenticationError("Password change required", AUTH_ERROR_REASON.PasswordChangeRequired), false);
+        }
+        if (user && !user?.isVerified) {
+          console.log("Needs password change");
+          return done(new AuthenticationError("User not verified", AUTH_ERROR_REASON.AccountNotVerified), false);
+        }
+
+        return done(null, false);
       })
       .catch((err) => {
         if (err) {

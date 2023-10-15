@@ -6,14 +6,14 @@ import {
   ForbiddenError,
   InternalServerException,
   NotFoundException,
-  PasswordChangeRequiredError,
   ValidationException,
 } from "@/exceptions/runtime.exceptions";
 import { AppConstants } from "@/server.constants";
 import { NextFunction, Request, Response } from "express";
 import { HttpStatusCode } from "@/constants/http-status-codes.constants";
+import { AxiosError } from "axios";
 
-export function exceptionHandler(err, req: Request, res: Response, next: NextFunction) {
+export function exceptionFilter(err: any | AxiosError, req: Request, res: Response, next: NextFunction) {
   const isTest = process.env.NODE_ENV === AppConstants.defaultTestEnv;
   if (!isTest) {
     console.error("[API Exception Handler]", err.stack || err?.response?.data);
@@ -28,7 +28,7 @@ export function exceptionHandler(err, req: Request, res: Response, next: NextFun
   }
   if (err instanceof AuthenticationError) {
     const code = err.statusCode || 401;
-    return res.status(code).send({ error: err.message });
+    return res.status(code).send({ error: err.message, reasonCode: err.reasonCode });
   }
   if (err instanceof AuthorizationError) {
     const code = err.statusCode || HttpStatusCode.FORBIDDEN;
@@ -40,10 +40,6 @@ export function exceptionHandler(err, req: Request, res: Response, next: NextFun
   }
   if (err instanceof ForbiddenError) {
     const code = err.statusCode || HttpStatusCode.FORBIDDEN;
-    return res.status(code).send({ error: err.message });
-  }
-  if (err instanceof PasswordChangeRequiredError) {
-    const code = err.statusCode || HttpStatusCode.CONFLICT;
     return res.status(code).send({ error: err.message });
   }
   if (err instanceof NotFoundException) {

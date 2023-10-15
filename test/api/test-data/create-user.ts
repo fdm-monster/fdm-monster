@@ -16,7 +16,8 @@ export async function ensureTestUserCreated(
   passwordIn = "test",
   needsPasswordChange = false,
   role = ROLES.ADMIN,
-  isVerified = true
+  isVerified = true,
+  isRootUser = true
 ) {
   const roleId = (await Role.findOne({ name: role }))?.id;
   const roles = roleId ? [roleId.toString()] : [];
@@ -26,11 +27,11 @@ export async function ensureTestUserCreated(
   const hash = hashPassword(password);
 
   if (foundUser) {
-    await User.updateOne({ _id: foundUser.id }, { passwordHash: hash, needsPasswordChange, roles, isVerified });
+    await User.updateOne({ _id: foundUser.id }, { passwordHash: hash, needsPasswordChange, roles, isVerified, isRootUser });
     return {
       id: foundUser.id,
       isVerified,
-      isRootUser: role === ROLES.ADMIN,
+      isRootUser,
       isDemoUser: foundUser.isDemoUser,
       username: foundUser.username,
       needsPasswordChange: foundUser.needsPasswordChange,
@@ -43,7 +44,7 @@ export async function ensureTestUserCreated(
     passwordHash: hash,
     roles,
     isDemoUser: false,
-    isRootUser: role === ROLES.ADMIN,
+    isRootUser,
     isVerified,
     needsPasswordChange,
   });
@@ -52,7 +53,7 @@ export async function ensureTestUserCreated(
     id: user.id,
     username: user.username,
     isDemoUser: false,
-    isRootUser: role === ROLES.ADMIN,
+    isRootUser,
     isVerified,
     needsPasswordChange: user.needsPasswordChange,
     roles: user.roles,
