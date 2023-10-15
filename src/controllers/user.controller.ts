@@ -4,7 +4,7 @@ import { authenticate, authorizeRoles } from "@/middleware/authenticate";
 import { ROLES } from "@/constants/authorization.constants";
 import { validateInput } from "@/handlers/validators";
 import { idRules } from "./validation/generic.validation";
-import { InternalServerException } from "@/exceptions/runtime.exceptions";
+import { AuthorizationError, BadRequestException, InternalServerException } from "@/exceptions/runtime.exceptions";
 import { IConfigService } from "@/services/core/config.service";
 import { IUserService } from "@/services/interfaces/user-service.interface";
 import { Request, Response } from "express";
@@ -106,10 +106,42 @@ export class UserController {
   async setVerified(req: Request, res: Response) {
     const { id } = await validateInput(req.params, idRules);
 
+    const ownUserId = req.user?.id;
+    if (ownUserId) {
+      if (ownUserId === id) {
+        throw new BadRequestException("Not allowed to change own verified status");
+      }
+
+      const isRootUser = await this.userService.isUserRootUser(id);
+      if (!isRootUser) {
+        throw new BadRequestException("Not allowed to change root user to unverified");
+      }
+    }
     const { isVerified } = await validateInput(req.body, {
       isVerified: "required|boolean",
     });
     await this.userService.setVerifiedById(id, isVerified);
+    res.send();
+  }
+
+  async setRootUser(req: Request, res: Response) {
+    const { id } = await validateInput(req.params, idRules);
+
+    const userId = req.user?.id;
+    if (req.user?.id) {
+      const isRootUser = await this.userService.isUserRootUser(userId);
+      if (!isRootUser) {
+        throw new AuthorizationError({
+          permissions: [],
+          roles: ["OWNER"],
+          reason: "Not allowed to change owner (root user) without being owner yourself",
+        });
+      }
+    }
+    const { isRootUser } = await validateInput(req.body, {
+      isRootUser: "required|boolean",
+    });
+    await this.userService.setIsRootUserById(id, isRootUser);
     res.send();
   }
 
@@ -134,6 +166,10 @@ export default createController(UserController)
   })
   .delete("/:id", "delete", {
     before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed],
+  })
+  // Has root user validation
+  .post("/:id/set-root-user", "setRootUser", {
+    before: [demoUserNotAllowed],
   })
   .post("/:id/set-verified", "setVerified", {
     before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed],

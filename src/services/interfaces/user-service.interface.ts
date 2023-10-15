@@ -1,4 +1,4 @@
-import { IdType, MongoIdType, SqliteIdType } from "@/shared.constants";
+import { IdType } from "@/shared.constants";
 import { IUser } from "@/models/Auth/User";
 import { RegisterUserDto, UserDto } from "@/services/interfaces/user.dto";
 import { DeleteResult } from "typeorm";
@@ -8,7 +8,13 @@ export interface IUserService<KeyType = IdType, Entity = IUser> {
 
   listUsers(limit?: number): Promise<Entity[]>;
 
-  findUserByRoleId(roleId: KeyType): Promise<Entity[]>;
+  findUsersByRoleId(roleId: KeyType): Promise<Entity[]>;
+
+  findVerifiedUsers(): Promise<Entity[]>;
+
+  isUserRootUser(userId: KeyType): Promise<boolean>;
+
+  findRootUsers(): Promise<Entity[]>;
 
   getDemoUserId(): Promise<KeyType>;
 
