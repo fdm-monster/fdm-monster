@@ -4,7 +4,7 @@ import { authenticate, authorizeRoles } from "@/middleware/authenticate";
 import { ROLES } from "@/constants/authorization.constants";
 import { validateInput } from "@/handlers/validators";
 import { idRules } from "./validation/generic.validation";
-import { AuthorizationError, BadRequestException, ForbiddenError } from "@/exceptions/runtime.exceptions";
+import { ForbiddenError } from "@/exceptions/runtime.exceptions";
 import { IConfigService } from "@/services/core/config.service";
 import { IUserService } from "@/services/interfaces/user-service.interface";
 import { Request, Response } from "express";
@@ -68,13 +68,13 @@ export class UserController {
     const ownUserId = req.user?.id;
     if (ownUserId) {
       if (ownUserId === id) {
-        throw new BadRequestException("Not allowed to delete own account");
+        throw new ForbiddenError("Not allowed to delete own account");
       }
     }
 
     const isRootUser = await this.userService.isUserRootUser(id);
     if (isRootUser) {
-      throw new BadRequestException("Not allowed to delete root user");
+      throw new ForbiddenError("Not allowed to delete root user");
     }
 
     if (this.configService.isDemoMode()) {
@@ -105,7 +105,7 @@ export class UserController {
     const { id } = await validateInput(req.params, idRules);
 
     if (req.user?.id !== id) {
-      throw new BadRequestException("Not allowed to change username of other users");
+      throw new ForbiddenError("Not allowed to change username of other users");
     }
 
     const { username } = await validateInput(req.body, {
@@ -119,7 +119,7 @@ export class UserController {
     const { id } = await validateInput(req.params, idRules);
 
     if (req.user?.id !== id) {
-      throw new BadRequestException("Not allowed to change password of other users");
+      throw new ForbiddenError("Not allowed to change password of other users");
     }
 
     const { oldPassword, newPassword } = await validateInput(req.body, {
@@ -136,13 +136,13 @@ export class UserController {
     const ownUserId = req.user?.id;
     if (ownUserId) {
       if (ownUserId === id) {
-        throw new BadRequestException("Not allowed to change own verified status");
+        throw new ForbiddenError("Not allowed to change own verified status");
       }
     }
 
     const isRootUser = await this.userService.isUserRootUser(id);
     if (isRootUser) {
-      throw new BadRequestException("Not allowed to change root user to unverified");
+      throw new ForbiddenError("Not allowed to change root user to unverified");
     }
 
     const { isVerified } = await validateInput(req.body, {
@@ -168,11 +168,7 @@ export class UserController {
     if (req.user?.id) {
       const isRootUser = await this.userService.isUserRootUser(userId);
       if (!isRootUser) {
-        throw new AuthorizationError({
-          permissions: [],
-          roles: ["OWNER"],
-          reason: "Not allowed to change owner (root user) without being owner yourself",
-        });
+        throw new ForbiddenError("Not allowed to change owner (root user) without being owner yourself");
       }
     }
     const { isRootUser } = await validateInput(req.body, {

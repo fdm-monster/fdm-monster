@@ -1,11 +1,19 @@
 import { connect } from "../db-handler";
 import { AppConstants } from "@/server.constants";
 import { setupTestApp } from "../test-server";
-import { expectInternalServerError, expectNotFoundResponse, expectOkResponse } from "../extensions";
+import {
+  expectBadRequestError,
+  expectForbiddenResponse,
+  expectInternalServerError,
+  expectNotFoundResponse,
+  expectOkResponse,
+  expectUnauthorizedResponse,
+} from "../extensions";
 import { ensureTestUserCreated } from "./test-data/create-user";
 import { ROLES } from "@/constants/authorization.constants";
 import supertest from "supertest";
 import { User } from "@/models";
+import { UserController } from "@/controllers/user.controller";
 
 const defaultRoute = `${AppConstants.apiRoute}/user`;
 const profileRoute = `${defaultRoute}/profile`;
@@ -20,7 +28,7 @@ beforeAll(async () => {
   ({ request } = await setupTestApp(true));
 });
 
-describe("UserController", () => {
+describe(UserController.name, () => {
   it("GET profile", async () => {
     await ensureTestUserCreated();
     const response = await request.get(profileRoute).send();
@@ -62,7 +70,7 @@ describe("UserController", () => {
   });
 
   it("should delete existing user", async function () {
-    const user = await ensureTestUserCreated("test", "user", false, ROLES.OPERATOR);
+    const user = await ensureTestUserCreated("test", "user", false, ROLES.OPERATOR, true, false);
     const response = await request.delete(deleteRoute(user.id)).send();
     expectOkResponse(response);
 
@@ -70,11 +78,23 @@ describe("UserController", () => {
     expectNotFoundResponse(responseVerification);
   });
 
+  it("should not delete root user", async function () {
+    const user123 = await ensureTestUserCreated("test456", "user", false, ROLES.OPERATOR, true, true);
+    const user456 = await ensureTestUserCreated("test123", "user", false, ROLES.OPERATOR, true, true);
+    const response = await request.delete(deleteRoute(user456.id)).send();
+    expectForbiddenResponse(response);
+
+    const responseVerification = await request.get(getRoute(user456.id)).send();
+    const response2Verification = await request.get(getRoute(user123.id)).send();
+    expectOkResponse(responseVerification);
+    expectOkResponse(response2Verification);
+  });
+
   it("should not delete last admin user", async function () {
     await User.deleteMany({});
     const user = await ensureTestUserCreated("test", "user", false, ROLES.ADMIN);
     const response = await request.delete(deleteRoute(user.id)).send();
-    expectInternalServerError(response);
+    expectForbiddenResponse(response);
 
     const responseVerification = await request.get(getRoute(user.id)).send();
     expectOkResponse(responseVerification);

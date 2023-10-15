@@ -58,6 +58,11 @@ export function expectUnauthenticatedResponse(response: Response) {
 
 export function expectUnauthorizedResponse(response: Response) {
   expect(response.statusCode).toEqual(403);
+  expect(response.body.roles).toBeDefined();
+}
+
+export function expectForbiddenResponse(response: Response) {
+  expect(response.statusCode).toEqual(403);
 }
 
 export function expectInvalidResponse(response: Response, keys?: string[], exact = false) {

@@ -7,7 +7,7 @@ import { AppConstants } from "@/server.constants";
 import { AwilixContainer } from "awilix";
 import { DITokens } from "@/container.tokens";
 import { SettingsStore } from "@/state/settings.store";
-import { expectOkResponse, expectUnauthorizedResponse } from "../extensions";
+import { expectForbiddenResponse, expectOkResponse, expectUnauthorizedResponse } from "../extensions";
 import { IUserService } from "@/services/interfaces/user-service.interface";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
 
@@ -72,6 +72,6 @@ describe(FirstTimeSetupController.name, () => {
       rootUsername: "test",
       rootPassword: "testtest",
     });
-    expectUnauthorizedResponse(response2);
+    expectForbiddenResponse(response2);
   });
 });
