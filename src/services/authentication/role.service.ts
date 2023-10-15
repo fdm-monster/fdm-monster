@@ -8,6 +8,7 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IRole } from "@/models/Auth/Role";
 import { MongoIdType } from "@/shared.constants";
 import { IRoleService } from "@/services/interfaces/role-service.interface";
+import { RoleDto } from "@/services/interfaces/role.dto";
 
 export class RoleService implements IRoleService<MongoIdType> {
   private logger: LoggerService;
@@ -33,6 +34,13 @@ export class RoleService implements IRoleService<MongoIdType> {
   }
 
   private _roles: IRole[] = [];
+
+  toDto(role: IRole): RoleDto<MongoIdType> {
+    return {
+      id: role.id,
+      name: role.name,
+    };
+  }
 
   get roles() {
     return this._roles;

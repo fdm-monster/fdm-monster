@@ -1,7 +1,12 @@
 import { IdType } from "@/shared.constants";
 import { IRole } from "@/models/Auth/Role";
+import { RoleDto } from "@/services/interfaces/role.dto";
 
 export interface IRoleService<KeyType = IdType, Entity = IRole> {
+  toDto(role: Entity): RoleDto<KeyType>;
+
+  get roles(): Entity[];
+
   getAppDefaultRole(): Promise<string>;
 
   getRolesPermissions(roles: string[]): string[];
