@@ -1,15 +1,15 @@
-import { IdType, MongoIdType } from "@/shared.constants";
+import { IdType } from "@/shared.constants";
 import { IPermission } from "@/models/Auth/Permission";
 import { PermissionDto } from "@/services/interfaces/permission.dto";
 
-export interface IPermissionService<KeyType = IdType> {
-  toDto(permission: IPermission): PermissionDto<KeyType>;
+export interface IPermissionService<KeyType = IdType, Entity = IPermission> {
+  toDto(permission: Entity): PermissionDto<KeyType>;
 
   authorizePermission(requiredPermission: string, assignedPermissions: string[]): boolean;
 
-  getPermissionByName(permissionName: string): Promise<IPermission>;
+  getPermissionByName(permissionName: string): Promise<Entity>;
 
-  getPermission(permissionId: MongoIdType): Promise<IPermission>;
+  getPermission(permissionId: KeyType): Promise<Entity>;
 
   syncPermissions(): Promise<void>;
 

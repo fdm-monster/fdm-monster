@@ -8,10 +8,12 @@ import { MongoIdType } from "@/shared.constants";
 import { IRefreshToken } from "@/models/Auth/RefreshToken";
 import { AuthenticationError } from "@/exceptions/runtime.exceptions";
 import { IRefreshTokenService } from "@/services/interfaces/refresh-token.service.interface";
+import { AUTH_ERROR_REASON } from "@/constants/authorization.constants";
 
 export class RefreshTokenService implements IRefreshTokenService<MongoIdType> {
   private settingsStore: SettingsStore;
   private logger: LoggerService;
+
   constructor({ loggerFactory, settingsStore }: { loggerFactory: ILoggerFactory; settingsStore: SettingsStore }) {
     this.logger = loggerFactory(RefreshTokenService.name);
     this.settingsStore = settingsStore;
@@ -23,7 +25,7 @@ export class RefreshTokenService implements IRefreshTokenService<MongoIdType> {
     });
     if (!userRefreshToken) {
       if (throwNotFoundError) {
-        throw new AuthenticationError("The refresh token was not found");
+        throw new AuthenticationError("The refresh token was not found", AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken);
       }
       return null;
     }
@@ -50,7 +52,7 @@ export class RefreshTokenService implements IRefreshTokenService<MongoIdType> {
   }
 
   async updateRefreshTokenAttempts(refreshToken: string, refreshAttemptsUsed: number) {
-    await this.getRefreshToken(refreshToken);
+    await this.getRefreshToken(refreshToken, true);
 
     await RefreshToken.updateOne(
       {

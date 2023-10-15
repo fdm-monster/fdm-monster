@@ -14,11 +14,11 @@ export class InfluxDbV2BaseService {
   }
 
   isConfigValid() {
-    const { bucket, org, url, token } = this.#getConfig();
+    const { bucket, org, url, token } = this.getConfig();
     return bucket && org && url && token;
   }
 
-  #getConfig() {
+  getConfig() {
     return {
       url: this.configService.get(AppConstants.influxUrl),
       token: this.configService.get(AppConstants.influxToken),
@@ -27,13 +27,13 @@ export class InfluxDbV2BaseService {
     };
   }
 
-  #getClient() {
-    const { url, token } = this.#getConfig();
+  getClient() {
+    const { url, token } = this.getConfig();
     return new InfluxDB({ url, token });
   }
 
-  #getQueryApi() {
-    const { org } = this.#getConfig();
-    return this.#getClient().getQueryApi(org);
-  }
+  // private getQueryApi() {
+  //   const { org } = this.getConfig();
+  //   return this.getClient().getQueryApi(org);
+  // }
 }

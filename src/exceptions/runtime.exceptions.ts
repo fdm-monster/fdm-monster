@@ -6,9 +6,11 @@ export class NotImplementedException extends Error {
 }
 
 export class AuthenticationError extends Error {
-  constructor(error?: string) {
+  reasonCode: string;
+  constructor(error?: string, reasonCode = "") {
     super(error);
     this.name = AuthenticationError.name;
+    this.reasonCode = reasonCode;
   }
 }
 
@@ -16,13 +18,6 @@ export class ForbiddenError extends Error {
   constructor(error?: string) {
     super(error);
     this.name = ForbiddenError.name;
-  }
-}
-
-export class PasswordChangeRequiredError extends Error {
-  constructor() {
-    super("Password change required");
-    this.name = PasswordChangeRequiredError.name;
   }
 }
 

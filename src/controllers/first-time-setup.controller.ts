@@ -2,7 +2,7 @@ import { createController } from "awilix-express";
 import { AppConstants } from "@/server.constants";
 import { validateMiddleware } from "@/handlers/validators";
 import { wizardSettingsRules } from "./validation/setting.validation";
-import { AuthorizationError, BadRequestException } from "@/exceptions/runtime.exceptions";
+import { BadRequestException, ForbiddenError } from "@/exceptions/runtime.exceptions";
 import { ROLES } from "@/constants/authorization.constants";
 import { SettingsStore } from "@/state/settings.store";
 import { Request, Response } from "express";
@@ -44,7 +44,7 @@ export class FirstTimeSetupController {
     const { loginRequired, registration, rootUsername, rootPassword } = await validateMiddleware(req, wizardSettingsRules);
 
     if (this.settingsStore.isWizardCompleted()) {
-      throw new AuthorizationError({ reason: "Wizard already completed" });
+      throw new ForbiddenError("Wizard already completed");
     }
 
     const role = await this.roleService.getSynchronizedRoleByName(ROLES.ADMIN);

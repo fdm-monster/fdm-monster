@@ -9,15 +9,9 @@ export interface ISettingsService<KeyType = IdType, Entity = ISettings> {
 
   migrateSettingsRuntime(knownSettings: Partial<Entity>): any;
 
-  setSentryDiagnosticsEnabled(enabled: boolean): Promise<Entity>;
-
   patchFileCleanSettings(fileClean: Partial<FileCleanSettingsDto>): Promise<Entity>;
 
   patchWizardSettings(patch: Partial<IWizardSettings>): Promise<Entity>;
-
-  setRegistrationEnabled(enabled: boolean): Promise<Entity>;
-
-  setLoginRequired(enabled: boolean): Promise<Entity>;
 
   setWhitelist(enabled: boolean, ipAddresses: string[]): Promise<Entity>;
 

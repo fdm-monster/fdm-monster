@@ -109,15 +109,6 @@ export class SettingsService implements ISettingsService<MongoIdType, ISettings>
     return knownSettings;
   }
 
-  async setSentryDiagnosticsEnabled(enabled: boolean) {
-    const settingsDoc = await this.getOrCreate();
-    settingsDoc[serverSettingsKey].sentryDiagnosticsEnabled = enabled;
-
-    return Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
-      new: true,
-    });
-  }
-
   async patchFileCleanSettings(patchUpdate: Partial<IFileCleanSettings>) {
     const validatedInput = await validateInput(patchUpdate, fileCleanSettingsUpdateRules);
 
@@ -138,24 +129,6 @@ export class SettingsService implements ISettingsService<MongoIdType, ISettings>
     });
   }
 
-  async setRegistrationEnabled(enabled = true) {
-    const settingsDoc = await this.getOrCreate();
-    settingsDoc[serverSettingsKey].registration = enabled;
-
-    return Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
-      new: true,
-    });
-  }
-
-  async setLoginRequired(enabled = true) {
-    const settingsDoc = await this.getOrCreate();
-    settingsDoc[serverSettingsKey].loginRequired = enabled;
-
-    return Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
-      new: true,
-    });
-  }
-
   async setWhitelist(enabled: boolean, ipAddresses: string[]) {
     if (!this.isWhiteListSettingEnabled()) {
       throw new BadRequestException("Whitelist settings are not enabled");
@@ -163,8 +136,8 @@ export class SettingsService implements ISettingsService<MongoIdType, ISettings>
 
     await validateInput(
       {
-        enabled,
-        ipAddresses,
+        whitelistEnabled: enabled,
+        whitelistedIpAddresses: ipAddresses,
       },
       whitelistSettingUpdateRules
     );

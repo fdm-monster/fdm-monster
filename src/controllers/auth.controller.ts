@@ -13,6 +13,7 @@ import { IUserService } from "@/services/interfaces/user-service.interface";
 import { IAuthService } from "@/services/interfaces/auth.service.interface";
 import { IRoleService } from "@/services/interfaces/role-service.interface";
 import { demoUserNotAllowedInterceptor } from "@/middleware/demo.middleware";
+import { IConfigService } from "@/services/core/config.service";
 
 export class AuthController {
   authService: IAuthService;
@@ -20,6 +21,7 @@ export class AuthController {
   userService: IUserService;
   roleService: IRoleService;
   logger: LoggerService;
+  configService: IConfigService;
 
   constructor({
     authService,
@@ -27,17 +29,20 @@ export class AuthController {
     userService,
     roleService,
     loggerFactory,
+    configService,
   }: {
     authService: IAuthService;
     settingsStore: SettingsStore;
     userService: IUserService;
     roleService: IRoleService;
     loggerFactory: ILoggerFactory;
+    configService: IConfigService;
   }) {
     this.authService = authService;
     this.settingsStore = settingsStore;
     this.userService = userService;
     this.roleService = roleService;
+    this.configService = configService;
     this.logger = loggerFactory(AuthController.name);
   }
 
@@ -48,10 +53,11 @@ export class AuthController {
   }
 
   async getLoginRequired(req: Request, res: Response) {
-    const isLoginRequired = await this.settingsStore.getLoginRequired();
+    const loginRequired = await this.settingsStore.getLoginRequired();
     const registration = this.settingsStore.isRegistrationEnabled();
     const wizardState = this.settingsStore.getWizardState();
-    return res.send({ loginRequired: isLoginRequired, registration, wizardState });
+    const isDemoMode = this.configService.isDemoMode();
+    res.send({ loginRequired, registration, wizardState, isDemoMode });
   }
 
   async verifyLogin(req: Request, res: Response) {

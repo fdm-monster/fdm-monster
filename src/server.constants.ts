@@ -4,6 +4,8 @@ export const AppConstants = {
   VERSION_KEY: "npm_package_version",
   SERVER_PORT_KEY: "SERVER_PORT",
   MONGO_KEY: "MONGO",
+  DATABASE_PATH: "DATABASE_PATH",
+  DATABASE_FILE: "DATABASE_FILE",
 
   pm2ServiceName: "FDM",
   logAppName: "fdm-monster",
@@ -26,6 +28,8 @@ export const AppConstants = {
   OVERRIDE_LOGIN_REQUIRED: "OVERRIDE_LOGIN_REQUIRED",
   // Boolean string (true/false), persisted always
   OVERRIDE_REGISTRATION_ENABLED: "OVERRIDE_REGISTRATION_ENABLED",
+  // Number
+  DEFAULT_USERNAME_MINLEN: 3,
   // Number
   DEFAULT_PASSWORD_MINLEN: 8,
   // String, persisted always
@@ -64,7 +68,7 @@ export const AppConstants = {
   orgName: "fdm-monster",
   // Wizard version changes will trigger a re-run of the wizard
   currentWizardVersion: 1,
-  defaultClientMinimum: "1.3.11",
+  defaultClientMinimum: "1.4.0",
 
   influxUrl: "INFLUX_URL",
   influxToken: "INFLUX_TOKEN",
@@ -94,4 +98,7 @@ export const AppConstants = {
   sentryCustomDsnDefault: "https://164b8028a8a745bba3dbcab991b84ae7@o4503975545733120.ingest.sentry.io/4505101598261248",
 
   debugRoutesKey: "DEBUG_ROUTES",
+
+  enableExperimentalTypeormKey: "ENABLE_EXPERIMENTAL_TYPEORM",
+  enableExperimentalTypeormDefault: "false",
 };

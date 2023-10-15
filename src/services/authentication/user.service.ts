@@ -34,8 +34,20 @@ export class UserService implements IUserService<MongoIdType> {
     return User.find().limit(limit);
   }
 
-  async findUserByRoleId(roleId: MongoIdType) {
+  async findUsersByRoleId(roleId: MongoIdType) {
     return User.find({ roles: { $in: [roleId] } });
+  }
+
+  async findVerifiedUsers() {
+    return User.find({ isVerified: true });
+  }
+
+  async isUserRootUser(userId: MongoIdType) {
+    return (await User.findById(userId))?.isRootUser;
+  }
+
+  async findRootUsers() {
+    return User.find({ isRootUser: true });
   }
 
   async getDemoUserId() {
@@ -48,14 +60,14 @@ export class UserService implements IUserService<MongoIdType> {
     });
   }
 
-  async getUser(userId: MongoIdType): Promise<IUser> {
+  async getUser(userId: MongoIdType, throwNotFoundError: boolean = true): Promise<IUser> {
     const user = await User.findById(userId);
-    if (!user) throw new NotFoundException("User not found");
+    if (!user && throwNotFoundError) throw new NotFoundException("User not found");
 
     return user;
   }
 
-  async getUserRoles(userId: MongoIdType) {
+  async getUserRoleIds(userId: MongoIdType) {
     const user = await this.getUser(userId);
     return user.roles?.map((r) => r.toString());
   }
@@ -75,10 +87,14 @@ export class UserService implements IUserService<MongoIdType> {
     // Validate
     const user = await this.getUser(userId);
 
+    if (user.isRootUser) {
+      throw new InternalServerException("Cannot delete a root user.");
+    }
+
     // Check if the user is the last admin
     const role = this.roleService.getRoleByName(ROLES.ADMIN);
     if (user.roles.includes(role.id)) {
-      const administrators = await this.findUserByRoleId(role.id);
+      const administrators = await this.findUsersByRoleId(role.id);
       if (administrators?.length === 1) {
         throw new InternalServerException("Cannot delete the last user with ADMIN role.");
       }
@@ -109,7 +125,7 @@ export class UserService implements IUserService<MongoIdType> {
     return await user.save();
   }
 
-  async updatePasswordUnsafe(username: string, newPassword: string) {
+  async updatePasswordUnsafeByUsername(username: string, newPassword: string) {
     const { password } = await validateInput({ password: newPassword }, newPasswordRules);
     const passwordHash = hashPassword(password);
     const user = await this.findRawByUsername(username);
@@ -125,9 +141,10 @@ export class UserService implements IUserService<MongoIdType> {
     if (!user) throw new NotFoundException("User not found");
 
     if (!isRootUser) {
-      const role = this.roleService.getRoleByName(ROLES.ADMIN);
-      if (user.roles.includes(role.id)) {
-        throw new InternalServerException("Cannot set a root user with isRootUser: false as that makes no sense");
+      // Ensure at least one user is root user
+      const rootUsers = await this.findRootUsers();
+      if (rootUsers.length === 1) {
+        throw new InternalServerException("Cannot set the last root user to non-root user.");
       }
     }
 
@@ -140,9 +157,14 @@ export class UserService implements IUserService<MongoIdType> {
     if (!user) throw new NotFoundException("User not found");
 
     if (!isVerified) {
-      const role = this.roleService.getRoleByName(ROLES.ADMIN);
-      if (user.roles.includes(role.id)) {
-        throw new InternalServerException("Cannot set a user with ADMIN role to unverified.");
+      if (user.isRootUser) {
+        throw new InternalServerException("Cannot set a owner (root user) to unverified.");
+      }
+
+      // Ensure at least one user is verified
+      const verifiedUsers = await this.findVerifiedUsers();
+      if (verifiedUsers.length === 1) {
+        throw new InternalServerException("Cannot set the last user to unverified.");
       }
     }
 

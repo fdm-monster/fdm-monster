@@ -1,7 +1,7 @@
 import { WebsocketAdapter } from "@/utils/websocket.adapter";
 import { HttpStatusCode } from "@/constants/http-status-codes.constants";
 import { AppConstants } from "@/server.constants";
-import { AuthenticationError } from "@/exceptions/runtime.exceptions";
+import { ExternalServiceError } from "@/exceptions/runtime.exceptions";
 import { httpToWsUrl } from "@/utils/url.utils";
 import { normalizeUrl } from "@/utils/normalize-url";
 import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
@@ -10,6 +10,7 @@ import { LoggerService } from "@/handlers/logger";
 import { ConfigService } from "@/services/core/config.service";
 import { IdType } from "@/shared.constants";
 import { ILoggerFactory } from "@/handlers/logger-factory";
+import { AxiosError } from "axios";
 
 type ThrottleRate = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 
@@ -171,9 +172,8 @@ export class OctoPrintSockIoAdapter extends WebsocketAdapter {
 
   /**
    * Retrieve session token by authenticating with OctoPrint API
-   * @returns {Promise<void>}
    */
-  async setupSocketSession() {
+  async setupSocketSession(): Promise<void> {
     this.resetSocketState();
     this.sessionDto = await this.octoPrintApiService
       .login(this.loginDto)
@@ -182,66 +182,57 @@ export class OctoPrintSockIoAdapter extends WebsocketAdapter {
         if (r.name === "_api") {
           this.setApiState(API_STATE.globalKey);
           this.setSocketState(SOCKET_STATE.aborted);
-          throw new AuthenticationError("Global API Key detected, aborting socket connection");
+          throw new ExternalServiceError("Global API Key detected, aborting socket connection");
         } else if (r.needs?.group[0] === "guests") {
           this.logger.warn("Detected group guests in OctoPrint login response, marking as unauthorized");
           // This doesn't occur often (instead a 400 with CSRF failed is returned)
           this.setApiState(API_STATE.authFail);
           this.setSocketState(SOCKET_STATE.aborted);
-          throw new AuthenticationError("Guest group detected, authentication failed, aborting socket connection");
+          throw new ExternalServiceError("Guest group detected, authentication failed, aborting socket connection");
         }
         this.setApiState(API_STATE.responding);
         this.setSocketState(SOCKET_STATE.opening);
         return r;
       })
-      .catch(
-        /**
-         * @param {ExternalHttpError|AxiosError} e
-         */
-        (e) => {
-          this.setSocketState(SOCKET_STATE.aborted);
-          if (e instanceof AuthenticationError) {
-            this.logger.warn(`Printer authorization error (id: ${this.printerId}), apiState: ${this.apiState}`);
-            throw e;
-          } else {
-            if (e?.response?.status === 403) {
-              this.setApiState(API_STATE.authFail);
-              this.setSocketState(SOCKET_STATE.aborted);
-              throw new AuthenticationError(e);
-            }
-            this.logger.error(`Printer (${this.printerId}) network or transport error, marking it as unreachable; ${e}`);
-            this.setApiState(API_STATE.noResponse);
-          }
+      .catch((e: AxiosError) => {
+        this.setSocketState(SOCKET_STATE.aborted);
+        // TODO improve error type detection
+        if (e instanceof ExternalServiceError) {
+          this.logger.warn(`Printer authorization error (id: ${this.printerId}), apiState: ${this.apiState}`);
           throw e;
-        }
-      );
-
-    this.username = await this.octoPrintApiService.getAdminUserOrDefault(this.loginDto).catch(
-      /**
-       * @param {ExternalHttpError|AxiosError} e
-       */
-      (e) => {
-        const status = e.response?.status;
-        if (status === HttpStatusCode.FORBIDDEN) {
-          this.setApiState(API_STATE.authFail);
-          this.setSocketState(SOCKET_STATE.aborted);
         } else {
-          this.setApiState(API_STATE.authFail);
-          this.setSocketState(SOCKET_STATE.aborted);
-        }
-        if (
-          [
-            HttpStatusCode.BAD_GATEWAY,
-            HttpStatusCode.NOT_IMPLEMENTED,
-            HttpStatusCode.SERVICE_UNAVAILABLE,
-            HttpStatusCode.GATEWAY_TIMEOUT,
-          ].includes(status)
-        ) {
-          this.logger.error(`Detected a 501-504 error (${status}) probably OctoPrint has crashed or is restarting`);
+          if (e?.response?.status === 403) {
+            this.setApiState(API_STATE.authFail);
+            this.setSocketState(SOCKET_STATE.aborted);
+            throw new ExternalServiceError(e);
+          }
+          this.logger.error(`Printer (${this.printerId}) network or transport error, marking it as unreachable; ${e}`);
+          this.setApiState(API_STATE.noResponse);
         }
         throw e;
+      });
+
+    this.username = await this.octoPrintApiService.getAdminUserOrDefault(this.loginDto).catch((e: AxiosError) => {
+      const status = e.response?.status;
+      if (status === HttpStatusCode.FORBIDDEN) {
+        this.setApiState(API_STATE.authFail);
+        this.setSocketState(SOCKET_STATE.aborted);
+      } else {
+        this.setApiState(API_STATE.authFail);
+        this.setSocketState(SOCKET_STATE.aborted);
       }
-    );
+      if (
+        [
+          HttpStatusCode.BAD_GATEWAY,
+          HttpStatusCode.NOT_IMPLEMENTED,
+          HttpStatusCode.SERVICE_UNAVAILABLE,
+          HttpStatusCode.GATEWAY_TIMEOUT,
+        ].includes(status)
+      ) {
+        this.logger.error(`Detected a 501-504 error (${status}) probably OctoPrint has crashed or is restarting`);
+      }
+      throw e;
+    });
   }
 
   /**

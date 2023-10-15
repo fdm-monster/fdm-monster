@@ -1,9 +1,10 @@
 export const DITokens = {
   // Values
   serverVersion: "serverVersion",
+  isTypeormMode: "isTypeormMode",
   appDefaultRole: "appDefaultRole",
   appDefaultRoleNoLogin: "appDefaultRoleNoLogin",
-  // Dynamically registered
+  typeormService: "typeormService",
   // Instances
   serverHost: "serverHost",
   loggerFactory: "loggerFactory",
@@ -17,6 +18,7 @@ export const DITokens = {
   eventEmitter2: "eventEmitter2",
   cacheManager: "cacheManager",
   printerService: "printerService",
+  floorPositionService: "floorPositionService",
   printCompletionService: "printCompletionService",
   floorService: "floorService",
   yamlService: "yamlService",
