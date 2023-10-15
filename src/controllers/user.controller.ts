@@ -150,13 +150,14 @@ export class UserController {
     });
     await this.userService.setVerifiedById(id, isVerified);
 
-    if (!isVerified) {
-      try {
-        await this.authService.logoutUserId(id);
-      } catch (e) {
-        this.logger.error(errorSummary(e));
-      }
-    }
+    // Note: this makes it impossible for the UI to determine if the user is verified or not
+    // if (!isVerified) {
+    //   try {
+    //     await this.authService.logoutUserId(id);
+    //   } catch (e) {
+    //     this.logger.error(errorSummary(e));
+    //   }
+    // }
 
     res.send();
   }
