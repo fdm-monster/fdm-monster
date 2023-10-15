@@ -4,30 +4,42 @@ import { authenticate, authorizeRoles } from "@/middleware/authenticate";
 import { ROLES } from "@/constants/authorization.constants";
 import { validateInput } from "@/handlers/validators";
 import { idRules } from "./validation/generic.validation";
-import { AuthorizationError, BadRequestException, InternalServerException } from "@/exceptions/runtime.exceptions";
+import { AuthorizationError, BadRequestException, ForbiddenError } from "@/exceptions/runtime.exceptions";
 import { IConfigService } from "@/services/core/config.service";
 import { IUserService } from "@/services/interfaces/user-service.interface";
 import { Request, Response } from "express";
 import { demoUserNotAllowed, demoUserNotAllowedInterceptor } from "@/middleware/demo.middleware";
 import { IRoleService } from "@/services/interfaces/role-service.interface";
+import { IAuthService } from "@/services/interfaces/auth.service.interface";
+import { LoggerService } from "@/handlers/logger";
+import { ILoggerFactory } from "@/handlers/logger-factory";
+import { errorSummary } from "@/utils/error.utils";
 
 export class UserController {
   userService: IUserService;
   roleService: IRoleService;
   configService: IConfigService;
+  authService: IAuthService;
+  logger: LoggerService;
 
   constructor({
     userService,
     configService,
     roleService,
+    authService,
+    loggerFactory,
   }: {
     userService: IUserService;
     configService: IConfigService;
     roleService: IRoleService;
+    authService: IAuthService;
+    loggerFactory: ILoggerFactory;
   }) {
     this.userService = userService;
     this.configService = configService;
     this.roleService = roleService;
+    this.authService = authService;
+    this.logger = loggerFactory(UserController.name);
   }
 
   async profile(req: Request, res: Response) {
@@ -53,8 +65,16 @@ export class UserController {
   async delete(req: Request, res: Response) {
     const { id } = await validateInput(req.params, idRules);
 
-    if (req.user?.id === id) {
-      throw new InternalServerException("Not allowed to delete your own account");
+    const ownUserId = req.user?.id;
+    if (ownUserId) {
+      if (ownUserId === id) {
+        throw new BadRequestException("Not allowed to delete own account");
+      }
+    }
+
+    const isRootUser = await this.userService.isUserRootUser(id);
+    if (isRootUser) {
+      throw new BadRequestException("Not allowed to delete root user");
     }
 
     if (this.configService.isDemoMode()) {
@@ -85,7 +105,7 @@ export class UserController {
     const { id } = await validateInput(req.params, idRules);
 
     if (req.user?.id !== id) {
-      throw new InternalServerException("Not allowed to change username of other users");
+      throw new BadRequestException("Not allowed to change username of other users");
     }
 
     const { username } = await validateInput(req.body, {
@@ -99,7 +119,7 @@ export class UserController {
     const { id } = await validateInput(req.params, idRules);
 
     if (req.user?.id !== id) {
-      throw new InternalServerException("Not allowed to change password of other users");
+      throw new BadRequestException("Not allowed to change password of other users");
     }
 
     const { oldPassword, newPassword } = await validateInput(req.body, {
@@ -118,12 +138,13 @@ export class UserController {
       if (ownUserId === id) {
         throw new BadRequestException("Not allowed to change own verified status");
       }
-
-      const isRootUser = await this.userService.isUserRootUser(id);
-      if (!isRootUser) {
-        throw new BadRequestException("Not allowed to change root user to unverified");
-      }
     }
+
+    const isRootUser = await this.userService.isUserRootUser(id);
+    if (isRootUser) {
+      throw new BadRequestException("Not allowed to change root user to unverified");
+    }
+
     const { isVerified } = await validateInput(req.body, {
       isVerified: "required|boolean",
     });
@@ -164,7 +185,7 @@ export class UserController {
   throwIfDemoMode() {
     const isDemoMode = this.configService.isDemoMode();
     if (isDemoMode) {
-      throw new InternalServerException("Not allowed in demo mode");
+      throw new ForbiddenError("Not allowed in demo mode");
     }
   }
 }
