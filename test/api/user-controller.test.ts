@@ -9,6 +9,7 @@ import { User } from "@/models";
 
 const defaultRoute = `${AppConstants.apiRoute}/user`;
 const profileRoute = `${defaultRoute}/profile`;
+const rolesRoute = `${defaultRoute}/roles`;
 const getRoute = (id: string) => `${defaultRoute}/${id}`;
 const deleteRoute = (id: string) => `${defaultRoute}/${id}`;
 
@@ -23,6 +24,12 @@ describe("UserController", () => {
   it("GET profile", async () => {
     await ensureTestUserCreated();
     const response = await request.get(profileRoute).send();
+    expectOkResponse(response);
+  });
+
+  it("GET roles", async () => {
+    await ensureTestUserCreated();
+    const response = await request.get(rolesRoute).send();
     expectOkResponse(response);
   });
 
