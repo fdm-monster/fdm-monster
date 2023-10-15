@@ -21,7 +21,7 @@ export const validateWizardCompleted = inject(
         "/api/test",
         "/api/auth/login-required",
       ];
-      if (allowedPaths.includes(req.path)) {
+      if (allowedPaths.includes(req.path) || !req.path.startsWith("/api")) {
         next();
         return;
       } else {
