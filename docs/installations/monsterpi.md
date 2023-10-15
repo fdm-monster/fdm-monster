@@ -52,7 +52,7 @@ Host monsterpi
 ```
 Personally I like the [VS Code SSH extension](https://code.visualstudio.com/docs/remote/ssh) for this!
 
-# MonsterPi Version 0.2.0+
+# MonsterPi Version 0.3.0+
 
 Run the following commands to change to the `pi` user and execute an update with root elevation.
 
@@ -60,10 +60,37 @@ Run the following commands to change to the `pi` user and execute an update with
 # Change to pi user
 sudo su pi
 
-cd /home/pi/fdm-monster-daemon
+cd /home/pi/scripts
 
 # Deploy the fdm-monster server update
 sudo bash ./update-fdm-monster.sh 
+```
+
+## Updating MonsterPi manually 0.2.x -> 0.3.0
+
+A couple of things have changed:
+- The update script has been rewritten and moved to `/home/pi/scripts`
+- The `/home/pi/install-fdm-monster.js` file has been altered
+- The `/home/pi/uninstall-fdm-monster.js` file has been altered
+- The `/home/pi/fdm-monster-daemon/package.json` file has been altered
+
+You can run these commands to update your server:
+```bash
+sudo su pi
+cd /home/pi/fdm-monster-daemon
+rm ./update-fdm-monster.sh
+wget https://raw.githubusercontent.com/fdm-monster/MonsterPi/main/src/modules/monsterpi/filesystem/home/pi/fdm-monster-daemon/install-fdm-monster.js
+wget https://raw.githubusercontent.com/fdm-monster/MonsterPi/main/src/modules/monsterpi/filesystem/home/pi/fdm-monster-daemon/uninstall-fdm-monster.js
+wget https://raw.githubusercontent.com/fdm-monster/MonsterPi/main/src/modules/monsterpi/filesystem/home/pi/fdm-monster-daemon/package.json
+sudo chmod +x install-fdm-monster.js
+sudo chmod +x uninstall-fdm-monster.js
+sudo chmod +x package.json
+
+# Deploy the fdm-monster server update
+cd /home/pi/scripts
+wget https://raw.githubusercontent.com/fdm-monster/MonsterPi/main/src/modules/monsterpi/filesystem/home/pi/scripts/update-fdm-monster.sh
+sudo chmod +x update-fdm-monster.sh
+sudo bash ./update-fdm-monster.sh -n --tag 1.5.0
 ```
 
 ## Updating MonsterPi manually 0.1.x -> 0.2.0
