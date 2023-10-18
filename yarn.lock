@@ -2165,10 +2165,10 @@
   resolved "https://registry.yarnpkg.com/@types/http-errors/-/http-errors-2.0.2.tgz#a86e00bbde8950364f8e7846687259ffcd96e8c2"
   integrity sha512-lPG6KlZs88gef6aD85z3HNkztpj7w2R7HmR3gygjfXCQmsLloWNARFkMuzKiiY8FGdh1XDpgBdrSf4aKDiA7Kg==
 
-"@types/ip@1.1.1":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@types/ip/-/ip-1.1.1.tgz#7847172c066c1f8400465423eaeb3f4f8ba22cb3"
-  integrity sha512-/v+XZuKNBQHJi3dKeFt9LySLzWNkgmaYRtnFfg27Ag0MO9tQLzHUuAA8zOhPtbDvDGkcnZGr4pVZQPGNft/WYA==
+"@types/ip@1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@types/ip/-/ip-1.1.2.tgz#647afb33d828e584f77326c0c4732ee3e23f9e4f"
+  integrity sha512-WjV3/mz9YSlfU8E88m4ZwvRQmpTjWy4vH8K+cggBUAjmp91wvT1he132Ql8V3CsZz3SYkze3CC3AxhjaD4ZYug==
   dependencies:
     "@types/node" "*"
 
