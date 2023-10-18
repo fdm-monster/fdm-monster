@@ -2057,10 +2057,10 @@
   resolved "https://registry.yarnpkg.com/@types/btoa-lite/-/btoa-lite-1.0.0.tgz#e190a5a548e0b348adb0df9ac7fa5f1151c7cca4"
   integrity sha512-wJsiX1tosQ+J5+bY5LrSahHxr2wT+uME5UDwdN1kg4frt40euqA+wzECkmq4t5QbveHiJepfdThgQrPw6KiSlg==
 
-"@types/cache-manager@4.0.3":
-  version "4.0.3"
-  resolved "https://registry.yarnpkg.com/@types/cache-manager/-/cache-manager-4.0.3.tgz#1baef7fffe2c9f73ababdac21a0d9e732909be72"
-  integrity sha512-tPo2eUsvPVk/i2AU7BKy2ekSoKFOkST918GF7Qvc4IMNTRHyekEWJtWS9sBdi+DaF/4saiBkgWji5HqH3X7W8g==
+"@types/cache-manager@4.0.4":
+  version "4.0.4"
+  resolved "https://registry.yarnpkg.com/@types/cache-manager/-/cache-manager-4.0.4.tgz#bfe330cff4b3a96082bbae13e7ddc8d3dd9d4009"
+  integrity sha512-Kyk9uF54w5/JQWLDKr5378euWUPvebknZut6UpsKhO3R7vE5a5o71QxTR2uev1niBgVAoXAR+BCNMU1lipjxWQ==
 
 "@types/cacheable-request@^6.0.1":
   version "6.0.3"
