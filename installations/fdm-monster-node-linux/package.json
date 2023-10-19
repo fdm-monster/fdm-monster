@@ -1,6 +1,6 @@
 {
   "name": "fdm-monster-daemon",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Daemon service wrapper ",
   "main": "./install-fdm-monster.js",
   "license": "MIT",
