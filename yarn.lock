@@ -3929,10 +3929,10 @@ expect@^29.0.0, expect@^29.7.0:
     jest-message-util "^29.7.0"
     jest-util "^29.7.0"
 
-express-list-routes@1.1.5:
-  version "1.1.5"
-  resolved "https://registry.yarnpkg.com/express-list-routes/-/express-list-routes-1.1.5.tgz#bcc9878a7e0d34dd61bad7cee2c431568f5a3399"
-  integrity sha512-DUqJE9lxUmRSuw2Od/5C0vhlzvzcHFVo4fXat12fk6agAuxXGgO6cOQeq1/1sFBKzbjgSfMilT2CRJdYpcBh4g==
+express-list-routes@1.1.9:
+  version "1.1.9"
+  resolved "https://registry.yarnpkg.com/express-list-routes/-/express-list-routes-1.1.9.tgz#5f312d6bc58d844b7e182e23a6db77713c1af487"
+  integrity sha512-YKX6L/KaR2tEvEdiBIEhbGgSJ7DneKcEblsaUwHmJNyTi1lhuCs+VvlPvViRpJPC/GY1Et8gXWvUCnL9bnu46Q==
 
 express@4.18.2:
   version "4.18.2"
