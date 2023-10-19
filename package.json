@@ -39,7 +39,7 @@
     "vue"
   ],
   "dependencies": {
-    "@fdm-monster/client": "1.4.0",
+    "@fdm-monster/client": "1.4.1",
     "@influxdata/influxdb-client": "1.33.2",
     "@sentry/node": "7.74.1",
     "adm-zip": "0.5.10",
