@@ -2233,11 +2233,12 @@
   resolved "https://registry.yarnpkg.com/@types/luxon/-/luxon-3.3.3.tgz#b2e20a9536f91ab3e6e7895c91883e1a7ad49a6e"
   integrity sha512-/BJF3NT0pRMuxrenr42emRUF67sXwcZCd+S1ksG/Fcf9O7C3kKCY4uJSbKBE4KDUIYr3WMsvfmWD8hRjXExBJQ==
 
-"@types/migrate-mongo@10.0.2":
-  version "10.0.2"
-  resolved "https://registry.yarnpkg.com/@types/migrate-mongo/-/migrate-mongo-10.0.2.tgz#6281aa2f517de97f79c09c28e7d83177af482335"
-  integrity sha512-1VbwkryVQHnEteUVPLntLxflUZJrYrfCRUZdOlx1Vh1kDvdkmMY007H7oslvXD63F6DTtuBPsJs/fzmTo0MPjw==
+"@types/migrate-mongo@10.0.3":
+  version "10.0.3"
+  resolved "https://registry.yarnpkg.com/@types/migrate-mongo/-/migrate-mongo-10.0.3.tgz#bc8f2cc20362c7d4f8650e487a1689da2e39dcb2"
+  integrity sha512-2Kag188LjKdjL4i6wlXTv4z1VNCk3v0Gyp1N0CtlGG2UqQyurKT2/PcShQG3xdPiA/yo1EHKw1nZ48iAyYEd0A==
   dependencies:
+    "@types/node" "*"
     mongodb "^6.1.0"
 
 "@types/mime@*":
