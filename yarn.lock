@@ -2272,10 +2272,10 @@
   dependencies:
     undici-types "~5.25.1"
 
-"@types/passport-anonymous@1.0.3":
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/@types/passport-anonymous/-/passport-anonymous-1.0.3.tgz#87cb68d6b905288364120a1b978a01f7872195db"
-  integrity sha512-unE2IivuYx6LUHlHokKMebx2TVi/YhqnnwM/Z3teGa/HTsRKgpD0PWrjpbw15ES8K8QNSCnRmXb/NpOyTem0tA==
+"@types/passport-anonymous@1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@types/passport-anonymous/-/passport-anonymous-1.0.4.tgz#f59e921423c9010b68d49522e8075a3ef02af126"
+  integrity sha512-LjR02lSnhPOH1L+j6HT0DTZKH/TIQ2gwmFdQGxRxg+5x/LFq79vQhMK+wYBr+Mtmo7VFtuf/uPLk7lPzz+hKwg==
   dependencies:
     "@types/passport" "*"
 
