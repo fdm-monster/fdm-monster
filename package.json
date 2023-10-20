@@ -107,7 +107,7 @@
     "@types/passport-anonymous": "1.0.4",
     "@types/passport-jwt": "3.0.11",
     "@types/semver": "7.5.4",
-    "@types/supertest": "2.0.14",
+    "@types/supertest": "2.0.15",
     "@types/uuid": "9.0.5",
     "chokidar": "3.5.3",
     "concurrently": "8.2.1",
