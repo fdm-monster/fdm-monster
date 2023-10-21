@@ -15,6 +15,36 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@anttiviljami/dtsgenerator@npm:^3.20.0":
+  version: 3.20.0
+  resolution: "@anttiviljami/dtsgenerator@npm:3.20.0"
+  dependencies:
+    commander: "npm:^11.1.0"
+    cross-fetch: "npm:^4.0.0"
+    debug: "npm:^4.3.4"
+    glob: "npm:^10.3.10"
+    http-proxy-agent: "npm:^7.0.0"
+    https-proxy-agent: "npm:^7.0.2"
+    js-yaml: "npm:^4.1.0"
+    tslib: "npm:^2.6.2"
+    typescript: "npm:^5.2.2"
+  bin:
+    dtsgen: bin/dtsgen
+  checksum: 10c0/f697943da974c94e77d919e502e08591d9c583e230c8c435220e321598514459f7e63927b5d685b657e4b15167ff2716e31589e87d06202f0c29c465ccc5f62c
+  languageName: node
+  linkType: hard
+
+"@apidevtools/json-schema-ref-parser@npm:^11.2.0":
+  version: 11.9.3
+  resolution: "@apidevtools/json-schema-ref-parser@npm:11.9.3"
+  dependencies:
+    "@jsdevtools/ono": "npm:^7.1.3"
+    "@types/json-schema": "npm:^7.0.15"
+    js-yaml: "npm:^4.1.0"
+  checksum: 10c0/5745813b3d964279f387677b7a903ba6634cdeaf879ff3a331a694392cbc923763f398506df190be114f2574b8b570baab3e367c2194bb35f50147ff6cf27d7a
+  languageName: node
+  linkType: hard
+
 "@aws-crypto/sha256-browser@npm:5.2.0":
   version: 5.2.0
   resolution: "@aws-crypto/sha256-browser@npm:5.2.0"
@@ -1093,6 +1123,8 @@ __metadata:
     multer: "npm:1.4.5-lts.2"
     nock: "npm:13.5.6"
     octokit: "npm:3.2.1"
+    openapi-client-axios: "npm:^7.3.11"
+    openapi-client-axios-typegen: "npm:^7.3.11"
     passport: "npm:0.7.0"
     passport-anonymous: "npm:1.0.1"
     passport-jwt: "npm:4.0.1"
@@ -1445,6 +1477,13 @@ __metadata:
     "@jridgewell/resolve-uri": "npm:^3.1.0"
     "@jridgewell/sourcemap-codec": "npm:^1.4.14"
   checksum: 10c0/3d1ce6ebc69df9682a5a8896b414c6537e428a1d68b02fcc8363b04284a8ca0df04d0ee3013132252ab14f2527bc13bea6526a912ecb5658f0e39fd2860b4df4
+  languageName: node
+  linkType: hard
+
+"@jsdevtools/ono@npm:^7.1.3":
+  version: 7.1.3
+  resolution: "@jsdevtools/ono@npm:7.1.3"
+  checksum: 10c0/a9f7e3e8e3bc315a34959934a5e2f874c423cf4eae64377d3fc9de0400ed9f36cb5fd5ebce3300d2e8f4085f557c4a8b591427a583729a87841fda46e6c216b9
   languageName: node
   linkType: hard
 
@@ -3450,6 +3489,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/json-schema@npm:^7.0.15":
+  version: 7.0.15
+  resolution: "@types/json-schema@npm:7.0.15"
+  checksum: 10c0/a996a745e6c5d60292f36731dd41341339d4eeed8180bb09226e5c8d23759067692b1d88e5d91d72ee83dfc00d3aca8e7bd43ea120516c17922cbcb7c3e252db
+  languageName: node
+  linkType: hard
+
 "@types/jsonwebtoken@npm:*, @types/jsonwebtoken@npm:^9.0.0":
   version: 9.0.9
   resolution: "@types/jsonwebtoken@npm:9.0.9"
@@ -4119,7 +4165,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:1.8.4":
+"axios@npm:1.8.4, axios@npm:>=0.25.0":
   version: 1.8.4
   resolution: "axios@npm:1.8.4"
   dependencies:
@@ -4241,6 +4287,13 @@ __metadata:
   version: 2.0.0
   resolution: "base64id@npm:2.0.0"
   checksum: 10c0/6919efd237ed44b9988cbfc33eca6f173a10e810ce50292b271a1a421aac7748ef232a64d1e6032b08f19aae48dce6ee8f66c5ae2c9e5066c82b884861d4d453
+  languageName: node
+  linkType: hard
+
+"bath-es5@npm:^3.0.3":
+  version: 3.0.3
+  resolution: "bath-es5@npm:3.0.3"
+  checksum: 10c0/cab899940a0eb492afcfd888562cf6a42bebbc63f8cb0b3ba7dfcc828e64e112b23f1270f41beb4649947befddb122cf5515464139281904a61b05de4b82cf42
   languageName: node
   linkType: hard
 
@@ -4758,6 +4811,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"commander@npm:^11.1.0":
+  version: 11.1.0
+  resolution: "commander@npm:11.1.0"
+  checksum: 10c0/13cc6ac875e48780250f723fb81c1c1178d35c5decb1abb1b628b3177af08a8554e76b2c0f29de72d69eef7c864d12613272a71fabef8047922bc622ab75a179
+  languageName: node
+  linkType: hard
+
 "commander@npm:^6.0.0":
   version: 6.2.1
   resolution: "commander@npm:6.2.1"
@@ -4940,6 +5000,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"cross-fetch@npm:^4.0.0":
+  version: 4.1.0
+  resolution: "cross-fetch@npm:4.1.0"
+  dependencies:
+    node-fetch: "npm:^2.7.0"
+  checksum: 10c0/628b134ea27cfcada67025afe6ef1419813fffc5d63d175553efa75a2334522d450300a0f3f0719029700da80e96327930709d5551cf6deb39bb62f1d536642e
+  languageName: node
+  linkType: hard
+
 "cross-spawn@npm:^7.0.1, cross-spawn@npm:^7.0.3, cross-spawn@npm:^7.0.6":
   version: 7.0.6
   resolution: "cross-spawn@npm:7.0.6"
@@ -5067,6 +5136,13 @@ __metadata:
   version: 2.3.1
   resolution: "deprecation@npm:2.3.1"
   checksum: 10c0/23d688ba66b74d09b908c40a76179418acbeeb0bfdf218c8075c58ad8d0c315130cb91aa3dffb623aa3a411a3569ce56c6460de6c8d69071c17fe6dd2442f032
+  languageName: node
+  linkType: hard
+
+"dereference-json-schema@npm:^0.2.1":
+  version: 0.2.1
+  resolution: "dereference-json-schema@npm:0.2.1"
+  checksum: 10c0/c45e4a0fffd82d21f7819ab667874820444d817cd80301993a26215d41f2b0012c91cf49408388b39da2e7eeb02bc532f89397a8887a7bd90f4ecddffc052261
   languageName: node
   linkType: hard
 
@@ -5864,7 +5940,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"glob@npm:^10.2.2, glob@npm:^10.4.5":
+"glob@npm:^10.2.2, glob@npm:^10.3.10, glob@npm:^10.4.5":
   version: 10.4.5
   resolution: "glob@npm:10.4.5"
   dependencies:
@@ -6027,7 +6103,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"https-proxy-agent@npm:^7.0.1, https-proxy-agent@npm:^7.0.5":
+"https-proxy-agent@npm:^7.0.1, https-proxy-agent@npm:^7.0.2, https-proxy-agent@npm:^7.0.5":
   version: 7.0.6
   resolution: "https-proxy-agent@npm:7.0.6"
   dependencies:
@@ -6790,7 +6866,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"js-yaml@npm:4.1.0":
+"js-yaml@npm:4.1.0, js-yaml@npm:^4.1.0":
   version: 4.1.0
   resolution: "js-yaml@npm:4.1.0"
   dependencies:
@@ -7658,6 +7734,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"node-fetch@npm:^2.7.0":
+  version: 2.7.0
+  resolution: "node-fetch@npm:2.7.0"
+  dependencies:
+    whatwg-url: "npm:^5.0.0"
+  peerDependencies:
+    encoding: ^0.1.0
+  peerDependenciesMeta:
+    encoding:
+      optional: true
+  checksum: 10c0/b55786b6028208e6fbe594ccccc213cab67a72899c9234eb59dba51062a299ea853210fcf526998eaa2867b0963ad72338824450905679ff0fa304b8c5093ae8
+  languageName: node
+  linkType: hard
+
 "node-gyp@npm:latest":
   version: 11.2.0
   resolution: "node-gyp@npm:11.2.0"
@@ -7798,6 +7888,45 @@ __metadata:
   dependencies:
     mimic-fn: "npm:^2.1.0"
   checksum: 10c0/ffcef6fbb2692c3c40749f31ea2e22677a876daea92959b8a80b521d95cca7a668c884d8b2045d1d8ee7d56796aa405c405462af112a1477594cc63531baeb8f
+  languageName: node
+  linkType: hard
+
+"openapi-client-axios-typegen@npm:^7.3.11":
+  version: 7.7.0
+  resolution: "openapi-client-axios-typegen@npm:7.7.0"
+  dependencies:
+    "@anttiviljami/dtsgenerator": "npm:^3.20.0"
+    "@apidevtools/json-schema-ref-parser": "npm:^11.2.0"
+    axios: "npm:>=0.25.0"
+    indent-string: "npm:^4.0.0"
+    lodash: "npm:^4.17.21"
+    openapi-client-axios: "npm:^7.5.5"
+    openapi-types: "npm:^12.1.0"
+    yargs: "npm:^17.3.0"
+  bin:
+    typegen: typegen
+  checksum: 10c0/a1097608940617cb374fdf98f8c83b19ca374718c4b7a0a55caaa09adfe9f8e5c2c27e4e4c2ce66e6abc250a14cfda96d1535229ded302e26ce1b3a1e72d4851
+  languageName: node
+  linkType: hard
+
+"openapi-client-axios@npm:^7.3.11, openapi-client-axios@npm:^7.5.5":
+  version: 7.5.5
+  resolution: "openapi-client-axios@npm:7.5.5"
+  dependencies:
+    bath-es5: "npm:^3.0.3"
+    dereference-json-schema: "npm:^0.2.1"
+    openapi-types: "npm:^12.1.3"
+  peerDependencies:
+    axios: ">=0.25.0"
+    js-yaml: ^4.1.0
+  checksum: 10c0/8dc176cc710b4588a61a219a28145a2e55b8e7c366f2c6e2a400c1e073e22cb9d12bd081fa63a2b8f6ef59660d20e3a8d7700049da8f8013192715e0a66ff47e
+  languageName: node
+  linkType: hard
+
+"openapi-types@npm:^12.1.0, openapi-types@npm:^12.1.3":
+  version: 12.1.3
+  resolution: "openapi-types@npm:12.1.3"
+  checksum: 10c0/4ad4eb91ea834c237edfa6ab31394e87e00c888fc2918009763389c00d02342345195d6f302d61c3fd807f17723cd48df29b47b538b68375b3827b3758cd520f
   languageName: node
   linkType: hard
 
@@ -9438,7 +9567,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:5.8.3":
+"typescript@npm:5.8.3, typescript@npm:^5.2.2":
   version: 5.8.3
   resolution: "typescript@npm:5.8.3"
   bin:
@@ -9448,7 +9577,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A5.8.3#optional!builtin<compat/typescript>":
+"typescript@patch:typescript@npm%3A5.8.3#optional!builtin<compat/typescript>, typescript@patch:typescript@npm%3A^5.2.2#optional!builtin<compat/typescript>":
   version: 5.8.3
   resolution: "typescript@patch:typescript@npm%3A5.8.3#optional!builtin<compat/typescript>::version=5.8.3&hash=5786d5"
   bin:
@@ -9618,6 +9747,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"webidl-conversions@npm:^3.0.0":
+  version: 3.0.1
+  resolution: "webidl-conversions@npm:3.0.1"
+  checksum: 10c0/5612d5f3e54760a797052eb4927f0ddc01383550f542ccd33d5238cfd65aeed392a45ad38364970d0a0f4fea32e1f4d231b3d8dac4a3bdd385e5cf802ae097db
+  languageName: node
+  linkType: hard
+
 "webidl-conversions@npm:^7.0.0":
   version: 7.0.0
   resolution: "webidl-conversions@npm:7.0.0"
@@ -9642,6 +9778,16 @@ __metadata:
     tr46: "npm:^5.1.0"
     webidl-conversions: "npm:^7.0.0"
   checksum: 10c0/f746fc2f4c906607d09537de1227b13f9494c171141e5427ed7d2c0dd0b6a48b43d8e71abaae57d368d0c06b673fd8ec63550b32ad5ed64990c7b0266c2b4272
+  languageName: node
+  linkType: hard
+
+"whatwg-url@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "whatwg-url@npm:5.0.0"
+  dependencies:
+    tr46: "npm:~0.0.3"
+    webidl-conversions: "npm:^3.0.0"
+  checksum: 10c0/1588bed84d10b72d5eec1d0faa0722ba1962f1821e7539c535558fb5398d223b0c50d8acab950b8c488b4ba69043fd833cc2697056b167d8ad46fac3995a55d5
   languageName: node
   linkType: hard
 
@@ -9808,7 +9954,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yargs@npm:^17.3.1, yargs@npm:^17.7.2":
+"yargs@npm:^17.3.0, yargs@npm:^17.3.1, yargs@npm:^17.7.2":
   version: 17.7.2
   resolution: "yargs@npm:17.7.2"
   dependencies:
