@@ -45,7 +45,7 @@
     "adm-zip": "0.5.10",
     "awilix": "9.0.0",
     "awilix-express": "8.0.0",
-    "axios": "1.5.1",
+    "axios": "1.6.0",
     "bcryptjs": "2.4.3",
     "cache-manager": "4.1.0",
     "class-validator": "0.14.0",
