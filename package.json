@@ -41,7 +41,7 @@
   "dependencies": {
     "@fdm-monster/client": "1.4.1",
     "@influxdata/influxdb-client": "1.33.2",
-    "@sentry/node": "7.76.0",
+    "@sentry/node": "7.77.0",
     "adm-zip": "0.5.10",
     "awilix": "9.0.0",
     "awilix-express": "8.0.0",
