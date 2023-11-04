@@ -14,9 +14,9 @@ here](https://github.com/fdm-monster/MonsterPi).
 This raspberry pi image includes FDM Monster and MongoDB. 
 All released image versions can be downloaded from the [Releases](https://github.com/fdm-monster/MonsterPi/releases) page.
 
-## Latest Version - MonsterPi 0.2.2
+## Latest Version - MonsterPi 0.3.0
 
-**MonsterPi 0.2.2** can be downloaded from Github Releases: [MonsterPi 0.2.2 release](https://github.com/fdm-monster/MonsterPi/releases/tag/0.2.2).
+**MonsterPi 0.3.0** can be downloaded from Github Releases: [MonsterPi 0.3.0 release](https://github.com/fdm-monster/MonsterPi/releases/tag/0.3.0).
 Please unzip the file before flashing it to your SD card.
 
 Older **MonsterPi releases** can be downloaded Github Releases: [MonsterPi releases](https://github.com/fdm-monster/MonsterPi/releases). 

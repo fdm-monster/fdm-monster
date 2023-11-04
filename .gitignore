@@ -26,3 +26,5 @@ installations/other/octoprint-virtual/default1.9.0/octoprint/octoprint/
 *.sqlite-wal
 
 *.sqlite-shm
+
+installations/ansible/inventory.cfg

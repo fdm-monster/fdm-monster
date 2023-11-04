@@ -8,8 +8,8 @@ jobs:
   nodejs-build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 18.x
 
@@ -45,7 +45,7 @@ jobs:
           echo ${{ env.RELEASE_TAG }}
 
       # Publish to NPM
-      - uses: JS-DevTools/npm-publish@v2
+      - uses: JS-DevTools/npm-publish@v3
         with:
           dry-run: true
           token: ${{ secrets.NPM_TOKEN }}

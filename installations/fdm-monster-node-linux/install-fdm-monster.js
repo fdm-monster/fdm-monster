@@ -9,11 +9,11 @@ const { Service } = require("node-linux");
 const { join } = require("path");
 
 // Create a new service object
-const rootPath = join("../../server/");
+const rootPath = join(__dirname, "../../fdm-monster/dist-active/");
 const svc = new Service({
   name: "FDM Monster",
   description: "The 3D Printer Farm server for managing your 100+ OctoPrints printers.",
-  script: join(rootPath, "index.mjs"),
+  script: join(rootPath, "dist/index.js"),
   nodeOptions: ["--harmony", "--max_old_space_size=4096"],
   workingDirectory: rootPath,
 });

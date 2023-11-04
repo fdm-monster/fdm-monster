@@ -10,7 +10,7 @@ jobs:
     outputs:
       foundServerVersion: ${{ steps.init.outputs.foundServerVersion }}
     steps:
-      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
       - name: get-client-version
         # https://gist.github.com/DarrenN/8c6a5b969481725a4413?permalink_comment_id=3863317#gistcomment-3863317
         run: |
@@ -30,8 +30,8 @@ jobs:
     runs-on: ubuntu-latest
     if: needs.checkversion.outputs.foundServerVersion == 'false'
     steps:
-      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 18.x
 
@@ -87,7 +87,7 @@ jobs:
           asset_content_type: application/zip
 
       # Publish to NPM
-      - uses: JS-DevTools/npm-publish@v2
+      - uses: JS-DevTools/npm-publish@v3
         with:
           dry-run: ${{ github.ref_name == 'develop' }}
           token: ${{ secrets.NPM_TOKEN }}
