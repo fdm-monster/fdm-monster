@@ -18,7 +18,6 @@ import { printerResolveMiddleware } from "@/middleware/printer";
 import { generateCorrelationToken } from "@/utils/correlation-token.util";
 import { ROLES } from "@/constants/authorization.constants";
 import { Floor } from "@/models";
-import { PrinterService } from "@/services/printer.service";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { TestPrinterSocketStore } from "@/state/test-printer-socket.store";
 import { PrinterCache } from "@/state/printer.cache";
