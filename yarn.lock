@@ -2093,10 +2093,10 @@
     "@types/node" "*"
     "@types/responselike" "^1.0.0"
 
-"@types/connect-history-api-fallback@1.5.2":
-  version "1.5.2"
-  resolved "https://registry.yarnpkg.com/@types/connect-history-api-fallback/-/connect-history-api-fallback-1.5.2.tgz#acf51e088b3bb6507f7b093bd2b0de20940179cc"
-  integrity sha512-gX2j9x+NzSh4zOhnRPSdPPmTepS4DfxES0AvIFv3jGv5QyeAJf6u6dY5/BAoAJU9Qq1uTvwOku8SSC2GnCRl6Q==
+"@types/connect-history-api-fallback@1.5.3":
+  version "1.5.3"
+  resolved "https://registry.yarnpkg.com/@types/connect-history-api-fallback/-/connect-history-api-fallback-1.5.3.tgz#7793aa2160cef7db0ce5fe2b8aab621200f1a470"
+  integrity sha512-6mfQ6iNvhSKCZJoY6sIG3m0pKkdUcweVNOLuBBKvoWGzl2yRxOJcYOTRyLKt3nxXvBLJWa6QkW//tgbIwJehmA==
   dependencies:
     "@types/express-serve-static-core" "*"
     "@types/node" "*"
