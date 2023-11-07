@@ -91,7 +91,7 @@
     "@swc/jest": "0.2.29",
     "@types/adm-zip": "0.5.4",
     "@types/bcryptjs": "2.4.6",
-    "@types/cache-manager": "4.0.4",
+    "@types/cache-manager": "4.0.5",
     "@types/connect-history-api-fallback": "1.5.2",
     "@types/cookie-parser": "1.4.5",
     "@types/express": "4.17.20",
