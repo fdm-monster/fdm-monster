@@ -2254,10 +2254,10 @@
   resolved "https://registry.yarnpkg.com/@types/luxon/-/luxon-3.3.4.tgz#cda5c0709a0c4c01ba059c40e62d76610479049a"
   integrity sha512-H9OXxv4EzJwE75aTPKpiGXJq+y4LFxjpsdgKwSmr503P5DkWc3AG7VAFYrFNVvqemT5DfgZJV9itYhqBHSGujA==
 
-"@types/migrate-mongo@10.0.3":
-  version "10.0.3"
-  resolved "https://registry.yarnpkg.com/@types/migrate-mongo/-/migrate-mongo-10.0.3.tgz#bc8f2cc20362c7d4f8650e487a1689da2e39dcb2"
-  integrity sha512-2Kag188LjKdjL4i6wlXTv4z1VNCk3v0Gyp1N0CtlGG2UqQyurKT2/PcShQG3xdPiA/yo1EHKw1nZ48iAyYEd0A==
+"@types/migrate-mongo@10.0.4":
+  version "10.0.4"
+  resolved "https://registry.yarnpkg.com/@types/migrate-mongo/-/migrate-mongo-10.0.4.tgz#5b68fb9c3ca516e4f025ebca34021880137f94a4"
+  integrity sha512-+9JAzkIbxgox33wCT18bdpZ6ASYo1qwbf4Gg8kTbqvT48ajosSbZBGg94Vsy3baFzT6+DUXWylY/DcoOWOPNRg==
   dependencies:
     "@types/node" "*"
     mongodb "^6.1.0"
