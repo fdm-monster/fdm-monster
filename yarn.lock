@@ -2318,7 +2318,7 @@
   resolved "https://registry.yarnpkg.com/@types/range-parser/-/range-parser-1.2.7.tgz#50ae4353eaaddc04044279812f52c8c65857dbcb"
   integrity sha512-hKormJbkJqzQGhziax5PItDUTMAM9uE2XXQmM37dyd4hVM+5aVl7oVxMVUiVQn2oCQFN/LKCZdvSM0pFRqbSmQ==
 
-"@types/readable-stream@^4.0.4":
+"@types/readable-stream@^4.0.5":
   version "4.0.5"
   resolved "https://registry.yarnpkg.com/@types/readable-stream/-/readable-stream-4.0.5.tgz#7a82f920748f81e6f6e6d062d6d3961e5731b296"
   integrity sha512-QzFG+b0/vKI8myBgHhUja5C8ZJr4vaAeSXNYbqedm3Pr8byTgkNf1OC2/16yQTn2H2ZpQpHr7sLKS13XWpKaCQ==
@@ -2403,7 +2403,7 @@
     "@types/node" "*"
     "@types/webidl-conversions" "*"
 
-"@types/ws@^8.5.8":
+"@types/ws@^8.5.9":
   version "8.5.9"
   resolved "https://registry.yarnpkg.com/@types/ws/-/ws-8.5.9.tgz#384c489f99c83225a53f01ebc3eddf3b8e202a8c"
   integrity sha512-jbdrY0a8lxfdTp/+r7Z4CkycbOFN8WX+IOchLJr3juT/xzbJ8URyTVSJ/hvNdadTgM1mnedb47n+Y31GsFnQlg==
@@ -2825,14 +2825,14 @@ binary-extensions@^2.0.0:
   resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-2.2.0.tgz#75f502eeaf9ffde42fc98829645be4ea76bd9e2d"
   integrity sha512-jDctJ/IVQbZoJykoeHbhXpOlNBqGNcwXJKJog42E5HDPUwQTSdjCHdihjj0DlnheQ7blbT6dHOafNAiS8ooQKA==
 
-bl@^5.0.0:
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/bl/-/bl-5.1.0.tgz#183715f678c7188ecef9fe475d90209400624273"
-  integrity sha512-tv1ZJHLfTDnXE6tMHv73YgSJaWR2AFuPwMntBe7XL/GBFHnT0CLnsHMogfk5+GzCDC5ZWarSCYaIGATZt9dNsQ==
+bl@^6.0.8:
+  version "6.0.8"
+  resolved "https://registry.yarnpkg.com/bl/-/bl-6.0.8.tgz#737d57f2d1e25b9ca45e0f4c5d84409731a86c04"
+  integrity sha512-HCRq8z0+3vrGCjEKrbnK6blpDZ1xzhfZKCCuyvPC7upGcfXZSmaCumpVao/jC8o1hs/fOqJoCSPMabl+CQTPXg==
   dependencies:
     buffer "^6.0.3"
     inherits "^2.0.4"
-    readable-stream "^3.4.0"
+    readable-stream "^4.2.0"
 
 body-parser@1.20.1:
   version "1.20.1"
@@ -5470,7 +5470,7 @@ lowercase-keys@^2.0.0:
   resolved "https://registry.yarnpkg.com/lowercase-keys/-/lowercase-keys-2.0.0.tgz#2603e78b7b4b0006cbca2fbcc8a3202558ac9479"
   integrity sha512-tqNXrS78oMOE73NMxK4EMLQsQowWf8jKooH9g7xPavRT706R6bkQJ6DY2Te7QukaZsulxa30wQ7bk0pm4XiHmA==
 
-lru-cache@^10.0.0:
+lru-cache@^10.0.0, lru-cache@^10.0.1:
   version "10.0.1"
   resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-10.0.1.tgz#0a3be479df549cca0e5d693ac402ff19537a6b7a"
   integrity sha512-IJ4uwUTi2qCccrioU6g9g/5rvvVl13bsdczUUcqbciD9iLr095yj8DQKdObriEvuNSx325N1rV1O0sJFszx75g==
@@ -5497,7 +5497,7 @@ lru-cache@^6.0.0:
   dependencies:
     yallist "^4.0.0"
 
-lru-cache@^7.10.1, lru-cache@^7.18.3:
+lru-cache@^7.10.1:
   version "7.18.3"
   resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-7.18.3.tgz#f793896e0fd0e954a59dfdd82f0773808df6aa89"
   integrity sha512-jumlc0BIUrS3qJGgIkWZsyfAM7NCWiBcCDhnd+3NNM5KbBmLTgHVfWBcg6W+rLUsIpzpERPsvwUP7CckAQSOoA==
@@ -5736,30 +5736,30 @@ mpath@0.9.0:
   resolved "https://registry.yarnpkg.com/mpath/-/mpath-0.9.0.tgz#0c122fe107846e31fc58c75b09c35514b3871904"
   integrity sha512-ikJRQTk8hw5DEoFVxHG1Gn9T/xcjtdnOKIU1JTmGjZZlg9LST2mBLmcX3/ICIbgJydT2GOc15RnNy5mHmzfSew==
 
-mqtt-packet@^8.2.1:
-  version "8.2.1"
-  resolved "https://registry.yarnpkg.com/mqtt-packet/-/mqtt-packet-8.2.1.tgz#f0875df12be5af3fdd994a81b104570bd45fc7c7"
-  integrity sha512-vrHHjwhmuxzQIe3fJWoOLQHF4H5FETUrQGYD5g1qGfEmpjkQUkPONfygA0cI8Wtb3IUCfu66WmZiVSCgGm8oUw==
+mqtt-packet@^9.0.0:
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/mqtt-packet/-/mqtt-packet-9.0.0.tgz#fd841854d8c0f1f5211b00de388c4ced45b59216"
+  integrity sha512-8v+HkX+fwbodsWAZIZTI074XIoxVBOmPeggQuDFCGg1SqNcC+uoRMWu7J6QlJPqIUIJXmjNYYHxBBLr1Y/Df4w==
   dependencies:
-    bl "^5.0.0"
-    debug "^4.1.1"
+    bl "^6.0.8"
+    debug "^4.3.4"
     process-nextick-args "^2.0.1"
 
-mqtt@5.1.4:
-  version "5.1.4"
-  resolved "https://registry.yarnpkg.com/mqtt/-/mqtt-5.1.4.tgz#010a161bef15f83433177f065ea1b65055caff23"
-  integrity sha512-rmwV8WL5Wud2EEs4b0pKlTksLZGOW4ATdS+hN2H/VK5pC6PWEZQ3KGjbUJRwjIOD0pggu7VZSQ746NqWhabD+A==
+mqtt@5.2.0:
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/mqtt/-/mqtt-5.2.0.tgz#9603f7c2fed649f61c3fc78af81271387379d037"
+  integrity sha512-IyMUQlUvf1bQodxL7qApSVKv/ILqNyqAJkE45C6CegO4yuGIHu8Yig5EdyaoADa5ietLU1jUZ1LOfDVckTYkJw==
   dependencies:
-    "@types/readable-stream" "^4.0.4"
-    "@types/ws" "^8.5.8"
+    "@types/readable-stream" "^4.0.5"
+    "@types/ws" "^8.5.9"
     commist "^3.2.0"
     concat-stream "^2.0.0"
     debug "^4.3.4"
     duplexify "^4.1.2"
     help-me "^4.2.0"
-    lru-cache "^7.18.3"
+    lru-cache "^10.0.1"
     minimist "^1.2.8"
-    mqtt-packet "^8.2.1"
+    mqtt-packet "^9.0.0"
     number-allocator "^1.0.14"
     readable-stream "^4.4.2"
     reinterval "^1.1.0"
@@ -6404,7 +6404,7 @@ readable-stream@^3.0.2, readable-stream@^3.1.1, readable-stream@^3.4.0, readable
     string_decoder "^1.1.1"
     util-deprecate "^1.0.1"
 
-readable-stream@^4.4.2:
+readable-stream@^4.2.0, readable-stream@^4.4.2:
   version "4.4.2"
   resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-4.4.2.tgz#e6aced27ad3b9d726d8308515b9a1b98dc1b9d13"
   integrity sha512-Lk/fICSyIhodxy1IDK2HazkeGjSmezAWX2egdtJnYhtzKEsBPJowlI6F6LPb5tqIQILrMbx22S5o3GuJavPusA==
