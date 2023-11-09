@@ -108,7 +108,7 @@
     "@types/passport-jwt": "3.0.13",
     "@types/semver": "7.5.5",
     "@types/supertest": "2.0.16",
-    "@types/uuid": "9.0.6",
+    "@types/uuid": "9.0.7",
     "chokidar": "3.5.3",
     "concurrently": "8.2.2",
     "eslint": "8.53.0",
