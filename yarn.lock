@@ -5745,10 +5745,10 @@ mqtt-packet@^9.0.0:
     debug "^4.3.4"
     process-nextick-args "^2.0.1"
 
-mqtt@5.2.0:
-  version "5.2.0"
-  resolved "https://registry.yarnpkg.com/mqtt/-/mqtt-5.2.0.tgz#9603f7c2fed649f61c3fc78af81271387379d037"
-  integrity sha512-IyMUQlUvf1bQodxL7qApSVKv/ILqNyqAJkE45C6CegO4yuGIHu8Yig5EdyaoADa5ietLU1jUZ1LOfDVckTYkJw==
+mqtt@5.2.1, mqtt@^5.2.0:
+  version "5.2.1"
+  resolved "https://registry.yarnpkg.com/mqtt/-/mqtt-5.2.1.tgz#2c7b71bd8903390701677888933644018f5a0a02"
+  integrity sha512-iXN1dEWDsl6GTMda2ZyhEbpb8BtgSpMuXVZf4c2C8HX/0r3N9SrTBYa+jVEyWhj/5CMiAobBhjtRYgjt9rXvfg==
   dependencies:
     "@types/readable-stream" "^4.0.5"
     "@types/ws" "^8.5.9"
@@ -5759,6 +5759,7 @@ mqtt@5.2.0:
     help-me "^4.2.0"
     lru-cache "^10.0.1"
     minimist "^1.2.8"
+    mqtt "^5.2.0"
     mqtt-packet "^9.0.0"
     number-allocator "^1.0.14"
     readable-stream "^4.4.2"
