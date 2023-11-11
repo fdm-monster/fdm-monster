@@ -38,8 +38,6 @@ export const importPrintersFloorsYamlRules = (
     "printers.*.printerURL": "required|httpurl",
     "printers.*.enabled": "boolean",
     "printers.*.name": "required|string",
-    "printers.*.settingsAppearance": "required|object",
-    "printers.*.settingsAppearance.name": "required|string",
     floors: `${!!importFloors ? "array|minLength:0" : "not"}`,
     "floors.*.id": `required|${idVal}`,
     "floors.*.floor": "required|integer",
@@ -50,6 +48,7 @@ export const importPrintersFloorsYamlRules = (
 export const importPrinterPositionsRules = {
   printers: "array|minLength:0",
   "printers.*.printerId": "required|mongoId",
+  "printers.*.floorId": "required|mongoId",
   "printers.*.x": "required|integer|min:0|max:12",
   "printers.*.y": "required|integer|min:0|max:12",
 };
