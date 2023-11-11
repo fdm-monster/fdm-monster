@@ -1,4 +1,5 @@
 import { IdType } from "@/shared.constants";
+import { IsDefined, IsNotEmpty, IsNumber } from "class-validator";
 
 export class PositionDto<KeyType = IdType> {
   x: number;
@@ -23,12 +24,18 @@ export class FloorDto<KeyType = IdType> {
 }
 
 export class CreateFloorDto {
+  @IsNotEmpty()
   name: string;
+  @IsDefined()
+  @IsNumber()
   floor: number;
 }
 
 export class UpdateFloorDto {
+  @IsDefined()
   name?: string;
+  @IsDefined()
+  @IsNumber()
   floor?: number;
 }
 

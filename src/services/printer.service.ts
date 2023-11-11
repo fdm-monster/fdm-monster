@@ -15,6 +15,8 @@ import { MongoIdType } from "@/shared.constants";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoginDto } from "@/services/interfaces/login.dto";
+import { PrinterDto, PrinterUnsafeDto } from "@/services/interfaces/printer.dto";
+import { IPrinter } from "@/models/Printer";
 
 export class PrinterService implements IPrinterService<MongoIdType> {
   eventEmitter2: EventEmitter2;
@@ -23,6 +25,24 @@ export class PrinterService implements IPrinterService<MongoIdType> {
   constructor({ eventEmitter2, loggerFactory }: { eventEmitter2: EventEmitter2; loggerFactory: ILoggerFactory }) {
     this.eventEmitter2 = eventEmitter2;
     this.logger = loggerFactory(PrinterService.name);
+  }
+
+  toUnsafeDto(entity: IPrinter): PrinterUnsafeDto<MongoIdType> {
+    return {
+      ...this.toDto(entity),
+      apiKey: entity.apiKey,
+      printerURL: entity.printerURL,
+    };
+  }
+
+  toDto(entity: IPrinter): PrinterDto<MongoIdType> {
+    return {
+      id: entity.id,
+      name: entity.settingsAppearance.name,
+      enabled: entity.enabled,
+      disabledReason: entity.disabledReason,
+      dateAdded: entity.dateAdded,
+    };
   }
 
   async list() {

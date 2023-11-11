@@ -2,7 +2,7 @@ import { createController } from "awilix-express";
 import { authenticate, withPermission } from "@/middleware/authenticate";
 import { validateInput, validateMiddleware } from "@/handlers/validators";
 import { AppConstants } from "@/server.constants";
-import { idRules } from "./validation/generic.validation";
+import { idRulesV2 } from "./validation/generic.validation";
 import { setGcodeAnalysis } from "./validation/printer-settings-controller.validation";
 import { PERMS } from "@/constants/authorization.constants";
 import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
@@ -12,14 +12,24 @@ import { Request, Response } from "express";
 export class PrinterSettingsController {
   printerCache: PrinterCache;
   octoPrintApiService: OctoPrintApiService;
+  isTypeormMode: boolean;
 
-  constructor({ printerCache, octoPrintApiService }: { printerCache: PrinterCache; octoPrintApiService: OctoPrintApiService }) {
+  constructor({
+    printerCache,
+    octoPrintApiService,
+    isTypeormMode,
+  }: {
+    printerCache: PrinterCache;
+    octoPrintApiService: OctoPrintApiService;
+    isTypeormMode: boolean;
+  }) {
     this.printerCache = printerCache;
     this.octoPrintApiService = octoPrintApiService;
+    this.isTypeormMode = isTypeormMode;
   }
 
   async get(req: Request, res: Response) {
-    const { id: printerId } = await validateInput(req.params, idRules);
+    const { id: printerId } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
 
     const loginDto = await this.printerCache.getLoginDtoAsync(printerId);
     const settings = await this.octoPrintApiService.getSettings(loginDto);
@@ -27,7 +37,7 @@ export class PrinterSettingsController {
   }
 
   async setGCodeAnalysis(req: Request, res: Response) {
-    const { id: printerId } = await validateInput(req.params, idRules);
+    const { id: printerId } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
     const { enabled } = await validateMiddleware(req, setGcodeAnalysis);
 
     const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
@@ -36,7 +46,7 @@ export class PrinterSettingsController {
   }
 
   async syncPrinterName(req: Request, res: Response) {
-    const { id: printerId } = await validateInput(req.params, idRules);
+    const { id: printerId } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
 
     const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
     const printerName = await this.printerCache.getNameAsync(printerId);

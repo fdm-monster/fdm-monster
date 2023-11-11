@@ -1,19 +1,36 @@
 import { PrintCompletion } from "@/models";
 import { createPrintCompletionRules } from "./validators/print-completion-service.validation";
 import { validateInput } from "@/handlers/validators";
-import { groupArrayBy } from "@/utils/array.util";
 import { EVENT_TYPES } from "./octoprint/constants/octoprint-websocket.constants";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
+import { MongoIdType } from "@/shared.constants";
+import { IPrintCompletionService } from "@/services/interfaces/print-completion.service";
+import { CreatePrintCompletionDto, PrintCompletionContext, PrintCompletionDto } from "@/services/interfaces/print-completion.dto";
+import { IPrintCompletion } from "@/models/PrintCompletion";
+import { processCompletions } from "@/services/print-completion.shared";
 
-export class PrintCompletionService {
+export class PrintCompletionService implements IPrintCompletionService<MongoIdType> {
   logger: LoggerService;
 
   constructor({ loggerFactory }: { loggerFactory: ILoggerFactory }) {
     this.logger = loggerFactory(PrintCompletionService.name);
   }
 
-  async create(input) {
+  toDto(entity: IPrintCompletion): PrintCompletionDto<MongoIdType> {
+    return {
+      id: entity.id,
+      completionLog: entity.completionLog,
+      context: entity.context,
+      fileName: entity.fileName,
+      createdAt: entity.createdAt,
+      correlationId: entity.correlationId,
+      status: entity.status,
+      printerId: entity.printerId.toString(),
+    };
+  }
+
+  async create(input: CreatePrintCompletionDto<MongoIdType>) {
     const { printerId, fileName, completionLog, status, context } = await validateInput(input, createPrintCompletionRules);
 
     return PrintCompletion.create({
@@ -36,7 +53,7 @@ export class PrintCompletionService {
     });
   }
 
-  async updateContext(correlationId: string, context) {
+  async updateContext(correlationId: string, context: PrintCompletionContext) {
     const completionEntry = await PrintCompletion.findOne({
       "context.correlationId": correlationId,
       status: EVENT_TYPES.PrintStarted,
@@ -85,7 +102,6 @@ export class PrintCompletionService {
       {
         $group: {
           _id: "$printerId",
-          eventCount: { $sum: 1 },
           printEvents: {
             $push: {
               printerId: "$printerId",
@@ -100,52 +116,6 @@ export class PrintCompletionService {
       },
     ]);
 
-    const durationDayMSec = 24 * 60 * 60 * 1000;
-
-    return printCompletionsAggr.map((pc) => {
-      const jobs = groupArrayBy(pc.printEvents, (e) => e.context?.correlationId);
-      pc.printJobs = Object.entries(jobs).map(([id, events]) => {
-        const eventMap = events.map(({ status, createdAt, fileName, completionLog }) => ({
-          status,
-          createdAt,
-          fileName, // if this changes across events then a bug occurred
-          completionLog,
-        }));
-        return {
-          correlationId: id,
-          events: eventMap,
-          lastEvent: eventMap.reduce((e1, e2) => (e1.createdAt > e2.createdAt ? e1 : e2)),
-        };
-      });
-      pc.correlationIds = pc.printJobs.map((j) => j.correlationId);
-      pc.printCount = pc.correlationIds?.length;
-
-      const mappedEvents = pc.printEvents.map(({ status, createdAt, fileName, context, completionLog }) => ({
-        status,
-        createdAt,
-        fileName,
-        context,
-        completionLog,
-      }));
-
-      const failureEvents = mappedEvents.filter((e) => e.status === EVENT_TYPES.PrintFailed);
-      pc.failureCount = failureEvents?.length;
-      pc.lastFailure = failureEvents?.length ? failureEvents.reduce((j1, j2) => (j1.createdAt > j2.createdAt ? j1 : j2)) : null;
-      pc.failureEventsLastWeek = failureEvents.filter((e) => e.createdAt > Date.now() - 7 * durationDayMSec)?.length;
-      pc.failureEventsLast48H = failureEvents.filter((e) => e.createdAt > Date.now() - 2 * durationDayMSec)?.length;
-      pc.failureEventsLast24H = failureEvents.filter((e) => e.createdAt > Date.now() - durationDayMSec)?.length;
-
-      const successEvents = mappedEvents.filter((e) => e.status === EVENT_TYPES.PrintDone);
-      pc.successCount = successEvents?.length;
-      pc.lastSuccess = successEvents?.length ? successEvents?.reduce((j1, j2) => (j1.createdAt > j2.createdAt ? j1 : j2)) : null;
-      pc.successEventsLastWeek = successEvents.filter((e) => e.createdAt > Date.now() - 7 * durationDayMSec)?.length;
-      pc.successEventsLast48H = successEvents.filter((e) => e.createdAt > Date.now() - 2 * durationDayMSec)?.length;
-      pc.successEventsLast24H = successEvents.filter((e) => e.createdAt > Date.now() - durationDayMSec)?.length;
-
-      // Explodes in size quickly, remove the event timeline
-      delete pc.printEvents;
-
-      return pc;
-    });
+    return processCompletions(printCompletionsAggr);
   }
 }

@@ -1,6 +1,6 @@
 import { IFloor } from "@/models/Floor";
 import { IdType } from "@/shared.constants";
-import { FloorDto, PositionDto, PrinterInFloorDto } from "@/services/interfaces/floor.dto";
+import { FloorDto, PositionDto, PrinterInFloorDto, UpdateFloorDto } from "@/services/interfaces/floor.dto";
 
 export interface IFloorService<KeyType = IdType, Entity = IFloor> {
   toDto(floor: Entity): FloorDto<KeyType>;
@@ -15,7 +15,7 @@ export interface IFloorService<KeyType = IdType, Entity = IFloor> {
 
   get(floorId: KeyType): Promise<Entity>;
 
-  update(floorId: KeyType, input: Entity): Promise<Entity>;
+  update(floorId: KeyType, input: UpdateFloorDto): Promise<Entity>;
 
   updateName(floorId: KeyType, name: string): Promise<Entity>;
 

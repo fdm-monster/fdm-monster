@@ -34,6 +34,7 @@ export const DITokens = {
   authService: "authService",
   refreshTokenService: "refreshTokenService",
   userService: "userService",
+  userRoleService: "userRoleService",
   permissionService: "permissionService",
   jwtService: "jwtService",
   roleService: "roleService",

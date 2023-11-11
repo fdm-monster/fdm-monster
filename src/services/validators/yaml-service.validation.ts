@@ -16,27 +16,36 @@ export const exportPrintersFloorsYamlRules = {
   // dropFloorIds: "required|boolean", // optional idea for future
 };
 
-export const importPrintersFloorsYamlRules = (importPrinters, importFloorGrid, importFloors) => ({
-  version: "required|string",
-  config: "required|object",
-  "config.exportPrinters": "required|boolean",
-  "config.exportFloorGrid": "required|boolean",
-  "config.exportFloors": "required|boolean",
-  "config.printerComparisonStrategiesByPriority": "required|arrayUnique|minLength:1",
-  "config.printerComparisonStrategiesByPriority.*": "required|string|in:name,url,id",
-  "config.floorComparisonStrategiesByPriority": "required|string|in:name,floor,id",
-  printers: `${!!importPrinters ? "array|minLength:0" : "not"}`,
-  "printers.*.id": "mongoId",
-  "printers.*.apiKey": `required|length:${UUID_LENGTH},${UUID_LENGTH}|alphaNumeric`,
-  "printers.*.printerURL": "required|httpurl",
-  "printers.*.enabled": "boolean",
-  "printers.*.settingsAppearance": "required|object",
-  "printers.*.settingsAppearance.name": "required|string",
-  floors: `${!!importFloors ? "array|minLength:0" : "not"}`,
-  "floors.*.id": "required|mongoId",
-  "floors.*.floor": "required|integer",
-  "floors.*.name": "required|string",
-});
+export const importPrintersFloorsYamlRules = (
+  importPrinters: boolean,
+  importFloorGrid: boolean,
+  importFloors: boolean,
+  isTypeormMode: boolean
+) => {
+  const idVal = isTypeormMode ? "integer|min:1" : "mongoId";
+  return {
+    version: "required|string",
+    config: "required|object",
+    "config.exportPrinters": "required|boolean",
+    "config.exportFloorGrid": "required|boolean",
+    "config.exportFloors": "required|boolean",
+    "config.printerComparisonStrategiesByPriority": "required|arrayUnique|minLength:1",
+    "config.printerComparisonStrategiesByPriority.*": "required|string|in:name,url,id",
+    "config.floorComparisonStrategiesByPriority": "required|string|in:name,floor,id",
+    printers: `${!!importPrinters ? "array|minLength:0" : "not"}`,
+    "printers.*.id": `${idVal}`,
+    "printers.*.apiKey": `required|length:${UUID_LENGTH},${UUID_LENGTH}|alphaNumeric`,
+    "printers.*.printerURL": "required|httpurl",
+    "printers.*.enabled": "boolean",
+    "printers.*.name": "required|string",
+    "printers.*.settingsAppearance": "required|object",
+    "printers.*.settingsAppearance.name": "required|string",
+    floors: `${!!importFloors ? "array|minLength:0" : "not"}`,
+    "floors.*.id": `required|${idVal}`,
+    "floors.*.floor": "required|integer",
+    "floors.*.name": "required|string",
+  };
+};
 
 export const importPrinterPositionsRules = {
   printers: "array|minLength:0",

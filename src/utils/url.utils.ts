@@ -8,6 +8,8 @@ export function httpToWsUrl(url: string, protocol = "ws") {
 }
 
 export function normalizeURLWithProtocol(printerURL: string) {
+  if (!printerURL) return;
+
   if (!printerURL.startsWith("http://") && !printerURL.startsWith("https://")) {
     printerURL = `http://${printerURL}`;
   }

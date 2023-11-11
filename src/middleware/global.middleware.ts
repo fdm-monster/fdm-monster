@@ -62,11 +62,15 @@ export const validateWhitelistedIp = inject(
 );
 
 export const interceptRoles = inject(
-  ({ settingsStore, roleService }) =>
+  ({ settingsStore, roleService, isTypeormMode }) =>
     async (req: Request, res: Response, next: NextFunction) => {
       const serverSettings = await settingsStore.getSettings();
 
-      req.roles = req.user?.roles;
+      if (isTypeormMode) {
+        req.roles = req.user?.roles.map((r) => r.id);
+      } else {
+        req.roles = req.user?.roles;
+      }
 
       // If server settings are not set, we can't determine the default role
       if (serverSettings && !req.user) {

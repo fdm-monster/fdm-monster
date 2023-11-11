@@ -1,6 +1,7 @@
 import { model, Schema } from "mongoose";
 
 export interface IPrinter {
+  id: string;
   apiKey: string;
   printerURL: string;
   enabled: boolean;

@@ -2,16 +2,16 @@ import { IdType } from "@/shared.constants";
 import { ICustomGcode } from "@/models/CustomGcode";
 import { CustomGcodeDto } from "@/services/interfaces/custom-gcode.dto";
 
-export interface ICustomGcodeService<KeyType = IdType> {
-  toDto(document: ICustomGcode): CustomGcodeDto;
+export interface ICustomGcodeService<KeyType = IdType, Entity = ICustomGcode> {
+  toDto(document: Entity): CustomGcodeDto;
 
-  get(gcodeScriptId: KeyType): Promise<ICustomGcode>;
+  get(gcodeScriptId: KeyType): Promise<Entity>;
 
-  list(): Promise<ICustomGcode[]>;
+  list(): Promise<Entity[]>;
 
-  create(gcodeScript: CustomGcodeDto): Promise<ICustomGcode>;
+  create(gcodeScript: CustomGcodeDto): Promise<Entity>;
 
-  delete(gcodeScriptId: KeyType): Promise<ICustomGcode>;
+  delete(gcodeScriptId: KeyType, throwIfNotFound?: boolean): Promise<any | void>;
 
-  update(gcodeScriptId: KeyType, updatedData: CustomGcodeDto): Promise<ICustomGcode>;
+  update(gcodeScriptId: KeyType, updatedData: CustomGcodeDto): Promise<Entity>;
 }

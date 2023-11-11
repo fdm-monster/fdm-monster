@@ -9,6 +9,7 @@ import { IRefreshToken } from "@/models/Auth/RefreshToken";
 import { AuthenticationError } from "@/exceptions/runtime.exceptions";
 import { IRefreshTokenService } from "@/services/interfaces/refresh-token.service.interface";
 import { AUTH_ERROR_REASON } from "@/constants/authorization.constants";
+import { RefreshTokenDto } from "@/services/interfaces/refresh-token.dto";
 
 export class RefreshTokenService implements IRefreshTokenService<MongoIdType> {
   private settingsStore: SettingsStore;
@@ -17,6 +18,17 @@ export class RefreshTokenService implements IRefreshTokenService<MongoIdType> {
   constructor({ loggerFactory, settingsStore }: { loggerFactory: ILoggerFactory; settingsStore: SettingsStore }) {
     this.logger = loggerFactory(RefreshTokenService.name);
     this.settingsStore = settingsStore;
+  }
+
+  toDto(entity: IRefreshToken): RefreshTokenDto<MongoIdType> {
+    return {
+      id: entity.id,
+      userId: entity.userId.toString(),
+      expiresAt: entity.expiresAt,
+      // Sensitive data
+      // refreshToken: entity.refreshToken,
+      refreshAttemptsUsed: entity.refreshAttemptsUsed,
+    };
   }
 
   async getRefreshToken(refreshToken: string, throwNotFoundError = true): Promise<IRefreshToken | null> {

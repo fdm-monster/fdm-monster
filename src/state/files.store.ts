@@ -6,13 +6,14 @@ import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service"
 import { LoggerService } from "@/handlers/logger";
 import { IdType } from "@/shared.constants";
 import { ILoggerFactory } from "@/handlers/logger-factory";
+import { IPrinterFilesService } from "@/services/interfaces/printer-files.service.interface";
 
 /**
  * Generic store for synchronisation of files and storage information of printers.
  */
 export class FilesStore {
   printerCache: PrinterCache;
-  printerFilesService: PrinterFilesService;
+  printerFilesService: IPrinterFilesService;
   fileCache: FileCache;
   octoPrintApiService: OctoPrintApiService;
   private logger: LoggerService;
@@ -25,7 +26,7 @@ export class FilesStore {
     loggerFactory,
   }: {
     printerCache: PrinterCache;
-    printerFilesService: PrinterFilesService;
+    printerFilesService: IPrinterFilesService;
     fileCache: FileCache;
     octoPrintApiService: OctoPrintApiService;
     loggerFactory: ILoggerFactory;

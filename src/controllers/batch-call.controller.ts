@@ -9,31 +9,33 @@ import { Request, Response } from "express";
 
 export class BatchCallController {
   batchCallService: BatchCallService;
+  isTypeormMode: boolean;
 
-  constructor({ batchCallService }: { batchCallService: BatchCallService }) {
+  constructor({ batchCallService, isTypeormMode }: { batchCallService: BatchCallService; isTypeormMode: boolean }) {
     this.batchCallService = batchCallService;
+    this.isTypeormMode = isTypeormMode;
   }
 
   async batchConnectUsb(req: Request, res: Response) {
-    const { printerIds } = await validateInput(req.body, batchPrinterRules);
+    const { printerIds } = await validateInput(req.body, batchPrinterRules(this.isTypeormMode));
     const results = await this.batchCallService.batchConnectUsb(printerIds);
     res.send(results);
   }
 
   async batchConnectSocket(req: Request, res: Response) {
-    const { printerIds } = await validateInput(req.body, batchPrinterRules);
+    const { printerIds } = await validateInput(req.body, batchPrinterRules(this.isTypeormMode));
     await this.batchCallService.batchConnectSocket(printerIds);
     res.send({});
   }
 
   async batchReprintFiles(req: Request, res: Response) {
-    const { printerIds } = await validateInput(req.body, batchPrinterRules);
+    const { printerIds } = await validateInput(req.body, batchPrinterRules(this.isTypeormMode));
     const results = await this.batchCallService.batchReprintCalls(printerIds);
     res.send(results);
   }
 
   async batchTogglePrintersEnabled(req: Request, res: Response) {
-    const { printerIds, enabled } = await validateInput(req.body, batchPrintersEnabledRules);
+    const { printerIds, enabled } = await validateInput(req.body, batchPrintersEnabledRules(this.isTypeormMode));
     const results = await this.batchCallService.batchTogglePrintersEnabled(printerIds, enabled);
     res.send(results);
   }

@@ -1,18 +1,26 @@
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import { findFileIndex } from "@/utils/find-predicate.utils";
 import { LoggerService } from "@/handlers/logger";
-import { PrinterService } from "@/services/printer.service";
 import { MongoIdType } from "@/shared.constants";
 import { ILoggerFactory } from "@/handlers/logger-factory";
+import { IPrinterFilesService } from "@/services/interfaces/printer-files.service.interface";
+import { IPrinterService } from "@/services/interfaces/printer.service.interface";
+import { IPrinter } from "@/models/Printer";
 
 /**
  * An extension repository for managing printer files in database
  */
-export class PrinterFilesService implements IPrinterFilesService {
-  printerService: PrinterService;
+export class PrinterFilesService implements IPrinterFilesService<MongoIdType> {
+  printerService: IPrinterService<MongoIdType, IPrinter>;
   private logger: LoggerService;
 
-  constructor({ printerService, loggerFactory }: { printerService: PrinterService; loggerFactory: ILoggerFactory }) {
+  constructor({
+    printerService,
+    loggerFactory,
+  }: {
+    printerService: IPrinterService<MongoIdType>;
+    loggerFactory: ILoggerFactory;
+  }) {
     this.printerService = printerService;
     this.logger = loggerFactory(PrinterFilesService.name);
   }
@@ -62,7 +70,7 @@ export class PrinterFilesService implements IPrinterFilesService {
     return { fileList: printer.fileList, lastPrintedFile };
   }
 
-  async setPrinterLastPrintedFile(printerId: MongoIdType, fileName) {
+  async setPrinterLastPrintedFile(printerId: MongoIdType, fileName: string) {
     await this.printerService.get(printerId);
     const lastPrintedFile = {
       fileName,

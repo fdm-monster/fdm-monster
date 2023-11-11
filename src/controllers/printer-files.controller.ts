@@ -36,6 +36,7 @@ export class PrinterFilesController {
   multerService: MulterService;
   printerFileCleanTask: PrinterFileCleanTask;
   logger: LoggerService;
+  isTypeormMode: boolean;
 
   constructor({
     filesStore,
@@ -45,6 +46,7 @@ export class PrinterFilesController {
     settingsStore,
     loggerFactory,
     multerService,
+    isTypeormMode,
   }: {
     filesStore: FilesStore;
     octoPrintApiService: OctoPrintApiService;
@@ -53,6 +55,7 @@ export class PrinterFilesController {
     settingsStore: SettingsStore;
     loggerFactory: ILoggerFactory;
     multerService: MulterService;
+    isTypeormMode: boolean;
   }) {
     this.filesStore = filesStore;
     this.settingsStore = settingsStore;
@@ -60,6 +63,7 @@ export class PrinterFilesController {
     this.octoPrintApiService = octoPrintApiService;
     this.batchCallService = batchCallService;
     this.multerService = multerService;
+    this.isTypeormMode = isTypeormMode;
     this.logger = loggerFactory(PrinterFilesController.name);
   }
 
@@ -156,7 +160,7 @@ export class PrinterFilesController {
    * @deprecated this API endpoint will be moved to /batch from BatchCallController in 1.6.0
    */
   async batchReprintFiles(req: Request, res: Response) {
-    const { printerIds } = await validateInput(req.body, batchPrinterRules);
+    const { printerIds } = await validateInput(req.body, batchPrinterRules(this.isTypeormMode));
     const results = await this.batchCallService.batchReprintCalls(printerIds);
     res.send(results);
   }
