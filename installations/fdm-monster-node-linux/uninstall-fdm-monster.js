@@ -18,10 +18,11 @@ const svc = new Service({
   workingDirectory: rootPath,
 });
 
-svc.on("install", function () {
-  svc.start();
-  console.log("Install complete. Service exists:", svc.exists());
-  console.log("Service running: ", svc.isRunning);
+svc.on("stop", function () {
+  console.log("Service stopped. Service exists?", svc.exists);
+});
+svc.on("uninstall", function () {
+  console.log("Uninstall complete. Service exists?", svc.exists);
 });
 
 svc.uninstall();

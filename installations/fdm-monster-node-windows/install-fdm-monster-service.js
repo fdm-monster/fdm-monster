@@ -9,11 +9,11 @@ const { Service } = require("node-windows");
 const { join } = require("path");
 
 // Create a new service object
-const rootPath = join(__dirname, "fdm-monster/server/");
+const rootPath = join(__dirname, "../../dist/");
 const svc = new Service({
   name: "FDM Monster",
   description: "The 3D Printer Farm server for managing your 100+ OctoPrints printers.",
-  script: join(rootPath, "index.mjs"),
+  script: join(rootPath, "index.js"),
   nodeOptions: ["--harmony", "--max_old_space_size=4096"],
   workingDirectory: rootPath,
 });
@@ -21,12 +21,10 @@ const svc = new Service({
 // Listen for the "install" event, which indicates the process is available as a service.
 svc.on("install", function () {
   svc.start();
-  console.log("Install complete. Service exists:", svc.exists);
-  console.log("Service running: ", svc.isRunning);
+  console.log("Install complete. Service exists?", svc.exists);
 });
 
-if (svc.isRunning) {
-  svc.stop();
+if (svc.exists) {
   svc.uninstall();
 }
 

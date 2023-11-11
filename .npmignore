@@ -3,6 +3,7 @@
 .DS_Store
 .git
 .hg
+.idea
 .npmrc
 .vscode
 .github
@@ -33,6 +34,7 @@ GitReleaseManager.yaml
 coverage
 docker
 docs
+src
 fdm-monster
 installations
 media
@@ -45,6 +47,7 @@ test
 **/*.sqlite-wal
 **/*.log
 **/*.zip
+
 !dist/**/*
 !*.md
 !.env.template

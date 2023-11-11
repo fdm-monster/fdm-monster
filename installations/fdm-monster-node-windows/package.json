@@ -5,10 +5,10 @@
   "main": "install-fdm-monster-service.js",
   "license": "MIT",
   "scripts": {
-    "preinstall": "powershell ./download-fdm-monster-server.ps1",
-    "install": "node ./install-fdm-monster-service.js",
+    "installl": "powershell ./download-fdm-monster-server.ps1",
+    "install-service": "node ./install-fdm-monster-service.js",
     "update": "powershell update-fdm-monster.ps1",
-    "uninstall": "node ./uninstall-fdm-monster-service.js"
+    "uninstall-service": "node ./uninstall-fdm-monster-service.js"
   },
   "dependencies": {
     "node-windows": "^1.0.0-beta.8"

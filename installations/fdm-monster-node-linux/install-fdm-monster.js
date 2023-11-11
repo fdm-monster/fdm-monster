@@ -20,8 +20,7 @@ const svc = new Service({
 
 svc.on("install", function () {
   svc.start();
-  console.log("Install complete. Service exists:", svc.exists());
-  console.log("Service running: ", svc.isRunning);
+  console.log("Install complete. Service exists?", svc.exists());
 });
 
 if (svc.exists()) {

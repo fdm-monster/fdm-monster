@@ -1,0 +1,6 @@
+node_version: "20"
+nvm_version: "0.39.5"
+cli_version: "latest"
+fdmm_version: "1.5.0"
+nodejs_npm_global_packages:
+  - name: yarn

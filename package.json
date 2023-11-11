@@ -7,7 +7,11 @@
   "author": "David Zwart",
   "license": "AGPL-3.0-or-later",
   "private": false,
-  "version": "1.5.4",
+  "version": "1.5.5-alpha",
+  "bin": {
+    "fdm-monster": "dist/cli.js",
+    "fdmm": "dist/cli.js"
+  },
   "description": "FDM Monster is a bulk OctoPrint manager to set up, configure and monitor 3D printers. Our aim is to provide extremely optimized websocket performance and reliability.",
   "main": "dist/index.js",
   "scripts": {
@@ -15,6 +19,7 @@
     "watch-dev": "cross-env NODE_ENV=development nodemon --watch \"dist/**/*\" -e js ./dist/index.js",
     "build": "swc src -d dist",
     "build:watch": "swc src -w -d dist",
+    "cli": "yarn build && cross-env NODE_ENV=development node ./dist/cli.js",
     "start:dev": "ts-node src/index.ts",
     "start": "cross-env NODE_ENV=production node dist/index.js",
     "migration:create": "migrate-mongo create printer-remove-settingsappearance",
@@ -81,7 +86,8 @@
     "toad-scheduler": "3.0.0",
     "uuid": "9.0.1",
     "winston": "3.11.0",
-    "ws": "8.14.2"
+    "ws": "8.14.2",
+    "yargs": "17.7.2"
   },
   "devDependencies": {
     "@lcov-viewer/cli": "1.3.0",
@@ -109,6 +115,7 @@
     "@types/semver": "7.5.6",
     "@types/supertest": "2.0.16",
     "@types/uuid": "9.0.7",
+    "@types/yargs": "17.0.29",
     "chokidar": "3.5.3",
     "concurrently": "8.2.2",
     "eslint": "8.55.0",
