@@ -1,4 +1,4 @@
-import { UUID_LENGTH } from "../../constants/service.constants";
+import { UUID_LENGTH } from "@/constants/service.constants";
 
 export const flowRateRules = {
   flowRate: "required|between:75,125|integer",

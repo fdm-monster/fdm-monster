@@ -119,6 +119,7 @@ describe("PrinterController", () => {
       {
         printerURL: "http://localhost/",
         apiKey,
+        name: "Printer name",
       },
     ]);
     expectOkResponse(response);
