@@ -10,9 +10,7 @@ export async function createTestPrinter(request: supertest.SuperTest<supertest.T
     printerURL: "http://url.com",
     apiKey: testApiKey,
     enabled,
-    settingsAppearance: {
-      name: "testPrinter 123",
-    },
+    name: "testPrinter 123",
   });
   return expectOkResponse(createResponse, { enabled, id: expect.any(String) });
 }

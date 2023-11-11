@@ -38,7 +38,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
   toDto(entity: IPrinter): PrinterDto<MongoIdType> {
     return {
       id: entity.id,
-      name: entity.settingsAppearance.name,
+      name: entity.name,
       enabled: entity.enabled,
       disabledReason: entity.disabledReason,
       dateAdded: entity.dateAdded,
@@ -89,14 +89,14 @@ export class PrinterService implements IPrinterService<MongoIdType> {
   async update(printerId: MongoIdType, updateData) {
     const printer = await this.get(printerId);
     updateData.printerURL = normalizeURLWithProtocol(updateData.printerURL);
-    const { printerURL, apiKey, enabled, settingsAppearance } = await validateInput(updateData, createMongoPrinterRules);
+    const { printerURL, apiKey, enabled, name } = await validateInput(updateData, createMongoPrinterRules);
 
     printer.printerURL = printerURL;
     printer.apiKey = apiKey;
     if (enabled !== undefined) {
       printer.enabled = enabled;
     }
-    printer.settingsAppearance.name = settingsAppearance.name;
+    printer.name = name;
     await printer.save();
     this.eventEmitter2.emit(printerEvents.printerUpdated, { printer });
     return printer;

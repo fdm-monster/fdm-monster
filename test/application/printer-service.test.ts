@@ -25,14 +25,12 @@ describe("PrinterService", () => {
     const updatedName = "newName";
     const printerUpdate = {
       ...testPrinterData,
-      settingsAppearance: {
-        name: updatedName,
-      },
+      name: updatedName,
     };
 
     await printerService.update(printer.id, printerUpdate);
     const foundPrinter = await Printer.findOne({ id: printer.id });
     expect(foundPrinter).toBeDefined();
-    expect(foundPrinter!.settingsAppearance.name).toEqual(updatedName);
+    expect(foundPrinter!.name).toEqual(updatedName);
   });
 });

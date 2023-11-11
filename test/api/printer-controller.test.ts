@@ -1,10 +1,10 @@
-import { connect, closeDatabase, clearDatabase } from "../db-handler";
+import { connect } from "../db-handler";
 import { setupTestApp } from "../test-server";
 import { expectInvalidResponse, expectNotFoundResponse, expectOkResponse } from "../extensions";
 import { AppConstants } from "@/server.constants";
 import { Printer } from "@/models";
 import { createTestPrinter, testApiKey } from "./test-data/create-printer";
-import supertest, { Request, SuperTest } from "supertest";
+import supertest, { SuperTest } from "supertest";
 import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
 
 let Model = Printer;
@@ -45,7 +45,7 @@ afterAll(async () => {
 describe("PrinterController", () => {
   it(`should not be able to POST ${createRoute} - invalid apiKey`, async () => {
     const response = await request.post(createRoute).send({
-      settingsAppearance: null,
+      name: "asd",
       printerURL: "http://url.com",
       apiKey: "notcorrect",
       tempTriggers: { heatingVariation: null },
@@ -57,13 +57,13 @@ describe("PrinterController", () => {
     const response = await request.post(createRoute).send({
       printerURL: "http://url.com",
       apiKey: testApiKey,
-      printerName: "test123",
+      name: "test123",
     });
     const body = expectOkResponse(response, {
       printerURL: expect.any(String),
     });
 
-    expect(body.printerName).toEqual("test123");
+    expect(body.name).toEqual("test123");
   });
 
   it(`should not be able to POST ${updateRoute} - missing printer field`, async () => {
@@ -155,13 +155,13 @@ describe("PrinterController", () => {
       printerURL: "https://test.com/",
       apiKey,
       enabled: false,
-      printerName: "asd124",
+      name: "asd124",
     };
     const updatePatch = await request.patch(updateRoute(printer.id)).send(patch);
     expectOkResponse(updatePatch, {
       printerURL: "https://test.com",
       enabled: false,
-      printerName: "asd124",
+      name: "asd124",
     });
   });
 

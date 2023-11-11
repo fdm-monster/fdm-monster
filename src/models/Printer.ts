@@ -6,9 +6,7 @@ export interface IPrinter {
   printerURL: string;
   enabled: boolean;
   disabledReason: string;
-  settingsAppearance: {
-    name: string;
-  };
+  name: string;
   currentUser: string;
   dateAdded: number;
   lastPrintedFile: {
@@ -48,14 +46,8 @@ export const PrinterSchema = new Schema<IPrinter>({
     type: String,
     required: false,
   },
-  settingsAppearance: {
-    // Not modeling properties is the cause of .save() not working
-    type: {
-      name: {
-        type: String,
-        required: false,
-      },
-    },
+  name: {
+    type: String,
     required: true,
   },
   // Auto-generated below

@@ -13,7 +13,6 @@ import {
   updatePrinterEnabledRule,
 } from "./validation/printer-controller.validation";
 import { AppConstants } from "@/server.constants";
-import { getSettingsAppearanceDefault } from "@/constants/service.constants";
 import { printerResolveMiddleware } from "@/middleware/printer";
 import { generateCorrelationToken } from "@/utils/correlation-token.util";
 import { ROLES } from "@/constants/authorization.constants";
@@ -177,7 +176,6 @@ export class PrinterController {
 
   async create(req: Request, res: Response) {
     let newPrinter = req.body;
-    newPrinter = this.#adjustPrinterObject(newPrinter);
 
     // Has internal validation, but might add some here above as well
     const createdPrinter = await this.printerService.create(newPrinter);
@@ -204,7 +202,6 @@ export class PrinterController {
   async update(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
     let updatedPrinter = req.body;
-    updatedPrinter = this.#adjustPrinterObject(updatedPrinter);
     await this.printerService.update(currentPrinterId, updatedPrinter);
 
     const result = await this.printerCache.getCachedPrinterOrThrowAsync(currentPrinterId);
@@ -338,17 +335,6 @@ export class PrinterController {
     const { fileName } = await validateMiddleware(req, getOctoPrintBackupRules);
     const response = await this.octoPrintApiService.deleteBackup(printerLogin, fileName);
     res.send(response);
-  }
-
-  #adjustPrinterObject(printer) {
-    // TODO move to service
-    printer.settingsAppearance = getSettingsAppearanceDefault();
-    if (printer.printerName) {
-      printer.settingsAppearance.name = printer.printerName;
-      delete printer.printerName;
-    }
-
-    return printer;
   }
 }
 

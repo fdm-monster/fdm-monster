@@ -6,14 +6,16 @@ import { AppConstants } from "@/server.constants";
 import { PrintCompletion as Model } from "@/models";
 import { EVENT_TYPES } from "@/services/octoprint/constants/octoprint-websocket.constants";
 import { DITokens } from "@/container.tokens";
+import { IPrintCompletionService } from "@/services/interfaces/print-completion.service";
+import supertest from "supertest";
 
-let printCompletionService;
+let printCompletionService: IPrintCompletionService;
 const listRoute = `${AppConstants.apiRoute}/print-completion`;
-const getCompletionEntryRoute = (corrId) => `${listRoute}/${corrId}`;
+const getCompletionEntryRoute = (corrId: string) => `${listRoute}/${corrId}`;
 const contextsRoute = `${listRoute}/contexts`;
 const testRoute = `${listRoute}/test`;
 
-let request;
+let request: supertest.SuperTest<supertest.Test>;
 let container: AwilixContainer<any>;
 
 beforeAll(async () => {

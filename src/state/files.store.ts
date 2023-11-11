@@ -87,7 +87,7 @@ export class FilesStore {
 
     const nonRecursiveFiles = this.getOutdatedFiles(printerId, ageDaysMax);
     const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
-    const printerName = await this.printerCache.getCachedPrinterOrThrowAsync(printerId).printerName;
+    const name = await this.printerCache.getCachedPrinterOrThrowAsync(printerId).name;
 
     for (let file of nonRecursiveFiles) {
       try {
@@ -98,9 +98,7 @@ export class FilesStore {
       }
     }
 
-    this.logger.log(
-      `Deleted ${succeededFiles.length} successfully and ${failedFiles.length} with failure for printer ${printerName}.`
-    );
+    this.logger.log(`Deleted ${succeededFiles.length} successfully and ${failedFiles.length} with failure for printer ${name}.`);
     return {
       failedFiles,
       succeededFiles,

@@ -5,8 +5,7 @@ export const createMongoPrinterRules = {
   apiKey: `required|length:${UUID_LENGTH},${UUID_LENGTH}|alphaNumeric`,
   printerURL: "required|httpurl",
   enabled: "boolean",
-  settingsAppearance: "object",
-  "settingsAppearance.name": "string",
+  name: "string",
 };
 
 export const createPrinterRules = {

@@ -12,7 +12,7 @@ import { superRootPath } from "@/utils/fs.utils";
 const logger = new Logger("FDM-Environment", false);
 
 // Constants and definition
-const instructionsReferralURL = "https://github.com/fdm-monster/fdm-monster/blob/master/README.md";
+const instructionsReferralURL = "https://docs.fdm-monster.net";
 const packageJsonPath = join(superRootPath(), "./package.json");
 const dotEnvPath = join(superRootPath(), "./.env");
 
@@ -78,7 +78,7 @@ function setupPackageJsonVersionOrThrow() {
  * Print out instructions URL
  */
 function printInstructionsURL() {
-  logger.log(`Please make sure to read ${instructionsReferralURL} on how to configure your environment correctly.`);
+  logger.log(`Please make sure to read ${instructionsReferralURL} for more information.`);
 }
 
 export function fetchMongoDBConnectionString() {

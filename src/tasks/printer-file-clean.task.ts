@@ -64,7 +64,7 @@ export class PrinterFileCleanTask {
         if (!outdatedFiles?.length) continue;
 
         // Report
-        this.logger.log(`Found ${outdatedFiles?.length} old files of ${printer.printerName}`);
+        this.logger.log(`Found ${outdatedFiles?.length} old files of ${printer.name}`);
 
         if (autoCleanAtBootEnabled) {
           await this.cleanPrinterFiles(printer.id);

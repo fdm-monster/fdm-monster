@@ -49,8 +49,8 @@ export class PrinterSettingsController {
     const { id: printerId } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
 
     const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
-    const printerName = await this.printerCache.getNameAsync(printerId);
-    const settings = await this.octoPrintApiService.updatePrinterNameSetting(printerLogin, printerName);
+    const name = await this.printerCache.getNameAsync(printerId);
+    const settings = await this.octoPrintApiService.updatePrinterNameSetting(printerLogin, name);
     res.send(settings);
   }
 }

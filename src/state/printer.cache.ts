@@ -16,7 +16,6 @@ interface CachedPrinter {
   printerURL: string;
   enabled: boolean;
   disabledReason: string;
-  printerName?: string;
   name: string;
   dateAdded: number;
   lastPrintedFile: {
