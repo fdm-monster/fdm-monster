@@ -6,7 +6,7 @@ describe("printer-schema", function () {
     const m = new Printer({
       apiKey: "asd",
       printerURL: "myawesomeprinter/",
-      name: "",
+      name: "Printer name",
     });
 
     m.validate(function (err) {

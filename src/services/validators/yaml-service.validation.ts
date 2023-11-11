@@ -48,7 +48,6 @@ export const importPrintersFloorsYamlRules = (
 export const importPrinterPositionsRules = {
   printers: "array|minLength:0",
   "printers.*.printerId": "required|mongoId",
-  "printers.*.floorId": "required|mongoId",
   "printers.*.x": "required|integer|min:0|max:12",
   "printers.*.y": "required|integer|min:0|max:12",
 };

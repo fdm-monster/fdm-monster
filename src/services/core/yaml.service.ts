@@ -320,7 +320,6 @@ export class YamlService {
           dumpedFloor.printers = f.printers.map((p) => {
             const fPrinterId = p.printerId.toString();
             return {
-              floorId: f.id,
               printerId: fPrinterId,
               x: p.x,
               y: p.y,

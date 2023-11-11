@@ -30,10 +30,11 @@ afterAll(async () => {
   await closeDatabase();
 });
 
-describe("FilesStore", () => {
+describe(FilesStore.name, () => {
   const validNewPrinter = {
     apiKey: "asdasasdasdasdasdasdasdasdasdasd",
     printerURL: "https://asd.com:81",
+    name: "FileTestPrinter",
   };
 
   it("old files - should deal with empty files cache correctly", async () => {

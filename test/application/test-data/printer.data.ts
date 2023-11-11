@@ -12,6 +12,7 @@ export const validNewPrinterState = {
   apiKey: "asdasasdasdasdasdasdasdasdasdasd",
   webSocketURL: "ws://asd.com/",
   printerURL: "https://asd.com:81",
+  name: "TestPrinter",
 };
 
 /**

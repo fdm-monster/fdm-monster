@@ -13,11 +13,6 @@ export const PrinterInFloorSchema = new Schema<IPrinterInFloor>({
     ref: "Printer",
     required: true,
   },
-  floorId: {
-    type: Schema.Types.ObjectId,
-    ref: "Floor",
-    required: true,
-  },
   x: {
     type: Number,
     required: true,
