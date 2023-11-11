@@ -29,9 +29,9 @@ export class CustomGcodeService implements ICustomGcodeService<MongoIdType> {
     return CustomGcode.create(gcodeScript);
   }
 
-  async delete(gcodeScriptId: MongoIdType) {
+  async delete(gcodeScriptId: MongoIdType, throwIfNotFound?: boolean) {
     const gcode = await this.get(gcodeScriptId);
-    return CustomGcode.findByIdAndDelete(gcode.id);
+    await CustomGcode.findByIdAndDelete(gcode.id);
   }
 
   async update(gcodeScriptId: MongoIdType, updatedData: CustomGcodeDto) {

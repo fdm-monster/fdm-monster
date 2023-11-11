@@ -1,4 +1,4 @@
-const exportYamlBuffer =
+export const exportYamlBuffer =
   "version: 1.3.1-rc2\n" +
   "exportedAt: 2023-05-01T04:46:06.130Z\n" +
   "config:\n" +
@@ -34,7 +34,3 @@ const exportYamlBuffer =
   "    floor: 1\n" +
   "    name: Default Floor\n" +
   "    printers: []";
-
-module.exports = {
-  exportYamlBuffer,
-};

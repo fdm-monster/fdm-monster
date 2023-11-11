@@ -38,7 +38,6 @@ export class PermissionService implements IPermissionService<MongoIdType> {
   async getPermissionByName(permissionName: string) {
     const permission = this.permissions.find((r) => r.name === permissionName);
     if (!permission) throw new NotFoundException("Permission not found");
-
     return permission;
   }
 

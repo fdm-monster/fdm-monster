@@ -6,13 +6,14 @@ import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service"
 import { LoggerService } from "@/handlers/logger";
 import { IdType } from "@/shared.constants";
 import { ILoggerFactory } from "@/handlers/logger-factory";
+import { IPrinterFilesService } from "@/services/interfaces/printer-files.service.interface";
 
 /**
  * Generic store for synchronisation of files and storage information of printers.
  */
 export class FilesStore {
   printerCache: PrinterCache;
-  printerFilesService: PrinterFilesService;
+  printerFilesService: IPrinterFilesService;
   fileCache: FileCache;
   octoPrintApiService: OctoPrintApiService;
   private logger: LoggerService;
@@ -25,7 +26,7 @@ export class FilesStore {
     loggerFactory,
   }: {
     printerCache: PrinterCache;
-    printerFilesService: PrinterFilesService;
+    printerFilesService: IPrinterFilesService;
     fileCache: FileCache;
     octoPrintApiService: OctoPrintApiService;
     loggerFactory: ILoggerFactory;
@@ -86,7 +87,7 @@ export class FilesStore {
 
     const nonRecursiveFiles = this.getOutdatedFiles(printerId, ageDaysMax);
     const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
-    const printerName = await this.printerCache.getCachedPrinterOrThrowAsync(printerId).printerName;
+    const name = await this.printerCache.getCachedPrinterOrThrowAsync(printerId).name;
 
     for (let file of nonRecursiveFiles) {
       try {
@@ -97,9 +98,7 @@ export class FilesStore {
       }
     }
 
-    this.logger.log(
-      `Deleted ${succeededFiles.length} successfully and ${failedFiles.length} with failure for printer ${printerName}.`
-    );
+    this.logger.log(`Deleted ${succeededFiles.length} successfully and ${failedFiles.length} with failure for printer ${name}.`);
     return {
       failedFiles,
       succeededFiles,

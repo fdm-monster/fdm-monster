@@ -6,7 +6,7 @@ describe("printer-schema", function () {
     const m = new Printer({
       apiKey: "asd",
       printerURL: "myawesomeprinter/",
-      settingsAppearance: {},
+      name: "Printer name",
     });
 
     m.validate(function (err) {
@@ -19,7 +19,7 @@ describe("printer-schema", function () {
     const m = new Printer({});
 
     m.validate(function (err) {
-      expectValidationError(err, ["settingsAppearance", "printerURL", "apiKey"], true);
+      expectValidationError(err, ["name", "printerURL", "apiKey"], true);
       done();
     });
   });

@@ -1,4 +1,4 @@
-import { IdType } from "@/shared.constants";
+import { IdType, SqliteIdType } from "@/shared.constants";
 import { IRole } from "@/models/Auth/Role";
 import { RoleDto } from "@/services/interfaces/role.dto";
 
@@ -9,17 +9,17 @@ export interface IRoleService<KeyType = IdType, Entity = IRole> {
 
   getAppDefaultRole(): Promise<string>;
 
-  getRolesPermissions(roles: string[]): string[];
+  getRolesPermissions(roles: (string | KeyType)[]): string[];
 
-  getRolePermissions(role: string): string[];
+  getRolePermissions(role: string | KeyType): string[];
 
   getAppDefaultRoleIds(): Promise<any[]>;
 
   getSynchronizedRoleByName(roleName: string): Promise<Entity>;
 
-  authorizeRole(requiredRole: string, assignedRoles: string[]): boolean;
+  authorizeRole(requiredRole: string | KeyType, assignedRoles: string[]): boolean;
 
-  authorizeRoles(requiredRoles: string[], assignedRoles: string[], subset: boolean): boolean;
+  authorizeRoles(requiredRoles: (string | KeyType)[], assignedRoles: (string | KeyType)[], subset: boolean): boolean;
 
   getRoleByName(roleName: string): Entity;
 

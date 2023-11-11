@@ -24,7 +24,7 @@ export class BatchCallService {
   printerCache: PrinterCache;
   printerEventsCache: PrinterEventsCache;
   filesStore: FilesStore;
-  printerService: IPrinterService<IdType>;
+  printerService: IPrinterService;
 
   constructor({
     octoPrintApiService,
@@ -39,7 +39,7 @@ export class BatchCallService {
     printerEventsCache: PrinterEventsCache;
     printerSocketStore: PrinterSocketStore;
     filesStore: FilesStore;
-    printerService: IPrinterService<IdType>;
+    printerService: IPrinterService;
   }) {
     this.octoPrintApiService = octoPrintApiService;
     this.printerCache = printerCache;

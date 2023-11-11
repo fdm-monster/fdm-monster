@@ -15,6 +15,8 @@ import { MongoIdType } from "@/shared.constants";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoginDto } from "@/services/interfaces/login.dto";
+import { PrinterDto, PrinterUnsafeDto } from "@/services/interfaces/printer.dto";
+import { IPrinter } from "@/models/Printer";
 
 export class PrinterService implements IPrinterService<MongoIdType> {
   eventEmitter2: EventEmitter2;
@@ -23,6 +25,24 @@ export class PrinterService implements IPrinterService<MongoIdType> {
   constructor({ eventEmitter2, loggerFactory }: { eventEmitter2: EventEmitter2; loggerFactory: ILoggerFactory }) {
     this.eventEmitter2 = eventEmitter2;
     this.logger = loggerFactory(PrinterService.name);
+  }
+
+  toUnsafeDto(entity: IPrinter): PrinterUnsafeDto<MongoIdType> {
+    return {
+      ...this.toDto(entity),
+      apiKey: entity.apiKey,
+      printerURL: entity.printerURL,
+    };
+  }
+
+  toDto(entity: IPrinter): PrinterDto<MongoIdType> {
+    return {
+      id: entity.id,
+      name: entity.name,
+      enabled: entity.enabled,
+      disabledReason: entity.disabledReason,
+      dateAdded: entity.dateAdded,
+    };
   }
 
   async list() {
@@ -69,14 +89,14 @@ export class PrinterService implements IPrinterService<MongoIdType> {
   async update(printerId: MongoIdType, updateData) {
     const printer = await this.get(printerId);
     updateData.printerURL = normalizeURLWithProtocol(updateData.printerURL);
-    const { printerURL, apiKey, enabled, settingsAppearance } = await validateInput(updateData, createMongoPrinterRules);
+    const { printerURL, apiKey, enabled, name } = await validateInput(updateData, createMongoPrinterRules);
 
     printer.printerURL = printerURL;
     printer.apiKey = apiKey;
     if (enabled !== undefined) {
       printer.enabled = enabled;
     }
-    printer.settingsAppearance.name = settingsAppearance.name;
+    printer.name = name;
     await printer.save();
     this.eventEmitter2.emit(printerEvents.printerUpdated, { printer });
     return printer;

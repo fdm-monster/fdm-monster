@@ -1,4 +1,3 @@
-const groupName = "Row0_0";
 const testApiKey = "fdmonsterfdmonsterfdmonsterfdmon";
 
 export const testPrinterData = {
@@ -6,16 +5,14 @@ export const testPrinterData = {
   webSocketURL: "ws://url.com",
   apiKey: testApiKey,
   enabled: false,
-  group: groupName,
-  settingsAppearance: {
-    name: "testPrinter 123",
-  },
+  name: "testPrinter 123",
 };
 
 export const validNewPrinterState = {
   apiKey: "asdasasdasdasdasdasdasdasdasdasd",
   webSocketURL: "ws://asd.com/",
   printerURL: "https://asd.com:81",
+  name: "TestPrinter",
 };
 
 /**
@@ -28,16 +25,6 @@ export class PrinterMockData {
       printerURL: "http://test.com/",
       webSocketURL: "ws://test/",
       apiKey: "asdasasdasdasdasdasdasdasdasdasd",
-    };
-  }
-
-  static get PrinterMockWithGroup() {
-    return {
-      name: "Printuh",
-      printerURL: "http://test.com/",
-      webSocketURL: "ws://test/",
-      apiKey: "asdasdasdasdasdasdasdasdasdasdas",
-      group: "testGroupName",
     };
   }
 }

@@ -1,28 +1,34 @@
 import { IPrinter } from "@/models/Printer";
 import { IdType } from "@/shared.constants";
+import { PrinterDto, PrinterUnsafeDto } from "@/services/interfaces/printer.dto";
+import { Printer } from "@/entities";
 
-export interface IPrinterService<KeyType = IdType> {
-  list(): Promise<IPrinter[]>;
+export interface IPrinterService<KeyType = IdType, Entity = IPrinter | Printer> {
+  toUnsafeDto(entity: Entity): PrinterUnsafeDto<KeyType>;
 
-  get(printerId: KeyType): Promise<IPrinter>;
+  toDto(entity: Entity): PrinterDto<KeyType>;
 
-  create(printer: Partial<IPrinter>, emitEvent: boolean): Promise<IPrinter>;
+  list(): Promise<Entity[]>;
 
-  update(printerId: KeyType, printer: Partial<IPrinter>): Promise<IPrinter>;
+  get(printerId: KeyType): Promise<Entity>;
+
+  create(printer: Partial<Entity>, emitEvent?: boolean): Promise<Entity>;
+
+  update(printerId: KeyType, printer: Partial<Entity>): Promise<Entity>;
 
   delete(printerId: KeyType): Promise<any>;
 
   deleteMany(printerIds: KeyType[]): Promise<any | void>;
 
-  batchImport(printers: Partial<IPrinter>[]): Promise<IPrinter[]>;
+  batchImport(printers: Partial<Entity>[]): Promise<Entity[]>;
 
-  updateConnectionSettings(printerId: KeyType, partial: { printerUrl: string; apiKey: string }): Promise<IPrinter>;
+  updateConnectionSettings(printerId: KeyType, partial: { printerUrl: string; apiKey: string }): Promise<Entity>;
 
-  updateEnabled(printerId: KeyType, enabled: boolean): Promise<IPrinter>;
+  updateEnabled(printerId: KeyType, enabled: boolean): Promise<Entity>;
 
-  updateFeedRate(printerId: KeyType, feedRate: number): Promise<IPrinter>;
+  updateFeedRate(printerId: KeyType, feedRate: number): Promise<Entity>;
 
-  updateFlowRate(printerId: KeyType, flowRate: number): Promise<IPrinter>;
+  updateFlowRate(printerId: KeyType, flowRate: number): Promise<Entity>;
 
-  updateDisabledReason(printerId: KeyType, disabledReason: string): Promise<IPrinter>;
+  updateDisabledReason(printerId: KeyType, disabledReason: string): Promise<Entity>;
 }

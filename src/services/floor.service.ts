@@ -13,7 +13,13 @@ import { LoggerService } from "@/handlers/logger";
 import { PrinterCache } from "@/state/printer.cache";
 import { MongoIdType } from "@/shared.constants";
 import { IFloorService } from "@/services/interfaces/floor.service.interface";
-import { CreateFloorDto, FloorDto, PrinterInFloorDto, UpdateFloorDto } from "@/services/interfaces/floor.dto";
+import {
+  AddOrUpdatePrinterDto,
+  CreateFloorDto,
+  FloorDto,
+  PrinterInFloorDto,
+  UpdateFloorDto,
+} from "@/services/interfaces/floor.dto";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class FloorService implements IFloorService<MongoIdType> {
@@ -156,7 +162,7 @@ export class FloorService implements IFloorService<MongoIdType> {
     );
   }
 
-  async addOrUpdatePrinter(floorId: MongoIdType, printerInFloor: PrinterInFloorDto) {
+  async addOrUpdatePrinter(floorId: MongoIdType, printerInFloor: AddOrUpdatePrinterDto<MongoIdType>) {
     const floor = await this.get(floorId, true);
     const validInput = await validateInput(printerInFloor, printerInFloorRules);
 

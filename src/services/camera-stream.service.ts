@@ -44,7 +44,7 @@ export class CameraStreamService implements ICameraStreamService<MongoIdType> {
   }
 
   async delete(id: MongoIdType) {
-    return this.model.findByIdAndDelete(id);
+    await this.model.findByIdAndDelete(id);
   }
 
   async update(id: MongoIdType, input: UpdateCameraStreamDto<MongoIdType>) {

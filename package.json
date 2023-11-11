@@ -7,7 +7,7 @@
   "author": "David Zwart",
   "license": "AGPL-3.0-or-later",
   "private": false,
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "FDM Monster is a bulk OctoPrint manager to set up, configure and monitor 3D printers. Our aim is to provide extremely optimized websocket performance and reliability.",
   "main": "dist/index.js",
   "scripts": {
@@ -17,7 +17,7 @@
     "build:watch": "swc src -w -d dist",
     "start:dev": "ts-node src/index.ts",
     "start": "cross-env NODE_ENV=production node dist/index.js",
-    "migration:create": "migrate-mongo create printer-remove-sortindex",
+    "migration:create": "migrate-mongo create printer-remove-settingsappearance",
     "migration:up": "migrate-mongo up",
     "migration:down": "migrate-mongo down",
     "migration:status": "migrate-mongo status",

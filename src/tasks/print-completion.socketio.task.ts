@@ -6,6 +6,8 @@ import EventEmitter2 from "eventemitter2";
 import { LoggerService } from "@/handlers/logger";
 import { PrintCompletionService } from "@/services/print-completion.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
+import { CreatePrintCompletionDto, PrintCompletionContext } from "@/services/interfaces/print-completion.dto";
+import { IdType } from "@/shared.constants";
 
 export class PrintCompletionSocketIoTask {
   eventEmitter2: EventEmitter2;
@@ -13,7 +15,7 @@ export class PrintCompletionSocketIoTask {
   logger: LoggerService;
   printCompletionService: PrintCompletionService;
 
-  contextCache = {};
+  contextCache: Record<IdType, PrintCompletionContext> = {};
 
   constructor({
     eventEmitter2,
@@ -41,7 +43,7 @@ export class PrintCompletionSocketIoTask {
     return this.contextCache;
   }
 
-  async handleMessage(fdmEvent, octoPrintEvent, data) {
+  async handleMessage(fdmEvent: string, octoPrintEvent: string, data: any) {
     // If not parsed well, skip log
     const printerId = fdmEvent.replace("octoprint.", "");
     if (!printerId) {
@@ -52,16 +54,16 @@ export class PrintCompletionSocketIoTask {
       return;
     }
 
+    this.socketIoGateway.send(IO_MESSAGES.CompletionEvent, JSON.stringify({ fdmEvent, octoPrintEvent, data }));
+
     const completion = {
       status: data.type,
       fileName: data.payload?.name,
       createdAt: Date.now(),
       completionLog: data.payload?.error,
-      printerId: printerId,
-    };
-
-    this.socketIoGateway.send(IO_MESSAGES.CompletionEvent, JSON.stringify({ fdmEvent, octoPrintEvent, data }));
-
+      printerId,
+      context: {},
+    } as CreatePrintCompletionDto;
     if (
       data.type === EVENT_TYPES.EStop ||
       data.type === EVENT_TYPES.PrintCancelling ||
@@ -87,9 +89,11 @@ export class PrintCompletionSocketIoTask {
 
     if (data.type === EVENT_TYPES.PrintStarted) {
       // Clear the context now with association id
+      const token = generateCorrelationToken();
       this.contextCache[printerId] = {
-        correlationId: generateCorrelationToken(),
+        correlationId: token,
       };
+      completion.correlationId = token;
       completion.context = this.contextCache[printerId];
       await this.printCompletionService.create(completion);
     } else if (data.type === EVENT_TYPES.PrintFailed || data.type === EVENT_TYPES.PrintDone) {

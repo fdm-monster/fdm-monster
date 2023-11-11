@@ -10,10 +10,10 @@ import { IAuthService } from "@/services/interfaces/auth.service.interface";
 import { IRefreshTokenService } from "@/services/interfaces/refresh-token.service.interface";
 import { AUTH_ERROR_REASON } from "@/constants/authorization.constants";
 
-export class AuthService implements IAuthService<MongoIdType> {
+export class AuthService implements IAuthService {
   private logger: LoggerService;
-  private userService: IUserService<MongoIdType>;
-  private jwtService: IJwtService<MongoIdType>;
+  private userService: IUserService;
+  private jwtService: IJwtService;
   private settingsStore: SettingsStore;
   private refreshTokenService: IRefreshTokenService<MongoIdType>;
   /**

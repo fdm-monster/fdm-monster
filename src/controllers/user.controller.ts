@@ -3,7 +3,7 @@ import { AppConstants } from "@/server.constants";
 import { authenticate, authorizeRoles } from "@/middleware/authenticate";
 import { ROLES } from "@/constants/authorization.constants";
 import { validateInput } from "@/handlers/validators";
-import { idRules } from "./validation/generic.validation";
+import { idRulesV2 } from "./validation/generic.validation";
 import { ForbiddenError } from "@/exceptions/runtime.exceptions";
 import { IConfigService } from "@/services/core/config.service";
 import { IUserService } from "@/services/interfaces/user-service.interface";
@@ -23,6 +23,7 @@ export class UserController {
   authService: IAuthService;
   settingsStore: SettingsStore;
   logger: LoggerService;
+  isTypeormMode: boolean;
 
   constructor({
     userService,
@@ -31,6 +32,7 @@ export class UserController {
     settingsStore,
     authService,
     loggerFactory,
+    isTypeormMode,
   }: {
     userService: IUserService;
     configService: IConfigService;
@@ -38,12 +40,14 @@ export class UserController {
     authService: IAuthService;
     settingsStore: SettingsStore;
     loggerFactory: ILoggerFactory;
+    isTypeormMode: boolean;
   }) {
     this.userService = userService;
     this.configService = configService;
     this.roleService = roleService;
     this.authService = authService;
     this.settingsStore = settingsStore;
+    this.isTypeormMode = isTypeormMode;
     this.logger = loggerFactory(UserController.name);
   }
 
@@ -68,7 +72,7 @@ export class UserController {
   }
 
   async delete(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRules);
+    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
 
     const ownUserId = req.user?.id;
     if (ownUserId) {
@@ -101,13 +105,13 @@ export class UserController {
   }
 
   async get(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRules);
+    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
     const user = await this.userService.getUser(id);
     res.send(this.userService.toDto(user));
   }
 
   async changeUsername(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRules);
+    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
 
     if (req.user?.id !== id && (await this.settingsStore.getLoginRequired())) {
       throw new ForbiddenError("Not allowed to change username of other users");
@@ -121,7 +125,7 @@ export class UserController {
   }
 
   async changePassword(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRules);
+    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
 
     if (req.user?.id !== id && (await this.settingsStore.getLoginRequired())) {
       throw new ForbiddenError("Not allowed to change password of other users");
@@ -136,7 +140,7 @@ export class UserController {
   }
 
   async setVerified(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRules);
+    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
 
     const ownUserId = req.user?.id;
     if (ownUserId) {
@@ -168,7 +172,7 @@ export class UserController {
   }
 
   async setRootUser(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRules);
+    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
 
     const userId = req.user?.id;
     if (req.user?.id) {

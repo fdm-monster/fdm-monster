@@ -3,6 +3,8 @@ import { IPermission } from "@/models/Auth/Permission";
 import { PermissionDto } from "@/services/interfaces/permission.dto";
 
 export interface IPermissionService<KeyType = IdType, Entity = IPermission> {
+  get permissions(): PermissionDto<KeyType>[];
+
   toDto(permission: Entity): PermissionDto<KeyType>;
 
   authorizePermission(requiredPermission: string, assignedPermissions: string[]): boolean;

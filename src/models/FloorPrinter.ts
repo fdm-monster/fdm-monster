@@ -3,6 +3,7 @@ import { Schema, Types } from "mongoose";
 export interface IPrinterInFloor {
   x: number;
   y: number;
+  floorId: Types.ObjectId;
   printerId: Types.ObjectId;
 }
 

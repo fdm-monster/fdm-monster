@@ -1,7 +1,3 @@
-export const getSettingsAppearanceDefault = () => ({
-  name: "",
-});
-
 export function getFileListDefault() {
   return {
     files: [],
@@ -13,7 +9,6 @@ export function getFileListDefault() {
 
 export function getDefaultPrinterEntry() {
   return {
-    settingsAppearance: getSettingsAppearanceDefault(),
     fileList: getFileListDefault(),
   };
 }
