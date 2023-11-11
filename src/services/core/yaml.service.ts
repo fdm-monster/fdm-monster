@@ -302,9 +302,7 @@ export class YamlService {
           disabledReason: p.disabledReason,
           enabled: p.enabled,
           dateAdded: p.dateAdded,
-          settingsAppearance: {
-            name: p.settingsAppearance.name,
-          },
+          name: p.name,
           printerURL: p.printerURL,
           apiKey,
         };
@@ -324,6 +322,7 @@ export class YamlService {
           dumpedFloor.printers = f.printers.map((p) => {
             const fPrinterId = p.printerId.toString();
             return {
+              floorId: f.id,
               printerId: fPrinterId,
               x: p.x,
               y: p.y,
