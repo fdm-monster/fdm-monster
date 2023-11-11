@@ -44,7 +44,7 @@ jobs:
         run: |
           echo ${{ env.RELEASE_TAG }}
 
-      # Publish to NPM
+      # Purely a dry-run!
       - uses: JS-DevTools/npm-publish@v3
         with:
           dry-run: true
