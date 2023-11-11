@@ -95,10 +95,10 @@ export class OctoPrintRoutes {
     return { command: "move", destination };
   }
 
-  printerNameSetting(printerName: string) {
+  printerNameSetting(name: string) {
     return {
       appearance: {
-        name: printerName,
+        name: name,
       },
     };
   }

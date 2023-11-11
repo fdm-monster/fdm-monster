@@ -1,16 +1,18 @@
 import { createController } from "awilix-express";
 import { AppConstants } from "@/server.constants";
 import { validateInput } from "@/handlers/validators";
-import { idRules } from "./validation/generic.validation";
+import { idRulesV2 } from "./validation/generic.validation";
 import { authenticate } from "@/middleware/authenticate";
 import { Request, Response } from "express";
 import { ICameraStreamService } from "@/services/interfaces/camera-stream.service.interface";
 
 export class CameraStreamController {
-  cameraStreamService: ICameraStreamService;
+  private cameraStreamService: ICameraStreamService;
+  private readonly isTypeormMode: boolean;
 
-  constructor({ cameraStreamService }: { cameraStreamService: ICameraStreamService }) {
+  constructor({ cameraStreamService, isTypeormMode }: { cameraStreamService: ICameraStreamService; isTypeormMode: boolean }) {
     this.cameraStreamService = cameraStreamService;
+    this.isTypeormMode = isTypeormMode;
   }
 
   async list(req: Request, res: Response) {
@@ -19,7 +21,7 @@ export class CameraStreamController {
   }
 
   async get(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRules);
+    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
     const result = await this.cameraStreamService.get(id);
     res.send(this.cameraStreamService.toDto(result));
   }
@@ -30,13 +32,13 @@ export class CameraStreamController {
   }
 
   async update(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRules);
+    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
     const result = await this.cameraStreamService.update(id, req.body);
     res.send(this.cameraStreamService.toDto(result));
   }
 
   async delete(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRules);
+    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
     await this.cameraStreamService.delete(id);
     res.send();
   }

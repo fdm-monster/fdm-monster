@@ -22,6 +22,7 @@ export class ServerHost {
   socketIoGateway: SocketIoGateway;
   appInstance: Application | null = null;
   configService: ConfigService;
+  private readonly isTypeormMode: boolean;
   private logger: LoggerService;
 
   constructor({
@@ -30,6 +31,7 @@ export class ServerHost {
     taskManagerService,
     socketIoGateway,
     configService,
+    isTypeormMode,
   }: {
     loggerFactory: ILoggerFactory;
     bootTask: BootTask;
@@ -42,6 +44,7 @@ export class ServerHost {
     this.taskManagerService = taskManagerService;
     this.socketIoGateway = socketIoGateway;
     this.configService = configService;
+    this.isTypeormMode = isTypeormMode;
   }
 
   async boot(app: Application, quick_boot = false, listenRequests = true) {

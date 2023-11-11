@@ -87,7 +87,7 @@ describe(ServerPrivateController.name, () => {
     expectOkResponse(response);
 
     const yamlObject = load(response.text);
-    await validateInput(yamlObject, importPrintersFloorsYamlRules(true, true, true));
+    await validateInput(yamlObject, importPrintersFloorsYamlRules(true, true, true, false));
   });
 
   test.skip("should import YAML and have data loaded", async () => {

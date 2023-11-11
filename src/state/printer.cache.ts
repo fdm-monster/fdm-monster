@@ -4,6 +4,11 @@ import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import { mapMongoDb } from "@/utils/mapper.utils";
 import { PrinterService } from "@/services/printer.service";
 import EventEmitter2 from "eventemitter2";
+import { IdType } from "@/shared.constants";
+import { IPrinterService } from "@/services/interfaces/printer.service.interface";
+import { PrinterDto } from "@/services/interfaces/printer.dto";
+import { Printer } from "@/entities";
+import { IPrinter } from "@/models/Printer";
 
 interface CachedPrinter {
   id: string;
@@ -11,7 +16,6 @@ interface CachedPrinter {
   printerURL: string;
   enabled: boolean;
   disabledReason: string;
-  printerName?: string;
   name: string;
   dateAdded: number;
   lastPrintedFile: {
@@ -34,10 +38,10 @@ interface CachedPrinter {
 }
 
 export class PrinterCache extends KeyDiffCache<CachedPrinter> {
-  printerService: PrinterService;
+  printerService: IPrinterService;
   eventEmitter2: EventEmitter2;
 
-  constructor({ printerService, eventEmitter2 }: { printerService: PrinterService; eventEmitter2: EventEmitter2 }) {
+  constructor({ printerService, eventEmitter2 }: { printerService: IPrinterService; eventEmitter2: EventEmitter2 }) {
     super();
     this.printerService = printerService;
     this.eventEmitter2 = eventEmitter2;
@@ -49,6 +53,7 @@ export class PrinterCache extends KeyDiffCache<CachedPrinter> {
   }
 
   async loadCache(): Promise<CachedPrinter> {
+    // TODO this is missing any login required for middleware
     const printerDocs = await this.printerService.list();
     const dtos = this.mapArray(printerDocs);
     const keyValues = dtos.map((p) => ({ key: this.getId(p), value: p }));
@@ -121,21 +126,17 @@ export class PrinterCache extends KeyDiffCache<CachedPrinter> {
     await this.deleteKeysBatch(printerIds, true);
   }
 
-  private getId(value) {
+  private getId(value: IPrinter | Printer) {
     return value.id.toString();
   }
 
-  private mapArray(printerDocs) {
-    return printerDocs.map((p) => {
+  private mapArray(entities: (IPrinter | Printer)[]) {
+    return entities.map((p) => {
       return this.map(p);
     });
   }
 
-  private map(printerDoc): CachedPrinter {
-    const p = mapMongoDb(printerDoc);
-    p.printerName = p.settingsAppearance.name;
-    delete p.settingsAppearance;
-    delete p.fileList;
-    return p;
+  private map(entity: IPrinter | Printer): PrinterDto<IdType> {
+    return this.printerService.toUnsafeDto(entity);
   }
 }

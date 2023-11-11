@@ -1,0 +1,53 @@
+version: 1.5.1
+exportedAt: 2023-11-11T09:02:41.703Z
+config:
+  exportPrinters: true
+  exportFloorGrid: true
+  printerComparisonStrategiesByPriority:
+    - name
+    - url
+  exportFloors: true
+  floorComparisonStrategiesByPriority: floor
+  notes: ''
+printers:
+  - id: 648f3e6d372112628bb8e404
+    disabledReason: null
+    enabled: true
+    dateAdded: 1687109229334
+    name: Dragon Eggggg
+    printerURL: http://demo.fdm-monster.net:5001
+    apiKey: asdasdasdasdasdasdasdasdasdasdas
+  - id: 648f3e6d372112628bb8e407
+    disabledReason: null
+    enabled: false
+    dateAdded: 1687109229346
+    name: Disabled Printer
+    printerURL: http://localhost
+    apiKey: asdasdasdasdasdasdasdasdasdasdas
+  - id: 648f3e6d372112628bb8e40a
+    disabledReason: Blob
+    enabled: false
+    dateAdded: 1687109229355
+    name: Broken Printer
+    printerURL: http://localhost
+    apiKey: asd123asd123asd123asd123asd12322
+  - id: 64dfd3df4f5a22fee0351592
+    disabledReason: null
+    enabled: true
+    dateAdded: 1692390367821
+    name: MiniPi
+    printerURL: http://192.168.178.221
+    apiKey: asd123asd123asd123asd123asd12322
+floors:
+  - id: 64427f2d070a27047acd5e6e
+    floor: 2
+    name: Default Floorrr
+    printers:
+      - floorId: 64427f2d070a27047acd5e6e
+        printerId: 648f3e6d372112628bb8e404
+        x: 0
+        'y': 0
+      - floorId: 64427f2d070a27047acd5e6e
+        printerId: 64dfd3df4f5a22fee0351592
+        x: 1
+        'y': 0

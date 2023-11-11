@@ -20,6 +20,7 @@ export class YamlService {
   printerCache: PrinterCache;
   serverVersion: string;
   private logger: LoggerService;
+  private readonly isTypeormMode: boolean;
 
   constructor({
     printerService,
@@ -28,6 +29,7 @@ export class YamlService {
     floorService,
     loggerFactory,
     serverVersion,
+    isTypeormMode,
   }: {
     printerService: IPrinterService<MongoIdType>;
     printerCache: PrinterCache;
@@ -35,6 +37,7 @@ export class YamlService {
     floorService: IFloorService<MongoIdType>;
     loggerFactory: ILoggerFactory;
     serverVersion: string;
+    isTypeormMode: boolean;
   }) {
     this.floorStore = floorStore;
     this.printerService = printerService;
@@ -42,6 +45,7 @@ export class YamlService {
     this.floorService = floorService;
     this.serverVersion = serverVersion;
     this.logger = loggerFactory(YamlService.name);
+    this.isTypeormMode = isTypeormMode;
   }
 
   async importPrintersAndFloors(yamlBuffer: string) {
@@ -49,17 +53,21 @@ export class YamlService {
     const { exportPrinters, exportFloorGrid, exportFloors } = importSpec?.config;
 
     for (const printer of importSpec.printers) {
-      if (!printer.settingsAppearance?.name && printer.printerName) {
-        printer.settingsAppearance = {
-          name: printer.printerName,
-        };
+      // old export bug
+      if (!printer.name && printer.printerName) {
+        printer.name = printer.printerName;
         delete printer.printerName;
+      }
+      // 1.5.2 schema
+      if (printer.settingsAppearance?.name) {
+        printer.name = printer.settingsAppearance?.name;
+        delete printer.settingsAppearance?.name;
       }
     }
 
     const importData = await validateInput(
       importSpec,
-      importPrintersFloorsYamlRules(exportPrinters, exportFloorGrid, exportFloors)
+      importPrintersFloorsYamlRules(exportPrinters, exportFloorGrid, exportFloors, this.isTypeormMode)
     );
 
     // Nested validation is manual (for now)
@@ -149,16 +157,10 @@ export class YamlService {
     };
   }
 
-  /**
-   *
-   * @param upsertPrinters
-   * @param comparisonStrategies array of string types
-   * @returns {Promise<object>}
-   */
   async analysePrintersUpsert(upsertPrinters, comparisonStrategies) {
     const existingPrinters = await this.printerService.list();
 
-    const names = existingPrinters.map((p) => p.settingsAppearance.name.toLowerCase());
+    const names = existingPrinters.map((p) => p.name.toLowerCase());
     const urls = existingPrinters.map((p) => p.printerURL);
     const ids = existingPrinters.map((p) => p.id.toString());
 
@@ -167,7 +169,7 @@ export class YamlService {
     for (const printer of upsertPrinters) {
       for (const strategy of [...comparisonStrategies, "new"]) {
         if (strategy === "name") {
-          const comparedName = printer.settingsAppearance.name.toLowerCase();
+          const comparedName = printer.name.toLowerCase();
           const foundIndex = names.findIndex((n) => n === comparedName);
           if (foundIndex !== -1) {
             updateByPropertyPrinters.push({
@@ -298,9 +300,7 @@ export class YamlService {
           disabledReason: p.disabledReason,
           enabled: p.enabled,
           dateAdded: p.dateAdded,
-          settingsAppearance: {
-            name: p.settingsAppearance.name,
-          },
+          name: p.name,
           printerURL: p.printerURL,
           apiKey,
         };
