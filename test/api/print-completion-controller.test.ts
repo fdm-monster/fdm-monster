@@ -54,7 +54,7 @@ describe("PrintCompletionController", () => {
         correlationId: "123",
       },
     });
-    expect(completionEntryStart._id).toBeTruthy();
+    expect(completionEntryStart.id).toBeTruthy();
     const completionEntryDone = await printCompletionService.create({
       printerId: "5f14968b11034c4ca49e7c69",
       completionLog: "some log happened here",
@@ -64,13 +64,13 @@ describe("PrintCompletionController", () => {
         correlationId: "123",
       },
     });
-    expect(completionEntryDone._id).toBeTruthy();
+    expect(completionEntryDone.id).toBeTruthy();
 
     const response = await request.get(listRoute).send();
     const body = expectOkResponse(response);
     expect(body).toHaveLength(1);
     const printerEvents = body[0];
-    expect(printerEvents._id).toEqual("5f14968b11034c4ca49e7c69");
+    expect(printerEvents.printerId).toEqual("5f14968b11034c4ca49e7c69");
     expect(printerEvents.eventCount).toEqual(2);
     expect(printerEvents.printCount).toEqual(1);
     expect(printerEvents.printJobs).toHaveLength(1);
