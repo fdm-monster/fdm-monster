@@ -19,7 +19,7 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   container = configureContainer();
-  printerFilesStore = container.resolve(DITokens.filesStore);
+  printerFilesStore = container.resolve(DITokens.printerFilesStore);
   printerFilesService = container.resolve(DITokens.printerFilesService);
   printerService = container.resolve(DITokens.printerService);
   printerCache = container.resolve(DITokens.printerCache);

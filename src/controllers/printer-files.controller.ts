@@ -7,12 +7,13 @@ import {
   fileUploadCommandsRules,
   getFileRules,
   getFilesRules,
+  localFileUploadRules,
   moveFileOrFolderRules,
   selectAndPrintFileRules,
   uploadFileRules,
 } from "./validation/printer-files-controller.validation";
 import { batchPrinterRules } from "@/controllers/validation/batch-controller.validation";
-import { ValidationException } from "@/exceptions/runtime.exceptions";
+import { NotFoundException, ValidationException } from "@/exceptions/runtime.exceptions";
 import { printerResolveMiddleware } from "@/middleware/printer";
 import { PERMS, ROLES } from "@/constants/authorization.constants";
 import { PrinterFilesStore } from "@/state/printer-files.store";
@@ -25,6 +26,7 @@ import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { Request, Response } from "express";
 import { AxiosResponse } from "axios";
+import { createReadStream, existsSync, lstatSync } from "node:fs";
 
 export class PrinterFilesController {
   printerFilesStore: PrinterFilesStore;
@@ -232,17 +234,17 @@ export class PrinterFilesController {
       });
     }
 
-    if (!fs.existsSync(localLocation)) {
+    if (!existsSync(localLocation)) {
       throw new NotFoundException("The indicated file was not found.");
     }
 
-    if (fs.lstatSync(localLocation).isDirectory()) {
+    if (lstatSync(localLocation).isDirectory()) {
       throw new ValidationException({
         localLocation: "The indicated file was not correctly found.",
       });
     }
 
-    const stream = fs.createReadStream(localLocation);
+    const stream = createReadStream(localLocation);
     const response = await this.octoPrintApiService.uploadFileAsMultiPart(printerLogin, stream, {
       select,
       print,
@@ -251,7 +253,7 @@ export class PrinterFilesController {
     // TODO update file cache with files store
     if (response.success !== false) {
       const newOrUpdatedFile = response.files.local;
-      await this.filesStore.appendOrSetPrinterFile(currentPrinterId, newOrUpdatedFile);
+      await this.printerFilesStore.appendOrSetPrinterFile(currentPrinterId, newOrUpdatedFile);
     }
 
     res.send(response);
