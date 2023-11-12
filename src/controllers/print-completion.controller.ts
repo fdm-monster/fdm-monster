@@ -3,19 +3,19 @@ import { createController } from "awilix-express";
 import { AppConstants } from "@/server.constants";
 import { PERMS } from "@/constants/authorization.constants";
 import { validateInput } from "@/handlers/validators";
-import { PrintCompletionService } from "@/services/print-completion.service";
 import { PrintCompletionSocketIoTask } from "@/tasks/print-completion.socketio.task";
 import { Request, Response } from "express";
+import { IPrintCompletionService } from "@/services/interfaces/print-completion.service";
 
 export class PrintCompletionController {
-  private printCompletionService: PrintCompletionService;
+  private printCompletionService: IPrintCompletionService;
   private printCompletionSocketIoTask: PrintCompletionSocketIoTask;
 
   constructor({
     printCompletionService,
     printCompletionSocketIoTask,
   }: {
-    printCompletionService: PrintCompletionService;
+    printCompletionService: IPrintCompletionService;
     printCompletionSocketIoTask: PrintCompletionSocketIoTask;
   }) {
     this.printCompletionService = printCompletionService;
@@ -47,7 +47,6 @@ export class PrintCompletionController {
   }
 }
 
-// prettier-ignore
 export default createController(PrintCompletionController)
   .prefix(AppConstants.apiRoute + "/print-completion")
   .before([authenticate()])

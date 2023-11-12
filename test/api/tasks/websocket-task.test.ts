@@ -12,7 +12,7 @@ beforeAll(async () => {
   task = container.resolve(DITokens.printerWebsocketTask);
 });
 
-describe("PrinterWebsocketTask", () => {
+describe(PrinterWebsocketTask.name, () => {
   it("should try running websocket task", async () => {
     try {
       await task.run();

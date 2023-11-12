@@ -5,7 +5,8 @@ import { AppConstants } from "@/server.constants";
 import { Printer } from "@/models";
 import { createTestPrinter, testApiKey } from "./test-data/create-printer";
 import supertest, { SuperTest } from "supertest";
-import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
+import { PrinterController } from "@/controllers/printer.controller";
+import { OctoPrintApiMock } from "../mocks/octoprint-api.mock";
 
 let Model = Printer;
 const defaultRoute = AppConstants.apiRoute + "/printer";
@@ -30,8 +31,9 @@ const serialDisconnectCommandRoute = (id: string) => `${getRoute(id)}/serial-dis
 const batchRoute = `${defaultRoute}/batch`;
 
 let request: SuperTest<supertest.Test>;
-let octoPrintApiService: OctoPrintApiService;
+let octoPrintApiService: OctoPrintApiMock;
 const apiKey = "fdmfdmfdmfdmfdmfdmfdmfdmfdmfdmfd";
+const name = "test1234";
 
 beforeAll(async () => {
   await connect();
@@ -42,7 +44,7 @@ afterAll(async () => {
   await Model.deleteMany({});
 });
 
-describe("PrinterController", () => {
+describe(PrinterController.name, () => {
   it(`should not be able to POST ${createRoute} - invalid apiKey`, async () => {
     const response = await request.post(createRoute).send({
       name: "asd",
@@ -59,11 +61,11 @@ describe("PrinterController", () => {
       apiKey: testApiKey,
       name: "test123",
     });
-    const body = expectOkResponse(response, {
-      printerURL: expect.any(String),
+    expectOkResponse(response, {
+      printerURL: "http://url.com",
+      apiKey: testApiKey,
+      name: "test123",
     });
-
-    expect(body.name).toEqual("test123");
   });
 
   it(`should not be able to POST ${updateRoute} - missing printer field`, async () => {
@@ -119,7 +121,7 @@ describe("PrinterController", () => {
       {
         printerURL: "http://localhost/",
         apiKey,
-        name: "Printer name",
+        name,
       },
     ]);
     expectOkResponse(response);
@@ -172,6 +174,7 @@ describe("PrinterController", () => {
     const updatePatch = await request.patch(connectionRoute(printer.id)).send({
       printerURL: "https://test.com/",
       apiKey,
+      name,
     });
     expectOkResponse(updatePatch, {
       printerURL: "https://test.com",
@@ -188,6 +191,7 @@ describe("PrinterController", () => {
     const res = await request.post(testPrinterRoute).send({
       apiKey,
       printerURL: "https://test.com/",
+      name,
     });
     expectOkResponse(res);
   });

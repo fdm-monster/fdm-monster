@@ -12,5 +12,5 @@ export async function createTestPrinter(request: supertest.SuperTest<supertest.T
     enabled,
     name: "testPrinter 123",
   });
-  return expectOkResponse(createResponse, { enabled, id: expect.any(String) });
+  return expectOkResponse(createResponse, { enabled, id: expect.anything() });
 }
