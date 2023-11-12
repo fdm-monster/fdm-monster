@@ -11,7 +11,7 @@ import { FloorStore } from "@/state/floor.store";
 import { PluginFirmwareUpdateService } from "@/services/octoprint/plugin-firmware-update.service";
 import { ConfigService } from "@/services/core/config.service";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
-import { FilesStore } from "@/state/files.store";
+import { PrinterFilesStore } from "@/state/printer-files.store";
 import { PermissionService } from "@/services/authentication/permission.service";
 import { RoleService } from "@/services/authentication/role.service";
 import { UserService } from "@/services/authentication/user.service";
@@ -28,7 +28,7 @@ export class BootTask {
   settingsService: ISettingsService;
   multerService: MulterService;
   printerSocketStore: PrinterSocketStore;
-  filesStore: FilesStore;
+  printerFilesStore: PrinterFilesStore;
   permissionService: PermissionService;
   roleService: RoleService;
   userService: UserService;
@@ -45,7 +45,7 @@ export class BootTask {
     settingsStore,
     multerService,
     printerSocketStore,
-    filesStore,
+    printerFilesStore,
     permissionService,
     roleService,
     userService,
@@ -62,7 +62,7 @@ export class BootTask {
     settingsStore: SettingsStore;
     multerService: MulterService;
     printerSocketStore: PrinterSocketStore;
-    filesStore: FilesStore;
+    printerFilesStore: PrinterFilesStore;
     permissionService: PermissionService;
     roleService: RoleService;
     userService: UserService;
@@ -79,7 +79,7 @@ export class BootTask {
     this.settingsStore = settingsStore;
     this.multerService = multerService;
     this.printerSocketStore = printerSocketStore;
-    this.filesStore = filesStore;
+    this.printerFilesStore = printerFilesStore;
     this.permissionService = permissionService;
     this.roleService = roleService;
     this.userService = userService;
@@ -156,7 +156,7 @@ export class BootTask {
     this.logger.log("Loading printer sockets");
     await this.printerSocketStore.loadPrinterSockets(); // New sockets
     this.logger.log("Loading files store");
-    await this.filesStore.loadFilesStore();
+    await this.printerFilesStore.loadFilesStore();
     this.logger.log("Loading floor store");
     await this.floorStore.loadStore();
 
