@@ -1,4 +1,3 @@
-import fs from "fs";
 import { createController } from "awilix-express";
 import { authenticate, authorizeRoles, withPermission } from "@/middleware/authenticate";
 import { getScopedPrinter, validateInput, validateMiddleware } from "@/handlers/validators";
@@ -8,16 +7,15 @@ import {
   fileUploadCommandsRules,
   getFileRules,
   getFilesRules,
-  localFileUploadRules,
   moveFileOrFolderRules,
   selectAndPrintFileRules,
   uploadFileRules,
 } from "./validation/printer-files-controller.validation";
 import { batchPrinterRules } from "@/controllers/validation/batch-controller.validation";
-import { NotFoundException, ValidationException } from "@/exceptions/runtime.exceptions";
+import { ValidationException } from "@/exceptions/runtime.exceptions";
 import { printerResolveMiddleware } from "@/middleware/printer";
 import { PERMS, ROLES } from "@/constants/authorization.constants";
-import { FilesStore } from "@/state/files.store";
+import { PrinterFilesStore } from "@/state/printer-files.store";
 import { SettingsStore } from "@/state/settings.store";
 import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
 import { BatchCallService } from "@/services/batch-call.service";
@@ -29,7 +27,7 @@ import { Request, Response } from "express";
 import { AxiosResponse } from "axios";
 
 export class PrinterFilesController {
-  filesStore: FilesStore;
+  printerFilesStore: PrinterFilesStore;
   settingsStore: SettingsStore;
   octoPrintApiService: OctoPrintApiService;
   batchCallService: BatchCallService;
@@ -39,7 +37,7 @@ export class PrinterFilesController {
   isTypeormMode: boolean;
 
   constructor({
-    filesStore,
+    printerFilesStore,
     octoPrintApiService,
     batchCallService,
     printerFileCleanTask,
@@ -48,7 +46,7 @@ export class PrinterFilesController {
     multerService,
     isTypeormMode,
   }: {
-    filesStore: FilesStore;
+    printerFilesStore: PrinterFilesStore;
     octoPrintApiService: OctoPrintApiService;
     batchCallService: BatchCallService;
     printerFileCleanTask: PrinterFileCleanTask;
@@ -57,7 +55,7 @@ export class PrinterFilesController {
     multerService: MulterService;
     isTypeormMode: boolean;
   }) {
-    this.filesStore = filesStore;
+    this.printerFilesStore = printerFilesStore;
     this.settingsStore = settingsStore;
     this.printerFileCleanTask = printerFileCleanTask;
     this.octoPrintApiService = octoPrintApiService;
@@ -77,7 +75,7 @@ export class PrinterFilesController {
     const { recursive } = await validateInput(req.query, getFilesRules);
 
     this.logger.log("Refreshing file storage by eager load");
-    const response = await this.filesStore.eagerLoadPrinterFiles(currentPrinterId, recursive);
+    const response = await this.printerFilesStore.eagerLoadPrinterFiles(currentPrinterId, recursive);
     this.statusResponse(res, response);
   }
 
@@ -87,7 +85,7 @@ export class PrinterFilesController {
   async getFilesCache(req: Request, res: Response) {
     const { currentPrinter } = getScopedPrinter(req);
 
-    const filesCache = await this.filesStore.getFiles(currentPrinter.id);
+    const filesCache = await this.printerFilesStore.getFiles(currentPrinter.id);
     res.send(filesCache);
   }
 
@@ -108,7 +106,7 @@ export class PrinterFilesController {
       }
     }
 
-    await this.filesStore.purgePrinterFiles(currentPrinterId);
+    await this.printerFilesStore.purgePrinterFiles(currentPrinterId);
 
     res.send({
       failedFiles,
@@ -117,7 +115,7 @@ export class PrinterFilesController {
   }
 
   async purgeIndexedFiles(req: Request, res: Response) {
-    await this.filesStore.purgeFiles();
+    await this.printerFilesStore.purgeFiles();
 
     res.send();
   }
@@ -150,7 +148,7 @@ export class PrinterFilesController {
 
     const result = await this.octoPrintApiService.deleteFileOrFolder(printerLogin, path);
 
-    await this.filesStore.deleteFile(currentPrinterId, path, false);
+    await this.printerFilesStore.deleteFile(currentPrinterId, path, false);
     this.logger.log(`File reference removed, printerId ${currentPrinterId}`, path);
 
     res.send(result);
@@ -171,7 +169,7 @@ export class PrinterFilesController {
 
     const result = await this.octoPrintApiService.selectPrintFile(printerLogin, path, print);
 
-    await this.filesStore.setExistingFileForPrint(currentPrinterId, path);
+    await this.printerFilesStore.setExistingFileForPrint(currentPrinterId, path);
     res.send(result);
   }
 
@@ -215,7 +213,7 @@ export class PrinterFilesController {
 
     if (response.success !== false) {
       const newOrUpdatedFile = response.files.local;
-      await this.filesStore.appendOrSetPrinterFile(currentPrinterId, newOrUpdatedFile);
+      await this.printerFilesStore.appendOrSetPrinterFile(currentPrinterId, newOrUpdatedFile);
     }
 
     res.send(response);

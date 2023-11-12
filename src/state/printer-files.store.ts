@@ -1,6 +1,5 @@
 import { ValidationException } from "@/exceptions/runtime.exceptions";
 import { PrinterCache } from "@/state/printer.cache";
-import { PrinterFilesService } from "@/services/printer-files.service";
 import { FileCache } from "@/state/file.cache";
 import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
 import { LoggerService } from "@/handlers/logger";
@@ -8,10 +7,7 @@ import { IdType } from "@/shared.constants";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IPrinterFilesService } from "@/services/interfaces/printer-files.service.interface";
 
-/**
- * Generic store for synchronisation of files and storage information of printers.
- */
-export class FilesStore {
+export class PrinterFilesStore {
   printerCache: PrinterCache;
   printerFilesService: IPrinterFilesService;
   fileCache: FileCache;
@@ -36,7 +32,7 @@ export class FilesStore {
     this.fileCache = fileCache;
     this.octoPrintApiService = octoPrintApiService;
 
-    this.logger = loggerFactory(FilesStore.name);
+    this.logger = loggerFactory(PrinterFilesStore.name);
   }
 
   /**
@@ -167,13 +163,12 @@ export class FilesStore {
     filePath: string,
     throwError: boolean
   ): Promise<{
-    cache: (any & { success: boolean; message?: string }) | (any & { success: boolean; message?: string });
     service: any;
   }> {
     const serviceActionResult = await this.printerFilesService.deleteFile(printerId, filePath, throwError);
 
     // Warning only
-    const cacheActionResult = this.fileCache.purgeFile(printerId, filePath);
-    return { service: serviceActionResult, cache: cacheActionResult };
+    this.fileCache.purgeFile(printerId, filePath);
+    return { service: serviceActionResult };
   }
 }

@@ -1,10 +1,12 @@
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
-import { FilesStore } from "@/state/files.store";
+import { PrinterFilesStore } from "@/state/printer-files.store";
 import { PrinterCache } from "@/state/printer.cache";
 import { SettingsStore } from "@/state/settings.store";
 import { TaskManagerService } from "@/services/core/task-manager.service";
 import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
+import { IdType } from "@/shared.constants";
+import { PrinterDto } from "@/services/interfaces/printer.dto";
 
 /**
  * Task which regularly cleans all printer files based on a configured predicate
@@ -12,7 +14,7 @@ import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service"
  */
 export class PrinterFileCleanTask {
   logger: LoggerService;
-  filesStore: FilesStore;
+  printerFilesStore: PrinterFilesStore;
   printerCache: PrinterCache;
   settingsStore: SettingsStore;
   taskManagerService: TaskManagerService;
@@ -20,35 +22,35 @@ export class PrinterFileCleanTask {
 
   constructor({
     printerCache,
-    filesStore,
+    printerFilesStore,
     octoPrintApiService,
     taskManagerService,
     settingsStore,
     loggerFactory,
   }: {
     printerCache: PrinterCache;
-    filesStore: FilesStore;
+    printerFilesStore: PrinterFilesStore;
     octoPrintApiService: OctoPrintApiService;
     taskManagerService: TaskManagerService;
     settingsStore: SettingsStore;
     loggerFactory: ILoggerFactory;
   }) {
     this.printerCache = printerCache;
-    this.filesStore = filesStore;
+    this.printerFilesStore = printerFilesStore;
     this.taskManagerService = taskManagerService;
     this.octoPrintApiService = octoPrintApiService;
     this.settingsStore = settingsStore;
     this.logger = loggerFactory(PrinterFileCleanTask.name);
   }
 
-  get #ageDaysMaxSetting() {
-    return this.#getSettings().autoRemoveOldFilesCriteriumDays;
+  private get ageDaysMaxSetting() {
+    return this.getSettings().autoRemoveOldFilesCriteriumDays;
   }
 
   async run() {
     // TODO filter disconnected printers
     const printers = await this.printerCache.listCachedPrinters(false);
-    const fileCleanSettings = this.#getSettings();
+    const fileCleanSettings = this.getSettings();
     const autoCleanAtBootEnabled = fileCleanSettings.autoRemoveOldFilesAtBoot;
 
     try {
@@ -75,24 +77,24 @@ export class PrinterFileCleanTask {
     }
   }
 
-  async cleanPrinterFiles(printerId) {
+  async cleanPrinterFiles(printerId: IdType) {
     // Act
-    await this.filesStore.deleteOutdatedFiles(printerId, this.#ageDaysMaxSetting);
+    await this.printerFilesStore.deleteOutdatedFiles(printerId, this.ageDaysMaxSetting);
 
     // Update printer files
-    await this.filesStore.eagerLoadPrinterFiles(printerId, false);
+    await this.printerFilesStore.eagerLoadPrinterFiles(printerId, false);
   }
 
   /**
    * Scans the printers files and checks the outdated ones based on settings
    * @param printer
    */
-  getPrinterOutdatedFiles(printer) {
-    const ageDaysMax = this.#ageDaysMaxSetting;
-    return this.filesStore.getOutdatedFiles(printer.id, ageDaysMax);
+  getPrinterOutdatedFiles(printer: PrinterDto<IdType>) {
+    const ageDaysMax = this.ageDaysMaxSetting;
+    return this.printerFilesStore.getOutdatedFiles(printer.id, ageDaysMax);
   }
 
-  #getSettings() {
+  private getSettings() {
     return this.settingsStore.getFileCleanSettings();
   }
 }

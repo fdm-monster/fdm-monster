@@ -1,7 +1,7 @@
 import { validNewPrinterState } from "../test-data/printer.data";
 import { PrinterService } from "@/services/printer.service";
 import { PrinterCache } from "@/state/printer.cache";
-import { FilesStore } from "@/state/files.store";
+import { PrinterFilesStore } from "@/state/printer-files.store";
 import { AwilixContainer } from "awilix";
 jest.mock("../../../src/services/octoprint/octoprint-api.service");
 import { connect, closeDatabase } from "../../db-handler";
@@ -14,7 +14,7 @@ let container: AwilixContainer;
 let printerService: PrinterService;
 let printerCache: PrinterCache;
 let testPrinterSocketStore: TestPrinterSocketStore;
-let filesStore: FilesStore;
+let printerFilesStore: PrinterFilesStore;
 
 beforeAll(async () => {
   await connect();
@@ -23,7 +23,7 @@ beforeAll(async () => {
   testPrinterSocketStore = container.resolve(DITokens.testPrinterSocketStore);
   printerCache = container.resolve(DITokens.printerCache);
   printerService = container.resolve(DITokens.printerService);
-  filesStore = container.resolve(DITokens.filesStore);
+  printerFilesStore = container.resolve(DITokens.printerFilesStore);
   await printerCache.loadCache();
 });
 
@@ -34,7 +34,7 @@ afterAll(async () => {
 describe("PrinterSocketStore", () => {
   const invalidNewPrinterState = {
     apiKey: "asd",
-    printerURL: null,
+    printerURL: null as null | string,
   };
 
   const weakNewPrinter = {
@@ -72,7 +72,7 @@ describe("PrinterSocketStore", () => {
     expect(printerEntity).toBeTruthy();
 
     // Need the store in order to have files to refer to
-    await filesStore.loadFilesStore();
+    await printerFilesStore.loadFilesStore();
 
     const printerDto = await printerCache.getCachedPrinterOrThrowAsync(printerEntity.id);
     expect(printerDto).toMatchObject({

@@ -1,4 +1,9 @@
-import { IdType } from "@/shared.constants";
+import { PrinterFilesStore } from "@/state/printer-files.store";
+import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
+import { PrinterSocketStore } from "@/state/printer-socket.store";
+import { PrinterCache } from "@/state/printer.cache";
+import { PrinterEventsCache } from "@/state/printer-events.cache";
+import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 
 interface BatchSingletonModel {
   success?: boolean;
@@ -8,14 +13,6 @@ interface BatchSingletonModel {
   error?: string;
 }
 
-import { FilesStore } from "@/state/files.store";
-import { PrinterService } from "@/services/printer.service";
-import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
-import { PrinterSocketStore } from "@/state/printer-socket.store";
-import { PrinterCache } from "@/state/printer.cache";
-import { PrinterEventsCache } from "@/state/printer-events.cache";
-import { IPrinterService } from "@/services/interfaces/printer.service.interface";
-
 type BatchModel = Array<BatchSingletonModel>;
 
 export class BatchCallService {
@@ -23,7 +20,7 @@ export class BatchCallService {
   printerSocketStore: PrinterSocketStore;
   printerCache: PrinterCache;
   printerEventsCache: PrinterEventsCache;
-  filesStore: FilesStore;
+  printerFilesStore: PrinterFilesStore;
   printerService: IPrinterService;
 
   constructor({
@@ -31,21 +28,21 @@ export class BatchCallService {
     printerCache,
     printerEventsCache,
     printerSocketStore,
-    filesStore,
+    printerFilesStore,
     printerService,
   }: {
     octoPrintApiService: OctoPrintApiService;
     printerCache: PrinterCache;
     printerEventsCache: PrinterEventsCache;
     printerSocketStore: PrinterSocketStore;
-    filesStore: FilesStore;
+    printerFilesStore: PrinterFilesStore;
     printerService: IPrinterService;
   }) {
     this.octoPrintApiService = octoPrintApiService;
     this.printerCache = printerCache;
     this.printerEventsCache = printerEventsCache;
     this.printerSocketStore = printerSocketStore;
-    this.filesStore = filesStore;
+    this.printerFilesStore = printerFilesStore;
     this.printerService = printerService;
   }
 
@@ -123,7 +120,7 @@ export class BatchCallService {
       // TODO test this
       let reprintPath = await this.printerEventsCache.getPrinterSocketEvents(printerId)?.current?.job?.file?.path;
       if (!reprintPath?.length) {
-        const files = await this.filesStore.getFiles(printerId)?.files;
+        const files = await this.printerFilesStore.getFiles(printerId)?.files;
         if (files?.length) {
           files.sort((f1, f2) => {
             // Sort by date, newest first
