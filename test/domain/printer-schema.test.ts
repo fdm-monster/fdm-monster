@@ -14,10 +14,10 @@ describe("printer-schema", function () {
 
   it("should be invalid if URLs, and apiKey properties are empty", async function () {
     const m = new Printer({});
-
-    m.validate(function (err) {
-      expectValidationError(err, ["name", "printerURL", "apiKey"], true);
-      done();
-    });
+    try {
+      await m.validate();
+    } catch (e) {
+      expectValidationError(e, ["name", "printerURL", "apiKey"], true);
+    }
   });
 });
