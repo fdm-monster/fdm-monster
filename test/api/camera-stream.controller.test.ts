@@ -13,7 +13,7 @@ const deleteRoute = (id: string) => `${listRoute}/${id}`;
 const updateRoute = (id: string) => `${getRoute(id)}`;
 
 let request: supertest.SuperTest<supertest.Test>;
-let idType: typeof Number | typeof String;
+const idType = String;
 beforeAll(async () => {
   await connect();
   ({ request } = await setupTestApp(true));
@@ -31,7 +31,7 @@ describe(CameraStreamController.name, () => {
     printerId: null,
   });
   const matchedBody = (url: string) => ({
-    id: expect.any(String),
+    id: expect.any(idType),
     streamURL: url,
     name: "Tester",
     printerId: null,

@@ -83,6 +83,11 @@ export const ROLE_PERMS: Record<string, string[]> = {
     allPerms(PERM_GROUP.PrinterSettings),
     allPerms(PERM_GROUP.ServerInfo)
   ),
-  [ROLES.OPERATOR]: union(allPerms(PERM_GROUP.PrinterFiles), allPerms(PERM_GROUP.PrintCompletion), allPerms(PERM_GROUP.Floors)),
+  [ROLES.OPERATOR]: union(
+    allPerms(PERM_GROUP.Floors),
+    allPerms(PERM_GROUP.PrinterFiles),
+    allPerms(PERM_GROUP.PrintCompletion),
+    allPerms(PERM_GROUP.PrinterSettings)
+  ),
   [ROLES.GUEST]: [],
 };

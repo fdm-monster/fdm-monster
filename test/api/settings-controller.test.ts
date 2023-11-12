@@ -32,12 +32,6 @@ beforeAll(async () => {
 });
 
 describe(SettingsController.name, () => {
-  const newSettings = {
-    [fileCleanSettingKey]: {
-      autoRemoveOldFilesBeforeUpload: true,
-    },
-  };
-
   it("should OK on GET settings", async () => {
     const response = await request.get(defaultRoute).send();
     expect(response.body).not.toBeNull();

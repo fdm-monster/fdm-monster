@@ -8,6 +8,7 @@ import { EVENT_TYPES } from "@/services/octoprint/constants/octoprint-websocket.
 import { DITokens } from "@/container.tokens";
 import { IPrintCompletionService } from "@/services/interfaces/print-completion.service";
 import supertest from "supertest";
+import { createTestPrinter } from "./test-data/create-printer";
 
 let printCompletionService: IPrintCompletionService;
 const listRoute = `${AppConstants.apiRoute}/print-completion`;
@@ -45,21 +46,24 @@ describe("PrintCompletionController", () => {
   });
 
   it("should aggregate created completions", async () => {
+    const printer = await createTestPrinter(request, false);
     const completionEntryStart = await printCompletionService.create({
-      printerId: "5f14968b11034c4ca49e7c69",
+      printerId: printer.id,
       completionLog: "some log happened here",
       status: EVENT_TYPES.PrintStarted,
       fileName: "mycode.gcode",
+      correlationId: "123",
       context: {
         correlationId: "123",
       },
     });
     expect(completionEntryStart.id).toBeTruthy();
     const completionEntryDone = await printCompletionService.create({
-      printerId: "5f14968b11034c4ca49e7c69",
+      printerId: printer.id,
       completionLog: "some log happened here",
       status: EVENT_TYPES.PrintDone,
       fileName: "mycode.gcode",
+      correlationId: "123",
       context: {
         correlationId: "123",
       },
@@ -69,12 +73,12 @@ describe("PrintCompletionController", () => {
     const response = await request.get(listRoute).send();
     const body = expectOkResponse(response);
     expect(body).toHaveLength(1);
-    const printerEvents = body[0];
-    expect(printerEvents.printerId).toEqual("5f14968b11034c4ca49e7c69");
-    expect(printerEvents.eventCount).toEqual(2);
-    expect(printerEvents.printCount).toEqual(1);
-    expect(printerEvents.printJobs).toHaveLength(1);
-    expect(printerEvents.printJobs[0].correlationId).toEqual("123");
+    const printEvents = body[0];
+    expect(printEvents.printerId).toEqual(printer.id);
+    expect(printEvents.eventCount).toEqual(2);
+    expect(printEvents.printCount).toEqual(1);
+    expect(printEvents.printJobs).toHaveLength(1);
+    expect(printEvents.printJobs[0].correlationId).toEqual("123");
 
     const responseEntries = await request.get(getCompletionEntryRoute("123"));
     const completionEntries = expectOkResponse(responseEntries);

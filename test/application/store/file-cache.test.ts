@@ -17,7 +17,7 @@ const fileStorageEntry = {
   storage: {},
 };
 
-describe("generate", function () {
+describe(FileCache.name, function () {
   it("should generate printer file cache without strict checks", function () {
     const fileStorageEntryNoStorage = {
       fileList: [1],

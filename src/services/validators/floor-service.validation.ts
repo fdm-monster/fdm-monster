@@ -1,14 +1,16 @@
 import { minPrinterFloorNameLength } from "@/constants/service.constants";
+import { idRuleV2 } from "@/controllers/validation/generic.validation";
 
-export const removePrinterInFloorRules = {
-  printerId: "required|mongoId",
-};
+export const removePrinterInFloorRules = (isSqlite: boolean) => ({
+  printerId: idRuleV2(isSqlite),
+});
 
-export const printerInFloorRules = {
-  printerId: "required|mongoId",
+export const printerInFloorRules = (isSqlite: boolean) => ({
+  printerId: idRuleV2(isSqlite),
+  floorId: isSqlite ? idRuleV2(true) : "not",
   x: "required|integer|between:0,12",
   y: "required|integer|between:0,12",
-};
+});
 
 export const updateFloorNameRules = {
   name: `required|minLength:${minPrinterFloorNameLength}`,

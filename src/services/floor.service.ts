@@ -115,12 +115,12 @@ export class FloorService implements IFloorService<MongoIdType> {
   /**
    * Stores a new floor into the database.
    */
-  async create(floor: CreateFloorDto) {
+  async create(floor: CreateFloorDto<MongoIdType>) {
     const validatedInput = await validateInput(floor, createFloorRules);
     return Floor.create(validatedInput);
   }
 
-  async update(floorId: MongoIdType, input: UpdateFloorDto) {
+  async update(floorId: MongoIdType, input: UpdateFloorDto<MongoIdType>) {
     const existingFloor = await this.get(floorId);
     const { name, floor, printers } = await validateInput(input, updateFloorRules);
     existingFloor.name = name;
@@ -164,7 +164,7 @@ export class FloorService implements IFloorService<MongoIdType> {
 
   async addOrUpdatePrinter(floorId: MongoIdType, printerInFloor: AddOrUpdatePrinterDto<MongoIdType>) {
     const floor = await this.get(floorId, true);
-    const validInput = await validateInput(printerInFloor, printerInFloorRules);
+    const validInput = await validateInput(printerInFloor, printerInFloorRules(false));
 
     // Ensure printer exists
     await this.printerCache.getCachedPrinterOrThrowAsync(validInput.printerId);
@@ -189,7 +189,7 @@ export class FloorService implements IFloorService<MongoIdType> {
 
   async removePrinter(floorId: MongoIdType, printerId: MongoIdType) {
     const floor = await this.get(floorId, true);
-    const validInput = await validateInput({ printerId }, removePrinterInFloorRules);
+    const validInput = await validateInput({ printerId }, removePrinterInFloorRules(false));
 
     // Ensure printer exists
     await this.printerCache.getCachedPrinterOrThrowAsync(validInput.printerId);
