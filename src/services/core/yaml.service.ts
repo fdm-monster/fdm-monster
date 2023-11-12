@@ -64,18 +64,18 @@ export class YamlService {
         delete printer.settingsAppearance?.name;
       }
 
-      if (this.isTypeormMode) {
-        if (typeof printer.id === "string") {
-          delete printer.id;
-        }
+      if (this.isTypeormMode && typeof printer.id === "string") {
+        delete printer.id;
+      } else if (!this.isTypeormMode && typeof printer.id === "number") {
+        delete printer.id;
       }
     }
 
     for (const floor of importSpec.floors) {
-      if (this.isTypeormMode) {
-        if (typeof floor.id === "string") {
-          delete floor.id;
-        }
+      if (this.isTypeormMode && typeof floor.id === "string") {
+        delete floor.id;
+      } else if (!this.isTypeormMode && typeof floor.id === "number") {
+        delete floor.id;
       }
     }
 
