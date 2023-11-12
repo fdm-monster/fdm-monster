@@ -63,7 +63,7 @@
     "js-yaml": "4.1.0",
     "jsonwebtoken": "9.0.2",
     "lodash": "4.17.21",
-    "luxon": "3.4.3",
+    "luxon": "3.4.4",
     "migrate-mongo": "11.0.0",
     "mongoose": "6.12.3",
     "mqtt": "5.2.1",
