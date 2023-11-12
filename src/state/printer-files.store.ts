@@ -83,7 +83,7 @@ export class PrinterFilesStore {
 
     const nonRecursiveFiles = this.getOutdatedFiles(printerId, ageDaysMax);
     const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
-    const name = await this.printerCache.getCachedPrinterOrThrowAsync(printerId).name;
+    const name = (await this.printerCache.getCachedPrinterOrThrowAsync(printerId)).name;
 
     for (let file of nonRecursiveFiles) {
       try {
@@ -155,9 +155,6 @@ export class PrinterFilesStore {
     await this.printerFilesService.setPrinterLastPrintedFile(printerId, filePath);
   }
 
-  /**
-   * Remove file reference from database and then cache.
-   */
   async deleteFile(
     printerId: IdType,
     filePath: string,
