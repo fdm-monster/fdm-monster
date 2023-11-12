@@ -1,13 +1,20 @@
 import { IFloor } from "@/models/Floor";
-import { IdType } from "@/shared.constants";
-import { FloorDto, PositionDto, PrinterInFloorDto, UpdateFloorDto } from "@/services/interfaces/floor.dto";
+import { IdType, MongoIdType } from "@/shared.constants";
+import {
+  AddOrUpdatePrinterDto,
+  CreateFloorDto,
+  FloorDto,
+  PositionDto,
+  PrinterInFloorDto,
+  UpdateFloorDto,
+} from "@/services/interfaces/floor.dto";
 
 export interface IFloorService<KeyType = IdType, Entity = IFloor> {
   toDto(floor: Entity): FloorDto<KeyType>;
 
   list(): Promise<Entity[]>;
 
-  create(input: Partial<Entity>): Promise<Entity>;
+  create(input: CreateFloorDto): Promise<Entity>;
 
   createDefaultFloor(): Promise<Entity>;
 
@@ -23,7 +30,7 @@ export interface IFloorService<KeyType = IdType, Entity = IFloor> {
 
   deletePrinterFromAnyFloor(printerId: KeyType): Promise<void>;
 
-  addOrUpdatePrinter(floorId: KeyType, position: PositionDto | PrinterInFloorDto): Promise<Entity>;
+  addOrUpdatePrinter(floorId: KeyType, position: AddOrUpdatePrinterDto<KeyType>): Promise<Entity>;
 
   removePrinter(floorId: KeyType, printerId: KeyType): Promise<Entity>;
 }

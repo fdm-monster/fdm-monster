@@ -7,6 +7,7 @@ import { createTestPrinter } from "./test-data/create-printer";
 import supertest from "supertest";
 import { CustomGcodeDto } from "@/services/interfaces/custom-gcode.dto";
 import { MongoIdType } from "@/shared.constants";
+import { CustomGcodeController } from "@/controllers/custom-gcode.controller";
 
 let Model = CustomGcode;
 const defaultRoute = `${AppConstants.apiRoute}/custom-gcode`;
@@ -40,7 +41,7 @@ async function createNormalGcodeScript(request: supertest.SuperTest<supertest.Te
   return response.body as CustomGcodeDto<MongoIdType>;
 }
 
-describe("CustomGCodeController", () => {
+describe(CustomGcodeController.name, () => {
   it("should send emergency gcode command", async function () {
     const printer = await createTestPrinter(request);
     const response = await request.post(emergencyGCodeRoute(printer.id)).send();

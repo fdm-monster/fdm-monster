@@ -68,15 +68,15 @@ describe("PrinterSocketStore", () => {
   });
 
   it("should be able to add printer - receiving an object back", async () => {
-    let printerDoc = await printerService.create(validNewPrinterState);
-    expect(printerDoc).toBeTruthy();
+    let printerEntity = await printerService.create(validNewPrinterState);
+    expect(printerEntity).toBeTruthy();
 
     // Need the store in order to have files to refer to
     await filesStore.loadFilesStore();
 
-    const printerDto = await printerCache.getCachedPrinterOrThrowAsync(printerDoc.id);
+    const printerDto = await printerCache.getCachedPrinterOrThrowAsync(printerEntity.id);
     expect(printerDto).toMatchObject({
-      id: expect.any(String),
+      id: expect.anything(),
     });
   });
 

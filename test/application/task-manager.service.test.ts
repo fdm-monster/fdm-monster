@@ -14,7 +14,7 @@ beforeAll(async () => {
   taskManagerService = container.resolve(DITokens.taskManagerService);
 });
 
-describe("TaskManagerService", () => {
+describe(TaskManagerService.name, () => {
   it("should invalidate wrong task spec", () => {
     let caught = false;
     try {

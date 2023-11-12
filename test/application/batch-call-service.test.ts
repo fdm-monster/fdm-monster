@@ -35,8 +35,8 @@ beforeEach(() => {
 
 describe("BatchCallService ", () => {
   it("should call multiple printers ", async () => {
-    let printer = await printerService.create(validNewPrinterState);
-    let printer2 = await printerService.create(validNewPrinterState);
+    const printer = await printerService.create(validNewPrinterState);
+    const printer2 = await printerService.create(validNewPrinterState);
 
     const result = await batchCallService.batchReprintCalls([printer.id, printer2.id]);
     expect(result).toHaveLength(2);

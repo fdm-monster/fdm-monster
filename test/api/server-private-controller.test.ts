@@ -2,7 +2,7 @@ import { connect } from "../db-handler";
 import { setupTestApp } from "../test-server";
 import { expectInternalServerError, expectOkResponse, expectUnauthenticatedResponse } from "../extensions";
 import { load } from "js-yaml";
-import { exportYamlBuffer } from "../application/test-data/yaml-import";
+import { exportYamlBuffer1_3_1 } from "../application/test-data/yaml-import";
 import { AppConstants } from "@/server.constants";
 import { DITokens } from "@/container.tokens";
 import { validateInput } from "@/handlers/validators";
@@ -91,7 +91,7 @@ describe(ServerPrivateController.name, () => {
   });
 
   test.skip("should import YAML and have data loaded", async () => {
-    const response = await request.post(importPrintersAndFloorsRoute).attach("file", exportYamlBuffer);
+    const response = await request.post(importPrintersAndFloorsRoute).attach("file", exportYamlBuffer1_3_1);
     expectOkResponse(response);
   });
 });

@@ -39,15 +39,15 @@ export const importPrintersFloorsYamlRules = (
     "printers.*.enabled": "boolean",
     "printers.*.name": "required|string",
     floors: `${!!importFloors ? "array|minLength:0" : "not"}`,
-    "floors.*.id": `required|${idVal}`,
+    "floors.*.id": `${idVal}`,
     "floors.*.floor": "required|integer",
     "floors.*.name": "required|string",
   };
 };
 
-export const importPrinterPositionsRules = {
+export const importPrinterPositionsRules = (isTypeormMode: boolean) => ({
   printers: "array|minLength:0",
-  "printers.*.printerId": "required|mongoId",
+  "printers.*.printerId": isTypeormMode ? "integer|min:1" : "mongoId",
   "printers.*.x": "required|integer|min:0|max:12",
   "printers.*.y": "required|integer|min:0|max:12",
-};
+});

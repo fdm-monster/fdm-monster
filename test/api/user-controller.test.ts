@@ -1,7 +1,7 @@
 import { connect } from "../db-handler";
 import { AppConstants } from "@/server.constants";
 import { setupTestApp } from "../test-server";
-import { expectForbiddenResponse, expectInternalServerError, expectNotFoundResponse, expectOkResponse } from "../extensions";
+import { expectForbiddenResponse, expectNotFoundResponse, expectOkResponse } from "../extensions";
 import { ensureTestUserCreated } from "./test-data/create-user";
 import { ROLES } from "@/constants/authorization.constants";
 import supertest from "supertest";
@@ -11,16 +11,17 @@ import { AwilixContainer } from "awilix";
 import { SettingsStore } from "@/state/settings.store";
 import { DITokens } from "@/container.tokens";
 import { loginTestUser } from "./auth/login-test-user";
+import { IdType } from "@/shared.constants";
 
 const defaultRoute = `${AppConstants.apiRoute}/user`;
 const profileRoute = `${defaultRoute}/profile`;
 const rolesRoute = `${defaultRoute}/roles`;
-const getRoute = (id: string) => `${defaultRoute}/${id}`;
-const changeUsernameRoute = (id: string) => `${defaultRoute}/${id}/change-username`;
-const changePasswordRoute = (id: string) => `${defaultRoute}/${id}/change-password`;
-const setVerifiedRoute = (id: string) => `${defaultRoute}/${id}/set-verified`;
-const setRootUserRoute = (id: string) => `${defaultRoute}/${id}/set-root-user`;
-const deleteRoute = (id: string) => `${defaultRoute}/${id}`;
+const getRoute = (id: IdType) => `${defaultRoute}/${id}`;
+const changeUsernameRoute = (id: IdType) => `${defaultRoute}/${id}/change-username`;
+const changePasswordRoute = (id: IdType) => `${defaultRoute}/${id}/change-password`;
+const setVerifiedRoute = (id: IdType) => `${defaultRoute}/${id}/set-verified`;
+const setRootUserRoute = (id: IdType) => `${defaultRoute}/${id}/set-root-user`;
+const deleteRoute = (id: IdType) => `${defaultRoute}/${id}`;
 
 let request: supertest.SuperTest<supertest.Test>;
 let container: AwilixContainer;

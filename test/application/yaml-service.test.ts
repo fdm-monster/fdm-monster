@@ -5,7 +5,7 @@ import { connect, closeDatabase } from "../db-handler";
 import { configureContainer } from "@/container";
 import { DITokens } from "@/container.tokens";
 import { Printer } from "@/models";
-import { exportYamlBuffer } from "./test-data/yaml-import";
+import { exportYamlBuffer1_3_1, exportYamlBuffer1_5_0 } from "./test-data/yaml-import";
 import { readFileSync } from "node:fs";
 import { join } from "path";
 
@@ -26,9 +26,14 @@ afterAll(async () => {
 });
 
 describe(YamlService.name, () => {
-  it("should import yaml", async () => {
+  it("should import yaml from version 1.5.0", async () => {
     await printerCache.loadCache();
-    await yamlService.importPrintersAndFloors(exportYamlBuffer);
+    await yamlService.importPrintersAndFloors(exportYamlBuffer1_5_0(true));
+  });
+
+  it("should import yaml from version 1.3.1", async () => {
+    await printerCache.loadCache();
+    await yamlService.importPrintersAndFloors(exportYamlBuffer1_3_1);
   });
 
   it("should import 1.5.2 yaml", async () => {

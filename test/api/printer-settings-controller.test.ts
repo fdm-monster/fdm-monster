@@ -1,25 +1,27 @@
 import { setupTestApp } from "../test-server";
 import { expectOkResponse } from "../extensions";
 import { createTestPrinter } from "./test-data/create-printer";
+import { OctoPrintApiMock } from "../mocks/octoprint-api.mock";
 import { AppConstants } from "@/server.constants";
-
+import supertest from "supertest";
 import { connect } from "../db-handler";
+import { PrinterSettingsController } from "@/controllers/printer-settings.controller";
 
 const defaultRoute = `${AppConstants.apiRoute}/printer-settings`;
 
-const getRoute = (id) => `${defaultRoute}/${id}`;
-const setGCodeAnalysisRoute = (id) => `${getRoute(id)}/gcode-analysis`;
-const syncPrinterNameRoute = (id) => `${getRoute(id)}/sync-printername`;
+const getRoute = (id: string) => `${defaultRoute}/${id}`;
+const setGCodeAnalysisRoute = (id: string) => `${getRoute(id)}/gcode-analysis`;
+const syncPrinterNameRoute = (id: string) => `${getRoute(id)}/sync-printername`;
 
-let request;
-let octoPrintApiService;
+let request: supertest.SuperTest<supertest.Test>;
+let octoPrintApiService: OctoPrintApiMock;
 
 beforeAll(async () => {
   await connect();
   ({ request, octoPrintApiService } = await setupTestApp(true));
 });
 
-describe("PrinterSettingsController", () => {
+describe(PrinterSettingsController.name, () => {
   it("should return printer settings from OctoPrint", async () => {
     const testPrinter = await createTestPrinter(request);
     octoPrintApiService.storeResponse(

@@ -63,6 +63,20 @@ export class YamlService {
         printer.name = printer.settingsAppearance?.name;
         delete printer.settingsAppearance?.name;
       }
+
+      if (this.isTypeormMode) {
+        if (typeof printer.id === "string") {
+          delete printer.id;
+        }
+      }
+    }
+
+    for (const floor of importSpec.floors) {
+      if (this.isTypeormMode) {
+        if (typeof floor.id === "string") {
+          delete floor.id;
+        }
+      }
     }
 
     const importData = await validateInput(
@@ -131,6 +145,7 @@ export class YamlService {
       const knownPrinters = [];
       if (exportFloorGrid && exportPrinters) {
         for (const floorPosition of updatedFloor?.printers) {
+          // TODO check this works from MongoDB to SQLite
           const knownPrinterId = printerIdMap[floorPosition.printerId];
           // If the ID was not mapped, this position is considered discarded
           if (!knownPrinterId) continue;
@@ -215,7 +230,7 @@ export class YamlService {
   }
 
   async analyseFloorsUpsert(upsertFloors, comparisonStrategy) {
-    const existingFloors = await this.floorService.list(false);
+    const existingFloors = await this.floorService.list();
     const names = existingFloors.map((p) => p.name.toLowerCase());
     const floorLevels = existingFloors.map((p) => p.floor);
     const ids = existingFloors.map((p) => p.id.toString());
@@ -286,6 +301,7 @@ export class YamlService {
     const dumpedObject = {
       version: process.env.npm_package_version,
       exportedAt: new Date(),
+      databaseType: this.isTypeormMode ? "sqlite" : "mongo",
       config: input,
     };
 

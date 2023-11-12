@@ -1,5 +1,5 @@
 import { IdType } from "@/shared.constants";
-import { IsDefined, IsNotEmpty, IsNumber } from "class-validator";
+import { IsDefined, IsNotEmpty, IsNumber, IsOptional } from "class-validator";
 
 export class PositionDto<KeyType = IdType> {
   x: number;
@@ -20,10 +20,12 @@ export class FloorDto<KeyType = IdType> {
   id: KeyType;
   name: string;
   floor: number;
-  printers: PositionDto[];
+  printers: PositionDto<KeyType>[];
 }
 
-export class CreateFloorDto {
+export class CreateFloorDto<KeyType> {
+  @IsOptional()
+  printers?: PositionDto<KeyType>[];
   @IsNotEmpty()
   name: string;
   @IsDefined()
@@ -31,7 +33,9 @@ export class CreateFloorDto {
   floor: number;
 }
 
-export class UpdateFloorDto {
+export class UpdateFloorDto<KeyType> {
+  @IsOptional()
+  printers?: PositionDto<KeyType>[];
   @IsDefined()
   name?: string;
   @IsDefined()
