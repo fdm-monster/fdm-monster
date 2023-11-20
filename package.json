@@ -127,7 +127,7 @@
     "prettier": "2.8.8",
     "supertest": "6.3.3",
     "ts-node": "10.9.1",
-    "typescript": "5.2.2"
+    "typescript": "5.3.2"
   },
   "resolutions": {
     "got": "11.8.6"
