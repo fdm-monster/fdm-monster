@@ -76,7 +76,7 @@
     "passport-jwt": "4.0.1",
     "reflect-metadata": "0.1.13",
     "semver": "7.5.4",
-    "simple-git": "3.20.0",
+    "simple-git": "3.21.0",
     "socket.io": "4.7.2",
     "toad-scheduler": "3.0.0",
     "uuid": "9.0.1",
