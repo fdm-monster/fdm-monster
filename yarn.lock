@@ -2245,10 +2245,10 @@
   resolved "https://registry.yarnpkg.com/@types/mime/-/mime-1.3.5.tgz#1ef302e01cf7d2b5a0fa526790c9123bf1d06690"
   integrity sha512-/pyBZWSLD2n0dcHE3hq8s8ZvcETHtEuF+3E7XVt0Ig2nvsVQXdghHVcEkIWjy9A0wKfTn97a/PSDYohKIlnP/w==
 
-"@types/multer@1.4.10":
-  version "1.4.10"
-  resolved "https://registry.yarnpkg.com/@types/multer/-/multer-1.4.10.tgz#6bca159aaaf40ec130e99831a08e3d0ed54be611"
-  integrity sha512-6l9mYMhUe8wbnz/67YIjc7ZJyQNZoKq7fRXVf7nMdgWgalD0KyzJ2ywI7hoATUSXSbTu9q2HBiEwzy0tNN1v2w==
+"@types/multer@1.4.11":
+  version "1.4.11"
+  resolved "https://registry.yarnpkg.com/@types/multer/-/multer-1.4.11.tgz#c70792670513b4af1159a2b60bf48cc932af55c5"
+  integrity sha512-svK240gr6LVWvv3YGyhLlA+6LRRWA4mnGIU7RcNmgjBYFl6665wcXrRfxGp5tEPVHUNm5FMcmq7too9bxCwX/w==
   dependencies:
     "@types/express" "*"
 
