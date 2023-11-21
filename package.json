@@ -102,7 +102,7 @@
     "@types/lodash": "4.14.202",
     "@types/luxon": "3.3.5",
     "@types/migrate-mongo": "10.0.4",
-    "@types/multer": "1.4.10",
+    "@types/multer": "1.4.11",
     "@types/node": "20.9.2",
     "@types/passport-anonymous": "1.0.5",
     "@types/passport-jwt": "3.0.13",
