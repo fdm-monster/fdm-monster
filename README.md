@@ -109,7 +109,7 @@ Thanks to the following parties for their financial support:
 
 | Tier 4 | Tier 3 | Tier 2 | Tier 1 | One Time |
 |--------|--------|--------|--------|-----------|
-|  | [WindArrow3d](https://github.com/WindArrow3d) | [3Dsauber](https://github.com/3Dsauber)  | [doucettom](https://github.com/doucettom) | [th3dstudio](https://github.com/th3dstudio) |
+|  | [WindArrow3d](https://github.com/WindArrow3d) | | [doucettom](https://github.com/doucettom) | [th3dstudio](https://github.com/th3dstudio) |
 
 
 ## Contribute
