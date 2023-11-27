@@ -9,7 +9,7 @@ import { LoggerService } from "@/handlers/logger";
  */
 export class TaskManagerService {
   jobScheduler: ToadScheduler;
-  taskStates = {};
+  taskStates: Record<string, any> = {};
 
   private cradle: any;
   private logger: LoggerService;
@@ -22,7 +22,7 @@ export class TaskManagerService {
 
   validateInput(taskId: string, workload, schedulerOptions) {
     if (!taskId) {
-      throw new JobValidationException("Task ID was not provided. Cant register task or schedule job.");
+      throw new JobValidationException("Task ID was not provided. Cant register task or schedule job.", taskId);
     }
     const prefix = `Job '${workload?.name || "anonymous"}' with ID '${taskId}'`;
     if (!!this.taskStates[taskId]) {
@@ -87,7 +87,15 @@ export class TaskManagerService {
    * Create a recurring job
    * Tip: use the options properties `runImmediately` and `seconds/milliseconds/minutes/hours/days`
    */
-  registerJobOrTask({ id: taskId, task: asyncTaskCallbackOrToken, preset: schedulerOptions }) {
+  registerJobOrTask({
+    id: taskId,
+    task: asyncTaskCallbackOrToken,
+    preset: schedulerOptions,
+  }: {
+    id: string;
+    task: any;
+    preset: any;
+  }) {
     try {
       this.validateInput(taskId, asyncTaskCallbackOrToken, schedulerOptions);
     } catch (e) {
@@ -118,13 +126,14 @@ export class TaskManagerService {
    * @param taskId
    * @param failIfEnabled throws when the job is already running
    */
-  scheduleDisabledJob(taskId, failIfEnabled = true) {
+  scheduleDisabledJob(taskId: string, failIfEnabled = true) {
     const taskState = this.getTaskState(taskId);
     const schedulerOptions = taskState?.options;
     if (schedulerOptions?.disabled !== true) {
       if (failIfEnabled) {
         throw new JobValidationException(
-          `The requested task with ID ${taskId} was not explicitly disabled and must be running already.`
+          `The requested task with ID ${taskId} was not explicitly disabled and must be running already.`,
+          taskId
         );
       }
       return;
@@ -135,10 +144,10 @@ export class TaskManagerService {
     this.#scheduleEnabledPeriodicJob(taskId);
   }
 
-  disableJob(taskId, failIfDisabled = true) {
+  disableJob(taskId: string, failIfDisabled = true) {
     if (this.isTaskDisabled(taskId)) {
       if (failIfDisabled) {
-        throw new JobValidationException("Cant disable a job which is already disabled");
+        throw new JobValidationException("Cant disable a job which is already disabled", taskId);
       }
       return;
     }
@@ -149,32 +158,32 @@ export class TaskManagerService {
     taskState.job.stop();
   }
 
-  isTaskDisabled(taskId) {
+  isTaskDisabled(taskId: string) {
     return !!this.getTaskState(taskId).options.disabled;
   }
 
-  deregisterTask(taskId) {
+  deregisterTask(taskId: string) {
     this.getTaskState(taskId);
 
     delete this.taskStates[taskId];
     this.jobScheduler.removeById(taskId);
   }
 
-  getTaskState(taskId) {
+  getTaskState(taskId: string) {
     const taskState = this.taskStates[taskId];
     if (!taskState) {
-      throw new JobValidationException(`The requested task with ID ${taskId} was not registered`);
+      throw new JobValidationException(`The requested task with ID ${taskId} was not registered`, taskId);
     }
     return taskState;
   }
 
-  runTimeoutTaskInstance(taskId, timeoutMs) {
+  runTimeoutTaskInstance(taskId: string, timeoutMs: number) {
     const taskState = this.getTaskState(taskId);
     this.logger.log(`Running delayed task ${taskId} in ${timeoutMs}ms`);
     setTimeout(() => taskState.timedTask.execute(), timeoutMs, taskId);
   }
 
-  getSafeTimedTask(taskId, handler) {
+  getSafeTimedTask(taskId: string, handler) {
     const asyncHandler = async () => {
       await this.timeTask(taskId, handler);
     };
@@ -182,7 +191,7 @@ export class TaskManagerService {
     return new AsyncTask(taskId, asyncHandler, this.getErrorHandler(taskId));
   }
 
-  async timeTask(taskId, handler) {
+  async timeTask(taskId: string, handler) {
     let taskState = this.taskStates[taskId];
     taskState.started = Date.now();
     if (typeof handler === "string") {
@@ -199,7 +208,7 @@ export class TaskManagerService {
     }
   }
 
-  getErrorHandler(taskId) {
+  getErrorHandler(taskId: string) {
     return (error) => {
       const registration = this.taskStates[taskId];
 
@@ -220,17 +229,18 @@ export class TaskManagerService {
     this.jobScheduler.stop();
   }
 
-  #scheduleEnabledPeriodicJob(taskId) {
+  #scheduleEnabledPeriodicJob(taskId: string) {
     const taskState = this.getTaskState(taskId);
     if (!taskState?.timedTask || !taskState?.options) {
       throw new JobValidationException(
-        `The requested task with ID ${taskId} was not registered properly ('timedTask' or 'options' missing).`
+        `The requested task with ID ${taskId} was not registered properly ('timedTask' or 'options' missing).`,
+        taskId
       );
     }
     const schedulerOptions = taskState?.options;
     const timedTask = taskState.timedTask;
     if (!schedulerOptions?.periodic) {
-      throw new JobValidationException(`The requested task with ID ${taskId} is not periodic and cannot be enabled.`);
+      throw new JobValidationException(`The requested task with ID ${taskId} is not periodic and cannot be enabled.`, taskId);
     }
     if (!schedulerOptions.disabled) {
       this.logger.log(`Task '${taskId}' was scheduled (runImmediately: ${!!schedulerOptions.runImmediately}).`);
