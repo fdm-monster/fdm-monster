@@ -16,7 +16,7 @@ import { PrinterWebsocketTask } from "./tasks/printer-websocket.task";
 import { SocketIoTask } from "./tasks/socketio.task";
 import { OctoPrintApiService } from "./services/octoprint/octoprint-api.service";
 import { SocketFactory } from "./services/octoprint/socket.factory";
-import { FilesStore } from "./state/files.store";
+import { PrinterFilesStore } from "./state/printer-files.store";
 import { configureEventEmitter } from "./handlers/event-emitter";
 import { AppConstants } from "./server.constants";
 import { PrinterFilesService } from "./services/printer-files.service";
@@ -136,7 +136,7 @@ export function configureContainer() {
 
     [di.fileCache]: asClass(FileCache).singleton(),
     [di.fileUploadTrackerCache]: asClass(FileUploadTrackerCache).singleton(),
-    [di.filesStore]: asClass(FilesStore).singleton(),
+    [di.printerFilesStore]: asClass(PrinterFilesStore).singleton(),
     [di.printerCache]: asClass(PrinterCache).singleton(),
     [di.printerEventsCache]: asClass(PrinterEventsCache).singleton(),
     [di.printerSocketStore]: asClass(PrinterSocketStore).singleton(),

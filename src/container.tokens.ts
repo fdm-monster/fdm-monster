@@ -54,8 +54,7 @@ export const DITokens = {
   printerEventsCache: "printerEventsCache",
   printerSocketStore: "printerSocketStore",
   testPrinterSocketStore: "testPrinterSocketStore",
-  octoPrintLogsCache: "printerTickerStore",
-  filesStore: "filesStore",
+  printerFilesStore: "printerFilesStore",
   octoPrintSockIoAdapter: "octoPrintSockIoAdapter",
   // Caches
   floorStore: "floorStore",

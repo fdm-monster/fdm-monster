@@ -13,7 +13,7 @@ let task: BootTask;
 
 beforeAll(async () => {
   await connect();
-  ({ container } = await setupTestApp(true));
+  ({ container } = await setupTestApp(false, undefined, true));
   taskManager = container.resolve(DITokens.taskManagerService);
   task = container.resolve(DITokens.bootTask);
   serverTasks = container.resolve(DITokens.serverTasks);
