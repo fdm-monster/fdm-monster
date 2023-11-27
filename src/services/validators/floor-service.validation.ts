@@ -1,4 +1,4 @@
-import { minPrinterFloorNameLength } from "@/constants/service.constants";
+import { minFloorNameLength } from "@/constants/service.constants";
 import { idRuleV2 } from "@/controllers/validation/generic.validation";
 
 export const removePrinterInFloorRules = (isSqlite: boolean) => ({
@@ -13,7 +13,7 @@ export const printerInFloorRules = (isSqlite: boolean) => ({
 });
 
 export const updateFloorNameRules = {
-  name: `required|minLength:${minPrinterFloorNameLength}`,
+  name: `required|minLength:${minFloorNameLength}`,
 };
 
 export const updateFloorNumberRules = {
@@ -21,7 +21,7 @@ export const updateFloorNumberRules = {
 };
 
 export const updateFloorRules = {
-  name: `required|minLength:${minPrinterFloorNameLength}`,
+  name: `required|minLength:${minFloorNameLength}`,
   floor: "required|integer",
   printers: "array",
   "printer.*.printerId": "required|mongoId",
@@ -30,7 +30,7 @@ export const updateFloorRules = {
 };
 
 export const createFloorRules = {
-  name: `required|minLength:${minPrinterFloorNameLength}`,
+  name: `required|minLength:${minFloorNameLength}`,
   floor: "required|integer",
   printers: "array",
 };

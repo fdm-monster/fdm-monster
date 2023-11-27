@@ -14,4 +14,4 @@ export function getDefaultPrinterEntry() {
 }
 
 export const UUID_LENGTH = 32;
-export const minPrinterFloorNameLength = 3;
+export const minFloorNameLength = 3;
