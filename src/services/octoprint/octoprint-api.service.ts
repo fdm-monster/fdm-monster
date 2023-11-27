@@ -129,7 +129,8 @@ export class OctoPrintApiService extends OctoPrintRoutes {
   }
 
   async getFile(login: LoginDto, path: string, responseOptions?: any) {
-    const { url, options } = this._prepareRequest(login, this.apiFile(path));
+    const pathUrl = this.apiFile(path);
+    const { url, options } = this._prepareRequest(login, pathUrl);
     const response = await this.axiosClient.get(url, options);
     return processResponse(response, responseOptions);
   }
@@ -168,7 +169,7 @@ export class OctoPrintApiService extends OctoPrintRoutes {
     return processResponse(response, responseOptions);
   }
 
-  async uploadFileAsMultiPart(login: LoginDto, fileStreamOrBuffer, commands, token: string, responseOptions?: any) {
+  async uploadFileAsMultiPart(login: LoginDto, fileStreamOrBuffer, commands: any, token: string, responseOptions?: any) {
     const { url, options } = this._prepareRequest(login, this.apiFilesLocation, null, multiPartContentType);
 
     const formData = new FormData();

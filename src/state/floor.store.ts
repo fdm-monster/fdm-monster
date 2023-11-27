@@ -2,9 +2,8 @@ import { KeyDiffCache, keyType } from "@/utils/cache/key-diff.cache";
 import { LoggerService } from "@/handlers/logger";
 import { IFloorService } from "@/services/interfaces/floor.service.interface";
 import { IdType } from "@/shared.constants";
-import { IFloor } from "@/models/Floor";
 import { ILoggerFactory } from "@/handlers/logger-factory";
-import { FloorDto, PositionDto, UpdateFloorDto } from "@/services/interfaces/floor.dto";
+import { CreateFloorDto, FloorDto, PositionDto, UpdateFloorDto } from "@/services/interfaces/floor.dto";
 
 export class FloorStore<KeyType extends keyType = IdType> extends KeyDiffCache<FloorDto<KeyType>> {
   private floorService: IFloorService<KeyType>;
@@ -44,7 +43,7 @@ export class FloorStore<KeyType extends keyType = IdType> extends KeyDiffCache<F
     return await this.getAllValues();
   }
 
-  async create(input: Partial<IFloor>) {
+  async create(input: CreateFloorDto<KeyType>) {
     const floor = await this.floorService.create(input);
     const floorDto = this.floorService.toDto(floor);
     await this.setKeyValue(floor.id, floorDto, true);
@@ -67,7 +66,7 @@ export class FloorStore<KeyType extends keyType = IdType> extends KeyDiffCache<F
     return floorDto;
   }
 
-  async update(floorId: KeyType, input: UpdateFloorDto) {
+  async update(floorId: KeyType, input: UpdateFloorDto<KeyType>) {
     const floor = await this.floorService.update(floorId, input);
     const floorDto = this.floorService.toDto(floor);
     await this.setKeyValue(floorId, floorDto, true);
@@ -88,7 +87,7 @@ export class FloorStore<KeyType extends keyType = IdType> extends KeyDiffCache<F
     return floorDto;
   }
 
-  async addOrUpdatePrinter(floorId: KeyType, position: PositionDto) {
+  async addOrUpdatePrinter(floorId: KeyType, position: PositionDto<KeyType>) {
     const floor = await this.floorService.addOrUpdatePrinter(floorId, position);
     const floorDto = this.floorService.toDto(floor);
     await this.setKeyValue(floorId, floorDto, true);
