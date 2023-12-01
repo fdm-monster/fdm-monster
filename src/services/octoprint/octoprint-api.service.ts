@@ -1,7 +1,6 @@
 import fs from "fs";
 import path from "path";
 import FormData from "form-data";
-import got from "got";
 import { multiPartContentType, pluginRepositoryUrl } from "./constants/octoprint-service.constants";
 import { processGotResponse, processResponse } from "./utils/api.utils";
 import { firmwareFlashUploadEvent, uploadProgressEvent } from "@/constants/event.constants";
@@ -193,16 +192,15 @@ export class OctoPrintApiService extends OctoPrintRoutes {
         ...formData.getHeaders(),
       };
 
-      const response = await got
-        .post(url, {
-          body: formData,
-          headers,
-        })
-        .on("uploadProgress", (p) => {
+      const response = await this.axiosClient.post(url, {
+        body: formData,
+        headers,
+        onUploadProgress: (p: any) => {
           if (token) {
             this.eventEmitter2.emit(`${uploadProgressEvent(token)}`, token, p);
           }
-        });
+        },
+      });
 
       // Cleanup
       if (isPhysicalFile) {
