@@ -210,6 +210,11 @@ export class SettingsStore {
     }
 
     if (isTestEnvironment()) return;
-    getCurrentHub().getClient()!.getOptions().enabled = sentryEnabled;
+    const client = getCurrentHub().getClient();
+    if (!client) {
+      this.logger.warn("Could not apply Sentry. Was the SDK initialized?");
+      return;
+    }
+    client.getOptions().enabled = sentryEnabled;
   }
 }

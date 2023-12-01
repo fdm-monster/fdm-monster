@@ -1,18 +1,18 @@
-import fs from "fs";
+import fs, { createReadStream, ReadStream, statSync } from "fs";
 import path from "path";
 import FormData from "form-data";
 import { multiPartContentType, pluginRepositoryUrl } from "./constants/octoprint-service.constants";
-import { processGotResponse, processResponse } from "./utils/api.utils";
 import { firmwareFlashUploadEvent, uploadProgressEvent } from "@/constants/event.constants";
 import { ExternalServiceError } from "@/exceptions/runtime.exceptions";
 import { OctoPrintRoutes } from "./octoprint-api.routes";
-import { AxiosStatic } from "axios";
+import axios, { AxiosStatic } from "axios";
 import EventEmitter2 from "eventemitter2";
 import { LoggerService } from "@/handlers/logger";
 import { LoginDto } from "@/services/interfaces/login.dto";
 import { IdType } from "@/shared.constants";
 import { SettingsStore } from "@/state/settings.store";
 import { ILoggerFactory } from "@/handlers/logger-factory";
+import Throttle from "throttle";
 
 export class OctoPrintApiService extends OctoPrintRoutes {
   eventEmitter2: EventEmitter2;
@@ -36,66 +36,66 @@ export class OctoPrintApiService extends OctoPrintRoutes {
     this.logger = loggerFactory(OctoPrintApiService.name);
   }
 
-  async login(login: LoginDto, responseOptions?: any) {
+  async login(login: LoginDto) {
     const { url, options } = this._prepareRequest(login, this.apiLogin);
     const response = await this.axiosClient.post(url, {}, options);
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 
-  async sendConnectionCommand(login: LoginDto, commandData, responseOptions?: any) {
+  async sendConnectionCommand(login: LoginDto, commandData) {
     const { url, options, data } = this._prepareJsonRequest(login, this.apiConnection, commandData);
     const response = await this.axiosClient.post(url, data, options);
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 
-  async sendCustomGCodeCommand(login: LoginDto, commandString: string, responseOptions?: any) {
+  async sendCustomGCodeCommand(login: LoginDto, commandString: string) {
     const { url, options, data } = this._prepareJsonRequest(login, this.apiPrinterCustomCommand, {
       command: commandString,
     });
     const response = await this.axiosClient.post(url, data, options);
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 
   /**
    * Ability to start, cancel, restart, or pause a job
    */
-  async sendJobCommand(login: LoginDto, commandData, responseOptions?: any) {
+  async sendJobCommand(login: LoginDto, commandData) {
     const { url, options, data } = this._prepareJsonRequest(login, this.apiJob, commandData);
     const response = await this.axiosClient.post(url, data, options);
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 
-  async sendBedTempCommand(login: LoginDto, targetTemp, responseOptions?: any) {
+  async sendBedTempCommand(login: LoginDto, targetTemp: number) {
     const { url, options, data } = this._prepareJsonRequest(login, this.apiPrinterBed, this.getBedTargetCommand(targetTemp));
     const response = await this.axiosClient.post(url, data, options);
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 
-  async getSettings(login: LoginDto, responseOptions?: any) {
+  async getSettings(login: LoginDto) {
     const { url, options } = this._prepareRequest(login, this.apiSettingsPart);
     const response = await this.axiosClient.get(url, options);
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 
-  async updatePrinterNameSetting(login: LoginDto, printerName: string, responseOptions?: any) {
+  async updatePrinterNameSetting(login: LoginDto, printerName: string) {
     const { url, options } = this._prepareRequest(login, this.apiSettingsPart);
     const settingPatch = this.printerNameSetting(printerName);
     const response = await this.axiosClient.post(url, settingPatch, options);
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 
-  async updateFirmwareUpdaterSettings(login: LoginDto, firmwareUpdateConfig: any, responseOptions?: any) {
+  async updateFirmwareUpdaterSettings(login: LoginDto, firmwareUpdateConfig: any) {
     const { url, options } = this._prepareRequest(login, this.apiSettingsPart);
     const settingPatch = this.pluginFirmwareUpdaterSettings(firmwareUpdateConfig);
     const response = await this.axiosClient.post(url, settingPatch, options);
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 
-  async setGCodeAnalysis(login: LoginDto, enabled: boolean, responseOptions?: any) {
+  async setGCodeAnalysis(login: LoginDto, enabled: boolean) {
     const { url, options } = this._prepareRequest(login, this.apiSettingsPart);
     const settingPatch = this.gcodeAnalysisSetting(enabled);
     const response = await this.axiosClient.post(url, settingPatch, options);
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 
   async getAdminUserOrDefault(login: LoginDto) {
@@ -110,31 +110,26 @@ export class OctoPrintApiService extends OctoPrintRoutes {
     return opAdminUserName;
   }
 
-  /**
-   * @param  {LoginDto} login
-   * @param responseOptions
-   * @returns {Promise<{data, status}|*>}
-   */
-  async getUsers(login, responseOptions?: any) {
+  async getUsers(login: LoginDto) {
     const { url, options } = this._prepareRequest(login, this.apiUsers);
     const response = await this.axiosClient.get(url, options);
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 
-  async getFiles(login: LoginDto, recursive = false, responseOptions?: any) {
+  async getFiles(login: LoginDto, recursive = false) {
     const { url, options } = this._prepareRequest(login, this.apiGetFiles(recursive));
     const response = await this.axiosClient.get(url, options);
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 
-  async getFile(login: LoginDto, path: string, responseOptions?: any) {
+  async getFile(login: LoginDto, path: string) {
     const pathUrl = this.apiFile(path);
     const { url, options } = this._prepareRequest(login, pathUrl);
     const response = await this.axiosClient.get(url, options);
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 
-  async createFolder(login: LoginDto, path: string, foldername: string, responseOptions?: any) {
+  async createFolder(login: LoginDto, path: string, foldername: string) {
     const { url, options } = this._prepareRequest(login, this.apiFilesLocation);
 
     const formData = new FormData();
@@ -151,24 +146,24 @@ export class OctoPrintApiService extends OctoPrintRoutes {
       headers,
     });
 
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 
-  async moveFileOrFolder(login: LoginDto, path: string, destination: string, responseOptions?: any) {
+  async moveFileOrFolder(login: LoginDto, path: string, destination: string) {
     const { url, options } = this._prepareRequest(login, this.apiFile(path));
     const command = this.moveFileCommand(destination);
     const response = await this.axiosClient.post(url, command, options);
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 
-  async selectPrintFile(login: LoginDto, path: string, print, responseOptions?: any) {
+  async selectPrintFile(login: LoginDto, path: string, print: boolean) {
     const { url, options } = this._prepareRequest(login, this.apiFile(path));
     const command = this.selectCommand(print);
     const response = await this.axiosClient.post(url, command, options);
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 
-  async uploadFileAsMultiPart(login: LoginDto, fileStreamOrBuffer, commands: any, token: string, responseOptions?: any) {
+  async uploadFileAsMultiPart(login: LoginDto, multerFileOrBuffer: Buffer | Express.Multer.File, commands: any, token: string) {
     const { url, options } = this._prepareRequest(login, this.apiFilesLocation, null, multiPartContentType);
 
     const formData = new FormData();
@@ -179,35 +174,46 @@ export class OctoPrintApiService extends OctoPrintRoutes {
       formData.append("print", "true");
     }
 
-    let source = fileStreamOrBuffer.buffer;
+    let source: ArrayBufferLike | ReadStream = (multerFileOrBuffer as Buffer).buffer;
     const isPhysicalFile = !source;
     if (isPhysicalFile) {
-      source = fs.createReadStream(fileStreamOrBuffer.path);
+      source = createReadStream((multerFileOrBuffer as Express.Multer.File).path);
     }
-    formData.append("file", source, { filename: fileStreamOrBuffer.originalname });
+    formData.append("file", source, { filename: (multerFileOrBuffer as Express.Multer.File).originalname });
+
+    // Calculate the header that axios uses to determine progress
+    const result: number = await new Promise<number>((resolve, reject) => {
+      return formData.getLength((err, length) => {
+        if (err) resolve(null);
+        resolve(length);
+      });
+    });
 
     try {
       const headers = {
         ...options.headers,
         ...formData.getHeaders(),
+        "Content-Length": result,
       };
 
-      const response = await this.axiosClient.post(url, {
-        body: formData,
+      const response = await this.axiosClient({
+        method: "POST",
+        url,
+        data: formData,
         headers,
-        onUploadProgress: (p: any) => {
+        onUploadProgress: (p) => {
           if (token) {
             this.eventEmitter2.emit(`${uploadProgressEvent(token)}`, token, p);
           }
         },
       });
 
-      // Cleanup
-      if (isPhysicalFile) {
-        fs.unlinkSync(fileStreamOrBuffer.path);
-      }
+      // Cleanup if file exists on disk
+      // if (isPhysicalFile) {
+      //   fs.unlinkSync((fileStreamOrBuffer as Express.Multer.File).path);
+      // }
 
-      return await processGotResponse(response, responseOptions);
+      return response.data;
     } catch (e) {
       this.eventEmitter2.emit(`${uploadProgressEvent(token)}`, token, { failed: true }, e);
       let data;
@@ -227,66 +233,66 @@ export class OctoPrintApiService extends OctoPrintRoutes {
   }
 
   // TODO implement when UI is ready, preferably using websocket stream and timing
-  // async getSoftwareUpdateCheck(login: LoginDto, responseOptions) {
+  // async getSoftwareUpdateCheck(login: LoginDto) {
   //   const { url, options } = this._prepareRequest(printer, this.pluginSoftwareUpdateCheck);
   //
   //   const response = await this.axiosClient.get(url, options);
-  //   return processResponse(response, responseOptions);
+  //   return response?.data;
   // }
 
-  async deleteFileOrFolder(login: LoginDto, path: string, responseOptions?: any) {
+  async deleteFileOrFolder(login: LoginDto, path: string) {
     const { url, options } = this._prepareRequest(login, this.apiFile(path));
     const response = await this.axiosClient.delete(url, options);
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 
-  async getConnection(login: LoginDto, responseOptions?: any) {
+  async getConnection(login: LoginDto) {
     const { url, options } = this._prepareRequest(login, this.apiConnection);
     const response = await this.axiosClient.get(url, options);
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 
-  async getPrinterProfiles(login: LoginDto, responseOptions?: any) {
+  async getPrinterProfiles(login: LoginDto) {
     const { url, options } = this._prepareRequest(login, this.apiPrinterProfiles);
     const response = await this.axiosClient.get(url, options);
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 
   /**
    * Based on https://github.com/OctoPrint/OctoPrint/blob/f430257d7072a83692fc2392c683ed8c97ae47b6/src/octoprint/plugins/softwareupdate/__init__.py#L1265
    */
-  async postSoftwareUpdate(login: LoginDto, targets, responseOptions?: any) {
+  async postSoftwareUpdate(login: LoginDto, targets) {
     const { url, options } = this._prepareJsonRequest(login, this.pluginSoftwareUpdateUpdate, {
       targets,
     });
 
     const response = await this.axiosClient.post(url, {}, options);
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 
-  async getPluginManagerPlugins(login: LoginDto, responseOptions?: any) {
+  async getPluginManagerPlugins(login: LoginDto) {
     const { url, options } = this._prepareRequest(login, this.pluginManagerPlugins);
 
     const response = await this.axiosClient.get(url, options);
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 
-  async getPluginManagerPlugin(login: LoginDto, pluginName: string, responseOptions?: any) {
+  async getPluginManagerPlugin(login: LoginDto, pluginName: string) {
     const { url, options } = this._prepareRequest(login, this.pluginManagerPlugin(pluginName));
 
     const response = await this.axiosClient.get(url, options);
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 
-  async postApiPluginManagerCommand(login: LoginDto, pluginCommand: string, pluginUrl: string, responseOptions?: any) {
+  async postApiPluginManagerCommand(login: LoginDto, pluginCommand: string, pluginUrl: string) {
     const { url, options } = this._prepareRequest(login, this.apiPluginManager);
     const command = this.pluginManagerCommand(pluginCommand, pluginUrl);
 
     const response = await this.axiosClient.post(url, command, options);
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 
-  async postPluginFirmwareUpdateFlash(currentPrinterId: IdType, login: LoginDto, firmwarePath: string, responseOptions?: any) {
+  async postPluginFirmwareUpdateFlash(currentPrinterId: IdType, login: LoginDto, firmwarePath: string) {
     const { url, options } = this._prepareRequest(login, this.pluginFirmwareUpdaterFlash, null, multiPartContentType);
 
     const formData = new FormData();
@@ -302,18 +308,17 @@ export class OctoPrintApiService extends OctoPrintRoutes {
         ...formData.getHeaders(),
       };
 
-      const response = await got
-        .post(url, {
-          body: formData,
-          headers,
-        })
-        .on("uploadProgress", (p) => {
+      const response = await this.axiosClient.post(url, {
+        body: formData,
+        headers,
+        uploadProgress: (p: any) => {
           if (currentPrinterId) {
             this.eventEmitter2.emit(`${firmwareFlashUploadEvent(currentPrinterId)}`, currentPrinterId, p);
           }
-        });
+        },
+      });
 
-      return await processGotResponse(response, responseOptions);
+      return response?.data;
     } catch (e) {
       this.eventEmitter2.emit(`${uploadProgressEvent(currentPrinterId)}`, currentPrinterId, { failed: true }, e);
       let data;
@@ -332,86 +337,86 @@ export class OctoPrintApiService extends OctoPrintRoutes {
     }
   }
 
-  async getPluginFirmwareUpdateStatus(login: LoginDto, responseOptions?: any) {
+  async getPluginFirmwareUpdateStatus(login: LoginDto) {
     const { url, options } = this._prepareRequest(login, this.pluginFirmwareUpdaterStatus);
 
     const response = await this.axiosClient.get(url, options);
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 
   /**
    * Does not require printer login, much faster, requires internet connectivity
    */
-  async fetchOctoPrintPlugins(responseOptions?: any) {
+  async fetchOctoPrintPlugins() {
     const { url, options } = this._prepareAnonymousRequest(pluginRepositoryUrl);
 
     const response = await this.axiosClient.get(url, options);
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 
-  async getSystemInfo(login: LoginDto, responseOptions?: any) {
+  async getSystemInfo(login: LoginDto) {
     const { url, options } = this._prepareRequest(login, this.apiSystemInfo);
     const response = await this.axiosClient.get(url, options);
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 
-  async getSystemCommands(login: LoginDto, responseOptions?: any) {
+  async getSystemCommands(login: LoginDto) {
     const { url, options } = this._prepareRequest(login, this.apiSystemCommands);
     const response = await this.axiosClient.get(url, options);
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 
-  async postSystemRestartCommand(login: LoginDto, responseOptions?: any) {
+  async postSystemRestartCommand(login: LoginDto) {
     const { url, options } = this._prepareRequest(login, this.apiSystemRestartCommand);
     const response = await this.axiosClient.post(url, {}, options);
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 
-  async getSoftwareUpdateCheck(login: LoginDto, force: boolean, responseOptions?: any) {
+  async getSoftwareUpdateCheck(login: LoginDto, force: boolean) {
     const { url, options } = this._prepareRequest(login, this.apiSoftwareUpdateCheck(force));
     const response = await this.axiosClient.get(url, options);
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 
-  async getPluginPiSupport(login: LoginDto, responseOptions?: any) {
+  async getPluginPiSupport(login: LoginDto) {
     const { url, options } = this._prepareRequest(login, this.apiPluginPiSupport);
     const response = await this.axiosClient.get(url, options);
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 
-  async deleteTimeLapse(login: LoginDto, fileName: string, responseOptions?: any) {
+  async deleteTimeLapse(login: LoginDto, fileName: string) {
     const path = `${this.apiTimelapse}/${fileName}`;
     const { url, options } = this._prepareRequest(login, path);
     const response = await this.axiosClient.delete(url, options);
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 
-  async listUnrenderedTimeLapses(login: LoginDto, responseOptions?: any) {
+  async listUnrenderedTimeLapses(login: LoginDto) {
     const path = `${this.apiTimelapse}?unrendered=true`;
     const { url, options } = this._prepareRequest(login, path);
     const response = await this.axiosClient.get(url, options);
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 
-  async listProfiles(login: LoginDto, responseOptions?: any) {
+  async listProfiles(login: LoginDto) {
     const { url, options } = this._prepareRequest(login, this.apiProfiles);
     const response = await this.axiosClient.get(url, options);
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 
-  async getBackupOverview(login: LoginDto, responseOptions?: any) {
+  async getBackupOverview(login: LoginDto) {
     const { url, options } = this._prepareRequest(login, this.pluginBackupIndex);
     const response = await this.axiosClient.get(url, options);
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 
-  async getBackups(login: LoginDto, responseOptions?: any) {
+  async getBackups(login: LoginDto) {
     const { url, options } = this._prepareRequest(login, this.pluginBackupEndpoint);
     const response = await this.axiosClient.get(url, options);
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 
-  async createBackup(login: LoginDto, excludeArray: string[], responseOptions?: any) {
+  async createBackup(login: LoginDto, excludeArray: string[]) {
     const { url, options } = this._prepareRequest(login, this.pluginBackupEndpoint);
     const response = await this.axiosClient.post(
       url,
@@ -420,7 +425,7 @@ export class OctoPrintApiService extends OctoPrintRoutes {
       },
       options
     );
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 
   async getDownloadBackupStream(login: LoginDto, filename: string) {
@@ -441,7 +446,7 @@ export class OctoPrintApiService extends OctoPrintRoutes {
     return response.data;
   }
 
-  async forwardRestoreBackupFileStream(login: LoginDto, buffer) {
+  async forwardRestoreBackupFileStream(login: LoginDto, buffer: Buffer) {
     const { url, options } = this._prepareRequest(login, this.pluginBackupFileRestore, null, multiPartContentType);
     const formData = new FormData();
     formData.append("file", buffer, { filename: "op-fdmm-restore.zip" });
@@ -461,12 +466,12 @@ export class OctoPrintApiService extends OctoPrintRoutes {
           stack: e.stack,
         });
       });
-    return processResponse(response);
+    return response?.data;
   }
 
-  async deleteBackup(login: LoginDto, filename: string, responseOptions?: any) {
+  async deleteBackup(login: LoginDto, filename: string) {
     const { url, options } = this._prepareRequest(login, this.pluginBackupFile(filename));
     const response = await this.axiosClient.delete(url, options);
-    return processResponse(response, responseOptions);
+    return response?.data;
   }
 }
