@@ -20,10 +20,10 @@ Please note that we cannot support custom scenarios or setups. Therefore, it is 
 In the next steps we will guide you through the process of running FDM Monster with Docker Compose.
 
 ### Step 1) FDM Monster image and version tag
-We provide the `davidzwa/fdm-monster` image. This image requires you to run a MongoDB service, MongoDB Atlas (cloud offering) or a MongoDB docker container (see compose file below).
-Find it on [Docker Hub](https://hub.docker.com/r/davidzwa/fdm-monster/tags).
+We provide the `fdmmonster/fdm-monster` image. This image requires you to run a MongoDB service, MongoDB Atlas (cloud offering) or a MongoDB docker container (see compose file below).
+Find it on [Docker Hub](https://hub.docker.com/r/fdmmonster/fdm-monster/tags).
 
-There are multiple tags available for the `davidzwa/fdm-monster` image.
+There are multiple tags available for the `fdmmonster/fdm-monster` image.
 - `latest` - The latest version of FDM Monster. This is the default tag.
 - `x`, `x.y`, `x.y.z` - A specific version of FDM Monster. For example, `1`, `1.4` or `1.4.0`.
 - `main` - The latest development version of FDM Monster. This version is the same as the `latest` tag and it is stable.
@@ -62,7 +62,7 @@ services:
 
   fdm-monster:
     container_name: fdm-monster
-    image: davidzwa/fdm-monster:latest
+    image: fdmmonster/fdm-monster:latest
     restart: unless-stopped
     ports:
       - "4000:4000"
