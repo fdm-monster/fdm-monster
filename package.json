@@ -7,7 +7,7 @@
   "author": "David Zwart",
   "license": "AGPL-3.0-or-later",
   "private": false,
-  "version": "1.5.5-alpha",
+  "version": "1.5.4",
   "bin": {
     "fdm-monster": "dist/cli.js",
     "fdmm": "dist/cli.js"
