@@ -1,5 +1,4 @@
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
-import { findFileIndex } from "@/utils/find-predicate.utils";
 import { LoggerService } from "@/handlers/logger";
 import { MongoIdType } from "@/shared.constants";
 import { ILoggerFactory } from "@/handlers/logger-factory";
@@ -25,13 +24,10 @@ export class PrinterFilesService implements IPrinterFilesService<MongoIdType> {
     this.logger = loggerFactory(PrinterFilesService.name);
   }
 
-  async getPrinterFilesStorage(printerId: MongoIdType) {
+  async getPrinterFiles(printerId: MongoIdType) {
     const printer = await this.printerService.get(printerId);
 
-    return {
-      fileList: printer.fileList,
-      storage: printer.storage,
-    };
+    return printer.fileList;
   }
 
   async updateFiles(printerId: MongoIdType, fileList) {
@@ -75,7 +71,7 @@ export class PrinterFilesService implements IPrinterFilesService<MongoIdType> {
   async deleteFile(printerId: MongoIdType, filePath: string, throwError = true) {
     const printer = await this.printerService.get(printerId);
 
-    const fileIndex = findFileIndex(printer.fileList, filePath);
+    const fileIndex = printer.fileList.findIndex((f) => f.path === filePath);
 
     if (fileIndex === -1) {
       if (throwError) {

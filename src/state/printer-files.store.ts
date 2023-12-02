@@ -42,7 +42,7 @@ export class PrinterFilesStore {
     const printers = await this.printerCache.listCachedPrinters(true);
     for (let printer of printers) {
       try {
-        const printerFileStorage = await this.printerFilesService.getPrinterFilesStorage(printer.id);
+        const printerFileStorage = await this.printerFilesService.getPrinterFiles(printer.id);
         this.fileCache.cachePrinterFileStorage(printer.id, printerFileStorage);
       } catch (e) {
         this.logger.error("Files store failed to reconstruct files from database.", e.stack);

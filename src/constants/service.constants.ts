@@ -1,15 +1,6 @@
-export function getFileListDefault() {
-  return {
-    files: [],
-    folders: [],
-    free: 0,
-    total: 0,
-  };
-}
-
 export function getDefaultPrinterEntry() {
   return {
-    fileList: getFileListDefault(),
+    fileList: [],
   };
 }
 

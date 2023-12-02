@@ -18,15 +18,6 @@ interface CachedPrinter {
   disabledReason: string;
   name: string;
   dateAdded: number;
-  lastPrintedFile: {
-    fileName: string;
-    editTimestamp: number;
-    parsedColor: string;
-    parsedVisualizationRAL: number;
-    parsedAmount: number;
-    parsedMaterial: string;
-    parsedOrderCode: string;
-  };
   fileList: {
     files: Array<any>;
     folders: Array<any>;

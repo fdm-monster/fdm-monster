@@ -1,7 +1,7 @@
 import { IdType } from "@/shared.constants";
 
 export interface IPrinterFilesService<KeyType = IdType> {
-  getPrinterFilesStorage(printerId: KeyType): Promise<{ storage: any; fileList: any }>;
+  getPrinterFiles(printerId: KeyType): Promise<any[]>;
 
   updateFiles(printerId: KeyType, fileList): Promise<any>;
 
