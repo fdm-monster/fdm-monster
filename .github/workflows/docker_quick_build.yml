@@ -98,7 +98,7 @@ jobs:
           labels: ${{ needs.meta.outputs.labels }}
 
       - name: Build and push
-        id: docker_build
+        id: docker_build_new
         uses: docker/build-push-action@v5
         with:
           push: ${{ github.event_name != 'pull_request' }}
@@ -112,3 +112,6 @@ jobs:
       # Show image digest output
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
+
+      - name: Image digest 2
+        run: echo ${{ steps.docker_build_new.outputs.digest }}
