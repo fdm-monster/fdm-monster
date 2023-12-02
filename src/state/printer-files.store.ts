@@ -69,9 +69,9 @@ export class PrinterFilesStore {
   getOutdatedFiles(printerId: IdType, ageDaysMax: number) {
     if (!ageDaysMax) throw new ValidationException("ageDaysMax property is required to get printer's outdated files");
     const printerFiles = this.getFiles(printerId);
-    if (!printerFiles?.files?.length) return [];
+    if (!printerFiles?.length) return [];
     const nowTimestampSeconds = Date.now() / 1000;
-    return printerFiles.files.filter((file) => !!file.date && file.date + ageDaysMax * 86400 < nowTimestampSeconds);
+    return printerFiles.filter((file) => !!file.date && file.date + ageDaysMax * 86400 < nowTimestampSeconds);
   }
 
   async deleteOutdatedFiles(printerId: IdType, ageDaysMax: number) {
