@@ -77,8 +77,8 @@ export class PrinterFilesController {
     const { recursive } = await validateInput(req.query, getFilesRules);
 
     this.logger.log("Refreshing file storage by eager load");
-    const response = await this.printerFilesStore.eagerLoadPrinterFiles(currentPrinterId, recursive);
-    this.statusResponse(res, response);
+    const files = await this.printerFilesStore.eagerLoadPrinterFiles(currentPrinterId, recursive);
+    res.send(files);
   }
 
   /**
@@ -257,11 +257,6 @@ export class PrinterFilesController {
     }
 
     res.send(response);
-  }
-
-  private statusResponse(res: Response, response: AxiosResponse) {
-    res.statusCode = response.status;
-    res.send(response.data);
   }
 }
 

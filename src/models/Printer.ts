@@ -18,12 +18,7 @@ export interface IPrinter {
     parsedMaterial: string;
     parsedOrderCode: string;
   };
-  fileList: {
-    files: string[];
-    folders: string[];
-    free: number;
-    total: number;
-  };
+  fileList: [];
   feedRate: number;
   flowRate: number;
 }
@@ -95,13 +90,8 @@ export const PrinterSchema = new Schema<IPrinter>({
   },
   // Deprecated in v1.5.0
   fileList: {
-    type: Object,
-    default: {
-      files: [],
-      folders: [],
-      free: 0,
-      total: 0,
-    },
+    type: Array,
+    default: [],
     required: true,
   },
   feedRate: {

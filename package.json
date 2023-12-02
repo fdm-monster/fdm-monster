@@ -22,7 +22,7 @@
     "build:watch": "swc src -w -d dist",
     "start:dev": "ts-node src/index.ts",
     "start": "cross-env NODE_ENV=production node dist/index.js",
-    "migration:create": "migrate-mongo create printer-remove-settingsappearance",
+    "migration:create": "migrate-mongo create printer-files-simpler",
     "migration:up": "migrate-mongo up",
     "migration:down": "migrate-mongo down",
     "migration:status": "migrate-mongo status",
