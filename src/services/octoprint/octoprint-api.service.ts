@@ -196,7 +196,7 @@ export class OctoPrintApiService extends OctoPrintRoutes {
         "Content-Length": result,
       };
 
-      const response = await this.axiosClient({
+      const response = await axios({
         method: "POST",
         url,
         data: formData,

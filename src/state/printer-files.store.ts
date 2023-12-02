@@ -139,17 +139,10 @@ export class PrinterFilesStore {
     const printer = await this.printerCache.getCachedPrinterOrThrowAsync(printerId);
 
     // Check printer in database and modify
-    const { fileList, lastPrintedFile } = await this.printerFilesService.appendOrReplaceFile(printer.id, addedFile);
+    const { fileList } = await this.printerFilesService.appendOrReplaceFile(printer.id, addedFile);
 
     // Update cache with data from storage
     await this.fileCache.cachePrinterFiles(printer.id, fileList);
-
-    // Update printer state with lastPrintedFile
-    await this.printerFilesService.setPrinterLastPrintedFile(printer.id, lastPrintedFile.fileName);
-  }
-
-  async setExistingFileForPrint(printerId: IdType, filePath: string) {
-    await this.printerFilesService.setPrinterLastPrintedFile(printerId, filePath);
   }
 
   async deleteFile(
