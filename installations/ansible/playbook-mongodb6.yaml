@@ -1,0 +1,58 @@
+---
+- name: Install NVM, Node.js 20 (LTS), Yarn, FDM Monster, and 7-Zip on Ubuntu 22.04
+  hosts: all
+  become: no
+  vars_files:
+    - vars/main.yml
+  tasks:
+    - name: Update apt packages cache
+      become: true
+      apt:
+        update_cache: yes
+      tags:
+        - mongodb
+
+    - name: Install gnupg and curl
+      become: true
+      apt:
+        pkg:
+          - gnupg
+          - curl
+      tags:
+        - mongodb
+
+    - name: Add MongoDb key
+      become: true
+      shell: |
+        curl -fsSL https://pgp.mongodb.com/server-6.0.asc | \
+        sudo gpg -o /usr/share/keyrings/mongodb-server-6.0.gpg \
+        --dearmor
+      tags:
+        - mongodb
+
+    - name: Add MongoDB Repository
+      become: true
+      apt_repository:
+        repo: "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse"
+        state: present
+      tags:
+        - mongodb
+
+    - name: Update apt packages cache
+      become: true
+      apt:
+        update_cache: yes
+      tags:
+        - mongodb
+
+    - name: Install mongodb
+      become: true
+      apt:
+        pkg:
+          - mongodb-org=6.0.10
+          - mongodb-org-database=6.0.10
+          - mongodb-org-server=6.0.10
+          - mongodb-org-mongos=6.0.10
+          - mongodb-org-tools=6.0.10
+      tags:
+        - mongodb
