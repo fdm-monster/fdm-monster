@@ -18,15 +18,6 @@ interface CachedPrinter {
   disabledReason: string;
   name: string;
   dateAdded: number;
-  lastPrintedFile: {
-    fileName: string;
-    editTimestamp: number;
-    parsedColor: string;
-    parsedVisualizationRAL: number;
-    parsedAmount: number;
-    parsedMaterial: string;
-    parsedOrderCode: string;
-  };
   fileList: {
     files: Array<any>;
     folders: Array<any>;
@@ -69,7 +60,7 @@ export class PrinterCache extends KeyDiffCache<CachedPrinter> {
     return printers;
   }
 
-  async getCachedPrinterOrThrowAsync(id: string): Promise<CachedPrinter | null> {
+  async getCachedPrinterOrThrowAsync(id: keyType): Promise<CachedPrinter | null> {
     const printer = await this.getValue(id);
     if (!printer) {
       throw new NotFoundException(`Printer with id ${id} not found`);

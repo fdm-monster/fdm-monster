@@ -40,14 +40,6 @@ beforeEach(async () => {
 describe(PrinterFilesController.name, () => {
   const gcodePath = "test/api/test-data/sample.gcode";
   const invalidGcodePath = "test/api/test-data/sample.gco";
-  const nockResponse = {
-    files: {
-      local: {
-        path: "/home/yes",
-        name: "3xP1234A_PLA_ParelWit_1h31m.gcode",
-      },
-    },
-  };
 
   it(`should return 404 on ${defaultRoute} for nonexisting printer`, async () => {
     const res = await request.get(getRoute("60ae2b760bca4f5930be3d88")).send();

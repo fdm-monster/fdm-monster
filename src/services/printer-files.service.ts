@@ -1,5 +1,4 @@
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
-import { findFileIndex } from "@/utils/find-predicate.utils";
 import { LoggerService } from "@/handlers/logger";
 import { MongoIdType } from "@/shared.constants";
 import { ILoggerFactory } from "@/handlers/logger-factory";
@@ -25,13 +24,10 @@ export class PrinterFilesService implements IPrinterFilesService<MongoIdType> {
     this.logger = loggerFactory(PrinterFilesService.name);
   }
 
-  async getPrinterFilesStorage(printerId: MongoIdType) {
+  async getPrinterFiles(printerId: MongoIdType) {
     const printer = await this.printerService.get(printerId);
 
-    return {
-      fileList: printer.fileList,
-      storage: printer.storage,
-    };
+    return printer.fileList;
   }
 
   async updateFiles(printerId: MongoIdType, fileList) {
@@ -49,41 +45,22 @@ export class PrinterFilesService implements IPrinterFilesService<MongoIdType> {
     const printer = await this.printerService.get(printerId);
 
     // TODO replace with file storage
-    const foundFileIndex = printer.fileList.files.findIndex((f) => f.path === addedFile.path);
+    const foundFileIndex = printer.fileList.findIndex((f) => f.path === addedFile.path);
     if (foundFileIndex === -1) {
-      printer.fileList.files.push(addedFile);
+      printer.fileList.push(addedFile);
     } else {
-      printer.fileList.files[foundFileIndex] = addedFile;
+      printer.fileList[foundFileIndex] = addedFile;
     }
 
     printer.markModified("fileList");
     await printer.save();
 
-    // Only now are we allowed to adjust the last uploaded printer file
-    let lastPrintedFile = {};
-    try {
-      lastPrintedFile = await this.setPrinterLastPrintedFile(printerId, addedFile.name);
-    } catch (e) {
-      this.logger.warn(`Parsing printer file did not succeed. Filename: ${addedFile}`);
-    }
-
-    return { fileList: printer.fileList, lastPrintedFile };
-  }
-
-  async setPrinterLastPrintedFile(printerId: MongoIdType, fileName: string) {
-    await this.printerService.get(printerId);
-    const lastPrintedFile = {
-      fileName,
-      editTimestamp: Date.now(),
-    };
-    const printer = await this.printerService.updateLastPrintedFile(printerId, lastPrintedFile);
-    this.logger.log("Parsed and updated printer file", printer.lastPrintedFile);
-    return printer.lastPrintedFile;
+    return { fileList: printer.fileList };
   }
 
   async clearFiles(printerId: MongoIdType) {
     const printer = await this.printerService.get(printerId);
-    printer.fileList.files = [];
+    printer.fileList = [];
     printer.markModified("fileList");
     await printer.save();
   }
@@ -94,7 +71,7 @@ export class PrinterFilesService implements IPrinterFilesService<MongoIdType> {
   async deleteFile(printerId: MongoIdType, filePath: string, throwError = true) {
     const printer = await this.printerService.get(printerId);
 
-    const fileIndex = findFileIndex(printer.fileList, filePath);
+    const fileIndex = printer.fileList.findIndex((f) => f.path === filePath);
 
     if (fileIndex === -1) {
       if (throwError) {
@@ -107,7 +84,7 @@ export class PrinterFilesService implements IPrinterFilesService<MongoIdType> {
       }
     }
 
-    printer.fileList.files.splice(fileIndex, 1);
+    printer.fileList.splice(fileIndex, 1);
     printer.markModified("fileList");
     await printer.save();
   }

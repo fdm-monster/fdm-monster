@@ -9,21 +9,7 @@ export interface IPrinter {
   name: string;
   currentUser: string;
   dateAdded: number;
-  lastPrintedFile: {
-    fileName: string;
-    editTimestamp: number;
-    parsedColor: string;
-    parsedVisualizationRAL: number;
-    parsedAmount: number;
-    parsedMaterial: string;
-    parsedOrderCode: string;
-  };
-  fileList: {
-    files: string[];
-    folders: string[];
-    free: number;
-    total: number;
-  };
+  fileList: [];
   feedRate: number;
   flowRate: number;
 }
@@ -59,49 +45,10 @@ export const PrinterSchema = new Schema<IPrinter>({
     type: Number,
     required: false,
   },
-  // Deprecated, Will become many to many
-  lastPrintedFile: {
-    type: {
-      fileName: {
-        type: String,
-        required: true,
-      },
-      editTimestamp: {
-        type: Number,
-        required: true,
-      },
-      parsedColor: {
-        type: String,
-        required: false,
-      },
-      parsedVisualizationRAL: {
-        type: Number,
-        required: false,
-      },
-      parsedAmount: {
-        type: Number,
-        required: false,
-      },
-      parsedMaterial: {
-        type: String,
-        required: false,
-      },
-      parsedOrderCode: {
-        type: String,
-        required: false,
-      },
-    },
-    required: false,
-  },
-  // Deprecated in v1.5.0
+  // Obsolete in v1.6.0
   fileList: {
-    type: Object,
-    default: {
-      files: [],
-      folders: [],
-      free: 0,
-      total: 0,
-    },
+    type: Array,
+    default: [],
     required: true,
   },
   feedRate: {

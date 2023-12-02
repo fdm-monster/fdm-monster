@@ -25,7 +25,6 @@ import { PrinterFileCleanTask } from "@/tasks/printer-file-clean.task";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { Request, Response } from "express";
-import { AxiosResponse } from "axios";
 import { createReadStream, existsSync, lstatSync } from "node:fs";
 
 export class PrinterFilesController {
@@ -77,8 +76,8 @@ export class PrinterFilesController {
     const { recursive } = await validateInput(req.query, getFilesRules);
 
     this.logger.log("Refreshing file storage by eager load");
-    const response = await this.printerFilesStore.eagerLoadPrinterFiles(currentPrinterId, recursive);
-    this.statusResponse(res, response);
+    const files = await this.printerFilesStore.eagerLoadPrinterFiles(currentPrinterId, recursive);
+    res.send(files);
   }
 
   /**
@@ -166,12 +165,11 @@ export class PrinterFilesController {
   }
 
   async selectAndPrintFile(req: Request, res: Response) {
-    const { currentPrinterId, printerLogin } = getScopedPrinter(req);
+    const { printerLogin } = getScopedPrinter(req);
     const { filePath: path, print } = await validateInput(req.body, selectAndPrintFileRules);
 
     const result = await this.octoPrintApiService.selectPrintFile(printerLogin, path, print);
 
-    await this.printerFilesStore.setExistingFileForPrint(currentPrinterId, path);
     res.send(result);
   }
 
@@ -257,11 +255,6 @@ export class PrinterFilesController {
     }
 
     res.send(response);
-  }
-
-  private statusResponse(res: Response, response: AxiosResponse) {
-    res.statusCode = response.status;
-    res.send(response.data);
   }
 }
 

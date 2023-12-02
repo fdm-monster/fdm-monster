@@ -42,7 +42,7 @@ export class PrinterFilesStore {
     const printers = await this.printerCache.listCachedPrinters(true);
     for (let printer of printers) {
       try {
-        const printerFileStorage = await this.printerFilesService.getPrinterFilesStorage(printer.id);
+        const printerFileStorage = await this.printerFilesService.getPrinterFiles(printer.id);
         this.fileCache.cachePrinterFileStorage(printer.id, printerFileStorage);
       } catch (e) {
         this.logger.error("Files store failed to reconstruct files from database.", e.stack);
@@ -55,12 +55,9 @@ export class PrinterFilesStore {
    */
   async eagerLoadPrinterFiles(printerId: IdType, recursive: boolean): Promise<any> {
     const loginDto = await this.printerCache.getLoginDtoAsync(printerId);
-    const response = await this.octoPrintApiService.getFiles(loginDto, recursive, {
-      unwrap: false,
-      simple: true,
-    });
+    const response = await this.octoPrintApiService.getFiles(loginDto, recursive);
 
-    await this.updatePrinterFiles(printerId, response.data);
+    await this.updatePrinterFiles(printerId, response);
     return response;
   }
 
@@ -72,9 +69,9 @@ export class PrinterFilesStore {
   getOutdatedFiles(printerId: IdType, ageDaysMax: number) {
     if (!ageDaysMax) throw new ValidationException("ageDaysMax property is required to get printer's outdated files");
     const printerFiles = this.getFiles(printerId);
-    if (!printerFiles?.files?.length) return [];
+    if (!printerFiles?.length) return [];
     const nowTimestampSeconds = Date.now() / 1000;
-    return printerFiles.files.filter((file) => !!file.date && file.date + ageDaysMax * 86400 < nowTimestampSeconds);
+    return printerFiles.filter((file) => !!file.date && file.date + ageDaysMax * 86400 < nowTimestampSeconds);
   }
 
   async deleteOutdatedFiles(printerId: IdType, ageDaysMax: number) {
@@ -142,17 +139,10 @@ export class PrinterFilesStore {
     const printer = await this.printerCache.getCachedPrinterOrThrowAsync(printerId);
 
     // Check printer in database and modify
-    const { fileList, lastPrintedFile } = await this.printerFilesService.appendOrReplaceFile(printer.id, addedFile);
+    const { fileList } = await this.printerFilesService.appendOrReplaceFile(printer.id, addedFile);
 
     // Update cache with data from storage
     await this.fileCache.cachePrinterFiles(printer.id, fileList);
-
-    // Update printer state with lastPrintedFile
-    await this.printerFilesService.setPrinterLastPrintedFile(printer.id, lastPrintedFile.fileName);
-  }
-
-  async setExistingFileForPrint(printerId: IdType, filePath: string) {
-    await this.printerFilesService.setPrinterLastPrintedFile(printerId, filePath);
   }
 
   async deleteFile(
