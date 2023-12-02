@@ -27,6 +27,6 @@ describe("PrinterFileService", () => {
     const printer = await printerService.create(testPrinterData);
 
     const files = await printerFilesService.getPrinterFilesStorage(printer.id);
-    expect(files.fileList.files).toEqual([]);
+    expect(files.fileList).toEqual([]);
   });
 });
