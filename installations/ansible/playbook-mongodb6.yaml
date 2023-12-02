@@ -2,7 +2,7 @@
 # https://docs.ansible.com/ansible/latest/collections/community/mongodb/mongodb_user_module.html
 ---
 - name: Install MongoDB 6
-  hosts: all
+  hosts: fdmm
   become: no
   vars_files:
     - vars/main.yml

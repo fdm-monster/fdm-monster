@@ -1,0 +1,56 @@
+---
+- name: Test
+  hosts: fdmm
+  become: no
+  vars_files:
+    - vars/main.yml
+  tasks:
+    - name: Set bash command
+      set_fact:
+        bash: "bash -ic"
+        src_nvm: ". {{ ansible_env.HOME }}/.nvm/nvm.sh"
+
+    - name: "Check nvm {{ node_version }}"
+      become: no
+      shell: "{{bash}} 'nvm -v'"
+      register: nvm_version_response
+      failed_when: nvm_version not in nvm_version_response.stdout
+      changed_when: nvm_version_response.rc != 0
+
+    - name: "Check node {{ node_version }}"
+      become: no
+      shell: "{{bash}} 'node -v'"
+      register: node_version_response
+      failed_when: node_version not in node_version_response.stdout
+      changed_when: node_version_response.rc != 0
+
+    # - name: "Check yarn v1"
+    #   become: no
+    #   shell: "{{bash}} 'yarn -v'"
+    #   register: yarn_version_response
+    #   failed_when: yarn_version_response.stdout is version('2', '>=')
+    #   changed_when: yarn_version_response.rc != 0
+
+    - name: "Check MongoDB {{ mongodb_version }} status"
+      ansible.builtin.systemd:
+        name: "mongod"
+      register: mongod_service_status
+
+    - name: "Show mongod status"
+      debug:
+        msg: "MongoDB service status: {{ mongod_service_status.status.ActiveState }}"
+
+    - name: "Check MongoDB {{ mongodb_version }} status"
+      become: no
+      shell: "mongod --version"
+      register: mongod_version_response
+      failed_when: mongodb_version not in mongod_version_response.stdout
+      changed_when: mongod_version_response.rc != 0
+
+    - name: "Check mongodb running on port 27017"
+      ansible.builtin.uri:
+        url: http://localhost:27017
+
+    - name: "Check fdm-monster running on port 4000"
+      ansible.builtin.uri:
+        url: http://localhost:4000

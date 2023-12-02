@@ -1,7 +1,7 @@
 # https://fig.io/manual/pm2/install
 ---
 - name: Install NVM, Node.js 20 (LTS), Yarn, FDM Monster on Ubuntu 22.04
-  hosts: all
+  hosts: fdmm
   become: no
   vars_files:
     - vars/main.yml
