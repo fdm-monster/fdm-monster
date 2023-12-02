@@ -8,7 +8,7 @@ last_modified_at: 2023-05-09T10:04:00+02:00
 
 # Windows Service
 
-**Note**: the Windows service installation involves quite some steps and is relatively new.
+> :warning: **The installation on this page will be obsolote in FDM Monster 1.6.0! The replacement needs to be determined: pm2 with chocolatey or winget is most likely.**
 
 If you're not an experienced user, you might find some of the steps below challenging. However, if you follow them carefully, you'll be able to install FDM Monster as a Windows service on your machine. 
 
@@ -78,7 +78,7 @@ Prepare the installation by ensuring you have Git installed. This will help you 
 From now on we will be working inside the Powershell (preferred), or Command Prompt (CMD). You should **not** use Administrator mode.
 
 ```powershell
-Invoke-WebRequest -Uri https://raw.githubusercontent.com/fdm-monster/fdm-monster/develop/installations/fdm-monster-node-windows/download-fdm-monster-server.ps1 -OutFile .\download-fdm-monster-server.ps1
+Invoke-WebRequest -Uri https://raw.githubusercontent.com/fdm-monster/fdm-monster/main/installations/fdm-monster-node-windows/download-fdm-monster-server.ps1 -OutFile .\download-fdm-monster-server.ps1
 ```
 Please download this script in the preferred location where you want to install FDM Monster. For example, `C:\Users\User1\fdm-monster-service\`.
 
@@ -107,7 +107,7 @@ If things are working, you can open fdm monster with this URL: [http://localhost
 Updating the service is possible through a powershell, similar to the installation. Please open a Powershell window **without Administrator rights**. 
 
 ```powershell
-Invoke-WebRequest -Uri https://raw.githubusercontent.com/fdm-monster/fdm-monster/develop/installations/fdm-monster-node-windows/update-fdm-monster.ps1 -OutFile .\update-fdm-monster.ps1
+Invoke-WebRequest -Uri https://raw.githubusercontent.com/fdm-monster/fdm-monster/main/installations/fdm-monster-node-windows/update-fdm-monster.ps1 -OutFile .\update-fdm-monster.ps1
 ```
 Please download this script in the preferred location where you have downloaded the installation script for installing FDM Monster previously. 
 For example, `C:\Users\User1\fdm-monster-service\`, but not `C:\Users\User1\fdm-monster-service\fdm-monster\`! 
