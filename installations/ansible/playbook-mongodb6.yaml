@@ -1,5 +1,5 @@
 ---
-- name: Install NVM, Node.js 20 (LTS), Yarn, FDM Monster, and 7-Zip on Ubuntu 22.04
+- name: Install MongoDB 6
   hosts: all
   become: no
   vars_files:
