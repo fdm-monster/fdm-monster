@@ -1,0 +1,6 @@
+node_version: "20"
+nvm_version: "0.39.5"
+cli_version: "latest"
+fdmm_version: "1.5.4"
+pm2_startup_type: "systemd"
+mongodb_version: "6.0.12"

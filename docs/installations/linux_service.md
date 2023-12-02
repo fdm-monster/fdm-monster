@@ -6,7 +6,7 @@ nav_order: 4
 last_modified_at: 2023-05-05T10:01:00+02:00
 ---
 
-> :warning: **This page is work in progress!**
+> :warning: **The installation on this page will be obsolete in FDM Monster 1.6.0! We need to document steps to install with Ansible still.**
 
 # Linux Service
 The scripts on this page are available in [installations/fdm-monster-node-linux](../../installations/fdm-monster-node-linux).

@@ -44,6 +44,7 @@ The docker-compose installation is suitable for both Windows and Linux.
 
 {: .note }
 > Skill level required: **medium**
+> :warning: this installation is soon obsolete in version 1.6.0
 
 Click the button below to get started with FDM Monster as a Windows Service, using `node-windows` under the hood.
 
@@ -53,7 +54,7 @@ Click the button below to get started with FDM Monster as a Windows Service, usi
 
 {: .note }
 > Skill level required: **high**
-> :warning: This page is work in progress!
+> :warning: this installation is soon obsolete in version 1.6.0
 
 Click the button below to get started with FDM Monster as a Windows Service, using `node-linux` under the hood.
 

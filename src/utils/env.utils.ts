@@ -35,21 +35,6 @@ export function isNode() {
   return "NODE" in process.env;
 }
 
-/**
- * Turn an object into an envfile string
- * Copied from https://github.com/bevry/envfile
- */
-function stringifyDotEnv(obj: any) {
-  let result = "";
-  for (const [key, value] of Object.entries(obj)) {
-    if (key) {
-      const line = `${key}=${String(value)}`;
-      result += line + "\n";
-    }
-  }
-  return result;
-}
-
 export function verifyPackageJsonRequirements(rootPath: string) {
   const dirConts = fs.readdirSync(rootPath);
   const hasPackageJson = dirConts.includes("package.json");
