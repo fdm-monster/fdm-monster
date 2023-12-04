@@ -51,8 +51,14 @@
     - name: "Install @fdm-monster/server as pm2 module"
       shell: "{{ bash }} 'pm2 install @fdm-monster/server@{{fdmm_version}} -n fdmm'"
 
+    - name: Set NodeJS Full Version as a variable
+      command: "{{ bash }} 'nvm current'"
+      register: node_fullversion
+      ignore_errors: true
+
     - name: Set PM2 to start on reboot
-      command: "{{ bash }} 'pm2 startup {{ pm2_startup_type }} -u {{ ansible_user }} --hp /home/{{ ansible_user }}'"
+      become: yes
+      command: "{{ bash }} 'env PATH=$PATH:/home/{{ ansible_user }}/.nvm/versions/node/{{ node_fullversion.stdout }}/bin pm2 startup {{ pm2_startup_type }} -u {{ ansible_user }} --hp /home/{{ ansible_user }}'"
 
     - name: Save PM2
       command: "{{ bash }} 'pm2 save'"
