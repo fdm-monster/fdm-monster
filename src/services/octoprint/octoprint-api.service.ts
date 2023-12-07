@@ -116,7 +116,7 @@ export class OctoPrintApiService extends OctoPrintRoutes {
     return response?.data;
   }
 
-  async getFiles(login: LoginDto, recursive = false) {
+  async getLocalFiles(login: LoginDto, recursive = false) {
     const { url, options } = this.prepareRequest(login, this.apiGetFiles(recursive));
     const response = await this.axiosClient.get(url, options);
     return response?.data;

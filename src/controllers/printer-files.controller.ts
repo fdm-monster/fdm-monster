@@ -93,7 +93,7 @@ export class PrinterFilesController {
   async clearPrinterFiles(req: Request, res: Response) {
     const { currentPrinterId, printerLogin } = getScopedPrinter(req);
 
-    const nonRecursiveFiles = await this.octoPrintApiService.getFiles(printerLogin, false);
+    const nonRecursiveFiles = await this.octoPrintApiService.getLocalFiles(printerLogin, false);
 
     const failedFiles = [];
     const succeededFiles = [];

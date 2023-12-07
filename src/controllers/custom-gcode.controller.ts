@@ -3,7 +3,7 @@ import { authenticate, authorizeRoles } from "@/middleware/authenticate";
 import { AppConstants } from "@/server.constants";
 import { ROLES } from "@/constants/authorization.constants";
 import { getScopedPrinter, validateInput } from "@/handlers/validators";
-import { idRules, idRulesV2 } from "./validation/generic.validation";
+import { idRulesV2 } from "./validation/generic.validation";
 import { printerResolveMiddleware } from "@/middleware/printer";
 import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
 import { Request, Response } from "express";
