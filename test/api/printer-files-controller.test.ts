@@ -54,7 +54,7 @@ describe(PrinterFilesController.name, () => {
 
   it("should retrieve files on GET for existing printer", async () => {
     const printer = await createTestPrinter(request);
-    octoPrintApiService.storeResponse([], 200);
+    octoPrintApiService.storeResponse({ files: [], free: 1, total: 1 }, 200);
     const response = await request.get(getFilesRoute(printer.id, false)).send();
     expectOkResponse(response, []);
   });

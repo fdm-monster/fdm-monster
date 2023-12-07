@@ -55,7 +55,7 @@ export class PrinterFilesStore {
    */
   async eagerLoadPrinterFiles(printerId: IdType, recursive: boolean): Promise<any> {
     const loginDto = await this.printerCache.getLoginDtoAsync(printerId);
-    const response = await this.octoPrintApiService.getFileStorage(loginDto, recursive);
+    const response = await this.octoPrintApiService.getLocalFiles(loginDto, recursive);
 
     const files = response?.files;
     await this.updatePrinterFiles(printerId, files);
