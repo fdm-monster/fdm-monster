@@ -6,7 +6,7 @@ import { AppConstants } from "@/server.constants";
 import { PrintCompletion as Model } from "@/models";
 import { EVENT_TYPES } from "@/services/octoprint/constants/octoprint-websocket.constants";
 import { DITokens } from "@/container.tokens";
-import { IPrintCompletionService } from "@/services/interfaces/print-completion.service";
+import { IPrintCompletionService } from "@/services/interfaces/print-completion.interface";
 import supertest from "supertest";
 import { createTestPrinter } from "./test-data/create-printer";
 

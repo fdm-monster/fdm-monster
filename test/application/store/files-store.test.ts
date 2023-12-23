@@ -50,6 +50,11 @@ describe(PrinterFilesStore.name, () => {
     await printerFilesService.updateFiles(testPrinterState.id, [
       {
         date: Date.now() / 1000,
+        path: "123.file",
+        origin: "local",
+        display: "displayvalue",
+        name: "123.file",
+        hash: "123",
       },
     ]);
     await printerFilesStore.loadFilesStore();
@@ -69,9 +74,19 @@ describe(PrinterFilesStore.name, () => {
     await printerFilesService.updateFiles(testPrinterState.id, [
       {
         date: Date.now() / 1000,
+        path: "125.file",
+        origin: "local",
+        display: "displayvalue",
+        name: "125.file",
+        hash: "125",
       },
       {
         date: Date.now() / 1000 - 8 * 86400,
+        path: "124.file",
+        origin: "local",
+        display: "displayvalue",
+        name: "124.file",
+        hash: "124",
       },
     ]);
     await printerFilesStore.loadFilesStore();

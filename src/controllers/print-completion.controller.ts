@@ -5,7 +5,7 @@ import { PERMS } from "@/constants/authorization.constants";
 import { validateInput } from "@/handlers/validators";
 import { PrintCompletionSocketIoTask } from "@/tasks/print-completion.socketio.task";
 import { Request, Response } from "express";
-import { IPrintCompletionService } from "@/services/interfaces/print-completion.service";
+import { IPrintCompletionService } from "@/services/interfaces/print-completion.interface";
 
 export class PrintCompletionController {
   private printCompletionService: IPrintCompletionService;

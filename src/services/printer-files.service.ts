@@ -97,7 +97,9 @@ export class PrinterFilesService implements IPrinterFilesService<MongoIdType> {
   async deletePrinterFiles(printerId: MongoIdType, filePaths: string[], throwError = true) {
     const printer = await this.printerService.get(printerId);
 
-    if (!filePaths?.length) {
+    if (!!filePaths && !filePaths?.length) {
+      return;
+    } else if (!filePaths) {
       throw new Error("Cant delete specific printer files without specific file path array being provided");
     }
 
