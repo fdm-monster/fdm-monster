@@ -1,4 +1,4 @@
-import fs, { createReadStream, ReadStream, statSync } from "fs";
+import fs, { createReadStream, ReadStream } from "fs";
 import path from "path";
 import FormData from "form-data";
 import { multiPartContentType, pluginRepositoryUrl } from "./constants/octoprint-service.constants";
@@ -12,7 +12,6 @@ import { LoginDto } from "@/services/interfaces/login.dto";
 import { IdType } from "@/shared.constants";
 import { SettingsStore } from "@/state/settings.store";
 import { ILoggerFactory } from "@/handlers/logger-factory";
-import Throttle from "throttle";
 
 export class OctoPrintApiService extends OctoPrintRoutes {
   eventEmitter2: EventEmitter2;

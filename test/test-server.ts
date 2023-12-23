@@ -15,9 +15,6 @@ jest.mock("../src/utils/env.utils", () => ({
 }));
 require("../src/utils/env.utils");
 
-/**
- * Setup the application without hassle
- */
 export async function setupTestApp(
   loadPrinterStore = false,
   mocks: any = undefined,

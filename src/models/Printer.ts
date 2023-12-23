@@ -7,9 +7,9 @@ export interface IPrinter {
   enabled: boolean;
   disabledReason: string;
   name: string;
+  assignee: string;
   currentUser: string;
   dateAdded: number;
-  fileList: [];
   feedRate: number;
   flowRate: number;
 }
@@ -32,6 +32,10 @@ export const PrinterSchema = new Schema<IPrinter>({
     type: String,
     required: false,
   },
+  assignee: {
+    type: String,
+    required: false,
+  },
   name: {
     type: String,
     required: true,
@@ -44,12 +48,6 @@ export const PrinterSchema = new Schema<IPrinter>({
   dateAdded: {
     type: Number,
     required: false,
-  },
-  // Obsolete in v1.6.0
-  fileList: {
-    type: Array,
-    default: [],
-    required: true,
   },
   feedRate: {
     type: Number,
