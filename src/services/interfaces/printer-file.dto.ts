@@ -1,4 +1,5 @@
 import { GcodeAnalysisDto } from "@/services/interfaces/gcode-analysis.dto";
+import { IdDto, IdType } from "@/shared.constants";
 
 export interface LastPrintMoment {
   date: number;
@@ -26,7 +27,9 @@ export interface Statistics {
   };
 }
 
-export class PrinterFileDto {
+export class PrinterFileDto<KeyType = IdType> extends IdDto<KeyType> {
+  printerId: KeyType;
+
   name: string;
   date: number;
   display: string;

@@ -18,12 +18,6 @@ interface CachedPrinter {
   disabledReason: string;
   name: string;
   dateAdded: number;
-  fileList: {
-    files: Array<any>;
-    folders: Array<any>;
-    free: number;
-    total: number;
-  };
   feedRate: number;
   flowRate: number;
 }
