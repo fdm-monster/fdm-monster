@@ -19,7 +19,6 @@ const moveFileOrFolderRoute = (id: string) => `${getRoute(id)}/move`;
 const deleteFileOrFolderRoute = (id: string, path: string) => `${getRoute(id)}?path=${path}`;
 const selectAndPrintRoute = (id: string) => `${getRoute(id)}/select`;
 const uploadFileRoute = (id: string) => `${getRoute(id)}/upload`;
-const localUploadFileRoute = (id: string) => `${getRoute(id)}/local-upload`;
 const createFolderRoute = (id: string) => `${getRoute(id)}/create-folder`;
 const getFilesRoute = (id: string, recursive: boolean) => `${getRoute(id)}?recursive=${recursive}`;
 const getCacheRoute = (id: string) => `${getRoute(id)}/cache`;
@@ -196,7 +195,7 @@ describe(PrinterFilesController.name, () => {
         hash: "a791a7c44a92e4c46827992a1c5a62281e5a2d13",
         name: "file.gcode",
         origin: "local",
-        path: "file.gcode",
+        path: gcodePath,
         prints: {
           failure: 0,
           last: {
@@ -285,31 +284,5 @@ describe(PrinterFilesController.name, () => {
     const printer = await createTestPrinter(request);
     const response = await request.post(uploadFileRoute(printer.id)).send();
     expectInvalidResponse(response);
-  });
-
-  it("should error 400 on POST to upload local file being a folder", async () => {
-    // We let it fail as late as possible checking the error to not be related to our API
-    const printer = await createTestPrinter(request);
-    octoPrintApiService.storeResponse({}, 200);
-    const response = await request.post(localUploadFileRoute(printer.id)).send({
-      localLocation: "node_modules",
-      select: true,
-      print: true,
-    });
-
-    expectInvalidResponse(response, ["localLocation"]);
-  });
-
-  it("should error 404 on POST to upload local non-existing file", async () => {
-    // We let it fail as late as possible checking the error to not be related to our API
-    const printer = await createTestPrinter(request);
-    octoPrintApiService.storeResponse({}, 200);
-    const response = await request.post(localUploadFileRoute(printer.id)).send({
-      localLocation: "test-file.gcode",
-      select: true,
-      print: true,
-    });
-
-    expectNotFoundResponse(response);
   });
 });
