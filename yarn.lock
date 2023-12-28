@@ -5815,10 +5815,10 @@ mongodb-memory-server@9.1.3:
     mongodb-memory-server-core "9.1.3"
     tslib "^2.6.2"
 
-mongodb@4.17.1:
-  version "4.17.1"
-  resolved "https://registry.yarnpkg.com/mongodb/-/mongodb-4.17.1.tgz#ccff6ddbda106d5e06c25b0e4df454fd36c5f819"
-  integrity sha512-MBuyYiPUPRTqfH2dV0ya4dcr2E5N52ocBuZ8Sgg/M030nGF78v855B3Z27mZJnp8PxjnUquEnAtjOsphgMZOlQ==
+mongodb@4.17.2:
+  version "4.17.2"
+  resolved "https://registry.yarnpkg.com/mongodb/-/mongodb-4.17.2.tgz#237c0534e36a3449bd74c6bf6d32f87a1ca7200c"
+  integrity sha512-mLV7SEiov2LHleRJPMPrK2PMyhXFZt2UQLC4VD4pnth3jMjYKHhtqfwwkkvS/NXuo/Fp3vbhaNcXrIDaLRb9Tg==
   dependencies:
     bson "^4.7.2"
     mongodb-connection-string-url "^2.6.0"
@@ -5847,14 +5847,14 @@ mongodb@^6.1.0:
     bson "^6.2.0"
     mongodb-connection-string-url "^3.0.0"
 
-mongoose@6.12.3:
-  version "6.12.3"
-  resolved "https://registry.yarnpkg.com/mongoose/-/mongoose-6.12.3.tgz#bc921ca2fd6d4c1a48dbf7bc88cf3eef1d3c4926"
-  integrity sha512-MNJymaaXali7w7rHBxVUoQ3HzHHMk/7I/+yeeoSa4rUzdjZwIWQznBNvVgc0A8ghuJwsuIkb5LyLV6gSjGjWyQ==
+mongoose@6.12.4:
+  version "6.12.4"
+  resolved "https://registry.yarnpkg.com/mongoose/-/mongoose-6.12.4.tgz#36c3876f9a8a53fc1d06f65d6dc1205efae359d2"
+  integrity sha512-CPfQytWHRfeG+TFDOnY7pAORxU3rvuDNVgH/UpMfa/Enf2+DD3J/PCt33MEcXt8X3PzF+1siEr1nADuLt6Oy6A==
   dependencies:
     bson "^4.7.2"
     kareem "2.5.1"
-    mongodb "4.17.1"
+    mongodb "4.17.2"
     mpath "0.9.0"
     mquery "4.0.3"
     ms "2.1.3"
