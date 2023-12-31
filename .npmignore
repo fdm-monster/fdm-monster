@@ -33,7 +33,6 @@ GitReleaseManager.yaml
 *.ps1
 coverage
 docker
-docs
 src
 fdm-monster
 installations

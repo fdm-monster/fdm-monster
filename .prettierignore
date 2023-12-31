@@ -5,7 +5,6 @@
 **/coverage
 **/.github
 docker
-**/docs
 **/images
 **/fdm-monster
 **/file-storage
