@@ -5928,10 +5928,10 @@ mongodb@^6.1.0:
     bson "^6.2.0"
     mongodb-connection-string-url "^3.0.0"
 
-mongoose@6.12.4:
-  version "6.12.4"
-  resolved "https://registry.yarnpkg.com/mongoose/-/mongoose-6.12.4.tgz#36c3876f9a8a53fc1d06f65d6dc1205efae359d2"
-  integrity sha512-CPfQytWHRfeG+TFDOnY7pAORxU3rvuDNVgH/UpMfa/Enf2+DD3J/PCt33MEcXt8X3PzF+1siEr1nADuLt6Oy6A==
+mongoose@6.12.5:
+  version "6.12.5"
+  resolved "https://registry.yarnpkg.com/mongoose/-/mongoose-6.12.5.tgz#13104117eeb18e0870062fde8b9341a3948e83f3"
+  integrity sha512-lG+FlJ1ItmwtQ4JPT1KqOsHp5HiD/LvjssRp7zmruZ5UDBSGWeht1rYPMzb1t70SNhMJDuimL5qvIi+AQiJFlQ==
   dependencies:
     bson "^4.7.2"
     kareem "2.5.1"
