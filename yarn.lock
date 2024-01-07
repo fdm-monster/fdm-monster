@@ -2749,13 +2749,13 @@ awilix-router-core@^1.6.1:
     glob "^7.1.3"
     tslib "^1.9.3"
 
-awilix@9.0.0:
-  version "9.0.0"
-  resolved "https://registry.yarnpkg.com/awilix/-/awilix-9.0.0.tgz#965cad9e3ed210ba2d84165c40185cbe3dd4f041"
-  integrity sha512-DVhdT1sbCCjGBvJbNKJaPSh+JVvgzUV0Rbdq3r3/MqxDgm7e/zs8aAhWI8O8nFNFvUYFtJPqWsFldyzC2rpMnA==
+awilix@10.0.0:
+  version "10.0.0"
+  resolved "https://registry.yarnpkg.com/awilix/-/awilix-10.0.0.tgz#b8b92445e091c76f3d5cd4f2c7c9c44a7bfd471c"
+  integrity sha512-d5V9mQ6AHF9expChh+kh61rUBWrkBSYvGslkMOlljibV0Cs4M1Kzl/ieRKJ9nI/46SRGbGV/grbnf6JUYn9GsQ==
   dependencies:
     camel-case "^4.1.2"
-    fast-glob "^3.3.1"
+    fast-glob "^3.3.2"
 
 axios@1.6.5:
   version "1.6.5"
@@ -4151,7 +4151,7 @@ fast-fifo@^1.1.0, fast-fifo@^1.2.0:
   resolved "https://registry.yarnpkg.com/fast-fifo/-/fast-fifo-1.3.2.tgz#286e31de96eb96d38a97899815740ba2a4f3640c"
   integrity sha512-/d9sfos4yxzpwkDkuN7k2SqFKtYNmCTzgfEpz82x34IM9/zc8KGxQoXg1liNC/izpRM/MBdt44Nmx41ZWqk+FQ==
 
-fast-glob@^3.2.5, fast-glob@^3.3.1:
+fast-glob@^3.2.5, fast-glob@^3.3.2:
   version "3.3.2"
   resolved "https://registry.yarnpkg.com/fast-glob/-/fast-glob-3.3.2.tgz#a904501e57cfdd2ffcded45e99a54fef55e46129"
   integrity sha512-oX2ruAFQwf/Orj8m737Y5adxDQO0LAB7/S5MnxCdTNDd4p6BsyIVsv9JQsATbTSq8KHRpLwIHbVlUNatxd+1Ow==
