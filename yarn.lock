@@ -2735,13 +2735,13 @@ available-typed-arrays@^1.0.5:
   resolved "https://registry.yarnpkg.com/available-typed-arrays/-/available-typed-arrays-1.0.5.tgz#92f95616501069d07d10edb2fc37d3e1c65123b7"
   integrity sha512-DMD0KiN46eipeziST1LPP/STfDU0sufISXmjSgvVsoU2tqxctQeASejWcfNtxYKqETM1UxQ8sp2OrSBWpHY6sw==
 
-awilix-express@8.0.0:
-  version "8.0.0"
-  resolved "https://registry.yarnpkg.com/awilix-express/-/awilix-express-8.0.0.tgz#4416204308b78935a1cb1c98a8686ca3ed9c6b30"
-  integrity sha512-UxMhm6DSl0lTiuQHgDMnSG86+gNYlhIWgFwmy/DkqYhfE6rHpKFfBaDsdUreEn1N9DeIi41dFxWGJI1OEzID2Q==
+awilix-express@9.0.1:
+  version "9.0.1"
+  resolved "https://registry.yarnpkg.com/awilix-express/-/awilix-express-9.0.1.tgz#08c3255843d6b942aadaafe512ee864030c0fb0d"
+  integrity sha512-F287qM5MD5PXMQGtXfvdq19dmOv8e6/tjhUh7xFlrYxQiO1WwZfKnP2arZuOaDOKZYtkFpb/0hm9CN7nzZv0Ww==
   dependencies:
     awilix-router-core "^1.6.1"
-    tslib "^2.3.1"
+    tslib "^2.6.2"
 
 awilix-router-core@^1.6.1:
   version "1.6.1"
