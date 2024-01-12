@@ -24,7 +24,6 @@ export class PrintCompletionService implements IPrintCompletionService<MongoIdTy
       context: entity.context,
       fileName: entity.fileName,
       createdAt: entity.createdAt,
-      correlationId: entity.correlationId,
       status: entity.status,
       printerId: entity.printerId.toString(),
     };
