@@ -61,7 +61,7 @@
     "bcryptjs": "2.4.3",
     "better-sqlite3": "9.2.2",
     "cache-manager": "4.1.0",
-    "class-validator": "0.14.0",
+    "class-validator": "0.14.1",
     "connect-history-api-fallback": "2.0.0",
     "cookie-parser": "1.4.6",
     "cors": "2.8.5",
