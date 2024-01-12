@@ -1,15 +1,12 @@
-import { findFileIndex } from "@/utils/find-predicate.utils";
 import { ValidationException } from "@/exceptions/runtime.exceptions";
-import { getFileListDefault } from "@/constants/service.constants";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IdType } from "@/shared.constants";
+import { PrinterFileDto } from "@/services/interfaces/printer-file.dto";
+import { IPrinterFile } from "@/models/PrinterFile";
 
-/**
- * A generic cache for file references, which will be abstracted in future to allow for proxy files and local files.
- */
 export class FileCache {
-  private printerFileStorage = {};
+  private printerFileStorage: Record<IdType, (IPrinterFile | PrinterFileDto)[]> = {};
   private totalFileCount = 0;
 
   private logger: LoggerService;
@@ -18,66 +15,26 @@ export class FileCache {
     this.logger = loggerFactory(FileCache.name);
   }
 
-  /**
-   * Save a printer storage reference to cache
-   * @param printerId
-   * @param fileList
-   * @param storage
-   */
-  cachePrinterFileStorage(printerId: IdType, { fileList, storage }) {
-    this.cachePrinterStorage(printerId, storage);
-
-    this.cachePrinterFiles(printerId, fileList);
-  }
-
-  cachePrinterFiles(printerId: IdType, fileList) {
-    const printerFileStorage = this.getPrinterFileStorage(printerId);
-
-    printerFileStorage.fileList = fileList;
-
-    this.updateCacheFileRefCount();
-  }
-
-  cachePrinterStorage(printerId: IdType, storage) {
-    const printerFileStorage = this.getPrinterFileStorage(printerId);
-
-    printerFileStorage.storage = storage;
-
-    this.updateCacheFileRefCount();
-  }
-
-  private getPrinterFileStorage(printerId: IdType) {
+  cachePrinterFiles(printerId: IdType, files: (IPrinterFile | PrinterFileDto)[]) {
     if (!printerId) {
       throw new Error("File Cache cant get a null/undefined printer id");
     }
-
-    let fileStorage = this.printerFileStorage[printerId];
-
-    if (!fileStorage) {
-      // A runtime thing only, repository handles it differently
-      fileStorage = this.printerFileStorage[printerId] = {
-        fileList: getFileListDefault(),
-        storage: undefined,
-      };
-    }
-
-    return fileStorage;
+    this.printerFileStorage[printerId] = files;
+    this.updateCacheFileRefCount();
   }
 
   getPrinterFiles(printerId: IdType) {
-    const fileStorage = this.getPrinterFileStorage(printerId);
-    return fileStorage?.fileList;
-  }
-
-  getPrinterStorage(printerId: IdType) {
-    const fileStorage = this.getPrinterFileStorage(printerId);
-    return fileStorage?.storage;
+    if (!printerId) {
+      throw new Error("File Cache cant get a null/undefined printer id");
+    }
+    this.printerFileStorage[printerId] = this.getPrinterFileStorage(printerId);
+    return this.getPrinterFileStorage(printerId);
   }
 
   updateCacheFileRefCount() {
     let totalFiles = 0;
     for (const storage of Object.values(this.printerFileStorage)) {
-      totalFiles += storage.fileList?.files?.length || 0;
+      totalFiles += storage?.length || 0;
     }
 
     if (totalFiles !== this.totalFileCount) {
@@ -106,9 +63,10 @@ export class FileCache {
   }
 
   purgeFile(printerId: IdType, filePath: string) {
-    const { fileList } = this.getPrinterFileStorage(printerId);
+    const files = this.getPrinterFileStorage(printerId);
+    if (!files) return;
 
-    const fileIndex = findFileIndex(fileList, filePath);
+    const fileIndex = files.findIndex((f) => f.path === filePath);
     if (fileIndex === -1) {
       // We can always choose to throw - if we trust the cache consistency
       this.logger.warn(
@@ -119,7 +77,15 @@ export class FileCache {
       return this.logger.log("File was not found in cached printer fileList");
     }
 
-    fileList.files.splice(fileIndex, 1);
+    files.splice(fileIndex, 1);
     this.logger.log(`File ${filePath} was removed`);
+  }
+
+  private getPrinterFileStorage(printerId: IdType) {
+    if (!printerId) {
+      throw new Error("File Cache cant get a null/undefined printer id");
+    }
+
+    return this.printerFileStorage[printerId];
   }
 }

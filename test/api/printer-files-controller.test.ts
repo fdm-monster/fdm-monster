@@ -19,7 +19,6 @@ const moveFileOrFolderRoute = (id: string) => `${getRoute(id)}/move`;
 const deleteFileOrFolderRoute = (id: string, path: string) => `${getRoute(id)}?path=${path}`;
 const selectAndPrintRoute = (id: string) => `${getRoute(id)}/select`;
 const uploadFileRoute = (id: string) => `${getRoute(id)}/upload`;
-const localUploadFileRoute = (id: string) => `${getRoute(id)}/local-upload`;
 const createFolderRoute = (id: string) => `${getRoute(id)}/create-folder`;
 const getFilesRoute = (id: string, recursive: boolean) => `${getRoute(id)}?recursive=${recursive}`;
 const getCacheRoute = (id: string) => `${getRoute(id)}/cache`;
@@ -40,14 +39,6 @@ beforeEach(async () => {
 describe(PrinterFilesController.name, () => {
   const gcodePath = "test/api/test-data/sample.gcode";
   const invalidGcodePath = "test/api/test-data/sample.gco";
-  const nockResponse = {
-    files: {
-      local: {
-        path: "/home/yes",
-        name: "3xP1234A_PLA_ParelWit_1h31m.gcode",
-      },
-    },
-  };
 
   it(`should return 404 on ${defaultRoute} for nonexisting printer`, async () => {
     const res = await request.get(getRoute("60ae2b760bca4f5930be3d88")).send();
@@ -62,7 +53,7 @@ describe(PrinterFilesController.name, () => {
 
   it("should retrieve files on GET for existing printer", async () => {
     const printer = await createTestPrinter(request);
-    octoPrintApiService.storeResponse([], 200);
+    octoPrintApiService.storeResponse({ files: [], free: 1, total: 1 }, 200);
     const response = await request.get(getFilesRoute(printer.id, false)).send();
     expectOkResponse(response, []);
   });
@@ -148,17 +139,93 @@ describe(PrinterFilesController.name, () => {
   it("should allow POST upload file", async () => {
     const printer = await createTestPrinter(request);
 
-    nock(printer.printerURL)
-      .post("/api/files/local")
-      .reply(200, {
-        files: {
-          local: {
-            path: "/home/yes",
-            name: "3xP1234A_PLA_ParelWit_1h31m.gcode",
+    const apiMock = nock(printer.printerURL);
+    apiMock.post("/api/files/local").reply(200, {
+      files: {
+        local: {
+          path: "file.gcode",
+          name: "file.gcode",
+        },
+      },
+    });
+    octoPrintApiService.storeResponse(
+      {
+        DisplayLayerProgress: {
+          totalLayerCountWithoutOffset: "19",
+        },
+        date: 1689190590,
+        display: "file.gcode",
+        gcodeAnalysis: {
+          analysisFirstFilamentPrintTime: 11.23491561690389,
+          analysisLastFilamentPrintTime: 7657.739990697696,
+          analysisPending: false,
+          analysisPrintTime: 7664.035725705694,
+          compensatedPrintTime: 7811.063505072208,
+          dimensions: {
+            depth: 171.8769989013672,
+            height: 3.799999952316284,
+            width: 128.8769989013672,
+          },
+          estimatedPrintTime: 7811.063505072208,
+          filament: {
+            tool0: {
+              length: 12463.312793658377,
+              volume: 29.977780370085828,
+            },
+          },
+          firstFilament: 0.00556784805395266,
+          lastFilament: 0.9944192313637905,
+          printingArea: {
+            maxX: 188.8769989013672,
+            maxY: 168.8769989013672,
+            maxZ: 3.799999952316284,
+            minX: 60.0,
+            minY: -3.0,
+            minZ: 0,
+          },
+          progress: [
+            [0, 7811.063505072208],
+            // ...
+            [0.9882939524753298, 77.78355728284184],
+            [0.9934423430553024, 17.78153162482447],
+            [0.9944192313637905, 7.3489461642040395],
+            [1, 0],
+          ],
+        },
+        hash: "a791a7c44a92e4c46827992a1c5a62281e5a2d13",
+        name: "file.gcode",
+        origin: "local",
+        path: gcodePath,
+        prints: {
+          failure: 0,
+          last: {
+            date: 1689197785.1172757,
+            printTime: 7194.159933987998,
+            success: true,
+          },
+          success: 1,
+        },
+        refs: {
+          download: "http://minipi.local/downloads/files/local/file.gcode",
+          resource: "http://minipi.local/api/files/local/file.gcode",
+        },
+        size: 2167085,
+        statistics: {
+          averagePrintTime: {
+            _default: 7194.159933987998,
+          },
+          lastPrintTime: {
+            _default: 7194.159933987998,
           },
         },
-      })
-      .persist();
+        thumbnail: "plugin/prusaslicerthumbnails/thumbnail/file.png?20230712213630",
+        thumbnail_src: "prusaslicerthumbnails",
+        type: "machinecode",
+        typePath: ["machinecode", "gcode"],
+      },
+
+      200
+    );
 
     const response = await request.post(uploadFileRoute(printer.id)).field("print", true).attach("file", gcodePath);
     expectOkResponse(response);
@@ -174,6 +241,9 @@ describe(PrinterFilesController.name, () => {
           local: {
             path: "/home/yes",
             name: "3xP1234A_PLA_ParelWit_1h31m.gcode",
+            hash: "123",
+            origin: "local",
+            display: "123",
           },
         },
       })
@@ -197,6 +267,9 @@ describe(PrinterFilesController.name, () => {
           local: {
             path: "/home/yes",
             name: "3xP1234A_PLA_ParelWit_1h31m.gcode",
+            hash: "123",
+            origin: "local",
+            display: "123",
           },
         },
       })
@@ -211,31 +284,5 @@ describe(PrinterFilesController.name, () => {
     const printer = await createTestPrinter(request);
     const response = await request.post(uploadFileRoute(printer.id)).send();
     expectInvalidResponse(response);
-  });
-
-  it("should error 400 on POST to upload local file being a folder", async () => {
-    // We let it fail as late as possible checking the error to not be related to our API
-    const printer = await createTestPrinter(request);
-    octoPrintApiService.storeResponse({}, 200);
-    const response = await request.post(localUploadFileRoute(printer.id)).send({
-      localLocation: "node_modules",
-      select: true,
-      print: true,
-    });
-
-    expectInvalidResponse(response, ["localLocation"]);
-  });
-
-  it("should error 404 on POST to upload local non-existing file", async () => {
-    // We let it fail as late as possible checking the error to not be related to our API
-    const printer = await createTestPrinter(request);
-    octoPrintApiService.storeResponse({}, 200);
-    const response = await request.post(localUploadFileRoute(printer.id)).send({
-      localLocation: "test-file.gcode",
-      select: true,
-      print: true,
-    });
-
-    expectNotFoundResponse(response);
   });
 });

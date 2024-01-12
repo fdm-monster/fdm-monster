@@ -7,7 +7,6 @@ import {
   updatePrinterDisabledReasonRule,
   updatePrinterEnabledRule,
 } from "./validators/printer-service.validation";
-import { getDefaultPrinterEntry } from "@/constants/service.constants";
 import { printerEvents } from "@/constants/event.constants";
 import { LoggerService } from "@/handlers/logger";
 import { normalizeURLWithProtocol } from "@/utils/url.utils";
@@ -68,7 +67,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
    * @param {boolean} emitEvent
    * @throws {Error} If the printer is not correctly provided.
    */
-  async create(newPrinter, emitEvent = true) {
+  async create(newPrinter: IPrinter, emitEvent = true) {
     if (!newPrinter) throw new Error("Missing printer");
 
     const mergedPrinter = await this.validateAndDefault(newPrinter);
@@ -86,7 +85,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
    * @param updateData
    * @returns {Promise<Query<Document<any, any, unknown> | null, Document<any, any, unknown>, {}, unknown>>}
    */
-  async update(printerId: MongoIdType, updateData) {
+  async update(printerId: MongoIdType, updateData: Partial<IPrinter>) {
     const printer = await this.get(printerId);
     updateData.printerURL = normalizeURLWithProtocol(updateData.printerURL);
     const { printerURL, apiKey, enabled, name } = await validateInput(updateData, createMongoPrinterRules);
@@ -227,9 +226,8 @@ export class PrinterService implements IPrinterService<MongoIdType> {
     return printer;
   }
 
-  private async validateAndDefault(printer): Promise<Object> {
+  private async validateAndDefault(printer): Promise<IPrinter> {
     const mergedPrinter = {
-      ...getDefaultPrinterEntry(),
       enabled: true,
       ...printer,
     };

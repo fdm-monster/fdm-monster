@@ -1,10 +1,11 @@
-import multer from "multer";
+import multer, { FileFilterCallback } from "multer";
 import { extname, join } from "path";
 import { createWriteStream, existsSync, lstatSync, mkdirSync, readdirSync, unlink } from "fs";
 import { superRootPath } from "@/utils/fs.utils";
 import { AppConstants } from "@/server.constants";
 import { AxiosStatic } from "axios";
 import { FileUploadTrackerCache } from "@/state/file-upload-tracker.cache";
+import { Request, Response } from "express";
 
 export class MulterService {
   fileUploadTrackerCache: FileUploadTrackerCache;
@@ -21,7 +22,7 @@ export class MulterService {
     this.httpClient = httpClient;
   }
 
-  getNewestFile(collection) {
+  getNewestFile(collection: string) {
     const dirPath = this.collectionPath(collection);
     const files = this.orderRecentFiles(dirPath);
     const latestFile = files.length ? files[0] : undefined;
@@ -44,12 +45,12 @@ export class MulterService {
     }
   }
 
-  fileExists(downloadFilename, collection) {
+  fileExists(downloadFilename: string, collection: string) {
     const downloadPath = join(superRootPath(), AppConstants.defaultFileStorageFolder, collection, downloadFilename);
     return existsSync(downloadPath);
   }
 
-  async downloadFile(downloadUrl, downloadFilename, collection) {
+  async downloadFile(downloadUrl: string, downloadFilename: string, collection: string) {
     const downloadFolder = join(superRootPath(), AppConstants.defaultFileStorageFolder, collection);
     if (!existsSync(downloadFolder)) {
       mkdirSync(downloadFolder, { recursive: true });
@@ -64,12 +65,12 @@ export class MulterService {
         return reject(err);
       });
       fileStream.on("finish", async () => {
-        return resolve();
+        return resolve(null);
       });
       fileStream.on("close", async () => {
-        return resolve();
+        return resolve(null);
       });
-      resolve();
+      resolve(null);
     });
   }
 
@@ -77,18 +78,19 @@ export class MulterService {
     return this.getMulterFileFilter(".gcode", storeAsFile);
   }
 
-  async multerLoadFileAsync(req, res, fileExtension, storeAsFile = true) {
-    return await new Promise((resolve, reject) =>
+  async multerLoadFileAsync(req: Request, res: Response, fileExtension: string, storeAsFile = true) {
+    return await new Promise<Express.Multer.File[]>((resolve, reject) =>
       this.getMulterFileFilter(fileExtension, storeAsFile)(req, res, (err) => {
         if (err) {
           return reject(err);
         }
-        resolve(req.files);
+        // Expected type: Express.Multer.File[]
+        resolve(req.files as Express.Multer.File[]);
       })
     );
   }
 
-  getMulterFileFilter(fileExtension, storeAsFile = true) {
+  getMulterFileFilter(fileExtension: string, storeAsFile = true) {
     return multer({
       storage: storeAsFile
         ? multer.diskStorage({
@@ -99,8 +101,8 @@ export class MulterService {
     }).any();
   }
 
-  multerFileFilter(extension) {
-    return (req, file, callback) => {
+  multerFileFilter(extension: string) {
+    return (req: Request, file: Express.Multer.File, callback: FileFilterCallback) => {
       const ext = extname(file.originalname);
       if (extension?.length && ext !== extension) {
         return callback(new Error(`Only files with extension ${extension} are allowed`));
@@ -109,7 +111,7 @@ export class MulterService {
     };
   }
 
-  startTrackingSession(multerFile) {
+  startTrackingSession(multerFile: Express.Multer.File) {
     return this.fileUploadTrackerCache.addUploadTracker(multerFile);
   }
 
@@ -117,18 +119,14 @@ export class MulterService {
     return this.fileUploadTrackerCache.getUploads();
   }
 
-  /**
-   *@param dir
-   * @returns {{file: *, mtime: Date}[]}
-   */
-  private orderRecentFiles = (dir) => {
+  private orderRecentFiles = (dir: string): { file: any; mtime: Date }[] => {
     return readdirSync(dir)
       .filter((file) => lstatSync(join(dir, file)).isFile())
       .map((file) => ({ file, mtime: lstatSync(join(dir, file)).mtime }))
       .sort((a, b) => b.mtime.getTime() - a.mtime.getTime());
   };
 
-  private collectionPath(collection): string {
+  private collectionPath(collection: string): string {
     return join(superRootPath(), AppConstants.defaultFileStorageFolder, collection);
   }
 }

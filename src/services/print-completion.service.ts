@@ -5,7 +5,7 @@ import { EVENT_TYPES } from "./octoprint/constants/octoprint-websocket.constants
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { MongoIdType } from "@/shared.constants";
-import { IPrintCompletionService } from "@/services/interfaces/print-completion.service";
+import { IPrintCompletionService } from "@/services/interfaces/print-completion.interface";
 import { CreatePrintCompletionDto, PrintCompletionContext, PrintCompletionDto } from "@/services/interfaces/print-completion.dto";
 import { IPrintCompletion } from "@/models/PrintCompletion";
 import { processCompletions } from "@/services/print-completion.shared";
@@ -24,7 +24,6 @@ export class PrintCompletionService implements IPrintCompletionService<MongoIdTy
       context: entity.context,
       fileName: entity.fileName,
       createdAt: entity.createdAt,
-      correlationId: entity.correlationId,
       status: entity.status,
       printerId: entity.printerId.toString(),
     };

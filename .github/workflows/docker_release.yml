@@ -14,7 +14,7 @@ jobs:
         # https://gist.github.com/DarrenN/8c6a5b969481725a4413?permalink_comment_id=3863317#gistcomment-3863317
         run: |
           echo "SERVER_VERSION=$(npm pkg get version | sed 's/"//g')" >> $GITHUB_ENV
-      - uses: mukunku/tag-exists-action@v1.4.0
+      - uses: mukunku/tag-exists-action@v1.5.0
         id: checkTag
         with:
           tag: ${{ env.SERVER_VERSION }}
@@ -32,7 +32,7 @@ jobs:
       - id: metadata
         uses: crazy-max/ghaction-docker-meta@v5
         with:
-          images: davidzwa/fdm-monster
+          images: fdmmonster/fdm-monster
 
   docker:
     needs: [ meta, checkversion ]
@@ -77,6 +77,19 @@ jobs:
           extra_tags: |
             latest::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
 
+      - name: Tagging Strategy new org
+        id: tagging2
+        uses: HackerHappyHour/tagging-strategy@v3
+        with:
+          image_name: fdmmonster/fdm-monster
+          tag_name: ${{ env.SERVER_VERSION }}
+          tags: |
+            %X%::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
+            %X.Y%::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
+            %X.Y.Z%
+          extra_tags: |
+            latest::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}            
+
       # Show docker tags to be (conditionally) pushed
       - name: "Show docker tags"
         run: |
@@ -107,6 +120,21 @@ jobs:
           tags: ${{ steps.tagging.outputs.tags }}
           labels: ${{ needs.meta.outputs.labels }}
 
+      - name: Build and push
+        id: docker_build_new
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          context: "{{defaultContext}}"
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
+          file: ./docker/Dockerfile
+          tags: ${{ steps.tagging2.outputs.tags }}
+          labels: ${{ needs.meta.outputs.labels }}
+
       # Show image digest output
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
+
+      - name: Image digest 2
+        run: echo ${{ steps.docker_build_new.outputs.digest }}

@@ -6,6 +6,7 @@ import EventEmitter2 from "eventemitter2";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IdType } from "@/shared.constants";
 import { LoggerService } from "@/handlers/logger";
+import { OctoPrintEventDto } from "@/services/octoprint/dto/octoprint-event.dto";
 
 export interface PrinterEventsCacheDto {
   current: any;
@@ -81,10 +82,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
     this.eventEmitter2.on(printerEvents.printersDeleted, this.handlePrintersDeleted.bind(this));
   }
 
-  /**
-   * @param {OctoPrintEventDto} e
-   */
-  private async onPrinterSocketMessage(e) {
+  private async onPrinterSocketMessage(e: OctoPrintEventDto) {
     const printerId = e.printerId;
     if (e.event !== "plugin" && e.event !== "event") {
       await this.setEvent(printerId, e.event, null, e.event === "history" ? this.pruneHistoryPayload(e.payload) : e.payload);

@@ -46,11 +46,11 @@ export class OctoPrintRoutes {
   pluginManagerPlugins = `${this.pluginManager}/plugins`; // Fast
   pluginManagerExport = `${this.pluginManager}/export`;
   pluginManagerOrphans = `${this.pluginManager}/orphans`;
-  _settingsStore;
-  _timeouts: ITimeoutSettings;
+  settingsStore: SettingsStore;
+  timeouts: ITimeoutSettings;
 
   constructor({ settingsStore }: { settingsStore: SettingsStore }) {
-    this._settingsStore = settingsStore;
+    this.settingsStore = settingsStore;
   }
 
   get disconnectCommand() {
@@ -126,25 +126,25 @@ export class OctoPrintRoutes {
     };
   }
 
-  _ensureTimeoutSettingsLoaded() {
-    const serverSettings = this._settingsStore.getSettings();
-    this._timeouts = { ...serverSettings[timeoutSettingKey] };
+  ensureTimeoutSettingsLoaded() {
+    const serverSettings = this.settingsStore.getSettings();
+    this.timeouts = { ...serverSettings[timeoutSettingKey] };
 
-    if (!this._timeouts) {
+    if (!this.timeouts) {
       throw new Error(
         "OctoPrint API Service could not load timeout settings. settingsStore:Settings:timeout didnt return anything"
       );
     }
   }
 
-  protected _prepareRequest(login: LoginDto, path: string, timeoutOverride?: number, contentType = jsonContentType) {
-    this._ensureTimeoutSettingsLoaded();
+  protected prepareRequest(login: LoginDto, path: string, timeoutOverride?: number, contentType = jsonContentType) {
+    this.ensureTimeoutSettingsLoaded();
 
     const { apiKey, printerURL } = validateLogin(login);
 
     let headers = constructHeaders(apiKey, contentType);
 
-    let timeout = timeoutOverride || this._timeouts.apiTimeout;
+    let timeout = timeoutOverride || this.timeouts.apiTimeout;
     if (timeout <= 0) {
       timeout = getDefaultTimeout().apiTimeout;
     }
@@ -158,13 +158,13 @@ export class OctoPrintRoutes {
     };
   }
 
-  _prepareAnonymousRequest(path: string, timeoutOverride?: number, contentType = jsonContentType) {
-    this._ensureTimeoutSettingsLoaded();
+  prepareAnonymousRequest(path: string, timeoutOverride?: number, contentType = jsonContentType) {
+    this.ensureTimeoutSettingsLoaded();
 
     let headers = {
       [contentTypeHeaderKey]: contentType,
     };
-    let timeout = timeoutOverride || this._timeouts.apiTimeout;
+    let timeout = timeoutOverride || this.timeouts.apiTimeout;
     if (timeout <= 0) {
       timeout = getDefaultTimeout().apiTimeout;
     }
@@ -179,8 +179,8 @@ export class OctoPrintRoutes {
   }
 
   // Unused because we dont have any PUT/PATCH/POST with relevant data so far
-  _prepareJsonRequest(login: LoginDto, path: string, data: any, timeoutOverride?: number) {
-    const { url, options } = this._prepareRequest(login, path, timeoutOverride);
+  prepareJsonRequest(login: LoginDto, path: string, data: any, timeoutOverride?: number) {
+    const { url, options } = this.prepareRequest(login, path, timeoutOverride);
 
     // We must allow file uploads elsewhere, so be explicit about the content type and data in this JSON request
     let serializedData = data ? JSON.stringify(data) : undefined;

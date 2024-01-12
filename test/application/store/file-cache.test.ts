@@ -12,22 +12,11 @@ beforeEach(() => {
 });
 
 const testPrinterId = "asd";
-const fileStorageEntry = {
-  fileList: [1],
-  storage: {},
-};
+const fileStorageEntry = [{ id: "1", name: "123" }];
 
 describe(FileCache.name, function () {
-  it("should generate printer file cache without strict checks", function () {
-    const fileStorageEntryNoStorage = {
-      fileList: [1],
-    };
-    fileCache.cachePrinterFileStorage(testPrinterId, fileStorageEntryNoStorage);
-    expect(fileCache.getPrinterFiles(testPrinterId)).toEqual([1]);
-    expect(fileCache.getPrinterStorage(testPrinterId)).toBeUndefined();
-
-    fileCache.cachePrinterFileStorage(testPrinterId, fileStorageEntry);
-    expect(fileCache.getPrinterFiles(testPrinterId)).toEqual([1]);
-    expect(fileCache.getPrinterStorage(testPrinterId)).toEqual({});
+  it("should generate printer file cache", function () {
+    fileCache.cachePrinterFiles(testPrinterId, fileStorageEntry);
+    expect(fileCache.getPrinterFiles(testPrinterId)).toStrictEqual(fileStorageEntry);
   });
 });

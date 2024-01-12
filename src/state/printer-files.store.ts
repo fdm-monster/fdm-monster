@@ -6,6 +6,8 @@ import { LoggerService } from "@/handlers/logger";
 import { IdType } from "@/shared.constants";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IPrinterFilesService } from "@/services/interfaces/printer-files.service.interface";
+import { errorSummary } from "@/utils/error.utils";
+import { PrinterFileDto } from "@/services/interfaces/printer-file.dto";
 
 export class PrinterFilesStore {
   printerCache: PrinterCache;
@@ -35,33 +37,25 @@ export class PrinterFilesStore {
     this.logger = loggerFactory(PrinterFilesStore.name);
   }
 
-  /**
-   * Load the file store by grabbing files from the service. TODO move files out of printer
-   */
   async loadFilesStore(): Promise<void> {
     const printers = await this.printerCache.listCachedPrinters(true);
     for (let printer of printers) {
       try {
-        const printerFileStorage = await this.printerFilesService.getPrinterFilesStorage(printer.id);
-        this.fileCache.cachePrinterFileStorage(printer.id, printerFileStorage);
+        const printerFiles = await this.printerFilesService.getPrinterFiles(printer.id);
+        this.fileCache.cachePrinterFiles(printer.id, printerFiles);
       } catch (e) {
-        this.logger.error("Files store failed to reconstruct files from database.", e.stack);
+        this.logger.error("Files store failed to reconstruct files from database.", errorSummary(e));
       }
     }
   }
 
-  /**
-   * Performs an OctoPrint call and updates both cache and database
-   */
   async eagerLoadPrinterFiles(printerId: IdType, recursive: boolean): Promise<any> {
     const loginDto = await this.printerCache.getLoginDtoAsync(printerId);
-    const response = await this.octoPrintApiService.getFiles(loginDto, recursive, {
-      unwrap: false,
-      simple: true,
-    });
+    const response = await this.octoPrintApiService.getLocalFiles(loginDto, recursive);
 
-    await this.updatePrinterFiles(printerId, response.data);
-    return response;
+    const files = response?.files;
+    await this.updatePrinterFiles(printerId, files);
+    return files;
   }
 
   getFiles(printerId: IdType) {
@@ -72,9 +66,9 @@ export class PrinterFilesStore {
   getOutdatedFiles(printerId: IdType, ageDaysMax: number) {
     if (!ageDaysMax) throw new ValidationException("ageDaysMax property is required to get printer's outdated files");
     const printerFiles = this.getFiles(printerId);
-    if (!printerFiles?.files?.length) return [];
+    if (!printerFiles?.length) return [];
     const nowTimestampSeconds = Date.now() / 1000;
-    return printerFiles.files.filter((file) => !!file.date && file.date + ageDaysMax * 86400 < nowTimestampSeconds);
+    return printerFiles.filter((file) => !!file.date && file.date + ageDaysMax * 86400 < nowTimestampSeconds);
   }
 
   async deleteOutdatedFiles(printerId: IdType, ageDaysMax: number) {
@@ -128,31 +122,18 @@ export class PrinterFilesStore {
     this.logger.log(`Clearing caches successful.`);
   }
 
-  async updatePrinterFiles(printerId: IdType, files) {
+  async updatePrinterFiles(printerId: IdType, files: PrinterFileDto[]) {
     const printer = await this.printerCache.getCachedPrinterOrThrowAsync(printerId);
-
-    // Check printer in database and modify
     const printerFileList = await this.printerFilesService.updateFiles(printer.id, files);
-
-    // Update cache with data from storage
     await this.fileCache.cachePrinterFiles(printer.id, printerFileList);
   }
 
-  async appendOrSetPrinterFile(printerId: IdType, addedFile) {
+  async appendOrSetPrinterFile(printerId: IdType, addedFile: PrinterFileDto) {
     const printer = await this.printerCache.getCachedPrinterOrThrowAsync(printerId);
 
-    // Check printer in database and modify
-    const { fileList, lastPrintedFile } = await this.printerFilesService.appendOrReplaceFile(printer.id, addedFile);
-
-    // Update cache with data from storage
-    await this.fileCache.cachePrinterFiles(printer.id, fileList);
-
-    // Update printer state with lastPrintedFile
-    await this.printerFilesService.setPrinterLastPrintedFile(printer.id, lastPrintedFile.fileName);
-  }
-
-  async setExistingFileForPrint(printerId: IdType, filePath: string) {
-    await this.printerFilesService.setPrinterLastPrintedFile(printerId, filePath);
+    // TODO this is probably the erroneous batch reprint cause
+    const files = await this.printerFilesService.appendOrReplaceFile(printer.id, addedFile);
+    await this.fileCache.cachePrinterFiles(printer.id, files);
   }
 
   async deleteFile(
@@ -162,7 +143,7 @@ export class PrinterFilesStore {
   ): Promise<{
     service: any;
   }> {
-    const serviceActionResult = await this.printerFilesService.deleteFile(printerId, filePath, throwError);
+    const serviceActionResult = await this.printerFilesService.deletePrinterFiles(printerId, [filePath], throwError);
 
     // Warning only
     this.fileCache.purgeFile(printerId, filePath);

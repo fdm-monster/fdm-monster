@@ -3,7 +3,7 @@ import { DITokens } from "@/container.tokens";
 import { PrinterCache } from "@/state/printer.cache";
 import { PrinterFilesService } from "@/services/printer-files.service";
 import { AwilixContainer } from "awilix";
-import { closeDatabase, connect } from "../../db-handler";
+import { connect } from "../../db-handler";
 import { PrinterFilesStore } from "@/state/printer-files.store";
 import { PrinterService } from "@/services/printer.service";
 
@@ -38,7 +38,7 @@ describe(PrinterFilesStore.name, () => {
     await printerFilesStore.loadFilesStore();
 
     const filesCache = printerFilesStore.getFiles(testPrinterState.id);
-    expect(filesCache.files.length).toBe(0);
+    expect(filesCache.length).toBe(0);
 
     const oldFiles = printerFilesStore.getOutdatedFiles(testPrinterState.id, 7);
     expect(oldFiles.length).toBe(0);
@@ -47,43 +47,52 @@ describe(PrinterFilesStore.name, () => {
   it("old files - should keep new files correctly", async () => {
     await printerCache.loadCache();
     let testPrinterState = await printerService.create(validNewPrinter);
-    await printerFilesService.updateFiles(testPrinterState.id, {
-      files: [
-        {
-          date: Date.now() / 1000,
-        },
-      ],
-    });
+    await printerFilesService.updateFiles(testPrinterState.id, [
+      {
+        date: Date.now() / 1000,
+        path: "123.file",
+        origin: "local",
+        display: "displayvalue",
+        name: "123.file",
+        hash: "123",
+      },
+    ]);
     await printerFilesStore.loadFilesStore();
 
     const filesCache = printerFilesStore.getFiles(testPrinterState.id);
-    expect(filesCache.files.length).toBe(1);
+    expect(filesCache.length).toBe(1);
 
     const oldFiles = printerFilesStore.getOutdatedFiles(testPrinterState.id, 7);
     expect(oldFiles.length).toBe(0);
-    await printerFilesService.updateFiles(testPrinterState.id, {
-      files: [],
-    });
+    await printerFilesService.updateFiles(testPrinterState.id, []);
   });
 
   it("old files - should filter old files correctly", async () => {
     await printerCache.loadCache();
     let testPrinterState = await printerService.create(validNewPrinter);
 
-    await printerFilesService.updateFiles(testPrinterState.id, {
-      files: [
-        {
-          date: Date.now() / 1000,
-        },
-        {
-          date: Date.now() / 1000 - 8 * 86400,
-        },
-      ],
-    });
+    await printerFilesService.updateFiles(testPrinterState.id, [
+      {
+        date: Date.now() / 1000,
+        path: "125.file",
+        origin: "local",
+        display: "displayvalue",
+        name: "125.file",
+        hash: "125",
+      },
+      {
+        date: Date.now() / 1000 - 8 * 86400,
+        path: "124.file",
+        origin: "local",
+        display: "displayvalue",
+        name: "124.file",
+        hash: "124",
+      },
+    ]);
     await printerFilesStore.loadFilesStore();
 
     const filesCache = printerFilesStore.getFiles(testPrinterState.id);
-    expect(filesCache.files.length).toBe(2);
+    expect(filesCache.length).toBe(2);
 
     const oldFiles = printerFilesStore.getOutdatedFiles(testPrinterState.id, 7);
     expect(oldFiles.length).toBe(1);

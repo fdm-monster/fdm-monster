@@ -7,13 +7,12 @@ import {
   fileUploadCommandsRules,
   getFileRules,
   getFilesRules,
-  localFileUploadRules,
   moveFileOrFolderRules,
   selectAndPrintFileRules,
   uploadFileRules,
 } from "./validation/printer-files-controller.validation";
 import { batchPrinterRules } from "@/controllers/validation/batch-controller.validation";
-import { NotFoundException, ValidationException } from "@/exceptions/runtime.exceptions";
+import { ValidationException } from "@/exceptions/runtime.exceptions";
 import { printerResolveMiddleware } from "@/middleware/printer";
 import { PERMS, ROLES } from "@/constants/authorization.constants";
 import { PrinterFilesStore } from "@/state/printer-files.store";
@@ -25,8 +24,8 @@ import { PrinterFileCleanTask } from "@/tasks/printer-file-clean.task";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { Request, Response } from "express";
-import { AxiosResponse } from "axios";
 import { createReadStream, existsSync, lstatSync } from "node:fs";
+import { AxiosResponse } from "axios";
 
 export class PrinterFilesController {
   printerFilesStore: PrinterFilesStore;
@@ -77,8 +76,8 @@ export class PrinterFilesController {
     const { recursive } = await validateInput(req.query, getFilesRules);
 
     this.logger.log("Refreshing file storage by eager load");
-    const response = await this.printerFilesStore.eagerLoadPrinterFiles(currentPrinterId, recursive);
-    this.statusResponse(res, response);
+    const files = await this.printerFilesStore.eagerLoadPrinterFiles(currentPrinterId, recursive);
+    res.send(files);
   }
 
   /**
@@ -94,7 +93,7 @@ export class PrinterFilesController {
   async clearPrinterFiles(req: Request, res: Response) {
     const { currentPrinterId, printerLogin } = getScopedPrinter(req);
 
-    const nonRecursiveFiles = await this.octoPrintApiService.getFiles(printerLogin, false);
+    const nonRecursiveFiles = await this.octoPrintApiService.getLocalFiles(printerLogin, false);
 
     const failedFiles = [];
     const succeededFiles = [];
@@ -166,12 +165,10 @@ export class PrinterFilesController {
   }
 
   async selectAndPrintFile(req: Request, res: Response) {
-    const { currentPrinterId, printerLogin } = getScopedPrinter(req);
+    const { printerLogin } = getScopedPrinter(req);
     const { filePath: path, print } = await validateInput(req.body, selectAndPrintFileRules);
 
     const result = await this.octoPrintApiService.selectPrintFile(printerLogin, path, print);
-
-    await this.printerFilesStore.setExistingFileForPrint(currentPrinterId, path);
     res.send(result);
   }
 
@@ -202,7 +199,7 @@ export class PrinterFilesController {
       await this.printerFileCleanTask.cleanPrinterFiles(currentPrinterId);
     }
 
-    const token = this.multerService.startTrackingSession(files);
+    const token = this.multerService.startTrackingSession(uploadedFile);
     const response = await this.octoPrintApiService.uploadFileAsMultiPart(
       printerLogin,
       uploadedFile,
@@ -213,55 +210,12 @@ export class PrinterFilesController {
       token
     );
 
-    if (response.success !== false) {
-      const newOrUpdatedFile = response.files.local;
-      await this.printerFilesStore.appendOrSetPrinterFile(currentPrinterId, newOrUpdatedFile);
+    if (response.success !== false && response?.files?.local?.path?.length) {
+      const file = await this.octoPrintApiService.getFile(printerLogin, response?.files?.local?.path);
+      await this.printerFilesStore.appendOrSetPrinterFile(currentPrinterId, file);
     }
 
     res.send(response);
-  }
-
-  /**
-   * This endpoint is not actively used. Its better to introduce a virtual file system (VFS) to be able to manage centralized uploads.
-   */
-  async localUploadFile(req: Request, res: Response) {
-    const { currentPrinterId, printerLogin } = getScopedPrinter(req);
-    const { select, print, localLocation } = await validateInput(req.body, localFileUploadRules);
-
-    if (!localLocation.endsWith(".gcode")) {
-      throw new ValidationException({
-        localLocation: "The indicated file extension did not match '.gcode'",
-      });
-    }
-
-    if (!existsSync(localLocation)) {
-      throw new NotFoundException("The indicated file was not found.");
-    }
-
-    if (lstatSync(localLocation).isDirectory()) {
-      throw new ValidationException({
-        localLocation: "The indicated file was not correctly found.",
-      });
-    }
-
-    const stream = createReadStream(localLocation);
-    const response = await this.octoPrintApiService.uploadFileAsMultiPart(printerLogin, stream, {
-      select,
-      print,
-    });
-
-    // TODO update file cache with files store
-    if (response.success !== false) {
-      const newOrUpdatedFile = response.files.local;
-      await this.printerFilesStore.appendOrSetPrinterFile(currentPrinterId, newOrUpdatedFile);
-    }
-
-    res.send(response);
-  }
-
-  private statusResponse(res: Response, response: AxiosResponse) {
-    res.statusCode = response.status;
-    res.send(response.data);
   }
 }
 
@@ -277,7 +231,6 @@ export default createController(PrinterFilesController)
   .post("/batch/reprint-files", "batchReprintFiles", withPermission(PERMS.PrinterFiles.Actions))
   .get("/:id", "getFiles", withPermission(PERMS.PrinterFiles.Get))
   .get("/:id/cache", "getFilesCache", withPermission(PERMS.PrinterFiles.Get))
-  .post("/:id/local-upload", "localUploadFile", withPermission(PERMS.PrinterFiles.Upload))
   .post("/:id/upload", "uploadFile", withPermission(PERMS.PrinterFiles.Upload))
   .post("/:id/create-folder", "createFolder", withPermission(PERMS.PrinterFiles.Actions))
   .post("/:id/select", "selectAndPrintFile", withPermission(PERMS.PrinterFiles.Actions))
