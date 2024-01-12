@@ -7,7 +7,7 @@
   "author": "David Zwart",
   "license": "AGPL-3.0-or-later",
   "private": false,
-  "version": "1.5.4",
+  "version": "1.6.0-rc1",
   "bin": {
     "fdm-monster": "dist/index.js",
     "fdmm": "dist/index.js"
@@ -51,7 +51,7 @@
     "vue"
   ],
   "dependencies": {
-    "@fdm-monster/client": "1.4.4",
+    "@fdm-monster/client": "1.5.0-rc3",
     "@influxdata/influxdb-client": "1.33.2",
     "@sentry/node": "7.93.0",
     "adm-zip": "0.5.10",
