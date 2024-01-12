@@ -55,6 +55,7 @@ export class PrintCompletionSocketIoTask {
       return;
     }
 
+    // TODO there is no need for this now
     // this.socketIoGateway.send(IO_MESSAGES.CompletionEvent, JSON.stringify({ fdmEvent, octoPrintEvent, data }));
 
     const completion = {
@@ -99,10 +100,8 @@ export class PrintCompletionSocketIoTask {
       completion.context = this.contextCache[printerId];
       await this.printCompletionService.create(completion);
     } else if (data.payload.type === EVENT_TYPES.PrintFailed || data.payload.type === EVENT_TYPES.PrintDone) {
-      // TODO fix completion?
-      completion.context = this.contextCache[printerId] || {
-        correlationId: token,
-      };
+      // TODO fix runtime memory dependency
+      completion.context = this.contextCache[printerId];
       await this.printCompletionService.create(completion);
 
       this.eventEmitter2.emit(fdmMonsterPrinterStoppedEvent(printerId));
