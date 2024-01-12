@@ -1,27 +1,31 @@
+import { PrinterSocketStore } from "@/state/printer-socket.store";
+import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
+import { SettingsStore } from "@/state/settings.store";
+import { TaskManagerService } from "@/services/core/task-manager.service";
+import { ILoggerFactory } from "@/handlers/logger-factory";
+import { LoggerService } from "@/handlers/logger";
+
 export class PrinterWebsocketTask {
-  /**
-   * @type {PrinterSocketStore}
-   */
-  printerSocketStore;
-  /**
-   * @type {SettingsStore}
-   */
-  settingsStore;
-  /**
-   * @type {OctoPrintApiService}
-   */
-  octoPrintApiService;
-  /**
-   * @type {TaskManagerService}
-   */
-  taskManagerService;
+  printerSocketStore: PrinterSocketStore;
+  settingsStore: SettingsStore;
+  octoPrintApiService: OctoPrintApiService;
+  taskManagerService: TaskManagerService;
 
-  /**
-   * @type {LoggerService}
-   */
-  logger;
+  logger: LoggerService;
 
-  constructor({ printerSocketStore, octoPrintApiService, settingsStore, taskManagerService, loggerFactory }) {
+  constructor({
+    printerSocketStore,
+    octoPrintApiService,
+    settingsStore,
+    taskManagerService,
+    loggerFactory,
+  }: {
+    printerSocketStore: PrinterSocketStore;
+    octoPrintApiService: OctoPrintApiService;
+    settingsStore: SettingsStore;
+    taskManagerService: TaskManagerService;
+    loggerFactory: ILoggerFactory;
+  }) {
     this.printerSocketStore = printerSocketStore;
     this.settingsStore = settingsStore;
     this.octoPrintApiService = octoPrintApiService;

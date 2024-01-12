@@ -10,7 +10,6 @@ export class CreatePrintCompletionDto<KeyType = IdType> {
   printerId: KeyType;
   printerReference?: string;
   completionLog: string;
-  correlationId: string;
   context: PrintCompletionContext;
 }
 
@@ -22,6 +21,5 @@ export class PrintCompletionDto<KeyType = IdType> {
   printerId: KeyType;
   printerReference?: string;
   completionLog: string;
-  correlationId: string;
   context: PrintCompletionContext;
 }

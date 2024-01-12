@@ -1,4 +1,4 @@
-import { octoPrintWebsocketEvent, fdmMonsterPrinterStoppedEvent } from "@/constants/event.constants";
+import { fdmMonsterPrinterStoppedEvent, octoPrintWebsocketEvent } from "@/constants/event.constants";
 import { EVENT_TYPES } from "@/services/octoprint/constants/octoprint-websocket.constants";
 import { generateCorrelationToken } from "@/utils/correlation-token.util";
 import { IO_MESSAGES, SocketIoGateway } from "@/state/socket-io.gateway";
@@ -8,6 +8,7 @@ import { PrintCompletionService } from "@/services/print-completion.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { CreatePrintCompletionDto, PrintCompletionContext } from "@/services/interfaces/print-completion.dto";
 import { IdType } from "@/shared.constants";
+import { OctoPrintEventDto } from "@/services/octoprint/dto/octoprint-event.dto";
 
 export class PrintCompletionSocketIoTask {
   eventEmitter2: EventEmitter2;
@@ -43,43 +44,45 @@ export class PrintCompletionSocketIoTask {
     return this.contextCache;
   }
 
-  async handleMessage(fdmEvent: string, octoPrintEvent: string, data: any) {
+  async handleMessage(fdmEvent: string, data: OctoPrintEventDto) {
     // If not parsed well, skip log
-    const printerId = fdmEvent.replace("octoprint.", "");
+    const printerId = data.printerId;
     if (!printerId) {
       this.logger.log(`Skipping print completion log for FDM event ${fdmEvent}`);
     }
 
-    if (octoPrintEvent !== "event") {
+    if (data.event !== "event") {
       return;
     }
 
-    this.socketIoGateway.send(IO_MESSAGES.CompletionEvent, JSON.stringify({ fdmEvent, octoPrintEvent, data }));
+    // this.socketIoGateway.send(IO_MESSAGES.CompletionEvent, JSON.stringify({ fdmEvent, octoPrintEvent, data }));
 
     const completion = {
-      status: data.type,
-      fileName: data.payload?.name,
+      status: data.payload.type,
+      fileName: data.payload?.payload?.name,
       createdAt: Date.now(),
       completionLog: data.payload?.error,
       printerId,
-      context: {},
+      context: {
+        correlationId: null,
+      },
     } as CreatePrintCompletionDto;
     if (
-      data.type === EVENT_TYPES.EStop ||
-      data.type === EVENT_TYPES.PrintCancelling ||
-      data.type === EVENT_TYPES.PrintCancelled ||
-      data.type === EVENT_TYPES.Home ||
-      data.type === EVENT_TYPES.TransferStarted ||
-      data.type === EVENT_TYPES.TransferDone ||
-      data.type === EVENT_TYPES.Disconnecting ||
-      data.type === EVENT_TYPES.Disconnected ||
-      data.type === EVENT_TYPES.MetadataAnalysisStarted ||
-      data.type === EVENT_TYPES.MetadataAnalysisFinished ||
-      data.type === EVENT_TYPES.Error
+      data.payload.type === EVENT_TYPES.EStop ||
+      data.payload.type === EVENT_TYPES.PrintCancelling ||
+      data.payload.type === EVENT_TYPES.PrintCancelled ||
+      data.payload.type === EVENT_TYPES.Home ||
+      data.payload.type === EVENT_TYPES.TransferStarted ||
+      data.payload.type === EVENT_TYPES.TransferDone ||
+      data.payload.type === EVENT_TYPES.Disconnecting ||
+      data.payload.type === EVENT_TYPES.Disconnected ||
+      data.payload.type === EVENT_TYPES.MetadataAnalysisStarted ||
+      data.payload.type === EVENT_TYPES.MetadataAnalysisFinished ||
+      data.payload.type === EVENT_TYPES.Error
     ) {
       this.contextCache[printerId] = {
         ...this.contextCache[printerId],
-        [data.type]: completion,
+        [data.payload.type]: completion,
       };
 
       const corrId = this.contextCache[printerId].correlationId;
@@ -87,17 +90,19 @@ export class PrintCompletionSocketIoTask {
       return;
     }
 
-    if (data.type === EVENT_TYPES.PrintStarted) {
+    if (data.payload.type === EVENT_TYPES.PrintStarted) {
       // Clear the context now with association id
       const token = generateCorrelationToken();
       this.contextCache[printerId] = {
         correlationId: token,
       };
-      completion.correlationId = token;
       completion.context = this.contextCache[printerId];
       await this.printCompletionService.create(completion);
-    } else if (data.type === EVENT_TYPES.PrintFailed || data.type === EVENT_TYPES.PrintDone) {
-      completion.context = this.contextCache[printerId] || {};
+    } else if (data.payload.type === EVENT_TYPES.PrintFailed || data.payload.type === EVENT_TYPES.PrintDone) {
+      // TODO fix completion?
+      completion.context = this.contextCache[printerId] || {
+        correlationId: token,
+      };
       await this.printCompletionService.create(completion);
 
       this.eventEmitter2.emit(fdmMonsterPrinterStoppedEvent(printerId));

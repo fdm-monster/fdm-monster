@@ -7,11 +7,11 @@ export const printerEvents = {
   batchPrinterCreated: "batchPrinterCreated",
 };
 
-export const octoPrintWebsocketEvent = (printerId) => `octoprint.${printerId}`;
-export const octoPrintWebsocketCurrentEvent = (printerId) => `octoprint.${printerId}.current`;
-export const uploadProgressEvent = (token) => `upload.progress.${token}`;
-export const firmwareFlashUploadEvent = (printerId) => `firmware-upload.${printerId}`;
+export const octoPrintWebsocketEvent = (printerId: string) => `octoprint.${printerId}`;
+export const octoPrintWebsocketCurrentEvent = (printerId: string) => `octoprint.${printerId}.current`;
+export const uploadProgressEvent = (token: string) => `upload.progress.${token}`;
+export const firmwareFlashUploadEvent = (printerId: string) => `firmware-upload.${printerId}`;
 
 export const prefix = "fdm-monster";
-export const fdmMonsterPrinterStoppedEvent = (printerId) => `${prefix}.${printerId}.printer-stopped`;
-export const fdmPrinterEventToPrinterId = (event) => event.split(".")[1];
+export const fdmMonsterPrinterStoppedEvent = (printerId: string) => `${prefix}.${printerId}.printer-stopped`;
+export const fdmPrinterEventToPrinterId = (event: string) => event.split(".")[1];
