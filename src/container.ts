@@ -59,6 +59,8 @@ import { CameraStreamService } from "./services/camera-stream.service";
 import { JwtService } from "./services/authentication/jwt.service";
 import { AuthService } from "./services/authentication/auth.service";
 import { RefreshTokenService } from "@/services/authentication/refresh-token.service";
+import { throttling } from "@octokit/plugin-throttling";
+import { InternalServerException } from "@/exceptions/runtime.exceptions";
 
 export function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -104,9 +106,20 @@ export function configureContainer() {
     [di.githubService]: asClass(GithubService),
     [di.octokitService]: asFunction((cradle: any) => {
       const config = cradle.configService;
-      // cradle.
-      return new Octokit({
+      const CustomOctoKit = Octokit.plugin(throttling);
+      return new CustomOctoKit({
         auth: config.get(AppConstants.GITHUB_PAT),
+        throttle: {
+          onRateLimit: (retryAfter, options, octokit, retryCount) => {
+            const logger = LoggerFactory()("OctoKitThrottle");
+            logger.warn(`Request quota exhaustedd for request ${options.method} ${options.url}`);
+          },
+          onSecondaryRateLimit: (retryAfter, options, octokit) => {
+            const logger = LoggerFactory()("OctoKitThrottle");
+            // does not retry, only logs a warning
+            logger.warn(`SecondaryRateLimit detected for request ${options.method} ${options.url}`);
+          },
+        },
       });
     }),
     [di.clientBundleService]: asClass(ClientBundleService),
