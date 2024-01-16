@@ -77,7 +77,7 @@ export class ServerPrivateController {
       downloadRelease: "string",
       allowDowngrade: "boolean",
     };
-    const updateDto = await validateMiddleware(req, inputRules, res);
+    const updateDto = await validateMiddleware(req, inputRules);
 
     const willExecute = await this.clientBundleService.shouldUpdateWithReason(
       true,
@@ -88,7 +88,7 @@ export class ServerPrivateController {
 
     this.logger.log(`Will execute: ${willExecute?.shouldUpdate}, reason: ${willExecute?.reason}`);
     if (!willExecute?.shouldUpdate) {
-      return {
+      return res.send({
         executed: false,
         requestedVersion: willExecute.requestedVersion,
         currentVersion: willExecute.currentVersion,
@@ -96,18 +96,12 @@ export class ServerPrivateController {
         shouldUpdate: willExecute.shouldUpdate,
         targetVersion: willExecute.targetVersion,
         reason: willExecute?.reason,
-      };
+      });
     }
 
     const tag_name = await this.clientBundleService.downloadClientUpdate(willExecute.targetVersion);
-    const entry = (await this.cacheManager.get(releaseCacheKey)) as any;
-    if (!!entry) {
-      entry.current = {
-        tag_name,
-      };
-      await this.cacheManager.set(releaseCacheKey, entry);
-    }
-    return {
+
+    return res.send({
       executed: true,
       requestedVersion: willExecute.requestedVersion,
       currentVersion: willExecute.currentVersion,
@@ -115,11 +109,11 @@ export class ServerPrivateController {
       shouldUpdate: willExecute.shouldUpdate,
       targetVersion: willExecute.targetVersion,
       reason: willExecute?.reason,
-    };
+    });
   }
 
   async getReleaseStateInfo(req: Request, res: Response) {
-    await this.serverReleaseService.syncLatestRelease(false);
+    await this.serverReleaseService.syncLatestRelease();
     const updateState = this.serverReleaseService.getState();
     res.send(updateState);
   }

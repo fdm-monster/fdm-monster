@@ -10,6 +10,8 @@ import { ConfigService } from "@/services/core/config.service";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { compare } from "semver";
+import { errorSummary } from "@/utils/error.utils";
+import { ExternalServiceError } from "@/exceptions/runtime.exceptions";
 
 export class ClientBundleService {
   githubService: GithubService;
@@ -41,18 +43,23 @@ export class ClientBundleService {
   async getReleases() {
     const githubOwner = AppConstants.orgName;
     const githubRepo = AppConstants.clientRepoName;
-    const result = await this.githubService.getReleases(githubOwner, githubRepo);
-    const latestResult = await this.githubService.getLatestRelease(githubOwner, githubRepo);
-    return {
-      minimum: {
-        tag_name: AppConstants.defaultClientMinimum,
-      },
-      current: {
-        tag_name: this.getClientVersion(),
-      },
-      latest: latestResult.data,
-      releases: result.data,
-    };
+    try {
+      const result = await this.githubService.getReleases(githubOwner, githubRepo);
+      const latestResult = await this.githubService.getLatestRelease(githubOwner, githubRepo);
+      return {
+        minimum: {
+          tag_name: AppConstants.defaultClientMinimum,
+        },
+        current: {
+          tag_name: this.getClientVersion(),
+        },
+        latest: latestResult.data,
+        releases: result.data,
+      };
+    } catch (e) {
+      this.logger.error(`Github OctoKit error ${errorSummary(e)}`);
+      throw new ExternalServiceError(e);
+    }
   }
 
   async shouldUpdateWithReason(
