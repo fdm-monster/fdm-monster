@@ -1,5 +1,5 @@
 import { PassThrough } from "stream";
-import { createController, updateState } from "awilix-express";
+import { createController } from "awilix-express";
 import { authenticate, authorizeRoles } from "@/middleware/authenticate";
 import { LoggerService as Logger } from "../handlers/logger";
 import { AppConstants } from "@/server.constants";
@@ -67,17 +67,55 @@ export class ServerPrivateController {
     res.send(releaseSpec);
   }
 
+  /**
+   * It is not advised to downgrade beyond the default minimum version, any server restart will
+   * update the bundle back to minimum version (if ENABLE_CLIENT_DIST_AUTO_UPDATE === 'true').
+   // * @param {UpdateClientDistDto} updateDto
+   */
   async updateClientBundleGithub(req: Request, res: Response) {
     const inputRules = {
-      tag_name: "required|string",
+      downloadRelease: "string",
+      allowDowngrade: "boolean",
     };
-    const { tag_name } = await validateMiddleware(req, inputRules, res);
-    await this.clientBundleService.downloadClientUpdate(tag_name);
+    const updateDto = await validateMiddleware(req, inputRules, res);
 
-    res.send({
+    const willExecute = await this.clientBundleService.shouldUpdateWithReason(
+      true,
+      AppConstants.defaultClientMinimum,
+      updateDto.downloadRelease,
+      updateDto.allowDowngrade
+    );
+
+    this.logger.log(`Will execute: ${willExecute?.shouldUpdate}, reason: ${willExecute?.reason}`);
+    if (!willExecute?.shouldUpdate) {
+      return {
+        executed: false,
+        requestedVersion: willExecute.requestedVersion,
+        currentVersion: willExecute.currentVersion,
+        minimumVersion: willExecute.minimumVersion,
+        shouldUpdate: willExecute.shouldUpdate,
+        targetVersion: willExecute.targetVersion,
+        reason: willExecute?.reason,
+      };
+    }
+
+    const tag_name = await this.clientBundleService.downloadClientUpdate(willExecute.targetVersion);
+    const entry = (await this.cacheManager.get(releaseCacheKey)) as any;
+    if (!!entry) {
+      entry.current = {
+        tag_name,
+      };
+      await this.cacheManager.set(releaseCacheKey, entry);
+    }
+    return {
       executed: true,
-      installed: tag_name,
-    });
+      requestedVersion: willExecute.requestedVersion,
+      currentVersion: willExecute.currentVersion,
+      minimumVersion: willExecute.minimumVersion,
+      shouldUpdate: willExecute.shouldUpdate,
+      targetVersion: willExecute.targetVersion,
+      reason: willExecute?.reason,
+    };
   }
 
   async getReleaseStateInfo(req: Request, res: Response) {
