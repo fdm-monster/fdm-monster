@@ -1202,9 +1202,9 @@
     os-filter-obj "^2.0.0"
 
 "@mongodb-js/saslprep@^1.1.0":
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/@mongodb-js/saslprep/-/saslprep-1.1.3.tgz#ef77edae4061cdc856ea2d355d582e9b49fae8fe"
-  integrity sha512-SyCxhJfmK6MoLNV5SbDpNdUy9SDv5H7y9/9rl3KpnwgTHWuNNMc87zWqbcIZXNWY+aUjxLGLEcvHoLagG4tWCg==
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/@mongodb-js/saslprep/-/saslprep-1.1.4.tgz#24ec1c4915a65f5c506bb88c081731450d91bb1c"
+  integrity sha512-8zJ8N1x51xo9hwPh6AWnKdLGEC5N3lDa6kms1YHmFBoRhTpJR6HG8wWk0td1MVCu9cD4YBrvjZEtd5Obw0Fbnw==
   dependencies:
     sparse-bitfield "^3.0.3"
 
@@ -2298,14 +2298,7 @@
   dependencies:
     "@types/express" "*"
 
-"@types/node@*", "@types/node@>=10.0.0":
-  version "20.11.0"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.11.0.tgz#8e0b99e70c0c1ade1a86c4a282f7b7ef87c9552f"
-  integrity sha512-o9bjXmDNcF7GbM4CNQpmi+TutCgap/K3w1JyKgxAjqx41zp9qlIAVFi0IhCNsJcXolEqLWhbFbEeL0PvYm4pcQ==
-  dependencies:
-    undici-types "~5.26.4"
-
-"@types/node@20.11.3":
+"@types/node@*", "@types/node@20.11.3", "@types/node@>=10.0.0":
   version "20.11.3"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-20.11.3.tgz#ac29fba7aeadc74046b02e50758156f4850f1296"
   integrity sha512-nrlmbvGPNGaj84IJZXMPhQuCMEVTT/hXZMJJG/aIqVL9fKxqk814sGGtJA4GI6hpJSLQjpi6cn0Qx9eOf9SDVg==
@@ -3643,9 +3636,9 @@ ee-first@1.1.1:
   integrity sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==
 
 electron-to-chromium@^1.4.601:
-  version "1.4.630"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.630.tgz#1d9f4169653784997bec98975e11a2c05214ce39"
-  integrity sha512-osHqhtjojpCsACVnuD11xO5g9xaCyw7Qqn/C2KParkMv42i8jrJJgx3g7mkHfpxwhy9MnOJr8+pKOdZ7qzgizg==
+  version "1.4.632"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.632.tgz#df6253483b802eb83eee2fdc0e5067bd46f36f11"
+  integrity sha512-JGmudTwg7yxMYvR/gWbalqqQiyu7WTFv2Xu3vw4cJHXPFxNgAk0oy8UHaer8nLF4lZJa+rNoj6GsrKIVJTV6Tw==
 
 emittery@^0.13.1:
   version "0.13.1"
@@ -6837,12 +6830,12 @@ rxjs@^7.8.1:
     tslib "^2.1.0"
 
 safe-array-concat@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/safe-array-concat/-/safe-array-concat-1.0.1.tgz#91686a63ce3adbea14d61b14c99572a8ff84754c"
-  integrity sha512-6XbUAseYE2KtOuGueyeobCySj9L4+66Tn6KQMOPQJrAJEowYKW/YR/MGJZl7FdydUdaFu4LYyDZjxf4/Nmo23Q==
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/safe-array-concat/-/safe-array-concat-1.1.0.tgz#8d0cae9cb806d6d1c06e08ab13d847293ebe0692"
+  integrity sha512-ZdQ0Jeb9Ofti4hbt5lX3T2JcAamT9hfzYU1MNB+z/jaEbB6wfFfPIR/zEORmZqobkCCJhSjodobH6WHNmJ97dg==
   dependencies:
-    call-bind "^1.0.2"
-    get-intrinsic "^1.2.1"
+    call-bind "^1.0.5"
+    get-intrinsic "^1.2.2"
     has-symbols "^1.0.3"
     isarray "^2.0.5"
 
