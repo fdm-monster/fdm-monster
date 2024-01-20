@@ -1,4 +1,5 @@
 import { model, Schema } from "mongoose";
+import { OctoPrintCustomDto } from "@/services/octoprint/models/octoprint-file.dto";
 
 export interface IPrinterFile {
   id: string;
@@ -16,6 +17,7 @@ export interface IPrinterFile {
   statistics?: any;
   type?: string;
   typePath?: string[];
+  customData?: OctoPrintCustomDto;
 }
 
 export const PrinterFileSchema = new Schema<IPrinterFile>({
@@ -75,6 +77,10 @@ export const PrinterFileSchema = new Schema<IPrinterFile>({
   typePath: {
     type: Array(String),
     required: false,
+  },
+  customData: {
+    type: Object,
+    required: true,
   },
 });
 

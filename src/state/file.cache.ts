@@ -27,8 +27,7 @@ export class FileCache {
     if (!printerId) {
       throw new Error("File Cache cant get a null/undefined printer id");
     }
-    this.printerFileStorage[printerId] = this.getPrinterFileStorage(printerId);
-    return this.getPrinterFileStorage(printerId);
+    return this.printerFileStorage[printerId];
   }
 
   updateCacheFileRefCount() {
@@ -63,7 +62,7 @@ export class FileCache {
   }
 
   purgeFile(printerId: IdType, filePath: string) {
-    const files = this.getPrinterFileStorage(printerId);
+    const files = this.getPrinterFiles(printerId);
     if (!files) return;
 
     const fileIndex = files.findIndex((f) => f.path === filePath);
@@ -79,13 +78,5 @@ export class FileCache {
 
     files.splice(fileIndex, 1);
     this.logger.log(`File ${filePath} was removed`);
-  }
-
-  private getPrinterFileStorage(printerId: IdType) {
-    if (!printerId) {
-      throw new Error("File Cache cant get a null/undefined printer id");
-    }
-
-    return this.printerFileStorage[printerId];
   }
 }
