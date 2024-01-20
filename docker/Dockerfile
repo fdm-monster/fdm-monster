@@ -1,8 +1,8 @@
 FROM node:18-bookworm-slim as build
 WORKDIR /build
-
-COPY .swcrc tsconfig.json package.json yarn.lock ./
-RUN yarn install --frozen-lockfile --network-timeout 1000000
+RUN yarn set version berry
+COPY .swcrc tsconfig.json package.json yarn.lock .yarnrc.yml ./
+RUN yarn install --immutable
 COPY src/ ./src/
 RUN yarn run build
 
@@ -10,10 +10,10 @@ FROM node:18-bookworm-slim as production
 WORKDIR /app
 
 RUN yarn global add pm2
+RUN yarn set version berry
 
-COPY .swcrc tsconfig.json package.json yarn.lock ./
-# Timeout is needed for yarn install to work on arm64 emulation (qemu)
-RUN yarn install --production --frozen-lockfile --network-timeout 1000000
+COPY .swcrc tsconfig.json package.json yarn.lock .yarnrc.yml ./
+RUN yarn workspaces focus --all --production
 
 COPY .env.template \
     migrate-mongo-config.js \

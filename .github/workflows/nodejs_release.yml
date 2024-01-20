@@ -55,6 +55,7 @@ jobs:
           echo ${{ env.RELEASE_TAG }}
 
       # Build dist folder
+      - run: yarn set version berry
       - run: yarn install --immutable --immutable-cache --check-cache
       - run: yarn build
 

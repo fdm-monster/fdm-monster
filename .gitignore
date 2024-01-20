@@ -28,3 +28,12 @@ installations/other/octoprint-virtual/default1.9.0/octoprint/octoprint/
 *.sqlite-shm
 
 installations/ansible/inventory.cfg
+
+.pnp.*
+.yarn/*
+!.yarn/cache
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
