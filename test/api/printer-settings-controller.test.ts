@@ -4,7 +4,7 @@ import { createTestPrinter } from "./test-data/create-printer";
 import { OctoPrintApiMock } from "../mocks/octoprint-api.mock";
 import { AppConstants } from "@/server.constants";
 import supertest from "supertest";
-import { connect } from "../db-handler";
+import { OctoPrintApiMock } from "../mocks/octoprint-api.mock";
 import { PrinterSettingsController } from "@/controllers/printer-settings.controller";
 
 const defaultRoute = `${AppConstants.apiRoute}/printer-settings`;
@@ -17,7 +17,6 @@ let request: supertest.SuperTest<supertest.Test>;
 let octoPrintApiService: OctoPrintApiMock;
 
 beforeAll(async () => {
-  await connect();
   ({ request, octoPrintApiService } = await setupTestApp(true));
 });
 

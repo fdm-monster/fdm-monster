@@ -8,6 +8,8 @@ import { ROLES } from "@/constants/authorization.constants";
 import supertest from "supertest";
 import { Express } from "express";
 import { AppConstants } from "@/server.constants";
+import { TypeormService } from "@/services/typeorm/typeorm.service";
+import { TaskManagerService } from "@/services/core/task-manager.service";
 
 jest.mock("../src/utils/env.utils", () => ({
   ...jest.requireActual("../src/utils/env.utils"),
@@ -24,6 +26,8 @@ export async function setupTestApp(
   httpServer: Express;
   httpClient: AxiosMock;
   request: supertest.SuperTest<supertest.Test>;
+  octoPrintApiService: OctoPrintApiMock;
+  typeormService: TypeormService;
   [k: string]: any;
 }> {
   setupEnvConfig(true);
@@ -38,6 +42,10 @@ export async function setupTestApp(
 
   // Overrides get last pick
   if (mocks) container.register(mocks);
+
+  // Setup database in memory - needed for loading settings etc
+  const typeormService = container.resolve<TypeormService>(DITokens.typeormService);
+  await typeormService.createConnection();
 
   // Setup
   const settingsStore = container.resolve(DITokens.settingsStore);
@@ -57,12 +65,16 @@ export async function setupTestApp(
     await printerSocketStore.loadPrinterSockets();
   }
 
+  const isTypeormMode = container.resolve(DITokens.isTypeormMode);
   return {
+    idType: isTypeormMode ? Number : String,
+    isTypeormMode,
     httpServer,
     request: supertest(httpServer),
     container,
     httpClient: container.resolve<AxiosMock>(DITokens.httpClient),
-    [DITokens.octoPrintApiService]: container.resolve(DITokens.octoPrintApiService),
-    [DITokens.taskManagerService]: container.resolve(DITokens.taskManagerService),
+    [DITokens.octoPrintApiService]: container.resolve<OctoPrintApiMock>(DITokens.octoPrintApiService),
+    [DITokens.taskManagerService]: container.resolve<TaskManagerService>(DITokens.taskManagerService),
+    [DITokens.typeormService]: container.resolve<TypeormService>(DITokens.typeormService),
   };
 }

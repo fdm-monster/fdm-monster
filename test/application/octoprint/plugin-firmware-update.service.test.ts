@@ -1,6 +1,4 @@
 import { asClass, AwilixContainer } from "awilix";
-import { clearDatabase, closeDatabase, connect } from "../../db-handler";
-import { configureContainer } from "@/container";
 import { AxiosMock } from "../../mocks/axios.mock";
 import pmPluginsResponse from "../test-data/plugin-manager-plugins.response.json";
 import pmFUPluginResponse from "../test-data/plugin-manager-firmwareupdater-plugin.response.json";
@@ -11,6 +9,8 @@ import { PrinterCache } from "@/state/printer.cache";
 import { PrinterService } from "@/services/printer.service";
 import { PluginRepositoryCache } from "@/services/octoprint/plugin-repository.cache";
 import { PluginFirmwareUpdateService } from "@/services/octoprint/plugin-firmware-update.service";
+import { LoginDto } from "@/services/interfaces/login.dto";
+import { setupTestApp } from "../../test-server";
 
 let httpClient: AxiosMock;
 let container: AwilixContainer;
@@ -19,12 +19,10 @@ let printerService: PrinterService;
 let pluginCache: PluginRepositoryCache;
 let pluginService: PluginFirmwareUpdateService;
 let createdPrinter;
-let loginDto;
+let loginDto: LoginDto;
 
 beforeAll(async () => {
-  await connect();
-  container = configureContainer();
-  container.register(DITokens.httpClient, asClass(AxiosMock).singleton());
+  ({ container } = await setupTestApp(true));
   await container.resolve(DITokens.settingsStore).loadSettings();
 
   pluginService = container.resolve(DITokens.pluginFirmwareUpdateService);
@@ -34,20 +32,13 @@ beforeAll(async () => {
   pluginCache = container.resolve(DITokens.pluginRepositoryCache);
 
   createdPrinter = await printerService.create(validNewPrinterState);
+  await printerCache.loadCache();
   loginDto = await printerCache.getLoginDtoAsync(createdPrinter.id);
   httpClient.saveMockResponse(pluginJson, 200, false);
   await pluginCache.queryCache();
 });
 
-afterEach(async () => {
-  await clearDatabase();
-});
-
-afterAll(async () => {
-  await closeDatabase();
-});
-
-describe("PluginFirmwareUpdateService", () => {
+describe(PluginFirmwareUpdateService.name, () => {
   it("should have plugin name set", () => {
     expect(pluginService.pluginName).toBe("firmwareupdater");
   });

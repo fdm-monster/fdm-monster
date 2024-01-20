@@ -36,3 +36,24 @@ services:
       - SERVER_PORT=4000
     volumes:
       - ./fdm-monster/media/:/app/media
+
+  fdm-monster-alpha:
+    container_name: fdm-monster-alpha
+    image: fdmmonster/fdm-monster:1.6.0-rc1-alpha
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    restart: unless-stopped
+    deploy:
+      restart_policy:
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    ports:
+      - "4001:4001"
+    environment:
+      - NODE_ENV=development
+      - SERVER_PORT=4001
+    volumes:
+      - ./fdm-monster-alpha/media/:/app/media
+      - ./fdm-monster-alpha/database/:/app/database

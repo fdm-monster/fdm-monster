@@ -1,16 +1,17 @@
 import { AwilixContainer } from "awilix";
-import { connect } from "../db-handler";
 import { setupTestApp } from "../test-server";
 import { expectOkResponse } from "../extensions";
 import { AppConstants } from "@/server.constants";
-import { PrintCompletion as Model } from "@/models";
 import { EVENT_TYPES } from "@/services/octoprint/constants/octoprint-websocket.constants";
 import { DITokens } from "@/container.tokens";
-import { IPrintCompletionService } from "@/services/interfaces/print-completion.interface";
+import { SqliteIdType } from "@/shared.constants";
+import { PrintCompletionDto } from "@/services/interfaces/print-completion.dto";
+import { IPrintCompletionService } from "@/services/interfaces/print-completion.service";
 import supertest from "supertest";
+import { PrintCompletionController } from "@/controllers/print-completion.controller";
 import { createTestPrinter } from "./test-data/create-printer";
 
-let printCompletionService: IPrintCompletionService;
+let printCompletionService: IPrintCompletionService<SqliteIdType, PrintCompletionDto>;
 const listRoute = `${AppConstants.apiRoute}/print-completion`;
 const getCompletionEntryRoute = (corrId: string) => `${listRoute}/${corrId}`;
 const contextsRoute = `${listRoute}/contexts`;
@@ -20,16 +21,11 @@ let request: supertest.SuperTest<supertest.Test>;
 let container: AwilixContainer<any>;
 
 beforeAll(async () => {
-  await connect();
   ({ request, container } = await setupTestApp(true));
   printCompletionService = container.resolve(DITokens.printCompletionService);
 });
 
-beforeEach(async () => {
-  Model.deleteMany({});
-});
-
-describe("PrintCompletionController", () => {
+describe(PrintCompletionController.name, () => {
   it("should return empty print completion list", async () => {
     const response = await request.get(listRoute).send();
     expectOkResponse(response, []);

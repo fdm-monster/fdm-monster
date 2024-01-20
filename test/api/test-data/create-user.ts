@@ -1,8 +1,10 @@
-import { Role, User } from "@/models";
+import { Role, User } from "@/entities";
 import { ROLES } from "@/constants/authorization.constants";
 import { hashPassword } from "@/utils/crypto.utils";
 import { UserDto } from "@/services/interfaces/user.dto";
-import { MongoIdType } from "@/shared.constants";
+import { SqliteIdType } from "@/shared.constants";
+import { getDatasource } from "../../typeorm.manager";
+import { UserRole } from "@/entities/user-role.entity";
 
 export function getUserData(username = "tester", password = "testpassword") {
   return {
@@ -19,15 +21,29 @@ export async function ensureTestUserCreated(
   isVerified = true,
   isRootUser = true
 ) {
-  const roleId = (await Role.findOne({ name: role }))?.id;
-  const roles = roleId ? [roleId.toString()] : [];
+  const roleRepo = getDatasource().getRepository(Role);
+  const userRepo = getDatasource().getRepository(User);
+  const userRoleRepo = getDatasource().getRepository(UserRole);
 
-  const foundUser = await User.findOne({ username: usernameIn });
+  const roleId = (await roleRepo.findOneBy({ name: role }))?.id;
+  const roles = roleId ? [roleId] : [];
+
+  const foundUser = await userRepo.findOneBy({ username: usernameIn });
   const { username, password } = getUserData(usernameIn, passwordIn);
   const hash = hashPassword(password);
 
   if (foundUser) {
-    await User.updateOne({ _id: foundUser.id }, { passwordHash: hash, needsPasswordChange, roles, isVerified, isRootUser });
+    await userRepo.update(foundUser.id, { passwordHash: hash, needsPasswordChange, isVerified, isRootUser });
+    await userRoleRepo.upsert(
+      roles.map((r) => ({
+        userId: foundUser.id,
+        roleId: r,
+      })),
+      {
+        skipUpdateIfNoValuesChanged: true,
+        conflictPaths: ["userId", "roleId"],
+      }
+    );
     return {
       id: foundUser.id,
       isVerified,
@@ -35,20 +51,31 @@ export async function ensureTestUserCreated(
       isDemoUser: foundUser.isDemoUser,
       username: foundUser.username,
       needsPasswordChange: foundUser.needsPasswordChange,
-      roles: foundUser.roles,
-    } as UserDto<MongoIdType>;
+      roles: foundUser.roles?.map((r) => r.roleId),
+    } as UserDto<SqliteIdType>;
   }
 
-  const user = await User.create({
+  const userr = userRepo.create({
     username,
     passwordHash: hash,
-    roles,
     isDemoUser: false,
     isRootUser,
     isVerified,
     needsPasswordChange,
   });
 
+  await userRepo.insert(userr);
+  await userRoleRepo.upsert(
+    roles.map((r) => ({
+      userId: userr.id,
+      roleId: r,
+    })),
+    {
+      skipUpdateIfNoValuesChanged: true,
+      conflictPaths: ["userId", "roleId"],
+    }
+  );
+  const user = await userRepo.findOneBy({ id: userr.id });
   return {
     id: user.id,
     username: user.username,
@@ -56,6 +83,6 @@ export async function ensureTestUserCreated(
     isRootUser,
     isVerified,
     needsPasswordChange: user.needsPasswordChange,
-    roles: user.roles,
-  } as UserDto<MongoIdType>;
+    roles: user.roles?.map((r) => r.roleId),
+  } as UserDto<SqliteIdType>;
 }

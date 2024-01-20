@@ -1,21 +1,20 @@
-import { connect } from "../../db-handler";
-import { configureContainer } from "@/container";
 import { DITokens } from "@/container.tokens";
-import { Floor } from "@/models";
+import { Floor } from "@/entities";
 import { FloorStore } from "@/state/floor.store";
+import { TypeormService } from "@/services/typeorm/typeorm.service";
+import { setupTestApp } from "../../test-server";
 
-let container;
 let floorStore: FloorStore;
-let Model = Floor;
+let typeormService: TypeormService;
 
 beforeAll(async () => {
-  await connect();
-  container = configureContainer();
+  const { container, typeormService: typeormService2 } = await setupTestApp(true);
   floorStore = container.resolve(DITokens.floorStore);
+  typeormService = typeormService2;
 });
 
 beforeEach(async () => {
-  Model.deleteMany({});
+  await typeormService.getDataSource().getRepository(Floor).clear();
 });
 
 describe(DITokens.floorStore, () => {
@@ -35,7 +34,6 @@ describe(DITokens.floorStore, () => {
     await floorStore.update(floors[0].id, {
       name: "flo",
       floor: 1,
-      printers: [],
     });
     const floors2 = await floorStore.listCache();
     expect(floors2).toHaveLength(1);

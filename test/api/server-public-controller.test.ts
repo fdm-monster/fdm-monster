@@ -1,5 +1,4 @@
 import { AwilixContainer } from "awilix";
-import { connect } from "../db-handler";
 import { setupTestApp } from "../test-server";
 import { expectOkResponse, expectUnauthenticatedResponse } from "../extensions";
 import { AppConstants } from "@/server.constants";
@@ -11,6 +10,7 @@ import { SettingsStore } from "@/state/settings.store";
 import { AxiosMock } from "../mocks/axios.mock";
 import supertest from "supertest";
 import { ServerPublicController } from "@/controllers/server-public.controller";
+import { isDocker } from "@/utils/is-docker";
 
 let container: AwilixContainer;
 let releaseService: ServerReleaseService;
@@ -24,7 +24,6 @@ const testRoute = `${welcomeRoute}/test`;
 const versionRoute = `${welcomeRoute}/version`;
 
 beforeAll(async () => {
-  await connect();
   ({ request, container } = await setupTestApp(true));
   releaseService = container.resolve(DITokens.serverReleaseService);
   settingsStore = container.resolve(DITokens.settingsStore);
@@ -87,7 +86,7 @@ describe(ServerPublicController.name, () => {
   it("should return unsynced state response", async function () {
     const response = await request.get(versionRoute).send();
     expectOkResponse(response, {
-      isDockerContainer: false,
+      isDockerContainer: isDocker(),
       isPm2: false,
       update: {
         synced: false,
@@ -103,7 +102,7 @@ describe(ServerPublicController.name, () => {
 
     const response = await request.get(versionRoute).send();
     expectOkResponse(response, {
-      isDockerContainer: false,
+      isDockerContainer: isDocker(),
       isPm2: false,
       update: {
         synced: false,
@@ -120,7 +119,7 @@ describe(ServerPublicController.name, () => {
 
     const response = await request.get(versionRoute).send();
     expectOkResponse(response, {
-      isDockerContainer: false,
+      isDockerContainer: isDocker(),
       isPm2: false,
       update: {
         airGapped: null,

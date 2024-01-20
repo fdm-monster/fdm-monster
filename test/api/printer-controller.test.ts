@@ -1,14 +1,11 @@
-import { connect } from "../db-handler";
 import { setupTestApp } from "../test-server";
 import { expectInvalidResponse, expectNotFoundResponse, expectOkResponse } from "../extensions";
 import { AppConstants } from "@/server.constants";
-import { Printer } from "@/models";
 import { createTestPrinter, testApiKey } from "./test-data/create-printer";
 import supertest, { SuperTest } from "supertest";
 import { PrinterController } from "@/controllers/printer.controller";
 import { OctoPrintApiMock } from "../mocks/octoprint-api.mock";
 
-let Model = Printer;
 const defaultRoute = AppConstants.apiRoute + "/printer";
 const createRoute = defaultRoute;
 const testPrinterRoute = `${defaultRoute}/test-connection`;
@@ -36,12 +33,7 @@ const apiKey = "fdmfdmfdmfdmfdmfdmfdmfdmfdmfdmfd";
 const name = "test1234";
 
 beforeAll(async () => {
-  await connect();
   ({ request, octoPrintApiService } = await setupTestApp(true));
-});
-
-afterAll(async () => {
-  await Model.deleteMany({});
 });
 
 describe(PrinterController.name, () => {

@@ -15,6 +15,7 @@ import { TaskManagerService } from "@/services/core/task-manager.service";
 import { isProductionEnvironment } from "@/utils/env.utils";
 import { ConfigService } from "@/services/core/config.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
+import { TypeormService } from "@/services/typeorm/typeorm.service";
 
 export class ServerHost {
   bootTask: BootTask;
@@ -22,6 +23,7 @@ export class ServerHost {
   socketIoGateway: SocketIoGateway;
   appInstance: Application | null = null;
   configService: ConfigService;
+  typeormService: TypeormService;
   private readonly isTypeormMode: boolean;
   private logger: LoggerService;
 
@@ -31,6 +33,7 @@ export class ServerHost {
     taskManagerService,
     socketIoGateway,
     configService,
+    typeormService,
     isTypeormMode,
   }: {
     loggerFactory: ILoggerFactory;
@@ -38,18 +41,23 @@ export class ServerHost {
     taskManagerService: TaskManagerService;
     socketIoGateway: SocketIoGateway;
     configService: ConfigService;
+    typeormService: TypeormService;
+    isTypeormMode: boolean;
   }) {
     this.logger = loggerFactory(ServerHost.name);
     this.bootTask = bootTask;
     this.taskManagerService = taskManagerService;
     this.socketIoGateway = socketIoGateway;
     this.configService = configService;
+    this.typeormService = typeormService;
     this.isTypeormMode = isTypeormMode;
   }
 
   async boot(app: Application, quick_boot = false, listenRequests = true) {
-    // Enforce models to be strictly applied, any unknown property will not be persisted
-    mongoose.set("strictQuery", true);
+    if (!this.isTypeormMode) {
+      // Enforce models to be strictly applied, any unknown property will not be persisted
+      mongoose.set("strictQuery", true);
+    }
 
     this.appInstance = app;
     this.serveControllerRoutes(this.appInstance);
@@ -62,7 +70,11 @@ export class ServerHost {
   }
 
   hasConnected() {
-    return mongoose.connections[0].readyState;
+    if (this.isTypeormMode) {
+      return this.typeormService.hasConnected();
+    } else {
+      return mongoose.connections[0].readyState;
+    }
   }
 
   serveControllerRoutes(app: Application) {

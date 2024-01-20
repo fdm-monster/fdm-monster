@@ -11,6 +11,7 @@ import { IUserService } from "@/services/interfaces/user-service.interface";
 import { Socket } from "socket.io";
 import { AuthenticationError } from "@/exceptions/runtime.exceptions";
 import { AUTH_ERROR_REASON } from "@/constants/authorization.constants";
+import { User } from "@/entities";
 
 export interface JwtFromSocketFunction {
   (socket: Socket): string | null;
@@ -36,7 +37,7 @@ export function verifyUserCallback(userService: IUserService) {
   return function (jwt_payload: any, done: VerifiedCallback) {
     userService
       .getUser(jwt_payload.userId)
-      .then((user: IUser) => {
+      .then((user: IUser | User) => {
         if (user && user.isVerified && !user.needsPasswordChange) {
           return done(null, user);
         }

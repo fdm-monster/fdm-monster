@@ -1,20 +1,14 @@
-import { closeDatabase, connect } from "../db-handler";
-import { configureContainer } from "@/container";
 import { DITokens } from "@/container.tokens";
-import { CameraStreamService } from "@/services/camera-stream.service";
 import { ICameraStreamService } from "@/services/interfaces/camera-stream.service.interface";
-import { MongoIdType } from "@/shared.constants";
+import { SqliteIdType } from "@/shared.constants";
+import { CameraStreamService } from "@/services/orm/camera-stream.service";
+import { setupTestApp } from "../test-server";
 
 let cameraStreamService: ICameraStreamService;
 
 beforeAll(async () => {
-  await connect();
-  const container = configureContainer();
-  cameraStreamService = container.resolve<ICameraStreamService<MongoIdType>>(DITokens.cameraStreamService);
-});
-
-afterAll(async () => {
-  await closeDatabase();
+  const { container } = await setupTestApp(true);
+  cameraStreamService = container.resolve<ICameraStreamService<SqliteIdType>>(DITokens.cameraStreamService);
 });
 
 describe(CameraStreamService.name, () => {

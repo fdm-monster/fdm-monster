@@ -1,10 +1,10 @@
 import { AppConstants } from "@/server.constants";
 import { configureContainer } from "@/container";
 import { DITokens } from "@/container.tokens";
-import { connect } from "../db-handler";
 import { asClass, AwilixContainer } from "awilix";
 import { AxiosMock } from "../mocks/axios.mock";
 import { ServerReleaseService } from "@/services/core/server-release.service";
+import { ServerUpdateService } from "@/services/core/server-update.service";
 
 let container: AwilixContainer;
 let service: ServerReleaseService;
@@ -12,7 +12,6 @@ let httpClient: AxiosMock;
 const v1 = "1.0.0";
 
 beforeAll(async () => {
-  await connect();
   container = configureContainer();
   container.register(DITokens.httpClient, asClass(AxiosMock).singleton());
 
@@ -20,7 +19,7 @@ beforeAll(async () => {
   httpClient = container.resolve(DITokens.httpClient);
 });
 
-describe("ServerUpdateService", () => {
+describe(ServerUpdateService.name, () => {
   it("should know process version", () => {
     expect(process.env[AppConstants.VERSION_KEY]).toEqual(v1);
     expect(container.resolve(DITokens.serverVersion)).toEqual(v1);

@@ -1,25 +1,32 @@
-import { connect } from "../db-handler";
 import { configureContainer } from "@/container";
-import { Printer } from "@/models";
 import { DITokens } from "@/container.tokens";
 import { testPrinterData } from "./test-data/printer.data";
 import { AwilixContainer } from "awilix";
 import { PrinterService } from "@/services/printer.service";
+import { TypeormService } from "@/services/typeorm/typeorm.service";
+import { Printer } from "@/entities";
+import { Repository } from "typeorm";
+import { IPrinterService } from "@/services/interfaces/printer.service.interface";
+import { SqliteIdType } from "@/shared.constants";
 
 let container: AwilixContainer;
-let printerService: PrinterService;
+let printerService: IPrinterService<SqliteIdType, Printer>;
+let typeorm: TypeormService;
+let printerRepository: Repository<Printer>;
 
 beforeAll(async () => {
-  await connect();
-  container = configureContainer();
-  printerService = container.resolve(DITokens.printerService);
+  container = configureContainer(true);
+  printerService = container.resolve<IPrinterService<SqliteIdType, Printer>>(DITokens.printerService);
+  typeorm = container.resolve<TypeormService>(DITokens.typeormService);
+  printerRepository = typeorm.getDataSource().getRepository(Printer);
+  await typeorm.createConnection();
 });
 
-afterAll(async () => {
-  return Printer.deleteMany({});
+afterEach(async () => {
+  await typeorm.getDataSource().getRepository(Printer).delete({});
 });
 
-describe("PrinterService", () => {
+describe(PrinterService.name, () => {
   it("Must be able to rename a created printer", async () => {
     const printer = await printerService.create(testPrinterData);
     const updatedName = "newName";
@@ -29,7 +36,7 @@ describe("PrinterService", () => {
     };
 
     await printerService.update(printer.id, printerUpdate);
-    const foundPrinter = await Printer.findOne({ id: printer.id });
+    const foundPrinter = await printerRepository.findOneBy({ id: printer.id });
     expect(foundPrinter).toBeDefined();
     expect(foundPrinter!.name).toEqual(updatedName);
   });

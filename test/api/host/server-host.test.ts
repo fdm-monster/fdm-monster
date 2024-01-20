@@ -1,6 +1,5 @@
 import { AwilixContainer } from "awilix";
 import supertest from "supertest";
-import { connect } from "../../db-handler";
 import { setupTestApp } from "../../test-server";
 import { expectOkResponse } from "../../extensions";
 import { DITokens } from "@/container.tokens";
@@ -12,7 +11,6 @@ let serverHost: ServerHost;
 let request: supertest.SuperTest<supertest.Test>;
 
 beforeAll(async () => {
-  await connect();
   ({ container, request } = await setupTestApp(true, undefined, false));
   serverHost = container.resolve(DITokens.serverHost);
 });

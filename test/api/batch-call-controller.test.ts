@@ -1,14 +1,15 @@
-import { connect } from "../db-handler";
 import { AppConstants } from "@/server.constants";
 import { setupTestApp } from "../test-server";
-import { Printer } from "@/models";
 import { createTestPrinter } from "./test-data/create-printer";
 import { expectOkResponse } from "../extensions";
 import { OctoPrintApiMock } from "../mocks/octoprint-api.mock";
 import supertest from "supertest";
 import { BatchCallController } from "@/controllers/batch-call.controller";
+import { AwilixContainer } from "awilix";
+import { DITokens } from "@/container.tokens";
+import { IPrinterService } from "@/services/interfaces/printer.service.interface";
+import { SqliteIdType } from "@/shared.constants";
 
-let Model = Printer;
 const defaultRoute = AppConstants.apiRoute + "/batch";
 const batchConnectUsbRoute = `${defaultRoute}/connect/usb`;
 const batchConnectSocketRoute = `${defaultRoute}/connect/socket`;
@@ -16,17 +17,25 @@ const batchToggleEnabledRoute = `${defaultRoute}/toggle-enabled`;
 const executeBatchReprintRoute = `${defaultRoute}/reprint/execute`;
 const getBatchReprintRoute = `${defaultRoute}/reprint/list`;
 
+let container: AwilixContainer;
 let request: supertest.SuperTest<supertest.Test>;
+let printerService: IPrinterService<SqliteIdType>;
 let octoPrintApiService: OctoPrintApiMock;
 
 beforeAll(async () => {
-  await connect();
-  ({ request, octoPrintApiService } = await setupTestApp(true));
+  ({ request, octoPrintApiService, container } = await setupTestApp(true));
+  printerService = container.resolve(DITokens.printerService);
 });
 
 beforeEach(async () => {
-  Model.deleteMany({});
   octoPrintApiService.storeResponse(undefined, undefined);
+});
+
+afterEach(async () => {
+  const printers = await printerService.list();
+  for (let printer of printers) {
+    await printerService.delete(printer.id);
+  }
 });
 
 describe(BatchCallController.name, () => {

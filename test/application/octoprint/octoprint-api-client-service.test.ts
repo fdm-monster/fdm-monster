@@ -1,32 +1,20 @@
-import { configureContainer } from "@/container";
 import { DITokens } from "@/container.tokens";
 import { AxiosMock } from "../../mocks/axios.mock";
-import { asClass } from "awilix";
+import { setupTestApp } from "../../test-server";
+import { AwilixContainer } from "awilix";
+import { OctoPrintApiMock } from "../../mocks/octoprint-api.mock";
 import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
-import { connect, clearDatabase, closeDatabase } from "../../db-handler";
 
-let octoPrintApi: OctoPrintApiService;
+let octoPrintApiService: OctoPrintApiMock;
+let container: AwilixContainer;
 let httpClient: AxiosMock;
 
 beforeAll(async () => {
-  await connect();
-  const container = configureContainer();
-  container.register(DITokens.httpClient, asClass(AxiosMock).singleton());
+  ({ container, httpClient, octoPrintApiService } = await setupTestApp(true));
   await container.resolve(DITokens.settingsStore).loadSettings();
-
-  httpClient = container.resolve(DITokens.httpClient);
-  octoPrintApi = container.resolve(DITokens.octoPrintApiService);
 });
 
-afterEach(async () => {
-  await clearDatabase();
-});
-
-afterAll(async () => {
-  await closeDatabase();
-});
-
-describe("OctoPrint-API-Client-Service", () => {
+describe(OctoPrintApiService.name, () => {
   const apiKey = "surewhynotsurewhynotsurewhynotsu";
   const printerURL = "http://someurl/";
   const auth = { apiKey, printerURL };
@@ -39,7 +27,7 @@ describe("OctoPrint-API-Client-Service", () => {
     // TODO Not human-friendly
     await expect(
       async () =>
-        await octoPrintApi.getSettings({
+        await octoPrintApiService.getSettings({
           apiKey: "surewhynot",
           printerURL: "some uwrl",
         })
@@ -47,119 +35,119 @@ describe("OctoPrint-API-Client-Service", () => {
   });
 
   it("should not throw error on getSettings with correct printerURL", async () => {
-    const settings = await octoPrintApi.getSettings(auth);
+    const settings = await octoPrintApiService.getSettings(auth);
   });
 
   it("should get first admin's username when response not recognized", async () => {
     httpClient.saveMockResponse([], 200);
-    const adminResult = await octoPrintApi.getAdminUserOrDefault(auth);
+    const adminResult = await octoPrintApiService.getAdminUserOrDefault(auth);
     expect(adminResult).toBe("admin");
   });
 
   it("should pick admin user from keys", async () => {
     const usersResponse = require("../test-data/octoprint-users.response.json");
     httpClient.saveMockResponse(usersResponse, 200);
-    const adminResult = await octoPrintApi.getAdminUserOrDefault(auth);
+    const adminResult = await octoPrintApiService.getAdminUserOrDefault(auth);
     expect(adminResult).toBe("root");
   });
 
   it("should not throw error on getUsers", async () => {
-    const usersResult = await octoPrintApi.getUsers(auth);
+    const usersResult = await octoPrintApiService.getUsers(auth);
     expect(usersResult).toBeUndefined();
   });
 
   it("should not throw error on getFiles", async () => {
-    const filesResult = await octoPrintApi.getLocalFiles(auth);
+    const filesResult = await octoPrintApiService.getLocalFiles(auth);
     expect(filesResult).toHaveLength(0);
   });
 
   it("should not throw error on getFile", async () => {
-    const fileResult = await octoPrintApi.getFile(auth, "usr/path/illegal.gcode");
+    const fileResult = await octoPrintApiService.getFile(auth, "usr/path/illegal.gcode");
     expect(fileResult).toBeUndefined();
   });
 
   it("should not throw error on sendJobCommand", async () => {
-    const result = await octoPrintApi.sendJobCommand(auth, { select: true });
+    const result = await octoPrintApiService.sendJobCommand(auth, { select: true });
     expect(result).toBeUndefined();
   });
 
   it("should not throw error on sendBedTempCommand", async () => {
-    const result = await octoPrintApi.sendBedTempCommand(auth, 50);
+    const result = await octoPrintApiService.sendBedTempCommand(auth, 50);
     expect(result).toBeUndefined();
   });
 
   it("should not throw error on setGCodeAnalysis", async () => {
-    const result = await octoPrintApi.setGCodeAnalysis(auth, { enabled: false });
+    const result = await octoPrintApiService.setGCodeAnalysis(auth, false);
     expect(result).toBeUndefined();
   });
 
   it("should not throw error on createFolder", async () => {
-    const result = await octoPrintApi.createFolder(auth, "newPath", "someFolder");
+    const result = await octoPrintApiService.createFolder(auth, "newPath", "someFolder");
     expect(result).toBeUndefined();
   });
 
   it("should not throw error on moveFileOrFolder", async () => {
-    const result = await octoPrintApi.moveFileOrFolder(auth, "oldPath", "newPath");
+    const result = await octoPrintApiService.moveFileOrFolder(auth, "oldPath", "newPath");
     expect(result).toBeUndefined();
   });
 
   it("should not throw error on selectPrintFile", async () => {
-    const result = await octoPrintApi.selectPrintFile(auth, "path", true);
+    const result = await octoPrintApiService.selectPrintFile(auth, "path", true);
     expect(result).toBeUndefined();
   });
 
   it("should not throw error on deleteFileOrFolder", async () => {
-    const result = await octoPrintApi.deleteFileOrFolder(auth, "path");
+    const result = await octoPrintApiService.deleteFileOrFolder(auth, "path");
     expect(result).toBeUndefined();
   });
 
   it("should not throw error on getConnection", async () => {
-    const result = await octoPrintApi.getConnection(auth);
+    const result = await octoPrintApiService.getConnection(auth);
     expect(result).toBeUndefined();
   });
 
   it("should not throw error on getPrinterProfiles", async () => {
-    const result = await octoPrintApi.getPrinterProfiles(auth);
+    const result = await octoPrintApiService.getPrinterProfiles(auth);
     expect(result).toBeUndefined();
   });
 
   it("should not throw error on getApiPluginManager", async () => {
-    const result = await octoPrintApi.getPluginManagerPlugins(auth);
+    const result = await octoPrintApiService.getPluginManagerPlugins(auth);
     expect(result).toBeUndefined();
   });
 
   it("should not throw error on getSystemInfo", async () => {
-    const result = await octoPrintApi.getSystemInfo(auth);
+    const result = await octoPrintApiService.getSystemInfo(auth);
     expect(result).toBeUndefined();
   });
 
   it("should not throw error on getSystemCommands", async () => {
-    const result = await octoPrintApi.getSystemCommands(auth);
+    const result = await octoPrintApiService.getSystemCommands(auth);
     expect(result).toBeUndefined();
   });
 
   it("should not throw error on getSoftwareUpdateCheck", async () => {
-    const result = await octoPrintApi.getSoftwareUpdateCheck(auth);
+    const result = await octoPrintApiService.getSoftwareUpdateCheck(auth, false);
     expect(result).toBeUndefined();
   });
 
   it("should not throw error on getPluginPiSupport", async () => {
-    const result = await octoPrintApi.getPluginPiSupport(auth);
+    const result = await octoPrintApiService.getPluginPiSupport(auth);
     expect(result).toBeUndefined();
   });
 
   it("should not throw error on deleteTimeLapse", async () => {
-    const result = await octoPrintApi.deleteTimeLapse(auth, "deletedFile");
+    const result = await octoPrintApiService.deleteTimeLapse(auth, "deletedFile");
     expect(result).toBeUndefined();
   });
 
   it("should not throw error on listUnrenderedTimeLapses", async () => {
-    const result = await octoPrintApi.listUnrenderedTimeLapses(auth);
+    const result = await octoPrintApiService.listUnrenderedTimeLapses(auth);
     expect(result).toBeUndefined();
   });
 
   it("should not throw error on listProfiles", async () => {
-    const result = await octoPrintApi.listProfiles(auth);
+    const result = await octoPrintApiService.listProfiles(auth);
     expect(result).toBeUndefined();
   });
 });

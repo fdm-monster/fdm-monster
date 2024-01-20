@@ -1,26 +1,16 @@
 import { AwilixContainer } from "awilix";
-import { UserService } from "@/services/authentication/user.service";
-import { RoleService } from "@/services/authentication/role.service";
-import { closeDatabase, connect } from "../db-handler";
-import { configureContainer } from "@/container";
 import { DITokens } from "@/container.tokens";
-import { User } from "@/models";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
 import { SettingsService } from "@/services/settings.service";
+import { setupTestApp } from "../test-server";
+import { TypeormService } from "@/services/typeorm/typeorm.service";
 
 let container: AwilixContainer;
 let settingsService: ISettingsService;
 
 beforeAll(async () => {
-  await connect();
-  container = configureContainer();
+  ({ container } = await setupTestApp(true));
   settingsService = container.resolve<ISettingsService>(DITokens.settingsService);
-});
-afterEach(async () => {
-  await User.deleteMany();
-});
-afterAll(async () => {
-  await closeDatabase();
 });
 
 describe(SettingsService.name, () => {

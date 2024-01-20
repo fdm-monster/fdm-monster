@@ -1,8 +1,6 @@
-import { connect } from "../db-handler";
 import { setupTestApp } from "../test-server";
 import { expectOkResponse } from "../extensions";
 import { AppConstants } from "@/server.constants";
-import { CameraStream as Model } from "@/models";
 import supertest from "supertest";
 import { createTestPrinter } from "./test-data/create-printer";
 import { CameraStreamController } from "@/controllers/camera-stream.controller";
@@ -13,23 +11,26 @@ const deleteRoute = (id: string) => `${listRoute}/${id}`;
 const updateRoute = (id: string) => `${getRoute(id)}`;
 
 let request: supertest.SuperTest<supertest.Test>;
-const idType = String;
+let idType: typeof Number | typeof String;
+let isTypeormMode: boolean;
 beforeAll(async () => {
-  await connect();
-  ({ request } = await setupTestApp(true));
-});
-
-beforeEach(async () => {
-  Model.deleteMany({});
+  ({ idType, isTypeormMode, request } = await setupTestApp(true));
 });
 
 describe(CameraStreamController.name, () => {
   const defaultTestURL = "https://test.url/stream";
-  const defaultCameraStreamInput = (url: string) => ({
-    streamURL: url,
-    name: "Tester",
-    printerId: null,
-  });
+  const defaultCameraStreamInput = (url: string) =>
+    isTypeormMode
+      ? {
+          streamURL: url,
+          printerId: null,
+          name: "Tester",
+        }
+      : {
+          streamURL: url,
+          printerId: null,
+          name: "Tester",
+        };
   const matchedBody = (url: string) => ({
     id: expect.any(idType),
     streamURL: url,

@@ -1,32 +1,32 @@
 import { FirstTimeSetupController } from "@/controllers/first-time-setup.controller";
 import supertest from "supertest";
-import { connect } from "../db-handler";
 import { setupTestApp } from "../test-server";
-import { CameraStream as Model, User } from "@/models";
 import { AppConstants } from "@/server.constants";
 import { AwilixContainer } from "awilix";
 import { DITokens } from "@/container.tokens";
 import { SettingsStore } from "@/state/settings.store";
-import { expectForbiddenResponse, expectOkResponse, expectUnauthorizedResponse } from "../extensions";
+import { expectForbiddenResponse, expectOkResponse } from "../extensions";
 import { IUserService } from "@/services/interfaces/user-service.interface";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
+import { TypeormService } from "@/services/typeorm/typeorm.service";
+import { User } from "@/entities";
+import { Repository } from "typeorm";
 
 let request: supertest.SuperTest<supertest.Test>;
 let container: AwilixContainer;
 let settingsService: ISettingsService;
 let settingsStore: SettingsStore;
+let userRepository: Repository<User>;
+let typeormService: TypeormService;
 const completeSetupRoute = `${AppConstants.apiRoute}/first-time-setup/complete`;
 
 beforeAll(async () => {
-  await connect();
-  ({ request, container } = await setupTestApp(true));
+  ({ request, container, typeormService } = await setupTestApp(true));
   settingsService = container.resolve<ISettingsService>(DITokens.settingsService);
   settingsStore = container.resolve<SettingsStore>(DITokens.settingsStore);
+  userRepository = typeormService.getDataSource().getRepository(User);
 });
 
-beforeEach(async () => {
-  Model.deleteMany({});
-});
 describe(FirstTimeSetupController.name, () => {
   const completeSetup = async (input: any) => await request.post(completeSetupRoute).send(input);
   const resetWizard = async () => {
@@ -57,7 +57,7 @@ describe(FirstTimeSetupController.name, () => {
   it("should not complete first-time-setup twice", async () => {
     await resetWizard();
     expect(settingsStore.isWizardCompleted()).toBeFalsy();
-    await User.deleteMany({});
+    await userRepository.delete({});
     const response = await completeSetup({
       loginRequired: true,
       registration: true,
