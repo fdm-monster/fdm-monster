@@ -6,7 +6,6 @@
   },
   "author": "David Zwart",
   "license": "AGPL-3.0-or-later",
-  "private": false,
   "version": "1.6.0-rc1",
   "bin": {
     "fdm-monster": "dist/index.js",
@@ -79,7 +78,6 @@
     "luxon": "3.4.4",
     "migrate-mongo": "11.0.0",
     "mongoose": "6.12.5",
-    "mqtt": "5.3.4",
     "multer": "1.4.5-lts.1",
     "node-input-validator": "4.5.1",
     "nodemon": "3.0.3",
@@ -109,7 +107,6 @@
     "@types/connect-history-api-fallback": "1.5.4",
     "@types/cookie-parser": "1.4.6",
     "@types/express": "4.17.21",
-    "@types/express-session": "1.17.10",
     "@types/ip": "1.1.3",
     "@types/jest": "29.5.11",
     "@types/js-yaml": "4.0.9",
@@ -161,5 +158,6 @@
       "docker/*"
     ],
     "delay": 100
-  }
+  },
+  "packageManager": "yarn@4.0.2"
 }

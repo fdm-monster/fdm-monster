@@ -13,11 +13,12 @@ jobs:
         with:
           node-version: 18.x
 
-      - run: yarn install --frozen-lockfile
+      - run: yarn set version berry
+      - run: yarn install --immutable
       - run: yarn run build
       - run: yarn run test:cov
         env:
-          NODE_OPTIONS: '--max_old_space_size=4096'
+          NODE_OPTIONS: '--max_old_space_size=8192'
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
