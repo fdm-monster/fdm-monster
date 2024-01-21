@@ -1073,7 +1073,7 @@ __metadata:
     "@lcov-viewer/istanbul-report": "npm:1.4.0"
     "@octokit/plugin-throttling": "npm:8.1.3"
     "@sentry/node": "npm:7.94.1"
-    "@swc/cli": "npm:0.1.63"
+    "@swc/cli": "npm:0.1.64"
     "@swc/core": "npm:1.3.105"
     "@swc/jest": "npm:0.2.31"
     "@types/adm-zip": "npm:0.5.5"
@@ -2469,13 +2469,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@swc/cli@npm:0.1.63":
-  version: 0.1.63
-  resolution: "@swc/cli@npm:0.1.63"
+"@swc/cli@npm:0.1.64":
+  version: 0.1.64
+  resolution: "@swc/cli@npm:0.1.64"
   dependencies:
     "@mole-inc/bin-wrapper": "npm:^8.0.1"
     commander: "npm:^7.1.0"
     fast-glob: "npm:^3.2.5"
+    minimatch: "npm:^9.0.3"
     semver: "npm:^7.3.8"
     slash: "npm:3.0.0"
     source-map: "npm:^0.7.3"
@@ -2489,7 +2490,7 @@ __metadata:
     spack: bin/spack.js
     swc: bin/swc.js
     swcx: bin/swcx.js
-  checksum: a8389647e6727f062903e4f90f3c4d6be979f5c85c50fd31342f580e7c58e514ecb13103a011806b33b09509aa6ebe61146efad803c5f55f4c70bcdb9c8f93da
+  checksum: a695149eec5ef99bacc481d2b09a9622958519a06a5057f0c40ba759a12899ea826457436228ae8a3567ae0d89ca8c89129f2a5d75f8248905705304e416c88f
   languageName: node
   linkType: hard
 
@@ -7614,7 +7615,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"minimatch@npm:^9.0.1":
+"minimatch@npm:^9.0.1, minimatch@npm:^9.0.3":
   version: 9.0.3
   resolution: "minimatch@npm:9.0.3"
   dependencies:
