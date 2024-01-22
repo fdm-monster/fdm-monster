@@ -70,6 +70,9 @@ export class PrinterFilesService implements IPrinterFilesService<MongoIdType> {
   async appendOrReplaceFile(printerId: MongoIdType, addedFile: CreateOrUpdatePrinterFileDto<MongoIdType>) {
     const printer = await this.printerService.get(printerId);
     addedFile.printerId = printer.id;
+    if (!addedFile.customData) {
+      addedFile.customData = {};
+    }
 
     const foundFile = await this.getPrinterFile(printer.id, addedFile.path);
     if (!foundFile) {
