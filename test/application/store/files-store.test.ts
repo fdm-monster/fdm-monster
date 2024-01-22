@@ -55,6 +55,7 @@ describe(PrinterFilesStore.name, () => {
         display: "displayvalue",
         name: "123.file",
         hash: "123",
+        customData: {},
       },
     ]);
     await printerFilesStore.loadFilesStore();
@@ -79,6 +80,7 @@ describe(PrinterFilesStore.name, () => {
         display: "displayvalue",
         name: "125.file",
         hash: "125",
+        customData: {},
       },
       {
         date: Date.now() / 1000 - 8 * 86400,
@@ -87,6 +89,7 @@ describe(PrinterFilesStore.name, () => {
         display: "displayvalue",
         name: "124.file",
         hash: "124",
+        customData: {},
       },
     ]);
     await printerFilesStore.loadFilesStore();
