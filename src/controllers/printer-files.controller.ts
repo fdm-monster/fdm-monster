@@ -98,7 +98,7 @@ export class PrinterFilesController {
     const failedFiles = [];
     const succeededFiles = [];
 
-    for (let file of nonRecursiveFiles.files) {
+    for (let file of nonRecursiveFiles) {
       try {
         await this.octoPrintApiService.deleteFileOrFolder(printerLogin, file.path);
         succeededFiles.push(file);

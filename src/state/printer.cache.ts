@@ -1,8 +1,6 @@
 import { KeyDiffCache, keyType } from "@/utils/cache/key-diff.cache";
 import { printerEvents } from "@/constants/event.constants";
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
-import { mapMongoDb } from "@/utils/mapper.utils";
-import { PrinterService } from "@/services/printer.service";
 import EventEmitter2 from "eventemitter2";
 import { IdType } from "@/shared.constants";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";

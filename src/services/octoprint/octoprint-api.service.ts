@@ -12,6 +12,9 @@ import { LoginDto } from "@/services/interfaces/login.dto";
 import { IdType } from "@/shared.constants";
 import { SettingsStore } from "@/state/settings.store";
 import { ILoggerFactory } from "@/handlers/logger-factory";
+import { OctoprintRawFilesResponseDto } from "@/services/octoprint/models/octoprint-file.dto";
+import { normalizePrinterFile } from "@/services/octoprint/utils/file.utils";
+import { errorSummary } from "@/utils/error.utils";
 
 export class OctoPrintApiService extends OctoPrintRoutes {
   eventEmitter2: EventEmitter2;
@@ -117,15 +120,28 @@ export class OctoPrintApiService extends OctoPrintRoutes {
 
   async getLocalFiles(login: LoginDto, recursive = false) {
     const { url, options } = this.prepareRequest(login, this.apiGetFiles(recursive));
-    const response = await this.axiosClient.get(url, options);
-    return response?.data;
+    const response = await this.axiosClient.get<OctoprintRawFilesResponseDto>(url, options);
+
+    const normalizedFiles =
+      response?.data?.files
+        // Filter out folders
+        .filter((f) => f.date)
+        .map((f) => {
+          return normalizePrinterFile(f);
+        }) || [];
+    return normalizedFiles;
   }
 
   async getFile(login: LoginDto, path: string) {
     const pathUrl = this.apiFile(path);
     const { url, options } = this.prepareRequest(login, pathUrl);
     const response = await this.axiosClient.get(url, options);
-    return response?.data;
+    try {
+      return normalizePrinterFile(response?.data);
+    } catch (e) {
+      this.logger.error(`File was empty or normalization failed ${errorSummary(e)}`);
+      return;
+    }
   }
 
   async createFolder(login: LoginDto, path: string, foldername: string) {

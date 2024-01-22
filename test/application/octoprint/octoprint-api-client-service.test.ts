@@ -70,7 +70,7 @@ describe("OctoPrint-API-Client-Service", () => {
 
   it("should not throw error on getFiles", async () => {
     const filesResult = await octoPrintApi.getLocalFiles(auth);
-    expect(filesResult).toBeUndefined();
+    expect(filesResult).toHaveLength(0);
   });
 
   it("should not throw error on getFile", async () => {
