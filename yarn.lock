@@ -1754,8 +1754,8 @@ __metadata:
   linkType: hard
 
 "@octokit/oauth-app@npm:^6.0.0":
-  version: 6.0.0
-  resolution: "@octokit/oauth-app@npm:6.0.0"
+  version: 6.1.0
+  resolution: "@octokit/oauth-app@npm:6.1.0"
   dependencies:
     "@octokit/auth-oauth-app": "npm:^7.0.0"
     "@octokit/auth-oauth-user": "npm:^4.0.0"
@@ -1765,7 +1765,7 @@ __metadata:
     "@octokit/oauth-methods": "npm:^4.0.0"
     "@types/aws-lambda": "npm:^8.10.83"
     universal-user-agent: "npm:^6.0.0"
-  checksum: 47b6a6d434bf106de3f1ae358f72ef9022c1e724e0a0ea6636277abe742935d1efdb0768f1fec010d8fdcb16e4f93d6bcb66cb46df2c739160599a120b3ef539
+  checksum: 9d67ca196eabbb397c677e006d28148d6c5185f88d86e5444c219e43b95e0ecaee5d31807ea24aedb64a76d61c0a53acd8091613e15d10733f41960bd981463c
   languageName: node
   linkType: hard
 
@@ -3114,13 +3114,13 @@ __metadata:
   linkType: hard
 
 "@types/superagent@npm:^8.1.0":
-  version: 8.1.1
-  resolution: "@types/superagent@npm:8.1.1"
+  version: 8.1.2
+  resolution: "@types/superagent@npm:8.1.2"
   dependencies:
     "@types/cookiejar": "npm:^2.1.5"
     "@types/methods": "npm:^1.1.4"
     "@types/node": "npm:*"
-  checksum: 8602854c2ba6a88fa9947db7fde5297a0e2b98b629144bb95f4a41dce66864edf5d886ac66df28aeb2b929bd7f37e517c2d9f9043efc61ee8064cd118f3ef7c0
+  checksum: 68cf140f768d90a52f9a2594278ae57c1c5f8d004bc0261aaacb50f96a89bd9f9bc2d1f3a306e1f79e3bc5fd739a41d12a3bcc65bc5f5930ba5bc29c65825f7a
   languageName: node
   linkType: hard
 
@@ -4729,9 +4729,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.4.601":
-  version: 1.4.640
-  resolution: "electron-to-chromium@npm:1.4.640"
-  checksum: fe5e2eaf3bdd73c1628ed0a7856a1d6afad99bdcceec6cacf87e7bac31db8514a52084d040b95b956ceba4f95723a6f3cf40a91f21b0061e6490328c9099dc4a
+  version: 1.4.642
+  resolution: "electron-to-chromium@npm:1.4.642"
+  checksum: 1a45c745e4cfa6dd0a756ca7df8295dd227b80a6d3552ccedd9665525aedab53d5335e8b97d64c02a6b10b0c773f8b9c20877875b3a3eb2428330f14d3892f27
   languageName: node
   linkType: hard
 
@@ -7134,9 +7134,9 @@ __metadata:
   linkType: hard
 
 "jsonc-parser@npm:^3.2.0":
-  version: 3.2.0
-  resolution: "jsonc-parser@npm:3.2.0"
-  checksum: 5a12d4d04dad381852476872a29dcee03a57439574e4181d91dca71904fcdcc5e8e4706c0a68a2c61ad9810e1e1c5806b5100d52d3e727b78f5cdc595401045b
+  version: 3.2.1
+  resolution: "jsonc-parser@npm:3.2.1"
+  checksum: ada66dec143d7f9cb0e2d0d29c69e9ce40d20f3a4cb96b0c6efb745025ac7f9ba647d7ac0990d0adfc37a2d2ae084a12009a9c833dbdbeadf648879a99b9df89
   languageName: node
   linkType: hard
 
@@ -7240,9 +7240,9 @@ __metadata:
   linkType: hard
 
 "libphonenumber-js@npm:^1.10.53":
-  version: 1.10.53
-  resolution: "libphonenumber-js@npm:1.10.53"
-  checksum: de5630a2c8c3a481fd4e37f2a36b5f199a7079b92f0e802e431124fe437c0401424a793bf3f18bcca151a57a6556d20ff8ccc2deea655a5675e2676ba2775224
+  version: 1.10.54
+  resolution: "libphonenumber-js@npm:1.10.54"
+  checksum: 685f4510d392b2b6dc5d6171d250ff9f0aa7b1c73160e1518fca8a2c453d854a4785aa625fd6f06d910856578b2c15468febe55b2cec7ea14526a1989247b993
   languageName: node
   linkType: hard
 
