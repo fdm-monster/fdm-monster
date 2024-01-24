@@ -32,9 +32,6 @@ export class PrinterWebsocketRestoreTask {
   async run() {
     const startTime = Date.now();
 
-    /**
-     * @type {OctoPrintSockIoAdapter[]}
-     */
     const existingSockets = this.printerSocketStore.listPrinterSockets();
     const resetAdapterIds = [];
     const silentSocketIds = [];
