@@ -68,6 +68,7 @@ export const DITokens = {
   socketIoTask: "socketIoTask",
   printCompletionSocketIoTask: "printCompletionSocketIoTask",
   printerWebsocketTask: "printerWebsocketTask",
+  printerDisconnectedPollTask: "printerDisconnectedPollTask",
   printerWebsocketRestoreTask: "printerWebsocketRestoreTask",
   printerFileCleanTask: "printerFileCleanTask",
 };

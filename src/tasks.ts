@@ -1,4 +1,4 @@
-import { TASK_PRESETS as TaskPresets } from "./task.presets";
+import { TASK_PRESETS as TaskPresets, TimingPreset } from "./task.presets";
 import { DITokens } from "./container.tokens";
 
 /**
@@ -9,10 +9,10 @@ import { DITokens } from "./container.tokens";
  * @param runImmediately
  * @returns {{task, id, preset}}
  */
-export function registerTask(task, preset, milliseconds = 0, runImmediately = false) {
+export function registerTask(task, preset: TimingPreset, milliseconds = 0, runImmediately = false) {
   let timingPreset = { ...preset };
   timingPreset.milliseconds = preset.milliseconds || milliseconds;
-  timingPreset.runImmediately = runImmediately | false;
+  timingPreset.runImmediately = runImmediately || false;
   return {
     id: task.name || task,
     task,
@@ -30,6 +30,8 @@ export class ServerTasks {
     registerTask(DITokens.printerFileCleanTask, TaskPresets.RUNONCE, 60 * 1000, true),
     // Every 2 seconds
     registerTask(DITokens.printerWebsocketTask, TaskPresets.PERIODIC, 2000, true),
+    // Every 10 seconds
+    registerTask(DITokens.printerDisconnectedPollTask, TaskPresets.PERIODIC, 10 * 1000, true),
     // Every 15 seconds
     registerTask(DITokens.printerWebsocketRestoreTask, TaskPresets.PERIODIC, 15 * 1000, false),
   ];

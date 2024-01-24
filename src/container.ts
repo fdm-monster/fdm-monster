@@ -60,7 +60,7 @@ import { JwtService } from "./services/authentication/jwt.service";
 import { AuthService } from "./services/authentication/auth.service";
 import { RefreshTokenService } from "@/services/authentication/refresh-token.service";
 import { throttling } from "@octokit/plugin-throttling";
-import { InternalServerException } from "@/exceptions/runtime.exceptions";
+import { PrinterDisconnectedPollTask } from "@/tasks/printer-disconnected-poll.task";
 
 export function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -166,6 +166,7 @@ export function configureContainer() {
     [di.printCompletionSocketIoTask]: asClass(PrintCompletionSocketIoTask).singleton(),
     [di.printerWebsocketTask]: asClass(PrinterWebsocketTask).singleton(), // This task is a recurring heartbeat task
     [di.printerWebsocketRestoreTask]: asClass(PrinterWebsocketRestoreTask).singleton(), // Task aimed at testing the printer API
+    [di.printerDisconnectedPollTask]: asClass(PrinterDisconnectedPollTask).singleton(),
     [di.printerFileCleanTask]: asClass(PrinterFileCleanTask).singleton(),
   });
 
