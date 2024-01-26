@@ -112,6 +112,23 @@ export class BatchCallService {
     return await Promise.all(promises);
   }
 
+  async getReprintFiles(printerIds: string[]): Promise<string[]> {
+    const promises = [];
+    for (const printerId of printerIds) {
+      const promise = new Promise<string>(async () => {
+        const login = await this.printerCache.getLoginDtoAsync(printerId);
+        const files = await this.octoPrintApiService.getLocalFiles(login, true);
+        files.sort((f1, f2) => {
+          return f1.prints.last < f2.prints.last ? -1 : 1;
+        });
+        return files[0];
+      });
+      promises.push(promise);
+    }
+
+    return await Promise.all(promises);
+  }
+
   async batchReprintCalls(printerIds: string[]): Promise<Awaited<BatchModel>[]> {
     const promises = [];
     for (const printerId of printerIds) {
