@@ -51,6 +51,7 @@ export const DITokens = {
   // Stores/states
   settingsStore: "settingsStore",
   printerCache: "printerCache",
+  printerConnectionCache: "printerConnectionCache",
   printerEventsCache: "printerEventsCache",
   printerSocketStore: "printerSocketStore",
   testPrinterSocketStore: "testPrinterSocketStore",

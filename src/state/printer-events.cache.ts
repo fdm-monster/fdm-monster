@@ -58,7 +58,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
     return ref;
   }
 
-  async setEvent(printerId: IdType, label: OctoPrintWsMessage, payload) {
+  async setEvent(printerId: IdType, label: OctoPrintWsMessage, payload: any) {
     const ref = await this.getOrCreateEvents(printerId);
     ref[label] = {
       payload,
@@ -67,7 +67,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
     await this.setKeyValue(printerId, ref);
   }
 
-  async setSubstate(printerId: IdType, label: OctoPrintWsMessage, substateName: string, payload) {
+  async setSubstate(printerId: IdType, label: OctoPrintWsMessage, substateName: string, payload: any) {
     const ref = await this.getOrCreateEvents(printerId);
     if (!ref[label]) {
       ref[label] = {};

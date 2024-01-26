@@ -15,6 +15,8 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { OctoprintRawFilesResponseDto } from "@/services/octoprint/models/octoprint-file.dto";
 import { normalizePrinterFile } from "@/services/octoprint/utils/file.utils";
 import { errorSummary } from "@/utils/error.utils";
+import { CurrentStateDto } from "@/services/octoprint/dto/websocket-output/current-message.dto";
+import { ConnectionDto } from "@/services/octoprint/dto/connection.dto";
 
 export class OctoPrintApiService extends OctoPrintRoutes {
   eventEmitter2: EventEmitter2;
@@ -265,12 +267,12 @@ export class OctoPrintApiService extends OctoPrintRoutes {
     const pathUrl = this.apiPrinterCurrent(history, limit, exclude);
     const { url, options } = this.prepareRequest(login, pathUrl);
     const response = await this.axiosClient.get(url, options);
-    return response?.data;
+    return response?.data as { state?: CurrentStateDto };
   }
   async getConnection(login: LoginDto) {
     const { url, options } = this.prepareRequest(login, this.apiConnection);
     const response = await this.axiosClient.get(url, options);
-    return response?.data;
+    return response?.data as ConnectionDto;
   }
 
   async getPrinterProfiles(login: LoginDto) {

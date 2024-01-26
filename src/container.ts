@@ -61,6 +61,7 @@ import { AuthService } from "./services/authentication/auth.service";
 import { RefreshTokenService } from "@/services/authentication/refresh-token.service";
 import { throttling } from "@octokit/plugin-throttling";
 import { PrinterStateUpdatePollTask } from "@/tasks/printer-state-update-poll.task";
+import { PrinterConnectionCache } from "@/state/printer-connection.cache";
 
 export function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -151,6 +152,7 @@ export function configureContainer() {
     [di.fileUploadTrackerCache]: asClass(FileUploadTrackerCache).singleton(),
     [di.printerFilesStore]: asClass(PrinterFilesStore).singleton(),
     [di.printerCache]: asClass(PrinterCache).singleton(),
+    [di.printerConnectionCache]: asClass(PrinterConnectionCache).singleton(),
     [di.printerEventsCache]: asClass(PrinterEventsCache).singleton(),
     [di.printerSocketStore]: asClass(PrinterSocketStore).singleton(),
     [di.testPrinterSocketStore]: asClass(TestPrinterSocketStore).singleton(),

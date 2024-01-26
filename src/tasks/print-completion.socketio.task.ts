@@ -9,11 +9,13 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { CreatePrintCompletionDto, PrintCompletionContext } from "@/services/interfaces/print-completion.dto";
 import { IdType } from "@/shared.constants";
 import { OctoPrintEventDto } from "@/services/octoprint/dto/octoprint-event.dto";
+import { PrinterEventsCache } from "@/state/printer-events.cache";
 
 export class PrintCompletionSocketIoTask {
   eventEmitter2: EventEmitter2;
   socketIoGateway: SocketIoGateway;
   logger: LoggerService;
+  printerEventsCache: PrinterEventsCache;
   printCompletionService: PrintCompletionService;
 
   contextCache: Record<IdType, PrintCompletionContext> = {};
@@ -22,15 +24,18 @@ export class PrintCompletionSocketIoTask {
     eventEmitter2,
     socketIoGateway,
     printCompletionService,
+    printerEventsCache,
     loggerFactory,
   }: {
     eventEmitter2: EventEmitter2;
     socketIoGateway: SocketIoGateway;
     printCompletionService: PrintCompletionService;
+    printerEventsCache: PrinterEventsCache;
     loggerFactory: ILoggerFactory;
   }) {
     this.eventEmitter2 = eventEmitter2;
     this.socketIoGateway = socketIoGateway;
+    this.printerEventsCache = printerEventsCache;
     this.printCompletionService = printCompletionService;
     this.logger = loggerFactory(PrintCompletionSocketIoTask.name);
 
@@ -85,6 +90,19 @@ export class PrintCompletionSocketIoTask {
         ...this.contextCache[printerId],
         [data.payload.type]: completion,
       };
+
+      if (data.payload.type === EVENT_TYPES.Disconnecting || data.payload.type === EVENT_TYPES.Disconnected) {
+        await this.printerEventsCache.setSubstate(printerId, "current", "state", {
+          text: data.payload.type,
+          flags: {
+            operational: false,
+            printing: false,
+            ready: false,
+            closedOrError: true,
+            error: false,
+          },
+        });
+      }
 
       const corrId = this.contextCache[printerId].correlationId;
       await this.printCompletionService.updateContext(corrId, this.contextCache[printerId]);
