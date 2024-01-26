@@ -4,7 +4,7 @@ module.exports = {
     try {
       await session.withTransaction(async () => {
         const dbCollection = db.collection("printers");
-        await dbCollection.updateMany({}, { $unset: "fileList" });
+        await dbCollection.updateMany({}, { $set: { fileList: [] } });
       });
     } catch (e) {
       console.log("Error executing up migration", e);

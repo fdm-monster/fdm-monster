@@ -122,14 +122,14 @@ export class OctoPrintApiService extends OctoPrintRoutes {
     const { url, options } = this.prepareRequest(login, this.apiGetFiles(recursive));
     const response = await this.axiosClient.get<OctoprintRawFilesResponseDto>(url, options);
 
-    const normalizedFiles =
+    return (
       response?.data?.files
         // Filter out folders
         .filter((f) => f.date)
         .map((f) => {
           return normalizePrinterFile(f);
-        }) || [];
-    return normalizedFiles;
+        }) || []
+    );
   }
 
   async getFile(login: LoginDto, path: string) {
@@ -261,6 +261,12 @@ export class OctoPrintApiService extends OctoPrintRoutes {
     return response?.data;
   }
 
+  async getPrinterCurrent(login: LoginDto, history: boolean, limit?: number, exclude?: ("temperature" | "sd" | "state")[]) {
+    const pathUrl = this.apiPrinterCurrent(history, limit, exclude);
+    const { url, options } = this.prepareRequest(login, pathUrl);
+    const response = await this.axiosClient.get(url, options);
+    return response?.data;
+  }
   async getConnection(login: LoginDto) {
     const { url, options } = this.prepareRequest(login, this.apiConnection);
     const response = await this.axiosClient.get(url, options);

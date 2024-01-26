@@ -14,6 +14,7 @@ import { OctoPrintSessionDto } from "./dto/octoprint-session.dto";
 import { IPrinterSocketLogin, PrinterLoginDto } from "@/shared/dtos/printer-login.dto";
 import { WebsocketAdapter } from "@/shared/websocket.adapter";
 import { OctoPrintEventDto } from "@/services/octoprint/dto/octoprint-event.dto";
+import { writeFileSync } from "node:fs";
 
 type ThrottleRate = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 
@@ -62,8 +63,8 @@ export const octoPrintEvent = (event: string) => `octoprint.${event}`;
 
 export class OctoPrintSockIoAdapter extends WebsocketAdapter {
   octoPrintApiService: OctoPrintApiService;
-  eventEmitter: EventEmitter2;
-  configService: ConfigService;
+  private eventEmitter: EventEmitter2;
+  private configService: ConfigService;
 
   public printerId?: IdType;
   stateUpdated = false;
@@ -263,11 +264,19 @@ export class OctoPrintSockIoAdapter extends WebsocketAdapter {
     const eventName = Object.keys(data)[0];
     const payload = data[eventName];
 
-    this.logger.log(`RX Msg ${eventName} ${message.substring(0, 40)}`);
+    if (this._debugMode) {
+      this.logger.log(`RX Msg ${eventName} ${message.substring(0, 140)}...`);
+    }
 
     if (eventName === Message.reauthRequired) {
       this.logger.log("Received 'reauthRequired', acting on it");
       this.setReauthRequired();
+    } else if (
+      eventName === Message.current &&
+      this.configService.get(AppConstants.debugFileWritePrinterStatesKey, AppConstants.defaultDebugFileWritePrinterStates) ===
+        "true"
+    ) {
+      writeFileSync(`websocket_current_${this.printerId}.txt`, JSON.stringify(payload, null, 2));
     }
 
     // Emit the message to the event bus

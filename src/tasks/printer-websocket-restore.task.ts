@@ -40,14 +40,12 @@ export class PrinterWebsocketRestoreTask {
         if (socket.isClosedOrAborted()) {
           socket.close();
           socket.resetSocketState();
+          this.logger.warn("Socket was closed or aborted, manually removing it");
           resetAdapterIds.push(socket.printerId);
           continue;
         }
-      } catch (e) {
-        this.logger.error(
-          `WebSocket authentication command failed for '${socket.printerId}' with error '${errorSummary(e)}'`,
-          e.stack
-        );
+      } catch (e: any) {
+        this.logger.error(`Resetting WebSocket socket failed for '${socket.printerId}' with error '${errorSummary(e)}'`, e.stack);
         continue;
       }
 
@@ -56,10 +54,11 @@ export class PrinterWebsocketRestoreTask {
         (socket.apiState !== API_STATE.unset && !socket.lastMessageReceivedTimestamp) ||
         Date.now() - socket.lastMessageReceivedTimestamp > 10 * 1000
       ) {
+        const result = await this.octoPrintApiService.getConnection(socket.loginDto);
+
         silentSocketIds.push(socket.printerId);
         // Produce logs for silent sockets
         try {
-          const result = await this.octoPrintApiService.getConnection(socket.loginDto);
           if (result?.current?.state !== "Closed") {
             this.logger.warn(
               `Silence was detected, but the OctoPrint current connection was not closed. Connection state ${result?.current?.state}, printerId: ${socket.printerId}.`
@@ -74,7 +73,7 @@ export class PrinterWebsocketRestoreTask {
     }
 
     const duration = Date.now() - startTime;
-    if (this.settingsStore.getServerSettings()?.debugSettings?.debugSocketRetries) {
+    if (this.settingsStore.getSettingsSensitive()?.server?.debugSettings.debugSocketRetries) {
       this.logger.log(
         `Reset ${resetAdapterIds.length} closed/aborted sockets and detected ${silentSocketIds.length} silent sockets (duration ${duration}ms)`
       );

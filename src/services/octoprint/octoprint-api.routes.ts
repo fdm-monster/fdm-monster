@@ -1,5 +1,5 @@
-import { jsonContentType, contentTypeHeaderKey } from "./constants/octoprint-service.constants";
-import { validateLogin, constructHeaders } from "./utils/api.utils";
+import { contentTypeHeaderKey, jsonContentType } from "./constants/octoprint-service.constants";
+import { constructHeaders, validateLogin } from "./utils/api.utils";
 import { getDefaultTimeout, timeoutSettingKey } from "@/constants/server-settings.constants";
 import { normalizeUrl } from "@/utils/normalize-url";
 import { LoginDto } from "@/services/interfaces/login.dto";
@@ -14,9 +14,9 @@ export class OctoPrintRoutes {
   apiFilesLocation = `${this.apiFiles}/local`;
   apiConnection = `${this.apiBase}/connection`;
   apiJob = `${this.apiBase}/job`;
-  apiPrinterOperations = `${this.apiBase}/printer`;
-  apiPrinterBed = `${this.apiPrinterOperations}/bed`;
-  apiPrinterCustomCommand = `${this.apiPrinterOperations}/command`;
+  apiPrinter = `${this.apiBase}/printer`;
+  apiPrinterBed = `${this.apiPrinter}/bed`;
+  apiPrinterCustomCommand = `${this.apiPrinter}/command`;
   apiPrinterProfiles = `${this.apiBase}/printerprofiles`;
   apiSystem = `${this.apiBase}/system`;
   apiSystemInfo = `${this.apiSystem}/info`;
@@ -80,6 +80,13 @@ export class OctoPrintRoutes {
   pluginManagerPlugin = (pluginName: string) => `${this.pluginManager}/${pluginName}`;
 
   pluginManagerRepository = (refresh = false) => `${this.pluginManager}/repository?refresh=${refresh}`;
+
+  apiPrinterCurrent = (history?: boolean, limit?: number, exclude?: ("temperature" | "sd" | "state")[]) => {
+    exclude = exclude?.filter((e) => !!e.length);
+    const excludeParam = exclude?.length ? `&exclude=${exclude?.join(",")}` : "";
+    const limitParam = !!limit ? "&limit=limit" : "";
+    return `${this.apiPrinter}?history=${!!history}${limitParam}${excludeParam}`;
+  };
 
   apiFile = (path: string) => `${this.apiFilesLocation}/${path}`;
 
