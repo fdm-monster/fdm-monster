@@ -44,6 +44,10 @@ export class PrinterCache extends KeyDiffCache<CachedPrinter> {
     return dtos;
   }
 
+  async countDisabledPrinters() {
+    return (await this.getAllValues()).filter((p) => !p.enabled).length;
+  }
+
   async listCachedPrinters(includeDisabled = false): Promise<CachedPrinter[]> {
     const printers = await this.getAllValues();
     if (!includeDisabled) {

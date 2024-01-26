@@ -60,7 +60,8 @@ import { JwtService } from "./services/authentication/jwt.service";
 import { AuthService } from "./services/authentication/auth.service";
 import { RefreshTokenService } from "@/services/authentication/refresh-token.service";
 import { throttling } from "@octokit/plugin-throttling";
-import { InternalServerException } from "@/exceptions/runtime.exceptions";
+import { PrinterStateUpdatePollTask } from "@/tasks/printer-state-update-poll.task";
+import { PrinterConnectionCache } from "@/state/printer-connection.cache";
 
 export function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -151,6 +152,7 @@ export function configureContainer() {
     [di.fileUploadTrackerCache]: asClass(FileUploadTrackerCache).singleton(),
     [di.printerFilesStore]: asClass(PrinterFilesStore).singleton(),
     [di.printerCache]: asClass(PrinterCache).singleton(),
+    [di.printerConnectionCache]: asClass(PrinterConnectionCache).singleton(),
     [di.printerEventsCache]: asClass(PrinterEventsCache).singleton(),
     [di.printerSocketStore]: asClass(PrinterSocketStore).singleton(),
     [di.testPrinterSocketStore]: asClass(TestPrinterSocketStore).singleton(),
@@ -166,6 +168,7 @@ export function configureContainer() {
     [di.printCompletionSocketIoTask]: asClass(PrintCompletionSocketIoTask).singleton(),
     [di.printerWebsocketTask]: asClass(PrinterWebsocketTask).singleton(), // This task is a recurring heartbeat task
     [di.printerWebsocketRestoreTask]: asClass(PrinterWebsocketRestoreTask).singleton(), // Task aimed at testing the printer API
+    [di.printerStateUpdatePollTask]: asClass(PrinterStateUpdatePollTask).singleton(),
     [di.printerFileCleanTask]: asClass(PrinterFileCleanTask).singleton(),
   });
 

@@ -1,5 +1,15 @@
 import { IdType } from "@/shared.constants";
 
+export type OctoPrintWsMessage =
+  | "connected"
+  | "reauthRequired"
+  | "current"
+  | "history"
+  | "event"
+  | "plugin"
+  | "timelapse"
+  | "slicingProgress";
+
 export enum Message {
   CONNECTED = "connected",
   REAUTHREQUIRED = "reauthRequired",

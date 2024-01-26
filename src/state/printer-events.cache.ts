@@ -6,20 +6,14 @@ import EventEmitter2 from "eventemitter2";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IdType } from "@/shared.constants";
 import { LoggerService } from "@/handlers/logger";
-import { OctoPrintEventDto } from "@/services/octoprint/dto/octoprint-event.dto";
+import { OctoPrintEventDto, OctoPrintWsMessage } from "@/services/octoprint/dto/octoprint-event.dto";
 
-export interface PrinterEventsCacheDto {
-  current: any;
-  history: any;
-  timelapse: any;
-  event: any;
-  plugin: any;
-}
+export type PrinterEventsCacheDto = Record<OctoPrintWsMessage, any | null>;
 
 export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
-  logger: LoggerService;
-  eventEmitter2: EventEmitter2;
-  settingsStore: SettingsStore;
+  private logger: LoggerService;
+  private eventEmitter2: EventEmitter2;
+  private settingsStore: SettingsStore;
 
   constructor({
     eventEmitter2,
@@ -38,8 +32,8 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
     this.subscribeToEvents();
   }
 
-  get _debugMode() {
-    return this.settingsStore.getServerSettings().debugSettings?.debugSocketMessages;
+  private get _debugMode() {
+    return this.settingsStore.getSettingsSensitive()?.server?.debugSettings?.debugSocketMessages;
   }
 
   async getPrinterSocketEvents(id: IdType) {
@@ -49,13 +43,22 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
   async getOrCreateEvents(printerId: IdType) {
     let ref = await this.getValue(printerId);
     if (!ref) {
-      ref = { current: null, history: null, timelapse: null, event: {}, plugin: {} };
+      ref = {
+        connected: null,
+        reauthRequired: null,
+        slicingProgress: null,
+        current: null,
+        history: null,
+        timelapse: null,
+        event: {},
+        plugin: {},
+      };
       await this.setKeyValue(printerId, ref);
     }
     return ref;
   }
 
-  async setEvent(printerId: IdType, label: string, eventName: string, payload) {
+  async setEvent(printerId: IdType, label: OctoPrintWsMessage, payload: any) {
     const ref = await this.getOrCreateEvents(printerId);
     ref[label] = {
       payload,
@@ -64,9 +67,12 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
     await this.setKeyValue(printerId, ref);
   }
 
-  async setSubEvent(printerId: IdType, label: string, eventName: string, payload) {
+  async setSubstate(printerId: IdType, label: OctoPrintWsMessage, substateName: string, payload: any) {
     const ref = await this.getOrCreateEvents(printerId);
-    ref[label][eventName] = {
+    if (!ref[label]) {
+      ref[label] = {};
+    }
+    ref[label][substateName] = {
       payload,
       receivedAt: Date.now(),
     };
@@ -85,15 +91,15 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
   private async onPrinterSocketMessage(e: OctoPrintEventDto) {
     const printerId = e.printerId;
     if (e.event !== "plugin" && e.event !== "event") {
-      await this.setEvent(printerId, e.event, null, e.event === "history" ? this.pruneHistoryPayload(e.payload) : e.payload);
+      await this.setEvent(printerId, e.event, e.event === "history" ? this.pruneHistoryPayload(e.payload) : e.payload);
       if (this._debugMode) {
         this.logger.log(`Message '${e.event}' received, size ${formatKB(e.payload)}`, e.printerId);
       }
     } else if (e.event === "plugin") {
-      await this.setSubEvent(printerId, "plugin", e.payload.plugin, e.payload);
+      await this.setSubstate(printerId, "plugin", e.payload.plugin, e.payload);
     } else if (e.event === "event") {
       const eventType = e.payload.type;
-      await this.setSubEvent(printerId, "event", eventType, e.payload.payload);
+      await this.setSubstate(printerId, "event", eventType, e.payload.payload);
       if (this._debugMode) {
         this.logger.log(`Event '${eventType}' received`, e.printerId);
       }

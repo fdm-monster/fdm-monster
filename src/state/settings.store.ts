@@ -66,6 +66,10 @@ export class SettingsStore {
     });
   }
 
+  getDebugSettingsSensitive() {
+    return this.getSettingsSensitive()[serverSettingsKey].debugSettings;
+  }
+
   async loadSettings() {
     // Setup Settings as connection is established
     this.settings = await this.settingsService.getOrCreate();
