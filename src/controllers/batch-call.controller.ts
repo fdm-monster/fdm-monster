@@ -28,12 +28,18 @@ export class BatchCallController {
     res.send({});
   }
 
+  async getLastPrintedFiles(req: Request, res: Response) {
+    const { printerIds } = await validateInput(req.body, batchPrinterRules(this.isTypeormMode));
+    const files = await this.batchCallService.getReprintFiles(printerIds);
+    // const results = await this.batchCallService.batchReprintCalls(printerIds);
+    res.send(files);
+  }
+
   async batchReprintFiles(req: Request, res: Response) {
     const { printerIds } = await validateInput(req.body, batchPrinterRules(this.isTypeormMode));
     const files = await this.batchCallService.getReprintFiles(printerIds);
-    console.log(files);
     // const results = await this.batchCallService.batchReprintCalls(printerIds);
-    res.send([]);
+    res.send(files);
   }
 
   async batchTogglePrintersEnabled(req: Request, res: Response) {
@@ -48,5 +54,6 @@ export default createController(BatchCallController)
   .before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR])])
   .post("/connect/usb", "batchConnectUsb")
   .post("/connect/socket", "batchConnectSocket")
-  .post("/reprint", "batchReprintFiles")
+  .get("/reprint/list", "getLastPrintedFiles")
+  .post("/reprint/execute", "batchReprintFiles")
   .post("/toggle-enabled", "batchTogglePrintersEnabled");

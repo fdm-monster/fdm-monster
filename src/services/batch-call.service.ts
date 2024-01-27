@@ -129,9 +129,10 @@ export class BatchCallService {
     return await Promise.all(promises);
   }
 
-  async batchReprintCalls(printerIds: string[]): Promise<Awaited<BatchModel>[]> {
+  async batchReprintCalls(printerIdFileList: { printerId: string; file: string }[]): Promise<Awaited<BatchModel>[]> {
     const promises = [];
-    for (const printerId of printerIds) {
+    for (const printerIdFile of printerIdFileList) {
+      const printerId = printerIdFile;
       const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
 
       // TODO test this
