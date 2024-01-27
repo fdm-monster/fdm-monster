@@ -24,14 +24,16 @@ export class BatchCallController {
 
   async batchConnectSocket(req: Request, res: Response) {
     const { printerIds } = await validateInput(req.body, batchPrinterRules(this.isTypeormMode));
-    await this.batchCallService.batchConnectSocket(printerIds);
+    this.batchCallService.batchConnectSocket(printerIds);
     res.send({});
   }
 
   async batchReprintFiles(req: Request, res: Response) {
     const { printerIds } = await validateInput(req.body, batchPrinterRules(this.isTypeormMode));
-    const results = await this.batchCallService.batchReprintCalls(printerIds);
-    res.send(results);
+    const files = await this.batchCallService.getReprintFiles(printerIds);
+    console.log(files);
+    // const results = await this.batchCallService.batchReprintCalls(printerIds);
+    res.send([]);
   }
 
   async batchTogglePrintersEnabled(req: Request, res: Response) {
