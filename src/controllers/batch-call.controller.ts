@@ -30,14 +30,14 @@ export class BatchCallController {
 
   async getLastPrintedFiles(req: Request, res: Response) {
     const { printerIds } = await validateInput(req.body, batchPrinterRules(this.isTypeormMode));
-    const files = await this.batchCallService.getReprintFiles(printerIds);
+    const files = await this.batchCallService.getBatchPrinterReprintFile(printerIds);
     // const results = await this.batchCallService.batchReprintCalls(printerIds);
     res.send(files);
   }
 
   async batchReprintFiles(req: Request, res: Response) {
     const { printerIds } = await validateInput(req.body, batchPrinterRules(this.isTypeormMode));
-    const files = await this.batchCallService.getReprintFiles(printerIds);
+    const files = await this.batchCallService.getBatchPrinterReprintFile(printerIds);
     // const results = await this.batchCallService.batchReprintCalls(printerIds);
     res.send(files);
   }
