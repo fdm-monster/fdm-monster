@@ -179,34 +179,15 @@ export class BatchCallService {
     return await Promise.all(promises);
   }
 
-  async batchReprintCalls(printerIdFileList: { printerId: string; file: string }[]): Promise<Awaited<BatchModel>[]> {
+  async batchReprintCalls(printerIdFileList: { printerId: IdType; path: string }[]): Promise<Awaited<BatchModel>[]> {
     const promises = [];
     for (const printerIdFile of printerIdFileList) {
-      const printerId = printerIdFile;
+      const { printerId, path } = printerIdFile;
       const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
-
-      // TODO test this
-      let reprintPath = await this.printerEventsCache.getPrinterSocketEvents(printerId)?.current?.job?.file?.path;
-      if (!reprintPath?.length) {
-        const files = await this.printerFilesStore.getFiles(printerId)?.files;
-        if (files?.length) {
-          files.sort((f1, f2) => {
-            // Sort by date, newest first
-            return f1.date < f2.date ? 1 : -1;
-          });
-
-          reprintPath = files[0].path;
-        }
-
-        if (!files?.length) {
-          promises.push(Promise.resolve({ failure: true, error: "No file to reprint", printerId }));
-          continue;
-        }
-      }
 
       const time = Date.now();
       const promise = this.octoPrintApiService
-        .selectPrintFile(printerLogin, reprintPath, true)
+        .selectPrintFile(printerLogin, path, true)
         .then(() => {
           return { success: true, printerId, time: Date.now() - time };
         })

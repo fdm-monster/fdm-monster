@@ -1,6 +1,10 @@
 import { createController } from "awilix-express";
 import { validateInput } from "@/handlers/validators";
-import { batchPrinterRules, batchPrintersEnabledRules } from "./validation/batch-controller.validation";
+import {
+  batchPrinterRules,
+  batchPrintersEnabledRules,
+  executeBatchRePrinterRule,
+} from "./validation/batch-controller.validation";
 import { AppConstants } from "@/server.constants";
 import { authenticate, authorizeRoles } from "@/middleware/authenticate";
 import { ROLES } from "@/constants/authorization.constants";
@@ -31,14 +35,12 @@ export class BatchCallController {
   async getLastPrintedFiles(req: Request, res: Response) {
     const { printerIds } = await validateInput(req.body, batchPrinterRules(this.isTypeormMode));
     const files = await this.batchCallService.getBatchPrinterReprintFile(printerIds);
-    // const results = await this.batchCallService.batchReprintCalls(printerIds);
     res.send(files);
   }
 
   async batchReprintFiles(req: Request, res: Response) {
-    const { printerIds } = await validateInput(req.body, batchPrinterRules(this.isTypeormMode));
-    const files = await this.batchCallService.getBatchPrinterReprintFile(printerIds);
-    // const results = await this.batchCallService.batchReprintCalls(printerIds);
+    const { prints } = await validateInput(req.body, executeBatchRePrinterRule(this.isTypeormMode));
+    const files = await this.batchCallService.batchReprintCalls(prints);
     res.send(files);
   }
 
@@ -54,6 +56,6 @@ export default createController(BatchCallController)
   .before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR])])
   .post("/connect/usb", "batchConnectUsb")
   .post("/connect/socket", "batchConnectSocket")
-  .get("/reprint/list", "getLastPrintedFiles")
+  .post("/reprint/list", "getLastPrintedFiles")
   .post("/reprint/execute", "batchReprintFiles")
   .post("/toggle-enabled", "batchTogglePrintersEnabled");
