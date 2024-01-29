@@ -155,15 +155,6 @@ export class PrinterFilesController {
     res.send(result);
   }
 
-  /**
-   * @deprecated this API endpoint will be moved to /batch from BatchCallController in 1.6.0
-   */
-  async batchReprintFiles(req: Request, res: Response) {
-    const { printerIds } = await validateInput(req.body, batchPrinterRules(this.isTypeormMode));
-    const results = await this.batchCallService.batchReprintCalls(printerIds);
-    res.send(results);
-  }
-
   async selectAndPrintFile(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
     const { filePath: path, print } = await validateInput(req.body, selectAndPrintFileRules);
@@ -225,10 +216,6 @@ export default createController(PrinterFilesController)
   .before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR]), printerResolveMiddleware()])
   .post("/purge", "purgeIndexedFiles", withPermission(PERMS.PrinterFiles.Clear))
   .get("/tracked-uploads", "getTrackedUploads", withPermission(PERMS.PrinterFiles.Upload))
-  /**
-   * @deprecated will be moved to /batch in 1.6.0
-   */
-  .post("/batch/reprint-files", "batchReprintFiles", withPermission(PERMS.PrinterFiles.Actions))
   .get("/:id", "getFiles", withPermission(PERMS.PrinterFiles.Get))
   .get("/:id/cache", "getFilesCache", withPermission(PERMS.PrinterFiles.Get))
   .post("/:id/upload", "uploadFile", withPermission(PERMS.PrinterFiles.Upload))

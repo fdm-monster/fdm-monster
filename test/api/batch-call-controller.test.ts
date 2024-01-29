@@ -13,7 +13,8 @@ const defaultRoute = AppConstants.apiRoute + "/batch";
 const batchConnectUsbRoute = `${defaultRoute}/connect/usb`;
 const batchConnectSocketRoute = `${defaultRoute}/connect/socket`;
 const batchToggleEnabledRoute = `${defaultRoute}/toggle-enabled`;
-const batchReprintRoute = `${defaultRoute}/reprint`;
+const executeBatchReprintRoute = `${defaultRoute}/reprint/execute`;
+const getBatchReprintRoute = `${defaultRoute}/reprint/list`;
 
 let request: supertest.SuperTest<supertest.Test>;
 let octoPrintApiService: OctoPrintApiMock;
@@ -29,11 +30,28 @@ beforeEach(async () => {
 });
 
 describe(BatchCallController.name, () => {
-  it("should allow POST to batch reprint many printer files", async () => {
+  it("should allow POST to fetch batch reprint returning printer files", async () => {
     const printer = await createTestPrinter(request);
     const printer2 = await createTestPrinter(request);
-    const response = await request.post(batchReprintRoute).send({
+    const response = await request.post(getBatchReprintRoute).send({
       printerIds: [printer.id, printer2.id],
+    });
+    expectOkResponse(response);
+  });
+  it("should allow POST to execute batch reprint for printer files", async () => {
+    const printer = await createTestPrinter(request);
+    const printer2 = await createTestPrinter(request);
+    const response = await request.post(executeBatchReprintRoute).send({
+      prints: [
+        {
+          printerId: printer.id,
+          path: "file.gcode",
+        },
+        {
+          printerId: printer2.id,
+          path: "file2.gcode",
+        },
+      ],
     });
     expectOkResponse(response);
   });

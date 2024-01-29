@@ -118,15 +118,6 @@ describe(PrinterFilesController.name, () => {
     expectOkResponse(response);
   });
 
-  it("should allow POST to batch reprint many printer files", async () => {
-    const printer = await createTestPrinter(request);
-    const printer2 = await createTestPrinter(request);
-    const response = await request.post(batchReprintRoute).send({
-      printerIds: [printer.id, printer2.id],
-    });
-    expectOkResponse(response);
-  });
-
   it("should allow POST to select and print a printer file", async () => {
     const printer = await createTestPrinter(request);
     const response = await request.post(selectAndPrintRoute(printer.id)).send({
