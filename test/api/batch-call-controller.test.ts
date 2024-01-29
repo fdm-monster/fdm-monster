@@ -41,7 +41,7 @@ describe(BatchCallController.name, () => {
   it("should allow POST to execute batch reprint for printer files", async () => {
     const printer = await createTestPrinter(request);
     const printer2 = await createTestPrinter(request);
-    const response = await request.post(getBatchReprintRoute).send({
+    const response = await request.post(executeBatchReprintRoute).send({
       prints: [
         {
           printerId: printer.id,
