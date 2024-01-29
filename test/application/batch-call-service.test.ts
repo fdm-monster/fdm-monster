@@ -33,12 +33,25 @@ beforeEach(() => {
   httpClient.saveMockResponse(undefined, 200);
 });
 
-describe("BatchCallService ", () => {
+describe(BatchCallService.name, () => {
   it("should call multiple printers ", async () => {
     const printer = await printerService.create(validNewPrinterState);
     const printer2 = await printerService.create(validNewPrinterState);
 
-    const result = await batchCallService.batchReprintCalls([printer.id, printer2.id]);
+    const result = await batchCallService.getBatchPrinterReprintFile([printer.id, printer2.id]);
+    expect(result).toHaveLength(2);
+  });
+  it("should call multiple printers ", async () => {
+    const printer = await printerService.create(validNewPrinterState);
+    const printer2 = await printerService.create(validNewPrinterState);
+
+    const result = await batchCallService.batchReprintCalls([
+      {
+        printerId: printer.id,
+        path: "gcode",
+      },
+      { printerId: printer2.id, path: "gcode" },
+    ]);
     expect(result).toHaveLength(2);
   });
 });
