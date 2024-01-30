@@ -8,6 +8,7 @@ import { SqliteIdType } from "@/shared.constants";
 import { Printer } from "@/entities";
 import { setupTestApp } from "../test-server";
 import { FloorPositionService } from "@/services/orm/floor-position.service";
+import { isSqliteModeTest } from "../typeorm.manager";
 
 let printerService: IPrinterService<SqliteIdType, Printer>;
 let floorService: IFloorService<SqliteIdType, Floor>;
@@ -42,7 +43,7 @@ describe(FloorService.name, () => {
     });
     const dto = floorService.toDto(floor);
     expect(dto).toBeTruthy();
-    expect(typeof dto.id).toBe("number");
+    expect(typeof dto.id).toBe(isSqliteModeTest() ? "number" : "string");
   });
 
   it("can delete existing floor", async () => {
@@ -72,7 +73,6 @@ describe(FloorService.name, () => {
 
     expect(floorService.get(floor.id)).toBeTruthy();
     const newFloor = await floorService.addOrUpdatePrinter(floor.id, {
-      floorId: floor.id,
       printerId: pos.id,
       x: 1,
       y: 1,

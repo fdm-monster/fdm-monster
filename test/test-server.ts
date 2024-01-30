@@ -12,6 +12,7 @@ import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { TaskManagerService } from "@/services/core/task-manager.service";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
+import { MongoClient } from "typeorm";
 
 let mongoMemory: MongoMemoryServer;
 
@@ -55,11 +56,13 @@ export async function setupTestApp(
   } else {
     mongoose.set("strictQuery", true);
 
-    mongoMemory = await MongoMemoryServer.create();
-    const uri = mongoMemory.getUri();
+    try {
+      mongoMemory = await MongoMemoryServer.create();
+      const uri = mongoMemory.getUri();
 
-    const mongooseOpts = {};
-    await mongoose.connect(uri, mongooseOpts);
+      const mongooseOpts = {};
+      await mongoose.connect(uri, mongooseOpts);
+    } catch {}
   }
 
   // Setup

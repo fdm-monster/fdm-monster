@@ -4,17 +4,18 @@ import { expectInvalidResponse, expectNotFoundResponse, expectOkResponse } from 
 import { createTestPrinter } from "./test-data/create-printer";
 import supertest from "supertest";
 import { CustomGcodeDto } from "@/services/interfaces/custom-gcode.dto";
-import { SqliteIdType } from "@/shared.constants";
-import { getDatasource } from "../typeorm.manager";
+import { IdType, SqliteIdType } from "@/shared.constants";
+import { getDatasource, isSqliteModeTest } from "../typeorm.manager";
 import { CustomGcode } from "@/entities";
+import { CustomGcode as CustomGcodeMongo } from "@/models";
 import { CustomGcodeController } from "@/controllers/custom-gcode.controller";
 
 const defaultRoute = `${AppConstants.apiRoute}/custom-gcode`;
 const createRoute = defaultRoute;
 const emergencyGCodeRoute = (printerId: string) => `${defaultRoute}/send-emergency-m112/${printerId}`;
-const getRoute = (id: number) => `${defaultRoute}/${id}`;
-const deleteRoute = (id: number) => `${defaultRoute}/${id}`;
-const updateRoute = (id: number) => `${defaultRoute}/${id}`;
+const getRoute = (id: IdType) => `${defaultRoute}/${id}`;
+const deleteRoute = (id: IdType) => `${defaultRoute}/${id}`;
+const updateRoute = (id: IdType) => `${defaultRoute}/${id}`;
 
 let request: supertest.SuperTest<supertest.Test>;
 
@@ -23,7 +24,11 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  return getDatasource().getRepository(CustomGcode).clear();
+  if (isSqliteModeTest()) {
+    return getDatasource().getRepository(CustomGcode).clear();
+  } else {
+    await CustomGcodeMongo.deleteMany({});
+  }
 });
 
 function getGCodeScript() {
@@ -81,7 +86,8 @@ describe(CustomGcodeController.name, () => {
   });
 
   it("should not get non-existing gcode script", async () => {
-    const response = await request.get(getRoute(1234)).send();
+    const response = await request.get(getRoute(isSqliteModeTest() ? 1234 : "648f3e6d372112628bb8e404")).send();
+    console.log(response.body);
     expectNotFoundResponse(response);
   });
 

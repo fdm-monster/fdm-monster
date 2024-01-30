@@ -6,23 +6,47 @@ import { ensureTestUserCreated } from "../api/test-data/create-user";
 import { SettingsStore } from "@/state/settings.store";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { RefreshToken } from "@/entities";
+import { RefreshToken as RefreshTokenMongo } from "@/models";
 import { SqliteIdType } from "@/shared.constants";
 import { IRefreshTokenService } from "@/services/interfaces/refresh-token.service.interface";
+import { isSqliteModeTest } from "../typeorm.manager";
+import { MongoMemoryServer } from "mongodb-memory-server";
+import mongoose from "mongoose";
+import { closeDatabase } from "../mongo-memory.handler";
 
 let container: AwilixContainer;
 let refreshTokenService: IRefreshTokenService<SqliteIdType>;
 let settingsStore: SettingsStore;
 let typeorm: TypeormService;
+let mongoMemory: MongoMemoryServer;
 
 beforeAll(async () => {
-  container = configureContainer(true);
+  container = configureContainer(isSqliteModeTest());
   refreshTokenService = container.resolve<IRefreshTokenService<SqliteIdType>>(DITokens.refreshTokenService);
   settingsStore = container.resolve<SettingsStore>(DITokens.settingsStore);
   typeorm = container.resolve<TypeormService>(DITokens.typeormService);
-  await typeorm.createConnection();
+  if (isSqliteModeTest()) {
+    await typeorm.createConnection();
+  } else {
+    mongoose.set("strictQuery", true);
+    mongoMemory = await MongoMemoryServer.create();
+    const uri = mongoMemory.getUri();
+
+    const mongooseOpts = {};
+    await mongoose.connect(uri, mongooseOpts);
+  }
 });
 afterEach(async () => {
-  await typeorm.getDataSource().getRepository(RefreshToken).delete({});
+  if (isSqliteModeTest()) {
+    await typeorm.getDataSource().getRepository(RefreshToken).delete({});
+  } else {
+    await RefreshTokenMongo.deleteMany({});
+  }
+});
+afterAll(async () => {
+  if (!isSqliteModeTest()) {
+    await closeDatabase();
+  }
 });
 
 describe(RefreshTokenService.name, () => {

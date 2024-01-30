@@ -3,11 +3,12 @@ import { expectInternalServerError, expectInvalidResponse, expectNotFoundRespons
 import { createTestPrinter } from "./test-data/create-printer";
 import { createTestFloor, floorRoute } from "./test-data/create-floor";
 import { Floor } from "@/entities";
+import { Floor as FloorMongo } from "@/models";
 import { AppConstants } from "@/server.constants";
 import supertest from "supertest";
 import { FloorController } from "@/controllers/floor.controller";
 import { IdType } from "@/shared.constants";
-import { getDatasource } from "../typeorm.manager";
+import { getDatasource, isSqliteModeTest } from "../typeorm.manager";
 
 const listRoute = `${AppConstants.apiRoute}/floor`;
 const getRoute = (id: IdType) => `${listRoute}/${id}`;
@@ -24,7 +25,11 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  return getDatasource().getRepository(Floor).clear();
+  if (isSqliteModeTest()) {
+    return getDatasource().getRepository(Floor).clear();
+  } else {
+    await FloorMongo.deleteMany({});
+  }
 });
 
 describe(FloorController.name, () => {

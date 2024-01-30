@@ -1,8 +1,10 @@
 import { DITokens } from "@/container.tokens";
 import { Floor } from "@/entities";
+import { Floor as FloorMongo } from "@/models";
 import { FloorStore } from "@/state/floor.store";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { setupTestApp } from "../../test-server";
+import { isSqliteModeTest } from "../../typeorm.manager";
 
 let floorStore: FloorStore;
 let typeormService: TypeormService;
@@ -14,7 +16,11 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  await typeormService.getDataSource().getRepository(Floor).clear();
+  if (isSqliteModeTest()) {
+    await typeormService.getDataSource().getRepository(Floor).clear();
+  } else {
+    await FloorMongo.deleteMany({});
+  }
 });
 
 describe(DITokens.floorStore, () => {
