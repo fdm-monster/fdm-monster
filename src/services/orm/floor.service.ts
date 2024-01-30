@@ -31,6 +31,7 @@ export class FloorService
     const floor = await super.create({
       name: dto.name,
       floor: dto.floor,
+      printers: [],
     });
 
     const printers = dto.printers;

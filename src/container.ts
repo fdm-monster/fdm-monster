@@ -70,7 +70,6 @@ import { RefreshTokenService } from "@/services/authentication/refresh-token.ser
 import { throttling } from "@octokit/plugin-throttling";
 import { PrinterStateUpdatePollTask } from "@/tasks/printer-state-update-poll.task";
 import { PrinterConnectionCache } from "@/state/printer-connection.cache";
-import { InternalServerException } from "@/exceptions/runtime.exceptions";
 import { RefreshTokenService as RefreshToken2 } from "@/services/orm/refresh-token.service";
 import { SettingsService2 } from "@/services/orm/settings.service";
 import { FloorService as FloorService2 } from "@/services/orm/floor.service";

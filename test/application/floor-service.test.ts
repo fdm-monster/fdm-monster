@@ -4,21 +4,18 @@ import { DITokens } from "@/container.tokens";
 import { FloorService } from "@/services/floor.service";
 import { IFloorService } from "@/services/interfaces/floor.service.interface";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
-import { SqliteIdType } from "@/shared.constants";
+import { IdType } from "@/shared.constants";
 import { Printer } from "@/entities";
 import { setupTestApp } from "../test-server";
-import { FloorPositionService } from "@/services/orm/floor-position.service";
 import { isSqliteModeTest } from "../typeorm.manager";
 
-let printerService: IPrinterService<SqliteIdType, Printer>;
-let floorService: IFloorService<SqliteIdType, Floor>;
-let floorPositionService: FloorPositionService;
+let printerService: IPrinterService<IdType, Printer>;
+let floorService: IFloorService<IdType, Floor>;
 
 beforeAll(async () => {
   const { container, httpClient: axiosMock } = await setupTestApp(true);
-  printerService = container.resolve<IPrinterService<SqliteIdType, Printer>>(DITokens.printerService);
-  floorService = container.resolve<IFloorService<SqliteIdType, Floor>>(DITokens.floorService);
-  floorPositionService = container.resolve<FloorPositionService>(DITokens.floorPositionService);
+  printerService = container.resolve<IPrinterService<IdType, Printer>>(DITokens.printerService);
+  floorService = container.resolve<IFloorService<IdType, Floor>>(DITokens.floorService);
 });
 
 describe(FloorService.name, () => {
@@ -90,7 +87,9 @@ describe(FloorService.name, () => {
       name: "TopFloor1",
       floor: 4,
     });
-    await floorPositionService.create({ floorId: floor.id, printerId: printer.id, x: 1, y: 1 });
+
+    await floorService.addOrUpdatePrinter(floor.id, { printerId: printer.id, x: 1, y: 1 });
+
     floor = await floorService.get(floor.id);
     // Check existence
     expect(floorService.get(floor.id)).toBeTruthy();
