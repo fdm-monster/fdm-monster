@@ -1,6 +1,6 @@
 FROM node:18-bookworm-slim as build
 WORKDIR /build
-
+COPY .yarn/releases ./.yarn/releases
 RUN yarn set version berry
 COPY .swcrc tsconfig.json package.json yarn.lock .yarnrc.yml ./
 RUN yarn install --immutable
@@ -11,6 +11,7 @@ FROM node:18-bookworm-slim as production
 WORKDIR /app
 
 RUN yarn global add pm2
+COPY .yarn/releases ./.yarn/releases
 RUN yarn set version berry
 
 COPY .swcrc tsconfig.json package.json yarn.lock .yarnrc.yml ./
