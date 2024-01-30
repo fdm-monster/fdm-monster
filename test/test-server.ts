@@ -10,6 +10,10 @@ import { Express } from "express";
 import { AppConstants } from "@/server.constants";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { TaskManagerService } from "@/services/core/task-manager.service";
+import { MongoMemoryServer } from "mongodb-memory-server";
+import mongoose from "mongoose";
+
+let mongoMemory: MongoMemoryServer;
 
 jest.mock("../src/utils/env.utils", () => ({
   ...jest.requireActual("../src/utils/env.utils"),
@@ -43,9 +47,20 @@ export async function setupTestApp(
   // Overrides get last pick
   if (mocks) container.register(mocks);
 
-  // Setup database in memory - needed for loading settings etc
-  const typeormService = container.resolve<TypeormService>(DITokens.typeormService);
-  await typeormService.createConnection();
+  const isTypeormMode = container.resolve(DITokens.isTypeormMode);
+  if (isTypeormMode) {
+    // Setup sqlite database in memory - needed for loading settings etc
+    const typeormService = container.resolve<TypeormService>(DITokens.typeormService);
+    await typeormService.createConnection();
+  } else {
+    mongoose.set("strictQuery", true);
+
+    mongoMemory = await MongoMemoryServer.create();
+    const uri = mongoMemory.getUri();
+
+    const mongooseOpts = {};
+    await mongoose.connect(uri, mongooseOpts);
+  }
 
   // Setup
   const settingsStore = container.resolve(DITokens.settingsStore);
@@ -64,8 +79,6 @@ export async function setupTestApp(
     const printerSocketStore = container.resolve(DITokens.printerSocketStore);
     await printerSocketStore.loadPrinterSockets();
   }
-
-  const isTypeormMode = container.resolve(DITokens.isTypeormMode);
   return {
     idType: isTypeormMode ? Number : String,
     isTypeormMode,

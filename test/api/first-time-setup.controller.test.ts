@@ -11,20 +11,19 @@ import { ISettingsService } from "@/services/interfaces/settings.service.interfa
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { User } from "@/entities";
 import { Repository } from "typeorm";
+import { getDatasource, isSqliteModeTest } from "../typeorm.manager";
+import { User as UserMongo } from "@/models";
 
 let request: supertest.SuperTest<supertest.Test>;
 let container: AwilixContainer;
 let settingsService: ISettingsService;
 let settingsStore: SettingsStore;
-let userRepository: Repository<User>;
-let typeormService: TypeormService;
 const completeSetupRoute = `${AppConstants.apiRoute}/first-time-setup/complete`;
 
 beforeAll(async () => {
-  ({ request, container, typeormService } = await setupTestApp(true));
+  ({ request, container } = await setupTestApp(true));
   settingsService = container.resolve<ISettingsService>(DITokens.settingsService);
   settingsStore = container.resolve<SettingsStore>(DITokens.settingsStore);
-  userRepository = typeormService.getDataSource().getRepository(User);
 });
 
 describe(FirstTimeSetupController.name, () => {
@@ -57,7 +56,11 @@ describe(FirstTimeSetupController.name, () => {
   it("should not complete first-time-setup twice", async () => {
     await resetWizard();
     expect(settingsStore.isWizardCompleted()).toBeFalsy();
-    await userRepository.delete({});
+    if (isSqliteModeTest()) {
+      await getDatasource().getRepository(User).delete({});
+    } else {
+      await UserMongo.deleteMany({});
+    }
     const response = await completeSetup({
       loginRequired: true,
       registration: true,
