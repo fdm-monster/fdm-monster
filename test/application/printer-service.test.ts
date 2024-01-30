@@ -5,25 +5,30 @@ import { AwilixContainer } from "awilix";
 import { PrinterService } from "@/services/printer.service";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { Printer } from "@/entities";
-import { Repository } from "typeorm";
+import { Printer as PrinterMongo } from "@/models";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { SqliteIdType } from "@/shared.constants";
+import { isSqliteModeTest } from "../typeorm.manager";
 
 let container: AwilixContainer;
 let printerService: IPrinterService<SqliteIdType, Printer>;
 let typeorm: TypeormService;
-let printerRepository: Repository<Printer>;
 
 beforeAll(async () => {
-  container = configureContainer(true);
+  container = configureContainer(isSqliteModeTest());
   printerService = container.resolve<IPrinterService<SqliteIdType, Printer>>(DITokens.printerService);
   typeorm = container.resolve<TypeormService>(DITokens.typeormService);
-  printerRepository = typeorm.getDataSource().getRepository(Printer);
-  await typeorm.createConnection();
+  if (isSqliteModeTest()) {
+    await typeorm.createConnection();
+  }
 });
 
 afterEach(async () => {
-  await typeorm.getDataSource().getRepository(Printer).delete({});
+  if (isSqliteModeTest()) {
+    await typeorm.getDataSource().getRepository(Printer).clear();
+  } else {
+    await PrinterMongo.deleteMany({});
+  }
 });
 
 describe(PrinterService.name, () => {
@@ -36,7 +41,7 @@ describe(PrinterService.name, () => {
     };
 
     await printerService.update(printer.id, printerUpdate);
-    const foundPrinter = await printerRepository.findOneBy({ id: printer.id });
+    const foundPrinter = await printerService.get(printer.id);
     expect(foundPrinter).toBeDefined();
     expect(foundPrinter!.name).toEqual(updatedName);
   });
