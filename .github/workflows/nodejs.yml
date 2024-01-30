@@ -16,6 +16,11 @@ jobs:
       - run: yarn set version berry
       - run: yarn install --immutable
       - run: yarn run build
+      # non-coverage sqlite tests
+      - run: yarn run test:sqlite
+        env:
+          NODE_OPTIONS: '--max_old_space_size=8192'
+      # run mongodb tests with coverage
       - run: yarn run test:cov
         env:
           NODE_OPTIONS: '--max_old_space_size=8192'

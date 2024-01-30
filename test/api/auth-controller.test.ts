@@ -3,7 +3,6 @@ import { setupTestApp } from "../test-server";
 import { expectBadRequestError, expectOkResponse, expectUnauthenticatedResponse } from "../extensions";
 import { ensureTestUserCreated, getUserData } from "./test-data/create-user";
 import { DITokens } from "@/container.tokens";
-import { connect } from "../db-handler";
 import { AwilixContainer } from "awilix";
 import supertest from "supertest";
 import { SettingsStore } from "@/state/settings.store";
@@ -23,7 +22,6 @@ const logoutRoute = `${baseRoute}/logout`;
 const verifyLoginRoute = `${baseRoute}/verify`;
 
 beforeAll(async () => {
-  await connect();
   ({ request, container } = await setupTestApp(true));
   settingsStore = container.resolve(DITokens.settingsStore);
   authService = container.resolve<AuthService>(DITokens.authService);

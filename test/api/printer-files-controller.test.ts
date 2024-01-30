@@ -2,37 +2,44 @@ import { setupTestApp } from "../test-server";
 import { createTestPrinter } from "./test-data/create-printer";
 import { expectInvalidResponse, expectNotFoundResponse, expectOkResponse } from "../extensions";
 import { AppConstants } from "@/server.constants";
-import { Printer } from "@/models";
 import nock from "nock";
 import supertest from "supertest";
-import { connect } from "../db-handler";
 import { OctoPrintApiMock } from "../mocks/octoprint-api.mock";
 import { PrinterFilesController } from "@/controllers/printer-files.controller";
+import { AwilixContainer } from "awilix";
+import { DITokens } from "@/container.tokens";
+import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 
 const defaultRoute = AppConstants.apiRoute + "/printer-files";
 const trackedUploadsRoute = `${defaultRoute}/tracked-uploads`;
 const purgeIndexedFilesRoute = `${defaultRoute}/purge`;
 const batchReprintRoute = `${defaultRoute}/batch/reprint-files`;
-const getRoute = (id: string) => `${defaultRoute}/${id}`;
-const clearFilesRoute = (id: string) => `${getRoute(id)}/clear`;
-const moveFileOrFolderRoute = (id: string) => `${getRoute(id)}/move`;
-const deleteFileOrFolderRoute = (id: string, path: string) => `${getRoute(id)}?path=${path}`;
-const selectAndPrintRoute = (id: string) => `${getRoute(id)}/select`;
-const uploadFileRoute = (id: string) => `${getRoute(id)}/upload`;
-const createFolderRoute = (id: string) => `${getRoute(id)}/create-folder`;
-const getFilesRoute = (id: string, recursive: boolean) => `${getRoute(id)}?recursive=${recursive}`;
-const getCacheRoute = (id: string) => `${getRoute(id)}/cache`;
+type idType = Number;
+const getRoute = (id: idType) => `${defaultRoute}/${id}`;
+const clearFilesRoute = (id: idType) => `${getRoute(id)}/clear`;
+const moveFileOrFolderRoute = (id: idType) => `${getRoute(id)}/move`;
+const deleteFileOrFolderRoute = (id: idType, path: string) => `${getRoute(id)}?path=${path}`;
+const selectAndPrintRoute = (id: idType) => `${getRoute(id)}/select`;
+const uploadFileRoute = (id: idType) => `${getRoute(id)}/upload`;
+const createFolderRoute = (id: idType) => `${getRoute(id)}/create-folder`;
+const getFilesRoute = (id: idType, recursive: boolean) => `${getRoute(id)}?recursive=${recursive}`;
+const getCacheRoute = (id: idType) => `${getRoute(id)}/cache`;
 
 let request: supertest.SuperTest<supertest.Test>;
 let octoPrintApiService: OctoPrintApiMock;
+let container: AwilixContainer;
+let printerService: IPrinterService;
 
 beforeAll(async () => {
-  await connect();
-  ({ request, octoPrintApiService } = await setupTestApp(true));
+  ({ request, octoPrintApiService, container } = await setupTestApp(true));
+  printerService = container.resolve<IPrinterService>(DITokens.printerService);
 });
 
 beforeEach(async () => {
-  Printer.deleteMany({});
+  const printers = await printerService.list();
+  for (let printer of printers) {
+    await printerService.delete(printer.id);
+  }
   octoPrintApiService.storeResponse(undefined, undefined);
 });
 
@@ -41,7 +48,7 @@ describe(PrinterFilesController.name, () => {
   const invalidGcodePath = "test/api/test-data/sample.gco";
 
   it(`should return 404 on ${defaultRoute} for nonexisting printer`, async () => {
-    const res = await request.get(getRoute("60ae2b760bca4f5930be3d88")).send();
+    const res = await request.get(getRoute(101)).send();
     expectNotFoundResponse(res);
   });
 

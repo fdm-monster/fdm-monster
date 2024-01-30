@@ -17,6 +17,7 @@ import { RoleService } from "@/services/authentication/role.service";
 import { UserService } from "@/services/authentication/user.service";
 import { PluginRepositoryCache } from "@/services/octoprint/plugin-repository.cache";
 import { ClientBundleService } from "@/services/core/client-bundle.service";
+import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
 
@@ -37,6 +38,8 @@ export class BootTask {
   pluginFirmwareUpdateService: PluginFirmwareUpdateService;
   clientBundleService: ClientBundleService;
   configService: ConfigService;
+  isTypeormMode: boolean;
+  typeormService: TypeormService;
 
   constructor({
     loggerFactory,
@@ -55,6 +58,8 @@ export class BootTask {
     pluginFirmwareUpdateService,
     clientBundleService,
     configService,
+    typeormService,
+    isTypeormMode,
   }: {
     loggerFactory: ILoggerFactory;
     serverTasks: ServerTasks;
@@ -72,7 +77,10 @@ export class BootTask {
     pluginFirmwareUpdateService: PluginFirmwareUpdateService;
     clientBundleService: ClientBundleService;
     configService: ConfigService;
+    typeormService: TypeormService;
+    isTypeormMode: boolean;
   }) {
+    this.isTypeormMode = isTypeormMode;
     this.logger = loggerFactory(BootTask.name);
     this.serverTasks = serverTasks;
     this.settingsService = settingsService;
@@ -89,6 +97,7 @@ export class BootTask {
     this.pluginFirmwareUpdateService = pluginFirmwareUpdateService;
     this.clientBundleService = clientBundleService;
     this.configService = configService;
+    this.typeormService = typeormService;
   }
 
   async runOnce() {
@@ -100,21 +109,25 @@ export class BootTask {
   }
 
   async run() {
-    try {
-      await this.createConnection();
-      await this.migrateDatabase();
-    } catch (e) {
-      if (e instanceof mongoose.Error) {
-        // Tests should just continue
-        if (!e.message.includes("Can't call `openUri()` on an active connection with different connection strings.")) {
-          // We are not in a test
-          if (e.message.includes("ECONNREFUSED")) {
-            this.logger.error("Database connection timed-out. Retrying in 5000.");
-          } else {
-            this.logger.error(`Database connection error: ${e.message}`);
+    if (this.isTypeormMode) {
+      await this.typeormService.createConnection();
+    } else {
+      try {
+        await this.createConnection();
+        await this.migrateDatabase();
+      } catch (e) {
+        if (e instanceof mongoose.Error) {
+          // Tests should just continue
+          if (!e.message.includes("Can't call `openUri()` on an active connection with different connection strings.")) {
+            // We are not in a test
+            if (e.message.includes("ECONNREFUSED")) {
+              this.logger.error("Database connection timed-out. Retrying in 5000.");
+            } else {
+              this.logger.error(`Database connection error: ${e.message}`);
+            }
+            this.taskManagerService.scheduleDisabledJob(DITokens.bootTask, false);
+            return;
           }
-          this.taskManagerService.scheduleDisabledJob(DITokens.bootTask, false);
-          return;
         }
       }
     }
@@ -202,13 +215,17 @@ export class BootTask {
   }
 
   async createConnection() {
-    await connect(fetchMongoDBConnectionString(), {
-      serverSelectionTimeoutMS: 1500,
-    });
-    await syncIndexes();
+    if (this.isTypeormMode) {
+      await connect(fetchMongoDBConnectionString(), {
+        serverSelectionTimeoutMS: 1500,
+      });
+      await syncIndexes();
+    }
   }
 
   async migrateDatabase() {
-    await runMigrations(mongoose.connection.db, mongoose.connection.getClient());
+    if (this.isTypeormMode) {
+      await runMigrations(mongoose.connection.db, mongoose.connection.getClient());
+    }
   }
 }

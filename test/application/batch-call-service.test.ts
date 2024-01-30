@@ -1,32 +1,22 @@
-import { clearDatabase, closeDatabase, connect } from "../db-handler";
-import { configureContainer } from "@/container";
 import { DITokens } from "@/container.tokens";
 import { validNewPrinterState } from "./test-data/printer.data";
-import { asClass } from "awilix";
 import { AxiosMock } from "../mocks/axios.mock";
 import { BatchCallService } from "@/services/batch-call.service";
-import { SettingsStore } from "@/state/settings.store";
-import { PrinterService } from "@/services/printer.service";
+import { IPrinterService } from "@/services/interfaces/printer.service.interface";
+import { setupTestApp } from "../test-server";
+import { SqliteIdType } from "@/shared.constants";
+import { Printer } from "@/entities";
 
 let batchCallService: BatchCallService;
-let printerService: PrinterService;
+let printerService: IPrinterService<SqliteIdType, Printer>;
 let httpClient: AxiosMock;
 
 beforeAll(async () => {
-  await connect();
-  const container = configureContainer();
-  container.register(DITokens.httpClient, asClass(AxiosMock).singleton());
-  printerService = container.resolve(DITokens.printerService);
+  const { container, httpClient: axiosMock } = await setupTestApp(true);
+  httpClient = axiosMock;
+
+  printerService = container.resolve<IPrinterService<SqliteIdType, Printer>>(DITokens.printerService);
   batchCallService = container.resolve(DITokens.batchCallService);
-  const settingsStore = container.resolve(DITokens.settingsStore) as SettingsStore;
-  httpClient = container.resolve(DITokens.httpClient);
-  await settingsStore.loadSettings();
-});
-afterEach(async () => {
-  await clearDatabase();
-});
-afterAll(async () => {
-  await closeDatabase();
 });
 
 beforeEach(() => {

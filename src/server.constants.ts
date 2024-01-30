@@ -101,6 +101,6 @@ export const AppConstants = {
 
   debugRoutesKey: "DEBUG_ROUTES",
 
-  enableExperimentalTypeormKey: "ENABLE_EXPERIMENTAL_TYPEORM",
+  ENABLE_EXPERIMENTAL_TYPEORM: "ENABLE_EXPERIMENTAL_TYPEORM",
   enableExperimentalTypeormDefault: "false",
 };

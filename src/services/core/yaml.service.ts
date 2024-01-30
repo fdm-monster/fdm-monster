@@ -12,6 +12,7 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { IFloorService } from "@/services/interfaces/floor.service.interface";
 import { MongoIdType } from "@/shared.constants";
+import { FloorPositionService } from "@/services/orm/floor-position.service";
 
 export class YamlService {
   floorStore: FloorStore;

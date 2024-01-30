@@ -1,4 +1,3 @@
-import { connect } from "../../db-handler";
 import { setupTestApp } from "../../test-server";
 import { DITokens } from "@/container.tokens";
 import { AwilixContainer } from "awilix";
@@ -12,14 +11,13 @@ let serverTasks: ServerTasks;
 let task: BootTask;
 
 beforeAll(async () => {
-  await connect();
-  ({ container } = await setupTestApp(false, undefined, true));
+  ({ container } = await setupTestApp(false));
   taskManager = container.resolve(DITokens.taskManagerService);
   task = container.resolve(DITokens.bootTask);
   serverTasks = container.resolve(DITokens.serverTasks);
 });
 
-describe("BootTask", () => {
+describe(BootTask.name, () => {
   it("should run boot tasks once without having to register", async () => {
     await task.runOnce();
     expect(taskManager.isTaskDisabled(DITokens.bootTask)).toBeTruthy();

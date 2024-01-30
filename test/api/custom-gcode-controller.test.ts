@@ -1,31 +1,34 @@
 import { AppConstants } from "@/server.constants";
-import { connect } from "../db-handler";
 import { setupTestApp } from "../test-server";
 import { expectInvalidResponse, expectNotFoundResponse, expectOkResponse } from "../extensions";
-import { CustomGcode } from "@/models";
 import { createTestPrinter } from "./test-data/create-printer";
 import supertest from "supertest";
 import { CustomGcodeDto } from "@/services/interfaces/custom-gcode.dto";
-import { MongoIdType } from "@/shared.constants";
+import { IdType, SqliteIdType } from "@/shared.constants";
+import { getDatasource, isSqliteModeTest } from "../typeorm.manager";
+import { CustomGcode } from "@/entities";
+import { CustomGcode as CustomGcodeMongo } from "@/models";
 import { CustomGcodeController } from "@/controllers/custom-gcode.controller";
 
-let Model = CustomGcode;
 const defaultRoute = `${AppConstants.apiRoute}/custom-gcode`;
 const createRoute = defaultRoute;
 const emergencyGCodeRoute = (printerId: string) => `${defaultRoute}/send-emergency-m112/${printerId}`;
-const getRoute = (id: string) => `${defaultRoute}/${id}`;
-const deleteRoute = (id: string) => `${defaultRoute}/${id}`;
-const updateRoute = (id: string) => `${defaultRoute}/${id}`;
+const getRoute = (id: IdType) => `${defaultRoute}/${id}`;
+const deleteRoute = (id: IdType) => `${defaultRoute}/${id}`;
+const updateRoute = (id: IdType) => `${defaultRoute}/${id}`;
 
 let request: supertest.SuperTest<supertest.Test>;
 
 beforeAll(async () => {
-  await connect();
   ({ request } = await setupTestApp(true));
 });
 
 beforeEach(async () => {
-  return Model.deleteMany({});
+  if (isSqliteModeTest()) {
+    return getDatasource().getRepository(CustomGcode).clear();
+  } else {
+    await CustomGcodeMongo.deleteMany({});
+  }
 });
 
 function getGCodeScript() {
@@ -38,7 +41,7 @@ function getGCodeScript() {
 async function createNormalGcodeScript(request: supertest.SuperTest<supertest.Test>) {
   const response = await request.post(createRoute).send(getGCodeScript());
   expectOkResponse(response);
-  return response.body as CustomGcodeDto<MongoIdType>;
+  return response.body as CustomGcodeDto<SqliteIdType>;
 }
 
 describe(CustomGcodeController.name, () => {
@@ -83,7 +86,8 @@ describe(CustomGcodeController.name, () => {
   });
 
   it("should not get non-existing gcode script", async () => {
-    const response = await request.get(getRoute("62e0e02478368d2013aff094")).send();
+    const response = await request.get(getRoute(isSqliteModeTest() ? 1234 : "648f3e6d372112628bb8e404")).send();
+    console.log(response.body);
     expectNotFoundResponse(response);
   });
 

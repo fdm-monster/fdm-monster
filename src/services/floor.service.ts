@@ -36,7 +36,7 @@ export class FloorService implements IFloorService<MongoIdType> {
       id: floor.id,
       name: floor.name,
       floor: floor.floor,
-      printers: floor.printers.map((p) => ({
+      printers: floor.printers?.map((p) => ({
         x: p.x,
         y: p.y,
         printerId: p.printerId.toString(),

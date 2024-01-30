@@ -1,4 +1,3 @@
-import { connect } from "../../db-handler";
 import { setupTestApp } from "../../test-server";
 import { PrinterWebsocketTask } from "@/tasks/printer-websocket.task";
 import { DITokens } from "@/container.tokens";
@@ -7,7 +6,6 @@ let container;
 let task: PrinterWebsocketTask;
 
 beforeAll(async () => {
-  await connect();
   ({ container } = await setupTestApp(true));
   task = container.resolve(DITokens.printerWebsocketTask);
 });

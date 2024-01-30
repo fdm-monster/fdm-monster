@@ -1,6 +1,5 @@
 import { AwilixContainer } from "awilix";
 import { TaskManagerService } from "@/services/core/task-manager.service";
-import { connect } from "../db-handler";
 import { configureContainer } from "@/container";
 import { DITokens } from "@/container.tokens";
 import { JobValidationException } from "@/exceptions/job.exceptions";
@@ -9,7 +8,6 @@ let container: AwilixContainer;
 let taskManagerService: TaskManagerService;
 
 beforeAll(async () => {
-  await connect();
   container = configureContainer();
   taskManagerService = container.resolve(DITokens.taskManagerService);
 });

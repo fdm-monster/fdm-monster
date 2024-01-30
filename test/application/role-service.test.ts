@@ -1,28 +1,29 @@
 import { configureContainer } from "@/container";
-import { Role } from "@/models";
 import { ROLES } from "@/constants/authorization.constants";
 import { DITokens } from "@/container.tokens";
 import { RoleService } from "@/services/authentication/role.service";
 import { AwilixContainer } from "awilix";
-import { closeDatabase, connect } from "../db-handler";
 import { IRoleService } from "@/services/interfaces/role-service.interface";
+import { SqliteIdType } from "@/shared.constants";
+import { TypeormService } from "@/services/typeorm/typeorm.service";
+import { Role } from "@/entities";
 
 let container: AwilixContainer;
-let roleService: IRoleService;
+let typeorm: TypeormService;
+let roleService: IRoleService<SqliteIdType, Role>;
 
 beforeAll(async () => {
-  await connect();
-  container = configureContainer();
+  container = configureContainer(true);
+  typeorm = container.resolve<TypeormService>(DITokens.typeormService);
   roleService = container.resolve(DITokens.roleService);
+
+  await typeorm.createConnection();
 });
 afterEach(async () => {
-  await Role.deleteMany();
-});
-afterAll(async () => {
-  await closeDatabase();
+  await typeorm.getDataSource().getRepository(Role).delete({});
 });
 
-describe("RoleService", () => {
+describe(RoleService.name, () => {
   it("should sync definition to database", async () => {
     await roleService.syncRoles();
     expect(roleService.roles).toHaveLength(Object.values(ROLES).length);
