@@ -56,7 +56,7 @@ jobs:
 
       # Build dist folder
       - run: yarn set version berry
-      - run: yarn install --immutable --immutable-cache --check-cache
+      - run: yarn install --immutable
       - run: yarn build
 
       - name: Create release
