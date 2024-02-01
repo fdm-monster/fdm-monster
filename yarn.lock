@@ -1169,7 +1169,7 @@ __metadata:
     simple-git: "npm:3.22.0"
     socket.io: "npm:4.7.4"
     supertest: "npm:6.3.4"
-    toad-scheduler: "npm:3.0.0"
+    toad-scheduler: "npm:3.0.1"
     ts-node: "npm:10.9.2"
     typeorm: "npm:0.3.20"
     typescript: "npm:5.3.3"
@@ -4492,6 +4492,13 @@ __metadata:
   version: 1.1.1
   resolution: "create-require@npm:1.1.1"
   checksum: 10c0/157cbc59b2430ae9a90034a5f3a1b398b6738bf510f713edc4d4e45e169bc514d3d99dd34d8d01ca7ae7830b5b8b537e46ae8f3c8f932371b0875c0151d7ec91
+  languageName: node
+  linkType: hard
+
+"croner@npm:^7.0.5":
+  version: 7.0.5
+  resolution: "croner@npm:7.0.5"
+  checksum: 10c0/8b23e80c375da9bc06bfc0fb481b67a281bffd7623d0bb380a9c9d1a42ebc9a7cc460b45bb6b3c8ab588294d3abddc769815460017f545a5e60a56f4976c505d
   languageName: node
   linkType: hard
 
@@ -9954,10 +9961,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"toad-scheduler@npm:3.0.0":
-  version: 3.0.0
-  resolution: "toad-scheduler@npm:3.0.0"
-  checksum: 10c0/4474c0b2a9c0633ec3e487abf255e131aebab4f5b4ebd1c5de9cd8d863fdde0c5a64625e4c1ee88721a0029a6bc64d4a289a1f69330d4775aa580f5ec8343e30
+"toad-scheduler@npm:3.0.1":
+  version: 3.0.1
+  resolution: "toad-scheduler@npm:3.0.1"
+  dependencies:
+    croner: "npm:^7.0.5"
+  checksum: 10c0/55e721b76f12759d91ffaf9d268ad26c744b2c816220de7d2eef3ed10e8d8767fd3fca772d7b6eee8b59c2065570e1533301d486766f57eb527259bae2db149e
   languageName: node
   linkType: hard
 
