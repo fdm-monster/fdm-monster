@@ -175,7 +175,7 @@ export class PrinterController {
   }
 
   async create(req: Request, res: Response) {
-    let newPrinter = req.body;
+    const newPrinter = req.body;
 
     // Has internal validation, but might add some here above as well
     const createdPrinter = await this.printerService.create(newPrinter);

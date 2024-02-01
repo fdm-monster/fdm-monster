@@ -63,7 +63,11 @@ export class PrinterService
   /**
    * Stores a new printer into the database.
    */
-  async create(newPrinter: PrinterDto<SqliteIdType>, emitEvent = true): Promise<Printer> {
+  async create(newPrinter: PrinterUnsafeDto<SqliteIdType>, emitEvent = true): Promise<Printer> {
+    if (newPrinter.id) {
+      delete newPrinter.id;
+    }
+
     const mergedPrinter = await this.validateAndDefault(newPrinter);
     mergedPrinter.dateAdded = Date.now();
     const printer = await super.create(mergedPrinter);
