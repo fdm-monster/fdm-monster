@@ -26,7 +26,6 @@ export class PrintCompletionService
     return {
       id: entity.id,
       completionLog: entity.completionLog,
-      correlationId: entity.correlationId,
       context: entity.context,
       fileName: entity.fileName,
       createdAt: entity.createdAt,
@@ -41,12 +40,12 @@ export class PrintCompletionService
   }
 
   async findPrintCompletion(correlationId: string) {
-    return this.repository.findBy({ correlationId });
+    return this.repository.findBy({ context: { correlationId } });
   }
 
   async updateContext(correlationId: string, context: PrintCompletionContext): Promise<void> {
     const completionEntry = await this.repository.findOneBy({
-      correlationId,
+      context: { correlationId },
       status: EVENT_TYPES.PrintStarted,
     });
     if (!completionEntry) {
