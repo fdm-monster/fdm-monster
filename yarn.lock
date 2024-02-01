@@ -1097,7 +1097,7 @@ __metadata:
     "@sentry/node": "npm:7.99.0"
     "@swc/cli": "npm:0.3.6"
     "@swc/core": "npm:1.3.107"
-    "@swc/jest": "npm:0.2.31"
+    "@swc/jest": "npm:0.2.34"
     "@types/adm-zip": "npm:0.5.5"
     "@types/bcryptjs": "npm:2.4.6"
     "@types/cache-manager": "npm:4.0.6"
@@ -2640,15 +2640,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@swc/jest@npm:0.2.31":
-  version: 0.2.31
-  resolution: "@swc/jest@npm:0.2.31"
+"@swc/jest@npm:0.2.34":
+  version: 0.2.34
+  resolution: "@swc/jest@npm:0.2.34"
   dependencies:
     "@jest/create-cache-key-function": "npm:^29.7.0"
     jsonc-parser: "npm:^3.2.0"
   peerDependencies:
     "@swc/core": "*"
-  checksum: 10c0/58f634d4b7b0cab7230f6b36a81ef88ecca5e9ec26b5b7ea5872c05b2b8c53fe982da9e3f8ec2a8f36c19d3eb92bad271c652575831d100ebae1449ec3506664
+  checksum: 10c0/7a09b91c39f81d0290241c1bcefea5653f35a20bfe4f206fbcc2a0bebb4d19891086a8a55593dc8e3efcd6ee6c61ddd5aa23c773a4e5392f0c046b0ff900132f
   languageName: node
   linkType: hard
 
