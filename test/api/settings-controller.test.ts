@@ -1,5 +1,4 @@
 import supertest from "supertest";
-import { connect } from "../db-handler";
 import { setupTestApp } from "../test-server";
 import { expectOkResponse } from "../extensions";
 import { AppConstants } from "@/server.constants";
@@ -27,7 +26,6 @@ const serverWhitelistRoute = `${defaultRoute}/whitelist`;
 const sentryDiagnosticsRoute = `${defaultRoute}/sentry-diagnostics`;
 
 beforeAll(async () => {
-  await connect();
   ({ request } = await setupTestApp(true));
 });
 

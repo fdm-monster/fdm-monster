@@ -14,6 +14,7 @@ import { OctoPrintSessionDto } from "./dto/octoprint-session.dto";
 import { IPrinterSocketLogin, PrinterLoginDto } from "@/shared/dtos/printer-login.dto";
 import { WebsocketAdapter } from "@/shared/websocket.adapter";
 import { OctoPrintEventDto } from "@/services/octoprint/dto/octoprint-event.dto";
+import { writeFileSync } from "node:fs";
 
 type ThrottleRate = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 
@@ -46,6 +47,8 @@ export const SOCKET_STATE = {
   closed: "closed",
 };
 
+export type SocketStateType = keyof typeof SOCKET_STATE;
+
 export const API_STATE = {
   unset: "unset",
   noResponse: "noResponse",
@@ -54,12 +57,14 @@ export const API_STATE = {
   responding: "responding",
 };
 
+export type ApiStateType = keyof typeof API_STATE;
+
 export const octoPrintEvent = (event: string) => `octoprint.${event}`;
 
 export class OctoPrintSockIoAdapter extends WebsocketAdapter {
   octoPrintApiService: OctoPrintApiService;
-  eventEmitter: EventEmitter2;
-  configService: ConfigService;
+  private eventEmitter: EventEmitter2;
+  private configService: ConfigService;
 
   public printerId?: IdType;
   stateUpdated = false;
@@ -143,11 +148,12 @@ export class OctoPrintSockIoAdapter extends WebsocketAdapter {
     super.close();
   }
 
-  async sendThrottle(throttle: ThrottleRate = AppConstants.defaultSocketThrottleRate): Promise<void> {
+  async sendThrottle(throttle: number = AppConstants.defaultSocketThrottleRate): Promise<void> {
     return await this.sendMessage(JSON.stringify({ throttle }));
   }
 
   async reauthSession() {
+    this.logger.log("Sending reauthSession");
     await this.setupSocketSession();
     await this.sendAuth();
     this.resetReauthRequired();
@@ -163,34 +169,34 @@ export class OctoPrintSockIoAdapter extends WebsocketAdapter {
       .then((r) => {
         // Check response for red flags
         if (r.name === "_api") {
-          this.setApiState(API_STATE.globalKey);
-          this.setSocketState(SOCKET_STATE.aborted);
+          this.setApiState("globalKey");
+          this.setSocketState("aborted");
           throw new ExternalServiceError("Global API Key detected, aborting socket connection");
         } else if (r.needs?.group[0] === "guests") {
           this.logger.warn("Detected group guests in OctoPrint login response, marking as unauthorized");
           // This doesn't occur often (instead a 400 with CSRF failed is returned)
-          this.setApiState(API_STATE.authFail);
-          this.setSocketState(SOCKET_STATE.aborted);
+          this.setApiState("authFail");
+          this.setSocketState("aborted");
           throw new ExternalServiceError("Guest group detected, authentication failed, aborting socket connection");
         }
-        this.setApiState(API_STATE.responding);
-        this.setSocketState(SOCKET_STATE.opening);
+        this.setApiState("responding");
+        this.setSocketState("opening");
         return r;
       })
       .catch((e: AxiosError) => {
-        this.setSocketState(SOCKET_STATE.aborted);
+        this.setSocketState("aborted");
         // TODO improve error type detection
         if (e instanceof ExternalServiceError) {
           this.logger.warn(`Printer authorization error (id: ${this.printerId}), apiState: ${this.apiState}`);
           throw e;
         } else {
           if (e?.response?.status === 403) {
-            this.setApiState(API_STATE.authFail);
-            this.setSocketState(SOCKET_STATE.aborted);
+            this.setApiState("authFail");
+            this.setSocketState("aborted");
             throw new ExternalServiceError(e);
           }
           this.logger.error(`Printer (${this.printerId}) network or transport error, marking it as unreachable; ${e}`);
-          this.setApiState(API_STATE.noResponse);
+          this.setApiState("noResponse");
         }
         throw e;
       });
@@ -198,11 +204,11 @@ export class OctoPrintSockIoAdapter extends WebsocketAdapter {
     this.username = await this.octoPrintApiService.getAdminUserOrDefault(this.loginDto).catch((e: AxiosError) => {
       const status = e.response?.status;
       if (status === HttpStatusCode.FORBIDDEN) {
-        this.setApiState(API_STATE.authFail);
-        this.setSocketState(SOCKET_STATE.aborted);
+        this.setApiState("authFail");
+        this.setSocketState("aborted");
       } else {
-        this.setApiState(API_STATE.authFail);
-        this.setSocketState(SOCKET_STATE.aborted);
+        this.setApiState("authFail");
+        this.setSocketState("aborted");
       }
       if (
         [
@@ -229,29 +235,84 @@ export class OctoPrintSockIoAdapter extends WebsocketAdapter {
   }
 
   resetSocketState() {
-    this.setSocketState(SOCKET_STATE.unopened);
-    this.setApiState(API_STATE.unset);
+    this.setSocketState("unopened");
+    this.setApiState("unset");
   }
 
-  /**
-   * @private
-   * @param {API_STATE} state
-   */
-  private setApiState(state: string) {
-    this.apiState = state;
-    this.apiStateUpdated = true;
-    this.apiStateUpdateTimestamp = Date.now();
-    if (this._debugMode) {
-      this.logger.log(`${this.printerId} API state updated to: ` + state);
+  emitEventSync(event: string, payload: any) {
+    this.eventEmitter.emit(octoPrintEvent(event), {
+      event,
+      payload,
+      printerId: this.printerId,
+    } as OctoPrintEventDto);
+  }
+
+  protected async afterOpened(event: any): Promise<void> {
+    this.setSocketState("opened");
+    await this.sendAuth();
+    await this.sendThrottle(AppConstants.defaultSocketThrottleRate);
+  }
+
+  protected async onMessage(message: string): Promise<void> {
+    this.lastMessageReceivedTimestamp = Date.now();
+
+    if (this.socketState !== SOCKET_STATE.authenticated) {
+      this.setSocketState("authenticated");
     }
-    this.emitEventSync(Message.API_STATE_UPDATED, state);
+
+    const data = JSON.parse(message);
+    const eventName = Object.keys(data)[0];
+    const payload = data[eventName];
+
+    if (this._debugMode) {
+      this.logger.log(`RX Msg ${eventName} ${message.substring(0, 140)}...`);
+    }
+
+    if (eventName === Message.reauthRequired) {
+      this.logger.log("Received 'reauthRequired', acting on it");
+      this.setReauthRequired();
+    } else if (
+      eventName === Message.current &&
+      this.configService.get(AppConstants.debugFileWritePrinterStatesKey, AppConstants.defaultDebugFileWritePrinterStates) ===
+        "true"
+    ) {
+      writeFileSync(`websocket_current_${this.printerId}.txt`, JSON.stringify(payload, null, 2));
+    }
+
+    // Emit the message to the event bus
+    await this.emitEvent(eventName, payload);
   }
 
-  /**
-   * @private
-   * @param {SOCKET_STATE} state
-   */
-  private setSocketState(state) {
+  protected async afterClosed(event: any) {
+    this.setSocketState("closed");
+    delete this.socket;
+    await this.emitEvent(Message.WS_CLOSED);
+  }
+
+  protected async onError(error: any) {
+    this.setSocketState("error");
+    await this.emitEvent(Message.WS_ERROR, error);
+  }
+
+  private async emitEvent(event: string, payload?: any) {
+    await this.eventEmitter.emitAsync(octoPrintEvent(event), {
+      event,
+      payload,
+      printerId: this.printerId,
+    } as OctoPrintEventDto);
+  }
+
+  private async sendAuth(): Promise<void> {
+    this.setSocketState(SOCKET_STATE.authenticating as SocketStateType);
+    await this.sendMessage(
+      JSON.stringify({
+        auth: `${this.username}:${this.sessionDto.session}`,
+      })
+    );
+    // TODO what if bad auth? => pure silence right?
+  }
+
+  private setSocketState(state: SocketStateType) {
     this.socketState = state;
     this.stateUpdated = true;
     this.stateUpdateTimestamp = Date.now();
@@ -261,70 +322,13 @@ export class OctoPrintSockIoAdapter extends WebsocketAdapter {
     this.emitEventSync(Message.WS_STATE_UPDATED, state);
   }
 
-  /**
-   * @private
-   * @param {Message} event
-   * @param {?Object} payload
-   */
-  private async emitEvent(event: string, payload) {
-    await this.eventEmitter.emitAsync(octoPrintEvent(event), {
-      event,
-      payload,
-      printerId: this.printerId,
-    } as OctoPrintEventDto);
-  }
-
-  emitEventSync(event: string, payload) {
-    this.eventEmitter.emit(octoPrintEvent(event), {
-      event,
-      payload,
-      printerId: this.printerId,
-    } as OctoPrintEventDto);
-  }
-
-  protected async afterOpened(event): Promise<void> {
-    this.setSocketState(SOCKET_STATE.opened);
-    await this.sendAuth();
-    await this.sendThrottle(AppConstants.defaultSocketThrottleRate);
-  }
-
-  protected async onMessage(message): Promise<void> {
-    this.lastMessageReceivedTimestamp = Date.now();
-
-    if (this.socketState !== SOCKET_STATE.authenticated) {
-      this.setSocketState(SOCKET_STATE.authenticated);
+  private setApiState(state: ApiStateType) {
+    this.apiState = state;
+    this.apiStateUpdated = true;
+    this.apiStateUpdateTimestamp = Date.now();
+    if (this._debugMode) {
+      this.logger.log(`${this.printerId} API state updated to: ` + state);
     }
-
-    const data = JSON.parse(message);
-    const eventName = Object.keys(data)[0];
-    const payload = data[eventName];
-
-    if (eventName === Message.reauthRequired) {
-      this.setReauthRequired();
-    }
-
-    // Emit the message to the event bus
-    await this.emitEvent(eventName, payload);
-  }
-
-  protected async afterClosed(event) {
-    this.setSocketState(SOCKET_STATE.closed);
-    delete this.socket;
-    await this.emitEvent(Message.WS_CLOSED);
-  }
-
-  protected async onError(error) {
-    this.setSocketState(SOCKET_STATE.error);
-    await this.emitEvent(Message.WS_ERROR, error);
-  }
-
-  private async sendAuth(): Promise<void> {
-    this.setSocketState(SOCKET_STATE.authenticating);
-    await this.sendMessage(
-      JSON.stringify({
-        auth: `${this.username}:${this.sessionDto.session}`,
-      })
-    );
-    // TODO what if bad auth? => pure silence right?
+    this.emitEventSync(Message.API_STATE_UPDATED, state);
   }
 }

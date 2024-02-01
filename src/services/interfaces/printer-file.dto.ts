@@ -1,5 +1,6 @@
 import { GcodeAnalysisDto } from "@/services/interfaces/gcode-analysis.dto";
 import { IdDto, IdType } from "@/shared.constants";
+import { OctoPrintCustomDto } from "@/services/octoprint/models/octoprint-file.dto";
 
 export interface LastPrintMoment {
   date: number;
@@ -10,21 +11,45 @@ export interface LastPrintMoment {
 export interface Prints {
   failure: number;
   last: LastPrintMoment;
-  success: boolean;
+  success: number;
 }
 
 export interface Refs {
   download: string;
   resource: string;
+  // model?: string;
 }
 
-export interface Statistics {
+export interface OctoPrintStatisticsDto {
   averagePrintTime: {
+    _default: number;
     [k: string]: number; //profile name like _default
   };
   lastPrintTime: {
+    _default: number;
     [k: string]: number; //profile name like _default
   };
+}
+
+export class CreateOrUpdatePrinterFileDto<KeyType = IdType> extends IdDto<KeyType> {
+  printerId?: KeyType;
+
+  name: string;
+  date: number;
+  display: string;
+  gcodeAnalysis?: GcodeAnalysisDto;
+
+  hash: string;
+  origin: string;
+  path: string;
+  prints: Prints;
+  refs: Refs;
+  size: number;
+  statistics: OctoPrintStatisticsDto;
+  type: string;
+  typePath: string[]; // machinecode gcode
+
+  customData?: OctoPrintCustomDto;
 }
 
 export class PrinterFileDto<KeyType = IdType> extends IdDto<KeyType> {
@@ -33,7 +58,7 @@ export class PrinterFileDto<KeyType = IdType> extends IdDto<KeyType> {
   name: string;
   date: number;
   display: string;
-  gcodeAnalysis: GcodeAnalysisDto;
+  gcodeAnalysis?: GcodeAnalysisDto;
 
   hash: string;
   origin: string;
@@ -41,7 +66,9 @@ export class PrinterFileDto<KeyType = IdType> extends IdDto<KeyType> {
   prints: Prints;
   refs: Refs;
   size: number;
-  statistics: Statistics;
+  statistics: OctoPrintStatisticsDto;
   type: string;
   typePath: string[]; // machinecode gcode
+
+  customData?: OctoPrintCustomDto;
 }

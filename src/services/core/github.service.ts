@@ -2,6 +2,7 @@ import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import { Octokit } from "octokit";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
+import * as console from "console";
 
 export class GithubService {
   octokitService: Octokit;
@@ -18,33 +19,33 @@ export class GithubService {
   }
 
   async getLatestRelease(owner: string, repo: string) {
-    return await this.octokitService.rest.repos
-      .getLatestRelease({
+    try {
+      return await this.octokitService.rest.repos.getLatestRelease({
         owner,
         repo,
-      })
-      .catch((e) => {
-        if (e.name === "HttpError" && e.status == 404) {
-          throw new NotFoundException(`Could not retrieve latest release`);
-        }
-
-        throw e;
       });
+    } catch (e) {
+      if (e?.name === "HttpError" && e.status == 404) {
+        throw new NotFoundException(`Could not find latest release`);
+      }
+
+      throw e;
+    }
   }
 
   async getReleases(owner: string, repo: string) {
-    return await this.octokitService.rest.repos
-      .listReleases({
+    try {
+      return await this.octokitService.rest.repos.listReleases({
         owner,
         repo,
-      })
-      .catch((e) => {
-        if (e.name === "HttpError" && e.status == 404) {
-          throw new NotFoundException(`Could not retrieve releases`);
-        }
-
-        throw e;
       });
+    } catch (e) {
+      if (e?.name === "HttpError" && e.status == 404) {
+        throw new NotFoundException(`Could not find releases`);
+      }
+
+      throw e;
+    }
   }
 
   async getReleaseByTag(owner: string, repo: string, tag: string) {

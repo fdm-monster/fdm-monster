@@ -4,6 +4,22 @@ import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { PrinterCache } from "@/state/printer.cache";
 import { PrinterEventsCache } from "@/state/printer-events.cache";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
+import { IdType } from "@/shared.constants";
+import { CreateOrUpdatePrinterFileDto } from "./interfaces/printer-file.dto";
+import { ConnectionState } from "@/services/octoprint/dto/connection.dto";
+
+enum ReprintState {
+  PrinterNotAvailable = 0,
+  NoLastPrint = 1,
+  LastPrintReady = 2,
+}
+
+interface ReprintFileDto {
+  file?: CreateOrUpdatePrinterFileDto;
+  reprintState: ReprintState;
+  connectionState: ConnectionState | null;
+  printerId: IdType;
+}
 
 interface BatchSingletonModel {
   success?: boolean;
@@ -46,10 +62,21 @@ export class BatchCallService {
     this.printerService = printerService;
   }
 
-  async batchTogglePrintersEnabled(printerIds: string[], enabled: boolean): Promise<void[]> {
+  async batchTogglePrintersEnabled(
+    printerIds: string[],
+    enabled: boolean
+  ): Promise<
+    {
+      failure?: boolean;
+      error?: any;
+      success?: boolean;
+      printerId: string;
+      time: number;
+    }[]
+  > {
     const promises = [];
     for (const printerId of printerIds) {
-      let promise = Promise.resolve();
+      let promise: Promise<any>;
       const printerDto = await this.printerCache.getValue(printerId);
       if (!printerDto) continue;
 
@@ -112,33 +139,55 @@ export class BatchCallService {
     return await Promise.all(promises);
   }
 
-  async batchReprintCalls(printerIds: string[]): Promise<Awaited<BatchModel>[]> {
+  async getBatchPrinterReprintFile(printerIds: IdType[]): Promise<ReprintFileDto[]> {
     const promises = [];
     for (const printerId of printerIds) {
-      const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
+      const promise = new Promise<ReprintFileDto>(async (resolve, _) => {
+        try {
+          const login = await this.printerCache.getLoginDtoAsync(printerId);
+          const files = (await this.octoPrintApiService.getLocalFiles(login, true)).filter((f) => f?.prints?.last?.date);
 
-      // TODO test this
-      let reprintPath = await this.printerEventsCache.getPrinterSocketEvents(printerId)?.current?.job?.file?.path;
-      if (!reprintPath?.length) {
-        const files = await this.printerFilesStore.getFiles(printerId)?.files;
-        if (files?.length) {
-          files.sort((f1, f2) => {
-            // Sort by date, newest first
-            return f1.date < f2.date ? 1 : -1;
+          const connected = await this.octoPrintApiService.getConnection(login);
+          const connectionState = connected.current?.state;
+
+          // OctoPrint sorts by last print time by default
+          // files.sort((f1, f2) => {
+          //   return f1?.prints?.last?.date > f2?.prints?.last?.date ? 1 : -1;
+          // });
+
+          if (files?.length == 0) {
+            return resolve({ connectionState, printerId, reprintState: ReprintState.NoLastPrint });
+          }
+
+          return resolve({
+            connectionState,
+            file: files[0],
+            printerId,
+            reprintState: ReprintState.LastPrintReady,
           });
-
-          reprintPath = files[0].path;
+        } catch (e) {
+          return resolve({
+            connectionState: null,
+            printerId,
+            reprintState: ReprintState.PrinterNotAvailable,
+          });
         }
+      });
+      promises.push(promise);
+    }
 
-        if (!files?.length) {
-          promises.push(Promise.resolve({ failure: true, error: "No file to reprint", printerId }));
-          continue;
-        }
-      }
+    return await Promise.all(promises);
+  }
+
+  async batchReprintCalls(printerIdFileList: { printerId: IdType; path: string }[]): Promise<Awaited<BatchModel>[]> {
+    const promises = [];
+    for (const printerIdFile of printerIdFileList) {
+      const { printerId, path } = printerIdFile;
+      const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
 
       const time = Date.now();
       const promise = this.octoPrintApiService
-        .selectPrintFile(printerLogin, reprintPath, true)
+        .selectPrintFile(printerLogin, path, true)
         .then(() => {
           return { success: true, printerId, time: Date.now() - time };
         })

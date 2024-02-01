@@ -1,28 +1,31 @@
 import { YamlService } from "@/services/core/yaml.service";
 import { PrinterCache } from "@/state/printer.cache";
 import { AwilixContainer } from "awilix";
-import { connect, closeDatabase } from "../db-handler";
-import { configureContainer } from "@/container";
 import { DITokens } from "@/container.tokens";
-import { Printer } from "@/models";
 import { exportYamlBuffer1_3_1, exportYamlBuffer1_5_0 } from "./test-data/yaml-import";
-import { readFileSync } from "node:fs";
+import { TypeormService } from "@/services/typeorm/typeorm.service";
+import { setupTestApp } from "../test-server";
 import { join } from "path";
+import { readFileSync } from "node:fs";
+import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 
 let container: AwilixContainer;
 let yamlService: YamlService;
 let printerCache: PrinterCache;
+let printerService: IPrinterService;
+let typeorm: TypeormService;
 beforeAll(async () => {
-  await connect();
-  container = configureContainer();
+  const { container } = await setupTestApp(true);
   yamlService = container.resolve(DITokens.yamlService);
   printerCache = container.resolve(DITokens.printerCache);
+  printerService = container.resolve(DITokens.printerService);
+  typeorm = container.resolve<TypeormService>(DITokens.typeormService);
 });
 afterEach(async () => {
-  await Printer.deleteMany();
-});
-afterAll(async () => {
-  await closeDatabase();
+  const printers = await printerService.list();
+  for (let printer of printers) {
+    await printerService.delete(printer.id);
+  }
 });
 
 describe(YamlService.name, () => {

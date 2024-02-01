@@ -51,6 +51,7 @@ export const DITokens = {
   // Stores/states
   settingsStore: "settingsStore",
   printerCache: "printerCache",
+  printerConnectionCache: "printerConnectionCache",
   printerEventsCache: "printerEventsCache",
   printerSocketStore: "printerSocketStore",
   testPrinterSocketStore: "testPrinterSocketStore",
@@ -68,6 +69,7 @@ export const DITokens = {
   socketIoTask: "socketIoTask",
   printCompletionSocketIoTask: "printCompletionSocketIoTask",
   printerWebsocketTask: "printerWebsocketTask",
+  printerStateUpdatePollTask: "printerStateUpdatePollTask",
   printerWebsocketRestoreTask: "printerWebsocketRestoreTask",
   printerFileCleanTask: "printerFileCleanTask",
 };

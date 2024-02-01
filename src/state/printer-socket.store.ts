@@ -124,7 +124,7 @@ export class PrinterSocketStore {
           promisesReauth.push(promise);
         }
       } catch (e) {
-        if (this.settingsStore.getServerSettings().debugSettings?.debugSocketSetup) {
+        if (this.settingsStore.getDebugSettingsSensitive()?.debugSocketSetup) {
           this.logger.log("Failed to reauth printer socket", errorSummary(e));
         }
         captureException(e);
@@ -133,12 +133,12 @@ export class PrinterSocketStore {
 
     await Promise.all(promisesReauth);
 
-    const promisesOpenSocket = [];
-    const failedSocketReopened = [];
+    const promisesOpenSocket: any[] = [];
+    const failedSocketReopened: any[] = [];
     for (const socket of Object.values(this.printerSocketAdaptersById)) {
       try {
         if (socket.needsSetup() || socket.needsReopen()) {
-          if (this.settingsStore.getServerSettings().debugSettings?.debugSocketSetup) {
+          if (this.settingsStore.getDebugSettingsSensitive()?.debugSocketSetup) {
             this.logger.log(
               `Reopening socket for printerId '${
                 socket.printerId
@@ -157,7 +157,7 @@ export class PrinterSocketStore {
           promisesOpenSocket.push(promise);
         }
       } catch (e) {
-        if (this.settingsStore.getServerSettings().debugSettings?.debugSocketSetup) {
+        if (this.settingsStore.getDebugSettingsSensitive()?.debugSocketSetup) {
           this.logger.log(`Failed to setup printer socket ${errorSummary(e)}`);
         }
         captureException(e);

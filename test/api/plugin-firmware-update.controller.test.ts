@@ -1,11 +1,10 @@
-import { closeDatabase, connect } from "../db-handler";
-
 import { AppConstants } from "@/server.constants";
 import { setupTestApp } from "../test-server";
 import { expectOkResponse, expectInternalServerError } from "../extensions";
 import { createTestPrinter } from "./test-data/create-printer";
 import supertest from "supertest";
 import { AxiosMock } from "../mocks/axios.mock";
+import { PluginFirmwareUpdateController } from "@/controllers/plugin-firmware-update.controller";
 
 const defaultRoute = AppConstants.apiRoute + "/plugin/firmware-update";
 const listRoute = `${defaultRoute}/`;
@@ -23,15 +22,10 @@ let request: supertest.SuperTest<supertest.Test>;
 let httpClient: AxiosMock;
 
 beforeAll(async () => {
-  await connect();
   ({ request, httpClient } = await setupTestApp(true));
 });
 
-afterAll(async () => {
-  return closeDatabase();
-});
-
-describe("PluginFirmwareUpdateController", () => {
+describe(PluginFirmwareUpdateController.name, () => {
   it(`should be able to GET ${listRoute} empty cache`, async () => {
     const response = await request.get(listRoute).send();
     expectOkResponse(response);

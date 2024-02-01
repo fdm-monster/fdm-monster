@@ -1,6 +1,6 @@
 import { IFloor } from "@/models/Floor";
 import { IdType } from "@/shared.constants";
-import { AddOrUpdatePrinterDto, CreateFloorDto, FloorDto, UpdateFloorDto } from "@/services/interfaces/floor.dto";
+import { CreateFloorDto, FloorDto, PositionDto, UpdateFloorDto } from "@/services/interfaces/floor.dto";
 
 export interface IFloorService<KeyType = IdType, Entity = IFloor> {
   toDto(floor: Entity): FloorDto<KeyType>;
@@ -23,7 +23,7 @@ export interface IFloorService<KeyType = IdType, Entity = IFloor> {
 
   deletePrinterFromAnyFloor(printerId: KeyType): Promise<void>;
 
-  addOrUpdatePrinter(floorId: KeyType, position: AddOrUpdatePrinterDto<KeyType>): Promise<Entity>;
+  addOrUpdatePrinter(floorId: KeyType, position: PositionDto<KeyType>): Promise<Entity>;
 
   removePrinter(floorId: KeyType, printerId: KeyType): Promise<Entity>;
 }

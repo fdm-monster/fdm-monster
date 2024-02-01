@@ -1,24 +1,14 @@
-import { closeDatabase, connect } from "../../db-handler";
-import { configureContainer } from "@/container";
 import { DITokens } from "@/container.tokens";
 import { AwilixContainer } from "awilix";
 import { SettingsStore } from "@/state/settings.store";
+import { setupTestApp } from "../../test-server";
 
 let container: AwilixContainer;
 let settingsStore: SettingsStore;
 
-beforeAll(async () => {
-  await connect();
-});
-
 beforeEach(async () => {
-  if (container) await container.dispose();
-  container = configureContainer();
+  const { container } = await setupTestApp(true);
   settingsStore = container.resolve(DITokens.settingsStore);
-});
-
-afterAll(async () => {
-  await closeDatabase();
 });
 
 describe(SettingsStore.name, () => {

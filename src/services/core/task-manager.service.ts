@@ -179,7 +179,7 @@ export class TaskManagerService {
 
   runTimeoutTaskInstance(taskId: string, timeoutMs: number) {
     const taskState = this.getTaskState(taskId);
-    this.logger.log(`Running delayed task ${taskId} in ${timeoutMs}ms`);
+    this.logger.log(`Running delayed task '${taskId}' in ${timeoutMs}ms`);
     setTimeout(() => taskState.timedTask.execute(), timeoutMs, taskId);
   }
 

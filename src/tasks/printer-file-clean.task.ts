@@ -48,7 +48,6 @@ export class PrinterFileCleanTask {
   }
 
   async run() {
-    // TODO filter disconnected printers
     const printers = await this.printerCache.listCachedPrinters(false);
     const fileCleanSettings = this.getSettings();
     const autoCleanAtBootEnabled = fileCleanSettings.autoRemoveOldFilesAtBoot;
@@ -58,6 +57,22 @@ export class PrinterFileCleanTask {
         this.logger.log(`Cleaning files of ${printers.length} active printers [printerFileClean:autoRemoveOldFilesAtBoot].`);
       } else {
         this.logger.log(`Reporting about old files of ${printers.length} printers.`);
+      }
+
+      const errorPrinters = [];
+      for (let printer of printers) {
+        try {
+          await this.printerFilesStore.eagerLoadPrinterFiles(printer.id, false);
+        } catch (e) {
+          errorPrinters.push({ e, printer });
+        }
+      }
+      if (errorPrinters.length > 0) {
+        this.logger.error(
+          `Error loading some files, ${errorPrinters.length} printer(s) (${errorPrinters.map(
+            (ep) => `${ep.printer.name} ${ep.e.toString()}`
+          )}) did not respond or returned an unexpected status code. Those will depend on previously cached files.`
+        );
       }
 
       // Filter printer states - cant clean unconnected OctoPrint instances

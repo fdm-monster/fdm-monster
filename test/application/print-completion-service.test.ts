@@ -1,21 +1,22 @@
-import { connect, clearDatabase, closeDatabase } from "../db-handler";
 import { DITokens } from "@/container.tokens";
-import { configureContainer } from "@/container";
 import { PrintCompletionService } from "@/services/print-completion.service";
 import { EVENT_TYPES } from "@/services/octoprint/constants/octoprint-websocket.constants";
+import { setupTestApp } from "../test-server";
+import { AwilixContainer } from "awilix";
+import { generateCorrelationToken } from "@/utils/correlation-token.util";
+import { createTestPrinter } from "../api/test-data/create-printer";
+import supertest, { SuperTest } from "supertest";
+import { IPrintCompletionService } from "@/services/interfaces/print-completion.service";
+import { SqliteIdType } from "@/shared.constants";
+import { PrintCompletion } from "@/entities";
 
-let printCompletionService: PrintCompletionService;
+let container: AwilixContainer;
+let printCompletionService: IPrintCompletionService<SqliteIdType, PrintCompletion>;
+let request: supertest.SuperTest<supertest.Test>;
 
 beforeAll(async () => {
-  await connect();
-  const container = configureContainer();
+  ({ container, request } = await setupTestApp(true));
   printCompletionService = container.resolve(DITokens.printCompletionService);
-});
-afterEach(async () => {
-  await clearDatabase();
-});
-afterAll(async () => {
-  await closeDatabase();
 });
 
 describe(PrintCompletionService.name, () => {
@@ -23,21 +24,25 @@ describe(PrintCompletionService.name, () => {
    * Tests that a valid completion can be created through the service without throwing any errors.
    */
   it("can add a print failure with or without log", async () => {
+    const trackingToken = generateCorrelationToken();
+    const printer = await createTestPrinter(request);
     const completionEntry = await printCompletionService.create({
-      printerId: "5f14968b11034c4ca49e7c69",
+      printerId: printer.id,
       completionLog: "some log happened here",
       status: EVENT_TYPES.PrintStarted,
       fileName: "mycode.gcode",
+      correlationId: trackingToken,
       context: {},
     });
-    expect(completionEntry._id).toBeTruthy();
+    expect(completionEntry.id).toBeTruthy();
 
     const completionEntryWithoutLog = await printCompletionService.create({
-      printerId: "5f14968b11034c4ca49e7c69",
+      printerId: printer.id,
       status: EVENT_TYPES.PrintFailed,
       fileName: "mycode.gcode",
+      correlationId: trackingToken,
       context: {},
     });
-    expect(completionEntryWithoutLog._id).toBeTruthy();
+    expect(completionEntryWithoutLog.id).toBeTruthy();
   });
 });

@@ -68,7 +68,7 @@ export const AppConstants = {
   orgName: "fdm-monster",
   // Wizard version changes will trigger a re-run of the wizard
   currentWizardVersion: 1,
-  defaultClientMinimum: "1.5.0-rc3",
+  defaultClientMinimum: "1.5.0-rc4",
 
   influxUrl: "INFLUX_URL",
   influxToken: "INFLUX_TOKEN",
@@ -80,6 +80,8 @@ export const AppConstants = {
   defaultSocketThrottleRate: 1,
   debugSocketStatesKey: "DEBUG_SOCKET_STATES",
   defaultDebugSocketStates: "false",
+  debugFileWritePrinterStatesKey: "DEBUG_FILE_WRITE_PRINTER_STATES",
+  defaultDebugFileWritePrinterStates: "false",
 
   // Future experimental feature
   enableMqttAutoDiscoveryToken: "ENABLE_MQTT_AUTODISCOVERY",
@@ -99,6 +101,6 @@ export const AppConstants = {
 
   debugRoutesKey: "DEBUG_ROUTES",
 
-  enableExperimentalTypeormKey: "ENABLE_EXPERIMENTAL_TYPEORM",
+  ENABLE_EXPERIMENTAL_TYPEORM: "ENABLE_EXPERIMENTAL_TYPEORM",
   enableExperimentalTypeormDefault: "false",
 };

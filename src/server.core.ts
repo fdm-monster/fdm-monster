@@ -8,10 +8,21 @@ import { configureContainer } from "./container";
 import { interceptDatabaseError } from "./middleware/database";
 import { interceptRoles, validateWhitelistedIp, validateWizardCompleted } from "./middleware/global.middleware";
 import { initializePassportStrategies } from "./middleware/passport";
+import { AppConstants } from "@/server.constants";
+import { join } from "path";
+import { ensureDirExists, superRootPath } from "@/utils/fs.utils";
+import { getEnvOrDefault } from "@/utils/env.utils";
 
 export async function setupServer() {
   const httpServer = express();
-  const container = configureContainer();
+  const experimentalTypeormEnabled =
+    getEnvOrDefault(AppConstants.ENABLE_EXPERIMENTAL_TYPEORM, AppConstants.enableExperimentalTypeormDefault) === "true";
+  if (experimentalTypeormEnabled) {
+    const dbFolder = process.env[AppConstants.DATABASE_PATH] || "./database";
+    ensureDirExists(join(superRootPath(), dbFolder));
+  }
+
+  const container = configureContainer(experimentalTypeormEnabled);
   initializePassportStrategies(passport, container);
 
   httpServer

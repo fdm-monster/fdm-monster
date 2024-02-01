@@ -6,7 +6,7 @@ import { IPrinterFilesService } from "@/services/interfaces/printer-files.servic
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { IPrinter } from "@/models/Printer";
 import { PrinterFile } from "@/models";
-import { PrinterFileDto } from "@/services/interfaces/printer-file.dto";
+import { CreateOrUpdatePrinterFileDto, PrinterFileDto } from "@/services/interfaces/printer-file.dto";
 import { IPrinterFile } from "@/models/PrinterFile";
 
 /**
@@ -52,7 +52,7 @@ export class PrinterFilesService implements IPrinterFilesService<MongoIdType> {
     return PrinterFile.find({ printerId: printer.id });
   }
 
-  async updateFiles(printerId: MongoIdType, newFiles: PrinterFileDto[]) {
+  async updateFiles(printerId: MongoIdType, newFiles: CreateOrUpdatePrinterFileDto<MongoIdType>[]) {
     const savedFiles = await this.getPrinterFiles(printerId);
 
     const newPaths = newFiles.map((f) => f.path);
@@ -67,9 +67,12 @@ export class PrinterFilesService implements IPrinterFilesService<MongoIdType> {
     return await this.getPrinterFiles(printerId);
   }
 
-  async appendOrReplaceFile(printerId: MongoIdType, addedFile: PrinterFileDto) {
+  async appendOrReplaceFile(printerId: MongoIdType, addedFile: CreateOrUpdatePrinterFileDto<MongoIdType>) {
     const printer = await this.printerService.get(printerId);
     addedFile.printerId = printer.id;
+    if (!addedFile.customData) {
+      addedFile.customData = {};
+    }
 
     const foundFile = await this.getPrinterFile(printer.id, addedFile.path);
     if (!foundFile) {

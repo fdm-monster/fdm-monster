@@ -7,7 +7,7 @@ import { IdType } from "@/shared.constants";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IPrinterFilesService } from "@/services/interfaces/printer-files.service.interface";
 import { errorSummary } from "@/utils/error.utils";
-import { PrinterFileDto } from "@/services/interfaces/printer-file.dto";
+import { CreateOrUpdatePrinterFileDto, PrinterFileDto } from "@/services/interfaces/printer-file.dto";
 
 export class PrinterFilesStore {
   printerCache: PrinterCache;
@@ -51,11 +51,9 @@ export class PrinterFilesStore {
 
   async eagerLoadPrinterFiles(printerId: IdType, recursive: boolean): Promise<any> {
     const loginDto = await this.printerCache.getLoginDtoAsync(printerId);
-    const response = await this.octoPrintApiService.getLocalFiles(loginDto, recursive);
-
-    const files = response?.files;
-    await this.updatePrinterFiles(printerId, files);
-    return files;
+    const normalizedFiles = await this.octoPrintApiService.getLocalFiles(loginDto, recursive);
+    await this.updatePrinterFiles(printerId, normalizedFiles);
+    return normalizedFiles;
   }
 
   getFiles(printerId: IdType) {
@@ -122,7 +120,7 @@ export class PrinterFilesStore {
     this.logger.log(`Clearing caches successful.`);
   }
 
-  async updatePrinterFiles(printerId: IdType, files: PrinterFileDto[]) {
+  async updatePrinterFiles(printerId: IdType, files: CreateOrUpdatePrinterFileDto[]) {
     const printer = await this.printerCache.getCachedPrinterOrThrowAsync(printerId);
     const printerFileList = await this.printerFilesService.updateFiles(printer.id, files);
     await this.fileCache.cachePrinterFiles(printer.id, printerFileList);

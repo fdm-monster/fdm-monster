@@ -1,17 +1,18 @@
-import { connect } from "../db-handler";
 import { AppConstants } from "@/server.constants";
 import { setupTestApp } from "../test-server";
 import { expectForbiddenResponse, expectNotFoundResponse, expectOkResponse } from "../extensions";
 import { ensureTestUserCreated } from "./test-data/create-user";
 import { ROLES } from "@/constants/authorization.constants";
 import supertest from "supertest";
-import { User } from "@/models";
+import { User } from "@/entities";
+import { User as UserMongo } from "@/models";
 import { UserController } from "@/controllers/user.controller";
 import { AwilixContainer } from "awilix";
 import { SettingsStore } from "@/state/settings.store";
 import { DITokens } from "@/container.tokens";
 import { loginTestUser } from "./auth/login-test-user";
 import { IdType } from "@/shared.constants";
+import { getDatasource, isSqliteModeTest } from "../typeorm.manager";
 
 const defaultRoute = `${AppConstants.apiRoute}/user`;
 const profileRoute = `${defaultRoute}/profile`;
@@ -27,7 +28,6 @@ let request: supertest.SuperTest<supertest.Test>;
 let container: AwilixContainer;
 
 beforeAll(async () => {
-  await connect();
   ({ request, container } = await setupTestApp(true));
 });
 
@@ -142,7 +142,15 @@ describe(UserController.name, () => {
   });
 
   it("should not delete last admin user", async function () {
-    await User.deleteMany({});
+    if (isSqliteModeTest()) {
+      const userRepo = getDatasource().getRepository(User);
+      const userCount = await userRepo.count();
+      expect(userCount).toBeGreaterThan(0);
+      await userRepo.delete({});
+    } else {
+      await UserMongo.deleteMany({});
+    }
+
     const user = await ensureTestUserCreated("test", "user", false, ROLES.ADMIN);
     const response = await request.delete(deleteRoute(user.id)).send();
     expectForbiddenResponse(response);

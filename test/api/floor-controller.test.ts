@@ -1,13 +1,14 @@
-import { connect } from "../db-handler";
 import { setupTestApp } from "../test-server";
 import { expectInternalServerError, expectInvalidResponse, expectNotFoundResponse, expectOkResponse } from "../extensions";
 import { createTestPrinter } from "./test-data/create-printer";
 import { createTestFloor, floorRoute } from "./test-data/create-floor";
-import { Floor } from "@/models";
+import { Floor } from "@/entities";
+import { Floor as FloorMongo } from "@/models";
 import { AppConstants } from "@/server.constants";
 import supertest from "supertest";
 import { FloorController } from "@/controllers/floor.controller";
 import { IdType } from "@/shared.constants";
+import { getDatasource, isSqliteModeTest } from "../typeorm.manager";
 
 const listRoute = `${AppConstants.apiRoute}/floor`;
 const getRoute = (id: IdType) => `${listRoute}/${id}`;
@@ -17,14 +18,18 @@ const updateNameRoute = (id: IdType) => `${getRoute(id)}/name`;
 const updateFloorNumberRoute = (id: IdType) => `${getRoute(id)}/floor-number`;
 
 let request: supertest.SuperTest<supertest.Test>;
+let isTypeormMode: boolean;
 
 beforeAll(async () => {
-  await connect();
-  ({ request } = await setupTestApp(true));
+  ({ request, isTypeormMode } = await setupTestApp(true));
 });
 
 beforeEach(async () => {
-  Floor.deleteMany({});
+  if (isSqliteModeTest()) {
+    return getDatasource().getRepository(Floor).clear();
+  } else {
+    await FloorMongo.deleteMany({});
+  }
 });
 
 describe(FloorController.name, () => {
@@ -69,7 +74,7 @@ describe(FloorController.name, () => {
   });
 
   it("should throw on getting non-existing floor", async () => {
-    const response = await request.get(getRoute("63452115122876ea11cd1656")).send();
+    const response = await request.get(getRoute(isTypeormMode ? 12345 : "63452115122876ea11cd1656")).send();
     expectNotFoundResponse(response);
   });
 
@@ -98,7 +103,7 @@ describe(FloorController.name, () => {
   it("should not be able to add printer to non-existing floor", async () => {
     const printer = await createTestPrinter(request);
 
-    const response = await request.post(addPrinterToFloorRoute("63452115122876ea11cd1656")).send({
+    const response = await request.post(addPrinterToFloorRoute(isTypeormMode ? 1234 : "63452115122876ea11cd1656")).send({
       printerId: printer.id,
       x: 1,
       y: 1,
@@ -108,8 +113,8 @@ describe(FloorController.name, () => {
 
   it("should be able to add printer to floor", async () => {
     const printer = await createTestPrinter(request);
-    const floor = await createTestFloor(request, "Floor123", 509);
-    expect(floor).toMatchObject({ id: expect.any(String) });
+    const floor = await createTestFloor(request, "Floor1234", 510);
+    expect(floor).toMatchObject({ id: isTypeormMode ? expect.any(Number) : expect.any(String) });
 
     const response = await request.post(addPrinterToFloorRoute(floor.id)).send({
       printerId: printer.id,
@@ -130,7 +135,7 @@ describe(FloorController.name, () => {
   it("should be able to remove printer from floor", async () => {
     const printer = await createTestPrinter(request);
     const floor = await createTestFloor(request, "Floor123", 510);
-    expect(floor).toMatchObject({ id: expect.any(String) });
+    expect(floor).toMatchObject({ id: isTypeormMode ? expect.any(Number) : expect.any(String) });
 
     const response = await request.post(addPrinterToFloorRoute(floor.id)).send({
       printerId: printer.id,
@@ -145,7 +150,7 @@ describe(FloorController.name, () => {
     expectOkResponse(deleteResponse);
 
     const deleteResponse2 = await request.delete(addPrinterToFloorRoute(floor.id)).send({
-      printerId: "63452115122876ea11cd1656",
+      printerId: isTypeormMode ? 1234 : "63452115122876ea11cd1656",
     });
     expectNotFoundResponse(deleteResponse2);
   });

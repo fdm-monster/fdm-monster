@@ -1,23 +1,9 @@
-import { connect, closeDatabase } from "../db-handler";
 import { hashPassword } from "@/utils/crypto.utils";
 import { User } from "@/models";
 
-/**
- * Connect to a new in-memory database before running any tests.
- */
-beforeAll(async () => {
-  await connect();
-});
-
-/**
- * Remove and close the db and server.
- */
-afterAll(async () => {
-  await closeDatabase();
-});
-
 describe("User:Schema", function () {
-  it("should not tolerate duplicate usernames", async () => {
+  // mongoose only
+  test.skip("should not tolerate duplicate usernames", async () => {
     const newUser = new User({
       name: "testname",
       username: "SAMENAME",

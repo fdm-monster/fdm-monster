@@ -1,37 +1,34 @@
-import { closeDatabase, connect } from "../db-handler";
 import { PrinterMockData } from "./test-data/printer.data";
-import { Floor } from "@/models/Floor";
+import { Floor } from "@/entities/floor.entity";
 import { DITokens } from "@/container.tokens";
-import { configureContainer } from "@/container";
 import { FloorService } from "@/services/floor.service";
-import { PrinterService } from "@/services/printer.service";
 import { IFloorService } from "@/services/interfaces/floor.service.interface";
+import { IPrinterService } from "@/services/interfaces/printer.service.interface";
+import { IdType } from "@/shared.constants";
+import { Printer } from "@/entities";
+import { setupTestApp } from "../test-server";
+import { isSqliteModeTest } from "../typeorm.manager";
 
-let floorService: IFloorService;
-let printerService: PrinterService;
+let printerService: IPrinterService<IdType, Printer>;
+let floorService: IFloorService<IdType, Floor>;
 
 beforeAll(async () => {
-  await connect();
-  const container = configureContainer();
-  printerService = container.resolve<PrinterService>(DITokens.printerService);
-  floorService = container.resolve<IFloorService>(DITokens.floorService);
-});
-
-afterAll(async () => {
-  await closeDatabase();
+  const { container, httpClient: axiosMock } = await setupTestApp(true);
+  printerService = container.resolve<IPrinterService<IdType, Printer>>(DITokens.printerService);
+  floorService = container.resolve<IFloorService<IdType, Floor>>(DITokens.floorService);
 });
 
 describe(FloorService.name, () => {
   it("can be created correctly without printers", async () => {
     // Create it
-    await floorService.create({
+    const result = await floorService.create({
       name: "TopFloor1",
       floor: 1,
       printers: [],
     });
 
     // Assert creation
-    const floor = await Floor.findOne();
+    const floor = await floorService.get(result.id);
     expect(floor).toBeTruthy();
   });
 
@@ -43,7 +40,7 @@ describe(FloorService.name, () => {
     });
     const dto = floorService.toDto(floor);
     expect(dto).toBeTruthy();
-    expect(typeof dto.id).toBe("string");
+    expect(typeof dto.id).toBe(isSqliteModeTest() ? "number" : "string");
   });
 
   it("can delete existing floor", async () => {
@@ -56,7 +53,7 @@ describe(FloorService.name, () => {
 
     expect(floorService.get(floor.id)).toBeTruthy();
     await floorService.delete(floor.id);
-    expect(floorService.get(floor.id)).rejects.toBeTruthy();
+    await expect(floorService.get(floor.id)).rejects.toBeTruthy();
   });
 
   it("can not add printer to floor", async () => {
@@ -86,12 +83,14 @@ describe(FloorService.name, () => {
     const printer = await printerService.create(newPrinter);
 
     // Create it
-    const floor = await floorService.create({
+    let floor = await floorService.create({
       name: "TopFloor1",
       floor: 4,
-      printers: [{ printerId: printer.id, x: 1, y: 1 }],
     });
 
+    await floorService.addOrUpdatePrinter(floor.id, { printerId: printer.id, x: 1, y: 1 });
+
+    floor = await floorService.get(floor.id);
     // Check existence
     expect(floorService.get(floor.id)).toBeTruthy();
     expect(floor.printers).toHaveLength(1);

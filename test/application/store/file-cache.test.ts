@@ -12,11 +12,11 @@ beforeEach(() => {
 });
 
 const testPrinterId = "asd";
-const fileStorageEntry = [{ id: "1", name: "123" }];
+const fileStorageEntry = [{ path: "asd" }];
 
 describe(FileCache.name, function () {
   it("should generate printer file cache", function () {
     fileCache.cachePrinterFiles(testPrinterId, fileStorageEntry);
-    expect(fileCache.getPrinterFiles(testPrinterId)).toStrictEqual(fileStorageEntry);
+    expect(fileCache.getPrinterFiles(testPrinterId)).toEqual([{ path: "asd" }]);
   });
 });

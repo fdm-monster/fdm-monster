@@ -55,7 +55,8 @@ jobs:
           echo ${{ env.RELEASE_TAG }}
 
       # Build dist folder
-      - run: yarn install --immutable --immutable-cache --check-cache
+      - run: yarn set version berry
+      - run: yarn install --immutable
       - run: yarn build
 
       - name: Create release
@@ -65,7 +66,7 @@ jobs:
           draft: ${{ github.ref_name == 'develop' }}
           prerelease: ${{ contains(env.SERVER_VERSION, 'rc') || contains(env.SERVER_VERSION, 'unstable') }}
           tag_name: ${{ env.RELEASE_TAG }}
-          release_name: ${{ env.RELEASE_TAG }} Awesome Axolotl 😃
+          release_name: ${{ env.RELEASE_TAG }} Raging Rex 🦖
           body: "Release notes not added" # ${{ steps.build_changelog.outputs.changelog }}
         env:
           GITHUB_TOKEN: ${{ github.token }}

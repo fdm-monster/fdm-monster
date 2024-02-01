@@ -1,28 +1,32 @@
-import { connect, closeDatabase } from "../db-handler";
 import { ensureTestUserCreated } from "../api/test-data/create-user";
-import { configureContainer } from "@/container";
 import { DITokens } from "@/container.tokens";
-import { User } from "@/models";
 import { ROLES } from "@/constants/authorization.constants";
-import { AwilixContainer } from "awilix";
 import { UserService } from "@/services/authentication/user.service";
-import { RoleService } from "@/services/authentication/role.service";
+import { setupTestApp } from "../test-server";
+import { SqliteIdType } from "@/shared.constants";
+import { IUserService } from "@/services/interfaces/user-service.interface";
+import { IRoleService } from "@/services/interfaces/role-service.interface";
+import { RoleDto } from "@/services/interfaces/role.dto";
+import { UserDto } from "@/services/interfaces/user.dto";
+import { getDatasource, isSqliteModeTest } from "../typeorm.manager";
+import { User } from "@/entities";
+import { User as UserMongo } from "@/models";
 
-let container: AwilixContainer;
-let userService: UserService;
-let roleService: RoleService;
+let userService: IUserService<SqliteIdType, UserDto<SqliteIdType>>;
+let roleService: IRoleService<SqliteIdType, RoleDto<SqliteIdType>>;
 
 beforeAll(async () => {
-  await connect();
-  container = configureContainer();
+  const { container, httpClient: axiosMock } = await setupTestApp(true);
   userService = container.resolve(DITokens.userService);
   roleService = container.resolve(DITokens.roleService);
 });
-afterEach(async () => {
-  await User.deleteMany();
-});
-afterAll(async () => {
-  await closeDatabase();
+
+beforeEach(async () => {
+  if (isSqliteModeTest()) {
+    await getDatasource().getRepository(User).clear();
+  } else {
+    await UserMongo.deleteMany({});
+  }
 });
 
 describe(UserService.name, () => {
