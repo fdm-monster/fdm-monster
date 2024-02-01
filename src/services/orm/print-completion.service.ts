@@ -40,7 +40,9 @@ export class PrintCompletionService
   }
 
   async findPrintCompletion(correlationId: string) {
-    return this.repository.findBy({ context: { correlationId } });
+    const completions = await this.repository.findBy({});
+    console.log({ context: { correlationId } });
+    return completions.filter((c) => c.context?.correlationId === correlationId);
   }
 
   async updateContext(correlationId: string, context: PrintCompletionContext): Promise<void> {
