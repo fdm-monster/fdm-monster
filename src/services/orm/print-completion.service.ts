@@ -2,7 +2,7 @@ import { BaseService } from "@/services/orm/base.service";
 import { PrintCompletion } from "@/entities";
 import { CreatePrintCompletionDto, PrintCompletionContext, PrintCompletionDto } from "@/services/interfaces/print-completion.dto";
 import { SqliteIdType } from "@/shared.constants";
-import { IPrintCompletionService } from "@/services/interfaces/print-completion.service";
+import { IPrintCompletionService } from "@/services/interfaces/print-completion.interface";
 import { In, Not } from "typeorm";
 import { EVENT_TYPES } from "@/services/octoprint/constants/octoprint-websocket.constants";
 import { groupArrayBy } from "@/utils/array.util";

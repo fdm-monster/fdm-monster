@@ -6,7 +6,7 @@ import { EVENT_TYPES } from "@/services/octoprint/constants/octoprint-websocket.
 import { DITokens } from "@/container.tokens";
 import { SqliteIdType } from "@/shared.constants";
 import { PrintCompletionDto } from "@/services/interfaces/print-completion.dto";
-import { IPrintCompletionService } from "@/services/interfaces/print-completion.service";
+import { IPrintCompletionService } from "@/services/interfaces/print-completion.interface";
 import supertest from "supertest";
 import { PrintCompletionController } from "@/controllers/print-completion.controller";
 import { createTestPrinter } from "./test-data/create-printer";
@@ -48,7 +48,6 @@ describe(PrintCompletionController.name, () => {
       completionLog: "some log happened here",
       status: EVENT_TYPES.PrintStarted,
       fileName: "mycode.gcode",
-      correlationId: "123",
       context: {
         correlationId: "123",
       },
@@ -59,7 +58,6 @@ describe(PrintCompletionController.name, () => {
       completionLog: "some log happened here",
       status: EVENT_TYPES.PrintDone,
       fileName: "mycode.gcode",
-      correlationId: "123",
       context: {
         correlationId: "123",
       },
