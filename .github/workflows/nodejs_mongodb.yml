@@ -1,0 +1,24 @@
+name: Node.js CI MongoDB
+
+on:
+  pull_request:
+  workflow_dispatch:
+  # Runs from default branch, which is develop
+  schedule:
+    - cron: '0 0 * * *'
+jobs:
+  nodejs-build-mongodb:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+
+      - run: yarn set version berry
+      - run: yarn install --immutable
+      - run: yarn run build
+      # non-coverage sqlite tests
+      - run: yarn run test
+        env:
+          NODE_OPTIONS: '--max_old_space_size=8192'
