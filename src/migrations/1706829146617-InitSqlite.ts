@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class InitSqlite1706828549686 implements MigrationInterface {
-    name = 'InitSqlite1706828549686'
+export class InitSqlite1706829146617 implements MigrationInterface {
+    name = 'InitSqlite1706829146617'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`
@@ -9,7 +9,6 @@ export class InitSqlite1706828549686 implements MigrationInterface {
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "fileName" varchar NOT NULL,
                 "createdAt" integer NOT NULL DEFAULT (datetime('now')),
-                "correlationId" varchar NOT NULL,
                 "status" varchar NOT NULL,
                 "printerId" integer NOT NULL,
                 "printerReference" varchar,
@@ -151,7 +150,6 @@ export class InitSqlite1706828549686 implements MigrationInterface {
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "fileName" varchar NOT NULL,
                 "createdAt" integer NOT NULL DEFAULT (datetime('now')),
-                "correlationId" varchar NOT NULL,
                 "status" varchar NOT NULL,
                 "printerId" integer NOT NULL,
                 "printerReference" varchar,
@@ -166,7 +164,6 @@ export class InitSqlite1706828549686 implements MigrationInterface {
                     "id",
                     "fileName",
                     "createdAt",
-                    "correlationId",
                     "status",
                     "printerId",
                     "printerReference",
@@ -176,7 +173,6 @@ export class InitSqlite1706828549686 implements MigrationInterface {
             SELECT "id",
                 "fileName",
                 "createdAt",
-                "correlationId",
                 "status",
                 "printerId",
                 "printerReference",
@@ -592,7 +588,6 @@ export class InitSqlite1706828549686 implements MigrationInterface {
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "fileName" varchar NOT NULL,
                 "createdAt" integer NOT NULL DEFAULT (datetime('now')),
-                "correlationId" varchar NOT NULL,
                 "status" varchar NOT NULL,
                 "printerId" integer NOT NULL,
                 "printerReference" varchar,
@@ -605,7 +600,6 @@ export class InitSqlite1706828549686 implements MigrationInterface {
                     "id",
                     "fileName",
                     "createdAt",
-                    "correlationId",
                     "status",
                     "printerId",
                     "printerReference",
@@ -615,7 +609,6 @@ export class InitSqlite1706828549686 implements MigrationInterface {
             SELECT "id",
                 "fileName",
                 "createdAt",
-                "correlationId",
                 "status",
                 "printerId",
                 "printerReference",

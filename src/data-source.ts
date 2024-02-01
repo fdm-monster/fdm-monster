@@ -14,7 +14,7 @@ import { CustomGcode } from "@/entities/custom-gcode.entity";
 import { Role } from "@/entities/role.entity";
 import { PrinterFile } from "@/entities/printer-file.entity";
 import { UserRole } from "@/entities/user-role.entity";
-import { InitSqlite1706828549686 } from "@/migrations/1706828549686-InitSqlite";
+import { InitSqlite1706829146617 } from "@/migrations/1706829146617-InitSqlite";
 
 dotenv.config({
   path: join(superRootPath(), ".env"),
@@ -48,6 +48,6 @@ export const AppDataSource = new DataSource({
     PrintCompletion,
     UserRole,
   ],
-  migrations: [InitSqlite1706828549686],
+  migrations: [InitSqlite1706829146617],
   subscribers: [],
 });
