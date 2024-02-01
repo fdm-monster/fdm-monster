@@ -2,7 +2,7 @@ import { BaseService } from "@/services/orm/base.service";
 import { PrintCompletion } from "@/entities";
 import { CreatePrintCompletionDto, PrintCompletionContext, PrintCompletionDto } from "@/services/interfaces/print-completion.dto";
 import { SqliteIdType } from "@/shared.constants";
-import { IPrintCompletionService } from "@/services/interfaces/print-completion.service";
+import { IPrintCompletionService } from "@/services/interfaces/print-completion.interface";
 import { In, Not } from "typeorm";
 import { EVENT_TYPES } from "@/services/octoprint/constants/octoprint-websocket.constants";
 import { groupArrayBy } from "@/utils/array.util";
@@ -26,7 +26,6 @@ export class PrintCompletionService
     return {
       id: entity.id,
       completionLog: entity.completionLog,
-      correlationId: entity.correlationId,
       context: entity.context,
       fileName: entity.fileName,
       createdAt: entity.createdAt,
@@ -41,12 +40,14 @@ export class PrintCompletionService
   }
 
   async findPrintCompletion(correlationId: string) {
-    return this.repository.findBy({ correlationId });
+    const completions = await this.repository.findBy({});
+    console.log({ context: { correlationId } });
+    return completions.filter((c) => c.context?.correlationId === correlationId);
   }
 
   async updateContext(correlationId: string, context: PrintCompletionContext): Promise<void> {
     const completionEntry = await this.repository.findOneBy({
-      correlationId,
+      context: { correlationId },
       status: EVENT_TYPES.PrintStarted,
     });
     if (!completionEntry) {

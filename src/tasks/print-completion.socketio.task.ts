@@ -1,7 +1,7 @@
 import { fdmMonsterPrinterStoppedEvent, octoPrintWebsocketEvent } from "@/constants/event.constants";
 import { EVENT_TYPES } from "@/services/octoprint/constants/octoprint-websocket.constants";
 import { generateCorrelationToken } from "@/utils/correlation-token.util";
-import { IO_MESSAGES, SocketIoGateway } from "@/state/socket-io.gateway";
+import { SocketIoGateway } from "@/state/socket-io.gateway";
 import EventEmitter2 from "eventemitter2";
 import { LoggerService } from "@/handlers/logger";
 import { PrintCompletionService } from "@/services/print-completion.service";

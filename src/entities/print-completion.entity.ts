@@ -2,7 +2,6 @@ import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGenerat
 import { Printer } from "@/entities/printer.entity";
 import { BaseEntity } from "@/entities/base.entity";
 import { PrintCompletionContextDto } from "@/services/interfaces/print-completion-context.dto";
-import { Unique } from "typeorm/browser";
 
 @Entity()
 export class PrintCompletion extends BaseEntity {
@@ -14,9 +13,6 @@ export class PrintCompletion extends BaseEntity {
 
   @CreateDateColumn({ type: "int" })
   createdAt!: number;
-
-  @Column({ unique: false })
-  correlationId!: string;
 
   @Column()
   status!: string;

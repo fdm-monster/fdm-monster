@@ -42,6 +42,7 @@ import { PrintCompletionCorrelationId1699189686327 } from "@/migrations/16991896
 import { NullableColsPrinterFile1699810905182 } from "@/migrations/1699810905182-NullableColsPrinterFile";
 import { DropFloorPositionIdPrinter1703406837191 } from "@/migrations/1703406837191-DropFloorPositionIdPrinter";
 import { CustomDataUserDataPrinterFile1703411779907 } from "@/migrations/1703411779907-CustomDataUserDataPrinterFile";
+import { DropCorrelationIdCompletion1706821653681 } from "@/migrations/1706821653681-DropCorrelationIdCompletion";
 
 dotenv.config({
   path: join(superRootPath(), ".env"),
@@ -104,6 +105,7 @@ export const AppDataSource = new DataSource({
     NullableColsPrinterFile1699810905182,
     DropFloorPositionIdPrinter1703406837191,
     CustomDataUserDataPrinterFile1703411779907,
+    DropCorrelationIdCompletion1706821653681,
   ],
   subscribers: [],
 });
