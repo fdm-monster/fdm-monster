@@ -11,7 +11,7 @@ import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { compare } from "semver";
 import { errorSummary } from "@/utils/error.utils";
-import { ExternalServiceError } from "@/exceptions/runtime.exceptions";
+import { ExternalServiceError, NotFoundException } from "@/exceptions/runtime.exceptions";
 
 export class ClientBundleService {
   githubService: GithubService;
@@ -180,8 +180,12 @@ export class ClientBundleService {
       `Retrieved ${release.assets.length} assets from release '${release.name}': ${release.assets.map((a) => a.name)}`
     );
 
-    const asset = release.assets.find((a) => a.name === `dist-client-${release.tag_name}.zip`);
-    const assetId = asset.id;
+    const assetName = `dist-client-${release.tag_name}.zip`;
+    const asset = release.assets.find((a) => a.name === assetName);
+    if (!asset) {
+      throw new NotFoundException(`Release with tag ${release.tag_name} asset ${assetName} does not exist`);
+    }
+    const assetId = asset?.id;
     const downloadPath = await this.downloadClientBundleZip(assetId, asset.name);
     await this.extractClientBundleZip(downloadPath);
 
