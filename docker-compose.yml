@@ -38,8 +38,8 @@ services:
       - ./fdm-monster/media/:/app/media
 
   fdm-monster-alpha:
-    container_name: fdm-monster-alpha
-    image: fdmmonster/fdm-monster:1.6.0-rc1-alpha
+    container_name: fdm-monster-develop
+    image: fdmmonster/fdm-monster:develop
     build:
       context: .
       dockerfile: docker/Dockerfile
