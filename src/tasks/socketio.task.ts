@@ -83,7 +83,7 @@ export class SocketIoTask {
     };
 
     // Precise debugging
-    if (this.settingsStore.getServerSettings().debugSettings?.debugSocketIoBandwidth) {
+    if (this.settingsStore.getDebugSettingsSensitive()?.debugSocketIoBandwidth) {
       const kbDataString = Object.entries(socketIoData)
         .map(([id, state]) => {
           return `${id} ${formatKB(state)}`;
