@@ -63,7 +63,7 @@ export class OctoPrintApiService extends OctoPrintRoutes {
   /**
    * Ability to start, cancel, restart, or pause a job
    */
-  async sendJobCommand(login: LoginDto, commandData) {
+  async sendJobCommand(login: LoginDto, commandData: any) {
     const { url, options, data } = this.prepareJsonRequest(login, this.apiJob, commandData);
     const response = await this.axiosClient.post(url, data, options);
     return response?.data;

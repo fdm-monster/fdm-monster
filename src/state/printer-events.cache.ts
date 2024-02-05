@@ -36,6 +36,10 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
     return this.settingsStore.getSettingsSensitive()?.server?.debugSettings?.debugSocketMessages;
   }
 
+  async deletePrinterSocketEvents(id: IdType) {
+    await this.deleteKeyValue(id, true);
+  }
+
   async getPrinterSocketEvents(id: IdType) {
     return this.keyValueStore[id];
   }

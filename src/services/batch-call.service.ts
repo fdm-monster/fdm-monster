@@ -24,7 +24,7 @@ interface ReprintFileDto {
 interface BatchSingletonModel {
   success?: boolean;
   failure?: boolean;
-  printerId: string;
+  printerId: IdType;
   time: number;
   error?: string;
 }
@@ -118,7 +118,27 @@ export class BatchCallService {
     }
   }
 
-  async batchConnectUsb(printerIds: string[]): Promise<Awaited<BatchModel>[]> {
+  async batchSettingsGet(printerIds: string[]): Promise<Awaited<BatchModel>> {
+    const promises = [];
+    for (const printerId of printerIds) {
+      const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
+      const time = Date.now();
+
+      const promise = this.octoPrintApiService
+        .getSettings(printerLogin)
+        .then((r) => {
+          return { success: true, printerId, time: Date.now() - time, value: r };
+        })
+        .catch((e) => {
+          return { failure: true, error: e.message, printerId, time: Date.now() - time };
+        });
+
+      promises.push(promise);
+    }
+    return await Promise.all(promises);
+  }
+
+  async batchConnectUsb(printerIds: string[]): Promise<Awaited<BatchModel>> {
     const promises = [];
     for (const printerId of printerIds) {
       const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
@@ -179,7 +199,7 @@ export class BatchCallService {
     return await Promise.all(promises);
   }
 
-  async batchReprintCalls(printerIdFileList: { printerId: IdType; path: string }[]): Promise<Awaited<BatchModel>[]> {
+  async batchReprintCalls(printerIdFileList: { printerId: IdType; path: string }[]): Promise<Awaited<BatchModel>> {
     const promises = [];
     for (const printerIdFile of printerIdFileList) {
       const { printerId, path } = printerIdFile;
