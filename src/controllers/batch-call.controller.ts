@@ -20,6 +20,12 @@ export class BatchCallController {
     this.isTypeormMode = isTypeormMode;
   }
 
+  async batchSettingsGet(req: Request, res: Response) {
+    const { printerIds } = await validateInput(req.body, batchPrinterRules(this.isTypeormMode));
+    const results = await this.batchCallService.batchSettingsGet(printerIds);
+    res.send(results);
+  }
+
   async batchConnectUsb(req: Request, res: Response) {
     const { printerIds } = await validateInput(req.body, batchPrinterRules(this.isTypeormMode));
     const results = await this.batchCallService.batchConnectUsb(printerIds);
@@ -54,6 +60,7 @@ export class BatchCallController {
 export default createController(BatchCallController)
   .prefix(AppConstants.apiRoute + "/batch")
   .before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR])])
+  .post("/settings/get", "batchSettingsGet")
   .post("/connect/usb", "batchConnectUsb")
   .post("/connect/socket", "batchConnectSocket")
   .post("/reprint/list", "getLastPrintedFiles")
