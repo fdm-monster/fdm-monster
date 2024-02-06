@@ -25,6 +25,7 @@ jobs:
         uses: codecov/codecov-action@v4
         with:
           flags: server-nodejs
+          token: ${{ secrets.CODECOV_TOKEN }}
           dry_run: false
 
       # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions
