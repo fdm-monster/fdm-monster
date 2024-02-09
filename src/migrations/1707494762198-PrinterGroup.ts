@@ -1,9 +1,15 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class PrinterGroup1707493819133 implements MigrationInterface {
-    name = 'PrinterGroup1707493819133'
+export class PrinterGroup1707494762198 implements MigrationInterface {
+    name = 'PrinterGroup1707494762198'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.query(`
+            CREATE TABLE "group" (
+                "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+                "name" varchar NOT NULL
+            )
+        `);
         await queryRunner.query(`
             CREATE TABLE "printer_group" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -63,6 +69,9 @@ export class PrinterGroup1707493819133 implements MigrationInterface {
         `);
         await queryRunner.query(`
             DROP TABLE "printer_group"
+        `);
+        await queryRunner.query(`
+            DROP TABLE "group"
         `);
     }
 
