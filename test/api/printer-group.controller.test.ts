@@ -1,0 +1,124 @@
+import supertest, { SuperTest } from "supertest";
+import { setupTestApp } from "../test-server";
+import { PrinterGroupController } from "@/controllers/printer-group.controller";
+import { AppConstants } from "@/server.constants";
+import { expectInternalServerError, expectNotFoundResponse, expectOkResponse } from "../extensions";
+import { testIf } from "../utils/conditional-if";
+import { isSqliteModeTest } from "../typeorm.manager";
+import { createTestPrinter } from "./test-data/create-printer";
+import { GroupWithPrinters } from "@/services/orm/printer-group.service";
+
+let request: SuperTest<supertest.Test>;
+
+beforeAll(async () => {
+  ({ request } = await setupTestApp(true));
+});
+
+const defaultRoute = AppConstants.apiRoute + "/printer-group";
+const listGroupsRoute = defaultRoute;
+const createGroupRoute = defaultRoute;
+const getRoute = (id: string) => `${defaultRoute}/${id}`;
+const deleteRoute = (id: string) => `${defaultRoute}/${id}`;
+const addPrinterToGroupRoute = (id: string) => `${defaultRoute}/${id}/printer`;
+const deletePrinterFromGroupRoute = (id: string) => `${addPrinterToGroupRoute(id)}`;
+
+describe(PrinterGroupController.name, () => {
+  testIf(!isSqliteModeTest(), "should throw for mongodb", async () => {
+    const response = await request.get(listGroupsRoute).send();
+    expectInternalServerError(response);
+  });
+  testIf(isSqliteModeTest(), "should list groups", async () => {
+    const response = await request.get(listGroupsRoute).send();
+    expectOkResponse(response);
+  });
+
+  testIf(isSqliteModeTest(), "should create and get group", async () => {
+    const testGroupName = "Group1";
+    const response = await request.post(createGroupRoute).send({
+      name: testGroupName,
+    });
+    expectOkResponse(response);
+    const groupName = response.body.name;
+    expect(groupName).toStrictEqual(testGroupName);
+    const groupId = response.body.id;
+    expect(groupId).toBeDefined();
+
+    const createResponse = await request.get(getRoute(groupId)).send();
+    expectOkResponse(createResponse);
+    expect(createResponse.body.id).toStrictEqual(groupId);
+  });
+
+  testIf(isSqliteModeTest(), "should create and remove group", async () => {
+    const testGroupName = "Group1";
+    const response = await request.post(createGroupRoute).send({
+      name: testGroupName,
+    });
+    expectOkResponse(response);
+    const groupId = response.body.id;
+    expect(groupId).toBeDefined();
+
+    const deleteResponse = await request.delete(deleteRoute(groupId)).send();
+    expectOkResponse(deleteResponse);
+
+    const getResponse = await request.get(getRoute(groupId)).send();
+    expectNotFoundResponse(getResponse);
+  });
+
+  testIf(isSqliteModeTest(), "should create group and add a printer to it", async () => {
+    const testGroupName = "Group2";
+    const response = await request.post(createGroupRoute).send({
+      name: testGroupName,
+    });
+    expectOkResponse(response);
+    const groupName = response.body.name;
+    expect(groupName).toStrictEqual(testGroupName);
+    const groupId = response.body.id;
+
+    const printer = await createTestPrinter(request, false);
+    const printerId = printer.id;
+    expect(printerId).toBeDefined();
+
+    const createResponse = await request.post(addPrinterToGroupRoute(groupId)).send({
+      groupId,
+      printerId,
+    });
+    expectOkResponse(createResponse);
+
+    const responseGroups = await request.get(listGroupsRoute).send();
+    expectOkResponse(responseGroups);
+    const groups = responseGroups.body as GroupWithPrinters[];
+    expect(groups.length).toBeGreaterThan(0);
+    const groupUnderTest = groups.find((g) => g.id == groupId);
+    expect(groupUnderTest).toBeDefined();
+    expect(groupUnderTest.printers.find((p) => p.printerId === printerId)).toBeDefined();
+  });
+
+  testIf(isSqliteModeTest(), "should create group and add+remove a printer", async () => {
+    const testGroupName = "Group3";
+    const response = await request.post(createGroupRoute).send({
+      name: testGroupName,
+    });
+    expectOkResponse(response);
+    const groupName = response.body.name;
+    expect(groupName).toStrictEqual(testGroupName);
+    const groupId = response.body.id;
+
+    const printer = await createTestPrinter(request, false);
+    const printerId = printer.id;
+    expect(printerId).toBeDefined();
+
+    const createResponse = await request.post(addPrinterToGroupRoute(groupId)).send({
+      printerId,
+    });
+    expectOkResponse(createResponse);
+    const deleteResponse = await request.delete(deletePrinterFromGroupRoute(groupId)).send({
+      printerId,
+    });
+    expectOkResponse(deleteResponse);
+    const responseGroups = await request.get(getRoute(groupId)).send();
+    expectOkResponse(responseGroups);
+    const groupUnderTest = responseGroups.body as GroupWithPrinters;
+    expect(groupUnderTest).toBeDefined();
+    expect(groupUnderTest.printers.find((p) => p.printerId === printerId)).toBeUndefined();
+  });
+});
