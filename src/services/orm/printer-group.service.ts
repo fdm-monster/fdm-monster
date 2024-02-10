@@ -8,12 +8,7 @@ import { Group } from "@/entities/group.entity";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { validate } from "class-validator";
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
-
-export type GroupWithPrinters<KeyType extends string | number = number> = {
-  id: KeyType;
-  name: string;
-  printers: PrinterGroup[];
-};
+import { GroupWithPrintersDto } from "@/services/interfaces/group.dto";
 
 export class PrinterGroupService
   extends BaseService(PrinterGroup, PrinterGroupDto)
@@ -27,9 +22,9 @@ export class PrinterGroupService
     this.groupRepository = typeormService.getDataSource().getRepository(Group);
   }
 
-  async listGroups(): Promise<GroupWithPrinters[]> {
+  async listGroups(): Promise<GroupWithPrintersDto[]> {
     const groups = await this.groupRepository.find();
-    const groupListing: Record<number, GroupWithPrinters> = {};
+    const groupListing: Record<number, GroupWithPrintersDto> = {};
     for (const group of groups) {
       groupListing[group.id] = {
         id: group.id,
@@ -53,7 +48,7 @@ export class PrinterGroupService
     return group;
   }
 
-  async getGroupWithPrinters(groupId: number): Promise<GroupWithPrinters> {
+  async getGroupWithPrinters(groupId: number): Promise<GroupWithPrintersDto> {
     const group = await this.getGroup(groupId);
     const printerGroups = await this.repository.findBy({ groupId: group.id });
     return {
@@ -63,7 +58,7 @@ export class PrinterGroupService
     };
   }
 
-  async createGroup(dto: CreateGroupDto): Promise<GroupWithPrinters> {
+  async createGroup(dto: CreateGroupDto): Promise<GroupWithPrintersDto> {
     // Safety mechanism against upserts
     if (dto.id) {
       delete dto.id;
