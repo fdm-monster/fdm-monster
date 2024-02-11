@@ -10,11 +10,13 @@ export interface IPrinterGroupService<KeyType extends string | number = IdType, 
 
   getGroupWithPrinters(printerId: KeyType): Promise<GroupWithPrintersDto<KeyType>>;
 
-  createGroup(printerGroup: CreateGroupDto): Promise<GroupWithPrintersDto<KeyType>>;
+  createGroup(group: CreateGroupDto): Promise<GroupWithPrintersDto<KeyType>>;
+
+  updateGroupName(groupId: KeyType, name: string): Promise<void>;
+
+  deleteGroup(groupId: KeyType): Promise<void>;
 
   addPrinterToGroup(groupId: KeyType, printerId: KeyType): Promise<Entity>;
 
   removePrinterFromGroup(groupId: KeyType, printerId: KeyType): Promise<void>;
-
-  deleteGroup(printerGroupId: KeyType): Promise<void>;
 }

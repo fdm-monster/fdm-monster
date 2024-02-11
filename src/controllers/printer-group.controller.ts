@@ -30,6 +30,12 @@ export class PrinterGroupController {
     res.send(entity);
   }
 
+  async updateGroupName(req: Request, res: Response) {
+    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const entity = await this.printerGroupService.updateGroupName(id, req.body.name);
+    res.send(entity);
+  }
+
   async deleteGroup(req: Request, res: Response) {
     const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
     res.send(await this.printerGroupService.deleteGroup(id));
@@ -54,5 +60,6 @@ export default createController(PrinterGroupController)
   .post("/", "createGroup")
   .get("/:id", "getGroup")
   .delete("/:id", "deleteGroup")
+  .patch("/:id/name", "updateGroupName")
   .post("/:id/printer", "addPrinterToGroup")
   .delete("/:id/printer", "removePrinterFromGroup");

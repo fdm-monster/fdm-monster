@@ -71,6 +71,19 @@ export class PrinterGroupService
     return await this.getGroupWithPrinters(group.id);
   }
 
+  async updateGroupName(groupId: number, name: string): Promise<void> {
+    const entity = await this.getGroup(groupId);
+    const updateDto = { name };
+    await validate(updateDto);
+    await validate(Object.assign(entity, updateDto));
+    await this.groupRepository.update(entity.id, updateDto);
+  }
+
+  async deleteGroup(groupId: number): Promise<void> {
+    const group = await this.getGroup(groupId);
+    await this.groupRepository.delete({ id: group.id });
+  }
+
   async addPrinterToGroup(groupId: number, printerId: number): Promise<PrinterGroup> {
     const group = await this.getGroup(groupId);
     const alreadyExisting = await this.repository.findOneBy({
@@ -88,11 +101,6 @@ export class PrinterGroupService
   async removePrinterFromGroup(groupId: number, printerId: number): Promise<void> {
     await this.getGroup(groupId);
     await this.repository.delete({ groupId, printerId });
-  }
-
-  async deleteGroup(groupId: number): Promise<void> {
-    const group = await this.getGroup(groupId);
-    await this.groupRepository.delete({ id: group.id });
   }
 
   toDto(entity: PrinterGroup): PrinterGroupDto {
