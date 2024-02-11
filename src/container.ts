@@ -77,6 +77,7 @@ import { FloorPositionService } from "@/services/orm/floor-position.service";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { BuildResolver, DisposableResolver } from "awilix/lib/resolvers";
 import { UserRoleService } from "@/services/orm/user-role.service";
+import { PrinterGroupService } from "@/services/orm/printer-group.service";
 
 export function config<T1, T2>(
   key: string,
@@ -116,6 +117,7 @@ export function configureContainer(isSqlite: boolean = false) {
     ...config(di.floorPositionService, isSqlite, asClass(FloorPositionService).singleton(), asValue(null)),
     ...config(di.cameraStreamService, isSqlite, asClass(CameraService2).singleton(), asClass(CameraService).singleton()),
     ...config(di.printerService, isSqlite, asClass(PrinterService2), asClass(PrinterService)),
+    ...config(di.printerGroupService, isSqlite, asClass(PrinterGroupService), asValue(null)),
     ...config(di.printerFilesService, isSqlite, asClass(PrinterFilesService2), asClass(PrinterFilesService)),
     ...config(di.refreshTokenService, isSqlite, asClass(RefreshToken2).singleton(), asClass(RefreshTokenService).singleton()),
     ...config(di.userService, isSqlite, asClass(UserService2).singleton(), asClass(UserService).singleton()),

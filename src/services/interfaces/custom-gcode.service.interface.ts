@@ -3,7 +3,7 @@ import { ICustomGcode } from "@/models/CustomGcode";
 import { CustomGcodeDto } from "@/services/interfaces/custom-gcode.dto";
 
 export interface ICustomGcodeService<KeyType = IdType, Entity = ICustomGcode> {
-  toDto(document: Entity): CustomGcodeDto;
+  toDto(document: Entity): CustomGcodeDto<KeyType>;
 
   get(gcodeScriptId: KeyType): Promise<Entity>;
 

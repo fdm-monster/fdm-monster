@@ -20,6 +20,7 @@ export class ServerPublicController {
   monsterPiService: MonsterPiService;
   userService: UserService;
   roleService: RoleService;
+  isTypeormMode: boolean;
 
   constructor({
     settingsStore,
@@ -29,6 +30,7 @@ export class ServerPublicController {
     monsterPiService,
     userService,
     roleService,
+    isTypeormMode,
   }: {
     settingsStore: SettingsStore;
     printerSocketStore: PrinterSocketStore;
@@ -37,6 +39,7 @@ export class ServerPublicController {
     monsterPiService: MonsterPiService;
     userService: UserService;
     roleService: RoleService;
+    isTypeormMode: boolean;
   }) {
     this.settingsStore = settingsStore;
     this.serverVersion = serverVersion;
@@ -45,6 +48,7 @@ export class ServerPublicController {
     this.monsterPiService = monsterPiService;
     this.userService = userService;
     this.roleService = roleService;
+    this.isTypeormMode = isTypeormMode;
   }
 
   welcome(req: Request, res: Response) {
@@ -102,6 +106,12 @@ export class ServerPublicController {
       },
       cameraStream: {
         available: true,
+        version: 1,
+        subFeatures: {},
+      },
+      printerGroupsApi: {
+        // Only SQLite mode supported for this feature
+        available: this.isTypeormMode,
         version: 1,
         subFeatures: {},
       },

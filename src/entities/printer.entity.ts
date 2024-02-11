@@ -1,9 +1,9 @@
 import { IsAlphanumeric } from "class-validator";
-import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, Relation } from "typeorm";
-import { FloorPosition } from "./floor-position.entity";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, Relation } from "typeorm";
 import { PrintCompletion } from "@/entities/print-completion.entity";
 import { BaseEntity } from "@/entities/base.entity";
 import { PrinterFile } from "@/entities/printer-file.entity";
+import { PrinterGroup } from "@/entities/printer-group.entity";
 
 @Entity()
 export class Printer extends BaseEntity {
@@ -38,6 +38,9 @@ export class Printer extends BaseEntity {
 
   @OneToMany(() => PrintCompletion, (pc) => pc.printer)
   printCompletions!: Relation<PrintCompletion>[];
+
+  @OneToMany(() => PrinterGroup, (pc) => pc.printer)
+  printerGroups!: Relation<PrinterGroup>[];
 
   @OneToMany(() => PrinterFile, (p) => p.printerId)
   printerFiles!: Relation<PrinterFile>[];

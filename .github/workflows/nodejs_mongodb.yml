@@ -19,6 +19,6 @@ jobs:
       - run: yarn install --immutable
       - run: yarn run build
       # non-coverage sqlite tests
-      - run: yarn run test
+      - run: yarn run test:mongodb
         env:
           NODE_OPTIONS: '--max_old_space_size=8192'

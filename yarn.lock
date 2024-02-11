@@ -1078,10 +1078,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fdm-monster/client@npm:1.5.0-rc8":
-  version: 1.5.0-rc8
-  resolution: "@fdm-monster/client@npm:1.5.0-rc8"
-  checksum: 10c0/40f1d015bda1ef72b31077eab45c68860d45eee6a8ddf76b3cf6acee53e4df90d9e491df57f43b6044aafb0bf4625dd9e9190a9f742670f4a3906d9d1d0ea1a3
+"@fdm-monster/client@npm:1.5.0-rc9":
+  version: 1.5.0-rc9
+  resolution: "@fdm-monster/client@npm:1.5.0-rc9"
+  checksum: 10c0/a7bc3889174378e3df1276bf8b591d097f3fb9484619db7e7d56c9757acd341ec30a47ce01427a4ad3567cb0855b6fa25b38040bdd3756e650d92d477c55c4b4
   languageName: node
   linkType: hard
 
@@ -1089,7 +1089,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@fdm-monster/server@workspace:."
   dependencies:
-    "@fdm-monster/client": "npm:1.5.0-rc8"
+    "@fdm-monster/client": "npm:1.5.0-rc9"
     "@influxdata/influxdb-client": "npm:1.33.2"
     "@lcov-viewer/cli": "npm:1.3.0"
     "@lcov-viewer/istanbul-report": "npm:1.4.0"

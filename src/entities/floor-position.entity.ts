@@ -23,7 +23,7 @@ export class FloorPosition {
   @Column()
   floorId!: number;
 
-  @OneToOne(() => Printer, (printer) => printer.floorPosition, {
+  @OneToOne(() => Printer, {
     onDelete: "CASCADE",
     nullable: false,
   })
