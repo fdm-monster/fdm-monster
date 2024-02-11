@@ -215,8 +215,9 @@ export class BootTask {
   }
 
   async createConnection() {
-    if (this.isTypeormMode) {
-      await connect(fetchMongoDBConnectionString(), {
+    if (!this.isTypeormMode) {
+      const envUrl = fetchMongoDBConnectionString();
+      await connect(envUrl, {
         serverSelectionTimeoutMS: 1500,
       });
       await syncIndexes();
@@ -224,7 +225,7 @@ export class BootTask {
   }
 
   async migrateDatabase() {
-    if (this.isTypeormMode) {
+    if (!this.isTypeormMode) {
       await runMigrations(mongoose.connection.db, mongoose.connection.getClient());
     }
   }
