@@ -11,7 +11,6 @@ import {
   selectAndPrintFileRules,
   uploadFileRules,
 } from "./validation/printer-files-controller.validation";
-import { batchPrinterRules } from "@/controllers/validation/batch-controller.validation";
 import { ValidationException } from "@/exceptions/runtime.exceptions";
 import { printerResolveMiddleware } from "@/middleware/printer";
 import { PERMS, ROLES } from "@/constants/authorization.constants";
@@ -24,8 +23,6 @@ import { PrinterFileCleanTask } from "@/tasks/printer-file-clean.task";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { Request, Response } from "express";
-import { createReadStream, existsSync, lstatSync } from "node:fs";
-import { AxiosResponse } from "axios";
 
 export class PrinterFilesController {
   printerFilesStore: PrinterFilesStore;

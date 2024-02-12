@@ -18,6 +18,7 @@ export const DITokens = {
   eventEmitter2: "eventEmitter2",
   cacheManager: "cacheManager",
   printerService: "printerService",
+  printerGroupService: "printerGroupService",
   floorPositionService: "floorPositionService",
   printCompletionService: "printCompletionService",
   floorService: "floorService",

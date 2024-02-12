@@ -15,6 +15,9 @@ import { Role } from "@/entities/role.entity";
 import { PrinterFile } from "@/entities/printer-file.entity";
 import { UserRole } from "@/entities/user-role.entity";
 import { InitSqlite1706829146617 } from "@/migrations/1706829146617-InitSqlite";
+import { PrinterGroup } from "@/entities/printer-group.entity";
+import { Group } from "@/entities/group.entity";
+import { PrinterGroup1707494762198 } from "@/migrations/1707494762198-PrinterGroup";
 
 dotenv.config({
   path: join(superRootPath(), ".env"),
@@ -47,7 +50,9 @@ export const AppDataSource = new DataSource({
     RefreshToken,
     PrintCompletion,
     UserRole,
+    Group,
+    PrinterGroup,
   ],
-  migrations: [InitSqlite1706829146617],
+  migrations: [InitSqlite1706829146617, PrinterGroup1707494762198],
   subscribers: [],
 });

@@ -13,7 +13,6 @@ import { IPrinterService } from "@/services/interfaces/printer.service.interface
 const defaultRoute = AppConstants.apiRoute + "/printer-files";
 const trackedUploadsRoute = `${defaultRoute}/tracked-uploads`;
 const purgeIndexedFilesRoute = `${defaultRoute}/purge`;
-const batchReprintRoute = `${defaultRoute}/batch/reprint-files`;
 type idType = Number;
 const getRoute = (id: idType) => `${defaultRoute}/${id}`;
 const clearFilesRoute = (id: idType) => `${getRoute(id)}/clear`;
