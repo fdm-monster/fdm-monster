@@ -63,8 +63,8 @@ export class FileUploadTrackerCache {
     return correlationToken;
   }
 
-  updateUploadProgress(token: string, progress: AxiosProgressEvent, reason: string) {
-    if (progress.done || progress.percent === 1) {
+  updateUploadProgress(token: string, progress: AxiosProgressEvent & { failed?: boolean }, reason?: string) {
+    if (progress.progress === 1) {
       this.logger.log("Upload tracker completed");
       this.markUploadDone(token, true);
       this.eventEmitter2.off(uploadProgressEvent(token), this.progressCallback);
@@ -77,7 +77,7 @@ export class FileUploadTrackerCache {
     }
   }
 
-  markUploadDone(token: string, success, reason: string) {
+  markUploadDone(token: string, success: boolean, reason?: string) {
     const trackedUploadIndex = this.currentUploads.findIndex((cu) => cu.correlationToken === token);
     if (trackedUploadIndex === -1) {
       this.logger.warn(`Could not mark upload tracker with token '${token}' as done as it was not found.`);
