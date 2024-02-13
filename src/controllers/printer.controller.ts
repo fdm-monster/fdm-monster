@@ -131,6 +131,20 @@ export class PrinterController {
     res.send({});
   }
 
+  async sendPrintHeadJogCommand(req: Request, res: Response) {
+    const { printerLogin } = getScopedPrinter(req);
+
+    await this.octoPrintApiService.sendPrintHeadJogCommand(printerLogin, req.body);
+    res.send({});
+  }
+
+  async sendPrintHeadHomeCommand(req: Request, res: Response) {
+    const { printerLogin } = getScopedPrinter(req);
+
+    await this.octoPrintApiService.sendPrintHeadHomeCommand(printerLogin, req.body);
+    res.send({});
+  }
+
   /**
    * Pauses the current job
    */
@@ -345,6 +359,8 @@ export default createController(PrinterController)
   .get("/:id/login-details", "getPrinterLoginDetails")
   .post("/:id/serial-connect", "sendSerialConnectCommand")
   .post("/:id/serial-disconnect", "sendSerialDisconnectCommand")
+  .post("/:id/jog", "sendPrintHeadJogCommand")
+  .post("/:id/home", "sendPrintHeadHomeCommand")
   .post("/:id/job/stop", "stopPrintJob")
   .post("/:id/job/pause", "pausePrintJob")
   .post("/:id/job/resume", "resumePrintJob")
