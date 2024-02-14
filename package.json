@@ -52,7 +52,7 @@
     "vue"
   ],
   "dependencies": {
-    "@fdm-monster/client": "1.5.2",
+    "@fdm-monster/client": "1.5.3",
     "@influxdata/influxdb-client": "1.33.2",
     "@octokit/plugin-throttling": "8.1.3",
     "@sentry/node": "7.101.0",
