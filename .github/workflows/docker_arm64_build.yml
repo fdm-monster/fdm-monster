@@ -1,0 +1,74 @@
+name: Docker ARM64
+on:
+  push:
+      branches:
+        - dev
+        - main
+  workflow_dispatch:
+jobs:
+  docker-arm64:
+    runs-on: ubuntu-latest
+    name: "Docker ARM64 build"
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Login to DockerHub with environment variables
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        if: github.event_name != 'pull_request'
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions
+      - name: get-server-version
+        # https://gist.github.com/DarrenN/8c6a5b969481725a4413?permalink_comment_id=3863317#gistcomment-3863317
+        run: |
+          echo "SERVER_VERSION=$(npm pkg get version | sed 's/"//g')" >> $GITHUB_ENV
+
+      # Speed up the build next time
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ hashfiles('./docker/Dockerfile') }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      # Clone the repo and build the image
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v5
+        with:
+          push: ${{ github.event_name != 'pull_request' }}
+          context: "{{defaultContext}}"
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
+          file: ./docker/Dockerfile
+          tags: fdmmonster/fdm-monster:${{ env.SERVER_VERSION }}-arm64, davidzwa/fdm-monster:${{ env.SERVER_VERSION }}-arm64
+          labels: ${{ needs.meta.outputs.labels }}
+          platforms: linux/arm64
+
+      - name: Build and push
+        id: docker_build_new
+        uses: docker/build-push-action@v5
+        with:
+          push: ${{ github.event_name != 'pull_request' }}
+          context: "{{defaultContext}}"
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
+          file: ./docker/alpha.Dockerfile
+          tags: fdmmonster/fdm-monster:${{ env.SERVER_VERSION }}-sqlite-arm64, davidzwa/fdm-monster:${{ env.SERVER_VERSION }}-sqlite-arm64
+          labels: ${{ needs.meta.outputs.labels }}
+          platforms: linux/arm64
+
+      # Show image digest output
+      - name: Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
+
+      - name: Image digest 2
+        run: echo ${{ steps.docker_build_new.outputs.digest }}
