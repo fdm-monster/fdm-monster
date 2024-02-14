@@ -48,9 +48,10 @@ jobs:
           context: "{{defaultContext}}"
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
-          file: ./docker/alpha.Dockerfile
-          tags: davidzwa/fdm-monster:${{ env.SERVER_VERSION }}-sqlite, davidzwa/fdm-monster:${{ env.SERVER_VERSION }}-alpha
+          file: ./docker/Dockerfile
+          tags: fdmmonster/fdm-monster:${{ env.SERVER_VERSION }}-arm64, davidzwa/fdm-monster:${{ env.SERVER_VERSION }}-arm64
           labels: ${{ needs.meta.outputs.labels }}
+          platforms: linux/arm64
 
       - name: Build and push
         id: docker_build_new
@@ -61,8 +62,9 @@ jobs:
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
           file: ./docker/alpha.Dockerfile
-          tags: fdmmonster/fdm-monster:${{ env.SERVER_VERSION }}-sqlite, fdmmonster/fdm-monster:${{ env.SERVER_VERSION }}-alpha
+          tags: fdmmonster/fdm-monster:${{ env.SERVER_VERSION }}-sqlite-arm64, davidzwa/fdm-monster:${{ env.SERVER_VERSION }}-sqlite-arm64
           labels: ${{ needs.meta.outputs.labels }}
+          platforms: linux/arm64
 
       # Show image digest output
       - name: Image digest
