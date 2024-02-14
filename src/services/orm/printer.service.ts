@@ -118,6 +118,14 @@ export class PrinterService
     return newPrinters;
   }
 
+  override async delete(printerId: SqliteIdType, emitEvent = true): Promise<DeleteResult> {
+    const result = await this.repository.delete([printerId]);
+    if (emitEvent) {
+      this.eventEmitter2.emit(printerEvents.printersDeleted, { printerIds: [[printerId]] });
+    }
+    return result;
+  }
+
   async deleteMany(printerIds: SqliteIdType[], emitEvent = true): Promise<DeleteResult> {
     const result = await this.repository.delete(printerIds);
     if (emitEvent) {

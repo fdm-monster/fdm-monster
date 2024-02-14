@@ -228,7 +228,6 @@ export class PrinterSocketStore {
   }
 
   /**
-   * @private
    * @param { printer: Printer } printer
    * @returns void
    */
@@ -237,7 +236,6 @@ export class PrinterSocketStore {
   }
 
   /**
-   * @private
    * @param { printer: Printer } printer
    * @returns void
    */
