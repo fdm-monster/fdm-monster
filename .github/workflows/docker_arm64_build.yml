@@ -2,7 +2,7 @@ name: Docker ARM64
 on:
   push:
       branches:
-        - dev
+        - develop
         - main
   workflow_dispatch:
 jobs:
