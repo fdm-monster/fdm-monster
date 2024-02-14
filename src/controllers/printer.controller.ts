@@ -16,7 +16,6 @@ import { AppConstants } from "@/server.constants";
 import { printerResolveMiddleware } from "@/middleware/printer";
 import { generateCorrelationToken } from "@/utils/correlation-token.util";
 import { ROLES } from "@/constants/authorization.constants";
-import { Floor } from "@/models";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { TestPrinterSocketStore } from "@/state/test-printer-socket.store";
 import { PrinterCache } from "@/state/printer.cache";
@@ -86,15 +85,6 @@ export class PrinterController {
     const printers = await this.printerCache.listCachedPrinters(true);
 
     res.send(printers);
-  }
-
-  async listPrinterFloors(req: Request, res: Response) {
-    const { currentPrinterId } = getScopedPrinter(req);
-    // TODO move to service?
-    const results = await Floor.find({
-      "printers.printerId": currentPrinterId,
-    });
-    res.send(results);
   }
 
   async getPrinter(req: Request, res: Response) {
@@ -364,7 +354,6 @@ export default createController(PrinterController)
   .patch("/:id/flow-rate", "setFlowRate")
   .patch("/:id/feed-rate", "setFeedRate")
   .patch("/:id/disabled-reason", "updatePrinterDisabledReason")
-  .get("/:id/list-printer-floors", "listPrinterFloors")
   .get("/:id/plugin-list", "getPrinterPluginList")
   .get("/:id/octoprint/system/", "octoPrintListCommands")
   .post("/:id/octoprint/system/restart", "octoPrintSystemRestart")
