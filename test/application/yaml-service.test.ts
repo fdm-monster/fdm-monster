@@ -83,7 +83,7 @@ describe(YamlService.name, () => {
     await yamlService.importPrintersAndFloors(buffer.toString());
 
     const printers = await printerService.list();
-    const printer = printers.find((p) => p.name === "Dragon Eggggg");
+    const printer = printers.find((p) => p.name === "Minipi Local");
 
     const floors = await floorService.list();
     const floor = floors.find((f) => f.name === "Default Floor1_6_0");
