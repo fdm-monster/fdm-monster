@@ -35,7 +35,7 @@ printers:
 floors:
   - id: 1
     floor: 0
-    name: Default Floor
+    name: Default Floor1_6_0
     printers:
       - printerId: '1'
         x: 0

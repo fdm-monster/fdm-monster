@@ -70,7 +70,7 @@ export const exportYamlBuffer1_5_0 = (isSqlite: boolean) =>
   "    name: Default Floor1_5_0\n" +
   "    printers: []";
 
-export const exportYamlBuffer1_6_0SQLite = (isSqlite: boolean) =>
+export const exportYamlBuffer1_6_0 = (isSqlite: boolean) =>
   "version: 1.6.0\n" +
   "exportedAt: 2024-02-17T09:15:47.840Z\n" +
   "databaseType: sqlite\n" +
@@ -84,7 +84,7 @@ export const exportYamlBuffer1_6_0SQLite = (isSqlite: boolean) =>
   "  floorComparisonStrategiesByPriority: floor\n" +
   "  notes: MegaPi\n" +
   "printers:\n" +
-  `  - id: ${isSqlite ? 1 : "6446f7345fb876356c31e5d3"}` +
+  `  - id: ${isSqlite ? 1 : "6446f7345fb876356c31e5d3"}\n` +
   "    disabledReason: null\n" +
   "    enabled: false\n" +
   "    dateAdded: 1707940463116\n" +
@@ -103,9 +103,9 @@ export const exportYamlBuffer1_6_0SQLite = (isSqlite: boolean) =>
   "    floor: 0\n" +
   "    name: Default Floor1_6_0\n" +
   "    printers:\n" +
-  `      - printerId: '${isSqlite ? "1" : "6446f7345fb876356c31e5d3"}'` +
+  `      - printerId: '${isSqlite ? "1" : "6446f7345fb876356c31e5d3"}'\n` +
   "        x: 0\n" +
   "        'y': 0\n" +
-  `      - printerId: '${isSqlite ? "2" : "644eb6d8c549c7e24e153b6d"}'` +
+  `      - printerId: '${isSqlite ? "2" : "644eb6d8c549c7e24e153b6d"}'\n` +
   "        x: 4\n" +
   "        'y': 0\n";
