@@ -32,7 +32,7 @@ export const exportYamlBuffer1_3_1 =
   "floors:\n" +
   "  - id: 6446f7345fb876356c31e5d2\n" +
   "    floor: 1\n" +
-  "    name: Default Floor\n" +
+  "    name: Default Floor1_3_1\n" +
   "    printers: []";
 
 export const exportYamlBuffer1_5_0 = (isSqlite: boolean) =>
@@ -67,5 +67,45 @@ export const exportYamlBuffer1_5_0 = (isSqlite: boolean) =>
   "floors:\n" +
   `  - id: ${isSqlite ? 1 : "6446f7345fb876356c31e5d2"}\n` +
   "    floor: 1\n" +
-  "    name: Default Floor\n" +
+  "    name: Default Floor1_5_0\n" +
   "    printers: []";
+
+export const exportYamlBuffer1_6_0SQLite = (isSqlite: boolean) =>
+  "version: 1.6.0\n" +
+  "exportedAt: 2024-02-17T09:15:47.840Z\n" +
+  "databaseType: sqlite\n" +
+  "config:\n" +
+  "  exportPrinters: true\n" +
+  "  exportFloorGrid: true\n" +
+  "  printerComparisonStrategiesByPriority:\n" +
+  "    - name\n" +
+  "    - url\n" +
+  "  exportFloors: true\n" +
+  "  floorComparisonStrategiesByPriority: floor\n" +
+  "  notes: MegaPi\n" +
+  "printers:\n" +
+  `  - id: ${isSqlite ? 1 : "6446f7345fb876356c31e5d3"}` +
+  "    disabledReason: null\n" +
+  "    enabled: false\n" +
+  "    dateAdded: 1707940463116\n" +
+  "    name: Pi Local\n" +
+  "    printerURL: http://localhost:80/\n" +
+  "    apiKey: ASD123ASD123ASD123ASD123ASD123AA\n" +
+  `  - id: ${isSqlite ? 2 : "644eb6d8c549c7e24e153b6d"}\n` +
+  "    disabledReason: null\n" +
+  "    enabled: true\n" +
+  "    dateAdded: 1707940530344\n" +
+  "    name: Civilian Coast\n" +
+  "    printerURL: http://localhost:81/\n" +
+  "    apiKey: ASD123ASD123ASD123ASD123ASD123AA\n" +
+  "floors:\n" +
+  `  - id: ${isSqlite ? 1 : "6446f7345fb876356c31e5d2"}\n` +
+  "    floor: 0\n" +
+  "    name: Default Floor1_6_0\n" +
+  "    printers:\n" +
+  `      - printerId: '${isSqlite ? "1" : "6446f7345fb876356c31e5d3"}'` +
+  "        x: 0\n" +
+  "        'y': 0\n" +
+  `      - printerId: '${isSqlite ? "2" : "644eb6d8c549c7e24e153b6d"}'` +
+  "        x: 4\n" +
+  "        'y': 0\n";

@@ -16,7 +16,7 @@ export interface IPrinterService<KeyType = IdType, Entity = IPrinter | Printer> 
 
   update(printerId: KeyType, printer: Partial<Entity>): Promise<Entity>;
 
-  delete(printerId: KeyType, emitEvent: boolean): Promise<any>;
+  delete(printerId: KeyType, emitEvent?: boolean): Promise<any>;
 
   deleteMany(printerIds: KeyType[]): Promise<any | void>;
 
