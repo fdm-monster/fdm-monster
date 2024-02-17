@@ -4770,9 +4770,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.4.668":
-  version: 1.4.671
-  resolution: "electron-to-chromium@npm:1.4.671"
-  checksum: 10c0/97c100ce6de2b75de8d327e6ece4172ce4fba8faddcfd1acf359c950a5cfbf70e52af1b5fff2d0e21551a093543b451bb440ecdcfbf42c4aafe4eebe41505fe1
+  version: 1.4.673
+  resolution: "electron-to-chromium@npm:1.4.673"
+  checksum: 10c0/3e01365ee9b5b32b772ac6437ad4395e4367a2ffb23d651caab67802dbe65e91fca677681c38fa8e14f04ba8e8c79463520ab29b9e5fadf9028e1b1e97772d69
   languageName: node
   linkType: hard
 
@@ -8704,14 +8704,14 @@ __metadata:
   linkType: hard
 
 "piscina@npm:^4.3.0":
-  version: 4.3.1
-  resolution: "piscina@npm:4.3.1"
+  version: 4.3.2
+  resolution: "piscina@npm:4.3.2"
   dependencies:
     nice-napi: "npm:^1.0.2"
   dependenciesMeta:
     nice-napi:
       optional: true
-  checksum: 10c0/29e907273041e3ede370f79327ec699d6ef7a12ded5e89e8b2cb536a9382ca70ead6407b0feb5b0fb804505498af6f9a5db85f32a2bf0b21356cf0227b8998ee
+  checksum: 10c0/1e7f906a286034777230e7cf988ec5029a01bc399e1d74a65338eb3514ae76a180fd6e23615d2711bcdc76a5be7cf6b059f638e2053dc7432d08e06836383bf7
   languageName: node
   linkType: hard
 
