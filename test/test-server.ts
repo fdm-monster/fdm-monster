@@ -10,9 +10,6 @@ import { Express } from "express";
 import { AppConstants } from "@/server.constants";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { TaskManagerService } from "@/services/core/task-manager.service";
-import { MongoMemoryServer } from "mongodb-memory-server";
-
-let mongoMemory: MongoMemoryServer;
 
 jest.mock("../src/utils/env.utils", () => ({
   ...jest.requireActual("../src/utils/env.utils"),

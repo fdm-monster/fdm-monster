@@ -14,9 +14,11 @@ let yamlService: YamlService;
 let printerCache: PrinterCache;
 let printerService: IPrinterService;
 let floorService: IFloorService;
+let isTypeormMode: boolean;
 
 beforeAll(async () => {
-  const { container } = await setupTestApp(true);
+  const { container, isTypeormMode: _isTypeormMode } = await setupTestApp(true);
+  isTypeormMode = _isTypeormMode;
   yamlService = container.resolve(DITokens.yamlService);
   printerCache = container.resolve(DITokens.printerCache);
   printerService = container.resolve(DITokens.printerService);
@@ -64,7 +66,12 @@ describe(YamlService.name, () => {
     const floor = floors.find((f) => f.name === "Default Floor1_5_2");
     expect(floor).toBeDefined();
     expect(floor.printers).toHaveLength(2);
-    expect(floor.printers.find((p) => p.printerId === printer.id)).toBeDefined();
+    if (isTypeormMode) {
+      expect(typeof printer.id).toBe("number");
+    } else {
+      expect(typeof printer.id).toBe("string");
+    }
+    expect(floor.printers.find((p) => p.printerId.toString() === printer.id.toString())).toBeDefined();
   });
 
   it("should import yaml from version 1.6.0 sqlite", async () => {
@@ -89,6 +96,6 @@ describe(YamlService.name, () => {
     const floor = floors.find((f) => f.name === "Default Floor1_6_0");
     expect(floor).toBeDefined();
     expect(floor.printers).toHaveLength(3);
-    expect(floor.printers.find((p) => p.printerId === printer.id)).toBeDefined();
+    expect(floor.printers.find((p) => p.printerId.toString() === printer.id.toString())).toBeDefined();
   });
 });
