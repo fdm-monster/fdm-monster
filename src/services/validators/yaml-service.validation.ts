@@ -33,13 +33,15 @@ export const importPrintersFloorsYamlRules = (
     "config.printerComparisonStrategiesByPriority.*": "required|string|in:name,url,id",
     "config.floorComparisonStrategiesByPriority": "required|string|in:name,floor,id",
     printers: `${!!importPrinters ? "array|minLength:0" : "not"}`,
-    "printers.*.id": `${idVal}`,
+    "printers.*.id": "required",
+    // `${idVal}`,
     "printers.*.apiKey": `required|length:${UUID_LENGTH},${UUID_LENGTH}|alphaNumeric`,
     "printers.*.printerURL": "required|httpurl",
     "printers.*.enabled": "boolean",
     "printers.*.name": "required|string",
     floors: `${!!importFloors ? "array|minLength:0" : "not"}`,
-    "floors.*.id": `${idVal}`,
+    "floors.*.id": `required`,
+    // "floors.*.id": `${idVal}`,
     "floors.*.floor": "required|integer",
     "floors.*.name": "required|string",
   };
@@ -47,7 +49,8 @@ export const importPrintersFloorsYamlRules = (
 
 export const importPrinterPositionsRules = (isTypeormMode: boolean) => ({
   printers: "array|minLength:0",
-  "printers.*.printerId": isTypeormMode ? "integer|min:1" : "mongoId",
+  "printers.*.printerId": "required",
+  // isTypeormMode ? "integer|min:1" : "mongoId",
   "printers.*.x": "required|integer|min:0|max:12",
   "printers.*.y": "required|integer|min:0|max:12",
 });

@@ -1,0 +1,48 @@
+version: 1.6.0
+exportedAt: 2024-02-17T09:15:47.840Z
+databaseType: sqlite
+config:
+  exportPrinters: true
+  exportFloorGrid: true
+  printerComparisonStrategiesByPriority:
+    - name
+    - url
+  exportFloors: true
+  floorComparisonStrategiesByPriority: floor
+  notes: MegaPi
+printers:
+  - id: 1
+    disabledReason: null
+    enabled: false
+    dateAdded: 1707940463116
+    name: Minipi Local
+    printerURL: http://192.168.178.46
+    apiKey: asdasdasdasdasdasdasdasdasdasdas
+  - id: 2
+    disabledReason: null
+    enabled: false
+    dateAdded: 1707940504296
+    name: Cautious Cupboard
+    printerURL: http://google.com
+    apiKey: asdasdasdasdasdasdasdasdasdasdas
+  - id: 3
+    disabledReason: null
+    enabled: true
+    dateAdded: 1707940530344
+    name: Civilian Coast
+    printerURL: http://192.168.178.46
+    apiKey: asdasdasdasdasdasdasdasdasdasdas
+floors:
+  - id: 1
+    floor: 0
+    name: Default Floor1_6_0
+    printers:
+      - printerId: '1'
+        x: 0
+        'y': 0
+      - printerId: '2'
+        x: 2
+        'y': 0
+      - printerId: '3'
+        x: 4
+        'y': 0

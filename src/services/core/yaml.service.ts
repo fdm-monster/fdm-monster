@@ -12,7 +12,6 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { IFloorService } from "@/services/interfaces/floor.service.interface";
 import { MongoIdType } from "@/shared.constants";
-import { FloorPositionService } from "@/services/orm/floor-position.service";
 
 export class YamlService {
   floorStore: FloorStore;
@@ -51,6 +50,7 @@ export class YamlService {
 
   async importPrintersAndFloors(yamlBuffer: string) {
     const importSpec = await load(yamlBuffer);
+    const databaseTypeSqlite = importSpec.databaseType === "sqlite";
     const { exportPrinters, exportFloorGrid, exportFloors } = importSpec?.config;
 
     for (const printer of importSpec.printers) {
@@ -64,19 +64,21 @@ export class YamlService {
         printer.name = printer.settingsAppearance?.name;
         delete printer.settingsAppearance?.name;
       }
-
-      if (this.isTypeormMode && typeof printer.id === "string") {
-        delete printer.id;
-      } else if (!this.isTypeormMode && typeof printer.id === "number") {
-        delete printer.id;
+      if (databaseTypeSqlite && typeof printer.id === "string") {
+        printer.id = parseInt(printer.id);
       }
     }
 
-    for (const floor of importSpec.floors) {
-      if (this.isTypeormMode && typeof floor.id === "string") {
-        delete floor.id;
-      } else if (!this.isTypeormMode && typeof floor.id === "number") {
-        delete floor.id;
+    if (databaseTypeSqlite) {
+      for (const floor of importSpec.floors) {
+        if (typeof floor.id === "string") {
+          floor.id = parseInt(floor.id);
+        }
+        for (const printer of floor.printers) {
+          if (typeof printer.printerId === "string") {
+            printer.printerId = parseInt(printer.printerId);
+          }
+        }
       }
     }
 
@@ -87,8 +89,8 @@ export class YamlService {
 
     // Nested validation is manual (for now)
     if (!!exportFloorGrid) {
-      for (let floor of importData.floors) {
-        await validateInput(floor, importPrinterPositionsRules);
+      for (const floor of importData.floors) {
+        await validateInput(floor, importPrinterPositionsRules(this.isTypeormMode));
       }
     }
 
@@ -107,13 +109,20 @@ export class YamlService {
     this.logger.log(`Performing pure insert printers (${insertPrinters.length} printers)`);
     const printerIdMap = {};
     for (const newPrinter of insertPrinters) {
-      const state = await this.printerService.create(newPrinter);
+      const state = await this.printerService.create({ ...newPrinter });
+      if (!newPrinter.id) {
+        throw new Error(`Saved ID was empty ${JSON.stringify(newPrinter)}`);
+      }
       printerIdMap[newPrinter.id] = state.id;
     }
+
     this.logger.log(`Performing update import printers (${updateByPropertyPrinters.length} printers)`);
     for (const updatePrinterSpec of updateByPropertyPrinters) {
       const updateId = updatePrinterSpec.printerId;
       const state = await this.printerService.update(updateId, updatePrinterSpec.value);
+      if (!updatePrinterSpec.printerId) {
+        throw new Error("Saved ID was empty");
+      }
       printerIdMap[updatePrinterSpec.printerId] = state.id;
     }
 
@@ -134,7 +143,7 @@ export class YamlService {
         newFloor.printers = knownPrinters;
       }
 
-      const state = await this.floorStore.create(newFloor, false);
+      const state = await this.floorStore.create({ ...newFloor }, false);
       floorIdMap[newFloor.id] = state.id;
     }
 
@@ -188,6 +197,9 @@ export class YamlService {
           const comparedName = printer.name.toLowerCase();
           const foundIndex = names.findIndex((n) => n === comparedName);
           if (foundIndex !== -1) {
+            if (!ids[foundIndex]) {
+              throw new Error("Update ID is undefined");
+            }
             updateByPropertyPrinters.push({
               strategy: "name",
               printerId: ids[foundIndex],
@@ -199,6 +211,9 @@ export class YamlService {
           const comparedName = printer.printerURL.toLowerCase();
           const foundIndex = urls.findIndex((n) => n === comparedName);
           if (foundIndex !== -1) {
+            if (!ids[foundIndex]) {
+              throw new Error("Update ID is undefined");
+            }
             updateByPropertyPrinters.push({
               strategy: "url",
               printerId: ids[foundIndex],
@@ -210,6 +225,9 @@ export class YamlService {
           const comparedName = printer.id.toLowerCase();
           const foundIndex = ids.findIndex((n) => n === comparedName);
           if (foundIndex !== -1) {
+            if (!ids[foundIndex]) {
+              throw new Error("Update ID is undefined");
+            }
             updateByPropertyPrinters.push({
               strategy: "id",
               printerId: ids[foundIndex],
@@ -218,6 +236,9 @@ export class YamlService {
             break;
           }
         } else if (strategy === "new") {
+          if (!printer.id) {
+            throw new Error(JSON.stringify(printer));
+          }
           insertPrinters.push(printer);
           break;
         }
@@ -244,6 +265,9 @@ export class YamlService {
           const comparedProperty = floor.name.toLowerCase();
           const foundIndex = names.findIndex((n) => n === comparedProperty);
           if (foundIndex !== -1) {
+            if (!ids[foundIndex]) {
+              throw new Error("IDS not found, floor name");
+            }
             updateByPropertyFloors.push({
               strategy: "name",
               floorId: ids[foundIndex],
@@ -255,6 +279,9 @@ export class YamlService {
           const comparedProperty = floor.floor;
           const foundIndex = floorLevels.findIndex((n) => n === comparedProperty);
           if (foundIndex !== -1) {
+            if (!ids[foundIndex]) {
+              throw new Error("IDS not found, floor level");
+            }
             updateByPropertyFloors.push({
               strategy: "floor",
               floorId: ids[foundIndex],
@@ -266,6 +293,9 @@ export class YamlService {
           const comparedProperty = floor.id.toLowerCase();
           const foundIndex = ids.findIndex((n) => n === comparedProperty);
           if (foundIndex !== -1) {
+            if (!ids[foundIndex]) {
+              throw new Error("IDS not found, floor id");
+            }
             updateByPropertyFloors.push({
               strategy: "id",
               floorId: ids[foundIndex],
@@ -335,7 +365,7 @@ export class YamlService {
 
         if (exportFloorGrid) {
           dumpedFloor.printers = f.printers.map((p) => {
-            const fPrinterId = p.printerId.toString();
+            const fPrinterId = p.printerId;
             return {
               printerId: fPrinterId,
               x: p.x,

@@ -1,8 +1,9 @@
 import { IFloor } from "@/models/Floor";
 import { IdType } from "@/shared.constants";
 import { CreateFloorDto, FloorDto, PositionDto, UpdateFloorDto } from "@/services/interfaces/floor.dto";
+import { Floor } from "@/entities";
 
-export interface IFloorService<KeyType = IdType, Entity = IFloor> {
+export interface IFloorService<KeyType = IdType, Entity = IFloor | Floor> {
   toDto(floor: Entity): FloorDto<KeyType>;
 
   list(): Promise<Entity[]>;
