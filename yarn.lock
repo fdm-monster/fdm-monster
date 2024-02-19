@@ -1131,7 +1131,7 @@ __metadata:
     express-list-routes: "npm:1.1.9"
     form-data: "npm:4.0.0"
     helmet: "npm:7.1.0"
-    ip: "npm:1.1.8"
+    ip: "npm:2.0.1"
     jest: "npm:29.7.0"
     jest-27-expect-message: "npm:1.1.0"
     js-yaml: "npm:4.1.0"
@@ -6323,10 +6323,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ip@npm:1.1.8":
-  version: 1.1.8
-  resolution: "ip@npm:1.1.8"
-  checksum: 10c0/ab32a5ecfa678d4c158c1381c4c6744fce89a1d793e1b6635ba79d0753c069030b672d765887b6fff55670c711dfa47475895e5d6013efbbcf04687c51cb8db9
+"ip@npm:2.0.1":
+  version: 2.0.1
+  resolution: "ip@npm:2.0.1"
+  checksum: 10c0/cab8eb3e88d0abe23e4724829621ec4c4c5cb41a7f936a2e626c947128c1be16ed543448d42af7cca95379f9892bfcacc1ccd8d09bc7e8bea0e86d492ce33616
   languageName: node
   linkType: hard
 
