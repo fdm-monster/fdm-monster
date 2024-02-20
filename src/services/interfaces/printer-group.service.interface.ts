@@ -8,7 +8,7 @@ export interface IPrinterGroupService<KeyType extends string | number = IdType, 
 
   listGroups(): Promise<GroupWithPrintersDto<KeyType>[]>;
 
-  getGroupWithPrinters(printerId: KeyType): Promise<GroupWithPrintersDto<KeyType>>;
+  getGroupWithPrinters(groupId: KeyType): Promise<GroupWithPrintersDto<KeyType>>;
 
   createGroup(group: CreateGroupDto): Promise<GroupWithPrintersDto<KeyType>>;
 

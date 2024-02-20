@@ -8,12 +8,15 @@ import { join } from "path";
 import { readFileSync } from "node:fs";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { IFloorService } from "@/services/interfaces/floor.service.interface";
+import { PrinterGroupService } from "@/services/orm/printer-group.service";
+import * as console from "console";
 
 let container: AwilixContainer;
 let yamlService: YamlService;
 let printerCache: PrinterCache;
 let printerService: IPrinterService;
 let floorService: IFloorService;
+let printerGroupService: PrinterGroupService;
 let isTypeormMode: boolean;
 
 beforeAll(async () => {
@@ -23,6 +26,7 @@ beforeAll(async () => {
   printerCache = container.resolve(DITokens.printerCache);
   printerService = container.resolve(DITokens.printerService);
   floorService = container.resolve(DITokens.floorService);
+  printerGroupService = container.resolve(DITokens.printerGroupService);
 });
 afterEach(async () => {
   const printers = await printerService.list();
@@ -97,5 +101,32 @@ describe(YamlService.name, () => {
     expect(floor).toBeDefined();
     expect(floor.printers).toHaveLength(3);
     expect(floor.printers.find((p) => p.printerId.toString() === printer.id.toString())).toBeDefined();
+
+    if (isTypeormMode) {
+      const groups = await printerGroupService.listGroups();
+      expect(groups).toHaveLength(0);
+    }
+  });
+
+  it("should import 1.6.1 sqlite yaml", async () => {
+    const buffer = readFileSync(join(__dirname, "./test-data/export-fdm-monster-1.6.1-sqlite-groups.yaml"));
+    await printerCache.loadCache();
+    await yamlService.importPrintersAndFloors(buffer.toString());
+
+    const printers = await printerService.list();
+    const printer = printers.find((p) => p.name === "Minipi Local1_6_1");
+
+    const floors = await floorService.list();
+    expect(floors).toHaveLength(1);
+    const floor = floors.find((f) => f.name === "Default Floor1_6_1");
+    expect(floor).toBeDefined();
+    expect(floor.printers).toHaveLength(4);
+    expect(floor.printers.find((p) => p.printerId.toString() === printer.id.toString())).toBeDefined();
+
+    const groups = await printerGroupService.listGroups();
+    const group = groups.find((g) => g.name === "Group A123_1.6.1");
+    expect(group).toBeDefined();
+    expect(group.printers).toHaveLength(2);
+    expect(groups.find((g) => g.name === "Group test_1.6.1").printers).toHaveLength(0);
   });
 });
