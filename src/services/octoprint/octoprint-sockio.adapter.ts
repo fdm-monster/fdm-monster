@@ -63,9 +63,6 @@ export const octoPrintEvent = (event: string) => `octoprint.${event}`;
 
 export class OctoPrintSockIoAdapter extends WebsocketAdapter {
   octoPrintApiService: OctoPrintApiService;
-  private eventEmitter: EventEmitter2;
-  private configService: ConfigService;
-
   public printerId?: IdType;
   stateUpdated = false;
   stateUpdateTimestamp: null | number = null;
@@ -78,6 +75,8 @@ export class OctoPrintSockIoAdapter extends WebsocketAdapter {
   reauthRequiredTimestamp: null | number = null;
   loginDto?: PrinterLoginDto;
   protected logger: LoggerService;
+  private eventEmitter: EventEmitter2;
+  private configService: ConfigService;
   private socketURL?: URL;
   private sessionDto?: OctoPrintSessionDto;
   private username?: string;
@@ -286,12 +285,12 @@ export class OctoPrintSockIoAdapter extends WebsocketAdapter {
   protected async afterClosed(event: any) {
     this.setSocketState("closed");
     delete this.socket;
-    await this.emitEvent(Message.WS_CLOSED);
+    await this.emitEvent(Message.WS_CLOSED, "connection closed");
   }
 
   protected async onError(error: any) {
     this.setSocketState("error");
-    await this.emitEvent(Message.WS_ERROR, error);
+    await this.emitEvent(Message.WS_ERROR, error?.length ? error : "connection error");
   }
 
   private async emitEvent(event: string, payload?: any) {
