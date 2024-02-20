@@ -11,18 +11,21 @@ import { FloorStore } from "@/state/floor.store";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { IFloorService } from "@/services/interfaces/floor.service.interface";
-import { MongoIdType } from "@/shared.constants";
+import { SqliteIdType } from "@/shared.constants";
+import { IPrinterGroupService } from "@/services/interfaces/printer-group.service.interface";
 
 export class YamlService {
+  printerGroupService: IPrinterGroupService<SqliteIdType>;
   floorStore: FloorStore;
-  floorService: IFloorService<MongoIdType>;
-  printerService: IPrinterService<MongoIdType>;
+  floorService: IFloorService;
+  printerService: IPrinterService;
   printerCache: PrinterCache;
   serverVersion: string;
   private logger: LoggerService;
   private readonly isTypeormMode: boolean;
 
   constructor({
+    printerGroupService,
     printerService,
     printerCache,
     floorStore,
@@ -31,14 +34,16 @@ export class YamlService {
     serverVersion,
     isTypeormMode,
   }: {
-    printerService: IPrinterService<MongoIdType>;
+    printerGroupService: IPrinterGroupService<SqliteIdType>;
+    printerService: IPrinterService;
     printerCache: PrinterCache;
     floorStore: FloorStore;
-    floorService: IFloorService<MongoIdType>;
+    floorService: IFloorService;
     loggerFactory: ILoggerFactory;
     serverVersion: string;
     isTypeormMode: boolean;
   }) {
+    this.printerGroupService = printerGroupService;
     this.floorStore = floorStore;
     this.printerService = printerService;
     this.printerCache = printerCache;
@@ -322,6 +327,7 @@ export class YamlService {
       exportFloors,
       exportPrinters,
       exportFloorGrid,
+      exportGroups,
       // dropPrinterIds, // optional idea for future
       // dropFloorIds, // optional idea for future
       // printerComparisonStrategiesByPriority, // not used for export
@@ -334,6 +340,9 @@ export class YamlService {
       exportedAt: new Date(),
       databaseType: this.isTypeormMode ? "sqlite" : "mongo",
       config: input,
+      printers: undefined as any,
+      floors: undefined as any,
+      groups: undefined as any,
     };
 
     if (exportPrinters) {
@@ -361,6 +370,7 @@ export class YamlService {
           id: f.id,
           floor: f.floor,
           name: f.name,
+          printers: undefined as any,
         };
 
         if (exportFloorGrid) {
@@ -375,6 +385,24 @@ export class YamlService {
         }
 
         return dumpedFloor;
+      });
+    }
+
+    if (exportGroups && this.isTypeormMode) {
+      const groups = await this.printerGroupService.listGroups();
+      dumpedObject.groups = groups.map((g) => {
+        const dumpedGroup = {
+          name: g.name,
+          id: g.id,
+          printers: g.printers.map((p) => {
+            return {
+              printerId: p.printerId,
+              groupId: p.groupId,
+            };
+          }),
+        };
+
+        return dumpedGroup;
       });
     }
 
