@@ -36,7 +36,7 @@ export class FloorService
 
     const printers = dto.printers;
     if (printers?.length) {
-      for (let printer of printers) {
+      for (const printer of printers) {
         await this.addOrUpdatePrinter(floor.id, printer);
       }
     }
@@ -97,7 +97,7 @@ export class FloorService
   }
 
   async addOrUpdatePrinter(floorId: SqliteIdType, positionDto: PositionDto<SqliteIdType>): Promise<Floor> {
-    const floor = await this.get(floorId);
+    await this.get(floorId);
 
     const position = await this.floorPositionService.findPrinterPosition(positionDto.printerId as SqliteIdType);
     if (position) {
@@ -118,7 +118,6 @@ export class FloorService
     });
 
     await this.floorPositionService.create(newPosition);
-
     return this.get(floorId);
   }
 
