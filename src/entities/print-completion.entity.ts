@@ -17,7 +17,7 @@ export class PrintCompletion extends BaseEntity {
   @Column()
   status!: string;
 
-  @ManyToOne(() => Printer, (p) => p.printCompletions, { onDelete: "SET NULL" })
+  @ManyToOne(() => Printer, (p) => p.printCompletions, { onDelete: "CASCADE" })
   @JoinColumn({ name: "printerId" })
   printer!: Relation<Printer>;
 
