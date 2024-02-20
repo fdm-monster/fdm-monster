@@ -9,7 +9,6 @@ import { readFileSync } from "node:fs";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { IFloorService } from "@/services/interfaces/floor.service.interface";
 import { PrinterGroupService } from "@/services/orm/printer-group.service";
-import * as console from "console";
 
 let container: AwilixContainer;
 let yamlService: YamlService;
@@ -123,10 +122,14 @@ describe(YamlService.name, () => {
     expect(floor.printers).toHaveLength(4);
     expect(floor.printers.find((p) => p.printerId.toString() === printer.id.toString())).toBeDefined();
 
-    const groups = await printerGroupService.listGroups();
-    const group = groups.find((g) => g.name === "Group A123_1.6.1");
-    expect(group).toBeDefined();
-    expect(group.printers).toHaveLength(2);
-    expect(groups.find((g) => g.name === "Group test_1.6.1").printers).toHaveLength(0);
+    if (isTypeormMode) {
+      const groups = await printerGroupService.listGroups();
+      const group = groups.find((g) => g.name === "Group A123_1.6.1");
+      expect(group).toBeDefined();
+      expect(group.printers).toHaveLength(2);
+      expect(groups.find((g) => g.name === "Group test_1.6.1").printers).toHaveLength(0);
+    } else {
+      expect(printerGroupService).toBeNull();
+    }
   });
 });

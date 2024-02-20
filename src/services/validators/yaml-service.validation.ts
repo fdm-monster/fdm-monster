@@ -5,6 +5,7 @@ export const exportPrintersFloorsYamlRules = {
   exportPrinters: "required|boolean",
   exportFloorGrid: "required|boolean",
   exportFloors: "required|boolean",
+  // TODO in V2 this should be required
   exportGroups: "boolean",
   // Used to determine import strategy
   printerComparisonStrategiesByPriority: "required|arrayUnique|minLength:1",
