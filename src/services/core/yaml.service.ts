@@ -412,6 +412,10 @@ export class YamlService {
       // notes, // passed on to config immediately
     } = input;
 
+    if (!this.isTypeormMode) {
+      input.exportGroups = false;
+    }
+
     const dumpedObject = {
       version: process.env.npm_package_version,
       exportedAt: new Date(),
@@ -467,7 +471,7 @@ export class YamlService {
     if (exportGroups && this.isTypeormMode) {
       const groups = await this.printerGroupService.listGroups();
       dumpedObject.groups = groups.map((g) => {
-        const dumpedGroup = {
+        return {
           name: g.name,
           id: g.id,
           printers: g.printers.map((p) => {
@@ -476,8 +480,6 @@ export class YamlService {
             };
           }),
         };
-
-        return dumpedGroup;
       });
     }
 
