@@ -1103,6 +1103,7 @@ __metadata:
     "@types/semver": "npm:7.5.7"
     "@types/supertest": "npm:6.0.2"
     "@types/uuid": "npm:9.0.8"
+    "@types/ws": "npm:8.5.10"
     adm-zip: "npm:0.5.10"
     awilix: "npm:10.0.1"
     awilix-express: "npm:9.0.1"
@@ -3189,6 +3190,15 @@ __metadata:
     "@types/node": "npm:*"
     "@types/webidl-conversions": "npm:*"
   checksum: 10c0/7e5b6837daff8c6d189b13d19cc6d69e3bf954751f4f8a92d9a762c7f32ba75464d8e686a69c7d70e5092499c8ac14933c0ed416cf563689b04c4e10bff95e40
+  languageName: node
+  linkType: hard
+
+"@types/ws@npm:8.5.10":
+  version: 8.5.10
+  resolution: "@types/ws@npm:8.5.10"
+  dependencies:
+    "@types/node": "npm:*"
+  checksum: 10c0/e9af279b984c4a04ab53295a40aa95c3e9685f04888df5c6920860d1dd073fcc57c7bd33578a04b285b2c655a0b52258d34bee0a20569dca8defb8393e1e5d29
   languageName: node
   linkType: hard
 
