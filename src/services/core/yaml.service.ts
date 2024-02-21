@@ -11,19 +11,21 @@ import { FloorStore } from "@/state/floor.store";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { IFloorService } from "@/services/interfaces/floor.service.interface";
-import { MongoIdType } from "@/shared.constants";
-import { FloorPositionService } from "@/services/orm/floor-position.service";
+import { SqliteIdType } from "@/shared.constants";
+import { IPrinterGroupService } from "@/services/interfaces/printer-group.service.interface";
 
 export class YamlService {
+  printerGroupService: IPrinterGroupService<SqliteIdType>;
   floorStore: FloorStore;
-  floorService: IFloorService<MongoIdType>;
-  printerService: IPrinterService<MongoIdType>;
+  floorService: IFloorService;
+  printerService: IPrinterService;
   printerCache: PrinterCache;
   serverVersion: string;
   private logger: LoggerService;
   private readonly isTypeormMode: boolean;
 
   constructor({
+    printerGroupService,
     printerService,
     printerCache,
     floorStore,
@@ -32,14 +34,16 @@ export class YamlService {
     serverVersion,
     isTypeormMode,
   }: {
-    printerService: IPrinterService<MongoIdType>;
+    printerGroupService: IPrinterGroupService<SqliteIdType>;
+    printerService: IPrinterService;
     printerCache: PrinterCache;
     floorStore: FloorStore;
-    floorService: IFloorService<MongoIdType>;
+    floorService: IFloorService;
     loggerFactory: ILoggerFactory;
     serverVersion: string;
     isTypeormMode: boolean;
   }) {
+    this.printerGroupService = printerGroupService;
     this.floorStore = floorStore;
     this.printerService = printerService;
     this.printerCache = printerCache;
@@ -51,7 +55,8 @@ export class YamlService {
 
   async importPrintersAndFloors(yamlBuffer: string) {
     const importSpec = await load(yamlBuffer);
-    const { exportPrinters, exportFloorGrid, exportFloors } = importSpec?.config;
+    const databaseTypeSqlite = importSpec.databaseType === "sqlite";
+    const { exportPrinters, exportFloorGrid, exportFloors, exportGroups } = importSpec?.config;
 
     for (const printer of importSpec.printers) {
       // old export bug
@@ -64,31 +69,36 @@ export class YamlService {
         printer.name = printer.settingsAppearance?.name;
         delete printer.settingsAppearance?.name;
       }
-
-      if (this.isTypeormMode && typeof printer.id === "string") {
-        delete printer.id;
-      } else if (!this.isTypeormMode && typeof printer.id === "number") {
-        delete printer.id;
+      // Ensure the type matches the database it came from (1.6.0+)
+      if (databaseTypeSqlite && typeof printer.id === "string") {
+        printer.id = parseInt(printer.id);
       }
     }
 
-    for (const floor of importSpec.floors) {
-      if (this.isTypeormMode && typeof floor.id === "string") {
-        delete floor.id;
-      } else if (!this.isTypeormMode && typeof floor.id === "number") {
-        delete floor.id;
+    if (databaseTypeSqlite) {
+      // Ensure the type matches the database it came from (1.6.0+)
+      for (const floor of importSpec.floors) {
+        if (typeof floor.id === "string") {
+          floor.id = parseInt(floor.id);
+        }
+        // Ensure the type matches the database it came from (1.6.0+)
+        for (const printer of floor.printers) {
+          if (typeof printer.printerId === "string") {
+            printer.printerId = parseInt(printer.printerId);
+          }
+        }
       }
     }
 
     const importData = await validateInput(
       importSpec,
-      importPrintersFloorsYamlRules(exportPrinters, exportFloorGrid, exportFloors, this.isTypeormMode)
+      importPrintersFloorsYamlRules(exportPrinters, exportFloorGrid, exportFloors, exportGroups, this.isTypeormMode)
     );
 
     // Nested validation is manual (for now)
     if (!!exportFloorGrid) {
-      for (let floor of importData.floors) {
-        await validateInput(floor, importPrinterPositionsRules);
+      for (const floor of importData.floors) {
+        await validateInput(floor, importPrinterPositionsRules(this.isTypeormMode));
       }
     }
 
@@ -104,16 +114,26 @@ export class YamlService {
       importData.config.floorComparisonStrategiesByPriority
     );
 
+    this.logger.log("Analysing groups for import");
+    const { updateByNameGroups, insertGroups } = await this.analyseUpsertGroups(importData.groups);
+
     this.logger.log(`Performing pure insert printers (${insertPrinters.length} printers)`);
     const printerIdMap = {};
     for (const newPrinter of insertPrinters) {
-      const state = await this.printerService.create(newPrinter);
+      const state = await this.printerService.create({ ...newPrinter });
+      if (!newPrinter.id) {
+        throw new Error(`Saved ID was empty ${JSON.stringify(newPrinter)}`);
+      }
       printerIdMap[newPrinter.id] = state.id;
     }
+
     this.logger.log(`Performing update import printers (${updateByPropertyPrinters.length} printers)`);
     for (const updatePrinterSpec of updateByPropertyPrinters) {
       const updateId = updatePrinterSpec.printerId;
       const state = await this.printerService.update(updateId, updatePrinterSpec.value);
+      if (!updatePrinterSpec.printerId) {
+        throw new Error("Saved ID was empty");
+      }
       printerIdMap[updatePrinterSpec.printerId] = state.id;
     }
 
@@ -121,20 +141,22 @@ export class YamlService {
     const floorIdMap = {};
     for (const newFloor of insertFloors) {
       // Replace printerIds with newly mapped IDs
-      const knownPrinters = [];
+      const knownPrinterPositions = [];
       if (exportFloorGrid && exportPrinters) {
         for (const floorPosition of newFloor.printers) {
           const knownPrinterId = printerIdMap[floorPosition.printerId];
           // If the ID was not mapped, this position is considered discarded
-          if (!knownPrinterId) continue;
+          if (!knownPrinterId) {
+            continue;
+          }
 
           floorPosition.printerId = knownPrinterId;
-          knownPrinters.push(floorPosition);
+          knownPrinterPositions.push(floorPosition);
         }
-        newFloor.printers = knownPrinters;
+        newFloor.printers = knownPrinterPositions;
       }
 
-      const state = await this.floorStore.create(newFloor, false);
+      const state = await this.floorStore.create({ ...newFloor });
       floorIdMap[newFloor.id] = state.id;
     }
 
@@ -149,7 +171,9 @@ export class YamlService {
           // TODO check this works from MongoDB to SQLite
           const knownPrinterId = printerIdMap[floorPosition.printerId];
           // If the ID was not mapped, this position is considered discarded
-          if (!knownPrinterId) continue;
+          if (!knownPrinterId) {
+            continue;
+          }
 
           floorPosition.printerId = knownPrinterId;
           knownPrinters.push(floorPosition);
@@ -163,6 +187,35 @@ export class YamlService {
 
     await this.floorStore.loadStore();
 
+    this.logger.log(`Performing pure create groups (${insertGroups.length} groups)`);
+    for (const group of insertGroups) {
+      const createdGroup = await this.printerGroupService.createGroup({
+        name: group.name,
+      });
+      for (const printer of group.printers) {
+        const knownPrinterId = printerIdMap[printer.printerId];
+        // If the ID was not mapped, this position is considered discarded
+        if (!knownPrinterId) continue;
+        await this.printerGroupService.addPrinterToGroup(createdGroup.id, knownPrinterId);
+      }
+    }
+
+    this.logger.log(`Performing update of group positions (${updateByNameGroups.length} groups)`);
+    for (const updateGroupSpec of updateByNameGroups) {
+      const existingGroup = await this.printerGroupService.getGroupWithPrinters(updateGroupSpec.groupId);
+      const existingPrinterIds = existingGroup.printers.map((p) => p.printerId);
+      const wantedTargetPrinterIds = (updateGroupSpec.value.printers as { printerId: number }[])
+        .filter((p) => !!printerIdMap[p.printerId])
+        .map((p) => printerIdMap[p.printerId]);
+
+      for (const unwantedId of existingPrinterIds.filter((eid) => !wantedTargetPrinterIds.includes(eid))) {
+        await this.printerGroupService.removePrinterFromGroup(existingGroup.id, unwantedId);
+      }
+      for (const nonExistingNewId of wantedTargetPrinterIds.filter((eid) => !existingPrinterIds.includes(eid))) {
+        await this.printerGroupService.addPrinterToGroup(existingGroup.id, nonExistingNewId);
+      }
+    }
+
     return {
       updateByPropertyPrinters,
       updateByPropertyFloors,
@@ -173,7 +226,7 @@ export class YamlService {
     };
   }
 
-  async analysePrintersUpsert(upsertPrinters, comparisonStrategies) {
+  async analysePrintersUpsert(upsertPrinters, comparisonStrategies: string[]) {
     const existingPrinters = await this.printerService.list();
 
     const names = existingPrinters.map((p) => p.name.toLowerCase());
@@ -188,6 +241,9 @@ export class YamlService {
           const comparedName = printer.name.toLowerCase();
           const foundIndex = names.findIndex((n) => n === comparedName);
           if (foundIndex !== -1) {
+            if (!ids[foundIndex]) {
+              throw new Error("Update ID is undefined");
+            }
             updateByPropertyPrinters.push({
               strategy: "name",
               printerId: ids[foundIndex],
@@ -199,6 +255,9 @@ export class YamlService {
           const comparedName = printer.printerURL.toLowerCase();
           const foundIndex = urls.findIndex((n) => n === comparedName);
           if (foundIndex !== -1) {
+            if (!ids[foundIndex]) {
+              throw new Error("Update ID is undefined");
+            }
             updateByPropertyPrinters.push({
               strategy: "url",
               printerId: ids[foundIndex],
@@ -210,6 +269,9 @@ export class YamlService {
           const comparedName = printer.id.toLowerCase();
           const foundIndex = ids.findIndex((n) => n === comparedName);
           if (foundIndex !== -1) {
+            if (!ids[foundIndex]) {
+              throw new Error("Update ID is undefined");
+            }
             updateByPropertyPrinters.push({
               strategy: "id",
               printerId: ids[foundIndex],
@@ -218,6 +280,9 @@ export class YamlService {
             break;
           }
         } else if (strategy === "new") {
+          if (!printer.id) {
+            throw new Error(JSON.stringify(printer));
+          }
           insertPrinters.push(printer);
           break;
         }
@@ -230,7 +295,7 @@ export class YamlService {
     };
   }
 
-  async analyseFloorsUpsert(upsertFloors, comparisonStrategy) {
+  async analyseFloorsUpsert(upsertFloors, comparisonStrategy: string) {
     const existingFloors = await this.floorService.list();
     const names = existingFloors.map((p) => p.name.toLowerCase());
     const floorLevels = existingFloors.map((p) => p.floor);
@@ -244,6 +309,9 @@ export class YamlService {
           const comparedProperty = floor.name.toLowerCase();
           const foundIndex = names.findIndex((n) => n === comparedProperty);
           if (foundIndex !== -1) {
+            if (!ids[foundIndex]) {
+              throw new Error("IDS not found, floor name");
+            }
             updateByPropertyFloors.push({
               strategy: "name",
               floorId: ids[foundIndex],
@@ -255,6 +323,9 @@ export class YamlService {
           const comparedProperty = floor.floor;
           const foundIndex = floorLevels.findIndex((n) => n === comparedProperty);
           if (foundIndex !== -1) {
+            if (!ids[foundIndex]) {
+              throw new Error("IDS not found, floor level");
+            }
             updateByPropertyFloors.push({
               strategy: "floor",
               floorId: ids[foundIndex],
@@ -266,6 +337,9 @@ export class YamlService {
           const comparedProperty = floor.id.toLowerCase();
           const foundIndex = ids.findIndex((n) => n === comparedProperty);
           if (foundIndex !== -1) {
+            if (!ids[foundIndex]) {
+              throw new Error("IDS not found, floor id");
+            }
             updateByPropertyFloors.push({
               strategy: "id",
               floorId: ids[foundIndex],
@@ -286,12 +360,51 @@ export class YamlService {
     };
   }
 
+  async analyseUpsertGroups(upsertGroups: any[]) {
+    if (!this.isTypeormMode || !upsertGroups?.length) {
+      return {
+        updateByNameGroups: [],
+        insertGroups: [],
+      };
+    }
+
+    const existingGroups = await this.printerGroupService.listGroups();
+    const names = existingGroups.map((p) => p.name.toLowerCase());
+    const ids = existingGroups.map((p) => p.id.toString());
+
+    const insertGroups = [];
+    const updateByNameGroups = [];
+    for (const group of upsertGroups) {
+      const comparedProperty = group.name.toLowerCase();
+      const foundIndex = names.findIndex((n) => n === comparedProperty);
+      if (foundIndex !== -1) {
+        if (!ids[foundIndex]) {
+          throw new Error("IDS not found, group name");
+        }
+        updateByNameGroups.push({
+          strategy: "name",
+          groupId: parseInt(ids[foundIndex]),
+          value: group,
+        });
+        break;
+      } else {
+        insertGroups.push(group);
+      }
+    }
+
+    return {
+      insertGroups,
+      updateByNameGroups,
+    };
+  }
+
   async exportPrintersAndFloors(options) {
     const input = await validateInput(options, exportPrintersFloorsYamlRules);
     const {
       exportFloors,
       exportPrinters,
       exportFloorGrid,
+      exportGroups,
       // dropPrinterIds, // optional idea for future
       // dropFloorIds, // optional idea for future
       // printerComparisonStrategiesByPriority, // not used for export
@@ -299,11 +412,18 @@ export class YamlService {
       // notes, // passed on to config immediately
     } = input;
 
+    if (!this.isTypeormMode) {
+      input.exportGroups = false;
+    }
+
     const dumpedObject = {
       version: process.env.npm_package_version,
       exportedAt: new Date(),
       databaseType: this.isTypeormMode ? "sqlite" : "mongo",
       config: input,
+      printers: undefined as any,
+      floors: undefined as any,
+      groups: undefined as any,
     };
 
     if (exportPrinters) {
@@ -313,7 +433,6 @@ export class YamlService {
         const { apiKey } = this.printerCache.getLoginDto(printerId);
         return {
           id: printerId,
-          stepSize: p.stepSize,
           disabledReason: p.disabledReason,
           enabled: p.enabled,
           dateAdded: p.dateAdded,
@@ -331,11 +450,12 @@ export class YamlService {
           id: f.id,
           floor: f.floor,
           name: f.name,
+          printers: undefined as any,
         };
 
         if (exportFloorGrid) {
           dumpedFloor.printers = f.printers.map((p) => {
-            const fPrinterId = p.printerId.toString();
+            const fPrinterId = p.printerId;
             return {
               printerId: fPrinterId,
               x: p.x,
@@ -345,6 +465,21 @@ export class YamlService {
         }
 
         return dumpedFloor;
+      });
+    }
+
+    if (exportGroups && this.isTypeormMode) {
+      const groups = await this.printerGroupService.listGroups();
+      dumpedObject.groups = groups.map((g) => {
+        return {
+          name: g.name,
+          id: g.id,
+          printers: g.printers.map((p) => {
+            return {
+              printerId: p.printerId,
+            };
+          }),
+        };
       });
     }
 

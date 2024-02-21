@@ -1,4 +1,4 @@
-import { isTestEnvironment } from "../../utils/env.utils";
+import { isTestEnvironment } from "@/utils/env.utils";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
 import { LoggerService } from "@/handlers/logger";

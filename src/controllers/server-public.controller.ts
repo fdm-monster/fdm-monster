@@ -115,6 +115,10 @@ export class ServerPublicController {
         version: 1,
         subFeatures: {},
       },
+      printerControlApi: {
+        available: true,
+        version: 1,
+      },
     });
   }
 

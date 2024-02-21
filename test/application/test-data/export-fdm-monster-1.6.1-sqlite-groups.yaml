@@ -1,0 +1,67 @@
+version: 1.6.1
+exportedAt: 2024-02-20T19:27:47.377Z
+databaseType: sqlite
+config:
+  printerComparisonStrategiesByPriority:
+    - name
+    - url
+  exportPrinters: true
+  exportFloorGrid: true
+  exportFloors: true
+  exportGroups: true
+  floorComparisonStrategiesByPriority: floor
+printers:
+  - id: 1
+    disabledReason: null
+    enabled: false
+    dateAdded: 1706858310659
+    name: Mute Helen
+    printerURL: http://localhost
+    apiKey: asd123asd123asd123asd123asd12312
+  - id: 2
+    disabledReason: null
+    enabled: false
+    dateAdded: 1706858369426
+    name: Alert Half 81
+    printerURL: http://localhost:81
+    apiKey: asd123asd123asd123asd123asd12312
+  - id: 3
+    disabledReason: null
+    enabled: false
+    dateAdded: 1706859345118
+    name: Outdoor Fedelini
+    printerURL: http://localhost:83
+    apiKey: asd123asd123asd123asd123asd12312
+  - id: 4
+    disabledReason: null
+    enabled: true
+    dateAdded: 1707850846065
+    name: Minipi Local1_6_1
+    printerURL: http://minipi.local
+    apiKey: asd123asd123asd123asd123asd12312
+floors:
+  - id: 1
+    floor: 0
+    name: Default Floor1_6_1
+    printers:
+      - printerId: 1
+        x: 1
+        'y': 0
+      - printerId: 2
+        x: 2
+        'y': 0
+      - printerId: 4
+        x: 2
+        'y': 1
+      - printerId: 3
+        x: 3
+        'y': 0
+groups:
+  - name: Group A123_1.6.1
+    id: 11
+    printers:
+      - printerId: 1
+      - printerId: 2
+  - name: Group test_1.6.1
+    id: 12
+    printers: []

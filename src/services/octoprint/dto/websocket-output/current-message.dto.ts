@@ -1,3 +1,8 @@
+export interface ToolTemp {
+  actual: number;
+  target: number;
+}
+
 export interface CurrentStateDto {
   error?: string;
   text?: string;
@@ -51,18 +56,10 @@ export interface CurrentMessageDto {
   serverTime?: number;
   temps?: {
     time?: number;
-    tool0?: {
-      actual?: number;
-      target?: number;
-    };
-    bed?: {
-      actual?: number;
-      target?: number;
-    };
-    chamber?: {
-      actual?: null;
-      target?: null;
-    };
+    tool0?: ToolTemp;
+    tool1?: ToolTemp;
+    bed?: ToolTemp;
+    chamber?: ToolTemp;
   }[];
   logs?: string[];
   messages?: string[];

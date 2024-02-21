@@ -16,7 +16,6 @@ import { AppConstants } from "@/server.constants";
 import { printerResolveMiddleware } from "@/middleware/printer";
 import { generateCorrelationToken } from "@/utils/correlation-token.util";
 import { ROLES } from "@/constants/authorization.constants";
-import { Floor } from "@/models";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { TestPrinterSocketStore } from "@/state/test-printer-socket.store";
 import { PrinterCache } from "@/state/printer.cache";
@@ -88,15 +87,6 @@ export class PrinterController {
     res.send(printers);
   }
 
-  async listPrinterFloors(req: Request, res: Response) {
-    const { currentPrinterId } = getScopedPrinter(req);
-    // TODO move to service?
-    const results = await Floor.find({
-      "printers.printerId": currentPrinterId,
-    });
-    res.send(results);
-  }
-
   async getPrinter(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
     const foundPrinter = await this.printerCache.getCachedPrinterOrThrowAsync(currentPrinterId);
@@ -138,6 +128,20 @@ export class PrinterController {
 
     const command = this.octoPrintApiService.disconnectCommand;
     await this.octoPrintApiService.sendConnectionCommand(printerLogin, command);
+    res.send({});
+  }
+
+  async sendPrintHeadJogCommand(req: Request, res: Response) {
+    const { printerLogin } = getScopedPrinter(req);
+
+    await this.octoPrintApiService.sendPrintHeadJogCommand(printerLogin, req.body);
+    res.send({});
+  }
+
+  async sendPrintHeadHomeCommand(req: Request, res: Response) {
+    const { printerLogin } = getScopedPrinter(req);
+
+    await this.octoPrintApiService.sendPrintHeadHomeCommand(printerLogin, req.body);
     res.send({});
   }
 
@@ -355,6 +359,8 @@ export default createController(PrinterController)
   .get("/:id/login-details", "getPrinterLoginDetails")
   .post("/:id/serial-connect", "sendSerialConnectCommand")
   .post("/:id/serial-disconnect", "sendSerialDisconnectCommand")
+  .post("/:id/jog", "sendPrintHeadJogCommand")
+  .post("/:id/home", "sendPrintHeadHomeCommand")
   .post("/:id/job/stop", "stopPrintJob")
   .post("/:id/job/pause", "pausePrintJob")
   .post("/:id/job/resume", "resumePrintJob")
@@ -364,7 +370,6 @@ export default createController(PrinterController)
   .patch("/:id/flow-rate", "setFlowRate")
   .patch("/:id/feed-rate", "setFeedRate")
   .patch("/:id/disabled-reason", "updatePrinterDisabledReason")
-  .get("/:id/list-printer-floors", "listPrinterFloors")
   .get("/:id/plugin-list", "getPrinterPluginList")
   .get("/:id/octoprint/system/", "octoPrintListCommands")
   .post("/:id/octoprint/system/restart", "octoPrintSystemRestart")

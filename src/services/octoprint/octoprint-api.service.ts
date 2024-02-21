@@ -18,6 +18,8 @@ import { errorSummary } from "@/utils/error.utils";
 import { CurrentStateDto } from "@/services/octoprint/dto/websocket-output/current-message.dto";
 import { ConnectionDto } from "@/services/octoprint/dto/connection.dto";
 
+type TAxes = "x" | "y" | "z";
+
 export class OctoPrintApiService extends OctoPrintRoutes {
   eventEmitter2: EventEmitter2;
   protected axiosClient: AxiosStatic;
@@ -46,8 +48,40 @@ export class OctoPrintApiService extends OctoPrintRoutes {
     return response?.data;
   }
 
-  async sendConnectionCommand(login: LoginDto, commandData) {
+  async sendConnectionCommand(login: LoginDto, commandData: any) {
     const { url, options, data } = this.prepareJsonRequest(login, this.apiConnection, commandData);
+    const response = await this.axiosClient.post(url, data, options);
+    return response?.data;
+  }
+
+  async sendPrintHeadJogCommand(login: LoginDto, amounts: { x?: number; y?: number; z?: number }) {
+    const axesToHome: Record<TAxes, number> = {
+      x: amounts.x ?? 0,
+      y: amounts.y ?? 0,
+      z: amounts.z ?? 0,
+    };
+    const commandData = {
+      command: "jog",
+      ...axesToHome,
+    };
+
+    return this.sendPrintHeadCommand(login, commandData);
+  }
+
+  async sendPrintHeadHomeCommand(login: LoginDto, axes: { x?: boolean; y?: boolean; z?: boolean }) {
+    const axesToHome: string[] = [...(axes.x ? ["x"] : []), ...(axes.y ? ["y"] : []), ...(axes.z ? ["z"] : [])];
+    const commandData = {
+      command: "home",
+      axes: axesToHome,
+    };
+    return this.sendPrintHeadCommand(login, commandData);
+  }
+
+  /**
+   * Ability to jog, home or set feedrate
+   */
+  async sendPrintHeadCommand(login: LoginDto, commandData: any) {
+    const { url, options, data } = this.prepareJsonRequest(login, this.apiPrinterHead, commandData);
     const response = await this.axiosClient.post(url, data, options);
     return response?.data;
   }
@@ -269,6 +303,7 @@ export class OctoPrintApiService extends OctoPrintRoutes {
     const response = await this.axiosClient.get(url, options);
     return response?.data as { state?: CurrentStateDto };
   }
+
   async getConnection(login: LoginDto) {
     const { url, options } = this.prepareRequest(login, this.apiConnection);
     const response = await this.axiosClient.get(url, options);

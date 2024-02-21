@@ -94,13 +94,15 @@ export class PrinterSocketStore {
    */
   reconnectOctoPrint(id: IdType) {
     const socket = this.getPrinterSocket(id);
+    if (!socket) return;
+
     socket.close();
 
     // The reconnect task will pick up this state and reconnect
     socket.resetSocketState();
   }
 
-  getPrinterSocket(id: IdType): OctoPrintSockIoAdapter {
+  getPrinterSocket(id: IdType): OctoPrintSockIoAdapter | undefined {
     return this.printerSocketAdaptersById[id];
   }
 
@@ -183,31 +185,6 @@ export class PrinterSocketStore {
     };
   }
 
-  private handleBatchPrinterCreated({ printers }) {
-    for (const p of printers) {
-      this.handlePrinterCreated({ printer: p });
-    }
-  }
-
-  /**
-   * @private
-   * @param { printer: Printer } printer
-   * @returns void
-   */
-  private handlePrinterCreated({ printer }) {
-    this.createOrUpdateSocket(printer);
-  }
-
-  /**
-   * @private
-   * @param { printer: Printer } printer
-   * @returns void
-   */
-  private handlePrinterUpdated({ printer }) {
-    this.logger.log(`Printer '${printer.id}' updated. Updating socket.`);
-    this.createOrUpdateSocket(printer);
-  }
-
   /**
    * @param { printer: Printer } printer
    * @returns void
@@ -242,6 +219,29 @@ export class PrinterSocketStore {
       protocol: "ws",
     });
     foundAdapter.resetSocketState();
+  }
+
+  private handleBatchPrinterCreated({ printers }) {
+    for (const p of printers) {
+      this.handlePrinterCreated({ printer: p });
+    }
+  }
+
+  /**
+   * @param { printer: Printer } printer
+   * @returns void
+   */
+  private handlePrinterCreated({ printer }) {
+    this.createOrUpdateSocket(printer);
+  }
+
+  /**
+   * @param { printer: Printer } printer
+   * @returns void
+   */
+  private handlePrinterUpdated({ printer }) {
+    this.logger.log(`Printer '${printer.id}' updated. Updating socket.`);
+    this.createOrUpdateSocket(printer);
   }
 
   private handlePrintersDeleted({ printerIds }) {

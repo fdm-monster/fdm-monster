@@ -7,6 +7,10 @@ import { IPrinterService } from "@/services/interfaces/printer.service.interface
 import { IdType } from "@/shared.constants";
 import { CreateOrUpdatePrinterFileDto } from "./interfaces/printer-file.dto";
 import { ConnectionState } from "@/services/octoprint/dto/connection.dto";
+import { captureException } from "@sentry/node";
+import { errorSummary } from "@/utils/error.utils";
+import { LoggerService } from "@/handlers/logger";
+import { ILoggerFactory } from "@/handlers/logger-factory";
 
 enum ReprintState {
   PrinterNotAvailable = 0,
@@ -38,6 +42,7 @@ export class BatchCallService {
   printerEventsCache: PrinterEventsCache;
   printerFilesStore: PrinterFilesStore;
   printerService: IPrinterService;
+  logger: LoggerService;
 
   constructor({
     octoPrintApiService,
@@ -46,6 +51,7 @@ export class BatchCallService {
     printerSocketStore,
     printerFilesStore,
     printerService,
+    loggerFactory,
   }: {
     octoPrintApiService: OctoPrintApiService;
     printerCache: PrinterCache;
@@ -53,6 +59,7 @@ export class BatchCallService {
     printerSocketStore: PrinterSocketStore;
     printerFilesStore: PrinterFilesStore;
     printerService: IPrinterService;
+    loggerFactory: ILoggerFactory;
   }) {
     this.octoPrintApiService = octoPrintApiService;
     this.printerCache = printerCache;
@@ -60,6 +67,7 @@ export class BatchCallService {
     this.printerSocketStore = printerSocketStore;
     this.printerFilesStore = printerFilesStore;
     this.printerService = printerService;
+    this.logger = loggerFactory(BatchCallService.name);
   }
 
   async batchTogglePrintersEnabled(
@@ -114,7 +122,12 @@ export class BatchCallService {
 
   batchConnectSocket(printerIds: string[]): void {
     for (const printerId of printerIds) {
-      this.printerSocketStore.reconnectOctoPrint(printerId);
+      try {
+        this.printerSocketStore.reconnectOctoPrint(printerId);
+      } catch (e) {
+        captureException(e);
+        this.logger.error(`Error setting socket to reconnect ${errorSummary(e)}`);
+      }
     }
   }
 

@@ -57,7 +57,8 @@
         "bug",
         "financial",
         "ideas",
-        "userTesting"
+        "userTesting",
+        "platform"
       ]
     },
     {
@@ -115,6 +116,15 @@
       "profile": "https://github.com/doucettom",
       "contributions": [
         "bug",
+        "ideas"
+      ]
+    },
+    {
+      "login": "ZombiesLoveMe",
+      "name": "Callum",
+      "avatar_url": "https://avatars.githubusercontent.com/u/35661391?v=4",
+      "profile": "https://github.com/ZombiesLoveMe",
+      "contributions": [
         "ideas"
       ]
     }

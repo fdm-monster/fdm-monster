@@ -41,7 +41,7 @@ printers:
 floors:
   - id: 64427f2d070a27047acd5e6e
     floor: 2
-    name: Default Floorrr
+    name: Default Floor1_5_2
     printers:
       - floorId: 64427f2d070a27047acd5e6e
         printerId: 648f3e6d372112628bb8e404

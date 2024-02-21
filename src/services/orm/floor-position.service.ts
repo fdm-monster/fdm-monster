@@ -19,7 +19,7 @@ export class FloorPositionService extends BaseService(FloorPosition, PositionDto
   }
 
   findPrinterPosition(printerId: SqliteIdType) {
-    return this.repository.findOneBy({ id: printerId });
+    return this.repository.findOneBy({ printerId });
   }
 
   deletePrinterPositionsByPrinterId(printerId: SqliteIdType) {

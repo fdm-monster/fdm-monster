@@ -15,6 +15,7 @@ export class OctoPrintRoutes {
   apiConnection = `${this.apiBase}/connection`;
   apiJob = `${this.apiBase}/job`;
   apiPrinter = `${this.apiBase}/printer`;
+  apiPrinterHead = `${this.apiBase}/printer/printhead`;
   apiPrinterBed = `${this.apiPrinter}/bed`;
   apiPrinterCustomCommand = `${this.apiPrinter}/command`;
   apiPrinterProfiles = `${this.apiBase}/printerprofiles`;

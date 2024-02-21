@@ -6,24 +6,32 @@ import { AppConstants } from "@/server.constants";
 import { SocketIoGateway } from "@/state/socket-io.gateway";
 import { SocketFactory } from "@/services/octoprint/socket.factory";
 import EventEmitter2 from "eventemitter2";
+import { LoggerService } from "@/handlers/logger";
+import { ILoggerFactory } from "@/handlers/logger-factory";
+import { errorSummary } from "@/utils/error.utils";
+import { captureException } from "@sentry/node";
 
 export class TestPrinterSocketStore {
   testSocket: OctoPrintSockIoAdapter;
   socketIoGateway: SocketIoGateway;
   socketFactory: SocketFactory;
   eventEmitter2: EventEmitter2;
+  logger: LoggerService;
   constructor({
     socketFactory,
     socketIoGateway,
     eventEmitter2,
+    loggerFactory,
   }: {
     socketFactory: SocketFactory;
     socketIoGateway: SocketIoGateway;
     eventEmitter2: EventEmitter2;
+    loggerFactory: ILoggerFactory;
   }) {
     this.socketFactory = socketFactory;
     this.socketIoGateway = socketIoGateway;
     this.eventEmitter2 = eventEmitter2;
+    this.logger = loggerFactory(TestPrinterSocketStore.name);
   }
 
   /**
@@ -74,26 +82,42 @@ export class TestPrinterSocketStore {
     testEvents.forEach((te) => {
       this.eventEmitter2.on(te, listener);
     });
-    await this.testSocket.setupSocketSession();
 
-    const promise = new Promise(async (resolve, reject) => {
-      this.testSocket.open();
-      for await (const startTime of setInterval(100)) {
-        if (!this.testSocket) {
-          return;
+    try {
+      this.logger.log("Test API calls for authentication and session");
+      await this.testSocket.setupSocketSession();
+
+      this.logger.log("Test socket connection started");
+      const promise = new Promise(async (resolve, reject) => {
+        this.testSocket.open();
+        for await (const startTime of setInterval(100)) {
+          if (!this.testSocket) {
+            this.logger.warn("Test without socket, rejecting");
+            reject();
+            return;
+          }
+          if (this.testSocket.socketState === SOCKET_STATE.authenticated) {
+            this.logger.log("Test completed successfully, resolving");
+            resolve(true);
+            break;
+          }
         }
-        if (this.testSocket.socketState === SOCKET_STATE.authenticated) {
-          resolve();
-          break;
-        }
+      });
+
+      await Promise.race([promise, setTimeout(AppConstants.defaultWebsocketHandshakeTimeout)]);
+
+      this.logger.log("Test finalized");
+    } catch (e) {
+      this.logger.error(`Test harness error ${errorSummary(e)}`);
+      captureException(e);
+    } finally {
+      if (this.testSocket) {
+        this.testSocket.close();
       }
-    });
-
-    await Promise.race([promise, setTimeout(AppConstants.defaultWebsocketHandshakeTimeout)]);
-    this.testSocket.close();
-    delete this.testSocket;
-    testEvents.forEach((te) => {
-      this.eventEmitter2.off(te, listener);
-    });
+      delete this.testSocket;
+      testEvents.forEach((te) => {
+        this.eventEmitter2.off(te, listener);
+      });
+    }
   }
 }
