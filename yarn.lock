@@ -1129,7 +1129,7 @@ __metadata:
     eslint-plugin-promise: "npm:6.1.1"
     eventemitter2: "npm:6.4.9"
     express: "npm:4.18.3"
-    express-list-routes: "npm:1.1.9"
+    express-list-routes: "npm:1.2.1"
     form-data: "npm:4.0.0"
     helmet: "npm:7.1.0"
     ip: "npm:2.0.1"
@@ -5397,10 +5397,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"express-list-routes@npm:1.1.9":
-  version: 1.1.9
-  resolution: "express-list-routes@npm:1.1.9"
-  checksum: 10c0/81b23dcc74089ba682a2abe3272ea99fcee509c99001fe063ba0ea274b63bc1c7c8a5f25c0df25d1392a90d4fd6047c83be3885a7de1fb217061585e8a0493d4
+"express-list-routes@npm:1.2.1":
+  version: 1.2.1
+  resolution: "express-list-routes@npm:1.2.1"
+  checksum: 10c0/64283f460e32d71d95aea1af60f598dbfad96b45b067f43d5844794c1e6c2d68d83d5af450f4214aec1e5ed77e75d294079ce34002d2ef049c8208191f9895f3
   languageName: node
   linkType: hard
 
