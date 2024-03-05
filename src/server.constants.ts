@@ -88,7 +88,7 @@ export const AppConstants = {
   enableMqttAutoDiscoveryDefault: "false",
   mqttUrlToken: "MQTT_HOST",
   mqttPortToken: "MQTT_PORT",
-  mqttPortDefault: 1883,
+  mqttPortDefault: "1883",
   mqttUsernameToken: "MQTT_USERNAME",
   mqttPasswordToken: "MQTT_PASSWORD",
 
