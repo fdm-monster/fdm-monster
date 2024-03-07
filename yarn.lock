@@ -1579,11 +1579,11 @@ __metadata:
   linkType: hard
 
 "@mongodb-js/saslprep@npm:^1.1.0":
-  version: 1.1.4
-  resolution: "@mongodb-js/saslprep@npm:1.1.4"
+  version: 1.1.5
+  resolution: "@mongodb-js/saslprep@npm:1.1.5"
   dependencies:
     sparse-bitfield: "npm:^3.0.3"
-  checksum: 10c0/652ff946e453d509f11da29274c1a1cbb73a15c0693bc5057ee42d84c41d9d06bf0c6e37cd879cfe33cbf8c62792c701d9827bcc76b75c8369e5e93325c3821a
+  checksum: 10c0/482ae24d1d8e27dc5f2cdbc2dd9f75c32329c0e4804d93725c894b327322731051832abfa73e36399d7fcef50f2c6364077889d0c8b5ed8353e3364ea0b2a323
   languageName: node
   linkType: hard
 
@@ -2046,16 +2046,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@smithy/credential-provider-imds@npm:^2.2.3, @smithy/credential-provider-imds@npm:^2.2.4":
-  version: 2.2.4
-  resolution: "@smithy/credential-provider-imds@npm:2.2.4"
+"@smithy/credential-provider-imds@npm:^2.2.3, @smithy/credential-provider-imds@npm:^2.2.5":
+  version: 2.2.5
+  resolution: "@smithy/credential-provider-imds@npm:2.2.5"
   dependencies:
     "@smithy/node-config-provider": "npm:^2.2.4"
     "@smithy/property-provider": "npm:^2.1.3"
     "@smithy/types": "npm:^2.10.1"
     "@smithy/url-parser": "npm:^2.1.3"
     tslib: "npm:^2.5.0"
-  checksum: 10c0/799267f0b4b4080e9b2f143e97ebe0bb0ebd7bf13c41c4ee522488684df590bf269868ae1a3456fa3decf5de37e8706aa035f957c5af405cf771d8bf76b6ae39
+  checksum: 10c0/e078ce12c6c9ad31264261bbbbdda055e63fac5789a145a914cb70596fa90b9bb7380800a381ce949f69dc9504fd8fedbcc70e1c98ae6fb40c0a5c784c9424eb
   languageName: node
   linkType: hard
 
@@ -2374,17 +2374,17 @@ __metadata:
   linkType: hard
 
 "@smithy/util-defaults-mode-node@npm:^2.2.3":
-  version: 2.2.3
-  resolution: "@smithy/util-defaults-mode-node@npm:2.2.3"
+  version: 2.2.4
+  resolution: "@smithy/util-defaults-mode-node@npm:2.2.4"
   dependencies:
     "@smithy/config-resolver": "npm:^2.1.4"
-    "@smithy/credential-provider-imds": "npm:^2.2.4"
+    "@smithy/credential-provider-imds": "npm:^2.2.5"
     "@smithy/node-config-provider": "npm:^2.2.4"
     "@smithy/property-provider": "npm:^2.1.3"
     "@smithy/smithy-client": "npm:^2.4.2"
     "@smithy/types": "npm:^2.10.1"
     tslib: "npm:^2.5.0"
-  checksum: 10c0/0bc643a97348d092f024cd92b5a71f36c401c44f9576fe0311c3fb459d53ea6ebfe067242ddb5eabb96d47bd1a0f5c6c59fe173e9236f18698410b1064ebd669
+  checksum: 10c0/5e68abf28a57db2c34d8f2593dc4a3a99489211d91c441308799568ac08df5e1c0a4dcd9edf78e1f7a9720a8b0728fe067ec137353ac30794b06be7feec07d7c
   languageName: node
   linkType: hard
 
@@ -3020,16 +3020,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:>=10.0.0":
-  version: 20.11.24
-  resolution: "@types/node@npm:20.11.24"
-  dependencies:
-    undici-types: "npm:~5.26.4"
-  checksum: 10c0/5a62225eb4797b41e6953f9c08c4611d607b5422ddd153312fc81ed6ed37115228ae27e3e3caa1a3bf52d88310306a196ba1cfbd8b2ec918a20f64d80dfa22c9
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:20.11.25":
+"@types/node@npm:*, @types/node@npm:20.11.25, @types/node@npm:>=10.0.0":
   version: 20.11.25
   resolution: "@types/node@npm:20.11.25"
   dependencies:
@@ -4824,9 +4815,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.4.668":
-  version: 1.4.693
-  resolution: "electron-to-chromium@npm:1.4.693"
-  checksum: 10c0/776014c015d3c326a357d3e9a2d007ad771d0ba0a70156d21fcc09fb68f5dad5e318b4ecf5bfdf0daa2805c126e5dc20da6da66bcd56331376e95c6b051fe088
+  version: 1.4.694
+  resolution: "electron-to-chromium@npm:1.4.694"
+  checksum: 10c0/99a2437f39086b83660775dcfee6b7dff5ef6d3fdb1ee101e908ecb021d7c9c1174d2f9bc94b115be91c24a89750f844b2ba8b5eefbcd892e0c006d3c7baa97c
   languageName: node
   linkType: hard
 
@@ -8962,11 +8953,11 @@ __metadata:
   linkType: hard
 
 "qs@npm:^6.11.0":
-  version: 6.11.2
-  resolution: "qs@npm:6.11.2"
+  version: 6.12.0
+  resolution: "qs@npm:6.12.0"
   dependencies:
-    side-channel: "npm:^1.0.4"
-  checksum: 10c0/4f95d4ff18ed480befcafa3390022817ffd3087fc65f146cceb40fc5edb9fa96cb31f648cae2fa96ca23818f0798bd63ad4ca369a0e22702fcd41379b3ab6571
+    side-channel: "npm:^1.0.6"
+  checksum: 10c0/e165a77ac5f3ca60c15c5f3d51b321ddec7aa438804436b29d160117bc6fb7bf7dab94abd0c7d7c0785890d3a75ae41e1d6346e158aaf1540c6fe53a31f11675
   languageName: node
   linkType: hard
 
@@ -9453,7 +9444,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"side-channel@npm:^1.0.4":
+"side-channel@npm:^1.0.4, side-channel@npm:^1.0.6":
   version: 1.0.6
   resolution: "side-channel@npm:1.0.6"
   dependencies:
