@@ -25,7 +25,7 @@ dotenv.config({
 });
 
 const dbFolder = process.env[AppConstants.DATABASE_PATH] || "./database";
-const dbFile = process.env[AppConstants.DATABASE_FILE] || "./fdm-monster-typeorm.sqlite";
+const dbFile = process.env[AppConstants.DATABASE_FILE] || "./fdm-monster.sqlite";
 const isMemoryDb = dbFile === ":memory:";
 const dbName = isMemoryDb ? dbFile : join(superRootPath(), dbFolder, dbFile);
 
