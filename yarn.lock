@@ -1079,7 +1079,7 @@ __metadata:
     "@influxdata/influxdb-client": "npm:1.33.2"
     "@lcov-viewer/cli": "npm:1.3.0"
     "@lcov-viewer/istanbul-report": "npm:1.4.0"
-    "@octokit/plugin-throttling": "npm:8.2.0"
+    "@octokit/plugin-throttling": "npm:9.0.3"
     "@sentry/node": "npm:7.105.0"
     "@swc/cli": "npm:0.3.10"
     "@swc/core": "npm:1.4.5"
@@ -1849,7 +1849,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/plugin-throttling@npm:8.2.0, @octokit/plugin-throttling@npm:^8.0.0":
+"@octokit/plugin-throttling@npm:9.0.3":
+  version: 9.0.3
+  resolution: "@octokit/plugin-throttling@npm:9.0.3"
+  dependencies:
+    "@octokit/types": "npm:^12.6.0"
+    bottleneck: "npm:^2.15.3"
+  peerDependencies:
+    "@octokit/core": ^6.0.0
+  checksum: 10c0/6abf6f719eaf59daa24f3f354a352b9157492d026c761efe178eb50ebf5e12b43333db6f7e64a8d7edc594d30c6e2ccb1c4d05e138f8a5a7b577c5557bfcf38c
+  languageName: node
+  linkType: hard
+
+"@octokit/plugin-throttling@npm:^8.0.0":
   version: 8.2.0
   resolution: "@octokit/plugin-throttling@npm:8.2.0"
   dependencies:
