@@ -105,7 +105,6 @@ export function configureContainer(isSqlite: boolean = false) {
     [di.appDefaultRole]: asValue(ROLES.GUEST),
     [di.appDefaultRoleNoLogin]: asValue(ROLES.ADMIN),
     [di.serverVersion]: asFunction(() => {
-      // TODO change the role to a non-admin role in the future once GUEST/OPERATOR have more meaningful permissions
       return process.env[AppConstants.VERSION_KEY];
     }),
     [di.socketFactory]: asClass(SocketFactory).transient(), // Factory function, transient on purpose!

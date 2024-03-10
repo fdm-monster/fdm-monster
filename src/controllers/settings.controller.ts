@@ -7,7 +7,6 @@ import { sentryDiagnosticsEnabledRules, whitelistSettingUpdateRules } from "@/se
 import { SettingsStore } from "@/state/settings.store";
 import { Request, Response } from "express";
 import { address } from "ip";
-import { version } from "@/../package.json";
 import { IpWhitelistSettingsDto } from "@/services/interfaces/settings.dto";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
@@ -16,10 +15,20 @@ import { demoUserNotAllowed, demoUserNotAllowedInterceptor } from "@/middleware/
 export class SettingsController {
   settingsStore: SettingsStore;
   logger: LoggerService;
+  serverVersion: string;
 
-  constructor({ settingsStore, loggerFactory }: { settingsStore: SettingsStore; loggerFactory: ILoggerFactory }) {
+  constructor({
+    settingsStore,
+    serverVersion,
+    loggerFactory,
+  }: {
+    serverVersion: string;
+    settingsStore: SettingsStore;
+    loggerFactory: ILoggerFactory;
+  }) {
     this.settingsStore = settingsStore;
     this.logger = loggerFactory(SettingsController.name);
+    this.serverVersion = serverVersion;
   }
 
   getSettings(req: Request, res: Response) {
@@ -30,7 +39,7 @@ export class SettingsController {
       connection = {
         clientIp: req.socket?.remoteAddress,
         ip: serverIp,
-        version,
+        version: serverVersion,
       };
     } catch (e) {
       this.logger.warn("Could not fetch server IP address");
