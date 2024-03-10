@@ -6,6 +6,9 @@
 <h1 align="center" style="padding-top: 0; margin-top: 10px">FDM Monster</h1>
 
 <p align="center">
+<a href="https://discord.gg/mwA8uP8CMc">
+    <img src="https://img.shields.io/discord/864835453773807686?label=Discord"/>
+</a>
 <a href="https://github.com/fdm-monster/fdm-monster/releases/latest">
     <img src="https://img.shields.io/github/release/fdm-monster/fdm-monster"/>
 </a>
@@ -29,7 +32,7 @@
 FDM Monster is a server for managing your 3D printer farm through [OctoPrint](https://octoprint.org/).
 Our efforts are focused on providing a professional print-farming workflow that is suitable for hobby and commercial farms alike.
 
-This server is has been battle-tested in the field for 100+ printers, so give it a star ⭐and enhance your 3D Printing Farm's workflow!
+This server has been battle-tested in the field for 100+ printers, so give it a star ⭐and enhance your 3D Printing Farm's workflow!
 
 ## Features
 - Adding OctoPrint instances
