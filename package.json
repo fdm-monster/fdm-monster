@@ -56,7 +56,7 @@
     "@influxdata/influxdb-client": "1.33.2",
     "@octokit/plugin-throttling": "8.2.0",
     "@sentry/node": "7.106.1",
-    "adm-zip": "0.5.10",
+    "adm-zip": "0.5.11",
     "awilix": "10.0.1",
     "awilix-express": "9.0.1",
     "axios": "1.6.7",
