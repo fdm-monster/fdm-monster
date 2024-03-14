@@ -1154,7 +1154,7 @@ __metadata:
     reflect-metadata: "npm:0.2.1"
     semver: "npm:7.6.0"
     simple-git: "npm:3.22.0"
-    socket.io: "npm:4.7.4"
+    socket.io: "npm:4.7.5"
     supertest: "npm:6.3.4"
     toad-scheduler: "npm:3.0.1"
     ts-node: "npm:10.9.2"
@@ -9566,9 +9566,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"socket.io@npm:4.7.4":
-  version: 4.7.4
-  resolution: "socket.io@npm:4.7.4"
+"socket.io@npm:4.7.5":
+  version: 4.7.5
+  resolution: "socket.io@npm:4.7.5"
   dependencies:
     accepts: "npm:~1.3.4"
     base64id: "npm:~2.0.0"
@@ -9577,7 +9577,7 @@ __metadata:
     engine.io: "npm:~6.5.2"
     socket.io-adapter: "npm:~2.5.2"
     socket.io-parser: "npm:~4.2.4"
-  checksum: 10c0/c37b7745d475695d5d5d20a30af940ebf1fefa9defdd1f3601978682a4e1d12eab10da0a6efb19d72038bb819a7972331a679649161689db600883b83818fb16
+  checksum: 10c0/221a2cd25f6077d6672cb8b19921336e1acf06788d4bade74953dc96dbfd8b788a5f721b051341a34ee81ef8e1b2028d39ad5257516776400a3f8f3f01255c5e
   languageName: node
   linkType: hard
 
