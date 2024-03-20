@@ -141,7 +141,7 @@
     "prettier": "2.8.8",
     "supertest": "6.3.4",
     "ts-node": "10.9.2",
-    "typescript": "5.4.2"
+    "typescript": "5.4.3"
   },
   "ignore-engines": false,
   "engine-strict": true,
