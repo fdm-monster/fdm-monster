@@ -33,6 +33,12 @@ import FormData from "form-data";
 import { createReadStream, ReadStream } from "fs";
 import { uploadProgressEvent } from "@/constants/event.constants";
 import EventEmitter2 from "eventemitter2";
+import { AccessLoginResultDto } from "@/services/moonraker/dto/access-login-result.dto";
+import { AccessUserResultDto } from "@/services/moonraker/dto/access-user-result.dto";
+import { AccessUserDto } from "@/services/moonraker/dto/access-user.dto";
+import { AccessUserDeleteDto } from "@/services/moonraker/dto/access-user-delete.dto";
+import { AccessLoginRefreshDto } from "@/services/moonraker/dto/access-login-refresh.dto";
+import { AccessInfoDto } from "@/services/moonraker/dto/access-info.dto";
 
 export class MoonrakerClient {
   private httpClient: AxiosStatic;
@@ -332,5 +338,65 @@ export class MoonrakerClient {
 
   async getServerFileMoonrakerLogDownload(login: LoginDto) {
     return this.httpClient.get<string>(`${login.printerURL}/server/files/moonraker.log`);
+  }
+
+  async postAccessLoginUser(login: LoginDto, username: string, password: string, source: "ldap" | "moonraker" = "moonraker") {
+    return this.httpClient.post<ResultDto<AccessLoginResultDto>>("/access/login", {
+      username,
+      password,
+      source,
+    });
+  }
+
+  async postAccessLogoutUser(login: LoginDto) {
+    // requires a bearer mechanism
+    return this.httpClient.post<ResultDto<AccessUserResultDto>>(`${login.printerURL}/access/logout`);
+  }
+
+  async getAccessUser(login: LoginDto) {
+    // requires a bearer mechanism
+    return this.httpClient.get<ResultDto<AccessUserDto>>(`${login.printerURL}/access/user`);
+  }
+
+  async postAccessCreateUser(login: LoginDto, username: string, password: string) {
+    return this.httpClient.post<ResultDto<AccessLoginResultDto>>(`${login.printerURL}/access/login`, {
+      username,
+      password,
+    });
+  }
+
+  async deleteAccessUser(login: LoginDto, username: string) {
+    return this.httpClient.delete<ResultDto<AccessUserResultDto>>(`${login.printerURL}/access/user`, {
+      data: {
+        username,
+      },
+    });
+  }
+
+  async listAccessUsers(login: LoginDto) {
+    // requires a bearer mechanism
+    return this.httpClient.get<ResultDto<AccessUserDto[]>>(`${login.printerURL}/access/user/list`);
+  }
+
+  async postAccessResetPassword(login: LoginDto, refresh_token: string) {
+    return this.httpClient.post<ResultDto<AccessLoginRefreshDto>>(`${login.printerURL}/access/refresh_jwt`, {
+      refresh_token,
+    });
+  }
+
+  async getAccessOneshotToken(login: LoginDto) {
+    return this.httpClient.get<ResultDto<string>>(`${login.printerURL}/access/oneshot_token`);
+  }
+
+  async getAccessInfo(login: LoginDto) {
+    return this.httpClient.get<ResultDto<AccessInfoDto>>(`${login.printerURL}/access/info`);
+  }
+
+  async getAccessApiKey(login: LoginDto) {
+    return this.httpClient.get<ResultDto<string>>(`${login.printerURL}/access/api_key`);
+  }
+
+  async postAccessApiKeyCreate(login: LoginDto) {
+    return this.httpClient.post<ResultDto<string>>(`${login.printerURL}/access/api_key`);
   }
 }

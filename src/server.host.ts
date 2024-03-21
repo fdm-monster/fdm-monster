@@ -73,6 +73,10 @@ export class ServerHost {
     };
     const result = await this.moonrakerClient.getServerFilesList(login);
     console.log(JSON.stringify(result.data.result));
+    // const token = await this.moonrakerClient.getAccessOneshotToken(login);
+    // console.log(JSON.stringify(token.data.result));
+    // const token = await this.moonrakerClient.getAccessApiKey(login);
+    // console.log(JSON.stringify(token.data.result));
     // const result = await this.moonrakerClient.postMachineRestartService(login, "webcamd");
     // console.log(result.data.result);
     // const result = await this.moonrakerClient.getServerInfo(login);
