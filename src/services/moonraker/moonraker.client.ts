@@ -36,7 +36,6 @@ import EventEmitter2 from "eventemitter2";
 import { AccessLoginResultDto } from "@/services/moonraker/dto/access-login-result.dto";
 import { AccessUserResultDto } from "@/services/moonraker/dto/access-user-result.dto";
 import { AccessUserDto } from "@/services/moonraker/dto/access-user.dto";
-import { AccessUserDeleteDto } from "@/services/moonraker/dto/access-user-delete.dto";
 import { AccessLoginRefreshDto } from "@/services/moonraker/dto/access-login-refresh.dto";
 import { AccessInfoDto } from "@/services/moonraker/dto/access-info.dto";
 
