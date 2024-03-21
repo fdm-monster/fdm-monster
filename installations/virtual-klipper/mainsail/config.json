@@ -1,0 +1,9 @@
+{
+  "instancesDB": "json",
+  "instances": [
+    {
+      "hostname": "host.docker.internal",
+      "port": 7125
+    }
+  ]
+}

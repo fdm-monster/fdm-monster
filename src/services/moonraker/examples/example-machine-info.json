@@ -1,0 +1,71 @@
+{
+  "system_info": {
+    "python": {
+      "version": [3, 9, 2, "final", 0],
+      "version_string": "3.9.2 (default, Feb 28 2021, 17:03:44)  [GCC 10.2.1 20210110]"
+    },
+    "cpu_info": {
+      "cpu_count": 16,
+      "bits": "64bit",
+      "processor": "x86_64",
+      "cpu_desc": "12th Gen Intel(R) Core(TM) i5-12500H",
+      "serial_number": "",
+      "hardware_desc": "",
+      "model": "",
+      "total_memory": 16212388,
+      "memory_units": "kB"
+    },
+    "sd_info": {},
+    "distribution": {
+      "name": "Debian GNU/Linux 11 (bullseye)",
+      "id": "debian",
+      "version": "11",
+      "version_parts": {
+        "major": "11",
+        "minor": "",
+        "build_number": ""
+      },
+      "like": "",
+      "codename": "bullseye",
+      "release_info": {},
+      "kernel_version": "5.15.146.1-microsoft-standard-WSL2"
+    },
+    "virtualization": {
+      "virt_type": "container",
+      "virt_identifier": "docker"
+    },
+    "network": {
+      "eth0": {
+        "mac_address": "02:42:ac:14:00:02",
+        "ip_addresses": [
+          {
+            "family": "ipv4",
+            "address": "172.20.0.2",
+            "is_link_local": false
+          }
+        ]
+      }
+    },
+    "canbus": {},
+    "provider": "systemd_cli",
+    "available_services": ["klipper", "moonraker", "webcamd"],
+    "service_state": {
+      "klipper": {
+        "active_state": "active",
+        "sub_state": "running"
+      },
+      "moonraker": {
+        "active_state": "active",
+        "sub_state": "running"
+      },
+      "webcamd": {
+        "active_state": "active",
+        "sub_state": "running"
+      }
+    },
+    "instance_ids": {
+      "moonraker": "moonraker",
+      "klipper": "klipper"
+    }
+  }
+}
