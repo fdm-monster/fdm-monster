@@ -1,43 +1,55 @@
-import axios, { AxiosStatic } from "axios";
-import { ServerInfoDto } from "@/services/moonraker/dto/server-info.dto";
+import axios, { AxiosResponse, AxiosStatic } from "axios";
+import { ServerInfoDto } from "@/services/moonraker/dto/server/server-info.dto";
 import { LoginDto } from "@/services/interfaces/login.dto";
 import { ResultDto } from "./dto/result.dto";
-import { ServerConfigDto } from "@/services/moonraker/dto/server-config.dto";
+import { ServerConfigDto } from "@/services/moonraker/dto/server/server-config.dto";
 import { TemperatureStoreDto } from "@/services/moonraker/dto/temperature-store.dto";
 import { GcodeStoreDto } from "@/services/moonraker/dto/gcode-store.dto";
 import { ActionResultDto } from "@/services/moonraker/dto/action-result.dto";
 import { PrinterInfoDto } from "@/services/moonraker/dto/printer-info.dto";
-import { PrinterAvailableObjects } from "@/services/moonraker/dto/printer-objects-list.dto";
-import { PrinterObjectsQueryDto } from "@/services/moonraker/dto/printer-objects-query.dto";
+import { PrinterAvailableObjects } from "@/services/moonraker/dto/objects/printer-objects-list.dto";
+import { PrinterObjectsQueryDto } from "@/services/moonraker/dto/objects/printer-objects-query.dto";
 import { PrinterQueryEndstopsDto } from "@/services/moonraker/dto/printer-query-endstops.dto";
 import { GcodeHelpDto } from "@/services/moonraker/dto/gcode-help.dto";
-import { MachineSystemInfoDto } from "@/services/moonraker/dto/machine-system-info.dto";
+import { MachineSystemInfoDto } from "@/services/moonraker/dto/machine/machine-system-info.dto";
 import { ProcessStatsDto } from "@/services/moonraker/dto/process-stats.dto";
 import { SudoInfoDto } from "@/services/moonraker/dto/sudo-info.dto";
 import { SudoResponseDto } from "@/services/moonraker/dto/sudo-response.dto";
-import { MachinePeripheralsUsbDto } from "@/services/moonraker/dto/machine-peripherals-usb.dto";
-import { MachinePeripheralsSerialDto } from "@/services/moonraker/dto/machine-peripherals-serial.dto";
-import { MachinePeripheralsVideoDto } from "@/services/moonraker/dto/machin-peripherals-video.dto";
-import { MachinePeripheralsCanbusDto } from "@/services/moonraker/dto/machine-peripherals-canbus.dto";
-import { ServerFileDto } from "@/services/moonraker/dto/server-file.dto";
-import { ServerFileRootDto } from "@/services/moonraker/dto/server-file-root.dto";
-import { ServerFileMetadataDto } from "@/services/moonraker/dto/server-file-metadata.dto";
-import { ServerFileThumbnailDto } from "@/services/moonraker/dto/server-file-thumbnail.dto";
-import { ServerFileDirectoryInfoDto } from "@/services/moonraker/dto/server-file-directory-info.dto";
+import { MachinePeripheralsUsbDto } from "@/services/moonraker/dto/machine/machine-peripherals-usb.dto";
+import { MachinePeripheralsSerialDto } from "@/services/moonraker/dto/machine/machine-peripherals-serial.dto";
+import { MachinePeripheralsVideoDto } from "@/services/moonraker/dto/machine/machine-peripherals-video.dto";
+import { MachinePeripheralsCanbusDto } from "@/services/moonraker/dto/machine/machine-peripherals-canbus.dto";
+import { ServerFileDto } from "@/services/moonraker/dto/server-files/server-file.dto";
+import { ServerFileRootDto } from "@/services/moonraker/dto/server-files/server-file-root.dto";
+import { ServerFileMetadataDto } from "@/services/moonraker/dto/server-files/server-file-metadata.dto";
+import { ServerFileThumbnailDto } from "@/services/moonraker/dto/server-files/server-file-thumbnail.dto";
+import { ServerFileDirectoryInfoDto } from "@/services/moonraker/dto/server-files/server-file-directory-info.dto";
 import {
   ServerFileDirectoryActionDto,
   ServerFileDirectoryMovedDto,
-} from "@/services/moonraker/dto/server-file-directory-action.dto";
-import { ServerFileZipActionDto } from "@/services/moonraker/dto/server-file-zip-action.dto";
+} from "@/services/moonraker/dto/server-files/server-file-directory-action.dto";
+import { ServerFileZipActionDto } from "@/services/moonraker/dto/server-files/server-file-zip-action.dto";
 import FormData from "form-data";
 import { createReadStream, ReadStream } from "fs";
 import { uploadProgressEvent } from "@/constants/event.constants";
 import EventEmitter2 from "eventemitter2";
-import { AccessLoginResultDto } from "@/services/moonraker/dto/access-login-result.dto";
-import { AccessUserResultDto } from "@/services/moonraker/dto/access-user-result.dto";
-import { AccessUserDto } from "@/services/moonraker/dto/access-user.dto";
-import { AccessLoginRefreshDto } from "@/services/moonraker/dto/access-login-refresh.dto";
-import { AccessInfoDto } from "@/services/moonraker/dto/access-info.dto";
+import { AccessLoginResultDto } from "@/services/moonraker/dto/access/access-login-result.dto";
+import { AccessUserResultDto } from "@/services/moonraker/dto/access/access-user-result.dto";
+import { AccessUserDto } from "@/services/moonraker/dto/access/access-user.dto";
+import { AccessLoginRefreshDto } from "@/services/moonraker/dto/access/access-login-refresh.dto";
+import { AccessInfoDto } from "@/services/moonraker/dto/access/access-info.dto";
+import { DatabaseNamespaceListDto, Namespaces } from "@/services/moonraker/dto/database/database-namespace-list.dto";
+import { DatabaseNamespaceItemDto } from "@/services/moonraker/dto/database/database-namespace-item.dto";
+import { JobQueueStatusDto } from "@/services/moonraker/dto/job-queue/job-queue-status.dto";
+import { EnqueueJobDto } from "@/services/moonraker/dto/job-queue/enqueue-job.dto";
+import { AnnouncementListDto } from "@/services/moonraker/dto/server-announcements/announcement-list.dto";
+import { AnnouncementEntryIdDto } from "@/services/moonraker/dto/server-announcements/announcement-entry-id.dto";
+import { AnnouncementFeedsDto } from "@/services/moonraker/dto/server-announcements/announcement-feeds.dto";
+import { AnnouncementActionDto } from "@/services/moonraker/dto/server-announcements/announcement-action.dto";
+import { WebcamDto, WebcamListDto } from "@/services/moonraker/dto/server-webcams/webcam-list.dto";
+import { WebcamItemDto } from "@/services/moonraker/dto/server-webcams/webcam-item.dto";
+import { WebcamTestDto } from "@/services/moonraker/dto/server-webcams/webcam-test.dto";
+import { NotifierListDto } from "@/services/moonraker/notifier-list.dto";
 
 export class MoonrakerClient {
   private httpClient: AxiosStatic;
@@ -397,5 +409,133 @@ export class MoonrakerClient {
 
   async postAccessApiKeyCreate(login: LoginDto) {
     return this.httpClient.post<ResultDto<string>>(`${login.printerURL}/access/api_key`);
+  }
+
+  async getDatabaseNamespaceList(login: LoginDto) {
+    return this.httpClient.get<ResultDto<DatabaseNamespaceListDto>>(`${login.printerURL}/database/list`);
+  }
+
+  async getDatabaseNamespaceItem(login: LoginDto, namespace: Namespaces, key: string) {
+    return this.httpClient.get<ResultDto<DatabaseNamespaceItemDto>>(
+      `${login.printerURL}/database/item?namespace=${namespace}&key=${key}`
+    );
+  }
+
+  async postDatabaseNamespaceItem(
+    login: LoginDto,
+    namespace: Namespaces,
+    key: string,
+    value: any,
+    typeHint?: "int" | "str" | "bool" | "json"
+  ) {
+    const typeHintParam = typeHint?.length ? `:${typeHint}` : "";
+    return this.httpClient.post<ResultDto<DatabaseNamespaceItemDto>>(
+      `${login.printerURL}/database/item?namespace=${namespace}&key=${key}&value${typeHintParam}=${value}`
+    );
+  }
+
+  async deleteDatabaseNamespaceItem(login: LoginDto, namespace: Namespaces, key: string) {
+    return this.httpClient.delete<ResultDto<DatabaseNamespaceItemDto>>(
+      `${login.printerURL}/database/item?namespace=${namespace}&key=${key}`
+    );
+  }
+
+  async getJobQueueStatus(login: LoginDto) {
+    return this.httpClient.get<ResultDto<JobQueueStatusDto>>(`${login.printerURL}/job_queue/status`);
+  }
+
+  async postJobQueueJob(login: LoginDto, filenames: string[], reset: boolean) {
+    // Alternatively param based with comma separated filenames: "POST /server/job_queue/job?filenames=job1.gcode,job2.gcode,subdir/job3.gcode"
+    return this.httpClient.post<ResultDto<JobQueueStatusDto>, AxiosResponse<ResultDto<JobQueueStatusDto>>, EnqueueJobDto>(
+      `${login.printerURL}/job_queue/job`,
+      {
+        filenames,
+        reset,
+      }
+    );
+  }
+
+  async deleteJobQueueJob(login: LoginDto, jobIds: string[], all?: boolean) {
+    const base = `${login.printerURL}/job_queue/job`;
+    const url = !!all ? `${base}?all=true` : `${base}?job_ids=${jobIds.join(",")}`;
+    return this.httpClient.delete<ResultDto<DatabaseNamespaceItemDto>>(url);
+  }
+
+  async postJobQueuePause(login: LoginDto) {
+    return this.httpClient.post<ResultDto<JobQueueStatusDto>>(`${login.printerURL}/job_queue/pause`);
+  }
+
+  async postJobQueueStart(login: LoginDto) {
+    return this.httpClient.post<ResultDto<JobQueueStatusDto>>(`${login.printerURL}/job_queue/start`);
+  }
+
+  async postJobQueueJump(login: LoginDto, jobId: string) {
+    return this.httpClient.post<ResultDto<JobQueueStatusDto>>(`${login.printerURL}/job_queue/jump?job_id=${jobId}`);
+  }
+
+  async getAnnouncementsList(login: LoginDto, includeDismissed: boolean) {
+    return this.httpClient.get<ResultDto<AnnouncementListDto>>(
+      `${login.printerURL}/server/announcements/list?include_dismissed=${includeDismissed}`
+    );
+  }
+
+  async postAnnouncementsUpdate(login: LoginDto) {
+    return this.httpClient.post<ResultDto<AnnouncementListDto>>(`${login.printerURL}/server/announcements/update`);
+  }
+
+  /**
+   *
+   * @param login
+   * @param entryId The entry identifier (name). This field may contain forward slashes, so it should be url escaped when placed in the query string of an http request. This parameter is required.
+   * @param wakeTime The time, in seconds, in which the entry's dismissed state will revert to false. This parameter is optional, if omitted the entry will be dismissed indefinitely.
+   */
+  async postAnnouncementsDismiss(login: LoginDto, entryId: string, wakeTime: number) {
+    return this.httpClient.post<ResultDto<AnnouncementEntryIdDto>>(
+      `${login.printerURL}/server/announcements/dismiss?entry_id=${encodeURIComponent(entryId)}&wake_time=${wakeTime}`
+    );
+  }
+
+  async getAnnouncementsFeeds(login: LoginDto) {
+    return this.httpClient.get<ResultDto<AnnouncementFeedsDto>>(`${login.printerURL}/server/announcements/feeds`);
+  }
+
+  async postAnnouncementsFeedAdd(login: LoginDto, name: string) {
+    return this.httpClient.get<ResultDto<AnnouncementActionDto>>(`${login.printerURL}/server/announcements/feeds?name=${name}`);
+  }
+
+  async deleteAnnouncementsFeedRemove(login: LoginDto, name: string) {
+    return this.httpClient.delete<ResultDto<AnnouncementActionDto>>(
+      `${login.printerURL}/server/announcements/feeds?name=${name}`
+    );
+  }
+
+  async getWebcamList(login: LoginDto) {
+    return this.httpClient.get<ResultDto<WebcamListDto>>(`${login.printerURL}/server/webcams/list`);
+  }
+
+  async getWebcamItem(login: LoginDto, uid?: string, name?: string) {
+    const base = `${login.printerURL}/server/webcams/get_item`;
+    const url = !!uid?.length ? `${base}?uid=${uid}` : `${base}?name=${name}`;
+    return this.httpClient.get<ResultDto<WebcamItemDto>>(url);
+  }
+
+  async postWebcamItemUpdate(login: LoginDto, webcam: Omit<WebcamDto, "source">) {
+    return this.httpClient.post<ResultDto<WebcamItemDto>>(`${login.printerURL}/server/webcams/post_item`, webcam);
+  }
+
+  async deleteWebcamItem(login: LoginDto, uid?: string, name?: string) {
+    const base = `${login.printerURL}/server/webcams/delete_item`;
+    const url = !!uid?.length ? `${base}?uid=${uid}` : `${base}?name=${name}`;
+    return this.httpClient.get<ResultDto<WebcamItemDto>>(url);
+  }
+
+  async postWebcamTest(login: LoginDto, uid?: string, name?: string) {
+    const base = `${login.printerURL}/server/webcams/test`;
+    const url = !!uid?.length ? `${base}?uid=${uid}` : `${base}?name=${name}`;
+    return this.httpClient.get<ResultDto<WebcamTestDto>>(url);
+  }
+
+  async getNotifierList(login: LoginDto) {
+    return this.httpClient.get<ResultDto<NotifierListDto>>(`${login.printerURL}/server/notifiers/list`);
   }
 }
