@@ -4824,9 +4824,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.4.668":
-  version: 1.4.715
-  resolution: "electron-to-chromium@npm:1.4.715"
-  checksum: 10c0/6c49b7f3ad41b9f0ecd36cc564333d238a4b7ab51c4928d6e19f25d1e3d2aa9311428fb6e45f02823eb05792acc584513f7cea0dbd27b0758de5f21c2142126b
+  version: 1.4.716
+  resolution: "electron-to-chromium@npm:1.4.716"
+  checksum: 10c0/8ab3d5def384756e520d23f7e303d5dbfc9d0c789a9ebb994deae52ce0d2ab7b5d32bbad77806b2b3a7089d98d1fdf33284ed9f11d6135dafd05662ef4bece9e
   languageName: node
   linkType: hard
 
@@ -7406,9 +7406,9 @@ __metadata:
   linkType: hard
 
 "libphonenumber-js@npm:^1.10.53":
-  version: 1.10.58
-  resolution: "libphonenumber-js@npm:1.10.58"
-  checksum: 10c0/4a66917204fbac443844e06c9d7e30c5759287c9a290cf6dab7d12f5353360388859c961747b95a4638e922451fa1caac17e9dd40496e03a2b2ffad148a6b1bf
+  version: 1.10.59
+  resolution: "libphonenumber-js@npm:1.10.59"
+  checksum: 10c0/68a2a13caedf304f3644ffd97faa308d74ae79d181b164d1a43d8f6c63643aa8e13117a3e2e53ea0dcaa16378121d2b6331d1b0353263d3ea7ca22f2bf3d1460
   languageName: node
   linkType: hard
 
@@ -8228,8 +8228,8 @@ __metadata:
   linkType: hard
 
 "node-gyp@npm:latest":
-  version: 10.0.1
-  resolution: "node-gyp@npm:10.0.1"
+  version: 10.1.0
+  resolution: "node-gyp@npm:10.1.0"
   dependencies:
     env-paths: "npm:^2.2.0"
     exponential-backoff: "npm:^3.1.1"
@@ -8243,7 +8243,7 @@ __metadata:
     which: "npm:^4.0.0"
   bin:
     node-gyp: bin/node-gyp.js
-  checksum: 10c0/abddfff7d873312e4ed4a5fb75ce893a5c4fb69e7fcb1dfa71c28a6b92a7f1ef6b62790dffb39181b5a82728ba8f2f32d229cf8cbe66769fe02cea7db4a555aa
+  checksum: 10c0/9cc821111ca244a01fb7f054db7523ab0a0cd837f665267eb962eb87695d71fb1e681f9e21464cc2fd7c05530dc4c81b810bca1a88f7d7186909b74477491a3c
   languageName: node
   linkType: hard
 
