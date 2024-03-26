@@ -1,3 +1,5 @@
+import { MoonrakerClient } from "@/services/moonraker/moonraker.client";
+
 export const DITokens = {
   // Values
   serverVersion: "serverVersion",
@@ -40,6 +42,7 @@ export const DITokens = {
   jwtService: "jwtService",
   roleService: "roleService",
   octoPrintApiService: "octoPrintApiService",
+  moonrakerClient: "moonrakerClient",
   cameraStreamService: "cameraStreamService",
   socketFactory: "socketFactory",
   batchCallService: "batchCallService",

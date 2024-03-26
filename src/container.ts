@@ -78,6 +78,7 @@ import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { BuildResolver, DisposableResolver } from "awilix/lib/resolvers";
 import { UserRoleService } from "@/services/orm/user-role.service";
 import { PrinterGroupService } from "@/services/orm/printer-group.service";
+import { MoonrakerClient } from "@/services/moonraker/moonraker.client";
 
 export function config<T1, T2>(
   key: string,
@@ -178,6 +179,7 @@ export function configureContainer(isSqlite: boolean = false) {
     [di.multerService]: asClass(MulterService).singleton(),
     [di.yamlService]: asClass(YamlService),
     [di.octoPrintApiService]: asClass(OctoPrintApiService).singleton(),
+    [di.moonrakerClient]: asClass(MoonrakerClient).singleton(),
     [di.batchCallService]: asClass(BatchCallService).singleton(),
     [di.pluginFirmwareUpdateService]: asClass(PluginFirmwareUpdateService).singleton(),
     [di.octoPrintSockIoAdapter]: asClass(OctoPrintSockIoAdapter).transient(), // Transient on purpose

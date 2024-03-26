@@ -16,6 +16,10 @@ import { isProductionEnvironment } from "@/utils/env.utils";
 import { ConfigService } from "@/services/core/config.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
+import { MoonrakerClient } from "@/services/moonraker/moonraker.client";
+import fs from "fs";
+import * as console from "console";
+import { AxiosError } from "axios";
 
 export class ServerHost {
   bootTask: BootTask;
@@ -24,6 +28,7 @@ export class ServerHost {
   appInstance: Application | null = null;
   configService: ConfigService;
   typeormService: TypeormService;
+  moonrakerClient: MoonrakerClient;
   private readonly isTypeormMode: boolean;
   private logger: LoggerService;
 
@@ -35,6 +40,7 @@ export class ServerHost {
     configService,
     typeormService,
     isTypeormMode,
+    moonrakerClient,
   }: {
     loggerFactory: ILoggerFactory;
     bootTask: BootTask;
@@ -42,6 +48,7 @@ export class ServerHost {
     socketIoGateway: SocketIoGateway;
     configService: ConfigService;
     typeormService: TypeormService;
+    moonrakerClient: MoonrakerClient;
     isTypeormMode: boolean;
   }) {
     this.logger = loggerFactory(ServerHost.name);
@@ -50,6 +57,7 @@ export class ServerHost {
     this.socketIoGateway = socketIoGateway;
     this.configService = configService;
     this.typeormService = typeormService;
+    this.moonrakerClient = moonrakerClient;
     this.isTypeormMode = isTypeormMode;
   }
 
