@@ -49,7 +49,31 @@ import { AnnouncementActionDto } from "@/services/moonraker/dto/server-announcem
 import { WebcamDto, WebcamListDto } from "@/services/moonraker/dto/server-webcams/webcam-list.dto";
 import { WebcamItemDto } from "@/services/moonraker/dto/server-webcams/webcam-item.dto";
 import { WebcamTestDto } from "@/services/moonraker/dto/server-webcams/webcam-test.dto";
-import { NotifierListDto } from "@/services/moonraker/notifier-list.dto";
+import { NotifierListDto } from "@/services/moonraker/dto/notifier-list.dto";
+import { MachineUpdateStatusDto } from "@/services/moonraker/dto/machine/machine-update-status.dto";
+import { MachineDevicePowerDevicesDto } from "@/services/moonraker/dto/machine/machine-device-power-devices.dto";
+import { MachineDevicePowerDeviceStateDto } from "@/services/moonraker/dto/machine/machine-device-power-device-state.dto";
+import { MachineWledStripsDto } from "@/services/moonraker/dto/machine/machine-wled-strips.dto";
+import { JsonRpcResponseDto } from "@/services/moonraker/dto/rpc/json-rpc-response.dto";
+import { JsonRpcRequestDto } from "@/services/moonraker/dto/rpc/json-rpc-request.dto";
+import { SensorListDto } from "@/services/moonraker/dto/server-sensors/sensor-list.dto";
+import { SensorsMeasurementsDto } from "@/services/moonraker/dto/server-sensors/sensor-measurements.dto";
+import { SensorDto } from "@/services/moonraker/dto/server-sensors/sensor-info.dto";
+import { SpoolmanStatusDto } from "@/services/moonraker/dto/spoolman/spoolman-status.dto";
+import { SpoolmanActiveSpoolDto } from "@/services/moonraker/dto/spoolman/spoolman-active-spool.dto";
+import { SpoolmanProxyRequestDto } from "@/services/moonraker/dto/spoolman/spoolman-proxy-request.dto";
+import { SpoolmanResponseDto } from "@/services/moonraker/dto/spoolman/spoolman-response.dto";
+import { ApiVersionDto } from "@/services/moonraker/dto/octoprint-compat/api-version.dto";
+import { ServerVersionDto } from "@/services/moonraker/dto/octoprint-compat/server-version.dto";
+import { ApiLoginDto } from "@/services/moonraker/dto/octoprint-compat/api-login.dto";
+import { ApiSettingsDto } from "@/services/moonraker/dto/octoprint-compat/api-settings.dto";
+import { ApiJobDto } from "@/services/moonraker/dto/octoprint-compat/api-job.dto";
+import { ApiPrinterDto } from "@/services/moonraker/dto/octoprint-compat/api-printer.dto";
+import { ApiProfilesDto } from "@/services/moonraker/dto/octoprint-compat/api-profiles.dto";
+import { HistoryListDto } from "@/services/moonraker/dto/server-history/history-list.dto";
+import { HistoryTotalsDto } from "@/services/moonraker/dto/server-history/history-totals.dto";
+import { HistoryLastTotalsDto } from "@/services/moonraker/dto/server-history/history-last-totals.dto";
+import { HistoryJobDto } from "@/services/moonraker/dto/server-history/history-job.dto";
 
 export class MoonrakerClient {
   private httpClient: AxiosStatic;
@@ -84,6 +108,18 @@ export class MoonrakerClient {
 
   async postRestartServer(login: LoginDto) {
     return this.httpClient.post<ResultDto<ActionResultDto>>(`${login.printerURL}/server/restart`);
+  }
+
+  async postJsonRpc<I, O>(login: LoginDto, method: string, params?: I, id?: number) {
+    return this.httpClient.post<JsonRpcResponseDto<O>, AxiosResponse<JsonRpcResponseDto<O>>, JsonRpcRequestDto<I>>(
+      `${login.printerURL}/server/jsonrpc`,
+      {
+        jsonrpc: "2.0",
+        id: id ? id : 0,
+        method,
+        params,
+      }
+    );
   }
 
   async getPrinterInfo(login: LoginDto) {
@@ -537,5 +573,229 @@ export class MoonrakerClient {
 
   async getNotifierList(login: LoginDto) {
     return this.httpClient.get<ResultDto<NotifierListDto>>(`${login.printerURL}/server/notifiers/list`);
+  }
+
+  async postMachineUpdateStatus(login: LoginDto) {
+    // Refresh parameter is deprecated over refresh endpoint
+    return this.httpClient.post<ResultDto<MachineUpdateStatusDto>>(`${login.printerURL}/machine/update/status`);
+  }
+
+  async postMachineUpdateRefresh(login: LoginDto, name?: string | "moonraker" | "klipper") {
+    const base = `${login.printerURL}/machine/update/refresh`;
+    const url = !!name ? `${base}` : `${base}?name=${name}`;
+    return this.httpClient.post<ResultDto<MachineUpdateStatusDto>>(url);
+  }
+
+  async postMachineUpdateFull(login: LoginDto) {
+    // Order
+    // system if enabled
+    // All configured clients
+    // Klipper
+    // Moonraker
+    return this.httpClient.post<ResultDto<ActionResultDto>>(`${login.printerURL}/machine/update/full`);
+  }
+
+  async postMachineUpdateMoonraker(login: LoginDto) {
+    return this.httpClient.post<ResultDto<ActionResultDto>>(`${login.printerURL}/machine/update/moonraker`);
+  }
+
+  async postMachineUpdateKlipper(login: LoginDto) {
+    return this.httpClient.post<ResultDto<ActionResultDto>>(`${login.printerURL}/machine/update/klipper`);
+  }
+
+  async postMachineUpdateClient(login: LoginDto, name: string) {
+    // [update_manager client client_name] sections (in config)
+    return this.httpClient.post<ResultDto<ActionResultDto>>(`${login.printerURL}/machine/update/client?name=${name}`);
+  }
+
+  async postMachineUpdateSystem(login: LoginDto) {
+    return this.httpClient.post<ResultDto<ActionResultDto>>(`${login.printerURL}/machine/update/system`);
+  }
+
+  async postMachineUpdateRecover(login: LoginDto, name?: string | "moonraker" | "klipper", hard: boolean = false) {
+    return this.httpClient.post<ResultDto<ActionResultDto>>(
+      `${login.printerURL}/machine/update/recover?name=${name}&hard=${hard}`
+    );
+  }
+
+  async postMachineUpdateRollback(login: LoginDto, name?: string | "moonraker" | "klipper") {
+    return this.httpClient.post<ResultDto<ActionResultDto>>(`${login.printerURL}/machine/update/rollback?name=${name}`);
+  }
+
+  async getMachineDevicePowerDevices(login: LoginDto) {
+    return this.httpClient.get<ResultDto<MachineDevicePowerDevicesDto>>(`${login.printerURL}/machine/device_power/devices`);
+  }
+
+  async getMachineDevicePowerDeviceState(login: LoginDto, device: string) {
+    return this.httpClient.get<ResultDto<MachineDevicePowerDeviceStateDto>>(
+      `${login.printerURL}/machine/device_power/device?device=${device}`
+    );
+  }
+
+  async postMachineDevicePowerDeviceState(login: LoginDto, device: string, action: "on" | "off" | "toggle") {
+    return this.httpClient.post<ResultDto<MachineDevicePowerDeviceStateDto>>(
+      `${login.printerURL}/machine/device_power/device?device=${device}&action=${action}`
+    );
+  }
+
+  async getMachineDevicePowerBatchDeviceState(login: LoginDto, devices: string[]) {
+    return this.httpClient.get<ResultDto<MachineDevicePowerDeviceStateDto>>(
+      `${login.printerURL}/machine/device_power/status?${devices.join("&")}`
+    );
+  }
+
+  async postMachineDevicePowerBatchPowerOn(login: LoginDto, device: string) {
+    return this.httpClient.post<ResultDto<MachineDevicePowerDeviceStateDto>>(
+      `${login.printerURL}/machine/device_power/on?device=${device}`
+    );
+  }
+
+  async postMachineDevicePowerBatchPowerOff(login: LoginDto, device: string) {
+    return this.httpClient.post<ResultDto<MachineDevicePowerDeviceStateDto>>(
+      `${login.printerURL}/machine/device_power/off?device=${device}`
+    );
+  }
+
+  async getMachineWledStrips(login: LoginDto) {
+    return this.httpClient.get<ResultDto<MachineWledStripsDto>>(`${login.printerURL}/machine/wled/strips`);
+  }
+
+  async getMachineWledStatuses(login: LoginDto, strips: string[]) {
+    return this.httpClient.get<ResultDto<MachineWledStripsDto>>(`${login.printerURL}/machine/wled/status?${strips.join("&")}`);
+  }
+
+  async postMachineWledPowerOn(login: LoginDto, strips: string[]) {
+    return this.httpClient.post<ResultDto<MachineWledStripsDto>>(`${login.printerURL}/machine/wled/on?${strips.join("&")}`);
+  }
+
+  async postMachineWledPowerOff(login: LoginDto, strips: string[]) {
+    return this.httpClient.post<ResultDto<MachineWledStripsDto>>(`${login.printerURL}/machine/wled/off?${strips.join("&")}`);
+  }
+
+  async postMachineWledPowerStripAction(login: LoginDto, strips: string[]) {
+    return this.httpClient.post<ResultDto<MachineWledStripsDto>>(`${login.printerURL}/machine/wled/toggle?${strips.join("&")}`);
+  }
+
+  async getMachineWledStripAction(
+    login: LoginDto,
+    strip: string,
+    action: "control" | "on" | "off",
+    controlParams: Record<string, number>
+  ) {
+    const queryParams = Object.entries(controlParams)
+      .map(([k, v]) => `${k}=${v}`)
+      .join("&");
+    return this.httpClient.get<ResultDto<MachineWledStripsDto>>(
+      `${login.printerURL}/machine/wled/strip?strip=${strip}&action=${action}&${queryParams}`
+    );
+  }
+
+  async getServerSensorsList(login: LoginDto) {
+    return this.httpClient.get<ResultDto<SensorListDto>>(`${login.printerURL}/server/sensors/list`);
+  }
+
+  async getServerSensorItem(login: LoginDto, sensor: string) {
+    return this.httpClient.get<ResultDto<SensorDto>>(`${login.printerURL}/server/sensors/info?sensor=${sensor}`);
+  }
+
+  async getServerSensorMeasurements(login: LoginDto, sensor: string) {
+    return this.httpClient.get<ResultDto<SensorsMeasurementsDto>>(
+      `${login.printerURL}/server/sensors/measurements?sensor=${sensor}`
+    );
+  }
+
+  async getServerSensorMeasurementsBatch(login: LoginDto) {
+    return this.httpClient.get<ResultDto<SensorsMeasurementsDto>>(`${login.printerURL}/server/sensors/measurements`);
+  }
+
+  async getServerSpoolmanStatus(login: LoginDto) {
+    return this.httpClient.get<ResultDto<SpoolmanStatusDto>>(`${login.printerURL}/server/spoolman/status`);
+  }
+
+  async postServerSpoolmanActiveSpool(login: LoginDto, spoolId: number) {
+    return this.httpClient.post<ResultDto<SpoolmanActiveSpoolDto>>(`${login.printerURL}/server/spoolman/spool_id`, {
+      spool_id: spoolId,
+    });
+  }
+
+  async getServerSpoolmanActiveSpool(login: LoginDto) {
+    return this.httpClient.get<ResultDto<SpoolmanActiveSpoolDto>>(`${login.printerURL}/server/spoolman/spool_id`);
+  }
+
+  async postServerSpoolmanProxyRequest<I, O>(login: LoginDto, body?: SpoolmanProxyRequestDto<I>) {
+    // Spoolman v1 will not wrap responses! Errors are proxied directly.
+    return this.httpClient.post<SpoolmanResponseDto<O>, AxiosResponse<SpoolmanResponseDto<O>>, SpoolmanProxyRequestDto<I>>(
+      `${login.printerURL}/server/spoolman/proxy`,
+      body
+    );
+  }
+
+  async getApiVersion(login: LoginDto) {
+    return this.httpClient.get<ApiVersionDto>(`${login.printerURL}/api/version`);
+  }
+
+  async getServerVersion(login: LoginDto) {
+    return this.httpClient.get<ServerVersionDto>(`${login.printerURL}/api/server`);
+  }
+
+  async getApiLogin(login: LoginDto) {
+    return this.httpClient.get<ApiLoginDto>(`${login.printerURL}/api/login`);
+  }
+
+  async getApiSettings(login: LoginDto) {
+    return this.httpClient.get<ApiSettingsDto>(`${login.printerURL}/api/settings`);
+  }
+
+  // async postFilesLocalUpload(login: LoginDto) {
+  // This is just an alias
+  // return this.postServerFileUpload(login);
+  // }
+
+  async getApiJob(login: LoginDto) {
+    return this.httpClient.get<ApiJobDto>(`${login.printerURL}/api/job`);
+  }
+
+  async getApiPrinter(login: LoginDto) {
+    return this.httpClient.get<ApiPrinterDto>(`${login.printerURL}/api/printer`);
+  }
+
+  async postApiPrinterCommand(login: LoginDto, commands: string[]) {
+    return this.httpClient.post<{}>(`${login.printerURL}/api/command`, {
+      commands,
+    });
+  }
+
+  async getApiProfiles(login: LoginDto) {
+    return this.httpClient.get<ApiProfilesDto>(`${login.printerURL}/api/printerprofiles`);
+  }
+
+  async getServerHistoryList(
+    login: LoginDto,
+    limit: number,
+    start: number,
+    since: number,
+    before: number,
+    order: "asc" | "desc" = "desc"
+  ) {
+    const params = `limit=${limit}&start=${start}&before=${before}&since=${since}&order=${order}`;
+    return this.httpClient.get<HistoryListDto>(`${login.printerURL}/server/history/list?${params}`);
+  }
+
+  async getServerHistoryTotals(login: LoginDto) {
+    return this.httpClient.get<HistoryTotalsDto>(`${login.printerURL}/server/history/totals`);
+  }
+
+  async postServerHistoryResetTotals(login: LoginDto) {
+    return this.httpClient.post<HistoryLastTotalsDto>(`${login.printerURL}/server/history/reset_totals`);
+  }
+
+  async getServerHistoryJob(login: LoginDto, uid: string) {
+    return this.httpClient.get<HistoryJobDto>(`${login.printerURL}/server/history/job?uid=${uid}`);
+  }
+
+  async deleteServerHistoryJob(login: LoginDto, uid?: string) {
+    const base = `${login.printerURL}/server/history/job`;
+    const url = !!uid?.length ? `${base}?uid=${uid}` : `${base}?all=true`;
+    return this.httpClient.get<ResultDto<string[]>>(url);
   }
 }
