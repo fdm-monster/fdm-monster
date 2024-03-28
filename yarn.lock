@@ -1141,7 +1141,7 @@ __metadata:
     lodash: "npm:4.17.21"
     luxon: "npm:3.4.4"
     migrate-mongo: "npm:11.0.0"
-    mongodb-memory-server: "npm:9.1.7"
+    mongodb-memory-server: "npm:9.1.8"
     mongoose: "npm:6.12.7"
     multer: "npm:1.4.5-lts.1"
     nock: "npm:13.5.4"
@@ -5764,7 +5764,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.15.3, follow-redirects@npm:^1.15.6":
+"follow-redirects@npm:^1.15.6":
   version: 1.15.6
   resolution: "follow-redirects@npm:1.15.6"
   peerDependenciesMeta:
@@ -7944,15 +7944,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mongodb-memory-server-core@npm:9.1.7":
-  version: 9.1.7
-  resolution: "mongodb-memory-server-core@npm:9.1.7"
+"mongodb-memory-server-core@npm:9.1.8":
+  version: 9.1.8
+  resolution: "mongodb-memory-server-core@npm:9.1.8"
   dependencies:
     async-mutex: "npm:^0.4.0"
     camelcase: "npm:^6.3.0"
     debug: "npm:^4.3.4"
     find-cache-dir: "npm:^3.3.2"
-    follow-redirects: "npm:^1.15.3"
+    follow-redirects: "npm:^1.15.6"
     https-proxy-agent: "npm:^7.0.2"
     mongodb: "npm:^5.9.1"
     new-find-package-json: "npm:^2.0.0"
@@ -7960,17 +7960,17 @@ __metadata:
     tar-stream: "npm:^3.0.0"
     tslib: "npm:^2.6.2"
     yauzl: "npm:^2.10.0"
-  checksum: 10c0/cae79d79e4f44fccea9839dc56df6f24ba50c1d007317f0ce3fa7348b15c0f0b19e9771650b4b3db0c4fa1747d1c9f589644b5e22b603a2b3a16622a57da9603
+  checksum: 10c0/b9a7d258debee5b94bc14ab463638a671f6738a4d37e762113aa9715e77832bab31e80972b5b92594e57f42d5e990ebe3bcdc19281c5851928ebc1a59bd2dadf
   languageName: node
   linkType: hard
 
-"mongodb-memory-server@npm:9.1.7":
-  version: 9.1.7
-  resolution: "mongodb-memory-server@npm:9.1.7"
+"mongodb-memory-server@npm:9.1.8":
+  version: 9.1.8
+  resolution: "mongodb-memory-server@npm:9.1.8"
   dependencies:
-    mongodb-memory-server-core: "npm:9.1.7"
+    mongodb-memory-server-core: "npm:9.1.8"
     tslib: "npm:^2.6.2"
-  checksum: 10c0/16c78bbdb23f8f1c2d5a3e56503379583b9cb2855bd8745900333f3044fe247fa5375cd52c6796e6088483e5b475c1038080bf621eaf1335e61ca185251e2fc5
+  checksum: 10c0/1e9d08a98440f02355c0158ed312b133805204685d336a94b7aedf510f711085cb99ca748f27aa6e8cdb5f90bbc8d0e8cd4f0bf042265680652d0ff190a64f8c
   languageName: node
   linkType: hard
 
