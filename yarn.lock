@@ -1154,7 +1154,7 @@ __metadata:
     prettier: "npm:2.8.8"
     reflect-metadata: "npm:0.2.2"
     semver: "npm:7.6.0"
-    simple-git: "npm:3.23.0"
+    simple-git: "npm:3.24.0"
     socket.io: "npm:4.7.5"
     supertest: "npm:6.3.4"
     toad-scheduler: "npm:3.0.1"
@@ -9532,14 +9532,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"simple-git@npm:3.23.0":
-  version: 3.23.0
-  resolution: "simple-git@npm:3.23.0"
+"simple-git@npm:3.24.0":
+  version: 3.24.0
+  resolution: "simple-git@npm:3.24.0"
   dependencies:
     "@kwsites/file-exists": "npm:^1.1.1"
     "@kwsites/promise-deferred": "npm:^1.1.1"
     debug: "npm:^4.3.4"
-  checksum: 10c0/f23ff9a6761b27debb8234f103b11c5b66d51e27cb3c3ab7dd53c7c8585809276b82925319538407851717875b64e2e03518369c7b958b75748ab84015ad0879
+  checksum: 10c0/4329e5be1a7af1ebb476354ed6edf6d2828dc221e15d22ce3e5e8028f537d5e9ac059d813911516f78e22dfa2ee4db4c8cf30bf912bd284e530b733bd6b5c3a0
   languageName: node
   linkType: hard
 
