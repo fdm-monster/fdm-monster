@@ -2032,18 +2032,18 @@ __metadata:
   linkType: hard
 
 "@smithy/core@npm:^1.4.0":
-  version: 1.4.0
-  resolution: "@smithy/core@npm:1.4.0"
+  version: 1.4.1
+  resolution: "@smithy/core@npm:1.4.1"
   dependencies:
     "@smithy/middleware-endpoint": "npm:^2.5.0"
-    "@smithy/middleware-retry": "npm:^2.2.0"
+    "@smithy/middleware-retry": "npm:^2.3.0"
     "@smithy/middleware-serde": "npm:^2.3.0"
     "@smithy/protocol-http": "npm:^3.3.0"
     "@smithy/smithy-client": "npm:^2.5.0"
     "@smithy/types": "npm:^2.12.0"
     "@smithy/util-middleware": "npm:^2.2.0"
     tslib: "npm:^2.6.2"
-  checksum: 10c0/a5ece1a4751be0778754cdff7484fd8930068c1ea858c696836ecd9c60fdd7944aef27590d35b95f6a4c499427c7b653ffddc452ad3ee6f8906e2a57e06e39ad
+  checksum: 10c0/b90f253ab5d110de2f30e5f049284e7956fd06aefd670956ddd38142981a55616c5466443674b623003f7005c93d54eb4a184e623a7fec6c91a27e8a091db045
   languageName: node
   linkType: hard
 
@@ -2142,9 +2142,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@smithy/middleware-retry@npm:^2.2.0":
-  version: 2.2.0
-  resolution: "@smithy/middleware-retry@npm:2.2.0"
+"@smithy/middleware-retry@npm:^2.2.0, @smithy/middleware-retry@npm:^2.3.0":
+  version: 2.3.0
+  resolution: "@smithy/middleware-retry@npm:2.3.0"
   dependencies:
     "@smithy/node-config-provider": "npm:^2.3.0"
     "@smithy/protocol-http": "npm:^3.3.0"
@@ -2154,8 +2154,8 @@ __metadata:
     "@smithy/util-middleware": "npm:^2.2.0"
     "@smithy/util-retry": "npm:^2.2.0"
     tslib: "npm:^2.6.2"
-    uuid: "npm:^8.3.2"
-  checksum: 10c0/6b4b0913b729b2f56e30cb9cef42cdd3e41a2ad570e1e6b60f8662326e1f1063ff2335176c5308f99153c13c3a3e8d30f5adacb2cd744d0fbb10192ebb021ad9
+    uuid: "npm:^9.0.1"
+  checksum: 10c0/ea4be0c81565ced078767e0d149ccd65f8e54114b9ce7ecea39df73e88f800079b9a246940dd2761d452ac46da52f62cf6d80ba3a4febd09324a520cdb6830b3
   languageName: node
   linkType: hard
 
@@ -4824,9 +4824,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.4.668":
-  version: 1.4.721
-  resolution: "electron-to-chromium@npm:1.4.721"
-  checksum: 10c0/d761b737b988fb3b3567b7062330afb5891690bc8030f5f5f4fb1c8a8d929c8408a5e7a41950bb9add904d30a6dda34b38aea3da08dcb1b01336e1ef3aece81f
+  version: 1.4.722
+  resolution: "electron-to-chromium@npm:1.4.722"
+  checksum: 10c0/6f1ebe00b6d8a4d122ee364dbf6c03772b9e141eac8a9456ee28a49e5b168ee64c0bb2608b90284a158f46caf912335360c5adbfd0e77271aff4e73279f34b84
   languageName: node
   linkType: hard
 
@@ -4932,8 +4932,8 @@ __metadata:
   linkType: hard
 
 "es-abstract@npm:^1.22.1, es-abstract@npm:^1.22.3, es-abstract@npm:^1.23.0, es-abstract@npm:^1.23.2":
-  version: 1.23.2
-  resolution: "es-abstract@npm:1.23.2"
+  version: 1.23.3
+  resolution: "es-abstract@npm:1.23.3"
   dependencies:
     array-buffer-byte-length: "npm:^1.0.1"
     arraybuffer.prototype.slice: "npm:^1.0.3"
@@ -4974,14 +4974,14 @@ __metadata:
     safe-regex-test: "npm:^1.0.3"
     string.prototype.trim: "npm:^1.2.9"
     string.prototype.trimend: "npm:^1.0.8"
-    string.prototype.trimstart: "npm:^1.0.7"
+    string.prototype.trimstart: "npm:^1.0.8"
     typed-array-buffer: "npm:^1.0.2"
     typed-array-byte-length: "npm:^1.0.1"
     typed-array-byte-offset: "npm:^1.0.2"
-    typed-array-length: "npm:^1.0.5"
+    typed-array-length: "npm:^1.0.6"
     unbox-primitive: "npm:^1.0.2"
     which-typed-array: "npm:^1.1.15"
-  checksum: 10c0/1262ebb7cdb79f255fc7d1f4505c0de2d88d117a0b21d0c984c28a0126efa717ef011f07d502353987cbade39f12c0a5ae59aef0b1231a51ce1b991e4e87c8bb
+  checksum: 10c0/d27e9afafb225c6924bee9971a7f25f20c314f2d6cb93a63cada4ac11dcf42040896a6c22e5fb8f2a10767055ed4ddf400be3b1eb12297d281726de470b75666
   languageName: node
   linkType: hard
 
@@ -9811,7 +9811,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"string.prototype.trimstart@npm:^1.0.7":
+"string.prototype.trimstart@npm:^1.0.8":
   version: 1.0.8
   resolution: "string.prototype.trimstart@npm:1.0.8"
   dependencies:
@@ -10353,7 +10353,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typed-array-length@npm:^1.0.5":
+"typed-array-length@npm:^1.0.6":
   version: 1.0.6
   resolution: "typed-array-length@npm:1.0.6"
   dependencies:
@@ -10586,21 +10586,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uuid@npm:9.0.1, uuid@npm:^9.0.0":
+"uuid@npm:9.0.1, uuid@npm:^9.0.0, uuid@npm:^9.0.1":
   version: 9.0.1
   resolution: "uuid@npm:9.0.1"
   bin:
     uuid: dist/bin/uuid
   checksum: 10c0/1607dd32ac7fc22f2d8f77051e6a64845c9bce5cd3dd8aa0070c074ec73e666a1f63c7b4e0f4bf2bc8b9d59dc85a15e17807446d9d2b17c8485fbc2147b27f9b
-  languageName: node
-  linkType: hard
-
-"uuid@npm:^8.3.2":
-  version: 8.3.2
-  resolution: "uuid@npm:8.3.2"
-  bin:
-    uuid: dist/bin/uuid
-  checksum: 10c0/bcbb807a917d374a49f475fae2e87fdca7da5e5530820ef53f65ba1d12131bd81a92ecf259cc7ce317cbe0f289e7d79fdfebcef9bfa3087c8c8a2fa304c9be54
   languageName: node
   linkType: hard
 
