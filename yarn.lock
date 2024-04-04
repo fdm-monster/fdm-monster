@@ -1106,7 +1106,7 @@ __metadata:
     "@types/uuid": "npm:9.0.8"
     "@types/ws": "npm:8.5.10"
     adm-zip: "npm:0.5.12"
-    awilix: "npm:10.0.1"
+    awilix: "npm:10.0.2"
     awilix-express: "npm:9.0.1"
     axios: "npm:1.6.8"
     bcryptjs: "npm:2.4.3"
@@ -3576,13 +3576,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"awilix@npm:10.0.1":
-  version: 10.0.1
-  resolution: "awilix@npm:10.0.1"
+"awilix@npm:10.0.2":
+  version: 10.0.2
+  resolution: "awilix@npm:10.0.2"
   dependencies:
     camel-case: "npm:^4.1.2"
     fast-glob: "npm:^3.3.2"
-  checksum: 10c0/5e04ea5c475b837f518f7bc06b5ca18ef725ffb83768e0994bd9401a6dc808097725fe17aae1564730204130cc4349d895ffea3951ea36256ce754cac946859d
+  checksum: 10c0/e9da1951ea0fe8e0c938ca0c6424dff4a13eed347138156a121bc363ffb7eb6f8e294aa2b73657796be17655dedf79745bbf284dfb5c3ada58a36ffdcd8c0044
   languageName: node
   linkType: hard
 
