@@ -48,7 +48,7 @@ jobs:
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
           file: ./docker/alpha.Dockerfile
-          tags: fdmmonster/fdm-monster:${{ env.SERVER_VERSION }}-sqlite, fdmmonster/fdm-monster:latest-sqlite, fdmmonster/fdm-monster:${{ env.SERVER_VERSION }}-alpha davidzwa/fdm-monster:${{ env.SERVER_VERSION }}-sqlite, davidzwa/fdm-monster:latest-sqlite, davidzwa/fdm-monster:${{ env.SERVER_VERSION }}-alpha
+          tags: fdmmonster/fdm-monster:${{ env.SERVER_VERSION }}-sqlite, fdmmonster/fdm-monster:latest-sqlite, fdmmonster/fdm-monster:${{ env.SERVER_VERSION }}-alpha, davidzwa/fdm-monster:${{ env.SERVER_VERSION }}-sqlite, davidzwa/fdm-monster:latest-sqlite, davidzwa/fdm-monster:${{ env.SERVER_VERSION }}-alpha
           labels: ${{ needs.meta.outputs.labels }}
 
       # Show image digest output
