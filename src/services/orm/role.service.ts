@@ -79,6 +79,12 @@ export class RoleService extends BaseService(Role, RoleDto<SqliteIdType>) implem
     return permissions;
   }
 
+  /**
+   * Checks if the role names or ids overlap
+   * @param requiredRoles list of roles that would grant access
+   * @param assignedRoles application role names or role ids (not to be confused with user role assignments)
+   * @param subset
+   */
   authorizeRoles(requiredRoles: (string | SqliteIdType)[], assignedRoles: (string | SqliteIdType)[], subset: boolean): boolean {
     let isAuthorized = false;
 
@@ -130,16 +136,6 @@ export class RoleService extends BaseService(Role, RoleDto<SqliteIdType>) implem
     return this.getRoleByName(roleName);
   }
 
-  normalizeRoleIdOrName(assignedRole: string | SqliteIdType): string | undefined {
-    const roleInstance = this.roles.find((r) => r.id === assignedRole || r.name === assignedRole);
-    if (!roleInstance) {
-      console.warn(`The role by ID ${assignedRole} did not exist in definition. Skipping.`);
-      return;
-    }
-
-    return roleInstance.name;
-  }
-
   async syncRoles(): Promise<void> {
     this._roles = [];
     for (let roleName of Object.values(ROLES)) {
@@ -153,5 +149,15 @@ export class RoleService extends BaseService(Role, RoleDto<SqliteIdType>) implem
         this._roles.push(storedRole);
       }
     }
+  }
+
+  private normalizeRoleIdOrName(assignedRole: string | SqliteIdType): string | undefined {
+    const roleInstance = this.roles.find((r) => r.id === assignedRole || r.name === assignedRole);
+    if (!roleInstance) {
+      console.warn(`The role by ID ${assignedRole} did not exist in definition. Skipping.`);
+      return;
+    }
+
+    return roleInstance.name;
   }
 }

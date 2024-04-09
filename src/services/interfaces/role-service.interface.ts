@@ -28,6 +28,4 @@ export interface IRoleService<KeyType = IdType, Entity = IRole> {
   getRole(roleId: KeyType): Entity;
 
   syncRoles(): Promise<void>;
-
-  normalizeRoleIdOrName(assignedRole: string | KeyType): string | undefined;
 }

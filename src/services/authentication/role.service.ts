@@ -141,7 +141,7 @@ export class RoleService implements IRoleService<MongoIdType> {
     }
   }
 
-  normalizeRoleIdOrName(assignedRole: string | MongoIdType) {
+  private normalizeRoleIdOrName(assignedRole: string | MongoIdType) {
     const roleInstance = this.roles.find((r) => r.id === assignedRole || r.name === assignedRole);
     if (!roleInstance) {
       console.warn(`The role by ID ${assignedRole} did not exist in definition. Skipping.`);
