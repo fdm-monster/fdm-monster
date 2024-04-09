@@ -67,7 +67,7 @@ export const interceptRoles = inject(
       const serverSettings = await settingsStore.getSettings();
 
       if (isTypeormMode) {
-        req.roles = req.user?.roles.map((r) => r.id);
+        req.roles = req.user?.roles.map((r) => r.roleId);
       } else {
         req.roles = req.user?.roles;
       }
