@@ -1,6 +1,8 @@
 FROM node:18-bookworm-slim as production
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y ca-certificates curl
+
 RUN yarn global add pm2
 
 COPY .swcrc tsconfig.json package.json jest.config.js yarn.lock ./
