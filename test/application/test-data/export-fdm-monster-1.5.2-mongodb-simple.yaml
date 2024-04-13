@@ -1,0 +1,36 @@
+version: 1.5.1
+exportedAt: 2023-11-11T09:02:41.703Z
+config:
+  exportPrinters: true
+  exportFloorGrid: true
+  printerComparisonStrategiesByPriority:
+    - name
+    - url
+  exportFloors: true
+  floorComparisonStrategiesByPriority: floor
+  notes: ''
+printers:
+  - id: 648f3e6d372112628bb8e404
+    disabledReason: null
+    enabled: true
+    dateAdded: 1687109229334
+    name: Dragon Eggggg
+    printerURL: http://demo.fdm-monster.net:5001
+    apiKey: asdasdasdasdasdasdasdasdasdasdas
+floors:
+  - id: 64427f2d070a27047acd5e6e
+    floor: 15
+    name: Floor1
+    printers:
+      - floorId: 64427f2d070a27047acd5e6e
+        printerId: 648f3e6d372112628bb8e404
+        x: 0
+        'y': 0
+  - id: 64427f2d070a27047acd5e6f
+    floor: 16
+    name: Floor2
+    printers:
+      - floorId: 64427f2d070a27047acd5e6f
+        printerId: 648f3e6d372112628bb8e404
+        x: 0
+        'y': 0

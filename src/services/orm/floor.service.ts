@@ -69,7 +69,13 @@ export class FloorService
 
   async update(floorId: SqliteIdType, update: UpdateFloorDto<SqliteIdType>) {
     const floor = await this.get(floorId);
-    const floorUpdate = Object.assign(floor, update);
+    const floorUpdate = {
+      ...floor,
+      name: update.name,
+      printers: update.printers,
+      floor: update.floor,
+    };
+
     await validateInput(floorUpdate, updateFloorRules);
     const printers = floorUpdate.printers;
     if (printers?.length) {

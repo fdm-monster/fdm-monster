@@ -132,4 +132,18 @@ describe(YamlService.name, () => {
       expect(printerGroupService).toBeNull();
     }
   });
+
+  it("should import floor over existing floor", async () => {
+    const defaultFloor = await floorService.create({
+      name: "Floor1",
+      floor: 15,
+      printers: [],
+    });
+    await printerCache.loadCache();
+
+    const buffer = readFileSync(join(__dirname, "./test-data/export-fdm-monster-1.5.2-mongodb-simple.yaml"));
+    await yamlService.importPrintersAndFloors(buffer.toString());
+    const floors = await floorService.list();
+    expect(floors).toHaveLength(2);
+  });
 });
