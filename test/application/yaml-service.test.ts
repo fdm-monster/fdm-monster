@@ -9,6 +9,7 @@ import { readFileSync } from "node:fs";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { IFloorService } from "@/services/interfaces/floor.service.interface";
 import { PrinterGroupService } from "@/services/orm/printer-group.service";
+import { testPrinterData } from "./test-data/printer.data";
 
 let container: AwilixContainer;
 let yamlService: YamlService;
@@ -134,10 +135,18 @@ describe(YamlService.name, () => {
   });
 
   it("should import floor over existing floor", async () => {
+    const printer = await printerService.create({ ...testPrinterData, name: "YamlImportTestPrinter" });
     const defaultFloor = await floorService.create({
-      name: "Floor1",
+      name: "Floor1_DifferentName",
       floor: 15,
-      printers: [],
+      printers: [
+        {
+          // Position is not used in imported floor "Floor1"
+          x: 0,
+          y: 1,
+          printerId: printer.id,
+        },
+      ],
     });
     await printerCache.loadCache();
 
@@ -145,5 +154,23 @@ describe(YamlService.name, () => {
     await yamlService.importPrintersAndFloors(buffer.toString());
     const floors = await floorService.list();
     expect(floors).toHaveLength(2);
+
+    expect(floors.find((f) => f.name === "Floor1_DifferentName")).toBeUndefined();
+
+    // This is the problem in #1948
+    const f2 = floors.find((f) => f.name === "Floor2");
+    expect(f2).toBeDefined();
+    expect(f2.printers).toHaveLength(1);
+
+    // This works fine
+    const mergedFloor = floors.find((f) => f.name === "Floor1");
+    expect(mergedFloor).toBeDefined();
+    expect(mergedFloor.printers).toHaveLength(2);
+    const originalPrinterPos = mergedFloor.printers.find((p) => p.printerId === printer.id);
+    expect(originalPrinterPos).toBeDefined();
+    expect(originalPrinterPos.x).toBe(0);
+    expect(originalPrinterPos.y).toBe(1);
+    const newPrinterPos = mergedFloor.printers.find((p) => p.x === 0 && p.y === 0);
+    expect(newPrinterPos).toBeDefined();
   });
 });
