@@ -10,5 +10,4 @@ Fixes:
 - YAML Import has issues updating a floor, printers positions are not consistently are updated.
 - YAML Import converted printer IDs to string, causing the printers to not show up on the printer grid until server restart. The import was done correctly on database level.
 - Deleting a printer would remove the position of another printer, the removal was referring to the wrong position.
-
-
+- Setting demo mode will not set wizard to be completed: first time setup will be required after setting demo mode to false.
