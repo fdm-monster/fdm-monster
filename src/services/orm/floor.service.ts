@@ -136,7 +136,7 @@ export class FloorService
     // Validation only
     await this.get(floorId, true);
 
-    const position = await this.floorPositionService.findPrinterPositionOnFloor(floorId, positionDto.printerId as SqliteIdType);
+    const position = await this.floorPositionService.findPrinterPosition(positionDto.printerId as SqliteIdType);
     // Optimization if position is in desired state already
     if (
       position &&
