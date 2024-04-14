@@ -1,5 +1,9 @@
 # FDM Monster 13/04/2024 1.6.1
 
+Changes:
+
+- Dropped the permission check on /api/features as it made no sense
+
 Fixes:
 
 - YAML Import would fail updating properly an existing floor by floor level
