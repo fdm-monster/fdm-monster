@@ -9,14 +9,20 @@ import { readFileSync } from "node:fs";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { IFloorService } from "@/services/interfaces/floor.service.interface";
 import { PrinterGroupService } from "@/services/orm/printer-group.service";
+import { testPrinterData } from "./test-data/printer.data";
+import { FloorStore } from "@/state/floor.store";
+import { FloorPositionService } from "@/services/orm/floor-position.service";
 
 let container: AwilixContainer;
 let yamlService: YamlService;
 let printerCache: PrinterCache;
 let printerService: IPrinterService;
 let floorService: IFloorService;
+let floorStore: FloorStore;
 let printerGroupService: PrinterGroupService;
 let isTypeormMode: boolean;
+// Use only when isTypeormMode is true
+let floorPositionService: FloorPositionService;
 
 beforeAll(async () => {
   const { container, isTypeormMode: _isTypeormMode } = await setupTestApp(true);
@@ -25,6 +31,8 @@ beforeAll(async () => {
   printerCache = container.resolve(DITokens.printerCache);
   printerService = container.resolve(DITokens.printerService);
   floorService = container.resolve(DITokens.floorService);
+  floorPositionService = container.resolve(DITokens.floorPositionService);
+  floorStore = container.resolve(DITokens.floorStore);
   printerGroupService = container.resolve(DITokens.printerGroupService);
 });
 afterEach(async () => {
@@ -131,5 +139,57 @@ describe(YamlService.name, () => {
     } else {
       expect(printerGroupService).toBeNull();
     }
+  });
+
+  it("should import floor over existing floor", async () => {
+    const printer = await printerService.create({ ...testPrinterData, name: "YamlImportTestPrinter" });
+    const defaultFloor = await floorService.create({
+      name: "Floor1_DifferentName",
+      floor: 15,
+      printers: [
+        {
+          // Position is not used in imported floor "Floor1"
+          x: 0,
+          y: 1,
+          printerId: printer.id,
+        },
+      ],
+    });
+    expect(defaultFloor.printers.find((p) => p.printerId.toString() === printer.id.toString())).toBeDefined();
+    await printerCache.loadCache();
+
+    const buffer = readFileSync(join(__dirname, "./test-data/export-fdm-monster-1.5.2-mongodb-simple.yaml"));
+    await yamlService.importPrintersAndFloors(buffer.toString());
+
+    // Probe the new floor and assert a position on it is taken
+    const floors = await floorService.list();
+    expect(floors).toHaveLength(2);
+    const newFloor2 = floors.find((f) => f.name === "Floor2");
+    if (isTypeormMode) {
+      expect(typeof newFloor2.id).toBe("number");
+    } else {
+      expect(typeof newFloor2.id).toBe("string");
+    }
+    expect(newFloor2).toBeDefined();
+    expect(newFloor2.floor).toBe(16);
+    expect(newFloor2.printers).toHaveLength(1);
+    if (isTypeormMode) {
+      const positionTemp = await floorPositionService.findPosition(newFloor2.id as number, 0, 0);
+      expect(positionTemp).not.toBeNull();
+    }
+
+    // The original floor's name is now gone, and the original printer has not been removed from it (overwrite action)
+    expect(floors.find((f) => f.name === "Floor1_DifferentName")).toBeUndefined();
+    const mutatedFloor1 = floors.find((f) => f.name === "Floor1" && f.floor === 15);
+    expect(mutatedFloor1.printers).toHaveLength(1);
+    expect(mutatedFloor1).toBeDefined();
+    const originalPrinterPos = mutatedFloor1.printers.find((p) => p.printerId === printer.id);
+    expect(originalPrinterPos).toBeUndefined();
+    const newPrinterPos = mutatedFloor1.printers.find((p) => p.x === 0 && p.y === 0);
+    expect(newPrinterPos).toBeDefined();
+
+    // Test that caching is not the cause
+    const cache = await floorStore.listCache();
+    expect(cache.find((f) => f.name === "Floor2").printers).toHaveLength(1);
   });
 });

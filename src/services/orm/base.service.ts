@@ -1,13 +1,20 @@
 import { IBaseService, Type } from "@/services/orm/base.interface";
 import { SqliteIdType } from "@/shared.constants";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
-import { DeepPartial, DeleteResult, EntityNotFoundError, EntityTarget, FindManyOptions, Repository } from "typeorm";
+import {
+  DeepPartial,
+  DeleteResult,
+  EntityNotFoundError,
+  EntityTarget,
+  FindManyOptions,
+  FindOneOptions,
+  Repository,
+} from "typeorm";
 import { validate } from "class-validator";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import { BaseEntity } from "@/entities/base.entity";
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import { DEFAULT_PAGE, IPagination } from "@/services/interfaces/page.interface";
-import { FindOptionsWhere } from "typeorm/find-options/FindOptionsWhere";
 
 export function BaseService<
   T extends BaseEntity,
@@ -26,9 +33,9 @@ export function BaseService<
 
     abstract toDto(entity: T): DTO;
 
-    async get(id: SqliteIdType, throwIfNotFound = true) {
+    async get(id: SqliteIdType, throwIfNotFound = true, options?: FindOneOptions<T>) {
       try {
-        return this.repository.findOneByOrFail({ id } as FindOptionsWhere<T> | FindOptionsWhere<T>[]);
+        return this.repository.findOneOrFail({ ...options, where: { id } } as FindOneOptions<T>);
       } catch (e) {
         if (throwIfNotFound && e instanceof EntityNotFoundError) {
           throw new NotFoundException(`The entity ${entity} with id '${id}' was not found.`);
@@ -50,7 +57,7 @@ export function BaseService<
       await validate(updateDto);
       await validate(Object.assign(entity, updateDto));
       await this.repository.update(entity.id, updateDto);
-      return entity;
+      return await this.get(id);
     }
 
     async create(dto: CreateDTO) {

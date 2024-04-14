@@ -51,7 +51,7 @@
     - name: "Install @fdm-monster/server as pm2 module"
       shell: "{{ bash }} 'pm2 install @fdm-monster/server@{{fdmm_version}} -n fdmm'"
 
-    - name: Set NodeJS Full Version as a variable
+    - name: Set Node.js Full Version as a variable
       command: "{{ bash }} 'nvm current'"
       register: node_fullversion
       ignore_errors: true

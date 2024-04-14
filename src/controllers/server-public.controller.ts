@@ -153,5 +153,5 @@ export default createController(ServerPublicController)
   .prefix(AppConstants.apiRoute + "/")
   .get("", "welcome", { before: [authenticate(), authorizePermission(PERMS.ServerInfo.Get)] })
   .get("test", "test")
-  .get("features", "getFeatures", { before: [authenticate(), authorizePermission(PERMS.ServerInfo.Get)] })
+  .get("features", "getFeatures", { before: [authenticate()] })
   .get("version", "getVersion", { before: [authenticate(), authorizePermission(PERMS.ServerInfo.Get)] });
