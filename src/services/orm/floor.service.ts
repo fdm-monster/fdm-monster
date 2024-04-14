@@ -110,7 +110,9 @@ export class FloorService
     }
     // Remove any printers that should not exist on floor
     const undesiredPositions = floor.printers.filter((pos) => !desiredPositions.find((dp) => dp.printerId === pos.printerId));
-    await this.floorPositionService.deleteMany(undesiredPositions.map((pos) => pos.id));
+    if (undesiredPositions?.length) {
+      await this.floorPositionService.deleteMany(undesiredPositions.map((pos) => pos.id));
+    }
     delete floorUpdate.printers;
 
     return super.update(floorId, floorUpdate);
