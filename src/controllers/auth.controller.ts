@@ -55,8 +55,12 @@ export class AuthController {
   async getLoginRequired(req: Request, res: Response) {
     const loginRequired = await this.settingsStore.getLoginRequired();
     const registration = this.settingsStore.isRegistrationEnabled();
-    const wizardState = this.settingsStore.getWizardState();
+    let wizardState = this.settingsStore.getWizardState();
     const isDemoMode = this.configService.isDemoMode();
+    wizardState = {
+      ...wizardState,
+      wizardCompleted: isDemoMode ? false : wizardState.wizardCompleted,
+    };
     res.send({ loginRequired, registration, wizardState, isDemoMode });
   }
 

@@ -1,4 +1,4 @@
-import { createController, inject } from "awilix-express";
+import { createController } from "awilix-express";
 import { AppConstants } from "@/server.constants";
 import { isNode, isNodemon, isPm2 } from "@/utils/env.utils";
 import { authenticate, authorizePermission } from "@/middleware/authenticate";
