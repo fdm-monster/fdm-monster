@@ -99,14 +99,14 @@ export class FloorService
   async updateName(floorId: SqliteIdType, name: string) {
     let floor = await this.get(floorId);
     floor.name = name;
-    floor = await this.update(floorId, { name });
+    floor = await this.update(floorId, floor);
     return floor;
   }
 
   async updateLevel(floorId: SqliteIdType, level: number): Promise<Floor> {
     let floor = await this.get(floorId);
     floor.floor = level;
-    floor = await this.update(floorId, { floor: level });
+    floor = await this.update(floorId, floor);
     return floor;
   }
 
