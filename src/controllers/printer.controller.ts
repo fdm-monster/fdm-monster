@@ -145,9 +145,6 @@ export class PrinterController {
     res.send({});
   }
 
-  /**
-   * Pauses the current job
-   */
   async pausePrintJob(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
 
@@ -156,9 +153,6 @@ export class PrinterController {
     res.send({});
   }
 
-  /**
-   * Pauses the current job
-   */
   async resumePrintJob(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
 
