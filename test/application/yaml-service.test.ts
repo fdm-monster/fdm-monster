@@ -155,6 +155,7 @@ describe(YamlService.name, () => {
         },
       ],
     });
+    expect(defaultFloor.printers.find((p) => p.printerId.toString() === printer.id.toString())).toBeDefined();
     await printerCache.loadCache();
 
     const buffer = readFileSync(join(__dirname, "./test-data/export-fdm-monster-1.5.2-mongodb-simple.yaml"));
@@ -177,15 +178,13 @@ describe(YamlService.name, () => {
       expect(positionTemp).not.toBeNull();
     }
 
-    // The original floor's name is now gone, but the printer has not been removed from it
+    // The original floor's name is now gone, and the original printer has not been removed from it (overwrite action)
     expect(floors.find((f) => f.name === "Floor1_DifferentName")).toBeUndefined();
     const mutatedFloor1 = floors.find((f) => f.name === "Floor1" && f.floor === 15);
-    expect(mutatedFloor1.printers).toHaveLength(2);
+    expect(mutatedFloor1.printers).toHaveLength(1);
     expect(mutatedFloor1).toBeDefined();
     const originalPrinterPos = mutatedFloor1.printers.find((p) => p.printerId === printer.id);
-    expect(originalPrinterPos).toBeDefined();
-    expect(originalPrinterPos.x).toBe(0);
-    expect(originalPrinterPos.y).toBe(1);
+    expect(originalPrinterPos).toBeUndefined();
     const newPrinterPos = mutatedFloor1.printers.find((p) => p.x === 0 && p.y === 0);
     expect(newPrinterPos).toBeDefined();
 

@@ -122,23 +122,23 @@ export class FloorService implements IFloorService<MongoIdType> {
     );
   }
 
-  async addOrUpdatePrinter(floorId: MongoIdType, printerInFloor: AddOrUpdatePrinterDto<MongoIdType>) {
+  async addOrUpdatePrinter(floorId: MongoIdType, updatedPosition: AddOrUpdatePrinterDto<MongoIdType>) {
     const floor = await this.get(floorId, true);
-    const validInput = await validateInput(printerInFloor, printerInFloorRules(false));
+    const validInput = await validateInput(updatedPosition, printerInFloorRules(false));
 
     // Ensure printer exists
     await this.printerCache.getCachedPrinterOrThrowAsync(validInput.printerId);
 
     // Ensure position is not taken twice
     floor.printers = floor.printers.filter(
-      (pif: PrinterInFloorDto) => !(pif.x === printerInFloor.x && pif.y === printerInFloor.y)
+      (position: PrinterInFloorDto) => !(position.x === updatedPosition.x && position.y === updatedPosition.y)
     );
 
-    const foundPrinterInFloorIndex = floor.printers.findIndex(
-      (pif: PrinterInFloorDto) => pif.printerId.toString() === validInput.printerId
+    const positionIndex = floor.printers.findIndex(
+      (position: PrinterInFloorDto) => position.printerId.toString() === validInput.printerId.toString()
     );
-    if (foundPrinterInFloorIndex !== -1) {
-      floor.printers[foundPrinterInFloorIndex] = validInput;
+    if (positionIndex !== -1) {
+      floor.printers[positionIndex] = validInput;
     } else {
       floor.printers.push(validInput);
     }
