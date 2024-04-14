@@ -14,10 +14,14 @@ export class FloorPositionService extends BaseService(FloorPosition, PositionDto
     return super.create(dto);
   }
 
-  findPosition(x: number, y: number) {
-    return this.repository.findOneBy({ x, y });
+  findPosition(floorId: SqliteIdType, x: number, y: number) {
+    return this.repository.findOneBy({ floorId, x, y });
   }
 
+  /**
+   * Find the printer across any floor, usually to see if it has been moved elsewhere.
+   * @param printerId The printer which position to be looked up.
+   */
   findPrinterPosition(printerId: SqliteIdType) {
     return this.repository.findOneBy({ printerId });
   }

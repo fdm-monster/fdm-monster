@@ -140,8 +140,12 @@ export class YamlService {
     this.logger.log(`Performing pure create floors (${insertFloors.length} floors)`);
     const floorIdMap = {};
     for (const newFloor of insertFloors) {
+      const originalFloorId = newFloor.id;
+      delete newFloor.id;
+
       // Replace printerIds with newly mapped IDs
       const knownPrinterPositions = [];
+
       if (exportFloorGrid && exportPrinters) {
         for (const floorPosition of newFloor.printers) {
           const knownPrinterId = printerIdMap[floorPosition.printerId];
@@ -150,14 +154,16 @@ export class YamlService {
             continue;
           }
 
+          delete floorPosition.id;
+          delete floorPosition.floorId;
           floorPosition.printerId = knownPrinterId;
           knownPrinterPositions.push(floorPosition);
         }
         newFloor.printers = knownPrinterPositions;
       }
 
-      const state = await this.floorStore.create({ ...newFloor });
-      floorIdMap[newFloor.id] = state.id;
+      const createdFloor = await this.floorStore.create({ ...newFloor });
+      floorIdMap[originalFloorId] = createdFloor.id;
     }
 
     this.logger.log(`Performing update of floors (${updateByPropertyFloors.length} floors)`);
@@ -168,13 +174,15 @@ export class YamlService {
       const knownPrinters = [];
       if (exportFloorGrid && exportPrinters) {
         for (const floorPosition of updatedFloor?.printers) {
-          // TODO check this works from MongoDB to SQLite
           const knownPrinterId = printerIdMap[floorPosition.printerId];
           // If the ID was not mapped, this position is considered discarded
           if (!knownPrinterId) {
             continue;
           }
 
+          // Purge ids that might be of wrong type or format
+          delete floorPosition.id;
+          delete floorPosition.floorId;
           floorPosition.printerId = knownPrinterId;
           knownPrinters.push(floorPosition);
         }
@@ -201,7 +209,7 @@ export class YamlService {
       }
     }
 
-    this.logger.log(`Performing update of group positions (${updateByNameGroups.length} groups)`);
+    this.logger.log(`Performing update of grouped printer links (${updateByNameGroups.length} groups)`);
     for (const updateGroupSpec of updateByNameGroups) {
       const existingGroup = await this.printerGroupService.getGroupWithPrinters(updateGroupSpec.groupId);
       const existingPrinterIds = existingGroup.printers.map((p) => p.printerId);

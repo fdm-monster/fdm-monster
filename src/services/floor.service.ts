@@ -57,42 +57,6 @@ export class FloorService implements IFloorService<MongoIdType> {
       return floors;
     }
 
-    // TODO this does more harm than good
-    // for (const floor of floors) {
-    //   if (!floor.printers?.length) continue;
-
-    // const removedPositionPrinterIds: MongoIdType[] = [];
-
-    // TODO this is prone to collisions
-    // const positionsKnown: { [k: string]: any } = {};
-    // for (const fp of floor.printers) {
-    //   // Remove orphans
-    //   const stringPrinterId = fp.printerId.toString();
-    //   const printerExists = printerIds.includes(stringPrinterId);
-    //   if (!printerExists) {
-    //     removedPositionPrinterIds.push(stringPrinterId);
-    //     continue;
-    //   }
-    //
-    //   // Remove duplicate position, keeping the last added one
-    //   const xyPos = positionsKnown[`${fp.x}${fp.y}`];
-    //   if (!!xyPos) {
-    //     removedPositionPrinterIds.push(xyPos.printerId);
-    //   }
-    //
-    //   // Keep last floor printer
-    //   positionsKnown[`${fp.x}${fp.y}`] = fp;
-    // }
-    //
-    // if (removedPositionPrinterIds?.length) {
-    //   floor.printers = floor.printers.filter((fp) => !removedPositionPrinterIds.includes(fp.printerId));
-    //   await floor.save();
-    //   this.logger.warn(
-    //     `Found ${removedPositionPrinterIds} (floor printerIds) to be in need of removal for floor (duplicate position or non-existing printer)`
-    //   );
-    // }
-    // }
-
     return floors;
   }
 
@@ -141,10 +105,6 @@ export class FloorService implements IFloorService<MongoIdType> {
     const { floor: validLevel } = await validateInput({ floor: level }, updateFloorNumberRules);
     floor.floor = validLevel;
     return await floor.save();
-  }
-
-  async getFloorsOfPrinterId(printerId: MongoIdType) {
-    return Floor.find({ printers: { $elemMatch: { printerId } } });
   }
 
   async deletePrinterFromAnyFloor(printerId: MongoIdType) {

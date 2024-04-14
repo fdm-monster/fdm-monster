@@ -10,12 +10,17 @@ import { IPrinterService } from "@/services/interfaces/printer.service.interface
 import { IFloorService } from "@/services/interfaces/floor.service.interface";
 import { PrinterGroupService } from "@/services/orm/printer-group.service";
 import { testPrinterData } from "./test-data/printer.data";
+import { FloorStore } from "@/state/floor.store";
+import { FloorPosition } from "@/entities";
+import { FloorPositionService } from "@/services/orm/floor-position.service";
 
 let container: AwilixContainer;
 let yamlService: YamlService;
 let printerCache: PrinterCache;
 let printerService: IPrinterService;
 let floorService: IFloorService;
+let floorPositionService: FloorPositionService;
+let floorStore: FloorStore;
 let printerGroupService: PrinterGroupService;
 let isTypeormMode: boolean;
 
@@ -26,6 +31,8 @@ beforeAll(async () => {
   printerCache = container.resolve(DITokens.printerCache);
   printerService = container.resolve(DITokens.printerService);
   floorService = container.resolve(DITokens.floorService);
+  floorPositionService = container.resolve(DITokens.floorPositionService);
+  floorStore = container.resolve(DITokens.floorStore);
   printerGroupService = container.resolve(DITokens.printerGroupService);
 });
 afterEach(async () => {
@@ -152,25 +159,32 @@ describe(YamlService.name, () => {
 
     const buffer = readFileSync(join(__dirname, "./test-data/export-fdm-monster-1.5.2-mongodb-simple.yaml"));
     await yamlService.importPrintersAndFloors(buffer.toString());
+
+    // Probe the new floor and assert a position on it is taken
     const floors = await floorService.list();
     expect(floors).toHaveLength(2);
+    const newFloor2 = floors.find((f) => f.name === "Floor2");
+    expect(typeof newFloor2.id).toBe("number");
+    expect(newFloor2).toBeDefined();
+    expect(newFloor2.floor).toBe(16);
+    expect(newFloor2.printers).toHaveLength(1);
+    const positionTemp = await floorPositionService.findPosition(newFloor2.id as number, 0, 0);
+    expect(positionTemp).not.toBeNull();
 
+    // The original floor's name is now gone, but the printer has not been removed from it
     expect(floors.find((f) => f.name === "Floor1_DifferentName")).toBeUndefined();
-
-    // This is the problem in #1948
-    const f2 = floors.find((f) => f.name === "Floor2");
-    expect(f2).toBeDefined();
-    expect(f2.printers).toHaveLength(1);
-
-    // This works fine
-    const mergedFloor = floors.find((f) => f.name === "Floor1");
-    expect(mergedFloor).toBeDefined();
-    expect(mergedFloor.printers).toHaveLength(2);
-    const originalPrinterPos = mergedFloor.printers.find((p) => p.printerId === printer.id);
+    const mutatedFloor1 = floors.find((f) => f.name === "Floor1" && f.floor === 15);
+    expect(mutatedFloor1.printers).toHaveLength(2);
+    expect(mutatedFloor1).toBeDefined();
+    const originalPrinterPos = mutatedFloor1.printers.find((p) => p.printerId === printer.id);
     expect(originalPrinterPos).toBeDefined();
     expect(originalPrinterPos.x).toBe(0);
     expect(originalPrinterPos.y).toBe(1);
-    const newPrinterPos = mergedFloor.printers.find((p) => p.x === 0 && p.y === 0);
+    const newPrinterPos = mutatedFloor1.printers.find((p) => p.x === 0 && p.y === 0);
     expect(newPrinterPos).toBeDefined();
+
+    // Test that caching is not the cause
+    const cache = await floorStore.listCache();
+    expect(cache.find((f) => f.name === "Floor2").printers).toHaveLength(1);
   });
 });
