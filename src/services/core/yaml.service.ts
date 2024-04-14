@@ -130,11 +130,23 @@ export class YamlService {
     this.logger.log(`Performing update import printers (${updateByPropertyPrinters.length} printers)`);
     for (const updatePrinterSpec of updateByPropertyPrinters) {
       const updateId = updatePrinterSpec.printerId;
-      const state = await this.printerService.update(updateId, updatePrinterSpec.value);
+      const updatedPrinter = updatePrinterSpec.value;
+      if (typeof updateId === "string" && this.isTypeormMode) {
+        throw new Error("Cannot update a printer by string id in SQLite mode");
+      } else if (typeof updateId === "number" && !this.isTypeormMode) {
+        throw new Error("Cannot update a printer by number id in MongoDB mode");
+      }
+
+      const originalPrinterId = updatedPrinter.id;
+      delete updatePrinterSpec.value.id;
+
+      updatedPrinter.id = updateId;
+      const state = await this.printerService.update(updateId, updatedPrinter);
       if (!updatePrinterSpec.printerId) {
         throw new Error("Saved ID was empty");
       }
-      printerIdMap[updatePrinterSpec.printerId] = state.id;
+
+      printerIdMap[originalPrinterId] = state.id;
     }
 
     this.logger.log(`Performing pure create floors (${insertFloors.length} floors)`);
@@ -169,7 +181,16 @@ export class YamlService {
     this.logger.log(`Performing update of floors (${updateByPropertyFloors.length} floors)`);
     for (const updateFloorSpec of updateByPropertyFloors) {
       const updateId = updateFloorSpec.floorId;
+
+      if (typeof updateId === "string" && this.isTypeormMode) {
+        throw new Error("Cannot update a floor by string id in SQLite mode");
+      } else if (typeof updateId === "number" && !this.isTypeormMode) {
+        throw new Error("Cannot update a floor by number id in MongoDB mode");
+      }
+
       const updatedFloor = updateFloorSpec.value;
+      const originalFloorId = updatedFloor.id;
+      delete updatedFloor.id;
 
       const knownPrinters = [];
       if (exportFloorGrid && exportPrinters) {
@@ -189,9 +210,9 @@ export class YamlService {
         updatedFloor.id = updateId;
         updatedFloor.printers = knownPrinters;
       }
-
-      const state = await this.floorStore.update(updateId, updatedFloor);
-      floorIdMap[updateId] = state.id;
+      const newFloor = await this.floorStore.update(updateId, updatedFloor);
+      console.log(JSON.stringify(newFloor, null, 2));
+      floorIdMap[originalFloorId] = newFloor.id;
     }
 
     await this.floorStore.loadStore();
@@ -255,7 +276,7 @@ export class YamlService {
             }
             updateByPropertyPrinters.push({
               strategy: "name",
-              printerId: ids[foundIndex],
+              printerId: this.isTypeormMode ? parseInt(ids[foundIndex]) : ids[foundIndex],
               value: printer,
             });
             break;
@@ -269,7 +290,7 @@ export class YamlService {
             }
             updateByPropertyPrinters.push({
               strategy: "url",
-              printerId: ids[foundIndex],
+              printerId: this.isTypeormMode ? parseInt(ids[foundIndex]) : ids[foundIndex],
               value: printer,
             });
             break;
@@ -283,7 +304,7 @@ export class YamlService {
             }
             updateByPropertyPrinters.push({
               strategy: "id",
-              printerId: ids[foundIndex],
+              printerId: this.isTypeormMode ? parseInt(ids[foundIndex]) : ids[foundIndex],
               value: printer,
             });
             break;
@@ -323,7 +344,7 @@ export class YamlService {
             }
             updateByPropertyFloors.push({
               strategy: "name",
-              floorId: ids[foundIndex],
+              floorId: this.isTypeormMode ? parseInt(ids[foundIndex]) : ids[foundIndex],
               value: floor,
             });
             break;
@@ -337,7 +358,7 @@ export class YamlService {
             }
             updateByPropertyFloors.push({
               strategy: "floor",
-              floorId: ids[foundIndex],
+              floorId: this.isTypeormMode ? parseInt(ids[foundIndex]) : ids[foundIndex],
               value: floor,
             });
             break;
@@ -351,7 +372,7 @@ export class YamlService {
             }
             updateByPropertyFloors.push({
               strategy: "id",
-              floorId: ids[foundIndex],
+              floorId: this.isTypeormMode ? parseInt(ids[foundIndex]) : ids[foundIndex],
               value: floor,
             });
             break;

@@ -57,7 +57,7 @@ export function BaseService<
       await validate(updateDto);
       await validate(Object.assign(entity, updateDto));
       await this.repository.update(entity.id, updateDto);
-      return entity;
+      return await this.get(id);
     }
 
     async create(dto: CreateDTO) {

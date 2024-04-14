@@ -3,7 +3,7 @@
 Fixes:
 
 - YAML Import would fail updating properly an existing floor by floor level
-
-Known issues:
-
 - YAML Import has issues updating a floor, printers positions are not consistently are updated.
+- YAML Import converted printer IDs to string, causing the printers to not show up on the printer grid until server restart. The import was done correctly on database level. 
+
+
