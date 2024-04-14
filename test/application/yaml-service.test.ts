@@ -164,7 +164,11 @@ describe(YamlService.name, () => {
     const floors = await floorService.list();
     expect(floors).toHaveLength(2);
     const newFloor2 = floors.find((f) => f.name === "Floor2");
-    expect(typeof newFloor2.id).toBe("number");
+    if (isTypeormMode) {
+      expect(typeof newFloor2.id).toBe("number");
+    } else {
+      expect(typeof newFloor2.id).toBe("string");
+    }
     expect(newFloor2).toBeDefined();
     expect(newFloor2.floor).toBe(16);
     expect(newFloor2.printers).toHaveLength(1);
