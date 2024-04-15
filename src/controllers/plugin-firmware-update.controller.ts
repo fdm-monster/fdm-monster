@@ -69,7 +69,6 @@ export class PluginFirmwareUpdateController {
     const { printerLogin } = getScopedPrinter(req);
     const isInstalled = await this.pluginFirmwareUpdateService.isPluginInstalled(printerLogin);
     if (!isInstalled) {
-      this.logger.log("Installing firmware-update plugin");
       await this.pluginFirmwareUpdateService.installPlugin(printerLogin);
       res.send({ isInstalled, installing: true });
       return;
@@ -118,7 +117,7 @@ export class PluginFirmwareUpdateController {
           pluginInstalled: isInstalled,
         });
       } catch (e) {
-        this.logger.warn("Firmware updater plugin scan failed", e);
+        this.logger.error("Firmware updater plugin scan failed with an error");
         failureStates.push({
           id: printer.id,
           printerName: printer.name,

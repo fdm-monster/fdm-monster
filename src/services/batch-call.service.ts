@@ -199,6 +199,7 @@ export class BatchCallService {
             reprintState: ReprintState.LastPrintReady,
           });
         } catch (e) {
+          captureException(e);
           return resolve({
             connectionState: null,
             printerId,
@@ -225,6 +226,7 @@ export class BatchCallService {
           return { success: true, printerId, time: Date.now() - time };
         })
         .catch((e) => {
+          captureException(e);
           return { failure: true, error: e.message, printerId, time: Date.now() - time };
         });
 

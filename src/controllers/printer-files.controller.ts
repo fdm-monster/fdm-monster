@@ -72,7 +72,7 @@ export class PrinterFilesController {
     const { currentPrinterId } = getScopedPrinter(req);
     const { recursive } = await validateInput(req.query, getFilesRules);
 
-    this.logger.log("Refreshing file storage by eager load");
+    this.logger.log("Refreshing file storage (eager load)");
     const files = await this.printerFilesStore.eagerLoadPrinterFiles(currentPrinterId, recursive);
     res.send(files);
   }
@@ -145,10 +145,7 @@ export class PrinterFilesController {
     const { path } = await validateInput(req.query, getFileRules);
 
     const result = await this.octoPrintApiService.deleteFileOrFolder(printerLogin, path);
-
     await this.printerFilesStore.deleteFile(currentPrinterId, path, false);
-    this.logger.log(`File reference removed, printerId ${currentPrinterId}`, path);
-
     res.send(result);
   }
 

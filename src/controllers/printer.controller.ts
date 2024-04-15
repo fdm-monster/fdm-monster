@@ -178,7 +178,6 @@ export class PrinterController {
     // Has internal validation, but might add some here above as well
     const createdPrinter = await this.printerService.create(newPrinter);
     const printer = await this.printerCache.getCachedPrinterOrThrowAsync(createdPrinter.id);
-    this.logger.log(`Created printer with ID ${printer.id || printer.correlationToken}`);
     res.send(printer);
   }
 
@@ -223,8 +222,6 @@ export class PrinterController {
   async updateEnabled(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
     const data = await validateMiddleware(req, updatePrinterEnabledRule);
-
-    this.logger.log("Changing printer enabled setting", JSON.stringify(data));
     await this.printerService.updateEnabled(currentPrinterId, data.enabled);
     res.send({});
   }
@@ -232,8 +229,6 @@ export class PrinterController {
   async updatePrinterDisabledReason(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
     const data = await validateMiddleware(req, updatePrinterDisabledReasonRules);
-
-    this.logger.log("Changing printer disabled reason setting", JSON.stringify(data));
     await this.printerService.updateDisabledReason(currentPrinterId, data.disabledReason);
     res.send({});
   }
