@@ -69,9 +69,7 @@ export class PrinterFileCleanTask {
       }
       if (errorPrinters.length > 0) {
         this.logger.error(
-          `Error loading some files, ${errorPrinters.length} printer(s) (${errorPrinters.map(
-            (ep) => `${ep.printer.name} ${ep.e.toString()}`
-          )}) did not respond or returned an unexpected status code. Those will depend on previously cached files.`
+          `Error loading some files, ${errorPrinters.length} printer(s) did not respond or returned an unexpected status code. Those will depend on previously cached files.`
         );
       }
 
@@ -81,7 +79,7 @@ export class PrinterFileCleanTask {
         if (!outdatedFiles?.length) continue;
 
         // Report
-        this.logger.log(`Found ${outdatedFiles?.length} old files of ${printer.name}`);
+        this.logger.log(`Found ${outdatedFiles?.length} old files of printer`);
 
         if (autoCleanAtBootEnabled) {
           await this.cleanPrinterFiles(printer.id);
@@ -93,17 +91,10 @@ export class PrinterFileCleanTask {
   }
 
   async cleanPrinterFiles(printerId: IdType) {
-    // Act
     await this.printerFilesStore.deleteOutdatedFiles(printerId, this.ageDaysMaxSetting);
-
-    // Update printer files
     await this.printerFilesStore.eagerLoadPrinterFiles(printerId, false);
   }
 
-  /**
-   * Scans the printers files and checks the outdated ones based on settings
-   * @param printer
-   */
   getPrinterOutdatedFiles(printer: PrinterDto<IdType>) {
     const ageDaysMax = this.ageDaysMaxSetting;
     return this.printerFilesStore.getOutdatedFiles(printer.id, ageDaysMax);
