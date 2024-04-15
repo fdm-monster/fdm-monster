@@ -17,6 +17,7 @@ import { normalizePrinterFile } from "@/services/octoprint/utils/file.utils";
 import { errorSummary } from "@/utils/error.utils";
 import { CurrentStateDto } from "@/services/octoprint/dto/websocket-output/current-message.dto";
 import { ConnectionDto } from "@/services/octoprint/dto/connection.dto";
+import { captureException } from "@sentry/node";
 
 type TAxes = "x" | "y" | "z";
 
@@ -175,7 +176,8 @@ export class OctoPrintApiService extends OctoPrintRoutes {
     try {
       return normalizePrinterFile(response?.data);
     } catch (e) {
-      this.logger.error(`File was empty or normalization failed ${errorSummary(e)}`);
+      captureException(e);
+      this.logger.error("File was empty or normalization failed");
       return;
     }
   }

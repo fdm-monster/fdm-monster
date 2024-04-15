@@ -8,8 +8,7 @@ import { CreateFloorDto, FloorDto, PositionDto, UpdateFloorDto } from "@/service
 import { validateInput } from "@/handlers/validators";
 import { createFloorRules, updateFloorRules } from "@/services/validators/floor-service.validation";
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
-import { FindManyOptions, FindOneOptions, FindOptions } from "typeorm";
-import { FindOptionsWhere } from "typeorm/find-options/FindOptionsWhere";
+import { FindManyOptions, FindOneOptions } from "typeorm";
 
 export class FloorService
   extends BaseService(Floor, FloorDto<SqliteIdType>, CreateFloorDto<SqliteIdType>, UpdateFloorDto<SqliteIdType>)

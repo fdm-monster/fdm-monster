@@ -111,14 +111,14 @@ export class RoleService extends BaseService(Role, RoleDto<SqliteIdType>) implem
 
   getRole(roleId: SqliteIdType): Role {
     const role = this._roles.find((r) => r.id === roleId);
-    if (!role) throw new NotFoundException(`Role Id '${roleId}' not found`);
+    if (!role) throw new NotFoundException(`Role by provided id was not found`);
 
     return role;
   }
 
   getRoleByName(roleName: string): Role {
     const role = this._roles.find((r) => r.name === roleName);
-    if (!role) throw new NotFoundException(`Role by name ${roleName} not found`);
+    if (!role) throw new NotFoundException(`Role by provided name was not found`);
 
     return role;
   }
@@ -154,7 +154,7 @@ export class RoleService extends BaseService(Role, RoleDto<SqliteIdType>) implem
   private normalizeRoleIdOrName(assignedRole: string | SqliteIdType): string | undefined {
     const roleInstance = this.roles.find((r) => r.id === assignedRole || r.name === assignedRole);
     if (!roleInstance) {
-      console.warn(`The role by ID ${assignedRole} did not exist in definition. Skipping.`);
+      console.warn(`The role by provided id was not found. Skipping.`);
       return;
     }
 

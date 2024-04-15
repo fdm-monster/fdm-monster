@@ -131,7 +131,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
       newPrinters.push(createdPrinter);
     }
 
-    this.logger.log("Batch create succeeeded");
+    this.logger.log("Batch create succeeded");
     this.eventEmitter2.emit(printerEvents.batchPrinterCreated, { printers: newPrinters });
     return newPrinters;
   }
