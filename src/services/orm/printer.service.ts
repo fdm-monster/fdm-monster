@@ -101,7 +101,7 @@ export class PrinterService
   async batchImport(printers: Partial<Printer>[]): Promise<Printer[]> {
     if (!printers?.length) return [];
 
-    this.logger.log(`Validating ${printers.length} printer objects`);
+    this.logger.log("Validating passed");
     for (let printer of printers) {
       await this.validateAndDefault(printer);
     }
@@ -113,7 +113,7 @@ export class PrinterService
       newPrinters.push(createdPrinter);
     }
 
-    this.logger.log(`Successfully created ${printers.length} printers`);
+    this.logger.log("Batch create succeeded");
     this.eventEmitter2.emit(printerEvents.batchPrinterCreated, { printers: newPrinters });
     return newPrinters;
   }

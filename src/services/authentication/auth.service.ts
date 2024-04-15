@@ -9,6 +9,7 @@ import { MongoIdType } from "@/shared.constants";
 import { IAuthService } from "@/services/interfaces/auth.service.interface";
 import { IRefreshTokenService } from "@/services/interfaces/refresh-token.service.interface";
 import { AUTH_ERROR_REASON } from "@/constants/authorization.constants";
+import { captureException } from "@sentry/node";
 
 export class AuthService implements IAuthService {
   private logger: LoggerService;
@@ -102,6 +103,7 @@ export class AuthService implements IAuthService {
       }
     } catch (err) {
       this.logger.error("Failed to purge blacklisted jwt cache", err);
+      captureException(err);
     }
   }
 

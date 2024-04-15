@@ -19,7 +19,6 @@ export class JwtService implements IJwtService {
 
     return sign({ userId, username }, jwtSecret, {
       expiresIn: jwtExpiresIn,
-      // TODO this might give trouble down the line
       subject: userId.toString(),
       audience: this.configService.get(AppConstants.OVERRIDE_JWT_AUDIENCE, AppConstants.DEFAULT_JWT_AUDIENCE),
       issuer: this.configService.get(AppConstants.OVERRIDE_JWT_ISSUER, AppConstants.DEFAULT_JWT_ISSUER),

@@ -2,32 +2,26 @@ import { union } from "lodash";
 import { ROLE_PERMS, ROLES } from "@/constants/authorization.constants";
 import { Role } from "@/models";
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
-import { LoggerService } from "@/handlers/logger";
 import { SettingsStore } from "@/state/settings.store";
-import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IRole } from "@/models/Auth/Role";
 import { MongoIdType } from "@/shared.constants";
 import { IRoleService } from "@/services/interfaces/role-service.interface";
 import { RoleDto } from "@/services/interfaces/role.dto";
 
 export class RoleService implements IRoleService<MongoIdType> {
-  private logger: LoggerService;
   settingsStore: SettingsStore;
   appDefaultRole!: string;
   appDefaultRoleNoLogin: string;
 
   constructor({
-    loggerFactory,
     appDefaultRole,
     appDefaultRoleNoLogin,
     settingsStore,
   }: {
-    loggerFactory: ILoggerFactory;
     appDefaultRole: string;
     appDefaultRoleNoLogin: string;
     settingsStore: SettingsStore;
   }) {
-    this.logger = loggerFactory(RoleService.name);
     this.settingsStore = settingsStore;
     this.appDefaultRole = appDefaultRole;
     this.appDefaultRoleNoLogin = appDefaultRoleNoLogin;
@@ -35,15 +29,15 @@ export class RoleService implements IRoleService<MongoIdType> {
 
   private _roles: IRole[] = [];
 
+  get roles() {
+    return this._roles;
+  }
+
   toDto(role: IRole): RoleDto<MongoIdType> {
     return {
       id: role.id,
       name: role.name,
     };
-  }
-
-  get roles() {
-    return this._roles;
   }
 
   async getAppDefaultRole() {
@@ -110,7 +104,7 @@ export class RoleService implements IRoleService<MongoIdType> {
 
   getRoleByName(roleName: string) {
     const role = this._roles.find((r) => r.name === roleName);
-    if (!role) throw new NotFoundException(`Role by name ${roleName} not found`);
+    if (!role) throw new NotFoundException(`Role by provided name not found`);
 
     return role;
   }
@@ -121,7 +115,7 @@ export class RoleService implements IRoleService<MongoIdType> {
 
   getRole(roleId: string) {
     const role = this._roles.find((r) => r.id === roleId);
-    if (!role) throw new NotFoundException(`Role Id '${roleId}' not found`);
+    if (!role) throw new NotFoundException(`Role by provided id not found`);
 
     return role;
   }
@@ -144,7 +138,7 @@ export class RoleService implements IRoleService<MongoIdType> {
   private normalizeRoleIdOrName(assignedRole: string | MongoIdType) {
     const roleInstance = this.roles.find((r) => r.id === assignedRole || r.name === assignedRole);
     if (!roleInstance) {
-      console.warn(`The role by ID ${assignedRole} did not exist in definition. Skipping.`);
+      console.warn(`The role by provided id did not exist in definition. Skipping`);
       return;
     }
 

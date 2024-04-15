@@ -5,6 +5,7 @@ import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
+import { captureException } from "@sentry/node";
 
 export class PrinterWebsocketRestoreTask {
   settingsStore: SettingsStore;
@@ -45,7 +46,8 @@ export class PrinterWebsocketRestoreTask {
           continue;
         }
       } catch (e: any) {
-        this.logger.error(`Resetting WebSocket socket failed for '${socket.printerId}' with error '${errorSummary(e)}'`, e.stack);
+        captureException(e);
+        this.logger.error(`Resetting WebSocket socket failed for printer with error '${errorSummary(e)}'`, e.stack);
         continue;
       }
 
@@ -61,13 +63,11 @@ export class PrinterWebsocketRestoreTask {
         try {
           if (result?.current?.state !== "Closed") {
             this.logger.warn(
-              `Silence was detected, but the OctoPrint current connection was not closed. Connection state ${result?.current?.state}, printerId: ${socket.printerId}.`
+              `Silence was detected, but the OctoPrint current connection was not closed. Connection state ${result?.current?.state}`
             );
           }
         } catch (e) {
-          this.logger.error(
-            `Silence was detected, but Websocket was not closed/aborted and API could not be called ${socket.printerId}.`
-          );
+          this.logger.error(`Silence was detected, but Websocket was not closed/aborted and API could not be called`);
         }
       }
     }

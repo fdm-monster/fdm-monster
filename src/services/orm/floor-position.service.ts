@@ -3,7 +3,6 @@ import { BaseService } from "@/services/orm/base.service";
 import { SqliteIdType } from "@/shared.constants";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { PositionDto } from "@/services/interfaces/floor.dto";
-import { DeepPartial } from "typeorm";
 
 export class FloorPositionService extends BaseService(FloorPosition, PositionDto<SqliteIdType>) {
   constructor({ typeormService }: { typeormService: TypeormService }) {

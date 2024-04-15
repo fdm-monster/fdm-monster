@@ -17,9 +17,6 @@ import { ConfigService } from "@/services/core/config.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { MoonrakerClient } from "@/services/moonraker/moonraker.client";
-import fs from "fs";
-import * as console from "console";
-import { AxiosError } from "axios";
 
 export class ServerHost {
   bootTask: BootTask;

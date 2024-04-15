@@ -1,12 +1,12 @@
 import { BaseService } from "@/services/orm/base.service";
 import { CameraStream } from "@/entities";
-import { CameraStreamDto } from "@/services/interfaces/camera-stream.dto";
+import { CameraStreamDto, CreateCameraStreamDto } from "@/services/interfaces/camera-stream.dto";
 import { ICameraStreamService } from "@/services/interfaces/camera-stream.service.interface";
 import { SqliteIdType } from "@/shared.constants";
 
 export class CameraStreamService
-  extends BaseService(CameraStream, CameraStreamDto)
-  implements ICameraStreamService<SqliteIdType>
+  extends BaseService(CameraStream, CameraStreamDto, CreateCameraStreamDto<SqliteIdType>)
+  implements ICameraStreamService<SqliteIdType, CameraStream>
 {
   toDto(entity: CameraStream): CameraStreamDto<SqliteIdType> {
     // Maps it to original format

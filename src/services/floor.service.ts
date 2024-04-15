@@ -45,13 +45,7 @@ export class FloorService implements IFloorService<MongoIdType> {
     };
   }
 
-  /**
-   * Lists the floors present in the database.
-   */
   async list(patchPositions = true) {
-    const printers = await this.printerCache.listCachedPrinters(true);
-    // const printerIds = printers.map((p) => p.id);
-
     const floors = await Floor.find({});
     if (!patchPositions) {
       return floors;
@@ -63,7 +57,7 @@ export class FloorService implements IFloorService<MongoIdType> {
   async get(floorId: MongoIdType, throwError = true) {
     const floor = await Floor.findOne({ _id: floorId });
     if (!floor && throwError) {
-      throw new NotFoundException(`Floor with id ${floorId} does not exist.`);
+      throw new NotFoundException(`Floor with provided id does not exist`);
     }
 
     return floor!;

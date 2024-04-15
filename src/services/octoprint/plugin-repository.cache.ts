@@ -25,7 +25,7 @@ export class PluginRepositoryCache {
   getPlugin(pluginName: string) {
     if (!this.wasCached) {
       if (!isTestEnvironment()) {
-        this.logger.warn(`Could not check plugin '${pluginName}', as cache was not loaded.`);
+        this.logger.warn(`Could not check plugin '${pluginName}', as cache was not loaded`);
       }
       return;
     }

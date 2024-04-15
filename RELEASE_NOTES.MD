@@ -3,6 +3,7 @@
 Changes:
 
 - Dropped the permission check on /api/features as it made no sense
+- Anonimized logging 
 
 Fixes:
 

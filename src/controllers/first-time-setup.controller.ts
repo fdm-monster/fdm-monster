@@ -48,7 +48,6 @@ export class FirstTimeSetupController {
     }
 
     const role = await this.roleService.getSynchronizedRoleByName(ROLES.ADMIN);
-
     const user = await this.userService.findRawByUsername(rootUsername?.toLowerCase());
     if (!!user) {
       throw new BadRequestException("This user already exists");

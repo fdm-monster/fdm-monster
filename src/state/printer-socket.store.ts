@@ -11,6 +11,7 @@ import { SettingsStore } from "@/state/settings.store";
 import { SocketIoGateway } from "@/state/socket-io.gateway";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IdType } from "@/shared.constants";
+import { PrinterDto } from "@/services/interfaces/printer.dto";
 
 export class PrinterSocketStore {
   socketIoGateway: SocketIoGateway;
@@ -78,6 +79,7 @@ export class PrinterSocketStore {
       try {
         await this.handlePrinterCreated({ printer: doc });
       } catch (e) {
+        captureException(e);
         this.logger.error("PrinterSocketStore failed to construct new OctoPrint socket.", errorSummary(e));
       }
     }
@@ -141,6 +143,7 @@ export class PrinterSocketStore {
       try {
         if (socket.needsSetup() || socket.needsReopen()) {
           if (this.settingsStore.getDebugSettingsSensitive()?.debugSocketSetup) {
+            // Exception anonymity
             this.logger.log(
               `Reopening socket for printerId '${
                 socket.printerId
@@ -185,17 +188,13 @@ export class PrinterSocketStore {
     };
   }
 
-  /**
-   * @param { printer: Printer } printer
-   * @returns void
-   */
-  createOrUpdateSocket(printer) {
+  createOrUpdateSocket(printer: PrinterDto<IdType>) {
     const { enabled, id } = printer;
     let foundAdapter = this.printerSocketAdaptersById[id.toString()];
 
     // Delete the socket if the printer is disabled
     if (!enabled) {
-      this.logger.log(`Printer '${id}' is disabled. Deleting socket.`);
+      this.logger.log(`Printer is disabled. Deleting socket`);
       this.deleteSocket(id);
       return;
     }
@@ -206,7 +205,7 @@ export class PrinterSocketStore {
       this.printerSocketAdaptersById[id] = foundAdapter;
     } else {
       foundAdapter.close();
-      this.logger.log(`Closing printer '${id}' socket for update.`);
+      this.logger.log(`Closing printer socket for update`);
     }
 
     // Reset the socket credentials before (re-)connecting
@@ -240,7 +239,7 @@ export class PrinterSocketStore {
    * @returns void
    */
   private handlePrinterUpdated({ printer }) {
-    this.logger.log(`Printer '${printer.id}' updated. Updating socket.`);
+    this.logger.log(`Printer updated. Updating socket`);
     this.createOrUpdateSocket(printer);
   }
 

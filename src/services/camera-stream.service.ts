@@ -29,7 +29,7 @@ export class CameraStreamService implements ICameraStreamService<MongoIdType> {
   async get(id: MongoIdType, throwError = true) {
     const cameraStream = await this.model.findById(id);
     if (!cameraStream && throwError) {
-      throw new NotFoundException(`Floor with id ${id} does not exist.`, "CameraStream");
+      throw new NotFoundException(`Floor with provided id does not exist`, "CameraStream");
     }
 
     return cameraStream;

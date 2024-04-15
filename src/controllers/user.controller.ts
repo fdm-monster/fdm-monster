@@ -178,7 +178,7 @@ export class UserController {
     if (req.user?.id) {
       const isRootUser = await this.userService.isUserRootUser(userId);
       if (!isRootUser) {
-        throw new ForbiddenError("Not allowed to change owner (root user) without being owner yourself");
+        throw new ForbiddenError("Not allowed to change owner without being owner yourself");
       }
     }
     const { isRootUser } = await validateInput(req.body, {

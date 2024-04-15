@@ -10,6 +10,7 @@ import { IPrinterService } from "@/services/interfaces/printer.service.interface
 import { Printer } from "@/entities";
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import { errorSummary } from "@/utils/error.utils";
+import { captureException } from "@sentry/node";
 
 export class PrinterFilesService extends BaseService(PrinterFile, PrinterFileDto) implements IPrinterFilesService<SqliteIdType> {
   printerService: IPrinterService<SqliteIdType, Printer>;
@@ -67,7 +68,8 @@ export class PrinterFilesService extends BaseService(PrinterFile, PrinterFileDto
       try {
         await this.appendOrReplaceFile(printerId, newFile);
       } catch (e) {
-        this.logger.error(`Error appending file ${errorSummary(e)}`);
+        captureException(e);
+        this.logger.error(`Error appending file`);
         throw e;
       }
     }
@@ -115,10 +117,7 @@ export class PrinterFilesService extends BaseService(PrinterFile, PrinterFileDto
       const file = await this.getPrinterFile(printer.id, filePath);
       if (!file) {
         if (throwError) {
-          throw new NotFoundException(
-            `A file removal was ordered but this file was not found in database for printer Id ${printer.id}`,
-            filePath
-          );
+          throw new NotFoundException(`A file removal was ordered but this file was not found in database for printer`, filePath);
         } else {
           this.logger.warn("File was not found in PrinterFile table");
           return;

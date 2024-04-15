@@ -38,7 +38,7 @@ export function BaseService<
         return this.repository.findOneOrFail({ ...options, where: { id } } as FindOneOptions<T>);
       } catch (e) {
         if (throwIfNotFound && e instanceof EntityNotFoundError) {
-          throw new NotFoundException(`The entity ${entity} with id '${id}' was not found.`);
+          throw new NotFoundException(`The entity ${entity} with the provided id was not found`);
         }
         return undefined;
       }

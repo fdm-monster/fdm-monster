@@ -80,7 +80,7 @@ export class FileUploadTrackerCache {
   markUploadDone(token: string, success: boolean, reason?: string) {
     const trackedUploadIndex = this.currentUploads.findIndex((cu) => cu.correlationToken === token);
     if (trackedUploadIndex === -1) {
-      this.logger.warn(`Could not mark upload tracker with token '${token}' as done as it was not found.`);
+      this.logger.warn(`Could not mark upload tracker with correlation token '${token}' as done as it was not found.`);
       return;
     }
 

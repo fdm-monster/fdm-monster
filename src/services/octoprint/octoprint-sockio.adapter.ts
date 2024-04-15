@@ -16,8 +16,6 @@ import { WebsocketAdapter } from "@/shared/websocket.adapter";
 import { OctoPrintEventDto } from "@/services/octoprint/dto/octoprint-event.dto";
 import { writeFileSync } from "node:fs";
 
-type ThrottleRate = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
-
 export const Message = {
   connected: "connected",
   reauthRequired: "reauthRequired",
@@ -138,7 +136,7 @@ export class OctoPrintSockIoAdapter extends WebsocketAdapter {
 
   open() {
     if (this.socket) {
-      throw new Error(`Socket already exists (printerId: ${this.printerId}, ignoring open request`);
+      throw new Error(`Socket already exists by printerId, ignoring open request`);
     }
     super.open(this.socketURL);
   }
@@ -186,7 +184,7 @@ export class OctoPrintSockIoAdapter extends WebsocketAdapter {
         this.setSocketState("aborted");
         // TODO improve error type detection
         if (e instanceof ExternalServiceError) {
-          this.logger.warn(`Printer authorization error (id: ${this.printerId}), apiState: ${this.apiState}`);
+          this.logger.warn(`Printer authorization error, apiState: ${this.apiState}`);
           throw e;
         } else {
           if (e?.response?.status === 403) {
@@ -194,6 +192,7 @@ export class OctoPrintSockIoAdapter extends WebsocketAdapter {
             this.setSocketState("aborted");
             throw new ExternalServiceError(e);
           }
+          // We make an exception for such a problem concerning log anonymization
           this.logger.error(`Printer (${this.printerId}) network or transport error, marking it as unreachable; ${e}`);
           this.setApiState("noResponse");
         }

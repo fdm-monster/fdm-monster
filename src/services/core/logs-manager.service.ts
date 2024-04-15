@@ -30,7 +30,7 @@ export class LogDumpService {
       const strippedFilename = f.replace(".log", "").replace(startingFormat, "");
       const date = new Date(strippedFilename);
       if (!isValidDate(date)) {
-        this.logger.warn(`Failed to parse date from log file ${f}, removing it as outdated`);
+        this.logger.warn("Failed to parse date from log file, removing it as outdated");
         return true;
       }
 
@@ -50,7 +50,7 @@ export class LogDumpService {
         unlinkSync(join(path, file));
         removedWrongFormatFilesCount++;
       } catch (err) {
-        this.logger.warn(`Failed to delete log file ${file}`);
+        this.logger.warn(`Failed to delete log file`);
       }
     }
 
@@ -60,7 +60,7 @@ export class LogDumpService {
         unlinkSync(join(path, file));
         removedOutdatedFilesCount++;
       } catch (err) {
-        this.logger.warn(`Failed to delete log file ${file}`);
+        this.logger.warn(`Failed to delete log file`);
       }
     }
 

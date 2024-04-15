@@ -71,7 +71,7 @@ export class SettingsStore {
   }
 
   async loadSettings() {
-    // Setup Settings as connection is established
+    // Setup Settings and add established connection info
     this.settings = await this.settingsService.getOrCreate();
     await this.processSentryEnabled();
   }

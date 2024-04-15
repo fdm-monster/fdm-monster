@@ -58,7 +58,7 @@ export class FileCache {
 
     delete this.printerFileStorage[printerId];
 
-    this.logger.log(`Purged printerId '${printerId}' file cache`);
+    this.logger.log(`Purged printer file cache`);
   }
 
   purgeFile(printerId: IdType, filePath: string) {
@@ -68,15 +68,12 @@ export class FileCache {
     const fileIndex = files.findIndex((f) => f.path === filePath);
     if (fileIndex === -1) {
       // We can always choose to throw - if we trust the cache consistency
-      this.logger.warn(
-        `A file removal was ordered but this file was not found in files cache for printer Id ${printerId}`,
-        filePath
-      );
+      this.logger.warn(`A file removal was ordered but this file was not found in files cache for provided printer id`, filePath);
 
       return this.logger.log("File was not found in cached printer fileList");
     }
 
     files.splice(fileIndex, 1);
-    this.logger.log(`File ${filePath} was removed`);
+    this.logger.log(`File was removed from cache`);
   }
 }
