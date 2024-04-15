@@ -82,12 +82,12 @@ export class SocketIoGateway {
   }
 
   onConnect(socket: Socket) {
-    this.logger.log("SocketIO Client connected", socket.id);
+    this.logger.debug("SocketIO Client connected", socket.id);
 
     this.eventEmitter2.emit(socketIoConnectedEvent, socket.id);
 
     socket.on("disconnect", () => {
-      this.logger.log("SocketIO Client disconnected", socket.id);
+      this.logger.debug("SocketIO Client disconnected", socket.id);
     });
   }
 

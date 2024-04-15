@@ -8,6 +8,7 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IPrinterFilesService } from "@/services/interfaces/printer-files.service.interface";
 import { errorSummary } from "@/utils/error.utils";
 import { CreateOrUpdatePrinterFileDto, PrinterFileDto } from "@/services/interfaces/printer-file.dto";
+import { captureException } from "@sentry/node";
 
 export class PrinterFilesStore {
   printerCache: PrinterCache;
@@ -44,6 +45,7 @@ export class PrinterFilesStore {
         const printerFiles = await this.printerFilesService.getPrinterFiles(printer.id);
         this.fileCache.cachePrinterFiles(printer.id, printerFiles);
       } catch (e) {
+        captureException(e);
         this.logger.error("Files store failed to reconstruct files from database.", errorSummary(e));
       }
     }
@@ -96,13 +98,13 @@ export class PrinterFilesStore {
   async purgePrinterFiles(printerId: IdType) {
     const printerState = await this.printerCache.getCachedPrinterOrThrowAsync(printerId);
 
-    this.logger.log(`Purging files from printer ${printerId}`);
+    this.logger.log(`Purging files from printer`);
     await this.printerFilesService.clearFiles(printerState.id);
 
-    this.logger.log(`Purging file cache from printer ${printerId}`);
+    this.logger.log(`Purging file cache from printer`);
     this.fileCache.purgePrinterId(printerState.id);
 
-    this.logger.log(`Clearing printer files successful.`);
+    this.logger.log(`Clearing printer files successful`);
   }
 
   async purgeFiles() {
@@ -129,7 +131,7 @@ export class PrinterFilesStore {
   async appendOrSetPrinterFile(printerId: IdType, addedFile: PrinterFileDto) {
     const printer = await this.printerCache.getCachedPrinterOrThrowAsync(printerId);
 
-    // TODO this is probably the erroneous batch reprint cause
+    // TODO this is probably leading to inconsistent state
     const files = await this.printerFilesService.appendOrReplaceFile(printer.id, addedFile);
     await this.fileCache.cachePrinterFiles(printer.id, files);
   }

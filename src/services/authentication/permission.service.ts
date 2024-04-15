@@ -43,7 +43,7 @@ export class PermissionService implements IPermissionService<MongoIdType> {
 
   async getPermission(permissionId: MongoIdType) {
     const permission = this.permissions.find((r) => r.id === permissionId);
-    if (!permission) throw new NotFoundException(`Permission Id '${permissionId}' not found`);
+    if (!permission) throw new NotFoundException(`Permission by provided id not found`);
 
     return permission;
   }
@@ -68,7 +68,7 @@ export class PermissionService implements IPermissionService<MongoIdType> {
   normalizePermission(assignedPermission: string) {
     const permissionInstance = this.permissions.find((r) => r.id === assignedPermission || r.name === assignedPermission);
     if (!permissionInstance) {
-      this.logger.warn(`The permission by ID ${assignedPermission} did not exist. Skipping.`);
+      this.logger.warn("The permission by by provided id did not exist. Skipping");
       return;
     }
     return permissionInstance.name;
