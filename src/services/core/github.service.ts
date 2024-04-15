@@ -2,7 +2,6 @@ import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import { Octokit } from "octokit";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
-import * as console from "console";
 
 export class GithubService {
   octokitService: Octokit;
