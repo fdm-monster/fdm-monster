@@ -8,7 +8,7 @@
 ## Changes:
 
 - Dropped the permission check on /api/features as it made no sense
-- Anonimized logging
+- Anonymized logging
 - Handle OctoKit errors (ExternalServiceErrors) differently than OctoPrint errors (different HttpClient implementations). Refer to the new rate limit API and feature flag.
 
 ## Fixes:
