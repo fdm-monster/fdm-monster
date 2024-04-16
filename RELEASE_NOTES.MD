@@ -1,11 +1,17 @@
 # FDM Monster 13/04/2024 1.6.1
 
-Changes:
+## Features:
+
+- Add GitHub Rate Limit API endpoint GET /api/server/github-rate-limit
+- Add feature flag for GitHub Rate Limit API endpoint
+
+## Changes:
 
 - Dropped the permission check on /api/features as it made no sense
-- Anonimized logging 
+- Anonimized logging
+- Handle OctoKit errors (ExternalServiceErrors) differently than OctoPrint errors (different HttpClient implementations). Refer to the new rate limit API and feature flag.
 
-Fixes:
+## Fixes:
 
 - YAML Import would fail updating properly an existing floor by floor level
 - YAML Import has issues updating a floor, printers positions are not consistently are updated.
