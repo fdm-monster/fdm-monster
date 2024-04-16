@@ -119,6 +119,10 @@ export class ServerPublicController {
         available: true,
         version: 1,
       },
+      githubRateLimitApi: {
+        available: true,
+        version: 1,
+      },
     });
   }
 

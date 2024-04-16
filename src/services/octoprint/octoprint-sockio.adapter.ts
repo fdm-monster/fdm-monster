@@ -168,13 +168,13 @@ export class OctoPrintSockIoAdapter extends WebsocketAdapter {
         if (r.name === "_api") {
           this.setApiState("globalKey");
           this.setSocketState("aborted");
-          throw new ExternalServiceError("Global API Key detected, aborting socket connection");
+          throw new ExternalServiceError("Global API Key detected, aborting socket connection", "OctoPrint");
         } else if (r.needs?.group[0] === "guests") {
           this.logger.warn("Detected group guests in OctoPrint login response, marking as unauthorized");
           // This doesn't occur often (instead a 400 with CSRF failed is returned)
           this.setApiState("authFail");
           this.setSocketState("aborted");
-          throw new ExternalServiceError("Guest group detected, authentication failed, aborting socket connection");
+          throw new ExternalServiceError("Guest group detected, authentication failed, aborting socket connection", "OctoPrint");
         }
         this.setApiState("responding");
         this.setSocketState("opening");
@@ -190,7 +190,7 @@ export class OctoPrintSockIoAdapter extends WebsocketAdapter {
           if (e?.response?.status === 403) {
             this.setApiState("authFail");
             this.setSocketState("aborted");
-            throw new ExternalServiceError(e);
+            throw new ExternalServiceError(e, "OctoPrint");
           }
           // We make an exception for such a problem concerning log anonymization
           this.logger.error(`Printer (${this.printerId}) network or transport error, marking it as unreachable; ${e}`);
