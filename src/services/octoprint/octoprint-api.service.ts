@@ -275,13 +275,16 @@ export class OctoPrintApiService extends OctoPrintRoutes {
       } catch {
         data = e.response?.body;
       }
-      throw new ExternalServiceError({
-        error: e.message,
-        statusCode: e.response?.statusCode,
-        data,
-        success: false,
-        stack: e.stack,
-      });
+      throw new ExternalServiceError(
+        {
+          error: e.message,
+          statusCode: e.response?.statusCode,
+          data,
+          success: false,
+          stack: e.stack,
+        },
+        "OctoPrint"
+      );
     }
   }
 
@@ -387,13 +390,16 @@ export class OctoPrintApiService extends OctoPrintRoutes {
       } catch {
         data = e.response?.body;
       }
-      throw new ExternalServiceError({
-        error: e.message,
-        statusCode: e.response?.statusCode,
-        data,
-        success: false,
-        stack: e.stack,
-      });
+      throw new ExternalServiceError(
+        {
+          error: e.message,
+          statusCode: e.response?.statusCode,
+          data,
+          success: false,
+          stack: e.stack,
+        },
+        "OctoPrint"
+      );
     }
   }
 
@@ -496,12 +502,15 @@ export class OctoPrintApiService extends OctoPrintRoutes {
         ...options,
       })
       .catch((e) => {
-        throw new ExternalServiceError({
-          error: e.message,
-          statusCode: e.response?.statusCode,
-          success: false,
-          stack: e.stack,
-        });
+        throw new ExternalServiceError(
+          {
+            error: e.message,
+            statusCode: e.response?.statusCode,
+            success: false,
+            stack: e.stack,
+          },
+          "OctoPrint"
+        );
       });
     return response.data;
   }
@@ -519,12 +528,15 @@ export class OctoPrintApiService extends OctoPrintRoutes {
         },
       })
       .catch((e) => {
-        throw new ExternalServiceError({
-          error: e.message,
-          statusCode: e.response?.statusCode,
-          success: false,
-          stack: e.stack,
-        });
+        throw new ExternalServiceError(
+          {
+            error: e.message,
+            statusCode: e.response?.statusCode,
+            success: false,
+            stack: e.stack,
+          },
+          "OctoPrint"
+        );
       });
     return response?.data;
   }

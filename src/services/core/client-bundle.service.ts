@@ -58,7 +58,7 @@ export class ClientBundleService {
       };
     } catch (e) {
       this.logger.error(`Github OctoKit error ${errorSummary(e)}`);
-      throw new ExternalServiceError(e);
+      throw new ExternalServiceError(e, "GitHub");
     }
   }
 

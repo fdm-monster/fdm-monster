@@ -64,11 +64,13 @@ export class ValidationException extends Error {
 
 export class ExternalServiceError extends Error {
   error: any;
+  serviceType?: string;
 
-  constructor(responseObject: any) {
+  constructor(responseObject: any, serviceType?: string) {
     super(JSON.stringify(responseObject));
     this.name = ExternalServiceError.name;
     this.error = responseObject;
+    this.serviceType = serviceType;
   }
 }
 
