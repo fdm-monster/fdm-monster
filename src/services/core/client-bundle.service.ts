@@ -11,7 +11,8 @@ import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { compare } from "semver";
 import { errorSummary } from "@/utils/error.utils";
-import { ExternalServiceError, NotFoundException } from "@/exceptions/runtime.exceptions";
+import { ExternalServiceError, InternalServerException, NotFoundException } from "@/exceptions/runtime.exceptions";
+import { RequestError } from "octokit";
 
 export class ClientBundleService {
   githubService: GithubService;
@@ -57,8 +58,11 @@ export class ClientBundleService {
         releases: result.data,
       };
     } catch (e) {
-      this.logger.error(`Github OctoKit error ${errorSummary(e)}`);
-      throw new ExternalServiceError(e, "GitHub");
+      if (e instanceof RequestError) {
+        this.logger.error(`Github OctoKit error ${errorSummary(e)}`);
+        throw new ExternalServiceError({ error: e.message }, "GitHub");
+      }
+      throw new InternalServerException("Something went wrong with the request to Github");
     }
   }
 
