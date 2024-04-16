@@ -17,12 +17,14 @@ import { MulterService } from "@/services/core/multer.service";
 import { LogDumpService } from "@/services/core/logs-manager.service";
 import { Request, Response } from "express";
 import { demoUserNotAllowed } from "@/middleware/demo.middleware";
+import { GithubService } from "@/services/core/github.service";
 
 export class ServerPrivateController {
   clientBundleService: ClientBundleService;
   printerCache: PrinterCache;
   printerService: PrinterService;
   printerSocketStore: PrinterSocketStore;
+  githubService: GithubService;
   yamlService: YamlService;
   multerService: MulterService;
   logDumpService: LogDumpService;
@@ -36,6 +38,7 @@ export class ServerPrivateController {
     printerCache,
     printerService,
     clientBundleService,
+    githubService,
     logDumpService,
     printerSocketStore,
     yamlService,
@@ -46,6 +49,7 @@ export class ServerPrivateController {
     printerCache: PrinterCache;
     printerService: PrinterService;
     clientBundleService: ClientBundleService;
+    githubService: GithubService;
     logDumpService: LogDumpService;
     printerSocketStore: PrinterSocketStore;
     yamlService: YamlService;
@@ -54,6 +58,7 @@ export class ServerPrivateController {
     this.serverReleaseService = serverReleaseService;
     this.serverUpdateService = serverUpdateService;
     this.clientBundleService = clientBundleService;
+    this.githubService = githubService;
     this.logDumpService = logDumpService;
     this.printerSocketStore = printerSocketStore;
     this.printerCache = printerCache;
@@ -110,6 +115,11 @@ export class ServerPrivateController {
       targetVersion: willExecute.targetVersion,
       reason: willExecute?.reason,
     });
+  }
+
+  async getGithubRateLimit(req: Request, res: Response) {
+    const rateLimitResponse = await this.githubService.getRateLimit();
+    res.send(rateLimitResponse.data);
   }
 
   async getReleaseStateInfo(req: Request, res: Response) {
@@ -178,6 +188,7 @@ export default createController(ServerPrivateController)
   .before([authenticate(), authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
   .get("/", "getReleaseStateInfo")
   .get("/client-releases", "getClientReleases")
+  .get("/github-rate-limit", "getGithubRateLimit")
   .post("/update-client-bundle-github", "updateClientBundleGithub")
   .post("/export-printers-floors-yaml", "exportPrintersAndFloorsYaml")
   .post("/import-printers-floors-yaml", "importPrintersAndFloorsYaml")

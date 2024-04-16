@@ -17,6 +17,10 @@ export class GithubService {
     return result?.type === "token";
   }
 
+  async getRateLimit() {
+    return this.octokitService.rest.rateLimit.get();
+  }
+
   async getLatestRelease(owner: string, repo: string) {
     try {
       return await this.octokitService.rest.repos.getLatestRelease({
