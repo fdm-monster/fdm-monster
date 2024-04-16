@@ -19,6 +19,7 @@ import { PrinterGroup } from "@/entities/printer-group.entity";
 import { Group } from "@/entities/group.entity";
 import { PrinterGroup1707494762198 } from "@/migrations/1707494762198-PrinterGroup";
 import { ChangePrintCompletionDeletePrinterCascade1708465930665 } from "@/migrations/1708465930665-ChangePrintCompletionDeletePrinterCascade";
+import { ChangeRoleNameUnique1713300747465 } from "@/migrations/1713300747465-ChangeRoleNameUnique";
 
 dotenv.config({
   path: join(superRootPath(), ".env"),
@@ -53,6 +54,11 @@ export const AppDataSource = new DataSource({
     Group,
     PrinterGroup,
   ],
-  migrations: [InitSqlite1706829146617, PrinterGroup1707494762198, ChangePrintCompletionDeletePrinterCascade1708465930665],
+  migrations: [
+    InitSqlite1706829146617,
+    PrinterGroup1707494762198,
+    ChangePrintCompletionDeletePrinterCascade1708465930665,
+    ChangeRoleNameUnique1713300747465,
+  ],
   subscribers: [],
 });
