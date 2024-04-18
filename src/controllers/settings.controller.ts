@@ -52,7 +52,7 @@ export class SettingsController {
       connection = {
         clientIp: req.socket?.remoteAddress,
         ip: serverIp,
-        version: serverVersion,
+        version: this.serverVersion,
       };
     } catch (e) {
       this.logger.warn("Could not fetch server IP address");
@@ -91,8 +91,9 @@ export class SettingsController {
   }
 
   async updateServerSettings(req: Request, res: Response) {
-    const isWhitelistFeatureEnabled =this.configService.get(AppConstants.ENABLE_EXPERIMENTAL_WHITELIST_SETTINGS, "false") === "true");
-    const validatedInput = await validateInput(req.body, serverSettingsUpdateRules(isWhitelistFeatureEnabled);
+    const isWhitelistFeatureEnabled =
+      this.configService.get(AppConstants.ENABLE_EXPERIMENTAL_WHITELIST_SETTINGS, "false") === "true";
+    const validatedInput = await validateInput(req.body, serverSettingsUpdateRules(isWhitelistFeatureEnabled));
     const result = await this.settingsStore.updateServerSettings(validatedInput);
     res.send(result);
   }
