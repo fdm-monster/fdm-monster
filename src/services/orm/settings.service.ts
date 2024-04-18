@@ -199,8 +199,6 @@ export class SettingsService2 extends BaseService(Settings, SettingsDto) impleme
   }
 
   async patchFileCleanSettings(patchUpdate: Partial<FileCleanSettingsDto>): Promise<Settings> {
-    const validatedInput = await validateInput(patchUpdate, fileCleanSettingsUpdateRules);
-
     const entity = await this.getOrCreate();
     if (!entity[fileCleanSettingKey]) {
       throw new Error("No existing wizard settings found, cant patch");
@@ -208,7 +206,7 @@ export class SettingsService2 extends BaseService(Settings, SettingsDto) impleme
 
     const newFileCleanSettings = {
       ...entity[fileCleanSettingKey],
-      ...validatedInput,
+      ...patchUpdate,
     };
 
     return await this.updateFileCleanSettings(newFileCleanSettings);
