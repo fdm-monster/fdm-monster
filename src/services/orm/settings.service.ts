@@ -32,7 +32,7 @@ import { AppConstants } from "@/server.constants";
 import { IConfigService } from "@/services/core/config.service";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { validateInput } from "@/handlers/validators";
-import { whitelistSettingUpdateRules } from "@/services/validators/settings-service.validation";
+import { fileCleanSettingsUpdateRules, whitelistSettingUpdateRules } from "@/services/validators/settings-service.validation";
 
 export class SettingsService2 extends BaseService(Settings, SettingsDto) implements ISettingsService<SqliteIdType, Settings> {
   configService: IConfigService;
@@ -199,6 +199,8 @@ export class SettingsService2 extends BaseService(Settings, SettingsDto) impleme
   }
 
   async patchFileCleanSettings(patchUpdate: Partial<FileCleanSettingsDto>): Promise<Settings> {
+    const validatedInput = await validateInput(patchUpdate, fileCleanSettingsUpdateRules);
+
     const entity = await this.getOrCreate();
     if (!entity[fileCleanSettingKey]) {
       throw new Error("No existing wizard settings found, cant patch");
@@ -206,7 +208,7 @@ export class SettingsService2 extends BaseService(Settings, SettingsDto) impleme
 
     const newFileCleanSettings = {
       ...entity[fileCleanSettingKey],
-      ...patchUpdate,
+      ...validatedInput,
     };
 
     return await this.updateFileCleanSettings(newFileCleanSettings);
