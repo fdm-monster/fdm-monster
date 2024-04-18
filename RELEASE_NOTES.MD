@@ -18,3 +18,5 @@
 - YAML Import converted printer IDs to string, causing the printers to not show up on the printer grid until server restart. The import was done correctly on database level.
 - Deleting a printer would remove the position of another printer, the removal was referring to the wrong position.
 - Setting demo mode will not set wizard to be completed: first time setup will be required after setting demo mode to false.
+- Settings: incorrect file clean shape would not throw any validation errors (SQLite only). Validation has been added for file clean on API level.
+- Settings: make all settings API endpoints stricter by adding validation on API level. Patching is not possible anymore.
