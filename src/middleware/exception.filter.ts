@@ -13,6 +13,7 @@ import { NextFunction, Request, Response } from "express";
 import { HttpStatusCode } from "@/constants/http-status-codes.constants";
 import { AxiosError } from "axios";
 import { EntityNotFoundError } from "typeorm";
+import { FailedDependencyException } from "@/exceptions/failed-dependency.exception";
 
 export function exceptionFilter(err: any | AxiosError, req: Request, res: Response, next: NextFunction) {
   const isTest = process.env.NODE_ENV === AppConstants.defaultTestEnv;
@@ -57,6 +58,14 @@ export function exceptionFilter(err: any | AxiosError, req: Request, res: Respon
       error: "API could not accept this input",
       type: err.name,
       errors: err.errors,
+    });
+  }
+  if (err instanceof FailedDependencyException) {
+    const code = 424;
+    return res.status(code).send({
+      error: err.message,
+      serviceCode: err.serviceCode,
+      type: err.name,
     });
   }
   if (err instanceof InternalServerException) {

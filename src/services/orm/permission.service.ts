@@ -46,7 +46,7 @@ export class PermissionService
 
   async getPermission(permissionId: SqliteIdType): Promise<Permission> {
     const permission = this.permissions.find((r) => r.id === permissionId);
-    if (!permission) throw new NotFoundException(`Permission Id '${permissionId}' not found`);
+    if (!permission) throw new NotFoundException(`Permission by provided id is not found`);
 
     return permission;
   }
@@ -71,7 +71,7 @@ export class PermissionService
   normalizePermission(assignedPermission: string | number): string {
     const permissionInstance = this.permissions.find((r) => r.id === assignedPermission || r.name === assignedPermission);
     if (!permissionInstance) {
-      this.logger.warn(`The permission by ID ${assignedPermission} did not exist. Skipping.`);
+      this.logger.warn(`The permission by provided id is not found. Skipping`);
       return;
     }
     return permissionInstance.name;

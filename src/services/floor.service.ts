@@ -45,53 +45,11 @@ export class FloorService implements IFloorService<MongoIdType> {
     };
   }
 
-  /**
-   * Lists the floors present in the database.
-   */
   async list(patchPositions = true) {
-    const printers = await this.printerCache.listCachedPrinters(true);
-    // const printerIds = printers.map((p) => p.id);
-
     const floors = await Floor.find({});
     if (!patchPositions) {
       return floors;
     }
-
-    // TODO this does more harm than good
-    // for (const floor of floors) {
-    //   if (!floor.printers?.length) continue;
-
-    // const removedPositionPrinterIds: MongoIdType[] = [];
-
-    // TODO this is prone to collisions
-    // const positionsKnown: { [k: string]: any } = {};
-    // for (const fp of floor.printers) {
-    //   // Remove orphans
-    //   const stringPrinterId = fp.printerId.toString();
-    //   const printerExists = printerIds.includes(stringPrinterId);
-    //   if (!printerExists) {
-    //     removedPositionPrinterIds.push(stringPrinterId);
-    //     continue;
-    //   }
-    //
-    //   // Remove duplicate position, keeping the last added one
-    //   const xyPos = positionsKnown[`${fp.x}${fp.y}`];
-    //   if (!!xyPos) {
-    //     removedPositionPrinterIds.push(xyPos.printerId);
-    //   }
-    //
-    //   // Keep last floor printer
-    //   positionsKnown[`${fp.x}${fp.y}`] = fp;
-    // }
-    //
-    // if (removedPositionPrinterIds?.length) {
-    //   floor.printers = floor.printers.filter((fp) => !removedPositionPrinterIds.includes(fp.printerId));
-    //   await floor.save();
-    //   this.logger.warn(
-    //     `Found ${removedPositionPrinterIds} (floor printerIds) to be in need of removal for floor (duplicate position or non-existing printer)`
-    //   );
-    // }
-    // }
 
     return floors;
   }
@@ -99,7 +57,7 @@ export class FloorService implements IFloorService<MongoIdType> {
   async get(floorId: MongoIdType, throwError = true) {
     const floor = await Floor.findOne({ _id: floorId });
     if (!floor && throwError) {
-      throw new NotFoundException(`Floor with id ${floorId} does not exist.`);
+      throw new NotFoundException(`Floor with provided id does not exist`);
     }
 
     return floor!;
@@ -143,10 +101,6 @@ export class FloorService implements IFloorService<MongoIdType> {
     return await floor.save();
   }
 
-  async getFloorsOfPrinterId(printerId: MongoIdType) {
-    return Floor.find({ printers: { $elemMatch: { printerId } } });
-  }
-
   async deletePrinterFromAnyFloor(printerId: MongoIdType) {
     await Floor.updateMany(
       {},
@@ -162,23 +116,23 @@ export class FloorService implements IFloorService<MongoIdType> {
     );
   }
 
-  async addOrUpdatePrinter(floorId: MongoIdType, printerInFloor: AddOrUpdatePrinterDto<MongoIdType>) {
+  async addOrUpdatePrinter(floorId: MongoIdType, updatedPosition: AddOrUpdatePrinterDto<MongoIdType>) {
     const floor = await this.get(floorId, true);
-    const validInput = await validateInput(printerInFloor, printerInFloorRules(false));
+    const validInput = await validateInput(updatedPosition, printerInFloorRules(false));
 
     // Ensure printer exists
     await this.printerCache.getCachedPrinterOrThrowAsync(validInput.printerId);
 
     // Ensure position is not taken twice
     floor.printers = floor.printers.filter(
-      (pif: PrinterInFloorDto) => !(pif.x === printerInFloor.x && pif.y === printerInFloor.y)
+      (position: PrinterInFloorDto) => !(position.x === updatedPosition.x && position.y === updatedPosition.y)
     );
 
-    const foundPrinterInFloorIndex = floor.printers.findIndex(
-      (pif: PrinterInFloorDto) => pif.printerId.toString() === validInput.printerId
+    const positionIndex = floor.printers.findIndex(
+      (position: PrinterInFloorDto) => position.printerId.toString() === validInput.printerId.toString()
     );
-    if (foundPrinterInFloorIndex !== -1) {
-      floor.printers[foundPrinterInFloorIndex] = validInput;
+    if (positionIndex !== -1) {
+      floor.printers[positionIndex] = validInput;
     } else {
       floor.printers.push(validInput);
     }

@@ -5,7 +5,7 @@ import { CustomGcodeDto } from "@/services/interfaces/custom-gcode.dto";
 import { BaseService } from "@/services/orm/base.service";
 
 export class CustomGcodeService
-  extends BaseService(CustomGcode, CustomGcodeDto)
+  extends BaseService(CustomGcode, CustomGcodeDto<SqliteIdType>, CustomGcodeDto<SqliteIdType>)
   implements ICustomGcodeService<SqliteIdType, CustomGcode>
 {
   toDto(entity: CustomGcode): CustomGcodeDto {

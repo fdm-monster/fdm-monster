@@ -2,7 +2,6 @@ import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import { Octokit } from "octokit";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
-import * as console from "console";
 
 export class GithubService {
   octokitService: Octokit;
@@ -16,6 +15,10 @@ export class GithubService {
   async wasAuthenticated() {
     const result = await this.octokitService.auth();
     return result?.type === "token";
+  }
+
+  async getRateLimit() {
+    return this.octokitService.rest.rateLimit.get();
   }
 
   async getLatestRelease(owner: string, repo: string) {

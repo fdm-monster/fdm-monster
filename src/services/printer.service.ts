@@ -55,7 +55,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
     const printer = await Printer.findOne(filter);
 
     if (!printer) {
-      throw new NotFoundException(`The printer ID '${printerId}' is not an existing printer.`);
+      throw new NotFoundException(`The printer with provided id was not found`);
     }
 
     return printer;
@@ -68,7 +68,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
    * @throws {Error} If the printer is not correctly provided.
    */
   async create(newPrinter: IPrinter, emitEvent = true) {
-    if (!newPrinter) throw new Error("Missing printer");
+    if (!newPrinter) throw new Error("Missing printer to create");
 
     const mergedPrinter = await this.validateAndDefault(newPrinter);
     mergedPrinter.dateAdded = Date.now();
@@ -119,13 +119,10 @@ export class PrinterService implements IPrinterService<MongoIdType> {
 
   async batchImport(printers: Partial<typeof Printer>[]) {
     if (!printers?.length) return [];
-
-    this.logger.log(`Validating ${printers.length} printer objects`);
     for (let printer of printers) {
       await this.validateAndDefault(printer);
     }
-
-    this.logger.log(`Validation passed. Creating ${printers.length} printers`);
+    this.logger.log("Validation passed");
 
     // We've passed validation completely - creation will likely succeed
     const newPrinters = [];
@@ -134,20 +131,9 @@ export class PrinterService implements IPrinterService<MongoIdType> {
       newPrinters.push(createdPrinter);
     }
 
-    this.logger.log(`Successfully created ${printers.length} printers`);
+    this.logger.log("Batch create succeeded");
     this.eventEmitter2.emit(printerEvents.batchPrinterCreated, { printers: newPrinters });
     return newPrinters;
-  }
-
-  async updateLastPrintedFile(printerId: MongoIdType, lastPrintedFile) {
-    const update = { lastPrintedFile };
-    await this.get(printerId);
-    const printer = await Printer.findByIdAndUpdate(printerId, update, {
-      new: true,
-      useFindAndModify: false,
-    });
-    this.eventEmitter2.emit(printerEvents.printerUpdated, { printer });
-    return printer;
   }
 
   async updateFlowRate(printerId: MongoIdType, flowRate: number) {

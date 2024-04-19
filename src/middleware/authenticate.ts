@@ -69,8 +69,7 @@ export function authorizePermission(permission: string) {
 
 export const authorizeRoles = (roles: string[], subset = true) =>
   inject(({ roleService }: { roleService: IRoleService }) => async (req: Request, res: Response, next: NextFunction) => {
-    const userRoles = req.roles as IdType[];
-    if (!roleService.authorizeRoles(roles, userRoles, subset)) {
+    if (!roleService.authorizeRoles(roles, req.roles, subset)) {
       throw new AuthorizationError({ roles });
     }
 

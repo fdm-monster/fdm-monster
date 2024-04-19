@@ -210,8 +210,6 @@ export class BootTask {
       await this.userService.setUserRoleIds(demoUserId, [adminRole.id]);
       this.logger.log("Updated demo account");
     }
-
-    await this.settingsStore.setWizardCompleted(1);
   }
 
   async createConnection() {

@@ -59,7 +59,7 @@ export class PrinterCache extends KeyDiffCache<CachedPrinter> {
   async getCachedPrinterOrThrowAsync(id: keyType): Promise<CachedPrinter | null> {
     const printer = await this.getValue(id);
     if (!printer) {
-      throw new NotFoundException(`Printer with id ${id} not found`);
+      throw new NotFoundException(`Printer with provided id not found`);
     }
     return printer;
   }
@@ -67,7 +67,7 @@ export class PrinterCache extends KeyDiffCache<CachedPrinter> {
   getCachedPrinterOrThrow(id: keyType) {
     const printer = this.keyValueStore[id];
     if (!printer) {
-      throw new NotFoundException(`Printer with id ${id} not found`);
+      throw new NotFoundException(`Printer with provided id not found`);
     }
     return printer;
   }

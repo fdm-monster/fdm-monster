@@ -1,7 +1,7 @@
 import { createController } from "awilix-express";
 import { normalizeURLWithProtocol } from "@/utils/url.utils";
 import { authenticate, authorizeRoles } from "@/middleware/authenticate";
-import { getScopedPrinter, validateMiddleware } from "@/handlers/validators";
+import { getScopedPrinter, validateInput, validateMiddleware } from "@/handlers/validators";
 import {
   createOctoPrintBackupRules,
   feedRateRules,
@@ -29,6 +29,11 @@ import { MulterService } from "@/services/core/multer.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { Request, Response } from "express";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
+import { LoginDto } from "@/services/interfaces/login.dto";
+import { captureException } from "@sentry/node";
+import { AxiosError } from "axios";
+import { FailedDependencyException } from "@/exceptions/failed-dependency.exception";
+import { InternalServerException } from "@/exceptions/runtime.exceptions";
 
 export class PrinterController {
   printerSocketStore: PrinterSocketStore;
@@ -145,9 +150,6 @@ export class PrinterController {
     res.send({});
   }
 
-  /**
-   * Pauses the current job
-   */
   async pausePrintJob(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
 
@@ -156,9 +158,6 @@ export class PrinterController {
     res.send({});
   }
 
-  /**
-   * Pauses the current job
-   */
   async resumePrintJob(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
 
@@ -181,11 +180,88 @@ export class PrinterController {
   async create(req: Request, res: Response) {
     const newPrinter = req.body;
 
+    if (req.query.forceSave !== "true") {
+      await this.testOctoPrintConnection(newPrinter);
+    }
+
     // Has internal validation, but might add some here above as well
     const createdPrinter = await this.printerService.create(newPrinter);
     const printer = await this.printerCache.getCachedPrinterOrThrowAsync(createdPrinter.id);
-    this.logger.log(`Created printer with ID ${printer.id || printer.correlationToken}`);
     res.send(printer);
+  }
+
+  /**
+   * Update the printer entity: printerURL, name, apiKey, enabled
+   */
+  async update(req: Request, res: Response) {
+    const { currentPrinterId } = getScopedPrinter(req);
+    const updatedPrinter = req.body;
+
+    if (req.query.forceSave !== "true") {
+      await this.testOctoPrintConnection(updatedPrinter);
+    }
+    await this.printerService.update(currentPrinterId, updatedPrinter);
+
+    const result = await this.printerCache.getCachedPrinterOrThrowAsync(currentPrinterId);
+    res.send(result);
+  }
+
+  /**
+   * Update the printer network connection settings like URL or apiKey - nothing else
+   */
+  async updateConnectionSettings(req: Request, res: Response) {
+    const { currentPrinterId } = getScopedPrinter(req);
+    const inputData = await validateMiddleware(req, updatePrinterConnectionSettingRules);
+
+    if (req.query.forceSave !== "true") {
+      await this.testOctoPrintConnection(inputData);
+    }
+
+    const newEntity = await this.printerService.updateConnectionSettings(currentPrinterId, inputData);
+    res.send({
+      printerURL: newEntity.printerURL,
+      apiKey: newEntity.apiKey,
+    });
+  }
+
+  private async testOctoPrintConnection(inputLoginDto: LoginDto) {
+    const loginDto = (await validateInput(inputLoginDto, updatePrinterConnectionSettingRules)) as LoginDto;
+    try {
+      await this.octoPrintApiService.getVersion(loginDto);
+    } catch (e) {
+      this.logger.log("OctoPrint /api/version test failed");
+
+      if (e instanceof AxiosError) {
+        this.logger.debug(e.message + " " + e.status + " " + e.response?.status);
+        switch (e.response?.status) {
+          case 404:
+            // Bad code design or wrong service type
+            break;
+          case 401:
+          case 403: {
+            throw new FailedDependencyException("Authentication failed", e.response?.status);
+          }
+          case 0:
+          case 502:
+          case 503: {
+            throw new FailedDependencyException("OctoPrint unreachable", e.response?.status);
+          }
+          default: {
+            if (!e.response?.status) {
+              // F.e. http://localhost:1324
+              // ENOTFOUND: DNS problem
+              // ECONNREFUSED: Port has no socket bound
+              // ERR_BAD_REQUEST
+              throw new FailedDependencyException(`Reaching OctoPrint failed without status (code ${e.code})`);
+            } else {
+              throw new FailedDependencyException(`Reaching OctoPrint failed with status (code ${e.code})`, e.response?.status);
+            }
+          }
+        }
+      }
+
+      throw new InternalServerException(`Could not call OctoPrint, internal problem`, (e as Error).stack);
+    }
   }
 
   async importBatch(req: Request, res: Response) {
@@ -200,37 +276,9 @@ export class PrinterController {
     res.send(result);
   }
 
-  /**
-   * Update the printer entity, does not adjust everything
-   */
-  async update(req: Request, res: Response) {
-    const { currentPrinterId } = getScopedPrinter(req);
-    let updatedPrinter = req.body;
-    await this.printerService.update(currentPrinterId, updatedPrinter);
-
-    const result = await this.printerCache.getCachedPrinterOrThrowAsync(currentPrinterId);
-    res.send(result);
-  }
-
-  /**
-   * Update the printer network connection settings like URL or apiKey - nothing else
-   */
-  async updateConnectionSettings(req: Request, res: Response) {
-    const { currentPrinterId } = getScopedPrinter(req);
-    const inputData = await validateMiddleware(req, updatePrinterConnectionSettingRules);
-
-    const newEntity = await this.printerService.updateConnectionSettings(currentPrinterId, inputData);
-    res.send({
-      printerURL: newEntity.printerURL,
-      apiKey: newEntity.apiKey,
-    });
-  }
-
   async updateEnabled(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
     const data = await validateMiddleware(req, updatePrinterEnabledRule);
-
-    this.logger.log("Changing printer enabled setting", JSON.stringify(data));
     await this.printerService.updateEnabled(currentPrinterId, data.enabled);
     res.send({});
   }
@@ -238,8 +286,6 @@ export class PrinterController {
   async updatePrinterDisabledReason(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
     const data = await validateMiddleware(req, updatePrinterDisabledReasonRules);
-
-    this.logger.log("Changing printer disabled reason setting", JSON.stringify(data));
     await this.printerService.updateDisabledReason(currentPrinterId, data.disabledReason);
     res.send({});
   }

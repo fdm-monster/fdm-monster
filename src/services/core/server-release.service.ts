@@ -2,6 +2,7 @@ import semver from "semver";
 import { LoggerService } from "@/handlers/logger";
 import { AppConstants } from "@/server.constants";
 import { GithubService } from "@/services/core/github.service";
+import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class ServerReleaseService {
   airGapped: null | boolean = null; // Connection error
@@ -11,15 +12,21 @@ export class ServerReleaseService {
   private updateAvailable: null | boolean = null;
   private latestRelease: null | boolean = null;
   private installedRelease: null | boolean = null;
-  /**
-   * @type {LoggerService}
-   */
-  #logger = new LoggerService(ServerReleaseService.name);
-  #serverVersion;
+  private logger: LoggerService;
+  serverVersion;
 
-  constructor({ serverVersion, githubService }: { serverVersion: string; githubService: GithubService }) {
-    this.#serverVersion = serverVersion;
+  constructor({
+    serverVersion,
+    githubService,
+    loggerFactory,
+  }: {
+    serverVersion: string;
+    githubService: GithubService;
+    loggerFactory: ILoggerFactory;
+  }) {
+    this.serverVersion = serverVersion;
     this.githubService = githubService;
+    this.logger = loggerFactory(ServerReleaseService.name);
   }
 
   getState() {
@@ -27,7 +34,7 @@ export class ServerReleaseService {
       airGapped: this.airGapped,
       latestRelease: this.latestRelease,
       installedRelease: this.installedRelease,
-      serverVersion: this.#serverVersion,
+      serverVersion: this.serverVersion,
       installedReleaseFound: this.installedReleaseFound,
       updateAvailable: this.updateAvailable,
       synced: this.synced,
@@ -52,11 +59,11 @@ export class ServerReleaseService {
     // Connection timeout results in airGapped state
     this.airGapped = !releases?.length;
     if (!releases?.length) {
-      this.#logger.warn("Latest release check failed because releases from github empty");
+      this.logger.warn("Latest release check failed because releases from github empty");
       return;
     }
 
-    const currentlyInstalledRelease = this.#serverVersion;
+    const currentlyInstalledRelease = this.serverVersion;
     this.installedRelease = {
       tag_name: currentlyInstalledRelease,
     };
@@ -86,9 +93,9 @@ export class ServerReleaseService {
       return;
     }
 
-    const packageVersion = this.#serverVersion;
+    const packageVersion = this.serverVersion;
     if (!this.installedReleaseFound) {
-      this.#logger.log(
+      this.logger.log(
         `\x1b[36mCurrent release tag not found in github releases.\x1b[0m
     Here's github's latest released: \x1b[32m${latestReleaseTag}\x1b[0m
     Here's your release tag: \x1b[32m${packageVersion}\x1b[0m
@@ -96,7 +103,7 @@ export class ServerReleaseService {
       );
       return;
     } else {
-      this.#logger.log(
+      this.logger.log(
         `\x1b[36mCurrent release was found in github releases.\x1b[0m
     Here's github's latest released: \x1b[32m${latestReleaseTag}\x1b[0m
     Here's your release tag: \x1b[32m${packageVersion}\x1b[0m
@@ -106,16 +113,16 @@ export class ServerReleaseService {
 
     if (!!packageVersion && latestReleaseState.updateAvailable) {
       if (!!this.airGapped) {
-        this.#logger.warn(`Installed release: ${packageVersion}. Skipping update check (air-gapped/disconnected from internet)`);
+        this.logger.warn(`Installed release: ${packageVersion}. Skipping update check (air-gapped/disconnected from internet)`);
       } else {
-        this.#logger.log(`Update available! New version: ${latestReleaseTag} (prerelease: ${latestRelease.prerelease})`);
+        this.logger.log(`Update available! New version: ${latestReleaseTag} (prerelease: ${latestRelease.prerelease})`);
       }
     } else if (!packageVersion) {
-      return this.#logger.error(
+      return this.logger.error(
         "Cant check release as package.json version environment variable is not set. Make sure FDM Server is run from a 'package.json' or NPM context."
       );
     } else {
-      return this.#logger.log(`Installed release: ${packageVersion}. You are up to date!`);
+      return this.logger.log(`Installed release: ${packageVersion}. You are up to date!`);
     }
   }
 }

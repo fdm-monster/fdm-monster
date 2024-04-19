@@ -34,23 +34,11 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ hashfiles('./docker/Dockerfile') }}
+          key: "${{ runner.os }}-buildx-${{ hashfiles('./docker/Dockerfile') }}"
           restore-keys: |
             ${{ runner.os }}-buildx-
 
       # Clone the repo and build the image
-      - name: Build and push
-        id: docker_build
-        uses: docker/build-push-action@v5
-        with:
-          push: ${{ github.event_name != 'pull_request' }}
-          context: "{{defaultContext}}"
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
-          file: ./docker/alpha.Dockerfile
-          tags: davidzwa/fdm-monster:${{ env.SERVER_VERSION }}-sqlite, davidzwa/fdm-monster:${{ env.SERVER_VERSION }}-alpha
-          labels: ${{ needs.meta.outputs.labels }}
-
       - name: Build and push
         id: docker_build_new
         uses: docker/build-push-action@v5
@@ -60,7 +48,7 @@ jobs:
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
           file: ./docker/alpha.Dockerfile
-          tags: fdmmonster/fdm-monster:${{ env.SERVER_VERSION }}-sqlite, fdmmonster/fdm-monster:${{ env.SERVER_VERSION }}-alpha
+          tags: fdmmonster/fdm-monster:${{ env.SERVER_VERSION }}-sqlite, fdmmonster/fdm-monster:latest-sqlite, fdmmonster/fdm-monster:${{ env.SERVER_VERSION }}-alpha, davidzwa/fdm-monster:${{ env.SERVER_VERSION }}-sqlite, davidzwa/fdm-monster:latest-sqlite, davidzwa/fdm-monster:${{ env.SERVER_VERSION }}-alpha
           labels: ${{ needs.meta.outputs.labels }}
 
       # Show image digest output

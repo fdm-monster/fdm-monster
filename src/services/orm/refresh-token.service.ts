@@ -3,7 +3,7 @@ import { RefreshToken } from "@/entities";
 import { IRefreshTokenService } from "@/services/interfaces/refresh-token.service.interface";
 import { SqliteIdType } from "@/shared.constants";
 import { RefreshTokenDto } from "@/services/interfaces/refresh-token.dto";
-import { AuthenticationError, NotFoundException } from "@/exceptions/runtime.exceptions";
+import { AuthenticationError } from "@/exceptions/runtime.exceptions";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { v4 as uuidv4 } from "uuid";
 import { AppConstants } from "@/server.constants";
@@ -50,7 +50,7 @@ export class RefreshTokenService
     if (!entity) {
       if (throwNotFoundError) {
         throw new AuthenticationError(
-          `The entity ${RefreshToken.name} '${refreshToken}' was not found.`,
+          `The entity ${RefreshToken.name} by provided refresh token is not found`,
           AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken
         );
       }
@@ -66,7 +66,7 @@ export class RefreshTokenService
 
     const timespan = refreshTokenExpiry ?? AppConstants.DEFAULT_REFRESH_TOKEN_EXPIRY;
     if (!refreshTokenExpiry) {
-      this.logger.warn(`Refresh token expiry not set in Settings:credentials, using default ${timespan} seconds}`);
+      this.logger.warn("Refresh token expiry not set in Settings:credentials, using default value");
     }
 
     await this.create({
@@ -101,7 +101,7 @@ export class RefreshTokenService
     });
 
     if (result.affected) {
-      this.logger.debug(`Removed ${result.affected} login refresh tokens for user ${userId}`);
+      this.logger.debug(`Removed ${result.affected} login refresh tokens for user`);
     }
   }
 
@@ -122,7 +122,7 @@ export class RefreshTokenService
     });
 
     if (result.affected) {
-      this.logger.debug(`Removed ${result.affected} outdated login refresh tokens for user ${userId}`);
+      this.logger.debug(`Removed ${result.affected} outdated login refresh tokens for user`);
     }
   }
 }

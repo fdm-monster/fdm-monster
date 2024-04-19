@@ -8,6 +8,7 @@ import { CreateFloorDto, FloorDto, PositionDto, UpdateFloorDto } from "@/service
 import { validateInput } from "@/handlers/validators";
 import { createFloorRules, updateFloorRules } from "@/services/validators/floor-service.validation";
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
+import { FindManyOptions, FindOneOptions } from "typeorm";
 
 export class FloorService
   extends BaseService(Floor, FloorDto<SqliteIdType>, CreateFloorDto<SqliteIdType>, UpdateFloorDto<SqliteIdType>)
@@ -26,6 +27,24 @@ export class FloorService
     this.floorPositionService = floorPositionService;
   }
 
+  override async list(options?: FindManyOptions<Floor>): Promise<Floor[]> {
+    return super.list(
+      Object.assign(options || {}, {
+        relations: ["printers"],
+      })
+    );
+  }
+
+  override async get(id: SqliteIdType, throwIfNotFound = true, options?: FindOneOptions<Floor>): Promise<Floor> {
+    return super.get(
+      id,
+      throwIfNotFound,
+      Object.assign(options || {}, {
+        relations: ["printers"],
+      })
+    );
+  }
+
   async create(dto: CreateFloorDto<SqliteIdType>): Promise<Floor> {
     await validateInput(dto, createFloorRules);
     const floor = await super.create({
@@ -34,9 +53,8 @@ export class FloorService
       printers: [],
     });
 
-    const printers = dto.printers;
-    if (printers?.length) {
-      for (const printer of printers) {
+    if (dto.printers?.length) {
+      for (const printer of dto.printers) {
         await this.addOrUpdatePrinter(floor.id, printer);
       }
     }
@@ -67,15 +85,32 @@ export class FloorService
     return await this.get(floor.id);
   }
 
+  /**
+   * This is an overwriting method. Any missing data will be deleted, and can cause sql errors if causing wrong constraints.
+   * Merge data before calling this function.
+   * @param floorId
+   * @param update
+   */
   async update(floorId: SqliteIdType, update: UpdateFloorDto<SqliteIdType>) {
     const floor = await this.get(floorId);
-    const floorUpdate = Object.assign(floor, update);
+    const floorUpdate = {
+      ...floor,
+      name: update.name,
+      printers: update.printers,
+      floor: update.floor,
+    };
+
     await validateInput(floorUpdate, updateFloorRules);
-    const printers = floorUpdate.printers;
-    if (printers?.length) {
-      for (let printer of printers) {
+    const desiredPositions = floorUpdate.printers;
+    if (desiredPositions?.length) {
+      for (let printer of desiredPositions) {
         await this.addOrUpdatePrinter(floor.id, printer);
       }
+    }
+    // Remove any printers that should not exist on floor
+    const undesiredPositions = floor.printers.filter((pos) => !desiredPositions.find((dp) => dp.printerId === pos.printerId));
+    if (undesiredPositions?.length) {
+      await this.floorPositionService.deleteMany(undesiredPositions.map((pos) => pos.id));
     }
     delete floorUpdate.printers;
 
@@ -85,26 +120,39 @@ export class FloorService
   async updateName(floorId: SqliteIdType, name: string) {
     let floor = await this.get(floorId);
     floor.name = name;
-    floor = await this.update(floorId, { name });
+    floor = await this.update(floorId, floor);
     return floor;
   }
 
   async updateLevel(floorId: SqliteIdType, level: number): Promise<Floor> {
     let floor = await this.get(floorId);
     floor.floor = level;
-    floor = await this.update(floorId, { floor: level });
+    floor = await this.update(floorId, floor);
     return floor;
   }
 
   async addOrUpdatePrinter(floorId: SqliteIdType, positionDto: PositionDto<SqliteIdType>): Promise<Floor> {
-    await this.get(floorId);
+    // Validation only
+    await this.get(floorId, true);
 
     const position = await this.floorPositionService.findPrinterPosition(positionDto.printerId as SqliteIdType);
+    // Optimization if position is in desired state already
+    if (
+      position &&
+      position.floorId === floorId &&
+      position.x === positionDto.x &&
+      position.x === positionDto.y &&
+      position.printerId === positionDto.printerId
+    ) {
+      return this.get(floorId);
+    }
+
+    // Clean up the printer's position
     if (position) {
       await this.floorPositionService.delete(position.id);
     }
 
-    const xyPosition = await this.floorPositionService.findPosition(positionDto.x, positionDto.y);
+    const xyPosition = await this.floorPositionService.findPosition(floorId, positionDto.x, positionDto.y);
     if (xyPosition) {
       await this.floorPositionService.delete(xyPosition.id);
     }

@@ -4,13 +4,22 @@ import { ForbiddenError } from "@/exceptions/runtime.exceptions";
 import { NextFunction, Request, Response } from "express";
 import { SettingsStore } from "@/state/settings.store";
 import { ILoggerFactory } from "@/handlers/logger-factory";
+import { IConfigService } from "@/services/core/config.service";
 
 export const validateWizardCompleted = inject(
-  ({ settingsStore, loggerFactory }: { settingsStore: SettingsStore; loggerFactory: ILoggerFactory }) =>
+  ({
+      configService,
+      settingsStore,
+      loggerFactory,
+    }: {
+      configService: IConfigService;
+      settingsStore: SettingsStore;
+      loggerFactory: ILoggerFactory;
+    }) =>
     async (req: Request, res: Response, next: NextFunction) => {
       const logger = loggerFactory(validateWhitelistedIp.name);
-      const serverSettings = settingsStore.getSettings();
-      if (!!settingsStore.getWizardSettings()?.wizardCompleted) {
+      const isDemoMode = configService.isDemoMode();
+      if (isDemoMode || !!settingsStore.getWizardSettings()?.wizardCompleted) {
         next();
         return;
       }
@@ -67,7 +76,7 @@ export const interceptRoles = inject(
       const serverSettings = await settingsStore.getSettings();
 
       if (isTypeormMode) {
-        req.roles = req.user?.roles.map((r) => r.id);
+        req.roles = req.user?.roles.map((r) => r.roleId);
       } else {
         req.roles = req.user?.roles;
       }

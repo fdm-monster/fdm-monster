@@ -111,7 +111,7 @@ export class PrinterFilesService implements IPrinterFilesService<MongoIdType> {
       if (!file) {
         if (throwError) {
           throw new NotFoundException(
-            `A file removal was ordered but this file was not found in database for printer Id ${printerId}`,
+            "A file removal was ordered but this file was not found in database for provided printer id",
             filePath
           );
         } else {

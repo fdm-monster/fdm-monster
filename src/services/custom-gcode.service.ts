@@ -16,7 +16,7 @@ export class CustomGcodeService implements ICustomGcodeService<MongoIdType> {
   }
   async get(gcodeScriptId: MongoIdType) {
     const document = await CustomGcode.findById(gcodeScriptId);
-    if (!document) throw new NotFoundException(`Custom GCode script with id ${gcodeScriptId} does not exist.`);
+    if (!document) throw new NotFoundException(`Custom GCode script with provided id does not exist`);
 
     return document;
   }

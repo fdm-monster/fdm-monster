@@ -47,7 +47,8 @@ export class AuthController {
   }
 
   async login(req: Request, res: Response) {
-    this.logger.log(`Login attempt from IP ${req.ip} and user-agent ${req.headers["user-agent"]}`);
+    // TODO sensitivity filter
+    this.logger.debug(`Login attempt from IP ${req.ip} and user-agent ${req.headers["user-agent"]}`);
     const tokens = await this.authService.loginUser(req.body.username, req.body.password);
     return res.send(tokens);
   }
@@ -55,8 +56,12 @@ export class AuthController {
   async getLoginRequired(req: Request, res: Response) {
     const loginRequired = await this.settingsStore.getLoginRequired();
     const registration = this.settingsStore.isRegistrationEnabled();
-    const wizardState = this.settingsStore.getWizardState();
+    let wizardState = this.settingsStore.getWizardState();
     const isDemoMode = this.configService.isDemoMode();
+    wizardState = {
+      ...wizardState,
+      wizardCompleted: isDemoMode ? false : wizardState.wizardCompleted,
+    };
     res.send({ loginRequired, registration, wizardState, isDemoMode });
   }
 
@@ -85,7 +90,8 @@ export class AuthController {
 
   async refreshLogin(req: Request, res: Response) {
     const { refreshToken } = await validateMiddleware(req, refreshTokenRules);
-    this.logger.log(`Refresh login attempt from IP ${req.ip} and user-agent ${req.headers["user-agent"]}`);
+    // TODO sensitivity filter
+    this.logger.debug(`Refresh login attempt from IP ${req.ip} and user-agent ${req.headers["user-agent"]}`);
     const idToken = await this.authService.renewLoginByRefreshToken(refreshToken);
     return res.send({ token: idToken });
   }
@@ -109,14 +115,12 @@ export class AuthController {
       throw new BadRequestException("Registration is disabled. Cant register user");
     }
     const { username, password } = await validateMiddleware(req, registerUserRules);
-    if (username.toLowerCase().includes("admin")) {
-      throw new BadRequestException("Username 'admin' is not allowed");
-    }
-    if (username.toLowerCase().includes("root")) {
-      throw new BadRequestException("Username 'root' is not allowed");
-    }
-    if (username.toLowerCase() === "demo") {
-      throw new BadRequestException("Username 'demo' is not allowed");
+    if (
+      username.toLowerCase().includes("admin") ||
+      username.toLowerCase().includes("root") ||
+      username.toLowerCase() === "demo"
+    ) {
+      throw new BadRequestException("Username is not allowed");
     }
 
     const roles = await this.roleService.getAppDefaultRoleIds();

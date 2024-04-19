@@ -9,6 +9,8 @@ import { ITimeoutSettings } from "@/models/Settings";
 export class OctoPrintRoutes {
   octoPrintBase = "/";
   apiBase = `${this.octoPrintBase}api`;
+  apiVersion = `${this.apiBase}/version`;
+  apiServer = `${this.apiBase}/server`;
   apiSettingsPart = `${this.apiBase}/settings`;
   apiFiles = `${this.apiBase}/files`;
   apiFilesLocation = `${this.apiFiles}/local`;

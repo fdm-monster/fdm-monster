@@ -3,16 +3,16 @@ import { CameraStreamDto, CreateCameraStreamDto } from "@/services/interfaces/ca
 import { IdType } from "@/shared.constants";
 import { CameraStream } from "@/entities";
 
-export interface ICameraStreamService<KeyType = IdType> {
-  toDto(entity: CameraStream | ICameraStream): CameraStreamDto<KeyType>;
+export interface ICameraStreamService<KeyType = IdType, Entity = CameraStream | ICameraStream> {
+  toDto(entity: Entity): CameraStreamDto<KeyType>;
 
-  list(): Promise<CameraStream[]>;
+  list(): Promise<Entity[]>;
 
-  get(id: KeyType, throwError?: boolean): Promise<CameraStream | ICameraStream>;
+  get(id: KeyType, throwError?: boolean): Promise<Entity>;
 
-  create(data: CreateCameraStreamDto<IdType>): Promise<CameraStream | ICameraStream>;
+  create(data: CreateCameraStreamDto<IdType>): Promise<Entity>;
 
   delete(id: KeyType): Promise<void>;
 
-  update(id: KeyType, input: CreateCameraStreamDto<KeyType>): Promise<CameraStream | ICameraStream>;
+  update(id: KeyType, input: CreateCameraStreamDto<KeyType>): Promise<Entity>;
 }

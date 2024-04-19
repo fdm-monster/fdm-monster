@@ -70,7 +70,7 @@ function setupPackageJsonVersionOrThrow() {
       // TODO test this works under docker as well
       removePm2Service("didnt pass startup validation (package.json)");
     }
-    throw new Error(`Aborting server.`);
+    throw new Error("Aborting server.");
   }
 }
 
@@ -83,9 +83,7 @@ function printInstructionsURL() {
 
 export function fetchMongoDBConnectionString() {
   if (!process.env[AppConstants.MONGO_KEY]) {
-    logger.debug(
-      `~ ${AppConstants.MONGO_KEY} environment variable is not set. Assuming default: ${AppConstants.MONGO_KEY}=${AppConstants.defaultMongoStringUnauthenticated}`
-    );
+    logger.debug(`~ ${AppConstants.MONGO_KEY} environment variable is not set. Assuming default`);
     printInstructionsURL();
     process.env[AppConstants.MONGO_KEY] = AppConstants.defaultMongoStringUnauthenticated;
   }
@@ -138,9 +136,7 @@ export function ensurePortSet() {
   fetchServerPort();
 
   if (!process.env[AppConstants.SERVER_PORT_KEY]) {
-    logger.log(
-      `~ ${AppConstants.SERVER_PORT_KEY} environment variable is not set. Assuming default: ${AppConstants.SERVER_PORT_KEY}=${AppConstants.defaultServerPort}.`
-    );
+    logger.log(`~ ${AppConstants.SERVER_PORT_KEY} environment variable is not set`);
     printInstructionsURL();
     process.env[AppConstants.SERVER_PORT_KEY] = AppConstants.defaultServerPort.toString();
   }

@@ -49,10 +49,11 @@ jobs:
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
           file: ./docker/Dockerfile
-          tags: fdmmonster/fdm-monster:${{ env.SERVER_VERSION }}-arm64, davidzwa/fdm-monster:${{ env.SERVER_VERSION }}-arm64
+          tags: fdmmonster/fdm-monster:${{ env.SERVER_VERSION }}-arm64, fdmmonster/fdm-monster:latest-arm64, davidzwa/fdm-monster:${{ env.SERVER_VERSION }}-arm64, davidzwa/fdm-monster:latest-arm64
           labels: ${{ needs.meta.outputs.labels }}
           platforms: linux/arm64
 
+      # SQLite ARM64 version, separate dockerfile
       - name: Build and push
         id: docker_build_new
         uses: docker/build-push-action@v5
@@ -62,7 +63,7 @@ jobs:
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
           file: ./docker/alpha.Dockerfile
-          tags: fdmmonster/fdm-monster:${{ env.SERVER_VERSION }}-sqlite-arm64, davidzwa/fdm-monster:${{ env.SERVER_VERSION }}-sqlite-arm64
+          tags: fdmmonster/fdm-monster:${{ env.SERVER_VERSION }}-sqlite-arm64, fdmmonster/fdm-monster:latest-sqlite-arm64, davidzwa/fdm-monster:${{ env.SERVER_VERSION }}-sqlite-arm64, davidzwa/fdm-monster:latest-sqlite-arm64
           labels: ${{ needs.meta.outputs.labels }}
           platforms: linux/arm64
 

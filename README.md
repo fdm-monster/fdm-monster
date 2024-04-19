@@ -1,22 +1,30 @@
 <p align="center" style="margin-bottom: 0">
     <a href="https://docs.fdm-monster.net/" target="_blank" rel="noopener noreferrer">
-        <img width="150" src="docs/images/logo-copyright.png" alt="FDM Monster">
+        <img width="150" src="https://github.com/fdm-monster/fdm-monster-client/blob/main/public/img/logo.png?raw=true" alt="FDM Monster">
     </a>
 </p>
 <h1 align="center" style="padding-top: 0; margin-top: 10px">FDM Monster</h1>
 
 <p align="center">
+<a href="https://discord.gg/mwA8uP8CMc">
+    <img src="https://img.shields.io/discord/864835453773807686?label=Discord"/>
+</a>
 <a href="https://github.com/fdm-monster/fdm-monster/releases/latest">
     <img src="https://img.shields.io/github/release/fdm-monster/fdm-monster"/>
 </a>
 <a href="https://github.com/fdm-monster/fdm-monster/stargazers">
     <img src="https://img.shields.io/github/stars/fdm-monster/fdmonster"/>
 </a>
+
 <a href="https://github.com/fdm-monster/fdm-monster/issues">
     <img src="https://img.shields.io/github/issues/fdm-monster/fdm-monster"/>
 </a> 
 <a href="https://app.codecov.io/gh/fdm-monster/fdm-monster">
     <img src="https://codecov.io/gh/fdm-monster/fdm-monster/branch/develop/graph/badge.svg?flag=server-nodejs&precision=0"/>
+</a>
+<br/>
+<a href="https://unraid.net/community/apps?q=fdm+monster">
+    <img src="https://img.shields.io/badge/Unraid%20Community%20Application-fc832e"/>
 </a>
 
 </p>
@@ -29,7 +37,7 @@
 FDM Monster is a server for managing your 3D printer farm through [OctoPrint](https://octoprint.org/).
 Our efforts are focused on providing a professional print-farming workflow that is suitable for hobby and commercial farms alike.
 
-This server is has been battle-tested in the field for 100+ printers, so give it a star ⭐and enhance your 3D Printing Farm's workflow!
+This server has been battle-tested in the field for 100+ printers, so give it a star ⭐and enhance your 3D Printing Farm's workflow!
 
 ## Features
 - Adding OctoPrint instances
@@ -40,7 +48,7 @@ This server is has been battle-tested in the field for 100+ printers, so give it
 - Import printers from OctoFarm
 - [Raspberry Pi image MonsterPi](https://docs.fdm-monster.net/guides/monsterpi)
 
-![docs/images/server-running.png](https://github.com/fdm-monster/fdm-monster-docs/blob/main/docs/images/server-running.png)
+![docs/images/server-running.png](https://raw.githubusercontent.com/fdm-monster/fdm-monster-docs/main/docs/images/server-running.png)
 _The FDM Monster grid after placing one OctoPrint instance._
 
 ## Getting started
@@ -61,7 +69,7 @@ Please join the discord, but stay professional and proactive!
 These are the people involved in the project. Find the meaning of the emoji keys [here](https://allcontributors.org/docs/en/emoji-key).
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-12-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-14-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
@@ -84,6 +92,8 @@ These are the people involved in the project. Find the meaning of the emoji keys
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/cyrixdx4"><img src="https://avatars.githubusercontent.com/u/62126724?v=4?s=80" width="80px;" alt="cyrixdx4"/><br /><sub><b>cyrixdx4</b></sub></a><br /><a href="https://github.com/fdm-monster/fdm-monster/issues?q=author%3Acyrixdx4" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/doucettom"><img src="https://avatars.githubusercontent.com/u/6595645?v=4?s=80" width="80px;" alt="doucettom"/><br /><sub><b>doucettom</b></sub></a><br /><a href="https://github.com/fdm-monster/fdm-monster/issues?q=author%3Adoucettom" title="Bug reports">🐛</a> <a href="#ideas-doucettom" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ZombiesLoveMe"><img src="https://avatars.githubusercontent.com/u/35661391?v=4?s=80" width="80px;" alt="Callum"/><br /><sub><b>Callum</b></sub></a><br /><a href="#ideas-ZombiesLoveMe" title="Ideas, Planning, & Feedback">🤔</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/bharvey88"><img src="https://avatars.githubusercontent.com/u/8107750?v=4?s=80" width="80px;" alt="bharvey88"/><br /><sub><b>bharvey88</b></sub></a><br /><a href="https://github.com/fdm-monster/fdm-monster/issues?q=author%3Abharvey88" title="Bug reports">🐛</a> <a href="#infra-bharvey88" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#platform-bharvey88" title="Packaging/porting to new platform">📦</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Mikec78660"><img src="https://avatars.githubusercontent.com/u/108021920?v=4?s=80" width="80px;" alt="Mikec78660"/><br /><sub><b>Mikec78660</b></sub></a><br /><a href="#ideas-Mikec78660" title="Ideas, Planning, & Feedback">🤔</a></td>
     </tr>
   </tbody>
 </table>

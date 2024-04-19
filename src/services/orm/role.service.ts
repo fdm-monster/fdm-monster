@@ -79,6 +79,12 @@ export class RoleService extends BaseService(Role, RoleDto<SqliteIdType>) implem
     return permissions;
   }
 
+  /**
+   * Checks if the role names or ids overlap
+   * @param requiredRoles list of roles that would grant access
+   * @param assignedRoles application role names or role ids (not to be confused with user role assignments)
+   * @param subset
+   */
   authorizeRoles(requiredRoles: (string | SqliteIdType)[], assignedRoles: (string | SqliteIdType)[], subset: boolean): boolean {
     let isAuthorized = false;
 
@@ -105,14 +111,14 @@ export class RoleService extends BaseService(Role, RoleDto<SqliteIdType>) implem
 
   getRole(roleId: SqliteIdType): Role {
     const role = this._roles.find((r) => r.id === roleId);
-    if (!role) throw new NotFoundException(`Role Id '${roleId}' not found`);
+    if (!role) throw new NotFoundException(`Role by provided id was not found`);
 
     return role;
   }
 
   getRoleByName(roleName: string): Role {
     const role = this._roles.find((r) => r.name === roleName);
-    if (!role) throw new NotFoundException(`Role by name ${roleName} not found`);
+    if (!role) throw new NotFoundException(`Role by provided name was not found`);
 
     return role;
   }
@@ -130,16 +136,6 @@ export class RoleService extends BaseService(Role, RoleDto<SqliteIdType>) implem
     return this.getRoleByName(roleName);
   }
 
-  normalizeRoleIdOrName(assignedRole: string | SqliteIdType): string | undefined {
-    const roleInstance = this.roles.find((r) => r.id === assignedRole || r.name === assignedRole);
-    if (!roleInstance) {
-      console.warn(`The role by ID ${assignedRole} did not exist in definition. Skipping.`);
-      return;
-    }
-
-    return roleInstance.name;
-  }
-
   async syncRoles(): Promise<void> {
     this._roles = [];
     for (let roleName of Object.values(ROLES)) {
@@ -153,5 +149,15 @@ export class RoleService extends BaseService(Role, RoleDto<SqliteIdType>) implem
         this._roles.push(storedRole);
       }
     }
+  }
+
+  private normalizeRoleIdOrName(assignedRole: string | SqliteIdType): string | undefined {
+    const roleInstance = this.roles.find((r) => r.id === assignedRole || r.name === assignedRole);
+    if (!roleInstance) {
+      console.warn(`The role by provided id was not found. Skipping.`);
+      return;
+    }
+
+    return roleInstance.name;
   }
 }

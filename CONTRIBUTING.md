@@ -42,7 +42,7 @@ FDM Monster currently consists of two active repositories:
 
 Server design
 
-- **FDM Monster server** was chosen to be a NodeJS server. The backend is currently structured as a REST API. It might be surprising that we use `awilix` as Inversion-of-Control implementation, but if you study the resulting architecture it will show its fresh and quick-to-develop benefits rapidly.
+- **FDM Monster server** was chosen to be a Node.js server. The backend is currently structured as a REST API. It might be surprising that we use `awilix` as Inversion-of-Control implementation, but if you study the resulting architecture it will show its fresh and quick-to-develop benefits rapidly.
 - **FDM Monster server** runs using MongoDB as database and Mongoose as ORM
 - **FDM Monster server** caches data in-memory using a self-written store/cache system between the database (no redis!)
 - **FDM Monster server** API is built up using `awilix-express` and uses `node-input-validation` as API validation

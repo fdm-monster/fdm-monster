@@ -1,15 +1,13 @@
-// to make the file a module and avoid the TypeScript error
 import { AwilixContainer } from "awilix";
-import { IRole } from "@/models/Auth/Role";
 import { IUser } from "@/models/Auth/User";
+import { IdType } from "@/shared.constants";
 
-declare global {
-  namespace Express {
+export type RequestRole = IdType;
 
-    interface Request {
-      user?: IUser;
-      container?: AwilixContainer;
-      roles?: IRole[];
-    }
+declare module "express" {
+  interface Request {
+    user?: IUser;
+    container?: AwilixContainer;
+    roles?: RequestRole[];
   }
 }

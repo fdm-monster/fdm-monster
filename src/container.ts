@@ -78,6 +78,7 @@ import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { BuildResolver, DisposableResolver } from "awilix/lib/resolvers";
 import { UserRoleService } from "@/services/orm/user-role.service";
 import { PrinterGroupService } from "@/services/orm/printer-group.service";
+import { MoonrakerClient } from "@/services/moonraker/moonraker.client";
 
 export function config<T1, T2>(
   key: string,
@@ -105,7 +106,6 @@ export function configureContainer(isSqlite: boolean = false) {
     [di.appDefaultRole]: asValue(ROLES.GUEST),
     [di.appDefaultRoleNoLogin]: asValue(ROLES.ADMIN),
     [di.serverVersion]: asFunction(() => {
-      // TODO change the role to a non-admin role in the future once GUEST/OPERATOR have more meaningful permissions
       return process.env[AppConstants.VERSION_KEY];
     }),
     [di.socketFactory]: asClass(SocketFactory).transient(), // Factory function, transient on purpose!
@@ -179,6 +179,7 @@ export function configureContainer(isSqlite: boolean = false) {
     [di.multerService]: asClass(MulterService).singleton(),
     [di.yamlService]: asClass(YamlService),
     [di.octoPrintApiService]: asClass(OctoPrintApiService).singleton(),
+    [di.moonrakerClient]: asClass(MoonrakerClient).singleton(),
     [di.batchCallService]: asClass(BatchCallService).singleton(),
     [di.pluginFirmwareUpdateService]: asClass(PluginFirmwareUpdateService).singleton(),
     [di.octoPrintSockIoAdapter]: asClass(OctoPrintSockIoAdapter).transient(), // Transient on purpose

@@ -3,23 +3,45 @@ import { authenticate, authorizeRoles } from "@/middleware/authenticate";
 import { AppConstants } from "@/server.constants";
 import { ROLES } from "@/constants/authorization.constants";
 import { validateInput } from "@/handlers/validators";
-import { sentryDiagnosticsEnabledRules, whitelistSettingUpdateRules } from "@/services/validators/settings-service.validation";
+import {
+  credentialSettingPatchRules,
+  fileCleanSettingsUpdateRules,
+  frontendSettingsUpdateRules,
+  sentryDiagnosticsEnabledRules,
+  serverSettingsUpdateRules,
+  timeoutSettingsUpdateRules,
+  whitelistSettingUpdateRules,
+} from "@/services/validators/settings-service.validation";
 import { SettingsStore } from "@/state/settings.store";
 import { Request, Response } from "express";
 import { address } from "ip";
-import { version } from "@/../package.json";
 import { IpWhitelistSettingsDto } from "@/services/interfaces/settings.dto";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 import { demoUserNotAllowed, demoUserNotAllowedInterceptor } from "@/middleware/demo.middleware";
+import { IConfigService } from "@/services/core/config.service";
 
 export class SettingsController {
   settingsStore: SettingsStore;
   logger: LoggerService;
+  configService: IConfigService;
+  serverVersion: string;
 
-  constructor({ settingsStore, loggerFactory }: { settingsStore: SettingsStore; loggerFactory: ILoggerFactory }) {
+  constructor({
+    settingsStore,
+    serverVersion,
+    loggerFactory,
+    configService,
+  }: {
+    serverVersion: string;
+    settingsStore: SettingsStore;
+    loggerFactory: ILoggerFactory;
+    configService: IConfigService;
+  }) {
     this.settingsStore = settingsStore;
     this.logger = loggerFactory(SettingsController.name);
+    this.serverVersion = serverVersion;
+    this.configService = configService;
   }
 
   getSettings(req: Request, res: Response) {
@@ -30,7 +52,7 @@ export class SettingsController {
       connection = {
         clientIp: req.socket?.remoteAddress,
         ip: serverIp,
-        version,
+        version: this.serverVersion,
       };
     } catch (e) {
       this.logger.warn("Could not fetch server IP address");
@@ -63,12 +85,16 @@ export class SettingsController {
   }
 
   async updateFrontendSettings(req: Request, res: Response) {
-    const result = await this.settingsStore.updateFrontendSettings(req.body);
+    const validatedInput = await validateInput(req.body, frontendSettingsUpdateRules);
+    const result = await this.settingsStore.updateFrontendSettings(validatedInput);
     res.send(result);
   }
 
   async updateServerSettings(req: Request, res: Response) {
-    const result = await this.settingsStore.updateServerSettings(req.body);
+    const isWhitelistFeatureEnabled =
+      this.configService.get(AppConstants.ENABLE_EXPERIMENTAL_WHITELIST_SETTINGS, "false") === "true";
+    const validatedInput = await validateInput(req.body, serverSettingsUpdateRules(isWhitelistFeatureEnabled));
+    const result = await this.settingsStore.updateServerSettings(validatedInput);
     res.send(result);
   }
 
@@ -85,17 +111,20 @@ export class SettingsController {
   }
 
   async updateCredentialSettings(req: Request, res: Response) {
-    await this.settingsStore.updateCredentialSettings(req.body);
+    const validatedInput = await validateInput(req.body, credentialSettingPatchRules);
+    await this.settingsStore.updateCredentialSettings(validatedInput);
     res.send();
   }
 
   async updateFileCleanSettings(req: Request, res: Response) {
-    const result = await this.settingsStore.patchFileCleanSettings(req.body);
+    const validatedInput = await validateInput(req.body, fileCleanSettingsUpdateRules);
+    const result = await this.settingsStore.patchFileCleanSettings(validatedInput);
     res.send(result);
   }
 
   async updateTimeoutSettings(req: Request, res: Response) {
-    const result = await this.settingsStore.updateTimeoutSettings(req.body);
+    const validatedInput = await validateInput(req.body, timeoutSettingsUpdateRules);
+    const result = await this.settingsStore.updateTimeoutSettings(validatedInput);
     res.send(result);
   }
 }

@@ -1,15 +1,3 @@
-// Test or example task
-// TaskManager.registerPeriodicJob(
-//   "unique_test_task1",
-//   async () => {
-//     await new Promise((resolve) => {
-//       setTimeout(() => resolve(), 9000);
-//     });
-//   },
-//   {
-//   PERIODIC_TASK_PRESET_2500MS
-// );
-
 export interface TimingPreset {
   periodic?: boolean;
   logFirstCompletion: boolean;

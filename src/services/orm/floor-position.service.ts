@@ -3,7 +3,6 @@ import { BaseService } from "@/services/orm/base.service";
 import { SqliteIdType } from "@/shared.constants";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { PositionDto } from "@/services/interfaces/floor.dto";
-import { DeepPartial } from "typeorm";
 
 export class FloorPositionService extends BaseService(FloorPosition, PositionDto<SqliteIdType>) {
   constructor({ typeormService }: { typeormService: TypeormService }) {
@@ -14,16 +13,20 @@ export class FloorPositionService extends BaseService(FloorPosition, PositionDto
     return super.create(dto);
   }
 
-  findPosition(x: number, y: number) {
-    return this.repository.findOneBy({ x, y });
+  findPosition(floorId: SqliteIdType, x: number, y: number) {
+    return this.repository.findOneBy({ floorId, x, y });
   }
 
+  /**
+   * Find the printer across any floor, usually to see if it has been moved elsewhere.
+   * @param printerId The printer which position to be looked up.
+   */
   findPrinterPosition(printerId: SqliteIdType) {
     return this.repository.findOneBy({ printerId });
   }
 
   deletePrinterPositionsByPrinterId(printerId: SqliteIdType) {
-    return this.repository.delete({ id: printerId });
+    return this.repository.delete({ printerId });
   }
 
   findPrinterPositionOnFloor(floorId: SqliteIdType, printerId: SqliteIdType) {

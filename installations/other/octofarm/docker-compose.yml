@@ -1,0 +1,32 @@
+version: '3.4'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: pass1234
+      MONGO_INITDB_DATABASE: octofarm
+    ports:
+      - "21111:27017"
+    volumes:
+      - ./mongodb-data:/data
+    restart: unless-stopped
+
+  octofarm:
+    container_name: octofarm
+    # choose octofarm/octofarm:1.8.0-beta.11
+    image: octofarm/octofarm:latest
+    restart: unless-stopped
+    links:
+      - mongodb
+    ports:
+      - 4111:4111 # port of SYSTEM : port of CONTAINER
+    environment:
+      - OCTOFARM_PORT=4111
+      - MONGO=mongodb://root:pass1234@host.docker.internal:21111/octofarm?authSource=admin
+    volumes:
+      - ./OctoFarm/logs:/app/logs
+      - ./OctoFarm/scripts:/app/scripts
+      - ./OctoFarm/images:/app/images

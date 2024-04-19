@@ -1,4 +1,4 @@
-import { createController, inject } from "awilix-express";
+import { createController } from "awilix-express";
 import { AppConstants } from "@/server.constants";
 import { isNode, isNodemon, isPm2 } from "@/utils/env.utils";
 import { authenticate, authorizePermission } from "@/middleware/authenticate";
@@ -119,6 +119,10 @@ export class ServerPublicController {
         available: true,
         version: 1,
       },
+      githubRateLimitApi: {
+        available: true,
+        version: 1,
+      },
     });
   }
 
@@ -153,5 +157,5 @@ export default createController(ServerPublicController)
   .prefix(AppConstants.apiRoute + "/")
   .get("", "welcome", { before: [authenticate(), authorizePermission(PERMS.ServerInfo.Get)] })
   .get("test", "test")
-  .get("features", "getFeatures", { before: [authenticate(), authorizePermission(PERMS.ServerInfo.Get)] })
+  .get("features", "getFeatures", { before: [authenticate()] })
   .get("version", "getVersion", { before: [authenticate(), authorizePermission(PERMS.ServerInfo.Get)] });
