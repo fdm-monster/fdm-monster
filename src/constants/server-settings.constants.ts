@@ -56,7 +56,7 @@ export const getDefaultFrontendSettings = (): FrontendSettingsDto => ({
 
 export const timeoutSettingKey = "timeout";
 export const getDefaultTimeout = (): TimeoutSettingsDto => ({
-  apiTimeout: 1000,
+  apiTimeout: 10000,
 });
 
 export const fileCleanSettingKey = "printerFileClean";

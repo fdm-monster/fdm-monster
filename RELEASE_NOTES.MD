@@ -10,6 +10,7 @@
 - Dropped the permission check on /api/features as it made no sense
 - Anonymized logging
 - Handle OctoKit errors (ExternalServiceErrors) differently than OctoPrint errors (different HttpClient implementations). Refer to the new rate limit API and feature flag.
+- Set default API call timeout to 10000 milliseconds (to call OctoPrint APIs)
 
 ## Fixes:
 
@@ -20,3 +21,4 @@
 - Setting demo mode will not set wizard to be completed: first time setup will be required after setting demo mode to false.
 - Settings: incorrect file clean shape would not throw any validation errors (SQLite only). Validation has been added for file clean on API level.
 - Settings: make all settings API endpoints stricter by adding validation on API level. Patching is not possible anymore.
+- Printer: add OctoPrint URL validation which parses the error with user friendly errors as result
