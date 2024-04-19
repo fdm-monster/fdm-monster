@@ -180,7 +180,7 @@ export class PrinterController {
   async create(req: Request, res: Response) {
     const newPrinter = req.body;
 
-    if (!req.query.skipTest) {
+    if (req.query.forceSave !== "true") {
       await this.testOctoPrintConnection(newPrinter);
     }
 
@@ -197,7 +197,7 @@ export class PrinterController {
     const { currentPrinterId } = getScopedPrinter(req);
     const updatedPrinter = req.body;
 
-    if (!req.query.skipTest) {
+    if (req.query.forceSave !== "true") {
       await this.testOctoPrintConnection(updatedPrinter);
     }
     await this.printerService.update(currentPrinterId, updatedPrinter);
@@ -213,7 +213,7 @@ export class PrinterController {
     const { currentPrinterId } = getScopedPrinter(req);
     const inputData = await validateMiddleware(req, updatePrinterConnectionSettingRules);
 
-    if (!req.query.skipTest) {
+    if (req.query.forceSave !== "true") {
       await this.testOctoPrintConnection(inputData);
     }
 
