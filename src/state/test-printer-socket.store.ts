@@ -34,12 +34,7 @@ export class TestPrinterSocketStore {
     this.logger = loggerFactory(TestPrinterSocketStore.name);
   }
 
-  /**
-   * Sets up/recreates a printer to be tested quickly by running the standard checks
-   * @param printer
-   * @returns {Promise<*>}
-   */
-  async setupTestPrinter(printer) {
+  async setupTestPrinter(printer): Promise<void> {
     if (this.testSocket) {
       this.testSocket.close();
       this.testSocket = null;
