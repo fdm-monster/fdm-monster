@@ -54,4 +54,5 @@ test
 !migrate-mongo-config.js
 !package.json
 !yarn.lock
+!.yarn
 !tsconfig.json

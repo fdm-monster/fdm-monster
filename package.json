@@ -154,11 +154,12 @@
     "verbose": false,
     "ignore": [
       ".github/*",
+      "database/*",
       "docs/*",
+      "docker/*",
+      "installations/*",
       "media",
-      "test/*",
-      "views/*",
-      "docker/*"
+      "test/*"
     ],
     "delay": 100
   },
