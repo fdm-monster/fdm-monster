@@ -134,24 +134,20 @@ the [CONTRIBUTING](CONTRIBUTING.md) file.
 - [x] :rocket: Docker amd64 image
 - [x] 🛡️ MongoDB 5 & 6 support
 - [x] :rocket: Quick copy paste of FDM Monster printers
-- [x] 🛡️ Complete API test coverage >80% (now at 80.5%)
+- [x] 🛡️ Complete API test coverage
 - [x] :rocket: Floor management
 - [x] Auto-clean old OctoPrint files (opt-in and configurable) 
 - [x] :rocket: Windows and Linux Service
 - [x] Printer completion/failure tracking (with statistics page)
-- [x] 🔌 Raspberry Pi image
-- [x] :rocket: Documentation
 - [x] Printer placement using drag n drop 
-- [ ] 🔌 FDM Connector - MQTT autodiscovery
-- [ ] :rocket: Chocolatey package (Windows install)
-- [ ] 🛡️ Frontend user and basic role management 
-- [ ] Klipper/OctoKlipper (and MoonRaker/Fluidd/Mainsail API integration)
-- [ ] :rocket: Plugin system (preparation work is ready)
-- [ ] Support for OctoPrint 2.0.0 (when it comes out)
+- [x] 🔌 Raspberry Pi image (https://github.com/fdm-monster/MonsterPi)
+- [x] :rocket: Documentation (https://docs.fdm-monster.net)
+- [x] 🛡️ Login and user management
+- [x] OctoFarm export 
+- [ ] Klipper and Moonraker API integration
+- [ ] OctoKlipper integration
+- [ ] Spoolman integration
 
-[//]: # (- [ ] :rocket: Docker overlay as service management &#40;daemonized restart & auto-updates&#41;)
-[//]: # (- [ ] 🛡️ Client test coverage)
-[//]: # (- [ ] Client with Vuetify 3.2 &#40;+ labs datatable&#41;)
 
 ## License
 
