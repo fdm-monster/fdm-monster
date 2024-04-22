@@ -10,7 +10,7 @@ jobs:
     outputs:
       foundServerVersion: ${{ steps.init.outputs.foundServerVersion }}
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+      - uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4
       - name: get-client-version
         # https://gist.github.com/DarrenN/8c6a5b969481725a4413?permalink_comment_id=3863317#gistcomment-3863317
         run: |
@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     if: needs.checkversion.outputs.foundServerVersion == 'false'
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+      - uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4
       - uses: actions/setup-node@v4
         with:
           node-version: 18.x
