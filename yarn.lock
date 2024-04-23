@@ -4784,9 +4784,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.4.668":
-  version: 1.4.745
-  resolution: "electron-to-chromium@npm:1.4.745"
-  checksum: 10c0/2dd1842e0ee84f88e78ee6e81dbd9dd554a589cf612ab2e5920d8be837aaea78b4c00cf189e545ee25d36777514fed80c11c9a867b2194f94f173d063873ec18
+  version: 1.4.746
+  resolution: "electron-to-chromium@npm:1.4.746"
+  checksum: 10c0/1ff47105510e9a6dbc542d7165b88e030c8f2c815b30683ca05d8bc1a24e8f03e57caa0dc03959b08860b0465f9645edea5c682400da5b79b71ce9ddbb89a3d6
   languageName: node
   linkType: hard
 
@@ -7348,9 +7348,9 @@ __metadata:
   linkType: hard
 
 "libphonenumber-js@npm:^1.10.53":
-  version: 1.10.60
-  resolution: "libphonenumber-js@npm:1.10.60"
-  checksum: 10c0/ee15efb27d32501d5928a323995d7e0140e8d4eb0a84327f4784d398487e457a6d93755d87e1c8920a71a376e258a4f1a8b00c939adca7b3b64e17a7ee99a309
+  version: 1.10.61
+  resolution: "libphonenumber-js@npm:1.10.61"
+  checksum: 10c0/0c920293b2845d0c1a613fcc9d9f7259c6d157c58fd820766471c48e64f7300205ece75fab32f8770f5e68d992512ff91793e3c600f98ffbce4a3905b6af4924
   languageName: node
   linkType: hard
 
@@ -8141,11 +8141,11 @@ __metadata:
   linkType: hard
 
 "node-abi@npm:^3.3.0":
-  version: 3.60.0
-  resolution: "node-abi@npm:3.60.0"
+  version: 3.61.0
+  resolution: "node-abi@npm:3.61.0"
   dependencies:
     semver: "npm:^7.3.5"
-  checksum: 10c0/e375d13b2c9ed60d233cf3943d34a29b7502350626508659b8097cb9ce12e97263f8931c5fd177a974681e3ca6518d6f8a6ae2bc6b3aab0e0bd40970fb6599c8
+  checksum: 10c0/ba1e248e69138a8b1cde9332910e4475f6238d2d72aad0f16232c262cd19438c3878d11eed03c27c2494496cc645c1c1e9f1ce49a2653ae4fbd2dc98c76f4ef2
   languageName: node
   linkType: hard
 
