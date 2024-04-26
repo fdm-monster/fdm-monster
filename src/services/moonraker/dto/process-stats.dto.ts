@@ -1,7 +1,7 @@
 export interface ProcessStatsDto {
   moonraker_stats: MoonrakerStat[];
   throttled_state: ThrottledState;
-  cpu_temp: number;
+  cpu_temp: number | null;
   network: Network;
   system_cpu_usage: SystemCpuUsage;
   system_uptime: number;

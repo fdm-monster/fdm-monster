@@ -8,7 +8,7 @@ export interface SystemInfo {
   distribution: Distribution;
   available_services: string[];
   instance_ids: InstanceIds;
-  service_state: ServiceState;
+  service_state: ServiceStates;
   virtualization: Virtualization;
   python: Python;
   network: Network;
@@ -59,25 +59,15 @@ export interface InstanceIds {
   klipper: string;
 }
 
+export interface ServiceStates {
+  klipper: ServiceState;
+  klipper_mcu: ServiceState;
+  moonraker: ServiceState;
+}
+
 export interface ServiceState {
-  klipper: Klipper;
-  klipper_mcu: KlipperMcu;
-  moonraker: Moonraker;
-}
-
-export interface Klipper {
-  active_state: string;
-  sub_state: string;
-}
-
-export interface KlipperMcu {
-  active_state: string;
-  sub_state: string;
-}
-
-export interface Moonraker {
-  active_state: string;
-  sub_state: string;
+  active_state: "active" | "inactive";
+  sub_state: "running" | "dead";
 }
 
 export interface Virtualization {
