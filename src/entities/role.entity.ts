@@ -7,7 +7,9 @@ export class Role extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column()
+  @Column({
+    unique: true,
+  })
   name!: string;
 
   @OneToMany(() => UserRole, (ur) => ur.role, { eager: false })
