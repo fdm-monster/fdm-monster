@@ -115,7 +115,7 @@ These are the people involved in the project. Find the meaning of the emoji keys
 
 ## Sponsors
 
-Please consider sponsoring FDM Monster to help this project! You can find the [Github Sponsorship Tiers here](https://github.com/sponsors/fdm-monster).
+Please consider sponsoring FDM Monster to help this project! You can find the [GitHub Sponsorship Tiers here](https://github.com/sponsors/fdm-monster).
 
 Thanks to the following parties for their financial support:
 

@@ -1,6 +1,7 @@
+export type JobQueueState = "ready" | "loading" | "starting" | "paused";
 export interface JobQueueStatusDto {
   queued_jobs: QueuedJob[];
-  queue_state: "ready" | "loading" | "starting" | "paused" | string;
+  queue_state: JobQueueState;
 }
 
 export interface QueuedJob {

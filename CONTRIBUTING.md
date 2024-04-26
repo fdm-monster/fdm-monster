@@ -28,7 +28,7 @@ This project and everyone participating in it is governed by the [FDM Monster Co
 
 ### Im Stuck with a quick question!
 
-Sorry we do not have a documentation with F.A.Q. yet. Please visit us on discord instead! Our Github repo is not the place for support questions. Find the link in [README.md - contact](README.md#contact).
+Sorry we do not have a documentation with F.A.Q. yet. Please visit us on discord instead! Our GitHub repo is not the place for support questions. Find the link in [README.md - contact](README.md#contact).
 
 ### FDM Monster and packages
 
@@ -128,7 +128,7 @@ Take `user-service.test.js` as template to get started with application/domain t
 1. You'll fork the repository (skip this if you're a direct FMD Monster contributor)
 2. You'll made the changes and committed the changes in a branch of your fork according to [gitflow standard](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow)
 3. You'll make a pull-request from your fork to development (See example here: https://github.com/fdm-monster/fdm-monster/compare)
-4. All required Github Actions have completed successfully - you understand that as a fork not all actions may complete due to security
+4. All required GitHub Actions have completed successfully - you understand that as a fork not all actions may complete due to security
 5. You'll await pull-request approval of a FDM Monster owner
 
 If all goes well you're changes will be released to FDM Monster.

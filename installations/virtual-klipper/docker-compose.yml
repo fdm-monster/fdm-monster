@@ -4,6 +4,6 @@ services:
     image: ghcr.io/mainsail-crew/mainsail
     container_name: mainsail
     ports:
-      - "8080:80"
+      - "8081:80"
     volumes:
       - "./mainsail/config.json:/usr/share/nginx/html/config.json"
