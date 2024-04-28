@@ -28,6 +28,13 @@
 </a>
 
 </p>
+
+## Support the project
+
+Github ![GitHub Sponsor](https://img.shields.io/github/sponsors/fdm-monster?label=Sponsor&logo=GitHub)
+
+Ko-Fi [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/V7V6XFWY0)
+
 <h2 align="center">
 <a href="https://docs.fdm-monster.net/" target="_blank">Documentation</a>
 </h2>
