@@ -3036,16 +3036,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:>=10.0.0":
-  version: 20.12.8
-  resolution: "@types/node@npm:20.12.8"
-  dependencies:
-    undici-types: "npm:~5.26.4"
-  checksum: 10c0/840002d20654e38a9af8cdffa215598fdb28ac4f96c5701ed672ec365ed6ccc66da299edddaa409baf13cd71bbf1128901f633b5e44e070fc236e26415805b78
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:20.12.10":
+"@types/node@npm:*, @types/node@npm:20.12.10, @types/node@npm:>=10.0.0":
   version: 20.12.10
   resolution: "@types/node@npm:20.12.10"
   dependencies:
@@ -4813,9 +4804,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.4.668":
-  version: 1.4.756
-  resolution: "electron-to-chromium@npm:1.4.756"
-  checksum: 10c0/c983c7d1b84f0bc73211f77504c3a4c58f2d01f55af640d230549eaca0a0667ad515672ddb2ae5c3f37762ca6a71aa20c2baaea0a63a61cb52415105c44b85c0
+  version: 1.4.757
+  resolution: "electron-to-chromium@npm:1.4.757"
+  checksum: 10c0/77fddf3870ff66280f4b639c409ff0a82661ba50e6519b571bb79325e6ea2c4fef645bcf65dcc1ced8b6151cc78083af8b781877247e62986ce39dee1d642cfe
   languageName: node
   linkType: hard
 
@@ -5975,11 +5966,11 @@ __metadata:
   linkType: hard
 
 "get-tsconfig@npm:^4.7.0":
-  version: 4.7.3
-  resolution: "get-tsconfig@npm:4.7.3"
+  version: 4.7.4
+  resolution: "get-tsconfig@npm:4.7.4"
   dependencies:
     resolve-pkg-maps: "npm:^1.0.0"
-  checksum: 10c0/b15ca9d5d0887ebfccadc9fe88b6ff3827a5691ec90e7608a5e9c74bef959c14aba62f6bb88ac7f50322395731789a2cf654244f00e10f4f76349911b6846d6f
+  checksum: 10c0/4bd9ca36aa8b117d7d2ddd57d18fce94444cda9225c8444b2ffa9f19490a1ac77d99089deaf03012945a86e8daed73ec910b33f8830e66df64b44f6f0ebccff1
   languageName: node
   linkType: hard
 
@@ -7391,9 +7382,9 @@ __metadata:
   linkType: hard
 
 "libphonenumber-js@npm:^1.10.53":
-  version: 1.10.62
-  resolution: "libphonenumber-js@npm:1.10.62"
-  checksum: 10c0/7dfdb21a81aec4c290c405cf19b7ee3e0587fa092da0f8f84e281697c72a575c5e798a13501d13b5237a0fb22949f7bf4afc68bd0a7312eaccb486478ccc6c35
+  version: 1.11.1
+  resolution: "libphonenumber-js@npm:1.11.1"
+  checksum: 10c0/003b0b39f9d4b246985723e93b744bafa0d6d12a6f393fe3b883add8db1c5189bad33d330550517aee0670c1c371573bda35a0950f0d0d54b6a7bab1a5f64466
   languageName: node
   linkType: hard
 
@@ -8029,8 +8020,8 @@ __metadata:
   linkType: hard
 
 "mongodb@npm:^6.1.0":
-  version: 6.6.0
-  resolution: "mongodb@npm:6.6.0"
+  version: 6.6.1
+  resolution: "mongodb@npm:6.6.1"
   dependencies:
     "@mongodb-js/saslprep": "npm:^1.1.5"
     bson: "npm:^6.7.0"
@@ -8058,7 +8049,7 @@ __metadata:
       optional: true
     socks:
       optional: true
-  checksum: 10c0/05f77be97f1d6d2e4b5949d23c6da1d0749adbce58f7608bc9432692335f00c849ee4eb81d0137c3329f205ff490181dae7b82b2b40537e943b7527fa6a09bde
+  checksum: 10c0/b426634cba060c84da47fec19704bfe7ca9d2c78d44705ba97456d89cef0e545c1f9a0a2e2903d6239ca191446c1bad2ceae7d9ba9fa744c5302844c08924245
   languageName: node
   linkType: hard
 
