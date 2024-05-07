@@ -1110,7 +1110,7 @@ __metadata:
     eslint-config-prettier: "npm:9.1.0"
     eslint-config-standard: "npm:17.1.0"
     eslint-plugin-import: "npm:2.29.1"
-    eslint-plugin-n: "npm:17.5.0"
+    eslint-plugin-n: "npm:17.5.1"
     eslint-plugin-prettier: "npm:4.2.1"
     eslint-plugin-promise: "npm:6.1.1"
     eventemitter2: "npm:6.4.9"
@@ -5185,9 +5185,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-n@npm:17.5.0":
-  version: 17.5.0
-  resolution: "eslint-plugin-n@npm:17.5.0"
+"eslint-plugin-n@npm:17.5.1":
+  version: 17.5.1
+  resolution: "eslint-plugin-n@npm:17.5.1"
   dependencies:
     "@eslint-community/eslint-utils": "npm:^4.4.0"
     enhanced-resolve: "npm:^5.15.0"
@@ -5199,7 +5199,7 @@ __metadata:
     semver: "npm:^7.5.3"
   peerDependencies:
     eslint: ">=8.23.0"
-  checksum: 10c0/4b0353d6339afefece99441d473767da6ec7b42a72040e4f0d1f5fd859a81c2cc0c7be489465f722cbbbec2e11b7cd2edb82d1c725c101b3efa2d561ac6b2dd9
+  checksum: 10c0/11918b6b3ead135d8acc2eccd60654625cda881c5c7c26e4248e63276627f728b440cea5e2f006397d58f629bb549a045327c5601d2e234e2db4f178e99d7fc8
   languageName: node
   linkType: hard
 
