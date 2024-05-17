@@ -1079,7 +1079,7 @@ __metadata:
     "@types/ip": "npm:1.1.3"
     "@types/jest": "npm:29.5.12"
     "@types/js-yaml": "npm:4.0.9"
-    "@types/lodash": "npm:4.17.3"
+    "@types/lodash": "npm:4.17.4"
     "@types/luxon": "npm:3.4.2"
     "@types/migrate-mongo": "npm:10.0.4"
     "@types/multer": "npm:1.4.11"
@@ -3503,10 +3503,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/lodash@npm:4.17.3":
-  version: 4.17.3
-  resolution: "@types/lodash@npm:4.17.3"
-  checksum: 10c0/04eb8cfde06b12f4b68251b8956a636c4e80e4ac85926f41d502e26b9c6d050dbbc9e586e4bf706c62e97d78309c3dad079e791f07efbe7ff6f19ccf62a414b4
+"@types/lodash@npm:4.17.4":
+  version: 4.17.4
+  resolution: "@types/lodash@npm:4.17.4"
+  checksum: 10c0/0124c64cb9fe7a0f78b6777955abd05ef0d97844d49118652eae45f8fa57bfb7f5a7a9bccc0b5a84c0a6dc09631042e4590cb665acb9d58dfd5e6543c75341ec
   languageName: node
   linkType: hard
 
