@@ -3147,9 +3147,9 @@ __metadata:
   linkType: hard
 
 "@types/aws-lambda@npm:^8.10.83":
-  version: 8.10.137
-  resolution: "@types/aws-lambda@npm:8.10.137"
-  checksum: 10c0/32272f8e9dfa88987cbc68e999554225d07282c3a884d769cdec7116fcec1f7e716914a9ac0d8afd79cf6c955b09e7bcfa6258dda6daa3f532c7eb97bf47bff1
+  version: 8.10.138
+  resolution: "@types/aws-lambda@npm:8.10.138"
+  checksum: 10c0/3ab791bae7ea1d9d129809b9e77e0891f2c554bfa7d9a9dda5b71d04aca9a1c9408a118b73ec758a2ac536dd7da272c73723f98ebc33247f72eb7d927860c33b
   languageName: node
   linkType: hard
 
@@ -4645,9 +4645,9 @@ __metadata:
   linkType: hard
 
 "caniuse-lite@npm:^1.0.30001587":
-  version: 1.0.30001618
-  resolution: "caniuse-lite@npm:1.0.30001618"
-  checksum: 10c0/2e33e5e854fb6365566e2ff5ba866c877cd08ca278a2c06b9bc3346a884fc1336a0674c2a0003e7ee7a1a64e90f167ec4ad08ea14d12da5926017c92c99f82a5
+  version: 1.0.30001620
+  resolution: "caniuse-lite@npm:1.0.30001620"
+  checksum: 10c0/3783117143fbdc98c1b91a579d0f2a7bcee7008f322ba7a2bf56a6c3d105400772c7ed8026840b4ea909ec7bf254bcc36532f2ce1b1a1240b00d0335da39b7ec
   languageName: node
   linkType: hard
 
@@ -5376,9 +5376,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.4.668":
-  version: 1.4.771
-  resolution: "electron-to-chromium@npm:1.4.771"
-  checksum: 10c0/e43c7e0c0abb38747ff95ee26e9655125f1ec7745e7b1be2e396e3ab919a30c4fb7a943c63d4a54918ba22dcc3c2c82242c804f24337590c5887213fe427ece3
+  version: 1.4.773
+  resolution: "electron-to-chromium@npm:1.4.773"
+  checksum: 10c0/eef684e2d64848418080715a76bc4147373d75ade07f65e64a97a3efd52d8c83dd8dd0daadba0d5ca891e3738144f8e97e1b7fe4545de3d15e71cd70ff14b2f1
   languageName: node
   linkType: hard
 
