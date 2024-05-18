@@ -54,7 +54,7 @@
   "dependencies": {
     "@fdm-monster/client": "1.5.16",
     "@influxdata/influxdb-client": "1.33.2",
-    "@octokit/plugin-throttling": "8.2.0",
+    "@octokit/plugin-throttling": "9.3.0",
     "@sentry/node": "8.2.1",
     "adm-zip": "0.5.12",
     "awilix": "10.0.2",
@@ -83,7 +83,7 @@
     "multer": "1.4.5-lts.1",
     "node-input-validator": "4.5.1",
     "nodemon": "3.1.0",
-    "octokit": "3.2.1",
+    "octokit": "4.0.2",
     "passport": "0.7.0",
     "passport-anonymous": "1.0.1",
     "passport-jwt": "4.0.1",
