@@ -1130,7 +1130,7 @@ __metadata:
     multer: "npm:1.4.5-lts.1"
     nock: "npm:13.5.4"
     node-input-validator: "npm:4.5.1"
-    nodemon: "npm:3.1.0"
+    nodemon: "npm:3.1.1"
     octokit: "npm:3.2.1"
     passport: "npm:0.7.0"
     passport-anonymous: "npm:1.0.1"
@@ -8771,9 +8771,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nodemon@npm:3.1.0":
-  version: 3.1.0
-  resolution: "nodemon@npm:3.1.0"
+"nodemon@npm:3.1.1":
+  version: 3.1.1
+  resolution: "nodemon@npm:3.1.1"
   dependencies:
     chokidar: "npm:^3.5.2"
     debug: "npm:^4"
@@ -8787,7 +8787,7 @@ __metadata:
     undefsafe: "npm:^2.0.5"
   bin:
     nodemon: bin/nodemon.js
-  checksum: 10c0/3aeb50105ecae31ce4d0a5cd464011d4aa0dc15419e39ac0fd203d784e38940e1436f4ed96adbaa0f9614ee0644f91e3cf38f2afae8d3918ae7afc51c7e2116b
+  checksum: 10c0/3c0ae94a6832b3baef4631ce609e7e3499e5fae6633303c8aa29e91712fd85d64e3175165649bbf7947afa1e8ab57825a02eb18ebcfe32646a2cf6ab6c20b202
   languageName: node
   linkType: hard
 
