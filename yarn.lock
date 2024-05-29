@@ -1065,7 +1065,7 @@ __metadata:
     "@lcov-viewer/cli": "npm:1.3.0"
     "@lcov-viewer/istanbul-report": "npm:1.4.0"
     "@octokit/plugin-throttling": "npm:8.2.0"
-    "@sentry/node": "npm:8.5.0"
+    "@sentry/node": "npm:8.7.0"
     "@swc/cli": "npm:0.3.12"
     "@swc/core": "npm:1.5.7"
     "@swc/jest": "npm:0.2.36"
@@ -1954,7 +1954,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/context-async-hooks@npm:^1.23.0":
+"@opentelemetry/context-async-hooks@npm:^1.24.1":
   version: 1.24.1
   resolution: "@opentelemetry/context-async-hooks@npm:1.24.1"
   peerDependencies:
@@ -1974,17 +1974,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/instrumentation-connect@npm:0.36.0":
-  version: 0.36.0
-  resolution: "@opentelemetry/instrumentation-connect@npm:0.36.0"
+"@opentelemetry/instrumentation-connect@npm:0.36.1":
+  version: 0.36.1
+  resolution: "@opentelemetry/instrumentation-connect@npm:0.36.1"
   dependencies:
     "@opentelemetry/core": "npm:^1.8.0"
     "@opentelemetry/instrumentation": "npm:^0.51.0"
-    "@opentelemetry/semantic-conventions": "npm:^1.0.0"
+    "@opentelemetry/semantic-conventions": "npm:^1.22.0"
     "@types/connect": "npm:3.4.36"
   peerDependencies:
     "@opentelemetry/api": ^1.3.0
-  checksum: 10c0/30580b6598febd964b4ce87fa8ea694fff152f5e1265dbdc1c614810aa695b659c8714af8a955748560a1c7c42316b5931928c445b950e4626e28b9e0ab11534
+  checksum: 10c0/a1ae755da7cd2f0b5bcd7b262a068b813e50d63fa4c68d67d8e20eeb12d56857d17d6ea25decfd8db629828443344a401ee7337805c4db409701f8e201806e56
   languageName: node
   linkType: hard
 
@@ -2271,25 +2271,25 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/core@npm:8.5.0":
-  version: 8.5.0
-  resolution: "@sentry/core@npm:8.5.0"
+"@sentry/core@npm:8.7.0":
+  version: 8.7.0
+  resolution: "@sentry/core@npm:8.7.0"
   dependencies:
-    "@sentry/types": "npm:8.5.0"
-    "@sentry/utils": "npm:8.5.0"
-  checksum: 10c0/906b94dbb3ba3f8e1e71e7740ea9e61a604476c344de769d50de75cf07baa50225c3051542127810b4ed41467055ffa4423208eb3541639d66f360c05044651a
+    "@sentry/types": "npm:8.7.0"
+    "@sentry/utils": "npm:8.7.0"
+  checksum: 10c0/1b1912214e93aab0e2e3238711e3ceb6485f3bb276f867b7ddc1b7976737b9b216e7fa9aa6e729956e2d7823ac8d7374df12e5e49826d503c53881aa753ce5c0
   languageName: node
   linkType: hard
 
-"@sentry/node@npm:8.5.0":
-  version: 8.5.0
-  resolution: "@sentry/node@npm:8.5.0"
+"@sentry/node@npm:8.7.0":
+  version: 8.7.0
+  resolution: "@sentry/node@npm:8.7.0"
   dependencies:
     "@opentelemetry/api": "npm:^1.8.0"
-    "@opentelemetry/context-async-hooks": "npm:^1.23.0"
+    "@opentelemetry/context-async-hooks": "npm:^1.24.1"
     "@opentelemetry/core": "npm:^1.24.1"
     "@opentelemetry/instrumentation": "npm:^0.51.1"
-    "@opentelemetry/instrumentation-connect": "npm:0.36.0"
+    "@opentelemetry/instrumentation-connect": "npm:0.36.1"
     "@opentelemetry/instrumentation-express": "npm:0.39.0"
     "@opentelemetry/instrumentation-fastify": "npm:0.36.1"
     "@opentelemetry/instrumentation-graphql": "npm:0.40.0"
@@ -2307,48 +2307,48 @@ __metadata:
     "@opentelemetry/sdk-trace-base": "npm:^1.23.0"
     "@opentelemetry/semantic-conventions": "npm:^1.23.0"
     "@prisma/instrumentation": "npm:5.14.0"
-    "@sentry/core": "npm:8.5.0"
-    "@sentry/opentelemetry": "npm:8.5.0"
-    "@sentry/types": "npm:8.5.0"
-    "@sentry/utils": "npm:8.5.0"
+    "@sentry/core": "npm:8.7.0"
+    "@sentry/opentelemetry": "npm:8.7.0"
+    "@sentry/types": "npm:8.7.0"
+    "@sentry/utils": "npm:8.7.0"
     opentelemetry-instrumentation-fetch-node: "npm:1.2.0"
   dependenciesMeta:
     opentelemetry-instrumentation-fetch-node:
       optional: true
-  checksum: 10c0/a37f478cfccc32049ff4d0aade818e585cc8b025f46d2b3c72a5933f80774ba3f9de834a5e227316289d80b78bd799c6022405de5d9d55f1c64ddda9e06dda3e
+  checksum: 10c0/ab10ec581bbf888a13a3ef50467fbe3599140573c84219127d1857cc97f802d548fa7656e99d38d3cac63d5da38113c7d7302e809371da14b6d35b02b38ab68d
   languageName: node
   linkType: hard
 
-"@sentry/opentelemetry@npm:8.5.0":
-  version: 8.5.0
-  resolution: "@sentry/opentelemetry@npm:8.5.0"
+"@sentry/opentelemetry@npm:8.7.0":
+  version: 8.7.0
+  resolution: "@sentry/opentelemetry@npm:8.7.0"
   dependencies:
-    "@sentry/core": "npm:8.5.0"
-    "@sentry/types": "npm:8.5.0"
-    "@sentry/utils": "npm:8.5.0"
+    "@sentry/core": "npm:8.7.0"
+    "@sentry/types": "npm:8.7.0"
+    "@sentry/utils": "npm:8.7.0"
   peerDependencies:
     "@opentelemetry/api": ^1.8.0
     "@opentelemetry/core": ^1.24.1
     "@opentelemetry/instrumentation": ^0.51.1
     "@opentelemetry/sdk-trace-base": ^1.23.0
     "@opentelemetry/semantic-conventions": ^1.23.0
-  checksum: 10c0/bfe48f0e334b96b5f8f9f8be7a7a890e9515c8c11198efc2ff2e1d93e75bcbbf3a8dfcccb3ba721bc28ecc43ec5bad6894792eda15c5ad06253d8bbc4fcd4450
+  checksum: 10c0/757ef2cb5308b4ce2afc358b47beb5296d8c84c935c0b72348706886fa20c72a6d487f8041dabf5e5333cd296a0cc6a1f3e15afd61d32876136af58b88e5bc0e
   languageName: node
   linkType: hard
 
-"@sentry/types@npm:8.5.0":
-  version: 8.5.0
-  resolution: "@sentry/types@npm:8.5.0"
-  checksum: 10c0/b1d812a07013150212e82fa0e64a453896fe593dd3951dba49fac68f7a67d8b34e6016c44470c271825f002e44cfce87dd1b93be4372615be183eaab99990af1
+"@sentry/types@npm:8.7.0":
+  version: 8.7.0
+  resolution: "@sentry/types@npm:8.7.0"
+  checksum: 10c0/3f410a2558f8a0ca0a90e67645b971594357370f8225f1c69bc36a18f5e9a33765542a702f360719b15ca52456756b9782dea9587f62488fe89a34e9d6e0acf4
   languageName: node
   linkType: hard
 
-"@sentry/utils@npm:8.5.0":
-  version: 8.5.0
-  resolution: "@sentry/utils@npm:8.5.0"
+"@sentry/utils@npm:8.7.0":
+  version: 8.7.0
+  resolution: "@sentry/utils@npm:8.7.0"
   dependencies:
-    "@sentry/types": "npm:8.5.0"
-  checksum: 10c0/5e7fe0289dc091c6f61f7c50aa6fd2f5577275a8844209279217e248c04eed420e13afe321b541c91f80de7cd0fd763358c8276a711b579a7d50d02f8ddc85fa
+    "@sentry/types": "npm:8.7.0"
+  checksum: 10c0/504597f38a51a734cacdb5ea9c8fb6b095f5cbe161725dc74a09338e443ce89c0f33d8f5c6411cab8edd7600fc045e0421dd23441b0e8fb24e498912c7139a36
   languageName: node
   linkType: hard
 
