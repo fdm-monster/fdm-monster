@@ -1108,7 +1108,7 @@ __metadata:
     "@types/supertest": "npm:6.0.2"
     "@types/uuid": "npm:9.0.8"
     "@types/ws": "npm:8.5.10"
-    adm-zip: "npm:0.5.12"
+    adm-zip: "npm:0.5.13"
     awilix: "npm:10.0.2"
     awilix-express: "npm:9.0.1"
     axios: "npm:1.7.2"
@@ -3787,10 +3787,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"adm-zip@npm:0.5.12":
-  version: 0.5.12
-  resolution: "adm-zip@npm:0.5.12"
-  checksum: 10c0/fca2893b416bfcbee8b371a403f4d2e980a3c1055ce7b9b0b2ac8540c8efe6bbb27cc63ddf64ff6e6ed40c84fcb1ede7e95d230e7a567025e03f1044efbf6be0
+"adm-zip@npm:0.5.13":
+  version: 0.5.13
+  resolution: "adm-zip@npm:0.5.13"
+  checksum: 10c0/d5abfcf9d45a83d1ebb39809d58a8dd4da175139e13a5e146c629ddb28ab05a19b0fde9a86b1a5db0b9e3fd1d88d55ab71b4458d30076c0605109e49ee9c95a9
   languageName: node
   linkType: hard
 
