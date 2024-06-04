@@ -3491,16 +3491,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:>=10.0.0":
-  version: 20.14.0
-  resolution: "@types/node@npm:20.14.0"
-  dependencies:
-    undici-types: "npm:~5.26.4"
-  checksum: 10c0/29ccc7592e9ca6b81d00f3a6673241d08e9042d801b10adfd9ebcbbf326208e0a0133a8d146158db18d02a68b85d9ce1fd94e6e1e5be0da263129bf6e42eb22d
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:20.14.1":
+"@types/node@npm:*, @types/node@npm:20.14.1, @types/node@npm:>=10.0.0":
   version: 20.14.1
   resolution: "@types/node@npm:20.14.1"
   dependencies:
@@ -7246,15 +7237,15 @@ __metadata:
   linkType: hard
 
 "jackspeak@npm:^3.1.2":
-  version: 3.2.0
-  resolution: "jackspeak@npm:3.2.0"
+  version: 3.2.3
+  resolution: "jackspeak@npm:3.2.3"
   dependencies:
     "@isaacs/cliui": "npm:^8.0.2"
     "@pkgjs/parseargs": "npm:^0.11.0"
   dependenciesMeta:
     "@pkgjs/parseargs":
       optional: true
-  checksum: 10c0/42cf7f6c17c5543795c1102819a84469920271dbccb54dd8a396bdc52ffd5e9380230748732211b482942fd0f136c7d4449f8de50e4c8a6e567a7b7a809112e2
+  checksum: 10c0/eed7a5056ac8cdafcadeb1fedbfbe96aef4e7fea7cf6f536f48696df7ef4d423c323ba03320860b886ecf1e59d0478bb3d0f8ed7d464932c7e3c0712095425f1
   languageName: node
   linkType: hard
 
