@@ -1161,7 +1161,7 @@ __metadata:
     prettier: "npm:2.8.8"
     reflect-metadata: "npm:0.2.2"
     semver: "npm:7.6.2"
-    simple-git: "npm:3.24.0"
+    simple-git: "npm:3.25.0"
     socket.io: "npm:4.7.5"
     supertest: "npm:7.0.0"
     toad-scheduler: "npm:3.0.1"
@@ -5139,7 +5139,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"debug@npm:4, debug@npm:4.x, debug@npm:^4, debug@npm:^4.1.0, debug@npm:^4.1.1, debug@npm:^4.3.1, debug@npm:^4.3.2, debug@npm:^4.3.4, debug@npm:~4.3.1, debug@npm:~4.3.2, debug@npm:~4.3.4":
+"debug@npm:4, debug@npm:4.x, debug@npm:^4, debug@npm:^4.1.0, debug@npm:^4.1.1, debug@npm:^4.3.1, debug@npm:^4.3.2, debug@npm:^4.3.4, debug@npm:^4.3.5, debug@npm:~4.3.1, debug@npm:~4.3.2, debug@npm:~4.3.4":
   version: 4.3.5
   resolution: "debug@npm:4.3.5"
   dependencies:
@@ -10197,14 +10197,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"simple-git@npm:3.24.0":
-  version: 3.24.0
-  resolution: "simple-git@npm:3.24.0"
+"simple-git@npm:3.25.0":
+  version: 3.25.0
+  resolution: "simple-git@npm:3.25.0"
   dependencies:
     "@kwsites/file-exists": "npm:^1.1.1"
     "@kwsites/promise-deferred": "npm:^1.1.1"
-    debug: "npm:^4.3.4"
-  checksum: 10c0/4329e5be1a7af1ebb476354ed6edf6d2828dc221e15d22ce3e5e8028f537d5e9ac059d813911516f78e22dfa2ee4db4c8cf30bf912bd284e530b733bd6b5c3a0
+    debug: "npm:^4.3.5"
+  checksum: 10c0/2087dddac041eac6330cbb7fafea21f3e45786ea54e50ae07a49ba6a7134298e12727e5e4b6580310b679c7cb4f2a83804c04e7eab247eeabcd48d33b7885e16
   languageName: node
   linkType: hard
 
