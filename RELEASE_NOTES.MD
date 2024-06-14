@@ -1,3 +1,8 @@
+# FDM Monster 14/06/2024 1.6.3
+
+## Fixes:
+- OctoPrint: websocket authentication would fail when multiple users are present. Fixed the username lookup with current-user OctoPrint API endpoint
+
 # FDM Monster 13/04/2024 1.6.2
 
 ## Features:
@@ -22,4 +27,3 @@
 - Settings: incorrect file clean shape would not throw any validation errors (SQLite only). Validation has been added for file clean on API level.
 - Settings: make all settings API endpoints stricter by adding validation on API level. Patching is not possible anymore.
 - Printer: add OctoPrint URL validation which parses the error with user friendly errors as result
-- OctoPrint: websocket authentication would fail when multiple users are present. Fixed the username lookup with current-user OctoPrint API endpoint.
