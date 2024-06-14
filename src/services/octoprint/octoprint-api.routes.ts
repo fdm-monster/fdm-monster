@@ -11,6 +11,7 @@ export class OctoPrintRoutes {
   apiBase = `${this.octoPrintBase}api`;
   apiVersion = `${this.apiBase}/version`;
   apiServer = `${this.apiBase}/server`;
+  apiCurrentUser = `${this.apiBase}/currentuser`;
   apiSettingsPart = `${this.apiBase}/settings`;
   apiFiles = `${this.apiBase}/files`;
   apiFilesLocation = `${this.apiFiles}/local`;
