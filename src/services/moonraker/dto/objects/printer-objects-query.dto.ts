@@ -3,6 +3,6 @@ export interface PrinterObjectsQueryDto {
   status: Status;
 }
 
-export interface Status {
-  [k: string]: any;
+export interface Status<T = any> {
+  [k: string]: T;
 }

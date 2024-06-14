@@ -10,7 +10,7 @@ jobs:
     outputs:
       foundServerVersion: ${{ steps.init.outputs.foundServerVersion }}
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
       - name: get-client-version
         # https://gist.github.com/DarrenN/8c6a5b969481725a4413?permalink_comment_id=3863317#gistcomment-3863317
         run: |
@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     if: needs.checkversion.outputs.foundServerVersion == 'false'
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
       - uses: actions/setup-node@v4
         with:
           node-version: 18.x
@@ -75,7 +75,7 @@ jobs:
         uses: montudor/action-zip@v1.0.0
         with:
           args: | 
-            zip -qq -r dist-server-${{ env.RELEASE_TAG }}.zip dist .env.template package.json yarn.lock .yarnrc.yml migrate-mongo-config.js tsconfig.json README.md LICENSE CODE_OF_CONDUCT.md CONTRIBUTING.md SECURITY.md .swcrc .dockerignore            
+            zip -qq -r dist-server-${{ env.RELEASE_TAG }}.zip dist .env.template package.json .yarn yarn.lock .yarnrc.yml migrate-mongo-config.js tsconfig.json README.md LICENSE CODE_OF_CONDUCT.md CONTRIBUTING.md SECURITY.md .swcrc .dockerignore            
 
       - name: Upload server bundle zip
         uses: actions/upload-release-asset@v1

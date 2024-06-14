@@ -53,6 +53,11 @@ export class PrintCompletionService implements IPrintCompletionService<MongoIdTy
   }
 
   async updateContext(correlationId: string, context: PrintCompletionContext) {
+    if (!correlationId?.length) {
+      this.logger.warn("Ignoring undefined correlationId, cant update print completion context");
+      return;
+    }
+
     const completionEntry = await PrintCompletion.findOne({
       "context.correlationId": correlationId,
       status: EVENT_TYPES.PrintStarted,

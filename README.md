@@ -28,6 +28,13 @@
 </a>
 
 </p>
+
+## Support the project
+
+Github ![GitHub Sponsor](https://img.shields.io/github/sponsors/fdm-monster?label=Sponsor&logo=GitHub)
+
+Ko-Fi [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/V7V6XFWY0)
+
 <h2 align="center">
 <a href="https://docs.fdm-monster.net/" target="_blank">Documentation</a>
 </h2>
@@ -69,7 +76,7 @@ Please join the discord, but stay professional and proactive!
 These are the people involved in the project. Find the meaning of the emoji keys [here](https://allcontributors.org/docs/en/emoji-key).
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-14-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-15-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
@@ -79,7 +86,7 @@ These are the people involved in the project. Find the meaning of the emoji keys
   <tbody>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/davidzwa"><img src="https://avatars.githubusercontent.com/u/6005355?v=4?s=80" width="80px;" alt="David Zwart"/><br /><sub><b>David Zwart</b></sub></a><br /><a href="https://github.com/fdm-monster/fdm-monster/issues?q=author%3Adavidzwa" title="Bug reports">🐛</a> <a href="https://github.com/fdm-monster/fdm-monster/commits?author=davidzwa" title="Code">💻</a> <a href="#maintenance-davidzwa" title="Maintenance">🚧</a> <a href="#userTesting-davidzwa" title="User Testing">📓</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://kevenaar.name"><img src="https://avatars.githubusercontent.com/u/834643?v=4?s=80" width="80px;" alt="Maurice Kevenaar"/><br /><sub><b>Maurice Kevenaar</b></sub></a><br /><a href="#security-mkevenaar" title="Security">🛡️</a> <a href="#maintenance-mkevenaar" title="Maintenance">🚧</a> <a href="#ideas-mkevenaar" title="Ideas, Planning, & Feedback">🤔</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://kevenaar.name"><img src="https://avatars.githubusercontent.com/u/834643?v=4?s=80" width="80px;" alt="Maurice Kevenaar"/><br /><sub><b>Maurice Kevenaar</b></sub></a><br /><a href="#security-mkevenaar" title="Security">🛡️</a> <a href="#maintenance-mkevenaar" title="Maintenance">🚧</a> <a href="#ideas-mkevenaar" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/fdm-monster/fdm-monster/issues?q=author%3Amkevenaar" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Tobikisss"><img src="https://avatars.githubusercontent.com/u/45754890?v=4?s=80" width="80px;" alt="Tobias"/><br /><sub><b>Tobias</b></sub></a><br /><a href="#ideas-Tobikisss" title="Ideas, Planning, & Feedback">🤔</a> <a href="#maintenance-Tobikisss" title="Maintenance">🚧</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://tideline3d.com"><img src="https://avatars.githubusercontent.com/u/12903320?v=4?s=80" width="80px;" alt="tideline3d"/><br /><sub><b>tideline3d</b></sub></a><br /><a href="https://github.com/fdm-monster/fdm-monster/issues?q=author%3Atideline3d" title="Bug reports">🐛</a> <a href="#ideas-tideline3d" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/windarrow3d"><img src="https://avatars.githubusercontent.com/u/91099282?v=4?s=80" width="80px;" alt="WindArrow3d"/><br /><sub><b>WindArrow3d</b></sub></a><br /><a href="https://github.com/fdm-monster/fdm-monster/issues?q=author%3Awindarrow3d" title="Bug reports">🐛</a> <a href="#financial-windarrow3d" title="Financial">💵</a> <a href="#ideas-windarrow3d" title="Ideas, Planning, & Feedback">🤔</a> <a href="#userTesting-windarrow3d" title="User Testing">📓</a> <a href="#platform-windarrow3d" title="Packaging/porting to new platform">📦</a></td>
@@ -94,6 +101,9 @@ These are the people involved in the project. Find the meaning of the emoji keys
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ZombiesLoveMe"><img src="https://avatars.githubusercontent.com/u/35661391?v=4?s=80" width="80px;" alt="Callum"/><br /><sub><b>Callum</b></sub></a><br /><a href="#ideas-ZombiesLoveMe" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/bharvey88"><img src="https://avatars.githubusercontent.com/u/8107750?v=4?s=80" width="80px;" alt="bharvey88"/><br /><sub><b>bharvey88</b></sub></a><br /><a href="https://github.com/fdm-monster/fdm-monster/issues?q=author%3Abharvey88" title="Bug reports">🐛</a> <a href="#infra-bharvey88" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#platform-bharvey88" title="Packaging/porting to new platform">📦</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Mikec78660"><img src="https://avatars.githubusercontent.com/u/108021920?v=4?s=80" width="80px;" alt="Mikec78660"/><br /><sub><b>Mikec78660</b></sub></a><br /><a href="#ideas-Mikec78660" title="Ideas, Planning, & Feedback">🤔</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://techinterview.guide"><img src="https://avatars.githubusercontent.com/u/168030?v=4?s=80" width="80px;" alt="w. ian douglas"/><br /><sub><b>w. ian douglas</b></sub></a><br /><a href="#ideas-iandouglas" title="Ideas, Planning, & Feedback">🤔</a></td>
     </tr>
   </tbody>
 </table>
@@ -115,7 +125,7 @@ These are the people involved in the project. Find the meaning of the emoji keys
 
 ## Sponsors
 
-Please consider sponsoring FDM Monster to help this project! You can find the [Github Sponsorship Tiers here](https://github.com/sponsors/fdm-monster).
+Please consider sponsoring FDM Monster to help this project! You can find the [GitHub Sponsorship Tiers here](https://github.com/sponsors/fdm-monster).
 
 Thanks to the following parties for their financial support:
 
@@ -134,24 +144,20 @@ the [CONTRIBUTING](CONTRIBUTING.md) file.
 - [x] :rocket: Docker amd64 image
 - [x] 🛡️ MongoDB 5 & 6 support
 - [x] :rocket: Quick copy paste of FDM Monster printers
-- [x] 🛡️ Complete API test coverage >80% (now at 80.5%)
+- [x] 🛡️ Complete API test coverage
 - [x] :rocket: Floor management
 - [x] Auto-clean old OctoPrint files (opt-in and configurable) 
 - [x] :rocket: Windows and Linux Service
 - [x] Printer completion/failure tracking (with statistics page)
-- [x] 🔌 Raspberry Pi image
-- [x] :rocket: Documentation
 - [x] Printer placement using drag n drop 
-- [ ] 🔌 FDM Connector - MQTT autodiscovery
-- [ ] :rocket: Chocolatey package (Windows install)
-- [ ] 🛡️ Frontend user and basic role management 
-- [ ] Klipper/OctoKlipper (and MoonRaker/Fluidd/Mainsail API integration)
-- [ ] :rocket: Plugin system (preparation work is ready)
-- [ ] Support for OctoPrint 2.0.0 (when it comes out)
+- [x] 🔌 Raspberry Pi image (https://github.com/fdm-monster/MonsterPi)
+- [x] :rocket: Documentation (https://docs.fdm-monster.net)
+- [x] 🛡️ Login and user management
+- [x] OctoFarm export 
+- [ ] Klipper and Moonraker API integration
+- [ ] OctoKlipper integration
+- [ ] Spoolman integration
 
-[//]: # (- [ ] :rocket: Docker overlay as service management &#40;daemonized restart & auto-updates&#41;)
-[//]: # (- [ ] 🛡️ Client test coverage)
-[//]: # (- [ ] Client with Vuetify 3.2 &#40;+ labs datatable&#41;)
 
 ## License
 

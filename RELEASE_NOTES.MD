@@ -1,4 +1,9 @@
-# FDM Monster 13/04/2024 1.6.1
+# FDM Monster 14/06/2024 1.6.3
+
+## Fixes:
+- OctoPrint: websocket authentication would fail when multiple users are present. Fixed the username lookup with current-user OctoPrint API endpoint
+
+# FDM Monster 13/04/2024 1.6.2
 
 ## Features:
 

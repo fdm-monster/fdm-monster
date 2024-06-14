@@ -1,6 +1,6 @@
 import { AxiosStatic } from "axios";
 import { LoginDto } from "@/services/interfaces/login.dto";
-import { PrinterObjectsQueryDto } from "@/services/moonraker/dto/printer-objects-query.dto";
+import { PrinterObjectsQueryDto } from "@/services/moonraker/dto/objects/printer-objects-query.dto";
 import { ResultDto } from "@/services/moonraker/dto/result.dto";
 
 export class MoonrakerSubscriptionClient {

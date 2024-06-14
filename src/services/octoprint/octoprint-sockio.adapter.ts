@@ -16,7 +16,16 @@ import { WebsocketAdapter } from "@/shared/websocket.adapter";
 import { OctoPrintEventDto } from "@/services/octoprint/dto/octoprint-event.dto";
 import { writeFileSync } from "node:fs";
 
-export const Message = {
+export const WsMessage = {
+  // Custom events
+  WS_OPENED: "WS_OPENED",
+  WS_CLOSED: "WS_CLOSED",
+  WS_ERROR: "WS_ERROR",
+  API_STATE_UPDATED: "API_STATE_UPDATED",
+  WS_STATE_UPDATED: "WS_STATE_UPDATED",
+};
+
+export const OctoPrintMessage = {
   connected: "connected",
   reauthRequired: "reauthRequired",
   current: "current",
@@ -25,13 +34,6 @@ export const Message = {
   plugin: "plugin",
   timelapse: "timelapse",
   slicingProgress: "slicingProgress",
-
-  // Custom events
-  WS_OPENED: "WS_OPENED",
-  WS_CLOSED: "WS_CLOSED",
-  WS_ERROR: "WS_ERROR",
-  API_STATE_UPDATED: "API_STATE_UPDATED",
-  WS_STATE_UPDATED: "WS_STATE_UPDATED",
 };
 
 export const SOCKET_STATE = {
@@ -266,11 +268,11 @@ export class OctoPrintSockIoAdapter extends WebsocketAdapter {
       this.logger.log(`RX Msg ${eventName} ${message.substring(0, 140)}...`);
     }
 
-    if (eventName === Message.reauthRequired) {
+    if (eventName === OctoPrintMessage.reauthRequired) {
       this.logger.log("Received 'reauthRequired', acting on it");
       this.setReauthRequired();
     } else if (
-      eventName === Message.current &&
+      eventName === OctoPrintMessage.current &&
       this.configService.get(AppConstants.debugFileWritePrinterStatesKey, AppConstants.defaultDebugFileWritePrinterStates) ===
         "true"
     ) {
@@ -284,12 +286,12 @@ export class OctoPrintSockIoAdapter extends WebsocketAdapter {
   protected async afterClosed(event: any) {
     this.setSocketState("closed");
     delete this.socket;
-    await this.emitEvent(Message.WS_CLOSED, "connection closed");
+    await this.emitEvent(WsMessage.WS_CLOSED, "connection closed");
   }
 
   protected async onError(error: any) {
     this.setSocketState("error");
-    await this.emitEvent(Message.WS_ERROR, error?.length ? error : "connection error");
+    await this.emitEvent(WsMessage.WS_ERROR, error?.length ? error : "connection error");
   }
 
   private async emitEvent(event: string, payload?: any) {
@@ -317,7 +319,7 @@ export class OctoPrintSockIoAdapter extends WebsocketAdapter {
     if (this._debugMode) {
       this.logger.log(`${this.printerId} Socket state updated to: ` + state);
     }
-    this.emitEventSync(Message.WS_STATE_UPDATED, state);
+    this.emitEventSync(WsMessage.WS_STATE_UPDATED, state);
   }
 
   private setApiState(state: ApiStateType) {
@@ -327,6 +329,6 @@ export class OctoPrintSockIoAdapter extends WebsocketAdapter {
     if (this._debugMode) {
       this.logger.log(`${this.printerId} API state updated to: ` + state);
     }
-    this.emitEventSync(Message.API_STATE_UPDATED, state);
+    this.emitEventSync(WsMessage.API_STATE_UPDATED, state);
   }
 }

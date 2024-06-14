@@ -1,7 +1,7 @@
 services:
   # States MQTT plugin incompatible
   octoprint:
-    image: davidzwa/octoprint:1.8.7
+    image: octoprint/octoprint:latest
     container_name: op0
     privileged: true
     restart: unless-stopped
@@ -12,7 +12,7 @@ services:
       - ./op0:/octoprint
   # MQTT plugin works
   octoprint2:
-    image: octoprint/octoprint:1.9.3
+    image: octoprint/octoprint:1.10.1
     container_name: op1
     privileged: true
     restart: unless-stopped

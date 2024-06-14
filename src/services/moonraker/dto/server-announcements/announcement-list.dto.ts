@@ -1,9 +1,9 @@
 export interface AnnouncementListDto {
-  entries: Entry[];
+  entries: AnnouncementEntry[];
   feeds: string[];
 }
 
-export interface Entry {
+export interface AnnouncementEntry {
   entry_id: string;
   url: string;
   title: string;

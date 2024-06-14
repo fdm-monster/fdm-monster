@@ -1,0 +1,31 @@
+export const klipperEvents = {
+  notify_gcode_response: "notify_gcode_response",
+  notify_status_update: "notify_status_update",
+  notify_klippy_ready: "notify_klippy_ready",
+  notify_klippy_shutdown: "notify_klippy_shutdown",
+  notify_klippy_disconnected: "notify_klippy_disconnected",
+  notify_filelist_changed: "notify_filelist_changed",
+  notify_update_response: "notify_update_response",
+  notify_update_refreshed: "notify_update_refreshed",
+  notify_cpu_throttled: "notify_cpu_throttled",
+  // TODO
+  notify_proc_stat_update: "notify_proc_stat_update",
+  notify_history_changed: "notify_history_changed",
+  notify_user_created: "notify_user_created",
+  notify_user_deleted: "notify_user_deleted",
+  notify_user_logged_out: "notify_user_logged_out",
+  notify_service_state_changed: "notify_service_state_changed",
+  notify_job_queue_changed: "notify_job_queue_changed",
+  notify_button_event: "notify_button_event",
+  notify_announcement_update: "notify_announcement_update",
+  notify_announcement_dismissed: "notify_announcement_dismissed",
+  notify_announcement_wake: "notify_announcement_wake",
+  notify_sudo_alert: "notify_sudo_alert",
+  notify_webcams_changed: "notify_webcams_changed",
+  notify_active_spool_set: "notify_active_spool_set",
+  notify_spoolman_status_changed: "notify_spoolman_status_changed",
+  notify_agent_event: "notify_agent_event",
+  "sensors:sensor_update": "sensors:sensor_update",
+} as const;
+export const wsEventsList = Object.keys(klipperEvents);
+export type WsEvents = keyof typeof klipperEvents;

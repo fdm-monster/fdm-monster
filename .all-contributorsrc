@@ -25,7 +25,8 @@
       "contributions": [
         "security",
         "maintenance",
-        "ideas"
+        "ideas",
+        "bug"
       ]
     },
     {
@@ -144,6 +145,15 @@
       "name": "Mikec78660",
       "avatar_url": "https://avatars.githubusercontent.com/u/108021920?v=4",
       "profile": "https://github.com/Mikec78660",
+      "contributions": [
+        "ideas"
+      ]
+    },
+    {
+      "login": "iandouglas",
+      "name": "w. ian douglas",
+      "avatar_url": "https://avatars.githubusercontent.com/u/168030?v=4",
+      "profile": "https://techinterview.guide",
       "contributions": [
         "ideas"
       ]

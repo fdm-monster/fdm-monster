@@ -79,6 +79,7 @@ import { BuildResolver, DisposableResolver } from "awilix/lib/resolvers";
 import { UserRoleService } from "@/services/orm/user-role.service";
 import { PrinterGroupService } from "@/services/orm/printer-group.service";
 import { MoonrakerClient } from "@/services/moonraker/moonraker.client";
+import { MoonrakerWebsocketAdapter } from "@/services/moonraker/moonraker-websocket.adapter";
 
 export function config<T1, T2>(
   key: string,
@@ -183,6 +184,7 @@ export function configureContainer(isSqlite: boolean = false) {
     [di.batchCallService]: asClass(BatchCallService).singleton(),
     [di.pluginFirmwareUpdateService]: asClass(PluginFirmwareUpdateService).singleton(),
     [di.octoPrintSockIoAdapter]: asClass(OctoPrintSockIoAdapter).transient(), // Transient on purpose
+    [di.moonrakerWebsocketAdapter]: asClass(MoonrakerWebsocketAdapter).transient(), // Transient on purpose
     [di.floorStore]: asClass(FloorStore).singleton(),
     [di.pluginRepositoryCache]: asClass(PluginRepositoryCache).singleton(),
 

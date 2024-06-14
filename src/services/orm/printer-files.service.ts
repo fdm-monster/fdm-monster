@@ -66,11 +66,15 @@ export class PrinterFilesService extends BaseService(PrinterFile, PrinterFileDto
 
     for (const newFile of newFiles) {
       try {
+        if (!newFile.hash?.length) {
+          this.logger.log(`Skipping folder ${newFile.path}`);
+          // A folder
+          continue;
+        }
         await this.appendOrReplaceFile(printerId, newFile);
       } catch (e) {
         captureException(e);
-        this.logger.error(`Error appending file`);
-        throw e;
+        this.logger.error(`Error appending file, skipping it`);
       }
     }
 
@@ -82,6 +86,10 @@ export class PrinterFilesService extends BaseService(PrinterFile, PrinterFileDto
     addedFile.printerId = printer.id;
     if (!addedFile.customData) {
       addedFile.customData = {};
+    }
+
+    if (!addedFile?.hash?.length) {
+      throw new Error("File without hash");
     }
 
     const foundFile = await this.getPrinterFile(printer.id, addedFile.path);

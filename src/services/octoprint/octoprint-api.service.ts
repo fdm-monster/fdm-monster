@@ -17,6 +17,7 @@ import { normalizePrinterFile } from "@/services/octoprint/utils/file.utils";
 import { CurrentStateDto } from "@/services/octoprint/dto/websocket-output/current-message.dto";
 import { ConnectionDto } from "@/services/octoprint/dto/connection.dto";
 import { captureException } from "@sentry/node";
+import { OctoPrintCurrentUserDto } from "@/services/octoprint/dto/octoprint-currentuser.dto";
 
 type TAxes = "x" | "y" | "z";
 
@@ -148,16 +149,15 @@ export class OctoPrintApiService extends OctoPrintRoutes {
     return response?.data;
   }
 
+  async getCurrentUser(login: LoginDto) {
+    const { url, options } = this.prepareRequest(login, this.apiCurrentUser);
+    const response = await this.axiosClient.get<OctoPrintCurrentUserDto>(url, options);
+    return response?.data;
+  }
+
   async getAdminUserOrDefault(login: LoginDto) {
-    const data = await this.getUsers(login);
-
-    let opAdminUserName = "admin";
-    if (!!data?.users && Array.isArray(data.users)) {
-      const adminUser = data.users.find((user) => !!user.admin);
-      if (!!adminUser) opAdminUserName = adminUser.name;
-    }
-
-    return opAdminUserName;
+    const currentUser = await this.getCurrentUser(login);
+    return currentUser?.name;
   }
 
   async getUsers(login: LoginDto) {
