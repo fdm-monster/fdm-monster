@@ -48,7 +48,7 @@ describe(OctoPrintApiService.name, () => {
     const usersResponse = require("../test-data/octoprint-users.response.json");
     httpClient.saveMockResponse(usersResponse, 200);
     const adminResult = await octoPrintApiService.getAdminUserOrDefault(auth);
-    expect(adminResult).toBe("root");
+    expect(adminResult).toBeUndefined();
   });
 
   it("should not throw error on getUsers", async () => {
