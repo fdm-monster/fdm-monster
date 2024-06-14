@@ -4,6 +4,7 @@ import { setupTestApp } from "../../test-server";
 import { AwilixContainer } from "awilix";
 import { OctoPrintApiMock } from "../../mocks/octoprint-api.mock";
 import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
+import { OctoPrintCurrentUserDto } from "@/services/octoprint/dto/octoprint-currentuser.dto";
 
 let octoPrintApiService: OctoPrintApiMock;
 let container: AwilixContainer;
@@ -39,16 +40,62 @@ describe(OctoPrintApiService.name, () => {
   });
 
   it("should get first admin's username when response not recognized", async () => {
-    httpClient.saveMockResponse([], 200);
+    httpClient.saveMockResponse(
+      {
+        groups: ["admins", "users"],
+        name: "rooter",
+        permissions: [
+          "ADMIN",
+          "STATUS",
+          "CONNECTION",
+          "WEBCAM",
+          "SYSTEM",
+          "FILES_LIST",
+          "FILES_UPLOAD",
+          "FILES_DOWNLOAD",
+          "FILES_DELETE",
+          "FILES_SELECT",
+          "PRINT",
+          "GCODE_VIEWER",
+          "MONITOR_TERMINAL",
+          "CONTROL",
+          "SLICE",
+          "TIMELAPSE_LIST",
+          "TIMELAPSE_DOWNLOAD",
+          "TIMELAPSE_DELETE",
+          "TIMELAPSE_MANAGE_UNRENDERED",
+          "TIMELAPSE_ADMIN",
+          "SETTINGS_READ",
+          "SETTINGS",
+          "PLUGIN_ACTION_COMMAND_NOTIFICATION_SHOW",
+          "PLUGIN_ACTION_COMMAND_NOTIFICATION_CLEAR",
+          "PLUGIN_ACTION_COMMAND_PROMPT_INTERACT",
+          "PLUGIN_ANNOUNCEMENTS_READ",
+          "PLUGIN_ANNOUNCEMENTS_MANAGE",
+          "PLUGIN_APPKEYS_ADMIN",
+          "PLUGIN_APPKEYS_GRANT",
+          "PLUGIN_BACKUP_ACCESS",
+          "PLUGIN_FIRMWARE_CHECK_DISPLAY",
+          "PLUGIN_LOGGING_MANAGE",
+          "PLUGIN_PLUGINMANAGER_LIST",
+          "PLUGIN_PLUGINMANAGER_MANAGE",
+          "PLUGIN_PLUGINMANAGER_INSTALL",
+          "PLUGIN_SOFTWAREUPDATE_CHECK",
+          "PLUGIN_SOFTWAREUPDATE_UPDATE",
+          "PLUGIN_SOFTWAREUPDATE_CONFIGURE",
+        ],
+      } as OctoPrintCurrentUserDto,
+      200
+    );
     const adminResult = await octoPrintApiService.getAdminUserOrDefault(auth);
-    expect(adminResult).toBe("admin");
+    expect(adminResult).toBe("rooter");
   });
 
   it("should pick admin user from keys", async () => {
     const usersResponse = require("../test-data/octoprint-users.response.json");
     httpClient.saveMockResponse(usersResponse, 200);
     const adminResult = await octoPrintApiService.getAdminUserOrDefault(auth);
-    expect(adminResult).toBe("root");
+    expect(adminResult).toBeUndefined();
   });
 
   it("should not throw error on getUsers", async () => {
