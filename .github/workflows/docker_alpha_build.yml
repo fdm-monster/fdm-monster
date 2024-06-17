@@ -41,7 +41,7 @@ jobs:
       # Clone the repo and build the image
       - name: Build and push
         id: docker_build_new
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           push: ${{ github.event_name != 'pull_request' }}
           context: "{{defaultContext}}"

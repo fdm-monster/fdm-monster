@@ -110,7 +110,7 @@ jobs:
       # Clone the repo and build the image
       - name: Build and push
         id: docker_build
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           push: true
           context: "{{defaultContext}}"
@@ -122,7 +122,7 @@ jobs:
 
       - name: Build and push
         id: docker_build_new
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           push: true
           context: "{{defaultContext}}"
