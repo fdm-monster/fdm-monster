@@ -3302,14 +3302,14 @@ __metadata:
   linkType: hard
 
 "@types/express-serve-static-core@npm:*, @types/express-serve-static-core@npm:^4.17.33":
-  version: 4.19.3
-  resolution: "@types/express-serve-static-core@npm:4.19.3"
+  version: 4.19.5
+  resolution: "@types/express-serve-static-core@npm:4.19.5"
   dependencies:
     "@types/node": "npm:*"
     "@types/qs": "npm:*"
     "@types/range-parser": "npm:*"
     "@types/send": "npm:*"
-  checksum: 10c0/5d2a1fb96a17a8e0e8c59325dfeb6d454bbc5c9b9b6796eec0397ddf9dbd262892040d5da3d72b5d7148f34bb3fcd438faf1b37fcba8c5a03e75fae491ad1edf
+  checksum: 10c0/ba8d8d976ab797b2602c60e728802ff0c98a00f13d420d82770f3661b67fa36ea9d3be0b94f2ddd632afe1fbc6e41620008b01db7e4fabdd71a2beb5539b0725
   languageName: node
   linkType: hard
 
@@ -3544,16 +3544,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:>=10.0.0":
-  version: 20.14.5
-  resolution: "@types/node@npm:20.14.5"
-  dependencies:
-    undici-types: "npm:~5.26.4"
-  checksum: 10c0/06a8c304b5f7f190d4497807dc67ad09ee7b14ea2996bfdc823553c624698d8cab1ef9d16f8b764f20cb9eb11caa0e832787741e9ef70e1c89d620797ab28436
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:20.14.6":
+"@types/node@npm:*, @types/node@npm:20.14.6, @types/node@npm:>=10.0.0":
   version: 20.14.6
   resolution: "@types/node@npm:20.14.6"
   dependencies:
@@ -7980,9 +7971,9 @@ __metadata:
   linkType: hard
 
 "libphonenumber-js@npm:^1.10.53":
-  version: 1.11.3
-  resolution: "libphonenumber-js@npm:1.11.3"
-  checksum: 10c0/a4b5ef5a53585154304ddd212120b7b80c2fd6a7db1bbb3dce5e71d77534d18ad001f1e8afac4560872b57e0d5c1466a7c67e5729c2a7beb9687519f826759ba
+  version: 1.11.4
+  resolution: "libphonenumber-js@npm:1.11.4"
+  checksum: 10c0/0a606da67b4b465e6e157570ad5e70b92f59197cdc1c505d160422a21a894b55a75c9044b863d0eaf4d96884d3fa3e77268adf55afc2d8f11efae7f7a249e7cc
   languageName: node
   linkType: hard
 
