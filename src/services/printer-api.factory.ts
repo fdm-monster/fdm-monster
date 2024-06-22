@@ -20,12 +20,10 @@ export class PrinterApiFactory {
     let printerApi;
     if (login.printerType === OctoprintType) {
       printerApi = this.cradle[DITokens.octoprintApi] as IPrinterApi;
-    }
-    // else if (login.printerType === MoonrakerType) {
-    //   printerApi = this.cradle[DITokens.moonrakerApi] as IPrinterApi;
-    // }
-    else {
-      throw new Error("PrinterType is unsupported, cant pick the right api client");
+    } else if (login.printerType === MoonrakerType) {
+      printerApi = this.cradle[DITokens.moonrakerApi] as IPrinterApi;
+    } else {
+      throw new Error("PrinterType is unknown, cant pick the right socket adapter");
     }
 
     printerApi.login = login;

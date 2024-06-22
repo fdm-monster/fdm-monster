@@ -5,7 +5,6 @@ import { PrinterCache } from "@/state/printer.cache";
 import { OctoprintApi } from "@/services/octoprint.api";
 import { MoonrakerType, OctoprintType } from "@/services/printer-api.interface";
 import { MoonrakerApi } from "@/services/moonraker.api";
-import { NotImplementedException } from "@/exceptions/runtime.exceptions";
 
 export const printerIdToken = "currentPrinterId";
 export const printerApiToken = "printerApi";
@@ -38,12 +37,11 @@ export const printerResolveMiddleware = (key = "id") => {
           });
           break;
         case MoonrakerType:
-          throw new NotImplementedException("Moonraker has not been implemented as a supported printer service type");
-        //   const moonrakerInstance = req.container.resolve<MoonrakerApi>(DITokens.moonrakerApi);
-        //   req.container.register({
-        //     [printerApiToken]: asValue(moonrakerInstance),
-        //   });
-        //   break;
+          const moonrakerInstance = req.container.resolve<MoonrakerApi>(DITokens.moonrakerApi);
+          req.container.register({
+            [printerApiToken]: asValue(moonrakerInstance),
+          });
+          break;
       }
     } else {
       req.container.register({
