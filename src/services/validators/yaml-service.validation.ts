@@ -22,10 +22,8 @@ export const importPrintersFloorsYamlRules = (
   importPrinters: boolean,
   importFloorGrid: boolean,
   importFloors: boolean,
-  importGroups: boolean,
-  isTypeormMode: boolean
+  importGroups: boolean
 ) => {
-  const idVal = isTypeormMode ? "integer|min:1" : "mongoId";
   return {
     version: "required|string",
     config: "required|object",
@@ -41,11 +39,13 @@ export const importPrintersFloorsYamlRules = (
     "printers.*.apiKey": `required|length:${UUID_LENGTH},${UUID_LENGTH}|alphaNumeric`,
     "printers.*.printerURL": "required|httpurl",
     "printers.*.enabled": "boolean",
+    "printers.*.printerType": "integer|in:0,1",
     "printers.*.name": "required|string",
     floors: `${!!importFloors ? "array|minLength:0" : "not"}`,
     "floors.*.id": "required",
     "floors.*.floor": "required|integer",
     "floors.*.name": "required|string",
+    // TODO no grid check?
     groups: `${!!importGroups ? "array|minLength:0" : "not"}`,
     "groups.*.id": "required",
     "groups.*.name": "required|string",

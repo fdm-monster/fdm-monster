@@ -1,8 +1,6 @@
-export interface PrinterObjectsQueryDto {
-  eventtime: number;
-  status: Status;
-}
+import { PrinterObjectDto } from "@/services/moonraker/dto/objects/printer-object.dto";
 
-export interface Status<T = any> {
-  [k: string]: T;
+export interface PrinterObjectsQueryDto<T = PrinterObjectDto> {
+  status: T;
+  eventtime: number;
 }

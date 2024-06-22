@@ -4,6 +4,7 @@ export interface IPrinter {
   id: string;
   apiKey: string;
   printerURL: string;
+  printerType: number;
   enabled: boolean;
   disabledReason: string;
   name: string;
@@ -22,6 +23,11 @@ export const PrinterSchema = new Schema<IPrinter>({
   printerURL: {
     type: String,
     required: true, // !
+  },
+  printerType: {
+    type: Number,
+    required: true,
+    default: 0,
   },
   enabled: {
     type: Boolean,

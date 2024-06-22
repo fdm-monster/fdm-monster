@@ -65,6 +65,7 @@ export const AppConstants = {
   clientPackageName: "@fdm-monster/client",
   clientRepoName: "fdm-monster-client",
   serverRepoName: "fdm-monster",
+  githubUrl: "https://github.com/fdm-monster/fdm-monster",
   orgName: "fdm-monster",
   // Wizard version changes will trigger a re-run of the wizard
   currentWizardVersion: 1,

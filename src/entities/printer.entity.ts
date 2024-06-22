@@ -16,6 +16,9 @@ export class Printer extends BaseEntity {
   @Column()
   printerURL!: string;
 
+  @Column({ default: 0, nullable: false })
+  printerType!: number;
+
   @Column()
   @IsAlphanumeric()
   apiKey!: string;

@@ -13,6 +13,7 @@ export async function createTestPrinter(
 ): Promise<PrinterUnsafeDto<SqliteIdType>> {
   const createResponse = await request.post(printerRoute).send({
     printerURL: "http://url.com",
+    printerType: 0,
     apiKey: testApiKey,
     enabled,
     name: "testPrinter 123",

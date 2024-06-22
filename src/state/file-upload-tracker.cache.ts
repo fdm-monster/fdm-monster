@@ -15,7 +15,7 @@ export class FileUploadTrackerCache {
   private eventEmitter2: EventEmitter2;
   private logger: LoggerService;
 
-  constructor({ loggerFactory, eventEmitter2 }: { loggerFactory: ILoggerFactory; eventEmitter: EventEmitter2 }) {
+  constructor({ loggerFactory, eventEmitter2 }: { loggerFactory: ILoggerFactory; eventEmitter2: EventEmitter2 }) {
     this.eventEmitter2 = eventEmitter2;
     this.logger = loggerFactory(FileUploadTrackerCache.name);
   }
