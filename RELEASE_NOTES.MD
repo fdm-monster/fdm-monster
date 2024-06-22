@@ -1,7 +1,14 @@
 # FDM Monster 14/06/2024 1.6.3
 
 ## Fixes:
+
+- Add .yarn folder to FDM Monster release .zip file on github release
+- SQLite: Role entity name column should be unique
 - OctoPrint: websocket authentication would fail when multiple users are present. Fixed the username lookup with current-user OctoPrint API endpoint
+
+## Features:
+
+- Moonraker: prep work by modeling the moonraker api and websocket events
 
 # FDM Monster 13/04/2024 1.6.2
 
