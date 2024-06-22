@@ -17,6 +17,7 @@ import { LoginDto } from "@/services/interfaces/login.dto";
 import { ConnectionIdentifyDto } from "@/services/moonraker/dto/websocket/connection-identify.dto";
 import { WebsocketRpcExtendedAdapter } from "@/shared/websocket-rpc-extended.adapter";
 import { JsonRpcEventDto } from "@/services/moonraker/dto/websocket/json-rpc-event.dto";
+import { errorSummary } from "@/utils/error.utils";
 import { KnownPrinterObject } from "@/services/moonraker/dto/objects/printer-objects-list.dto";
 import { NotifyStatusUpdate } from "@/services/moonraker/dto/websocket/message.types";
 import {
