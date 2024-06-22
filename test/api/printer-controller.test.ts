@@ -5,9 +5,9 @@ import { createTestPrinter, testApiKey } from "./test-data/create-printer";
 import { Test } from "supertest";
 import { PrinterController } from "@/controllers/printer.controller";
 import { IdType } from "@/shared.constants";
-import { OctoprintType } from "@/services/printer-api.interface";
 import TestAgent from "supertest/lib/agent";
 import nock from "nock";
+import { OctoprintType, MoonrakerType } from "@/services/printer-api.interface";
 
 const defaultRoute = AppConstants.apiRoute + "/printer";
 const createRoute = defaultRoute;
@@ -54,13 +54,13 @@ describe(PrinterController.name, () => {
       printerURL: "http://url.com",
       apiKey: testApiKey,
       name: "test123",
-      printerType: OctoprintType,
+      printerType: MoonrakerType,
     });
     expectOkResponse(response, {
       printerURL: "http://url.com",
       apiKey: testApiKey,
       name: "test123",
-      printerType: OctoprintType,
+      printerType: MoonrakerType,
     });
   });
 
@@ -118,7 +118,7 @@ describe(PrinterController.name, () => {
         printerURL: "http://localhost/",
         apiKey,
         name,
-        printerType: OctoprintType,
+        printerType: MoonrakerType,
       },
     ]);
     expectOkResponse(response);
@@ -158,14 +158,14 @@ describe(PrinterController.name, () => {
       apiKey,
       enabled: false,
       name: "asd124",
-      printerType: OctoprintType,
+      printerType: MoonrakerType,
     };
     const updatePatch = await request.patch(updateRoute(printer.id)).send(patch);
     expectOkResponse(updatePatch, {
       printerURL: "https://test.com",
       enabled: false,
       name: "asd124",
-      printerType: OctoprintType,
+      printerType: MoonrakerType,
     });
   });
 
@@ -178,12 +178,12 @@ describe(PrinterController.name, () => {
       printerURL: "https://test.com/",
       apiKey,
       name,
-      printerType: OctoprintType,
+      printerType: MoonrakerType,
     });
     expectOkResponse(updatePatch, {
       printerURL: "https://test.com",
       apiKey,
-      printerType: OctoprintType,
+      printerType: MoonrakerType,
     });
   });
 
@@ -197,7 +197,7 @@ describe(PrinterController.name, () => {
       apiKey,
       printerURL: "https://test.com/",
       name,
-      printerType: OctoprintType,
+      printerType: MoonrakerType,
     });
     expectOkResponse(res);
   });

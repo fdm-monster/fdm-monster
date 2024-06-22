@@ -41,3 +41,5 @@ installations/ansible/inventory.cfg
 !.yarn/versions
 
 requests/http-client.private.env.json
+
+*.sqlite-journal

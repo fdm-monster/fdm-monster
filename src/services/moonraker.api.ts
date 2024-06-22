@@ -91,7 +91,7 @@ export class MoonrakerApi implements IPrinterApi {
     await this.client.postGcodeScript(this.login, script);
   }
 
-  async quickStop(): Promise<void> {
+  async emergencyStop(): Promise<void> {
     await this.client.postEmergencyStop(this.login);
   }
 
