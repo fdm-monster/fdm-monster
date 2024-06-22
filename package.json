@@ -121,7 +121,7 @@
     "@types/passport-jwt": "4.0.1",
     "@types/semver": "7.5.8",
     "@types/supertest": "6.0.2",
-    "@types/uuid": "9.0.8",
+    "@types/uuid": "10.0.0",
     "@types/ws": "8.5.10",
     "chokidar": "3.6.0",
     "concurrently": "8.2.2",
