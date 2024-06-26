@@ -1,5 +1,3 @@
-import { MoonrakerClient } from "@/services/moonraker/moonraker.client";
-
 export const DITokens = {
   // Values
   serverVersion: "serverVersion",

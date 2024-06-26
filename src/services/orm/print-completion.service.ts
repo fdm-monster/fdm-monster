@@ -41,11 +41,15 @@ export class PrintCompletionService
 
   async findPrintCompletion(correlationId: string) {
     const completions = await this.repository.findBy({});
-    console.log({ context: { correlationId } });
     return completions.filter((c) => c.context?.correlationId === correlationId);
   }
 
   async updateContext(correlationId: string, context: PrintCompletionContext): Promise<void> {
+    if (!correlationId?.length) {
+      this.logger.warn("Ignoring undefined correlationId, cant update print completion context");
+      return;
+    }
+
     const completionEntry = await this.repository.findOneBy({
       context: { correlationId },
       status: EVENT_TYPES.PrintStarted,

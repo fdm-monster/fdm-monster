@@ -27,6 +27,11 @@ export const pluginManagerCommands = {
     name: "refresh_repository",
     param: undefined,
   },
+} as {
+  [k: string]: {
+    name: string;
+    param?: string;
+  };
 };
 
 export const pluginRepositoryUrl = "https://plugins.octoprint.org/plugins.json";

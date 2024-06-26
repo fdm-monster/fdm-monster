@@ -9,7 +9,6 @@ import { validateMiddleware } from "@/handlers/validators";
 import { ServerReleaseService } from "@/services/core/server-release.service";
 import { ClientBundleService } from "@/services/core/client-bundle.service";
 import { ServerUpdateService } from "@/services/core/server-update.service";
-import { PrinterService } from "@/services/printer.service";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { PrinterCache } from "@/state/printer.cache";
 import { YamlService } from "@/services/core/yaml.service";
@@ -18,11 +17,12 @@ import { LogDumpService } from "@/services/core/logs-manager.service";
 import { Request, Response } from "express";
 import { demoUserNotAllowed } from "@/middleware/demo.middleware";
 import { GithubService } from "@/services/core/github.service";
+import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 
 export class ServerPrivateController {
   clientBundleService: ClientBundleService;
   printerCache: PrinterCache;
-  printerService: PrinterService;
+  printerService: IPrinterService;
   printerSocketStore: PrinterSocketStore;
   githubService: GithubService;
   yamlService: YamlService;
@@ -47,7 +47,7 @@ export class ServerPrivateController {
     serverUpdateService: ServerUpdateService;
     serverReleaseService: ServerReleaseService;
     printerCache: PrinterCache;
-    printerService: PrinterService;
+    printerService: IPrinterService;
     clientBundleService: ClientBundleService;
     githubService: GithubService;
     logDumpService: LogDumpService;
