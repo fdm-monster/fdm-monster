@@ -1,0 +1,35 @@
+version: 1.7.0
+exportedAt: 2024-05-07T21:59:03.223Z
+databaseType: sqlite
+config:
+  exportFloors: true
+  exportPrinters: true
+  exportFloorGrid: true
+  exportGroups: true
+  printerComparisonStrategiesByPriority:
+    - name
+    - id
+  floorComparisonStrategiesByPriority: floor
+printers:
+  - id: 1
+    disabledReason: null
+    enabled: true
+    printerType: 0
+    dateAdded: 1715119143210
+    name: MyPrintah
+    printerURL: http://localhost
+    apiKey: SOMEAWESOMEAPIKEYTHATOCTOPRINTLI
+  - id: 2
+    disabledReason: null
+    enabled: true
+    printerType: 0
+    dateAdded: 1715119143216
+    name: MyPrintah2
+    printerURL: http://localhost:81
+    apiKey: SOMEAWESOMEAPIKEYTHATOCTOPRINTLI
+floors:
+  - id: 1
+    floor: 1
+    name: Default Floor1_3_1
+    printers: []
+groups: []

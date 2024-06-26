@@ -5,7 +5,7 @@ import { setupTestApp } from "../test-server";
 import { AwilixContainer } from "awilix";
 import { generateCorrelationToken } from "@/utils/correlation-token.util";
 import { createTestPrinter } from "../api/test-data/create-printer";
-import supertest, { SuperTest } from "supertest";
+import supertest from "supertest";
 import { IPrintCompletionService } from "@/services/interfaces/print-completion.service";
 import { SqliteIdType } from "@/shared.constants";
 import { PrintCompletion } from "@/entities";

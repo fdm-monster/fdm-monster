@@ -16,7 +16,7 @@
   "scripts": {
     "console:upload": "yarn build && cross-env NODE_ENV=development node ./dist/consoles/upload-test.js",
     "dev": "concurrently \"yarn build:watch\" \"yarn watch-dev\"",
-    "watch-dev": "cross-env NODE_ENV=development nodemon --watch \"dist/**/*\" -e js ./dist/index.js",
+    "watch-dev": "cross-env NODE_ENV=development nodemon --enable-source-maps --watch \"dist/**/*\" -e js ./dist/index.js",
     "console:torm": "yarn build && cross-env NODE_ENV=development nodemon --watch \"dist/**/*\" -e js ./dist/consoles/sqlite-torm.js",
     "console:migrate": "yarn build && cross-env NODE_ENV=development nodemon --watch \"dist/**/*\" -e js ./dist/consoles/typeorm-migrate.js",
     "console:generate": "yarn build && cross-env NODE_ENV=development node ./dist/consoles/typeorm-generate.js",
