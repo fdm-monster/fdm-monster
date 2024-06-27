@@ -21,7 +21,7 @@ import { OctoPrintCurrentUserDto } from "@/services/octoprint/dto/octoprint-curr
 
 type TAxes = "x" | "y" | "z";
 
-export class OctoPrintApiService extends OctoPrintRoutes {
+export class OctoprintClient extends OctoPrintRoutes {
   eventEmitter2: EventEmitter2;
   protected axiosClient: AxiosStatic;
   protected logger: LoggerService;
@@ -40,7 +40,7 @@ export class OctoPrintApiService extends OctoPrintRoutes {
     super({ settingsStore });
     this.axiosClient = httpClient;
     this.eventEmitter2 = eventEmitter2;
-    this.logger = loggerFactory(OctoPrintApiService.name);
+    this.logger = loggerFactory(OctoprintClient.name);
   }
 
   async getVersion(login: LoginDto, timeout?: number) {

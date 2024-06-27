@@ -22,7 +22,7 @@ import { PrinterCache } from "@/state/printer.cache";
 import { LoggerService } from "@/handlers/logger";
 import { PrinterEventsCache } from "@/state/printer-events.cache";
 import { TaskManagerService } from "@/services/core/task-manager.service";
-import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
+import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { PluginRepositoryCache } from "@/services/octoprint/plugin-repository.cache";
 import { FloorStore } from "@/state/floor.store";
 import { MulterService } from "@/services/core/multer.service";
@@ -42,7 +42,7 @@ export class PrinterController {
   printerCache: PrinterCache;
   printerEventsCache: PrinterEventsCache;
   taskManagerService: TaskManagerService;
-  octoPrintApiService: OctoPrintApiService;
+  octoprintClient: OctoprintClient;
   pluginRepositoryCache: PluginRepositoryCache;
   floorStore: FloorStore;
   multerService: MulterService;
@@ -56,7 +56,7 @@ export class PrinterController {
     printerEventsCache,
     taskManagerService,
     loggerFactory,
-    octoPrintApiService,
+    octoprintClient,
     pluginRepositoryCache,
     floorStore,
     multerService,
@@ -68,7 +68,7 @@ export class PrinterController {
     printerEventsCache: PrinterEventsCache;
     taskManagerService: TaskManagerService;
     loggerFactory: ILoggerFactory;
-    octoPrintApiService: OctoPrintApiService;
+    octoprintClient: OctoprintClient;
     pluginRepositoryCache: PluginRepositoryCache;
     floorStore: FloorStore;
     multerService: MulterService;
@@ -80,7 +80,7 @@ export class PrinterController {
     this.printerSocketStore = printerSocketStore;
     this.testPrinterSocketStore = testPrinterSocketStore;
     this.taskManagerService = taskManagerService;
-    this.octoPrintApiService = octoPrintApiService;
+    this.octoprintClient = octoprintClient;
     this.pluginRepositoryCache = pluginRepositoryCache;
     this.floorStore = floorStore;
     this.multerService = multerService;
@@ -111,58 +111,58 @@ export class PrinterController {
 
   async octoPrintListCommands(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
-    const commands = await this.octoPrintApiService.getSystemCommands(printerLogin);
+    const commands = await this.octoprintClient.getSystemCommands(printerLogin);
     res.send(commands);
   }
 
   async octoPrintSystemRestart(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
-    const result = await this.octoPrintApiService.postSystemRestartCommand(printerLogin);
+    const result = await this.octoprintClient.postSystemRestartCommand(printerLogin);
     res.send(result);
   }
 
   async sendSerialConnectCommand(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
-    const command = this.octoPrintApiService.connectCommand;
-    await this.octoPrintApiService.sendConnectionCommand(printerLogin, command);
+    const command = this.octoprintClient.connectCommand;
+    await this.octoprintClient.sendConnectionCommand(printerLogin, command);
     res.send({});
   }
 
   async sendSerialDisconnectCommand(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
 
-    const command = this.octoPrintApiService.disconnectCommand;
-    await this.octoPrintApiService.sendConnectionCommand(printerLogin, command);
+    const command = this.octoprintClient.disconnectCommand;
+    await this.octoprintClient.sendConnectionCommand(printerLogin, command);
     res.send({});
   }
 
   async sendPrintHeadJogCommand(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
 
-    await this.octoPrintApiService.sendPrintHeadJogCommand(printerLogin, req.body);
+    await this.octoprintClient.sendPrintHeadJogCommand(printerLogin, req.body);
     res.send({});
   }
 
   async sendPrintHeadHomeCommand(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
 
-    await this.octoPrintApiService.sendPrintHeadHomeCommand(printerLogin, req.body);
+    await this.octoprintClient.sendPrintHeadHomeCommand(printerLogin, req.body);
     res.send({});
   }
 
   async pausePrintJob(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
 
-    const command = this.octoPrintApiService.pauseJobCommand;
-    await this.octoPrintApiService.sendJobCommand(printerLogin, command);
+    const command = this.octoprintClient.pauseJobCommand;
+    await this.octoprintClient.sendJobCommand(printerLogin, command);
     res.send({});
   }
 
   async resumePrintJob(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
 
-    const command = this.octoPrintApiService.resumeJobCommand;
-    await this.octoPrintApiService.sendJobCommand(printerLogin, command);
+    const command = this.octoprintClient.resumeJobCommand;
+    await this.octoprintClient.sendJobCommand(printerLogin, command);
     res.send({});
   }
 
@@ -172,8 +172,8 @@ export class PrinterController {
   async stopPrintJob(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
 
-    const command = this.octoPrintApiService.cancelJobCommand;
-    await this.octoPrintApiService.sendJobCommand(printerLogin, command);
+    const command = this.octoprintClient.cancelJobCommand;
+    await this.octoprintClient.sendJobCommand(printerLogin, command);
     res.send({});
   }
 
@@ -227,7 +227,7 @@ export class PrinterController {
   private async testOctoPrintConnection(inputLoginDto: LoginDto) {
     const loginDto = (await validateInput(inputLoginDto, updatePrinterConnectionSettingRules)) as LoginDto;
     try {
-      await this.octoPrintApiService.getVersion(loginDto);
+      await this.octoprintClient.getVersion(loginDto);
     } catch (e) {
       this.logger.log("OctoPrint /api/version test failed");
 
@@ -319,7 +319,7 @@ export class PrinterController {
    */
   async getPrinterPluginList(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
-    let pluginList = await this.octoPrintApiService.getPluginManagerPlugins(printerLogin);
+    let pluginList = await this.octoprintClient.getPluginManagerPlugins(printerLogin);
     res.send(pluginList);
   }
 
@@ -350,41 +350,41 @@ export class PrinterController {
 
   async getOctoPrintBackupOverview(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
-    const backupOverview = await this.octoPrintApiService.getBackupOverview(printerLogin);
+    const backupOverview = await this.octoprintClient.getBackupOverview(printerLogin);
     res.send(backupOverview);
   }
 
   async listOctoPrintBackups(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
-    const backupOverview = await this.octoPrintApiService.getBackups(printerLogin);
+    const backupOverview = await this.octoprintClient.getBackups(printerLogin);
     res.send(backupOverview);
   }
 
   async createOctoPrintBackup(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
     const { exclude } = await validateMiddleware(req, createOctoPrintBackupRules);
-    const response = await this.octoPrintApiService.createBackup(printerLogin, exclude);
+    const response = await this.octoprintClient.createBackup(printerLogin, exclude);
     res.send(response);
   }
 
   async downloadOctoPrintBackup(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
     const { fileName } = await validateMiddleware(req, getOctoPrintBackupRules);
-    const dataStream = await this.octoPrintApiService.getDownloadBackupStream(printerLogin, fileName);
+    const dataStream = await this.octoprintClient.getDownloadBackupStream(printerLogin, fileName);
     dataStream.pipe(res);
   }
 
   async restoreOctoPrintBackup(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
     const files = await this.multerService.multerLoadFileAsync(req, res, null, false);
-    const response = await this.octoPrintApiService.forwardRestoreBackupFileStream(printerLogin, files[0].buffer);
+    const response = await this.octoprintClient.forwardRestoreBackupFileStream(printerLogin, files[0].buffer);
     res.send(response.data);
   }
 
   async deleteOctoPrintBackup(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
     const { fileName } = await validateMiddleware(req, getOctoPrintBackupRules);
-    const response = await this.octoPrintApiService.deleteBackup(printerLogin, fileName);
+    const response = await this.octoprintClient.deleteBackup(printerLogin, fileName);
     res.send(response);
   }
 }

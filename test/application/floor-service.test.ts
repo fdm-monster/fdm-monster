@@ -1,7 +1,7 @@
 import { PrinterMockData } from "./test-data/printer.data";
 import { Floor } from "@/entities/floor.entity";
 import { DITokens } from "@/container.tokens";
-import { FloorService } from "@/services/floor.service";
+import { FloorService } from "@/services/mongoose/floor.service";
 import { IFloorService } from "@/services/interfaces/floor.service.interface";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { IdType } from "@/shared.constants";

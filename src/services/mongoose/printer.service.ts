@@ -6,7 +6,7 @@ import {
   createMongoPrinterRules,
   updatePrinterDisabledReasonRule,
   updatePrinterEnabledRule,
-} from "./validators/printer-service.validation";
+} from "../validators/printer-service.validation";
 import { printerEvents } from "@/constants/event.constants";
 import { LoggerService } from "@/handlers/logger";
 import { normalizeURLWithProtocol } from "@/utils/url.utils";

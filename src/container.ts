@@ -4,10 +4,10 @@ import { Octokit } from "octokit";
 import { asClass, asFunction, asValue, createContainer, InjectionMode, Resolver } from "awilix";
 import { ToadScheduler } from "toad-scheduler";
 import { DITokens } from "./container.tokens";
-import { PrinterService } from "./services/printer.service";
+import { PrinterService } from "./services/mongoose/printer.service";
 import { PrinterService as PrinterService2 } from "./services/orm/printer.service";
 import { SettingsStore } from "./state/settings.store";
-import { SettingsService } from "./services/settings.service";
+import { SettingsService } from "./services/mongoose/settings.service";
 import { ServerReleaseService } from "./services/core/server-release.service";
 import { TaskManagerService } from "./services/core/task-manager.service";
 import { ServerUpdateService } from "./services/core/server-update.service";
@@ -15,13 +15,11 @@ import { GithubService } from "./services/core/github.service";
 import { FileCache } from "./state/file.cache";
 import { PrinterWebsocketTask } from "./tasks/printer-websocket.task";
 import { SocketIoTask } from "./tasks/socketio.task";
-import { OctoPrintApiService } from "./services/octoprint/octoprint-api.service";
+import { OctoprintClient } from "./services/octoprint/octoprint.client";
 import { SocketFactory } from "./services/octoprint/socket.factory";
 import { PrinterFilesStore } from "./state/printer-files.store";
 import { configureEventEmitter } from "./handlers/event-emitter";
 import { AppConstants } from "./server.constants";
-import { PrinterFilesService } from "./services/printer-files.service";
-import { PrinterFilesService as PrinterFilesService2 } from "./services/orm/printer-files.service";
 import { SoftwareUpdateTask } from "./tasks/software-update.task";
 import { LoggerFactory } from "./handlers/logger-factory";
 import { MulterService } from "./services/core/multer.service";
@@ -37,7 +35,7 @@ import { PermissionService } from "./services/authentication/permission.service"
 import { PermissionService as PermissionService2 } from "./services/orm/permission.service";
 import { PrinterFileCleanTask } from "./tasks/printer-file-clean.task";
 import { ROLES } from "./constants/authorization.constants";
-import { CustomGcodeService } from "./services/custom-gcode.service";
+import { CustomGcodeService } from "./services/mongoose/custom-gcode.service";
 import { CustomGcodeService as CustomGcodeService2 } from "./services/orm/custom-gcode.service";
 import { PrinterWebsocketRestoreTask } from "./tasks/printer-websocket-restore.task";
 import { PluginFirmwareUpdateService } from "./services/octoprint/plugin-firmware-update.service";
@@ -46,30 +44,29 @@ import { configureCacheManager } from "./handlers/cache-manager";
 import { InfluxDbV2BaseService } from "./services/influxdb-v2/influx-db-v2-base.service";
 import { ConfigService } from "./services/core/config.service";
 import { PrintCompletionSocketIoTask } from "./tasks/print-completion.socketio.task";
-import { PrintCompletionService } from "./services/print-completion.service";
+import { PrintCompletionService } from "./services/mongoose/print-completion.service";
 import { PrintCompletionService as PrintCompletionService2 } from "./services/orm/print-completion.service";
 import { SocketIoGateway } from "./state/socket-io.gateway";
 import { ClientBundleService } from "./services/core/client-bundle.service";
-import { FloorService } from "./services/floor.service";
+import { FloorService } from "./services/mongoose/floor.service";
 import { FloorStore } from "./state/floor.store";
 import { YamlService } from "./services/core/yaml.service";
 import { MonsterPiService } from "./services/core/monsterpi.service";
-import { BatchCallService } from "./services/batch-call.service";
+import { BatchCallService } from "./services/core/batch-call.service";
 import { ClientDistDownloadTask } from "./tasks/client-bundle.task";
-import { OctoPrintSockIoAdapter } from "./services/octoprint/octoprint-sockio.adapter";
+import { OctoprintWebsocketAdapter } from "./services/octoprint/octoprint-websocket.adapter";
 import { PrinterCache } from "./state/printer.cache";
 import { PrinterSocketStore } from "./state/printer-socket.store";
 import { TestPrinterSocketStore } from "./state/test-printer-socket.store";
 import { PrinterEventsCache } from "./state/printer-events.cache";
 import { LogDumpService } from "./services/core/logs-manager.service";
-import { CameraStreamService as CameraService } from "./services/camera-stream.service";
+import { CameraStreamService as CameraService } from "./services/mongoose/camera-stream.service";
 import { CameraStreamService as CameraService2 } from "./services/orm/camera-stream.service";
 import { JwtService } from "./services/authentication/jwt.service";
 import { AuthService } from "./services/authentication/auth.service";
 import { RefreshTokenService } from "@/services/authentication/refresh-token.service";
 import { throttling } from "@octokit/plugin-throttling";
 import { PrinterStateUpdatePollTask } from "@/tasks/printer-state-update-poll.task";
-import { PrinterConnectionCache } from "@/state/printer-connection.cache";
 import { RefreshTokenService as RefreshToken2 } from "@/services/orm/refresh-token.service";
 import { SettingsService2 } from "@/services/orm/settings.service";
 import { FloorService as FloorService2 } from "@/services/orm/floor.service";
@@ -119,7 +116,6 @@ export function configureContainer(isSqlite: boolean = false) {
     ...config(di.cameraStreamService, isSqlite, asClass(CameraService2).singleton(), asClass(CameraService).singleton()),
     ...config(di.printerService, isSqlite, asClass(PrinterService2), asClass(PrinterService)),
     ...config(di.printerGroupService, isSqlite, asClass(PrinterGroupService), asValue(null)),
-    ...config(di.printerFilesService, isSqlite, asClass(PrinterFilesService2), asClass(PrinterFilesService)),
     ...config(di.refreshTokenService, isSqlite, asClass(RefreshToken2).singleton(), asClass(RefreshTokenService).singleton()),
     ...config(di.userService, isSqlite, asClass(UserService2).singleton(), asClass(UserService).singleton()),
     ...config(di.userRoleService, isSqlite, asClass(UserRoleService).singleton(), asValue(null)),
@@ -179,11 +175,11 @@ export function configureContainer(isSqlite: boolean = false) {
     [di.socketIoGateway]: asClass(SocketIoGateway).singleton(),
     [di.multerService]: asClass(MulterService).singleton(),
     [di.yamlService]: asClass(YamlService),
-    [di.octoPrintApiService]: asClass(OctoPrintApiService).singleton(),
+    [di.octoprintClient]: asClass(OctoprintClient).singleton(),
     [di.moonrakerClient]: asClass(MoonrakerClient).singleton(),
     [di.batchCallService]: asClass(BatchCallService).singleton(),
     [di.pluginFirmwareUpdateService]: asClass(PluginFirmwareUpdateService).singleton(),
-    [di.octoPrintSockIoAdapter]: asClass(OctoPrintSockIoAdapter).transient(), // Transient on purpose
+    [di.octoPrintSockIoAdapter]: asClass(OctoprintWebsocketAdapter).transient(), // Transient on purpose
     [di.moonrakerWebsocketAdapter]: asClass(MoonrakerWebsocketAdapter).transient(), // Transient on purpose
     [di.floorStore]: asClass(FloorStore).singleton(),
     [di.pluginRepositoryCache]: asClass(PluginRepositoryCache).singleton(),
@@ -192,7 +188,6 @@ export function configureContainer(isSqlite: boolean = false) {
     [di.fileUploadTrackerCache]: asClass(FileUploadTrackerCache).singleton(),
     [di.printerFilesStore]: asClass(PrinterFilesStore).singleton(),
     [di.printerCache]: asClass(PrinterCache).singleton(),
-    [di.printerConnectionCache]: asClass(PrinterConnectionCache).singleton(),
     [di.printerEventsCache]: asClass(PrinterEventsCache).singleton(),
     [di.printerSocketStore]: asClass(PrinterSocketStore).singleton(),
     [di.testPrinterSocketStore]: asClass(TestPrinterSocketStore).singleton(),

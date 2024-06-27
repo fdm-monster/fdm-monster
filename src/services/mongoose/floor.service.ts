@@ -8,7 +8,7 @@ import {
   updateFloorNameRules,
   updateFloorNumberRules,
   updateFloorRules,
-} from "./validators/floor-service.validation";
+} from "../validators/floor-service.validation";
 import { LoggerService } from "@/handlers/logger";
 import { PrinterCache } from "@/state/printer.cache";
 import { MongoIdType } from "@/shared.constants";

@@ -1,5 +1,5 @@
 import { DITokens } from "@/container.tokens";
-import { PrintCompletionService } from "@/services/print-completion.service";
+import { PrintCompletionService } from "@/services/mongoose/print-completion.service";
 import { EVENT_TYPES } from "@/services/octoprint/constants/octoprint-websocket.constants";
 import { setupTestApp } from "../test-server";
 import { AwilixContainer } from "awilix";

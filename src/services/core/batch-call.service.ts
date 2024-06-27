@@ -1,11 +1,11 @@
 import { PrinterFilesStore } from "@/state/printer-files.store";
-import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
+import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { PrinterCache } from "@/state/printer.cache";
 import { PrinterEventsCache } from "@/state/printer-events.cache";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { IdType } from "@/shared.constants";
-import { CreateOrUpdatePrinterFileDto } from "./interfaces/printer-file.dto";
+import { CreateOrUpdatePrinterFileDto } from "../interfaces/printer-file.dto";
 import { ConnectionState } from "@/services/octoprint/dto/connection.dto";
 import { captureException } from "@sentry/node";
 import { errorSummary } from "@/utils/error.utils";
@@ -36,7 +36,7 @@ interface BatchSingletonModel {
 type BatchModel = Array<BatchSingletonModel>;
 
 export class BatchCallService {
-  octoPrintApiService: OctoPrintApiService;
+  octoprintClient: OctoprintClient;
   printerSocketStore: PrinterSocketStore;
   printerCache: PrinterCache;
   printerEventsCache: PrinterEventsCache;
@@ -45,7 +45,7 @@ export class BatchCallService {
   logger: LoggerService;
 
   constructor({
-    octoPrintApiService,
+    octoprintClient,
     printerCache,
     printerEventsCache,
     printerSocketStore,
@@ -53,7 +53,7 @@ export class BatchCallService {
     printerService,
     loggerFactory,
   }: {
-    octoPrintApiService: OctoPrintApiService;
+    octoprintClient: OctoprintClient;
     printerCache: PrinterCache;
     printerEventsCache: PrinterEventsCache;
     printerSocketStore: PrinterSocketStore;
@@ -61,7 +61,7 @@ export class BatchCallService {
     printerService: IPrinterService;
     loggerFactory: ILoggerFactory;
   }) {
-    this.octoPrintApiService = octoPrintApiService;
+    this.octoprintClient = octoprintClient;
     this.printerCache = printerCache;
     this.printerEventsCache = printerEventsCache;
     this.printerSocketStore = printerSocketStore;
@@ -137,7 +137,7 @@ export class BatchCallService {
       const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
       const time = Date.now();
 
-      const promise = this.octoPrintApiService
+      const promise = this.octoprintClient
         .getSettings(printerLogin)
         .then((r) => {
           return { success: true, printerId, time: Date.now() - time, value: r };
@@ -157,8 +157,8 @@ export class BatchCallService {
       const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
       const time = Date.now();
 
-      const command = this.octoPrintApiService.connectCommand;
-      const promise = this.octoPrintApiService
+      const command = this.octoprintClient.connectCommand;
+      const promise = this.octoprintClient
         .sendConnectionCommand(printerLogin, command)
         .then(() => {
           return { success: true, printerId, time: Date.now() - time };
@@ -178,9 +178,9 @@ export class BatchCallService {
       const promise = new Promise<ReprintFileDto>(async (resolve, _) => {
         try {
           const login = await this.printerCache.getLoginDtoAsync(printerId);
-          const files = (await this.octoPrintApiService.getLocalFiles(login, true)).filter((f) => f?.prints?.last?.date);
+          const files = (await this.octoprintClient.getLocalFiles(login, true)).filter((f) => f?.prints?.last?.date);
 
-          const connected = await this.octoPrintApiService.getConnection(login);
+          const connected = await this.octoprintClient.getConnection(login);
           const connectionState = connected.current?.state;
 
           // OctoPrint sorts by last print time by default
@@ -220,7 +220,7 @@ export class BatchCallService {
       const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
 
       const time = Date.now();
-      const promise = this.octoPrintApiService
+      const promise = this.octoprintClient
         .selectPrintFile(printerLogin, path, true)
         .then(() => {
           return { success: true, printerId, time: Date.now() - time };
