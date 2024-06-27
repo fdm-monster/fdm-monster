@@ -39,6 +39,7 @@ export class PrinterService
       ...this.toDto(entity),
       apiKey: entity.apiKey,
       printerURL: entity.printerURL,
+      printerType: entity.printerType,
     };
   }
 
@@ -86,13 +87,14 @@ export class PrinterService
       partial.printerURL = normalizeURLWithProtocol(partial.printerURL);
     }
     Object.assign(printer, partial);
-    const { printerURL, apiKey, enabled, name } = await validateInput(printer, createPrinterRules);
+    const { printerURL, apiKey, enabled, name, printerType } = await validateInput(printer, createPrinterRules);
 
     const updatedPrinter = await super.update(printerId, {
       printerURL,
       name,
       apiKey,
       enabled,
+      printerType,
     });
     this.eventEmitter2.emit(printerEvents.printerUpdated, { printer, updatedPrinter });
     return updatedPrinter;

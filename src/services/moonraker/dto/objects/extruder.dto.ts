@@ -5,5 +5,6 @@ export interface ExtruderDto {
   can_extrude: boolean;
   pressure_advance: number;
   smooth_time: number;
-  motion_queue: any;
+  // Missing in docs https://moonraker.readthedocs.io/en/latest/printer_objects/#extruder
+  motion_queue: null | any;
 }

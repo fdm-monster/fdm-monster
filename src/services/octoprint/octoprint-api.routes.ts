@@ -6,7 +6,7 @@ import { LoginDto } from "@/services/interfaces/login.dto";
 import { SettingsStore } from "@/state/settings.store";
 import { ITimeoutSettings } from "@/models/Settings";
 
-export class OctoPrintRoutes {
+export class OctoprintRoutes {
   octoPrintBase = "/";
   apiBase = `${this.octoPrintBase}api`;
   apiVersion = `${this.apiBase}/version`;
@@ -14,7 +14,7 @@ export class OctoPrintRoutes {
   apiCurrentUser = `${this.apiBase}/currentuser`;
   apiSettingsPart = `${this.apiBase}/settings`;
   apiFiles = `${this.apiBase}/files`;
-  apiFilesLocation = `${this.apiFiles}/local`;
+  apiFilesLocal = `${this.apiFiles}/local`;
   apiConnection = `${this.apiBase}/connection`;
   apiJob = `${this.apiBase}/job`;
   apiPrinter = `${this.apiBase}/printer`;
@@ -25,7 +25,7 @@ export class OctoPrintRoutes {
   apiSystem = `${this.apiBase}/system`;
   apiSystemInfo = `${this.apiSystem}/info`;
   apiSystemCommands = `${this.apiSystem}/commands`;
-  apiSystemRestartCommand = `${this.apiSystemCommands}/core/restart`;
+  apiServerRestartCommand = `${this.apiSystemCommands}/core/restart`;
   apiUsers = `${this.apiBase}/users`;
   apiLogin = `${this.apiBase}/login?passive=true`;
   apiPluginPiSupport = `${this.apiBase}/plugin/pi_support`;
@@ -92,7 +92,9 @@ export class OctoPrintRoutes {
     return `${this.apiPrinter}?history=${!!history}${limitParam}${excludeParam}`;
   };
 
-  apiFile = (path: string) => `${this.apiFilesLocation}/${path}`;
+  apiFile = (path: string) => `${this.apiFilesLocal}/${path}`;
+
+  downloadFileLocal = (path: string) => `${this.octoPrintBase}downloads/files/local/${path}`;
 
   apiGetFiles = (recursive = false) => `${this.apiFiles}/local?recursive=${recursive}`;
 

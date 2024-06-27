@@ -5,7 +5,7 @@ export interface ToolheadDto {
   print_time: number;
   stalls: number;
   estimated_print_time: number;
-  extruder: string;
+  extruder: string | "extruder" | "extruder1";
   position: number[];
   max_velocity: number;
   max_accel: number;

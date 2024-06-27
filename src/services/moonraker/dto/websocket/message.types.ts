@@ -18,16 +18,17 @@ import { NotifySpoolmanStatusChangedParams } from "@/services/moonraker/dto/webs
 import { NotifyAgentEventParams } from "@/services/moonraker/dto/websocket/notify-agent-event.params";
 import { SensorUpdateParams } from "@/services/moonraker/dto/websocket/notify-sensor-update.params";
 
+// Event based
 export type NotifyGcodeResponse = JsonRpcEventDto<"notify_gcode_response", [string]>;
-export type NotifySubscriptionStatusDto<T = any> = JsonRpcEventDto<"notify_status_update", [status: T, time: number]>;
-// const example: SubscriptionStatusDto = {
-//   jsonrpc: "2.0",
-//   method: "notify_status_update",
-//   params: [{ status: "yes" }, Date.now()],
-// };
+// Objects, very frequent
+export type NotifyStatusUpdate<T = any> = JsonRpcEventDto<"notify_status_update", [status: T, eventtime: number]>;
+// Crucial
 export type NotifyKlipperReady = JsonRpcEventDto<"notify_klippy_ready", never>;
+// Crucial
 export type NotifyKlipperShutdown = JsonRpcEventDto<"notify_klippy_shutdown", never>;
+// Crucial
 export type NotifyKlipperDisconnected = JsonRpcEventDto<"notify_klippy_disconnected", never>;
+// Less frequent below
 export type NotifyFileListChanged = JsonRpcEventDto<"notify_filelist_changed", [NotifyFileListChangedParams]>;
 export type NotifyUpdateResponse = JsonRpcEventDto<"notify_update_response", [NotifyUpdateResponseParams]>;
 export type NotifyUpdateRefreshed = JsonRpcEventDto<"notify_update_refreshed", [MachineUpdateStatusDto]>;

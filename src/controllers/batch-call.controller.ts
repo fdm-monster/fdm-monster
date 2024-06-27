@@ -8,7 +8,7 @@ import {
 import { AppConstants } from "@/server.constants";
 import { authenticate, authorizeRoles } from "@/middleware/authenticate";
 import { ROLES } from "@/constants/authorization.constants";
-import { BatchCallService } from "@/services/batch-call.service";
+import { BatchCallService } from "@/services/core/batch-call.service";
 import { Request, Response } from "express";
 
 export class BatchCallController {

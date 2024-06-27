@@ -4,7 +4,7 @@ import { PrinterFilesStore } from "@/state/printer-files.store";
 import { PrinterCache } from "@/state/printer.cache";
 import { SettingsStore } from "@/state/settings.store";
 import { TaskManagerService } from "@/services/core/task-manager.service";
-import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
+import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { IdType } from "@/shared.constants";
 import { PrinterDto } from "@/services/interfaces/printer.dto";
 
@@ -18,19 +18,19 @@ export class PrinterFileCleanTask {
   printerCache: PrinterCache;
   settingsStore: SettingsStore;
   taskManagerService: TaskManagerService;
-  octoPrintApiService: OctoPrintApiService;
+  octoprintClient: OctoprintClient;
 
   constructor({
     printerCache,
     printerFilesStore,
-    octoPrintApiService,
+    octoprintClient,
     taskManagerService,
     settingsStore,
     loggerFactory,
   }: {
     printerCache: PrinterCache;
     printerFilesStore: PrinterFilesStore;
-    octoPrintApiService: OctoPrintApiService;
+    octoprintClient: OctoprintClient;
     taskManagerService: TaskManagerService;
     settingsStore: SettingsStore;
     loggerFactory: ILoggerFactory;
@@ -38,7 +38,7 @@ export class PrinterFileCleanTask {
     this.printerCache = printerCache;
     this.printerFilesStore = printerFilesStore;
     this.taskManagerService = taskManagerService;
-    this.octoPrintApiService = octoPrintApiService;
+    this.octoprintClient = octoprintClient;
     this.settingsStore = settingsStore;
     this.logger = loggerFactory(PrinterFileCleanTask.name);
   }
@@ -62,7 +62,7 @@ export class PrinterFileCleanTask {
       const errorPrinters = [];
       for (let printer of printers) {
         try {
-          await this.printerFilesStore.eagerLoadPrinterFiles(printer.id, false);
+          await this.printerFilesStore.loadFiles(printer.id, false);
         } catch (e) {
           errorPrinters.push({ e, printer });
         }
@@ -92,7 +92,7 @@ export class PrinterFileCleanTask {
 
   async cleanPrinterFiles(printerId: IdType) {
     await this.printerFilesStore.deleteOutdatedFiles(printerId, this.ageDaysMaxSetting);
-    await this.printerFilesStore.eagerLoadPrinterFiles(printerId, false);
+    await this.printerFilesStore.loadFiles(printerId, false);
   }
 
   getPrinterOutdatedFiles(printer: PrinterDto<IdType>) {

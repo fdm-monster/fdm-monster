@@ -38,25 +38,3 @@ export const EVENT_TYPES = {
   Waiting: "Waiting",
   ZChange: "ZChange",
 };
-
-export const OP_WS_MSG = {
-  connected: "connected",
-  reauthRequired: "reauthRequired",
-  current: "current",
-  history: "history",
-  event: "event",
-  plugin: "plugin",
-  timelapse: "timelapse",
-  slicingProgress: "slicingProgress",
-};
-
-export const OP_WS_SKIP = [OP_WS_MSG.slicingProgress, OP_WS_MSG.timelapse];
-
-export const WS_STATE = {
-  unopened: "unopened",
-  opening: "opening",
-  connected: "connected",
-  authed: "authed",
-  errored: "errored", // Not a disconnect error
-  closed: "closed", // Closing error received
-};
