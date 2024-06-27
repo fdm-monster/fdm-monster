@@ -1,14 +1,14 @@
 import { PrintCompletion } from "@/models";
-import { createPrintCompletionRules } from "./validators/print-completion-service.validation";
+import { createPrintCompletionRules } from "../validators/print-completion-service.validation";
 import { validateInput } from "@/handlers/validators";
-import { EVENT_TYPES } from "./octoprint/constants/octoprint-websocket.constants";
+import { EVENT_TYPES } from "../octoprint/constants/octoprint-websocket.constants";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { MongoIdType } from "@/shared.constants";
 import { IPrintCompletionService } from "@/services/interfaces/print-completion.interface";
 import { CreatePrintCompletionDto, PrintCompletionContext, PrintCompletionDto } from "@/services/interfaces/print-completion.dto";
 import { IPrintCompletion } from "@/models/PrintCompletion";
-import { processCompletions } from "@/services/print-completion.shared";
+import { processCompletions } from "@/services/mongoose/print-completion.shared";
 
 export class PrintCompletionService implements IPrintCompletionService<MongoIdType> {
   logger: LoggerService;

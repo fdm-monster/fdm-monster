@@ -4,7 +4,7 @@ import { printerEvents } from "@/constants/event.constants";
 import EventEmitter2 from "eventemitter2";
 import { SocketFactory } from "@/services/octoprint/socket.factory";
 import { PrinterCache } from "@/state/printer.cache";
-import { OctoPrintSockIoAdapter } from "@/services/octoprint/octoprint-sockio.adapter";
+import { OctoprintWebsocketAdapter } from "@/services/octoprint/octoprint-websocket.adapter";
 import { LoggerService } from "@/handlers/logger";
 import { ConfigService } from "@/services/core/config.service";
 import { SettingsStore } from "@/state/settings.store";
@@ -18,7 +18,7 @@ export class PrinterSocketStore {
   socketFactory: SocketFactory;
   eventEmitter2: EventEmitter2;
   printerCache: PrinterCache;
-  printerSocketAdaptersById: Record<string, OctoPrintSockIoAdapter> = {};
+  printerSocketAdaptersById: Record<string, OctoprintWebsocketAdapter> = {};
   logger: LoggerService;
   configService: ConfigService;
   settingsStore: SettingsStore;
@@ -104,7 +104,7 @@ export class PrinterSocketStore {
     socket.resetSocketState();
   }
 
-  getPrinterSocket(id: IdType): OctoPrintSockIoAdapter | undefined {
+  getPrinterSocket(id: IdType): OctoprintWebsocketAdapter | undefined {
     return this.printerSocketAdaptersById[id];
   }
 

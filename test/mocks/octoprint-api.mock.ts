@@ -1,7 +1,7 @@
-import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
+import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { AxiosMock } from "./axios.mock";
 
-export class OctoPrintApiMock extends OctoPrintApiService {
+export class OctoPrintApiMock extends OctoprintClient {
   eventEmitter2;
 
   constructor({ settingsStore, httpClient, loggerFactory, eventEmitter2 }) {

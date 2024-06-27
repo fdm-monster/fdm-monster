@@ -1,7 +1,7 @@
 import fs from "fs";
 import { configureContainer } from "@/container";
 import { DITokens } from "@/container.tokens";
-import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
+import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { connect } from "mongoose";
 import { fetchMongoDBConnectionString } from "@/server.env";
 import { SettingsStore } from "@/state/settings.store";
@@ -116,7 +116,7 @@ Throttle.prototype._onchunk = function (output, done) {
 // }).then(async () => {
 //   const container = configureContainer();
 //   await container.resolve<SettingsStore>(DITokens.settingsStore).loadSettings();
-//   const opService = container.resolve<OctoPrintApiService>(DITokens.octoPrintApiService);
+//   const opService = container.resolve<octoprintClient>(DITokens.octoprintClient);
 //   await opService.uploadFileAsMultiPart(
 //     {
 //       apiKey: "123asd",

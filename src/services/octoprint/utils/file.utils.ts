@@ -12,19 +12,19 @@ export function normalizePrinterFile(file: OctoprintRawFileDto): CreateOrUpdateP
   };
 
   const knownKeys = [
-    "name",
+    // "name",
     "date",
-    "display",
-    "gcodeAnalysis",
-    "hash",
-    "origin",
+    // "display",
+    // "gcodeAnalysis",
+    // "hash",
+    // "origin",
     "path",
-    "prints",
-    "refs",
+    // "prints",
+    // "refs",
     "size",
-    "statistics",
-    "type",
-    "typePath",
+    // "statistics",
+    // "type",
+    // "typePath",
   ];
 
   const unknownKeys = keys.filter((k) => !knownKeys.includes(k));

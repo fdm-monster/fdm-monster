@@ -29,12 +29,12 @@ const serialDisconnectCommandRoute = (id: IdType) => `${getRoute(id)}/serial-dis
 const batchRoute = `${defaultRoute}/batch`;
 
 let request: SuperTest<supertest.Test>;
-let octoPrintApiService: OctoPrintApiMock;
+let octoprintClient: OctoPrintApiMock;
 const apiKey = "fdmfdmfdmfdmfdmfdmfdmfdmfdmfdmfd";
 const name = "test1234";
 
 beforeAll(async () => {
-  ({ request, octoPrintApiService } = await setupTestApp(true));
+  ({ request, octoprintClient } = await setupTestApp(true));
 });
 
 describe(PrinterController.name, () => {
@@ -222,14 +222,14 @@ describe(PrinterController.name, () => {
   });
 
   it("should get plugin list", async () => {
-    octoPrintApiService.storeResponse(["test"], 200);
+    octoprintClient.storeResponse(["test"], 200);
     const res = await request.get(pluginListRoute).send();
     expectOkResponse(res, []); // Cache is not loaded
   });
 
   it("should get printer plugin list", async () => {
     const printer = await createTestPrinter(request);
-    octoPrintApiService.storeResponse(["test"], 200);
+    octoprintClient.storeResponse(["test"], 200);
     const res = await request.get(printerPluginListRoute(printer.id)).send();
     expectOkResponse(res, ["test"]);
   });
@@ -237,7 +237,7 @@ describe(PrinterController.name, () => {
   it("should send restart octoprint command", async () => {
     const printer = await createTestPrinter(request);
     const response = {};
-    octoPrintApiService.storeResponse(response, 200);
+    octoprintClient.storeResponse(response, 200);
     const res = await request.post(restartOctoPrintRoute(printer.id)).send();
     expectOkResponse(res);
   });
@@ -245,7 +245,7 @@ describe(PrinterController.name, () => {
   it("should send serial connect command", async () => {
     const printer = await createTestPrinter(request);
     const response = { port: "/dev/ttyACM0" };
-    octoPrintApiService.storeResponse(response, 200);
+    octoprintClient.storeResponse(response, 200);
     const res = await request.post(serialConnectCommandRoute(printer.id)).send();
     expectOkResponse(res);
   });
@@ -253,7 +253,7 @@ describe(PrinterController.name, () => {
   it("should send serial disconnect command", async () => {
     const printer = await createTestPrinter(request);
     const response = { port: "/dev/ttyACM0" };
-    octoPrintApiService.storeResponse(response, 200);
+    octoprintClient.storeResponse(response, 200);
     const res = await request.post(serialDisconnectCommandRoute(printer.id)).send();
     expectOkResponse(res);
   });

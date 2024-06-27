@@ -6,7 +6,7 @@ import { validNewPrinterState } from "../test-data/printer.data";
 import pluginJson from "../test-data/plugins.json";
 import { DITokens } from "@/container.tokens";
 import { PrinterCache } from "@/state/printer.cache";
-import { PrinterService } from "@/services/printer.service";
+import { PrinterService } from "@/services/mongoose/printer.service";
 import { PluginRepositoryCache } from "@/services/octoprint/plugin-repository.cache";
 import { PluginFirmwareUpdateService } from "@/services/octoprint/plugin-firmware-update.service";
 import { LoginDto } from "@/services/interfaces/login.dto";

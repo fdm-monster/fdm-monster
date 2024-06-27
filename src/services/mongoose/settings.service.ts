@@ -24,7 +24,7 @@ import {
   timeoutSettingsUpdateRules,
   whitelistSettingUpdateRules,
   wizardUpdateRules,
-} from "./validators/settings-service.validation";
+} from "../validators/settings-service.validation";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
 import {
   ICredentialSettings,

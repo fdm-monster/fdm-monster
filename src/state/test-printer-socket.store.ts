@@ -5,9 +5,9 @@ import {
   octoPrintEvent,
   OctoPrintMessage,
   SOCKET_STATE,
-  OctoPrintSockIoAdapter,
+  OctoprintWebsocketAdapter,
   WsMessage,
-} from "@/services/octoprint/octoprint-sockio.adapter";
+} from "@/services/octoprint/octoprint-websocket.adapter";
 import { AppConstants } from "@/server.constants";
 import { SocketIoGateway } from "@/state/socket-io.gateway";
 import { SocketFactory } from "@/services/octoprint/socket.factory";
@@ -18,7 +18,7 @@ import { errorSummary } from "@/utils/error.utils";
 import { captureException } from "@sentry/node";
 
 export class TestPrinterSocketStore {
-  testSocket: OctoPrintSockIoAdapter;
+  testSocket: OctoprintWebsocketAdapter;
   socketIoGateway: SocketIoGateway;
   socketFactory: SocketFactory;
   eventEmitter2: EventEmitter2;

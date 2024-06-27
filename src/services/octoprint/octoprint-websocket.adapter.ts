@@ -3,7 +3,7 @@ import { AppConstants } from "@/server.constants";
 import { ExternalServiceError } from "@/exceptions/runtime.exceptions";
 import { httpToWsUrl } from "@/utils/url.utils";
 import { normalizeUrl } from "@/utils/normalize-url";
-import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
+import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import EventEmitter2 from "eventemitter2";
 import { LoggerService } from "@/handlers/logger";
 import { ConfigService } from "@/services/core/config.service";
@@ -61,8 +61,8 @@ export type ApiStateType = keyof typeof API_STATE;
 
 export const octoPrintEvent = (event: string) => `octoprint.${event}`;
 
-export class OctoPrintSockIoAdapter extends WebsocketAdapter {
-  octoPrintApiService: OctoPrintApiService;
+export class OctoprintWebsocketAdapter extends WebsocketAdapter {
+  octoprintClient: OctoprintClient;
   public printerId?: IdType;
   stateUpdated = false;
   stateUpdateTimestamp: null | number = null;
@@ -83,19 +83,19 @@ export class OctoPrintSockIoAdapter extends WebsocketAdapter {
 
   constructor({
     loggerFactory,
-    octoPrintApiService,
+    octoprintClient,
     eventEmitter2,
     configService,
   }: {
     loggerFactory: ILoggerFactory;
-    octoPrintApiService: OctoPrintApiService;
+    octoprintClient: OctoprintClient;
     eventEmitter2: EventEmitter2;
     configService: ConfigService;
   }) {
     super({ loggerFactory });
 
-    this.logger = loggerFactory(OctoPrintSockIoAdapter.name);
-    this.octoPrintApiService = octoPrintApiService;
+    this.logger = loggerFactory(OctoprintWebsocketAdapter.name);
+    this.octoprintClient = octoprintClient;
     this.eventEmitter = eventEmitter2;
     this.configService = configService;
   }
@@ -163,7 +163,7 @@ export class OctoPrintSockIoAdapter extends WebsocketAdapter {
    */
   async setupSocketSession(): Promise<void> {
     this.resetSocketState();
-    this.sessionDto = await this.octoPrintApiService
+    this.sessionDto = await this.octoprintClient
       .login(this.loginDto)
       .then((r) => {
         // Check response for red flags
@@ -201,7 +201,7 @@ export class OctoPrintSockIoAdapter extends WebsocketAdapter {
         throw e;
       });
 
-    this.username = await this.octoPrintApiService.getAdminUserOrDefault(this.loginDto).catch((e: AxiosError) => {
+    this.username = await this.octoprintClient.getAdminUserOrDefault(this.loginDto).catch((e: AxiosError) => {
       const status = e.response?.status;
       if (status === HttpStatusCode.FORBIDDEN) {
         this.setApiState("authFail");
