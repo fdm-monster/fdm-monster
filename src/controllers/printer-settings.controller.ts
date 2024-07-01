@@ -5,26 +5,26 @@ import { AppConstants } from "@/server.constants";
 import { idRulesV2 } from "./validation/generic.validation";
 import { setGcodeAnalysis } from "./validation/printer-settings-controller.validation";
 import { PERMS } from "@/constants/authorization.constants";
-import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
+import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { PrinterCache } from "@/state/printer.cache";
 import { Request, Response } from "express";
 
 export class PrinterSettingsController {
   printerCache: PrinterCache;
-  octoPrintApiService: OctoPrintApiService;
+  octoprintClient: OctoprintClient;
   isTypeormMode: boolean;
 
   constructor({
     printerCache,
-    octoPrintApiService,
+    octoprintClient,
     isTypeormMode,
   }: {
     printerCache: PrinterCache;
-    octoPrintApiService: OctoPrintApiService;
+    octoprintClient: OctoprintClient;
     isTypeormMode: boolean;
   }) {
     this.printerCache = printerCache;
-    this.octoPrintApiService = octoPrintApiService;
+    this.octoprintClient = octoprintClient;
     this.isTypeormMode = isTypeormMode;
   }
 
@@ -32,7 +32,7 @@ export class PrinterSettingsController {
     const { id: printerId } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
 
     const loginDto = await this.printerCache.getLoginDtoAsync(printerId);
-    const settings = await this.octoPrintApiService.getSettings(loginDto);
+    const settings = await this.octoprintClient.getSettings(loginDto);
     res.send(settings);
   }
 
@@ -41,7 +41,7 @@ export class PrinterSettingsController {
     const { enabled } = await validateMiddleware(req, setGcodeAnalysis);
 
     const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
-    const settings = await this.octoPrintApiService.setGCodeAnalysis(printerLogin, enabled);
+    const settings = await this.octoprintClient.setGCodeAnalysis(printerLogin, enabled);
     res.send(settings);
   }
 
@@ -50,7 +50,7 @@ export class PrinterSettingsController {
 
     const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
     const name = await this.printerCache.getNameAsync(printerId);
-    const settings = await this.octoPrintApiService.updatePrinterNameSetting(printerLogin, name);
+    const settings = await this.octoprintClient.updatePrinterNameSetting(printerLogin, name);
     res.send(settings);
   }
 }

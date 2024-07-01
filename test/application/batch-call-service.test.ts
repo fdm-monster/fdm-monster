@@ -1,7 +1,7 @@
 import { DITokens } from "@/container.tokens";
 import { validNewPrinterState } from "./test-data/printer.data";
 import { AxiosMock } from "../mocks/axios.mock";
-import { BatchCallService } from "@/services/batch-call.service";
+import { BatchCallService } from "@/services/core/batch-call.service";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { setupTestApp } from "../test-server";
 import { SqliteIdType } from "@/shared.constants";
