@@ -9285,9 +9285,9 @@ __metadata:
   linkType: hard
 
 "peek-readable@npm:^5.0.0":
-  version: 5.1.0
-  resolution: "peek-readable@npm:5.1.0"
-  checksum: 10c0/24189888e96c0c6d3fd023c4fbf2b45ec94ca6af497b218f2451b97d1e3b3dfef120711a78c8d95d4708fed7cbdf3f0c0c364789584729c4ee24ebb521f567f7
+  version: 5.1.1
+  resolution: "peek-readable@npm:5.1.1"
+  checksum: 10c0/2f51dc8c3529d8252114d11c279f0045c06309322836586173d3b9c0b6da9c3f3d2576ab7cddef3088a95625f3a36762efd60507ad5781d21d4259c498e6334d
   languageName: node
   linkType: hard
 
