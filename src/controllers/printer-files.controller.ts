@@ -32,7 +32,6 @@ export class PrinterFilesController {
   multerService: MulterService;
   printerFileCleanTask: PrinterFileCleanTask;
   logger: LoggerService;
-  isTypeormMode: boolean;
 
   constructor({
     printerFilesStore,
@@ -42,7 +41,6 @@ export class PrinterFilesController {
     settingsStore,
     loggerFactory,
     multerService,
-    isTypeormMode,
   }: {
     printerFilesStore: PrinterFilesStore;
     octoprintClient: OctoprintClient;
@@ -51,7 +49,6 @@ export class PrinterFilesController {
     settingsStore: SettingsStore;
     loggerFactory: ILoggerFactory;
     multerService: MulterService;
-    isTypeormMode: boolean;
   }) {
     this.printerFilesStore = printerFilesStore;
     this.settingsStore = settingsStore;
@@ -59,7 +56,6 @@ export class PrinterFilesController {
     this.octoprintClient = octoprintClient;
     this.batchCallService = batchCallService;
     this.multerService = multerService;
-    this.isTypeormMode = isTypeormMode;
     this.logger = loggerFactory(PrinterFilesController.name);
   }
 
@@ -73,7 +69,7 @@ export class PrinterFilesController {
     const { recursive } = await validateInput(req.query, getFilesRules);
 
     this.logger.log("Refreshing file storage (eager load)");
-    const files = await this.printerFilesStore.loadFiles(currentPrinterId, recursive);
+    const files = await this.printerFilesStore.loadFiles(currentPrinterId, recursive as boolean);
     res.send(files);
   }
 
@@ -83,8 +79,7 @@ export class PrinterFilesController {
   async getFilesCache(req: Request, res: Response) {
     const { currentPrinter } = getScopedPrinter(req);
 
-    const filesCache = await this.printerFilesStore.getFiles(currentPrinter.id);
-    res.send(filesCache);
+    res.send(this.printerFilesStore.getFiles(currentPrinter.id));
   }
 
   async clearPrinterFiles(req: Request, res: Response) {
@@ -195,10 +190,7 @@ export class PrinterFilesController {
       token
     );
 
-    if (response.success !== false && response?.files?.local?.path?.length) {
-      const file = await this.octoprintClient.getFile(printerLogin, response?.files?.local?.path);
-      await this.printerFilesStore.appendOrSetPrinterFile(currentPrinterId, file);
-    }
+    await this.printerFilesStore.loadFiles(currentPrinterId, false);
 
     res.send(response);
   }
