@@ -12,7 +12,7 @@ export function normalizePrinterFile(file: OctoprintRawFileDto): CreateOrUpdateP
   };
 
   const knownKeys = [
-    // "name",
+    "name",
     "date",
     // "display",
     // "gcodeAnalysis",
