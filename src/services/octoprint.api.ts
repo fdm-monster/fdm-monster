@@ -85,6 +85,7 @@ export class OctoprintApi implements IPrinterApi {
   async getFiles() {
     const files = await this.client.getLocalFiles(this.login, false);
     return files.map((f) => ({
+      name: f.name,
       path: f.path,
       size: f.size,
       date: f.date,
