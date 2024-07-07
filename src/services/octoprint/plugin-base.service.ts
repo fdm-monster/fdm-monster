@@ -126,6 +126,6 @@ export class PluginBaseService {
   async #conditionalRestartCommand(printerLogin: LoginDto, restartAfter = false) {
     if (!restartAfter) return;
 
-    await this.octoprintClient.postSystemRestartCommand(printerLogin);
+    await this.octoprintClient.postServerRestartCommand(printerLogin);
   }
 }

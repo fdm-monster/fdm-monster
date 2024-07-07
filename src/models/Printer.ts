@@ -1,9 +1,11 @@
 import { model, Schema } from "mongoose";
+import { OctoprintType } from "@/services/printer-api.interface";
 
 export interface IPrinter {
   id: string;
   apiKey: string;
   printerURL: string;
+  printerType: number;
   enabled: boolean;
   disabledReason: string;
   name: string;
@@ -22,6 +24,11 @@ export const PrinterSchema = new Schema<IPrinter>({
   printerURL: {
     type: String,
     required: true, // !
+  },
+  printerType: {
+    type: Number,
+    required: true,
+    default: OctoprintType,
   },
   enabled: {
     type: Boolean,

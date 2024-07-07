@@ -1,6 +1,6 @@
 import { GcodeAnalysisDto } from "@/services/interfaces/gcode-analysis.dto";
 import { IdDto, IdType } from "@/shared.constants";
-import { OctoPrintCustomDto } from "@/services/octoprint/models/octoprint-file.dto";
+import { OctoPrintCustomDto } from "@/services/octoprint/dto/files/octoprint-file.dto";
 
 export interface LastPrintMoment {
   date: number;

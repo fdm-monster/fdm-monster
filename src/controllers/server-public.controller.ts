@@ -123,6 +123,13 @@ export class ServerPublicController {
         available: true,
         version: 1,
       },
+      multiplePrinterServices: {
+        available: true,
+        version: 1,
+        subFeatures: {
+          types: ["octoprint"],
+        },
+      },
     });
   }
 

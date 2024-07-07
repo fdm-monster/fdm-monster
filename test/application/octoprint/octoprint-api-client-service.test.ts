@@ -4,7 +4,8 @@ import { setupTestApp } from "../../test-server";
 import { AwilixContainer } from "awilix";
 import { OctoPrintApiMock } from "../../mocks/octoprint-api.mock";
 import { OctoprintClient } from "@/services/octoprint/octoprint.client";
-import { OctoPrintCurrentUserDto } from "@/services/octoprint/dto/octoprint-currentuser.dto";
+import { CurrentUserDto } from "@/services/octoprint/dto/auth/current-user.dto";
+import { OctoprintType } from "@/services/printer-api.interface";
 
 let octoprintClient: OctoPrintApiMock;
 let container: AwilixContainer;
@@ -18,7 +19,7 @@ beforeAll(async () => {
 describe(OctoprintClient.name, () => {
   const apiKey = "surewhynotsurewhynotsurewhynotsu";
   const printerURL = "http://someurl/";
-  const auth = { apiKey, printerURL };
+  const auth = { apiKey, printerURL, printerType: OctoprintType };
 
   beforeEach(() => {
     httpClient.saveMockResponse(undefined, 200);
@@ -31,12 +32,13 @@ describe(OctoprintClient.name, () => {
         await octoprintClient.getSettings({
           apiKey: "surewhynot",
           printerURL: "some uwrl",
+          printerType: OctoprintType,
         })
     ).rejects.toHaveProperty("code", "ERR_INVALID_URL");
   });
 
   it("should not throw error on getSettings with correct printerURL", async () => {
-    const settings = await octoprintClient.getSettings(auth);
+    await octoprintClient.getSettings(auth);
   });
 
   it("should get first admin's username when response not recognized", async () => {
@@ -84,7 +86,7 @@ describe(OctoprintClient.name, () => {
           "PLUGIN_SOFTWAREUPDATE_UPDATE",
           "PLUGIN_SOFTWAREUPDATE_CONFIGURE",
         ],
-      } as OctoPrintCurrentUserDto,
+      } as CurrentUserDto,
       200
     );
     const adminResult = await octoprintClient.getAdminUserOrDefault(auth);
@@ -139,7 +141,7 @@ describe(OctoprintClient.name, () => {
   });
 
   it("should not throw error on selectPrintFile", async () => {
-    const result = await octoprintClient.selectPrintFile(auth, "path", true);
+    const result = await octoprintClient.postSelectPrintFile(auth, "path", true);
     expect(result).toBeUndefined();
   });
 

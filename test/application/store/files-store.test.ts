@@ -4,6 +4,7 @@ import { PrinterFilesStore } from "@/state/printer-files.store";
 import { setupTestApp } from "../../test-server";
 import { SqliteIdType } from "@/shared.constants";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
+import { OctoprintType } from "@/services/printer-api.interface";
 
 let printerFilesStore: PrinterFilesStore;
 let printerService: IPrinterService<SqliteIdType>;
@@ -21,6 +22,7 @@ describe(PrinterFilesStore.name, () => {
     apiKey: "asdasasdasdasdasdasdasdasdasdasd",
     printerURL: "https://asd.com:81",
     name: "TestPrinter",
+    printerType: OctoprintType,
   };
 
   it("old files - should deal with empty files cache correctly", async () => {

@@ -1,98 +1,145 @@
-import { createController } from "awilix-express";
-import { authenticate, authorizeRoles, withPermission } from "@/middleware/authenticate";
-import { getScopedPrinter, validateInput, validateMiddleware } from "@/handlers/validators";
+import { before, DELETE, GET, POST, route } from "awilix-express";
+import { authenticate, authorizePermission, authorizeRoles } from "@/middleware/authenticate";
+import { getScopedPrinter, validateInput } from "@/handlers/validators";
 import { AppConstants } from "@/server.constants";
-import {
-  createFolderRules,
-  fileUploadCommandsRules,
-  getFileRules,
-  getFilesRules,
-  moveFileOrFolderRules,
-  selectAndPrintFileRules,
-  uploadFileRules,
-} from "./validation/printer-files-controller.validation";
+import { downloadFileRules, getFileRules, startPrintFileRules } from "./validation/printer-files-controller.validation";
 import { ValidationException } from "@/exceptions/runtime.exceptions";
 import { printerResolveMiddleware } from "@/middleware/printer";
 import { PERMS, ROLES } from "@/constants/authorization.constants";
 import { PrinterFilesStore } from "@/state/printer-files.store";
 import { SettingsStore } from "@/state/settings.store";
-import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { BatchCallService } from "@/services/core/batch-call.service";
 import { MulterService } from "@/services/core/multer.service";
 import { PrinterFileCleanTask } from "@/tasks/printer-file-clean.task";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { Request, Response } from "express";
+import { IPrinterApi } from "@/services/printer-api.interface";
 
+@route(AppConstants.apiRoute + "/printer-files")
+@before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR]), printerResolveMiddleware()])
 export class PrinterFilesController {
+  printerApi: IPrinterApi;
   printerFilesStore: PrinterFilesStore;
   settingsStore: SettingsStore;
-  octoprintClient: OctoprintClient;
   batchCallService: BatchCallService;
   multerService: MulterService;
   printerFileCleanTask: PrinterFileCleanTask;
   logger: LoggerService;
 
   constructor({
+    printerApi,
     printerFilesStore,
-    octoprintClient,
     batchCallService,
     printerFileCleanTask,
     settingsStore,
     loggerFactory,
     multerService,
   }: {
+    printerApi: IPrinterApi;
     printerFilesStore: PrinterFilesStore;
-    octoprintClient: OctoprintClient;
     batchCallService: BatchCallService;
     printerFileCleanTask: PrinterFileCleanTask;
     settingsStore: SettingsStore;
     loggerFactory: ILoggerFactory;
     multerService: MulterService;
   }) {
+    this.printerApi = printerApi;
     this.printerFilesStore = printerFilesStore;
     this.settingsStore = settingsStore;
     this.printerFileCleanTask = printerFileCleanTask;
-    this.octoprintClient = octoprintClient;
     this.batchCallService = batchCallService;
     this.multerService = multerService;
     this.logger = loggerFactory(PrinterFilesController.name);
   }
 
+  @GET()
+  @route("/tracked-uploads")
+  @before(authorizePermission(PERMS.PrinterFiles.Upload))
   getTrackedUploads(req: Request, res: Response) {
     const sessions = this.multerService.getSessions();
     res.send(sessions);
   }
 
+  @POST()
+  @route("/purge")
+  @before(authorizePermission(PERMS.PrinterFiles.Clear))
+  async purgeIndexedFiles(req: Request, res: Response) {
+    await this.printerFilesStore.purgeFiles();
+    res.send();
+  }
+
+  @GET()
+  @route("/:id")
+  @before(authorizePermission(PERMS.PrinterFiles.Get))
   async getFiles(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
-    const { recursive } = await validateInput(req.query, getFilesRules);
-
     this.logger.log("Refreshing file storage (eager load)");
-    const files = await this.printerFilesStore.loadFiles(currentPrinterId, recursive as boolean);
+    const files = await this.printerFilesStore.loadFiles(currentPrinterId);
     res.send(files);
   }
 
+  @POST()
   /**
-   * When the printer host is not reachable or is disabled the cache is still accessible
+   * @obsolete /:id/select, removed in v2
    */
+  @route("/:id/select")
+  @route("/:id/print")
+  @before(authorizePermission(PERMS.PrinterFiles.Actions))
+  async startPrintFile(req: Request, res: Response) {
+    const { filePath } = await validateInput(req.body, startPrintFileRules);
+    await this.printerApi.startPrint(filePath);
+    res.send();
+  }
+
+  @GET()
+  @route("/:id/cache")
+  @before(authorizePermission(PERMS.PrinterFiles.Get))
   async getFilesCache(req: Request, res: Response) {
     const { currentPrinter } = getScopedPrinter(req);
-
     res.send(this.printerFilesStore.getFiles(currentPrinter.id));
   }
 
-  async clearPrinterFiles(req: Request, res: Response) {
-    const { currentPrinterId, printerLogin } = getScopedPrinter(req);
+  @GET()
+  @route("/:id/download/:path")
+  @before(authorizePermission(PERMS.PrinterFiles.Get))
+  async downloadFile(req: Request, res: Response) {
+    this.logger.log(`Downloading file ${req.params.path}`);
+    const { path } = await validateInput(req.params, downloadFileRules);
+    const response = await this.printerApi.downloadFile(path);
+    res.setHeader("Content-Type", response.headers["content-type"]);
+    res.setHeader("Content-Length", response.headers["content-length"]);
+    res.setHeader("Content-Disposition", response.headers["content-disposition"]);
+    if (response.headers["etag"]?.length) {
+      res.setHeader("ETag", response.headers["etag"]);
+    }
+    response.data.pipe(res);
+  }
 
-    const nonRecursiveFiles = await this.octoprintClient.getLocalFiles(printerLogin, false);
+  @DELETE()
+  @route("/:id")
+  @before(authorizePermission(PERMS.PrinterFiles.Delete))
+  async deleteFileOrFolder(req: Request, res: Response) {
+    const { currentPrinterId } = getScopedPrinter(req);
+    const { path } = await validateInput(req.query, getFileRules);
+    const result = await this.printerApi.deleteFile(path);
+    await this.printerFilesStore.deleteFile(currentPrinterId, path);
+    res.send(result);
+  }
+
+  @DELETE()
+  @route("/:id/clear")
+  @before(authorizePermission(PERMS.PrinterFiles.Clear))
+  async clearPrinterFiles(req: Request, res: Response) {
+    const { currentPrinterId } = getScopedPrinter(req);
 
     const failedFiles = [];
     const succeededFiles = [];
 
+    const nonRecursiveFiles = await this.printerApi.getFiles();
     for (let file of nonRecursiveFiles) {
       try {
-        await this.octoprintClient.deleteFileOrFolder(printerLogin, file.path);
+        await this.printerApi.deleteFile(file.path);
         succeededFiles.push(file);
       } catch (e) {
         failedFiles.push(file);
@@ -107,54 +154,14 @@ export class PrinterFilesController {
     });
   }
 
-  async purgeIndexedFiles(req: Request, res: Response) {
-    await this.printerFilesStore.purgeFiles();
-
-    res.send();
-  }
-
-  async moveFileOrFolder(req: Request, res: Response) {
-    const { printerLogin } = getScopedPrinter(req);
-    const { filePath: path, destination } = await validateMiddleware(req, moveFileOrFolderRules);
-
-    const result = await this.octoprintClient.moveFileOrFolder(printerLogin, path, destination);
-
-    // TODO Update file storage
-
-    res.send(result);
-  }
-
-  async createFolder(req: Request, res: Response) {
-    const { printerLogin } = getScopedPrinter(req);
-    const { path, foldername } = await validateMiddleware(req, createFolderRules);
-
-    const result = await this.octoprintClient.createFolder(printerLogin, path, foldername);
-
-    // TODO Update file storage
-
-    res.send(result);
-  }
-
-  async deleteFileOrFolder(req: Request, res: Response) {
-    const { currentPrinterId, printerLogin } = getScopedPrinter(req);
-    const { path } = await validateInput(req.query, getFileRules);
-
-    const result = await this.octoprintClient.deleteFileOrFolder(printerLogin, path);
-    await this.printerFilesStore.deleteFile(currentPrinterId, path, false);
-    res.send(result);
-  }
-
-  async selectAndPrintFile(req: Request, res: Response) {
-    const { printerLogin } = getScopedPrinter(req);
-    const { filePath: path, print } = await validateInput(req.body, selectAndPrintFileRules);
-
-    const result = await this.octoprintClient.selectPrintFile(printerLogin, path, print);
-    res.send(result);
-  }
-
+  @POST()
+  @route("/:id/upload")
+  @before(authorizePermission(PERMS.PrinterFiles.Upload))
   async uploadFile(req: Request, res: Response) {
-    const { printerLogin, currentPrinterId } = getScopedPrinter(req);
-    const {} = await validateInput(req.query, uploadFileRules);
+    const { currentPrinterId } = getScopedPrinter(req);
+
+    // Any query params can be added here
+    // const {} = await validateInput(req.query, uploadFileRules);
 
     const files = await this.multerService.multerLoadFileAsync(req, res, ".gcode", true);
 
@@ -169,44 +176,17 @@ export class PrinterFilesController {
       });
     }
 
-    // Multer has processed the remaining multipart data into the body as json
-    const { print, select } = await validateInput(req.body, fileUploadCommandsRules);
-    const uploadedFile = files[0];
-
     // Perform specific file clean if configured
     const fileCleanEnabled = this.settingsStore.isPreUploadFileCleanEnabled();
     if (fileCleanEnabled) {
       await this.printerFileCleanTask.cleanPrinterFiles(currentPrinterId);
     }
 
+    const uploadedFile = files[0];
     const token = this.multerService.startTrackingSession(uploadedFile);
-    const response = await this.octoprintClient.uploadFileAsMultiPart(
-      printerLogin,
-      uploadedFile,
-      {
-        print,
-        select,
-      },
-      token
-    );
+    await this.printerApi.uploadFile(uploadedFile, token);
+    await this.printerFilesStore.loadFiles(currentPrinterId);
 
-    await this.printerFilesStore.loadFiles(currentPrinterId, false);
-
-    res.send(response);
+    res.send();
   }
 }
-
-// prettier-ignore
-export default createController(PrinterFilesController)
-  .prefix(AppConstants.apiRoute + "/printer-files")
-  .before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR]), printerResolveMiddleware()])
-  .post("/purge", "purgeIndexedFiles", withPermission(PERMS.PrinterFiles.Clear))
-  .get("/tracked-uploads", "getTrackedUploads", withPermission(PERMS.PrinterFiles.Upload))
-  .get("/:id", "getFiles", withPermission(PERMS.PrinterFiles.Get))
-  .get("/:id/cache", "getFilesCache", withPermission(PERMS.PrinterFiles.Get))
-  .post("/:id/upload", "uploadFile", withPermission(PERMS.PrinterFiles.Upload))
-  .post("/:id/create-folder", "createFolder", withPermission(PERMS.PrinterFiles.Actions))
-  .post("/:id/select", "selectAndPrintFile", withPermission(PERMS.PrinterFiles.Actions))
-  .post("/:id/move", "moveFileOrFolder", withPermission(PERMS.PrinterFiles.Actions))
-  .delete("/:id", "deleteFileOrFolder", withPermission(PERMS.PrinterFiles.Delete))
-  .delete("/:id/clear", "clearPrinterFiles", withPermission(PERMS.PrinterFiles.Clear));

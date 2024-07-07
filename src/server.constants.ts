@@ -65,10 +65,11 @@ export const AppConstants = {
   clientPackageName: "@fdm-monster/client",
   clientRepoName: "fdm-monster-client",
   serverRepoName: "fdm-monster",
+  githubUrl: "https://github.com/fdm-monster/fdm-monster",
   orgName: "fdm-monster",
   // Wizard version changes will trigger a re-run of the wizard
   currentWizardVersion: 1,
-  defaultClientMinimum: "1.5.14",
+  defaultClientMinimum: "1.6.0",
 
   influxUrl: "INFLUX_URL",
   influxToken: "INFLUX_TOKEN",

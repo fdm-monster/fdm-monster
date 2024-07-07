@@ -15,8 +15,7 @@ import { GithubService } from "./services/core/github.service";
 import { FileCache } from "./state/file.cache";
 import { PrinterWebsocketTask } from "./tasks/printer-websocket.task";
 import { SocketIoTask } from "./tasks/socketio.task";
-import { OctoprintClient } from "./services/octoprint/octoprint.client";
-import { SocketFactory } from "./services/octoprint/socket.factory";
+import { SocketFactory } from "./services/socket.factory";
 import { PrinterFilesStore } from "./state/printer-files.store";
 import { configureEventEmitter } from "./handlers/event-emitter";
 import { AppConstants } from "./server.constants";
@@ -77,6 +76,10 @@ import { UserRoleService } from "@/services/orm/user-role.service";
 import { PrinterGroupService } from "@/services/orm/printer-group.service";
 import { MoonrakerClient } from "@/services/moonraker/moonraker.client";
 import { MoonrakerWebsocketAdapter } from "@/services/moonraker/moonraker-websocket.adapter";
+import { OctoprintApi } from "@/services/octoprint.api";
+import { OctoprintClient } from "@/services/octoprint/octoprint.client";
+import { MoonrakerApi } from "@/services/moonraker.api";
+import { PrinterApiFactory } from "@/services/printer-api.factory";
 
 export function config<T1, T2>(
   key: string,
@@ -152,7 +155,7 @@ export function configureContainer(isSqlite: boolean = false) {
         throttle: {
           onRateLimit: (retryAfter, options, octokit, retryCount) => {
             const logger = LoggerFactory()("OctoKitThrottle");
-            logger.warn(`Request quota exhaustedd for request ${options.method} ${options.url}`);
+            logger.warn(`Request quota exhausted for request ${options.method} ${options.url}`);
           },
           onSecondaryRateLimit: (retryAfter, options, octokit) => {
             const logger = LoggerFactory()("OctoKitThrottle");
@@ -175,15 +178,19 @@ export function configureContainer(isSqlite: boolean = false) {
     [di.socketIoGateway]: asClass(SocketIoGateway).singleton(),
     [di.multerService]: asClass(MulterService).singleton(),
     [di.yamlService]: asClass(YamlService),
+    [di.printerLogin]: asValue(null), // Fallback when no scope is provided
+    [di.printerApiFactory]: asClass(PrinterApiFactory).transient(), // Factory function, transient on purpose!
+    [di.octoprintApi]: asClass(OctoprintApi).transient(), // Transient on purpose
     [di.octoprintClient]: asClass(OctoprintClient).singleton(),
+    [di.octoPrintSockIoAdapter]: asClass(OctoprintWebsocketAdapter).transient(), // Transient on purpose
+    [di.moonrakerApi]: asClass(MoonrakerApi).transient(), // Transient on purpose
     [di.moonrakerClient]: asClass(MoonrakerClient).singleton(),
+    [di.moonrakerWebsocketAdapter]: asClass(MoonrakerWebsocketAdapter).transient(), // Transient on purpose
     [di.batchCallService]: asClass(BatchCallService).singleton(),
     [di.pluginFirmwareUpdateService]: asClass(PluginFirmwareUpdateService).singleton(),
-    [di.octoPrintSockIoAdapter]: asClass(OctoprintWebsocketAdapter).transient(), // Transient on purpose
-    [di.moonrakerWebsocketAdapter]: asClass(MoonrakerWebsocketAdapter).transient(), // Transient on purpose
+
     [di.floorStore]: asClass(FloorStore).singleton(),
     [di.pluginRepositoryCache]: asClass(PluginRepositoryCache).singleton(),
-
     [di.fileCache]: asClass(FileCache).singleton(),
     [di.fileUploadTrackerCache]: asClass(FileUploadTrackerCache).singleton(),
     [di.printerFilesStore]: asClass(PrinterFilesStore).singleton(),

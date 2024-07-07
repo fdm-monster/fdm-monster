@@ -1,13 +1,13 @@
 import { PrinterMockData } from "./test-data/printer.data";
 import { Floor } from "@/entities/floor.entity";
 import { DITokens } from "@/container.tokens";
-import { FloorService } from "@/services/mongoose/floor.service";
 import { IFloorService } from "@/services/interfaces/floor.service.interface";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { IdType } from "@/shared.constants";
 import { Printer } from "@/entities";
 import { setupTestApp } from "../test-server";
 import { isSqliteModeTest } from "../typeorm.manager";
+import { FloorService } from "@/services/orm/floor.service";
 
 let printerService: IPrinterService<IdType, Printer>;
 let floorService: IFloorService<IdType, Floor>;

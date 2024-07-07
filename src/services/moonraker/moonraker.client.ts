@@ -1,14 +1,14 @@
 import axios, { AxiosResponse, AxiosStatic } from "axios";
 import { ServerInfoDto } from "@/services/moonraker/dto/server/server-info.dto";
 import { LoginDto } from "@/services/interfaces/login.dto";
-import { ResultDto } from "./dto/result.dto";
+import { ResultDto } from "./dto/rest/result.dto";
 import { ServerConfigDto } from "@/services/moonraker/dto/server/server-config.dto";
 import { TemperatureStoreDto } from "@/services/moonraker/dto/temperature-store.dto";
 import { GcodeStoreDto } from "@/services/moonraker/dto/gcode-store.dto";
-import { ActionResultDto } from "@/services/moonraker/dto/action-result.dto";
+import { ActionResultDto } from "@/services/moonraker/dto/rest/action-result.dto";
 import { PrinterInfoDto } from "@/services/moonraker/dto/printer-info.dto";
-import { PrinterAvailableObjects } from "@/services/moonraker/dto/objects/printer-objects-list.dto";
-import { PrinterObjectsQueryDto } from "@/services/moonraker/dto/objects/printer-objects-query.dto";
+import { KnownPrinterObject, PrinterAvailableObjects } from "@/services/moonraker/dto/objects/printer-objects-list.dto";
+import { PrinterObjectDto } from "@/services/moonraker/dto/objects/printer-object.dto";
 import { PrinterQueryEndstopsDto } from "@/services/moonraker/dto/printer-query-endstops.dto";
 import { GcodeHelpDto } from "@/services/moonraker/dto/gcode-help.dto";
 import { MachineSystemInfoDto } from "@/services/moonraker/dto/machine/machine-system-info.dto";
@@ -74,6 +74,7 @@ import { HistoryListDto } from "@/services/moonraker/dto/server-history/history-
 import { HistoryTotalsDto } from "@/services/moonraker/dto/server-history/history-totals.dto";
 import { HistoryLastTotalsDto } from "@/services/moonraker/dto/server-history/history-last-totals.dto";
 import { HistoryJobDto } from "@/services/moonraker/dto/server-history/history-job.dto";
+import { PrinterObjectsQueryDto } from "@/services/moonraker/dto/objects/printer-objects-query.dto";
 
 export class MoonrakerClient {
   private httpClient: AxiosStatic;
@@ -142,15 +143,27 @@ export class MoonrakerClient {
     return this.httpClient.get<ResultDto<PrinterAvailableObjects>>(`${login.printerURL}/printer/objects/list`);
   }
 
-  async getPrinterObjectsQuery(
+  async getPrinterObjectsQuery<R = PrinterObjectsQueryDto>(
     login: LoginDto,
-    query: Record<string, string[]> = {
-      gcode_move: [],
-      toolhead: [],
-      extruder: [], // ["target", "temperature"],
-    }
+    query: Partial<Record<KnownPrinterObject, string[]>>
   ) {
-    const queryString = Object.entries(query)
+    const queryString = this.convertToQueryString(query);
+    return this.httpClient.get<ResultDto<R>>(`${login.printerURL}/printer/objects/query?${queryString}`);
+  }
+
+  postSubscribePrinterObjects<R = PrinterObjectsQueryDto>(
+    login: LoginDto,
+    connectionId: number,
+    query: Partial<Record<KnownPrinterObject, string[]>>
+  ) {
+    const queryString = this.convertToQueryString(query);
+    return this.httpClient.post<ResultDto<R>>(
+      `${login.printerURL}/printer/objects/subscribe?connection_id=${connectionId}&${queryString}`
+    );
+  }
+
+  private convertToQueryString(query: Partial<Record<KnownPrinterObject, string[]>>): string {
+    return Object.entries(query)
       .reduce((acc, [key, value]) => {
         if (value.length > 0) {
           acc.push(`${key}=${value.join(",")}`);
@@ -160,7 +173,6 @@ export class MoonrakerClient {
         return acc;
       }, [])
       .join("&");
-    return this.httpClient.get<ResultDto<PrinterObjectsQueryDto>>(`${login.printerURL}/printer/objects/query?${queryString}`);
   }
 
   async getPrinterQueryEndstops(login: LoginDto) {
@@ -318,7 +330,7 @@ export class MoonrakerClient {
   }
 
   async getServerFilesDownload(login: LoginDto, root: string, filename: string) {
-    return await this.httpClient.get(`${login.printerURL}/server/files/${root}/${filename}`, {
+    return await this.httpClient.get<NodeJS.ReadableStream>(`${login.printerURL}/server/files/${root}/${filename}`, {
       responseType: "stream",
     });
   }
@@ -326,10 +338,10 @@ export class MoonrakerClient {
   async postServerFileUpload(
     login: LoginDto,
     multerFileOrBuffer: Buffer | Express.Multer.File,
+    progressToken?: string,
     root?: string,
     path?: string,
-    checksum?: string,
-    progressToken?: string
+    checksum?: string
   ) {
     const formData = new FormData();
     if (root?.length) {
@@ -362,7 +374,7 @@ export class MoonrakerClient {
       "Content-Length": result,
     };
 
-    return await axios({
+    return await axios.request({
       method: "POST",
       url: `${login.printerURL}/server/files/upload`,
       data: formData,
@@ -376,7 +388,8 @@ export class MoonrakerClient {
   }
 
   async deleteServerFile(login: LoginDto, root: string, path: string) {
-    return this.httpClient.delete<ResultDto<ServerFileDirectoryActionDto>>(`${login.printerURL}/server/files/${root}}/${path}`);
+    const url = `${login.printerURL}/server/files/${root}/${path}`;
+    return this.httpClient.delete<ResultDto<ServerFileDirectoryActionDto>>(url);
   }
 
   async getServerFileKlippyLogDownload(login: LoginDto) {

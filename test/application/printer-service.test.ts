@@ -2,7 +2,7 @@ import { configureContainer } from "@/container";
 import { DITokens } from "@/container.tokens";
 import { testPrinterData } from "./test-data/printer.data";
 import { AwilixContainer } from "awilix";
-import { PrinterService } from "@/services/mongoose/printer.service";
+import { PrinterService } from "@/services/orm/printer.service";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { Printer } from "@/entities";
 import { Printer as PrinterMongo } from "@/models";

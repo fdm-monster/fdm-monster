@@ -1,4 +1,4 @@
-import { JobDto } from "@/services/moonraker/dto/server-history/history-list.dto";
+import { JobDto } from "@/services/moonraker/dto/server-history/job.dto";
 
 export interface NotifyHistoryChangedParams {
   action: "added" | "finished";

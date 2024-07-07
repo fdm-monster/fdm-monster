@@ -2,11 +2,10 @@ import { ValidationException } from "@/exceptions/runtime.exceptions";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IdType } from "@/shared.constants";
-import { PrinterFileDto } from "@/services/interfaces/printer-file.dto";
-import { IPrinterFile } from "@/models/PrinterFile";
+import { FileDto } from "@/services/printer-api.interface";
 
 export class FileCache {
-  private printerFileStorage: Record<IdType, (IPrinterFile | PrinterFileDto)[]> = {};
+  private printerFileStorage: Record<IdType, FileDto[]> = {};
   private totalFileCount = 0;
 
   private logger: LoggerService;
@@ -15,7 +14,7 @@ export class FileCache {
     this.logger = loggerFactory(FileCache.name);
   }
 
-  cachePrinterFiles(printerId: IdType, files: (IPrinterFile | PrinterFileDto)[]) {
+  cachePrinterFiles(printerId: IdType, files: FileDto[]) {
     if (!printerId) {
       throw new Error("File Cache cant get a null/undefined printer id");
     }

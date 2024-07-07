@@ -1,10 +1,12 @@
 import { Request } from "express";
 import { InternalServerException, ValidationException } from "@/exceptions/runtime.exceptions";
-import { currentPrinterToken, printerIdToken, printerLoginToken } from "@/middleware/printer";
+import { currentPrinterToken, printerApiToken, printerIdToken, printerLoginToken } from "@/middleware/printer";
 import { normalizeUrl } from "@/utils/normalize-url";
 import nodeInputValidator, { extend, extendMessages } from "node-input-validator";
 import { IdType } from "@/shared.constants";
 import { LoginDto } from "@/services/interfaces/login.dto";
+import { CachedPrinter } from "@/state/printer.cache";
+import { IPrinterApi } from "@/services/printer-api.interface";
 
 export function getExtendedValidator() {
   extend("wsurl", ({ value, args }, validator) => {
@@ -38,8 +40,13 @@ export function getExtendedValidator() {
 }
 
 export function getScopedPrinter(req: Request) {
-  const tokens = [printerLoginToken, currentPrinterToken, printerIdToken];
-  let resolvedDependencies: { [printerLoginToken]: LoginDto; [currentPrinterToken]: any; [printerIdToken]: IdType } = {};
+  const tokens = [printerApiToken, printerLoginToken, currentPrinterToken, printerIdToken];
+  let resolvedDependencies: {
+    [printerApiToken]: IPrinterApi;
+    [printerLoginToken]: LoginDto;
+    [currentPrinterToken]: CachedPrinter;
+    [printerIdToken]: IdType;
+  } = {};
   let errors: any[] = [];
   tokens.forEach((t) => {
     try {

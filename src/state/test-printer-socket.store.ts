@@ -1,24 +1,20 @@
 import { setInterval, setTimeout } from "timers/promises";
 import { validateInput } from "@/handlers/validators";
 import { createTestPrinterRules } from "./validation/create-test-printer.validation";
-import {
-  octoPrintEvent,
-  OctoPrintMessage,
-  SOCKET_STATE,
-  OctoprintWebsocketAdapter,
-  WsMessage,
-} from "@/services/octoprint/octoprint-websocket.adapter";
+import { octoPrintEvent, OctoprintWebsocketAdapter, WsMessage } from "@/services/octoprint/octoprint-websocket.adapter";
 import { AppConstants } from "@/server.constants";
 import { SocketIoGateway } from "@/state/socket-io.gateway";
-import { SocketFactory } from "@/services/octoprint/socket.factory";
+import { SocketFactory } from "@/services/socket.factory";
 import EventEmitter2 from "eventemitter2";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { errorSummary } from "@/utils/error.utils";
 import { captureException } from "@sentry/node";
+import { MoonrakerWebsocketAdapter } from "@/services/moonraker/moonraker-websocket.adapter";
+import { SOCKET_STATE } from "@/shared/dtos/socket-state.type";
 
 export class TestPrinterSocketStore {
-  testSocket: OctoprintWebsocketAdapter;
+  testSocket: OctoprintWebsocketAdapter | MoonrakerWebsocketAdapter;
   socketIoGateway: SocketIoGateway;
   socketFactory: SocketFactory;
   eventEmitter2: EventEmitter2;
@@ -51,7 +47,7 @@ export class TestPrinterSocketStore {
 
     // Create a new socket if it doesn't exist
     const { correlationToken } = printer;
-    this.testSocket = this.socketFactory.createInstance();
+    this.testSocket = this.socketFactory.createInstance(printer.printerType);
 
     // Reset the socket credentials before (re-)connecting
     this.testSocket.registerCredentials({

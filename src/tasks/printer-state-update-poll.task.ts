@@ -5,10 +5,11 @@ import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { PrinterCache } from "@/state/printer.cache";
 import { PrinterEventsCache } from "@/state/printer-events.cache";
-import { writeFileSync } from "node:fs";
 import { ConfigService } from "@/services/core/config.service";
 import { AppConstants } from "@/server.constants";
-import { AxiosError } from "axios";
+import { LoginDto } from "@/services/interfaces/login.dto";
+import { MoonrakerClient } from "@/services/moonraker/moonraker.client";
+import { MoonrakerType } from "@/services/printer-api.interface";
 
 export class PrinterStateUpdatePollTask {
   printerCache: PrinterCache;
@@ -16,6 +17,7 @@ export class PrinterStateUpdatePollTask {
   settingsStore: SettingsStore;
   configService: ConfigService;
   octoprintClient: OctoprintClient;
+  moonrakerClient: MoonrakerClient;
   taskManagerService: TaskManagerService;
   logger: LoggerService;
 
@@ -23,6 +25,7 @@ export class PrinterStateUpdatePollTask {
     printerCache,
     printerEventsCache,
     octoprintClient,
+    moonrakerClient,
     settingsStore,
     configService,
     taskManagerService,
@@ -31,6 +34,7 @@ export class PrinterStateUpdatePollTask {
     printerCache: PrinterCache;
     printerEventsCache: PrinterEventsCache;
     octoprintClient: OctoprintClient;
+    moonrakerClient: MoonrakerClient;
     settingsStore: SettingsStore;
     configService: ConfigService;
     taskManagerService: TaskManagerService;
@@ -41,6 +45,7 @@ export class PrinterStateUpdatePollTask {
     this.settingsStore = settingsStore;
     this.configService = configService;
     this.octoprintClient = octoprintClient;
+    this.moonrakerClient = moonrakerClient;
     this.taskManagerService = taskManagerService;
     this.logger = loggerFactory(PrinterStateUpdatePollTask.name);
   }
@@ -60,55 +65,73 @@ export class PrinterStateUpdatePollTask {
     let paused = 0;
     for (const printer of printers) {
       const login = this.printerCache.getLoginDto(printer.id);
-      try {
-        const promise = await this.octoprintClient.getConnection(login).then(async (connection) => {
-          if (this._isDebugMode()) {
-            writeFileSync(`printer_connection_${printer.id}.txt`, JSON.stringify(connection, null, 2));
-          }
+      if (login.printerType === MoonrakerType) {
+        const promise = this.verifyMoonrakerState(login)
+          .then((r) => {
+            operational += r.state === "ready" ? 1 : 0;
+          })
+          .catch((e) => {
+            failures++;
+          });
 
-          const current = await this.octoprintClient
-            .getPrinterCurrent(login, false, null, ["sd", "temperature"])
-            .catch(async (e: Error) => {
-              if ((e as AxiosError).isAxiosError) {
-                const castError = e as AxiosError;
-                if (castError?.response?.status == 409) {
-                  // Printer is not connected, reset the current state
-                  await this.printerEventsCache.setSubstate(printer.id, "current", "state", {});
-                  disconnected += 1;
-
-                  return null;
-                }
-              }
-
-              throw e;
-            });
-
-          if (!current) return;
-          if (this._isDebugMode()) {
-            writeFileSync(`printer_current_${printer.id}.txt`, JSON.stringify(current, null, 2));
-          }
-          const currentState = current.state;
-          operational += currentState?.flags.operational ? 1 : 0;
-          disconnected += currentState?.flags.closedOrError ? 1 : 0;
-          printing += currentState?.flags.printing ? 1 : 0;
-          paused += currentState?.flags.paused ? 1 : 0;
-          await this.printerEventsCache.setSubstate(printer.id, "current", "state", current);
-        });
         promisesStateUpdate.push(promise);
-      } catch (e: any) {
-        failures++;
+      } else {
+        // const promise = this.octoprintClient
+        //   .getConnection(login)
+        //   .then(async (connection) => {
+        //     const current = await this.octoprintClient
+        //       .getPrinterCurrent(login, false, null, ["sd", "temperature"])
+        //       .catch(async (e: Error) => {
+        //         if ((e as AxiosError).isAxiosError) {
+        //           const castError = e as AxiosError;
+        //           if (castError?.response?.status == 409) {
+        //             // Printer is not Operational, reset the current state
+        //             await this.printerEventsCache.setSubstate(printer.id, "current", "state", {
+        //               operational: false,
+        //             });
+        //             disconnected += 1;
+        //
+        //             return null;
+        //           }
+        //         }
+        //
+        //         throw e;
+        //       });
+        //
+        //     if (!current.data) return;
+        //     if (this._isDebugMode()) {
+        //       writeFileSync(`printer_current_${printer.id}.txt`, PP(current.data, null, 2));
+        //     }
+        //     const currentState = current.data.state;
+        //     operational += currentState?.flags.operational ? 1 : 0;
+        //     disconnected += currentState?.flags.closedOrError ? 1 : 0;
+        //     printing += currentState?.flags.printing ? 1 : 0;
+        //     paused += currentState?.flags.paused ? 1 : 0;
+        //     console.log(`Setting substate ${current.data.state}`);
+        //     await this.printerEventsCache.setSubstate(printer.id, "current", "state", current.data.state);
+        //   })
+        //   .catch((e) => {
+        //     failures++;
+        //   });
+        // promisesStateUpdate.push(promise);
       }
     }
 
-    await Promise.all(promisesStateUpdate);
+    // await Promise.all(promisesStateUpdate);
 
-    this.logger.log(
-      `Printer state updates (total: ${
-        printers.length
-      }, failed: ${failures}, disabled: ${disabledPrintersCount}, operational: ${operational}, disconnected: ${disconnected}, offlineAfterError: ${offlineAfterError}, printing: ${printing}, paused: ${paused}) completed (${
-        Date.now() - startTime
-      }ms)`
-    );
+    // this.logger.log(
+    //   `Printer state updates (total: ${
+    //     printers.length
+    //   }, failed: ${failures}, disabled: ${disabledPrintersCount}, operational: ${operational}, disconnected: ${disconnected}, offlineAfterError: ${offlineAfterError}, printing: ${printing}, paused: ${paused}) completed (${
+    //     Date.now() - startTime
+    //   }ms)`
+    // );
+  }
+
+  private async verifyMoonrakerState(login: LoginDto) {
+    return await this.moonrakerClient.getPrinterInfo(login).then((r) => {
+      return r.data.result;
+    });
   }
 
   private _isDebugMode() {

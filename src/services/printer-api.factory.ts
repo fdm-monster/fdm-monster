@@ -1,0 +1,34 @@
+import { IPrinterApi, MoonrakerType, OctoprintType } from "@/services/printer-api.interface";
+import { DITokens } from "@/container.tokens";
+import { LoginDto } from "@/services/interfaces/login.dto";
+import { PrinterCache } from "@/state/printer.cache";
+import { IdType } from "@/shared.constants";
+
+export class PrinterApiFactory {
+  cradle: any;
+
+  constructor(cradle: {}) {
+    this.cradle = cradle;
+  }
+
+  getById(id: IdType): IPrinterApi {
+    const login = (this.cradle[DITokens.printerCache] as PrinterCache).getLoginDto(id);
+    return this.getScopedPrinter(login);
+  }
+
+  getScopedPrinter(login: LoginDto): IPrinterApi {
+    let printerApi;
+    if (login.printerType === OctoprintType) {
+      printerApi = this.cradle[DITokens.octoprintApi] as IPrinterApi;
+    }
+    // else if (login.printerType === MoonrakerType) {
+    //   printerApi = this.cradle[DITokens.moonrakerApi] as IPrinterApi;
+    // }
+    else {
+      throw new Error("PrinterType is unsupported, cant pick the right api client");
+    }
+
+    printerApi.login = login;
+    return printerApi;
+  }
+}
