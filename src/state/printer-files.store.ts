@@ -41,7 +41,7 @@ export class PrinterFilesStore {
         this.fileCache.cachePrinterFiles(printer.id, printerFiles);
       } catch (e) {
         captureException(e);
-        this.logger.error("Files store failed to reconstruct files from database.");
+        this.logger.error("Files store failed to reconstruct files for printer");
       }
     }
   }
