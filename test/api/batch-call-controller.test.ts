@@ -20,15 +20,15 @@ const getBatchReprintRoute = `${defaultRoute}/reprint/list`;
 let container: AwilixContainer;
 let request: supertest.SuperTest<supertest.Test>;
 let printerService: IPrinterService<SqliteIdType>;
-let octoPrintApiService: OctoPrintApiMock;
+let octoprintClient: OctoPrintApiMock;
 
 beforeAll(async () => {
-  ({ request, octoPrintApiService, container } = await setupTestApp(true));
+  ({ request, octoprintClient, container } = await setupTestApp(true));
   printerService = container.resolve(DITokens.printerService);
 });
 
 beforeEach(async () => {
-  octoPrintApiService.storeResponse(undefined, undefined);
+  octoprintClient.storeResponse(undefined, undefined);
 });
 
 afterEach(async () => {

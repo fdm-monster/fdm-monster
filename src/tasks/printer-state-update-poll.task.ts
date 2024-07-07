@@ -1,5 +1,5 @@
 import { SettingsStore } from "@/state/settings.store";
-import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
+import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { TaskManagerService } from "@/services/core/task-manager.service";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
@@ -8,44 +8,39 @@ import { PrinterEventsCache } from "@/state/printer-events.cache";
 import { writeFileSync } from "node:fs";
 import { ConfigService } from "@/services/core/config.service";
 import { AppConstants } from "@/server.constants";
-import { PrinterConnectionCache } from "@/state/printer-connection.cache";
 import { AxiosError } from "axios";
 
 export class PrinterStateUpdatePollTask {
   printerCache: PrinterCache;
-  printerConnectionCache: PrinterConnectionCache;
   printerEventsCache: PrinterEventsCache;
   settingsStore: SettingsStore;
   configService: ConfigService;
-  octoPrintApiService: OctoPrintApiService;
+  octoprintClient: OctoprintClient;
   taskManagerService: TaskManagerService;
   logger: LoggerService;
 
   constructor({
     printerCache,
-    printerConnectionCache,
     printerEventsCache,
-    octoPrintApiService,
+    octoprintClient,
     settingsStore,
     configService,
     taskManagerService,
     loggerFactory,
   }: {
     printerCache: PrinterCache;
-    printerConnectionCache: PrinterConnectionCache;
     printerEventsCache: PrinterEventsCache;
-    octoPrintApiService: OctoPrintApiService;
+    octoprintClient: OctoprintClient;
     settingsStore: SettingsStore;
     configService: ConfigService;
     taskManagerService: TaskManagerService;
     loggerFactory: ILoggerFactory;
   }) {
     this.printerCache = printerCache;
-    this.printerConnectionCache = printerConnectionCache;
     this.printerEventsCache = printerEventsCache;
     this.settingsStore = settingsStore;
     this.configService = configService;
-    this.octoPrintApiService = octoPrintApiService;
+    this.octoprintClient = octoprintClient;
     this.taskManagerService = taskManagerService;
     this.logger = loggerFactory(PrinterStateUpdatePollTask.name);
   }
@@ -66,13 +61,12 @@ export class PrinterStateUpdatePollTask {
     for (const printer of printers) {
       const login = this.printerCache.getLoginDto(printer.id);
       try {
-        const promise = await this.octoPrintApiService.getConnection(login).then(async (connection) => {
-          await this.printerConnectionCache.setPrinterConnection(printer.id, connection);
+        const promise = await this.octoprintClient.getConnection(login).then(async (connection) => {
           if (this._isDebugMode()) {
             writeFileSync(`printer_connection_${printer.id}.txt`, JSON.stringify(connection, null, 2));
           }
 
-          const current = await this.octoPrintApiService
+          const current = await this.octoprintClient
             .getPrinterCurrent(login, false, null, ["sd", "temperature"])
             .catch(async (e: Error) => {
               if ((e as AxiosError).isAxiosError) {

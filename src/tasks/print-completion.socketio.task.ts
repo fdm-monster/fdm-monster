@@ -4,19 +4,19 @@ import { generateCorrelationToken } from "@/utils/correlation-token.util";
 import { SocketIoGateway } from "@/state/socket-io.gateway";
 import EventEmitter2 from "eventemitter2";
 import { LoggerService } from "@/handlers/logger";
-import { PrintCompletionService } from "@/services/print-completion.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { CreatePrintCompletionDto, PrintCompletionContext } from "@/services/interfaces/print-completion.dto";
 import { IdType } from "@/shared.constants";
 import { OctoPrintEventDto } from "@/services/octoprint/dto/octoprint-event.dto";
 import { PrinterEventsCache } from "@/state/printer-events.cache";
+import { IPrintCompletionService } from "@/services/interfaces/print-completion.interface";
 
 export class PrintCompletionSocketIoTask {
   eventEmitter2: EventEmitter2;
   socketIoGateway: SocketIoGateway;
   logger: LoggerService;
   printerEventsCache: PrinterEventsCache;
-  printCompletionService: PrintCompletionService;
+  printCompletionService: IPrintCompletionService;
 
   contextCache: Record<IdType, PrintCompletionContext> = {};
 
@@ -29,7 +29,7 @@ export class PrintCompletionSocketIoTask {
   }: {
     eventEmitter2: EventEmitter2;
     socketIoGateway: SocketIoGateway;
-    printCompletionService: PrintCompletionService;
+    printCompletionService: IPrintCompletionService;
     printerEventsCache: PrinterEventsCache;
     loggerFactory: ILoggerFactory;
   }) {

@@ -37,7 +37,7 @@
     "test:cov-sqlite": "cross-env MONGODB_MODE=false jest --forceExit --coverage  --maxConcurrency=8 --runInBand ",
     "cov:show": "./coverage/lcov-report/index.html",
     "torm": "ts-node --swc -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
-    "typeorm:generate": "yarn torm migration:generate -d src/data-source.ts --pretty src/migrations/CustomGCode",
+    "typeorm:generate": "yarn torm migration:generate -d src/data-source.ts --pretty src/migrations/RemovePrinterFile",
     "typeorm:migrate": "yarn torm migration:run -d src/data-source.ts",
     "typeorm:revert": "yarn torm migration:revert -d src/data-source.ts"
   },

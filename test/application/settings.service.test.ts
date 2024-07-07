@@ -1,7 +1,7 @@
 import { AwilixContainer } from "awilix";
 import { DITokens } from "@/container.tokens";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
-import { SettingsService } from "@/services/settings.service";
+import { SettingsService } from "@/services/mongoose/settings.service";
 import { setupTestApp } from "../test-server";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 

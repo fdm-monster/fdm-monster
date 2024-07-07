@@ -36,20 +36,20 @@ export class CreateOrUpdatePrinterFileDto<KeyType = IdType> extends IdDto<KeyTyp
 
   name: string;
   date: number;
-  display: string;
-  gcodeAnalysis?: GcodeAnalysisDto;
+  // display: string;
+  // gcodeAnalysis?: GcodeAnalysisDto;
 
-  hash: string;
-  origin: string;
+  // hash: string;
+  // origin: string;
   path: string;
-  prints: Prints;
-  refs: Refs;
+  // prints: Prints;
+  // refs: Refs;
   size: number;
-  statistics: OctoPrintStatisticsDto;
-  type: string;
-  typePath: string[]; // machinecode gcode
-
-  customData?: OctoPrintCustomDto;
+  // statistics: OctoPrintStatisticsDto;
+  // type: string;
+  // typePath: string[]; // machinecode gcode
+  //
+  // customData?: OctoPrintCustomDto;
 }
 
 export class PrinterFileDto<KeyType = IdType> extends IdDto<KeyType> {
@@ -57,18 +57,18 @@ export class PrinterFileDto<KeyType = IdType> extends IdDto<KeyType> {
 
   name: string;
   date: number;
-  display: string;
-  gcodeAnalysis?: GcodeAnalysisDto;
+  // display: string;
+  // gcodeAnalysis?: GcodeAnalysisDto;
 
-  hash: string;
-  origin: string;
+  // hash: string;
+  // origin: string;
   path: string;
-  prints: Prints;
-  refs: Refs;
+  // prints: Prints;
+  // refs: Refs;
   size: number;
-  statistics: OctoPrintStatisticsDto;
-  type: string;
-  typePath: string[]; // machinecode gcode
-
-  customData?: OctoPrintCustomDto;
+  // statistics: OctoPrintStatisticsDto;
+  // type: string;
+  // typePath: string[]; // machinecode gcode
+  //
+  // customData?: OctoPrintCustomDto;
 }

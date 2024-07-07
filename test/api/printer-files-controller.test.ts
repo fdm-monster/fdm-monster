@@ -25,12 +25,12 @@ const getFilesRoute = (id: idType, recursive: boolean) => `${getRoute(id)}?recur
 const getCacheRoute = (id: idType) => `${getRoute(id)}/cache`;
 
 let request: supertest.SuperTest<supertest.Test>;
-let octoPrintApiService: OctoPrintApiMock;
+let octoprintClient: OctoPrintApiMock;
 let container: AwilixContainer;
 let printerService: IPrinterService;
 
 beforeAll(async () => {
-  ({ request, octoPrintApiService, container } = await setupTestApp(true));
+  ({ request, octoprintClient, container } = await setupTestApp(true));
   printerService = container.resolve<IPrinterService>(DITokens.printerService);
 });
 
@@ -39,7 +39,7 @@ beforeEach(async () => {
   for (let printer of printers) {
     await printerService.delete(printer.id);
   }
-  octoPrintApiService.storeResponse(undefined, undefined);
+  octoprintClient.storeResponse(undefined, undefined);
 });
 
 describe(PrinterFilesController.name, () => {
@@ -59,7 +59,7 @@ describe(PrinterFilesController.name, () => {
 
   it("should retrieve files on GET for existing printer", async () => {
     const printer = await createTestPrinter(request);
-    octoPrintApiService.storeResponse({ files: [], free: 1, total: 1 }, 200);
+    octoprintClient.storeResponse({ files: [], free: 1, total: 1 }, 200);
     const response = await request.get(getFilesRoute(printer.id, false)).send();
     expectOkResponse(response, []);
   });
@@ -83,7 +83,7 @@ describe(PrinterFilesController.name, () => {
   it("should allow DELETE to clear printer files - with status result", async () => {
     const printer = await createTestPrinter(request);
     const jsonFile = require("./test-data/octoprint-file.data.json");
-    octoPrintApiService.storeResponse({ files: [jsonFile] }, 200);
+    octoprintClient.storeResponse({ files: [jsonFile] }, 200);
     const response = await request.delete(clearFilesRoute(printer.id)).send();
     expectOkResponse(response, {
       succeededFiles: expect.any(Array),
@@ -145,7 +145,7 @@ describe(PrinterFilesController.name, () => {
         },
       },
     });
-    octoPrintApiService.storeResponse(
+    octoprintClient.storeResponse(
       {
         DisplayLayerProgress: {
           totalLayerCountWithoutOffset: "19",

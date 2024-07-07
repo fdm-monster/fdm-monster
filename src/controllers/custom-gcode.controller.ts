@@ -5,26 +5,26 @@ import { ROLES } from "@/constants/authorization.constants";
 import { getScopedPrinter, validateInput } from "@/handlers/validators";
 import { idRulesV2 } from "./validation/generic.validation";
 import { printerResolveMiddleware } from "@/middleware/printer";
-import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
+import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { Request, Response } from "express";
 import { ICustomGcodeService } from "@/services/interfaces/custom-gcode.service.interface";
 
 export class CustomGcodeController {
-  private octoPrintApiService: OctoPrintApiService;
+  private octoprintClient: OctoprintClient;
   private customGCodeService: ICustomGcodeService;
   isTypeormMode: boolean;
 
   constructor({
     customGCodeService,
-    octoPrintApiService,
+    octoprintClient,
     isTypeormMode,
   }: {
     customGCodeService: ICustomGcodeService;
-    octoPrintApiService: OctoPrintApiService;
+    octoprintClient: OctoprintClient;
     isTypeormMode: boolean;
   }) {
     this.customGCodeService = customGCodeService;
-    this.octoPrintApiService = octoPrintApiService;
+    this.octoprintClient = octoprintClient;
     this.isTypeormMode = isTypeormMode;
   }
 
@@ -44,7 +44,7 @@ export class CustomGcodeController {
    */
   async sendEmergencyM112(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
-    const response = await this.octoPrintApiService.sendCustomGCodeCommand(printerLogin, "M112");
+    const response = await this.octoprintClient.sendCustomGCodeCommand(printerLogin, "M112");
     res.send(response);
   }
 

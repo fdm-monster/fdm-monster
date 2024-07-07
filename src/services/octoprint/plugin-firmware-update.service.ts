@@ -2,7 +2,7 @@ import { PluginBaseService } from "./plugin-base.service";
 import { ValidationException } from "@/exceptions/runtime.exceptions";
 import { defaultFirmwareUpdaterSettings } from "./constants/firmware-update-settings.constants";
 import { MulterService } from "@/services/core/multer.service";
-import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
+import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { GithubService } from "@/services/core/github.service";
 import { PluginRepositoryCache } from "@/services/octoprint/plugin-repository.cache";
 import { ILoggerFactory } from "@/handlers/logger-factory";
@@ -24,7 +24,7 @@ const firmwareProp = "printer.firmware";
 const firmwareDownloadPath = "firmware-downloads";
 
 export class PluginFirmwareUpdateService extends PluginBaseService {
-  octoPrintApiService: OctoPrintApiService;
+  octoprintClient: OctoprintClient;
   githubService: GithubService;
   private multerService: MulterService;
 
@@ -32,20 +32,20 @@ export class PluginFirmwareUpdateService extends PluginBaseService {
   private latestFirmware;
 
   constructor({
-    octoPrintApiService,
+    octoprintClient,
     pluginRepositoryCache,
     githubService,
     multerService,
     loggerFactory,
   }: {
-    octoPrintApiService: OctoPrintApiService;
+    octoprintClient: OctoprintClient;
     pluginRepositoryCache: PluginRepositoryCache;
     githubService: GithubService;
     multerService: MulterService;
     loggerFactory: ILoggerFactory;
   }) {
-    super({ octoPrintApiService, pluginRepositoryCache, loggerFactory }, config);
-    this.octoPrintApiService = octoPrintApiService;
+    super({ octoprintClient: octoprintClient, pluginRepositoryCache, loggerFactory }, config);
+    this.octoprintClient = octoprintClient;
     this.githubService = githubService;
     this.multerService = multerService;
   }
@@ -91,7 +91,7 @@ export class PluginFirmwareUpdateService extends PluginBaseService {
   }
 
   async getPrinterFirmwareVersion(printerLogin: LoginDto) {
-    const response = await this.octoPrintApiService.getSystemInfo(printerLogin);
+    const response = await this.octoprintClient.getSystemInfo(printerLogin);
     const systemInfo = response.systeminfo;
 
     // @todo If this fails, the printer most likely is not connected...
@@ -115,16 +115,16 @@ export class PluginFirmwareUpdateService extends PluginBaseService {
   }
 
   async getPluginFirmwareStatus(printerLogin: LoginDto) {
-    return await this.octoPrintApiService.getPluginFirmwareUpdateStatus(printerLogin);
+    return await this.octoprintClient.getPluginFirmwareUpdateStatus(printerLogin);
   }
 
   async configureFirmwareUpdaterSettings(printerLogin: LoginDto) {
-    return await this.octoPrintApiService.updateFirmwareUpdaterSettings(printerLogin, defaultFirmwareUpdaterSettings);
+    return await this.octoprintClient.updateFirmwareUpdaterSettings(printerLogin, defaultFirmwareUpdaterSettings);
   }
 
   async flashPrusaFirmware(currentPrinterId: IdType, printerLogin: LoginDto) {
     const latestHexFilePath = this.multerService.getNewestFile(firmwareDownloadPath);
     // todo setup BG task to track progress
-    return await this.octoPrintApiService.postPluginFirmwareUpdateFlash(currentPrinterId, printerLogin, latestHexFilePath);
+    return await this.octoprintClient.postPluginFirmwareUpdateFlash(currentPrinterId, printerLogin, latestHexFilePath);
   }
 }

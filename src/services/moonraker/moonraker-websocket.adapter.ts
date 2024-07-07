@@ -19,7 +19,7 @@ import {
   SOCKET_STATE,
   SocketStateType,
   WsMessage,
-} from "@/services/octoprint/octoprint-sockio.adapter";
+} from "@/services/octoprint/octoprint-websocket.adapter";
 import { moonrakerEvent, MoonrakerEventDto } from "@/services/moonraker/constants/websocket.constants";
 import { writeFileSync } from "node:fs";
 
