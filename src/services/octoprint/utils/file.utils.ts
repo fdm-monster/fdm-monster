@@ -1,7 +1,8 @@
 import { CreateOrUpdatePrinterFileDto } from "@/services/interfaces/printer-file.dto";
-import { OctoPrintCustomDto, OctoprintRawFileDto } from "@/services/octoprint/models/octoprint-file.dto";
+import { OctoPrintCustomDto, OctoprintFileDto } from "@/services/octoprint/dto/files/octoprint-file.dto";
+import { FileDto } from "@/services/printer-api.interface";
 
-export function normalizePrinterFile(file: OctoprintRawFileDto): CreateOrUpdatePrinterFileDto {
+export function normalizePrinterFile(file: OctoprintFileDto): FileDto {
   if (!file) {
     throw new Error("File should not be null for normalization");
   }

@@ -6,9 +6,16 @@ import EventEmitter2 from "eventemitter2";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IdType } from "@/shared.constants";
 import { LoggerService } from "@/handlers/logger";
-import { OctoPrintEventDto, OctoPrintWsMessage } from "@/services/octoprint/dto/octoprint-event.dto";
+import { OctoPrintEventDto, WsMessage } from "@/services/octoprint/dto/octoprint-event.dto";
+import { MoonrakerEventDto, MR_WsMessage } from "@/services/moonraker/constants/moonraker-event.dto";
+import { HistoryMessageDto } from "@/services/octoprint/dto/websocket/history-message.dto";
+import { CurrentMessageDto } from "@/services/octoprint/dto/websocket/current-message.dto";
+import { FlagsDto } from "@/services/octoprint/dto/printer/flags.dto";
+import { ConnectionDto } from "@/services/octoprint/dto/connection/connection.dto";
+import { SubscriptionType } from "@/services/moonraker/moonraker-websocket.adapter";
+import { PrinterObjectsQueryDto } from "@/services/moonraker/dto/objects/printer-objects-query.dto";
 
-export type PrinterEventsCacheDto = Record<OctoPrintWsMessage, any | null>;
+export type PrinterEventsCacheDto = Record<WsMessage, any | null>;
 
 export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
   private logger: LoggerService;
@@ -71,7 +78,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
     await this.setKeyValue(printerId, ref);
   }
 
-  async setSubstate(printerId: IdType, label: OctoPrintWsMessage, substateName: string, payload: any) {
+  async setSubstate(printerId: IdType, label: WsMessage, substateName: string, payload: any) {
     const ref = await this.getOrCreateEvents(printerId);
     if (!ref[label]) {
       ref[label] = {};
@@ -112,7 +119,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
     }
   }
 
-  private pruneHistoryPayload(payload) {
+  private pruneHistoryPayload(payload: HistoryMessageDto) {
     delete payload.logs;
     delete payload.temps;
     delete payload.messages;

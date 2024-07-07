@@ -27,6 +27,7 @@ export class PrinterMockData {
     return {
       name: "Printuh",
       printerURL: "http://test.com/",
+      printerType: OctoprintType,
       webSocketURL: "ws://test/",
       apiKey: "asdasasdasdasdasdasdasdasdasdasd",
     };

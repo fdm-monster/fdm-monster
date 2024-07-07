@@ -6,6 +6,7 @@ import supertest, { SuperTest } from "supertest";
 import { PrinterController } from "@/controllers/printer.controller";
 import { OctoPrintApiMock } from "../mocks/octoprint-api.mock";
 import { IdType } from "@/shared.constants";
+import { OctoprintType } from "@/services/printer-api.interface";
 
 const defaultRoute = AppConstants.apiRoute + "/printer";
 const createRoute = defaultRoute;
@@ -23,7 +24,7 @@ const disabledReasonRoute = (id: IdType) => `${updateRoute(id)}/disabled-reason`
 const feedRateRoute = (id: IdType) => `${updateRoute(id)}/feed-rate`;
 const flowRateRoute = (id: IdType) => `${updateRoute(id)}/flow-rate`;
 const printerPluginListRoute = (id: IdType) => `${getRoute(id)}/plugin-list`;
-const restartOctoPrintRoute = (id: IdType) => `${getRoute(id)}/octoprint/system/restart`;
+const restartOctoPrintRoute = (id: IdType) => `${getRoute(id)}/octoprint/server/restart`;
 const serialConnectCommandRoute = (id: IdType) => `${getRoute(id)}/serial-connect`;
 const serialDisconnectCommandRoute = (id: IdType) => `${getRoute(id)}/serial-disconnect`;
 const batchRoute = `${defaultRoute}/batch`;
@@ -53,11 +54,13 @@ describe(PrinterController.name, () => {
       printerURL: "http://url.com",
       apiKey: testApiKey,
       name: "test123",
+      printerType: OctoprintType,
     });
     expectOkResponse(response, {
       printerURL: "http://url.com",
       apiKey: testApiKey,
       name: "test123",
+      printerType: OctoprintType,
     });
   });
 
@@ -115,6 +118,7 @@ describe(PrinterController.name, () => {
         printerURL: "http://localhost/",
         apiKey,
         name,
+        printerType: OctoprintType,
       },
     ]);
     expectOkResponse(response);
@@ -152,12 +156,14 @@ describe(PrinterController.name, () => {
       apiKey,
       enabled: false,
       name: "asd124",
+      printerType: OctoprintType,
     };
     const updatePatch = await request.patch(updateRoute(printer.id)).send(patch);
     expectOkResponse(updatePatch, {
       printerURL: "https://test.com",
       enabled: false,
       name: "asd124",
+      printerType: OctoprintType,
     });
   });
 
@@ -168,10 +174,12 @@ describe(PrinterController.name, () => {
       printerURL: "https://test.com/",
       apiKey,
       name,
+      printerType: OctoprintType,
     });
     expectOkResponse(updatePatch, {
       printerURL: "https://test.com",
       apiKey,
+      printerType: OctoprintType,
     });
   });
 
@@ -185,6 +193,7 @@ describe(PrinterController.name, () => {
       apiKey,
       printerURL: "https://test.com/",
       name,
+      printerType: OctoprintType,
     });
     expectOkResponse(res);
   });
