@@ -1,3 +1,9 @@
+# Develop
+
+Change:
+
+- Dropped printer file database table (kept the entity/schema), so FDMM "remote file" architecture can be redesigned. We're solely using in-memory cache from this point.
+
 # FDM Monster 14/06/2024 1.6.3
 
 ## Fixes:
