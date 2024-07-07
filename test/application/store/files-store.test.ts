@@ -72,7 +72,6 @@ describe(PrinterFilesStore.name, () => {
         size: 10,
       },
     ]);
-    await printerFilesStore.loadFilesStore();
 
     const filesCache = printerFilesStore.getFiles(testPrinterState.id);
     expect(filesCache.length).toBe(2);
