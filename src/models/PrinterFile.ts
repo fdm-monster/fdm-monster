@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-import { OctoPrintCustomDto } from "@/services/octoprint/models/octoprint-file.dto";
+import { OctoPrintCustomDto } from "@/services/octoprint/dto/files/octoprint-file.dto";
 
 export interface IPrinterFile {
   id: string;

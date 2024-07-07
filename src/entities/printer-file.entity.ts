@@ -3,7 +3,7 @@ import { Column, Entity, JoinColumn, ManyToOne, Relation } from "typeorm";
 import { GcodeAnalysisDto } from "@/services/interfaces/gcode-analysis.dto";
 import { Prints, Refs, OctoPrintStatisticsDto } from "@/services/interfaces/printer-file.dto";
 import { Printer } from "@/entities/printer.entity";
-import { OctoPrintCustomDto } from "@/services/octoprint/models/octoprint-file.dto";
+import { OctoPrintCustomDto } from "@/services/octoprint/dto/files/octoprint-file.dto";
 
 /**
  * @deprecated This entity will be removed, or reshaped and is unused right now.

@@ -31,6 +31,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
       ...this.toDto(entity),
       apiKey: entity.apiKey,
       printerURL: entity.printerURL,
+      printerType: entity.printerType,
     };
   }
 
@@ -88,7 +89,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
   async update(printerId: MongoIdType, updateData: Partial<IPrinter>) {
     const printer = await this.get(printerId);
     updateData.printerURL = normalizeURLWithProtocol(updateData.printerURL);
-    const { printerURL, apiKey, enabled, name } = await validateInput(updateData, createMongoPrinterRules);
+    const { printerURL, apiKey, enabled, name, printerType } = await validateInput(updateData, createMongoPrinterRules);
 
     printer.printerURL = printerURL;
     printer.apiKey = apiKey;
@@ -96,6 +97,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
       printer.enabled = enabled;
     }
     printer.name = name;
+    printer.printerType = printerType;
     await printer.save();
     this.eventEmitter2.emit(printerEvents.printerUpdated, { printer });
     return printer;
@@ -158,10 +160,11 @@ export class PrinterService implements IPrinterService<MongoIdType> {
     return printer;
   }
 
-  async updateConnectionSettings(printerId: MongoIdType, { printerURL, apiKey }: LoginDto) {
+  async updateConnectionSettings(printerId: MongoIdType, { printerURL, apiKey, printerType }: LoginDto) {
     const update = {
       printerURL: normalizeURLWithProtocol(printerURL),
       apiKey,
+      printerType,
     };
 
     await validateInput(update, createMongoPrinterRules);

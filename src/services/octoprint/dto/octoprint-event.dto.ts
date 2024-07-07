@@ -1,35 +1,38 @@
 import { IdType } from "@/shared.constants";
 
-export type OctoPrintWsMessage =
-  | "connected"
-  | "reauthRequired"
-  | "current"
-  | "history"
-  | "event"
-  | "plugin"
-  | "timelapse"
-  | "slicingProgress";
+export const octoprintWsMessages = {
+  connected: "connected",
+  reauthRequired: "reauthRequired",
+  current: "current",
+  history: "history",
+  // Lets not expose what we dont use
+  // event: "event",
+  // plugin: "plugin",
+  // timelapse: "timelapse",
+  // slicingProgress: "slicingProgress",
+} as const;
 
-export enum Message {
-  CONNECTED = "connected",
-  REAUTHREQUIRED = "reauthRequired",
-  CURRENT = "current",
-  HISTORY = "history",
-  EVENT = "event",
-  PLUGIN = "plugin",
-  TIMELAPSE = "timelapse",
-  SLICINGPROCESS = "slicingProgress",
+export type OctoPrintWsMessage = keyof typeof octoprintWsMessages;
+
+export const messages = {
+  ...octoprintWsMessages,
+
+  // Nice klipper subscription state
+  notify_status_update: "notify_status_update",
 
   // Custom events
-  WS_OPENED = "WS_OPENED",
-  WS_CLOSED = "WS_CLOSED",
-  WS_ERROR = "WS_ERROR",
-  API_STATE_UPDATED = "API_STATE_UPDATED",
-  WS_STATE_UPDATED = "WS_STATE_UPDATED",
-}
+  WS_OPENED: "WS_OPENED",
+  WS_CLOSED: "WS_CLOSED",
+  WS_ERROR: "WS_ERROR",
+  API_STATE_UPDATED: "API_STATE_UPDATED",
+  WS_STATE_UPDATED: "WS_STATE_UPDATED",
+} as const;
 
-export class OctoPrintEventDto<T = any> {
-  event: Message;
+export type WsMessage = keyof typeof messages;
+
+export class OctoPrintEventDto<K extends WsMessage = WsMessage, T = any, I extends IdType = IdType> {
+  event: K;
   payload: T;
-  printerId: IdType;
+  printerId: I;
+  printerType: 0;
 }

@@ -44,7 +44,7 @@ export class PluginFirmwareUpdateService extends PluginBaseService {
     multerService: MulterService;
     loggerFactory: ILoggerFactory;
   }) {
-    super({ octoprintClient: octoprintClient, pluginRepositoryCache, loggerFactory }, config);
+    super({ octoprintClient, pluginRepositoryCache, loggerFactory }, config);
     this.octoprintClient = octoprintClient;
     this.githubService = githubService;
     this.multerService = multerService;

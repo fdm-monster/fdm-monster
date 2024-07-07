@@ -5,28 +5,31 @@ import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { LoggerService } from "@/handlers/logger";
 import { IdType } from "@/shared.constants";
 import { ILoggerFactory } from "@/handlers/logger-factory";
-import { errorSummary } from "@/utils/error.utils";
-import { CreateOrUpdatePrinterFileDto, PrinterFileDto } from "@/services/interfaces/printer-file.dto";
 import { captureException } from "@sentry/node";
+import { PrinterApiFactory } from "@/services/printer-api.factory";
 
 export class PrinterFilesStore {
   printerCache: PrinterCache;
   fileCache: FileCache;
+  printerApiFactory: PrinterApiFactory;
   octoprintClient: OctoprintClient;
   private logger: LoggerService;
 
   constructor({
     printerCache,
     fileCache,
+    printerApiFactory,
     octoprintClient,
     loggerFactory,
   }: {
     printerCache: PrinterCache;
     fileCache: FileCache;
+    printerApiFactory: PrinterApiFactory;
     octoprintClient: OctoprintClient;
     loggerFactory: ILoggerFactory;
   }) {
     this.printerCache = printerCache;
+    this.printerApiFactory = printerApiFactory;
     this.fileCache = fileCache;
     this.octoprintClient = octoprintClient;
 
@@ -37,7 +40,6 @@ export class PrinterFilesStore {
     const printers = await this.printerCache.listCachedPrinters(true);
     for (const printer of printers) {
       try {
-        // Have to force recursion to either false/true, decide in future
         const printerFiles = await this.loadFiles(printer.id, false);
         this.fileCache.cachePrinterFiles(printer.id, printerFiles);
       } catch (e) {
@@ -47,11 +49,12 @@ export class PrinterFilesStore {
     }
   }
 
-  async loadFiles(printerId: IdType, recursive: boolean): Promise<any> {
+  async loadFiles(printerId: IdType, recursive: boolean = false): Promise<any> {
     const loginDto = await this.printerCache.getLoginDtoAsync(printerId);
-    const printerFiles = await this.octoprintClient.getLocalFiles(loginDto, recursive);
-    this.fileCache.cachePrinterFiles(printerId, printerFiles);
-    return printerFiles;
+    const printerApi = this.printerApiFactory.getScopedPrinter(loginDto);
+    const files = await printerApi.getFiles();
+    this.fileCache.cachePrinterFiles(printerId, files);
+    return files;
   }
 
   getFiles(printerId: IdType) {
@@ -67,16 +70,17 @@ export class PrinterFilesStore {
   }
 
   async deleteOutdatedFiles(printerId: IdType, ageDaysMax: number) {
+    const printerApi = this.printerApiFactory.getById(printerId);
+
     const failedFiles = [];
     const succeededFiles = [];
-
     const nonRecursiveFiles = this.getOutdatedFiles(printerId, ageDaysMax);
-    const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
+
     const name = (await this.printerCache.getCachedPrinterOrThrowAsync(printerId)).name;
 
     for (let file of nonRecursiveFiles) {
       try {
-        await this.octoprintClient.deleteFileOrFolder(printerLogin, file.path);
+        await printerApi.deleteFile(file.path);
         succeededFiles.push(file);
       } catch (e) {
         failedFiles.push(file);
@@ -93,7 +97,7 @@ export class PrinterFilesStore {
   async purgePrinterFiles(printerId: IdType) {
     const printerState = await this.printerCache.getCachedPrinterOrThrowAsync(printerId);
 
-    this.logger.log(`Clearing file cache from printer`);
+    this.logger.log(`Purging file cache from printer`);
     this.fileCache.purgePrinterId(printerState.id);
     this.logger.log(`Clearing printer files successful`);
   }
@@ -108,7 +112,7 @@ export class PrinterFilesStore {
     this.logger.log(`Clearing caches successful.`);
   }
 
-  async deleteFile(printerId: IdType, filePath: string, throwError: boolean) {
+  async deleteFile(printerId: IdType, filePath: string) {
     this.fileCache.purgeFile(printerId, filePath);
   }
 }

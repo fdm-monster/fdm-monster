@@ -1,4 +1,5 @@
 import { UUID_LENGTH } from "@/constants/service.constants";
+import { OctoprintType } from "@/services/printer-api.interface";
 
 export const flowRateRules = {
   flowRate: "required|between:75,125|integer",
@@ -9,6 +10,7 @@ export const feedRateRules = {
 };
 
 export const testPrinterApiRules = {
+  printerType: `required|integer|in:${OctoprintType}`,
   apiKey: `required|length:${UUID_LENGTH},${UUID_LENGTH}|alphaNumeric`,
   printerURL: "required|httpurl",
 };
@@ -22,6 +24,7 @@ export const updatePrinterEnabledRule = {
 };
 
 export const updatePrinterConnectionSettingRules = {
+  printerType: `required|integer|in:${OctoprintType}`,
   printerURL: "required|httpurl",
   apiKey: `required|minLength:${UUID_LENGTH}|maxLength:${UUID_LENGTH}`,
 };

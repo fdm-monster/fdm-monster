@@ -1,6 +1,14 @@
+export const printerInfoStates = {
+  error: "error",
+  ready: "ready",
+  startup: "startup",
+  shutdown: "shutdown",
+};
+export const printerInfoStatesList = Object.keys(printerInfoStates);
+export type PrinterInfoState = keyof typeof printerInfoStates;
+
 export interface PrinterInfoDto {
-  // "ready"
-  state: string;
+  state: PrinterInfoState;
   state_message: string;
   hostname: string;
   software_version: string;

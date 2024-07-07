@@ -11,6 +11,6 @@ export class OctoPrintApiMock extends OctoprintClient {
   }
 
   storeResponse(storedResponse: any, storedStatusCode: number) {
-    (this.axiosClient as unknown as AxiosMock).saveMockResponse(storedResponse, storedStatusCode);
+    (this.httpClient as unknown as AxiosMock).saveMockResponse(storedResponse, storedStatusCode);
   }
 }

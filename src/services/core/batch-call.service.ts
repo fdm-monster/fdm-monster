@@ -6,7 +6,7 @@ import { PrinterEventsCache } from "@/state/printer-events.cache";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { IdType } from "@/shared.constants";
 import { CreateOrUpdatePrinterFileDto } from "../interfaces/printer-file.dto";
-import { ConnectionState } from "@/services/octoprint/dto/connection.dto";
+import { ConnectionState } from "@/services/octoprint/dto/connection/connection.dto";
 import { captureException } from "@sentry/node";
 import { errorSummary } from "@/utils/error.utils";
 import { LoggerService } from "@/handlers/logger";
@@ -221,7 +221,7 @@ export class BatchCallService {
 
       const time = Date.now();
       const promise = this.octoprintClient
-        .selectPrintFile(printerLogin, path, true)
+        .postSelectPrintFile(printerLogin, path, true)
         .then(() => {
           return { success: true, printerId, time: Date.now() - time };
         })

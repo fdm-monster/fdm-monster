@@ -1,11 +1,11 @@
 import { errorSummary } from "@/utils/error.utils";
-import { API_STATE } from "@/services/octoprint/octoprint-websocket.adapter";
 import { SettingsStore } from "@/state/settings.store";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { captureException } from "@sentry/node";
+import { API_STATE } from "@/shared/dtos/api-state.type";
 
 export class PrinterWebsocketRestoreTask {
   settingsStore: SettingsStore;
@@ -56,7 +56,7 @@ export class PrinterWebsocketRestoreTask {
         (socket.apiState !== API_STATE.unset && !socket.lastMessageReceivedTimestamp) ||
         Date.now() - socket.lastMessageReceivedTimestamp > 10 * 1000
       ) {
-        const result = await this.octoprintClient.getConnection(socket.loginDto);
+        const result = await this.octoprintClient.getConnection(socket.login);
 
         silentSocketIds.push(socket.printerId);
         // Produce logs for silent sockets
