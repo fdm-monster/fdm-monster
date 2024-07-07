@@ -1,5 +1,5 @@
 import { UUID_LENGTH } from "@/constants/service.constants";
-import { OctoprintType } from "@/services/printer-api.interface";
+import { MoonrakerType, OctoprintType } from "@/services/printer-api.interface";
 
 export const flowRateRules = {
   flowRate: "required|between:75,125|integer",
