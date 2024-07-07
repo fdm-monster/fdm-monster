@@ -4,7 +4,7 @@ import { OctoPrintCustomDto } from "@/services/octoprint/models/octoprint-file.d
 export interface IPrinterFile {
   id: string;
   printerId: Schema.Types.ObjectId;
-  // name: string;
+  name: string;
   date: number;
   // display: string;
   // gcodeAnalysis?: any;
@@ -20,15 +20,18 @@ export interface IPrinterFile {
   // customData?: OctoPrintCustomDto;
 }
 
+/**
+ * @deprecated This schema will be removed and is unused right now.
+ */
 export const PrinterFileSchema = new Schema<IPrinterFile>({
   printerId: {
     type: Schema.Types.ObjectId,
     required: true,
   },
-  // name: {
-  //   type: String,
-  //   required: true,
-  // },
+  name: {
+    type: String,
+    required: true,
+  },
   date: {
     type: Number,
     required: true,

@@ -5,6 +5,9 @@ import { Prints, Refs, OctoPrintStatisticsDto } from "@/services/interfaces/prin
 import { Printer } from "@/entities/printer.entity";
 import { OctoPrintCustomDto } from "@/services/octoprint/models/octoprint-file.dto";
 
+/**
+ * @deprecated This entity will be removed, or reshaped and is unused right now.
+ */
 @Entity()
 export class PrinterFile extends BaseEntity {
   @ManyToOne(() => Printer, { onDelete: "CASCADE", nullable: false })

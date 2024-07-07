@@ -34,7 +34,7 @@ export interface OctoPrintStatisticsDto {
 export class CreateOrUpdatePrinterFileDto<KeyType = IdType> extends IdDto<KeyType> {
   printerId?: KeyType;
 
-  // name: string;
+  name: string;
   date: number;
   // display: string;
   // gcodeAnalysis?: GcodeAnalysisDto;
@@ -55,7 +55,7 @@ export class CreateOrUpdatePrinterFileDto<KeyType = IdType> extends IdDto<KeyTyp
 export class PrinterFileDto<KeyType = IdType> extends IdDto<KeyType> {
   printerId: KeyType;
 
-  // name: string;
+  name: string;
   date: number;
   // display: string;
   // gcodeAnalysis?: GcodeAnalysisDto;
