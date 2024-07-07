@@ -211,7 +211,6 @@ export class YamlService {
         updatedFloor.printers = knownPrinters;
       }
       const newFloor = await this.floorStore.update(updateId, updatedFloor);
-      console.log(JSON.stringify(newFloor, null, 2));
       floorIdMap[originalFloorId] = newFloor.id;
     }
 
