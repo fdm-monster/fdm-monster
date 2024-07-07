@@ -37,6 +37,7 @@ export class PrinterFilesStore {
     const printers = await this.printerCache.listCachedPrinters(true);
     for (const printer of printers) {
       try {
+        // Have to force recursion to either false/true, decide in future
         const printerFiles = await this.loadFiles(printer.id, false);
         this.fileCache.cachePrinterFiles(printer.id, printerFiles);
       } catch (e) {
