@@ -7,13 +7,7 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IdType } from "@/shared.constants";
 import { LoggerService } from "@/handlers/logger";
 import { OctoPrintEventDto, WsMessage } from "@/services/octoprint/dto/octoprint-event.dto";
-import { MoonrakerEventDto, MR_WsMessage } from "@/services/moonraker/constants/moonraker-event.dto";
 import { HistoryMessageDto } from "@/services/octoprint/dto/websocket/history-message.dto";
-import { CurrentMessageDto } from "@/services/octoprint/dto/websocket/current-message.dto";
-import { FlagsDto } from "@/services/octoprint/dto/printer/flags.dto";
-import { ConnectionDto } from "@/services/octoprint/dto/connection/connection.dto";
-import { SubscriptionType } from "@/services/moonraker/moonraker-websocket.adapter";
-import { PrinterObjectsQueryDto } from "@/services/moonraker/dto/objects/printer-objects-query.dto";
 
 export type PrinterEventsCacheDto = Record<WsMessage, any | null>;
 
@@ -57,19 +51,25 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
       ref = {
         connected: null,
         reauthRequired: null,
-        slicingProgress: null,
+        // slicingProgress: null,
+        // notify_status_update: null,
         current: null,
         history: null,
-        timelapse: null,
-        event: {},
-        plugin: {},
+        // timelapse: null,
+        // event: {},
+        // plugin: {},
+        API_STATE_UPDATED: null,
+        WS_CLOSED: null,
+        WS_ERROR: null,
+        WS_OPENED: null,
+        WS_STATE_UPDATED: null,
       };
       await this.setKeyValue(printerId, ref);
     }
     return ref;
   }
 
-  async setEvent(printerId: IdType, label: OctoPrintWsMessage, payload: any) {
+  async setEvent(printerId: IdType, label: WsMessage, payload: any) {
     const ref = await this.getOrCreateEvents(printerId);
     ref[label] = {
       payload,
@@ -95,29 +95,33 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
   }
 
   private subscribeToEvents() {
-    this.eventEmitter2.on("octoprint.*", (e) => this.onPrinterSocketMessage(e));
+    this.eventEmitter2.on("octoprint.*", (e) => this.onOctoPrintSocketMessage(e));
+    // this.eventEmitter2.on("moonraker.*", (e) => this.onMoonrakerSocketMessage(e));
     this.eventEmitter2.on(printerEvents.printersDeleted, this.handlePrintersDeleted.bind(this));
   }
 
-  private async onPrinterSocketMessage(e: OctoPrintEventDto) {
+  private async onOctoPrintSocketMessage(e: OctoPrintEventDto) {
     const printerId = e.printerId;
-    if (e.event !== "plugin" && e.event !== "event") {
+    if (!["plugin", "event"].includes(e.event)) {
       await this.setEvent(printerId, e.event, e.event === "history" ? this.pruneHistoryPayload(e.payload) : e.payload);
+
       if (this._debugMode) {
         this.logger.log(`Message '${e.event}' received, size ${formatKB(e.payload)}`, e.printerId);
       }
-    } else if (e.event === "plugin") {
-      await this.setSubstate(printerId, "plugin", e.payload.plugin, e.payload);
-    } else if (e.event === "event") {
-      const eventType = e.payload.type;
-      await this.setSubstate(printerId, "event", eventType, e.payload.payload);
-      if (this._debugMode) {
-        this.logger.log(`Event '${eventType}' received`, e.printerId);
-      }
-    } else {
-      this.logger.log(`Message '${e.event}' received`, e.printerId);
     }
   }
+
+  // private async onMoonrakerSocketMessage(
+  //   e: MoonrakerEventDto<MR_WsMessage, PrinterObjectsQueryDto<SubscriptionType | null>, IdType>
+  // ) {
+  //   const printerId = e.printerId;
+  //   const eventType = e.event;
+  //
+  //   // https://github.com/mainsail-crew/mainsail/blob/fa61d4ef92 97426a404dd845a1a4d5e4525c43dc/src/components/panels/StatusPanel.vue#L199
+  //   if (["notify_status_update", "current"].includes(eventType)) {
+  //     await this.setEvent(printerId, eventType as "notify_status_update" | "current", e.payload);
+  //   }
+  // }
 
   private pruneHistoryPayload(payload: HistoryMessageDto) {
     delete payload.logs;

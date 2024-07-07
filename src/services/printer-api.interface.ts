@@ -1,6 +1,5 @@
 import { AxiosPromise } from "axios";
 import { LoginDto } from "@/services/interfaces/login.dto";
-import { IdType } from "@/shared.constants";
 
 export const OctoprintType = 0;
 export const MoonrakerType = 1;
@@ -14,7 +13,12 @@ export interface StatusFlags {
   error: boolean;
   finished: boolean;
 }
+
 export interface FileDto {
+  /**
+   * @deprecated name will be removed soon, use path instead
+   */
+  name: string;
   path: string;
   size: number;
   date: number;

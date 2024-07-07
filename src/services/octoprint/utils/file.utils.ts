@@ -1,4 +1,3 @@
-import { CreateOrUpdatePrinterFileDto } from "@/services/interfaces/printer-file.dto";
 import { OctoPrintCustomDto, OctoprintFileDto } from "@/services/octoprint/dto/files/octoprint-file.dto";
 import { FileDto } from "@/services/printer-api.interface";
 
@@ -13,13 +12,13 @@ export function normalizePrinterFile(file: OctoprintFileDto): FileDto {
   };
 
   const knownKeys = [
-    "name",
+    "path",
     "date",
+    "hash",
     // "display",
     // "gcodeAnalysis",
-    // "hash",
     // "origin",
-    "path",
+    "name",
     // "prints",
     // "refs",
     "size",
