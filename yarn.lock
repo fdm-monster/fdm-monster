@@ -1070,7 +1070,7 @@ __metadata:
     "@lcov-viewer/cli": "npm:1.3.0"
     "@lcov-viewer/istanbul-report": "npm:1.4.0"
     "@octokit/plugin-throttling": "npm:8.2.0"
-    "@sentry/node": "npm:8.15.0"
+    "@sentry/node": "npm:8.16.0"
     "@swc/cli": "npm:0.4.0"
     "@swc/core": "npm:1.6.13"
     "@swc/jest": "npm:0.2.36"
@@ -2271,19 +2271,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/core@npm:8.15.0":
-  version: 8.15.0
-  resolution: "@sentry/core@npm:8.15.0"
+"@sentry/core@npm:8.16.0":
+  version: 8.16.0
+  resolution: "@sentry/core@npm:8.16.0"
   dependencies:
-    "@sentry/types": "npm:8.15.0"
-    "@sentry/utils": "npm:8.15.0"
-  checksum: 10c0/2be955c7ad8d3f36e770feb720e2d1d39427ae3e1dad2352ddd31a01025b20c0cc27df45be5d78193ab9aaf9c40231d980717d4dfca3288403a286a23e3fdb4b
+    "@sentry/types": "npm:8.16.0"
+    "@sentry/utils": "npm:8.16.0"
+  checksum: 10c0/6e4b23757c4c3f755a0958835b2655c3ce77f314e354ef532217638708b653f511c5b7650d18b0d8b81025d6322eefc28d549321f7e09a3440483935833288fa
   languageName: node
   linkType: hard
 
-"@sentry/node@npm:8.15.0":
-  version: 8.15.0
-  resolution: "@sentry/node@npm:8.15.0"
+"@sentry/node@npm:8.16.0":
+  version: 8.16.0
+  resolution: "@sentry/node@npm:8.16.0"
   dependencies:
     "@opentelemetry/api": "npm:^1.9.0"
     "@opentelemetry/context-async-hooks": "npm:^1.25.1"
@@ -2308,48 +2308,48 @@ __metadata:
     "@opentelemetry/sdk-trace-base": "npm:^1.25.1"
     "@opentelemetry/semantic-conventions": "npm:^1.25.1"
     "@prisma/instrumentation": "npm:5.16.1"
-    "@sentry/core": "npm:8.15.0"
-    "@sentry/opentelemetry": "npm:8.15.0"
-    "@sentry/types": "npm:8.15.0"
-    "@sentry/utils": "npm:8.15.0"
+    "@sentry/core": "npm:8.16.0"
+    "@sentry/opentelemetry": "npm:8.16.0"
+    "@sentry/types": "npm:8.16.0"
+    "@sentry/utils": "npm:8.16.0"
     opentelemetry-instrumentation-fetch-node: "npm:1.2.0"
   dependenciesMeta:
     opentelemetry-instrumentation-fetch-node:
       optional: true
-  checksum: 10c0/ace05427c15cfd755680d3f6722927f5c608b3f9f98b9649999c9e485c2141bfe2aaeb8c0eb71b332ed0a36c23ecdee4dd1dcdaaea37d7583809a2df221a468d
+  checksum: 10c0/9a31622f4e3696ad173c1a02f8d5ba17d9a4ce3474513c045e7ed77b7664b8c48ebd1122847d297ef08e486b4f7d874f273c0854e5cccd3aea62e2f8ff77c3a5
   languageName: node
   linkType: hard
 
-"@sentry/opentelemetry@npm:8.15.0":
-  version: 8.15.0
-  resolution: "@sentry/opentelemetry@npm:8.15.0"
+"@sentry/opentelemetry@npm:8.16.0":
+  version: 8.16.0
+  resolution: "@sentry/opentelemetry@npm:8.16.0"
   dependencies:
-    "@sentry/core": "npm:8.15.0"
-    "@sentry/types": "npm:8.15.0"
-    "@sentry/utils": "npm:8.15.0"
+    "@sentry/core": "npm:8.16.0"
+    "@sentry/types": "npm:8.16.0"
+    "@sentry/utils": "npm:8.16.0"
   peerDependencies:
     "@opentelemetry/api": ^1.9.0
     "@opentelemetry/core": ^1.25.1
     "@opentelemetry/instrumentation": ^0.52.1
     "@opentelemetry/sdk-trace-base": ^1.25.1
     "@opentelemetry/semantic-conventions": ^1.25.1
-  checksum: 10c0/3f9b268223a6fc468096d93107d5eff3626b88b5506b73a026287f7fb93b903eac0de822d106a216dfd6cf4b230788a68ec09261a7a0964d361c787af4d3aff5
+  checksum: 10c0/71a6ad53f00a85ee13c729fac6b785d50d2a01eb5e8cb278eb3cd72f900c3c72177ebb9a7cbda375e0536f47bfb380b34cc990f01f4405caa233df4908947cc4
   languageName: node
   linkType: hard
 
-"@sentry/types@npm:8.15.0":
-  version: 8.15.0
-  resolution: "@sentry/types@npm:8.15.0"
-  checksum: 10c0/b51a043e8a259f42cf4615852347b33eb2fafdaffede48246d266b8fa92418b83a2408818e2ac89155445b42119d373d557345fbf470b4500eeaeae01e64dca7
+"@sentry/types@npm:8.16.0":
+  version: 8.16.0
+  resolution: "@sentry/types@npm:8.16.0"
+  checksum: 10c0/383584fd5eb809dac92ef3828bd5a1216b599c2c2509b6447ca8f1f93468709bbc7fed56923c5a5e8fe787d6ee69f6605c5e215bfd6b51259055c897dba4dcad
   languageName: node
   linkType: hard
 
-"@sentry/utils@npm:8.15.0":
-  version: 8.15.0
-  resolution: "@sentry/utils@npm:8.15.0"
+"@sentry/utils@npm:8.16.0":
+  version: 8.16.0
+  resolution: "@sentry/utils@npm:8.16.0"
   dependencies:
-    "@sentry/types": "npm:8.15.0"
-  checksum: 10c0/a7de61301d3358afde40cd7684bcb4c15248e8cab0af77b541cb25a759ad32b7f83b681106ae7895eb1669117a70056867c4bcca644097344f0d919a1f2ab3ea
+    "@sentry/types": "npm:8.16.0"
+  checksum: 10c0/854298fed063518b1640adfea62d6ca85a01f70499e8e2475f9a12ec491799ee407955967b1c123c1923c1ba768832be544e68a94e2a1d2a8edee75cb791ba98
   languageName: node
   linkType: hard
 
