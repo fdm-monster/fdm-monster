@@ -122,7 +122,7 @@
     "@types/semver": "7.5.8",
     "@types/supertest": "6.0.2",
     "@types/uuid": "10.0.0",
-    "@types/ws": "8.5.10",
+    "@types/ws": "8.5.11",
     "chokidar": "3.6.0",
     "concurrently": "8.2.2",
     "eslint": "9.7.0",
