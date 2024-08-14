@@ -55,7 +55,7 @@
     "@fdm-monster/client": "1.6.0",
     "@influxdata/influxdb-client": "1.34.0",
     "@octokit/plugin-throttling": "8.2.0",
-    "@sentry/node": "8.25.0",
+    "@sentry/node": "8.26.0",
     "adm-zip": "0.5.15",
     "awilix": "10.0.2",
     "awilix-express": "9.0.1",
