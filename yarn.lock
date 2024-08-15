@@ -1063,7 +1063,7 @@ __metadata:
   resolution: "@fdm-monster/server@workspace:."
   dependencies:
     "@fdm-monster/client": "npm:1.6.0"
-    "@influxdata/influxdb-client": "npm:1.34.0"
+    "@influxdata/influxdb-client": "npm:1.35.0"
     "@lcov-viewer/cli": "npm:1.3.0"
     "@lcov-viewer/istanbul-report": "npm:1.4.0"
     "@octokit/plugin-throttling": "npm:8.2.0"
@@ -1170,10 +1170,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@influxdata/influxdb-client@npm:1.34.0":
-  version: 1.34.0
-  resolution: "@influxdata/influxdb-client@npm:1.34.0"
-  checksum: 10c0/f491a827858bae8a0e174619944e1ec80fbb600d55c5c7a01701ec975b05fb5205a7470212acfca78c634aaa254499bca8946384f9da3ef3056fb3eb60992a75
+"@influxdata/influxdb-client@npm:1.35.0":
+  version: 1.35.0
+  resolution: "@influxdata/influxdb-client@npm:1.35.0"
+  checksum: 10c0/7b55f1e884a307d648d39e0e66059c5b6d2c4a7ede3dade07bd98231db28732069ac40282e4fd4144f593a559b703d938375adf31b518381c305929127c522a3
   languageName: node
   linkType: hard
 
