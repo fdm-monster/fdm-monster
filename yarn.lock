@@ -1096,7 +1096,7 @@ __metadata:
     awilix-express: "npm:9.0.1"
     axios: "npm:1.7.4"
     bcryptjs: "npm:2.4.3"
-    better-sqlite3: "npm:11.1.2"
+    better-sqlite3: "npm:11.2.0"
     cache-manager: "npm:4.1.0"
     chokidar: "npm:3.6.0"
     class-validator: "npm:0.14.1"
@@ -4202,14 +4202,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"better-sqlite3@npm:11.1.2":
-  version: 11.1.2
-  resolution: "better-sqlite3@npm:11.1.2"
+"better-sqlite3@npm:11.2.0":
+  version: 11.2.0
+  resolution: "better-sqlite3@npm:11.2.0"
   dependencies:
     bindings: "npm:^1.5.0"
     node-gyp: "npm:latest"
     prebuild-install: "npm:^7.1.1"
-  checksum: 10c0/d4f4d7e56fc854fdf794781fc99fe5c0f7f373d635769d8ad1b7b22278bd91cdcdfe03360cbc63b51ab208b86a05465281a2b4c55065d6c3e911274f6f1e07cb
+  checksum: 10c0/248db355f8f40dcd9df3053389fe25f8319b0f71260238188e3b17756b174d157f8460a2ce3e9d955618c8b2ca27379add03de83384cc40af357f5453dc5aea4
   languageName: node
   linkType: hard
 
