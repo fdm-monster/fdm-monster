@@ -1128,7 +1128,7 @@ __metadata:
     luxon: "npm:3.5.0"
     migrate-mongo: "npm:11.0.0"
     mongodb-memory-server: "npm:10.0.0"
-    mongoose: "npm:6.13.0"
+    mongoose: "npm:6.13.1"
     multer: "npm:1.4.5-lts.1"
     nock: "npm:13.5.5"
     node-input-validator: "npm:4.5.1"
@@ -8517,9 +8517,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mongoose@npm:6.13.0":
-  version: 6.13.0
-  resolution: "mongoose@npm:6.13.0"
+"mongoose@npm:6.13.1":
+  version: 6.13.1
+  resolution: "mongoose@npm:6.13.1"
   dependencies:
     bson: "npm:^4.7.2"
     kareem: "npm:2.5.1"
@@ -8528,7 +8528,7 @@ __metadata:
     mquery: "npm:4.0.3"
     ms: "npm:2.1.3"
     sift: "npm:16.0.1"
-  checksum: 10c0/6dcadd497fe5335a43be6a1b0f11303d0f8e30a9980ab532748eaff136f598cc6f75925866aa16b926efc864eda9f91b7ab268bd8f1ae5cea0fe8bd59e25fa4f
+  checksum: 10c0/dcddd4beaa151f52f9e98191439c7ffef8526e9db47b2c3292755c50bd3f0a948a48c34b80140f4390602f8f0007d0b556b05711e7a048ec402ecfe8a616a464
   languageName: node
   linkType: hard
 
