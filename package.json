@@ -57,7 +57,7 @@
     "@octokit/plugin-throttling": "8.2.0",
     "@sentry/node": "8.29.0",
     "adm-zip": "0.5.16",
-    "awilix": "10.0.2",
+    "awilix": "11.0.0",
     "awilix-express": "9.0.1",
     "axios": "1.7.7",
     "bcryptjs": "2.4.3",
