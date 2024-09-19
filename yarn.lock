@@ -1091,7 +1091,7 @@ __metadata:
     "@types/js-yaml": "npm:4.0.9"
     "@types/lodash": "npm:4.17.7"
     "@types/luxon": "npm:3.4.2"
-    "@types/migrate-mongo": "npm:10.0.4"
+    "@types/migrate-mongo": "npm:10.0.5"
     "@types/multer": "npm:1.4.12"
     "@types/node": "npm:20.16.5"
     "@types/passport-anonymous": "npm:1.0.5"
@@ -3464,13 +3464,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/migrate-mongo@npm:10.0.4":
-  version: 10.0.4
-  resolution: "@types/migrate-mongo@npm:10.0.4"
+"@types/migrate-mongo@npm:10.0.5":
+  version: 10.0.5
+  resolution: "@types/migrate-mongo@npm:10.0.5"
   dependencies:
     "@types/node": "npm:*"
     mongodb: "npm:^6.1.0"
-  checksum: 10c0/9c3bf8fd203717c349a267cf49610ed6759c52702838b1c79a6064ee3bc7666e3c5f0aa1b16b05eea20a0cc60d72fa93bf64985d3f9a785c618c8078d372c0ab
+  checksum: 10c0/bbc61e69fd6a3fc60acdaf75b9025ac249d946efa3768492514cfc3ed4116c5066fed53205305dc614f12952b26e55e52d2e209cf354e49f7ba9e5fddf7f1615
   languageName: node
   linkType: hard
 
