@@ -1150,7 +1150,7 @@ __metadata:
     reflect-metadata: "npm:0.2.2"
     semver: "npm:7.6.3"
     simple-git: "npm:3.27.0"
-    socket.io: "npm:4.7.5"
+    socket.io: "npm:4.8.0"
     supertest: "npm:7.0.0"
     toad-scheduler: "npm:3.0.1"
     ts-node: "npm:10.9.2"
@@ -5564,9 +5564,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"engine.io@npm:~6.5.2":
-  version: 6.5.5
-  resolution: "engine.io@npm:6.5.5"
+"engine.io@npm:~6.6.0":
+  version: 6.6.1
+  resolution: "engine.io@npm:6.6.1"
   dependencies:
     "@types/cookie": "npm:^0.4.1"
     "@types/cors": "npm:^2.8.12"
@@ -5578,7 +5578,7 @@ __metadata:
     debug: "npm:~4.3.1"
     engine.io-parser: "npm:~5.2.1"
     ws: "npm:~8.17.1"
-  checksum: 10c0/b0994134917c5d3649fd7aea283492eaf092131e572a8d379c7c9081548b42cff756730b4641edd0d1598148dd3be253c4d634cea2ba5c59622d175d9e567469
+  checksum: 10c0/1356b58a47eb25d52f60223c2119256484a0273dbbcf1e5494c7eb44cd5cb952053150247ff30e8dfb5a37773066379671bb33aebb213cbed63844370a8a9829
   languageName: node
   linkType: hard
 
@@ -10335,18 +10335,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"socket.io@npm:4.7.5":
-  version: 4.7.5
-  resolution: "socket.io@npm:4.7.5"
+"socket.io@npm:4.8.0":
+  version: 4.8.0
+  resolution: "socket.io@npm:4.8.0"
   dependencies:
     accepts: "npm:~1.3.4"
     base64id: "npm:~2.0.0"
     cors: "npm:~2.8.5"
     debug: "npm:~4.3.2"
-    engine.io: "npm:~6.5.2"
+    engine.io: "npm:~6.6.0"
     socket.io-adapter: "npm:~2.5.2"
     socket.io-parser: "npm:~4.2.4"
-  checksum: 10c0/221a2cd25f6077d6672cb8b19921336e1acf06788d4bade74953dc96dbfd8b788a5f721b051341a34ee81ef8e1b2028d39ad5257516776400a3f8f3f01255c5e
+  checksum: 10c0/eab8a0da617f2583a0003883155f252f814c59324f4b174b5e940fcce2bd3a553ab9c6d7f128c7b515a537f776b1b4e34293b8324ec048c4b8df2bf8930ce8bf
   languageName: node
   linkType: hard
 
