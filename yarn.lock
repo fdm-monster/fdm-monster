@@ -1083,7 +1083,7 @@ __metadata:
     "@lcov-viewer/cli": "npm:1.3.0"
     "@lcov-viewer/istanbul-report": "npm:1.4.0"
     "@octokit/plugin-throttling": "npm:8.2.0"
-    "@sentry/node": "npm:8.32.0"
+    "@sentry/node": "npm:8.33.0"
     "@swc/cli": "npm:0.4.0"
     "@swc/core": "npm:1.7.28"
     "@swc/jest": "npm:0.2.36"
@@ -2315,6 +2315,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@opentelemetry/instrumentation-lru-memoizer@npm:0.40.0":
+  version: 0.40.0
+  resolution: "@opentelemetry/instrumentation-lru-memoizer@npm:0.40.0"
+  dependencies:
+    "@opentelemetry/instrumentation": "npm:^0.53.0"
+  peerDependencies:
+    "@opentelemetry/api": ^1.3.0
+  checksum: 10c0/2832a1668e237b8690405a7961a9a27fa99fe06f587daf13d516349805f8dcd9e0eacfd41ec45abdfaa7e79ca6e799387cdc33585b1ae7d16f80f2db1bb5b30d
+  languageName: node
+  linkType: hard
+
 "@opentelemetry/instrumentation-mongodb@npm:0.47.0":
   version: 0.47.0
   resolution: "@opentelemetry/instrumentation-mongodb@npm:0.47.0"
@@ -2538,19 +2549,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/core@npm:8.32.0":
-  version: 8.32.0
-  resolution: "@sentry/core@npm:8.32.0"
+"@sentry/core@npm:8.33.0":
+  version: 8.33.0
+  resolution: "@sentry/core@npm:8.33.0"
   dependencies:
-    "@sentry/types": "npm:8.32.0"
-    "@sentry/utils": "npm:8.32.0"
-  checksum: 10c0/11de3a4810c9f33548577356afda93081daf925663dd01c89778f82f5e74a7c46dc4b84f2983291c91ba8d040b01ad0b881b627ddcff2fc5e5354dfe66ff0cdb
+    "@sentry/types": "npm:8.33.0"
+    "@sentry/utils": "npm:8.33.0"
+  checksum: 10c0/1121e73afbc066ec1c52b6476b265204c4b29913971e27432797752a466b677c54a033f2833b2ce70a87279cfdfd86c890d6e1f18a0028a8ff20b77e5ce16dfb
   languageName: node
   linkType: hard
 
-"@sentry/node@npm:8.32.0":
-  version: 8.32.0
-  resolution: "@sentry/node@npm:8.32.0"
+"@sentry/node@npm:8.33.0":
+  version: 8.33.0
+  resolution: "@sentry/node@npm:8.33.0"
   dependencies:
     "@opentelemetry/api": "npm:^1.9.0"
     "@opentelemetry/context-async-hooks": "npm:^1.25.1"
@@ -2569,6 +2580,7 @@ __metadata:
     "@opentelemetry/instrumentation-ioredis": "npm:0.43.0"
     "@opentelemetry/instrumentation-kafkajs": "npm:0.3.0"
     "@opentelemetry/instrumentation-koa": "npm:0.43.0"
+    "@opentelemetry/instrumentation-lru-memoizer": "npm:0.40.0"
     "@opentelemetry/instrumentation-mongodb": "npm:0.47.0"
     "@opentelemetry/instrumentation-mongoose": "npm:0.42.0"
     "@opentelemetry/instrumentation-mysql": "npm:0.41.0"
@@ -2581,45 +2593,45 @@ __metadata:
     "@opentelemetry/sdk-trace-base": "npm:^1.26.0"
     "@opentelemetry/semantic-conventions": "npm:^1.27.0"
     "@prisma/instrumentation": "npm:5.19.1"
-    "@sentry/core": "npm:8.32.0"
-    "@sentry/opentelemetry": "npm:8.32.0"
-    "@sentry/types": "npm:8.32.0"
-    "@sentry/utils": "npm:8.32.0"
+    "@sentry/core": "npm:8.33.0"
+    "@sentry/opentelemetry": "npm:8.33.0"
+    "@sentry/types": "npm:8.33.0"
+    "@sentry/utils": "npm:8.33.0"
     import-in-the-middle: "npm:^1.11.0"
-  checksum: 10c0/5acee7fe284755c650555cdffce26f1b1a3b9471b39ce79c3a1e2f20fa7ea4ed64cedba598adaf46ede811810e3d71400cf363b28b2106444ddd3d270f063104
+  checksum: 10c0/d431c04baa491c3a1b8cf522110e1518c908b4eef92734b18914b3702a77d8e9a16a3b6954206dcb0c30cfa279d1f674323be3acd617f1fa8977a76b0524861c
   languageName: node
   linkType: hard
 
-"@sentry/opentelemetry@npm:8.32.0":
-  version: 8.32.0
-  resolution: "@sentry/opentelemetry@npm:8.32.0"
+"@sentry/opentelemetry@npm:8.33.0":
+  version: 8.33.0
+  resolution: "@sentry/opentelemetry@npm:8.33.0"
   dependencies:
-    "@sentry/core": "npm:8.32.0"
-    "@sentry/types": "npm:8.32.0"
-    "@sentry/utils": "npm:8.32.0"
+    "@sentry/core": "npm:8.33.0"
+    "@sentry/types": "npm:8.33.0"
+    "@sentry/utils": "npm:8.33.0"
   peerDependencies:
     "@opentelemetry/api": ^1.9.0
     "@opentelemetry/core": ^1.25.1
     "@opentelemetry/instrumentation": ^0.53.0
     "@opentelemetry/sdk-trace-base": ^1.26.0
     "@opentelemetry/semantic-conventions": ^1.27.0
-  checksum: 10c0/9244db3a4febe063062f4bf3f7f136a79d2060976a620e3afd35f5d27c45baef47f464b79dbcd68b75492c87529a1919b8e97a7e7549decc5fa41723470b982f
+  checksum: 10c0/ed7b7affe15b2c918499632c066d70c81fdebe69a442c2ea9ec29ed826fd022e30ca15ab5499c36df2330ac010f94df12dd505d97a0671d0feb534b6d2697a4e
   languageName: node
   linkType: hard
 
-"@sentry/types@npm:8.32.0":
-  version: 8.32.0
-  resolution: "@sentry/types@npm:8.32.0"
-  checksum: 10c0/386f5c8fa126c5ce8adf7740b1203b9833a78dcc23ebbe43a5e48a76093779596d35c4e58564d32b3a358a81e696f31706c870fa7ce43d3616018bb6b25c872a
+"@sentry/types@npm:8.33.0":
+  version: 8.33.0
+  resolution: "@sentry/types@npm:8.33.0"
+  checksum: 10c0/dba9a3c1c74fb3dfda64d3bdc5b1772063359fb1ffc2539da67ffa148c31c64f9b7d50113d60dfd0aacd8594c900f34edc47821be1f4efbdaa308f0125dd7d2e
   languageName: node
   linkType: hard
 
-"@sentry/utils@npm:8.32.0":
-  version: 8.32.0
-  resolution: "@sentry/utils@npm:8.32.0"
+"@sentry/utils@npm:8.33.0":
+  version: 8.33.0
+  resolution: "@sentry/utils@npm:8.33.0"
   dependencies:
-    "@sentry/types": "npm:8.32.0"
-  checksum: 10c0/cfff34eaa411dd913861d1734f02111aaebbf8d7078a0e1931a3c3ed06f332abbcbe4ec0022505c625ee296b28692f4ae5cee1c66d592ddf87fd798784d5382a
+    "@sentry/types": "npm:8.33.0"
+  checksum: 10c0/70051187adc969f7a92f1f54212363e2d9f0dcdd6dfa08c72e1000623dd7ecaeb6dfa383fc27a0d0dec618725518c3725562a61191d8d47604a3defc410a5c9a
   languageName: node
   linkType: hard
 
