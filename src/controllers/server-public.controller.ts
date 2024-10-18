@@ -127,7 +127,7 @@ export class ServerPublicController {
         available: true,
         version: 1,
         subFeatures: {
-          types: ["octoprint"],
+          types: ["octoprint", "klipper"],
         },
       },
     });

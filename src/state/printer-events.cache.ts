@@ -52,7 +52,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
         connected: null,
         reauthRequired: null,
         // slicingProgress: null,
-        // notify_status_update: null,
+        notify_status_update: null,
         current: null,
         history: null,
         // timelapse: null,
@@ -96,7 +96,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
 
   private subscribeToEvents() {
     this.eventEmitter2.on("octoprint.*", (e) => this.onOctoPrintSocketMessage(e));
-    // this.eventEmitter2.on("moonraker.*", (e) => this.onMoonrakerSocketMessage(e));
+    this.eventEmitter2.on("moonraker.*", (e) => this.onMoonrakerSocketMessage(e));
     this.eventEmitter2.on(printerEvents.printersDeleted, this.handlePrintersDeleted.bind(this));
   }
 
@@ -111,17 +111,17 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
     }
   }
 
-  // private async onMoonrakerSocketMessage(
-  //   e: MoonrakerEventDto<MR_WsMessage, PrinterObjectsQueryDto<SubscriptionType | null>, IdType>
-  // ) {
-  //   const printerId = e.printerId;
-  //   const eventType = e.event;
-  //
-  //   // https://github.com/mainsail-crew/mainsail/blob/fa61d4ef92 97426a404dd845a1a4d5e4525c43dc/src/components/panels/StatusPanel.vue#L199
-  //   if (["notify_status_update", "current"].includes(eventType)) {
-  //     await this.setEvent(printerId, eventType as "notify_status_update" | "current", e.payload);
-  //   }
-  // }
+  private async onMoonrakerSocketMessage(
+    e: MoonrakerEventDto<MR_WsMessage, PrinterObjectsQueryDto<SubscriptionType | null>, IdType>
+  ) {
+    const printerId = e.printerId;
+    const eventType = e.event;
+
+    // https://github.com/mainsail-crew/mainsail/blob/fa61d4ef92 97426a404dd845a1a4d5e4525c43dc/src/components/panels/StatusPanel.vue#L199
+    if (["notify_status_update", "current"].includes(eventType)) {
+      await this.setEvent(printerId, eventType as "notify_status_update" | "current", e.payload);
+    }
+  }
 
   private pruneHistoryPayload(payload: HistoryMessageDto) {
     delete payload.logs;
