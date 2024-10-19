@@ -13,7 +13,7 @@ import { IdType } from "@/shared.constants";
 import { SettingsStore } from "@/state/settings.store";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { normalizePrinterFile } from "@/services/octoprint/utils/file.utils";
-import { ConnectionDto, Current } from "@/services/octoprint/dto/connection/connection.dto";
+import { ConnectionDto } from "@/services/octoprint/dto/connection/connection.dto";
 import { captureException } from "@sentry/node";
 import { OP_LoginDto } from "@/services/octoprint/dto/auth/login.dto";
 import { VersionDto } from "@/services/octoprint/dto/server/version.dto";
@@ -21,7 +21,9 @@ import { ServerDto } from "@/services/octoprint/dto/server/server.dto";
 import { UserListDto } from "@/services/octoprint/dto/access/user-list.dto";
 import { OctoprintFilesResponseDto } from "@/services/octoprint/dto/files/octoprint-files-response.dto";
 import { CurrentMessageDto } from "@/services/octoprint/dto/websocket/current-message.dto";
-import { OctoPrintCurrentUserDto } from "@/services/octoprint/dto/octoprint-currentuser.dto";
+import { CurrentUserDto } from "@/services/octoprint/dto/auth/current-user.dto";
+import { JobDto } from "@/services/octoprint/dto/job/job.dto";
+import { CurrentJobDto } from "@/services/octoprint/dto/job/current-job.dto";
 
 type TAxes = "x" | "y" | "z";
 
@@ -111,6 +113,12 @@ export class OctoprintClient extends OctoprintRoutes {
     return response?.data;
   }
 
+  async getJob(login: LoginDto) {
+    const { url, options } = this.prepareRequest(login, this.apiJob);
+    const response = await this.httpClient.get(url, options);
+    return response?.data as CurrentJobDto;
+  }
+
   /**
    * Ability to start, cancel, restart, or pause a job
    */
@@ -155,7 +163,7 @@ export class OctoprintClient extends OctoprintRoutes {
 
   async getCurrentUser(login: LoginDto) {
     const { url, options } = this.prepareRequest(login, this.apiCurrentUser);
-    const response = await this.httpClient.get<OctoPrintCurrentUserDto>(url, options);
+    const response = await this.httpClient.get<CurrentUserDto>(url, options);
     return response?.data;
   }
 
