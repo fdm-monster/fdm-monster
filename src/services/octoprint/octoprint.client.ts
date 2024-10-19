@@ -22,6 +22,8 @@ import { UserListDto } from "@/services/octoprint/dto/access/user-list.dto";
 import { OctoprintFilesResponseDto } from "@/services/octoprint/dto/files/octoprint-files-response.dto";
 import { CurrentMessageDto } from "@/services/octoprint/dto/websocket/current-message.dto";
 import { OctoPrintCurrentUserDto } from "@/services/octoprint/dto/octoprint-currentuser.dto";
+import { JobDto } from "@/services/octoprint/dto/job/job.dto";
+import { CurrentJobDto } from "@/services/octoprint/dto/job/current-job.dto";
 
 type TAxes = "x" | "y" | "z";
 
@@ -109,6 +111,12 @@ export class OctoprintClient extends OctoprintRoutes {
     });
     const response = await this.httpClient.post(url, data, options);
     return response?.data;
+  }
+
+  async getJob(login: LoginDto) {
+    const { url, options } = this.prepareRequest(login, this.apiJob);
+    const response = await this.httpClient.get(url, options);
+    return response?.data as CurrentJobDto;
   }
 
   /**

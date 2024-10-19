@@ -178,23 +178,19 @@ export class BatchCallService {
       const promise = new Promise<ReprintFileDto>(async (resolve, _) => {
         try {
           const login = await this.printerCache.getLoginDtoAsync(printerId);
-          const files = (await this.octoprintClient.getLocalFiles(login, true)).filter((f) => f?.prints?.last?.date);
 
           const connected = await this.octoprintClient.getConnection(login);
           const connectionState = connected.current?.state;
 
-          // OctoPrint sorts by last print time by default
-          // files.sort((f1, f2) => {
-          //   return f1?.prints?.last?.date > f2?.prints?.last?.date ? 1 : -1;
-          // });
-
-          if (files?.length == 0) {
+          const selectedJob = await this.octoprintClient.getJob(login);
+          const currentJobFile = selectedJob?.job?.file;
+          if (!currentJobFile) {
             return resolve({ connectionState, printerId, reprintState: ReprintState.NoLastPrint });
           }
 
           return resolve({
             connectionState,
-            file: files[0],
+            file: currentJobFile,
             printerId,
             reprintState: ReprintState.LastPrintReady,
           });
