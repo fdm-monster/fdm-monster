@@ -4,6 +4,11 @@ Change:
 
 - Dropped printer file database table (kept the entity/schema), so FDMM "remote file" architecture can be redesigned. We're solely using in-memory cache from this point.
 
+Fix:
+
+- Moonraker type printers will resort to OctoPrint implementation (edge case in development)
+- Reprint will now take selected job instead of scanning the unreliable file list for latest print date
+
 # FDM Monster 14/06/2024 1.6.3
 
 ## Fixes:
