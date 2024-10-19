@@ -156,10 +156,12 @@ export class PrinterController {
   @PATCH()
   @route("/:id")
   async update(req: Request, res: Response) {
+    const forceSave = req.query.forceSave !== "true";
+
     // Update the printer entity: printerURL, name, apiKey, enabled
     const { currentPrinterId } = getScopedPrinter(req);
     const updatedPrinter = req.body;
-    if (req.query.forceSave !== "true") {
+    if (!forceSave) {
       await this.testPrintApiConnection(updatedPrinter);
     }
 
