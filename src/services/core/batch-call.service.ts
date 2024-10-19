@@ -6,7 +6,7 @@ import { PrinterEventsCache } from "@/state/printer-events.cache";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { IdType } from "@/shared.constants";
 import { CreateOrUpdatePrinterFileDto } from "../interfaces/printer-file.dto";
-import { ConnectionState } from "@/services/octoprint/dto/connection/connection.dto";
+import { ConnectionState } from "@/services/octoprint/dto/connection/connection-state.type";
 import { captureException } from "@sentry/node";
 import { errorSummary } from "@/utils/error.utils";
 import { LoggerService } from "@/handlers/logger";

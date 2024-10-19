@@ -31,7 +31,7 @@ export interface OctoPrintStatisticsDto {
   };
 }
 
-export class CreateOrUpdatePrinterFileDto<KeyType = IdType> extends IdDto<KeyType> {
+export class CreateOrUpdatePrinterFileDto<KeyType = IdType> {
   printerId?: KeyType;
 
   name: string;
