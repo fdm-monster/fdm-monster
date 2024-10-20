@@ -77,7 +77,7 @@ export class YamlService {
 
       // 1.7 backwards compatibility
       // if (![OctoprintType, MoonrakerType].includes[printer.printerType]) {
-      if (![OctoprintType].includes[printer.printerType]) {
+      if (![OctoprintType, MoonrakerType].includes[printer.printerType]) {
         printer.printerType = OctoprintType;
       }
     }

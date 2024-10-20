@@ -13,12 +13,7 @@ export interface StatusFlags {
   error: boolean;
   finished: boolean;
 }
-
 export interface FileDto {
-  /**
-   * @deprecated name will be removed soon, use path instead
-   */
-  name: string;
   path: string;
   size: number;
   date: number;
@@ -45,7 +40,7 @@ export interface IPrinterApi {
   pausePrint(): Promise<void>;
   resumePrint(): Promise<void>;
   cancelPrint(): Promise<void>;
-  quickStop(): Promise<void>;
+  emergencyStop(): Promise<void>;
 
   // Subsetting of OctoPrint
   // getName(): string;

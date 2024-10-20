@@ -13,12 +13,10 @@ export class SocketFactory {
   createInstance(printerType: number): OctoprintWebsocketAdapter | MoonrakerWebsocketAdapter {
     if (printerType === OctoprintType) {
       return this.cradle[DITokens.octoPrintSockIoAdapter];
-    }
-    // else if (printerType === MoonrakerType) {
-    //   return this.cradle[DITokens.moonrakerWebsocketAdapter];
-    // }
-    else {
-      throw new Error("PrinterType is unsupported, cant pick the right socket adapter");
+    } else if (printerType === MoonrakerType) {
+      return this.cradle[DITokens.moonrakerWebsocketAdapter];
+    } else {
+      throw new Error("PrinterType is unknown, cant pick the right socket adapter");
     }
   }
 }
