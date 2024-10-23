@@ -59,6 +59,14 @@ jobs:
       - run: yarn install --immutable
       - run: yarn build
 
+      # Publish to NPM
+      - uses: JS-DevTools/npm-publish@v3
+        with:
+          dry-run: ${{ github.ref_name == 'develop' }}
+          token: ${{ secrets.NPM_TOKEN }}
+          access: public
+          package: package.json
+
       - name: Create release
         uses: actions/create-release@v1
         id: create_release
@@ -87,10 +95,3 @@ jobs:
           asset_name: dist-server-${{ env.RELEASE_TAG }}.zip
           asset_content_type: application/zip
 
-      # Publish to NPM
-      - uses: JS-DevTools/npm-publish@v3
-        with:
-          dry-run: ${{ github.ref_name == 'develop' }}
-          token: ${{ secrets.NPM_TOKEN }}
-          access: public
-          package: package.json
