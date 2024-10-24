@@ -1,5 +1,5 @@
 import { UUID_LENGTH } from "@/constants/service.constants";
-import { OctoprintType } from "@/services/printer-api.interface";
+import { OctoprintType, MoonrakerType } from "@/services/printer-api.interface";
 
 export const exportPrintersFloorsYamlRules = {
   // Used to export
@@ -40,7 +40,7 @@ export const importPrintersFloorsYamlRules = (
     "printers.*.apiKey": `required|length:${UUID_LENGTH},${UUID_LENGTH}|alphaNumeric`,
     "printers.*.printerURL": "required|httpurl",
     "printers.*.enabled": "boolean",
-    "printers.*.printerType": `integer|in:${OctoprintType}`,
+    "printers.*.printerType": `integer|in:${OctoprintType},${MoonrakerType}`,
     "printers.*.name": "required|string",
     floors: `${!!importFloors ? "array|minLength:0" : "not"}`,
     "floors.*.id": "required",
