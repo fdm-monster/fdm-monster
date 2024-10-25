@@ -90,7 +90,7 @@
     "reflect-metadata": "0.2.2",
     "semver": "7.6.3",
     "simple-git": "3.27.0",
-    "socket.io": "4.8.0",
+    "socket.io": "4.8.1",
     "toad-scheduler": "3.0.1",
     "typeorm": "0.3.20",
     "uuid": "10.0.0",
