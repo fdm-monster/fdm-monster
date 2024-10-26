@@ -200,6 +200,13 @@ export class SettingsStore {
     return this.getSettings();
   }
 
+  async setExperimentalMoonrakerSupport(moonrakerEnabled: boolean) {
+    this.settings = await this.settingsService.patchServerSettings({
+      experimentalMoonrakerSupport: moonrakerEnabled,
+    });
+    return this.getSettings();
+  }
+
   async updateFrontendSettings(frontendSettings: FrontendSettingsDto) {
     this.settings = await this.settingsService.updateFrontendSettings(frontendSettings);
     return this.getSettings();
