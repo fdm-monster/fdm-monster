@@ -1,6 +1,6 @@
 module.exports = {
   transform: {
-    "^.+\\.[jt]s$": [
+    "^.+\\.[jt]sx?$": [
       "@swc/jest",
       {
         sourceMaps: "inline",
