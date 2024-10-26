@@ -168,6 +168,15 @@
         "ideas",
         "bug"
       ]
+    },
+    {
+      "login": "LyfeOnEdge",
+      "name": "Andrew (LyfeOnEdge) (ArcticGentoo)",
+      "avatar_url": "https://avatars.githubusercontent.com/u/26140376?v=4",
+      "profile": "https://github.com/LyfeOnEdge",
+      "contributions": [
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
