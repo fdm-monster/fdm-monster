@@ -76,7 +76,7 @@ Please join the discord, but stay professional and proactive!
 These are the people involved in the project. Find the meaning of the emoji keys [here](https://allcontributors.org/docs/en/emoji-key).
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-16-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-17-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
@@ -105,6 +105,7 @@ These are the people involved in the project. Find the meaning of the emoji keys
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://techinterview.guide"><img src="https://avatars.githubusercontent.com/u/168030?v=4?s=80" width="80px;" alt="w. ian douglas"/><br /><sub><b>w. ian douglas</b></sub></a><br /><a href="#ideas-iandouglas" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://insanityautomation.com/"><img src="https://avatars.githubusercontent.com/u/38436470?v=4?s=80" width="80px;" alt="InsanityAutomation"/><br /><sub><b>InsanityAutomation</b></sub></a><br /><a href="#ideas-InsanityAutomation" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/fdm-monster/fdm-monster/issues?q=author%3AInsanityAutomation" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/LyfeOnEdge"><img src="https://avatars.githubusercontent.com/u/26140376?v=4?s=80" width="80px;" alt="Andrew (LyfeOnEdge) (ArcticGentoo)"/><br /><sub><b>Andrew (LyfeOnEdge) (ArcticGentoo)</b></sub></a><br /><a href="#ideas-LyfeOnEdge" title="Ideas, Planning, & Feedback">🤔</a></td>
     </tr>
   </tbody>
 </table>
