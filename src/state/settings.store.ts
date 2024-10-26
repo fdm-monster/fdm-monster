@@ -41,6 +41,7 @@ export class SettingsStore {
         loginRequired: settings[serverSettingsKey].loginRequired,
         registration: settings[serverSettingsKey].registration,
         sentryDiagnosticsEnabled: settings[serverSettingsKey].sentryDiagnosticsEnabled,
+        experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
       },
       [wizardSettingKey]: settings[wizardSettingKey],
       [frontendSettingKey]: settings[frontendSettingKey],
