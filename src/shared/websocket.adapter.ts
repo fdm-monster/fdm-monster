@@ -1,5 +1,5 @@
 import { AppConstants } from "@/server.constants";
-import { CloseEvent, Data, WebSocket, Event as WsEvent, ErrorEvent } from "ws";
+import { CloseEvent, Data, WebSocket, Event as WsEvent, ErrorEvent, MessageEvent } from "ws";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 

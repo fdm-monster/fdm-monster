@@ -26,7 +26,7 @@ export async function setupTestApp(
   httpServer: Express;
   httpClient: AxiosMock;
   request: supertest.SuperTest<supertest.Test>;
-  octoPrintApiService: OctoPrintApiMock;
+  octoprintClient: OctoPrintApiMock;
   typeormService: TypeormService;
   [k: string]: any;
 }> {
@@ -34,7 +34,7 @@ export async function setupTestApp(
 
   const { httpServer, container } = await setupServer();
   container.register({
-    [DITokens.octoPrintApiService]: asClass(OctoPrintApiMock).singleton(),
+    [DITokens.octoprintClient]: asClass(OctoPrintApiMock).singleton(),
     [DITokens.httpClient]: asClass(AxiosMock).singleton(),
     [DITokens.appDefaultRole]: asValue(ROLES.ADMIN),
     [DITokens.appDefaultRoleNoLogin]: asValue(ROLES.ADMIN),
@@ -74,7 +74,7 @@ export async function setupTestApp(
     request: supertest(httpServer),
     container,
     httpClient: container.resolve<AxiosMock>(DITokens.httpClient),
-    [DITokens.octoPrintApiService]: container.resolve<OctoPrintApiMock>(DITokens.octoPrintApiService),
+    [DITokens.octoprintClient]: container.resolve<OctoPrintApiMock>(DITokens.octoprintClient),
     [DITokens.taskManagerService]: container.resolve<TaskManagerService>(DITokens.taskManagerService),
     [DITokens.typeormService]: container.resolve<TypeormService>(DITokens.typeormService),
   };

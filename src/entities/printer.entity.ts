@@ -2,8 +2,8 @@ import { IsAlphanumeric } from "class-validator";
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, Relation } from "typeorm";
 import { PrintCompletion } from "@/entities/print-completion.entity";
 import { BaseEntity } from "@/entities/base.entity";
-import { PrinterFile } from "@/entities/printer-file.entity";
 import { PrinterGroup } from "@/entities/printer-group.entity";
+import { OctoprintType } from "@/services/printer-api.interface";
 
 @Entity()
 export class Printer extends BaseEntity {
@@ -15,6 +15,9 @@ export class Printer extends BaseEntity {
 
   @Column()
   printerURL!: string;
+
+  @Column({ default: OctoprintType, nullable: false })
+  printerType!: number;
 
   @Column()
   @IsAlphanumeric()
@@ -41,9 +44,6 @@ export class Printer extends BaseEntity {
 
   @OneToMany(() => PrinterGroup, (pc) => pc.printer)
   printerGroups!: Relation<PrinterGroup>[];
-
-  @OneToMany(() => PrinterFile, (p) => p.printerId)
-  printerFiles!: Relation<PrinterFile>[];
 
   @CreateDateColumn({ type: "int" })
   dateAdded!: number;

@@ -1,7 +1,7 @@
-import { CreateOrUpdatePrinterFileDto } from "@/services/interfaces/printer-file.dto";
-import { OctoPrintCustomDto, OctoprintRawFileDto } from "@/services/octoprint/models/octoprint-file.dto";
+import { OctoPrintCustomDto, OctoprintFileDto } from "@/services/octoprint/dto/files/octoprint-file.dto";
+import { FileDto } from "@/services/printer-api.interface";
 
-export function normalizePrinterFile(file: OctoprintRawFileDto): CreateOrUpdatePrinterFileDto {
+export function normalizePrinterFile(file: OctoprintFileDto): FileDto {
   if (!file) {
     throw new Error("File should not be null for normalization");
   }
@@ -12,19 +12,19 @@ export function normalizePrinterFile(file: OctoprintRawFileDto): CreateOrUpdateP
   };
 
   const knownKeys = [
-    "name",
-    "date",
-    "display",
-    "gcodeAnalysis",
-    "hash",
-    "origin",
     "path",
-    "prints",
-    "refs",
+    "date",
+    "hash",
+    // "display",
+    // "gcodeAnalysis",
+    // "origin",
+    "name",
+    // "prints",
+    // "refs",
     "size",
-    "statistics",
-    "type",
-    "typePath",
+    // "statistics",
+    // "type",
+    // "typePath",
   ];
 
   const unknownKeys = keys.filter((k) => !knownKeys.includes(k));

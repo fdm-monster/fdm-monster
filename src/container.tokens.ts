@@ -1,5 +1,3 @@
-import { MoonrakerClient } from "@/services/moonraker/moonraker.client";
-
 export const DITokens = {
   // Values
   serverVersion: "serverVersion",
@@ -41,21 +39,23 @@ export const DITokens = {
   permissionService: "permissionService",
   jwtService: "jwtService",
   roleService: "roleService",
-  octoPrintApiService: "octoPrintApiService",
+  octoprintApi: "octoprintApi",
+  octoprintClient: "octoprintClient",
+  moonrakerApi: "moonrakerApi",
   moonrakerClient: "moonrakerClient",
   cameraStreamService: "cameraStreamService",
   socketFactory: "socketFactory",
+  printerApiFactory: "printerApiFactory",
+  printerLogin: "printerLogin",
   batchCallService: "batchCallService",
   pluginRepositoryCache: "pluginRepositoryCache",
   pluginFirmwareUpdateService: "pluginFirmwareUpdateService",
   influxDbV2BaseService: "influxDbV2BaseService",
   systemInfoBundleService: "systemInfoBundleService",
-  printerFilesService: "printerFilesService",
   customGCodeService: "customGCodeService",
   // Stores/states
   settingsStore: "settingsStore",
   printerCache: "printerCache",
-  printerConnectionCache: "printerConnectionCache",
   printerEventsCache: "printerEventsCache",
   printerSocketStore: "printerSocketStore",
   testPrinterSocketStore: "testPrinterSocketStore",

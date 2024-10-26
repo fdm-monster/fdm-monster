@@ -12,6 +12,7 @@ import { PrinterGroupService } from "@/services/orm/printer-group.service";
 import { testPrinterData } from "./test-data/printer.data";
 import { FloorStore } from "@/state/floor.store";
 import { FloorPositionService } from "@/services/orm/floor-position.service";
+import { OctoprintType } from "@/services/printer-api.interface";
 
 let container: AwilixContainer;
 let yamlService: YamlService;
@@ -47,6 +48,23 @@ afterEach(async () => {
 });
 
 describe(YamlService.name, () => {
+  it("should import yaml from version 1.3.1 and export it", async () => {
+    await printerCache.loadCache();
+    await yamlService.importPrintersAndFloors(exportYamlBuffer1_3_1);
+
+    const yamlDump = await yamlService.exportPrintersAndFloors({
+      exportFloors: true,
+      exportPrinters: true,
+      exportFloorGrid: true,
+      exportGroups: true,
+      printerComparisonStrategiesByPriority: ["name", "id"],
+      floorComparisonStrategiesByPriority: "floor",
+    });
+
+    expect(yamlDump).toBeDefined();
+    expect(yamlDump.includes(`printerType: ${OctoprintType}`)).toBeTruthy();
+  });
+
   it("should import yaml from version 1.3.1", async () => {
     await printerCache.loadCache();
     await yamlService.importPrintersAndFloors(exportYamlBuffer1_3_1);

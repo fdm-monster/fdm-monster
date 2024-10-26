@@ -1,12 +1,12 @@
 import { DITokens } from "@/container.tokens";
-import { PrintCompletionService } from "@/services/print-completion.service";
+import { PrintCompletionService } from "@/services/orm/print-completion.service";
 import { EVENT_TYPES } from "@/services/octoprint/constants/octoprint-websocket.constants";
 import { setupTestApp } from "../test-server";
 import { AwilixContainer } from "awilix";
 import { generateCorrelationToken } from "@/utils/correlation-token.util";
 import { createTestPrinter } from "../api/test-data/create-printer";
-import supertest, { SuperTest } from "supertest";
-import { IPrintCompletionService } from "@/services/interfaces/print-completion.service";
+import supertest from "supertest";
+import { IPrintCompletionService } from "@/services/interfaces/print-completion.interface";
 import { SqliteIdType } from "@/shared.constants";
 import { PrintCompletion } from "@/entities";
 

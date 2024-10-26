@@ -1,9 +1,8 @@
 import { validNewPrinterState } from "../test-data/printer.data";
-import { PrinterService } from "@/services/printer.service";
+import { PrinterService } from "@/services/orm/printer.service";
 import { PrinterCache } from "@/state/printer.cache";
 import { PrinterFilesStore } from "@/state/printer-files.store";
-import { AwilixContainer } from "awilix";
-jest.mock("../../../src/services/octoprint/octoprint-api.service");
+jest.mock("@/services/octoprint/octoprint.client");
 import { DITokens } from "@/container.tokens";
 import { configureContainer } from "@/container";
 import { ValidationException } from "@/exceptions/runtime.exceptions";
@@ -11,7 +10,6 @@ import { TestPrinterSocketStore } from "@/state/test-printer-socket.store";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 
-let container: AwilixContainer;
 let printerService: PrinterService;
 let printerCache: PrinterCache;
 let testPrinterSocketStore: TestPrinterSocketStore;

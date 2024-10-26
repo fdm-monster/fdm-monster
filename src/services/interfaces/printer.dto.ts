@@ -10,4 +10,5 @@ export class PrinterDto<KeyType> extends IdDto<KeyType> {
 export class PrinterUnsafeDto<KeyType> extends PrinterDto<KeyType> {
   apiKey: string;
   printerURL: string;
+  printerType: number;
 }

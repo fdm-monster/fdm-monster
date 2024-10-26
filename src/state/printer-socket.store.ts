@@ -2,23 +2,25 @@ import { captureException } from "@sentry/node";
 import { errorSummary } from "@/utils/error.utils";
 import { printerEvents } from "@/constants/event.constants";
 import EventEmitter2 from "eventemitter2";
-import { SocketFactory } from "@/services/octoprint/socket.factory";
+import { SocketFactory } from "@/services/socket.factory";
 import { PrinterCache } from "@/state/printer.cache";
-import { OctoPrintSockIoAdapter } from "@/services/octoprint/octoprint-sockio.adapter";
+import { OctoprintWebsocketAdapter } from "@/services/octoprint/octoprint-websocket.adapter";
 import { LoggerService } from "@/handlers/logger";
 import { ConfigService } from "@/services/core/config.service";
 import { SettingsStore } from "@/state/settings.store";
 import { SocketIoGateway } from "@/state/socket-io.gateway";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IdType } from "@/shared.constants";
-import { PrinterDto } from "@/services/interfaces/printer.dto";
+import { PrinterUnsafeDto } from "@/services/interfaces/printer.dto";
+import { MoonrakerWebsocketAdapter } from "@/services/moonraker/moonraker-websocket.adapter";
+import { OctoprintType } from "@/services/printer-api.interface";
 
 export class PrinterSocketStore {
   socketIoGateway: SocketIoGateway;
   socketFactory: SocketFactory;
   eventEmitter2: EventEmitter2;
   printerCache: PrinterCache;
-  printerSocketAdaptersById: Record<string, OctoPrintSockIoAdapter> = {};
+  printerSocketAdaptersById: Record<string, OctoprintWebsocketAdapter | MoonrakerWebsocketAdapter> = {};
   logger: LoggerService;
   configService: ConfigService;
   settingsStore: SettingsStore;
@@ -56,6 +58,7 @@ export class PrinterSocketStore {
     Object.values(this.printerSocketAdaptersById).forEach((s) => {
       socketStatesById[s.printerId] = {
         printerId: s.printerId,
+        printerType: s.printerType,
         socket: s.socketState,
         api: s.apiState,
       };
@@ -104,7 +107,7 @@ export class PrinterSocketStore {
     socket.resetSocketState();
   }
 
-  getPrinterSocket(id: IdType): OctoPrintSockIoAdapter | undefined {
+  getPrinterSocket(id: IdType): OctoprintWebsocketAdapter | undefined {
     return this.printerSocketAdaptersById[id];
   }
 
@@ -120,11 +123,13 @@ export class PrinterSocketStore {
     const failedSocketsReauth = [];
     for (const socket of Object.values(this.printerSocketAdaptersById)) {
       try {
-        if (socket.needsReauth()) {
+        if (socket.printerType === OctoprintType && (socket as OctoprintWebsocketAdapter).needsReauth()) {
           reauthRequested++;
+          // TODO OP close socket
           const promise = socket.reauthSession().catch((_) => {
             failedSocketsReauth.push(socket.printerId);
           });
+          // TODO MR reconnect
           promisesReauth.push(promise);
         }
       } catch (e) {
@@ -188,7 +193,7 @@ export class PrinterSocketStore {
     };
   }
 
-  createOrUpdateSocket(printer: PrinterDto<IdType>) {
+  createOrUpdateSocket(printer: PrinterUnsafeDto<IdType>) {
     const { enabled, id } = printer;
     let foundAdapter = this.printerSocketAdaptersById[id.toString()];
 
@@ -201,7 +206,7 @@ export class PrinterSocketStore {
 
     // Create a new socket if it doesn't exist
     if (!foundAdapter) {
-      foundAdapter = this.socketFactory.createInstance();
+      foundAdapter = this.socketFactory.createInstance(printer.printerType);
       this.printerSocketAdaptersById[id] = foundAdapter;
     } else {
       foundAdapter.close();
@@ -214,6 +219,7 @@ export class PrinterSocketStore {
       loginDto: {
         apiKey: printer.apiKey,
         printerURL: printer.printerURL,
+        printerType: printer.printerType,
       },
       protocol: "ws",
     });

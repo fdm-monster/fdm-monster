@@ -1,24 +1,18 @@
 import { isTestEnvironment } from "@/utils/env.utils";
 import { ILoggerFactory } from "@/handlers/logger-factory";
-import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
+import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { LoggerService } from "@/handlers/logger";
 
 export class PluginRepositoryCache {
-  octoPrintApiService: OctoPrintApiService;
+  octoprintClient: OctoprintClient;
   logger: LoggerService;
 
   wasCached = false;
   pluginCache = [];
   lastQueried = undefined;
 
-  constructor({
-    octoPrintApiService,
-    loggerFactory,
-  }: {
-    octoPrintApiService: OctoPrintApiService;
-    loggerFactory: ILoggerFactory;
-  }) {
-    this.octoPrintApiService = octoPrintApiService;
+  constructor({ octoprintClient, loggerFactory }: { octoprintClient: OctoprintClient; loggerFactory: ILoggerFactory }) {
+    this.octoprintClient = octoprintClient;
     this.logger = loggerFactory(PluginRepositoryCache.name);
   }
 
@@ -38,7 +32,7 @@ export class PluginRepositoryCache {
   }
 
   async queryCache() {
-    this.pluginCache = (await this.octoPrintApiService.fetchOctoPrintPlugins()) || [];
+    this.pluginCache = (await this.octoprintClient.fetchOctoPrintPlugins()) || [];
     this.wasCached = true;
     this.lastQueried = Date.now();
 

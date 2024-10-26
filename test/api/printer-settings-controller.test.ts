@@ -14,16 +14,16 @@ const setGCodeAnalysisRoute = (id: string) => `${getRoute(id)}/gcode-analysis`;
 const syncPrinterNameRoute = (id: string) => `${getRoute(id)}/sync-printername`;
 
 let request: supertest.SuperTest<supertest.Test>;
-let octoPrintApiService: OctoPrintApiMock;
+let octoprintClient: OctoPrintApiMock;
 
 beforeAll(async () => {
-  ({ request, octoPrintApiService } = await setupTestApp(true));
+  ({ request, octoprintClient } = await setupTestApp(true));
 });
 
 describe(PrinterSettingsController.name, () => {
   it("should return printer settings from OctoPrint", async () => {
     const testPrinter = await createTestPrinter(request);
-    octoPrintApiService.storeResponse(
+    octoprintClient.storeResponse(
       {
         api: {
           allowCrossOrigin: true,
@@ -40,7 +40,7 @@ describe(PrinterSettingsController.name, () => {
 
   it("should set printer gcode settings to false on OctoPrint", async () => {
     const testPrinter = await createTestPrinter(request);
-    octoPrintApiService.storeResponse({}, 200);
+    octoprintClient.storeResponse({}, 200);
     const response = await request.post(setGCodeAnalysisRoute(testPrinter.id)).send({
       enabled: false,
     });
@@ -49,7 +49,7 @@ describe(PrinterSettingsController.name, () => {
 
   it("should sync printer name to OctoPrint", async () => {
     const testPrinter = await createTestPrinter(request);
-    octoPrintApiService.storeResponse({}, 200);
+    octoprintClient.storeResponse({}, 200);
     const response = await request.post(syncPrinterNameRoute(testPrinter.id)).send({});
     expectOkResponse(response, {});
   });

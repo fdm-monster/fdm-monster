@@ -12,7 +12,6 @@ import { Permission, PrintCompletion, RefreshToken, User } from "@/entities";
 import { CameraStream } from "@/entities/camera-stream.entity";
 import { CustomGcode } from "@/entities/custom-gcode.entity";
 import { Role } from "@/entities/role.entity";
-import { PrinterFile } from "@/entities/printer-file.entity";
 import { UserRole } from "@/entities/user-role.entity";
 import { InitSqlite1706829146617 } from "@/migrations/1706829146617-InitSqlite";
 import { PrinterGroup } from "@/entities/printer-group.entity";
@@ -20,6 +19,8 @@ import { Group } from "@/entities/group.entity";
 import { PrinterGroup1707494762198 } from "@/migrations/1707494762198-PrinterGroup";
 import { ChangePrintCompletionDeletePrinterCascade1708465930665 } from "@/migrations/1708465930665-ChangePrintCompletionDeletePrinterCascade";
 import { ChangeRoleNameUnique1713300747465 } from "@/migrations/1713300747465-ChangeRoleNameUnique";
+import { RemovePrinterFile1720338804844 } from "@/migrations/1720338804844-RemovePrinterFile";
+import { AddPrinterType1713897879622 } from "@/migrations/1713897879622-AddPrinterType";
 
 dotenv.config({
   path: join(superRootPath(), ".env"),
@@ -41,7 +42,6 @@ export const AppDataSource = new DataSource({
     Floor,
     FloorPosition,
     Printer,
-    PrinterFile,
     Settings,
     User,
     CameraStream,
@@ -59,6 +59,8 @@ export const AppDataSource = new DataSource({
     PrinterGroup1707494762198,
     ChangePrintCompletionDeletePrinterCascade1708465930665,
     ChangeRoleNameUnique1713300747465,
+    RemovePrinterFile1720338804844,
+    AddPrinterType1713897879622,
   ],
   subscribers: [],
 });

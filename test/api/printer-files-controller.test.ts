@@ -16,21 +16,19 @@ const purgeIndexedFilesRoute = `${defaultRoute}/purge`;
 type idType = Number;
 const getRoute = (id: idType) => `${defaultRoute}/${id}`;
 const clearFilesRoute = (id: idType) => `${getRoute(id)}/clear`;
-const moveFileOrFolderRoute = (id: idType) => `${getRoute(id)}/move`;
-const deleteFileOrFolderRoute = (id: idType, path: string) => `${getRoute(id)}?path=${path}`;
-const selectAndPrintRoute = (id: idType) => `${getRoute(id)}/select`;
+const deleteFileRoute = (id: idType, path: string) => `${getRoute(id)}?path=${path}`;
+const printFileRoute = (id: idType) => `${getRoute(id)}/print`;
 const uploadFileRoute = (id: idType) => `${getRoute(id)}/upload`;
-const createFolderRoute = (id: idType) => `${getRoute(id)}/create-folder`;
-const getFilesRoute = (id: idType, recursive: boolean) => `${getRoute(id)}?recursive=${recursive}`;
+const getFilesRoute = (id: idType) => `${getRoute(id)}`;
 const getCacheRoute = (id: idType) => `${getRoute(id)}/cache`;
 
 let request: supertest.SuperTest<supertest.Test>;
-let octoPrintApiService: OctoPrintApiMock;
+let octoprintClient: OctoPrintApiMock;
 let container: AwilixContainer;
 let printerService: IPrinterService;
 
 beforeAll(async () => {
-  ({ request, octoPrintApiService, container } = await setupTestApp(true));
+  ({ request, octoprintClient, container } = await setupTestApp(true));
   printerService = container.resolve<IPrinterService>(DITokens.printerService);
 });
 
@@ -39,7 +37,7 @@ beforeEach(async () => {
   for (let printer of printers) {
     await printerService.delete(printer.id);
   }
-  octoPrintApiService.storeResponse(undefined, undefined);
+  octoprintClient.storeResponse(undefined, undefined);
 });
 
 describe(PrinterFilesController.name, () => {
@@ -51,16 +49,10 @@ describe(PrinterFilesController.name, () => {
     expectNotFoundResponse(res);
   });
 
-  it(`should require 'recursive' on ${defaultRoute} for existing printer`, async () => {
-    const printer = await createTestPrinter(request);
-    const response = await request.get(getRoute(printer.id)).send();
-    expectInvalidResponse(response, ["recursive"]);
-  });
-
   it("should retrieve files on GET for existing printer", async () => {
     const printer = await createTestPrinter(request);
-    octoPrintApiService.storeResponse({ files: [], free: 1, total: 1 }, 200);
-    const response = await request.get(getFilesRoute(printer.id, false)).send();
+    octoprintClient.storeResponse({ files: [], free: 1, total: 1 }, 200);
+    const response = await request.get(getFilesRoute(printer.id)).send();
     expectOkResponse(response, []);
   });
 
@@ -83,7 +75,7 @@ describe(PrinterFilesController.name, () => {
   it("should allow DELETE to clear printer files - with status result", async () => {
     const printer = await createTestPrinter(request);
     const jsonFile = require("./test-data/octoprint-file.data.json");
-    octoPrintApiService.storeResponse({ files: [jsonFile] }, 200);
+    octoprintClient.storeResponse({ files: [jsonFile] }, 200);
     const response = await request.delete(clearFilesRoute(printer.id)).send();
     expectOkResponse(response, {
       succeededFiles: expect.any(Array),
@@ -100,35 +92,16 @@ describe(PrinterFilesController.name, () => {
     expectOkResponse(response);
   });
 
-  it("should allow POST to move a printer folder", async () => {
-    const printer = await createTestPrinter(request);
-    const response = await request.post(moveFileOrFolderRoute(printer.id)).send({
-      filePath: "/test",
-      destination: "/test2",
-    });
-    expectOkResponse(response);
-  });
-
-  it("should allow POST to create a printer folder", async () => {
-    const printer = await createTestPrinter(request);
-    const response = await request.post(createFolderRoute(printer.id)).send({
-      foldername: "/test",
-      path: "local",
-    });
-    expectOkResponse(response);
-  });
-
   it("should allow DELETE to remove a printer file or folder", async () => {
     const printer = await createTestPrinter(request);
-    const response = await request.delete(deleteFileOrFolderRoute(printer.id, "test")).send();
+    const response = await request.delete(deleteFileRoute(printer.id, "test")).send();
     expectOkResponse(response);
   });
 
-  it("should allow POST to select and print a printer file", async () => {
+  it("should allow POST to print a printer file", async () => {
     const printer = await createTestPrinter(request);
-    const response = await request.post(selectAndPrintRoute(printer.id)).send({
+    const response = await request.post(printFileRoute(printer.id)).send({
       filePath: "file.gcode",
-      print: false,
     });
     expectOkResponse(response);
   });
@@ -145,7 +118,7 @@ describe(PrinterFilesController.name, () => {
         },
       },
     });
-    octoPrintApiService.storeResponse(
+    octoprintClient.storeResponse(
       {
         DisplayLayerProgress: {
           totalLayerCountWithoutOffset: "19",
@@ -224,7 +197,10 @@ describe(PrinterFilesController.name, () => {
       200
     );
 
-    const response = await request.post(uploadFileRoute(printer.id)).field("print", true).attach("file", gcodePath);
+    const response = await request
+      .post(uploadFileRoute(printer.id))
+      // .field("print", true)
+      .attach("file", gcodePath);
     expectOkResponse(response);
   });
 

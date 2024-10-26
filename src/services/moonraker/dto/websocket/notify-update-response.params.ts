@@ -6,6 +6,7 @@ export const applications = {
 } as const;
 export const applicationList = Object.keys(applications);
 export type Application = keyof typeof applicationList;
+
 export interface NotifyUpdateResponseParams {
   application: Application;
   proc_id: number;

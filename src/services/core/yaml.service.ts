@@ -13,6 +13,7 @@ import { IPrinterService } from "@/services/interfaces/printer.service.interface
 import { IFloorService } from "@/services/interfaces/floor.service.interface";
 import { SqliteIdType } from "@/shared.constants";
 import { IPrinterGroupService } from "@/services/interfaces/printer-group.service.interface";
+import { MoonrakerType, OctoprintType } from "@/services/printer-api.interface";
 
 export class YamlService {
   printerGroupService: IPrinterGroupService<SqliteIdType>;
@@ -73,6 +74,12 @@ export class YamlService {
       if (databaseTypeSqlite && typeof printer.id === "string") {
         printer.id = parseInt(printer.id);
       }
+
+      // 1.7 backwards compatibility
+      // if (![OctoprintType, MoonrakerType].includes[printer.printerType]) {
+      if (![OctoprintType].includes[printer.printerType]) {
+        printer.printerType = OctoprintType;
+      }
     }
 
     if (databaseTypeSqlite) {
@@ -92,7 +99,7 @@ export class YamlService {
 
     const importData = await validateInput(
       importSpec,
-      importPrintersFloorsYamlRules(exportPrinters, exportFloorGrid, exportFloors, exportGroups, this.isTypeormMode)
+      importPrintersFloorsYamlRules(exportPrinters, exportFloorGrid, exportFloors, exportGroups)
     );
 
     // Nested validation is manual (for now)
@@ -211,7 +218,6 @@ export class YamlService {
         updatedFloor.printers = knownPrinters;
       }
       const newFloor = await this.floorStore.update(updateId, updatedFloor);
-      console.log(JSON.stringify(newFloor, null, 2));
       floorIdMap[originalFloorId] = newFloor.id;
     }
 
@@ -465,6 +471,7 @@ export class YamlService {
           id: printerId,
           disabledReason: p.disabledReason,
           enabled: p.enabled,
+          printerType: p.printerType,
           dateAdded: p.dateAdded,
           name: p.name,
           printerURL: p.printerURL,

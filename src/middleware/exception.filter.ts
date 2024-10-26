@@ -25,7 +25,7 @@ export function exceptionFilter(err: any | AxiosError, req: Request, res: Respon
     return res.status(code).send({
       error: "External API call failed",
       type: "axios-error",
-      data: err.response?.data,
+      data: err.response?.data?._readableState ? null : err.response?.data,
     });
   }
   if (err instanceof AuthenticationError) {

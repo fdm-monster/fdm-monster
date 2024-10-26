@@ -3,22 +3,23 @@ import { AxiosMock } from "../../mocks/axios.mock";
 import { setupTestApp } from "../../test-server";
 import { AwilixContainer } from "awilix";
 import { OctoPrintApiMock } from "../../mocks/octoprint-api.mock";
-import { OctoPrintApiService } from "@/services/octoprint/octoprint-api.service";
-import { OctoPrintCurrentUserDto } from "@/services/octoprint/dto/octoprint-currentuser.dto";
+import { OctoprintClient } from "@/services/octoprint/octoprint.client";
+import { CurrentUserDto } from "@/services/octoprint/dto/auth/current-user.dto";
+import { OctoprintType } from "@/services/printer-api.interface";
 
-let octoPrintApiService: OctoPrintApiMock;
+let octoprintClient: OctoPrintApiMock;
 let container: AwilixContainer;
 let httpClient: AxiosMock;
 
 beforeAll(async () => {
-  ({ container, httpClient, octoPrintApiService } = await setupTestApp(true));
+  ({ container, httpClient, octoprintClient } = await setupTestApp(true));
   await container.resolve(DITokens.settingsStore).loadSettings();
 });
 
-describe(OctoPrintApiService.name, () => {
+describe(OctoprintClient.name, () => {
   const apiKey = "surewhynotsurewhynotsurewhynotsu";
   const printerURL = "http://someurl/";
-  const auth = { apiKey, printerURL };
+  const auth = { apiKey, printerURL, printerType: OctoprintType };
 
   beforeEach(() => {
     httpClient.saveMockResponse(undefined, 200);
@@ -28,15 +29,16 @@ describe(OctoPrintApiService.name, () => {
     // TODO Not human-friendly
     await expect(
       async () =>
-        await octoPrintApiService.getSettings({
+        await octoprintClient.getSettings({
           apiKey: "surewhynot",
           printerURL: "some uwrl",
+          printerType: OctoprintType,
         })
     ).rejects.toHaveProperty("code", "ERR_INVALID_URL");
   });
 
   it("should not throw error on getSettings with correct printerURL", async () => {
-    const settings = await octoPrintApiService.getSettings(auth);
+    await octoprintClient.getSettings(auth);
   });
 
   it("should get first admin's username when response not recognized", async () => {
@@ -84,117 +86,117 @@ describe(OctoPrintApiService.name, () => {
           "PLUGIN_SOFTWAREUPDATE_UPDATE",
           "PLUGIN_SOFTWAREUPDATE_CONFIGURE",
         ],
-      } as OctoPrintCurrentUserDto,
+      } as CurrentUserDto,
       200
     );
-    const adminResult = await octoPrintApiService.getAdminUserOrDefault(auth);
+    const adminResult = await octoprintClient.getAdminUserOrDefault(auth);
     expect(adminResult).toBe("rooter");
   });
 
   it("should pick admin user from keys", async () => {
     const usersResponse = require("../test-data/octoprint-users.response.json");
     httpClient.saveMockResponse(usersResponse, 200);
-    const adminResult = await octoPrintApiService.getAdminUserOrDefault(auth);
+    const adminResult = await octoprintClient.getAdminUserOrDefault(auth);
     expect(adminResult).toBeUndefined();
   });
 
   it("should not throw error on getUsers", async () => {
-    const usersResult = await octoPrintApiService.getUsers(auth);
+    const usersResult = await octoprintClient.getUsers(auth);
     expect(usersResult).toBeUndefined();
   });
 
   it("should not throw error on getFiles", async () => {
-    const filesResult = await octoPrintApiService.getLocalFiles(auth);
+    const filesResult = await octoprintClient.getLocalFiles(auth);
     expect(filesResult).toHaveLength(0);
   });
 
   it("should not throw error on getFile", async () => {
-    const fileResult = await octoPrintApiService.getFile(auth, "usr/path/illegal.gcode");
+    const fileResult = await octoprintClient.getFile(auth, "usr/path/illegal.gcode");
     expect(fileResult).toBeUndefined();
   });
 
   it("should not throw error on sendJobCommand", async () => {
-    const result = await octoPrintApiService.sendJobCommand(auth, { select: true });
+    const result = await octoprintClient.sendJobCommand(auth, { select: true });
     expect(result).toBeUndefined();
   });
 
   it("should not throw error on sendBedTempCommand", async () => {
-    const result = await octoPrintApiService.sendBedTempCommand(auth, 50);
+    const result = await octoprintClient.sendBedTempCommand(auth, 50);
     expect(result).toBeUndefined();
   });
 
   it("should not throw error on setGCodeAnalysis", async () => {
-    const result = await octoPrintApiService.setGCodeAnalysis(auth, false);
+    const result = await octoprintClient.setGCodeAnalysis(auth, false);
     expect(result).toBeUndefined();
   });
 
   it("should not throw error on createFolder", async () => {
-    const result = await octoPrintApiService.createFolder(auth, "newPath", "someFolder");
+    const result = await octoprintClient.createFolder(auth, "newPath", "someFolder");
     expect(result).toBeUndefined();
   });
 
   it("should not throw error on moveFileOrFolder", async () => {
-    const result = await octoPrintApiService.moveFileOrFolder(auth, "oldPath", "newPath");
+    const result = await octoprintClient.moveFileOrFolder(auth, "oldPath", "newPath");
     expect(result).toBeUndefined();
   });
 
   it("should not throw error on selectPrintFile", async () => {
-    const result = await octoPrintApiService.selectPrintFile(auth, "path", true);
+    const result = await octoprintClient.postSelectPrintFile(auth, "path", true);
     expect(result).toBeUndefined();
   });
 
   it("should not throw error on deleteFileOrFolder", async () => {
-    const result = await octoPrintApiService.deleteFileOrFolder(auth, "path");
+    const result = await octoprintClient.deleteFileOrFolder(auth, "path");
     expect(result).toBeUndefined();
   });
 
   it("should not throw error on getConnection", async () => {
-    const result = await octoPrintApiService.getConnection(auth);
+    const result = await octoprintClient.getConnection(auth);
     expect(result).toBeUndefined();
   });
 
   it("should not throw error on getPrinterProfiles", async () => {
-    const result = await octoPrintApiService.getPrinterProfiles(auth);
+    const result = await octoprintClient.getPrinterProfiles(auth);
     expect(result).toBeUndefined();
   });
 
   it("should not throw error on getApiPluginManager", async () => {
-    const result = await octoPrintApiService.getPluginManagerPlugins(auth);
+    const result = await octoprintClient.getPluginManagerPlugins(auth);
     expect(result).toBeUndefined();
   });
 
   it("should not throw error on getSystemInfo", async () => {
-    const result = await octoPrintApiService.getSystemInfo(auth);
+    const result = await octoprintClient.getSystemInfo(auth);
     expect(result).toBeUndefined();
   });
 
   it("should not throw error on getSystemCommands", async () => {
-    const result = await octoPrintApiService.getSystemCommands(auth);
+    const result = await octoprintClient.getSystemCommands(auth);
     expect(result).toBeUndefined();
   });
 
   it("should not throw error on getSoftwareUpdateCheck", async () => {
-    const result = await octoPrintApiService.getSoftwareUpdateCheck(auth, false);
+    const result = await octoprintClient.getSoftwareUpdateCheck(auth, false);
     expect(result).toBeUndefined();
   });
 
   it("should not throw error on getPluginPiSupport", async () => {
-    const result = await octoPrintApiService.getPluginPiSupport(auth);
+    const result = await octoprintClient.getPluginPiSupport(auth);
     expect(result).toBeUndefined();
   });
 
   it("should not throw error on deleteTimeLapse", async () => {
-    const result = await octoPrintApiService.deleteTimeLapse(auth, "deletedFile");
+    const result = await octoprintClient.deleteTimeLapse(auth, "deletedFile");
     expect(result).toBeUndefined();
   });
 
   it("should not throw error on listUnrenderedTimeLapses", async () => {
-    const result = await octoPrintApiService.listUnrenderedTimeLapses(auth);
+    const result = await octoprintClient.listUnrenderedTimeLapses(auth);
     expect(result).toBeUndefined();
   });
 
   it("should not throw error on listProfiles", async () => {
-    const result = await octoPrintApiService.listProfiles(auth);
+    const result = await octoprintClient.listProfiles(auth);
     expect(result).toBeUndefined();
   });
 });

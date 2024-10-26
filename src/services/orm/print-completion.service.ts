@@ -9,7 +9,7 @@ import { groupArrayBy } from "@/utils/array.util";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
-import { AnalyzedCompletions, processCompletions } from "@/services/print-completion.shared";
+import { AnalyzedCompletions, processCompletions } from "@/services/mongoose/print-completion.shared";
 
 export class PrintCompletionService
   extends BaseService(PrintCompletion, PrintCompletionDto<SqliteIdType>)
@@ -41,11 +41,15 @@ export class PrintCompletionService
 
   async findPrintCompletion(correlationId: string) {
     const completions = await this.repository.findBy({});
-    console.log({ context: { correlationId } });
     return completions.filter((c) => c.context?.correlationId === correlationId);
   }
 
   async updateContext(correlationId: string, context: PrintCompletionContext): Promise<void> {
+    if (!correlationId?.length) {
+      this.logger.warn("Ignoring undefined correlationId, cant update print completion context");
+      return;
+    }
+
     const completionEntry = await this.repository.findOneBy({
       context: { correlationId },
       status: EVENT_TYPES.PrintStarted,

@@ -10,7 +10,7 @@ jobs:
     outputs:
       foundServerVersion: ${{ steps.init.outputs.foundServerVersion }}
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - name: get-client-version
         # https://gist.github.com/DarrenN/8c6a5b969481725a4413?permalink_comment_id=3863317#gistcomment-3863317
         run: |
@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     if: needs.checkversion.outputs.foundServerVersion == 'false'
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - uses: actions/setup-node@v4
         with:
           node-version: 18.x
@@ -58,6 +58,14 @@ jobs:
       - run: yarn set version berry
       - run: yarn install --immutable
       - run: yarn build
+
+      # Publish to NPM
+      - uses: JS-DevTools/npm-publish@v3
+        with:
+          dry-run: ${{ github.ref_name == 'develop' }}
+          token: ${{ secrets.NPM_TOKEN }}
+          access: public
+          package: package.json
 
       - name: Create release
         uses: actions/create-release@v1
@@ -87,10 +95,3 @@ jobs:
           asset_name: dist-server-${{ env.RELEASE_TAG }}.zip
           asset_content_type: application/zip
 
-      # Publish to NPM
-      - uses: JS-DevTools/npm-publish@v3
-        with:
-          dry-run: ${{ github.ref_name == 'develop' }}
-          token: ${{ secrets.NPM_TOKEN }}
-          access: public
-          package: package.json

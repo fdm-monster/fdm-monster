@@ -3,5 +3,6 @@ other/mosquitto-broker/log/**/*
 other/mosquitto-broker/config/**/*
 other/octoprint-virtual/op0/**/*
 other/octoprint-virtual/op1/**/*
+other/octoprint-virtual/op2/**/*
 fdm-monster-node-linux/fdm-monster/**/*
 fdm-monster-node-windows/fdm-monster/**/*

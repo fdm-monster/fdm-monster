@@ -4,6 +4,10 @@
     {
       "hostname": "host.docker.internal",
       "port": 7125
+    },
+    {
+      "hostname": "host.docker.internal",
+      "port": 7126
     }
   ]
 }

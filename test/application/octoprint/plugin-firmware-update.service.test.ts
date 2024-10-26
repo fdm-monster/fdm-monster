@@ -1,4 +1,4 @@
-import { asClass, AwilixContainer } from "awilix";
+import { AwilixContainer } from "awilix";
 import { AxiosMock } from "../../mocks/axios.mock";
 import pmPluginsResponse from "../test-data/plugin-manager-plugins.response.json";
 import pmFUPluginResponse from "../test-data/plugin-manager-firmwareupdater-plugin.response.json";
@@ -6,7 +6,7 @@ import { validNewPrinterState } from "../test-data/printer.data";
 import pluginJson from "../test-data/plugins.json";
 import { DITokens } from "@/container.tokens";
 import { PrinterCache } from "@/state/printer.cache";
-import { PrinterService } from "@/services/printer.service";
+import { PrinterService } from "@/services/orm/printer.service";
 import { PluginRepositoryCache } from "@/services/octoprint/plugin-repository.cache";
 import { PluginFirmwareUpdateService } from "@/services/octoprint/plugin-firmware-update.service";
 import { LoginDto } from "@/services/interfaces/login.dto";

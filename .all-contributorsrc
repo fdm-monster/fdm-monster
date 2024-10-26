@@ -26,7 +26,8 @@
         "security",
         "maintenance",
         "ideas",
-        "bug"
+        "bug",
+        "review"
       ]
     },
     {
@@ -156,6 +157,16 @@
       "profile": "https://techinterview.guide",
       "contributions": [
         "ideas"
+      ]
+    },
+    {
+      "login": "InsanityAutomation",
+      "name": "InsanityAutomation",
+      "avatar_url": "https://avatars.githubusercontent.com/u/38436470?v=4",
+      "profile": "http://insanityautomation.com/",
+      "contributions": [
+        "ideas",
+        "bug"
       ]
     }
   ],

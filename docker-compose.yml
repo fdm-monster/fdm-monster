@@ -1,6 +1,6 @@
 services:
   mongodb:
-    image: mongo:7
+    image: mongo:8
     container_name: mongodb
     environment:
       # Authenticated variant, comment out for non-authenticated variant:
