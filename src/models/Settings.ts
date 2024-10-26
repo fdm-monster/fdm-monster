@@ -194,6 +194,11 @@ const SettingsSchema = new Schema<ISettings>({
         type: String,
       },
     ],
+    experimentalMoonrakerSupport: {
+      type: Boolean,
+      default: false,
+      required: true,
+    },
   },
   [frontendSettingKey]: {
     gridCols: {
