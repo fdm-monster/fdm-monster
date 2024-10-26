@@ -7,6 +7,7 @@ import {
   credentialSettingPatchRules,
   fileCleanSettingsUpdateRules,
   frontendSettingsUpdateRules,
+  moonrakerSupportRules,
   sentryDiagnosticsEnabledRules,
   serverSettingsUpdateRules,
   timeoutSettingsUpdateRules,
@@ -69,6 +70,12 @@ export class SettingsController {
   async updateSentryDiagnosticsEnabled(req: Request, res: Response) {
     const { enabled } = await validateInput(req.body, sentryDiagnosticsEnabledRules);
     const result = this.settingsStore.setSentryDiagnosticsEnabled(enabled);
+    res.send(result);
+  }
+
+  async updateMoonrakerSupport(req: Request, res: Response) {
+    const { enabled } = await validateInput(req.body, moonrakerSupportRules);
+    const result = await this.settingsStore.setExperimentalMoonrakerSupport(enabled);
     res.send(result);
   }
 
@@ -136,6 +143,7 @@ export default createController(SettingsController)
     .get("/", "getSettings")
     .get("/sensitive", "getSettingsSensitive", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
     .patch("/sentry-diagnostics", "updateSentryDiagnosticsEnabled", demoUserNotAllowedInterceptor)
+    .put("/experimental-moonraker-support", "updateMoonrakerSupport", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
     .put("/server", "updateServerSettings", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
     .put("/login-required", "updateLoginRequiredSettings", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
     .put("/registration-enabled", "updateRegistrationEnabledSettings", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })

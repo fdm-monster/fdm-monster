@@ -33,6 +33,7 @@ export const getDefaultServerSettings = (): ServerSettingsDto => ({
   registration: false,
   whitelistEnabled: false,
   whitelistedIpAddresses: getDefaultWhitelistIpAddresses(),
+  experimentalMoonrakerSupport: false,
 });
 
 export const credentialSettingsKey = "credentials";

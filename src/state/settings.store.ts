@@ -41,6 +41,7 @@ export class SettingsStore {
         loginRequired: settings[serverSettingsKey].loginRequired,
         registration: settings[serverSettingsKey].registration,
         sentryDiagnosticsEnabled: settings[serverSettingsKey].sentryDiagnosticsEnabled,
+        experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
       },
       [wizardSettingKey]: settings[wizardSettingKey],
       [frontendSettingKey]: settings[frontendSettingKey],
@@ -197,6 +198,13 @@ export class SettingsStore {
       sentryDiagnosticsEnabled,
     });
     await this.processSentryEnabled();
+    return this.getSettings();
+  }
+
+  async setExperimentalMoonrakerSupport(moonrakerEnabled: boolean) {
+    this.settings = await this.settingsService.patchServerSettings({
+      experimentalMoonrakerSupport: moonrakerEnabled,
+    });
     return this.getSettings();
   }
 

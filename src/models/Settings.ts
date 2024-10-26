@@ -45,6 +45,7 @@ export interface IServerSettings {
   registration: boolean;
   whitelistEnabled: boolean;
   whitelistedIpAddresses: string[];
+  experimentalMoonrakerSupport: boolean;
 }
 
 export interface IFrontendSettings {
@@ -193,6 +194,11 @@ const SettingsSchema = new Schema<ISettings>({
         type: String,
       },
     ],
+    experimentalMoonrakerSupport: {
+      type: Boolean,
+      default: false,
+      required: true,
+    },
   },
   [frontendSettingKey]: {
     gridCols: {
