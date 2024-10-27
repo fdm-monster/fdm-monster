@@ -46,6 +46,7 @@ export interface IServerSettings {
   whitelistEnabled: boolean;
   whitelistedIpAddresses: string[];
   experimentalMoonrakerSupport: boolean;
+  experimentalClientSupport: boolean;
 }
 
 export interface IFrontendSettings {
@@ -195,6 +196,11 @@ const SettingsSchema = new Schema<ISettings>({
       },
     ],
     experimentalMoonrakerSupport: {
+      type: Boolean,
+      default: false,
+      required: true,
+    },
+    experimentalClientSupport: {
       type: Boolean,
       default: false,
       required: true,

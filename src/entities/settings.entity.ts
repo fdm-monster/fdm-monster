@@ -30,6 +30,7 @@ export class Settings extends BaseEntity {
     whitelistEnabled: boolean;
     whitelistedIpAddresses: string[];
     experimentalMoonrakerSupport: boolean;
+    experimentalClientSupport: boolean;
   };
 
   @Column({ type: "simple-json", nullable: false })

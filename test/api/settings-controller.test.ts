@@ -22,6 +22,7 @@ const sensitiveSettingsRoute = `${defaultRoute}/sensitive`;
 const credentialSettingsRoute = `${defaultRoute}/credential`;
 const serverSettingsRoute = `${defaultRoute}/server`;
 const experimentalMoonrakerSupport = `${defaultRoute}/experimental-moonraker-support`;
+const experimentalClientSupport = `${defaultRoute}/experimental-client-support`;
 const frontendSettingsRoute = `${defaultRoute}/frontend`;
 const fileCleanSettingsRoute = `${defaultRoute}/file-clean`;
 const serverWhitelistRoute = `${defaultRoute}/whitelist`;
@@ -70,6 +71,13 @@ describe(SettingsController.name, () => {
 
   it("should OK on PUT experimental moonraker support setting", async () => {
     const response = await request.put(experimentalMoonrakerSupport).send({
+      enabled: true,
+    });
+    expectOkResponse(response);
+  });
+
+  it("should OK on PUT experimental client support setting", async () => {
+    const response = await request.put(experimentalClientSupport).send({
       enabled: true,
     });
     expectOkResponse(response);

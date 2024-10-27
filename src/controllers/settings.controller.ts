@@ -4,6 +4,7 @@ import { AppConstants } from "@/server.constants";
 import { ROLES } from "@/constants/authorization.constants";
 import { validateInput } from "@/handlers/validators";
 import {
+  clientNextRules,
   credentialSettingPatchRules,
   fileCleanSettingsUpdateRules,
   frontendSettingsUpdateRules,
@@ -79,6 +80,12 @@ export class SettingsController {
     res.send(result);
   }
 
+  async updateClientSupport(req: Request, res: Response) {
+    const { enabled } = await validateInput(req.body, clientNextRules);
+    const result = await this.settingsStore.setExperimentalClientSupport(enabled);
+    res.send(result);
+  }
+
   async updateWhitelistSettings(req: Request, res: Response) {
     const { whitelistEnabled, whitelistedIpAddresses } = await validateInput<IpWhitelistSettingsDto>(
       req.body,
@@ -144,6 +151,7 @@ export default createController(SettingsController)
     .get("/sensitive", "getSettingsSensitive", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
     .patch("/sentry-diagnostics", "updateSentryDiagnosticsEnabled", demoUserNotAllowedInterceptor)
     .put("/experimental-moonraker-support", "updateMoonrakerSupport", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
+    .put("/experimental-client-support", "updateClientSupport", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
     .put("/server", "updateServerSettings", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
     .put("/login-required", "updateLoginRequiredSettings", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
     .put("/registration-enabled", "updateRegistrationEnabledSettings", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })

@@ -44,7 +44,10 @@ export class SettingsService2 extends BaseService(Settings, SettingsDto) impleme
 
   toDto(entity: Settings): SettingsDto<SqliteIdType> {
     return {
-      [serverSettingsKey]: entity[serverSettingsKey],
+      [serverSettingsKey]: {
+        ...entity[serverSettingsKey],
+        experimentalTypeormSupport: true,
+      },
       [frontendSettingKey]: entity[frontendSettingKey],
       [printerFileCleanSettingKey]: entity[printerFileCleanSettingKey],
       [wizardSettingKey]: entity[wizardSettingKey],

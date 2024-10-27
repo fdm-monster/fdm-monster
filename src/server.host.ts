@@ -16,7 +16,7 @@ import { isProductionEnvironment } from "@/utils/env.utils";
 import { ConfigService } from "@/services/core/config.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
-import { MoonrakerClient } from "@/services/moonraker/moonraker.client";
+import { SettingsStore } from "@/state/settings.store";
 
 export class ServerHost {
   bootTask: BootTask;
@@ -25,7 +25,7 @@ export class ServerHost {
   appInstance: Application | null = null;
   configService: ConfigService;
   typeormService: TypeormService;
-  moonrakerClient: MoonrakerClient;
+  settingsStore: SettingsStore;
   private readonly isTypeormMode: boolean;
   private logger: LoggerService;
 
@@ -37,7 +37,7 @@ export class ServerHost {
     configService,
     typeormService,
     isTypeormMode,
-    moonrakerClient,
+    settingsStore,
   }: {
     loggerFactory: ILoggerFactory;
     bootTask: BootTask;
@@ -45,7 +45,7 @@ export class ServerHost {
     socketIoGateway: SocketIoGateway;
     configService: ConfigService;
     typeormService: TypeormService;
-    moonrakerClient: MoonrakerClient;
+    settingsStore: SettingsStore;
     isTypeormMode: boolean;
   }) {
     this.logger = loggerFactory(ServerHost.name);
@@ -54,7 +54,7 @@ export class ServerHost {
     this.socketIoGateway = socketIoGateway;
     this.configService = configService;
     this.typeormService = typeormService;
-    this.moonrakerClient = moonrakerClient;
+    this.settingsStore = settingsStore;
     this.isTypeormMode = isTypeormMode;
   }
 
@@ -97,11 +97,23 @@ export class ServerHost {
       .use(loadControllers(`${routePath}/*.controller.*`, { cwd: __dirname, ignore: "**/*.map" }))
       .use(exceptionFilter);
 
-    // Serve the files for our frontend - do this later than the controllers
+    const nextClientPath = join(superRootPath(), "node_modules", AppConstants.clientNextPackageName, "dist");
     const bundleDistPath = join(superRootPath(), AppConstants.defaultClientBundleStorage, "dist");
-    app.use(express.static(bundleDistPath));
-    // Backup client in node_modules
     const backupClientPath = join(superRootPath(), "node_modules", AppConstants.clientPackageName, "dist");
+
+    // Middleware to serve nextClientPath if isClientNextEnabled() is true
+    app.use((req, res, next) => {
+      if (this.isClientNextEnabled()) {
+        express.static(nextClientPath)(req, res, next);
+      } else {
+        next();
+      }
+    });
+
+    // Serve the main bundle
+    app.use(express.static(bundleDistPath));
+
+    // Serve the backup client
     app.use(express.static(backupClientPath));
 
     app
@@ -122,6 +134,11 @@ export class ServerHost {
         }
       })
       .use(exceptionFilter);
+  }
+
+  private isClientNextEnabled() {
+    const settings = this.settingsStore.getServerSettings();
+    return settings.experimentalClientSupport;
   }
 
   async httpListen() {

@@ -50,7 +50,10 @@ export class SettingsService implements ISettingsService<MongoIdType, ISettings>
   toDto(entity: ISettings): SettingsDto<MongoIdType> {
     return {
       // Credential settings are not shared with the client
-      [serverSettingsKey]: entity[serverSettingsKey],
+      [serverSettingsKey]: {
+        ...entity[serverSettingsKey],
+        experimentalTypeormSupport: false,
+      },
       [wizardSettingKey]: entity[wizardSettingKey],
       [frontendSettingKey]: entity[frontendSettingKey],
       [printerFileCleanSettingKey]: entity[printerFileCleanSettingKey],
