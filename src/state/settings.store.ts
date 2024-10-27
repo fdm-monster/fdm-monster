@@ -77,6 +77,7 @@ export class SettingsStore {
         whitelistedIpAddresses: settings[serverSettingsKey].whitelistedIpAddresses,
         experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
         experimentalTypeormSupport: this.isTypeOrmMode,
+        experimentalClientSupport: settings[serverSettingsKey].experimentalClientSupport,
       },
     });
   }
@@ -222,9 +223,9 @@ export class SettingsStore {
     return this.getSettings();
   }
 
-  async setExperimentalClientNextSupport(clientNextEnabled: boolean) {
+  async setExperimentalClientSupport(experimentalClientEnabled: boolean) {
     this.settings = await this.settingsService.patchServerSettings({
-      experimentalClientSupport: clientNextEnabled,
+      experimentalClientSupport: experimentalClientEnabled,
     });
     return this.getSettings();
   }

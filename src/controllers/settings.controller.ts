@@ -80,9 +80,9 @@ export class SettingsController {
     res.send(result);
   }
 
-  async updateClientNextSupport(req: Request, res: Response) {
+  async updateClientSupport(req: Request, res: Response) {
     const { enabled } = await validateInput(req.body, clientNextRules);
-    const result = await this.settingsStore.setExperimentalClientNextSupport(enabled);
+    const result = await this.settingsStore.setExperimentalClientSupport(enabled);
     res.send(result);
   }
 
@@ -151,7 +151,7 @@ export default createController(SettingsController)
     .get("/sensitive", "getSettingsSensitive", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
     .patch("/sentry-diagnostics", "updateSentryDiagnosticsEnabled", demoUserNotAllowedInterceptor)
     .put("/experimental-moonraker-support", "updateMoonrakerSupport", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
-    .put("/experimental-client-next-support", "updateClientNextSupport", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
+    .put("/experimental-client-support", "updateClientSupport", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
     .put("/server", "updateServerSettings", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
     .put("/login-required", "updateLoginRequiredSettings", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
     .put("/registration-enabled", "updateRegistrationEnabledSettings", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })

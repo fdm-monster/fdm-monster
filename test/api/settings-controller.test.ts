@@ -22,7 +22,7 @@ const sensitiveSettingsRoute = `${defaultRoute}/sensitive`;
 const credentialSettingsRoute = `${defaultRoute}/credential`;
 const serverSettingsRoute = `${defaultRoute}/server`;
 const experimentalMoonrakerSupport = `${defaultRoute}/experimental-moonraker-support`;
-const experimentalClientNextSupport = `${defaultRoute}/experimental-client-next-support`;
+const experimentalClientSupport = `${defaultRoute}/experimental-client-support`;
 const frontendSettingsRoute = `${defaultRoute}/frontend`;
 const fileCleanSettingsRoute = `${defaultRoute}/file-clean`;
 const serverWhitelistRoute = `${defaultRoute}/whitelist`;
@@ -76,8 +76,8 @@ describe(SettingsController.name, () => {
     expectOkResponse(response);
   });
 
-  it("should OK on PUT experimental client next support setting", async () => {
-    const response = await request.put(experimentalClientNextSupport).send({
+  it("should OK on PUT experimental client support setting", async () => {
+    const response = await request.put(experimentalClientSupport).send({
       enabled: true,
     });
     expectOkResponse(response);
