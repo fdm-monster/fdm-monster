@@ -23,13 +23,23 @@ import {
 import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class SettingsStore {
+  private isTypeOrmMode: boolean;
   private settingsService: ISettingsService;
   private logger: LoggerService;
   private settings: ISettings | null = null;
 
-  constructor({ settingsService, loggerFactory }: { settingsService: ISettingsService; loggerFactory: ILoggerFactory }) {
+  constructor({
+    settingsService,
+    loggerFactory,
+    isTypeormMode,
+  }: {
+    settingsService: ISettingsService;
+    loggerFactory: ILoggerFactory;
+    isTypeormMode: boolean;
+  }) {
     this.settingsService = settingsService;
     this.logger = loggerFactory(SettingsStore.name);
+    this.isTypeOrmMode = isTypeormMode;
   }
 
   getSettings() {
@@ -42,6 +52,7 @@ export class SettingsStore {
         registration: settings[serverSettingsKey].registration,
         sentryDiagnosticsEnabled: settings[serverSettingsKey].sentryDiagnosticsEnabled,
         experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
+        experimentalTypeormSupport: this.isTypeOrmMode,
       },
       [wizardSettingKey]: settings[wizardSettingKey],
       [frontendSettingKey]: settings[frontendSettingKey],
@@ -63,6 +74,8 @@ export class SettingsStore {
         debugSettings: settings[serverSettingsKey].debugSettings,
         whitelistEnabled: settings[serverSettingsKey].whitelistEnabled,
         whitelistedIpAddresses: settings[serverSettingsKey].whitelistedIpAddresses,
+        experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
+        experimentalTypeormSupport: this.isTypeOrmMode,
       },
     });
   }

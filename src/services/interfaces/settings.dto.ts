@@ -30,6 +30,7 @@ export interface ServerSettingsDto {
   whitelistedIpAddresses: string[];
   debugSettings: DebugSettingsDto;
   experimentalMoonrakerSupport: boolean;
+  experimentalTypeormSupport: boolean;
 }
 
 export interface WizardSettingsDto {

@@ -13,6 +13,7 @@ import {
   wizardSettingKey,
 } from "@/constants/server-settings.constants";
 import { SettingsController } from "@/controllers/settings.controller";
+import { isSqliteModeTest } from "../typeorm.manager";
 
 let request: supertest.SuperTest<supertest.Test>;
 
@@ -36,6 +37,7 @@ describe(SettingsController.name, () => {
     expect(response.body).not.toBeNull();
     const defaultSettings = getDefaultSettings();
     defaultSettings[serverSettingsKey].loginRequired = false; // Test override
+    defaultSettings[serverSettingsKey].experimentalTypeormSupport = isSqliteModeTest();
     delete defaultSettings[serverSettingsKey].whitelistEnabled;
     delete defaultSettings[serverSettingsKey].whitelistedIpAddresses;
     delete defaultSettings[serverSettingsKey].debugSettings;
