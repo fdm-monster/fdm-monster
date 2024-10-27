@@ -1,6 +1,6 @@
 import {
   credentialSettingsKey,
-  fileCleanSettingKey,
+  printerFileCleanSettingKey,
   frontendSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
@@ -48,7 +48,7 @@ export class Settings extends BaseEntity {
   };
 
   @Column({ type: "simple-json", nullable: false })
-  [fileCleanSettingKey]!: {
+  [printerFileCleanSettingKey]!: {
     autoRemoveOldFilesBeforeUpload: boolean;
     autoRemoveOldFilesAtBoot: boolean;
     autoRemoveOldFilesCriteriumDays: number;

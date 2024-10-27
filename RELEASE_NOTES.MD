@@ -7,6 +7,7 @@
 ## Fixes:
 
 - Add sourceMaps: "inline" to jest for hitting breakpoints with swc in Webstorm
+- Printer file clean could contain extra data, skim those props off
 
 # FDM Monster 14/06/2024 1.6.4
 

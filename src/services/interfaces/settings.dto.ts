@@ -1,6 +1,6 @@
 import {
   credentialSettingsKey,
-  fileCleanSettingKey,
+  printerFileCleanSettingKey,
   frontendSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
@@ -66,6 +66,6 @@ export class SettingsDto<KeyType> {
   [wizardSettingKey]: WizardSettingsDto;
   [frontendSettingKey]: FrontendSettingsDto;
   // [credentialSettingsKey]: CredentialSettingsDto;
-  [fileCleanSettingKey]: FileCleanSettingsDto;
+  [printerFileCleanSettingKey]: FileCleanSettingsDto;
   [timeoutSettingKey]: TimeoutSettingsDto;
 }
