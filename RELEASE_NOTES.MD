@@ -1,5 +1,9 @@
 # Develop
 
+## Chore:
+
+- Workflows: upgrade github actions to node 20
+
 ## Features:
 
 - Setting: add experimental moonraker support setting to model, validation and API endpoints
@@ -19,7 +23,7 @@
 - Simplified the PrinterFile model, dropped unused properties for multi-print-service standardization in the future.
 - Used attributes for PrinterFilesController
 - Renamed OctoPrintApiService to OctoprintClient
-- Switch to 1.6.x client UI version range 
+- Switch to 1.6.x client UI version range
 - Update Octoprint websocket with refresh interval, defaulting to 10sec. This loop will keep refresh attempts internal to the Websocket adapter of each service type (Octoprint, Moonraker, Bambu, etc).
 
 ## Fixes:
