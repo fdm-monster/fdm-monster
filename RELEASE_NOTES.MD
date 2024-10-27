@@ -3,6 +3,7 @@
 ## Features:
 
 - Setting: add experimental moonraker support setting to model, validation and API endpoints
+- Setting: expose typeorm setting and adjust test
 
 ## Fixes:
 
