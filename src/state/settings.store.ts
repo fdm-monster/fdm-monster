@@ -53,6 +53,7 @@ export class SettingsStore {
         sentryDiagnosticsEnabled: settings[serverSettingsKey].sentryDiagnosticsEnabled,
         experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
         experimentalTypeormSupport: this.isTypeOrmMode,
+        experimentalClientSupport: settings[serverSettingsKey].experimentalClientSupport,
       },
       [wizardSettingKey]: settings[wizardSettingKey],
       [frontendSettingKey]: settings[frontendSettingKey],
@@ -217,6 +218,13 @@ export class SettingsStore {
   async setExperimentalMoonrakerSupport(moonrakerEnabled: boolean) {
     this.settings = await this.settingsService.patchServerSettings({
       experimentalMoonrakerSupport: moonrakerEnabled,
+    });
+    return this.getSettings();
+  }
+
+  async setExperimentalClientNextSupport(clientNextEnabled: boolean) {
+    this.settings = await this.settingsService.patchServerSettings({
+      experimentalClientSupport: clientNextEnabled,
     });
     return this.getSettings();
   }

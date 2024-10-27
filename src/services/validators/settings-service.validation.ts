@@ -54,3 +54,7 @@ export const sentryDiagnosticsEnabledRules = {
 export const moonrakerSupportRules = {
   enabled: "required|boolean",
 };
+
+export const clientNextRules = {
+  enabled: "required|boolean",
+};

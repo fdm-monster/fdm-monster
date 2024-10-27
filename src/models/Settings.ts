@@ -46,6 +46,7 @@ export interface IServerSettings {
   whitelistEnabled: boolean;
   whitelistedIpAddresses: string[];
   experimentalMoonrakerSupport: boolean;
+  experimentalClientSupport: boolean;
 }
 
 export interface IFrontendSettings {

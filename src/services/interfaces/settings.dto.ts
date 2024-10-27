@@ -31,6 +31,7 @@ export interface ServerSettingsDto {
   debugSettings: DebugSettingsDto;
   experimentalMoonrakerSupport: boolean;
   experimentalTypeormSupport: boolean;
+  experimentalClientSupport: boolean;
 }
 
 export interface WizardSettingsDto {
