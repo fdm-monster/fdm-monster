@@ -1,7 +1,7 @@
 import { InternalServerException } from "@/exceptions/runtime.exceptions";
 import {
   credentialSettingsKey,
-  fileCleanSettingKey,
+  printerFileCleanSettingKey,
   frontendSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
@@ -45,7 +45,7 @@ export class SettingsStore {
       },
       [wizardSettingKey]: settings[wizardSettingKey],
       [frontendSettingKey]: settings[frontendSettingKey],
-      [fileCleanSettingKey]: settings[fileCleanSettingKey],
+      [printerFileCleanSettingKey]: settings[printerFileCleanSettingKey],
       [timeoutSettingKey]: settings[timeoutSettingKey],
     });
   }
@@ -131,11 +131,11 @@ export class SettingsStore {
   }
 
   getFileCleanSettings() {
-    return this.getSettings()[fileCleanSettingKey];
+    return this.getSettings()[printerFileCleanSettingKey];
   }
 
   isPreUploadFileCleanEnabled() {
-    return this.getSettings()[fileCleanSettingKey]?.autoRemoveOldFilesBeforeUpload;
+    return this.getSettings()[printerFileCleanSettingKey]?.autoRemoveOldFilesBeforeUpload;
   }
 
   async setWizardCompleted(version: number) {

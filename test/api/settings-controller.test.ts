@@ -4,7 +4,7 @@ import { expectOkResponse } from "../extensions";
 import { AppConstants } from "@/server.constants";
 import {
   credentialSettingsKey,
-  fileCleanSettingKey,
+  printerFileCleanSettingKey,
   frontendSettingKey,
   getDefaultFileCleanSettings,
   getDefaultFrontendSettings,
@@ -48,7 +48,7 @@ describe(SettingsController.name, () => {
     expect(response.body[serverSettingsKey].loginRequired).toBe(false);
     expect(response.body[serverSettingsKey].registration).toBe(false);
     expect(response.body[frontendSettingKey]).toMatchObject(getDefaultFrontendSettings());
-    expect(response.body[fileCleanSettingKey]).toMatchObject(getDefaultFileCleanSettings());
+    expect(response.body[printerFileCleanSettingKey]).toMatchObject(getDefaultFileCleanSettings());
     expectOkResponse(response);
   });
 
@@ -120,7 +120,7 @@ describe(SettingsController.name, () => {
     const response = await request.put(fileCleanSettingsRoute).send(newFileCleanSettings);
     expect(response.body).not.toBeNull();
     expect(response.body).toMatchObject({
-      [fileCleanSettingKey]: newFileCleanSettings,
+      [printerFileCleanSettingKey]: newFileCleanSettings,
     });
     expectOkResponse(response);
   });
