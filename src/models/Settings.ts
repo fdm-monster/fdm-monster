@@ -200,6 +200,11 @@ const SettingsSchema = new Schema<ISettings>({
       default: false,
       required: true,
     },
+    experimentalClientSupport: {
+      type: Boolean,
+      default: false,
+      required: true,
+    },
   },
   [frontendSettingKey]: {
     gridCols: {
