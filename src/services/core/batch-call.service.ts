@@ -184,7 +184,7 @@ export class BatchCallService {
 
           const selectedJob = await this.octoprintClient.getJob(login);
           const currentJobFile = selectedJob?.job?.file;
-          if (!currentJobFile) {
+          if (!currentJobFile?.name) {
             return resolve({ connectionState, printerId, reprintState: ReprintState.NoLastPrint });
           }
 

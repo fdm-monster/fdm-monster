@@ -13,6 +13,7 @@
 
 - Add sourceMaps: "inline" to jest for hitting breakpoints with swc in Webstorm
 - Printer file clean could contain extra data, skim those props off
+- Batch reprint selection: wrong status is concluded when reprint preparation is called (OctoPrint is not available, instead of no job is selected)
 
 # FDM Monster 14/06/2024 1.6.4
 
