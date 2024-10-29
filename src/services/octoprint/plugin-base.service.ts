@@ -60,11 +60,11 @@ export class PluginBaseService {
   }
 
   async isPluginInstalled(printerLogin: LoginDto) {
-    const foundPlugin = await this.#findPluginFromListQuery(printerLogin);
+    const foundPlugin = await this.findPluginFromListQuery(printerLogin);
     return !!foundPlugin;
   }
 
-  async #findPluginFromListQuery(printerLogin: LoginDto) {
+  private async findPluginFromListQuery(printerLogin: LoginDto) {
     const response = await this.octoprintClient.getPluginManagerPlugins(printerLogin);
     if (!response?.plugins?.length) {
       throw new InternalServerException("Plugin query response was empty");

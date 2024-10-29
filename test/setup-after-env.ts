@@ -7,6 +7,7 @@ expect.extend(getExpectExtensions());
 // https://github.com/jestjs/jest/issues/10322
 beforeEach(() => {
   global.console = require("console");
+  process.env["NODE_NO_WARNINGS"] = "1";
 });
 
 afterEach(() => {

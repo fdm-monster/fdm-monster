@@ -13,6 +13,9 @@ module.exports = {
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
   },
+  globals: {
+    NODE_NO_WARNINGS: "1",
+  },
   modulePathIgnorePatterns: [
     "src/migrate-mongo-config.js",
     "src/consoles",

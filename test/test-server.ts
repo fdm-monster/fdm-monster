@@ -5,11 +5,13 @@ import { setupEnvConfig } from "@/server.env";
 import { AxiosMock } from "./mocks/axios.mock";
 import { OctoPrintApiMock } from "./mocks/octoprint-api.mock";
 import { ROLES } from "@/constants/authorization.constants";
-import supertest from "supertest";
+import supertest, { Test } from "supertest";
 import { Express } from "express";
 import { AppConstants } from "@/server.constants";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { TaskManagerService } from "@/services/core/task-manager.service";
+import { AxiosInstance } from "axios";
+import TestAgent from "supertest/lib/agent";
 
 jest.mock("../src/utils/env.utils", () => ({
   ...jest.requireActual("../src/utils/env.utils"),
@@ -24,8 +26,8 @@ export async function setupTestApp(
 ): Promise<{
   container: AwilixContainer;
   httpServer: Express;
-  httpClient: AxiosMock;
-  request: supertest.SuperTest<supertest.Test>;
+  httpClient: AxiosInstance;
+  request: TestAgent<Test>;
   octoprintClient: OctoPrintApiMock;
   typeormService: TypeormService;
   [k: string]: any;
@@ -35,7 +37,7 @@ export async function setupTestApp(
   const { httpServer, container } = await setupServer();
   container.register({
     [DITokens.octoprintClient]: asClass(OctoPrintApiMock).singleton(),
-    [DITokens.httpClient]: asClass(AxiosMock).singleton(),
+    // [DITokens.httpClient]: asClass(AxiosMock).singleton(),
     [DITokens.appDefaultRole]: asValue(ROLES.ADMIN),
     [DITokens.appDefaultRoleNoLogin]: asValue(ROLES.ADMIN),
   });
@@ -73,7 +75,7 @@ export async function setupTestApp(
     httpServer,
     request: supertest(httpServer),
     container,
-    httpClient: container.resolve<AxiosMock>(DITokens.httpClient),
+    httpClient: container.resolve<AxiosInstance>(DITokens.httpClient),
     [DITokens.octoprintClient]: container.resolve<OctoPrintApiMock>(DITokens.octoprintClient),
     [DITokens.taskManagerService]: container.resolve<TaskManagerService>(DITokens.taskManagerService),
     [DITokens.typeormService]: container.resolve<TypeormService>(DITokens.typeormService),

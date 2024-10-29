@@ -7,4 +7,5 @@ module.exports = async () => {
   process.env[AppConstants.OVERRIDE_IS_DEMO_MODE] = "false";
   process.env[AppConstants.DATABASE_FILE] = ":memory:";
   process.env[AppConstants.ENABLE_EXPERIMENTAL_TYPEORM] = (process.env["MONGODB_MODE"] !== "true").toString();
+  process.env["NODE_NO_WARNINGS"] = "1";
 };

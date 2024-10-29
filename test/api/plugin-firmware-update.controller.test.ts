@@ -2,9 +2,12 @@ import { AppConstants } from "@/server.constants";
 import { setupTestApp } from "../test-server";
 import { expectOkResponse, expectInternalServerError } from "../extensions";
 import { createTestPrinter } from "./test-data/create-printer";
-import supertest from "supertest";
-import { AxiosMock } from "../mocks/axios.mock";
+import { Test } from "supertest";
 import { PluginFirmwareUpdateController } from "@/controllers/plugin-firmware-update.controller";
+import nock from "nock";
+import { AxiosInstance } from "axios";
+import TestAgent from "supertest/lib/agent";
+import { IdType } from "@/shared.constants";
 
 const defaultRoute = AppConstants.apiRoute + "/plugin/firmware-update";
 const listRoute = `${defaultRoute}/`;
@@ -12,17 +15,24 @@ const scanRoute = `${defaultRoute}/scan`;
 const releasesRoute = `${defaultRoute}/releases`;
 const syncReleasesRoute = `${defaultRoute}/releases/sync`;
 const downloadFirmwareRoute = `${defaultRoute}/download-firmware`;
-const isPluginInstalledRoute = (id: string) => `${defaultRoute}/${id}/is-plugin-installed`;
-const installPluginRoute = (id: string) => `${defaultRoute}/${id}/install-firmware-update-plugin`;
-const pluginStatusRoute = (id: string) => `${defaultRoute}/${id}/status`;
-const configurePluginSettingsRoute = (id: string) => `${defaultRoute}/${id}/configure-plugin-settings`;
-const flashFirmwareRoute = (id: string) => `${defaultRoute}/${id}/flash-firmware`;
+const isPluginInstalledRoute = (id: IdType) => `${defaultRoute}/${id}/is-plugin-installed`;
+const installPluginRoute = (id: IdType) => `${defaultRoute}/${id}/install-firmware-update-plugin`;
+const pluginStatusRoute = (id: IdType) => `${defaultRoute}/${id}/status`;
+const configurePluginSettingsRoute = (id: IdType) => `${defaultRoute}/${id}/configure-plugin-settings`;
+const flashFirmwareRoute = (id: IdType) => `${defaultRoute}/${id}/flash-firmware`;
 
-let request: supertest.SuperTest<supertest.Test>;
-let httpClient: AxiosMock;
+let request: TestAgent<Test>;
+let httpClient: AxiosInstance;
 
 beforeAll(async () => {
   ({ request, httpClient } = await setupTestApp(true));
+  nock.disableNetConnect();
+  nock.enableNetConnect("127.0.0.1");
+});
+
+afterAll(() => {
+  nock.enableNetConnect();
+  nock.cleanAll();
 });
 
 describe(PluginFirmwareUpdateController.name, () => {
@@ -37,8 +47,11 @@ describe(PluginFirmwareUpdateController.name, () => {
     expectOkResponse(response);
   });
 
-  it("should query github releases", async () => {
-    httpClient.saveMockResponse(require("./test-data/prusa-github-releases.data.json"), 200);
+  it("should query GitHub releases", async () => {
+    nock("https://api.github.com")
+      .get("/repos/prusa3d/Prusa-Firmware/releases/156805112")
+      .reply(200, require("./test-data/prusa-github-releases.data.json"));
+
     const syncResponse = await request.post(syncReleasesRoute).send();
     expectOkResponse(syncResponse);
     expect(syncResponse.body).toHaveLength(30);
@@ -46,7 +59,13 @@ describe(PluginFirmwareUpdateController.name, () => {
 
   it("should indicate plugin is installed", async () => {
     const testPrinter = await createTestPrinter(request);
-    httpClient.saveMockResponse({ plugins: [{ key: "firmwareupdater" }] }, 200);
+
+    // Original URL could be specific to the test printer
+    // nock(testPrinter.printerURL).get("/plugin/pluginmanager/plugins").reply(200, { plugins: [{ key: "firmwareupdater" }] });
+    nock(testPrinter.printerURL)
+      .get(`/plugin/pluginmanager/plugins`)
+      .reply(200, { plugins: [{ key: "firmwareupdater" }] });
+
     const response = await request.get(isPluginInstalledRoute(testPrinter.id)).send();
     expectOkResponse(response);
     expect(response.body.isInstalled).toBeTruthy();
@@ -54,7 +73,11 @@ describe(PluginFirmwareUpdateController.name, () => {
 
   it("should not install plugin when already installed", async () => {
     const testPrinter = await createTestPrinter(request);
-    httpClient.saveMockResponse({ plugins: [{ key: "firmwareupdater" }] }, 200);
+
+    nock(testPrinter.printerURL)
+      .get(`/plugin/pluginmanager/plugins`)
+      .reply(200, { plugins: [{ key: "firmwareupdater" }] });
+
     const response = await request.post(installPluginRoute(testPrinter.id)).send();
     expectOkResponse(response, {
       isInstalled: true,
@@ -64,28 +87,38 @@ describe(PluginFirmwareUpdateController.name, () => {
 
   it("should get idle firmware updater status", async () => {
     const testPrinter = await createTestPrinter(request);
-    httpClient.saveMockResponse({ flashing: false }, 200);
+
+    // Replacing httpClient.saveMockResponse with nock
+    nock(testPrinter.printerURL).get("/plugin/firmwareupdater/status").reply(200, { flashing: false });
+
     const response = await request.get(pluginStatusRoute(testPrinter.id)).send();
     expectOkResponse(response, { flashing: false });
   });
 
   it("should configure plugin settings", async () => {
     const testPrinter = await createTestPrinter(request);
-    httpClient.saveMockResponse({ plugins: [] }, 200);
+
+    nock(testPrinter.printerURL).post(`/plugin/pluginmanager/plugins`).reply(200, { plugins: [] });
+
     const response = await request.post(configurePluginSettingsRoute(testPrinter.id)).send();
     expectOkResponse(response);
   });
 
   it("should not trigger flash firmware action on illegal files", async () => {
     const testPrinter = await createTestPrinter(request);
-    httpClient.saveMockResponse({ flashing: true }, 200);
+
+    nock(testPrinter.printerURL).post(`/plugin/pluginmanager/plugins`).reply(200, { flashing: true });
+
     const response = await request.post(flashFirmwareRoute(testPrinter.id)).send();
-    expect(response).not.toBe(200);
+    expect(response.status).not.toBe(200);
   });
 
   // This is too intrusive still (needs fs isolation)
   test.skip(`should be able to POST ${downloadFirmwareRoute} to let server download firmware`, async () => {
-    httpClient.saveMockResponse(require("./test-data/prusa-github-releases.data.json"), 200);
+    nock("https://api.github.com")
+      .get("/repos/prusa3d/Prusa-Firmware/releases")
+      .reply(200, require("./test-data/prusa-github-releases.data.json"));
+
     const syncResponse = await request.post(syncReleasesRoute).send();
     expectOkResponse(syncResponse);
     expect(syncResponse.body).toHaveLength(16);
@@ -94,7 +127,8 @@ describe(PluginFirmwareUpdateController.name, () => {
     expectOkResponse(releasesResponse);
     expect(releasesResponse.body).toHaveLength(16);
 
-    httpClient.saveMockResponse([], 200, false, false);
+    nock(testPrinter.printerURL).post("/plugin/pluginmanager/plugins").reply(200, []);
+
     const response = await request.post(downloadFirmwareRoute).send();
     expectInternalServerError(response);
 
