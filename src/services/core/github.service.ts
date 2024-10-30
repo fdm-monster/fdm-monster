@@ -27,7 +27,7 @@ export class GithubService {
         owner,
         repo,
       });
-    } catch (e) {
+    } catch (e: any) {
       if (e?.name === "HttpError" && e.status == 404) {
         throw new NotFoundException(`Could not find latest release`);
       }
@@ -42,7 +42,7 @@ export class GithubService {
         owner,
         repo,
       });
-    } catch (e) {
+    } catch (e: any) {
       if (e?.name === "HttpError" && e.status == 404) {
         throw new NotFoundException(`Could not find releases`);
       }
