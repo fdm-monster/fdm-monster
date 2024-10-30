@@ -103,6 +103,7 @@ export class OctoprintApi implements IPrinterApi {
   async deleteFile(path: string) {
     await this.client.deleteFileOrFolder(this.login, path);
   }
+
   async deleteFolder(path: string) {
     await this.client.deleteFileOrFolder(this.login, path);
   }
