@@ -2,22 +2,24 @@ import { AppConstants } from "@/server.constants";
 import { setupTestApp } from "../test-server";
 import { expectInvalidResponse, expectNotFoundResponse, expectOkResponse } from "../extensions";
 import { createTestPrinter } from "./test-data/create-printer";
-import supertest from "supertest";
+import { Test } from "supertest";
 import { CustomGcodeDto } from "@/services/interfaces/custom-gcode.dto";
 import { IdType, SqliteIdType } from "@/shared.constants";
 import { getDatasource, isSqliteModeTest } from "../typeorm.manager";
 import { CustomGcode } from "@/entities";
 import { CustomGcode as CustomGcodeMongo } from "@/models";
 import { CustomGcodeController } from "@/controllers/custom-gcode.controller";
+import TestAgent from "supertest/lib/agent";
+import nock from "nock";
 
 const defaultRoute = `${AppConstants.apiRoute}/custom-gcode`;
 const createRoute = defaultRoute;
-const emergencyGCodeRoute = (printerId: string) => `${defaultRoute}/send-emergency-m112/${printerId}`;
+const emergencyGCodeRoute = (printerId: IdType) => `${defaultRoute}/send-emergency-m112/${printerId}`;
 const getRoute = (id: IdType) => `${defaultRoute}/${id}`;
 const deleteRoute = (id: IdType) => `${defaultRoute}/${id}`;
 const updateRoute = (id: IdType) => `${defaultRoute}/${id}`;
 
-let request: supertest.SuperTest<supertest.Test>;
+let request: TestAgent<Test>;
 
 beforeAll(async () => {
   ({ request } = await setupTestApp(true));
@@ -38,7 +40,7 @@ function getGCodeScript() {
   };
 }
 
-async function createNormalGcodeScript(request: supertest.SuperTest<supertest.Test>) {
+async function createNormalGcodeScript(request: TestAgent<Test>) {
   const response = await request.post(createRoute).send(getGCodeScript());
   expectOkResponse(response);
   return response.body as CustomGcodeDto<SqliteIdType>;
@@ -47,6 +49,9 @@ async function createNormalGcodeScript(request: supertest.SuperTest<supertest.Te
 describe(CustomGcodeController.name, () => {
   it("should send emergency gcode command", async function () {
     const printer = await createTestPrinter(request);
+
+    nock(printer.printerURL).post("/api/printer/command").reply(200, {});
+
     const response = await request.post(emergencyGCodeRoute(printer.id)).send();
     expectOkResponse(response, null);
   });
