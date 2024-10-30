@@ -1,18 +1,16 @@
 import { AppConstants } from "@/server.constants";
 import { setupTestApp } from "../test-server";
-import { expectOkResponse, expectInternalServerError } from "../extensions";
+import { expectOkResponse } from "../extensions";
 import { createTestPrinter } from "./test-data/create-printer";
 import { Test } from "supertest";
 import { PluginFirmwareUpdateController } from "@/controllers/plugin-firmware-update.controller";
 import nock from "nock";
-import { AxiosInstance } from "axios";
 import TestAgent from "supertest/lib/agent";
 import { IdType } from "@/shared.constants";
 
 const defaultRoute = AppConstants.apiRoute + "/plugin/firmware-update";
 const listRoute = `${defaultRoute}/`;
 const scanRoute = `${defaultRoute}/scan`;
-const releasesRoute = `${defaultRoute}/releases`;
 const syncReleasesRoute = `${defaultRoute}/releases/sync`;
 const downloadFirmwareRoute = `${defaultRoute}/download-firmware`;
 const isPluginInstalledRoute = (id: IdType) => `${defaultRoute}/${id}/is-plugin-installed`;
@@ -22,10 +20,9 @@ const configurePluginSettingsRoute = (id: IdType) => `${defaultRoute}/${id}/conf
 const flashFirmwareRoute = (id: IdType) => `${defaultRoute}/${id}/flash-firmware`;
 
 let request: TestAgent<Test>;
-let httpClient: AxiosInstance;
 
 beforeAll(async () => {
-  ({ request, httpClient } = await setupTestApp(true));
+  ({ request } = await setupTestApp(true));
   nock.disableNetConnect();
   nock.enableNetConnect("127.0.0.1");
 });
@@ -98,7 +95,7 @@ describe(PluginFirmwareUpdateController.name, () => {
   it("should configure plugin settings", async () => {
     const testPrinter = await createTestPrinter(request);
 
-    nock(testPrinter.printerURL).post(`/plugin/pluginmanager/plugins`).reply(200, { plugins: [] });
+    nock(testPrinter.printerURL).post(`/api/settings`).reply(200, { plugins: [] });
 
     const response = await request.post(configurePluginSettingsRoute(testPrinter.id)).send();
     expectOkResponse(response);
@@ -115,22 +112,19 @@ describe(PluginFirmwareUpdateController.name, () => {
 
   // This is too intrusive still (needs fs isolation)
   test.skip(`should be able to POST ${downloadFirmwareRoute} to let server download firmware`, async () => {
+    const testPrinter = await createTestPrinter(request);
     nock("https://api.github.com")
       .get("/repos/prusa3d/Prusa-Firmware/releases")
       .reply(200, require("./test-data/prusa-github-releases.data.json"));
 
     const syncResponse = await request.post(syncReleasesRoute).send();
     expectOkResponse(syncResponse);
-    expect(syncResponse.body).toHaveLength(16);
-
-    const releasesResponse = await request.get(releasesRoute).send();
-    expectOkResponse(releasesResponse);
-    expect(releasesResponse.body).toHaveLength(16);
+    expect(syncResponse.body).toHaveLength(30);
 
     nock(testPrinter.printerURL).post("/plugin/pluginmanager/plugins").reply(200, []);
 
     const response = await request.post(downloadFirmwareRoute).send();
-    expectInternalServerError(response);
+    expectOkResponse(response);
 
     const response2 = await request.post(downloadFirmwareRoute).send();
     expectOkResponse(response2);

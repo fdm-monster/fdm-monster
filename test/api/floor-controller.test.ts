@@ -5,10 +5,12 @@ import { createTestFloor, floorRoute } from "./test-data/create-floor";
 import { Floor } from "@/entities";
 import { Floor as FloorMongo } from "@/models";
 import { AppConstants } from "@/server.constants";
-import supertest from "supertest";
+import { Test } from "supertest";
 import { FloorController } from "@/controllers/floor.controller";
 import { IdType } from "@/shared.constants";
 import { getDatasource, isSqliteModeTest } from "../typeorm.manager";
+import TestAgent from "supertest/lib/agent";
+import nock from "nock";
 
 const listRoute = `${AppConstants.apiRoute}/floor`;
 const getRoute = (id: IdType) => `${listRoute}/${id}`;
@@ -17,7 +19,7 @@ const deleteRoute = (id: IdType) => `${listRoute}/${id}`;
 const updateNameRoute = (id: IdType) => `${getRoute(id)}/name`;
 const updateFloorNumberRoute = (id: IdType) => `${getRoute(id)}/floor-number`;
 
-let request: supertest.SuperTest<supertest.Test>;
+let request: TestAgent<Test>;
 let isTypeormMode: boolean;
 
 beforeAll(async () => {
