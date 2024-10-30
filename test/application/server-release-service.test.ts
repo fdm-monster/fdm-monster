@@ -8,7 +8,6 @@ import { ServerUpdateService } from "@/services/core/server-update.service";
 
 let container: AwilixContainer;
 let service: ServerReleaseService;
-let httpClient: AxiosMock;
 const v1 = "1.0.0";
 
 beforeAll(async () => {
@@ -16,7 +15,6 @@ beforeAll(async () => {
   container.register(DITokens.httpClient, asClass(AxiosMock).singleton());
 
   service = container.resolve(DITokens.serverReleaseService);
-  httpClient = container.resolve(DITokens.httpClient);
 });
 
 describe(ServerUpdateService.name, () => {

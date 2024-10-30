@@ -1,18 +1,15 @@
 import { DITokens } from "@/container.tokens";
-import { AxiosMock } from "../../mocks/axios.mock";
 import { setupTestApp } from "../../test-server";
 import { AwilixContainer } from "awilix";
-import { OctoPrintApiMock } from "../../mocks/octoprint-api.mock";
 import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { CurrentUserDto } from "@/services/octoprint/dto/auth/current-user.dto";
 import { OctoprintType } from "@/services/printer-api.interface";
 
-let octoprintClient: OctoPrintApiMock;
+let octoprintClient: OctoprintClient;
 let container: AwilixContainer;
-let httpClient: AxiosMock;
 
 beforeAll(async () => {
-  ({ container, httpClient, octoprintClient } = await setupTestApp(true));
+  ({ container, octoprintClient } = await setupTestApp(true));
   await container.resolve(DITokens.settingsStore).loadSettings();
 });
 

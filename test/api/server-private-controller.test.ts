@@ -8,11 +8,12 @@ import { validateInput } from "@/handlers/validators";
 import { importPrintersFloorsYamlRules } from "@/services/validators/yaml-service.validation";
 import { asFunction, AwilixContainer } from "awilix";
 import simpleGitMock from "../application/__mocks__/simple-git";
-import supertest from "supertest";
+import { Test } from "supertest";
 import { SettingsStore } from "@/state/settings.store";
 import { ServerPrivateController } from "@/controllers/server-private.controller";
+import TestAgent from "supertest/lib/agent";
 
-let request: supertest.SuperTest<supertest.Test>;
+let request: TestAgent<Test>;
 let container: AwilixContainer;
 let settingsStore: SettingsStore;
 

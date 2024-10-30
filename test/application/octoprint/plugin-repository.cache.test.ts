@@ -5,16 +5,13 @@ import { DITokens } from "@/container.tokens";
 import pluginJson from "../test-data/plugins.json";
 import { setupTestApp } from "../../test-server";
 
-let httpClient: AxiosMock;
-let container: AwilixContainer;
 let cache: PluginRepositoryCache;
 
 beforeAll(async () => {
-  const { container, httpClient: axiosMock } = await setupTestApp(true);
+  const { container } = await setupTestApp(true);
   await container.resolve(DITokens.settingsStore).loadSettings();
 
   cache = container.resolve(DITokens.pluginRepositoryCache);
-  httpClient = container.resolve(DITokens.httpClient);
 });
 
 describe(PluginRepositoryCache.name, () => {

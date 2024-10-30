@@ -1,5 +1,4 @@
 import { AwilixContainer } from "awilix";
-import { AxiosMock } from "../../mocks/axios.mock";
 import pmPluginsResponse from "../test-data/plugin-manager-plugins.response.json";
 import pmFUPluginResponse from "../test-data/plugin-manager-firmwareupdater-plugin.response.json";
 import { validNewPrinterState } from "../test-data/printer.data";
@@ -12,7 +11,6 @@ import { PluginFirmwareUpdateService } from "@/services/octoprint/plugin-firmwar
 import { LoginDto } from "@/services/interfaces/login.dto";
 import { setupTestApp } from "../../test-server";
 
-let httpClient: AxiosMock;
 let container: AwilixContainer;
 let printerCache: PrinterCache;
 let printerService: PrinterService;
@@ -28,13 +26,12 @@ beforeAll(async () => {
   pluginService = container.resolve(DITokens.pluginFirmwareUpdateService);
   printerCache = container.resolve(DITokens.printerCache);
   printerService = container.resolve(DITokens.printerService);
-  httpClient = container.resolve(DITokens.httpClient);
   pluginCache = container.resolve(DITokens.pluginRepositoryCache);
 
   createdPrinter = await printerService.create(validNewPrinterState);
   await printerCache.loadCache();
   loginDto = await printerCache.getLoginDtoAsync(createdPrinter.id);
-  httpClient.saveMockResponse(pluginJson, 200, false);
+  // httpClient.saveMockResponse(pluginJson, 200, false);
   await pluginCache.queryCache();
 });
 

@@ -9,18 +9,16 @@ import { Printer } from "@/entities";
 
 let batchCallService: BatchCallService;
 let printerService: IPrinterService<SqliteIdType, Printer>;
-let httpClient: AxiosMock;
 
 beforeAll(async () => {
-  const { container, httpClient: axiosMock } = await setupTestApp(true);
-  httpClient = axiosMock;
+  const { container } = await setupTestApp(true);
 
   printerService = container.resolve<IPrinterService<SqliteIdType, Printer>>(DITokens.printerService);
   batchCallService = container.resolve(DITokens.batchCallService);
 });
 
 beforeEach(() => {
-  httpClient.saveMockResponse(undefined, 200);
+  // httpClient.saveMockResponse(undefined, 200);
 });
 
 describe(BatchCallService.name, () => {
@@ -31,6 +29,7 @@ describe(BatchCallService.name, () => {
     const result = await batchCallService.getBatchPrinterReprintFile([printer.id, printer2.id]);
     expect(result).toHaveLength(2);
   });
+
   it("should call multiple printers ", async () => {
     const printer = await printerService.create(validNewPrinterState);
     const printer2 = await printerService.create(validNewPrinterState);
