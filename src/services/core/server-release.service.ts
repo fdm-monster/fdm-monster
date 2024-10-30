@@ -3,6 +3,7 @@ import { LoggerService } from "@/handlers/logger";
 import { AppConstants } from "@/server.constants";
 import { GithubService } from "@/services/core/github.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
+import { Octokit } from "octokit";
 
 export class ServerReleaseService {
   airGapped: null | boolean = null; // Connection error
@@ -10,8 +11,8 @@ export class ServerReleaseService {
   private synced = false;
   private installedReleaseFound: null | boolean = null;
   private updateAvailable: null | boolean = null;
-  private latestRelease: null | boolean = null;
-  private installedRelease: null | boolean = null;
+  private latestRelease?: Awaited<ReturnType<Octokit["rest"]["repos"]["listReleases"]>>["data"][number];
+  private installedRelease?: Awaited<ReturnType<Octokit["rest"]["repos"]["listReleases"]>>["data"][number];
   private logger: LoggerService;
   serverVersion;
 

@@ -57,8 +57,6 @@ describe(PluginFirmwareUpdateController.name, () => {
   it("should indicate plugin is installed", async () => {
     const testPrinter = await createTestPrinter(request);
 
-    // Original URL could be specific to the test printer
-    // nock(testPrinter.printerURL).get("/plugin/pluginmanager/plugins").reply(200, { plugins: [{ key: "firmwareupdater" }] });
     nock(testPrinter.printerURL)
       .get(`/plugin/pluginmanager/plugins`)
       .reply(200, { plugins: [{ key: "firmwareupdater" }] });

@@ -13,7 +13,7 @@ export class GithubService {
   }
 
   async wasAuthenticated() {
-    const result = await this.octokitService.auth();
+    const result = (await this.octokitService.auth()) as { type: string };
     return result?.type === "token";
   }
 
