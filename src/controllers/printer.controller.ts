@@ -134,7 +134,7 @@ export class PrinterController {
   @GET()
   @route("/plugin-list")
   async getPluginList(req: Request, res: Response) {
-    let pluginList = this.pluginRepositoryCache.getCache();
+    const pluginList = this.pluginRepositoryCache.getCache();
     res.send(pluginList);
   }
 
