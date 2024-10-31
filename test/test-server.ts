@@ -5,7 +5,7 @@ import { setupEnvConfig } from "@/server.env";
 import { AxiosMock } from "./mocks/axios.mock";
 import { OctoPrintApiMock } from "./mocks/octoprint-api.mock";
 import { ROLES } from "@/constants/authorization.constants";
-import { Test } from "supertest";
+import supertest, { Test } from "supertest";
 import { Express } from "express";
 import { AppConstants } from "@/server.constants";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
@@ -66,6 +66,7 @@ export async function setupTestApp(
     const printerSocketStore = container.resolve(DITokens.printerSocketStore);
     await printerSocketStore.loadPrinterSockets();
   }
+
   return {
     idType: isTypeormMode ? Number : String,
     isTypeormMode,

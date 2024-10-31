@@ -11,8 +11,8 @@ export class ServerReleaseService {
   private synced = false;
   private installedReleaseFound: null | boolean = null;
   private updateAvailable: null | boolean = null;
-  private latestRelease?: Awaited<ReturnType<Octokit["rest"]["repos"]["listReleases"]>>["data"][number];
-  private installedRelease?: Awaited<ReturnType<Octokit["rest"]["repos"]["listReleases"]>>["data"][number];
+  private latestRelease: Awaited<ReturnType<Octokit["rest"]["repos"]["listReleases"]>>["data"][number] = null;
+  private installedRelease: Awaited<ReturnType<Octokit["rest"]["repos"]["listReleases"]>>["data"][number] = null;
   private logger: LoggerService;
   serverVersion;
 
