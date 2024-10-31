@@ -228,7 +228,7 @@ export class ClientBundleService {
       this.logger.log(`Removing existing file/dir '${distPath}/${fileOrDir}' before updating client`);
       try {
         await rm(join(distPath, fileOrDir), { force: true, recursive: true });
-      } catch (e) {
+      } catch (e: any) {
         this.logger.error(`${e.message} ${e.stack}`);
         throw e;
       }
@@ -236,7 +236,7 @@ export class ClientBundleService {
 
     try {
       zip.extractAllTo(join(superRootPath(), AppConstants.defaultClientBundleStorage));
-    } catch (e) {
+    } catch (e: any) {
       this.logger.error(`Unzipping failed ${e.message} ${e.stack}`);
       throw e;
     }

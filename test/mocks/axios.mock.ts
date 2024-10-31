@@ -1,10 +1,7 @@
 import { AxiosError } from "axios";
 
 export class AxiosMock {
-  mockStatus?: number = undefined;
-  mockResponse = undefined;
-  isStream?: boolean = undefined;
-  willThrow?: boolean = undefined;
+  mockResponses: Record<string, { status: number; data: any; isStream?: boolean; throws?: boolean }> = {};
   timeout = null;
   streamRejectPayload: any;
 
@@ -16,17 +13,20 @@ export class AxiosMock {
     this.streamRejectPayload = rejectPayload;
   }
 
-  saveMockResponse(response: any, status: number, isStream = false, throws = false) {
-    this.mockStatus = status;
-    this.mockResponse = response;
-    this.isStream = isStream;
-    this.willThrow = throws;
+  saveMockResponse(path: string, response: any, status: number, isStream = false, throws = false) {
+    this.mockResponses[path] = { status, data: response, isStream, throws };
   }
 
-  async getMockResponse() {
+  async getMockResponse(path: string) {
+    const responseConfig = this.mockResponses[path];
+
+    if (!responseConfig) {
+      throw new AxiosError(`No mock response for path: ${path}`);
+    }
+
     const result = Promise.resolve({
-      status: this.mockStatus,
-      data: this.isStream
+      status: responseConfig.status,
+      data: responseConfig.isStream
         ? {
             pipe: (stream) => {},
             on: (event, cb) => {
@@ -35,32 +35,32 @@ export class AxiosMock {
                   return cb(this.streamRejectPayload);
                 }
               } else {
-                return cb(this.mockResponse);
+                return cb(responseConfig.data);
               }
             },
           }
-        : this.mockResponse,
+        : responseConfig.data,
     });
 
-    if (this.willThrow) {
-      throw new AxiosError(this.mockResponse, this.mockStatus?.toString());
+    if (responseConfig.throws) {
+      throw new AxiosError(responseConfig.data, responseConfig.status.toString());
     }
     return result;
   }
 
-  get() {
-    return this.getMockResponse();
+  get(path: string) {
+    return this.getMockResponse(path);
   }
 
-  post() {
-    return this.getMockResponse();
+  post(path: string) {
+    return this.getMockResponse(path);
   }
 
-  patch() {
-    return this.getMockResponse();
+  patch(path: string) {
+    return this.getMockResponse(path);
   }
 
-  delete() {
-    return this.getMockResponse();
+  delete(path: string) {
+    return this.getMockResponse(path);
   }
 }

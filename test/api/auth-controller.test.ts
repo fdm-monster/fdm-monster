@@ -4,13 +4,14 @@ import { expectBadRequestError, expectOkResponse, expectUnauthenticatedResponse 
 import { ensureTestUserCreated, getUserData } from "./test-data/create-user";
 import { DITokens } from "@/container.tokens";
 import { AwilixContainer } from "awilix";
-import supertest from "supertest";
+import { Test } from "supertest";
 import { SettingsStore } from "@/state/settings.store";
 import { loginTestUser } from "./auth/login-test-user";
 import { AuthService } from "@/services/authentication/auth.service";
 import { AuthController } from "@/controllers/auth.controller";
+import TestAgent from "supertest/lib/agent";
 
-let request: supertest.SuperTest<supertest.Test>;
+let request: TestAgent<Test>;
 let container: AwilixContainer;
 let settingsStore: SettingsStore;
 let authService: AuthService;

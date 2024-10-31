@@ -39,3 +39,5 @@ installations/ansible/inventory.cfg
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+requests/http-client.private.env.json

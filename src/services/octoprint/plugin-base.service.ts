@@ -10,8 +10,8 @@ export class PluginBaseService {
   // https://github.com/OctoPrint/OctoPrint/blob/76e87ba81329e6ce761c9307d3e80c291000871e/src/octoprint/plugins/pluginmanager/__init__.py#L609
   octoprintClient: OctoprintClient;
   pluginRepositoryCache: PluginRepositoryCache;
-  private _pluginName: string;
-  private _pluginUrl: string;
+  private readonly _pluginName: string;
+  private readonly pluginUrl: string;
 
   protected logger: LoggerService;
 
@@ -33,7 +33,7 @@ export class PluginBaseService {
     this.logger = loggerFactory(`Plugin-${pluginName}`);
 
     const pluginReference = pluginRepositoryCache.getPlugin(pluginName);
-    this._pluginUrl = pluginUrl || pluginReference.archive;
+    this.pluginUrl = pluginUrl || pluginReference.archive;
 
     if (!pluginName || !pluginUrl) {
       throw new ValidationException("OctoPrint Plugin not configured correctly");
@@ -60,11 +60,11 @@ export class PluginBaseService {
   }
 
   async isPluginInstalled(printerLogin: LoginDto) {
-    const foundPlugin = await this.#findPluginFromListQuery(printerLogin);
+    const foundPlugin = await this.findPluginFromListQuery(printerLogin);
     return !!foundPlugin;
   }
 
-  async #findPluginFromListQuery(printerLogin: LoginDto) {
+  private async findPluginFromListQuery(printerLogin: LoginDto) {
     const response = await this.octoprintClient.getPluginManagerPlugins(printerLogin);
     if (!response?.plugins?.length) {
       throw new InternalServerException("Plugin query response was empty");
@@ -77,7 +77,7 @@ export class PluginBaseService {
   }
 
   async updatePlugin(login: LoginDto) {
-    return await this.octoprintClient.postSoftwareUpdate(login, [this.pluginName], this._pluginUrl);
+    return await this.octoprintClient.postSoftwareUpdate(login, [this.pluginName], this.pluginUrl);
   }
 
   async installPlugin(login: LoginDto, restartAfter = false) {

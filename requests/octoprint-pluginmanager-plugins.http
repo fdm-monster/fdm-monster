@@ -1,0 +1,7 @@
+### GET request to OctoPrint plugins
+
+GET http://{{env-op}}/plugin/pluginmanager/plugins
+    ?generated-in=WebStorm
+x-api-key: {{api-key}}
+
+###

@@ -134,8 +134,7 @@ export class PrinterController {
   @GET()
   @route("/plugin-list")
   async getPluginList(req: Request, res: Response) {
-    console.warn("asd");
-    let pluginList = this.pluginRepositoryCache.getCache();
+    const pluginList = this.pluginRepositoryCache.getCache();
     res.send(pluginList);
   }
 
@@ -378,7 +377,7 @@ export class PrinterController {
   async getPrinterPluginList(req: Request, res: Response) {
     // List installed plugins (OP 1.6.0+)
     const { printerLogin } = getScopedPrinter(req);
-    let pluginList = await this.octoprintClient.getPluginManagerPlugins(printerLogin);
+    const pluginList = await this.octoprintClient.getPluginManagerPlugins(printerLogin);
     res.send(pluginList);
   }
 
