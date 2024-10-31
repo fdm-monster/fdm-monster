@@ -40,7 +40,7 @@ export interface IPrinterApi {
   pausePrint(): Promise<void>;
   resumePrint(): Promise<void>;
   cancelPrint(): Promise<void>;
-  emergencyStop(): Promise<void>;
+  quickStop(): Promise<void>;
 
   // Subsetting of OctoPrint
   // getName(): string;
