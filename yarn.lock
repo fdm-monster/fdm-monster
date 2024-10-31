@@ -1110,7 +1110,7 @@ __metadata:
     axios: "npm:1.7.7"
     bcryptjs: "npm:2.4.3"
     better-sqlite3: "npm:11.5.0"
-    cache-manager: "npm:4.1.0"
+    cache-manager: "npm:6.1.2"
     chokidar: "npm:4.0.1"
     class-validator: "npm:0.14.1"
     concurrently: "npm:9.0.1"
@@ -1529,6 +1529,15 @@ __metadata:
     "@jridgewell/resolve-uri": "npm:^3.1.0"
     "@jridgewell/sourcemap-codec": "npm:^1.4.14"
   checksum: 10c0/3d1ce6ebc69df9682a5a8896b414c6537e428a1d68b02fcc8363b04284a8ca0df04d0ee3013132252ab14f2527bc13bea6526a912ecb5658f0e39fd2860b4df4
+  languageName: node
+  linkType: hard
+
+"@keyv/serialize@npm:*":
+  version: 1.0.1
+  resolution: "@keyv/serialize@npm:1.0.1"
+  dependencies:
+    buffer: "npm:^6.0.3"
+  checksum: 10c0/948fadc632f6050b67cb8ea664192a98d7743015e1b449d383addacbce371414b9cd7129b33ab36d5d81b558744ab0a56c2753b287e7c4f5b2c46401c486cbd0
   languageName: node
   linkType: hard
 
@@ -4344,13 +4353,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"async@npm:3.2.3":
-  version: 3.2.3
-  resolution: "async@npm:3.2.3"
-  checksum: 10c0/109780c846f05109dde14412d916ae4ed6daf6f9aad0c4aa1dcf0d4da775a3a9e35e0e06e4e06ad9fed66f99ca15549da16f2f243c56103b346e9d3bcd9c943f
-  languageName: node
-  linkType: hard
-
 "async@npm:^3.2.3":
   version: 3.2.6
   resolution: "async@npm:3.2.6"
@@ -4797,14 +4799,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cache-manager@npm:4.1.0":
-  version: 4.1.0
-  resolution: "cache-manager@npm:4.1.0"
+"cache-manager@npm:6.1.2":
+  version: 6.1.2
+  resolution: "cache-manager@npm:6.1.2"
   dependencies:
-    async: "npm:3.2.3"
-    lodash.clonedeep: "npm:^4.5.0"
-    lru-cache: "npm:^7.10.1"
-  checksum: 10c0/64287c95882b47b4525ba8c699862e6fc1e847ebdfc4084f463ecf254a4101eea5e0160236a7d9b633e8d9a75c1ed5bd5bc8b19c5bb3341ae729e2ab4b4be6eb
+    keyv: "npm:^5.1.2"
+  checksum: 10c0/247a3af2fb32aa04404c64682ec46af5e51316f3aebbefcdacd591f256ea0707e469ad5f6970dd7154cb64941dd6e36e73d5d9e825a95305a3334d07fdd31093
   languageName: node
   linkType: hard
 
@@ -8162,6 +8162,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"keyv@npm:^5.1.2":
+  version: 5.1.2
+  resolution: "keyv@npm:5.1.2"
+  dependencies:
+    "@keyv/serialize": "npm:*"
+  checksum: 10c0/0b848e2e867352db24be2c963a9ae50e883388a6d0e6aa7bdd75baae7e6d1f4e7f31403cf36b863acdac51a4b78ad959a8c8c1a025cbdc68b96c4f7fb11e8120
+  languageName: node
+  linkType: hard
+
 "kleur@npm:^3.0.3":
   version: 3.0.3
   resolution: "kleur@npm:3.0.3"
@@ -8222,13 +8231,6 @@ __metadata:
   dependencies:
     p-locate: "npm:^5.0.0"
   checksum: 10c0/d3972ab70dfe58ce620e64265f90162d247e87159b6126b01314dd67be43d50e96a50b517bce2d9452a79409c7614054c277b5232377de50416564a77ac7aad3
-  languageName: node
-  linkType: hard
-
-"lodash.clonedeep@npm:^4.5.0":
-  version: 4.5.0
-  resolution: "lodash.clonedeep@npm:4.5.0"
-  checksum: 10c0/2caf0e4808f319d761d2939ee0642fa6867a4bbf2cfce43276698828380756b99d4c4fa226d881655e6ac298dd453fe12a5ec8ba49861777759494c534936985
   languageName: node
   linkType: hard
 
@@ -8355,13 +8357,6 @@ __metadata:
   dependencies:
     yallist: "npm:^3.0.2"
   checksum: 10c0/89b2ef2ef45f543011e38737b8a8622a2f8998cddf0e5437174ef8f1f70a8b9d14a918ab3e232cb3ba343b7abddffa667f0b59075b2b80e6b4d63c3de6127482
-  languageName: node
-  linkType: hard
-
-"lru-cache@npm:^7.10.1":
-  version: 7.18.3
-  resolution: "lru-cache@npm:7.18.3"
-  checksum: 10c0/b3a452b491433db885beed95041eb104c157ef7794b9c9b4d647be503be91769d11206bb573849a16b4cc0d03cbd15ffd22df7960997788b74c1d399ac7a4fed
   languageName: node
   linkType: hard
 
