@@ -5,7 +5,7 @@ import { multiPartContentType, pluginRepositoryUrl } from "./constants/octoprint
 import { firmwareFlashUploadEvent, uploadProgressEvent } from "@/constants/event.constants";
 import { ExternalServiceError } from "@/exceptions/runtime.exceptions";
 import { OctoprintRoutes } from "./octoprint-api.routes";
-import axios, { AxiosPromise, AxiosStatic } from "axios";
+import axios, { AxiosInstance, AxiosPromise, AxiosStatic } from "axios";
 import EventEmitter2 from "eventemitter2";
 import { LoggerService } from "@/handlers/logger";
 import { LoginDto } from "@/services/interfaces/login.dto";
@@ -32,7 +32,7 @@ type TAxes = "x" | "y" | "z";
  */
 export class OctoprintClient extends OctoprintRoutes {
   eventEmitter2: EventEmitter2;
-  protected httpClient: AxiosStatic;
+  protected httpClient: AxiosInstance;
   protected logger: LoggerService;
 
   constructor({
@@ -42,7 +42,7 @@ export class OctoprintClient extends OctoprintRoutes {
     eventEmitter2,
   }: {
     settingsStore: SettingsStore;
-    httpClient: AxiosStatic;
+    httpClient: AxiosInstance;
     loggerFactory: ILoggerFactory;
     eventEmitter2: EventEmitter2;
   }) {

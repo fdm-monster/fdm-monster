@@ -23,13 +23,6 @@ let request: TestAgent<Test>;
 
 beforeAll(async () => {
   ({ request } = await setupTestApp(true));
-  nock.disableNetConnect();
-  nock.enableNetConnect("127.0.0.1");
-});
-
-afterAll(() => {
-  nock.enableNetConnect();
-  nock.cleanAll();
 });
 
 describe(PluginFirmwareUpdateController.name, () => {
@@ -45,8 +38,8 @@ describe(PluginFirmwareUpdateController.name, () => {
   });
 
   it("should query GitHub releases", async () => {
-    nock("https://api.github.com")
-      .get("/repos/prusa3d/Prusa-Firmware/releases/156805112")
+    nock("https://api.github.com/")
+      .get("/repos/prusa3d/Prusa-Firmware/releases")
       .reply(200, require("./test-data/prusa-github-releases.data.json"));
 
     const syncResponse = await request.post(syncReleasesRoute).send();

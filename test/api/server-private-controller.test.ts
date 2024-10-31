@@ -41,7 +41,7 @@ describe(ServerPrivateController.name, () => {
 
     const response = await request.get(getClientReleasesRoute).send();
     expectOkResponse(response);
-    expect(response.body.latest.tag_name).toEqual("1.6.4");
+    expect(response.body.latest.tag_name).toEqual("1.6.3");
 
     expect(nock.activeMocks()).toHaveLength(0);
   });
