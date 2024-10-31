@@ -1,11 +1,11 @@
 import { DITokens } from "@/container.tokens";
 import { validNewPrinterState } from "./test-data/printer.data";
-import { AxiosMock } from "../mocks/axios.mock";
 import { BatchCallService } from "@/services/core/batch-call.service";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { setupTestApp } from "../test-server";
 import { SqliteIdType } from "@/shared.constants";
 import { Printer } from "@/entities";
+import nock from "nock";
 
 let batchCallService: BatchCallService;
 let printerService: IPrinterService<SqliteIdType, Printer>;
@@ -17,12 +17,10 @@ beforeAll(async () => {
   batchCallService = container.resolve(DITokens.batchCallService);
 });
 
-beforeEach(() => {
-  // httpClient.saveMockResponse(undefined, 200);
-});
-
 describe(BatchCallService.name, () => {
-  it("should call multiple printers ", async () => {
+  it("should call multiple printers to get re-printable jobs", async () => {
+    nock(validNewPrinterState.printerURL).get(/.*/).reply(200).post(/.*/).reply(200);
+
     const printer = await printerService.create(validNewPrinterState);
     const printer2 = await printerService.create(validNewPrinterState);
 
@@ -31,6 +29,8 @@ describe(BatchCallService.name, () => {
   });
 
   it("should call multiple printers ", async () => {
+    nock(validNewPrinterState.printerURL).get(/.*/).reply(200).post(/.*/).reply(200);
+
     const printer = await printerService.create(validNewPrinterState);
     const printer2 = await printerService.create(validNewPrinterState);
 
@@ -49,8 +49,12 @@ describe(BatchCallService.name, () => {
     const printer = await printerService.create(validNewPrinterState);
     const printer2 = await printerService.create(validNewPrinterState);
 
-    httpClient.saveMockResponse("https://asd.com:81/api/job", { job: { file: { name: "test-file.gcode" } } }, 200);
-    httpClient.saveMockResponse("https://asd.com:81/api/connection", { state: { text: "Operational" } }, 200);
+    nock(printer.printerURL)
+      .get("/api/job")
+      .reply(200, { job: { file: { name: "test-file.gcode" } } });
+    nock(printer2.printerURL)
+      .get("/api/connection")
+      .reply(200, { state: { text: "Operational" } });
 
     // Action: call getBatchPrinterReprintFile with valid printer IDs
     const result = await batchCallService.getBatchPrinterReprintFile([printer.id, printer2.id]);
@@ -64,8 +68,12 @@ describe(BatchCallService.name, () => {
   it("should return NoLastPrint state if no last print file is found", async () => {
     const printer = await printerService.create(validNewPrinterState);
 
-    httpClient.saveMockResponse("https://asd.com:81/api/job", { job: { file: {} } }, 200);
-    httpClient.saveMockResponse("https://asd.com:81/api/connection", { state: { text: "Operational" } }, 200);
+    nock(printer.printerURL)
+      .get("/api/job")
+      .reply(200, { job: { file: {} } });
+    nock(printer.printerURL)
+      .get("/api/connection")
+      .reply(200, { state: { text: "Operational" } });
 
     const result = await batchCallService.getBatchPrinterReprintFile([printer.id]);
 

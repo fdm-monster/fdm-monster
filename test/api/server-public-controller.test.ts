@@ -5,7 +5,7 @@ import { expectOkResponse, expectUnauthenticatedResponse } from "../extensions";
 import { AppConstants } from "@/server.constants";
 import { DITokens } from "@/container.tokens";
 import { loginTestUser } from "./auth/login-test-user";
-import githubReleasesResponse from "./test-data/github-releases.data.json";
+import githubReleasesResponse from "./test-data/github-releases-server-feb-2022.data.json";
 import { ServerReleaseService } from "@/services/core/server-release.service";
 import { SettingsStore } from "@/state/settings.store";
 import { Test } from "supertest";

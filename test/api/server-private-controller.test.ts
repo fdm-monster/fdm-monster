@@ -6,12 +6,12 @@ import { AppConstants } from "@/server.constants";
 import { DITokens } from "@/container.tokens";
 import { validateInput } from "@/handlers/validators";
 import { importPrintersFloorsYamlRules } from "@/services/validators/yaml-service.validation";
-import { asFunction, AwilixContainer } from "awilix";
-import simpleGitMock from "../application/__mocks__/simple-git";
+import { AwilixContainer } from "awilix";
 import { Test } from "supertest";
 import { SettingsStore } from "@/state/settings.store";
 import { ServerPrivateController } from "@/controllers/server-private.controller";
 import TestAgent from "supertest/lib/agent";
+import nock from "nock";
 
 let request: TestAgent<Test>;
 let container: AwilixContainer;
@@ -26,17 +26,24 @@ const restartRoute = `${defaultRoute}/restart`;
 
 beforeAll(async () => {
   ({ request, container } = await setupTestApp());
-  container.register({
-    [DITokens.simpleGitService]: asFunction(simpleGitMock),
-  });
   settingsStore = container.resolve(DITokens.settingsStore);
 });
 
 describe(ServerPrivateController.name, () => {
   it("should get client releases", async () => {
+    nock("https://api.github.com/")
+      .get("/repos/fdm-monster/fdm-monster-client/releases/latest")
+      .reply(200, require("./test-data/github-releases-latest-client-slim-oct-2024.data.json"))
+      .get("/repos/fdm-monster/fdm-monster-client/releases")
+      .reply(200, require("./test-data/github-releases-client-slim-oct-2024.data.json"));
+
+    expect(nock.activeMocks()).toHaveLength(2);
+
     const response = await request.get(getClientReleasesRoute).send();
-    // TODO might be prone to throttling
     expectOkResponse(response);
+    expect(response.body.latest.tag_name).toEqual("1.6.4");
+
+    expect(nock.activeMocks()).toHaveLength(0);
   });
 
   it("should get update info", async () => {

@@ -5,6 +5,8 @@ import { asClass, AwilixContainer } from "awilix";
 import { AxiosMock } from "../mocks/axios.mock";
 import { ServerReleaseService } from "@/services/core/server-release.service";
 import { ServerUpdateService } from "@/services/core/server-update.service";
+import nock from "nock";
+import githubReleasesResponse from "../api/test-data/github-releases-server-feb-2022.data.json";
 
 let container: AwilixContainer;
 let service: ServerReleaseService;
@@ -24,7 +26,8 @@ describe(ServerUpdateService.name, () => {
   });
 
   it("should return github releases", async () => {
-    httpClient.saveMockResponse(require("./test-data/github-releases-response.json"), 200, false);
+    nock("https://api.github.com").get("/repos/fdm-monster/fdm-monster/releases/").reply(200, githubReleasesResponse);
+
     await service.syncLatestRelease();
     expect(service.getState()).toMatchObject({
       airGapped: null,
@@ -37,7 +40,7 @@ describe(ServerUpdateService.name, () => {
     });
   });
 
-  it("should log server update", async () => {
-    await service.logServerVersionState();
+  it("should log server update", () => {
+    service.logServerVersionState();
   });
 });
