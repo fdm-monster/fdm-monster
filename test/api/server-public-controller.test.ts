@@ -112,11 +112,8 @@ describe(ServerPublicController.name, () => {
     });
   });
 
-  /**
-   * This is redundant: we don't have a way to mock OctoKit auth yet, so the releases will never be called.
-   * There's currently a auth requirement to prevent rate-limit. The client updater has preference.
-   */
   test.skip("should return update-to-date response", async function () {
+    // TODO these dont work yet (octokit undici/native-fetch)
     nock("https://api.github.com").get("/repos/fdm-monster/fdm-monster/releases/").reply(200, githubReleasesResponse);
 
     await releaseService.syncLatestRelease();

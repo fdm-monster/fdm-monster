@@ -38,6 +38,7 @@ describe(PluginFirmwareUpdateController.name, () => {
   });
 
   it("should query GitHub releases", async () => {
+    // TODO these dont work yet (octokit undici/native-fetch)
     nock("https://api.github.com/")
       .get("/repos/prusa3d/Prusa-Firmware/releases")
       .reply(200, require("./test-data/prusa-github-releases.data.json"));
@@ -104,6 +105,8 @@ describe(PluginFirmwareUpdateController.name, () => {
   // This is too intrusive still (needs fs isolation)
   test.skip(`should be able to POST ${downloadFirmwareRoute} to let server download firmware`, async () => {
     const testPrinter = await createTestPrinter(request);
+
+    // TODO these dont work yet (octokit undici/native-fetch)
     nock("https://api.github.com")
       .get("/repos/prusa3d/Prusa-Firmware/releases")
       .reply(200, require("./test-data/prusa-github-releases.data.json"));

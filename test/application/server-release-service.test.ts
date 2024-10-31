@@ -26,6 +26,7 @@ describe(ServerUpdateService.name, () => {
   });
 
   it("should return github releases", async () => {
+    // TODO these dont work yet (octokit undici/native-fetch)
     nock("https://api.github.com").get("/repos/fdm-monster/fdm-monster/releases/").reply(200, githubReleasesResponse);
 
     await service.syncLatestRelease();
