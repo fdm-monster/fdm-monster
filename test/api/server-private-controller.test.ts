@@ -41,6 +41,7 @@ describe(ServerPrivateController.name, () => {
 
     const response = await request.get(getClientReleasesRoute).send();
     expectOkResponse(response);
+    // Technically speaking this should not query live data (but sadly octokit is not nock-compatible right now)
     expect(response.body.latest.tag_name).toEqual("1.6.3");
 
     expect(nock.activeMocks()).toHaveLength(0);

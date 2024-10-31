@@ -4,6 +4,7 @@ import { PluginRepositoryCache } from "@/services/octoprint/plugin-repository.ca
 import { DITokens } from "@/container.tokens";
 import pluginJson from "../test-data/plugins.json";
 import { setupTestApp } from "../../test-server";
+import nock from "nock";
 
 let cache: PluginRepositoryCache;
 
@@ -23,7 +24,7 @@ describe(PluginRepositoryCache.name, () => {
   });
 
   it("should load cache and firmware plugin from Mocked Axios", async () => {
-    httpClient.saveMockResponse(pluginJson, 200, false);
+    nock("https://plugins.octoprint.org").get("/plugins.json").reply(200, pluginJson);
     const result = await cache.queryCache();
 
     expect(result).toHaveLength(356);
