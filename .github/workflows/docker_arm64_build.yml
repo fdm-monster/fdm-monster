@@ -1,5 +1,6 @@
 name: Docker ARM64
 on:
+  pull_request:
   push:
       branches:
         - develop
@@ -10,11 +11,35 @@ jobs:
     runs-on: ubuntu-latest
     name: "Docker ARM64 build"
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - uses: actions/checkout@v4 # v4
+
+      # Add Yarn cache
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+
+      - name: Cache Yarn dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+            .yarn/cache
+            .yarn/unplugged
+            .yarn/build-state.yml
+            .yarn/install-state.gz
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+        with:
+          platforms: linux/arm64
+          driver-opts: |
+            image=moby/buildkit:master
+            network=host
 
       # Login to DockerHub with environment variables
       - name: Login to DockerHub
@@ -37,7 +62,7 @@ jobs:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-buildx-${{ hashfiles('./docker/Dockerfile') }}
           restore-keys: |
-            ${{ runner.os }}-buildx-
+            ${{ runner.os }}-arm64-buildx-
 
       # Clone the repo and build the image
       - name: Build and push
@@ -52,6 +77,9 @@ jobs:
           tags: fdmmonster/fdm-monster:${{ env.SERVER_VERSION }}-arm64, fdmmonster/fdm-monster:latest-arm64, davidzwa/fdm-monster:${{ env.SERVER_VERSION }}-arm64, davidzwa/fdm-monster:latest-arm64
           labels: ${{ needs.meta.outputs.labels }}
           platforms: linux/arm64
+          build-args: |
+            BUILDKIT_STEP_LOG_MAX_SIZE=10485760
+            BUILDKIT_STEP_LOG_MAX_SPEED=10485760
 
       # SQLite ARM64 version, separate dockerfile
       - name: Build and push
@@ -66,6 +94,9 @@ jobs:
           tags: fdmmonster/fdm-monster:${{ env.SERVER_VERSION }}-sqlite-arm64, fdmmonster/fdm-monster:latest-sqlite-arm64, davidzwa/fdm-monster:${{ env.SERVER_VERSION }}-sqlite-arm64, davidzwa/fdm-monster:latest-sqlite-arm64
           labels: ${{ needs.meta.outputs.labels }}
           platforms: linux/arm64
+          build-args: |
+            BUILDKIT_STEP_LOG_MAX_SIZE=10485760
+            BUILDKIT_STEP_LOG_MAX_SPEED=10485760
 
       # Show image digest output
       - name: Image digest
