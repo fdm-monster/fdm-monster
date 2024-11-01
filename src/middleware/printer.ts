@@ -5,6 +5,7 @@ import { PrinterCache } from "@/state/printer.cache";
 import { OctoprintApi } from "@/services/octoprint.api";
 import { MoonrakerType, OctoprintType } from "@/services/printer-api.interface";
 import { MoonrakerApi } from "@/services/moonraker.api";
+import { SettingsStore } from "@/state/settings.store";
 
 export const printerIdToken = "currentPrinterId";
 export const printerApiToken = "printerApi";
@@ -14,6 +15,8 @@ export const printerLoginToken = "printerLogin";
 export const printerResolveMiddleware = (key = "id") => {
   return (req: Request, res: Response, next: NextFunction) => {
     const printerCache = req.container.resolve<PrinterCache>(DITokens.printerCache);
+    const settingsService = req.container.resolve<any>(DITokens.settingsStore) as SettingsStore;
+    const moonrakerEnabled = settingsService.getServerSettings().experimentalMoonrakerSupport;
 
     let scopedPrinter = undefined;
     let loginDto = undefined;
@@ -39,7 +42,7 @@ export const printerResolveMiddleware = (key = "id") => {
         case MoonrakerType:
           const moonrakerInstance = req.container.resolve<MoonrakerApi>(DITokens.moonrakerApi);
           req.container.register({
-            [printerApiToken]: asValue(moonrakerInstance),
+            [printerApiToken]: moonrakerEnabled ? asValue(moonrakerInstance) : asValue(undefined),
           });
           break;
       }
