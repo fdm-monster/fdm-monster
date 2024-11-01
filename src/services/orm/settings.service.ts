@@ -1,7 +1,7 @@
 import { Settings } from "@/entities";
 import {
   credentialSettingsKey,
-  fileCleanSettingKey,
+  printerFileCleanSettingKey,
   frontendSettingKey,
   getDefaultCredentialSettings,
   getDefaultFileCleanSettings,
@@ -32,7 +32,7 @@ import { AppConstants } from "@/server.constants";
 import { IConfigService } from "@/services/core/config.service";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { validateInput } from "@/handlers/validators";
-import { fileCleanSettingsUpdateRules, whitelistSettingUpdateRules } from "@/services/validators/settings-service.validation";
+import { whitelistSettingUpdateRules } from "@/services/validators/settings-service.validation";
 
 export class SettingsService2 extends BaseService(Settings, SettingsDto) implements ISettingsService<SqliteIdType, Settings> {
   configService: IConfigService;
@@ -44,9 +44,12 @@ export class SettingsService2 extends BaseService(Settings, SettingsDto) impleme
 
   toDto(entity: Settings): SettingsDto<SqliteIdType> {
     return {
-      [serverSettingsKey]: entity[serverSettingsKey],
+      [serverSettingsKey]: {
+        ...entity[serverSettingsKey],
+        experimentalTypeormSupport: true,
+      },
       [frontendSettingKey]: entity[frontendSettingKey],
-      [fileCleanSettingKey]: entity[fileCleanSettingKey],
+      [printerFileCleanSettingKey]: entity[printerFileCleanSettingKey],
       [wizardSettingKey]: entity[wizardSettingKey],
       [timeoutSettingKey]: entity[timeoutSettingKey],
     };
@@ -60,7 +63,7 @@ export class SettingsService2 extends BaseService(Settings, SettingsDto) impleme
         [serverSettingsKey]: getDefaultServerSettings(),
         [credentialSettingsKey]: getDefaultCredentialSettings(),
         [wizardSettingKey]: getDefaultWizardSettings(),
-        [fileCleanSettingKey]: getDefaultFileCleanSettings(),
+        [printerFileCleanSettingKey]: getDefaultFileCleanSettings(),
         [frontendSettingKey]: getDefaultFrontendSettings(),
         [timeoutSettingKey]: getDefaultTimeout(),
       });
@@ -107,7 +110,7 @@ export class SettingsService2 extends BaseService(Settings, SettingsDto) impleme
 
   async updateFileCleanSettings(fileCleanSettings: FileCleanSettingsDto) {
     const entity = await this.getOrCreate();
-    entity[fileCleanSettingKey] = fileCleanSettings;
+    entity[printerFileCleanSettingKey] = fileCleanSettings;
     await this.update(entity.id, entity);
     return entity;
   }
@@ -154,8 +157,15 @@ export class SettingsService2 extends BaseService(Settings, SettingsDto) impleme
 
   migrateSettingsRuntime(knownSettings: Settings): Settings {
     const entity = knownSettings; // alias _doc also works
-    if (!entity[fileCleanSettingKey]) {
-      entity[fileCleanSettingKey] = getDefaultFileCleanSettings();
+    if (!entity[printerFileCleanSettingKey]) {
+      entity[printerFileCleanSettingKey] = getDefaultFileCleanSettings();
+    } else {
+      // Remove superfluous settings
+      entity[printerFileCleanSettingKey] = {
+        autoRemoveOldFilesBeforeUpload: entity[printerFileCleanSettingKey].autoRemoveOldFilesBeforeUpload,
+        autoRemoveOldFilesAtBoot: entity[printerFileCleanSettingKey].autoRemoveOldFilesBeforeUpload,
+        autoRemoveOldFilesCriteriumDays: entity[printerFileCleanSettingKey].autoRemoveOldFilesCriteriumDays,
+      };
     }
 
     // Server settings exist, but need updating with new ones if they don't exist.
@@ -200,12 +210,12 @@ export class SettingsService2 extends BaseService(Settings, SettingsDto) impleme
 
   async patchFileCleanSettings(patchUpdate: Partial<FileCleanSettingsDto>): Promise<Settings> {
     const entity = await this.getOrCreate();
-    if (!entity[fileCleanSettingKey]) {
+    if (!entity[printerFileCleanSettingKey]) {
       throw new Error("No existing wizard settings found, cant patch");
     }
 
     const newFileCleanSettings = {
-      ...entity[fileCleanSettingKey],
+      ...entity[printerFileCleanSettingKey],
       ...patchUpdate,
     };
 

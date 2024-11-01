@@ -1,3 +1,5 @@
+import { IdType } from "@/shared.constants";
+
 export const socketIoConnectedEvent = "socketio.connected";
 
 export const printerEvents = {
@@ -7,11 +9,11 @@ export const printerEvents = {
   batchPrinterCreated: "batchPrinterCreated",
 };
 
-export const octoPrintWebsocketEvent = (printerId: string) => `octoprint.${printerId}`;
-export const octoPrintWebsocketCurrentEvent = (printerId: string) => `octoprint.${printerId}.current`;
+export const octoPrintWebsocketEvent = (printerId: IdType) => `octoprint.${printerId}`;
+export const octoPrintWebsocketCurrentEvent = (printerId: IdType) => `octoprint.${printerId}.current`;
 export const uploadProgressEvent = (token: string) => `upload.progress.${token}`;
-export const firmwareFlashUploadEvent = (printerId: string) => `firmware-upload.${printerId}`;
+export const firmwareFlashUploadEvent = (printerId: IdType) => `firmware-upload.${printerId}`;
 
 export const prefix = "fdm-monster";
-export const fdmMonsterPrinterStoppedEvent = (printerId: string) => `${prefix}.${printerId}.printer-stopped`;
+export const fdmMonsterPrinterStoppedEvent = (printerId: IdType) => `${prefix}.${printerId}.printer-stopped`;
 export const fdmPrinterEventToPrinterId = (event: string) => event.split(".")[1];

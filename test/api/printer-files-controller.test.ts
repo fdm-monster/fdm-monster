@@ -3,12 +3,12 @@ import { createTestPrinter } from "./test-data/create-printer";
 import { expectInvalidResponse, expectNotFoundResponse, expectOkResponse } from "../extensions";
 import { AppConstants } from "@/server.constants";
 import nock from "nock";
-import supertest from "supertest";
-import { OctoPrintApiMock } from "../mocks/octoprint-api.mock";
+import { Test } from "supertest";
 import { PrinterFilesController } from "@/controllers/printer-files.controller";
 import { AwilixContainer } from "awilix";
 import { DITokens } from "@/container.tokens";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
+import TestAgent from "supertest/lib/agent";
 
 const defaultRoute = AppConstants.apiRoute + "/printer-files";
 const trackedUploadsRoute = `${defaultRoute}/tracked-uploads`;
@@ -22,13 +22,12 @@ const uploadFileRoute = (id: idType) => `${getRoute(id)}/upload`;
 const getFilesRoute = (id: idType) => `${getRoute(id)}`;
 const getCacheRoute = (id: idType) => `${getRoute(id)}/cache`;
 
-let request: supertest.SuperTest<supertest.Test>;
-let octoprintClient: OctoPrintApiMock;
+let request: TestAgent<Test>;
 let container: AwilixContainer;
 let printerService: IPrinterService;
 
 beforeAll(async () => {
-  ({ request, octoprintClient, container } = await setupTestApp(true));
+  ({ request, container } = await setupTestApp(true));
   printerService = container.resolve<IPrinterService>(DITokens.printerService);
 });
 
@@ -37,7 +36,6 @@ beforeEach(async () => {
   for (let printer of printers) {
     await printerService.delete(printer.id);
   }
-  octoprintClient.storeResponse(undefined, undefined);
 });
 
 describe(PrinterFilesController.name, () => {
@@ -51,7 +49,9 @@ describe(PrinterFilesController.name, () => {
 
   it("should retrieve files on GET for existing printer", async () => {
     const printer = await createTestPrinter(request);
-    octoprintClient.storeResponse({ files: [], free: 1, total: 1 }, 200);
+
+    nock(printer.printerURL).get("/api/files/local").query("recursive=false").reply(200, { files: [], free: 1, total: 1 });
+
     const response = await request.get(getFilesRoute(printer.id)).send();
     expectOkResponse(response, []);
   });
@@ -72,10 +72,32 @@ describe(PrinterFilesController.name, () => {
     expectOkResponse(response);
   });
 
+  it("should allow DELETE to remove a printer file or folder", async () => {
+    const printer = await createTestPrinter(request);
+
+    const filename = "test.gcode";
+    nock(printer.printerURL)
+      .delete("/api/files/local/" + filename)
+      .reply(200);
+
+    const response = await request.delete(deleteFileRoute(printer.id, filename)).send();
+    expectOkResponse(response);
+  });
+
   it("should allow DELETE to clear printer files - with status result", async () => {
     const printer = await createTestPrinter(request);
     const jsonFile = require("./test-data/octoprint-file.data.json");
-    octoprintClient.storeResponse({ files: [jsonFile] }, 200);
+
+    nock(printer.printerURL)
+      .delete("/api/files/local/" + jsonFile.path)
+      .reply(200);
+
+    nock(printer.printerURL)
+      .get("/api/files/local")
+      .query("recursive=false")
+      .reply(200, { files: [jsonFile], free: 1, total: 1 });
+
+    // octoprintClient.storeResponse({ files: [jsonFile] }, 200);
     const response = await request.delete(clearFilesRoute(printer.id)).send();
     expectOkResponse(response, {
       succeededFiles: expect.any(Array),
@@ -92,16 +114,16 @@ describe(PrinterFilesController.name, () => {
     expectOkResponse(response);
   });
 
-  it("should allow DELETE to remove a printer file or folder", async () => {
-    const printer = await createTestPrinter(request);
-    const response = await request.delete(deleteFileRoute(printer.id, "test")).send();
-    expectOkResponse(response);
-  });
-
   it("should allow POST to print a printer file", async () => {
     const printer = await createTestPrinter(request);
+
+    const filename = "test.gcode";
+    nock(printer.printerURL)
+      .post("/api/files/local/" + filename)
+      .reply(200);
+
     const response = await request.post(printFileRoute(printer.id)).send({
-      filePath: "file.gcode",
+      filePath: filename,
     });
     expectOkResponse(response);
   });
@@ -118,89 +140,9 @@ describe(PrinterFilesController.name, () => {
         },
       },
     });
-    octoprintClient.storeResponse(
-      {
-        DisplayLayerProgress: {
-          totalLayerCountWithoutOffset: "19",
-        },
-        date: 1689190590,
-        display: "file.gcode",
-        gcodeAnalysis: {
-          analysisFirstFilamentPrintTime: 11.23491561690389,
-          analysisLastFilamentPrintTime: 7657.739990697696,
-          analysisPending: false,
-          analysisPrintTime: 7664.035725705694,
-          compensatedPrintTime: 7811.063505072208,
-          dimensions: {
-            depth: 171.8769989013672,
-            height: 3.799999952316284,
-            width: 128.8769989013672,
-          },
-          estimatedPrintTime: 7811.063505072208,
-          filament: {
-            tool0: {
-              length: 12463.312793658377,
-              volume: 29.977780370085828,
-            },
-          },
-          firstFilament: 0.00556784805395266,
-          lastFilament: 0.9944192313637905,
-          printingArea: {
-            maxX: 188.8769989013672,
-            maxY: 168.8769989013672,
-            maxZ: 3.799999952316284,
-            minX: 60.0,
-            minY: -3.0,
-            minZ: 0,
-          },
-          progress: [
-            [0, 7811.063505072208],
-            // ...
-            [0.9882939524753298, 77.78355728284184],
-            [0.9934423430553024, 17.78153162482447],
-            [0.9944192313637905, 7.3489461642040395],
-            [1, 0],
-          ],
-        },
-        hash: "a791a7c44a92e4c46827992a1c5a62281e5a2d13",
-        name: "file.gcode",
-        origin: "local",
-        path: gcodePath,
-        prints: {
-          failure: 0,
-          last: {
-            date: 1689197785.1172757,
-            printTime: 7194.159933987998,
-            success: true,
-          },
-          success: 1,
-        },
-        refs: {
-          download: "http://minipi.local/downloads/files/local/file.gcode",
-          resource: "http://minipi.local/api/files/local/file.gcode",
-        },
-        size: 2167085,
-        statistics: {
-          averagePrintTime: {
-            _default: 7194.159933987998,
-          },
-          lastPrintTime: {
-            _default: 7194.159933987998,
-          },
-        },
-        thumbnail: "plugin/prusaslicerthumbnails/thumbnail/file.png?20230712213630",
-        thumbnail_src: "prusaslicerthumbnails",
-        type: "machinecode",
-        typePath: ["machinecode", "gcode"],
-      },
+    nock(printer.printerURL).get("/api/files/local").query("recursive=false").reply(200, { files: [], free: 1, total: 1 });
 
-      200
-    );
-
-    const response = await request
-      .post(uploadFileRoute(printer.id))
-      // .field("print", true)
-      .attach("file", gcodePath);
+    const response = await request.post(uploadFileRoute(printer.id)).attach("file", gcodePath);
     expectOkResponse(response);
   });
 

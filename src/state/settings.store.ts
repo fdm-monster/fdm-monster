@@ -1,7 +1,7 @@
 import { InternalServerException } from "@/exceptions/runtime.exceptions";
 import {
   credentialSettingsKey,
-  fileCleanSettingKey,
+  printerFileCleanSettingKey,
   frontendSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
@@ -23,13 +23,23 @@ import {
 import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class SettingsStore {
+  private isTypeOrmMode: boolean;
   private settingsService: ISettingsService;
   private logger: LoggerService;
   private settings: ISettings | null = null;
 
-  constructor({ settingsService, loggerFactory }: { settingsService: ISettingsService; loggerFactory: ILoggerFactory }) {
+  constructor({
+    settingsService,
+    loggerFactory,
+    isTypeormMode,
+  }: {
+    settingsService: ISettingsService;
+    loggerFactory: ILoggerFactory;
+    isTypeormMode: boolean;
+  }) {
     this.settingsService = settingsService;
     this.logger = loggerFactory(SettingsStore.name);
+    this.isTypeOrmMode = isTypeormMode;
   }
 
   getSettings() {
@@ -41,10 +51,13 @@ export class SettingsStore {
         loginRequired: settings[serverSettingsKey].loginRequired,
         registration: settings[serverSettingsKey].registration,
         sentryDiagnosticsEnabled: settings[serverSettingsKey].sentryDiagnosticsEnabled,
+        experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
+        experimentalTypeormSupport: this.isTypeOrmMode,
+        experimentalClientSupport: settings[serverSettingsKey].experimentalClientSupport,
       },
       [wizardSettingKey]: settings[wizardSettingKey],
       [frontendSettingKey]: settings[frontendSettingKey],
-      [fileCleanSettingKey]: settings[fileCleanSettingKey],
+      [printerFileCleanSettingKey]: settings[printerFileCleanSettingKey],
       [timeoutSettingKey]: settings[timeoutSettingKey],
     });
   }
@@ -62,6 +75,9 @@ export class SettingsStore {
         debugSettings: settings[serverSettingsKey].debugSettings,
         whitelistEnabled: settings[serverSettingsKey].whitelistEnabled,
         whitelistedIpAddresses: settings[serverSettingsKey].whitelistedIpAddresses,
+        experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
+        experimentalTypeormSupport: this.isTypeOrmMode,
+        experimentalClientSupport: settings[serverSettingsKey].experimentalClientSupport,
       },
     });
   }
@@ -130,11 +146,11 @@ export class SettingsStore {
   }
 
   getFileCleanSettings() {
-    return this.getSettings()[fileCleanSettingKey];
+    return this.getSettings()[printerFileCleanSettingKey];
   }
 
   isPreUploadFileCleanEnabled() {
-    return this.getSettings()[fileCleanSettingKey]?.autoRemoveOldFilesBeforeUpload;
+    return this.getSettings()[printerFileCleanSettingKey]?.autoRemoveOldFilesBeforeUpload;
   }
 
   async setWizardCompleted(version: number) {
@@ -197,6 +213,20 @@ export class SettingsStore {
       sentryDiagnosticsEnabled,
     });
     await this.processSentryEnabled();
+    return this.getSettings();
+  }
+
+  async setExperimentalMoonrakerSupport(moonrakerEnabled: boolean) {
+    this.settings = await this.settingsService.patchServerSettings({
+      experimentalMoonrakerSupport: moonrakerEnabled,
+    });
+    return this.getSettings();
+  }
+
+  async setExperimentalClientSupport(experimentalClientEnabled: boolean) {
+    this.settings = await this.settingsService.patchServerSettings({
+      experimentalClientSupport: experimentalClientEnabled,
+    });
     return this.getSettings();
   }
 

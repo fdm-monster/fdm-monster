@@ -1,6 +1,6 @@
 import {
   credentialSettingsKey,
-  fileCleanSettingKey,
+  printerFileCleanSettingKey,
   frontendSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
@@ -29,6 +29,8 @@ export class Settings extends BaseEntity {
     registration: boolean;
     whitelistEnabled: boolean;
     whitelistedIpAddresses: string[];
+    experimentalMoonrakerSupport: boolean;
+    experimentalClientSupport: boolean;
   };
 
   @Column({ type: "simple-json", nullable: false })
@@ -47,7 +49,7 @@ export class Settings extends BaseEntity {
   };
 
   @Column({ type: "simple-json", nullable: false })
-  [fileCleanSettingKey]!: {
+  [printerFileCleanSettingKey]!: {
     autoRemoveOldFilesBeforeUpload: boolean;
     autoRemoveOldFilesAtBoot: boolean;
     autoRemoveOldFilesCriteriumDays: number;

@@ -2,11 +2,12 @@ import { setupTestApp } from "../test-server";
 import { expectInvalidResponse, expectNotFoundResponse, expectOkResponse } from "../extensions";
 import { AppConstants } from "@/server.constants";
 import { createTestPrinter, testApiKey } from "./test-data/create-printer";
-import supertest, { SuperTest } from "supertest";
+import { Test } from "supertest";
 import { PrinterController } from "@/controllers/printer.controller";
-import { OctoPrintApiMock } from "../mocks/octoprint-api.mock";
 import { IdType } from "@/shared.constants";
-import { OctoprintType } from "@/services/printer-api.interface";
+import TestAgent from "supertest/lib/agent";
+import nock from "nock";
+import { OctoprintType, MoonrakerType } from "@/services/printer-api.interface";
 
 const defaultRoute = AppConstants.apiRoute + "/printer";
 const createRoute = defaultRoute;
@@ -16,7 +17,7 @@ const getRoute = (id: IdType) => `${defaultRoute}/${id}`;
 const deleteRoute = (id: IdType) => `${defaultRoute}/${id}`;
 const updateRoute = (id: IdType) => `${defaultRoute}/${id}`;
 const stopJobRoute = (id: IdType) => `${updateRoute(id)}/job/stop`;
-const reconnectRoute = (id: IdType) => `${updateRoute(id)}/reconnect`;
+const refreshSocket = (id: IdType) => `${updateRoute(id)}/refresh-socket`;
 const connectionRoute = (id: IdType) => `${updateRoute(id)}/connection`;
 const loginDetailsRoute = (id: IdType) => `${updateRoute(id)}/login-details`;
 const enabledRoute = (id: IdType) => `${updateRoute(id)}/enabled`;
@@ -29,13 +30,12 @@ const serialConnectCommandRoute = (id: IdType) => `${getRoute(id)}/serial-connec
 const serialDisconnectCommandRoute = (id: IdType) => `${getRoute(id)}/serial-disconnect`;
 const batchRoute = `${defaultRoute}/batch`;
 
-let request: SuperTest<supertest.Test>;
-let octoprintClient: OctoPrintApiMock;
+let request: TestAgent<Test>;
 const apiKey = "fdmfdmfdmfdmfdmfdmfdmfdmfdmfdmfd";
 const name = "test1234";
 
 beforeAll(async () => {
-  ({ request, octoprintClient } = await setupTestApp(true));
+  ({ request } = await setupTestApp(true));
 });
 
 describe(PrinterController.name, () => {
@@ -50,17 +50,17 @@ describe(PrinterController.name, () => {
   });
 
   it(`should be able to POST ${createRoute}`, async () => {
-    const response = await request.post(createRoute).send({
+    const response = await request.post(createRoute).query("forceSave=true").send({
       printerURL: "http://url.com",
       apiKey: testApiKey,
       name: "test123",
-      printerType: OctoprintType,
+      printerType: MoonrakerType,
     });
     expectOkResponse(response, {
       printerURL: "http://url.com",
       apiKey: testApiKey,
       name: "test123",
-      printerType: OctoprintType,
+      printerType: MoonrakerType,
     });
   });
 
@@ -118,7 +118,7 @@ describe(PrinterController.name, () => {
         printerURL: "http://localhost/",
         apiKey,
         name,
-        printerType: OctoprintType,
+        printerType: MoonrakerType,
       },
     ]);
     expectOkResponse(response);
@@ -143,6 +143,8 @@ describe(PrinterController.name, () => {
     const printer = await createTestPrinter(request);
     expect(printer.enabled).toBe(false);
 
+    nock(printer.printerURL).post(`/api/job`).reply(200);
+
     const response = await request.post(stopJobRoute(printer.id)).send();
     expectOkResponse(response);
   });
@@ -156,30 +158,32 @@ describe(PrinterController.name, () => {
       apiKey,
       enabled: false,
       name: "asd124",
-      printerType: OctoprintType,
+      printerType: MoonrakerType,
     };
     const updatePatch = await request.patch(updateRoute(printer.id)).send(patch);
     expectOkResponse(updatePatch, {
       printerURL: "https://test.com",
       enabled: false,
       name: "asd124",
-      printerType: OctoprintType,
+      printerType: MoonrakerType,
     });
   });
 
   it("should update printer connection settings correctly", async () => {
     const printer = await createTestPrinter(request);
 
+    nock(printer.printerURL).get(`/api/version`).reply(200, { server: "1.2.3" });
+
     const updatePatch = await request.patch(connectionRoute(printer.id)).send({
       printerURL: "https://test.com/",
       apiKey,
       name,
-      printerType: OctoprintType,
+      printerType: MoonrakerType,
     });
     expectOkResponse(updatePatch, {
       printerURL: "https://test.com",
       apiKey,
-      printerType: OctoprintType,
+      printerType: MoonrakerType,
     });
   });
 
@@ -193,7 +197,7 @@ describe(PrinterController.name, () => {
       apiKey,
       printerURL: "https://test.com/",
       name,
-      printerType: OctoprintType,
+      printerType: MoonrakerType,
     });
     expectOkResponse(res);
   });
@@ -231,22 +235,26 @@ describe(PrinterController.name, () => {
   });
 
   it("should get plugin list", async () => {
-    octoprintClient.storeResponse(["test"], 200);
+    // Cache is not loaded
     const res = await request.get(pluginListRoute).send();
-    expectOkResponse(res, []); // Cache is not loaded
+    expectOkResponse(res, []);
   });
 
   it("should get printer plugin list", async () => {
     const printer = await createTestPrinter(request);
-    octoprintClient.storeResponse(["test"], 200);
+
+    const wantedResponse = { plugins: [{ key: "firmwareupdater", name: "Firmware Updater" }] };
+    nock(printer.printerURL).get(`/plugin/pluginmanager/plugins`).reply(200, wantedResponse);
+
     const res = await request.get(printerPluginListRoute(printer.id)).send();
-    expectOkResponse(res, ["test"]);
+    expectOkResponse(res, wantedResponse);
   });
 
   it("should send restart octoprint command", async () => {
     const printer = await createTestPrinter(request);
-    const response = {};
-    octoprintClient.storeResponse(response, 200);
+
+    nock(printer.printerURL).post("/api/system/commands/core/restart").reply(200);
+
     const res = await request.post(restartOctoPrintRoute(printer.id)).send();
     expectOkResponse(res);
   });
@@ -254,15 +262,19 @@ describe(PrinterController.name, () => {
   it("should send serial connect command", async () => {
     const printer = await createTestPrinter(request);
     const response = { port: "/dev/ttyACM0" };
-    octoprintClient.storeResponse(response, 200);
+
+    nock(printer.printerURL).post("/api/connection").reply(200, response);
+
     const res = await request.post(serialConnectCommandRoute(printer.id)).send();
     expectOkResponse(res);
   });
 
   it("should send serial disconnect command", async () => {
     const printer = await createTestPrinter(request);
+
     const response = { port: "/dev/ttyACM0" };
-    octoprintClient.storeResponse(response, 200);
+    nock(printer.printerURL).post("/api/connection").reply(200, response);
+
     const res = await request.post(serialDisconnectCommandRoute(printer.id)).send();
     expectOkResponse(res);
   });

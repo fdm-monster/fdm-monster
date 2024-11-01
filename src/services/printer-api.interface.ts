@@ -13,12 +13,7 @@ export interface StatusFlags {
   error: boolean;
   finished: boolean;
 }
-
 export interface FileDto {
-  /**
-   * @deprecated name will be removed soon, use path instead
-   */
-  name: string;
   path: string;
   size: number;
   date: number;

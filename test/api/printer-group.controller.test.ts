@@ -1,4 +1,4 @@
-import supertest, { SuperTest } from "supertest";
+import { SuperTest } from "supertest";
 import { setupTestApp } from "../test-server";
 import { PrinterGroupController } from "@/controllers/printer-group.controller";
 import { AppConstants } from "@/server.constants";

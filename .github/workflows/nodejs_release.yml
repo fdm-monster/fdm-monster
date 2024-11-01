@@ -33,7 +33,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 18.x
+          node-version: 20.x
 
       # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions
       - name: get-server-version
@@ -74,7 +74,7 @@ jobs:
           draft: ${{ github.ref_name == 'develop' }}
           prerelease: ${{ contains(env.SERVER_VERSION, 'rc') || contains(env.SERVER_VERSION, 'unstable') }}
           tag_name: ${{ env.RELEASE_TAG }}
-          release_name: ${{ env.RELEASE_TAG }} Raging Rex 🦖
+          release_name: ${{ env.RELEASE_TAG }} Klipper Tripper 📎
           body: "Release notes not added" # ${{ steps.build_changelog.outputs.changelog }}
         env:
           GITHUB_TOKEN: ${{ github.token }}

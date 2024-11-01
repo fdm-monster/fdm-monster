@@ -9,6 +9,7 @@ export const serverSettingsUpdateRules = (whitelistFeatureEnabled: boolean) => (
   whitelistEnabled: whitelistFeatureEnabled ? "boolean" : "not",
   whitelistedIpAddresses: whitelistFeatureEnabled ? "array|minLength:1" : "not",
   "whitelistedIpAddresses.*": whitelistFeatureEnabled ? "required|string" : "not",
+  experimentalMoonrakerSupport: "boolean",
 });
 
 export const timeoutSettingsUpdateRules = {
@@ -47,5 +48,13 @@ export const fileCleanSettingsUpdateRules = {
 };
 
 export const sentryDiagnosticsEnabledRules = {
+  enabled: "required|boolean",
+};
+
+export const moonrakerSupportRules = {
+  enabled: "required|boolean",
+};
+
+export const clientNextRules = {
   enabled: "required|boolean",
 };

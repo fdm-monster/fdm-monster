@@ -4,7 +4,7 @@ import { expectOkResponse } from "../extensions";
 import { AppConstants } from "@/server.constants";
 import {
   credentialSettingsKey,
-  fileCleanSettingKey,
+  printerFileCleanSettingKey,
   frontendSettingKey,
   getDefaultFileCleanSettings,
   getDefaultFrontendSettings,
@@ -13,6 +13,7 @@ import {
   wizardSettingKey,
 } from "@/constants/server-settings.constants";
 import { SettingsController } from "@/controllers/settings.controller";
+import { isSqliteModeTest } from "../typeorm.manager";
 
 let request: supertest.SuperTest<supertest.Test>;
 
@@ -20,6 +21,8 @@ const defaultRoute = `${AppConstants.apiRoute}/settings`;
 const sensitiveSettingsRoute = `${defaultRoute}/sensitive`;
 const credentialSettingsRoute = `${defaultRoute}/credential`;
 const serverSettingsRoute = `${defaultRoute}/server`;
+const experimentalMoonrakerSupport = `${defaultRoute}/experimental-moonraker-support`;
+const experimentalClientSupport = `${defaultRoute}/experimental-client-support`;
 const frontendSettingsRoute = `${defaultRoute}/frontend`;
 const fileCleanSettingsRoute = `${defaultRoute}/file-clean`;
 const serverWhitelistRoute = `${defaultRoute}/whitelist`;
@@ -35,6 +38,8 @@ describe(SettingsController.name, () => {
     expect(response.body).not.toBeNull();
     const defaultSettings = getDefaultSettings();
     defaultSettings[serverSettingsKey].loginRequired = false; // Test override
+    defaultSettings[serverSettingsKey].experimentalTypeormSupport = isSqliteModeTest();
+    defaultSettings[serverSettingsKey].experimentalMoonrakerSupport = true;
     delete defaultSettings[serverSettingsKey].whitelistEnabled;
     delete defaultSettings[serverSettingsKey].whitelistedIpAddresses;
     delete defaultSettings[serverSettingsKey].debugSettings;
@@ -47,7 +52,7 @@ describe(SettingsController.name, () => {
     expect(response.body[serverSettingsKey].loginRequired).toBe(false);
     expect(response.body[serverSettingsKey].registration).toBe(false);
     expect(response.body[frontendSettingKey]).toMatchObject(getDefaultFrontendSettings());
-    expect(response.body[fileCleanSettingKey]).toMatchObject(getDefaultFileCleanSettings());
+    expect(response.body[printerFileCleanSettingKey]).toMatchObject(getDefaultFileCleanSettings());
     expectOkResponse(response);
   });
 
@@ -61,6 +66,20 @@ describe(SettingsController.name, () => {
     const response = await request.put(serverSettingsRoute).send({
       registration: true,
       loginRequired: false,
+    });
+    expectOkResponse(response);
+  });
+
+  it("should OK on PUT experimental moonraker support setting", async () => {
+    const response = await request.put(experimentalMoonrakerSupport).send({
+      enabled: true,
+    });
+    expectOkResponse(response);
+  });
+
+  it("should OK on PUT experimental client support setting", async () => {
+    const response = await request.put(experimentalClientSupport).send({
+      enabled: true,
     });
     expectOkResponse(response);
   });
@@ -112,7 +131,7 @@ describe(SettingsController.name, () => {
     const response = await request.put(fileCleanSettingsRoute).send(newFileCleanSettings);
     expect(response.body).not.toBeNull();
     expect(response.body).toMatchObject({
-      [fileCleanSettingKey]: newFileCleanSettings,
+      [printerFileCleanSettingKey]: newFileCleanSettings,
     });
     expectOkResponse(response);
   });

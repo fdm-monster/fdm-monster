@@ -20,7 +20,7 @@ export function expectEmptyResponse(response: Response) {
 
 export function expectOkResponse(response: Response, matchedBody?: any) {
   if (response.statusCode >= 400) {
-    console.warn(response.body);
+    console.warn(response.body + " url " + response.request.url);
   }
   expect(response.statusCode).toEqual(200);
   if (!matchedBody) {

@@ -18,7 +18,7 @@ export const messages = {
   ...octoprintWsMessages,
 
   // Nice klipper subscription state
-  // notify_status_update: "notify_status_update",
+  notify_status_update: "notify_status_update",
 
   // Custom events
   WS_OPENED: "WS_OPENED",

@@ -5,7 +5,7 @@ import { multiPartContentType, pluginRepositoryUrl } from "./constants/octoprint
 import { firmwareFlashUploadEvent, uploadProgressEvent } from "@/constants/event.constants";
 import { ExternalServiceError } from "@/exceptions/runtime.exceptions";
 import { OctoprintRoutes } from "./octoprint-api.routes";
-import axios, { AxiosPromise, AxiosStatic } from "axios";
+import axios, { AxiosInstance, AxiosPromise, AxiosStatic } from "axios";
 import EventEmitter2 from "eventemitter2";
 import { LoggerService } from "@/handlers/logger";
 import { LoginDto } from "@/services/interfaces/login.dto";
@@ -22,7 +22,6 @@ import { UserListDto } from "@/services/octoprint/dto/access/user-list.dto";
 import { OctoprintFilesResponseDto } from "@/services/octoprint/dto/files/octoprint-files-response.dto";
 import { CurrentMessageDto } from "@/services/octoprint/dto/websocket/current-message.dto";
 import { CurrentUserDto } from "@/services/octoprint/dto/auth/current-user.dto";
-import { JobDto } from "@/services/octoprint/dto/job/job.dto";
 import { CurrentJobDto } from "@/services/octoprint/dto/job/current-job.dto";
 
 type TAxes = "x" | "y" | "z";
@@ -33,7 +32,7 @@ type TAxes = "x" | "y" | "z";
  */
 export class OctoprintClient extends OctoprintRoutes {
   eventEmitter2: EventEmitter2;
-  protected httpClient: AxiosStatic;
+  protected httpClient: AxiosInstance;
   protected logger: LoggerService;
 
   constructor({
@@ -43,7 +42,7 @@ export class OctoprintClient extends OctoprintRoutes {
     eventEmitter2,
   }: {
     settingsStore: SettingsStore;
-    httpClient: AxiosStatic;
+    httpClient: AxiosInstance;
     loggerFactory: ILoggerFactory;
     eventEmitter2: EventEmitter2;
   }) {
@@ -299,7 +298,7 @@ export class OctoprintClient extends OctoprintRoutes {
       // }
 
       return response.data;
-    } catch (e) {
+    } catch (e: any) {
       this.eventEmitter2.emit(`${uploadProgressEvent(token)}`, token, { failed: true }, e);
       let data;
       try {
@@ -413,7 +412,7 @@ export class OctoprintClient extends OctoprintRoutes {
       });
 
       return response?.data;
-    } catch (e) {
+    } catch (e: any) {
       this.eventEmitter2.emit(`${uploadProgressEvent(currentPrinterId)}`, currentPrinterId, { failed: true }, e);
       let data;
       try {

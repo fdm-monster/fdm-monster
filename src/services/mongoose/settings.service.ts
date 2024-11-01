@@ -1,7 +1,7 @@
 import { Settings } from "@/models";
 import {
   credentialSettingsKey,
-  fileCleanSettingKey,
+  printerFileCleanSettingKey,
   frontendSettingKey,
   getDefaultCredentialSettings,
   getDefaultFileCleanSettings,
@@ -50,10 +50,13 @@ export class SettingsService implements ISettingsService<MongoIdType, ISettings>
   toDto(entity: ISettings): SettingsDto<MongoIdType> {
     return {
       // Credential settings are not shared with the client
-      [serverSettingsKey]: entity[serverSettingsKey],
+      [serverSettingsKey]: {
+        ...entity[serverSettingsKey],
+        experimentalTypeormSupport: false,
+      },
       [wizardSettingKey]: entity[wizardSettingKey],
       [frontendSettingKey]: entity[frontendSettingKey],
-      [fileCleanSettingKey]: entity[fileCleanSettingKey],
+      [printerFileCleanSettingKey]: entity[printerFileCleanSettingKey],
       [timeoutSettingKey]: entity[timeoutSettingKey],
     };
   }
@@ -79,8 +82,15 @@ export class SettingsService implements ISettingsService<MongoIdType, ISettings>
    */
   migrateSettingsRuntime(knownSettings: Partial<SettingsDto<MongoIdType>>) {
     const doc = knownSettings; // alias _doc also works
-    if (!doc[fileCleanSettingKey]) {
-      doc[fileCleanSettingKey] = getDefaultFileCleanSettings();
+    if (!doc[printerFileCleanSettingKey]) {
+      doc[printerFileCleanSettingKey] = getDefaultFileCleanSettings();
+    } else {
+      // Remove superfluous settings
+      doc[printerFileCleanSettingKey] = {
+        autoRemoveOldFilesBeforeUpload: doc[printerFileCleanSettingKey].autoRemoveOldFilesBeforeUpload,
+        autoRemoveOldFilesAtBoot: doc[printerFileCleanSettingKey].autoRemoveOldFilesBeforeUpload,
+        autoRemoveOldFilesCriteriumDays: doc[printerFileCleanSettingKey].autoRemoveOldFilesCriteriumDays,
+      };
     }
 
     // Server settings exist, but need updating with new ones if they don't exist.
@@ -113,7 +123,7 @@ export class SettingsService implements ISettingsService<MongoIdType, ISettings>
     const validatedInput = await validateInput(patchUpdate, fileCleanSettingsUpdateRules);
 
     const settingsDoc = await this.getOrCreate();
-    settingsDoc[fileCleanSettingKey] = Object.assign(settingsDoc[fileCleanSettingKey], validatedInput);
+    settingsDoc[printerFileCleanSettingKey] = Object.assign(settingsDoc[printerFileCleanSettingKey], validatedInput);
     return Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
       new: true,
     });

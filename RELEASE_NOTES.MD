@@ -1,18 +1,38 @@
 # Develop
 
-# FDM Monster 14/06/2024 1.6.4
+# FDM Monster 01/11/2024 1.6.4
 
-Change:
+## Chore:
+
+- Workflows: upgrade github actions to node 20
+- Introduce nock to test everything (except for octokit based tests)
+ 
+## Features:
+
+- Setting: add experimental moonraker support setting to model, validation and API endpoints
+- Setting: expose experimental typeorm setting and adjust test
+- Apply moonraker setting to middleware, and disable moonraker printers on disabling feature
+- Enable moonraker printerType support
+
+## Fixes:
+
+- Add sourceMaps: "inline" to jest for hitting breakpoints with swc in Webstorm
+- Printer file clean could contain extra data, skim those props off
+- Batch reprint selection: wrong status is concluded when reprint preparation is called (OctoPrint is not available, instead of no job is selected)
+
+# FDM Monster 12/26/2024 1.6.4
+
+## Changes:
 
 - Dropped printer file database table (kept the entity/schema), so FDMM "remote file" architecture can be redesigned. We're solely using in-memory cache from this point.
 - Introduced first version of the standardized PrinterApi, the concept of multiplePrinterServices with only OctoPrint and printer type to indicate service types in the future
 - Simplified the PrinterFile model, dropped unused properties for multi-print-service standardization in the future.
 - Used attributes for PrinterFilesController
 - Renamed OctoPrintApiService to OctoprintClient
-- Switch to 1.6.x client UI version range 
+- Switch to 1.6.x client UI version range
 - Update Octoprint websocket with refresh interval, defaulting to 10sec. This loop will keep refresh attempts internal to the Websocket adapter of each service type (Octoprint, Moonraker, Bambu, etc).
 
-Fix:
+## Fixes:
 
 - Print completion service would throw exception that correlationId was not provided (SQLite didnt like that). This error is prevented.
 - Moonraker type printers will resort to OctoPrint implementation (edge case in development)

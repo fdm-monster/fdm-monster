@@ -4,9 +4,11 @@ import { AppConstants } from "@/server.constants";
 import { ROLES } from "@/constants/authorization.constants";
 import { validateInput } from "@/handlers/validators";
 import {
+  clientNextRules,
   credentialSettingPatchRules,
   fileCleanSettingsUpdateRules,
   frontendSettingsUpdateRules,
+  moonrakerSupportRules,
   sentryDiagnosticsEnabledRules,
   serverSettingsUpdateRules,
   timeoutSettingsUpdateRules,
@@ -20,20 +22,29 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 import { demoUserNotAllowed, demoUserNotAllowedInterceptor } from "@/middleware/demo.middleware";
 import { IConfigService } from "@/services/core/config.service";
+import { PrinterCache } from "@/state/printer.cache";
+import { MoonrakerType } from "@/services/printer-api.interface";
+import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 
 export class SettingsController {
   settingsStore: SettingsStore;
   logger: LoggerService;
+  printerCache: PrinterCache;
+  printerService: IPrinterService;
   configService: IConfigService;
   serverVersion: string;
 
   constructor({
     settingsStore,
+    printerCache,
+    printerService,
     serverVersion,
     loggerFactory,
     configService,
   }: {
     serverVersion: string;
+    printerCache: PrinterCache;
+    printerService: IPrinterService;
     settingsStore: SettingsStore;
     loggerFactory: ILoggerFactory;
     configService: IConfigService;
@@ -42,6 +53,8 @@ export class SettingsController {
     this.logger = loggerFactory(SettingsController.name);
     this.serverVersion = serverVersion;
     this.configService = configService;
+    this.printerCache = printerCache;
+    this.printerService = printerService;
   }
 
   getSettings(req: Request, res: Response) {
@@ -69,6 +82,26 @@ export class SettingsController {
   async updateSentryDiagnosticsEnabled(req: Request, res: Response) {
     const { enabled } = await validateInput(req.body, sentryDiagnosticsEnabledRules);
     const result = this.settingsStore.setSentryDiagnosticsEnabled(enabled);
+    res.send(result);
+  }
+
+  async updateMoonrakerSupport(req: Request, res: Response) {
+    const { enabled } = await validateInput(req.body, moonrakerSupportRules);
+    const result = await this.settingsStore.setExperimentalMoonrakerSupport(enabled);
+
+    if (!enabled) {
+      const printers = await this.printerCache.listCachedPrinters(false);
+      const klipperPrinters = printers.filter((p) => p.printerType === MoonrakerType);
+      for (const printer of klipperPrinters) {
+        await this.printerService.updateEnabled(printer.id, false);
+      }
+    }
+    res.send(result);
+  }
+
+  async updateClientSupport(req: Request, res: Response) {
+    const { enabled } = await validateInput(req.body, clientNextRules);
+    const result = await this.settingsStore.setExperimentalClientSupport(enabled);
     res.send(result);
   }
 
@@ -136,6 +169,8 @@ export default createController(SettingsController)
     .get("/", "getSettings")
     .get("/sensitive", "getSettingsSensitive", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
     .patch("/sentry-diagnostics", "updateSentryDiagnosticsEnabled", demoUserNotAllowedInterceptor)
+    .put("/experimental-moonraker-support", "updateMoonrakerSupport", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
+    .put("/experimental-client-support", "updateClientSupport", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
     .put("/server", "updateServerSettings", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
     .put("/login-required", "updateLoginRequiredSettings", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
     .put("/registration-enabled", "updateRegistrationEnabledSettings", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })

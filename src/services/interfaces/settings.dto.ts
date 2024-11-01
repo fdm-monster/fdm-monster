@@ -1,6 +1,6 @@
 import {
   credentialSettingsKey,
-  fileCleanSettingKey,
+  printerFileCleanSettingKey,
   frontendSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
@@ -29,6 +29,9 @@ export interface ServerSettingsDto {
   whitelistEnabled: boolean;
   whitelistedIpAddresses: string[];
   debugSettings: DebugSettingsDto;
+  experimentalMoonrakerSupport: boolean;
+  experimentalTypeormSupport: boolean;
+  experimentalClientSupport: boolean;
 }
 
 export interface WizardSettingsDto {
@@ -65,6 +68,6 @@ export class SettingsDto<KeyType> {
   [wizardSettingKey]: WizardSettingsDto;
   [frontendSettingKey]: FrontendSettingsDto;
   // [credentialSettingsKey]: CredentialSettingsDto;
-  [fileCleanSettingKey]: FileCleanSettingsDto;
+  [printerFileCleanSettingKey]: FileCleanSettingsDto;
   [timeoutSettingKey]: TimeoutSettingsDto;
 }

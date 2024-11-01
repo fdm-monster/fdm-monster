@@ -5,12 +5,22 @@ import { PrintCompletionDto } from "@/services/interfaces/print-completion.dto";
 
 const durationDayMSec = 24 * 60 * 60 * 1000;
 
+export interface ShortEvent {
+  status: string;
+  fileName: string;
+  createdAt: number;
+  completionLog?: string;
+}
+
+export type PrintJobEvents = {
+  correlationId: string;
+  events: ShortEvent[]; // ... others
+  lastEvent: ShortEvent;
+};
+
 export interface AnalyzedCompletions {
   _id?: IdType;
   printerId: IdType;
-  printEvents: PrintCompletionDto[];
-  printJobs?: any[];
-  correlationIds: IdType[];
   eventCount: number;
   printCount: number;
   failureCount: number;
@@ -23,6 +33,12 @@ export interface AnalyzedCompletions {
   successEventsLastWeek: number;
   successEventsLast48H: number;
   successEventsLast24H: number;
+
+  correlationIds: IdType[];
+
+  printEvents: PrintCompletionDto[];
+
+  printJobs: PrintJobEvents[];
 }
 
 export function processCompletions(completions: AnalyzedCompletions[]): AnalyzedCompletions[] {

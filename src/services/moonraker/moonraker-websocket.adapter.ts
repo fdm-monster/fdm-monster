@@ -64,7 +64,7 @@ export type SubscriptionType = IdleTimeoutObject &
 export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter {
   public readonly printerType = 1;
   private client: MoonrakerClient;
-  protected logger: LoggerService;
+  protected declare logger: LoggerService;
   private eventEmitter: EventEmitter2;
   private configService: ConfigService;
   socketState: SocketState = SOCKET_STATE.unopened;
@@ -395,7 +395,7 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter {
     const currentMessage: Partial<CurrentMessageDto> = {
       progress: {
         printTime: printTime,
-        completion: originalKlipperObjects.display_status?.progress * 100.0 ?? 0,
+        completion: (originalKlipperObjects.display_status?.progress ?? 0) * 100.0,
       },
       state: {
         text: stateText,

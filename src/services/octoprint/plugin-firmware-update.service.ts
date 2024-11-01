@@ -8,6 +8,7 @@ import { PluginRepositoryCache } from "@/services/octoprint/plugin-repository.ca
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoginDto } from "../interfaces/login.dto";
 import { IdType } from "@/shared.constants";
+import { Octokit } from "octokit";
 
 const config = {
   pluginName: "firmwareupdater",
@@ -24,12 +25,11 @@ const firmwareProp = "printer.firmware";
 const firmwareDownloadPath = "firmware-downloads";
 
 export class PluginFirmwareUpdateService extends PluginBaseService {
-  octoprintClient: OctoprintClient;
   githubService: GithubService;
   private multerService: MulterService;
 
-  private prusaFirmwareReleases;
-  private latestFirmware;
+  private prusaFirmwareReleases: Awaited<ReturnType<Octokit["rest"]["repos"]["listReleases"]>>["data"];
+  private latestFirmware: Awaited<ReturnType<Octokit["rest"]["repos"]["listReleases"]>>["data"][number];
 
   constructor({
     octoprintClient,

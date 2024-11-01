@@ -1,7 +1,7 @@
 import { model, Schema } from "mongoose";
 import {
   credentialSettingsKey,
-  fileCleanSettingKey,
+  printerFileCleanSettingKey,
   frontendSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
@@ -45,6 +45,8 @@ export interface IServerSettings {
   registration: boolean;
   whitelistEnabled: boolean;
   whitelistedIpAddresses: string[];
+  experimentalMoonrakerSupport: boolean;
+  experimentalClientSupport: boolean;
 }
 
 export interface IFrontendSettings {
@@ -59,7 +61,7 @@ export interface ITimeoutSettings {
 
 export interface ISettings {
   [wizardSettingKey]: IWizardSettings;
-  [fileCleanSettingKey]: IFileCleanSettings;
+  [printerFileCleanSettingKey]: IFileCleanSettings;
   [credentialSettingsKey]: ICredentialSettings;
   [serverSettingsKey]: IServerSettings;
   [frontendSettingKey]: IFrontendSettings;
@@ -84,7 +86,7 @@ const SettingsSchema = new Schema<ISettings>({
       required: true,
     },
   },
-  [fileCleanSettingKey]: {
+  [printerFileCleanSettingKey]: {
     autoRemoveOldFilesBeforeUpload: {
       type: Boolean,
       default: false,
@@ -193,6 +195,16 @@ const SettingsSchema = new Schema<ISettings>({
         type: String,
       },
     ],
+    experimentalMoonrakerSupport: {
+      type: Boolean,
+      default: false,
+      required: true,
+    },
+    experimentalClientSupport: {
+      type: Boolean,
+      default: false,
+      required: true,
+    },
   },
   [frontendSettingKey]: {
     gridCols: {
