@@ -92,7 +92,7 @@ export class MoonrakerApi implements IPrinterApi {
   }
 
   async quickStop(): Promise<void> {
-    await this.client.postEmergencyStop(this.login);
+    await this.client.postQuickStop(this.login);
   }
 
   async movePrintHead(amounts: { x?: number; y?: number; z?: number; speed?: number }) {

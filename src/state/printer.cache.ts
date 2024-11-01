@@ -4,7 +4,7 @@ import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import EventEmitter2 from "eventemitter2";
 import { IdType } from "@/shared.constants";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
-import { PrinterDto, PrinterUnsafeDto } from "@/services/interfaces/printer.dto";
+import { PrinterUnsafeDto } from "@/services/interfaces/printer.dto";
 import { Printer } from "@/entities";
 import { IPrinter } from "@/models/Printer";
 import { PrinterType } from "@/services/printer-api.interface";

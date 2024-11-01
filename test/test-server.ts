@@ -2,8 +2,6 @@ import { asClass, asValue, AwilixContainer } from "awilix";
 import { DITokens } from "@/container.tokens";
 import { setupServer } from "@/server.core";
 import { setupEnvConfig } from "@/server.env";
-import { AxiosMock } from "./mocks/axios.mock";
-import { OctoPrintApiMock } from "./mocks/octoprint-api.mock";
 import { ROLES } from "@/constants/authorization.constants";
 import supertest, { Test } from "supertest";
 import { Express } from "express";
@@ -12,6 +10,7 @@ import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { TaskManagerService } from "@/services/core/task-manager.service";
 import { AxiosInstance } from "axios";
 import TestAgent from "supertest/lib/agent";
+import { SettingsStore } from "@/state/settings.store";
 
 jest.mock("../src/utils/env.utils", () => ({
   ...jest.requireActual("../src/utils/env.utils"),
@@ -50,8 +49,9 @@ export async function setupTestApp(
   }
 
   // Setup
-  const settingsStore = container.resolve(DITokens.settingsStore);
+  const settingsStore = container.resolve(DITokens.settingsStore) as SettingsStore;
   await settingsStore.loadSettings();
+  await settingsStore.setExperimentalMoonrakerSupport(true);
 
   const serverHost = container.resolve(DITokens.serverHost);
   await serverHost.boot(httpServer, quick_boot, false);

@@ -1,5 +1,7 @@
 # Develop
 
+# FDM Monster 01/11/2024 1.6.4
+
 ## Chore:
 
 - Workflows: upgrade github actions to node 20
@@ -8,7 +10,9 @@
 ## Features:
 
 - Setting: add experimental moonraker support setting to model, validation and API endpoints
-- Setting: expose typeorm setting and adjust test
+- Setting: expose experimental typeorm setting and adjust test
+- Apply moonraker setting to middleware, and disable moonraker printers on disabling feature
+- Enable moonraker printerType support
 
 ## Fixes:
 
@@ -16,7 +20,7 @@
 - Printer file clean could contain extra data, skim those props off
 - Batch reprint selection: wrong status is concluded when reprint preparation is called (OctoPrint is not available, instead of no job is selected)
 
-# FDM Monster 14/06/2024 1.6.4
+# FDM Monster 12/26/2024 1.6.4
 
 ## Changes:
 

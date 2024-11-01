@@ -127,7 +127,7 @@ export class MoonrakerClient {
     return this.httpClient.post<ResultDto<PrinterInfoDto>>(`${login.printerURL}/printer/info`);
   }
 
-  async postEmergencyStop(login: LoginDto) {
+  async postQuickStop(login: LoginDto) {
     return this.httpClient.post<ResultDto<ActionResultDto>>(`${login.printerURL}/printer/emergency_stop`);
   }
 
