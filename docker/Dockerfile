@@ -10,6 +10,8 @@ RUN apt-get update && \
 COPY .yarn/releases ./.yarn/releases
 RUN yarn set version berry
 
+# test
+
 # Copy package files
 COPY .swcrc tsconfig.json package.json yarn.lock .yarnrc.yml ./
 
