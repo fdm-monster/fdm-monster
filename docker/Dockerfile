@@ -42,7 +42,7 @@ ENV YARN_NETWORK_CONCURRENCY=10
 
 # Install production dependencies with optimizations
 RUN yarn config set enableGlobalCache true && \
-    yarn workspaces focus --all --production --inline-builds
+    yarn workspaces focus --all --production
 
 COPY .env.template \
     migrate-mongo-config.js \
