@@ -39,6 +39,7 @@ describe(SettingsController.name, () => {
     const defaultSettings = getDefaultSettings();
     defaultSettings[serverSettingsKey].loginRequired = false; // Test override
     defaultSettings[serverSettingsKey].experimentalTypeormSupport = isSqliteModeTest();
+    defaultSettings[serverSettingsKey].experimentalMoonrakerSupport = true;
     delete defaultSettings[serverSettingsKey].whitelistEnabled;
     delete defaultSettings[serverSettingsKey].whitelistedIpAddresses;
     delete defaultSettings[serverSettingsKey].debugSettings;
