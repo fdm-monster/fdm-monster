@@ -1,7 +1,7 @@
 name: Klipper beta bug report
 description: Beta klipper issue report
 title: "[Klipper]: "
-labels: ["klipper", "triage"]
+labels: ["bug", "klipper", "triage"]
 assignees: 
   - mkevenaar
 body:
