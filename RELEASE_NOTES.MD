@@ -1,6 +1,10 @@
 # Develop
 
-# FDM Monster 01/11/2024 1.6.4
+## Fixes:
+
+- Octoprint does not require api key, but moonraker does not. Adjust API validation.
+
+# FDM Monster 01/11/2024 1.7.0
 
 ## Chore:
 
