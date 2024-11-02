@@ -200,7 +200,7 @@ describe(PrinterController.name, () => {
 
   it("should invalidate empty test printer connection", async () => {
     const res = await request.post(testPrinterRoute).send();
-    expectInvalidResponse(res, ["apiKey", "printerURL"]);
+    expectInvalidResponse(res, ["printerType", "printerURL"]);
   });
 
   it("should test printer connection", async () => {
