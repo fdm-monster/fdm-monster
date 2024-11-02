@@ -20,6 +20,7 @@ export const PrinterSchema = new Schema<IPrinter>({
   apiKey: {
     type: String,
     required: true, // !
+    default: "",
   },
   printerURL: {
     type: String,

@@ -19,7 +19,7 @@ export class Printer extends BaseEntity {
   @Column({ default: OctoprintType, nullable: false })
   printerType!: number;
 
-  @Column()
+  @Column({ default: "" })
   @IsAlphanumeric()
   apiKey!: string;
 

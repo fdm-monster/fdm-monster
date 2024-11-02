@@ -49,18 +49,29 @@ describe(PrinterController.name, () => {
     expectInvalidResponse(response, ["apiKey"]);
   });
 
-  it(`should be able to POST ${createRoute}`, async () => {
+  it(`should be able to POST ${createRoute} moonraker without api key`, async () => {
     const response = await request.post(createRoute).query("forceSave=true").send({
       printerURL: "http://url.com",
-      apiKey: testApiKey,
       name: "test123",
       printerType: MoonrakerType,
     });
     expectOkResponse(response, {
       printerURL: "http://url.com",
-      apiKey: testApiKey,
       name: "test123",
       printerType: MoonrakerType,
+    });
+
+    const response2 = await request.post(createRoute).query("forceSave=true").send({
+      printerURL: "http://url.com",
+      apiKey: "12341234123412341234123412341234",
+      name: "test123",
+      printerType: OctoprintType,
+    });
+    expectOkResponse(response2, {
+      printerURL: "http://url.com",
+      apiKey: "12341234123412341234123412341234",
+      name: "test123",
+      printerType: OctoprintType,
     });
   });
 
