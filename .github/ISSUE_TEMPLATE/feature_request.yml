@@ -1,7 +1,7 @@
 name: Feature Request
 description: Is there additional functionality you would love us to consider?
 title: "[Feature]: "
-labels: ["enhancement"]
+labels: ["enhancement", "triage"]
 body:
   - type: markdown
     attributes:
