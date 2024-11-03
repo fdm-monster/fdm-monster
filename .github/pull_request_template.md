@@ -23,6 +23,7 @@ Please describe the tests that you ran to verify your changes.
 **Test Configuration**:
 * Node version:
 * OctoPrint version:
+* Klipper version:
 * Nodemon/PM2/docker:
 
 # Checklist:

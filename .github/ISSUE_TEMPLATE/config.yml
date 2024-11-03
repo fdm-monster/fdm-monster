@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Ask Question In Chat
+    url: https://discord.com/invite/mwA8uP8CMc
+    about: Chat with our community and ask your question.
+  - name: Read the docs
+    url: https://docs.fdm-monster.net/
+    about: Read the FDM Monster documentation

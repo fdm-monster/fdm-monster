@@ -1,0 +1,78 @@
+name: Bug report
+description: Create a report to help us improve
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checkoxes
+      description: Before continuing, make sure you have done the following. 
+      options:
+        - label: I agree to follow our [Code of Conduct](https://github.com/fdm-monster/fdm-monster/blob/develop/CODE_OF_CONDUCT.md).
+          required: true
+        - label: I have verified no [other issues](https://github.com/fdm-monster/fdm-monster/issues) exist related to my request.
+          required: true
+  - type: textarea
+    id: current-behavior
+    attributes:
+      label: What You Are Seeing?
+      description: |
+        In your own words, please describe the problem that you are experiencing. Please include images if possible, as this can give a clearer indication of the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: What is Expected?
+      description: |
+        Instead of the behavior that you were seeing, what did you expect would be happening instead?
+    validations:
+      required: true
+  - type: textarea
+    id: repeatable-steps
+    attributes:
+      label: How Did You Get This To Happen?
+      description: |
+        Please include a complete set of _reproducible steps_ that another user or maintainer of the repository can follow to get the same behavior that you are seeing. _Reproducible steps_ should allow _anybody_ who is unfamiliar with your issue or environment to be able to reproduce your issue. This may include code, scripts or other environment configuration.
+
+        **NOTE: We are unlikely to be able to troubleshoot or respond to issues without _reproducible steps_. If you do not complete this section with _reproducible steps_, the issue will be closed.**
+      placeholder: |
+        1. I clicked on this button
+        2. Nothing happend
+        3. I clicked again
+        4. etc.
+    validations:
+      required: true
+  - type: textarea
+    id: system-details
+    attributes:
+      label: System Details
+      description: |
+        Please include as many details about your setup as possible. Sometimes, a problem may only happen on specific setup, and this information can be vital to resolving your issue.
+
+        At a minimum, include the following pieces of information:
+
+        * Operating System and version: [e.g. iOS 18.1, Windows 11 24h2]
+        * Browser and version: [e.g. Google Chrome 130.0.6723.92, FireFox 132.0]
+        * FDM Monster Installation Method: [e.g. MonsterPi 0.4.2, Docker 23.0.3]
+        * FDM Monster Server version: [e.g. 1.17.0]
+        * FDM Monster Client version: [e.g. 1.6.5]
+        * Middleware: [e.g. OctoPrint, Moonraker]
+        * Middleware version: [e.g. OctoPrint 0.18.0, Moonraker 0.1.0 + Klipper 0.11.0]
+      value: |
+        * Operating System and version: 
+        * Browser and version: 
+        * FDM Monster Installation Method: 
+        * FDM Monster Server version: 
+        * FDM Monster Client version: 
+        * Middleware: 
+        * Middleware version: 
+    validations:
+      required: true
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: |
+        Please include any other information here that you feel may be relevant to the problem you are seeing but is not covered in the previous sections.
