@@ -11,14 +11,17 @@ import { OctoPrintEventDto } from "@/services/octoprint/dto/octoprint-event.dto"
 export type CurrentMessageEvent = OctoPrintEventDto<"current", CurrentMessageDto>;
 
 export interface CurrentMessageDto {
+  // Printer information
+  temps: TempsDto;
   state: StateDto;
+
+  // Job information
   job: JobDto;
   currentZ: number;
   progress: ProgressDto;
   offsets: {};
   resends: ResendsDto;
   serverTime: number;
-  temps: TempsDto;
   busyFiles: BusyFileDto[];
   markings: MarkingsDto[];
   logs: string[];

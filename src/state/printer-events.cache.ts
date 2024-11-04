@@ -8,6 +8,9 @@ import { IdType } from "@/shared.constants";
 import { LoggerService } from "@/handlers/logger";
 import { OctoPrintEventDto, WsMessage } from "@/services/octoprint/dto/octoprint-event.dto";
 import { HistoryMessageDto } from "@/services/octoprint/dto/websocket/history-message.dto";
+import { MoonrakerEventDto, MR_WsMessage } from "@/services/moonraker/constants/moonraker-event.dto";
+import { PrinterObjectsQueryDto } from "@/services/moonraker/dto/objects/printer-objects-query.dto";
+import { SubscriptionType } from "@/services/moonraker/moonraker-websocket.adapter";
 
 export type PrinterEventsCacheDto = Record<WsMessage, any | null>;
 

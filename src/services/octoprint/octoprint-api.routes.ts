@@ -88,7 +88,7 @@ export class OctoprintRoutes {
   apiPrinterCurrent = (history?: boolean, limit?: number, exclude?: ("temperature" | "sd" | "state")[]) => {
     exclude = exclude?.filter((e) => !!e.length);
     const excludeParam = exclude?.length ? `&exclude=${exclude?.join(",")}` : "";
-    const limitParam = !!limit ? "&limit=limit" : "";
+    const limitParam = !!limit ? `&limit=${limit}` : "";
     return `${this.apiPrinter}?history=${!!history}${limitParam}${excludeParam}`;
   };
 

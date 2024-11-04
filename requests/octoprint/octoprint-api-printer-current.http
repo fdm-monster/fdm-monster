@@ -1,0 +1,7 @@
+### GET request to OctoPrint plugins
+
+GET http://{{env-op}}/api/printer
+    ?history=false
+x-api-key: {{api-key}}
+
+###
