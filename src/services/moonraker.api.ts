@@ -1,10 +1,19 @@
-import { FileDto, IPrinterApi, MoonrakerType, PrinterType } from "@/services/printer-api.interface";
+import {
+  FileDto,
+  IPrinterApi,
+  MoonrakerType,
+  PartialReprintFileDto,
+  PrinterType,
+  ReprintState,
+} from "@/services/printer-api.interface";
 import { MoonrakerClient } from "@/services/moonraker/moonraker.client";
 import { LoginDto } from "@/services/interfaces/login.dto";
 import { NotImplementedException } from "@/exceptions/runtime.exceptions";
 import { AxiosPromise } from "axios";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
+import { PrinterObjectsQueryDto } from "@/services/moonraker/dto/objects/printer-objects-query.dto";
+import { PrintStatsObject, SystemStatsObject, WebhooksObject } from "@/services/moonraker/dto/objects/printer-object.types";
 
 /**
  * Moonraker Remote API
@@ -151,7 +160,47 @@ export class MoonrakerApi implements IPrinterApi {
   async deleteFile(path: string) {
     await this.client.deleteServerFile(this.login, "gcodes", path);
   }
+
   async deleteFolder(path: string) {
     await this.client.deleteServerFilesDirectory(this.login, path, false);
+  }
+
+  async getSettings() {
+    const result = await this.client.getServerConfig(this.login);
+    return result.data?.result;
+  }
+
+  async getReprintState(): Promise<PartialReprintFileDto> {
+    const response = await this.client.getPrinterObjectsQuery<PrinterObjectsQueryDto<PrintStatsObject & WebhooksObject>>(
+      this.login,
+      {
+        print_stats: [],
+        webhooks: [],
+      }
+    );
+
+    const result = response.data.result;
+    const operational = result.status.webhooks.state === "ready";
+
+    const response2 = await this.client.getServerHistoryList(this.login, 5, 0);
+    const jobs = (response2.data?.result.jobs ?? []).sort((a, b) => (a.start_time > b.start_time ? 1 : 0));
+
+    if (jobs.length === 0 || !operational) {
+      return {
+        connectionState: operational ? "Operational" : "Error",
+        reprintState: ReprintState.NoLastPrint,
+      };
+    }
+
+    const job = jobs[0];
+    return {
+      connectionState: "Operational",
+      reprintState: ReprintState.LastPrintReady,
+      file: {
+        date: job.start_time,
+        path: job.filename,
+        size: job.metadata.size,
+      },
+    };
   }
 }

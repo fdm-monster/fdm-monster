@@ -1,5 +1,9 @@
 import { AxiosPromise } from "axios";
 import { LoginDto } from "@/services/interfaces/login.dto";
+import { ServerConfigDto } from "@/services/moonraker/dto/server/server-config.dto";
+import { SettingsDto } from "@/services/octoprint/dto/settings/settings.dto";
+import { ConnectionState } from "@/services/octoprint/dto/connection/connection-state.type";
+import { IdType } from "@/shared.constants";
 
 export const OctoprintType = 0;
 export const MoonrakerType = 1;
@@ -13,6 +17,7 @@ export interface StatusFlags {
   error: boolean;
   finished: boolean;
 }
+
 export interface FileDto {
   path: string;
   size: number;
@@ -24,7 +29,25 @@ export const capabilities = {
   // Could be function names, or maybe a specification for each function specifically?
   startPrint: "startPrint",
 };
+
 export type Capability = keyof typeof capabilities;
+
+export enum ReprintState {
+  PrinterNotAvailable = 0,
+  NoLastPrint = 1,
+  LastPrintReady = 2,
+}
+
+export interface PartialReprintFileDto {
+  file?: FileDto;
+  reprintState: ReprintState;
+  connectionState: ConnectionState | null;
+}
+
+export interface ReprintFileDto extends PartialReprintFileDto {
+  printerId: IdType;
+}
+
 export interface IPrinterApi {
   get type(): PrinterType;
   set login(login: LoginDto);
@@ -57,4 +80,8 @@ export interface IPrinterApi {
   uploadFile(fileOrBuffer: Buffer | Express.Multer.File, uploadToken?: string): Promise<void>;
   deleteFile(path: string): Promise<void>;
   deleteFolder(path: string): Promise<void>;
+
+  getSettings(): Promise<ServerConfigDto | SettingsDto>;
+
+  getReprintState(): Promise<PartialReprintFileDto>;
 }

@@ -1,4 +1,3 @@
-import { CreateOrUpdatePrinterFileDto } from "@/services/interfaces/printer-file.dto";
 import { OctoPrintCustomDto, OctoprintFileDto } from "@/services/octoprint/dto/files/octoprint-file.dto";
 import { FileDto } from "@/services/printer-api.interface";
 
