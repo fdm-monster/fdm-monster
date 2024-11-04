@@ -68,8 +68,12 @@ jobs:
             %X%::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
             %X.Y%::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
             %X.Y.Z%
+            %X%-arm64::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
+            %X.Y%-arm64::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
+            %X.Y.Z%-arm64
           extra_tags: |
             latest::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
+            latest-arm64::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
 
       - name: Tagging Strategy SQLite
         id: tagging_sqlite
@@ -81,8 +85,12 @@ jobs:
             %X%-sqlite::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
             %X.Y%-sqlite::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
             %X.Y.Z%-sqlite
+            %X%-sqlite-arm64::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
+            %X.Y%-sqlite-arm64::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
+            %X.Y.Z%-sqlite-arm64
           extra_tags: |
             latest-sqlite::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
+            latest-sqlite-arm64::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
 
       - name: "Show docker tags"
         run: |
