@@ -108,7 +108,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
-      - name: Build and push regular
+      - name: Build and push regular ARM64
         id: docker_build_regular
         uses: docker/build-push-action@v6
         with:
@@ -121,7 +121,7 @@ jobs:
           labels: ${{ needs.meta.outputs.labels }}
           platforms: linux/arm64
 
-      - name: Build and push SQLite
+      - name: Build and push SQLite ARM64
         id: docker_build_sqlite
         uses: docker/build-push-action@v6
         with:
