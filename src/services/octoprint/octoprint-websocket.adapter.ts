@@ -21,6 +21,7 @@ import { OP_LoginDto } from "@/services/octoprint/dto/auth/login.dto";
 import { Event as WsEvent } from "ws";
 import { CurrentMessageDto } from "@/services/octoprint/dto/websocket/current-message.dto";
 import { OctoprintErrorDto } from "@/services/octoprint/dto/rest/error.dto";
+import { OctoprintType } from "@/services/printer-api.interface";
 
 export const WsMessage = {
   // Custom events
@@ -275,6 +276,7 @@ export class OctoprintWebsocketAdapter extends WebsocketAdapter {
       event,
       payload,
       printerId: this.printerId,
+      printerType: OctoprintType,
     } as OctoPrintEventDto);
   }
 
