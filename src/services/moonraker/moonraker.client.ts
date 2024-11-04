@@ -8,7 +8,6 @@ import { GcodeStoreDto } from "@/services/moonraker/dto/gcode-store.dto";
 import { ActionResultDto } from "@/services/moonraker/dto/rest/action-result.dto";
 import { PrinterInfoDto } from "@/services/moonraker/dto/printer-info.dto";
 import { KnownPrinterObject, PrinterAvailableObjects } from "@/services/moonraker/dto/objects/printer-objects-list.dto";
-import { PrinterObjectDto } from "@/services/moonraker/dto/objects/printer-object.dto";
 import { PrinterQueryEndstopsDto } from "@/services/moonraker/dto/printer-query-endstops.dto";
 import { GcodeHelpDto } from "@/services/moonraker/dto/gcode-help.dto";
 import { MachineSystemInfoDto } from "@/services/moonraker/dto/machine/machine-system-info.dto";
@@ -743,41 +742,79 @@ export class MoonrakerClient {
     );
   }
 
+  /**
+   * @deprecated API might not be available in the future
+   * @param login
+   */
   async getApiVersion(login: LoginDto) {
     return this.httpClient.get<ApiVersionDto>(`${login.printerURL}/api/version`);
   }
 
+  /**
+   * @deprecated API might not be available in the future
+   * @param login
+   */
   async getServerVersion(login: LoginDto) {
     return this.httpClient.get<ServerVersionDto>(`${login.printerURL}/api/server`);
   }
 
+  /**
+   * @deprecated API might not be available in the future
+   * @param login
+   */
   async getApiLogin(login: LoginDto) {
     return this.httpClient.get<ApiLoginDto>(`${login.printerURL}/api/login`);
   }
 
+  /**
+   * @deprecated API might not be available in the future
+   * @param login
+   */
   async getApiSettings(login: LoginDto) {
     return this.httpClient.get<ApiSettingsDto>(`${login.printerURL}/api/settings`);
   }
 
+  /**
+   * @deprecated API might not be available in the future
+   * @param login
+   * @param commands
+   */
   // async postFilesLocalUpload(login: LoginDto) {
-  // This is just an alias
-  // return this.postServerFileUpload(login);
+  //   // This is just an alias
+  //   return this.postServerFileUpload(login);
   // }
 
+  /**
+   * @deprecated API might not be available in the future
+   * @param login
+   */
   async getApiJob(login: LoginDto) {
     return this.httpClient.get<ApiJobDto>(`${login.printerURL}/api/job`);
   }
 
+  /**
+   * @deprecated API might not be available in the future
+   * @param login
+   */
   async getApiPrinter(login: LoginDto) {
     return this.httpClient.get<ApiPrinterDto>(`${login.printerURL}/api/printer`);
   }
 
+  /**
+   * @deprecated API might not be available in the future
+   * @param login
+   * @param commands
+   */
   async postApiPrinterCommand(login: LoginDto, commands: string[]) {
     return this.httpClient.post<{}>(`${login.printerURL}/api/command`, {
       commands,
     });
   }
 
+  /**
+   * @deprecated API might not be available in the future
+   * @param login
+   */
   async getApiProfiles(login: LoginDto) {
     return this.httpClient.get<ApiProfilesDto>(`${login.printerURL}/api/printerprofiles`);
   }
@@ -786,24 +823,30 @@ export class MoonrakerClient {
     login: LoginDto,
     limit: number,
     start: number,
-    since: number,
-    before: number,
+    since?: number,
+    before?: number,
     order: "asc" | "desc" = "desc"
   ) {
-    const params = `limit=${limit}&start=${start}&before=${before}&since=${since}&order=${order}`;
-    return this.httpClient.get<HistoryListDto>(`${login.printerURL}/server/history/list?${params}`);
+    let params = `limit=${limit}&start=${start}&order=${order}`;
+    if (!!before || before === 0) {
+      params += "&before=" + before;
+    }
+    if (!!since || since === 0) {
+      params += "&since=" + since;
+    }
+    return this.httpClient.get<ResultDto<HistoryListDto>>(`${login.printerURL}/server/history/list?${params}`);
   }
 
   async getServerHistoryTotals(login: LoginDto) {
-    return this.httpClient.get<HistoryTotalsDto>(`${login.printerURL}/server/history/totals`);
+    return this.httpClient.get<ResultDto<HistoryTotalsDto>>(`${login.printerURL}/server/history/totals`);
   }
 
   async postServerHistoryResetTotals(login: LoginDto) {
-    return this.httpClient.post<HistoryLastTotalsDto>(`${login.printerURL}/server/history/reset_totals`);
+    return this.httpClient.post<ResultDto<HistoryLastTotalsDto>>(`${login.printerURL}/server/history/reset_totals`);
   }
 
   async getServerHistoryJob(login: LoginDto, uid: string) {
-    return this.httpClient.get<HistoryJobDto>(`${login.printerURL}/server/history/job?uid=${uid}`);
+    return this.httpClient.get<ResultDto<HistoryJobDto>>(`${login.printerURL}/server/history/job?uid=${uid}`);
   }
 
   async deleteServerHistoryJob(login: LoginDto, uid?: string) {

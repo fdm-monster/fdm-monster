@@ -1,29 +1,16 @@
 import { PrinterFilesStore } from "@/state/printer-files.store";
-import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { PrinterCache } from "@/state/printer.cache";
 import { PrinterEventsCache } from "@/state/printer-events.cache";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { IdType } from "@/shared.constants";
-import { CreateOrUpdatePrinterFileDto } from "../interfaces/printer-file.dto";
-import { ConnectionState } from "@/services/octoprint/dto/connection/connection-state.type";
 import { captureException } from "@sentry/node";
 import { errorSummary } from "@/utils/error.utils";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
-
-enum ReprintState {
-  PrinterNotAvailable = 0,
-  NoLastPrint = 1,
-  LastPrintReady = 2,
-}
-
-interface ReprintFileDto {
-  file?: CreateOrUpdatePrinterFileDto;
-  reprintState: ReprintState;
-  connectionState: ConnectionState | null;
-  printerId: IdType;
-}
+import { PrinterApiFactory } from "@/services/printer-api.factory";
+import { IPrinterApi, ReprintFileDto, ReprintState } from "@/services/printer-api.interface";
+import { LoginDto } from "@/services/interfaces/login.dto";
 
 interface BatchSingletonModel {
   success?: boolean;
@@ -36,7 +23,7 @@ interface BatchSingletonModel {
 type BatchModel = Array<BatchSingletonModel>;
 
 export class BatchCallService {
-  octoprintClient: OctoprintClient;
+  printerApiFactory: PrinterApiFactory;
   printerSocketStore: PrinterSocketStore;
   printerCache: PrinterCache;
   printerEventsCache: PrinterEventsCache;
@@ -45,7 +32,7 @@ export class BatchCallService {
   logger: LoggerService;
 
   constructor({
-    octoprintClient,
+    printerApiFactory,
     printerCache,
     printerEventsCache,
     printerSocketStore,
@@ -53,7 +40,7 @@ export class BatchCallService {
     printerService,
     loggerFactory,
   }: {
-    octoprintClient: OctoprintClient;
+    printerApiFactory: PrinterApiFactory;
     printerCache: PrinterCache;
     printerEventsCache: PrinterEventsCache;
     printerSocketStore: PrinterSocketStore;
@@ -61,13 +48,17 @@ export class BatchCallService {
     printerService: IPrinterService;
     loggerFactory: ILoggerFactory;
   }) {
-    this.octoprintClient = octoprintClient;
+    this.printerApiFactory = printerApiFactory;
     this.printerCache = printerCache;
     this.printerEventsCache = printerEventsCache;
     this.printerSocketStore = printerSocketStore;
     this.printerFilesStore = printerFilesStore;
     this.printerService = printerService;
     this.logger = loggerFactory(BatchCallService.name);
+  }
+
+  getPrinter(login: LoginDto): IPrinterApi {
+    return this.printerApiFactory.getScopedPrinter(login);
   }
 
   async batchTogglePrintersEnabled(
@@ -134,11 +125,13 @@ export class BatchCallService {
   async batchSettingsGet(printerIds: string[]): Promise<Awaited<BatchModel>> {
     const promises = [];
     for (const printerId of printerIds) {
-      const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
+      const login = await this.printerCache.getLoginDtoAsync(printerId);
       const time = Date.now();
 
-      const promise = this.octoprintClient
-        .getSettings(printerLogin)
+      const client = this.getPrinter(login);
+
+      const promise = client
+        .getSettings()
         .then((r) => {
           return { success: true, printerId, time: Date.now() - time, value: r };
         })
@@ -154,12 +147,12 @@ export class BatchCallService {
   async batchConnectUsb(printerIds: string[]): Promise<Awaited<BatchModel>> {
     const promises = [];
     for (const printerId of printerIds) {
-      const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
+      const login = await this.printerCache.getLoginDtoAsync(printerId);
       const time = Date.now();
 
-      const command = this.octoprintClient.connectCommand;
-      const promise = this.octoprintClient
-        .sendConnectionCommand(printerLogin, command)
+      const client = this.getPrinter(login);
+      const promise = client
+        .connect()
         .then(() => {
           return { success: true, printerId, time: Date.now() - time };
         })
@@ -178,21 +171,12 @@ export class BatchCallService {
       const promise = new Promise<ReprintFileDto>(async (resolve, _) => {
         try {
           const login = await this.printerCache.getLoginDtoAsync(printerId);
-
-          const connected = await this.octoprintClient.getConnection(login);
-          const connectionState = connected.current?.state;
-
-          const selectedJob = await this.octoprintClient.getJob(login);
-          const currentJobFile = selectedJob?.job?.file;
-          if (!currentJobFile?.name) {
-            return resolve({ connectionState, printerId, reprintState: ReprintState.NoLastPrint });
-          }
+          const client = this.getPrinter(login);
+          const partialReprintState = await client.getReprintState();
 
           return resolve({
-            connectionState,
-            file: currentJobFile,
+            ...partialReprintState,
             printerId,
-            reprintState: ReprintState.LastPrintReady,
           });
         } catch (e) {
           captureException(e);
@@ -213,11 +197,12 @@ export class BatchCallService {
     const promises = [];
     for (const printerIdFile of printerIdFileList) {
       const { printerId, path } = printerIdFile;
-      const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
+      const login = await this.printerCache.getLoginDtoAsync(printerId);
 
       const time = Date.now();
-      const promise = this.octoprintClient
-        .postSelectPrintFile(printerLogin, path, true)
+      const client = this.getPrinter(login);
+      const promise = client
+        .startPrint(path)
         .then(() => {
           return { success: true, printerId, time: Date.now() - time };
         })
