@@ -1,6 +1,6 @@
 ### GET request to example server
 GET {{moonraker}}
-    /printer/objects/query?pause_resume
+    /printer/objects/query?webhooks
 
 ###
 

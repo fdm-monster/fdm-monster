@@ -1,5 +1,6 @@
 ### GET request to example server
 GET {{moonraker}}
-    /api/printer?generated-in=WebStorm
+    /printer/objects/list
 
 ###
+

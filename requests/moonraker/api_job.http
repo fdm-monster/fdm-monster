@@ -1,5 +1,5 @@
 ### GET request to example server
 GET {{moonraker}}
-    /api/printer?generated-in=WebStorm
+    /api/job?generated-in=WebStorm
 
 ###
