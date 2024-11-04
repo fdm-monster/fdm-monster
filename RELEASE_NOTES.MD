@@ -5,6 +5,8 @@
 - Octoprint does not require api key, but moonraker does not. Adjust API validation.
 - Only printers which OctoPrint controlled need a USB silence check for restoring the websocket connectivity
 - ApiKey requiredNotIf validation does not work (?)
+- Batch service: missing implementation for batch get settings and batch connect
+- Batch service: get and submit moonraker reprint based on history and webhooks objects
 
 # FDM Monster 01/11/2024 1.7.0
 
