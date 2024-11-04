@@ -20,7 +20,7 @@
 
 - Workflows: upgrade github actions to node 20
 - Introduce nock to test everything (except for octokit based tests)
- 
+
 ## Features:
 
 - Setting: add experimental moonraker support setting to model, validation and API endpoints
