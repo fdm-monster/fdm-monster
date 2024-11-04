@@ -24,6 +24,7 @@ import { CurrentMessageDto } from "@/services/octoprint/dto/websocket/current-me
 import { CurrentUserDto } from "@/services/octoprint/dto/auth/current-user.dto";
 import { CurrentJobDto } from "@/services/octoprint/dto/job/current-job.dto";
 import { SettingsDto } from "@/services/octoprint/dto/settings/settings.dto";
+import { CurrentPrinterStateDto } from "@/services/octoprint/dto/printer/current-printer-state.dto";
 
 type TAxes = "x" | "y" | "z";
 
@@ -337,7 +338,7 @@ export class OctoprintClient extends OctoprintRoutes {
   async getPrinterCurrent(login: LoginDto, history: boolean, limit?: number, exclude?: ("temperature" | "sd" | "state")[]) {
     const pathUrl = this.apiPrinterCurrent(history, limit, exclude);
     const { url, options } = this.prepareRequest(login, pathUrl);
-    return await this.httpClient.get<CurrentMessageDto>(url, options);
+    return await this.httpClient.get<CurrentPrinterStateDto>(url, options);
   }
 
   async getConnection(login: LoginDto) {
