@@ -57,6 +57,7 @@ describe(PrinterController.name, () => {
     });
     expectOkResponse(response, {
       printerURL: "http://url.com",
+      apiKey: "",
       name: "test123",
       printerType: MoonrakerType,
     });
