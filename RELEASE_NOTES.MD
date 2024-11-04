@@ -1,5 +1,7 @@
 # Develop
 
+# FDM Monster 04/11/2024 1.7.1
+
 ## Changes:
 
 - Remove PrinterStateUpdatePollTask, it was slowing development down
@@ -48,7 +50,7 @@
 
 ## Fixes:
 
-- Print completion service would throw exception that correlationId was not provided (SQLite didnt like that). This error is prevented.
+- Print completion service would throw exception that correlationId was not provided (SQLite didn't like that). This error is prevented.
 - Moonraker type printers will resort to OctoPrint implementation (edge case in development)
 - Yaml import service will not assume printerType is provided, therefore defaulting to OctoprintType for older FDM Monster versions
 - Reprint will now take selected job instead of scanning the unreliable file list for latest print date
