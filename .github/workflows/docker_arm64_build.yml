@@ -25,6 +25,7 @@ jobs:
         id: init
         run: |
           echo "foundServerVersion=${{ steps.checkTag.outputs.exists }}" >> $GITHUB_OUTPUT
+
   meta:
     needs: [ checkversion ]
     runs-on: ubuntu-latest
@@ -65,14 +66,10 @@ jobs:
           image_name: fdmmonster/fdm-monster
           tag_name: ${{ env.SERVER_VERSION }}
           tags: |
-            %X%::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
-            %X.Y%::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
-            %X.Y.Z%
             %X%-arm64::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
             %X.Y%-arm64::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
             %X.Y.Z%-arm64
           extra_tags: |
-            latest::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
             latest-arm64::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
 
       - name: Tagging Strategy SQLite
@@ -82,14 +79,10 @@ jobs:
           image_name: fdmmonster/fdm-monster
           tag_name: ${{ env.SERVER_VERSION }}
           tags: |
-            %X%-sqlite::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
-            %X.Y%-sqlite::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
-            %X.Y.Z%-sqlite
             %X%-sqlite-arm64::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
             %X.Y%-sqlite-arm64::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
             %X.Y.Z%-sqlite-arm64
           extra_tags: |
-            latest-sqlite::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
             latest-sqlite-arm64::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
 
       - name: "Show docker tags"
