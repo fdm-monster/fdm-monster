@@ -54,7 +54,7 @@
   ],
   "dependencies": {
     "@fdm-monster/client": "1.6.7",
-    "@fdm-monster/client-next": "0.0.3",
+    "@fdm-monster/client-next": "0.0.4",
     "@influxdata/influxdb-client": "1.35.0",
     "@octokit/plugin-throttling": "8.2.0",
     "@sentry/node": "8.36.0",
