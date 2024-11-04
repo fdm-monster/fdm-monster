@@ -1,6 +1,12 @@
 # Develop
 
-# FDM Monster 01/11/2024 1.6.4
+## Fixes:
+
+- Octoprint does not require api key, but moonraker does not. Adjust API validation.
+- Only printers which OctoPrint controlled need a USB silence check for restoring the websocket connectivity
+- ApiKey requiredNotIf validation does not work (?)
+
+# FDM Monster 01/11/2024 1.7.0
 
 ## Chore:
 

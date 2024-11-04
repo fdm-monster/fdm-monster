@@ -3,17 +3,17 @@ import { OctoprintType, MoonrakerType } from "@/services/printer-api.interface";
 
 export const createMongoPrinterRules = {
   _id: "not",
-  apiKey: `required|length:${UUID_LENGTH},${UUID_LENGTH}|alphaNumeric`,
   printerURL: "required|httpurl",
   printerType: `required|integer|in:${OctoprintType},${MoonrakerType}`,
+  apiKey: `requiredIf:printerType,${OctoprintType}|length:${UUID_LENGTH},${UUID_LENGTH}|alphaNumeric`,
   enabled: "boolean",
   name: "string",
 };
 
 export const createPrinterRules = {
-  apiKey: `required|length:${UUID_LENGTH},${UUID_LENGTH}|alphaNumeric`,
   printerURL: "required|httpurl",
   printerType: `required|integer|in:${OctoprintType},${MoonrakerType}`,
+  apiKey: `requiredIf:printerType,${OctoprintType}|length:${UUID_LENGTH},${UUID_LENGTH}|alphaNumeric`,
   enabled: "boolean",
   name: "required|string",
 };
