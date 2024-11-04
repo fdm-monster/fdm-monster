@@ -3806,16 +3806,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:>=10.0.0":
-  version: 22.8.6
-  resolution: "@types/node@npm:22.8.6"
-  dependencies:
-    undici-types: "npm:~6.19.8"
-  checksum: 10c0/d3a11f2549234a91a4c5d0ff35ab4bdcb7ba34db4d3f1d189be39b8bd41c19aac98d117150a95a9c5a9d45b1014135477ea240b2b8317c86ae3d3cf1c3b3f8f4
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:22.8.7":
+"@types/node@npm:*, @types/node@npm:22.8.7, @types/node@npm:>=10.0.0":
   version: 22.8.7
   resolution: "@types/node@npm:22.8.7"
   dependencies:
@@ -11794,12 +11785,12 @@ __metadata:
   linkType: hard
 
 "yauzl@npm:^3.1.3":
-  version: 3.1.3
-  resolution: "yauzl@npm:3.1.3"
+  version: 3.2.0
+  resolution: "yauzl@npm:3.2.0"
   dependencies:
     buffer-crc32: "npm:~0.2.3"
     pend: "npm:~1.2.0"
-  checksum: 10c0/e04a2567860e1337798cd2570d776b4040520b20660e7ec5dfcce24b8be2b134d6a5ae835804a0186b1a58cb8b1741b37eaa6a86f7546b6219b62a265dbaf3fc
+  checksum: 10c0/7b40b3dc46b95761a2a764391d257a11f494d365875af73a1b48fe16d4bd103dd178612e60168d12a0e59a8ba4f6411a15a5e8871d5a5f78255d6cc1ce39ee62
   languageName: node
   linkType: hard
 
