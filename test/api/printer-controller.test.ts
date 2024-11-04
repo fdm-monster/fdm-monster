@@ -120,7 +120,7 @@ describe(PrinterController.name, () => {
 
   it("should invalidate to malformed singular printer json array", async () => {
     const response = await request.post(batchRoute).send([{}]);
-    expectInvalidResponse(response, ["printerURL", "apiKey"]);
+    expectInvalidResponse(response, ["printerURL"]);
   });
 
   it("should import to singular printer json array", async () => {
