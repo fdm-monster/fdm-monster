@@ -65,7 +65,6 @@ import { JwtService } from "./services/authentication/jwt.service";
 import { AuthService } from "./services/authentication/auth.service";
 import { RefreshTokenService } from "@/services/authentication/refresh-token.service";
 import { throttling } from "@octokit/plugin-throttling";
-import { PrinterStateUpdatePollTask } from "@/tasks/printer-state-update-poll.task";
 import { RefreshTokenService as RefreshToken2 } from "@/services/orm/refresh-token.service";
 import { SettingsService2 } from "@/services/orm/settings.service";
 import { FloorService as FloorService2 } from "@/services/orm/floor.service";
@@ -209,7 +208,6 @@ export function configureContainer(isSqlite: boolean = false) {
     [di.printCompletionSocketIoTask]: asClass(PrintCompletionSocketIoTask).singleton(),
     [di.printerWebsocketTask]: asClass(PrinterWebsocketTask).singleton(), // This task is a recurring heartbeat task
     [di.printerWebsocketRestoreTask]: asClass(PrinterWebsocketRestoreTask).singleton(), // Task aimed at testing the printer API
-    [di.printerStateUpdatePollTask]: asClass(PrinterStateUpdatePollTask).singleton(),
     [di.printerFileCleanTask]: asClass(PrinterFileCleanTask).singleton(),
   });
 

@@ -1,8 +1,7 @@
 import { DITokens } from "@/container.tokens";
-import { OctoprintWebsocketAdapter } from "@/services/octoprint/octoprint-websocket.adapter";
-import { MoonrakerWebsocketAdapter } from "@/services/moonraker/moonraker-websocket.adapter";
 import { MoonrakerType, OctoprintType } from "@/services/printer-api.interface";
 import { SettingsStore } from "@/state/settings.store";
+import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
 
 export class SocketFactory {
   cradle: any;
@@ -11,7 +10,7 @@ export class SocketFactory {
     this.cradle = cradle;
   }
 
-  createInstance(printerType: number): OctoprintWebsocketAdapter | MoonrakerWebsocketAdapter {
+  createInstance(printerType: number): IWebsocketAdapter {
     const settingsStore = this.cradle[DITokens.settingsStore] as SettingsStore;
     const serverSettings = settingsStore.getServerSettings();
     const moonrakerSupport = serverSettings.experimentalMoonrakerSupport;

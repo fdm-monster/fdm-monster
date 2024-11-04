@@ -1,12 +1,30 @@
 # Develop
 
-# FDM Monster 01/11/2024 1.6.4
+# FDM Monster 04/11/2024 1.7.1
+
+## Changes:
+
+- Remove PrinterStateUpdatePollTask, it was slowing development down
+- Stopped pushing to old davidzwa dockerhub organization
+
+## Fixes:
+
+- Octoprint does not require api key, but moonraker does not. Adjust API validation.
+- Only printers which OctoPrint controlled need a USB silence check for restoring the websocket connectivity
+- ApiKey requiredNotIf validation does not work (?)
+- Batch service: missing implementation for batch get settings and batch connect
+- Batch service: get and submit moonraker reprint based on history and webhooks objects
+- Printer current state update task missed information about printer job and progress, caused null progress/job state
+- Test connection: Moonraker adapter would not hook required events for connectivity tests
+- Docker ARM64 release now tracks main instead of develop (and 1, 1.x and 1.x.y versions)
+
+# FDM Monster 01/11/2024 1.7.0
 
 ## Chore:
 
 - Workflows: upgrade github actions to node 20
 - Introduce nock to test everything (except for octokit based tests)
- 
+
 ## Features:
 
 - Setting: add experimental moonraker support setting to model, validation and API endpoints
@@ -34,7 +52,7 @@
 
 ## Fixes:
 
-- Print completion service would throw exception that correlationId was not provided (SQLite didnt like that). This error is prevented.
+- Print completion service would throw exception that correlationId was not provided (SQLite didn't like that). This error is prevented.
 - Moonraker type printers will resort to OctoPrint implementation (edge case in development)
 - Yaml import service will not assume printerType is provided, therefore defaulting to OctoprintType for older FDM Monster versions
 - Reprint will now take selected job instead of scanning the unreliable file list for latest print date

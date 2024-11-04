@@ -21,6 +21,7 @@ import { OP_LoginDto } from "@/services/octoprint/dto/auth/login.dto";
 import { Event as WsEvent } from "ws";
 import { CurrentMessageDto } from "@/services/octoprint/dto/websocket/current-message.dto";
 import { OctoprintErrorDto } from "@/services/octoprint/dto/rest/error.dto";
+import { OctoprintType } from "@/services/printer-api.interface";
 
 export const WsMessage = {
   // Custom events
@@ -219,11 +220,16 @@ export class OctoprintWebsocketAdapter extends WebsocketAdapter {
     }, 10000);
   }
 
+  /**
+   * Re-fetch the printer current state without depending on Websocket
+   * @private
+   */
   private async updateCurrentStateSafely() {
     try {
       const current = await this.octoprintClient.getPrinterCurrent(this.login, true);
+      const job = await this.octoprintClient.getJob(this.login);
       this.setApiState(API_STATE.responding);
-      return await this.emitEvent("current", current.data);
+      return await this.emitEvent("current", { ...current.data, progress: job?.progress, job: job?.job });
     } catch (e) {
       if ((e as AxiosError).isAxiosError) {
         const castError = e as OctoprintErrorDto;
@@ -270,6 +276,7 @@ export class OctoprintWebsocketAdapter extends WebsocketAdapter {
       event,
       payload,
       printerId: this.printerId,
+      printerType: OctoprintType,
     } as OctoPrintEventDto);
   }
 

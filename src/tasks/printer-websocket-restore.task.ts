@@ -6,6 +6,7 @@ import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { captureException } from "@sentry/node";
 import { API_STATE } from "@/shared/dtos/api-state.type";
+import { OctoprintType } from "@/services/printer-api.interface";
 
 export class PrinterWebsocketRestoreTask {
   settingsStore: SettingsStore;
@@ -37,6 +38,10 @@ export class PrinterWebsocketRestoreTask {
     const resetAdapterIds = [];
     const silentSocketIds = [];
     for (const socket of existingSockets) {
+      if (socket.printerType !== OctoprintType) {
+        continue;
+      }
+
       try {
         if (socket.isClosedOrAborted()) {
           socket.close();

@@ -2,7 +2,7 @@ name: Docker release
 on:
   push:
     branches:
-      - 'main'
+      - main
 jobs:
   checkversion:
     runs-on: ubuntu-latest
@@ -64,19 +64,6 @@ jobs:
       # if tag then XYZ, if the tag does not contain rc or unstable then X and XY tags
       # if tag is not rc/unstable, push to dockerhub with tag 'latest' (at the same time)
 
-      - name: Tagging Strategy
-        id: tagging
-        uses: HackerHappyHour/tagging-strategy@v3
-        with:
-          image_name: davidzwa/fdm-monster
-          tag_name: ${{ env.SERVER_VERSION }}
-          tags: |
-            %X%::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
-            %X.Y%::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
-            %X.Y.Z%
-          extra_tags: |
-            latest::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
-
       - name: Tagging Strategy new org
         id: tagging2
         uses: HackerHappyHour/tagging-strategy@v3
@@ -96,7 +83,7 @@ jobs:
           echo '${{ github.ref }}'
           echo '${{ github.ref_type }}'
           echo '${{ github.event.pull_request.base.ref }}'
-          echo '${{ steps.tagging.outputs.tags }}'
+          echo '${{ steps.tagging2.outputs.tags }}'
 
       # Speed up the build next time
       - name: Cache Docker layers
@@ -108,18 +95,6 @@ jobs:
             ${{ runner.os }}-buildx-
 
       # Clone the repo and build the image
-      - name: Build and push
-        id: docker_build
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          context: "{{defaultContext}}"
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
-          file: ./docker/Dockerfile
-          tags: ${{ steps.tagging.outputs.tags }}
-          labels: ${{ needs.meta.outputs.labels }}
-
       - name: Build and push
         id: docker_build_new
         uses: docker/build-push-action@v6
@@ -134,7 +109,4 @@ jobs:
 
       # Show image digest output
       - name: Image digest
-        run: echo ${{ steps.docker_build.outputs.digest }}
-
-      - name: Image digest 2
         run: echo ${{ steps.docker_build_new.outputs.digest }}

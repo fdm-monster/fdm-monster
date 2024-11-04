@@ -1,4 +1,4 @@
-import { IPrinterApi, OctoprintType, PrinterType } from "@/services/printer-api.interface";
+import { IPrinterApi, OctoprintType, PrinterType, ReprintState } from "@/services/printer-api.interface";
 import { LoginDto } from "@/services/interfaces/login.dto";
 import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { NotImplementedException } from "@/exceptions/runtime.exceptions";
@@ -85,7 +85,6 @@ export class OctoprintApi implements IPrinterApi {
   async getFiles() {
     const files = await this.client.getLocalFiles(this.login, false);
     return files.map((f) => ({
-      name: f.name,
       path: f.path,
       size: f.size,
       date: f.date,
@@ -106,5 +105,27 @@ export class OctoprintApi implements IPrinterApi {
 
   async deleteFolder(path: string) {
     await this.client.deleteFileOrFolder(this.login, path);
+  }
+
+  async getSettings() {
+    return await this.client.getSettings(this.login);
+  }
+
+  async getReprintState() {
+    const connected = await this.client.getConnection(this.login);
+
+    const connectionState = connected.current?.state;
+
+    const selectedJob = await this.client.getJob(this.login);
+    const currentJobFile = selectedJob?.job?.file;
+    if (!currentJobFile?.name) {
+      return { connectionState, reprintState: ReprintState.NoLastPrint };
+    }
+
+    return {
+      connectionState,
+      file: currentJobFile,
+      reprintState: ReprintState.LastPrintReady,
+    };
   }
 }

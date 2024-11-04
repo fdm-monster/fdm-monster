@@ -12,15 +12,15 @@ import { SocketIoGateway } from "@/state/socket-io.gateway";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IdType } from "@/shared.constants";
 import { PrinterUnsafeDto } from "@/services/interfaces/printer.dto";
-import { MoonrakerWebsocketAdapter } from "@/services/moonraker/moonraker-websocket.adapter";
 import { OctoprintType } from "@/services/printer-api.interface";
+import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
 
 export class PrinterSocketStore {
   socketIoGateway: SocketIoGateway;
   socketFactory: SocketFactory;
   eventEmitter2: EventEmitter2;
   printerCache: PrinterCache;
-  printerSocketAdaptersById: Record<string, OctoprintWebsocketAdapter | MoonrakerWebsocketAdapter> = {};
+  printerSocketAdaptersById: Record<string, IWebsocketAdapter> = {};
   logger: LoggerService;
   configService: ConfigService;
   settingsStore: SettingsStore;
