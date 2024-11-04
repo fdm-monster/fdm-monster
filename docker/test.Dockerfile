@@ -1,4 +1,4 @@
-FROM node:18-bookworm-slim as production
+FROM node:18-bookworm-slim AS production
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y ca-certificates curl
