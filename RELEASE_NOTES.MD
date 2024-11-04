@@ -2,7 +2,7 @@
 
 ## Changes:
 
-- Remove PrinterStateUpdatePollTask, it was slowing development down 
+- Remove PrinterStateUpdatePollTask, it was slowing development down
 
 ## Fixes:
 
@@ -12,6 +12,7 @@
 - Batch service: missing implementation for batch get settings and batch connect
 - Batch service: get and submit moonraker reprint based on history and webhooks objects
 - Printer current state update task missed information about printer job and progress, caused null progress/job state
+- Test connection: Moonraker adapter would not hook required events for connectivity tests
 
 # FDM Monster 01/11/2024 1.7.0
 
