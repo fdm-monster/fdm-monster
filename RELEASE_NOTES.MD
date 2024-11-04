@@ -5,6 +5,7 @@
 ## Changes:
 
 - Remove PrinterStateUpdatePollTask, it was slowing development down
+- Stopped pushing to old davidzwa dockerhub organization
 
 ## Fixes:
 
@@ -15,6 +16,7 @@
 - Batch service: get and submit moonraker reprint based on history and webhooks objects
 - Printer current state update task missed information about printer job and progress, caused null progress/job state
 - Test connection: Moonraker adapter would not hook required events for connectivity tests
+- Docker ARM64 release now tracks main instead of develop (and 1, 1.x and 1.x.y versions)
 
 # FDM Monster 01/11/2024 1.7.0
 
