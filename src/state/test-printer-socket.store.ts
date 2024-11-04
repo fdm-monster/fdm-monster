@@ -1,7 +1,7 @@
 import { setInterval, setTimeout } from "timers/promises";
 import { validateInput } from "@/handlers/validators";
 import { createTestPrinterRules } from "./validation/create-test-printer.validation";
-import { octoPrintEvent, OctoprintWebsocketAdapter, WsMessage } from "@/services/octoprint/octoprint-websocket.adapter";
+import { octoPrintEvent, WsMessage } from "@/services/octoprint/octoprint-websocket.adapter";
 import { AppConstants } from "@/server.constants";
 import { SocketIoGateway } from "@/state/socket-io.gateway";
 import { SocketFactory } from "@/services/socket.factory";
@@ -10,11 +10,14 @@ import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { errorSummary } from "@/utils/error.utils";
 import { captureException } from "@sentry/node";
-import { MoonrakerWebsocketAdapter } from "@/services/moonraker/moonraker-websocket.adapter";
 import { SOCKET_STATE } from "@/shared/dtos/socket-state.type";
+import { PrinterUnsafeDto } from "@/services/interfaces/printer.dto";
+import { IdType } from "@/shared.constants";
+import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
+import { moonrakerEvent } from "@/services/moonraker/constants/websocket.constants";
 
 export class TestPrinterSocketStore {
-  testSocket: OctoprintWebsocketAdapter | MoonrakerWebsocketAdapter;
+  testSocket: IWebsocketAdapter;
   socketIoGateway: SocketIoGateway;
   socketFactory: SocketFactory;
   eventEmitter2: EventEmitter2;
@@ -36,7 +39,7 @@ export class TestPrinterSocketStore {
     this.logger = loggerFactory(TestPrinterSocketStore.name);
   }
 
-  async setupTestPrinter(printer): Promise<void> {
+  async setupTestPrinter(printer: PrinterUnsafeDto<IdType>): Promise<void> {
     if (this.testSocket) {
       this.testSocket.close();
       this.testSocket = null;
@@ -55,6 +58,7 @@ export class TestPrinterSocketStore {
       loginDto: {
         apiKey: printer.apiKey,
         printerURL: printer.printerURL,
+        printerType: printer.printerType,
       },
       protocol: "ws",
     });
@@ -65,6 +69,11 @@ export class TestPrinterSocketStore {
       octoPrintEvent(WsMessage.WS_CLOSED),
       octoPrintEvent(WsMessage.WS_OPENED),
       octoPrintEvent(WsMessage.WS_ERROR),
+      moonrakerEvent(WsMessage.WS_STATE_UPDATED),
+      moonrakerEvent(WsMessage.API_STATE_UPDATED),
+      moonrakerEvent(WsMessage.WS_CLOSED),
+      moonrakerEvent(WsMessage.WS_OPENED),
+      moonrakerEvent(WsMessage.WS_ERROR),
     ];
     const listener = ({ event, payload, printerId }) => {
       if (printerId !== correlationToken) {

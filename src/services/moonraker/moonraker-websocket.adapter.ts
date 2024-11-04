@@ -15,7 +15,6 @@ import { SOCKET_STATE, SocketState } from "@/shared/dtos/socket-state.type";
 import { API_STATE, ApiState } from "@/shared/dtos/api-state.type";
 import { LoginDto } from "@/services/interfaces/login.dto";
 import { ConnectionIdentifyDto } from "@/services/moonraker/dto/websocket/connection-identify.dto";
-import { WebsocketRpcExtendedAdapter } from "@/shared/websocket-rpc-extended.adapter";
 import { JsonRpcEventDto } from "@/services/moonraker/dto/websocket/json-rpc-event.dto";
 import { KnownPrinterObject } from "@/services/moonraker/dto/objects/printer-objects-list.dto";
 import { NotifyStatusUpdate } from "@/services/moonraker/dto/websocket/message.types";
@@ -45,6 +44,9 @@ import { FlagsDto } from "@/services/octoprint/dto/printer/flags.dto";
 import { CurrentMessageDto } from "@/services/octoprint/dto/websocket/current-message.dto";
 import { Event as WsEvent } from "ws";
 import { NotifyServiceStateChangedParams } from "@/services/moonraker/dto/websocket/notify-service-state-changed.params";
+import { WebsocketRpcExtendedAdapter } from "@/shared/websocket-rpc-extended.adapter";
+import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
+import { MoonrakerType } from "@/services/printer-api.interface";
 
 export type SubscriptionType = IdleTimeoutObject &
   PauseResumeObject &
@@ -61,8 +63,8 @@ export type SubscriptionType = IdleTimeoutObject &
   MotionReportObject &
   SystemStatsObject;
 
-export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter {
-  public readonly printerType = 1;
+export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter implements IWebsocketAdapter {
+  readonly printerType = 1;
   private client: MoonrakerClient;
   protected declare logger: LoggerService;
   private eventEmitter: EventEmitter2;
@@ -76,7 +78,7 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter {
   apiState: ApiState = API_STATE.unset;
   login?: LoginDto;
   private socketURL?: URL;
-  public printerId?: IdType;
+  printerId?: IdType;
   private readonly serverVersion: string;
 
   refreshPrinterObjectsInterval?: NodeJS.Timeout;
@@ -143,6 +145,8 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter {
   needsReauth() {
     return false;
   }
+
+  reauthSession() {}
 
   registerCredentials(socketLogin: ISocketLogin) {
     const { printerId, loginDto, protocol } = socketLogin;
@@ -419,7 +423,7 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter {
       event,
       payload,
       printerId: this.printerId,
-      printerType: 1,
+      printerType: MoonrakerType,
     } as MoonrakerEventDto);
   }
 
