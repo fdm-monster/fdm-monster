@@ -15,7 +15,7 @@ export class SocketIoTask {
   logger: LoggerService;
 
   private aggregateSizeCounter = 0;
-  private aggregateWindowLength = 100;
+  private aggregateWindowLength = 5000;
   private aggregateSizes: number[] = [];
   private rounding = 2;
 
