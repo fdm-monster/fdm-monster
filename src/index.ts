@@ -8,6 +8,7 @@ import { LoggerService as Logger } from "@/handlers/logger";
 import { join } from "path";
 import { superRootPath } from "@/utils/fs.utils";
 import { createStaticLogger } from "@/handlers/logging/static.logger";
+import { setupSwagger } from "@/utils/swagger/swagger";
 
 config({ path: join(superRootPath(), "./.env") });
 createStaticLogger({ enableFileLogs: true });
@@ -17,7 +18,9 @@ logger.log("✓ Parsed environment with (optional) .env file, created static log
 
 setupEnvConfig();
 
-setupServer().then(({ httpServer, container }) => {
+setupServer().then(async ({ httpServer, container }) => {
+  await setupSwagger(httpServer);
+
   container
     .resolve<ServerHost>(DITokens.serverHost)
     .boot(httpServer)

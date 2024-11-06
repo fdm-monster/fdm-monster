@@ -11,7 +11,6 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class SocketIoTask {
   logger: LoggerService;
-
   constructor(
     loggerFactory: ILoggerFactory,
     private readonly socketIoGateway: SocketIoGateway,
