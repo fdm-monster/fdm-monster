@@ -3,10 +3,13 @@ import { setupEnvConfig } from "./server.env";
 import { setupServer } from "./server.core";
 import { DITokens } from "./container.tokens";
 import { ServerHost } from "@/server.host";
+import { setupSwagger } from "@/utils/swagger/swagger";
 
 setupEnvConfig();
 
-setupServer().then(({ httpServer, container }) => {
+setupServer().then(async ({ httpServer, container }) => {
+  await setupSwagger(httpServer);
+
   container
     .resolve<ServerHost>(DITokens.serverHost)
     .boot(httpServer)

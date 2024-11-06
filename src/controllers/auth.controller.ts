@@ -14,6 +14,7 @@ import { demoUserNotAllowed } from "@/middleware/demo.middleware";
 import { IConfigService } from "@/services/core/config.service";
 import { registerUserSchema } from "@/controllers/validation/user-controller.validation";
 import { validateMiddleware } from "@/handlers/validators";
+import { ApiOperation } from "@/utils/swagger/decorators";
 
 @route(AppConstants.apiRoute + "/auth")
 export class AuthController {
@@ -32,6 +33,15 @@ export class AuthController {
 
   @POST()
   @route("/login")
+  @ApiOperation({
+    summary: "Create a new user",
+    description: "Creates a new user with the provided information",
+    responses: {
+      "201": {
+        description: "User created successfully",
+      },
+    },
+  })
   async login(req: Request, res: Response) {
     this.logger.debug(`Login attempt from IP ${req.ip} and user-agent ${req.headers["user-agent"]}`);
     const tokens = await this.authService.loginUser(req.body.username, req.body.password);
@@ -40,6 +50,15 @@ export class AuthController {
 
   @GET()
   @route("/login-required")
+  @ApiOperation({
+    summary: "Create a new user",
+    description: "Creates a new user with the provided information",
+    responses: {
+      "201": {
+        description: "User created successfully",
+      },
+    },
+  })
   async getLoginRequired(req: Request, res: Response) {
     const loginRequired = await this.settingsStore.getLoginRequired();
     const registration = this.settingsStore.isRegistrationEnabled();

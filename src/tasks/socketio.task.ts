@@ -17,6 +17,7 @@ export class SocketIoTask {
   private readonly aggregateWindowLength = 100;
 
   private aggregateSizeCounter = 0;
+  private aggregateWindowLength = 5000;
   private aggregateSizes: number[] = [];
 
   constructor(
