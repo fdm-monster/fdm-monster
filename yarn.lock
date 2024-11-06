@@ -1053,6 +1053,7 @@ __metadata:
     "@types/passport-jwt": "npm:4.0.1"
     "@types/semver": "npm:7.7.0"
     "@types/supertest": "npm:6.0.3"
+    "@types/swagger-ui-express": "npm:^4.1.7"
     "@types/uuid": "npm:10.0.0"
     "@types/ws": "npm:8.18.0"
     adm-zip: "npm:0.5.16"
@@ -1094,6 +1095,7 @@ __metadata:
     nock: "npm:13.5.6"
     node-input-validator: "npm:4.5.1"
     octokit: "npm:3.2.1"
+    openapi3-ts: "npm:^4.4.0"
     passport: "npm:0.7.0"
     passport-anonymous: "npm:1.0.1"
     passport-jwt: "npm:4.0.1"
@@ -1102,6 +1104,7 @@ __metadata:
     semver: "npm:7.7.1"
     socket.io: "npm:4.8.1"
     supertest: "npm:7.1.0"
+    swagger-ui-express: "npm:5.0.1"
     toad-scheduler: "npm:3.0.1"
     ts-node: "npm:10.9.2"
     typeorm: "npm:0.3.21"
@@ -2470,6 +2473,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@scarf/scarf@npm:=1.3.0":
+  version: 1.3.0
+  resolution: "@scarf/scarf@npm:1.3.0"
+  checksum: 10c0/b616ea968b9e04124b9fa43bc170d2b002e18936eb3450e71ccaa88faf0a90a28eead36efdfe9c5bc69bf4cf6b9e079e364e67e276701e950fbbd463bc735356
+  languageName: node
+  linkType: hard
+
 "@sec-ant/readable-stream@npm:^0.4.1":
   version: 0.4.1
   resolution: "@sec-ant/readable-stream@npm:0.4.1"
@@ -3743,6 +3753,16 @@ __metadata:
     "@types/methods": "npm:^1.1.4"
     "@types/superagent": "npm:^8.1.0"
   checksum: 10c0/a2080f870154b09db123864a484fb633bc9e2a0f7294a194388df4c7effe5af9de36d5a5ebf819f72b404fa47b5e813c47d5a3a51354251fd2fa8589bfb64f2c
+  languageName: node
+  linkType: hard
+
+"@types/swagger-ui-express@npm:^4.1.7":
+  version: 4.1.7
+  resolution: "@types/swagger-ui-express@npm:4.1.7"
+  dependencies:
+    "@types/express": "npm:*"
+    "@types/serve-static": "npm:*"
+  checksum: 10c0/8c337fd4166cd45aa7500b0ed3e19f6d5a5bc8c3d2b1ff554c1bc4735b14a3b816516bde2a759bba4ac066be3d8ea5988ecf02fe616507b6b82c6c9b1e70e969
   languageName: node
   linkType: hard
 
@@ -9028,6 +9048,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"openapi3-ts@npm:^4.4.0":
+  version: 4.4.0
+  resolution: "openapi3-ts@npm:4.4.0"
+  dependencies:
+    yaml: "npm:^2.5.0"
+  checksum: 10c0/900b834279fc8a43c545728ad75ec7c26934ec5344225b60d1e1c0df44d742d7e7379aea18d9034e03031f079d3308ba5a68600682eece3ed41cdbdd10346a9e
+  languageName: node
+  linkType: hard
+
 "optionator@npm:^0.9.3":
   version: 0.9.4
   resolution: "optionator@npm:0.9.4"
@@ -10667,6 +10696,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"swagger-ui-dist@npm:>=5.0.0":
+  version: 5.18.1
+  resolution: "swagger-ui-dist@npm:5.18.1"
+  dependencies:
+    "@scarf/scarf": "npm:=1.3.0"
+  checksum: 10c0/053ca5144c97569b1d40e7b9960803766ba2be23fea1cac95da91aefd0289afa72715913fbccd0497f70542f3a24999757943eb681434ecfec4b924261959481
+  languageName: node
+  linkType: hard
+
+"swagger-ui-express@npm:5.0.1":
+  version: 5.0.1
+  resolution: "swagger-ui-express@npm:5.0.1"
+  dependencies:
+    swagger-ui-dist: "npm:>=5.0.0"
+  peerDependencies:
+    express: ">=4.0.0 || >=5.0.0-beta"
+  checksum: 10c0/dbe9830caef7fe455241e44e74958bac62642997e4341c1b0f38a3d684d19a4a81b431217c656792d99f046a1b5f261abf7783ede0afe41098cd4450401f6fd1
+  languageName: node
+  linkType: hard
+
 "tapable@npm:^2.2.0":
   version: 2.2.1
   resolution: "tapable@npm:2.2.1"
@@ -11533,6 +11582,15 @@ __metadata:
   version: 5.0.0
   resolution: "yallist@npm:5.0.0"
   checksum: 10c0/a499c81ce6d4a1d260d4ea0f6d49ab4da09681e32c3f0472dee16667ed69d01dae63a3b81745a24bd78476ec4fcf856114cb4896ace738e01da34b2c42235416
+  languageName: node
+  linkType: hard
+
+"yaml@npm:^2.5.0":
+  version: 2.7.0
+  resolution: "yaml@npm:2.7.0"
+  bin:
+    yaml: bin.mjs
+  checksum: 10c0/886a7d2abbd70704b79f1d2d05fe9fb0aa63aefb86e1cb9991837dced65193d300f5554747a872b4b10ae9a12bc5d5327e4d04205f70336e863e35e89d8f4ea9
   languageName: node
   linkType: hard
 
