@@ -74,6 +74,19 @@ describe(PrinterController.name, () => {
       name: "test123",
       printerType: OctoprintType,
     });
+
+    const response3 = await request.post(createRoute).query("forceSave=true").send({
+      printerURL: "http://url.com",
+      apiKey: "1234123412341234123412A4-234123412341234123",
+      name: "test123",
+      printerType: OctoprintType,
+    });
+    expectOkResponse(response3, {
+      printerURL: "http://url.com",
+      apiKey: "1234123412341234123412A4-234123412341234123",
+      name: "test123",
+      printerType: OctoprintType,
+    });
   });
 
   it(`should not be able to POST ${updateRoute} - missing printer field`, async () => {
