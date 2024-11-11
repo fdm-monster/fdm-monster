@@ -3,6 +3,7 @@
 ## Fixes:
 
 - BaseService: catch null or undefined id before querying database
+- Add set user roles API to avoid users staying in limbo with GUEST role after verification.
 
 # FDM Monster 11/11/2024 1.7.2
 
