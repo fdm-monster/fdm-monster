@@ -97,10 +97,8 @@ export class UserController {
     const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
 
     const ownUserId = req.user?.id;
-    if (ownUserId) {
-      if (ownUserId === id) {
-        throw new ForbiddenError("Not allowed to delete own account");
-      }
+    if (ownUserId == id) {
+      throw new ForbiddenError("Not allowed to delete own account");
     }
 
     const isRootUser = await this.userService.isUserRootUser(id);
@@ -132,7 +130,7 @@ export class UserController {
   async changeUsername(req: Request, res: Response) {
     const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
 
-    if (req.user?.id !== id && (await this.settingsStore.getLoginRequired())) {
+    if (req.user?.id != id && (await this.settingsStore.getLoginRequired())) {
       throw new ForbiddenError("Not allowed to change username of other users");
     }
 
@@ -149,7 +147,7 @@ export class UserController {
   async changePassword(req: Request, res: Response) {
     const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
 
-    if (req.user?.id !== id && (await this.settingsStore.getLoginRequired())) {
+    if (req.user?.id != id && (await this.settingsStore.getLoginRequired())) {
       throw new ForbiddenError("Not allowed to change password of other users");
     }
 
@@ -200,10 +198,8 @@ export class UserController {
     const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
 
     const ownUserId = req.user?.id;
-    if (ownUserId) {
-      if (ownUserId === id) {
-        throw new ForbiddenError("Not allowed to change own verified status");
-      }
+    if (ownUserId == id) {
+      throw new ForbiddenError("Not allowed to change own verified status");
     }
 
     const isRootUser = await this.userService.isUserRootUser(id);
