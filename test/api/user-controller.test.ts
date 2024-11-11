@@ -101,9 +101,6 @@ describe(UserController.name, () => {
     expectNotFoundResponse(responseVerification);
   });
 
-  // const changePasswordRoute = (id: string) => `${defaultRoute}/${id}/change-password`;
-  // const setVerifiedRoute = (id: string) => `${defaultRoute}/${id}/set-verified`;
-  // const setRootUserRoute = (id: string) => `${defaultRoute}/${id}/set-root-user`;
   it("should change username", async function () {
     const user = await ensureTestUserCreated("test", "user", false, ROLES.OPERATOR, true, true);
     const response = await request.post(changeUsernameRoute(user.id)).send({
@@ -130,19 +127,23 @@ describe(UserController.name, () => {
   });
 
   it("should set user roles", async function () {
-    const user = await ensureTestUserCreated("test", "user", false, ROLES.OPERATOR, true, false);
+    const { token, refreshToken } = await loginTestUser(request, "fakeuser");
 
+    const user = await ensureTestUserCreated("test", "user", false, ROLES.OPERATOR, true, false);
     const roles = await roleService.getSynchronizedRoleByName(ROLES.OPERATOR);
-    const response = await request.post(setUserRolesRoute(user.id)).send({
-      roleIds: [roles.id],
-    });
+    const response = await request
+      .post(setUserRolesRoute(user.id))
+      .set("Authorization", `Bearer ${token}`)
+      .send({
+        roleIds: [roles.id],
+      });
     expectOkResponse(response);
     const getUser = await request.get(getRoute(user.id));
     expectOkResponse(getUser);
     expect(getUser.body.roles.includes(roles.id)).toBeTruthy();
     expect(getUser.body.roles).toHaveLength(1);
 
-    const response2 = await request.post(setUserRolesRoute(user.id)).send({
+    const response2 = await request.post(setUserRolesRoute(user.id)).set("Authorization", `Bearer ${token}`).send({
       roleIds: [],
     });
     expectOkResponse(response2);
