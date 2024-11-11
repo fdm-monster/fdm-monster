@@ -3,7 +3,7 @@ import { setupTestApp } from "../test-server";
 import { expectForbiddenResponse, expectNotFoundResponse, expectOkResponse } from "../extensions";
 import { ensureTestUserCreated } from "./test-data/create-user";
 import { ROLES } from "@/constants/authorization.constants";
-import supertest from "supertest";
+import { Test } from "supertest";
 import { User } from "@/entities";
 import { User as UserMongo } from "@/models";
 import { UserController } from "@/controllers/user.controller";
@@ -13,6 +13,9 @@ import { DITokens } from "@/container.tokens";
 import { loginTestUser } from "./auth/login-test-user";
 import { IdType } from "@/shared.constants";
 import { getDatasource, isSqliteModeTest } from "../typeorm.manager";
+import TestAgent from "supertest/lib/agent";
+import { IUserService } from "@/services/interfaces/user-service.interface";
+import { IRoleService } from "@/services/interfaces/role-service.interface";
 
 const defaultRoute = `${AppConstants.apiRoute}/user`;
 const profileRoute = `${defaultRoute}/profile`;
@@ -21,11 +24,14 @@ const getRoute = (id: IdType) => `${defaultRoute}/${id}`;
 const changeUsernameRoute = (id: IdType) => `${defaultRoute}/${id}/change-username`;
 const changePasswordRoute = (id: IdType) => `${defaultRoute}/${id}/change-password`;
 const setVerifiedRoute = (id: IdType) => `${defaultRoute}/${id}/set-verified`;
+const setUserRolesRoute = (id: IdType) => `${defaultRoute}/${id}/set-user-roles`;
 const setRootUserRoute = (id: IdType) => `${defaultRoute}/${id}/set-root-user`;
 const deleteRoute = (id: IdType) => `${defaultRoute}/${id}`;
 
-let request: supertest.SuperTest<supertest.Test>;
+let request: TestAgent<Test>;
 let container: AwilixContainer;
+let userService: IUserService;
+let roleService: IRoleService;
 
 beforeAll(async () => {
   ({ request, container } = await setupTestApp(true));
@@ -33,6 +39,8 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   await container.resolve<SettingsStore>(DITokens.settingsStore).setLoginRequired(false);
+  userService = container.resolve<IUserService>(DITokens.userService);
+  roleService = container.resolve<IRoleService>(DITokens.roleService);
 });
 
 describe(UserController.name, () => {
@@ -119,6 +127,28 @@ describe(UserController.name, () => {
       isVerified: true,
     });
     expectOkResponse(response);
+  });
+
+  it("should set user roles", async function () {
+    const user = await ensureTestUserCreated("test", "user", false, ROLES.OPERATOR, true, false);
+
+    const roles = await roleService.getSynchronizedRoleByName(ROLES.OPERATOR);
+    const response = await request.post(setUserRolesRoute(user.id)).send({
+      roleIds: [roles.id],
+    });
+    expectOkResponse(response);
+    const getUser = await request.get(getRoute(user.id));
+    expectOkResponse(getUser);
+    expect(getUser.body.roles.includes(roles.id)).toBeTruthy();
+    expect(getUser.body.roles).toHaveLength(1);
+
+    const response2 = await request.post(setUserRolesRoute(user.id)).send({
+      roleIds: [],
+    });
+    expectOkResponse(response2);
+    const getUser2 = await request.get(getRoute(user.id));
+    expectOkResponse(getUser2);
+    expect(getUser2.body.roles).toHaveLength(0);
   });
 
   it("should set root user", async function () {
