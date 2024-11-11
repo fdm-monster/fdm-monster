@@ -1056,17 +1056,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fdm-monster/client-next@npm:0.0.4":
-  version: 0.0.4
-  resolution: "@fdm-monster/client-next@npm:0.0.4"
-  checksum: 10c0/bf52b6fa2b1c45772e368c1404b8a99419f64df0e0a8a30ea8e2a0db6029c6f923c4caf3ccf8de207dd1963c1d2f4f59a459ce7be7ff9f069c94952f9a0a5110
+"@fdm-monster/client-next@npm:0.0.5":
+  version: 0.0.5
+  resolution: "@fdm-monster/client-next@npm:0.0.5"
+  checksum: 10c0/59706f6235293126b5abfa643cce0a29ab91d2a0fca18f39a5db8fc5630ee06e3d3816ed30a64db7effa17a749402a13c82ea60bb109b273dc0ea438daa812c8
   languageName: node
   linkType: hard
 
-"@fdm-monster/client@npm:1.6.7":
-  version: 1.6.7
-  resolution: "@fdm-monster/client@npm:1.6.7"
-  checksum: 10c0/be201d142f2fcef4e0b4576d339cd8016b3a22edc5456f28036fed89d5183b09a0211b163a2fbf06cd4183ea0905995d62b583638b186fd3cd455b7f611c2c9c
+"@fdm-monster/client@npm:1.6.8":
+  version: 1.6.8
+  resolution: "@fdm-monster/client@npm:1.6.8"
+  checksum: 10c0/b1b809e7f678ac5c7486b287b7cd74135ba3bfc250e054f96bd0830b5cbb72b1e82dbc1c3d2b09af740e1b682ef74cf879c17f93ad9882b0abbaac654a45a933
   languageName: node
   linkType: hard
 
@@ -1074,8 +1074,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@fdm-monster/server@workspace:."
   dependencies:
-    "@fdm-monster/client": "npm:1.6.7"
-    "@fdm-monster/client-next": "npm:0.0.4"
+    "@fdm-monster/client": "npm:1.6.8"
+    "@fdm-monster/client-next": "npm:0.0.5"
     "@influxdata/influxdb-client": "npm:1.35.0"
     "@lcov-viewer/cli": "npm:1.3.0"
     "@lcov-viewer/istanbul-report": "npm:1.4.0"
