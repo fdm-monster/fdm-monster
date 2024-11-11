@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-import { MoonrakerType, OctoprintType } from "@/services/printer-api.interface";
+import { OctoprintType } from "@/services/printer-api.interface";
 
 export interface IPrinter {
   id: string;

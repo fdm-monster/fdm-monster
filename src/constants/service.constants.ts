@@ -1,4 +1,4 @@
-export const UUID_LENGTH = 32;
 export const minFloorNameLength = 3;
 
-export const apiKeyLengthMinimumDefault = 32;
+export const apiKeyLengthMinDefault = 32;
+export const apiKeyLengthMaxDefault = 43;
