@@ -1,5 +1,7 @@
 # Develop
 
+# FDM Monster 11/11/2024 1.7.2
+
 ## Fixes:
 
 - API & Service validators: adjust max length of apiKey property validation to 43 to allow new `secrets` based OctoPrint api keys
