@@ -35,6 +35,9 @@ export function BaseService<
 
     async get(id: SqliteIdType, throwIfNotFound = true, options?: FindOneOptions<T>) {
       try {
+        if (id === null || id === undefined) {
+          throw new EntityNotFoundError(entity, "Id was not provided");
+        }
         return this.repository.findOneOrFail({ ...options, where: { id } } as FindOneOptions<T>);
       } catch (e) {
         if (throwIfNotFound && e instanceof EntityNotFoundError) {

@@ -178,6 +178,15 @@
       "contributions": [
         "ideas"
       ]
+    },
+    {
+      "login": "callanova",
+      "name": "callanova",
+      "avatar_url": "https://avatars.githubusercontent.com/u/175639705?v=4",
+      "profile": "https://github.com/callanova",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,

@@ -1,11 +1,19 @@
 # Develop
 
+# FDM Monster 11/11/2024 1.7.3
+
+## Fixes:
+
+- BaseService: catch null or undefined id before querying database
+- Add set user roles API to avoid users staying in limbo with GUEST role after verification.
+- User API apply consistent string number coercion in user API to avoid unexpected ID comparison
+
 # FDM Monster 11/11/2024 1.7.2
 
 ## Fixes:
 
 - API & Service validators: adjust max length of apiKey property validation to 43 to allow new `secrets` based OctoPrint api keys
-
+ 
 # FDM Monster 04/11/2024 1.7.1
 
 ## Changes:

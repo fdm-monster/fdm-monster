@@ -30,10 +30,15 @@ beforeEach(async () => {
 });
 
 describe(UserService.name, () => {
-  it("should get user ", async () => {
+  it("should get user", async () => {
     await roleService.syncRoles();
     const { id } = await ensureTestUserCreated();
     await userService.getUser(id);
+  });
+
+  it("should not get user by undefined id", async () => {
+    await roleService.syncRoles();
+    await expect(async () => await userService.getUser(undefined)).rejects.toBeDefined();
   });
 
   it("should find no user by role id ", async () => {

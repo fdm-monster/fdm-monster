@@ -6,7 +6,7 @@
   },
   "author": "David Zwart",
   "license": "AGPL-3.0-or-later",
-  "version": "1.7.2",
+  "version": "1.7.3",
   "bin": {
     "fdm-monster": "dist/index.js",
     "fdmm": "dist/index.js"
@@ -53,8 +53,8 @@
     "vue"
   ],
   "dependencies": {
-    "@fdm-monster/client": "1.6.8",
-    "@fdm-monster/client-next": "0.0.5",
+    "@fdm-monster/client": "1.6.10",
+    "@fdm-monster/client-next": "0.0.7",
     "@influxdata/influxdb-client": "1.35.0",
     "@octokit/plugin-throttling": "8.2.0",
     "@sentry/node": "8.37.1",
@@ -96,7 +96,7 @@
     "toad-scheduler": "3.0.1",
     "typeorm": "0.3.20",
     "uuid": "11.0.3",
-    "winston": "3.16.0",
+    "winston": "3.17.0",
     "ws": "8.18.0"
   },
   "devDependencies": {
