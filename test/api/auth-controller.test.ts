@@ -36,7 +36,7 @@ beforeEach(async () => {
 });
 
 describe(AuthController.name, () => {
-  it("should fail login without creds", async () => {
+  it("should fail login without credentials", async () => {
     const response = await request.post(loginRoute).send();
     expectUnauthenticatedResponse(response);
   });
@@ -107,7 +107,7 @@ describe(AuthController.name, () => {
     expectBadRequestError(response);
   });
 
-  it("should authorize known user", async () => {
+  it("should login known user", async () => {
     const password = "newPassword";
     const { username } = await ensureTestUserCreated("default", password);
     const response = await request.post(loginRoute).send({ username, password });
