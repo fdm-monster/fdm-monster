@@ -1,4 +1,4 @@
-import { UUID_LENGTH } from "@/constants/service.constants";
+import { apiKeyLengthMaxDefault, apiKeyLengthMinDefault } from "@/constants/service.constants";
 import { MoonrakerType, OctoprintType } from "@/services/printer-api.interface";
 
 export const flowRateRules = {
@@ -11,7 +11,7 @@ export const feedRateRules = {
 
 export const testPrinterApiRules = {
   printerType: `required|integer|in:${OctoprintType},${MoonrakerType}`,
-  apiKey: `requiredIf:printerType,${OctoprintType}|length:${UUID_LENGTH},${UUID_LENGTH}|alphaNumeric`,
+  apiKey: `requiredIf:printerType,${OctoprintType}|length:${apiKeyLengthMaxDefault},${apiKeyLengthMinDefault}|alphaNumeric`,
   printerURL: "required|httpurl",
 };
 
@@ -26,7 +26,7 @@ export const updatePrinterEnabledRule = {
 export const updatePrinterConnectionSettingRules = {
   printerType: `required|integer|in:${OctoprintType},${MoonrakerType}`,
   printerURL: "required|httpurl",
-  apiKey: `requiredIf:printerType,${OctoprintType}|length:${UUID_LENGTH},${UUID_LENGTH}|alphaNumeric`,
+  apiKey: `requiredIf:printerType,${OctoprintType}|length:${apiKeyLengthMaxDefault},${apiKeyLengthMinDefault}|alphaNumeric`,
 };
 
 export const createOctoPrintBackupRules = {

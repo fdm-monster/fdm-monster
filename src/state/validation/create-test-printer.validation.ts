@@ -1,9 +1,9 @@
-import { UUID_LENGTH } from "@/constants/service.constants";
+import { apiKeyLengthMaxDefault, apiKeyLengthMinDefault } from "@/constants/service.constants";
 import { MoonrakerType, OctoprintType } from "@/services/printer-api.interface";
 
 export const createTestPrinterRules = {
   printerType: `required|integer|in:${OctoprintType},${MoonrakerType}`,
   correlationToken: "required|string",
-  apiKey: `requiredIf:printerType,${OctoprintType}|length:${UUID_LENGTH},${UUID_LENGTH}|alphaNumeric`,
+  apiKey: `requiredIf:printerType,${OctoprintType}|length:${apiKeyLengthMaxDefault},${apiKeyLengthMinDefault}|alphaNumeric`,
   printerURL: "required|httpurl",
 };
