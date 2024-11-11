@@ -5,7 +5,7 @@ export const createMongoPrinterRules = {
   _id: "not",
   printerURL: "required|httpurl",
   printerType: `required|integer|in:${OctoprintType},${MoonrakerType}`,
-  apiKey: `requiredIf:printerType,${OctoprintType}|length:${apiKeyLengthMaxDefault},${apiKeyLengthMinDefault}|alphaNumeric`,
+  apiKey: `requiredIf:printerType,${OctoprintType}|length:${apiKeyLengthMaxDefault},${apiKeyLengthMinDefault}|alphaDash`,
   enabled: "boolean",
   name: "string",
 };
@@ -13,7 +13,7 @@ export const createMongoPrinterRules = {
 export const createPrinterRules = {
   printerURL: "required|httpurl",
   printerType: `required|integer|in:${OctoprintType},${MoonrakerType}`,
-  apiKey: `requiredIf:printerType,${OctoprintType}|length:${apiKeyLengthMaxDefault},${apiKeyLengthMinDefault}|alphaNumeric`,
+  apiKey: `requiredIf:printerType,${OctoprintType}|length:${apiKeyLengthMaxDefault},${apiKeyLengthMinDefault}|alphaDash`,
   enabled: "boolean",
   name: "required|string",
 };

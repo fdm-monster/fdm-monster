@@ -11,7 +11,7 @@ export const feedRateRules = {
 
 export const testPrinterApiRules = {
   printerType: `required|integer|in:${OctoprintType},${MoonrakerType}`,
-  apiKey: `requiredIf:printerType,${OctoprintType}|length:${apiKeyLengthMaxDefault},${apiKeyLengthMinDefault}|alphaNumeric`,
+  apiKey: `requiredIf:printerType,${OctoprintType}|length:${apiKeyLengthMaxDefault},${apiKeyLengthMinDefault}|alphaDash`,
   printerURL: "required|httpurl",
 };
 
@@ -26,7 +26,7 @@ export const updatePrinterEnabledRule = {
 export const updatePrinterConnectionSettingRules = {
   printerType: `required|integer|in:${OctoprintType},${MoonrakerType}`,
   printerURL: "required|httpurl",
-  apiKey: `requiredIf:printerType,${OctoprintType}|length:${apiKeyLengthMaxDefault},${apiKeyLengthMinDefault}|alphaNumeric`,
+  apiKey: `requiredIf:printerType,${OctoprintType}|length:${apiKeyLengthMaxDefault},${apiKeyLengthMinDefault}|alphaDash`,
 };
 
 export const createOctoPrintBackupRules = {
