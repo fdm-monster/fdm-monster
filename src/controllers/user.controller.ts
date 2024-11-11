@@ -8,7 +8,7 @@ import { idRulesV2 } from "./validation/generic.validation";
 import { BadRequestException, ForbiddenError } from "@/exceptions/runtime.exceptions";
 import { IConfigService } from "@/services/core/config.service";
 import { IUserService } from "@/services/interfaces/user-service.interface";
-import { demoUserNotAllowed, demoUserNotAllowedInterceptor } from "@/middleware/demo.middleware";
+import { demoUserNotAllowed } from "@/middleware/demo.middleware";
 import { IRoleService } from "@/services/interfaces/role-service.interface";
 import { IAuthService } from "@/services/interfaces/auth.service.interface";
 import { LoggerService } from "@/handlers/logger";
