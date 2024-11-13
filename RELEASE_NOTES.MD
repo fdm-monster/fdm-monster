@@ -1,12 +1,16 @@
 # Develop
 
+## Features:
+
+- User API: new endpoint which registers user directly with roles and without verification step
+ 
 # FDM Monster 11/11/2024 1.7.3
 
 ## Fixes:
 
 - BaseService: catch null or undefined id before querying database
 - Add set user roles API to avoid users staying in limbo with GUEST role after verification.
-- User API apply consistent string number coercion in user API to avoid unexpected ID comparison
+- User API: apply consistent string number coercion in user API to avoid unexpected ID comparison
 
 # FDM Monster 11/11/2024 1.7.2
 

@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { AppConstants } from "@/server.constants";
 import { authenticate, authorizeRoles } from "@/middleware/authenticate";
 import { ROLES } from "@/constants/authorization.constants";
-import { validateInput } from "@/handlers/validators";
+import { validateInput, validateMiddleware } from "@/handlers/validators";
 import { idRulesV2 } from "./validation/generic.validation";
 import { BadRequestException, ForbiddenError } from "@/exceptions/runtime.exceptions";
 import { IConfigService } from "@/services/core/config.service";
@@ -16,6 +16,7 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { errorSummary } from "@/utils/error.utils";
 import { SettingsStore } from "@/state/settings.store";
 import { before, DELETE, GET, POST, route } from "awilix-express";
+import { registerUserRules, registerUserWithRolesRules } from "@/controllers/validation/user-controller.validation";
 
 @route(AppConstants.apiRoute + "/user")
 @before([authenticate()])
@@ -60,6 +61,32 @@ export class UserController {
   async list(req: Request, res: Response) {
     const users = await this.userService.listUsers();
     res.send(users.map((u) => this.userService.toDto(u)));
+  }
+
+  @POST()
+  @route("/")
+  @before([authorizeRoles([ROLES.ADMIN])])
+  async create(req: Request, res: Response) {
+    const { username, password, roleIds } = await validateMiddleware(req, registerUserWithRolesRules(this.isTypeormMode));
+    if (
+      username.toLowerCase().includes("admin") ||
+      username.toLowerCase().includes("root") ||
+      username.toLowerCase() === "demo"
+    ) {
+      throw new BadRequestException("Username is not allowed");
+    }
+
+    await this.userService.register({
+      username,
+      password,
+      roles: roleIds,
+      needsPasswordChange: false,
+      isDemoUser: false,
+      isRootUser: false,
+      // An admin needs to verify the user first
+      isVerified: true,
+    });
+    res.send();
   }
 
   @GET()
