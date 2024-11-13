@@ -15,6 +15,7 @@ import { PrinterUnsafeDto } from "@/services/interfaces/printer.dto";
 import { IdType } from "@/shared.constants";
 import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
 import { moonrakerEvent } from "@/services/moonraker/constants/websocket.constants";
+import { printerEvents } from "@/constants/event.constants";
 
 export class TestPrinterSocketStore {
   testSocket: IWebsocketAdapter;
@@ -22,6 +23,7 @@ export class TestPrinterSocketStore {
   socketFactory: SocketFactory;
   eventEmitter2: EventEmitter2;
   logger: LoggerService;
+
   constructor({
     socketFactory,
     socketIoGateway,
@@ -120,6 +122,9 @@ export class TestPrinterSocketStore {
       if (this.testSocket) {
         this.testSocket.close();
       }
+      this.eventEmitter2.emit(printerEvents.printersDeleted, {
+        printerIds: [correlationToken],
+      });
       delete this.testSocket;
       testEvents.forEach((te) => {
         this.eventEmitter2.off(te, listener);

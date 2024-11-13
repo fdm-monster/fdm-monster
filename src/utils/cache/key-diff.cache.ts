@@ -75,6 +75,11 @@ export class KeyDiffCache<T> {
       throw new Error("Key must be a non-empty serializable string");
     }
 
+    // We dont accept deleted key updates
+    if (this.deletedKeys.includes(keyString)) {
+      return;
+    }
+
     this.keyValueStore[keyString] = value;
     if (markUpdated) {
       this.markUpdated(keyString);

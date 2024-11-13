@@ -102,18 +102,18 @@ export class PrinterCache extends KeyDiffCache<CachedPrinter> {
     };
   }
 
-  async handleBatchPrinterCreated({ printers }) {
+  private async handleBatchPrinterCreated({ printers }) {
     const mappedPrinters = this.mapArray(printers);
     const keyValues = mappedPrinters.map((p) => ({ key: this.getId(p), value: p }));
     await this.setKeyValuesBatch(keyValues, true);
   }
 
-  async handlePrinterCreatedOrUpdated({ printer }) {
+  private async handlePrinterCreatedOrUpdated({ printer }) {
     const printerDto = this.map(printer);
     await this.setKeyValue(printerDto.id, printerDto, true);
   }
 
-  async handlePrintersDeleted({ printerIds }: { printerIds: keyType[] }) {
+  private async handlePrintersDeleted({ printerIds }: { printerIds: keyType[] }) {
     await this.deleteKeysBatch(printerIds, true);
   }
 

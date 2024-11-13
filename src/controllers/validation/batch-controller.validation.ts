@@ -1,4 +1,4 @@
-import { idRuleV2, idRulesV2 } from "@/controllers/validation/generic.validation";
+import { idRuleV2 } from "@/controllers/validation/generic.validation";
 
 export const batchPrinterRules = (isSqlite: boolean) => ({
   printerIds: "required|array",

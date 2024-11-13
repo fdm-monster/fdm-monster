@@ -126,6 +126,16 @@ describe(UserController.name, () => {
     expectOkResponse(response);
   });
 
+  it("should create registered user", async function () {
+    const role = await roleService.getSynchronizedRoleByName(ROLES.OPERATOR);
+    const response = await request.post(defaultRoute).send({
+      username: "david",
+      password: "test1234",
+      roleIds: [role.id],
+    });
+    expectOkResponse(response);
+  });
+
   it("should set user roles", async function () {
     const { token, refreshToken } = await loginTestUser(request, "fakeuser");
 
