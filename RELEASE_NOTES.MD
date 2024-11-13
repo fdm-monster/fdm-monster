@@ -1,5 +1,7 @@
 # Develop
 
+# FDM Monster 13/11/2024 1.7.4
+
 ## Features:
 
 - User API: new endpoint which registers user directly with roles and without verification step
