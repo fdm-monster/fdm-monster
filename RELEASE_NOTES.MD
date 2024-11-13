@@ -3,7 +3,11 @@
 ## Features:
 
 - User API: new endpoint which registers user directly with roles and without verification step
- 
+
+## Fixes: 
+
+- PrinterEventsCache: when printers and test printers are deleted, the printer events cache should not be allowed to be filled by late update events
+
 # FDM Monster 11/11/2024 1.7.3
 
 ## Fixes:

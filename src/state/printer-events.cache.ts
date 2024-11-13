@@ -93,7 +93,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
     await this.setKeyValue(printerId, ref);
   }
 
-  async handlePrintersDeleted({ printerIds }: { printerIds: IdType[] }) {
+  private async handlePrintersDeleted({ printerIds }: { printerIds: IdType[] }) {
     await this.deleteKeysBatch(printerIds);
   }
 
