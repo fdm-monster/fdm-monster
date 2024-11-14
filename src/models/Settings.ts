@@ -43,8 +43,6 @@ export interface IServerSettings {
   debugSettings: IDebugSettings;
   loginRequired: boolean;
   registration: boolean;
-  whitelistEnabled: boolean;
-  whitelistedIpAddresses: string[];
   experimentalMoonrakerSupport: boolean;
   experimentalClientSupport: boolean;
 }
@@ -184,17 +182,6 @@ const SettingsSchema = new Schema<ISettings>({
       default: false,
       required: true,
     },
-    // TODO: Feature not fully tested/implemented yet
-    whitelistEnabled: {
-      type: Boolean,
-      default: false,
-      required: true,
-    },
-    whitelistedIpAddresses: [
-      {
-        type: String,
-      },
-    ],
     experimentalMoonrakerSupport: {
       type: Boolean,
       default: false,

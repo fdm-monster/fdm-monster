@@ -1,5 +1,9 @@
 # Develop
 
+## Features
+
+- Remove whitelist settings from database, API, validation and remove IP package (CVE)
+
 # FDM Monster 13/11/2024 1.7.4
 
 ## Features:

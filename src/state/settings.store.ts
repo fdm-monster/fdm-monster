@@ -73,8 +73,6 @@ export class SettingsStore {
       },
       [serverSettingsKey]: {
         debugSettings: settings[serverSettingsKey].debugSettings,
-        whitelistEnabled: settings[serverSettingsKey].whitelistEnabled,
-        whitelistedIpAddresses: settings[serverSettingsKey].whitelistedIpAddresses,
         experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
         experimentalTypeormSupport: this.isTypeOrmMode,
         experimentalClientSupport: settings[serverSettingsKey].experimentalClientSupport,
@@ -176,14 +174,6 @@ export class SettingsStore {
   async setLoginRequired(loginRequired = true) {
     this.settings = await this.settingsService.patchServerSettings({
       loginRequired,
-    });
-    return this.getSettings();
-  }
-
-  async setWhitelist(whitelistEnabled = true, whitelistedIpAddresses: string[]) {
-    this.settings = await this.settingsService.patchServerSettings({
-      whitelistEnabled,
-      whitelistedIpAddresses,
     });
     return this.getSettings();
   }

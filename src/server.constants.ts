@@ -22,8 +22,6 @@ export const AppConstants = {
   apiRoute: "/api",
   enableClientDistAutoUpdateKey: "ENABLE_CLIENT_DIST_AUTO_UPDATE",
 
-  // This whitelist feature is experimental and may be removed or altered in the future
-  ENABLE_EXPERIMENTAL_WHITELIST_SETTINGS: "ENABLE_EXPERIMENTAL_WHITELIST_SETTINGS",
   // Boolean string (true/false), persisted always
   OVERRIDE_LOGIN_REQUIRED: "OVERRIDE_LOGIN_REQUIRED",
   // Boolean string (true/false), persisted always
