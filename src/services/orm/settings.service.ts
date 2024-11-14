@@ -8,7 +8,6 @@ import {
   getDefaultFrontendSettings,
   getDefaultServerSettings,
   getDefaultTimeout,
-  getDefaultWhitelistIpAddresses,
   getDefaultWizardSettings,
   serverSettingsKey,
   timeoutSettingKey,
@@ -27,12 +26,8 @@ import {
 import { SqliteIdType } from "@/shared.constants";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
 import { ICredentialSettings } from "@/models/Settings";
-import { BadRequestException } from "@/exceptions/runtime.exceptions";
-import { AppConstants } from "@/server.constants";
 import { IConfigService } from "@/services/core/config.service";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
-import { validateInput } from "@/handlers/validators";
-import { whitelistSettingUpdateRules } from "@/services/validators/settings-service.validation";
 
 export class SettingsService2 extends BaseService(Settings, SettingsDto) implements ISettingsService<SqliteIdType, Settings> {
   configService: IConfigService;
@@ -177,15 +172,19 @@ export class SettingsService2 extends BaseService(Settings, SettingsDto) impleme
     }
     if (!entity[serverSettingsKey]) {
       entity[serverSettingsKey] = getDefaultServerSettings();
+    } else {
+      // Remove superfluous settings
+      entity[serverSettingsKey] = {
+        debugSettings: entity[serverSettingsKey].debugSettings,
+        loginRequired: entity[serverSettingsKey].loginRequired,
+        registration: entity[serverSettingsKey].registration,
+        experimentalClientSupport: entity[serverSettingsKey].experimentalClientSupport,
+        experimentalMoonrakerSupport: entity[serverSettingsKey].experimentalMoonrakerSupport,
+        sentryDiagnosticsEnabled: entity[serverSettingsKey].sentryDiagnosticsEnabled,
+      };
     }
     if (!entity[credentialSettingsKey]) {
       entity[credentialSettingsKey] = getDefaultCredentialSettings();
-    }
-    if (!this.isWhiteListSettingEnabled()) {
-      entity.server.whitelistEnabled = false;
-      entity.server.whitelistedIpAddresses = getDefaultWhitelistIpAddresses();
-    } else if (!entity.server.whitelistedIpAddresses?.length) {
-      entity.server.whitelistedIpAddresses = getDefaultWhitelistIpAddresses();
     }
     if (!entity[frontendSettingKey]) {
       entity[frontendSettingKey] = getDefaultFrontendSettings();
@@ -241,28 +240,5 @@ export class SettingsService2 extends BaseService(Settings, SettingsDto) impleme
     entity[serverSettingsKey].sentryDiagnosticsEnabled = enabled;
     await this.update(entity.id, entity);
     return entity;
-  }
-
-  async setWhitelist(enabled: boolean, ipAddresses: string[]): Promise<Settings> {
-    if (!this.isWhiteListSettingEnabled()) {
-      throw new BadRequestException("Whitelist settings are not enabled");
-    }
-    await validateInput(
-      {
-        whitelistEnabled: enabled,
-        whitelistedIpAddresses: ipAddresses,
-      },
-      whitelistSettingUpdateRules
-    );
-
-    const entity = await this.getOrCreate();
-    entity[serverSettingsKey].whitelistEnabled = enabled;
-    entity[serverSettingsKey].whitelistedIpAddresses = ipAddresses;
-    await this.update(entity.id, entity);
-    return entity;
-  }
-
-  isWhiteListSettingEnabled() {
-    return this.configService.get(AppConstants.ENABLE_EXPERIMENTAL_WHITELIST_SETTINGS, "false") === "true";
   }
 }

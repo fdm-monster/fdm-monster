@@ -6,7 +6,7 @@ import helmet from "helmet";
 import { scopePerRequest } from "awilix-express";
 import { configureContainer } from "./container";
 import { interceptDatabaseError } from "./middleware/database";
-import { interceptRoles, validateWhitelistedIp, validateWizardCompleted } from "./middleware/global.middleware";
+import { interceptRoles, validateWizardCompleted } from "./middleware/global.middleware";
 import { initializePassportStrategies } from "./middleware/passport";
 import { AppConstants } from "@/server.constants";
 import { join } from "path";
@@ -45,7 +45,6 @@ export async function setupServer() {
     .use(scopePerRequest(container))
     .use(interceptDatabaseError)
     // Global guards
-    .use(validateWhitelistedIp)
     .use(validateWizardCompleted)
     .use(interceptRoles);
 

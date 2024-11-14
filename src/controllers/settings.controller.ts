@@ -12,12 +12,10 @@ import {
   sentryDiagnosticsEnabledRules,
   serverSettingsUpdateRules,
   timeoutSettingsUpdateRules,
-  whitelistSettingUpdateRules,
 } from "@/services/validators/settings-service.validation";
 import { SettingsStore } from "@/state/settings.store";
 import { Request, Response } from "express";
 import { address } from "ip";
-import { IpWhitelistSettingsDto } from "@/services/interfaces/settings.dto";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 import { demoUserNotAllowed, demoUserNotAllowedInterceptor } from "@/middleware/demo.middleware";
@@ -105,18 +103,6 @@ export class SettingsController {
     res.send(result);
   }
 
-  async updateWhitelistSettings(req: Request, res: Response) {
-    const { whitelistEnabled, whitelistedIpAddresses } = await validateInput<IpWhitelistSettingsDto>(
-      req.body,
-      whitelistSettingUpdateRules
-    );
-    if (!whitelistedIpAddresses.includes("127.0.0.1")) {
-      whitelistedIpAddresses.push("127.0.0.1");
-    }
-    await this.settingsStore.setWhitelist(whitelistEnabled, whitelistedIpAddresses);
-    res.send();
-  }
-
   async updateFrontendSettings(req: Request, res: Response) {
     const validatedInput = await validateInput(req.body, frontendSettingsUpdateRules);
     const result = await this.settingsStore.updateFrontendSettings(validatedInput);
@@ -124,9 +110,7 @@ export class SettingsController {
   }
 
   async updateServerSettings(req: Request, res: Response) {
-    const isWhitelistFeatureEnabled =
-      this.configService.get(AppConstants.ENABLE_EXPERIMENTAL_WHITELIST_SETTINGS, "false") === "true";
-    const validatedInput = await validateInput(req.body, serverSettingsUpdateRules(isWhitelistFeatureEnabled));
+    const validatedInput = await validateInput(req.body, serverSettingsUpdateRules);
     const result = await this.settingsStore.updateServerSettings(validatedInput);
     res.send(result);
   }
@@ -176,6 +160,5 @@ export default createController(SettingsController)
     .put("/registration-enabled", "updateRegistrationEnabledSettings", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
     .put("/credential", "updateCredentialSettings", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
     .put("/file-clean", "updateFileCleanSettings", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
-    .put("/whitelist", "updateWhitelistSettings", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
     .put("/frontend", "updateFrontendSettings", { before: [authorizeRoles([ROLES.ADMIN])] })
     .put("/timeout", "updateTimeoutSettings", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] });

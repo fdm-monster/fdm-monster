@@ -13,8 +13,6 @@ export interface ISettingsService<KeyType = IdType, Entity = ISettings> {
 
   patchWizardSettings(patch: Partial<IWizardSettings>): Promise<Entity>;
 
-  setWhitelist(enabled: boolean, ipAddresses: string[]): Promise<Entity>;
-
   updateFrontendSettings(patchUpdate: IFrontendSettings): Promise<Entity>;
 
   patchCredentialSettings(patchUpdate: Partial<ICredentialSettings>): Promise<Entity>;

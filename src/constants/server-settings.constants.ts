@@ -9,8 +9,6 @@ import {
   WizardSettingsDto,
 } from "@/services/interfaces/settings.dto";
 
-export const getDefaultWhitelistIpAddresses = () => ["::12", "127.0.0.1"];
-
 export const wizardSettingKey = "wizard";
 export const getDefaultWizardSettings = (): WizardSettingsDto => ({
   wizardCompleted: false,
@@ -31,8 +29,6 @@ export const getDefaultServerSettings = (): ServerSettingsDto => ({
   sentryDiagnosticsEnabled: false,
   loginRequired: true,
   registration: false,
-  whitelistEnabled: false,
-  whitelistedIpAddresses: getDefaultWhitelistIpAddresses(),
   experimentalMoonrakerSupport: false,
   experimentalTypeormSupport: false,
   experimentalClientSupport: false,
