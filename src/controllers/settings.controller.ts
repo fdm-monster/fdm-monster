@@ -15,7 +15,6 @@ import {
 } from "@/services/validators/settings-service.validation";
 import { SettingsStore } from "@/state/settings.store";
 import { Request, Response } from "express";
-import { address } from "ip";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 import { demoUserNotAllowed, demoUserNotAllowedInterceptor } from "@/middleware/demo.middleware";
@@ -56,13 +55,10 @@ export class SettingsController {
   }
 
   getSettings(req: Request, res: Response) {
-    // Safely get IP address
     let connection;
     try {
-      const serverIp = address();
       connection = {
         clientIp: req.socket?.remoteAddress,
-        ip: serverIp,
         version: this.serverVersion,
       };
     } catch (e) {
