@@ -22,7 +22,7 @@ jobs:
           NODE_OPTIONS: '--max_old_space_size=8192'
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           flags: server-nodejs
           token: ${{ secrets.CODECOV_TOKEN }}
