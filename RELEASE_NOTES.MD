@@ -3,6 +3,7 @@
 ## Fixes
 
 - Demo mode should never show first-time-setup. It would always return "first time setup completed: false". Now this will return true.
+- Incorrect UI state "No USB" shown, when OctoPrint USB is disconnected.
 
 ## Features
 
