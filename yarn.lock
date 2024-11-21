@@ -2567,10 +2567,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/semantic-conventions@npm:1.27.0, @opentelemetry/semantic-conventions@npm:^1.27.0":
+"@opentelemetry/semantic-conventions@npm:1.27.0":
   version: 1.27.0
   resolution: "@opentelemetry/semantic-conventions@npm:1.27.0"
   checksum: 10c0/b859773ba06b7e53dd9c6b45a171bf3000e405733adbf462ae91004ed011bc80edb5beecb817fb344a085adfd06045ab5b729c9bd0f1479650ad377134fb798c
+  languageName: node
+  linkType: hard
+
+"@opentelemetry/semantic-conventions@npm:^1.27.0":
+  version: 1.28.0
+  resolution: "@opentelemetry/semantic-conventions@npm:1.28.0"
+  checksum: 10c0/deb8a0f744198071e70fea27143cf7c9f7ecb7e4d7b619488c917834ea09b31543c1c2bcea4ec5f3cf68797f0ef3549609c14e859013d9376400ac1499c2b9cb
   languageName: node
   linkType: hard
 
@@ -3392,11 +3399,11 @@ __metadata:
   linkType: hard
 
 "@swc/types@npm:^0.1.15":
-  version: 0.1.15
-  resolution: "@swc/types@npm:0.1.15"
+  version: 0.1.16
+  resolution: "@swc/types@npm:0.1.16"
   dependencies:
     "@swc/counter": "npm:^0.1.3"
-  checksum: 10c0/82bcfa64e53c6c93ae162fe9e491e5f300227fad6f110e32d9718e5a0e29586bc79c516234f6eccbe5ccd7ed72b514a21f03196a54408cf1b7b47c072fad44f0
+  checksum: 10c0/ca079125ef4c619a4ae908a9d6b99e526e0e21d54443585da9904e9e67a3e7320189843639c6e4435d807dfae5837ab3083a18e86f698e1decf00ecc277ab0ec
   languageName: node
   linkType: hard
 
@@ -8227,9 +8234,9 @@ __metadata:
   linkType: hard
 
 "libphonenumber-js@npm:^1.10.53":
-  version: 1.11.14
-  resolution: "libphonenumber-js@npm:1.11.14"
-  checksum: 10c0/59fef763545eac4aa3cd81305adb4c23712a7d780434fd7384973a6a5b628daa61dbe093a5ce1fbf5fb73b98bbf2a4966d41e2f897c5d5c528c31456a8bf0f46
+  version: 1.11.15
+  resolution: "libphonenumber-js@npm:1.11.15"
+  checksum: 10c0/eb1794ee38d2bc3087f7e5596740949493c745fe4734c5bcee3cf51344da16e1ea49c96fcc19c57eac36ebfffda6d328cbdbaff7bc26714a594a4a98f7789153
   languageName: node
   linkType: hard
 
