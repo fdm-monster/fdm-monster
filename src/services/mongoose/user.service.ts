@@ -4,7 +4,7 @@ import { validateInput } from "@/handlers/validators";
 import { newPasswordRules, registerUserRules } from "../validators/user-service.validation";
 import { ROLES } from "@/constants/authorization.constants";
 import { comparePasswordHash, hashPassword } from "@/utils/crypto.utils";
-import { RoleService } from "@/services/authentication/role.service";
+import { RoleService } from "@/services/mongoose/role.service";
 import { IUserService } from "@/services/interfaces/user-service.interface";
 import { MongoIdType } from "@/shared.constants";
 import { RegisterUserDto, UserDto } from "@/services/interfaces/user.dto";
@@ -95,7 +95,7 @@ export class UserService implements IUserService<MongoIdType> {
     const role = this.roleService.getRoleByName(ROLES.ADMIN);
     if (user.roles.includes(role.id)) {
       const administrators = await this.findUsersByRoleId(role.id);
-      if (administrators?.length === 1) {
+      if (administrators?.length === 1 && administrators[0].id === userId) {
         throw new InternalServerException("Cannot delete the last user with ADMIN role");
       }
     }
@@ -143,7 +143,7 @@ export class UserService implements IUserService<MongoIdType> {
     if (!isRootUser) {
       // Ensure at least one user is root user
       const rootUsers = await this.findRootUsers();
-      if (rootUsers.length === 1) {
+      if (rootUsers.filter((u) => u.id !== userId).length === 1) {
         throw new InternalServerException("Cannot set the last root user to non-root user");
       }
     }

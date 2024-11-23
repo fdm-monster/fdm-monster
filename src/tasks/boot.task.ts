@@ -12,9 +12,9 @@ import { PluginFirmwareUpdateService } from "@/services/octoprint/plugin-firmwar
 import { ConfigService } from "@/services/core/config.service";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { PrinterFilesStore } from "@/state/printer-files.store";
-import { PermissionService } from "@/services/authentication/permission.service";
-import { RoleService } from "@/services/authentication/role.service";
-import { UserService } from "@/services/authentication/user.service";
+import { PermissionService } from "@/services/mongoose/permission.service";
+import { RoleService } from "@/services/mongoose/role.service";
+import { UserService } from "@/services/mongoose/user.service";
 import { PluginRepositoryCache } from "@/services/octoprint/plugin-repository.cache";
 import { ClientBundleService } from "@/services/core/client-bundle.service";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
