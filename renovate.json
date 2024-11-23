@@ -1,8 +1,11 @@
 {
-  "extends": ["config:base"],
+  "extends": ["config:recommended"],
   "assignees": [],
   "labels": ["renovate"],
-  "lockFileMaintenance": { "enabled": true, "extends": ["schedule:daily"] },
+  "lockFileMaintenance": {
+    "enabled": true,
+    "extends": ["schedule:daily"]
+  },
   "packageRules": [
     {
       "matchDatasources": ["docker"],
@@ -16,7 +19,13 @@
       "enabled": true
     },
     {
-      "matchUpdateTypes": ["minor", "patch", "pin", "digest", "lockFileMaintenance"],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "pin",
+        "digest",
+        "lockFileMaintenance"
+      ],
       "enabled": true,
       "automerge": true
     }

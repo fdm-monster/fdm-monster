@@ -1,5 +1,16 @@
 # Develop
 
+# FDM Monster 23/11/2024 1.7.5
+
+## Fixes
+
+- Demo mode should never show first-time-setup. It would always return "first time setup completed: false". Now this will return true.
+- Incorrect UI state "No USB" shown, when OctoPrint USB is disconnected.
+
+## Features
+
+- Remove whitelist settings from database, API, validation and remove IP package (CVE)
+
 # FDM Monster 13/11/2024 1.7.4
 
 ## Features:

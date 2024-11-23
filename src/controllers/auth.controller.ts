@@ -47,7 +47,6 @@ export class AuthController {
   }
 
   async login(req: Request, res: Response) {
-    // TODO sensitivity filter
     this.logger.debug(`Login attempt from IP ${req.ip} and user-agent ${req.headers["user-agent"]}`);
     const tokens = await this.authService.loginUser(req.body.username, req.body.password);
     return res.send(tokens);
@@ -60,7 +59,7 @@ export class AuthController {
     const isDemoMode = this.configService.isDemoMode();
     wizardState = {
       ...wizardState,
-      wizardCompleted: isDemoMode ? false : wizardState.wizardCompleted,
+      wizardCompleted: isDemoMode ? true : wizardState.wizardCompleted,
     };
     res.send({ loginRequired, registration, wizardState, isDemoMode });
   }

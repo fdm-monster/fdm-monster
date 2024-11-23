@@ -27,8 +27,6 @@ export class Settings extends BaseEntity {
     };
     loginRequired: boolean;
     registration: boolean;
-    whitelistEnabled: boolean;
-    whitelistedIpAddresses: string[];
     experimentalMoonrakerSupport: boolean;
     experimentalClientSupport: boolean;
   };

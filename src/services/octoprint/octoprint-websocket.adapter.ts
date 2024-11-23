@@ -227,7 +227,8 @@ export class OctoprintWebsocketAdapter extends WebsocketAdapter {
   private async updateCurrentStateSafely() {
     try {
       const current = await this.octoprintClient.getPrinterCurrent(this.login, true);
-      const job = await this.octoprintClient.getJob(this.login);
+      const isOperational = current.data?.state?.flags?.operational;
+      const job = isOperational ? await this.octoprintClient.getJob(this.login) : {};
       this.setApiState(API_STATE.responding);
       return await this.emitEvent("current", { ...current.data, progress: job?.progress, job: job?.job });
     } catch (e) {

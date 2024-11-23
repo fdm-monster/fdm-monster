@@ -1,12 +1,10 @@
 import {
-  credentialSettingsKey,
   printerFileCleanSettingKey,
   frontendSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
   wizardSettingKey,
 } from "@/constants/server-settings.constants";
-import { IdDto, IdType } from "@/shared.constants";
 
 export interface DebugSettingsDto {
   debugSocketIoEvents: boolean;
@@ -17,17 +15,10 @@ export interface DebugSettingsDto {
   debugSocketIoBandwidth: boolean;
 }
 
-export class IpWhitelistSettingsDto {
-  whitelistedIpAddresses: string[];
-  whitelistEnabled: boolean;
-}
-
 export interface ServerSettingsDto {
   sentryDiagnosticsEnabled: boolean;
   registration: boolean;
   loginRequired: boolean;
-  whitelistEnabled: boolean;
-  whitelistedIpAddresses: string[];
   debugSettings: DebugSettingsDto;
   experimentalMoonrakerSupport: boolean;
   experimentalTypeormSupport: boolean;

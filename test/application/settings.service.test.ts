@@ -22,8 +22,4 @@ describe(SettingsService.name, () => {
     const dto = settingsService.toDto(freshSettings);
     expect(dto).toBeTruthy();
   });
-
-  it("should set whitelist", async () => {
-    await settingsService.setWhitelist(true, ["127.0.0.1"]);
-  });
 });

@@ -25,7 +25,6 @@ const experimentalMoonrakerSupport = `${defaultRoute}/experimental-moonraker-sup
 const experimentalClientSupport = `${defaultRoute}/experimental-client-support`;
 const frontendSettingsRoute = `${defaultRoute}/frontend`;
 const fileCleanSettingsRoute = `${defaultRoute}/file-clean`;
-const serverWhitelistRoute = `${defaultRoute}/whitelist`;
 const sentryDiagnosticsRoute = `${defaultRoute}/sentry-diagnostics`;
 
 beforeAll(async () => {
@@ -40,8 +39,6 @@ describe(SettingsController.name, () => {
     defaultSettings[serverSettingsKey].loginRequired = false; // Test override
     defaultSettings[serverSettingsKey].experimentalTypeormSupport = isSqliteModeTest();
     defaultSettings[serverSettingsKey].experimentalMoonrakerSupport = true;
-    delete defaultSettings[serverSettingsKey].whitelistEnabled;
-    delete defaultSettings[serverSettingsKey].whitelistedIpAddresses;
     delete defaultSettings[serverSettingsKey].debugSettings;
     delete defaultSettings[credentialSettingsKey];
     defaultSettings[wizardSettingKey].wizardCompleted = true;
@@ -87,23 +84,6 @@ describe(SettingsController.name, () => {
   it("should OK on PATCH sentry diagnostics ", async () => {
     const response = await request.patch(sentryDiagnosticsRoute).send({
       enabled: true,
-    });
-    expectOkResponse(response);
-  });
-
-  it("should OK on PUT whitelist settings ", async () => {
-    const response = await request.put(serverWhitelistRoute).send({
-      whitelistEnabled: true,
-      whitelistedIpAddresses: ["127.0.0", "192.178.168"],
-    });
-    expect(response.body).toStrictEqual({});
-
-    const sensitiveSettings = await request.get(sensitiveSettingsRoute).send();
-    expect(sensitiveSettings.body).toMatchObject({
-      [serverSettingsKey]: {
-        whitelistEnabled: true,
-        whitelistedIpAddresses: ["127.0.0", "192.178.168", "127.0.0.1"],
-      },
     });
     expectOkResponse(response);
   });

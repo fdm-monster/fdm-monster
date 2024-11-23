@@ -9,7 +9,6 @@ import {
   getDefaultServerSettings,
   getDefaultSettings,
   getDefaultTimeout,
-  getDefaultWhitelistIpAddresses,
   getDefaultWizardSettings,
   serverSettingsKey,
   timeoutSettingKey,
@@ -22,7 +21,6 @@ import {
   frontendSettingsUpdateRules,
   serverSettingsUpdateRules,
   timeoutSettingsUpdateRules,
-  whitelistSettingUpdateRules,
   wizardUpdateRules,
 } from "../validators/settings-service.validation";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
@@ -80,7 +78,7 @@ export class SettingsService implements ISettingsService<MongoIdType, ISettings>
   /**
    * Patch the given settings object manually - runtime migration strategy
    */
-  migrateSettingsRuntime(knownSettings: Partial<SettingsDto<MongoIdType>>) {
+  migrateSettingsRuntime(knownSettings: Partial<ISettings>) {
     const doc = knownSettings; // alias _doc also works
     if (!doc[printerFileCleanSettingKey]) {
       doc[printerFileCleanSettingKey] = getDefaultFileCleanSettings();
@@ -102,15 +100,19 @@ export class SettingsService implements ISettingsService<MongoIdType, ISettings>
     }
     if (!doc[serverSettingsKey]) {
       doc[serverSettingsKey] = getDefaultServerSettings();
+    } else {
+      // Remove superfluous settings
+      doc[serverSettingsKey] = {
+        debugSettings: doc[serverSettingsKey].debugSettings,
+        loginRequired: doc[serverSettingsKey].loginRequired,
+        registration: doc[serverSettingsKey].registration,
+        experimentalClientSupport: doc[serverSettingsKey].experimentalClientSupport,
+        experimentalMoonrakerSupport: doc[serverSettingsKey].experimentalMoonrakerSupport,
+        sentryDiagnosticsEnabled: doc[serverSettingsKey].sentryDiagnosticsEnabled,
+      };
     }
     if (!doc[credentialSettingsKey]) {
       doc[credentialSettingsKey] = getDefaultCredentialSettings();
-    }
-    if (!this.isWhiteListSettingEnabled()) {
-      doc.server.whitelistEnabled = false;
-      doc.server.whitelistedIpAddresses = getDefaultWhitelistIpAddresses();
-    } else if (!doc.server.whitelistedIpAddresses?.length) {
-      doc.server.whitelistedIpAddresses = getDefaultWhitelistIpAddresses();
     }
     if (!doc[frontendSettingKey]) {
       doc[frontendSettingKey] = getDefaultFrontendSettings();
@@ -139,27 +141,6 @@ export class SettingsService implements ISettingsService<MongoIdType, ISettings>
     });
   }
 
-  async setWhitelist(enabled: boolean, ipAddresses: string[]) {
-    if (!this.isWhiteListSettingEnabled()) {
-      throw new BadRequestException("Whitelist settings are not enabled");
-    }
-
-    await validateInput(
-      {
-        whitelistEnabled: enabled,
-        whitelistedIpAddresses: ipAddresses,
-      },
-      whitelistSettingUpdateRules
-    );
-    const settingsDoc = await this.getOrCreate();
-    const settings = settingsDoc[serverSettingsKey];
-    settings.whitelistEnabled = enabled;
-    settings.whitelistedIpAddresses = ipAddresses;
-    return Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
-      new: true,
-    });
-  }
-
   async updateFrontendSettings(patchUpdate: IFrontendSettings) {
     const validatedInput = await validateInput(patchUpdate, frontendSettingsUpdateRules);
 
@@ -183,7 +164,7 @@ export class SettingsService implements ISettingsService<MongoIdType, ISettings>
   }
 
   async patchServerSettings(patchUpdate: Partial<IServerSettings>) {
-    const validatedInput = await validateInput(patchUpdate, serverSettingsUpdateRules(this.isWhiteListSettingEnabled()));
+    const validatedInput = await validateInput(patchUpdate, serverSettingsUpdateRules);
 
     const settingsDoc = await this.getOrCreate();
     const serverSettings = settingsDoc[serverSettingsKey];
@@ -202,9 +183,5 @@ export class SettingsService implements ISettingsService<MongoIdType, ISettings>
     return Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
       new: true,
     });
-  }
-
-  isWhiteListSettingEnabled() {
-    return this.configService.get(AppConstants.ENABLE_EXPERIMENTAL_WHITELIST_SETTINGS, "false") === "true";
   }
 }
