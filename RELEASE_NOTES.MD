@@ -1,5 +1,7 @@
 # Develop
 
+# FDM Monster 23/11/2024 1.7.5
+
 ## Fixes
 
 - Demo mode should never show first-time-setup. It would always return "first time setup completed: false". Now this will return true.
