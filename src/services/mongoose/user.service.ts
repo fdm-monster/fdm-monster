@@ -143,7 +143,7 @@ export class UserService implements IUserService<MongoIdType> {
     if (!isRootUser) {
       // Ensure at least one user is root user
       const rootUsers = await this.findRootUsers();
-      if (rootUsers.filter((u) => u.id !== userId).length === 1) {
+      if (rootUsers.length === 1 && rootUsers[0].id === userId) {
         throw new InternalServerException("Cannot set the last root user to non-root user");
       }
     }
