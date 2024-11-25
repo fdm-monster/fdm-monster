@@ -108,7 +108,7 @@
     "@types/bcryptjs": "2.4.6",
     "@types/cache-manager": "4.0.6",
     "@types/connect-history-api-fallback": "1.5.4",
-    "@types/cookie-parser": "1.4.7",
+    "@types/cookie-parser": "1.4.8",
     "@types/express": "5.0.0",
     "@types/ip": "1.1.3",
     "@types/jest": "29.5.14",
