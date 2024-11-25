@@ -6,10 +6,9 @@ import { authenticate, authorizeRoles } from "@/middleware/authenticate";
 import { Request, Response } from "express";
 import { ICameraStreamService } from "@/services/interfaces/camera-stream.service.interface";
 import { ROLES } from "@/constants/authorization.constants";
-import { printerResolveMiddleware } from "@/middleware/printer";
 
 @route(`${AppConstants.apiRoute}/camera-stream`)
-@before([authenticate(), authorizeRoles([ROLES.OPERATOR, ROLES.ADMIN]), printerResolveMiddleware()])
+@before([authenticate(), authorizeRoles([ROLES.OPERATOR, ROLES.ADMIN])])
 export class CameraStreamController {
   private readonly cameraStreamService: ICameraStreamService;
   private readonly isTypeormMode: boolean;
