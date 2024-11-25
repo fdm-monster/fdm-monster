@@ -1,5 +1,7 @@
 # Develop
 
+# FDM Monster 25/11/2024 1.7.6
+
 ## Fixes
 
 - UserService: MongoDB had incorrect root user checks and SQLite user service missed the check altogether. Now root user checks are robust. 
