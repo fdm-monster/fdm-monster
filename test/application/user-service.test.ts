@@ -1,7 +1,7 @@
 import { ensureTestUserCreated } from "../api/test-data/create-user";
 import { DITokens } from "@/container.tokens";
 import { ROLES } from "@/constants/authorization.constants";
-import { UserService } from "@/services/authentication/user.service";
+import { UserService } from "@/services/mongoose/user.service";
 import { setupTestApp } from "../test-server";
 import { SqliteIdType } from "@/shared.constants";
 import { IUserService } from "@/services/interfaces/user-service.interface";

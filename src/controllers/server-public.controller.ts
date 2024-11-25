@@ -4,12 +4,12 @@ import { isNode, isNodemon, isPm2 } from "@/utils/env.utils";
 import { authenticate, authorizePermission } from "@/middleware/authenticate";
 import { PERMS } from "@/constants/authorization.constants";
 import { isDocker } from "@/utils/is-docker";
-import { RoleService } from "@/services/authentication/role.service";
+import { RoleService } from "@/services/mongoose/role.service";
 import { SettingsStore } from "@/state/settings.store";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { ServerReleaseService } from "@/services/core/server-release.service";
 import { MonsterPiService } from "@/services/core/monsterpi.service";
-import { UserService } from "@/services/authentication/user.service";
+import { UserService } from "@/services/mongoose/user.service";
 import { Request, Response } from "express";
 
 export class ServerPublicController {
