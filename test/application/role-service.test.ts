@@ -1,7 +1,7 @@
 import { configureContainer } from "@/container";
 import { ROLES } from "@/constants/authorization.constants";
 import { DITokens } from "@/container.tokens";
-import { RoleService } from "@/services/authentication/role.service";
+import { RoleService } from "@/services/mongoose/role.service";
 import { AwilixContainer } from "awilix";
 import { IRoleService } from "@/services/interfaces/role-service.interface";
 import { SqliteIdType } from "@/shared.constants";

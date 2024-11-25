@@ -4,21 +4,33 @@ import { User } from "@/entities";
 import { SqliteIdType } from "@/shared.constants";
 import { IUserService } from "@/services/interfaces/user-service.interface";
 import { DeleteResult, In } from "typeorm";
-import { NotFoundException } from "@/exceptions/runtime.exceptions";
+import { InternalServerException, NotFoundException } from "@/exceptions/runtime.exceptions";
 import { validateInput } from "@/handlers/validators";
 import { newPasswordRules, registerUserRules } from "@/services/validators/user-service.validation";
 import { comparePasswordHash, hashPassword } from "@/utils/crypto.utils";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { UserRoleService } from "@/services/orm/user-role.service";
+import { ROLES } from "@/constants/authorization.constants";
+import { RoleService } from "@/services/orm/role.service";
 
 export class UserService extends BaseService(User, UserDto<SqliteIdType>) implements IUserService<SqliteIdType, User> {
   typeormService: TypeormService;
   userRoleService: UserRoleService;
+  roleService: RoleService;
 
-  constructor({ typeormService, userRoleService }: { typeormService: TypeormService; userRoleService: UserRoleService }) {
+  constructor({
+    typeormService,
+    userRoleService,
+    roleService,
+  }: {
+    typeormService: TypeormService;
+    userRoleService: UserRoleService;
+    roleService: RoleService;
+  }) {
     super({ typeormService });
 
     this.userRoleService = userRoleService;
+    this.roleService = roleService;
   }
 
   toDto(user: User): UserDto<SqliteIdType> {
@@ -66,8 +78,24 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
     return entity.isRootUser;
   }
 
-  deleteUser(userId: SqliteIdType): Promise<DeleteResult> {
-    return this.delete(userId);
+  async deleteUser(userId: SqliteIdType): Promise<DeleteResult> {
+    // Validate
+    const user = await this.getUser(userId);
+
+    if (user.isRootUser) {
+      throw new InternalServerException("Cannot delete a root user");
+    }
+
+    // Check if the user is the last admin
+    const role = this.roleService.getRoleByName(ROLES.ADMIN);
+    if (user.roles.find((r) => r.roleId == role.id)) {
+      const administrators = await this.findUsersByRoleId(role.id);
+      if (administrators?.length === 1 && administrators[0].id === userId) {
+        throw new InternalServerException("Cannot delete the last user with ADMIN role");
+      }
+    }
+
+    return await this.delete(userId);
   }
 
   findRawByUsername(username: string): Promise<User> {
@@ -79,6 +107,17 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
   }
 
   async setIsRootUserById(userId: SqliteIdType, isRootUser: boolean): Promise<void> {
+    const user = await this.getUser(userId);
+    if (!user) throw new NotFoundException("User not found");
+
+    if (!isRootUser) {
+      // Ensure at least one user is root user
+      const rootUsers = await this.findRootUsers();
+      if (rootUsers.length === 1 && rootUsers[0].id === userId) {
+        throw new InternalServerException("Cannot set the last root user to non-root user");
+      }
+    }
+
     await this.update(userId, { isRootUser });
   }
 
@@ -88,11 +127,28 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
   }
 
   async setVerifiedById(userId: SqliteIdType, isVerified: boolean): Promise<void> {
+    const user = await this.getUser(userId);
+    if (!user) throw new NotFoundException("User not found");
+
+    if (!isVerified) {
+      if (user.isRootUser) {
+        throw new InternalServerException("Cannot set a owner (root user) to unverified");
+      }
+
+      // Ensure at least one user is verified
+      const verifiedUsers = await this.findVerifiedUsers();
+      if (verifiedUsers.length === 1) {
+        throw new InternalServerException("Cannot set the last user to unverified");
+      }
+    }
+
     await this.update(userId, { isVerified });
   }
 
   async updatePasswordById(userId: SqliteIdType, oldPassword: string, newPassword: string): Promise<User> {
     const user = await this.getUser(userId);
+    if (!user) throw new NotFoundException("User not found");
+
     if (!comparePasswordHash(oldPassword, user.passwordHash)) {
       throw new NotFoundException("User old password incorrect");
     }
@@ -106,6 +162,8 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
     const { password } = await validateInput({ password: newPassword }, newPasswordRules);
     const passwordHash = hashPassword(password);
     const user = await this.findRawByUsername(username);
+    if (!user) throw new NotFoundException("User not found");
+
     return await this.update(user.id, { passwordHash, needsPasswordChange: false });
   }
 

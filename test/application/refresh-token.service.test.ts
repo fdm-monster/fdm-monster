@@ -1,4 +1,4 @@
-import { RefreshTokenService } from "@/services/authentication/refresh-token.service";
+import { RefreshTokenService } from "@/services/mongoose/refresh-token.service";
 import { AwilixContainer } from "awilix";
 import { configureContainer } from "@/container";
 import { DITokens } from "@/container.tokens";

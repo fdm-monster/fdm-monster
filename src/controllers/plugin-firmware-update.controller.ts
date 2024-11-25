@@ -4,7 +4,7 @@ import { authenticate, authorizeRoles } from "@/middleware/authenticate";
 import { ROLES } from "@/constants/authorization.constants";
 import { printerResolveMiddleware } from "@/middleware/printer";
 import { getScopedPrinter } from "@/handlers/validators";
-import { Cache } from "cache-manager";
+import { type Cache } from "cache-manager";
 import { PrinterCache } from "@/state/printer.cache";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { Request, Response } from "express";

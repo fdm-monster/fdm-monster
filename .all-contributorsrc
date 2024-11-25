@@ -38,7 +38,8 @@
       "profile": "https://github.com/Tobikisss",
       "contributions": [
         "ideas",
-        "maintenance"
+        "maintenance",
+        "bug"
       ]
     },
     {
@@ -186,6 +187,15 @@
       "profile": "https://github.com/callanova",
       "contributions": [
         "bug"
+      ]
+    },
+    {
+      "login": "thatguymendel",
+      "name": "thatguymendel",
+      "avatar_url": "https://avatars.githubusercontent.com/u/67444998?v=4",
+      "profile": "https://github.com/thatguymendel",
+      "contributions": [
+        "ideas"
       ]
     }
   ],
