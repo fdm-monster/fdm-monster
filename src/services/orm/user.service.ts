@@ -127,11 +127,28 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
   }
 
   async setVerifiedById(userId: SqliteIdType, isVerified: boolean): Promise<void> {
+    const user = await this.getUser(userId);
+    if (!user) throw new NotFoundException("User not found");
+
+    if (!isVerified) {
+      if (user.isRootUser) {
+        throw new InternalServerException("Cannot set a owner (root user) to unverified");
+      }
+
+      // Ensure at least one user is verified
+      const verifiedUsers = await this.findVerifiedUsers();
+      if (verifiedUsers.length === 1) {
+        throw new InternalServerException("Cannot set the last user to unverified");
+      }
+    }
+
     await this.update(userId, { isVerified });
   }
 
   async updatePasswordById(userId: SqliteIdType, oldPassword: string, newPassword: string): Promise<User> {
     const user = await this.getUser(userId);
+    if (!user) throw new NotFoundException("User not found");
+
     if (!comparePasswordHash(oldPassword, user.passwordHash)) {
       throw new NotFoundException("User old password incorrect");
     }
@@ -145,6 +162,8 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
     const { password } = await validateInput({ password: newPassword }, newPasswordRules);
     const passwordHash = hashPassword(password);
     const user = await this.findRawByUsername(username);
+    if (!user) throw new NotFoundException("User not found");
+
     return await this.update(user.id, { passwordHash, needsPasswordChange: false });
   }
 
