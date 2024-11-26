@@ -63,7 +63,7 @@
     "awilix-express": "9.0.1",
     "axios": "1.7.8",
     "bcryptjs": "2.4.3",
-    "better-sqlite3": "11.5.0",
+    "better-sqlite3": "11.6.0",
     "cache-manager": "6.2.0",
     "class-validator": "0.14.1",
     "connect-history-api-fallback": "2.0.0",
