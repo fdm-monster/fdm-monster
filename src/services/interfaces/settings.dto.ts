@@ -35,6 +35,7 @@ export interface FrontendSettingsDto {
   gridCols: number;
   gridRows: number;
   largeTiles: boolean;
+  tilePreferCancelOverQuickStop: boolean;
 }
 
 export interface FileCleanSettingsDto {

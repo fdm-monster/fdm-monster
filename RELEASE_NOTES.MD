@@ -1,5 +1,9 @@
 # Develop
 
+## Features
+
+- Settings: add grid setting to show cancel button instead of quick stop button
+
 # FDM Monster 25/11/2024 1.7.6
 
 ## Fixes
