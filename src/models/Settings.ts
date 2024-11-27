@@ -210,6 +210,11 @@ const SettingsSchema = new Schema<ISettings>({
       default: false,
       required: false,
     },
+    tilePreferCancelOverQuickStop: {
+      type: Boolean,
+      default: false,
+      required: false,
+    },
   },
   [timeoutSettingKey]: {
     apiTimeout: {
