@@ -1,4 +1,4 @@
-import supertest from "supertest";
+import { Test } from "supertest";
 import { setupTestApp } from "../test-server";
 import { expectOkResponse } from "../extensions";
 import { AppConstants } from "@/server.constants";
@@ -14,8 +14,9 @@ import {
 } from "@/constants/server-settings.constants";
 import { SettingsController } from "@/controllers/settings.controller";
 import { isSqliteModeTest } from "../typeorm.manager";
+import TestAgent from "supertest/lib/agent";
 
-let request: supertest.SuperTest<supertest.Test>;
+let request: TestAgent<Test>;
 
 const defaultRoute = `${AppConstants.apiRoute}/settings`;
 const sensitiveSettingsRoute = `${defaultRoute}/sensitive`;

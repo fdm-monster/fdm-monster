@@ -58,6 +58,7 @@ export class Settings extends BaseEntity {
     gridCols: number;
     gridRows: number;
     largeTiles: boolean;
+    tilePreferCancelOverQuickStop: boolean;
   };
 
   @Column({ type: "simple-json", nullable: false })

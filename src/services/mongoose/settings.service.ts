@@ -35,9 +35,7 @@ import {
 } from "@/models/Settings";
 import { SettingsDto } from "@/services/interfaces/settings.dto";
 import { MongoIdType } from "@/shared.constants";
-import { AppConstants } from "@/server.constants";
 import { ConfigService } from "@/services/core/config.service";
-import { BadRequestException } from "@/exceptions/runtime.exceptions";
 
 export class SettingsService implements ISettingsService<MongoIdType, ISettings> {
   configService: ConfigService;

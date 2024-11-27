@@ -51,6 +51,7 @@ export interface IFrontendSettings {
   gridCols: number;
   gridRows: number;
   largeTiles: boolean;
+  tilePreferCancelOverQuickStop: boolean;
 }
 
 export interface ITimeoutSettings {
@@ -205,6 +206,11 @@ const SettingsSchema = new Schema<ISettings>({
       required: false,
     },
     largeTiles: {
+      type: Boolean,
+      default: false,
+      required: false,
+    },
+    tilePreferCancelOverQuickStop: {
       type: Boolean,
       default: false,
       required: false,

@@ -17,6 +17,7 @@ export const frontendSettingsUpdateRules = {
   gridCols: "integer|min:1",
   gridRows: "integer|min:1",
   largeTiles: "boolean",
+  tilePreferCancelOverQuickStop: "boolean",
 };
 
 export const credentialSettingPatchRules = {
