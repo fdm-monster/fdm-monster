@@ -104,7 +104,7 @@
     "@swc/cli": "0.5.1",
     "@swc/core": "1.9.3",
     "@swc/jest": "0.2.37",
-    "@types/adm-zip": "0.5.6",
+    "@types/adm-zip": "0.5.7",
     "@types/bcryptjs": "2.4.6",
     "@types/cache-manager": "4.0.6",
     "@types/connect-history-api-fallback": "1.5.4",
