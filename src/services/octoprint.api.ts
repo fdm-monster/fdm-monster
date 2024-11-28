@@ -128,4 +128,6 @@ export class OctoprintApi implements IPrinterApi {
       reprintState: ReprintState.LastPrintReady,
     };
   }
+
+  async getThumbnail() {}
 }

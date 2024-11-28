@@ -12,6 +12,12 @@
 - Camera API: GUEST should not have access to change cameras
 - YAML import validation: new API keys are not accepted by outdated YAML validation
 
+## Features
+
+- Add generic upload store
+- Scan and save gcode thumbnails per printer
+- Support uploading .bgcode format
+
 # FDM Monster 23/11/2024 1.7.5
 
 ## Fixes

@@ -20,6 +20,7 @@ import { ClientBundleService } from "@/services/core/client-bundle.service";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
+import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
 
 export class BootTask {
   logger: LoggerService;
@@ -40,6 +41,7 @@ export class BootTask {
   configService: ConfigService;
   isTypeormMode: boolean;
   typeormService: TypeormService;
+  printerThumbnailCache: PrinterThumbnailCache;
 
   constructor({
     loggerFactory,
@@ -60,6 +62,7 @@ export class BootTask {
     configService,
     typeormService,
     isTypeormMode,
+    printerThumbnailCache,
   }: {
     loggerFactory: ILoggerFactory;
     serverTasks: ServerTasks;
@@ -79,6 +82,7 @@ export class BootTask {
     configService: ConfigService;
     typeormService: TypeormService;
     isTypeormMode: boolean;
+    printerThumbnailCache: PrinterThumbnailCache;
   }) {
     this.isTypeormMode = isTypeormMode;
     this.logger = loggerFactory(BootTask.name);
@@ -98,6 +102,7 @@ export class BootTask {
     this.clientBundleService = clientBundleService;
     this.configService = configService;
     this.typeormService = typeormService;
+    this.printerThumbnailCache = printerThumbnailCache;
   }
 
   async runOnce() {
@@ -172,6 +177,10 @@ export class BootTask {
     await this.printerFilesStore.loadFilesStore();
     this.logger.log("Loading floor store");
     await this.floorStore.loadStore();
+    this.logger.log("Loading printer thumbnail cache");
+    await this.printerThumbnailCache.loadCache();
+    const length = await this.printerThumbnailCache.getAllValues();
+    this.logger.log(`Loaded ${length.length} thumbnail(s)`);
 
     if (process.env.SAFEMODE_ENABLED === "true") {
       this.logger.warn("Starting in safe mode due to SAFEMODE_ENABLED");

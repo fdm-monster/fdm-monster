@@ -79,6 +79,7 @@ import { OctoprintApi } from "@/services/octoprint.api";
 import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { MoonrakerApi } from "@/services/moonraker.api";
 import { PrinterApiFactory } from "@/services/printer-api.factory";
+import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
 
 export function config<T1, T2>(
   key: string,
@@ -190,6 +191,7 @@ export function configureContainer(isSqlite: boolean = false) {
 
     [di.floorStore]: asClass(FloorStore).singleton(),
     [di.pluginRepositoryCache]: asClass(PluginRepositoryCache).singleton(),
+    [di.printerThumbnailCache]: asClass(PrinterThumbnailCache).singleton(),
     [di.fileCache]: asClass(FileCache).singleton(),
     [di.fileUploadTrackerCache]: asClass(FileUploadTrackerCache).singleton(),
     [di.printerFilesStore]: asClass(PrinterFilesStore).singleton(),

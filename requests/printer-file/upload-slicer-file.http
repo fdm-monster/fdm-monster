@@ -1,0 +1,11 @@
+### POST request to upload file to test endpoint
+
+POST http://{{env}}/api/printer-files/upload
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="testfile.gcode"
+
+< testfile.gcode
+
+###
