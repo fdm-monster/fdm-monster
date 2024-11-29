@@ -216,6 +216,18 @@ export class OctoprintClient extends OctoprintRoutes {
     });
   }
 
+  getFileChunk(login: LoginDto, filePath: string, startBytes: number, endBytes: number) {
+    const pathUrl = this.downloadFileLocal(filePath);
+    const { url, options } = this.prepareRequest(login, pathUrl);
+    return this.httpClient.get<string>(url, {
+      headers: {
+        ...options.headers,
+        Range: `bytes=${startBytes}-${endBytes}`,
+      },
+      timeout: options.timeout,
+    });
+  }
+
   async createFolder(login: LoginDto, path: string, foldername: string) {
     const { url, options } = this.prepareRequest(login, this.apiFilesLocal);
 
@@ -356,7 +368,7 @@ export class OctoprintClient extends OctoprintRoutes {
   /**
    * Based on https://github.com/OctoPrint/OctoPrint/blob/f430257d7072a83692fc2392c683ed8c97ae47b6/src/octoprint/plugins/softwareupdate/__init__.py#L1265
    */
-  async postSoftwareUpdate(login: LoginDto, targets) {
+  async postSoftwareUpdate(login: LoginDto, targets: string[]) {
     const { url, options } = this.prepareJsonRequest(login, this.pluginSoftwareUpdateUpdate, {
       targets,
     });
