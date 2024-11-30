@@ -100,6 +100,11 @@ export class PrinterThumbnailCache extends KeyDiffCache<CachedPrinterThumbnail> 
   }
 
   private async writeThumbnailFile(printerId: string, thumbnailData: string) {
+    if (!thumbnailData?.length) {
+      await this.removeThumbnailFile(printerId);
+      await this.unsetPrinterThumbnail(printerId);
+      return;
+    }
     const baseFolder = join(superRootPath(), AppConstants.defaultPrinterThumbnailsStorage);
     const thumbnailPath = join(baseFolder, printerId + ".dat");
     ensureDirExists(baseFolder);
