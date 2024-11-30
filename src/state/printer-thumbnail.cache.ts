@@ -1,4 +1,4 @@
-import { KeyDiffCache } from "@/utils/cache/key-diff.cache";
+import { KeyDiffCache, keyType } from "@/utils/cache/key-diff.cache";
 import { PrinterCache } from "@/state/printer.cache";
 import { join } from "path";
 import { ensureDirExists, superRootPath } from "@/utils/fs.utils";
@@ -14,9 +14,11 @@ import { captureException } from "@sentry/node";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { PrinterApiFactory } from "@/services/printer-api.factory";
+import { printerEvents } from "@/constants/event.constants";
+import EventEmitter2 from "eventemitter2";
 
 export interface CachedPrinterThumbnail {
-  id: string;
+  id: keyType;
   thumbnailBase64: string;
 }
 
@@ -26,19 +28,26 @@ export class PrinterThumbnailCache extends KeyDiffCache<CachedPrinterThumbnail> 
   printerCache: PrinterCache;
   printerApiFactory: PrinterApiFactory;
   logger: LoggerService;
+  eventEmitter2: EventEmitter2;
+
   constructor({
     printerCache,
     printerApiFactory,
     loggerFactory,
+    eventEmitter2,
   }: {
     printerCache: PrinterCache;
     printerApiFactory: PrinterApiFactory;
     loggerFactory: ILoggerFactory;
+    eventEmitter2: EventEmitter2;
   }) {
     super();
     this.printerCache = printerCache;
     this.printerApiFactory = printerApiFactory;
     this.logger = loggerFactory(PrinterThumbnailCache.name);
+    this.eventEmitter2 = eventEmitter2;
+
+    this.eventEmitter2.on(printerEvents.printersDeleted, this.handlePrintersDeleted.bind(this));
   }
 
   async loadCache() {
@@ -59,11 +68,18 @@ export class PrinterThumbnailCache extends KeyDiffCache<CachedPrinterThumbnail> 
     }
   }
 
-  async setPrinterThumbnail(id: string, imageData: string) {
+  async handlePrintersDeleted({ printerIds }: { printerIds: keyType[] }) {
+    for (const printerId of printerIds) {
+      await this.removeThumbnailFile(printerId);
+      await this.unsetPrinterThumbnail(printerId);
+    }
+  }
+
+  async setPrinterThumbnail(id: keyType, imageData: string) {
     await this.setKeyValue(id, { id: id, thumbnailBase64: imageData });
   }
 
-  async unsetPrinterThumbnail(id: string) {
+  async unsetPrinterThumbnail(id: keyType) {
     await this.deleteKeyValue(id);
   }
 
@@ -111,7 +127,7 @@ export class PrinterThumbnailCache extends KeyDiffCache<CachedPrinterThumbnail> 
     await writeFile(thumbnailPath, thumbnailData);
   }
 
-  private async removeThumbnailFile(printerId: string) {
+  private async removeThumbnailFile(printerId: keyType) {
     const baseFolder = join(superRootPath(), AppConstants.defaultPrinterThumbnailsStorage);
     const thumbnailPath = join(baseFolder, printerId + ".dat");
 
