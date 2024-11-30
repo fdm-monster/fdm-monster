@@ -15,16 +15,16 @@ import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { Request, Response } from "express";
 import { IPrinterApi } from "@/services/printer-api.interface";
-import { extractThumbnailBase64 } from "@/utils/gcode.utils";
-import { ensureDirExists, superRootPath } from "@/utils/fs.utils";
-import { join } from "path";
-import { existsSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
+import { captureException } from "@sentry/node";
+import { errorSummary } from "@/utils/error.utils";
+import { LoginDto } from "@/services/interfaces/login.dto";
 
 @route(AppConstants.apiRoute + "/printer-files")
 @before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR]), printerResolveMiddleware()])
 export class PrinterFilesController {
   printerApi: IPrinterApi;
+  printerLogin: LoginDto;
   printerThumbnailCache: PrinterThumbnailCache;
   printerFilesStore: PrinterFilesStore;
   settingsStore: SettingsStore;
@@ -35,6 +35,7 @@ export class PrinterFilesController {
 
   constructor({
     printerApi,
+    printerLogin,
     printerFilesStore,
     batchCallService,
     printerFileCleanTask,
@@ -44,6 +45,7 @@ export class PrinterFilesController {
     printerThumbnailCache,
   }: {
     printerApi: IPrinterApi;
+    printerLogin: LoginDto;
     printerFilesStore: PrinterFilesStore;
     batchCallService: BatchCallService;
     printerFileCleanTask: PrinterFileCleanTask;
@@ -53,6 +55,7 @@ export class PrinterFilesController {
     printerThumbnailCache: PrinterThumbnailCache;
   }) {
     this.printerApi = printerApi;
+    this.printerLogin = printerLogin;
     this.printerFilesStore = printerFilesStore;
     this.settingsStore = settingsStore;
     this.printerFileCleanTask = printerFileCleanTask;
@@ -97,6 +100,23 @@ export class PrinterFilesController {
   }
 
   @POST()
+  @route("/:id/reload-thumbnail")
+  @before(authorizePermission(PERMS.PrinterFiles.Actions))
+  async reloadThumbnail(req: Request, res: Response) {
+    const { filePath } = await validateInput(req.body, startPrintFileRules);
+
+    try {
+      // TODO move into printerAPI
+      await this.printerThumbnailCache.loadPrinterThumbnailRemote(this.printerLogin, req.params.id, filePath);
+    } catch (e) {
+      this.logger.error(`Unexpected error processing thumbnail ${errorSummary(e)}`);
+      captureException(e);
+    }
+
+    res.send();
+  }
+
+  @POST()
   /**
    * @obsolete /:id/select, removed in v2
    */
@@ -106,6 +126,15 @@ export class PrinterFilesController {
   async startPrintFile(req: Request, res: Response) {
     const { filePath } = await validateInput(req.body, startPrintFileRules);
     await this.printerApi.startPrint(filePath);
+
+    try {
+      // TODO move into printerAPI
+      await this.printerThumbnailCache.loadPrinterThumbnailRemote(this.printerLogin, req.params.id, filePath);
+    } catch (e) {
+      this.logger.error(`Unexpected error processing thumbnail ${errorSummary(e)}`);
+      captureException(e);
+    }
+
     res.send();
   }
 
@@ -171,66 +200,6 @@ export class PrinterFilesController {
     });
   }
 
-  @POST()
-  @route("/upload")
-  @before(authorizePermission(PERMS.PrinterFiles.Upload))
-  async uploadFile(req: Request, res: Response) {
-    const files = await this.multerService.multerLoadFileAsync(req, res, AppConstants.defaultAcceptedGcodeExtensions, true);
-    if (!files?.length) {
-      throw new ValidationException({
-        error: `No file was available for upload. Did you upload files with one of these extensions: ${AppConstants.defaultAcceptedGcodeExtensions.join(
-          ", "
-        )}?`,
-      });
-    }
-    if (files.length > 1) {
-      throw new ValidationException({
-        error: "Only 1 .gcode file can be uploaded at a time",
-      });
-    }
-
-    const file = files[0];
-    if (!file.filename?.length) {
-      throw new Error("File name is required");
-    }
-
-    // Move it to uploads, add it to original
-
-    const uploadsFolder = join(superRootPath(), AppConstants.defaultFileUploadsStorage);
-    ensureDirExists(uploadsFolder);
-
-    const metadataFile = join(uploadsFolder, file.filename.trim() + ".metadata.json");
-
-    // Write the file itself
-    const targetFilename = join(uploadsFolder, file.filename);
-    renameSync(file.path, targetFilename);
-
-    // Add the thumbnail if present
-    const metadata = {
-      originalname: file.originalname,
-      uploaded: Date.now(),
-      mimetype: file.mimetype,
-      filename: file.filename,
-      thumbnailFound: false,
-    };
-    const thumbnailName = join(uploadsFolder, file.filename.trim() + ".dat");
-
-    try {
-      await extractThumbnailBase64(targetFilename, thumbnailName);
-      metadata.thumbnailFound = true;
-    } catch (e) {
-      this.logger.error("Could not parse thumbnail, clearing printer thumbnail", e);
-      if (existsSync(thumbnailName)) {
-        rmSync(thumbnailName);
-      }
-    }
-
-    // Write the metadata file
-    writeFileSync(metadataFile, JSON.stringify(metadata, null, 2));
-
-    res.send();
-  }
-
   @GET()
   @route("/:id/thumbnail")
   @before(authorizePermission(PERMS.PrinterFiles.Get))
@@ -260,17 +229,12 @@ export class PrinterFilesController {
       });
     }
 
-    const baseFolder = join(superRootPath(), AppConstants.defaultPrinterThumbnailsStorage);
-    const thumbnailName = join(baseFolder, currentPrinterId + ".dat");
     try {
-      ensureDirExists(baseFolder);
-      const data = await extractThumbnailBase64(files[0].path, thumbnailName);
-      await this.printerThumbnailCache.setPrinterThumbnail(currentPrinterId.toString(), data);
+      // TODO move into printerAPI or decouple
+      await this.printerThumbnailCache.loadPrinterThumbnailLocal(currentPrinterId, files[0].path);
     } catch (e) {
-      this.logger.error("Could not parse thumbnail, clearing printer thumbnail", e);
-      if (existsSync(thumbnailName)) {
-        rmSync(thumbnailName);
-      }
+      this.logger.error(`Unexpected error processing thumbnail ${errorSummary(e)}`);
+      captureException(e);
     }
 
     // Perform specific file clean if configured
