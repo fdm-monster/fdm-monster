@@ -1,6 +1,6 @@
 ### POST request to upload file to test endpoint
 
-POST http://{{env}}/api/printer-files/1/reload-thumbnail
+POST http://{{env}}/api/printer-files/6/reload-thumbnail
 Content-Type: application/json
 
 {

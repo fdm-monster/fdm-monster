@@ -123,6 +123,10 @@ export class PrinterThumbnailCache extends KeyDiffCache<CachedPrinterThumbnail> 
   private async extractRemoteThumbnailBase64(login: LoginDto, file: string): Promise<string> {
     const lines = await this.readRemoteGcodeLines(login, file, gcodeMaxLinesToRead);
 
+    if (!lines?.length) {
+      throw new Error("No gcode lines were returned.");
+    }
+
     let collecting = false;
     let currentThumbnailBase64 = "";
 
