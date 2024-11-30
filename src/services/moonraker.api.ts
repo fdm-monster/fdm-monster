@@ -13,7 +13,7 @@ import { AxiosPromise } from "axios";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 import { PrinterObjectsQueryDto } from "@/services/moonraker/dto/objects/printer-objects-query.dto";
-import { PrintStatsObject, SystemStatsObject, WebhooksObject } from "@/services/moonraker/dto/objects/printer-object.types";
+import { PrintStatsObject, WebhooksObject } from "@/services/moonraker/dto/objects/printer-object.types";
 
 /**
  * Moonraker Remote API
@@ -128,6 +128,12 @@ export class MoonrakerApi implements IPrinterApi {
     );
   }
 
+  async getFile(path: string): Promise<FileDto> {
+    const metadata = await this.client.getServerFileMetadata(this.login, path);
+    const file = metadata.data.result;
+    return { size: file.size, path, date: file.modified };
+  }
+
   async getFiles(): Promise<FileDto[]> {
     const files = await this.client.getServerFilesList(this.login);
     return files.data.result.map((f) => ({ size: f.size, path: f.path, date: f.modified }));
@@ -151,6 +157,10 @@ export class MoonrakerApi implements IPrinterApi {
 
   async downloadFile(path: string): AxiosPromise<NodeJS.ReadableStream> {
     return await this.client.getServerFilesDownload(this.login, "gcodes", path);
+  }
+
+  async getFileChunk(path: string, startBytes: number, endBytes: number): AxiosPromise<string> {
+    return await this.client.getServerFilesDownloadChunk(this.login, "gcodes", path, startBytes, endBytes);
   }
 
   async uploadFile(fileOrBuffer: Buffer | Express.Multer.File, uploadToken?: string) {

@@ -4,7 +4,7 @@ POST http://{{env}}/api/printer-files/1/reload-thumbnail
 Content-Type: application/json
 
 {
- "filePath": "Clay Golem Updated_0.05mm_PLA_MK3S_7h40m.gcode"
+ "filePath": "example_file"
 }
 
 ###

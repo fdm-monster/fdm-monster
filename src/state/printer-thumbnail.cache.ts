@@ -6,7 +6,6 @@ import { AppConstants } from "@/server.constants";
 import { existsSync, rmSync } from "node:fs";
 import { createReadStream, readFileSync } from "fs";
 import { LoginDto } from "@/services/interfaces/login.dto";
-import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { gcodeScanningChunkSize } from "@/utils/gcode.utils";
 import { createInterface } from "node:readline/promises";
 import { IdType } from "@/shared.constants";
@@ -14,6 +13,7 @@ import { writeFile } from "node:fs/promises";
 import { captureException } from "@sentry/node";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
+import { PrinterApiFactory } from "@/services/printer-api.factory";
 
 export interface CachedPrinterThumbnail {
   id: string;
@@ -24,20 +24,20 @@ export const gcodeMaxLinesToRead = 10000;
 
 export class PrinterThumbnailCache extends KeyDiffCache<CachedPrinterThumbnail> {
   printerCache: PrinterCache;
-  octoprintClient: OctoprintClient;
+  printerApiFactory: PrinterApiFactory;
   logger: LoggerService;
   constructor({
     printerCache,
-    octoprintClient,
+    printerApiFactory,
     loggerFactory,
   }: {
     printerCache: PrinterCache;
-    octoprintClient: OctoprintClient;
+    printerApiFactory: PrinterApiFactory;
     loggerFactory: ILoggerFactory;
   }) {
     super();
     this.printerCache = printerCache;
-    this.octoprintClient = octoprintClient;
+    this.printerApiFactory = printerApiFactory;
     this.logger = loggerFactory(PrinterThumbnailCache.name);
   }
 
@@ -157,7 +157,8 @@ export class PrinterThumbnailCache extends KeyDiffCache<CachedPrinterThumbnail> 
     fromEnd: boolean = false,
     endCondition: string = "; thumbnail end"
   ) {
-    const fileData = await this.octoprintClient.getFile(login, file);
+    const printer = this.printerApiFactory.getScopedPrinter(login);
+    const fileData = await printer.getFile(file);
     const fileSize = fileData.size;
 
     let lines: string[] = [];
@@ -176,7 +177,7 @@ export class PrinterThumbnailCache extends KeyDiffCache<CachedPrinterThumbnail> 
       const end = fromEnd ? position : position + bytesToRead;
       position = fromEnd ? start : end;
 
-      const remoteChunk = await this.octoprintClient.getFileChunk(login, file, start, end);
+      const remoteChunk = await printer.getFileChunk(file, start, end);
       const chunkLines = remoteChunk.data.split("\n");
       if (fromEnd) {
         lines = chunkLines.concat(lines);

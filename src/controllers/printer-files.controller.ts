@@ -106,7 +106,6 @@ export class PrinterFilesController {
     const { filePath } = await validateInput(req.body, startPrintFileRules);
 
     try {
-      // TODO move into printerAPI
       await this.printerThumbnailCache.loadPrinterThumbnailRemote(this.printerLogin, req.params.id, filePath);
     } catch (e) {
       this.logger.error(`Unexpected error processing thumbnail ${errorSummary(e)}`);
