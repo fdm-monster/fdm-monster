@@ -3,6 +3,8 @@
 ## Features
 
 - Settings: add grid setting to show cancel button instead of quick stop button
+- Scan and save gcode thumbnails per printer
+- Support uploading .bgcode format files
 
 # FDM Monster 25/11/2024 1.7.6
 
@@ -11,12 +13,6 @@
 - UserService: MongoDB had incorrect root user checks and SQLite user service missed the check altogether. Now root user checks are robust. 
 - Camera API: GUEST should not have access to change cameras
 - YAML import validation: new API keys are not accepted by outdated YAML validation
-
-## Features
-
-- Add generic upload store
-- Scan and save gcode thumbnails per printer
-- Support uploading .bgcode format
 
 # FDM Monster 23/11/2024 1.7.5
 
