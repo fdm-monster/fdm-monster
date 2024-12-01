@@ -280,9 +280,9 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
     if (eventName === "notify_service_state_changed") {
       const serviceChanged = event.params[0] as NotifyServiceStateChangedParams;
       if (
-        serviceChanged.klipper.active_state ||
-        serviceChanged.klipper_mcu.active_state ||
-        serviceChanged.moonraker.active_state
+        serviceChanged.klipper?.active_state ||
+        serviceChanged.klipper_mcu?.active_state ||
+        serviceChanged.moonraker?.active_state
       ) {
         this.logger.log("Received notify_service_state_changed, reloading Moonraker printer objects");
         await this.setupSocketSession();

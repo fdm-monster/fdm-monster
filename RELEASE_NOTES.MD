@@ -1,5 +1,9 @@
 # Develop
 
+##
+
+- Moonraker 'notify_service_state_changed' event: sometimes the moonraker services object can miss properties
+
 ## Features
 
 - Settings: add grid setting to show cancel button instead of quick stop button
