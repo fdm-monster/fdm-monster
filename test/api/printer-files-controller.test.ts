@@ -23,6 +23,7 @@ const reloadThumbnailRoute = (id: idType) => `${getRoute(id)}/reload-thumbnail`;
 const uploadFileRoute = (id: idType) => `${getRoute(id)}/upload`;
 const getFilesRoute = (id: idType) => `${getRoute(id)}`;
 const getCacheRoute = (id: idType) => `${getRoute(id)}/cache`;
+const getPrintThumbnailRoute = (id: idType) => `${getRoute(id)}/thumbnail`;
 
 let request: TestAgent<Test>;
 let container: AwilixContainer;
@@ -66,6 +67,12 @@ describe(PrinterFilesController.name, () => {
 
   it("should allow GET on printer files thumbnails cache", async () => {
     const response = await request.get(thumbnailsRoute).send();
+    expectOkResponse(response);
+  });
+
+  it("should allow GET on cached printer thumbnail", async () => {
+    const printer = await createTestPrinter(request);
+    const response = await request.get(getPrintThumbnailRoute(printer.id)).send();
     expectOkResponse(response);
   });
 
