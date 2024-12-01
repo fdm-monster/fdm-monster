@@ -11,6 +11,7 @@ import {
   moonrakerSupportRules,
   sentryDiagnosticsEnabledRules,
   serverSettingsUpdateRules,
+  thumbnailSupportRules,
   timeoutSettingsUpdateRules,
 } from "@/services/validators/settings-service.validation";
 import { SettingsStore } from "@/state/settings.store";
@@ -93,6 +94,13 @@ export class SettingsController {
     res.send(result);
   }
 
+  async updateThumbnailSupport(req: Request, res: Response) {
+    const { enabled } = await validateInput(req.body, thumbnailSupportRules);
+    const result = await this.settingsStore.setExperimentalThumbnailSupport(enabled);
+
+    res.send(result);
+  }
+
   async updateClientSupport(req: Request, res: Response) {
     const { enabled } = await validateInput(req.body, clientNextRules);
     const result = await this.settingsStore.setExperimentalClientSupport(enabled);
@@ -150,6 +158,7 @@ export default createController(SettingsController)
     .get("/sensitive", "getSettingsSensitive", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
     .patch("/sentry-diagnostics", "updateSentryDiagnosticsEnabled", demoUserNotAllowedInterceptor)
     .put("/experimental-moonraker-support", "updateMoonrakerSupport", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
+    .put("/experimental-thumbnail-support", "updateThumbnailSupport", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
     .put("/experimental-client-support", "updateClientSupport", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
     .put("/server", "updateServerSettings", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
     .put("/login-required", "updateLoginRequiredSettings", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })

@@ -107,6 +107,7 @@ export class SettingsService implements ISettingsService<MongoIdType, ISettings>
         experimentalClientSupport: doc[serverSettingsKey].experimentalClientSupport,
         experimentalMoonrakerSupport: doc[serverSettingsKey].experimentalMoonrakerSupport,
         sentryDiagnosticsEnabled: doc[serverSettingsKey].sentryDiagnosticsEnabled,
+        experimentalThumbnailSupport: doc[serverSettingsKey].experimentalThumbnailSupport,
       };
     }
     if (!doc[credentialSettingsKey]) {
