@@ -16,6 +16,7 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { PrinterApiFactory } from "@/services/printer-api.factory";
 import { printerEvents } from "@/constants/event.constants";
 import EventEmitter2 from "eventemitter2";
+import { SettingsStore } from "@/state/settings.store";
 
 export interface CachedPrinterThumbnail {
   id: keyType;
@@ -29,28 +30,34 @@ export class PrinterThumbnailCache extends KeyDiffCache<CachedPrinterThumbnail> 
   printerApiFactory: PrinterApiFactory;
   logger: LoggerService;
   eventEmitter2: EventEmitter2;
+  private settingsStore: SettingsStore;
 
   constructor({
     printerCache,
     printerApiFactory,
     loggerFactory,
     eventEmitter2,
+    settingsStore,
   }: {
     printerCache: PrinterCache;
     printerApiFactory: PrinterApiFactory;
     loggerFactory: ILoggerFactory;
     eventEmitter2: EventEmitter2;
+    settingsStore: SettingsStore;
   }) {
     super();
     this.printerCache = printerCache;
     this.printerApiFactory = printerApiFactory;
     this.logger = loggerFactory(PrinterThumbnailCache.name);
     this.eventEmitter2 = eventEmitter2;
+    this.settingsStore = settingsStore;
 
     this.eventEmitter2.on(printerEvents.printersDeleted, this.handlePrintersDeleted.bind(this));
   }
 
   async loadCache() {
+    if (!this.settingsStore.isThumbnailSupportEnabled()) return;
+
     const printers = await this.printerCache.listCachedPrinters();
     const baseFolder = join(superRootPath(), AppConstants.defaultPrinterThumbnailsStorage);
 
@@ -69,6 +76,8 @@ export class PrinterThumbnailCache extends KeyDiffCache<CachedPrinterThumbnail> 
   }
 
   async handlePrintersDeleted({ printerIds }: { printerIds: keyType[] }) {
+    if (!this.settingsStore.isThumbnailSupportEnabled()) return;
+
     for (const printerId of printerIds) {
       await this.removeThumbnailFile(printerId);
       await this.unsetPrinterThumbnail(printerId);
@@ -84,6 +93,8 @@ export class PrinterThumbnailCache extends KeyDiffCache<CachedPrinterThumbnail> 
   }
 
   async loadPrinterThumbnailRemote(login: LoginDto, printerId: IdType, file: string) {
+    if (!this.settingsStore.isThumbnailSupportEnabled()) return;
+
     const id = printerId.toString();
     try {
       const thumbnailData = await this.extractRemoteThumbnailBase64(login, file);
@@ -100,6 +111,8 @@ export class PrinterThumbnailCache extends KeyDiffCache<CachedPrinterThumbnail> 
   }
 
   async loadPrinterThumbnailLocal(printerId: IdType, file: string) {
+    if (!this.settingsStore.isThumbnailSupportEnabled()) return;
+
     const id = printerId.toString();
     try {
       const thumbnailData = await this.extractThumbnailBase64(file);

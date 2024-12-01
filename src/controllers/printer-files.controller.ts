@@ -106,7 +106,9 @@ export class PrinterFilesController {
     const { filePath } = await validateInput(req.body, startPrintFileRules);
 
     try {
-      await this.printerThumbnailCache.loadPrinterThumbnailRemote(this.printerLogin, req.params.id, filePath);
+      if (this.settingsStore.isThumbnailSupportEnabled()) {
+        await this.printerThumbnailCache.loadPrinterThumbnailRemote(this.printerLogin, req.params.id, filePath);
+      }
     } catch (e) {
       this.logger.error(`Unexpected error processing thumbnail ${errorSummary(e)}`);
       captureException(e);
@@ -127,8 +129,9 @@ export class PrinterFilesController {
     await this.printerApi.startPrint(filePath);
 
     try {
-      // TODO move into printerAPI
-      await this.printerThumbnailCache.loadPrinterThumbnailRemote(this.printerLogin, req.params.id, filePath);
+      if (this.settingsStore.isThumbnailSupportEnabled()) {
+        await this.printerThumbnailCache.loadPrinterThumbnailRemote(this.printerLogin, req.params.id, filePath);
+      }
     } catch (e) {
       this.logger.error(`Unexpected error processing thumbnail ${errorSummary(e)}`);
       captureException(e);
@@ -229,8 +232,9 @@ export class PrinterFilesController {
     }
 
     try {
-      // TODO move into printerAPI or decouple
-      await this.printerThumbnailCache.loadPrinterThumbnailLocal(currentPrinterId, files[0].path);
+      if (this.settingsStore.isThumbnailSupportEnabled()) {
+        await this.printerThumbnailCache.loadPrinterThumbnailLocal(currentPrinterId, files[0].path);
+      }
     } catch (e) {
       this.logger.error(`Unexpected error processing thumbnail ${errorSummary(e)}`);
       captureException(e);

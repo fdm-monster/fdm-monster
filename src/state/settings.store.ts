@@ -137,6 +137,11 @@ export class SettingsStore {
     return this.settings[serverSettingsKey].registration;
   }
 
+  isThumbnailSupportEnabled() {
+    if (!this.settings) throw new InternalServerException("Could not check server settings (server settings not loaded");
+    return this.settings[serverSettingsKey].experimentalThumbnailSupport;
+  }
+
   getServerSettings() {
     return this.getSettings()[serverSettingsKey];
   }
