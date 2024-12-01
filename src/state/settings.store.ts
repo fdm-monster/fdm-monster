@@ -54,6 +54,7 @@ export class SettingsStore {
         experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
         experimentalTypeormSupport: this.isTypeOrmMode,
         experimentalClientSupport: settings[serverSettingsKey].experimentalClientSupport,
+        experimentalThumbnailSupport: settings[serverSettingsKey].experimentalThumbnailSupport,
       },
       [wizardSettingKey]: settings[wizardSettingKey],
       [frontendSettingKey]: settings[frontendSettingKey],
@@ -76,6 +77,7 @@ export class SettingsStore {
         experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
         experimentalTypeormSupport: this.isTypeOrmMode,
         experimentalClientSupport: settings[serverSettingsKey].experimentalClientSupport,
+        experimentalThumbnailSupport: settings[serverSettingsKey].experimentalThumbnailSupport,
       },
     });
   }
@@ -133,6 +135,11 @@ export class SettingsStore {
   isRegistrationEnabled() {
     if (!this.settings) throw new InternalServerException("Could not check server settings (server settings not loaded");
     return this.settings[serverSettingsKey].registration;
+  }
+
+  isThumbnailSupportEnabled() {
+    if (!this.settings) throw new InternalServerException("Could not check server settings (server settings not loaded");
+    return this.settings[serverSettingsKey].experimentalThumbnailSupport;
   }
 
   getServerSettings() {
@@ -209,6 +216,13 @@ export class SettingsStore {
   async setExperimentalMoonrakerSupport(moonrakerEnabled: boolean) {
     this.settings = await this.settingsService.patchServerSettings({
       experimentalMoonrakerSupport: moonrakerEnabled,
+    });
+    return this.getSettings();
+  }
+
+  async setExperimentalThumbnailSupport(thumbnailsEnabled: boolean) {
+    this.settings = await this.settingsService.patchServerSettings({
+      experimentalThumbnailSupport: thumbnailsEnabled,
     });
     return this.getSettings();
   }

@@ -75,37 +75,37 @@ export class MulterService {
   }
 
   getMulterGCodeFileFilter(storeAsFile = true) {
-    return this.getMulterFileFilter(".gcode", storeAsFile);
+    return this.getMulterFileFilter(AppConstants.defaultAcceptedGcodeExtensions, storeAsFile);
   }
 
-  async multerLoadFileAsync(req: Request, res: Response, fileExtension: string, storeAsFile = true) {
+  async multerLoadFileAsync(req: Request, res: Response, fileExtensions: string[], storeAsFile = true) {
     return await new Promise<Express.Multer.File[]>((resolve, reject) =>
-      this.getMulterFileFilter(fileExtension, storeAsFile)(req, res, (err) => {
+      this.getMulterFileFilter(fileExtensions, storeAsFile)(req, res, (err) => {
         if (err) {
           return reject(err);
         }
-        // Expected type: Express.Multer.File[]
+
         resolve(req.files as Express.Multer.File[]);
       })
     );
   }
 
-  getMulterFileFilter(fileExtension: string, storeAsFile = true) {
+  getMulterFileFilter(fileExtensions: string[], storeAsFile = true) {
     return multer({
       storage: storeAsFile
         ? multer.diskStorage({
             destination: join(superRootPath(), AppConstants.defaultFileStorageFolder),
           })
         : multer.memoryStorage(),
-      fileFilter: this.multerFileFilter(fileExtension),
+      fileFilter: this.multerFileFilter(fileExtensions),
     }).any();
   }
 
-  multerFileFilter(extension: string) {
+  multerFileFilter(extensions: string[]) {
     return (req: Request, file: Express.Multer.File, callback: FileFilterCallback) => {
       const ext = extname(file.originalname);
-      if (extension?.length && ext !== extension) {
-        return callback(new Error(`Only files with extension ${extension} are allowed`));
+      if (extensions?.length && !extensions.includes(ext?.toLowerCase())) {
+        return callback(new Error(`Only files with extensions ${extensions} are allowed`));
       }
       return callback(null, true);
     };

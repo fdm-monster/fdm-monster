@@ -15,11 +15,17 @@ import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { Request, Response } from "express";
 import { IPrinterApi } from "@/services/printer-api.interface";
+import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
+import { captureException } from "@sentry/node";
+import { errorSummary } from "@/utils/error.utils";
+import { LoginDto } from "@/services/interfaces/login.dto";
 
 @route(AppConstants.apiRoute + "/printer-files")
 @before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR]), printerResolveMiddleware()])
 export class PrinterFilesController {
   printerApi: IPrinterApi;
+  printerLogin: LoginDto;
+  printerThumbnailCache: PrinterThumbnailCache;
   printerFilesStore: PrinterFilesStore;
   settingsStore: SettingsStore;
   batchCallService: BatchCallService;
@@ -29,27 +35,33 @@ export class PrinterFilesController {
 
   constructor({
     printerApi,
+    printerLogin,
     printerFilesStore,
     batchCallService,
     printerFileCleanTask,
     settingsStore,
     loggerFactory,
     multerService,
+    printerThumbnailCache,
   }: {
     printerApi: IPrinterApi;
+    printerLogin: LoginDto;
     printerFilesStore: PrinterFilesStore;
     batchCallService: BatchCallService;
     printerFileCleanTask: PrinterFileCleanTask;
     settingsStore: SettingsStore;
     loggerFactory: ILoggerFactory;
     multerService: MulterService;
+    printerThumbnailCache: PrinterThumbnailCache;
   }) {
     this.printerApi = printerApi;
+    this.printerLogin = printerLogin;
     this.printerFilesStore = printerFilesStore;
     this.settingsStore = settingsStore;
     this.printerFileCleanTask = printerFileCleanTask;
     this.batchCallService = batchCallService;
     this.multerService = multerService;
+    this.printerThumbnailCache = printerThumbnailCache;
     this.logger = loggerFactory(PrinterFilesController.name);
   }
 
@@ -70,6 +82,14 @@ export class PrinterFilesController {
   }
 
   @GET()
+  @route("/thumbnails")
+  @before(authorizePermission(PERMS.PrinterFiles.Get))
+  async getThumbnails(req: Request, res: Response) {
+    const thumbnails = await this.printerThumbnailCache.getAllValues();
+    res.send(thumbnails);
+  }
+
+  @GET()
   @route("/:id")
   @before(authorizePermission(PERMS.PrinterFiles.Get))
   async getFiles(req: Request, res: Response) {
@@ -77,6 +97,24 @@ export class PrinterFilesController {
     this.logger.log("Refreshing file storage (eager load)");
     const files = await this.printerFilesStore.loadFiles(currentPrinterId);
     res.send(files);
+  }
+
+  @POST()
+  @route("/:id/reload-thumbnail")
+  @before(authorizePermission(PERMS.PrinterFiles.Actions))
+  async reloadThumbnail(req: Request, res: Response) {
+    const { filePath } = await validateInput(req.body, startPrintFileRules);
+
+    try {
+      if (this.settingsStore.isThumbnailSupportEnabled()) {
+        await this.printerThumbnailCache.loadPrinterThumbnailRemote(this.printerLogin, req.params.id, filePath);
+      }
+    } catch (e) {
+      this.logger.error(`Unexpected error processing thumbnail ${errorSummary(e)}`);
+      captureException(e);
+    }
+
+    res.send();
   }
 
   @POST()
@@ -89,6 +127,16 @@ export class PrinterFilesController {
   async startPrintFile(req: Request, res: Response) {
     const { filePath } = await validateInput(req.body, startPrintFileRules);
     await this.printerApi.startPrint(filePath);
+
+    try {
+      if (this.settingsStore.isThumbnailSupportEnabled()) {
+        await this.printerThumbnailCache.loadPrinterThumbnailRemote(this.printerLogin, req.params.id, filePath);
+      }
+    } catch (e) {
+      this.logger.error(`Unexpected error processing thumbnail ${errorSummary(e)}`);
+      captureException(e);
+    }
+
     res.send();
   }
 
@@ -154,26 +202,42 @@ export class PrinterFilesController {
     });
   }
 
+  @GET()
+  @route("/:id/thumbnail")
+  @before(authorizePermission(PERMS.PrinterFiles.Get))
+  async getPrinterThumbnail(req: Request, res: Response) {
+    const { currentPrinterId } = getScopedPrinter(req);
+    const printerThumbnail = await this.printerThumbnailCache.getValue(currentPrinterId.toString());
+    res.send(printerThumbnail);
+  }
+
   @POST()
   @route("/:id/upload")
   @before(authorizePermission(PERMS.PrinterFiles.Upload))
-  async uploadFile(req: Request, res: Response) {
+  async uploadPrinterFile(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
 
-    // Any query params can be added here
-    // const {} = await validateInput(req.query, uploadFileRules);
-
-    const files = await this.multerService.multerLoadFileAsync(req, res, ".gcode", true);
-
+    const files = await this.multerService.multerLoadFileAsync(req, res, AppConstants.defaultAcceptedGcodeExtensions, true);
     if (!files?.length) {
       throw new ValidationException({
-        error: "No file was available for upload. Did you upload files with extension '.gcode'?",
+        error: `No file was available for upload. Did you upload files with one of these extensions: ${AppConstants.defaultAcceptedGcodeExtensions.join(
+          ", "
+        )}?`,
       });
     }
     if (files.length > 1) {
       throw new ValidationException({
-        error: "Only 1 .gcode file can be uploaded at a time due to bandwidth restrictions",
+        error: "Only 1 .gcode file can be uploaded at a time",
       });
+    }
+
+    try {
+      if (this.settingsStore.isThumbnailSupportEnabled()) {
+        await this.printerThumbnailCache.loadPrinterThumbnailLocal(currentPrinterId, files[0].path);
+      }
+    } catch (e) {
+      this.logger.error(`Unexpected error processing thumbnail ${errorSummary(e)}`);
+      captureException(e);
     }
 
     // Perform specific file clean if configured

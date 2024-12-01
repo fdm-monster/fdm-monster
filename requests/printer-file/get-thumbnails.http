@@ -1,0 +1,5 @@
+### POST request to upload file to test endpoint
+
+GET http://{{env}}/api/printer-files/thumbnails
+
+###

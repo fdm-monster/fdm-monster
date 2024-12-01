@@ -17,6 +17,9 @@ export const AppConstants = {
   // New place for all downloads, files etc
   defaultClientBundleStorage: "./media/client-dist",
   defaultClientBundleZipsStorage: "./media/client-dist-zips",
+  defaultPrinterThumbnailsStorage: "./media/printer-thumbnails",
+  defaultFileUploadsStorage: "./media/file-uploads",
+  defaultAcceptedGcodeExtensions: [".gcode", ".bgcode"],
   defaultServerPort: 4000,
   defaultMongoStringUnauthenticated: "mongodb://127.0.0.1:27017/fdm-monster",
   apiRoute: "/api",

@@ -334,6 +334,14 @@ export class MoonrakerClient {
     });
   }
 
+  async getServerFilesDownloadChunk(login: LoginDto, root: string, filename: string, startBytes: number, endBytes: number) {
+    return await this.httpClient.get<string>(`${login.printerURL}/server/files/${root}/${filename}`, {
+      headers: {
+        Range: `bytes=${startBytes}-${endBytes}`,
+      },
+    });
+  }
+
   async postServerFileUpload(
     login: LoginDto,
     multerFileOrBuffer: Buffer | Express.Multer.File,

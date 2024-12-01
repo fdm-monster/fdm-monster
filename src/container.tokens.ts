@@ -53,17 +53,18 @@ export const DITokens = {
   influxDbV2BaseService: "influxDbV2BaseService",
   systemInfoBundleService: "systemInfoBundleService",
   customGCodeService: "customGCodeService",
-  // Stores/states
+  // Stores
+  floorStore: "floorStore",
   settingsStore: "settingsStore",
-  printerCache: "printerCache",
-  printerEventsCache: "printerEventsCache",
   printerSocketStore: "printerSocketStore",
   testPrinterSocketStore: "testPrinterSocketStore",
   printerFilesStore: "printerFilesStore",
   octoPrintSockIoAdapter: "octoPrintSockIoAdapter",
   moonrakerWebsocketAdapter: "moonrakerWebsocketAdapter",
   // Caches
-  floorStore: "floorStore",
+  printerCache: "printerCache",
+  printerEventsCache: "printerEventsCache",
+  printerThumbnailCache: "printerThumbnailCache",
   fileCache: "fileCache",
   fileUploadTrackerCache: "fileUploadTrackerCache",
   // Tasks

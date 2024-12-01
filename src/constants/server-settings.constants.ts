@@ -32,6 +32,7 @@ export const getDefaultServerSettings = (): ServerSettingsDto => ({
   experimentalMoonrakerSupport: false,
   experimentalTypeormSupport: false,
   experimentalClientSupport: false,
+  experimentalThumbnailSupport: false,
 });
 
 export const credentialSettingsKey = "credentials";

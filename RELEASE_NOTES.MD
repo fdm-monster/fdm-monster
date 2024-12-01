@@ -3,6 +3,8 @@
 ## Features
 
 - Settings: add grid setting to show cancel button instead of quick stop button
+- Scan and save gcode thumbnails per printer
+- Support uploading .bgcode format files
 
 # FDM Monster 25/11/2024 1.7.6
 

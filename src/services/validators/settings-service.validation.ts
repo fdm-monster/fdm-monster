@@ -7,6 +7,7 @@ export const serverSettingsUpdateRules = {
   "debugSettings.debugSocketEvents": "boolean",
   "debugSettings.debugSocketReconnect": "boolean",
   experimentalMoonrakerSupport: "boolean",
+  experimentalThumbnailSupport: "boolean",
 };
 
 export const timeoutSettingsUpdateRules = {
@@ -44,6 +45,10 @@ export const sentryDiagnosticsEnabledRules = {
 };
 
 export const moonrakerSupportRules = {
+  enabled: "required|boolean",
+};
+
+export const thumbnailSupportRules = {
   enabled: "required|boolean",
 };
 

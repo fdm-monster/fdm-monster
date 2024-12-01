@@ -11,6 +11,7 @@ import {
   moonrakerSupportRules,
   sentryDiagnosticsEnabledRules,
   serverSettingsUpdateRules,
+  thumbnailSupportRules,
   timeoutSettingsUpdateRules,
 } from "@/services/validators/settings-service.validation";
 import { SettingsStore } from "@/state/settings.store";
@@ -22,6 +23,7 @@ import { IConfigService } from "@/services/core/config.service";
 import { PrinterCache } from "@/state/printer.cache";
 import { MoonrakerType } from "@/services/printer-api.interface";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
+import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
 
 export class SettingsController {
   settingsStore: SettingsStore;
@@ -30,6 +32,7 @@ export class SettingsController {
   printerService: IPrinterService;
   configService: IConfigService;
   serverVersion: string;
+  private printerThumbnailCache: PrinterThumbnailCache;
 
   constructor({
     settingsStore,
@@ -38,6 +41,7 @@ export class SettingsController {
     serverVersion,
     loggerFactory,
     configService,
+    printerThumbnailCache,
   }: {
     serverVersion: string;
     printerCache: PrinterCache;
@@ -45,6 +49,7 @@ export class SettingsController {
     settingsStore: SettingsStore;
     loggerFactory: ILoggerFactory;
     configService: IConfigService;
+    printerThumbnailCache: PrinterThumbnailCache;
   }) {
     this.settingsStore = settingsStore;
     this.logger = loggerFactory(SettingsController.name);
@@ -52,6 +57,7 @@ export class SettingsController {
     this.configService = configService;
     this.printerCache = printerCache;
     this.printerService = printerService;
+    this.printerThumbnailCache = printerThumbnailCache;
   }
 
   getSettings(req: Request, res: Response) {
@@ -89,6 +95,18 @@ export class SettingsController {
       for (const printer of klipperPrinters) {
         await this.printerService.updateEnabled(printer.id, false);
       }
+    }
+    res.send(result);
+  }
+
+  async updateThumbnailSupport(req: Request, res: Response) {
+    const { enabled } = await validateInput(req.body, thumbnailSupportRules);
+    const result = await this.settingsStore.setExperimentalThumbnailSupport(enabled);
+
+    if (enabled) {
+      await this.printerThumbnailCache.loadCache();
+    } else {
+      await this.printerThumbnailCache.resetCache();
     }
     res.send(result);
   }
@@ -150,6 +168,7 @@ export default createController(SettingsController)
     .get("/sensitive", "getSettingsSensitive", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
     .patch("/sentry-diagnostics", "updateSentryDiagnosticsEnabled", demoUserNotAllowedInterceptor)
     .put("/experimental-moonraker-support", "updateMoonrakerSupport", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
+    .put("/experimental-thumbnail-support", "updateThumbnailSupport", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
     .put("/experimental-client-support", "updateClientSupport", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
     .put("/server", "updateServerSettings", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
     .put("/login-required", "updateLoginRequiredSettings", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })

@@ -2,6 +2,7 @@ import { IPrinterApi, OctoprintType, PrinterType, ReprintState } from "@/service
 import { LoginDto } from "@/services/interfaces/login.dto";
 import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { NotImplementedException } from "@/exceptions/runtime.exceptions";
+import { AxiosPromise } from "axios";
 
 export class OctoprintApi implements IPrinterApi {
   client: OctoprintClient;
@@ -82,6 +83,15 @@ export class OctoprintApi implements IPrinterApi {
     await this.client.sendPrintHeadHomeCommand(this.login, axes);
   }
 
+  async getFile(path: string) {
+    const file = await this.client.getFile(this.login, path);
+    return {
+      path: file.path,
+      size: file.size,
+      date: file.date,
+    };
+  }
+
   async getFiles() {
     const files = await this.client.getLocalFiles(this.login, false);
     return files.map((f) => ({
@@ -93,6 +103,10 @@ export class OctoprintApi implements IPrinterApi {
 
   async downloadFile(path: string) {
     return await this.client.downloadFile(this.login, path);
+  }
+
+  async getFileChunk(path: string, startBytes: number, endBytes: number): AxiosPromise<string> {
+    return await this.client.getFileChunk(this.login, path, startBytes, endBytes);
   }
 
   async uploadFile(fileOrBuffer: Buffer | Express.Multer.File, uploadToken?: string) {
@@ -128,4 +142,6 @@ export class OctoprintApi implements IPrinterApi {
       reprintState: ReprintState.LastPrintReady,
     };
   }
+
+  async getThumbnail() {}
 }

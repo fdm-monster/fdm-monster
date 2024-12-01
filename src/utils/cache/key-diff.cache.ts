@@ -126,7 +126,7 @@ export class KeyDiffCache<T> {
     return key?.toString();
   }
 
-  private resetDiffs() {
+  protected resetDiffs() {
     this.deletedKeys = [];
     this.updatedKeys = [];
   }
