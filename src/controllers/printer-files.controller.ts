@@ -126,11 +126,12 @@ export class PrinterFilesController {
   @before(authorizePermission(PERMS.PrinterFiles.Actions))
   async startPrintFile(req: Request, res: Response) {
     const { filePath } = await validateInput(req.body, startPrintFileRules);
-    await this.printerApi.startPrint(filePath);
+    const encodedFilePath = encodeURIComponent(filePath);
+    await this.printerApi.startPrint(encodedFilePath);
 
     try {
       if (this.settingsStore.isThumbnailSupportEnabled()) {
-        await this.printerThumbnailCache.loadPrinterThumbnailRemote(this.printerLogin, req.params.id, filePath);
+        await this.printerThumbnailCache.loadPrinterThumbnailRemote(this.printerLogin, req.params.id, encodedFilePath);
       }
     } catch (e) {
       this.logger.error(`Unexpected error processing thumbnail ${errorSummary(e)}`);
@@ -154,7 +155,9 @@ export class PrinterFilesController {
   async downloadFile(req: Request, res: Response) {
     this.logger.log(`Downloading file ${req.params.path}`);
     const { path } = await validateInput(req.params, downloadFileRules);
-    const response = await this.printerApi.downloadFile(path);
+    const encodedFilePath = encodeURIComponent(path);
+
+    const response = await this.printerApi.downloadFile(encodedFilePath);
     res.setHeader("Content-Type", response.headers["content-type"]);
     res.setHeader("Content-Length", response.headers["content-length"]);
     res.setHeader("Content-Disposition", response.headers["content-disposition"]);
@@ -170,7 +173,9 @@ export class PrinterFilesController {
   async deleteFileOrFolder(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
     const { path } = await validateInput(req.query, getFileRules);
-    const result = await this.printerApi.deleteFile(path);
+    const encodedFilePath = encodeURIComponent(path);
+
+    const result = await this.printerApi.deleteFile(encodedFilePath);
     await this.printerFilesStore.deleteFile(currentPrinterId, path);
     res.send(result);
   }
@@ -187,7 +192,8 @@ export class PrinterFilesController {
     const nonRecursiveFiles = await this.printerApi.getFiles();
     for (let file of nonRecursiveFiles) {
       try {
-        await this.printerApi.deleteFile(file.path);
+        const encodedFilePath = encodeURIComponent(file.path);
+        await this.printerApi.deleteFile(encodedFilePath);
         succeededFiles.push(file);
       } catch (e) {
         failedFiles.push(file);
