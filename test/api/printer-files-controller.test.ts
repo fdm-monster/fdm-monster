@@ -13,11 +13,13 @@ import TestAgent from "supertest/lib/agent";
 const defaultRoute = AppConstants.apiRoute + "/printer-files";
 const trackedUploadsRoute = `${defaultRoute}/tracked-uploads`;
 const purgeIndexedFilesRoute = `${defaultRoute}/purge`;
+const thumbnailsRoute = `${defaultRoute}/thumbnails`;
 type idType = Number;
 const getRoute = (id: idType) => `${defaultRoute}/${id}`;
 const clearFilesRoute = (id: idType) => `${getRoute(id)}/clear`;
 const deleteFileRoute = (id: idType, path: string) => `${getRoute(id)}?path=${path}`;
 const printFileRoute = (id: idType) => `${getRoute(id)}/print`;
+const reloadThumbnailRoute = (id: idType) => `${getRoute(id)}/reload-thumbnail`;
 const uploadFileRoute = (id: idType) => `${getRoute(id)}/upload`;
 const getFilesRoute = (id: idType) => `${getRoute(id)}`;
 const getCacheRoute = (id: idType) => `${getRoute(id)}/cache`;
@@ -59,6 +61,20 @@ describe(PrinterFilesController.name, () => {
   it("should allow GET on printer files cache", async () => {
     const printer = await createTestPrinter(request);
     const response = await request.get(getCacheRoute(printer.id)).send();
+    expectOkResponse(response);
+  });
+
+  it("should allow GET on printer files thumbnails cache", async () => {
+    const response = await request.get(thumbnailsRoute).send();
+    expectOkResponse(response);
+  });
+
+  it("should allow POST to reload thumbnail cache", async () => {
+    const printer = await createTestPrinter(request);
+    nock(printer.printerURL).get("/api/files/local/123.gcode").reply(200, "; thumbnail begin\n; thumbnail end");
+    const response = await request.post(reloadThumbnailRoute(printer.id)).send({
+      filePath: "123.gcode",
+    });
     expectOkResponse(response);
   });
 
