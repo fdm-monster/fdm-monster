@@ -23,6 +23,7 @@ import { IConfigService } from "@/services/core/config.service";
 import { PrinterCache } from "@/state/printer.cache";
 import { MoonrakerType } from "@/services/printer-api.interface";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
+import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
 
 export class SettingsController {
   settingsStore: SettingsStore;
@@ -31,6 +32,7 @@ export class SettingsController {
   printerService: IPrinterService;
   configService: IConfigService;
   serverVersion: string;
+  private printerThumbnailCache: PrinterThumbnailCache;
 
   constructor({
     settingsStore,
@@ -39,6 +41,7 @@ export class SettingsController {
     serverVersion,
     loggerFactory,
     configService,
+    printerThumbnailCache,
   }: {
     serverVersion: string;
     printerCache: PrinterCache;
@@ -46,6 +49,7 @@ export class SettingsController {
     settingsStore: SettingsStore;
     loggerFactory: ILoggerFactory;
     configService: IConfigService;
+    printerThumbnailCache: PrinterThumbnailCache;
   }) {
     this.settingsStore = settingsStore;
     this.logger = loggerFactory(SettingsController.name);
@@ -53,6 +57,7 @@ export class SettingsController {
     this.configService = configService;
     this.printerCache = printerCache;
     this.printerService = printerService;
+    this.printerThumbnailCache = printerThumbnailCache;
   }
 
   getSettings(req: Request, res: Response) {
@@ -98,6 +103,11 @@ export class SettingsController {
     const { enabled } = await validateInput(req.body, thumbnailSupportRules);
     const result = await this.settingsStore.setExperimentalThumbnailSupport(enabled);
 
+    if (enabled) {
+      await this.printerThumbnailCache.loadCache();
+    } else {
+      await this.printerThumbnailCache.resetCache();
+    }
     res.send(result);
   }
 

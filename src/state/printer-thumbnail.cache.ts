@@ -55,12 +55,18 @@ export class PrinterThumbnailCache extends KeyDiffCache<CachedPrinterThumbnail> 
     this.eventEmitter2.on(printerEvents.printersDeleted, this.handlePrintersDeleted.bind(this));
   }
 
+  async resetCache() {
+    const keys = Object.keys(this.keyValueStore);
+    await this.deleteKeysBatch(keys);
+  }
+
   async loadCache() {
     if (!this.settingsStore.isThumbnailSupportEnabled()) return;
 
     const printers = await this.printerCache.listCachedPrinters();
     const baseFolder = join(superRootPath(), AppConstants.defaultPrinterThumbnailsStorage);
 
+    this.resetDiffs();
     Object.keys(this.keyValueStore).forEach((key) => {
       delete this.keyValueStore[key];
     });
