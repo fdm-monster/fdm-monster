@@ -51,8 +51,8 @@ export class OctoprintApi implements IPrinterApi {
     throw new NotImplementedException();
   }
 
-  async startPrint(path: string) {
-    await this.client.postSelectPrintFile(this.login, path, true);
+  async startPrint(filePath: string) {
+    await this.client.postSelectPrintFile(this.login, filePath, true);
   }
 
   async pausePrint(): Promise<void> {
