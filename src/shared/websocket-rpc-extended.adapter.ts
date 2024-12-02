@@ -7,7 +7,7 @@ import { LoggerService } from "@/handlers/logger";
 import { JsonRpcEventDto } from "@/services/moonraker/dto/websocket/json-rpc-event.dto";
 
 export abstract class WebsocketRpcExtendedAdapter extends WebsocketAdapter {
-  protected logger: LoggerService;
+  protected declare logger: LoggerService;
   protected constructor({ loggerFactory }: { loggerFactory: ILoggerFactory }) {
     super({ loggerFactory });
 
@@ -16,7 +16,6 @@ export abstract class WebsocketRpcExtendedAdapter extends WebsocketAdapter {
     this.requestMap = new Map();
   }
 
-  private nextRequestId = 0;
   private requestMap: Map<
     number,
     {

@@ -264,9 +264,12 @@ export class PrinterSocketStore {
 
   private deleteSocket(printerId: string) {
     const socket = this.printerSocketAdaptersById[printerId];
-    if (!!socket) {
-      socket.close();
-    }
+
+    // Ensure that the printer does not re-register itself after being purged
+    socket?.disallowEmittingEvents();
+
+    socket?.close();
+
     // TODO mark diff cache
     delete this.printerSocketAdaptersById[printerId];
   }

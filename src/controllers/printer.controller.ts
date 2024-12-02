@@ -318,7 +318,7 @@ export class PrinterController {
         await printerApi.getVersion();
       }
     } catch (e) {
-      this.logger.log("OctoPrint /api/version test failed");
+      this.logger.log("Printer version test failed");
 
       if (e instanceof AxiosError) {
         this.logger.debug(e.message + " " + e.status + " " + e.response?.status);
@@ -333,7 +333,7 @@ export class PrinterController {
           case 0:
           case 502:
           case 503: {
-            throw new FailedDependencyException("OctoPrint unreachable", e.response?.status);
+            throw new FailedDependencyException("Printer service unreachable", e.response?.status);
           }
           default: {
             if (!e.response?.status) {
@@ -341,15 +341,18 @@ export class PrinterController {
               // ENOTFOUND: DNS problem
               // ECONNREFUSED: Port has no socket bound
               // ERR_BAD_REQUEST
-              throw new FailedDependencyException(`Reaching OctoPrint failed without status (code ${e.code})`);
+              throw new FailedDependencyException(`Reaching Printer service failed without status (code ${e.code})`);
             } else {
-              throw new FailedDependencyException(`Reaching OctoPrint failed with status (code ${e.code})`, e.response?.status);
+              throw new FailedDependencyException(
+                `Reaching Printer service failed with status (code ${e.code})`,
+                e.response?.status
+              );
             }
           }
         }
       }
 
-      throw new InternalServerException(`Could not call OctoPrint, internal problem`, (e as Error).stack);
+      throw new InternalServerException(`Could not call Printer service, internal problem`, (e as Error).stack);
     }
   }
 

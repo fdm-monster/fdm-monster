@@ -23,7 +23,7 @@ import {
 import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class SettingsStore {
-  private isTypeOrmMode: boolean;
+  private readonly isTypeOrmMode: boolean;
   private settingsService: ISettingsService;
   private logger: LoggerService;
   private settings: ISettings | null = null;

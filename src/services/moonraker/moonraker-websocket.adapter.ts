@@ -320,6 +320,10 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
   }
 
   emitEventSync(event: string, payload: any) {
+    if (!this.eventEmittingAllowed) {
+      return;
+    }
+
     this.eventEmitter.emit(moonrakerEvent(event), {
       event,
       payload,
@@ -419,6 +423,10 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
   }
 
   private async emitEvent(event: string, payload?: any) {
+    if (!this.eventEmittingAllowed) {
+      return;
+    }
+
     await this.eventEmitter.emitAsync(moonrakerEvent(event), {
       event,
       payload,
