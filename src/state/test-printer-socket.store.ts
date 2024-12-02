@@ -119,6 +119,9 @@ export class TestPrinterSocketStore {
       this.logger.error(`Test harness error ${errorSummary(e)}`);
       captureException(e);
     } finally {
+      // Ensure that the printer does not re-register itself after being purged
+      this.testSocket.disallowEmittingEvents();
+
       if (this.testSocket) {
         this.testSocket.close();
       }

@@ -26,4 +26,8 @@ export interface IWebsocketAdapter<T = IdType> {
   setupSocketSession(): Promise<void>;
 
   resetSocketState(): void;
+
+  allowEmittingEvents(): void;
+
+  disallowEmittingEvents(): void;
 }

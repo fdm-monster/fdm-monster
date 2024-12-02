@@ -22,6 +22,7 @@ import { Event as WsEvent } from "ws";
 import { CurrentMessageDto } from "@/services/octoprint/dto/websocket/current-message.dto";
 import { OctoprintErrorDto } from "@/services/octoprint/dto/rest/error.dto";
 import { OctoprintType } from "@/services/printer-api.interface";
+import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
 
 export const WsMessage = {
   // Custom events
@@ -45,7 +46,7 @@ export const OctoPrintMessage = {
 
 export const octoPrintEvent = (event: string) => `octoprint.${event}`;
 
-export class OctoprintWebsocketAdapter extends WebsocketAdapter {
+export class OctoprintWebsocketAdapter extends WebsocketAdapter implements IWebsocketAdapter {
   public readonly printerType = 0;
   octoprintClient: OctoprintClient;
   public printerId?: IdType;
@@ -59,7 +60,7 @@ export class OctoprintWebsocketAdapter extends WebsocketAdapter {
   reauthRequired = false;
   reauthRequiredTimestamp: null | number = null;
   login?: LoginDto;
-  protected logger: LoggerService;
+  protected declare logger: LoggerService;
   private eventEmitter: EventEmitter2;
   private configService: ConfigService;
   private socketURL?: URL;
@@ -273,6 +274,10 @@ export class OctoprintWebsocketAdapter extends WebsocketAdapter {
   }
 
   emitEventSync(event: string, payload: any) {
+    if (!this.eventEmittingAllowed) {
+      return;
+    }
+
     this.eventEmitter.emit(octoPrintEvent(event), {
       event,
       payload,
@@ -329,6 +334,10 @@ export class OctoprintWebsocketAdapter extends WebsocketAdapter {
   }
 
   private async emitEvent(event: string, payload?: any) {
+    if (!this.eventEmittingAllowed) {
+      return;
+    }
+
     await this.eventEmitter.emitAsync(octoPrintEvent(event), {
       event,
       payload,
