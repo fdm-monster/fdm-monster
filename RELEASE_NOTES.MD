@@ -1,5 +1,9 @@
 # Develop
 
+## Chores
+
+- Remove unused influxdb v2 service and package
+
 ## Fixes
 
 - Moonraker 'notify_service_state_changed' event: sometimes the moonraker services object can miss properties
