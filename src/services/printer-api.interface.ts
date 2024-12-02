@@ -75,8 +75,10 @@ export interface IPrinterApi {
   movePrintHead(amounts: { x?: number; y?: number; z?: number; speed?: number }): Promise<void>;
   homeAxes(axes: { x?: boolean; y?: boolean; z?: boolean }): Promise<void>;
 
+  getFile(path: string): Promise<FileDto>;
   getFiles(): Promise<FileDto[]>;
   downloadFile(path: string): AxiosPromise<NodeJS.ReadableStream>;
+  getFileChunk(path: string, startBytes: number, endBytes: number): AxiosPromise<string>;
   uploadFile(fileOrBuffer: Buffer | Express.Multer.File, uploadToken?: string): Promise<void>;
   deleteFile(path: string): Promise<void>;
   deleteFolder(path: string): Promise<void>;

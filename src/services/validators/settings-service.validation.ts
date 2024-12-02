@@ -7,6 +7,7 @@ export const serverSettingsUpdateRules = {
   "debugSettings.debugSocketEvents": "boolean",
   "debugSettings.debugSocketReconnect": "boolean",
   experimentalMoonrakerSupport: "boolean",
+  experimentalThumbnailSupport: "boolean",
 };
 
 export const timeoutSettingsUpdateRules = {
@@ -17,6 +18,7 @@ export const frontendSettingsUpdateRules = {
   gridCols: "integer|min:1",
   gridRows: "integer|min:1",
   largeTiles: "boolean",
+  tilePreferCancelOverQuickStop: "boolean",
 };
 
 export const credentialSettingPatchRules = {
@@ -43,6 +45,10 @@ export const sentryDiagnosticsEnabledRules = {
 };
 
 export const moonrakerSupportRules = {
+  enabled: "required|boolean",
+};
+
+export const thumbnailSupportRules = {
   enabled: "required|boolean",
 };
 

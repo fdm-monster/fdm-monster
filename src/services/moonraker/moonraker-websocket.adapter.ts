@@ -149,12 +149,11 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
   reauthSession() {}
 
   registerCredentials(socketLogin: ISocketLogin) {
-    const { printerId, loginDto, protocol } = socketLogin;
+    const { printerId, loginDto } = socketLogin;
     this.printerId = printerId;
     this.login = loginDto;
 
-    const httpUrl = normalizeUrl(this.login.printerURL);
-    const wsUrl = httpToWsUrl(httpUrl, protocol);
+    const wsUrl = httpToWsUrl(this.login.printerURL);
     wsUrl.pathname = "/websocket";
     this.socketURL = wsUrl;
   }
@@ -280,9 +279,9 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
     if (eventName === "notify_service_state_changed") {
       const serviceChanged = event.params[0] as NotifyServiceStateChangedParams;
       if (
-        serviceChanged.klipper.active_state ||
-        serviceChanged.klipper_mcu.active_state ||
-        serviceChanged.moonraker.active_state
+        serviceChanged.klipper?.active_state ||
+        serviceChanged.klipper_mcu?.active_state ||
+        serviceChanged.moonraker?.active_state
       ) {
         this.logger.log("Received notify_service_state_changed, reloading Moonraker printer objects");
         await this.setupSocketSession();
@@ -320,6 +319,10 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
   }
 
   emitEventSync(event: string, payload: any) {
+    if (!this.eventEmittingAllowed) {
+      return;
+    }
+
     this.eventEmitter.emit(moonrakerEvent(event), {
       event,
       payload,
@@ -419,6 +422,10 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
   }
 
   private async emitEvent(event: string, payload?: any) {
+    if (!this.eventEmittingAllowed) {
+      return;
+    }
+
     await this.eventEmitter.emitAsync(moonrakerEvent(event), {
       event,
       payload,

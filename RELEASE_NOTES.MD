@@ -1,5 +1,24 @@
 # Develop
 
+# FDM Monster 02/12/2024 1.8.0
+
+## Chores
+
+- Remove unused influxdb v2 service and package
+
+## Fixes
+
+- Moonraker 'notify_service_state_changed' event: sometimes the moonraker services object can miss properties
+- PrinterEventsCache: remove cache protection against deleted keys as this caused retry loops to stop updating printer state. Cache prevention on this level is too rough and needs to be moved to the place responsible for socket deletion.
+- WebsocketAdapters (OctoPrint, Moonraker): prevent a deleted socket from entering cache state again by silencing the event emits in the printer socket
+- Url http/https normalization: Printer loaded over https:// wont open websocket over wss://
+
+## Features
+
+- Settings: add grid setting to show cancel button instead of quick stop button
+- Scan and save gcode thumbnails per printer
+- Support uploading .bgcode format files
+
 # FDM Monster 25/11/2024 1.7.6
 
 ## Fixes

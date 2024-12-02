@@ -5,7 +5,7 @@ import { multiPartContentType, pluginRepositoryUrl } from "./constants/octoprint
 import { firmwareFlashUploadEvent, uploadProgressEvent } from "@/constants/event.constants";
 import { ExternalServiceError } from "@/exceptions/runtime.exceptions";
 import { OctoprintRoutes } from "./octoprint-api.routes";
-import axios, { AxiosInstance, AxiosPromise, AxiosStatic } from "axios";
+import axios, { AxiosInstance, AxiosPromise } from "axios";
 import EventEmitter2 from "eventemitter2";
 import { LoggerService } from "@/handlers/logger";
 import { LoginDto } from "@/services/interfaces/login.dto";
@@ -20,7 +20,6 @@ import { VersionDto } from "@/services/octoprint/dto/server/version.dto";
 import { ServerDto } from "@/services/octoprint/dto/server/server.dto";
 import { UserListDto } from "@/services/octoprint/dto/access/user-list.dto";
 import { OctoprintFilesResponseDto } from "@/services/octoprint/dto/files/octoprint-files-response.dto";
-import { CurrentMessageDto } from "@/services/octoprint/dto/websocket/current-message.dto";
 import { CurrentUserDto } from "@/services/octoprint/dto/auth/current-user.dto";
 import { CurrentJobDto } from "@/services/octoprint/dto/job/current-job.dto";
 import { SettingsDto } from "@/services/octoprint/dto/settings/settings.dto";
@@ -216,6 +215,18 @@ export class OctoprintClient extends OctoprintRoutes {
     });
   }
 
+  getFileChunk(login: LoginDto, filePath: string, startBytes: number, endBytes: number) {
+    const pathUrl = this.downloadFileLocal(filePath);
+    const { url, options } = this.prepareRequest(login, pathUrl);
+    return this.httpClient.get<string>(url, {
+      headers: {
+        ...options.headers,
+        Range: `bytes=${startBytes}-${endBytes}`,
+      },
+      timeout: options.timeout,
+    });
+  }
+
   async createFolder(login: LoginDto, path: string, foldername: string) {
     const { url, options } = this.prepareRequest(login, this.apiFilesLocal);
 
@@ -356,7 +367,7 @@ export class OctoprintClient extends OctoprintRoutes {
   /**
    * Based on https://github.com/OctoPrint/OctoPrint/blob/f430257d7072a83692fc2392c683ed8c97ae47b6/src/octoprint/plugins/softwareupdate/__init__.py#L1265
    */
-  async postSoftwareUpdate(login: LoginDto, targets) {
+  async postSoftwareUpdate(login: LoginDto, targets: string[]) {
     const { url, options } = this.prepareJsonRequest(login, this.pluginSoftwareUpdateUpdate, {
       targets,
     });

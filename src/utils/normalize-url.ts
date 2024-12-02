@@ -10,7 +10,8 @@ const supportedProtocols = new Set(["https:", "http:", "file:"]);
 const hasCustomProtocol = (urlString: string) => {
   try {
     const { protocol } = new URL(urlString);
-    return protocol.endsWith(":") && !supportedProtocols.has(protocol);
+
+    return protocol.endsWith(":") && !protocol.includes(".") && !supportedProtocols.has(protocol);
   } catch {
     return false;
   }
@@ -66,7 +67,8 @@ const normalizeDataURL = (urlString: string, { stripHash }: { stripHash: boolean
 };
 
 /**
- * https://github.com/sindresorhus/normalize-url v8.0.0 downloaded at 13/08/2023
+ * https://github.com/sindresorhus/normalize-url v8.0.1 patched at 12/01/2024
+ * v8.0.0 downloaded at 13/08/2023
  * @param urlString
  * @param options
  * @return {*|string}

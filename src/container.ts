@@ -40,7 +40,6 @@ import { PrinterWebsocketRestoreTask } from "./tasks/printer-websocket-restore.t
 import { PluginFirmwareUpdateService } from "./services/octoprint/plugin-firmware-update.service";
 import { PluginRepositoryCache } from "./services/octoprint/plugin-repository.cache";
 import { configureCacheManager } from "./handlers/cache-manager";
-import { InfluxDbV2BaseService } from "./services/influxdb-v2/influx-db-v2-base.service";
 import { ConfigService } from "./services/core/config.service";
 import { PrintCompletionSocketIoTask } from "./tasks/print-completion.socketio.task";
 import { PrintCompletionService } from "./services/mongoose/print-completion.service";
@@ -79,6 +78,7 @@ import { OctoprintApi } from "@/services/octoprint.api";
 import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { MoonrakerApi } from "@/services/moonraker.api";
 import { PrinterApiFactory } from "@/services/printer-api.factory";
+import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
 
 export function config<T1, T2>(
   key: string,
@@ -190,6 +190,7 @@ export function configureContainer(isSqlite: boolean = false) {
 
     [di.floorStore]: asClass(FloorStore).singleton(),
     [di.pluginRepositoryCache]: asClass(PluginRepositoryCache).singleton(),
+    [di.printerThumbnailCache]: asClass(PrinterThumbnailCache).singleton(),
     [di.fileCache]: asClass(FileCache).singleton(),
     [di.fileUploadTrackerCache]: asClass(FileUploadTrackerCache).singleton(),
     [di.printerFilesStore]: asClass(PrinterFilesStore).singleton(),
@@ -197,9 +198,6 @@ export function configureContainer(isSqlite: boolean = false) {
     [di.printerEventsCache]: asClass(PrinterEventsCache).singleton(),
     [di.printerSocketStore]: asClass(PrinterSocketStore).singleton(),
     [di.testPrinterSocketStore]: asClass(TestPrinterSocketStore).singleton(),
-
-    // Extensibility and export
-    [di.influxDbV2BaseService]: asClass(InfluxDbV2BaseService),
 
     [di.bootTask]: asClass(BootTask),
     [di.softwareUpdateTask]: asClass(SoftwareUpdateTask), // Provided SSE handlers (couplers) shared with controllers

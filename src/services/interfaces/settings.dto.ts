@@ -23,6 +23,7 @@ export interface ServerSettingsDto {
   experimentalMoonrakerSupport: boolean;
   experimentalTypeormSupport: boolean;
   experimentalClientSupport: boolean;
+  experimentalThumbnailSupport: boolean;
 }
 
 export interface WizardSettingsDto {
@@ -35,6 +36,7 @@ export interface FrontendSettingsDto {
   gridCols: number;
   gridRows: number;
   largeTiles: boolean;
+  tilePreferCancelOverQuickStop: boolean;
 }
 
 export interface FileCleanSettingsDto {

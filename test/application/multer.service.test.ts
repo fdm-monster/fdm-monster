@@ -46,7 +46,7 @@ describe("MulterService", () => {
     const incorrectFile = { originalname: "file.gco" };
 
     expect(() =>
-      multerService.multerFileFilter(".gcode")(null, incorrectFile, (err, result) => {
+      multerService.multerFileFilter([".gcode", ".bgcode"])(null, incorrectFile, (err, result) => {
         if (err) throw err;
         return result;
       })
@@ -57,7 +57,7 @@ describe("MulterService", () => {
     const correctFile = { originalname: "file.gcode" };
 
     expect(() =>
-      multerService.multerFileFilter(".gcode")(null, correctFile, (err, result) => {
+      multerService.multerFileFilter([".gcode", ".bgcode"])(null, correctFile, (err, result) => {
         if (err) throw err;
         return result;
       })

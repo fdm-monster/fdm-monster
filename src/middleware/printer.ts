@@ -1,4 +1,4 @@
-import { asClass, asValue } from "awilix";
+import { asValue } from "awilix";
 import { DITokens } from "@/container.tokens";
 import { NextFunction, Request, Response } from "express";
 import { PrinterCache } from "@/state/printer.cache";

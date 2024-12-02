@@ -2,7 +2,7 @@ import { setupTestApp } from "../test-server";
 import { createTestPrinter } from "./test-data/create-printer";
 import { expectInvalidResponse, expectNotFoundResponse, expectOkResponse } from "../extensions";
 import { AppConstants } from "@/server.constants";
-import nock from "nock";
+import nock, { Body, ReplyHeaders } from "nock";
 import { Test } from "supertest";
 import { PrinterFilesController } from "@/controllers/printer-files.controller";
 import { AwilixContainer } from "awilix";
@@ -13,14 +13,18 @@ import TestAgent from "supertest/lib/agent";
 const defaultRoute = AppConstants.apiRoute + "/printer-files";
 const trackedUploadsRoute = `${defaultRoute}/tracked-uploads`;
 const purgeIndexedFilesRoute = `${defaultRoute}/purge`;
+const thumbnailsRoute = `${defaultRoute}/thumbnails`;
 type idType = Number;
 const getRoute = (id: idType) => `${defaultRoute}/${id}`;
 const clearFilesRoute = (id: idType) => `${getRoute(id)}/clear`;
 const deleteFileRoute = (id: idType, path: string) => `${getRoute(id)}?path=${path}`;
 const printFileRoute = (id: idType) => `${getRoute(id)}/print`;
+const reloadThumbnailRoute = (id: idType) => `${getRoute(id)}/reload-thumbnail`;
 const uploadFileRoute = (id: idType) => `${getRoute(id)}/upload`;
 const getFilesRoute = (id: idType) => `${getRoute(id)}`;
+const downloadFileRoute = (id: idType, path: string) => `${getRoute(id)}/download/${path}`;
 const getCacheRoute = (id: idType) => `${getRoute(id)}/cache`;
+const getPrintThumbnailRoute = (id: idType) => `${getRoute(id)}/thumbnail`;
 
 let request: TestAgent<Test>;
 let container: AwilixContainer;
@@ -49,16 +53,54 @@ describe(PrinterFilesController.name, () => {
 
   it("should retrieve files on GET for existing printer", async () => {
     const printer = await createTestPrinter(request);
-
     nock(printer.printerURL).get("/api/files/local").query("recursive=false").reply(200, { files: [], free: 1, total: 1 });
-
     const response = await request.get(getFilesRoute(printer.id)).send();
     expectOkResponse(response, []);
+  });
+
+  it("should retrieve file with hash character on GET for existing printer", async () => {
+    const printer = await createTestPrinter(request);
+    const filename = "test#.gcode";
+    const reply0 = { path: filename };
+    const reply1 = JSON.stringify(reply0);
+    nock(printer.printerURL)
+      .get(`/downloads/files/local/${encodeURIComponent(filename)}`)
+      .reply(
+        200,
+        reply1 as Body,
+        {
+          "content-type": "application/json",
+          "content-length": reply1.length.toString(),
+          "content-disposition": "attachment; filename=test#.gcode",
+        } as ReplyHeaders
+      );
+    const response = await request.get(downloadFileRoute(printer.id, encodeURIComponent(filename))).send();
+    expectOkResponse(response, reply0);
   });
 
   it("should allow GET on printer files cache", async () => {
     const printer = await createTestPrinter(request);
     const response = await request.get(getCacheRoute(printer.id)).send();
+    expectOkResponse(response);
+  });
+
+  it("should allow GET on printer files thumbnails cache", async () => {
+    const response = await request.get(thumbnailsRoute).send();
+    expectOkResponse(response);
+  });
+
+  it("should allow GET on cached printer thumbnail", async () => {
+    const printer = await createTestPrinter(request);
+    const response = await request.get(getPrintThumbnailRoute(printer.id)).send();
+    expectOkResponse(response);
+  });
+
+  it("should allow POST to reload thumbnail cache", async () => {
+    const printer = await createTestPrinter(request);
+    nock(printer.printerURL).get("/api/files/local/123.gcode").reply(200, "; thumbnail begin\n; thumbnail end");
+    const response = await request.post(reloadThumbnailRoute(printer.id)).send({
+      filePath: "123.gcode",
+    });
     expectOkResponse(response);
   });
 

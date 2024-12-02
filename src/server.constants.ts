@@ -17,6 +17,9 @@ export const AppConstants = {
   // New place for all downloads, files etc
   defaultClientBundleStorage: "./media/client-dist",
   defaultClientBundleZipsStorage: "./media/client-dist-zips",
+  defaultPrinterThumbnailsStorage: "./media/printer-thumbnails",
+  defaultFileUploadsStorage: "./media/file-uploads",
+  defaultAcceptedGcodeExtensions: [".gcode", ".bgcode"],
   defaultServerPort: 4000,
   defaultMongoStringUnauthenticated: "mongodb://127.0.0.1:27017/fdm-monster",
   apiRoute: "/api",
@@ -69,7 +72,7 @@ export const AppConstants = {
   orgName: "fdm-monster",
   // Wizard version changes will trigger a re-run of the wizard
   currentWizardVersion: 1,
-  defaultClientMinimum: "1.7.2",
+  defaultClientMinimum: "1.8.0",
 
   influxUrl: "INFLUX_URL",
   influxToken: "INFLUX_TOKEN",

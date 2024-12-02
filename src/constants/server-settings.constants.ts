@@ -32,6 +32,7 @@ export const getDefaultServerSettings = (): ServerSettingsDto => ({
   experimentalMoonrakerSupport: false,
   experimentalTypeormSupport: false,
   experimentalClientSupport: false,
+  experimentalThumbnailSupport: false,
 });
 
 export const credentialSettingsKey = "credentials";
@@ -51,6 +52,7 @@ export const getDefaultFrontendSettings = (): FrontendSettingsDto => ({
   gridCols: 8,
   gridRows: 8,
   largeTiles: false,
+  tilePreferCancelOverQuickStop: false,
 });
 
 export const timeoutSettingKey = "timeout";
