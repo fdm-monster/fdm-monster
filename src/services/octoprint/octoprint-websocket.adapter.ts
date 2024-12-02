@@ -109,12 +109,12 @@ export class OctoprintWebsocketAdapter extends WebsocketAdapter implements IWebs
   }
 
   registerCredentials(socketLogin: ISocketLogin) {
-    const { printerId, loginDto, protocol } = socketLogin;
+    const { printerId, loginDto } = socketLogin;
     this.printerId = printerId;
     this.login = loginDto;
 
     const httpUrl = normalizeUrl(this.login.printerURL);
-    const wsUrl = httpToWsUrl(httpUrl, protocol);
+    const wsUrl = httpToWsUrl(httpUrl);
     wsUrl.pathname = "/sockjs/websocket";
     this.socketURL = wsUrl;
   }

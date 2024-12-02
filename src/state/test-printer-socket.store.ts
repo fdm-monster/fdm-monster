@@ -62,7 +62,6 @@ export class TestPrinterSocketStore {
         printerURL: printer.printerURL,
         printerType: printer.printerType,
       },
-      protocol: "ws",
     });
 
     const testEvents = [
