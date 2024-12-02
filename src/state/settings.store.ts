@@ -53,6 +53,7 @@ export class SettingsStore {
         registration: settings[serverSettingsKey].registration,
         sentryDiagnosticsEnabled: settings[serverSettingsKey].sentryDiagnosticsEnabled,
         experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
+        experimentalBambuSupport: settings[serverSettingsKey].experimentalBambuSupport,
         experimentalTypeormSupport: this.isTypeOrmMode,
         experimentalClientSupport: settings[serverSettingsKey].experimentalClientSupport,
         experimentalThumbnailSupport: settings[serverSettingsKey].experimentalThumbnailSupport,
@@ -76,6 +77,7 @@ export class SettingsStore {
       [serverSettingsKey]: {
         debugSettings: settings[serverSettingsKey].debugSettings,
         experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
+        experimentalBambuSupport: settings[serverSettingsKey].experimentalBambuSupport,
         experimentalTypeormSupport: this.isTypeOrmMode,
         experimentalClientSupport: settings[serverSettingsKey].experimentalClientSupport,
         experimentalThumbnailSupport: settings[serverSettingsKey].experimentalThumbnailSupport,
@@ -221,6 +223,13 @@ export class SettingsStore {
   async setExperimentalMoonrakerSupport(moonrakerEnabled: boolean) {
     this.settings = await this.settingsService.patchServerSettings({
       experimentalMoonrakerSupport: moonrakerEnabled,
+    });
+    return this.getSettings();
+  }
+
+  async setExperimentalBambuSupport(bambuEnabled: boolean) {
+    this.settings = await this.settingsService.patchServerSettings({
+      experimentalBambuSupport: bambuEnabled,
     });
     return this.getSettings();
   }
