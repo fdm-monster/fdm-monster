@@ -8,6 +8,7 @@ export type WsProtocol = "ws" | "wss";
 export class WebsocketAdapter {
   socket?: WebSocket;
   protected logger: LoggerService;
+  eventEmittingAllowed: boolean = true;
 
   constructor({ loggerFactory }: { loggerFactory: ILoggerFactory }) {
     this.logger = loggerFactory(WebsocketAdapter.name);
@@ -20,6 +21,14 @@ export class WebsocketAdapter {
   public close() {
     this.socket?.close();
     delete this.socket;
+  }
+
+  public allowEmittingEvents() {
+    this.eventEmittingAllowed = true;
+  }
+
+  public disallowEmittingEvents() {
+    this.eventEmittingAllowed = false;
   }
 
   /**
