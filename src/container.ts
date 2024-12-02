@@ -80,6 +80,7 @@ import { HttpClientFactory } from "@/services/core/http-client.factory";
 import { BambuClient } from "@/services/bambu/bambu.client";
 import { BambuMqttAdapter } from "@/services/bambu/bambu-mqtt.adapter";
 import { BambuFtpAdapter } from "@/services/bambu/bambu-ftp.adapter";
+import { BambuApi } from "@/services/bambu.api";
 
 export function config<T1, T2>(
   key: string,
@@ -178,6 +179,7 @@ export function configureContainer(isSqlite: boolean = false) {
     [di.moonrakerApi]: asClass(MoonrakerApi).transient(), // Transient on purpose
     [di.moonrakerClient]: asClass(MoonrakerClient).singleton(),
     [di.moonrakerWebsocketAdapter]: asClass(MoonrakerWebsocketAdapter).transient(), // Transient on purpose
+    [di.bambuApi]: asClass(BambuApi).transient(),
     [di.bambuClient]: asClass(BambuClient).singleton(),
     [di.bambuFtpAdapter]: asClass(BambuFtpAdapter).transient(),
     [di.bambuMqttAdapter]: asClass(BambuMqttAdapter).transient(),
