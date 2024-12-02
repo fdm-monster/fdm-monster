@@ -149,12 +149,11 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
   reauthSession() {}
 
   registerCredentials(socketLogin: ISocketLogin) {
-    const { printerId, loginDto, protocol } = socketLogin;
+    const { printerId, loginDto } = socketLogin;
     this.printerId = printerId;
     this.login = loginDto;
 
-    const httpUrl = normalizeUrl(this.login.printerURL);
-    const wsUrl = httpToWsUrl(httpUrl, protocol);
+    const wsUrl = httpToWsUrl(this.login.printerURL);
     wsUrl.pathname = "/websocket";
     this.socketURL = wsUrl;
   }

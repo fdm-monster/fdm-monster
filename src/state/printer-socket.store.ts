@@ -221,7 +221,6 @@ export class PrinterSocketStore {
         printerURL: printer.printerURL,
         printerType: printer.printerType,
       },
-      protocol: "ws",
     });
     foundAdapter.resetSocketState();
   }
