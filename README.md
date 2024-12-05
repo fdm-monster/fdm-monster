@@ -76,7 +76,7 @@ Please join the discord, but stay professional and proactive!
 These are the people involved in the project. Find the meaning of the emoji keys [here](https://allcontributors.org/docs/en/emoji-key).
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-19-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-20-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
@@ -108,6 +108,7 @@ These are the people involved in the project. Find the meaning of the emoji keys
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/LyfeOnEdge"><img src="https://avatars.githubusercontent.com/u/26140376?v=4?s=80" width="80px;" alt="Andrew (LyfeOnEdge) (ArcticGentoo)"/><br /><sub><b>Andrew (LyfeOnEdge) (ArcticGentoo)</b></sub></a><br /><a href="#ideas-LyfeOnEdge" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/callanova"><img src="https://avatars.githubusercontent.com/u/175639705?v=4?s=80" width="80px;" alt="callanova"/><br /><sub><b>callanova</b></sub></a><br /><a href="https://github.com/fdm-monster/fdm-monster/issues?q=author%3Acallanova" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/thatguymendel"><img src="https://avatars.githubusercontent.com/u/67444998?v=4?s=80" width="80px;" alt="thatguymendel"/><br /><sub><b>thatguymendel</b></sub></a><br /><a href="#ideas-thatguymendel" title="Ideas, Planning, & Feedback">🤔</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Tbwan"><img src="https://avatars.githubusercontent.com/u/44231748?v=4?s=80" width="80px;" alt="Tbwan"/><br /><sub><b>Tbwan</b></sub></a><br /><a href="https://github.com/fdm-monster/fdm-monster/issues?q=author%3ATbwan" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
