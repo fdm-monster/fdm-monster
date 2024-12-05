@@ -133,9 +133,9 @@ Please consider sponsoring FDM Monster to help this project! You can find the [G
 
 Thanks to the following parties for their financial support:
 
-| Tier 4 | Tier 3 | Tier 2 | Tier 1 | One Time |
+| Tier 1 | Tier 2 | Tier 3 | Tier 4 | One Time |
 |--------|--------|--------|--------|-----------|
-|  | [WindArrow3d](https://github.com/WindArrow3d) | | [doucettom](https://github.com/doucettom) | [th3dstudio](https://github.com/th3dstudio) |
+|  | [WindArrow3d](https://github.com/WindArrow3d), [thatguymendel](https://github.com/thatguymendel) | | [doucettom](https://github.com/doucettom) | [th3dstudio](https://github.com/th3dstudio) |
 
 
 ## Contribute
