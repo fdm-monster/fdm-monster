@@ -158,8 +158,12 @@ the [CONTRIBUTING](CONTRIBUTING.md) file.
 - [x] :rocket: Documentation (https://docs.fdm-monster.net)
 - [x] 🛡️ Login and user management
 - [x] OctoFarm export 
-- [ ] Klipper and Moonraker API integration
-- [ ] OctoKlipper integration
+- [x] Klipper and Moonraker API integration
+- [x] GCode Thumbnail support
+- [x] `.bgcode` support
+- [x] Modernized UI layout and tile design
+- [ ] History and statistics
+- [ ] Extended webcam integration
 - [ ] Spoolman integration
 
 
