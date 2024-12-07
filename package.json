@@ -53,7 +53,7 @@
     "vue"
   ],
   "dependencies": {
-    "@fdm-monster/client": "1.8.2",
+    "@fdm-monster/client": "1.8.3",
     "@fdm-monster/client-next": "0.0.12",
     "@octokit/plugin-throttling": "8.2.0",
     "@sentry/node": "8.42.0",
