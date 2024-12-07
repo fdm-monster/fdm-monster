@@ -5,6 +5,9 @@
 </p>
 <h1 align="center" style="padding-top: 0; margin-top: 10px">FDM Monster</h1>
 
+![fdm-monster-main-grid](https://github.com/user-attachments/assets/4137d8d6-0365-44db-b9a9-53e3820a4cb3)
+_The FDM Monster grid after placing one OctoPrint and one Klipper (Moonraker) instance._
+
 <p align="center">
 <a href="https://discord.gg/mwA8uP8CMc">
     <img src="https://img.shields.io/discord/864835453773807686?label=Discord"/>
@@ -55,8 +58,6 @@ This server has been battle-tested in the field for 100+ printers, so give it a 
 - Import printers from OctoFarm
 - [Raspberry Pi image MonsterPi](https://docs.fdm-monster.net/guides/monsterpi)
 
-![docs/images/server-running.png](https://raw.githubusercontent.com/fdm-monster/fdm-monster-docs/main/docs/images/server-running.png)
-_The FDM Monster grid after placing one OctoPrint instance._
 
 ## Getting started
 
