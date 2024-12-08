@@ -5,16 +5,26 @@ import { PERMS } from "@/constants/authorization.constants";
 import { validateInput } from "@/handlers/validators";
 import { PrintCompletionSocketIoTask } from "@/tasks/print-completion.socketio.task";
 import { Request, Response } from "express";
-import { IPrintCompletionService } from "@/services/interfaces/print-completion.interface";
-import { findPrinterCompletionSchema } from "@/controllers/validation/printer-completion-controller.validation";
+import { IPrintHistoryService } from "@/services/interfaces/print-history.interface";
 
 @route(AppConstants.apiRoute + "/print-completion")
 @before([authenticate()])
 export class PrintCompletionController {
   constructor(
-    private readonly printCompletionService: IPrintCompletionService,
-    private readonly printCompletionSocketIoTask: PrintCompletionSocketIoTask,
+    private printCompletionService: IPrintHistoryService,
+    private printCompletionSocketIoTask: PrintCompletionSocketIoTask,
   ) {}
+
+  constructor({
+    printCompletionService,
+    printCompletionSocketIoTask,
+  }: {
+    printCompletionService: IPrintHistoryService;
+    printCompletionSocketIoTask: PrintCompletionSocketIoTask;
+  }) {
+    this.printCompletionService = printCompletionService;
+    this.printCompletionSocketIoTask = printCompletionSocketIoTask;
+  }
 
   /**
    * Not a production ready call, just for testing.
