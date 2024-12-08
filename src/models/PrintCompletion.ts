@@ -2,7 +2,7 @@ import { model, Schema } from "mongoose";
 import { PrintCompletionContextDto } from "@/services/interfaces/print-completion-context.dto";
 import { MongoIdType } from "@/shared.constants";
 
-export interface IPrintCompletion<KeyType = MongoIdType> {
+export interface IPrintLog<KeyType = MongoIdType> {
   id: KeyType;
   fileName: string;
   createdAt: number;
@@ -12,7 +12,7 @@ export interface IPrintCompletion<KeyType = MongoIdType> {
   context: PrintCompletionContextDto;
 }
 
-const PrintCompletionSchema = new Schema<IPrintCompletion>({
+const PrintCompletionSchema = new Schema<IPrintLog>({
   fileName: {
     type: String,
     required: true,

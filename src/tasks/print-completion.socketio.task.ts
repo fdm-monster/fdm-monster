@@ -4,11 +4,11 @@ import { generateCorrelationToken } from "@/utils/correlation-token.util";
 import EventEmitter2 from "eventemitter2";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
-import { CreatePrintCompletionDto, PrintCompletionContext } from "@/services/interfaces/print-completion.dto";
+import { CreatePrintHistoryDto, PrintCompletionContext } from "@/services/interfaces/print-history.dto";
 import { IdType } from "@/shared.constants";
 import { OctoPrintEventDto } from "@/services/octoprint/dto/octoprint-event.dto";
 import { PrinterEventsCache } from "@/state/printer-events.cache";
-import { IPrintCompletionService } from "@/services/interfaces/print-completion.interface";
+import { IPrintHistoryService } from "@/services/interfaces/print-history.interface";
 
 export class PrintCompletionSocketIoTask {
   private readonly logger: LoggerService;
@@ -18,7 +18,7 @@ export class PrintCompletionSocketIoTask {
   constructor(
     loggerFactory: ILoggerFactory,
     private readonly eventEmitter2: EventEmitter2,
-    private readonly printCompletionService: IPrintCompletionService,
+    private readonly printCompletionService: IPrintHistoryService,
     private readonly printerEventsCache: PrinterEventsCache
   ) {
     this.logger = loggerFactory(PrintCompletionSocketIoTask.name);
@@ -56,7 +56,7 @@ export class PrintCompletionSocketIoTask {
       context: {
         correlationId: null,
       },
-    } as CreatePrintCompletionDto;
+    } as CreatePrintHistoryDto;
     if (
       data.payload.type === EVENT_TYPES.EStop ||
       data.payload.type === EVENT_TYPES.PrintCancelling ||
