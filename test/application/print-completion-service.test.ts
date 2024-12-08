@@ -1,18 +1,18 @@
 import { DITokens } from "@/container.tokens";
-import { PrintCompletionService } from "@/services/orm/print-completion.service";
+import { PrintHistoryService } from "@/services/orm/print-history.service";
 import { EVENT_TYPES } from "@/services/octoprint/constants/octoprint-websocket.constants";
 import { setupTestApp } from "../test-server";
 import { AwilixContainer } from "awilix";
 import { generateCorrelationToken } from "@/utils/correlation-token.util";
 import { createTestPrinter } from "../api/test-data/create-printer";
 import { Test } from "supertest";
-import { IPrintCompletionService } from "@/services/interfaces/print-completion.interface";
+import { IPrintHistoryService } from "@/services/interfaces/print-history.interface";
 import { SqliteIdType } from "@/shared.constants";
-import { PrintCompletion } from "@/entities";
 import TestAgent from "supertest/lib/agent";
+import { PrintLog } from "@/entities";
 
 let container: AwilixContainer;
-let printCompletionService: IPrintCompletionService<SqliteIdType, PrintCompletion>;
+let printCompletionService: IPrintHistoryService<SqliteIdType, PrintLog>;
 let request: TestAgent<Test>;
 
 beforeAll(async () => {
@@ -20,7 +20,7 @@ beforeAll(async () => {
   printCompletionService = container.resolve(DITokens.printCompletionService);
 });
 
-describe(PrintCompletionService.name, () => {
+describe(PrintHistoryService.name, () => {
   it("can add a print failure with or without log", async () => {
     const trackingToken = generateCorrelationToken();
     const printer = await createTestPrinter(request);

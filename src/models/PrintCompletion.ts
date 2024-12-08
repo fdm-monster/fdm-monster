@@ -12,7 +12,7 @@ export interface IPrintCompletion<KeyType = MongoIdType, PrinterIdType = Schema.
   context: PrintCompletionContextDto;
 }
 
-const PrintCompletionSchema = new Schema<IPrintCompletion>({
+const PrintCompletionSchema = new Schema<IPrintLog>({
   fileName: {
     type: String,
     required: true,
