@@ -1,20 +1,23 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Relation } from "typeorm";
 import { Printer } from "@/entities/printer.entity";
-import { PrintCompletionContextDto } from "@/services/interfaces/print-completion-context.dto";
+import { BaseEntity } from "@/entities/base.entity";
 
 @Entity()
-export class PrintCompletion {
+export class PrintLog extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
   fileName: string;
 
-  @CreateDateColumn({ type: "int" })
-  createdAt: number;
+  @CreateDateColumn()
+  createdAt!: Date;
 
   @Column()
-  status: string;
+  endedAt!: Date;
+
+  @Column()
+  status!: string;
 
   @ManyToOne(() => Printer, (p) => p.printCompletions, { onDelete: "CASCADE" })
   @JoinColumn({ name: "printerId" })
@@ -24,11 +27,5 @@ export class PrintCompletion {
   printerId: number;
 
   @Column({ nullable: true })
-  printerReference?: string;
-
-  @Column({ nullable: true })
-  completionLog?: string;
-
-  @Column({ type: "simple-json", nullable: true })
-  context: PrintCompletionContextDto;
+  printerName?: string;
 }
