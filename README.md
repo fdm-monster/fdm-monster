@@ -4,72 +4,69 @@
     </a>
 </p>
 <h1 align="center" style="padding-top: 0; margin-top: 10px">FDM Monster</h1>
-
 <p align="center">
-<a href="https://discord.gg/mwA8uP8CMc">
-    <img src="https://img.shields.io/discord/864835453773807686?label=Discord"/>
-</a>
-<a href="https://github.com/fdm-monster/fdm-monster/releases/latest">
-    <img src="https://img.shields.io/github/release/fdm-monster/fdm-monster"/>
-</a>
-<a href="https://github.com/fdm-monster/fdm-monster/stargazers">
-    <img src="https://img.shields.io/github/stars/fdm-monster/fdmonster"/>
-</a>
-
-<a href="https://github.com/fdm-monster/fdm-monster/issues">
-    <img src="https://img.shields.io/github/issues/fdm-monster/fdm-monster"/>
-</a> 
-<a href="https://app.codecov.io/gh/fdm-monster/fdm-monster">
-    <img src="https://codecov.io/gh/fdm-monster/fdm-monster/branch/develop/graph/badge.svg?flag=server-nodejs&precision=0"/>
-</a>
-<br/>
-<a href="https://unraid.net/community/apps?q=fdm+monster">
-    <img src="https://img.shields.io/badge/Unraid%20Community%20Application-fc832e"/>
-</a>
-
+    <a href="https://discord.gg/mwA8uP8CMc"><img src="https://img.shields.io/discord/864835453773807686?label=Discord"/></a>
+    <a href="https://github.com/fdm-monster/fdm-monster/releases/latest">
+        <img src="https://img.shields.io/github/release/fdm-monster/fdm-monster"/></a>
+    <a href="https://github.com/fdm-monster/fdm-monster/stargazers">
+        <img src="https://img.shields.io/github/stars/fdm-monster/fdmonster"/></a>
+    <a href="https://github.com/fdm-monster/fdm-monster/issues">
+        <img src="https://img.shields.io/github/issues/fdm-monster/fdm-monster"/></a>
+    <a href="https://app.codecov.io/gh/fdm-monster/fdm-monster">
+        <img src="https://codecov.io/gh/fdm-monster/fdm-monster/branch/develop/graph/badge.svg?flag=server-nodejs&precision=0"/></a>
+    <br/>
+    <a href="https://unraid.net/community/apps?q=fdm+monster">
+        <img src="https://img.shields.io/badge/Unraid%20Community%20Application-fc832e"/>
+    </a>
 </p>
 
-## Support the project
+FDM Monster is a server for managing your 3D printer farm through [OctoPrint](https://octoprint.org/) as well as [Klipper](https://www.klipper3d.org/) using [Moonraker](https://github.com/Arksine/moonraker).
 
-Github ![GitHub Sponsor](https://img.shields.io/github/sponsors/fdm-monster?label=Sponsor&logo=GitHub)
+![fdm-monster-main-grid](https://github.com/user-attachments/assets/4137d8d6-0365-44db-b9a9-53e3820a4cb3)
 
-Ko-Fi [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/V7V6XFWY0)
+## Features 🖨️
+Here is a list of features that make FDM Monster stand out:
 
-<h2 align="center">
-<a href="https://docs.fdm-monster.net/" target="_blank">Documentation</a>
-</h2>
-
-## What is FDM Monster?
-
-FDM Monster is a server for managing your 3D printer farm through [OctoPrint](https://octoprint.org/).
-Our efforts are focused on providing a professional print-farming workflow that is suitable for hobby and commercial farms alike.
-
-This server has been battle-tested in the field for 100+ printers, so give it a star ⭐and enhance your 3D Printing Farm's workflow!
-
-## Features
-- Adding OctoPrint instances
-- Dragging printers on grid
-- Dropping GCode to print
-- Batch select and print GCode
-- Marking printers as maintenance mode
-- Import printers from OctoFarm
+- Adding OctoPrint and Moonraker instances
+- Dragging or creating new printers on a customizable grid
+- Drag n drop GCode to print
+- Select printers and print one GCode file in batch 
+- Marking printers as 'under maintenance'
+- Import printers from software like OctoFarm
+- YAML backup and import
 - [Raspberry Pi image MonsterPi](https://docs.fdm-monster.net/guides/monsterpi)
+- Thumbnail support
+- SQLite as well as MongoDB support
 
-![docs/images/server-running.png](https://raw.githubusercontent.com/fdm-monster/fdm-monster-docs/main/docs/images/server-running.png)
-_The FDM Monster grid after placing one OctoPrint instance._
+## Getting started 🔌
 
-## Getting started
-
-Check out the [Documentation](https://docs.fdm-monster.net). Are you interested in running the Raspberry Pi image?
+Check out the [documentation](https://docs.fdm-monster.net) to install or deploy FDM Monster for your farm. Are you interested in running the Raspberry Pi image?
 Please jump ahead [MonsterPi Section](https://docs.fdm-monster.net/guides/monsterpi).
 
-### Reach out for questions
+## Reach out for questions or ideas ❔
 
 Please join the discord, but stay professional and proactive!
 
 - Discord server: https://discord.gg/mwA8uP8CMc
 - Website: [https://fdm-monster.net](https://fdm-monster.net)
-- Mail: davidzwa@gmail.com
+ 
+## Support the project 💸
+
+Is the project helping you? Please consider these options. FDM Monster would not exist without all your support! 
+
+![GitHub Sponsor](https://img.shields.io/github/sponsors/fdm-monster?label=Sponsor&logo=GitHub)
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/V7V6XFWY0)
+
+## Sponsors 🤩
+
+Please consider sponsoring FDM Monster to help this project! You can find the [GitHub Sponsorship Tiers here](https://github.com/sponsors/fdm-monster).
+
+Thanks to the following parties for their financial support:
+
+| Tier 1 | Tier 2 | Tier 3 | Tier 4 | One time |
+|--------|--------|--------|--------|-----------|
+|  | [WindArrow3d](https://github.com/WindArrow3d), [thatguymendel](https://github.com/thatguymendel) | | [doucettom](https://github.com/doucettom) | [th3dstudio](https://github.com/th3dstudio) |
+
 
 ## Contributors ✨
 
@@ -129,16 +126,6 @@ These are the people involved in the project. Find the meaning of the emoji keys
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
-## Sponsors
-
-Please consider sponsoring FDM Monster to help this project! You can find the [GitHub Sponsorship Tiers here](https://github.com/sponsors/fdm-monster).
-
-Thanks to the following parties for their financial support:
-
-| Tier 1 | Tier 2 | Tier 3 | Tier 4 | One Time |
-|--------|--------|--------|--------|-----------|
-|  | [WindArrow3d](https://github.com/WindArrow3d), [thatguymendel](https://github.com/thatguymendel) | | [doucettom](https://github.com/doucettom) | [th3dstudio](https://github.com/th3dstudio) |
-
 
 ## Contribute
 
@@ -167,7 +154,6 @@ the [CONTRIBUTING](CONTRIBUTING.md) file.
 - [ ] History and statistics
 - [ ] Extended webcam integration
 - [ ] Spoolman integration
-
 
 ## License
 

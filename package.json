@@ -53,8 +53,8 @@
     "vue"
   ],
   "dependencies": {
-    "@fdm-monster/client": "1.8.2",
-    "@fdm-monster/client-next": "0.0.12",
+    "@fdm-monster/client": "1.8.3",
+    "@fdm-monster/client-next": "0.0.13",
     "@octokit/plugin-throttling": "8.2.0",
     "@sentry/node": "8.42.0",
     "adm-zip": "0.5.16",
@@ -62,7 +62,7 @@
     "awilix-express": "9.0.1",
     "axios": "1.7.9",
     "bcryptjs": "2.4.3",
-    "better-sqlite3": "11.6.0",
+    "better-sqlite3": "11.7.0",
     "cache-manager": "6.3.0",
     "class-validator": "0.14.1",
     "connect-history-api-fallback": "2.0.0",
