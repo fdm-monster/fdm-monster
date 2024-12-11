@@ -1111,7 +1111,7 @@ __metadata:
     axios: "npm:1.7.9"
     bcryptjs: "npm:2.4.3"
     better-sqlite3: "npm:11.7.0"
-    cache-manager: "npm:6.3.0"
+    cache-manager: "npm:6.3.1"
     chokidar: "npm:4.0.1"
     class-validator: "npm:0.14.1"
     concurrently: "npm:9.1.0"
@@ -4826,12 +4826,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cache-manager@npm:6.3.0":
-  version: 6.3.0
-  resolution: "cache-manager@npm:6.3.0"
+"cache-manager@npm:6.3.1":
+  version: 6.3.1
+  resolution: "cache-manager@npm:6.3.1"
   dependencies:
     keyv: "npm:^5.2.1"
-  checksum: 10c0/531d20b160787d1b870aa7c24e5438e27a9b9f6cf25892c576bdb7a5be1404889f080a8f5baa4d594fa8ed9dcf0366045020a4868360d1d8aaaa2db3311bba11
+  checksum: 10c0/d1b042533839eb3aa2a2944ff02b13b870ff03718a947ec5811c74369be0df11a18c521837be81efe5634248bbf50748185eb1738b42ccf9d895ca46dd66ecb2
   languageName: node
   linkType: hard
 
