@@ -22,6 +22,8 @@
 
 FDM Monster is a server for managing your 3D printer farm through [OctoPrint](https://octoprint.org/) as well as [Klipper](https://www.klipper3d.org/) using [Moonraker](https://github.com/Arksine/moonraker).
 
+## Check out our [documentation](https://docs.fdm-monster.net)
+
 ![fdm-monster-main-grid](https://github.com/user-attachments/assets/4137d8d6-0365-44db-b9a9-53e3820a4cb3)
 
 ## Features 🖨️
