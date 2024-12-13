@@ -197,6 +197,23 @@
       "contributions": [
         "ideas"
       ]
+    },
+    {
+      "login": "julien-printerbox",
+      "name": "julien-printerbox",
+      "avatar_url": "https://avatars.githubusercontent.com/u/134132189?v=4",
+      "profile": "https://github.com/julien-printerbox",
+      "contributions": [
+        "ideas"
+    },
+    {
+      "login": "Tbwan",
+      "name": "Tbwan",
+      "avatar_url": "https://avatars.githubusercontent.com/u/44231748?v=4",
+      "profile": "https://github.com/Tbwan",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,

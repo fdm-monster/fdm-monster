@@ -1,5 +1,16 @@
 # Develop
 
+# FDM Monster 13/12/2024 1.8.1
+
+## Changes
+
+- Update to client 1.8.4
+
+## Fixes 
+
+- YAML import: regression caused all imports to fail validation
+- YAML import: a bug caused all import with printers without api key to fail validation
+
 # FDM Monster 02/12/2024 1.8.0
 
 ## Chores
