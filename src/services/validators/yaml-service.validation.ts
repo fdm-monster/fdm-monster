@@ -37,7 +37,7 @@ export const importPrintersFloorsYamlRules = (
     "config.floorComparisonStrategiesByPriority": "required|string|in:name,floor,id",
     printers: `${!!importPrinters ? "array|minLength:0" : "not"}`,
     "printers.*.id": "required",
-    "printers.*.apiKey": `required|length:${apiKeyLengthMaxDefault},${apiKeyLengthMinDefault}|alphaDash`,
+    "printers.*.apiKey": `requiredIf:printerType,${OctoprintType}|length:${apiKeyLengthMaxDefault},${apiKeyLengthMinDefault}|alphaDash`,
     "printers.*.printerURL": "required|httpurl",
     "printers.*.enabled": "boolean",
     "printers.*.printerType": `integer|in:${OctoprintType},${MoonrakerType}`,
