@@ -6,7 +6,7 @@
   },
   "author": "David Zwart",
   "license": "AGPL-3.0-or-later",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "bin": {
     "fdm-monster": "dist/index.js",
     "fdmm": "dist/index.js"
@@ -54,7 +54,7 @@
   ],
   "dependencies": {
     "@fdm-monster/client": "1.8.4",
-    "@fdm-monster/client-next": "0.0.13",
+    "@fdm-monster/client-next": "0.0.14",
     "@octokit/plugin-throttling": "8.2.0",
     "@sentry/node": "8.45.0",
     "adm-zip": "0.5.16",
