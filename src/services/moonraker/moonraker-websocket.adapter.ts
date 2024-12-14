@@ -6,7 +6,6 @@ import { ISocketLogin } from "@/shared/dtos/socket-login.dto";
 import { LoggerService } from "@/handlers/logger";
 import { IdType } from "@/shared.constants";
 import { AppConstants } from "@/server.constants";
-import { normalizeUrl } from "@/utils/normalize-url";
 import { httpToWsUrl } from "@/utils/url.utils";
 import { OctoPrintEventDto } from "@/services/octoprint/dto/octoprint-event.dto";
 import { WsMessage } from "@/services/octoprint/octoprint-websocket.adapter";
