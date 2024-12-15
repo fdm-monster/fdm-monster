@@ -5,7 +5,7 @@
 </p>
 <h1 align="center" style="padding-top: 0; margin-top: 10px">FDM Monster</h1>
 <p align="center">
-    <a href="https://discord.gg/mwA8uP8CMc"><img src="https://img.shields.io/discord/864835453773807686?label=Discord"/></a>
+    <a href="https://discord.gg/mwA8uP8CMc"><img src="https://img.shields.io/discord/864835453773807686?label=Discord&logo=discord"/></a>
     <a href="https://github.com/fdm-monster/fdm-monster/releases/latest">
         <img src="https://img.shields.io/github/release/fdm-monster/fdm-monster"/></a>
     <a href="https://github.com/fdm-monster/fdm-monster/stargazers">
@@ -36,11 +36,18 @@ Here is a list of features that make FDM Monster stand out:
 - Marking printers as 'under maintenance'
 - Import printers from software like OctoFarm
 - YAML backup and import
-- [Raspberry Pi image MonsterPi](https://docs.fdm-monster.net/guides/monsterpi)
 - Thumbnail support
 - SQLite as well as MongoDB support
 
-## Getting started 🔌
+## Installation methods ⚙️
+
+- [Docker image](https://hub.docker.com/r/fdmmonster/fdm-monster)
+- [Raspberry Pi image MonsterPi](https://docs.fdm-monster.net/guides/monsterpi)
+- [Unraid Community App](https://unraid.net/community/apps?q=fdm+monster)
+
+Would you like to add a method of running FDM Monster? Please reach out or create an issue/pull-request!
+
+## Getting started 😎
 
 Check out the [documentation](https://docs.fdm-monster.net) to install or deploy FDM Monster for your farm. Are you interested in running the Raspberry Pi image?
 Please jump ahead [MonsterPi Section](https://docs.fdm-monster.net/guides/monsterpi).
