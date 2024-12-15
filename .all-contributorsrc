@@ -2,7 +2,7 @@
   "files": [
     "README.md"
   ],
-  "imageSize": 80,
+  "imageSize": 40,
   "commit": false,
   "contributors": [
     {
@@ -228,7 +228,7 @@
       ]
     }
   ],
-  "contributorsPerLine": 7,
+  "contributorsPerLine": 10,
   "projectName": "fdm-monster",
   "projectOwner": "fdm-monster",
   "repoType": "github",
