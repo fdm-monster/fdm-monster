@@ -1058,10 +1058,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fdm-monster/client-next@npm:0.0.14":
-  version: 0.0.14
-  resolution: "@fdm-monster/client-next@npm:0.0.14"
-  checksum: 10c0/2cb16f761042eaebb83c24e4e208ec2d7c51146b9c4c1251ac11d6430aadc0470cdea2cc47d3bc78a3df652f676527a05a3bf4da7bd2ba858f8ee90249897658
+"@fdm-monster/client-next@npm:0.0.15":
+  version: 0.0.15
+  resolution: "@fdm-monster/client-next@npm:0.0.15"
+  checksum: 10c0/1a69acc55fed6bd41417c9bef1e8b6b1c743fb0c9b35c4871f32ae97c8f910b18a1750fa56bac139d1f0aa22c4c0c47d7400c479ad90bb79892ad2d4ecbf8d5c
   languageName: node
   linkType: hard
 
@@ -1077,7 +1077,7 @@ __metadata:
   resolution: "@fdm-monster/server@workspace:."
   dependencies:
     "@fdm-monster/client": "npm:1.8.4"
-    "@fdm-monster/client-next": "npm:0.0.14"
+    "@fdm-monster/client-next": "npm:0.0.15"
     "@lcov-viewer/cli": "npm:1.3.0"
     "@lcov-viewer/istanbul-report": "npm:1.4.0"
     "@octokit/plugin-throttling": "npm:8.2.0"
