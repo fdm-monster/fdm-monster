@@ -11010,11 +11010,11 @@ __metadata:
   linkType: hard
 
 "text-decoder@npm:^1.1.0":
-  version: 1.2.2
-  resolution: "text-decoder@npm:1.2.2"
+  version: 1.2.3
+  resolution: "text-decoder@npm:1.2.3"
   dependencies:
     b4a: "npm:^1.6.4"
-  checksum: 10c0/20612b87d282ee07d8fba28f4b411c556a2487948de4c77610191e263e4e80fec5af1ffd9a00b58b7598c153e58127e36110be642721a197f222b58ff2aab5c2
+  checksum: 10c0/569d776b9250158681c83656ef2c3e0a5d5c660c27ca69f87eedef921749a4fbf02095e5f9a0f862a25cf35258379b06e31dee9c125c9f72e273b7ca1a6d1977
   languageName: node
   linkType: hard
 
