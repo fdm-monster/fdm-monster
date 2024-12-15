@@ -82,7 +82,7 @@ Thanks to the following parties for their financial support:
 These are the people involved in the project. Find the meaning of the emoji keys [here](https://allcontributors.org/docs/en/emoji-key).
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-20-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-22-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
@@ -116,6 +116,9 @@ These are the people involved in the project. Find the meaning of the emoji keys
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/thatguymendel"><img src="https://avatars.githubusercontent.com/u/67444998?v=4?s=80" width="80px;" alt="thatguymendel"/><br /><sub><b>thatguymendel</b></sub></a><br /><a href="#ideas-thatguymendel" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/julien-printerbox"><img src="https://avatars.githubusercontent.com/u/134132189?v=4?s=80" width="80px;" alt="julien-printerbox"/><br /><sub><b>julien-printerbox</b></sub></a><br /><a href="#ideas-julien-printerbox" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Tbwan"><img src="https://avatars.githubusercontent.com/u/44231748?v=4?s=80" width="80px;" alt="Tbwan"/><br /><sub><b>Tbwan</b></sub></a><br /><a href="https://github.com/fdm-monster/fdm-monster/issues?q=author%3ATbwan" title="Bug reports">🐛</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/nuvious"><img src="https://avatars.githubusercontent.com/u/5287736?v=4?s=80" width="80px;" alt="David Cheeseman"/><br /><sub><b>David Cheeseman</b></sub></a><br /><a href="#ideas-nuvious" title="Ideas, Planning, & Feedback">🤔</a> <a href="#platform-nuvious" title="Packaging/porting to new platform">📦</a> <a href="#infra-nuvious" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
     </tr>
   </tbody>
 </table>

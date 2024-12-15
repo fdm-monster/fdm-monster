@@ -215,6 +215,17 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "nuvious",
+      "name": "David Cheeseman",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5287736?v=4",
+      "profile": "https://github.com/nuvious",
+      "contributions": [
+        "ideas",
+        "platform",
+        "infra"
+      ]
     }
   ],
   "contributorsPerLine": 7,
