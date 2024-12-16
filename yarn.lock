@@ -1112,7 +1112,7 @@ __metadata:
     bcryptjs: "npm:2.4.3"
     better-sqlite3: "npm:11.7.0"
     cache-manager: "npm:6.3.1"
-    chokidar: "npm:4.0.1"
+    chokidar: "npm:4.0.2"
     class-validator: "npm:0.14.1"
     concurrently: "npm:9.1.0"
     connect-history-api-fallback: "npm:2.0.0"
@@ -4934,12 +4934,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chokidar@npm:4.0.1":
-  version: 4.0.1
-  resolution: "chokidar@npm:4.0.1"
+"chokidar@npm:4.0.2":
+  version: 4.0.2
+  resolution: "chokidar@npm:4.0.2"
   dependencies:
     readdirp: "npm:^4.0.1"
-  checksum: 10c0/4bb7a3adc304059810bb6c420c43261a15bb44f610d77c35547addc84faa0374265c3adc67f25d06f363d9a4571962b02679268c40de07676d260de1986efea9
+  checksum: 10c0/562a3456d529ce9e16f9a6447f86a3e82a816200fed473fa0b6f84b447ce29f96210c92874a8d5e619a0b453d92a352e93252baa214e376a9a08489e96337c65
   languageName: node
   linkType: hard
 
