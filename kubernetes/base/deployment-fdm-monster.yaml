@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: fdm-monster
+  name: fdm-monster
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fdm-monster
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: fdm-monster
+    spec:
+      initContainers:
+      - name: mongo-startup
+        image: busybox:latest
+        command:
+        - nc
+        - -zv
+        - mongodb
+        - "27017"
+      containers:
+      - image: fdmmonster/fdm-monster:latest
+        name: fdm-monster
+        resources: {}
+        volumeMounts:
+          - name: fdm-monster-media
+            mountPath: /app/media
+        env:
+          - name: MONGO
+            value: mongodb://admin:admin@mongodb:27017/fdm-monster?authSource=admin
+        livenessProbe:
+          tcpSocket:
+            port: 4000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          tcpSocket:
+            port: 4000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+      volumes:
+        - name: fdm-monster-media
+          emptyDir:
+status: {}
