@@ -1107,7 +1107,7 @@ __metadata:
     "@types/ws": "npm:8.5.13"
     adm-zip: "npm:0.5.16"
     awilix: "npm:12.0.4"
-    awilix-express: "npm:9.0.1"
+    awilix-express: "npm:9.0.2"
     axios: "npm:1.7.9"
     bcryptjs: "npm:2.4.3"
     better-sqlite3: "npm:11.7.0"
@@ -4414,23 +4414,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"awilix-express@npm:9.0.1":
-  version: 9.0.1
-  resolution: "awilix-express@npm:9.0.1"
+"awilix-express@npm:9.0.2":
+  version: 9.0.2
+  resolution: "awilix-express@npm:9.0.2"
   dependencies:
-    awilix-router-core: "npm:^1.6.1"
-    tslib: "npm:^2.6.2"
-  checksum: 10c0/34126d70511784e9bdd94901446b004e329f228d836c61fc15d6c29627029d6456d0a5a1df13daf233fc5c43ac8a856eccb57c305a33020622773407cc1a10d8
+    awilix-router-core: "npm:^2.1.0"
+    tslib: "npm:^2.8.1"
+  checksum: 10c0/52f32158b7e95aaca76fb8a98b9090734f36d5eb4672d0a7c07d933fc5130397549fdf3fed24213eda6c525b43bc02a1caf84f6f863b473124b6e35188571cef
   languageName: node
   linkType: hard
 
-"awilix-router-core@npm:^1.6.1":
-  version: 1.6.1
-  resolution: "awilix-router-core@npm:1.6.1"
+"awilix-router-core@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "awilix-router-core@npm:2.1.0"
   dependencies:
-    glob: "npm:^7.1.3"
-    tslib: "npm:^1.9.3"
-  checksum: 10c0/74cc86d95f916eacf52efe02ef3800aa14925307f04f2bde525ab09c110c38552d2b102fdcb31bef3c6d8f95fa905e6c51e0e89b636e16aed3b7c998f670939d
+    fast-glob: "npm:^3.3.2"
+  checksum: 10c0/b3943cd4b6d131ab8083d7044ae9fef8e44ef113017c8db75ec216c4b5a790caa40f1bee8adf53094786f94153cdba855c7f5243b1017c11ad0b40c0e181a97b
   languageName: node
   linkType: hard
 
@@ -11205,14 +11204,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^1.9.3":
-  version: 1.14.1
-  resolution: "tslib@npm:1.14.1"
-  checksum: 10c0/69ae09c49eea644bc5ebe1bca4fa4cc2c82b7b3e02f43b84bd891504edf66dbc6b2ec0eef31a957042de2269139e4acff911e6d186a258fb14069cd7f6febce2
-  languageName: node
-  linkType: hard
-
-"tslib@npm:^2.0.3, tslib@npm:^2.1.0, tslib@npm:^2.4.0, tslib@npm:^2.5.0, tslib@npm:^2.6.2, tslib@npm:^2.7.0":
+"tslib@npm:^2.0.3, tslib@npm:^2.1.0, tslib@npm:^2.4.0, tslib@npm:^2.5.0, tslib@npm:^2.6.2, tslib@npm:^2.7.0, tslib@npm:^2.8.1":
   version: 2.8.1
   resolution: "tslib@npm:2.8.1"
   checksum: 10c0/9c4759110a19c53f992d9aae23aac5ced636e99887b51b9e61def52611732872ff7668757d4e4c61f19691e36f4da981cd9485e869b4a7408d689f6bf1f14e62
