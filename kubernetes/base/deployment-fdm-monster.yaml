@@ -15,24 +15,22 @@ spec:
       labels:
         app: fdm-monster
     spec:
-      initContainers:
-      - name: mongo-startup
-        image: busybox:latest
-        command:
-        - nc
-        - -zv
-        - mongodb
-        - "27017"
       containers:
-      - image: fdmmonster/fdm-monster:latest
+      - image: fdmmonster/fdm-monster:latest-sqlite
         name: fdm-monster
         resources: {}
         volumeMounts:
           - name: fdm-monster-media
             mountPath: /app/media
+          - name: fdm-monster-db
+            mountPath: /app/db
         env:
-          - name: MONGO
-            value: mongodb://admin:admin@mongodb:27017/fdm-monster?authSource=admin
+          - name: ENABLE_EXPERIMENTAL_TYPEORM
+            value: "true"
+          - name: DATABASE_PATH
+            value: db
+          - name: DATABASE_FILE
+            value: fdm-monster.sqlite
         livenessProbe:
           tcpSocket:
             port: 4000
@@ -45,5 +43,7 @@ spec:
           periodSeconds: 10
       volumes:
         - name: fdm-monster-media
+          emptyDir:
+        - name: fdm-monster-db
           emptyDir:
 status: {}

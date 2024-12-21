@@ -43,7 +43,7 @@ Here is a list of features that make FDM Monster stand out:
 ## Getting started 🔌
 
 Check out the [documentation](https://docs.fdm-monster.net) to install or deploy FDM Monster for your farm. Are you interested in running the Raspberry Pi image?
-Please jump ahead [MonsterPi Section](https://docs.fdm-monster.net/guides/monsterpi).
+Please jump ahead [MonsterPi Section](https://docs.fdm-monster.net/guides/monsterpi). There is also a [kubernetes configuration](/kubernetes) for those wanting to deploy to a kubernetes environment.
 
 ## Reach out for questions or ideas ❔
 

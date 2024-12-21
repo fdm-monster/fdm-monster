@@ -1,8 +1,6 @@
 namespace: fdm-monster
 resources:
   - deployment-fdm-monster.yaml
-  - deployment-mongodb.yaml
   - ingress.yaml
   - namespace.yaml
   - service-fdm-monster.yaml
-  - service-mongodb.yaml
