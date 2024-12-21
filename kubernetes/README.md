@@ -12,7 +12,8 @@ deploying the fdm-monster application.
 A kubernetes installation that has `ingress` functionality enabled. This
 configuration was tested with [microk8s](https://microk8s.io/), but other
 distributions such as [k3s](https://k3s.io/), [minikube](https://minikube.sigs.k8s.io/docs/),
-etc.
+etc. should also work if they have ingress support enabled. See documentation
+for your kubernetes environment for enabling ingress.
 
 ## Try/Test Base Configuration
 
