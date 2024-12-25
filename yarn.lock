@@ -1065,10 +1065,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fdm-monster/client@npm:1.8.6":
-  version: 1.8.6
-  resolution: "@fdm-monster/client@npm:1.8.6"
-  checksum: 10c0/a063b5e3eff18f69f67a303f1b8ce53314b0c0d5c5f93ddb6b8ffb0e5721473ebea3d9c35769d071d272b634ced2b9b97bae2894ab0c9831c8c9d2493b8fd514
+"@fdm-monster/client@npm:1.8.7":
+  version: 1.8.7
+  resolution: "@fdm-monster/client@npm:1.8.7"
+  checksum: 10c0/00ef1c2780019ad2ea2eb50e292a9fa34d42336a650f27f970a1cfa328344330b0186360dde160e12c4ff0549a21b91a6f9c7c2123fbb4e052da1be7004eff31
   languageName: node
   linkType: hard
 
@@ -1076,7 +1076,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@fdm-monster/server@workspace:."
   dependencies:
-    "@fdm-monster/client": "npm:1.8.6"
+    "@fdm-monster/client": "npm:1.8.7"
     "@fdm-monster/client-next": "npm:0.0.15"
     "@lcov-viewer/cli": "npm:1.3.0"
     "@lcov-viewer/istanbul-report": "npm:1.4.0"
