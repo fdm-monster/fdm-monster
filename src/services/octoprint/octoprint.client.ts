@@ -185,7 +185,7 @@ export class OctoprintClient extends OctoprintRoutes {
     return (
       // Filter out folders
       response?.data?.files
-        ?.filter((f) => f.date)
+        ?.filter((f) => f.date && f.type === "machinecode")
         .map((f) => {
           return normalizePrinterFile(f);
         }) || []

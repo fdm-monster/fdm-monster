@@ -1,5 +1,9 @@
 # Develop
 
+## Fixes
+
+- OctoPrint client: filter folders on calling getLocalFiles for OctoPrint
+
 # FDM Monster 13/12/2024 1.8.1
 
 ## Changes
