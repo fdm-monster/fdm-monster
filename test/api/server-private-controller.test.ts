@@ -19,10 +19,8 @@ let settingsStore: SettingsStore;
 
 const defaultRoute = `${AppConstants.apiRoute}/server`;
 const getClientReleasesRoute = `${defaultRoute}/client-releases`;
-const gitUpdateRoute = `${defaultRoute}/git-update`;
 const exportPrintersAndFloorsRoute = `${defaultRoute}/export-printers-floors-yaml`;
 const importPrintersAndFloorsRoute = `${defaultRoute}/import-printers-floors-yaml`;
-const restartRoute = `${defaultRoute}/restart`;
 
 beforeAll(async () => {
   ({ request, container } = await setupTestApp());
@@ -62,33 +60,6 @@ describe(ServerPrivateController.name, () => {
       updateAvailable: null,
       synced: false,
     });
-  });
-
-  it("should pull git updates", async () => {
-    const response = await request.post(gitUpdateRoute).send();
-    expectOkResponse(response);
-  });
-
-  it("should skip server restart - no daemon error", async () => {
-    const response = await request.post(restartRoute).send();
-    expectInternalServerError(response);
-  });
-
-  it("should not allow unauthenticated server restart", async () => {
-    await settingsStore.setLoginRequired();
-    const response = await request.post(restartRoute).send();
-    expectUnauthenticatedResponse(response);
-    await settingsStore.setLoginRequired(false);
-  });
-
-  it("should do server restart when nodemon is detected", async () => {
-    let valueBefore = process.env.npm_lifecycle_script;
-
-    process.env.npm_lifecycle_script = "nodemon";
-    const response = await request.post(restartRoute).send();
-    expectOkResponse(response);
-
-    process.env.npm_lifecycle_script = valueBefore;
   });
 
   it("should export YAML and return valid object", async () => {

@@ -23,40 +23,6 @@ export function isProductionEnvironment() {
   return process.env.NODE_ENV === AppConstants.defaultProductionEnv;
 }
 
-export function isPm2() {
-  return "PM2_HOME" in process.env || "PM2_JSON_PROCESSING" in process.env || "PM2_CLI" in process.env;
-}
-
-export function isNodemon() {
-  return "npm_lifecycle_script" in process.env && process.env.npm_lifecycle_script!.includes("nodemon");
-}
-
 export function isNode() {
   return "NODE" in process.env;
-}
-
-export function verifyPackageJsonRequirements(rootPath: string) {
-  const dirConts = fs.readdirSync(rootPath);
-  const hasPackageJson = dirConts.includes("package.json");
-  if (!hasPackageJson) {
-    logger.error(`FAILURE. Could not find 'package.json' in root folder ${rootPath}`);
-    return false;
-  }
-
-  logger.debug("✓ found 'package.json'");
-  const packageName = require(join(rootPath, "package.json")).name;
-  if (!packageName) {
-    logger.error("X Could not find 'name' property in package.json file. Aborting FDM Server.");
-    return false;
-  }
-
-  if (packageName.toLowerCase() !== AppConstants.serverPackageName) {
-    logger.error(
-      `X property 'name' in package.json file didnt equal 'fdm-monster' (found: ${packageName.toLowerCase()}). Aborting FDM Server.`
-    );
-    return false;
-  }
-
-  logger.debug("✓ Correctly validated FDM package.json file!");
-  return true;
 }

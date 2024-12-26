@@ -2,8 +2,11 @@
 
 ## Chore
 
-- Change developer setup to be node based only (drop concurrently and nodemon)
+- Change developer setup to be node based only (remove concurrently and nodemon packages)
 - Replace server restart with NotImplementedException
+- Remove simple-git package
+- Remove git-pull-based server update mechanic
+- Remove unnecessary environment utilities
 
 ## Fixes
 

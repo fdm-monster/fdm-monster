@@ -4,11 +4,9 @@ import { authenticate, authorizeRoles } from "@/middleware/authenticate";
 import { LoggerService as Logger } from "../handlers/logger";
 import { AppConstants } from "@/server.constants";
 import { ROLES } from "@/constants/authorization.constants";
-import { isTestEnvironment } from "@/utils/env.utils";
 import { validateMiddleware } from "@/handlers/validators";
 import { ServerReleaseService } from "@/services/core/server-release.service";
 import { ClientBundleService } from "@/services/core/client-bundle.service";
-import { ServerUpdateService } from "@/services/core/server-update.service";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { PrinterCache } from "@/state/printer.cache";
 import { YamlService } from "@/services/core/yaml.service";
@@ -29,11 +27,9 @@ export class ServerPrivateController {
   multerService: MulterService;
   logDumpService: LogDumpService;
   private logger = new Logger(ServerPrivateController.name);
-  private serverUpdateService: ServerUpdateService;
   private serverReleaseService: ServerReleaseService;
 
   constructor({
-    serverUpdateService,
     serverReleaseService,
     printerCache,
     printerService,
@@ -44,7 +40,6 @@ export class ServerPrivateController {
     yamlService,
     multerService,
   }: {
-    serverUpdateService: ServerUpdateService;
     serverReleaseService: ServerReleaseService;
     printerCache: PrinterCache;
     printerService: IPrinterService;
@@ -56,7 +51,6 @@ export class ServerPrivateController {
     multerService: MulterService;
   }) {
     this.serverReleaseService = serverReleaseService;
-    this.serverUpdateService = serverUpdateService;
     this.clientBundleService = clientBundleService;
     this.githubService = githubService;
     this.logDumpService = logDumpService;
@@ -128,19 +122,6 @@ export class ServerPrivateController {
     res.send(updateState);
   }
 
-  async pullGitUpdates(req: Request, res: Response) {
-    const result = await this.serverUpdateService.checkGitUpdates();
-    res.send(result);
-  }
-
-  async restartServer(req: Request, res: Response) {
-    if (!isTestEnvironment()) {
-      this.logger.warn("Server restart command fired. Expect the server to be unavailable for a moment");
-    }
-    const result = await this.serverUpdateService.restartServer();
-    res.send(result);
-  }
-
   async importPrintersAndFloorsYaml(req: Request, res: Response) {
     const files = await this.multerService.multerLoadFileAsync(req, res, [".yaml"], false);
     const firstFile = files[0];
@@ -192,8 +173,6 @@ export default createController(ServerPrivateController)
   .post("/update-client-bundle-github", "updateClientBundleGithub")
   .post("/export-printers-floors-yaml", "exportPrintersAndFloorsYaml")
   .post("/import-printers-floors-yaml", "importPrintersAndFloorsYaml")
-  .post("/git-update", "pullGitUpdates")
-  .post("/restart", "restartServer")
   .get("/dump-fdm-monster-logs", "dumpLogZips")
   .post("/dump-fdm-monster-logs", "dumpLogZips")
   .delete("/clear-outdated-fdm-monster-logs", "clearLogs")

@@ -1,5 +1,4 @@
 export const AppConstants = {
-  NON_NPM_MODE_KEY: "NON_NPM_MODE",
   NODE_ENV_KEY: "NODE_ENV",
   VERSION_KEY: "npm_package_version",
   SERVER_PORT_KEY: "SERVER_PORT",

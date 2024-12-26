@@ -1,5 +1,4 @@
 import axios from "axios";
-import simpleGit from "simple-git";
 import { Octokit } from "octokit";
 import { asClass, asFunction, asValue, createContainer, InjectionMode, Resolver } from "awilix";
 import { ToadScheduler } from "toad-scheduler";
@@ -10,7 +9,6 @@ import { SettingsStore } from "./state/settings.store";
 import { SettingsService } from "./services/mongoose/settings.service";
 import { ServerReleaseService } from "./services/core/server-release.service";
 import { TaskManagerService } from "./services/core/task-manager.service";
-import { ServerUpdateService } from "./services/core/server-update.service";
 import { GithubService } from "./services/core/github.service";
 import { FileCache } from "./state/file.cache";
 import { PrinterWebsocketTask } from "./tasks/printer-websocket.task";
@@ -144,7 +142,6 @@ export function configureContainer(isSqlite: boolean = false) {
     [di.cacheManager]: asFunction(configureCacheManager).singleton(),
     [di.serverReleaseService]: asClass(ServerReleaseService).singleton(),
     [di.monsterPiService]: asClass(MonsterPiService).singleton(),
-    [di.serverUpdateService]: asClass(ServerUpdateService).singleton(),
     [di.githubService]: asClass(GithubService),
     [di.octokitService]: asFunction((cradle: any) => {
       const config = cradle.configService;
@@ -166,7 +163,6 @@ export function configureContainer(isSqlite: boolean = false) {
     }),
     [di.clientBundleService]: asClass(ClientBundleService),
     [di.logDumpService]: asClass(LogDumpService),
-    [di.simpleGitService]: asValue(simpleGit()),
     [di.httpClient]: asValue(
       axios.create({
         maxBodyLength: 1000 * 1000 * 1000, // 1GB

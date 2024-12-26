@@ -1,6 +1,6 @@
 import { createController } from "awilix-express";
 import { AppConstants } from "@/server.constants";
-import { isNode, isNodemon, isPm2 } from "@/utils/env.utils";
+import { isNode } from "@/utils/env.utils";
 import { authenticate, authorizePermission } from "@/middleware/authenticate";
 import { PERMS } from "@/constants/authorization.constants";
 import { isDocker } from "@/utils/is-docker";
@@ -142,9 +142,7 @@ export class ServerPublicController {
     res.json({
       version: this.serverVersion,
       isDockerContainer: isDocker(),
-      isNodemon: isNodemon(),
       isNode: isNode(),
-      isPm2: isPm2(),
       os: process.env.OS,
       monsterPi: monsterPiVersion,
       update: {
