@@ -4,7 +4,6 @@ import { DITokens } from "@/container.tokens";
 import { asClass, AwilixContainer } from "awilix";
 import { AxiosMock } from "../mocks/axios.mock";
 import { ServerReleaseService } from "@/services/core/server-release.service";
-import { ServerUpdateService } from "@/services/core/server-update.service";
 import nock from "nock";
 import githubReleasesResponse from "../api/test-data/github-releases-server-feb-2022.data.json";
 
@@ -19,7 +18,7 @@ beforeAll(async () => {
   service = container.resolve(DITokens.serverReleaseService);
 });
 
-describe(ServerUpdateService.name, () => {
+describe(ServerReleaseService.name, () => {
   it("should know process version", () => {
     expect(process.env[AppConstants.VERSION_KEY]).toEqual(v1);
     expect(container.resolve(DITokens.serverVersion)).toEqual(v1);
@@ -41,7 +40,7 @@ describe(ServerUpdateService.name, () => {
     });
   });
 
-  it("should log server update", () => {
+  it("should log server version", () => {
     service.logServerVersionState();
   });
 });

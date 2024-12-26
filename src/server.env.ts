@@ -1,11 +1,10 @@
 import { status, up } from "migrate-mongo";
 import { join } from "path";
-import { execSync } from "child_process";
 import * as Sentry from "@sentry/node";
 import { config } from "dotenv";
 import { AppConstants } from "./server.constants";
 import { LoggerService as Logger } from "./handlers/logger";
-import { getEnvOrDefault, isPm2, isProductionEnvironment, verifyPackageJsonRequirements } from "./utils/env.utils";
+import { getEnvOrDefault, isProductionEnvironment } from "./utils/env.utils";
 import { errorSummary } from "./utils/error.utils";
 import { superRootPath } from "@/utils/fs.utils";
 
@@ -24,10 +23,6 @@ export function isEnvProd() {
   return process.env[AppConstants.NODE_ENV_KEY] === AppConstants.defaultProductionEnv;
 }
 
-/**
- * Set and write the environment name to file, if applicable
-
- */
 function ensureNodeEnvSet() {
   const environment = process.env[AppConstants.NODE_ENV_KEY];
   if (!environment || !AppConstants.knownEnvNames.includes(environment)) {
@@ -39,44 +34,15 @@ function ensureNodeEnvSet() {
   }
 }
 
-/**
- * Ensures that `process.env[AppConstants.VERSION_KEY]` is never undefined
- */
-function ensureEnvNpmVersionSet() {
+function ensurePackageVersionSet() {
   const packageJsonVersion = require(packageJsonPath).version;
   if (!process.env[AppConstants.VERSION_KEY]) {
     process.env[AppConstants.VERSION_KEY] = packageJsonVersion;
-    process.env[AppConstants.NON_NPM_MODE_KEY] = "true";
-    logger.log(`✓ Running server version ${process.env[AppConstants.VERSION_KEY]} in non-NPM mode!`);
-  } else {
-    logger.debug(`✓ Running server version ${process.env[AppConstants.VERSION_KEY]} in NPM mode!`);
   }
 
-  if (process.env[AppConstants.VERSION_KEY] !== packageJsonVersion) {
-    process.env[AppConstants.VERSION_KEY] = packageJsonVersion;
-    logger.debug(`~ Had to synchronize FDM version to '${packageJsonVersion}' as it was outdated.`);
-  }
+  logger.log(`✓ Running server version ${process.env[AppConstants.VERSION_KEY]}`);
 }
 
-function removePm2Service(reason: string) {
-  logger.error(`Removing PM2 service as Server failed to start: ${reason}`);
-  execSync(`pm2 delete ${AppConstants.pm2ServiceName}`);
-}
-
-function setupPackageJsonVersionOrThrow() {
-  const result = verifyPackageJsonRequirements(superRootPath());
-  if (!result) {
-    if (isPm2()) {
-      // TODO test this works under docker as well
-      removePm2Service("didnt pass startup validation (package.json)");
-    }
-    throw new Error("Aborting server.");
-  }
-}
-
-/**
- * Print out instructions URL
- */
 function printInstructionsURL() {
   logger.log(`Please make sure to read ${instructionsReferralURL} for more information.`);
 }
@@ -100,9 +66,6 @@ export function fetchServerPort() {
   return port;
 }
 
-/**
- * Make sure that we have a valid MongoDB connection string to work with.
- */
 export function ensureMongoDBConnectionStringSet() {
   let dbConnectionString = process.env[AppConstants.MONGO_KEY];
   if (!dbConnectionString) {
@@ -142,10 +105,6 @@ export function ensurePortSet() {
   }
 }
 
-/**
- * Parse and consume the .env file. Validate everything before starting the server.
- * Later this will switch to parsing a `config.yaml` file.
- */
 export function setupEnvConfig(skipDotEnv = false) {
   if (!skipDotEnv) {
     // This needs to be CWD of app.js, so be careful not to move this call.
@@ -154,16 +113,12 @@ export function setupEnvConfig(skipDotEnv = false) {
   }
 
   ensureNodeEnvSet();
-  setupPackageJsonVersionOrThrow();
-  ensureEnvNpmVersionSet();
+  ensurePackageVersionSet();
   setupSentry();
   ensureMongoDBConnectionStringSet();
   ensurePortSet();
 }
 
-/**
- * Checks and runs database migrations
- **/
 export async function runMigrations(db: any, client: any): Promise<void> {
   const migrationsStatus = await status(db);
   const pendingMigrations = migrationsStatus.filter((m) => m.appliedAt === "PENDING");
