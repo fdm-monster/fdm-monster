@@ -1,21 +1,16 @@
 import { setupTestApp } from "../test-server";
-import { expectInternalServerError, expectOkResponse, expectUnauthenticatedResponse } from "../extensions";
+import { expectOkResponse } from "../extensions";
 import { load } from "js-yaml";
 import { exportYamlBuffer1_3_1 } from "../application/test-data/yaml-import";
 import { AppConstants } from "@/server.constants";
-import { DITokens } from "@/container.tokens";
 import { validateInput } from "@/handlers/validators";
 import { importPrintersFloorsYamlRules } from "@/services/validators/yaml-service.validation";
-import { AwilixContainer } from "awilix";
 import { Test } from "supertest";
-import { SettingsStore } from "@/state/settings.store";
 import { ServerPrivateController } from "@/controllers/server-private.controller";
 import TestAgent from "supertest/lib/agent";
 import nock from "nock";
 
 let request: TestAgent<Test>;
-let container: AwilixContainer;
-let settingsStore: SettingsStore;
 
 const defaultRoute = `${AppConstants.apiRoute}/server`;
 const getClientReleasesRoute = `${defaultRoute}/client-releases`;
@@ -23,8 +18,7 @@ const exportPrintersAndFloorsRoute = `${defaultRoute}/export-printers-floors-yam
 const importPrintersAndFloorsRoute = `${defaultRoute}/import-printers-floors-yaml`;
 
 beforeAll(async () => {
-  ({ request, container } = await setupTestApp());
-  settingsStore = container.resolve(DITokens.settingsStore);
+  ({ request } = await setupTestApp());
 });
 
 describe(ServerPrivateController.name, () => {
@@ -48,14 +42,13 @@ describe(ServerPrivateController.name, () => {
   });
 
   it("should get update info", async () => {
-    process.env[AppConstants.VERSION_KEY] = require("../../package.json").version;
-
     const response = await request.get(defaultRoute).send();
     expectOkResponse(response, {
       airGapped: null,
       latestRelease: null,
       installedRelease: null,
-      serverVersion: process.env.npm_package_version,
+      // test version
+      serverVersion: "1.0.0",
       installedReleaseFound: null,
       updateAvailable: null,
       synced: false,
