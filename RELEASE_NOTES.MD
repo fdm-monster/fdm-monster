@@ -1,5 +1,10 @@
 # Develop
 
+## Chore
+
+- Change developer setup to be node based only (drop concurrently and nodemon)
+- Replace server restart with NotImplementedException
+
 ## Fixes
 
 - OctoPrint client: filter folders on calling getLocalFiles for OctoPrint
