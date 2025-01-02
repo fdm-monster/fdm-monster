@@ -1098,7 +1098,7 @@ __metadata:
     "@types/luxon": "npm:3.4.2"
     "@types/migrate-mongo": "npm:10.0.5"
     "@types/multer": "npm:1.4.12"
-    "@types/node": "npm:22.10.3"
+    "@types/node": "npm:22.10.4"
     "@types/passport-anonymous": "npm:1.0.5"
     "@types/passport-jwt": "npm:4.0.1"
     "@types/semver": "npm:7.5.8"
@@ -3721,12 +3721,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:22.10.3, @types/node@npm:>=10.0.0":
+"@types/node@npm:*, @types/node@npm:>=10.0.0":
   version: 22.10.3
   resolution: "@types/node@npm:22.10.3"
   dependencies:
     undici-types: "npm:~6.20.0"
   checksum: 10c0/0471a73c8672c803b1f2b912c2c466d00a217186933e8ff38ec7779b4a3f88a0eea3b513a59f2abf9de17cc8bbca688a3c6643c6513ac8dd1c3e45d25fab93b1
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:22.10.4":
+  version: 22.10.4
+  resolution: "@types/node@npm:22.10.4"
+  dependencies:
+    undici-types: "npm:~6.20.0"
+  checksum: 10c0/b2950f71dad821ef5103f42f3b4a804f8613f5799b8d96f427f904f49841b424e311fa38b3a92cf4710529abc82a355093b9258b030af3e94ee9b84bd1313063
   languageName: node
   linkType: hard
 
