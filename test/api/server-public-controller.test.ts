@@ -38,7 +38,7 @@ describe(ServerPublicController.name, () => {
     expectOkResponse(response);
   });
 
-  it("test should work for loginRequired true/false /", async function () {
+  it("test should work for loginRequired true/false", async function () {
     await settingsStore.setLoginRequired();
     const response = await request.get(testRoute).send();
     expectOkResponse(response);
@@ -88,7 +88,6 @@ describe(ServerPublicController.name, () => {
     const response = await request.get(versionRoute).send();
     expectOkResponse(response, {
       isDockerContainer: isDocker(),
-      isPm2: false,
       update: {
         synced: false,
         airGapped: null,
@@ -103,7 +102,6 @@ describe(ServerPublicController.name, () => {
     const response = await request.get(versionRoute).send();
     expectOkResponse(response, {
       isDockerContainer: isDocker(),
-      isPm2: false,
       update: {
         synced: false,
         airGapped: null,
@@ -121,7 +119,6 @@ describe(ServerPublicController.name, () => {
     const response = await request.get(versionRoute).send();
     expectOkResponse(response, {
       isDockerContainer: isDocker(),
-      isPm2: false,
       update: {
         airGapped: null,
         synced: false,

@@ -1,5 +1,23 @@
 # Develop
 
+# FDM Monster 03/01/2025 1.8.2
+
+## Changes 
+
+Update client to 1.8.8
+
+## Chore
+
+- Change developer setup to be node based only (remove concurrently and nodemon packages)
+- Replace server restart with NotImplementedException
+- Remove simple-git package
+- Remove git-pull-based server update mechanic
+- Remove unnecessary environment utilities
+
+## Fixes
+
+- OctoPrint client: filter folders on calling getLocalFiles for OctoPrint
+
 # FDM Monster 13/12/2024 1.8.1
 
 ## Changes

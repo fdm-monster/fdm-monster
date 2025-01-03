@@ -37,7 +37,24 @@ services:
     volumes:
       - ./fdm-monster/media/:/app/media
 
-  fdm-monster-alpha:
+  fdm-monster-sqlite:
+    container_name: fdm-monster-sqlite
+    image: fdmmonster/fdm-monster:1.8.1-sqlite # -arm64
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=development
+      - SERVER_PORT=4000
+      # These three variables are implicit to this docker image
+      # - ENABLE_EXPERIMENTAL_TYPEORM=true
+      # - DATABASE_PATH=./database
+      # - DATABASE_FILE=fdm-monster.sqlite
+    volumes:
+      - fdmm-media:/app/media
+      - fdmm-database:/app/database
+
+  fdm-monster-develop:
     container_name: fdm-monster-develop
     image: fdmmonster/fdm-monster:develop
     build:
@@ -57,19 +74,6 @@ services:
     volumes:
       - ./fdm-monster-alpha/media/:/app/media
       - ./fdm-monster-alpha/database/:/app/database
-
-  fdm-monster-sqlite:
-    container_name: fdm-monster-sqlite
-    image: fdmmonster/fdm-monster:1.8.0-sqlite # -arm64
-    restart: unless-stopped
-    ports:
-      - "4000:4000"
-    environment:
-      - NODE_ENV=development
-      - SERVER_PORT=4000
-    volumes:
-      - fdmm-media:/app/media
-      - fdmm-database:/app/database
 
 volumes:
   fdmm-media:

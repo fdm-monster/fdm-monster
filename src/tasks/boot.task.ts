@@ -8,7 +8,6 @@ import { ServerTasks } from "@/tasks";
 import { MulterService } from "@/services/core/multer.service";
 import { SettingsStore } from "@/state/settings.store";
 import { FloorStore } from "@/state/floor.store";
-import { PluginFirmwareUpdateService } from "@/services/octoprint/plugin-firmware-update.service";
 import { ConfigService } from "@/services/core/config.service";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { PrinterFilesStore } from "@/state/printer-files.store";
@@ -57,7 +56,6 @@ export class BootTask {
     taskManagerService,
     pluginRepositoryCache,
     floorStore,
-    pluginFirmwareUpdateService,
     clientBundleService,
     configService,
     typeormService,
@@ -77,7 +75,6 @@ export class BootTask {
     taskManagerService: TaskManagerService;
     pluginRepositoryCache: PluginRepositoryCache;
     floorStore: FloorStore;
-    pluginFirmwareUpdateService: PluginFirmwareUpdateService;
     clientBundleService: ClientBundleService;
     configService: ConfigService;
     typeormService: TypeormService;
@@ -98,7 +95,6 @@ export class BootTask {
     this.taskManagerService = taskManagerService;
     this.pluginRepositoryCache = pluginRepositoryCache;
     this.floorStore = floorStore;
-    this.pluginFirmwareUpdateService = pluginFirmwareUpdateService;
     this.clientBundleService = clientBundleService;
     this.configService = configService;
     this.typeormService = typeormService;

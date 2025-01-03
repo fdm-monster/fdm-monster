@@ -1,5 +1,4 @@
 export const AppConstants = {
-  NON_NPM_MODE_KEY: "NON_NPM_MODE",
   NODE_ENV_KEY: "NODE_ENV",
   VERSION_KEY: "npm_package_version",
   SERVER_PORT_KEY: "SERVER_PORT",
@@ -72,7 +71,7 @@ export const AppConstants = {
   orgName: "fdm-monster",
   // Wizard version changes will trigger a re-run of the wizard
   currentWizardVersion: 1,
-  defaultClientMinimum: "1.8.4",
+  defaultClientMinimum: "1.8.8",
 
   influxUrl: "INFLUX_URL",
   influxToken: "INFLUX_TOKEN",

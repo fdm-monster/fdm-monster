@@ -2,7 +2,7 @@
   "files": [
     "README.md"
   ],
-  "imageSize": 80,
+  "imageSize": 40,
   "commit": false,
   "contributors": [
     {
@@ -205,6 +205,7 @@
       "profile": "https://github.com/julien-printerbox",
       "contributions": [
         "ideas"
+      ]
     },
     {
       "login": "Tbwan",
@@ -214,9 +215,20 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "nuvious",
+      "name": "David Cheeseman",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5287736?v=4",
+      "profile": "https://github.com/nuvious",
+      "contributions": [
+        "ideas",
+        "platform",
+        "infra"
+      ]
     }
   ],
-  "contributorsPerLine": 7,
+  "contributorsPerLine": 10,
   "projectName": "fdm-monster",
   "projectOwner": "fdm-monster",
   "repoType": "github",
