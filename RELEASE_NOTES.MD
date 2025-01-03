@@ -1,5 +1,10 @@
 # Develop
 
+# FDM Monster 03/01/2025 1.8.2
+
+## Changes 
+Update client to 1.8.7
+
 ## Chore
 
 - Change developer setup to be node based only (remove concurrently and nodemon packages)
