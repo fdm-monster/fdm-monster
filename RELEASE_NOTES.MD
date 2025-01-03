@@ -3,7 +3,8 @@
 # FDM Monster 03/01/2025 1.8.2
 
 ## Changes 
-Update client to 1.8.7
+
+Update client to 1.8.8
 
 ## Chore
 
