@@ -79,7 +79,7 @@
     "lodash": "4.17.21",
     "luxon": "3.5.0",
     "migrate-mongo": "11.0.0",
-    "mongoose": "6.13.6",
+    "mongoose": "6.13.8",
     "multer": "1.4.5-lts.1",
     "node-input-validator": "4.5.1",
     "octokit": "3.2.1",
