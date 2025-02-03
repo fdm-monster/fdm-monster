@@ -87,7 +87,7 @@
     "passport-anonymous": "1.0.1",
     "passport-jwt": "4.0.1",
     "reflect-metadata": "0.2.2",
-    "semver": "7.7.0",
+    "semver": "7.7.1",
     "socket.io": "4.8.1",
     "toad-scheduler": "3.0.1",
     "typeorm": "0.3.20",
