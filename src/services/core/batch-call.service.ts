@@ -1,5 +1,5 @@
 import { PrinterFilesStore } from "@/state/printer-files.store";
-import { PrinterSocketStore } from "@/state/printer-socket.store";
+import { PrinterAdapterStore } from "@/state/printer-adapter.store";
 import { PrinterCache } from "@/state/printer.cache";
 import { PrinterEventsCache } from "@/state/printer-events.cache";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
@@ -24,7 +24,7 @@ type BatchModel = Array<BatchSingletonModel>;
 
 export class BatchCallService {
   printerApiFactory: PrinterApiFactory;
-  printerSocketStore: PrinterSocketStore;
+  printerAdapterStore: PrinterAdapterStore;
   printerCache: PrinterCache;
   printerEventsCache: PrinterEventsCache;
   printerFilesStore: PrinterFilesStore;
@@ -35,7 +35,7 @@ export class BatchCallService {
     printerApiFactory,
     printerCache,
     printerEventsCache,
-    printerSocketStore,
+    printerAdapterStore,
     printerFilesStore,
     printerService,
     loggerFactory,
@@ -43,7 +43,7 @@ export class BatchCallService {
     printerApiFactory: PrinterApiFactory;
     printerCache: PrinterCache;
     printerEventsCache: PrinterEventsCache;
-    printerSocketStore: PrinterSocketStore;
+    printerAdapterStore: PrinterAdapterStore;
     printerFilesStore: PrinterFilesStore;
     printerService: IPrinterService;
     loggerFactory: ILoggerFactory;
@@ -51,7 +51,7 @@ export class BatchCallService {
     this.printerApiFactory = printerApiFactory;
     this.printerCache = printerCache;
     this.printerEventsCache = printerEventsCache;
-    this.printerSocketStore = printerSocketStore;
+    this.printerAdapterStore = printerAdapterStore;
     this.printerFilesStore = printerFilesStore;
     this.printerService = printerService;
     this.logger = loggerFactory(BatchCallService.name);
@@ -111,10 +111,10 @@ export class BatchCallService {
     return await Promise.all(promises);
   }
 
-  batchConnectSocket(printerIds: string[]): void {
+  async batchConnectSocket(printerIds: string[]): Promise<void> {
     for (const printerId of printerIds) {
       try {
-        this.printerSocketStore.reconnectOctoPrint(printerId);
+        await this.printerAdapterStore.reconnectAdapter(printerId);
       } catch (e) {
         captureException(e);
         this.logger.error(`Error setting socket to reconnect ${errorSummary(e)}`);
