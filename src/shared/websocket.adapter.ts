@@ -2,16 +2,19 @@ import { AppConstants } from "@/server.constants";
 import { CloseEvent, Data, WebSocket, Event as WsEvent, ErrorEvent, MessageEvent } from "ws";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
+import { IConfigService } from "@/services/core/config.service";
 
 export type WsProtocol = "ws" | "wss";
 
 export class WebsocketAdapter {
   socket?: WebSocket;
   protected logger: LoggerService;
+  protected configService: IConfigService;
   eventEmittingAllowed: boolean = true;
 
   constructor(loggerFactory: ILoggerFactory) {
     this.logger = loggerFactory(WebsocketAdapter.name);
+    this.configService = configService;
   }
 
   get isOpened() {
@@ -39,9 +42,11 @@ export class WebsocketAdapter {
    * @returns {void}
    */
   open(url: string | URL): void {
-    this.socket = new WebSocket(url, {
-      handshakeTimeout: AppConstants.defaultWebsocketHandshakeTimeout,
-    });
+    if (this.socket) {
+      throw new Error("Socket already exists, ignoring open request");
+    }
+
+    this.socket = new WebSocket(url, { handshakeTimeout: AppConstants.defaultWebsocketHandshakeTimeout });
     this.socket.onopen = (event) => this.onOpen(event);
     this.socket.onerror = (error) => this.onError(error);
     this.socket.onclose = (event) => this.onClose(event);
@@ -78,24 +83,6 @@ export class WebsocketAdapter {
   protected onError(error: ErrorEvent): Promise<void> | void {}
 
   /**
-   * Handle after opened event.
-   * @protected
-   * @abstract
-   * @param {Event} event - The event object.
-   * @returns {Promise<void> | void} A promise that resolves when the after opened handling is complete, or void if no promise is returned.
-   */
-  protected afterOpened(event: WsEvent): Promise<void> | void {}
-
-  /**
-   * Handle after closed event.
-   * @protected
-   * @abstract
-   * @param {CloseEvent} event - The event object.
-   * @returns {Promise<void> | void} A promise that resolves when the after closed handling is complete, or void if no promise is returned.
-   */
-  protected afterClosed(event: CloseEvent): Promise<void> | void {}
-
-  /**
    * Handle message event.
    * @protected
    * @abstract
@@ -106,21 +93,23 @@ export class WebsocketAdapter {
 
   /**
    * Handle open event.
-   * @private
+   * @protected
+   * @abstract
    * @param {Event} event - The event object.
    * @returns {Promise<void>} A promise that resolves when the open handling is complete.
    */
-  private async onOpen(event: WsEvent): Promise<void> {
-    await this.afterOpened(event);
-  }
+  protected async onOpen(event: WsEvent): Promise<void> {}
 
   /**
    * Handle close event.
-   * @private
+   * @protected
+   * @abstract
    * @param {CloseEvent} event - The event object.
    * @returns {Promise<void>} A promise that resolves when the close handling is complete.
    */
-  private async onClose(event: CloseEvent): Promise<void> {
-    await this.afterClosed(event);
+  protected async onClose(event: CloseEvent): Promise<void> {}
+
+  protected get _debugMode() {
+    return this.configService.get(AppConstants.debugSocketStatesKey, AppConstants.defaultDebugSocketStates) === "true";
   }
 }
