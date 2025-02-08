@@ -15,8 +15,8 @@ import { AppConstants } from "@/server.constants";
 import { printerResolveMiddleware } from "@/middleware/printer";
 import { generateCorrelationToken } from "@/utils/correlation-token.util";
 import { ROLES } from "@/constants/authorization.constants";
-import { PrinterSocketStore } from "@/state/printer-socket.store";
-import { TestPrinterSocketStore } from "@/state/test-printer-socket.store";
+import { PrinterAdapterStore } from "@/state/printer-adapter.store";
+import { TestPrinterAdapterStore } from "@/state/test-printer-adapter.store";
 import { PrinterCache } from "@/state/printer.cache";
 import { LoggerService } from "@/handlers/logger";
 import { PrinterEventsCache } from "@/state/printer-events.cache";
@@ -42,8 +42,8 @@ import { defaultHttpProtocol } from "@/utils/url.utils";
 @before([authenticate(), authorizeRoles([ROLES.OPERATOR, ROLES.ADMIN]), printerResolveMiddleware()])
 export class PrinterController {
   printerApiFactory: PrinterApiFactory;
-  printerSocketStore: PrinterSocketStore;
-  testPrinterSocketStore: TestPrinterSocketStore;
+  printerAdapterStore: PrinterAdapterStore;
+  testPrinterAdapterStore: TestPrinterAdapterStore;
   printerService: IPrinterService;
   printerCache: PrinterCache;
   printerEventsCache: PrinterEventsCache;
@@ -58,8 +58,8 @@ export class PrinterController {
 
   constructor({
     printerApiFactory,
-    printerSocketStore,
-    testPrinterSocketStore,
+    printerAdapterStore,
+    testPrinterAdapterStore,
     printerService,
     printerCache,
     printerEventsCache,
@@ -73,8 +73,8 @@ export class PrinterController {
     multerService,
   }: {
     printerApiFactory: PrinterApiFactory;
-    printerSocketStore: PrinterSocketStore;
-    testPrinterSocketStore: TestPrinterSocketStore;
+    printerAdapterStore: PrinterAdapterStore;
+    testPrinterAdapterStore: TestPrinterAdapterStore;
     printerService: IPrinterService;
     printerCache: PrinterCache;
     printerEventsCache: PrinterEventsCache;
@@ -92,8 +92,8 @@ export class PrinterController {
     this.printerCache = printerCache;
     this.printerEventsCache = printerEventsCache;
     this.printerService = printerService;
-    this.printerSocketStore = printerSocketStore;
-    this.testPrinterSocketStore = testPrinterSocketStore;
+    this.printerAdapterStore = printerAdapterStore;
+    this.testPrinterAdapterStore = testPrinterAdapterStore;
     this.taskManagerService = taskManagerService;
     this.printerApi = printerApi;
     this.octoprintClient = octoprintClient;
@@ -218,8 +218,13 @@ export class PrinterController {
   @route("/:id/refresh-socket")
   async refreshPrinterSocket(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
-    this.printerSocketStore.reconnectOctoPrint(currentPrinterId);
+    this.logger.log(`Refresh called by user for printer ${this.printerApi.login.printerURL} and id ${currentPrinterId}`);
+
+    this.printerAdapterStore.adapterAllowEmittingEvents(currentPrinterId, false);
     await this.printerEventsCache.deletePrinterSocketEvents(currentPrinterId);
+    await this.printerAdapterStore.reconnectAdapter(currentPrinterId);
+
+    this.logger.log(`Refresh request returned`);
     res.send({});
   }
 
@@ -235,7 +240,7 @@ export class PrinterController {
 
     // Add printer with test=true
     try {
-      await this.testPrinterSocketStore.setupTestPrinter(newPrinter);
+      await this.testPrinterAdapterStore.setupTestPrinter(newPrinter);
     } catch (e) {
       res.send({ correlationToken: newPrinter.correlationToken, failure: true, error: e.toString() });
       return;

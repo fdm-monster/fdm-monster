@@ -4,7 +4,7 @@ import { createTestPrinterRules } from "./validation/create-test-printer.validat
 import { octoPrintEvent, WsMessage } from "@/services/octoprint/octoprint-websocket.adapter";
 import { AppConstants } from "@/server.constants";
 import { SocketIoGateway } from "@/state/socket-io.gateway";
-import { SocketFactory } from "@/services/socket.factory";
+import { PrinterAdapterFactory } from "@/services/printer-adapter.factory";
 import EventEmitter2 from "eventemitter2";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
@@ -17,28 +17,28 @@ import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
 import { moonrakerEvent } from "@/services/moonraker/constants/websocket.constants";
 import { printerEvents } from "@/constants/event.constants";
 
-export class TestPrinterSocketStore {
+export class TestPrinterAdapterStore {
   testSocket: IWebsocketAdapter;
   socketIoGateway: SocketIoGateway;
-  socketFactory: SocketFactory;
+  printerAdapterFactory: PrinterAdapterFactory;
   eventEmitter2: EventEmitter2;
   logger: LoggerService;
 
   constructor({
-    socketFactory,
+    printerAdapterFactory,
     socketIoGateway,
     eventEmitter2,
     loggerFactory,
   }: {
-    socketFactory: SocketFactory;
+    printerAdapterFactory: PrinterAdapterFactory;
     socketIoGateway: SocketIoGateway;
     eventEmitter2: EventEmitter2;
     loggerFactory: ILoggerFactory;
   }) {
-    this.socketFactory = socketFactory;
+    this.printerAdapterFactory = printerAdapterFactory;
     this.socketIoGateway = socketIoGateway;
     this.eventEmitter2 = eventEmitter2;
-    this.logger = loggerFactory(TestPrinterSocketStore.name);
+    this.logger = loggerFactory(TestPrinterAdapterStore.name);
   }
 
   async setupTestPrinter(printer: PrinterUnsafeWithCorrelationDto<IdType>): Promise<void> {
@@ -52,7 +52,7 @@ export class TestPrinterSocketStore {
 
     // Create a new socket if it doesn't exist
     const { correlationToken } = printer;
-    this.testSocket = this.socketFactory.createInstance(printer.printerType);
+    this.testSocket = this.printerAdapterFactory.createInstance(printer.printerType);
 
     // Reset the socket credentials before (re-)connecting
     this.testSocket.registerCredentials({
@@ -92,7 +92,7 @@ export class TestPrinterSocketStore {
 
     try {
       this.logger.log("Test API calls for authentication and session");
-      await this.testSocket.setupSocketSession();
+      await this.testSocket.initSession();
 
       this.logger.log("Test socket connection started");
       const promise = new Promise(async (resolve, reject) => {
