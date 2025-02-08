@@ -22,6 +22,7 @@ import { PrintStatsObject, WebhooksObject } from "@/services/moonraker/dto/objec
 export class MoonrakerApi implements IPrinterApi {
   private readonly logger: LoggerService;
   private readonly client: MoonrakerClient;
+  printerLogin: LoginDto;
 
   constructor(
     loggerFactory: ILoggerFactory,

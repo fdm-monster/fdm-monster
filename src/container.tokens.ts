@@ -42,7 +42,7 @@ export const DITokens = {
   moonrakerApi: "moonrakerApi",
   moonrakerClient: "moonrakerClient",
   cameraStreamService: "cameraStreamService",
-  socketFactory: "socketFactory",
+  printerAdapterFactory: "printerAdapterFactory",
   printerApiFactory: "printerApiFactory",
   printerLogin: "printerLogin",
   batchCallService: "batchCallService",
@@ -52,8 +52,8 @@ export const DITokens = {
   // Stores
   floorStore: "floorStore",
   settingsStore: "settingsStore",
-  printerSocketStore: "printerSocketStore",
-  testPrinterSocketStore: "testPrinterSocketStore",
+  printerAdapterStore: "printerAdapterStore",
+  testPrinterAdapterStore: "testPrinterAdapterStore",
   printerFilesStore: "printerFilesStore",
   octoPrintSockIoAdapter: "octoPrintSockIoAdapter",
   moonrakerWebsocketAdapter: "moonrakerWebsocketAdapter",
@@ -69,7 +69,5 @@ export const DITokens = {
   clientDistDownloadTask: "clientDistDownloadTask",
   socketIoTask: "socketIoTask",
   printCompletionSocketIoTask: "printCompletionSocketIoTask",
-  printerWebsocketTask: "printerWebsocketTask",
-  printerWebsocketRestoreTask: "printerWebsocketRestoreTask",
   printerFileCleanTask: "printerFileCleanTask",
 } as const;

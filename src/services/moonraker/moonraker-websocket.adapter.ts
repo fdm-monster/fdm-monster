@@ -2,7 +2,6 @@ import { MoonrakerClient } from "@/services/moonraker/moonraker.client";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import EventEmitter2 from "eventemitter2";
 import { ConfigService } from "@/services/core/config.service";
-import { ISocketLogin } from "@/shared/dtos/socket-login.dto";
 import { LoggerService } from "@/handlers/logger";
 import { IdType } from "@/shared.constants";
 import { AppConstants } from "@/server.constants";
@@ -84,24 +83,15 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
   protected declare logger: LoggerService;
   private readonly client: MoonrakerClient;
   private socketURL?: URL;
+  printerId?: IdType;
+  private readonly serverVersion: string;
 
-  constructor(
-    loggerFactory: ILoggerFactory,
-    moonrakerClient: MoonrakerClient,
-    private readonly eventEmitter2: EventEmitter2,
-    private readonly configService: ConfigService,
-    private readonly serverVersion: string,
-  ) {
-    super(loggerFactory);
+  protected declare logger: LoggerService;
+  private client: MoonrakerClient;
+  private eventEmitter: EventEmitter2;
+  private configService: ConfigService;
 
-    this.logger = loggerFactory(MoonrakerWebsocketAdapter.name);
-    this.client = moonrakerClient;
-  }
-
-  get _debugMode() {
-    return this.configService.get(AppConstants.debugSocketStatesKey, AppConstants.defaultDebugSocketStates) === "true";
-  }
-
+  refreshPrinterObjectsInterval?: NodeJS.Timeout;
   private get subscriptionObjects() {
     return {
       pause_resume: [],
@@ -125,23 +115,20 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
     };
   }
 
-  needsReopen() {
-    return false;
+  constructor(
+    loggerFactory: ILoggerFactory,
+    moonrakerClient: MoonrakerClient,
+    private readonly eventEmitter2: EventEmitter2,
+    private readonly configService: ConfigService,
+    private readonly serverVersion: string
+  ) {
+    super(loggerFactory);
+
+    this.logger = loggerFactory(MoonrakerWebsocketAdapter.name);
+    this.client = moonrakerClient;
   }
 
-  needsSetup() {
-    return this.socketState === SOCKET_STATE.unopened;
-  }
-
-  needsReauth() {
-    return false;
-  }
-
-  async reauthSession() {
-  }
-
-  registerCredentials(socketLogin: ISocketLogin) {
-    const { printerId, loginDto } = socketLogin;
+  async connect(printerId: T, loginDto: LoginDto) {
     this.printerId = printerId;
     this.login = loginDto;
 
@@ -154,20 +141,16 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
     this.socketURL = wsUrl;
   }
 
-  open() {
-    if (this.socket) {
-      throw new Error(`Socket already exists by printerId, ignoring open request`);
-    }
+  async reconnect(): Promise<void> {}
 
-    super.open(this.socketURL);
-  }
+  async disconnect(): Promise<void> {}
 
   close() {
     clearInterval(this.refreshPrinterObjectsInterval);
     super.close();
   }
 
-  async setupSocketSession(): Promise<void> {
+  async initSession(): Promise<void> {
     // Can 404 or 503
     // const oneshot = await this.client.getAccessOneshotToken(this.login);
     // this.logger.log(`Oneshot ${oneshot.data.result}`);
@@ -278,21 +261,21 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
         serviceChanged.moonraker?.active_state
       ) {
         this.logger.log("Received notify_service_state_changed, reloading Moonraker printer objects");
-        await this.setupSocketSession();
+        await this.initSession();
       }
       return;
     }
     if (eventName === "notify_klippy_ready") {
       this.logger.log("Received notify_klippy_ready, reloading Moonraker printer objects");
-      return await this.setupSocketSession();
+      return await this.initSession();
     }
     if (eventName === "notify_klippy_disconnected") {
       this.logger.log("Received notify_klippy_disconnected, reloading Moonraker printer objects");
-      return await this.setupSocketSession();
+      return await this.initSession();
     }
     if (eventName === "notify_klippy_shutdown") {
       this.logger.log("Received notify_klippy_shutdown, reloading Moonraker printer objects");
-      return await this.setupSocketSession();
+      return await this.initSession();
     }
 
     if (eventName === "notify_status_update") {
@@ -473,5 +456,9 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
       this.logger.log(`${this.printerId} API state updated to: ` + state);
     }
     this.emitEventSync(WsMessage.API_STATE_UPDATED, state);
+  }
+
+  get _debugMode() {
+    return this.configService.get(AppConstants.debugSocketStatesKey, AppConstants.defaultDebugSocketStates) === "true";
   }
 }
