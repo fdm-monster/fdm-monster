@@ -10,10 +10,8 @@ import { ConfigService } from "@/services/core/config.service";
 import { IdType } from "@/shared.constants";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { AxiosError } from "axios";
-import { ISocketLogin } from "@/shared/dtos/socket-login.dto";
 import { WebsocketAdapter } from "@/shared/websocket.adapter";
 import { OctoPrintEventDto } from "@/services/octoprint/dto/octoprint-event.dto";
-import { writeFileSync } from "node:fs";
 import { LoginDto } from "@/services/interfaces/login.dto";
 import { SOCKET_STATE, SocketState } from "@/shared/dtos/socket-state.type";
 import { API_STATE, ApiState } from "@/shared/dtos/api-state.type";
@@ -24,6 +22,7 @@ import { OctoprintErrorDto } from "@/services/octoprint/dto/rest/error.dto";
 import { OctoprintType } from "@/services/printer-api.interface";
 import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
 import { CurrentJobDto } from "@/services/octoprint/dto/job/current-job.dto";
+import { sleep } from "@/utils/time.utils";
 
 export const WsMessage = {
   // Custom events
@@ -50,8 +49,10 @@ export const octoPrintEvent = (event: string) => `octoprint.${event}`;
 export class OctoprintWebsocketAdapter extends WebsocketAdapter implements IWebsocketAdapter {
   protected declare logger: LoggerService;
 
-  public readonly printerType = 0;
   public printerId?: IdType;
+  public get printerType() {
+    return OctoprintType;
+  }
   stateUpdated = false;
   stateUpdateTimestamp: null | number = null;
   socketState: SocketState = SOCKET_STATE.unopened;
@@ -65,6 +66,8 @@ export class OctoprintWebsocketAdapter extends WebsocketAdapter implements IWebs
   private socketURL?: URL;
   private sessionDto?: OP_LoginDto;
   private username?: string;
+
+  // Redesign and make super robust (memory leaks)
   private refreshPrinterCurrentInterval?: NodeJS.Timeout;
 
   constructor(
@@ -78,29 +81,10 @@ export class OctoprintWebsocketAdapter extends WebsocketAdapter implements IWebs
     this.logger = loggerFactory(OctoprintWebsocketAdapter.name);
   }
 
-  get _debugMode() {
-    return this.configService.get(AppConstants.debugSocketStatesKey, AppConstants.defaultDebugSocketStates) === "true";
-  }
+  // Would expect an async function to be entry-point
+  async connect(printerId: T, loginDto: LoginDto): Promise<void> {
+    // TODO deal with existing socket
 
-  needsReopen() {
-    const isApiOnline = this.apiState === API_STATE.responding;
-    return isApiOnline && (this.socketState === SOCKET_STATE.closed || this.socketState === SOCKET_STATE.error);
-  }
-
-  needsSetup() {
-    return this.socketState === SOCKET_STATE.unopened;
-  }
-
-  needsReauth() {
-    return this.reauthRequired;
-  }
-
-  isClosedOrAborted() {
-    return this.socketState === SOCKET_STATE.closed || this.socketState === SOCKET_STATE.aborted;
-  }
-
-  registerCredentials(socketLogin: ISocketLogin) {
-    const { printerId, loginDto } = socketLogin;
     this.printerId = printerId;
     this.login = loginDto;
 
@@ -111,36 +95,58 @@ export class OctoprintWebsocketAdapter extends WebsocketAdapter implements IWebs
     const wsUrl = httpToWsUrl(httpUrlString);
     wsUrl.pathname = (httpUrlPath ?? "/") + "sockjs/websocket";
     this.socketURL = wsUrl;
+
+    // TODO connect here
   }
 
-  open() {
-    if (this.socket) {
-      throw new Error(`Socket already exists by printerId, ignoring open request`);
-    }
+  // Specific, overloaded
+  async reconnect() {
+    this.logger.log("'reauthSession' called");
+
+    await this.initSession();
+
     super.open(this.socketURL);
+
+    let tries = 5;
+    while (this.socket.readyState === WebSocket.CONNECTING && tries-- > 0) {
+      this.logger.log("Waiting for websocket to open, 150ms");
+      await sleep(150);
+    }
+
+    if (this.isClosedOrAborted()) {
+      this.logger.log("Could not setup websocket within expected time. Closing");
+      return;
+    }
+
+    this.resetReauthRequired();
   }
 
-  close() {
+  // Would expect an async function, expect a guaranteed closure
+  async disconnect(): Promise<void> {
     clearInterval(this.refreshPrinterCurrentInterval);
     super.close();
   }
 
-  async sendThrottle(throttle: number = AppConstants.defaultSocketThrottleRate): Promise<void> {
-    return await this.sendMessage(JSON.stringify({ throttle }));
+  private needsReopen() {
+    const isApiOnline = this.apiState === API_STATE.responding;
+    return isApiOnline && (this.socketState === SOCKET_STATE.closed || this.socketState === SOCKET_STATE.error);
   }
 
-  async reauthSession() {
-    this.logger.log("Sending reauthSession");
-    await this.setupSocketSession();
-    await this.sendAuth();
-    this.resetReauthRequired();
+  private needsSetup() {
+    return this.socketState === SOCKET_STATE.unopened;
   }
 
-  /**
-   * Retrieve session token by authenticating with OctoPrint API
-   */
-  async setupSocketSession(): Promise<void> {
+  private isClosedOrAborted() {
+    return this.socketState === SOCKET_STATE.closed || this.socketState === SOCKET_STATE.aborted;
+  }
+
+  // Overloaded and specific
+  async initSession(): Promise<void> {
+    this.logger.log("Setting up socket session - resetting socket state");
     this.resetSocketState();
+    this.allowEmittingEvents();
+
+    this.logger.log("Setting up socket session - logging in");
     this.sessionDto = await this.octoprintClient
       .login(this.login)
       .then((d) => {
@@ -181,6 +187,7 @@ export class OctoprintWebsocketAdapter extends WebsocketAdapter implements IWebs
         throw e;
       });
 
+    this.logger.log("Setting up socket session - fetching username");
     this.username = await this.octoprintClient.getAdminUserOrDefault(this.login).catch((e: AxiosError) => {
       const status = e.response?.status;
       if (status === HttpStatusCode.FORBIDDEN) {
@@ -203,6 +210,7 @@ export class OctoprintWebsocketAdapter extends WebsocketAdapter implements IWebs
       throw e;
     });
 
+    this.logger.log("Setting up socket session - call interval loop manually");
     await this.updateCurrentStateSafely();
 
     this.logger.log(`Setting up printer current interval loop with 10 seconds interval`);
@@ -220,6 +228,8 @@ export class OctoprintWebsocketAdapter extends WebsocketAdapter implements IWebs
    * @private
    */
   private async updateCurrentStateSafely() {
+    this.logger.log(`Printer current interval loop called`);
+
     try {
       const current = await this.octoprintClient.getPrinterCurrent(this.login, true);
       const isOperational = current.data?.state?.flags?.operational;
@@ -258,21 +268,25 @@ export class OctoprintWebsocketAdapter extends WebsocketAdapter implements IWebs
     }
   }
 
-  setReauthRequired() {
+  // Specific
+  private setReauthRequired() {
     this.reauthRequired = true;
     this.reauthRequiredTimestamp = Date.now();
   }
 
-  resetReauthRequired() {
+  // Specific
+  private resetReauthRequired() {
     this.reauthRequired = false;
     this.reauthRequiredTimestamp = null;
   }
 
+  // Generic
   resetSocketState() {
     this.setSocketState("unopened");
     this.setApiState("unset");
   }
 
+  // Generic-ish
   emitEventSync(event: string, payload: any) {
     if (!this.eventEmittingAllowed) {
       return;
@@ -286,12 +300,14 @@ export class OctoprintWebsocketAdapter extends WebsocketAdapter implements IWebs
     } as OctoPrintEventDto);
   }
 
+  // Generic + specific
   protected async afterOpened(_: WsEvent): Promise<void> {
     this.setSocketState("opened");
     await this.sendAuth();
     await this.sendThrottle(AppConstants.defaultSocketThrottleRate);
   }
 
+  // Bit generic, mostly specific
   protected async onMessage(message: string): Promise<void> {
     this.lastMessageReceivedTimestamp = Date.now();
 
@@ -303,36 +319,33 @@ export class OctoprintWebsocketAdapter extends WebsocketAdapter implements IWebs
     const eventName = Object.keys(data)[0];
     const payload = data[eventName];
 
-    if (this._debugMode) {
-      this.logger.log(`RX Msg ${eventName} ${message.substring(0, 140)}...`);
-    }
+    this.logger.log(`RX Msg ${eventName} ${message.substring(0, 140)}...`);
 
     if (eventName === OctoPrintMessage.reauthRequired) {
       this.logger.log("Received 'reauthRequired', acting on it");
       this.setReauthRequired();
-    } else if (
-      eventName === OctoPrintMessage.current &&
-      this.configService.get(AppConstants.debugFileWritePrinterStatesKey, AppConstants.defaultDebugFileWritePrinterStates) ===
-        "true"
-    ) {
-      writeFileSync(`websocket_current_${this.printerId}.txt`, JSON.stringify(payload, null, 2));
     }
 
     // Emit the message to the event bus
     await this.emitEvent(eventName, payload);
   }
 
+  // Generic
   protected async afterClosed(event: any) {
+    this.logger.log("'afterClosed' handler called");
+
     this.setSocketState("closed");
     delete this.socket;
     await this.emitEvent(WsMessage.WS_CLOSED, "connection closed");
   }
 
+  // Generic
   protected async onError(error: any) {
     this.setSocketState("error");
     await this.emitEvent(WsMessage.WS_ERROR, error?.length ? error : "connection error");
   }
 
+  // Generic-ish
   private async emitEvent(event: string, payload?: any) {
     if (!this.eventEmittingAllowed) {
       return;
@@ -346,16 +359,27 @@ export class OctoprintWebsocketAdapter extends WebsocketAdapter implements IWebs
     } as OctoPrintEventDto);
   }
 
+  // Specific
   private async sendAuth(): Promise<void> {
+    const sessionCredentials = `${this.username}:${this.sessionDto.session}`;
+    this.logger.log(`Sending auth ${sessionCredentials}`);
+
     this.setSocketState(SOCKET_STATE.authenticating as SocketState);
+
+    // TODO test what happens if authentication is incorrect
     await this.sendMessage(
       JSON.stringify({
-        auth: `${this.username}:${this.sessionDto.session}`,
+        auth: sessionCredentials,
       })
     );
-    // TODO what if bad auth? => pure silence right?
   }
 
+  // Specific
+  private async sendThrottle(throttle: number = AppConstants.defaultSocketThrottleRate): Promise<void> {
+    return await this.sendMessage(JSON.stringify({ throttle }));
+  }
+
+  // Generic
   private setSocketState(state: SocketState) {
     this.socketState = state;
     this.stateUpdated = true;
@@ -366,6 +390,7 @@ export class OctoprintWebsocketAdapter extends WebsocketAdapter implements IWebs
     this.emitEventSync(WsMessage.WS_STATE_UPDATED, state);
   }
 
+  // Generic
   private setApiState(state: ApiState) {
     if (state === API_STATE.globalKey) {
       this.logger.warn("Global API Key WS State detected");
