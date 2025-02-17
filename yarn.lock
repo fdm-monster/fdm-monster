@@ -4868,9 +4868,9 @@ __metadata:
   linkType: hard
 
 "caniuse-lite@npm:^1.0.30001688":
-  version: 1.0.30001699
-  resolution: "caniuse-lite@npm:1.0.30001699"
-  checksum: 10c0/e87b3a0602c3124131f6a21f1eb262378e17a2ee3089e3c472ac8b9caa85cf7d6a219655379302c29c6f10a74051f2a712639d7f98ee0444c73fefcbaf25d519
+  version: 1.0.30001700
+  resolution: "caniuse-lite@npm:1.0.30001700"
+  checksum: 10c0/3d391bcdd193208166d3ad759de240b9c18ac3759dbd57195770f0fcd2eedcd47d5e853609aba1eee5a2def44b0a14eee457796bdb3451a27de0c8b27355017c
   languageName: node
   linkType: hard
 
@@ -8212,9 +8212,9 @@ __metadata:
   linkType: hard
 
 "libphonenumber-js@npm:^1.10.53":
-  version: 1.11.19
-  resolution: "libphonenumber-js@npm:1.11.19"
-  checksum: 10c0/cf02204746dd89cacbd5830c32e6ea4a7e4593efa84b0707207900d79bb0bbd19bd38eb6da7544f49638d609b8c4b9dcbd7e50ea6506e957cd149f6a3c2c7b2b
+  version: 1.11.20
+  resolution: "libphonenumber-js@npm:1.11.20"
+  checksum: 10c0/fb1010bfa5f8682dadfbd9608f76207510e13c456db96d0d534cf727efa2de005cafbb16d016046965894af0787bf567eb5a1a2688d7bb2d5f8b2eebc42437c6
   languageName: node
   linkType: hard
 
