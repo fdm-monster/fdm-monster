@@ -1855,13 +1855,13 @@ __metadata:
   linkType: hard
 
 "@octokit/graphql@npm:^7.1.0":
-  version: 7.1.0
-  resolution: "@octokit/graphql@npm:7.1.0"
+  version: 7.1.1
+  resolution: "@octokit/graphql@npm:7.1.1"
   dependencies:
-    "@octokit/request": "npm:^8.3.0"
+    "@octokit/request": "npm:^8.4.1"
     "@octokit/types": "npm:^13.0.0"
     universal-user-agent: "npm:^6.0.0"
-  checksum: 10c0/6d50a013d151f416fc837644e394e8b8872da7b17b181da119842ca569b0971e4dfacda55af6c329b51614e436945415dd5bd75eb3652055fdb754bbcd20d9d1
+  checksum: 10c0/c27216200f3f4ce7ce2a694fb7ea43f8ea4a807fbee3a423c41ed137dd7948dfc0bbf6ea1656f029a7625c84b583acdef740a7032266d0eff55305c91c3a1ed6
   languageName: node
   linkType: hard
 
@@ -1993,7 +1993,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/request@npm:^8.3.0, @octokit/request@npm:^8.3.1":
+"@octokit/request@npm:^8.3.1, @octokit/request@npm:^8.4.1":
   version: 8.4.1
   resolution: "@octokit/request@npm:8.4.1"
   dependencies:
@@ -4673,7 +4673,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bson@npm:^6.10.1":
+"bson@npm:^6.10.3":
   version: 6.10.3
   resolution: "bson@npm:6.10.3"
   checksum: 10c0/15ad7a9b3bf8090add5fea1761b1ba7d75e5256efcfbb8c9ca448ca98e59c3b079c37c36c7aca0cc916236bd2d4684a5525c68f3d76da8a13d55dc230abbdd21
@@ -8778,14 +8778,14 @@ __metadata:
   linkType: hard
 
 "mongodb@npm:^6.1.0, mongodb@npm:^6.9.0":
-  version: 6.13.0
-  resolution: "mongodb@npm:6.13.0"
+  version: 6.13.1
+  resolution: "mongodb@npm:6.13.1"
   dependencies:
     "@mongodb-js/saslprep": "npm:^1.1.9"
-    bson: "npm:^6.10.1"
+    bson: "npm:^6.10.3"
     mongodb-connection-string-url: "npm:^3.0.0"
   peerDependencies:
-    "@aws-sdk/credential-providers": ^3.188.0
+    "@aws-sdk/credential-providers": ^3.632.0
     "@mongodb-js/zstd": ^1.1.0 || ^2.0.0
     gcp-metadata: ^5.2.0
     kerberos: ^2.0.1
@@ -8807,7 +8807,7 @@ __metadata:
       optional: true
     socks:
       optional: true
-  checksum: 10c0/8fe03ef208113a47842a0ae3676abe287d6e1cff81d47414abf501c7b78257c7fecb80cafc5ba16b3e42821fffcd3652c62650302c8f4f58464c802a17910478
+  checksum: 10c0/319a8f76ebee3f79d8af0218dca46e79ad7fbd2e6e11d80b902f3efd8d2bf9ee1c85f445bad45d7a2b40aff98ac7e2f3f899b9408c773579b6e91df6e283783f
   languageName: node
   linkType: hard
 
@@ -10751,9 +10751,9 @@ __metadata:
   linkType: hard
 
 "strnum@npm:^1.0.5":
-  version: 1.0.5
-  resolution: "strnum@npm:1.0.5"
-  checksum: 10c0/64fb8cc2effbd585a6821faa73ad97d4b553c8927e49086a162ffd2cc818787643390b89d567460a8e74300148d11ac052e21c921ef2049f2987f4b1b89a7ff1
+  version: 1.1.0
+  resolution: "strnum@npm:1.1.0"
+  checksum: 10c0/7d054ada4b43d116cf27817a2549a90693922218111371febbd298b1358358f49ca7f5880bbc658af87fa7d94ead046325a65ac68b8ca63d0e2ca88d64b83143
   languageName: node
   linkType: hard
 
