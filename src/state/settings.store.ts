@@ -7,7 +7,7 @@ import {
   timeoutSettingKey,
   wizardSettingKey,
 } from "@/constants/server-settings.constants";
-import { getCurrentHub } from "@sentry/node";
+import { getClient } from "@sentry/node";
 import { isTestEnvironment } from "@/utils/env.utils";
 import { AppConstants } from "@/server.constants";
 import { LoggerService } from "@/handlers/logger";
@@ -248,7 +248,7 @@ export class SettingsStore {
     }
 
     if (isTestEnvironment()) return;
-    const client = getCurrentHub().getClient();
+    const client = getClient();
     if (!client) {
       this.logger.warn("Could not apply Sentry. Was the SDK initialized?");
       return;
