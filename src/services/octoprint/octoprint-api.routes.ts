@@ -1,11 +1,3 @@
-import { contentTypeHeaderKey, jsonContentType } from "./constants/octoprint-service.constants";
-import { constructHeaders, validateLogin } from "./utils/api.utils";
-import { getDefaultTimeout, timeoutSettingKey } from "@/constants/server-settings.constants";
-import { normalizeUrl } from "@/utils/normalize-url";
-import { LoginDto } from "@/services/interfaces/login.dto";
-import { SettingsStore } from "@/state/settings.store";
-import { ITimeoutSettings } from "@/models/Settings";
-
 export class OctoprintRoutes {
   octoPrintBase = "/";
   apiBase = `${this.octoPrintBase}api`;
@@ -50,12 +42,6 @@ export class OctoprintRoutes {
   pluginManagerPlugins = `${this.pluginManager}/plugins`; // Fast
   pluginManagerExport = `${this.pluginManager}/export`;
   pluginManagerOrphans = `${this.pluginManager}/orphans`;
-  settingsStore: SettingsStore;
-  timeouts: ITimeoutSettings;
-
-  constructor({ settingsStore }: { settingsStore: SettingsStore }) {
-    this.settingsStore = settingsStore;
-  }
 
   get disconnectCommand() {
     return { command: "disconnect" };
@@ -136,73 +122,6 @@ export class OctoprintRoutes {
     return {
       command,
       url,
-    };
-  }
-
-  ensureTimeoutSettingsLoaded() {
-    const serverSettings = this.settingsStore.getSettings();
-    this.timeouts = { ...serverSettings[timeoutSettingKey] };
-
-    if (!this.timeouts) {
-      throw new Error(
-        "OctoPrint API Service could not load timeout settings. settingsStore:Settings:timeout didnt return anything"
-      );
-    }
-  }
-
-  protected prepareRequest(login: LoginDto, path: string, timeoutOverride?: number, contentType = jsonContentType) {
-    this.ensureTimeoutSettingsLoaded();
-
-    const { apiKey, printerURL } = validateLogin(login);
-
-    let headers = constructHeaders(apiKey, contentType);
-
-    let timeout = timeoutOverride || this.timeouts.apiTimeout;
-    if (timeout <= 0) {
-      timeout = getDefaultTimeout().apiTimeout;
-    }
-
-    return {
-      url: new URL(path, normalizeUrl(printerURL)).href,
-      options: {
-        headers,
-        timeout,
-      },
-    };
-  }
-
-  prepareAnonymousRequest(path: string, timeoutOverride?: number, contentType = jsonContentType) {
-    this.ensureTimeoutSettingsLoaded();
-
-    let headers = {
-      [contentTypeHeaderKey]: contentType,
-    };
-    let timeout = timeoutOverride || this.timeouts.apiTimeout;
-    if (timeout <= 0) {
-      timeout = getDefaultTimeout().apiTimeout;
-    }
-
-    return {
-      url: path,
-      options: {
-        headers,
-        timeout,
-      },
-    };
-  }
-
-  // Unused because we dont have any PUT/PATCH/POST with relevant data so far
-  prepareJsonRequest(login: LoginDto, path: string, data: any, timeoutOverride?: number) {
-    const { url, options } = this.prepareRequest(login, path, timeoutOverride);
-
-    // We must allow file uploads elsewhere, so be explicit about the content type and data in this JSON request
-    let serializedData = data ? JSON.stringify(data) : undefined;
-    options.headers[contentTypeHeaderKey] = jsonContentType;
-
-    return {
-      url,
-      data: serializedData,
-      options,
     };
   }
 }

@@ -1,4 +1,4 @@
-import axios, { AxiosResponse, AxiosStatic } from "axios";
+import axios, { AxiosResponse } from "axios";
 import { ServerInfoDto } from "@/services/moonraker/dto/server/server-info.dto";
 import { LoginDto } from "@/services/interfaces/login.dto";
 import { ResultDto } from "./dto/rest/result.dto";
@@ -74,45 +74,47 @@ import { HistoryTotalsDto } from "@/services/moonraker/dto/server-history/histor
 import { HistoryLastTotalsDto } from "@/services/moonraker/dto/server-history/history-last-totals.dto";
 import { HistoryJobDto } from "@/services/moonraker/dto/server-history/history-job.dto";
 import { PrinterObjectsQueryDto } from "@/services/moonraker/dto/objects/printer-objects-query.dto";
+import { DefaultHttpClientBuilder } from "@/shared/default-http-client.builder";
+import { HttpClientFactory } from "@/services/core/http-client.factory";
 
 export class MoonrakerClient {
-  private httpClient: AxiosStatic;
+  private httpClientFactory: HttpClientFactory;
   private eventEmitter2: EventEmitter2;
 
-  constructor({ httpClient, eventEmitter2 }: { httpClient: AxiosStatic; eventEmitter2: EventEmitter2 }) {
-    this.httpClient = httpClient;
+  constructor({ httpClientFactory, eventEmitter2 }: { httpClientFactory: HttpClientFactory; eventEmitter2: EventEmitter2 }) {
+    this.httpClientFactory = httpClientFactory;
     this.eventEmitter2 = eventEmitter2;
   }
 
   async getServerInfo(login: LoginDto) {
-    return this.httpClient.get<ResultDto<ServerInfoDto>>(`${login.printerURL}/server/info`);
+    return this.createClient(login).get<ResultDto<ServerInfoDto>>("/server/info");
   }
 
   async getServerConfig(login: LoginDto) {
-    return this.httpClient.get<ResultDto<ServerConfigDto>>(`${login.printerURL}/server/config`);
+    return this.createClient(login).get<ResultDto<ServerConfigDto>>("/server/config");
   }
 
   async getTemperatureStore(login: LoginDto, includeMonitors: boolean = false) {
-    return this.httpClient.get<ResultDto<TemperatureStoreDto>>(
-      `${login.printerURL}/server/temperature_store?include_monitors=${!!includeMonitors}`
+    return this.createClient(login).get<ResultDto<TemperatureStoreDto>>(
+      `/server/temperature_store?include_monitors=${!!includeMonitors}`
     );
   }
 
   async getGcodeStore(login: LoginDto, count: number = 100) {
-    return this.httpClient.get<ResultDto<GcodeStoreDto>>(`${login.printerURL}/server/gcode_store?count=${count}`);
+    return this.createClient(login).get<ResultDto<GcodeStoreDto>>(`/server/gcode_store?count=${count}`);
   }
 
   async postRolloverLogs(login: LoginDto, application: "moonraker" | "klipper" | "" = "") {
-    return this.httpClient.post<ResultDto<GcodeStoreDto>>(`${login.printerURL}/server/logs/rollover`, { application });
+    return this.createClient(login).post<ResultDto<GcodeStoreDto>>(`server/logs/rollover`, { application });
   }
 
   async postRestartServer(login: LoginDto) {
-    return this.httpClient.post<ResultDto<ActionResultDto>>(`${login.printerURL}/server/restart`);
+    return this.createClient(login).post<ResultDto<ActionResultDto>>(`server/restart`);
   }
 
   async postJsonRpc<I, O>(login: LoginDto, method: string, params?: I, id?: number) {
-    return this.httpClient.post<JsonRpcResponseDto<O>, AxiosResponse<JsonRpcResponseDto<O>>, JsonRpcRequestDto<I>>(
-      `${login.printerURL}/server/jsonrpc`,
+    return this.createClient(login).post<JsonRpcResponseDto<O>, AxiosResponse<JsonRpcResponseDto<O>>, JsonRpcRequestDto<I>>(
+      `server/jsonrpc`,
       {
         jsonrpc: "2.0",
         id: id ? id : 0,
@@ -123,23 +125,23 @@ export class MoonrakerClient {
   }
 
   async getPrinterInfo(login: LoginDto) {
-    return this.httpClient.post<ResultDto<PrinterInfoDto>>(`${login.printerURL}/printer/info`);
+    return this.createClient(login).post<ResultDto<PrinterInfoDto>>(`printer/info`);
   }
 
   async postQuickStop(login: LoginDto) {
-    return this.httpClient.post<ResultDto<ActionResultDto>>(`${login.printerURL}/printer/emergency_stop`);
+    return this.createClient(login).post<ResultDto<ActionResultDto>>(`printer/emergency_stop`);
   }
 
   async postHostRestart(login: LoginDto) {
-    return this.httpClient.post<ResultDto<ActionResultDto>>(`${login.printerURL}/printer/restart`);
+    return this.createClient(login).post<ResultDto<ActionResultDto>>(`printer/restart`);
   }
 
   async postFirmwareRestart(login: LoginDto) {
-    return this.httpClient.post<ResultDto<ActionResultDto>>(`${login.printerURL}/printer/firmware_restart`);
+    return this.createClient(login).post<ResultDto<ActionResultDto>>(`printer/firmware_restart`);
   }
 
   async getPrinterObjectsList(login: LoginDto) {
-    return this.httpClient.get<ResultDto<PrinterAvailableObjects>>(`${login.printerURL}/printer/objects/list`);
+    return this.createClient(login).get<ResultDto<PrinterAvailableObjects>>(`printer/objects/list`);
   }
 
   async getPrinterObjectsQuery<R = PrinterObjectsQueryDto>(
@@ -147,7 +149,7 @@ export class MoonrakerClient {
     query: Partial<Record<KnownPrinterObject, string[]>>
   ) {
     const queryString = this.convertToQueryString(query);
-    return this.httpClient.get<ResultDto<R>>(`${login.printerURL}/printer/objects/query?${queryString}`);
+    return this.createClient(login).get<ResultDto<R>>(`printer/objects/query?${queryString}`);
   }
 
   postSubscribePrinterObjects<R = PrinterObjectsQueryDto>(
@@ -156,9 +158,7 @@ export class MoonrakerClient {
     query: Partial<Record<KnownPrinterObject, string[]>>
   ) {
     const queryString = this.convertToQueryString(query);
-    return this.httpClient.post<ResultDto<R>>(
-      `${login.printerURL}/printer/objects/subscribe?connection_id=${connectionId}&${queryString}`
-    );
+    return this.createClient(login).post<ResultDto<R>>(`printer/objects/subscribe?connection_id=${connectionId}&${queryString}`);
   }
 
   private convertToQueryString(query: Partial<Record<KnownPrinterObject, string[]>>): string {
@@ -175,46 +175,46 @@ export class MoonrakerClient {
   }
 
   async getPrinterQueryEndstops(login: LoginDto) {
-    return this.httpClient.get<ResultDto<PrinterQueryEndstopsDto>>(`${login.printerURL}/printer/query-endstops`);
+    return this.createClient(login).get<ResultDto<PrinterQueryEndstopsDto>>(`printer/query-endstops`);
   }
 
   async postGcodeScript(login: LoginDto, script: string = "G28") {
-    return this.httpClient.get<ResultDto<ActionResultDto>>(`${login.printerURL}/printer/gcode/script?script=${script}`);
+    return this.createClient(login).get<ResultDto<ActionResultDto>>(`printer/gcode/script?script=${script}`);
   }
 
   async getGcodeHelp(login: LoginDto) {
-    return this.httpClient.get<ResultDto<GcodeHelpDto>>(`${login.printerURL}/printer/gcode/help`);
+    return this.createClient(login).get<ResultDto<GcodeHelpDto>>(`printer/gcode/help`);
   }
 
   async postPrintStart(login: LoginDto, filename: string) {
     // will throw 400 if SD busy
-    return this.httpClient.post<ResultDto<ActionResultDto>>(`${login.printerURL}/printer/print/start?filename=${filename}`);
+    return this.createClient(login).post<ResultDto<ActionResultDto>>(`printer/print/start?filename=${filename}`);
   }
 
   async postPrintPause(login: LoginDto) {
-    return this.httpClient.post<ResultDto<ActionResultDto>>(`${login.printerURL}/printer/print/pause`);
+    return this.createClient(login).post<ResultDto<ActionResultDto>>(`printer/print/pause`);
   }
 
   async postPrintResume(login: LoginDto) {
-    return this.httpClient.post<ResultDto<ActionResultDto>>(`${login.printerURL}/printer/print/resume`);
+    return this.createClient(login).post<ResultDto<ActionResultDto>>(`printer/print/resume`);
   }
 
   async postPrintCancel(login: LoginDto) {
-    return this.httpClient.post<ResultDto<ActionResultDto>>(`${login.printerURL}/printer/print/cancel`);
+    return this.createClient(login).post<ResultDto<ActionResultDto>>(`printer/print/cancel`);
   }
 
   async getMachineSystemInfo(login: LoginDto) {
-    return this.httpClient.get<ResultDto<MachineSystemInfoDto>>(`${login.printerURL}/machine/system_info`);
+    return this.createClient(login).get<ResultDto<MachineSystemInfoDto>>(`machine/system_info`);
   }
 
   async postMachineShutdown(login: LoginDto) {
     // Will result in error.
-    return this.httpClient.post<null>(`${login.printerURL}/machine/shutdown`);
+    return this.createClient(login).post<null>(`machine/shutdown`);
   }
 
   async postMachineReboot(login: LoginDto) {
     // Will result in error.
-    return this.httpClient.post<null>(`${login.printerURL}/machine/reboot`);
+    return this.createClient(login).post<null>(`machine/reboot`);
   }
 
   async postMachineRestartService(
@@ -222,106 +222,102 @@ export class MoonrakerClient {
     service: "crowsnest" | "MoonCord" | "moonraker" | "moonraker-telegram-bot" | "klipper" | "KlipperScreen" | "sonar" | "webcamd"
   ) {
     // Can result in 500 if klipper fails to start
-    return this.httpClient.post<ResultDto<ActionResultDto>>(`${login.printerURL}/machine/services/restart?service=${service}`);
+    return this.createClient(login).post<ResultDto<ActionResultDto>>(`machine/services/restart?service=${service}`);
   }
 
   async postMachineStartService(login: LoginDto, service: "webcamd" | "klipper") {
-    return this.httpClient.post<ResultDto<ActionResultDto>>(`${login.printerURL}/machine/services/restart?service=${service}`);
+    return this.createClient(login).post<ResultDto<ActionResultDto>>(`machine/services/restart?service=${service}`);
   }
 
   async postMachineProcessStats(login: LoginDto) {
     // Will result in error.
-    return this.httpClient.post<ResultDto<ProcessStatsDto>>(`${login.printerURL}/machine/proc_stats`);
+    return this.createClient(login).post<ResultDto<ProcessStatsDto>>(`machine/proc_stats`);
   }
 
   async getMachineSudoInfo(login: LoginDto, checkAccess: boolean = false) {
-    return this.httpClient.get<ResultDto<SudoInfoDto>>(`${login.printerURL}/machine/sudo/info?check_access=${checkAccess}`);
+    return this.createClient(login).get<ResultDto<SudoInfoDto>>(`machine/sudo/info?check_access=${checkAccess}`);
   }
 
   async postMachineSetSudoPassword(login: LoginDto, password: string) {
     // Does not persist across reboots
-    return this.httpClient.post<ResultDto<SudoResponseDto>>(`${login.printerURL}/machine/sudo/password`, {
+    return this.createClient(login).post<ResultDto<SudoResponseDto>>(`machine/sudo/password`, {
       password,
     });
   }
 
   async getMachineListPeripheralsUsb(login: LoginDto) {
-    return this.httpClient.get<ResultDto<MachinePeripheralsUsbDto>>(`${login.printerURL}/machine/peripherals/usb`);
+    return this.createClient(login).get<ResultDto<MachinePeripheralsUsbDto>>(`machine/peripherals/usb`);
   }
 
   async getMachineListPeripheralsSerial(login: LoginDto) {
-    return this.httpClient.get<ResultDto<MachinePeripheralsSerialDto>>(`${login.printerURL}/machine/peripherals/serial`);
+    return this.createClient(login).get<ResultDto<MachinePeripheralsSerialDto>>(`machine/peripherals/serial`);
   }
 
   async getMachineListPeripheralsVideo(login: LoginDto) {
-    return this.httpClient.get<ResultDto<MachinePeripheralsVideoDto>>(`${login.printerURL}/machine/peripherals/video`);
+    return this.createClient(login).get<ResultDto<MachinePeripheralsVideoDto>>(`machine/peripherals/video`);
   }
 
   async getMachineListPeripheralsCanbus(login: LoginDto, canInterface: "can0" | "can1" | string = "can0") {
-    return this.httpClient.get<ResultDto<MachinePeripheralsCanbusDto>>(
-      `${login.printerURL}/machine/peripherals/canbus?interface=${canInterface}`
+    return this.createClient(login).get<ResultDto<MachinePeripheralsCanbusDto>>(
+      `machine/peripherals/canbus?interface=${canInterface}`
     );
   }
 
   async getServerFilesList(login: LoginDto, rootFolder = "") {
     const paramString = rootFolder?.length ? `?root=${rootFolder}` : "";
-    return this.httpClient.get<ResultDto<ServerFileDto[]>>(`${login.printerURL}/server/files/list${paramString}`);
+    return this.createClient(login).get<ResultDto<ServerFileDto[]>>(`server/files/list${paramString}`);
   }
 
   async getServerFilesRoots(login: LoginDto) {
-    return this.httpClient.get<ResultDto<ServerFileRootDto[]>>(`${login.printerURL}/server/files/roots`);
+    return this.createClient(login).get<ResultDto<ServerFileRootDto[]>>(`server/files/roots`);
   }
 
   async getServerFileMetadata(login: LoginDto, filename: string) {
-    return this.httpClient.get<ResultDto<ServerFileMetadataDto>>(
-      `${login.printerURL}/server/files/metadata?filename=${filename}`
-    );
+    return this.createClient(login).get<ResultDto<ServerFileMetadataDto>>(`server/files/metadata?filename=${filename}`);
   }
 
   async getServerFileMetadataScan(login: LoginDto, filename: string) {
-    return this.httpClient.get<ResultDto<ServerFileMetadataDto>>(
-      `${login.printerURL}/server/files/metascan?filename=${filename}`
-    );
+    return this.createClient(login).get<ResultDto<ServerFileMetadataDto>>(`server/files/metascan?filename=${filename}`);
   }
 
   async getServerFilesThumbnails(login: LoginDto, filename: string) {
-    return this.httpClient.get<ResultDto<ServerFileThumbnailDto[]>>(
-      `${login.printerURL}/server/files/thumbnails?filename=${filename}`
-    );
+    return this.createClient(login).get<ResultDto<ServerFileThumbnailDto[]>>(`server/files/thumbnails?filename=${filename}`);
   }
 
   async getServerFilesDirectoryInfo(login: LoginDto, path: string, extended: boolean) {
-    return this.httpClient.get<ResultDto<ServerFileDirectoryInfoDto>>(
-      `${login.printerURL}/server/files/directory?path=${path}&extended=${extended}`
+    return this.createClient(login).get<ResultDto<ServerFileDirectoryInfoDto>>(
+      `server/files/directory?path=${path}&extended=${extended}`
     );
   }
 
   async postServerFilesDirectory(login: LoginDto, path: string) {
-    return this.httpClient.post<ResultDto<ServerFileDirectoryActionDto>>(`${login.printerURL}/server/files/directory`, { path });
+    return this.createClient(login).post<ResultDto<ServerFileDirectoryActionDto>>(`server/files/directory`, {
+      path,
+    });
   }
 
   async deleteServerFilesDirectory(login: LoginDto, path: string, force: boolean) {
-    return this.httpClient.delete<ResultDto<ServerFileDirectoryActionDto>>(
-      `${login.printerURL}/server/files/directory?path=${path}&force=${!!force}`
+    return this.createClient(login).delete<ResultDto<ServerFileDirectoryActionDto>>(
+      `server/files/directory?path=${path}&force=${!!force}`
     );
   }
 
   async postServerFilesMove(login: LoginDto, source: string, dest: string) {
-    return this.httpClient.post<ResultDto<ServerFileDirectoryMovedDto>>(`${login.printerURL}/server/files/directory`, {
+    return this.createClient(login).post<ResultDto<ServerFileDirectoryMovedDto>>(`server/files/directory`, {
       source,
       dest,
     });
   }
 
   async postServerFilesCopy(login: LoginDto, source: string, dest: string) {
-    return this.httpClient.post<ResultDto<ServerFileDirectoryActionDto>>(`${login.printerURL}/server/files/copy`, {
+    return this.createClient(login).post<ResultDto<ServerFileDirectoryActionDto>>(`server/files/copy`, {
       source,
       dest,
     });
   }
 
   async postServerFilesZip(login: LoginDto, items: string[], dest: string, store_only: boolean) {
-    return this.httpClient.post<ResultDto<ServerFileZipActionDto>>(`${login.printerURL}/server/files/zip`, {
+    return this.createClient(login).post<ResultDto<ServerFileZipActionDto>>(`server/files/zip`, {
       items,
       store_only,
       dest,
@@ -329,13 +325,13 @@ export class MoonrakerClient {
   }
 
   async getServerFilesDownload(login: LoginDto, root: string, filename: string) {
-    return await this.httpClient.get<NodeJS.ReadableStream>(`${login.printerURL}/server/files/${root}/${filename}`, {
+    return await this.createClient(login).get<NodeJS.ReadableStream>(`server/files/${root}/${filename}`, {
       responseType: "stream",
     });
   }
 
   async getServerFilesDownloadChunk(login: LoginDto, root: string, filename: string, startBytes: number, endBytes: number) {
-    return await this.httpClient.get<string>(`${login.printerURL}/server/files/${root}/${filename}`, {
+    return await this.createClient(login).get<string>(`server/files/${root}/${filename}`, {
       headers: {
         Range: `bytes=${startBytes}-${endBytes}`,
       },
@@ -383,7 +379,7 @@ export class MoonrakerClient {
 
     return await axios.request({
       method: "POST",
-      url: `${login.printerURL}/server/files/upload`,
+      url: `server/files/upload`,
       data: formData,
       headers,
       onUploadProgress: (p) => {
@@ -395,20 +391,20 @@ export class MoonrakerClient {
   }
 
   async deleteServerFile(login: LoginDto, root: string, path: string) {
-    const url = `${login.printerURL}/server/files/${root}/${path}`;
-    return this.httpClient.delete<ResultDto<ServerFileDirectoryActionDto>>(url);
+    const url = `server/files/${root}/${path}`;
+    return this.createClient(login).delete<ResultDto<ServerFileDirectoryActionDto>>(url);
   }
 
   async getServerFileKlippyLogDownload(login: LoginDto) {
-    return this.httpClient.get<string>(`${login.printerURL}/server/files/klippy.log`);
+    return this.createClient(login).get<string>(`server/files/klippy.log`);
   }
 
   async getServerFileMoonrakerLogDownload(login: LoginDto) {
-    return this.httpClient.get<string>(`${login.printerURL}/server/files/moonraker.log`);
+    return this.createClient(login).get<string>(`server/files/moonraker.log`);
   }
 
   async postAccessLoginUser(login: LoginDto, username: string, password: string, source: "ldap" | "moonraker" = "moonraker") {
-    return this.httpClient.post<ResultDto<AccessLoginResultDto>>("/access/login", {
+    return this.createClient(login).post<ResultDto<AccessLoginResultDto>>("/access/login", {
       username,
       password,
       source,
@@ -417,23 +413,23 @@ export class MoonrakerClient {
 
   async postAccessLogoutUser(login: LoginDto) {
     // requires a bearer mechanism
-    return this.httpClient.post<ResultDto<AccessUserResultDto>>(`${login.printerURL}/access/logout`);
+    return this.createClient(login).post<ResultDto<AccessUserResultDto>>(`access/logout`);
   }
 
   async getAccessUser(login: LoginDto) {
     // requires a bearer mechanism
-    return this.httpClient.get<ResultDto<AccessUserDto>>(`${login.printerURL}/access/user`);
+    return this.createClient(login).get<ResultDto<AccessUserDto>>(`access/user`);
   }
 
   async postAccessCreateUser(login: LoginDto, username: string, password: string) {
-    return this.httpClient.post<ResultDto<AccessLoginResultDto>>(`${login.printerURL}/access/login`, {
+    return this.createClient(login).post<ResultDto<AccessLoginResultDto>>(`access/login`, {
       username,
       password,
     });
   }
 
   async deleteAccessUser(login: LoginDto, username: string) {
-    return this.httpClient.delete<ResultDto<AccessUserResultDto>>(`${login.printerURL}/access/user`, {
+    return this.createClient(login).delete<ResultDto<AccessUserResultDto>>(`access/user`, {
       data: {
         username,
       },
@@ -442,39 +438,37 @@ export class MoonrakerClient {
 
   async listAccessUsers(login: LoginDto) {
     // requires a bearer mechanism
-    return this.httpClient.get<ResultDto<AccessUserDto[]>>(`${login.printerURL}/access/user/list`);
+    return this.createClient(login).get<ResultDto<AccessUserDto[]>>(`access/user/list`);
   }
 
   async postAccessResetPassword(login: LoginDto, refresh_token: string) {
-    return this.httpClient.post<ResultDto<AccessLoginRefreshDto>>(`${login.printerURL}/access/refresh_jwt`, {
+    return this.createClient(login).post<ResultDto<AccessLoginRefreshDto>>(`access/refresh_jwt`, {
       refresh_token,
     });
   }
 
   async getAccessOneshotToken(login: LoginDto) {
-    return this.httpClient.get<ResultDto<string>>(`${login.printerURL}/access/oneshot_token`);
+    return this.createClient(login).get<ResultDto<string>>(`access/oneshot_token`);
   }
 
   async getAccessInfo(login: LoginDto) {
-    return this.httpClient.get<ResultDto<AccessInfoDto>>(`${login.printerURL}/access/info`);
+    return this.createClient(login).get<ResultDto<AccessInfoDto>>(`access/info`);
   }
 
   async getAccessApiKey(login: LoginDto) {
-    return this.httpClient.get<ResultDto<string>>(`${login.printerURL}/access/api_key`);
+    return this.createClient(login).get<ResultDto<string>>(`access/api_key`);
   }
 
   async postAccessApiKeyCreate(login: LoginDto) {
-    return this.httpClient.post<ResultDto<string>>(`${login.printerURL}/access/api_key`);
+    return this.createClient(login).post<ResultDto<string>>(`access/api_key`);
   }
 
   async getDatabaseNamespaceList(login: LoginDto) {
-    return this.httpClient.get<ResultDto<DatabaseNamespaceListDto>>(`${login.printerURL}/database/list`);
+    return this.createClient(login).get<ResultDto<DatabaseNamespaceListDto>>(`database/list`);
   }
 
   async getDatabaseNamespaceItem(login: LoginDto, namespace: Namespaces, key: string) {
-    return this.httpClient.get<ResultDto<DatabaseNamespaceItemDto>>(
-      `${login.printerURL}/database/item?namespace=${namespace}&key=${key}`
-    );
+    return this.createClient(login).get<ResultDto<DatabaseNamespaceItemDto>>(`database/item?namespace=${namespace}&key=${key}`);
   }
 
   async postDatabaseNamespaceItem(
@@ -485,58 +479,59 @@ export class MoonrakerClient {
     typeHint?: "int" | "str" | "bool" | "json"
   ) {
     const typeHintParam = typeHint?.length ? `:${typeHint}` : "";
-    return this.httpClient.post<ResultDto<DatabaseNamespaceItemDto>>(
-      `${login.printerURL}/database/item?namespace=${namespace}&key=${key}&value${typeHintParam}=${value}`
+    return this.createClient(login).post<ResultDto<DatabaseNamespaceItemDto>>(
+      `database/item?namespace=${namespace}&key=${key}&value${typeHintParam}=${value}`
     );
   }
 
   async deleteDatabaseNamespaceItem(login: LoginDto, namespace: Namespaces, key: string) {
-    return this.httpClient.delete<ResultDto<DatabaseNamespaceItemDto>>(
-      `${login.printerURL}/database/item?namespace=${namespace}&key=${key}`
+    return this.createClient(login).delete<ResultDto<DatabaseNamespaceItemDto>>(
+      `database/item?namespace=${namespace}&key=${key}`
     );
   }
 
   async getJobQueueStatus(login: LoginDto) {
-    return this.httpClient.get<ResultDto<JobQueueStatusDto>>(`${login.printerURL}/job_queue/status`);
+    return this.createClient(login).get<ResultDto<JobQueueStatusDto>>(`job_queue/status`);
   }
 
   async postJobQueueJob(login: LoginDto, filenames: string[], reset: boolean) {
     // Alternatively param based with comma separated filenames: "POST /server/job_queue/job?filenames=job1.gcode,job2.gcode,subdir/job3.gcode"
-    return this.httpClient.post<ResultDto<JobQueueStatusDto>, AxiosResponse<ResultDto<JobQueueStatusDto>>, EnqueueJobDto>(
-      `${login.printerURL}/job_queue/job`,
-      {
-        filenames,
-        reset,
-      }
-    );
+    return this.createClient(login).post<
+      ResultDto<JobQueueStatusDto>,
+      AxiosResponse<ResultDto<JobQueueStatusDto>>,
+      EnqueueJobDto
+    >(`job_queue/job`, {
+      filenames,
+      reset,
+    });
   }
 
   async deleteJobQueueJob(login: LoginDto, jobIds: string[], all?: boolean) {
-    const base = `${login.printerURL}/job_queue/job`;
+    const base = `job_queue/job`;
     const url = !!all ? `${base}?all=true` : `${base}?job_ids=${jobIds.join(",")}`;
-    return this.httpClient.delete<ResultDto<DatabaseNamespaceItemDto>>(url);
+    return this.createClient(login).delete<ResultDto<DatabaseNamespaceItemDto>>(url);
   }
 
   async postJobQueuePause(login: LoginDto) {
-    return this.httpClient.post<ResultDto<JobQueueStatusDto>>(`${login.printerURL}/job_queue/pause`);
+    return this.createClient(login).post<ResultDto<JobQueueStatusDto>>(`job_queue/pause`);
   }
 
   async postJobQueueStart(login: LoginDto) {
-    return this.httpClient.post<ResultDto<JobQueueStatusDto>>(`${login.printerURL}/job_queue/start`);
+    return this.createClient(login).post<ResultDto<JobQueueStatusDto>>(`job_queue/start`);
   }
 
   async postJobQueueJump(login: LoginDto, jobId: string) {
-    return this.httpClient.post<ResultDto<JobQueueStatusDto>>(`${login.printerURL}/job_queue/jump?job_id=${jobId}`);
+    return this.createClient(login).post<ResultDto<JobQueueStatusDto>>(`job_queue/jump?job_id=${jobId}`);
   }
 
   async getAnnouncementsList(login: LoginDto, includeDismissed: boolean) {
-    return this.httpClient.get<ResultDto<AnnouncementListDto>>(
-      `${login.printerURL}/server/announcements/list?include_dismissed=${includeDismissed}`
+    return this.createClient(login).get<ResultDto<AnnouncementListDto>>(
+      `server/announcements/list?include_dismissed=${includeDismissed}`
     );
   }
 
   async postAnnouncementsUpdate(login: LoginDto) {
-    return this.httpClient.post<ResultDto<AnnouncementListDto>>(`${login.printerURL}/server/announcements/update`);
+    return this.createClient(login).post<ResultDto<AnnouncementListDto>>(`server/announcements/update`);
   }
 
   /**
@@ -546,64 +541,62 @@ export class MoonrakerClient {
    * @param wakeTime The time, in seconds, in which the entry's dismissed state will revert to false. This parameter is optional, if omitted the entry will be dismissed indefinitely.
    */
   async postAnnouncementsDismiss(login: LoginDto, entryId: string, wakeTime: number) {
-    return this.httpClient.post<ResultDto<AnnouncementEntryIdDto>>(
-      `${login.printerURL}/server/announcements/dismiss?entry_id=${encodeURIComponent(entryId)}&wake_time=${wakeTime}`
+    return this.createClient(login).post<ResultDto<AnnouncementEntryIdDto>>(
+      `server/announcements/dismiss?entry_id=${encodeURIComponent(entryId)}&wake_time=${wakeTime}`
     );
   }
 
   async getAnnouncementsFeeds(login: LoginDto) {
-    return this.httpClient.get<ResultDto<AnnouncementFeedsDto>>(`${login.printerURL}/server/announcements/feeds`);
+    return this.createClient(login).get<ResultDto<AnnouncementFeedsDto>>(`server/announcements/feeds`);
   }
 
   async postAnnouncementsFeedAdd(login: LoginDto, name: string) {
-    return this.httpClient.get<ResultDto<AnnouncementActionDto>>(`${login.printerURL}/server/announcements/feeds?name=${name}`);
+    return this.createClient(login).get<ResultDto<AnnouncementActionDto>>(`server/announcements/feeds?name=${name}`);
   }
 
   async deleteAnnouncementsFeedRemove(login: LoginDto, name: string) {
-    return this.httpClient.delete<ResultDto<AnnouncementActionDto>>(
-      `${login.printerURL}/server/announcements/feeds?name=${name}`
-    );
+    return this.createClient(login).delete<ResultDto<AnnouncementActionDto>>(`server/announcements/feeds?name=${name}`);
   }
 
   async getWebcamList(login: LoginDto) {
-    return this.httpClient.get<ResultDto<WebcamListDto>>(`${login.printerURL}/server/webcams/list`);
+    return this.createClient(login).get<ResultDto<WebcamListDto>>(`server/webcams/list`);
   }
 
   async getWebcamItem(login: LoginDto, uid?: string, name?: string) {
-    const base = `${login.printerURL}/server/webcams/get_item`;
+    const base = `server/webcams/get_item`;
     const url = !!uid?.length ? `${base}?uid=${uid}` : `${base}?name=${name}`;
-    return this.httpClient.get<ResultDto<WebcamItemDto>>(url);
+    return this.createClient(login).get<ResultDto<WebcamItemDto>>(url);
   }
 
   async postWebcamItemUpdate(login: LoginDto, webcam: Omit<WebcamDto, "source">) {
-    return this.httpClient.post<ResultDto<WebcamItemDto>>(`${login.printerURL}/server/webcams/post_item`, webcam);
+    return this.createClient(login).post<ResultDto<WebcamItemDto>>(`server/webcams/post_item`, webcam);
   }
 
   async deleteWebcamItem(login: LoginDto, uid?: string, name?: string) {
-    const base = `${login.printerURL}/server/webcams/delete_item`;
+    const base = `server/webcams/delete_item`;
     const url = !!uid?.length ? `${base}?uid=${uid}` : `${base}?name=${name}`;
-    return this.httpClient.get<ResultDto<WebcamItemDto>>(url);
+    return this.createClient(login).get<ResultDto<WebcamItemDto>>(url);
   }
 
   async postWebcamTest(login: LoginDto, uid?: string, name?: string) {
-    const base = `${login.printerURL}/server/webcams/test`;
+    const base = `server/webcams/test`;
     const url = !!uid?.length ? `${base}?uid=${uid}` : `${base}?name=${name}`;
-    return this.httpClient.get<ResultDto<WebcamTestDto>>(url);
+    return this.createClient(login).get<ResultDto<WebcamTestDto>>(url);
   }
 
   async getNotifierList(login: LoginDto) {
-    return this.httpClient.get<ResultDto<NotifierListDto>>(`${login.printerURL}/server/notifiers/list`);
+    return this.createClient(login).get<ResultDto<NotifierListDto>>(`server/notifiers/list`);
   }
 
   async postMachineUpdateStatus(login: LoginDto) {
     // Refresh parameter is deprecated over refresh endpoint
-    return this.httpClient.post<ResultDto<MachineUpdateStatusDto>>(`${login.printerURL}/machine/update/status`);
+    return this.createClient(login).post<ResultDto<MachineUpdateStatusDto>>(`machine/update/status`);
   }
 
   async postMachineUpdateRefresh(login: LoginDto, name?: string | "moonraker" | "klipper") {
-    const base = `${login.printerURL}/machine/update/refresh`;
+    const base = `machine/update/refresh`;
     const url = !!name ? `${base}` : `${base}?name=${name}`;
-    return this.httpClient.post<ResultDto<MachineUpdateStatusDto>>(url);
+    return this.createClient(login).post<ResultDto<MachineUpdateStatusDto>>(url);
   }
 
   async postMachineUpdateFull(login: LoginDto) {
@@ -612,88 +605,84 @@ export class MoonrakerClient {
     // All configured clients
     // Klipper
     // Moonraker
-    return this.httpClient.post<ResultDto<ActionResultDto>>(`${login.printerURL}/machine/update/full`);
+    return this.createClient(login).post<ResultDto<ActionResultDto>>(`machine/update/full`);
   }
 
   async postMachineUpdateMoonraker(login: LoginDto) {
-    return this.httpClient.post<ResultDto<ActionResultDto>>(`${login.printerURL}/machine/update/moonraker`);
+    return this.createClient(login).post<ResultDto<ActionResultDto>>(`machine/update/moonraker`);
   }
 
   async postMachineUpdateKlipper(login: LoginDto) {
-    return this.httpClient.post<ResultDto<ActionResultDto>>(`${login.printerURL}/machine/update/klipper`);
+    return this.createClient(login).post<ResultDto<ActionResultDto>>(`machine/update/klipper`);
   }
 
   async postMachineUpdateClient(login: LoginDto, name: string) {
     // [update_manager client client_name] sections (in config)
-    return this.httpClient.post<ResultDto<ActionResultDto>>(`${login.printerURL}/machine/update/client?name=${name}`);
+    return this.createClient(login).post<ResultDto<ActionResultDto>>(`machine/update/client?name=${name}`);
   }
 
   async postMachineUpdateSystem(login: LoginDto) {
-    return this.httpClient.post<ResultDto<ActionResultDto>>(`${login.printerURL}/machine/update/system`);
+    return this.createClient(login).post<ResultDto<ActionResultDto>>(`machine/update/system`);
   }
 
   async postMachineUpdateRecover(login: LoginDto, name?: string | "moonraker" | "klipper", hard: boolean = false) {
-    return this.httpClient.post<ResultDto<ActionResultDto>>(
-      `${login.printerURL}/machine/update/recover?name=${name}&hard=${hard}`
-    );
+    return this.createClient(login).post<ResultDto<ActionResultDto>>(`machine/update/recover?name=${name}&hard=${hard}`);
   }
 
   async postMachineUpdateRollback(login: LoginDto, name?: string | "moonraker" | "klipper") {
-    return this.httpClient.post<ResultDto<ActionResultDto>>(`${login.printerURL}/machine/update/rollback?name=${name}`);
+    return this.createClient(login).post<ResultDto<ActionResultDto>>(`machine/update/rollback?name=${name}`);
   }
 
   async getMachineDevicePowerDevices(login: LoginDto) {
-    return this.httpClient.get<ResultDto<MachineDevicePowerDevicesDto>>(`${login.printerURL}/machine/device_power/devices`);
+    return this.createClient(login).get<ResultDto<MachineDevicePowerDevicesDto>>(`machine/device_power/devices`);
   }
 
   async getMachineDevicePowerDeviceState(login: LoginDto, device: string) {
-    return this.httpClient.get<ResultDto<MachineDevicePowerDeviceStateDto>>(
-      `${login.printerURL}/machine/device_power/device?device=${device}`
+    return this.createClient(login).get<ResultDto<MachineDevicePowerDeviceStateDto>>(
+      `machine/device_power/device?device=${device}`
     );
   }
 
   async postMachineDevicePowerDeviceState(login: LoginDto, device: string, action: "on" | "off" | "toggle") {
-    return this.httpClient.post<ResultDto<MachineDevicePowerDeviceStateDto>>(
-      `${login.printerURL}/machine/device_power/device?device=${device}&action=${action}`
+    return this.createClient(login).post<ResultDto<MachineDevicePowerDeviceStateDto>>(
+      `machine/device_power/device?device=${device}&action=${action}`
     );
   }
 
   async getMachineDevicePowerBatchDeviceState(login: LoginDto, devices: string[]) {
-    return this.httpClient.get<ResultDto<MachineDevicePowerDeviceStateDto>>(
-      `${login.printerURL}/machine/device_power/status?${devices.join("&")}`
+    return this.createClient(login).get<ResultDto<MachineDevicePowerDeviceStateDto>>(
+      `machine/device_power/status?${devices.join("&")}`
     );
   }
 
   async postMachineDevicePowerBatchPowerOn(login: LoginDto, device: string) {
-    return this.httpClient.post<ResultDto<MachineDevicePowerDeviceStateDto>>(
-      `${login.printerURL}/machine/device_power/on?device=${device}`
-    );
+    return this.createClient(login).post<ResultDto<MachineDevicePowerDeviceStateDto>>(`machine/device_power/on?device=${device}`);
   }
 
   async postMachineDevicePowerBatchPowerOff(login: LoginDto, device: string) {
-    return this.httpClient.post<ResultDto<MachineDevicePowerDeviceStateDto>>(
-      `${login.printerURL}/machine/device_power/off?device=${device}`
+    return this.createClient(login).post<ResultDto<MachineDevicePowerDeviceStateDto>>(
+      `machine/device_power/off?device=${device}`
     );
   }
 
   async getMachineWledStrips(login: LoginDto) {
-    return this.httpClient.get<ResultDto<MachineWledStripsDto>>(`${login.printerURL}/machine/wled/strips`);
+    return this.createClient(login).get<ResultDto<MachineWledStripsDto>>(`machine/wled/strips`);
   }
 
   async getMachineWledStatuses(login: LoginDto, strips: string[]) {
-    return this.httpClient.get<ResultDto<MachineWledStripsDto>>(`${login.printerURL}/machine/wled/status?${strips.join("&")}`);
+    return this.createClient(login).get<ResultDto<MachineWledStripsDto>>(`machine/wled/status?${strips.join("&")}`);
   }
 
   async postMachineWledPowerOn(login: LoginDto, strips: string[]) {
-    return this.httpClient.post<ResultDto<MachineWledStripsDto>>(`${login.printerURL}/machine/wled/on?${strips.join("&")}`);
+    return this.createClient(login).post<ResultDto<MachineWledStripsDto>>(`machine/wled/on?${strips.join("&")}`);
   }
 
   async postMachineWledPowerOff(login: LoginDto, strips: string[]) {
-    return this.httpClient.post<ResultDto<MachineWledStripsDto>>(`${login.printerURL}/machine/wled/off?${strips.join("&")}`);
+    return this.createClient(login).post<ResultDto<MachineWledStripsDto>>(`machine/wled/off?${strips.join("&")}`);
   }
 
   async postMachineWledPowerStripAction(login: LoginDto, strips: string[]) {
-    return this.httpClient.post<ResultDto<MachineWledStripsDto>>(`${login.printerURL}/machine/wled/toggle?${strips.join("&")}`);
+    return this.createClient(login).post<ResultDto<MachineWledStripsDto>>(`machine/wled/toggle?${strips.join("&")}`);
   }
 
   async getMachineWledStripAction(
@@ -705,49 +694,48 @@ export class MoonrakerClient {
     const queryParams = Object.entries(controlParams)
       .map(([k, v]) => `${k}=${v}`)
       .join("&");
-    return this.httpClient.get<ResultDto<MachineWledStripsDto>>(
-      `${login.printerURL}/machine/wled/strip?strip=${strip}&action=${action}&${queryParams}`
+    return this.createClient(login).get<ResultDto<MachineWledStripsDto>>(
+      `machine/wled/strip?strip=${strip}&action=${action}&${queryParams}`
     );
   }
 
   async getServerSensorsList(login: LoginDto) {
-    return this.httpClient.get<ResultDto<SensorListDto>>(`${login.printerURL}/server/sensors/list`);
+    return this.createClient(login).get<ResultDto<SensorListDto>>(`server/sensors/list`);
   }
 
   async getServerSensorItem(login: LoginDto, sensor: string) {
-    return this.httpClient.get<ResultDto<SensorDto>>(`${login.printerURL}/server/sensors/info?sensor=${sensor}`);
+    return this.createClient(login).get<ResultDto<SensorDto>>(`server/sensors/info?sensor=${sensor}`);
   }
 
   async getServerSensorMeasurements(login: LoginDto, sensor: string) {
-    return this.httpClient.get<ResultDto<SensorsMeasurementsDto>>(
-      `${login.printerURL}/server/sensors/measurements?sensor=${sensor}`
-    );
+    return this.createClient(login).get<ResultDto<SensorsMeasurementsDto>>(`server/sensors/measurements?sensor=${sensor}`);
   }
 
   async getServerSensorMeasurementsBatch(login: LoginDto) {
-    return this.httpClient.get<ResultDto<SensorsMeasurementsDto>>(`${login.printerURL}/server/sensors/measurements`);
+    return this.createClient(login).get<ResultDto<SensorsMeasurementsDto>>(`server/sensors/measurements`);
   }
 
   async getServerSpoolmanStatus(login: LoginDto) {
-    return this.httpClient.get<ResultDto<SpoolmanStatusDto>>(`${login.printerURL}/server/spoolman/status`);
+    return this.createClient(login).get<ResultDto<SpoolmanStatusDto>>(`server/spoolman/status`);
   }
 
   async postServerSpoolmanActiveSpool(login: LoginDto, spoolId: number) {
-    return this.httpClient.post<ResultDto<SpoolmanActiveSpoolDto>>(`${login.printerURL}/server/spoolman/spool_id`, {
+    return this.createClient(login).post<ResultDto<SpoolmanActiveSpoolDto>>(`server/spoolman/spool_id`, {
       spool_id: spoolId,
     });
   }
 
   async getServerSpoolmanActiveSpool(login: LoginDto) {
-    return this.httpClient.get<ResultDto<SpoolmanActiveSpoolDto>>(`${login.printerURL}/server/spoolman/spool_id`);
+    return this.createClient(login).get<ResultDto<SpoolmanActiveSpoolDto>>(`server/spoolman/spool_id`);
   }
 
   async postServerSpoolmanProxyRequest<I, O>(login: LoginDto, body?: SpoolmanProxyRequestDto<I>) {
     // Spoolman v1 will not wrap responses! Errors are proxied directly.
-    return this.httpClient.post<SpoolmanResponseDto<O>, AxiosResponse<SpoolmanResponseDto<O>>, SpoolmanProxyRequestDto<I>>(
-      `${login.printerURL}/server/spoolman/proxy`,
-      body
-    );
+    return this.createClient(login).post<
+      SpoolmanResponseDto<O>,
+      AxiosResponse<SpoolmanResponseDto<O>>,
+      SpoolmanProxyRequestDto<I>
+    >(`server/spoolman/proxy`, body);
   }
 
   /**
@@ -755,7 +743,7 @@ export class MoonrakerClient {
    * @param login
    */
   async getApiVersion(login: LoginDto) {
-    return this.httpClient.get<ApiVersionDto>(`${login.printerURL}/api/version`);
+    return this.createClient(login).get<ApiVersionDto>(`api/version`);
   }
 
   /**
@@ -763,7 +751,7 @@ export class MoonrakerClient {
    * @param login
    */
   async getServerVersion(login: LoginDto) {
-    return this.httpClient.get<ServerVersionDto>(`${login.printerURL}/api/server`);
+    return this.createClient(login).get<ServerVersionDto>(`api/server`);
   }
 
   /**
@@ -771,7 +759,7 @@ export class MoonrakerClient {
    * @param login
    */
   async getApiLogin(login: LoginDto) {
-    return this.httpClient.get<ApiLoginDto>(`${login.printerURL}/api/login`);
+    return this.createClient(login).get<ApiLoginDto>(`api/login`);
   }
 
   /**
@@ -779,7 +767,7 @@ export class MoonrakerClient {
    * @param login
    */
   async getApiSettings(login: LoginDto) {
-    return this.httpClient.get<ApiSettingsDto>(`${login.printerURL}/api/settings`);
+    return this.createClient(login).get<ApiSettingsDto>(`api/settings`);
   }
 
   /**
@@ -797,7 +785,7 @@ export class MoonrakerClient {
    * @param login
    */
   async getApiJob(login: LoginDto) {
-    return this.httpClient.get<ApiJobDto>(`${login.printerURL}/api/job`);
+    return this.createClient(login).get<ApiJobDto>(`api/job`);
   }
 
   /**
@@ -805,7 +793,7 @@ export class MoonrakerClient {
    * @param login
    */
   async getApiPrinter(login: LoginDto) {
-    return this.httpClient.get<ApiPrinterDto>(`${login.printerURL}/api/printer`);
+    return this.createClient(login).get<ApiPrinterDto>(`api/printer`);
   }
 
   /**
@@ -814,7 +802,7 @@ export class MoonrakerClient {
    * @param commands
    */
   async postApiPrinterCommand(login: LoginDto, commands: string[]) {
-    return this.httpClient.post<{}>(`${login.printerURL}/api/command`, {
+    return this.createClient(login).post<{}>(`api/command`, {
       commands,
     });
   }
@@ -824,7 +812,7 @@ export class MoonrakerClient {
    * @param login
    */
   async getApiProfiles(login: LoginDto) {
-    return this.httpClient.get<ApiProfilesDto>(`${login.printerURL}/api/printerprofiles`);
+    return this.createClient(login).get<ApiProfilesDto>(`api/printerprofiles`);
   }
 
   async getServerHistoryList(
@@ -842,24 +830,44 @@ export class MoonrakerClient {
     if (!!since || since === 0) {
       params += "&since=" + since;
     }
-    return this.httpClient.get<ResultDto<HistoryListDto>>(`${login.printerURL}/server/history/list?${params}`);
+    return this.createClient(login).get<ResultDto<HistoryListDto>>(`server/history/list?${params}`);
   }
 
   async getServerHistoryTotals(login: LoginDto) {
-    return this.httpClient.get<ResultDto<HistoryTotalsDto>>(`${login.printerURL}/server/history/totals`);
+    return this.createClient(login).get<ResultDto<HistoryTotalsDto>>(`server/history/totals`);
   }
 
   async postServerHistoryResetTotals(login: LoginDto) {
-    return this.httpClient.post<ResultDto<HistoryLastTotalsDto>>(`${login.printerURL}/server/history/reset_totals`);
+    return this.createClient(login).post<ResultDto<HistoryLastTotalsDto>>(`server/history/reset_totals`);
   }
 
   async getServerHistoryJob(login: LoginDto, uid: string) {
-    return this.httpClient.get<ResultDto<HistoryJobDto>>(`${login.printerURL}/server/history/job?uid=${uid}`);
+    return this.createClient(login).get<ResultDto<HistoryJobDto>>(`server/history/job?uid=${uid}`);
   }
 
   async deleteServerHistoryJob(login: LoginDto, uid?: string) {
-    const base = `${login.printerURL}/server/history/job`;
+    const base = `server/history/job`;
     const url = !!uid?.length ? `${base}?uid=${uid}` : `${base}?all=true`;
-    return this.httpClient.get<ResultDto<string[]>>(url);
+    return this.createClient(login).get<ResultDto<string[]>>(url);
+  }
+
+  private createClient(login: LoginDto, buildFluentOptions?: (base: DefaultHttpClientBuilder) => void) {
+    const baseAddress = login.printerURL;
+
+    return this.createAnonymousClient(baseAddress, (o) => {
+      if (buildFluentOptions) {
+        buildFluentOptions(o);
+      }
+    });
+  }
+
+  private createAnonymousClient(baseAddress: string, buildFluentOptions?: (base: DefaultHttpClientBuilder) => void) {
+    const builder = new DefaultHttpClientBuilder();
+
+    return this.httpClientFactory.createClientWithBaseUrl(builder, baseAddress, (b) => {
+      if (buildFluentOptions) {
+        buildFluentOptions(b);
+      }
+    });
   }
 }

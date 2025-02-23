@@ -23,6 +23,7 @@ import { CurrentMessageDto } from "@/services/octoprint/dto/websocket/current-me
 import { OctoprintErrorDto } from "@/services/octoprint/dto/rest/error.dto";
 import { OctoprintType } from "@/services/printer-api.interface";
 import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
+import { CurrentJobDto } from "@/services/octoprint/dto/job/current-job.dto";
 
 export const WsMessage = {
   // Custom events
@@ -214,7 +215,7 @@ export class OctoprintWebsocketAdapter extends WebsocketAdapter implements IWebs
 
     await this.updateCurrentStateSafely();
 
-    this.logger.log(`Setting up printer current interval loop with ${this.refreshPrinterCurrentInterval} seconds interval`);
+    this.logger.log(`Setting up printer current interval loop with 10 seconds interval`);
     if (this.refreshPrinterCurrentInterval) {
       clearInterval(this.refreshPrinterCurrentInterval);
     }
@@ -232,7 +233,13 @@ export class OctoprintWebsocketAdapter extends WebsocketAdapter implements IWebs
     try {
       const current = await this.octoprintClient.getPrinterCurrent(this.login, true);
       const isOperational = current.data?.state?.flags?.operational;
-      const job = isOperational ? await this.octoprintClient.getJob(this.login) : {};
+
+      let job = {} as CurrentJobDto;
+      if (isOperational) {
+        const jobResponse = await this.octoprintClient.getJob(this.login);
+        job = jobResponse.data;
+      }
+
       this.setApiState(API_STATE.responding);
       return await this.emitEvent("current", { ...current.data, progress: job?.progress, job: job?.job });
     } catch (e) {

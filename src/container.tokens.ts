@@ -8,7 +8,7 @@ export const DITokens = {
   // Instances
   serverHost: "serverHost",
   loggerFactory: "loggerFactory",
-  httpClient: "httpClient",
+  httpClientFactory: "httpClientFactory",
   socketIoGateway: "socketIoGateway",
   multerService: "multerService",
   configService: "configService",
