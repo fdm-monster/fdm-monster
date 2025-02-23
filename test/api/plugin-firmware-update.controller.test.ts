@@ -77,7 +77,6 @@ describe(PluginFirmwareUpdateController.name, () => {
   it("should get idle firmware updater status", async () => {
     const testPrinter = await createTestPrinter(request);
 
-    // Replacing httpClient.saveMockResponse with nock
     nock(testPrinter.printerURL).get("/plugin/firmwareupdater/status").reply(200, { flashing: false });
 
     const response = await request.get(pluginStatusRoute(testPrinter.id)).send();

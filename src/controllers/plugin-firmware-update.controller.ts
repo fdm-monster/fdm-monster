@@ -96,7 +96,7 @@ export class PluginFirmwareUpdateController {
   async getFirmwareUpdaterStatus(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
     const status = await this.pluginFirmwareUpdateService.getPluginFirmwareStatus(printerLogin);
-    res.send(status);
+    res.send(status.data);
   }
 
   @POST()
@@ -104,7 +104,7 @@ export class PluginFirmwareUpdateController {
   async configurePluginSettings(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
     const response = await this.pluginFirmwareUpdateService.configureFirmwareUpdaterSettings(printerLogin);
-    res.send(response);
+    res.send(response.data);
   }
 
   @POST()

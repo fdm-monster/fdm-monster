@@ -218,7 +218,7 @@ export class OctoprintClient extends OctoprintRoutes {
 
   async postSelectPrintFile(login: LoginDto, path: string, print: boolean) {
     const command = this.selectCommand(print);
-    return await this.createClient(login).post(this.apiFile(path), command);
+    await this.createClient(login).post(this.apiFile(path), command);
   }
 
   async uploadFileAsMultiPart(login: LoginDto, multerFileOrBuffer: Buffer | Express.Multer.File, commands: any, token: string) {
