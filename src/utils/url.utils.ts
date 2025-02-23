@@ -12,7 +12,7 @@ export function normalizeURLWithProtocol(printerURL: string) {
   if (!printerURL) return;
 
   if (!printerURL.startsWith("http://") && !printerURL.startsWith("https://")) {
-    printerURL = `httpS://${printerURL}`;
+    printerURL = `https://${printerURL}`;
   }
 
   return normalizeUrl(printerURL);
