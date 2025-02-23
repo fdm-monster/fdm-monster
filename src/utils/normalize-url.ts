@@ -24,7 +24,7 @@ const normalizeDataURL = (urlString: string, { stripHash }: { stripHash: boolean
     throw new Error(`Invalid URL: ${urlString}`);
   }
 
-  let { type, data, hash } = match.groups as any;
+  let { type, data, hash } = match.groups;
   const mediaType = type.split(";");
   hash = stripHash ? "" : hash;
 

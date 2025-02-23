@@ -211,7 +211,7 @@ export class OctoprintWebsocketAdapter extends WebsocketAdapter implements IWebs
 
     await this.updateCurrentStateSafely();
 
-    this.logger.log("Setting up printer current interval loop");
+    this.logger.log(`Setting up printer current interval loop with ${this.refreshPrinterCurrentInterval} seconds interval`);
     if (this.refreshPrinterCurrentInterval) {
       clearInterval(this.refreshPrinterCurrentInterval);
     }

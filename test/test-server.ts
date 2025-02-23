@@ -73,7 +73,6 @@ export async function setupTestApp(
     httpServer,
     request: supertest(httpServer),
     container,
-    httpClient: container.resolve<AxiosInstance>(DITokens.httpClient),
     [DITokens.taskManagerService]: container.resolve<TaskManagerService>(DITokens.taskManagerService),
     [DITokens.typeormService]: container.resolve<TypeormService>(DITokens.typeormService),
   };
