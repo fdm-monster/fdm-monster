@@ -51,10 +51,6 @@ export class DefaultHttpClientBuilder implements IHttpClientBuilder {
       throw new Error("Base address may not be an empty string");
     }
 
-    if (!baseUrl?.includes("://")) {
-      throw new Error("Base address must include a protocol like https:// or ws://");
-    }
-
     this.axiosOptions.baseURL = baseUrl;
     return this;
   }
