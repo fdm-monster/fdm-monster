@@ -2,14 +2,15 @@ import { isTestEnvironment } from "@/utils/env.utils";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { LoggerService } from "@/handlers/logger";
+import { OP_PluginDto } from "@/services/octoprint/dto/plugin.dto";
 
 export class PluginRepositoryCache {
   octoprintClient: OctoprintClient;
   logger: LoggerService;
 
   wasCached = false;
-  pluginCache = [];
-  lastQueried = undefined;
+  pluginCache: OP_PluginDto[] = [];
+  lastQueried?: number = undefined;
 
   constructor({ octoprintClient, loggerFactory }: { octoprintClient: OctoprintClient; loggerFactory: ILoggerFactory }) {
     this.octoprintClient = octoprintClient;
@@ -32,7 +33,8 @@ export class PluginRepositoryCache {
   }
 
   async queryCache() {
-    this.pluginCache = (await this.octoprintClient.fetchOctoPrintPlugins()) || [];
+    const response = await this.octoprintClient.fetchOctoPrintPlugins();
+    this.pluginCache = response.data || [];
     this.wasCached = true;
     this.lastQueried = Date.now();
 

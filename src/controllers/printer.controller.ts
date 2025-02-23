@@ -380,8 +380,8 @@ export class PrinterController {
   async getPrinterPluginList(req: Request, res: Response) {
     // List installed plugins (OP 1.6.0+)
     const { printerLogin } = getScopedPrinter(req);
-    const pluginList = await this.octoprintClient.getPluginManagerPlugins(printerLogin);
-    res.send(pluginList);
+    const pluginListResponse = await this.octoprintClient.getPluginManagerPlugins(printerLogin);
+    res.send(pluginListResponse.data);
   }
 
   @GET()
@@ -389,7 +389,7 @@ export class PrinterController {
   async getOctoPrintBackupOverview(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
     const backupOverview = await this.octoprintClient.getBackupOverview(printerLogin);
-    res.send(backupOverview);
+    res.send(backupOverview.data);
   }
 
   @GET()
@@ -397,7 +397,7 @@ export class PrinterController {
   async listOctoPrintBackups(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
     const backupOverview = await this.octoprintClient.getBackups(printerLogin);
-    res.send(backupOverview);
+    res.send(backupOverview.data);
   }
 
   @POST()
@@ -406,7 +406,7 @@ export class PrinterController {
     const { printerLogin } = getScopedPrinter(req);
     const { exclude } = await validateMiddleware(req, createOctoPrintBackupRules);
     const response = await this.octoprintClient.createBackup(printerLogin, exclude);
-    res.send(response);
+    res.send(response.data);
   }
 
   @POST()

@@ -26,6 +26,7 @@ import { CurrentPrinterStateDto } from "@/services/octoprint/dto/printer/current
 import { HttpClientFactory } from "@/services/core/http-client.factory";
 import { OctoprintHttpClientBuilder } from "@/services/octoprint/utils/octoprint-http-client.builder";
 import { OctoprintFileDto } from "@/services/octoprint/dto/files/octoprint-file.dto";
+import { OP_PluginDto } from "@/services/octoprint/dto/plugin.dto";
 
 type TAxes = "x" | "y" | "z";
 
@@ -391,7 +392,7 @@ export class OctoprintClient extends OctoprintRoutes {
    * Does not require printer login, much faster, requires internet connectivity
    */
   async fetchOctoPrintPlugins() {
-    await this.createAnonymousClient(pluginRepositoryUrl).get("");
+    return await this.createAnonymousClient(pluginRepositoryUrl).get<OP_PluginDto[]>("");
   }
 
   async getSystemInfo(login: LoginDto) {
@@ -457,7 +458,7 @@ export class OctoprintClient extends OctoprintRoutes {
           "OctoPrint"
         );
       });
-    return response.data;
+    return response?.data;
   }
 
   async forwardRestoreBackupFileStream(login: LoginDto, buffer: Buffer) {

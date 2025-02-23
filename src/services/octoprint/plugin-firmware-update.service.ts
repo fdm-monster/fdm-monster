@@ -92,7 +92,7 @@ export class PluginFirmwareUpdateService extends PluginBaseService {
 
   async getPrinterFirmwareVersion(printerLogin: LoginDto) {
     const response = await this.octoprintClient.getSystemInfo(printerLogin);
-    const systemInfo = response.systeminfo;
+    const systemInfo = response.data.systeminfo;
 
     // @todo If this fails, the printer most likely is not connected...
     if (!Object.keys(systemInfo).includes(connectivityProp) || !Object.keys(systemInfo).includes(firmwareProp)) {

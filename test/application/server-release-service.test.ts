@@ -1,7 +1,7 @@
 import { AppConstants } from "@/server.constants";
 import { configureContainer } from "@/container";
 import { DITokens } from "@/container.tokens";
-import { asClass, AwilixContainer } from "awilix";
+import { asClass, asFunction, AwilixContainer } from "awilix";
 import { AxiosMock } from "../mocks/axios.mock";
 import { ServerReleaseService } from "@/services/core/server-release.service";
 import nock from "nock";
@@ -13,7 +13,7 @@ const v1 = "1.0.0";
 
 beforeAll(async () => {
   container = configureContainer();
-  container.register(DITokens.httpClient, asClass(AxiosMock).singleton());
+  container.register(DITokens.httpClientFactory, asFunction(() => AxiosMock).singleton());
 
   service = container.resolve(DITokens.serverReleaseService);
 });
