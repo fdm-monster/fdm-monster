@@ -35,11 +35,13 @@ export class WebsocketAdapter {
    * @protected
    * Open a WebSocket connection.
    *
-   * @param {string|URL} url - The URL to connect to.
+   * @param {string|URL} url The URL to connect to.
    * @returns {void}
    */
   open(url: string | URL): void {
-    this.socket = new WebSocket(url, { handshakeTimeout: AppConstants.defaultWebsocketHandshakeTimeout });
+    this.socket = new WebSocket(url, {
+      handshakeTimeout: AppConstants.defaultWebsocketHandshakeTimeout,
+    });
     this.socket.onopen = (event) => this.onOpen(event);
     this.socket.onerror = (error) => this.onError(error);
     this.socket.onclose = (event) => this.onClose(event);

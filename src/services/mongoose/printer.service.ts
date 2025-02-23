@@ -9,13 +9,13 @@ import {
 } from "../validators/printer-service.validation";
 import { printerEvents } from "@/constants/event.constants";
 import { LoggerService } from "@/handlers/logger";
-import { normalizeURLWithProtocol } from "@/utils/url.utils";
 import { MongoIdType } from "@/shared.constants";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoginDto } from "@/services/interfaces/login.dto";
 import { PrinterDto, PrinterUnsafeDto } from "@/services/interfaces/printer.dto";
 import { IPrinter } from "@/models/Printer";
+import { normalizeUrl } from "@/utils/normalize-url";
 
 export class PrinterService implements IPrinterService<MongoIdType> {
   eventEmitter2: EventEmitter2;
@@ -88,7 +88,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
    */
   async update(printerId: MongoIdType, updateData: Partial<IPrinter>) {
     const printer = await this.get(printerId);
-    updateData.printerURL = normalizeURLWithProtocol(updateData.printerURL);
+    updateData.printerURL = normalizeUrl(updateData.printerURL, { defaultProtocol: "https" });
     const { printerURL, apiKey, enabled, name, printerType } = await validateInput(updateData, createMongoPrinterRules);
 
     printer.printerURL = printerURL;
@@ -162,7 +162,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
 
   async updateConnectionSettings(printerId: MongoIdType, { printerURL, apiKey, printerType }: LoginDto) {
     const update = {
-      printerURL: normalizeURLWithProtocol(printerURL),
+      printerURL: normalizeUrl(printerURL, { defaultProtocol: "https" }),
       apiKey,
       printerType,
     };
@@ -221,7 +221,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
       ...printer,
     };
     if (mergedPrinter.printerURL?.length) {
-      mergedPrinter.printerURL = normalizeURLWithProtocol(mergedPrinter.printerURL);
+      mergedPrinter.printerURL = normalizeUrl(mergedPrinter.printerURL, { defaultProtocol: "https" });
     }
     return await validateInput(mergedPrinter, createMongoPrinterRules);
   }

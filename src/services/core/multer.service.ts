@@ -39,7 +39,6 @@ export class MulterService {
 
     for (const file of files) {
       unlink(join(fileStoragePath, file), (err) => {
-        /* istanbul ignore next */
         if (err) throw err;
       });
     }
