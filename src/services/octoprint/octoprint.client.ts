@@ -445,7 +445,9 @@ export class OctoprintClient extends OctoprintRoutes {
   }
 
   async getDownloadBackupStream(login: LoginDto, filename: string) {
-    const response = await this.createClient(login, (builder) => builder.withStreamResponse())
+    const response = await this.createClient(login, (builder) => {
+      builder.withStreamResponse();
+    })
       .get(this.pluginBackupFileDownload(filename))
       .catch((e) => {
         throw new ExternalServiceError(

@@ -25,6 +25,9 @@ const disabledReasonRoute = (id: IdType) => `${updateRoute(id)}/disabled-reason`
 const feedRateRoute = (id: IdType) => `${updateRoute(id)}/feed-rate`;
 const flowRateRoute = (id: IdType) => `${updateRoute(id)}/flow-rate`;
 const printerPluginListRoute = (id: IdType) => `${getRoute(id)}/plugin-list`;
+const printerOctoprintBackupIndex = (id: IdType) => `${getRoute(id)}/octoprint/backup`;
+const printerOctoprintBackupList = (id: IdType) => `${getRoute(id)}/octoprint/backup/list`;
+const printerOctoprintBackupDownload = (id: IdType) => `${getRoute(id)}/octoprint/backup/download`;
 const restartOctoPrintRoute = (id: IdType) => `${getRoute(id)}/octoprint/server/restart`;
 const serialConnectCommandRoute = (id: IdType) => `${getRoute(id)}/serial-connect`;
 const serialDisconnectCommandRoute = (id: IdType) => `${getRoute(id)}/serial-disconnect`;
@@ -296,11 +299,31 @@ describe(PrinterController.name, () => {
 
   it("should send serial disconnect command", async () => {
     const printer = await createTestPrinter(request);
-
-    const response = { port: "/dev/ttyACM0" };
-    nock(printer.printerURL).post("/api/connection").reply(200, response);
-
+    nock(printer.printerURL).post("/api/connection").reply(200, { port: "/dev/ttyACM0" });
     const res = await request.post(serialDisconnectCommandRoute(printer.id)).send();
+    expectOkResponse(res);
+  });
+
+  it("should get backup index", async () => {
+    const printer = await createTestPrinter(request);
+    nock(printer.printerURL).get("/plugin/backup").reply(200, {});
+    const res = await request.get(printerOctoprintBackupIndex(printer.id)).send();
+    expectOkResponse(res, {});
+  });
+
+  it("should get backup list", async () => {
+    const printer = await createTestPrinter(request);
+    nock(printer.printerURL).get("/plugin/backup/backup").reply(200, []);
+    const res = await request.get(printerOctoprintBackupList(printer.id)).send();
+    expectOkResponse(res, []);
+  });
+
+  it("should download backup", async () => {
+    const printer = await createTestPrinter(request);
+    nock(printer.printerURL).get("/plugin/backup/download/123.abc").reply(200, "asd");
+    const res = await request.post(printerOctoprintBackupDownload(printer.id)).send({
+      fileName: "123.abc",
+    });
     expectOkResponse(res);
   });
 });
