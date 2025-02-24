@@ -19,7 +19,6 @@ describe(DefaultHttpClientBuilder.name, () => {
   it("should build http client with stream response without error", () => {
     const uut = new DefaultHttpClientBuilder();
     const httpClient = uut.withStreamResponse().build();
-
     expect(httpClient).toBeDefined();
   });
 

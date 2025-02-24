@@ -1,10 +1,15 @@
 # Develop
 
+## Fixes
+
+- Introduce HttpClientBuilder pattern for Octoprint client
+- Fix Sentry usage has updated
+
 # FDM Monster 03/01/2025 1.8.2
 
 ## Changes 
 
-Update client to 1.8.8
+- Update client to 1.8.8
 
 ## Chore
 
