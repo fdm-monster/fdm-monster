@@ -298,7 +298,7 @@ export class OctoprintClient extends OctoprintRoutes {
   // }
 
   async deleteFileOrFolder(login: LoginDto, path: string) {
-    return await this.createClient(login).delete(this.apiFile(path));
+    await this.createClient(login).delete(this.apiFile(path));
   }
 
   async getPrinterCurrent(login: LoginDto, history: boolean, limit?: number, exclude?: ("temperature" | "sd" | "state")[]) {

@@ -101,7 +101,7 @@ export class OctoprintApi implements IPrinterApi {
     }));
   }
 
-  async downloadFile(path: string) {
+  async downloadFile(path: string): AxiosPromise<NodeJS.ReadableStream> {
     return await this.client.downloadFile(this.login, path);
   }
 

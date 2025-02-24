@@ -66,7 +66,7 @@ export class PrinterWebsocketRestoreTask {
         silentSocketIds.push(socket.printerId);
         // Produce logs for silent sockets
         try {
-          if (result?.current?.state !== "Closed") {
+          if (result.data?.current?.state !== "Closed") {
             this.logger.warn(
               `Silence was detected, but the OctoPrint current connection was not closed. Connection state ${result?.current?.state}`
             );
