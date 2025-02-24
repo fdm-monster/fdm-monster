@@ -16,6 +16,7 @@ import { LoginDto } from "@/services/interfaces/login.dto";
 import { PrinterDto, PrinterUnsafeDto } from "@/services/interfaces/printer.dto";
 import { IPrinter } from "@/models/Printer";
 import { normalizeUrl } from "@/utils/normalize-url";
+import { defaultHttpProtocol } from "@/utils/url.utils";
 
 export class PrinterService implements IPrinterService<MongoIdType> {
   eventEmitter2: EventEmitter2;
@@ -88,7 +89,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
    */
   async update(printerId: MongoIdType, updateData: Partial<IPrinter>) {
     const printer = await this.get(printerId);
-    updateData.printerURL = normalizeUrl(updateData.printerURL, { defaultProtocol: "https" });
+    updateData.printerURL = normalizeUrl(updateData.printerURL, { defaultProtocol: defaultHttpProtocol });
     const { printerURL, apiKey, enabled, name, printerType } = await validateInput(updateData, createMongoPrinterRules);
 
     printer.printerURL = printerURL;
@@ -162,7 +163,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
 
   async updateConnectionSettings(printerId: MongoIdType, { printerURL, apiKey, printerType }: LoginDto) {
     const update = {
-      printerURL: normalizeUrl(printerURL, { defaultProtocol: "https" }),
+      printerURL: normalizeUrl(printerURL, { defaultProtocol: defaultHttpProtocol }),
       apiKey,
       printerType,
     };
@@ -221,7 +222,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
       ...printer,
     };
     if (mergedPrinter.printerURL?.length) {
-      mergedPrinter.printerURL = normalizeUrl(mergedPrinter.printerURL, { defaultProtocol: "https" });
+      mergedPrinter.printerURL = normalizeUrl(mergedPrinter.printerURL, { defaultProtocol: defaultHttpProtocol });
     }
     return await validateInput(mergedPrinter, createMongoPrinterRules);
   }

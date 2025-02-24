@@ -36,6 +36,7 @@ import { IPrinterApi } from "@/services/printer-api.interface";
 import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { PrinterApiFactory } from "@/services/printer-api.factory";
 import { normalizeUrl } from "@/utils/normalize-url";
+import { defaultHttpProtocol } from "@/utils/url.utils";
 
 @route(AppConstants.apiRoute + "/printer")
 @before([authenticate(), authorizeRoles([ROLES.OPERATOR, ROLES.ADMIN]), printerResolveMiddleware()])
@@ -226,7 +227,7 @@ export class PrinterController {
   @route("/test-connection")
   async testConnection(req: Request, res: Response) {
     if (req.body.printerURL?.length) {
-      req.body.printerURL = normalizeUrl(req.body.printerURL, { defaultProtocol: "https" });
+      req.body.printerURL = normalizeUrl(req.body.printerURL, { defaultProtocol: defaultHttpProtocol });
     }
     const newPrinter = await validateMiddleware(req, testPrinterApiRules);
     newPrinter.correlationToken = generateCorrelationToken();
