@@ -33,8 +33,42 @@ describe(OctoprintClient.name, () => {
   });
 
   it("should not throw error on getSettings with correct printerURL", async () => {
-    nock(printerURL).get("/api/settings").reply(200, {});
-    await octoprintClient.getSettings(auth);
+    const reply = {};
+    nock(printerURL).get("/api/settings").reply(200, reply);
+
+    const result = await octoprintClient.getSettings(auth);
+    expect(result.data).toStrictEqual(reply);
+  });
+
+  it("should not throw error on getApiVersion", async () => {
+    const reply = {
+      api: "0.1",
+      server: "1.10.2",
+      text: "OctoPrint 1.10.2",
+    };
+    nock(printerURL).get("/api/version").reply(200, reply);
+
+    const result = await octoprintClient.getApiVersion(auth);
+    expect(result.data).toStrictEqual(reply);
+  });
+
+  it("should not throw error on getServer", async () => {
+    const reply = {
+      version: "1.10.2",
+      safemode: "",
+    };
+    nock(printerURL).get("/api/server").reply(200, reply);
+
+    const result = await octoprintClient.getServer(auth);
+    expect(result.data).toStrictEqual(reply);
+  });
+
+  it("should not throw error on POST login", async () => {
+    const reply = { session: "1234asd" };
+    nock(printerURL).post("/api/login").query("passive=true").reply(200, reply);
+
+    const result = await octoprintClient.login(auth);
+    expect(result.data).toStrictEqual(reply);
   });
 
   it("should get first admin's username when response not recognized", async () => {
@@ -166,6 +200,12 @@ describe(OctoprintClient.name, () => {
     expect(result).toBeTruthy();
   });
 
+  it("should not throw error on getPrinterCurrent", async () => {
+    nock(printerURL).get("/api/printer").query("history=false").reply(200, {});
+    const result = await octoprintClient.getPrinterCurrent(auth, false);
+    expect(result).toBeTruthy();
+  });
+
   it("should not throw error on getConnection", async () => {
     nock(printerURL).get("/api/connection").reply(200, {});
     const result = await octoprintClient.getConnection(auth);
@@ -224,5 +264,44 @@ describe(OctoprintClient.name, () => {
     nock(printerURL).get("/api/plugin/printerprofiles").reply(200, {});
     const result = await octoprintClient.listProfiles(auth);
     expect(result).toBeTruthy();
+  });
+
+  it("should not throw error on getBackupOverview", async () => {
+    nock(printerURL).get("/plugin/backup").reply(200, {});
+    const result = await octoprintClient.getBackupOverview(auth);
+    expect(result).toBeTruthy();
+  });
+
+  it("should not throw error on getBackups", async () => {
+    nock(printerURL).get("/plugin/backup/backup").reply(200, {});
+    const result = await octoprintClient.getBackups(auth);
+    expect(result).toBeTruthy();
+  });
+
+  it("should not throw error on createBackup", async () => {
+    nock(printerURL).post("/plugin/backup/backup").reply(200, {});
+    const result = await octoprintClient.createBackup(auth, []);
+    expect(result).toBeTruthy();
+  });
+
+  it("should not throw error on deleteBackup", async () => {
+    const file = "123.file";
+    nock(printerURL)
+      .delete("/plugin/backup/backup/" + file)
+      .reply(200, {});
+    const result = await octoprintClient.deleteBackup(auth, file);
+    expect(result).toBeTruthy();
+  });
+
+  it("should not throw error on sendPrintHeadJogCommand", async () => {
+    nock(printerURL).post("/api/printer/printhead").reply(200, {});
+    const result = await octoprintClient.sendPrintHeadJogCommand(auth, { x: 1, y: 0, z: 0, speed: 1 });
+    expect(result).toBeUndefined();
+  });
+
+  it("should not throw error on sendPrintHeadJogCommand", async () => {
+    nock(printerURL).post("/api/printer/printhead").reply(200, {});
+    const result = await octoprintClient.sendPrintHeadHomeCommand(auth, { x: true, y: false, z: false });
+    expect(result).toBeUndefined();
   });
 });
