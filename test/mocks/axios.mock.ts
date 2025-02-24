@@ -2,14 +2,14 @@ import { AxiosError } from "axios";
 
 export class AxiosMock {
   mockResponses: Record<string, { status: number; data: any; isStream?: boolean; throws?: boolean }> = {};
-  timeout = null;
+  timeout: number | null = null;
   streamRejectPayload: any;
 
   constructor(timeoutSettings: any) {
     this.timeout = timeoutSettings;
   }
 
-  setStreamWillError(rejectPayload = undefined) {
+  setStreamWillError(rejectPayload: any = undefined) {
     this.streamRejectPayload = rejectPayload;
   }
 
@@ -28,8 +28,8 @@ export class AxiosMock {
       status: responseConfig.status,
       data: responseConfig.isStream
         ? {
-            pipe: (stream) => {},
-            on: (event, cb) => {
+            pipe: (stream: any) => {},
+            on: (event: any, cb: (payload: any) => void) => {
               if (event === "error") {
                 if (this.streamRejectPayload) {
                   return cb(this.streamRejectPayload);

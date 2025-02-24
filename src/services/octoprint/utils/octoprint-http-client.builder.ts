@@ -3,7 +3,7 @@ import { apiKeyHeaderKey } from "@/services/octoprint/constants/octoprint-servic
 import { AxiosInstance } from "axios";
 
 export class OctoprintHttpClientBuilder extends DefaultHttpClientBuilder {
-  override build<D = any>(): AxiosInstance {
+  public override build<D = any>(): AxiosInstance {
     if (!this.axiosOptions.baseURL) {
       throw new Error("Base URL is required");
     }
@@ -11,7 +11,7 @@ export class OctoprintHttpClientBuilder extends DefaultHttpClientBuilder {
     return super.build<D>();
   }
 
-  withXApiKeyHeader(apiKey: string): DefaultHttpClientBuilder {
+  public withXApiKeyHeader(apiKey: string): OctoprintHttpClientBuilder {
     if (!apiKey?.length) {
       throw new Error("XApiKey header may not be an empty string");
     }
