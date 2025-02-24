@@ -1,5 +1,4 @@
 import { Printer } from "@/models";
-import { expectValidationError } from "../extensions";
 
 describe("printer-schema", function () {
   it("should be valid for required properties", async () => {

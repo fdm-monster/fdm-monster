@@ -16,7 +16,7 @@ let userService: IUserService<SqliteIdType, UserDto<SqliteIdType>>;
 let roleService: IRoleService<SqliteIdType, RoleDto<SqliteIdType>>;
 
 beforeAll(async () => {
-  const { container, httpClient: axiosMock } = await setupTestApp(true);
+  const { container } = await setupTestApp(true);
   userService = container.resolve(DITokens.userService);
   roleService = container.resolve(DITokens.roleService);
 });

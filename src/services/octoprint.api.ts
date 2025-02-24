@@ -101,7 +101,7 @@ export class OctoprintApi implements IPrinterApi {
     }));
   }
 
-  async downloadFile(path: string) {
+  async downloadFile(path: string): AxiosPromise<NodeJS.ReadableStream> {
     return await this.client.downloadFile(this.login, path);
   }
 
@@ -122,15 +122,17 @@ export class OctoprintApi implements IPrinterApi {
   }
 
   async getSettings() {
-    return await this.client.getSettings(this.login);
+    const response = await this.client.getSettings(this.login);
+    return response.data;
   }
 
   async getReprintState() {
-    const connected = await this.client.getConnection(this.login);
+    const connectedResponse = await this.client.getConnection(this.login);
+    const connectionState = connectedResponse.data.current?.state;
 
-    const connectionState = connected.current?.state;
+    const selectedJobResponse = await this.client.getJob(this.login);
+    const selectedJob = selectedJobResponse.data;
 
-    const selectedJob = await this.client.getJob(this.login);
     const currentJobFile = selectedJob?.job?.file;
     if (!currentJobFile?.name) {
       return { connectionState, reprintState: ReprintState.NoLastPrint };

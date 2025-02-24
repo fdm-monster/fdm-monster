@@ -45,18 +45,18 @@ export class PluginBaseService {
   }
 
   async isPluginUpToDate(printerLogin: LoginDto) {
-    const response = await this.#queryInstalledPlugin(printerLogin);
+    const response = await this.queryInstalledPlugin(printerLogin);
 
     const result = this.pluginRepositoryCache.getPlugin(this.pluginName);
     return result?.github?.latest_release.name === response.version;
   }
 
-  async #queryInstalledPlugin(printerLogin: LoginDto) {
+  private async queryInstalledPlugin(printerLogin: LoginDto) {
     const response = await this.octoprintClient.getPluginManagerPlugin(printerLogin, this.pluginName);
-    if (!response) {
+    if (!response.data) {
       throw new InternalServerException("Plugin query response was empty");
     }
-    return response.plugin;
+    return response.data.plugin;
   }
 
   async isPluginInstalled(printerLogin: LoginDto) {
@@ -66,18 +66,18 @@ export class PluginBaseService {
 
   private async findPluginFromListQuery(printerLogin: LoginDto) {
     const response = await this.octoprintClient.getPluginManagerPlugins(printerLogin);
-    if (!response?.plugins?.length) {
+    if (!response.data?.plugins?.length) {
       throw new InternalServerException("Plugin query response was empty");
     }
-    return this.findPluginInList(response.plugins);
+    return this.findPluginInList(response.data.plugins);
   }
 
-  private findPluginInList(pluginList) {
+  private findPluginInList(pluginList: any[]) {
     return pluginList.find((p) => p.key.toLowerCase() === this.pluginName.toLowerCase());
   }
 
   async updatePlugin(login: LoginDto) {
-    return await this.octoprintClient.postSoftwareUpdate(login, [this.pluginName], this.pluginUrl);
+    return await this.octoprintClient.postSoftwareUpdate(login, [this.pluginName]);
   }
 
   async installPlugin(login: LoginDto, restartAfter = false) {
@@ -85,45 +85,45 @@ export class PluginBaseService {
     const plugin = this.pluginRepositoryCache.getPlugin(this.pluginName);
     await this.octoprintClient.postApiPluginManagerCommand(login, command, plugin.archive);
 
-    await this.#conditionalRestartCommand(login, restartAfter);
+    await this.conditionalRestartCommand(login, restartAfter);
   }
 
   async uninstallPlugin(login: LoginDto, restartAfter = false) {
     const command = pluginManagerCommands.uninstall.name;
     await this.octoprintClient.postApiPluginManagerCommand(login, command, this.pluginName);
 
-    await this.#conditionalRestartCommand(login, restartAfter);
+    await this.conditionalRestartCommand(login, restartAfter);
   }
 
   async enablePlugin(login: LoginDto, restartAfter = false) {
     const command = pluginManagerCommands.enable.name;
     await this.octoprintClient.postApiPluginManagerCommand(login, command, this.pluginName);
 
-    await this.#conditionalRestartCommand(login, restartAfter);
+    await this.conditionalRestartCommand(login, restartAfter);
   }
 
   async disablePlugin(login: LoginDto, restartAfter = false) {
     const command = pluginManagerCommands.disable.name;
     await this.octoprintClient.postApiPluginManagerCommand(login, command, this.pluginName);
 
-    await this.#conditionalRestartCommand(login, restartAfter);
+    await this.conditionalRestartCommand(login, restartAfter);
   }
 
   async cleanupPlugin(login: LoginDto, restartAfter = false) {
     const command = pluginManagerCommands.cleanup.name;
     await this.octoprintClient.postApiPluginManagerCommand(login, command, this.pluginName);
 
-    await this.#conditionalRestartCommand(login, restartAfter);
+    await this.conditionalRestartCommand(login, restartAfter);
   }
 
   async cleanupAllPlugins(login: LoginDto, restartAfter = false) {
     const command = pluginManagerCommands.cleanup_all.name;
-    await this.octoprintClient.postApiPluginManagerCommand(login, command);
+    await this.octoprintClient.postApiPluginManagerCommand(login, command, this.pluginUrl);
 
-    await this.#conditionalRestartCommand(login, restartAfter);
+    await this.conditionalRestartCommand(login, restartAfter);
   }
 
-  async #conditionalRestartCommand(printerLogin: LoginDto, restartAfter = false) {
+  private async conditionalRestartCommand(printerLogin: LoginDto, restartAfter = false) {
     if (!restartAfter) return;
 
     await this.octoprintClient.postServerRestartCommand(printerLogin);

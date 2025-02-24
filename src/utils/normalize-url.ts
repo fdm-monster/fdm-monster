@@ -24,7 +24,7 @@ const normalizeDataURL = (urlString: string, { stripHash }: { stripHash: boolean
     throw new Error(`Invalid URL: ${urlString}`);
   }
 
-  let { type, data, hash } = match.groups as any;
+  let { type, data, hash } = match.groups;
   const mediaType = type.split(";");
   hash = stripHash ? "" : hash;
 
@@ -67,13 +67,34 @@ const normalizeDataURL = (urlString: string, { stripHash }: { stripHash: boolean
 };
 
 /**
+ * Modified with extra typing 23/02/2025
  * https://github.com/sindresorhus/normalize-url v8.0.1 patched at 12/01/2024
  * v8.0.0 downloaded at 13/08/2023
  * @param urlString
  * @param options
  * @return {*|string}
  */
-export function normalizeUrl(urlString: string, options?: any): string {
+export function normalizeUrl(
+  urlString: string,
+  options?: Partial<{
+    defaultProtocol: "http" | "https" | "ws" | "wss" | string;
+    normalizeProtocol: boolean;
+    forceHttp: boolean;
+    forceHttps: boolean;
+    stripAuthentication: boolean;
+    stripHash: boolean;
+    stripTextFragment: boolean;
+    stripProtocol: boolean;
+    stripWWW: boolean;
+    removeQueryParameters: boolean | RegExp[];
+    keepQueryParameters: string[];
+    removeTrailingSlash: boolean;
+    removeSingleSlash: boolean;
+    removeDirectoryIndex: boolean | RegExp[];
+    removeExplicitPort: boolean;
+    sortQueryParameters: boolean;
+  }>
+): string {
   options = {
     defaultProtocol: "http",
     normalizeProtocol: true,
@@ -101,7 +122,7 @@ export function normalizeUrl(urlString: string, options?: any): string {
 
   // Data URL
   if (/^data:/i.test(urlString)) {
-    return normalizeDataURL(urlString, options);
+    return normalizeDataURL(urlString, { stripHash: options.stripHash });
   }
 
   if (hasCustomProtocol(urlString)) {

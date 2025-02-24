@@ -3,13 +3,8 @@ import { DITokens } from "./container.tokens";
 
 /**
  * Register a task with a preset and timing (run immediate does not retry in case of failure)
- * @param task
- * @param preset
- * @param milliseconds optional parameter to quickly set milliseconds timing
- * @param runImmediately
- * @returns {{task, id, preset}}
  */
-export function registerTask(task, preset: TimingPreset, milliseconds = 0, runImmediately = false) {
+export function registerTask(task: any, preset: TimingPreset, milliseconds = 0, runImmediately = false) {
   let timingPreset = { ...preset };
   timingPreset.milliseconds = preset.milliseconds || milliseconds;
   timingPreset.runImmediately = runImmediately || false;

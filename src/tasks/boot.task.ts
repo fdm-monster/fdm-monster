@@ -20,6 +20,7 @@ import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
 import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
+import { PluginFirmwareUpdateService } from "@/services/octoprint/plugin-firmware-update.service";
 
 export class BootTask {
   logger: LoggerService;

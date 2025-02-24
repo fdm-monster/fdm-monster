@@ -94,7 +94,7 @@ export class ServerHost {
           next();
         }
       })
-      .use(loadControllers(`${routePath}/*.controller.*`, { cwd: __dirname, ignore: "**/*.map" }))
+      .use(loadControllers(`${routePath}/*.controller.*`, { cwd: __dirname, ignore: ["**/*.map"] }))
       .use(exceptionFilter);
 
     const nextClientPath = join(superRootPath(), "node_modules", AppConstants.clientNextPackageName, "dist");

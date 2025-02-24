@@ -7,35 +7,39 @@ import { IdType } from "@/shared.constants";
 import { LoginDto } from "@/services/interfaces/login.dto";
 import { CachedPrinter } from "@/state/printer.cache";
 import { IPrinterApi } from "@/services/printer-api.interface";
+import { defaultHttpProtocol } from "@/utils/url.utils";
 
 export function getExtendedValidator() {
-  extend("wsurl", ({ value, args }, validator) => {
-    if (!value) return false;
-    try {
-      const url = normalizeUrl(value);
-      return url.startsWith("ws://") || url.startsWith("wss://");
-    } catch (e) {
-      return false;
-    }
-  });
-  extend("httpurl", ({ value, args }, validator) => {
+  extend("wsurl", ({ value, args }: { value: any; args: any }, validator: any) => {
     if (!value) return false;
 
     try {
-      if (!value.startsWith("http://") && !value.startsWith("https://")) {
-        return false;
-      }
-      return new URL(normalizeUrl(value));
+      const url = new URL(normalizeUrl(value, { defaultProtocol: "wss" }));
+      return url.protocol === "ws:" || url.protocol === "wss:";
     } catch (e) {
       return false;
     }
   });
-  extend("not", ({ value, args }, validator) => {
+
+  extend("httpurl", ({ value, args }: { value: any; args: any }, validator: any) => {
+    if (!value) return false;
+
+    try {
+      const url = new URL(normalizeUrl(value, { defaultProtocol: defaultHttpProtocol }));
+      return url.protocol === "http:" || url.protocol === "https:";
+    } catch (e) {
+      return false;
+    }
+  });
+
+  extend("not", ({ value, args }: { value: any; args: any }, validator: any) => {
     return !value && value !== false;
   });
+
   extendMessages({
     not: "The :attribute field may not be present.",
   });
+
   return nodeInputValidator;
 }
 

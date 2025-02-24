@@ -96,7 +96,7 @@ export class PluginFirmwareUpdateController {
   async getFirmwareUpdaterStatus(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
     const status = await this.pluginFirmwareUpdateService.getPluginFirmwareStatus(printerLogin);
-    res.send(status);
+    res.send(status.data);
   }
 
   @POST()
@@ -104,7 +104,7 @@ export class PluginFirmwareUpdateController {
   async configurePluginSettings(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
     const response = await this.pluginFirmwareUpdateService.configureFirmwareUpdaterSettings(printerLogin);
-    res.send(response);
+    res.send(response.data);
   }
 
   @POST()
@@ -119,7 +119,7 @@ export class PluginFirmwareUpdateController {
     const printers = await this.printerCache.listCachedPrinters();
     const printerFirmwareStates = [];
     const failureStates = [];
-    for (let printer of printers) {
+    for (const printer of printers) {
       try {
         const loginDto = await this.printerCache.getLoginDtoAsync(printer.id);
         const isInstalled = await this.pluginFirmwareUpdateService.isPluginInstalled(loginDto);
@@ -148,7 +148,7 @@ export class PluginFirmwareUpdateController {
       firmwareStates: printerFirmwareStates,
       failures: failureStates,
     };
-    await this.cacheManager.set(cacheKey, result, { ttl: 3600 * 4 });
+    await this.cacheManager.set(cacheKey, result, 3600 * 4);
     return result;
   }
 }

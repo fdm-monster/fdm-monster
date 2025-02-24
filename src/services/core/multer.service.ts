@@ -3,23 +3,24 @@ import { extname, join } from "path";
 import { createWriteStream, existsSync, lstatSync, mkdirSync, readdirSync, unlink } from "fs";
 import { superRootPath } from "@/utils/fs.utils";
 import { AppConstants } from "@/server.constants";
-import { AxiosStatic } from "axios";
 import { FileUploadTrackerCache } from "@/state/file-upload-tracker.cache";
 import { Request, Response } from "express";
+import { HttpClientFactory } from "@/services/core/http-client.factory";
+import { DefaultHttpClientBuilder } from "@/shared/default-http-client.builder";
 
 export class MulterService {
   fileUploadTrackerCache: FileUploadTrackerCache;
-  httpClient: AxiosStatic;
+  httpClientFactory: HttpClientFactory;
 
   constructor({
     fileUploadTrackerCache,
-    httpClient,
+    httpClientFactory,
   }: {
     fileUploadTrackerCache: FileUploadTrackerCache;
-    httpClient: AxiosStatic;
+    httpClientFactory: HttpClientFactory;
   }) {
     this.fileUploadTrackerCache = fileUploadTrackerCache;
-    this.httpClient = httpClient;
+    this.httpClientFactory = httpClientFactory;
   }
 
   getNewestFile(collection: string) {
@@ -39,7 +40,6 @@ export class MulterService {
 
     for (const file of files) {
       unlink(join(fileStoragePath, file), (err) => {
-        /* istanbul ignore next */
         if (err) throw err;
       });
     }
@@ -58,7 +58,8 @@ export class MulterService {
     const downloadPath = join(superRootPath(), AppConstants.defaultFileStorageFolder, collection, downloadFilename);
     const fileStream = createWriteStream(downloadPath);
 
-    const res = await this.httpClient.get(downloadUrl);
+    const defaultHttpClient = this.httpClientFactory.createDefaultClient();
+    const res = await defaultHttpClient.get(downloadUrl);
     return await new Promise((resolve, reject) => {
       fileStream.write(res.data);
       fileStream.on("error", (err) => {

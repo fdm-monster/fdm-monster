@@ -1,19 +1,15 @@
 import { normalizeUrl } from "./normalize-url";
 
+export const defaultHttpProtocol = "https";
+
 export function httpToWsUrl(url: string) {
-  const protocolNormalizedUrl = normalizeURLWithProtocol(url);
-  const wsUrl = new URL("/sockjs/websocket", protocolNormalizedUrl);
-  wsUrl.protocol = protocolNormalizedUrl.startsWith("https://") ? "wss" : "ws";
-  wsUrl.pathname = "/sockjs/websocket";
-  return wsUrl;
-}
-
-export function normalizeURLWithProtocol(printerURL: string) {
-  if (!printerURL) return;
-
-  if (!printerURL.startsWith("http://") && !printerURL.startsWith("https://")) {
-    printerURL = `httpS://${printerURL}`;
+  if (!url?.length) {
+    return;
   }
 
-  return normalizeUrl(printerURL);
+  const protocolNormalizedAddress = normalizeUrl(url, { defaultProtocol: defaultHttpProtocol });
+
+  const wsUrl = new URL(protocolNormalizedAddress);
+  wsUrl.protocol = wsUrl.protocol === "https:" ? "wss:" : "ws:";
+  return wsUrl;
 }

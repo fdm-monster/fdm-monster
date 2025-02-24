@@ -1,16 +1,15 @@
 import fs, { createReadStream, ReadStream } from "fs";
 import path from "path";
 import FormData from "form-data";
-import { multiPartContentType, pluginRepositoryUrl } from "./constants/octoprint-service.constants";
+import { pluginRepositoryUrl } from "./constants/octoprint-service.constants";
 import { firmwareFlashUploadEvent, uploadProgressEvent } from "@/constants/event.constants";
 import { ExternalServiceError } from "@/exceptions/runtime.exceptions";
 import { OctoprintRoutes } from "./octoprint-api.routes";
-import axios, { AxiosInstance, AxiosPromise } from "axios";
+import { AxiosPromise } from "axios";
 import EventEmitter2 from "eventemitter2";
 import { LoggerService } from "@/handlers/logger";
 import { LoginDto } from "@/services/interfaces/login.dto";
 import { IdType } from "@/shared.constants";
-import { SettingsStore } from "@/state/settings.store";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { normalizePrinterFile } from "@/services/octoprint/utils/file.utils";
 import { ConnectionDto } from "@/services/octoprint/dto/connection/connection.dto";
@@ -24,6 +23,10 @@ import { CurrentUserDto } from "@/services/octoprint/dto/auth/current-user.dto";
 import { CurrentJobDto } from "@/services/octoprint/dto/job/current-job.dto";
 import { SettingsDto } from "@/services/octoprint/dto/settings/settings.dto";
 import { CurrentPrinterStateDto } from "@/services/octoprint/dto/printer/current-printer-state.dto";
+import { HttpClientFactory } from "@/services/core/http-client.factory";
+import { OctoprintHttpClientBuilder } from "@/services/octoprint/utils/octoprint-http-client.builder";
+import { OctoprintFileDto } from "@/services/octoprint/dto/files/octoprint-file.dto";
+import { OP_PluginDto } from "@/services/octoprint/dto/plugin.dto";
 
 type TAxes = "x" | "y" | "z";
 
@@ -33,44 +36,38 @@ type TAxes = "x" | "y" | "z";
  */
 export class OctoprintClient extends OctoprintRoutes {
   eventEmitter2: EventEmitter2;
-  protected httpClient: AxiosInstance;
+  protected httpClientFactory: HttpClientFactory;
   protected logger: LoggerService;
 
   constructor({
-    settingsStore,
-    httpClient,
+    httpClientFactory,
     loggerFactory,
     eventEmitter2,
   }: {
-    settingsStore: SettingsStore;
-    httpClient: AxiosInstance;
+    httpClientFactory: HttpClientFactory;
     loggerFactory: ILoggerFactory;
     eventEmitter2: EventEmitter2;
   }) {
-    super({ settingsStore });
-    this.httpClient = httpClient;
+    super();
+    this.httpClientFactory = httpClientFactory;
     this.eventEmitter2 = eventEmitter2;
     this.logger = loggerFactory(OctoprintClient.name);
   }
 
-  async getApiVersion(login: LoginDto, timeout?: number): AxiosPromise<VersionDto> {
-    const { url, options } = this.prepareRequest(login, this.apiVersion, timeout);
-    return await this.httpClient.get<VersionDto>(url, options);
+  async getApiVersion(login: LoginDto) {
+    return await this.createClient(login).get<VersionDto>(this.apiVersion);
   }
 
-  async getServer(login: LoginDto): AxiosPromise<ServerDto> {
-    const { url, options } = this.prepareRequest(login, this.apiServer);
-    return await this.httpClient.get<ServerDto>(url, options);
+  async getServer(login: LoginDto) {
+    return await this.createClient(login).get<ServerDto>(this.apiServer);
   }
 
-  async login(login: LoginDto): AxiosPromise<OP_LoginDto> {
-    const { url, options } = this.prepareRequest(login, this.apiLogin);
-    return await this.httpClient.post<OP_LoginDto>(url, {}, options);
+  async login(login: LoginDto) {
+    return await this.createClient(login).post<OP_LoginDto>(this.apiLogin);
   }
 
   async sendConnectionCommand(login: LoginDto, commandData: any) {
-    const { url, options, data } = this.prepareJsonRequest(login, this.apiConnection, commandData);
-    await this.httpClient.post<void>(url, data, options);
+    await this.createClient(login).post(this.apiConnection, commandData);
   }
 
   async sendPrintHeadJogCommand(login: LoginDto, amounts: { x?: number; y?: number; z?: number; speed?: number }) {
@@ -97,90 +94,68 @@ export class OctoprintClient extends OctoprintRoutes {
   }
 
   /**
-   * Ability to jog, home or set feedrate
+   * Ability to jog, home or set feed rate
    */
   async sendPrintHeadCommand(login: LoginDto, commandData: any) {
-    const { url, options, data } = this.prepareJsonRequest(login, this.apiPrinterHead, commandData);
-    const response = await this.httpClient.post(url, data, options);
-    return response?.data;
+    await this.createClient(login).post(this.apiPrinterHead, commandData);
   }
 
   async sendCustomGCodeCommand(login: LoginDto, commandString: string) {
-    const { url, options, data } = this.prepareJsonRequest(login, this.apiPrinterCustomCommand, {
+    await this.createClient(login).post(this.apiPrinterCustomCommand, {
       command: commandString,
     });
-    const response = await this.httpClient.post(url, data, options);
-    return response?.data;
   }
 
   async getJob(login: LoginDto) {
-    const { url, options } = this.prepareRequest(login, this.apiJob);
-    const response = await this.httpClient.get(url, options);
-    return response?.data as CurrentJobDto;
+    return await this.createClient(login).get<CurrentJobDto>(this.apiJob);
   }
 
   /**
    * Ability to start, cancel, restart, or pause a job
    */
   async sendJobCommand(login: LoginDto, commandData: any) {
-    const { url, options, data } = this.prepareJsonRequest(login, this.apiJob, commandData);
-    const response = await this.httpClient.post(url, data, options);
-    return response?.data;
+    return await this.createClient(login).post(this.apiJob, commandData);
   }
 
   async sendBedTempCommand(login: LoginDto, targetTemp: number) {
-    const { url, options, data } = this.prepareJsonRequest(login, this.apiPrinterBed, this.getBedTargetCommand(targetTemp));
-    const response = await this.httpClient.post(url, data, options);
-    return response?.data;
+    const data = this.getBedTargetCommand(targetTemp);
+    return await this.createClient(login).post(this.apiPrinterBed, data);
   }
 
-  async getSettings(login: LoginDto): Promise<SettingsDto> {
-    const { url, options } = this.prepareRequest(login, this.apiSettingsPart);
-    const response = await this.httpClient.get<SettingsDto>(url, options);
-    return response?.data;
+  async getSettings(login: LoginDto) {
+    return await this.createClient(login).get<SettingsDto>(this.apiSettingsPart);
   }
 
   async updatePrinterNameSetting(login: LoginDto, printerName: string) {
-    const { url, options } = this.prepareRequest(login, this.apiSettingsPart);
     const settingPatch = this.printerNameSetting(printerName);
-    const response = await this.httpClient.post(url, settingPatch, options);
-    return response?.data;
+    return await this.createClient(login).post(this.apiSettingsPart, settingPatch);
   }
 
   async updateFirmwareUpdaterSettings(login: LoginDto, firmwareUpdateConfig: any) {
-    const { url, options } = this.prepareRequest(login, this.apiSettingsPart);
     const settingPatch = this.pluginFirmwareUpdaterSettings(firmwareUpdateConfig);
-    const response = await this.httpClient.post(url, settingPatch, options);
-    return response?.data;
+    return await this.createClient(login).post(this.apiSettingsPart, settingPatch);
   }
 
   async setGCodeAnalysis(login: LoginDto, enabled: boolean) {
-    const { url, options } = this.prepareRequest(login, this.apiSettingsPart);
     const settingPatch = this.gcodeAnalysisSetting(enabled);
-    const response = await this.httpClient.post(url, settingPatch, options);
-    return response?.data;
+    return await this.createClient(login).post(this.apiSettingsPart, settingPatch);
   }
 
   async getCurrentUser(login: LoginDto) {
-    const { url, options } = this.prepareRequest(login, this.apiCurrentUser);
-    const response = await this.httpClient.get<CurrentUserDto>(url, options);
-    return response?.data;
+    return await this.createClient(login).get<CurrentUserDto>(this.apiCurrentUser);
   }
 
-  async getAdminUserOrDefault(login: LoginDto): Promise<string> {
-    const currentUser = await this.getCurrentUser(login);
-    return currentUser?.name;
+  async getAdminUserOrDefault(login: LoginDto) {
+    const currentUserResponse = await this.getCurrentUser(login);
+    return currentUserResponse?.data?.name;
   }
 
-  async getUsers(login: LoginDto): Promise<UserListDto> {
-    const { url, options } = this.prepareRequest(login, this.apiUsers);
-    const response = await this.httpClient.get(url, options);
-    return response?.data;
+  async getUsers(login: LoginDto) {
+    return await this.createClient(login).get<UserListDto>(this.apiUsers);
   }
 
   async getLocalFiles(login: LoginDto, recursive = false) {
-    const { url, options } = this.prepareRequest(login, this.apiGetFiles(recursive));
-    const response = await this.httpClient.get<OctoprintFilesResponseDto>(url, options);
+    const response = await this.createClient(login).get<OctoprintFilesResponseDto>(this.apiGetFiles(recursive));
 
     return (
       // Filter out folders
@@ -193,9 +168,9 @@ export class OctoprintClient extends OctoprintRoutes {
   }
 
   async getFile(login: LoginDto, path: string) {
-    const pathUrl = this.apiFile(path);
-    const { url, options } = this.prepareRequest(login, pathUrl);
-    const response = await this.httpClient.get(url, options);
+    const urlPath = this.apiFile(path);
+    const response = await this.createClient(login).get<OctoprintFileDto>(urlPath);
+
     try {
       return normalizePrinterFile(response?.data);
     } catch (e) {
@@ -206,62 +181,48 @@ export class OctoprintClient extends OctoprintRoutes {
   }
 
   async downloadFile(login: LoginDto, path: string): AxiosPromise<NodeJS.ReadableStream> {
-    const pathUrl = this.downloadFileLocal(path);
-    const { url, options } = this.prepareRequest(login, pathUrl);
+    const urlPath = this.downloadFileLocal(path);
 
-    return await this.httpClient.get(url, {
+    return await this.createClient(login).get(urlPath, {
       responseType: "stream",
-      ...options,
     });
   }
 
-  getFileChunk(login: LoginDto, filePath: string, startBytes: number, endBytes: number) {
+  async getFileChunk(login: LoginDto, filePath: string, startBytes: number, endBytes: number) {
     const pathUrl = this.downloadFileLocal(filePath);
-    const { url, options } = this.prepareRequest(login, pathUrl);
-    return this.httpClient.get<string>(url, {
-      headers: {
-        ...options.headers,
+
+    return await this.createClient(login, (o) =>
+      o.withHeaders({
         Range: `bytes=${startBytes}-${endBytes}`,
-      },
-      timeout: options.timeout,
-    });
+      })
+    ).get<string>(pathUrl);
   }
 
   async createFolder(login: LoginDto, path: string, foldername: string) {
-    const { url, options } = this.prepareRequest(login, this.apiFilesLocal);
-
     const formData = new FormData();
     formData.append("path", path);
     formData.append("foldername", foldername);
 
     const headers = {
-      ...options.headers,
       ...formData.getHeaders(),
-      "Content-Length": formData.getLengthSync(),
+      "Content-Length": formData.getLengthSync().toString(),
     };
 
-    const response = await this.httpClient.post(url, formData, {
-      headers,
-    });
-
-    return response?.data;
+    return await this.createClient(login, (o) => o.withHeaders(headers)).post(this.apiFilesLocal, formData);
   }
 
   async moveFileOrFolder(login: LoginDto, path: string, destination: string) {
-    const { url, options } = this.prepareRequest(login, this.apiFile(path));
     const command = this.moveFileCommand(destination);
-    const response = await this.httpClient.post(url, command, options);
-    return response?.data;
+    return await this.createClient(login).post(this.apiFile(path), command);
   }
 
   async postSelectPrintFile(login: LoginDto, path: string, print: boolean) {
-    const { url, options } = this.prepareRequest(login, this.apiFile(path));
     const command = this.selectCommand(print);
-    await this.httpClient.post<void>(url, command, options);
+    await this.createClient(login).post(this.apiFile(path), command);
   }
 
   async uploadFileAsMultiPart(login: LoginDto, multerFileOrBuffer: Buffer | Express.Multer.File, commands: any, token: string) {
-    const { url, options } = this.prepareRequest(login, this.apiFilesLocal, null, multiPartContentType);
+    const urlPath = this.apiFilesLocal;
 
     const formData = new FormData();
     if (commands.select) {
@@ -287,23 +248,19 @@ export class OctoprintClient extends OctoprintRoutes {
     });
 
     try {
-      const headers = {
-        ...options.headers,
-        ...formData.getHeaders(),
-        "Content-Length": result,
-      };
-
-      const response = await axios({
-        method: "POST",
-        url,
-        data: formData,
-        headers,
-        onUploadProgress: (p) => {
-          if (token) {
-            this.eventEmitter2.emit(`${uploadProgressEvent(token)}`, token, p);
-          }
-        },
-      });
+      const response = await this.createClient(login, (builder) =>
+        builder
+          .withMultiPartFormData()
+          .withHeaders({
+            ...formData.getHeaders(),
+            "Content-Length": result.toString(),
+          })
+          .withOnUploadProgress((p) => {
+            if (token) {
+              this.eventEmitter2.emit(`${uploadProgressEvent(token)}`, token, p);
+            }
+          })
+      ).post(urlPath, formData);
 
       // Cleanup if file exists on disk
       // if (isPhysicalFile) {
@@ -341,65 +298,48 @@ export class OctoprintClient extends OctoprintRoutes {
   // }
 
   async deleteFileOrFolder(login: LoginDto, path: string) {
-    const { url, options } = this.prepareRequest(login, this.apiFile(path));
-    const response = await this.httpClient.delete(url, options);
-    return response?.data;
+    await this.createClient(login).delete(this.apiFile(path));
   }
 
   async getPrinterCurrent(login: LoginDto, history: boolean, limit?: number, exclude?: ("temperature" | "sd" | "state")[]) {
     const pathUrl = this.apiPrinterCurrent(history, limit, exclude);
-    const { url, options } = this.prepareRequest(login, pathUrl);
-    return await this.httpClient.get<CurrentPrinterStateDto>(url, options);
+    return await this.createClient(login).get<CurrentPrinterStateDto>(pathUrl);
   }
 
   async getConnection(login: LoginDto) {
-    const { url, options } = this.prepareRequest(login, this.apiConnection);
-    const response = await this.httpClient.get(url, options);
-    return response?.data as ConnectionDto;
+    return await this.createClient(login).get<ConnectionDto>(this.apiConnection);
   }
 
   async getPrinterProfiles(login: LoginDto) {
-    const { url, options } = this.prepareRequest(login, this.apiPrinterProfiles);
-    const response = await this.httpClient.get(url, options);
-    return response?.data;
+    return await this.createClient(login).get(this.apiPrinterProfiles);
   }
 
   /**
    * Based on https://github.com/OctoPrint/OctoPrint/blob/f430257d7072a83692fc2392c683ed8c97ae47b6/src/octoprint/plugins/softwareupdate/__init__.py#L1265
    */
   async postSoftwareUpdate(login: LoginDto, targets: string[]) {
-    const { url, options } = this.prepareJsonRequest(login, this.pluginSoftwareUpdateUpdate, {
+    return await this.createClient(login).post(this.pluginSoftwareUpdateUpdate, {
       targets,
     });
-
-    const response = await this.httpClient.post(url, {}, options);
-    return response?.data;
   }
 
   async getPluginManagerPlugins(login: LoginDto) {
-    const { url, options } = this.prepareRequest(login, this.pluginManagerPlugins);
-
-    const response = await this.httpClient.get(url, options);
-    return response?.data;
+    return await this.createClient(login).get(this.pluginManagerPlugins);
   }
 
   async getPluginManagerPlugin(login: LoginDto, pluginName: string) {
-    const { url, options } = this.prepareRequest(login, this.pluginManagerPlugin(pluginName));
-
-    const response = await this.httpClient.get(url, options);
-    return response?.data;
+    const urlPath = this.pluginManagerPlugin(pluginName);
+    return await this.createClient(login).get(urlPath);
   }
 
   async postApiPluginManagerCommand(login: LoginDto, pluginCommand: string, pluginUrl: string) {
-    const { url, options } = this.prepareRequest(login, this.apiPluginManager);
     const command = this.pluginManagerCommand(pluginCommand, pluginUrl);
 
-    const response = await this.httpClient.post(url, command, options);
-    return response?.data;
+    return await this.createClient(login).post(this.apiPluginManager, command);
   }
 
   async postPluginFirmwareUpdateFlash(currentPrinterId: IdType, login: LoginDto, firmwarePath: string) {
-    const { url, options } = this.prepareRequest(login, this.pluginFirmwareUpdaterFlash, null, multiPartContentType);
+    const urlPath = this.pluginFirmwareUpdaterFlash;
 
     const formData = new FormData();
     formData.append("port", "/dev/op2");
@@ -409,24 +349,22 @@ export class OctoprintClient extends OctoprintRoutes {
     formData.append("file", fileReadStream, { filename });
 
     try {
-      const headers = {
-        ...options.headers,
-        ...formData.getHeaders(),
-      };
-
-      const response = await this.httpClient.post(url, {
-        body: formData,
-        headers,
-        uploadProgress: (p: any) => {
-          if (currentPrinterId) {
-            this.eventEmitter2.emit(`${firmwareFlashUploadEvent(currentPrinterId)}`, currentPrinterId, p);
-          }
-        },
-      });
+      const response = await this.createClient(login, (builder) =>
+        builder
+          .withMultiPartFormData()
+          .withHeaders({
+            ...formData.getHeaders(),
+          })
+          .withOnUploadProgress((p: any) => {
+            if (currentPrinterId) {
+              this.eventEmitter2.emit(`${firmwareFlashUploadEvent(currentPrinterId)}`, currentPrinterId, p);
+            }
+          })
+      ).post(urlPath, formData);
 
       return response?.data;
     } catch (e: any) {
-      this.eventEmitter2.emit(`${uploadProgressEvent(currentPrinterId)}`, currentPrinterId, { failed: true }, e);
+      this.eventEmitter2.emit(`${uploadProgressEvent(currentPrinterId.toString())}`, currentPrinterId, { failed: true }, e);
       let data;
       try {
         data = JSON.parse(e.response?.body);
@@ -447,103 +385,70 @@ export class OctoprintClient extends OctoprintRoutes {
   }
 
   async getPluginFirmwareUpdateStatus(login: LoginDto) {
-    const { url, options } = this.prepareRequest(login, this.pluginFirmwareUpdaterStatus);
-
-    const response = await this.httpClient.get(url, options);
-    return response?.data;
+    return await this.createClient(login).get(this.pluginFirmwareUpdaterStatus);
   }
 
   /**
    * Does not require printer login, much faster, requires internet connectivity
    */
   async fetchOctoPrintPlugins() {
-    const { url, options } = this.prepareAnonymousRequest(pluginRepositoryUrl);
-
-    const response = await this.httpClient.get(url, options);
-    return response?.data;
+    return await this.createAnonymousClient(pluginRepositoryUrl).get<OP_PluginDto[]>("");
   }
 
   async getSystemInfo(login: LoginDto) {
-    const { url, options } = this.prepareRequest(login, this.apiSystemInfo);
-    const response = await this.httpClient.get(url, options);
-    return response?.data;
+    return await this.createClient(login).get(this.apiSystemInfo);
   }
 
   async getSystemCommands(login: LoginDto) {
-    const { url, options } = this.prepareRequest(login, this.apiSystemCommands);
-    const response = await this.httpClient.get(url, options);
-    return response?.data;
+    return await this.createClient(login).get(this.apiSystemCommands);
   }
 
   async postServerRestartCommand(login: LoginDto) {
-    const { url, options } = this.prepareRequest(login, this.apiServerRestartCommand);
-    const response = await this.httpClient.post(url, {}, options);
-    return response?.data;
+    await this.createClient(login).post(this.apiServerRestartCommand);
   }
 
   async getSoftwareUpdateCheck(login: LoginDto, force: boolean) {
-    const { url, options } = this.prepareRequest(login, this.apiSoftwareUpdateCheck(force));
-    const response = await this.httpClient.get(url, options);
-    return response?.data;
+    return await this.createClient(login).get(this.apiSoftwareUpdateCheck(force));
   }
 
   async getPluginPiSupport(login: LoginDto) {
-    const { url, options } = this.prepareRequest(login, this.apiPluginPiSupport);
-    const response = await this.httpClient.get(url, options);
-    return response?.data;
+    return await this.createClient(login).get(this.apiPluginPiSupport);
   }
 
   async deleteTimeLapse(login: LoginDto, fileName: string) {
-    const path = `${this.apiTimelapse}/${fileName}`;
-    const { url, options } = this.prepareRequest(login, path);
-    const response = await this.httpClient.delete(url, options);
-    return response?.data;
+    const urlPath = `${this.apiTimelapse}/${fileName}`;
+
+    await this.createClient(login).delete(urlPath);
   }
 
   async listUnrenderedTimeLapses(login: LoginDto) {
-    const path = `${this.apiTimelapse}?unrendered=true`;
-    const { url, options } = this.prepareRequest(login, path);
-    const response = await this.httpClient.get(url, options);
-    return response?.data;
+    const urlPath = `${this.apiTimelapse}?unrendered=true`;
+    return await this.createClient(login).get(urlPath);
   }
 
   async listProfiles(login: LoginDto) {
-    const { url, options } = this.prepareRequest(login, this.apiProfiles);
-    const response = await this.httpClient.get(url, options);
-    return response?.data;
+    return await this.createClient(login).get(this.apiProfiles);
   }
 
   async getBackupOverview(login: LoginDto) {
-    const { url, options } = this.prepareRequest(login, this.pluginBackupIndex);
-    const response = await this.httpClient.get(url, options);
-    return response?.data;
+    return await this.createClient(login).get(this.pluginBackupIndex);
   }
 
   async getBackups(login: LoginDto) {
-    const { url, options } = this.prepareRequest(login, this.pluginBackupEndpoint);
-    const response = await this.httpClient.get(url, options);
-    return response?.data;
+    return await this.createClient(login).get(this.pluginBackupEndpoint);
   }
 
   async createBackup(login: LoginDto, excludeArray: string[]) {
-    const { url, options } = this.prepareRequest(login, this.pluginBackupEndpoint);
-    const response = await this.httpClient.post(
-      url,
-      {
-        exclude: excludeArray,
-      },
-      options
-    );
-    return response?.data;
+    return await this.createClient(login).post(this.pluginBackupEndpoint, {
+      exclude: excludeArray,
+    });
   }
 
   async getDownloadBackupStream(login: LoginDto, filename: string) {
-    const { url, options } = this.prepareRequest(login, this.pluginBackupFileDownload(filename));
-    const response = await this.httpClient
-      .get(url, {
-        responseType: "stream",
-        ...options,
-      })
+    const response = await this.createClient(login, (builder) => {
+      builder.withStreamResponse();
+    })
+      .get(this.pluginBackupFileDownload(filename))
       .catch((e) => {
         throw new ExternalServiceError(
           {
@@ -555,21 +460,19 @@ export class OctoprintClient extends OctoprintRoutes {
           "OctoPrint"
         );
       });
-    return response.data;
+    return response?.data;
   }
 
   async forwardRestoreBackupFileStream(login: LoginDto, buffer: Buffer) {
-    const { url, options } = this.prepareRequest(login, this.pluginBackupFileRestore, null, multiPartContentType);
     const formData = new FormData();
     formData.append("file", buffer, { filename: "op-fdmm-restore.zip" });
-    const response = await this.httpClient
-      .post(url, formData, {
-        headers: {
-          ...options.headers,
-          ...formData.getHeaders(),
-          // "Content-Type": "application/octet-stream",
-        },
+
+    const response = await this.createClient(login, (builder) =>
+      builder.withMultiPartFormData().withHeaders({
+        ...formData.getHeaders(),
       })
+    )
+      .post(this.pluginBackupFileRestore, formData)
       .catch((e) => {
         throw new ExternalServiceError(
           {
@@ -585,8 +488,27 @@ export class OctoprintClient extends OctoprintRoutes {
   }
 
   async deleteBackup(login: LoginDto, filename: string) {
-    const { url, options } = this.prepareRequest(login, this.pluginBackupFile(filename));
-    const response = await this.httpClient.delete(url, options);
-    return response?.data;
+    return await this.createClient(login).delete(this.pluginBackupFile(filename));
+  }
+
+  private createClient(login: LoginDto, buildFluentOptions?: (base: OctoprintHttpClientBuilder) => void) {
+    const baseAddress = login.printerURL;
+
+    return this.createAnonymousClient(baseAddress, (o) => {
+      if (buildFluentOptions) {
+        buildFluentOptions(o);
+      }
+      o.withXApiKeyHeader(login.apiKey);
+    });
+  }
+
+  private createAnonymousClient(baseAddress: string, buildFluentOptions?: (base: OctoprintHttpClientBuilder) => void) {
+    const builder = new OctoprintHttpClientBuilder();
+
+    return this.httpClientFactory.createClientWithBaseUrl(builder, baseAddress, (b) => {
+      if (buildFluentOptions) {
+        buildFluentOptions(b);
+      }
+    });
   }
 }

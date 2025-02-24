@@ -75,7 +75,7 @@ export class LogDumpService {
     this.logger.log("Dumping logs as ZIP");
     const zip = new AdmZip();
     const path = join(superRootPath(), AppConstants.defaultLogsFolder);
-    zip.addLocalFolder(path, "/logs", "*.log");
+    zip.addLocalFolder(path, "/logs", (filename) => filename.endsWith(".log"));
 
     const outputPath = join(superRootPath(), AppConstants.defaultLogZipsFolder, `logs-${AppConstants.serverRepoName}.zip`);
     zip.writeZip(outputPath);

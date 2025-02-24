@@ -12,3 +12,7 @@ export class PrinterUnsafeDto<KeyType> extends PrinterDto<KeyType> {
   printerURL: string;
   printerType: number;
 }
+
+export class PrinterUnsafeWithCorrelationDto<KeyType> extends PrinterUnsafeDto<KeyType> {
+  correlationToken: string;
+}
