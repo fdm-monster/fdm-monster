@@ -72,12 +72,12 @@ export class PluginBaseService {
     return this.findPluginInList(response.data.plugins);
   }
 
-  private findPluginInList(pluginList) {
+  private findPluginInList(pluginList: any[]) {
     return pluginList.find((p) => p.key.toLowerCase() === this.pluginName.toLowerCase());
   }
 
   async updatePlugin(login: LoginDto) {
-    return await this.octoprintClient.postSoftwareUpdate(login, [this.pluginName], this.pluginUrl);
+    return await this.octoprintClient.postSoftwareUpdate(login, [this.pluginName]);
   }
 
   async installPlugin(login: LoginDto, restartAfter = false) {
@@ -118,7 +118,7 @@ export class PluginBaseService {
 
   async cleanupAllPlugins(login: LoginDto, restartAfter = false) {
     const command = pluginManagerCommands.cleanup_all.name;
-    await this.octoprintClient.postApiPluginManagerCommand(login, command);
+    await this.octoprintClient.postApiPluginManagerCommand(login, command, this.pluginUrl);
 
     await this.#conditionalRestartCommand(login, restartAfter);
   }
