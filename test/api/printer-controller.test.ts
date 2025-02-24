@@ -1,5 +1,5 @@
 import { setupTestApp } from "../test-server";
-import { expectInvalidResponse, expectNotFoundResponse, expectOkResponse } from "../extensions";
+import { expectBadRequestError, expectInvalidResponse, expectNotFoundResponse, expectOkResponse } from "../extensions";
 import { AppConstants } from "@/server.constants";
 import { createTestPrinter, testApiKey } from "./test-data/create-printer";
 import { Test } from "supertest";
@@ -27,6 +27,8 @@ const flowRateRoute = (id: IdType) => `${updateRoute(id)}/flow-rate`;
 const printerPluginListRoute = (id: IdType) => `${getRoute(id)}/plugin-list`;
 const printerOctoprintBackupIndex = (id: IdType) => `${getRoute(id)}/octoprint/backup`;
 const printerOctoprintBackupList = (id: IdType) => `${getRoute(id)}/octoprint/backup/list`;
+const printerOctoprintBackupRestore = (id: IdType) => `${getRoute(id)}/octoprint/backup/restore`;
+const printerOctoprintBackupDelete = (id: IdType) => `${getRoute(id)}/octoprint/backup/delete`;
 const printerOctoprintBackupDownload = (id: IdType) => `${getRoute(id)}/octoprint/backup/download`;
 const restartOctoPrintRoute = (id: IdType) => `${getRoute(id)}/octoprint/server/restart`;
 const serialConnectCommandRoute = (id: IdType) => `${getRoute(id)}/serial-connect`;
@@ -325,5 +327,21 @@ describe(PrinterController.name, () => {
       fileName: "123.abc",
     });
     expectOkResponse(res);
+  });
+
+  it("should return 400 when backup has not been uploaded for restore", async () => {
+    const printer = await createTestPrinter(request);
+    nock(printer.printerURL).post("/plugin/backup/restore").reply(200, []);
+    const res = await request.post(printerOctoprintBackupRestore(printer.id)).send();
+    expectBadRequestError(res);
+  });
+
+  it("should delete backup", async () => {
+    const printer = await createTestPrinter(request);
+    nock(printer.printerURL).delete("/plugin/backup/delete/123.abc").reply(200, []);
+    const res = await request.delete(printerOctoprintBackupDelete(printer.id)).send({
+      filename: "123.abc",
+    });
+    expectBadRequestError(res);
   });
 });

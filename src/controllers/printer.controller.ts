@@ -30,7 +30,7 @@ import { IPrinterService } from "@/services/interfaces/printer.service.interface
 import { LoginDto } from "@/services/interfaces/login.dto";
 import { AxiosError } from "axios";
 import { FailedDependencyException } from "@/exceptions/failed-dependency.exception";
-import { InternalServerException } from "@/exceptions/runtime.exceptions";
+import { BadRequestException, InternalServerException } from "@/exceptions/runtime.exceptions";
 import { MoonrakerClient } from "@/services/moonraker/moonraker.client";
 import { IPrinterApi } from "@/services/printer-api.interface";
 import { OctoprintClient } from "@/services/octoprint/octoprint.client";
@@ -424,6 +424,9 @@ export class PrinterController {
   async restoreOctoPrintBackup(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
     const files = await this.multerService.multerLoadFileAsync(req, res, null, false);
+    if (!files?.length) {
+      throw new BadRequestException("No files uploaded.");
+    }
     const response = await this.octoprintClient.forwardRestoreBackupFileStream(printerLogin, files[0].buffer);
     res.send(response.data);
   }
