@@ -433,6 +433,6 @@ export class PrinterController {
     const { printerLogin } = getScopedPrinter(req);
     const { fileName } = await validateMiddleware(req, getOctoPrintBackupRules);
     const response = await this.octoprintClient.deleteBackup(printerLogin, fileName);
-    res.send(response);
+    res.send(response.data);
   }
 }

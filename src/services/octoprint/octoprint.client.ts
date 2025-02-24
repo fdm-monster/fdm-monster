@@ -404,7 +404,7 @@ export class OctoprintClient extends OctoprintRoutes {
   }
 
   async postServerRestartCommand(login: LoginDto) {
-    return await this.createClient(login).post(this.apiServerRestartCommand);
+    await this.createClient(login).post(this.apiServerRestartCommand);
   }
 
   async getSoftwareUpdateCheck(login: LoginDto, force: boolean) {
@@ -418,7 +418,7 @@ export class OctoprintClient extends OctoprintRoutes {
   async deleteTimeLapse(login: LoginDto, fileName: string) {
     const urlPath = `${this.apiTimelapse}/${fileName}`;
 
-    return await this.createClient(login).delete(urlPath);
+    await this.createClient(login).delete(urlPath);
   }
 
   async listUnrenderedTimeLapses(login: LoginDto) {

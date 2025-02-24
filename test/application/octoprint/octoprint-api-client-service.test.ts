@@ -251,7 +251,7 @@ describe(OctoprintClient.name, () => {
   it("should not throw error on deleteTimeLapse", async () => {
     nock(printerURL).delete("/api/timelapse/deletedFile").reply(200, {});
     const result = await octoprintClient.deleteTimeLapse(auth, "deletedFile");
-    expect(result.data).toBeTruthy();
+    expect(result).toBeUndefined();
   });
 
   it("should not throw error on listUnrenderedTimeLapses", async () => {
