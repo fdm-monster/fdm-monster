@@ -1,4 +1,4 @@
-### GET request to OctoPrint plugins
+### GET request to OctoPrint version
 
 GET http://{{env-op}}/api/version
     ?history=false
