@@ -8,6 +8,7 @@
 **/.cache
 coverage
 
+
 # NPM publish
 *.tgz
 
@@ -17,19 +18,10 @@ coverage
 **/media
 **/nodemon_restart_trigger.js
 
-**/yarn-error.log
-
-installations/other/octoprint-virtual/default1.9.0/op1.9.0-backup/
-installations/other/octoprint-virtual/default1.9.0/octoprint/octoprint/
-installations/other/octofarm/OctoFarm
-installations/other/octofarm/mongodb-data
 **/*.sqlite
-
 *.sqlite-wal
-
 *.sqlite-shm
-
-installations/ansible/inventory.cfg
+*.sqlite-journal
 
 .pnp.*
 .yarn/*
@@ -39,7 +31,6 @@ installations/ansible/inventory.cfg
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+**/yarn-error.log
 
-requests/http-client.private.env.json
-
-*.sqlite-journal
+test/requests/*.env.json
