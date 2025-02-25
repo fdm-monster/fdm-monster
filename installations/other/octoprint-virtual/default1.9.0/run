@@ -1,7 +1,0 @@
-#!/usr/bin/with-contenv sh
-
-cp -r /octoprint-seed/octoprint/ /octoprint/
-cp -r /octoprint-seed/plugins/ /octoprint/
-rm -rf /octoprint-seed
-
-exec octoprint serve --iknowwhatimdoing --host 0.0.0.0 --port 5000 --basedir /octoprint/octoprint

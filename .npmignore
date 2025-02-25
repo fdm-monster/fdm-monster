@@ -27,7 +27,6 @@ npm-debug.log
 renovate.json
 jest.config.js
 docker-compose.yml
-GitReleaseManager.yaml
 
 # Custom
 *.ps1
@@ -35,7 +34,6 @@ coverage
 docker
 src
 fdm-monster
-installations
 media
 src/**/*
 test/**/*
