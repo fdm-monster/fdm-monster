@@ -32,6 +32,7 @@ export class DefaultHttpClientBuilder implements IHttpClientBuilder {
       maxBodyLength: this.axiosOptions.maxBodyLength ?? 1000 * 1000 * 1000, // 1GB,
       maxContentLength: this.axiosOptions.maxContentLength ?? 1000 * 1000 * 1000, // 1GB
       responseType: this.axiosOptions.responseType,
+      onUploadProgress: this.axiosOptions.onUploadProgress,
     };
 
     return axios.create(axiosConfig);
