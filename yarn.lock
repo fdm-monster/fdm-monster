@@ -1053,7 +1053,7 @@ __metadata:
     adm-zip: "npm:0.5.16"
     awilix: "npm:12.0.4"
     awilix-express: "npm:9.0.2"
-    axios: "npm:1.8.0"
+    axios: "npm:1.8.1"
     bcryptjs: "npm:3.0.2"
     better-sqlite3: "npm:11.8.1"
     cache-manager: "npm:6.4.0"
@@ -4390,14 +4390,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:1.8.0":
-  version: 1.8.0
-  resolution: "axios@npm:1.8.0"
+"axios@npm:1.8.1":
+  version: 1.8.1
+  resolution: "axios@npm:1.8.1"
   dependencies:
     follow-redirects: "npm:^1.15.6"
     form-data: "npm:^4.0.0"
     proxy-from-env: "npm:^1.1.0"
-  checksum: 10c0/e015663526ab4bd1aba1bc4a37750ca815cc2eb911401797ab9e5d3d13f66c482dcd95dcbb28e832f01e926c64ffa40ae5c2e86ce817fda7eb570f245b2524dd
+  checksum: 10c0/b2e1d5a61264502deee4b50f0a6df0aa3b174c546ccf68c0dff714a2b8863232e0bd8cb5b84f853303e97f242a98260f9bb9beabeafe451ad5af538e9eb7ac22
   languageName: node
   linkType: hard
 
