@@ -1483,7 +1483,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@keyv/serialize@npm:^1.0.2":
+"@keyv/serialize@npm:^1.0.3":
   version: 1.0.3
   resolution: "@keyv/serialize@npm:1.0.3"
   dependencies:
@@ -3612,16 +3612,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:>=10.0.0":
-  version: 22.13.5
-  resolution: "@types/node@npm:22.13.5"
-  dependencies:
-    undici-types: "npm:~6.20.0"
-  checksum: 10c0/a2e7ed7bb0690e439004779baedeb05159c5cc41ef6d81c7a6ebea5303fde4033669e1c0e41ff7453b45fd2fea8dbd55fddfcd052950c7fcae3167c970bca725
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:22.13.8":
+"@types/node@npm:*, @types/node@npm:22.13.8, @types/node@npm:>=10.0.0":
   version: 22.13.8
   resolution: "@types/node@npm:22.13.8"
   dependencies:
@@ -5513,9 +5504,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.5.73":
-  version: 1.5.108
-  resolution: "electron-to-chromium@npm:1.5.108"
-  checksum: 10c0/b8b2d4ee865dcaaeb6df833e4c541921d7b666371c482e6ed8f9ff97c00a5a38113722a2255e09354a2a9983ff2e7b9374b5bdefd206c4b533647e732b51ff46
+  version: 1.5.109
+  resolution: "electron-to-chromium@npm:1.5.109"
+  checksum: 10c0/19d86b95b1288b2e73d9d6084f64b14d4ef2c51d8551d85697ea68da690542d26e6d07878ff053f137e561e3e6c8c2b062d0353bc159930569831f7960bb6ed7
   languageName: node
   linkType: hard
 
@@ -7008,7 +6999,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"import-in-the-middle@npm:^1.13.0":
+"import-in-the-middle@npm:^1.13.0, import-in-the-middle@npm:^1.8.1":
   version: 1.13.1
   resolution: "import-in-the-middle@npm:1.13.1"
   dependencies:
@@ -7017,18 +7008,6 @@ __metadata:
     cjs-module-lexer: "npm:^1.2.2"
     module-details-from-path: "npm:^1.0.3"
   checksum: 10c0/4ef05a924c37ff718dd08654927c90d470d92fd9425d646b0d423aaddc89655848debd14761bcb6efa4f57870d63ff38109bab31ca8a1d9d5df2e7d84d2649cf
-  languageName: node
-  linkType: hard
-
-"import-in-the-middle@npm:^1.8.1":
-  version: 1.13.0
-  resolution: "import-in-the-middle@npm:1.13.0"
-  dependencies:
-    acorn: "npm:^8.14.0"
-    acorn-import-attributes: "npm:^1.9.5"
-    cjs-module-lexer: "npm:^1.2.2"
-    module-details-from-path: "npm:^1.0.3"
-  checksum: 10c0/f84146bf5eabf5a9cf2269a65413487be26ba21cb3cd33ffb8e59e0f94d775a624a4d2c77ef3dc06f89f7ce5265c3ec2e93546a73b70ce9aac6a6932be6e0aba
   languageName: node
   linkType: hard
 
@@ -8122,11 +8101,11 @@ __metadata:
   linkType: hard
 
 "keyv@npm:^5.2.3":
-  version: 5.2.3
-  resolution: "keyv@npm:5.2.3"
+  version: 5.3.0
+  resolution: "keyv@npm:5.3.0"
   dependencies:
-    "@keyv/serialize": "npm:^1.0.2"
-  checksum: 10c0/76b87dd2c21a4c1c5c05e9ff3b85670beab98f153429aaa9aee544b72b65411a7d80d96c29f3fef3e9dcebb672c8268e7209d6f80beb5da939b4e019722948b4
+    "@keyv/serialize": "npm:^1.0.3"
+  checksum: 10c0/1f6f20fbdf4227d641dc4b55741986c0f370e1382d5a66deb905fa291c1c4052cfd3a9db9abda7587f35836d33f97ad5eaff87d68c78ca149e589726221aa848
   languageName: node
   linkType: hard
 
@@ -8744,14 +8723,14 @@ __metadata:
   linkType: hard
 
 "mongodb@npm:^6.1.0, mongodb@npm:^6.9.0":
-  version: 6.13.1
-  resolution: "mongodb@npm:6.13.1"
+  version: 6.14.0
+  resolution: "mongodb@npm:6.14.0"
   dependencies:
     "@mongodb-js/saslprep": "npm:^1.1.9"
     bson: "npm:^6.10.3"
     mongodb-connection-string-url: "npm:^3.0.0"
   peerDependencies:
-    "@aws-sdk/credential-providers": ^3.632.0
+    "@aws-sdk/credential-providers": ^3.188.0
     "@mongodb-js/zstd": ^1.1.0 || ^2.0.0
     gcp-metadata: ^5.2.0
     kerberos: ^2.0.1
@@ -8773,7 +8752,7 @@ __metadata:
       optional: true
     socks:
       optional: true
-  checksum: 10c0/319a8f76ebee3f79d8af0218dca46e79ad7fbd2e6e11d80b902f3efd8d2bf9ee1c85f445bad45d7a2b40aff98ac7e2f3f899b9408c773579b6e91df6e283783f
+  checksum: 10c0/92e43fa625f3f83a2352b273e8a84ba1648499a87bab6cc83d483031c076aee1ecdfc0cfdc8b6f83fba4616f24d3e718c1f35a076700bd2a05bcdace408cf89a
   languageName: node
   linkType: hard
 
