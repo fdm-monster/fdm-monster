@@ -8163,11 +8163,11 @@ __metadata:
   linkType: hard
 
 "keyv@npm:^5.2.3":
-  version: 5.3.0
-  resolution: "keyv@npm:5.3.0"
+  version: 5.3.1
+  resolution: "keyv@npm:5.3.1"
   dependencies:
     "@keyv/serialize": "npm:^1.0.3"
-  checksum: 10c0/1f6f20fbdf4227d641dc4b55741986c0f370e1382d5a66deb905fa291c1c4052cfd3a9db9abda7587f35836d33f97ad5eaff87d68c78ca149e589726221aa848
+  checksum: 10c0/d5ffe3d2d547a50a5e1189d5acbc0480821c22c025082851a8eeb26667d789f3f7b7ee7beb933660d98c239f7e7c403c652a511693670a78a73f06cd411e04fa
   languageName: node
   linkType: hard
 
