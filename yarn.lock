@@ -1056,7 +1056,7 @@ __metadata:
     axios: "npm:1.8.1"
     bcryptjs: "npm:3.0.2"
     better-sqlite3: "npm:11.8.1"
-    cache-manager: "npm:6.4.0"
+    cache-manager: "npm:6.4.1"
     chokidar: "npm:4.0.3"
     class-validator: "npm:0.14.1"
     connect-history-api-fallback: "npm:2.0.0"
@@ -4778,12 +4778,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cache-manager@npm:*, cache-manager@npm:6.4.0":
+"cache-manager@npm:*":
   version: 6.4.0
   resolution: "cache-manager@npm:6.4.0"
   dependencies:
     keyv: "npm:^5.2.3"
   checksum: 10c0/e0029fe7624b477bc85c48ec0bae6aed66222281e4c44f6b198127140611726e77a32b41e8526824deb9763586a0758e69b185b8b9a8eb484cff27698eae77b8
+  languageName: node
+  linkType: hard
+
+"cache-manager@npm:6.4.1":
+  version: 6.4.1
+  resolution: "cache-manager@npm:6.4.1"
+  dependencies:
+    keyv: "npm:^5.3.1"
+  checksum: 10c0/abed9b208ae466117b6cd5b943b68701da0d3894b13500e6579473f501158840d42d20334ece3bd2e692755ad0fb98897b203e92d6f73046b346d48ce077d223
   languageName: node
   linkType: hard
 
@@ -8137,7 +8146,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"keyv@npm:^5.2.3":
+"keyv@npm:^5.2.3, keyv@npm:^5.3.1":
   version: 5.3.1
   resolution: "keyv@npm:5.3.1"
   dependencies:
