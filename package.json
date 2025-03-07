@@ -122,7 +122,7 @@
     "@types/uuid": "10.0.0",
     "@types/ws": "8.18.0",
     "chokidar": "4.0.3",
-    "eslint": "9.21.0",
+    "eslint": "9.22.0",
     "eslint-config-airbnb-base": "15.0.0",
     "eslint-config-prettier": "10.1.1",
     "eslint-config-standard": "17.1.0",
