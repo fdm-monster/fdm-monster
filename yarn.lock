@@ -1066,7 +1066,7 @@ __metadata:
     dotenv: "npm:16.4.7"
     eslint: "npm:9.21.0"
     eslint-config-airbnb-base: "npm:15.0.0"
-    eslint-config-prettier: "npm:10.1.0"
+    eslint-config-prettier: "npm:10.1.1"
     eslint-config-standard: "npm:17.1.0"
     eslint-plugin-import: "npm:2.31.0"
     eslint-plugin-n: "npm:17.16.2"
@@ -5768,14 +5768,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-config-prettier@npm:10.1.0":
-  version: 10.1.0
-  resolution: "eslint-config-prettier@npm:10.1.0"
+"eslint-config-prettier@npm:10.1.1":
+  version: 10.1.1
+  resolution: "eslint-config-prettier@npm:10.1.1"
   peerDependencies:
     eslint: ">=7.0.0"
   bin:
     eslint-config-prettier: bin/cli.js
-  checksum: 10c0/1324357287a9ac2ea5601db57eeb4a23a905d5f868182f9f202b5b96450f1309ca83938e07afb7b97ea2c95a414cdc99d03a5512a3102a7cee9913970eb6ba98
+  checksum: 10c0/3dbfdf6495dd62e2e1644ea9e8e978100dabcd8740fd264df1222d130001a1e8de05d6ed6c67d3a60727386a07507f067d1ca79af6d546910414beab19e7966e
   languageName: node
   linkType: hard
 
