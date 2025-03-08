@@ -1,46 +1,48 @@
 import { generateCorrelationToken } from "@/utils/correlation-token.util";
-import { uploadProgressEvent } from "@/constants/event.constants";
+import { uploadDoneEvent, uploadFailedEvent, uploadProgressEvent } from "@/constants/event.constants";
 import EventEmitter2 from "eventemitter2";
 import { LoggerService } from "@/handlers/logger";
 import { AxiosProgressEvent } from "axios";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 
+interface TrackedUpload {
+  correlationToken: string;
+  startedAt: number;
+  multerFile: {
+    originalname: string;
+    [k: string]: any;
+  };
+  progress: {
+    percent: number;
+    [k: string]: number;
+  };
+  succeededAt?: number;
+  failedAt?: number;
+  reason?: string;
+  complete: boolean;
+}
+
 /**
  * A generic cache for file upload progress
  */
 export class FileUploadTrackerCache {
-  private currentUploads = [];
-  private uploadsDone = [];
-  private uploadsFailed = [];
+  private currentUploads: TrackedUpload[] = [];
   private eventEmitter2: EventEmitter2;
   private logger: LoggerService;
 
   constructor({ loggerFactory, eventEmitter2 }: { loggerFactory: ILoggerFactory; eventEmitter2: EventEmitter2 }) {
     this.eventEmitter2 = eventEmitter2;
     this.logger = loggerFactory(FileUploadTrackerCache.name);
+
+    this.eventEmitter2.on(uploadProgressEvent("*"), (token, progress) => this.handleUploadProgress(token, progress));
+    this.eventEmitter2.on(uploadDoneEvent("*"), (token: string) => this.handleUploadDone(token));
+    this.eventEmitter2.on(uploadFailedEvent("*"), (token: string, reason?: string) => this.handleUploadFailed(token, reason));
   }
 
-  progressCallback = (token: string, p: AxiosProgressEvent) => {
-    // Ensure binding of this is correct
-    this.updateUploadProgress(token, p);
-  };
-
-  getUploads(filterHourOld = false) {
-    const currentTime = Date.now();
-
-    const done = this.uploadsDone.filter((d) => currentTime - d.startedAt < 60 * 60 * 1000);
-    const failed = this.uploadsFailed.filter((d) => currentTime - d.startedAt < 60 * 60 * 1000);
-    return filterHourOld
-      ? {
-          current: this.currentUploads,
-          done,
-          failed,
-        }
-      : {
-          current: this.currentUploads,
-          done: this.uploadsDone,
-          failed: this.uploadsFailed,
-        };
+  getUploads() {
+    return {
+      current: this.currentUploads,
+    };
   }
 
   getUpload(correlationToken: string) {
@@ -51,30 +53,33 @@ export class FileUploadTrackerCache {
     const correlationToken = generateCorrelationToken();
     this.logger.log(`Starting upload session with token ${correlationToken}`);
 
-    this.eventEmitter2.on(uploadProgressEvent(correlationToken), this.progressCallback);
-
     this.currentUploads.push({
       correlationToken,
       startedAt: Date.now(),
       multerFile,
-      progress: {},
+      progress: {
+        percent: 0,
+        progress: 0,
+      },
+      complete: false,
     });
 
     return correlationToken;
   }
 
-  updateUploadProgress(token: string, progress: AxiosProgressEvent & { failed?: boolean }, reason?: string) {
-    if (progress.progress === 1) {
-      this.logger.log("Upload tracker completed");
-      this.markUploadDone(token, true);
-      this.eventEmitter2.off(uploadProgressEvent(token), this.progressCallback);
-    } else if (progress.failed) {
-      this.markUploadDone(token, false, reason);
-      this.eventEmitter2.off(uploadProgressEvent(token), this.progressCallback);
-    } else {
-      const upload = this.getUpload(token);
-      upload.progress = progress;
-    }
+  handleUploadProgress(token: string, progress: AxiosProgressEvent) {
+    const upload = this.getUpload(token);
+    upload.progress = progress;
+  }
+
+  handleUploadFailed(token: string, reason?: string) {
+    this.logger.log(`Upload tracker ${token} completed with failure`);
+    this.markUploadDone(token, false, reason);
+  }
+
+  handleUploadDone(token: string) {
+    this.logger.log(`Upload tracker ${token} completed with success`);
+    this.markUploadDone(token, true);
   }
 
   markUploadDone(token: string, success: boolean, reason?: string) {
@@ -87,13 +92,12 @@ export class FileUploadTrackerCache {
     const trackedUpload = this.currentUploads[trackedUploadIndex];
 
     if (success) {
+      trackedUpload.succeededAt = Date.now();
+      trackedUpload.complete = true;
+    } else {
       trackedUpload.failedAt = Date.now();
       trackedUpload.reason = reason;
-      this.uploadsDone.push(trackedUpload);
-    } else {
-      trackedUpload.succeededAt = Date.now();
-      this.uploadsFailed.push(trackedUpload);
+      trackedUpload.complete = true;
     }
-    this.currentUploads.splice(trackedUploadIndex, 1);
   }
 }

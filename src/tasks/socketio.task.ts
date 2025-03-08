@@ -72,7 +72,7 @@ export class SocketIoTask {
     const printers = await this.printerCache.listCachedPrinters(true);
     const socketStates = this.printerSocketStore.getSocketStatesById();
     const printerEvents = await this.printerEventsCache.getAllKeyValues();
-    const trackedUploads = this.fileUploadTrackerCache.getUploads(true);
+    const trackedUploads = this.fileUploadTrackerCache.getUploads();
 
     const socketIoData = {
       printers,

@@ -2,10 +2,10 @@ import fs, { createReadStream, ReadStream } from "fs";
 import path from "path";
 import FormData from "form-data";
 import { pluginRepositoryUrl } from "./constants/octoprint-service.constants";
-import { firmwareFlashUploadEvent, uploadProgressEvent } from "@/constants/event.constants";
+import { firmwareFlashUploadEvent, uploadDoneEvent, uploadFailedEvent, uploadProgressEvent } from "@/constants/event.constants";
 import { ExternalServiceError } from "@/exceptions/runtime.exceptions";
 import { OctoprintRoutes } from "./octoprint-api.routes";
-import { AxiosPromise } from "axios";
+import { AxiosError, AxiosPromise } from "axios";
 import EventEmitter2 from "eventemitter2";
 import { LoggerService } from "@/handlers/logger";
 import { LoginDto } from "@/services/interfaces/login.dto";
@@ -267,9 +267,11 @@ export class OctoprintClient extends OctoprintRoutes {
       //   fs.unlinkSync((fileStreamOrBuffer as Express.Multer.File).path);
       // }
 
+      this.eventEmitter2.emit(`${uploadDoneEvent(token)}`, token);
+
       return response.data;
     } catch (e: any) {
-      this.eventEmitter2.emit(`${uploadProgressEvent(token)}`, token, { failed: true }, e);
+      this.eventEmitter2.emit(`${uploadFailedEvent(token)}`, token, (e as AxiosError)?.message);
       let data;
       try {
         data = JSON.parse(e.response?.body);
