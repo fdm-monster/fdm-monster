@@ -243,7 +243,7 @@ export class OctoprintClient extends OctoprintRoutes {
     let knownFileSize = (multerFileOrBuffer as Express.Multer.File).size;
     if (!fileBuffer) {
       const filePath = (multerFileOrBuffer as Express.Multer.File).path;
-      const fileStream = createReadStream(filePath, { highWaterMark: 16 * 1024 });
+      const fileStream = createReadStream(filePath, { highWaterMark: 512 });
       knownFileSize = fs.statSync(filePath).size;
 
       const delayedStream = new Readable({

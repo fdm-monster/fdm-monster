@@ -4,23 +4,8 @@ import EventEmitter2 from "eventemitter2";
 import { LoggerService } from "@/handlers/logger";
 import { AxiosProgressEvent } from "axios";
 import { ILoggerFactory } from "@/handlers/logger-factory";
-
-interface TrackedUpload {
-  correlationToken: string;
-  startedAt: number;
-  multerFile: {
-    originalname: string;
-    [k: string]: any;
-  };
-  progress: {
-    percent: number;
-    [k: string]: number;
-  };
-  succeededAt?: number;
-  failedAt?: number;
-  reason?: string;
-  complete: boolean;
-}
+import { TrackedUpload } from "../services/interfaces/file-upload-tracker.interface";
+import { IdType } from "../shared.constants";
 
 /**
  * A generic cache for file upload progress
@@ -49,12 +34,13 @@ export class FileUploadTrackerCache {
     return this.currentUploads.find((cu) => cu.correlationToken === correlationToken);
   }
 
-  addUploadTracker(multerFile: Express.Multer.File) {
+  addUploadTracker(multerFile: Express.Multer.File, printerId: IdType) {
     const correlationToken = generateCorrelationToken();
     this.logger.log(`Starting upload session with token ${correlationToken}`);
 
     this.currentUploads.push({
       correlationToken,
+      printerId,
       startedAt: Date.now(),
       multerFile,
       progress: {

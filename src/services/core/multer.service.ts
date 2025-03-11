@@ -1,4 +1,4 @@
-import multer, { FileFilterCallback } from "multer";
+import multer, { diskStorage, FileFilterCallback, memoryStorage } from "multer";
 import { extname, join } from "path";
 import { createWriteStream, existsSync, lstatSync, mkdirSync, readdirSync, unlink } from "fs";
 import { superRootPath } from "@/utils/fs.utils";
@@ -6,7 +6,7 @@ import { AppConstants } from "@/server.constants";
 import { FileUploadTrackerCache } from "@/state/file-upload-tracker.cache";
 import { Request, Response } from "express";
 import { HttpClientFactory } from "@/services/core/http-client.factory";
-import { DefaultHttpClientBuilder } from "@/shared/default-http-client.builder";
+import { IdType } from "../../shared.constants";
 
 export class MulterService {
   fileUploadTrackerCache: FileUploadTrackerCache;
@@ -94,10 +94,10 @@ export class MulterService {
   getMulterFileFilter(fileExtensions: string[], storeAsFile = true) {
     return multer({
       storage: storeAsFile
-        ? multer.diskStorage({
+        ? diskStorage({
             destination: join(superRootPath(), AppConstants.defaultFileStorageFolder),
           })
-        : multer.memoryStorage(),
+        : memoryStorage(),
       fileFilter: this.multerFileFilter(fileExtensions),
     }).any();
   }
@@ -112,8 +112,8 @@ export class MulterService {
     };
   }
 
-  startTrackingSession(multerFile: Express.Multer.File) {
-    return this.fileUploadTrackerCache.addUploadTracker(multerFile);
+  startTrackingSession(multerFile: Express.Multer.File, printerId: IdType) {
+    return this.fileUploadTrackerCache.addUploadTracker(multerFile, printerId);
   }
 
   getSessions() {
