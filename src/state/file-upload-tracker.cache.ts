@@ -69,6 +69,9 @@ export class FileUploadTrackerCache {
 
   handleUploadProgress(token: string, progress: AxiosProgressEvent) {
     const upload = this.getUpload(token);
+    if (!upload) {
+      return;
+    }
     upload.progress = progress;
   }
 

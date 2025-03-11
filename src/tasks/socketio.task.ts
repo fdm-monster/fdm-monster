@@ -95,7 +95,7 @@ export class SocketIoTask {
     const serializedData = JSON.stringify(socketIoData);
     const transportDataSize = sizeKB(serializedData);
     this.updateAggregator(transportDataSize);
-    this.socketIoGateway.send(IO_MESSAGES.LegacyUpdate, serializedData);
+    this.socketIoGateway.send(IO_MESSAGES.LegacyUpdate, socketIoData);
   }
 
   updateAggregator(transportDataLength: number) {

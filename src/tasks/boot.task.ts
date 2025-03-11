@@ -170,8 +170,8 @@ export class BootTask {
     this.multerService.clearUploadsFolder();
     this.logger.log("Loading printer sockets");
     await this.printerSocketStore.loadPrinterSockets(); // New sockets
-    this.logger.log("Loading files store");
-    await this.printerFilesStore.loadFilesStore();
+    // this.logger.log("Loading files store");
+    // await this.printerFilesStore.loadFilesStore();
     this.logger.log("Loading floor store");
     await this.floorStore.loadStore();
     this.logger.log("Loading printer thumbnail cache");

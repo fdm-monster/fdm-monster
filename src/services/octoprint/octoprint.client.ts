@@ -1,5 +1,6 @@
 import fs, { createReadStream, ReadStream } from "fs";
 import path from "path";
+import { Readable } from "stream";
 import FormData from "form-data";
 import { pluginRepositoryUrl } from "./constants/octoprint-service.constants";
 import { firmwareFlashUploadEvent, uploadDoneEvent, uploadFailedEvent, uploadProgressEvent } from "@/constants/event.constants";
@@ -29,6 +30,11 @@ import { OctoprintFileDto } from "@/services/octoprint/dto/files/octoprint-file.
 import { OP_PluginDto } from "@/services/octoprint/dto/plugin.dto";
 
 type TAxes = "x" | "y" | "z";
+
+const AB = new Int32Array(new SharedArrayBuffer(4));
+function sleep(t: number) {
+  Atomics.wait(AB, 0, 0, Math.max(1, t | 0));
+}
 
 /**
  * OctoPrint REST API
@@ -232,12 +238,58 @@ export class OctoprintClient extends OctoprintRoutes {
       formData.append("print", "true");
     }
 
-    let source: ArrayBufferLike | ReadStream = (multerFileOrBuffer as Buffer).buffer;
-    const isPhysicalFile = !source;
-    if (isPhysicalFile) {
-      source = createReadStream((multerFileOrBuffer as Express.Multer.File).path);
+    let fileBuffer: ArrayBufferLike | ReadStream = (multerFileOrBuffer as Buffer).buffer;
+    const filename = (multerFileOrBuffer as Express.Multer.File).originalname;
+    let knownFileSize = (multerFileOrBuffer as Express.Multer.File).size;
+    if (!fileBuffer) {
+      const filePath = (multerFileOrBuffer as Express.Multer.File).path;
+      const fileStream = createReadStream(filePath, { highWaterMark: 16 * 1024 });
+      knownFileSize = fs.statSync(filePath).size;
+
+      const delayedStream = new Readable({
+        read() {}, // No need to override read, we'll push manually
+      });
+
+      let uploaded = 0;
+      let total = knownFileSize;
+      fileStream.on("data", (chunk) => {
+        fileStream.pause(); // Pause reading while we delay
+
+        uploaded += chunk.length;
+
+        // sleep(1);
+        delayedStream.push(chunk);
+        fileStream.resume(); // Resume after delay
+        const progress = uploaded / total;
+        console.log(`Upload file ${filename} - progress ${(100.0 * uploaded) / total}% `);
+        this.eventEmitter2.emit(`${uploadProgressEvent(token)}`, token, {
+          percent: progress,
+          progress: uploaded / total,
+        });
+        // setTimeout(() => {
+        //
+        // }, 1);
+      });
+
+      fileStream.on("end", () => delayedStream.push(null));
+
+      this.logger.log(`Attaching file from disk to formdata of size ${knownFileSize}`);
+      // const streamWithDelay = new Readable({
+      //   read() {
+      //     fileStream.on("data", (chunk) => {
+      //       this.push(chunk);
+      //       setTimeout(() => this.resume(), 1); // 100ms delay per chunk
+      //       this.pause();
+      //     });
+      //
+      //     fileStream.on("end", () => this.push(null));
+      //   },
+      // });
+      formData.append("file", delayedStream, { filename });
+    } else {
+      this.logger.log("Attaching file from memory buffer to formdata");
+      formData.append("file", fileBuffer, { filename });
     }
-    formData.append("file", source, { filename: (multerFileOrBuffer as Express.Multer.File).originalname });
 
     // Calculate the header that axios uses to determine progress
     const result: number = await new Promise<number>((resolve, reject) => {
@@ -250,15 +302,17 @@ export class OctoprintClient extends OctoprintRoutes {
     try {
       const response = await this.createClient(login, (builder) =>
         builder
+          .withBaseUrl("http://localhost:1234")
           .withMultiPartFormData()
           .withHeaders({
             ...formData.getHeaders(),
-            "Content-Length": result.toString(),
+            // "Content-Length": result?.toString() ?? knownFileSize.toString(),
           })
           .withOnUploadProgress((p) => {
-            if (token) {
-              this.eventEmitter2.emit(`${uploadProgressEvent(token)}`, token, p);
-            }
+            // console.log(`Upload file ${filename} - progress ${p.progress} `);
+            // if (token) {
+            //   this.eventEmitter2.emit(`${uploadProgressEvent(token)}`, token, p);
+            // }
           })
       ).post(urlPath, formData);
 
