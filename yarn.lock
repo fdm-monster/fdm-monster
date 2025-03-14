@@ -1058,7 +1058,7 @@ __metadata:
     "@types/uuid": "npm:10.0.0"
     "@types/ws": "npm:8.18.0"
     adm-zip: "npm:0.5.16"
-    awilix: "npm:12.0.4"
+    awilix: "npm:12.0.5"
     awilix-express: "npm:9.0.2"
     axios: "npm:1.8.3"
     bcryptjs: "npm:3.0.2"
@@ -4328,13 +4328,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"awilix@npm:12.0.4":
-  version: 12.0.4
-  resolution: "awilix@npm:12.0.4"
+"awilix@npm:12.0.5":
+  version: 12.0.5
+  resolution: "awilix@npm:12.0.5"
   dependencies:
     camel-case: "npm:^4.1.2"
-    fast-glob: "npm:^3.3.2"
-  checksum: 10c0/8a39f895b45f527605be4b3b34e9b91ee75b9f8d4614a80c005f604f936fd3f313629e9ca48a68dd9edcd989c2d78bf737f0ecbca976a4aa33c46852d318e803
+    fast-glob: "npm:^3.3.3"
+  checksum: 10c0/39c387b58521aa4830289d3a79d38485e50a22ba66feb17924faf59b2b2cb2f04b59fdc2800ae07ab2481a40f4a09f72d3f0a470f6081994c336e07685db1f4e
   languageName: node
   linkType: hard
 
@@ -6199,7 +6199,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-glob@npm:^3.2.5, fast-glob@npm:^3.3.2, fast-glob@npm:^3.3.3":
+"fast-glob@npm:^3.2.5, fast-glob@npm:^3.3.3":
   version: 3.3.3
   resolution: "fast-glob@npm:3.3.3"
   dependencies:
