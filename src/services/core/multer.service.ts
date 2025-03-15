@@ -55,7 +55,7 @@ export class MulterService {
     if (existsSync(multerFile.path)) {
       rmSync(multerFile.path);
     } else {
-      console.log("Cannot unlink temporarily uploaded file as it was not found");
+      this.logger.warn("Cannot unlink temporarily uploaded file as it was not found");
     }
   }
 

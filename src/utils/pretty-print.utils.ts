@@ -3,5 +3,5 @@ export function PP(input: any) {
 }
 
 export function PL(input: any) {
-  return console.log(PP(input));
+  console.log(PP(input));
 }
