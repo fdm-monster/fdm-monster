@@ -221,7 +221,12 @@ export class OctoprintClient extends OctoprintRoutes {
     await this.createClient(login).post(this.apiFile(path), command);
   }
 
-  async uploadFileAsMultiPart(login: LoginDto, multerFileOrBuffer: Buffer | Express.Multer.File, commands: any, token: string) {
+  async uploadFileAsMultiPart(
+    login: LoginDto,
+    multerFileOrBuffer: Buffer | Express.Multer.File,
+    commands: any,
+    progressToken: string
+  ) {
     const urlPath = this.apiFilesLocal;
 
     const formData = new FormData();
@@ -261,22 +266,17 @@ export class OctoprintClient extends OctoprintRoutes {
             "Content-Length": result.toString(),
           })
           .withOnUploadProgress((p) => {
-            if (token) {
-              this.eventEmitter2.emit(`${uploadProgressEvent(token)}`, token, p);
+            if (progressToken) {
+              this.eventEmitter2.emit(`${uploadProgressEvent(progressToken)}`, progressToken, p);
             }
           })
       ).post(urlPath, formData);
 
-      // Cleanup if file exists on disk
-      // if (isPhysicalFile) {
-      //   fs.unlinkSync((fileStreamOrBuffer as Express.Multer.File).path);
-      // }
-
-      this.eventEmitter2.emit(`${uploadDoneEvent(token)}`, token);
+      this.eventEmitter2.emit(`${uploadDoneEvent(progressToken)}`, progressToken);
 
       return response.data;
     } catch (e: any) {
-      this.eventEmitter2.emit(`${uploadFailedEvent(token)}`, token, (e as AxiosError)?.message);
+      this.eventEmitter2.emit(`${uploadFailedEvent(progressToken)}`, progressToken, (e as AxiosError)?.message);
       let data;
       try {
         data = JSON.parse(e.response?.body);

@@ -1,36 +1,40 @@
 import multer, { diskStorage, FileFilterCallback, memoryStorage } from "multer";
 import { extname, join } from "path";
-import { createWriteStream, existsSync, lstatSync, mkdirSync, readdirSync, unlink } from "fs";
+import { createWriteStream, existsSync, lstatSync, mkdirSync, readdirSync, unlink, unlinkSync } from "fs";
 import { superRootPath } from "@/utils/fs.utils";
 import { AppConstants } from "@/server.constants";
 import { FileUploadTrackerCache } from "@/state/file-upload-tracker.cache";
 import { Request, Response } from "express";
 import { HttpClientFactory } from "@/services/core/http-client.factory";
-import { IdType } from "../../shared.constants";
+import { IdType } from "@/shared.constants";
+import { rmSync } from "node:fs";
+import { errorSummary } from "@/utils/error.utils";
+import { LoggerService } from "@/handlers/logger";
+import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class MulterService {
   fileUploadTrackerCache: FileUploadTrackerCache;
   httpClientFactory: HttpClientFactory;
-
+  logger: LoggerService;
   constructor({
     fileUploadTrackerCache,
     httpClientFactory,
+    loggerFactory,
   }: {
     fileUploadTrackerCache: FileUploadTrackerCache;
     httpClientFactory: HttpClientFactory;
+    loggerFactory: ILoggerFactory;
   }) {
     this.fileUploadTrackerCache = fileUploadTrackerCache;
     this.httpClientFactory = httpClientFactory;
+    this.logger = loggerFactory(MulterService.name);
   }
 
-  getNewestFile(collection: string) {
-    const dirPath = this.collectionPath(collection);
-    const files = this.orderRecentFiles(dirPath);
-    const latestFile = files.length ? files[0] : undefined;
-    return latestFile ? join(dirPath, latestFile.file) : undefined;
+  public startTrackingSession(multerFile: Express.Multer.File, printerId: IdType) {
+    return this.fileUploadTrackerCache.addUploadTracker(multerFile, printerId);
   }
 
-  clearUploadsFolder() {
+  public clearUploadsFolder() {
     const fileStoragePath = join(superRootPath(), AppConstants.defaultFileStorageFolder);
     if (!existsSync(fileStoragePath)) return;
 
@@ -39,10 +43,27 @@ export class MulterService {
       .map((item) => item.name);
 
     for (const file of files) {
-      unlink(join(fileStoragePath, file), (err) => {
-        if (err) throw err;
-      });
+      try {
+        rmSync(join(fileStoragePath, file));
+      } catch (error) {
+        this.logger.error(`Could not clear upload file in temporary folder ${errorSummary(error)}`);
+      }
     }
+  }
+
+  public clearUploadedFile(multerFile: Express.Multer.File) {
+    if (existsSync(multerFile.path)) {
+      rmSync(multerFile.path);
+    } else {
+      this.logger.warn("Cannot unlink temporarily uploaded file as it was not found");
+    }
+  }
+
+  getNewestFile(collection: string) {
+    const dirPath = this.collectionPath(collection);
+    const files = this.orderRecentFiles(dirPath);
+    const latestFile = files.length ? files[0] : undefined;
+    return latestFile ? join(dirPath, latestFile.file) : undefined;
   }
 
   fileExists(downloadFilename: string, collection: string) {
@@ -103,17 +124,13 @@ export class MulterService {
   }
 
   multerFileFilter(extensions: string[]) {
-    return (req: Request, file: Express.Multer.File, callback: FileFilterCallback) => {
+    return (_: Request, file: Express.Multer.File, callback: FileFilterCallback) => {
       const ext = extname(file.originalname);
       if (extensions?.length && !extensions.includes(ext?.toLowerCase())) {
         return callback(new Error(`Only files with extensions ${extensions} are allowed`));
       }
       return callback(null, true);
     };
-  }
-
-  startTrackingSession(multerFile: Express.Multer.File, printerId: IdType) {
-    return this.fileUploadTrackerCache.addUploadTracker(multerFile, printerId);
   }
 
   getSessions() {

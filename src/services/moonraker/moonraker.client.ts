@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import { ServerInfoDto } from "@/services/moonraker/dto/server/server-info.dto";
 import { LoginDto } from "@/services/interfaces/login.dto";
 import { ResultDto } from "./dto/rest/result.dto";
@@ -30,7 +30,7 @@ import {
 import { ServerFileZipActionDto } from "@/services/moonraker/dto/server-files/server-file-zip-action.dto";
 import FormData from "form-data";
 import { createReadStream, ReadStream } from "fs";
-import { uploadProgressEvent } from "@/constants/event.constants";
+import { uploadDoneEvent, uploadFailedEvent, uploadProgressEvent } from "@/constants/event.constants";
 import EventEmitter2 from "eventemitter2";
 import { AccessLoginResultDto } from "@/services/moonraker/dto/access/access-login-result.dto";
 import { AccessUserResultDto } from "@/services/moonraker/dto/access/access-user-result.dto";
@@ -78,6 +78,7 @@ import { DefaultHttpClientBuilder } from "@/shared/default-http-client.builder";
 import { HttpClientFactory } from "@/services/core/http-client.factory";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
+import { ExternalServiceError } from "@/exceptions/runtime.exceptions";
 
 export class MoonrakerClient {
   private httpClientFactory: HttpClientFactory;
@@ -389,18 +390,42 @@ export class MoonrakerClient {
       });
     });
 
-    return await this.createClient(login, (b) => {
-      b.withMultiPartFormData()
-        .withHeaders({
-          ...formData.getHeaders(),
-          "Content-Length": result.toString(),
-        })
-        .withOnUploadProgress((p) => {
-          if (progressToken) {
-            this.eventEmitter2.emit(`${uploadProgressEvent(progressToken)}`, progressToken, p);
-          }
-        });
-    }).post(`server/files/upload`, formData);
+    try {
+      const response = await this.createClient(login, (b) => {
+        b.withMultiPartFormData()
+          .withHeaders({
+            ...formData.getHeaders(),
+            "Content-Length": result.toString(),
+          })
+          .withOnUploadProgress((p) => {
+            if (progressToken) {
+              this.eventEmitter2.emit(`${uploadProgressEvent(progressToken)}`, progressToken, p);
+            }
+          });
+      }).post(`server/files/upload`, formData);
+
+      this.eventEmitter2.emit(`${uploadDoneEvent(progressToken)}`, progressToken);
+
+      return response.data;
+    } catch (e: any) {
+      this.eventEmitter2.emit(`${uploadFailedEvent(progressToken)}`, progressToken, (e as AxiosError)?.message);
+      let data;
+      try {
+        data = JSON.parse(e.response?.body);
+      } catch {
+        data = e.response?.body;
+      }
+      throw new ExternalServiceError(
+        {
+          error: e.message,
+          statusCode: e.response?.statusCode,
+          data,
+          success: false,
+          stack: e.stack,
+        },
+        "Moonraker"
+      );
+    }
   }
 
   async deleteServerFile(login: LoginDto, root: string, path: string) {
