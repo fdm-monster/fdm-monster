@@ -65,14 +65,6 @@ export class PrinterFilesController {
     this.logger = loggerFactory(PrinterFilesController.name);
   }
 
-  @GET()
-  @route("/tracked-uploads")
-  @before(authorizePermission(PERMS.PrinterFiles.Upload))
-  getTrackedUploads(req: Request, res: Response) {
-    const sessions = this.multerService.getSessions();
-    res.send(sessions);
-  }
-
   @POST()
   @route("/purge")
   @before(authorizePermission(PERMS.PrinterFiles.Clear))
@@ -253,7 +245,7 @@ export class PrinterFilesController {
     }
 
     const uploadedFile = files[0];
-    const token = this.multerService.startTrackingSession(uploadedFile);
+    const token = this.multerService.startTrackingSession(uploadedFile, currentPrinterId);
     await this.printerApi.uploadFile(uploadedFile, token);
     await this.printerFilesStore.loadFiles(currentPrinterId);
 

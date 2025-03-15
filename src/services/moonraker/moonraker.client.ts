@@ -76,14 +76,26 @@ import { HistoryJobDto } from "@/services/moonraker/dto/server-history/history-j
 import { PrinterObjectsQueryDto } from "@/services/moonraker/dto/objects/printer-objects-query.dto";
 import { DefaultHttpClientBuilder } from "@/shared/default-http-client.builder";
 import { HttpClientFactory } from "@/services/core/http-client.factory";
+import { LoggerService } from "@/handlers/logger";
+import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class MoonrakerClient {
   private httpClientFactory: HttpClientFactory;
   private eventEmitter2: EventEmitter2;
+  protected logger: LoggerService;
 
-  constructor({ httpClientFactory, eventEmitter2 }: { httpClientFactory: HttpClientFactory; eventEmitter2: EventEmitter2 }) {
+  constructor({
+    httpClientFactory,
+    loggerFactory,
+    eventEmitter2,
+  }: {
+    httpClientFactory: HttpClientFactory;
+    loggerFactory: ILoggerFactory;
+    eventEmitter2: EventEmitter2;
+  }) {
     this.httpClientFactory = httpClientFactory;
     this.eventEmitter2 = eventEmitter2;
+    this.logger = loggerFactory(MoonrakerClient.name);
   }
 
   async getServerInfo(login: LoginDto) {
@@ -357,12 +369,17 @@ export class MoonrakerClient {
       formData.append("checksum", checksum);
     }
 
-    let source: ArrayBufferLike | ReadStream = (multerFileOrBuffer as Buffer).buffer;
-    const isPhysicalFile = !source;
-    if (isPhysicalFile) {
-      source = createReadStream((multerFileOrBuffer as Express.Multer.File).path);
+    let fileBuffer: ArrayBufferLike | ReadStream = (multerFileOrBuffer as Buffer).buffer;
+    const filename = (multerFileOrBuffer as Express.Multer.File).originalname;
+    if (fileBuffer) {
+      this.logger.log("Attaching file from memory buffer to formdata for upload");
+      formData.append("file", fileBuffer, { filename });
+    } else {
+      const filePath = (multerFileOrBuffer as Express.Multer.File).path;
+      const fileStream = createReadStream(filePath);
+      this.logger.log(`Attaching file from disk to formdata for upload`);
+      formData.append("file", fileStream, { filename });
     }
-    formData.append("file", source, { filename: (multerFileOrBuffer as Express.Multer.File).originalname });
 
     // Calculate the header that axios uses to determine progress
     const result: number = await new Promise<number>((resolve, reject) => {
@@ -372,22 +389,18 @@ export class MoonrakerClient {
       });
     });
 
-    const headers = {
-      ...formData.getHeaders(),
-      "Content-Length": result,
-    };
-
-    return await axios.request({
-      method: "POST",
-      url: `server/files/upload`,
-      data: formData,
-      headers,
-      onUploadProgress: (p) => {
-        if (progressToken) {
-          this.eventEmitter2.emit(`${uploadProgressEvent(progressToken)}`, progressToken, p);
-        }
-      },
-    });
+    return await this.createClient(login, (b) => {
+      b.withMultiPartFormData()
+        .withHeaders({
+          ...formData.getHeaders(),
+          "Content-Length": result.toString(),
+        })
+        .withOnUploadProgress((p) => {
+          if (progressToken) {
+            this.eventEmitter2.emit(`${uploadProgressEvent(progressToken)}`, progressToken, p);
+          }
+        });
+    }).post(`server/files/upload`, formData);
   }
 
   async deleteServerFile(login: LoginDto, root: string, path: string) {

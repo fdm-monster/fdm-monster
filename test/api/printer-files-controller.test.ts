@@ -11,7 +11,6 @@ import { IPrinterService } from "@/services/interfaces/printer.service.interface
 import TestAgent from "supertest/lib/agent";
 
 const defaultRoute = AppConstants.apiRoute + "/printer-files";
-const trackedUploadsRoute = `${defaultRoute}/tracked-uploads`;
 const purgeIndexedFilesRoute = `${defaultRoute}/purge`;
 const thumbnailsRoute = `${defaultRoute}/thumbnails`;
 type idType = Number;
@@ -101,16 +100,6 @@ describe(PrinterFilesController.name, () => {
     const response = await request.post(reloadThumbnailRoute(printer.id)).send({
       filePath: "123.gcode",
     });
-    expectOkResponse(response);
-  });
-
-  it("should allow GET on printer files - tracked uploads", async () => {
-    const response = await request.get(trackedUploadsRoute).send();
-    expectOkResponse(response);
-  });
-
-  it("should allow GET on printer files - tracked uploads", async () => {
-    const response = await request.get(trackedUploadsRoute).send();
     expectOkResponse(response);
   });
 

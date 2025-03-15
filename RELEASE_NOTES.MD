@@ -4,6 +4,8 @@
 
 - Introduce HttpClientBuilder pattern for Octoprint client
 - Fix Sentry usage has updated
+- Fix upload progress was not updated properly
+- Fix failures and completions in file upload to OctoPrint/Moonraker were not consistently pushed over SocketIO
 
 # FDM Monster 03/01/2025 1.8.2
 
