@@ -4,12 +4,9 @@ import EventEmitter2 from "eventemitter2";
 import { LoggerService } from "@/handlers/logger";
 import { AxiosProgressEvent } from "axios";
 import { ILoggerFactory } from "@/handlers/logger-factory";
-import { TrackedUpload } from "../services/interfaces/file-upload-tracker.interface";
-import { IdType } from "../shared.constants";
+import { TrackedUpload } from "@/services/interfaces/file-upload-tracker.interface";
+import { IdType } from "@/shared.constants";
 
-/**
- * A generic cache for file upload progress
- */
 export class FileUploadTrackerCache {
   private currentUploads: TrackedUpload[] = [];
   private eventEmitter2: EventEmitter2;
@@ -43,22 +40,22 @@ export class FileUploadTrackerCache {
       printerId,
       startedAt: Date.now(),
       multerFile,
-      progress: {
-        percent: 0,
-        progress: 0,
-      },
-      complete: false,
+      progress: 0,
+      completed: false,
+      completedAt: null,
+      success: null,
+      reason: null,
     });
 
     return correlationToken;
   }
 
-  handleUploadProgress(token: string, progress: AxiosProgressEvent) {
+  handleUploadProgress(token: string, event: AxiosProgressEvent) {
     const upload = this.getUpload(token);
     if (!upload) {
       return;
     }
-    upload.progress = progress;
+    upload.progress = event.progress;
   }
 
   handleUploadFailed(token: string, reason?: string) {
@@ -80,13 +77,9 @@ export class FileUploadTrackerCache {
 
     const trackedUpload = this.currentUploads[trackedUploadIndex];
 
-    if (success) {
-      trackedUpload.succeededAt = Date.now();
-      trackedUpload.complete = true;
-    } else {
-      trackedUpload.failedAt = Date.now();
-      trackedUpload.reason = reason;
-      trackedUpload.complete = true;
-    }
+    trackedUpload.completed = true;
+    trackedUpload.success = success;
+    trackedUpload.completedAt = Date.now();
+    trackedUpload.reason = reason;
   }
 }

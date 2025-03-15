@@ -1,4 +1,4 @@
-import { IdType } from "../../shared.constants";
+import { IdType } from "@/shared.constants";
 
 export interface TrackedUpload {
   correlationToken: string;
@@ -8,12 +8,9 @@ export interface TrackedUpload {
     originalname: string;
     [k: string]: any;
   };
-  progress: {
-    percent: number;
-    [k: string]: number;
-  };
-  succeededAt?: number;
-  failedAt?: number;
+  progress: number;
+  completed: boolean;
+  completedAt?: number;
+  success?: boolean;
   reason?: string;
-  complete: boolean;
 }
