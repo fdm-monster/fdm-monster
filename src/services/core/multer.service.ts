@@ -1,6 +1,6 @@
 import multer, { diskStorage, FileFilterCallback, memoryStorage } from "multer";
 import { extname, join } from "path";
-import { createWriteStream, existsSync, lstatSync, mkdirSync, readdirSync, unlink } from "fs";
+import { createWriteStream, existsSync, lstatSync, mkdirSync, readdirSync, unlink, unlinkSync } from "fs";
 import { superRootPath } from "@/utils/fs.utils";
 import { AppConstants } from "@/server.constants";
 import { FileUploadTrackerCache } from "@/state/file-upload-tracker.cache";
@@ -42,6 +42,12 @@ export class MulterService {
       unlink(join(fileStoragePath, file), (err) => {
         if (err) throw err;
       });
+    }
+  }
+
+  clearUploadedFile(multerFile: Express.Multer.File) {
+    if (existsSync(multerFile.path)) {
+      unlinkSync(multerFile.path);
     }
   }
 

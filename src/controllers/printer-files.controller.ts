@@ -229,6 +229,18 @@ export class PrinterFilesController {
       });
     }
 
+    // Perform specific file clean if configured
+    const fileCleanEnabled = this.settingsStore.isPreUploadFileCleanEnabled();
+    if (fileCleanEnabled) {
+      await this.printerFileCleanTask.cleanPrinterFiles(currentPrinterId);
+    }
+
+    const uploadedFile = files[0];
+    const token = this.multerService.startTrackingSession(uploadedFile, currentPrinterId);
+
+    await this.printerApi.uploadFile(uploadedFile, token);
+    await this.printerFilesStore.loadFiles(currentPrinterId);
+
     try {
       if (this.settingsStore.isThumbnailSupportEnabled()) {
         await this.printerThumbnailCache.loadPrinterThumbnailLocal(currentPrinterId, files[0].path);
@@ -238,17 +250,11 @@ export class PrinterFilesController {
       captureException(e);
     }
 
-    // Perform specific file clean if configured
-    const fileCleanEnabled = this.settingsStore.isPreUploadFileCleanEnabled();
-    if (fileCleanEnabled) {
-      await this.printerFileCleanTask.cleanPrinterFiles(currentPrinterId);
+    try {
+      this.multerService.clearUploadedFile(uploadedFile);
+    } catch (e) {
+      this.logger.error(`Could not remove uploaded file from temporary storage ${errorSummary(e)}`);
     }
-
-    const uploadedFile = files[0];
-    const token = this.multerService.startTrackingSession(uploadedFile, currentPrinterId);
-    await this.printerApi.uploadFile(uploadedFile, token);
-    await this.printerFilesStore.loadFiles(currentPrinterId);
-
     res.send();
   }
 }
