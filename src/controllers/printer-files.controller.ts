@@ -238,7 +238,14 @@ export class PrinterFilesController {
     const uploadedFile = files[0];
     const token = this.multerService.startTrackingSession(uploadedFile, currentPrinterId);
 
-    await this.printerApi.uploadFile(uploadedFile, token);
+    await this.printerApi.uploadFile(uploadedFile, token).catch((e) => {
+      try {
+        this.multerService.clearUploadedFile(uploadedFile);
+      } catch (e) {
+        this.logger.error(`Could not remove uploaded file from temporary storage ${errorSummary(e)}`);
+      }
+      throw e;
+    });
     await this.printerFilesStore.loadFiles(currentPrinterId);
 
     try {
@@ -255,6 +262,7 @@ export class PrinterFilesController {
     } catch (e) {
       this.logger.error(`Could not remove uploaded file from temporary storage ${errorSummary(e)}`);
     }
+
     res.send();
   }
 }
