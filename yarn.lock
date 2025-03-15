@@ -1038,7 +1038,7 @@ __metadata:
     "@swc/core": "npm:1.11.9"
     "@swc/jest": "npm:0.2.37"
     "@types/adm-zip": "npm:0.5.7"
-    "@types/bcryptjs": "npm:2.4.6"
+    "@types/bcryptjs": "npm:3.0.0"
     "@types/cache-manager": "npm:5.0.0"
     "@types/connect-history-api-fallback": "npm:1.5.4"
     "@types/cookie-parser": "npm:1.4.8"
@@ -3350,10 +3350,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/bcryptjs@npm:2.4.6":
-  version: 2.4.6
-  resolution: "@types/bcryptjs@npm:2.4.6"
-  checksum: 10c0/1182663f0c081c5c58760019459cd309335e9b5fc6552780b0fd21b6c5f25661a844709e46218796f4bdbebe6736e11cfc5af0729bc2cdb0160943650aceb3da
+"@types/bcryptjs@npm:3.0.0":
+  version: 3.0.0
+  resolution: "@types/bcryptjs@npm:3.0.0"
+  dependencies:
+    bcryptjs: "npm:*"
+  checksum: 10c0/5d61ce381736f8252627cf32f2bbc17003c0361c6cf63ac23034a651b9c1edfdbf8f786730816e0b5257a927ffa369658562183a68495eb07ca2ddc77fbb171c
   languageName: node
   linkType: hard
 
@@ -4464,7 +4466,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bcryptjs@npm:3.0.2":
+"bcryptjs@npm:*, bcryptjs@npm:3.0.2":
   version: 3.0.2
   resolution: "bcryptjs@npm:3.0.2"
   bin:
