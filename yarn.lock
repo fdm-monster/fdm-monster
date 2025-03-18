@@ -1083,7 +1083,7 @@ __metadata:
     express: "npm:4.21.2"
     express-list-routes: "npm:1.2.4"
     form-data: "npm:4.0.2"
-    helmet: "npm:8.0.0"
+    helmet: "npm:8.1.0"
     jest: "npm:29.7.0"
     jest-27-expect-message: "npm:1.1.0"
     js-yaml: "npm:4.1.0"
@@ -6845,10 +6845,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"helmet@npm:8.0.0":
-  version: 8.0.0
-  resolution: "helmet@npm:8.0.0"
-  checksum: 10c0/c3d273df206cbb4e5e830ea68afdbd3d0f8e055b2707f67f651ebb4b679c7fd4d6ac77ce6188a2cee32e853d4e24aa00548f787989bbe6e5f98ebfb703855d09
+"helmet@npm:8.1.0":
+  version: 8.1.0
+  resolution: "helmet@npm:8.1.0"
+  checksum: 10c0/94d3a7ebc88dbda1421635bdf33f00724adb5252269e93c5ab296ec0db11336d01265659ad3739ab1a1e881fb23a686ff7e788aac6a5fb929285134f157df763
   languageName: node
   linkType: hard
 
