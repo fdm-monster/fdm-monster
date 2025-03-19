@@ -1,4 +1,3 @@
-import axios from "axios";
 import { Octokit } from "octokit";
 import { asClass, asFunction, asValue, createContainer, InjectionMode, Resolver } from "awilix";
 import { ToadScheduler } from "toad-scheduler";
@@ -77,6 +76,7 @@ import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { MoonrakerApi } from "@/services/moonraker.api";
 import { PrinterApiFactory } from "@/services/printer-api.factory";
 import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
+import { HttpClientFactory } from "@/services/core/http-client.factory";
 
 export function config<T1, T2>(
   key: string,
@@ -163,13 +163,7 @@ export function configureContainer(isSqlite: boolean = false) {
     }),
     [di.clientBundleService]: asClass(ClientBundleService),
     [di.logDumpService]: asClass(LogDumpService),
-    [di.httpClient]: asValue(
-      axios.create({
-        maxBodyLength: 1000 * 1000 * 1000, // 1GB
-        maxContentLength: 1000 * 1000 * 1000, // 1GB
-      })
-    ),
-
+    [di.httpClientFactory]: asClass(HttpClientFactory),
     [di.socketIoGateway]: asClass(SocketIoGateway).singleton(),
     [di.multerService]: asClass(MulterService).singleton(),
     [di.yamlService]: asClass(YamlService),

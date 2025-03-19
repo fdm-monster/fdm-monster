@@ -65,14 +65,6 @@ export class PrinterFilesController {
     this.logger = loggerFactory(PrinterFilesController.name);
   }
 
-  @GET()
-  @route("/tracked-uploads")
-  @before(authorizePermission(PERMS.PrinterFiles.Upload))
-  getTrackedUploads(req: Request, res: Response) {
-    const sessions = this.multerService.getSessions();
-    res.send(sessions);
-  }
-
   @POST()
   @route("/purge")
   @before(authorizePermission(PERMS.PrinterFiles.Clear))
@@ -237,6 +229,25 @@ export class PrinterFilesController {
       });
     }
 
+    // Perform specific file clean if configured
+    const fileCleanEnabled = this.settingsStore.isPreUploadFileCleanEnabled();
+    if (fileCleanEnabled) {
+      await this.printerFileCleanTask.cleanPrinterFiles(currentPrinterId);
+    }
+
+    const uploadedFile = files[0];
+    const token = this.multerService.startTrackingSession(uploadedFile, currentPrinterId);
+
+    await this.printerApi.uploadFile(uploadedFile, token).catch((e) => {
+      try {
+        this.multerService.clearUploadedFile(uploadedFile);
+      } catch (e) {
+        this.logger.error(`Could not remove uploaded file from temporary storage ${errorSummary(e)}`);
+      }
+      throw e;
+    });
+    await this.printerFilesStore.loadFiles(currentPrinterId);
+
     try {
       if (this.settingsStore.isThumbnailSupportEnabled()) {
         await this.printerThumbnailCache.loadPrinterThumbnailLocal(currentPrinterId, files[0].path);
@@ -246,16 +257,11 @@ export class PrinterFilesController {
       captureException(e);
     }
 
-    // Perform specific file clean if configured
-    const fileCleanEnabled = this.settingsStore.isPreUploadFileCleanEnabled();
-    if (fileCleanEnabled) {
-      await this.printerFileCleanTask.cleanPrinterFiles(currentPrinterId);
+    try {
+      this.multerService.clearUploadedFile(uploadedFile);
+    } catch (e) {
+      this.logger.error(`Could not remove uploaded file from temporary storage ${errorSummary(e)}`);
     }
-
-    const uploadedFile = files[0];
-    const token = this.multerService.startTrackingSession(uploadedFile);
-    await this.printerApi.uploadFile(uploadedFile, token);
-    await this.printerFilesStore.loadFiles(currentPrinterId);
 
     res.send();
   }

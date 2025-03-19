@@ -46,6 +46,7 @@ import { NotifyServiceStateChangedParams } from "@/services/moonraker/dto/websoc
 import { WebsocketRpcExtendedAdapter } from "@/shared/websocket-rpc-extended.adapter";
 import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
 import { MoonrakerType } from "@/services/printer-api.interface";
+import { normalizeUrl } from "@/utils/normalize-url";
 
 export type SubscriptionType = IdleTimeoutObject &
   PauseResumeObject &
@@ -152,8 +153,12 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
     this.printerId = printerId;
     this.login = loginDto;
 
-    const wsUrl = httpToWsUrl(this.login.printerURL);
-    wsUrl.pathname = "/websocket";
+    const httpUrlString = normalizeUrl(this.login.printerURL);
+    const httpUrl = new URL(httpUrlString);
+    const httpUrlPath = httpUrl.pathname;
+
+    const wsUrl = httpToWsUrl(httpUrlString);
+    wsUrl.pathname = (httpUrlPath ?? "/") + "websocket";
     this.socketURL = wsUrl;
   }
 

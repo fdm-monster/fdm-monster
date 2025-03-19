@@ -13,7 +13,7 @@ let printerService: IPrinterService<IdType, Printer>;
 let floorService: IFloorService<IdType, Floor>;
 
 beforeAll(async () => {
-  const { container, httpClient: axiosMock } = await setupTestApp(true);
+  const { container } = await setupTestApp(true);
   printerService = container.resolve<IPrinterService<IdType, Printer>>(DITokens.printerService);
   floorService = container.resolve<IFloorService<IdType, Floor>>(DITokens.floorService);
 });

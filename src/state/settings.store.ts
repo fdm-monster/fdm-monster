@@ -7,7 +7,7 @@ import {
   timeoutSettingKey,
   wizardSettingKey,
 } from "@/constants/server-settings.constants";
-import { getCurrentHub } from "@sentry/node";
+import { getClient } from "@sentry/node";
 import { isTestEnvironment } from "@/utils/env.utils";
 import { AppConstants } from "@/server.constants";
 import { LoggerService } from "@/handlers/logger";
@@ -45,6 +45,7 @@ export class SettingsStore {
   getSettings() {
     const settings = this.settings;
     if (!settings) throw new InternalServerException("Could not check server settings (server settings not loaded");
+
     return Object.freeze({
       // Credential settings are not shared with the client
       [serverSettingsKey]: {
@@ -144,6 +145,10 @@ export class SettingsStore {
 
   getServerSettings() {
     return this.getSettings()[serverSettingsKey];
+  }
+
+  getTimeoutSettings() {
+    return this.getSettings()[timeoutSettingKey];
   }
 
   getFrontendSettings() {
@@ -248,7 +253,7 @@ export class SettingsStore {
     }
 
     if (isTestEnvironment()) return;
-    const client = getCurrentHub().getClient();
+    const client = getClient();
     if (!client) {
       this.logger.warn("Could not apply Sentry. Was the SDK initialized?");
       return;

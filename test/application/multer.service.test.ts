@@ -29,12 +29,10 @@ describe("MulterService", () => {
   });
 
   it("should be able to start tracking upload", async () => {
-    multerService.startTrackingSession({});
+    multerService.startTrackingSession({}, 1);
 
     const trackedSessions = multerService.getSessions();
     expect(trackedSessions.current).not.toHaveLength(0);
-    expect(trackedSessions.done).toHaveLength(0);
-    expect(trackedSessions.failed).toHaveLength(0);
   });
 
   it("should provide multer filter middleware", async () => {

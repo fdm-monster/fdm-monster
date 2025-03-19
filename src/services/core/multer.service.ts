@@ -1,35 +1,40 @@
-import multer, { FileFilterCallback } from "multer";
+import multer, { diskStorage, FileFilterCallback, memoryStorage } from "multer";
 import { extname, join } from "path";
-import { createWriteStream, existsSync, lstatSync, mkdirSync, readdirSync, unlink } from "fs";
+import { createWriteStream, existsSync, lstatSync, mkdirSync, readdirSync, unlink, unlinkSync } from "fs";
 import { superRootPath } from "@/utils/fs.utils";
 import { AppConstants } from "@/server.constants";
-import { AxiosStatic } from "axios";
 import { FileUploadTrackerCache } from "@/state/file-upload-tracker.cache";
 import { Request, Response } from "express";
+import { HttpClientFactory } from "@/services/core/http-client.factory";
+import { IdType } from "@/shared.constants";
+import { rmSync } from "node:fs";
+import { errorSummary } from "@/utils/error.utils";
+import { LoggerService } from "@/handlers/logger";
+import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class MulterService {
   fileUploadTrackerCache: FileUploadTrackerCache;
-  httpClient: AxiosStatic;
-
+  httpClientFactory: HttpClientFactory;
+  logger: LoggerService;
   constructor({
     fileUploadTrackerCache,
-    httpClient,
+    httpClientFactory,
+    loggerFactory,
   }: {
     fileUploadTrackerCache: FileUploadTrackerCache;
-    httpClient: AxiosStatic;
+    httpClientFactory: HttpClientFactory;
+    loggerFactory: ILoggerFactory;
   }) {
     this.fileUploadTrackerCache = fileUploadTrackerCache;
-    this.httpClient = httpClient;
+    this.httpClientFactory = httpClientFactory;
+    this.logger = loggerFactory(MulterService.name);
   }
 
-  getNewestFile(collection: string) {
-    const dirPath = this.collectionPath(collection);
-    const files = this.orderRecentFiles(dirPath);
-    const latestFile = files.length ? files[0] : undefined;
-    return latestFile ? join(dirPath, latestFile.file) : undefined;
+  public startTrackingSession(multerFile: Express.Multer.File, printerId: IdType) {
+    return this.fileUploadTrackerCache.addUploadTracker(multerFile, printerId);
   }
 
-  clearUploadsFolder() {
+  public clearUploadsFolder() {
     const fileStoragePath = join(superRootPath(), AppConstants.defaultFileStorageFolder);
     if (!existsSync(fileStoragePath)) return;
 
@@ -38,11 +43,27 @@ export class MulterService {
       .map((item) => item.name);
 
     for (const file of files) {
-      unlink(join(fileStoragePath, file), (err) => {
-        /* istanbul ignore next */
-        if (err) throw err;
-      });
+      try {
+        rmSync(join(fileStoragePath, file));
+      } catch (error) {
+        this.logger.error(`Could not clear upload file in temporary folder ${errorSummary(error)}`);
+      }
     }
+  }
+
+  public clearUploadedFile(multerFile: Express.Multer.File) {
+    if (existsSync(multerFile.path)) {
+      rmSync(multerFile.path);
+    } else {
+      this.logger.warn("Cannot unlink temporarily uploaded file as it was not found");
+    }
+  }
+
+  getNewestFile(collection: string) {
+    const dirPath = this.collectionPath(collection);
+    const files = this.orderRecentFiles(dirPath);
+    const latestFile = files.length ? files[0] : undefined;
+    return latestFile ? join(dirPath, latestFile.file) : undefined;
   }
 
   fileExists(downloadFilename: string, collection: string) {
@@ -58,7 +79,8 @@ export class MulterService {
     const downloadPath = join(superRootPath(), AppConstants.defaultFileStorageFolder, collection, downloadFilename);
     const fileStream = createWriteStream(downloadPath);
 
-    const res = await this.httpClient.get(downloadUrl);
+    const defaultHttpClient = this.httpClientFactory.createDefaultClient();
+    const res = await defaultHttpClient.get(downloadUrl);
     return await new Promise((resolve, reject) => {
       fileStream.write(res.data);
       fileStream.on("error", (err) => {
@@ -93,26 +115,22 @@ export class MulterService {
   getMulterFileFilter(fileExtensions: string[], storeAsFile = true) {
     return multer({
       storage: storeAsFile
-        ? multer.diskStorage({
+        ? diskStorage({
             destination: join(superRootPath(), AppConstants.defaultFileStorageFolder),
           })
-        : multer.memoryStorage(),
+        : memoryStorage(),
       fileFilter: this.multerFileFilter(fileExtensions),
     }).any();
   }
 
   multerFileFilter(extensions: string[]) {
-    return (req: Request, file: Express.Multer.File, callback: FileFilterCallback) => {
+    return (_: Request, file: Express.Multer.File, callback: FileFilterCallback) => {
       const ext = extname(file.originalname);
       if (extensions?.length && !extensions.includes(ext?.toLowerCase())) {
         return callback(new Error(`Only files with extensions ${extensions} are allowed`));
       }
       return callback(null, true);
     };
-  }
-
-  startTrackingSession(multerFile: Express.Multer.File) {
-    return this.fileUploadTrackerCache.addUploadTracker(multerFile);
   }
 
   getSessions() {

@@ -1,11 +1,12 @@
 import AdmZip from "adm-zip";
 import { join } from "path";
-import { readdirSync, unlinkSync } from "fs";
+import { readdirSync } from "fs";
 import { superRootPath } from "@/utils/fs.utils";
 import { AppConstants } from "@/server.constants";
 import { isValidDate } from "@/utils/time.utils";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
+import { rmSync } from "node:fs";
 
 export class LogDumpService {
   logger: LoggerService;
@@ -47,7 +48,7 @@ export class LogDumpService {
     let removedWrongFormatFilesCount = 0;
     for (const file of removedFilesNotInFormat) {
       try {
-        unlinkSync(join(path, file));
+        rmSync(join(path, file));
         removedWrongFormatFilesCount++;
       } catch (err) {
         this.logger.warn(`Failed to delete log file`);
@@ -57,7 +58,7 @@ export class LogDumpService {
     let removedOutdatedFilesCount = 0;
     for (const file of removedFilesOutdated) {
       try {
-        unlinkSync(join(path, file));
+        rmSync(join(path, file));
         removedOutdatedFilesCount++;
       } catch (err) {
         this.logger.warn(`Failed to delete log file`);
@@ -75,7 +76,7 @@ export class LogDumpService {
     this.logger.log("Dumping logs as ZIP");
     const zip = new AdmZip();
     const path = join(superRootPath(), AppConstants.defaultLogsFolder);
-    zip.addLocalFolder(path, "/logs", "*.log");
+    zip.addLocalFolder(path, "/logs", (filename) => filename.endsWith(".log"));
 
     const outputPath = join(superRootPath(), AppConstants.defaultLogZipsFolder, `logs-${AppConstants.serverRepoName}.zip`);
     zip.writeZip(outputPath);

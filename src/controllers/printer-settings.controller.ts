@@ -33,7 +33,7 @@ export class PrinterSettingsController {
 
     const loginDto = await this.printerCache.getLoginDtoAsync(printerId);
     const settings = await this.octoprintClient.getSettings(loginDto);
-    res.send(settings);
+    res.send(settings.data);
   }
 
   async setGCodeAnalysis(req: Request, res: Response) {
@@ -42,7 +42,7 @@ export class PrinterSettingsController {
 
     const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
     const settings = await this.octoprintClient.setGCodeAnalysis(printerLogin, enabled);
-    res.send(settings);
+    res.send(settings.data);
   }
 
   async syncPrinterName(req: Request, res: Response) {
@@ -51,7 +51,7 @@ export class PrinterSettingsController {
     const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
     const name = await this.printerCache.getNameAsync(printerId);
     const settings = await this.octoprintClient.updatePrinterNameSetting(printerLogin, name);
-    res.send(settings);
+    res.send(settings.data);
   }
 }
 

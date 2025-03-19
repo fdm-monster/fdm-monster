@@ -72,7 +72,7 @@ export class SocketIoTask {
     const printers = await this.printerCache.listCachedPrinters(true);
     const socketStates = this.printerSocketStore.getSocketStatesById();
     const printerEvents = await this.printerEventsCache.getAllKeyValues();
-    const trackedUploads = this.fileUploadTrackerCache.getUploads(true);
+    const trackedUploads = this.fileUploadTrackerCache.getUploads();
 
     const socketIoData = {
       printers,
@@ -95,7 +95,7 @@ export class SocketIoTask {
     const serializedData = JSON.stringify(socketIoData);
     const transportDataSize = sizeKB(serializedData);
     this.updateAggregator(transportDataSize);
-    this.socketIoGateway.send(IO_MESSAGES.LegacyUpdate, serializedData);
+    this.socketIoGateway.send(IO_MESSAGES.LegacyUpdate, socketIoData);
   }
 
   updateAggregator(transportDataLength: number) {

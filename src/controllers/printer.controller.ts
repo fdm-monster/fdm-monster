@@ -1,5 +1,4 @@
 import { before, DELETE, GET, PATCH, POST, route } from "awilix-express";
-import { normalizeURLWithProtocol } from "@/utils/url.utils";
 import { authenticate, authorizeRoles } from "@/middleware/authenticate";
 import { getScopedPrinter, validateInput, validateMiddleware } from "@/handlers/validators";
 import {
@@ -31,11 +30,13 @@ import { IPrinterService } from "@/services/interfaces/printer.service.interface
 import { LoginDto } from "@/services/interfaces/login.dto";
 import { AxiosError } from "axios";
 import { FailedDependencyException } from "@/exceptions/failed-dependency.exception";
-import { InternalServerException } from "@/exceptions/runtime.exceptions";
+import { BadRequestException, InternalServerException } from "@/exceptions/runtime.exceptions";
 import { MoonrakerClient } from "@/services/moonraker/moonraker.client";
 import { IPrinterApi } from "@/services/printer-api.interface";
 import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { PrinterApiFactory } from "@/services/printer-api.factory";
+import { normalizeUrl } from "@/utils/normalize-url";
+import { defaultHttpProtocol } from "@/utils/url.utils";
 
 @route(AppConstants.apiRoute + "/printer")
 @before([authenticate(), authorizeRoles([ROLES.OPERATOR, ROLES.ADMIN]), printerResolveMiddleware()])
@@ -226,7 +227,7 @@ export class PrinterController {
   @route("/test-connection")
   async testConnection(req: Request, res: Response) {
     if (req.body.printerURL?.length) {
-      req.body.printerURL = normalizeURLWithProtocol(req.body.printerURL);
+      req.body.printerURL = normalizeUrl(req.body.printerURL, { defaultProtocol: defaultHttpProtocol });
     }
     const newPrinter = await validateMiddleware(req, testPrinterApiRules);
     newPrinter.correlationToken = generateCorrelationToken();
@@ -380,8 +381,8 @@ export class PrinterController {
   async getPrinterPluginList(req: Request, res: Response) {
     // List installed plugins (OP 1.6.0+)
     const { printerLogin } = getScopedPrinter(req);
-    const pluginList = await this.octoprintClient.getPluginManagerPlugins(printerLogin);
-    res.send(pluginList);
+    const pluginListResponse = await this.octoprintClient.getPluginManagerPlugins(printerLogin);
+    res.send(pluginListResponse.data);
   }
 
   @GET()
@@ -389,7 +390,7 @@ export class PrinterController {
   async getOctoPrintBackupOverview(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
     const backupOverview = await this.octoprintClient.getBackupOverview(printerLogin);
-    res.send(backupOverview);
+    res.send(backupOverview.data);
   }
 
   @GET()
@@ -397,7 +398,7 @@ export class PrinterController {
   async listOctoPrintBackups(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
     const backupOverview = await this.octoprintClient.getBackups(printerLogin);
-    res.send(backupOverview);
+    res.send(backupOverview.data);
   }
 
   @POST()
@@ -406,7 +407,7 @@ export class PrinterController {
     const { printerLogin } = getScopedPrinter(req);
     const { exclude } = await validateMiddleware(req, createOctoPrintBackupRules);
     const response = await this.octoprintClient.createBackup(printerLogin, exclude);
-    res.send(response);
+    res.send(response.data);
   }
 
   @POST()
@@ -423,6 +424,9 @@ export class PrinterController {
   async restoreOctoPrintBackup(req: Request, res: Response) {
     const { printerLogin } = getScopedPrinter(req);
     const files = await this.multerService.multerLoadFileAsync(req, res, null, false);
+    if (!files?.length) {
+      throw new BadRequestException("No files uploaded.");
+    }
     const response = await this.octoprintClient.forwardRestoreBackupFileStream(printerLogin, files[0].buffer);
     res.send(response.data);
   }
@@ -433,6 +437,6 @@ export class PrinterController {
     const { printerLogin } = getScopedPrinter(req);
     const { fileName } = await validateMiddleware(req, getOctoPrintBackupRules);
     const response = await this.octoprintClient.deleteBackup(printerLogin, fileName);
-    res.send(response);
+    res.send(response.data);
   }
 }

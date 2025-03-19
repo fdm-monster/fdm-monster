@@ -1,10 +1,23 @@
 # Develop
 
+# FDM Monster 19/03/2025 1.8.3
+
+## Fixes
+
+- Introduce HttpClientBuilder pattern for Octoprint client
+- Fix Sentry usage has updated
+- Fix upload progress was not updated properly
+- Fix failures and completions in file upload to OctoPrint/Moonraker were not consistently pushed over SocketIO
+- Fix Moonraker file upload did not track upload, failure or completion
+- Fix Moonraker file upload did not try-catch failures
+- Fix thumbnail is now parsed after file upload instead of before, preventing premature thumbnail switch in case of upload failure.
+- Fix file uploads were never unlinked, except for server startup.
+
 # FDM Monster 03/01/2025 1.8.2
 
-## Changes 
+## Changes
 
-Update client to 1.8.8
+- Update client to 1.8.8
 
 ## Chore
 
@@ -24,7 +37,7 @@ Update client to 1.8.8
 
 - Update to client 1.8.4
 
-## Fixes 
+## Fixes
 
 - YAML import: regression caused all imports to fail validation
 - YAML import: a bug caused all import with printers without api key to fail validation
@@ -52,7 +65,7 @@ Update client to 1.8.8
 
 ## Fixes
 
-- UserService: MongoDB had incorrect root user checks and SQLite user service missed the check altogether. Now root user checks are robust. 
+- UserService: MongoDB had incorrect root user checks and SQLite user service missed the check altogether. Now root user checks are robust.
 - Camera API: GUEST should not have access to change cameras
 - YAML import validation: new API keys are not accepted by outdated YAML validation
 
@@ -73,7 +86,7 @@ Update client to 1.8.8
 
 - User API: new endpoint which registers user directly with roles and without verification step
 
-## Fixes: 
+## Fixes:
 
 - PrinterEventsCache: when printers and test printers are deleted, the printer events cache should not be allowed to be filled by late update events
 
@@ -90,7 +103,7 @@ Update client to 1.8.8
 ## Fixes:
 
 - API & Service validators: adjust max length of apiKey property validation to 43 to allow new `secrets` based OctoPrint api keys
- 
+
 # FDM Monster 04/11/2024 1.7.1
 
 ## Changes:

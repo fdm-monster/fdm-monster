@@ -2,7 +2,6 @@ name: NodeJS Release
 on:
   push:
     branches:
-      - 'develop'
       - 'main'
 jobs:
   checkversion:
@@ -62,7 +61,7 @@ jobs:
       # Publish to NPM
       - uses: JS-DevTools/npm-publish@v3
         with:
-          dry-run: ${{ github.ref_name == 'develop' }}
+          dry-run: false
           token: ${{ secrets.NPM_TOKEN }}
           access: public
           package: package.json
@@ -71,7 +70,7 @@ jobs:
         uses: actions/create-release@v1
         id: create_release
         with:
-          draft: ${{ github.ref_name == 'develop' }}
+          draft: false
           prerelease: ${{ contains(env.SERVER_VERSION, 'rc') || contains(env.SERVER_VERSION, 'unstable') }}
           tag_name: ${{ env.RELEASE_TAG }}
           release_name: ${{ env.RELEASE_TAG }} Thumbnail Thumper 🔨
