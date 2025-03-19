@@ -1,5 +1,7 @@
 # Develop
 
+# FDM Monster 19/03/2025 1.8.3
+
 ## Fixes
 
 - Introduce HttpClientBuilder pattern for Octoprint client
