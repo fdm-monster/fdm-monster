@@ -137,7 +137,7 @@
     "mongodb-memory-server": "10.1.4",
     "nock": "13.5.6",
     "prettier": "2.8.8",
-    "supertest": "7.0.0",
+    "supertest": "7.1.0",
     "ts-node": "10.9.2",
     "typescript": "5.8.2"
   },
