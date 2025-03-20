@@ -21,6 +21,9 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
 import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
 import { PluginFirmwareUpdateService } from "@/services/octoprint/plugin-firmware-update.service";
+import { PrusaLinkClient } from "@/services/prusa-link/prusa-link.client";
+import { PrusaLinkHttpClientBuilder } from "@/services/prusa-link/utils/prusa-link-http-client.builder";
+import { PrusaLinkType } from "@/services/printer-api.interface";
 
 export class BootTask {
   logger: LoggerService;
@@ -42,6 +45,7 @@ export class BootTask {
   isTypeormMode: boolean;
   typeormService: TypeormService;
   printerThumbnailCache: PrinterThumbnailCache;
+  prusaLinkApi: PrusaLinkClient;
 
   constructor({
     loggerFactory,
@@ -62,6 +66,7 @@ export class BootTask {
     typeormService,
     isTypeormMode,
     printerThumbnailCache,
+    prusaLinkApi,
   }: {
     loggerFactory: ILoggerFactory;
     serverTasks: ServerTasks;
@@ -81,6 +86,7 @@ export class BootTask {
     typeormService: TypeormService;
     isTypeormMode: boolean;
     printerThumbnailCache: PrinterThumbnailCache;
+    prusaLinkApi: PrusaLinkClient;
   }) {
     this.isTypeormMode = isTypeormMode;
     this.logger = loggerFactory(BootTask.name);
@@ -100,6 +106,7 @@ export class BootTask {
     this.configService = configService;
     this.typeormService = typeormService;
     this.printerThumbnailCache = printerThumbnailCache;
+    this.prusaLinkApi = prusaLinkApi;
   }
 
   async runOnce() {
@@ -165,6 +172,25 @@ export class BootTask {
     const overrideJwtSecret = this.configService.get(AppConstants.OVERRIDE_JWT_SECRET, undefined);
     const overrideJwtExpiresIn = this.configService.get(AppConstants.OVERRIDE_JWT_EXPIRES_IN, undefined);
     await this.settingsStore.persistOptionalCredentialSettings(overrideJwtSecret, overrideJwtExpiresIn);
+
+    const prusaLinkUrl = process.env["TEST_PL_URL"];
+    const prusaLinkUsername = process.env["TEST_PL_USERNAME"];
+    const prusaLinkPassword = process.env["TEST_PL_PASSWORD"];
+    if (prusaLinkUrl?.length) {
+      this.prusaLinkApi.login = {
+        printerURL: prusaLinkUrl,
+        username: prusaLinkUsername,
+        password: prusaLinkPassword,
+        apiKey: "",
+        printerType: PrusaLinkType,
+      };
+      await this.prusaLinkApi.updateAuthHeader();
+
+      const version = await this.prusaLinkApi.getVersion();
+      this.logger.log(`Prusa link server version: ${version}`);
+      const files = await this.prusaLinkApi.getFiles();
+      this.logger.log(`Prusa link files: ${files.map((f) => f.path).join("\n")}`);
+    }
 
     this.logger.log("Clearing upload folder");
     this.multerService.clearUploadsFolder();
