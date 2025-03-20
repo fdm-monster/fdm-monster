@@ -74,6 +74,7 @@ import { MoonrakerApi } from "@/services/moonraker.api";
 import { PrinterApiFactory } from "@/services/printer-api.factory";
 import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
 import { HttpClientFactory } from "@/services/core/http-client.factory";
+import { PrusaLinkClient } from "@/services/prusa-link/prusa-link.client";
 
 export function config<T1, T2>(
   key: string,
@@ -164,6 +165,7 @@ export function configureContainer(isSqlite: boolean = false) {
     [di.yamlService]: asClass(YamlService),
     [di.printerLogin]: asValue(null), // Fallback when no scope is provided
     [di.printerApiFactory]: asClass(PrinterApiFactory).transient(), // Factory function, transient on purpose!
+    [di.prusaLinkApi]: asClass(PrusaLinkClient).transient(), // Transient on purpose
     [di.octoprintApi]: asClass(OctoprintApi).transient(), // Transient on purpose
     [di.octoprintClient]: asClass(OctoprintClient).singleton(),
     [di.octoPrintSockIoAdapter]: asClass(OctoprintWebsocketAdapter).transient(), // Transient on purpose

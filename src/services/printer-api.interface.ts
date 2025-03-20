@@ -7,7 +7,8 @@ import { IdType } from "@/shared.constants";
 
 export const OctoprintType = 0;
 export const MoonrakerType = 1;
-export type PrinterType = typeof OctoprintType | typeof MoonrakerType;
+export const PrusaLinkType = 2;
+export type PrinterType = typeof OctoprintType | typeof MoonrakerType | typeof PrusaLinkType;
 
 export interface StatusFlags {
   connected: boolean;

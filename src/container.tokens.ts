@@ -36,6 +36,7 @@ export const DITokens = {
   permissionService: "permissionService",
   jwtService: "jwtService",
   roleService: "roleService",
+  prusaLinkApi: "prusaLinkApi",
   octoprintApi: "octoprintApi",
   octoprintClient: "octoprintClient",
   moonrakerApi: "moonrakerApi",
