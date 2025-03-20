@@ -22,10 +22,6 @@ export class OctoprintApi implements IPrinterApi {
     this.printerLogin = login;
   }
 
-  get login() {
-    return this.printerLogin;
-  }
-
   async getVersion() {
     const result = await this.client.getApiVersion(this.login);
     return result.data?.server;
