@@ -22,6 +22,7 @@ export class Settings implements ISettings<number> {
     experimentalMoonrakerSupport: boolean;
     experimentalClientSupport: boolean;
     experimentalThumbnailSupport: boolean;
+    experimentalPrusaLinkSupport: boolean;
   };
 
   @Column({ type: "simple-json", nullable: false })

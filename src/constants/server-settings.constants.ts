@@ -26,6 +26,7 @@ export const getDefaultServerSettings = (): ServerSettingsDto => ({
   experimentalTypeormSupport: false,
   experimentalClientSupport: false,
   experimentalThumbnailSupport: false,
+  experimentalPrusaLinkSupport: false,
 });
 
 export const credentialSettingsKey = "credentials";
