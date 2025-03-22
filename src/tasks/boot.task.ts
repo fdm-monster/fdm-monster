@@ -21,7 +21,7 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
 import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
 import { PluginFirmwareUpdateService } from "@/services/octoprint/plugin-firmware-update.service";
-import { PrusaLinkClient } from "@/services/prusa-link/prusa-link.client";
+import { PrusaLinkApi } from "@/services/prusa-link/prusa-link.api";
 import { PrusaLinkHttpClientBuilder } from "@/services/prusa-link/utils/prusa-link-http-client.builder";
 import { PrusaLinkType } from "@/services/printer-api.interface";
 
@@ -45,7 +45,7 @@ export class BootTask {
   isTypeormMode: boolean;
   typeormService: TypeormService;
   printerThumbnailCache: PrinterThumbnailCache;
-  prusaLinkApi: PrusaLinkClient;
+  prusaLinkApi: PrusaLinkApi;
 
   constructor({
     loggerFactory,
@@ -86,7 +86,7 @@ export class BootTask {
     typeormService: TypeormService;
     isTypeormMode: boolean;
     printerThumbnailCache: PrinterThumbnailCache;
-    prusaLinkApi: PrusaLinkClient;
+    prusaLinkApi: PrusaLinkApi;
   }) {
     this.isTypeormMode = isTypeormMode;
     this.logger = loggerFactory(BootTask.name);

@@ -182,6 +182,7 @@ export class SettingsService2 extends BaseService(Settings, SettingsDto) impleme
         experimentalMoonrakerSupport: entity[serverSettingsKey].experimentalMoonrakerSupport,
         sentryDiagnosticsEnabled: entity[serverSettingsKey].sentryDiagnosticsEnabled,
         experimentalThumbnailSupport: entity[serverSettingsKey].experimentalThumbnailSupport || false,
+        experimentalPrusaLinkSupport: entity[serverSettingsKey].experimentalPrusaLinkSupport || false,
       };
     }
     if (!entity[credentialSettingsKey]) {

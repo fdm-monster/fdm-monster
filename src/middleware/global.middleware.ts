@@ -1,5 +1,4 @@
 import { inject } from "awilix-express";
-import { serverSettingsKey } from "@/constants/server-settings.constants";
 import { ForbiddenError } from "@/exceptions/runtime.exceptions";
 import { NextFunction, Request, Response } from "express";
 import { SettingsStore } from "@/state/settings.store";
