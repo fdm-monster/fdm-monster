@@ -3,9 +3,10 @@ import { DITokens } from "@/container.tokens";
 import { NextFunction, Request, Response } from "express";
 import { PrinterCache } from "@/state/printer.cache";
 import { OctoprintApi } from "@/services/octoprint.api";
-import { MoonrakerType, OctoprintType } from "@/services/printer-api.interface";
+import { MoonrakerType, OctoprintType, PrusaLinkType } from "@/services/printer-api.interface";
 import { MoonrakerApi } from "@/services/moonraker.api";
 import { SettingsStore } from "@/state/settings.store";
+import { PrusaLinkApi } from "@/services/prusa-link/prusa-link.api";
 
 export const printerIdToken = "currentPrinterId";
 export const printerApiToken = "printerApi";
@@ -17,6 +18,7 @@ export const printerResolveMiddleware = (key = "id") => {
     const printerCache = req.container.resolve<PrinterCache>(DITokens.printerCache);
     const settingsService = req.container.resolve<any>(DITokens.settingsStore) as SettingsStore;
     const moonrakerEnabled = settingsService.getServerSettings().experimentalMoonrakerSupport;
+    const prusaLinkEnabled = settingsService.getServerSettings().experimentalPrusaLinkSupport;
 
     let scopedPrinter = undefined;
     let loginDto = undefined;
@@ -32,9 +34,9 @@ export const printerResolveMiddleware = (key = "id") => {
         [printerIdToken]: asValue(printerId),
       });
 
-      const octoprintApiInstance = req.container.resolve<OctoprintApi>(DITokens.octoprintApi);
       switch (scopedPrinter.printerType) {
         case OctoprintType:
+          const octoprintApiInstance = req.container.resolve<OctoprintApi>(DITokens.octoprintApi);
           req.container.register({
             [printerApiToken]: asValue(octoprintApiInstance),
           });
@@ -45,6 +47,11 @@ export const printerResolveMiddleware = (key = "id") => {
             [printerApiToken]: moonrakerEnabled ? asValue(moonrakerInstance) : asValue(undefined),
           });
           break;
+        case PrusaLinkType:
+          const prusaLinkInstance = req.container.resolve<PrusaLinkApi>(DITokens.prusaLinkApi);
+          req.container.register({
+            [printerApiToken]: prusaLinkEnabled ? asValue(prusaLinkInstance) : asValue(undefined),
+          });
       }
     } else {
       req.container.register({

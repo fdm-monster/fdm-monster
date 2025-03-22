@@ -33,6 +33,7 @@ export interface IServerSettings {
   loginRequired: boolean;
   registration: boolean;
   experimentalMoonrakerSupport: boolean;
+  experimentalPrusaLinkSupport: boolean;
   experimentalClientSupport: boolean;
   experimentalThumbnailSupport: boolean;
 }
@@ -143,6 +144,11 @@ const SettingsSchema = new Schema<ISettings>({
       required: true,
     },
     experimentalThumbnailSupport: {
+      type: Boolean,
+      default: false,
+      required: true,
+    },
+    experimentalPrusaLinkSupport: {
       type: Boolean,
       default: false,
       required: true,

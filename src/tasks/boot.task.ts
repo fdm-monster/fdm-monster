@@ -17,7 +17,7 @@ import { UserService } from "@/services/mongoose/user.service";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
-import { PrusaLinkClient } from "@/services/prusa-link/prusa-link.client";
+import { PrusaLinkApi } from "@/services/prusa-link/prusa-link.api";
 import { PrusaLinkHttpClientBuilder } from "@/services/prusa-link/utils/prusa-link-http-client.builder";
 import { PrusaLinkType } from "@/services/printer-api.interface";
 
@@ -39,7 +39,7 @@ export class BootTask {
     private readonly typeormService: TypeormService,
     private readonly isTypeormMode: boolean,
     private readonly printerThumbnailCache: PrinterThumbnailCache,
-    private readonly prusaLinkApi: PrusaLinkClient
+    private readonly prusaLinkApi: PrusaLinkApi
   ) {
     this.logger = loggerFactory(BootTask.name);
   }

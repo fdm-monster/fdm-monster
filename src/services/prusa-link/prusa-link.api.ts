@@ -17,7 +17,7 @@ import { PL_FileResponseDto } from "@/services/prusa-link/dto/file-response.dto"
  * Prusa Link https://github.com/prusa3d/Prusa-Link
  * Prusa Link Web https://github.com/prusa3d/Prusa-Link-Web/tree/master
  */
-export class PrusaLinkClient implements IPrinterApi {
+export class PrusaLinkApi implements IPrinterApi {
   eventEmitter2: EventEmitter2;
   protected httpClientFactory: HttpClientFactory;
   protected logger: LoggerService;
@@ -38,7 +38,7 @@ export class PrusaLinkClient implements IPrinterApi {
   }) {
     this.httpClientFactory = httpClientFactory;
     this.eventEmitter2 = eventEmitter2;
-    this.logger = loggerFactory(PrusaLinkClient.name);
+    this.logger = loggerFactory(PrusaLinkApi.name);
     this.printerLogin = printerLogin;
   }
 

@@ -123,4 +123,5 @@ export class SettingsService
     const settingsList = await this.repository.find({ take: 1 });
     return settingsList?.length ? settingsList[0] : null;
   }
+        experimentalPrusaLinkSupport: entity[serverSettingsKey].experimentalPrusaLinkSupport || false,
 }
