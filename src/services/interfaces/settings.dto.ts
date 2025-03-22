@@ -24,6 +24,7 @@ export interface ServerSettingsDto {
   experimentalTypeormSupport: boolean;
   experimentalClientSupport: boolean;
   experimentalThumbnailSupport: boolean;
+  experimentalPrusaLinkSupport: boolean;
 }
 
 export interface WizardSettingsDto {

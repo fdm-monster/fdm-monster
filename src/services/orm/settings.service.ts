@@ -175,6 +175,7 @@ export class SettingsService
         experimentalMoonrakerSupport: entity[serverSettingsKey].experimentalMoonrakerSupport,
         sentryDiagnosticsEnabled: entity[serverSettingsKey].sentryDiagnosticsEnabled,
         experimentalThumbnailSupport: entity[serverSettingsKey].experimentalThumbnailSupport || false,
+        experimentalPrusaLinkSupport: entity[serverSettingsKey].experimentalPrusaLinkSupport || false,
       };
     }
     if (!entity[credentialSettingsKey]) {

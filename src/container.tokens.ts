@@ -56,6 +56,7 @@ export const DITokens = {
   printerSocketStore: "printerSocketStore",
   testPrinterSocketStore: "testPrinterSocketStore",
   printerFilesStore: "printerFilesStore",
+  prusaLinkPollingAdapter: "prusaLinkPollingAdapter",
   octoPrintSockIoAdapter: "octoPrintSockIoAdapter",
   moonrakerWebsocketAdapter: "moonrakerWebsocketAdapter",
   // Caches
