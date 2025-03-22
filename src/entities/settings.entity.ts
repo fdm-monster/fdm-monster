@@ -29,6 +29,7 @@ export class Settings {
     experimentalMoonrakerSupport: boolean;
     experimentalClientSupport: boolean;
     experimentalThumbnailSupport: boolean;
+    experimentalPrusaLinkSupport: boolean;
   };
 
   @Column({ type: "simple-json", nullable: false })

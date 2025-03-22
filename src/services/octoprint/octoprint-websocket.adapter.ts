@@ -49,8 +49,8 @@ export const octoPrintEvent = (event: string) => `octoprint.${event}`;
 
 export class OctoprintWebsocketAdapter extends WebsocketAdapter implements IWebsocketAdapter {
   protected declare logger: LoggerService;
-
-  public readonly printerType = 0;
+  
+  public readonly printerType = OctoprintType;
   public printerId?: IdType;
   stateUpdated = false;
   stateUpdateTimestamp: null | number = null;
