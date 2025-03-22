@@ -53,6 +53,7 @@ export class SettingsStore {
         registration: settings[serverSettingsKey].registration,
         sentryDiagnosticsEnabled: settings[serverSettingsKey].sentryDiagnosticsEnabled,
         experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
+        experimentalPrusaLinkSupport: settings[serverSettingsKey].experimentalPrusaLinkSupport,
         experimentalTypeormSupport: this.isTypeOrmMode,
         experimentalClientSupport: settings[serverSettingsKey].experimentalClientSupport,
         experimentalThumbnailSupport: settings[serverSettingsKey].experimentalThumbnailSupport,

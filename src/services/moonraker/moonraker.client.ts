@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosResponse } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 import { ServerInfoDto } from "@/services/moonraker/dto/server/server-info.dto";
 import { LoginDto } from "@/services/interfaces/login.dto";
 import { ResultDto } from "./dto/rest/result.dto";

@@ -30,6 +30,7 @@ export class Settings extends BaseEntity {
     experimentalMoonrakerSupport: boolean;
     experimentalClientSupport: boolean;
     experimentalThumbnailSupport: boolean;
+    experimentalPrusaLinkSupport: boolean;
   };
 
   @Column({ type: "simple-json", nullable: false })

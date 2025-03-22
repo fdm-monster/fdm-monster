@@ -48,7 +48,7 @@ export const OctoPrintMessage = {
 export const octoPrintEvent = (event: string) => `octoprint.${event}`;
 
 export class OctoprintWebsocketAdapter extends WebsocketAdapter implements IWebsocketAdapter {
-  public readonly printerType = 0;
+  public readonly printerType = OctoprintType;
   octoprintClient: OctoprintClient;
   public printerId?: IdType;
   stateUpdated = false;
