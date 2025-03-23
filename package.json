@@ -101,8 +101,6 @@
     "@swc/core": "1.11.11",
     "@swc/jest": "0.2.37",
     "@types/adm-zip": "0.5.7",
-    "@types/bcryptjs": "3.0.0",
-    "@types/cache-manager": "5.0.0",
     "@types/connect-history-api-fallback": "1.5.4",
     "@types/cookie-parser": "1.4.8",
     "@types/express": "5.0.1",

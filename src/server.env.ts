@@ -66,8 +66,8 @@ export function fetchServerPort() {
   return port;
 }
 
-export function ensureMongoDBConnectionStringSet() {
-  let dbConnectionString = process.env[AppConstants.MONGO_KEY];
+export function ensureMongoDbConnectionStringSet() {
+  const dbConnectionString = process.env[AppConstants.MONGO_KEY];
   if (!dbConnectionString) {
     fetchMongoDBConnectionString();
   } else {
@@ -115,7 +115,7 @@ export function setupEnvConfig(skipDotEnv = false) {
   ensureNodeEnvSet();
   ensurePackageVersionSet();
   setupSentry();
-  ensureMongoDBConnectionStringSet();
+  ensureMongoDbConnectionStringSet();
   ensurePortSet();
 }
 
