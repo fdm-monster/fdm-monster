@@ -58,6 +58,10 @@ export const moonrakerSupportSchema = z.object({
   enabled: z.boolean(),
 });
 
+export const prusaLinkSupportSchema = z.object({
+  enabled: z.boolean(),
+});
+
 export const thumbnailSupportSchema = z.object({
   enabled: z.boolean(),
 });

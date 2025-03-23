@@ -198,7 +198,7 @@
 - Used attributes for PrinterFilesController
 - Renamed OctoPrintApiService to OctoprintClient
 - Switch to 1.6.x client UI version range
-- Update Octoprint websocket with refresh interval, defaulting to 10sec. This loop will keep refresh attempts internal to the Websocket adapter of each service type (Octoprint, Moonraker, Bambu, etc).
+- Update Octoprint websocket with refresh interval, defaulting to 10sec. This loop will keep refresh attempts internal to the Websocket adapter of each service type (Octoprint, Moonraker, etc).
 
 ## Fixes:
 
