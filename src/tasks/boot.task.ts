@@ -116,19 +116,23 @@ export class BootTask {
     const prusaLinkUsername = process.env["TEST_PL_USERNAME"];
     const prusaLinkPassword = process.env["TEST_PL_PASSWORD"];
     if (prusaLinkUrl?.length) {
-      this.prusaLinkApi.login = {
-        printerURL: prusaLinkUrl,
-        username: prusaLinkUsername,
-        password: prusaLinkPassword,
-        apiKey: "",
-        printerType: PrusaLinkType,
-      };
-      await this.prusaLinkApi.updateAuthHeader();
+      try {
+        this.prusaLinkApi.login = {
+          printerURL: prusaLinkUrl,
+          username: prusaLinkUsername,
+          password: prusaLinkPassword,
+          apiKey: "",
+          printerType: PrusaLinkType,
+        };
+        await this.prusaLinkApi.updateAuthHeader();
 
-      const version = await this.prusaLinkApi.getVersion();
-      this.logger.log(`Prusa link server version: ${version}`);
-      const files = await this.prusaLinkApi.getFiles();
-      this.logger.log(`Prusa link files: ${files.map((f) => f.path).join("\n")}`);
+        const version = await this.prusaLinkApi.getVersion();
+        this.logger.log(`Prusa link server version: ${version}`);
+        const files = await this.prusaLinkApi.getFiles();
+        this.logger.log(`Prusa link files: ${files.map((f) => f.path).join("\n")}`);
+      } catch (e) {
+        this.logger.error(e);
+      }
     }
 
     this.logger.log("Clearing upload folder");

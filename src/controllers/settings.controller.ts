@@ -9,6 +9,7 @@ import {
   fileCleanSettingsUpdateSchema,
   frontendSettingsUpdateSchema,
   moonrakerSupportSchema,
+  prusaLinkSupportSchema,
   sentryDiagnosticsEnabledSchema,
   thumbnailSupportSchema,
   timeoutSettingsUpdateSchema,
@@ -19,7 +20,7 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 import { demoUserNotAllowed } from "@/middleware/demo.middleware";
 import { PrinterCache } from "@/state/printer.cache";
-import { MoonrakerType } from "@/services/printer-api.interface";
+import { MoonrakerType, PrusaLinkType } from "@/services/printer-api.interface";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
 import { loginRequiredSchema, registrationEnabledSchema } from "@/controllers/validation/setting.validation";
@@ -84,6 +85,23 @@ export class SettingsController {
       const printers = await this.printerCache.listCachedPrinters(false);
       const klipperPrinters = printers.filter((p) => p.printerType === MoonrakerType);
       for (const printer of klipperPrinters) {
+        await this.printerService.updateEnabled(printer.id, false);
+      }
+    }
+    res.send(result);
+  }
+
+  @PUT()
+  @route("/experimental-prusa-link-support")
+  @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
+  async updatePrusaLinkSupport(req: Request, res: Response) {
+    const { enabled } = await validateInput(req.body, prusaLinkSupportSchema);
+    const result = await this.settingsStore.setExperimentalPrusaLinkSupport(enabled);
+
+    if (!enabled) {
+      const printers = await this.printerCache.listCachedPrinters(false);
+      const prusaLinkPrinters = printers.filter((p) => p.printerType === PrusaLinkType);
+      for (const printer of prusaLinkPrinters) {
         await this.printerService.updateEnabled(printer.id, false);
       }
     }

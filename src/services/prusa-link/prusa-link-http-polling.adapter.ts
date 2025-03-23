@@ -5,8 +5,10 @@ import { LoggerService } from "@/handlers/logger";
 import EventEmitter2 from "eventemitter2";
 import { ConfigService } from "@/services/core/config.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
+import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
+import { ISocketLogin } from "@/shared/dtos/socket-login.dto";
 
-export class PrusaLinkHttpPollingAdapter {
+export class PrusaLinkHttpPollingAdapter implements IWebsocketAdapter {
   public readonly printerType = PrusaLinkType;
   prusaLinkApi: PrusaLinkApi;
   public printerId?: IdType;
@@ -33,6 +35,43 @@ export class PrusaLinkHttpPollingAdapter {
     this.configService = configService;
   }
 
+  socketState: "unopened" | "opening" | "authenticating" | "opened" | "authenticated" | "aborted" | "error" | "closed";
+  apiState: "unset" | "noResponse" | "globalKey" | "authFail" | "responding";
+  needsReopen(): boolean {
+    throw new Error("Method not implemented.");
+  }
+  needsSetup(): boolean {
+    throw new Error("Method not implemented.");
+  }
+  needsReauth(): boolean {
+    throw new Error("Method not implemented.");
+  }
+  reauthSession(): void {
+    throw new Error("Method not implemented.");
+  }
+  registerCredentials(socketLogin: ISocketLogin): void {
+    this.socketURL = new URL(socketLogin.loginDto.printerURL);
+    this.printerId = socketLogin.printerId;
+  }
+  open(): void {
+    throw new Error("Method not implemented.");
+  }
+  close(): void {
+    throw new Error("Method not implemented.");
+  }
+  setupSocketSession(): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
+  resetSocketState(): void {
+    // throw new Error("Method not implemented.");
+  }
+  allowEmittingEvents(): void {
+    throw new Error("Method not implemented.");
+  }
+  disallowEmittingEvents(): void {
+    throw new Error("Method not implemented.");
+  }
+
   startPolling() {
     this.stopPolling(); // Ensure no duplicate intervals exist
 
@@ -43,8 +82,9 @@ export class PrusaLinkHttpPollingAdapter {
       }
 
       try {
-        const status = await this.prusaLinkApi.getStatus(this.printerId);
-        this.eventEmitter.emit("prusaLinkStatus", status);
+        await this.prusaLinkApi.updateAuthHeader();
+        const status = await this.prusaLinkApi.getVersion();
+        // this.eventEmitter.emit("prusaLinkStatus", status);
       } catch (error) {
         this.logger.error("Failed to fetch PrusaLink status", error);
       }
