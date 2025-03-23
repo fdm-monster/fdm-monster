@@ -16,8 +16,8 @@ export function registerTask(task: any, preset: TimingPreset, milliseconds = 0, 
 }
 
 export class ServerTasks {
-  static SERVER_BOOT_TASK = registerTask(DITokens.bootTask, TaskPresets.PERIODIC_DISABLED, 5000, false);
-  static BOOT_TASKS = [
+  public static SERVER_BOOT_TASK = registerTask(DITokens.bootTask, TaskPresets.PERIODIC_DISABLED, 5000, false);
+  public static BOOT_TASKS = [
     registerTask(DITokens.softwareUpdateTask, TaskPresets.RUNDELAYED, 1500),
     registerTask(DITokens.clientDistDownloadTask, TaskPresets.RUNONCE),
     registerTask(DITokens.socketIoTask, TaskPresets.PERIODIC, 500),

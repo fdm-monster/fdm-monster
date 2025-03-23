@@ -96,7 +96,6 @@ export function configureContainer(isSqlite: boolean = false) {
 
   container.register({
     // -- asValue/asFunction constants --
-    [di.serverTasks]: asValue(ServerTasks),
     [di.isTypeormMode]: asValue(isSqlite),
     [di.appDefaultRole]: asValue(ROLES.GUEST),
     [di.appDefaultRoleNoLogin]: asValue(ROLES.ADMIN),

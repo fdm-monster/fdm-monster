@@ -7,14 +7,12 @@ import { BootTask } from "@/tasks/boot.task";
 
 let container: AwilixContainer;
 let taskManager: TaskManagerService;
-let serverTasks: ServerTasks;
 let task: BootTask;
 
 beforeAll(async () => {
   ({ container } = await setupTestApp(false));
   taskManager = container.resolve(DITokens.taskManagerService);
   task = container.resolve(DITokens.bootTask);
-  serverTasks = container.resolve(DITokens.serverTasks);
 });
 
 describe(BootTask.name, () => {
@@ -26,7 +24,7 @@ describe(BootTask.name, () => {
   });
 
   it("should skip running tasks by default", async () => {
-    taskManager.registerJobOrTask(serverTasks.SERVER_BOOT_TASK);
+    taskManager.registerJobOrTask(ServerTasks.SERVER_BOOT_TASK);
     await task.run();
 
     expect(taskManager.isTaskDisabled(DITokens.bootTask)).toBeTruthy();
