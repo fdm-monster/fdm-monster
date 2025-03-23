@@ -48,6 +48,10 @@ export const moonrakerSupportRules = {
   enabled: "required|boolean",
 };
 
+export const prusaLinkSupportRules = {
+  enabled: "required|boolean",
+};
+
 export const thumbnailSupportRules = {
   enabled: "required|boolean",
 };

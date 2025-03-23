@@ -23,7 +23,6 @@ export interface FileDto {
   path: string;
   size: number;
   date: number;
-  // hash?: number | string;
 }
 
 export const capabilities = {

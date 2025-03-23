@@ -9,6 +9,7 @@ import {
   fileCleanSettingsUpdateRules,
   frontendSettingsUpdateRules,
   moonrakerSupportRules,
+  prusaLinkSupportRules,
   sentryDiagnosticsEnabledRules,
   serverSettingsUpdateRules,
   thumbnailSupportRules,
@@ -21,7 +22,7 @@ import { LoggerService } from "@/handlers/logger";
 import { demoUserNotAllowed, demoUserNotAllowedInterceptor } from "@/middleware/demo.middleware";
 import { IConfigService } from "@/services/core/config.service";
 import { PrinterCache } from "@/state/printer.cache";
-import { MoonrakerType } from "@/services/printer-api.interface";
+import { MoonrakerType, PrusaLinkType } from "@/services/printer-api.interface";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
 
@@ -99,6 +100,20 @@ export class SettingsController {
     res.send(result);
   }
 
+  async updatePrusaLinkSupport(req: Request, res: Response) {
+    const { enabled } = await validateInput(req.body, prusaLinkSupportRules);
+    const result = await this.settingsStore.setExperimentalPrusaLinkSupport(enabled);
+
+    if (!enabled) {
+      const printers = await this.printerCache.listCachedPrinters(false);
+      const prusaLinkPrinters = printers.filter((p) => p.printerType === PrusaLinkType);
+      for (const printer of prusaLinkPrinters) {
+        await this.printerService.updateEnabled(printer.id, false);
+      }
+    }
+    res.send(result);
+  }
+
   async updateThumbnailSupport(req: Request, res: Response) {
     const { enabled } = await validateInput(req.body, thumbnailSupportRules);
     const result = await this.settingsStore.setExperimentalThumbnailSupport(enabled);
@@ -168,6 +183,7 @@ export default createController(SettingsController)
     .get("/sensitive", "getSettingsSensitive", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
     .patch("/sentry-diagnostics", "updateSentryDiagnosticsEnabled", demoUserNotAllowedInterceptor)
     .put("/experimental-moonraker-support", "updateMoonrakerSupport", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
+    .put("/experimental-prusa-link-support", "updatePrusaLinkSupport", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
     .put("/experimental-thumbnail-support", "updateThumbnailSupport", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
     .put("/experimental-client-support", "updateClientSupport", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })
     .put("/server", "updateServerSettings", { before: [authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed] })

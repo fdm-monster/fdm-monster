@@ -75,6 +75,7 @@ import { PrinterApiFactory } from "@/services/printer-api.factory";
 import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
 import { HttpClientFactory } from "@/services/core/http-client.factory";
 import { PrusaLinkApi } from "@/services/prusa-link/prusa-link.api";
+import { PrusaLinkHttpPollingAdapter } from "@/services/prusa-link/prusa-link-http-polling.adapter";
 
 export function config<T1, T2>(
   key: string,
@@ -166,6 +167,7 @@ export function configureContainer(isSqlite: boolean = false) {
     [di.printerLogin]: asValue(null), // Fallback when no scope is provided
     [di.printerApiFactory]: asClass(PrinterApiFactory).transient(), // Factory function, transient on purpose!
     [di.prusaLinkApi]: asClass(PrusaLinkApi).transient(), // Transient on purpose
+    [di.prusaLinkPollingAdapter]: asClass(PrusaLinkHttpPollingAdapter).transient(), // Transient on purpose
     [di.octoprintApi]: asClass(OctoprintApi).transient(), // Transient on purpose
     [di.octoprintClient]: asClass(OctoprintClient).singleton(),
     [di.octoPrintSockIoAdapter]: asClass(OctoprintWebsocketAdapter).transient(), // Transient on purpose
