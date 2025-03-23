@@ -23,7 +23,6 @@ import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
 export class BootTask {
   logger: LoggerService;
   taskManagerService: TaskManagerService;
-  serverTasks: ServerTasks;
   settingsStore: SettingsStore;
   settingsService: ISettingsService;
   multerService: MulterService;
@@ -41,7 +40,6 @@ export class BootTask {
 
   constructor({
     loggerFactory,
-    serverTasks,
     settingsService,
     settingsStore,
     multerService,
@@ -59,7 +57,6 @@ export class BootTask {
     printerThumbnailCache,
   }: {
     loggerFactory: ILoggerFactory;
-    serverTasks: ServerTasks;
     settingsService: ISettingsService;
     settingsStore: SettingsStore;
     multerService: MulterService;
@@ -78,7 +75,6 @@ export class BootTask {
   }) {
     this.isTypeormMode = isTypeormMode;
     this.logger = loggerFactory(BootTask.name);
-    this.serverTasks = serverTasks;
     this.settingsService = settingsService;
     this.settingsStore = settingsStore;
     this.multerService = multerService;
@@ -97,7 +93,7 @@ export class BootTask {
 
   async runOnce() {
     // To cope with retries after failures we register this task - disabled
-    this.taskManagerService.registerJobOrTask(this.serverTasks.SERVER_BOOT_TASK);
+    this.taskManagerService.registerJobOrTask(ServerTasks.SERVER_BOOT_TASK);
 
     this.logger.log("Running boot task once.");
     await this.run();
@@ -175,7 +171,7 @@ export class BootTask {
     if (process.env.SAFEMODE_ENABLED === "true") {
       this.logger.warn("Starting in safe mode due to SAFEMODE_ENABLED");
     } else {
-      this.serverTasks.BOOT_TASKS.forEach((task) => {
+      ServerTasks.BOOT_TASKS.forEach((task) => {
         this.taskManagerService.registerJobOrTask(task);
       });
     }

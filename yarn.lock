@@ -1038,8 +1038,6 @@ __metadata:
     "@swc/core": "npm:1.11.11"
     "@swc/jest": "npm:0.2.37"
     "@types/adm-zip": "npm:0.5.7"
-    "@types/bcryptjs": "npm:3.0.0"
-    "@types/cache-manager": "npm:5.0.0"
     "@types/connect-history-api-fallback": "npm:1.5.4"
     "@types/cookie-parser": "npm:1.4.8"
     "@types/express": "npm:5.0.1"
@@ -1486,15 +1484,6 @@ __metadata:
     "@jridgewell/resolve-uri": "npm:^3.1.0"
     "@jridgewell/sourcemap-codec": "npm:^1.4.14"
   checksum: 10c0/3d1ce6ebc69df9682a5a8896b414c6537e428a1d68b02fcc8363b04284a8ca0df04d0ee3013132252ab14f2527bc13bea6526a912ecb5658f0e39fd2860b4df4
-  languageName: node
-  linkType: hard
-
-"@keyv/serialize@npm:^1.0.3":
-  version: 1.0.3
-  resolution: "@keyv/serialize@npm:1.0.3"
-  dependencies:
-    buffer: "npm:^6.0.3"
-  checksum: 10c0/24a257870b0548cfe430680c2ae1641751e6a6ec90c573eaf51bfe956839b6cfa462b4d2827157363b6d620872d32d69fa2f37210a864ba488f8ec7158436398
   languageName: node
   linkType: hard
 
@@ -3349,15 +3338,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/bcryptjs@npm:3.0.0":
-  version: 3.0.0
-  resolution: "@types/bcryptjs@npm:3.0.0"
-  dependencies:
-    bcryptjs: "npm:*"
-  checksum: 10c0/5d61ce381736f8252627cf32f2bbc17003c0361c6cf63ac23034a651b9c1edfdbf8f786730816e0b5257a927ffa369658562183a68495eb07ca2ddc77fbb171c
-  languageName: node
-  linkType: hard
-
 "@types/body-parser@npm:*":
   version: 1.19.5
   resolution: "@types/body-parser@npm:1.19.5"
@@ -3372,15 +3352,6 @@ __metadata:
   version: 1.0.2
   resolution: "@types/btoa-lite@npm:1.0.2"
   checksum: 10c0/daffbb47e4fe6493df70d83878b550adab48bab2f02b3591a59367af3ecebf34c971e070479ab68d83ca59cbeefbc61a50d9a7552f639dc908706183e0222bab
-  languageName: node
-  linkType: hard
-
-"@types/cache-manager@npm:5.0.0":
-  version: 5.0.0
-  resolution: "@types/cache-manager@npm:5.0.0"
-  dependencies:
-    cache-manager: "npm:*"
-  checksum: 10c0/b5343f9d5e88d2de55847b203247b6ec56a91915917897d17db9cce75b1cec286d24b7266981860d2b6f5d3a8de6193cf0db3644e04189cc88bfe25657e35db8
   languageName: node
   linkType: hard
 
@@ -4464,7 +4435,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bcryptjs@npm:*, bcryptjs@npm:3.0.2":
+"bcryptjs@npm:3.0.2":
   version: 3.0.2
   resolution: "bcryptjs@npm:3.0.2"
   bin:
@@ -4714,15 +4685,6 @@ __metadata:
     tar: "npm:^7.4.3"
     unique-filename: "npm:^4.0.0"
   checksum: 10c0/01f2134e1bd7d3ab68be851df96c8d63b492b1853b67f2eecb2c37bb682d37cb70bb858a16f2f0554d3c0071be6dfe21456a1ff6fa4b7eed996570d6a25ffe9c
-  languageName: node
-  linkType: hard
-
-"cache-manager@npm:*":
-  version: 6.4.1
-  resolution: "cache-manager@npm:6.4.1"
-  dependencies:
-    keyv: "npm:^5.3.1"
-  checksum: 10c0/abed9b208ae466117b6cd5b943b68701da0d3894b13500e6579473f501158840d42d20334ece3bd2e692755ad0fb98897b203e92d6f73046b346d48ce077d223
   languageName: node
   linkType: hard
 
@@ -8072,15 +8034,6 @@ __metadata:
   dependencies:
     json-buffer: "npm:3.0.1"
   checksum: 10c0/aa52f3c5e18e16bb6324876bb8b59dd02acf782a4b789c7b2ae21107fab95fab3890ed448d4f8dba80ce05391eeac4bfabb4f02a20221342982f806fa2cf271e
-  languageName: node
-  linkType: hard
-
-"keyv@npm:^5.3.1":
-  version: 5.3.2
-  resolution: "keyv@npm:5.3.2"
-  dependencies:
-    "@keyv/serialize": "npm:^1.0.3"
-  checksum: 10c0/293ebd052e7889685b8b770b7b4c9047aaafd821f5446b5b5ffa1cc6e9b830ee752f7b2d108bd96e1277c644c89f02a39e09c45159a6cb87663e183c4405989a
   languageName: node
   linkType: hard
 

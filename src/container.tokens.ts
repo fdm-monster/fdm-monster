@@ -63,7 +63,6 @@ export const DITokens = {
   fileCache: "fileCache",
   fileUploadTrackerCache: "fileUploadTrackerCache",
   // Tasks
-  serverTasks: "serverTasks",
   bootTask: "bootTask",
   softwareUpdateTask: "softwareUpdateTask",
   clientDistDownloadTask: "clientDistDownloadTask",

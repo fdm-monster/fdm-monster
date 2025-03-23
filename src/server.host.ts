@@ -117,7 +117,7 @@ export class ServerHost {
     app.use(express.static(backupClientPath));
 
     app
-      .get("*", (req, res) => {
+      .get("*", (req, _) => {
         const path = req.originalUrl;
 
         let resource = "MVC";

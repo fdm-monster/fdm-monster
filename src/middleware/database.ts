@@ -4,7 +4,7 @@ import { NextFunction, Request, Response } from "express";
 /**
  * 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting
  */
-export async function interceptDatabaseError(req: Request, res: Response, next: NextFunction) {
+export async function interceptDatabaseError(req: any | Request, res: Response, next: NextFunction) {
   const serverHost = req.container.resolve(DITokens.serverHost);
 
   const databaseReadyState = serverHost.hasConnected();

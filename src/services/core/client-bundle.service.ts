@@ -196,7 +196,7 @@ export class ClientBundleService {
     return release.tag_name;
   }
 
-  private async getClientBundleRelease(releaseTag: string): Promise<{ assets: any[] }> {
+  private async getClientBundleRelease(releaseTag: string) {
     const githubOwner = AppConstants.orgName;
     const githubRepo = AppConstants.clientRepoName;
 
