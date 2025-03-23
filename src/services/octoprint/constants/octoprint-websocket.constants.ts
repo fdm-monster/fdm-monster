@@ -12,9 +12,9 @@ export const EVENT_TYPES = {
   FileAdded: "FileAdded",
   FileDeselected: "FileDeselected",
   FileRemoved: "FileRemoved",
-  FirmwareData: "FirmwareData", // Not modeled yet
+  FirmwareData: "FirmwareData",
   FolderAdded: "FolderAdded",
-  FolderRemoved: "FolderRemoved", // Not modeled yet
+  FolderRemoved: "FolderRemoved",
   Home: "Home",
   MetadataAnalysisFinished: "MetadataAnalysisFinished",
   MetadataAnalysisStarted: "MetadataAnalysisStarted",

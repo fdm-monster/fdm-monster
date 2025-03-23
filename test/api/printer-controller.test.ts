@@ -1,5 +1,5 @@
 import { setupTestApp } from "../test-server";
-import { expectBadRequestError, expectInvalidResponse, expectNotFoundResponse, expectOkResponse } from "../extensions";
+import { expectInvalidResponse, expectNotFoundResponse, expectOkResponse } from "../extensions";
 import { AppConstants } from "@/server.constants";
 import { createTestPrinter, testApiKey } from "./test-data/create-printer";
 import { Test } from "supertest";
@@ -12,7 +12,6 @@ import { OctoprintType, MoonrakerType } from "@/services/printer-api.interface";
 const defaultRoute = AppConstants.apiRoute + "/printer";
 const createRoute = defaultRoute;
 const testPrinterRoute = `${defaultRoute}/test-connection`;
-const pluginListRoute = `${defaultRoute}/plugin-list`;
 const getRoute = (id: IdType) => `${defaultRoute}/${id}`;
 const deleteRoute = (id: IdType) => `${defaultRoute}/${id}`;
 const updateRoute = (id: IdType) => `${defaultRoute}/${id}`;
@@ -25,11 +24,6 @@ const disabledReasonRoute = (id: IdType) => `${updateRoute(id)}/disabled-reason`
 const feedRateRoute = (id: IdType) => `${updateRoute(id)}/feed-rate`;
 const flowRateRoute = (id: IdType) => `${updateRoute(id)}/flow-rate`;
 const printerPluginListRoute = (id: IdType) => `${getRoute(id)}/plugin-list`;
-const printerOctoprintBackupIndex = (id: IdType) => `${getRoute(id)}/octoprint/backup`;
-const printerOctoprintBackupList = (id: IdType) => `${getRoute(id)}/octoprint/backup/list`;
-const printerOctoprintBackupRestore = (id: IdType) => `${getRoute(id)}/octoprint/backup/restore`;
-const printerOctoprintBackupDelete = (id: IdType) => `${getRoute(id)}/octoprint/backup/delete`;
-const printerOctoprintBackupDownload = (id: IdType) => `${getRoute(id)}/octoprint/backup/download`;
 const restartOctoPrintRoute = (id: IdType) => `${getRoute(id)}/octoprint/server/restart`;
 const serialConnectCommandRoute = (id: IdType) => `${getRoute(id)}/serial-connect`;
 const serialDisconnectCommandRoute = (id: IdType) => `${getRoute(id)}/serial-disconnect`;
