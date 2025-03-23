@@ -10,11 +10,9 @@ import { ICustomGcodeService } from "@/services/interfaces/custom-gcode.service.
 
 export class CustomGcodeController {
   private customGCodeService: ICustomGcodeService;
-  isTypeormMode: boolean;
 
-  constructor({ customGCodeService, isTypeormMode }: { customGCodeService: ICustomGcodeService; isTypeormMode: boolean }) {
+  constructor({ customGCodeService }: { customGCodeService: ICustomGcodeService }) {
     this.customGCodeService = customGCodeService;
-    this.isTypeormMode = isTypeormMode;
   }
 
   async list(req: Request, res: Response) {
@@ -23,7 +21,7 @@ export class CustomGcodeController {
   }
 
   async get(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const { id } = await validateInput(req.params, idRulesV2);
     const entity = await this.customGCodeService.get(id);
     res.send(this.customGCodeService.toDto(entity));
   }
@@ -43,13 +41,13 @@ export class CustomGcodeController {
   }
 
   async delete(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const { id } = await validateInput(req.params, idRulesV2);
     await this.customGCodeService.delete(id);
     res.send();
   }
 
   async update(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const { id } = await validateInput(req.params, idRulesV2);
     const updatedScript = await this.customGCodeService.update(id, req.body);
     res.send(this.customGCodeService.toDto(updatedScript));
   }

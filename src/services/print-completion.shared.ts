@@ -19,8 +19,9 @@ export type PrintJobEvents = {
 };
 
 export interface AnalyzedCompletions {
-  _id?: IdType;
   printerId: IdType;
+  printEvents: PrintCompletionDto[];
+
   eventCount: number;
   printCount: number;
   failureCount: number;
@@ -36,15 +37,11 @@ export interface AnalyzedCompletions {
 
   correlationIds: IdType[];
 
-  printEvents: PrintCompletionDto[];
-
   printJobs: PrintJobEvents[];
 }
 
 export function processCompletions(completions: AnalyzedCompletions[]): AnalyzedCompletions[] {
   return completions.map((pc) => {
-    pc.printerId = pc.printerId ?? pc._id;
-    delete pc._id;
     const jobs = groupArrayBy(pc.printEvents, (e) => e.context?.correlationId);
     pc.printJobs = Object.entries(jobs).map(([id, events]) => {
       const eventMap = events.map(({ status, createdAt, fileName, completionLog }) => ({

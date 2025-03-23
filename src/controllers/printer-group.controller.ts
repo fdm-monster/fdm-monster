@@ -9,11 +9,9 @@ import { Request, Response } from "express";
 
 export class PrinterGroupController {
   printerGroupService: IPrinterGroupService;
-  isTypeormMode: boolean;
 
-  constructor({ printerGroupService, isTypeormMode }: { printerGroupService: IPrinterGroupService; isTypeormMode: boolean }) {
+  constructor({ printerGroupService }: { printerGroupService: IPrinterGroupService }) {
     this.printerGroupService = printerGroupService;
-    this.isTypeormMode = isTypeormMode;
   }
 
   async listGroups(req: Request, res: Response) {
@@ -21,7 +19,7 @@ export class PrinterGroupController {
   }
 
   async getGroup(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const { id } = await validateInput(req.params, idRulesV2);
     res.send(await this.printerGroupService.getGroupWithPrinters(id));
   }
 
@@ -31,24 +29,24 @@ export class PrinterGroupController {
   }
 
   async updateGroupName(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const { id } = await validateInput(req.params, idRulesV2);
     const entity = await this.printerGroupService.updateGroupName(id, req.body.name);
     res.send(entity);
   }
 
   async deleteGroup(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const { id } = await validateInput(req.params, idRulesV2);
     res.send(await this.printerGroupService.deleteGroup(id));
   }
 
   async addPrinterToGroup(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const { id } = await validateInput(req.params, idRulesV2);
     const entity = await this.printerGroupService.addPrinterToGroup(id, req.body.printerId);
     res.send(this.printerGroupService.toDto(entity));
   }
 
   async removePrinterFromGroup(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const { id } = await validateInput(req.params, idRulesV2);
     res.send(await this.printerGroupService.removePrinterFromGroup(id, req.body.printerId));
   }
 }

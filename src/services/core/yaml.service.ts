@@ -23,7 +23,6 @@ export class YamlService {
   printerCache: PrinterCache;
   serverVersion: string;
   private logger: LoggerService;
-  private readonly isTypeormMode: boolean;
 
   constructor({
     printerGroupService,
@@ -33,7 +32,6 @@ export class YamlService {
     floorService,
     loggerFactory,
     serverVersion,
-    isTypeormMode,
   }: {
     printerGroupService: IPrinterGroupService<SqliteIdType>;
     printerService: IPrinterService;
@@ -42,7 +40,6 @@ export class YamlService {
     floorService: IFloorService;
     loggerFactory: ILoggerFactory;
     serverVersion: string;
-    isTypeormMode: boolean;
   }) {
     this.printerGroupService = printerGroupService;
     this.floorStore = floorStore;
@@ -51,7 +48,6 @@ export class YamlService {
     this.floorService = floorService;
     this.serverVersion = serverVersion;
     this.logger = loggerFactory(YamlService.name);
-    this.isTypeormMode = isTypeormMode;
   }
 
   async importPrintersAndFloors(yamlBuffer: string) {
@@ -105,7 +101,7 @@ export class YamlService {
     // Nested validation is manual (for now)
     if (!!exportFloorGrid) {
       for (const floor of importData.floors) {
-        await validateInput(floor, importPrinterPositionsRules(this.isTypeormMode));
+        await validateInput(floor, importPrinterPositionsRules());
       }
     }
 
@@ -138,10 +134,8 @@ export class YamlService {
     for (const updatePrinterSpec of updateByPropertyPrinters) {
       const updateId = updatePrinterSpec.printerId;
       const updatedPrinter = updatePrinterSpec.value;
-      if (typeof updateId === "string" && this.isTypeormMode) {
-        throw new Error("Cannot update a printer by string id in SQLite mode");
-      } else if (typeof updateId === "number" && !this.isTypeormMode) {
-        throw new Error("Cannot update a printer by number id in MongoDB mode");
+      if (typeof updateId === "string") {
+        throw new Error("Cannot update a printer by string id");
       }
 
       const originalPrinterId = updatedPrinter.id;
@@ -189,10 +183,8 @@ export class YamlService {
     for (const updateFloorSpec of updateByPropertyFloors) {
       const updateId = updateFloorSpec.floorId;
 
-      if (typeof updateId === "string" && this.isTypeormMode) {
-        throw new Error("Cannot update a floor by string id in SQLite mode");
-      } else if (typeof updateId === "number" && !this.isTypeormMode) {
-        throw new Error("Cannot update a floor by number id in MongoDB mode");
+      if (typeof updateId === "string") {
+        throw new Error("Cannot update a floor by string id");
       }
 
       const updatedFloor = updateFloorSpec.value;
@@ -282,7 +274,7 @@ export class YamlService {
             }
             updateByPropertyPrinters.push({
               strategy: "name",
-              printerId: this.isTypeormMode ? parseInt(ids[foundIndex]) : ids[foundIndex],
+              printerId: parseInt(ids[foundIndex]),
               value: printer,
             });
             break;
@@ -296,7 +288,7 @@ export class YamlService {
             }
             updateByPropertyPrinters.push({
               strategy: "url",
-              printerId: this.isTypeormMode ? parseInt(ids[foundIndex]) : ids[foundIndex],
+              printerId: parseInt(ids[foundIndex]),
               value: printer,
             });
             break;
@@ -310,7 +302,7 @@ export class YamlService {
             }
             updateByPropertyPrinters.push({
               strategy: "id",
-              printerId: this.isTypeormMode ? parseInt(ids[foundIndex]) : ids[foundIndex],
+              printerId: parseInt(ids[foundIndex]),
               value: printer,
             });
             break;
@@ -350,7 +342,7 @@ export class YamlService {
             }
             updateByPropertyFloors.push({
               strategy: "name",
-              floorId: this.isTypeormMode ? parseInt(ids[foundIndex]) : ids[foundIndex],
+              floorId: parseInt(ids[foundIndex]),
               value: floor,
             });
             break;
@@ -364,7 +356,7 @@ export class YamlService {
             }
             updateByPropertyFloors.push({
               strategy: "floor",
-              floorId: this.isTypeormMode ? parseInt(ids[foundIndex]) : ids[foundIndex],
+              floorId: parseInt(ids[foundIndex]),
               value: floor,
             });
             break;
@@ -378,7 +370,7 @@ export class YamlService {
             }
             updateByPropertyFloors.push({
               strategy: "id",
-              floorId: this.isTypeormMode ? parseInt(ids[foundIndex]) : ids[foundIndex],
+              floorId: parseInt(ids[foundIndex]),
               value: floor,
             });
             break;
@@ -397,7 +389,7 @@ export class YamlService {
   }
 
   async analyseUpsertGroups(upsertGroups: any[]) {
-    if (!this.isTypeormMode || !upsertGroups?.length) {
+    if (!upsertGroups?.length) {
       return {
         updateByNameGroups: [],
         insertGroups: [],
@@ -448,14 +440,10 @@ export class YamlService {
       // notes, // passed on to config immediately
     } = input;
 
-    if (!this.isTypeormMode) {
-      input.exportGroups = false;
-    }
-
     const dumpedObject = {
       version: process.env.npm_package_version,
       exportedAt: new Date(),
-      databaseType: this.isTypeormMode ? "sqlite" : "mongo",
+      databaseType: "sqlite",
       config: input,
       printers: undefined as any,
       floors: undefined as any,
@@ -505,7 +493,7 @@ export class YamlService {
       });
     }
 
-    if (exportGroups && this.isTypeormMode) {
+    if (exportGroups) {
       const groups = await this.printerGroupService.listGroups();
       dumpedObject.groups = groups.map((g) => {
         return {

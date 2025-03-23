@@ -41,15 +41,11 @@ export const validateWizardCompleted = inject(
 );
 
 export const interceptRoles = inject(
-  ({ settingsStore, roleService, isTypeormMode }) =>
+  ({ settingsStore, roleService }) =>
     async (req: Request, res: Response, next: NextFunction) => {
       const serverSettings = await settingsStore.getSettings();
 
-      if (isTypeormMode) {
-        req.roles = req.user?.roles.map((r) => r.roleId);
-      } else {
-        req.roles = req.user?.roles;
-      }
+      req.roles = req.user?.roles.map((r) => r.roleId);
 
       // If server settings are not set, we can't determine the default role
       if (serverSettings && !req.user) {

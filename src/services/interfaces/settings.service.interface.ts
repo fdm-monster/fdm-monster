@@ -1,4 +1,4 @@
-import { ICredentialSettings, IFrontendSettings, IServerSettings, ISettings, IWizardSettings } from "@/models/Settings";
+import { ICredentialSettings, IFrontendSettings, IServerSettings, ISettings, IWizardSettings } from "@/entities/settings.entity";
 import { FileCleanSettingsDto, SettingsDto, TimeoutSettingsDto } from "@/services/interfaces/settings.dto";
 import { IdType } from "@/shared.constants";
 

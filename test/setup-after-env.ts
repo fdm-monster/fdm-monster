@@ -1,6 +1,4 @@
 import { getExpectExtensions } from "./extensions";
-import { isSqliteModeTest } from "./typeorm.manager";
-import { closeDatabase, connect } from "./mongo-memory.handler";
 import nock from "nock";
 const jestConsole = console;
 expect.extend(getExpectExtensions());
@@ -26,10 +24,6 @@ beforeAll(async () => {
   //     headers: req.headers,
   //   });
   // });
-
-  if (!isSqliteModeTest()) {
-    await connect();
-  }
 });
 
 // https://github.com/jestjs/jest/issues/10322
@@ -44,7 +38,4 @@ afterEach(() => {
 afterAll(async () => {
   nock.enableNetConnect();
   nock.cleanAll();
-  if (!isSqliteModeTest()) {
-    await closeDatabase();
-  }
 });

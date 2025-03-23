@@ -6,9 +6,9 @@ export const registerUserRules = {
   password: `required|string|minLength:${AppConstants.DEFAULT_PASSWORD_MINLEN}`,
 };
 
-export const registerUserWithRolesRules = (isSqlite: boolean) => ({
+export const registerUserWithRolesRules = {
   username: `required|string|minLength:${AppConstants.DEFAULT_USERNAME_MINLEN}`,
   password: `required|string|minLength:${AppConstants.DEFAULT_PASSWORD_MINLEN}`,
   roleIds: "array",
-  "roleIds.*": idRuleV2(isSqlite),
-});
+  "roleIds.*": idRuleV2,
+};

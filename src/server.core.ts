@@ -15,14 +15,11 @@ import { getEnvOrDefault } from "@/utils/env.utils";
 
 export async function setupServer() {
   const httpServer = express();
-  const experimentalTypeormEnabled =
-    getEnvOrDefault(AppConstants.ENABLE_EXPERIMENTAL_TYPEORM, AppConstants.enableExperimentalTypeormDefault) === "true";
-  if (experimentalTypeormEnabled) {
-    const dbFolder = process.env[AppConstants.DATABASE_PATH] || "./database";
-    ensureDirExists(join(superRootPath(), dbFolder));
-  }
 
-  const container = configureContainer(experimentalTypeormEnabled);
+  const dbFolder = process.env[AppConstants.DATABASE_PATH] || "./database";
+  ensureDirExists(join(superRootPath(), dbFolder));
+
+  const container = configureContainer();
   initializePassportStrategies(passport, container);
 
   httpServer

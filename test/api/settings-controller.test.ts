@@ -13,7 +13,6 @@ import {
   wizardSettingKey,
 } from "@/constants/server-settings.constants";
 import { SettingsController } from "@/controllers/settings.controller";
-import { isSqliteModeTest } from "../typeorm.manager";
 import TestAgent from "supertest/lib/agent";
 
 let request: TestAgent<Test>;
@@ -38,7 +37,6 @@ describe(SettingsController.name, () => {
     expect(response.body).not.toBeNull();
     const defaultSettings = getDefaultSettings();
     defaultSettings[serverSettingsKey].loginRequired = false; // Test override
-    defaultSettings[serverSettingsKey].experimentalTypeormSupport = isSqliteModeTest();
     defaultSettings[serverSettingsKey].experimentalMoonrakerSupport = true;
     delete defaultSettings[serverSettingsKey].debugSettings;
     delete defaultSettings[credentialSettingsKey];

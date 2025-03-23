@@ -41,12 +41,9 @@ export async function setupTestApp(
   // Overrides get last pick
   if (mocks) container.register(mocks);
 
-  const isTypeormMode = container.resolve(DITokens.isTypeormMode);
-  if (isTypeormMode) {
-    // Setup sqlite database in memory - needed for loading settings etc
-    const typeormService = container.resolve<TypeormService>(DITokens.typeormService);
-    await typeormService.createConnection();
-  }
+  // Setup sqlite database in memory - needed for loading settings etc
+  const typeormService = container.resolve<TypeormService>(DITokens.typeormService);
+  await typeormService.createConnection();
 
   // Setup
   const settingsStore = container.resolve(DITokens.settingsStore) as SettingsStore;
@@ -68,8 +65,7 @@ export async function setupTestApp(
   }
 
   return {
-    idType: isTypeormMode ? Number : String,
-    isTypeormMode,
+    idType: Number,
     httpServer,
     request: supertest(httpServer),
     container,

@@ -1,4 +1,3 @@
-import { injectable, inject } from "awilix";
 import { Request, Response } from "express";
 import { AppConstants } from "@/server.constants";
 import { authenticate, authorizeRoles } from "@/middleware/authenticate";
@@ -16,7 +15,7 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { errorSummary } from "@/utils/error.utils";
 import { SettingsStore } from "@/state/settings.store";
 import { before, DELETE, GET, POST, route } from "awilix-express";
-import { registerUserRules, registerUserWithRolesRules } from "@/controllers/validation/user-controller.validation";
+import { registerUserWithRolesRules } from "@/controllers/validation/user-controller.validation";
 
 @route(AppConstants.apiRoute + "/user")
 @before([authenticate()])
@@ -27,7 +26,6 @@ export class UserController {
   authService: IAuthService;
   settingsStore: SettingsStore;
   logger: LoggerService;
-  isTypeormMode: boolean;
 
   constructor({
     userService,
@@ -36,7 +34,6 @@ export class UserController {
     settingsStore,
     authService,
     loggerFactory,
-    isTypeormMode,
   }: {
     userService: IUserService;
     configService: IConfigService;
@@ -44,14 +41,12 @@ export class UserController {
     authService: IAuthService;
     settingsStore: SettingsStore;
     loggerFactory: ILoggerFactory;
-    isTypeormMode: boolean;
   }) {
     this.userService = userService;
     this.configService = configService;
     this.roleService = roleService;
     this.authService = authService;
     this.settingsStore = settingsStore;
-    this.isTypeormMode = isTypeormMode;
     this.logger = loggerFactory(UserController.name);
   }
 
@@ -67,7 +62,7 @@ export class UserController {
   @route("/")
   @before([authorizeRoles([ROLES.ADMIN])])
   async create(req: Request, res: Response) {
-    const { username, password, roleIds } = await validateMiddleware(req, registerUserWithRolesRules(this.isTypeormMode));
+    const { username, password, roleIds } = await validateMiddleware(req, registerUserWithRolesRules);
     if (
       username.toLowerCase().includes("admin") ||
       username.toLowerCase().includes("root") ||
@@ -112,7 +107,7 @@ export class UserController {
   @route("/:id")
   @before([authorizeRoles([ROLES.ADMIN])])
   async get(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const { id } = await validateInput(req.params, idRulesV2);
     const user = await this.userService.getUser(id);
     res.send(this.userService.toDto(user));
   }
@@ -121,7 +116,7 @@ export class UserController {
   @route("/:id")
   @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
   async delete(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const { id } = await validateInput(req.params, idRulesV2);
 
     const ownUserId = req.user?.id;
     if (ownUserId == id) {
@@ -155,7 +150,7 @@ export class UserController {
   @route("/:id/change-username")
   @before([demoUserNotAllowed])
   async changeUsername(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const { id } = await validateInput(req.params, idRulesV2);
 
     if (req.user?.id != id && (await this.settingsStore.getLoginRequired())) {
       throw new ForbiddenError("Not allowed to change username of other users");
@@ -172,7 +167,7 @@ export class UserController {
   @route("/:id/change-password")
   @before([demoUserNotAllowed])
   async changePassword(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const { id } = await validateInput(req.params, idRulesV2);
 
     if (req.user?.id != id && (await this.settingsStore.getLoginRequired())) {
       throw new ForbiddenError("Not allowed to change password of other users");
@@ -190,7 +185,7 @@ export class UserController {
   @route("/:id/set-user-roles")
   @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
   async setUserRoles(req: Request, res: Response) {
-    const { id: currentUserId } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const { id: currentUserId } = await validateInput(req.params, idRulesV2);
 
     const ownUserId = req.user?.id;
     const ownUser = await this.userService.getUser(ownUserId);
@@ -222,7 +217,7 @@ export class UserController {
   @route("/:id/set-verified")
   @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
   async setVerified(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const { id } = await validateInput(req.params, idRulesV2);
 
     const ownUserId = req.user?.id;
     if (ownUserId == id) {
@@ -246,7 +241,7 @@ export class UserController {
   @route("/:id/set-root-user")
   @before([demoUserNotAllowed])
   async setRootUser(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const { id } = await validateInput(req.params, idRulesV2);
 
     const userId = req.user?.id;
     if (req.user?.id) {

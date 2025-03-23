@@ -12,24 +12,14 @@ import { Request, Response } from "express";
 export class PrinterSettingsController {
   printerCache: PrinterCache;
   octoprintClient: OctoprintClient;
-  isTypeormMode: boolean;
 
-  constructor({
-    printerCache,
-    octoprintClient,
-    isTypeormMode,
-  }: {
-    printerCache: PrinterCache;
-    octoprintClient: OctoprintClient;
-    isTypeormMode: boolean;
-  }) {
+  constructor({ printerCache, octoprintClient }: { printerCache: PrinterCache; octoprintClient: OctoprintClient }) {
     this.printerCache = printerCache;
     this.octoprintClient = octoprintClient;
-    this.isTypeormMode = isTypeormMode;
   }
 
   async get(req: Request, res: Response) {
-    const { id: printerId } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const { id: printerId } = await validateInput(req.params, idRulesV2);
 
     const loginDto = await this.printerCache.getLoginDtoAsync(printerId);
     const settings = await this.octoprintClient.getSettings(loginDto);
@@ -37,7 +27,7 @@ export class PrinterSettingsController {
   }
 
   async setGCodeAnalysis(req: Request, res: Response) {
-    const { id: printerId } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const { id: printerId } = await validateInput(req.params, idRulesV2);
     const { enabled } = await validateMiddleware(req, setGcodeAnalysis);
 
     const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
@@ -46,7 +36,7 @@ export class PrinterSettingsController {
   }
 
   async syncPrinterName(req: Request, res: Response) {
-    const { id: printerId } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const { id: printerId } = await validateInput(req.params, idRulesV2);
 
     const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
     const name = await this.printerCache.getNameAsync(printerId);

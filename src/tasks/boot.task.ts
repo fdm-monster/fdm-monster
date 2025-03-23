@@ -1,5 +1,3 @@
-import mongoose, { connect, syncIndexes } from "mongoose";
-import { fetchMongoDBConnectionString, runMigrations } from "@/server.env";
 import { DITokens } from "@/container.tokens";
 import { AppConstants } from "@/server.constants";
 import { LoggerService } from "@/handlers/logger";
@@ -11,14 +9,14 @@ import { FloorStore } from "@/state/floor.store";
 import { ConfigService } from "@/services/core/config.service";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { PrinterFilesStore } from "@/state/printer-files.store";
-import { PermissionService } from "@/services/mongoose/permission.service";
-import { RoleService } from "@/services/mongoose/role.service";
-import { UserService } from "@/services/mongoose/user.service";
 import { ClientBundleService } from "@/services/core/client-bundle.service";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
 import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
+import { IPermissionService } from "@/services/interfaces/permission.service.interface";
+import { IRoleService } from "@/services/interfaces/role-service.interface";
+import { IUserService } from "@/services/interfaces/user-service.interface";
 
 export class BootTask {
   logger: LoggerService;
@@ -28,13 +26,12 @@ export class BootTask {
   multerService: MulterService;
   printerSocketStore: PrinterSocketStore;
   printerFilesStore: PrinterFilesStore;
-  permissionService: PermissionService;
-  roleService: RoleService;
-  userService: UserService;
+  permissionService: IPermissionService;
+  roleService: IRoleService;
+  userService: IUserService;
   floorStore: FloorStore;
   clientBundleService: ClientBundleService;
   configService: ConfigService;
-  isTypeormMode: boolean;
   typeormService: TypeormService;
   printerThumbnailCache: PrinterThumbnailCache;
 
@@ -53,7 +50,6 @@ export class BootTask {
     clientBundleService,
     configService,
     typeormService,
-    isTypeormMode,
     printerThumbnailCache,
   }: {
     loggerFactory: ILoggerFactory;
@@ -62,18 +58,16 @@ export class BootTask {
     multerService: MulterService;
     printerSocketStore: PrinterSocketStore;
     printerFilesStore: PrinterFilesStore;
-    permissionService: PermissionService;
-    roleService: RoleService;
-    userService: UserService;
+    permissionService: IPermissionService;
+    roleService: IRoleService;
+    userService: IUserService;
     taskManagerService: TaskManagerService;
     floorStore: FloorStore;
     clientBundleService: ClientBundleService;
     configService: ConfigService;
     typeormService: TypeormService;
-    isTypeormMode: boolean;
     printerThumbnailCache: PrinterThumbnailCache;
   }) {
-    this.isTypeormMode = isTypeormMode;
     this.logger = loggerFactory(BootTask.name);
     this.settingsService = settingsService;
     this.settingsStore = settingsStore;
@@ -100,28 +94,7 @@ export class BootTask {
   }
 
   async run() {
-    if (this.isTypeormMode) {
-      await this.typeormService.createConnection();
-    } else {
-      try {
-        await this.createConnection();
-        await this.migrateDatabase();
-      } catch (e) {
-        if (e instanceof mongoose.Error) {
-          // Tests should just continue
-          if (!e.message.includes("Can't call `openUri()` on an active connection with different connection strings.")) {
-            // We are not in a test
-            if (e.message.includes("ECONNREFUSED")) {
-              this.logger.error("Database connection timed-out. Retrying in 5000.");
-            } else {
-              this.logger.error(`Database connection error: ${e.message}`);
-            }
-            this.taskManagerService.scheduleDisabledJob(DITokens.bootTask, false);
-            return;
-          }
-        }
-      }
-    }
+    await this.typeormService.createConnection();
 
     this.logger.log("Loading and synchronizing Server Settings");
     await this.settingsStore.loadSettings();
@@ -204,22 +177,6 @@ export class BootTask {
       await this.userService.updatePasswordUnsafeByUsername(demoUsername, demoPassword);
       await this.userService.setUserRoleIds(demoUserId, [adminRole.id]);
       this.logger.log("Updated demo account");
-    }
-  }
-
-  async createConnection() {
-    if (!this.isTypeormMode) {
-      const envUrl = fetchMongoDBConnectionString();
-      await connect(envUrl, {
-        serverSelectionTimeoutMS: 1500,
-      });
-      await syncIndexes();
-    }
-  }
-
-  async migrateDatabase() {
-    if (!this.isTypeormMode) {
-      await runMigrations(mongoose.connection.db, mongoose.connection.getClient());
     }
   }
 }

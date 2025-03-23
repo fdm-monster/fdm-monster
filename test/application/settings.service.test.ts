@@ -2,7 +2,7 @@ import { AwilixContainer } from "awilix";
 import { DITokens } from "@/container.tokens";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
 import { setupTestApp } from "../test-server";
-import { SettingsService } from "@/services/mongoose/settings.service";
+import { SettingsService } from "@/services/orm/settings.service";
 
 let container: AwilixContainer;
 let settingsService: ISettingsService;

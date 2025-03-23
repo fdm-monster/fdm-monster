@@ -1,9 +1,6 @@
 import { DITokens } from "@/container.tokens";
 import { NextFunction, Request, Response } from "express";
 
-/**
- * 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting
- */
 export async function interceptDatabaseError(req: any | Request, res: Response, next: NextFunction) {
   const serverHost = req.container.resolve(DITokens.serverHost);
 
@@ -14,7 +11,7 @@ export async function interceptDatabaseError(req: any | Request, res: Response, 
     res.status(500);
     res.send({
       databaseReadyState: serverHost.hasConnected(),
-      state: "Retrying mongo connection. Please contact the developer if this persists.",
+      state: "Retrying database connection. Please contact the developer if this persists.",
     });
   }
 }

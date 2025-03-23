@@ -10,11 +10,9 @@ import { IdType } from "@/shared.constants";
 
 export class FloorController {
   private floorStore: FloorStore;
-  private readonly isTypeormMode: boolean;
 
-  constructor({ floorStore, isTypeormMode }: { floorStore: FloorStore; isTypeormMode: boolean }) {
+  constructor({ floorStore }: { floorStore: FloorStore }) {
     this.floorStore = floorStore;
-    this.isTypeormMode = isTypeormMode;
   }
 
   async create(req: Request, res: Response) {
@@ -24,7 +22,7 @@ export class FloorController {
   }
 
   async updateName(req: Request, res: Response) {
-    const { id: floorId } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const { id: floorId } = await validateInput<{ id: IdType }>(req.params, idRulesV2);
 
     // Has internal validation
     const floor = await this.floorStore.updateName(floorId, req.body.name);
@@ -32,7 +30,7 @@ export class FloorController {
   }
 
   async updateFloorNumber(req: Request, res: Response) {
-    const { id: floorId } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const { id: floorId } = await validateInput<{ id: IdType }>(req.params, idRulesV2);
 
     // Has internal validation
     const floor = await this.floorStore.updateFloorNumber(floorId, req.body.floor);
@@ -40,7 +38,7 @@ export class FloorController {
   }
 
   async addPrinterToFloor(req: Request, res: Response) {
-    const { id: floorId } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const { id: floorId } = await validateInput<{ id: IdType }>(req.params, idRulesV2);
 
     // Has internal validation
     const floor = await this.floorStore.addOrUpdatePrinter(floorId, req.body);
@@ -48,7 +46,7 @@ export class FloorController {
   }
 
   async removePrinterFromFloor(req: Request, res: Response) {
-    const { id: floorId } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const { id: floorId } = await validateInput<{ id: IdType }>(req.params, idRulesV2);
 
     // Has internal validation
     const floor = await this.floorStore.removePrinter(floorId, req.body.printerId);
@@ -61,13 +59,13 @@ export class FloorController {
   }
 
   async get(req: Request, res: Response) {
-    const { id: floorId } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const { id: floorId } = await validateInput<{ id: IdType }>(req.params, idRulesV2);
     const floor = await this.floorStore.getFloor(floorId);
     res.send(floor);
   }
 
   async delete(req: Request, res: Response) {
-    const { id: floorId } = await validateInput<{ id: IdType }>(req.params, idRulesV2(this.isTypeormMode));
+    const { id: floorId } = await validateInput<{ id: IdType }>(req.params, idRulesV2);
     await this.floorStore.delete(floorId);
     res.send();
   }

@@ -9,8 +9,66 @@ import {
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 import { BaseEntity } from "@/entities/base.entity";
 
+export interface IWizardSettings {
+  wizardCompleted: boolean;
+  wizardCompletedAt: Date | null;
+  wizardVersion: number;
+}
+
+export interface IFileCleanSettings {
+  autoRemoveOldFilesBeforeUpload: boolean;
+  autoRemoveOldFilesAtBoot: boolean;
+  autoRemoveOldFilesCriteriumDays: number;
+}
+
+export interface ICredentialSettings {
+  jwtSecret: string;
+  jwtExpiresIn: number;
+  refreshTokenAttempts: number;
+  refreshTokenExpiry: number;
+}
+
+export interface IDebugSettings {
+  debugSocketIoEvents: boolean;
+  debugSocketReconnect: boolean;
+  debugSocketRetries: boolean;
+  debugSocketSetup: boolean;
+  debugSocketMessages: boolean;
+  debugSocketIoBandwidth: boolean;
+}
+
+export interface IServerSettings {
+  sentryDiagnosticsEnabled: boolean;
+  debugSettings: IDebugSettings;
+  loginRequired: boolean;
+  registration: boolean;
+  experimentalMoonrakerSupport: boolean;
+  experimentalClientSupport: boolean;
+  experimentalThumbnailSupport: boolean;
+}
+
+export interface IFrontendSettings {
+  gridCols: number;
+  gridRows: number;
+  largeTiles: boolean;
+  tilePreferCancelOverQuickStop: boolean;
+}
+
+export interface ITimeoutSettings {
+  apiTimeout: number;
+}
+
+export interface ISettings {
+  [wizardSettingKey]: IWizardSettings;
+  [printerFileCleanSettingKey]: IFileCleanSettings;
+  [credentialSettingsKey]: ICredentialSettings;
+  [serverSettingsKey]: IServerSettings;
+  [frontendSettingKey]: IFrontendSettings;
+  [timeoutSettingKey]: ITimeoutSettings;
+}
+
 @Entity()
-export class Settings extends BaseEntity {
+export class Settings extends BaseEntity implements ISettings {
   @PrimaryGeneratedColumn()
   id!: number;
 

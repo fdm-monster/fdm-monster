@@ -6,7 +6,6 @@ import { IPrinterService } from "@/services/interfaces/printer.service.interface
 import { IdType } from "@/shared.constants";
 import { Printer } from "@/entities";
 import { setupTestApp } from "../test-server";
-import { isSqliteModeTest } from "../typeorm.manager";
 import { FloorService } from "@/services/orm/floor.service";
 
 let printerService: IPrinterService<IdType, Printer>;
@@ -40,7 +39,7 @@ describe(FloorService.name, () => {
     });
     const dto = floorService.toDto(floor);
     expect(dto).toBeTruthy();
-    expect(typeof dto.id).toBe(isSqliteModeTest() ? "number" : "string");
+    expect(typeof dto.id).toBe("number");
   });
 
   it("can delete existing floor", async () => {
@@ -73,6 +72,7 @@ describe(FloorService.name, () => {
       printerId: pos.id,
       x: 1,
       y: 1,
+      floorId: floor.id,
     });
     expect(newFloor.printers).toHaveLength(1);
   });
@@ -88,7 +88,7 @@ describe(FloorService.name, () => {
       floor: 4,
     });
 
-    await floorService.addOrUpdatePrinter(floor.id, { printerId: printer.id, x: 1, y: 1 });
+    await floorService.addOrUpdatePrinter(floor.id, { printerId: printer.id, x: 1, y: 1, floorId: floor.id });
 
     floor = await floorService.get(floor.id);
     // Check existence

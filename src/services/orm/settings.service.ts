@@ -1,7 +1,6 @@
 import { Settings } from "@/entities";
 import {
   credentialSettingsKey,
-  printerFileCleanSettingKey,
   frontendSettingKey,
   getDefaultCredentialSettings,
   getDefaultFileCleanSettings,
@@ -9,6 +8,7 @@ import {
   getDefaultServerSettings,
   getDefaultTimeout,
   getDefaultWizardSettings,
+  printerFileCleanSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
   wizardSettingKey,
@@ -25,11 +25,11 @@ import {
 } from "../interfaces/settings.dto";
 import { SqliteIdType } from "@/shared.constants";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
-import { ICredentialSettings } from "@/models/Settings";
 import { IConfigService } from "@/services/core/config.service";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
+import { ICredentialSettings } from "@/entities/settings.entity";
 
-export class SettingsService2 extends BaseService(Settings, SettingsDto) implements ISettingsService<SqliteIdType, Settings> {
+export class SettingsService extends BaseService(Settings, SettingsDto) implements ISettingsService<SqliteIdType, Settings> {
   configService: IConfigService;
 
   constructor({ configService, typeormService }: { configService: IConfigService; typeormService: TypeormService }) {
@@ -39,10 +39,7 @@ export class SettingsService2 extends BaseService(Settings, SettingsDto) impleme
 
   toDto(entity: Settings): SettingsDto<SqliteIdType> {
     return {
-      [serverSettingsKey]: {
-        ...entity[serverSettingsKey],
-        experimentalTypeormSupport: true,
-      },
+      [serverSettingsKey]: entity[serverSettingsKey],
       [frontendSettingKey]: entity[frontendSettingKey],
       [printerFileCleanSettingKey]: entity[printerFileCleanSettingKey],
       [wizardSettingKey]: entity[wizardSettingKey],
@@ -54,7 +51,7 @@ export class SettingsService2 extends BaseService(Settings, SettingsDto) impleme
     let settings = await this.get();
 
     if (!settings) {
-      const settings = await this.create({
+      return await this.create({
         [serverSettingsKey]: getDefaultServerSettings(),
         [credentialSettingsKey]: getDefaultCredentialSettings(),
         [wizardSettingKey]: getDefaultWizardSettings(),
@@ -62,7 +59,6 @@ export class SettingsService2 extends BaseService(Settings, SettingsDto) impleme
         [frontendSettingKey]: getDefaultFrontendSettings(),
         [timeoutSettingKey]: getDefaultTimeout(),
       });
-      return settings;
     } else {
       settings = this.migrateSettingsRuntime(settings);
     }

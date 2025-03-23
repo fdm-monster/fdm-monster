@@ -1,15 +1,15 @@
 import { AppConstants } from "@/server.constants";
 
-export const registerUserRules = (isSqlite: boolean) => ({
+export const registerUserRules = {
   username: `required|string|minLength:${AppConstants.DEFAULT_USERNAME_MINLEN}`,
   password: `required|string|minLength:${AppConstants.DEFAULT_PASSWORD_MINLEN}`,
   needsPasswordChange: "boolean",
   roles: "required|array",
   isDemoUser: "boolean",
   isRootUser: "boolean",
-  "roles.*": `required|${isSqlite ? "integer|min:1" : "mongoId"}`,
+  "roles.*": "required|integer|min:1",
   isVerified: "boolean",
-});
+};
 
 export const newPasswordRules = {
   password: `required|string|minLength:${AppConstants.DEFAULT_PASSWORD_MINLEN}`,

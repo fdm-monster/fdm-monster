@@ -1,5 +1,5 @@
 import { FirstTimeSetupController } from "@/controllers/first-time-setup.controller";
-import supertest from "supertest";
+import { Test } from "supertest";
 import { setupTestApp } from "../test-server";
 import { AppConstants } from "@/server.constants";
 import { AwilixContainer } from "awilix";
@@ -8,13 +8,11 @@ import { SettingsStore } from "@/state/settings.store";
 import { expectForbiddenResponse, expectOkResponse } from "../extensions";
 import { IUserService } from "@/services/interfaces/user-service.interface";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
-import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { User } from "@/entities";
-import { Repository } from "typeorm";
-import { getDatasource, isSqliteModeTest } from "../typeorm.manager";
-import { User as UserMongo } from "@/models";
+import { getDatasource } from "../typeorm.manager";
+import TestAgent from "supertest/lib/agent";
 
-let request: supertest.SuperTest<supertest.Test>;
+let request: TestAgent<Test>;
 let container: AwilixContainer;
 let settingsService: ISettingsService;
 let settingsStore: SettingsStore;
@@ -56,11 +54,9 @@ describe(FirstTimeSetupController.name, () => {
   it("should not complete first-time-setup twice", async () => {
     await resetWizard();
     expect(settingsStore.isWizardCompleted()).toBeFalsy();
-    if (isSqliteModeTest()) {
-      await getDatasource().getRepository(User).delete({});
-    } else {
-      await UserMongo.deleteMany({});
-    }
+
+    await getDatasource().getRepository(User).delete({});
+
     const response = await completeSetup({
       loginRequired: true,
       registration: true,

@@ -11,11 +11,9 @@ import { ROLES } from "@/constants/authorization.constants";
 @before([authenticate(), authorizeRoles([ROLES.OPERATOR, ROLES.ADMIN])])
 export class CameraStreamController {
   private readonly cameraStreamService: ICameraStreamService;
-  private readonly isTypeormMode: boolean;
 
-  constructor({ cameraStreamService, isTypeormMode }: { cameraStreamService: ICameraStreamService; isTypeormMode: boolean }) {
+  constructor({ cameraStreamService }: { cameraStreamService: ICameraStreamService }) {
     this.cameraStreamService = cameraStreamService;
-    this.isTypeormMode = isTypeormMode;
   }
 
   @GET()
@@ -28,7 +26,7 @@ export class CameraStreamController {
   @GET()
   @route("/:id")
   async get(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const { id } = await validateInput(req.params, idRulesV2);
     const result = await this.cameraStreamService.get(id);
     res.send(this.cameraStreamService.toDto(result));
   }
@@ -43,7 +41,7 @@ export class CameraStreamController {
   @PUT()
   @route("/:id")
   async update(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const { id } = await validateInput(req.params, idRulesV2);
     const result = await this.cameraStreamService.update(id, req.body);
     res.send(this.cameraStreamService.toDto(result));
   }
@@ -51,7 +49,7 @@ export class CameraStreamController {
   @DELETE()
   @route("/:id")
   async delete(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const { id } = await validateInput(req.params, idRulesV2);
     await this.cameraStreamService.delete(id);
     res.send();
   }

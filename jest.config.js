@@ -14,7 +14,6 @@ module.exports = {
     "^@/(.*)$": "<rootDir>/src/$1",
   },
   modulePathIgnorePatterns: [
-    "src/migrate-mongo-config.js",
     "src/consoles",
     ".eslintrc.js",
     "src/assets",

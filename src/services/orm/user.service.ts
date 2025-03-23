@@ -174,7 +174,7 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
   async register(input: RegisterUserDto<SqliteIdType>): Promise<User> {
     const { username, password, roles, isDemoUser, isRootUser, needsPasswordChange, isVerified } = (await validateInput(
       input,
-      registerUserRules(true)
+      registerUserRules
     )) as RegisterUserDto<SqliteIdType>;
 
     const passwordHash = hashPassword(password);

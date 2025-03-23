@@ -9,7 +9,7 @@ import { groupArrayBy } from "@/utils/array.util";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
-import { AnalyzedCompletions, processCompletions } from "@/services/mongoose/print-completion.shared";
+import { AnalyzedCompletions, processCompletions } from "@/services/print-completion.shared";
 
 export class PrintCompletionService
   extends BaseService(PrintCompletion, PrintCompletionDto<SqliteIdType>)

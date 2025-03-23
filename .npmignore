@@ -49,7 +49,6 @@ test
 !*.md
 !.env.template
 !.swcrc
-!migrate-mongo-config.js
 !package.json
 !yarn.lock
 !.yarn

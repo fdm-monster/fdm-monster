@@ -2,7 +2,6 @@ export const AppConstants = {
   NODE_ENV_KEY: "NODE_ENV",
   VERSION_KEY: "npm_package_version",
   SERVER_PORT_KEY: "SERVER_PORT",
-  MONGO_KEY: "MONGO",
   DATABASE_PATH: "DATABASE_PATH",
   DATABASE_FILE: "DATABASE_FILE",
 
@@ -20,7 +19,6 @@ export const AppConstants = {
   defaultFileUploadsStorage: "./media/file-uploads",
   defaultAcceptedGcodeExtensions: [".gcode", ".bgcode"],
   defaultServerPort: 4000,
-  defaultMongoStringUnauthenticated: "mongodb://127.0.0.1:27017/fdm-monster",
   apiRoute: "/api",
   enableClientDistAutoUpdateKey: "ENABLE_CLIENT_DIST_AUTO_UPDATE",
 
@@ -103,7 +101,4 @@ export const AppConstants = {
   sentryCustomDsnDefault: "https://164b8028a8a745bba3dbcab991b84ae7@o4503975545733120.ingest.sentry.io/4505101598261248",
 
   debugRoutesKey: "DEBUG_ROUTES",
-
-  ENABLE_EXPERIMENTAL_TYPEORM: "ENABLE_EXPERIMENTAL_TYPEORM",
-  enableExperimentalTypeormDefault: "false",
 };

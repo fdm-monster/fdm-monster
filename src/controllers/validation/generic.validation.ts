@@ -1,5 +1,5 @@
-export const idRuleV2 = (isSqlite: boolean) => `required|${isSqlite ? "integer|min:1" : "mongoId"}`;
+export const idRuleV2 = "required|integer|min:1";
 
-export const idRulesV2 = (isSqlite: boolean) => ({
-  id: idRuleV2(isSqlite),
-});
+export const idRulesV2 = {
+  id: idRuleV2,
+};

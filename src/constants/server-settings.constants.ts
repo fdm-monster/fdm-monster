@@ -30,7 +30,6 @@ export const getDefaultServerSettings = (): ServerSettingsDto => ({
   loginRequired: true,
   registration: false,
   experimentalMoonrakerSupport: false,
-  experimentalTypeormSupport: false,
   experimentalClientSupport: false,
   experimentalThumbnailSupport: false,
 });

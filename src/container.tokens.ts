@@ -1,7 +1,6 @@
 export const DITokens = {
   // Values
   serverVersion: "serverVersion",
-  isTypeormMode: "isTypeormMode",
   appDefaultRole: "appDefaultRole",
   appDefaultRoleNoLogin: "appDefaultRoleNoLogin",
   typeormService: "typeormService",

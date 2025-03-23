@@ -4,13 +4,13 @@ import { isNode } from "@/utils/env.utils";
 import { authenticate, authorizePermission } from "@/middleware/authenticate";
 import { PERMS } from "@/constants/authorization.constants";
 import { isDocker } from "@/utils/is-docker";
-import { RoleService } from "@/services/mongoose/role.service";
 import { SettingsStore } from "@/state/settings.store";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { ServerReleaseService } from "@/services/core/server-release.service";
 import { MonsterPiService } from "@/services/core/monsterpi.service";
-import { UserService } from "@/services/mongoose/user.service";
 import { Request, Response } from "express";
+import { IRoleService } from "@/services/interfaces/role-service.interface";
+import { IUserService } from "@/services/interfaces/user-service.interface";
 
 export class ServerPublicController {
   serverVersion: string;
@@ -18,9 +18,8 @@ export class ServerPublicController {
   printerSocketStore: PrinterSocketStore;
   serverReleaseService: ServerReleaseService;
   monsterPiService: MonsterPiService;
-  userService: UserService;
-  roleService: RoleService;
-  isTypeormMode: boolean;
+  userService: IUserService;
+  roleService: IRoleService;
 
   constructor({
     settingsStore,
@@ -30,16 +29,14 @@ export class ServerPublicController {
     monsterPiService,
     userService,
     roleService,
-    isTypeormMode,
   }: {
     settingsStore: SettingsStore;
     printerSocketStore: PrinterSocketStore;
     serverVersion: string;
     serverReleaseService: ServerReleaseService;
     monsterPiService: MonsterPiService;
-    userService: UserService;
-    roleService: RoleService;
-    isTypeormMode: boolean;
+    userService: IUserService;
+    roleService: IRoleService;
   }) {
     this.settingsStore = settingsStore;
     this.serverVersion = serverVersion;
@@ -48,7 +45,6 @@ export class ServerPublicController {
     this.monsterPiService = monsterPiService;
     this.userService = userService;
     this.roleService = roleService;
-    this.isTypeormMode = isTypeormMode;
   }
 
   welcome(req: Request, res: Response) {
@@ -112,8 +108,7 @@ export class ServerPublicController {
         subFeatures: {},
       },
       printerGroupsApi: {
-        // Only SQLite mode supported for this feature
-        available: this.isTypeormMode,
+        available: true,
         version: 1,
         subFeatures: {},
       },

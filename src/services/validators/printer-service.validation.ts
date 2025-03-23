@@ -1,15 +1,6 @@
 import { apiKeyLengthMaxDefault, apiKeyLengthMinDefault } from "@/constants/service.constants";
 import { OctoprintType, MoonrakerType } from "@/services/printer-api.interface";
 
-export const createMongoPrinterRules = {
-  _id: "not",
-  printerURL: "required|httpurl",
-  printerType: `required|integer|in:${OctoprintType},${MoonrakerType}`,
-  apiKey: `requiredIf:printerType,${OctoprintType}|length:${apiKeyLengthMaxDefault},${apiKeyLengthMinDefault}|alphaDash`,
-  enabled: "boolean",
-  name: "string",
-};
-
 export const createPrinterRules = {
   printerURL: "required|httpurl",
   printerType: `required|integer|in:${OctoprintType},${MoonrakerType}`,

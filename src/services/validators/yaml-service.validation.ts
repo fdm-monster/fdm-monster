@@ -55,10 +55,9 @@ export const importPrintersFloorsYamlRules = (
   };
 };
 
-export const importPrinterPositionsRules = (isTypeormMode: boolean) => ({
+export const importPrinterPositionsRules = () => ({
   printers: "array|minLength:0",
   "printers.*.printerId": "required",
-  // isTypeormMode ? "integer|min:1" : "mongoId",
   "printers.*.x": "required|integer|min:0|max:12",
   "printers.*.y": "required|integer|min:0|max:12",
 });

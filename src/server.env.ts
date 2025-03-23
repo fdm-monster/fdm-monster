@@ -1,4 +1,3 @@
-import { status, up } from "migrate-mongo";
 import { join } from "path";
 import * as Sentry from "@sentry/node";
 import { config } from "dotenv";
@@ -47,15 +46,6 @@ function printInstructionsURL() {
   logger.log(`Please make sure to read ${instructionsReferralURL} for more information.`);
 }
 
-export function fetchMongoDBConnectionString() {
-  if (!process.env[AppConstants.MONGO_KEY]) {
-    logger.debug(`~ ${AppConstants.MONGO_KEY} environment variable is not set. Assuming default`);
-    printInstructionsURL();
-    process.env[AppConstants.MONGO_KEY] = AppConstants.defaultMongoStringUnauthenticated;
-  }
-  return process.env[AppConstants.MONGO_KEY];
-}
-
 export function fetchServerPort() {
   let port = process.env[AppConstants.SERVER_PORT_KEY];
   if (Number.isNaN(parseInt(port!))) {
@@ -64,15 +54,6 @@ export function fetchServerPort() {
     port = process.env[AppConstants.SERVER_PORT_KEY];
   }
   return port;
-}
-
-export function ensureMongoDbConnectionStringSet() {
-  const dbConnectionString = process.env[AppConstants.MONGO_KEY];
-  if (!dbConnectionString) {
-    fetchMongoDBConnectionString();
-  } else {
-    logger.log(`✓ ${AppConstants.MONGO_KEY} environment variable set!`);
-  }
 }
 
 export function setupSentry() {
@@ -115,26 +96,5 @@ export function setupEnvConfig(skipDotEnv = false) {
   ensureNodeEnvSet();
   ensurePackageVersionSet();
   setupSentry();
-  ensureMongoDbConnectionStringSet();
   ensurePortSet();
-}
-
-export async function runMigrations(db: any, client: any): Promise<void> {
-  const migrationsStatus = await status(db);
-  const pendingMigrations = migrationsStatus.filter((m) => m.appliedAt === "PENDING");
-
-  if (pendingMigrations.length) {
-    logger.log(
-      `! MongoDB has ${pendingMigrations.length} migrations left to run (${migrationsStatus.length} migrations in total)`
-    );
-  } else {
-    logger.log(`✓ Mongo Database is up to date [${migrationsStatus.length} migration applied]`);
-  }
-
-  const migrationResult = await up(db, client);
-  if (migrationResult?.length > 0) {
-    logger.log(`Applied ${migrationResult.length} migrations successfully`, migrationResult);
-  } else {
-    logger.log("No migrations were run");
-  }
 }

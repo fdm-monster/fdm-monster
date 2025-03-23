@@ -1,5 +1,4 @@
 import express, { Application } from "express";
-import mongoose from "mongoose";
 import history from "connect-history-api-fallback";
 import { LoggerService } from "./handlers/logger";
 import { loadControllers } from "awilix-express";
@@ -26,7 +25,6 @@ export class ServerHost {
   configService: ConfigService;
   typeormService: TypeormService;
   settingsStore: SettingsStore;
-  private readonly isTypeormMode: boolean;
   private logger: LoggerService;
 
   constructor({
@@ -36,7 +34,6 @@ export class ServerHost {
     socketIoGateway,
     configService,
     typeormService,
-    isTypeormMode,
     settingsStore,
   }: {
     loggerFactory: ILoggerFactory;
@@ -46,7 +43,6 @@ export class ServerHost {
     configService: ConfigService;
     typeormService: TypeormService;
     settingsStore: SettingsStore;
-    isTypeormMode: boolean;
   }) {
     this.logger = loggerFactory(ServerHost.name);
     this.bootTask = bootTask;
@@ -55,15 +51,9 @@ export class ServerHost {
     this.configService = configService;
     this.typeormService = typeormService;
     this.settingsStore = settingsStore;
-    this.isTypeormMode = isTypeormMode;
   }
 
   async boot(app: Application, quick_boot = false, listenRequests = true) {
-    if (!this.isTypeormMode) {
-      // Enforce models to be strictly applied, any unknown property will not be persisted
-      mongoose.set("strictQuery", true);
-    }
-
     this.appInstance = app;
     this.serveControllerRoutes(this.appInstance);
 
@@ -75,11 +65,7 @@ export class ServerHost {
   }
 
   hasConnected() {
-    if (this.isTypeormMode) {
-      return this.typeormService.hasConnected();
-    } else {
-      return mongoose.connections[0].readyState;
-    }
+    return this.typeormService.hasConnected();
   }
 
   serveControllerRoutes(app: Application) {

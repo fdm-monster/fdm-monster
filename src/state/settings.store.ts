@@ -12,7 +12,6 @@ import { isTestEnvironment } from "@/utils/env.utils";
 import { AppConstants } from "@/server.constants";
 import { LoggerService } from "@/handlers/logger";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
-import { ISettings } from "@/models/Settings";
 import {
   CredentialSettingsDto,
   FileCleanSettingsDto,
@@ -21,25 +20,16 @@ import {
   TimeoutSettingsDto,
 } from "@/services/interfaces/settings.dto";
 import { ILoggerFactory } from "@/handlers/logger-factory";
+import { Settings } from "@/entities";
 
 export class SettingsStore {
-  private readonly isTypeOrmMode: boolean;
   private settingsService: ISettingsService;
   private logger: LoggerService;
-  private settings: ISettings | null = null;
+  private settings: Settings | null = null;
 
-  constructor({
-    settingsService,
-    loggerFactory,
-    isTypeormMode,
-  }: {
-    settingsService: ISettingsService;
-    loggerFactory: ILoggerFactory;
-    isTypeormMode: boolean;
-  }) {
+  constructor({ settingsService, loggerFactory }: { settingsService: ISettingsService; loggerFactory: ILoggerFactory }) {
     this.settingsService = settingsService;
     this.logger = loggerFactory(SettingsStore.name);
-    this.isTypeOrmMode = isTypeormMode;
   }
 
   getSettings() {
@@ -53,7 +43,6 @@ export class SettingsStore {
         registration: settings[serverSettingsKey].registration,
         sentryDiagnosticsEnabled: settings[serverSettingsKey].sentryDiagnosticsEnabled,
         experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
-        experimentalTypeormSupport: this.isTypeOrmMode,
         experimentalClientSupport: settings[serverSettingsKey].experimentalClientSupport,
         experimentalThumbnailSupport: settings[serverSettingsKey].experimentalThumbnailSupport,
       },
@@ -76,7 +65,6 @@ export class SettingsStore {
       [serverSettingsKey]: {
         debugSettings: settings[serverSettingsKey].debugSettings,
         experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
-        experimentalTypeormSupport: this.isTypeOrmMode,
         experimentalClientSupport: settings[serverSettingsKey].experimentalClientSupport,
         experimentalThumbnailSupport: settings[serverSettingsKey].experimentalThumbnailSupport,
       },

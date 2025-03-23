@@ -3,7 +3,7 @@ import { EVENT_TYPES } from "../octoprint/constants/octoprint-websocket.constant
 export const createPrintCompletionRules = {
   fileName: "required",
   status: `required|string|in:${Object.values(EVENT_TYPES)}`,
-  printerId: "required|string|mongoId",
+  printerId: "required|string",
   completionLog: "string",
   context: "required|object",
 };

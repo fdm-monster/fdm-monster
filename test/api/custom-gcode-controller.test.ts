@@ -5,9 +5,8 @@ import { createTestPrinter } from "./test-data/create-printer";
 import { Test } from "supertest";
 import { CustomGcodeDto } from "@/services/interfaces/custom-gcode.dto";
 import { IdType, SqliteIdType } from "@/shared.constants";
-import { getDatasource, isSqliteModeTest } from "../typeorm.manager";
+import { getDatasource } from "../typeorm.manager";
 import { CustomGcode } from "@/entities";
-import { CustomGcode as CustomGcodeMongo } from "@/models";
 import { CustomGcodeController } from "@/controllers/custom-gcode.controller";
 import TestAgent from "supertest/lib/agent";
 import nock from "nock";
@@ -26,11 +25,7 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  if (isSqliteModeTest()) {
-    return getDatasource().getRepository(CustomGcode).clear();
-  } else {
-    await CustomGcodeMongo.deleteMany({});
-  }
+  return getDatasource().getRepository(CustomGcode).clear();
 });
 
 function getGCodeScript() {
@@ -91,7 +86,7 @@ describe(CustomGcodeController.name, () => {
   });
 
   it("should not get non-existing gcode script", async () => {
-    const response = await request.get(getRoute(isSqliteModeTest() ? 1234 : "648f3e6d372112628bb8e404")).send();
+    const response = await request.get(getRoute(1234)).send();
     console.log(response.body);
     expectNotFoundResponse(response);
   });
