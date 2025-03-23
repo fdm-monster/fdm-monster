@@ -219,6 +219,13 @@ export class SettingsStore {
     return this.getSettings();
   }
 
+  async setExperimentalPrusaLinkSupport(prusaLinkEnabled: boolean) {
+    this.settings = await this.settingsService.patchServerSettings({
+      experimentalPrusaLinkSupport: prusaLinkEnabled,
+    });
+    return this.getSettings();
+  }
+
   async setExperimentalThumbnailSupport(thumbnailsEnabled: boolean) {
     this.settings = await this.settingsService.patchServerSettings({
       experimentalThumbnailSupport: thumbnailsEnabled,
