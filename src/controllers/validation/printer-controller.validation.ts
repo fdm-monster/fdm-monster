@@ -28,12 +28,3 @@ export const updatePrinterConnectionSettingRules = {
   printerURL: "required|httpurl",
   apiKey: `requiredIf:printerType,${OctoprintType}|length:${apiKeyLengthMaxDefault},${apiKeyLengthMinDefault}|alphaDash`,
 };
-
-export const createOctoPrintBackupRules = {
-  exclude: "array",
-  "exclude.*": "string",
-};
-
-export const getOctoPrintBackupRules = {
-  fileName: "required|string",
-};

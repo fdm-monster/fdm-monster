@@ -20,28 +20,6 @@ export class OctoprintRoutes {
   apiServerRestartCommand = `${this.apiSystemCommands}/core/restart`;
   apiUsers = `${this.apiBase}/users`;
   apiLogin = `${this.apiBase}/login?passive=true`;
-  apiPluginPiSupport = `${this.apiBase}/plugin/pi_support`;
-  apiProfiles = `${this.apiBase}/plugin/printerprofiles`;
-  apiTimelapse = `${this.apiBase}/timelapse`;
-  apiPlugin = `${this.apiBase}/plugin`;
-  apiPluginManager = `${this.apiPlugin}/pluginmanager`; // GET is deprecated, POST is in use
-
-  pluginsBase = `${this.octoPrintBase}plugin`;
-  pluginSoftwareUpdate = `${this.pluginsBase}/softwareupdate`;
-  pluginSoftwareUpdateCheck = `${this.pluginSoftwareUpdate}/check`; // GET
-  pluginSoftwareUpdateUpdate = `${this.pluginSoftwareUpdate}/update`; // POST
-  pluginFirmwareUpdater = `${this.pluginsBase}/firmwareupdater`;
-  pluginFirmwareUpdaterStatus = `${this.pluginsBase}/firmwareupdater/status`; // GET
-  pluginFirmwareUpdaterFlash = `${this.pluginsBase}/firmwareupdater/flash`; // POST
-  pluginBackupIndex = `${this.pluginsBase}/backup`;
-  pluginBackupEndpoint = `${this.pluginsBase}/backup/backup`;
-  pluginBackupFile = (filename: string) => `${this.pluginsBase}/backup/backup/${filename}`;
-  pluginBackupFileDownload = (filename: string) => `${this.pluginsBase}/backup/download/${filename}`;
-  pluginBackupFileRestore = `${this.pluginsBase}/backup/restore`; // Upload a backup on the fly
-  pluginManager = `${this.pluginsBase}/pluginmanager`;
-  pluginManagerPlugins = `${this.pluginManager}/plugins`; // Fast
-  pluginManagerExport = `${this.pluginManager}/export`;
-  pluginManagerOrphans = `${this.pluginManager}/orphans`;
 
   get disconnectCommand() {
     return { command: "disconnect" };
@@ -67,10 +45,6 @@ export class OctoprintRoutes {
     return { command: "target", target: targetTemperature };
   }
 
-  pluginManagerPlugin = (pluginName: string) => `${this.pluginManager}/${pluginName}`;
-
-  pluginManagerRepository = (refresh = false) => `${this.pluginManager}/repository?refresh=${refresh}`;
-
   apiPrinterCurrent = (history?: boolean, limit?: number, exclude?: ("temperature" | "sd" | "state")[]) => {
     exclude = exclude?.filter((e) => !!e.length);
     const excludeParam = exclude?.length ? `&exclude=${exclude?.join(",")}` : "";
@@ -83,8 +57,6 @@ export class OctoprintRoutes {
   downloadFileLocal = (path: string) => `${this.octoPrintBase}downloads/files/local/${path}`;
 
   apiGetFiles = (recursive = false) => `${this.apiFiles}/local?recursive=${recursive}`;
-
-  apiSoftwareUpdateCheck = (force: boolean) => `${this.octoPrintBase}plugin/softwareupdate/check${force ? "?force=true" : ""}`;
 
   selectCommand(print = false) {
     return { command: "select", print };
@@ -107,21 +79,6 @@ export class OctoprintRoutes {
       gcodeAnalysis: {
         runAt: enabled ? "idle" : "never",
       },
-    };
-  }
-
-  pluginFirmwareUpdaterSettings(subsettings: any) {
-    return {
-      plugins: {
-        firmwareupdater: subsettings,
-      },
-    };
-  }
-
-  pluginManagerCommand(command: string, url: string) {
-    return {
-      command,
-      url,
     };
   }
 }

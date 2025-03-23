@@ -121,7 +121,7 @@ export class ServerHost {
         const path = req.originalUrl;
 
         let resource = "MVC";
-        if (path.startsWith("/socket.io") || path.startsWith("/api") || path.startsWith("/plugins")) {
+        if (path.startsWith("/socket.io") || path.startsWith("/api")) {
           resource = "API";
         } else if (path.endsWith(".min.js")) {
           resource = "client-bundle";

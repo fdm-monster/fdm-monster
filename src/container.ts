@@ -34,9 +34,6 @@ import { ROLES } from "./constants/authorization.constants";
 import { CustomGcodeService } from "./services/mongoose/custom-gcode.service";
 import { CustomGcodeService as CustomGcodeService2 } from "./services/orm/custom-gcode.service";
 import { PrinterWebsocketRestoreTask } from "./tasks/printer-websocket-restore.task";
-import { PluginFirmwareUpdateService } from "./services/octoprint/plugin-firmware-update.service";
-import { PluginRepositoryCache } from "./services/octoprint/plugin-repository.cache";
-import { configureCacheManager } from "./handlers/cache-manager";
 import { ConfigService } from "./services/core/config.service";
 import { PrintCompletionSocketIoTask } from "./tasks/print-completion.socketio.task";
 import { PrintCompletionService } from "./services/mongoose/print-completion.service";
@@ -139,7 +136,6 @@ export function configureContainer(isSqlite: boolean = false) {
     [di.taskManagerService]: asClass(TaskManagerService).singleton(),
     [di.toadScheduler]: asClass(ToadScheduler).singleton(),
     [di.eventEmitter2]: asFunction(configureEventEmitter).singleton(),
-    [di.cacheManager]: asFunction(configureCacheManager).singleton(),
     [di.serverReleaseService]: asClass(ServerReleaseService).singleton(),
     [di.monsterPiService]: asClass(MonsterPiService).singleton(),
     [di.githubService]: asClass(GithubService),
@@ -176,10 +172,8 @@ export function configureContainer(isSqlite: boolean = false) {
     [di.moonrakerClient]: asClass(MoonrakerClient).singleton(),
     [di.moonrakerWebsocketAdapter]: asClass(MoonrakerWebsocketAdapter).transient(), // Transient on purpose
     [di.batchCallService]: asClass(BatchCallService).singleton(),
-    [di.pluginFirmwareUpdateService]: asClass(PluginFirmwareUpdateService).singleton(),
 
     [di.floorStore]: asClass(FloorStore).singleton(),
-    [di.pluginRepositoryCache]: asClass(PluginRepositoryCache).singleton(),
     [di.printerThumbnailCache]: asClass(PrinterThumbnailCache).singleton(),
     [di.fileCache]: asClass(FileCache).singleton(),
     [di.fileUploadTrackerCache]: asClass(FileUploadTrackerCache).singleton(),
