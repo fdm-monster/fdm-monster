@@ -264,22 +264,6 @@ describe(PrinterController.name, () => {
     expectOkResponse(updatePatch);
   });
 
-  it("should get plugin list", async () => {
-    // Cache is not loaded
-    const res = await request.get(pluginListRoute).send();
-    expectOkResponse(res, []);
-  });
-
-  it("should get printer plugin list", async () => {
-    const printer = await createTestPrinter(request);
-
-    const wantedResponse = { plugins: [{ key: "firmwareupdater", name: "Firmware Updater" }] };
-    nock(printer.printerURL).get(`/plugin/pluginmanager/plugins`).reply(200, wantedResponse);
-
-    const res = await request.get(printerPluginListRoute(printer.id)).send();
-    expectOkResponse(res, wantedResponse);
-  });
-
   it("should send restart octoprint command", async () => {
     const printer = await createTestPrinter(request);
 
@@ -304,44 +288,5 @@ describe(PrinterController.name, () => {
     nock(printer.printerURL).post("/api/connection").reply(200, { port: "/dev/ttyACM0" });
     const res = await request.post(serialDisconnectCommandRoute(printer.id)).send();
     expectOkResponse(res);
-  });
-
-  it("should get backup index", async () => {
-    const printer = await createTestPrinter(request);
-    nock(printer.printerURL).get("/plugin/backup").reply(200, {});
-    const res = await request.get(printerOctoprintBackupIndex(printer.id)).send();
-    expectOkResponse(res, {});
-  });
-
-  it("should get backup list", async () => {
-    const printer = await createTestPrinter(request);
-    nock(printer.printerURL).get("/plugin/backup/backup").reply(200, []);
-    const res = await request.get(printerOctoprintBackupList(printer.id)).send();
-    expectOkResponse(res, []);
-  });
-
-  it("should download backup", async () => {
-    const printer = await createTestPrinter(request);
-    nock(printer.printerURL).get("/plugin/backup/download/123.abc").reply(200, "asd");
-    const res = await request.post(printerOctoprintBackupDownload(printer.id)).send({
-      fileName: "123.abc",
-    });
-    expectOkResponse(res);
-  });
-
-  it("should return 400 when backup has not been uploaded for restore", async () => {
-    const printer = await createTestPrinter(request);
-    nock(printer.printerURL).post("/plugin/backup/restore").reply(200, []);
-    const res = await request.post(printerOctoprintBackupRestore(printer.id)).send();
-    expectBadRequestError(res);
-  });
-
-  it("should delete backup", async () => {
-    const printer = await createTestPrinter(request);
-    nock(printer.printerURL).delete("/plugin/backup/delete/123.abc").reply(200, []);
-    const res = await request.delete(printerOctoprintBackupDelete(printer.id)).send({
-      filename: "123.abc",
-    });
-    expectBadRequestError(res);
   });
 });

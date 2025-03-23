@@ -2,10 +2,8 @@ import { before, DELETE, GET, PATCH, POST, route } from "awilix-express";
 import { authenticate, authorizeRoles } from "@/middleware/authenticate";
 import { getScopedPrinter, validateInput, validateMiddleware } from "@/handlers/validators";
 import {
-  createOctoPrintBackupRules,
   feedRateRules,
   flowRateRules,
-  getOctoPrintBackupRules,
   testPrinterApiRules,
   updatePrinterConnectionSettingRules,
   updatePrinterDisabledReasonRules,
@@ -21,7 +19,6 @@ import { PrinterCache } from "@/state/printer.cache";
 import { LoggerService } from "@/handlers/logger";
 import { PrinterEventsCache } from "@/state/printer-events.cache";
 import { TaskManagerService } from "@/services/core/task-manager.service";
-import { PluginRepositoryCache } from "@/services/octoprint/plugin-repository.cache";
 import { FloorStore } from "@/state/floor.store";
 import { MulterService } from "@/services/core/multer.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
@@ -30,7 +27,7 @@ import { IPrinterService } from "@/services/interfaces/printer.service.interface
 import { LoginDto } from "@/services/interfaces/login.dto";
 import { AxiosError } from "axios";
 import { FailedDependencyException } from "@/exceptions/failed-dependency.exception";
-import { BadRequestException, InternalServerException } from "@/exceptions/runtime.exceptions";
+import { InternalServerException } from "@/exceptions/runtime.exceptions";
 import { MoonrakerClient } from "@/services/moonraker/moonraker.client";
 import { IPrinterApi } from "@/services/printer-api.interface";
 import { OctoprintClient } from "@/services/octoprint/octoprint.client";
@@ -51,7 +48,6 @@ export class PrinterController {
   printerApi: IPrinterApi;
   octoprintClient: OctoprintClient;
   moonrakerClient: MoonrakerClient;
-  pluginRepositoryCache: PluginRepositoryCache;
   floorStore: FloorStore;
   multerService: MulterService;
   logger: LoggerService;
@@ -68,7 +64,6 @@ export class PrinterController {
     printerApi,
     moonrakerClient,
     octoprintClient,
-    pluginRepositoryCache,
     floorStore,
     multerService,
   }: {
@@ -83,7 +78,6 @@ export class PrinterController {
     printerApi: IPrinterApi;
     octoprintClient: OctoprintClient;
     moonrakerClient: MoonrakerClient;
-    pluginRepositoryCache: PluginRepositoryCache;
     floorStore: FloorStore;
     multerService: MulterService;
   }) {
@@ -98,7 +92,6 @@ export class PrinterController {
     this.printerApi = printerApi;
     this.octoprintClient = octoprintClient;
     this.moonrakerClient = moonrakerClient;
-    this.pluginRepositoryCache = pluginRepositoryCache;
     this.floorStore = floorStore;
     this.multerService = multerService;
   }
@@ -127,16 +120,6 @@ export class PrinterController {
   async createBatch(req: Request, res: Response) {
     const importResult = await this.printerService.batchImport(req.body);
     res.send(importResult);
-  }
-
-  /**
-   * This list should move to generic controller
-   */
-  @GET()
-  @route("/plugin-list")
-  async getPluginList(req: Request, res: Response) {
-    const pluginList = this.pluginRepositoryCache.getCache();
-    res.send(pluginList);
   }
 
   @GET()
@@ -374,69 +357,5 @@ export class PrinterController {
     const data = await validateMiddleware(req, flowRateRules);
     await this.printerService.updateFlowRate(currentPrinterId, data.flowRate);
     res.send({});
-  }
-
-  @GET()
-  @route("/:id/plugin-list")
-  async getPrinterPluginList(req: Request, res: Response) {
-    // List installed plugins (OP 1.6.0+)
-    const { printerLogin } = getScopedPrinter(req);
-    const pluginListResponse = await this.octoprintClient.getPluginManagerPlugins(printerLogin);
-    res.send(pluginListResponse.data);
-  }
-
-  @GET()
-  @route("/:id/octoprint/backup")
-  async getOctoPrintBackupOverview(req: Request, res: Response) {
-    const { printerLogin } = getScopedPrinter(req);
-    const backupOverview = await this.octoprintClient.getBackupOverview(printerLogin);
-    res.send(backupOverview.data);
-  }
-
-  @GET()
-  @route("/:id/octoprint/backup/list")
-  async listOctoPrintBackups(req: Request, res: Response) {
-    const { printerLogin } = getScopedPrinter(req);
-    const backupOverview = await this.octoprintClient.getBackups(printerLogin);
-    res.send(backupOverview.data);
-  }
-
-  @POST()
-  @route("/:id/octoprint/backup/create")
-  async createOctoPrintBackup(req: Request, res: Response) {
-    const { printerLogin } = getScopedPrinter(req);
-    const { exclude } = await validateMiddleware(req, createOctoPrintBackupRules);
-    const response = await this.octoprintClient.createBackup(printerLogin, exclude);
-    res.send(response.data);
-  }
-
-  @POST()
-  @route("/:id/octoprint/backup/download")
-  async downloadOctoPrintBackup(req: Request, res: Response) {
-    const { printerLogin } = getScopedPrinter(req);
-    const { fileName } = await validateMiddleware(req, getOctoPrintBackupRules);
-    const dataStream = await this.octoprintClient.getDownloadBackupStream(printerLogin, fileName);
-    dataStream.pipe(res);
-  }
-
-  @POST()
-  @route("/:id/octoprint/backup/restore")
-  async restoreOctoPrintBackup(req: Request, res: Response) {
-    const { printerLogin } = getScopedPrinter(req);
-    const files = await this.multerService.multerLoadFileAsync(req, res, null, false);
-    if (!files?.length) {
-      throw new BadRequestException("No files uploaded.");
-    }
-    const response = await this.octoprintClient.forwardRestoreBackupFileStream(printerLogin, files[0].buffer);
-    res.send(response.data);
-  }
-
-  @DELETE()
-  @route("/:id/octoprint/backup/delete")
-  async deleteOctoPrintBackup(req: Request, res: Response) {
-    const { printerLogin } = getScopedPrinter(req);
-    const { fileName } = await validateMiddleware(req, getOctoPrintBackupRules);
-    const response = await this.octoprintClient.deleteBackup(printerLogin, fileName);
-    res.send(response.data);
   }
 }

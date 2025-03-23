@@ -5,7 +5,6 @@ export const octoprintWsMessages = {
   reauthRequired: "reauthRequired",
   current: "current",
   history: "history",
-  // Lets not expose what we dont use
   // event: "event",
   // plugin: "plugin",
   // timelapse: "timelapse",

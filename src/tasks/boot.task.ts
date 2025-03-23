@@ -14,13 +14,11 @@ import { PrinterFilesStore } from "@/state/printer-files.store";
 import { PermissionService } from "@/services/mongoose/permission.service";
 import { RoleService } from "@/services/mongoose/role.service";
 import { UserService } from "@/services/mongoose/user.service";
-import { PluginRepositoryCache } from "@/services/octoprint/plugin-repository.cache";
 import { ClientBundleService } from "@/services/core/client-bundle.service";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
 import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
-import { PluginFirmwareUpdateService } from "@/services/octoprint/plugin-firmware-update.service";
 
 export class BootTask {
   logger: LoggerService;
@@ -34,9 +32,7 @@ export class BootTask {
   permissionService: PermissionService;
   roleService: RoleService;
   userService: UserService;
-  pluginRepositoryCache: PluginRepositoryCache;
   floorStore: FloorStore;
-  pluginFirmwareUpdateService: PluginFirmwareUpdateService;
   clientBundleService: ClientBundleService;
   configService: ConfigService;
   isTypeormMode: boolean;
@@ -55,7 +51,6 @@ export class BootTask {
     roleService,
     userService,
     taskManagerService,
-    pluginRepositoryCache,
     floorStore,
     clientBundleService,
     configService,
@@ -74,7 +69,6 @@ export class BootTask {
     roleService: RoleService;
     userService: UserService;
     taskManagerService: TaskManagerService;
-    pluginRepositoryCache: PluginRepositoryCache;
     floorStore: FloorStore;
     clientBundleService: ClientBundleService;
     configService: ConfigService;
@@ -94,7 +88,6 @@ export class BootTask {
     this.roleService = roleService;
     this.userService = userService;
     this.taskManagerService = taskManagerService;
-    this.pluginRepositoryCache = pluginRepositoryCache;
     this.floorStore = floorStore;
     this.clientBundleService = clientBundleService;
     this.configService = configService;

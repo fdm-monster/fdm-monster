@@ -1063,7 +1063,6 @@ __metadata:
     axios: "npm:1.8.4"
     bcryptjs: "npm:3.0.2"
     better-sqlite3: "npm:11.9.1"
-    cache-manager: "npm:6.4.1"
     chokidar: "npm:4.0.3"
     class-validator: "npm:0.14.1"
     connect-history-api-fallback: "npm:2.0.0"
@@ -4718,7 +4717,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cache-manager@npm:*, cache-manager@npm:6.4.1":
+"cache-manager@npm:*":
   version: 6.4.1
   resolution: "cache-manager@npm:6.4.1"
   dependencies:
