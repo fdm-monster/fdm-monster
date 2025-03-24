@@ -1052,7 +1052,7 @@ __metadata:
     "@types/passport-anonymous": "npm:1.0.5"
     "@types/passport-jwt": "npm:4.0.1"
     "@types/semver": "npm:7.5.8"
-    "@types/supertest": "npm:6.0.2"
+    "@types/supertest": "npm:6.0.3"
     "@types/uuid": "npm:10.0.0"
     "@types/ws": "npm:8.18.0"
     adm-zip: "npm:0.5.16"
@@ -3745,13 +3745,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/supertest@npm:6.0.2":
-  version: 6.0.2
-  resolution: "@types/supertest@npm:6.0.2"
+"@types/supertest@npm:6.0.3":
+  version: 6.0.3
+  resolution: "@types/supertest@npm:6.0.3"
   dependencies:
     "@types/methods": "npm:^1.1.4"
     "@types/superagent": "npm:^8.1.0"
-  checksum: 10c0/44a28f9b35b65800f4c7bcc23748e71c925098aa74ea504d14c98385c36d00de2a4f5aca15d7dc4514bc80533e0af21f985a4ab9f5f317c7266e9e75836aef39
+  checksum: 10c0/a2080f870154b09db123864a484fb633bc9e2a0f7294a194388df4c7effe5af9de36d5a5ebf819f72b404fa47b5e813c47d5a3a51354251fd2fa8589bfb64f2c
   languageName: node
   linkType: hard
 
