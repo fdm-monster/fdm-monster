@@ -1,5 +1,21 @@
 # Develop
 
+## Chores
+
+- Remove unused code for OctoPrint plugin support (this work needs to go through triage again)
+- Remove unused code for OctoPrint plugin backup (this work needs to go through triage again)
+- Remove unused code for OctoPrint plugin firmware update (this work needs to go through triage again)
+- Remove unused code for OctoPrint plugin repository
+- Remove unused code for Prusa firmware releases
+- Remove printer API endpoints for OctoPrint plugins, backups and firmware updates
+- Remove cache-manager package
+- Remove unused console files
+- Update .env.template
+
+## Fixes
+
+- Fix quite some type errors (needs more work)
+
 # FDM Monster 19/03/2025 1.8.3
 
 ## Fixes
