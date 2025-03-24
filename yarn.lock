@@ -3291,9 +3291,9 @@ __metadata:
   linkType: hard
 
 "@types/aws-lambda@npm:^8.10.83":
-  version: 8.10.147
-  resolution: "@types/aws-lambda@npm:8.10.147"
-  checksum: 10c0/c77bcb18a935fb26f5b1164aaadf46b3d11d6c001a95c6e9f2ff72f7d9ed4e7f28075a3abf9f9585cc75510acbc29c7a6441e66727902eae1bd39ac8dc28351e
+  version: 8.10.148
+  resolution: "@types/aws-lambda@npm:8.10.148"
+  checksum: 10c0/b2cf5c991263a9276490757ec8f78fa42e41ac5029588d87f6b01f03321ee97eeaed8d66d259165d941717242a84e5b67e5d3a8872e9642a47645c6610f85287
   languageName: node
   linkType: hard
 
