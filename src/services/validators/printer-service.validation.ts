@@ -3,21 +3,22 @@ import { OctoprintType, PrinterTypes } from "@/services/printer-api.interface";
 import { z } from "zod";
 import { numberEnum } from "@/handlers/validators";
 
+export const validateApiKey = z
+  .string()
+  .min(apiKeyLengthMinDefault)
+  .max(apiKeyLengthMaxDefault)
+  .regex(/^[a-zA-Z0-9_-]+$/, "Alpha-numeric, dash, and underscore only")
+  .optional();
+
 export const createPrinterSchema = z
   .object({
-    _id: z.never(),
-    id: z.never(),
     printerURL: z.string().url(),
     printerType: z.number().superRefine(numberEnum(PrinterTypes)),
-    apiKey: z
-      .string()
-      .min(apiKeyLengthMinDefault)
-      .max(apiKeyLengthMaxDefault)
-      .regex(/^[a-zA-Z0-9_-]+$/, "Alpha-numeric, dash, and underscore only")
-      .optional(),
+    apiKey: validateApiKey,
     enabled: z.boolean().optional(), // Optional, adjust as needed
     name: z.string(), // Name is required
   })
+  .strict()
   .superRefine((data, ctx) => {
     if (data.printerType === OctoprintType && !data.apiKey?.length) {
       ctx.addIssue({

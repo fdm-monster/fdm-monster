@@ -166,7 +166,7 @@ export class YamlService {
       const knownPrinterPositions = [];
 
       if (exportFloorGrid && exportPrinters) {
-        for (const floorPosition of newFloor.printers) {
+        for (const floorPosition of newFloor.printers || []) {
           const knownPrinterId = printerIdMap[floorPosition.printerId];
           // If the ID was not mapped, this position is considered discarded
           if (!knownPrinterId) {

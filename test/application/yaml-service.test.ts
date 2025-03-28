@@ -169,6 +169,7 @@ describe(YamlService.name, () => {
           // Position is not used in imported floor "Floor1"
           x: 0,
           y: 1,
+          floorId: 15,
           printerId: printer.id,
         },
       ],

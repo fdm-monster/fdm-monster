@@ -3,7 +3,7 @@ import { authenticate, withPermission } from "@/middleware/authenticate";
 import { validateInput, validateMiddleware } from "@/handlers/validators";
 import { AppConstants } from "@/server.constants";
 import { idRulesV2 } from "./validation/generic.validation";
-import { setGcodeAnalysis } from "./validation/printer-settings-controller.validation";
+import { setGcodeAnalysisSchema } from "./validation/printer-settings-controller.validation";
 import { PERMS } from "@/constants/authorization.constants";
 import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { PrinterCache } from "@/state/printer.cache";
@@ -38,7 +38,7 @@ export class PrinterSettingsController {
 
   async setGCodeAnalysis(req: Request, res: Response) {
     const { id: printerId } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
-    const { enabled } = await validateMiddleware(req, setGcodeAnalysis);
+    const { enabled } = await validateMiddleware(req, setGcodeAnalysisSchema);
 
     const printerLogin = await this.printerCache.getLoginDtoAsync(printerId);
     const settings = await this.octoprintClient.setGCodeAnalysis(printerLogin, enabled);

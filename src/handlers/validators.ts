@@ -11,7 +11,7 @@ export async function validateInput<I, S>(data: I, zodSchema: ZodSchema<S>): Pro
   return result.data;
 }
 
-export async function validateMiddlewareOld<I, S>(req: Request<I>, zodSchema: ZodSchema<S>): Promise<S> {
+export async function validateMiddleware<I, S>(req: Request<I>, zodSchema: ZodSchema<S>): Promise<S> {
   return validateInput(req.body, zodSchema);
 }
 

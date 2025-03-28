@@ -97,5 +97,6 @@ export const importPrinterPositionsSchema = (isSqliteMode: boolean) =>
           y: z.number().int().min(0).max(12),
         })
       )
-      .min(0),
+      .min(0)
+      .optional(),
   });

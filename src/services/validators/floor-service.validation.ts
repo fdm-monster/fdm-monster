@@ -27,14 +27,16 @@ export const updateFloorSchema = (isSqlite: boolean) =>
   z.object({
     name: z.string().min(minFloorNameLength),
     floor: z.number().int(),
-    printers: z.array(
-      z.object({
-        printerId: idRuleV2(isSqlite),
-        floorId: idRuleV2(isSqlite),
-        x: z.number().min(0).max(12),
-        y: z.number().min(0).max(12),
-      })
-    ),
+    printers: z
+      .array(
+        z.object({
+          printerId: idRuleV2(isSqlite),
+          floorId: idRuleV2(isSqlite),
+          x: z.number().min(0).max(12),
+          y: z.number().min(0).max(12),
+        })
+      )
+      .optional(),
   });
 
 export const createFloorSchema = (isSqlite: boolean) =>

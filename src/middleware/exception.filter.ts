@@ -10,7 +10,6 @@ import {
 } from "@/exceptions/runtime.exceptions";
 import { AppConstants } from "@/server.constants";
 import { NextFunction, Response, Request } from "express";
-import { HttpStatusCode } from "@/constants/http-status-codes.constants";
 import { AxiosError } from "axios";
 import { EntityNotFoundError } from "typeorm";
 import { FailedDependencyException } from "@/exceptions/failed-dependency.exception";

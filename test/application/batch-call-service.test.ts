@@ -62,7 +62,7 @@ describe(BatchCallService.name, () => {
     // Verify: ensure reprint file details are retrieved successfully
     expect(result).toHaveLength(2);
     expect(result[0].reprintState).toBe(2); // LastPrintReady
-    expect(result[0].file?.name).toBe("test-file.gcode");
+    expect(result[0].file?.path).toBe("test-file.gcode");
   });
 
   it("should return NoLastPrint state if no last print file is found", async () => {

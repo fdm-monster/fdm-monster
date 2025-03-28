@@ -1,4 +1,3 @@
-import { injectable, inject } from "awilix";
 import { Request, Response } from "express";
 import { AppConstants } from "@/server.constants";
 import { authenticate, authorizeRoles } from "@/middleware/authenticate";
@@ -16,7 +15,14 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { errorSummary } from "@/utils/error.utils";
 import { SettingsStore } from "@/state/settings.store";
 import { before, DELETE, GET, POST, route } from "awilix-express";
-import { registerUserRules, registerUserWithRolesRules } from "@/controllers/validation/user-controller.validation";
+import {
+  changePasswordSchema,
+  isRootUserSchema,
+  isVerifiedSchema,
+  registerUserWithRolesSchema,
+  setUserRolesSchema,
+  usernameSchema,
+} from "@/controllers/validation/user-controller.validation";
 
 @route(AppConstants.apiRoute + "/user")
 @before([authenticate()])
@@ -67,7 +73,7 @@ export class UserController {
   @route("/")
   @before([authorizeRoles([ROLES.ADMIN])])
   async create(req: Request, res: Response) {
-    const { username, password, roleIds } = await validateMiddleware(req, registerUserWithRolesRules(this.isTypeormMode));
+    const { username, password, roleIds } = await validateMiddleware(req, registerUserWithRolesSchema(this.isTypeormMode));
     if (
       username.toLowerCase().includes("admin") ||
       username.toLowerCase().includes("root") ||
@@ -161,9 +167,7 @@ export class UserController {
       throw new ForbiddenError("Not allowed to change username of other users");
     }
 
-    const { username } = await validateInput(req.body, {
-      username: "required|string",
-    });
+    const { username } = await validateInput(req.body, usernameSchema);
     await this.userService.updateUsernameById(id, username);
     res.send();
   }
@@ -178,10 +182,7 @@ export class UserController {
       throw new ForbiddenError("Not allowed to change password of other users");
     }
 
-    const { oldPassword, newPassword } = await validateInput(req.body, {
-      oldPassword: "required|string",
-      newPassword: "required|string",
-    });
+    const { oldPassword, newPassword } = await validateInput(req.body, changePasswordSchema);
     await this.userService.updatePasswordById(id, oldPassword, newPassword);
     res.send();
   }
@@ -201,10 +202,7 @@ export class UserController {
       throw new ForbiddenError("Only an ADMIN or OWNER user is allowed to change its own roles");
     }
 
-    const { roleIds } = await validateInput(req.body, {
-      roleIds: "array",
-      "roleIds.*": "alphaNumeric",
-    });
+    const { roleIds } = await validateInput(req.body, setUserRolesSchema(this.isTypeormMode));
 
     if (ownUserId == currentUserId && !roleIds.includes(adminRole.id)) {
       if (ownUser.isRootUser) {
@@ -234,9 +232,7 @@ export class UserController {
       throw new ForbiddenError("Not allowed to change root user to unverified");
     }
 
-    const { isVerified } = await validateInput(req.body, {
-      isVerified: "required|boolean",
-    });
+    const { isVerified } = await validateInput(req.body, isVerifiedSchema);
     await this.userService.setVerifiedById(id, isVerified);
 
     res.send();
@@ -255,9 +251,7 @@ export class UserController {
         throw new ForbiddenError("Not allowed to change owner without being owner yourself");
       }
     }
-    const { isRootUser } = await validateInput(req.body, {
-      isRootUser: "required|boolean",
-    });
+    const { isRootUser } = await validateInput(req.body, isRootUserSchema);
     await this.userService.setIsRootUserById(id, isRootUser);
     res.send();
   }

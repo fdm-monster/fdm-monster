@@ -1,8 +1,8 @@
 import { before, DELETE, GET, POST, route } from "awilix-express";
 import { authenticate, authorizePermission, authorizeRoles } from "@/middleware/authenticate";
-import { getScopedPrinter, validateInput } from "@/handlers/validators";
+import { validateInput } from "@/handlers/validators";
 import { AppConstants } from "@/server.constants";
-import { downloadFileRules, getFileRules, startPrintFileRules } from "./validation/printer-files-controller.validation";
+import { downloadFileSchema, getFileSchema, startPrintFileSchema } from "./validation/printer-files-controller.validation";
 import { ValidationException } from "@/exceptions/runtime.exceptions";
 import { printerResolveMiddleware } from "@/middleware/printer";
 import { PERMS, ROLES } from "@/constants/authorization.constants";
@@ -19,6 +19,7 @@ import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
 import { captureException } from "@sentry/node";
 import { errorSummary } from "@/utils/error.utils";
 import { LoginDto } from "@/services/interfaces/login.dto";
+import { getScopedPrinter } from "@/handlers/printer-resolver";
 
 @route(AppConstants.apiRoute + "/printer-files")
 @before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR]), printerResolveMiddleware()])
@@ -95,7 +96,7 @@ export class PrinterFilesController {
   @route("/:id/reload-thumbnail")
   @before(authorizePermission(PERMS.PrinterFiles.Actions))
   async reloadThumbnail(req: Request, res: Response) {
-    const { filePath } = await validateInput(req.body, startPrintFileRules);
+    const { filePath } = await validateInput(req.body, startPrintFileSchema);
 
     try {
       if (this.settingsStore.isThumbnailSupportEnabled()) {
@@ -117,7 +118,7 @@ export class PrinterFilesController {
   @route("/:id/print")
   @before(authorizePermission(PERMS.PrinterFiles.Actions))
   async startPrintFile(req: Request, res: Response) {
-    const { filePath } = await validateInput(req.body, startPrintFileRules);
+    const { filePath } = await validateInput(req.body, startPrintFileSchema);
     const encodedFilePath = encodeURIComponent(filePath);
     await this.printerApi.startPrint(encodedFilePath);
 
@@ -146,7 +147,7 @@ export class PrinterFilesController {
   @before(authorizePermission(PERMS.PrinterFiles.Get))
   async downloadFile(req: Request, res: Response) {
     this.logger.log(`Downloading file ${req.params.path}`);
-    const { path } = await validateInput(req.params, downloadFileRules);
+    const { path } = await validateInput(req.params, downloadFileSchema);
     const encodedFilePath = encodeURIComponent(path);
 
     const response = await this.printerApi.downloadFile(encodedFilePath);
@@ -164,7 +165,7 @@ export class PrinterFilesController {
   @before(authorizePermission(PERMS.PrinterFiles.Delete))
   async deleteFileOrFolder(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
-    const { path } = await validateInput(req.query, getFileRules);
+    const { path } = await validateInput(req.query, getFileSchema);
     const encodedFilePath = encodeURIComponent(path);
 
     const result = await this.printerApi.deleteFile(encodedFilePath);

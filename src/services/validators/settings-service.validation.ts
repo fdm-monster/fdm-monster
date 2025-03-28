@@ -2,39 +2,43 @@ import { isProductionEnvironment } from "@/utils/env.utils";
 import { z } from "zod";
 
 export const serverSettingsUpdateSchema = z.object({
-  registration: z.boolean(),
-  loginRequired: z.boolean(),
-  debugSettings: z.object({
-    debugSocketEvents: z.boolean(),
-    debugSocketReconnect: z.boolean(),
-  }),
-  experimentalMoonrakerSupport: z.boolean(),
-  experimentalThumbnailSupport: z.boolean(),
+  registration: z.boolean().optional(),
+  loginRequired: z.boolean().optional(),
+  debugSettings: z
+    .object({
+      debugSocketEvents: z.boolean().optional(),
+      debugSocketReconnect: z.boolean().optional(),
+    })
+    .optional(),
+  experimentalMoonrakerSupport: z.boolean().optional(),
+  experimentalThumbnailSupport: z.boolean().optional(),
 });
 
 export const timeoutSettingsUpdateSchema = z.object({
-  apiTimeout: z.number().int().min(1000),
+  apiTimeout: z.number().int().min(1000).optional(),
 });
 
 export const frontendSettingsUpdateSchema = z.object({
-  gridCols: z.number().int().min(1),
-  gridRows: z.number().int().min(1),
-  largeTiles: z.boolean(),
-  tilePreferCancelOverQuickStop: z.boolean(),
+  gridCols: z.number().int().min(1).optional(),
+  gridRows: z.number().int().min(1).optional(),
+  largeTiles: z.boolean().optional(),
+  tilePreferCancelOverQuickStop: z.boolean().optional(),
 });
 
 export const credentialSettingPatchSchema = z.object({
-  jwtSecret: z.string(),
+  jwtSecret: z.string().optional(),
   jwtExpiresIn: z
     .number()
     .int()
     .min(isProductionEnvironment() ? 120 : 0)
-    .max(isProductionEnvironment() ? 7200 : Infinity),
-  refreshTokenAttempts: z.number().int().min(-1),
+    .max(isProductionEnvironment() ? 7200 : Infinity)
+    .optional(),
+  refreshTokenAttempts: z.number().int().min(-1).optional(),
   refreshTokenExpiry: z
     .number()
     .int()
-    .min(isProductionEnvironment() ? 240 : 0),
+    .min(isProductionEnvironment() ? 240 : 0)
+    .optional(),
 });
 
 export const wizardUpdateSchema = z.object({
