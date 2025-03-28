@@ -9482,7 +9482,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"punycode@npm:^2.1.0, punycode@npm:^2.1.1, punycode@npm:^2.3.1":
+"punycode@npm:^2.1.0, punycode@npm:^2.3.1":
   version: 2.3.1
   resolution: "punycode@npm:2.3.1"
   checksum: 10c0/14f76a8206bc3464f794fb2e3d3cc665ae416c01893ad7a02b23766eb07159144ee612ad67af5e84fa4479ccfe67678c4feb126b0485651b302babf66f04f9e9
@@ -10647,21 +10647,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tr46@npm:^3.0.0":
-  version: 3.0.0
-  resolution: "tr46@npm:3.0.0"
-  dependencies:
-    punycode: "npm:^2.1.1"
-  checksum: 10c0/cdc47cad3a9d0b6cb293e39ccb1066695ae6fdd39b9e4f351b010835a1f8b4f3a6dc3a55e896b421371187f22b48d7dac1b693de4f6551bdef7b6ab6735dfe3b
-  languageName: node
-  linkType: hard
-
-"tr46@npm:^5.1.0":
-  version: 5.1.0
-  resolution: "tr46@npm:5.1.0"
+"tr46@npm:5.0.0":
+  version: 5.0.0
+  resolution: "tr46@npm:5.0.0"
   dependencies:
     punycode: "npm:^2.3.1"
-  checksum: 10c0/d761f7144e0cb296187674ef245c74f761e334d7cf25ca73ef60e4c72c097c75051031c093fa1a2fee04b904977b316716a7915854bcae8fb1a371746513cbe8
+  checksum: 10c0/1521b6e7bbc8adc825c4561480f9fe48eb2276c81335eed9fa610aa4c44a48a3221f78b10e5f18b875769eb3413e30efbf209ed556a17a42aa8d690df44b7bee
   languageName: node
   linkType: hard
 
