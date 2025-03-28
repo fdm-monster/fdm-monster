@@ -1,21 +1,18 @@
 import { route, GET, POST, PUT, DELETE, before } from "awilix-router-core";
 import { AppConstants } from "@/server.constants";
-import { validateInput } from "@/handlers/validators";
-import { idRulesV2 } from "./validation/generic.validation";
 import { authenticate, authorizeRoles } from "@/middleware/authenticate";
 import { Request, Response } from "express";
 import { ICameraStreamService } from "@/services/interfaces/camera-stream.service.interface";
 import { ROLES } from "@/constants/authorization.constants";
+import { ParamId } from "@/middleware/param-converter.middleware";
 
 @route(`${AppConstants.apiRoute}/camera-stream`)
 @before([authenticate(), authorizeRoles([ROLES.OPERATOR, ROLES.ADMIN])])
 export class CameraStreamController {
   private readonly cameraStreamService: ICameraStreamService;
-  private readonly isTypeormMode: boolean;
 
-  constructor({ cameraStreamService, isTypeormMode }: { cameraStreamService: ICameraStreamService; isTypeormMode: boolean }) {
+  constructor({ cameraStreamService }: { cameraStreamService: ICameraStreamService }) {
     this.cameraStreamService = cameraStreamService;
-    this.isTypeormMode = isTypeormMode;
   }
 
   @GET()
@@ -27,9 +24,9 @@ export class CameraStreamController {
 
   @GET()
   @route("/:id")
+  @before([ParamId("id")])
   async get(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
-    const result = await this.cameraStreamService.get(id);
+    const result = await this.cameraStreamService.get(req.local.id);
     res.send(this.cameraStreamService.toDto(result));
   }
 
@@ -42,17 +39,17 @@ export class CameraStreamController {
 
   @PUT()
   @route("/:id")
+  @before([ParamId("id")])
   async update(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
-    const result = await this.cameraStreamService.update(id, req.body);
+    const result = await this.cameraStreamService.update(req.local.id, req.body);
     res.send(this.cameraStreamService.toDto(result));
   }
 
   @DELETE()
   @route("/:id")
+  @before([ParamId("id")])
   async delete(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
-    await this.cameraStreamService.delete(id);
+    await this.cameraStreamService.delete(req.local.id);
     res.send();
   }
 }

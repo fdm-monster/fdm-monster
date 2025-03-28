@@ -59,7 +59,7 @@ export function BaseService<
       if (dto.id) {
         delete dto.id;
       }
-      await validate(dto);
+
       const entity = this.repository.create(dto) as T;
       await validate(entity);
 
