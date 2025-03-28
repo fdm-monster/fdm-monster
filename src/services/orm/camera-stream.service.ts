@@ -15,12 +15,14 @@ export class CameraStreamService
       streamURL: entity.streamURL,
       name: entity.name,
       printerId: entity.printerId,
-      // settings: {
-      //   aspectRatio: entity.aspectRatio,
-      //   rotationClockwise: entity.rotationClockwise,
-      //   flipHorizontal: entity.flipHorizontal,
-      //   flipVertical: entity.flipVertical,
-      // },
+      aspectRatio: entity.aspectRatio,
+      rotationClockwise: entity.rotationClockwise,
+      flipHorizontal: entity.flipHorizontal,
+      flipVertical: entity.flipVertical,
     };
+  }
+
+  async delete(id: SqliteIdType, throwIfNotFound?: boolean) {
+    await super.delete(id, throwIfNotFound);
   }
 }

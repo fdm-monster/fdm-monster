@@ -20,6 +20,6 @@ export class PrintCompletionDto<KeyType = IdType> {
   status: string;
   printerId: KeyType;
   printerReference?: string;
-  completionLog: string;
+  completionLog?: string;
   context: PrintCompletionContext;
 }

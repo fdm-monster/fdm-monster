@@ -5,8 +5,10 @@ import { SettingsDto } from "@/services/octoprint/dto/settings/settings.dto";
 import { ConnectionState } from "@/services/octoprint/dto/connection/connection-state.type";
 import { IdType } from "@/shared.constants";
 
-export const OctoprintType = 0;
-export const MoonrakerType = 1;
+export const OctoprintType = 0 as const;
+export const MoonrakerType = 1 as const;
+export const PrinterTypes = [OctoprintType, MoonrakerType];
+export type PrinterTypes = typeof PrinterTypes[number];
 export type PrinterType = typeof OctoprintType | typeof MoonrakerType;
 
 export interface StatusFlags {
@@ -22,7 +24,6 @@ export interface FileDto {
   path: string;
   size: number;
   date: number;
-  // hash?: number | string;
 }
 
 export const capabilities = {

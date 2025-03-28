@@ -12,7 +12,7 @@ export interface ICameraStreamService<KeyType = IdType, Entity = CameraStream | 
 
   create(data: CreateCameraStreamDto<IdType>): Promise<Entity>;
 
-  delete(id: KeyType): Promise<void>;
+  delete(id: KeyType, throwError?: boolean): Promise<void>;
 
   update(id: KeyType, input: CreateCameraStreamDto<KeyType>): Promise<Entity>;
 }

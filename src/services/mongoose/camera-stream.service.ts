@@ -6,13 +6,7 @@ import { MongoIdType } from "@/shared.constants";
 import { ICameraStreamService } from "@/services/interfaces/camera-stream.service.interface";
 import { ICameraStream } from "@/models/CameraStream";
 import { CameraStreamDto, CreateCameraStreamDto, UpdateCameraStreamDto } from "@/services/interfaces/camera-stream.dto";
-
-// TODO switch to class-validator DTO validation
-const createCameraStreamRules = {
-  printerId: "mongoId",
-  streamURL: "required|httpurl",
-  name: "required|string",
-};
+import { createCameraStreamSchema } from "../validators/camera-service.validation";
 
 export class CameraStreamService implements ICameraStreamService<MongoIdType> {
   model = CameraStream;
@@ -32,26 +26,28 @@ export class CameraStreamService implements ICameraStreamService<MongoIdType> {
       throw new NotFoundException(`Floor with provided id does not exist`, "CameraStream");
     }
 
-    return cameraStream;
+    return cameraStream!;
   }
 
   async create(data: CreateCameraStreamDto<MongoIdType>) {
-    const input = await validateInput(data, createCameraStreamRules);
+    const input = await validateInput(data, createCameraStreamSchema(false));
     if (input.printerId) {
-      await this.printerCache.getCachedPrinterOrThrow(input.printerId);
+      this.printerCache.getCachedPrinterOrThrow(input.printerId);
     }
     return this.model.create(input);
   }
 
-  async delete(id: MongoIdType) {
+  async delete(id: MongoIdType, throwError?: boolean) {
+    await this.get(id, throwError);
     await this.model.findByIdAndDelete(id);
   }
 
   async update(id: MongoIdType, input: UpdateCameraStreamDto<MongoIdType>) {
     await this.get(id);
-    const updateInput = await validateInput(input, createCameraStreamRules);
+
+    const updateInput = await validateInput(input, createCameraStreamSchema(false));
     if (input.printerId) {
-      await this.printerCache.getCachedPrinterOrThrow(input.printerId);
+      this.printerCache.getCachedPrinterOrThrow(input.printerId);
     }
     await this.model.updateOne({ id }, updateInput);
     return this.get(id);
@@ -61,8 +57,12 @@ export class CameraStreamService implements ICameraStreamService<MongoIdType> {
     return {
       id: entity.id,
       streamURL: entity.streamURL,
-      printerId: entity.printerId === null ? null : entity.printerId?.toString(),
+      printerId: !entity?.printerId ? null : entity.printerId.toString(),
       name: entity.name,
+      aspectRatio: entity.aspectRatio,
+      flipHorizontal: entity.flipHorizontal,
+      flipVertical: entity.flipVertical,
+      rotationClockwise: entity.rotationClockwise,
     };
   }
 }

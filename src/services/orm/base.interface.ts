@@ -24,9 +24,9 @@ export interface IBaseService<
 
   update(id: SqliteIdType, dto: UpdateDTO): Promise<T>;
 
-  delete(id: SqliteIdType): Promise<DeleteResult>;
+  delete(id: SqliteIdType): Promise<void>;
 
-  deleteMany(ids: SqliteIdType[], emitEvent: boolean): Promise<DeleteResult>;
+  deleteMany(ids: SqliteIdType[], emitEvent: boolean): Promise<void>;
 }
 
 export interface Type<T = any> extends Function {

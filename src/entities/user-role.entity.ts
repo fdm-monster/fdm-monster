@@ -1,30 +1,29 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Relation, Unique } from "typeorm";
 import { Role } from "@/entities/role.entity";
 import { User } from "@/entities/user.entity";
-import { BaseEntity } from "@/entities/base.entity";
 
 @Entity()
 @Unique(["roleId", "userId"])
-export class UserRole extends BaseEntity {
+export class UserRole {
   @PrimaryGeneratedColumn()
-  id!: number;
+  id: number;
 
   @ManyToOne(() => Role, {
     onDelete: "CASCADE",
     nullable: false,
   })
-  role!: Relation<Role>;
+  role: Relation<Role>;
   @Column()
-  roleId!: number;
+  roleId: number;
 
   @ManyToOne(() => User, {
     onDelete: "CASCADE",
     nullable: false,
   })
-  user!: Relation<User>;
+  user: Relation<User>;
   @Column()
-  userId!: number;
+  userId: number;
 
   @CreateDateColumn()
-  createdAt!: Date;
+  createdAt: Date;
 }

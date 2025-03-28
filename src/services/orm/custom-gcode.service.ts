@@ -8,7 +8,7 @@ export class CustomGcodeService
   extends BaseService(CustomGcode, CustomGcodeDto<SqliteIdType>, CustomGcodeDto<SqliteIdType>)
   implements ICustomGcodeService<SqliteIdType, CustomGcode>
 {
-  toDto(entity: CustomGcode): CustomGcodeDto {
+  toDto(entity: CustomGcode): CustomGcodeDto<SqliteIdType> {
     return {
       id: entity.id,
       name: entity.name,

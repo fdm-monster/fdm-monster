@@ -16,12 +16,12 @@ import {
 } from "@/constants/server-settings.constants";
 import { validateInput } from "@/handlers/validators";
 import {
-  credentialSettingPatchRules,
-  fileCleanSettingsUpdateRules,
-  frontendSettingsUpdateRules,
-  serverSettingsUpdateRules,
-  timeoutSettingsUpdateRules,
-  wizardUpdateRules,
+  credentialSettingPatchSchema,
+  fileCleanSettingsUpdateSchema,
+  frontendSettingsUpdateSchema,
+  serverSettingsUpdateSchema,
+  timeoutSettingsUpdateSchema,
+  wizardUpdateSchema,
 } from "../validators/settings-service.validation";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
 import {
@@ -121,7 +121,7 @@ export class SettingsService implements ISettingsService<MongoIdType, ISettings>
   }
 
   async patchFileCleanSettings(patchUpdate: Partial<IFileCleanSettings>) {
-    const validatedInput = await validateInput(patchUpdate, fileCleanSettingsUpdateRules);
+    const validatedInput = await validateInput(patchUpdate, fileCleanSettingsUpdateSchema);
 
     const settingsDoc = await this.getOrCreate();
     settingsDoc[printerFileCleanSettingKey] = Object.assign(settingsDoc[printerFileCleanSettingKey], validatedInput);
@@ -131,7 +131,7 @@ export class SettingsService implements ISettingsService<MongoIdType, ISettings>
   }
 
   async patchWizardSettings(patchUpdate: Partial<IWizardSettings>) {
-    const validatedInput = await validateInput(patchUpdate, wizardUpdateRules);
+    const validatedInput = await validateInput(patchUpdate, wizardUpdateSchema);
 
     const settingsDoc = await this.getOrCreate();
     settingsDoc[wizardSettingKey] = Object.assign(settingsDoc[wizardSettingKey], validatedInput);
@@ -141,7 +141,7 @@ export class SettingsService implements ISettingsService<MongoIdType, ISettings>
   }
 
   async updateFrontendSettings(patchUpdate: IFrontendSettings) {
-    const validatedInput = await validateInput(patchUpdate, frontendSettingsUpdateRules);
+    const validatedInput = await validateInput(patchUpdate, frontendSettingsUpdateSchema);
 
     const settingsDoc = await this.getOrCreate();
     const frontendSettings = settingsDoc[frontendSettingKey];
@@ -152,7 +152,7 @@ export class SettingsService implements ISettingsService<MongoIdType, ISettings>
   }
 
   async patchCredentialSettings(patchUpdate: Partial<ICredentialSettings>) {
-    const validatedInput = await validateInput(patchUpdate, credentialSettingPatchRules);
+    const validatedInput = await validateInput(patchUpdate, credentialSettingPatchSchema);
 
     const settingsDoc = await this.getOrCreate();
     const credentialSettings = settingsDoc[credentialSettingsKey];
@@ -163,7 +163,7 @@ export class SettingsService implements ISettingsService<MongoIdType, ISettings>
   }
 
   async patchServerSettings(patchUpdate: Partial<IServerSettings>) {
-    const validatedInput = await validateInput(patchUpdate, serverSettingsUpdateRules);
+    const validatedInput = await validateInput(patchUpdate, serverSettingsUpdateSchema);
 
     const settingsDoc = await this.getOrCreate();
     const serverSettings = settingsDoc[serverSettingsKey];
@@ -174,7 +174,7 @@ export class SettingsService implements ISettingsService<MongoIdType, ISettings>
   }
 
   async updateTimeoutSettings(patchUpdate: Partial<ITimeoutSettings>) {
-    const validatedInput = await validateInput(patchUpdate, timeoutSettingsUpdateRules);
+    const validatedInput = await validateInput(patchUpdate, timeoutSettingsUpdateSchema);
 
     const settingsDoc = await this.getOrCreate();
     const timeoutSettings = settingsDoc[timeoutSettingKey];

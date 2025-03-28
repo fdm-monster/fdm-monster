@@ -2,6 +2,16 @@ import { captureException, flush } from "@sentry/node";
 import { setupEnvConfig } from "./server.env";
 import { setupServer } from "./server.core";
 import { DITokens } from "./container.tokens";
+import { createPrinterSchema } from "@/services/validators/printer-service.validation";
+import { Printer } from "@/entities";
+import { OctoprintType } from "@/services/printer-api.interface";
+
+createPrinterSchema.parse({
+  printerType: OctoprintType,
+  printerURL: "https://printers.github.io/",
+  apiKey: "1234",
+  name: "Printer",
+} as Printer);
 
 setupEnvConfig();
 

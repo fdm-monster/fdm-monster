@@ -1,3 +1,6 @@
+import { z } from "zod";
+import { idRuleV2 } from "@/controllers/validation/generic.validation";
+
 export const EVENT_TYPES = {
   ClientAuthed: "ClientAuthed",
   ClientClosed: "ClientClosed",
@@ -37,4 +40,8 @@ export const EVENT_TYPES = {
   UserLoggedIn: "UserLoggedIn",
   Waiting: "Waiting",
   ZChange: "ZChange",
-};
+} as const;
+
+export const EVENT_TYPES_ARRAY = Object.values(EVENT_TYPES);
+
+export type EventType = typeof EVENT_TYPES_ARRAY[number];

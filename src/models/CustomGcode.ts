@@ -3,7 +3,7 @@ import { AnyArray, model, Schema } from "mongoose";
 export interface ICustomGcode {
   id: string;
   name: string;
-  description: string;
+  description?: string;
   gcode: AnyArray<string>;
 }
 

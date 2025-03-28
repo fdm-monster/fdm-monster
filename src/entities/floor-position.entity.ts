@@ -6,29 +6,29 @@ import { Printer } from "./printer.entity";
 @Unique(["x", "y", "floorId"])
 export class FloorPosition {
   @PrimaryGeneratedColumn()
-  id!: number;
+  id: number;
 
   @Column()
-  x!: number;
+  x: number;
 
   @Column()
-  y!: number;
+  y: number;
 
   // onDelete set null https://stackoverflow.com/questions/55098023/typeorm-cascade-option-cascade-ondelete-onupdate
   @ManyToOne(() => Floor, {
     onDelete: "CASCADE",
     nullable: false,
   })
-  floor!: Relation<Floor>;
+  floor: Relation<Floor>;
   @Column()
-  floorId!: number;
+  floorId: number;
 
   @OneToOne(() => Printer, {
     onDelete: "CASCADE",
     nullable: false,
   })
   @JoinColumn({ name: "printerId" })
-  printer!: Relation<Printer>;
+  printer: Relation<Printer>;
   @Column()
-  printerId!: number;
+  printerId: number;
 }

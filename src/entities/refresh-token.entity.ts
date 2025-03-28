@@ -1,28 +1,27 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Relation } from "typeorm";
 import { User } from "@/entities/user.entity";
-import { BaseEntity } from "@/entities/base.entity";
 
 @Entity()
-export class RefreshToken extends BaseEntity {
+export class RefreshToken {
   @PrimaryGeneratedColumn()
-  id!: number;
+  id: number;
 
   @ManyToOne(() => User, (user) => user.refreshTokens, { nullable: false, onDelete: "CASCADE" })
   @JoinColumn({ name: "userId" })
-  user!: Relation<User>;
+  user: Relation<User>;
 
   @Column()
-  userId!: number;
+  userId: number;
 
   @CreateDateColumn()
-  createdAt!: Date;
+  createdAt: Date;
 
   @Column()
-  expiresAt!: number;
+  expiresAt: number;
 
   @Column()
-  refreshToken!: string;
+  refreshToken: string;
 
   @Column()
-  refreshAttemptsUsed!: number;
+  refreshAttemptsUsed: number;
 }

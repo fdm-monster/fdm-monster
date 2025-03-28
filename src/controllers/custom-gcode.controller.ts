@@ -2,11 +2,12 @@ import { createController } from "awilix-express";
 import { authenticate, authorizeRoles } from "@/middleware/authenticate";
 import { AppConstants } from "@/server.constants";
 import { ROLES } from "@/constants/authorization.constants";
-import { getScopedPrinter, validateInput } from "@/handlers/validators";
+import { validateInput } from "@/handlers/validators";
 import { idRulesV2 } from "./validation/generic.validation";
 import { printerResolveMiddleware } from "@/middleware/printer";
 import { Request, Response } from "express";
 import { ICustomGcodeService } from "@/services/interfaces/custom-gcode.service.interface";
+import { getScopedPrinter } from "@/handlers/printer-resolver";
 
 export class CustomGcodeController {
   private customGCodeService: ICustomGcodeService;

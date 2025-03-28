@@ -18,7 +18,9 @@ export class PermissionService
 
   constructor({ loggerFactory, typeormService }: { loggerFactory: ILoggerFactory; typeormService: TypeormService }) {
     super({ typeormService });
+    this.logger = loggerFactory(PermissionService.name);
   }
+
   get permissions() {
     return this._permissions;
   }
@@ -68,7 +70,7 @@ export class PermissionService
     }
   }
 
-  normalizePermission(assignedPermission: string | number): string {
+  normalizePermission(assignedPermission: string | number) {
     const permissionInstance = this.permissions.find((r) => r.id === assignedPermission || r.name === assignedPermission);
     if (!permissionInstance) {
       this.logger.warn(`The permission by provided id is not found. Skipping`);

@@ -5,12 +5,10 @@ export interface ICameraStream {
   name?: string;
   streamURL: string;
   printerId?: Types.ObjectId;
-  settings: {
-    aspectRatio: string;
-    rotationClockwise: number;
-    flipHorizontal: boolean;
-    flipVertical: boolean;
-  };
+  aspectRatio: string;
+  rotationClockwise: number;
+  flipHorizontal: boolean;
+  flipVertical: boolean;
 }
 
 const CameraStreamSchema = new Schema<ICameraStream>({
@@ -26,6 +24,26 @@ const CameraStreamSchema = new Schema<ICameraStream>({
     type: Schema.Types.ObjectId,
     ref: "Printer",
     required: false,
+  },
+  aspectRatio: {
+    required: true,
+    type: String,
+    default: "16:9",
+  },
+  rotationClockwise: {
+    required: true,
+    type: Number,
+    default: 0,
+  },
+  flipVertical: {
+    required: true,
+    type: Boolean,
+    default: false,
+  },
+  flipHorizontal: {
+    required: true,
+    type: Boolean,
+    default: false,
   },
 });
 

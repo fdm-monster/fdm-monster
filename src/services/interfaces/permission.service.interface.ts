@@ -15,5 +15,5 @@ export interface IPermissionService<KeyType = IdType, Entity = IPermission> {
 
   syncPermissions(): Promise<void>;
 
-  normalizePermission(assignedPermission: string): string;
+  normalizePermission(assignedPermission: string): string | undefined;
 }

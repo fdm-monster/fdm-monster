@@ -1,5 +1,5 @@
 import { PrintCompletion } from "@/models";
-import { createPrintCompletionRules } from "../validators/print-completion-service.validation";
+import { createPrintCompletionSchema } from "../validators/print-completion-service.validation";
 import { validateInput } from "@/handlers/validators";
 import { EVENT_TYPES } from "../octoprint/constants/octoprint-websocket.constants";
 import { LoggerService } from "@/handlers/logger";
@@ -30,7 +30,10 @@ export class PrintCompletionService implements IPrintCompletionService<MongoIdTy
   }
 
   async create(input: CreatePrintCompletionDto<MongoIdType>) {
-    const { printerId, fileName, completionLog, status, context } = await validateInput(input, createPrintCompletionRules);
+    const { printerId, fileName, completionLog, status, context } = await validateInput(
+      input,
+      createPrintCompletionSchema(false)
+    );
 
     return PrintCompletion.create({
       printerId,
