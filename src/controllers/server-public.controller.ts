@@ -1,7 +1,7 @@
 import { createController } from "awilix-express";
 import { AppConstants } from "@/server.constants";
 import { isNode } from "@/utils/env.utils";
-import { authenticate, authorizePermission } from "@/middleware/authenticate";
+import { authenticate, permission } from "@/middleware/authenticate";
 import { PERMS } from "@/constants/authorization.constants";
 import { isDocker } from "@/utils/is-docker";
 import { RoleService } from "@/services/mongoose/role.service";
@@ -162,7 +162,7 @@ export class ServerPublicController {
 
 export default createController(ServerPublicController)
   .prefix(AppConstants.apiRoute + "/")
-  .get("", "welcome", { before: [authenticate(), authorizePermission(PERMS.ServerInfo.Get)] })
+  .get("", "welcome", { before: [authenticate(), permission(PERMS.ServerInfo.Get)] })
   .get("test", "test")
   .get("features", "getFeatures", { before: [authenticate()] })
-  .get("version", "getVersion", { before: [authenticate(), authorizePermission(PERMS.ServerInfo.Get)] });
+  .get("version", "getVersion", { before: [authenticate(), permission(PERMS.ServerInfo.Get)] });
