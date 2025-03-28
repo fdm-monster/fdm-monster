@@ -23,6 +23,7 @@ import {
   setUserRolesSchema,
   usernameSchema,
 } from "@/controllers/validation/user-controller.validation";
+import { ParamId } from "@/middleware/param-converter.middleware";
 
 @route(AppConstants.apiRoute + "/user")
 @before([authenticate()])
@@ -116,40 +117,38 @@ export class UserController {
 
   @GET()
   @route("/:id")
-  @before([authorizeRoles([ROLES.ADMIN])])
+  @before([authorizeRoles([ROLES.ADMIN]), ParamId("id")])
   async get(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
-    const user = await this.userService.getUser(id);
+    const user = await this.userService.getUser(req.local.id);
     res.send(this.userService.toDto(user));
   }
 
   @DELETE()
   @route("/:id")
-  @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
+  @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed, ParamId("id")])
   async delete(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
-
+    const deletedUserId = req.local.id;
     const ownUserId = req.user?.id;
-    if (ownUserId == id) {
+    if (ownUserId == deletedUserId) {
       throw new ForbiddenError("Not allowed to delete own account");
     }
 
-    const isRootUser = await this.userService.isUserRootUser(id);
+    const isRootUser = await this.userService.isUserRootUser(deletedUserId);
     if (isRootUser) {
       throw new ForbiddenError("Not allowed to delete root user");
     }
 
     if (this.configService.isDemoMode()) {
       const demoUserId = await this.userService.getDemoUserId();
-      if (id === demoUserId) {
+      if (deletedUserId === demoUserId) {
         this.throwIfDemoMode();
       }
     }
 
-    await this.userService.deleteUser(id);
+    await this.userService.deleteUser(deletedUserId);
 
     try {
-      await this.authService.logoutUserId(id);
+      await this.authService.logoutUserId(deletedUserId);
     } catch (e) {
       this.logger.error(errorSummary(e));
     }
@@ -159,52 +158,56 @@ export class UserController {
 
   @POST()
   @route("/:id/change-username")
-  @before([demoUserNotAllowed])
+  @before([demoUserNotAllowed, ParamId("id")])
   async changeUsername(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const changedUserId = req.local.id;
 
-    if (req.user?.id != id && (await this.settingsStore.getLoginRequired())) {
+    if (req.user?.id != changedUserId && (await this.settingsStore.getLoginRequired())) {
       throw new ForbiddenError("Not allowed to change username of other users");
     }
 
     const { username } = await validateInput(req.body, usernameSchema);
-    await this.userService.updateUsernameById(id, username);
+    await this.userService.updateUsernameById(changedUserId, username);
     res.send();
   }
 
   @POST()
   @route("/:id/change-password")
-  @before([demoUserNotAllowed])
+  @before([demoUserNotAllowed, ParamId("id")])
   async changePassword(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const changedUserId = req.local.id;
 
-    if (req.user?.id != id && (await this.settingsStore.getLoginRequired())) {
+    if (req.user?.id != changedUserId && (await this.settingsStore.getLoginRequired())) {
       throw new ForbiddenError("Not allowed to change password of other users");
     }
 
     const { oldPassword, newPassword } = await validateInput(req.body, changePasswordSchema);
-    await this.userService.updatePasswordById(id, oldPassword, newPassword);
+    await this.userService.updatePasswordById(changedUserId, oldPassword, newPassword);
     res.send();
   }
 
   @POST()
   @route("/:id/set-user-roles")
-  @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
+  @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed, ParamId("id")])
   async setUserRoles(req: Request, res: Response) {
-    const { id: currentUserId } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const changedUserId = req.local.id;
 
     const ownUserId = req.user?.id;
+    if (!ownUserId) {
+      throw new ForbiddenError("Need to be logged in, in order to set user roles");
+    }
+
     const ownUser = await this.userService.getUser(ownUserId);
     const ownUserRoles = ownUser.roles;
     const adminRole = await this.roleService.getSynchronizedRoleByName(ROLES.ADMIN);
 
-    if (ownUserId == currentUserId && !ownUserRoles.includes(adminRole.id) && !ownUser.isRootUser) {
+    if (ownUserId == changedUserId && !ownUserRoles.includes(adminRole.id) && !ownUser.isRootUser) {
       throw new ForbiddenError("Only an ADMIN or OWNER user is allowed to change its own roles");
     }
 
     const { roleIds } = await validateInput(req.body, setUserRolesSchema(this.isTypeormMode));
 
-    if (ownUserId == currentUserId && !roleIds.includes(adminRole.id)) {
+    if (ownUserId == changedUserId && !roleIds.includes(adminRole.id)) {
       if (ownUser.isRootUser) {
         throw new BadRequestException("It does not make sense to remove ADMIN role from an OWNER user.");
       } else {
@@ -212,47 +215,47 @@ export class UserController {
       }
     }
 
-    await this.userService.setUserRoleIds(currentUserId, roleIds);
+    await this.userService.setUserRoleIds(changedUserId, roleIds);
     res.send();
   }
 
   @POST()
   @route("/:id/set-verified")
-  @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
+  @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed, ParamId("id")])
   async setVerified(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const changedUserId = req.local.id;
 
     const ownUserId = req.user?.id;
-    if (ownUserId == id) {
+    if (ownUserId == changedUserId) {
       throw new ForbiddenError("Not allowed to change own verified status");
     }
 
-    const isRootUser = await this.userService.isUserRootUser(id);
+    const isRootUser = await this.userService.isUserRootUser(changedUserId);
     if (isRootUser) {
       throw new ForbiddenError("Not allowed to change root user to unverified");
     }
 
     const { isVerified } = await validateInput(req.body, isVerifiedSchema);
-    await this.userService.setVerifiedById(id, isVerified);
+    await this.userService.setVerifiedById(changedUserId, isVerified);
 
     res.send();
   }
 
   @POST()
   @route("/:id/set-root-user")
-  @before([demoUserNotAllowed])
+  @before([demoUserNotAllowed, ParamId("id")])
   async setRootUser(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const changedUserId = req.local.id;
 
     const userId = req.user?.id;
-    if (req.user?.id) {
+    if (userId) {
       const isRootUser = await this.userService.isUserRootUser(userId);
       if (!isRootUser) {
         throw new ForbiddenError("Not allowed to change owner without being owner yourself");
       }
     }
     const { isRootUser } = await validateInput(req.body, isRootUserSchema);
-    await this.userService.setIsRootUserById(id, isRootUser);
+    await this.userService.setIsRootUserById(changedUserId, isRootUser);
     res.send();
   }
 

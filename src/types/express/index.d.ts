@@ -5,9 +5,9 @@ import { IdType } from "@/shared.constants";
 export type RequestRole = IdType;
 
 declare module "express" {
-  interface Request {
+  interface Request<KeyType = IdType> {
     local?: any;
-    user?: IUser;
+    user?: IUser<KeyType>;
     container?: AwilixContainer;
     roles?: RequestRole[];
   }
