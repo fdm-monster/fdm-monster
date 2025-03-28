@@ -12,6 +12,8 @@ export const idRuleV2 = (isSqlite: boolean) =>
       });
 
 export const idRulesV2 = (isSqlite: boolean) =>
-  z.object({
-    id: idRuleV2(isSqlite),
-  });
+  z
+    .object({
+      id: idRuleV2(isSqlite),
+    })
+    .strict();

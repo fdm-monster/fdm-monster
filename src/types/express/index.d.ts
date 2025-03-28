@@ -6,6 +6,7 @@ export type RequestRole = IdType;
 
 declare module "express" {
   interface Request {
+    local?: any;
     user?: IUser;
     container?: AwilixContainer;
     roles?: RequestRole[];

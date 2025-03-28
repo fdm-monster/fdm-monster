@@ -7,19 +7,19 @@ import { BatchCallController } from "@/controllers/batch-call.controller";
 import { AwilixContainer } from "awilix";
 import { DITokens } from "@/container.tokens";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
-import { SqliteIdType } from "@/shared.constants";
 import TestAgent from "supertest/lib/agent";
 
 const defaultRoute = AppConstants.apiRoute + "/batch";
+const batchSettingsGetRoute = `${defaultRoute}/settings/get`;
 const batchConnectUsbRoute = `${defaultRoute}/connect/usb`;
 const batchConnectSocketRoute = `${defaultRoute}/connect/socket`;
 const batchToggleEnabledRoute = `${defaultRoute}/toggle-enabled`;
 const executeBatchReprintRoute = `${defaultRoute}/reprint/execute`;
-const getBatchReprintRoute = `${defaultRoute}/reprint/list`;
+const listBatchReprintRoute = `${defaultRoute}/reprint/list`;
 
 let container: AwilixContainer;
 let request: TestAgent<Test>;
-let printerService: IPrinterService<SqliteIdType>;
+let printerService: IPrinterService;
 
 beforeAll(async () => {
   ({ request, container } = await setupTestApp(true));
@@ -34,14 +34,24 @@ afterEach(async () => {
 });
 
 describe(BatchCallController.name, () => {
-  it("should allow POST to fetch batch reprint returning printer files", async () => {
+  it("should allow POST to fetch batch settings", async () => {
     const printer = await createTestPrinter(request);
     const printer2 = await createTestPrinter(request);
-    const response = await request.post(getBatchReprintRoute).send({
+    const response = await request.post(batchSettingsGetRoute).send({
       printerIds: [printer.id, printer2.id],
     });
     expectOkResponse(response);
   });
+
+  it("should allow POST to fetch batch reprint returning printer files", async () => {
+    const printer = await createTestPrinter(request);
+    const printer2 = await createTestPrinter(request);
+    const response = await request.post(listBatchReprintRoute).send({
+      printerIds: [printer.id, printer2.id],
+    });
+    expectOkResponse(response);
+  });
+
   it("should allow POST to execute batch reprint for printer files", async () => {
     const printer = await createTestPrinter(request);
     const printer2 = await createTestPrinter(request);
@@ -59,6 +69,7 @@ describe(BatchCallController.name, () => {
     });
     expectOkResponse(response);
   });
+
   it("should allow POST to batch connect printer usbs", async () => {
     const printer = await createTestPrinter(request);
     const printer2 = await createTestPrinter(request);
@@ -67,6 +78,7 @@ describe(BatchCallController.name, () => {
     });
     expectOkResponse(response);
   });
+
   it("should allow POST to batch connect printer sockets", async () => {
     const printer = await createTestPrinter(request, true);
     const printer2 = await createTestPrinter(request, true);
@@ -75,6 +87,7 @@ describe(BatchCallController.name, () => {
     });
     expectOkResponse(response);
   });
+
   it("should allow POST to batch toggle enabled", async () => {
     const printer = await createTestPrinter(request, true);
     const printer2 = await createTestPrinter(request, true);

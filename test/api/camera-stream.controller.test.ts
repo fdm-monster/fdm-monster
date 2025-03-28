@@ -1,16 +1,17 @@
 import { setupTestApp } from "../test-server";
 import { expectOkResponse } from "../extensions";
 import { AppConstants } from "@/server.constants";
-import supertest from "supertest";
+import { Test } from "supertest";
 import { createTestPrinter } from "./test-data/create-printer";
 import { CameraStreamController } from "@/controllers/camera-stream.controller";
+import TestAgent from "supertest/lib/agent";
 
 const listRoute = `${AppConstants.apiRoute}/camera-stream`;
 const getRoute = (id: string) => `${listRoute}/${id}`;
 const deleteRoute = (id: string) => `${listRoute}/${id}`;
 const updateRoute = (id: string) => `${getRoute(id)}`;
 
-let request: supertest.SuperTest<supertest.Test>;
+let request: TestAgent<Test>;
 let idType: typeof Number | typeof String;
 let isTypeormMode: boolean;
 beforeAll(async () => {

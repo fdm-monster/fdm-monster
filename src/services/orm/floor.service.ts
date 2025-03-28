@@ -148,7 +148,7 @@ export class FloorService
   async addOrUpdatePrinter(floorId: SqliteIdType, positionDto: PositionDto<SqliteIdType>): Promise<Floor> {
     // Validation only
     await this.get(floorId, true);
-    const validInput = await validateInput(positionDto, printerInFloorSchema(false));
+    const validInput = await validateInput(positionDto, printerInFloorSchema(true));
 
     const position = await this.floorPositionService.findPrinterPosition(validInput.printerId as SqliteIdType);
     // Optimization if position is in desired state already
