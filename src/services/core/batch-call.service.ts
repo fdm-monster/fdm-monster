@@ -1,7 +1,5 @@
-import { PrinterFilesStore } from "@/state/printer-files.store";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { PrinterCache } from "@/state/printer.cache";
-import { PrinterEventsCache } from "@/state/printer-events.cache";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { IdType } from "@/shared.constants";
 import { captureException } from "@sentry/node";
@@ -23,37 +21,15 @@ interface BatchSingletonModel {
 type BatchModel = Array<BatchSingletonModel>;
 
 export class BatchCallService<KeyType = IdType> {
-  printerApiFactory: PrinterApiFactory;
-  printerSocketStore: PrinterSocketStore;
-  printerCache: PrinterCache;
-  printerEventsCache: PrinterEventsCache;
-  printerFilesStore: PrinterFilesStore;
-  printerService: IPrinterService;
-  logger: LoggerService;
+  private readonly logger: LoggerService;
 
-  constructor({
-    printerApiFactory,
-    printerCache,
-    printerEventsCache,
-    printerSocketStore,
-    printerFilesStore,
-    printerService,
-    loggerFactory,
-  }: {
-    printerApiFactory: PrinterApiFactory;
-    printerCache: PrinterCache;
-    printerEventsCache: PrinterEventsCache;
-    printerSocketStore: PrinterSocketStore;
-    printerFilesStore: PrinterFilesStore;
-    printerService: IPrinterService;
-    loggerFactory: ILoggerFactory;
-  }) {
-    this.printerApiFactory = printerApiFactory;
-    this.printerCache = printerCache;
-    this.printerEventsCache = printerEventsCache;
-    this.printerSocketStore = printerSocketStore;
-    this.printerFilesStore = printerFilesStore;
-    this.printerService = printerService;
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly printerApiFactory: PrinterApiFactory,
+    private readonly printerCache: PrinterCache,
+    private readonly printerSocketStore: PrinterSocketStore,
+    private readonly printerService: IPrinterService
+  ) {
     this.logger = loggerFactory(BatchCallService.name);
   }
 

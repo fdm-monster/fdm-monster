@@ -16,15 +16,18 @@ export class MulterService {
   fileUploadTrackerCache: FileUploadTrackerCache;
   httpClientFactory: HttpClientFactory;
   logger: LoggerService;
-  constructor({
-    fileUploadTrackerCache,
-    httpClientFactory,
-    loggerFactory,
-  }: {
-    fileUploadTrackerCache: FileUploadTrackerCache;
-    httpClientFactory: HttpClientFactory;
-    loggerFactory: ILoggerFactory;
-  }) {
+  constructor(
+    loggerFactory: ILoggerFactory,
+    {
+      fileUploadTrackerCache,
+      httpClientFactory,
+    }: // loggerFactory,
+    {
+      fileUploadTrackerCache: FileUploadTrackerCache;
+      httpClientFactory: HttpClientFactory;
+      // loggerFactory: ILoggerFactory;
+    }
+  ) {
     this.fileUploadTrackerCache = fileUploadTrackerCache;
     this.httpClientFactory = httpClientFactory;
     this.logger = loggerFactory(MulterService.name);

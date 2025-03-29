@@ -8,9 +8,9 @@ export class FileCache {
   private printerFileStorage: Record<IdType, FileDto[]> = {};
   private totalFileCount = 0;
 
-  private logger: LoggerService;
+  private readonly logger: LoggerService;
 
-  constructor({ loggerFactory }: { loggerFactory: ILoggerFactory }) {
+  constructor(loggerFactory: ILoggerFactory) {
     this.logger = loggerFactory(FileCache.name);
   }
 

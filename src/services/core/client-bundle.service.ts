@@ -6,7 +6,6 @@ import { ensureDirExists, superRootPath } from "@/utils/fs.utils";
 import { checkVersionSatisfiesMinimum, getMaximumOfVersionsSafe } from "@/utils/semver.utils";
 import { AppConstants } from "@/server.constants";
 import { GithubService } from "@/services/core/github.service";
-import { ConfigService } from "@/services/core/config.service";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { compare } from "semver";
@@ -15,21 +14,9 @@ import { ExternalServiceError, InternalServerException, NotFoundException } from
 import { RequestError } from "octokit";
 
 export class ClientBundleService {
-  githubService: GithubService;
-  configService: ConfigService;
-  logger: LoggerService;
+  private readonly logger: LoggerService;
 
-  constructor({
-    githubService,
-    configService,
-    loggerFactory,
-  }: {
-    githubService: GithubService;
-    configService: ConfigService;
-    loggerFactory: ILoggerFactory;
-  }) {
-    this.githubService = githubService;
-    this.configService = configService;
+  constructor(loggerFactory: ILoggerFactory, private readonly githubService: GithubService) {
     this.logger = loggerFactory(ClientBundleService.name);
   }
 

@@ -12,29 +12,17 @@ import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import { ROLE_PERMS, ROLES } from "@/constants/authorization.constants";
 
 export class RoleService extends BaseService(Role, RoleDto<SqliteIdType>) implements IRoleService<SqliteIdType, Role> {
-  settingsStore: SettingsStore;
-  appDefaultRole!: string;
-  appDefaultRoleNoLogin: string;
   private logger: LoggerService;
 
-  constructor({
-    loggerFactory,
-    appDefaultRole,
-    appDefaultRoleNoLogin,
-    settingsStore,
-    typeormService,
-  }: {
-    loggerFactory: ILoggerFactory;
-    appDefaultRole: string;
-    appDefaultRoleNoLogin: string;
-    settingsStore: SettingsStore;
-    typeormService: TypeormService;
-  }) {
-    super({ typeormService });
+  constructor(
+    loggerFactory: ILoggerFactory,
+    typeormService: TypeormService,
+    private readonly appDefaultRole: string,
+    private readonly appDefaultRoleNoLogin: string,
+    private readonly settingsStore: SettingsStore
+  ) {
+    super(typeormService);
     this.logger = loggerFactory(RoleService.name);
-    this.settingsStore = settingsStore;
-    this.appDefaultRole = appDefaultRole;
-    this.appDefaultRoleNoLogin = appDefaultRoleNoLogin;
   }
 
   private _roles: Role[] = [];

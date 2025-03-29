@@ -11,17 +11,10 @@ import { IdType } from "@/shared.constants";
 
 export const authenticate = () =>
   inject(
-    ({
-        settingsStore,
-        authService,
-        loggerFactory,
-      }: {
-        settingsStore: SettingsStore;
-        authService: AuthService;
-        loggerFactory: ILoggerFactory;
-      }) =>
+    (authService: AuthService, loggerFactory: ILoggerFactory, settingsStore: SettingsStore) =>
       async (req: Request, res: Response, next: NextFunction) => {
         const logger = loggerFactory("Middleware:authenticate");
+
         const isLoginRequired = await settingsStore.getLoginRequired();
         if (!isLoginRequired) {
           return next();
@@ -50,7 +43,7 @@ export const authenticate = () =>
 
 export function permission(requiredPermission: string) {
   return inject(
-    ({ permissionService, roleService }: { permissionService: IPermissionService; roleService: IRoleService }) =>
+    (permissionService: IPermissionService, roleService: IRoleService) =>
       async (req: Request, res: Response, next: NextFunction) => {
         const userRoles = req.roles as IdType[];
         if (!userRoles?.length) {
@@ -68,7 +61,7 @@ export function permission(requiredPermission: string) {
 }
 
 export const authorizeRoles = (roles: string[], subset = true) =>
-  inject(({ roleService }: { roleService: IRoleService }) => async (req: Request, res: Response, next: NextFunction) => {
+  inject((roleService: IRoleService) => async (req: Request, res: Response, next: NextFunction) => {
     if (!roleService.authorizeRoles(roles, req.roles, subset)) {
       throw new AuthorizationError({ roles });
     }

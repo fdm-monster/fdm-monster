@@ -16,42 +16,18 @@ import { IPrinterGroupService } from "@/services/interfaces/printer-group.servic
 import { MoonrakerType, OctoprintType } from "@/services/printer-api.interface";
 
 export class YamlService {
-  printerGroupService: IPrinterGroupService<SqliteIdType>;
-  floorStore: FloorStore;
-  floorService: IFloorService;
-  printerService: IPrinterService;
-  printerCache: PrinterCache;
-  serverVersion: string;
-  private logger: LoggerService;
-  private readonly isTypeormMode: boolean;
+  private readonly logger: LoggerService;
 
-  constructor({
-    printerGroupService,
-    printerService,
-    printerCache,
-    floorStore,
-    floorService,
-    loggerFactory,
-    serverVersion,
-    isTypeormMode,
-  }: {
-    printerGroupService: IPrinterGroupService<SqliteIdType>;
-    printerService: IPrinterService;
-    printerCache: PrinterCache;
-    floorStore: FloorStore;
-    floorService: IFloorService;
-    loggerFactory: ILoggerFactory;
-    serverVersion: string;
-    isTypeormMode: boolean;
-  }) {
-    this.printerGroupService = printerGroupService;
-    this.floorStore = floorStore;
-    this.printerService = printerService;
-    this.printerCache = printerCache;
-    this.floorService = floorService;
-    this.serverVersion = serverVersion;
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly printerGroupService: IPrinterGroupService<SqliteIdType>,
+    private readonly printerService: IPrinterService,
+    private readonly printerCache: PrinterCache,
+    private readonly floorStore: FloorStore,
+    private readonly floorService: IFloorService,
+    private readonly isTypeormMode: boolean
+  ) {
     this.logger = loggerFactory(YamlService.name);
-    this.isTypeormMode = isTypeormMode;
   }
 
   async importPrintersAndFloors(yamlBuffer: string) {

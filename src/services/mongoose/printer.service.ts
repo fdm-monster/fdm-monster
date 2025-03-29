@@ -19,11 +19,9 @@ import { normalizeUrl } from "@/utils/normalize-url";
 import { defaultHttpProtocol } from "@/utils/url.utils";
 
 export class PrinterService implements IPrinterService<MongoIdType> {
-  eventEmitter2: EventEmitter2;
   logger: LoggerService;
 
-  constructor({ eventEmitter2, loggerFactory }: { eventEmitter2: EventEmitter2; loggerFactory: ILoggerFactory }) {
-    this.eventEmitter2 = eventEmitter2;
+  constructor(private readonly eventEmitter2: EventEmitter2, loggerFactory: ILoggerFactory) {
     this.logger = loggerFactory(PrinterService.name);
   }
 

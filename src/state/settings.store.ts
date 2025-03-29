@@ -23,28 +23,21 @@ import {
 import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class SettingsStore {
-  private readonly isTypeOrmMode: boolean;
-  private settingsService: ISettingsService;
   private logger: LoggerService;
+
   private settings: ISettings | null = null;
 
-  constructor({
-    settingsService,
-    loggerFactory,
-    isTypeormMode,
-  }: {
-    settingsService: ISettingsService;
-    loggerFactory: ILoggerFactory;
-    isTypeormMode: boolean;
-  }) {
-    this.settingsService = settingsService;
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly settingsService: ISettingsService,
+    private readonly isTypeormMode: boolean
+  ) {
     this.logger = loggerFactory(SettingsStore.name);
-    this.isTypeOrmMode = isTypeormMode;
   }
 
   getSettings() {
     const settings = this.settings;
-    if (!settings) throw new InternalServerException("Could not check server settings (server settings not loaded");
+    if (!settings) throw new InternalServerException("Could not check server settings (server settings not loaded)");
 
     return Object.freeze({
       // Credential settings are not shared with the client
@@ -53,7 +46,7 @@ export class SettingsStore {
         registration: settings[serverSettingsKey].registration,
         sentryDiagnosticsEnabled: settings[serverSettingsKey].sentryDiagnosticsEnabled,
         experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
-        experimentalTypeormSupport: this.isTypeOrmMode,
+        experimentalTypeormSupport: this.isTypeormMode,
         experimentalClientSupport: settings[serverSettingsKey].experimentalClientSupport,
         experimentalThumbnailSupport: settings[serverSettingsKey].experimentalThumbnailSupport,
       },

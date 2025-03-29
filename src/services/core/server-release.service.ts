@@ -7,26 +7,18 @@ import { Octokit } from "octokit";
 
 export class ServerReleaseService {
   airGapped: null | boolean = null; // Connection error
-  githubService: GithubService;
   private synced = false;
   private installedReleaseFound: null | boolean = null;
   private updateAvailable: null | boolean = null;
   private latestRelease: Awaited<ReturnType<Octokit["rest"]["repos"]["listReleases"]>>["data"][number] = null;
   private installedRelease: Awaited<ReturnType<Octokit["rest"]["repos"]["listReleases"]>>["data"][number] = null;
   private logger: LoggerService;
-  serverVersion;
 
-  constructor({
-    serverVersion,
-    githubService,
-    loggerFactory,
-  }: {
-    serverVersion: string;
-    githubService: GithubService;
-    loggerFactory: ILoggerFactory;
-  }) {
-    this.serverVersion = serverVersion;
-    this.githubService = githubService;
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly serverVersion: string,
+    private readonly githubService: GithubService
+  ) {
     this.logger = loggerFactory(ServerReleaseService.name);
   }
 

@@ -5,11 +5,10 @@ import { NotImplementedException } from "@/exceptions/runtime.exceptions";
 import { AxiosPromise } from "axios";
 
 export class OctoprintApi implements IPrinterApi {
-  client: OctoprintClient;
-  printerLogin: LoginDto;
-  constructor({ octoprintClient, printerLogin }: { octoprintClient: OctoprintClient; printerLogin: LoginDto }) {
+  private readonly client: OctoprintClient;
+
+  constructor(octoprintClient: OctoprintClient, private printerLogin: LoginDto) {
     this.client = octoprintClient;
-    this.printerLogin = printerLogin;
   }
 
   get type(): PrinterType {

@@ -14,13 +14,7 @@ import { ROLES } from "@/constants/authorization.constants";
 @route(AppConstants.apiRoute + "/batch")
 @before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR])])
 export class BatchCallController {
-  batchCallService: BatchCallService;
-  isTypeormMode: boolean;
-
-  constructor({ batchCallService, isTypeormMode }: { batchCallService: BatchCallService; isTypeormMode: boolean }) {
-    this.batchCallService = batchCallService;
-    this.isTypeormMode = isTypeormMode;
-  }
+  constructor(private readonly batchCallService: BatchCallService, private readonly isTypeormMode: boolean) {}
 
   @POST()
   @route("/settings/get")

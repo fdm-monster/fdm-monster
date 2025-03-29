@@ -26,31 +26,17 @@ export interface CachedPrinterThumbnail {
 export const gcodeMaxLinesToRead = 10000;
 
 export class PrinterThumbnailCache extends KeyDiffCache<CachedPrinterThumbnail> {
-  printerCache: PrinterCache;
-  printerApiFactory: PrinterApiFactory;
-  logger: LoggerService;
-  eventEmitter2: EventEmitter2;
-  private settingsStore: SettingsStore;
+  private readonly logger: LoggerService;
 
-  constructor({
-    printerCache,
-    printerApiFactory,
-    loggerFactory,
-    eventEmitter2,
-    settingsStore,
-  }: {
-    printerCache: PrinterCache;
-    printerApiFactory: PrinterApiFactory;
-    loggerFactory: ILoggerFactory;
-    eventEmitter2: EventEmitter2;
-    settingsStore: SettingsStore;
-  }) {
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly printerCache: PrinterCache,
+    private readonly printerApiFactory: PrinterApiFactory,
+    private readonly eventEmitter2: EventEmitter2,
+    private readonly settingsStore: SettingsStore
+  ) {
     super();
-    this.printerCache = printerCache;
-    this.printerApiFactory = printerApiFactory;
     this.logger = loggerFactory(PrinterThumbnailCache.name);
-    this.eventEmitter2 = eventEmitter2;
-    this.settingsStore = settingsStore;
 
     this.eventEmitter2.on(printerEvents.printersDeleted, this.handlePrintersDeleted.bind(this));
   }

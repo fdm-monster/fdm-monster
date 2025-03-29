@@ -10,23 +10,11 @@ import { IUserService } from "@/services/interfaces/user-service.interface";
 import { IRoleService } from "@/services/interfaces/role-service.interface";
 
 export class FirstTimeSetupController {
-  userService: IUserService;
-  roleService: IRoleService;
-  settingsStore: SettingsStore;
-
-  constructor({
-    settingsStore,
-    roleService,
-    userService,
-  }: {
-    settingsStore: SettingsStore;
-    roleService: IRoleService;
-    userService: IUserService;
-  }) {
-    this.settingsStore = settingsStore;
-    this.roleService = roleService;
-    this.userService = userService;
-  }
+  constructor(
+    private readonly settingsStore: SettingsStore,
+    private readonly roleService: IRoleService,
+    private readonly userService: IUserService
+  ) {}
 
   async validateWizard(req: Request, res: Response) {
     const { rootUsername } = await validateMiddleware(req, wizardSettingsSchema);

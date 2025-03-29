@@ -6,21 +6,13 @@ import { validateInput } from "@/handlers/validators";
 import { PrintCompletionSocketIoTask } from "@/tasks/print-completion.socketio.task";
 import { Request, Response } from "express";
 import { IPrintCompletionService } from "@/services/interfaces/print-completion.interface";
+import { z } from "zod";
 
 export class PrintCompletionController {
-  private printCompletionService: IPrintCompletionService;
-  private printCompletionSocketIoTask: PrintCompletionSocketIoTask;
-
-  constructor({
-    printCompletionService,
-    printCompletionSocketIoTask,
-  }: {
-    printCompletionService: IPrintCompletionService;
-    printCompletionSocketIoTask: PrintCompletionSocketIoTask;
-  }) {
-    this.printCompletionService = printCompletionService;
-    this.printCompletionSocketIoTask = printCompletionSocketIoTask;
-  }
+  constructor(
+    private readonly printCompletionService: IPrintCompletionService,
+    private readonly printCompletionSocketIoTask: PrintCompletionSocketIoTask
+  ) {}
 
   /**
    * Not a production ready call, just for testing.
@@ -36,7 +28,7 @@ export class PrintCompletionController {
   }
 
   async findCorrelatedEntries(req: Request, res: Response) {
-    const { correlationId } = await validateInput(req.params, { correlationId: "required|string" });
+    const { correlationId } = await validateInput(req.params, z.object({ correlationId: z.string().min(1) }));
     const result = await this.printCompletionService.findPrintCompletion(correlationId);
     res.send(result);
   }

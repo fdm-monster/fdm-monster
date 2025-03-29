@@ -14,81 +14,30 @@ import { PrinterFilesStore } from "@/state/printer-files.store";
 import { PermissionService } from "@/services/mongoose/permission.service";
 import { RoleService } from "@/services/mongoose/role.service";
 import { UserService } from "@/services/mongoose/user.service";
-import { ClientBundleService } from "@/services/core/client-bundle.service";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
-import { ISettingsService } from "@/services/interfaces/settings.service.interface";
 import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
 
 export class BootTask {
   logger: LoggerService;
-  taskManagerService: TaskManagerService;
-  settingsStore: SettingsStore;
-  settingsService: ISettingsService;
-  multerService: MulterService;
-  printerSocketStore: PrinterSocketStore;
-  printerFilesStore: PrinterFilesStore;
-  permissionService: PermissionService;
-  roleService: RoleService;
-  userService: UserService;
-  floorStore: FloorStore;
-  clientBundleService: ClientBundleService;
-  configService: ConfigService;
-  isTypeormMode: boolean;
-  typeormService: TypeormService;
-  printerThumbnailCache: PrinterThumbnailCache;
 
-  constructor({
-    loggerFactory,
-    settingsService,
-    settingsStore,
-    multerService,
-    printerSocketStore,
-    printerFilesStore,
-    permissionService,
-    roleService,
-    userService,
-    taskManagerService,
-    floorStore,
-    clientBundleService,
-    configService,
-    typeormService,
-    isTypeormMode,
-    printerThumbnailCache,
-  }: {
-    loggerFactory: ILoggerFactory;
-    settingsService: ISettingsService;
-    settingsStore: SettingsStore;
-    multerService: MulterService;
-    printerSocketStore: PrinterSocketStore;
-    printerFilesStore: PrinterFilesStore;
-    permissionService: PermissionService;
-    roleService: RoleService;
-    userService: UserService;
-    taskManagerService: TaskManagerService;
-    floorStore: FloorStore;
-    clientBundleService: ClientBundleService;
-    configService: ConfigService;
-    typeormService: TypeormService;
-    isTypeormMode: boolean;
-    printerThumbnailCache: PrinterThumbnailCache;
-  }) {
-    this.isTypeormMode = isTypeormMode;
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly taskManagerService: TaskManagerService,
+    private readonly settingsStore: SettingsStore,
+    private readonly multerService: MulterService,
+    private readonly printerSocketStore: PrinterSocketStore,
+    private readonly printerFilesStore: PrinterFilesStore,
+    private readonly permissionService: PermissionService,
+    private readonly roleService: RoleService,
+    private readonly userService: UserService,
+    private readonly floorStore: FloorStore,
+    private readonly configService: ConfigService,
+    private readonly typeormService: TypeormService,
+    private readonly isTypeormMode: boolean,
+    private readonly printerThumbnailCache: PrinterThumbnailCache
+  ) {
     this.logger = loggerFactory(BootTask.name);
-    this.settingsService = settingsService;
-    this.settingsStore = settingsStore;
-    this.multerService = multerService;
-    this.printerSocketStore = printerSocketStore;
-    this.printerFilesStore = printerFilesStore;
-    this.permissionService = permissionService;
-    this.roleService = roleService;
-    this.userService = userService;
-    this.taskManagerService = taskManagerService;
-    this.floorStore = floorStore;
-    this.clientBundleService = clientBundleService;
-    this.configService = configService;
-    this.typeormService = typeormService;
-    this.printerThumbnailCache = printerThumbnailCache;
   }
 
   async runOnce() {

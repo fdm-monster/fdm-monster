@@ -1,4 +1,5 @@
 export const DITokens = {
+  cradleService: "cradleService",
   // Values
   serverVersion: "serverVersion",
   isTypeormMode: "isTypeormMode",
@@ -71,4 +72,4 @@ export const DITokens = {
   printerWebsocketTask: "printerWebsocketTask",
   printerWebsocketRestoreTask: "printerWebsocketRestoreTask",
   printerFileCleanTask: "printerFileCleanTask",
-};
+} as const;

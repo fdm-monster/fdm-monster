@@ -2,7 +2,6 @@ import express, { Application } from "express";
 import mongoose from "mongoose";
 import history from "connect-history-api-fallback";
 import { LoggerService } from "./handlers/logger";
-import { loadControllers } from "awilix-express";
 import { join } from "path";
 import { exceptionFilter } from "./middleware/exception.filter";
 import { fetchServerPort } from "./server.env";
@@ -11,61 +10,38 @@ import { AppConstants } from "./server.constants";
 import { superRootPath } from "./utils/fs.utils";
 import { SocketIoGateway } from "@/state/socket-io.gateway";
 import { BootTask } from "./tasks/boot.task";
-import { TaskManagerService } from "@/services/core/task-manager.service";
 import { isProductionEnvironment } from "@/utils/env.utils";
-import { ConfigService } from "@/services/core/config.service";
+import { IConfigService } from "@/services/core/config.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { SettingsStore } from "@/state/settings.store";
+import { loadControllers2 } from "@/handlers/classic-controller-injection";
+import { AwilixContainer } from "awilix";
 
 export class ServerHost {
-  bootTask: BootTask;
-  taskManagerService: TaskManagerService;
-  socketIoGateway: SocketIoGateway;
+  logger: LoggerService;
   appInstance: Application | null = null;
-  configService: ConfigService;
-  typeormService: TypeormService;
-  settingsStore: SettingsStore;
-  private readonly isTypeormMode: boolean;
-  private logger: LoggerService;
 
-  constructor({
-    loggerFactory,
-    bootTask,
-    taskManagerService,
-    socketIoGateway,
-    configService,
-    typeormService,
-    isTypeormMode,
-    settingsStore,
-  }: {
-    loggerFactory: ILoggerFactory;
-    bootTask: BootTask;
-    taskManagerService: TaskManagerService;
-    socketIoGateway: SocketIoGateway;
-    configService: ConfigService;
-    typeormService: TypeormService;
-    settingsStore: SettingsStore;
-    isTypeormMode: boolean;
-  }) {
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly configService: IConfigService,
+    private readonly isTypeormMode: boolean,
+    private readonly settingsStore: SettingsStore,
+    private readonly bootTask: BootTask,
+    private readonly socketIoGateway: SocketIoGateway,
+    private readonly typeormService: TypeormService
+  ) {
     this.logger = loggerFactory(ServerHost.name);
-    this.bootTask = bootTask;
-    this.taskManagerService = taskManagerService;
-    this.socketIoGateway = socketIoGateway;
-    this.configService = configService;
-    this.typeormService = typeormService;
-    this.settingsStore = settingsStore;
-    this.isTypeormMode = isTypeormMode;
   }
 
-  async boot(app: Application, quick_boot = false, listenRequests = true) {
+  async boot(container: AwilixContainer, app: Application, quick_boot = false, listenRequests = true) {
     if (!this.isTypeormMode) {
       // Enforce models to be strictly applied, any unknown property will not be persisted
       mongoose.set("strictQuery", true);
     }
 
     this.appInstance = app;
-    this.serveControllerRoutes(this.appInstance);
+    this.serveControllerRoutes(container, this.appInstance);
 
     if (!quick_boot) {
       await this.bootTask.runOnce();
@@ -82,7 +58,7 @@ export class ServerHost {
     }
   }
 
-  serveControllerRoutes(app: Application) {
+  serveControllerRoutes(container: AwilixContainer, app: Application) {
     const routePath = "./controllers";
 
     // Catches any HTML request to paths like / or file/ as long as its text/html
@@ -94,7 +70,7 @@ export class ServerHost {
           next();
         }
       })
-      .use(loadControllers(`${routePath}/*.controller.*`, { cwd: __dirname, ignore: ["**/*.map"] }))
+      .use(loadControllers2(container, `${routePath}/*.controller.*`, { cwd: __dirname, ignore: ["**/*.map"] }))
       .use(exceptionFilter);
 
     const nextClientPath = join(superRootPath(), "node_modules", AppConstants.clientNextPackageName, "dist");

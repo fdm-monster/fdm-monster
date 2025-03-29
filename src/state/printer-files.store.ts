@@ -1,7 +1,6 @@
 import { ValidationException } from "@/exceptions/runtime.exceptions";
 import { PrinterCache } from "@/state/printer.cache";
 import { FileCache } from "@/state/file.cache";
-import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { LoggerService } from "@/handlers/logger";
 import { IdType } from "@/shared.constants";
 import { ILoggerFactory } from "@/handlers/logger-factory";
@@ -9,30 +8,14 @@ import { captureException } from "@sentry/node";
 import { PrinterApiFactory } from "@/services/printer-api.factory";
 
 export class PrinterFilesStore {
-  printerCache: PrinterCache;
-  fileCache: FileCache;
-  printerApiFactory: PrinterApiFactory;
-  octoprintClient: OctoprintClient;
   private logger: LoggerService;
 
-  constructor({
-    printerCache,
-    fileCache,
-    printerApiFactory,
-    octoprintClient,
-    loggerFactory,
-  }: {
-    printerCache: PrinterCache;
-    fileCache: FileCache;
-    printerApiFactory: PrinterApiFactory;
-    octoprintClient: OctoprintClient;
-    loggerFactory: ILoggerFactory;
-  }) {
-    this.printerCache = printerCache;
-    this.printerApiFactory = printerApiFactory;
-    this.fileCache = fileCache;
-    this.octoprintClient = octoprintClient;
-
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly printerCache: PrinterCache,
+    public readonly fileCache: FileCache,
+    private readonly printerApiFactory: PrinterApiFactory
+  ) {
     this.logger = loggerFactory(PrinterFilesStore.name);
   }
 

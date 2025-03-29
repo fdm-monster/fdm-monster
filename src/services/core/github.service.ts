@@ -4,12 +4,10 @@ import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class GithubService {
-  octokitService: Octokit;
-  logger: LoggerService;
+  private readonly logger: LoggerService;
 
-  constructor({ loggerFactory, octokitService }: { loggerFactory: ILoggerFactory; octokitService: Octokit }) {
+  constructor(loggerFactory: ILoggerFactory, private readonly octokitService: Octokit) {
     this.logger = loggerFactory(GithubService.name, false);
-    this.octokitService = octokitService;
   }
 
   async wasAuthenticated() {

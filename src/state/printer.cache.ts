@@ -23,13 +23,8 @@ export interface CachedPrinter {
 }
 
 export class PrinterCache extends KeyDiffCache<CachedPrinter> {
-  printerService: IPrinterService;
-  eventEmitter2: EventEmitter2;
-
-  constructor({ printerService, eventEmitter2 }: { printerService: IPrinterService; eventEmitter2: EventEmitter2 }) {
+  constructor(private readonly printerService: IPrinterService, private readonly eventEmitter2: EventEmitter2) {
     super();
-    this.printerService = printerService;
-    this.eventEmitter2 = eventEmitter2;
 
     this.eventEmitter2.on(printerEvents.batchPrinterCreated, this.handleBatchPrinterCreated.bind(this));
     this.eventEmitter2.on(printerEvents.printerCreated, this.handlePrinterCreatedOrUpdated.bind(this));

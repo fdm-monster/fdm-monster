@@ -9,9 +9,9 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { rmSync } from "node:fs";
 
 export class LogDumpService {
-  logger: LoggerService;
+  private readonly logger: LoggerService;
 
-  constructor({ loggerFactory }: { loggerFactory: ILoggerFactory }) {
+  constructor(loggerFactory: ILoggerFactory) {
     this.logger = loggerFactory(LogDumpService.name);
   }
 

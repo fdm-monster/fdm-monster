@@ -8,7 +8,7 @@ setupEnvConfig();
 setupServer().then(({ httpServer, container }) => {
   container
     .resolve(DITokens.serverHost)
-    .boot(httpServer)
+    .boot(container, httpServer)
     .catch(async (e: any | Error) => {
       console.error("Server has crashed unintentionally - please report this", e);
 

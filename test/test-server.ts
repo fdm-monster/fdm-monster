@@ -49,7 +49,7 @@ export async function setupTestApp(
   }
 
   // Setup
-  const settingsStore = container.resolve(DITokens.settingsStore) as SettingsStore;
+  const settingsStore = container.resolve<SettingsStore>(DITokens.settingsStore);
   await settingsStore.loadSettings();
   await settingsStore.setExperimentalMoonrakerSupport(true);
 

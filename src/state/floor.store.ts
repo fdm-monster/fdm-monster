@@ -6,12 +6,10 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { CreateFloorDto, FloorDto, PositionDto, UpdateFloorDto } from "@/services/interfaces/floor.dto";
 
 export class FloorStore<KeyType extends keyType = IdType> extends KeyDiffCache<FloorDto<KeyType>> {
-  private floorService: IFloorService<KeyType>;
-  private logger: LoggerService;
+  private readonly logger: LoggerService;
 
-  constructor({ floorService, loggerFactory }: { floorService: IFloorService<KeyType>; loggerFactory: ILoggerFactory }) {
+  constructor(private readonly floorService: IFloorService<KeyType>, loggerFactory: ILoggerFactory) {
     super();
-    this.floorService = floorService;
     this.logger = loggerFactory(FloorStore.name);
   }
 

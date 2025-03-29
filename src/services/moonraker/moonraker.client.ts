@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosResponse } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 import { ServerInfoDto } from "@/services/moonraker/dto/server/server-info.dto";
 import { LoginDto } from "@/services/interfaces/login.dto";
 import { ResultDto } from "./dto/rest/result.dto";
@@ -81,21 +81,13 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { ExternalServiceError } from "@/exceptions/runtime.exceptions";
 
 export class MoonrakerClient {
-  private httpClientFactory: HttpClientFactory;
-  private eventEmitter2: EventEmitter2;
   protected logger: LoggerService;
 
-  constructor({
-    httpClientFactory,
-    loggerFactory,
-    eventEmitter2,
-  }: {
-    httpClientFactory: HttpClientFactory;
-    loggerFactory: ILoggerFactory;
-    eventEmitter2: EventEmitter2;
-  }) {
-    this.httpClientFactory = httpClientFactory;
-    this.eventEmitter2 = eventEmitter2;
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly httpClientFactory: HttpClientFactory,
+    private readonly eventEmitter2: EventEmitter2
+  ) {
     this.logger = loggerFactory(MoonrakerClient.name);
   }
 

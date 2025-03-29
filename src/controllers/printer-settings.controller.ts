@@ -10,23 +10,11 @@ import { PrinterCache } from "@/state/printer.cache";
 import { Request, Response } from "express";
 
 export class PrinterSettingsController {
-  printerCache: PrinterCache;
-  octoprintClient: OctoprintClient;
-  isTypeormMode: boolean;
-
-  constructor({
-    printerCache,
-    octoprintClient,
-    isTypeormMode,
-  }: {
-    printerCache: PrinterCache;
-    octoprintClient: OctoprintClient;
-    isTypeormMode: boolean;
-  }) {
-    this.printerCache = printerCache;
-    this.octoprintClient = octoprintClient;
-    this.isTypeormMode = isTypeormMode;
-  }
+  constructor(
+    private readonly printerCache: PrinterCache,
+    private readonly octoprintClient: OctoprintClient,
+    private readonly isTypeormMode: boolean
+  ) {}
 
   async get(req: Request, res: Response) {
     const { id: printerId } = await validateInput(req.params, idRulesV2(this.isTypeormMode));

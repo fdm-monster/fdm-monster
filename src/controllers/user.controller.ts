@@ -3,7 +3,6 @@ import { AppConstants } from "@/server.constants";
 import { authenticate, authorizeRoles } from "@/middleware/authenticate";
 import { ROLES } from "@/constants/authorization.constants";
 import { validateInput, validateMiddleware } from "@/handlers/validators";
-import { idRulesV2 } from "./validation/generic.validation";
 import { BadRequestException, ForbiddenError } from "@/exceptions/runtime.exceptions";
 import { IConfigService } from "@/services/core/config.service";
 import { IUserService } from "@/services/interfaces/user-service.interface";
@@ -28,37 +27,17 @@ import { ParamId } from "@/middleware/param-converter.middleware";
 @route(AppConstants.apiRoute + "/user")
 @before([authenticate()])
 export class UserController {
-  userService: IUserService;
-  roleService: IRoleService;
-  configService: IConfigService;
-  authService: IAuthService;
-  settingsStore: SettingsStore;
   logger: LoggerService;
-  isTypeormMode: boolean;
 
-  constructor({
-    userService,
-    configService,
-    roleService,
-    settingsStore,
-    authService,
-    loggerFactory,
-    isTypeormMode,
-  }: {
-    userService: IUserService;
-    configService: IConfigService;
-    roleService: IRoleService;
-    authService: IAuthService;
-    settingsStore: SettingsStore;
-    loggerFactory: ILoggerFactory;
-    isTypeormMode: boolean;
-  }) {
-    this.userService = userService;
-    this.configService = configService;
-    this.roleService = roleService;
-    this.authService = authService;
-    this.settingsStore = settingsStore;
-    this.isTypeormMode = isTypeormMode;
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly userService: IUserService,
+    private readonly configService: IConfigService,
+    private readonly roleService: IRoleService,
+    private readonly authService: IAuthService,
+    private readonly settingsStore: SettingsStore,
+    private readonly isTypeormMode: boolean
+  ) {
     this.logger = loggerFactory(UserController.name);
   }
 

@@ -18,21 +18,11 @@ export class PrinterService
   extends BaseService(Printer, PrinterDto<SqliteIdType>)
   implements IPrinterService<SqliteIdType, Printer>
 {
-  logger: LoggerService;
-  eventEmitter2: EventEmitter2;
+  private readonly logger: LoggerService;
 
-  constructor({
-    loggerFactory,
-    typeormService,
-    eventEmitter2,
-  }: {
-    loggerFactory: ILoggerFactory;
-    typeormService: TypeormService;
-    eventEmitter2: EventEmitter2;
-  }) {
-    super({ typeormService });
+  constructor(loggerFactory: ILoggerFactory, typeormService: TypeormService, private readonly eventEmitter2: EventEmitter2) {
+    super(typeormService);
     this.logger = loggerFactory(PrinterService.name);
-    this.eventEmitter2 = eventEmitter2;
   }
 
   toUnsafeDto(entity: Printer): PrinterUnsafeDto<SqliteIdType> {

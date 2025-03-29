@@ -22,43 +22,44 @@ export class ServerPublicController {
   roleService: RoleService;
   isTypeormMode: boolean;
 
-  constructor({
-    settingsStore,
-    printerSocketStore,
-    serverVersion,
-    serverReleaseService,
-    monsterPiService,
-    userService,
-    roleService,
-    isTypeormMode,
-  }: {
-    settingsStore: SettingsStore;
-    printerSocketStore: PrinterSocketStore;
-    serverVersion: string;
-    serverReleaseService: ServerReleaseService;
-    monsterPiService: MonsterPiService;
-    userService: UserService;
-    roleService: RoleService;
-    isTypeormMode: boolean;
-  }) {
+  constructor(private settingsStore) // {
+  //   // settingsStore,
+  //   printerSocketStore,
+  //   serverVersion,
+  //   serverReleaseService,
+  //   monsterPiService,
+  //   userService,
+  //   roleService,
+  //   isTypeormMode,
+  // }: {
+  //   // settingsStore: SettingsStore;
+  //   printerSocketStore: PrinterSocketStore;
+  //   serverVersion: string;
+  //   serverReleaseService: ServerReleaseService;
+  //   monsterPiService: MonsterPiService;
+  //   userService: UserService;
+  //   roleService: RoleService;
+  //   isTypeormMode: boolean;
+  // }
+  {
     this.settingsStore = settingsStore;
-    this.serverVersion = serverVersion;
-    this.printerSocketStore = printerSocketStore;
-    this.serverReleaseService = serverReleaseService;
-    this.monsterPiService = monsterPiService;
-    this.userService = userService;
-    this.roleService = roleService;
-    this.isTypeormMode = isTypeormMode;
+    // this.serverVersion = serverVersion;
+    // this.printerSocketStore = printerSocketStore;
+    // this.serverReleaseService = serverReleaseService;
+    // this.monsterPiService = monsterPiService;
+    // this.userService = userService;
+    // this.roleService = roleService;
+    // this.isTypeormMode = isTypeormMode;
   }
 
   welcome(req: Request, res: Response) {
-    const serverSettings = this.settingsStore.getSettings();
+    // const serverSettings = this.settingsStore.getSettings();
 
-    if (!this.settingsStore.getLoginRequired()) {
-      return res.send({
-        message: "Login disabled. Please load the Vue app.",
-      });
-    }
+    // if (!this.settingsStore.getLoginRequired()) {
+    //   return res.send({
+    //     message: "Login disabled. Please load the Vue app.",
+    //   });
+    // }
 
     return res.send({
       message: "Login required. Please load the Vue app.",
@@ -162,7 +163,7 @@ export class ServerPublicController {
 
 export default createController(ServerPublicController)
   .prefix(AppConstants.apiRoute + "/")
-  .get("", "welcome", { before: [authenticate(), permission(PERMS.ServerInfo.Get)] })
+  .get("", "welcome")
   .get("test", "test")
   .get("features", "getFeatures", { before: [authenticate()] })
   .get("version", "getVersion", { before: [authenticate(), permission(PERMS.ServerInfo.Get)] });

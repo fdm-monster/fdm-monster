@@ -8,7 +8,6 @@ import { printerResolveMiddleware } from "@/middleware/printer";
 import { PERMS, ROLES } from "@/constants/authorization.constants";
 import { PrinterFilesStore } from "@/state/printer-files.store";
 import { SettingsStore } from "@/state/settings.store";
-import { BatchCallService } from "@/services/core/batch-call.service";
 import { MulterService } from "@/services/core/multer.service";
 import { PrinterFileCleanTask } from "@/tasks/printer-file-clean.task";
 import { LoggerService } from "@/handlers/logger";
@@ -24,45 +23,18 @@ import { getScopedPrinter } from "@/handlers/printer-resolver";
 @route(AppConstants.apiRoute + "/printer-files")
 @before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR]), printerResolveMiddleware()])
 export class PrinterFilesController {
-  printerApi: IPrinterApi;
-  printerLogin: LoginDto;
-  printerThumbnailCache: PrinterThumbnailCache;
-  printerFilesStore: PrinterFilesStore;
-  settingsStore: SettingsStore;
-  batchCallService: BatchCallService;
-  multerService: MulterService;
-  printerFileCleanTask: PrinterFileCleanTask;
-  logger: LoggerService;
+  private readonly logger: LoggerService;
 
-  constructor({
-    printerApi,
-    printerLogin,
-    printerFilesStore,
-    batchCallService,
-    printerFileCleanTask,
-    settingsStore,
-    loggerFactory,
-    multerService,
-    printerThumbnailCache,
-  }: {
-    printerApi: IPrinterApi;
-    printerLogin: LoginDto;
-    printerFilesStore: PrinterFilesStore;
-    batchCallService: BatchCallService;
-    printerFileCleanTask: PrinterFileCleanTask;
-    settingsStore: SettingsStore;
-    loggerFactory: ILoggerFactory;
-    multerService: MulterService;
-    printerThumbnailCache: PrinterThumbnailCache;
-  }) {
-    this.printerApi = printerApi;
-    this.printerLogin = printerLogin;
-    this.printerFilesStore = printerFilesStore;
-    this.settingsStore = settingsStore;
-    this.printerFileCleanTask = printerFileCleanTask;
-    this.batchCallService = batchCallService;
-    this.multerService = multerService;
-    this.printerThumbnailCache = printerThumbnailCache;
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly printerApi: IPrinterApi,
+    private readonly printerLogin: LoginDto,
+    private readonly printerFilesStore: PrinterFilesStore,
+    private readonly printerFileCleanTask: PrinterFileCleanTask,
+    private readonly settingsStore: SettingsStore,
+    private readonly multerService: MulterService,
+    private readonly printerThumbnailCache: PrinterThumbnailCache
+  ) {
     this.logger = loggerFactory(PrinterFilesController.name);
   }
 

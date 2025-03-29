@@ -10,13 +10,7 @@ import { ICustomGcodeService } from "@/services/interfaces/custom-gcode.service.
 import { getScopedPrinter } from "@/handlers/printer-resolver";
 
 export class CustomGcodeController {
-  private customGCodeService: ICustomGcodeService;
-  isTypeormMode: boolean;
-
-  constructor({ customGCodeService, isTypeormMode }: { customGCodeService: ICustomGcodeService; isTypeormMode: boolean }) {
-    this.customGCodeService = customGCodeService;
-    this.isTypeormMode = isTypeormMode;
-  }
+  constructor(private readonly customGCodeService: ICustomGcodeService, private readonly isTypeormMode: boolean) {}
 
   async list(req: Request, res: Response) {
     const entities = await this.customGCodeService.list();

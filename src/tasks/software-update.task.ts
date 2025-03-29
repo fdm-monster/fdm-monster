@@ -1,11 +1,7 @@
 import { ServerReleaseService } from "@/services/core/server-release.service";
 
 export class SoftwareUpdateTask {
-  serverReleaseService: ServerReleaseService;
-
-  constructor({ serverReleaseService }: { serverReleaseService: ServerReleaseService }) {
-    this.serverReleaseService = serverReleaseService;
-  }
+  constructor(private readonly serverReleaseService: ServerReleaseService) {}
 
   async run() {
     await this.serverReleaseService.syncLatestRelease();

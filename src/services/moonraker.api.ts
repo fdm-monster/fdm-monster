@@ -20,21 +20,12 @@ import { PrintStatsObject, WebhooksObject } from "@/services/moonraker/dto/objec
  * https://moonraker.readthedocs.io/en/latest/web_api/#query-server-info
  */
 export class MoonrakerApi implements IPrinterApi {
-  logger: LoggerService;
-  client: MoonrakerClient;
-  printerLogin: LoginDto;
-  constructor({
-    moonrakerClient,
-    printerLogin,
-    loggerFactory,
-  }: {
-    moonrakerClient: MoonrakerClient;
-    printerLogin: LoginDto;
-    loggerFactory: ILoggerFactory;
-  }) {
+  private readonly logger: LoggerService;
+  private readonly client: MoonrakerClient;
+
+  constructor(loggerFactory: ILoggerFactory, moonrakerClient: MoonrakerClient, private printerLogin: LoginDto) {
     this.logger = loggerFactory(MoonrakerApi.name);
     this.client = moonrakerClient;
-    this.printerLogin = printerLogin;
   }
 
   get type(): PrinterType {

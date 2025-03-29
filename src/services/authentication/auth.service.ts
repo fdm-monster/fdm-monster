@@ -14,10 +14,6 @@ import { IUser } from "@/models/Auth/User";
 
 export class AuthService<KeyType = IdType> implements IAuthService<KeyType> {
   private logger: LoggerService;
-  private userService: IUserService<KeyType, IUser<KeyType>>;
-  private jwtService: IJwtService<KeyType>;
-  private settingsStore: SettingsStore;
-  private refreshTokenService: IRefreshTokenService<KeyType>;
   /**
    *  When users are blacklisted at runtime, this cache can make quick work of rejecting them
    */
@@ -41,24 +37,14 @@ export class AuthService<KeyType = IdType> implements IAuthService<KeyType> {
    * refreshAttempts => integer in setting with cap?
    */
 
-  constructor({
-    userService,
-    jwtService,
-    loggerFactory,
-    settingsStore,
-    refreshTokenService,
-  }: {
-    userService: IUserService<KeyType, IUser<KeyType>>;
-    jwtService: IJwtService<KeyType>;
-    loggerFactory: ILoggerFactory;
-    settingsStore: SettingsStore;
-    refreshTokenService: IRefreshTokenService<KeyType>;
-  }) {
-    this.userService = userService;
-    this.jwtService = jwtService;
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly userService: IUserService<KeyType, IUser<KeyType>>,
+    private readonly jwtService: IJwtService<KeyType>,
+    private readonly settingsStore: SettingsStore,
+    private readonly refreshTokenService: IRefreshTokenService<KeyType>
+  ) {
     this.logger = loggerFactory(AuthService.name);
-    this.settingsStore = settingsStore;
-    this.refreshTokenService = refreshTokenService;
   }
 
   async loginUser(username: string, password: string) {
@@ -71,7 +57,7 @@ export class AuthService<KeyType = IdType> implements IAuthService<KeyType> {
       throw new AuthenticationError("Login incorrect", AUTH_ERROR_REASON.IncorrectCredentials);
     }
 
-    const userId = userDoc.id.toString();
+    const userId = userDoc.id;
     const token = await this.signJwtToken(userId);
     await this.refreshTokenService.purgeOutdatedRefreshTokensByUserId(userId);
     await this.purgeOutdatedBlacklistedJwtCache();
@@ -110,7 +96,7 @@ export class AuthService<KeyType = IdType> implements IAuthService<KeyType> {
 
   async logoutUserRefreshToken(refreshToken: string) {
     const userRefreshToken = await this.getValidRefreshToken(refreshToken);
-    await this.refreshTokenService.deleteRefreshTokenByUserId(userRefreshToken.userId.toString());
+    await this.refreshTokenService.deleteRefreshTokenByUserId(userRefreshToken.userId);
   }
 
   async renewLoginByRefreshToken(refreshToken: string): Promise<string> {
@@ -122,7 +108,7 @@ export class AuthService<KeyType = IdType> implements IAuthService<KeyType> {
       );
     }
 
-    const userId = userRefreshToken.userId.toString();
+    const userId = userRefreshToken.userId;
     const user = await this.userService.getUser(userId, false);
     if (!user) {
       await this.refreshTokenService.deleteRefreshToken(refreshToken);
@@ -145,7 +131,7 @@ export class AuthService<KeyType = IdType> implements IAuthService<KeyType> {
       return null;
     }
     if (Date.now() > userRefreshToken.expiresAt) {
-      await this.refreshTokenService.deleteRefreshTokenByUserId(userRefreshToken.userId.toString());
+      await this.refreshTokenService.deleteRefreshTokenByUserId(userRefreshToken.userId);
       throw new AuthenticationError("Refresh token expired, login required", AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken);
     }
     return userRefreshToken;
@@ -159,7 +145,7 @@ export class AuthService<KeyType = IdType> implements IAuthService<KeyType> {
     // If no attempts are set, then we don't care about attempts
     if (refreshTokenAttempts !== -1) {
       if (attemptsUsed >= refreshTokenAttempts) {
-        await this.refreshTokenService.deleteRefreshTokenByUserId(userRefreshToken.userId.toString());
+        await this.refreshTokenService.deleteRefreshTokenByUserId(userRefreshToken.userId);
         throw new AuthenticationError(
           "Refresh token attempts exceeded, login required",
           AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken
