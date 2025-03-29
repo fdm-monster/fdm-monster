@@ -303,8 +303,8 @@ __metadata:
   linkType: hard
 
 "@aws-sdk/credential-providers@npm:^3.186.0":
-  version: 3.777.0
-  resolution: "@aws-sdk/credential-providers@npm:3.777.0"
+  version: 3.778.0
+  resolution: "@aws-sdk/credential-providers@npm:3.778.0"
   dependencies:
     "@aws-sdk/client-cognito-identity": "npm:3.777.0"
     "@aws-sdk/core": "npm:3.775.0"
@@ -318,12 +318,14 @@ __metadata:
     "@aws-sdk/credential-provider-web-identity": "npm:3.777.0"
     "@aws-sdk/nested-clients": "npm:3.777.0"
     "@aws-sdk/types": "npm:3.775.0"
+    "@smithy/config-resolver": "npm:^4.1.0"
     "@smithy/core": "npm:^3.2.0"
     "@smithy/credential-provider-imds": "npm:^4.0.2"
+    "@smithy/node-config-provider": "npm:^4.0.2"
     "@smithy/property-provider": "npm:^4.0.2"
     "@smithy/types": "npm:^4.2.0"
     tslib: "npm:^2.6.2"
-  checksum: 10c0/22bcfca65045cea62c2c89d25395401ccaa3125869cf18fb993db2fdcf01c38052f6a135b9310ae3273a13fd040f8b867d897eed6d572d7b3102c71fdfefeedd
+  checksum: 10c0/1865bb9262d21e8b3d3b2f69853d345e4b5b39b115095a897af2aee6e3d13e7959b45de668ca498a55d99bc8dedf370448234ba2e984349a9768dfafb817cfdc
   languageName: node
   linkType: hard
 
@@ -5447,9 +5449,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.5.73":
-  version: 1.5.127
-  resolution: "electron-to-chromium@npm:1.5.127"
-  checksum: 10c0/e8525538ed5c90d25e53b901fc404241b406b724150a5439dec89be569b5ccfab7d6f8e482370ec9f94aa07717094ef354833aabf08fef097b5d49d656e2cfa2
+  version: 1.5.128
+  resolution: "electron-to-chromium@npm:1.5.128"
+  checksum: 10c0/3c64ec24a8aff8e9954e99366aebdf41c0a5d0e48a498435b68d4deddd938584af53c1b176edd166285cfb9dcd407d4897184208a0369d1bb97e21d8daee8bc2
   languageName: node
   linkType: hard
 
