@@ -51,7 +51,7 @@ export class FirstTimeSetupController {
   @POST()
   @route("/complete")
   async completeWizard(req: Request, res: Response) {
-    const { loginRequired, registration, rootUsername, rootPassword } = await validateMiddleware(req, wizardSettingsSchema);
+    const { loginRequired, registration, rootUsername, rootPassword } = await validateMiddleware(req, wizardSettingsRules);
 
     if (this.settingsStore.isWizardCompleted()) {
       throw new ForbiddenError("Wizard already completed");

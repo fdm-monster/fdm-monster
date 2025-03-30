@@ -2,7 +2,6 @@ import { before, GET, POST, route } from "awilix-express";
 import { authenticate, permission } from "@/middleware/authenticate";
 import { validateMiddleware } from "@/handlers/validators";
 import { AppConstants } from "@/server.constants";
-import { idRulesV2 } from "./validation/generic.validation";
 import { PERMS } from "@/constants/authorization.constants";
 import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { PrinterCache } from "@/state/printer.cache";

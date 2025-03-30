@@ -1,4 +1,4 @@
-import { createController, GET, PATCH, PUT, route, before } from "awilix-express";
+import { GET, PATCH, PUT, route, before } from "awilix-express";
 import { authenticate, authorizeRoles } from "@/middleware/authenticate";
 import { AppConstants } from "@/server.constants";
 import { ROLES } from "@/constants/authorization.constants";

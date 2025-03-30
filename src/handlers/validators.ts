@@ -1,12 +1,7 @@
 import { Request } from "express";
-import { InternalServerException, ValidationException } from "@/exceptions/runtime.exceptions";
-import { currentPrinterToken, printerApiToken, printerIdToken, printerLoginToken } from "@/middleware/printer";
+import { ValidationException } from "@/exceptions/runtime.exceptions";
 import { normalizeUrl } from "@/utils/normalize-url";
 import nodeInputValidator, { extend, extendMessages } from "node-input-validator";
-import { IdType } from "@/shared.constants";
-import { LoginDto } from "@/services/interfaces/login.dto";
-import { CachedPrinter } from "@/state/printer.cache";
-import { IPrinterApi } from "@/services/printer-api.interface";
 import { defaultHttpProtocol } from "@/utils/url.utils";
 
 export function getExtendedValidator() {
