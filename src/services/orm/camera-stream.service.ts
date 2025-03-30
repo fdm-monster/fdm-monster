@@ -21,8 +21,4 @@ export class CameraStreamService
       flipVertical: entity.flipVertical,
     };
   }
-
-  async delete(id: SqliteIdType, throwIfNotFound?: boolean) {
-    await super.delete(id, throwIfNotFound);
-  }
 }
