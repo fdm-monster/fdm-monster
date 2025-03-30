@@ -9,6 +9,8 @@
     "sourceMap": true,
     "outDir": "dist",
     "strict": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": false,
     "lib": ["es2022"],
     "baseUrl": "./src",
     "forceConsistentCasingInFileNames": true,
@@ -17,7 +19,6 @@
     "emitDecoratorMetadata": true,
     "moduleResolution": "Node",
     "skipLibCheck": true,
-    "strictNullChecks": false,
     "noImplicitAny": true,
     "paths": {
       "@/*": ["./*"]

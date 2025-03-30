@@ -14,6 +14,14 @@
 - Fix punycode warning by pinning tr46 package
 - Update API controller, use decorators over api builder
 - Update dependency injection with awilix, switch to CLASSIC mode for less verbose code
+- Removed BaseEntity
+- Fix camera dto and entity
+- `tsconfig.json` strictNullChecks and strictPropertyInitialization set to true for better null propagation logic.
+- Fix print completion interface and dto
+- Enforce properties on camera stream Mongoose schema for consistency with TypeORM camera stream entity
+- Enforce floor id on Mongoose schema for consistency with TypeORM floor entity
+- Set floor id in Mongoose floor service for consistency with typeorm service
+- Remove PrinterFile entity (unused)
 
 ## Fixes
 

@@ -1,23 +1,14 @@
 import { IBaseService, Type } from "@/services/orm/base.interface";
 import { SqliteIdType } from "@/shared.constants";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
-import {
-  DeepPartial,
-  DeleteResult,
-  EntityNotFoundError,
-  EntityTarget,
-  FindManyOptions,
-  FindOneOptions,
-  Repository,
-} from "typeorm";
+import { DeepPartial, EntityNotFoundError, EntityTarget, FindManyOptions, FindOneOptions, Repository } from "typeorm";
 import { validate } from "class-validator";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
-import { BaseEntity } from "@/entities/base.entity";
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import { DEFAULT_PAGE, IPagination } from "@/services/interfaces/page.interface";
 
 export function BaseService<
-  T extends BaseEntity,
+  T,
   DTO extends object,
   CreateDTO extends object = DeepPartial<T>,
   UpdateDTO extends object = QueryDeepPartialEntity<T>
@@ -38,8 +29,11 @@ export function BaseService<
         }
         return this.repository.findOneOrFail({ ...options, where: { id } } as FindOneOptions<T>);
       } catch (e) {
-        if (throwIfNotFound && e instanceof EntityNotFoundError) {
-          throw new NotFoundException(`The entity ${entity} with the provided id was not found`);
+        if (throwIfNotFound) {
+          if (e instanceof EntityNotFoundError) {
+            throw new NotFoundException(`The entity ${entity} with the provided id was not found`);
+          }
+          throw e;
         }
         return undefined;
       }
@@ -73,13 +67,13 @@ export function BaseService<
       return await this.repository.save(entity);
     }
 
-    async delete(id: SqliteIdType, throwIfNotFound = true) {
+    async delete(id: SqliteIdType, throwIfNotFound?: boolean) {
       const entity = await this.get(id, throwIfNotFound);
-      return await this.repository.delete(entity.id);
+      await this.repository.delete(entity.id);
     }
 
-    async deleteMany(ids: SqliteIdType[], emitEvent = true): Promise<DeleteResult> {
-      return await this.repository.delete(ids);
+    async deleteMany(ids: SqliteIdType[], emitEvent = true) {
+      await this.repository.delete(ids);
     }
   }
 

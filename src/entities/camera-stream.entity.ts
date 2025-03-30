@@ -1,33 +1,32 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, Relation } from "typeorm";
 import { Printer } from "@/entities/printer.entity";
-import { BaseEntity } from "@/entities/base.entity";
 
 @Entity()
-export class CameraStream extends BaseEntity {
+export class CameraStream {
   @PrimaryGeneratedColumn()
-  id!: number;
+  id: number;
 
   @Column()
-  streamURL!: string;
+  streamURL: string;
 
   @Column()
-  name!: string;
+  name: string;
 
   @OneToOne(() => Printer, { nullable: true })
   @JoinColumn({ name: "printerId" })
   printer?: Relation<Printer>;
   @Column({ nullable: true, unique: true })
-  printerId?: number;
+  printerId: number | null;
 
   @Column({ nullable: false, default: "16:9" })
-  aspectRatio!: string;
+  aspectRatio: string;
 
   @Column({ nullable: false, default: 0 })
-  rotationClockwise!: number;
+  rotationClockwise: number;
 
   @Column({ nullable: false, default: false })
-  flipHorizontal!: boolean;
+  flipHorizontal: boolean;
 
   @Column({ nullable: false, default: false })
-  flipVertical!: boolean;
+  flipVertical: boolean;
 }

@@ -1,5 +1,4 @@
-import { BaseEntity } from "@/entities/base.entity";
-import { Column, Entity, JoinColumn, ManyToOne, Relation } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Relation } from "typeorm";
 import { GcodeAnalysisDto } from "@/services/interfaces/gcode-analysis.dto";
 import { Prints, Refs, OctoPrintStatisticsDto } from "@/services/interfaces/printer-file.dto";
 import { Printer } from "@/entities/printer.entity";
@@ -9,10 +8,13 @@ import { OctoPrintCustomDto } from "@/services/octoprint/dto/files/octoprint-fil
  * @deprecated This entity will be removed, or reshaped and is unused right now.
  */
 @Entity()
-export class PrinterFile extends BaseEntity {
+export class PrinterFile {
+  @PrimaryGeneratedColumn()
+  id: number;
+
   @ManyToOne(() => Printer, { onDelete: "CASCADE", nullable: false })
   @JoinColumn({ name: "printerId" })
-  printer!: Relation<Printer>;
+  printer: Relation<Printer>;
 
   @Column()
   printerId: number;
