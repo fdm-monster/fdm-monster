@@ -5,9 +5,9 @@ import { SettingsDto } from "@/services/octoprint/dto/settings/settings.dto";
 import { ConnectionState } from "@/services/octoprint/dto/connection/connection-state.type";
 import { IdType } from "@/shared.constants";
 
-export const OctoprintType = 0 as const;
-export const MoonrakerType = 1 as const;
-export const PrinterTypes = [OctoprintType, MoonrakerType];
+export const OctoprintType = 0;
+export const MoonrakerType = 1;
+export const PrinterTypes = [OctoprintType, MoonrakerType] as const;
 export type PrinterTypes = typeof PrinterTypes[number];
 export type PrinterType = typeof OctoprintType | typeof MoonrakerType;
 
