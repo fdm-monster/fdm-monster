@@ -5,14 +5,15 @@ import { setupTestApp } from "../test-server";
 import { AwilixContainer } from "awilix";
 import { generateCorrelationToken } from "@/utils/correlation-token.util";
 import { createTestPrinter } from "../api/test-data/create-printer";
-import supertest from "supertest";
+import { Test } from "supertest";
 import { IPrintCompletionService } from "@/services/interfaces/print-completion.interface";
 import { SqliteIdType } from "@/shared.constants";
 import { PrintCompletion } from "@/entities";
+import TestAgent from "supertest/lib/agent";
 
 let container: AwilixContainer;
 let printCompletionService: IPrintCompletionService<SqliteIdType, PrintCompletion>;
-let request: supertest.SuperTest<supertest.Test>;
+let request: TestAgent<Test>;
 
 beforeAll(async () => {
   ({ container, request } = await setupTestApp(true));

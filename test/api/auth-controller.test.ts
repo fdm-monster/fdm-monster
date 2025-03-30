@@ -19,6 +19,7 @@ let authService: AuthService;
 const baseRoute = AppConstants.apiRoute + "/auth";
 const loginRoute = `${baseRoute}/login`;
 const registerRoute = `${baseRoute}/register`;
+const needsPasswordChangeRoute = `${baseRoute}/needs-password-change`;
 const logoutRoute = `${baseRoute}/logout`;
 const verifyLoginRoute = `${baseRoute}/verify`;
 
@@ -41,8 +42,15 @@ describe(AuthController.name, () => {
     expectUnauthenticatedResponse(response);
   });
 
-  it("should not authorize unknown credentials", async () => {
+  it("should not authorize unknown account credentials", async () => {
     const response = await request.post(loginRoute).send({ username: "test", password: "test" });
+    expectUnauthenticatedResponse(response);
+  });
+
+  it("should not authorize known account incorrect password", async () => {
+    const userDto = await ensureTestUserCreated();
+
+    const response = await request.post(loginRoute).send({ username: userDto.username, password: "definitely-incorrect" });
     expectUnauthenticatedResponse(response);
   });
 
@@ -166,20 +174,26 @@ describe(AuthController.name, () => {
   it("should get needsPasswordChange", async () => {
     // Not authenticated
     await settingsStore.setLoginRequired(true);
-    const response = await request.post(`${baseRoute}/needs-password-change`).send();
+    const response = await request.post(needsPasswordChangeRoute).send();
     expectOkResponse(response);
     expect(response.body.needsPasswordChange).toBe(null);
 
     // No authentication required
     await settingsStore.setLoginRequired(false);
-    const response2 = await request.post(`${baseRoute}/needs-password-change`).send();
+    const response2 = await request.post(needsPasswordChangeRoute).send();
     expectOkResponse(response2);
     expect(response2.body.needsPasswordChange).toBe(false);
 
-    const { token, refreshToken } = await loginTestUser(request);
-    const response3 = await request.post(`${baseRoute}/needs-password-change`).set("Authorization", `Bearer ${token}`).send();
+    await settingsStore.setLoginRequired(false);
+    const { token } = await loginTestUser(request);
+    const response3 = await request.post(needsPasswordChangeRoute).set("Authorization", `Bearer ${token}`).send();
     expectOkResponse(response3);
     expect(response3.body.needsPasswordChange).toBe(false);
+
+    await settingsStore.setLoginRequired(true);
+    const response4 = await request.post(needsPasswordChangeRoute).set("Authorization", `Bearer ${token}`).send();
+    expectOkResponse(response4);
+    expect(response4.body.needsPasswordChange).toBe(false);
   });
 
   it("should refresh login", async () => {
