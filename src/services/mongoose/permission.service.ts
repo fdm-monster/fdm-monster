@@ -71,6 +71,6 @@ export class PermissionService implements IPermissionService<MongoIdType> {
       this.logger.warn("The permission by by provided id did not exist. Skipping");
       return;
     }
-    return permissionInstance!.name;
+    return permissionInstance.name;
   }
 }
