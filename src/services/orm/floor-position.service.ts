@@ -1,14 +1,9 @@
 import { FloorPosition } from "@/entities/floor-position.entity";
 import { BaseService } from "@/services/orm/base.service";
 import { SqliteIdType } from "@/shared.constants";
-import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { PositionDto } from "@/services/interfaces/floor.dto";
 
 export class FloorPositionService extends BaseService(FloorPosition, PositionDto<SqliteIdType>) {
-  constructor(typeormService: TypeormService) {
-    super(typeormService);
-  }
-
   async create(dto: PositionDto<SqliteIdType>): Promise<FloorPosition> {
     return super.create(dto);
   }

@@ -19,7 +19,6 @@ import { Request, Response } from "express";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 import { demoUserNotAllowed } from "@/middleware/demo.middleware";
-import { IConfigService } from "@/services/core/config.service";
 import { PrinterCache } from "@/state/printer.cache";
 import { MoonrakerType } from "@/services/printer-api.interface";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";

@@ -26,13 +26,8 @@ import {
 import { SqliteIdType } from "@/shared.constants";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
 import { ICredentialSettings } from "@/models/Settings";
-import { TypeormService } from "@/services/typeorm/typeorm.service";
 
 export class SettingsService extends BaseService(Settings, SettingsDto) implements ISettingsService<SqliteIdType, Settings> {
-  constructor(typeormService: TypeormService) {
-    super(typeormService);
-  }
-
   toDto(entity: Settings): SettingsDto<SqliteIdType> {
     return {
       [serverSettingsKey]: {

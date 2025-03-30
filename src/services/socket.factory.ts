@@ -5,7 +5,7 @@ import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
 import { CradleService } from "@/services/cradle.service";
 
 export class SocketFactory {
-  constructor(private cradleService: CradleService) {}
+  constructor(private readonly cradleService: CradleService) {}
 
   createInstance(printerType: number): IWebsocketAdapter {
     const settingsStore = this.cradleService.resolve<SettingsStore>(DITokens.settingsStore);

@@ -1,4 +1,4 @@
-import { DeepPartial, DeleteResult, FindManyOptions, FindOneOptions, Repository } from "typeorm";
+import { DeepPartial, FindManyOptions, FindOneOptions, Repository } from "typeorm";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { SqliteIdType } from "@/shared.constants";
 import { IPagination } from "@/services/interfaces/page.interface";

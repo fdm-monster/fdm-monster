@@ -6,7 +6,7 @@ import { IdType } from "@/shared.constants";
 import { CradleService } from "./cradle.service";
 
 export class PrinterApiFactory {
-  constructor(private cradleService: CradleService) {}
+  constructor(private readonly cradleService: CradleService) {}
 
   getById(id: IdType): IPrinterApi {
     const printerCache = this.cradleService.resolve<PrinterCache>(DITokens.printerCache);
