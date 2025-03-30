@@ -2,12 +2,12 @@ import { before, DELETE, GET, PATCH, POST, route } from "awilix-express";
 import { authenticate, authorizeRoles } from "@/middleware/authenticate";
 import { validateInput, validateMiddleware } from "@/handlers/validators";
 import {
-  feedRateRules,
-  flowRateRules,
-  testPrinterApiRules,
-  updatePrinterConnectionSettingRules,
-  updatePrinterDisabledReasonRules,
-  updatePrinterEnabledRule,
+  feedRateSchema,
+  flowRateSchema,
+  testPrinterApiSchema,
+  updatePrinterConnectionSettingSchema,
+  updatePrinterDisabledReasonSchema,
+  updatePrinterEnabledSchema,
 } from "./validation/printer-controller.validation";
 import { AppConstants } from "@/server.constants";
 import { printerResolveMiddleware } from "@/middleware/printer";
@@ -120,7 +120,7 @@ export class PrinterController {
   @route("/:id/enabled")
   async updateEnabled(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
-    const data = await validateMiddleware(req, updatePrinterEnabledRule);
+    const data = await validateMiddleware(req, updatePrinterEnabledSchema);
     await this.printerService.updateEnabled(currentPrinterId, data.enabled);
     res.send({});
   }
@@ -129,7 +129,7 @@ export class PrinterController {
   @route("/:id/disabled-reason")
   async updatePrinterDisabledReason(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
-    const data = await validateMiddleware(req, updatePrinterDisabledReasonRules);
+    const data = await validateMiddleware(req, updatePrinterDisabledReasonSchema);
     await this.printerService.updateDisabledReason(currentPrinterId, data.disabledReason);
     res.send({});
   }
@@ -138,7 +138,7 @@ export class PrinterController {
   @route("/:id/connection")
   async updateConnectionSettings(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
-    const inputData = await validateMiddleware(req, updatePrinterConnectionSettingRules);
+    const inputData = await validateMiddleware(req, updatePrinterConnectionSettingSchema);
 
     if (req.query.forceSave !== "true") {
       await this.testPrintApiConnection(inputData);
@@ -167,7 +167,7 @@ export class PrinterController {
     if (req.body.printerURL?.length) {
       req.body.printerURL = normalizeUrl(req.body.printerURL, { defaultProtocol: defaultHttpProtocol });
     }
-    const newPrinter = await validateMiddleware(req, testPrinterApiRules);
+    const newPrinter = await validateMiddleware(req, testPrinterApiSchema);
     newPrinter.correlationToken = generateCorrelationToken();
     this.logger.log(`Testing printer with correlation token ${newPrinter.correlationToken}`);
 
@@ -248,7 +248,7 @@ export class PrinterController {
   }
 
   private async testPrintApiConnection(inputLoginDto: LoginDto) {
-    await validateInput(inputLoginDto, updatePrinterConnectionSettingRules);
+    await validateInput(inputLoginDto, updatePrinterConnectionSettingSchema);
     try {
       if (this.printerApi) {
         await this.printerApi.getVersion();
@@ -299,7 +299,7 @@ export class PrinterController {
   @route("/:id/feed-rate")
   async setFeedRate(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
-    const data = await validateMiddleware(req, feedRateRules);
+    const data = await validateMiddleware(req, feedRateSchema);
 
     await this.printerService.updateFeedRate(currentPrinterId, data.feedRate);
     res.send({});
@@ -309,7 +309,7 @@ export class PrinterController {
   @route("/:id/flow-rate")
   async setFlowRate(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
-    const data = await validateMiddleware(req, flowRateRules);
+    const data = await validateMiddleware(req, flowRateSchema);
     await this.printerService.updateFlowRate(currentPrinterId, data.flowRate);
     res.send({});
   }

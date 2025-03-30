@@ -1,7 +1,7 @@
 import { User } from "@/models";
 import { InternalServerException, NotFoundException } from "@/exceptions/runtime.exceptions";
 import { validateInput } from "@/handlers/validators";
-import { newPasswordRules, registerUserRules } from "../validators/user-service.validation";
+import { newPasswordSchema, registerUserSchema } from "../validators/user-service.validation";
 import { ROLES } from "@/constants/authorization.constants";
 import { comparePasswordHash, hashPassword } from "@/utils/crypto.utils";
 import { RoleService } from "@/services/mongoose/role.service";
@@ -80,7 +80,6 @@ export class UserService implements IUserService<MongoIdType> {
   }
 
   async deleteUser(userId: MongoIdType) {
-    // Validate
     const user = await this.getUser(userId);
 
     if (user.isRootUser) {
@@ -115,14 +114,14 @@ export class UserService implements IUserService<MongoIdType> {
       throw new NotFoundException("User old password incorrect");
     }
 
-    const { password } = await validateInput({ password: newPassword }, newPasswordRules);
+    const { password } = await validateInput({ password: newPassword }, newPasswordSchema);
     user.passwordHash = hashPassword(password);
     user.needsPasswordChange = false;
     return await user.save();
   }
 
   async updatePasswordUnsafeByUsername(username: string, newPassword: string) {
-    const { password } = await validateInput({ password: newPassword }, newPasswordRules);
+    const { password } = await validateInput({ password: newPassword }, newPasswordSchema);
     const passwordHash = hashPassword(password);
     const user = await this.findRawByUsername(username);
     if (!user) throw new NotFoundException("User not found");
@@ -171,7 +170,7 @@ export class UserService implements IUserService<MongoIdType> {
   async register(input: RegisterUserDto<MongoIdType>) {
     const { username, password, roles, isDemoUser, isRootUser, needsPasswordChange, isVerified } = await validateInput(
       input,
-      registerUserRules(false)
+      registerUserSchema(false)
     );
 
     const passwordHash = hashPassword(password);

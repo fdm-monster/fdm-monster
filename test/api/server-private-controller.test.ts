@@ -4,11 +4,11 @@ import { load } from "js-yaml";
 import { exportYamlBuffer1_3_1 } from "../application/test-data/yaml-import";
 import { AppConstants } from "@/server.constants";
 import { validateInput } from "@/handlers/validators";
-import { importPrintersFloorsYamlRules } from "@/services/validators/yaml-service.validation";
 import { Test } from "supertest";
 import { ServerPrivateController } from "@/controllers/server-private.controller";
 import TestAgent from "supertest/lib/agent";
 import nock from "nock";
+import { importPrintersFloorsYamlSchema } from "@/services/validators/yaml-service.validation";
 
 let request: TestAgent<Test>;
 
@@ -68,7 +68,7 @@ describe(ServerPrivateController.name, () => {
     expectOkResponse(response);
 
     const yamlObject = load(response.text);
-    await validateInput(yamlObject, importPrintersFloorsYamlRules(true, true, true, true));
+    await validateInput(yamlObject, importPrintersFloorsYamlSchema(true, true, true, true));
   });
 
   test.skip("should import YAML and have data loaded", async () => {

@@ -44,7 +44,20 @@ describe(PrinterController.name, () => {
       apiKey: "notcorrect",
       tempTriggers: { heatingVariation: null },
     });
-    expectInvalidResponse(response, ["apiKey"]);
+    expectInvalidResponse(
+      response,
+      [
+        {
+          code: "invalid_type",
+          path: "printerType",
+        },
+        {
+          code: "too_small",
+          path: "apiKey",
+        },
+      ],
+      true
+    );
   });
 
   it(`should be able to POST ${createRoute} moonraker without api key`, async () => {
@@ -132,7 +145,12 @@ describe(PrinterController.name, () => {
 
   it("should invalidate to malformed singular printer json array", async () => {
     const response = await request.post(batchRoute).send([{}]);
-    expectInvalidResponse(response, ["printerURL"]);
+    expectInvalidResponse(response, [
+      {
+        code: "invalid_type",
+        path: "printerURL",
+      },
+    ]);
   });
 
   it("should import to singular printer json array", async () => {
@@ -212,7 +230,13 @@ describe(PrinterController.name, () => {
 
   it("should invalidate empty test printer connection", async () => {
     const res = await request.post(testPrinterRoute).send();
-    expectInvalidResponse(res, ["printerType", "printerURL"]);
+    expectInvalidResponse(res, [
+      {
+        path: "printerType",
+        code: "invalid_type",
+      },
+      { path: "printerURL", code: "invalid_type" },
+    ]);
   });
 
   it("should test printer connection", async () => {

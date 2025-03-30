@@ -9,6 +9,7 @@ import { ValidationException } from "@/exceptions/runtime.exceptions";
 import { TestPrinterSocketStore } from "@/state/test-printer-socket.store";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
+import { ZodError } from "zod";
 
 let printerService: PrinterService;
 let printerCache: PrinterCache;
@@ -46,11 +47,41 @@ describe(PrinterSocketStore.name, () => {
   it("should avoid adding invalid printer", async () => {
     await expect(async () => await printerService.create({})).rejects.toBeInstanceOf(ValidationException);
 
-    expect(() => printerService.create(invalidNewPrinterState)).rejects.toHaveErrors({
-      apiKey: {
-        rule: "length",
-      },
-    });
+    await expect(() => printerService.create(invalidNewPrinterState)).rejects.toBeInstanceOf(ValidationException);
+    await expect(() => printerService.create(invalidNewPrinterState)).rejects.toHaveErrors(
+      new ZodError([
+        {
+          code: "invalid_type",
+          expected: "string",
+          received: "null",
+          path: ["printerURL"],
+          message: "Expected string, received null",
+        },
+        {
+          code: "invalid_type",
+          expected: "number",
+          received: "undefined",
+          path: ["printerType"],
+          message: "Required",
+        },
+        {
+          code: "too_small",
+          minimum: 32,
+          type: "string",
+          inclusive: true,
+          exact: false,
+          message: "String must contain at least 32 character(s)",
+          path: ["apiKey"],
+        },
+        {
+          code: "invalid_type",
+          expected: "string",
+          received: "undefined",
+          path: ["name"],
+          message: "Required",
+        },
+      ])
+    );
 
     await expect(async () => await printerService.create(weakNewPrinter)).rejects.toBeInstanceOf(ValidationException);
 

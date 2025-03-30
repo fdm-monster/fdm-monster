@@ -1,8 +1,8 @@
 import { validateInput } from "@/handlers/validators";
 import {
-  exportPrintersFloorsYamlRules,
-  importPrinterPositionsRules,
-  importPrintersFloorsYamlRules,
+  exportPrintersFloorsYamlSchema,
+  importPrinterPositionsSchema,
+  importPrintersFloorsYamlSchema,
 } from "../validators/yaml-service.validation";
 import { dump, load } from "js-yaml";
 import { LoggerService } from "@/handlers/logger";
@@ -75,13 +75,13 @@ export class YamlService {
 
     const importData = await validateInput(
       importSpec,
-      importPrintersFloorsYamlRules(exportPrinters, exportFloorGrid, exportFloors, exportGroups)
+      importPrintersFloorsYamlSchema(exportPrinters, exportFloorGrid, exportFloors, exportGroups)
     );
 
     // Nested validation is manual (for now)
     if (!!exportFloorGrid) {
       for (const floor of importData.floors) {
-        await validateInput(floor, importPrinterPositionsRules(this.isTypeormMode));
+        await validateInput(floor, importPrinterPositionsSchema(this.isTypeormMode));
       }
     }
 
@@ -412,18 +412,8 @@ export class YamlService {
   }
 
   async exportPrintersAndFloors(options) {
-    const input = await validateInput(options, exportPrintersFloorsYamlRules);
-    const {
-      exportFloors,
-      exportPrinters,
-      exportFloorGrid,
-      exportGroups,
-      // dropPrinterIds, // optional idea for future
-      // dropFloorIds, // optional idea for future
-      // printerComparisonStrategiesByPriority, // not used for export
-      // floorComparisonStrategiesByPriority, // not used for export
-      // notes, // passed on to config immediately
-    } = input;
+    const input = await validateInput(options, exportPrintersFloorsYamlSchema);
+    const { exportFloors, exportPrinters, exportFloorGrid, exportGroups } = input;
 
     if (!this.isTypeormMode) {
       input.exportGroups = false;

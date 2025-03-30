@@ -1,7 +1,7 @@
 import { AnyArray, model, Schema } from "mongoose";
 
-export interface IUser {
-  id: string;
+export interface IUser<KeyType = string> {
+  id: KeyType;
   username: string;
   isDemoUser: boolean;
   isRootUser: boolean;

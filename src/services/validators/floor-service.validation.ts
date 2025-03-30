@@ -1,36 +1,46 @@
+import { z } from "zod";
 import { minFloorNameLength } from "@/constants/service.constants";
 import { idRuleV2 } from "@/controllers/validation/generic.validation";
 
-export const removePrinterInFloorRules = (isSqlite: boolean) => ({
-  printerId: idRuleV2(isSqlite),
+export const removePrinterInFloorSchema = (isSqlite: boolean) =>
+  z.object({
+    printerId: idRuleV2(isSqlite),
+  });
+
+export const printerInFloorSchema = (isSqlite: boolean) =>
+  z.object({
+    printerId: idRuleV2(isSqlite),
+    floorId: idRuleV2(isSqlite),
+    x: z.number().int().min(0).max(12),
+    y: z.number().int().min(0).max(12),
+  });
+
+export const updateFloorNameSchema = z.object({
+  name: z.string().min(minFloorNameLength),
 });
 
-export const printerInFloorRules = (isSqlite: boolean) => ({
-  printerId: idRuleV2(isSqlite),
-  floorId: idRuleV2(isSqlite),
-  x: "required|integer|between:0,12",
-  y: "required|integer|between:0,12",
+export const updateFloorLevelSchema = z.object({
+  floor: z.number().int(),
 });
 
-export const updateFloorNameRules = {
-  name: `required|minLength:${minFloorNameLength}`,
-};
+export const updateFloorSchema = (isSqlite: boolean) =>
+  z.object({
+    name: z.string().min(minFloorNameLength),
+    floor: z.number().int(),
+    printers: z
+      .array(
+        z.object({
+          printerId: idRuleV2(isSqlite),
+          floorId: idRuleV2(isSqlite),
+          x: z.number().min(0).max(12),
+          y: z.number().min(0).max(12),
+        })
+      )
+      .optional(),
+  });
 
-export const updateFloorNumberRules = {
-  floor: "required|integer",
-};
-
-export const updateFloorRules = {
-  name: `required|minLength:${minFloorNameLength}`,
-  floor: "required|integer",
-  printers: "array",
-  "printer.*.printerId": "required|mongoId",
-  "printer.*.x": "required|integer|between:0,12",
-  "printer.*.y": "required|integer|between:0,12",
-};
-
-export const createFloorRules = {
-  name: `required|minLength:${minFloorNameLength}`,
-  floor: "required|integer",
-  printers: "array",
-};
+export const createFloorSchema = (isSqlite: boolean) =>
+  z.object({
+    name: z.string().min(minFloorNameLength),
+    floor: z.number().int(),
+  });

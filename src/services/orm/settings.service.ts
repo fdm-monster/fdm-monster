@@ -1,7 +1,6 @@
 import { Settings } from "@/entities";
 import {
   credentialSettingsKey,
-  printerFileCleanSettingKey,
   frontendSettingKey,
   getDefaultCredentialSettings,
   getDefaultFileCleanSettings,
@@ -9,6 +8,7 @@ import {
   getDefaultServerSettings,
   getDefaultTimeout,
   getDefaultWizardSettings,
+  printerFileCleanSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
   wizardSettingKey,

@@ -6,13 +6,13 @@ import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { SqliteIdType } from "@/shared.constants";
 import { validateInput } from "@/handlers/validators";
-import { createPrinterRules } from "@/services/validators/printer-service.validation";
 import { printerEvents } from "@/constants/event.constants";
 import EventEmitter2 from "eventemitter2";
 import { DeleteResult } from "typeorm";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { normalizeUrl } from "@/utils/normalize-url";
 import { defaultHttpProtocol } from "@/utils/url.utils";
+import { createPrinterSchema } from "@/services/validators/printer-service.validation";
 
 export class PrinterService
   extends BaseService(Printer, PrinterDto<SqliteIdType>)
@@ -78,7 +78,7 @@ export class PrinterService
       partial.printerURL = normalizeUrl(partial.printerURL, { defaultProtocol: defaultHttpProtocol });
     }
     Object.assign(printer, partial);
-    const { printerURL, apiKey, enabled, name, printerType } = await validateInput(printer, createPrinterRules);
+    const { printerURL, apiKey, enabled, name, printerType } = await validateInput(printer, createPrinterSchema);
 
     const updatedPrinter = await super.update(printerId, {
       printerURL,
@@ -155,6 +155,8 @@ export class PrinterService
     if (mergedPrinter.printerURL?.length) {
       mergedPrinter.printerURL = normalizeUrl(mergedPrinter.printerURL, { defaultProtocol: defaultHttpProtocol });
     }
-    return await validateInput(mergedPrinter, createPrinterRules);
+    await validateInput(mergedPrinter, createPrinterSchema);
+
+    return mergedPrinter;
   }
 }

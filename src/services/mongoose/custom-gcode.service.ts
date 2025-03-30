@@ -6,7 +6,7 @@ import { ICustomGcodeService } from "@/services/interfaces/custom-gcode.service.
 import { ICustomGcode } from "@/models/CustomGcode";
 
 export class CustomGcodeService implements ICustomGcodeService<MongoIdType> {
-  toDto(document: ICustomGcode): CustomGcodeDto {
+  toDto(document: ICustomGcode): CustomGcodeDto<MongoIdType> {
     return {
       id: document.id,
       name: document.name,
