@@ -1,4 +1,5 @@
 export const DITokens = {
+  cradleService: "cradleService",
   // Values
   serverVersion: "serverVersion",
   isTypeormMode: "isTypeormMode",
