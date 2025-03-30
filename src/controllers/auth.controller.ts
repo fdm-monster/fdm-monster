@@ -13,6 +13,7 @@ import { IRoleService } from "@/services/interfaces/role-service.interface";
 import { demoUserNotAllowed } from "@/middleware/demo.middleware";
 import { IConfigService } from "@/services/core/config.service";
 import { registerUserSchema } from "@/controllers/validation/user-controller.validation";
+import { validateMiddleware } from "@/handlers/validators";
 
 @route(AppConstants.apiRoute + "/auth")
 export class AuthController {

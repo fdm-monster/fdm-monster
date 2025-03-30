@@ -93,7 +93,7 @@ export const importPrinterPositionsSchema = (isSqliteMode: boolean) =>
       .array(
         z.object({
           printerId: numberOrStringIdValidator,
-          floorId: numberOrStringIdValidator,
+          floorId: numberOrStringIdValidator.optional(),
           x: xValidator,
           y: yValidator,
         })
