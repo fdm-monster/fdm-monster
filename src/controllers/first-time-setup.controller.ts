@@ -32,9 +32,8 @@ export class FirstTimeSetupController {
   @POST()
   @route("/validate")
   async validateWizard(req: Request, res: Response) {
-    const { loginRequired, registration, rootUsername, rootPassword } = await validateMiddleware(req, wizardSettingsRules);
-
-    const role = await this.roleService.getSynchronizedRoleByName(ROLES.ADMIN);
+    const { rootUsername } = await validateMiddleware(req, wizardSettingsRules);
+    await this.roleService.getSynchronizedRoleByName(ROLES.ADMIN);
 
     if (this.settingsStore.isWizardCompleted()) {
       throw new ForbiddenError("Wizard already completed");

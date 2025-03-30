@@ -10,11 +10,9 @@ import { ParamId } from "@/middleware/param-converter.middleware";
 @before([authenticate(), authorizeRoles([ROLES.OPERATOR, ROLES.ADMIN])])
 export class CameraStreamController {
   private readonly cameraStreamService: ICameraStreamService;
-  private readonly isTypeormMode: boolean;
 
-  constructor({ cameraStreamService, isTypeormMode }: { cameraStreamService: ICameraStreamService; isTypeormMode: boolean }) {
+  constructor({ cameraStreamService }: { cameraStreamService: ICameraStreamService }) {
     this.cameraStreamService = cameraStreamService;
-    this.isTypeormMode = isTypeormMode;
   }
 
   @GET()
