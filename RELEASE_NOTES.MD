@@ -12,6 +12,7 @@
 - Remove unused console files
 - Update .env.template
 - Fix punycode warning by pinning tr46 package
+- Update API controller, use decorators over api builder
 
 ## Fixes
 
