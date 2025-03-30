@@ -23,7 +23,6 @@ const enabledRoute = (id: IdType) => `${updateRoute(id)}/enabled`;
 const disabledReasonRoute = (id: IdType) => `${updateRoute(id)}/disabled-reason`;
 const feedRateRoute = (id: IdType) => `${updateRoute(id)}/feed-rate`;
 const flowRateRoute = (id: IdType) => `${updateRoute(id)}/flow-rate`;
-const printerPluginListRoute = (id: IdType) => `${getRoute(id)}/plugin-list`;
 const restartOctoPrintRoute = (id: IdType) => `${getRoute(id)}/octoprint/server/restart`;
 const serialConnectCommandRoute = (id: IdType) => `${getRoute(id)}/serial-connect`;
 const serialDisconnectCommandRoute = (id: IdType) => `${getRoute(id)}/serial-disconnect`;

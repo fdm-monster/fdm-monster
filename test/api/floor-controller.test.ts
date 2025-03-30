@@ -10,7 +10,6 @@ import { FloorController } from "@/controllers/floor.controller";
 import { IdType } from "@/shared.constants";
 import { getDatasource, isSqliteModeTest } from "../typeorm.manager";
 import TestAgent from "supertest/lib/agent";
-import nock from "nock";
 
 const listRoute = `${AppConstants.apiRoute}/floor`;
 const getRoute = (id: IdType) => `${listRoute}/${id}`;

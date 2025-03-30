@@ -1,4 +1,4 @@
-import { SuperTest } from "supertest";
+import { Test } from "supertest";
 import { setupTestApp } from "../test-server";
 import { PrinterGroupController } from "@/controllers/printer-group.controller";
 import { AppConstants } from "@/server.constants";
@@ -7,8 +7,9 @@ import { testIf } from "../utils/conditional-if";
 import { isSqliteModeTest } from "../typeorm.manager";
 import { createTestPrinter } from "./test-data/create-printer";
 import { GroupWithPrintersDto } from "@/services/interfaces/group.dto";
+import TestAgent from "supertest/lib/agent";
 
-let request: SuperTest<supertest.Test>;
+let request: TestAgent<Test>;
 
 beforeAll(async () => {
   ({ request } = await setupTestApp(true));

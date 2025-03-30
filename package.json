@@ -52,6 +52,9 @@
     "node",
     "vue"
   ],
+  "resolutions": {
+    "tr46": "5.1.0"
+  },
   "dependencies": {
     "@fdm-monster/client": "1.9.0",
     "@fdm-monster/client-next": "0.0.18",
