@@ -67,6 +67,12 @@ export class FloorService implements IFloorService<MongoIdType> {
 
   async update(floorId: MongoIdType, input: UpdateFloorDto<MongoIdType>) {
     const existingFloor = await this.get(floorId);
+
+    if (input.printers) {
+      for (const position of input.printers) {
+        position.floorId = existingFloor.id;
+      }
+    }
     const { name, floor, printers } = await validateInput(input, updateFloorRules);
     existingFloor.name = name;
     existingFloor.floor = floor;
