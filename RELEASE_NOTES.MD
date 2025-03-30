@@ -11,6 +11,7 @@
 - Remove cache-manager package
 - Remove unused console files
 - Update .env.template
+- Fix punycode warning by pinning tr46 package
 
 ## Fixes
 
