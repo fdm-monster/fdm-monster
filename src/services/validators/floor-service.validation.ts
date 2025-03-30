@@ -7,7 +7,7 @@ export const removePrinterInFloorRules = (isSqlite: boolean) => ({
 
 export const printerInFloorRules = (isSqlite: boolean) => ({
   printerId: idRuleV2(isSqlite),
-  floorId: isSqlite ? idRuleV2(true) : "not",
+  floorId: idRuleV2(isSqlite),
   x: "required|integer|between:0,12",
   y: "required|integer|between:0,12",
 });
