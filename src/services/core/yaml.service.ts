@@ -152,6 +152,7 @@ export class YamlService {
           delete floorPosition.id;
           delete floorPosition.floorId;
           floorPosition.printerId = knownPrinterId;
+          floorPosition.floorId = updateId;
           knownPrinterPositions.push(floorPosition);
         }
         newFloor.printers = knownPrinterPositions;
