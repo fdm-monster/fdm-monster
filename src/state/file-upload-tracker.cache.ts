@@ -9,11 +9,10 @@ import { IdType } from "@/shared.constants";
 
 export class FileUploadTrackerCache {
   private currentUploads: TrackedUpload[] = [];
-  private eventEmitter2: EventEmitter2;
-  private logger: LoggerService;
 
-  constructor({ loggerFactory, eventEmitter2 }: { loggerFactory: ILoggerFactory; eventEmitter2: EventEmitter2 }) {
-    this.eventEmitter2 = eventEmitter2;
+  private readonly logger: LoggerService;
+
+  constructor(loggerFactory: ILoggerFactory, private readonly eventEmitter2: EventEmitter2) {
     this.logger = loggerFactory(FileUploadTrackerCache.name);
 
     this.eventEmitter2.on(uploadProgressEvent("*"), (token, progress) => this.handleUploadProgress(token, progress));

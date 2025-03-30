@@ -4,8 +4,7 @@ import { SettingsStore } from "@/state/settings.store";
 import EventEmitter2 from "eventemitter2";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
-import * as http from "http";
-import { AuthService } from "@/services/authentication/auth.service";
+import { Server as HttpServer } from "http";
 import { getPassportJwtOptions, verifyUserCallback } from "@/middleware/passport";
 import { IConfigService } from "@/services/core/config.service";
 import { Strategy as JwtStrategy, StrategyOptions, VerifiedCallback } from "passport-jwt";
@@ -42,38 +41,20 @@ const authorize = (
 
 export class SocketIoGateway {
   logger: LoggerService;
-  eventEmitter2: EventEmitter2;
+
   io: Server;
 
-  authService: AuthService;
-  settingsStore: SettingsStore;
-  configService: IConfigService;
-  userService: IUserService;
-
-  constructor({
-    loggerFactory,
-    eventEmitter2,
-    settingsStore,
-    authService,
-    configService,
-    userService,
-  }: {
-    loggerFactory: ILoggerFactory;
-    eventEmitter2: EventEmitter2;
-    settingsStore: SettingsStore;
-    authService: AuthService;
-    userService: IUserService;
-    configService: IConfigService;
-  }) {
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly eventEmitter2: EventEmitter2,
+    private readonly settingsStore: SettingsStore,
+    private readonly userService: IUserService,
+    private readonly configService: IConfigService
+  ) {
     this.logger = loggerFactory(SocketIoGateway.name);
-    this.eventEmitter2 = eventEmitter2;
-    this.settingsStore = settingsStore;
-    this.authService = authService;
-    this.userService = userService;
-    this.configService = configService;
   }
 
-  attachServer(httpServer: http.Server) {
+  attachServer(httpServer: HttpServer) {
     this.io = new Server(httpServer, { cors: { origin: "*" } });
     const opts = getPassportJwtOptions(this.settingsStore, this.configService, (value: Socket) => value.handshake.auth.token);
     const verify = verifyUserCallback(this.userService);

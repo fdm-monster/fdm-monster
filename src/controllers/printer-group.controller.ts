@@ -9,13 +9,7 @@ import { ParamId } from "@/middleware/param-converter.middleware";
 @route(AppConstants.apiRoute + "/printer-group")
 @before([authenticate(), authorizeRoles([ROLES.OPERATOR, ROLES.ADMIN])])
 export class PrinterGroupController {
-  printerGroupService: IPrinterGroupService;
-  isTypeormMode: boolean;
-
-  constructor({ printerGroupService, isTypeormMode }: { printerGroupService: IPrinterGroupService; isTypeormMode: boolean }) {
-    this.printerGroupService = printerGroupService;
-    this.isTypeormMode = isTypeormMode;
-  }
+  constructor(private readonly printerGroupService: IPrinterGroupService) {}
 
   @GET()
   @route("/")

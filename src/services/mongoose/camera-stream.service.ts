@@ -16,11 +16,8 @@ const createCameraStreamRules = {
 
 export class CameraStreamService implements ICameraStreamService<MongoIdType> {
   model = CameraStream;
-  printerCache: PrinterCache;
 
-  constructor({ printerCache }: { printerCache: PrinterCache }) {
-    this.printerCache = printerCache;
-  }
+  constructor(private readonly printerCache: PrinterCache) {}
 
   async list() {
     return this.model.find();

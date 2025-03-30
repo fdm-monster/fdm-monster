@@ -31,22 +31,15 @@ type TAxes = "x" | "y" | "z";
  * https://docs.octoprint.org/en/master/api/index.html
  */
 export class OctoprintClient extends OctoprintRoutes {
-  eventEmitter2: EventEmitter2;
-  protected httpClientFactory: HttpClientFactory;
   protected logger: LoggerService;
 
-  constructor({
-    httpClientFactory,
-    loggerFactory,
-    eventEmitter2,
-  }: {
-    httpClientFactory: HttpClientFactory;
-    loggerFactory: ILoggerFactory;
-    eventEmitter2: EventEmitter2;
-  }) {
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly httpClientFactory: HttpClientFactory,
+    private readonly eventEmitter2: EventEmitter2
+  ) {
     super();
-    this.httpClientFactory = httpClientFactory;
-    this.eventEmitter2 = eventEmitter2;
+
     this.logger = loggerFactory(OctoprintClient.name);
   }
 

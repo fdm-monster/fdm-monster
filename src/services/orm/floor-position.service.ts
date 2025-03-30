@@ -5,8 +5,8 @@ import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { PositionDto } from "@/services/interfaces/floor.dto";
 
 export class FloorPositionService extends BaseService(FloorPosition, PositionDto<SqliteIdType>) {
-  constructor({ typeormService }: { typeormService: TypeormService }) {
-    super({ typeormService });
+  constructor(typeormService: TypeormService) {
+    super(typeormService);
   }
 
   async create(dto: PositionDto<SqliteIdType>): Promise<FloorPosition> {

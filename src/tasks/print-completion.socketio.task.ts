@@ -1,7 +1,6 @@
 import { fdmMonsterPrinterStoppedEvent, octoPrintWebsocketEvent } from "@/constants/event.constants";
 import { EVENT_TYPES } from "@/services/octoprint/constants/octoprint-websocket.constants";
 import { generateCorrelationToken } from "@/utils/correlation-token.util";
-import { SocketIoGateway } from "@/state/socket-io.gateway";
 import EventEmitter2 from "eventemitter2";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
@@ -12,31 +11,16 @@ import { PrinterEventsCache } from "@/state/printer-events.cache";
 import { IPrintCompletionService } from "@/services/interfaces/print-completion.interface";
 
 export class PrintCompletionSocketIoTask {
-  eventEmitter2: EventEmitter2;
-  socketIoGateway: SocketIoGateway;
-  logger: LoggerService;
-  printerEventsCache: PrinterEventsCache;
-  printCompletionService: IPrintCompletionService;
+  private readonly logger: LoggerService;
 
   contextCache: Record<IdType, PrintCompletionContext> = {};
 
-  constructor({
-    eventEmitter2,
-    socketIoGateway,
-    printCompletionService,
-    printerEventsCache,
-    loggerFactory,
-  }: {
-    eventEmitter2: EventEmitter2;
-    socketIoGateway: SocketIoGateway;
-    printCompletionService: IPrintCompletionService;
-    printerEventsCache: PrinterEventsCache;
-    loggerFactory: ILoggerFactory;
-  }) {
-    this.eventEmitter2 = eventEmitter2;
-    this.socketIoGateway = socketIoGateway;
-    this.printerEventsCache = printerEventsCache;
-    this.printCompletionService = printCompletionService;
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly eventEmitter2: EventEmitter2,
+    private readonly printCompletionService: IPrintCompletionService,
+    private readonly printerEventsCache: PrinterEventsCache
+  ) {
     this.logger = loggerFactory(PrintCompletionSocketIoTask.name);
 
     let that = this;

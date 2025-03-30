@@ -14,23 +14,12 @@ import { ROLES } from "@/constants/authorization.constants";
 import { RoleService } from "@/services/orm/role.service";
 
 export class UserService extends BaseService(User, UserDto<SqliteIdType>) implements IUserService<SqliteIdType, User> {
-  typeormService: TypeormService;
-  userRoleService: UserRoleService;
-  roleService: RoleService;
-
-  constructor({
-    typeormService,
-    userRoleService,
-    roleService,
-  }: {
-    typeormService: TypeormService;
-    userRoleService: UserRoleService;
-    roleService: RoleService;
-  }) {
-    super({ typeormService });
-
-    this.userRoleService = userRoleService;
-    this.roleService = roleService;
+  constructor(
+    typeormService: TypeormService,
+    private readonly userRoleService: UserRoleService,
+    private readonly roleService: RoleService
+  ) {
+    super(typeormService);
   }
 
   toDto(user: User): UserDto<SqliteIdType> {

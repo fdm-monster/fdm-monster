@@ -17,33 +17,16 @@ import { IConfigService } from "@/services/core/config.service";
 
 @route(AppConstants.apiRoute + "/auth")
 export class AuthController {
-  authService: IAuthService;
-  settingsStore: SettingsStore;
-  userService: IUserService;
-  roleService: IRoleService;
   logger: LoggerService;
-  configService: IConfigService;
 
-  constructor({
-    authService,
-    settingsStore,
-    userService,
-    roleService,
-    loggerFactory,
-    configService,
-  }: {
-    authService: IAuthService;
-    settingsStore: SettingsStore;
-    userService: IUserService;
-    roleService: IRoleService;
-    loggerFactory: ILoggerFactory;
-    configService: IConfigService;
-  }) {
-    this.authService = authService;
-    this.settingsStore = settingsStore;
-    this.userService = userService;
-    this.roleService = roleService;
-    this.configService = configService;
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly authService: IAuthService,
+    private readonly settingsStore: SettingsStore,
+    private readonly userService: IUserService,
+    private readonly roleService: IRoleService,
+    private readonly configService: IConfigService
+  ) {
     this.logger = loggerFactory(AuthController.name);
   }
 

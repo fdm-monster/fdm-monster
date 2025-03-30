@@ -37,4 +37,4 @@ export const EVENT_TYPES = {
   UserLoggedIn: "UserLoggedIn",
   Waiting: "Waiting",
   ZChange: "ZChange",
-};
+} as const;

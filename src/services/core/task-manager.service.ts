@@ -1,23 +1,23 @@
 import { AsyncTask, SimpleIntervalJob, ToadScheduler } from "toad-scheduler";
 import { AwilixResolutionError } from "awilix";
 import { JobValidationException } from "@/exceptions/job.exceptions";
-import { DITokens } from "@/container.tokens";
 import { LoggerService } from "@/handlers/logger";
+import { CradleService } from "@/services/cradle.service";
+import { ILoggerFactory } from "@/handlers/logger-factory";
 
 /**
  * Manage immediate or delayed tasks and recurring jobs.
  */
 export class TaskManagerService {
-  jobScheduler: ToadScheduler;
   taskStates: Record<string, any> = {};
+  logger: LoggerService;
 
-  private cradle: any;
-  private logger: LoggerService;
-
-  constructor(container: any) {
-    this.cradle = container;
-    this.logger = container[DITokens.loggerFactory](TaskManagerService.name);
-    this.jobScheduler = container[DITokens.toadScheduler];
+  constructor(
+    private readonly cradleService: CradleService,
+    private readonly loggerFactory: ILoggerFactory,
+    private readonly toadScheduler: ToadScheduler
+  ) {
+    this.logger = loggerFactory(TaskManagerService.name);
   }
 
   validateInput(taskId: string, workload, schedulerOptions) {
@@ -39,7 +39,7 @@ export class TaskManagerService {
 
       let resolvedService;
       try {
-        resolvedService = this.cradle[workload];
+        resolvedService = this.cradleService.resolve(workload);
       } catch (e) {
         if (e instanceof AwilixResolutionError) {
           throw new JobValidationException(
@@ -166,7 +166,7 @@ export class TaskManagerService {
     this.getTaskState(taskId);
 
     delete this.taskStates[taskId];
-    this.jobScheduler.removeById(taskId);
+    this.toadScheduler.removeById(taskId);
   }
 
   getTaskState(taskId: string) {
@@ -195,7 +195,7 @@ export class TaskManagerService {
     let taskState = this.taskStates[taskId];
     taskState.started = Date.now();
     if (typeof handler === "string") {
-      const taskService = this.cradle[handler];
+      const taskService = this.cradleService.resolve(handler);
       await taskService.run();
     } else {
       await handler();
@@ -226,7 +226,7 @@ export class TaskManagerService {
    * Stops the tasks which were registered
    */
   stopSchedulerTasks() {
-    this.jobScheduler.stop();
+    this.toadScheduler.stop();
   }
 
   #scheduleEnabledPeriodicJob(taskId: string) {
@@ -246,7 +246,7 @@ export class TaskManagerService {
       this.logger.log(`Task '${taskId}' was scheduled (runImmediately: ${!!schedulerOptions.runImmediately}).`);
       const job = new SimpleIntervalJob(schedulerOptions, timedTask);
       taskState.job = job;
-      this.jobScheduler.addSimpleIntervalJob(job);
+      this.toadScheduler.addSimpleIntervalJob(job);
     } else {
       this.logger.log(`Task '${taskId}' was marked as disabled (deferred execution).`);
     }

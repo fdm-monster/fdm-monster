@@ -9,25 +9,14 @@ import { API_STATE } from "@/shared/dtos/api-state.type";
 import { OctoprintType } from "@/services/printer-api.interface";
 
 export class PrinterWebsocketRestoreTask {
-  settingsStore: SettingsStore;
-  printerSocketStore: PrinterSocketStore;
-  octoprintClient: OctoprintClient;
-  logger: LoggerService;
+  private readonly logger: LoggerService;
 
-  constructor({
-    printerSocketStore,
-    octoprintClient,
-    settingsStore,
-    loggerFactory,
-  }: {
-    printerSocketStore: PrinterSocketStore;
-    octoprintClient: OctoprintClient;
-    settingsStore: SettingsStore;
-    loggerFactory: ILoggerFactory;
-  }) {
-    this.printerSocketStore = printerSocketStore;
-    this.octoprintClient = octoprintClient;
-    this.settingsStore = settingsStore;
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly printerSocketStore: PrinterSocketStore,
+    private readonly octoprintClient: OctoprintClient,
+    private readonly settingsStore: SettingsStore
+  ) {
     this.logger = loggerFactory(PrinterWebsocketRestoreTask.name);
   }
 

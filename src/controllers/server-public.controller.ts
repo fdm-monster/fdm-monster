@@ -4,53 +4,20 @@ import { isNode } from "@/utils/env.utils";
 import { authenticate, permission } from "@/middleware/authenticate";
 import { PERMS } from "@/constants/authorization.constants";
 import { isDocker } from "@/utils/is-docker";
-import { RoleService } from "@/services/mongoose/role.service";
 import { SettingsStore } from "@/state/settings.store";
-import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { ServerReleaseService } from "@/services/core/server-release.service";
 import { MonsterPiService } from "@/services/core/monsterpi.service";
-import { UserService } from "@/services/mongoose/user.service";
 import { Request, Response } from "express";
 
 @route(AppConstants.apiRoute)
 export class ServerPublicController {
-  serverVersion: string;
-  settingsStore: SettingsStore;
-  printerSocketStore: PrinterSocketStore;
-  serverReleaseService: ServerReleaseService;
-  monsterPiService: MonsterPiService;
-  userService: UserService;
-  roleService: RoleService;
-  isTypeormMode: boolean;
-
-  constructor({
-    settingsStore,
-    printerSocketStore,
-    serverVersion,
-    serverReleaseService,
-    monsterPiService,
-    userService,
-    roleService,
-    isTypeormMode,
-  }: {
-    settingsStore: SettingsStore;
-    printerSocketStore: PrinterSocketStore;
-    serverVersion: string;
-    serverReleaseService: ServerReleaseService;
-    monsterPiService: MonsterPiService;
-    userService: UserService;
-    roleService: RoleService;
-    isTypeormMode: boolean;
-  }) {
-    this.settingsStore = settingsStore;
-    this.serverVersion = serverVersion;
-    this.printerSocketStore = printerSocketStore;
-    this.serverReleaseService = serverReleaseService;
-    this.monsterPiService = monsterPiService;
-    this.userService = userService;
-    this.roleService = roleService;
-    this.isTypeormMode = isTypeormMode;
-  }
+  constructor(
+    private readonly settingsStore: SettingsStore,
+    private readonly serverVersion: string,
+    private readonly serverReleaseService: ServerReleaseService,
+    private readonly monsterPiService: MonsterPiService,
+    private readonly isTypeormMode: boolean
+  ) {}
 
   @GET()
   @route("/")

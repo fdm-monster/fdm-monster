@@ -33,7 +33,7 @@ import { ROLES } from "./constants/authorization.constants";
 import { CustomGcodeService } from "./services/mongoose/custom-gcode.service";
 import { CustomGcodeService as CustomGcodeService2 } from "./services/orm/custom-gcode.service";
 import { PrinterWebsocketRestoreTask } from "./tasks/printer-websocket-restore.task";
-import { ConfigService } from "./services/core/config.service";
+import { ConfigService, IConfigService } from "./services/core/config.service";
 import { PrintCompletionSocketIoTask } from "./tasks/print-completion.socketio.task";
 import { PrintCompletionService } from "./services/mongoose/print-completion.service";
 import { PrintCompletionService as PrintCompletionService2 } from "./services/orm/print-completion.service";
@@ -58,7 +58,7 @@ import { AuthService } from "./services/authentication/auth.service";
 import { RefreshTokenService } from "@/services/mongoose/refresh-token.service";
 import { throttling } from "@octokit/plugin-throttling";
 import { RefreshTokenService as RefreshToken2 } from "@/services/orm/refresh-token.service";
-import { SettingsService2 } from "@/services/orm/settings.service";
+import { SettingsService as SettingsService2 } from "@/services/orm/settings.service";
 import { FloorService as FloorService2 } from "@/services/orm/floor.service";
 import { FloorPositionService } from "@/services/orm/floor-position.service";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
@@ -73,6 +73,7 @@ import { MoonrakerApi } from "@/services/moonraker.api";
 import { PrinterApiFactory } from "@/services/printer-api.factory";
 import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
 import { HttpClientFactory } from "@/services/core/http-client.factory";
+import { CradleService } from "@/services/cradle.service";
 
 export function config<T1, T2>(
   key: string,
@@ -88,7 +89,7 @@ export function config<T1, T2>(
 export function configureContainer(isSqlite: boolean = false) {
   // Create the container and set the injectionMode to PROXY (which is also the default).
   const container = createContainer({
-    injectionMode: InjectionMode.PROXY,
+    injectionMode: InjectionMode.CLASSIC,
   });
 
   const di = DITokens;
@@ -101,6 +102,7 @@ export function configureContainer(isSqlite: boolean = false) {
     [di.serverVersion]: asFunction(() => {
       return process.env[AppConstants.VERSION_KEY];
     }),
+    [di.cradleService]: asClass(CradleService).inject((container) => ({ container })),
     [di.socketFactory]: asClass(SocketFactory).transient(), // Factory function, transient on purpose!
 
     // V1.6.0 capable services
@@ -137,11 +139,10 @@ export function configureContainer(isSqlite: boolean = false) {
     [di.serverReleaseService]: asClass(ServerReleaseService).singleton(),
     [di.monsterPiService]: asClass(MonsterPiService).singleton(),
     [di.githubService]: asClass(GithubService),
-    [di.octokitService]: asFunction((cradle: any) => {
-      const config = cradle.configService;
+    [di.octokitService]: asFunction((configService: IConfigService) => {
       const CustomOctoKit = Octokit.plugin(throttling);
       return new CustomOctoKit({
-        auth: config.get(AppConstants.GITHUB_PAT),
+        auth: configService.get(AppConstants.GITHUB_PAT),
         throttle: {
           onRateLimit: (retryAfter, options, octokit, retryCount) => {
             const logger = LoggerFactory()("OctoKitThrottle");

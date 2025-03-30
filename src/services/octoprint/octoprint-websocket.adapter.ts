@@ -48,8 +48,9 @@ export const OctoPrintMessage = {
 export const octoPrintEvent = (event: string) => `octoprint.${event}`;
 
 export class OctoprintWebsocketAdapter extends WebsocketAdapter implements IWebsocketAdapter {
+  protected declare logger: LoggerService;
+
   public readonly printerType = 0;
-  octoprintClient: OctoprintClient;
   public printerId?: IdType;
   stateUpdated = false;
   stateUpdateTimestamp: null | number = null;
@@ -61,31 +62,20 @@ export class OctoprintWebsocketAdapter extends WebsocketAdapter implements IWebs
   reauthRequired = false;
   reauthRequiredTimestamp: null | number = null;
   login?: LoginDto;
-  protected declare logger: LoggerService;
-  private eventEmitter: EventEmitter2;
-  private configService: ConfigService;
   private socketURL?: URL;
   private sessionDto?: OP_LoginDto;
   private username?: string;
   private refreshPrinterCurrentInterval?: NodeJS.Timeout;
 
-  constructor({
-    loggerFactory,
-    octoprintClient,
-    eventEmitter2,
-    configService,
-  }: {
-    loggerFactory: ILoggerFactory;
-    octoprintClient: OctoprintClient;
-    eventEmitter2: EventEmitter2;
-    configService: ConfigService;
-  }) {
-    super({ loggerFactory });
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly octoprintClient: OctoprintClient,
+    private readonly eventEmitter2: EventEmitter2,
+    private readonly configService: ConfigService
+  ) {
+    super(loggerFactory);
 
     this.logger = loggerFactory(OctoprintWebsocketAdapter.name);
-    this.octoprintClient = octoprintClient;
-    this.eventEmitter = eventEmitter2;
-    this.configService = configService;
   }
 
   get _debugMode() {
@@ -288,7 +278,7 @@ export class OctoprintWebsocketAdapter extends WebsocketAdapter implements IWebs
       return;
     }
 
-    this.eventEmitter.emit(octoPrintEvent(event), {
+    this.eventEmitter2.emit(octoPrintEvent(event), {
       event,
       payload,
       printerId: this.printerId,
@@ -348,7 +338,7 @@ export class OctoprintWebsocketAdapter extends WebsocketAdapter implements IWebs
       return;
     }
 
-    await this.eventEmitter.emitAsync(octoPrintEvent(event), {
+    await this.eventEmitter2.emitAsync(octoPrintEvent(event), {
       event,
       payload,
       printerId: this.printerId,

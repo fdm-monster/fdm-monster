@@ -17,20 +17,10 @@ export class RefreshTokenService
   extends BaseService(RefreshToken, RefreshTokenDto<SqliteIdType>)
   implements IRefreshTokenService<SqliteIdType, RefreshToken>
 {
-  private settingsStore: SettingsStore;
   private logger: LoggerService;
 
-  constructor({
-    typeormService,
-    settingsStore,
-    loggerFactory,
-  }: {
-    typeormService: TypeormService;
-    settingsStore: SettingsStore;
-    loggerFactory: ILoggerFactory;
-  }) {
-    super({ typeormService });
-    this.settingsStore = settingsStore;
+  constructor(private readonly settingsStore: SettingsStore, loggerFactory: ILoggerFactory, typeormService: TypeormService) {
+    super(typeormService);
     this.logger = loggerFactory(RefreshTokenService.name);
   }
 

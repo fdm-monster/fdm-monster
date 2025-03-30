@@ -35,13 +35,9 @@ import {
 } from "@/models/Settings";
 import { SettingsDto } from "@/services/interfaces/settings.dto";
 import { MongoIdType } from "@/shared.constants";
-import { ConfigService } from "@/services/core/config.service";
 
 export class SettingsService implements ISettingsService<MongoIdType, ISettings> {
-  configService: ConfigService;
-  constructor({ configService }: { configService: ConfigService }) {
-    this.configService = configService;
-  }
+  constructor() {}
 
   toDto(entity: ISettings): SettingsDto<MongoIdType> {
     return {

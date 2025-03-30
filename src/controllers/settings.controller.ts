@@ -28,38 +28,17 @@ import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
 @route(AppConstants.apiRoute + "/settings")
 @before([authenticate()])
 export class SettingsController {
-  settingsStore: SettingsStore;
-  logger: LoggerService;
-  printerCache: PrinterCache;
-  printerService: IPrinterService;
-  configService: IConfigService;
-  serverVersion: string;
-  private printerThumbnailCache: PrinterThumbnailCache;
+  private readonly logger: LoggerService;
 
-  constructor({
-    settingsStore,
-    printerCache,
-    printerService,
-    serverVersion,
-    loggerFactory,
-    configService,
-    printerThumbnailCache,
-  }: {
-    serverVersion: string;
-    printerCache: PrinterCache;
-    printerService: IPrinterService;
-    settingsStore: SettingsStore;
-    loggerFactory: ILoggerFactory;
-    configService: IConfigService;
-    printerThumbnailCache: PrinterThumbnailCache;
-  }) {
-    this.settingsStore = settingsStore;
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly serverVersion: string,
+    private readonly printerCache: PrinterCache,
+    private readonly printerService: IPrinterService,
+    private readonly settingsStore: SettingsStore,
+    private readonly printerThumbnailCache: PrinterThumbnailCache
+  ) {
     this.logger = loggerFactory(SettingsController.name);
-    this.serverVersion = serverVersion;
-    this.configService = configService;
-    this.printerCache = printerCache;
-    this.printerService = printerService;
-    this.printerThumbnailCache = printerThumbnailCache;
   }
 
   @GET()

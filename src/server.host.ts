@@ -10,7 +10,6 @@ import { AppConstants } from "./server.constants";
 import { superRootPath } from "./utils/fs.utils";
 import { SocketIoGateway } from "@/state/socket-io.gateway";
 import { BootTask } from "./tasks/boot.task";
-import { TaskManagerService } from "@/services/core/task-manager.service";
 import { isProductionEnvironment } from "@/utils/env.utils";
 import { IConfigService } from "@/services/core/config.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
@@ -19,42 +18,18 @@ import { SettingsStore } from "@/state/settings.store";
 import { loadControllersFunc } from "@/shared/load-controllers";
 
 export class ServerHost {
-  bootTask: BootTask;
-  taskManagerService: TaskManagerService;
-  socketIoGateway: SocketIoGateway;
-  configService: IConfigService;
-  typeormService: TypeormService;
-  settingsStore: SettingsStore;
-  private readonly isTypeormMode: boolean;
-  private logger: LoggerService;
+  private readonly logger: LoggerService;
 
-  constructor({
-    loggerFactory,
-    bootTask,
-    taskManagerService,
-    socketIoGateway,
-    configService,
-    typeormService,
-    isTypeormMode,
-    settingsStore,
-  }: {
-    loggerFactory: ILoggerFactory;
-    bootTask: BootTask;
-    taskManagerService: TaskManagerService;
-    socketIoGateway: SocketIoGateway;
-    configService: IConfigService;
-    typeormService: TypeormService;
-    settingsStore: SettingsStore;
-    isTypeormMode: boolean;
-  }) {
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly configService: IConfigService,
+    private readonly isTypeormMode: boolean,
+    private readonly settingsStore: SettingsStore,
+    private readonly bootTask: BootTask,
+    private readonly socketIoGateway: SocketIoGateway,
+    private readonly typeormService: TypeormService
+  ) {
     this.logger = loggerFactory(ServerHost.name);
-    this.bootTask = bootTask;
-    this.taskManagerService = taskManagerService;
-    this.socketIoGateway = socketIoGateway;
-    this.configService = configService;
-    this.typeormService = typeormService;
-    this.settingsStore = settingsStore;
-    this.isTypeormMode = isTypeormMode;
   }
 
   async boot(app: Application, quick_boot = false, listenRequests = true) {

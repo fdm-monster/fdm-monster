@@ -13,20 +13,12 @@ import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class MulterService {
-  fileUploadTrackerCache: FileUploadTrackerCache;
-  httpClientFactory: HttpClientFactory;
-  logger: LoggerService;
-  constructor({
-    fileUploadTrackerCache,
-    httpClientFactory,
-    loggerFactory,
-  }: {
-    fileUploadTrackerCache: FileUploadTrackerCache;
-    httpClientFactory: HttpClientFactory;
-    loggerFactory: ILoggerFactory;
-  }) {
-    this.fileUploadTrackerCache = fileUploadTrackerCache;
-    this.httpClientFactory = httpClientFactory;
+  private readonly logger: LoggerService;
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly fileUploadTrackerCache: FileUploadTrackerCache,
+    private readonly httpClientFactory: HttpClientFactory
+  ) {
     this.logger = loggerFactory(MulterService.name);
   }
 
