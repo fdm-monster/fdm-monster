@@ -22,6 +22,7 @@ export const authenticate = () =>
       }) =>
       async (req: Request, res: Response, next: NextFunction) => {
         const logger = loggerFactory("Middleware:authenticate");
+
         const isLoginRequired = await settingsStore.getLoginRequired();
         if (!isLoginRequired) {
           return next();
@@ -48,18 +49,18 @@ export const authenticate = () =>
       }
   );
 
-export function authorizePermission(permission: string) {
+export function permission(requiredPermission: string) {
   return inject(
     ({ permissionService, roleService }: { permissionService: IPermissionService; roleService: IRoleService }) =>
       async (req: Request, res: Response, next: NextFunction) => {
         const userRoles = req.roles as IdType[];
         if (!userRoles?.length) {
-          throw new AuthorizationError({ permissions: [permission] });
+          throw new AuthorizationError({ permissions: [requiredPermission] });
         }
 
         const assignedPermissions = roleService.getRolesPermissions(userRoles);
-        if (!permissionService.authorizePermission(permission, assignedPermissions)) {
-          throw new AuthorizationError({ permissions: [permission] });
+        if (!permissionService.authorizePermission(requiredPermission, assignedPermissions)) {
+          throw new AuthorizationError({ permissions: [requiredPermission] });
         }
 
         next();
@@ -75,9 +76,3 @@ export const authorizeRoles = (roles: string[], subset = true) =>
 
     next();
   });
-
-export function withPermission(permission: string) {
-  return {
-    before: [authorizePermission(permission)],
-  };
-}

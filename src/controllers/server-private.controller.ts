@@ -1,5 +1,5 @@
 import { PassThrough } from "stream";
-import { createController } from "awilix-express";
+import { GET, POST, DELETE, route, before } from "awilix-express";
 import { authenticate, authorizeRoles } from "@/middleware/authenticate";
 import { LoggerService as Logger } from "../handlers/logger";
 import { AppConstants } from "@/server.constants";
@@ -16,7 +16,10 @@ import { Request, Response } from "express";
 import { demoUserNotAllowed } from "@/middleware/demo.middleware";
 import { GithubService } from "@/services/core/github.service";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
+import { ILoggerFactory } from "@/handlers/logger-factory";
 
+@route(AppConstants.apiRoute + "/server")
+@before([authenticate(), authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
 export class ServerPrivateController {
   clientBundleService: ClientBundleService;
   printerCache: PrinterCache;
@@ -30,6 +33,7 @@ export class ServerPrivateController {
   private serverReleaseService: ServerReleaseService;
 
   constructor({
+    loggerFactory,
     serverReleaseService,
     printerCache,
     printerService,
@@ -40,6 +44,7 @@ export class ServerPrivateController {
     yamlService,
     multerService,
   }: {
+    loggerFactory: ILoggerFactory;
     serverReleaseService: ServerReleaseService;
     printerCache: PrinterCache;
     printerService: IPrinterService;
@@ -50,6 +55,7 @@ export class ServerPrivateController {
     yamlService: YamlService;
     multerService: MulterService;
   }) {
+    this.logger = loggerFactory(ServerPrivateController.name);
     this.serverReleaseService = serverReleaseService;
     this.clientBundleService = clientBundleService;
     this.githubService = githubService;
@@ -61,6 +67,16 @@ export class ServerPrivateController {
     this.multerService = multerService;
   }
 
+  @GET()
+  @route("/")
+  async getReleaseStateInfo(req: Request, res: Response) {
+    await this.serverReleaseService.syncLatestRelease();
+    const updateState = this.serverReleaseService.getState();
+    res.send(updateState);
+  }
+
+  @GET()
+  @route("/client-releases")
   async getClientReleases(req: Request, res: Response) {
     const releaseSpec = await this.clientBundleService.getReleases();
     res.send(releaseSpec);
@@ -69,8 +85,9 @@ export class ServerPrivateController {
   /**
    * It is not advised to downgrade beyond the default minimum version, any server restart will
    * update the bundle back to minimum version (if ENABLE_CLIENT_DIST_AUTO_UPDATE === 'true').
-   // * @param {UpdateClientDistDto} updateDto
    */
+  @POST()
+  @route("/update-client-bundle-github")
   async updateClientBundleGithub(req: Request, res: Response) {
     const inputRules = {
       downloadRelease: "string",
@@ -111,17 +128,15 @@ export class ServerPrivateController {
     });
   }
 
+  @GET()
+  @route("/github-rate-limit")
   async getGithubRateLimit(req: Request, res: Response) {
     const rateLimitResponse = await this.githubService.getRateLimit();
     res.send(rateLimitResponse.data);
   }
 
-  async getReleaseStateInfo(req: Request, res: Response) {
-    await this.serverReleaseService.syncLatestRelease();
-    const updateState = this.serverReleaseService.getState();
-    res.send(updateState);
-  }
-
+  @POST()
+  @route("/import-printers-floors-yaml")
   async importPrintersAndFloorsYaml(req: Request, res: Response) {
     const files = await this.multerService.multerLoadFileAsync(req, res, [".yaml"], false);
     const firstFile = files[0];
@@ -133,6 +148,8 @@ export class ServerPrivateController {
     });
   }
 
+  @POST()
+  @route("/export-printers-floors-yaml")
   async exportPrintersAndFloorsYaml(req: Request, res: Response) {
     const yaml = await this.yamlService.exportPrintersAndFloors(req.body);
     const fileContents = Buffer.from(yaml);
@@ -145,6 +162,8 @@ export class ServerPrivateController {
     readStream.pipe(res);
   }
 
+  @DELETE()
+  @route("/delete-all-printers")
   async deleteAllPrinters(req: Request, res: Response) {
     const printers = await this.printerCache.listCachedPrinters(true);
     const printerIds = printers.map((p) => p.id);
@@ -152,28 +171,18 @@ export class ServerPrivateController {
     res.send();
   }
 
+  @DELETE()
+  @route("/clear-outdated-fdm-monster-logs")
   async clearLogs(req: Request, res: Response) {
     const counts = await this.logDumpService.deleteOlderThanWeekAndMismatchingLogFiles();
     res.send(counts);
   }
 
+  @GET()
+  @POST()
+  @route("/dump-fdm-monster-logs")
   async dumpLogZips(req: Request, res: Response) {
     const filePath = await this.logDumpService.dumpZip();
     res.sendFile(filePath);
   }
 }
-
-// prettier-ignore
-export default createController(ServerPrivateController)
-  .prefix(AppConstants.apiRoute + "/server")
-  .before([authenticate(), authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
-  .get("/", "getReleaseStateInfo")
-  .get("/client-releases", "getClientReleases")
-  .get("/github-rate-limit", "getGithubRateLimit")
-  .post("/update-client-bundle-github", "updateClientBundleGithub")
-  .post("/export-printers-floors-yaml", "exportPrintersAndFloorsYaml")
-  .post("/import-printers-floors-yaml", "importPrintersAndFloorsYaml")
-  .get("/dump-fdm-monster-logs", "dumpLogZips")
-  .post("/dump-fdm-monster-logs", "dumpLogZips")
-  .delete("/clear-outdated-fdm-monster-logs", "clearLogs")
-  .delete("/delete-all-printers", "deleteAllPrinters");

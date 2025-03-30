@@ -43,36 +43,6 @@ export function getExtendedValidator() {
   return nodeInputValidator;
 }
 
-export function getScopedPrinter(req: Request) {
-  const tokens = [printerApiToken, printerLoginToken, currentPrinterToken, printerIdToken];
-  let resolvedDependencies: {
-    [printerApiToken]: IPrinterApi;
-    [printerLoginToken]: LoginDto;
-    [currentPrinterToken]: CachedPrinter;
-    [printerIdToken]: IdType;
-  } = {};
-  let errors: any[] = [];
-  tokens.forEach((t) => {
-    try {
-      const dependency = req.container.resolve(t);
-      if (!dependency) {
-        errors.push(
-          `Scoped Dependency '${t}' was not resolved. Please ensure the route requires a :id param and the printerId was provided.`
-        );
-      }
-      resolvedDependencies[t] = dependency;
-    } catch (e) {
-      throw new InternalServerException(`Dependency ${t} could not be resolved. Aborted request.`);
-    }
-  });
-
-  if (errors.length > 0) {
-    throw new ValidationException(errors);
-  }
-
-  return resolvedDependencies;
-}
-
 /**
  * Validate input based on rules
  */

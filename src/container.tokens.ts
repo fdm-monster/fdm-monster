@@ -71,4 +71,4 @@ export const DITokens = {
   printerWebsocketTask: "printerWebsocketTask",
   printerWebsocketRestoreTask: "printerWebsocketRestoreTask",
   printerFileCleanTask: "printerFileCleanTask",
-};
+} as const;

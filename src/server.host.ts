@@ -2,7 +2,6 @@ import express, { Application } from "express";
 import mongoose from "mongoose";
 import history from "connect-history-api-fallback";
 import { LoggerService } from "./handlers/logger";
-import { loadControllers } from "awilix-express";
 import { join } from "path";
 import { exceptionFilter } from "./middleware/exception.filter";
 import { fetchServerPort } from "./server.env";
@@ -13,17 +12,17 @@ import { SocketIoGateway } from "@/state/socket-io.gateway";
 import { BootTask } from "./tasks/boot.task";
 import { TaskManagerService } from "@/services/core/task-manager.service";
 import { isProductionEnvironment } from "@/utils/env.utils";
-import { ConfigService } from "@/services/core/config.service";
+import { IConfigService } from "@/services/core/config.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { SettingsStore } from "@/state/settings.store";
+import { loadControllersFunc } from "@/shared/load-controllers";
 
 export class ServerHost {
   bootTask: BootTask;
   taskManagerService: TaskManagerService;
   socketIoGateway: SocketIoGateway;
-  appInstance: Application | null = null;
-  configService: ConfigService;
+  configService: IConfigService;
   typeormService: TypeormService;
   settingsStore: SettingsStore;
   private readonly isTypeormMode: boolean;
@@ -43,7 +42,7 @@ export class ServerHost {
     bootTask: BootTask;
     taskManagerService: TaskManagerService;
     socketIoGateway: SocketIoGateway;
-    configService: ConfigService;
+    configService: IConfigService;
     typeormService: TypeormService;
     settingsStore: SettingsStore;
     isTypeormMode: boolean;
@@ -63,15 +62,13 @@ export class ServerHost {
       // Enforce models to be strictly applied, any unknown property will not be persisted
       mongoose.set("strictQuery", true);
     }
-
-    this.appInstance = app;
-    this.serveControllerRoutes(this.appInstance);
+    this.serveControllerRoutes(app);
 
     if (!quick_boot) {
       await this.bootTask.runOnce();
     }
 
-    if (listenRequests) return this.httpListen();
+    if (listenRequests) return this.httpListen(app);
   }
 
   hasConnected() {
@@ -83,8 +80,6 @@ export class ServerHost {
   }
 
   serveControllerRoutes(app: Application) {
-    const routePath = "./controllers";
-
     // Catches any HTML request to paths like / or file/ as long as its text/html
     app
       .use((req, res, next) => {
@@ -94,7 +89,7 @@ export class ServerHost {
           next();
         }
       })
-      .use(loadControllers(`${routePath}/*.controller.*`, { cwd: __dirname, ignore: ["**/*.map"] }))
+      .use(loadControllersFunc())
       .use(exceptionFilter);
 
     const nextClientPath = join(superRootPath(), "node_modules", AppConstants.clientNextPackageName, "dist");
@@ -141,11 +136,11 @@ export class ServerHost {
     return settings.experimentalClientSupport;
   }
 
-  async httpListen() {
+  async httpListen(app: Application) {
     const port = fetchServerPort();
     if (!isProductionEnvironment() && this.configService.get(AppConstants.debugRoutesKey, "false") === "true") {
       const expressListRoutes = require("express-list-routes");
-      expressListRoutes(this.appInstance!, { prefix: "/" });
+      expressListRoutes(app, { prefix: "/" });
     }
 
     if (!port || Number.isNaN(parseInt(port))) {
@@ -153,7 +148,7 @@ export class ServerHost {
     }
 
     const hostOrFqdn = "0.0.0.0";
-    const server = this.appInstance!.listen(parseInt(port), hostOrFqdn, () => {
+    const server = app.listen(parseInt(port), hostOrFqdn, () => {
       this.logger.log(`Server started... open it at http://127.0.0.1:${port}`);
     });
     this.socketIoGateway.attachServer(server);

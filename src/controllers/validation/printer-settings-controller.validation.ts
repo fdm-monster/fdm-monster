@@ -1,3 +1,3 @@
-export const setGcodeAnalysis = {
+export const setGcodeAnalysisRules = {
   enabled: "required|boolean",
 };
