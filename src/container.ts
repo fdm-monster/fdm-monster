@@ -26,7 +26,6 @@ import { UserService } from "./services/mongoose/user.service";
 import { UserService as UserService2 } from "./services/orm/user.service";
 import { RoleService } from "./services/mongoose/role.service";
 import { RoleService as RoleService2 } from "./services/orm/role.service";
-import { ServerTasks } from "./tasks";
 import { PermissionService } from "./services/mongoose/permission.service";
 import { PermissionService as PermissionService2 } from "./services/orm/permission.service";
 import { PrinterFileCleanTask } from "./tasks/printer-file-clean.task";
