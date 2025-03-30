@@ -5,7 +5,6 @@ import { SettingsStore } from "@/state/settings.store";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IConfigService } from "@/services/core/config.service";
 import { IRoleService } from "@/services/interfaces/role-service.interface";
-import { IRole } from "@/models/Auth/Role";
 import { UserRole } from "@/entities/user-role.entity";
 
 export const validateWizardCompleted = inject(
