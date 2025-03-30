@@ -12,23 +12,7 @@ import { setGcodeAnalysisRules } from "@/controllers/validation/printer-settings
 @route(AppConstants.apiRoute + "/printer-settings")
 @before([authenticate()])
 export class PrinterSettingsController {
-  printerCache: PrinterCache;
-  octoprintClient: OctoprintClient;
-  isTypeormMode: boolean;
-
-  constructor({
-    printerCache,
-    octoprintClient,
-    isTypeormMode,
-  }: {
-    printerCache: PrinterCache;
-    octoprintClient: OctoprintClient;
-    isTypeormMode: boolean;
-  }) {
-    this.printerCache = printerCache;
-    this.octoprintClient = octoprintClient;
-    this.isTypeormMode = isTypeormMode;
-  }
+  constructor(private readonly printerCache: PrinterCache, private readonly octoprintClient: OctoprintClient) {}
 
   @GET()
   @route("/:id")

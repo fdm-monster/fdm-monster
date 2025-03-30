@@ -18,26 +18,16 @@ import { moonrakerEvent } from "@/services/moonraker/constants/websocket.constan
 import { printerEvents } from "@/constants/event.constants";
 
 export class TestPrinterSocketStore {
-  testSocket: IWebsocketAdapter;
-  socketIoGateway: SocketIoGateway;
-  socketFactory: SocketFactory;
-  eventEmitter2: EventEmitter2;
-  logger: LoggerService;
+  private readonly logger: LoggerService;
 
-  constructor({
-    socketFactory,
-    socketIoGateway,
-    eventEmitter2,
-    loggerFactory,
-  }: {
-    socketFactory: SocketFactory;
-    socketIoGateway: SocketIoGateway;
-    eventEmitter2: EventEmitter2;
-    loggerFactory: ILoggerFactory;
-  }) {
-    this.socketFactory = socketFactory;
-    this.socketIoGateway = socketIoGateway;
-    this.eventEmitter2 = eventEmitter2;
+  testSocket: IWebsocketAdapter;
+
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly socketFactory: SocketFactory,
+    private readonly socketIoGateway: SocketIoGateway,
+    private readonly eventEmitter2: EventEmitter2
+  ) {
     this.logger = loggerFactory(TestPrinterSocketStore.name);
   }
 

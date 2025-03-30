@@ -11,11 +11,7 @@ import { RegisterUserDto, UserDto } from "@/services/interfaces/user.dto";
 import { IUser } from "@/models/Auth/User";
 
 export class UserService implements IUserService<MongoIdType> {
-  roleService: RoleService;
-
-  constructor({ roleService }: { roleService: RoleService }) {
-    this.roleService = roleService;
-  }
+  constructor(private readonly roleService: RoleService) {}
 
   toDto(user: IUser): UserDto {
     return {

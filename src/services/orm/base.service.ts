@@ -23,11 +23,9 @@ export function BaseService<
   UpdateDTO extends object = QueryDeepPartialEntity<T>
 >(entity: EntityTarget<T>, dto: Type<DTO>, createDTO?: Type<CreateDTO>, updateDto?: Type<UpdateDTO>) {
   abstract class BaseServiceHost implements IBaseService<T, DTO, CreateDTO, UpdateDTO> {
-    typeormService: TypeormService;
     repository: Repository<T>;
 
-    constructor({ typeormService }: { typeormService: TypeormService }) {
-      this.typeormService = typeormService;
+    constructor(protected readonly typeormService: TypeormService) {
       this.repository = typeormService.getDataSource().getRepository(entity);
     }
 

@@ -10,19 +10,10 @@ import { IPrintCompletionService } from "@/services/interfaces/print-completion.
 @route(AppConstants.apiRoute + "/print-completion")
 @before([authenticate()])
 export class PrintCompletionController {
-  private printCompletionService: IPrintCompletionService;
-  private printCompletionSocketIoTask: PrintCompletionSocketIoTask;
-
-  constructor({
-    printCompletionService,
-    printCompletionSocketIoTask,
-  }: {
-    printCompletionService: IPrintCompletionService;
-    printCompletionSocketIoTask: PrintCompletionSocketIoTask;
-  }) {
-    this.printCompletionService = printCompletionService;
-    this.printCompletionSocketIoTask = printCompletionSocketIoTask;
-  }
+  constructor(
+    private readonly printCompletionService: IPrintCompletionService,
+    private readonly printCompletionSocketIoTask: PrintCompletionSocketIoTask
+  ) {}
 
   /**
    * Not a production ready call, just for testing.

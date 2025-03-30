@@ -11,23 +11,11 @@ import { IRoleService } from "@/services/interfaces/role-service.interface";
 
 @route(AppConstants.apiRoute + "/first-time-setup")
 export class FirstTimeSetupController {
-  userService: IUserService;
-  roleService: IRoleService;
-  settingsStore: SettingsStore;
-
-  constructor({
-    settingsStore,
-    roleService,
-    userService,
-  }: {
-    settingsStore: SettingsStore;
-    roleService: IRoleService;
-    userService: IUserService;
-  }) {
-    this.settingsStore = settingsStore;
-    this.roleService = roleService;
-    this.userService = userService;
-  }
+  constructor(
+    private readonly settingsStore: SettingsStore,
+    private readonly roleService: IRoleService,
+    private readonly userService: IUserService
+  ) {}
 
   @POST()
   @route("/validate")

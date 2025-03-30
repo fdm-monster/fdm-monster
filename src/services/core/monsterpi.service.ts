@@ -4,11 +4,11 @@ import { AppConstants } from "@/server.constants";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class MonsterPiService {
-  monsterPiVersion: string | null = null;
-  logger;
-  private fileLocation = AppConstants.monsterPiFilePath;
+  private monsterPiVersion: string | null = null;
+  private readonly logger;
+  private readonly fileLocation = AppConstants.monsterPiFilePath;
 
-  constructor({ loggerFactory }: { loggerFactory: ILoggerFactory }) {
+  constructor(loggerFactory: ILoggerFactory) {
     this.logger = loggerFactory(MonsterPiService.name);
   }
 

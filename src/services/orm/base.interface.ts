@@ -1,4 +1,4 @@
-import { DeepPartial, DeleteResult, FindManyOptions, FindOneOptions, Repository } from "typeorm";
+import { DeepPartial, FindManyOptions, FindOneOptions, Repository } from "typeorm";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { SqliteIdType } from "@/shared.constants";
 import { IPagination } from "@/services/interfaces/page.interface";
@@ -24,9 +24,9 @@ export interface IBaseService<
 
   update(id: SqliteIdType, dto: UpdateDTO): Promise<T>;
 
-  delete(id: SqliteIdType): Promise<DeleteResult>;
+  delete(id: SqliteIdType): Promise<void>;
 
-  deleteMany(ids: SqliteIdType[], emitEvent: boolean): Promise<DeleteResult>;
+  deleteMany(ids: SqliteIdType[], emitEvent: boolean): Promise<void>;
 }
 
 export interface Type<T = any> extends Function {

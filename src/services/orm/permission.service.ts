@@ -16,9 +16,11 @@ export class PermissionService
   private logger: LoggerService;
   private _permissions: Permission[] = [];
 
-  constructor({ loggerFactory, typeormService }: { loggerFactory: ILoggerFactory; typeormService: TypeormService }) {
-    super({ typeormService });
+  constructor(loggerFactory: ILoggerFactory, typeormService: TypeormService) {
+    super(typeormService);
+    this.logger = loggerFactory(PermissionService.name);
   }
+
   get permissions() {
     return this._permissions;
   }

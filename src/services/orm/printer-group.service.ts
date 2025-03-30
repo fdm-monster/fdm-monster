@@ -14,10 +14,10 @@ export class PrinterGroupService
   extends BaseService(PrinterGroup, PrinterGroupDto)
   implements IPrinterGroupService<SqliteIdType>
 {
-  groupRepository: Repository<Group>;
+  private readonly groupRepository: Repository<Group>;
 
-  constructor({ typeormService }: { typeormService: TypeormService }) {
-    super({ typeormService });
+  constructor(typeormService: TypeormService) {
+    super(typeormService);
 
     this.groupRepository = typeormService.getDataSource().getRepository(Group);
   }

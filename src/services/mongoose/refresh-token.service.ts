@@ -12,12 +12,10 @@ import { AUTH_ERROR_REASON } from "@/constants/authorization.constants";
 import { RefreshTokenDto } from "@/services/interfaces/refresh-token.dto";
 
 export class RefreshTokenService implements IRefreshTokenService<MongoIdType> {
-  private settingsStore: SettingsStore;
   private logger: LoggerService;
 
-  constructor({ loggerFactory, settingsStore }: { loggerFactory: ILoggerFactory; settingsStore: SettingsStore }) {
+  constructor(loggerFactory: ILoggerFactory, private readonly settingsStore: SettingsStore) {
     this.logger = loggerFactory(RefreshTokenService.name);
-    this.settingsStore = settingsStore;
   }
 
   toDto(entity: IRefreshToken): RefreshTokenDto<MongoIdType> {

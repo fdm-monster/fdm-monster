@@ -15,23 +15,15 @@ import { SubscriptionType } from "@/services/moonraker/moonraker-websocket.adapt
 export type PrinterEventsCacheDto = Record<WsMessage, any | null>;
 
 export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
-  private logger: LoggerService;
-  private eventEmitter2: EventEmitter2;
-  private settingsStore: SettingsStore;
+  private readonly logger: LoggerService;
 
-  constructor({
-    eventEmitter2,
-    loggerFactory,
-    settingsStore,
-  }: {
-    eventEmitter2: EventEmitter2;
-    loggerFactory: ILoggerFactory;
-    settingsStore: SettingsStore;
-  }) {
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly eventEmitter2: EventEmitter2,
+    private readonly settingsStore: SettingsStore
+  ) {
     super();
-    this.settingsStore = settingsStore;
     this.logger = loggerFactory(PrinterEventsCache.name);
-    this.eventEmitter2 = eventEmitter2;
 
     this.subscribeToEvents();
   }

@@ -65,10 +65,10 @@ export type SubscriptionType = IdleTimeoutObject &
 
 export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter implements IWebsocketAdapter {
   readonly printerType = 1;
-  private client: MoonrakerClient;
+
   protected declare logger: LoggerService;
-  private eventEmitter: EventEmitter2;
-  private configService: ConfigService;
+  private readonly client: MoonrakerClient;
+
   socketState: SocketState = SOCKET_STATE.unopened;
   lastMessageReceivedTimestamp: null | number = null;
   stateUpdated = false;
@@ -79,7 +79,6 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
   login?: LoginDto;
   private socketURL?: URL;
   printerId?: IdType;
-  private readonly serverVersion: string;
 
   refreshPrinterObjectsInterval?: NodeJS.Timeout;
   private get subscriptionObjects() {
@@ -109,25 +108,17 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
     status: null,
   };
 
-  constructor({
-    moonrakerClient,
-    loggerFactory,
-    eventEmitter2,
-    configService,
-    serverVersion,
-  }: {
-    moonrakerClient: MoonrakerClient;
-    loggerFactory: ILoggerFactory;
-    eventEmitter2: EventEmitter2;
-    configService: ConfigService;
-    serverVersion: string;
-  }) {
-    super({ loggerFactory });
-    this.client = moonrakerClient;
+  constructor(
+    loggerFactory: ILoggerFactory,
+    moonrakerClient: MoonrakerClient,
+    private readonly eventEmitter2: EventEmitter2,
+    private readonly configService: ConfigService,
+    private readonly serverVersion: string
+  ) {
+    super(loggerFactory);
+
     this.logger = loggerFactory(MoonrakerWebsocketAdapter.name);
-    this.eventEmitter = eventEmitter2;
-    this.configService = configService;
-    this.serverVersion = serverVersion;
+    this.client = moonrakerClient;
   }
 
   get _debugMode() {
@@ -327,7 +318,7 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
       return;
     }
 
-    this.eventEmitter.emit(moonrakerEvent(event), {
+    this.eventEmitter2.emit(moonrakerEvent(event), {
       event,
       payload,
       printerId: this.printerId,
@@ -430,7 +421,7 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
       return;
     }
 
-    await this.eventEmitter.emitAsync(moonrakerEvent(event), {
+    await this.eventEmitter2.emitAsync(moonrakerEvent(event), {
       event,
       payload,
       printerId: this.printerId,

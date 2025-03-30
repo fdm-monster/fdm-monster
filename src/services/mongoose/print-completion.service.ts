@@ -11,9 +11,9 @@ import { IPrintCompletion } from "@/models/PrintCompletion";
 import { processCompletions } from "@/services/mongoose/print-completion.shared";
 
 export class PrintCompletionService implements IPrintCompletionService<MongoIdType> {
-  logger: LoggerService;
+  private readonly logger: LoggerService;
 
-  constructor({ loggerFactory }: { loggerFactory: ILoggerFactory }) {
+  constructor(loggerFactory: ILoggerFactory) {
     this.logger = loggerFactory(PrintCompletionService.name);
   }
 

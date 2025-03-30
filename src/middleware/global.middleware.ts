@@ -4,17 +4,11 @@ import { NextFunction, Request, Response } from "express";
 import { SettingsStore } from "@/state/settings.store";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IConfigService } from "@/services/core/config.service";
+import { IRoleService } from "@/services/interfaces/role-service.interface";
+import { UserRole } from "@/entities/user-role.entity";
 
 export const validateWizardCompleted = inject(
-  ({
-      configService,
-      settingsStore,
-      loggerFactory,
-    }: {
-      configService: IConfigService;
-      settingsStore: SettingsStore;
-      loggerFactory: ILoggerFactory;
-    }) =>
+  (configService: IConfigService, settingsStore: SettingsStore, loggerFactory: ILoggerFactory) =>
     async (req: Request, res: Response, next: NextFunction) => {
       const logger = loggerFactory(validateWizardCompleted.name);
       const isDemoMode = configService.isDemoMode();
@@ -40,12 +34,12 @@ export const validateWizardCompleted = inject(
 );
 
 export const interceptRoles = inject(
-  ({ settingsStore, roleService, isTypeormMode }) =>
+  (settingsStore: SettingsStore, roleService: IRoleService, isTypeormMode: boolean) =>
     async (req: Request, res: Response, next: NextFunction) => {
-      const serverSettings = await settingsStore.getSettings();
+      const serverSettings = settingsStore.getSettings();
 
       if (isTypeormMode) {
-        req.roles = req.user?.roles.map((r) => r.roleId);
+        req.roles = req.user?.roles.map((r: UserRole) => r.roleId);
       } else {
         req.roles = req.user?.roles;
       }

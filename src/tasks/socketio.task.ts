@@ -12,51 +12,25 @@ import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class SocketIoTask {
-  socketIoGateway: SocketIoGateway;
-  printerSocketStore: PrinterSocketStore;
-  printerEventsCache: PrinterEventsCache;
-  floorStore: FloorStore;
-  fileUploadTrackerCache: FileUploadTrackerCache;
-  eventEmitter2: EventEmitter2;
-  printerCache: PrinterCache;
   logger: LoggerService;
-  settingsStore: SettingsStore;
 
   private aggregateSizeCounter = 0;
   private aggregateWindowLength = 100;
   private aggregateSizes: number[] = [];
   private rounding = 2;
 
-  constructor({
-    socketIoGateway,
-    floorStore,
-    printerSocketStore,
-    printerEventsCache,
-    printerCache,
-    loggerFactory,
-    fileUploadTrackerCache,
-    settingsStore,
-    eventEmitter2,
-  }: {
-    socketIoGateway: SocketIoGateway;
-    floorStore: FloorStore;
-    printerSocketStore: PrinterSocketStore;
-    printerEventsCache: PrinterEventsCache;
-    printerCache: PrinterCache;
-    loggerFactory: ILoggerFactory;
-    fileUploadTrackerCache: FileUploadTrackerCache;
-    settingsStore: SettingsStore;
-    eventEmitter2: EventEmitter2;
-  }) {
-    this.socketIoGateway = socketIoGateway;
-    this.printerSocketStore = printerSocketStore;
-    this.printerEventsCache = printerEventsCache;
-    this.fileUploadTrackerCache = fileUploadTrackerCache;
-    this.floorStore = floorStore;
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly socketIoGateway: SocketIoGateway,
+    private readonly floorStore: FloorStore,
+    private readonly printerSocketStore: PrinterSocketStore,
+    private readonly printerEventsCache: PrinterEventsCache,
+    private readonly printerCache: PrinterCache,
+    private readonly fileUploadTrackerCache: FileUploadTrackerCache,
+    private readonly settingsStore: SettingsStore,
+    private readonly eventEmitter2: EventEmitter2
+  ) {
     this.logger = loggerFactory(SocketIoTask.name);
-    this.eventEmitter2 = eventEmitter2;
-    this.printerCache = printerCache;
-    this.settingsStore = settingsStore;
 
     this.eventEmitter2.on(socketIoConnectedEvent, async () => {
       await this.sendUpdate();

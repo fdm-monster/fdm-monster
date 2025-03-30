@@ -1,13 +1,11 @@
 import { PassThrough } from "stream";
 import { GET, POST, DELETE, route, before } from "awilix-express";
 import { authenticate, authorizeRoles } from "@/middleware/authenticate";
-import { LoggerService as Logger } from "../handlers/logger";
 import { AppConstants } from "@/server.constants";
 import { ROLES } from "@/constants/authorization.constants";
 import { validateMiddleware } from "@/handlers/validators";
 import { ServerReleaseService } from "@/services/core/server-release.service";
 import { ClientBundleService } from "@/services/core/client-bundle.service";
-import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { PrinterCache } from "@/state/printer.cache";
 import { YamlService } from "@/services/core/yaml.service";
 import { MulterService } from "@/services/core/multer.service";
@@ -21,50 +19,20 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 @route(AppConstants.apiRoute + "/server")
 @before([authenticate(), authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
 export class ServerPrivateController {
-  clientBundleService: ClientBundleService;
-  printerCache: PrinterCache;
-  printerService: IPrinterService;
-  printerSocketStore: PrinterSocketStore;
-  githubService: GithubService;
-  yamlService: YamlService;
-  multerService: MulterService;
-  logDumpService: LogDumpService;
-  private logger = new Logger(ServerPrivateController.name);
-  private serverReleaseService: ServerReleaseService;
+  private readonly logger;
 
-  constructor({
-    loggerFactory,
-    serverReleaseService,
-    printerCache,
-    printerService,
-    clientBundleService,
-    githubService,
-    logDumpService,
-    printerSocketStore,
-    yamlService,
-    multerService,
-  }: {
-    loggerFactory: ILoggerFactory;
-    serverReleaseService: ServerReleaseService;
-    printerCache: PrinterCache;
-    printerService: IPrinterService;
-    clientBundleService: ClientBundleService;
-    githubService: GithubService;
-    logDumpService: LogDumpService;
-    printerSocketStore: PrinterSocketStore;
-    yamlService: YamlService;
-    multerService: MulterService;
-  }) {
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly serverReleaseService: ServerReleaseService,
+    private readonly printerCache: PrinterCache,
+    private readonly printerService: IPrinterService,
+    private readonly clientBundleService: ClientBundleService,
+    private readonly githubService: GithubService,
+    private readonly logDumpService: LogDumpService,
+    private readonly yamlService: YamlService,
+    private readonly multerService: MulterService
+  ) {
     this.logger = loggerFactory(ServerPrivateController.name);
-    this.serverReleaseService = serverReleaseService;
-    this.clientBundleService = clientBundleService;
-    this.githubService = githubService;
-    this.logDumpService = logDumpService;
-    this.printerSocketStore = printerSocketStore;
-    this.printerCache = printerCache;
-    this.printerService = printerService;
-    this.yamlService = yamlService;
-    this.multerService = multerService;
   }
 
   @GET()

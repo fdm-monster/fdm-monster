@@ -47,12 +47,12 @@ describe(BatchCallService.name, () => {
   it("should return last print file details if available", async () => {
     // Setup: create printers and mock OctoprintClient responses for the job and connection status
     const printer = await printerService.create(validNewPrinterState);
-    const printer2 = await printerService.create(validNewPrinterState);
+    const printer2 = await printerService.create(validNewPrinterState); // will not resolve
 
     nock(printer.printerURL)
       .get("/api/job")
-      .reply(200, { job: { file: { name: "test-file.gcode" } } });
-    nock(printer2.printerURL)
+      .reply(200, { job: { file: { path: "test-file.gcode", name: "test-file.gcode" } } });
+    nock(printer.printerURL)
       .get("/api/connection")
       .reply(200, { state: { text: "Operational" } });
 
@@ -62,7 +62,10 @@ describe(BatchCallService.name, () => {
     // Verify: ensure reprint file details are retrieved successfully
     expect(result).toHaveLength(2);
     expect(result[0].reprintState).toBe(2); // LastPrintReady
-    expect(result[0].file?.name).toBe("test-file.gcode");
+    expect(result[0].file?.path).toBe("test-file.gcode");
+
+    expect(result[1].reprintState).toBe(0); // NoLastPrint
+    expect(result[1].file?.path).toBeUndefined();
   });
 
   it("should return NoLastPrint state if no last print file is found", async () => {

@@ -13,6 +13,7 @@
 - Update .env.template
 - Fix punycode warning by pinning tr46 package
 - Update API controller, use decorators over api builder
+- Update dependency injection with awilix, switch to CLASSIC mode for less verbose code
 
 ## Fixes
 

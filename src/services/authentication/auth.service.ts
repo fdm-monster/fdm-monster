@@ -5,22 +5,19 @@ import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IUserService } from "@/services/interfaces/user-service.interface";
 import { IJwtService } from "@/services/interfaces/jwt.service.interface";
-import { MongoIdType } from "@/shared.constants";
+import { IdType } from "@/shared.constants";
 import { IAuthService } from "@/services/interfaces/auth.service.interface";
 import { IRefreshTokenService } from "@/services/interfaces/refresh-token.service.interface";
 import { AUTH_ERROR_REASON } from "@/constants/authorization.constants";
 import { captureException } from "@sentry/node";
+import { IUser } from "@/models/Auth/User";
 
-export class AuthService implements IAuthService {
+export class AuthService<KeyType = IdType> implements IAuthService<KeyType> {
   private logger: LoggerService;
-  private userService: IUserService;
-  private jwtService: IJwtService;
-  private settingsStore: SettingsStore;
-  private refreshTokenService: IRefreshTokenService<MongoIdType>;
   /**
    *  When users are blacklisted at runtime, this cache can make quick work of rejecting them
    */
-  private blacklistedJwtCache: Record<string, { userId: MongoIdType; createdAt: number }> = {};
+  private blacklistedJwtCache: Record<string, { userId: KeyType; createdAt: number }> = {};
 
   /**
    * loginUser: starts new session: id-token, refresh, removing any old refresh
@@ -40,24 +37,14 @@ export class AuthService implements IAuthService {
    * refreshAttempts => integer in setting with cap?
    */
 
-  constructor({
-    userService,
-    jwtService,
-    loggerFactory,
-    settingsStore,
-    refreshTokenService,
-  }: {
-    userService: IUserService<MongoIdType>;
-    jwtService: IJwtService<MongoIdType>;
-    loggerFactory: ILoggerFactory;
-    settingsStore: SettingsStore;
-    refreshTokenService: IRefreshTokenService<MongoIdType>;
-  }) {
-    this.userService = userService;
-    this.jwtService = jwtService;
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly userService: IUserService<KeyType, IUser<KeyType>>,
+    private readonly jwtService: IJwtService<KeyType>,
+    private readonly settingsStore: SettingsStore,
+    private readonly refreshTokenService: IRefreshTokenService<KeyType>
+  ) {
     this.logger = loggerFactory(AuthService.name);
-    this.settingsStore = settingsStore;
-    this.refreshTokenService = refreshTokenService;
   }
 
   async loginUser(username: string, password: string) {
@@ -82,7 +69,7 @@ export class AuthService implements IAuthService {
     };
   }
 
-  async logoutUserId(userId: MongoIdType, jwtToken?: string) {
+  async logoutUserId(userId: KeyType, jwtToken?: string) {
     await this.refreshTokenService.deleteRefreshTokenByUserId(userId);
     if (jwtToken?.length) {
       this.blacklistedJwtCache[jwtToken] = { userId, createdAt: Date.now() };
@@ -169,7 +156,7 @@ export class AuthService implements IAuthService {
     await this.refreshTokenService.updateRefreshTokenAttempts(refreshToken, attemptsUsed + 1);
   }
 
-  async signJwtToken(userId: MongoIdType) {
+  async signJwtToken(userId: KeyType) {
     const user = await this.userService.getUser(userId, false);
     if (!user) {
       throw new AuthenticationError("User not found", AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken);

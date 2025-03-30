@@ -18,9 +18,7 @@ import { TestPrinterSocketStore } from "@/state/test-printer-socket.store";
 import { PrinterCache } from "@/state/printer.cache";
 import { LoggerService } from "@/handlers/logger";
 import { PrinterEventsCache } from "@/state/printer-events.cache";
-import { TaskManagerService } from "@/services/core/task-manager.service";
 import { FloorStore } from "@/state/floor.store";
-import { MulterService } from "@/services/core/multer.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { Request, Response } from "express";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
@@ -28,9 +26,7 @@ import { LoginDto } from "@/services/interfaces/login.dto";
 import { AxiosError } from "axios";
 import { FailedDependencyException } from "@/exceptions/failed-dependency.exception";
 import { InternalServerException } from "@/exceptions/runtime.exceptions";
-import { MoonrakerClient } from "@/services/moonraker/moonraker.client";
 import { IPrinterApi } from "@/services/printer-api.interface";
-import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { PrinterApiFactory } from "@/services/printer-api.factory";
 import { normalizeUrl } from "@/utils/normalize-url";
 import { defaultHttpProtocol } from "@/utils/url.utils";
@@ -39,62 +35,20 @@ import { getScopedPrinter } from "@/handlers/printer-resolver";
 @route(AppConstants.apiRoute + "/printer")
 @before([authenticate(), authorizeRoles([ROLES.OPERATOR, ROLES.ADMIN]), printerResolveMiddleware()])
 export class PrinterController {
-  printerApiFactory: PrinterApiFactory;
-  printerSocketStore: PrinterSocketStore;
-  testPrinterSocketStore: TestPrinterSocketStore;
-  printerService: IPrinterService;
-  printerCache: PrinterCache;
-  printerEventsCache: PrinterEventsCache;
-  taskManagerService: TaskManagerService;
-  printerApi: IPrinterApi;
-  octoprintClient: OctoprintClient;
-  moonrakerClient: MoonrakerClient;
-  floorStore: FloorStore;
-  multerService: MulterService;
   logger: LoggerService;
 
-  constructor({
-    printerApiFactory,
-    printerSocketStore,
-    testPrinterSocketStore,
-    printerService,
-    printerCache,
-    printerEventsCache,
-    taskManagerService,
-    loggerFactory,
-    printerApi,
-    moonrakerClient,
-    octoprintClient,
-    floorStore,
-    multerService,
-  }: {
-    printerApiFactory: PrinterApiFactory;
-    printerSocketStore: PrinterSocketStore;
-    testPrinterSocketStore: TestPrinterSocketStore;
-    printerService: IPrinterService;
-    printerCache: PrinterCache;
-    printerEventsCache: PrinterEventsCache;
-    taskManagerService: TaskManagerService;
-    loggerFactory: ILoggerFactory;
-    printerApi: IPrinterApi;
-    octoprintClient: OctoprintClient;
-    moonrakerClient: MoonrakerClient;
-    floorStore: FloorStore;
-    multerService: MulterService;
-  }) {
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly printerApiFactory: PrinterApiFactory,
+    private readonly printerSocketStore: PrinterSocketStore,
+    private readonly testPrinterSocketStore: TestPrinterSocketStore,
+    private readonly printerService: IPrinterService,
+    private readonly printerCache: PrinterCache,
+    private readonly printerEventsCache: PrinterEventsCache,
+    private readonly printerApi: IPrinterApi,
+    private readonly floorStore: FloorStore
+  ) {
     this.logger = loggerFactory(PrinterController.name);
-    this.printerApiFactory = printerApiFactory;
-    this.printerCache = printerCache;
-    this.printerEventsCache = printerEventsCache;
-    this.printerService = printerService;
-    this.printerSocketStore = printerSocketStore;
-    this.testPrinterSocketStore = testPrinterSocketStore;
-    this.taskManagerService = taskManagerService;
-    this.printerApi = printerApi;
-    this.octoprintClient = octoprintClient;
-    this.moonrakerClient = moonrakerClient;
-    this.floorStore = floorStore;
-    this.multerService = multerService;
   }
 
   @GET()

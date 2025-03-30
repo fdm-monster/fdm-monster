@@ -3,7 +3,7 @@ import { IUser } from "@/models/Auth/User";
 import { RegisterUserDto, UserDto } from "@/services/interfaces/user.dto";
 import { DeleteResult } from "typeorm";
 
-export interface IUserService<KeyType = IdType, Entity = IUser> {
+export interface IUserService<KeyType = IdType, Entity = IUser<KeyType>> {
   toDto(user: Entity): UserDto;
 
   listUsers(limit?: number): Promise<Entity[]>;

@@ -14,17 +14,8 @@ export class FloorService
   extends BaseService(Floor, FloorDto<SqliteIdType>, CreateFloorDto<SqliteIdType>, UpdateFloorDto<SqliteIdType>)
   implements IFloorService<SqliteIdType, Floor>
 {
-  private floorPositionService: FloorPositionService;
-
-  constructor({
-    floorPositionService,
-    typeormService,
-  }: {
-    typeormService: TypeormService;
-    floorPositionService: FloorPositionService;
-  }) {
-    super({ typeormService });
-    this.floorPositionService = floorPositionService;
+  constructor(protected readonly typeormService: TypeormService, private readonly floorPositionService: FloorPositionService) {
+    super(typeormService);
   }
 
   override async list(options?: FindManyOptions<Floor>): Promise<Floor[]> {

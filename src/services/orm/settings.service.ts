@@ -26,17 +26,8 @@ import {
 import { SqliteIdType } from "@/shared.constants";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
 import { ICredentialSettings } from "@/models/Settings";
-import { IConfigService } from "@/services/core/config.service";
-import { TypeormService } from "@/services/typeorm/typeorm.service";
 
-export class SettingsService2 extends BaseService(Settings, SettingsDto) implements ISettingsService<SqliteIdType, Settings> {
-  configService: IConfigService;
-
-  constructor({ configService, typeormService }: { configService: IConfigService; typeormService: TypeormService }) {
-    super({ typeormService });
-    this.configService = configService;
-  }
-
+export class SettingsService extends BaseService(Settings, SettingsDto) implements ISettingsService<SqliteIdType, Settings> {
   toDto(entity: Settings): SettingsDto<SqliteIdType> {
     return {
       [serverSettingsKey]: {
@@ -54,7 +45,7 @@ export class SettingsService2 extends BaseService(Settings, SettingsDto) impleme
     let settings = await this.get();
 
     if (!settings) {
-      const settings = await this.create({
+      return await this.create({
         [serverSettingsKey]: getDefaultServerSettings(),
         [credentialSettingsKey]: getDefaultCredentialSettings(),
         [wizardSettingKey]: getDefaultWizardSettings(),
@@ -62,7 +53,6 @@ export class SettingsService2 extends BaseService(Settings, SettingsDto) impleme
         [frontendSettingKey]: getDefaultFrontendSettings(),
         [timeoutSettingKey]: getDefaultTimeout(),
       });
-      return settings;
     } else {
       settings = this.migrateSettingsRuntime(settings);
     }

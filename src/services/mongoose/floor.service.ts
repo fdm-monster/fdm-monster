@@ -23,11 +23,9 @@ import {
 import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class FloorService implements IFloorService<MongoIdType> {
-  printerCache: PrinterCache;
-  logger: LoggerService;
+  private readonly logger: LoggerService;
 
-  constructor({ printerCache, loggerFactory }: { printerCache: PrinterCache; loggerFactory: ILoggerFactory }) {
-    this.printerCache = printerCache;
+  constructor(private readonly printerCache: PrinterCache, loggerFactory: ILoggerFactory) {
     this.logger = loggerFactory(FloorService.name);
   }
 

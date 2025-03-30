@@ -9,23 +9,11 @@ import { IRoleService } from "@/services/interfaces/role-service.interface";
 import { RoleDto } from "@/services/interfaces/role.dto";
 
 export class RoleService implements IRoleService<MongoIdType> {
-  settingsStore: SettingsStore;
-  appDefaultRole!: string;
-  appDefaultRoleNoLogin: string;
-
-  constructor({
-    appDefaultRole,
-    appDefaultRoleNoLogin,
-    settingsStore,
-  }: {
-    appDefaultRole: string;
-    appDefaultRoleNoLogin: string;
-    settingsStore: SettingsStore;
-  }) {
-    this.settingsStore = settingsStore;
-    this.appDefaultRole = appDefaultRole;
-    this.appDefaultRoleNoLogin = appDefaultRoleNoLogin;
-  }
+  constructor(
+    private readonly appDefaultRole: string,
+    private readonly appDefaultRoleNoLogin: string,
+    private readonly settingsStore: SettingsStore
+  ) {}
 
   private _roles: IRole[] = [];
 

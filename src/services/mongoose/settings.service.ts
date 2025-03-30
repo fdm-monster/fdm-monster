@@ -35,14 +35,8 @@ import {
 } from "@/models/Settings";
 import { SettingsDto } from "@/services/interfaces/settings.dto";
 import { MongoIdType } from "@/shared.constants";
-import { ConfigService } from "@/services/core/config.service";
 
-export class SettingsService implements ISettingsService<MongoIdType, ISettings> {
-  configService: ConfigService;
-  constructor({ configService }: { configService: ConfigService }) {
-    this.configService = configService;
-  }
-
+export class SettingsService implements ISettingsService<MongoIdType> {
   toDto(entity: ISettings): SettingsDto<MongoIdType> {
     return {
       // Credential settings are not shared with the client

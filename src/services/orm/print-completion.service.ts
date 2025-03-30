@@ -15,10 +15,10 @@ export class PrintCompletionService
   extends BaseService(PrintCompletion, PrintCompletionDto<SqliteIdType>)
   implements IPrintCompletionService<SqliteIdType, PrintCompletion>
 {
-  logger: LoggerService;
+  private readonly logger: LoggerService;
 
-  constructor({ typeormService, loggerFactory }: { typeormService: TypeormService; loggerFactory: ILoggerFactory }) {
-    super({ typeormService });
+  constructor(typeormService: TypeormService, loggerFactory: ILoggerFactory) {
+    super(typeormService);
     this.logger = loggerFactory(PrintCompletionService.name);
   }
 

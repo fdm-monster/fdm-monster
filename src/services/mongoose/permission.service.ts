@@ -8,9 +8,9 @@ import { IPermission } from "@/models/Auth/Permission";
 import { IPermissionService } from "@/services/interfaces/permission.service.interface";
 
 export class PermissionService implements IPermissionService<MongoIdType> {
-  private logger: LoggerService;
+  private readonly logger: LoggerService;
 
-  constructor({ loggerFactory }: { loggerFactory: ILoggerFactory }) {
+  constructor(loggerFactory: ILoggerFactory) {
     this.logger = loggerFactory(PermissionService.name);
   }
 

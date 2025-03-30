@@ -8,8 +8,9 @@ import { JsonRpcEventDto } from "@/services/moonraker/dto/websocket/json-rpc-eve
 
 export abstract class WebsocketRpcExtendedAdapter extends WebsocketAdapter {
   protected declare logger: LoggerService;
-  protected constructor({ loggerFactory }: { loggerFactory: ILoggerFactory }) {
-    super({ loggerFactory });
+
+  protected constructor(loggerFactory: ILoggerFactory) {
+    super(loggerFactory);
 
     this.logger = loggerFactory(WebsocketRpcExtendedAdapter.name);
 

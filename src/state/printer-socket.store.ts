@@ -6,9 +6,7 @@ import { SocketFactory } from "@/services/socket.factory";
 import { PrinterCache } from "@/state/printer.cache";
 import { OctoprintWebsocketAdapter } from "@/services/octoprint/octoprint-websocket.adapter";
 import { LoggerService } from "@/handlers/logger";
-import { ConfigService } from "@/services/core/config.service";
 import { SettingsStore } from "@/state/settings.store";
-import { SocketIoGateway } from "@/state/socket-io.gateway";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IdType } from "@/shared.constants";
 import { PrinterUnsafeDto } from "@/services/interfaces/printer.dto";
@@ -16,39 +14,18 @@ import { OctoprintType } from "@/services/printer-api.interface";
 import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
 
 export class PrinterSocketStore {
-  socketIoGateway: SocketIoGateway;
-  socketFactory: SocketFactory;
-  eventEmitter2: EventEmitter2;
-  printerCache: PrinterCache;
-  printerSocketAdaptersById: Record<string, IWebsocketAdapter> = {};
-  logger: LoggerService;
-  configService: ConfigService;
-  settingsStore: SettingsStore;
+  private readonly logger: LoggerService;
 
-  constructor({
-    socketFactory,
-    socketIoGateway,
-    settingsStore,
-    eventEmitter2,
-    printerCache,
-    loggerFactory,
-    configService,
-  }: {
-    socketFactory: SocketFactory;
-    socketIoGateway: SocketIoGateway;
-    settingsStore: SettingsStore;
-    eventEmitter2: EventEmitter2;
-    printerCache: PrinterCache;
-    loggerFactory: ILoggerFactory;
-    configService: ConfigService;
-  }) {
-    this.printerCache = printerCache;
-    this.socketIoGateway = socketIoGateway;
-    this.socketFactory = socketFactory;
-    this.eventEmitter2 = eventEmitter2;
-    this.settingsStore = settingsStore;
+  printerSocketAdaptersById: Record<string, IWebsocketAdapter> = {};
+
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly socketFactory: SocketFactory,
+    private readonly settingsStore: SettingsStore,
+    private readonly eventEmitter2: EventEmitter2,
+    private readonly printerCache: PrinterCache
+  ) {
     this.logger = loggerFactory(PrinterSocketStore.name);
-    this.configService = configService;
 
     this.subscribeToEvents();
   }

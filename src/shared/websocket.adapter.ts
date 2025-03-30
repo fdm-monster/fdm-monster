@@ -10,7 +10,7 @@ export class WebsocketAdapter {
   protected logger: LoggerService;
   eventEmittingAllowed: boolean = true;
 
-  constructor({ loggerFactory }: { loggerFactory: ILoggerFactory }) {
+  constructor(loggerFactory: ILoggerFactory) {
     this.logger = loggerFactory(WebsocketAdapter.name);
   }
 

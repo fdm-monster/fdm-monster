@@ -9,12 +9,7 @@ import { ParamId } from "@/middleware/param-converter.middleware";
 @route(`${AppConstants.apiRoute}/camera-stream`)
 @before([authenticate(), authorizeRoles([ROLES.OPERATOR, ROLES.ADMIN])])
 export class CameraStreamController {
-  private readonly cameraStreamService: ICameraStreamService;
-
-  constructor({ cameraStreamService }: { cameraStreamService: ICameraStreamService }) {
-    this.cameraStreamService = cameraStreamService;
-  }
-
+  constructor(private readonly cameraStreamService: ICameraStreamService) {}
   @GET()
   @route("/")
   async list(req: Request, res: Response) {
