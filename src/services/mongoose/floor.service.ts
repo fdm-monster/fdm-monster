@@ -14,7 +14,6 @@ import { MongoIdType } from "@/shared.constants";
 import { IFloorService } from "@/services/interfaces/floor.service.interface";
 import { CreateFloorDto, FloorDto, PositionDto, UpdateFloorDto } from "@/services/interfaces/floor.dto";
 import { IPosition } from "@/models/FloorPrinter";
-import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class FloorService implements IFloorService<MongoIdType> {
   constructor(private readonly printerCache: PrinterCache) {}
@@ -116,7 +115,7 @@ export class FloorService implements IFloorService<MongoIdType> {
 
   async addOrUpdatePrinter(floorId: MongoIdType, updatedPosition: PositionDto<MongoIdType>) {
     const floor = await this.get(floorId, true);
-    
+
     updatedPosition.floorId = floor.id;
     const validInput = await validateInput(updatedPosition, printerInFloorSchema(false));
 
