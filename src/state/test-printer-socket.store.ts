@@ -1,6 +1,6 @@
 import { setInterval, setTimeout } from "timers/promises";
 import { validateInput } from "@/handlers/validators";
-import { createPrinterSchema } from "./validation/create-test-printer.validation";
+import { createTestPrinterSchema } from "./validation/create-test-printer.validation";
 import { octoPrintEvent, WsMessage } from "@/services/octoprint/octoprint-websocket.adapter";
 import { AppConstants } from "@/server.constants";
 import { SocketIoGateway } from "@/state/socket-io.gateway";
@@ -37,7 +37,7 @@ export class TestPrinterSocketStore {
       this.testSocket = null;
     }
 
-    const validatedData = await validateInput(printer, createPrinterSchema);
+    const validatedData = await validateInput(printer, createTestPrinterSchema);
     validatedData.enabled = true;
 
     // Create a new socket if it doesn't exist

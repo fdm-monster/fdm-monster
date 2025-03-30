@@ -7,33 +7,38 @@ export const removePrinterInFloorSchema = (isSqlite: boolean) =>
     printerId: idRuleV2(isSqlite),
   });
 
+export const xValidator = z.number().int().min(0).max(12);
+export const yValidator = z.number().int().min(0).max(12);
+export const floorLevelValidator = z.number().int();
+export const floorNameValidator = z.string().min(minFloorNameLength);
+
 export const printerInFloorSchema = (isSqlite: boolean) =>
   z.object({
     printerId: idRuleV2(isSqlite),
     floorId: idRuleV2(isSqlite),
-    x: z.number().int().min(0).max(12),
-    y: z.number().int().min(0).max(12),
+    x: xValidator,
+    y: yValidator,
   });
 
 export const updateFloorNameSchema = z.object({
-  name: z.string().min(minFloorNameLength),
+  name: floorNameValidator,
 });
 
 export const updateFloorLevelSchema = z.object({
-  floor: z.number().int(),
+  floor: floorLevelValidator,
 });
 
 export const updateFloorSchema = (isSqlite: boolean) =>
   z.object({
-    name: z.string().min(minFloorNameLength),
-    floor: z.number().int(),
+    name: floorNameValidator,
+    floor: floorLevelValidator,
     printers: z
       .array(
         z.object({
           printerId: idRuleV2(isSqlite),
           floorId: idRuleV2(isSqlite),
-          x: z.number().min(0).max(12),
-          y: z.number().min(0).max(12),
+          x: xValidator,
+          y: yValidator,
         })
       )
       .optional(),
@@ -41,6 +46,6 @@ export const updateFloorSchema = (isSqlite: boolean) =>
 
 export const createFloorSchema = (isSqlite: boolean) =>
   z.object({
-    name: z.string().min(minFloorNameLength),
-    floor: z.number().int(),
+    name: floorNameValidator,
+    floor: floorLevelValidator,
   });

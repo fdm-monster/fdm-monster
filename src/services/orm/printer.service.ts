@@ -8,7 +8,6 @@ import { SqliteIdType } from "@/shared.constants";
 import { validateInput } from "@/handlers/validators";
 import { printerEvents } from "@/constants/event.constants";
 import EventEmitter2 from "eventemitter2";
-import { DeleteResult } from "typeorm";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { normalizeUrl } from "@/utils/normalize-url";
 import { defaultHttpProtocol } from "@/utils/url.utils";
@@ -111,20 +110,18 @@ export class PrinterService
     return newPrinters;
   }
 
-  override async delete(printerId: SqliteIdType, emitEvent = true): Promise<DeleteResult> {
-    const result = await this.repository.delete([printerId]);
+  override async delete(printerId: SqliteIdType, emitEvent = true): Promise<void> {
+    await this.repository.delete([printerId]);
     if (emitEvent) {
       this.eventEmitter2.emit(printerEvents.printersDeleted, { printerIds: [[printerId]] });
     }
-    return result;
   }
 
-  async deleteMany(printerIds: SqliteIdType[], emitEvent = true): Promise<DeleteResult> {
-    const result = await this.repository.delete(printerIds);
+  async deleteMany(printerIds: SqliteIdType[], emitEvent = true): Promise<void> {
+    await this.repository.delete(printerIds);
     if (emitEvent) {
       this.eventEmitter2.emit(printerEvents.printersDeleted, { printerIds });
     }
-    return result;
   }
 
   updateConnectionSettings(printerId: SqliteIdType, partial: { printerUrl: string; apiKey: string }): Promise<Printer> {

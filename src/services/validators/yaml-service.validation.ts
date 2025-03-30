@@ -1,26 +1,24 @@
-import { apiKeyLengthMaxDefault, apiKeyLengthMinDefault } from "@/constants/service.constants";
-import { PrinterTypes } from "@/services/printer-api.interface";
 import { z } from "zod";
-import { numberEnum } from "@/handlers/validators";
-import { idRuleV2 } from "@/controllers/validation/generic.validation";
+import {
+  printerApiKeyValidator,
+  printerEnabledValidator,
+  printerNameValidator,
+  printerTypeValidator,
+  printerUrlValidator,
+} from "@/services/validators/printer-service.validation";
+import { floorLevelValidator, floorNameValidator, xValidator, yValidator } from "@/services/validators/floor-service.validation";
 
 export const exportPrintersFloorsYamlSchema = z.object({
   exportPrinters: z.boolean(),
   exportFloorGrid: z.boolean(),
   exportFloors: z.boolean(),
   exportGroups: z.boolean(),
-  printerComparisonStrategiesByPriority: z
-    .array(
-      z.string().refine((val) => ["name", "url", "id"].includes(val), {
-        message: "Must be one of: name, url, id",
-      })
-    )
-    .min(1),
-  floorComparisonStrategiesByPriority: z.string().refine((val) => ["name", "floor", "id"].includes(val), {
-    message: "Must be one of: name, floor, id",
-  }),
+  printerComparisonStrategiesByPriority: z.array(z.string().refine((val) => ["name", "url", "id"].includes(val))).min(1),
+  floorComparisonStrategiesByPriority: z.string().refine((val) => ["name", "floor", "id"].includes(val)),
   notes: z.string().optional(),
 });
+
+export const numberOrStringIdValidator = z.union([z.number(), z.string()]);
 
 export const importPrintersFloorsYamlSchema = (
   importPrinters: boolean,
@@ -42,16 +40,12 @@ export const importPrintersFloorsYamlSchema = (
       ? z
           .array(
             z.object({
-              id: z.union([z.number(), z.string()]),
-              apiKey: z
-                .string()
-                .min(apiKeyLengthMinDefault)
-                .max(apiKeyLengthMaxDefault)
-                .regex(/^[a-zA-Z0-9_-]+$/),
-              printerURL: z.string().url(),
-              enabled: z.boolean().optional(),
-              printerType: z.number().superRefine(numberEnum(PrinterTypes)),
-              name: z.string(),
+              id: numberOrStringIdValidator,
+              printerURL: printerUrlValidator,
+              printerType: printerTypeValidator,
+              apiKey: printerApiKeyValidator,
+              enabled: printerEnabledValidator,
+              name: printerNameValidator,
             })
           )
           .min(0)
@@ -60,16 +54,16 @@ export const importPrintersFloorsYamlSchema = (
       ? z
           .array(
             z.object({
-              id: z.union([z.number(), z.string()]),
-              floor: z.number().int(),
-              name: z.string(),
+              id: numberOrStringIdValidator,
+              floor: floorLevelValidator,
+              name: floorNameValidator,
               printers: z.array(
                 z.object({
-                  printerId: z.union([z.number(), z.string()]),
+                  printerId: numberOrStringIdValidator,
                   // Added on multiple places
-                  floorId: z.union([z.number(), z.string()]).optional(),
-                  x: z.number().int().min(0).max(12),
-                  y: z.number().int().min(0).max(12),
+                  floorId: numberOrStringIdValidator.optional(),
+                  x: xValidator,
+                  y: yValidator,
                 })
               ),
             })
@@ -80,11 +74,11 @@ export const importPrintersFloorsYamlSchema = (
       ? z
           .array(
             z.object({
-              id: z.union([z.number(), z.string()]),
+              id: numberOrStringIdValidator,
               name: z.string(),
               printers: z.array(
                 z.object({
-                  printerId: z.union([z.number(), z.string()]),
+                  printerId: numberOrStringIdValidator,
                 })
               ),
             })
@@ -98,10 +92,10 @@ export const importPrinterPositionsSchema = (isSqliteMode: boolean) =>
     printers: z
       .array(
         z.object({
-          printerId: z.union([z.number(), z.string()]),
-          floorId: z.union([z.number(), z.string()]).optional(),
-          x: z.number().int().min(0).max(12),
-          y: z.number().int().min(0).max(12),
+          printerId: numberOrStringIdValidator,
+          floorId: numberOrStringIdValidator,
+          x: xValidator,
+          y: yValidator,
         })
       )
       .min(0)
