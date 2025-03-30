@@ -10,7 +10,7 @@ export const ParamString = (paramName: string) => createParamDecorator(paramName
 export const ParamId = (paramName: string) => createParamDecorator(paramName, "id");
 
 function createParamDecorator(paramName: string, type: StringConstructor | NumberConstructor | BooleanConstructor | "id") {
-  return async function (req: Request<{ local: any; [k: string]: any }>, res: Response, next: NextFunction) {
+  return async (req: Request<{ local: any; [k: string]: any }>, res: Response, next: NextFunction) => {
     const paramValue = req.params[paramName];
 
     if (paramValue === undefined) {
@@ -51,7 +51,11 @@ function createParamDecorator(paramName: string, type: StringConstructor | Numbe
 
     // Validate an id type so it fits with the database
     if (validateIdAsType === String || validateIdAsType === Number) {
-      await validateInput({ id: convertedValue }, idRulesV2(isTypeormMode));
+      try {
+        await validateInput({ id: convertedValue }, idRulesV2(isTypeormMode));
+      } catch (e) {
+        return next(e);
+      }
     }
 
     req.local = req.local || {};

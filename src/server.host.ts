@@ -89,8 +89,7 @@ export class ServerHost {
           next();
         }
       })
-      .use(loadControllersFunc())
-      .use(exceptionFilter);
+      .use(loadControllersFunc());
 
     const nextClientPath = join(superRootPath(), "node_modules", AppConstants.clientNextPackageName, "dist");
     const bundleDistPath = join(superRootPath(), AppConstants.defaultClientBundleStorage, "dist");
@@ -111,24 +110,24 @@ export class ServerHost {
     // Serve the backup client
     app.use(express.static(backupClientPath));
 
-    app
-      .get("*", (req, _) => {
-        const path = req.originalUrl;
+    app.get("*", (req, _) => {
+      const path = req.originalUrl;
 
-        let resource = "MVC";
-        if (path.startsWith("/socket.io") || path.startsWith("/api")) {
-          resource = "API";
-        } else if (path.endsWith(".min.js")) {
-          resource = "client-bundle";
-        }
+      let resource = "MVC";
+      if (path.startsWith("/socket.io") || path.startsWith("/api")) {
+        resource = "API";
+      } else if (path.endsWith(".min.js")) {
+        resource = "client-bundle";
+      }
 
-        this.logger.error(`${resource} resource at '${path}' was not found`);
+      this.logger.error(`${resource} resource at '${path}' was not found`);
 
-        if (!path.startsWith("/socket.io")) {
-          throw new NotFoundException(`${resource} resource was not found`, path);
-        }
-      })
-      .use(exceptionFilter);
+      if (!path.startsWith("/socket.io")) {
+        throw new NotFoundException(`${resource} resource was not found`, path);
+      }
+    });
+
+    app.use(exceptionFilter);
   }
 
   private isClientNextEnabled() {
