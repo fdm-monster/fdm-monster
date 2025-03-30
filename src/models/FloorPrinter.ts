@@ -7,24 +7,29 @@ export interface IPosition {
   printerId: Types.ObjectId;
 }
 
-export const PrinterInFloorSchema = new Schema<IPosition>({
-  printerId: {
-    type: Schema.Types.ObjectId,
-    ref: "Printer",
-    required: true,
+export const PrinterInFloorSchema = new Schema<IPosition>(
+  {
+    printerId: {
+      type: Schema.Types.ObjectId,
+      ref: "Printer",
+      required: true,
+    },
+    floorId: {
+      type: Schema.Types.ObjectId,
+      ref: "Floor",
+      required: true,
+      default: function () {
+        return this.parent().id;
+      },
+    },
+    x: {
+      type: Number,
+      required: true,
+    },
+    y: {
+      type: Number,
+      required: true,
+    }, // No metadata needed yet
   },
-  floorId: {
-    type: Schema.Types.ObjectId,
-    ref: "Floor",
-    required: true,
-  },
-  x: {
-    type: Number,
-    required: true,
-  },
-  y: {
-    type: Number,
-    required: true,
-  }, // No metadata needed yet
-  _id: false,
-});
+  { _id: false }
+);
