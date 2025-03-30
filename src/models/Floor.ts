@@ -1,11 +1,11 @@
 import { model, Schema } from "mongoose";
-import { IPrinterInFloor, PrinterInFloorSchema } from "./FloorPrinter";
+import { IPosition, PrinterInFloorSchema } from "./FloorPrinter";
 
 export interface IFloor {
   id: string;
   name: string;
   floor: number;
-  printers: IPrinterInFloor[];
+  printers: IPosition[];
 }
 
 const FloorSchema = new Schema<IFloor>({

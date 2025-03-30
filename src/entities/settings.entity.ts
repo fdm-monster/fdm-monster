@@ -7,15 +7,14 @@ import {
   wizardSettingKey,
 } from "@/constants/server-settings.constants";
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
-import { BaseEntity } from "@/entities/base.entity";
 
 @Entity()
-export class Settings extends BaseEntity {
+export class Settings {
   @PrimaryGeneratedColumn()
-  id!: number;
+  id: number;
 
   @Column({ type: "simple-json", nullable: false })
-  [serverSettingsKey]!: {
+  [serverSettingsKey]: {
     sentryDiagnosticsEnabled: boolean;
     debugSettings: {
       debugSocketIoEvents: boolean;
@@ -33,7 +32,7 @@ export class Settings extends BaseEntity {
   };
 
   @Column({ type: "simple-json", nullable: false })
-  [credentialSettingsKey]!: {
+  [credentialSettingsKey]: {
     jwtSecret: string; // minlength: 10, trim
     jwtExpiresIn: number;
     refreshTokenAttempts: number;
@@ -41,21 +40,21 @@ export class Settings extends BaseEntity {
   };
 
   @Column({ type: "simple-json", nullable: false })
-  [wizardSettingKey]!: {
+  [wizardSettingKey]: {
     wizardCompleted: boolean;
     wizardCompletedAt: Date | null;
     wizardVersion: number;
   };
 
   @Column({ type: "simple-json", nullable: false })
-  [printerFileCleanSettingKey]!: {
+  [printerFileCleanSettingKey]: {
     autoRemoveOldFilesBeforeUpload: boolean;
     autoRemoveOldFilesAtBoot: boolean;
     autoRemoveOldFilesCriteriumDays: number;
   };
 
   @Column({ type: "simple-json", nullable: false })
-  [frontendSettingKey]!: {
+  [frontendSettingKey]: {
     gridCols: number;
     gridRows: number;
     largeTiles: boolean;
@@ -63,7 +62,7 @@ export class Settings extends BaseEntity {
   };
 
   @Column({ type: "simple-json", nullable: false })
-  [timeoutSettingKey]!: {
+  [timeoutSettingKey]: {
     apiTimeout: number;
   };
 }

@@ -1,9 +1,11 @@
-import { Column, Entity } from "typeorm";
-import { BaseEntity } from "@/entities/base.entity";
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 import { Length } from "class-validator";
 
 @Entity()
-export class Group extends BaseEntity {
+export class Group {
+  @PrimaryGeneratedColumn()
+  id: number;
+
   @Column()
   @Length(1)
   name: string;

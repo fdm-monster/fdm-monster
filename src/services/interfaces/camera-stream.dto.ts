@@ -2,9 +2,13 @@ import { IdDto } from "@/shared.constants";
 import { IsDefined, IsIn, IsNotEmpty, IsOptional } from "class-validator";
 
 export class CameraStreamDto<KeyType> extends IdDto<KeyType> {
-  name: string;
+  name?: string;
   streamURL: string;
-  printerId: KeyType;
+  printerId: KeyType | null;
+  aspectRatio: string;
+  rotationClockwise: number;
+  flipHorizontal: boolean;
+  flipVertical: boolean;
 }
 
 export class CreateCameraStreamDto<KeyType> {

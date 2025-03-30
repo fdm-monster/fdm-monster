@@ -113,7 +113,7 @@ describe(PrinterGroupController.name, () => {
     expect(groups.length).toBeGreaterThan(0);
     const groupUnderTest = groups.find((g) => g.id == groupId);
     expect(groupUnderTest).toBeDefined();
-    expect(groupUnderTest.printers.find((p) => p.printerId === printerId)).toBeDefined();
+    expect(groupUnderTest!.printers.find((p) => p.printerId === printerId)).toBeDefined();
   });
 
   testIf(isSqliteModeTest(), "should create group and add+remove a printer", async () => {

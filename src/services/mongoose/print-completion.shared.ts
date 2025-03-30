@@ -21,24 +21,24 @@ export type PrintJobEvents = {
 export interface AnalyzedCompletions {
   _id?: IdType;
   printerId: IdType;
-  eventCount: number;
-  printCount: number;
-  failureCount: number;
-  lastFailure: Partial<PrintCompletionDto>;
-  failureEventsLastWeek: number;
-  failureEventsLast48H: number;
-  failureEventsLast24H: number;
-  successCount: number;
-  lastSuccess: Partial<PrintCompletionDto>;
-  successEventsLastWeek: number;
-  successEventsLast48H: number;
-  successEventsLast24H: number;
-
-  correlationIds: IdType[];
-
   printEvents: PrintCompletionDto[];
 
-  printJobs: PrintJobEvents[];
+  eventCount?: number;
+  printCount?: number;
+  failureCount?: number;
+  lastFailure?: Partial<PrintCompletionDto> | null;
+  failureEventsLastWeek?: number;
+  failureEventsLast48H?: number;
+  failureEventsLast24H?: number;
+  successCount?: number;
+  lastSuccess?: Partial<PrintCompletionDto> | null;
+  successEventsLastWeek?: number;
+  successEventsLast48H?: number;
+  successEventsLast24H?: number;
+
+  correlationIds?: IdType[];
+
+  printJobs?: PrintJobEvents[];
 }
 
 export function processCompletions(completions: AnalyzedCompletions[]): AnalyzedCompletions[] {
@@ -86,7 +86,7 @@ export function processCompletions(completions: AnalyzedCompletions[]): Analyzed
     pc.successEventsLast24H = successEvents.filter((e) => e.createdAt > Date.now() - durationDayMSec)?.length;
 
     // Explodes in size quickly, remove the event timeline
-    delete pc.printEvents;
+    pc.printEvents = [];
 
     return pc;
   });
