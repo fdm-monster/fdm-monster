@@ -1,6 +1,6 @@
 import { before, DELETE, GET, PATCH, POST, route } from "awilix-express";
 import { authenticate, authorizeRoles } from "@/middleware/authenticate";
-import { getScopedPrinter, validateInput, validateMiddleware } from "@/handlers/validators";
+import { validateInput, validateMiddleware } from "@/handlers/validators";
 import {
   feedRateRules,
   flowRateRules,
@@ -34,6 +34,7 @@ import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { PrinterApiFactory } from "@/services/printer-api.factory";
 import { normalizeUrl } from "@/utils/normalize-url";
 import { defaultHttpProtocol } from "@/utils/url.utils";
+import { getScopedPrinter } from "@/handlers/printer-resolver";
 
 @route(AppConstants.apiRoute + "/printer")
 @before([authenticate(), authorizeRoles([ROLES.OPERATOR, ROLES.ADMIN]), printerResolveMiddleware()])

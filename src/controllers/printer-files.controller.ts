@@ -1,6 +1,6 @@
 import { before, DELETE, GET, POST, route } from "awilix-express";
-import { authenticate, authorizePermission, authorizeRoles } from "@/middleware/authenticate";
-import { getScopedPrinter, validateInput } from "@/handlers/validators";
+import { authenticate, permission, authorizeRoles } from "@/middleware/authenticate";
+import { validateInput } from "@/handlers/validators";
 import { AppConstants } from "@/server.constants";
 import { downloadFileRules, getFileRules, startPrintFileRules } from "./validation/printer-files-controller.validation";
 import { ValidationException } from "@/exceptions/runtime.exceptions";
@@ -19,6 +19,7 @@ import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
 import { captureException } from "@sentry/node";
 import { errorSummary } from "@/utils/error.utils";
 import { LoginDto } from "@/services/interfaces/login.dto";
+import { getScopedPrinter } from "@/handlers/printer-resolver";
 
 @route(AppConstants.apiRoute + "/printer-files")
 @before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR]), printerResolveMiddleware()])
@@ -67,7 +68,7 @@ export class PrinterFilesController {
 
   @POST()
   @route("/purge")
-  @before(authorizePermission(PERMS.PrinterFiles.Clear))
+  @before(permission(PERMS.PrinterFiles.Clear))
   async purgeIndexedFiles(req: Request, res: Response) {
     await this.printerFilesStore.purgeFiles();
     res.send();
@@ -75,7 +76,7 @@ export class PrinterFilesController {
 
   @GET()
   @route("/thumbnails")
-  @before(authorizePermission(PERMS.PrinterFiles.Get))
+  @before(permission(PERMS.PrinterFiles.Get))
   async getThumbnails(req: Request, res: Response) {
     const thumbnails = await this.printerThumbnailCache.getAllValues();
     res.send(thumbnails);
@@ -83,7 +84,7 @@ export class PrinterFilesController {
 
   @GET()
   @route("/:id")
-  @before(authorizePermission(PERMS.PrinterFiles.Get))
+  @before(permission(PERMS.PrinterFiles.Get))
   async getFiles(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
     this.logger.log("Refreshing file storage (eager load)");
@@ -93,7 +94,7 @@ export class PrinterFilesController {
 
   @POST()
   @route("/:id/reload-thumbnail")
-  @before(authorizePermission(PERMS.PrinterFiles.Actions))
+  @before(permission(PERMS.PrinterFiles.Actions))
   async reloadThumbnail(req: Request, res: Response) {
     const { filePath } = await validateInput(req.body, startPrintFileRules);
 
@@ -115,7 +116,7 @@ export class PrinterFilesController {
    */
   @route("/:id/select")
   @route("/:id/print")
-  @before(authorizePermission(PERMS.PrinterFiles.Actions))
+  @before(permission(PERMS.PrinterFiles.Actions))
   async startPrintFile(req: Request, res: Response) {
     const { filePath } = await validateInput(req.body, startPrintFileRules);
     const encodedFilePath = encodeURIComponent(filePath);
@@ -135,7 +136,7 @@ export class PrinterFilesController {
 
   @GET()
   @route("/:id/cache")
-  @before(authorizePermission(PERMS.PrinterFiles.Get))
+  @before(permission(PERMS.PrinterFiles.Get))
   async getFilesCache(req: Request, res: Response) {
     const { currentPrinter } = getScopedPrinter(req);
     res.send(this.printerFilesStore.getFiles(currentPrinter.id));
@@ -143,7 +144,7 @@ export class PrinterFilesController {
 
   @GET()
   @route("/:id/download/:path")
-  @before(authorizePermission(PERMS.PrinterFiles.Get))
+  @before(permission(PERMS.PrinterFiles.Get))
   async downloadFile(req: Request, res: Response) {
     this.logger.log(`Downloading file ${req.params.path}`);
     const { path } = await validateInput(req.params, downloadFileRules);
@@ -161,7 +162,7 @@ export class PrinterFilesController {
 
   @DELETE()
   @route("/:id")
-  @before(authorizePermission(PERMS.PrinterFiles.Delete))
+  @before(permission(PERMS.PrinterFiles.Delete))
   async deleteFileOrFolder(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
     const { path } = await validateInput(req.query, getFileRules);
@@ -174,7 +175,7 @@ export class PrinterFilesController {
 
   @DELETE()
   @route("/:id/clear")
-  @before(authorizePermission(PERMS.PrinterFiles.Clear))
+  @before(permission(PERMS.PrinterFiles.Clear))
   async clearPrinterFiles(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
 
@@ -202,7 +203,7 @@ export class PrinterFilesController {
 
   @GET()
   @route("/:id/thumbnail")
-  @before(authorizePermission(PERMS.PrinterFiles.Get))
+  @before(permission(PERMS.PrinterFiles.Get))
   async getPrinterThumbnail(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
     const printerThumbnail = await this.printerThumbnailCache.getValue(currentPrinterId.toString());
@@ -211,7 +212,7 @@ export class PrinterFilesController {
 
   @POST()
   @route("/:id/upload")
-  @before(authorizePermission(PERMS.PrinterFiles.Upload))
+  @before(permission(PERMS.PrinterFiles.Upload))
   async uploadPrinterFile(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
 

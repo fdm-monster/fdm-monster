@@ -1,7 +1,7 @@
-import { createController } from "awilix-express";
+import { before, GET, route } from "awilix-express";
 import { AppConstants } from "@/server.constants";
 import { isNode } from "@/utils/env.utils";
-import { authenticate, authorizePermission } from "@/middleware/authenticate";
+import { authenticate, permission } from "@/middleware/authenticate";
 import { PERMS } from "@/constants/authorization.constants";
 import { isDocker } from "@/utils/is-docker";
 import { RoleService } from "@/services/mongoose/role.service";
@@ -12,6 +12,7 @@ import { MonsterPiService } from "@/services/core/monsterpi.service";
 import { UserService } from "@/services/mongoose/user.service";
 import { Request, Response } from "express";
 
+@route(AppConstants.apiRoute)
 export class ServerPublicController {
   serverVersion: string;
   settingsStore: SettingsStore;
@@ -51,8 +52,11 @@ export class ServerPublicController {
     this.isTypeormMode = isTypeormMode;
   }
 
+  @GET()
+  @route("/")
+  @before([authenticate(), permission(PERMS.ServerInfo.Get)])
   welcome(req: Request, res: Response) {
-    const serverSettings = this.settingsStore.getSettings();
+    this.settingsStore.getSettings();
 
     if (!this.settingsStore.getLoginRequired()) {
       return res.send({
@@ -65,6 +69,9 @@ export class ServerPublicController {
     });
   }
 
+  @GET()
+  @route("/features")
+  @before([authenticate()])
   getFeatures(req: Request, res: Response) {
     const serverSettings = this.settingsStore.getServerSettings();
     const moonrakerEnabled = serverSettings.experimentalMoonrakerSupport;
@@ -135,8 +142,11 @@ export class ServerPublicController {
     });
   }
 
+  @GET()
+  @route("/version")
+  @before([authenticate(), permission(PERMS.ServerInfo.Get)])
   async getVersion(req: Request, res: Response) {
-    let updateState = this.serverReleaseService.getState();
+    const updateState = this.serverReleaseService.getState();
     const monsterPiVersion = this.monsterPiService.getMonsterPiVersionSafe();
 
     res.json({
@@ -153,16 +163,11 @@ export class ServerPublicController {
     });
   }
 
+  @GET()
+  @route("/test")
   async test(req: Request, res: Response) {
     res.send({
       message: "Test successful. Please load the Vue app.",
     });
   }
 }
-
-export default createController(ServerPublicController)
-  .prefix(AppConstants.apiRoute + "/")
-  .get("", "welcome", { before: [authenticate(), authorizePermission(PERMS.ServerInfo.Get)] })
-  .get("test", "test")
-  .get("features", "getFeatures", { before: [authenticate()] })
-  .get("version", "getVersion", { before: [authenticate(), authorizePermission(PERMS.ServerInfo.Get)] });

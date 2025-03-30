@@ -31,7 +31,3 @@ export const demoUserNotAllowed = inject(
     };
   }
 );
-
-export const demoUserNotAllowedInterceptor = {
-  before: [demoUserNotAllowed],
-};
