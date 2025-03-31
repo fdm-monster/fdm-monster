@@ -1,7 +1,8 @@
 import { model, Schema } from "mongoose";
+import { MongoIdType } from "@/shared.constants";
 
-export interface IPermission {
-  id: string;
+export interface IPermission<KeyType = MongoIdType> {
+  id: KeyType;
   name: string;
 }
 

@@ -3,10 +3,10 @@ import { IPosition, PrinterInFloorSchema } from "./FloorPrinter";
 import { MongoIdType } from "@/shared.constants";
 
 export interface IFloor<KeyType = MongoIdType> {
-  id: string;
+  id: KeyType;
   name: string;
   floor: number;
-  printers: IPosition<KeyType>[];
+  printers: IPosition[];
 }
 
 const FloorSchema = new Schema<IFloor>({

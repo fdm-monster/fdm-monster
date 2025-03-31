@@ -1,6 +1,7 @@
 import { AnyArray, model, Schema } from "mongoose";
+import { MongoIdType } from "@/shared.constants";
 
-export interface IUser<KeyType = string> {
+export interface IUser<KeyType = MongoIdType> {
   id: KeyType;
   username: string;
   isDemoUser: boolean;

@@ -1,8 +1,9 @@
 import { model, Schema } from "mongoose";
 import { PrintCompletionContextDto } from "@/services/interfaces/print-completion-context.dto";
+import { MongoIdType } from "@/shared.constants";
 
-export interface IPrintCompletion {
-  id: string;
+export interface IPrintCompletion<KeyType = MongoIdType> {
+  id: KeyType;
   fileName: string;
   createdAt: number;
   status: string;
