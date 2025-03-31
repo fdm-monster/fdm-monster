@@ -6,25 +6,15 @@ import { validateInput } from "@/handlers/validators";
 import { PrintCompletionSocketIoTask } from "@/tasks/print-completion.socketio.task";
 import { Request, Response } from "express";
 import { IPrintHistoryService } from "@/services/interfaces/print-history.interface";
+import { findPrinterCompletionSchema } from "@/controllers/validation/printer-completion-controller.validation";
 
 @route(AppConstants.apiRoute + "/print-completion")
 @before([authenticate()])
 export class PrintCompletionController {
   constructor(
-    private printCompletionService: IPrintHistoryService,
-    private printCompletionSocketIoTask: PrintCompletionSocketIoTask,
+    private readonly printHistoryService: IPrintHistoryService,
+    private readonly printCompletionSocketIoTask: PrintCompletionSocketIoTask
   ) {}
-
-  constructor({
-    printCompletionService,
-    printCompletionSocketIoTask,
-  }: {
-    printCompletionService: IPrintHistoryService;
-    printCompletionSocketIoTask: PrintCompletionSocketIoTask;
-  }) {
-    this.printCompletionService = printCompletionService;
-    this.printCompletionSocketIoTask = printCompletionSocketIoTask;
-  }
 
   /**
    * Not a production ready call, just for testing.
@@ -33,7 +23,7 @@ export class PrintCompletionController {
   @route("/test")
   @before([permission(PERMS.PrintCompletion.List)])
   async test(req: Request, res: Response) {
-    const result = await this.printCompletionService.loadPrintContexts();
+    const result = await this.printHistoryService.loadPrintContexts();
     res.send(result);
   }
 
@@ -50,7 +40,7 @@ export class PrintCompletionController {
   @before([permission(PERMS.PrintCompletion.Default)])
   async findCorrelatedEntries(req: Request, res: Response) {
     const { correlationId } = await validateInput(req.params, findPrinterCompletionSchema);
-    const result = await this.printCompletionService.findPrintCompletion(correlationId);
+    const result = await this.printHistoryService.findPrintLog(correlationId);
     res.send(result);
   }
 
@@ -58,7 +48,7 @@ export class PrintCompletionController {
   @route("/")
   @before([permission(PERMS.PrintCompletion.List)])
   async list(req: Request, res: Response) {
-    const completions = await this.printCompletionService.listGroupByPrinterStatus();
+    const completions = await this.printHistoryService.listGroupByPrinterStatus();
     res.send(completions);
   }
 }
