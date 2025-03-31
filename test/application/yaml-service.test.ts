@@ -1,6 +1,5 @@
 import { YamlService } from "@/services/core/yaml.service";
 import { PrinterCache } from "@/state/printer.cache";
-import { AwilixContainer } from "awilix";
 import { DITokens } from "@/container.tokens";
 import { exportYamlBuffer1_3_1, exportYamlBuffer1_5_0, exportYamlBuffer1_6_0 } from "./test-data/yaml-import";
 import { setupTestApp } from "../test-server";

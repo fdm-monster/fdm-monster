@@ -35,7 +35,7 @@ export class YamlService {
   async importPrintersAndFloors(yamlBuffer: string) {
     const importSpec = (await load(yamlBuffer)) as YamlExportSchema;
     const databaseTypeSqlite = importSpec.databaseType === "sqlite";
-    const { exportPrinters, exportFloorGrid } = importSpec?.config;
+    const { exportPrinters, exportFloorGrid } = importSpec.config;
 
     for (const printer of importSpec.printers) {
       // old export bug
