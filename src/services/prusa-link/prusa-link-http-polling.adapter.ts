@@ -10,29 +10,18 @@ import { ISocketLogin } from "@/shared/dtos/socket-login.dto";
 
 export class PrusaLinkHttpPollingAdapter implements IWebsocketAdapter {
   public readonly printerType = PrusaLinkType;
-  prusaLinkApi: PrusaLinkApi;
   public printerId?: IdType;
   protected declare logger: LoggerService;
-  private eventEmitter: EventEmitter2;
-  private configService: ConfigService;
   private socketURL?: URL;
   private refreshPrinterCurrentInterval?: NodeJS.Timeout;
 
-  constructor({
-    loggerFactory,
-    prusaLinkApi,
-    eventEmitter2,
-    configService,
-  }: {
-    loggerFactory: ILoggerFactory;
-    prusaLinkApi: PrusaLinkApi;
-    eventEmitter2: EventEmitter2;
-    configService: ConfigService;
-  }) {
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly prusaLinkApi: PrusaLinkApi,
+    private readonly eventEmitter2: EventEmitter2,
+    private readonly configService: ConfigService
+  ) {
     this.logger = loggerFactory(PrusaLinkHttpPollingAdapter.name);
-    this.prusaLinkApi = prusaLinkApi;
-    this.eventEmitter = eventEmitter2;
-    this.configService = configService;
   }
 
   socketState: "unopened" | "opening" | "authenticating" | "opened" | "authenticated" | "aborted" | "error" | "closed";
