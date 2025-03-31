@@ -1,9 +1,7 @@
 import { before, GET, POST, route } from "awilix-express";
 import { BadRequestException } from "@/exceptions/runtime.exceptions";
 import { AppConstants } from "@/server.constants";
-import { validateMiddleware } from "@/handlers/validators";
-import { registerUserRules } from "./validation/user-controller.validation";
-import { refreshTokenRules } from "./validation/auth-controller.validation";
+import { refreshTokenSchema } from "./validation/auth-controller.validation";
 import { authenticate } from "@/middleware/authenticate";
 import { SettingsStore } from "@/state/settings.store";
 import { ILoggerFactory } from "@/handlers/logger-factory";
@@ -14,6 +12,8 @@ import { IAuthService } from "@/services/interfaces/auth.service.interface";
 import { IRoleService } from "@/services/interfaces/role-service.interface";
 import { demoUserNotAllowed } from "@/middleware/demo.middleware";
 import { IConfigService } from "@/services/core/config.service";
+import { registerUserSchema } from "@/controllers/validation/user-controller.validation";
+import { validateMiddleware } from "@/handlers/validators";
 
 @route(AppConstants.apiRoute + "/auth")
 export class AuthController {
@@ -92,7 +92,7 @@ export class AuthController {
   @POST()
   @route("/refresh")
   async refreshLogin(req: Request, res: Response) {
-    const { refreshToken } = await validateMiddleware(req, refreshTokenRules);
+    const { refreshToken } = await validateMiddleware(req, refreshTokenSchema);
     // TODO sensitivity filter
     this.logger.debug(`Refresh login attempt from IP ${req.ip} and user-agent ${req.headers["user-agent"]}`);
     const idToken = await this.authService.renewLoginByRefreshToken(refreshToken);
@@ -123,7 +123,7 @@ export class AuthController {
     if (!registrationEnabled) {
       throw new BadRequestException("Registration is disabled. Cant register user");
     }
-    const { username, password } = await validateMiddleware(req, registerUserRules);
+    const { username, password } = await validateMiddleware(req, registerUserSchema);
     if (
       username.toLowerCase().includes("admin") ||
       username.toLowerCase().includes("root") ||

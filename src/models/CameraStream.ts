@@ -1,7 +1,8 @@
 import { model, Schema, Types } from "mongoose";
+import { MongoIdType } from "@/shared.constants";
 
-export interface ICameraStream {
-  id: string;
+export interface ICameraStream<KeyType = MongoIdType> {
+  id: KeyType;
   name?: string;
   streamURL: string;
   printerId?: Types.ObjectId;

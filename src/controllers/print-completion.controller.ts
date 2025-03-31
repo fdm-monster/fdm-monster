@@ -6,6 +6,7 @@ import { validateInput } from "@/handlers/validators";
 import { PrintCompletionSocketIoTask } from "@/tasks/print-completion.socketio.task";
 import { Request, Response } from "express";
 import { IPrintCompletionService } from "@/services/interfaces/print-completion.interface";
+import { findPrinterCompletionSchema } from "@/controllers/validation/printer-completion-controller.validation";
 
 @route(AppConstants.apiRoute + "/print-completion")
 @before([authenticate()])
@@ -38,7 +39,7 @@ export class PrintCompletionController {
   @route("/:correlationId")
   @before([permission(PERMS.PrintCompletion.Default)])
   async findCorrelatedEntries(req: Request, res: Response) {
-    const { correlationId } = await validateInput(req.params, { correlationId: "required|string" });
+    const { correlationId } = await validateInput(req.params, findPrinterCompletionSchema);
     const result = await this.printCompletionService.findPrintCompletion(correlationId);
     res.send(result);
   }

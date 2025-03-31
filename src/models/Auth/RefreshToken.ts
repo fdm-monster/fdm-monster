@@ -1,7 +1,8 @@
 import { model, Schema, Types } from "mongoose";
+import { MongoIdType } from "@/shared.constants";
 
-export interface IRefreshToken {
-  id: string;
+export interface IRefreshToken<KeyType = MongoIdType> {
+  id: KeyType;
   userId: Types.ObjectId;
   createdAt: Date;
   expiresAt: number;

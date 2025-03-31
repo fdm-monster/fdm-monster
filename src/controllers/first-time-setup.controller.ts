@@ -1,7 +1,7 @@
 import { POST, route } from "awilix-express";
 import { AppConstants } from "@/server.constants";
 import { validateMiddleware } from "@/handlers/validators";
-import { wizardSettingsRules } from "./validation/setting.validation";
+import { wizardSettingsSchema } from "./validation/setting.validation";
 import { BadRequestException, ForbiddenError } from "@/exceptions/runtime.exceptions";
 import { ROLES } from "@/constants/authorization.constants";
 import { SettingsStore } from "@/state/settings.store";
@@ -20,7 +20,7 @@ export class FirstTimeSetupController {
   @POST()
   @route("/validate")
   async validateWizard(req: Request, res: Response) {
-    const { rootUsername } = await validateMiddleware(req, wizardSettingsRules);
+    const { rootUsername } = await validateMiddleware(req, wizardSettingsSchema);
     await this.roleService.getSynchronizedRoleByName(ROLES.ADMIN);
 
     if (this.settingsStore.isWizardCompleted()) {
@@ -38,7 +38,7 @@ export class FirstTimeSetupController {
   @POST()
   @route("/complete")
   async completeWizard(req: Request, res: Response) {
-    const { loginRequired, registration, rootUsername, rootPassword } = await validateMiddleware(req, wizardSettingsRules);
+    const { loginRequired, registration, rootUsername, rootPassword } = await validateMiddleware(req, wizardSettingsSchema);
 
     if (this.settingsStore.isWizardCompleted()) {
       throw new ForbiddenError("Wizard already completed");

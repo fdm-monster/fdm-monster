@@ -1,6 +1,5 @@
 import { YamlService } from "@/services/core/yaml.service";
 import { PrinterCache } from "@/state/printer.cache";
-import { AwilixContainer } from "awilix";
 import { DITokens } from "@/container.tokens";
 import { exportYamlBuffer1_3_1, exportYamlBuffer1_5_0, exportYamlBuffer1_6_0 } from "./test-data/yaml-import";
 import { setupTestApp } from "../test-server";
@@ -14,7 +13,6 @@ import { FloorStore } from "@/state/floor.store";
 import { FloorPositionService } from "@/services/orm/floor-position.service";
 import { OctoprintType } from "@/services/printer-api.interface";
 
-let container: AwilixContainer;
 let yamlService: YamlService;
 let printerCache: PrinterCache;
 let printerService: IPrinterService;
@@ -89,10 +87,11 @@ describe(YamlService.name, () => {
     await yamlService.importPrintersAndFloors(buffer.toString());
 
     const printers = await printerService.list();
-    const printer = printers.find((p) => p.name === "Dragon Eggggg");
+    const printer = printers.find((p) => p.name === "Dragon Eggggg")!;
+    expect(printer).toBeDefined();
 
     const floors = await floorService.list();
-    const floor = floors.find((f) => f.name === "Default Floor1_5_2");
+    const floor = floors.find((f) => f.name === "Default Floor1_5_2")!;
     expect(floor).toBeDefined();
     expect(floor.printers).toHaveLength(2);
     if (isTypeormMode) {
@@ -108,7 +107,7 @@ describe(YamlService.name, () => {
     await yamlService.importPrintersAndFloors(exportYamlBuffer1_6_0(true));
 
     const floors = await floorService.list();
-    const floor = floors.find((f) => f.name === "Default Floor1_6_0");
+    const floor = floors.find((f) => f.name === "Default Floor1_6_0")!;
     expect(floor).toBeDefined();
     expect(floor.printers).toHaveLength(2);
   });
@@ -119,10 +118,11 @@ describe(YamlService.name, () => {
     await yamlService.importPrintersAndFloors(buffer.toString());
 
     const printers = await printerService.list();
-    const printer = printers.find((p) => p.name === "Minipi Local");
+    const printer = printers.find((p) => p.name === "Minipi Local")!;
+    expect(printer).toBeDefined();
 
     const floors = await floorService.list();
-    const floor = floors.find((f) => f.name === "Default Floor1_6_0");
+    const floor = floors.find((f) => f.name === "Default Floor1_6_0")!;
     expect(floor).toBeDefined();
     expect(floor.printers).toHaveLength(3);
     expect(floor.printers.find((p) => p.printerId.toString() === printer.id.toString())).toBeDefined();
@@ -139,21 +139,23 @@ describe(YamlService.name, () => {
     await yamlService.importPrintersAndFloors(buffer.toString());
 
     const printers = await printerService.list();
-    const printer = printers.find((p) => p.name === "Minipi Local1_6_1");
+    const printer = printers.find((p) => p.name === "Minipi Local1_6_1")!;
+    expect(printer).toBeDefined();
 
     const floors = await floorService.list();
     expect(floors).toHaveLength(1);
-    const floor = floors.find((f) => f.name === "Default Floor1_6_1");
+    const floor = floors.find((f) => f.name === "Default Floor1_6_1")!;
     expect(floor).toBeDefined();
     expect(floor.printers).toHaveLength(4);
     expect(floor.printers.find((p) => p.printerId.toString() === printer.id.toString())).toBeDefined();
 
     if (isTypeormMode) {
       const groups = await printerGroupService.listGroups();
-      const group = groups.find((g) => g.name === "Group A123_1.6.1");
+      expect(groups).toBeDefined();
+      const group = groups.find((g) => g.name === "Group A123_1.6.1")!;
       expect(group).toBeDefined();
       expect(group.printers).toHaveLength(2);
-      expect(groups.find((g) => g.name === "Group test_1.6.1").printers).toHaveLength(0);
+      expect(groups.find((g) => g.name === "Group test_1.6.1")!.printers).toHaveLength(0);
     } else {
       expect(printerGroupService).toBeNull();
     }
@@ -182,7 +184,9 @@ describe(YamlService.name, () => {
     // Probe the new floor and assert a position on it is taken
     const floors = await floorService.list();
     expect(floors).toHaveLength(2);
-    const newFloor2 = floors.find((f) => f.name === "Floor2");
+    const newFloor2 = floors.find((f) => f.name === "Floor2")!;
+    expect(newFloor2).toBeDefined();
+
     if (isTypeormMode) {
       expect(typeof newFloor2.id).toBe("number");
     } else {
@@ -198,7 +202,9 @@ describe(YamlService.name, () => {
 
     // The original floor's name is now gone, and the original printer has not been removed from it (overwrite action)
     expect(floors.find((f) => f.name === "Floor1_DifferentName")).toBeUndefined();
-    const mutatedFloor1 = floors.find((f) => f.name === "Floor1" && f.floor === 15);
+    const mutatedFloor1 = floors.find((f) => f.name === "Floor1" && f.floor === 15)!;
+    expect(mutatedFloor1).toBeDefined();
+
     expect(mutatedFloor1.printers).toHaveLength(1);
     expect(mutatedFloor1).toBeDefined();
     const originalPrinterPos = mutatedFloor1.printers.find((p) => p.printerId === printer.id);
@@ -208,6 +214,8 @@ describe(YamlService.name, () => {
 
     // Test that caching is not the cause
     const cache = await floorStore.listCache();
-    expect(cache.find((f) => f.name === "Floor2").printers).toHaveLength(1);
+    const foundPrinters = cache.find((f) => f.name === "Floor2")!;
+    expect(foundPrinters).toBeDefined();
+    expect(foundPrinters.printers).toHaveLength(1);
   });
 });

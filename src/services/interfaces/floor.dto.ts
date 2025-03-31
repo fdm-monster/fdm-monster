@@ -7,6 +7,13 @@ export class PositionDto<KeyType = IdType> {
   floorId: KeyType;
 }
 
+export class CreatePositionDto<KeyType> {
+  x: number;
+  y: number;
+  printerId: KeyType;
+  floorId?: KeyType;
+}
+
 export class FloorDto<KeyType = IdType> {
   id: KeyType;
   name: string;
@@ -15,7 +22,7 @@ export class FloorDto<KeyType = IdType> {
 }
 
 export class CreateFloorDto<KeyType> {
-  printers?: PositionDto<KeyType>[];
+  printers?: CreatePositionDto<KeyType>[];
   name: string;
   floor: number;
 }

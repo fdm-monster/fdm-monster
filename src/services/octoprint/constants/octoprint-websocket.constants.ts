@@ -38,3 +38,7 @@ export const EVENT_TYPES = {
   Waiting: "Waiting",
   ZChange: "ZChange",
 } as const;
+
+export const EVENT_TYPES_ARRAY = Object.values(EVENT_TYPES);
+
+export type EventType = typeof EVENT_TYPES_ARRAY[number];

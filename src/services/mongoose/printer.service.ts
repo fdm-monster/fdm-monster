@@ -3,16 +3,15 @@ import { Printer } from "@/models";
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import { validateInput } from "@/handlers/validators";
 import {
-  createMongoPrinterRules,
-  updatePrinterDisabledReasonRule,
-  updatePrinterEnabledRule,
+  createPrinterSchema,
+  updatePrinterDisabledReasonSchema,
+  updatePrinterEnabledSchema,
 } from "../validators/printer-service.validation";
 import { printerEvents } from "@/constants/event.constants";
 import { LoggerService } from "@/handlers/logger";
 import { MongoIdType } from "@/shared.constants";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { ILoggerFactory } from "@/handlers/logger-factory";
-import { LoginDto } from "@/services/interfaces/login.dto";
 import { PrinterDto, PrinterUnsafeDto } from "@/services/interfaces/printer.dto";
 import { IPrinter } from "@/models/Printer";
 import { normalizeUrl } from "@/utils/normalize-url";
@@ -88,7 +87,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
   async update(printerId: MongoIdType, updateData: Partial<IPrinter>) {
     const printer = await this.get(printerId);
     updateData.printerURL = normalizeUrl(updateData.printerURL, { defaultProtocol: defaultHttpProtocol });
-    const { printerURL, apiKey, enabled, name, printerType } = await validateInput(updateData, createMongoPrinterRules);
+    const { printerURL, apiKey, enabled, name, printerType } = await validateInput(updateData, createPrinterSchema);
 
     printer.printerURL = printerURL;
     printer.apiKey = apiKey;
@@ -159,24 +158,6 @@ export class PrinterService implements IPrinterService<MongoIdType> {
     return printer;
   }
 
-  async updateConnectionSettings(printerId: MongoIdType, { printerURL, apiKey, printerType }: LoginDto) {
-    const update = {
-      printerURL: normalizeUrl(printerURL, { defaultProtocol: defaultHttpProtocol }),
-      apiKey,
-      printerType,
-    };
-
-    await validateInput(update, createMongoPrinterRules);
-    await this.get(printerId);
-
-    const printer = await Printer.findByIdAndUpdate(printerId, update, {
-      new: true,
-      useFindAndModify: false,
-    });
-    this.eventEmitter2.emit(printerEvents.printerUpdated, { printer });
-    return printer;
-  }
-
   async updateEnabled(printerId: MongoIdType, enabled: boolean) {
     const update = enabled
       ? {
@@ -185,7 +166,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
         }
       : { enabled };
 
-    await validateInput(update, updatePrinterEnabledRule);
+    await validateInput(update, updatePrinterEnabledSchema);
     await this.get(printerId);
 
     const printer = await Printer.findByIdAndUpdate(printerId, update, {
@@ -193,7 +174,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
       useFindAndModify: false,
     });
     this.eventEmitter2.emit(printerEvents.printerUpdated, { printer });
-    return printer;
+    return printer!;
   }
 
   async updateDisabledReason(printerId: MongoIdType, disabledReason: string) {
@@ -203,7 +184,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
       enabled,
     };
 
-    await validateInput(update, updatePrinterDisabledReasonRule);
+    await validateInput(update, updatePrinterDisabledReasonSchema);
     await this.get(printerId);
 
     const printer = await Printer.findByIdAndUpdate(printerId, update, {
@@ -211,7 +192,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
       useFindAndModify: false,
     });
     this.eventEmitter2.emit(printerEvents.printerUpdated, { printer });
-    return printer;
+    return printer!;
   }
 
   private async validateAndDefault(printer): Promise<IPrinter> {
@@ -222,6 +203,6 @@ export class PrinterService implements IPrinterService<MongoIdType> {
     if (mergedPrinter.printerURL?.length) {
       mergedPrinter.printerURL = normalizeUrl(mergedPrinter.printerURL, { defaultProtocol: defaultHttpProtocol });
     }
-    return await validateInput(mergedPrinter, createMongoPrinterRules);
+    return await validateInput(mergedPrinter, createPrinterSchema);
   }
 }

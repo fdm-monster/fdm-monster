@@ -22,6 +22,12 @@
 - Enforce floor id on Mongoose schema for consistency with TypeORM floor entity
 - Set floor id in Mongoose floor service for consistency with typeorm service
 - Remove PrinterFile entity (unused)
+- Remove printer/connection PATCH endpoint (unused)
+- Make yaml import fill in defaults
+- Make printerId camera nullish
+- Merge create and update schema floor
+- Make printCompletionSchema context type any,
+- printerPositionsSchema simplified
 
 ## Fixes
 

@@ -4,15 +4,15 @@ import { AppConstants } from "@/server.constants";
 import { ROLES } from "@/constants/authorization.constants";
 import { validateInput } from "@/handlers/validators";
 import {
-  clientNextRules,
-  credentialSettingPatchRules,
-  fileCleanSettingsUpdateRules,
-  frontendSettingsUpdateRules,
-  moonrakerSupportRules,
-  sentryDiagnosticsEnabledRules,
-  serverSettingsUpdateRules,
-  thumbnailSupportRules,
-  timeoutSettingsUpdateRules,
+  clientNextSchema,
+  credentialSettingPatchSchema,
+  fileCleanSettingsUpdateSchema,
+  frontendSettingsUpdateSchema,
+  moonrakerSupportSchema,
+  sentryDiagnosticsEnabledSchema,
+  serverSettingsUpdateSchema,
+  thumbnailSupportSchema,
+  timeoutSettingsUpdateSchema,
 } from "@/services/validators/settings-service.validation";
 import { SettingsStore } from "@/state/settings.store";
 import { Request, Response } from "express";
@@ -23,6 +23,7 @@ import { PrinterCache } from "@/state/printer.cache";
 import { MoonrakerType } from "@/services/printer-api.interface";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
+import { loginRequiredSchema, registrationEnabledSchema } from "@/controllers/validation/setting.validation";
 
 @route(AppConstants.apiRoute + "/settings")
 @before([authenticate()])
@@ -68,7 +69,7 @@ export class SettingsController {
   @route("/sentry-diagnostics")
   @before([demoUserNotAllowed])
   async updateSentryDiagnosticsEnabled(req: Request, res: Response) {
-    const { enabled } = await validateInput(req.body, sentryDiagnosticsEnabledRules);
+    const { enabled } = await validateInput(req.body, sentryDiagnosticsEnabledSchema);
     const result = this.settingsStore.setSentryDiagnosticsEnabled(enabled);
     res.send(result);
   }
@@ -77,7 +78,7 @@ export class SettingsController {
   @route("/experimental-moonraker-support")
   @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
   async updateMoonrakerSupport(req: Request, res: Response) {
-    const { enabled } = await validateInput(req.body, moonrakerSupportRules);
+    const { enabled } = await validateInput(req.body, moonrakerSupportSchema);
     const result = await this.settingsStore.setExperimentalMoonrakerSupport(enabled);
 
     if (!enabled) {
@@ -94,7 +95,7 @@ export class SettingsController {
   @route("/experimental-thumbnail-support")
   @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
   async updateThumbnailSupport(req: Request, res: Response) {
-    const { enabled } = await validateInput(req.body, thumbnailSupportRules);
+    const { enabled } = await validateInput(req.body, thumbnailSupportSchema);
     const result = await this.settingsStore.setExperimentalThumbnailSupport(enabled);
 
     if (enabled) {
@@ -109,7 +110,7 @@ export class SettingsController {
   @route("/experimental-client-support")
   @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
   async updateClientSupport(req: Request, res: Response) {
-    const { enabled } = await validateInput(req.body, clientNextRules);
+    const { enabled } = await validateInput(req.body, clientNextSchema);
     const result = await this.settingsStore.setExperimentalClientSupport(enabled);
     res.send(result);
   }
@@ -118,7 +119,7 @@ export class SettingsController {
   @route("/frontend")
   @before([authorizeRoles([ROLES.ADMIN])])
   async updateFrontendSettings(req: Request, res: Response) {
-    const validatedInput = await validateInput(req.body, frontendSettingsUpdateRules);
+    const validatedInput = await validateInput(req.body, frontendSettingsUpdateSchema);
     const result = await this.settingsStore.updateFrontendSettings(validatedInput);
     res.send(result);
   }
@@ -127,7 +128,7 @@ export class SettingsController {
   @route("/server")
   @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
   async updateServerSettings(req: Request, res: Response) {
-    const validatedInput = await validateInput(req.body, serverSettingsUpdateRules);
+    const validatedInput = await validateInput(req.body, serverSettingsUpdateSchema);
     const result = await this.settingsStore.updateServerSettings(validatedInput);
     res.send(result);
   }
@@ -136,7 +137,7 @@ export class SettingsController {
   @route("/login-required")
   @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
   async updateLoginRequiredSettings(req: Request, res: Response) {
-    const { loginRequired } = await validateInput(req.body, { loginRequired: "required|boolean" });
+    const { loginRequired } = await validateInput(req.body, loginRequiredSchema);
     const result = await this.settingsStore.setLoginRequired(loginRequired);
     res.send(result);
   }
@@ -145,7 +146,7 @@ export class SettingsController {
   @route("/registration-enabled")
   @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
   async updateRegistrationEnabledSettings(req: Request, res: Response) {
-    const { registrationEnabled } = await validateInput(req.body, { registrationEnabled: "required|boolean" });
+    const { registrationEnabled } = await validateInput(req.body, registrationEnabledSchema);
     const result = await this.settingsStore.setRegistrationEnabled(registrationEnabled);
     res.send(result);
   }
@@ -154,7 +155,7 @@ export class SettingsController {
   @route("/credential")
   @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
   async updateCredentialSettings(req: Request, res: Response) {
-    const validatedInput = await validateInput(req.body, credentialSettingPatchRules);
+    const validatedInput = await validateInput(req.body, credentialSettingPatchSchema);
     await this.settingsStore.updateCredentialSettings(validatedInput);
     res.send();
   }
@@ -163,7 +164,7 @@ export class SettingsController {
   @route("/file-clean")
   @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
   async updateFileCleanSettings(req: Request, res: Response) {
-    const validatedInput = await validateInput(req.body, fileCleanSettingsUpdateRules);
+    const validatedInput = await validateInput(req.body, fileCleanSettingsUpdateSchema);
     const result = await this.settingsStore.patchFileCleanSettings(validatedInput);
     res.send(result);
   }
@@ -172,7 +173,7 @@ export class SettingsController {
   @route("/timeout")
   @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
   async updateTimeoutSettings(req: Request, res: Response) {
-    const validatedInput = await validateInput(req.body, timeoutSettingsUpdateRules);
+    const validatedInput = await validateInput(req.body, timeoutSettingsUpdateSchema);
     const result = await this.settingsStore.updateTimeoutSettings(validatedInput);
     res.send(result);
   }

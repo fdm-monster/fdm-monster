@@ -14,6 +14,7 @@ import { Request, Response } from "express";
 import { demoUserNotAllowed } from "@/middleware/demo.middleware";
 import { GithubService } from "@/services/core/github.service";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
+import { updateClientBundleSchema } from "@/controllers/validation/server-private.validation";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 
 @route(AppConstants.apiRoute + "/server")
@@ -57,11 +58,7 @@ export class ServerPrivateController {
   @POST()
   @route("/update-client-bundle-github")
   async updateClientBundleGithub(req: Request, res: Response) {
-    const inputRules = {
-      downloadRelease: "string",
-      allowDowngrade: "boolean",
-    };
-    const updateDto = await validateMiddleware(req, inputRules);
+    const updateDto = await validateMiddleware(req, updateClientBundleSchema);
 
     const willExecute = await this.clientBundleService.shouldUpdateWithReason(
       true,

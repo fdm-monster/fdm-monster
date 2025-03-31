@@ -3,7 +3,7 @@ import { IdDto } from "@/shared.constants";
 export class PrinterDto<KeyType> extends IdDto<KeyType> {
   name: string;
   enabled: boolean;
-  disabledReason: string;
+  disabledReason?: string;
   dateAdded: number;
 }
 

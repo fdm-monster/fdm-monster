@@ -6,7 +6,7 @@ import { IUserService } from "@/services/interfaces/user-service.interface";
 import { DeleteResult, In } from "typeorm";
 import { InternalServerException, NotFoundException } from "@/exceptions/runtime.exceptions";
 import { validateInput } from "@/handlers/validators";
-import { newPasswordRules, registerUserRules } from "@/services/validators/user-service.validation";
+import { newPasswordSchema, registerUserSchema } from "@/services/validators/user-service.validation";
 import { comparePasswordHash, hashPassword } from "@/utils/crypto.utils";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { UserRoleService } from "@/services/orm/user-role.service";
@@ -142,13 +142,13 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
       throw new NotFoundException("User old password incorrect");
     }
 
-    const { password } = await validateInput({ password: newPassword }, newPasswordRules);
+    const { password } = await validateInput({ password: newPassword }, newPasswordSchema);
     const passwordHash = hashPassword(password);
     return await this.update(userId, { passwordHash, needsPasswordChange: false });
   }
 
   async updatePasswordUnsafeByUsername(username: string, newPassword: string): Promise<User> {
-    const { password } = await validateInput({ password: newPassword }, newPasswordRules);
+    const { password } = await validateInput({ password: newPassword }, newPasswordSchema);
     const passwordHash = hashPassword(password);
     const user = await this.findRawByUsername(username);
     if (!user) throw new NotFoundException("User not found");
@@ -161,10 +161,10 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
   }
 
   async register(input: RegisterUserDto<SqliteIdType>): Promise<User> {
-    const { username, password, roles, isDemoUser, isRootUser, needsPasswordChange, isVerified } = (await validateInput(
+    const { username, password, roles, isDemoUser, isRootUser, needsPasswordChange, isVerified } = await validateInput(
       input,
-      registerUserRules(true)
-    )) as RegisterUserDto<SqliteIdType>;
+      registerUserSchema(true)
+    );
 
     const passwordHash = hashPassword(password);
     const result = await this.create({

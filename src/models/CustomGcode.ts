@@ -1,7 +1,8 @@
 import { AnyArray, model, Schema } from "mongoose";
+import { MongoIdType } from "@/shared.constants";
 
-export interface ICustomGcode {
-  id: string;
+export interface ICustomGcode<KeyType = MongoIdType> {
+  id: KeyType;
   name: string;
   description?: string;
   gcode: AnyArray<string>;

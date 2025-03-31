@@ -1,5 +1,6 @@
 import { Response } from "supertest";
 import CustomMatcherResult = jest.CustomMatcherResult;
+import { ZodIssue } from "zod";
 
 export function getExpectExtensions() {
   return {
@@ -31,12 +32,25 @@ export function expectOkResponse(response: Response, matchedBody?: any) {
   return response.body;
 }
 
-export function expectValidationError(object: any, keys: string[], exact = false) {
-  const objectErrors = Object.keys(object.errors);
+export function expectValidationError(response: any, expectedErrors: Array<{ code: string; path: string }>, exact = false) {
+  // Extract the issues array from the ZodError
+  const issues: ZodIssue[] = response.errors?.issues || [];
+
+  // Convert each issue's path array to a dot-notation string
+  const responseErrors = issues.map((issue) => ({
+    code: issue.code,
+    path: issue.path.join("."),
+  }));
+
   if (!exact) {
-    keys.forEach((key) => expect(objectErrors).toContain(key));
+    const missingErrors = expectedErrors.filter(
+      (expected) => !responseErrors.some((actual) => actual.code === expected.code && actual.path === expected.path)
+    );
+    expect(missingErrors).toEqual([]);
   } else {
-    expect(keys).toMatchObject(objectErrors);
+    // For exact matching, both arrays should have the same errors
+    expect(responseErrors).toEqual(expect.arrayContaining(expectedErrors));
+    expect(expectedErrors).toEqual(expect.arrayContaining(responseErrors));
   }
 }
 
@@ -65,12 +79,12 @@ export function expectForbiddenResponse(response: Response) {
   expect(response.statusCode).toEqual(403);
 }
 
-export function expectInvalidResponse(response: Response, keys?: string[], exact = false) {
+export function expectInvalidResponse(response: Response, expectedErrors: Array<{ code: string; path: string }>, exact = false) {
   expect(response.statusCode).toEqual(400);
 
-  if (!keys) return;
+  if (!expectedErrors?.length) return;
 
-  expectValidationError(response.body, keys, exact);
+  expectValidationError(response.body, expectedErrors, exact);
 }
 
 export function expectNotFoundResponse(response: Response) {

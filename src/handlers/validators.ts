@@ -1,61 +1,30 @@
 import { Request } from "express";
 import { ValidationException } from "@/exceptions/runtime.exceptions";
-import { normalizeUrl } from "@/utils/normalize-url";
-import nodeInputValidator, { extend, extendMessages } from "node-input-validator";
-import { defaultHttpProtocol } from "@/utils/url.utils";
+import { z, ZodSchema } from "zod";
 
-export function getExtendedValidator() {
-  extend("wsurl", ({ value, args }: { value: any; args: any }, validator: any) => {
-    if (!value) return false;
+export async function validateInput<I, S>(data: I, zodSchema: ZodSchema<S>): Promise<S> {
+  const result = await zodSchema.safeParseAsync(data);
 
-    try {
-      const url = new URL(normalizeUrl(value, { defaultProtocol: "wss" }));
-      return url.protocol === "ws:" || url.protocol === "wss:";
-    } catch (e) {
-      return false;
-    }
-  });
-
-  extend("httpurl", ({ value, args }: { value: any; args: any }, validator: any) => {
-    if (!value) return false;
-
-    try {
-      const url = new URL(normalizeUrl(value, { defaultProtocol: defaultHttpProtocol }));
-      return url.protocol === "http:" || url.protocol === "https:";
-    } catch (e) {
-      return false;
-    }
-  });
-
-  extend("not", ({ value, args }: { value: any; args: any }, validator: any) => {
-    return !value && value !== false;
-  });
-
-  extendMessages({
-    not: "The :attribute field may not be present.",
-  });
-
-  return nodeInputValidator;
-}
-
-/**
- * Validate input based on rules
- */
-export async function validateInput<T>(data: any, rules: T): Promise<T> {
-  const localNIV = getExtendedValidator();
-
-  const v = new localNIV.Validator(data, rules as object);
-
-  const matched = await v.check();
-  if (!matched) {
-    throw new ValidationException(v.errors);
+  if (!result.success) {
+    throw new ValidationException(result.error);
   }
-  return v.inputs as T;
+  return result.data;
 }
 
-/**
- * Handle API input validation
- */
-export async function validateMiddleware<T>(req: Request, rules: T): Promise<any> {
-  return validateInput(req.body, rules);
+export async function validateMiddleware<I, S>(req: Request<I>, zodSchema: ZodSchema<S>): Promise<S> {
+  return validateInput(req.body, zodSchema);
+}
+
+export function numberEnum<T extends number>(values: readonly T[]) {
+  const set = new Set<unknown>(values);
+  return (v: number, ctx: z.RefinementCtx): v is T => {
+    if (!set.has(v)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.invalid_enum_value,
+        received: v,
+        options: [...values],
+      });
+    }
+    return z.NEVER;
+  };
 }
