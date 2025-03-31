@@ -68,7 +68,7 @@ describe(ServerPrivateController.name, () => {
     expectOkResponse(response);
 
     const yamlObject = load(response.text) as YamlExportSchema;
-    expect(yamlObject!).toBeDefined();
+    expect(yamlObject).toBeDefined();
     await validateInput(yamlObject, importPrintersFloorsYamlSchema);
   });
 

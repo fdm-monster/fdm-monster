@@ -12,7 +12,6 @@ import { PrinterCache } from "@/state/printer.cache";
 import { MongoIdType } from "@/shared.constants";
 import { IFloorService } from "@/services/interfaces/floor.service.interface";
 import { CreateFloorDto, FloorDto, PositionDto, UpdateFloorDto } from "@/services/interfaces/floor.dto";
-import { IPosition } from "@/models/FloorPrinter";
 
 export class FloorService implements IFloorService<MongoIdType> {
   constructor(private readonly printerCache: PrinterCache) {}

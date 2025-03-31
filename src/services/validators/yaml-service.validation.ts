@@ -56,6 +56,13 @@ export const importPrintersFloorsYamlSchema = z.object({
         apiKey: printerApiKeyValidator,
         enabled: printerEnabledValidator,
         name: printerNameValidator,
+        // Legacy properties
+        printerName: z.string().optional(),
+        settingsAppearance: z
+          .object({
+            name: z.string().optional(),
+          })
+          .optional(),
       })
     )
     .min(0)

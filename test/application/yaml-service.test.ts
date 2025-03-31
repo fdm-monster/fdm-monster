@@ -14,7 +14,6 @@ import { FloorStore } from "@/state/floor.store";
 import { FloorPositionService } from "@/services/orm/floor-position.service";
 import { OctoprintType } from "@/services/printer-api.interface";
 
-let container: AwilixContainer;
 let yamlService: YamlService;
 let printerCache: PrinterCache;
 let printerService: IPrinterService;
@@ -152,7 +151,7 @@ describe(YamlService.name, () => {
     expect(floor.printers.find((p) => p.printerId.toString() === printer.id.toString())).toBeDefined();
 
     if (isTypeormMode) {
-      const groups = (await printerGroupService.listGroups())!;
+      const groups = await printerGroupService.listGroups();
       expect(groups).toBeDefined();
       const group = groups.find((g) => g.name === "Group A123_1.6.1")!;
       expect(group).toBeDefined();
