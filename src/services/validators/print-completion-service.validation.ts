@@ -15,5 +15,5 @@ export const createPrintCompletionSchema = (isSqlite: boolean) =>
     }),
     printerId: idRuleV2(isSqlite),
     completionLog: z.string().optional(),
-    context: z.object({}).strict("Context is required"), // Adjust depending on the expected shape of the context
+    context: z.any(),
   });

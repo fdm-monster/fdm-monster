@@ -26,7 +26,7 @@ export class Printer {
     nullable: false,
     default: true,
   })
-  enabled: boolean = true;
+  enabled: boolean;
 
   @Column({
     nullable: true,

@@ -7,10 +7,9 @@ import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { CreateFloorDto, FloorDto, PositionDto, UpdateFloorDto } from "@/services/interfaces/floor.dto";
 import { validateInput } from "@/handlers/validators";
 import {
-  createFloorSchema,
   updateFloorNameSchema,
   updateFloorLevelSchema,
-  updateFloorSchema,
+  createOrUpdateFloorSchema,
   printerInFloorSchema,
 } from "@/services/validators/floor-service.validation";
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
@@ -43,7 +42,7 @@ export class FloorService
   }
 
   async create(dto: CreateFloorDto<SqliteIdType>): Promise<Floor> {
-    const outcome = await validateInput(dto, createFloorSchema(true));
+    const outcome = await validateInput(dto, createOrUpdateFloorSchema(true));
 
     const floor = await super.create({
       name: outcome.name,
@@ -51,9 +50,9 @@ export class FloorService
       printers: [],
     });
 
-    if (dto.printers?.length) {
-      for (const printer of dto.printers) {
-        await this.addOrUpdatePrinter(floor.id, printer);
+    if (outcome.printers?.length) {
+      for (const position of outcome.printers) {
+        await this.addOrUpdatePrinter(floor.id, position as PositionDto<number>);
       }
     }
 
@@ -97,7 +96,7 @@ export class FloorService
       printers: update.printers,
       floor: update.floor,
     };
-    const validatedFloor = await validateInput(floorUpdate, updateFloorSchema(true));
+    const validatedFloor = await validateInput(floorUpdate, createOrUpdateFloorSchema(true));
 
     // Add new printer positions
     const desiredPositions = validatedFloor.printers;

@@ -51,9 +51,6 @@ export class PrinterService
     });
   }
 
-  /**
-   * Stores a new printer into the database.
-   */
   async create(newPrinter: PrinterUnsafeDto<SqliteIdType>, emitEvent = true): Promise<Printer> {
     if (newPrinter.id) {
       delete newPrinter.id;
@@ -122,10 +119,6 @@ export class PrinterService
     if (emitEvent) {
       this.eventEmitter2.emit(printerEvents.printersDeleted, { printerIds });
     }
-  }
-
-  updateConnectionSettings(printerId: SqliteIdType, partial: { printerUrl: string; apiKey: string }): Promise<Printer> {
-    return this.update(printerId, partial);
   }
 
   updateDisabledReason(printerId: SqliteIdType, disabledReason: string): Promise<Printer> {

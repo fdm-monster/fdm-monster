@@ -134,24 +134,6 @@ export class PrinterController {
     res.send({});
   }
 
-  @PATCH()
-  @route("/:id/connection")
-  async updateConnectionSettings(req: Request, res: Response) {
-    const { currentPrinterId } = getScopedPrinter(req);
-    const inputData = await validateMiddleware(req, updatePrinterConnectionSettingSchema);
-
-    if (req.query.forceSave !== "true") {
-      await this.testPrintApiConnection(inputData);
-    }
-
-    const newEntity = await this.printerService.updateConnectionSettings(currentPrinterId, inputData);
-    res.send({
-      printerURL: newEntity.printerURL,
-      apiKey: newEntity.apiKey,
-      printerType: newEntity.printerType,
-    });
-  }
-
   @POST()
   @route("/:id/refresh-socket")
   async refreshPrinterSocket(req: Request, res: Response) {

@@ -2,12 +2,11 @@ import { Floor, IFloor } from "@/models/Floor";
 import { validateInput } from "@/handlers/validators";
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import {
-  createFloorSchema,
   printerInFloorSchema,
   removePrinterInFloorSchema,
   updateFloorNameSchema,
   updateFloorLevelSchema,
-  updateFloorSchema,
+  createOrUpdateFloorSchema,
 } from "../validators/floor-service.validation";
 import { PrinterCache } from "@/state/printer.cache";
 import { MongoIdType } from "@/shared.constants";
@@ -54,7 +53,7 @@ export class FloorService implements IFloorService<MongoIdType> {
   }
 
   async create(floor: CreateFloorDto<MongoIdType>) {
-    const validatedInput = await validateInput(floor, createFloorSchema(false));
+    const validatedInput = await validateInput(floor, createOrUpdateFloorSchema(false));
 
     return Floor.create(validatedInput);
   }
@@ -74,7 +73,7 @@ export class FloorService implements IFloorService<MongoIdType> {
       printers: update.printers,
       floor: update.floor,
     };
-    const input = await validateInput(floorUpdate, updateFloorSchema(false));
+    const input = await validateInput(floorUpdate, createOrUpdateFloorSchema(false));
 
     existingFloor.name = input.name;
     existingFloor.floor = input.floor;
@@ -129,7 +128,7 @@ export class FloorService implements IFloorService<MongoIdType> {
       (position) => position.printerId.toString() === validInput.printerId.toString()
     );
     if (positionIndex !== -1) {
-      floor.printers[positionIndex] = validInput as PositionDto<MongoIdType> as IPosition;
+      floor.printers[positionIndex] = validInput as PositionDto<MongoIdType>;
     } else {
       floor.printers.push(validInput);
     }

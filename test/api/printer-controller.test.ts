@@ -210,24 +210,6 @@ describe(PrinterController.name, () => {
     });
   });
 
-  it("should update printer connection settings correctly", async () => {
-    const printer = await createTestPrinter(request);
-
-    nock(printer.printerURL).get(`/api/version`).reply(200, { server: "1.2.3" });
-
-    const updatePatch = await request.patch(connectionRoute(printer.id)).send({
-      printerURL: "https://test.com/",
-      apiKey,
-      name,
-      printerType: MoonrakerType,
-    });
-    expectOkResponse(updatePatch, {
-      printerURL: "https://test.com",
-      apiKey,
-      printerType: MoonrakerType,
-    });
-  });
-
   it("should invalidate empty test printer connection", async () => {
     const res = await request.post(testPrinterRoute).send();
     expectInvalidResponse(res, [

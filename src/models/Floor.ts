@@ -1,11 +1,12 @@
 import { model, Schema } from "mongoose";
 import { IPosition, PrinterInFloorSchema } from "./FloorPrinter";
+import { MongoIdType } from "@/shared.constants";
 
-export interface IFloor {
+export interface IFloor<KeyType = MongoIdType> {
   id: string;
   name: string;
   floor: number;
-  printers: IPosition[];
+  printers: IPosition<KeyType>[];
 }
 
 const FloorSchema = new Schema<IFloor>({

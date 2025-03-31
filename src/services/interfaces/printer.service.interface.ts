@@ -22,8 +22,6 @@ export interface IPrinterService<KeyType = IdType, Entity = IPrinter | Printer> 
 
   batchImport(printers: Partial<Entity>[]): Promise<Entity[]>;
 
-  updateConnectionSettings(printerId: KeyType, partial: { printerUrl: string; apiKey: string }): Promise<Entity>;
-
   updateEnabled(printerId: KeyType, enabled: boolean): Promise<Entity>;
 
   updateFeedRate(printerId: KeyType, feedRate: number): Promise<Entity>;

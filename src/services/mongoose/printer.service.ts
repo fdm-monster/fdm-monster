@@ -12,7 +12,6 @@ import { LoggerService } from "@/handlers/logger";
 import { MongoIdType } from "@/shared.constants";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { ILoggerFactory } from "@/handlers/logger-factory";
-import { LoginDto } from "@/services/interfaces/login.dto";
 import { PrinterDto, PrinterUnsafeDto } from "@/services/interfaces/printer.dto";
 import { IPrinter } from "@/models/Printer";
 import { normalizeUrl } from "@/utils/normalize-url";
@@ -151,24 +150,6 @@ export class PrinterService implements IPrinterService<MongoIdType> {
   async updateFeedRate(printerId: MongoIdType, feedRate: number) {
     const update = { feedRate };
     await this.get(printerId);
-    const printer = await Printer.findByIdAndUpdate(printerId, update, {
-      new: true,
-      useFindAndModify: false,
-    });
-    this.eventEmitter2.emit(printerEvents.printerUpdated, { printer });
-    return printer;
-  }
-
-  async updateConnectionSettings(printerId: MongoIdType, { printerURL, apiKey, printerType }: LoginDto) {
-    const update = {
-      printerURL: normalizeUrl(printerURL, { defaultProtocol: defaultHttpProtocol }),
-      apiKey,
-      printerType,
-    };
-
-    await validateInput(update, createPrinterSchema);
-    await this.get(printerId);
-
     const printer = await Printer.findByIdAndUpdate(printerId, update, {
       new: true,
       useFindAndModify: false,

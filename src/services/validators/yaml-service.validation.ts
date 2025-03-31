@@ -20,84 +20,71 @@ export const exportPrintersFloorsYamlSchema = z.object({
 
 export const numberOrStringIdValidator = z.union([z.number(), z.string()]);
 
-export const importPrintersFloorsYamlSchema = (
-  importPrinters: boolean,
-  importFloorGrid: boolean,
-  importFloors: boolean,
-  importGroups: boolean
-) =>
-  z.object({
-    version: z.string(),
-    config: z.object({
-      exportPrinters: z.boolean(),
-      exportFloorGrid: z.boolean(),
-      exportFloors: z.boolean(),
-      exportGroups: z.boolean().optional(),
-      printerComparisonStrategiesByPriority: z.array(z.string().refine((val) => ["name", "url", "id"].includes(val))).min(1),
-      floorComparisonStrategiesByPriority: z.string().refine((val) => ["name", "floor", "id"].includes(val)),
-    }),
-    printers: importPrinters
-      ? z
-          .array(
-            z.object({
-              id: numberOrStringIdValidator,
-              printerURL: printerUrlValidator,
-              printerType: printerTypeValidator,
-              apiKey: printerApiKeyValidator,
-              enabled: printerEnabledValidator,
-              name: printerNameValidator,
-            })
-          )
-          .min(0)
-      : z.array(z.any()).optional(),
-    floors: importFloors
-      ? z
-          .array(
-            z.object({
-              id: numberOrStringIdValidator,
-              floor: floorLevelValidator,
-              name: floorNameValidator,
-              printers: z.array(
-                z.object({
-                  printerId: numberOrStringIdValidator,
-                  // Added on multiple places
-                  floorId: numberOrStringIdValidator.optional(),
-                  x: xValidator,
-                  y: yValidator,
-                })
-              ),
-            })
-          )
-          .min(0)
-      : z.array(z.any()).optional(),
-    groups: importGroups
-      ? z
-          .array(
-            z.object({
-              id: numberOrStringIdValidator,
-              name: z.string(),
-              printers: z.array(
-                z.object({
-                  printerId: numberOrStringIdValidator,
-                })
-              ),
-            })
-          )
-          .min(0)
-      : z.array(z.any()).optional(),
-  });
+export const printerPositionsSchema = z
+  .array(
+    z.object({
+      printerId: numberOrStringIdValidator,
+      floorId: numberOrStringIdValidator.optional(),
+      x: xValidator,
+      y: yValidator,
+    })
+  )
+  .min(0);
 
-export const importPrinterPositionsSchema = (isSqliteMode: boolean) =>
-  z.object({
-    printers: z
-      .array(
-        z.object({
-          printerId: numberOrStringIdValidator,
-          floorId: numberOrStringIdValidator.optional(),
-          x: xValidator,
-          y: yValidator,
-        })
-      )
-      .min(0)
-      .optional(),
-  });
+export const importPrinterPositionsSchema = z.object({
+  printers: printerPositionsSchema.optional(),
+});
+
+export const importPrintersFloorsYamlSchema = z.object({
+  version: z.string().optional(),
+  exportedAt: z.date().optional(),
+  databaseType: z.enum(["mongo", "sqlite"]).default("mongo"),
+  config: z.object({
+    exportPrinters: z.boolean(),
+    exportFloorGrid: z.boolean(),
+    exportFloors: z.boolean(),
+    exportGroups: z.boolean().optional(),
+    printerComparisonStrategiesByPriority: z.array(z.string().refine((val) => ["name", "url", "id"].includes(val))).min(1),
+    floorComparisonStrategiesByPriority: z.string().refine((val) => ["name", "floor", "id"].includes(val)),
+  }),
+  printers: z
+    .array(
+      z.object({
+        id: numberOrStringIdValidator,
+        printerURL: printerUrlValidator,
+        printerType: printerTypeValidator,
+        apiKey: printerApiKeyValidator,
+        enabled: printerEnabledValidator,
+        name: printerNameValidator,
+      })
+    )
+    .min(0)
+    .default([]),
+  floors: z
+    .array(
+      z.object({
+        id: numberOrStringIdValidator,
+        floor: floorLevelValidator,
+        name: floorNameValidator,
+        printers: printerPositionsSchema,
+      })
+    )
+    .min(0)
+    .default([]),
+  groups: z
+    .array(
+      z.object({
+        id: numberOrStringIdValidator,
+        name: z.string(),
+        printers: z.array(
+          z.object({
+            printerId: numberOrStringIdValidator,
+          })
+        ),
+      })
+    )
+    .min(0)
+    .default([]),
+});
+
+export type YamlExportSchema = z.infer<typeof importPrintersFloorsYamlSchema>;

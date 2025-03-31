@@ -3,6 +3,7 @@ import {
   exportPrintersFloorsYamlSchema,
   importPrinterPositionsSchema,
   importPrintersFloorsYamlSchema,
+  YamlExportSchema,
 } from "../validators/yaml-service.validation";
 import { dump, load } from "js-yaml";
 import { LoggerService } from "@/handlers/logger";
@@ -14,6 +15,7 @@ import { IFloorService } from "@/services/interfaces/floor.service.interface";
 import { SqliteIdType } from "@/shared.constants";
 import { IPrinterGroupService } from "@/services/interfaces/printer-group.service.interface";
 import { MoonrakerType, OctoprintType } from "@/services/printer-api.interface";
+import { z } from "zod";
 
 export class YamlService {
   private readonly logger: LoggerService;
@@ -31,7 +33,7 @@ export class YamlService {
   }
 
   async importPrintersAndFloors(yamlBuffer: string) {
-    const importSpec = await load(yamlBuffer);
+    const importSpec = (await load(yamlBuffer)) as YamlExportSchema;
     const databaseTypeSqlite = importSpec.databaseType === "sqlite";
     const { exportPrinters, exportFloorGrid, exportFloors, exportGroups } = importSpec?.config;
 
@@ -73,15 +75,12 @@ export class YamlService {
       }
     }
 
-    const importData = await validateInput(
-      importSpec,
-      importPrintersFloorsYamlSchema(exportPrinters, exportFloorGrid, exportFloors, exportGroups)
-    );
+    const importData = await validateInput(importSpec, importPrintersFloorsYamlSchema);
 
     // Nested validation is manual (for now)
     if (!!exportFloorGrid) {
       for (const floor of importData.floors) {
-        await validateInput(floor, importPrinterPositionsSchema(this.isTypeormMode));
+        await validateInput(floor, importPrinterPositionsSchema);
       }
     }
 
@@ -411,13 +410,13 @@ export class YamlService {
     };
   }
 
-  async exportPrintersAndFloors(options) {
+  async exportPrintersAndFloors(options: z.infer<typeof exportPrintersFloorsYamlSchema>) {
     const input = await validateInput(options, exportPrintersFloorsYamlSchema);
-    const { exportFloors, exportPrinters, exportFloorGrid, exportGroups } = input;
 
     if (!this.isTypeormMode) {
       input.exportGroups = false;
     }
+    const { exportFloors, exportPrinters, exportFloorGrid, exportGroups } = input;
 
     const dumpedObject = {
       version: process.env.npm_package_version,

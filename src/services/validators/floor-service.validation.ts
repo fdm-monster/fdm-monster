@@ -28,7 +28,7 @@ export const updateFloorLevelSchema = z.object({
   floor: floorLevelValidator,
 });
 
-export const updateFloorSchema = (isSqlite: boolean) =>
+export const createOrUpdateFloorSchema = (isSqlite: boolean) =>
   z.object({
     name: floorNameValidator,
     floor: floorLevelValidator,
@@ -36,16 +36,10 @@ export const updateFloorSchema = (isSqlite: boolean) =>
       .array(
         z.object({
           printerId: idRuleV2(isSqlite),
-          floorId: idRuleV2(isSqlite),
+          floorId: idRuleV2(isSqlite).optional(),
           x: xValidator,
           y: yValidator,
         })
       )
       .optional(),
-  });
-
-export const createFloorSchema = (isSqlite: boolean) =>
-  z.object({
-    name: floorNameValidator,
-    floor: floorLevelValidator,
   });
