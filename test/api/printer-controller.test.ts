@@ -38,19 +38,15 @@ beforeAll(async () => {
 
 describe(PrinterController.name, () => {
   it(`should not be able to POST ${createRoute} - invalid apiKey`, async () => {
-    const response = await request.post(createRoute).send({
+    const response = await request.post(createRoute).query("forceSave=true").send({
       name: "asd",
       printerURL: "http://url.com",
       apiKey: "notcorrect",
-      tempTriggers: { heatingVariation: null },
+      printerType: OctoprintType,
     });
     expectInvalidResponse(
       response,
       [
-        {
-          code: "invalid_type",
-          path: "printerType",
-        },
         {
           code: "too_small",
           path: "apiKey",
@@ -201,7 +197,7 @@ describe(PrinterController.name, () => {
       name: "asd124",
       printerType: MoonrakerType,
     };
-    const updatePatch = await request.patch(updateRoute(printer.id)).send(patch);
+    const updatePatch = await request.patch(updateRoute(printer.id)).query("forceSave=true").send(patch);
     expectOkResponse(updatePatch, {
       printerURL: "https://test.com",
       enabled: false,

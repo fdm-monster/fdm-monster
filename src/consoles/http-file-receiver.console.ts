@@ -39,6 +39,7 @@ const delayedMemoryStorage = (): multer.StorageEngine => {
     },
   };
 };
+const port = process.argv[2] ? parseInt(process.argv[2]) : 1234;
 
 const upload = multer({ storage: delayedMemoryStorage() });
 
@@ -61,14 +62,14 @@ app.post("/api/files/local", upload.single("file"), (req: Request, res: Response
     return res.status(400).json({ error: "Fields 'select' and 'print' must be boolean values (true/false)" });
   }
 
-  console.log("Received file:", file.originalname);
-  console.log("File size:", file.size);
-  console.log("MIME type:", file.mimetype);
-  console.log("select:", select, "\nprint:", print, "\n-----");
+  console.log(`[PORT ${port}] Received file:`, file.originalname);
+  console.log(`[PORT ${port}] File size:`, file.size);
+  console.log(`[PORT ${port}] MIME type:`, file.mimetype);
+  console.log(`[PORT ${port}] select:`, select, `\n[PORT ${port}] print:`, print, `\n-----`);
 
   res.json({ message: "File received successfully" });
 });
 
-app.listen(1234, () => {
-  console.log("Server is running on http://localhost:1234");
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
 });

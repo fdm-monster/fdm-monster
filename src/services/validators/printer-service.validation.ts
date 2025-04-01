@@ -3,14 +3,13 @@ import { OctoprintType, PrinterTypes } from "@/services/printer-api.interface";
 import { RefinementCtx, z } from "zod";
 import { numberEnum } from "@/handlers/validators";
 
-export const printerApiKeyValidator = z
+const octoPrintApiKeySchema = z
   .string()
   .min(apiKeyLengthMinDefault)
   .max(apiKeyLengthMaxDefault)
-  .regex(/^[a-zA-Z0-9_-]+$/, "Alpha-numeric, dash, and underscore only")
-  // Requires superRefine to validate whether required or not
-  .optional();
+  .regex(/^[a-zA-Z0-9_-]+$/, "Alpha-numeric, dash, and underscore only");
 
+export const printerApiKeyValidator = z.string().optional();
 export const printerNameValidator = z.string();
 export const printerEnabledValidator = z.boolean();
 export const printerDisabledReasonValidator = z.string().optional();
@@ -35,22 +34,18 @@ const apiKeyPrinterTypeSchema = z.object({
 type ApiKeyPrinterTypeSchema = z.infer<typeof apiKeyPrinterTypeSchema>;
 
 export const refineApiKeyValidator = <T extends ApiKeyPrinterTypeSchema>(data: T, ctx: RefinementCtx) => {
-  if (data.printerType === OctoprintType && !data.apiKey?.length) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "apiKey is required when printerType is OctoprintType",
-      path: ["apiKey"],
-    });
-    return ctx;
-  }
-
-  // Validate that apiKey length is either 32 or 43 characters if it exists
-  if (data.apiKey && data.apiKey.length !== 32 && data.apiKey.length !== 43) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "apiKey must be either 32 or 43 characters long",
-      path: ["apiKey"],
-    });
+  // OctoPrint apiKey constraints
+  if (data.printerType === OctoprintType) {
+    const result = octoPrintApiKeySchema.safeParse(data.apiKey);
+    if (!result.success) {
+      result.error.issues.forEach((issue) => {
+        ctx.addIssue({
+          ...issue,
+          // Nesting misses path under "apiKey"
+          path: ["apiKey", ...issue.path],
+        });
+      });
+    }
   }
 };
 
