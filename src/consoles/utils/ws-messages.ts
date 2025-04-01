@@ -1,0 +1,72 @@
+export const currentMessage = {
+  current: {
+    state: {
+      text: "Operational",
+      flags: {
+        operational: true,
+        printing: false,
+        cancelling: false,
+        pausing: false,
+        resuming: false,
+        finishing: false,
+        closedOrError: false,
+        error: false,
+        paused: false,
+        ready: true,
+        sdReady: true,
+      },
+      error: "",
+    },
+    job: {
+      file: {
+        name: null,
+        path: null,
+        display: null,
+        origin: null,
+        size: null,
+        date: null,
+      },
+      estimatedPrintTime: null,
+      averagePrintTime: null,
+      lastPrintTime: null,
+      filament: null,
+      user: null,
+    },
+    currentZ: null,
+    progress: {
+      completion: null,
+      filepos: null,
+      printTime: null,
+      printTimeLeft: null,
+      printTimeLeftOrigin: null,
+    },
+    offsets: {},
+    resends: {
+      count: 0,
+      transmitted: 8,
+      ratio: 0,
+    },
+    serverTime: 1743539826.251039,
+    temps: [],
+    busyFiles: [],
+    markings: [
+      {
+        type: "print",
+        label: "Start",
+        time: 1743493157.1085136,
+      },
+      {
+        type: "disconnected",
+        label: "Disconnected",
+        time: 1743493322.9317226,
+      },
+      {
+        type: "connected",
+        label: "Connected",
+        time: 1743493326.1316566,
+      },
+    ],
+    logs: ["Recv: Not SD printing"],
+    messages: ["Not SD printing"],
+  },
+};
