@@ -197,7 +197,7 @@ describe(PrinterController.name, () => {
       name: "asd124",
       printerType: MoonrakerType,
     };
-    const updatePatch = await request.patch(updateRoute(printer.id)).send(patch);
+    const updatePatch = await request.patch(updateRoute(printer.id)).query("forceSave=true").send(patch);
     expectOkResponse(updatePatch, {
       printerURL: "https://test.com",
       enabled: false,
