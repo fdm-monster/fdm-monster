@@ -11,23 +11,31 @@
 - Remove cache-manager package
 - Remove unused console files
 - Update .env.template
-- Fix punycode warning by pinning tr46 package
-- Update API controller, use decorators over api builder
-- Update dependency injection with awilix, switch to CLASSIC mode for less verbose code
 - Removed BaseEntity
-- Fix camera dto and entity
+- Make printerId camera nullish
+- Merge create and update schema floor
+- Schema printerPositionsSchema simplified
+
+## Changes
+
 - `tsconfig.json` strictNullChecks and strictPropertyInitialization set to true for better null propagation logic.
-- Fix print completion interface and dto
+- Update dependency injection with awilix, switch to CLASSIC mode for less verbose code
+- Update API controller, use decorators over api builder
+- Remove PrinterFile entity (unused)
+- Remove printer/connection PATCH endpoint (unused)
+
+## Fixes
+
+- Fix punycode warning by pinning tr46 package
+- Fix camera dto and entity
+- Make yaml import fill in defaults
+- Make printCompletionSchema context type any
 - Enforce properties on camera stream Mongoose schema for consistency with TypeORM camera stream entity
 - Enforce floor id on Mongoose schema for consistency with TypeORM floor entity
 - Set floor id in Mongoose floor service for consistency with typeorm service
-- Remove PrinterFile entity (unused)
-- Remove printer/connection PATCH endpoint (unused)
-- Make yaml import fill in defaults
-- Make printerId camera nullish
-- Merge create and update schema floor
-- Make printCompletionSchema context type any,
-- printerPositionsSchema simplified
+- Fix print completion interface and dto
+- Improved API key validation: klipper validation completely isolated from OctoPrint api key validation
+- Query parameter `forceSave` in printer create/update API was used incorrectly (flipped around)
 
 ## Fixes
 
