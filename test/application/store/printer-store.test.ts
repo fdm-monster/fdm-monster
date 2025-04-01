@@ -65,15 +65,6 @@ describe(PrinterSocketStore.name, () => {
           message: "Required",
         },
         {
-          code: "too_small",
-          minimum: 32,
-          type: "string",
-          inclusive: true,
-          exact: false,
-          message: "String must contain at least 32 character(s)",
-          path: ["apiKey"],
-        },
-        {
           code: "invalid_type",
           expected: "string",
           received: "undefined",

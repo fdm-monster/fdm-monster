@@ -38,7 +38,13 @@ export const refineApiKeyValidator = <T extends ApiKeyPrinterTypeSchema>(data: T
   if (data.printerType === OctoprintType) {
     const result = octoPrintApiKeySchema.safeParse(data.apiKey);
     if (!result.success) {
-      result.error.issues.forEach((issue) => ctx.addIssue(issue));
+      result.error.issues.forEach((issue) => {
+        ctx.addIssue({
+          ...issue,
+          // Nesting misses path under "apiKey"
+          path: ["apiKey", ...issue.path],
+        });
+      });
     }
   }
 };
