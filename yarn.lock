@@ -1056,7 +1056,7 @@ __metadata:
     "@types/jest": "npm:29.5.14"
     "@types/js-yaml": "npm:4.0.9"
     "@types/lodash": "npm:4.17.16"
-    "@types/luxon": "npm:3.6.0"
+    "@types/luxon": "npm:3.6.1"
     "@types/migrate-mongo": "npm:10.0.5"
     "@types/multer": "npm:1.4.12"
     "@types/node": "npm:22.14.0"
@@ -3545,10 +3545,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/luxon@npm:3.6.0":
-  version: 3.6.0
-  resolution: "@types/luxon@npm:3.6.0"
-  checksum: 10c0/486188bdc0c40081f75aad404a88418a241e0fe5ca5d64da346c0864cb6cfd9c9115da0cc1155a0101902219c7d4c880f520b7df660fc9bbea1a104e2b3395f6
+"@types/luxon@npm:3.6.1":
+  version: 3.6.1
+  resolution: "@types/luxon@npm:3.6.1"
+  checksum: 10c0/682977d7e19ae9923ccbce5797262f21c9d02a8c37083bd2fb4faf237e058c294080cbaf20a12abb9c77a683b9ae07c38380018ff806035954b49a68a9b6f4c2
   languageName: node
   linkType: hard
 
