@@ -59,7 +59,7 @@
   "dependencies": {
     "@fdm-monster/client": "1.9.1",
     "@fdm-monster/client-next": "0.0.18",
-    "@octokit/plugin-throttling": "8.2.0",
+    "@octokit/plugin-throttling": "9.6.1",
     "@sentry/node": "9.11.0",
     "adm-zip": "0.5.16",
     "awilix": "12.0.5",
@@ -84,7 +84,7 @@
     "migrate-mongo": "11.0.0",
     "mongoose": "6.13.8",
     "multer": "1.4.5-lts.2",
-    "octokit": "3.2.1",
+    "octokit": "4.1.2",
     "passport": "0.7.0",
     "passport-anonymous": "1.0.1",
     "passport-jwt": "4.0.1",
