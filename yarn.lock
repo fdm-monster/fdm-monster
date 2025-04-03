@@ -1114,7 +1114,7 @@ __metadata:
     supertest: "npm:7.1.0"
     toad-scheduler: "npm:3.0.1"
     ts-node: "npm:10.9.2"
-    typeorm: "npm:0.3.21"
+    typeorm: "npm:0.3.22"
     typescript: "npm:5.8.2"
     uuid: "npm:11.1.0"
     winston: "npm:3.17.0"
@@ -4091,7 +4091,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ansis@npm:^3.9.0":
+"ansis@npm:^3.17.0":
   version: 3.17.0
   resolution: "ansis@npm:3.17.0"
   checksum: 10c0/d8fa94ca7bb91e7e5f8a7d323756aa075facce07c5d02ca883673e128b2873d16f93e0dec782f98f1eeb1f2b3b4b7b60dcf0ad98fb442e75054fe857988cc5cb
@@ -5205,7 +5205,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dayjs@npm:^1.11.9":
+"dayjs@npm:^1.11.13":
   version: 1.11.13
   resolution: "dayjs@npm:1.11.13"
   checksum: 10c0/a3caf6ac8363c7dade9d1ee797848ddcf25c1ace68d9fe8678ecf8ba0675825430de5d793672ec87b24a69bf04a1544b176547b2539982275d5542a7955f35b7
@@ -5221,7 +5221,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"debug@npm:4, debug@npm:4.x, debug@npm:^4.1.0, debug@npm:^4.1.1, debug@npm:^4.3.1, debug@npm:^4.3.2, debug@npm:^4.3.4, debug@npm:^4.3.5, debug@npm:^4.3.7":
+"debug@npm:4, debug@npm:4.x, debug@npm:^4.1.0, debug@npm:^4.1.1, debug@npm:^4.3.1, debug@npm:^4.3.2, debug@npm:^4.3.4, debug@npm:^4.3.5, debug@npm:^4.3.7, debug@npm:^4.4.0":
   version: 4.4.0
   resolution: "debug@npm:4.4.0"
   dependencies:
@@ -5407,7 +5407,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv@npm:16.4.7, dotenv@npm:^16.0.3":
+"dotenv@npm:16.4.7, dotenv@npm:^16.4.7":
   version: 16.4.7
   resolution: "dotenv@npm:16.4.7"
   checksum: 10c0/be9f597e36a8daf834452daa1f4cc30e5375a5968f98f46d89b16b983c567398a330580c88395069a77473943c06b877d1ca25b4afafcdd6d4adb549e8293462
@@ -10741,7 +10741,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2.0.3, tslib@npm:^2.4.0, tslib@npm:^2.5.0, tslib@npm:^2.6.2, tslib@npm:^2.7.0, tslib@npm:^2.8.1":
+"tslib@npm:^2.0.3, tslib@npm:^2.4.0, tslib@npm:^2.6.2, tslib@npm:^2.7.0, tslib@npm:^2.8.1":
   version: 2.8.1
   resolution: "tslib@npm:2.8.1"
   checksum: 10c0/9c4759110a19c53f992d9aae23aac5ced636e99887b51b9e61def52611732872ff7668757d4e4c61f19691e36f4da981cd9485e869b4a7408d689f6bf1f14e62
@@ -10850,30 +10850,30 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typeorm@npm:0.3.21":
-  version: 0.3.21
-  resolution: "typeorm@npm:0.3.21"
+"typeorm@npm:0.3.22":
+  version: 0.3.22
+  resolution: "typeorm@npm:0.3.22"
   dependencies:
     "@sqltools/formatter": "npm:^1.2.5"
-    ansis: "npm:^3.9.0"
+    ansis: "npm:^3.17.0"
     app-root-path: "npm:^3.1.0"
     buffer: "npm:^6.0.3"
-    dayjs: "npm:^1.11.9"
-    debug: "npm:^4.3.4"
-    dotenv: "npm:^16.0.3"
+    dayjs: "npm:^1.11.13"
+    debug: "npm:^4.4.0"
+    dotenv: "npm:^16.4.7"
     glob: "npm:^10.4.5"
     sha.js: "npm:^2.4.11"
     sql-highlight: "npm:^6.0.0"
-    tslib: "npm:^2.5.0"
-    uuid: "npm:^11.0.5"
-    yargs: "npm:^17.6.2"
+    tslib: "npm:^2.8.1"
+    uuid: "npm:^11.1.0"
+    yargs: "npm:^17.7.2"
   peerDependencies:
-    "@google-cloud/spanner": ^5.18.0
+    "@google-cloud/spanner": ^5.18.0 || ^6.0.0 || ^7.0.0
     "@sap/hana-client": ^2.12.25
     better-sqlite3: ^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0
     hdb-pool: ^0.1.6
     ioredis: ^5.0.4
-    mongodb: ^5.8.0
+    mongodb: ^5.8.0 || ^6.0.0
     mssql: ^9.1.1 || ^10.0.1 || ^11.0.1
     mysql2: ^2.2.5 || ^3.0.1
     oracledb: ^6.3.0
@@ -10885,7 +10885,7 @@ __metadata:
     sql.js: ^1.4.0
     sqlite3: ^5.0.3
     ts-node: ^10.7.0
-    typeorm-aurora-data-api-driver: ^2.0.0
+    typeorm-aurora-data-api-driver: ^2.0.0 || ^3.0.0
   peerDependenciesMeta:
     "@google-cloud/spanner":
       optional: true
@@ -10925,7 +10925,7 @@ __metadata:
     typeorm: cli.js
     typeorm-ts-node-commonjs: cli-ts-node-commonjs.js
     typeorm-ts-node-esm: cli-ts-node-esm.js
-  checksum: 10c0/4e1a827bc7a5028c6ebcefea5ce17076394379cfdf74b34a94bc1a17c918fd85ee71d9cf891acb10f46c9e460f91809f9df4a4d42538f2505f1ada3a99ee487a
+  checksum: 10c0/bb4c283170fbb0890ed326db3e0fb25bbe5480ee4e60dab89f1b51d3bcc1bc6ce808ee61aeeb1c0a716755e2de198ab999153ae89842954656e4f8ac9abbf57f
   languageName: node
   linkType: hard
 
@@ -11071,7 +11071,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uuid@npm:11.1.0, uuid@npm:^11.0.5":
+"uuid@npm:11.1.0, uuid@npm:^11.1.0":
   version: 11.1.0
   resolution: "uuid@npm:11.1.0"
   bin:
@@ -11388,7 +11388,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yargs@npm:^17.3.1, yargs@npm:^17.6.2":
+"yargs@npm:^17.3.1, yargs@npm:^17.7.2":
   version: 17.7.2
   resolution: "yargs@npm:17.7.2"
   dependencies:
