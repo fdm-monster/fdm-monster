@@ -11,7 +11,7 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { errorSummary } from "@/utils/error.utils";
 import { captureException } from "@sentry/node";
 import { SOCKET_STATE } from "@/shared/dtos/socket-state.type";
-import { PrinterUnsafeWithCorrelationDto } from "@/services/interfaces/printer.dto";
+import { TestPrinterDto } from "@/services/interfaces/printer.dto";
 import { IdType } from "@/shared.constants";
 import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
 import { moonrakerEvent } from "@/services/moonraker/constants/websocket.constants";
@@ -31,7 +31,7 @@ export class TestPrinterSocketStore {
     this.logger = loggerFactory(TestPrinterSocketStore.name);
   }
 
-  async setupTestPrinter(printer: PrinterUnsafeWithCorrelationDto<IdType>): Promise<void> {
+  async setupTestPrinter(printer: TestPrinterDto<IdType>): Promise<void> {
     if (this.testSocket) {
       this.testSocket.close();
       this.testSocket = null;

@@ -6,9 +6,9 @@ export class KeyDiffCache<T> {
 
   protected keyValueStore: { [key: string]: T } = {};
 
-  public async getAllValues(): Promise<Array<T>> {
+  public async getAllValues() {
     const keys = Object.keys(this.keyValueStore);
-    return (await this.getValuesBatch(keys)) as Array<T>;
+    return await this.getValuesBatch(keys);
   }
 
   public async getAllKeyValues() {
@@ -20,7 +20,7 @@ export class KeyDiffCache<T> {
     if (!keyString?.length) {
       throw new Error("Key must be a non-empty serializable string");
     }
-    return this.keyValueStore[keyString] as T;
+    return this.keyValueStore[keyString];
   }
 
   async processStateDiffs() {

@@ -21,14 +21,4 @@ describe(PrinterWebsocketTask.name, () => {
       );
     }
   });
-
-  // it("should try connecting to OctoPrint websocket", async () => {
-  //   const newPrinterState = await printerService.create(validNewPrinterState);
-  //
-  //   try {
-  //     await task.setupPrinterConnection(newPrinterState);
-  //   } catch (e) {
-  //     expect(e.toString()).toEqual("Error: OctoPrint apiKey was rejected. (Not retried)");
-  //   }
-  // });
 });

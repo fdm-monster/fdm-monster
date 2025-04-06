@@ -25,7 +25,6 @@ export async function setupTestApp(
 ): Promise<{
   container: AwilixContainer;
   httpServer: Express;
-  httpClient: AxiosInstance;
   request: TestAgent<Test>;
   typeormService: TypeormService;
   [k: string]: any;

@@ -2,7 +2,7 @@ import { IsAlphanumeric } from "class-validator";
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, Relation } from "typeorm";
 import { PrintCompletion } from "@/entities/print-completion.entity";
 import { PrinterGroup } from "@/entities/printer-group.entity";
-import { OctoprintType } from "@/services/printer-api.interface";
+import { OctoprintType, PrinterType } from "@/services/printer-api.interface";
 
 @Entity()
 export class Printer {
@@ -16,7 +16,7 @@ export class Printer {
   printerURL: string;
 
   @Column({ default: OctoprintType, nullable: false })
-  printerType: number;
+  printerType: PrinterType;
 
   @Column({ default: "" })
   @IsAlphanumeric()

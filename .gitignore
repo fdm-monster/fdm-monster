@@ -8,7 +8,6 @@
 **/.cache
 coverage
 
-
 # NPM publish
 *.tgz
 

@@ -3,7 +3,7 @@ import { Role as RoleMongo, User as UserMongo } from "@/models";
 import { ROLES } from "@/constants/authorization.constants";
 import { hashPassword } from "@/utils/crypto.utils";
 import { UserDto } from "@/services/interfaces/user.dto";
-import { MongoIdType, SqliteIdType } from "@/shared.constants";
+import { IdType, MongoIdType, SqliteIdType } from "@/shared.constants";
 import { getDatasource, isSqliteModeTest } from "../../typeorm.manager";
 import { UserRole } from "@/entities/user-role.entity";
 
@@ -20,8 +20,8 @@ export async function ensureTestUserCreated(
   needsPasswordChange = false,
   role = ROLES.ADMIN,
   isVerified = true,
-  isRootUser = true,
-) {
+  isRootUser = true
+): Promise<UserDto> {
   if (!isSqliteModeTest()) {
     return ensureTestUserCreatedMongo(usernameIn, passwordIn, needsPasswordChange, role, isVerified, isRootUser);
   }

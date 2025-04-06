@@ -12,7 +12,7 @@ import { IRefreshTokenService } from "@/services/interfaces/refresh-token.servic
 import { isSqliteModeTest } from "../typeorm.manager";
 
 let container: AwilixContainer;
-let refreshTokenService: IRefreshTokenService<SqliteIdType>;
+let refreshTokenService: IRefreshTokenService;
 let settingsStore: SettingsStore;
 let typeorm: TypeormService;
 

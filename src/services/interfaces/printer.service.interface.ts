@@ -3,9 +3,7 @@ import { IdType } from "@/shared.constants";
 import { PrinterDto, PrinterUnsafeDto } from "@/services/interfaces/printer.dto";
 import { Printer } from "@/entities";
 
-export interface IPrinterService<KeyType = IdType, Entity = IPrinter | Printer> {
-  toUnsafeDto(entity: Entity): PrinterUnsafeDto<KeyType>;
-
+export interface IPrinterService<KeyType = IdType, Entity = IPrinter<KeyType>> {
   toDto(entity: Entity): PrinterDto<KeyType>;
 
   list(): Promise<Entity[]>;

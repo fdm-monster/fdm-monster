@@ -4,10 +4,9 @@ import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import EventEmitter2 from "eventemitter2";
 import { IdType } from "@/shared.constants";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
-import { PrinterUnsafeDto } from "@/services/interfaces/printer.dto";
-import { Printer } from "@/entities";
 import { IPrinter } from "@/models/Printer";
 import { PrinterType } from "@/services/printer-api.interface";
+import { PrinterDto } from "@/services/interfaces/printer.dto";
 
 export interface CachedPrinter {
   id: string;
@@ -115,17 +114,17 @@ export class PrinterCache extends KeyDiffCache<CachedPrinter> {
     await this.deleteKeysBatch(printerIds, true);
   }
 
-  private getId(value: IPrinter | Printer) {
+  private getId(value: IPrinter) {
     return value.id.toString();
   }
 
-  private mapArray(entities: (IPrinter | Printer)[]) {
+  private mapArray(entities: IPrinter[]) {
     return entities.map((p) => {
       return this.map(p);
     });
   }
 
-  private map(entity: IPrinter | Printer): PrinterUnsafeDto<IdType> {
-    return this.printerService.toUnsafeDto(entity);
+  private map(entity: IPrinter): PrinterDto<IdType> {
+    return this.printerService.toDto(entity);
   }
 }
