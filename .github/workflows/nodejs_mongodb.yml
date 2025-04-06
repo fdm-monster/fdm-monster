@@ -18,6 +18,7 @@ jobs:
       - run: yarn set version berry
       - run: yarn install --immutable
       - run: yarn run build
+      - run: yarn run tsc
       # non-coverage sqlite tests
       - run: yarn run test:mongodb
         env:
