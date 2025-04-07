@@ -1,14 +1,15 @@
 import { AwilixContainer } from "awilix";
-import supertest from "supertest";
+import { Test } from "supertest";
 import { setupTestApp } from "../../test-server";
 import { expectOkResponse } from "../../extensions";
 import { DITokens } from "@/container.tokens";
 import { AppConstants } from "@/server.constants";
 import { ServerHost } from "@/server.host";
+import TestAgent from "supertest/lib/agent";
 
 let container: AwilixContainer;
 let serverHost: ServerHost;
-let request: supertest.SuperTest<supertest.Test>;
+let request: TestAgent<Test>;
 
 beforeAll(async () => {
   ({ container, request } = await setupTestApp(true, undefined, false));

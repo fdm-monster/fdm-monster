@@ -1,7 +1,6 @@
 import { IPrinter } from "@/models/Printer";
 import { IdType } from "@/shared.constants";
-import { PrinterDto, PrinterUnsafeDto } from "@/services/interfaces/printer.dto";
-import { Printer } from "@/entities";
+import { PrinterDto } from "@/services/interfaces/printer.dto";
 
 export interface IPrinterService<KeyType = IdType, Entity = IPrinter<KeyType>> {
   toDto(entity: Entity): PrinterDto<KeyType>;

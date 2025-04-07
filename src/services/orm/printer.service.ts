@@ -49,7 +49,7 @@ export class PrinterService
     });
   }
 
-  async create(newPrinter: PrinterUnsafeDto<SqliteIdType>, emitEvent = true): Promise<Printer> {
+  async create(newPrinter: CreatePrinterDto, emitEvent = true): Promise<Printer> {
     const mergedPrinter = await this.validateAndDefault(newPrinter);
     mergedPrinter.dateAdded = Date.now();
     const printer = await super.create(mergedPrinter);
@@ -131,7 +131,7 @@ export class PrinterService
     return this.update(printerId, { flowRate });
   }
 
-  private async validateAndDefault(printer: Printer): Promise<Printer> {
+  private async validateAndDefault(printer: CreatePrinterDto): Promise<Printer> {
     const mergedPrinter = {
       enabled: true,
       ...printer,

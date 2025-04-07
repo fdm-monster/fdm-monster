@@ -10,6 +10,7 @@ import { TestPrinterSocketStore } from "@/state/test-printer-socket.store";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { ZodError } from "zod";
+import { CreatePrinterDto } from "@/services/interfaces/printer.dto";
 
 let printerService: PrinterService;
 let printerCache: PrinterCache;
@@ -45,10 +46,10 @@ describe(PrinterSocketStore.name, () => {
   };
 
   it("should avoid adding invalid printer", async () => {
-    await expect(async () => await printerService.create({})).rejects.toBeInstanceOf(ValidationException);
+    await expect(async () => await printerService.create({} as CreatePrinterDto)).rejects.toBeInstanceOf(ValidationException);
 
-    await expect(() => printerService.create(invalidNewPrinterState)).rejects.toBeInstanceOf(ValidationException);
-    await expect(() => printerService.create(invalidNewPrinterState)).rejects.toHaveErrors(
+    await expect(() => printerService.create(invalidNewPrinterState as CreatePrinterDto)).rejects.toBeInstanceOf(ValidationException);
+    await expect(() => printerService.create(invalidNewPrinterState as CreatePrinterDto)).rejects.toHaveErrors(
       new ZodError([
         {
           code: "invalid_type",

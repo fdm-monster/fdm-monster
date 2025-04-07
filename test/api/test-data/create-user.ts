@@ -3,14 +3,14 @@ import { Role as RoleMongo, User as UserMongo } from "@/models";
 import { ROLES } from "@/constants/authorization.constants";
 import { hashPassword } from "@/utils/crypto.utils";
 import { UserDto } from "@/services/interfaces/user.dto";
-import { IdType, MongoIdType, SqliteIdType } from "@/shared.constants";
+import { MongoIdType, SqliteIdType } from "@/shared.constants";
 import { getDatasource, isSqliteModeTest } from "../../typeorm.manager";
 import { UserRole } from "@/entities/user-role.entity";
 
 export function getUserData(username = "tester", password = "testpassword") {
   return {
     username,
-    password,
+    password
   };
 }
 
@@ -42,12 +42,12 @@ export async function ensureTestUserCreated(
     await userRoleRepo.upsert(
       roles.map((r) => ({
         userId: foundUser.id,
-        roleId: r,
+        roleId: r
       })),
       {
         skipUpdateIfNoValuesChanged: true,
-        conflictPaths: ["userId", "roleId"],
-      },
+        conflictPaths: ["userId", "roleId"]
+      }
     );
     return {
       id: foundUser.id,
@@ -56,7 +56,7 @@ export async function ensureTestUserCreated(
       isDemoUser: foundUser.isDemoUser,
       username: foundUser.username,
       needsPasswordChange: foundUser.needsPasswordChange,
-      roles: foundUser.roles?.map((r) => r.roleId),
+      roles: foundUser.roles?.map((r) => r.roleId)
     } as UserDto<SqliteIdType>;
   }
 
@@ -66,21 +66,25 @@ export async function ensureTestUserCreated(
     isDemoUser: false,
     isRootUser,
     isVerified,
-    needsPasswordChange,
+    needsPasswordChange
   });
 
   await userRepo.insert(userr);
   await userRoleRepo.upsert(
     roles.map((r) => ({
       userId: userr.id,
-      roleId: r,
+      roleId: r
     })),
     {
       skipUpdateIfNoValuesChanged: true,
-      conflictPaths: ["userId", "roleId"],
-    },
+      conflictPaths: ["userId", "roleId"]
+    }
   );
   const user = await userRepo.findOneBy({ id: userr.id });
+  if (!user) {
+    throw new Error("Could not find user with id " + userr.id);
+  }
+
   return {
     id: user.id,
     username: user.username,
@@ -88,7 +92,7 @@ export async function ensureTestUserCreated(
     isRootUser,
     isVerified,
     needsPasswordChange: user.needsPasswordChange,
-    roles: user.roles?.map((r) => r.roleId),
+    roles: user.roles?.map((r) => r.roleId)
   } as UserDto<SqliteIdType>;
 }
 
@@ -98,7 +102,7 @@ export async function ensureTestUserCreatedMongo(
   needsPasswordChange = false,
   role = ROLES.ADMIN,
   isVerified = true,
-  isRootUser = true,
+  isRootUser = true
 ) {
   const roleId = (await RoleMongo.findOne({ name: role }))?.id;
   const roles = roleId ? [roleId.toString()] : [];
@@ -115,8 +119,8 @@ export async function ensureTestUserCreatedMongo(
         needsPasswordChange,
         roles,
         isVerified,
-        isRootUser,
-      },
+        isRootUser
+      }
     );
     return {
       id: foundUser.id,
@@ -125,7 +129,7 @@ export async function ensureTestUserCreatedMongo(
       isDemoUser: foundUser.isDemoUser,
       username: foundUser.username,
       needsPasswordChange: foundUser.needsPasswordChange,
-      roles: foundUser.roles,
+      roles: foundUser.roles
     } as UserDto<MongoIdType>;
   }
 
@@ -136,7 +140,7 @@ export async function ensureTestUserCreatedMongo(
     isDemoUser: false,
     isRootUser,
     isVerified,
-    needsPasswordChange,
+    needsPasswordChange
   });
 
   return {
@@ -146,6 +150,6 @@ export async function ensureTestUserCreatedMongo(
     isRootUser,
     isVerified,
     needsPasswordChange: user.needsPasswordChange,
-    roles: user.roles,
+    roles: user.roles
   } as UserDto<MongoIdType>;
 }

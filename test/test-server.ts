@@ -1,4 +1,4 @@
-import { asClass, asValue, AwilixContainer } from "awilix";
+import { asValue, AwilixContainer } from "awilix";
 import { DITokens } from "@/container.tokens";
 import { setupServer } from "@/server.core";
 import { setupEnvConfig } from "@/server.env";
@@ -8,20 +8,19 @@ import { Express } from "express";
 import { AppConstants } from "@/server.constants";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { TaskManagerService } from "@/services/core/task-manager.service";
-import { AxiosInstance } from "axios";
 import TestAgent from "supertest/lib/agent";
 import { SettingsStore } from "@/state/settings.store";
 
 jest.mock("../src/utils/env.utils", () => ({
   ...jest.requireActual("../src/utils/env.utils"),
-  writeVariableToEnvFile: jest.fn(),
+  writeVariableToEnvFile: jest.fn()
 }));
 require("../src/utils/env.utils");
 
 export async function setupTestApp(
   loadPrinterStore = false,
   mocks: any = undefined,
-  quick_boot = true,
+  quick_boot = true
 ): Promise<{
   container: AwilixContainer;
   httpServer: Express;
@@ -34,7 +33,7 @@ export async function setupTestApp(
   const { httpServer, container } = await setupServer();
   container.register({
     [DITokens.appDefaultRole]: asValue(ROLES.ADMIN),
-    [DITokens.appDefaultRoleNoLogin]: asValue(ROLES.ADMIN),
+    [DITokens.appDefaultRoleNoLogin]: asValue(ROLES.ADMIN)
   });
 
   // Overrides get last pick
@@ -73,6 +72,6 @@ export async function setupTestApp(
     request: supertest(httpServer),
     container,
     [DITokens.taskManagerService]: container.resolve<TaskManagerService>(DITokens.taskManagerService),
-    [DITokens.typeormService]: container.resolve<TypeormService>(DITokens.typeormService),
+    [DITokens.typeormService]: container.resolve<TypeormService>(DITokens.typeormService)
   };
 }

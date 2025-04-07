@@ -1,6 +1,6 @@
 import multer, { diskStorage, FileFilterCallback, memoryStorage } from "multer";
 import { extname, join } from "path";
-import { createWriteStream, existsSync, lstatSync, mkdirSync, readdirSync, unlink, unlinkSync } from "fs";
+import { createWriteStream, existsSync, lstatSync, mkdirSync, readdirSync } from "fs";
 import { superRootPath } from "@/utils/fs.utils";
 import { AppConstants } from "@/server.constants";
 import { FileUploadTrackerCache } from "@/state/file-upload-tracker.cache";
@@ -14,10 +14,11 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class MulterService {
   private readonly logger: LoggerService;
+
   constructor(
     loggerFactory: ILoggerFactory,
     private readonly fileUploadTrackerCache: FileUploadTrackerCache,
-    private readonly httpClientFactory: HttpClientFactory,
+    private readonly httpClientFactory: HttpClientFactory
   ) {
     this.logger = loggerFactory(MulterService.name);
   }
@@ -100,7 +101,7 @@ export class MulterService {
         }
 
         resolve(req.files as Express.Multer.File[]);
-      }),
+      })
     );
   }
 
@@ -108,15 +109,15 @@ export class MulterService {
     return multer({
       storage: storeAsFile
         ? diskStorage({
-            destination: join(superRootPath(), AppConstants.defaultFileStorageFolder),
-          })
+          destination: join(superRootPath(), AppConstants.defaultFileStorageFolder)
+        })
         : memoryStorage(),
-      fileFilter: this.multerFileFilter(fileExtensions),
+      fileFilter: this.multerFileFilter(fileExtensions)
     }).any();
   }
 
   multerFileFilter(extensions: string[]) {
-    return (_: Request, file: Express.Multer.File, callback: FileFilterCallback) => {
+    return (_: any, file: Express.Multer.File, callback: FileFilterCallback) => {
       const ext = extname(file.originalname);
       if (extensions?.length && !extensions.includes(ext?.toLowerCase())) {
         return callback(new Error(`Only files with extensions ${extensions} are allowed`));
