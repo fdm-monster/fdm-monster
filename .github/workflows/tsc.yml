@@ -1,8 +1,7 @@
 name: NodeJS Typecheck
 on:
-  push:
-    branches:
-      - 'main'
+  pull_request:
+  workflow_dispatch:
 jobs:
   tsc:
     runs-on: ubuntu-latest
