@@ -125,7 +125,7 @@ export async function runMigrations(db: any, client: any): Promise<void> {
 
   if (pendingMigrations.length) {
     logger.log(
-      `! MongoDB has ${pendingMigrations.length} migrations left to run (${migrationsStatus.length} migrations in total)`
+      `! MongoDB has ${pendingMigrations.length} migrations left to run (${migrationsStatus.length} migrations in total)`,
     );
   } else {
     logger.log(`✓ Mongo Database is up to date [${migrationsStatus.length} migration applied]`);

@@ -16,7 +16,11 @@ export class PrintCompletion {
   @Column()
   status: string;
 
-  @ManyToOne(() => Printer, (p) => p.printCompletions, { onDelete: "CASCADE" })
+  @ManyToOne(
+    () => Printer,
+    (p) => p.printCompletions,
+    { onDelete: "CASCADE" },
+  )
   @JoinColumn({ name: "printerId" })
   printer: Relation<Printer>;
 

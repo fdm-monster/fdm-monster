@@ -7,7 +7,10 @@ import { AxiosPromise } from "axios";
 export class OctoprintApi implements IPrinterApi {
   private readonly client: OctoprintClient;
 
-  constructor(octoprintClient: OctoprintClient, private printerLogin: LoginDto) {
+  constructor(
+    octoprintClient: OctoprintClient,
+    private printerLogin: LoginDto,
+  ) {
     this.client = octoprintClient;
   }
 

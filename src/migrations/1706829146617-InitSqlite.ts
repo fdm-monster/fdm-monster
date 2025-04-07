@@ -1,10 +1,10 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class InitSqlite1706829146617 implements MigrationInterface {
-    name = 'InitSqlite1706829146617'
+  name = "InitSqlite1706829146617";
 
-    public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`
             CREATE TABLE "print_completion" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "fileName" varchar NOT NULL,
@@ -16,7 +16,7 @@ export class InitSqlite1706829146617 implements MigrationInterface {
                 "context" text
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "printer_file" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "printerId" integer NOT NULL,
@@ -36,7 +36,7 @@ export class InitSqlite1706829146617 implements MigrationInterface {
                 "customData" text NOT NULL
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "printer" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "name" varchar NOT NULL,
@@ -50,7 +50,7 @@ export class InitSqlite1706829146617 implements MigrationInterface {
                 "flowRate" integer
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "floor_position" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "x" integer NOT NULL,
@@ -61,7 +61,7 @@ export class InitSqlite1706829146617 implements MigrationInterface {
                 CONSTRAINT "REL_2ce10d03d7c8f3d6a30d8e30bb" UNIQUE ("printerId")
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "floor" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "name" varchar NOT NULL,
@@ -69,7 +69,7 @@ export class InitSqlite1706829146617 implements MigrationInterface {
                 CONSTRAINT "UQ_61b83f63f4e2d1f8c1b331aaf67" UNIQUE ("floor")
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "settings" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "server" text NOT NULL,
@@ -80,7 +80,7 @@ export class InitSqlite1706829146617 implements MigrationInterface {
                 "timeout" text NOT NULL
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "refresh_token" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "userId" integer NOT NULL,
@@ -90,13 +90,13 @@ export class InitSqlite1706829146617 implements MigrationInterface {
                 "refreshAttemptsUsed" integer NOT NULL
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "role" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "name" varchar NOT NULL
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "user_role" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "roleId" integer NOT NULL,
@@ -105,7 +105,7 @@ export class InitSqlite1706829146617 implements MigrationInterface {
                 CONSTRAINT "UQ_7b4e17a669299579dfa55a3fc35" UNIQUE ("roleId", "userId")
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "user" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "username" varchar NOT NULL,
@@ -117,13 +117,13 @@ export class InitSqlite1706829146617 implements MigrationInterface {
                 "createdAt" datetime NOT NULL DEFAULT (datetime('now'))
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "permission" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "name" varchar NOT NULL
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "camera_stream" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "streamURL" varchar NOT NULL,
@@ -137,7 +137,7 @@ export class InitSqlite1706829146617 implements MigrationInterface {
                 CONSTRAINT "REL_565f1b0713258ce710e9fb4827" UNIQUE ("printerId")
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "custom_gcode" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "name" varchar NOT NULL,
@@ -145,7 +145,7 @@ export class InitSqlite1706829146617 implements MigrationInterface {
                 "gcode" text NOT NULL
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "temporary_print_completion" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "fileName" varchar NOT NULL,
@@ -159,7 +159,7 @@ export class InitSqlite1706829146617 implements MigrationInterface {
                 SET NULL ON UPDATE NO ACTION
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             INSERT INTO "temporary_print_completion"(
                     "id",
                     "fileName",
@@ -180,14 +180,14 @@ export class InitSqlite1706829146617 implements MigrationInterface {
                 "context"
             FROM "print_completion"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "print_completion"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "temporary_print_completion"
                 RENAME TO "print_completion"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "temporary_printer_file" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "printerId" integer NOT NULL,
@@ -208,7 +208,7 @@ export class InitSqlite1706829146617 implements MigrationInterface {
                 CONSTRAINT "FK_66046b90513581dfadc836223a4" FOREIGN KEY ("printerId") REFERENCES "printer" ("id") ON DELETE CASCADE ON UPDATE NO ACTION
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             INSERT INTO "temporary_printer_file"(
                     "id",
                     "printerId",
@@ -245,14 +245,14 @@ export class InitSqlite1706829146617 implements MigrationInterface {
                 "customData"
             FROM "printer_file"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "printer_file"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "temporary_printer_file"
                 RENAME TO "printer_file"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "temporary_floor_position" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "x" integer NOT NULL,
@@ -265,7 +265,7 @@ export class InitSqlite1706829146617 implements MigrationInterface {
                 CONSTRAINT "FK_2ce10d03d7c8f3d6a30d8e30bb3" FOREIGN KEY ("printerId") REFERENCES "printer" ("id") ON DELETE CASCADE ON UPDATE NO ACTION
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             INSERT INTO "temporary_floor_position"("id", "x", "y", "floorId", "printerId")
             SELECT "id",
                 "x",
@@ -274,14 +274,14 @@ export class InitSqlite1706829146617 implements MigrationInterface {
                 "printerId"
             FROM "floor_position"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "floor_position"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "temporary_floor_position"
                 RENAME TO "floor_position"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "temporary_refresh_token" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "userId" integer NOT NULL,
@@ -292,7 +292,7 @@ export class InitSqlite1706829146617 implements MigrationInterface {
                 CONSTRAINT "FK_8e913e288156c133999341156ad" FOREIGN KEY ("userId") REFERENCES "user" ("id") ON DELETE CASCADE ON UPDATE NO ACTION
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             INSERT INTO "temporary_refresh_token"(
                     "id",
                     "userId",
@@ -309,14 +309,14 @@ export class InitSqlite1706829146617 implements MigrationInterface {
                 "refreshAttemptsUsed"
             FROM "refresh_token"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "refresh_token"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "temporary_refresh_token"
                 RENAME TO "refresh_token"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "temporary_user_role" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "roleId" integer NOT NULL,
@@ -327,7 +327,7 @@ export class InitSqlite1706829146617 implements MigrationInterface {
                 CONSTRAINT "FK_ab40a6f0cd7d3ebfcce082131fd" FOREIGN KEY ("userId") REFERENCES "user" ("id") ON DELETE CASCADE ON UPDATE NO ACTION
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             INSERT INTO "temporary_user_role"("id", "roleId", "userId", "createdAt")
             SELECT "id",
                 "roleId",
@@ -335,14 +335,14 @@ export class InitSqlite1706829146617 implements MigrationInterface {
                 "createdAt"
             FROM "user_role"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "user_role"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "temporary_user_role"
                 RENAME TO "user_role"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "temporary_camera_stream" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "streamURL" varchar NOT NULL,
@@ -357,7 +357,7 @@ export class InitSqlite1706829146617 implements MigrationInterface {
                 CONSTRAINT "FK_565f1b0713258ce710e9fb48273" FOREIGN KEY ("printerId") REFERENCES "printer" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             INSERT INTO "temporary_camera_stream"(
                     "id",
                     "streamURL",
@@ -378,21 +378,21 @@ export class InitSqlite1706829146617 implements MigrationInterface {
                 "flipVertical"
             FROM "camera_stream"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "camera_stream"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "temporary_camera_stream"
                 RENAME TO "camera_stream"
         `);
-    }
+  }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`
             ALTER TABLE "camera_stream"
                 RENAME TO "temporary_camera_stream"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "camera_stream" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "streamURL" varchar NOT NULL,
@@ -406,7 +406,7 @@ export class InitSqlite1706829146617 implements MigrationInterface {
                 CONSTRAINT "REL_565f1b0713258ce710e9fb4827" UNIQUE ("printerId")
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             INSERT INTO "camera_stream"(
                     "id",
                     "streamURL",
@@ -427,14 +427,14 @@ export class InitSqlite1706829146617 implements MigrationInterface {
                 "flipVertical"
             FROM "temporary_camera_stream"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "temporary_camera_stream"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "user_role"
                 RENAME TO "temporary_user_role"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "user_role" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "roleId" integer NOT NULL,
@@ -443,7 +443,7 @@ export class InitSqlite1706829146617 implements MigrationInterface {
                 CONSTRAINT "UQ_7b4e17a669299579dfa55a3fc35" UNIQUE ("roleId", "userId")
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             INSERT INTO "user_role"("id", "roleId", "userId", "createdAt")
             SELECT "id",
                 "roleId",
@@ -451,14 +451,14 @@ export class InitSqlite1706829146617 implements MigrationInterface {
                 "createdAt"
             FROM "temporary_user_role"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "temporary_user_role"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "refresh_token"
                 RENAME TO "temporary_refresh_token"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "refresh_token" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "userId" integer NOT NULL,
@@ -468,7 +468,7 @@ export class InitSqlite1706829146617 implements MigrationInterface {
                 "refreshAttemptsUsed" integer NOT NULL
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             INSERT INTO "refresh_token"(
                     "id",
                     "userId",
@@ -485,14 +485,14 @@ export class InitSqlite1706829146617 implements MigrationInterface {
                 "refreshAttemptsUsed"
             FROM "temporary_refresh_token"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "temporary_refresh_token"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "floor_position"
                 RENAME TO "temporary_floor_position"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "floor_position" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "x" integer NOT NULL,
@@ -503,7 +503,7 @@ export class InitSqlite1706829146617 implements MigrationInterface {
                 CONSTRAINT "REL_2ce10d03d7c8f3d6a30d8e30bb" UNIQUE ("printerId")
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             INSERT INTO "floor_position"("id", "x", "y", "floorId", "printerId")
             SELECT "id",
                 "x",
@@ -512,14 +512,14 @@ export class InitSqlite1706829146617 implements MigrationInterface {
                 "printerId"
             FROM "temporary_floor_position"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "temporary_floor_position"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "printer_file"
                 RENAME TO "temporary_printer_file"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "printer_file" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "printerId" integer NOT NULL,
@@ -539,7 +539,7 @@ export class InitSqlite1706829146617 implements MigrationInterface {
                 "customData" text NOT NULL
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             INSERT INTO "printer_file"(
                     "id",
                     "printerId",
@@ -576,14 +576,14 @@ export class InitSqlite1706829146617 implements MigrationInterface {
                 "customData"
             FROM "temporary_printer_file"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "temporary_printer_file"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "print_completion"
                 RENAME TO "temporary_print_completion"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "print_completion" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "fileName" varchar NOT NULL,
@@ -595,7 +595,7 @@ export class InitSqlite1706829146617 implements MigrationInterface {
                 "context" text
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             INSERT INTO "print_completion"(
                     "id",
                     "fileName",
@@ -616,48 +616,47 @@ export class InitSqlite1706829146617 implements MigrationInterface {
                 "context"
             FROM "temporary_print_completion"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "temporary_print_completion"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "custom_gcode"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "camera_stream"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "permission"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "user"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "user_role"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "role"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "refresh_token"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "settings"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "floor"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "floor_position"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "printer"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "printer_file"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "print_completion"
         `);
-    }
-
+  }
 }

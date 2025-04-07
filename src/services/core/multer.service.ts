@@ -17,7 +17,7 @@ export class MulterService {
   constructor(
     loggerFactory: ILoggerFactory,
     private readonly fileUploadTrackerCache: FileUploadTrackerCache,
-    private readonly httpClientFactory: HttpClientFactory
+    private readonly httpClientFactory: HttpClientFactory,
   ) {
     this.logger = loggerFactory(MulterService.name);
   }
@@ -100,7 +100,7 @@ export class MulterService {
         }
 
         resolve(req.files as Express.Multer.File[]);
-      })
+      }),
     );
   }
 

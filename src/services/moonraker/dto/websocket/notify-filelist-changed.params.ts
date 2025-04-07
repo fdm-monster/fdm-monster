@@ -14,7 +14,7 @@ export const actionType = [
   "modify_file",
   "root_update",
 ] as const;
-export type ActionType = typeof actionType[number];
+export type ActionType = (typeof actionType)[number];
 
 export interface Item {
   path: string;

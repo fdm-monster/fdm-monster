@@ -2,7 +2,11 @@ import { before, DELETE, GET, POST, route } from "awilix-express";
 import { authenticate, permission, authorizeRoles } from "@/middleware/authenticate";
 import { validateInput } from "@/handlers/validators";
 import { AppConstants } from "@/server.constants";
-import { downloadFileSchema, getFileSchema, startPrintFileSchema } from "./validation/printer-files-controller.validation";
+import {
+  downloadFileSchema,
+  getFileSchema,
+  startPrintFileSchema,
+} from "./validation/printer-files-controller.validation";
 import { ValidationException } from "@/exceptions/runtime.exceptions";
 import { printerResolveMiddleware } from "@/middleware/printer";
 import { PERMS, ROLES } from "@/constants/authorization.constants";
@@ -33,7 +37,7 @@ export class PrinterFilesController {
     private readonly printerFileCleanTask: PrinterFileCleanTask,
     private readonly settingsStore: SettingsStore,
     private readonly multerService: MulterService,
-    private readonly printerThumbnailCache: PrinterThumbnailCache
+    private readonly printerThumbnailCache: PrinterThumbnailCache,
   ) {
     this.logger = loggerFactory(PrinterFilesController.name);
   }
@@ -188,11 +192,16 @@ export class PrinterFilesController {
   async uploadPrinterFile(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
 
-    const files = await this.multerService.multerLoadFileAsync(req, res, AppConstants.defaultAcceptedGcodeExtensions, true);
+    const files = await this.multerService.multerLoadFileAsync(
+      req,
+      res,
+      AppConstants.defaultAcceptedGcodeExtensions,
+      true,
+    );
     if (!files?.length) {
       throw new ValidationException({
         error: `No file was available for upload. Did you upload files with one of these extensions: ${AppConstants.defaultAcceptedGcodeExtensions.join(
-          ", "
+          ", ",
         )}?`,
       });
     }

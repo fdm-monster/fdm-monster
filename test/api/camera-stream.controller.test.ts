@@ -40,7 +40,8 @@ describe(CameraStreamController.name, () => {
     printerId: null,
   });
   const getTestCameraStream = async (id: string) => await request.get(getRoute(id));
-  const createTestCameraStream = async (url: string) => await request.post(listRoute).send(defaultCameraStreamInput(url));
+  const createTestCameraStream = async (url: string) =>
+    await request.post(listRoute).send(defaultCameraStreamInput(url));
   const deleteTestCameraStream = async (id: IdType) => await request.delete(deleteRoute(id));
   const updateTestCameraStream = async (id: IdType, url: string, printerId: IdType | null) =>
     await request.put(updateRoute(id)).send(defaultCameraStreamInput(url));

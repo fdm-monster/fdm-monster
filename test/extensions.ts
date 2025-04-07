@@ -32,7 +32,11 @@ export function expectOkResponse(response: Response, matchedBody?: any) {
   return response.body;
 }
 
-export function expectValidationError(response: any, expectedErrors: Array<{ code: string; path: string }>, exact = false) {
+export function expectValidationError(
+  response: any,
+  expectedErrors: Array<{ code: string; path: string }>,
+  exact = false,
+) {
   // Extract the issues array from the ZodError
   const issues: ZodIssue[] = response.errors?.issues || [];
 
@@ -44,7 +48,7 @@ export function expectValidationError(response: any, expectedErrors: Array<{ cod
 
   if (!exact) {
     const missingErrors = expectedErrors.filter(
-      (expected) => !responseErrors.some((actual) => actual.code === expected.code && actual.path === expected.path)
+      (expected) => !responseErrors.some((actual) => actual.code === expected.code && actual.path === expected.path),
     );
     expect(missingErrors).toEqual([]);
   } else {
@@ -79,7 +83,11 @@ export function expectForbiddenResponse(response: Response) {
   expect(response.statusCode).toEqual(403);
 }
 
-export function expectInvalidResponse(response: Response, expectedErrors: Array<{ code: string; path: string }>, exact = false) {
+export function expectInvalidResponse(
+  response: Response,
+  expectedErrors: Array<{ code: string; path: string }>,
+  exact = false,
+) {
   expect(response.statusCode).toEqual(400);
 
   if (!expectedErrors?.length) return;

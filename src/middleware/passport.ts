@@ -1,4 +1,10 @@
-import { ExtractJwt, JwtFromRequestFunction, Strategy as JwtStrategy, StrategyOptions, VerifiedCallback } from "passport-jwt";
+import {
+  ExtractJwt,
+  JwtFromRequestFunction,
+  Strategy as JwtStrategy,
+  StrategyOptions,
+  VerifiedCallback,
+} from "passport-jwt";
 import { Strategy as AnonymousStrategy } from "passport-anonymous";
 import { DITokens } from "@/container.tokens";
 import { AppConstants } from "@/server.constants";
@@ -20,7 +26,7 @@ export interface JwtFromSocketFunction {
 export function getPassportJwtOptions(
   settingsStore: SettingsStore,
   configService: ConfigService,
-  jwtFromRequest: JwtFromRequestFunction | JwtFromSocketFunction = ExtractJwt.fromAuthHeaderAsBearerToken()
+  jwtFromRequest: JwtFromRequestFunction | JwtFromSocketFunction = ExtractJwt.fromAuthHeaderAsBearerToken(),
 ): StrategyOptions {
   return {
     jwtFromRequest: jwtFromRequest,
@@ -43,7 +49,10 @@ export function verifyUserCallback(userService: IUserService) {
         }
         if (user && user.needsPasswordChange) {
           console.log("Needs password change");
-          return done(new AuthenticationError("Password change required", AUTH_ERROR_REASON.PasswordChangeRequired), false);
+          return done(
+            new AuthenticationError("Password change required", AUTH_ERROR_REASON.PasswordChangeRequired),
+            false,
+          );
         }
         if (user && !user?.isVerified) {
           console.log("Needs password change");
@@ -60,7 +69,10 @@ export function verifyUserCallback(userService: IUserService) {
   };
 }
 
-export function initializePassportStrategies(passport: PassportStatic, container: AwilixContainer<any>): PassportStatic {
+export function initializePassportStrategies(
+  passport: PassportStatic,
+  container: AwilixContainer<any>,
+): PassportStatic {
   const settingsStore = container.resolve<SettingsStore>(DITokens.settingsStore);
   const configService = container.resolve<ConfigService>(DITokens.configService);
   const userService = container.resolve<IUserService>(DITokens.userService);
@@ -70,7 +82,7 @@ export function initializePassportStrategies(passport: PassportStatic, container
   passport.use(
     new JwtStrategy(opts, function (jwt_payload, done) {
       verifyUserCallback(userService)(jwt_payload, done);
-    })
+    }),
   );
   passport.use(new AnonymousStrategy());
   return passport;

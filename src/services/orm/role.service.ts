@@ -19,7 +19,7 @@ export class RoleService extends BaseService(Role, RoleDto<SqliteIdType>) implem
     typeormService: TypeormService,
     private readonly appDefaultRole: string,
     private readonly appDefaultRoleNoLogin: string,
-    private readonly settingsStore: SettingsStore
+    private readonly settingsStore: SettingsStore,
   ) {
     super(typeormService);
     this.logger = loggerFactory(RoleService.name);
@@ -73,7 +73,11 @@ export class RoleService extends BaseService(Role, RoleDto<SqliteIdType>) implem
    * @param assignedRoles application role names or role ids (not to be confused with user role assignments)
    * @param subset
    */
-  authorizeRoles(requiredRoles: (string | SqliteIdType)[], assignedRoles: (string | SqliteIdType)[], subset: boolean): boolean {
+  authorizeRoles(
+    requiredRoles: (string | SqliteIdType)[],
+    assignedRoles: (string | SqliteIdType)[],
+    subset: boolean,
+  ): boolean {
     let isAuthorized = false;
 
     if (!requiredRoles?.length) return true;

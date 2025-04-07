@@ -35,7 +35,7 @@ export class BootTask {
     private readonly configService: ConfigService,
     private readonly typeormService: TypeormService,
     private readonly isTypeormMode: boolean,
-    private readonly printerThumbnailCache: PrinterThumbnailCache
+    private readonly printerThumbnailCache: PrinterThumbnailCache,
   ) {
     this.logger = loggerFactory(BootTask.name);
   }
@@ -58,7 +58,9 @@ export class BootTask {
       } catch (e) {
         if (e instanceof mongoose.Error) {
           // Tests should just continue
-          if (!e.message.includes("Can't call `openUri()` on an active connection with different connection strings.")) {
+          if (
+            !e.message.includes("Can't call `openUri()` on an active connection with different connection strings.")
+          ) {
             // We are not in a test
             if (e.message.includes("ECONNREFUSED")) {
               this.logger.error("Database connection timed-out. Retrying in 5000.");
@@ -83,7 +85,9 @@ export class BootTask {
     if (isDemoMode) {
       this.logger.warn(`Starting in demo mode due to ${AppConstants.OVERRIDE_IS_DEMO_MODE}`);
       await this.createOrUpdateDemoAccount();
-      this.logger.warn(`Setting loginRequired=true and registration=false due to ${AppConstants.OVERRIDE_IS_DEMO_MODE}`);
+      this.logger.warn(
+        `Setting loginRequired=true and registration=false due to ${AppConstants.OVERRIDE_IS_DEMO_MODE}`,
+      );
       await this.settingsStore.setLoginRequired(true);
       await this.settingsStore.setRegistrationEnabled(false);
     } else {
@@ -130,8 +134,14 @@ export class BootTask {
   }
 
   async createOrUpdateDemoAccount() {
-    const demoUsername = this.configService.get(AppConstants.OVERRIDE_DEMO_USERNAME, AppConstants.DEFAULT_DEMO_USERNAME);
-    const demoPassword = this.configService.get(AppConstants.OVERRIDE_DEMO_PASSWORD, AppConstants.DEFAULT_DEMO_PASSWORD);
+    const demoUsername = this.configService.get(
+      AppConstants.OVERRIDE_DEMO_USERNAME,
+      AppConstants.DEFAULT_DEMO_USERNAME,
+    );
+    const demoPassword = this.configService.get(
+      AppConstants.OVERRIDE_DEMO_PASSWORD,
+      AppConstants.DEFAULT_DEMO_PASSWORD,
+    );
     const demoRole = this.configService.get(AppConstants.OVERRIDE_DEMO_ROLE, AppConstants.DEFAULT_DEMO_ROLE);
     const adminRole = this.roleService.getRoleByName(demoRole);
 

@@ -72,7 +72,7 @@ export abstract class WebsocketRpcExtendedAdapter extends WebsocketAdapter {
     const request = this.requestMap.get(requestId);
     if (!request) {
       this.logger.warn(
-        `No request was associated with the provided request id ${response.id}, websocket RPC response has been dropped`
+        `No request was associated with the provided request id ${response.id}, websocket RPC response has been dropped`,
       );
       return;
     }

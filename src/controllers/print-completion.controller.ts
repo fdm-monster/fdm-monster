@@ -13,7 +13,7 @@ import { findPrinterCompletionSchema } from "@/controllers/validation/printer-co
 export class PrintCompletionController {
   constructor(
     private readonly printCompletionService: IPrintCompletionService,
-    private readonly printCompletionSocketIoTask: PrintCompletionSocketIoTask
+    private readonly printCompletionSocketIoTask: PrintCompletionSocketIoTask,
   ) {}
 
   /**

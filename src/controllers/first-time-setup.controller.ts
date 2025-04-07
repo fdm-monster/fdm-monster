@@ -14,7 +14,7 @@ export class FirstTimeSetupController {
   constructor(
     private readonly settingsStore: SettingsStore,
     private readonly roleService: IRoleService,
-    private readonly userService: IUserService
+    private readonly userService: IUserService,
   ) {}
 
   @POST()
@@ -38,7 +38,10 @@ export class FirstTimeSetupController {
   @POST()
   @route("/complete")
   async completeWizard(req: Request, res: Response) {
-    const { loginRequired, registration, rootUsername, rootPassword } = await validateMiddleware(req, wizardSettingsSchema);
+    const { loginRequired, registration, rootUsername, rootPassword } = await validateMiddleware(
+      req,
+      wizardSettingsSchema,
+    );
 
     if (this.settingsStore.isWizardCompleted()) {
       throw new ForbiddenError("Wizard already completed");

@@ -1,6 +1,10 @@
 import { BaseService } from "@/services/orm/base.service";
 import { PrintCompletion } from "@/entities";
-import { CreatePrintCompletionDto, PrintCompletionContext, PrintCompletionDto } from "@/services/interfaces/print-completion.dto";
+import {
+  CreatePrintCompletionDto,
+  PrintCompletionContext,
+  PrintCompletionDto,
+} from "@/services/interfaces/print-completion.dto";
 import { SqliteIdType } from "@/shared.constants";
 import { IPrintCompletionService } from "@/services/interfaces/print-completion.interface";
 import { In, Not } from "typeorm";
@@ -55,7 +59,9 @@ export class PrintCompletionService
       status: EVENT_TYPES.PrintStarted,
     });
     if (!completionEntry) {
-      this.logger.warn(`Print with correlationId ${correlationId} could not be updated with new context as it was not found`);
+      this.logger.warn(
+        `Print with correlationId ${correlationId} could not be updated with new context as it was not found`,
+      );
       return;
     }
     completionEntry.context = context;

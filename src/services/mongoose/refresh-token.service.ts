@@ -14,7 +14,10 @@ import { RefreshTokenDto } from "@/services/interfaces/refresh-token.dto";
 export class RefreshTokenService implements IRefreshTokenService<MongoIdType> {
   private logger: LoggerService;
 
-  constructor(loggerFactory: ILoggerFactory, private readonly settingsStore: SettingsStore) {
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly settingsStore: SettingsStore,
+  ) {
     this.logger = loggerFactory(RefreshTokenService.name);
   }
 
@@ -35,7 +38,10 @@ export class RefreshTokenService implements IRefreshTokenService<MongoIdType> {
     });
     if (!userRefreshToken) {
       if (throwNotFoundError) {
-        throw new AuthenticationError("The refresh token was not found", AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken);
+        throw new AuthenticationError(
+          "The refresh token was not found",
+          AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken,
+        );
       }
       return null;
     }
@@ -73,7 +79,7 @@ export class RefreshTokenService implements IRefreshTokenService<MongoIdType> {
       },
       {
         new: true,
-      }
+      },
     );
   }
 

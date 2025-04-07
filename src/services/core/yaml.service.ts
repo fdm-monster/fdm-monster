@@ -27,7 +27,7 @@ export class YamlService {
     private readonly printerCache: PrinterCache,
     private readonly floorStore: FloorStore,
     private readonly floorService: IFloorService,
-    private readonly isTypeormMode: boolean
+    private readonly isTypeormMode: boolean,
   ) {
     this.logger = loggerFactory(YamlService.name);
   }
@@ -87,13 +87,13 @@ export class YamlService {
     this.logger.log("Analysing printers for import");
     const { updateByPropertyPrinters, insertPrinters } = await this.analysePrintersUpsert(
       importData.printers,
-      importData.config.printerComparisonStrategiesByPriority
+      importData.config.printerComparisonStrategiesByPriority,
     );
 
     this.logger.log("Analysing floors for import");
     const { updateByPropertyFloors, insertFloors } = await this.analyseFloorsUpsert(
       importData.floors,
-      importData.config.floorComparisonStrategiesByPriority
+      importData.config.floorComparisonStrategiesByPriority,
     );
 
     this.logger.log("Analysing groups for import");

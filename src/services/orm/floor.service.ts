@@ -19,7 +19,10 @@ export class FloorService
   extends BaseService(Floor, FloorDto<SqliteIdType>, CreateFloorDto<SqliteIdType>, UpdateFloorDto<SqliteIdType>)
   implements IFloorService<SqliteIdType, Floor>
 {
-  constructor(protected readonly typeormService: TypeormService, private readonly floorPositionService: FloorPositionService) {
+  constructor(
+    protected readonly typeormService: TypeormService,
+    private readonly floorPositionService: FloorPositionService,
+  ) {
     super(typeormService);
   }
 
@@ -27,7 +30,7 @@ export class FloorService
     return super.list(
       Object.assign(options || {}, {
         relations: ["printers"],
-      })
+      }),
     );
   }
 
@@ -37,7 +40,7 @@ export class FloorService
       throwIfNotFound,
       Object.assign(options || {}, {
         relations: ["printers"],
-      })
+      }),
     );
   }
 
@@ -108,7 +111,7 @@ export class FloorService
 
     // Remove any printers that should not exist on floor
     const undesiredPositions = existingFloor.printers.filter(
-      (pos) => !desiredPositions.find((dp) => dp.printerId === pos.printerId)
+      (pos) => !desiredPositions.find((dp) => dp.printerId === pos.printerId),
     );
     if (undesiredPositions?.length) {
       await this.floorPositionService.deleteMany(undesiredPositions.map((pos) => pos.id));

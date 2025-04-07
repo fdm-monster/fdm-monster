@@ -23,7 +23,11 @@ export class MoonrakerApi implements IPrinterApi {
   private readonly logger: LoggerService;
   private readonly client: MoonrakerClient;
 
-  constructor(loggerFactory: ILoggerFactory, moonrakerClient: MoonrakerClient, private printerLogin: LoginDto) {
+  constructor(
+    loggerFactory: ILoggerFactory,
+    moonrakerClient: MoonrakerClient,
+    private printerLogin: LoginDto,
+  ) {
     this.logger = loggerFactory(MoonrakerApi.name);
     this.client = moonrakerClient;
   }
@@ -115,7 +119,7 @@ export class MoonrakerApi implements IPrinterApi {
       `
       G91
       G1 ${g1CommandAxes} F${setSpeed}
-      G90`
+      G90`,
     );
   }
 
@@ -172,13 +176,12 @@ export class MoonrakerApi implements IPrinterApi {
   }
 
   async getReprintState(): Promise<PartialReprintFileDto> {
-    const response = await this.client.getPrinterObjectsQuery<PrinterObjectsQueryDto<PrintStatsObject & WebhooksObject>>(
-      this.login,
-      {
-        print_stats: [],
-        webhooks: [],
-      }
-    );
+    const response = await this.client.getPrinterObjectsQuery<
+      PrinterObjectsQueryDto<PrintStatsObject & WebhooksObject>
+    >(this.login, {
+      print_stats: [],
+      webhooks: [],
+    });
 
     const result = response.data.result;
     const operational = result.status.webhooks.state === "ready";

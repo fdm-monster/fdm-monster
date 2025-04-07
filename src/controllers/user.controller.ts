@@ -36,7 +36,7 @@ export class UserController {
     private readonly roleService: IRoleService,
     private readonly authService: IAuthService,
     private readonly settingsStore: SettingsStore,
-    private readonly isTypeormMode: boolean
+    private readonly isTypeormMode: boolean,
   ) {
     this.logger = loggerFactory(UserController.name);
   }
@@ -53,7 +53,10 @@ export class UserController {
   @route("/")
   @before([authorizeRoles([ROLES.ADMIN])])
   async create(req: Request, res: Response) {
-    const { username, password, roleIds } = await validateMiddleware(req, registerUserWithRolesSchema(this.isTypeormMode));
+    const { username, password, roleIds } = await validateMiddleware(
+      req,
+      registerUserWithRolesSchema(this.isTypeormMode),
+    );
     if (
       username.toLowerCase().includes("admin") ||
       username.toLowerCase().includes("root") ||

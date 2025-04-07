@@ -66,7 +66,9 @@ export class PermissionService implements IPermissionService<MongoIdType> {
   }
 
   normalizePermission(assignedPermission: string) {
-    const permissionInstance = this.permissions.find((r) => r.id === assignedPermission || r.name === assignedPermission);
+    const permissionInstance = this.permissions.find(
+      (r) => r.id === assignedPermission || r.name === assignedPermission,
+    );
     if (!permissionInstance) {
       this.logger.warn("The permission by by provided id did not exist. Skipping");
       return;

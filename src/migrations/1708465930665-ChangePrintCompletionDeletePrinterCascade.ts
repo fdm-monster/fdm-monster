@@ -1,10 +1,10 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class ChangePrintCompletionDeletePrinterCascade1708465930665 implements MigrationInterface {
-    name = 'ChangePrintCompletionDeletePrinterCascade1708465930665'
+  name = "ChangePrintCompletionDeletePrinterCascade1708465930665";
 
-    public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`
             CREATE TABLE "temporary_print_completion" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "fileName" varchar NOT NULL,
@@ -16,7 +16,7 @@ export class ChangePrintCompletionDeletePrinterCascade1708465930665 implements M
                 "context" text
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             INSERT INTO "temporary_print_completion"(
                     "id",
                     "fileName",
@@ -37,14 +37,14 @@ export class ChangePrintCompletionDeletePrinterCascade1708465930665 implements M
                 "context"
             FROM "print_completion"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "print_completion"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "temporary_print_completion"
                 RENAME TO "print_completion"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "temporary_print_completion" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "fileName" varchar NOT NULL,
@@ -57,7 +57,7 @@ export class ChangePrintCompletionDeletePrinterCascade1708465930665 implements M
                 CONSTRAINT "FK_c078b1dfe5f87f79f131520d856" FOREIGN KEY ("printerId") REFERENCES "printer" ("id") ON DELETE CASCADE ON UPDATE NO ACTION
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             INSERT INTO "temporary_print_completion"(
                     "id",
                     "fileName",
@@ -78,21 +78,21 @@ export class ChangePrintCompletionDeletePrinterCascade1708465930665 implements M
                 "context"
             FROM "print_completion"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "print_completion"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "temporary_print_completion"
                 RENAME TO "print_completion"
         `);
-    }
+  }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`
             ALTER TABLE "print_completion"
                 RENAME TO "temporary_print_completion"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "print_completion" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "fileName" varchar NOT NULL,
@@ -104,7 +104,7 @@ export class ChangePrintCompletionDeletePrinterCascade1708465930665 implements M
                 "context" text
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             INSERT INTO "print_completion"(
                     "id",
                     "fileName",
@@ -125,14 +125,14 @@ export class ChangePrintCompletionDeletePrinterCascade1708465930665 implements M
                 "context"
             FROM "temporary_print_completion"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "temporary_print_completion"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "print_completion"
                 RENAME TO "temporary_print_completion"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "print_completion" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "fileName" varchar NOT NULL,
@@ -146,7 +146,7 @@ export class ChangePrintCompletionDeletePrinterCascade1708465930665 implements M
                 SET NULL ON UPDATE NO ACTION
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             INSERT INTO "print_completion"(
                     "id",
                     "fileName",
@@ -167,9 +167,8 @@ export class ChangePrintCompletionDeletePrinterCascade1708465930665 implements M
                 "context"
             FROM "temporary_print_completion"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "temporary_print_completion"
         `);
-    }
-
+  }
 }

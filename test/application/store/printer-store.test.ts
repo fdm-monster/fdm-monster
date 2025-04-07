@@ -71,7 +71,7 @@ describe(PrinterSocketStore.name, () => {
           path: ["name"],
           message: "Required",
         },
-      ])
+      ]),
     );
 
     await expect(async () => await printerService.create(weakNewPrinter)).rejects.toBeInstanceOf(ValidationException);

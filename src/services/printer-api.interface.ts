@@ -8,7 +8,7 @@ import { IdType } from "@/shared.constants";
 export const OctoprintType = 0;
 export const MoonrakerType = 1;
 export const PrinterTypes = [OctoprintType, MoonrakerType] as const;
-export type PrinterTypes = typeof PrinterTypes[number];
+export type PrinterTypes = (typeof PrinterTypes)[number];
 export type PrinterType = typeof OctoprintType | typeof MoonrakerType;
 
 export interface StatusFlags {

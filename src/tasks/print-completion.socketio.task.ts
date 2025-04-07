@@ -19,7 +19,7 @@ export class PrintCompletionSocketIoTask {
     loggerFactory: ILoggerFactory,
     private readonly eventEmitter2: EventEmitter2,
     private readonly printCompletionService: IPrintCompletionService,
-    private readonly printerEventsCache: PrinterEventsCache
+    private readonly printerEventsCache: PrinterEventsCache,
   ) {
     this.logger = loggerFactory(PrintCompletionSocketIoTask.name);
 

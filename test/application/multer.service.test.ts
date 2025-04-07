@@ -47,7 +47,7 @@ describe("MulterService", () => {
       multerService.multerFileFilter([".gcode", ".bgcode"])(null, incorrectFile, (err, result) => {
         if (err) throw err;
         return result;
-      })
+      }),
     ).toThrow();
   });
 
@@ -58,7 +58,7 @@ describe("MulterService", () => {
       multerService.multerFileFilter([".gcode", ".bgcode"])(null, correctFile, (err, result) => {
         if (err) throw err;
         return result;
-      })
+      }),
     ).not.toThrow();
   });
 });

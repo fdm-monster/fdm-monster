@@ -14,6 +14,10 @@ export class Floor {
   })
   floor: number;
 
-  @OneToMany(() => FloorPosition, (gp) => gp.floor, { eager: true })
+  @OneToMany(
+    () => FloorPosition,
+    (gp) => gp.floor,
+    { eager: true },
+  )
   printers: Relation<FloorPosition>[];
 }

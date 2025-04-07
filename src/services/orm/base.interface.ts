@@ -7,7 +7,7 @@ export interface IBaseService<
   T extends object,
   DTO extends object,
   CreateDTO extends object = DeepPartial<T>,
-  UpdateDTO extends object = DTO
+  UpdateDTO extends object = DTO,
 > {
   repository: Repository<T>;
   typeormService: TypeormService;

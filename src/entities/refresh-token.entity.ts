@@ -6,7 +6,11 @@ export class RefreshToken {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (user) => user.refreshTokens, { nullable: false, onDelete: "CASCADE" })
+  @ManyToOne(
+    () => User,
+    (user) => user.refreshTokens,
+    { nullable: false, onDelete: "CASCADE" },
+  )
   @JoinColumn({ name: "userId" })
   user: Relation<User>;
 

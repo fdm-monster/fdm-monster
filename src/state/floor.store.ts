@@ -8,7 +8,10 @@ import { CreateFloorDto, FloorDto, PositionDto, UpdateFloorDto } from "@/service
 export class FloorStore<KeyType extends keyType = IdType> extends KeyDiffCache<FloorDto<KeyType>> {
   private readonly logger: LoggerService;
 
-  constructor(private readonly floorService: IFloorService<KeyType>, loggerFactory: ILoggerFactory) {
+  constructor(
+    private readonly floorService: IFloorService<KeyType>,
+    loggerFactory: ILoggerFactory,
+  ) {
     super();
     this.logger = loggerFactory(FloorStore.name);
   }

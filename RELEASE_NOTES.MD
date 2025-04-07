@@ -15,6 +15,7 @@
 - Make printerId camera nullish
 - Merge create and update schema floor
 - Schema printerPositionsSchema simplified
+- Add biome linter/formatter, remove prettier and eslint
 
 ## Changes
 

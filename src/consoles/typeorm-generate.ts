@@ -110,9 +110,9 @@ async function main() {
       console.log(
         chalk.yellow(
           `ATTENTION: you have pending migrations (${chalk.blue(
-            hasPendingMigrations
-          )}). Running those first, before generating a new migration.`
-        )
+            hasPendingMigrations,
+          )}). Running those first, before generating a new migration.`,
+        ),
       );
 
       await dataSource.runMigrations({ transaction: "each" });
@@ -141,7 +141,7 @@ async function main() {
             upQuery.query.replace(new RegExp("`", "g"), "\\`") +
             "`" +
             queryParams(upQuery.parameters) +
-            ");"
+            ");",
         );
       });
       sqlInMemory.downQueries.forEach((downQuery) => {
@@ -150,7 +150,7 @@ async function main() {
             downQuery.query.replace(new RegExp("`", "g"), "\\`") +
             "`" +
             queryParams(downQuery.parameters) +
-            ");"
+            ");",
         );
       });
     } finally {

@@ -17,7 +17,7 @@ export class PrinterFileCleanTask {
     loggerFactory: ILoggerFactory,
     private readonly printerCache: PrinterCache,
     private readonly printerFilesStore: PrinterFilesStore,
-    private readonly settingsStore: SettingsStore
+    private readonly settingsStore: SettingsStore,
   ) {
     this.logger = loggerFactory(PrinterFileCleanTask.name);
   }
@@ -33,7 +33,9 @@ export class PrinterFileCleanTask {
 
     try {
       if (autoCleanAtBootEnabled) {
-        this.logger.log(`Cleaning files of ${printers.length} active printers [printerFileClean:autoRemoveOldFilesAtBoot].`);
+        this.logger.log(
+          `Cleaning files of ${printers.length} active printers [printerFileClean:autoRemoveOldFilesAtBoot].`,
+        );
       } else {
         this.logger.log(`Reporting about old files of ${printers.length} printers.`);
       }
@@ -48,7 +50,7 @@ export class PrinterFileCleanTask {
       }
       if (errorPrinters.length > 0) {
         this.logger.error(
-          `Error loading some files, ${errorPrinters.length} printer(s) did not respond or returned an unexpected status code. Those will depend on previously cached files.`
+          `Error loading some files, ${errorPrinters.length} printer(s) did not respond or returned an unexpected status code. Those will depend on previously cached files.`,
         );
       }
 

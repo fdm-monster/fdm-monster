@@ -71,7 +71,9 @@ export class PermissionService
   }
 
   normalizePermission(assignedPermission: string | number) {
-    const permissionInstance = this.permissions.find((r) => r.id === assignedPermission || r.name === assignedPermission);
+    const permissionInstance = this.permissions.find(
+      (r) => r.id === assignedPermission || r.name === assignedPermission,
+    );
     if (!permissionInstance) {
       this.logger.warn(`The permission by provided id is not found. Skipping`);
       return;

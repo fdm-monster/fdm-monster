@@ -25,7 +25,7 @@ export class AuthController {
     private readonly settingsStore: SettingsStore,
     private readonly userService: IUserService,
     private readonly roleService: IRoleService,
-    private readonly configService: IConfigService
+    private readonly configService: IConfigService,
   ) {
     this.logger = loggerFactory(AuthController.name);
   }

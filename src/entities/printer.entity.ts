@@ -38,10 +38,16 @@ export class Printer {
   })
   assignee?: string;
 
-  @OneToMany(() => PrintCompletion, (pc) => pc.printer)
+  @OneToMany(
+    () => PrintCompletion,
+    (pc) => pc.printer,
+  )
   printCompletions: Relation<PrintCompletion>[];
 
-  @OneToMany(() => PrinterGroup, (pc) => pc.printer)
+  @OneToMany(
+    () => PrinterGroup,
+    (pc) => pc.printer,
+  )
   printerGroups: Relation<PrinterGroup>[];
 
   @CreateDateColumn({ type: "int" })

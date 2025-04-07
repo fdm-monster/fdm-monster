@@ -71,7 +71,7 @@ export class OctoprintWebsocketAdapter extends WebsocketAdapter implements IWebs
     loggerFactory: ILoggerFactory,
     private readonly octoprintClient: OctoprintClient,
     private readonly eventEmitter2: EventEmitter2,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
   ) {
     super(loggerFactory);
 
@@ -156,7 +156,10 @@ export class OctoprintWebsocketAdapter extends WebsocketAdapter implements IWebs
           // This doesn't occur often (instead a 400 with CSRF failed is returned)
           this.setApiState("authFail");
           this.setSocketState("aborted");
-          throw new ExternalServiceError("Guest group detected, authentication failed, aborting socket connection", "OctoPrint");
+          throw new ExternalServiceError(
+            "Guest group detected, authentication failed, aborting socket connection",
+            "OctoPrint",
+          );
         }
         this.setApiState("responding");
         this.setSocketState("opening");
@@ -312,8 +315,10 @@ export class OctoprintWebsocketAdapter extends WebsocketAdapter implements IWebs
       this.setReauthRequired();
     } else if (
       eventName === OctoPrintMessage.current &&
-      this.configService.get(AppConstants.debugFileWritePrinterStatesKey, AppConstants.defaultDebugFileWritePrinterStates) ===
-        "true"
+      this.configService.get(
+        AppConstants.debugFileWritePrinterStatesKey,
+        AppConstants.defaultDebugFileWritePrinterStates,
+      ) === "true"
     ) {
       writeFileSync(`websocket_current_${this.printerId}.txt`, JSON.stringify(payload, null, 2));
     }
@@ -351,7 +356,7 @@ export class OctoprintWebsocketAdapter extends WebsocketAdapter implements IWebs
     await this.sendMessage(
       JSON.stringify({
         auth: `${this.username}:${this.sessionDto.session}`,
-      })
+      }),
     );
     // TODO what if bad auth? => pure silence right?
   }

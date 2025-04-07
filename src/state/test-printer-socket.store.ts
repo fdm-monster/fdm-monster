@@ -26,7 +26,7 @@ export class TestPrinterSocketStore {
     loggerFactory: ILoggerFactory,
     private readonly socketFactory: SocketFactory,
     private readonly socketIoGateway: SocketIoGateway,
-    private readonly eventEmitter2: EventEmitter2
+    private readonly eventEmitter2: EventEmitter2,
   ) {
     this.logger = loggerFactory(TestPrinterSocketStore.name);
   }

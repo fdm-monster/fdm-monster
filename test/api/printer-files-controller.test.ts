@@ -52,7 +52,10 @@ describe(PrinterFilesController.name, () => {
 
   it("should retrieve files on GET for existing printer", async () => {
     const printer = await createTestPrinter(request);
-    nock(printer.printerURL).get("/api/files/local").query("recursive=false").reply(200, { files: [], free: 1, total: 1 });
+    nock(printer.printerURL)
+      .get("/api/files/local")
+      .query("recursive=false")
+      .reply(200, { files: [], free: 1, total: 1 });
     const response = await request.get(getFilesRoute(printer.id)).send();
     expectOkResponse(response, []);
   });
@@ -71,7 +74,7 @@ describe(PrinterFilesController.name, () => {
           "content-type": "application/json",
           "content-length": reply1.length.toString(),
           "content-disposition": "attachment; filename=test#.gcode",
-        } as ReplyHeaders
+        } as ReplyHeaders,
       );
     const response = await request.get(downloadFileRoute(printer.id, encodeURIComponent(filename))).send();
     expectOkResponse(response, reply0);
@@ -171,7 +174,10 @@ describe(PrinterFilesController.name, () => {
         },
       },
     });
-    nock(printer.printerURL).get("/api/files/local").query("recursive=false").reply(200, { files: [], free: 1, total: 1 });
+    nock(printer.printerURL)
+      .get("/api/files/local")
+      .query("recursive=false")
+      .reply(200, { files: [], free: 1, total: 1 });
 
     const response = await request.post(uploadFileRoute(printer.id)).attach("file", gcodePath);
     expectOkResponse(response);
@@ -221,7 +227,10 @@ describe(PrinterFilesController.name, () => {
       })
       .persist();
 
-    const response = await request.post(uploadFileRoute(printer.id)).field("print", true).attach("file", invalidGcodePath);
+    const response = await request
+      .post(uploadFileRoute(printer.id))
+      .field("print", true)
+      .attach("file", invalidGcodePath);
     console.log(response);
     expectInvalidResponse(response, ["error"]);
   });

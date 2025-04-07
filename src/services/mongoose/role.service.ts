@@ -12,7 +12,7 @@ export class RoleService implements IRoleService<MongoIdType> {
   constructor(
     private readonly appDefaultRole: string,
     private readonly appDefaultRoleNoLogin: string,
-    private readonly settingsStore: SettingsStore
+    private readonly settingsStore: SettingsStore,
   ) {}
 
   private _roles: IRole[] = [];

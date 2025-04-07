@@ -30,7 +30,7 @@ export class SettingsStore {
   constructor(
     loggerFactory: ILoggerFactory,
     private readonly settingsService: ISettingsService,
-    private readonly isTypeormMode: boolean
+    private readonly isTypeormMode: boolean,
   ) {
     this.logger = loggerFactory(SettingsStore.name);
   }
@@ -127,12 +127,14 @@ export class SettingsStore {
   }
 
   isRegistrationEnabled() {
-    if (!this.settings) throw new InternalServerException("Could not check server settings (server settings not loaded");
+    if (!this.settings)
+      throw new InternalServerException("Could not check server settings (server settings not loaded");
     return this.settings[serverSettingsKey].registration;
   }
 
   isThumbnailSupportEnabled() {
-    if (!this.settings) throw new InternalServerException("Could not check server settings (server settings not loaded");
+    if (!this.settings)
+      throw new InternalServerException("Could not check server settings (server settings not loaded");
     return this.settings[serverSettingsKey].experimentalThumbnailSupport;
   }
 

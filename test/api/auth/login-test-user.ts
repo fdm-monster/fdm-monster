@@ -11,7 +11,7 @@ export async function loginTestUser(
   request: TestAgent<Test>,
   usernameIn = "default",
   password = "testFDMMonster",
-  role = ROLES.ADMIN
+  role = ROLES.ADMIN,
 ) {
   const { username } = await ensureTestUserCreated(usernameIn, password, false, role);
   const response = await request.post(loginRoute).send({ username, password });

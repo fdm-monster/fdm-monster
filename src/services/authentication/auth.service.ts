@@ -42,7 +42,7 @@ export class AuthService<KeyType = IdType> implements IAuthService<KeyType> {
     private readonly userService: IUserService<KeyType, IUser<KeyType>>,
     private readonly jwtService: IJwtService<KeyType>,
     private readonly settingsStore: SettingsStore,
-    private readonly refreshTokenService: IRefreshTokenService<KeyType>
+    private readonly refreshTokenService: IRefreshTokenService<KeyType>,
   ) {
     this.logger = loggerFactory(AuthService.name);
   }
@@ -104,7 +104,7 @@ export class AuthService<KeyType = IdType> implements IAuthService<KeyType> {
     if (!userRefreshToken) {
       throw new AuthenticationError(
         "The refresh token was invalid or expired, could not refresh user token",
-        AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken
+        AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken,
       );
     }
 
@@ -132,7 +132,10 @@ export class AuthService<KeyType = IdType> implements IAuthService<KeyType> {
     }
     if (Date.now() > userRefreshToken.expiresAt) {
       await this.refreshTokenService.deleteRefreshTokenByUserId(userRefreshToken.userId.toString());
-      throw new AuthenticationError("Refresh token expired, login required", AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken);
+      throw new AuthenticationError(
+        "Refresh token expired, login required",
+        AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken,
+      );
     }
     return userRefreshToken;
   }
@@ -148,7 +151,7 @@ export class AuthService<KeyType = IdType> implements IAuthService<KeyType> {
         await this.refreshTokenService.deleteRefreshTokenByUserId(userRefreshToken.userId.toString());
         throw new AuthenticationError(
           "Refresh token attempts exceeded, login required",
-          AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken
+          AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken,
         );
       }
     }

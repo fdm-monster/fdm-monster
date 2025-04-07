@@ -15,13 +15,13 @@ import { IUserService } from "@/services/interfaces/user-service.interface";
 const authorize = (
   settingsStore: SettingsStore,
   options: StrategyOptions,
-  verify: (jwt_payload: any, done: VerifiedCallback) => void
+  verify: (jwt_payload: any, done: VerifiedCallback) => void,
 ) => {
   const strategy = new JwtStrategy(options, verify);
 
   return async function authorizeCallback(
     socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
-    next: (err?: ExtendedError) => void
+    next: (err?: ExtendedError) => void,
   ) {
     if (!(await settingsStore.getLoginRequired())) {
       // No login required, so we can skip the authentication
@@ -49,14 +49,18 @@ export class SocketIoGateway {
     private readonly eventEmitter2: EventEmitter2,
     private readonly settingsStore: SettingsStore,
     private readonly userService: IUserService,
-    private readonly configService: IConfigService
+    private readonly configService: IConfigService,
   ) {
     this.logger = loggerFactory(SocketIoGateway.name);
   }
 
   attachServer(httpServer: HttpServer) {
     this.io = new Server(httpServer, { cors: { origin: "*" } });
-    const opts = getPassportJwtOptions(this.settingsStore, this.configService, (value: Socket) => value.handshake.auth.token);
+    const opts = getPassportJwtOptions(
+      this.settingsStore,
+      this.configService,
+      (value: Socket) => value.handshake.auth.token,
+    );
     const verify = verifyUserCallback(this.userService);
     this.io.use(authorize(this.settingsStore, opts, verify));
     this.io.on("connection", (socket) => this.onConnect.bind(this)(socket));

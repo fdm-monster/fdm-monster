@@ -1,5 +1,9 @@
 import { IdType } from "@/shared.constants";
-import { CreatePrintCompletionDto, PrintCompletionContext, PrintCompletionDto } from "@/services/interfaces/print-completion.dto";
+import {
+  CreatePrintCompletionDto,
+  PrintCompletionContext,
+  PrintCompletionDto,
+} from "@/services/interfaces/print-completion.dto";
 import { IPrintCompletion } from "@/models/PrintCompletion";
 import { PrintCompletion } from "@/entities";
 

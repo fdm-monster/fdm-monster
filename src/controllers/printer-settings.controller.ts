@@ -12,7 +12,10 @@ import { ParamId } from "@/middleware/param-converter.middleware";
 @route(AppConstants.apiRoute + "/printer-settings")
 @before([authenticate()])
 export class PrinterSettingsController {
-  constructor(private readonly printerCache: PrinterCache, private readonly octoprintClient: OctoprintClient) {}
+  constructor(
+    private readonly printerCache: PrinterCache,
+    private readonly octoprintClient: OctoprintClient,
+  ) {}
 
   @GET()
   @route("/:id")

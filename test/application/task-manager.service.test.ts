@@ -61,7 +61,7 @@ describe(TaskManagerService.name, () => {
         disabled: true,
         periodic: true,
         milliseconds: 1000,
-      }
+      },
     );
 
     expect(ran).toBeFalsy();

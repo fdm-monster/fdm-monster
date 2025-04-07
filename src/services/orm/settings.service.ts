@@ -27,7 +27,10 @@ import { SqliteIdType } from "@/shared.constants";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
 import { ICredentialSettings } from "@/models/Settings";
 
-export class SettingsService extends BaseService(Settings, SettingsDto) implements ISettingsService<SqliteIdType, Settings> {
+export class SettingsService
+  extends BaseService(Settings, SettingsDto)
+  implements ISettingsService<SqliteIdType, Settings>
+{
   toDto(entity: Settings): SettingsDto<SqliteIdType> {
     return {
       [serverSettingsKey]: {

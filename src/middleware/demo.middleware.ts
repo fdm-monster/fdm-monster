@@ -21,5 +21,5 @@ export const demoUserNotAllowed = inject(
       }
       next();
     };
-  }
+  },
 );

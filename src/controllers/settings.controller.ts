@@ -36,7 +36,7 @@ export class SettingsController {
     private readonly printerCache: PrinterCache,
     private readonly printerService: IPrinterService,
     private readonly settingsStore: SettingsStore,
-    private readonly printerThumbnailCache: PrinterThumbnailCache
+    private readonly printerThumbnailCache: PrinterThumbnailCache,
   ) {
     this.logger = loggerFactory(SettingsController.name);
   }

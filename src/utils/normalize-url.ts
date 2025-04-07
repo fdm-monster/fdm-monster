@@ -93,7 +93,7 @@ export function normalizeUrl(
     removeDirectoryIndex: boolean | RegExp[];
     removeExplicitPort: boolean;
     sortQueryParameters: boolean;
-  }>
+  }>,
 ): string {
   options = {
     defaultProtocol: "http",
@@ -283,12 +283,21 @@ export function normalizeUrl(
   // Take advantage of many of the Node `url` normalizations
   urlString = urlObject.toString();
 
-  if (!options.removeSingleSlash && urlObject.pathname === "/" && !oldUrlString.endsWith("/") && urlObject.hash === "") {
+  if (
+    !options.removeSingleSlash &&
+    urlObject.pathname === "/" &&
+    !oldUrlString.endsWith("/") &&
+    urlObject.hash === ""
+  ) {
     urlString = urlString.replace(/\/$/, "");
   }
 
   // Remove ending `/` unless removeSingleSlash is false
-  if ((options.removeTrailingSlash || urlObject.pathname === "/") && urlObject.hash === "" && options.removeSingleSlash) {
+  if (
+    (options.removeTrailingSlash || urlObject.pathname === "/") &&
+    urlObject.hash === "" &&
+    options.removeSingleSlash
+  ) {
     urlString = urlString.replace(/\/$/, "");
   }
 

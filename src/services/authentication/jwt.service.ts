@@ -6,7 +6,10 @@ import { IdType } from "@/shared.constants";
 import { IJwtService } from "@/services/interfaces/jwt.service.interface";
 
 export class JwtService implements IJwtService {
-  constructor(private readonly settingsStore: SettingsStore, private readonly configService: IConfigService) {}
+  constructor(
+    private readonly settingsStore: SettingsStore,
+    private readonly configService: IConfigService,
+  ) {}
 
   async signJwtToken(userId: IdType, username: string) {
     const { jwtSecret, jwtExpiresIn } = await this.settingsStore.getCredentialSettings();

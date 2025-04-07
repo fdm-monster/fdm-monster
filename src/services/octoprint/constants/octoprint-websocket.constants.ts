@@ -41,4 +41,4 @@ export const EVENT_TYPES = {
 
 export const EVENT_TYPES_ARRAY = Object.values(EVENT_TYPES);
 
-export type EventType = typeof EVENT_TYPES_ARRAY[number];
+export type EventType = (typeof EVENT_TYPES_ARRAY)[number];

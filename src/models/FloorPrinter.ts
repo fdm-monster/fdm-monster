@@ -31,5 +31,5 @@ export const PrinterInFloorSchema = new Schema<IPosition>(
       required: true,
     }, // No metadata needed yet
   },
-  { _id: false }
+  { _id: false },
 );
