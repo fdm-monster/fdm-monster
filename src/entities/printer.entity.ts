@@ -2,7 +2,7 @@ import { IsAlphanumeric } from "class-validator";
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, Relation } from "typeorm";
 import { PrintCompletion } from "@/entities/print-completion.entity";
 import { PrinterGroup } from "@/entities/printer-group.entity";
-import { OctoprintType, PrinterType } from "@/services/printer-api.interface";
+import { OctoprintType } from "@/services/printer-api.interface";
 
 @Entity()
 export class Printer {
@@ -16,7 +16,7 @@ export class Printer {
   printerURL: string;
 
   @Column({ default: OctoprintType, nullable: false })
-  printerType: PrinterType;
+  printerType: number;
 
   @Column({ default: "" })
   @IsAlphanumeric()
@@ -24,29 +24,29 @@ export class Printer {
 
   @Column({
     nullable: false,
-    default: true,
+    default: true
   })
   enabled: boolean;
 
   @Column({
-    nullable: true,
+    nullable: true
   })
   disabledReason?: string;
 
   @Column({
-    nullable: true,
+    nullable: true
   })
   assignee?: string;
 
   @OneToMany(
     () => PrintCompletion,
-    (pc) => pc.printer,
+    (pc) => pc.printer
   )
   printCompletions: Relation<PrintCompletion>[];
 
   @OneToMany(
     () => PrinterGroup,
-    (pc) => pc.printer,
+    (pc) => pc.printer
   )
   printerGroups: Relation<PrinterGroup>[];
 

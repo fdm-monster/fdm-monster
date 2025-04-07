@@ -13,11 +13,12 @@ beforeEach(() => {
 });
 
 const testPrinterId = "asd";
-const fakeFileList: FileDto[] = [{ path: "asd", size: 1, date: Date.now() }];
+const fileEntry = { path: "asd", size: 1, date: Date.now() } as FileDto;
+const fakeFileList = [fileEntry];
 
 describe(FileCache.name, function () {
   it("should generate printer file cache", function () {
     fileCache.cachePrinterFiles(testPrinterId, fakeFileList);
-    expect(fileCache.getPrinterFiles(testPrinterId)).toEqual([{ path: "asd" }]);
+    expect(fileCache.getPrinterFiles(testPrinterId)).toEqual([fileEntry]);
   });
 });
