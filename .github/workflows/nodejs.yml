@@ -16,7 +16,6 @@ jobs:
       - run: yarn set version berry
       - run: yarn install --immutable
       - run: yarn run build
-      - run: yarn run tsc
       # run sqlite tests with coverage
       - run: yarn run test:cov-sqlite
         env:

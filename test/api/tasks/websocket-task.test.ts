@@ -16,8 +16,8 @@ describe(PrinterWebsocketTask.name, () => {
       await task.run();
     } catch (e) {
       // It throws because system task has not been registered by the BootTask yet - complete fine
-      expect(e.toString()).toEqual(
-        "JobValidationError [anonymous]: The requested task with ID printerSystemTask was not registered",
+      expect((e as Error).toString()).toEqual(
+        "JobValidationError [anonymous]: The requested task with ID printerSystemTask was not registered"
       );
     }
   });

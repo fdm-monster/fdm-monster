@@ -1,6 +1,6 @@
 import { Response } from "supertest";
-import CustomMatcherResult = jest.CustomMatcherResult;
 import { ZodIssue } from "zod";
+import CustomMatcherResult = jest.CustomMatcherResult;
 
 export function getExpectExtensions() {
   return {
@@ -8,9 +8,9 @@ export function getExpectExtensions() {
       expect(received.errors).toMatchObject(keys);
 
       return {
-        pass: true,
+        pass: true
       } as CustomMatcherResult;
-    },
+    }
   };
 }
 
@@ -34,21 +34,22 @@ export function expectOkResponse(response: Response, matchedBody?: any) {
 
 export function expectValidationError(
   response: any,
-  expectedErrors: Array<{ code: string; path: string }>,
-  exact = false,
+  expectedErrors?: Array<{ code: string; path: string }>,
+  exact = false
 ) {
   // Extract the issues array from the ZodError
   const issues: ZodIssue[] = response.errors?.issues || [];
+  expectedErrors ??= [];
 
   // Convert each issue's path array to a dot-notation string
   const responseErrors = issues.map((issue) => ({
     code: issue.code,
-    path: issue.path.join("."),
+    path: issue.path.join(".")
   }));
 
   if (!exact) {
     const missingErrors = expectedErrors.filter(
-      (expected) => !responseErrors.some((actual) => actual.code === expected.code && actual.path === expected.path),
+      (expected) => !responseErrors.some((actual) => actual.code === expected.code && actual.path === expected.path)
     );
     expect(missingErrors).toEqual([]);
   } else {
@@ -85,8 +86,8 @@ export function expectForbiddenResponse(response: Response) {
 
 export function expectInvalidResponse(
   response: Response,
-  expectedErrors: Array<{ code: string; path: string }>,
-  exact = false,
+  expectedErrors?: Array<{ code: string; path: string }>,
+  exact = false
 ) {
   expect(response.statusCode).toEqual(400);
 

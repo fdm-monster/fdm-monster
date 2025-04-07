@@ -7,9 +7,10 @@ import { DITokens } from "@/container.tokens";
 import { SqliteIdType } from "@/shared.constants";
 import { PrintCompletionDto } from "@/services/interfaces/print-completion.dto";
 import { IPrintCompletionService } from "@/services/interfaces/print-completion.interface";
-import supertest from "supertest";
+import { Test } from "supertest";
 import { PrintCompletionController } from "@/controllers/print-completion.controller";
 import { createTestPrinter } from "./test-data/create-printer";
+import TestAgent from "supertest/lib/agent";
 
 let printCompletionService: IPrintCompletionService<SqliteIdType, PrintCompletionDto>;
 const listRoute = `${AppConstants.apiRoute}/print-completion`;
@@ -17,7 +18,7 @@ const getCompletionEntryRoute = (corrId: string) => `${listRoute}/${corrId}`;
 const contextsRoute = `${listRoute}/contexts`;
 const testRoute = `${listRoute}/test`;
 
-let request: supertest.SuperTest<supertest.Test>;
+let request: TestAgent<Test>;
 let container: AwilixContainer<any>;
 
 beforeAll(async () => {
@@ -49,8 +50,8 @@ describe(PrintCompletionController.name, () => {
       status: EVENT_TYPES.PrintStarted,
       fileName: "mycode.gcode",
       context: {
-        correlationId: "123",
-      },
+        correlationId: "123"
+      }
     });
     expect(completionEntryStart.id).toBeTruthy();
     const completionEntryDone = await printCompletionService.create({
@@ -59,8 +60,8 @@ describe(PrintCompletionController.name, () => {
       status: EVENT_TYPES.PrintDone,
       fileName: "mycode.gcode",
       context: {
-        correlationId: "123",
-      },
+        correlationId: "123"
+      }
     });
     expect(completionEntryDone.id).toBeTruthy();
 

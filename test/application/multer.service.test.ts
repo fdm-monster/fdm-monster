@@ -34,7 +34,7 @@ describe("MulterService", () => {
   });
 
   it("should be able to start tracking upload", async () => {
-    multerService.startTrackingSession({}, 1);
+    multerService.startTrackingSession({} as Express.Multer.File, 1);
 
     const trackedSessions = multerService.getSessions();
     expect(trackedSessions.current).not.toHaveLength(0);
