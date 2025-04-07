@@ -12,12 +12,17 @@ export class FileUploadTrackerCache {
 
   private readonly logger: LoggerService;
 
-  constructor(loggerFactory: ILoggerFactory, private readonly eventEmitter2: EventEmitter2) {
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly eventEmitter2: EventEmitter2,
+  ) {
     this.logger = loggerFactory(FileUploadTrackerCache.name);
 
     this.eventEmitter2.on(uploadProgressEvent("*"), (token, progress) => this.handleUploadProgress(token, progress));
     this.eventEmitter2.on(uploadDoneEvent("*"), (token: string) => this.handleUploadDone(token));
-    this.eventEmitter2.on(uploadFailedEvent("*"), (token: string, reason?: string) => this.handleUploadFailed(token, reason));
+    this.eventEmitter2.on(uploadFailedEvent("*"), (token: string, reason?: string) =>
+      this.handleUploadFailed(token, reason),
+    );
   }
 
   getUploads() {

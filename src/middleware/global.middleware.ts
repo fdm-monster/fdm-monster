@@ -28,9 +28,11 @@ export const validateWizardCompleted = inject(
         return;
       } else {
         logger.error("Wizard not completed", req.path);
-        throw new ForbiddenError(`First-time-setup not completed, these api paths are enabled: ${allowedPaths.join(", ")}`);
+        throw new ForbiddenError(
+          `First-time-setup not completed, these api paths are enabled: ${allowedPaths.join(", ")}`,
+        );
       }
-    }
+    },
 );
 
 export const interceptRoles = inject(
@@ -51,5 +53,5 @@ export const interceptRoles = inject(
       }
 
       next();
-    }
+    },
 );

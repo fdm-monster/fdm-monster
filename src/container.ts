@@ -79,7 +79,7 @@ export function config<T1, T2>(
   key: string,
   experimentalMode: boolean,
   serviceTypeorm: BuildResolver<T2> & DisposableResolver<T2>,
-  serviceMongoose?: (BuildResolver<T1> & DisposableResolver<T1>) | Resolver<T1>
+  serviceMongoose?: (BuildResolver<T1> & DisposableResolver<T1>) | Resolver<T1>,
 ) {
   return {
     [key]: experimentalMode ? serviceTypeorm : serviceMongoose,
@@ -110,20 +110,40 @@ export function configureContainer(isSqlite: boolean = false) {
     ...config(di.settingsService, isSqlite, asClass(SettingsService2), asClass(SettingsService)),
     ...config(di.floorService, isSqlite, asClass(FloorService2).singleton(), asClass(FloorService).singleton()),
     ...config(di.floorPositionService, isSqlite, asClass(FloorPositionService).singleton(), asValue(null)),
-    ...config(di.cameraStreamService, isSqlite, asClass(CameraService2).singleton(), asClass(CameraService).singleton()),
+    ...config(
+      di.cameraStreamService,
+      isSqlite,
+      asClass(CameraService2).singleton(),
+      asClass(CameraService).singleton(),
+    ),
     ...config(di.printerService, isSqlite, asClass(PrinterService2), asClass(PrinterService)),
     ...config(di.printerGroupService, isSqlite, asClass(PrinterGroupService), asValue(null)),
-    ...config(di.refreshTokenService, isSqlite, asClass(RefreshToken2).singleton(), asClass(RefreshTokenService).singleton()),
+    ...config(
+      di.refreshTokenService,
+      isSqlite,
+      asClass(RefreshToken2).singleton(),
+      asClass(RefreshTokenService).singleton(),
+    ),
     ...config(di.userService, isSqlite, asClass(UserService2).singleton(), asClass(UserService).singleton()),
     ...config(di.userRoleService, isSqlite, asClass(UserRoleService).singleton(), asValue(null)),
     ...config(di.roleService, isSqlite, asClass(RoleService2).singleton(), asClass(RoleService).singleton()), // caches roles
-    ...config(di.permissionService, isSqlite, asClass(PermissionService2).singleton(), asClass(PermissionService).singleton()), // caches roles
-    ...config(di.customGCodeService, isSqlite, asClass(CustomGcodeService2).singleton(), asClass(CustomGcodeService).singleton()),
+    ...config(
+      di.permissionService,
+      isSqlite,
+      asClass(PermissionService2).singleton(),
+      asClass(PermissionService).singleton(),
+    ), // caches roles
+    ...config(
+      di.customGCodeService,
+      isSqlite,
+      asClass(CustomGcodeService2).singleton(),
+      asClass(CustomGcodeService).singleton(),
+    ),
     ...config(
       di.printCompletionService,
       isSqlite,
       asClass(PrintCompletionService2).singleton(),
-      asClass(PrintCompletionService).singleton()
+      asClass(PrintCompletionService).singleton(),
     ),
     // -- asClass --
     [di.serverHost]: asClass(ServerHost).singleton(),

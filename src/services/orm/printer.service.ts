@@ -19,7 +19,11 @@ export class PrinterService
 {
   private readonly logger: LoggerService;
 
-  constructor(loggerFactory: ILoggerFactory, typeormService: TypeormService, private readonly eventEmitter2: EventEmitter2) {
+  constructor(
+    loggerFactory: ILoggerFactory,
+    typeormService: TypeormService,
+    private readonly eventEmitter2: EventEmitter2,
+  ) {
     super(typeormService);
     this.logger = loggerFactory(PrinterService.name);
   }

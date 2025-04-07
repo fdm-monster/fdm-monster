@@ -6,7 +6,10 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 export class ClientDistDownloadTask {
   private readonly logger: LoggerService;
 
-  constructor(loggerFactory: ILoggerFactory, private readonly clientBundleService: ClientBundleService) {
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly clientBundleService: ClientBundleService,
+  ) {
     this.logger = loggerFactory(ClientDistDownloadTask.name);
   }
 

@@ -28,7 +28,7 @@ describe(OctoprintClient.name, () => {
           apiKey: "surewhynot",
           printerURL: "some uwrl",
           printerType: OctoprintType,
-        })
+        }),
     ).rejects.toHaveProperty("code", "ERR_INVALID_URL");
   });
 

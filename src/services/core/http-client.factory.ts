@@ -29,7 +29,7 @@ export class HttpClientFactory {
   createClientWithBaseUrl<T extends DefaultHttpClientBuilder>(
     base: T,
     baseAddress: string,
-    buildFluentOptions?: (base: T) => void
+    buildFluentOptions?: (base: T) => void,
   ): AxiosInstance {
     return this.createClient(base, (builder) => {
       builder.withBaseUrl(baseAddress);

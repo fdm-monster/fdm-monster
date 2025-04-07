@@ -6,14 +6,21 @@ import {
   printerTypeValidator,
   printerUrlValidator,
 } from "@/services/validators/printer-service.validation";
-import { floorLevelValidator, floorNameValidator, xValidator, yValidator } from "@/services/validators/floor-service.validation";
+import {
+  floorLevelValidator,
+  floorNameValidator,
+  xValidator,
+  yValidator,
+} from "@/services/validators/floor-service.validation";
 
 export const exportPrintersFloorsYamlSchema = z.object({
   exportPrinters: z.boolean(),
   exportFloorGrid: z.boolean(),
   exportFloors: z.boolean(),
   exportGroups: z.boolean(),
-  printerComparisonStrategiesByPriority: z.array(z.string().refine((val) => ["name", "url", "id"].includes(val))).min(1),
+  printerComparisonStrategiesByPriority: z
+    .array(z.string().refine((val) => ["name", "url", "id"].includes(val)))
+    .min(1),
   floorComparisonStrategiesByPriority: z.string().refine((val) => ["name", "floor", "id"].includes(val)),
   notes: z.string().optional(),
 });
@@ -27,7 +34,7 @@ export const printerPositionsSchema = z
       floorId: numberOrStringIdValidator.optional(),
       x: xValidator,
       y: yValidator,
-    })
+    }),
   )
   .min(0);
 
@@ -44,7 +51,9 @@ export const importPrintersFloorsYamlSchema = z.object({
     exportFloorGrid: z.boolean(),
     exportFloors: z.boolean(),
     exportGroups: z.boolean().optional(),
-    printerComparisonStrategiesByPriority: z.array(z.string().refine((val) => ["name", "url", "id"].includes(val))).min(1),
+    printerComparisonStrategiesByPriority: z
+      .array(z.string().refine((val) => ["name", "url", "id"].includes(val)))
+      .min(1),
     floorComparisonStrategiesByPriority: z.string().refine((val) => ["name", "floor", "id"].includes(val)),
   }),
   printers: z
@@ -63,7 +72,7 @@ export const importPrintersFloorsYamlSchema = z.object({
             name: z.string().optional(),
           })
           .optional(),
-      })
+      }),
     )
     .min(0)
     .default([]),
@@ -74,7 +83,7 @@ export const importPrintersFloorsYamlSchema = z.object({
         floor: floorLevelValidator,
         name: floorNameValidator,
         printers: printerPositionsSchema,
-      })
+      }),
     )
     .min(0)
     .default([]),
@@ -86,9 +95,9 @@ export const importPrintersFloorsYamlSchema = z.object({
         printers: z.array(
           z.object({
             printerId: numberOrStringIdValidator,
-          })
+          }),
         ),
-      })
+      }),
     )
     .min(0)
     .default([]),

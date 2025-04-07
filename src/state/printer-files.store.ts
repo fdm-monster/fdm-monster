@@ -14,7 +14,7 @@ export class PrinterFilesStore {
     loggerFactory: ILoggerFactory,
     private readonly printerCache: PrinterCache,
     public readonly fileCache: FileCache,
-    private readonly printerApiFactory: PrinterApiFactory
+    private readonly printerApiFactory: PrinterApiFactory,
   ) {
     this.logger = loggerFactory(PrinterFilesStore.name);
   }
@@ -70,7 +70,9 @@ export class PrinterFilesStore {
       }
     }
 
-    this.logger.log(`Deleted ${succeededFiles.length} successfully and ${failedFiles.length} with failure for printer ${name}.`);
+    this.logger.log(
+      `Deleted ${succeededFiles.length} successfully and ${failedFiles.length} with failure for printer ${name}.`,
+    );
     return {
       failedFiles,
       succeededFiles,

@@ -23,7 +23,7 @@ export class PrinterSocketStore {
     private readonly socketFactory: SocketFactory,
     private readonly settingsStore: SettingsStore,
     private readonly eventEmitter2: EventEmitter2,
-    private readonly printerCache: PrinterCache
+    private readonly printerCache: PrinterCache,
   ) {
     this.logger = loggerFactory(PrinterSocketStore.name);
 
@@ -129,7 +129,7 @@ export class PrinterSocketStore {
             this.logger.log(
               `Reopening socket for printerId '${
                 socket.printerId
-              }' (setup: ${socket.needsSetup()}, reopen: ${socket.needsReopen()})`
+              }' (setup: ${socket.needsSetup()}, reopen: ${socket.needsReopen()})`,
             );
           }
           socketSetupRequested++;

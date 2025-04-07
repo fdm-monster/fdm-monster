@@ -12,7 +12,7 @@ export const executeBatchRePrinterSchema = (isSqlite: boolean) =>
       z.object({
         printerId: idRuleV2(isSqlite),
         path: z.string(),
-      })
+      }),
     ),
   });
 

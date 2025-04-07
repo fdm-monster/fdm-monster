@@ -36,7 +36,7 @@ export class OctoprintClient extends OctoprintRoutes {
   constructor(
     loggerFactory: ILoggerFactory,
     private readonly httpClientFactory: HttpClientFactory,
-    private readonly eventEmitter2: EventEmitter2
+    private readonly eventEmitter2: EventEmitter2,
   ) {
     super();
 
@@ -178,7 +178,7 @@ export class OctoprintClient extends OctoprintRoutes {
     return await this.createClient(login, (o) =>
       o.withHeaders({
         Range: `bytes=${startBytes}-${endBytes}`,
-      })
+      }),
     ).get<string>(pathUrl);
   }
 
@@ -209,7 +209,7 @@ export class OctoprintClient extends OctoprintRoutes {
     login: LoginDto,
     multerFileOrBuffer: Buffer | Express.Multer.File,
     commands: any,
-    progressToken: string
+    progressToken: string,
   ) {
     const urlPath = this.apiFilesLocal;
 
@@ -253,7 +253,7 @@ export class OctoprintClient extends OctoprintRoutes {
             if (progressToken) {
               this.eventEmitter2.emit(`${uploadProgressEvent(progressToken)}`, progressToken, p);
             }
-          })
+          }),
       ).post(urlPath, formData);
 
       this.eventEmitter2.emit(`${uploadDoneEvent(progressToken)}`, progressToken);
@@ -275,7 +275,7 @@ export class OctoprintClient extends OctoprintRoutes {
           success: false,
           stack: e.stack,
         },
-        "OctoPrint"
+        "OctoPrint",
       );
     }
   }
@@ -284,7 +284,12 @@ export class OctoprintClient extends OctoprintRoutes {
     await this.createClient(login).delete(this.apiFile(path));
   }
 
-  async getPrinterCurrent(login: LoginDto, history: boolean, limit?: number, exclude?: ("temperature" | "sd" | "state")[]) {
+  async getPrinterCurrent(
+    login: LoginDto,
+    history: boolean,
+    limit?: number,
+    exclude?: ("temperature" | "sd" | "state")[],
+  ) {
     const pathUrl = this.apiPrinterCurrent(history, limit, exclude);
     return await this.createClient(login).get<CurrentPrinterStateDto>(pathUrl);
   }

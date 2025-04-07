@@ -15,7 +15,7 @@ export class TaskManagerService {
   constructor(
     private readonly cradleService: CradleService,
     private readonly loggerFactory: ILoggerFactory,
-    private readonly toadScheduler: ToadScheduler
+    private readonly toadScheduler: ToadScheduler,
   ) {
     this.logger = loggerFactory(TaskManagerService.name);
   }
@@ -33,7 +33,7 @@ export class TaskManagerService {
       if (typeof workload !== "string") {
         throw new JobValidationException(
           `${prefix} is not a callable nor a string dependency to lookup. It can't be scheduled.`,
-          taskId
+          taskId,
         );
       }
 
@@ -45,18 +45,21 @@ export class TaskManagerService {
           throw new JobValidationException(
             `${prefix} had an awilix dependency resolution error. It can't be scheduled without fixing this problem. Inner error:\n` +
               e.stack,
-            taskId
+            taskId,
           );
         } else {
           throw new JobValidationException(
             `${prefix} is not a registered awilix dependency. It can't be scheduled. Error:\n` + e.stack,
-            taskId
+            taskId,
           );
         }
       }
 
       if (typeof resolvedService?.run !== "function") {
-        throw new JobValidationException(`${prefix} was resolved but it doesn't have a 'run(..)' method to call.`, taskId);
+        throw new JobValidationException(
+          `${prefix} was resolved but it doesn't have a 'run(..)' method to call.`,
+          taskId,
+        );
       }
     }
 
@@ -79,7 +82,10 @@ export class TaskManagerService {
       !schedulerOptions.days
     ) {
       // Require milliseconds, minutes, hours or days
-      throw new JobValidationException(`Provide a periodic timing parameter (milliseconds|seconds|minutes|hours|days)'`, taskId);
+      throw new JobValidationException(
+        `Provide a periodic timing parameter (milliseconds|seconds|minutes|hours|days)'`,
+        taskId,
+      );
     }
   }
 
@@ -133,7 +139,7 @@ export class TaskManagerService {
       if (failIfEnabled) {
         throw new JobValidationException(
           `The requested task with ID ${taskId} was not explicitly disabled and must be running already.`,
-          taskId
+          taskId,
         );
       }
       return;
@@ -234,13 +240,16 @@ export class TaskManagerService {
     if (!taskState?.timedTask || !taskState?.options) {
       throw new JobValidationException(
         `The requested task with ID ${taskId} was not registered properly ('timedTask' or 'options' missing).`,
-        taskId
+        taskId,
       );
     }
     const schedulerOptions = taskState?.options;
     const timedTask = taskState.timedTask;
     if (!schedulerOptions?.periodic) {
-      throw new JobValidationException(`The requested task with ID ${taskId} is not periodic and cannot be enabled.`, taskId);
+      throw new JobValidationException(
+        `The requested task with ID ${taskId} is not periodic and cannot be enabled.`,
+        taskId,
+      );
     }
     if (!schedulerOptions.disabled) {
       this.logger.log(`Task '${taskId}' was scheduled (runImmediately: ${!!schedulerOptions.runImmediately}).`);

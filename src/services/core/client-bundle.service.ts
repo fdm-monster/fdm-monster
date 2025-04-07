@@ -16,7 +16,10 @@ import { RequestError } from "octokit";
 export class ClientBundleService {
   private readonly logger: LoggerService;
 
-  constructor(loggerFactory: ILoggerFactory, private readonly githubService: GithubService) {
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly githubService: GithubService,
+  ) {
     this.logger = loggerFactory(ClientBundleService.name);
   }
 
@@ -57,7 +60,7 @@ export class ClientBundleService {
     overrideAutoUpdate?: boolean,
     minimumVersion?: string,
     requestedVersion?: string,
-    allowDowngrade?: boolean
+    allowDowngrade?: boolean,
   ) {
     const clientAutoUpdate = AppConstants.enableClientDistAutoUpdateKey;
 
@@ -168,7 +171,7 @@ export class ClientBundleService {
   async downloadClientUpdate(releaseTag: string): Promise<string> {
     const release = await this.getClientBundleRelease(releaseTag);
     this.logger.log(
-      `Retrieved ${release.assets.length} assets from release '${release.name}': ${release.assets.map((a) => a.name)}`
+      `Retrieved ${release.assets.length} assets from release '${release.name}': ${release.assets.map((a) => a.name)}`,
     );
 
     const assetName = `dist-client-${release.tag_name}.zip`;

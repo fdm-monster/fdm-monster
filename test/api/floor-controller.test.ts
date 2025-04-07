@@ -1,5 +1,10 @@
 import { setupTestApp } from "../test-server";
-import { expectInternalServerError, expectInvalidResponse, expectNotFoundResponse, expectOkResponse } from "../extensions";
+import {
+  expectInternalServerError,
+  expectInvalidResponse,
+  expectNotFoundResponse,
+  expectOkResponse,
+} from "../extensions";
 import { createTestPrinter } from "./test-data/create-printer";
 import { createTestFloor, floorRoute } from "./test-data/create-floor";
 import { Floor } from "@/entities";
@@ -104,11 +109,13 @@ describe(FloorController.name, () => {
   it("should not be able to add printer to non-existing floor", async () => {
     const printer = await createTestPrinter(request);
 
-    const response = await request.post(addPrinterToFloorRoute(isTypeormMode ? 1234 : "63452115122876ea11cd1656")).send({
-      printerId: printer.id,
-      x: 1,
-      y: 1,
-    });
+    const response = await request
+      .post(addPrinterToFloorRoute(isTypeormMode ? 1234 : "63452115122876ea11cd1656"))
+      .send({
+        printerId: printer.id,
+        x: 1,
+        y: 1,
+      });
     expectNotFoundResponse(response);
   });
 

@@ -9,7 +9,7 @@ export class PrinterWebsocketTask {
   constructor(
     loggerFactory: ILoggerFactory,
     private readonly printerSocketStore: PrinterSocketStore,
-    private readonly settingsStore: SettingsStore
+    private readonly settingsStore: SettingsStore,
   ) {
     this.logger = loggerFactory(PrinterWebsocketTask.name);
   }

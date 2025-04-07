@@ -6,7 +6,10 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 export class GithubService {
   private readonly logger: LoggerService;
 
-  constructor(loggerFactory: ILoggerFactory, private readonly octokitService: Octokit) {
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly octokitService: Octokit,
+  ) {
     this.logger = loggerFactory(GithubService.name, false);
   }
 

@@ -20,7 +20,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
   constructor(
     loggerFactory: ILoggerFactory,
     private readonly eventEmitter2: EventEmitter2,
-    private readonly settingsStore: SettingsStore
+    private readonly settingsStore: SettingsStore,
   ) {
     super();
     this.logger = loggerFactory(PrinterEventsCache.name);
@@ -107,7 +107,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
   }
 
   private async onMoonrakerSocketMessage(
-    e: MoonrakerEventDto<MR_WsMessage, PrinterObjectsQueryDto<SubscriptionType | null>, IdType>
+    e: MoonrakerEventDto<MR_WsMessage, PrinterObjectsQueryDto<SubscriptionType | null>, IdType>,
   ) {
     const printerId = e.printerId;
     const eventType = e.event;

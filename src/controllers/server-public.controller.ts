@@ -16,7 +16,7 @@ export class ServerPublicController {
     private readonly serverVersion: string,
     private readonly serverReleaseService: ServerReleaseService,
     private readonly monsterPiService: MonsterPiService,
-    private readonly isTypeormMode: boolean
+    private readonly isTypeormMode: boolean,
   ) {}
 
   @GET()

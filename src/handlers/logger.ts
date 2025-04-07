@@ -37,7 +37,11 @@ export class LoggerService {
           ? [
               new winston.transports.File({
                 level: isTest ? "warn" : "info", // Irrespective of environment
-                filename: join(superRootPath(), AppConstants.defaultLogsFolder, `${AppConstants.logAppName}-${date}.log`),
+                filename: join(
+                  superRootPath(),
+                  AppConstants.defaultLogsFolder,
+                  `${AppConstants.logAppName}-${date}.log`,
+                ),
                 maxsize: 5000000,
                 maxFiles: 5,
               }),

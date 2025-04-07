@@ -17,7 +17,7 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
   constructor(
     typeormService: TypeormService,
     private readonly userRoleService: UserRoleService,
-    private readonly roleService: RoleService
+    private readonly roleService: RoleService,
   ) {
     super(typeormService);
   }
@@ -163,7 +163,7 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
   async register(input: RegisterUserDto<SqliteIdType>): Promise<User> {
     const { username, password, roles, isDemoUser, isRootUser, needsPasswordChange, isVerified } = await validateInput(
       input,
-      registerUserSchema(true)
+      registerUserSchema(true),
     );
 
     const passwordHash = hashPassword(password);

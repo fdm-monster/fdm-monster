@@ -38,7 +38,7 @@ export const authenticate = () =>
 
         logger.log(`Not authenticated for route: ${req.originalUrl}`);
         throw new AuthenticationError("Not authenticated", AUTH_ERROR_REASON.InvalidOrExpiredAuthToken);
-      }
+      },
   );
 
 export function permission(requiredPermission: string) {
@@ -56,7 +56,7 @@ export function permission(requiredPermission: string) {
         }
 
         next();
-      }
+      },
   );
 }
 

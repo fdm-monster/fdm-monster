@@ -28,7 +28,7 @@ describe(OctoprintHttpClientBuilder.name, () => {
         .withMaxBodyLength(1000 * 1000)
         .withMaxContentLength(1000 * 1000)
         .withJsonContentTypeHeader()
-        .build()
+        .build(),
     ).toThrow("Base URL is required");
   });
 
@@ -43,7 +43,7 @@ describe(OctoprintHttpClientBuilder.name, () => {
         .withMaxBodyLength(1000 * 1000)
         .withMaxContentLength(1000 * 1000)
         .withJsonContentTypeHeader()
-        .build()
+        .build(),
     ).toThrow("XApiKey header may not be an empty string");
   });
 });

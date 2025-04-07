@@ -9,7 +9,10 @@ export const ParamBool = (paramName: string) => createParamDecorator(paramName, 
 export const ParamString = (paramName: string) => createParamDecorator(paramName, String);
 export const ParamId = (paramName: string) => createParamDecorator(paramName, "id");
 
-function createParamDecorator(paramName: string, type: StringConstructor | NumberConstructor | BooleanConstructor | "id") {
+function createParamDecorator(
+  paramName: string,
+  type: StringConstructor | NumberConstructor | BooleanConstructor | "id",
+) {
   return async (req: Request<{ local: any; [k: string]: any }>, res: Response, next: NextFunction) => {
     const paramValue = req.params[paramName];
 

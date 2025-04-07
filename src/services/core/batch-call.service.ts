@@ -28,7 +28,7 @@ export class BatchCallService<KeyType = IdType> {
     private readonly printerApiFactory: PrinterApiFactory,
     private readonly printerCache: PrinterCache,
     private readonly printerSocketStore: PrinterSocketStore,
-    private readonly printerService: IPrinterService
+    private readonly printerService: IPrinterService,
   ) {
     this.logger = loggerFactory(BatchCallService.name);
   }
@@ -39,7 +39,7 @@ export class BatchCallService<KeyType = IdType> {
 
   async batchTogglePrintersEnabled(
     printerIds: KeyType[],
-    enabled: boolean
+    enabled: boolean,
   ): Promise<
     {
       failure?: boolean;

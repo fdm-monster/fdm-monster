@@ -30,12 +30,12 @@ export async function setupServer() {
       cors({
         origin: "*",
         methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-      })
+      }),
     )
     .use(
       helmet({
         contentSecurityPolicy: false,
-      })
+      }),
     )
     .use(json({ limit: "10mb" }))
     .use(cookieParser())

@@ -4,16 +4,10 @@
       "active": true,
       "admin": true,
       "apikey": "0F5BB5EC6C014BC0936E683388B39BE3",
-      "groups": [
-        "admins",
-        "users"
-      ],
+      "groups": ["admins", "users"],
       "name": "root",
       "needs": {
-        "group": [
-          "users",
-          "admins"
-        ],
+        "group": ["users", "admins"],
         "role": [
           "files_upload",
           "plugin_pi_support_check",
@@ -54,10 +48,7 @@
         ]
       },
       "permissions": [],
-      "roles": [
-        "user",
-        "admin"
-      ],
+      "roles": ["user", "admin"],
       "settings": {
         "interface": {
           "language": "_default"

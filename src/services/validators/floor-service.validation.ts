@@ -39,7 +39,7 @@ export const createOrUpdateFloorSchema = (isSqlite: boolean) =>
           floorId: idRuleV2(isSqlite).optional(),
           x: xValidator,
           y: yValidator,
-        })
+        }),
       )
       .optional(),
   });

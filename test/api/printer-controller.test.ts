@@ -52,7 +52,7 @@ describe(PrinterController.name, () => {
           path: "apiKey",
         },
       ],
-      true
+      true,
     );
   });
 

@@ -33,7 +33,9 @@ const fetchReleases = async () => {
 
 const fetchLatest = async () => {
   try {
-    const response = await axios.get<Release>("https://api.github.com/repos/fdm-monster/fdm-monster-client/releases/latest");
+    const response = await axios.get<Release>(
+      "https://api.github.com/repos/fdm-monster/fdm-monster-client/releases/latest",
+    );
     const release = response.data;
 
     // Filter relevant information from each release

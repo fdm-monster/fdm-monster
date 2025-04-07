@@ -6,7 +6,11 @@ import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { MongoIdType } from "@/shared.constants";
 import { IPrintCompletionService } from "@/services/interfaces/print-completion.interface";
-import { CreatePrintCompletionDto, PrintCompletionContext, PrintCompletionDto } from "@/services/interfaces/print-completion.dto";
+import {
+  CreatePrintCompletionDto,
+  PrintCompletionContext,
+  PrintCompletionDto,
+} from "@/services/interfaces/print-completion.dto";
 import { IPrintCompletion } from "@/models/PrintCompletion";
 import { processCompletions } from "@/services/mongoose/print-completion.shared";
 
@@ -32,7 +36,7 @@ export class PrintCompletionService implements IPrintCompletionService<MongoIdTy
   async create(input: CreatePrintCompletionDto<MongoIdType>) {
     const { printerId, fileName, completionLog, status, context } = await validateInput(
       input,
-      createPrintCompletionSchema(false)
+      createPrintCompletionSchema(false),
     );
 
     return PrintCompletion.create({
@@ -67,7 +71,9 @@ export class PrintCompletionService implements IPrintCompletionService<MongoIdTy
     });
 
     if (!completionEntry) {
-      this.logger.warn(`Print with correlationId ${correlationId} could not be updated with new context as it was not found`);
+      this.logger.warn(
+        `Print with correlationId ${correlationId} could not be updated with new context as it was not found`,
+      );
       return;
     }
     completionEntry.context = context;
@@ -100,7 +106,7 @@ export class PrintCompletionService implements IPrintCompletionService<MongoIdTy
         c.printerId = c._id;
         delete c._id;
         return [c.printerId, c];
-      })
+      }),
     );
   }
 

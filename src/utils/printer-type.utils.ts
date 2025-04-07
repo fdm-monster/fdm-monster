@@ -7,9 +7,5 @@ export function isMoonrakerType(printerType?: number) {
 }
 
 export function getServiceName(printerType?: number) {
-  return isOctoPrintType(printerType)
-    ? "OctoPrint"
-    : isMoonrakerType(printerType)
-    ? "Moonraker"
-    : "Unknown";
+  return isOctoPrintType(printerType) ? "OctoPrint" : isMoonrakerType(printerType) ? "Moonraker" : "Unknown";
 }

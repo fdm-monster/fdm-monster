@@ -21,7 +21,7 @@ require("../src/utils/env.utils");
 export async function setupTestApp(
   loadPrinterStore = false,
   mocks: any = undefined,
-  quick_boot = true
+  quick_boot = true,
 ): Promise<{
   container: AwilixContainer;
   httpServer: Express;

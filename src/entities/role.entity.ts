@@ -11,6 +11,10 @@ export class Role {
   })
   name: string;
 
-  @OneToMany(() => UserRole, (ur) => ur.role, { eager: false })
+  @OneToMany(
+    () => UserRole,
+    (ur) => ur.role,
+    { eager: false },
+  )
   roles: Relation<UserRole>[];
 }

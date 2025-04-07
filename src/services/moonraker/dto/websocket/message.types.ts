@@ -38,7 +38,10 @@ export type NotifyHistoryChanged = JsonRpcEventDto<"notify_history_changed", [No
 export type NotifyUserCreated = JsonRpcEventDto<"notify_user_created", [NotifyUserChangeParams]>;
 export type NotifyUserDeleted = JsonRpcEventDto<"notify_user_deleted", [NotifyUserChangeParams]>;
 export type NotifyUserLoggedOut = JsonRpcEventDto<"notify_user_logged_out", [NotifyUserChangeParams]>;
-export type NotifyServiceStateChanged = JsonRpcEventDto<"notify_service_state_changed", [NotifyServiceStateChangedParams]>;
+export type NotifyServiceStateChanged = JsonRpcEventDto<
+  "notify_service_state_changed",
+  [NotifyServiceStateChangedParams]
+>;
 export type NotifyJobQueueChanged = JsonRpcEventDto<"notify_job_queue_changed", [JobQueueChangedParams]>;
 export type NotifyButtonEvent = JsonRpcEventDto<"notify_button_event", [NotifyButtonEventParams]>;
 export type NotifyAnnouncementUpdate = JsonRpcEventDto<"notify_announcement_update", [NotificationUpdateParams]>;
@@ -47,7 +50,10 @@ export type NotifyAnnouncementWake = JsonRpcEventDto<"notify_announcement_wake",
 export type NotifySudoAlert = JsonRpcEventDto<"notify_sudo_alert", [NotifySudoAlertParams]>;
 export type NotifyWebcamsChanged = JsonRpcEventDto<"notify_webcams_changed", [WebcamListDto]>;
 export type NotifyActiveSpoolSet = JsonRpcEventDto<"notify_active_spool_set", [NotifyActiveSpoolSetParams]>;
-export type NotifySpoolmanStatusChanged = JsonRpcEventDto<"notify_spoolman_status_changed", [NotifySpoolmanStatusChangedParams]>;
+export type NotifySpoolmanStatusChanged = JsonRpcEventDto<
+  "notify_spoolman_status_changed",
+  [NotifySpoolmanStatusChangedParams]
+>;
 export type NotifyAgentEvent = JsonRpcEventDto<"notify_agent_event", [NotifyAgentEventParams]>;
 export type NotifySensorUpdate = JsonRpcEventDto<"sensors:sensor_update", [SensorUpdateParams]>;
 

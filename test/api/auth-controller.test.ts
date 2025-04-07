@@ -50,7 +50,9 @@ describe(AuthController.name, () => {
   it("should not authorize known account incorrect password", async () => {
     const userDto = await ensureTestUserCreated();
 
-    const response = await request.post(loginRoute).send({ username: userDto.username, password: "definitely-incorrect" });
+    const response = await request
+      .post(loginRoute)
+      .send({ username: userDto.username, password: "definitely-incorrect" });
     expectUnauthenticatedResponse(response);
   });
 
@@ -84,28 +86,28 @@ describe(AuthController.name, () => {
         username: "root1234",
         password,
         password2: password,
-      })
+      }),
     );
     expectBadRequestError(
       await request.post(registerRoute).send({
         username: "admin1234",
         password,
         password2: password,
-      })
+      }),
     );
     expectBadRequestError(
       await request.post(registerRoute).send({
         username: "demo",
         password,
         password2: password,
-      })
+      }),
     );
     expectOkResponse(
       await request.post(registerRoute).send({
         username: "demo1234",
         password,
         password2: password,
-      })
+      }),
     );
   });
 

@@ -20,7 +20,10 @@ import { defaultHttpProtocol } from "@/utils/url.utils";
 export class PrinterService implements IPrinterService<MongoIdType> {
   logger: LoggerService;
 
-  constructor(private readonly eventEmitter2: EventEmitter2, loggerFactory: ILoggerFactory) {
+  constructor(
+    private readonly eventEmitter2: EventEmitter2,
+    loggerFactory: ILoggerFactory,
+  ) {
     this.logger = loggerFactory(PrinterService.name);
   }
 

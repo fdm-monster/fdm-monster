@@ -113,7 +113,7 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
     moonrakerClient: MoonrakerClient,
     private readonly eventEmitter2: EventEmitter2,
     private readonly configService: ConfigService,
-    private readonly serverVersion: string
+    private readonly serverVersion: string,
   ) {
     super(loggerFactory);
 
@@ -187,7 +187,10 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
   private async updateCurrentStateSafely() {
     try {
       const query: Partial<Record<KnownPrinterObject, []>> = this.subscriptionObjects;
-      const objects = await this.client.getPrinterObjectsQuery<PrinterObjectsQueryDto<SubscriptionType>>(this.login, query);
+      const objects = await this.client.getPrinterObjectsQuery<PrinterObjectsQueryDto<SubscriptionType>>(
+        this.login,
+        query,
+      );
       this.printerObjects = objects.data.result;
       this.setApiState(API_STATE.responding);
       return await this.emitCurrentEvent(this.printerObjects);
@@ -234,7 +237,7 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
       const result = await this.client.postSubscribePrinterObjects<PrinterObjectsQueryDto<SubscriptionType>>(
         this.login,
         response.result.connection_id,
-        query
+        query,
       );
       this.printerObjects = result.data.result;
       await this.emitCurrentEvent(this.printerObjects);

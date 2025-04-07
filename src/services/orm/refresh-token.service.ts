@@ -19,7 +19,11 @@ export class RefreshTokenService
 {
   private logger: LoggerService;
 
-  constructor(private readonly settingsStore: SettingsStore, loggerFactory: ILoggerFactory, typeormService: TypeormService) {
+  constructor(
+    private readonly settingsStore: SettingsStore,
+    loggerFactory: ILoggerFactory,
+    typeormService: TypeormService,
+  ) {
     super(typeormService);
     this.logger = loggerFactory(RefreshTokenService.name);
   }
@@ -41,7 +45,7 @@ export class RefreshTokenService
       if (throwNotFoundError) {
         throw new AuthenticationError(
           `The entity ${RefreshToken.name} by provided refresh token is not found`,
-          AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken
+          AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken,
         );
       }
       return null;
