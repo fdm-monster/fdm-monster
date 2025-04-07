@@ -37,6 +37,7 @@ describe(OctoprintHttpClientBuilder.name, () => {
 
     expect(() =>
       uut
+        // @ts-ignore
         .withXApiKeyHeader(null)
         .withHeaders({ [contentTypeHeaderKey]: jsonContentType })
         .withTimeout(500)

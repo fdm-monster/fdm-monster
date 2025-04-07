@@ -1,18 +1,23 @@
 import { IdDto } from "@/shared.constants";
+import { PrinterType } from "@/services/printer-api.interface";
+
+export class CreatePrinterDto {
+  name: string;
+  apiKey: string;
+  printerURL: string;
+  printerType: PrinterType;
+}
 
 export class PrinterDto<KeyType> extends IdDto<KeyType> {
   name: string;
   enabled: boolean;
   disabledReason?: string;
   dateAdded: number;
-}
-
-export class PrinterUnsafeDto<KeyType> extends PrinterDto<KeyType> {
   apiKey: string;
   printerURL: string;
-  printerType: number;
+  printerType: PrinterType;
 }
 
-export class PrinterUnsafeWithCorrelationDto<KeyType> extends PrinterUnsafeDto<KeyType> {
+export class TestPrinterDto<KeyType> extends PrinterDto<KeyType> {
   correlationToken: string;
 }

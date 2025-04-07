@@ -3,7 +3,7 @@ import { DITokens } from "@/container.tokens";
 import { ROLES } from "@/constants/authorization.constants";
 import { UserService } from "@/services/mongoose/user.service";
 import { setupTestApp } from "../test-server";
-import { SqliteIdType } from "@/shared.constants";
+import { IdType } from "@/shared.constants";
 import { IUserService } from "@/services/interfaces/user-service.interface";
 import { IRoleService } from "@/services/interfaces/role-service.interface";
 import { RoleDto } from "@/services/interfaces/role.dto";
@@ -12,8 +12,8 @@ import { getDatasource, isSqliteModeTest } from "../typeorm.manager";
 import { User } from "@/entities";
 import { User as UserMongo } from "@/models";
 
-let userService: IUserService<SqliteIdType, UserDto<SqliteIdType>>;
-let roleService: IRoleService<SqliteIdType, RoleDto<SqliteIdType>>;
+let userService: IUserService<IdType, UserDto>;
+let roleService: IRoleService<IdType, RoleDto>;
 
 beforeAll(async () => {
   const { container } = await setupTestApp(true);
@@ -38,6 +38,7 @@ describe(UserService.name, () => {
 
   it("should not get user by undefined id", async () => {
     await roleService.syncRoles();
+    // @ts-ignore
     await expect(async () => await userService.getUser(undefined)).rejects.toBeDefined();
   });
 

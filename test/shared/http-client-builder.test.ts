@@ -24,12 +24,15 @@ describe(DefaultHttpClientBuilder.name, () => {
 
   it("should not build http client with unspecified or negative timeout in withTimeout", () => {
     const uut = new DefaultHttpClientBuilder();
+    // @ts-ignore
     expect(() => uut.withTimeout(null).build()).toThrow("Timeout value (milliseconds) must be greater than 0");
     expect(() => uut.withTimeout(-1).build()).toThrow("Timeout value (milliseconds) must be greater than 0");
   });
 
   it("should not build http client with unspecified baseUrl in withBaseUrl", () => {
     const uut = new DefaultHttpClientBuilder();
+    // @ts-ignore
     expect(() => uut.withBaseUrl(null).build()).toThrow("Base address may not be an empty string");
+    expect(() => uut.withBaseUrl("").build()).toThrow("Base address may not be an empty string");
   });
 });

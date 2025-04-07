@@ -9,9 +9,9 @@ import { LoggerService } from "@/handlers/logger";
 import { SettingsStore } from "@/state/settings.store";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IdType } from "@/shared.constants";
-import { PrinterUnsafeDto } from "@/services/interfaces/printer.dto";
 import { OctoprintType } from "@/services/printer-api.interface";
 import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
+import { PrinterDto } from "@/services/interfaces/printer.dto";
 
 export class PrinterSocketStore {
   private readonly logger: LoggerService;
@@ -170,7 +170,7 @@ export class PrinterSocketStore {
     };
   }
 
-  createOrUpdateSocket(printer: PrinterUnsafeDto<IdType>) {
+  createOrUpdateSocket(printer: PrinterDto<IdType>) {
     const { enabled, id } = printer;
     let foundAdapter = this.printerSocketAdaptersById[id.toString()];
 

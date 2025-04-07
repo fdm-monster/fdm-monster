@@ -1,5 +1,5 @@
 import { LoggerService } from "@/handlers/logger";
-import { PrinterDto, PrinterUnsafeDto } from "@/services/interfaces/printer.dto";
+import { CreatePrinterDto, PrinterDto } from "@/services/interfaces/printer.dto";
 import { Printer } from "@/entities/printer.entity";
 import { BaseService } from "@/services/orm/base.service";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
@@ -14,7 +14,7 @@ import { defaultHttpProtocol } from "@/utils/url.utils";
 import { createPrinterSchema } from "@/services/validators/printer-service.validation";
 
 export class PrinterService
-  extends BaseService(Printer, PrinterDto<SqliteIdType>)
+  extends BaseService(Printer, PrinterDto<SqliteIdType>, CreatePrinterDto)
   implements IPrinterService<SqliteIdType, Printer>
 {
   private readonly logger: LoggerService;
@@ -28,15 +28,6 @@ export class PrinterService
     this.logger = loggerFactory(PrinterService.name);
   }
 
-  toUnsafeDto(entity: Printer): PrinterUnsafeDto<SqliteIdType> {
-    return {
-      ...this.toDto(entity),
-      apiKey: entity.apiKey,
-      printerURL: entity.printerURL,
-      printerType: entity.printerType,
-    };
-  }
-
   toDto(entity: Printer): PrinterDto<SqliteIdType> {
     return {
       id: entity.id,
@@ -44,6 +35,9 @@ export class PrinterService
       enabled: entity.enabled,
       disabledReason: entity.disabledReason,
       dateAdded: entity.dateAdded,
+      apiKey: entity.apiKey,
+      printerURL: entity.printerURL,
+      printerType: entity.printerType,
     };
   }
 
@@ -55,11 +49,7 @@ export class PrinterService
     });
   }
 
-  async create(newPrinter: PrinterUnsafeDto<SqliteIdType>, emitEvent = true): Promise<Printer> {
-    if (newPrinter.id) {
-      delete newPrinter.id;
-    }
-
+  async create(newPrinter: CreatePrinterDto, emitEvent = true): Promise<Printer> {
     const mergedPrinter = await this.validateAndDefault(newPrinter);
     mergedPrinter.dateAdded = Date.now();
     const printer = await super.create(mergedPrinter);
@@ -141,7 +131,7 @@ export class PrinterService
     return this.update(printerId, { flowRate });
   }
 
-  private async validateAndDefault(printer: Printer): Promise<Printer> {
+  private async validateAndDefault(printer: CreatePrinterDto): Promise<Printer> {
     const mergedPrinter = {
       enabled: true,
       ...printer,

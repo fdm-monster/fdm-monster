@@ -12,7 +12,7 @@ import { LoggerService } from "@/handlers/logger";
 import { MongoIdType } from "@/shared.constants";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { ILoggerFactory } from "@/handlers/logger-factory";
-import { PrinterDto, PrinterUnsafeDto } from "@/services/interfaces/printer.dto";
+import { PrinterDto } from "@/services/interfaces/printer.dto";
 import { IPrinter } from "@/models/Printer";
 import { normalizeUrl } from "@/utils/normalize-url";
 import { defaultHttpProtocol } from "@/utils/url.utils";
@@ -27,15 +27,6 @@ export class PrinterService implements IPrinterService<MongoIdType> {
     this.logger = loggerFactory(PrinterService.name);
   }
 
-  toUnsafeDto(entity: IPrinter): PrinterUnsafeDto<MongoIdType> {
-    return {
-      ...this.toDto(entity),
-      apiKey: entity.apiKey,
-      printerURL: entity.printerURL,
-      printerType: entity.printerType,
-    };
-  }
-
   toDto(entity: IPrinter): PrinterDto<MongoIdType> {
     return {
       id: entity.id,
@@ -43,6 +34,9 @@ export class PrinterService implements IPrinterService<MongoIdType> {
       enabled: entity.enabled,
       disabledReason: entity.disabledReason,
       dateAdded: entity.dateAdded,
+      apiKey: entity.apiKey,
+      printerURL: entity.printerURL,
+      printerType: entity.printerType,
     };
   }
 

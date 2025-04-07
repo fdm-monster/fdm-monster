@@ -37,7 +37,7 @@ const normalizeDataURL = (urlString: string, { stripHash }: { stripHash: boolean
   // Lowercase MIME type
   const mimeType = mediaType.shift()?.toLowerCase() ?? "";
   const attributes = mediaType
-    .map((attribute) => {
+    .map((attribute: any) => {
       let [key, value = ""] = attribute.split("=").map((string) => string.trim());
 
       // Lowercase `charset`
@@ -93,7 +93,7 @@ export function normalizeUrl(
     removeDirectoryIndex: boolean | RegExp[];
     removeExplicitPort: boolean;
     sortQueryParameters: boolean;
-  }>,
+  }>
 ): string {
   options = {
     defaultProtocol: "http",
@@ -110,7 +110,7 @@ export function normalizeUrl(
     removeDirectoryIndex: false,
     removeExplicitPort: false,
     sortQueryParameters: true,
-    ...options,
+    ...options
   };
 
   // Legacy: Append `:` to the protocol if missing.
@@ -178,7 +178,7 @@ export function normalizeUrl(
 
     let lastIndex = 0;
     let result = "";
-    for (;;) {
+    for (; ;) {
       const match = protocolRegex.exec(urlObject.pathname);
       if (!match) {
         break;

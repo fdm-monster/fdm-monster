@@ -21,9 +21,6 @@ beforeAll(async () => {
 });
 
 describe(PrintCompletionService.name, () => {
-  /**
-   * Tests that a valid completion can be created through the service without throwing any errors.
-   */
   it("can add a print failure with or without log", async () => {
     const trackingToken = generateCorrelationToken();
     const printer = await createTestPrinter(request);
@@ -32,8 +29,9 @@ describe(PrintCompletionService.name, () => {
       completionLog: "some log happened here",
       status: EVENT_TYPES.PrintStarted,
       fileName: "mycode.gcode",
-      correlationId: trackingToken,
-      context: {},
+      context: {
+        correlationId: trackingToken
+      },
     });
     expect(completionEntry.id).toBeTruthy();
 
@@ -41,8 +39,9 @@ describe(PrintCompletionService.name, () => {
       printerId: printer.id,
       status: EVENT_TYPES.PrintFailed,
       fileName: "mycode.gcode",
-      correlationId: trackingToken,
-      context: {},
+      completionLog: undefined,
+      context: {
+        correlationId: trackingToken,},
     });
     expect(completionEntryWithoutLog.id).toBeTruthy();
   });

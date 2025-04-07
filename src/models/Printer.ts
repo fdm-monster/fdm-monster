@@ -1,12 +1,12 @@
 import { model, Schema } from "mongoose";
-import { OctoprintType } from "@/services/printer-api.interface";
+import { OctoprintType, PrinterType } from "@/services/printer-api.interface";
 import { MongoIdType } from "@/shared.constants";
 
 export interface IPrinter<KeyType = MongoIdType> {
   id: KeyType;
   apiKey: string;
   printerURL: string;
-  printerType: number;
+  printerType: PrinterType;
   enabled: boolean;
   disabledReason: string;
   name: string;

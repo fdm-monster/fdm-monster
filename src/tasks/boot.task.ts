@@ -1,4 +1,4 @@
-import mongoose, { connect, syncIndexes } from "mongoose";
+import mongoose, { connect, ConnectOptions, syncIndexes } from "mongoose";
 import { fetchMongoDBConnectionString, runMigrations } from "@/server.env";
 import { DITokens } from "@/container.tokens";
 import { AppConstants } from "@/server.constants";
@@ -35,7 +35,7 @@ export class BootTask {
     private readonly configService: ConfigService,
     private readonly typeormService: TypeormService,
     private readonly isTypeormMode: boolean,
-    private readonly printerThumbnailCache: PrinterThumbnailCache,
+    private readonly printerThumbnailCache: PrinterThumbnailCache
   ) {
     this.logger = loggerFactory(BootTask.name);
   }
@@ -86,7 +86,7 @@ export class BootTask {
       this.logger.warn(`Starting in demo mode due to ${AppConstants.OVERRIDE_IS_DEMO_MODE}`);
       await this.createOrUpdateDemoAccount();
       this.logger.warn(
-        `Setting loginRequired=true and registration=false due to ${AppConstants.OVERRIDE_IS_DEMO_MODE}`,
+        `Setting loginRequired=true and registration=false due to ${AppConstants.OVERRIDE_IS_DEMO_MODE}`
       );
       await this.settingsStore.setLoginRequired(true);
       await this.settingsStore.setRegistrationEnabled(false);
@@ -136,11 +136,11 @@ export class BootTask {
   async createOrUpdateDemoAccount() {
     const demoUsername = this.configService.get(
       AppConstants.OVERRIDE_DEMO_USERNAME,
-      AppConstants.DEFAULT_DEMO_USERNAME,
+      AppConstants.DEFAULT_DEMO_USERNAME
     );
     const demoPassword = this.configService.get(
       AppConstants.OVERRIDE_DEMO_PASSWORD,
-      AppConstants.DEFAULT_DEMO_PASSWORD,
+      AppConstants.DEFAULT_DEMO_PASSWORD
     );
     const demoRole = this.configService.get(AppConstants.OVERRIDE_DEMO_ROLE, AppConstants.DEFAULT_DEMO_ROLE);
     const adminRole = this.roleService.getRoleByName(demoRole);
@@ -154,7 +154,7 @@ export class BootTask {
         isVerified: true,
         isRootUser: false,
         needsPasswordChange: false,
-        roles: [adminRole.id],
+        roles: [adminRole.id]
       });
       this.logger.log("Created demo account");
     } else {
@@ -169,9 +169,13 @@ export class BootTask {
   async createConnection() {
     if (!this.isTypeormMode) {
       const envUrl = fetchMongoDBConnectionString();
+      if (!envUrl?.length) {
+        throw new Error("Mongodb connection string not set");
+      }
+
       await connect(envUrl, {
-        serverSelectionTimeoutMS: 1500,
-      });
+        serverSelectionTimeoutMS: 1500
+      } as ConnectOptions);
       await syncIndexes();
     }
   }

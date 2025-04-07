@@ -2,7 +2,6 @@ import { validNewPrinterState } from "../test-data/printer.data";
 import { PrinterService } from "@/services/orm/printer.service";
 import { PrinterCache } from "@/state/printer.cache";
 import { PrinterFilesStore } from "@/state/printer-files.store";
-jest.mock("@/services/octoprint/octoprint.client");
 import { DITokens } from "@/container.tokens";
 import { configureContainer } from "@/container";
 import { ValidationException } from "@/exceptions/runtime.exceptions";
@@ -10,6 +9,9 @@ import { TestPrinterSocketStore } from "@/state/test-printer-socket.store";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { ZodError } from "zod";
+import { CreatePrinterDto } from "@/services/interfaces/printer.dto";
+
+jest.mock("@/services/octoprint/octoprint.client");
 
 let printerService: PrinterService;
 let printerCache: PrinterCache;
@@ -31,52 +33,52 @@ beforeAll(async () => {
 describe(PrinterSocketStore.name, () => {
   const invalidNewPrinterState = {
     apiKey: "asd",
-    printerURL: null as null | string,
+    printerURL: null as null | string
   };
 
   const weakNewPrinter = {
     apiKey: "asdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasd",
-    printerURL: "http://192.168.1.0",
+    printerURL: "http://192.168.1.0"
   };
 
   const weakNewPrinter2 = {
     apiKey: "1C0KVOKWEAKWEAK8VBGAR",
-    printerURL: "http://192.168.1.0",
+    printerURL: "http://192.168.1.0"
   };
 
   it("should avoid adding invalid printer", async () => {
-    await expect(async () => await printerService.create({})).rejects.toBeInstanceOf(ValidationException);
+    await expect(async () => await printerService.create({} as CreatePrinterDto)).rejects.toBeInstanceOf(ValidationException);
 
-    await expect(() => printerService.create(invalidNewPrinterState)).rejects.toBeInstanceOf(ValidationException);
-    await expect(() => printerService.create(invalidNewPrinterState)).rejects.toHaveErrors(
+    await expect(() => printerService.create(invalidNewPrinterState as CreatePrinterDto)).rejects.toBeInstanceOf(ValidationException);
+    await expect(() => printerService.create(invalidNewPrinterState as CreatePrinterDto)).rejects.toHaveErrors(
       new ZodError([
         {
           code: "invalid_type",
           expected: "string",
           received: "null",
           path: ["printerURL"],
-          message: "Expected string, received null",
+          message: "Expected string, received null"
         },
         {
           code: "invalid_type",
           expected: "number",
           received: "undefined",
           path: ["printerType"],
-          message: "Required",
+          message: "Required"
         },
         {
           code: "invalid_type",
           expected: "string",
           received: "undefined",
           path: ["name"],
-          message: "Required",
-        },
-      ]),
+          message: "Required"
+        }
+      ])
     );
 
-    await expect(async () => await printerService.create(weakNewPrinter)).rejects.toBeInstanceOf(ValidationException);
+    await expect(async () => await printerService.create(weakNewPrinter as CreatePrinterDto)).rejects.toBeInstanceOf(ValidationException);
 
-    await expect(async () => await printerService.create(weakNewPrinter2)).rejects.toBeDefined();
+    await expect(async () => await printerService.create(weakNewPrinter2 as CreatePrinterDto)).rejects.toBeDefined();
   });
 
   it("should be able to add and flatten new printer", async () => {
@@ -94,7 +96,7 @@ describe(PrinterSocketStore.name, () => {
 
     const printerDto = await printerCache.getCachedPrinterOrThrowAsync(printerEntity.id);
     expect(printerDto).toMatchObject({
-      id: expect.anything(),
+      id: expect.anything()
     });
   });
 
