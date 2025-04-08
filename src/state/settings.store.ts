@@ -1,11 +1,11 @@
 import { InternalServerException } from "@/exceptions/runtime.exceptions";
 import {
   credentialSettingsKey,
-  printerFileCleanSettingKey,
   frontendSettingKey,
+  printerFileCleanSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
-  wizardSettingKey,
+  wizardSettingKey
 } from "@/constants/server-settings.constants";
 import { getClient } from "@sentry/node";
 import { isTestEnvironment } from "@/utils/env.utils";
@@ -18,26 +18,27 @@ import {
   FileCleanSettingsDto,
   FrontendSettingsDto,
   ServerSettingsDto,
-  TimeoutSettingsDto,
+  TimeoutSettingsDto
 } from "@/services/interfaces/settings.dto";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class SettingsStore {
-  private logger: LoggerService;
+  private readonly logger: LoggerService;
 
   private settings: ISettings | null = null;
 
   constructor(
     loggerFactory: ILoggerFactory,
     private readonly settingsService: ISettingsService,
-    private readonly isTypeormMode: boolean,
+    private readonly isTypeormMode: boolean
   ) {
     this.logger = loggerFactory(SettingsStore.name);
   }
 
   getSettings() {
-    const settings = this.settings;
-    if (!settings) throw new InternalServerException("Could not check server settings (server settings not loaded)");
+    this.throwIfSettingsUnset();
+
+    const settings = this.settings!;
 
     return Object.freeze({
       // Credential settings are not shared with the client
@@ -48,36 +49,32 @@ export class SettingsStore {
         experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
         experimentalTypeormSupport: this.isTypeormMode,
         experimentalClientSupport: settings[serverSettingsKey].experimentalClientSupport,
-        experimentalThumbnailSupport: settings[serverSettingsKey].experimentalThumbnailSupport,
+        experimentalThumbnailSupport: settings[serverSettingsKey].experimentalThumbnailSupport
       },
       [wizardSettingKey]: settings[wizardSettingKey],
       [frontendSettingKey]: settings[frontendSettingKey],
       [printerFileCleanSettingKey]: settings[printerFileCleanSettingKey],
-      [timeoutSettingKey]: settings[timeoutSettingKey],
+      [timeoutSettingKey]: settings[timeoutSettingKey]
     });
   }
 
   getSettingsSensitive() {
-    const settings = this.settings;
-    if (!settings) throw new InternalServerException("Could not check server settings (server settings not loaded");
+    this.throwIfSettingsUnset();
+
+    const settings = this.settings!;
     return Object.freeze({
       [credentialSettingsKey]: {
         jwtExpiresIn: settings[credentialSettingsKey].jwtExpiresIn,
         refreshTokenAttempts: settings[credentialSettingsKey].refreshTokenAttempts,
-        refreshTokenExpiry: settings[credentialSettingsKey].refreshTokenExpiry,
+        refreshTokenExpiry: settings[credentialSettingsKey].refreshTokenExpiry
       },
       [serverSettingsKey]: {
-        debugSettings: settings[serverSettingsKey].debugSettings,
         experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
-        experimentalTypeormSupport: this.isTypeOrmMode,
+        experimentalTypeormSupport: this.isTypeormMode,
         experimentalClientSupport: settings[serverSettingsKey].experimentalClientSupport,
-        experimentalThumbnailSupport: settings[serverSettingsKey].experimentalThumbnailSupport,
-      },
+        experimentalThumbnailSupport: settings[serverSettingsKey].experimentalThumbnailSupport
+      }
     });
-  }
-
-  getDebugSettingsSensitive() {
-    return this.getSettingsSensitive()[serverSettingsKey].debugSettings;
   }
 
   async loadSettings() {
@@ -87,55 +84,67 @@ export class SettingsStore {
   }
 
   async getCredentialSettings() {
-    return this.settings[credentialSettingsKey];
+    this.throwIfSettingsUnset();
+
+    return this.settings![credentialSettingsKey];
   }
 
   async getAnonymousDiagnosticsEnabled() {
-    return this.settings[serverSettingsKey].sentryDiagnosticsEnabled;
+    this.throwIfSettingsUnset();
+
+    return this.settings![serverSettingsKey].sentryDiagnosticsEnabled;
   }
 
   async persistOptionalCredentialSettings(overrideJwtSecret: string, overrideJwtExpiresIn: string) {
     if (overrideJwtSecret) {
       await this.updateCredentialSettings({
-        jwtSecret: overrideJwtSecret,
+        jwtSecret: overrideJwtSecret
       });
     }
     if (overrideJwtExpiresIn) {
       await this.updateCredentialSettings({
-        jwtExpiresIn: parseInt(overrideJwtExpiresIn),
+        jwtExpiresIn: parseInt(overrideJwtExpiresIn)
       });
     }
   }
 
   getWizardState() {
+    this.throwIfSettingsUnset();
+
+    const settings = this.settings!;
     return {
-      wizardCompleted: this.settings[wizardSettingKey].wizardCompleted,
-      wizardVersion: this.settings[wizardSettingKey].wizardVersion,
-      latestWizardVersion: AppConstants.currentWizardVersion,
+      wizardCompleted: settings[wizardSettingKey].wizardCompleted,
+      wizardVersion: settings[wizardSettingKey].wizardVersion,
+      latestWizardVersion: AppConstants.currentWizardVersion
     };
   }
 
   isWizardCompleted() {
+    this.throwIfSettingsUnset();
+
+    const settings = this.settings!;
     return (
-      this.settings[wizardSettingKey].wizardCompleted &&
-      this.settings[wizardSettingKey].wizardVersion === AppConstants.currentWizardVersion
+      settings[wizardSettingKey].wizardCompleted &&
+      settings[wizardSettingKey].wizardVersion === AppConstants.currentWizardVersion
     );
   }
 
   getWizardSettings() {
-    return this.settings[wizardSettingKey];
+    this.throwIfSettingsUnset();
+
+    return this.settings![wizardSettingKey];
   }
 
   isRegistrationEnabled() {
-    if (!this.settings)
-      throw new InternalServerException("Could not check server settings (server settings not loaded");
-    return this.settings[serverSettingsKey].registration;
+    this.throwIfSettingsUnset();
+
+    return this.settings![serverSettingsKey].registration;
   }
 
   isThumbnailSupportEnabled() {
-    if (!this.settings)
-      throw new InternalServerException("Could not check server settings (server settings not loaded");
-    return this.settings[serverSettingsKey].experimentalThumbnailSupport;
+    this.throwIfSettingsUnset();
+
+    return this.settings![serverSettingsKey].experimentalThumbnailSupport;
   }
 
   getServerSettings() {
@@ -162,14 +171,14 @@ export class SettingsStore {
     this.settings = await this.settingsService.patchWizardSettings({
       wizardCompleted: true,
       wizardCompletedAt: new Date(),
-      wizardVersion: version,
+      wizardVersion: version
     });
     return this.getSettings();
   }
 
   async setRegistrationEnabled(registration = true) {
     this.settings = await this.settingsService.patchServerSettings({
-      registration,
+      registration
     });
     return this.getSettings();
   }
@@ -180,7 +189,7 @@ export class SettingsStore {
 
   async setLoginRequired(loginRequired = true) {
     this.settings = await this.settingsService.patchServerSettings({
-      loginRequired,
+      loginRequired
     });
     return this.getSettings();
   }
@@ -207,7 +216,7 @@ export class SettingsStore {
 
   async setSentryDiagnosticsEnabled(sentryDiagnosticsEnabled: boolean) {
     this.settings = await this.settingsService.patchServerSettings({
-      sentryDiagnosticsEnabled,
+      sentryDiagnosticsEnabled
     });
     await this.processSentryEnabled();
     return this.getSettings();
@@ -215,21 +224,21 @@ export class SettingsStore {
 
   async setExperimentalMoonrakerSupport(moonrakerEnabled: boolean) {
     this.settings = await this.settingsService.patchServerSettings({
-      experimentalMoonrakerSupport: moonrakerEnabled,
+      experimentalMoonrakerSupport: moonrakerEnabled
     });
     return this.getSettings();
   }
 
   async setExperimentalThumbnailSupport(thumbnailsEnabled: boolean) {
     this.settings = await this.settingsService.patchServerSettings({
-      experimentalThumbnailSupport: thumbnailsEnabled,
+      experimentalThumbnailSupport: thumbnailsEnabled
     });
     return this.getSettings();
   }
 
   async setExperimentalClientSupport(experimentalClientEnabled: boolean) {
     this.settings = await this.settingsService.patchServerSettings({
-      experimentalClientSupport: experimentalClientEnabled,
+      experimentalClientSupport: experimentalClientEnabled
     });
     return this.getSettings();
   }
@@ -237,6 +246,10 @@ export class SettingsStore {
   async updateFrontendSettings(frontendSettings: FrontendSettingsDto) {
     this.settings = await this.settingsService.updateFrontendSettings(frontendSettings);
     return this.getSettings();
+  }
+
+  private throwIfSettingsUnset() {
+    if (!this.settings) throw new InternalServerException("Could not check server settings (server settings not loaded)");
   }
 
   private async processSentryEnabled() {

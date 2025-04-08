@@ -11,7 +11,7 @@ import {
   printerFileCleanSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
-  wizardSettingKey,
+  wizardSettingKey
 } from "@/constants/server-settings.constants";
 import { BaseService } from "@/services/orm/base.service";
 import {
@@ -21,7 +21,7 @@ import {
   ServerSettingsDto,
   SettingsDto,
   TimeoutSettingsDto,
-  WizardSettingsDto,
+  WizardSettingsDto
 } from "../interfaces/settings.dto";
 import { SqliteIdType } from "@/shared.constants";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
@@ -29,18 +29,17 @@ import { ICredentialSettings } from "@/models/Settings";
 
 export class SettingsService
   extends BaseService(Settings, SettingsDto)
-  implements ISettingsService<SqliteIdType, Settings>
-{
+  implements ISettingsService<SqliteIdType, Settings> {
   toDto(entity: Settings): SettingsDto<SqliteIdType> {
     return {
       [serverSettingsKey]: {
         ...entity[serverSettingsKey],
-        experimentalTypeormSupport: true,
+        experimentalTypeormSupport: true
       },
       [frontendSettingKey]: entity[frontendSettingKey],
       [printerFileCleanSettingKey]: entity[printerFileCleanSettingKey],
       [wizardSettingKey]: entity[wizardSettingKey],
-      [timeoutSettingKey]: entity[timeoutSettingKey],
+      [timeoutSettingKey]: entity[timeoutSettingKey]
     };
   }
 
@@ -54,7 +53,7 @@ export class SettingsService
         [wizardSettingKey]: getDefaultWizardSettings(),
         [printerFileCleanSettingKey]: getDefaultFileCleanSettings(),
         [frontendSettingKey]: getDefaultFrontendSettings(),
-        [timeoutSettingKey]: getDefaultTimeout(),
+        [timeoutSettingKey]: getDefaultTimeout()
       });
     } else {
       settings = this.migrateSettingsRuntime(settings);
@@ -76,7 +75,7 @@ export class SettingsService
 
     const newServerSettings = {
       ...entity[serverSettingsKey],
-      ...serverSettingsPartial,
+      ...serverSettingsPartial
     };
 
     return await this.updateServerSettings(newServerSettings);
@@ -125,7 +124,7 @@ export class SettingsService
 
     const newWizardSettings = {
       ...entity[wizardSettingKey],
-      ...wizardSettingsPartial,
+      ...wizardSettingsPartial
     };
 
     return await this.updateWizardSettings(newWizardSettings);
@@ -152,7 +151,7 @@ export class SettingsService
       entity[printerFileCleanSettingKey] = {
         autoRemoveOldFilesBeforeUpload: entity[printerFileCleanSettingKey].autoRemoveOldFilesBeforeUpload,
         autoRemoveOldFilesAtBoot: entity[printerFileCleanSettingKey].autoRemoveOldFilesBeforeUpload,
-        autoRemoveOldFilesCriteriumDays: entity[printerFileCleanSettingKey].autoRemoveOldFilesCriteriumDays,
+        autoRemoveOldFilesCriteriumDays: entity[printerFileCleanSettingKey].autoRemoveOldFilesCriteriumDays
       };
     }
 
@@ -168,13 +167,12 @@ export class SettingsService
     } else {
       // Remove superfluous settings
       entity[serverSettingsKey] = {
-        debugSettings: entity[serverSettingsKey].debugSettings,
         loginRequired: entity[serverSettingsKey].loginRequired,
         registration: entity[serverSettingsKey].registration,
         experimentalClientSupport: entity[serverSettingsKey].experimentalClientSupport,
         experimentalMoonrakerSupport: entity[serverSettingsKey].experimentalMoonrakerSupport,
         sentryDiagnosticsEnabled: entity[serverSettingsKey].sentryDiagnosticsEnabled,
-        experimentalThumbnailSupport: entity[serverSettingsKey].experimentalThumbnailSupport || false,
+        experimentalThumbnailSupport: entity[serverSettingsKey].experimentalThumbnailSupport || false
       };
     }
     if (!entity[credentialSettingsKey]) {
@@ -195,7 +193,7 @@ export class SettingsService
 
     const newCredentialSettings = {
       ...entity[credentialSettingsKey],
-      ...patchUpdate,
+      ...patchUpdate
     };
 
     return await this.updateCredentialSettings(newCredentialSettings);
@@ -209,7 +207,7 @@ export class SettingsService
 
     const newFileCleanSettings = {
       ...entity[printerFileCleanSettingKey],
-      ...patchUpdate,
+      ...patchUpdate
     };
 
     return await this.updateFileCleanSettings(newFileCleanSettings);

@@ -1,5 +1,4 @@
 import { KeyDiffCache } from "@/utils/cache/key-diff.cache";
-import { formatKB } from "@/utils/metric.utils";
 import { printerEvents } from "@/constants/event.constants";
 import { SettingsStore } from "@/state/settings.store";
 import EventEmitter2 from "eventemitter2";
@@ -20,16 +19,12 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
   constructor(
     loggerFactory: ILoggerFactory,
     private readonly eventEmitter2: EventEmitter2,
-    private readonly settingsStore: SettingsStore,
+    private readonly settingsStore: SettingsStore
   ) {
     super();
     this.logger = loggerFactory(PrinterEventsCache.name);
 
     this.subscribeToEvents();
-  }
-
-  private get _debugMode() {
-    return this.settingsStore.getSettingsSensitive()?.server?.debugSettings?.debugSocketMessages;
   }
 
   async deletePrinterSocketEvents(id: IdType) {
@@ -57,7 +52,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
         WS_CLOSED: null,
         WS_ERROR: null,
         WS_OPENED: null,
-        WS_STATE_UPDATED: null,
+        WS_STATE_UPDATED: null
       };
       await this.setKeyValue(printerId, ref);
     }
@@ -68,7 +63,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
     const ref = await this.getOrCreateEvents(printerId);
     ref[label] = {
       payload,
-      receivedAt: Date.now(),
+      receivedAt: Date.now()
     };
     await this.setKeyValue(printerId, ref);
   }
@@ -80,7 +75,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
     }
     ref[label][substateName] = {
       payload,
-      receivedAt: Date.now(),
+      receivedAt: Date.now()
     };
     await this.setKeyValue(printerId, ref);
   }
@@ -99,15 +94,11 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
     const printerId = e.printerId;
     if (!["plugin", "event"].includes(e.event)) {
       await this.setEvent(printerId, e.event, e.event === "history" ? this.pruneHistoryPayload(e.payload) : e.payload);
-
-      if (this._debugMode) {
-        this.logger.log(`Message '${e.event}' received, size ${formatKB(e.payload)}`, e.printerId);
-      }
     }
   }
 
   private async onMoonrakerSocketMessage(
-    e: MoonrakerEventDto<MR_WsMessage, PrinterObjectsQueryDto<SubscriptionType | null>, IdType>,
+    e: MoonrakerEventDto<MR_WsMessage, PrinterObjectsQueryDto<SubscriptionType | null>, IdType>
   ) {
     const printerId = e.printerId;
     const eventType = e.event;

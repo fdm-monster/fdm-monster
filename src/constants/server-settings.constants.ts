@@ -18,14 +18,6 @@ export const getDefaultWizardSettings = (): WizardSettingsDto => ({
 
 export const serverSettingsKey = "server";
 export const getDefaultServerSettings = (): ServerSettingsDto => ({
-  debugSettings: {
-    debugSocketIoEvents: false,
-    debugSocketReconnect: false,
-    debugSocketRetries: false,
-    debugSocketSetup: false,
-    debugSocketMessages: false,
-    debugSocketIoBandwidth: false,
-  },
   sentryDiagnosticsEnabled: false,
   loginRequired: true,
   registration: false,

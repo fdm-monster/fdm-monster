@@ -1,5 +1,4 @@
 import { errorSummary } from "@/utils/error.utils";
-import { SettingsStore } from "@/state/settings.store";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { LoggerService } from "@/handlers/logger";
@@ -14,15 +13,12 @@ export class PrinterWebsocketRestoreTask {
   constructor(
     loggerFactory: ILoggerFactory,
     private readonly printerSocketStore: PrinterSocketStore,
-    private readonly octoprintClient: OctoprintClient,
-    private readonly settingsStore: SettingsStore,
+    private readonly octoprintClient: OctoprintClient
   ) {
     this.logger = loggerFactory(PrinterWebsocketRestoreTask.name);
   }
 
   async run() {
-    const startTime = Date.now();
-
     const existingSockets = this.printerSocketStore.listPrinterSockets();
     const resetAdapterIds = [];
     const silentSocketIds = [];
@@ -57,20 +53,13 @@ export class PrinterWebsocketRestoreTask {
         try {
           if (result.data?.current?.state !== "Closed") {
             this.logger.warn(
-              `Silence was detected, but the OctoPrint current connection was not closed. Connection state ${result?.current?.state}`,
+              `Silence was detected, but the OctoPrint current connection was not closed. Connection state ${result?.current?.state}`
             );
           }
         } catch (e) {
           this.logger.error(`Silence was detected, but Websocket was not closed/aborted and API could not be called`);
         }
       }
-    }
-
-    const duration = Date.now() - startTime;
-    if (this.settingsStore.getSettingsSensitive()?.server?.debugSettings.debugSocketRetries) {
-      this.logger.log(
-        `Reset ${resetAdapterIds.length} closed/aborted sockets and detected ${silentSocketIds.length} silent sockets (duration ${duration}ms)`,
-      );
     }
   }
 }

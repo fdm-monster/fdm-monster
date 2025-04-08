@@ -10,7 +10,6 @@ import {
   frontendSettingsUpdateSchema,
   moonrakerSupportSchema,
   sentryDiagnosticsEnabledSchema,
-  serverSettingsUpdateSchema,
   thumbnailSupportSchema,
   timeoutSettingsUpdateSchema,
 } from "@/services/validators/settings-service.validation";
@@ -121,15 +120,6 @@ export class SettingsController {
   async updateFrontendSettings(req: Request, res: Response) {
     const validatedInput = await validateInput(req.body, frontendSettingsUpdateSchema);
     const result = await this.settingsStore.updateFrontendSettings(validatedInput);
-    res.send(result);
-  }
-
-  @PUT()
-  @route("/server")
-  @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
-  async updateServerSettings(req: Request, res: Response) {
-    const validatedInput = await validateInput(req.body, serverSettingsUpdateSchema);
-    const result = await this.settingsStore.updateServerSettings(validatedInput);
     res.send(result);
   }
 
