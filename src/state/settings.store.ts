@@ -95,13 +95,13 @@ export class SettingsStore {
     return this.settings![serverSettingsKey].sentryDiagnosticsEnabled;
   }
 
-  async persistOptionalCredentialSettings(overrideJwtSecret: string, overrideJwtExpiresIn: string) {
-    if (overrideJwtSecret) {
+  async persistOptionalCredentialSettings(overrideJwtSecret?: string, overrideJwtExpiresIn?: string) {
+    if (overrideJwtSecret?.length) {
       await this.updateCredentialSettings({
         jwtSecret: overrideJwtSecret
       });
     }
-    if (overrideJwtExpiresIn) {
+    if (overrideJwtExpiresIn?.length) {
       await this.updateCredentialSettings({
         jwtExpiresIn: parseInt(overrideJwtExpiresIn)
       });

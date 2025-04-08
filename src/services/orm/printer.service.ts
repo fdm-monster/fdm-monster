@@ -12,6 +12,7 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { normalizeUrl } from "@/utils/normalize-url";
 import { defaultHttpProtocol } from "@/utils/url.utils";
 import { createPrinterSchema } from "@/services/validators/printer-service.validation";
+import { PrinterType } from "@/services/printer-api.interface";
 
 export class PrinterService
   extends BaseService(Printer, PrinterDto<SqliteIdType>, CreatePrinterDto)
@@ -37,7 +38,7 @@ export class PrinterService
       dateAdded: entity.dateAdded,
       apiKey: entity.apiKey,
       printerURL: entity.printerURL,
-      printerType: entity.printerType,
+      printerType: entity.printerType as PrinterType,
     };
   }
 

@@ -3,7 +3,7 @@ import { join } from "path";
 import { readdirSync } from "fs";
 import { superRootPath } from "@/utils/fs.utils";
 import { AppConstants } from "@/server.constants";
-import { isValidDate } from "@/utils/time.utils";
+import { isParsableDate } from "@/utils/time.utils";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { rmSync } from "node:fs";
@@ -29,12 +29,12 @@ export class LogDumpService {
       if (!matchesFormat) return false;
 
       const strippedFilename = f.replace(".log", "").replace(startingFormat, "");
-      const date = new Date(strippedFilename);
-      if (!isValidDate(date)) {
+      if (!isParsableDate(strippedFilename)) {
         this.logger.warn("Failed to parse date from log file, removing it as outdated");
         return true;
       }
 
+      const date = new Date(strippedFilename);
       const now = new Date();
       const diff = now.getTime() - date.getTime();
       const diffDays = diff / (1000 * 3600 * 24);
@@ -42,7 +42,7 @@ export class LogDumpService {
     });
 
     this.logger.log(
-      `Removing ${removedFilesNotInFormat.length} files that are not in the format of ${startingFormat}<date>.log, and ${removedFilesOutdated.length} files that are older than 7 days`,
+      `Removing ${removedFilesNotInFormat.length} files that are not in the format of ${startingFormat}<date>.log, and ${removedFilesOutdated.length} files that are older than 7 days`
     );
 
     let removedWrongFormatFilesCount = 0;
@@ -68,7 +68,7 @@ export class LogDumpService {
     this.logger.log(`Removed ${removedWrongFormatFilesCount + removedOutdatedFilesCount} log file(s)`);
     return {
       removedWrongFormatFilesCount,
-      removedOutdatedFilesCount,
+      removedOutdatedFilesCount
     };
   }
 
@@ -81,7 +81,7 @@ export class LogDumpService {
     const outputPath = join(
       superRootPath(),
       AppConstants.defaultLogZipsFolder,
-      `logs-${AppConstants.serverRepoName}.zip`,
+      `logs-${AppConstants.serverRepoName}.zip`
     );
     zip.writeZip(outputPath);
     return outputPath;

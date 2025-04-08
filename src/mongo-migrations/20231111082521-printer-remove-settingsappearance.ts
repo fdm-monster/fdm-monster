@@ -1,4 +1,5 @@
 module.exports = {
+  // @ts-ignore
   async up(db, client) {
     const session = client.startSession();
     try {
@@ -17,6 +18,7 @@ module.exports = {
     // await db.collection('albums').updateOne({artist: 'The Beatles'}, {$set: {blacklisted: true}});
   },
 
+  // @ts-ignore
   async down(db, client) {
     const session = client.startSession();
     try {

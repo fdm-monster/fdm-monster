@@ -17,8 +17,6 @@ export interface CachedPrinter {
   disabledReason: string;
   name: string;
   dateAdded: number;
-  feedRate: number;
-  flowRate: number;
 }
 
 export class PrinterCache extends KeyDiffCache<CachedPrinter> {
