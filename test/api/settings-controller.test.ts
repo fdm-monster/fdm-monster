@@ -15,6 +15,7 @@ import {
 import { SettingsController } from "@/controllers/settings.controller";
 import { isSqliteModeTest } from "../typeorm.manager";
 import TestAgent from "supertest/lib/agent";
+import { FrontendSettingsDto } from "@/services/interfaces/settings.dto";
 
 let request: TestAgent<Test>;
 
@@ -103,10 +104,11 @@ describe(SettingsController.name, () => {
   });
 
   it("should OK on PUT frontend settings", async () => {
-    const newFrontendSettings = {
+    const newFrontendSettings: FrontendSettingsDto = {
       gridCols: 6,
       gridRows: 6,
-      largeTiles: false
+      largeTiles: false,
+      tilePreferCancelOverQuickStop: false
     };
     const response = await request.put(frontendSettingsRoute).send(newFrontendSettings);
     expect(response.body).not.toBeNull();

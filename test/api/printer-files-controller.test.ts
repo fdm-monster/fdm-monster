@@ -43,7 +43,6 @@ beforeEach(async () => {
 
 describe(PrinterFilesController.name, () => {
   const gcodePath = "test/api/test-data/sample.gcode";
-  const invalidGcodePath = "test/api/test-data/sample.gco";
 
   it(`should return 404 on ${defaultRoute} for nonexisting printer`, async () => {
     const res = await request.get(getRoute(101)).send();

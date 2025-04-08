@@ -20,8 +20,6 @@ export class PrinterWebsocketRestoreTask {
 
   async run() {
     const existingSockets = this.printerSocketStore.listPrinterSockets();
-    const resetAdapterIds = [];
-    const silentSocketIds = [];
     for (const socket of existingSockets) {
       if (socket.printerType !== OctoprintType) {
         continue;
@@ -32,7 +30,6 @@ export class PrinterWebsocketRestoreTask {
           socket.close();
           socket.resetSocketState();
           this.logger.warn("Socket was closed or aborted, manually removing it");
-          resetAdapterIds.push(socket.printerId);
           continue;
         }
       } catch (e: any) {
@@ -48,8 +45,6 @@ export class PrinterWebsocketRestoreTask {
       ) {
         const result = await this.octoprintClient.getConnection(socket.login);
 
-        silentSocketIds.push(socket.printerId);
-        // Produce logs for silent sockets
         try {
           if (result.data?.current?.state !== "Closed") {
             this.logger.warn(
