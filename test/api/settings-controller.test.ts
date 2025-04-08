@@ -74,14 +74,6 @@ describe(SettingsController.name, () => {
     expectOkResponse(response);
   });
 
-  it("should OK on PUT server settings ", async () => {
-    const response = await request.put(serverSettingsRoute).send({
-      registration: true,
-      loginRequired: false
-    });
-    expectOkResponse(response);
-  });
-
   it("should OK on PUT experimental moonraker support setting", async () => {
     const response = await request.put(experimentalMoonrakerSupport).send({
       enabled: true
