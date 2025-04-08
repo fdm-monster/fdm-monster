@@ -137,12 +137,12 @@ export class BootTask {
     const demoUsername = this.configService.get(
       AppConstants.OVERRIDE_DEMO_USERNAME,
       AppConstants.DEFAULT_DEMO_USERNAME
-    );
+    ) as string;
     const demoPassword = this.configService.get(
       AppConstants.OVERRIDE_DEMO_PASSWORD,
       AppConstants.DEFAULT_DEMO_PASSWORD
-    );
-    const demoRole = this.configService.get(AppConstants.OVERRIDE_DEMO_ROLE, AppConstants.DEFAULT_DEMO_ROLE);
+    ) as string;
+    const demoRole = this.configService.get(AppConstants.OVERRIDE_DEMO_ROLE, AppConstants.DEFAULT_DEMO_ROLE) as string;
     const adminRole = this.roleService.getRoleByName(demoRole);
 
     const demoUserId = await this.userService.getDemoUserId();

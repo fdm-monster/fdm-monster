@@ -24,7 +24,7 @@ export interface CachedPrinter {
 export class PrinterCache extends KeyDiffCache<CachedPrinter> {
   constructor(
     private readonly printerService: IPrinterService,
-    private readonly eventEmitter2: EventEmitter2,
+    private readonly eventEmitter2: EventEmitter2
   ) {
     super();
 
@@ -55,7 +55,7 @@ export class PrinterCache extends KeyDiffCache<CachedPrinter> {
     return printers;
   }
 
-  async getCachedPrinterOrThrowAsync(id: keyType): Promise<CachedPrinter | null> {
+  async getCachedPrinterOrThrowAsync(id: keyType): Promise<CachedPrinter> {
     const printer = await this.getValue(id);
     if (!printer) {
       throw new NotFoundException(`Printer with provided id not found`);
@@ -86,7 +86,7 @@ export class PrinterCache extends KeyDiffCache<CachedPrinter> {
     return {
       printerURL: printer.printerURL,
       apiKey: printer.apiKey,
-      printerType: printer.printerType,
+      printerType: printer.printerType
     };
   }
 
@@ -95,7 +95,7 @@ export class PrinterCache extends KeyDiffCache<CachedPrinter> {
     return {
       printerURL: printer.printerURL,
       apiKey: printer.apiKey,
-      printerType: printer.printerType,
+      printerType: printer.printerType
     };
   }
 
