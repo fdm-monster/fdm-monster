@@ -4,25 +4,19 @@ import { z } from "zod";
 export const serverSettingsUpdateSchema = z.object({
   registration: z.boolean().optional(),
   loginRequired: z.boolean().optional(),
-  debugSettings: z
-    .object({
-      debugSocketEvents: z.boolean().optional(),
-      debugSocketReconnect: z.boolean().optional(),
-    })
-    .optional(),
   experimentalMoonrakerSupport: z.boolean().optional(),
   experimentalThumbnailSupport: z.boolean().optional(),
 });
 
 export const timeoutSettingsUpdateSchema = z.object({
-  apiTimeout: z.number().int().min(1000).optional(),
+  apiTimeout: z.number().int().min(1000),
 });
 
 export const frontendSettingsUpdateSchema = z.object({
-  gridCols: z.number().int().min(1).optional(),
-  gridRows: z.number().int().min(1).optional(),
-  largeTiles: z.boolean().optional(),
-  tilePreferCancelOverQuickStop: z.boolean().optional(),
+  gridCols: z.number().int().min(1),
+  gridRows: z.number().int().min(1),
+  largeTiles: z.boolean(),
+  tilePreferCancelOverQuickStop: z.boolean(),
 });
 
 export const credentialSettingPatchSchema = z.object({

@@ -29,18 +29,8 @@ export interface ICredentialSettings {
   updatedAt: Date;
 }
 
-export interface IDebugSettings {
-  debugSocketIoEvents: boolean;
-  debugSocketReconnect: boolean;
-  debugSocketRetries: boolean;
-  debugSocketSetup: boolean;
-  debugSocketMessages: boolean;
-  debugSocketIoBandwidth: boolean;
-}
-
 export interface IServerSettings {
   sentryDiagnosticsEnabled: boolean;
-  debugSettings: IDebugSettings;
   loginRequired: boolean;
   registration: boolean;
   experimentalMoonrakerSupport: boolean;
@@ -141,38 +131,6 @@ const SettingsSchema = new Schema<ISettings>({
       type: Boolean,
       default: false,
       required: true,
-    },
-    debugSettings: {
-      debugSocketIoEvents: {
-        type: Boolean,
-        default: false,
-        required: true,
-      },
-      debugSocketReconnect: {
-        type: Boolean,
-        default: false,
-        required: true,
-      },
-      debugSocketRetries: {
-        type: Boolean,
-        default: false,
-        required: true,
-      },
-      debugSocketSetup: {
-        type: Boolean,
-        default: false,
-        required: true,
-      },
-      debugSocketMessages: {
-        type: Boolean,
-        default: false,
-        required: true,
-      },
-      debugSocketIoBandwidth: {
-        type: Boolean,
-        default: false,
-        required: true,
-      },
     },
     loginRequired: {
       type: Boolean,

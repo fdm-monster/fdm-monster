@@ -6,7 +6,6 @@ import { SocketFactory } from "@/services/socket.factory";
 import { PrinterCache } from "@/state/printer.cache";
 import { OctoprintWebsocketAdapter } from "@/services/octoprint/octoprint-websocket.adapter";
 import { LoggerService } from "@/handlers/logger";
-import { SettingsStore } from "@/state/settings.store";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IdType } from "@/shared.constants";
 import { OctoprintType } from "@/services/printer-api.interface";
@@ -14,16 +13,14 @@ import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
 import { PrinterDto } from "@/services/interfaces/printer.dto";
 
 export class PrinterSocketStore {
-  private readonly logger: LoggerService;
-
   printerSocketAdaptersById: Record<string, IWebsocketAdapter> = {};
+  private readonly logger: LoggerService;
 
   constructor(
     loggerFactory: ILoggerFactory,
     private readonly socketFactory: SocketFactory,
-    private readonly settingsStore: SettingsStore,
     private readonly eventEmitter2: EventEmitter2,
-    private readonly printerCache: PrinterCache,
+    private readonly printerCache: PrinterCache
   ) {
     this.logger = loggerFactory(PrinterSocketStore.name);
 
@@ -37,7 +34,7 @@ export class PrinterSocketStore {
         printerId: s.printerId,
         printerType: s.printerType,
         socket: s.socketState,
-        api: s.apiState,
+        api: s.apiState
       };
     });
     return socketStatesById;
@@ -110,9 +107,6 @@ export class PrinterSocketStore {
           promisesReauth.push(promise);
         }
       } catch (e) {
-        if (this.settingsStore.getDebugSettingsSensitive()?.debugSocketSetup) {
-          this.logger.log("Failed to reauth printer socket", errorSummary(e));
-        }
         captureException(e);
       }
     }
@@ -124,14 +118,6 @@ export class PrinterSocketStore {
     for (const socket of Object.values(this.printerSocketAdaptersById)) {
       try {
         if (socket.needsSetup() || socket.needsReopen()) {
-          if (this.settingsStore.getDebugSettingsSensitive()?.debugSocketSetup) {
-            // Exception anonymity
-            this.logger.log(
-              `Reopening socket for printerId '${
-                socket.printerId
-              }' (setup: ${socket.needsSetup()}, reopen: ${socket.needsReopen()})`,
-            );
-          }
           socketSetupRequested++;
           const promise = socket
             .setupSocketSession()
@@ -144,9 +130,6 @@ export class PrinterSocketStore {
           promisesOpenSocket.push(promise);
         }
       } catch (e) {
-        if (this.settingsStore.getDebugSettingsSensitive()?.debugSocketSetup) {
-          this.logger.log(`Failed to setup printer socket ${errorSummary(e)}`);
-        }
         captureException(e);
       }
 
@@ -166,7 +149,7 @@ export class PrinterSocketStore {
       failedSocketsReauth,
       socketSetup: socketSetupRequested,
       socket: socketStates,
-      api: apiStates,
+      api: apiStates
     };
   }
 
@@ -196,8 +179,8 @@ export class PrinterSocketStore {
       loginDto: {
         apiKey: printer.apiKey,
         printerURL: printer.printerURL,
-        printerType: printer.printerType,
-      },
+        printerType: printer.printerType
+      }
     });
     foundAdapter.resetSocketState();
   }

@@ -6,20 +6,10 @@ import {
   wizardSettingKey,
 } from "@/constants/server-settings.constants";
 
-export interface DebugSettingsDto {
-  debugSocketIoEvents: boolean;
-  debugSocketReconnect: boolean;
-  debugSocketRetries: boolean;
-  debugSocketSetup: boolean;
-  debugSocketMessages: boolean;
-  debugSocketIoBandwidth: boolean;
-}
-
 export interface ServerSettingsDto {
   sentryDiagnosticsEnabled: boolean;
   registration: boolean;
   loginRequired: boolean;
-  debugSettings: DebugSettingsDto;
   experimentalMoonrakerSupport: boolean;
   experimentalTypeormSupport: boolean;
   experimentalClientSupport: boolean;

@@ -137,7 +137,7 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
     return false;
   }
 
-  reauthSession() {}
+  async reauthSession() {}
 
   registerCredentials(socketLogin: ISocketLogin) {
     const { printerId, loginDto } = socketLogin;

@@ -95,7 +95,6 @@ export class SettingsService implements ISettingsService<MongoIdType> {
     } else {
       // Remove superfluous settings
       doc[serverSettingsKey] = {
-        debugSettings: doc[serverSettingsKey].debugSettings,
         loginRequired: doc[serverSettingsKey].loginRequired,
         registration: doc[serverSettingsKey].registration,
         experimentalClientSupport: doc[serverSettingsKey].experimentalClientSupport,

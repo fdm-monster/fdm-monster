@@ -13,11 +13,12 @@ import { UserRoleService } from "@/services/orm/user-role.service";
 import { ROLES } from "@/constants/authorization.constants";
 import { RoleService } from "@/services/orm/role.service";
 
-export class UserService extends BaseService(User, UserDto<SqliteIdType>) implements IUserService<SqliteIdType, User> {
+export class UserService extends BaseService(User, UserDto<SqliteIdType>)
+  implements IUserService<SqliteIdType, User> {
   constructor(
     typeormService: TypeormService,
     private readonly userRoleService: UserRoleService,
-    private readonly roleService: RoleService,
+    private readonly roleService: RoleService
   ) {
     super(typeormService);
   }
@@ -31,7 +32,7 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
       isRootUser: user.isRootUser,
       username: user.username,
       needsPasswordChange: user.needsPasswordChange,
-      roles: user.roles?.map((r) => r.roleId),
+      roles: (user.roles ?? []).map((r) => r.roleId)
     };
   }
 
@@ -39,8 +40,8 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
     return this.list({ take: limit });
   }
 
-  getUser(userId: SqliteIdType): Promise<User> {
-    return this.get(userId, true);
+  async getUser(userId: SqliteIdType): Promise<User> {
+    return (await this.get(userId, true)) as User;
   }
 
   async getUserRoleIds(userId: SqliteIdType): Promise<SqliteIdType[]> {
@@ -87,7 +88,7 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
     return await this.delete(userId);
   }
 
-  findRawByUsername(username: string): Promise<User> {
+  findRawByUsername(username: string): Promise<User | null> {
     return this.repository.findOneBy({ username });
   }
 
@@ -163,7 +164,7 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
   async register(input: RegisterUserDto<SqliteIdType>): Promise<User> {
     const { username, password, roles, isDemoUser, isRootUser, needsPasswordChange, isVerified } = await validateInput(
       input,
-      registerUserSchema(true),
+      registerUserSchema(true)
     );
 
     const passwordHash = hashPassword(password);
@@ -173,7 +174,7 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
       isVerified: isVerified ?? false,
       isDemoUser: isDemoUser ?? false,
       isRootUser: isRootUser ?? false,
-      needsPasswordChange: needsPasswordChange ?? true,
+      needsPasswordChange: needsPasswordChange ?? true
     });
     await this.userRoleService.setUserRoles(result.id, roles);
 

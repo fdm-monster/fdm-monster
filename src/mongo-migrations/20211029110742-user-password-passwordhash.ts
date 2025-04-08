@@ -1,4 +1,5 @@
 module.exports = {
+  // @ts-ignore
   async up(db, client) {
     const session = client.startSession();
     try {
@@ -13,6 +14,7 @@ module.exports = {
     }
   },
 
+  // @ts-ignore
   async down(db, client) {
     const session = client.startSession();
     try {
@@ -25,5 +27,5 @@ module.exports = {
     } finally {
       await session.endSession();
     }
-  },
+  }
 };

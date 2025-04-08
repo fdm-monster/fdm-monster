@@ -15,7 +15,7 @@ export interface IWebsocketAdapter<T = IdType> {
 
   needsReauth(): boolean;
 
-  reauthSession(): void;
+  reauthSession(): Promise<void>;
 
   registerCredentials(socketLogin: ISocketLogin): void;
 

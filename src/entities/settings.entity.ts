@@ -16,14 +16,6 @@ export class Settings {
   @Column({ type: "simple-json", nullable: false })
   [serverSettingsKey]: {
     sentryDiagnosticsEnabled: boolean;
-    debugSettings: {
-      debugSocketIoEvents: boolean;
-      debugSocketReconnect: boolean;
-      debugSocketRetries: boolean;
-      debugSocketSetup: boolean;
-      debugSocketMessages: boolean;
-      debugSocketIoBandwidth: boolean;
-    };
     loginRequired: boolean;
     registration: boolean;
     experimentalMoonrakerSupport: boolean;

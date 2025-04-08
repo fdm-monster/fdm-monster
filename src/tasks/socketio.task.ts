@@ -1,7 +1,6 @@
 import { IO_MESSAGES, SocketIoGateway } from "@/state/socket-io.gateway";
 import { socketIoConnectedEvent } from "@/constants/event.constants";
-import { formatKB, sizeKB } from "@/utils/metric.utils";
-import { SettingsStore } from "@/state/settings.store";
+import { sizeKB } from "@/utils/metric.utils";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { PrinterEventsCache } from "@/state/printer-events.cache";
 import { FloorStore } from "@/state/floor.store";
@@ -14,10 +13,11 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 export class SocketIoTask {
   logger: LoggerService;
 
+  private readonly rounding = 2;
+  private readonly aggregateWindowLength = 100;
+
   private aggregateSizeCounter = 0;
-  private aggregateWindowLength = 100;
   private aggregateSizes: number[] = [];
-  private rounding = 2;
 
   constructor(
     loggerFactory: ILoggerFactory,
@@ -27,8 +27,7 @@ export class SocketIoTask {
     private readonly printerEventsCache: PrinterEventsCache,
     private readonly printerCache: PrinterCache,
     private readonly fileUploadTrackerCache: FileUploadTrackerCache,
-    private readonly settingsStore: SettingsStore,
-    private readonly eventEmitter2: EventEmitter2,
+    private readonly eventEmitter2: EventEmitter2
   ) {
     this.logger = loggerFactory(SocketIoTask.name);
 
@@ -53,18 +52,8 @@ export class SocketIoTask {
       floors,
       socketStates,
       printerEvents,
-      trackedUploads,
+      trackedUploads
     };
-
-    // Precise debugging
-    if (this.settingsStore.getDebugSettingsSensitive()?.debugSocketIoBandwidth) {
-      const kbDataString = Object.entries(socketIoData)
-        .map(([id, state]) => {
-          return `${id} ${formatKB(state)}`;
-        })
-        .join(" ");
-      this.logger.log(kbDataString);
-    }
 
     const serializedData = JSON.stringify(socketIoData);
     const transportDataSize = sizeKB(serializedData);
@@ -77,7 +66,7 @@ export class SocketIoTask {
       const summedPayloadSize = this.aggregateSizes.reduce((t, n) => (t += n));
       const averagePayloadSize = summedPayloadSize / this.aggregateWindowLength;
       this.logger.log(
-        `Printer SocketIO metrics ${averagePayloadSize.toFixed(this.rounding)}kB [${this.aggregateWindowLength} TX avg].`,
+        `Printer SocketIO metrics ${averagePayloadSize.toFixed(this.rounding)}kB [${this.aggregateWindowLength} TX avg].`
       );
       this.aggregateSizeCounter = 0;
       this.aggregateSizes = [];
