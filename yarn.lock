@@ -1469,11 +1469,11 @@ __metadata:
   linkType: hard
 
 "@mongodb-js/saslprep@npm:^1.1.0, @mongodb-js/saslprep@npm:^1.1.9":
-  version: 1.2.1
-  resolution: "@mongodb-js/saslprep@npm:1.2.1"
+  version: 1.2.2
+  resolution: "@mongodb-js/saslprep@npm:1.2.2"
   dependencies:
     sparse-bitfield: "npm:^3.0.3"
-  checksum: 10c0/6431fe18c948b5a03b4eb0e260ee2b90bfe5be81b3c49b3e6ccb8d6ff8fa57a20f048ee1952c4a7e092e5b68eec30346ab18bbc374b50fdf9d8cedbd92b9efff
+  checksum: 10c0/6ea882034fe99c6abe033d843dfa0f90fcec105ef538c04ee32aca9d2cda7cc8f2dd45c94c2dbf30f14668524ed076f7072bce857f9ee321ad5b0bc1f930c423
   languageName: node
   linkType: hard
 
