@@ -2389,9 +2389,9 @@ __metadata:
   linkType: hard
 
 "@opentelemetry/semantic-conventions@npm:^1.27.0, @opentelemetry/semantic-conventions@npm:^1.30.0":
-  version: 1.30.0
-  resolution: "@opentelemetry/semantic-conventions@npm:1.30.0"
-  checksum: 10c0/0bf99552e3b4b7e8b7eb504b678d52f59c6f259df88e740a2011a0d858e523d36fee86047ae1b7f45849c77f00f970c3059ba58e0a06a7d47d6f01dbe8c455bd
+  version: 1.31.0
+  resolution: "@opentelemetry/semantic-conventions@npm:1.31.0"
+  checksum: 10c0/a21e250d14565c86b7f53378149765425371486516485721e1c64fc24aead71659d60a25ea6796d32d23bbcb6931e760f0ac3aac14a0cae15d19e106523147f7
   languageName: node
   linkType: hard
 
@@ -3245,9 +3245,9 @@ __metadata:
   linkType: hard
 
 "@types/aws-lambda@npm:^8.10.83":
-  version: 8.10.148
-  resolution: "@types/aws-lambda@npm:8.10.148"
-  checksum: 10c0/b2cf5c991263a9276490757ec8f78fa42e41ac5029588d87f6b01f03321ee97eeaed8d66d259165d941717242a84e5b67e5d3a8872e9642a47645c6610f85287
+  version: 8.10.149
+  resolution: "@types/aws-lambda@npm:8.10.149"
+  checksum: 10c0/9ef41214a1b69fa30d89cab575429793f1ccc49cfe3a7aa75228aef31a202bb6d2c306a5b33def61ef29e0d0a1a324412bf6a4fa5a615e61117685584a394047
   languageName: node
   linkType: hard
 
@@ -5157,9 +5157,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.5.73":
-  version: 1.5.134
-  resolution: "electron-to-chromium@npm:1.5.134"
-  checksum: 10c0/ba0c8b3a86e139b142ce797e807f3a7b4b5708d8a550d820cc5467bf22fc62517fa9c2a38c4fec975c96f321f18918be1bcae41687f1715889a0ac6122fbfa6d
+  version: 1.5.135
+  resolution: "electron-to-chromium@npm:1.5.135"
+  checksum: 10c0/d431751080e659dd089423cbf7e5efcd1c6672a06b9552b2ebfb80caf0e2c442a2ee883f445f70ffb53c4f740b3fe8f6607760d9a15d6db2d3ba44dff39fc901
   languageName: node
   linkType: hard
 
