@@ -2,7 +2,7 @@ import {
   ExtractJwt,
   JwtFromRequestFunction,
   Strategy as JwtStrategy,
-  StrategyOptions, StrategyOptionsWithoutRequest,
+  StrategyOptionsWithoutRequest,
   VerifiedCallback
 } from "passport-jwt";
 import { Strategy as AnonymousStrategy } from "passport-anonymous";
