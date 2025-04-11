@@ -44,9 +44,6 @@ export class PrintCompletionSocketIoTask {
       return;
     }
 
-    // TODO there is no need for this now
-    // this.socketIoGateway.send(IO_MESSAGES.CompletionEvent, JSON.stringify({ fdmEvent, octoPrintEvent, data }));
-
     const completion = {
       status: data.payload.type,
       fileName: data.payload?.payload?.name,
@@ -111,10 +108,5 @@ export class PrintCompletionSocketIoTask {
       // Clear the context now
       this.contextCache[printerId] = {};
     }
-  }
-
-  async run() {
-    // Run once to bind event handler and reload the cache
-    this.contextCache = await this.printCompletionService.loadPrintContexts();
   }
 }
