@@ -3,14 +3,15 @@ import {
   printerFileCleanSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
-  wizardSettingKey
+  wizardSettingKey,
 } from "@/constants/server-settings.constants";
 import { z } from "zod";
 import {
   credentialSettingUpdateSchema,
   fileCleanSettingsUpdateSchema,
   frontendSettingsUpdateSchema,
-  timeoutSettingsUpdateSchema, wizardUpdateSchema
+  timeoutSettingsUpdateSchema,
+  wizardUpdateSchema,
 } from "@/services/validators/settings-service.validation";
 
 export interface ServerSettingsDto {
@@ -25,7 +26,7 @@ export interface ServerSettingsDto {
 
 export type WizardSettingsDto = z.infer<typeof wizardUpdateSchema>;
 
-export type FrontendSettingsDto = z.infer<typeof frontendSettingsUpdateSchema>
+export type FrontendSettingsDto = z.infer<typeof frontendSettingsUpdateSchema>;
 
 export type FileCleanSettingsDto = z.infer<typeof fileCleanSettingsUpdateSchema>;
 

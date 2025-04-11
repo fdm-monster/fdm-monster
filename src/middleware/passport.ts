@@ -3,7 +3,7 @@ import {
   JwtFromRequestFunction,
   Strategy as JwtStrategy,
   StrategyOptionsWithoutRequest,
-  VerifiedCallback
+  VerifiedCallback,
 } from "passport-jwt";
 import { Strategy as AnonymousStrategy } from "passport-anonymous";
 import { DITokens } from "@/container.tokens";
@@ -24,7 +24,7 @@ export type JwtFromSocketFunction = (socket: Socket) => string | null;
 export function getPassportJwtOptions(
   settingsStore: SettingsStore,
   configService: ConfigService,
-  jwtFromRequest: JwtFromRequestFunction | JwtFromSocketFunction = ExtractJwt.fromAuthHeaderAsBearerToken()
+  jwtFromRequest: JwtFromRequestFunction | JwtFromSocketFunction = ExtractJwt.fromAuthHeaderAsBearerToken(),
 ): StrategyOptionsWithoutRequest {
   return {
     jwtFromRequest: jwtFromRequest,
@@ -33,12 +33,12 @@ export function getPassportJwtOptions(
       return done(null, jwtSecret);
     },
     audience: configService.get(AppConstants.OVERRIDE_JWT_AUDIENCE, AppConstants.DEFAULT_JWT_AUDIENCE),
-    issuer: configService.get(AppConstants.OVERRIDE_JWT_ISSUER, AppConstants.DEFAULT_JWT_ISSUER)
+    issuer: configService.get(AppConstants.OVERRIDE_JWT_ISSUER, AppConstants.DEFAULT_JWT_ISSUER),
   };
 }
 
 export function verifyUserCallback(userService: IUserService) {
-  return function(jwt_payload: any, done: VerifiedCallback) {
+  return function (jwt_payload: any, done: VerifiedCallback) {
     userService
       .getUser(jwt_payload.userId)
       .then((user: IUser<IdType>) => {
@@ -48,7 +48,7 @@ export function verifyUserCallback(userService: IUserService) {
         if (user?.needsPasswordChange) {
           return done(
             new AuthenticationError("Password change required", AUTH_ERROR_REASON.PasswordChangeRequired),
-            false
+            false,
           );
         }
         if (!user?.isVerified) {
@@ -65,10 +65,7 @@ export function verifyUserCallback(userService: IUserService) {
   };
 }
 
-export function initializePassportStrategies(
-  passport: PassportStatic,
-  container: AwilixContainer
-): PassportStatic {
+export function initializePassportStrategies(passport: PassportStatic, container: AwilixContainer): PassportStatic {
   const settingsStore = container.resolve<SettingsStore>(DITokens.settingsStore);
   const configService = container.resolve<ConfigService>(DITokens.configService);
   const userService = container.resolve<IUserService>(DITokens.userService);
@@ -76,9 +73,9 @@ export function initializePassportStrategies(
   const opts = getPassportJwtOptions(settingsStore, configService, ExtractJwt.fromAuthHeaderAsBearerToken());
 
   passport.use(
-    new JwtStrategy(opts, function(jwt_payload: any, done: VerifiedCallback) {
+    new JwtStrategy(opts, function (jwt_payload: any, done: VerifiedCallback) {
       verifyUserCallback(userService)(jwt_payload, done);
-    })
+    }),
   );
   passport.use(new AnonymousStrategy());
   return passport;

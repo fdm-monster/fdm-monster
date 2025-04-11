@@ -18,7 +18,7 @@ export class MulterService {
   constructor(
     loggerFactory: ILoggerFactory,
     private readonly fileUploadTrackerCache: FileUploadTrackerCache,
-    private readonly httpClientFactory: HttpClientFactory
+    private readonly httpClientFactory: HttpClientFactory,
   ) {
     this.logger = loggerFactory(MulterService.name);
   }
@@ -101,7 +101,7 @@ export class MulterService {
         }
 
         resolve(req.files as Express.Multer.File[]);
-      })
+      }),
     );
   }
 
@@ -109,10 +109,10 @@ export class MulterService {
     return multer({
       storage: storeAsFile
         ? diskStorage({
-          destination: join(superRootPath(), AppConstants.defaultFileStorageFolder)
-        })
+            destination: join(superRootPath(), AppConstants.defaultFileStorageFolder),
+          })
         : memoryStorage(),
-      fileFilter: this.multerFileFilter(fileExtensions)
+      fileFilter: this.multerFileFilter(fileExtensions),
     }).any();
   }
 

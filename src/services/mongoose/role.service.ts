@@ -17,7 +17,7 @@ export class RoleService implements IRoleService<MongoIdType> {
     loggerFactory: ILoggerFactory,
     private readonly appDefaultRole: string,
     private readonly appDefaultRoleNoLogin: string,
-    private readonly settingsStore: SettingsStore
+    private readonly settingsStore: SettingsStore,
   ) {
     this.logger = loggerFactory(RoleService.name);
   }
@@ -31,7 +31,7 @@ export class RoleService implements IRoleService<MongoIdType> {
   toDto(role: IRole): RoleDto<MongoIdType> {
     return {
       id: role.id,
-      name: role.name
+      name: role.name,
     };
   }
 
@@ -127,7 +127,7 @@ export class RoleService implements IRoleService<MongoIdType> {
       const storedRole = await Role.findOne({ name: roleName });
       if (!storedRole) {
         const newRole = await Role.create({
-          name: roleName
+          name: roleName,
         });
         this._roles.push(newRole);
       } else {

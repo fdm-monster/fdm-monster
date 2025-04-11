@@ -50,8 +50,8 @@ describe(PrintCompletionController.name, () => {
       status: EVENT_TYPES.PrintStarted,
       fileName: "mycode.gcode",
       context: {
-        correlationId: "123"
-      }
+        correlationId: "123",
+      },
     });
     expect(completionEntryStart.id).toBeTruthy();
     const completionEntryDone = await printCompletionService.create({
@@ -60,8 +60,8 @@ describe(PrintCompletionController.name, () => {
       status: EVENT_TYPES.PrintDone,
       fileName: "mycode.gcode",
       context: {
-        correlationId: "123"
-      }
+        correlationId: "123",
+      },
     });
     expect(completionEntryDone.id).toBeTruthy();
 

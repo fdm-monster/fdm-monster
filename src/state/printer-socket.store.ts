@@ -5,7 +5,7 @@ import {
   PrinterCreatedEvent,
   printerEvents,
   PrintersDeletedEvent,
-  PrinterUpdatedEvent
+  PrinterUpdatedEvent,
 } from "@/constants/event.constants";
 import EventEmitter2 from "eventemitter2";
 import { SocketFactory } from "@/services/socket.factory";
@@ -26,7 +26,7 @@ export class PrinterSocketStore {
     loggerFactory: ILoggerFactory,
     private readonly socketFactory: SocketFactory,
     private readonly eventEmitter2: EventEmitter2,
-    private readonly printerCache: PrinterCache
+    private readonly printerCache: PrinterCache,
   ) {
     this.logger = loggerFactory(PrinterSocketStore.name);
 
@@ -40,7 +40,7 @@ export class PrinterSocketStore {
         printerId: s.printerId,
         printerType: s.printerType,
         socket: s.socketState,
-        api: s.apiState
+        api: s.apiState,
       };
     });
     return socketStatesById;
@@ -166,8 +166,8 @@ export class PrinterSocketStore {
       loginDto: {
         apiKey: printer.apiKey,
         printerURL: printer.printerURL,
-        printerType: printer.printerType
-      }
+        printerType: printer.printerType,
+      },
     });
     foundAdapter.resetSocketState();
   }

@@ -6,7 +6,7 @@ import {
   printerInFloorSchema,
   removePrinterInFloorSchema,
   updateFloorLevelSchema,
-  updateFloorNameSchema
+  updateFloorNameSchema,
 } from "../validators/floor-service.validation";
 import { PrinterCache } from "@/state/printer.cache";
 import { MongoIdType } from "@/shared.constants";
@@ -14,8 +14,7 @@ import { IFloorService } from "@/services/interfaces/floor.service.interface";
 import { CreateFloorDto, FloorDto, PositionDto, UpdateFloorDto } from "@/services/interfaces/floor.dto";
 
 export class FloorService implements IFloorService<MongoIdType> {
-  constructor(private readonly printerCache: PrinterCache) {
-  }
+  constructor(private readonly printerCache: PrinterCache) {}
 
   toDto(floor: IFloor): FloorDto<MongoIdType> {
     return {
@@ -26,8 +25,8 @@ export class FloorService implements IFloorService<MongoIdType> {
         x: p.x,
         y: p.y,
         printerId: p.printerId.toString(),
-        floorId: floor.id
-      }))
+        floorId: floor.id,
+      })),
     };
   }
 
@@ -48,7 +47,7 @@ export class FloorService implements IFloorService<MongoIdType> {
     return await this.create({
       name: "Default Floor",
       floor: 1,
-      printers: []
+      printers: [],
     });
   }
 
@@ -71,7 +70,7 @@ export class FloorService implements IFloorService<MongoIdType> {
       ...existingFloor,
       name: update.name,
       printers: update.printers,
-      floor: update.floor
+      floor: update.floor,
     };
     const input = await validateInput(floorUpdate, createOrUpdateFloorSchema(false));
 
@@ -104,11 +103,11 @@ export class FloorService implements IFloorService<MongoIdType> {
         $pull: {
           printers: {
             printerId: {
-              $in: [printerId]
-            }
-          }
-        }
-      }
+              $in: [printerId],
+            },
+          },
+        },
+      },
     );
   }
 
@@ -125,7 +124,7 @@ export class FloorService implements IFloorService<MongoIdType> {
     floor.printers = floor.printers.filter((position) => !(position.x === validInput.x && position.y === validInput.y));
 
     const positionIndex = floor.printers.findIndex(
-      (position) => position.printerId.toString() === validInput.printerId.toString()
+      (position) => position.printerId.toString() === validInput.printerId.toString(),
     );
     if (positionIndex !== -1) {
       floor.printers[positionIndex] = validInput as PositionDto<MongoIdType>;
@@ -145,7 +144,7 @@ export class FloorService implements IFloorService<MongoIdType> {
     await this.printerCache.getCachedPrinterOrThrowAsync(validInput.printerId);
 
     const foundPrinterInFloorIndex = floor.printers.findIndex(
-      (pif) => pif.printerId.toString() === validInput.printerId.toString()
+      (pif) => pif.printerId.toString() === validInput.printerId.toString(),
     );
     if (foundPrinterInFloorIndex === -1) return floor;
     floor.printers.splice(foundPrinterInFloorIndex, 1);

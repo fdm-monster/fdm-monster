@@ -31,7 +31,7 @@ export class TaskManagerService {
   constructor(
     loggerFactory: ILoggerFactory,
     private readonly cradleService: CradleService,
-    private readonly toadScheduler: ToadScheduler
+    private readonly toadScheduler: ToadScheduler,
   ) {
     this.logger = loggerFactory(TaskManagerService.name);
   }
@@ -54,7 +54,7 @@ export class TaskManagerService {
 
     this.taskStates[taskId] = {
       options: schedulerOptions,
-      timedTask
+      timedTask,
     };
 
     if (schedulerOptions.runOnce) {
@@ -81,7 +81,7 @@ export class TaskManagerService {
       if (failIfEnabled) {
         throw new JobValidationException(
           `The requested task with ID ${taskId} was not explicitly disabled and must be running already.`,
-          taskId
+          taskId,
         );
       }
       return;
@@ -181,22 +181,19 @@ export class TaskManagerService {
       if (e instanceof AwilixResolutionError) {
         throw new JobValidationException(
           `${prefix} had an awilix dependency resolution error. It can't be scheduled without fixing this problem. Inner error:\n` +
-          e.stack,
-          taskId
+            e.stack,
+          taskId,
         );
       } else {
         throw new JobValidationException(
           `${prefix} is not a registered awilix dependency. It can't be scheduled. Error:\n` + (e as Error).stack,
-          taskId
+          taskId,
         );
       }
     }
 
     if (typeof resolvedService?.run !== "function") {
-      throw new JobValidationException(
-        `${prefix} was resolved but it doesn't have a 'run()' method to call.`,
-        taskId
-      );
+      throw new JobValidationException(`${prefix} was resolved but it doesn't have a 'run()' method to call.`, taskId);
     }
 
     if (!schedulerOptions?.periodic && !schedulerOptions?.runOnce && !schedulerOptions?.runDelayed) {
@@ -221,7 +218,7 @@ export class TaskManagerService {
     ) {
       throw new JobValidationException(
         `${prefix} Provide a periodic timing parameter (milliseconds|seconds|minutes|hours|days)`,
-        taskId
+        taskId,
       );
     }
   }
@@ -271,7 +268,7 @@ export class TaskManagerService {
 
       taskState.lastError ??= {
         time: Date.now(),
-        error
+        error,
       };
 
       this.logger.error(`Task '${taskId}' threw an exception: ${error.stack}`);
@@ -288,7 +285,7 @@ export class TaskManagerService {
     if (!taskState?.timedTask || !taskState?.options) {
       throw new JobValidationException(
         `The requested task with ID ${taskId} was not registered properly ('timedTask' or 'options' missing).`,
-        taskId
+        taskId,
       );
     }
 
@@ -298,7 +295,7 @@ export class TaskManagerService {
     if (!schedulerOptions?.periodic) {
       throw new JobValidationException(
         `The requested task with ID ${taskId} is not periodic and cannot be enabled.`,
-        taskId
+        taskId,
       );
     }
 

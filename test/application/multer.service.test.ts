@@ -27,8 +27,8 @@ describe("MulterService", () => {
     fs.readdirSync.mockReturnValue([
       {
         name: "somefile.gcode",
-        isDirectory: () => false
-      }
+        isDirectory: () => false,
+      },
     ]);
     multerService.clearUploadsFolder();
   });
@@ -49,7 +49,7 @@ describe("MulterService", () => {
     const incorrectFile = { originalname: "file.gco" } as Express.Multer.File;
 
     expect(() =>
-      multerService.multerFileFilter([".gcode", ".bgcode"])(null, incorrectFile, fileFilterCallBack)
+      multerService.multerFileFilter([".gcode", ".bgcode"])(null, incorrectFile, fileFilterCallBack),
     ).toThrow();
   });
 
@@ -57,7 +57,7 @@ describe("MulterService", () => {
     const correctFile = { originalname: "file.gcode" } as Express.Multer.File;
 
     expect(() =>
-      multerService.multerFileFilter([".gcode", ".bgcode"])(null, correctFile, fileFilterCallBack)
+      multerService.multerFileFilter([".gcode", ".bgcode"])(null, correctFile, fileFilterCallBack),
     ).not.toThrow();
   });
 });

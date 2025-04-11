@@ -31,7 +31,7 @@ export class ClientBundleService {
 
   constructor(
     loggerFactory: ILoggerFactory,
-    private readonly githubService: GithubService
+    private readonly githubService: GithubService,
   ) {
     this.logger = loggerFactory(ClientBundleService.name);
   }
@@ -48,14 +48,14 @@ export class ClientBundleService {
     try {
       const [releases, latestRelease] = await Promise.all([
         this.githubService.getReleases(this.githubOwner, this.githubRepo),
-        this.githubService.getLatestRelease(this.githubOwner, this.githubRepo)
+        this.githubService.getLatestRelease(this.githubOwner, this.githubRepo),
       ]);
 
       return {
         minimum: { tag_name: this.minVersion },
         current: { tag_name: this.getClientVersion() },
         latest: latestRelease.data,
-        releases: releases.data
+        releases: releases.data,
       };
     } catch (e) {
       if (e instanceof RequestError) {
@@ -70,7 +70,7 @@ export class ClientBundleService {
     overrideAutoUpdate?: boolean,
     minimumVersion?: string,
     requestedVersion?: string,
-    allowDowngrade?: boolean
+    allowDowngrade?: boolean,
   ): Promise<UpdateResponse> {
     const clientAutoUpdate = AppConstants.enableClientDistAutoUpdateKey;
     const existingVersion = this.getClientVersion();
@@ -78,57 +78,67 @@ export class ClientBundleService {
 
     // Auto-update check
     if (!clientAutoUpdate && !overrideAutoUpdate) {
-      return this.createResponse(false, existingVersion, minimumVersion, requestedVersion, null,
-        "Client auto-update disabled, skipping");
+      return this.createResponse(
+        false,
+        existingVersion,
+        minimumVersion,
+        requestedVersion,
+        null,
+        "Client auto-update disabled, skipping",
+      );
     }
 
     // Client files existence check
     if (!existingVersion || !this.doesClientIndexHtmlExist()) {
-      const reason = !existingVersion
-        ? "Client package.json does not exist"
-        : "Client index.html could not be found";
+      const reason = !existingVersion ? "Client package.json does not exist" : "Client index.html could not be found";
 
-      return this.createResponse(true, existingVersion, minimumVersion, requestedVersion,
+      return this.createResponse(
+        true,
+        existingVersion,
+        minimumVersion,
+        requestedVersion,
         getMaximumOfVersionsSafe(minimumVersion, requestedVersion),
-        `${reason}, downloading new release`);
+        `${reason}, downloading new release`,
+      );
     }
 
     // Minimum version check
     const meetsMinimum = checkVersionSatisfiesMinimum(existingVersion, minimumVersion);
     if (!meetsMinimum) {
-      return this.createResponse(true, existingVersion, minimumVersion, requestedVersion,
+      return this.createResponse(
+        true,
+        existingVersion,
+        minimumVersion,
+        requestedVersion,
         getMaximumOfVersionsSafe(minimumVersion, requestedVersion),
-        `Client version ${existingVersion} below minimum ${minimumVersion}, downloading new release`);
+        `Client version ${existingVersion} below minimum ${minimumVersion}, downloading new release`,
+      );
     }
 
     // Handle requested version scenarios
     if (requestedVersion) {
-      return this.evaluateRequestedVersion(
-        existingVersion,
-        minimumVersion,
-        requestedVersion,
-        allowDowngrade
-      );
+      return this.evaluateRequestedVersion(existingVersion, minimumVersion, requestedVersion, allowDowngrade);
     }
 
     // Default case - already up to date
-    return this.createResponse(false, existingVersion, minimumVersion, requestedVersion,
+    return this.createResponse(
+      false,
+      existingVersion,
+      minimumVersion,
+      requestedVersion,
       getMaximumOfVersionsSafe(minimumVersion, requestedVersion),
-      `Client already satisfies minimum version ${minimumVersion}`);
+      `Client already satisfies minimum version ${minimumVersion}`,
+    );
   }
 
   async downloadClientUpdate(releaseTag: string): Promise<string> {
     // Get release info
-    const result = await this.githubService.getReleaseByTag(
-      this.githubOwner,
-      this.githubRepo,
-      releaseTag
-    );
+    const result = await this.githubService.getReleaseByTag(this.githubOwner, this.githubRepo, releaseTag);
     const release = result.data;
 
     // Find asset
     const assetName = `dist-client-${release.tag_name}.zip`;
-    const asset = release.assets.find(a => a.name === assetName);
+    const asset = release.assets.find((a) => a.name === assetName);
     if (!asset) {
       throw new NotFoundException(`Asset ${assetName} not found in release ${release.tag_name}`);
     }
@@ -144,13 +154,18 @@ export class ClientBundleService {
     currentVersion: string,
     minimumVersion: string,
     requestedVersion: string,
-    allowDowngrade?: boolean
+    allowDowngrade?: boolean,
   ): UpdateResponse {
     // Check if requested version meets minimum
     if (compare(requestedVersion, minimumVersion) === -1) {
-      return this.createResponse(false, currentVersion, minimumVersion, requestedVersion,
+      return this.createResponse(
+        false,
+        currentVersion,
+        minimumVersion,
         requestedVersion,
-        `Requested version ${requestedVersion} below minimum ${minimumVersion}, skipping`);
+        requestedVersion,
+        `Requested version ${requestedVersion} below minimum ${minimumVersion}, skipping`,
+      );
     }
 
     // Compare with current version
@@ -158,9 +173,14 @@ export class ClientBundleService {
 
     if (versionComparison === 0) {
       // Same version
-      return this.createResponse(false, currentVersion, minimumVersion, requestedVersion,
+      return this.createResponse(
+        false,
+        currentVersion,
+        minimumVersion,
         requestedVersion,
-        `Requested version ${requestedVersion} same as current, skipping`);
+        requestedVersion,
+        `Requested version ${requestedVersion} same as current, skipping`,
+      );
     } else if (versionComparison === -1) {
       // Downgrade
       return this.createResponse(
@@ -171,13 +191,18 @@ export class ClientBundleService {
         requestedVersion,
         allowDowngrade
           ? `Downgrading to ${requestedVersion} (above minimum ${minimumVersion})`
-          : `Downgrade not allowed, skipping`
+          : `Downgrade not allowed, skipping`,
       );
     } else {
       // Upgrade
-      return this.createResponse(true, currentVersion, minimumVersion, requestedVersion,
+      return this.createResponse(
+        true,
+        currentVersion,
+        minimumVersion,
         requestedVersion,
-        `Upgrading from ${currentVersion} to ${requestedVersion}`);
+        requestedVersion,
+        `Upgrading from ${currentVersion} to ${requestedVersion}`,
+      );
     }
   }
 
@@ -187,7 +212,7 @@ export class ClientBundleService {
     minimumVersion: string,
     requestedVersion: string | undefined,
     targetVersion: string | null,
-    reason: string
+    reason: string,
   ): UpdateResponse {
     return {
       shouldUpdate,
@@ -195,16 +220,12 @@ export class ClientBundleService {
       currentVersion,
       minimumVersion,
       targetVersion,
-      reason
+      reason,
     };
   }
 
   private async downloadZip(assetId: number, assetName: string): Promise<string> {
-    const assetResult = await this.githubService.requestAsset(
-      this.githubOwner,
-      this.githubRepo,
-      assetId
-    );
+    const assetResult = await this.githubService.requestAsset(this.githubOwner, this.githubRepo, assetId);
 
     const dir = join(this.storageRoot, AppConstants.defaultClientBundleZipsStorage);
     ensureDirExists(dir);
@@ -224,8 +245,9 @@ export class ClientBundleService {
     this.logger.debug(`Clearing contents of ${distPath}`);
     for (const item of await readdir(distPath)) {
       const itemPath = join(distPath, item);
-      await rm(itemPath, { force: true, recursive: true })
-        .catch(e => this.logger.error(`Failed to remove ${itemPath}: ${e.message}`));
+      await rm(itemPath, { force: true, recursive: true }).catch((e) =>
+        this.logger.error(`Failed to remove ${itemPath}: ${e.message}`),
+      );
     }
 
     // Extract the zip

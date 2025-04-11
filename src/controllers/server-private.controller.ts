@@ -31,7 +31,7 @@ export class ServerPrivateController {
     private readonly githubService: GithubService,
     private readonly logDumpService: LogDumpService,
     private readonly yamlService: YamlService,
-    private readonly multerService: MulterService
+    private readonly multerService: MulterService,
   ) {
     this.logger = loggerFactory(ServerPrivateController.name);
   }
@@ -64,7 +64,7 @@ export class ServerPrivateController {
       true,
       AppConstants.defaultClientMinimum,
       updateDto.downloadRelease,
-      updateDto.allowDowngrade
+      updateDto.allowDowngrade,
     );
 
     this.logger.log(`Will execute: ${willExecute?.shouldUpdate}, reason: ${willExecute?.reason}`);
@@ -76,7 +76,7 @@ export class ServerPrivateController {
         minimumVersion: willExecute.minimumVersion,
         shouldUpdate: willExecute.shouldUpdate,
         targetVersion: willExecute.targetVersion,
-        reason: willExecute?.reason
+        reason: willExecute?.reason,
       });
     }
 
@@ -91,7 +91,7 @@ export class ServerPrivateController {
       minimumVersion: willExecute.minimumVersion,
       shouldUpdate: willExecute.shouldUpdate,
       targetVersion: willExecute.targetVersion,
-      reason: willExecute?.reason
+      reason: willExecute?.reason,
     });
   }
 
@@ -111,7 +111,7 @@ export class ServerPrivateController {
 
     res.send({
       success: true,
-      spec
+      spec,
     });
   }
 

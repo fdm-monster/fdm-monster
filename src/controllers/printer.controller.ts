@@ -7,7 +7,7 @@ import {
   testPrinterApiSchema,
   updatePrinterConnectionSettingSchema,
   updatePrinterDisabledReasonSchema,
-  updatePrinterEnabledSchema
+  updatePrinterEnabledSchema,
 } from "./validation/printer-controller.validation";
 import { AppConstants } from "@/server.constants";
 import { printerResolveMiddleware } from "@/middleware/printer";
@@ -46,7 +46,7 @@ export class PrinterController {
     private readonly printerCache: PrinterCache,
     private readonly printerEventsCache: PrinterEventsCache,
     private readonly printerApi: IPrinterApi,
-    private readonly floorStore: FloorStore
+    private readonly floorStore: FloorStore,
   ) {
     this.logger = loggerFactory(PrinterController.name);
   }
@@ -285,7 +285,7 @@ export class PrinterController {
             } else {
               throw new FailedDependencyException(
                 `Reaching Printer service failed with status (code ${e.code})`,
-                e.response?.status
+                e.response?.status,
               );
             }
           }

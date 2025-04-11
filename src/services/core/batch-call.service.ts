@@ -29,7 +29,7 @@ export class BatchCallService<KeyType extends IdType = keyType> {
     private readonly printerApiFactory: PrinterApiFactory,
     private readonly printerCache: PrinterCache,
     private readonly printerSocketStore: PrinterSocketStore,
-    private readonly printerService: IPrinterService
+    private readonly printerService: IPrinterService,
   ) {
     this.logger = loggerFactory(BatchCallService.name);
   }
@@ -40,7 +40,7 @@ export class BatchCallService<KeyType extends IdType = keyType> {
 
   async batchTogglePrintersEnabled(
     printerIds: KeyType[],
-    enabled: boolean
+    enabled: boolean,
   ): Promise<
     {
       failure?: boolean;
@@ -151,14 +151,14 @@ export class BatchCallService<KeyType extends IdType = keyType> {
 
           return resolve({
             ...partialReprintState,
-            printerId
+            printerId,
           });
         } catch (e) {
           captureException(e);
           return resolve({
             connectionState: null,
             printerId,
-            reprintState: ReprintState.PrinterNotAvailable
+            reprintState: ReprintState.PrinterNotAvailable,
           });
         }
       });

@@ -14,7 +14,7 @@ export const printerEvents = {
   printersDeleted: "printersDeleted",
   printerUpdated: "printerUpdated",
   printerCreated: "printerCreated",
-  batchPrinterCreated: "batchPrinterCreated"
+  batchPrinterCreated: "batchPrinterCreated",
 };
 
 export interface PrinterCreatedEvent<T = IdType> {

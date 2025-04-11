@@ -24,29 +24,29 @@ export class Printer {
 
   @Column({
     nullable: false,
-    default: true
+    default: true,
   })
   enabled: boolean;
 
   @Column({
-    nullable: true
+    nullable: true,
   })
   disabledReason?: string;
 
   @Column({
-    nullable: true
+    nullable: true,
   })
   assignee?: string;
 
   @OneToMany(
     () => PrintCompletion,
-    (pc) => pc.printer
+    (pc) => pc.printer,
   )
   printCompletions: Relation<PrintCompletion>[];
 
   @OneToMany(
     () => PrinterGroup,
-    (pc) => pc.printer
+    (pc) => pc.printer,
   )
   printerGroups: Relation<PrinterGroup>[];
 

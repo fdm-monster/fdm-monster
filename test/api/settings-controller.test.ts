@@ -10,7 +10,7 @@ import {
   printerFileCleanSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
-  wizardSettingKey
+  wizardSettingKey,
 } from "@/constants/server-settings.constants";
 import { SettingsController } from "@/controllers/settings.controller";
 import { isSqliteModeTest } from "../typeorm.manager";
@@ -48,20 +48,20 @@ describe(SettingsController.name, () => {
       experimentalMoonrakerSupport: true,
       experimentalTypeormSupport: isSqliteModeTest(),
       experimentalClientSupport: false,
-      experimentalThumbnailSupport: false
+      experimentalThumbnailSupport: false,
     });
     expect(body[wizardSettingKey]).toMatchObject({
       wizardCompleted: true,
-      wizardVersion: AppConstants.currentWizardVersion
+      wizardVersion: AppConstants.currentWizardVersion,
     });
     expect(body[frontendSettingKey]).toMatchObject(getDefaultFrontendSettings());
     expect(body[printerFileCleanSettingKey]).toMatchObject(getDefaultFileCleanSettings());
     expect(body.connection).toMatchObject({
       clientIp: expect.any(String),
-      version: expect.any(String)
+      version: expect.any(String),
     });
     expect(body[timeoutSettingKey]).toMatchObject({
-      apiTimeout: 10000
+      apiTimeout: 10000,
     });
 
     // Removed property
@@ -76,21 +76,21 @@ describe(SettingsController.name, () => {
 
   it("should OK on PUT experimental moonraker support setting", async () => {
     const response = await request.put(experimentalMoonrakerSupport).send({
-      enabled: true
+      enabled: true,
     });
     expectOkResponse(response);
   });
 
   it("should OK on PUT experimental client support setting", async () => {
     const response = await request.put(experimentalClientSupport).send({
-      enabled: true
+      enabled: true,
     });
     expectOkResponse(response);
   });
 
   it("should OK on PATCH sentry diagnostics ", async () => {
     const response = await request.patch(sentryDiagnosticsRoute).send({
-      enabled: true
+      enabled: true,
     });
     expectOkResponse(response);
   });
@@ -100,12 +100,12 @@ describe(SettingsController.name, () => {
       gridCols: 6,
       gridRows: 6,
       largeTiles: false,
-      tilePreferCancelOverQuickStop: false
+      tilePreferCancelOverQuickStop: false,
     };
     const response = await request.put(frontendSettingsRoute).send(newFrontendSettings);
     expect(response.body).not.toBeNull();
     expect(response.body).toMatchObject({
-      [frontendSettingKey]: newFrontendSettings
+      [frontendSettingKey]: newFrontendSettings,
     });
     expectOkResponse(response);
   });
@@ -114,12 +114,12 @@ describe(SettingsController.name, () => {
     const newFileCleanSettings = {
       autoRemoveOldFilesBeforeUpload: true,
       autoRemoveOldFilesAtBoot: true,
-      autoRemoveOldFilesCriteriumDays: 30
+      autoRemoveOldFilesCriteriumDays: 30,
     };
     const response = await request.put(fileCleanSettingsRoute).send(newFileCleanSettings);
     expect(response.body).not.toBeNull();
     expect(response.body).toMatchObject({
-      [printerFileCleanSettingKey]: newFileCleanSettings
+      [printerFileCleanSettingKey]: newFileCleanSettings,
     });
     expectOkResponse(response);
   });
@@ -128,7 +128,7 @@ describe(SettingsController.name, () => {
     const newCredentialsSettings = {
       jwtExpiresIn: 120,
       refreshTokenAttempts: -1,
-      refreshTokenExpiry: 3600
+      refreshTokenExpiry: 3600,
     };
 
     const response = await request.put(credentialSettingsRoute).send(newCredentialsSettings);
@@ -138,21 +138,21 @@ describe(SettingsController.name, () => {
 
   it("should OK on PUT login-required", async () => {
     const response = await request.put(`${defaultRoute}/login-required`).send({
-      loginRequired: false
+      loginRequired: false,
     });
     expectOkResponse(response);
   });
 
   it("should OK on PUT registration-enabled", async () => {
     const response = await request.put(`${defaultRoute}/registration-enabled`).send({
-      registrationEnabled: true
+      registrationEnabled: true,
     });
     expectOkResponse(response);
   });
 
   it("should OK on PUT timeout", async () => {
     const response = await request.put(`${defaultRoute}/timeout`).send({
-      apiTimeout: 1000
+      apiTimeout: 1000,
     });
     expectOkResponse(response);
   });

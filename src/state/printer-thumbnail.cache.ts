@@ -33,7 +33,7 @@ export class PrinterThumbnailCache extends KeyDiffCache<CachedPrinterThumbnail> 
     private readonly printerCache: PrinterCache,
     private readonly printerApiFactory: PrinterApiFactory,
     private readonly eventEmitter2: EventEmitter2,
-    private readonly settingsStore: SettingsStore
+    private readonly settingsStore: SettingsStore,
   ) {
     super();
     this.logger = loggerFactory(PrinterThumbnailCache.name);
@@ -180,7 +180,7 @@ export class PrinterThumbnailCache extends KeyDiffCache<CachedPrinterThumbnail> 
     file: string,
     numberOfLines: number,
     fromEnd: boolean = false,
-    endCondition: string = "; thumbnail end"
+    endCondition: string = "; thumbnail end",
   ) {
     const printer = this.printerApiFactory.getScopedPrinter(login);
     const fileData = await printer.getFile(file);
@@ -228,7 +228,7 @@ export class PrinterThumbnailCache extends KeyDiffCache<CachedPrinterThumbnail> 
     const fileStream = createReadStream(gcodePath);
     const rl = createInterface({
       input: fileStream,
-      crlfDelay: Infinity // Handles cross-platform line endings
+      crlfDelay: Infinity, // Handles cross-platform line endings
     });
 
     let collecting = false;

@@ -5,7 +5,7 @@ import {
   printerFileCleanSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
-  wizardSettingKey
+  wizardSettingKey,
 } from "@/constants/server-settings.constants";
 import { MongoIdType } from "@/shared.constants";
 
@@ -63,35 +63,35 @@ const SettingsSchema = new Schema<ISettings>({
     wizardCompleted: {
       type: Boolean,
       default: false,
-      required: true
+      required: true,
     },
     wizardCompletedAt: {
       type: Date,
       default: null,
-      required: false
+      required: false,
     },
     wizardVersion: {
       type: Number,
       default: 0,
-      required: true
-    }
+      required: true,
+    },
   },
   [printerFileCleanSettingKey]: {
     autoRemoveOldFilesBeforeUpload: {
       type: Boolean,
       default: false,
-      required: true
+      required: true,
     },
     autoRemoveOldFilesAtBoot: {
       type: Boolean,
       default: false,
-      required: true
+      required: true,
     },
     autoRemoveOldFilesCriteriumDays: {
       type: Number,
       default: 14,
-      required: true
-    }
+      required: true,
+    },
   },
   [credentialSettingsKey]: {
     type: {
@@ -99,84 +99,84 @@ const SettingsSchema = new Schema<ISettings>({
         type: String,
         minlength: 10,
         trim: true,
-        required: true
+        required: true,
       },
       jwtExpiresIn: {
         type: Number,
-        required: true
+        required: true,
       },
       refreshTokenAttempts: {
         type: Number,
-        required: true
+        required: true,
       },
       refreshTokenExpiry: {
         type: Number,
-        required: true
-      }
+        required: true,
+      },
     },
-    required: true
+    required: true,
   },
   [serverSettingsKey]: {
     sentryDiagnosticsEnabled: {
       type: Boolean,
       default: false,
-      required: true
+      required: true,
     },
     loginRequired: {
       type: Boolean,
       default: true,
-      required: true
+      required: true,
     },
     registration: {
       type: Boolean,
       default: false,
-      required: true
+      required: true,
     },
     experimentalMoonrakerSupport: {
       type: Boolean,
       default: false,
-      required: true
+      required: true,
     },
     experimentalClientSupport: {
       type: Boolean,
       default: false,
-      required: true
+      required: true,
     },
     experimentalThumbnailSupport: {
       type: Boolean,
       default: false,
-      required: true
-    }
+      required: true,
+    },
   },
   [frontendSettingKey]: {
     gridCols: {
       type: Number,
       default: 8,
-      required: false
+      required: false,
     },
     gridRows: {
       type: Number,
       default: 8,
-      required: false
+      required: false,
     },
     largeTiles: {
       type: Boolean,
       default: false,
-      required: false
+      required: false,
     },
     tilePreferCancelOverQuickStop: {
       type: Boolean,
       default: false,
-      required: false
-    }
+      required: false,
+    },
   },
   [timeoutSettingKey]: {
     apiTimeout: {
       type: Number,
       default: 1000,
-      required: true
-    }
-  }
+      required: true,
+    },
+  },
 });
 
 export const Settings = model("ServerSettings", SettingsSchema);

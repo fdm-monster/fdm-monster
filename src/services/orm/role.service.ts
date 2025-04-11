@@ -19,7 +19,7 @@ export class RoleService extends BaseService(Role, RoleDto<SqliteIdType>) implem
     loggerFactory: ILoggerFactory,
     private readonly appDefaultRole: string,
     private readonly appDefaultRoleNoLogin: string,
-    private readonly settingsStore: SettingsStore
+    private readonly settingsStore: SettingsStore,
   ) {
     super(typeormService);
     this.logger = loggerFactory(RoleService.name);
@@ -50,7 +50,7 @@ export class RoleService extends BaseService(Role, RoleDto<SqliteIdType>) implem
   toDto(role: Role): RoleDto<SqliteIdType> {
     return {
       id: role.id,
-      name: role.name
+      name: role.name,
     };
   }
 
@@ -76,7 +76,7 @@ export class RoleService extends BaseService(Role, RoleDto<SqliteIdType>) implem
   authorizeRoles(
     requiredRoles: (string | SqliteIdType)[],
     assignedRoles: (string | SqliteIdType)[],
-    subset: boolean
+    subset: boolean,
   ): boolean {
     let isAuthorized = false;
 
@@ -140,7 +140,7 @@ export class RoleService extends BaseService(Role, RoleDto<SqliteIdType>) implem
       const storedRole = await this.repository.findOneBy({ name: roleName });
       if (!storedRole) {
         const newRole = await this.create({
-          name: roleName
+          name: roleName,
         });
         this._roles.push(newRole);
       } else {
