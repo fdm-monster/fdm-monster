@@ -6,7 +6,7 @@ import { z } from "zod";
 
 export type WsProtocol = "ws" | "wss";
 
-export class WebsocketAdapter {
+export abstract class WebsocketAdapter {
   socket?: WebSocket;
   eventEmittingAllowed: boolean = true;
   protected logger: LoggerService;
@@ -78,8 +78,7 @@ export class WebsocketAdapter {
    * @param {Event} error - The error event object.
    * @returns {Promise<void> | void} A promise that resolves when the error handling is complete, or void if no promise is returned.
    */
-  protected onError(error: ErrorEvent): Promise<void> | void {
-  }
+  protected abstract onError(error: ErrorEvent): Promise<void> | void;
 
   /**
    * Handle after opened event.
@@ -88,8 +87,7 @@ export class WebsocketAdapter {
    * @param {Event} event - The event object.
    * @returns {Promise<void> | void} A promise that resolves when the after opened handling is complete, or void if no promise is returned.
    */
-  protected afterOpened(event: WsEvent): Promise<void> | void {
-  }
+  protected abstract afterOpened(event: WsEvent): Promise<void> | void;
 
   /**
    * Handle after closed event.
@@ -98,8 +96,7 @@ export class WebsocketAdapter {
    * @param {CloseEvent} event - The event object.
    * @returns {Promise<void> | void} A promise that resolves when the after closed handling is complete, or void if no promise is returned.
    */
-  protected afterClosed(event: CloseEvent): Promise<void> | void {
-  }
+  protected abstract afterClosed(event: CloseEvent): Promise<void> | void;
 
   /**
    * Handle message event.
@@ -108,8 +105,7 @@ export class WebsocketAdapter {
    * @param {Data} event - The event object.
    * @returns {Promise<void> | void} A promise that resolves when the message handling is complete, or void if no promise is returned.
    */
-  protected onMessage(event: Data): Promise<void> | void {
-  }
+  protected abstract onMessage(event: Data): Promise<void> | void;
 
   /**
    * Handle open event.

@@ -9,7 +9,12 @@ import { Flags } from "@/services/moonraker/dto/octoprint-compat/api-printer.dto
 export const OctoprintType = 0;
 export const MoonrakerType = 1;
 export const PrinterTypes = [OctoprintType, MoonrakerType] as const;
-export type PrinterTypes = (typeof PrinterTypes)[number];
+
+export enum PrinterTypesEnum {
+  Octoprint = 0,
+  Moonraker = 1,
+}
+
 export type PrinterType = typeof OctoprintType | typeof MoonrakerType;
 
 export interface FdmCurrentMessageDto {

@@ -43,7 +43,7 @@ export class PrinterWebsocketRestoreTask {
         (socket.apiState !== API_STATE.unset && !socket.lastMessageReceivedTimestamp) ||
         (socket.lastMessageReceivedTimestamp && Date.now() - socket.lastMessageReceivedTimestamp > 10 * 1000)
       ) {
-        const result = await this.octoprintClient.getConnection(socket.login!);
+        const result = await this.octoprintClient.getConnection(socket.login);
 
         try {
           if (result.data?.current?.state !== "Closed") {
