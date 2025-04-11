@@ -1,32 +1,33 @@
 import { ISettings } from "@/models/Settings";
 import { SettingsDto } from "@/services/interfaces/settings.dto";
 import { IdType } from "@/shared.constants";
-import { z } from "zod";
 import {
-  credentialSettingPatchSchema,
+  credentialSettingUpdateSchema,
   fileCleanSettingsUpdateSchema,
   frontendSettingsUpdateSchema,
+  jwtSecretCredentialSettingUpdateSchema,
   serverSettingsUpdateSchema,
   timeoutSettingsUpdateSchema,
   wizardUpdateSchema
 } from "@/services/validators/settings-service.validation";
+import { z } from "zod";
 
-export interface ISettingsService<KeyType = IdType, Entity = ISettings> {
-  toDto(entity: Entity): SettingsDto<KeyType>;
+export interface ISettingsService<KeyType = IdType, Entity = ISettings<KeyType>> {
+  toDto(entity: Entity): SettingsDto;
 
   getOrCreate(): Promise<Entity>;
 
-  migrateSettingsRuntime(knownSettings: Partial<Entity>): any;
+  updateFileCleanSettings(update: z.infer<typeof fileCleanSettingsUpdateSchema>): Promise<Entity>;
 
-  patchFileCleanSettings(fileClean: z.infer<typeof fileCleanSettingsUpdateSchema>): Promise<Entity>;
+  updateWizardSettings(update: z.infer<typeof wizardUpdateSchema>): Promise<Entity>;
 
-  patchWizardSettings(patch: z.infer<typeof wizardUpdateSchema>): Promise<Entity>;
+  updateFrontendSettings(update: z.infer<typeof frontendSettingsUpdateSchema>): Promise<Entity>;
 
-  updateFrontendSettings(patchUpdate: z.infer<typeof frontendSettingsUpdateSchema>): Promise<Entity>;
+  updateJwtSecretCredentialSetting(update: z.infer<typeof jwtSecretCredentialSettingUpdateSchema>): Promise<Entity>;
 
-  patchCredentialSettings(patchUpdate: z.infer<typeof credentialSettingPatchSchema>): Promise<Entity>;
+  updateCredentialSettings(update: z.infer<typeof credentialSettingUpdateSchema>): Promise<Entity>;
 
-  patchServerSettings(patchUpdate: z.infer<typeof serverSettingsUpdateSchema>): Promise<Entity>;
+  updateServerSettings(update: z.infer<typeof serverSettingsUpdateSchema>): Promise<Entity>;
 
-  updateTimeoutSettings(patchUpdate: z.infer<typeof timeoutSettingsUpdateSchema>): Promise<Entity>;
+  updateTimeoutSettings(update: z.infer<typeof timeoutSettingsUpdateSchema>): Promise<Entity>;
 }

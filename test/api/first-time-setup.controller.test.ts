@@ -27,7 +27,7 @@ describe(FirstTimeSetupController.name, () => {
   const validateWizard = async (input: any) => await request.post(validateWizardRoute).send(input);
   const completeSetup = async (input: any) => await request.post(completeSetupRoute).send(input);
   const resetWizard = async () => {
-    await settingsService.patchWizardSettings({
+    await settingsService.updateWizardSettings({
       wizardCompleted: false,
       wizardCompletedAt: null,
       wizardVersion: 0,

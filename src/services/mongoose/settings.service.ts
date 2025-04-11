@@ -2,13 +2,7 @@ import { Settings } from "@/models";
 import {
   credentialSettingsKey,
   frontendSettingKey,
-  getDefaultCredentialSettings,
-  getDefaultFileCleanSettings,
-  getDefaultFrontendSettings,
-  getDefaultServerSettings,
   getDefaultSettings,
-  getDefaultTimeout,
-  getDefaultWizardSettings,
   printerFileCleanSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
@@ -16,9 +10,10 @@ import {
 } from "@/constants/server-settings.constants";
 import { validateInput } from "@/handlers/validators";
 import {
-  credentialSettingPatchSchema,
+  credentialSettingUpdateSchema,
   fileCleanSettingsUpdateSchema,
   frontendSettingsUpdateSchema,
+  jwtSecretCredentialSettingUpdateSchema,
   serverSettingsUpdateSchema,
   timeoutSettingsUpdateSchema,
   wizardUpdateSchema
@@ -28,9 +23,11 @@ import { ISettings } from "@/models/Settings";
 import { SettingsDto } from "@/services/interfaces/settings.dto";
 import { MongoIdType } from "@/shared.constants";
 import { z } from "zod";
+import { migrateSettingsRuntime } from "@/shared/runtime-settings.migration";
+
 
 export class SettingsService implements ISettingsService<MongoIdType> {
-  toDto(entity: ISettings<MongoIdType>): SettingsDto<MongoIdType> {
+  toDto(entity: ISettings): SettingsDto {
     return {
       // Credential settings are not shared with the client
       [serverSettingsKey]: {
@@ -54,59 +51,13 @@ export class SettingsService implements ISettingsService<MongoIdType> {
       return defaultSettings;
     } else {
       // Perform patch of settings
-      settings = this.migrateSettingsRuntime(settings);
+      settings = migrateSettingsRuntime(settings);
 
       return (await Settings.findOneAndUpdate({ _id: settings.id }, settings, { new: true }))!;
     }
   }
 
-  /**
-   * Patch the given settings object manually - runtime migration strategy
-   */
-  migrateSettingsRuntime(knownSettings: Partial<ISettings>): ISettings {
-    const doc = knownSettings; // alias _doc also works
-    if (!doc[printerFileCleanSettingKey]) {
-      doc[printerFileCleanSettingKey] = getDefaultFileCleanSettings();
-    } else {
-      // Remove superfluous settings
-      doc[printerFileCleanSettingKey] = {
-        autoRemoveOldFilesBeforeUpload: doc[printerFileCleanSettingKey].autoRemoveOldFilesBeforeUpload,
-        autoRemoveOldFilesAtBoot: doc[printerFileCleanSettingKey].autoRemoveOldFilesBeforeUpload,
-        autoRemoveOldFilesCriteriumDays: doc[printerFileCleanSettingKey].autoRemoveOldFilesCriteriumDays
-      };
-    }
-
-    // Server settings exist, but need updating with new ones if they don't exist.
-    if (!doc[wizardSettingKey]) {
-      doc[wizardSettingKey] = getDefaultWizardSettings();
-    }
-    if (!doc[timeoutSettingKey]) {
-      doc[timeoutSettingKey] = getDefaultTimeout();
-    }
-    if (!doc[serverSettingsKey]) {
-      doc[serverSettingsKey] = getDefaultServerSettings();
-    } else {
-      // Remove superfluous settings
-      doc[serverSettingsKey] = {
-        loginRequired: doc[serverSettingsKey].loginRequired,
-        registration: doc[serverSettingsKey].registration,
-        experimentalClientSupport: doc[serverSettingsKey].experimentalClientSupport,
-        experimentalMoonrakerSupport: doc[serverSettingsKey].experimentalMoonrakerSupport,
-        sentryDiagnosticsEnabled: doc[serverSettingsKey].sentryDiagnosticsEnabled,
-        experimentalThumbnailSupport: doc[serverSettingsKey].experimentalThumbnailSupport
-      };
-    }
-    if (!doc[credentialSettingsKey]) {
-      doc[credentialSettingsKey] = getDefaultCredentialSettings();
-    }
-    if (!doc[frontendSettingKey]) {
-      doc[frontendSettingKey] = getDefaultFrontendSettings();
-    }
-
-    return doc as ISettings;
-  }
-
-  async patchFileCleanSettings(patchUpdate: z.infer<typeof fileCleanSettingsUpdateSchema>) {
+  async updateFileCleanSettings(patchUpdate: z.infer<typeof fileCleanSettingsUpdateSchema>) {
     const validatedInput = await validateInput(patchUpdate, fileCleanSettingsUpdateSchema);
 
     const settingsDoc = await this.getOrCreate();
@@ -116,7 +67,7 @@ export class SettingsService implements ISettingsService<MongoIdType> {
     }))!;
   }
 
-  async patchWizardSettings(patchUpdate: z.infer<typeof wizardUpdateSchema>) {
+  async updateWizardSettings(patchUpdate: z.infer<typeof wizardUpdateSchema>) {
     const validatedInput = await validateInput(patchUpdate, wizardUpdateSchema);
 
     const settingsDoc = await this.getOrCreate();
@@ -137,8 +88,8 @@ export class SettingsService implements ISettingsService<MongoIdType> {
     }))!;
   }
 
-  async patchCredentialSettings(patchUpdate: z.infer<typeof credentialSettingPatchSchema>) {
-    const validatedInput = await validateInput(patchUpdate, credentialSettingPatchSchema);
+  async updateJwtSecretCredentialSetting(update: z.infer<typeof jwtSecretCredentialSettingUpdateSchema>) {
+    const validatedInput = await validateInput(update, jwtSecretCredentialSettingUpdateSchema);
 
     const settingsDoc = await this.getOrCreate();
     const credentialSettings = settingsDoc[credentialSettingsKey];
@@ -148,7 +99,18 @@ export class SettingsService implements ISettingsService<MongoIdType> {
     }))!;
   }
 
-  async patchServerSettings(patchUpdate: z.infer<typeof serverSettingsUpdateSchema>) {
+  async updateCredentialSettings(patchUpdate: z.infer<typeof credentialSettingUpdateSchema>) {
+    const validatedInput = await validateInput(patchUpdate, credentialSettingUpdateSchema);
+
+    const settingsDoc = await this.getOrCreate();
+    const credentialSettings = settingsDoc[credentialSettingsKey];
+    Object.assign(credentialSettings, validatedInput);
+    return (await Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
+      new: true
+    }))!;
+  }
+
+  async updateServerSettings(patchUpdate: z.infer<typeof serverSettingsUpdateSchema>) {
     const validatedInput = await validateInput(patchUpdate, serverSettingsUpdateSchema);
 
     const settingsDoc = await this.getOrCreate();

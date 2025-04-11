@@ -16,7 +16,7 @@ export function BaseService<
   abstract class BaseServiceHost implements IBaseService<T, DTO, CreateDTO, UpdateDTO> {
     repository: Repository<T>;
 
-    protected constructor(protected readonly typeormService: TypeormService) {
+    constructor(protected readonly typeormService: TypeormService) {
       this.repository = typeormService.getDataSource().getRepository(entity);
     }
 

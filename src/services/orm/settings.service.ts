@@ -2,36 +2,32 @@ import { Settings } from "@/entities";
 import {
   credentialSettingsKey,
   frontendSettingKey,
-  getDefaultCredentialSettings,
-  getDefaultFileCleanSettings,
-  getDefaultFrontendSettings,
-  getDefaultServerSettings,
   getDefaultSettings,
-  getDefaultTimeout,
-  getDefaultWizardSettings,
   printerFileCleanSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
   wizardSettingKey
 } from "@/constants/server-settings.constants";
 import { BaseService } from "@/services/orm/base.service";
-import {
-  CredentialSettingsDto,
-  FileCleanSettingsDto,
-  FrontendSettingsDto,
-  ServerSettingsDto,
-  SettingsDto,
-  TimeoutSettingsDto,
-  WizardSettingsDto
-} from "../interfaces/settings.dto";
+import { SettingsDto } from "../interfaces/settings.dto";
 import { SqliteIdType } from "@/shared.constants";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
-import { ICredentialSettings } from "@/models/Settings";
+import { z } from "zod";
+import {
+  credentialSettingUpdateSchema,
+  fileCleanSettingsUpdateSchema,
+  frontendSettingsUpdateSchema,
+  jwtSecretCredentialSettingUpdateSchema,
+  serverSettingsUpdateSchema,
+  timeoutSettingsUpdateSchema,
+  wizardUpdateSchema
+} from "@/services/validators/settings-service.validation";
+import { migrateSettingsRuntime } from "@/shared/runtime-settings.migration";
 
 export class SettingsService
   extends BaseService(Settings, SettingsDto)
   implements ISettingsService<SqliteIdType, Settings> {
-  toDto(entity: Settings): SettingsDto<SqliteIdType> {
+  toDto(entity: Settings): SettingsDto {
     return {
       [serverSettingsKey]: {
         ...entity[serverSettingsKey],
@@ -50,7 +46,7 @@ export class SettingsService
     if (!settings) {
       return await this.create(getDefaultSettings());
     } else {
-      settings = this.migrateSettingsRuntime(settings);
+      settings = migrateSettingsRuntime(settings);
 
       const settingsId = settings.id;
       return await this.update(settingsId, settings);
@@ -62,70 +58,51 @@ export class SettingsService
     return settings[serverSettingsKey];
   }
 
-  async patchServerSettings(serverSettingsPartial: ServerSettingsDto) {
-    const entity = await this.getOrCreate();
-    if (!entity[serverSettingsKey]) {
-      throw new Error("No existing server settings found, cant patch");
-    }
-
-    const newServerSettings = {
-      ...entity[serverSettingsKey],
-      ...serverSettingsPartial
-    };
-
-    return await this.updateServerSettings(newServerSettings);
-  }
-
-  async updateServerSettings(serverSettings: ServerSettingsDto) {
+  async updateServerSettings(serverSettings: z.infer<typeof serverSettingsUpdateSchema>) {
     const entity = await this.getOrCreate();
     entity[serverSettingsKey] = serverSettings;
     await this.update(entity.id, entity);
     return entity;
   }
 
-  async updateCredentialSettings(credentialSettings: CredentialSettingsDto) {
+  async updateJwtSecretCredentialSetting(update: z.infer<typeof jwtSecretCredentialSettingUpdateSchema>) {
     const entity = await this.getOrCreate();
-    entity[credentialSettingsKey] = credentialSettings;
+    entity[credentialSettingsKey].jwtSecret = update.jwtSecret;
     await this.update(entity.id, entity);
     return entity;
   }
 
-  async updateFileCleanSettings(fileCleanSettings: FileCleanSettingsDto) {
+  async updateCredentialSettings(credentialSettings: z.infer<typeof credentialSettingUpdateSchema>) {
+    const entity = await this.getOrCreate();
+    entity[credentialSettingsKey].refreshTokenExpiry = credentialSettings.refreshTokenExpiry;
+    entity[credentialSettingsKey].refreshTokenAttempts = credentialSettings.refreshTokenAttempts;
+    entity[credentialSettingsKey].jwtExpiresIn = credentialSettings.jwtExpiresIn;
+    await this.update(entity.id, entity);
+    return entity;
+  }
+
+  async updateFileCleanSettings(fileCleanSettings: z.infer<typeof fileCleanSettingsUpdateSchema>) {
     const entity = await this.getOrCreate();
     entity[printerFileCleanSettingKey] = fileCleanSettings;
     await this.update(entity.id, entity);
     return entity;
   }
 
-  async updateFrontendSettings(frontendSettings: FrontendSettingsDto) {
+  async updateFrontendSettings(frontendSettings: z.infer<typeof frontendSettingsUpdateSchema>) {
     const entity = await this.getOrCreate();
     entity[frontendSettingKey] = frontendSettings;
     await this.update(entity.id, entity);
     return entity;
   }
 
-  async updateTimeoutSettings(timeoutSettings: TimeoutSettingsDto) {
+  async updateTimeoutSettings(timeoutSettings: z.infer<typeof timeoutSettingsUpdateSchema>) {
     const entity = await this.getOrCreate();
     entity[timeoutSettingKey] = timeoutSettings;
     await this.update(entity.id, entity);
     return entity;
   }
 
-  async patchWizardSettings(wizardSettingsPartial: WizardSettingsDto) {
-    const entity = await this.getOrCreate();
-    if (!entity[wizardSettingKey]) {
-      throw new Error("No existing wizard settings found, cant patch");
-    }
-
-    const newWizardSettings = {
-      ...entity[wizardSettingKey],
-      ...wizardSettingsPartial
-    };
-
-    return await this.updateWizardSettings(newWizardSettings);
-  }
-
-  async updateWizardSettings(wizardSettings: WizardSettingsDto) {
+  async updateWizardSettings(wizardSettings: z.infer<typeof wizardUpdateSchema>) {
     const entity = await this.getOrCreate();
     entity[wizardSettingKey] = wizardSettings;
     await this.update(entity.id, entity);
@@ -135,77 +112,6 @@ export class SettingsService
   async getOptional() {
     const settingsList = await this.repository.find({ take: 1 });
     return settingsList?.length ? settingsList[0] : null;
-  }
-
-  migrateSettingsRuntime(knownSettings: Settings): Settings {
-    const entity = knownSettings; // alias _doc also works
-    if (!entity[printerFileCleanSettingKey]) {
-      entity[printerFileCleanSettingKey] = getDefaultFileCleanSettings();
-    } else {
-      // Remove superfluous settings
-      entity[printerFileCleanSettingKey] = {
-        autoRemoveOldFilesBeforeUpload: entity[printerFileCleanSettingKey].autoRemoveOldFilesBeforeUpload,
-        autoRemoveOldFilesAtBoot: entity[printerFileCleanSettingKey].autoRemoveOldFilesBeforeUpload,
-        autoRemoveOldFilesCriteriumDays: entity[printerFileCleanSettingKey].autoRemoveOldFilesCriteriumDays
-      };
-    }
-
-    // Server settings exist, but need updating with new ones if they don't exist.
-    if (!entity[wizardSettingKey]) {
-      entity[wizardSettingKey] = getDefaultWizardSettings();
-    }
-    if (!entity[timeoutSettingKey]) {
-      entity[timeoutSettingKey] = getDefaultTimeout();
-    }
-    if (!entity[serverSettingsKey]) {
-      entity[serverSettingsKey] = getDefaultServerSettings();
-    } else {
-      // Remove superfluous settings
-      entity[serverSettingsKey] = {
-        loginRequired: entity[serverSettingsKey].loginRequired,
-        registration: entity[serverSettingsKey].registration,
-        experimentalClientSupport: entity[serverSettingsKey].experimentalClientSupport,
-        experimentalMoonrakerSupport: entity[serverSettingsKey].experimentalMoonrakerSupport,
-        sentryDiagnosticsEnabled: entity[serverSettingsKey].sentryDiagnosticsEnabled,
-        experimentalThumbnailSupport: entity[serverSettingsKey].experimentalThumbnailSupport || false
-      };
-    }
-    if (!entity[credentialSettingsKey]) {
-      entity[credentialSettingsKey] = getDefaultCredentialSettings();
-    }
-    if (!entity[frontendSettingKey]) {
-      entity[frontendSettingKey] = getDefaultFrontendSettings();
-    }
-
-    return entity;
-  }
-
-  async patchCredentialSettings(patchUpdate: Partial<ICredentialSettings>): Promise<Settings> {
-    const entity = await this.getOrCreate();
-    if (!entity[credentialSettingsKey]) {
-      throw new Error("No existing wizard settings found, cant patch");
-    }
-
-    const newCredentialSettings = {
-      ...entity[credentialSettingsKey],
-      ...patchUpdate
-    };
-
-    return await this.updateCredentialSettings(newCredentialSettings);
-  }
-
-  async patchFileCleanSettings(patchUpdate: Partial<FileCleanSettingsDto>): Promise<Settings> {
-    const entity = await this.getOrCreate();
-    if (!entity[printerFileCleanSettingKey]) {
-      throw new Error("No existing wizard settings found, cant patch");
-    }
-
-    const newFileCleanSettings = {
-      ...entity[printerFileCleanSettingKey],
-      ...patchUpdate
-    };
-
-    return await this.updateFileCleanSettings(newFileCleanSettings);
   }
 
   async setLoginRequired(enabled: boolean): Promise<Settings> {

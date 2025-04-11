@@ -3,6 +3,7 @@ import { DITokens } from "@/container.tokens";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
 import { setupTestApp } from "../test-server";
 import { SettingsService } from "@/services/mongoose/settings.service";
+import { migrateSettingsRuntime } from "@/shared/runtime-settings.migration";
 
 let container: AwilixContainer;
 let settingsService: ISettingsService;
@@ -17,7 +18,7 @@ describe(SettingsService.name, () => {
     const settings = await settingsService.getOrCreate();
     expect(settings).toBeTruthy();
 
-    const freshSettings = settingsService.migrateSettingsRuntime(settings);
+    const freshSettings = migrateSettingsRuntime(settings);
     expect(freshSettings).toBeTruthy();
     const dto = settingsService.toDto(freshSettings);
     expect(dto).toBeTruthy();

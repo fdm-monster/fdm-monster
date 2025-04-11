@@ -29,8 +29,6 @@ export const getDefaultServerSettings = (): ServerSettingsDto => ({
 
 export const credentialSettingsKey = "credentials";
 export const getDefaultCredentialSettings = (): CredentialSettingsDto => ({
-  // Verification and signing of JWT tokens, can be changed on the fly
-  jwtSecret: uuidv4(),
   // Signing only, verification is automatic
   jwtExpiresIn: AppConstants.DEFAULT_JWT_EXPIRES_IN,
   // Verification only, bringing into effect requires updating all stored refresh tokens
