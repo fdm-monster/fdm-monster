@@ -6,6 +6,7 @@ import {
   getDefaultFileCleanSettings,
   getDefaultFrontendSettings,
   getDefaultServerSettings,
+  getDefaultSettings,
   getDefaultTimeout,
   getDefaultWizardSettings,
   printerFileCleanSettingKey,
@@ -44,22 +45,16 @@ export class SettingsService
   }
 
   async getOrCreate() {
-    let settings = await this.get();
+    let settings = await this.getOptional();
 
     if (!settings) {
-      return await this.create({
-        [serverSettingsKey]: getDefaultServerSettings(),
-        [credentialSettingsKey]: getDefaultCredentialSettings(),
-        [wizardSettingKey]: getDefaultWizardSettings(),
-        [printerFileCleanSettingKey]: getDefaultFileCleanSettings(),
-        [frontendSettingKey]: getDefaultFrontendSettings(),
-        [timeoutSettingKey]: getDefaultTimeout()
-      });
+      return await this.create(getDefaultSettings());
     } else {
       settings = this.migrateSettingsRuntime(settings);
-    }
 
-    return settings;
+      const settingsId = settings.id;
+      return await this.update(settingsId, settings);
+    }
   }
 
   async getServerSettings() {
@@ -137,7 +132,7 @@ export class SettingsService
     return entity;
   }
 
-  async get() {
+  async getOptional() {
     const settingsList = await this.repository.find({ take: 1 });
     return settingsList?.length ? settingsList[0] : null;
   }
