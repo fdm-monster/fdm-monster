@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { FloorStore } from "@/state/floor.store";
 import { PERMS } from "@/constants/authorization.constants";
 import { AppConstants } from "@/server.constants";
-import { POST, GET, PATCH, DELETE, before, route } from "awilix-express";
+import { before, DELETE, GET, PATCH, POST, route } from "awilix-express";
 import { authenticate, permission } from "@/middleware/authenticate";
 import { ParamId } from "@/middleware/param-converter.middleware";
 
@@ -10,9 +10,9 @@ import { ParamId } from "@/middleware/param-converter.middleware";
 @before([authenticate()])
 export class FloorController {
   constructor(
-    private readonly floorStore: FloorStore,
-    private readonly isTypeormMode: boolean,
-  ) {}
+    private readonly floorStore: FloorStore
+  ) {
+  }
 
   @GET()
   @route("/")

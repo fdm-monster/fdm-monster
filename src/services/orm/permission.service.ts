@@ -13,7 +13,7 @@ export class PermissionService
   extends BaseService(Permission, PermissionDto<SqliteIdType>)
   implements IPermissionService<SqliteIdType, Permission>
 {
-  private logger: LoggerService;
+  private readonly logger: LoggerService;
   private _permissions: Permission[] = [];
 
   constructor(loggerFactory: ILoggerFactory, typeormService: TypeormService) {

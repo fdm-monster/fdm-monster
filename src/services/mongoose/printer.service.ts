@@ -5,9 +5,15 @@ import { validateInput } from "@/handlers/validators";
 import {
   createPrinterSchema,
   updatePrinterDisabledReasonSchema,
-  updatePrinterEnabledSchema,
+  updatePrinterEnabledSchema
 } from "../validators/printer-service.validation";
-import { printerEvents } from "@/constants/event.constants";
+import {
+  BatchPrinterCreatedEvent,
+  PrinterCreatedEvent,
+  printerEvents,
+  PrintersDeletedEvent,
+  PrinterUpdatedEvent
+} from "@/constants/event.constants";
 import { LoggerService } from "@/handlers/logger";
 import { MongoIdType } from "@/shared.constants";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
@@ -22,7 +28,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
 
   constructor(
     private readonly eventEmitter2: EventEmitter2,
-    loggerFactory: ILoggerFactory,
+    loggerFactory: ILoggerFactory
   ) {
     this.logger = loggerFactory(PrinterService.name);
   }
@@ -36,13 +42,13 @@ export class PrinterService implements IPrinterService<MongoIdType> {
       dateAdded: entity.dateAdded,
       apiKey: entity.apiKey,
       printerURL: entity.printerURL,
-      printerType: entity.printerType,
+      printerType: entity.printerType
     };
   }
 
   async list() {
     return Printer.find({}, null, {
-      sort: { dateAdded: 1 },
+      sort: { dateAdded: 1 }
     });
   }
 
@@ -57,12 +63,6 @@ export class PrinterService implements IPrinterService<MongoIdType> {
     return printer;
   }
 
-  /**
-   * Stores a new printer into the database.
-   * @param {Object} newPrinter object to create.
-   * @param {boolean} emitEvent
-   * @throws {Error} If the printer is not correctly provided.
-   */
   async create(newPrinter: IPrinter, emitEvent = true) {
     if (!newPrinter) throw new Error("Missing printer to create");
 
@@ -70,7 +70,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
     mergedPrinter.dateAdded = Date.now();
     const printer = await Printer.create(mergedPrinter);
     if (emitEvent) {
-      this.eventEmitter2.emit(printerEvents.printerCreated, { printer });
+      this.eventEmitter2.emit(printerEvents.printerCreated, { printer } satisfies PrinterCreatedEvent<string>);
     }
     return printer;
   }
@@ -94,14 +94,14 @@ export class PrinterService implements IPrinterService<MongoIdType> {
     printer.name = name;
     printer.printerType = printerType;
     await printer.save();
-    this.eventEmitter2.emit(printerEvents.printerUpdated, { printer });
+    this.eventEmitter2.emit(printerEvents.printerUpdated, { printer } satisfies PrinterUpdatedEvent<string>);
     return printer;
   }
 
   async deleteMany(printerIds: MongoIdType[], emitEvent = true) {
     await Printer.deleteMany({ _id: { $in: printerIds } });
     if (emitEvent) {
-      this.eventEmitter2.emit(printerEvents.printersDeleted, { printerIds });
+      this.eventEmitter2.emit(printerEvents.printersDeleted, { printerIds } satisfies PrintersDeletedEvent<string>);
     }
   }
 
@@ -110,7 +110,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
 
     await Printer.findOneAndDelete(filter);
     if (emitEvent) {
-      this.eventEmitter2.emit(printerEvents.printersDeleted, { printerIds: [printerId] });
+      this.eventEmitter2.emit(printerEvents.printersDeleted, { printerIds: [printerId] } satisfies PrintersDeletedEvent<string>);
     }
   }
 
@@ -129,7 +129,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
     }
 
     this.logger.log("Batch create succeeded");
-    this.eventEmitter2.emit(printerEvents.batchPrinterCreated, { printers: newPrinters });
+    this.eventEmitter2.emit(printerEvents.batchPrinterCreated, { printers: newPrinters } satisfies BatchPrinterCreatedEvent<string>);
     return newPrinters;
   }
 
@@ -138,9 +138,11 @@ export class PrinterService implements IPrinterService<MongoIdType> {
     await this.get(printerId);
     const printer = await Printer.findByIdAndUpdate(printerId, update, {
       new: true,
-      useFindAndModify: false,
+      useFindAndModify: false
     });
-    this.eventEmitter2.emit(printerEvents.printerUpdated, { printer });
+    if (printer) {
+      this.eventEmitter2.emit(printerEvents.printerUpdated, { printer } satisfies PrinterUpdatedEvent<string>);
+    }
     return printer;
   }
 
@@ -149,18 +151,20 @@ export class PrinterService implements IPrinterService<MongoIdType> {
     await this.get(printerId);
     const printer = await Printer.findByIdAndUpdate(printerId, update, {
       new: true,
-      useFindAndModify: false,
+      useFindAndModify: false
     });
-    this.eventEmitter2.emit(printerEvents.printerUpdated, { printer });
+    if (printer) {
+      this.eventEmitter2.emit(printerEvents.printerUpdated, { printer } satisfies PrinterUpdatedEvent<string>);
+    }
     return printer;
   }
 
   async updateEnabled(printerId: MongoIdType, enabled: boolean) {
     const update = enabled
       ? {
-          enabled,
-          disabledReason: null,
-        }
+        enabled,
+        disabledReason: null
+      }
       : { enabled };
 
     await validateInput(update, updatePrinterEnabledSchema);
@@ -168,9 +172,11 @@ export class PrinterService implements IPrinterService<MongoIdType> {
 
     const printer = await Printer.findByIdAndUpdate(printerId, update, {
       new: true,
-      useFindAndModify: false,
+      useFindAndModify: false
     });
-    this.eventEmitter2.emit(printerEvents.printerUpdated, { printer });
+    if (printer) {
+      this.eventEmitter2.emit(printerEvents.printerUpdated, { printer } satisfies PrinterUpdatedEvent<string>);
+    }
     return printer!;
   }
 
@@ -178,7 +184,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
     const enabled = !disabledReason?.length;
     const update = {
       disabledReason,
-      enabled,
+      enabled
     };
 
     await validateInput(update, updatePrinterDisabledReasonSchema);
@@ -186,16 +192,18 @@ export class PrinterService implements IPrinterService<MongoIdType> {
 
     const printer = await Printer.findByIdAndUpdate(printerId, update, {
       new: true,
-      useFindAndModify: false,
+      useFindAndModify: false
     });
-    this.eventEmitter2.emit(printerEvents.printerUpdated, { printer });
+    if (printer) {
+      this.eventEmitter2.emit(printerEvents.printerUpdated, { printer } satisfies PrinterUpdatedEvent<string>);
+    }
     return printer!;
   }
 
   private async validateAndDefault(printer): Promise<IPrinter> {
     const mergedPrinter = {
       enabled: true,
-      ...printer,
+      ...printer
     };
     if (mergedPrinter.printerURL?.length) {
       mergedPrinter.printerURL = normalizeUrl(mergedPrinter.printerURL, { defaultProtocol: defaultHttpProtocol });

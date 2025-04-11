@@ -6,7 +6,13 @@ import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { SqliteIdType } from "@/shared.constants";
 import { validateInput } from "@/handlers/validators";
-import { printerEvents } from "@/constants/event.constants";
+import {
+  BatchPrinterCreatedEvent,
+  PrinterCreatedEvent,
+  printerEvents,
+  PrintersDeletedEvent,
+  PrinterUpdatedEvent
+} from "@/constants/event.constants";
 import EventEmitter2 from "eventemitter2";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { normalizeUrl } from "@/utils/normalize-url";
@@ -16,14 +22,13 @@ import { PrinterType } from "@/services/printer-api.interface";
 
 export class PrinterService
   extends BaseService(Printer, PrinterDto<SqliteIdType>, CreatePrinterDto)
-  implements IPrinterService<SqliteIdType, Printer>
-{
+  implements IPrinterService<SqliteIdType, Printer> {
   private readonly logger: LoggerService;
 
   constructor(
     loggerFactory: ILoggerFactory,
     typeormService: TypeormService,
-    private readonly eventEmitter2: EventEmitter2,
+    private readonly eventEmitter2: EventEmitter2
   ) {
     super(typeormService);
     this.logger = loggerFactory(PrinterService.name);
@@ -38,15 +43,15 @@ export class PrinterService
       dateAdded: entity.dateAdded,
       apiKey: entity.apiKey,
       printerURL: entity.printerURL,
-      printerType: entity.printerType as PrinterType,
+      printerType: entity.printerType as PrinterType
     };
   }
 
   async list(): Promise<Printer[]> {
     return this.repository.find({
       order: {
-        dateAdded: "ASC",
-      },
+        dateAdded: "ASC"
+      }
     });
   }
 
@@ -55,7 +60,7 @@ export class PrinterService
     mergedPrinter.dateAdded = Date.now();
     const printer = await super.create(mergedPrinter);
     if (emitEvent) {
-      this.eventEmitter2.emit(printerEvents.printerCreated, { printer });
+      this.eventEmitter2.emit(printerEvents.printerCreated, { printer } satisfies PrinterCreatedEvent<number>);
     }
     return printer;
   }
@@ -64,7 +69,7 @@ export class PrinterService
    * Explicit patching of printer document
    */
   async update(printerId: SqliteIdType, partial: Partial<Printer>): Promise<Printer> {
-    const printer = await this.get(printerId);
+    const printer = (await this.get(printerId))!;
     if (partial.printerURL) {
       partial.printerURL = normalizeUrl(partial.printerURL, { defaultProtocol: defaultHttpProtocol });
     }
@@ -76,9 +81,9 @@ export class PrinterService
       name,
       apiKey,
       enabled,
-      printerType,
+      printerType
     });
-    this.eventEmitter2.emit(printerEvents.printerUpdated, { printer, updatedPrinter });
+    this.eventEmitter2.emit(printerEvents.printerUpdated, { printer } satisfies PrinterUpdatedEvent<number>);
     return updatedPrinter;
   }
 
@@ -98,21 +103,21 @@ export class PrinterService
     }
 
     this.logger.log("Batch create succeeded");
-    this.eventEmitter2.emit(printerEvents.batchPrinterCreated, { printers: newPrinters });
+    this.eventEmitter2.emit(printerEvents.batchPrinterCreated, { printers: newPrinters } satisfies BatchPrinterCreatedEvent<number>);
     return newPrinters;
   }
 
   override async delete(printerId: SqliteIdType, emitEvent = true): Promise<void> {
     await this.repository.delete([printerId]);
     if (emitEvent) {
-      this.eventEmitter2.emit(printerEvents.printersDeleted, { printerIds: [[printerId]] });
+      this.eventEmitter2.emit(printerEvents.printersDeleted, { printerIds: [printerId] } satisfies PrintersDeletedEvent<number>);
     }
   }
 
   async deleteMany(printerIds: SqliteIdType[], emitEvent = true): Promise<void> {
     await this.repository.delete(printerIds);
     if (emitEvent) {
-      this.eventEmitter2.emit(printerEvents.printersDeleted, { printerIds });
+      this.eventEmitter2.emit(printerEvents.printersDeleted, { printerIds } satisfies PrintersDeletedEvent<number>);
     }
   }
 
@@ -135,7 +140,7 @@ export class PrinterService
   private async validateAndDefault(printer: CreatePrinterDto): Promise<Printer> {
     const mergedPrinter = {
       enabled: true,
-      ...printer,
+      ...printer
     };
     if (mergedPrinter.printerURL?.length) {
       mergedPrinter.printerURL = normalizeUrl(mergedPrinter.printerURL, { defaultProtocol: defaultHttpProtocol });

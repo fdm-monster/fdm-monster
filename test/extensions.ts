@@ -1,18 +1,5 @@
 import { Response } from "supertest";
 import { ZodIssue } from "zod";
-import CustomMatcherResult = jest.CustomMatcherResult;
-
-export function getExpectExtensions() {
-  return {
-    toHaveErrors(received: { errors: string[] }, keys: string[]) {
-      expect(received.errors).toMatchObject(keys);
-
-      return {
-        pass: true
-      } as CustomMatcherResult;
-    }
-  };
-}
 
 export function expectEmptyResponse(response: Response) {
   expect(response.statusCode).toEqual(204);
@@ -42,20 +29,20 @@ export function expectValidationError(
   expectedErrors ??= [];
 
   // Convert each issue's path array to a dot-notation string
-  const responseErrors = issues.map((issue) => ({
+  const zodIssues = issues.map((issue) => ({
     code: issue.code,
     path: issue.path.join(".")
   }));
 
   if (!exact) {
     const missingErrors = expectedErrors.filter(
-      (expected) => !responseErrors.some((actual) => actual.code === expected.code && actual.path === expected.path)
+      (expected) => !zodIssues.some((actual) => actual.code === expected.code && actual.path === expected.path)
     );
     expect(missingErrors).toEqual([]);
   } else {
     // For exact matching, both arrays should have the same errors
-    expect(responseErrors).toEqual(expect.arrayContaining(expectedErrors));
-    expect(expectedErrors).toEqual(expect.arrayContaining(responseErrors));
+    expect(zodIssues).toEqual(expect.arrayContaining(expectedErrors));
+    expect(expectedErrors).toEqual(expect.arrayContaining(zodIssues));
   }
 }
 

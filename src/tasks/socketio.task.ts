@@ -63,7 +63,7 @@ export class SocketIoTask {
 
   updateAggregator(transportDataLength: number) {
     if (this.aggregateSizeCounter >= this.aggregateWindowLength) {
-      const summedPayloadSize = this.aggregateSizes.reduce((t, n) => (t += n));
+      const summedPayloadSize = this.aggregateSizes.reduce((t, n) => t + n);
       const averagePayloadSize = summedPayloadSize / this.aggregateWindowLength;
       this.logger.log(
         `Printer SocketIO metrics ${averagePayloadSize.toFixed(this.rounding)}kB [${this.aggregateWindowLength} TX avg].`

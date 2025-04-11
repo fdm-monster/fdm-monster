@@ -9,7 +9,7 @@ import { IPrintCompletionService } from "@/services/interfaces/print-completion.
 import {
   CreatePrintCompletionDto,
   PrintCompletionContext,
-  PrintCompletionDto,
+  PrintCompletionDto
 } from "@/services/interfaces/print-completion.dto";
 import { IPrintCompletion } from "@/models/PrintCompletion";
 import { processCompletions } from "@/services/mongoose/print-completion.shared";
@@ -29,14 +29,14 @@ export class PrintCompletionService implements IPrintCompletionService<MongoIdTy
       fileName: entity.fileName,
       createdAt: entity.createdAt,
       status: entity.status,
-      printerId: entity.printerId.toString(),
+      printerId: entity.printerId.toString()
     };
   }
 
   async create(input: CreatePrintCompletionDto<MongoIdType>) {
     const { printerId, fileName, completionLog, status, context } = await validateInput(
       input,
-      createPrintCompletionSchema(false),
+      createPrintCompletionSchema(false)
     );
 
     return PrintCompletion.create({
@@ -45,7 +45,7 @@ export class PrintCompletionService implements IPrintCompletionService<MongoIdTy
       completionLog,
       status,
       createdAt: Date.now(),
-      context,
+      context
     });
   }
 
@@ -55,11 +55,11 @@ export class PrintCompletionService implements IPrintCompletionService<MongoIdTy
 
   async findPrintCompletion(correlationId: string) {
     return PrintCompletion.find({
-      "context.correlationId": correlationId,
+      "context.correlationId": correlationId
     });
   }
 
-  async updateContext(correlationId: string, context: PrintCompletionContext) {
+  async updateContext(correlationId: string | undefined, context: PrintCompletionContext) {
     if (!correlationId?.length) {
       this.logger.warn("Ignoring undefined correlationId, cant update print completion context");
       return;
@@ -67,12 +67,12 @@ export class PrintCompletionService implements IPrintCompletionService<MongoIdTy
 
     const completionEntry = await PrintCompletion.findOne({
       "context.correlationId": correlationId,
-      status: EVENT_TYPES.PrintStarted,
+      status: EVENT_TYPES.PrintStarted
     });
 
     if (!completionEntry) {
       this.logger.warn(
-        `Print with correlationId ${correlationId} could not be updated with new context as it was not found`,
+        `Print with correlationId ${correlationId} could not be updated with new context as it was not found`
       );
       return;
     }
@@ -89,16 +89,16 @@ export class PrintCompletionService implements IPrintCompletionService<MongoIdTy
           createdAt: { $first: "$createdAt" },
           context: { $first: "$context" },
           status: { $first: "$status" },
-          fileName: { $first: "$fileName" },
-        },
+          fileName: { $first: "$fileName" }
+        }
       },
       {
         $match: {
           status: {
-            $nin: [EVENT_TYPES.PrintDone, EVENT_TYPES.PrintFailed],
-          },
-        },
-      },
+            $nin: [EVENT_TYPES.PrintDone, EVENT_TYPES.PrintFailed]
+          }
+        }
+      }
     ]);
 
     return Object.fromEntries(
@@ -106,7 +106,7 @@ export class PrintCompletionService implements IPrintCompletionService<MongoIdTy
         c.printerId = c._id;
         delete c._id;
         return [c.printerId, c];
-      }),
+      })
     );
   }
 
@@ -122,11 +122,11 @@ export class PrintCompletionService implements IPrintCompletionService<MongoIdTy
               completionLog: "$completionLog",
               fileName: "$fileName",
               status: "$status",
-              createdAt: "$createdAt",
-            },
-          },
-        },
-      },
+              createdAt: "$createdAt"
+            }
+          }
+        }
+      }
     ]);
 
     return processCompletions(printCompletionsAggr);

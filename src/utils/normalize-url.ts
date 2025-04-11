@@ -1,4 +1,6 @@
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
+import { defaultHttpProtocol } from "@/utils/url.utils";
+
 const DATA_URL_DEFAULT_MIME_TYPE = "text/plain";
 const DATA_URL_DEFAULT_CHARSET = "us-ascii";
 
@@ -17,10 +19,10 @@ const hasCustomProtocol = (urlString: string) => {
   }
 };
 
-const normalizeDataURL = (urlString: string, { stripHash }: { stripHash: boolean }) => {
+const normalizeDataURL = (urlString: string, { stripHash }: { stripHash?: boolean }) => {
   const match = /^data:(?<type>[^,]*?),(?<data>[^#]*?)(?:#(?<hash>.*))?$/.exec(urlString);
 
-  if (!match) {
+  if (!match?.groups) {
     throw new Error(`Invalid URL: ${urlString}`);
   }
 
@@ -37,7 +39,7 @@ const normalizeDataURL = (urlString: string, { stripHash }: { stripHash: boolean
   // Lowercase MIME type
   const mimeType = mediaType.shift()?.toLowerCase() ?? "";
   const attributes = mediaType
-    .map((attribute: any) => {
+    .map((attribute) => {
       let [key, value = ""] = attribute.split("=").map((string) => string.trim());
 
       // Lowercase `charset`
@@ -134,7 +136,7 @@ export function normalizeUrl(
 
   // Prepend protocol
   if (!isRelativeUrl) {
-    urlString = urlString.replace(/^(?!(?:\w+:)?\/\/)|^\/\//, options.defaultProtocol);
+    urlString = urlString.replace(/^(?!(?:\w+:)?\/\/)|^\/\//, options.defaultProtocol ?? defaultHttpProtocol);
   }
 
   const urlObject = new URL(urlString);

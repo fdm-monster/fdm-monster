@@ -16,7 +16,6 @@ const getRoute = (id: IdType) => `${defaultRoute}/${id}`;
 const deleteRoute = (id: IdType) => `${defaultRoute}/${id}`;
 const updateRoute = (id: IdType) => `${defaultRoute}/${id}`;
 const stopJobRoute = (id: IdType) => `${updateRoute(id)}/job/stop`;
-const refreshSocket = (id: IdType) => `${updateRoute(id)}/refresh-socket`;
 const connectionRoute = (id: IdType) => `${updateRoute(id)}/connection`;
 const loginDetailsRoute = (id: IdType) => `${updateRoute(id)}/login-details`;
 const enabledRoute = (id: IdType) => `${updateRoute(id)}/enabled`;

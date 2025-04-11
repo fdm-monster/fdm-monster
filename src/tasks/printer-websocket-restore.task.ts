@@ -41,14 +41,14 @@ export class PrinterWebsocketRestoreTask {
       // Often due to USB disconnect, not interesting to reconnect unless we perform an API call for verification
       if (
         (socket.apiState !== API_STATE.unset && !socket.lastMessageReceivedTimestamp) ||
-        Date.now() - socket.lastMessageReceivedTimestamp > 10 * 1000
+        (socket.lastMessageReceivedTimestamp && Date.now() - socket.lastMessageReceivedTimestamp > 10 * 1000)
       ) {
-        const result = await this.octoprintClient.getConnection(socket.login);
+        const result = await this.octoprintClient.getConnection(socket.login!);
 
         try {
           if (result.data?.current?.state !== "Closed") {
             this.logger.warn(
-              `Silence was detected, but the OctoPrint current connection was not closed. Connection state ${result?.current?.state}`
+              `Silence was detected, but the OctoPrint current connection was not closed. Connection state ${result.data?.current?.state}`
             );
           }
         } catch (e) {

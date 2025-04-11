@@ -2,24 +2,24 @@ import { BaseService } from "@/services/orm/base.service";
 import { SqliteIdType } from "@/shared.constants";
 import { IRoleService } from "@/services/interfaces/role-service.interface";
 import { Role } from "@/entities";
-import { LoggerService } from "@/handlers/logger";
 import { SettingsStore } from "@/state/settings.store";
-import { ILoggerFactory } from "@/handlers/logger-factory";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { RoleDto } from "@/services/interfaces/role.dto";
 import { union } from "lodash";
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import { ROLE_PERMS, ROLES } from "@/constants/authorization.constants";
+import { ILoggerFactory } from "@/handlers/logger-factory";
+import { LoggerService } from "@/handlers/logger";
 
 export class RoleService extends BaseService(Role, RoleDto<SqliteIdType>) implements IRoleService<SqliteIdType, Role> {
-  private logger: LoggerService;
+  private readonly logger: LoggerService;
 
   constructor(
-    loggerFactory: ILoggerFactory,
     typeormService: TypeormService,
+    loggerFactory: ILoggerFactory,
     private readonly appDefaultRole: string,
     private readonly appDefaultRoleNoLogin: string,
-    private readonly settingsStore: SettingsStore,
+    private readonly settingsStore: SettingsStore
   ) {
     super(typeormService);
     this.logger = loggerFactory(RoleService.name);
@@ -50,7 +50,7 @@ export class RoleService extends BaseService(Role, RoleDto<SqliteIdType>) implem
   toDto(role: Role): RoleDto<SqliteIdType> {
     return {
       id: role.id,
-      name: role.name,
+      name: role.name
     };
   }
 
@@ -76,7 +76,7 @@ export class RoleService extends BaseService(Role, RoleDto<SqliteIdType>) implem
   authorizeRoles(
     requiredRoles: (string | SqliteIdType)[],
     assignedRoles: (string | SqliteIdType)[],
-    subset: boolean,
+    subset: boolean
   ): boolean {
     let isAuthorized = false;
 
@@ -134,7 +134,7 @@ export class RoleService extends BaseService(Role, RoleDto<SqliteIdType>) implem
       const storedRole = await this.repository.findOneBy({ name: roleName });
       if (!storedRole) {
         const newRole = await this.create({
-          name: roleName,
+          name: roleName
         });
         this._roles.push(newRole);
       } else {
@@ -146,7 +146,7 @@ export class RoleService extends BaseService(Role, RoleDto<SqliteIdType>) implem
   private normalizeRoleIdOrName(assignedRole: string | SqliteIdType): string | undefined {
     const roleInstance = this.roles.find((r) => r.id === assignedRole || r.name === assignedRole);
     if (!roleInstance) {
-      console.warn(`The role by provided id was not found. Skipping.`);
+      this.logger.warn(`The role by provided id was not found. Skipping.`);
       return;
     }
 

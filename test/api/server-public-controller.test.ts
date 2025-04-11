@@ -10,7 +10,6 @@ import { ServerReleaseService } from "@/services/core/server-release.service";
 import { SettingsStore } from "@/state/settings.store";
 import { Test } from "supertest";
 import { ServerPublicController } from "@/controllers/server-public.controller";
-import { isDocker } from "@/utils/is-docker";
 import TestAgent from "supertest/lib/agent";
 
 let container: AwilixContainer;
@@ -87,7 +86,6 @@ describe(ServerPublicController.name, () => {
   it("should return unsynced state response", async function () {
     const response = await request.get(versionRoute).send();
     expectOkResponse(response, {
-      isDockerContainer: isDocker(),
       update: {
         synced: false,
         airGapped: null,
@@ -101,7 +99,6 @@ describe(ServerPublicController.name, () => {
 
     const response = await request.get(versionRoute).send();
     expectOkResponse(response, {
-      isDockerContainer: isDocker(),
       update: {
         synced: false,
         airGapped: null,
@@ -118,7 +115,6 @@ describe(ServerPublicController.name, () => {
 
     const response = await request.get(versionRoute).send();
     expectOkResponse(response, {
-      isDockerContainer: isDocker(),
       update: {
         airGapped: null,
         synced: false,

@@ -9,6 +9,7 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { PrinterApiFactory } from "@/services/printer-api.factory";
 import { IPrinterApi, ReprintFileDto, ReprintState } from "@/services/printer-api.interface";
 import { LoginDto } from "@/services/interfaces/login.dto";
+import { keyType } from "@/utils/cache/key-diff.cache";
 
 interface BatchSingletonModel {
   success?: boolean;
@@ -20,7 +21,7 @@ interface BatchSingletonModel {
 
 type BatchModel = Array<BatchSingletonModel>;
 
-export class BatchCallService<KeyType = IdType> {
+export class BatchCallService<KeyType extends IdType = keyType> {
   private readonly logger: LoggerService;
 
   constructor(
@@ -28,7 +29,7 @@ export class BatchCallService<KeyType = IdType> {
     private readonly printerApiFactory: PrinterApiFactory,
     private readonly printerCache: PrinterCache,
     private readonly printerSocketStore: PrinterSocketStore,
-    private readonly printerService: IPrinterService,
+    private readonly printerService: IPrinterService
   ) {
     this.logger = loggerFactory(BatchCallService.name);
   }
@@ -39,7 +40,7 @@ export class BatchCallService<KeyType = IdType> {
 
   async batchTogglePrintersEnabled(
     printerIds: KeyType[],
-    enabled: boolean,
+    enabled: boolean
   ): Promise<
     {
       failure?: boolean;
@@ -68,18 +69,16 @@ export class BatchCallService<KeyType = IdType> {
               return { failure: true, error: e.message, printerId, time: Date.now() - time };
             });
         }
-      } else {
+      } else if (printerDto.enabled) {
         // If enabled, disable the printer
-        if (printerDto.enabled) {
-          promise = this.printerService
-            .updateEnabled(printerId, false)
-            .then(() => {
-              return { success: true, printerId, time: Date.now() - time };
-            })
-            .catch((e) => {
-              return { failure: true, error: e.message, printerId, time: Date.now() - time };
-            });
-        }
+        promise = this.printerService
+          .updateEnabled(printerId, false)
+          .then(() => {
+            return { success: true, printerId, time: Date.now() - time };
+          })
+          .catch((e) => {
+            return { failure: true, error: e.message, printerId, time: Date.now() - time };
+          });
       }
       promises.push(promise);
     }
@@ -152,14 +151,14 @@ export class BatchCallService<KeyType = IdType> {
 
           return resolve({
             ...partialReprintState,
-            printerId,
+            printerId
           });
         } catch (e) {
           captureException(e);
           return resolve({
             connectionState: null,
             printerId,
-            reprintState: ReprintState.PrinterNotAvailable,
+            reprintState: ReprintState.PrinterNotAvailable
           });
         }
       });

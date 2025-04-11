@@ -1,5 +1,4 @@
 import { DeepPartial, FindManyOptions, FindOneOptions, Repository } from "typeorm";
-import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { SqliteIdType } from "@/shared.constants";
 import { IPagination } from "@/services/interfaces/page.interface";
 
@@ -10,7 +9,6 @@ export interface IBaseService<
   UpdateDTO extends object = DTO,
 > {
   repository: Repository<T>;
-  typeormService: TypeormService;
 
   toDto(entity: T): DTO;
 
@@ -18,7 +16,7 @@ export interface IBaseService<
 
   listPaged(page: IPagination): Promise<T[]>;
 
-  get(id: SqliteIdType, throwIfNotFound?: boolean, options?: FindOneOptions<T>): Promise<T | null>;
+  get(id: SqliteIdType, options?: FindOneOptions<T>): Promise<T>;
 
   create(dto: CreateDTO): Promise<T>;
 

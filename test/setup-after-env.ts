@@ -1,9 +1,7 @@
-import { getExpectExtensions } from "./extensions";
 import { isSqliteModeTest } from "./typeorm.manager";
 import { closeDatabase, connect } from "./mongo-memory.handler";
 import nock from "nock";
 const jestConsole = console;
-expect.extend(getExpectExtensions());
 
 beforeAll(async () => {
   nock.disableNetConnect();

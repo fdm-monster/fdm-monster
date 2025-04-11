@@ -13,7 +13,7 @@ import { captureException } from "@sentry/node";
 import { IUser } from "@/models/Auth/User";
 
 export class AuthService<KeyType = IdType> implements IAuthService<KeyType> {
-  private logger: LoggerService;
+  private readonly logger: LoggerService;
   /**
    *  When users are blacklisted at runtime, this cache can make quick work of rejecting them
    */
@@ -100,16 +100,10 @@ export class AuthService<KeyType = IdType> implements IAuthService<KeyType> {
   }
 
   async renewLoginByRefreshToken(refreshToken: string): Promise<string> {
-    const userRefreshToken = await this.getValidRefreshToken(refreshToken, false);
-    if (!userRefreshToken) {
-      throw new AuthenticationError(
-        "The refresh token was invalid or expired, could not refresh user token",
-        AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken,
-      );
-    }
+    const userRefreshToken = await this.getValidRefreshToken(refreshToken);
 
     const userId = userRefreshToken.userId.toString();
-    const user = await this.userService.getUser(userId, false);
+    const user = await this.userService.getUser(userId);
     if (!user) {
       await this.refreshTokenService.deleteRefreshToken(refreshToken);
       throw new AuthenticationError("User not found", AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken);
@@ -125,11 +119,8 @@ export class AuthService<KeyType = IdType> implements IAuthService<KeyType> {
     return this.blacklistedJwtCache[jwtToken];
   }
 
-  async getValidRefreshToken(refreshToken: string, throwNotFoundError: boolean = true) {
-    const userRefreshToken = await this.refreshTokenService.getRefreshToken(refreshToken, throwNotFoundError);
-    if (!userRefreshToken) {
-      return null;
-    }
+  async getValidRefreshToken(refreshToken: string) {
+    const userRefreshToken = await this.refreshTokenService.getRefreshToken(refreshToken);
     if (Date.now() > userRefreshToken.expiresAt) {
       await this.refreshTokenService.deleteRefreshTokenByUserId(userRefreshToken.userId.toString());
       throw new AuthenticationError(
