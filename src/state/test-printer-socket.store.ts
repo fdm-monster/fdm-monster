@@ -91,10 +91,10 @@ export class TestPrinterSocketStore {
           return;
         }
         this.testSocket.open();
-        for await (const startTime of setInterval(100)) {
+        for await (const _startTime of setInterval(100)) {
           if (!this.testSocket) {
             this.logger.warn("Test without socket, rejecting");
-            reject();
+            reject("Test without socket, rejecting");
             return;
           }
           if (this.testSocket.socketState === SOCKET_STATE.authenticated) {
