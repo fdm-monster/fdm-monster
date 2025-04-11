@@ -3,7 +3,6 @@ import { AppConstants } from "@/server.constants";
 import { isNode } from "@/utils/env.utils";
 import { authenticate, permission } from "@/middleware/authenticate";
 import { PERMS } from "@/constants/authorization.constants";
-import { isDocker } from "@/utils/is-docker";
 import { SettingsStore } from "@/state/settings.store";
 import { ServerReleaseService } from "@/services/core/server-release.service";
 import { MonsterPiService } from "@/services/core/monsterpi.service";
@@ -118,7 +117,6 @@ export class ServerPublicController {
 
     res.json({
       version: this.serverVersion,
-      isDockerContainer: isDocker(),
       isNode: isNode(),
       os: process.env.OS,
       monsterPi: monsterPiVersion,

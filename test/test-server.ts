@@ -11,12 +11,6 @@ import { TaskManagerService } from "@/services/core/task-manager.service";
 import TestAgent from "supertest/lib/agent";
 import { SettingsStore } from "@/state/settings.store";
 
-jest.mock("../src/utils/env.utils", () => ({
-  ...jest.requireActual("../src/utils/env.utils"),
-  writeVariableToEnvFile: jest.fn()
-}));
-require("../src/utils/env.utils");
-
 export async function setupTestApp(
   loadPrinterStore = false,
   mocks: any = undefined,
