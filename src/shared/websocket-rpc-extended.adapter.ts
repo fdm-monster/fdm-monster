@@ -8,15 +8,6 @@ import { JsonRpcEventDto } from "@/services/moonraker/dto/websocket/json-rpc-eve
 
 export abstract class WebsocketRpcExtendedAdapter extends WebsocketAdapter {
   protected declare logger: LoggerService;
-
-  protected constructor(loggerFactory: ILoggerFactory) {
-    super(loggerFactory);
-
-    this.logger = loggerFactory(WebsocketRpcExtendedAdapter.name);
-
-    this.requestMap = new Map();
-  }
-
   private requestMap: Map<
     number,
     {
@@ -26,7 +17,19 @@ export abstract class WebsocketRpcExtendedAdapter extends WebsocketAdapter {
     }
   >;
 
+  protected constructor(loggerFactory: ILoggerFactory) {
+    super(loggerFactory);
+
+    this.logger = loggerFactory(WebsocketRpcExtendedAdapter.name);
+
+    this.requestMap = new Map();
+  }
+
   sendRequest<R, I = any>(request: JsonRpcRequestDto<I>, options = { timeout: 10000 }): Promise<JsonRpcResponseDto<R>> {
+    if (!this.socket) {
+      throw new Error("Websocket was not created, cannot send request");
+    }
+
     request.id = request.id++;
 
     // Create a registered promise for the response
@@ -44,14 +47,6 @@ export abstract class WebsocketRpcExtendedAdapter extends WebsocketAdapter {
     this.socket.send(JSON.stringify(request));
 
     return promise;
-  }
-
-  private clearRequest(requestId: number): void {
-    const request = this.requestMap.get(requestId);
-    if (request) {
-      clearTimeout(request.timeout);
-      this.requestMap.delete(requestId);
-    }
   }
 
   /**
@@ -80,6 +75,14 @@ export abstract class WebsocketRpcExtendedAdapter extends WebsocketAdapter {
     if (request) {
       clearTimeout(request.timeout);
       request.resolve(response);
+      this.requestMap.delete(requestId);
+    }
+  }
+
+  private clearRequest(requestId: number): void {
+    const request = this.requestMap.get(requestId);
+    if (request) {
+      clearTimeout(request.timeout);
       this.requestMap.delete(requestId);
     }
   }

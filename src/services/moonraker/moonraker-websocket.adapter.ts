@@ -76,7 +76,8 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
   apiStateUpdated = false;
   apiStateUpdateTimestamp: null | number = null;
   apiState: ApiState = API_STATE.unset;
-  login?: LoginDto;
+  // Guaranteed to be set and valid by PrinterApiFactory
+  login: LoginDto;
   private socketURL?: URL;
   printerId?: IdType;
 
