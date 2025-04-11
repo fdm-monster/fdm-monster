@@ -144,15 +144,6 @@ export class PrinterSocketStore {
     }
 
     await Promise.all(promisesOpenSocket);
-
-    return {
-      reauth: reauthRequested,
-      failedSocketReopened,
-      failedSocketsReauth,
-      socketSetup: socketSetupRequested,
-      socket: socketStates,
-      api: apiStates
-    };
   }
 
   createOrUpdateSocket(printer: PrinterDto<IdType>) {
