@@ -52,7 +52,7 @@ export class BatchCallService<KeyType extends IdType = keyType> {
   > {
     const promises = [];
     for (const printerId of printerIds) {
-      let promise: Promise<any>;
+      let promise: Promise<any> | undefined = undefined;
       const printerDto = await this.printerCache.getValue(printerId);
       if (!printerDto) continue;
 
@@ -79,8 +79,14 @@ export class BatchCallService<KeyType extends IdType = keyType> {
           .catch((e) => {
             return { failure: true, error: e.message, printerId, time: Date.now() - time };
           });
+      } else {
+        this.logger.warn("Did not toggle printer enabled, its in maintenance");
       }
-      promises.push(promise);
+
+
+      if (promise) {
+        promises.push(promise);
+      }
     }
 
     return await Promise.all(promises);

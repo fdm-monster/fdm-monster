@@ -57,7 +57,7 @@ export class AuthService<KeyType = IdType> implements IAuthService<KeyType> {
       throw new AuthenticationError("Login incorrect", AUTH_ERROR_REASON.IncorrectCredentials);
     }
 
-    const userId = userDoc.id.toString();
+    const userId = userDoc.id;
     const token = await this.signJwtToken(userId);
     await this.refreshTokenService.purgeOutdatedRefreshTokensByUserId(userId);
     await this.purgeOutdatedBlacklistedJwtCache();
@@ -96,13 +96,13 @@ export class AuthService<KeyType = IdType> implements IAuthService<KeyType> {
 
   async logoutUserRefreshToken(refreshToken: string) {
     const userRefreshToken = await this.getValidRefreshToken(refreshToken);
-    await this.refreshTokenService.deleteRefreshTokenByUserId(userRefreshToken.userId.toString());
+    await this.refreshTokenService.deleteRefreshTokenByUserId(userRefreshToken.userId);
   }
 
   async renewLoginByRefreshToken(refreshToken: string): Promise<string> {
     const userRefreshToken = await this.getValidRefreshToken(refreshToken);
 
-    const userId = userRefreshToken.userId.toString();
+    const userId = userRefreshToken.userId;
     const user = await this.userService.getUser(userId);
     if (!user) {
       await this.refreshTokenService.deleteRefreshToken(refreshToken);
@@ -122,7 +122,7 @@ export class AuthService<KeyType = IdType> implements IAuthService<KeyType> {
   async getValidRefreshToken(refreshToken: string) {
     const userRefreshToken = await this.refreshTokenService.getRefreshToken(refreshToken);
     if (Date.now() > userRefreshToken.expiresAt) {
-      await this.refreshTokenService.deleteRefreshTokenByUserId(userRefreshToken.userId.toString());
+      await this.refreshTokenService.deleteRefreshTokenByUserId(userRefreshToken.userId);
       throw new AuthenticationError(
         "Refresh token expired, login required",
         AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken,
@@ -139,7 +139,7 @@ export class AuthService<KeyType = IdType> implements IAuthService<KeyType> {
     // If no attempts are set, then we don't care about attempts
     if (refreshTokenAttempts !== -1) {
       if (attemptsUsed >= refreshTokenAttempts) {
-        await this.refreshTokenService.deleteRefreshTokenByUserId(userRefreshToken.userId.toString());
+        await this.refreshTokenService.deleteRefreshTokenByUserId(userRefreshToken.userId);
         throw new AuthenticationError(
           "Refresh token attempts exceeded, login required",
           AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken,
@@ -151,7 +151,7 @@ export class AuthService<KeyType = IdType> implements IAuthService<KeyType> {
   }
 
   async signJwtToken(userId: KeyType) {
-    const user = await this.userService.getUser(userId, false);
+    const user = await this.userService.getUser(userId);
     if (!user) {
       throw new AuthenticationError("User not found", AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken);
     }
