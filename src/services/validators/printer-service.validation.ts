@@ -1,5 +1,5 @@
 import { apiKeyLengthMaxDefault, apiKeyLengthMinDefault } from "@/constants/service.constants";
-import { OctoprintType, PrinterTypes } from "@/services/printer-api.interface";
+import { MoonrakerType, OctoprintType, PrinterTypes } from "@/services/printer-api.interface";
 import { RefinementCtx, z } from "zod";
 import { numberEnum } from "@/handlers/validators";
 
@@ -14,7 +14,9 @@ export const printerNameValidator = z.string();
 export const printerEnabledValidator = z.boolean();
 export const printerDisabledReasonValidator = z.string().optional();
 export const printerUrlValidator = z.string().url();
-export const printerTypeValidator = z.number().superRefine(numberEnum(PrinterTypes));
+export const printerTypeValidator = z.union(
+  [z.literal(OctoprintType), z.literal(MoonrakerType)],
+).superRefine(numberEnum(PrinterTypes));
 export const printerDateAddedValidator = z.number().optional();
 
 const basePrinterSchema = z

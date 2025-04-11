@@ -25,7 +25,7 @@ export class FloorService implements IFloorService<MongoIdType> {
       printers: floor.printers?.map((p) => ({
         x: p.x,
         y: p.y,
-        printerId: p.printerId.toString(),
+        printerId: p.printerId,
         floorId: floor.id,
       })),
     };
@@ -41,7 +41,7 @@ export class FloorService implements IFloorService<MongoIdType> {
       throw new NotFoundException(`Floor with provided id does not exist`);
     }
 
-    return floor!;
+    return floor;
   }
 
   async createDefaultFloor() {

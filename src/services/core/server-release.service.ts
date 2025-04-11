@@ -10,9 +10,9 @@ export class ServerReleaseService {
   private synced = false;
   private installedReleaseFound: null | boolean = null;
   private updateAvailable: null | boolean = null;
-  private latestRelease: Awaited<ReturnType<Octokit["rest"]["repos"]["listReleases"]>>["data"][number] = null;
-  private installedRelease: Awaited<ReturnType<Octokit["rest"]["repos"]["listReleases"]>>["data"][number] = null;
-  private logger: LoggerService;
+  private latestRelease: Awaited<ReturnType<Octokit["rest"]["repos"]["listReleases"]>>["data"][number] | null = null;
+  private installedRelease: { tag_name: string } | null = null;
+  private readonly logger: LoggerService;
 
   constructor(
     loggerFactory: ILoggerFactory,

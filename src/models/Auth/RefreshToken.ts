@@ -10,9 +10,9 @@ export interface IRefreshToken<KeyType = MongoIdType> {
   refreshAttemptsUsed: number;
 }
 
-const RefreshTokenSchema = new Schema<IRefreshToken<Schema.Types.ObjectId>>({
+const RefreshTokenSchema = new Schema<IRefreshToken>({
   userId: {
-    type: Schema.Types.ObjectId,
+    type: Schema.Types.Mixed,
     ref: "User",
     required: true,
     unique: false,
