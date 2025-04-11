@@ -8,7 +8,7 @@ declare module "express" {
   interface Request<KeyType = IdType> {
     local?: any;
     user?: IUser<KeyType>;
-    container?: AwilixContainer;
+    container: AwilixContainer;
     roles?: readonly RequestRole[];
   }
 }

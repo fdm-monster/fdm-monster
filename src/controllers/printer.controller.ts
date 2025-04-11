@@ -30,7 +30,7 @@ import { IPrinterApi } from "@/services/printer-api.interface";
 import { PrinterApiFactory } from "@/services/printer-api.factory";
 import { normalizeUrl } from "@/utils/normalize-url";
 import { defaultHttpProtocol } from "@/utils/url.utils";
-import { getScopedPrinter } from "@/handlers/printer-resolver";
+import { getScopedPrinter } from "@/middleware/printer-resolver";
 
 @route(AppConstants.apiRoute + "/printer")
 @before([authenticate(), authorizeRoles([ROLES.OPERATOR, ROLES.ADMIN]), printerResolveMiddleware()])
