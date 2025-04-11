@@ -7,6 +7,8 @@ import {
   TimeoutSettingsDto,
   WizardSettingsDto
 } from "@/services/interfaces/settings.dto";
+import { v4 as uuidv4 } from "uuid";
+import { ICredentialSettings } from "@/models/Settings";
 
 export const wizardSettingKey = "wizard";
 export const getDefaultWizardSettings = (): WizardSettingsDto => ({
@@ -59,7 +61,10 @@ export const getDefaultFileCleanSettings = (): FileCleanSettingsDto => ({
 export const getDefaultSettings = () => ({
   [serverSettingsKey]: getDefaultServerSettings(),
   [wizardSettingKey]: getDefaultWizardSettings(),
-  [credentialSettingsKey]: getDefaultCredentialSettings(),
+  [credentialSettingsKey]: {
+    ...getDefaultCredentialSettings(),
+    jwtSecret: uuidv4()
+  } satisfies ICredentialSettings,
   [printerFileCleanSettingKey]: getDefaultFileCleanSettings(),
   [frontendSettingKey]: getDefaultFrontendSettings(),
   [timeoutSettingKey]: getDefaultTimeout()
