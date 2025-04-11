@@ -3,7 +3,7 @@ import { RegisterUserDto, UserDto } from "@/services/interfaces/user.dto";
 import { User } from "@/entities";
 import { SqliteIdType } from "@/shared.constants";
 import { IUserService } from "@/services/interfaces/user-service.interface";
-import { DeleteResult, In } from "typeorm";
+import { In } from "typeorm";
 import { InternalServerException, NotFoundException } from "@/exceptions/runtime.exceptions";
 import { validateInput } from "@/handlers/validators";
 import { newPasswordSchema, registerUserSchema } from "@/services/validators/user-service.validation";
@@ -39,8 +39,8 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
     return this.list({ take: limit });
   }
 
-  async getUser(userId: SqliteIdType): Promise<User> {
-    return (await this.get(userId, true)) as User;
+  async getUser(userId: SqliteIdType) {
+    return this.get(userId);
   }
 
   async getUserRoleIds(userId: SqliteIdType): Promise<SqliteIdType[]> {
@@ -67,12 +67,16 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
     return entity.isRootUser;
   }
 
-  async deleteUser(userId: SqliteIdType): Promise<DeleteResult> {
+  async deleteUser(userId: SqliteIdType) {
     // Validate
     const user = await this.getUser(userId);
 
     if (user.isRootUser) {
       throw new InternalServerException("Cannot delete a root user");
+    }
+
+    if (!user.roles?.length) {
+      throw new InternalServerException("User:roles relation not loaded, cannot perform deletion role check");
     }
 
     // Check if the user is the last admin
@@ -84,14 +88,14 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
       }
     }
 
-    return await this.delete(userId);
+    await this.delete(userId);
   }
 
   findRawByUsername(username: string): Promise<User | null> {
     return this.repository.findOneBy({ username });
   }
 
-  async getDemoUserId(): Promise<SqliteIdType> {
+  async getDemoUserId(): Promise<SqliteIdType | undefined> {
     return (await this.repository.findOneBy({ isDemoUser: true }))?.id;
   }
 
@@ -112,7 +116,7 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
 
   async setUserRoleIds(userId: SqliteIdType, roleIds: SqliteIdType[]): Promise<User> {
     await this.userRoleService.setUserRoles(userId, roleIds);
-    return await this.get(userId, true);
+    return await this.get(userId);
   }
 
   async setVerifiedById(userId: SqliteIdType, isVerified: boolean): Promise<void> {
@@ -175,7 +179,7 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
       isRootUser: isRootUser ?? false,
       needsPasswordChange: needsPasswordChange ?? true,
     });
-    await this.userRoleService.setUserRoles(result.id, roles);
+    await this.userRoleService.setUserRoles(result.id, roles as SqliteIdType[]);
 
     return this.get(result.id);
   }

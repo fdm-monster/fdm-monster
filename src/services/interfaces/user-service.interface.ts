@@ -16,11 +16,11 @@ export interface IUserService<KeyType = IdType, Entity = IUser<KeyType>> {
 
   findRootUsers(): Promise<Entity[]>;
 
-  getDemoUserId(): Promise<KeyType>;
+  getDemoUserId(): Promise<KeyType | undefined>;
 
   findRawByUsername(username: string): Promise<Entity | null>;
 
-  getUser(userId: KeyType, throwNotFoundError?: boolean): Promise<Entity>;
+  getUser(userId: KeyType): Promise<Entity>;
 
   getUserRoleIds(userId: KeyType): Promise<KeyType[]>;
 
