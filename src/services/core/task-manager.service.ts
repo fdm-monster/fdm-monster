@@ -60,7 +60,7 @@ export class TaskManagerService {
     if (schedulerOptions.runOnce) {
       timedTask.execute();
     } else if (schedulerOptions.runDelayed) {
-      const delay = (schedulerOptions.milliseconds || 0) + (schedulerOptions.seconds ?? 0) * 1000;
+      const delay = (schedulerOptions.milliseconds ?? 0) + (schedulerOptions.seconds ?? 0) * 1000;
       this.runTimeoutTaskInstance(taskId, delay);
     } else {
       // This must be 'periodic'
@@ -269,12 +269,10 @@ export class TaskManagerService {
     return (error: Error): void => {
       const taskState = this.taskStates[taskId];
 
-      if (!taskState.lastError) {
-        taskState.lastError = {
-          time: Date.now(),
-          error
-        };
-      }
+      taskState.lastError ??= {
+        time: Date.now(),
+        error
+      };
 
       this.logger.error(`Task '${taskId}' threw an exception: ${error.stack}`);
     };
