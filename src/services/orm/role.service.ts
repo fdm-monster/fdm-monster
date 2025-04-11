@@ -115,8 +115,14 @@ export class RoleService extends BaseService(Role, RoleDto<SqliteIdType>) implem
     return role;
   }
 
-  getRolePermissions(role: string | SqliteIdType): string[] {
+  getRolePermissions(role?: string | SqliteIdType): string[] {
+    if (!role || !(role as string)?.length) {
+      return [];
+    }
     const normalizedRole = this.normalizeRoleIdOrName(role);
+    if (!normalizedRole?.length) {
+      return [];
+    }
     return ROLE_PERMS[normalizedRole];
   }
 

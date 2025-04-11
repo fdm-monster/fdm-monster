@@ -7,13 +7,20 @@ import { IRole } from "@/models/Auth/Role";
 import { MongoIdType } from "@/shared.constants";
 import { IRoleService } from "@/services/interfaces/role-service.interface";
 import { RoleDto } from "@/services/interfaces/role.dto";
+import { ILoggerFactory } from "@/handlers/logger-factory";
+import { LoggerService } from "@/handlers/logger";
 
 export class RoleService implements IRoleService<MongoIdType> {
+  private readonly logger: LoggerService;
+
   constructor(
+    loggerFactory: ILoggerFactory,
     private readonly appDefaultRole: string,
     private readonly appDefaultRoleNoLogin: string,
-    private readonly settingsStore: SettingsStore,
-  ) {}
+    private readonly settingsStore: SettingsStore
+  ) {
+    this.logger = loggerFactory(RoleService.name);
+  }
 
   private _roles: IRole[] = [];
 
@@ -24,7 +31,7 @@ export class RoleService implements IRoleService<MongoIdType> {
   toDto(role: IRole): RoleDto<MongoIdType> {
     return {
       id: role.id,
-      name: role.name,
+      name: role.name
     };
   }
 
@@ -48,8 +55,14 @@ export class RoleService implements IRoleService<MongoIdType> {
     return permissions;
   }
 
-  getRolePermissions(role: string) {
+  getRolePermissions(role?: string) {
+    if (!role?.length) {
+      return [];
+    }
     const normalizedRole = this.normalizeRoleIdOrName(role);
+    if (!normalizedRole?.length) {
+      return [];
+    }
     return ROLE_PERMS[normalizedRole];
   }
 
@@ -114,7 +127,7 @@ export class RoleService implements IRoleService<MongoIdType> {
       const storedRole = await Role.findOne({ name: roleName });
       if (!storedRole) {
         const newRole = await Role.create({
-          name: roleName,
+          name: roleName
         });
         this._roles.push(newRole);
       } else {
@@ -126,7 +139,7 @@ export class RoleService implements IRoleService<MongoIdType> {
   private normalizeRoleIdOrName(assignedRole: string | MongoIdType) {
     const roleInstance = this.roles.find((r) => r.id === assignedRole || r.name === assignedRole);
     if (!roleInstance) {
-      console.warn(`The role by provided id did not exist in definition. Skipping`);
+      this.logger.warn(`The role by provided id was not found. Skipping.`);
       return;
     }
 

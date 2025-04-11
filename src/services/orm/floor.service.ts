@@ -169,7 +169,7 @@ export class FloorService
       x: validInput.x,
       y: validInput.y,
       printerId: validInput.printerId as SqliteIdType,
-      floorId: floorId as SqliteIdType
+      floorId
     });
 
     await this.floorPositionService.create(newPosition);
