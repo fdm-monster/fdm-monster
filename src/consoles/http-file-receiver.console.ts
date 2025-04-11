@@ -1,6 +1,5 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import multer from "multer";
-import { Request, Response } from "express";
 
 // Custom storage to introduce artificial delay
 const delayedMemoryStorage = (): multer.StorageEngine => {
@@ -36,7 +35,7 @@ const delayedMemoryStorage = (): multer.StorageEngine => {
     },
     _removeFile(req, file, cb) {
       cb(null);
-    },
+    }
   };
 };
 const port = process.argv[2] ? parseInt(process.argv[2]) : 1234;
@@ -45,6 +44,7 @@ const upload = multer({ storage: delayedMemoryStorage() });
 
 const app = express();
 
+// @ts-ignore
 app.post("/api/files/local", upload.single("file"), (req: Request, res: Response) => {
   const { select, print } = req.body;
   const file = req.file;

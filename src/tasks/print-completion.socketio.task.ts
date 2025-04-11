@@ -72,7 +72,7 @@ export class PrintCompletionSocketIoTask {
       };
 
       if (event.payload.type === EVENT_TYPES.Disconnecting || event.payload.type === EVENT_TYPES.Disconnected) {
-        await this.printerEventsCache.setSubstate(printerId, "current", "state", {
+        await this.printerEventsCache.setSubState(printerId, "current", "state", {
           text: event.payload.type,
           flags: {
             operational: false,
