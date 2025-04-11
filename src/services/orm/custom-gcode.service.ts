@@ -21,8 +21,8 @@ export class CustomGcodeService
     return await super.create(gcodeScript);
   }
 
-  async delete(gcodeScriptId: SqliteIdType, throwIfNotFound?: boolean) {
-    return await super.delete(gcodeScriptId, throwIfNotFound);
+  async delete(gcodeScriptId: SqliteIdType) {
+    await super.delete(gcodeScriptId);
   }
 
   async get(gcodeScriptId: SqliteIdType): Promise<CustomGcode> {

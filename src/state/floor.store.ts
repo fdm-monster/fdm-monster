@@ -10,7 +10,7 @@ export class FloorStore<KeyType extends keyType = IdType> extends KeyDiffCache<F
 
   constructor(
     private readonly floorService: IFloorService<KeyType>,
-    loggerFactory: ILoggerFactory,
+    loggerFactory: ILoggerFactory
   ) {
     super();
     this.logger = loggerFactory(FloorStore.name);
@@ -29,7 +29,7 @@ export class FloorStore<KeyType extends keyType = IdType> extends KeyDiffCache<F
 
     const keyValues = floors.map((floor) => ({
       key: floor.id.toString(),
-      value: this.floorService.toDto(floor),
+      value: this.floorService.toDto(floor)
     }));
     await this.setKeyValuesBatch(keyValues, true);
   }
@@ -52,14 +52,15 @@ export class FloorStore<KeyType extends keyType = IdType> extends KeyDiffCache<F
   }
 
   async delete(floorId: KeyType) {
-    const deleteResult = await this.floorService.delete(floorId);
+    await this.floorService.delete(floorId);
     await this.deleteKeyValue(floorId);
-    return deleteResult;
   }
 
   async getFloor(floorId: KeyType) {
     let floor = await this.getValue(floorId);
-    if (!!floor) return floor;
+    if (floor) {
+      return floor;
+    }
 
     const dbFloor = await this.floorService.get(floorId);
     const floorDto = this.floorService.toDto(dbFloor);

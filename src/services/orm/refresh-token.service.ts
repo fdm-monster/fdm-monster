@@ -15,14 +15,13 @@ import { AUTH_ERROR_REASON } from "@/constants/authorization.constants";
 
 export class RefreshTokenService
   extends BaseService(RefreshToken, RefreshTokenDto<SqliteIdType>)
-  implements IRefreshTokenService<SqliteIdType, RefreshToken>
-{
-  private logger: LoggerService;
+  implements IRefreshTokenService<SqliteIdType, RefreshToken> {
+  private readonly logger: LoggerService;
 
   constructor(
     private readonly settingsStore: SettingsStore,
     loggerFactory: ILoggerFactory,
-    typeormService: TypeormService,
+    typeormService: TypeormService
   ) {
     super(typeormService);
     this.logger = loggerFactory(RefreshTokenService.name);
@@ -35,20 +34,17 @@ export class RefreshTokenService
       expiresAt: entity.expiresAt,
       // Sensitive data
       // refreshToken: entity.refreshToken,
-      refreshAttemptsUsed: entity.refreshAttemptsUsed,
+      refreshAttemptsUsed: entity.refreshAttemptsUsed
     };
   }
 
-  async getRefreshToken(refreshToken: string, throwNotFoundError = true): Promise<RefreshToken | null> {
+  async getRefreshToken(refreshToken: string): Promise<RefreshToken> {
     const entity = await this.repository.findOneBy({ refreshToken });
     if (!entity) {
-      if (throwNotFoundError) {
-        throw new AuthenticationError(
-          `The entity ${RefreshToken.name} by provided refresh token is not found`,
-          AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken,
-        );
-      }
-      return null;
+      throw new AuthenticationError(
+        `The entity ${RefreshToken.name} by provided refresh token is not found`,
+        AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken
+      );
     }
 
     return entity;
@@ -67,21 +63,21 @@ export class RefreshTokenService
       userId,
       expiresAt: Date.now() + timespan * 1000,
       refreshToken,
-      refreshAttemptsUsed: 0,
+      refreshAttemptsUsed: 0
     });
 
     return refreshToken;
   }
 
   async updateRefreshTokenAttempts(refreshToken: string, refreshAttemptsUsed: number): Promise<void> {
-    await this.getRefreshToken(refreshToken, true);
+    await this.getRefreshToken(refreshToken);
 
     await this.repository.update({ refreshToken }, { refreshAttemptsUsed });
   }
 
   async purgeAllOutdatedRefreshTokens(): Promise<void> {
     const result = await this.repository.delete({
-      expiresAt: LessThan(Date.now()),
+      expiresAt: LessThan(Date.now())
     });
 
     if (result.affected) {
@@ -91,7 +87,7 @@ export class RefreshTokenService
 
   async deleteRefreshTokenByUserId(userId: SqliteIdType): Promise<void> {
     const result = await this.repository.delete({
-      userId,
+      userId
     });
 
     if (result.affected) {
@@ -101,7 +97,7 @@ export class RefreshTokenService
 
   async deleteRefreshToken(refreshToken: string): Promise<void> {
     const result = await this.repository.delete({
-      refreshToken,
+      refreshToken
     });
 
     if (result.affected) {
@@ -112,7 +108,7 @@ export class RefreshTokenService
   async purgeOutdatedRefreshTokensByUserId(userId: SqliteIdType): Promise<void> {
     const result = await this.repository.delete({
       userId,
-      expiresAt: LessThan(Date.now()),
+      expiresAt: LessThan(Date.now())
     });
 
     if (result.affected) {

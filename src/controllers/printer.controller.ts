@@ -111,9 +111,9 @@ export class PrinterController {
   @route("/:id")
   async delete(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
-    const result = await this.printerService.delete(currentPrinterId);
+    await this.printerService.delete(currentPrinterId);
     await this.floorStore.removePrinterFromAnyFloor(currentPrinterId);
-    res.send(result);
+    res.send();
   }
 
   @PATCH()

@@ -34,10 +34,9 @@ export class FloorService
     );
   }
 
-  override async get(id: SqliteIdType, throwIfNotFound = true, options?: FindOneOptions<Floor>): Promise<Floor> {
+  override async get(id: SqliteIdType, options?: FindOneOptions<Floor>): Promise<Floor> {
     return super.get(
       id,
-      throwIfNotFound,
       Object.assign(options || {}, {
         relations: ["printers"],
       }),
@@ -140,7 +139,7 @@ export class FloorService
 
   async addOrUpdatePrinter(floorId: SqliteIdType, positionDto: PositionDto<SqliteIdType>): Promise<Floor> {
     // Validation only
-    await this.get(floorId, true);
+    await this.get(floorId);
     positionDto.floorId = floorId;
     const validInput = await validateInput(positionDto, printerInFloorSchema(true));
 

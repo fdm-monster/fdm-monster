@@ -11,19 +11,20 @@ import { createCameraStreamSchema } from "../validators/camera-service.validatio
 export class CameraStreamService implements ICameraStreamService<MongoIdType> {
   model = CameraStream;
 
-  constructor(private readonly printerCache: PrinterCache) {}
+  constructor(private readonly printerCache: PrinterCache) {
+  }
 
   async list() {
     return this.model.find();
   }
 
-  async get(id: MongoIdType, throwError = true) {
+  async get(id: MongoIdType) {
     const cameraStream = await this.model.findById(id);
-    if (!cameraStream && throwError) {
+    if (!cameraStream) {
       throw new NotFoundException(`Floor with provided id does not exist`, "CameraStream");
     }
 
-    return cameraStream!;
+    return cameraStream;
   }
 
   async create(data: CreateCameraStreamDto<MongoIdType>) {
@@ -34,8 +35,8 @@ export class CameraStreamService implements ICameraStreamService<MongoIdType> {
     return this.model.create(input);
   }
 
-  async delete(id: MongoIdType, throwError?: boolean) {
-    await this.get(id, throwError);
+  async delete(id: MongoIdType) {
+    await this.get(id);
     await this.model.findByIdAndDelete(id);
   }
 
@@ -59,7 +60,7 @@ export class CameraStreamService implements ICameraStreamService<MongoIdType> {
       aspectRatio: entity.aspectRatio,
       flipHorizontal: entity.flipHorizontal,
       flipVertical: entity.flipVertical,
-      rotationClockwise: entity.rotationClockwise,
+      rotationClockwise: entity.rotationClockwise
     };
   }
 }

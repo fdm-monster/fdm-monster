@@ -69,18 +69,16 @@ export class BatchCallService<KeyType extends IdType = keyType> {
               return { failure: true, error: e.message, printerId, time: Date.now() - time };
             });
         }
-      } else {
+      } else if (printerDto.enabled) {
         // If enabled, disable the printer
-        if (printerDto.enabled) {
-          promise = this.printerService
-            .updateEnabled(printerId, false)
-            .then(() => {
-              return { success: true, printerId, time: Date.now() - time };
-            })
-            .catch((e) => {
-              return { failure: true, error: e.message, printerId, time: Date.now() - time };
-            });
-        }
+        promise = this.printerService
+          .updateEnabled(printerId, false)
+          .then(() => {
+            return { success: true, printerId, time: Date.now() - time };
+          })
+          .catch((e) => {
+            return { failure: true, error: e.message, printerId, time: Date.now() - time };
+          });
       }
       promises.push(promise);
     }

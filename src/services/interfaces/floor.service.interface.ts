@@ -9,13 +9,13 @@ export interface IFloorService<KeyType = IdType, Entity = IFloor | Floor> {
 
   createDefaultFloor(): Promise<Entity>;
 
-  delete(floorId: KeyType): Promise<any | void>;
+  delete(floorId: KeyType): Promise<void>;
 
   addOrUpdatePrinter(floorId: KeyType, position: CreatePositionDto<KeyType>): Promise<Entity>;
 
   deletePrinterFromAnyFloor(printerId: KeyType): Promise<void>;
 
-  get(floorId: KeyType, throwIfNotFound?: boolean, options?: FindOneOptions<Entity>): Promise<Entity>;
+  get(floorId: KeyType, options?: FindOneOptions<Entity>): Promise<Entity>;
 
   list(): Promise<Entity[]>;
 

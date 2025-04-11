@@ -14,9 +14,12 @@ export class CustomGcodeService implements ICustomGcodeService<MongoIdType> {
       gcode: [...document.gcode],
     };
   }
+
   async get(gcodeScriptId: MongoIdType) {
     const document = await CustomGcode.findById(gcodeScriptId);
-    if (!document) throw new NotFoundException(`Custom GCode script with provided id does not exist`);
+    if (!document) {
+      throw new NotFoundException(`Custom GCode script with provided id does not exist`);
+    }
 
     return document;
   }
@@ -29,7 +32,7 @@ export class CustomGcodeService implements ICustomGcodeService<MongoIdType> {
     return CustomGcode.create(gcodeScript);
   }
 
-  async delete(gcodeScriptId: MongoIdType, throwIfNotFound?: boolean) {
+  async delete(gcodeScriptId: MongoIdType) {
     const gcode = await this.get(gcodeScriptId);
     await CustomGcode.findByIdAndDelete(gcode.id);
   }
