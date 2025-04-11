@@ -137,9 +137,9 @@
   "ignore-engines": false,
   "engine-strict": true,
   "engines": {
-    "node": ">= 18.0.0",
+    "node": ">= 20.0.0",
     "npm": ">= 8.1.4",
-    "yarn": ">= 1.22.10"
+    "yarn": ">= 4.8.0"
   },
   "packageManager": "yarn@4.9.0"
 }
