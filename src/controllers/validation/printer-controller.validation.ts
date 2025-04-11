@@ -21,7 +21,6 @@ export const testPrinterApiSchema = z
     printerURL: printerUrlValidator,
     printerType: printerTypeValidator,
     apiKey: printerApiKeyValidator,
-    correlationToken: z.string().optional(),
   })
   .superRefine(refineApiKeyValidator);
 

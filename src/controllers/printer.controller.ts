@@ -150,17 +150,16 @@ export class PrinterController {
       req.body.printerURL = normalizeUrl(req.body.printerURL, { defaultProtocol: defaultHttpProtocol });
     }
     const newPrinter = await validateMiddleware(req, testPrinterApiSchema);
-    newPrinter.correlationToken = generateCorrelationToken();
-    this.logger.log(`Testing printer with correlation token ${newPrinter.correlationToken}`);
+    const printerCorrelationToken = generateCorrelationToken();
+    this.logger.log(`Testing printer with correlation token ${printerCorrelationToken}`);
 
-    // Add printer with test=true
     try {
-      await this.testPrinterSocketStore.setupTestPrinter(newPrinter);
+      await this.testPrinterSocketStore.setupTestPrinter(printerCorrelationToken, newPrinter);
     } catch (e) {
-      res.send({ correlationToken: newPrinter.correlationToken, failure: true, error: (e as Error).toString() });
+      res.send({ correlationToken: printerCorrelationToken, failure: true, error: (e as Error).toString() });
       return;
     }
-    res.send({ correlationToken: newPrinter.correlationToken });
+    res.send({ correlationToken: printerCorrelationToken });
   }
 
   @GET()

@@ -30,7 +30,7 @@ export class TestPrinterSocketStore {
     this.logger = loggerFactory(TestPrinterSocketStore.name);
   }
 
-  async setupTestPrinter(printer: z.infer<typeof createTestPrinterSchema>): Promise<void> {
+  async setupTestPrinter(correlationToken: string, printer: z.infer<typeof createTestPrinterSchema>): Promise<void> {
     if (this.testSocket) {
       this.testSocket.close();
       delete this.testSocket;
@@ -40,7 +40,6 @@ export class TestPrinterSocketStore {
     validatedData.enabled = true;
 
     // Create a new socket if it doesn't exist
-    const { correlationToken } = printer;
     this.testSocket = this.socketFactory.createInstance(printer.printerType);
 
     // Reset the socket credentials before (re-)connecting

@@ -17,9 +17,18 @@ import { IdType } from "@/shared.constants";
 import { OctoprintType } from "@/services/printer-api.interface";
 import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
 import { PrinterDto } from "@/services/interfaces/printer.dto";
+import { SocketState } from "@/shared/dtos/socket-state.type";
+import { ApiState } from "@/shared/dtos/api-state.type";
+
+export interface PrinterSocketState {
+  printerId: IdType,
+  printerType: number,
+  socket: SocketState,
+  api: ApiState,
+}
 
 export class PrinterSocketStore {
-  printerSocketAdaptersById: Record<string, IWebsocketAdapter> = {};
+  printerSocketAdaptersById: Record<IdType, IWebsocketAdapter> = {};
   private readonly logger: LoggerService;
 
   constructor(
@@ -34,8 +43,12 @@ export class PrinterSocketStore {
   }
 
   getSocketStatesById() {
-    const socketStatesById = {};
+    const socketStatesById: { [k: IdType]: PrinterSocketState } = {};
     Object.values(this.printerSocketAdaptersById).forEach((s) => {
+      if (!s.printerId) {
+        return;
+      }
+
       socketStatesById[s.printerId] = {
         printerId: s.printerId,
         printerType: s.printerType,
@@ -83,7 +96,7 @@ export class PrinterSocketStore {
     socket.resetSocketState();
   }
 
-  getPrinterSocket(id: IdType): OctoprintWebsocketAdapter | undefined {
+  getPrinterSocket(id: IdType): IWebsocketAdapter | undefined {
     return this.printerSocketAdaptersById[id];
   }
 
@@ -93,8 +106,8 @@ export class PrinterSocketStore {
   async reconnectPrinterSockets(): Promise<void> {
     let reauthRequested = 0;
     let socketSetupRequested = 0;
-    const socketStates = {};
-    const apiStates = {};
+    const socketStates: { [k: string]: number } = {};
+    const apiStates: { [k: string]: number } = {};
     const promisesReauth = [];
     for (const socket of Object.values(this.printerSocketAdaptersById)) {
       try {

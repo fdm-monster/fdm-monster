@@ -15,7 +15,6 @@ export const createTestPrinterSchema = z
     apiKey: printerApiKeyValidator,
     enabled: printerEnabledValidator.optional(),
     name: printerNameValidator.optional(),
-    correlationToken: z.string(),
   })
   .strict()
   .superRefine(refineApiKeyValidator);
