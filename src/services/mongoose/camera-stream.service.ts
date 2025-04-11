@@ -11,8 +11,7 @@ import { createCameraStreamSchema } from "../validators/camera-service.validatio
 export class CameraStreamService implements ICameraStreamService<MongoIdType> {
   model = CameraStream;
 
-  constructor(private readonly printerCache: PrinterCache) {
-  }
+  constructor(private readonly printerCache: PrinterCache) {}
 
   async list() {
     return this.model.find();
@@ -60,7 +59,7 @@ export class CameraStreamService implements ICameraStreamService<MongoIdType> {
       aspectRatio: entity.aspectRatio,
       flipHorizontal: entity.flipHorizontal,
       flipVertical: entity.flipVertical,
-      rotationClockwise: entity.rotationClockwise
+      rotationClockwise: entity.rotationClockwise,
     };
   }
 }

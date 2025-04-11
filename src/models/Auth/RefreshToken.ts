@@ -1,9 +1,9 @@
-import { model, Schema, Types } from "mongoose";
+import { model, Schema } from "mongoose";
 import { MongoIdType } from "@/shared.constants";
 
 export interface IRefreshToken<KeyType = MongoIdType> {
   id: KeyType;
-  userId: Types.ObjectId;
+  userId: KeyType;
   createdAt: Date;
   expiresAt: number;
   refreshToken: string;
@@ -12,7 +12,7 @@ export interface IRefreshToken<KeyType = MongoIdType> {
 
 const RefreshTokenSchema = new Schema<IRefreshToken>({
   userId: {
-    type: Schema.Types.ObjectId,
+    type: Schema.Types.Mixed,
     ref: "User",
     required: true,
     unique: false,

@@ -8,15 +8,6 @@ import { JsonRpcEventDto } from "@/services/moonraker/dto/websocket/json-rpc-eve
 
 export abstract class WebsocketRpcExtendedAdapter extends WebsocketAdapter {
   protected declare logger: LoggerService;
-
-  protected constructor(loggerFactory: ILoggerFactory) {
-    super(loggerFactory);
-
-    this.logger = loggerFactory(WebsocketRpcExtendedAdapter.name);
-
-    this.requestMap = new Map();
-  }
-
   private requestMap: Map<
     number,
     {
@@ -26,7 +17,19 @@ export abstract class WebsocketRpcExtendedAdapter extends WebsocketAdapter {
     }
   >;
 
+  protected constructor(loggerFactory: ILoggerFactory) {
+    super(loggerFactory);
+
+    this.logger = loggerFactory(WebsocketRpcExtendedAdapter.name);
+
+    this.requestMap = new Map();
+  }
+
   sendRequest<R, I = any>(request: JsonRpcRequestDto<I>, options = { timeout: 10000 }): Promise<JsonRpcResponseDto<R>> {
+    if (!this.socket) {
+      throw new Error("Websocket was not created, cannot send request");
+    }
+
     request.id = request.id++;
 
     // Create a registered promise for the response
@@ -46,27 +49,19 @@ export abstract class WebsocketRpcExtendedAdapter extends WebsocketAdapter {
     return promise;
   }
 
-  private clearRequest(requestId: number): void {
-    const request = this.requestMap.get(requestId);
-    if (request) {
-      clearTimeout(request.timeout);
-      this.requestMap.delete(requestId);
-    }
-  }
-
   /**
    * @abstract
    * @param message
    * @protected
    */
-  protected abstract onEventMessage(message: JsonRpcEventDto): void;
+  protected abstract onEventMessage(message: JsonRpcEventDto): Promise<void>;
 
-  protected onMessage(message: Data): void {
+  protected async onMessage(message: Data): Promise<void> {
     const response: JsonRpcResponseDto<any> = JSON.parse(message.toString());
     const requestId = response.id;
     if (!requestId) {
       const event = response as unknown as JsonRpcEventDto;
-      return this.onEventMessage(event);
+      return await this.onEventMessage(event);
     }
 
     const request = this.requestMap.get(requestId);
@@ -80,6 +75,14 @@ export abstract class WebsocketRpcExtendedAdapter extends WebsocketAdapter {
     if (request) {
       clearTimeout(request.timeout);
       request.resolve(response);
+      this.requestMap.delete(requestId);
+    }
+  }
+
+  private clearRequest(requestId: number): void {
+    const request = this.requestMap.get(requestId);
+    if (request) {
+      clearTimeout(request.timeout);
       this.requestMap.delete(requestId);
     }
   }

@@ -13,7 +13,7 @@ export class PrinterWebsocketRestoreTask {
   constructor(
     loggerFactory: ILoggerFactory,
     private readonly printerSocketStore: PrinterSocketStore,
-    private readonly octoprintClient: OctoprintClient
+    private readonly octoprintClient: OctoprintClient,
   ) {
     this.logger = loggerFactory(PrinterWebsocketRestoreTask.name);
   }
@@ -43,12 +43,12 @@ export class PrinterWebsocketRestoreTask {
         (socket.apiState !== API_STATE.unset && !socket.lastMessageReceivedTimestamp) ||
         (socket.lastMessageReceivedTimestamp && Date.now() - socket.lastMessageReceivedTimestamp > 10 * 1000)
       ) {
-        const result = await this.octoprintClient.getConnection(socket.login!);
+        const result = await this.octoprintClient.getConnection(socket.login);
 
         try {
           if (result.data?.current?.state !== "Closed") {
             this.logger.warn(
-              `Silence was detected, but the OctoPrint current connection was not closed. Connection state ${result.data?.current?.state}`
+              `Silence was detected, but the OctoPrint current connection was not closed. Connection state ${result.data?.current?.state}`,
             );
           }
         } catch (e) {

@@ -32,18 +32,15 @@ export class RefreshTokenService implements IRefreshTokenService<MongoIdType> {
     };
   }
 
-  async getRefreshToken(refreshToken: string, throwNotFoundError = true): Promise<IRefreshToken | null> {
+  async getRefreshToken(refreshToken: string): Promise<IRefreshToken> {
     const userRefreshToken = await RefreshToken.findOne({
       refreshToken,
     });
     if (!userRefreshToken) {
-      if (throwNotFoundError) {
-        throw new AuthenticationError(
-          "The refresh token was not found",
-          AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken,
-        );
-      }
-      return null;
+      throw new AuthenticationError(
+        "The refresh token was not found",
+        AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken,
+      );
     }
     return userRefreshToken;
   }
@@ -68,7 +65,7 @@ export class RefreshTokenService implements IRefreshTokenService<MongoIdType> {
   }
 
   async updateRefreshTokenAttempts(refreshToken: string, refreshAttemptsUsed: number) {
-    await this.getRefreshToken(refreshToken, true);
+    await this.getRefreshToken(refreshToken);
 
     await RefreshToken.updateOne(
       {

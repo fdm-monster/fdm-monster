@@ -20,7 +20,7 @@ export class PrintCompletion implements IPrintCompletion<number, number> {
   @ManyToOne(
     () => Printer,
     (p) => p.printCompletions,
-    { onDelete: "CASCADE" }
+    { onDelete: "CASCADE" },
   )
   @JoinColumn({ name: "printerId" })
   printer: Relation<Printer>;

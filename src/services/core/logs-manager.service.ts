@@ -42,7 +42,7 @@ export class LogDumpService {
     });
 
     this.logger.log(
-      `Removing ${removedFilesNotInFormat.length} files that are not in the format of ${startingFormat}<date>.log, and ${removedFilesOutdated.length} files that are older than 7 days`
+      `Removing ${removedFilesNotInFormat.length} files that are not in the format of ${startingFormat}<date>.log, and ${removedFilesOutdated.length} files that are older than 7 days`,
     );
 
     let removedWrongFormatFilesCount = 0;
@@ -68,7 +68,7 @@ export class LogDumpService {
     this.logger.log(`Removed ${removedWrongFormatFilesCount + removedOutdatedFilesCount} log file(s)`);
     return {
       removedWrongFormatFilesCount,
-      removedOutdatedFilesCount
+      removedOutdatedFilesCount,
     };
   }
 
@@ -81,7 +81,7 @@ export class LogDumpService {
     const outputPath = join(
       superRootPath(),
       AppConstants.defaultLogZipsFolder,
-      `logs-${AppConstants.serverRepoName}.zip`
+      `logs-${AppConstants.serverRepoName}.zip`,
     );
     zip.writeZip(outputPath);
     return outputPath;

@@ -25,7 +25,7 @@ export class AuthController {
     private readonly settingsStore: SettingsStore,
     private readonly userService: IUserService,
     private readonly roleService: IRoleService,
-    private readonly configService: IConfigService
+    private readonly configService: IConfigService,
   ) {
     this.logger = loggerFactory(AuthController.name);
   }
@@ -47,7 +47,7 @@ export class AuthController {
     const isDemoMode = this.configService.isDemoMode();
     wizardState = {
       ...wizardState,
-      wizardCompleted: isDemoMode ? true : wizardState.wizardCompleted
+      wizardCompleted: isDemoMode ? true : wizardState.wizardCompleted,
     };
     res.send({ loginRequired, registration, wizardState, isDemoMode });
   }
@@ -69,7 +69,7 @@ export class AuthController {
         loginRequired: isLoginRequired,
         registration,
         needsPasswordChange: false,
-        authenticated: true
+        authenticated: true,
       });
     }
 
@@ -78,14 +78,14 @@ export class AuthController {
         loginRequired: isLoginRequired,
         registration,
         needsPasswordChange: req.user?.needsPasswordChange,
-        authenticated: true
+        authenticated: true,
       });
     }
 
     return res.send({
       loginRequired: isLoginRequired,
       needsPasswordChange: null,
-      authenticated: false
+      authenticated: false,
     });
   }
 
@@ -140,7 +140,7 @@ export class AuthController {
       isDemoUser: false,
       isRootUser: false,
       // An admin needs to verify the user first
-      isVerified: false
+      isVerified: false,
     });
     const userDto = this.userService.toDto(result);
     res.send(userDto);

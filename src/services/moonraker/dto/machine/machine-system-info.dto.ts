@@ -82,7 +82,8 @@ export interface Python {
 
 export interface Network {
   wlan0: NetworkInterface;
-  eth0?: NetworkInterface;
+  eth0: NetworkInterface;
+
   [k: string]: NetworkInterface;
 }
 
@@ -100,6 +101,7 @@ export interface IpAddress {
 export interface Canbus {
   can0: CanBusInterface;
   can1: CanBusInterface;
+
   [k: string]: CanBusInterface;
 }
 

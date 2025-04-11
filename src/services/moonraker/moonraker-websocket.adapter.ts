@@ -40,12 +40,13 @@ import { PrinterObjectsQueryDto } from "@/services/moonraker/dto/objects/printer
 import _ from "lodash";
 import { ConnectionIdentifyResponseDto } from "@/services/moonraker/dto/websocket/connection-identify-response.dto";
 import { FlagsDto } from "@/services/octoprint/dto/printer/flags.dto";
-import { CurrentMessageDto } from "@/services/octoprint/dto/websocket/current-message.dto";
+import { FdmCurrentMessageDto, MoonrakerType } from "@/services/printer-api.interface";
 import { Event as WsEvent } from "ws";
-import { NotifyServiceStateChangedParams } from "@/services/moonraker/dto/websocket/notify-service-state-changed.params";
+import {
+  NotifyServiceStateChangedParams,
+} from "@/services/moonraker/dto/websocket/notify-service-state-changed.params";
 import { WebsocketRpcExtendedAdapter } from "@/shared/websocket-rpc-extended.adapter";
 import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
-import { MoonrakerType } from "@/services/printer-api.interface";
 import { normalizeUrl } from "@/utils/normalize-url";
 
 export type SubscriptionType = IdleTimeoutObject &
@@ -65,10 +66,6 @@ export type SubscriptionType = IdleTimeoutObject &
 
 export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter implements IWebsocketAdapter {
   readonly printerType = 1;
-
-  protected declare logger: LoggerService;
-  private readonly client: MoonrakerClient;
-
   socketState: SocketState = SOCKET_STATE.unopened;
   lastMessageReceivedTimestamp: null | number = null;
   stateUpdated = false;
@@ -76,11 +73,35 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
   apiStateUpdated = false;
   apiStateUpdateTimestamp: null | number = null;
   apiState: ApiState = API_STATE.unset;
-  login?: LoginDto;
-  private socketURL?: URL;
+  // Guaranteed to be set and valid by PrinterApiFactory
+  login: LoginDto;
   printerId?: IdType;
-
   refreshPrinterObjectsInterval?: NodeJS.Timeout;
+  printerObjects: PrinterObjectsQueryDto<SubscriptionType | null> = {
+    eventtime: null,
+    status: null,
+  };
+  protected declare logger: LoggerService;
+  private readonly client: MoonrakerClient;
+  private socketURL?: URL;
+
+  constructor(
+    loggerFactory: ILoggerFactory,
+    moonrakerClient: MoonrakerClient,
+    private readonly eventEmitter2: EventEmitter2,
+    private readonly configService: ConfigService,
+    private readonly serverVersion: string,
+  ) {
+    super(loggerFactory);
+
+    this.logger = loggerFactory(MoonrakerWebsocketAdapter.name);
+    this.client = moonrakerClient;
+  }
+
+  get _debugMode() {
+    return this.configService.get(AppConstants.debugSocketStatesKey, AppConstants.defaultDebugSocketStates) === "true";
+  }
+
   private get subscriptionObjects() {
     return {
       pause_resume: [],
@@ -103,27 +124,6 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
       [k in KnownPrinterObject]: [];
     };
   }
-  printerObjects: PrinterObjectsQueryDto<SubscriptionType | null> = {
-    eventtime: null,
-    status: null,
-  };
-
-  constructor(
-    loggerFactory: ILoggerFactory,
-    moonrakerClient: MoonrakerClient,
-    private readonly eventEmitter2: EventEmitter2,
-    private readonly configService: ConfigService,
-    private readonly serverVersion: string,
-  ) {
-    super(loggerFactory);
-
-    this.logger = loggerFactory(MoonrakerWebsocketAdapter.name);
-    this.client = moonrakerClient;
-  }
-
-  get _debugMode() {
-    return this.configService.get(AppConstants.debugSocketStatesKey, AppConstants.defaultDebugSocketStates) === "true";
-  }
 
   needsReopen() {
     return false;
@@ -137,7 +137,8 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
     return false;
   }
 
-  async reauthSession() {}
+  async reauthSession() {
+  }
 
   registerCredentials(socketLogin: ISocketLogin) {
     const { printerId, loginDto } = socketLogin;
@@ -184,36 +185,25 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
     }, 15000);
   }
 
-  private async updateCurrentStateSafely() {
-    try {
-      const query: Partial<Record<KnownPrinterObject, []>> = this.subscriptionObjects;
-      const objects = await this.client.getPrinterObjectsQuery<PrinterObjectsQueryDto<SubscriptionType>>(
-        this.login,
-        query,
-      );
-      this.printerObjects = objects.data.result;
-      this.setApiState(API_STATE.responding);
-      return await this.emitCurrentEvent(this.printerObjects);
-    } catch (e) {
-      // Could be network transient error, klippy error, or Moonraker host problem. All scenarios require a different approach.
-      // transient: we should retry and if happening regularly report this host as problematic
-      // klippy error (503): we should definitely clear up and report this as error
-      // Moonraker host error: this means the socket has to be completely shut down
-      const castError = e as MoonrakerErrorDto;
-      if (castError.isAxiosError) {
-        if (castError?.response?.status == 503) {
-          this.printerObjects.status = {};
-          this.printerObjects.eventtime = Date.now();
-          return await this.emitCurrentEvent(this.printerObjects);
-        }
-        this.logger.error("Could not update Moonraker printer objects due to a request error");
-        this.setApiState(API_STATE.noResponse);
-        return;
-      }
-
-      this.logger.error(`Could not update Moonraker current due to an unknown error`);
-      this.setApiState(API_STATE.noResponse);
+  emitEventSync(event: string, payload: any) {
+    if (!this.eventEmittingAllowed) {
+      return;
     }
+
+    this.eventEmitter2.emit(moonrakerEvent(event), {
+      event,
+      payload,
+      printerId: this.printerId,
+    } as OctoPrintEventDto);
+  }
+
+  resetSocketState() {
+    this.setSocketState("unopened");
+    this.setApiState("unset");
+  }
+
+  isClosedOrAborted() {
+    return this.socketState === SOCKET_STATE.closed || this.socketState === SOCKET_STATE.aborted;
   }
 
   protected async afterOpened(_: WsEvent): Promise<void> {
@@ -240,14 +230,14 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
         query,
       );
       this.printerObjects = result.data.result;
-      await this.emitCurrentEvent(this.printerObjects);
+      await this.emitCurrentEvent(this.printerObjects as PrinterObjectsQueryDto<SubscriptionType>);
     } catch (e) {
       const ae = e as MoonrakerErrorDto;
       if (ae.isAxiosError) {
-        if (ae.response.status === 503) {
+        if (ae.response?.status === 503) {
           // shutdown, we should probably mark this host as problematic
           this.logger.warn(`Klipper host issue ${PP(ae.response.data?.error?.message)}`);
-        } else if (ae.response.status === 404) {
+        } else if (ae.response?.status === 404) {
           this.logger.error("Error while afterOpened (404) - usually this means Moonraker is still starting");
         }
         this.setApiState(API_STATE.noResponse);
@@ -275,6 +265,11 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
     const payload = event.params?.length ? event.params[0] : undefined;
 
     if (eventName === "notify_service_state_changed") {
+      if (!event.params) {
+        // We dont understand the service changed...
+        this.logger.error("Received 'notify_service_state_changed' but service indicators params were undefined");
+        return;
+      }
       const serviceChanged = event.params[0] as NotifyServiceStateChangedParams;
       if (
         serviceChanged.klipper?.active_state ||
@@ -300,41 +295,26 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
     }
 
     if (eventName === "notify_status_update") {
-      const [data, eventtime] = (event as NotifyStatusUpdate<SubscriptionType>).params;
+      if (!event.params) {
+        // We dont understand the service changed...
+        this.logger.error("Received 'notify_status_update' but service indicators params were undefined");
+        return;
+      }
 
-      const substate = Object.keys(data)[0] as keyof SubscriptionType;
-      if (Object.keys(this.printerObjects.status).includes(substate)) {
+      const [data, eventtime] = (event as NotifyStatusUpdate<SubscriptionType>).params!;
+
+      const subState = Object.keys(data)[0] as keyof SubscriptionType;
+      if (Object.keys((this.printerObjects as PrinterObjectsQueryDto<SubscriptionType>).status).includes(subState)) {
         this.printerObjects.status = _.merge(this.printerObjects.status, data);
         this.printerObjects.eventtime = eventtime;
         await this.emitCurrentEvent(this.printerObjects);
       } else {
-        this.logger.warn(`Substate ${substate} unknown`);
+        this.logger.warn(`Substate ${subState} unknown`);
       }
       return;
     }
 
     await this.emitEvent(eventName, payload);
-  }
-
-  emitEventSync(event: string, payload: any) {
-    if (!this.eventEmittingAllowed) {
-      return;
-    }
-
-    this.eventEmitter2.emit(moonrakerEvent(event), {
-      event,
-      payload,
-      printerId: this.printerId,
-    } as OctoPrintEventDto);
-  }
-
-  resetSocketState() {
-    this.setSocketState("unopened");
-    this.setApiState("unset");
-  }
-
-  isClosedOrAborted() {
-    return this.socketState === SOCKET_STATE.closed || this.socketState === SOCKET_STATE.aborted;
   }
 
   protected async afterClosed(event: any) {
@@ -348,7 +328,39 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
     await this.emitEvent(WsMessage.WS_ERROR, error?.length ? error : "connection error");
   }
 
-  private async emitCurrentEvent(printerObject: PrinterObjectsQueryDto<SubscriptionType>) {
+  private async updateCurrentStateSafely() {
+    try {
+      const query: Partial<Record<KnownPrinterObject, []>> = this.subscriptionObjects;
+      const objects = await this.client.getPrinterObjectsQuery<PrinterObjectsQueryDto<SubscriptionType>>(
+        this.login,
+        query,
+      );
+      this.printerObjects = objects.data.result;
+      this.setApiState(API_STATE.responding);
+      return await this.emitCurrentEvent(this.printerObjects as PrinterObjectsQueryDto<SubscriptionType>);
+    } catch (e) {
+      // Could be network transient error, klippy error, or Moonraker host problem. All scenarios require a different approach.
+      // transient: we should retry and if happening regularly report this host as problematic
+      // klippy error (503): we should definitely clear up and report this as error
+      // Moonraker host error: this means the socket has to be completely shut down
+      const castError = e as MoonrakerErrorDto;
+      if (castError.isAxiosError) {
+        if (castError?.response?.status == 503) {
+          this.printerObjects.status = null;
+          this.printerObjects.eventtime = Date.now();
+          return await this.emitCurrentEvent(this.printerObjects);
+        }
+        this.logger.error("Could not update Moonraker printer objects due to a request error");
+        this.setApiState(API_STATE.noResponse);
+        return;
+      }
+
+      this.logger.error(`Could not update Moonraker current due to an unknown error`);
+      this.setApiState(API_STATE.noResponse);
+    }
+  }
+
+  private async emitCurrentEvent(printerObject: PrinterObjectsQueryDto<SubscriptionType | null>) {
     const originalKlipperObjects = printerObject.status;
 
     // When klipper not connected expect lots of 503
@@ -374,33 +386,40 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
     let filename = "";
     let printTime = null;
 
-    let stateText = originalKlipperObjects.display_status?.message ?? "Error";
+    let stateText = "Unset";
     let error = "";
-    if (originalKlipperObjects.print_stats?.state?.length) {
-      const systemState = originalKlipperObjects.webhooks;
-      const printState = originalKlipperObjects.print_stats.state;
+    let completion: number | null = null;
 
-      const idleState = originalKlipperObjects.idle_timeout?.state;
-      filename = originalKlipperObjects.print_stats.filename;
-      printTime = originalKlipperObjects.print_stats.print_duration;
+    if (originalKlipperObjects != null) {
+      stateText = originalKlipperObjects.display_status?.message;
+      if (originalKlipperObjects.print_stats?.state?.length) {
+        const systemState = originalKlipperObjects.webhooks;
+        const printState = originalKlipperObjects.print_stats.state;
 
-      flags.operational = systemState.state === "ready";
+        const idleState = originalKlipperObjects.idle_timeout?.state;
+        filename = originalKlipperObjects.print_stats.filename;
+        printTime = originalKlipperObjects.print_stats.print_duration;
 
-      if (flags.operational) {
-        flags.printing = printState === "printing";
-        flags.paused = printState === "paused";
-        flags.ready = printState === "standby" && idleState !== "Printing";
-        flags.sdReady = true;
-      } else {
-        flags.error = true;
-        stateText = "Klipper reports: " + (systemState.state ?? "unknown")?.toUpperCase();
+        flags.operational = systemState.state === "ready";
+
+        if (flags.operational) {
+          flags.printing = printState === "printing";
+          flags.paused = printState === "paused";
+          flags.ready = printState === "standby" && idleState !== "Printing";
+          flags.sdReady = true;
+        } else {
+          flags.error = true;
+          stateText = "Klipper reports: " + (systemState.state ?? "unknown")?.toUpperCase();
+        }
       }
+
+      completion = (originalKlipperObjects.display_status?.progress ?? 0) * 100.0;
     }
 
-    const currentMessage: Partial<CurrentMessageDto> = {
+    const currentMessage: FdmCurrentMessageDto = {
       progress: {
-        printTime: printTime,
-        completion: (originalKlipperObjects.display_status?.progress ?? 0) * 100.0,
+        printTime,
+        completion,
       },
       state: {
         text: stateText,

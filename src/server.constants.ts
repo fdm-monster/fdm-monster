@@ -83,8 +83,6 @@ export const AppConstants = {
   defaultSocketThrottleRate: 1,
   debugSocketStatesKey: "DEBUG_SOCKET_STATES",
   defaultDebugSocketStates: "false",
-  debugFileWritePrinterStatesKey: "DEBUG_FILE_WRITE_PRINTER_STATES",
-  defaultDebugFileWritePrinterStates: "false",
 
   // Future experimental feature
   enableMqttAutoDiscoveryToken: "ENABLE_MQTT_AUTODISCOVERY",

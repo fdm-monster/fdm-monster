@@ -9,9 +9,11 @@ import { IUserService } from "@/services/interfaces/user-service.interface";
 import { MongoIdType } from "@/shared.constants";
 import { RegisterUserDto, UserDto } from "@/services/interfaces/user.dto";
 import { IUser } from "@/models/Auth/User";
+import { AnyArray } from "mongoose";
 
 export class UserService implements IUserService<MongoIdType> {
-  constructor(private readonly roleService: RoleService) {}
+  constructor(private readonly roleService: RoleService) {
+  }
 
   toDto(user: IUser): UserDto {
     return {
@@ -39,14 +41,15 @@ export class UserService implements IUserService<MongoIdType> {
   }
 
   async isUserRootUser(userId: MongoIdType) {
-    return (await User.findById(userId))?.isRootUser;
+    const entity = await this.getUser(userId);
+    return entity.isRootUser;
   }
 
   async findRootUsers() {
     return User.find({ isRootUser: true });
   }
 
-  async getDemoUserId() {
+  async getDemoUserId(): Promise<MongoIdType | undefined> {
     return (await User.findOne({ isDemoUser: true }))?.id;
   }
 
@@ -56,9 +59,9 @@ export class UserService implements IUserService<MongoIdType> {
     });
   }
 
-  async getUser(userId: MongoIdType, throwNotFoundError: boolean = true): Promise<IUser> {
+  async getUser(userId: MongoIdType): Promise<IUser> {
     const user = await User.findById(userId);
-    if (!user && throwNotFoundError) throw new NotFoundException("User not found");
+    if (!user) throw new NotFoundException("User not found");
 
     return user;
   }
@@ -74,7 +77,7 @@ export class UserService implements IUserService<MongoIdType> {
     const roles = this.roleService.getManyRoles(roleIds);
 
     user.roles = roles.map((r) => r.id);
-    user.roles = Array.from(new Set(user.roles));
+    user.roles = Array.from(new Set(user.roles as AnyArray<MongoIdType>));
 
     return await user.save();
   }
@@ -88,7 +91,7 @@ export class UserService implements IUserService<MongoIdType> {
 
     // Check if the user is the last admin
     const role = this.roleService.getRoleByName(ROLES.ADMIN);
-    if (user.roles.includes(role.id)) {
+    if ((user.roles as AnyArray<MongoIdType>).includes(role.id)) {
       const administrators = await this.findUsersByRoleId(role.id);
       if (administrators?.length === 1 && administrators[0].id === userId) {
         throw new InternalServerException("Cannot delete the last user with ADMIN role");

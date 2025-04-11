@@ -43,7 +43,9 @@ describe(TaskManagerService.name, () => {
       taskManagerService.validateInput("name", DITokens.configService, {});
     } catch (e) {
       expect(e instanceof JobValidationException).toBeTruthy();
-      expect((e as JobValidationException).message).toEqual("Job 'configService' with ID 'name' was resolved but it doesn't have a 'run()' method to call.");
+      expect((e as JobValidationException).message).toEqual(
+        "Job 'configService' with ID 'name' was resolved but it doesn't have a 'run()' method to call.",
+      );
       caught = true;
     }
     expect(caught).toEqual(true);
@@ -52,15 +54,11 @@ describe(TaskManagerService.name, () => {
   it("should not run disabled periodic job", () => {
     let ran = false;
 
-    taskManagerService.validateInput(
-      "name",
-      DITokens.softwareUpdateTask,
-      {
-        disabled: true,
-        periodic: true,
-        milliseconds: 1000,
-      },
-    );
+    taskManagerService.validateInput("name", DITokens.softwareUpdateTask, {
+      disabled: true,
+      periodic: true,
+      milliseconds: 1000,
+    });
 
     expect(ran).toBeFalsy();
   });

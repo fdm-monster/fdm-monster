@@ -57,6 +57,7 @@ jobs:
       - run: yarn set version berry
       - run: yarn install --immutable
       - run: yarn build
+      - run: yarn run tsc
 
       # Publish to NPM
       - uses: JS-DevTools/npm-publish@v3

@@ -10,17 +10,18 @@ import {
   createOrUpdateFloorSchema,
   printerInFloorSchema,
   updateFloorLevelSchema,
-  updateFloorNameSchema
+  updateFloorNameSchema,
 } from "@/services/validators/floor-service.validation";
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import { FindManyOptions, FindOneOptions } from "typeorm";
 
 export class FloorService
   extends BaseService(Floor, FloorDto<SqliteIdType>, CreateFloorDto<SqliteIdType>, UpdateFloorDto<SqliteIdType>)
-  implements IFloorService<SqliteIdType, Floor> {
+  implements IFloorService<SqliteIdType, Floor>
+{
   constructor(
     protected readonly typeormService: TypeormService,
-    private readonly floorPositionService: FloorPositionService
+    private readonly floorPositionService: FloorPositionService,
   ) {
     super(typeormService);
   }
@@ -28,8 +29,8 @@ export class FloorService
   override async list(options?: FindManyOptions<Floor>): Promise<Floor[]> {
     return super.list(
       Object.assign(options || {}, {
-        relations: ["printers"]
-      })
+        relations: ["printers"],
+      }),
     );
   }
 
@@ -37,8 +38,8 @@ export class FloorService
     return super.get(
       id,
       Object.assign(options || {}, {
-        relations: ["printers"]
-      })
+        relations: ["printers"],
+      }),
     );
   }
 
@@ -48,7 +49,7 @@ export class FloorService
     const floor = await super.create({
       name: outcome.name,
       floor: outcome.floor,
-      printers: []
+      printers: [],
     });
 
     if (outcome.printers?.length) {
@@ -69,15 +70,15 @@ export class FloorService
         printerId: p.printerId,
         floorId: p.floorId,
         x: p.x,
-        y: p.y
-      }))
+        y: p.y,
+      })),
     };
   }
 
   async createDefaultFloor() {
     const floor = await this.create({
       name: "Default Floor",
-      floor: 0
+      floor: 0,
     });
 
     return await this.get(floor.id);
@@ -95,7 +96,7 @@ export class FloorService
       ...existingFloor,
       name: update.name,
       printers: update.printers,
-      floor: update.floor
+      floor: update.floor,
     };
     const validatedFloor = await validateInput(floorUpdate, createOrUpdateFloorSchema(true));
 
@@ -108,7 +109,7 @@ export class FloorService
 
       // Remove any printers that should not exist on floor
       const undesiredPositions = existingFloor.printers.filter(
-        (pos) => !desiredPositions.find((dp) => dp.printerId === pos.printerId)
+        (pos) => !desiredPositions.find((dp) => dp.printerId === pos.printerId),
       );
       if (undesiredPositions?.length) {
         await this.floorPositionService.deleteMany(undesiredPositions.map((pos) => pos.id));
@@ -169,7 +170,7 @@ export class FloorService
       x: validInput.x,
       y: validInput.y,
       printerId: validInput.printerId as SqliteIdType,
-      floorId: floorId as SqliteIdType
+      floorId,
     });
 
     await this.floorPositionService.create(newPosition);

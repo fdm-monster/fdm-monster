@@ -27,5 +27,5 @@ module.exports = {
     } finally {
       await session.endSession();
     }
-  }
+  },
 };

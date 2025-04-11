@@ -6,7 +6,7 @@ export interface IFloor<KeyType = MongoIdType> {
   id: KeyType;
   name: string;
   floor: number;
-  printers: IPosition[];
+  printers: IPosition<KeyType>[];
 }
 
 const FloorSchema = new Schema<IFloor>({

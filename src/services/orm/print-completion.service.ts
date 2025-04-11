@@ -3,7 +3,7 @@ import { PrintCompletion } from "@/entities";
 import {
   CreatePrintCompletionDto,
   PrintCompletionContext,
-  PrintCompletionDto
+  PrintCompletionDto,
 } from "@/services/interfaces/print-completion.dto";
 import { SqliteIdType } from "@/shared.constants";
 import { IPrintCompletionService } from "@/services/interfaces/print-completion.interface";
@@ -18,7 +18,8 @@ import { IPrintCompletion } from "@/models/PrintCompletion";
 
 export class PrintCompletionService
   extends BaseService(PrintCompletion, PrintCompletionDto<SqliteIdType>)
-  implements IPrintCompletionService<SqliteIdType, PrintCompletion> {
+  implements IPrintCompletionService<SqliteIdType, PrintCompletion>
+{
   private readonly logger: LoggerService;
 
   constructor(typeormService: TypeormService, loggerFactory: ILoggerFactory) {
@@ -35,7 +36,7 @@ export class PrintCompletionService
       createdAt: entity.createdAt,
       printerReference: entity.printerReference,
       status: entity.status,
-      printerId: entity.printerId
+      printerId: entity.printerId,
     };
   }
 
@@ -56,11 +57,11 @@ export class PrintCompletionService
 
     const completionEntry = await this.repository.findOneBy({
       context: { correlationId },
-      status: EVENT_TYPES.PrintStarted
+      status: EVENT_TYPES.PrintStarted,
     });
     if (!completionEntry) {
       this.logger.warn(
-        `Print with correlationId ${correlationId} could not be updated with new context as it was not found`
+        `Print with correlationId ${correlationId} could not be updated with new context as it was not found`,
       );
       return;
     }
@@ -73,7 +74,7 @@ export class PrintCompletionService
     const printCompletionsAggr = groupArrayBy(limitedCompletions, (val) => val.printerId.toString());
     const completions = Object.entries(printCompletionsAggr).map(([pc, val]) => ({
       printerId: parseInt(pc),
-      printEvents: val
+      printEvents: val,
     }));
     return processCompletions(completions);
   }
@@ -81,12 +82,12 @@ export class PrintCompletionService
   async loadPrintContexts(): Promise<Record<string, IPrintCompletion<number, number>[]>> {
     const completions = await this.repository.find({
       where: {
-        status: Not(In([EVENT_TYPES.PrintDone, EVENT_TYPES.PrintFailed]))
+        status: Not(In([EVENT_TYPES.PrintDone, EVENT_TYPES.PrintFailed])),
       },
       order: {
         printerId: 1,
-        createdAt: -1
-      }
+        createdAt: -1,
+      },
     });
 
     return groupArrayBy(completions, (val) => val.id.toString());

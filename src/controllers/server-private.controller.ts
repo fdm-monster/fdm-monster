@@ -1,5 +1,5 @@
 import { PassThrough } from "stream";
-import { GET, POST, DELETE, route, before } from "awilix-express";
+import { before, DELETE, GET, POST, route } from "awilix-express";
 import { authenticate, authorizeRoles } from "@/middleware/authenticate";
 import { AppConstants } from "@/server.constants";
 import { ROLES } from "@/constants/authorization.constants";
@@ -46,7 +46,7 @@ export class ServerPrivateController {
 
   @GET()
   @route("/client-releases")
-  async getClientReleases(req: Request, res: Response) {
+  async getClientReleases(_req: Request, res: Response) {
     const releaseSpec = await this.clientBundleService.getReleases();
     res.send(releaseSpec);
   }
@@ -80,7 +80,9 @@ export class ServerPrivateController {
       });
     }
 
-    const tag_name = await this.clientBundleService.downloadClientUpdate(willExecute.targetVersion);
+    if (willExecute.targetVersion) {
+      await this.clientBundleService.downloadClientUpdate(willExecute.targetVersion);
+    }
 
     return res.send({
       executed: true,

@@ -33,23 +33,29 @@ beforeAll(async () => {
 describe(PrinterSocketStore.name, () => {
   const invalidNewPrinterState = {
     apiKey: "asd",
-    printerURL: null as null | string
+    printerURL: null as null | string,
   };
 
   const weakNewPrinter = {
     apiKey: "asdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasd",
-    printerURL: "http://192.168.1.0"
+    printerURL: "http://192.168.1.0",
   };
 
   const weakNewPrinter2 = {
     apiKey: "1C0KVOKWEAKWEAK8VBGAR",
-    printerURL: "http://192.168.1.0"
+    printerURL: "http://192.168.1.0",
   };
 
   it("should avoid adding invalid printer", async () => {
-    await expect(() => printerService.create({} as z.infer<typeof createPrinterSchema>)).rejects.toBeInstanceOf(ValidationException);
-    await expect(() => printerService.create(invalidNewPrinterState as z.infer<typeof createPrinterSchema>)).rejects.toBeInstanceOf(ValidationException<ZodError>);
-    await expect(() => printerService.create(invalidNewPrinterState as z.infer<typeof createPrinterSchema>)).rejects.toMatchObject({
+    await expect(() => printerService.create({} as z.infer<typeof createPrinterSchema>)).rejects.toBeInstanceOf(
+      ValidationException,
+    );
+    await expect(() =>
+      printerService.create(invalidNewPrinterState as z.infer<typeof createPrinterSchema>),
+    ).rejects.toBeInstanceOf(ValidationException<ZodError>);
+    await expect(() =>
+      printerService.create(invalidNewPrinterState as z.infer<typeof createPrinterSchema>),
+    ).rejects.toMatchObject({
       name: "ValidationException",
       errors: expect.objectContaining({
         issues: expect.arrayContaining([
@@ -58,29 +64,33 @@ describe(PrinterSocketStore.name, () => {
             expected: "string",
             received: "null",
             path: ["printerURL"],
-            message: "Expected string, received null"
+            message: "Expected string, received null",
           },
           {
             code: "invalid_type",
-            expected: "number",
+            expected: "0 | 1",
             received: "undefined",
             path: ["printerType"],
-            message: "Required"
+            message: "Required",
           },
           {
             code: "invalid_type",
             expected: "string",
             received: "undefined",
             path: ["name"],
-            message: "Required"
-          }
-        ])
-      })
+            message: "Required",
+          },
+        ]),
+      }),
     });
 
-    await expect(async () => await printerService.create(weakNewPrinter as z.infer<typeof createPrinterSchema>)).rejects.toBeInstanceOf(ValidationException);
+    await expect(
+      async () => await printerService.create(weakNewPrinter as z.infer<typeof createPrinterSchema>),
+    ).rejects.toBeInstanceOf(ValidationException);
 
-    await expect(async () => await printerService.create(weakNewPrinter2 as z.infer<typeof createPrinterSchema>)).rejects.toBeDefined();
+    await expect(
+      async () => await printerService.create(weakNewPrinter2 as z.infer<typeof createPrinterSchema>),
+    ).rejects.toBeDefined();
   });
 
   it("should be able to add and flatten new printer", async () => {
@@ -98,7 +108,7 @@ describe(PrinterSocketStore.name, () => {
 
     const printerDto = await printerCache.getCachedPrinterOrThrowAsync(printerEntity.id);
     expect(printerDto).toMatchObject({
-      id: expect.anything()
+      id: expect.anything(),
     });
   });
 

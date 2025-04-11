@@ -29,7 +29,7 @@ export class BatchCallService<KeyType extends IdType = keyType> {
     private readonly printerApiFactory: PrinterApiFactory,
     private readonly printerCache: PrinterCache,
     private readonly printerSocketStore: PrinterSocketStore,
-    private readonly printerService: IPrinterService
+    private readonly printerService: IPrinterService,
   ) {
     this.logger = loggerFactory(BatchCallService.name);
   }
@@ -40,7 +40,7 @@ export class BatchCallService<KeyType extends IdType = keyType> {
 
   async batchTogglePrintersEnabled(
     printerIds: KeyType[],
-    enabled: boolean
+    enabled: boolean,
   ): Promise<
     {
       failure?: boolean;
@@ -52,7 +52,7 @@ export class BatchCallService<KeyType extends IdType = keyType> {
   > {
     const promises = [];
     for (const printerId of printerIds) {
-      let promise: Promise<any>;
+      let promise: Promise<any> | undefined = undefined;
       const printerDto = await this.printerCache.getValue(printerId);
       if (!printerDto) continue;
 
@@ -79,8 +79,14 @@ export class BatchCallService<KeyType extends IdType = keyType> {
           .catch((e) => {
             return { failure: true, error: e.message, printerId, time: Date.now() - time };
           });
+      } else {
+        this.logger.warn("Did not toggle printer enabled, its in maintenance");
       }
-      promises.push(promise);
+
+
+      if (promise) {
+        promises.push(promise);
+      }
     }
 
     return await Promise.all(promises);
@@ -151,14 +157,14 @@ export class BatchCallService<KeyType extends IdType = keyType> {
 
           return resolve({
             ...partialReprintState,
-            printerId
+            printerId,
           });
         } catch (e) {
           captureException(e);
           return resolve({
             connectionState: null,
             printerId,
-            reprintState: ReprintState.PrinterNotAvailable
+            reprintState: ReprintState.PrinterNotAvailable,
           });
         }
       });
