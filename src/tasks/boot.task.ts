@@ -91,21 +91,21 @@ export class BootTask {
       await this.settingsStore.setLoginRequired(true);
       await this.settingsStore.setRegistrationEnabled(false);
     } else {
-      const loginRequired = this.configService.get(AppConstants.OVERRIDE_LOGIN_REQUIRED, null);
+      const loginRequired = this.configService.get(AppConstants.OVERRIDE_LOGIN_REQUIRED);
       if (loginRequired !== null) {
         this.logger.warn(`Setting login required due to ${AppConstants.OVERRIDE_LOGIN_REQUIRED}`);
         await this.settingsStore.setLoginRequired(loginRequired === "true");
       }
 
-      const registrationEnabled = this.configService.get(AppConstants.OVERRIDE_REGISTRATION_ENABLED, null);
+      const registrationEnabled = this.configService.get(AppConstants.OVERRIDE_REGISTRATION_ENABLED);
       if (registrationEnabled !== null) {
         this.logger.warn(`Setting registration enabled due to ${AppConstants.OVERRIDE_REGISTRATION_ENABLED}`);
         await this.settingsStore.setRegistrationEnabled(registrationEnabled === "true");
       }
     }
 
-    const overrideJwtSecret = this.configService.get(AppConstants.OVERRIDE_JWT_SECRET, undefined);
-    const overrideJwtExpiresIn = this.configService.get(AppConstants.OVERRIDE_JWT_EXPIRES_IN, undefined);
+    const overrideJwtSecret = this.configService.get(AppConstants.OVERRIDE_JWT_SECRET);
+    const overrideJwtExpiresIn = this.configService.get(AppConstants.OVERRIDE_JWT_EXPIRES_IN);
     await this.settingsStore.persistOptionalCredentialSettings(overrideJwtSecret, overrideJwtExpiresIn);
 
     this.logger.log("Clearing upload folder");
