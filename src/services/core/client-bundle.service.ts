@@ -74,7 +74,7 @@ export class ClientBundleService {
   ): Promise<UpdateResponse> {
     const clientAutoUpdate = AppConstants.enableClientDistAutoUpdateKey;
     const existingVersion = this.getClientVersion();
-    minimumVersion = minimumVersion || this.minVersion;
+    minimumVersion ??= this.minVersion;
 
     // Auto-update check
     if (!clientAutoUpdate && !overrideAutoUpdate) {
