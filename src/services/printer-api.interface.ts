@@ -4,12 +4,32 @@ import { ServerConfigDto } from "@/services/moonraker/dto/server/server-config.d
 import { SettingsDto } from "@/services/octoprint/dto/settings/settings.dto";
 import { ConnectionState } from "@/services/octoprint/dto/connection/connection-state.type";
 import { IdType } from "@/shared.constants";
+import { Flags } from "@/services/moonraker/dto/octoprint-compat/api-printer.dto";
 
 export const OctoprintType = 0;
 export const MoonrakerType = 1;
 export const PrinterTypes = [OctoprintType, MoonrakerType] as const;
 export type PrinterTypes = (typeof PrinterTypes)[number];
 export type PrinterType = typeof OctoprintType | typeof MoonrakerType;
+
+export interface FDMM_CurrentMessageDto {
+  progress: {
+    printTime: number | null,
+    completion: number
+  },
+  state: {
+    text: string,
+    error: string,
+    flags: Flags
+  },
+  job: {
+    file: {
+      name: string,
+      path: string
+    }
+  }
+}
+
 
 export interface StatusFlags {
   connected: boolean;
@@ -51,19 +71,29 @@ export interface ReprintFileDto extends PartialReprintFileDto {
 
 export interface IPrinterApi {
   get type(): PrinterType;
+
   set login(login: LoginDto);
+
   getVersion(): Promise<string>;
 
   connect(): Promise<void>;
+
   disconnect(): Promise<void>;
+
   restartServer(): Promise<void>;
+
   restartHost(): Promise<void>;
+
   restartPrinterFirmware(): Promise<void>;
 
   startPrint(path: string): Promise<void>;
+
   pausePrint(): Promise<void>;
+
   resumePrint(): Promise<void>;
+
   cancelPrint(): Promise<void>;
+
   quickStop(): Promise<void>;
 
   // Subsetting of OctoPrint
@@ -73,15 +103,23 @@ export interface IPrinterApi {
   // getStatusFlags(): StatusFlags;
 
   sendGcode(script: string): Promise<void>;
+
   movePrintHead(amounts: { x?: number; y?: number; z?: number; speed?: number }): Promise<void>;
+
   homeAxes(axes: { x?: boolean; y?: boolean; z?: boolean }): Promise<void>;
 
   getFile(path: string): Promise<FileDto>;
+
   getFiles(): Promise<FileDto[]>;
+
   downloadFile(path: string): AxiosPromise<NodeJS.ReadableStream>;
+
   getFileChunk(path: string, startBytes: number, endBytes: number): AxiosPromise<string>;
+
   uploadFile(fileOrBuffer: Buffer | Express.Multer.File, uploadToken?: string): Promise<void>;
+
   deleteFile(path: string): Promise<void>;
+
   deleteFolder(path: string): Promise<void>;
 
   getSettings(): Promise<ServerConfigDto | SettingsDto>;

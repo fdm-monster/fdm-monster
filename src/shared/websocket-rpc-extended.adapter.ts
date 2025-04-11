@@ -54,14 +54,14 @@ export abstract class WebsocketRpcExtendedAdapter extends WebsocketAdapter {
    * @param message
    * @protected
    */
-  protected abstract onEventMessage(message: JsonRpcEventDto): void;
+  protected abstract onEventMessage(message: JsonRpcEventDto): Promise<void>;
 
-  protected onMessage(message: Data): void {
+  protected async onMessage(message: Data): Promise<void> {
     const response: JsonRpcResponseDto<any> = JSON.parse(message.toString());
     const requestId = response.id;
     if (!requestId) {
       const event = response as unknown as JsonRpcEventDto;
-      return this.onEventMessage(event);
+      return await this.onEventMessage(event);
     }
 
     const request = this.requestMap.get(requestId);

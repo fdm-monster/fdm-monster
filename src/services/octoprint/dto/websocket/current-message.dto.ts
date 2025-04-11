@@ -5,7 +5,6 @@ import { ResendsDto } from "@/services/octoprint/dto/printer/resends.dto";
 import { StateDto } from "@/services/octoprint/dto/printer/state.dto";
 import { MarkingsDto } from "@/services/octoprint/dto/printer/markings.dto";
 import { BusyFileDto } from "@/services/octoprint/dto/printer/busy-file.dto";
-import { OctoPrintEventDto } from "@/services/octoprint/dto/octoprint-event.dto";
 
 export interface CurrentMessageDto {
   // Printer information
