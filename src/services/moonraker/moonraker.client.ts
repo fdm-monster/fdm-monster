@@ -51,7 +51,9 @@ import { WebcamTestDto } from "@/services/moonraker/dto/server-webcams/webcam-te
 import { NotifierListDto } from "@/services/moonraker/dto/notifier-list.dto";
 import { MachineUpdateStatusDto } from "@/services/moonraker/dto/machine/machine-update-status.dto";
 import { MachineDevicePowerDevicesDto } from "@/services/moonraker/dto/machine/machine-device-power-devices.dto";
-import { MachineDevicePowerDeviceStateDto } from "@/services/moonraker/dto/machine/machine-device-power-device-state.dto";
+import {
+  MachineDevicePowerDeviceStateDto,
+} from "@/services/moonraker/dto/machine/machine-device-power-device-state.dto";
 import { MachineWledStripsDto } from "@/services/moonraker/dto/machine/machine-wled-strips.dto";
 import { JsonRpcResponseDto } from "@/services/moonraker/dto/rpc/json-rpc-response.dto";
 import { JsonRpcRequestDto } from "@/services/moonraker/dto/rpc/json-rpc-request.dto";
@@ -167,19 +169,6 @@ export class MoonrakerClient {
     return this.createClient(login).post<ResultDto<R>>(
       `printer/objects/subscribe?connection_id=${connectionId}&${queryString}`,
     );
-  }
-
-  private convertToQueryString(query: Partial<Record<KnownPrinterObject, string[]>>): string {
-    return Object.entries(query)
-      .reduce((acc, [key, value]) => {
-        if (value.length > 0) {
-          acc.push(`${key}=${value.join(",")}`);
-        } else {
-          acc.push(key);
-        }
-        return acc;
-      }, [])
-      .join("&");
   }
 
   async getPrinterQueryEndstops(login: LoginDto) {
@@ -396,7 +385,7 @@ export class MoonrakerClient {
     // Calculate the header that axios uses to determine progress
     const result: number = await new Promise<number>((resolve, reject) => {
       return formData.getLength((err, length) => {
-        if (err) resolve(null);
+        if (err) reject(new Error("Could not retrieve formData length"));
         resolve(length);
       });
     });
@@ -415,11 +404,15 @@ export class MoonrakerClient {
           });
       }).post(`server/files/upload`, formData);
 
-      this.eventEmitter2.emit(`${uploadDoneEvent(progressToken)}`, progressToken);
+      if (progressToken) {
+        this.eventEmitter2.emit(`${uploadDoneEvent(progressToken)}`, progressToken);
+      }
 
       return response.data;
     } catch (e: any) {
-      this.eventEmitter2.emit(`${uploadFailedEvent(progressToken)}`, progressToken, (e as AxiosError)?.message);
+      if (progressToken) {
+        this.eventEmitter2.emit(`${uploadFailedEvent(progressToken)}`, progressToken, (e as AxiosError)?.message);
+      }
       let data;
       try {
         data = JSON.parse(e.response?.body);
@@ -835,20 +828,20 @@ export class MoonrakerClient {
   /**
    * @deprecated API might not be available in the future
    * @param login
+   */
+  async getApiJob(login: LoginDto) {
+    return this.createClient(login).get<ApiJobDto>(`api/job`);
+  }
+
+  /**
+   * @deprecated API might not be available in the future
+   * @param login
    * @param commands
    */
   // async postFilesLocalUpload(login: LoginDto) {
   //   // This is just an alias
   //   return this.postServerFileUpload(login);
   // }
-
-  /**
-   * @deprecated API might not be available in the future
-   * @param login
-   */
-  async getApiJob(login: LoginDto) {
-    return this.createClient(login).get<ApiJobDto>(`api/job`);
-  }
 
   /**
    * @deprecated API might not be available in the future
@@ -911,6 +904,19 @@ export class MoonrakerClient {
     const base = `server/history/job`;
     const url = !!uid?.length ? `${base}?uid=${uid}` : `${base}?all=true`;
     return this.createClient(login).get<ResultDto<string[]>>(url);
+  }
+
+  private convertToQueryString(query: Partial<Record<KnownPrinterObject, string[]>>): string {
+    return Object.entries(query)
+      .reduce((acc: string[], [key, value]) => {
+        if (value.length > 0) {
+          acc.push(`${key}=${value.join(",")}`);
+        } else {
+          acc.push(key);
+        }
+        return acc;
+      }, [])
+      .join("&");
   }
 
   private createClient(login: LoginDto, buildFluentOptions?: (base: DefaultHttpClientBuilder) => void) {
