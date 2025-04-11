@@ -48,6 +48,6 @@ describe(RefreshTokenService.name, () => {
     const user = await ensureTestUserCreated("test", "test");
     const refreshToken = await refreshTokenService.createRefreshTokenForUserId(user.id);
     await refreshTokenService.deleteRefreshToken(refreshToken);
-    expect(await refreshTokenService.getRefreshToken(refreshToken, false)).toBeNull();
+    await expect(() => refreshTokenService.getRefreshToken(refreshToken)).rejects.toThrow();
   });
 });

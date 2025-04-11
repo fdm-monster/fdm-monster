@@ -8,7 +8,7 @@ import { captureException } from "@sentry/node";
 import { PrinterApiFactory } from "@/services/printer-api.factory";
 
 export class PrinterFilesStore {
-  private logger: LoggerService;
+  private readonly logger: LoggerService;
 
   constructor(
     loggerFactory: ILoggerFactory,
