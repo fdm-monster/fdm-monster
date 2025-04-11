@@ -7,7 +7,7 @@ import {
   testPrinterApiSchema,
   updatePrinterConnectionSettingSchema,
   updatePrinterDisabledReasonSchema,
-  updatePrinterEnabledSchema,
+  updatePrinterEnabledSchema
 } from "./validation/printer-controller.validation";
 import { AppConstants } from "@/server.constants";
 import { printerResolveMiddleware } from "@/middleware/printer";
@@ -46,7 +46,7 @@ export class PrinterController {
     private readonly printerCache: PrinterCache,
     private readonly printerEventsCache: PrinterEventsCache,
     private readonly printerApi: IPrinterApi,
-    private readonly floorStore: FloorStore,
+    private readonly floorStore: FloorStore
   ) {
     this.logger = loggerFactory(PrinterController.name);
   }
@@ -157,7 +157,7 @@ export class PrinterController {
     try {
       await this.testPrinterSocketStore.setupTestPrinter(newPrinter);
     } catch (e) {
-      res.send({ correlationToken: newPrinter.correlationToken, failure: true, error: e.toString() });
+      res.send({ correlationToken: newPrinter.correlationToken, failure: true, error: (e as Error).toString() });
       return;
     }
     res.send({ correlationToken: newPrinter.correlationToken });
@@ -229,6 +229,25 @@ export class PrinterController {
     res.send();
   }
 
+  @PATCH()
+  @route("/:id/feed-rate")
+  async setFeedRate(req: Request, res: Response) {
+    const { currentPrinterId } = getScopedPrinter(req);
+    const data = await validateMiddleware(req, feedRateSchema);
+
+    await this.printerService.updateFeedRate(currentPrinterId, data.feedRate);
+    res.send({});
+  }
+
+  @PATCH()
+  @route("/:id/flow-rate")
+  async setFlowRate(req: Request, res: Response) {
+    const { currentPrinterId } = getScopedPrinter(req);
+    const data = await validateMiddleware(req, flowRateSchema);
+    await this.printerService.updateFlowRate(currentPrinterId, data.flowRate);
+    res.send({});
+  }
+
   private async testPrintApiConnection(inputLoginDto: LoginDto) {
     await validateInput(inputLoginDto, updatePrinterConnectionSettingSchema);
     try {
@@ -266,7 +285,7 @@ export class PrinterController {
             } else {
               throw new FailedDependencyException(
                 `Reaching Printer service failed with status (code ${e.code})`,
-                e.response?.status,
+                e.response?.status
               );
             }
           }
@@ -275,24 +294,5 @@ export class PrinterController {
 
       throw new InternalServerException(`Could not call Printer service, internal problem`, (e as Error).stack);
     }
-  }
-
-  @PATCH()
-  @route("/:id/feed-rate")
-  async setFeedRate(req: Request, res: Response) {
-    const { currentPrinterId } = getScopedPrinter(req);
-    const data = await validateMiddleware(req, feedRateSchema);
-
-    await this.printerService.updateFeedRate(currentPrinterId, data.feedRate);
-    res.send({});
-  }
-
-  @PATCH()
-  @route("/:id/flow-rate")
-  async setFlowRate(req: Request, res: Response) {
-    const { currentPrinterId } = getScopedPrinter(req);
-    const data = await validateMiddleware(req, flowRateSchema);
-    await this.printerService.updateFlowRate(currentPrinterId, data.flowRate);
-    res.send({});
   }
 }

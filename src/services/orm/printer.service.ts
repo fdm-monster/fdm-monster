@@ -19,6 +19,7 @@ import { normalizeUrl } from "@/utils/normalize-url";
 import { defaultHttpProtocol } from "@/utils/url.utils";
 import { createPrinterSchema } from "@/services/validators/printer-service.validation";
 import { PrinterType } from "@/services/printer-api.interface";
+import { z } from "zod";
 
 export class PrinterService
   extends BaseService(Printer, PrinterDto<SqliteIdType>, CreatePrinterDto)
@@ -55,7 +56,7 @@ export class PrinterService
     });
   }
 
-  async create(newPrinter: CreatePrinterDto, emitEvent = true): Promise<Printer> {
+  async create(newPrinter: z.infer<typeof createPrinterSchema>, emitEvent = true): Promise<Printer> {
     const mergedPrinter = await this.validateAndDefault(newPrinter);
     mergedPrinter.dateAdded = Date.now();
     const printer = await super.create(mergedPrinter);
@@ -87,7 +88,7 @@ export class PrinterService
     return updatedPrinter;
   }
 
-  async batchImport(printers: Partial<Printer>[]): Promise<Printer[]> {
+  async batchImport(printers: z.infer<typeof createPrinterSchema>[]): Promise<Printer[]> {
     if (!printers?.length) return [];
 
     this.logger.log("Validation passed");
@@ -121,7 +122,7 @@ export class PrinterService
     }
   }
 
-  updateDisabledReason(printerId: SqliteIdType, disabledReason: string): Promise<Printer> {
+  updateDisabledReason(printerId: SqliteIdType, disabledReason?: string): Promise<Printer> {
     return this.update(printerId, { disabledReason });
   }
 
@@ -137,7 +138,7 @@ export class PrinterService
     return this.update(printerId, { flowRate });
   }
 
-  private async validateAndDefault(printer: CreatePrinterDto): Promise<Printer> {
+  private async validateAndDefault(printer: z.infer<typeof createPrinterSchema>) {
     const mergedPrinter = {
       enabled: true,
       ...printer
@@ -145,8 +146,6 @@ export class PrinterService
     if (mergedPrinter.printerURL?.length) {
       mergedPrinter.printerURL = normalizeUrl(mergedPrinter.printerURL, { defaultProtocol: defaultHttpProtocol });
     }
-    await validateInput(mergedPrinter, createPrinterSchema);
-
-    return mergedPrinter;
+    return await validateInput(mergedPrinter, createPrinterSchema);
   }
 }

@@ -4,7 +4,7 @@ import { MongoIdType } from "@/shared.constants";
 
 export interface IPrinter<KeyType = MongoIdType> {
   id: KeyType;
-  apiKey: string;
+  apiKey?: string;
   printerURL: string;
   printerType: number;
   enabled: boolean;
@@ -20,46 +20,47 @@ export const PrinterSchema = new Schema<IPrinter>({
   apiKey: {
     type: String,
     default: "",
+    required: false
   },
   printerURL: {
     type: String,
-    required: true, // !
+    required: true // !
   },
   printerType: {
     type: Number,
     required: true,
-    default: OctoprintType,
+    default: OctoprintType
   },
   enabled: {
     type: Boolean,
     required: true,
-    default: true,
+    default: true
   },
   disabledReason: {
     type: String,
-    required: false,
+    required: false
   },
   assignee: {
     type: String,
-    required: false,
+    required: false
   },
   name: {
     type: String,
-    required: true,
+    required: true
   },
   // Auto-generated below
   dateAdded: {
     type: Number,
-    required: false,
+    required: false
   },
   feedRate: {
     type: Number,
-    required: false,
+    required: false
   },
   flowRate: {
     type: Number,
-    required: false,
-  },
+    required: false
+  }
 });
 
 export const Printer = model("Printer", PrinterSchema);

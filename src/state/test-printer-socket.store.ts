@@ -11,12 +11,11 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { errorSummary } from "@/utils/error.utils";
 import { captureException } from "@sentry/node";
 import { SOCKET_STATE } from "@/shared/dtos/socket-state.type";
-import { TestPrinterDto } from "@/services/interfaces/printer.dto";
-import { IdType } from "@/shared.constants";
 import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
 import { moonrakerEvent } from "@/services/moonraker/constants/websocket.constants";
 import { printerEvents } from "@/constants/event.constants";
 import { OctoPrintEventDto } from "@/services/octoprint/dto/octoprint-event.dto";
+import { z } from "zod";
 
 export class TestPrinterSocketStore {
   testSocket?: IWebsocketAdapter;
@@ -31,7 +30,7 @@ export class TestPrinterSocketStore {
     this.logger = loggerFactory(TestPrinterSocketStore.name);
   }
 
-  async setupTestPrinter(printer: TestPrinterDto<IdType>): Promise<void> {
+  async setupTestPrinter(printer: z.infer<typeof createTestPrinterSchema>): Promise<void> {
     if (this.testSocket) {
       this.testSocket.close();
       delete this.testSocket;

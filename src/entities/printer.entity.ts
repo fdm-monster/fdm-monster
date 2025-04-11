@@ -18,7 +18,7 @@ export class Printer {
   @Column({ default: OctoprintType, nullable: false })
   printerType: number;
 
-  @Column({ default: "" })
+  @Column({ default: "", nullable: true })
   @IsAlphanumeric()
   apiKey: string;
 

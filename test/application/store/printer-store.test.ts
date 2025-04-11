@@ -7,9 +7,10 @@ import { ValidationException } from "@/exceptions/runtime.exceptions";
 import { TestPrinterSocketStore } from "@/state/test-printer-socket.store";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
-import { ZodError } from "zod";
+import { z, ZodError } from "zod";
 import { CreatePrinterDto } from "@/services/interfaces/printer.dto";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
+import { createPrinterSchema } from "@/services/validators/printer-service.validation";
 
 jest.mock("@/services/octoprint/octoprint.client");
 
@@ -47,9 +48,9 @@ describe(PrinterSocketStore.name, () => {
   };
 
   it("should avoid adding invalid printer", async () => {
-    await expect(() => printerService.create({} as CreatePrinterDto)).rejects.toBeInstanceOf(ValidationException);
-    await expect(() => printerService.create(invalidNewPrinterState as CreatePrinterDto)).rejects.toBeInstanceOf(ValidationException<ZodError>);
-    await expect(() => printerService.create(invalidNewPrinterState as CreatePrinterDto)).rejects.toMatchObject({
+    await expect(() => printerService.create({} as z.infer<typeof createPrinterSchema>)).rejects.toBeInstanceOf(ValidationException);
+    await expect(() => printerService.create(invalidNewPrinterState as z.infer<typeof createPrinterSchema>)).rejects.toBeInstanceOf(ValidationException<ZodError>);
+    await expect(() => printerService.create(invalidNewPrinterState as z.infer<typeof createPrinterSchema>)).rejects.toMatchObject({
       name: "ValidationException",
       errors: expect.objectContaining({
         issues: expect.arrayContaining([
@@ -78,9 +79,9 @@ describe(PrinterSocketStore.name, () => {
       })
     });
 
-    await expect(async () => await printerService.create(weakNewPrinter as CreatePrinterDto)).rejects.toBeInstanceOf(ValidationException);
+    await expect(async () => await printerService.create(weakNewPrinter as z.infer<typeof createPrinterSchema>)).rejects.toBeInstanceOf(ValidationException);
 
-    await expect(async () => await printerService.create(weakNewPrinter2 as CreatePrinterDto)).rejects.toBeDefined();
+    await expect(async () => await printerService.create(weakNewPrinter2 as z.infer<typeof createPrinterSchema>)).rejects.toBeDefined();
   });
 
   it("should be able to add and flatten new printer", async () => {

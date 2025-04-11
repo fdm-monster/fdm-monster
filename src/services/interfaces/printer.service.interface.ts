@@ -1,6 +1,8 @@
 import { IPrinter } from "@/models/Printer";
 import { IdType } from "@/shared.constants";
 import { PrinterDto } from "@/services/interfaces/printer.dto";
+import { z } from "zod";
+import { createPrinterSchema } from "@/services/validators/printer-service.validation";
 
 export interface IPrinterService<KeyType = IdType, Entity = IPrinter<KeyType>> {
   toDto(entity: Entity): PrinterDto<KeyType>;
@@ -9,7 +11,7 @@ export interface IPrinterService<KeyType = IdType, Entity = IPrinter<KeyType>> {
 
   get(printerId: KeyType): Promise<Entity>;
 
-  create(printer: Partial<Entity>, emitEvent?: boolean): Promise<Entity>;
+  create(printer: z.infer<typeof createPrinterSchema>, emitEvent?: boolean): Promise<Entity>;
 
   update(printerId: KeyType, printer: Partial<Entity>): Promise<Entity>;
 
@@ -21,9 +23,9 @@ export interface IPrinterService<KeyType = IdType, Entity = IPrinter<KeyType>> {
 
   updateEnabled(printerId: KeyType, enabled: boolean): Promise<Entity>;
 
-  updateFeedRate(printerId: KeyType, feedRate: number): Promise<Entity>;
+  updateFeedRate(printerId: KeyType, feedRate?: number): Promise<Entity>;
 
-  updateFlowRate(printerId: KeyType, flowRate: number): Promise<Entity>;
+  updateFlowRate(printerId: KeyType, flowRate?: number): Promise<Entity>;
 
-  updateDisabledReason(printerId: KeyType, disabledReason: string): Promise<Entity>;
+  updateDisabledReason(printerId: KeyType, disabledReason?: string): Promise<Entity>;
 }
