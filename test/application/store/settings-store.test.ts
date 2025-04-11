@@ -1,9 +1,7 @@
 import { DITokens } from "@/container.tokens";
-import { AwilixContainer } from "awilix";
 import { SettingsStore } from "@/state/settings.store";
 import { setupTestApp } from "../../test-server";
 
-let container: AwilixContainer;
 let settingsStore: SettingsStore;
 
 beforeEach(async () => {

@@ -115,7 +115,7 @@ export class SettingsStore {
       });
     }
 
-    this.settings![credentialSettingsKey] = credentialSettings;
+    this.settings![credentialSettingsKey] = await this.getCredentialSettings();
   }
 
   getWizardState() {
