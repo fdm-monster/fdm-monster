@@ -25,7 +25,6 @@ import { MongoIdType } from "@/shared.constants";
 import { z } from "zod";
 import { migrateSettingsRuntime } from "@/shared/runtime-settings.migration";
 
-
 export class SettingsService implements ISettingsService<MongoIdType> {
   toDto(entity: ISettings): SettingsDto {
     return {
