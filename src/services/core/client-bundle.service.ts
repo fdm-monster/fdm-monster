@@ -13,12 +13,25 @@ import { errorSummary } from "@/utils/error.utils";
 import { ExternalServiceError, InternalServerException, NotFoundException } from "@/exceptions/runtime.exceptions";
 import { RequestError } from "octokit";
 
+type UpdateResponse = {
+  shouldUpdate: boolean;
+  requestedVersion: string | undefined;
+  currentVersion: string | null;
+  minimumVersion: string;
+  targetVersion: string | null;
+  reason: string;
+};
+
 export class ClientBundleService {
   private readonly logger: LoggerService;
+  private readonly githubOwner = AppConstants.orgName;
+  private readonly githubRepo = AppConstants.clientRepoName;
+  private readonly storageRoot = superRootPath();
+  private readonly minVersion = AppConstants.defaultClientMinimum;
 
   constructor(
     loggerFactory: ILoggerFactory,
-    private readonly githubService: GithubService,
+    private readonly githubService: GithubService
   ) {
     this.logger = loggerFactory(ClientBundleService.name);
   }
@@ -32,20 +45,17 @@ export class ClientBundleService {
   }
 
   async getReleases() {
-    const githubOwner = AppConstants.orgName;
-    const githubRepo = AppConstants.clientRepoName;
     try {
-      const result = await this.githubService.getReleases(githubOwner, githubRepo);
-      const latestResult = await this.githubService.getLatestRelease(githubOwner, githubRepo);
+      const [releases, latestRelease] = await Promise.all([
+        this.githubService.getReleases(this.githubOwner, this.githubRepo),
+        this.githubService.getLatestRelease(this.githubOwner, this.githubRepo)
+      ]);
+
       return {
-        minimum: {
-          tag_name: AppConstants.defaultClientMinimum,
-        },
-        current: {
-          tag_name: this.getClientVersion(),
-        },
-        latest: latestResult.data,
-        releases: result.data,
+        minimum: { tag_name: this.minVersion },
+        current: { tag_name: this.getClientVersion() },
+        latest: latestRelease.data,
+        releases: releases.data
       };
     } catch (e) {
       if (e instanceof RequestError) {
@@ -60,194 +70,187 @@ export class ClientBundleService {
     overrideAutoUpdate?: boolean,
     minimumVersion?: string,
     requestedVersion?: string,
-    allowDowngrade?: boolean,
-  ) {
+    allowDowngrade?: boolean
+  ): Promise<UpdateResponse> {
     const clientAutoUpdate = AppConstants.enableClientDistAutoUpdateKey;
+    const existingVersion = this.getClientVersion();
+    minimumVersion = minimumVersion || this.minVersion;
 
-    const existingClientVersion = this.getClientVersion();
+    // Auto-update check
     if (!clientAutoUpdate && !overrideAutoUpdate) {
-      return {
-        shouldUpdate: false,
+      return this.createResponse(false, existingVersion, minimumVersion, requestedVersion, null,
+        "Client auto-update disabled, skipping");
+    }
+
+    // Client files existence check
+    if (!existingVersion || !this.doesClientIndexHtmlExist()) {
+      const reason = !existingVersion
+        ? "Client package.json does not exist"
+        : "Client index.html could not be found";
+
+      return this.createResponse(true, existingVersion, minimumVersion, requestedVersion,
+        getMaximumOfVersionsSafe(minimumVersion, requestedVersion),
+        `${reason}, downloading new release`);
+    }
+
+    // Minimum version check
+    const meetsMinimum = checkVersionSatisfiesMinimum(existingVersion, minimumVersion);
+    if (!meetsMinimum) {
+      return this.createResponse(true, existingVersion, minimumVersion, requestedVersion,
+        getMaximumOfVersionsSafe(minimumVersion, requestedVersion),
+        `Client version ${existingVersion} below minimum ${minimumVersion}, downloading new release`);
+    }
+
+    // Handle requested version scenarios
+    if (requestedVersion) {
+      return this.evaluateRequestedVersion(
+        existingVersion,
+        minimumVersion,
         requestedVersion,
-        minimumVersion: AppConstants.defaultClientMinimum,
-        currentVersion: existingClientVersion,
-        targetVersion: null,
-        reason: "Client auto-update disabled (ENABLE_CLIENT_DIST_AUTO_UPDATE), skipping",
-      };
+        allowDowngrade
+      );
     }
 
-    // If no package.json found, we should update to latest/minimum
-    if (!existingClientVersion) {
-      return {
-        shouldUpdate: true,
-        requestedVersion,
-        currentVersion: existingClientVersion,
-        minimumVersion: AppConstants.defaultClientMinimum,
-        targetVersion: getMaximumOfVersionsSafe(minimumVersion, requestedVersion),
-        reason: `Client package.json does not exist, downloading new release`,
-      };
-    }
-
-    if (!this.doesClientIndexHtmlExist()) {
-      return {
-        shouldUpdate: true,
-        requestedVersion,
-        currentVersion: existingClientVersion,
-        minimumVersion: AppConstants.defaultClientMinimum,
-        targetVersion: getMaximumOfVersionsSafe(minimumVersion, requestedVersion),
-        reason: `Client index.html could not be found, downloading new release`,
-      };
-    }
-
-    const satisfiesMinimumVersion = checkVersionSatisfiesMinimum(existingClientVersion, minimumVersion);
-    const clientOutdated = !satisfiesMinimumVersion;
-    const clientOutdatedResponse = {
-      shouldUpdate: true,
-      requestedVersion,
-      currentVersion: existingClientVersion,
-      minimumVersion: AppConstants.defaultClientMinimum,
-      targetVersion: getMaximumOfVersionsSafe(minimumVersion, requestedVersion),
-      reason: `Client bundle release ${existingClientVersion} does not satisfy minimum version ${minimumVersion}, downloading new release`,
-    };
-
-    // If requestedVersion was specified, ensure above minimum and in case of downgrade whether thats allowed
-    if (!!requestedVersion) {
-      const minimumComparison = compare(requestedVersion, minimumVersion);
-      if (minimumComparison === -1) {
-        if (clientOutdated) return clientOutdatedResponse;
-        return {
-          shouldUpdate: false,
-          requestedVersion,
-          currentVersion: existingClientVersion,
-          minimumVersion: AppConstants.defaultClientMinimum,
-          targetVersion: requestedVersion,
-          reason: `Requested version ${requestedVersion} is below minimum designed version ${minimumVersion}, skipping`,
-        };
-      }
-
-      // We know requestedVersion is above minimum, so we should check if its above the existing version
-      const newComparison = compare(requestedVersion, existingClientVersion);
-      const isDowngrade = newComparison === -1;
-      if (isDowngrade) {
-        if (!allowDowngrade && clientOutdated) return clientOutdatedResponse;
-        return {
-          shouldUpdate: allowDowngrade,
-          requestedVersion,
-          currentVersion: existingClientVersion,
-          minimumVersion: AppConstants.defaultClientMinimum,
-          // Explicit downgrade is allowed, so we should return the requestedVersion
-          targetVersion: requestedVersion,
-          reason: allowDowngrade
-            ? `Client bundle downgrade allowed (above ${minimumVersion}), downloading new release`
-            : `Client bundle downgrade not allowed (even thought above ${minimumVersion}), skipping`,
-        };
-      } else if (newComparison === 1) {
-        return {
-          shouldUpdate: true,
-          requestedVersion,
-          currentVersion: existingClientVersion,
-          minimumVersion: AppConstants.defaultClientMinimum,
-          targetVersion: getMaximumOfVersionsSafe(minimumVersion, requestedVersion),
-          reason: `Client bundle release ${requestedVersion} is above existing version ${existingClientVersion}, downloading updated release`,
-        };
-      }
-    }
-
-    // No requestedVersion was specified, so we should check if the existing version satisfies the minimum
-    if (!satisfiesMinimumVersion) {
-      return clientOutdatedResponse;
-    }
-
-    return {
-      shouldUpdate: false,
-      requestedVersion,
-      currentVersion: existingClientVersion,
-      minimumVersion: AppConstants.defaultClientMinimum,
-      targetVersion: getMaximumOfVersionsSafe(minimumVersion, requestedVersion),
-      reason: `Client already satisfies minimum version ${minimumVersion} and requested version is not an upgrade, skipping`,
-    };
+    // Default case - already up to date
+    return this.createResponse(false, existingVersion, minimumVersion, requestedVersion,
+      getMaximumOfVersionsSafe(minimumVersion, requestedVersion),
+      `Client already satisfies minimum version ${minimumVersion}`);
   }
 
   async downloadClientUpdate(releaseTag: string): Promise<string> {
-    const release = await this.getClientBundleRelease(releaseTag);
-    this.logger.log(
-      `Retrieved ${release.assets.length} assets from release '${release.name}': ${release.assets.map((a) => a.name)}`,
+    // Get release info
+    const result = await this.githubService.getReleaseByTag(
+      this.githubOwner,
+      this.githubRepo,
+      releaseTag
     );
+    const release = result.data;
 
+    // Find asset
     const assetName = `dist-client-${release.tag_name}.zip`;
-    const asset = release.assets.find((a) => a.name === assetName);
+    const asset = release.assets.find(a => a.name === assetName);
     if (!asset) {
-      throw new NotFoundException(`Release with tag ${release.tag_name} asset ${assetName} does not exist`);
+      throw new NotFoundException(`Asset ${assetName} not found in release ${release.tag_name}`);
     }
-    const assetId = asset?.id;
-    const downloadPath = await this.downloadClientBundleZip(assetId, asset.name);
-    await this.extractClientBundleZip(downloadPath);
+
+    // Download and extract
+    const zipPath = await this.downloadZip(asset.id, asset.name);
+    await this.extractZip(zipPath);
 
     return release.tag_name;
   }
 
-  private async getClientBundleRelease(releaseTag: string) {
-    const githubOwner = AppConstants.orgName;
-    const githubRepo = AppConstants.clientRepoName;
+  private evaluateRequestedVersion(
+    currentVersion: string,
+    minimumVersion: string,
+    requestedVersion: string,
+    allowDowngrade?: boolean
+  ): UpdateResponse {
+    // Check if requested version meets minimum
+    if (compare(requestedVersion, minimumVersion) === -1) {
+      return this.createResponse(false, currentVersion, minimumVersion, requestedVersion,
+        requestedVersion,
+        `Requested version ${requestedVersion} below minimum ${minimumVersion}, skipping`);
+    }
 
-    const result = await this.githubService.getReleaseByTag(githubOwner, githubRepo, releaseTag);
-    return result.data;
+    // Compare with current version
+    const versionComparison = compare(requestedVersion, currentVersion);
+
+    if (versionComparison === 0) {
+      // Same version
+      return this.createResponse(false, currentVersion, minimumVersion, requestedVersion,
+        requestedVersion,
+        `Requested version ${requestedVersion} same as current, skipping`);
+    } else if (versionComparison === -1) {
+      // Downgrade
+      return this.createResponse(
+        !!allowDowngrade,
+        currentVersion,
+        minimumVersion,
+        requestedVersion,
+        requestedVersion,
+        allowDowngrade
+          ? `Downgrading to ${requestedVersion} (above minimum ${minimumVersion})`
+          : `Downgrade not allowed, skipping`
+      );
+    } else {
+      // Upgrade
+      return this.createResponse(true, currentVersion, minimumVersion, requestedVersion,
+        requestedVersion,
+        `Upgrading from ${currentVersion} to ${requestedVersion}`);
+    }
   }
 
-  private async downloadClientBundleZip(assetId: any, assetName: string): Promise<string | any> {
-    const githubOwner = AppConstants.orgName;
-    const githubRepo = AppConstants.clientRepoName;
+  private createResponse(
+    shouldUpdate: boolean,
+    currentVersion: string | null,
+    minimumVersion: string,
+    requestedVersion: string | undefined,
+    targetVersion: string | null,
+    reason: string
+  ): UpdateResponse {
+    return {
+      shouldUpdate,
+      requestedVersion,
+      currentVersion,
+      minimumVersion,
+      targetVersion,
+      reason
+    };
+  }
 
-    const assetResult = await this.githubService.requestAsset(githubOwner, githubRepo, assetId);
-    const dir = join(superRootPath(), AppConstants.defaultClientBundleZipsStorage);
+  private async downloadZip(assetId: number, assetName: string): Promise<string> {
+    const assetResult = await this.githubService.requestAsset(
+      this.githubOwner,
+      this.githubRepo,
+      assetId
+    );
+
+    const dir = join(this.storageRoot, AppConstants.defaultClientBundleZipsStorage);
     ensureDirExists(dir);
-    this.logger.log(`Downloaded client release ZIP to '${dir}'. Extracting archive now`);
+
     const path = join(dir, assetName);
     writeFileSync(path, Buffer.from(assetResult.data));
+    this.logger.log(`Downloaded client ZIP to ${dir}`);
 
     return path;
   }
 
-  private async extractClientBundleZip(downloadedZipPath: string): Promise<void> {
-    const distPath = join(superRootPath(), AppConstants.defaultClientBundleStorage);
-    const zip = new AdmZip(downloadedZipPath);
+  private async extractZip(zipPath: string): Promise<void> {
+    const distPath = join(this.storageRoot, AppConstants.defaultClientBundleStorage);
     ensureDirExists(distPath);
 
+    // Clear the directory
     this.logger.debug(`Clearing contents of ${distPath}`);
-    for (const fileOrDir of await readdir(distPath)) {
-      this.logger.log(`Removing existing file/dir '${distPath}/${fileOrDir}' before updating client`);
-      try {
-        await rm(join(distPath, fileOrDir), { force: true, recursive: true });
-      } catch (e: any) {
-        this.logger.error(`${e.message} ${e.stack}`);
-        throw e;
-      }
+    for (const item of await readdir(distPath)) {
+      const itemPath = join(distPath, item);
+      await rm(itemPath, { force: true, recursive: true })
+        .catch(e => this.logger.error(`Failed to remove ${itemPath}: ${e.message}`));
     }
 
+    // Extract the zip
     try {
-      zip.extractAllTo(join(superRootPath(), AppConstants.defaultClientBundleStorage));
+      const zip = new AdmZip(zipPath);
+      zip.extractAllTo(distPath);
+      this.logger.log(`Successfully extracted client to ${distPath}`);
     } catch (e: any) {
-      this.logger.error(`Unzipping failed ${e.message} ${e.stack}`);
+      this.logger.error(`Extraction failed: ${e.message}`);
       throw e;
     }
-    this.logger.log(`Successfully extracted client dist to ${distPath}`);
   }
 
   private doesClientIndexHtmlExist(): boolean {
-    const indexHtmlPath = this.clientIndexHtmlPath;
-    return existsSync(indexHtmlPath);
+    return existsSync(this.clientIndexHtmlPath);
   }
 
   private getClientVersion(): string | null {
-    const packageJsonPath = this.clientPackageJsonPath;
-    const packageJsonFound = existsSync(packageJsonPath);
-    // If no package.json found, we should update to latest/minimum
-    if (!packageJsonFound) {
-      return;
+    const path = this.clientPackageJsonPath;
+    if (!existsSync(path)) {
+      return null;
     }
 
-    require.cache[packageJsonPath] = undefined;
-    const json = require(packageJsonPath);
-    return json?.version;
+    require.cache[path] = undefined;
+    const json = require(path);
+    return json?.version ?? null;
   }
 }

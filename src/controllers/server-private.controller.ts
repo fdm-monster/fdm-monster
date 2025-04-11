@@ -1,5 +1,5 @@
 import { PassThrough } from "stream";
-import { GET, POST, DELETE, route, before } from "awilix-express";
+import { before, DELETE, GET, POST, route } from "awilix-express";
 import { authenticate, authorizeRoles } from "@/middleware/authenticate";
 import { AppConstants } from "@/server.constants";
 import { ROLES } from "@/constants/authorization.constants";
@@ -31,7 +31,7 @@ export class ServerPrivateController {
     private readonly githubService: GithubService,
     private readonly logDumpService: LogDumpService,
     private readonly yamlService: YamlService,
-    private readonly multerService: MulterService,
+    private readonly multerService: MulterService
   ) {
     this.logger = loggerFactory(ServerPrivateController.name);
   }
@@ -46,7 +46,7 @@ export class ServerPrivateController {
 
   @GET()
   @route("/client-releases")
-  async getClientReleases(req: Request, res: Response) {
+  async getClientReleases(_req: Request, res: Response) {
     const releaseSpec = await this.clientBundleService.getReleases();
     res.send(releaseSpec);
   }
@@ -64,7 +64,7 @@ export class ServerPrivateController {
       true,
       AppConstants.defaultClientMinimum,
       updateDto.downloadRelease,
-      updateDto.allowDowngrade,
+      updateDto.allowDowngrade
     );
 
     this.logger.log(`Will execute: ${willExecute?.shouldUpdate}, reason: ${willExecute?.reason}`);
@@ -76,11 +76,13 @@ export class ServerPrivateController {
         minimumVersion: willExecute.minimumVersion,
         shouldUpdate: willExecute.shouldUpdate,
         targetVersion: willExecute.targetVersion,
-        reason: willExecute?.reason,
+        reason: willExecute?.reason
       });
     }
 
-    const tag_name = await this.clientBundleService.downloadClientUpdate(willExecute.targetVersion);
+    if (willExecute.targetVersion) {
+      await this.clientBundleService.downloadClientUpdate(willExecute.targetVersion);
+    }
 
     return res.send({
       executed: true,
@@ -89,7 +91,7 @@ export class ServerPrivateController {
       minimumVersion: willExecute.minimumVersion,
       shouldUpdate: willExecute.shouldUpdate,
       targetVersion: willExecute.targetVersion,
-      reason: willExecute?.reason,
+      reason: willExecute?.reason
     });
   }
 
@@ -109,7 +111,7 @@ export class ServerPrivateController {
 
     res.send({
       success: true,
-      spec,
+      spec
     });
   }
 
