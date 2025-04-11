@@ -12,10 +12,10 @@ export const PrinterTypes = [OctoprintType, MoonrakerType] as const;
 export type PrinterTypes = (typeof PrinterTypes)[number];
 export type PrinterType = typeof OctoprintType | typeof MoonrakerType;
 
-export interface FDMM_CurrentMessageDto {
+export interface FdmCurrentMessageDto {
   progress: {
     printTime: number | null,
-    completion: number
+    completion: number | null
   },
   state: {
     text: string,

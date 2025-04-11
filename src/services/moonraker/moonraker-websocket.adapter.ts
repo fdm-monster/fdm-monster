@@ -40,7 +40,7 @@ import { PrinterObjectsQueryDto } from "@/services/moonraker/dto/objects/printer
 import _ from "lodash";
 import { ConnectionIdentifyResponseDto } from "@/services/moonraker/dto/websocket/connection-identify-response.dto";
 import { FlagsDto } from "@/services/octoprint/dto/printer/flags.dto";
-import { FDMM_CurrentMessageDto, MoonrakerType } from "@/services/printer-api.interface";
+import { FdmCurrentMessageDto, MoonrakerType } from "@/services/printer-api.interface";
 import { Event as WsEvent } from "ws";
 import {
   NotifyServiceStateChangedParams,
@@ -230,7 +230,7 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
         query,
       );
       this.printerObjects = result.data.result;
-      await this.emitCurrentEvent(this.printerObjects);
+      await this.emitCurrentEvent(this.printerObjects as PrinterObjectsQueryDto<SubscriptionType>);
     } catch (e) {
       const ae = e as MoonrakerErrorDto;
       if (ae.isAxiosError) {
@@ -295,15 +295,21 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
     }
 
     if (eventName === "notify_status_update") {
-      const [data, eventtime] = (event as NotifyStatusUpdate<SubscriptionType>).params;
+      if (!event.params) {
+        // We dont understand the service changed...
+        this.logger.error("Received 'notify_status_update' but service indicators params were undefined");
+        return;
+      }
 
-      const substate = Object.keys(data)[0] as keyof SubscriptionType;
-      if (Object.keys(this.printerObjects.status).includes(substate)) {
+      const [data, eventtime] = (event as NotifyStatusUpdate<SubscriptionType>).params!;
+
+      const subState = Object.keys(data)[0] as keyof SubscriptionType;
+      if (Object.keys((this.printerObjects as PrinterObjectsQueryDto<SubscriptionType>).status).includes(subState)) {
         this.printerObjects.status = _.merge(this.printerObjects.status, data);
         this.printerObjects.eventtime = eventtime;
         await this.emitCurrentEvent(this.printerObjects);
       } else {
-        this.logger.warn(`Substate ${substate} unknown`);
+        this.logger.warn(`Substate ${subState} unknown`);
       }
       return;
     }
@@ -331,7 +337,7 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
       );
       this.printerObjects = objects.data.result;
       this.setApiState(API_STATE.responding);
-      return await this.emitCurrentEvent(this.printerObjects);
+      return await this.emitCurrentEvent(this.printerObjects as PrinterObjectsQueryDto<SubscriptionType>);
     } catch (e) {
       // Could be network transient error, klippy error, or Moonraker host problem. All scenarios require a different approach.
       // transient: we should retry and if happening regularly report this host as problematic
@@ -340,7 +346,7 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
       const castError = e as MoonrakerErrorDto;
       if (castError.isAxiosError) {
         if (castError?.response?.status == 503) {
-          this.printerObjects.status = {};
+          this.printerObjects.status = null;
           this.printerObjects.eventtime = Date.now();
           return await this.emitCurrentEvent(this.printerObjects);
         }
@@ -354,7 +360,7 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
     }
   }
 
-  private async emitCurrentEvent(printerObject: PrinterObjectsQueryDto<SubscriptionType>) {
+  private async emitCurrentEvent(printerObject: PrinterObjectsQueryDto<SubscriptionType | null>) {
     const originalKlipperObjects = printerObject.status;
 
     // When klipper not connected expect lots of 503
@@ -380,33 +386,40 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
     let filename = "";
     let printTime = null;
 
-    let stateText = originalKlipperObjects.display_status?.message ?? "Error";
+    let stateText = "Unset";
     let error = "";
-    if (originalKlipperObjects.print_stats?.state?.length) {
-      const systemState = originalKlipperObjects.webhooks;
-      const printState = originalKlipperObjects.print_stats.state;
+    let completion: number | null = null;
 
-      const idleState = originalKlipperObjects.idle_timeout?.state;
-      filename = originalKlipperObjects.print_stats.filename;
-      printTime = originalKlipperObjects.print_stats.print_duration;
+    if (originalKlipperObjects != null) {
+      stateText = originalKlipperObjects.display_status?.message;
+      if (originalKlipperObjects.print_stats?.state?.length) {
+        const systemState = originalKlipperObjects.webhooks;
+        const printState = originalKlipperObjects.print_stats.state;
 
-      flags.operational = systemState.state === "ready";
+        const idleState = originalKlipperObjects.idle_timeout?.state;
+        filename = originalKlipperObjects.print_stats.filename;
+        printTime = originalKlipperObjects.print_stats.print_duration;
 
-      if (flags.operational) {
-        flags.printing = printState === "printing";
-        flags.paused = printState === "paused";
-        flags.ready = printState === "standby" && idleState !== "Printing";
-        flags.sdReady = true;
-      } else {
-        flags.error = true;
-        stateText = "Klipper reports: " + (systemState.state ?? "unknown")?.toUpperCase();
+        flags.operational = systemState.state === "ready";
+
+        if (flags.operational) {
+          flags.printing = printState === "printing";
+          flags.paused = printState === "paused";
+          flags.ready = printState === "standby" && idleState !== "Printing";
+          flags.sdReady = true;
+        } else {
+          flags.error = true;
+          stateText = "Klipper reports: " + (systemState.state ?? "unknown")?.toUpperCase();
+        }
       }
+
+      completion = (originalKlipperObjects.display_status?.progress ?? 0) * 100.0;
     }
 
-    const currentMessage: FDMM_CurrentMessageDto = {
+    const currentMessage: FdmCurrentMessageDto = {
       progress: {
         printTime,
-        completion: (originalKlipperObjects.display_status?.progress ?? 0) * 100.0,
+        completion,
       },
       state: {
         text: stateText,
