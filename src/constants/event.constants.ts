@@ -3,7 +3,6 @@ import { IPrinter } from "@/models/Printer";
 
 export const socketIoConnectedEvent = "socketio.connected";
 
-export const octoPrintWebsocketEvent = (printerId: IdType) => `octoprint.${printerId}`;
 export const uploadProgressEvent = (token: string) => `upload.progress.${token}`;
 export const uploadDoneEvent = (token: string) => `upload.done.${token}`;
 export const uploadFailedEvent = (token: string) => `upload.failed.${token}`;

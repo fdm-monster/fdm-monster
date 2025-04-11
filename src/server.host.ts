@@ -27,7 +27,7 @@ export class ServerHost {
     private readonly settingsStore: SettingsStore,
     private readonly bootTask: BootTask,
     private readonly socketIoGateway: SocketIoGateway,
-    private readonly typeormService: TypeormService,
+    private readonly typeormService: TypeormService
   ) {
     this.logger = loggerFactory(ServerHost.name);
   }

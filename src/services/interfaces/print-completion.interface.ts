@@ -16,7 +16,7 @@ export interface IPrintCompletionService<KeyType extends IdType = IdType, Entity
 
   findPrintCompletion(correlationId: string): Promise<Entity[]>;
 
-  updateContext(correlationId: string | undefined, context: PrintCompletionContext): Promise<void>;
+  updateContext(correlationId: string | null | undefined, context: PrintCompletionContext): Promise<void>;
 
   loadPrintContexts(): Promise<Record<KeyType, (IPrintCompletion<KeyType, number | Schema.Types.ObjectId>)[]>>;
 
