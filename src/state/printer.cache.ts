@@ -91,7 +91,9 @@ export class PrinterCache extends KeyDiffCache<PrinterDto<IdType>> {
 
   private async handleBatchPrinterCreated(event: BatchPrinterCreatedEvent) {
     const mappedPrinters = this.mapArray(event.printers);
-    const keyValues = mappedPrinters.map((p) => ({ key: this.getId(p), value: p }));
+    const keyValues = mappedPrinters.map((p) =>
+      ({ key: this.getId(p), value: p })
+    );
     await this.setKeyValuesBatch(keyValues, true);
   }
 

@@ -2,7 +2,7 @@ import {
   ExtractJwt,
   JwtFromRequestFunction,
   Strategy as JwtStrategy,
-  StrategyOptions,
+  StrategyOptionsWithoutRequest,
   VerifiedCallback
 } from "passport-jwt";
 import { Strategy as AnonymousStrategy } from "passport-anonymous";
@@ -25,7 +25,7 @@ export function getPassportJwtOptions(
   settingsStore: SettingsStore,
   configService: ConfigService,
   jwtFromRequest: JwtFromRequestFunction | JwtFromSocketFunction = ExtractJwt.fromAuthHeaderAsBearerToken()
-): StrategyOptions {
+): StrategyOptionsWithoutRequest {
   return {
     jwtFromRequest: jwtFromRequest,
     secretOrKeyProvider: async (_req, _token: string, done) => {
@@ -34,7 +34,7 @@ export function getPassportJwtOptions(
     },
     audience: configService.get(AppConstants.OVERRIDE_JWT_AUDIENCE, AppConstants.DEFAULT_JWT_AUDIENCE),
     issuer: configService.get(AppConstants.OVERRIDE_JWT_ISSUER, AppConstants.DEFAULT_JWT_ISSUER)
-  } as StrategyOptions;
+  };
 }
 
 export function verifyUserCallback(userService: IUserService) {

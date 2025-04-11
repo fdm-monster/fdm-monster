@@ -1,15 +1,16 @@
 import {
   credentialSettingsKey,
-  printerFileCleanSettingKey,
   frontendSettingKey,
+  printerFileCleanSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
-  wizardSettingKey,
+  wizardSettingKey
 } from "@/constants/server-settings.constants";
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { ISettings } from "@/models/Settings";
 
 @Entity()
-export class Settings {
+export class Settings implements ISettings<number> {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -25,7 +26,7 @@ export class Settings {
 
   @Column({ type: "simple-json", nullable: false })
   [credentialSettingsKey]: {
-    jwtSecret: string; // minlength: 10, trim
+    jwtSecret: string;
     jwtExpiresIn: number;
     refreshTokenAttempts: number;
     refreshTokenExpiry: number;

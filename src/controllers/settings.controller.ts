@@ -5,7 +5,7 @@ import { ROLES } from "@/constants/authorization.constants";
 import { validateInput } from "@/handlers/validators";
 import {
   clientNextSchema,
-  credentialSettingPatchSchema,
+  credentialSettingUpdateSchema,
   fileCleanSettingsUpdateSchema,
   frontendSettingsUpdateSchema,
   moonrakerSupportSchema,
@@ -145,7 +145,7 @@ export class SettingsController {
   @route("/credential")
   @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
   async updateCredentialSettings(req: Request, res: Response) {
-    const validatedInput = await validateInput(req.body, credentialSettingPatchSchema);
+    const validatedInput = await validateInput(req.body, credentialSettingUpdateSchema);
     await this.settingsStore.updateCredentialSettings(validatedInput);
     res.send();
   }
@@ -155,7 +155,7 @@ export class SettingsController {
   @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
   async updateFileCleanSettings(req: Request, res: Response) {
     const validatedInput = await validateInput(req.body, fileCleanSettingsUpdateSchema);
-    const result = await this.settingsStore.patchFileCleanSettings(validatedInput);
+    const result = await this.settingsStore.updateFileCleanSettings(validatedInput);
     res.send(result);
   }
 

@@ -1,7 +1,7 @@
 import { IdType } from "@/shared.constants";
 
 export interface PrintCompletionContext {
-  correlationId?: string;
+  correlationId: string | null | undefined;
 }
 
 export class CreatePrintCompletionDto<KeyType = IdType> {

@@ -11,30 +11,29 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { errorSummary } from "@/utils/error.utils";
 import { captureException } from "@sentry/node";
 import { SOCKET_STATE } from "@/shared/dtos/socket-state.type";
-import { TestPrinterDto } from "@/services/interfaces/printer.dto";
-import { IdType } from "@/shared.constants";
 import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
 import { moonrakerEvent } from "@/services/moonraker/constants/websocket.constants";
 import { printerEvents } from "@/constants/event.constants";
+import { OctoPrintEventDto } from "@/services/octoprint/dto/octoprint-event.dto";
+import { z } from "zod";
 
 export class TestPrinterSocketStore {
+  testSocket?: IWebsocketAdapter;
   private readonly logger: LoggerService;
-
-  testSocket: IWebsocketAdapter;
 
   constructor(
     loggerFactory: ILoggerFactory,
     private readonly socketFactory: SocketFactory,
     private readonly socketIoGateway: SocketIoGateway,
-    private readonly eventEmitter2: EventEmitter2,
+    private readonly eventEmitter2: EventEmitter2
   ) {
     this.logger = loggerFactory(TestPrinterSocketStore.name);
   }
 
-  async setupTestPrinter(printer: TestPrinterDto<IdType>): Promise<void> {
+  async setupTestPrinter(printer: z.infer<typeof createTestPrinterSchema>): Promise<void> {
     if (this.testSocket) {
       this.testSocket.close();
-      this.testSocket = null;
+      delete this.testSocket;
     }
 
     const validatedData = await validateInput(printer, createTestPrinterSchema);
@@ -50,8 +49,8 @@ export class TestPrinterSocketStore {
       loginDto: {
         apiKey: printer.apiKey,
         printerURL: printer.printerURL,
-        printerType: printer.printerType,
-      },
+        printerType: printer.printerType
+      }
     });
 
     const testEvents = [
@@ -64,16 +63,16 @@ export class TestPrinterSocketStore {
       moonrakerEvent(WsMessage.API_STATE_UPDATED),
       moonrakerEvent(WsMessage.WS_CLOSED),
       moonrakerEvent(WsMessage.WS_OPENED),
-      moonrakerEvent(WsMessage.WS_ERROR),
+      moonrakerEvent(WsMessage.WS_ERROR)
     ];
-    const listener = ({ event, payload, printerId }) => {
+    const listener = ({ event, payload, printerId }: OctoPrintEventDto) => {
       if (printerId !== correlationToken) {
         return;
       }
       this.socketIoGateway.send("test-printer-state", {
         event,
         payload,
-        correlationToken,
+        correlationToken
       });
     };
     testEvents.forEach((te) => {
@@ -86,11 +85,15 @@ export class TestPrinterSocketStore {
 
       this.logger.log("Test socket connection started");
       const promise = new Promise(async (resolve, reject) => {
+        if (!this.testSocket) {
+          this.logger.error("Aborting test as testSocket is undefined.");
+          return;
+        }
         this.testSocket.open();
-        for await (const startTime of setInterval(100)) {
+        for await (const _startTime of setInterval(100)) {
           if (!this.testSocket) {
             this.logger.warn("Test without socket, rejecting");
-            reject();
+            reject(new Error("Test without socket, rejecting"));
             return;
           }
           if (this.testSocket.socketState === SOCKET_STATE.authenticated) {
@@ -115,7 +118,7 @@ export class TestPrinterSocketStore {
         this.testSocket.close();
       }
       this.eventEmitter2.emit(printerEvents.printersDeleted, {
-        printerIds: [correlationToken],
+        printerIds: [correlationToken]
       });
       delete this.testSocket;
       testEvents.forEach((te) => {

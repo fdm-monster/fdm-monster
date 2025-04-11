@@ -22,6 +22,7 @@ import { PrinterDto } from "@/services/interfaces/printer.dto";
 import { IPrinter } from "@/models/Printer";
 import { normalizeUrl } from "@/utils/normalize-url";
 import { defaultHttpProtocol } from "@/utils/url.utils";
+import { z } from "zod";
 
 export class PrinterService implements IPrinterService<MongoIdType> {
   logger: LoggerService;
@@ -63,7 +64,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
     return printer;
   }
 
-  async create(newPrinter: IPrinter, emitEvent = true) {
+  async create(newPrinter: z.infer<typeof createPrinterSchema>, emitEvent = true) {
     if (!newPrinter) throw new Error("Missing printer to create");
 
     const mergedPrinter = await this.validateAndDefault(newPrinter);
@@ -81,7 +82,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
    * @param updateData
    * @returns {Promise<Query<Document<any, any, unknown> | null, Document<any, any, unknown>, {}, unknown>>}
    */
-  async update(printerId: MongoIdType, updateData: Partial<IPrinter>) {
+  async update(printerId: MongoIdType, updateData: z.infer<typeof createPrinterSchema>) {
     const printer = await this.get(printerId);
     updateData.printerURL = normalizeUrl(updateData.printerURL, { defaultProtocol: defaultHttpProtocol });
     const { printerURL, apiKey, enabled, name, printerType } = await validateInput(updateData, createPrinterSchema);
@@ -114,7 +115,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
     }
   }
 
-  async batchImport(printers: Partial<typeof Printer>[]) {
+  async batchImport(printers: z.infer<typeof createPrinterSchema>[]) {
     if (!printers?.length) return [];
     for (let printer of printers) {
       await this.validateAndDefault(printer);
@@ -133,7 +134,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
     return newPrinters;
   }
 
-  async updateFlowRate(printerId: MongoIdType, flowRate: number) {
+  async updateFlowRate(printerId: MongoIdType, flowRate?: number) {
     const update = { flowRate };
     await this.get(printerId);
     const printer = await Printer.findByIdAndUpdate(printerId, update, {
@@ -143,10 +144,10 @@ export class PrinterService implements IPrinterService<MongoIdType> {
     if (printer) {
       this.eventEmitter2.emit(printerEvents.printerUpdated, { printer } satisfies PrinterUpdatedEvent<string>);
     }
-    return printer;
+    return printer!;
   }
 
-  async updateFeedRate(printerId: MongoIdType, feedRate: number) {
+  async updateFeedRate(printerId: MongoIdType, feedRate?: number) {
     const update = { feedRate };
     await this.get(printerId);
     const printer = await Printer.findByIdAndUpdate(printerId, update, {
@@ -156,7 +157,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
     if (printer) {
       this.eventEmitter2.emit(printerEvents.printerUpdated, { printer } satisfies PrinterUpdatedEvent<string>);
     }
-    return printer;
+    return printer!;
   }
 
   async updateEnabled(printerId: MongoIdType, enabled: boolean) {
@@ -180,7 +181,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
     return printer!;
   }
 
-  async updateDisabledReason(printerId: MongoIdType, disabledReason: string) {
+  async updateDisabledReason(printerId: MongoIdType, disabledReason?: string) {
     const enabled = !disabledReason?.length;
     const update = {
       disabledReason,
@@ -200,7 +201,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
     return printer!;
   }
 
-  private async validateAndDefault(printer): Promise<IPrinter> {
+  private async validateAndDefault(printer: z.infer<typeof createPrinterSchema>) {
     const mergedPrinter = {
       enabled: true,
       ...printer

@@ -1,58 +1,47 @@
 import { Settings } from "@/models";
 import {
   credentialSettingsKey,
-  printerFileCleanSettingKey,
   frontendSettingKey,
-  getDefaultCredentialSettings,
-  getDefaultFileCleanSettings,
-  getDefaultFrontendSettings,
-  getDefaultServerSettings,
   getDefaultSettings,
-  getDefaultTimeout,
-  getDefaultWizardSettings,
+  printerFileCleanSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
-  wizardSettingKey,
+  wizardSettingKey
 } from "@/constants/server-settings.constants";
 import { validateInput } from "@/handlers/validators";
 import {
-  credentialSettingPatchSchema,
+  credentialSettingUpdateSchema,
   fileCleanSettingsUpdateSchema,
   frontendSettingsUpdateSchema,
+  jwtSecretCredentialSettingUpdateSchema,
   serverSettingsUpdateSchema,
   timeoutSettingsUpdateSchema,
-  wizardUpdateSchema,
+  wizardUpdateSchema
 } from "../validators/settings-service.validation";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
-import {
-  ICredentialSettings,
-  IFileCleanSettings,
-  IFrontendSettings,
-  IServerSettings,
-  ISettings,
-  ITimeoutSettings,
-  IWizardSettings,
-} from "@/models/Settings";
+import { ISettings } from "@/models/Settings";
 import { SettingsDto } from "@/services/interfaces/settings.dto";
 import { MongoIdType } from "@/shared.constants";
+import { z } from "zod";
+import { migrateSettingsRuntime } from "@/shared/runtime-settings.migration";
 
 export class SettingsService implements ISettingsService<MongoIdType> {
-  toDto(entity: ISettings): SettingsDto<MongoIdType> {
+  toDto(entity: ISettings): SettingsDto {
     return {
       // Credential settings are not shared with the client
       [serverSettingsKey]: {
         ...entity[serverSettingsKey],
-        experimentalTypeormSupport: false,
+        experimentalTypeormSupport: false
       },
       [wizardSettingKey]: entity[wizardSettingKey],
       [frontendSettingKey]: entity[frontendSettingKey],
       [printerFileCleanSettingKey]: entity[printerFileCleanSettingKey],
-      [timeoutSettingKey]: entity[timeoutSettingKey],
+      [timeoutSettingKey]: entity[timeoutSettingKey]
     };
   }
 
   async getOrCreate() {
-    let settings = await Settings.findOne();
+    let settings: ISettings | null = await this.getOptional();
     if (!settings) {
       const defaultSettings = new Settings(getDefaultSettings());
       await defaultSettings.save();
@@ -61,119 +50,88 @@ export class SettingsService implements ISettingsService<MongoIdType> {
       return defaultSettings;
     } else {
       // Perform patch of settings
-      settings = this.migrateSettingsRuntime(settings);
+      settings = migrateSettingsRuntime(settings);
 
-      return Settings.findOneAndUpdate({ _id: settings.id }, settings, { new: true });
+      return (await Settings.findOneAndUpdate({ _id: settings.id }, settings, { new: true }))!;
     }
   }
 
-  /**
-   * Patch the given settings object manually - runtime migration strategy
-   */
-  migrateSettingsRuntime(knownSettings: Partial<ISettings>) {
-    const doc = knownSettings; // alias _doc also works
-    if (!doc[printerFileCleanSettingKey]) {
-      doc[printerFileCleanSettingKey] = getDefaultFileCleanSettings();
-    } else {
-      // Remove superfluous settings
-      doc[printerFileCleanSettingKey] = {
-        autoRemoveOldFilesBeforeUpload: doc[printerFileCleanSettingKey].autoRemoveOldFilesBeforeUpload,
-        autoRemoveOldFilesAtBoot: doc[printerFileCleanSettingKey].autoRemoveOldFilesBeforeUpload,
-        autoRemoveOldFilesCriteriumDays: doc[printerFileCleanSettingKey].autoRemoveOldFilesCriteriumDays,
-      };
-    }
-
-    // Server settings exist, but need updating with new ones if they don't exist.
-    if (!doc[wizardSettingKey]) {
-      doc[wizardSettingKey] = getDefaultWizardSettings();
-    }
-    if (!doc[timeoutSettingKey]) {
-      doc[timeoutSettingKey] = getDefaultTimeout();
-    }
-    if (!doc[serverSettingsKey]) {
-      doc[serverSettingsKey] = getDefaultServerSettings();
-    } else {
-      // Remove superfluous settings
-      doc[serverSettingsKey] = {
-        loginRequired: doc[serverSettingsKey].loginRequired,
-        registration: doc[serverSettingsKey].registration,
-        experimentalClientSupport: doc[serverSettingsKey].experimentalClientSupport,
-        experimentalMoonrakerSupport: doc[serverSettingsKey].experimentalMoonrakerSupport,
-        sentryDiagnosticsEnabled: doc[serverSettingsKey].sentryDiagnosticsEnabled,
-        experimentalThumbnailSupport: doc[serverSettingsKey].experimentalThumbnailSupport,
-      };
-    }
-    if (!doc[credentialSettingsKey]) {
-      doc[credentialSettingsKey] = getDefaultCredentialSettings();
-    }
-    if (!doc[frontendSettingKey]) {
-      doc[frontendSettingKey] = getDefaultFrontendSettings();
-    }
-
-    return knownSettings;
-  }
-
-  async patchFileCleanSettings(patchUpdate: Partial<IFileCleanSettings>) {
-    const validatedInput = await validateInput(patchUpdate, fileCleanSettingsUpdateSchema);
+  async updateFileCleanSettings(update: z.infer<typeof fileCleanSettingsUpdateSchema>) {
+    const validatedInput = await validateInput(update, fileCleanSettingsUpdateSchema);
 
     const settingsDoc = await this.getOrCreate();
     settingsDoc[printerFileCleanSettingKey] = Object.assign(settingsDoc[printerFileCleanSettingKey], validatedInput);
-    return Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
-      new: true,
-    });
+    return (await Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
+      new: true
+    }))!;
   }
 
-  async patchWizardSettings(patchUpdate: Partial<IWizardSettings>) {
-    const validatedInput = await validateInput(patchUpdate, wizardUpdateSchema);
+  async updateWizardSettings(update: z.infer<typeof wizardUpdateSchema>) {
+    const validatedInput = await validateInput(update, wizardUpdateSchema);
 
     const settingsDoc = await this.getOrCreate();
     settingsDoc[wizardSettingKey] = Object.assign(settingsDoc[wizardSettingKey], validatedInput);
-    return Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
-      new: true,
-    });
+    return (await Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
+      new: true
+    }))!;
   }
 
-  async updateFrontendSettings(patchUpdate: IFrontendSettings) {
-    const validatedInput = await validateInput(patchUpdate, frontendSettingsUpdateSchema);
+  async updateFrontendSettings(update: z.infer<typeof frontendSettingsUpdateSchema>) {
+    const validatedInput = await validateInput(update, frontendSettingsUpdateSchema);
 
     const settingsDoc = await this.getOrCreate();
     const frontendSettings = settingsDoc[frontendSettingKey];
     Object.assign(frontendSettings, validatedInput);
-    return Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
-      new: true,
-    });
+    return (await Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
+      new: true
+    }))!;
   }
 
-  async patchCredentialSettings(patchUpdate: Partial<ICredentialSettings>) {
-    const validatedInput = await validateInput(patchUpdate, credentialSettingPatchSchema);
+  async updateJwtSecretCredentialSetting(update: z.infer<typeof jwtSecretCredentialSettingUpdateSchema>) {
+    const validatedInput = await validateInput(update, jwtSecretCredentialSettingUpdateSchema);
 
     const settingsDoc = await this.getOrCreate();
     const credentialSettings = settingsDoc[credentialSettingsKey];
     Object.assign(credentialSettings, validatedInput);
-    return Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
-      new: true,
-    });
+    return (await Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
+      new: true
+    }))!;
   }
 
-  async patchServerSettings(patchUpdate: Partial<IServerSettings>) {
-    const validatedInput = await validateInput(patchUpdate, serverSettingsUpdateSchema);
+  async updateCredentialSettings(patchUpdate: z.infer<typeof credentialSettingUpdateSchema>) {
+    const validatedInput = await validateInput(patchUpdate, credentialSettingUpdateSchema);
+
+    const settingsDoc = await this.getOrCreate();
+    const credentialSettings = settingsDoc[credentialSettingsKey];
+    Object.assign(credentialSettings, validatedInput);
+    return (await Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
+      new: true
+    }))!;
+  }
+
+  async updateServerSettings(update: z.infer<typeof serverSettingsUpdateSchema>) {
+    const validatedInput = await validateInput(update, serverSettingsUpdateSchema);
 
     const settingsDoc = await this.getOrCreate();
     const serverSettings = settingsDoc[serverSettingsKey];
     Object.assign(serverSettings, validatedInput);
-    return Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
-      new: true,
-    });
+    return (await Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
+      new: true
+    }))!;
   }
 
-  async updateTimeoutSettings(patchUpdate: Partial<ITimeoutSettings>) {
+  async updateTimeoutSettings(patchUpdate: z.infer<typeof timeoutSettingsUpdateSchema>) {
     const validatedInput = await validateInput(patchUpdate, timeoutSettingsUpdateSchema);
 
     const settingsDoc = await this.getOrCreate();
     const timeoutSettings = settingsDoc[timeoutSettingKey];
     Object.assign(timeoutSettings, validatedInput);
-    return Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
-      new: true,
-    });
+    return (await Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
+      new: true
+    }))!;
+  }
+
+  private async getOptional(): Promise<ISettings | null> {
+    return Settings.findOne();
   }
 }

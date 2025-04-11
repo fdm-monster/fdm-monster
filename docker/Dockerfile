@@ -1,20 +1,22 @@
-FROM node:18-bookworm-slim AS build
+FROM node:22-bookworm-slim AS build
 WORKDIR /build
+
 COPY .yarn/releases ./.yarn/releases
-RUN yarn set version berry
 COPY .swcrc tsconfig.json package.json yarn.lock .yarnrc.yml ./
+
 RUN yarn install --immutable
+
 COPY src/ ./src/
+
 RUN yarn run build
 
-FROM node:18-bookworm-slim AS production
+FROM node:22-bookworm-slim AS production
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y ca-certificates curl
 
 RUN yarn global add pm2
 COPY .yarn/releases ./.yarn/releases
-RUN yarn set version berry
 
 COPY .swcrc tsconfig.json package.json yarn.lock .yarnrc.yml ./
 RUN yarn workspaces focus --all --production

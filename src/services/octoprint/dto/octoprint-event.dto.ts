@@ -5,7 +5,8 @@ export const octoprintWsMessages = {
   reauthRequired: "reauthRequired",
   current: "current",
   history: "history",
-  // event: "event",
+  // Used by completion tracking
+  event: "event",
   // plugin: "plugin",
   // timelapse: "timelapse",
   // slicingProgress: "slicingProgress",

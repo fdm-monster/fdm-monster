@@ -1,5 +1,5 @@
 export class LoginDto {
-  apiKey: string;
+  apiKey?: string;
   printerURL: string;
   printerType: number;
 }

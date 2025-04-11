@@ -20,5 +20,7 @@ export interface HistoryMessageDto {
   logs: string[];
   messages: string[];
   // 1.10 documents this
-  // plugins: any[];
+  plugins: any[];
 }
+
+export type HistoryMessageDtoWithoutLogsMessagesPluginsAndTemps = Omit<HistoryMessageDto, 'logs' | 'messages' | 'temps' | 'plugins'>;

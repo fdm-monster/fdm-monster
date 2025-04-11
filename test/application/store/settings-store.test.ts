@@ -1,9 +1,7 @@
 import { DITokens } from "@/container.tokens";
-import { AwilixContainer } from "awilix";
 import { SettingsStore } from "@/state/settings.store";
 import { setupTestApp } from "../../test-server";
 
-let container: AwilixContainer;
 let settingsStore: SettingsStore;
 
 beforeEach(async () => {
@@ -13,7 +11,7 @@ beforeEach(async () => {
 
 describe(SettingsStore.name, () => {
   it("should persist jwt secret and expiresIn", async () => {
-    await settingsStore.persistOptionalCredentialSettings("123123123", "123d");
+    await settingsStore.persistOptionalCredentialSettings("1234567890", "123d");
     const creds = await settingsStore.getCredentialSettings();
     expect(creds.jwtExpiresIn).toBe(123);
     expect(creds.refreshTokenAttempts).toBe(-1);

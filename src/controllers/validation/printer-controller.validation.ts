@@ -1,19 +1,19 @@
 import { z } from "zod";
 import {
+  printerApiKeyValidator,
+  printerDisabledReasonValidator,
+  printerEnabledValidator,
   printerTypeValidator,
   printerUrlValidator,
-  printerApiKeyValidator,
-  printerEnabledValidator,
-  printerDisabledReasonValidator,
-  refineApiKeyValidator,
+  refineApiKeyValidator
 } from "@/services/validators/printer-service.validation";
 
 export const flowRateSchema = z.object({
-  flowRate: z.number().int().min(75).max(125).nonnegative(),
+  flowRate: z.number().int().min(75).max(125).nonnegative()
 });
 
 export const feedRateSchema = z.object({
-  feedRate: z.number().int().min(10).max(200).nonnegative(),
+  feedRate: z.number().int().min(10).max(200).nonnegative()
 });
 
 export const testPrinterApiSchema = z
@@ -21,19 +21,20 @@ export const testPrinterApiSchema = z
     printerURL: printerUrlValidator,
     printerType: printerTypeValidator,
     apiKey: printerApiKeyValidator,
+    correlationToken: z.string().optional()
   })
   .superRefine(refineApiKeyValidator);
 
 export const updatePrinterDisabledReasonSchema = z.object({
-  disabledReason: printerDisabledReasonValidator,
+  disabledReason: printerDisabledReasonValidator
 });
 
 export const updatePrinterEnabledSchema = z.object({
-  enabled: printerEnabledValidator,
+  enabled: printerEnabledValidator
 });
 
 export const updatePrinterConnectionSettingSchema = z.object({
   printerType: printerTypeValidator,
   printerURL: printerUrlValidator,
-  apiKey: printerApiKeyValidator,
+  apiKey: printerApiKeyValidator
 });

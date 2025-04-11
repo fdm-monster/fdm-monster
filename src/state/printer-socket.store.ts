@@ -96,15 +96,12 @@ export class PrinterSocketStore {
     const socketStates = {};
     const apiStates = {};
     const promisesReauth = [];
-    const failedSocketsReauth = [];
     for (const socket of Object.values(this.printerSocketAdaptersById)) {
       try {
         if (socket.printerType === OctoprintType && (socket as OctoprintWebsocketAdapter).needsReauth()) {
           reauthRequested++;
           // TODO OP close socket
-          const promise = socket.reauthSession().catch((_) => {
-            failedSocketsReauth.push(socket.printerId);
-          });
+          const promise = socket.reauthSession().catch();
           // TODO MR reconnect
           promisesReauth.push(promise);
         }
@@ -116,7 +113,6 @@ export class PrinterSocketStore {
     await Promise.all(promisesReauth);
 
     const promisesOpenSocket: any[] = [];
-    const failedSocketReopened: any[] = [];
     for (const socket of Object.values(this.printerSocketAdaptersById)) {
       try {
         if (socket.needsSetup() || socket.needsReopen()) {
@@ -126,9 +122,7 @@ export class PrinterSocketStore {
             .then(() => {
               socket.open();
             })
-            .catch((_) => {
-              failedSocketReopened.push(socket.printerId);
-            });
+            .catch();
           promisesOpenSocket.push(promise);
         }
       } catch (e) {
@@ -144,15 +138,6 @@ export class PrinterSocketStore {
     }
 
     await Promise.all(promisesOpenSocket);
-
-    return {
-      reauth: reauthRequested,
-      failedSocketReopened,
-      failedSocketsReauth,
-      socketSetup: socketSetupRequested,
-      socket: socketStates,
-      api: apiStates
-    };
   }
 
   createOrUpdateSocket(printer: PrinterDto<IdType>) {

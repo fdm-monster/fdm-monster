@@ -3,12 +3,16 @@ import { printerEvents, PrintersDeletedEvent } from "@/constants/event.constants
 import EventEmitter2 from "eventemitter2";
 import { IdType } from "@/shared.constants";
 import { OctoPrintEventDto, WsMessage } from "@/services/octoprint/dto/octoprint-event.dto";
-import { HistoryMessageDto } from "@/services/octoprint/dto/websocket/history-message.dto";
+import {
+  HistoryMessageDto,
+  HistoryMessageDtoWithoutLogsMessagesPluginsAndTemps
+} from "@/services/octoprint/dto/websocket/history-message.dto";
 import { MoonrakerEventDto, MR_WsMessage } from "@/services/moonraker/constants/moonraker-event.dto";
 import { PrinterObjectsQueryDto } from "@/services/moonraker/dto/objects/printer-objects-query.dto";
 import { SubscriptionType } from "@/services/moonraker/moonraker-websocket.adapter";
 
-export type PrinterEventsCacheDto = Record<WsMessage, any | null>;
+export type WsMessageWithoutEventAndPlugin = Exclude<WsMessage, "event" | "plugin">;
+export type PrinterEventsCacheDto = Record<WsMessageWithoutEventAndPlugin, any>;
 
 export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
 
@@ -52,7 +56,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
     return ref;
   }
 
-  async setEvent(printerId: IdType, label: WsMessage, payload: any) {
+  async setEvent(printerId: IdType, label: WsMessageWithoutEventAndPlugin, payload: any) {
     const ref = await this.getOrCreateEvents(printerId);
     ref[label] = {
       payload,
@@ -61,7 +65,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
     await this.setKeyValue(printerId, ref);
   }
 
-  async setSubstate(printerId: IdType, label: WsMessage, substateName: string, payload: any) {
+  async setSubState(printerId: IdType, label: WsMessageWithoutEventAndPlugin, substateName: string, payload: any) {
     const ref = await this.getOrCreateEvents(printerId);
     if (!ref[label]) {
       ref[label] = {};
@@ -86,7 +90,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
   private async onOctoPrintSocketMessage(e: OctoPrintEventDto) {
     const printerId = e.printerId;
     if (!["plugin", "event"].includes(e.event)) {
-      await this.setEvent(printerId, e.event, e.event === "history" ? this.pruneHistoryPayload(e.payload) : e.payload);
+      await this.setEvent(printerId, e.event as WsMessageWithoutEventAndPlugin, e.event === "history" ? this.pruneHistoryPayload(e.payload) : e.payload);
     }
   }
 
@@ -102,10 +106,8 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
     }
   }
 
-  private pruneHistoryPayload(payload: HistoryMessageDto) {
-    delete payload.logs;
-    delete payload.temps;
-    delete payload.messages;
-    return payload;
+  private pruneHistoryPayload(payload: HistoryMessageDto): HistoryMessageDtoWithoutLogsMessagesPluginsAndTemps {
+    const { logs, temps, messages, plugins, ...prunedPayload } = payload;
+    return prunedPayload satisfies HistoryMessageDtoWithoutLogsMessagesPluginsAndTemps;
   }
 }
