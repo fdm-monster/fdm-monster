@@ -8,7 +8,6 @@ import { TestPrinterSocketStore } from "@/state/test-printer-socket.store";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { z, ZodError } from "zod";
-import { CreatePrinterDto } from "@/services/interfaces/printer.dto";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { createPrinterSchema } from "@/services/validators/printer-service.validation";
 
