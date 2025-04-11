@@ -41,7 +41,7 @@ export class SettingsService implements ISettingsService<MongoIdType> {
   }
 
   async getOrCreate() {
-    let settings: ISettings | null = await Settings.findOne();
+    let settings: ISettings | null = await this.getOptional();
     if (!settings) {
       const defaultSettings = new Settings(getDefaultSettings());
       await defaultSettings.save();
@@ -56,8 +56,8 @@ export class SettingsService implements ISettingsService<MongoIdType> {
     }
   }
 
-  async updateFileCleanSettings(patchUpdate: z.infer<typeof fileCleanSettingsUpdateSchema>) {
-    const validatedInput = await validateInput(patchUpdate, fileCleanSettingsUpdateSchema);
+  async updateFileCleanSettings(update: z.infer<typeof fileCleanSettingsUpdateSchema>) {
+    const validatedInput = await validateInput(update, fileCleanSettingsUpdateSchema);
 
     const settingsDoc = await this.getOrCreate();
     settingsDoc[printerFileCleanSettingKey] = Object.assign(settingsDoc[printerFileCleanSettingKey], validatedInput);
@@ -66,8 +66,8 @@ export class SettingsService implements ISettingsService<MongoIdType> {
     }))!;
   }
 
-  async updateWizardSettings(patchUpdate: z.infer<typeof wizardUpdateSchema>) {
-    const validatedInput = await validateInput(patchUpdate, wizardUpdateSchema);
+  async updateWizardSettings(update: z.infer<typeof wizardUpdateSchema>) {
+    const validatedInput = await validateInput(update, wizardUpdateSchema);
 
     const settingsDoc = await this.getOrCreate();
     settingsDoc[wizardSettingKey] = Object.assign(settingsDoc[wizardSettingKey], validatedInput);
@@ -76,8 +76,8 @@ export class SettingsService implements ISettingsService<MongoIdType> {
     }))!;
   }
 
-  async updateFrontendSettings(patchUpdate: z.infer<typeof frontendSettingsUpdateSchema>) {
-    const validatedInput = await validateInput(patchUpdate, frontendSettingsUpdateSchema);
+  async updateFrontendSettings(update: z.infer<typeof frontendSettingsUpdateSchema>) {
+    const validatedInput = await validateInput(update, frontendSettingsUpdateSchema);
 
     const settingsDoc = await this.getOrCreate();
     const frontendSettings = settingsDoc[frontendSettingKey];
@@ -109,8 +109,8 @@ export class SettingsService implements ISettingsService<MongoIdType> {
     }))!;
   }
 
-  async updateServerSettings(patchUpdate: z.infer<typeof serverSettingsUpdateSchema>) {
-    const validatedInput = await validateInput(patchUpdate, serverSettingsUpdateSchema);
+  async updateServerSettings(update: z.infer<typeof serverSettingsUpdateSchema>) {
+    const validatedInput = await validateInput(update, serverSettingsUpdateSchema);
 
     const settingsDoc = await this.getOrCreate();
     const serverSettings = settingsDoc[serverSettingsKey];
@@ -129,5 +129,9 @@ export class SettingsService implements ISettingsService<MongoIdType> {
     return (await Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
       new: true
     }))!;
+  }
+
+  private async getOptional(): Promise<ISettings | null> {
+    return Settings.findOne();
   }
 }

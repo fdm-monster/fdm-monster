@@ -23,6 +23,8 @@ import {
   wizardUpdateSchema
 } from "@/services/validators/settings-service.validation";
 import { migrateSettingsRuntime } from "@/shared/runtime-settings.migration";
+import { validateInput } from "@/handlers/validators";
+import { ISettings } from "@/models/Settings";
 
 export class SettingsService
   extends BaseService(Settings, SettingsDto)
@@ -58,80 +60,66 @@ export class SettingsService
     return settings[serverSettingsKey];
   }
 
-  async updateServerSettings(serverSettings: z.infer<typeof serverSettingsUpdateSchema>) {
+  async updateServerSettings(update: z.infer<typeof serverSettingsUpdateSchema>) {
+    const validatedInput = await validateInput(update, serverSettingsUpdateSchema);
     const entity = await this.getOrCreate();
-    entity[serverSettingsKey] = serverSettings;
+    entity[serverSettingsKey] = validatedInput;
     await this.update(entity.id, entity);
     return entity;
   }
 
   async updateJwtSecretCredentialSetting(update: z.infer<typeof jwtSecretCredentialSettingUpdateSchema>) {
+    const validatedInput = await validateInput(update, jwtSecretCredentialSettingUpdateSchema);
     const entity = await this.getOrCreate();
-    entity[credentialSettingsKey].jwtSecret = update.jwtSecret;
+    entity[credentialSettingsKey].jwtSecret = validatedInput.jwtSecret;
     await this.update(entity.id, entity);
     return entity;
   }
 
-  async updateCredentialSettings(credentialSettings: z.infer<typeof credentialSettingUpdateSchema>) {
+  async updateCredentialSettings(update: z.infer<typeof credentialSettingUpdateSchema>) {
+    const validatedInput = await validateInput(update, credentialSettingUpdateSchema);
     const entity = await this.getOrCreate();
-    entity[credentialSettingsKey].refreshTokenExpiry = credentialSettings.refreshTokenExpiry;
-    entity[credentialSettingsKey].refreshTokenAttempts = credentialSettings.refreshTokenAttempts;
-    entity[credentialSettingsKey].jwtExpiresIn = credentialSettings.jwtExpiresIn;
+    entity[credentialSettingsKey].refreshTokenExpiry = validatedInput.refreshTokenExpiry;
+    entity[credentialSettingsKey].refreshTokenAttempts = validatedInput.refreshTokenAttempts;
+    entity[credentialSettingsKey].jwtExpiresIn = validatedInput.jwtExpiresIn;
     await this.update(entity.id, entity);
     return entity;
   }
 
-  async updateFileCleanSettings(fileCleanSettings: z.infer<typeof fileCleanSettingsUpdateSchema>) {
+  async updateFileCleanSettings(update: z.infer<typeof fileCleanSettingsUpdateSchema>) {
+    const validatedInput = await validateInput(update, fileCleanSettingsUpdateSchema);
     const entity = await this.getOrCreate();
-    entity[printerFileCleanSettingKey] = fileCleanSettings;
+    entity[printerFileCleanSettingKey] = validatedInput;
     await this.update(entity.id, entity);
     return entity;
   }
 
-  async updateFrontendSettings(frontendSettings: z.infer<typeof frontendSettingsUpdateSchema>) {
+  async updateFrontendSettings(update: z.infer<typeof frontendSettingsUpdateSchema>) {
+    const validatedInput = await validateInput(update, frontendSettingsUpdateSchema);
     const entity = await this.getOrCreate();
-    entity[frontendSettingKey] = frontendSettings;
+    entity[frontendSettingKey] = validatedInput;
     await this.update(entity.id, entity);
     return entity;
   }
 
-  async updateTimeoutSettings(timeoutSettings: z.infer<typeof timeoutSettingsUpdateSchema>) {
+  async updateTimeoutSettings(update: z.infer<typeof timeoutSettingsUpdateSchema>) {
+    const validatedInput = await validateInput(update, timeoutSettingsUpdateSchema);
     const entity = await this.getOrCreate();
-    entity[timeoutSettingKey] = timeoutSettings;
+    entity[timeoutSettingKey] = validatedInput;
     await this.update(entity.id, entity);
     return entity;
   }
 
-  async updateWizardSettings(wizardSettings: z.infer<typeof wizardUpdateSchema>) {
+  async updateWizardSettings(update: z.infer<typeof wizardUpdateSchema>) {
+    const validatedInput = await validateInput(update, wizardUpdateSchema);
     const entity = await this.getOrCreate();
-    entity[wizardSettingKey] = wizardSettings;
+    entity[wizardSettingKey] = validatedInput;
     await this.update(entity.id, entity);
     return entity;
   }
 
-  async getOptional() {
+  private async getOptional(): Promise<ISettings<number> | null> {
     const settingsList = await this.repository.find({ take: 1 });
     return settingsList?.length ? settingsList[0] : null;
-  }
-
-  async setLoginRequired(enabled: boolean): Promise<Settings> {
-    const entity = await this.getOrCreate();
-    entity[serverSettingsKey].loginRequired = enabled;
-    await this.update(entity.id, entity);
-    return entity;
-  }
-
-  async setRegistrationEnabled(enabled: boolean): Promise<Settings> {
-    const entity = await this.getOrCreate();
-    entity[serverSettingsKey].registration = enabled;
-    await this.update(entity.id, entity);
-    return entity;
-  }
-
-  async setSentryDiagnosticsEnabled(enabled: boolean): Promise<Settings> {
-    const entity = await this.getOrCreate();
-    entity[serverSettingsKey].sentryDiagnosticsEnabled = enabled;
-    await this.update(entity.id, entity);
-    return entity;
   }
 }
