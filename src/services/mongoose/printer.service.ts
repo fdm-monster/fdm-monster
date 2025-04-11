@@ -7,7 +7,12 @@ import {
   updatePrinterDisabledReasonSchema,
   updatePrinterEnabledSchema,
 } from "../validators/printer-service.validation";
-import { printerEvents } from "@/constants/event.constants";
+import {
+  BatchPrinterCreatedEvent, PrinterCreatedEvent,
+  printerEvents,
+  PrintersDeletedEvent,
+  PrinterUpdatedEvent
+} from "@/constants/event.constants";
 import { LoggerService } from "@/handlers/logger";
 import { MongoIdType } from "@/shared.constants";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
@@ -57,12 +62,6 @@ export class PrinterService implements IPrinterService<MongoIdType> {
     return printer;
   }
 
-  /**
-   * Stores a new printer into the database.
-   * @param {Object} newPrinter object to create.
-   * @param {boolean} emitEvent
-   * @throws {Error} If the printer is not correctly provided.
-   */
   async create(newPrinter: IPrinter, emitEvent = true) {
     if (!newPrinter) throw new Error("Missing printer to create");
 
@@ -70,7 +69,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
     mergedPrinter.dateAdded = Date.now();
     const printer = await Printer.create(mergedPrinter);
     if (emitEvent) {
-      this.eventEmitter2.emit(printerEvents.printerCreated, { printer });
+      this.eventEmitter2.emit(printerEvents.printerCreated, { printer } satisfies PrinterCreatedEvent<string>);
     }
     return printer;
   }
@@ -94,14 +93,14 @@ export class PrinterService implements IPrinterService<MongoIdType> {
     printer.name = name;
     printer.printerType = printerType;
     await printer.save();
-    this.eventEmitter2.emit(printerEvents.printerUpdated, { printer });
+    this.eventEmitter2.emit(printerEvents.printerUpdated, { printer } satisfies PrinterUpdatedEvent<string>);
     return printer;
   }
 
   async deleteMany(printerIds: MongoIdType[], emitEvent = true) {
     await Printer.deleteMany({ _id: { $in: printerIds } });
     if (emitEvent) {
-      this.eventEmitter2.emit(printerEvents.printersDeleted, { printerIds });
+      this.eventEmitter2.emit(printerEvents.printersDeleted, { printerIds } satisfies PrintersDeletedEvent<string>);
     }
   }
 
@@ -110,7 +109,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
 
     await Printer.findOneAndDelete(filter);
     if (emitEvent) {
-      this.eventEmitter2.emit(printerEvents.printersDeleted, { printerIds: [printerId] });
+      this.eventEmitter2.emit(printerEvents.printersDeleted, { printerIds: [printerId] } satisfies PrintersDeletedEvent<string>);
     }
   }
 
@@ -129,7 +128,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
     }
 
     this.logger.log("Batch create succeeded");
-    this.eventEmitter2.emit(printerEvents.batchPrinterCreated, { printers: newPrinters });
+    this.eventEmitter2.emit(printerEvents.batchPrinterCreated, { printers: newPrinters } satisfies BatchPrinterCreatedEvent<string>);
     return newPrinters;
   }
 
@@ -140,7 +139,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
       new: true,
       useFindAndModify: false,
     });
-    this.eventEmitter2.emit(printerEvents.printerUpdated, { printer });
+    this.eventEmitter2.emit(printerEvents.printerUpdated, { printer } satisfies PrinterUpdatedEvent<string>);
     return printer;
   }
 
@@ -151,7 +150,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
       new: true,
       useFindAndModify: false,
     });
-    this.eventEmitter2.emit(printerEvents.printerUpdated, { printer });
+    this.eventEmitter2.emit(printerEvents.printerUpdated, { printer } satisfies PrinterUpdatedEvent<string>);
     return printer;
   }
 
@@ -170,7 +169,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
       new: true,
       useFindAndModify: false,
     });
-    this.eventEmitter2.emit(printerEvents.printerUpdated, { printer });
+    this.eventEmitter2.emit(printerEvents.printerUpdated, { printer } satisfies PrinterUpdatedEvent<string>);
     return printer!;
   }
 
@@ -188,7 +187,7 @@ export class PrinterService implements IPrinterService<MongoIdType> {
       new: true,
       useFindAndModify: false,
     });
-    this.eventEmitter2.emit(printerEvents.printerUpdated, { printer });
+    this.eventEmitter2.emit(printerEvents.printerUpdated, { printer } satisfies PrinterUpdatedEvent<string>);
     return printer!;
   }
 

@@ -1,9 +1,4 @@
-import fs from "fs";
-import { LoggerService } from "@/handlers/logger";
 import { AppConstants } from "@/server.constants";
-import { join } from "path";
-
-const logger = new LoggerService("Utils-Env", false);
 
 export function getEnvOrDefault(key: any, defaultVal: any) {
   const val = process.env[key];

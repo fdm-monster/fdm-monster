@@ -1,11 +1,10 @@
 import { IdDto } from "@/shared.constants";
-import { PrinterType } from "@/services/printer-api.interface";
 
 export class CreatePrinterDto {
   name: string;
   apiKey: string;
   printerURL: string;
-  printerType: PrinterType;
+  printerType: number;
 }
 
 export class PrinterDto<KeyType> extends IdDto<KeyType> {
@@ -15,7 +14,7 @@ export class PrinterDto<KeyType> extends IdDto<KeyType> {
   dateAdded: number;
   apiKey: string;
   printerURL: string;
-  printerType: PrinterType;
+  printerType: number;
 }
 
 export class TestPrinterDto<KeyType> extends PrinterDto<KeyType> {

@@ -5,6 +5,7 @@ module.exports = {
     try {
       await session.withTransaction(async () => {
         const collections = await client.db().listCollections().toArray();
+        // @ts-ignore
         if (collections.find((c) => c.name === "printerfloors")) {
           await db.collection("printerfloors").update({}, { $unset: { printerGroups: 1 } }, { multi: true });
           await db.collection("printerfloors").update({}, { $set: { printers: [] } }, { multi: true });
@@ -21,12 +22,14 @@ module.exports = {
     const session = client.startSession();
     try {
       const collections = await client.db().listCollections().toArray();
+      // @ts-ignore
       if (collections.find((c) => c.name === "floors")) {
         await db.collection("printerfloors").update({}, { $set: { printerGroups: [] } }, { multi: true });
         await db.collection("printerfloors").update({}, { $unset: { printers: 1 } }, { multi: true });
         await db.collection("floors").rename("printerfloors");
       }
 
+      // @ts-ignore
       if (!collections.find((c) => c.name === "printerfloors")) {
         throw new Error("Illegal migration state, didnt find floors table");
       }

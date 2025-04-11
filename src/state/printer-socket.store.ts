@@ -1,6 +1,12 @@
 import { captureException } from "@sentry/node";
 import { errorSummary } from "@/utils/error.utils";
-import { printerEvents } from "@/constants/event.constants";
+import {
+  BatchPrinterCreatedEvent,
+  PrinterCreatedEvent,
+  printerEvents,
+  PrintersDeletedEvent,
+  PrinterUpdatedEvent
+} from "@/constants/event.constants";
 import EventEmitter2 from "eventemitter2";
 import { SocketFactory } from "@/services/socket.factory";
 import { PrinterCache } from "@/state/printer.cache";
@@ -42,19 +48,15 @@ export class PrinterSocketStore {
 
   /**
    * Load all printers into cache, and create a new socket for each printer (if enabled)
-   * @param {OctoPrintEventDto} e
    */
   async loadPrinterSockets() {
     await this.printerCache.loadCache();
 
     const printerDocs = await this.printerCache.listCachedPrinters(false);
     this.printerSocketAdaptersById = {};
-    /**
-     * @type {Printer}
-     */
     for (const doc of printerDocs) {
       try {
-        await this.handlePrinterCreated({ printer: doc });
+        this.handlePrinterCreated({ printer: doc });
       } catch (e) {
         captureException(e);
         this.logger.error("PrinterSocketStore failed to construct new OctoPrint socket.", errorSummary(e));
@@ -185,31 +187,23 @@ export class PrinterSocketStore {
     foundAdapter.resetSocketState();
   }
 
-  private handleBatchPrinterCreated({ printers }) {
-    for (const p of printers) {
-      this.handlePrinterCreated({ printer: p });
+  private handleBatchPrinterCreated(event: BatchPrinterCreatedEvent) {
+    for (const printer of event.printers) {
+      this.handlePrinterCreated({ printer });
     }
   }
 
-  /**
-   * @param { printer: Printer } printer
-   * @returns void
-   */
-  private handlePrinterCreated({ printer }) {
-    this.createOrUpdateSocket(printer);
+  private handlePrinterCreated(event: PrinterCreatedEvent) {
+    this.createOrUpdateSocket(event.printer);
   }
 
-  /**
-   * @param { printer: Printer } printer
-   * @returns void
-   */
-  private handlePrinterUpdated({ printer }) {
+  private handlePrinterUpdated(event: PrinterUpdatedEvent) {
     this.logger.log(`Printer updated. Updating socket`);
-    this.createOrUpdateSocket(printer);
+    this.createOrUpdateSocket(event.printer);
   }
 
-  private handlePrintersDeleted({ printerIds }) {
-    printerIds.forEach((id) => {
+  private handlePrintersDeleted(event: PrintersDeletedEvent) {
+    event.printerIds.forEach((id) => {
       this.deleteSocket(id);
     });
   }
@@ -221,7 +215,7 @@ export class PrinterSocketStore {
     this.eventEmitter2.on(printerEvents.batchPrinterCreated, this.handleBatchPrinterCreated.bind(this));
   }
 
-  private deleteSocket(printerId: string) {
+  private deleteSocket(printerId: IdType) {
     const socket = this.printerSocketAdaptersById[printerId];
 
     // Ensure that the printer does not re-register itself after being purged

@@ -13,7 +13,7 @@ import { captureException } from "@sentry/node";
 import { IUser } from "@/models/Auth/User";
 
 export class AuthService<KeyType = IdType> implements IAuthService<KeyType> {
-  private logger: LoggerService;
+  private readonly logger: LoggerService;
   /**
    *  When users are blacklisted at runtime, this cache can make quick work of rejecting them
    */

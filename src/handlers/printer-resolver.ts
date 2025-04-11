@@ -2,16 +2,16 @@ import { Request } from "express";
 import { currentPrinterToken, printerApiToken, printerIdToken, printerLoginToken } from "@/middleware/printer";
 import { IPrinterApi } from "@/services/printer-api.interface";
 import { LoginDto } from "@/services/interfaces/login.dto";
-import { CachedPrinter } from "@/state/printer.cache";
 import { IdType } from "@/shared.constants";
 import { InternalServerException, ValidationException } from "@/exceptions/runtime.exceptions";
+import { PrinterDto } from "@/services/interfaces/printer.dto";
 
 export function getScopedPrinter(req: Request) {
   const tokens = [printerApiToken, printerLoginToken, currentPrinterToken, printerIdToken];
   let resolvedDependencies: {
     [printerApiToken]: IPrinterApi;
     [printerLoginToken]: LoginDto;
-    [currentPrinterToken]: CachedPrinter;
+    [currentPrinterToken]: PrinterDto<IdType>;
     [printerIdToken]: IdType;
   } = {};
   let errors: any[] = [];

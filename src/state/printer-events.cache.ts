@@ -1,10 +1,7 @@
 import { KeyDiffCache } from "@/utils/cache/key-diff.cache";
-import { printerEvents } from "@/constants/event.constants";
-import { SettingsStore } from "@/state/settings.store";
+import { printerEvents, PrintersDeletedEvent } from "@/constants/event.constants";
 import EventEmitter2 from "eventemitter2";
-import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IdType } from "@/shared.constants";
-import { LoggerService } from "@/handlers/logger";
 import { OctoPrintEventDto, WsMessage } from "@/services/octoprint/dto/octoprint-event.dto";
 import { HistoryMessageDto } from "@/services/octoprint/dto/websocket/history-message.dto";
 import { MoonrakerEventDto, MR_WsMessage } from "@/services/moonraker/constants/moonraker-event.dto";
@@ -14,15 +11,11 @@ import { SubscriptionType } from "@/services/moonraker/moonraker-websocket.adapt
 export type PrinterEventsCacheDto = Record<WsMessage, any | null>;
 
 export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
-  private readonly logger: LoggerService;
 
   constructor(
-    loggerFactory: ILoggerFactory,
-    private readonly eventEmitter2: EventEmitter2,
-    private readonly settingsStore: SettingsStore
+    private readonly eventEmitter2: EventEmitter2
   ) {
     super();
-    this.logger = loggerFactory(PrinterEventsCache.name);
 
     this.subscribeToEvents();
   }
@@ -80,8 +73,8 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
     await this.setKeyValue(printerId, ref);
   }
 
-  private async handlePrintersDeleted({ printerIds }: { printerIds: IdType[] }) {
-    await this.deleteKeysBatch(printerIds);
+  private async handlePrintersDeleted(event: PrintersDeletedEvent) {
+    await this.deleteKeysBatch(event.printerIds);
   }
 
   private subscribeToEvents() {
@@ -98,7 +91,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
   }
 
   private async onMoonrakerSocketMessage(
-    e: MoonrakerEventDto<MR_WsMessage, PrinterObjectsQueryDto<SubscriptionType | null>, IdType>
+    e: MoonrakerEventDto<MR_WsMessage, PrinterObjectsQueryDto<SubscriptionType | null>>
   ) {
     const printerId = e.printerId;
     const eventType = e.event;
