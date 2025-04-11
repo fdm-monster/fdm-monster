@@ -19,7 +19,7 @@ export interface IRoleService<KeyType = IdType, Entity = IRole> {
 
   authorizeRole(requiredRole: string | KeyType, assignedRoles: string[]): boolean;
 
-  authorizeRoles(requiredRoles: (string | KeyType)[], assignedRoles: (string | KeyType)[], subset: boolean): boolean;
+  authorizeRoles(requiredRoles: (string | KeyType)[], assignedRoles: readonly (string | KeyType)[], subset: boolean): boolean;
 
   getRoleByName(roleName: string): Entity;
 

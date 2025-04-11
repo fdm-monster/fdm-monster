@@ -1,7 +1,7 @@
 import { AppConstants } from "@/server.constants";
 
 export interface IConfigService {
-  get(key: string, defaultValue?: string): string | undefined;
+  get<T>(key: string, defaultValue?: T): T | undefined;
 
   getOrThrow(key: string): void;
 
@@ -9,11 +9,11 @@ export interface IConfigService {
 }
 
 export class ConfigService implements IConfigService {
-  get(key: string, defaultValue?: string) {
+  get<T>(key: string, defaultValue?: T) {
     if (!Object.keys(process.env).includes(key) || !process.env[key]?.length) {
       return defaultValue;
     }
-    return process.env[key];
+    return process.env[key] as T;
   }
 
   getOrThrow(key: string) {
@@ -24,6 +24,6 @@ export class ConfigService implements IConfigService {
   }
 
   isDemoMode() {
-    return this.get(AppConstants.OVERRIDE_IS_DEMO_MODE, "false") === "true";
+    return this.get<string>(AppConstants.OVERRIDE_IS_DEMO_MODE, "false") === "true";
   }
 }

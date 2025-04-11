@@ -400,7 +400,7 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
 
     const currentMessage: Partial<CurrentMessageDto> = {
       progress: {
-        printTime: printTime,
+        printTime,
         completion: (originalKlipperObjects.display_status?.progress ?? 0) * 100.0,
       },
       state: {

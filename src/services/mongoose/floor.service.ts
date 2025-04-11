@@ -12,6 +12,7 @@ import { PrinterCache } from "@/state/printer.cache";
 import { MongoIdType } from "@/shared.constants";
 import { IFloorService } from "@/services/interfaces/floor.service.interface";
 import { CreateFloorDto, FloorDto, PositionDto, UpdateFloorDto } from "@/services/interfaces/floor.dto";
+import { IPosition } from "@/models/FloorPrinter";
 
 export class FloorService implements IFloorService<MongoIdType> {
   constructor(private readonly printerCache: PrinterCache) {}
@@ -127,9 +128,9 @@ export class FloorService implements IFloorService<MongoIdType> {
       (position) => position.printerId.toString() === validInput.printerId.toString(),
     );
     if (positionIndex !== -1) {
-      floor.printers[positionIndex] = validInput as PositionDto<MongoIdType>;
+      floor.printers[positionIndex] = validInput as IPosition;
     } else {
-      floor.printers.push(validInput);
+      floor.printers.push(validInput as IPosition);
     }
 
     await floor.save();

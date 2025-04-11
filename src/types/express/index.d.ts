@@ -9,6 +9,6 @@ declare module "express" {
     local?: any;
     user?: IUser<KeyType>;
     container?: AwilixContainer;
-    roles?: RequestRole[];
+    roles?: readonly RequestRole[];
   }
 }

@@ -13,7 +13,6 @@ import { AxiosError } from "axios";
 import { ISocketLogin } from "@/shared/dtos/socket-login.dto";
 import { WebsocketAdapter } from "@/shared/websocket.adapter";
 import { OctoPrintEventDto } from "@/services/octoprint/dto/octoprint-event.dto";
-import { writeFileSync } from "node:fs";
 import { LoginDto } from "@/services/interfaces/login.dto";
 import { SOCKET_STATE, SocketState } from "@/shared/dtos/socket-state.type";
 import { API_STATE, ApiState } from "@/shared/dtos/api-state.type";
@@ -269,17 +268,8 @@ export class OctoprintWebsocketAdapter extends WebsocketAdapter implements IWebs
     if (eventName === OctoPrintMessage.reauthRequired) {
       this.logger.log("Received 'reauthRequired', acting on it");
       this.setReauthRequired();
-    } else if (
-      eventName === OctoPrintMessage.current &&
-      this.configService.get(
-        AppConstants.debugFileWritePrinterStatesKey,
-        AppConstants.defaultDebugFileWritePrinterStates,
-      ) === "true"
-    ) {
-      writeFileSync(`websocket_current_${this.printerId}.txt`, JSON.stringify(payload, null, 2));
     }
 
-    // Emit the message to the event bus
     await this.emitEvent(eventName, payload);
   }
 
