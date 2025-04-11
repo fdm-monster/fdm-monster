@@ -40,10 +40,10 @@ describe(TaskManagerService.name, () => {
   it("should invalidate wrong workload - missing run", () => {
     let caught = false;
     try {
-      // @ts-ignore
-      taskManagerService.validateInput("name", () => {});
+      taskManagerService.validateInput("name", DITokens.configService, {});
     } catch (e) {
       expect(e instanceof JobValidationException).toBeTruthy();
+      expect((e as JobValidationException).message).toEqual("Job 'configService' with ID 'name' was resolved but it doesn't have a 'run()' method to call.");
       caught = true;
     }
     expect(caught).toEqual(true);
@@ -54,9 +54,7 @@ describe(TaskManagerService.name, () => {
 
     taskManagerService.validateInput(
       "name",
-      () => {
-        ran = true;
-      },
+      DITokens.softwareUpdateTask,
       {
         disabled: true,
         periodic: true,
