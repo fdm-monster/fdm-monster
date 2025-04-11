@@ -94,7 +94,7 @@ export class TestPrinterSocketStore {
         for await (const _startTime of setInterval(100)) {
           if (!this.testSocket) {
             this.logger.warn("Test without socket, rejecting");
-            reject("Test without socket, rejecting");
+            reject(new Error("Test without socket, rejecting"));
             return;
           }
           if (this.testSocket.socketState === SOCKET_STATE.authenticated) {
