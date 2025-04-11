@@ -11,7 +11,7 @@ export interface IPrinter<KeyType = MongoIdType> {
   disabledReason?: string;
   name: string;
   assignee?: string;
-  dateAdded: number;
+  dateAdded?: number;
   feedRate?: number;
   flowRate?: number;
 }
