@@ -8,7 +8,7 @@ import { TrackedUpload } from "@/services/interfaces/file-upload-tracker.interfa
 import { IdType } from "@/shared.constants";
 
 export class FileUploadTrackerCache {
-  private currentUploads: TrackedUpload[] = [];
+  private readonly currentUploads: TrackedUpload[] = [];
 
   private readonly logger: LoggerService;
 
@@ -59,7 +59,7 @@ export class FileUploadTrackerCache {
     if (!upload) {
       return;
     }
-    upload.progress = event.progress;
+    upload.progress = event.progress ?? null;
   }
 
   handleUploadFailed(token: string, reason?: string) {
@@ -84,6 +84,6 @@ export class FileUploadTrackerCache {
     trackedUpload.completed = true;
     trackedUpload.success = success;
     trackedUpload.completedAt = Date.now();
-    trackedUpload.reason = reason;
+    trackedUpload.reason = reason ?? null;
   }
 }
