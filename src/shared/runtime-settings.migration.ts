@@ -12,11 +12,13 @@ import {
   printerFileCleanSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
-  wizardSettingKey
+  wizardSettingKey,
 } from "@/constants/server-settings.constants";
 import { v4 as uuidv4 } from "uuid";
 
-export function migrateSettingsRuntime<KeyType = IdType>(knownSettings: Partial<ISettings<KeyType>>): ISettings<KeyType> {
+export function migrateSettingsRuntime<KeyType = IdType>(
+  knownSettings: Partial<ISettings<KeyType>>,
+): ISettings<KeyType> {
   const entity = knownSettings;
 
   entity[wizardSettingKey] ??= getDefaultWizardSettings();
@@ -26,7 +28,7 @@ export function migrateSettingsRuntime<KeyType = IdType>(knownSettings: Partial<
   entity[credentialSettingsKey] ??= {
     ...getDefaultCredentialSettings(),
     // Verification and signing of JWT tokens, can be changed on the fly
-    jwtSecret: uuidv4()
+    jwtSecret: uuidv4(),
   };
   entity[printerFileCleanSettingKey] ??= getDefaultFileCleanSettings();
 
@@ -35,7 +37,7 @@ export function migrateSettingsRuntime<KeyType = IdType>(knownSettings: Partial<
     entity[printerFileCleanSettingKey] = {
       autoRemoveOldFilesBeforeUpload: entity[printerFileCleanSettingKey].autoRemoveOldFilesBeforeUpload,
       autoRemoveOldFilesAtBoot: entity[printerFileCleanSettingKey].autoRemoveOldFilesBeforeUpload,
-      autoRemoveOldFilesCriteriumDays: entity[printerFileCleanSettingKey].autoRemoveOldFilesCriteriumDays
+      autoRemoveOldFilesCriteriumDays: entity[printerFileCleanSettingKey].autoRemoveOldFilesCriteriumDays,
     };
   }
 
@@ -47,7 +49,7 @@ export function migrateSettingsRuntime<KeyType = IdType>(knownSettings: Partial<
       experimentalClientSupport: entity[serverSettingsKey].experimentalClientSupport,
       experimentalMoonrakerSupport: entity[serverSettingsKey].experimentalMoonrakerSupport,
       sentryDiagnosticsEnabled: entity[serverSettingsKey].sentryDiagnosticsEnabled,
-      experimentalThumbnailSupport: entity[serverSettingsKey].experimentalThumbnailSupport
+      experimentalThumbnailSupport: entity[serverSettingsKey].experimentalThumbnailSupport,
     };
   }
 

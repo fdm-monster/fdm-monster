@@ -4,7 +4,7 @@ import {
   printerFileCleanSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
-  wizardSettingKey
+  wizardSettingKey,
 } from "@/constants/server-settings.constants";
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 import { ISettings } from "@/models/Settings";

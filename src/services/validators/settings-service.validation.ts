@@ -7,22 +7,22 @@ export const serverSettingsUpdateSchema = z.object({
   experimentalMoonrakerSupport: z.boolean(),
   experimentalThumbnailSupport: z.boolean(),
   experimentalClientSupport: z.boolean(),
-  sentryDiagnosticsEnabled: z.boolean()
+  sentryDiagnosticsEnabled: z.boolean(),
 });
 
 export const timeoutSettingsUpdateSchema = z.object({
-  apiTimeout: z.number().int().min(1000)
+  apiTimeout: z.number().int().min(1000),
 });
 
 export const frontendSettingsUpdateSchema = z.object({
   gridCols: z.number().int().min(1),
   gridRows: z.number().int().min(1),
   largeTiles: z.boolean(),
-  tilePreferCancelOverQuickStop: z.boolean()
+  tilePreferCancelOverQuickStop: z.boolean(),
 });
 
 export const jwtSecretCredentialSettingUpdateSchema = z.object({
-  jwtSecret: z.string().min(10)
+  jwtSecret: z.string().min(10),
 });
 
 export const credentialSettingUpdateSchema = z.object({
@@ -35,33 +35,33 @@ export const credentialSettingUpdateSchema = z.object({
   refreshTokenExpiry: z
     .number()
     .int()
-    .min(isProductionEnvironment() ? 240 : 0)
+    .min(isProductionEnvironment() ? 240 : 0),
 });
 
 export const wizardUpdateSchema = z.object({
   wizardCompleted: z.boolean(),
   wizardCompletedAt: z.date().nullable(),
-  wizardVersion: z.number().int().min(0)
+  wizardVersion: z.number().int().min(0),
 });
 
 export const fileCleanSettingsUpdateSchema = z.object({
   autoRemoveOldFilesBeforeUpload: z.boolean(),
   autoRemoveOldFilesAtBoot: z.boolean(),
-  autoRemoveOldFilesCriteriumDays: z.number().int().min(0)
+  autoRemoveOldFilesCriteriumDays: z.number().int().min(0),
 });
 
 export const sentryDiagnosticsEnabledSchema = z.object({
-  enabled: z.boolean()
+  enabled: z.boolean(),
 });
 
 export const moonrakerSupportSchema = z.object({
-  enabled: z.boolean()
+  enabled: z.boolean(),
 });
 
 export const thumbnailSupportSchema = z.object({
-  enabled: z.boolean()
+  enabled: z.boolean(),
 });
 
 export const clientNextSchema = z.object({
-  enabled: z.boolean()
+  enabled: z.boolean(),
 });

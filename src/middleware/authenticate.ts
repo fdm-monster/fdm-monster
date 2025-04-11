@@ -27,8 +27,7 @@ export const authenticate = () =>
 
         // Check if a logout was called
         const bearer = req.headers.authorization?.replace("Bearer ", "") || undefined;
-        const isJwtBlacklisted = authService.isJwtTokenBlacklisted(bearer);
-        if (!!bearer?.length && isJwtBlacklisted) {
+        if (!!bearer?.length && authService.isJwtTokenBlacklisted(bearer)) {
           throw new AuthenticationError("Not authenticated", AUTH_ERROR_REASON.LoginRequired);
         }
 
@@ -62,7 +61,7 @@ export function permission(requiredPermission: string) {
 
 export const authorizeRoles = (roles: string[], subset = true) =>
   inject((roleService: IRoleService) => async (req: Request, res: Response, next: NextFunction) => {
-    if (!roleService.authorizeRoles(roles, req.roles, subset)) {
+    if (!req.roles?.length || !roleService.authorizeRoles(roles, req.roles, subset)) {
       throw new AuthorizationError({ roles });
     }
 

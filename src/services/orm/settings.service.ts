@@ -6,7 +6,7 @@ import {
   printerFileCleanSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
-  wizardSettingKey
+  wizardSettingKey,
 } from "@/constants/server-settings.constants";
 import { BaseService } from "@/services/orm/base.service";
 import { SettingsDto } from "../interfaces/settings.dto";
@@ -20,7 +20,7 @@ import {
   jwtSecretCredentialSettingUpdateSchema,
   serverSettingsUpdateSchema,
   timeoutSettingsUpdateSchema,
-  wizardUpdateSchema
+  wizardUpdateSchema,
 } from "@/services/validators/settings-service.validation";
 import { migrateSettingsRuntime } from "@/shared/runtime-settings.migration";
 import { validateInput } from "@/handlers/validators";
@@ -28,17 +28,18 @@ import { ISettings } from "@/models/Settings";
 
 export class SettingsService
   extends BaseService(Settings, SettingsDto)
-  implements ISettingsService<SqliteIdType, Settings> {
+  implements ISettingsService<SqliteIdType, Settings>
+{
   toDto(entity: Settings): SettingsDto {
     return {
       [serverSettingsKey]: {
         ...entity[serverSettingsKey],
-        experimentalTypeormSupport: true
+        experimentalTypeormSupport: true,
       },
       [frontendSettingKey]: entity[frontendSettingKey],
       [printerFileCleanSettingKey]: entity[printerFileCleanSettingKey],
       [wizardSettingKey]: entity[wizardSettingKey],
-      [timeoutSettingKey]: entity[timeoutSettingKey]
+      [timeoutSettingKey]: entity[timeoutSettingKey],
     };
   }
 

@@ -38,17 +38,17 @@ export class DefaultHttpClientBuilder implements IHttpClientBuilder {
     return axios.create(axiosConfig);
   }
 
-  withMaxBodyLength(maxBodyLength: number): DefaultHttpClientBuilder {
+  withMaxBodyLength(maxBodyLength: number): this {
     this.axiosOptions.maxBodyLength = maxBodyLength;
     return this;
   }
 
-  withMaxContentLength(maxContentLength: number): DefaultHttpClientBuilder {
+  withMaxContentLength(maxContentLength: number): this {
     this.axiosOptions.maxContentLength = maxContentLength;
     return this;
   }
 
-  withBaseUrl(baseUrl: string): DefaultHttpClientBuilder {
+  withBaseUrl(baseUrl: string): this {
     if (!baseUrl?.length) {
       throw new Error("Base address may not be an empty string");
     }
@@ -61,7 +61,7 @@ export class DefaultHttpClientBuilder implements IHttpClientBuilder {
    * Set the timeout for the http client.
    * @param timeout the value for timeout in milliseconds.
    */
-  withTimeout(timeout: number): DefaultHttpClientBuilder {
+  withTimeout(timeout: number): this {
     if (!timeout || timeout <= 0) {
       throw new Error("Timeout value (milliseconds) must be greater than 0");
     }
@@ -87,12 +87,12 @@ export class DefaultHttpClientBuilder implements IHttpClientBuilder {
     return this;
   }
 
-  withJsonContentTypeHeader(): DefaultHttpClientBuilder {
+  withJsonContentTypeHeader(): this {
     this.withHeaders({ [contentTypeHeaderKey]: jsonContentType });
     return this;
   }
 
-  withHeaders(headers: Record<string, string>): DefaultHttpClientBuilder {
+  withHeaders(headers: Record<string, string>): this {
     this.axiosOptions.headers = {
       ...this.axiosOptions.headers,
       ...headers,

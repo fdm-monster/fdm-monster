@@ -35,7 +35,7 @@ export class BootTask {
     private readonly configService: ConfigService,
     private readonly typeormService: TypeormService,
     private readonly isTypeormMode: boolean,
-    private readonly printerThumbnailCache: PrinterThumbnailCache
+    private readonly printerThumbnailCache: PrinterThumbnailCache,
   ) {
     this.logger = loggerFactory(BootTask.name);
   }
@@ -86,26 +86,26 @@ export class BootTask {
       this.logger.warn(`Starting in demo mode due to ${AppConstants.OVERRIDE_IS_DEMO_MODE}`);
       await this.createOrUpdateDemoAccount();
       this.logger.warn(
-        `Setting loginRequired=true and registration=false due to ${AppConstants.OVERRIDE_IS_DEMO_MODE}`
+        `Setting loginRequired=true and registration=false due to ${AppConstants.OVERRIDE_IS_DEMO_MODE}`,
       );
       await this.settingsStore.setLoginRequired(true);
       await this.settingsStore.setRegistrationEnabled(false);
     } else {
-      const loginRequired = this.configService.get(AppConstants.OVERRIDE_LOGIN_REQUIRED);
+      const loginRequired = this.configService.get<string | null>(AppConstants.OVERRIDE_LOGIN_REQUIRED, null);
       if (loginRequired !== null) {
         this.logger.warn(`Setting login required due to ${AppConstants.OVERRIDE_LOGIN_REQUIRED}`);
         await this.settingsStore.setLoginRequired(loginRequired === "true");
       }
 
-      const registrationEnabled = this.configService.get(AppConstants.OVERRIDE_REGISTRATION_ENABLED);
+      const registrationEnabled = this.configService.get(AppConstants.OVERRIDE_REGISTRATION_ENABLED, null);
       if (registrationEnabled !== null) {
         this.logger.warn(`Setting registration enabled due to ${AppConstants.OVERRIDE_REGISTRATION_ENABLED}`);
         await this.settingsStore.setRegistrationEnabled(registrationEnabled === "true");
       }
     }
 
-    const overrideJwtSecret = this.configService.get(AppConstants.OVERRIDE_JWT_SECRET);
-    const overrideJwtExpiresIn = this.configService.get(AppConstants.OVERRIDE_JWT_EXPIRES_IN);
+    const overrideJwtSecret = this.configService.get<string>(AppConstants.OVERRIDE_JWT_SECRET);
+    const overrideJwtExpiresIn = this.configService.get<string>(AppConstants.OVERRIDE_JWT_EXPIRES_IN);
     await this.settingsStore.persistOptionalCredentialSettings(overrideJwtSecret, overrideJwtExpiresIn);
 
     this.logger.log("Clearing upload folder");
@@ -136,11 +136,11 @@ export class BootTask {
   async createOrUpdateDemoAccount() {
     const demoUsername = this.configService.get(
       AppConstants.OVERRIDE_DEMO_USERNAME,
-      AppConstants.DEFAULT_DEMO_USERNAME
+      AppConstants.DEFAULT_DEMO_USERNAME,
     ) as string;
     const demoPassword = this.configService.get(
       AppConstants.OVERRIDE_DEMO_PASSWORD,
-      AppConstants.DEFAULT_DEMO_PASSWORD
+      AppConstants.DEFAULT_DEMO_PASSWORD,
     ) as string;
     const demoRole = this.configService.get(AppConstants.OVERRIDE_DEMO_ROLE, AppConstants.DEFAULT_DEMO_ROLE) as string;
     const adminRole = this.roleService.getRoleByName(demoRole);
@@ -154,7 +154,7 @@ export class BootTask {
         isVerified: true,
         isRootUser: false,
         needsPasswordChange: false,
-        roles: [adminRole.id]
+        roles: [adminRole.id],
       });
       this.logger.log("Created demo account");
     } else {
@@ -174,7 +174,7 @@ export class BootTask {
       }
 
       await connect(envUrl, {
-        serverSelectionTimeoutMS: 1500
+        serverSelectionTimeoutMS: 1500,
       } as ConnectOptions);
       await syncIndexes();
     }

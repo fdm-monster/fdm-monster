@@ -15,7 +15,7 @@ export const printerEnabledValidator = z.boolean();
 export const printerDisabledReasonValidator = z.string().optional();
 export const printerUrlValidator = z.string().url();
 export const printerTypeValidator = z.number().superRefine(numberEnum(PrinterTypes));
-export const printerDateAddedValidator = z.number().optional()
+export const printerDateAddedValidator = z.number().optional();
 
 const basePrinterSchema = z
   .object({

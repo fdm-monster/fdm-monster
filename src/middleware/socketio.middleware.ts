@@ -8,13 +8,13 @@ import { IUser } from "@/models/Auth/User";
 export const authorize = (
   settingsStore: SettingsStore,
   options: StrategyOptionsWithoutRequest,
-  verify: VerifyCallback
+  verify: VerifyCallback,
 ) => {
   const strategy = new PassportJwtStrategy(options, verify);
 
   return async function authorizeCallback(
     socket: Socket<DefaultEventsMap, DefaultEventsMap>,
-    next: (err?: ExtendedError) => void
+    next: (err?: ExtendedError) => void,
   ) {
     if (!(await settingsStore.getLoginRequired())) {
       // No login required, so we can skip the authentication

@@ -15,28 +15,28 @@ export interface IPrintCompletion<KeyType = MongoIdType, PrinterIdType = Schema.
 const PrintCompletionSchema = new Schema<IPrintCompletion>({
   fileName: {
     type: String,
-    required: true
+    required: true,
   },
   createdAt: {
     type: Number,
-    required: true
+    required: true,
   },
   status: {
     type: String,
-    required: true
+    required: true,
   },
   printerId: {
     type: Schema.Types.ObjectId,
-    required: true
+    required: true,
   },
   completionLog: {
     type: String,
-    required: false
+    required: false,
   },
   context: {
     type: Object,
-    required: true
-  }
+    required: true,
+  },
 });
 
 export const PrintCompletion = model("PrintCompletion", PrintCompletionSchema);

@@ -14,7 +14,7 @@ import { SettingsStore } from "@/state/settings.store";
 export async function setupTestApp(
   loadPrinterStore = false,
   mocks: any = undefined,
-  quick_boot = true
+  quick_boot = true,
 ): Promise<{
   container: AwilixContainer;
   httpServer: Express;
@@ -27,7 +27,7 @@ export async function setupTestApp(
   const { httpServer, container } = await setupServer();
   container.register({
     [DITokens.appDefaultRole]: asValue(ROLES.ADMIN),
-    [DITokens.appDefaultRoleNoLogin]: asValue(ROLES.ADMIN)
+    [DITokens.appDefaultRoleNoLogin]: asValue(ROLES.ADMIN),
   });
 
   // Overrides get last pick
@@ -66,6 +66,6 @@ export async function setupTestApp(
     request: supertest(httpServer),
     container,
     [DITokens.taskManagerService]: container.resolve<TaskManagerService>(DITokens.taskManagerService),
-    [DITokens.typeormService]: container.resolve<TypeormService>(DITokens.typeormService)
+    [DITokens.typeormService]: container.resolve<TypeormService>(DITokens.typeormService),
   };
 }

@@ -27,7 +27,7 @@ export class ServerHost {
     private readonly settingsStore: SettingsStore,
     private readonly bootTask: BootTask,
     private readonly socketIoGateway: SocketIoGateway,
-    private readonly typeormService: TypeormService
+    private readonly typeormService: TypeormService,
   ) {
     this.logger = loggerFactory(ServerHost.name);
   }
@@ -112,7 +112,7 @@ export class ServerHost {
 
   async httpListen(app: Application) {
     const port = fetchServerPort();
-    if (!isProductionEnvironment() && this.configService.get(AppConstants.debugRoutesKey, "false") === "true") {
+    if (!isProductionEnvironment() && this.configService.get<string>(AppConstants.debugRoutesKey, "false") === "true") {
       const expressListRoutes = require("express-list-routes");
       expressListRoutes(app, { prefix: "/" });
     }

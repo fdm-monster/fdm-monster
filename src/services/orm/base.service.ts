@@ -10,7 +10,7 @@ import { DEFAULT_PAGE, IPagination } from "@/services/interfaces/page.interface"
 export function BaseService<
   T extends { id: number },
   DTO extends object,
-  CreateDTO extends object = DeepPartial<T>,
+  CreateDTO extends DeepPartial<T> = DeepPartial<T>,
   UpdateDTO extends object = QueryDeepPartialEntity<T>,
 >(entity: EntityTarget<T>, dto: Type<DTO>, createDTO?: Type<CreateDTO>, updateDto?: Type<UpdateDTO>) {
   abstract class BaseServiceHost implements IBaseService<T, DTO, CreateDTO, UpdateDTO> {
@@ -53,9 +53,9 @@ export function BaseService<
     }
 
     async create(dto: CreateDTO) {
-      // Safety mechanism against upserts
-      if (dto.id) {
-        delete dto.id;
+      // Explicit runtime check with a meaningful error
+      if ("id" in dto && dto.id !== undefined && dto.id !== null) {
+        throw new Error("Cannot create entity with an existing ID. Use update method instead.");
       }
 
       const entity = this.repository.create(dto) as T;

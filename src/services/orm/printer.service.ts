@@ -11,7 +11,7 @@ import {
   PrinterCreatedEvent,
   printerEvents,
   PrintersDeletedEvent,
-  PrinterUpdatedEvent
+  PrinterUpdatedEvent,
 } from "@/constants/event.constants";
 import EventEmitter2 from "eventemitter2";
 import { ILoggerFactory } from "@/handlers/logger-factory";
@@ -23,13 +23,14 @@ import { z } from "zod";
 
 export class PrinterService
   extends BaseService(Printer, PrinterDto<SqliteIdType>, CreatePrinterDto)
-  implements IPrinterService<SqliteIdType, Printer> {
+  implements IPrinterService<SqliteIdType, Printer>
+{
   private readonly logger: LoggerService;
 
   constructor(
     loggerFactory: ILoggerFactory,
     typeormService: TypeormService,
-    private readonly eventEmitter2: EventEmitter2
+    private readonly eventEmitter2: EventEmitter2,
   ) {
     super(typeormService);
     this.logger = loggerFactory(PrinterService.name);
@@ -44,15 +45,15 @@ export class PrinterService
       dateAdded: entity.dateAdded,
       apiKey: entity.apiKey,
       printerURL: entity.printerURL,
-      printerType: entity.printerType as PrinterType
+      printerType: entity.printerType as PrinterType,
     };
   }
 
   async list(): Promise<Printer[]> {
     return this.repository.find({
       order: {
-        dateAdded: "ASC"
-      }
+        dateAdded: "ASC",
+      },
     });
   }
 
@@ -82,7 +83,7 @@ export class PrinterService
       name,
       apiKey,
       enabled,
-      printerType
+      printerType,
     });
     this.eventEmitter2.emit(printerEvents.printerUpdated, { printer } satisfies PrinterUpdatedEvent<number>);
     return updatedPrinter;
@@ -104,14 +105,18 @@ export class PrinterService
     }
 
     this.logger.log("Batch create succeeded");
-    this.eventEmitter2.emit(printerEvents.batchPrinterCreated, { printers: newPrinters } satisfies BatchPrinterCreatedEvent<number>);
+    this.eventEmitter2.emit(printerEvents.batchPrinterCreated, {
+      printers: newPrinters,
+    } satisfies BatchPrinterCreatedEvent<number>);
     return newPrinters;
   }
 
   override async delete(printerId: SqliteIdType, emitEvent = true): Promise<void> {
     await this.repository.delete([printerId]);
     if (emitEvent) {
-      this.eventEmitter2.emit(printerEvents.printersDeleted, { printerIds: [printerId] } satisfies PrintersDeletedEvent<number>);
+      this.eventEmitter2.emit(printerEvents.printersDeleted, {
+        printerIds: [printerId],
+      } satisfies PrintersDeletedEvent<number>);
     }
   }
 
@@ -141,7 +146,7 @@ export class PrinterService
   private async validateAndDefault(printer: z.infer<typeof createPrinterSchema>) {
     const mergedPrinter = {
       enabled: true,
-      ...printer
+      ...printer,
     };
     if (mergedPrinter.printerURL?.length) {
       mergedPrinter.printerURL = normalizeUrl(mergedPrinter.printerURL, { defaultProtocol: defaultHttpProtocol });

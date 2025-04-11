@@ -5,7 +5,7 @@ import { ROLES } from "@/constants/authorization.constants";
 import { printerResolveMiddleware } from "@/middleware/printer";
 import { Request, Response } from "express";
 import { ICustomGcodeService } from "@/services/interfaces/custom-gcode.service.interface";
-import { getScopedPrinter } from "@/handlers/printer-resolver";
+import { getScopedPrinter } from "@/middleware/printer-resolver";
 import { ParamId } from "@/middleware/param-converter.middleware";
 
 @route(`${AppConstants.apiRoute}/custom-gcode`)

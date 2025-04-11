@@ -10,7 +10,6 @@ import { LoginDto } from "@/services/interfaces/login.dto";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { normalizePrinterFile } from "@/services/octoprint/utils/file.utils";
 import { ConnectionDto } from "@/services/octoprint/dto/connection/connection.dto";
-import { captureException } from "@sentry/node";
 import { OP_LoginDto } from "@/services/octoprint/dto/auth/login.dto";
 import { VersionDto } from "@/services/octoprint/dto/server/version.dto";
 import { ServerDto } from "@/services/octoprint/dto/server/server.dto";
@@ -155,13 +154,7 @@ export class OctoprintClient extends OctoprintRoutes {
     const urlPath = this.apiFile(path);
     const response = await this.createClient(login).get<OctoprintFileDto>(urlPath);
 
-    try {
-      return normalizePrinterFile(response?.data);
-    } catch (e) {
-      captureException(e);
-      this.logger.error("File was empty or normalization failed");
-      return;
-    }
+    return normalizePrinterFile(response?.data);
   }
 
   async downloadFile(login: LoginDto, path: string): AxiosPromise<NodeJS.ReadableStream> {
@@ -209,7 +202,7 @@ export class OctoprintClient extends OctoprintRoutes {
     login: LoginDto,
     multerFileOrBuffer: Buffer | Express.Multer.File,
     commands: any,
-    progressToken: string,
+    progressToken?: string,
   ) {
     const urlPath = this.apiFilesLocal;
 
@@ -236,7 +229,7 @@ export class OctoprintClient extends OctoprintRoutes {
     // Calculate the header that axios uses to determine progress
     const result: number = await new Promise<number>((resolve, reject) => {
       return formData.getLength((err, length) => {
-        if (err) resolve(null);
+        if (err) reject(new Error("Could not retrieve formData length"));
         resolve(length);
       });
     });
@@ -256,11 +249,15 @@ export class OctoprintClient extends OctoprintRoutes {
           }),
       ).post(urlPath, formData);
 
-      this.eventEmitter2.emit(`${uploadDoneEvent(progressToken)}`, progressToken);
+      if (progressToken) {
+        this.eventEmitter2.emit(`${uploadDoneEvent(progressToken)}`, progressToken);
+      }
 
       return response.data;
     } catch (e: any) {
-      this.eventEmitter2.emit(`${uploadFailedEvent(progressToken)}`, progressToken, (e as AxiosError)?.message);
+      if (progressToken) {
+        this.eventEmitter2.emit(`${uploadFailedEvent(progressToken)}`, progressToken, (e as AxiosError)?.message);
+      }
       let data;
       try {
         data = JSON.parse(e.response?.body);
@@ -321,6 +318,7 @@ export class OctoprintClient extends OctoprintRoutes {
       if (buildFluentOptions) {
         buildFluentOptions(o);
       }
+
       o.withXApiKeyHeader(login.apiKey);
     });
   }

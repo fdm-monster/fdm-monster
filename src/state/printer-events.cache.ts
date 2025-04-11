@@ -5,7 +5,7 @@ import { IdType } from "@/shared.constants";
 import { OctoPrintEventDto, WsMessage } from "@/services/octoprint/dto/octoprint-event.dto";
 import {
   HistoryMessageDto,
-  HistoryMessageDtoWithoutLogsMessagesPluginsAndTemps
+  HistoryMessageDtoWithoutLogsMessagesPluginsAndTemps,
 } from "@/services/octoprint/dto/websocket/history-message.dto";
 import { MoonrakerEventDto, MR_WsMessage } from "@/services/moonraker/constants/moonraker-event.dto";
 import { PrinterObjectsQueryDto } from "@/services/moonraker/dto/objects/printer-objects-query.dto";
@@ -15,10 +15,7 @@ export type WsMessageWithoutEventAndPlugin = Exclude<WsMessage, "event" | "plugi
 export type PrinterEventsCacheDto = Record<WsMessageWithoutEventAndPlugin, any>;
 
 export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
-
-  constructor(
-    private readonly eventEmitter2: EventEmitter2
-  ) {
+  constructor(private readonly eventEmitter2: EventEmitter2) {
     super();
 
     this.subscribeToEvents();
@@ -49,7 +46,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
         WS_CLOSED: null,
         WS_ERROR: null,
         WS_OPENED: null,
-        WS_STATE_UPDATED: null
+        WS_STATE_UPDATED: null,
       };
       await this.setKeyValue(printerId, ref);
     }
@@ -60,7 +57,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
     const ref = await this.getOrCreateEvents(printerId);
     ref[label] = {
       payload,
-      receivedAt: Date.now()
+      receivedAt: Date.now(),
     };
     await this.setKeyValue(printerId, ref);
   }
@@ -72,7 +69,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
     }
     ref[label][substateName] = {
       payload,
-      receivedAt: Date.now()
+      receivedAt: Date.now(),
     };
     await this.setKeyValue(printerId, ref);
   }
@@ -90,12 +87,16 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
   private async onOctoPrintSocketMessage(e: OctoPrintEventDto) {
     const printerId = e.printerId;
     if (!["plugin", "event"].includes(e.event)) {
-      await this.setEvent(printerId, e.event as WsMessageWithoutEventAndPlugin, e.event === "history" ? this.pruneHistoryPayload(e.payload) : e.payload);
+      await this.setEvent(
+        printerId,
+        e.event as WsMessageWithoutEventAndPlugin,
+        e.event === "history" ? this.pruneHistoryPayload(e.payload) : e.payload,
+      );
     }
   }
 
   private async onMoonrakerSocketMessage(
-    e: MoonrakerEventDto<MR_WsMessage, PrinterObjectsQueryDto<SubscriptionType | null>>
+    e: MoonrakerEventDto<MR_WsMessage, PrinterObjectsQueryDto<SubscriptionType | null>>,
   ) {
     const printerId = e.printerId;
     const eventType = e.event;

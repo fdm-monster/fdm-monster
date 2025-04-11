@@ -20,7 +20,7 @@ export class SocketIoGateway {
     private readonly eventEmitter2: EventEmitter2,
     private readonly settingsStore: SettingsStore,
     private readonly userService: IUserService,
-    private readonly configService: IConfigService
+    private readonly configService: IConfigService,
   ) {
     this.logger = loggerFactory(SocketIoGateway.name);
   }
@@ -30,7 +30,7 @@ export class SocketIoGateway {
     const opts = getPassportJwtOptions(
       this.settingsStore,
       this.configService,
-      (value: Socket) => value.handshake.auth.token
+      (value: Socket) => value.handshake.auth.token,
     );
     this.io.use(authorize(this.settingsStore, opts, verifyUserCallback(this.userService)));
     this.io.on("connection", (socket) => this.onConnect.bind(this)(socket));
@@ -61,5 +61,5 @@ export const IO_MESSAGES = {
   LegacyPrinterTest: "legacy-printer-test",
   CompletionEvent: "completion-event",
   HostState: "host-state",
-  ApiAccessibility: "api-accessibility"
+  ApiAccessibility: "api-accessibility",
 };

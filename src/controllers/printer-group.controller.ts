@@ -27,6 +27,10 @@ export class PrinterGroupController {
   @POST()
   @route("/")
   async createGroup(req: Request, res: Response) {
+    // Safety mechanism against updating
+    if (req.body.id) {
+      delete req.body.id;
+    }
     const entity = await this.printerGroupService.createGroup(req.body);
     res.send(entity);
   }

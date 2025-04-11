@@ -18,12 +18,12 @@ export class OctoprintApi implements IPrinterApi {
     return OctoprintType;
   }
 
-  set login(login: LoginDto) {
-    this.printerLogin = login;
-  }
-
   get login() {
     return this.printerLogin;
+  }
+
+  set login(login: LoginDto) {
+    this.printerLogin = login;
   }
 
   async getVersion() {
@@ -86,12 +86,7 @@ export class OctoprintApi implements IPrinterApi {
   }
 
   async getFile(path: string) {
-    const file = await this.client.getFile(this.login, path);
-    return {
-      path: file.path,
-      size: file.size,
-      date: file.date,
-    };
+    return this.client.getFile(this.login, path);
   }
 
   async getFiles() {
@@ -146,6 +141,4 @@ export class OctoprintApi implements IPrinterApi {
       reprintState: ReprintState.LastPrintReady,
     };
   }
-
-  async getThumbnail() {}
 }

@@ -25,12 +25,12 @@ export class TestPrinterSocketStore {
     loggerFactory: ILoggerFactory,
     private readonly socketFactory: SocketFactory,
     private readonly socketIoGateway: SocketIoGateway,
-    private readonly eventEmitter2: EventEmitter2
+    private readonly eventEmitter2: EventEmitter2,
   ) {
     this.logger = loggerFactory(TestPrinterSocketStore.name);
   }
 
-  async setupTestPrinter(printer: z.infer<typeof createTestPrinterSchema>): Promise<void> {
+  async setupTestPrinter(correlationToken: string, printer: z.infer<typeof createTestPrinterSchema>): Promise<void> {
     if (this.testSocket) {
       this.testSocket.close();
       delete this.testSocket;
@@ -40,7 +40,6 @@ export class TestPrinterSocketStore {
     validatedData.enabled = true;
 
     // Create a new socket if it doesn't exist
-    const { correlationToken } = printer;
     this.testSocket = this.socketFactory.createInstance(printer.printerType);
 
     // Reset the socket credentials before (re-)connecting
@@ -49,8 +48,8 @@ export class TestPrinterSocketStore {
       loginDto: {
         apiKey: printer.apiKey,
         printerURL: printer.printerURL,
-        printerType: printer.printerType
-      }
+        printerType: printer.printerType,
+      },
     });
 
     const testEvents = [
@@ -63,7 +62,7 @@ export class TestPrinterSocketStore {
       moonrakerEvent(WsMessage.API_STATE_UPDATED),
       moonrakerEvent(WsMessage.WS_CLOSED),
       moonrakerEvent(WsMessage.WS_OPENED),
-      moonrakerEvent(WsMessage.WS_ERROR)
+      moonrakerEvent(WsMessage.WS_ERROR),
     ];
     const listener = ({ event, payload, printerId }: OctoPrintEventDto) => {
       if (printerId !== correlationToken) {
@@ -72,7 +71,7 @@ export class TestPrinterSocketStore {
       this.socketIoGateway.send("test-printer-state", {
         event,
         payload,
-        correlationToken
+        correlationToken,
       });
     };
     testEvents.forEach((te) => {
@@ -118,7 +117,7 @@ export class TestPrinterSocketStore {
         this.testSocket.close();
       }
       this.eventEmitter2.emit(printerEvents.printersDeleted, {
-        printerIds: [correlationToken]
+        printerIds: [correlationToken],
       });
       delete this.testSocket;
       testEvents.forEach((te) => {

@@ -30,7 +30,7 @@ describe(PrintCompletionService.name, () => {
       status: EVENT_TYPES.PrintStarted,
       fileName: "mycode.gcode",
       context: {
-        correlationId: trackingToken
+        correlationId: trackingToken,
       },
     });
     expect(completionEntry.id).toBeTruthy();
@@ -41,7 +41,8 @@ describe(PrintCompletionService.name, () => {
       fileName: "mycode.gcode",
       completionLog: undefined,
       context: {
-        correlationId: trackingToken,},
+        correlationId: trackingToken,
+      },
     });
     expect(completionEntryWithoutLog.id).toBeTruthy();
   });

@@ -19,7 +19,7 @@ export class PrintCompletionSocketIoTask {
     loggerFactory: ILoggerFactory,
     private readonly eventEmitter2: EventEmitter2,
     private readonly printCompletionService: IPrintCompletionService,
-    private readonly printerEventsCache: PrinterEventsCache
+    private readonly printerEventsCache: PrinterEventsCache,
   ) {
     this.logger = loggerFactory(PrintCompletionSocketIoTask.name);
 
@@ -50,8 +50,8 @@ export class PrintCompletionSocketIoTask {
       completionLog: event.payload?.error,
       printerId,
       context: {
-        correlationId: null
-      }
+        correlationId: null,
+      },
     } as CreatePrintCompletionDto;
     if (
       event.payload.type === EVENT_TYPES.EStop ||
@@ -68,7 +68,7 @@ export class PrintCompletionSocketIoTask {
     ) {
       this.contextCache[printerId] = {
         ...this.contextCache[printerId],
-        [event.payload.type]: completion
+        [event.payload.type]: completion,
       };
 
       if (event.payload.type === EVENT_TYPES.Disconnecting || event.payload.type === EVENT_TYPES.Disconnected) {
@@ -79,8 +79,8 @@ export class PrintCompletionSocketIoTask {
             printing: false,
             ready: false,
             closedOrError: true,
-            error: false
-          }
+            error: false,
+          },
         });
       }
 
@@ -93,7 +93,7 @@ export class PrintCompletionSocketIoTask {
       // Clear the context now with association id
       const token = generateCorrelationToken();
       this.contextCache[printerId] = {
-        correlationId: token
+        correlationId: token,
       };
       completion.context = this.contextCache[printerId];
       await this.printCompletionService.create(completion);
@@ -106,7 +106,7 @@ export class PrintCompletionSocketIoTask {
 
       // Clear the context now
       this.contextCache[printerId] = {
-        correlationId: undefined
+        correlationId: undefined,
       };
     }
   }

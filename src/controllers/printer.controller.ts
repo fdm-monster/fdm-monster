@@ -7,7 +7,7 @@ import {
   testPrinterApiSchema,
   updatePrinterConnectionSettingSchema,
   updatePrinterDisabledReasonSchema,
-  updatePrinterEnabledSchema
+  updatePrinterEnabledSchema,
 } from "./validation/printer-controller.validation";
 import { AppConstants } from "@/server.constants";
 import { printerResolveMiddleware } from "@/middleware/printer";
@@ -30,7 +30,7 @@ import { IPrinterApi } from "@/services/printer-api.interface";
 import { PrinterApiFactory } from "@/services/printer-api.factory";
 import { normalizeUrl } from "@/utils/normalize-url";
 import { defaultHttpProtocol } from "@/utils/url.utils";
-import { getScopedPrinter } from "@/handlers/printer-resolver";
+import { getScopedPrinter } from "@/middleware/printer-resolver";
 
 @route(AppConstants.apiRoute + "/printer")
 @before([authenticate(), authorizeRoles([ROLES.OPERATOR, ROLES.ADMIN]), printerResolveMiddleware()])
@@ -46,7 +46,7 @@ export class PrinterController {
     private readonly printerCache: PrinterCache,
     private readonly printerEventsCache: PrinterEventsCache,
     private readonly printerApi: IPrinterApi,
-    private readonly floorStore: FloorStore
+    private readonly floorStore: FloorStore,
   ) {
     this.logger = loggerFactory(PrinterController.name);
   }
@@ -150,17 +150,16 @@ export class PrinterController {
       req.body.printerURL = normalizeUrl(req.body.printerURL, { defaultProtocol: defaultHttpProtocol });
     }
     const newPrinter = await validateMiddleware(req, testPrinterApiSchema);
-    newPrinter.correlationToken = generateCorrelationToken();
-    this.logger.log(`Testing printer with correlation token ${newPrinter.correlationToken}`);
+    const printerCorrelationToken = generateCorrelationToken();
+    this.logger.log(`Testing printer with correlation token ${printerCorrelationToken}`);
 
-    // Add printer with test=true
     try {
-      await this.testPrinterSocketStore.setupTestPrinter(newPrinter);
+      await this.testPrinterSocketStore.setupTestPrinter(printerCorrelationToken, newPrinter);
     } catch (e) {
-      res.send({ correlationToken: newPrinter.correlationToken, failure: true, error: (e as Error).toString() });
+      res.send({ correlationToken: printerCorrelationToken, failure: true, error: (e as Error).toString() });
       return;
     }
-    res.send({ correlationToken: newPrinter.correlationToken });
+    res.send({ correlationToken: printerCorrelationToken });
   }
 
   @GET()
@@ -285,7 +284,7 @@ export class PrinterController {
             } else {
               throw new FailedDependencyException(
                 `Reaching Printer service failed with status (code ${e.code})`,
-                e.response?.status
+                e.response?.status,
               );
             }
           }

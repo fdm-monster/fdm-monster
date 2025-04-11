@@ -180,17 +180,20 @@ export class UserController {
     }
 
     const ownUser = await this.userService.getUser(ownUserId);
-    const ownUserRoles = ownUser.roles;
+    // Cancel out the internal interface differences
+    const mappedUser = this.userService.toDto(ownUser);
+
+    const ownUserRoles = mappedUser.roles;
     const adminRole = await this.roleService.getSynchronizedRoleByName(ROLES.ADMIN);
 
-    if (ownUserId == changedUserId && !ownUserRoles.includes(adminRole.id) && !ownUser.isRootUser) {
+    if (ownUserId == changedUserId && !ownUserRoles.includes(adminRole.id) && !mappedUser.isRootUser) {
       throw new ForbiddenError("Only an ADMIN or OWNER user is allowed to change its own roles");
     }
 
     const { roleIds } = await validateInput(req.body, setUserRolesSchema(this.isTypeormMode));
 
     if (ownUserId == changedUserId && !roleIds.includes(adminRole.id)) {
-      if (ownUser.isRootUser) {
+      if (mappedUser.isRootUser) {
         throw new BadRequestException("It does not make sense to remove ADMIN role from an OWNER user.");
       } else {
         throw new BadRequestException("An ADMIN user cannot remove its ADMIN role.");

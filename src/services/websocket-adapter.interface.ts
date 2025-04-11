@@ -9,7 +9,7 @@ export interface IWebsocketAdapter<T = IdType> {
   printerId?: T;
   socketState: SocketState;
   apiState: ApiState;
-  login?: LoginDto;
+  login: LoginDto;
   lastMessageReceivedTimestamp: null | number;
 
   needsReopen(): boolean;

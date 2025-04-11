@@ -35,7 +35,7 @@ const delayedMemoryStorage = (): multer.StorageEngine => {
     },
     _removeFile(req, file, cb) {
       cb(null);
-    }
+    },
   };
 };
 const port = process.argv[2] ? parseInt(process.argv[2]) : 1234;

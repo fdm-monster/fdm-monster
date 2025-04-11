@@ -27,7 +27,7 @@ export class SocketIoTask {
     private readonly printerEventsCache: PrinterEventsCache,
     private readonly printerCache: PrinterCache,
     private readonly fileUploadTrackerCache: FileUploadTrackerCache,
-    private readonly eventEmitter2: EventEmitter2
+    private readonly eventEmitter2: EventEmitter2,
   ) {
     this.logger = loggerFactory(SocketIoTask.name);
 
@@ -52,7 +52,7 @@ export class SocketIoTask {
       floors,
       socketStates,
       printerEvents,
-      trackedUploads
+      trackedUploads,
     };
 
     const serializedData = JSON.stringify(socketIoData);
@@ -66,7 +66,7 @@ export class SocketIoTask {
       const summedPayloadSize = this.aggregateSizes.reduce((t, n) => t + n);
       const averagePayloadSize = summedPayloadSize / this.aggregateWindowLength;
       this.logger.log(
-        `Printer SocketIO metrics ${averagePayloadSize.toFixed(this.rounding)}kB [${this.aggregateWindowLength} TX avg].`
+        `Printer SocketIO metrics ${averagePayloadSize.toFixed(this.rounding)}kB [${this.aggregateWindowLength} TX avg].`,
       );
       this.aggregateSizeCounter = 0;
       this.aggregateSizes = [];

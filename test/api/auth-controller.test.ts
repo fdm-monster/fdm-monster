@@ -32,7 +32,7 @@ beforeAll(async () => {
 beforeEach(async () => {
   await settingsStore.setRefreshTokenSettings({
     refreshTokenAttempts: 1000,
-    refreshTokenExpiry: 1000
+    refreshTokenExpiry: 1000,
   });
 });
 
@@ -64,7 +64,7 @@ describe(AuthController.name, () => {
     const response = await request.post(registerRoute).send({
       username,
       password,
-      password2: password
+      password2: password,
     });
     expectBadRequestError(response);
   });
@@ -77,7 +77,7 @@ describe(AuthController.name, () => {
     const response = await request.post(registerRoute).send({
       username,
       password,
-      password2: password
+      password2: password,
     });
     expectOkResponse(response);
 
@@ -85,29 +85,29 @@ describe(AuthController.name, () => {
       await request.post(registerRoute).send({
         username: "root1234",
         password,
-        password2: password
-      })
+        password2: password,
+      }),
     );
     expectBadRequestError(
       await request.post(registerRoute).send({
         username: "admin1234",
         password,
-        password2: password
-      })
+        password2: password,
+      }),
     );
     expectBadRequestError(
       await request.post(registerRoute).send({
         username: "demo",
         password,
-        password2: password
-      })
+        password2: password,
+      }),
     );
     expectOkResponse(
       await request.post(registerRoute).send({
         username: "demo1234",
         password,
-        password2: password
-      })
+        password2: password,
+      }),
     );
   });
 
@@ -202,7 +202,7 @@ describe(AuthController.name, () => {
     await settingsStore.setLoginRequired(true);
     await settingsStore.setRefreshTokenSettings({
       refreshTokenAttempts: 1,
-      refreshTokenExpiry: 1000
+      refreshTokenExpiry: 1000,
     });
     const { refreshToken } = await loginTestUser(request);
     const response = await request.post(`${baseRoute}/refresh`).send({ refreshToken });
@@ -216,7 +216,7 @@ describe(AuthController.name, () => {
     await settingsStore.setLoginRequired(true);
     await settingsStore.setRefreshTokenSettings({
       refreshTokenAttempts: 1,
-      refreshTokenExpiry: 0
+      refreshTokenExpiry: 0,
     });
     const { refreshToken } = await loginTestUser(request);
     const response = await request.post(`${baseRoute}/refresh`).send({ refreshToken });

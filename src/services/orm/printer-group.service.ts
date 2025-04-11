@@ -59,10 +59,6 @@ export class PrinterGroupService
   }
 
   async createGroup(dto: CreateGroupDto): Promise<GroupWithPrintersDto> {
-    // Safety mechanism against upserts
-    if (dto.id) {
-      delete dto.id;
-    }
     await validate(dto);
     const entity = this.groupRepository.create(dto);
     await validate(entity);

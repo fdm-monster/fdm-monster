@@ -22,7 +22,7 @@ import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
 import { captureException } from "@sentry/node";
 import { errorSummary } from "@/utils/error.utils";
 import { LoginDto } from "@/services/interfaces/login.dto";
-import { getScopedPrinter } from "@/handlers/printer-resolver";
+import { getScopedPrinter } from "@/middleware/printer-resolver";
 
 @route(AppConstants.apiRoute + "/printer-files")
 @before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR]), printerResolveMiddleware()])

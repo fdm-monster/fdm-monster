@@ -3,7 +3,7 @@ import {
   BatchPrinterCreatedEvent,
   PrinterCreatedEvent,
   printerEvents,
-  PrintersDeletedEvent
+  PrintersDeletedEvent,
 } from "@/constants/event.constants";
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import EventEmitter2 from "eventemitter2";
@@ -15,7 +15,7 @@ import { PrinterDto } from "@/services/interfaces/printer.dto";
 export class PrinterCache extends KeyDiffCache<PrinterDto<IdType>> {
   constructor(
     private readonly printerService: IPrinterService,
-    private readonly eventEmitter2: EventEmitter2
+    private readonly eventEmitter2: EventEmitter2,
   ) {
     super();
 
@@ -76,7 +76,7 @@ export class PrinterCache extends KeyDiffCache<PrinterDto<IdType>> {
     return {
       printerURL: printer.printerURL,
       apiKey: printer.apiKey,
-      printerType: printer.printerType
+      printerType: printer.printerType,
     };
   }
 
@@ -85,15 +85,13 @@ export class PrinterCache extends KeyDiffCache<PrinterDto<IdType>> {
     return {
       printerURL: printer.printerURL,
       apiKey: printer.apiKey,
-      printerType: printer.printerType
+      printerType: printer.printerType,
     };
   }
 
   private async handleBatchPrinterCreated(event: BatchPrinterCreatedEvent) {
     const mappedPrinters = this.mapArray(event.printers);
-    const keyValues = mappedPrinters.map((p) =>
-      ({ key: this.getId(p), value: p })
-    );
+    const keyValues = mappedPrinters.map((p) => ({ key: this.getId(p), value: p }));
     await this.setKeyValuesBatch(keyValues, true);
   }
 

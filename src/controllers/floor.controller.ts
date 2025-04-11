@@ -9,10 +9,7 @@ import { ParamId } from "@/middleware/param-converter.middleware";
 @route(AppConstants.apiRoute + "/floor")
 @before([authenticate()])
 export class FloorController {
-  constructor(
-    private readonly floorStore: FloorStore
-  ) {
-  }
+  constructor(private readonly floorStore: FloorStore) {}
 
   @GET()
   @route("/")

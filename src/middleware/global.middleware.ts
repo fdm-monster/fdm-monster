@@ -6,6 +6,7 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IConfigService } from "@/services/core/config.service";
 import { IRoleService } from "@/services/interfaces/role-service.interface";
 import { UserRole } from "@/entities/user-role.entity";
+import { MongoIdType } from "@/shared.constants";
 
 export const validateWizardCompleted = inject(
   (configService: IConfigService, settingsStore: SettingsStore, loggerFactory: ILoggerFactory) =>
@@ -41,9 +42,9 @@ export const interceptRoles = inject(
       const serverSettings = settingsStore.getSettings();
 
       if (isTypeormMode) {
-        req.roles = req.user?.roles.map((r: UserRole) => r.roleId);
+        req.roles = (req.user?.roles as UserRole[] ?? []).map((r: UserRole) => r.roleId);
       } else {
-        req.roles = req.user?.roles;
+        req.roles = req.user?.roles as MongoIdType[];
       }
 
       // If server settings are not set, we can't determine the default role

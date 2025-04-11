@@ -6,7 +6,7 @@ import {
   printerFileCleanSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
-  wizardSettingKey
+  wizardSettingKey,
 } from "@/constants/server-settings.constants";
 import { validateInput } from "@/handlers/validators";
 import {
@@ -16,7 +16,7 @@ import {
   jwtSecretCredentialSettingUpdateSchema,
   serverSettingsUpdateSchema,
   timeoutSettingsUpdateSchema,
-  wizardUpdateSchema
+  wizardUpdateSchema,
 } from "../validators/settings-service.validation";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
 import { ISettings } from "@/models/Settings";
@@ -31,12 +31,12 @@ export class SettingsService implements ISettingsService<MongoIdType> {
       // Credential settings are not shared with the client
       [serverSettingsKey]: {
         ...entity[serverSettingsKey],
-        experimentalTypeormSupport: false
+        experimentalTypeormSupport: false,
       },
       [wizardSettingKey]: entity[wizardSettingKey],
       [frontendSettingKey]: entity[frontendSettingKey],
       [printerFileCleanSettingKey]: entity[printerFileCleanSettingKey],
-      [timeoutSettingKey]: entity[timeoutSettingKey]
+      [timeoutSettingKey]: entity[timeoutSettingKey],
     };
   }
 
@@ -62,7 +62,7 @@ export class SettingsService implements ISettingsService<MongoIdType> {
     const settingsDoc = await this.getOrCreate();
     settingsDoc[printerFileCleanSettingKey] = Object.assign(settingsDoc[printerFileCleanSettingKey], validatedInput);
     return (await Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
-      new: true
+      new: true,
     }))!;
   }
 
@@ -72,7 +72,7 @@ export class SettingsService implements ISettingsService<MongoIdType> {
     const settingsDoc = await this.getOrCreate();
     settingsDoc[wizardSettingKey] = Object.assign(settingsDoc[wizardSettingKey], validatedInput);
     return (await Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
-      new: true
+      new: true,
     }))!;
   }
 
@@ -83,7 +83,7 @@ export class SettingsService implements ISettingsService<MongoIdType> {
     const frontendSettings = settingsDoc[frontendSettingKey];
     Object.assign(frontendSettings, validatedInput);
     return (await Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
-      new: true
+      new: true,
     }))!;
   }
 
@@ -94,7 +94,7 @@ export class SettingsService implements ISettingsService<MongoIdType> {
     const credentialSettings = settingsDoc[credentialSettingsKey];
     Object.assign(credentialSettings, validatedInput);
     return (await Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
-      new: true
+      new: true,
     }))!;
   }
 
@@ -105,7 +105,7 @@ export class SettingsService implements ISettingsService<MongoIdType> {
     const credentialSettings = settingsDoc[credentialSettingsKey];
     Object.assign(credentialSettings, validatedInput);
     return (await Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
-      new: true
+      new: true,
     }))!;
   }
 
@@ -116,7 +116,7 @@ export class SettingsService implements ISettingsService<MongoIdType> {
     const serverSettings = settingsDoc[serverSettingsKey];
     Object.assign(serverSettings, validatedInput);
     return (await Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
-      new: true
+      new: true,
     }))!;
   }
 
@@ -127,7 +127,7 @@ export class SettingsService implements ISettingsService<MongoIdType> {
     const timeoutSettings = settingsDoc[timeoutSettingKey];
     Object.assign(timeoutSettings, validatedInput);
     return (await Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {
-      new: true
+      new: true,
     }))!;
   }
 

@@ -8,9 +8,9 @@ export interface TrackedUpload {
     originalname: string;
     [k: string]: any;
   };
-  progress: number;
+  progress: number | null;
   completed: boolean;
-  completedAt?: number;
-  success?: boolean;
-  reason?: string;
+  completedAt: number | null;
+  success: boolean | null;
+  reason: string | null;
 }

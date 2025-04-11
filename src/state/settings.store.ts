@@ -5,7 +5,7 @@ import {
   printerFileCleanSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
-  wizardSettingKey
+  wizardSettingKey,
 } from "@/constants/server-settings.constants";
 import { getClient } from "@sentry/node";
 import { isTestEnvironment } from "@/utils/env.utils";
@@ -20,7 +20,7 @@ import {
   fileCleanSettingsUpdateSchema,
   frontendSettingsUpdateSchema,
   serverSettingsUpdateSchema,
-  timeoutSettingsUpdateSchema
+  timeoutSettingsUpdateSchema,
 } from "@/services/validators/settings-service.validation";
 import { IdType } from "@/shared.constants";
 
@@ -32,7 +32,7 @@ export class SettingsStore {
   constructor(
     loggerFactory: ILoggerFactory,
     private readonly settingsService: ISettingsService,
-    private readonly isTypeormMode: boolean
+    private readonly isTypeormMode: boolean,
   ) {
     this.logger = loggerFactory(SettingsStore.name);
   }
@@ -51,12 +51,12 @@ export class SettingsStore {
         experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
         experimentalTypeormSupport: this.isTypeormMode,
         experimentalClientSupport: settings[serverSettingsKey].experimentalClientSupport,
-        experimentalThumbnailSupport: settings[serverSettingsKey].experimentalThumbnailSupport
+        experimentalThumbnailSupport: settings[serverSettingsKey].experimentalThumbnailSupport,
       },
       [wizardSettingKey]: settings[wizardSettingKey],
       [frontendSettingKey]: settings[frontendSettingKey],
       [printerFileCleanSettingKey]: settings[printerFileCleanSettingKey],
-      [timeoutSettingKey]: settings[timeoutSettingKey]
+      [timeoutSettingKey]: settings[timeoutSettingKey],
     });
   }
 
@@ -68,14 +68,14 @@ export class SettingsStore {
       [credentialSettingsKey]: {
         jwtExpiresIn: settings[credentialSettingsKey].jwtExpiresIn,
         refreshTokenAttempts: settings[credentialSettingsKey].refreshTokenAttempts,
-        refreshTokenExpiry: settings[credentialSettingsKey].refreshTokenExpiry
+        refreshTokenExpiry: settings[credentialSettingsKey].refreshTokenExpiry,
       },
       [serverSettingsKey]: {
         experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
         experimentalTypeormSupport: this.isTypeormMode,
         experimentalClientSupport: settings[serverSettingsKey].experimentalClientSupport,
-        experimentalThumbnailSupport: settings[serverSettingsKey].experimentalThumbnailSupport
-      }
+        experimentalThumbnailSupport: settings[serverSettingsKey].experimentalThumbnailSupport,
+      },
     });
   }
 
@@ -103,7 +103,7 @@ export class SettingsStore {
     const credentialSettings = await this.getCredentialSettings();
     if (overrideJwtSecret?.length) {
       await this.settingsService.updateJwtSecretCredentialSetting({
-        jwtSecret: overrideJwtSecret
+        jwtSecret: overrideJwtSecret,
       });
     }
 
@@ -111,7 +111,7 @@ export class SettingsStore {
       await this.updateCredentialSettings({
         refreshTokenExpiry: credentialSettings.refreshTokenExpiry,
         refreshTokenAttempts: credentialSettings.refreshTokenAttempts,
-        jwtExpiresIn: parseInt(overrideJwtExpiresIn)
+        jwtExpiresIn: parseInt(overrideJwtExpiresIn),
       });
     }
 
@@ -125,7 +125,7 @@ export class SettingsStore {
     return {
       wizardCompleted: settings[wizardSettingKey].wizardCompleted,
       wizardVersion: settings[wizardSettingKey].wizardVersion,
-      latestWizardVersion: AppConstants.currentWizardVersion
+      latestWizardVersion: AppConstants.currentWizardVersion,
     };
   }
 
@@ -181,7 +181,7 @@ export class SettingsStore {
     this.settings = await this.settingsService.updateWizardSettings({
       wizardCompleted: true,
       wizardCompletedAt: new Date(),
-      wizardVersion: version
+      wizardVersion: version,
     });
     return this.getSettings();
   }
@@ -223,9 +223,12 @@ export class SettingsStore {
     this.settings = await this.settingsService.updateCredentialSettings(credentialSettings);
   }
 
-  async setRefreshTokenSettings({ refreshTokenAttempts, refreshTokenExpiry }: {
-    refreshTokenAttempts: number,
-    refreshTokenExpiry: number
+  async setRefreshTokenSettings({
+    refreshTokenAttempts,
+    refreshTokenExpiry,
+  }: {
+    refreshTokenAttempts: number;
+    refreshTokenExpiry: number;
   }) {
     this.throwIfSettingsUnset();
     this.settings![credentialSettingsKey].refreshTokenAttempts = refreshTokenAttempts;
@@ -268,7 +271,8 @@ export class SettingsStore {
   }
 
   private throwIfSettingsUnset() {
-    if (!this.settings) throw new InternalServerException("Could not check server settings (server settings not loaded)");
+    if (!this.settings)
+      throw new InternalServerException("Could not check server settings (server settings not loaded)");
   }
 
   private async processSentryEnabled() {

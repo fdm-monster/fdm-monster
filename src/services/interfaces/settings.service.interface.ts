@@ -8,7 +8,7 @@ import {
   jwtSecretCredentialSettingUpdateSchema,
   serverSettingsUpdateSchema,
   timeoutSettingsUpdateSchema,
-  wizardUpdateSchema
+  wizardUpdateSchema,
 } from "@/services/validators/settings-service.validation";
 import { z } from "zod";
 
