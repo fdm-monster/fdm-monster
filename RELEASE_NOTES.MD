@@ -24,6 +24,7 @@
 - Update API controller, use decorators over api builder
 - Remove PrinterFile entity (unused)
 - Remove printer/connection PATCH endpoint (unused)
+- Remove debug settings from server settings database
 
 ## Fixes
 
@@ -37,6 +38,8 @@
 - Fix print completion interface and dto
 - Improved API key validation: klipper validation completely isolated from OctoPrint api key validation
 - Query parameter `forceSave` in printer create/update API was used incorrectly (flipped around)
+- Fixed all typescript issues
+- Server settings would not always migrate properly
 
 ## Fixes
 
