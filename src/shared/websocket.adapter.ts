@@ -39,10 +39,11 @@ export abstract class WebsocketAdapter {
    * @param {string|URL} url The URL to connect to.
    * @returns {void}
    */
-  open(url?: string | URL): void {
-    const validUrl = z.string().url().parse(url);
-
-    this.socket = new WebSocket(validUrl, {
+  open(url?: URL): void {
+    if (!url) {
+      throw new Error("Cant setup up websocket, URL may not be empty.");
+    }
+    this.socket = new WebSocket(url, {
       handshakeTimeout: AppConstants.defaultWebsocketHandshakeTimeout,
     });
     this.socket.onopen = (event) => this.onOpen(event);

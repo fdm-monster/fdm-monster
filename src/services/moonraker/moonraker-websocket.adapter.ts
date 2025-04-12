@@ -158,6 +158,7 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
     if (this.socket) {
       throw new Error(`Socket already exists by printerId, ignoring open request`);
     }
+    
     super.open(this.socketURL);
   }
 

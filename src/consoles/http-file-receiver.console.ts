@@ -1,8 +1,8 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import multer from "multer";
 import fs from "fs";
 import path from "path";
-import { Server as WebSocketServer } from "ws";
+import { Server as WebSocketServer, WebSocket } from "ws";
 import http from "http";
 import { z } from "zod";
 import * as console from "node:console";
@@ -72,7 +72,7 @@ wss.on("connection", (ws) => {
         try {
           // Validate the auth message format
           const parts = json.auth.split(":");
-          const authData = AuthSchema.parse({
+          AuthSchema.parse({
             command: "auth",
             user: parts[0],
             token: parts[1],
@@ -122,7 +122,7 @@ wss.on("connection", (ws) => {
   });
 
   // Set up interval to send current message periodically with randomization
-  const setupMessageInterval = (ws, clientId, baseInterval) => {
+  const setupMessageInterval = (ws: WebSocket, clientId: string, baseInterval: number) => {
     // Clear any existing interval
     if (messageInterval) {
       clearInterval(messageInterval);
@@ -130,7 +130,7 @@ wss.on("connection", (ws) => {
     }
 
     // Function to calculate randomized interval
-    const getRandomizedInterval = (baseMs) => {
+    const getRandomizedInterval = (baseMs: number) => {
       // Add random variation of ±15% to prevent synchronized load
       const variationFactor = 0.85 + Math.random() * 0.3; // Range: 0.85 to 1.15
       return Math.floor(baseMs * variationFactor);
@@ -207,6 +207,7 @@ app.post("/api/login", async (req, res) => {
   });
 });
 
+// @ts-ignore
 app.post("/api/files/local", upload.single("file"), (req, res) => {
   const { select, print } = req.body;
   const file = req.file;

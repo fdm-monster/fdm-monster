@@ -1,9 +1,10 @@
 import { Request } from "express";
+import { StorageEngine } from "multer";
 
 /**
  * Custom storage to introduce artificial delay
  */
-export const delayedMemoryStorage = (): multer.StorageEngine => {
+export const delayedMemoryStorage = (): StorageEngine => {
   return {
     _handleFile(req: Request, file, cb) {
       let chunks: Buffer[] = [];
@@ -15,12 +16,13 @@ export const delayedMemoryStorage = (): multer.StorageEngine => {
         chunks.push(chunk);
         processingComplete = processingComplete.then(
           // () => chunks.push(chunk)
+          // @ts-ignore
           new Promise((resolve) => {
-            setTimeout(() => {
+            return setTimeout(() => {
               chunks.push(chunk);
               resolve(null);
             }, 1); // ~1ms delay per chunk
-          })
+          }),
         );
       });
 
