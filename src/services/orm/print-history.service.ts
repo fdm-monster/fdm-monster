@@ -9,13 +9,10 @@ import { groupArrayBy } from "@/utils/array.util";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
-import { AnalyzedCompletions, processCompletions } from "@/services/mongoose/print-completion.shared";
-import { IPrintCompletion } from "@/models/PrintCompletion";
 
 export class PrintHistoryService
   extends BaseService(PrintLog, PrintHistoryDto<SqliteIdType>)
-  implements IPrintHistoryService<SqliteIdType, PrintLog>
-{
+  implements IPrintHistoryService<SqliteIdType, PrintLog> {
   private readonly logger: LoggerService;
 
   constructor(typeormService: TypeormService, loggerFactory: ILoggerFactory) {
@@ -28,6 +25,7 @@ export class PrintHistoryService
       id: entity.id,
       fileName: entity.fileName,
       createdAt: entity.createdAt,
+      endedAt: entity.endedAt,
       printerName: entity.printerName,
       status: entity.status,
       printerId: entity.printerId,
@@ -36,41 +34,6 @@ export class PrintHistoryService
 
   async create(input: CreatePrintHistoryDto<SqliteIdType>) {
     return await super.create(input);
-  }
-
-  async findPrintLog(correlationId: string) {
-    const completions = await this.repository.findBy({});
-    return completions.filter((c) => c.context?.correlationId === correlationId);
-  }
-
-  async updateContext(correlationId: string | undefined, context: PrintCompletionContext): Promise<void> {
-    if (!correlationId?.length) {
-      this.logger.warn("Ignoring undefined correlationId, cant update print completion context");
-      return;
-    }
-
-    const completionEntry = await this.repository.findOneBy({
-      context: { correlationId },
-      status: EVENT_TYPES.PrintStarted,
-    });
-    if (!completionEntry) {
-      this.logger.warn(
-        `Print with correlationId ${correlationId} could not be updated with new context as it was not found`,
-      );
-      return;
-    }
-    completionEntry.context = context;
-    await this.update(completionEntry.id, completionEntry);
-  }
-
-  async listGroupByPrinterStatus(): Promise<AnalyzedCompletions[]> {
-    const limitedCompletions = await this.listPaged();
-    const printCompletionsAggr = groupArrayBy(limitedCompletions, (val) => val.printerId.toString());
-    const completions = Object.entries(printCompletionsAggr).map(([pc, val]) => ({
-      printerId: parseInt(pc),
-      printEvents: val,
-    }));
-    return processCompletions(completions);
   }
 
   async loadPrintContexts(): Promise<Record<string, PrintLog[]>> {

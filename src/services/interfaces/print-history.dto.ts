@@ -11,7 +11,7 @@ export class PrintHistoryDto<KeyType = IdType> {
   id!: KeyType;
   fileName: string;
   createdAt: Date;
-  endedAt: Date;
+  endedAt: Date | null;
   status: string;
   printerId: KeyType;
   printerName?: string;

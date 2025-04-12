@@ -1,15 +1,13 @@
 import { model, Schema } from "mongoose";
-import { PrintCompletionContextDto } from "@/services/interfaces/print-completion-context.dto";
 import { MongoIdType } from "@/shared.constants";
 
-export interface IPrintCompletion<KeyType = MongoIdType, PrinterIdType = Schema.Types.ObjectId> {
+export interface IPrintLog<KeyType = MongoIdType, PrinterIdType = Schema.Types.ObjectId> {
   id: KeyType;
   fileName: string;
-  createdAt: number;
+  createdAt: Date;
+  endedAt: null | Date;
   status: string;
   printerId: PrinterIdType;
-  completionLog?: string;
-  context: PrintCompletionContextDto;
 }
 
 const PrintCompletionSchema = new Schema<IPrintLog>({
@@ -18,7 +16,13 @@ const PrintCompletionSchema = new Schema<IPrintLog>({
     required: true,
   },
   createdAt: {
-    type: Number,
+    type: Date,
+    default: () => new Date(),
+    required: true,
+  },
+  endedAt: {
+    type: Date,
+    default: null,
     required: true,
   },
   status: {
@@ -27,14 +31,6 @@ const PrintCompletionSchema = new Schema<IPrintLog>({
   },
   printerId: {
     type: Schema.Types.ObjectId,
-    required: true,
-  },
-  completionLog: {
-    type: String,
-    required: false,
-  },
-  context: {
-    type: Object,
     required: true,
   },
 });

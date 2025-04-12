@@ -3,7 +3,6 @@ import { PrintHistoryService } from "@/services/orm/print-history.service";
 import { EVENT_TYPES } from "@/services/octoprint/constants/octoprint-websocket.constants";
 import { setupTestApp } from "../test-server";
 import { AwilixContainer } from "awilix";
-import { generateCorrelationToken } from "@/utils/correlation-token.util";
 import { createTestPrinter } from "../api/test-data/create-printer";
 import { Test } from "supertest";
 import { IPrintHistoryService } from "@/services/interfaces/print-history.interface";
@@ -22,16 +21,11 @@ beforeAll(async () => {
 
 describe(PrintHistoryService.name, () => {
   it("can add a print failure with or without log", async () => {
-    const trackingToken = generateCorrelationToken();
     const printer = await createTestPrinter(request);
     const completionEntry = await printCompletionService.create({
       printerId: printer.id,
-      completionLog: "some log happened here",
       status: EVENT_TYPES.PrintStarted,
       fileName: "mycode.gcode",
-      context: {
-        correlationId: trackingToken,
-      },
     });
     expect(completionEntry.id).toBeTruthy();
 
@@ -39,10 +33,6 @@ describe(PrintHistoryService.name, () => {
       printerId: printer.id,
       status: EVENT_TYPES.PrintFailed,
       fileName: "mycode.gcode",
-      completionLog: undefined,
-      context: {
-        correlationId: trackingToken,
-      },
     });
     expect(completionEntryWithoutLog.id).toBeTruthy();
   });
