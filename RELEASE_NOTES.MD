@@ -25,6 +25,7 @@
 - Remove PrinterFile entity (unused)
 - Remove printer/connection PATCH endpoint (unused)
 - Remove debug settings from server settings database
+- Remove all API compatibility feature flags except for printerGroupsApi and multiplePrinterServices
 
 ## Fixes
 

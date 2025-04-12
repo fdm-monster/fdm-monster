@@ -42,61 +42,11 @@ export class ServerPublicController {
     const serverSettings = this.settingsStore.getServerSettings();
     const moonrakerEnabled = serverSettings.experimentalMoonrakerSupport;
     res.send({
-      batchReprintCalls: {
-        available: true,
-        // API duplicated at /batch/reprint (deprecated but backwards compatible)
-        version: 2,
-      },
-      batchConnectSocketCalls: {
-        available: true,
-        version: 1,
-      },
-      batchConnectUsbCalls: {
-        available: true,
-        version: 1,
-      },
-      newSockets: {
-        available: true,
-        version: 1,
-      },
-      anonymousDiagnosticsToggle: {
-        available: true,
-        version: 1,
-      },
-      pauseResumePrinterCommand: {
-        available: true,
-        version: 1,
-      },
-      logDumpZip: {
-        available: true,
-        version: 1,
-      },
-      clearLogFiles: {
-        available: true,
-        version: 1,
-      },
-      batchTogglePrinterEnabled: {
-        available: true,
-        version: 1,
-      },
-      cameraStream: {
-        available: true,
-        version: 1,
-        subFeatures: {},
-      },
       printerGroupsApi: {
         // Only SQLite mode supported for this feature
         available: this.isTypeormMode,
         version: 1,
         subFeatures: {},
-      },
-      printerControlApi: {
-        available: true,
-        version: 1,
-      },
-      githubRateLimitApi: {
-        available: true,
-        version: 1,
       },
       multiplePrinterServices: {
         available: true,
