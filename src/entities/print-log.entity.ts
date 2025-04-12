@@ -1,9 +1,9 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Relation } from "typeorm";
 import { Printer } from "@/entities/printer.entity";
-import { IPrintCompletion } from "@/models/PrintCompletion";
+import { IPrintLog } from "@/models/PrintCompletion";
 
 @Entity()
-export class PrintLog implements IPrintCompletion<number, number> {
+export class PrintLog implements IPrintLog<number, number> {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -11,10 +11,13 @@ export class PrintLog implements IPrintCompletion<number, number> {
   fileName: string;
 
   @CreateDateColumn()
-  createdAt!: Date;
+  createdAt: Date;
 
   @Column()
-  endedAt!: Date;
+  endedAt: Date;
+
+  @Column()
+  status: string;
 
   @ManyToOne(
     () => Printer,
