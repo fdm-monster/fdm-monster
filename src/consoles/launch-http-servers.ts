@@ -1,9 +1,8 @@
-// launch-servers.ts
 import { spawn } from "child_process";
 import path from "path";
 
 const startPort = 1234;
-const instanceCount = 5; // Start with 5 printers, adjust as needed
+const instanceCount = 10; // Start with 5 printers, adjust as needed
 
 console.log(`Starting ${instanceCount} fake OctoPrint servers...`);
 
