@@ -46,22 +46,14 @@ describe(PrintCompletionController.name, () => {
     const printer = await createTestPrinter(request, false);
     const completionEntryStart = await printCompletionService.create({
       printerId: printer.id,
-      completionLog: "some log happened here",
       status: EVENT_TYPES.PrintStarted,
       fileName: "mycode.gcode",
-      context: {
-        correlationId: "123",
-      },
     });
     expect(completionEntryStart.id).toBeTruthy();
     const completionEntryDone = await printCompletionService.create({
       printerId: printer.id,
-      completionLog: "some log happened here",
       status: EVENT_TYPES.PrintDone,
       fileName: "mycode.gcode",
-      context: {
-        correlationId: "123",
-      },
     });
     expect(completionEntryDone.id).toBeTruthy();
 
