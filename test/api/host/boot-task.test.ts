@@ -1,7 +1,7 @@
 import { setupTestApp } from "../../test-server";
 import { DITokens } from "@/container.tokens";
 import { AwilixContainer } from "awilix";
-import { TaskManagerService } from "@/services/core/task-manager.service";
+import { TaskManagerService } from "@/services/task-manager.service";
 import { ServerTasks } from "@/tasks";
 import { BootTask } from "@/tasks/boot.task";
 

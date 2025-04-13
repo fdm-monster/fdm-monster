@@ -5,10 +5,21 @@ export interface TaskService {
   run(): Promise<void> | void;
 }
 
+export interface TimingPreset {
+  periodic?: boolean;
+  logFirstCompletion?: boolean;
+  runImmediately?: boolean;
+  runOnce?: boolean;
+  runDelayed?: boolean;
+  disabled?: boolean;
+  milliseconds?: number;
+  seconds?: number;
+}
+
 /**
  * Configuration options for scheduling tasks
  */
-export interface TaskSchedulerOptions {
+export interface TaskSchedulerOptions extends TimingPreset {
   // Timing options
   milliseconds?: number;
   seconds?: number;

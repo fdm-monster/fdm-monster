@@ -1,13 +1,4 @@
-export interface TimingPreset {
-  periodic?: boolean;
-  logFirstCompletion: boolean;
-  runImmediately: boolean;
-  runOnce?: boolean;
-  runDelayed?: boolean;
-  disabled?: boolean;
-  milliseconds?: number;
-  seconds?: number;
-}
+import { TimingPreset } from "@/services/interfaces/task.interfaces";
 
 export class TASK_PRESETS {
   static PERIODIC: TimingPreset = {

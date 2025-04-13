@@ -1,4 +1,3 @@
-import EventEmitter2 from "eventemitter2";
 import { HttpClientFactory } from "@/services/core/http-client.factory";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
@@ -14,7 +13,6 @@ import { LoginDto } from "../interfaces/login.dto";
 import { ServerConfigDto } from "../moonraker/dto/server/server-config.dto";
 import { SettingsDto } from "../octoprint/dto/settings/settings.dto";
 import { PrusaLinkHttpClientBuilder } from "@/services/prusa-link/utils/prusa-link-http-client.builder";
-import { wwwAuthenticationHeaderKey } from "@/services/octoprint/constants/octoprint-service.constants";
 import { VersionDto } from "@/services/prusa-link/dto/version.dto";
 import { PL_FileResponseDto } from "@/services/prusa-link/dto/file-response.dto";
 
@@ -24,12 +22,12 @@ import { PL_FileResponseDto } from "@/services/prusa-link/dto/file-response.dto"
  * Prusa Link Web https://github.com/prusa3d/Prusa-Link-Web/tree/master
  */
 export class PrusaLinkApi implements IPrinterApi {
-  authHeader?: string;
   protected logger: LoggerService;
+  private authHeader: string | null = null;
 
   constructor(
-    private readonly httpClientFactory: HttpClientFactory,
     loggerFactory: ILoggerFactory,
+    private readonly httpClientFactory: HttpClientFactory,
     private printerLogin: LoginDto,
   ) {
     this.logger = loggerFactory(PrusaLinkApi.name);
@@ -43,27 +41,17 @@ export class PrusaLinkApi implements IPrinterApi {
     this.printerLogin = login;
   }
 
-  async updateAuthHeader() {
-    const client = this.createAnonymousClient(this.printerLogin.printerURL);
-    const response = await client.get("/api/v1/status", {
-      validateStatus: (status) => status < 500,
-    });
-
-    const receivedHeader = response.headers[wwwAuthenticationHeaderKey] as string;
-    if (!receivedHeader?.length) {
-      throw new Error("Authentication header was not received");
-    }
-
-    this.authHeader = receivedHeader;
+  private get client() {
+    return this.createClient();
   }
 
   async getVersion(): Promise<string> {
-    const response = await this.createClient(this.printerLogin, "GET", "/api/version").get<VersionDto>("/api/version");
+    const response = await this.client.get<VersionDto>("/api/version");
     return response.data.server;
   }
 
   async getFiles(): Promise<FileDto[]> {
-    const response = await this.createClient(this.printerLogin, "GET", "/api/files").get<PL_FileResponseDto>("/api/files");
+    const response = await this.client.get<PL_FileResponseDto>("/api/files");
     return response.data.files
       .filter((dir) => dir.path === "/usb")[0]
       .children.map(
@@ -161,28 +149,30 @@ export class PrusaLinkApi implements IPrinterApi {
   }
 
   private createClient(
-    login: LoginDto,
-    requestMethod: string,
-    requestPath: string,
     buildFluentOptions?: (base: PrusaLinkHttpClientBuilder) => void,
   ) {
-    const baseAddress = login.printerURL;
-
-    return this.createAnonymousClient(baseAddress, (o) => {
-      if (buildFluentOptions) {
-        buildFluentOptions(o);
-      }
-      // TODO merge request path with base address path
-      o.withDigestAuth(this.authHeader, login.username, login.password, requestMethod, requestPath);
-    });
-  }
-
-  private createAnonymousClient(baseAddress: string, buildFluentOptions?: (base: PrusaLinkHttpClientBuilder) => void) {
     const builder = new PrusaLinkHttpClientBuilder();
 
-    return this.httpClientFactory.createClientWithBaseUrl(builder, baseAddress, (b) => {
-      if (buildFluentOptions) {
-        buildFluentOptions(b);
+    return this.httpClientFactory.createClientWithBaseUrl(builder, this.printerLogin.printerURL, (b) => {
+      // Set up digest auth with the credentials and an error handler
+      b.withDigestAuth(
+        this.printerLogin.username,
+        this.printerLogin.password,
+        (error) => {
+          this.logger.error("Authentication error occurred", error);
+        },
+        (error, attemptCount) => {
+          this.logger.log(`Authentication attempt count ${attemptCount} for method ${error.config?.method} path ${error.config?.url}.`);
+        },
+        (authHeader) => {
+          this.logger.debug("Authentication successful, saving auth header for later reuse.");
+          this.authHeader = authHeader;
+        },
+      );
+
+      if (this.authHeader) {
+        this.logger.debug("Reusing stored auth header");
+        b.withAuthHeader(this.authHeader);
       }
     });
   }

@@ -19,7 +19,7 @@ export class PrusaLinkHttpPollingAdapter implements IWebsocketAdapter {
   apiState: ApiState;
   lastMessageReceivedTimestamp: null | number;
   protected declare logger: LoggerService;
-  private socketURL?: URL;
+  private printerURL?: URL;
   private refreshPrinterCurrentInterval?: NodeJS.Timeout;
 
   constructor(
@@ -52,7 +52,7 @@ export class PrusaLinkHttpPollingAdapter implements IWebsocketAdapter {
   }
 
   registerCredentials(socketLogin: ISocketLogin): void {
-    this.socketURL = new URL(socketLogin.loginDto.printerURL);
+    this.printerURL = new URL(socketLogin.loginDto.printerURL);
     this.printerId = socketLogin.printerId;
   }
 
@@ -90,7 +90,6 @@ export class PrusaLinkHttpPollingAdapter implements IWebsocketAdapter {
       }
 
       try {
-        await this.prusaLinkApi.updateAuthHeader();
         const status = await this.prusaLinkApi.getVersion();
         // this.eventEmitter.emit("prusaLinkStatus", status);
       } catch (error) {

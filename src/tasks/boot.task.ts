@@ -3,7 +3,7 @@ import { fetchMongoDBConnectionString, runMigrations } from "@/server.env";
 import { DITokens } from "@/container.tokens";
 import { AppConstants } from "@/server.constants";
 import { LoggerService } from "@/handlers/logger";
-import { TaskManagerService } from "@/services/core/task-manager.service";
+import { TaskManagerService } from "@/services/task-manager.service";
 import { ServerTasks } from "@/tasks";
 import { MulterService } from "@/services/core/multer.service";
 import { SettingsStore } from "@/state/settings.store";
@@ -17,11 +17,9 @@ import { UserService } from "@/services/mongoose/user.service";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
-import { PrusaLinkApi } from "@/services/prusa-link/prusa-link.api";
-import { PrusaLinkType } from "@/services/printer-api.interface";
-import { errorSummary } from "@/utils/error.utils";
+import { TaskService } from "@/services/interfaces/task.interfaces";
 
-export class BootTask {
+export class BootTask implements TaskService {
   logger: LoggerService;
 
   constructor(
@@ -39,7 +37,6 @@ export class BootTask {
     private readonly typeormService: TypeormService,
     private readonly isTypeormMode: boolean,
     private readonly printerThumbnailCache: PrinterThumbnailCache,
-    private readonly prusaLinkApi: PrusaLinkApi,
   ) {
     this.logger = loggerFactory(BootTask.name);
   }
@@ -111,29 +108,6 @@ export class BootTask {
     const overrideJwtSecret = this.configService.get<string>(AppConstants.OVERRIDE_JWT_SECRET);
     const overrideJwtExpiresIn = this.configService.get<string>(AppConstants.OVERRIDE_JWT_EXPIRES_IN);
     await this.settingsStore.persistOptionalCredentialSettings(overrideJwtSecret, overrideJwtExpiresIn);
-
-    const prusaLinkUrl = process.env["TEST_PL_URL"];
-    const prusaLinkUsername = process.env["TEST_PL_USERNAME"];
-    const prusaLinkPassword = process.env["TEST_PL_PASSWORD"];
-    if (prusaLinkUrl?.length) {
-      try {
-        this.prusaLinkApi.login = {
-          printerURL: prusaLinkUrl,
-          username: prusaLinkUsername,
-          password: prusaLinkPassword,
-          apiKey: "",
-          printerType: PrusaLinkType,
-        };
-        await this.prusaLinkApi.updateAuthHeader();
-
-        const version = await this.prusaLinkApi.getVersion();
-        this.logger.log(`Prusa link server version: ${version}`);
-        const files = await this.prusaLinkApi.getFiles();
-        this.logger.log(`Prusa link files: ${files.map((f) => f.path).join("\n")}`);
-      } catch (e) {
-        this.logger.error(errorSummary(e));
-      }
-    }
 
     this.logger.log("Clearing upload folder");
     this.multerService.clearUploadsFolder();

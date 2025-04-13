@@ -3,10 +3,13 @@ import { DITokens } from "@/container.tokens";
 import { LoginDto } from "@/services/interfaces/login.dto";
 import { PrinterCache } from "@/state/printer.cache";
 import { IdType } from "@/shared.constants";
-import { CradleService } from "./cradle.service";
+import { CradleService } from "./core/cradle.service";
 
 export class PrinterApiFactory {
-  constructor(private readonly cradleService: CradleService) {}
+  constructor(
+    private readonly cradleService: CradleService,
+  ) {
+  }
 
   getById(id: IdType): IPrinterApi {
     const printerCache = this.cradleService.resolve<PrinterCache>(DITokens.printerCache);
