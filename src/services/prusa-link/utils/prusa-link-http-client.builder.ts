@@ -1,5 +1,5 @@
 import { DefaultHttpClientBuilder } from "@/shared/default-http-client.builder";
-import { apiKeyHeaderKey, authorizationHeaderKey } from "@/services/octoprint/constants/octoprint-service.constants";
+import { authorizationHeaderKey } from "@/services/octoprint/constants/octoprint-service.constants";
 import { AxiosInstance } from "axios";
 import { generateDigestAuthHeader } from "./digest-auth.util";
 import { randomBytes } from "node:crypto";
@@ -22,12 +22,12 @@ export class PrusaLinkHttpClientBuilder extends DefaultHttpClientBuilder {
    * @param pathname
    */
   public withDigestAuth(
-    authHeader: string,
-    username: string,
-    password: string,
-    method: string,
-    pathname: string
-  ): PrusaLinkHttpClientBuilder {
+    authHeader?: string,
+    username?: string,
+    password?: string,
+    method?: string,
+    pathname?: string,
+  ): this {
     if (!authHeader?.length) {
       throw new Error("Digest header may not be an empty string");
     }
@@ -37,12 +37,18 @@ export class PrusaLinkHttpClientBuilder extends DefaultHttpClientBuilder {
     if (!password?.length) {
       throw new Error("password may not be an empty string");
     }
+    if (!method?.length) {
+      throw new Error("method may not be an empty string");
+    }
+    if (!pathname?.length) {
+      throw new Error("pathname may not be an empty string");
+    }
 
     const authParams = Object.fromEntries(
       authHeader
         .replace("Digest ", "")
         .split(", ")
-        .map((param) => param.split("=").map((s) => s.replace(/"/g, "")))
+        .map((param) => param.split("=").map((s) => s.replace(/"/g, ""))),
     );
 
     const hasQop = "qop" in authParams;

@@ -7,6 +7,7 @@ export const serverSettingsUpdateSchema = z.object({
   experimentalMoonrakerSupport: z.boolean(),
   experimentalThumbnailSupport: z.boolean(),
   experimentalClientSupport: z.boolean(),
+  experimentalPrusaLinkSupport: z.boolean(),
   sentryDiagnosticsEnabled: z.boolean(),
 });
 
