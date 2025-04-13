@@ -33,10 +33,6 @@ export class TryPrusaLinkTask implements TaskService {
 
         const version = await this.prusaLinkApi.getVersion();
         this.logger.log(`Prusa link server version: ${version}`);
-        const files = await this.prusaLinkApi.getFiles();
-        this.logger.log(`Prusa link files: ${files.map((f) => f.path).join("\n")}`);
-        const version2 = await this.prusaLinkApi.getVersion();
-        this.logger.log(`Prusa link server version: ${version2}`);
       } catch (e) {
         this.logger.error(errorSummary(e));
       }

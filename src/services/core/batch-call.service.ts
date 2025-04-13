@@ -95,7 +95,7 @@ export class BatchCallService<KeyType extends IdType = keyType> {
   batchConnectSocket(printerIds: KeyType[]): void {
     for (const printerId of printerIds) {
       try {
-        this.printerSocketStore.reconnectOctoPrint(printerId);
+        this.printerSocketStore.reconnectPrinterAdapter(printerId);
       } catch (e) {
         captureException(e);
         this.logger.error(`Error setting socket to reconnect ${errorSummary(e)}`);
