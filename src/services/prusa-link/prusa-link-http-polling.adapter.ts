@@ -7,10 +7,17 @@ import { ConfigService } from "@/services/core/config.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
 import { ISocketLogin } from "@/shared/dtos/socket-login.dto";
+import { LoginDto } from "@/services/interfaces/login.dto";
+import { SocketState } from "@/shared/dtos/socket-state.type";
+import { ApiState } from "@/shared/dtos/api-state.type";
 
 export class PrusaLinkHttpPollingAdapter implements IWebsocketAdapter {
   public readonly printerType = PrusaLinkType;
   public printerId?: IdType;
+  login: LoginDto;
+  socketState: SocketState;
+  apiState: ApiState;
+  lastMessageReceivedTimestamp: null | number;
   protected declare logger: LoggerService;
   private socketURL?: URL;
   private refreshPrinterCurrentInterval?: NodeJS.Timeout;
@@ -19,44 +26,56 @@ export class PrusaLinkHttpPollingAdapter implements IWebsocketAdapter {
     loggerFactory: ILoggerFactory,
     private readonly prusaLinkApi: PrusaLinkApi,
     private readonly eventEmitter2: EventEmitter2,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
   ) {
     this.logger = loggerFactory(PrusaLinkHttpPollingAdapter.name);
   }
 
-  socketState: "unopened" | "opening" | "authenticating" | "opened" | "authenticated" | "aborted" | "error" | "closed";
-  apiState: "unset" | "noResponse" | "globalKey" | "authFail" | "responding";
   needsReopen(): boolean {
     throw new Error("Method not implemented.");
   }
+
   needsSetup(): boolean {
     throw new Error("Method not implemented.");
   }
+
   needsReauth(): boolean {
     throw new Error("Method not implemented.");
   }
-  reauthSession(): void {
+
+  isClosedOrAborted(): boolean {
     throw new Error("Method not implemented.");
   }
+
+  reauthSession(): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
+
   registerCredentials(socketLogin: ISocketLogin): void {
     this.socketURL = new URL(socketLogin.loginDto.printerURL);
     this.printerId = socketLogin.printerId;
   }
+
   open(): void {
     throw new Error("Method not implemented.");
   }
+
   close(): void {
     throw new Error("Method not implemented.");
   }
+
   setupSocketSession(): Promise<void> {
     throw new Error("Method not implemented.");
   }
+
   resetSocketState(): void {
     // throw new Error("Method not implemented.");
   }
+
   allowEmittingEvents(): void {
     throw new Error("Method not implemented.");
   }
+
   disallowEmittingEvents(): void {
     throw new Error("Method not implemented.");
   }

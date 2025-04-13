@@ -18,8 +18,8 @@ import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
 import { PrusaLinkApi } from "@/services/prusa-link/prusa-link.api";
-import { PrusaLinkHttpClientBuilder } from "@/services/prusa-link/utils/prusa-link-http-client.builder";
 import { PrusaLinkType } from "@/services/printer-api.interface";
+import { errorSummary } from "@/utils/error.utils";
 
 export class BootTask {
   logger: LoggerService;
@@ -39,7 +39,7 @@ export class BootTask {
     private readonly typeormService: TypeormService,
     private readonly isTypeormMode: boolean,
     private readonly printerThumbnailCache: PrinterThumbnailCache,
-    private readonly prusaLinkApi: PrusaLinkApi
+    private readonly prusaLinkApi: PrusaLinkApi,
   ) {
     this.logger = loggerFactory(BootTask.name);
   }
@@ -131,7 +131,7 @@ export class BootTask {
         const files = await this.prusaLinkApi.getFiles();
         this.logger.log(`Prusa link files: ${files.map((f) => f.path).join("\n")}`);
       } catch (e) {
-        this.logger.error(e);
+        this.logger.error(errorSummary(e));
       }
     }
 

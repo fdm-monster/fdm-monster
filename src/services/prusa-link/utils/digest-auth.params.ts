@@ -6,6 +6,6 @@ export interface DigestAuthParams {
   realm: string;
   nonce: string;
   qop?: string;
-  nc: string;
-  cnonce: string;
+  nc?: string;
+  cnonce?: string;
 }

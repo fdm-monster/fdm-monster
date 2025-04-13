@@ -50,7 +50,7 @@ export interface StatusFlags {
 export interface FileDto {
   path: string;
   size: number;
-  date: number;
+  date: number| null;
 }
 
 export const capabilities = {
