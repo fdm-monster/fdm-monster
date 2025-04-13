@@ -43,14 +43,14 @@ export class PrinterFileCleanTask {
       const errorPrinters = [];
       for (let printer of printers) {
         try {
-          await this.printerFilesStore.loadFiles(printer.id, false);
+          await this.printerFilesStore.loadFiles(printer.id);
         } catch (e) {
           errorPrinters.push({ e, printer });
         }
       }
       if (errorPrinters.length > 0) {
         this.logger.error(
-          `Error loading some files, ${errorPrinters.length} printer(s) did not respond or returned an unexpected status code. Those will depend on previously cached files.`,
+          `Error loading some files, ${errorPrinters.length} printer(s) did not respond or returned an unexpected status code.`,
         );
       }
 
@@ -73,7 +73,7 @@ export class PrinterFileCleanTask {
 
   async cleanPrinterFiles(printerId: IdType) {
     await this.printerFilesStore.deleteOutdatedFiles(printerId, this.ageDaysMaxSetting);
-    await this.printerFilesStore.loadFiles(printerId, false);
+    await this.printerFilesStore.loadFiles(printerId);
   }
 
   getPrinterOutdatedFiles(printer: PrinterDto<IdType>) {
