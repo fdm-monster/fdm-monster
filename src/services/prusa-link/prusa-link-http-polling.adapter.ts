@@ -32,11 +32,13 @@ export class PrusaLinkHttpPollingAdapter implements IWebsocketAdapter {
   }
 
   needsReopen(): boolean {
-    throw new Error("Method not implemented.");
+    // TODO this can be standardized
+    return !this.refreshPrinterCurrentInterval;
   }
 
   needsSetup(): boolean {
-    throw new Error("Method not implemented.");
+    // TODO this can be standardized
+    return !this.refreshPrinterCurrentInterval;
   }
 
   needsReauth(): boolean {
@@ -57,19 +59,20 @@ export class PrusaLinkHttpPollingAdapter implements IWebsocketAdapter {
   }
 
   open(): void {
-    throw new Error("Method not implemented.");
+    this.startPolling();
   }
 
   close(): void {
-    throw new Error("Method not implemented.");
+    this.stopPolling();
   }
 
   setupSocketSession(): Promise<void> {
-    throw new Error("Method not implemented.");
+    this.logger.warn("SetupSocketSession");
+    return Promise.resolve();
   }
 
   resetSocketState(): void {
-    // throw new Error("Method not implemented.");
+    this.logger.warn("ResetSocketState");
   }
 
   allowEmittingEvents(): void {

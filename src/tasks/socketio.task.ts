@@ -1,6 +1,5 @@
 import { IO_MESSAGES, SocketIoGateway } from "@/state/socket-io.gateway";
 import { socketIoConnectedEvent } from "@/constants/event.constants";
-import { sizeKB } from "@/utils/metric.utils";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { PrinterEventsCache } from "@/state/printer-events.cache";
 import { FloorStore } from "@/state/floor.store";
@@ -55,24 +54,6 @@ export class SocketIoTask {
       trackedUploads,
     };
 
-    const serializedData = JSON.stringify(socketIoData);
-    const transportDataSize = sizeKB(serializedData);
-    this.updateAggregator(transportDataSize);
     this.socketIoGateway.send(IO_MESSAGES.LegacyUpdate, socketIoData);
-  }
-
-  updateAggregator(transportDataLength: number) {
-    if (this.aggregateSizeCounter >= this.aggregateWindowLength) {
-      const summedPayloadSize = this.aggregateSizes.reduce((t, n) => t + n);
-      const averagePayloadSize = summedPayloadSize / this.aggregateWindowLength;
-      this.logger.log(
-        `Printer SocketIO metrics ${averagePayloadSize.toFixed(this.rounding)}kB [${this.aggregateWindowLength} TX avg].`,
-      );
-      this.aggregateSizeCounter = 0;
-      this.aggregateSizes = [];
-    }
-
-    this.aggregateSizes.push(transportDataLength);
-    ++this.aggregateSizeCounter;
   }
 }
