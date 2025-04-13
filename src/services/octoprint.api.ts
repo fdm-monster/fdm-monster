@@ -18,6 +18,10 @@ export class OctoprintApi implements IPrinterApi {
     return OctoprintType;
   }
 
+  get login() {
+    return this.printerLogin;
+  }
+
   set login(login: LoginDto) {
     this.printerLogin = login;
   }

@@ -2,7 +2,7 @@ import { DITokens } from "@/container.tokens";
 import { MoonrakerType, OctoprintType, PrusaLinkType } from "@/services/printer-api.interface";
 import { SettingsStore } from "@/state/settings.store";
 import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
-import { CradleService } from "@/services/cradle.service";
+import { CradleService } from "@/services/core/cradle.service";
 
 export class SocketFactory {
   constructor(private readonly cradleService: CradleService) {}

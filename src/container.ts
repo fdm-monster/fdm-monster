@@ -7,7 +7,7 @@ import { PrinterService as PrinterService2 } from "./services/orm/printer.servic
 import { SettingsStore } from "./state/settings.store";
 import { SettingsService } from "./services/mongoose/settings.service";
 import { ServerReleaseService } from "./services/core/server-release.service";
-import { TaskManagerService } from "./services/core/task-manager.service";
+import { TaskManagerService } from "./services/task-manager.service";
 import { GithubService } from "./services/core/github.service";
 import { FileCache } from "./state/file.cache";
 import { PrinterWebsocketTask } from "./tasks/printer-websocket.task";
@@ -73,9 +73,10 @@ import { MoonrakerApi } from "@/services/moonraker.api";
 import { PrinterApiFactory } from "@/services/printer-api.factory";
 import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
 import { HttpClientFactory } from "@/services/core/http-client.factory";
-import { CradleService } from "@/services/cradle.service";
+import { CradleService } from "@/services/core/cradle.service";
 import { PrusaLinkApi } from "@/services/prusa-link/prusa-link.api";
 import { PrusaLinkHttpPollingAdapter } from "@/services/prusa-link/prusa-link-http-polling.adapter";
+import { TryPrusaLinkTask } from "@/tasks/try-prusa-link.task";
 
 export function config<T1, T2>(
   key: string,
@@ -214,6 +215,7 @@ export function configureContainer(isSqlite: boolean = false) {
     [di.printerWebsocketTask]: asClass(PrinterWebsocketTask).singleton(), // This task is a recurring heartbeat task
     [di.printerWebsocketRestoreTask]: asClass(PrinterWebsocketRestoreTask).singleton(), // Task aimed at testing the printer API
     [di.printerFileCleanTask]: asClass(PrinterFileCleanTask).singleton(),
+    [di.tryPrusaLinkTask]: asClass(TryPrusaLinkTask).singleton(),
   });
 
   return container;
