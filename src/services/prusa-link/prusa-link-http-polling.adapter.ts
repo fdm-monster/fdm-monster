@@ -10,6 +10,7 @@ import { ISocketLogin } from "@/shared/dtos/socket-login.dto";
 import { LoginDto } from "@/services/interfaces/login.dto";
 import { SocketState } from "@/shared/dtos/socket-state.type";
 import { ApiState } from "@/shared/dtos/api-state.type";
+import { errorSummary } from "@/utils/error.utils";
 
 export class PrusaLinkHttpPollingAdapter implements IWebsocketAdapter {
   public readonly printerType = PrusaLinkType;
@@ -91,12 +92,21 @@ export class PrusaLinkHttpPollingAdapter implements IWebsocketAdapter {
         this.logger.warn("Printer ID is not set, skipping status check.");
         return;
       }
+      const prusaLinkUsername = this.configService.get<string>("TEST_PL_USERNAME");
+      const prusaLinkPassword = this.configService.get<string>("TEST_PL_PASSWORD");
 
       try {
+        this.prusaLinkApi.login = {
+          printerURL: this.login.printerURL,
+          username: this.login.username ?? prusaLinkUsername,
+          password: this.login.password ?? prusaLinkPassword,
+          apiKey: "",
+          printerType: PrusaLinkType,
+        };
         const status = await this.prusaLinkApi.getVersion();
         // this.eventEmitter.emit("prusaLinkStatus", status);
       } catch (error) {
-        this.logger.error("Failed to fetch PrusaLink status", error);
+        this.logger.error(`Failed to fetch PrusaLink status ${errorSummary(error)}`);
       }
     }, 10000);
   }
