@@ -3580,13 +3580,13 @@ __metadata:
   linkType: hard
 
 "@types/pg@npm:*":
-  version: 8.11.12
-  resolution: "@types/pg@npm:8.11.12"
+  version: 8.11.13
+  resolution: "@types/pg@npm:8.11.13"
   dependencies:
     "@types/node": "npm:*"
     pg-protocol: "npm:*"
     pg-types: "npm:^4.0.1"
-  checksum: 10c0/290a4ef201fb685de92c2201118c3069195c7a75fbf006a68fdf4a48f46681b06fcf30dd4eea56b5edf355750534976d762b3a54458697b1737a836767bbceae
+  checksum: 10c0/a111989a223f21ff864e35150474409e9659766603e4f7a51f89ffc173292adcd895c1551f792aaf1cf94afe99e4bd1dbf7c740252c1dca2a5038f1fd2c6e0bd
   languageName: node
   linkType: hard
 
@@ -3703,9 +3703,9 @@ __metadata:
   linkType: hard
 
 "@types/validator@npm:^13.11.8":
-  version: 13.12.3
-  resolution: "@types/validator@npm:13.12.3"
-  checksum: 10c0/bc40191cd2e3c9b4b8d1f10611038ae3793462685366201940f2ef953b3229c02edcdb7c73cc5e6f762d5ecf1762a821afadaf97f71bd7fb06fae3aeb2729caf
+  version: 13.15.0
+  resolution: "@types/validator@npm:13.15.0"
+  checksum: 10c0/e05ee9fb59c8b3de0f8910b082e43ffebe1202a2f2bfc0390031d788b2fd68880b365b0cb2b9685d4f8458b2d4e09c7cb6e61d4f24031dc05bafd70e9560738f
   languageName: node
   linkType: hard
 
@@ -5157,9 +5157,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.5.73":
-  version: 1.5.136
-  resolution: "electron-to-chromium@npm:1.5.136"
-  checksum: 10c0/6a207e397638b0428b31c87d409a73f6bd953598cb7359ee4c3c175e645c3ae0cc99fc5128eaca19e2f1052200fd016eb4bb1012a55e5824eb1dce85b0396184
+  version: 1.5.137
+  resolution: "electron-to-chromium@npm:1.5.137"
+  checksum: 10c0/678613e0a3d023563a1acca4d8103a69d389168efeb3b78c1fcc683ed0778d81bfb00c6f621d6535f3fa9530664fc948fc8f2ed27e7548d46cd3987d4b0add6a
   languageName: node
   linkType: hard
 
