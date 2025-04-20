@@ -58,7 +58,9 @@ export class ServerHost {
     // Catches any HTML request to paths like / or file/ as long as its text/html
     app
       .use((req, res, next) => {
-        if (!req.originalUrl.startsWith("/api") && !req.originalUrl.startsWith("/socket.io")) {
+        if (!req.originalUrl.startsWith("/metrics")
+          && !req.originalUrl.startsWith("/api")
+          && !req.originalUrl.startsWith("/socket.io")) {
           history()(req, res, next);
         } else {
           next();
@@ -89,7 +91,9 @@ export class ServerHost {
       const path = req.originalUrl;
 
       let resource = "MVC";
-      if (path.startsWith("/socket.io") || path.startsWith("/api")) {
+      if (path.startsWith("/socket.io")
+        || path.startsWith("/api")
+        || path.startsWith("/metrics")) {
         resource = "API";
       } else if (path.endsWith(".min.js")) {
         resource = "client-bundle";
@@ -103,11 +107,6 @@ export class ServerHost {
     });
 
     app.use(exceptionFilter);
-  }
-
-  private isClientNextEnabled() {
-    const settings = this.settingsStore.getServerSettings();
-    return settings.experimentalClientSupport;
   }
 
   async httpListen(app: Application) {
@@ -126,5 +125,10 @@ export class ServerHost {
       this.logger.log(`Server started... open it at http://127.0.0.1:${port}`);
     });
     this.socketIoGateway.attachServer(server);
+  }
+
+  private isClientNextEnabled() {
+    const settings = this.settingsStore.getServerSettings();
+    return settings.experimentalClientSupport;
   }
 }

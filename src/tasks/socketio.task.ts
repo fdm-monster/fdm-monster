@@ -12,12 +12,6 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 export class SocketIoTask {
   logger: LoggerService;
 
-  private readonly rounding = 2;
-  private readonly aggregateWindowLength = 100;
-
-  private aggregateSizeCounter = 0;
-  private aggregateSizes: number[] = [];
-
   constructor(
     loggerFactory: ILoggerFactory,
     private readonly socketIoGateway: SocketIoGateway,
@@ -53,6 +47,8 @@ export class SocketIoTask {
       printerEvents,
       trackedUploads,
     };
+
+    this.logger.log("Sending SocketIO printerEvents", printerEvents)
 
     this.socketIoGateway.send(IO_MESSAGES.LegacyUpdate, socketIoData);
   }

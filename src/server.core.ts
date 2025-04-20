@@ -12,6 +12,13 @@ import { AppConstants } from "@/server.constants";
 import { join } from "path";
 import { ensureDirExists, superRootPath } from "@/utils/fs.utils";
 import { getEnvOrDefault } from "@/utils/env.utils";
+import { Counter } from "prom-client";
+import { LoggerService } from "@/handlers/logger";
+
+const httpRequestsTotal = new Counter({
+  name: "http_requests_total",
+  help: "HTTP requests executed",
+});
 
 export async function setupServer() {
   const httpServer = express();
@@ -26,6 +33,32 @@ export async function setupServer() {
   initializePassportStrategies(passport, container);
 
   httpServer
+    .use((req, res, next) => {
+      const route = req.route?.path || req.path || "unknown";
+
+      if (route.includes("/api")) {
+        const start = process.hrtime();
+
+        res.on("finish", () => {
+          httpRequestsTotal.inc();
+
+          const delta = process.hrtime(start);
+          const duration = delta[0] + delta[1] / 1e9;
+          const logger = new LoggerService("HttpRequest");
+          logger.newDebug({
+            message: `HTTP request ${req.method} ${req.originalUrl} ${res.statusCode}`,
+            method: req.method,
+            path: req.originalUrl,
+            statusCode: res.statusCode,
+            responseTimeMs: duration.toFixed(2),
+            clientIp: req.ip,
+            userAgent: req.get("User-Agent"),
+          });
+        });
+      }
+
+      next();
+    })
     .use(
       cors({
         origin: "*",

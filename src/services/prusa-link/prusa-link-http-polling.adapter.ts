@@ -11,6 +11,10 @@ import { LoginDto } from "@/services/interfaces/login.dto";
 import { SocketState } from "@/shared/dtos/socket-state.type";
 import { ApiState } from "@/shared/dtos/api-state.type";
 import { errorSummary } from "@/utils/error.utils";
+import { prusaLinkEvent } from "@/services/prusa-link/constants/prusalink.constants";
+import { PrusaLinkEventDto } from "@/services/prusa-link/constants/prusalink-event.dto";
+
+const defaultLog = { adapter: "prusa-link" };
 
 export class PrusaLinkHttpPollingAdapter implements IWebsocketAdapter {
   public readonly printerType = PrusaLinkType;
@@ -20,8 +24,9 @@ export class PrusaLinkHttpPollingAdapter implements IWebsocketAdapter {
   apiState: ApiState;
   lastMessageReceivedTimestamp: null | number;
   protected declare logger: LoggerService;
-  private printerURL?: URL;
   private refreshPrinterCurrentInterval?: NodeJS.Timeout;
+
+  private eventEmittingAllowed: boolean = true;
 
   constructor(
     loggerFactory: ILoggerFactory,
@@ -30,6 +35,14 @@ export class PrusaLinkHttpPollingAdapter implements IWebsocketAdapter {
     private readonly configService: ConfigService,
   ) {
     this.logger = loggerFactory(PrusaLinkHttpPollingAdapter.name);
+  }
+
+  public allowEmittingEvents() {
+    this.eventEmittingAllowed = true;
+  }
+
+  public disallowEmittingEvents() {
+    this.eventEmittingAllowed = false;
   }
 
   needsReopen(): boolean {
@@ -55,7 +68,7 @@ export class PrusaLinkHttpPollingAdapter implements IWebsocketAdapter {
   }
 
   registerCredentials(socketLogin: ISocketLogin): void {
-    this.printerURL = new URL(socketLogin.loginDto.printerURL);
+    this.login = socketLogin.loginDto;
     this.printerId = socketLogin.printerId;
   }
 
@@ -68,20 +81,12 @@ export class PrusaLinkHttpPollingAdapter implements IWebsocketAdapter {
   }
 
   setupSocketSession(): Promise<void> {
-    this.logger.warn("SetupSocketSession");
+    this.logger.warn("SetupSocketSession", defaultLog);
     return Promise.resolve();
   }
 
   resetSocketState(): void {
-    this.logger.warn("ResetSocketState");
-  }
-
-  allowEmittingEvents(): void {
-    throw new Error("Method not implemented.");
-  }
-
-  disallowEmittingEvents(): void {
-    throw new Error("Method not implemented.");
+    this.logger.warn("ResetSocketState", defaultLog);
   }
 
   startPolling() {
@@ -89,12 +94,13 @@ export class PrusaLinkHttpPollingAdapter implements IWebsocketAdapter {
 
     this.refreshPrinterCurrentInterval = setInterval(async () => {
       if (!this.printerId) {
-        this.logger.warn("Printer ID is not set, skipping status check.");
+        this.logger.warn("Printer ID is not set, skipping status check.", this.logMeta());
         return;
       }
       const prusaLinkUsername = this.configService.get<string>("TEST_PL_USERNAME");
       const prusaLinkPassword = this.configService.get<string>("TEST_PL_PASSWORD");
 
+      this.socketState = "opening";
       try {
         this.prusaLinkApi.login = {
           printerURL: this.login.printerURL,
@@ -103,18 +109,41 @@ export class PrusaLinkHttpPollingAdapter implements IWebsocketAdapter {
           apiKey: "",
           printerType: PrusaLinkType,
         };
-        const status = await this.prusaLinkApi.getVersion();
-        // this.eventEmitter.emit("prusaLinkStatus", status);
+        this.socketState = "authenticating";
+        const status = await this.prusaLinkApi.getPrinterState();
+        this.socketState = "authenticated";
+        this.apiState = "responding";
+        await this.emitEvent("current", status);
       } catch (error) {
-        this.logger.error(`Failed to fetch PrusaLink status ${errorSummary(error)}`);
+        this.socketState = "error";
+        this.logger.error(`Failed to fetch PrusaLink status ${errorSummary(error)}`, this.logMeta());
       }
-    }, 10000);
+    }, 5000);
   }
 
   stopPolling() {
     if (this.refreshPrinterCurrentInterval) {
       clearInterval(this.refreshPrinterCurrentInterval);
       this.refreshPrinterCurrentInterval = undefined;
+      this.socketState = "closed";
     }
+  }
+
+  private async emitEvent(event: string, payload?: any) {
+    if (!this.eventEmittingAllowed) {
+      return;
+    }
+
+    this.logger.debug(`Emitting event ${prusaLinkEvent(event)}`, this.logMeta());
+    await this.eventEmitter2.emitAsync(prusaLinkEvent(event), {
+      event,
+      payload,
+      printerId: this.printerId,
+      printerType: PrusaLinkType,
+    } as PrusaLinkEventDto);
+  }
+
+  private logMeta() {
+    return defaultLog;
   }
 }

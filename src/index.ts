@@ -3,6 +3,10 @@ import { setupEnvConfig } from "./server.env";
 import { setupServer } from "./server.core";
 import { DITokens } from "./container.tokens";
 import { ServerHost } from "@/server.host";
+import { collectDefaultMetrics, register } from "prom-client";
+
+// Optional: Enable collection of default metrics like memory, CPU, etc.
+collectDefaultMetrics({ register });
 
 setupEnvConfig();
 

@@ -1,0 +1,2 @@
+### Get status from PrusaLink using Digest Auth
+GET {{prusalink}}/api/v1/status

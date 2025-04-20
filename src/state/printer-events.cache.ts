@@ -10,14 +10,25 @@ import {
 import { MoonrakerEventDto, MR_WsMessage } from "@/services/moonraker/constants/moonraker-event.dto";
 import { PrinterObjectsQueryDto } from "@/services/moonraker/dto/objects/printer-objects-query.dto";
 import { SubscriptionType } from "@/services/moonraker/moonraker-websocket.adapter";
+import { octoPrintEvent } from "@/services/octoprint/octoprint-websocket.adapter";
+import { moonrakerEvent } from "@/services/moonraker/constants/moonraker.constants";
+import { prusaLinkEvent } from "@/services/prusa-link/constants/prusalink.constants";
+import { PrusaLinkEventDto } from "@/services/prusa-link/constants/prusalink-event.dto";
+import { ILoggerFactory } from "@/handlers/logger-factory";
+import { LoggerService } from "@/handlers/logger";
 
 export type WsMessageWithoutEventAndPlugin = Exclude<WsMessage, "event" | "plugin">;
 export type PrinterEventsCacheDto = Record<WsMessageWithoutEventAndPlugin, any>;
 
 export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
-  constructor(private readonly eventEmitter2: EventEmitter2) {
+  private readonly logger: LoggerService;
+
+  constructor(
+    private readonly eventEmitter2: EventEmitter2,
+    loggerFactory: ILoggerFactory) {
     super();
 
+    this.logger = loggerFactory(PrinterEventsCache.name);
     this.subscribeToEvents();
   }
 
@@ -79,8 +90,9 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
   }
 
   private subscribeToEvents() {
-    this.eventEmitter2.on("octoprint.*", (e) => this.onOctoPrintSocketMessage(e));
-    this.eventEmitter2.on("moonraker.*", (e) => this.onMoonrakerSocketMessage(e));
+    this.eventEmitter2.on(octoPrintEvent("*"), (e) => this.onOctoPrintSocketMessage(e));
+    this.eventEmitter2.on(moonrakerEvent("*"), (e) => this.onMoonrakerSocketMessage(e));
+    this.eventEmitter2.on(prusaLinkEvent("*"), (e) => this.onPrusaLinkPollMessage(e));
     this.eventEmitter2.on(printerEvents.printersDeleted, this.handlePrintersDeleted.bind(this));
   }
 
@@ -104,6 +116,16 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
     // https://github.com/mainsail-crew/mainsail/blob/fa61d4ef92 97426a404dd845a1a4d5e4525c43dc/src/components/panels/StatusPanel.vue#L199
     if (["notify_status_update", "current"].includes(eventType)) {
       await this.setEvent(printerId, eventType as "notify_status_update" | "current", e.payload);
+    }
+  }
+
+  private async onPrusaLinkPollMessage(
+    e: PrusaLinkEventDto) {
+    const printerId = e.printerId;
+
+    this.logger.debug(`Received prusaLink event ${e.event}, printerId ${e.printerId}`, e);
+    if (e.event === "current") {
+      await this.setEvent(printerId, e.event, e.payload);
     }
   }
 

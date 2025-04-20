@@ -15,6 +15,10 @@ import { SettingsDto } from "../octoprint/dto/settings/settings.dto";
 import { PrusaLinkHttpClientBuilder } from "@/services/prusa-link/utils/prusa-link-http-client.builder";
 import { VersionDto } from "@/services/prusa-link/dto/version.dto";
 import { PL_FileResponseDto } from "@/services/prusa-link/dto/file-response.dto";
+import { PL_StatusDto } from "@/services/prusa-link/dto/status.dto";
+import { PL_PrinterStateDto } from "@/services/prusa-link/dto/printer-state.dto";
+
+const defaultLog = { adapter: "prusa-link" };
 
 /**
  * Prusa Link OpenAPI spec https://raw.githubusercontent.com/prusa3d/Prusa-Link-Web/master/spec/openapi.yaml
@@ -31,6 +35,7 @@ export class PrusaLinkApi implements IPrinterApi {
     private printerLogin: LoginDto,
   ) {
     this.logger = loggerFactory(PrusaLinkApi.name);
+    this.logger.debug("Constructed", this.logMeta());
   }
 
   get type(): PrinterType {
@@ -62,6 +67,16 @@ export class PrusaLinkApi implements IPrinterApi {
             size: -1,
           } as FileDto),
       );
+  }
+
+  async getStatus(): Promise<PL_StatusDto> {
+    const response = await this.client.get<PL_StatusDto>("/api/v1/status");
+    return response.data;
+  }
+
+  async getPrinterState(): Promise<PL_PrinterStateDto> {
+    const response = await this.client.get<PL_PrinterStateDto>("/api/printer");
+    return response.data;
   }
 
   connect(): Promise<void> {
@@ -153,6 +168,8 @@ export class PrusaLinkApi implements IPrinterApi {
   ) {
     const builder = new PrusaLinkHttpClientBuilder();
 
+    this.logger.debug("Create client", this.logMeta());
+
     return this.httpClientFactory.createClientWithBaseUrl(builder, this.printerLogin.printerURL, (b) => {
       // Set up digest auth with the credentials and an error handler
       b.withDigestAuth(
@@ -162,18 +179,22 @@ export class PrusaLinkApi implements IPrinterApi {
           this.logger.error("Authentication error occurred", error);
         },
         (error, attemptCount) => {
-          this.logger.log(`Authentication attempt count ${attemptCount} for method ${error.config?.method} path ${error.config?.url}.`);
+          this.logger.log(`Authentication attempt count ${attemptCount} for method ${error.config?.method} path ${error.config?.url}`, this.logMeta());
         },
         (authHeader) => {
-          this.logger.debug("Authentication successful, saving auth header for later reuse.");
+          this.logger.debug("Authentication successful, saving auth header for later reuse", this.logMeta());
           this.authHeader = authHeader;
         },
       );
 
       if (this.authHeader) {
-        this.logger.debug("Reusing stored auth header");
+        this.logger.debug("Reusing stored auth header", this.logMeta());
         b.withAuthHeader(this.authHeader);
       }
     });
+  }
+
+  private logMeta() {
+    return defaultLog;
   }
 }
