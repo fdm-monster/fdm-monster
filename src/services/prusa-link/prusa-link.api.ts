@@ -17,6 +17,7 @@ import { VersionDto } from "@/services/prusa-link/dto/version.dto";
 import { PL_FileResponseDto } from "@/services/prusa-link/dto/file-response.dto";
 import { PL_StatusDto } from "@/services/prusa-link/dto/status.dto";
 import { PL_PrinterStateDto } from "@/services/prusa-link/dto/printer-state.dto";
+import { PL_JobStateDto } from "@/services/prusa-link/dto/job-state.dto";
 
 const defaultLog = { adapter: "prusa-link" };
 
@@ -76,6 +77,11 @@ export class PrusaLinkApi implements IPrinterApi {
 
   async getPrinterState(): Promise<PL_PrinterStateDto> {
     const response = await this.client.get<PL_PrinterStateDto>("/api/printer");
+    return response.data;
+  }
+
+  async getJobState(): Promise<PL_JobStateDto> {
+    const response = await this.client.get<PL_JobStateDto>("/api/job");
     return response.data;
   }
 

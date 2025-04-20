@@ -108,10 +108,15 @@ export class PrusaLinkHttpPollingAdapter implements IWebsocketAdapter {
           printerType: PrusaLinkType,
         };
         this.socketState = "authenticating";
-        const status = await this.prusaLinkApi.getPrinterState();
+        const printerState = await this.prusaLinkApi.getPrinterState();
+        const jobState = await this.prusaLinkApi.getJobState();
         this.socketState = "authenticated";
         this.apiState = "responding";
-        await this.emitEvent("current", status);
+        await this.emitEvent("current", {
+          ...printerState,
+          job: jobState.job,
+          progress: jobState.progress,
+        });
       } catch (error) {
         this.socketState = "error";
         this.logger.error(`Failed to fetch PrusaLink status ${errorSummary(error)}`, this.logMeta());
