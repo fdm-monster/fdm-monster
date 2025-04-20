@@ -10,7 +10,7 @@ export function registerTask(task: any, preset: TimingPreset, milliseconds = 0, 
   timingPreset.milliseconds = preset.milliseconds ?? milliseconds;
   timingPreset.runImmediately = runImmediately ?? false;
   return {
-    id: task.name || task,
+    id: task.name ?? task,
     task,
     preset: timingPreset,
   };
@@ -21,7 +21,6 @@ export class ServerTasks {
   public static BOOT_TASKS = [
     registerTask(DITokens.softwareUpdateTask, TaskPresets.RUNDELAYED, 1500),
     registerTask(DITokens.clientDistDownloadTask, TaskPresets.RUNONCE),
-    registerTask(DITokens.tryPrusaLinkTask, TaskPresets.RUNONCE),
     registerTask(DITokens.socketIoTask, TaskPresets.PERIODIC, 500),
     registerTask(DITokens.printerFileCleanTask, TaskPresets.RUNONCE, 60 * 1000, true),
     // Every 2 seconds

@@ -47,6 +47,8 @@ export class TestPrinterSocketStore {
       printerId: correlationToken,
       loginDto: {
         apiKey: printer.apiKey,
+        username: printer.username,
+        password: printer.password,
         printerURL: printer.printerURL,
         printerType: printer.printerType,
       },

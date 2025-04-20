@@ -87,10 +87,20 @@ export class PrinterService implements IPrinterService<MongoIdType> {
   async update(printerId: MongoIdType, updateData: z.infer<typeof createPrinterSchema>) {
     const printer = await this.get(printerId);
     updateData.printerURL = normalizeUrl(updateData.printerURL, { defaultProtocol: defaultHttpProtocol });
-    const { printerURL, apiKey, enabled, name, printerType } = await validateInput(updateData, createPrinterSchema);
+    const {
+      printerURL,
+      apiKey,
+      username,
+      password,
+      enabled,
+      name,
+      printerType,
+    } = await validateInput(updateData, createPrinterSchema);
 
     printer.printerURL = printerURL;
     printer.apiKey = apiKey;
+    printer.username = username;
+    printer.password = password;
     if (enabled !== undefined) {
       printer.enabled = enabled;
     }

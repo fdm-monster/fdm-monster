@@ -76,6 +76,8 @@ export class PrinterCache extends KeyDiffCache<PrinterDto<IdType>> {
     return {
       printerURL: printer.printerURL,
       apiKey: printer.apiKey,
+      username: printer.username,
+      password: printer.password,
       printerType: printer.printerType,
     };
   }
@@ -87,7 +89,7 @@ export class PrinterCache extends KeyDiffCache<PrinterDto<IdType>> {
       apiKey: printer.apiKey,
       printerType: printer.printerType,
       username: printer.username,
-      password: printer.password
+      password: printer.password,
     };
   }
 

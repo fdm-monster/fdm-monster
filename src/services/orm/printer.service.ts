@@ -77,7 +77,11 @@ export class PrinterService
       partial.printerURL = normalizeUrl(partial.printerURL, { defaultProtocol: defaultHttpProtocol });
     }
     Object.assign(printer, partial);
-    const { printerURL, apiKey, enabled, name, printerType } = await validateInput(printer, createPrinterSchema);
+    const {
+      printerURL, apiKey, enabled, name, printerType,
+      password,
+      username,
+    } = await validateInput(printer, createPrinterSchema);
 
     const updatedPrinter = await super.update(printerId, {
       printerURL,
@@ -85,6 +89,8 @@ export class PrinterService
       apiKey,
       enabled,
       printerType,
+      password,
+      username,
     });
     this.eventEmitter2.emit(printerEvents.printerUpdated, { printer } satisfies PrinterUpdatedEvent<number>);
     return updatedPrinter;

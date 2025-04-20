@@ -76,7 +76,6 @@ import { HttpClientFactory } from "@/services/core/http-client.factory";
 import { CradleService } from "@/services/core/cradle.service";
 import { PrusaLinkApi } from "@/services/prusa-link/prusa-link.api";
 import { PrusaLinkHttpPollingAdapter } from "@/services/prusa-link/prusa-link-http-polling.adapter";
-import { TryPrusaLinkTask } from "@/tasks/try-prusa-link.task";
 
 export function config<T1, T2>(
   key: string,
@@ -215,7 +214,6 @@ export function configureContainer(isSqlite: boolean = false) {
     [di.printerWebsocketTask]: asClass(PrinterWebsocketTask).singleton(), // This task is a recurring heartbeat task
     [di.printerWebsocketRestoreTask]: asClass(PrinterWebsocketRestoreTask).singleton(), // Task aimed at testing the printer API
     [di.printerFileCleanTask]: asClass(PrinterFileCleanTask).singleton(),
-    [di.tryPrusaLinkTask]: asClass(TryPrusaLinkTask).singleton(),
   });
 
   return container;

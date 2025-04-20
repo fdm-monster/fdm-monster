@@ -3,8 +3,10 @@ import {
   printerApiKeyValidator,
   printerEnabledValidator,
   printerNameValidator,
+  printerPasswordValidator,
   printerTypeValidator,
   printerUrlValidator,
+  printerUsernameValidator,
   refineApiKeyValidator,
 } from "@/services/validators/printer-service.validation";
 
@@ -15,6 +17,8 @@ export const createTestPrinterSchema = z
     apiKey: printerApiKeyValidator,
     enabled: printerEnabledValidator.optional(),
     name: printerNameValidator.optional(),
+    username: printerUsernameValidator.optional(),
+    password: printerPasswordValidator.optional(),
   })
   .strict()
   .superRefine(refineApiKeyValidator);

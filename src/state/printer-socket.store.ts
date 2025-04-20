@@ -172,6 +172,8 @@ export class PrinterSocketStore {
       printerId: printer.id.toString(),
       loginDto: {
         apiKey: printer.apiKey,
+        username: printer.username,
+        password: printer.password,
         printerURL: printer.printerURL,
         printerType: printer.printerType,
       },

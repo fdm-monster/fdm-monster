@@ -97,15 +97,13 @@ export class PrusaLinkHttpPollingAdapter implements IWebsocketAdapter {
         this.logger.warn("Printer ID is not set, skipping status check.", this.logMeta());
         return;
       }
-      const prusaLinkUsername = this.configService.get<string>("TEST_PL_USERNAME");
-      const prusaLinkPassword = this.configService.get<string>("TEST_PL_PASSWORD");
 
       this.socketState = "opening";
       try {
         this.prusaLinkApi.login = {
           printerURL: this.login.printerURL,
-          username: this.login.username ?? prusaLinkUsername,
-          password: this.login.password ?? prusaLinkPassword,
+          username: this.login.username,
+          password: this.login.password,
           apiKey: "",
           printerType: PrusaLinkType,
         };
