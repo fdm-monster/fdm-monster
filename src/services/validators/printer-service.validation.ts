@@ -1,5 +1,5 @@
 import { apiKeyLengthMaxDefault, apiKeyLengthMinDefault } from "@/constants/service.constants";
-import { OctoprintType, PrinterTypesEnum } from "@/services/printer-api.interface";
+import { OctoprintType, PrinterTypesEnum, PrusaLinkType } from "@/services/printer-api.interface";
 import { RefinementCtx, z } from "zod";
 
 const octoPrintApiKeySchema = z
@@ -8,13 +8,21 @@ const octoPrintApiKeySchema = z
   .max(apiKeyLengthMaxDefault)
   .regex(/^[a-zA-Z0-9_-]+$/, "Alpha-numeric, dash, and underscore only");
 
+
 export const printerApiKeyValidator = z.string().optional();
 export const printerNameValidator = z.string();
+export const printerUsernameValidator = z.string();
+export const printerPasswordValidator = z.string();
 export const printerEnabledValidator = z.boolean();
 export const printerDisabledReasonValidator = z.string().optional();
 export const printerUrlValidator = z.string().url();
 export const printerTypeValidator = z.nativeEnum(PrinterTypesEnum);
 export const printerDateAddedValidator = z.number().optional();
+
+const prusaLinkAuthSchema = z.object({
+  username: printerUsernameValidator,
+  password: printerPasswordValidator,
+});
 
 const basePrinterSchema = z
   .object({
@@ -22,6 +30,8 @@ const basePrinterSchema = z
     printerURL: printerUrlValidator,
     printerType: printerTypeValidator,
     apiKey: printerApiKeyValidator,
+    username: printerUsernameValidator.optional(),
+    password: printerPasswordValidator.optional(),
     enabled: printerEnabledValidator.optional(),
     name: printerNameValidator,
   })
@@ -31,6 +41,8 @@ const basePrinterSchema = z
 const apiKeyPrinterTypeSchema = z.object({
   apiKey: printerApiKeyValidator,
   printerType: printerTypeValidator,
+  username: printerUsernameValidator.optional(),
+  password: printerPasswordValidator.optional(),
 });
 type ApiKeyPrinterTypeSchema = z.infer<typeof apiKeyPrinterTypeSchema>;
 
@@ -44,6 +56,25 @@ export const refineApiKeyValidator = <T extends ApiKeyPrinterTypeSchema>(data: T
           ...issue,
           // Nesting misses path under "apiKey"
           path: ["apiKey", ...issue.path],
+        });
+      });
+    }
+  } else if (data.printerType === PrusaLinkType) {
+    const result = prusaLinkAuthSchema.safeParse({
+      username: data.username,
+      password: data.password,
+    });
+    if (!result.success) {
+      result.error.issues.forEach((issue) => {
+        ctx.addIssue({
+          ...issue,
+          // Nesting misses path under "username"
+          path: ["username", ...issue.path],
+        });
+        ctx.addIssue({
+          ...issue,
+          // Nesting misses path under "password"
+          path: ["password", ...issue.path],
         });
       });
     }

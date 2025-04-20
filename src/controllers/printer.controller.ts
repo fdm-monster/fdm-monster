@@ -5,7 +5,6 @@ import {
   feedRateSchema,
   flowRateSchema,
   testPrinterApiSchema,
-  updatePrinterConnectionSettingSchema,
   updatePrinterDisabledReasonSchema,
   updatePrinterEnabledSchema,
 } from "./validation/printer-controller.validation";
@@ -248,7 +247,7 @@ export class PrinterController {
   }
 
   private async testPrintApiConnection(inputLoginDto: LoginDto) {
-    await validateInput(inputLoginDto, updatePrinterConnectionSettingSchema);
+    await validateInput(inputLoginDto, testPrinterApiSchema);
     try {
       if (this.printerApi) {
         await this.printerApi.getVersion();

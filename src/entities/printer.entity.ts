@@ -22,6 +22,14 @@ export class Printer {
   @IsAlphanumeric()
   apiKey: string;
 
+  @Column({ default: "", nullable: true })
+  @IsAlphanumeric()
+  username: string;
+
+  @Column({ default: "", nullable: true })
+  @IsAlphanumeric()
+  password: string;
+
   @Column({
     nullable: false,
     default: true,

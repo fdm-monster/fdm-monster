@@ -42,6 +42,8 @@ export class PrinterService implements IPrinterService<MongoIdType> {
       disabledReason: entity.disabledReason,
       dateAdded: entity.dateAdded,
       apiKey: entity.apiKey,
+      username: entity.username,
+      password: entity.password,
       printerURL: entity.printerURL,
       printerType: entity.printerType,
     };
@@ -167,9 +169,9 @@ export class PrinterService implements IPrinterService<MongoIdType> {
   async updateEnabled(printerId: MongoIdType, enabled: boolean) {
     const update = enabled
       ? {
-          enabled,
-          disabledReason: null,
-        }
+        enabled,
+        disabledReason: null,
+      }
       : { enabled };
 
     await validateInput(update, updatePrinterEnabledSchema);

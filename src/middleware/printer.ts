@@ -35,23 +35,26 @@ export const printerResolveMiddleware = (key = "id") => {
       });
 
       switch (scopedPrinter.printerType) {
-        case OctoprintType:
+        case OctoprintType: {
           const octoprintApiInstance = req.container.resolve<OctoprintApi>(DITokens.octoprintApi);
           req.container.register({
             [printerApiToken]: asValue(octoprintApiInstance),
           });
           break;
-        case MoonrakerType:
+        }
+        case MoonrakerType: {
           const moonrakerInstance = req.container.resolve<MoonrakerApi>(DITokens.moonrakerApi);
           req.container.register({
             [printerApiToken]: moonrakerEnabled ? asValue(moonrakerInstance) : asValue(undefined),
           });
           break;
-        case PrusaLinkType:
+        }
+        case PrusaLinkType: {
           const prusaLinkInstance = req.container.resolve<PrusaLinkApi>(DITokens.prusaLinkApi);
           req.container.register({
             [printerApiToken]: prusaLinkEnabled ? asValue(prusaLinkInstance) : asValue(undefined),
           });
+        }
       }
     } else {
       req.container.register({

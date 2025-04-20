@@ -5,6 +5,8 @@ import { MongoIdType } from "@/shared.constants";
 export interface IPrinter<KeyType = MongoIdType> {
   id: KeyType;
   apiKey?: string;
+  username?: string;
+  password?: string;
   printerURL: string;
   printerType: number;
   enabled: boolean;
@@ -18,6 +20,16 @@ export interface IPrinter<KeyType = MongoIdType> {
 
 export const PrinterSchema = new Schema<IPrinter>({
   apiKey: {
+    type: String,
+    default: "",
+    required: false,
+  },
+  username: {
+    type: String,
+    default: "",
+    required: false,
+  },
+  password: {
     type: String,
     default: "",
     required: false,

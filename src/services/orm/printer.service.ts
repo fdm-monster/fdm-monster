@@ -23,8 +23,7 @@ import { z } from "zod";
 
 export class PrinterService
   extends BaseService(Printer, PrinterDto<SqliteIdType>, CreatePrinterDto)
-  implements IPrinterService<SqliteIdType, Printer>
-{
+  implements IPrinterService<SqliteIdType, Printer> {
   private readonly logger: LoggerService;
 
   constructor(
@@ -44,6 +43,8 @@ export class PrinterService
       disabledReason: entity.disabledReason,
       dateAdded: entity.dateAdded,
       apiKey: entity.apiKey,
+      username: entity.username,
+      password: entity.password,
       printerURL: entity.printerURL,
       printerType: entity.printerType as PrinterType,
     };
