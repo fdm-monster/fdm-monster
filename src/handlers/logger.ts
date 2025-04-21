@@ -4,6 +4,8 @@ import { DateTime } from "luxon";
 import { AppConstants } from "@/server.constants";
 import { superRootPath } from "@/utils/fs.utils";
 import LokiTransport from "winston-loki";
+import { z } from "zod";
+import * as Transport from "winston-transport";
 
 const levelMap: Record<string, string> = {
   error: "ERR",
@@ -16,6 +18,12 @@ const levelMap: Record<string, string> = {
 };
 
 const lokiLineClassProperty = "class";
+const lokiValidationSchema = z.object({
+  lokiEnabled: z.boolean(),
+  lokiAddress: z.string().url(),
+  lokiTimeoutSeconds: z.coerce.number().positive().default(30),
+  lokiInterval: z.coerce.number().positive().default(15),
+});
 
 export class LoggerService {
   name: string;
@@ -31,22 +39,43 @@ export class LoggerService {
       effectiveLogLevel = isProd || isTest ? "warn" : "debug";
     }
 
-    this.name = name;
-    this.logger = winston.createLogger({
-      transports: [
-        new LokiTransport({
+    const isLokiEnabled = process.env[AppConstants.ENABLE_LOKI_LOGGING] === "true";
+    const extraWinstonTransports: Transport[] = [];
+    if (isLokiEnabled) {
+      const lokiConfigValidationResult = lokiValidationSchema.safeParse({
+        lokiEnabled: isLokiEnabled,
+        lokiTimeoutSeconds: process.env[AppConstants.LOKI_TIMEOUT_SECONDS],
+        lokiAddress: process.env[AppConstants.LOKI_ADDRESS],
+        lokiInterval: process.env[AppConstants.LOKI_INTERVAL],
+      });
+      if (lokiConfigValidationResult.success) {
+        extraWinstonTransports.push(new LokiTransport({
           level: effectiveLogLevel,
-          host: "http://127.0.0.1:3100",
-          interval: 5,
-          timeout: 30000,
-          // These formatting settings plays well with Loki/Grafana
+          host: lokiConfigValidationResult.data.lokiAddress,
+          interval: lokiConfigValidationResult.data.lokiInterval,
+          timeout: lokiConfigValidationResult.data.lokiTimeoutSeconds,
+          handleExceptions: true,
+          onConnectionError(error: unknown) {
+            console.debug(`Loki logger enabled, but connection failed. ${error}`);
+          },
+          // The labels,json, useWinstonMetaAsLabels, format settings plays well with Loki + Grafana
           labels: {
             app: "fdm-monster-server",
           },
+          // When set to false, uses protobuf
           json: false,
+          // When set to false, the labels column cardinality is kept low (better for performance)
           useWinstonMetaAsLabels: false,
+          // Other formats like simple cause string + json, and are thus harder to work with
           format: winston.format.json(),
-        }),
+        }));
+      }
+    }
+
+    this.name = name;
+    this.logger = winston.createLogger({
+      transports: [
+        ...extraWinstonTransports,
         // Always include console transport
         new winston.transports.Console({
           level: effectiveLogLevel,

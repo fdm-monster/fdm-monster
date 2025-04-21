@@ -25,7 +25,7 @@ export async function setupServer() {
   const experimentalTypeormEnabled =
     getEnvOrDefault(AppConstants.ENABLE_EXPERIMENTAL_TYPEORM, AppConstants.enableExperimentalTypeormDefault) === "true";
   if (experimentalTypeormEnabled) {
-    const dbFolder = process.env[AppConstants.DATABASE_PATH] || "./database";
+    const dbFolder = process.env[AppConstants.DATABASE_PATH] ?? "./database";
     ensureDirExists(join(superRootPath(), dbFolder));
   }
 
@@ -34,7 +34,7 @@ export async function setupServer() {
 
   httpServer
     .use((req, res, next) => {
-      const route = req.route?.path || req.path || "unknown";
+      const route = (req.route?.path ?? req.path) ?? "unknown";
 
       if (route.includes("/api")) {
         const start = process.hrtime();

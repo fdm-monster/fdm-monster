@@ -7,6 +7,7 @@ import { LoggerService as Logger } from "./handlers/logger";
 import { getEnvOrDefault, isProductionEnvironment } from "./utils/env.utils";
 import { errorSummary } from "./utils/error.utils";
 import { superRootPath } from "@/utils/fs.utils";
+import { collectDefaultMetrics, register } from "prom-client";
 
 const logger = new Logger("FDM-Environment", false);
 
@@ -117,6 +118,12 @@ export function setupEnvConfig(skipDotEnv = false) {
   setupSentry();
   ensureMongoDbConnectionStringSet();
   ensurePortSet();
+
+// Optional: Enable collection of default metrics like memory, CPU, etc.
+  if (process.env[AppConstants.ENABLE_PROMETHEUS_METRICS]) {
+    collectDefaultMetrics({ register });
+    register.removeSingleMetric("nodejs_version_info");
+  }
 }
 
 export async function runMigrations(db: any, client: any): Promise<void> {
