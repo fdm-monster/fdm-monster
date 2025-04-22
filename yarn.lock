@@ -1647,9 +1647,9 @@ __metadata:
   linkType: hard
 
 "@noble/hashes@npm:^1.1.5":
-  version: 1.7.2
-  resolution: "@noble/hashes@npm:1.7.2"
-  checksum: 10c0/b1411eab3c0b6691d847e9394fe7f1fcd45eeb037547c8f97e7d03c5068a499b4aef188e8e717eee67389dca4fee17d69d7e0f58af6c092567b0b76359b114b2
+  version: 1.8.0
+  resolution: "@noble/hashes@npm:1.8.0"
+  checksum: 10c0/06a0b52c81a6fa7f04d67762e08b2c476a00285858150caeaaff4037356dd5e119f45b2a530f638b77a5eeca013168ec1b655db41bae3236cb2e9d511484fc77
   languageName: node
   linkType: hard
 
@@ -5173,9 +5173,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.5.73":
-  version: 1.5.139
-  resolution: "electron-to-chromium@npm:1.5.139"
-  checksum: 10c0/1b468c0c02a38322261b50b12ed090ff792a0d2ea24f299368babd484d5b81829528540463158572a3524fd835014d877d6c4bf097509bdb13ca696609b04aca
+  version: 1.5.140
+  resolution: "electron-to-chromium@npm:1.5.140"
+  checksum: 10c0/cd0c5a3e0624592494e03b1ae28e04b0d4f8dec0e2ff8fc0f38dc8622fdf795811ef8abe41167f03380f969515c2f4f23297f6e1372ff36aad01c78446565e6d
   languageName: node
   linkType: hard
 
@@ -7507,8 +7507,8 @@ __metadata:
   linkType: hard
 
 "mongodb@npm:^6.1.0, mongodb@npm:^6.9.0":
-  version: 6.15.0
-  resolution: "mongodb@npm:6.15.0"
+  version: 6.16.0
+  resolution: "mongodb@npm:6.16.0"
   dependencies:
     "@mongodb-js/saslprep": "npm:^1.1.9"
     bson: "npm:^6.10.3"
@@ -7536,7 +7536,7 @@ __metadata:
       optional: true
     socks:
       optional: true
-  checksum: 10c0/e5038ef81982e9c06b4da727e97e36c363b27a710e41b8d1cba13142d08063bbb9d0a47832412a94facdacb51e85b368c2a685f4e9e218c12bc8f97fcdb84596
+  checksum: 10c0/daf54347181d50ff6207a78f545bd1bea856505efa61a1bb29fc200b412fad84971c49e7d8a57e96a09bb6eab9625a6d6ad1d84884afa3a16041d5dba1b18b38
   languageName: node
   linkType: hard
 
