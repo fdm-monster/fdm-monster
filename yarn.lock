@@ -5094,9 +5094,9 @@ __metadata:
   linkType: hard
 
 "detect-libc@npm:^2.0.0":
-  version: 2.0.3
-  resolution: "detect-libc@npm:2.0.3"
-  checksum: 10c0/88095bda8f90220c95f162bf92cad70bd0e424913e655c20578600e35b91edc261af27531cf160a331e185c0ced93944bc7e09939143225f56312d7fd800fdb7
+  version: 2.0.4
+  resolution: "detect-libc@npm:2.0.4"
+  checksum: 10c0/c15541f836eba4b1f521e4eecc28eefefdbc10a94d3b8cb4c507689f332cc111babb95deda66f2de050b22122113189986d5190be97d51b5a2b23b938415e67c
   languageName: node
   linkType: hard
 
@@ -5707,13 +5707,13 @@ __metadata:
   linkType: hard
 
 "formidable@npm:^3.5.1":
-  version: 3.5.3
-  resolution: "formidable@npm:3.5.3"
+  version: 3.5.4
+  resolution: "formidable@npm:3.5.4"
   dependencies:
     "@paralleldrive/cuid2": "npm:^2.2.2"
     dezalgo: "npm:^1.0.4"
     once: "npm:^1.4.0"
-  checksum: 10c0/4e2732d3ed946dd972bc80ecba5c5a3709baa7d541583058c7e0a7344e64ced3b69f32813884a174855ad31f9ce978a6dc9fbf2578a1ed5e08691baf679266f4
+  checksum: 10c0/3a311ce57617eb8f532368e91c0f2bbfb299a0f1a35090e085bd6ca772298f196fbb0b66f0d4b5549d7bf3c5e1844439338d4402b7b6d1fedbe206ad44a931f8
   languageName: node
   linkType: hard
 
@@ -8019,9 +8019,9 @@ __metadata:
   linkType: hard
 
 "pg-protocol@npm:*":
-  version: 1.8.0
-  resolution: "pg-protocol@npm:1.8.0"
-  checksum: 10c0/2be784955599d84b564795952cee52cc2b8eab0be43f74fc1061506353801e282c1d52c9e0691a9b72092c1f3fde370e9b181e80fef6bb82a9b8d1618bfa91e6
+  version: 1.9.0
+  resolution: "pg-protocol@npm:1.9.0"
+  checksum: 10c0/c37e61d7fafa97f22eabf12de69863f42fdabb3671df9cc2623bd0ffd6bdedc212e7e8460ad2c721c8a08d8477b4f128a923bf2381905d68a23a532ec7517c77
   languageName: node
   linkType: hard
 
