@@ -2799,8 +2799,8 @@ __metadata:
   linkType: hard
 
 "@smithy/signature-v4@npm:^5.0.2":
-  version: 5.0.2
-  resolution: "@smithy/signature-v4@npm:5.0.2"
+  version: 5.1.0
+  resolution: "@smithy/signature-v4@npm:5.1.0"
   dependencies:
     "@smithy/is-array-buffer": "npm:^4.0.0"
     "@smithy/protocol-http": "npm:^5.1.0"
@@ -2810,7 +2810,7 @@ __metadata:
     "@smithy/util-uri-escape": "npm:^4.0.0"
     "@smithy/util-utf8": "npm:^4.0.0"
     tslib: "npm:^2.6.2"
-  checksum: 10c0/379b2bcd535cfcf68567b8931920eefd3ec30fc734369b5a1055792377a815cb7b6c7fc3a18567e6066d771ddfd0d06da8e45334a02bf86d69985d1923a11c29
+  checksum: 10c0/7f3aed4999b47f04485846a90a08d0863c8bf4201a38616faf4bcb3166892a5b2946e7d0f1d5dc068b667913713873e21ab8374d60c1ff02828972d8c9201282
   languageName: node
   linkType: hard
 
@@ -3596,13 +3596,13 @@ __metadata:
   linkType: hard
 
 "@types/pg@npm:*":
-  version: 8.11.13
-  resolution: "@types/pg@npm:8.11.13"
+  version: 8.11.14
+  resolution: "@types/pg@npm:8.11.14"
   dependencies:
     "@types/node": "npm:*"
     pg-protocol: "npm:*"
     pg-types: "npm:^4.0.1"
-  checksum: 10c0/a111989a223f21ff864e35150474409e9659766603e4f7a51f89ffc173292adcd895c1551f792aaf1cf94afe99e4bd1dbf7c740252c1dca2a5038f1fd2c6e0bd
+  checksum: 10c0/ad9be5f0215a337409d843b844c21af9a0073485125f32e91b1c19a3be233c7c8bfe641c761e91228a4b10e803f1ba4d3c0ed55dcd0ca1dd4f3a07ebd798347c
   languageName: node
   linkType: hard
 
@@ -5173,9 +5173,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.5.73":
-  version: 1.5.140
-  resolution: "electron-to-chromium@npm:1.5.140"
-  checksum: 10c0/cd0c5a3e0624592494e03b1ae28e04b0d4f8dec0e2ff8fc0f38dc8622fdf795811ef8abe41167f03380f969515c2f4f23297f6e1372ff36aad01c78446565e6d
+  version: 1.5.141
+  resolution: "electron-to-chromium@npm:1.5.141"
+  checksum: 10c0/3e17fecee4420cfa312f5c38333b9428dec4fae8ebcc54bf20754e781d7551adfa2cd3b96f597e8323f2ac015d6050e60cc311011084ecd61ec7aaeff1b67dcf
   languageName: node
   linkType: hard
 
@@ -8019,9 +8019,9 @@ __metadata:
   linkType: hard
 
 "pg-protocol@npm:*":
-  version: 1.9.0
-  resolution: "pg-protocol@npm:1.9.0"
-  checksum: 10c0/c37e61d7fafa97f22eabf12de69863f42fdabb3671df9cc2623bd0ffd6bdedc212e7e8460ad2c721c8a08d8477b4f128a923bf2381905d68a23a532ec7517c77
+  version: 1.9.5
+  resolution: "pg-protocol@npm:1.9.5"
+  checksum: 10c0/5cb3444cf973adadd22ee9ea26bb1674f0d980ef8f9c66d426bbe67fc9cb5f0ca4a204bf7e432b3ab2ab59ac8227f4b18ab3b2e64eaed537e037e916991c7319
   languageName: node
   linkType: hard
 
