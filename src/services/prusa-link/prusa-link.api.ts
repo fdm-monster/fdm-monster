@@ -8,7 +8,7 @@ import {
   PrinterType,
   PrusaLinkType,
 } from "@/services/printer-api.interface";
-import { AxiosPromise } from "axios";
+import { AxiosError, AxiosPromise } from "axios";
 import { LoginDto } from "../interfaces/login.dto";
 import { ServerConfigDto } from "../moonraker/dto/server/server-config.dto";
 import { SettingsDto } from "../octoprint/dto/settings/settings.dto";
@@ -18,6 +18,10 @@ import { PL_FileResponseDto } from "@/services/prusa-link/dto/file-response.dto"
 import { PL_StatusDto } from "@/services/prusa-link/dto/status.dto";
 import { PL_PrinterStateDto } from "@/services/prusa-link/dto/printer-state.dto";
 import { PL_JobStateDto } from "@/services/prusa-link/dto/job-state.dto";
+import { readFileSync } from "fs";
+import { uploadDoneEvent, uploadFailedEvent, uploadProgressEvent } from "@/constants/event.constants";
+import { ExternalServiceError } from "@/exceptions/runtime.exceptions";
+import EventEmitter2 from "eventemitter2";
 
 const defaultLog = { adapter: "prusa-link" };
 
@@ -32,11 +36,12 @@ export class PrusaLinkApi implements IPrinterApi {
 
   constructor(
     loggerFactory: ILoggerFactory,
+    private readonly eventEmitter2: EventEmitter2,
     private readonly httpClientFactory: HttpClientFactory,
     private printerLogin: LoginDto,
   ) {
     this.logger = loggerFactory(PrusaLinkApi.name);
-    this.logger.debug("Constructed", this.logMeta());
+    this.logger.debug("Constructed api client", this.logMeta());
   }
 
   get type(): PrinterType {
@@ -76,11 +81,13 @@ export class PrusaLinkApi implements IPrinterApi {
   }
 
   async getPrinterState(): Promise<PL_PrinterStateDto> {
+    // OctoPrint compatibility
     const response = await this.client.get<PL_PrinterStateDto>("/api/printer");
     return response.data;
   }
 
   async getJobState(): Promise<PL_JobStateDto> {
+    // OctoPrint compatibility
     const response = await this.client.get<PL_JobStateDto>("/api/job");
     return response.data;
   }
@@ -105,20 +112,35 @@ export class PrusaLinkApi implements IPrinterApi {
     throw new Error("Method not implemented.");
   }
 
-  startPrint(path: string): Promise<void> {
-    throw new Error("Method not implemented.");
+  async startPrint(path: string): Promise<void> {
+    await this.client.post<void>(`/api/v1/files/usb/${path}`);
   }
 
-  pausePrint(): Promise<void> {
-    throw new Error("Method not implemented.");
+  async pausePrint(): Promise<void> {
+    const jobId = await this.getCurrentJobId();
+    if (!jobId) {
+      this.logger.warn("Job pause command did not complete, job or job id not set");
+      return;
+    }
+    await this.client.put<void>(`/api/v1/job/${jobId}/pause`);
   }
 
-  resumePrint(): Promise<void> {
-    throw new Error("Method not implemented.");
+  async resumePrint(): Promise<void> {
+    const jobId = await this.getCurrentJobId();
+    if (!jobId) {
+      this.logger.warn("Job resume command did not complete, job or job id not set");
+      return;
+    }
+    await this.client.put<void>(`/api/v1/job/${jobId}/resume`);
   }
 
-  cancelPrint(): Promise<void> {
-    throw new Error("Method not implemented.");
+  async cancelPrint(): Promise<void> {
+    const jobId = await this.getCurrentJobId();
+    if (!jobId) {
+      this.logger.warn("Job cancel command did not complete, job or job id not set");
+      return;
+    }
+    await this.client.delete<void>(`/api/v1/job/${jobId}`);
   }
 
   quickStop(): Promise<void> {
@@ -149,8 +171,70 @@ export class PrusaLinkApi implements IPrinterApi {
     throw new Error("Method not implemented.");
   }
 
-  uploadFile(fileOrBuffer: Buffer | Express.Multer.File, uploadToken?: string): Promise<void> {
-    throw new Error("Method not implemented.");
+  async uploadFile(
+    multerFileOrBuffer: Buffer | Express.Multer.File,
+    progressToken?: string,
+  ): Promise<void> {
+    try {
+      let fileBuffer: Buffer;
+      const filename = (multerFileOrBuffer as Express.Multer.File).originalname;
+
+      // Get file buffer - either from buffer or from file path
+      if (Buffer.isBuffer(multerFileOrBuffer)) {
+        this.logger.log("Using file directly from memory buffer for upload");
+        fileBuffer = multerFileOrBuffer as Buffer;
+      } else {
+        const filePath = (multerFileOrBuffer as Express.Multer.File).path;
+        this.logger.log(`Reading file from disk for upload: ${filePath}`);
+        fileBuffer = readFileSync(filePath);
+      }
+
+      // Calculate content length
+      const contentLength = fileBuffer.length;
+
+      const response = await this.createClient((b) => {
+        b.withHeaders({
+          "Content-Length": contentLength.toString(),
+          // Compliance with other printer services
+          "Overwrite": "?1",
+          // Compliance with other printer services
+          "Print-After-Upload": "?1",
+        })
+          .withOnUploadProgress((p) => {
+            if (progressToken) {
+              this.eventEmitter2.emit(`${uploadProgressEvent(progressToken)}`, progressToken, p);
+            }
+          });
+      }).put(`/api/v1/files/usb/${filename}`, fileBuffer);
+
+      if (progressToken) {
+        this.eventEmitter2.emit(`${uploadDoneEvent(progressToken)}`, progressToken);
+      }
+
+      return response.data;
+    } catch (e: any) {
+      if (progressToken) {
+        this.eventEmitter2.emit(`${uploadFailedEvent(progressToken)}`, progressToken, (e as AxiosError)?.message);
+      }
+
+      let data;
+      try {
+        data = JSON.parse(e.response?.body);
+      } catch {
+        data = e.response?.body;
+      }
+
+      throw new ExternalServiceError(
+        {
+          error: e.message,
+          statusCode: e.response?.statusCode,
+          data,
+          success: false,
+          stack: e.stack,
+        },
+        "Prusa-Link",
+      );
+    }
   }
 
   deleteFile(path: string): Promise<void> {
@@ -169,14 +253,19 @@ export class PrusaLinkApi implements IPrinterApi {
     throw new Error("Method not implemented.");
   }
 
+  private async getCurrentJobId() {
+    const status = await this.getStatus();
+    return status.job?.id;
+  }
+
   private createClient(
     buildFluentOptions?: (base: PrusaLinkHttpClientBuilder) => void,
   ) {
     const builder = new PrusaLinkHttpClientBuilder();
 
-    this.logger.debug("Create client", this.logMeta());
-
     return this.httpClientFactory.createClientWithBaseUrl(builder, this.printerLogin.printerURL, (b) => {
+      this.logger.debug("Building API client", this.logMeta());
+
       // Set up digest auth with the credentials and an error handler
       b.withDigestAuth(
         this.printerLogin.username,
@@ -185,7 +274,7 @@ export class PrusaLinkApi implements IPrinterApi {
           this.logger.error("Authentication error occurred", error);
         },
         (error, attemptCount) => {
-          this.logger.log(`Authentication attempt count ${attemptCount} for method ${error.config?.method} path ${error.config?.url}`, this.logMeta());
+          this.logger.log(`Authentication attempt count ${attemptCount} for method ${error.config?.method?.toUpperCase()} path ${error.config?.url}`, this.logMeta());
         },
         (authHeader) => {
           this.logger.debug("Authentication successful, saving auth header for later reuse", this.logMeta());
@@ -194,8 +283,11 @@ export class PrusaLinkApi implements IPrinterApi {
       );
 
       if (this.authHeader) {
-        this.logger.debug("Reusing stored auth header", this.logMeta());
         b.withAuthHeader(this.authHeader);
+      }
+
+      if (buildFluentOptions && typeof buildFluentOptions === "function") {
+        buildFluentOptions(b);
       }
     });
   }

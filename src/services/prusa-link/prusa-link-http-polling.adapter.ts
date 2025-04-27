@@ -77,6 +77,7 @@ export class PrusaLinkHttpPollingAdapter implements IWebsocketAdapter {
   }
 
   close(): void {
+    this.logger.debug("Polling adapter attempting stoppage.", this.logMeta());
     this.stopPolling();
   }
 
@@ -92,9 +93,12 @@ export class PrusaLinkHttpPollingAdapter implements IWebsocketAdapter {
   startPolling() {
     this.stopPolling(); // Ensure no duplicate intervals exist
 
+    this.logger.debug("Polling adapter starting, setting interval.", this.logMeta());
+
     this.refreshPrinterCurrentInterval = setInterval(async () => {
       if (!this.printerId) {
         this.logger.warn("Printer ID is not set, skipping status check.", this.logMeta());
+        this.stopPolling();
         return;
       }
 
@@ -126,6 +130,7 @@ export class PrusaLinkHttpPollingAdapter implements IWebsocketAdapter {
 
   stopPolling() {
     if (this.refreshPrinterCurrentInterval) {
+      this.logger.debug("Polling adapter stopping, clearing interval.", this.logMeta());
       clearInterval(this.refreshPrinterCurrentInterval);
       this.refreshPrinterCurrentInterval = undefined;
       this.socketState = "closed";

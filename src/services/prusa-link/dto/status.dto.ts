@@ -7,6 +7,7 @@ export interface PL_StatusDto {
 }
 
 export interface PL_JobDto {
+  // Id required to execute pause or stop
   id: number;
   progress: number;
   time_remaining: number;

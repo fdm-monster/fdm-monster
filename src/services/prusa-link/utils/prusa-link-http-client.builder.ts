@@ -35,10 +35,12 @@ export class PrusaLinkHttpClientBuilder extends DefaultHttpClientBuilder {
       axiosInstance.interceptors.request.use(async (config) => {
         // If we have auth info, add the digest header
         if (this.authHeaderContext) {
-          config.headers[authorizationHeaderKey] = this.generateDigestHeader(
+          const computedDigestHeader = this.generateDigestHeader(
             config.method?.toUpperCase() ?? "GET",
             config.url ?? "/",
           );
+
+          config.headers[authorizationHeaderKey] = computedDigestHeader;
         }
         return config;
       });
@@ -52,8 +54,8 @@ export class PrusaLinkHttpClientBuilder extends DefaultHttpClientBuilder {
           // If we get a 401 and have credentials but no auth info or retried less than once
           if (
             error.response?.status === 401 &&
-            this.username &&
-            this.password &&
+            this.username?.length &&
+            this.password?.length &&
             (!originalRequest._retryCount || originalRequest._retryCount < this.maxRetries)
           ) {
             // Extract WWW-Authenticate header
