@@ -48,8 +48,6 @@ export class SocketIoTask {
       trackedUploads,
     };
 
-    this.logger.debug("Sending SocketIO printerEvents", printerEvents)
-
     this.socketIoGateway.send(IO_MESSAGES.LegacyUpdate, socketIoData);
   }
 }
