@@ -4,7 +4,7 @@ import { createTestPrinterSchema } from "./validation/create-test-printer.valida
 import { octoPrintEvent, WsMessage } from "@/services/octoprint/octoprint-websocket.adapter";
 import { AppConstants } from "@/server.constants";
 import { SocketIoGateway } from "@/state/socket-io.gateway";
-import { SocketFactory } from "@/services/socket.factory";
+import { PrinterAdapterFactory } from "@/services/printer-adapter.factory";
 import EventEmitter2 from "eventemitter2";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
@@ -17,17 +17,17 @@ import { printerEvents } from "@/constants/event.constants";
 import { OctoPrintEventDto } from "@/services/octoprint/dto/octoprint-event.dto";
 import { z } from "zod";
 
-export class TestPrinterSocketStore {
+export class TestPrinterAdapterStore {
   testSocket?: IWebsocketAdapter;
   private readonly logger: LoggerService;
 
   constructor(
     loggerFactory: ILoggerFactory,
-    private readonly socketFactory: SocketFactory,
+    private readonly printerAdapterFactory: PrinterAdapterFactory,
     private readonly socketIoGateway: SocketIoGateway,
     private readonly eventEmitter2: EventEmitter2,
   ) {
-    this.logger = loggerFactory(TestPrinterSocketStore.name);
+    this.logger = loggerFactory(TestPrinterAdapterStore.name);
   }
 
   async setupTestPrinter(correlationToken: string, printer: z.infer<typeof createTestPrinterSchema>): Promise<void> {
@@ -40,7 +40,7 @@ export class TestPrinterSocketStore {
     validatedData.enabled = true;
 
     // Create a new socket if it doesn't exist
-    this.testSocket = this.socketFactory.createInstance(printer.printerType);
+    this.testSocket = this.printerAdapterFactory.createInstance(printer.printerType);
 
     // Reset the socket credentials before (re-)connecting
     this.testSocket.registerCredentials({
@@ -82,7 +82,7 @@ export class TestPrinterSocketStore {
 
     try {
       this.logger.log("Test API calls for authentication and session");
-      await this.testSocket.setupSocketSession();
+      await this.testSocket.initSession();
 
       this.logger.log("Test socket connection started");
       const promise = new Promise(async (resolve, reject) => {
