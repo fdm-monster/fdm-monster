@@ -119,7 +119,7 @@ export function setupEnvConfig(skipDotEnv = false) {
   ensureMongoDbConnectionStringSet();
   ensurePortSet();
 
-// Optional: Enable collection of default metrics like memory, CPU, etc.
+  // Optional: Enable collection of default metrics like memory, CPU, etc.
   if (process.env[AppConstants.ENABLE_PROMETHEUS_METRICS]) {
     collectDefaultMetrics({ register });
     register.removeSingleMetric("nodejs_version_info");
