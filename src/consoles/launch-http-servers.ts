@@ -8,7 +8,7 @@ console.log(`Starting ${instanceCount} fake OctoPrint servers...`);
 
 for (let i = 0; i < instanceCount; i++) {
   const port = startPort + i;
-  const process = spawn("node", [path.join(__dirname, "./http-file-receiver.console.js"), port.toString()]);
+  const process = spawn("node", [path.join(__dirname, "./mock-octoprint.server.js"), port.toString()]);
 
   process.stdout.on("data", (data) => {
     console.log(`[Server ${i + 1} - Port ${port}]: ${data.toString().trim()}`);

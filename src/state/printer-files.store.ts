@@ -21,18 +21,18 @@ export class PrinterFilesStore {
 
   async loadFilesStore(): Promise<void> {
     const printers = await this.printerCache.listCachedPrinters(true);
-    for (const printer of printers) {
+    for (const printer of printers.filter(p => p.enabled)) {
       try {
-        const printerFiles = await this.loadFiles(printer.id, false);
+        const printerFiles = await this.loadFiles(printer.id);
         this.fileCache.cachePrinterFiles(printer.id, printerFiles);
       } catch (e) {
         captureException(e);
-        this.logger.error("Files store failed to load file list for printer");
+        this.logger.error(`Files store failed to load file list for printer ${printer.name}`);
       }
     }
   }
 
-  async loadFiles(printerId: IdType, recursive: boolean = false): Promise<any> {
+  async loadFiles(printerId: IdType): Promise<any> {
     const loginDto = await this.printerCache.getLoginDtoAsync(printerId);
     const printerApi = this.printerApiFactory.getScopedPrinter(loginDto);
     const files = await printerApi.getFiles();

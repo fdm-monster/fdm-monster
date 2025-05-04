@@ -49,6 +49,7 @@ export class SettingsStore {
         registration: settings[serverSettingsKey].registration,
         sentryDiagnosticsEnabled: settings[serverSettingsKey].sentryDiagnosticsEnabled,
         experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
+        experimentalPrusaLinkSupport: settings[serverSettingsKey].experimentalPrusaLinkSupport,
         experimentalTypeormSupport: this.isTypeormMode,
         experimentalClientSupport: settings[serverSettingsKey].experimentalClientSupport,
         experimentalThumbnailSupport: settings[serverSettingsKey].experimentalThumbnailSupport,
@@ -255,6 +256,13 @@ export class SettingsStore {
     this.throwIfSettingsUnset();
     this.settings![serverSettingsKey].experimentalThumbnailSupport = experimentalThumbnailSupport;
     this.settings = await this.settingsService.updateServerSettings(this.settings![serverSettingsKey]);
+     return this.getSettings();
+  }
+  
+  async setExperimentalPrusaLinkSupport(experimentalPrusaLinkSupport: boolean) {
+    this.throwIfSettingsUnset();
+    this.settings![serverSettingsKey].experimentalPrusaLinkSupport = experimentalPrusaLinkSupport;
+    this.settings = await this.settingsService.updateServerSettings(this.settings![serverSettingsKey]);    
     return this.getSettings();
   }
 

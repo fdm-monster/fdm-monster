@@ -9,6 +9,27 @@ import { getPassportJwtOptions, verifyUserCallback } from "@/middleware/passport
 import { IConfigService } from "@/services/core/config.service";
 import { IUserService } from "@/services/interfaces/user-service.interface";
 import { authorize } from "@/middleware/socketio.middleware";
+import { Counter, Gauge } from "prom-client";
+
+const socketIoGatewaySessions = new Gauge({
+  name: "socketio_gateway_sessions",
+  help: "Gateway active sessions",
+});
+
+const socketIoGatewayDisconnects = new Counter({
+  name: "socketio_gateway_disconnects",
+  help: "Gateway connections closed",
+});
+
+const socketIoGatewayMessagesSent = new Counter({
+  name: "socketio_messages_sent",
+  help: "Gateway messages sent",
+});
+
+const socketIoGatewayMessageSentSize = new Gauge({
+  name: "socketio_message_size",
+  help: "Gateway message sent size",
+});
 
 export class SocketIoGateway {
   logger: LoggerService;
@@ -34,32 +55,36 @@ export class SocketIoGateway {
     );
     this.io.use(authorize(this.settingsStore, opts, verifyUserCallback(this.userService)));
     this.io.on("connection", (socket) => this.onConnect.bind(this)(socket));
+
   }
 
   onConnect(socket: Socket) {
-    this.logger.debug("SocketIO Client connected", socket.id);
-
+    this.logger.debug("SocketIO Client connected", { socketId: socket.id });
     this.eventEmitter2.emit(socketIoConnectedEvent, socket.id);
+    socketIoGatewaySessions.inc();
 
     socket.on("disconnect", () => {
-      this.logger.debug("SocketIO Client disconnected", socket.id);
+      this.logger.debug("SocketIO Client disconnected", { socketId: socket.id });
+      socketIoGatewaySessions.dec(1);
+      socketIoGatewayDisconnects.inc();
     });
   }
 
   send<T>(event: string, data: T) {
     if (!this.io) {
-      this.logger.debug("No io server setup yet");
+      this.logger.debug(`Cant send event ${event}, socketio gateway must be created first`);
       return;
     }
 
     this.io.emit(event, data);
+    socketIoGatewayMessagesSent.inc();
+
+    const payload = JSON.stringify(data);
+    const sizeInBytes = Buffer.byteLength(payload);
+    socketIoGatewayMessageSentSize.set(sizeInBytes);
   }
 }
 
 export const IO_MESSAGES = {
   LegacyUpdate: "legacy-update",
-  LegacyPrinterTest: "legacy-printer-test",
-  CompletionEvent: "completion-event",
-  HostState: "host-state",
-  ApiAccessibility: "api-accessibility",
 };

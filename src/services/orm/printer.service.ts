@@ -23,8 +23,7 @@ import { z } from "zod";
 
 export class PrinterService
   extends BaseService(Printer, PrinterDto<SqliteIdType>, CreatePrinterDto)
-  implements IPrinterService<SqliteIdType, Printer>
-{
+  implements IPrinterService<SqliteIdType, Printer> {
   private readonly logger: LoggerService;
 
   constructor(
@@ -44,6 +43,8 @@ export class PrinterService
       disabledReason: entity.disabledReason,
       dateAdded: entity.dateAdded,
       apiKey: entity.apiKey,
+      username: entity.username,
+      password: entity.password,
       printerURL: entity.printerURL,
       printerType: entity.printerType as PrinterType,
     };
@@ -76,7 +77,11 @@ export class PrinterService
       partial.printerURL = normalizeUrl(partial.printerURL, { defaultProtocol: defaultHttpProtocol });
     }
     Object.assign(printer, partial);
-    const { printerURL, apiKey, enabled, name, printerType } = await validateInput(printer, createPrinterSchema);
+    const {
+      printerURL, apiKey, enabled, name, printerType,
+      password,
+      username,
+    } = await validateInput(printer, createPrinterSchema);
 
     const updatedPrinter = await super.update(printerId, {
       printerURL,
@@ -84,6 +89,8 @@ export class PrinterService
       apiKey,
       enabled,
       printerType,
+      password,
+      username,
     });
     this.eventEmitter2.emit(printerEvents.printerUpdated, { printer } satisfies PrinterUpdatedEvent<number>);
     return updatedPrinter;

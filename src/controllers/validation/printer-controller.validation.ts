@@ -3,8 +3,10 @@ import {
   printerApiKeyValidator,
   printerDisabledReasonValidator,
   printerEnabledValidator,
+  printerPasswordValidator,
   printerTypeValidator,
   printerUrlValidator,
+  printerUsernameValidator,
   refineApiKeyValidator,
 } from "@/services/validators/printer-service.validation";
 
@@ -21,6 +23,8 @@ export const testPrinterApiSchema = z
     printerURL: printerUrlValidator,
     printerType: printerTypeValidator,
     apiKey: printerApiKeyValidator,
+    username: printerUsernameValidator.optional(),
+    password: printerPasswordValidator.optional(),
   })
   .superRefine(refineApiKeyValidator);
 
@@ -30,10 +34,4 @@ export const updatePrinterDisabledReasonSchema = z.object({
 
 export const updatePrinterEnabledSchema = z.object({
   enabled: printerEnabledValidator,
-});
-
-export const updatePrinterConnectionSettingSchema = z.object({
-  printerType: printerTypeValidator,
-  printerURL: printerUrlValidator,
-  apiKey: printerApiKeyValidator,
 });

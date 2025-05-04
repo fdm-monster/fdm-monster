@@ -59,34 +59,28 @@ export class PrinterSocketStore {
     return socketStatesById;
   }
 
-  /**
-   * Load all printers into cache, and create a new socket for each printer (if enabled)
-   */
   async loadPrinterSockets() {
     await this.printerCache.loadCache();
 
-    const printerDocs = await this.printerCache.listCachedPrinters(false);
+    const printerDtoList = await this.printerCache.listCachedPrinters(false);
     this.printerSocketAdaptersById = {};
-    for (const doc of printerDocs) {
+    for (const printerDto of printerDtoList) {
       try {
-        this.handlePrinterCreated({ printer: doc });
+        this.handlePrinterCreated({ printer: printerDto });
       } catch (e) {
         captureException(e);
-        this.logger.error("PrinterSocketStore failed to construct new OctoPrint socket.", errorSummary(e));
+        this.logger.error("PrinterSocketStore failed to construct new socket.", errorSummary(e));
       }
     }
 
-    this.logger.log(`Loaded ${Object.keys(this.printerSocketAdaptersById).length} printer OctoPrint sockets`);
+    this.logger.log(`Loaded ${Object.keys(this.printerSocketAdaptersById).length} printer sockets`);
   }
 
   listPrinterSockets() {
     return Object.values(this.printerSocketAdaptersById);
   }
 
-  /**
-   * Reconnect the OctoPrint Websocket connection
-   */
-  reconnectOctoPrint(id: IdType) {
+  reconnectPrinterAdapter(id: IdType) {
     const socket = this.getPrinterSocket(id);
     if (!socket) return;
 
@@ -178,6 +172,8 @@ export class PrinterSocketStore {
       printerId: printer.id.toString(),
       loginDto: {
         apiKey: printer.apiKey,
+        username: printer.username,
+        password: printer.password,
         printerURL: printer.printerURL,
         printerType: printer.printerType,
       },

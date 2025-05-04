@@ -37,6 +37,7 @@ export const DITokens = {
   permissionService: "permissionService",
   jwtService: "jwtService",
   roleService: "roleService",
+  prusaLinkApi: "prusaLinkApi",
   octoprintApi: "octoprintApi",
   octoprintClient: "octoprintClient",
   moonrakerApi: "moonrakerApi",
@@ -55,6 +56,7 @@ export const DITokens = {
   printerSocketStore: "printerSocketStore",
   testPrinterSocketStore: "testPrinterSocketStore",
   printerFilesStore: "printerFilesStore",
+  prusaLinkPollingAdapter: "prusaLinkPollingAdapter",
   octoPrintSockIoAdapter: "octoPrintSockIoAdapter",
   moonrakerWebsocketAdapter: "moonrakerWebsocketAdapter",
   // Caches

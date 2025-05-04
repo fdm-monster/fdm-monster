@@ -1,5 +1,5 @@
 import { AwilixContainer } from "awilix";
-import { TaskManagerService } from "@/services/core/task-manager.service";
+import { TaskManagerService } from "@/services/task-manager.service";
 import { configureContainer } from "@/container";
 import { DITokens } from "@/container.tokens";
 import { JobValidationException } from "@/exceptions/job.exceptions";

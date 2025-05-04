@@ -8,14 +8,15 @@ import { Flags } from "@/services/moonraker/dto/octoprint-compat/api-printer.dto
 
 export const OctoprintType = 0;
 export const MoonrakerType = 1;
-export const PrinterTypes = [OctoprintType, MoonrakerType] as const;
+export const PrusaLinkType = 2;
 
 export enum PrinterTypesEnum {
   Octoprint = 0,
   Moonraker = 1,
+  PrusaLink = 2
 }
 
-export type PrinterType = typeof OctoprintType | typeof MoonrakerType;
+export type PrinterType = typeof OctoprintType | typeof MoonrakerType | typeof PrusaLinkType;
 
 export interface FdmCurrentMessageDto {
   progress: {
@@ -35,7 +36,6 @@ export interface FdmCurrentMessageDto {
   }
 }
 
-
 export interface StatusFlags {
   connected: boolean;
   operational: boolean;
@@ -48,15 +48,8 @@ export interface StatusFlags {
 export interface FileDto {
   path: string;
   size: number;
-  date: number;
+  date: number | null;
 }
-
-export const capabilities = {
-  // Could be function names, or maybe a specification for each function specifically?
-  startPrint: "startPrint",
-};
-
-export type Capability = keyof typeof capabilities;
 
 export enum ReprintState {
   PrinterNotAvailable = 0,
@@ -100,12 +93,6 @@ export interface IPrinterApi {
   cancelPrint(): Promise<void>;
 
   quickStop(): Promise<void>;
-
-  // Subsetting of OctoPrint
-  // getName(): string;
-  // isCapable(capability: Capability): boolean;
-  // getStatus(): string;
-  // getStatusFlags(): StatusFlags;
 
   sendGcode(script: string): Promise<void>;
 

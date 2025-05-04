@@ -3,7 +3,7 @@ import { fetchMongoDBConnectionString, runMigrations } from "@/server.env";
 import { DITokens } from "@/container.tokens";
 import { AppConstants } from "@/server.constants";
 import { LoggerService } from "@/handlers/logger";
-import { TaskManagerService } from "@/services/core/task-manager.service";
+import { TaskManagerService } from "@/services/task-manager.service";
 import { ServerTasks } from "@/tasks";
 import { MulterService } from "@/services/core/multer.service";
 import { SettingsStore } from "@/state/settings.store";
@@ -17,8 +17,9 @@ import { UserService } from "@/services/mongoose/user.service";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
+import { TaskService } from "@/services/interfaces/task.interfaces";
 
-export class BootTask {
+export class BootTask implements TaskService {
   logger: LoggerService;
 
   constructor(

@@ -42,6 +42,8 @@ export class PrinterService implements IPrinterService<MongoIdType> {
       disabledReason: entity.disabledReason,
       dateAdded: entity.dateAdded,
       apiKey: entity.apiKey,
+      username: entity.username,
+      password: entity.password,
       printerURL: entity.printerURL,
       printerType: entity.printerType,
     };
@@ -85,10 +87,20 @@ export class PrinterService implements IPrinterService<MongoIdType> {
   async update(printerId: MongoIdType, updateData: z.infer<typeof createPrinterSchema>) {
     const printer = await this.get(printerId);
     updateData.printerURL = normalizeUrl(updateData.printerURL, { defaultProtocol: defaultHttpProtocol });
-    const { printerURL, apiKey, enabled, name, printerType } = await validateInput(updateData, createPrinterSchema);
+    const {
+      printerURL,
+      apiKey,
+      username,
+      password,
+      enabled,
+      name,
+      printerType,
+    } = await validateInput(updateData, createPrinterSchema);
 
     printer.printerURL = printerURL;
     printer.apiKey = apiKey;
+    printer.username = username;
+    printer.password = password;
     if (enabled !== undefined) {
       printer.enabled = enabled;
     }
@@ -167,9 +179,9 @@ export class PrinterService implements IPrinterService<MongoIdType> {
   async updateEnabled(printerId: MongoIdType, enabled: boolean) {
     const update = enabled
       ? {
-          enabled,
-          disabledReason: null,
-        }
+        enabled,
+        disabledReason: null,
+      }
       : { enabled };
 
     await validateInput(update, updatePrinterEnabledSchema);

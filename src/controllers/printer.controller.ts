@@ -5,7 +5,6 @@ import {
   feedRateSchema,
   flowRateSchema,
   testPrinterApiSchema,
-  updatePrinterConnectionSettingSchema,
   updatePrinterDisabledReasonSchema,
   updatePrinterEnabledSchema,
 } from "./validation/printer-controller.validation";
@@ -138,7 +137,7 @@ export class PrinterController {
   @route("/:id/refresh-socket")
   async refreshPrinterSocket(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
-    this.printerSocketStore.reconnectOctoPrint(currentPrinterId);
+    this.printerSocketStore.reconnectPrinterAdapter(currentPrinterId);
     await this.printerEventsCache.deletePrinterSocketEvents(currentPrinterId);
     res.send({});
   }
@@ -248,7 +247,7 @@ export class PrinterController {
   }
 
   private async testPrintApiConnection(inputLoginDto: LoginDto) {
-    await validateInput(inputLoginDto, updatePrinterConnectionSettingSchema);
+    await validateInput(inputLoginDto, testPrinterApiSchema);
     try {
       if (this.printerApi) {
         await this.printerApi.getVersion();

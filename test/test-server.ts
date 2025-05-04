@@ -7,7 +7,7 @@ import supertest, { Test } from "supertest";
 import { Express } from "express";
 import { AppConstants } from "@/server.constants";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
-import { TaskManagerService } from "@/services/core/task-manager.service";
+import { TaskManagerService } from "@/services/task-manager.service";
 import TestAgent from "supertest/lib/agent";
 import { SettingsStore } from "@/state/settings.store";
 

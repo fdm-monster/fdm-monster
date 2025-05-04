@@ -2,14 +2,13 @@ import { AppConstants } from "@/server.constants";
 import { CloseEvent, Data, ErrorEvent, Event as WsEvent, WebSocket } from "ws";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
-import { z } from "zod";
 
 export type WsProtocol = "ws" | "wss";
 
 export abstract class WebsocketAdapter {
   socket?: WebSocket;
-  eventEmittingAllowed: boolean = true;
   protected logger: LoggerService;
+  eventEmittingAllowed: boolean = true;
 
   constructor(loggerFactory: ILoggerFactory) {
     this.logger = loggerFactory(WebsocketAdapter.name);

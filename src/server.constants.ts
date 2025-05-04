@@ -71,7 +71,7 @@ export const AppConstants = {
   orgName: "fdm-monster",
   // Wizard version changes will trigger a re-run of the wizard
   currentWizardVersion: 1,
-  defaultClientMinimum: "1.10.0",
+  defaultClientMinimum: "1.10.1",
 
   influxUrl: "INFLUX_URL",
   influxToken: "INFLUX_TOKEN",
@@ -105,4 +105,9 @@ export const AppConstants = {
 
   ENABLE_EXPERIMENTAL_TYPEORM: "ENABLE_EXPERIMENTAL_TYPEORM",
   enableExperimentalTypeormDefault: "false",
+  ENABLE_PROMETHEUS_METRICS: "ENABLE_PROMETHEUS_METRICS",
+  ENABLE_LOKI_LOGGING: "ENABLE_LOKI_LOGGING",
+  LOKI_ADDRESS: "LOKI_ADDRESS",
+  LOKI_TIMEOUT_SECONDS: "LOKI_TIMEOUT_SECONDS",
+  LOKI_INTERVAL: "LOKI_INTERVAL"
 };

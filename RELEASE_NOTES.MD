@@ -1,5 +1,10 @@
 # Develop
 
+## Features
+- Introduce PrusaLink adapter for limited printer support for these printers: MK3S(+) (needs PrusaLink extension with Raspberry Pi), Mini(+), MK4(S), XL, Core One
+- Add opt-in Prometheus integration (still experimental)
+- Add opt-in Loki integration (still experimental)
+
 ## Chores
 
 - Remove unused code for OctoPrint plugin support (this work needs to go through triage again)
@@ -41,6 +46,7 @@
 - Query parameter `forceSave` in printer create/update API was used incorrectly (flipped around)
 - Fixed all typescript issues
 - Server settings would not always migrate properly
+- Printer files store will not cache files of disabled printers
 
 ## Fixes
 
@@ -198,7 +204,7 @@
 - Used attributes for PrinterFilesController
 - Renamed OctoPrintApiService to OctoprintClient
 - Switch to 1.6.x client UI version range
-- Update Octoprint websocket with refresh interval, defaulting to 10sec. This loop will keep refresh attempts internal to the Websocket adapter of each service type (Octoprint, Moonraker, Bambu, etc).
+- Update Octoprint websocket with refresh interval, defaulting to 10sec. This loop will keep refresh attempts internal to the Websocket adapter of each service type (Octoprint, Moonraker, etc).
 
 ## Fixes:
 

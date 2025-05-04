@@ -9,7 +9,7 @@ import { AppConstants } from "@/server.constants";
 import { httpToWsUrl } from "@/utils/url.utils";
 import { OctoPrintEventDto } from "@/services/octoprint/dto/octoprint-event.dto";
 import { WsMessage } from "@/services/octoprint/octoprint-websocket.adapter";
-import { moonrakerEvent } from "@/services/moonraker/constants/websocket.constants";
+import { moonrakerEvent } from "@/services/moonraker/constants/moonraker.constants";
 import { SOCKET_STATE, SocketState } from "@/shared/dtos/socket-state.type";
 import { API_STATE, ApiState } from "@/shared/dtos/api-state.type";
 import { LoginDto } from "@/services/interfaces/login.dto";

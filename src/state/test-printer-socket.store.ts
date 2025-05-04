@@ -12,7 +12,7 @@ import { errorSummary } from "@/utils/error.utils";
 import { captureException } from "@sentry/node";
 import { SOCKET_STATE } from "@/shared/dtos/socket-state.type";
 import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
-import { moonrakerEvent } from "@/services/moonraker/constants/websocket.constants";
+import { moonrakerEvent } from "@/services/moonraker/constants/moonraker.constants";
 import { printerEvents } from "@/constants/event.constants";
 import { OctoPrintEventDto } from "@/services/octoprint/dto/octoprint-event.dto";
 import { z } from "zod";
@@ -47,6 +47,8 @@ export class TestPrinterSocketStore {
       printerId: correlationToken,
       loginDto: {
         apiKey: printer.apiKey,
+        username: printer.username,
+        password: printer.password,
         printerURL: printer.printerURL,
         printerType: printer.printerType,
       },

@@ -1,15 +1,16 @@
-import { TASK_PRESETS as TaskPresets, TimingPreset } from "./task.presets";
+import { TASK_PRESETS as TaskPresets } from "./task.presets";
 import { DITokens } from "./container.tokens";
+import { TimingPreset } from "@/services/interfaces/task.interfaces";
 
 /**
  * Register a task with a preset and timing (run immediate does not retry in case of failure)
  */
 export function registerTask(task: any, preset: TimingPreset, milliseconds = 0, runImmediately = false) {
   let timingPreset = { ...preset };
-  timingPreset.milliseconds = preset.milliseconds || milliseconds;
-  timingPreset.runImmediately = runImmediately || false;
+  timingPreset.milliseconds = preset.milliseconds ?? milliseconds;
+  timingPreset.runImmediately = runImmediately ?? false;
   return {
-    id: task.name || task,
+    id: task.name ?? task,
     task,
     preset: timingPreset,
   };

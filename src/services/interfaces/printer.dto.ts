@@ -13,6 +13,8 @@ export class PrinterDto<KeyType> extends IdDto<KeyType> {
   disabledReason?: string;
   dateAdded?: number;
   apiKey?: string;
+  username?: string;
+  password?: string;
   printerURL: string;
   printerType: number;
 }

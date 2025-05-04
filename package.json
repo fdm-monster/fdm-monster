@@ -40,7 +40,7 @@
     "test:cov-sqlite": "cross-env MONGODB_MODE=false jest --forceExit --coverage  --maxConcurrency=8 --runInBand ",
     "cov:show": "./coverage/lcov-report/index.html",
     "torm": "ts-node --swc -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
-    "typeorm:generate": "yarn torm migration:generate -d src/data-source.ts --pretty src/migrations/RemovePrinterFile",
+    "typeorm:generate": "yarn torm migration:generate -d src/data-source.ts --pretty src/migrations/AddPrinterUsernamePassword",
     "typeorm:migrate": "yarn torm migration:run -d src/data-source.ts",
     "typeorm:revert": "yarn torm migration:revert -d src/data-source.ts"
   },
@@ -48,6 +48,8 @@
     "fdm-monster",
     "fdm-connector",
     "octoprint",
+    "moonraker",
+    "prusalink",
     "fdm",
     "3d printing",
     "pi",
@@ -89,6 +91,7 @@
     "passport": "0.7.0",
     "passport-anonymous": "1.0.1",
     "passport-jwt": "4.0.1",
+    "prom-client": "15.1.3",
     "reflect-metadata": "0.2.2",
     "semver": "7.7.1",
     "socket.io": "4.8.1",
@@ -96,6 +99,7 @@
     "typeorm": "0.3.22",
     "uuid": "11.1.0",
     "winston": "3.17.0",
+    "winston-loki": "6.1.3",
     "ws": "8.18.2",
     "zod": "3.24.3"
   },

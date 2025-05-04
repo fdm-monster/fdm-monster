@@ -2,9 +2,9 @@ import { AsyncTask, SimpleIntervalJob, ToadScheduler } from "toad-scheduler";
 import { AwilixResolutionError } from "awilix";
 import { JobValidationException } from "@/exceptions/job.exceptions";
 import { LoggerService } from "@/handlers/logger";
-import { CradleService } from "@/services/cradle.service";
+import { CradleService } from "@/services/core/cradle.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
-import { TaskRegistration, TaskSchedulerOptions, TaskService } from "../interfaces/task.interfaces";
+import { TaskRegistration, TaskSchedulerOptions, TaskService } from "./interfaces/task.interfaces";
 import { DITokens } from "@/container.tokens";
 import { errorSummary } from "@/utils/error.utils";
 
