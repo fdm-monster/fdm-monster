@@ -224,7 +224,7 @@ export class PrusaLinkApi implements IPrinterApi {
               this.eventEmitter2.emit(`${uploadProgressEvent(progressToken)}`, progressToken, p);
             }
           });
-      }).put(`/api/v1/files/usb/${filename}`, fileBuffer);
+      }).put(`/api/v1/files/usb/${encodeURIComponent(filename)}`, fileBuffer);
 
       if (progressToken) {
         this.eventEmitter2.emit(`${uploadDoneEvent(progressToken)}`, progressToken);
