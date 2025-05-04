@@ -1,5 +1,10 @@
 # Develop
 
+## Features
+- Introduce PrusaLink adapter for limited printer support for these printers: MK3S(+) (needs PrusaLink extension with Raspberry Pi), Mini(+), MK4(S), XL, Core One
+- Add opt-in Prometheus integration (still experimental)
+- Add opt-in Loki integration (still experimental)
+
 ## Chores
 
 - Remove unused code for OctoPrint plugin support (this work needs to go through triage again)
