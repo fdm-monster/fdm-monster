@@ -22,6 +22,7 @@ import { readFileSync } from "fs";
 import { uploadDoneEvent, uploadFailedEvent, uploadProgressEvent } from "@/constants/event.constants";
 import { ExternalServiceError } from "@/exceptions/runtime.exceptions";
 import EventEmitter2 from "eventemitter2";
+import { PL_FileDto } from "@/services/prusa-link/dto/file.dto";
 
 const defaultLog = { adapter: "prusa-link" };
 
@@ -73,6 +74,16 @@ export class PrusaLinkApi implements IPrinterApi {
             size: -1,
           } as FileDto),
       );
+  }
+
+  async getFile(path: string): Promise<FileDto> {
+    const response = await this.getFileRaw(path);
+
+    return {
+      path: response.data.name,
+      size: response.data.size,
+      date: null,
+    };
   }
 
   async getStatus(): Promise<PL_StatusDto> {
@@ -159,16 +170,24 @@ export class PrusaLinkApi implements IPrinterApi {
     throw new Error("Method not implemented.");
   }
 
-  getFile(path: string): Promise<FileDto> {
-    throw new Error("Method not implemented.");
+  async downloadFile(path: string): AxiosPromise<NodeJS.ReadableStream> {
+    const fileReference = await this.getFileRaw(path);
+    const pathUrl = fileReference.data.refs.download;
+
+    return await this.client.get(pathUrl, {
+      responseType: "stream",
+    });
   }
 
-  downloadFile(path: string): AxiosPromise<NodeJS.ReadableStream> {
-    throw new Error("Method not implemented.");
-  }
+  async getFileChunk(path: string, startBytes: number, endBytes: number): AxiosPromise<string> {
+    const fileReference = await this.getFileRaw(path);
+    const pathUrl = fileReference.data.refs.download;
 
-  getFileChunk(path: string, startBytes: number, endBytes: number): AxiosPromise<string> {
-    throw new Error("Method not implemented.");
+    return await this.createClient((o) =>
+      o.withHeaders({
+        Range: `bytes=${startBytes}-${endBytes}`,
+      }),
+    ).get<string>(pathUrl);
   }
 
   async uploadFile(
@@ -251,6 +270,10 @@ export class PrusaLinkApi implements IPrinterApi {
 
   getReprintState(): Promise<PartialReprintFileDto> {
     throw new Error("Method not implemented.");
+  }
+
+  private getFileRaw(path: string) {
+    return this.client.get<PL_FileDto>(`/api/v1/files/usb/${path}`);
   }
 
   private async getCurrentJobId() {

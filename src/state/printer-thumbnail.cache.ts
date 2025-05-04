@@ -193,7 +193,6 @@ export class PrinterThumbnailCache extends KeyDiffCache<CachedPrinterThumbnail> 
     while (lines.length <= numberOfLines && (fromEnd ? position > 0 : position < fileSize)) {
       iterationsLeft--;
       if (iterationsLeft <= 0) {
-        // throw new Error("Too many iterations reached, 'readRemoteGcodeLines' aborted");
         return;
       }
 
