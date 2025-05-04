@@ -120,7 +120,7 @@ export function setupEnvConfig(skipDotEnv = false) {
   ensurePortSet();
 
   // Optional: Enable collection of default metrics like memory, CPU, etc.
-  if (process.env[AppConstants.ENABLE_PROMETHEUS_METRICS]) {
+  if (process.env[AppConstants.ENABLE_PROMETHEUS_METRICS] === "true") {
     collectDefaultMetrics({ register });
     register.removeSingleMetric("nodejs_version_info");
   }

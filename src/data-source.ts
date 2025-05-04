@@ -25,9 +25,11 @@ import { RemovePrinterFile1720338804844 } from "@/migrations/1720338804844-Remov
 import { AddPrinterType1713897879622 } from "@/migrations/1713897879622-AddPrinterType";
 import { AddPrinterUsernamePassword1745141688926 } from "@/migrations/1745141688926-AddPrinterUsernamePassword";
 
-dotenv.config({
-  path: join(superRootPath(), ".env"),
-});
+if (process.env.NODE_ENV !== "test") {
+  dotenv.config({
+    path: join(superRootPath(), ".env"),
+  });
+}
 
 const dbFolder = process.env[AppConstants.DATABASE_PATH] ?? "./database";
 const dbFile = process.env[AppConstants.DATABASE_FILE] ?? "./fdm-monster.sqlite";
