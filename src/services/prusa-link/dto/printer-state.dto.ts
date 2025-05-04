@@ -36,6 +36,9 @@ export interface PL_StateDto {
 }
 
 export interface PL_FlagsDto {
+  // Custom state: PRINTING, PAUSING, PAUSED, BUSY
+  link_state?: string;
+  // Known flags
   operational: boolean;
   paused: boolean;
   printing: boolean;

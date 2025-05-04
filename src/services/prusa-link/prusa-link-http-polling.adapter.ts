@@ -113,6 +113,10 @@ export class PrusaLinkHttpPollingAdapter implements IWebsocketAdapter {
         };
         this.socketState = "authenticating";
         const printerState = await this.prusaLinkApi.getPrinterState();
+        // Only when PRINTING we avoid appending the flag
+        if (printerState.state.flags?.link_state && printerState.state.flags?.link_state !== "PRINTING") {
+          printerState.state.text = printerState.state.flags.link_state;
+        }
         const jobState = await this.prusaLinkApi.getJobState();
         this.socketState = "authenticated";
         this.apiState = "responding";
