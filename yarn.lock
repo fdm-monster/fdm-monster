@@ -1022,10 +1022,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fdm-monster/client@npm:1.10.0":
-  version: 1.10.0
-  resolution: "@fdm-monster/client@npm:1.10.0"
-  checksum: 10c0/bd95d1f1878ff7ab4c0209d479a46c419327248f0f5814df3c031f15edb24547681021f039ec6e4f43fc182eeb231493a4803f5138efdee218fbbd8154d92f84
+"@fdm-monster/client@npm:1.10.1":
+  version: 1.10.1
+  resolution: "@fdm-monster/client@npm:1.10.1"
+  checksum: 10c0/0774ddbaab28ebef225cea63b5bc62111a3df8044f5db06fa44ec96447d42eaaebc5b8aa6f0b5f8157affcffc72f20dabf61c56370cfd1b7a75077b352eeed70
   languageName: node
   linkType: hard
 
@@ -1034,7 +1034,7 @@ __metadata:
   resolution: "@fdm-monster/server@workspace:."
   dependencies:
     "@biomejs/biome": "npm:1.9.4"
-    "@fdm-monster/client": "npm:1.10.0"
+    "@fdm-monster/client": "npm:1.10.1"
     "@fdm-monster/client-next": "npm:0.0.19"
     "@lcov-viewer/cli": "npm:1.3.0"
     "@lcov-viewer/istanbul-report": "npm:1.4.0"
