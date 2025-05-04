@@ -46,6 +46,7 @@
 - Query parameter `forceSave` in printer create/update API was used incorrectly (flipped around)
 - Fixed all typescript issues
 - Server settings would not always migrate properly
+- Printer files store will not cache files of disabled printers
 
 ## Fixes
 
