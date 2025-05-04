@@ -123,7 +123,11 @@ export class PrusaLinkHttpPollingAdapter implements IWebsocketAdapter {
         await this.emitEvent("current", {
           ...printerState,
           job: jobState.job,
-          progress: jobState.progress,
+          progress: {
+            printTime: jobState.progress?.printTime,
+            printTimeLeft: jobState.progress?.printTimeLeft,
+            completion: jobState.progress?.completion * 100,
+          },
         });
       } catch (error) {
         this.socketState = "error";

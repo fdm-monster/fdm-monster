@@ -1,6 +1,6 @@
 export interface PL_JobStateDto {
   state: string;
-  job: PL_JobDto;
+  job?: PL_JobDto;
   progress: PL_ProgressDto;
 }
 
