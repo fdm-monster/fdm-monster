@@ -1,4 +1,4 @@
-import { PrinterSocketStore } from "@/state/printer-socket.store";
+import { PrinterAdapterStore } from "@/state/printer-adapter.store";
 import { PrinterCache } from "@/state/printer.cache";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { IdType } from "@/shared.constants";
@@ -28,7 +28,7 @@ export class BatchCallService<KeyType extends IdType = keyType> {
     loggerFactory: ILoggerFactory,
     private readonly printerApiFactory: PrinterApiFactory,
     private readonly printerCache: PrinterCache,
-    private readonly printerSocketStore: PrinterSocketStore,
+    private readonly printerAdapterStore: PrinterAdapterStore,
     private readonly printerService: IPrinterService,
   ) {
     this.logger = loggerFactory(BatchCallService.name);
@@ -92,10 +92,10 @@ export class BatchCallService<KeyType extends IdType = keyType> {
     return await Promise.all(promises);
   }
 
-  batchConnectSocket(printerIds: KeyType[]): void {
+  async batchConnectSocket(printerIds: string[]): Promise<void> {
     for (const printerId of printerIds) {
       try {
-        this.printerSocketStore.reconnectPrinterAdapter(printerId);
+        await this.printerAdapterStore.reconnectAdapter(printerId);
       } catch (e) {
         captureException(e);
         this.logger.error(`Error setting socket to reconnect ${errorSummary(e)}`);

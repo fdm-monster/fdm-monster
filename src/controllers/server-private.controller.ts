@@ -16,6 +16,7 @@ import { GithubService } from "@/services/core/github.service";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { updateClientBundleSchema } from "@/controllers/validation/server-private.validation";
 import { ILoggerFactory } from "@/handlers/logger-factory";
+import { PrinterAdapterStore } from "@/state/printer-adapter.store";
 
 @route(AppConstants.apiRoute + "/server")
 @before([authenticate(), authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
@@ -32,8 +33,9 @@ export class ServerPrivateController {
     private readonly logDumpService: LogDumpService,
     private readonly yamlService: YamlService,
     private readonly multerService: MulterService,
+    private readonly printerAdapterStore: PrinterAdapterStore
   ) {
-    this.logger = loggerFactory(ServerPrivateController.name);
+    this.logger = loggerFactory(ServerPrivateController.name);    
   }
 
   @GET()

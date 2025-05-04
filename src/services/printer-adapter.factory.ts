@@ -4,7 +4,7 @@ import { SettingsStore } from "@/state/settings.store";
 import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
 import { CradleService } from "@/services/core/cradle.service";
 
-export class SocketFactory {
+export class PrinterAdapterFactory {
   constructor(private readonly cradleService: CradleService) {}
 
   createInstance(printerType: number): IWebsocketAdapter {

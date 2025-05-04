@@ -10,9 +10,8 @@ import { ServerReleaseService } from "./services/core/server-release.service";
 import { TaskManagerService } from "./services/task-manager.service";
 import { GithubService } from "./services/core/github.service";
 import { FileCache } from "./state/file.cache";
-import { PrinterWebsocketTask } from "./tasks/printer-websocket.task";
 import { SocketIoTask } from "./tasks/socketio.task";
-import { SocketFactory } from "./services/socket.factory";
+import { PrinterAdapterFactory } from "./services/printer-adapter.factory";
 import { PrinterFilesStore } from "./state/printer-files.store";
 import { configureEventEmitter } from "./handlers/event-emitter";
 import { AppConstants } from "./server.constants";
@@ -47,8 +46,8 @@ import { BatchCallService } from "./services/core/batch-call.service";
 import { ClientDistDownloadTask } from "./tasks/client-bundle.task";
 import { OctoprintWebsocketAdapter } from "./services/octoprint/octoprint-websocket.adapter";
 import { PrinterCache } from "./state/printer.cache";
-import { PrinterSocketStore } from "./state/printer-socket.store";
-import { TestPrinterSocketStore } from "./state/test-printer-socket.store";
+import { PrinterAdapterStore } from "./state/printer-adapter.store";
+import { TestPrinterAdapterStore } from "./state/test-printer-adapter.store";
 import { PrinterEventsCache } from "./state/printer-events.cache";
 import { LogDumpService } from "./services/core/logs-manager.service";
 import { CameraStreamService as CameraService } from "./services/mongoose/camera-stream.service";
@@ -105,7 +104,7 @@ export function configureContainer(isSqlite: boolean = false) {
       return process.env[AppConstants.VERSION_KEY];
     }),
     [di.cradleService]: asClass(CradleService).inject((container) => ({ container })),
-    [di.socketFactory]: asClass(SocketFactory).transient(), // Factory function, transient on purpose!
+    [di.printerAdapterFactory]: asClass(PrinterAdapterFactory).transient(), // Factory function, transient on purpose!
 
     // V1.6.0 capable services
     ...config(di.typeormService, isSqlite, asClass(TypeormService).singleton(), asValue(null)),
@@ -203,16 +202,14 @@ export function configureContainer(isSqlite: boolean = false) {
     [di.printerFilesStore]: asClass(PrinterFilesStore).singleton(),
     [di.printerCache]: asClass(PrinterCache).singleton(),
     [di.printerEventsCache]: asClass(PrinterEventsCache).singleton(),
-    [di.printerSocketStore]: asClass(PrinterSocketStore).singleton(),
-    [di.testPrinterSocketStore]: asClass(TestPrinterSocketStore).singleton(),
+    [di.printerAdapterStore]: asClass(PrinterAdapterStore).singleton(),
+    [di.testPrinterAdapterStore]: asClass(TestPrinterAdapterStore).singleton(),
 
     [di.bootTask]: asClass(BootTask),
     [di.softwareUpdateTask]: asClass(SoftwareUpdateTask), // Provided SSE handlers (couplers) shared with controllers
     [di.socketIoTask]: asClass(SocketIoTask).singleton(), // This task is a quick task (~100ms per printer)
     [di.clientDistDownloadTask]: asClass(ClientDistDownloadTask).singleton(),
     [di.printCompletionSocketIoTask]: asClass(PrintCompletionSocketIoTask).singleton(),
-    [di.printerWebsocketTask]: asClass(PrinterWebsocketTask).singleton(), // This task is a recurring heartbeat task
-    [di.printerWebsocketRestoreTask]: asClass(PrinterWebsocketRestoreTask).singleton(), // Task aimed at testing the printer API
     [di.printerFileCleanTask]: asClass(PrinterFileCleanTask).singleton(),
   });
 

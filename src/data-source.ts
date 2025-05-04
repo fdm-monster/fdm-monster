@@ -34,7 +34,6 @@ if (process.env.NODE_ENV !== "test") {
 const dbFolder = process.env[AppConstants.DATABASE_PATH] ?? "./database";
 const dbFile = process.env[AppConstants.DATABASE_FILE] ?? "./fdm-monster.sqlite";
 const dbName = dbFile === ":memory:" ? dbFile : join(superRootPath(), dbFolder, dbFile);
-
 export const AppDataSource = new DataSource({
   type: "better-sqlite3",
   database: dbName,
