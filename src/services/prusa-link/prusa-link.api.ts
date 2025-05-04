@@ -256,12 +256,12 @@ export class PrusaLinkApi implements IPrinterApi {
     }
   }
 
-  deleteFile(path: string): Promise<void> {
-    throw new Error("Method not implemented.");
+  async deleteFile(path: string): Promise<void> {
+    await this.client.delete<void>(`/api/v1/files/usb/${path}`);
   }
 
-  deleteFolder(path: string): Promise<void> {
-    throw new Error("Method not implemented.");
+  async deleteFolder(path: string): Promise<void> {
+    await this.client.delete<void>(`/api/v1/files/usb/${path}`);
   }
 
   getSettings(): Promise<ServerConfigDto | SettingsDto> {
