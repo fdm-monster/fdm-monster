@@ -1040,7 +1040,7 @@ __metadata:
     "@lcov-viewer/istanbul-report": "npm:1.4.0"
     "@octokit/plugin-throttling": "npm:8.2.0"
     "@sentry/node": "npm:9.15.0"
-    "@swc/cli": "npm:0.7.3"
+    "@swc/cli": "npm:0.7.5"
     "@swc/core": "npm:1.11.24"
     "@swc/jest": "npm:0.2.38"
     "@types/adm-zip": "npm:0.5.7"
@@ -3199,9 +3199,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@swc/cli@npm:0.7.3":
-  version: 0.7.3
-  resolution: "@swc/cli@npm:0.7.3"
+"@swc/cli@npm:0.7.5":
+  version: 0.7.5
+  resolution: "@swc/cli@npm:0.7.5"
   dependencies:
     "@swc/counter": "npm:^0.1.3"
     "@xhmikosr/bin-wrapper": "npm:^13.0.5"
@@ -3222,7 +3222,7 @@ __metadata:
     spack: bin/spack.js
     swc: bin/swc.js
     swcx: bin/swcx.js
-  checksum: 10c0/056ec3533ade2fec657158ef80ba0f5074a89346de02141e5da340b7ff5f17da62bcdb0b584abd2f205b2b778922574f8597e8934e1bb1fb0841f3f4897a4ad1
+  checksum: 10c0/e0a73b113e425f08bf5753ba943840563af9d2ca3a9b1d14a770120face850223fc62ed63a0a812d0e29d9ffcd2496a43c89fa51e70aeea49453bbcfd0926805
   languageName: node
   linkType: hard
 
