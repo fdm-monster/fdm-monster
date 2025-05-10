@@ -1114,7 +1114,7 @@ __metadata:
     supertest: "npm:7.1.0"
     toad-scheduler: "npm:3.1.0"
     ts-node: "npm:10.9.2"
-    typeorm: "npm:0.3.22"
+    typeorm: "npm:0.3.23"
     typescript: "npm:5.8.3"
     uuid: "npm:11.1.0"
     winston: "npm:3.17.0"
@@ -9677,9 +9677,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typeorm@npm:0.3.22":
-  version: 0.3.22
-  resolution: "typeorm@npm:0.3.22"
+"typeorm@npm:0.3.23":
+  version: 0.3.23
+  resolution: "typeorm@npm:0.3.23"
   dependencies:
     "@sqltools/formatter": "npm:^1.2.5"
     ansis: "npm:^3.17.0"
@@ -9752,7 +9752,7 @@ __metadata:
     typeorm: cli.js
     typeorm-ts-node-commonjs: cli-ts-node-commonjs.js
     typeorm-ts-node-esm: cli-ts-node-esm.js
-  checksum: 10c0/bb4c283170fbb0890ed326db3e0fb25bbe5480ee4e60dab89f1b51d3bcc1bc6ce808ee61aeeb1c0a716755e2de198ab999153ae89842954656e4f8ac9abbf57f
+  checksum: 10c0/a1443355aab8250d467fe4f689f1ae1614ad3af645a1565019bbc9fb710e784d4c27ad12d824baed4d4972e0566262dea0c0cb6ecc4a4fedc3dab7795fd453a8
   languageName: node
   linkType: hard
 
