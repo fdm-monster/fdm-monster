@@ -42,15 +42,16 @@ export function migrateSettingsRuntime<KeyType = IdType>(
   }
 
   if (entity[serverSettingsKey]) {
-    // Remove superfluous settings
+    const defaultServerSettings = getDefaultServerSettings();
+    // Remove superfluous settings and provide default values if properties are missing
     entity[serverSettingsKey] = {
-      loginRequired: entity[serverSettingsKey].loginRequired,
-      registration: entity[serverSettingsKey].registration,
-      experimentalClientSupport: entity[serverSettingsKey].experimentalClientSupport,
-      experimentalMoonrakerSupport: entity[serverSettingsKey].experimentalMoonrakerSupport,
-      experimentalPrusaLinkSupport: entity[serverSettingsKey].experimentalPrusaLinkSupport,
-      sentryDiagnosticsEnabled: entity[serverSettingsKey].sentryDiagnosticsEnabled,
-      experimentalThumbnailSupport: entity[serverSettingsKey].experimentalThumbnailSupport,
+      loginRequired: entity[serverSettingsKey].loginRequired ?? defaultServerSettings.loginRequired,
+      registration: entity[serverSettingsKey].registration ?? defaultServerSettings.registration,
+      experimentalClientSupport: entity[serverSettingsKey].experimentalClientSupport ?? defaultServerSettings.experimentalClientSupport,
+      experimentalMoonrakerSupport: entity[serverSettingsKey].experimentalMoonrakerSupport ?? defaultServerSettings.experimentalMoonrakerSupport,
+      experimentalPrusaLinkSupport: entity[serverSettingsKey].experimentalPrusaLinkSupport ?? defaultServerSettings.experimentalPrusaLinkSupport,
+      sentryDiagnosticsEnabled: entity[serverSettingsKey].sentryDiagnosticsEnabled ?? defaultServerSettings.sentryDiagnosticsEnabled,
+      experimentalThumbnailSupport: entity[serverSettingsKey].experimentalThumbnailSupport ?? defaultServerSettings.experimentalThumbnailSupport,
     };
   }
 
