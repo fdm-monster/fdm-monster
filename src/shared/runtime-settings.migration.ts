@@ -43,6 +43,7 @@ export function migrateSettingsRuntime<KeyType = IdType>(
 
   if (entity[serverSettingsKey]) {
     const defaultServerSettings = getDefaultServerSettings();
+
     // Remove superfluous settings and provide default values if properties are missing
     entity[serverSettingsKey] = {
       loginRequired: entity[serverSettingsKey].loginRequired ?? defaultServerSettings.loginRequired,
