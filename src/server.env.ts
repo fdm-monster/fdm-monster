@@ -37,9 +37,7 @@ function ensureNodeEnvSet() {
 
 function ensurePackageVersionSet() {
   const packageJsonVersion = require(packageJsonPath).version;
-  if (!process.env[AppConstants.VERSION_KEY]) {
-    process.env[AppConstants.VERSION_KEY] = packageJsonVersion;
-  }
+  process.env[AppConstants.VERSION_KEY] ??= packageJsonVersion;
 
   logger.log(`✓ Running server version ${process.env[AppConstants.VERSION_KEY]}`);
 }

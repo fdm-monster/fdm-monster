@@ -116,7 +116,7 @@ describe(FirstTimeSetupController.name, () => {
     await resetWizard();
     expect(settingsStore.isWizardCompleted()).toBeFalsy();
     if (isSqliteModeTest()) {
-      await getDatasource().getRepository(User).delete({});
+      await getDatasource().getRepository(User).clear();
     } else {
       await UserMongo.deleteMany({});
     }

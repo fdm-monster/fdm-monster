@@ -20,7 +20,7 @@ beforeAll(async () => {
   await typeorm.createConnection();
 });
 afterEach(async () => {
-  await typeorm.getDataSource().getRepository(Role).delete({});
+  await typeorm.getDataSource().getRepository(Role).clear();
 });
 
 describe(RoleService.name, () => {
