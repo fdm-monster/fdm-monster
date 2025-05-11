@@ -35,8 +35,8 @@
 ## Fixes
 
 - Fix punycode warning by pinning tr46 package
-- Fix camera dto and entity
-- Make yaml import fill in defaults
+- Fix camera dto and entity to be consistent
+- Make yaml import fill in default arrays
 - Make printCompletionSchema context type any
 - Enforce properties on camera stream Mongoose schema for consistency with TypeORM camera stream entity
 - Enforce floor id on Mongoose schema for consistency with TypeORM floor entity
@@ -47,10 +47,7 @@
 - Fixed all typescript issues
 - Server settings would not always migrate properly
 - Printer files store will not cache files of disabled printers
-
-## Fixes
-
-- Fix quite some type errors (needs more work)
+- Klipper printer should print on upload
 
 # FDM Monster 19/03/2025 1.8.3
 

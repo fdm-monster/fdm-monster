@@ -369,6 +369,7 @@ export class MoonrakerClient {
     if (checksum?.length) {
       formData.append("checksum", checksum);
     }
+    formData.append("print", "true");
 
     let fileBuffer: ArrayBufferLike | ReadStream = (multerFileOrBuffer as Buffer).buffer;
     const filename = (multerFileOrBuffer as Express.Multer.File).originalname;
