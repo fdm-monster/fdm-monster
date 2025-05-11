@@ -1,4 +1,5 @@
 export const DITokens = {
+  cradleService: "cradleService",
   // Values
   serverVersion: "serverVersion",
   isTypeormMode: "isTypeormMode",
@@ -15,7 +16,6 @@ export const DITokens = {
   taskManagerService: "taskManagerService",
   toadScheduler: "toadScheduler",
   eventEmitter2: "eventEmitter2",
-  cacheManager: "cacheManager",
   printerService: "printerService",
   printerGroupService: "printerGroupService",
   floorPositionService: "floorPositionService",
@@ -37,6 +37,7 @@ export const DITokens = {
   permissionService: "permissionService",
   jwtService: "jwtService",
   roleService: "roleService",
+  prusaLinkApi: "prusaLinkApi",
   octoprintApi: "octoprintApi",
   octoprintClient: "octoprintClient",
   moonrakerApi: "moonrakerApi",
@@ -46,8 +47,6 @@ export const DITokens = {
   printerApiFactory: "printerApiFactory",
   printerLogin: "printerLogin",
   batchCallService: "batchCallService",
-  pluginRepositoryCache: "pluginRepositoryCache",
-  pluginFirmwareUpdateService: "pluginFirmwareUpdateService",
   influxDbV2BaseService: "influxDbV2BaseService",
   systemInfoBundleService: "systemInfoBundleService",
   customGCodeService: "customGCodeService",
@@ -57,6 +56,7 @@ export const DITokens = {
   printerSocketStore: "printerSocketStore",
   testPrinterSocketStore: "testPrinterSocketStore",
   printerFilesStore: "printerFilesStore",
+  prusaLinkPollingAdapter: "prusaLinkPollingAdapter",
   octoPrintSockIoAdapter: "octoPrintSockIoAdapter",
   moonrakerWebsocketAdapter: "moonrakerWebsocketAdapter",
   // Caches
@@ -66,7 +66,6 @@ export const DITokens = {
   fileCache: "fileCache",
   fileUploadTrackerCache: "fileUploadTrackerCache",
   // Tasks
-  serverTasks: "serverTasks",
   bootTask: "bootTask",
   softwareUpdateTask: "softwareUpdateTask",
   clientDistDownloadTask: "clientDistDownloadTask",
@@ -75,4 +74,4 @@ export const DITokens = {
   printerWebsocketTask: "printerWebsocketTask",
   printerWebsocketRestoreTask: "printerWebsocketRestoreTask",
   printerFileCleanTask: "printerFileCleanTask",
-};
+} as const;

@@ -71,7 +71,7 @@ export const AppConstants = {
   orgName: "fdm-monster",
   // Wizard version changes will trigger a re-run of the wizard
   currentWizardVersion: 1,
-  defaultClientMinimum: "1.9.0",
+  defaultClientMinimum: "1.10.1",
 
   influxUrl: "INFLUX_URL",
   influxToken: "INFLUX_TOKEN",
@@ -83,8 +83,6 @@ export const AppConstants = {
   defaultSocketThrottleRate: 1,
   debugSocketStatesKey: "DEBUG_SOCKET_STATES",
   defaultDebugSocketStates: "false",
-  debugFileWritePrinterStatesKey: "DEBUG_FILE_WRITE_PRINTER_STATES",
-  defaultDebugFileWritePrinterStates: "false",
 
   // Future experimental feature
   enableMqttAutoDiscoveryToken: "ENABLE_MQTT_AUTODISCOVERY",
@@ -100,10 +98,16 @@ export const AppConstants = {
 
   // Sentry
   sentryCustomDsnToken: "SENTRY_CUSTOM_DSN",
-  sentryCustomDsnDefault: "https://164b8028a8a745bba3dbcab991b84ae7@o4503975545733120.ingest.sentry.io/4505101598261248",
+  sentryCustomDsnDefault:
+    "https://164b8028a8a745bba3dbcab991b84ae7@o4503975545733120.ingest.sentry.io/4505101598261248",
 
   debugRoutesKey: "DEBUG_ROUTES",
 
   ENABLE_EXPERIMENTAL_TYPEORM: "ENABLE_EXPERIMENTAL_TYPEORM",
   enableExperimentalTypeormDefault: "false",
+  ENABLE_PROMETHEUS_METRICS: "ENABLE_PROMETHEUS_METRICS",
+  ENABLE_LOKI_LOGGING: "ENABLE_LOKI_LOGGING",
+  LOKI_ADDRESS: "LOKI_ADDRESS",
+  LOKI_TIMEOUT_SECONDS: "LOKI_TIMEOUT_SECONDS",
+  LOKI_INTERVAL: "LOKI_INTERVAL"
 };

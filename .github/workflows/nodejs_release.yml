@@ -32,7 +32,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: 22.x
 
       # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions
       - name: get-server-version
@@ -57,6 +57,7 @@ jobs:
       - run: yarn set version berry
       - run: yarn install --immutable
       - run: yarn build
+      - run: yarn run tsc
 
       # Publish to NPM
       - uses: JS-DevTools/npm-publish@v3

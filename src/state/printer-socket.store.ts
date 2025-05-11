@@ -1,61 +1,54 @@
 import { captureException } from "@sentry/node";
 import { errorSummary } from "@/utils/error.utils";
-import { printerEvents } from "@/constants/event.constants";
+import {
+  BatchPrinterCreatedEvent,
+  PrinterCreatedEvent,
+  printerEvents,
+  PrintersDeletedEvent,
+  PrinterUpdatedEvent,
+} from "@/constants/event.constants";
 import EventEmitter2 from "eventemitter2";
 import { SocketFactory } from "@/services/socket.factory";
 import { PrinterCache } from "@/state/printer.cache";
 import { OctoprintWebsocketAdapter } from "@/services/octoprint/octoprint-websocket.adapter";
 import { LoggerService } from "@/handlers/logger";
-import { ConfigService } from "@/services/core/config.service";
-import { SettingsStore } from "@/state/settings.store";
-import { SocketIoGateway } from "@/state/socket-io.gateway";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IdType } from "@/shared.constants";
-import { PrinterUnsafeDto } from "@/services/interfaces/printer.dto";
 import { OctoprintType } from "@/services/printer-api.interface";
 import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
+import { PrinterDto } from "@/services/interfaces/printer.dto";
+import { SocketState } from "@/shared/dtos/socket-state.type";
+import { ApiState } from "@/shared/dtos/api-state.type";
+
+export interface PrinterSocketState {
+  printerId: IdType,
+  printerType: number,
+  socket: SocketState,
+  api: ApiState,
+}
 
 export class PrinterSocketStore {
-  socketIoGateway: SocketIoGateway;
-  socketFactory: SocketFactory;
-  eventEmitter2: EventEmitter2;
-  printerCache: PrinterCache;
-  printerSocketAdaptersById: Record<string, IWebsocketAdapter> = {};
-  logger: LoggerService;
-  configService: ConfigService;
-  settingsStore: SettingsStore;
+  printerSocketAdaptersById: Record<IdType, IWebsocketAdapter> = {};
+  private readonly logger: LoggerService;
 
-  constructor({
-    socketFactory,
-    socketIoGateway,
-    settingsStore,
-    eventEmitter2,
-    printerCache,
-    loggerFactory,
-    configService,
-  }: {
-    socketFactory: SocketFactory;
-    socketIoGateway: SocketIoGateway;
-    settingsStore: SettingsStore;
-    eventEmitter2: EventEmitter2;
-    printerCache: PrinterCache;
-    loggerFactory: ILoggerFactory;
-    configService: ConfigService;
-  }) {
-    this.printerCache = printerCache;
-    this.socketIoGateway = socketIoGateway;
-    this.socketFactory = socketFactory;
-    this.eventEmitter2 = eventEmitter2;
-    this.settingsStore = settingsStore;
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly socketFactory: SocketFactory,
+    private readonly eventEmitter2: EventEmitter2,
+    private readonly printerCache: PrinterCache,
+  ) {
     this.logger = loggerFactory(PrinterSocketStore.name);
-    this.configService = configService;
 
     this.subscribeToEvents();
   }
 
   getSocketStatesById() {
-    const socketStatesById = {};
+    const socketStatesById: { [k: IdType]: PrinterSocketState } = {};
     Object.values(this.printerSocketAdaptersById).forEach((s) => {
+      if (!s.printerId) {
+        return;
+      }
+
       socketStatesById[s.printerId] = {
         printerId: s.printerId,
         printerType: s.printerType,
@@ -66,38 +59,28 @@ export class PrinterSocketStore {
     return socketStatesById;
   }
 
-  /**
-   * Load all printers into cache, and create a new socket for each printer (if enabled)
-   * @param {OctoPrintEventDto} e
-   */
   async loadPrinterSockets() {
     await this.printerCache.loadCache();
 
-    const printerDocs = await this.printerCache.listCachedPrinters(false);
+    const printerDtoList = await this.printerCache.listCachedPrinters(false);
     this.printerSocketAdaptersById = {};
-    /**
-     * @type {Printer}
-     */
-    for (const doc of printerDocs) {
+    for (const printerDto of printerDtoList) {
       try {
-        await this.handlePrinterCreated({ printer: doc });
+        this.handlePrinterCreated({ printer: printerDto });
       } catch (e) {
         captureException(e);
-        this.logger.error("PrinterSocketStore failed to construct new OctoPrint socket.", errorSummary(e));
+        this.logger.error("PrinterSocketStore failed to construct new socket.", errorSummary(e));
       }
     }
 
-    this.logger.log(`Loaded ${Object.keys(this.printerSocketAdaptersById).length} printer OctoPrint sockets`);
+    this.logger.log(`Loaded ${Object.keys(this.printerSocketAdaptersById).length} printer sockets`);
   }
 
   listPrinterSockets() {
     return Object.values(this.printerSocketAdaptersById);
   }
 
-  /**
-   * Reconnect the OctoPrint Websocket connection
-   */
-  reconnectOctoPrint(id: IdType) {
+  reconnectPrinterAdapter(id: IdType) {
     const socket = this.getPrinterSocket(id);
     if (!socket) return;
 
@@ -107,7 +90,7 @@ export class PrinterSocketStore {
     socket.resetSocketState();
   }
 
-  getPrinterSocket(id: IdType): OctoprintWebsocketAdapter | undefined {
+  getPrinterSocket(id: IdType): IWebsocketAdapter | undefined {
     return this.printerSocketAdaptersById[id];
   }
 
@@ -117,25 +100,19 @@ export class PrinterSocketStore {
   async reconnectPrinterSockets(): Promise<void> {
     let reauthRequested = 0;
     let socketSetupRequested = 0;
-    const socketStates = {};
-    const apiStates = {};
+    const socketStates: { [k: string]: number } = {};
+    const apiStates: { [k: string]: number } = {};
     const promisesReauth = [];
-    const failedSocketsReauth = [];
     for (const socket of Object.values(this.printerSocketAdaptersById)) {
       try {
         if (socket.printerType === OctoprintType && (socket as OctoprintWebsocketAdapter).needsReauth()) {
           reauthRequested++;
           // TODO OP close socket
-          const promise = socket.reauthSession().catch((_) => {
-            failedSocketsReauth.push(socket.printerId);
-          });
+          const promise = socket.reauthSession().catch();
           // TODO MR reconnect
           promisesReauth.push(promise);
         }
       } catch (e) {
-        if (this.settingsStore.getDebugSettingsSensitive()?.debugSocketSetup) {
-          this.logger.log("Failed to reauth printer socket", errorSummary(e));
-        }
         captureException(e);
       }
     }
@@ -143,33 +120,19 @@ export class PrinterSocketStore {
     await Promise.all(promisesReauth);
 
     const promisesOpenSocket: any[] = [];
-    const failedSocketReopened: any[] = [];
     for (const socket of Object.values(this.printerSocketAdaptersById)) {
       try {
         if (socket.needsSetup() || socket.needsReopen()) {
-          if (this.settingsStore.getDebugSettingsSensitive()?.debugSocketSetup) {
-            // Exception anonymity
-            this.logger.log(
-              `Reopening socket for printerId '${
-                socket.printerId
-              }' (setup: ${socket.needsSetup()}, reopen: ${socket.needsReopen()})`
-            );
-          }
           socketSetupRequested++;
           const promise = socket
             .setupSocketSession()
             .then(() => {
               socket.open();
             })
-            .catch((_) => {
-              failedSocketReopened.push(socket.printerId);
-            });
+            .catch();
           promisesOpenSocket.push(promise);
         }
       } catch (e) {
-        if (this.settingsStore.getDebugSettingsSensitive()?.debugSocketSetup) {
-          this.logger.log(`Failed to setup printer socket ${errorSummary(e)}`);
-        }
         captureException(e);
       }
 
@@ -182,18 +145,9 @@ export class PrinterSocketStore {
     }
 
     await Promise.all(promisesOpenSocket);
-
-    return {
-      reauth: reauthRequested,
-      failedSocketReopened,
-      failedSocketsReauth,
-      socketSetup: socketSetupRequested,
-      socket: socketStates,
-      api: apiStates,
-    };
   }
 
-  createOrUpdateSocket(printer: PrinterUnsafeDto<IdType>) {
+  createOrUpdateSocket(printer: PrinterDto<IdType>) {
     const { enabled, id } = printer;
     let foundAdapter = this.printerSocketAdaptersById[id.toString()];
 
@@ -218,6 +172,8 @@ export class PrinterSocketStore {
       printerId: printer.id.toString(),
       loginDto: {
         apiKey: printer.apiKey,
+        username: printer.username,
+        password: printer.password,
         printerURL: printer.printerURL,
         printerType: printer.printerType,
       },
@@ -225,31 +181,23 @@ export class PrinterSocketStore {
     foundAdapter.resetSocketState();
   }
 
-  private handleBatchPrinterCreated({ printers }) {
-    for (const p of printers) {
-      this.handlePrinterCreated({ printer: p });
+  private handleBatchPrinterCreated(event: BatchPrinterCreatedEvent) {
+    for (const printer of event.printers) {
+      this.handlePrinterCreated({ printer });
     }
   }
 
-  /**
-   * @param { printer: Printer } printer
-   * @returns void
-   */
-  private handlePrinterCreated({ printer }) {
-    this.createOrUpdateSocket(printer);
+  private handlePrinterCreated(event: PrinterCreatedEvent) {
+    this.createOrUpdateSocket(event.printer);
   }
 
-  /**
-   * @param { printer: Printer } printer
-   * @returns void
-   */
-  private handlePrinterUpdated({ printer }) {
+  private handlePrinterUpdated(event: PrinterUpdatedEvent) {
     this.logger.log(`Printer updated. Updating socket`);
-    this.createOrUpdateSocket(printer);
+    this.createOrUpdateSocket(event.printer);
   }
 
-  private handlePrintersDeleted({ printerIds }) {
-    printerIds.forEach((id) => {
+  private handlePrintersDeleted(event: PrintersDeletedEvent) {
+    event.printerIds.forEach((id) => {
       this.deleteSocket(id);
     });
   }
@@ -261,7 +209,7 @@ export class PrinterSocketStore {
     this.eventEmitter2.on(printerEvents.batchPrinterCreated, this.handleBatchPrinterCreated.bind(this));
   }
 
-  private deleteSocket(printerId: string) {
+  private deleteSocket(printerId: IdType) {
     const socket = this.printerSocketAdaptersById[printerId];
 
     // Ensure that the printer does not re-register itself after being purged

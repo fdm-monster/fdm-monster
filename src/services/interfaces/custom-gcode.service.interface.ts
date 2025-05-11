@@ -11,7 +11,7 @@ export interface ICustomGcodeService<KeyType = IdType, Entity = ICustomGcode> {
 
   create(gcodeScript: CustomGcodeDto): Promise<Entity>;
 
-  delete(gcodeScriptId: KeyType, throwIfNotFound?: boolean): Promise<any | void>;
+  delete(gcodeScriptId: KeyType): Promise<void>;
 
   update(gcodeScriptId: KeyType, updatedData: CustomGcodeDto): Promise<Entity>;
 }

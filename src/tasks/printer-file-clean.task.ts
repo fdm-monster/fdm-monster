@@ -3,8 +3,6 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { PrinterFilesStore } from "@/state/printer-files.store";
 import { PrinterCache } from "@/state/printer.cache";
 import { SettingsStore } from "@/state/settings.store";
-import { TaskManagerService } from "@/services/core/task-manager.service";
-import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { IdType } from "@/shared.constants";
 import { PrinterDto } from "@/services/interfaces/printer.dto";
 
@@ -14,32 +12,13 @@ import { PrinterDto } from "@/services/interfaces/printer.dto";
  */
 export class PrinterFileCleanTask {
   logger: LoggerService;
-  printerFilesStore: PrinterFilesStore;
-  printerCache: PrinterCache;
-  settingsStore: SettingsStore;
-  taskManagerService: TaskManagerService;
-  octoprintClient: OctoprintClient;
 
-  constructor({
-    printerCache,
-    printerFilesStore,
-    octoprintClient,
-    taskManagerService,
-    settingsStore,
-    loggerFactory,
-  }: {
-    printerCache: PrinterCache;
-    printerFilesStore: PrinterFilesStore;
-    octoprintClient: OctoprintClient;
-    taskManagerService: TaskManagerService;
-    settingsStore: SettingsStore;
-    loggerFactory: ILoggerFactory;
-  }) {
-    this.printerCache = printerCache;
-    this.printerFilesStore = printerFilesStore;
-    this.taskManagerService = taskManagerService;
-    this.octoprintClient = octoprintClient;
-    this.settingsStore = settingsStore;
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly printerCache: PrinterCache,
+    private readonly printerFilesStore: PrinterFilesStore,
+    private readonly settingsStore: SettingsStore,
+  ) {
     this.logger = loggerFactory(PrinterFileCleanTask.name);
   }
 
@@ -54,7 +33,9 @@ export class PrinterFileCleanTask {
 
     try {
       if (autoCleanAtBootEnabled) {
-        this.logger.log(`Cleaning files of ${printers.length} active printers [printerFileClean:autoRemoveOldFilesAtBoot].`);
+        this.logger.log(
+          `Cleaning files of ${printers.length} active printers [printerFileClean:autoRemoveOldFilesAtBoot].`,
+        );
       } else {
         this.logger.log(`Reporting about old files of ${printers.length} printers.`);
       }
@@ -62,14 +43,14 @@ export class PrinterFileCleanTask {
       const errorPrinters = [];
       for (let printer of printers) {
         try {
-          await this.printerFilesStore.loadFiles(printer.id, false);
+          await this.printerFilesStore.loadFiles(printer.id);
         } catch (e) {
           errorPrinters.push({ e, printer });
         }
       }
       if (errorPrinters.length > 0) {
         this.logger.error(
-          `Error loading some files, ${errorPrinters.length} printer(s) did not respond or returned an unexpected status code. Those will depend on previously cached files.`
+          `Error loading some files, ${errorPrinters.length} printer(s) did not respond or returned an unexpected status code.`,
         );
       }
 
@@ -92,7 +73,7 @@ export class PrinterFileCleanTask {
 
   async cleanPrinterFiles(printerId: IdType) {
     await this.printerFilesStore.deleteOutdatedFiles(printerId, this.ageDaysMaxSetting);
-    await this.printerFilesStore.loadFiles(printerId, false);
+    await this.printerFilesStore.loadFiles(printerId);
   }
 
   getPrinterOutdatedFiles(printer: PrinterDto<IdType>) {

@@ -1,19 +1,15 @@
-import fs, { createReadStream, ReadStream } from "fs";
-import path from "path";
+import { createReadStream, ReadStream } from "fs";
 import FormData from "form-data";
-import { pluginRepositoryUrl } from "./constants/octoprint-service.constants";
-import { firmwareFlashUploadEvent, uploadDoneEvent, uploadFailedEvent, uploadProgressEvent } from "@/constants/event.constants";
+import { uploadDoneEvent, uploadFailedEvent, uploadProgressEvent } from "@/constants/event.constants";
 import { ExternalServiceError } from "@/exceptions/runtime.exceptions";
 import { OctoprintRoutes } from "./octoprint-api.routes";
 import { AxiosError, AxiosPromise } from "axios";
 import EventEmitter2 from "eventemitter2";
 import { LoggerService } from "@/handlers/logger";
 import { LoginDto } from "@/services/interfaces/login.dto";
-import { IdType } from "@/shared.constants";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { normalizePrinterFile } from "@/services/octoprint/utils/file.utils";
 import { ConnectionDto } from "@/services/octoprint/dto/connection/connection.dto";
-import { captureException } from "@sentry/node";
 import { OP_LoginDto } from "@/services/octoprint/dto/auth/login.dto";
 import { VersionDto } from "@/services/octoprint/dto/server/version.dto";
 import { ServerDto } from "@/services/octoprint/dto/server/server.dto";
@@ -26,7 +22,6 @@ import { CurrentPrinterStateDto } from "@/services/octoprint/dto/printer/current
 import { HttpClientFactory } from "@/services/core/http-client.factory";
 import { OctoprintHttpClientBuilder } from "@/services/octoprint/utils/octoprint-http-client.builder";
 import { OctoprintFileDto } from "@/services/octoprint/dto/files/octoprint-file.dto";
-import { OP_PluginDto } from "@/services/octoprint/dto/plugin.dto";
 
 type TAxes = "x" | "y" | "z";
 
@@ -35,22 +30,15 @@ type TAxes = "x" | "y" | "z";
  * https://docs.octoprint.org/en/master/api/index.html
  */
 export class OctoprintClient extends OctoprintRoutes {
-  eventEmitter2: EventEmitter2;
-  protected httpClientFactory: HttpClientFactory;
   protected logger: LoggerService;
 
-  constructor({
-    httpClientFactory,
-    loggerFactory,
-    eventEmitter2,
-  }: {
-    httpClientFactory: HttpClientFactory;
-    loggerFactory: ILoggerFactory;
-    eventEmitter2: EventEmitter2;
-  }) {
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly httpClientFactory: HttpClientFactory,
+    private readonly eventEmitter2: EventEmitter2,
+  ) {
     super();
-    this.httpClientFactory = httpClientFactory;
-    this.eventEmitter2 = eventEmitter2;
+
     this.logger = loggerFactory(OctoprintClient.name);
   }
 
@@ -131,11 +119,6 @@ export class OctoprintClient extends OctoprintRoutes {
     return await this.createClient(login).post(this.apiSettingsPart, settingPatch);
   }
 
-  async updateFirmwareUpdaterSettings(login: LoginDto, firmwareUpdateConfig: any) {
-    const settingPatch = this.pluginFirmwareUpdaterSettings(firmwareUpdateConfig);
-    return await this.createClient(login).post(this.apiSettingsPart, settingPatch);
-  }
-
   async setGCodeAnalysis(login: LoginDto, enabled: boolean) {
     const settingPatch = this.gcodeAnalysisSetting(enabled);
     return await this.createClient(login).post(this.apiSettingsPart, settingPatch);
@@ -171,13 +154,7 @@ export class OctoprintClient extends OctoprintRoutes {
     const urlPath = this.apiFile(path);
     const response = await this.createClient(login).get<OctoprintFileDto>(urlPath);
 
-    try {
-      return normalizePrinterFile(response?.data);
-    } catch (e) {
-      captureException(e);
-      this.logger.error("File was empty or normalization failed");
-      return;
-    }
+    return normalizePrinterFile(response?.data);
   }
 
   async downloadFile(login: LoginDto, path: string): AxiosPromise<NodeJS.ReadableStream> {
@@ -194,7 +171,7 @@ export class OctoprintClient extends OctoprintRoutes {
     return await this.createClient(login, (o) =>
       o.withHeaders({
         Range: `bytes=${startBytes}-${endBytes}`,
-      })
+      }),
     ).get<string>(pathUrl);
   }
 
@@ -225,7 +202,7 @@ export class OctoprintClient extends OctoprintRoutes {
     login: LoginDto,
     multerFileOrBuffer: Buffer | Express.Multer.File,
     commands: any,
-    progressToken: string
+    progressToken?: string,
   ) {
     const urlPath = this.apiFilesLocal;
 
@@ -252,7 +229,7 @@ export class OctoprintClient extends OctoprintRoutes {
     // Calculate the header that axios uses to determine progress
     const result: number = await new Promise<number>((resolve, reject) => {
       return formData.getLength((err, length) => {
-        if (err) resolve(null);
+        if (err) reject(new Error("Could not retrieve formData length"));
         resolve(length);
       });
     });
@@ -269,14 +246,18 @@ export class OctoprintClient extends OctoprintRoutes {
             if (progressToken) {
               this.eventEmitter2.emit(`${uploadProgressEvent(progressToken)}`, progressToken, p);
             }
-          })
+          }),
       ).post(urlPath, formData);
 
-      this.eventEmitter2.emit(`${uploadDoneEvent(progressToken)}`, progressToken);
+      if (progressToken) {
+        this.eventEmitter2.emit(`${uploadDoneEvent(progressToken)}`, progressToken);
+      }
 
       return response.data;
     } catch (e: any) {
-      this.eventEmitter2.emit(`${uploadFailedEvent(progressToken)}`, progressToken, (e as AxiosError)?.message);
+      if (progressToken) {
+        this.eventEmitter2.emit(`${uploadFailedEvent(progressToken)}`, progressToken, (e as AxiosError)?.message);
+      }
       let data;
       try {
         data = JSON.parse(e.response?.body);
@@ -291,24 +272,21 @@ export class OctoprintClient extends OctoprintRoutes {
           success: false,
           stack: e.stack,
         },
-        "OctoPrint"
+        "OctoPrint",
       );
     }
   }
-
-  // TODO implement when UI is ready, preferably using websocket stream and timing
-  // async getSoftwareUpdateCheck(login: LoginDto) {
-  //   const { url, options } = this._prepareRequest(printer, this.pluginSoftwareUpdateCheck);
-  //
-  //   const response = await this.axiosClient.get(url, options);
-  //   return response?.data;
-  // }
 
   async deleteFileOrFolder(login: LoginDto, path: string) {
     await this.createClient(login).delete(this.apiFile(path));
   }
 
-  async getPrinterCurrent(login: LoginDto, history: boolean, limit?: number, exclude?: ("temperature" | "sd" | "state")[]) {
+  async getPrinterCurrent(
+    login: LoginDto,
+    history: boolean,
+    limit?: number,
+    exclude?: ("temperature" | "sd" | "state")[],
+  ) {
     const pathUrl = this.apiPrinterCurrent(history, limit, exclude);
     return await this.createClient(login).get<CurrentPrinterStateDto>(pathUrl);
   }
@@ -319,87 +297,6 @@ export class OctoprintClient extends OctoprintRoutes {
 
   async getPrinterProfiles(login: LoginDto) {
     return await this.createClient(login).get(this.apiPrinterProfiles);
-  }
-
-  /**
-   * Based on https://github.com/OctoPrint/OctoPrint/blob/f430257d7072a83692fc2392c683ed8c97ae47b6/src/octoprint/plugins/softwareupdate/__init__.py#L1265
-   */
-  async postSoftwareUpdate(login: LoginDto, targets: string[]) {
-    return await this.createClient(login).post(this.pluginSoftwareUpdateUpdate, {
-      targets,
-    });
-  }
-
-  async getPluginManagerPlugins(login: LoginDto) {
-    return await this.createClient(login).get(this.pluginManagerPlugins);
-  }
-
-  async getPluginManagerPlugin(login: LoginDto, pluginName: string) {
-    const urlPath = this.pluginManagerPlugin(pluginName);
-    return await this.createClient(login).get(urlPath);
-  }
-
-  async postApiPluginManagerCommand(login: LoginDto, pluginCommand: string, pluginUrl: string) {
-    const command = this.pluginManagerCommand(pluginCommand, pluginUrl);
-
-    return await this.createClient(login).post(this.apiPluginManager, command);
-  }
-
-  async postPluginFirmwareUpdateFlash(currentPrinterId: IdType, login: LoginDto, firmwarePath: string) {
-    const urlPath = this.pluginFirmwareUpdaterFlash;
-
-    const formData = new FormData();
-    formData.append("port", "/dev/op2");
-    formData.append("profile", "default");
-    const filename = path.basename(firmwarePath);
-    const fileReadStream = fs.createReadStream(firmwarePath);
-    formData.append("file", fileReadStream, { filename });
-
-    try {
-      const response = await this.createClient(login, (builder) =>
-        builder
-          .withMultiPartFormData()
-          .withHeaders({
-            ...formData.getHeaders(),
-          })
-          .withOnUploadProgress((p: any) => {
-            if (currentPrinterId) {
-              this.eventEmitter2.emit(`${firmwareFlashUploadEvent(currentPrinterId)}`, currentPrinterId, p);
-            }
-          })
-      ).post(urlPath, formData);
-
-      return response?.data;
-    } catch (e: any) {
-      this.eventEmitter2.emit(`${uploadProgressEvent(currentPrinterId.toString())}`, currentPrinterId, { failed: true }, e);
-      let data;
-      try {
-        data = JSON.parse(e.response?.body);
-      } catch {
-        data = e.response?.body;
-      }
-      throw new ExternalServiceError(
-        {
-          error: e.message,
-          statusCode: e.response?.statusCode,
-          data,
-          success: false,
-          stack: e.stack,
-        },
-        "OctoPrint"
-      );
-    }
-  }
-
-  async getPluginFirmwareUpdateStatus(login: LoginDto) {
-    return await this.createClient(login).get(this.pluginFirmwareUpdaterStatus);
-  }
-
-  /**
-   * Does not require printer login, much faster, requires internet connectivity
-   */
-  async fetchOctoPrintPlugins() {
-    return await this.createAnonymousClient(pluginRepositoryUrl).get<OP_PluginDto[]>("");
   }
 
   async getSystemInfo(login: LoginDto) {
@@ -414,90 +311,6 @@ export class OctoprintClient extends OctoprintRoutes {
     await this.createClient(login).post(this.apiServerRestartCommand);
   }
 
-  async getSoftwareUpdateCheck(login: LoginDto, force: boolean) {
-    return await this.createClient(login).get(this.apiSoftwareUpdateCheck(force));
-  }
-
-  async getPluginPiSupport(login: LoginDto) {
-    return await this.createClient(login).get(this.apiPluginPiSupport);
-  }
-
-  async deleteTimeLapse(login: LoginDto, fileName: string) {
-    const urlPath = `${this.apiTimelapse}/${fileName}`;
-
-    await this.createClient(login).delete(urlPath);
-  }
-
-  async listUnrenderedTimeLapses(login: LoginDto) {
-    const urlPath = `${this.apiTimelapse}?unrendered=true`;
-    return await this.createClient(login).get(urlPath);
-  }
-
-  async listProfiles(login: LoginDto) {
-    return await this.createClient(login).get(this.apiProfiles);
-  }
-
-  async getBackupOverview(login: LoginDto) {
-    return await this.createClient(login).get(this.pluginBackupIndex);
-  }
-
-  async getBackups(login: LoginDto) {
-    return await this.createClient(login).get(this.pluginBackupEndpoint);
-  }
-
-  async createBackup(login: LoginDto, excludeArray: string[]) {
-    return await this.createClient(login).post(this.pluginBackupEndpoint, {
-      exclude: excludeArray,
-    });
-  }
-
-  async getDownloadBackupStream(login: LoginDto, filename: string) {
-    const response = await this.createClient(login, (builder) => {
-      builder.withStreamResponse();
-    })
-      .get(this.pluginBackupFileDownload(filename))
-      .catch((e) => {
-        throw new ExternalServiceError(
-          {
-            error: e.message,
-            statusCode: e.response?.statusCode,
-            success: false,
-            stack: e.stack,
-          },
-          "OctoPrint"
-        );
-      });
-    return response?.data;
-  }
-
-  async forwardRestoreBackupFileStream(login: LoginDto, buffer: Buffer) {
-    const formData = new FormData();
-    formData.append("file", buffer, { filename: "op-fdmm-restore.zip" });
-
-    const response = await this.createClient(login, (builder) =>
-      builder.withMultiPartFormData().withHeaders({
-        ...formData.getHeaders(),
-      })
-    )
-      .post(this.pluginBackupFileRestore, formData)
-      .catch((e) => {
-        throw new ExternalServiceError(
-          {
-            error: e.message,
-            statusCode: e.response?.statusCode,
-            success: false,
-            stack: e.stack,
-          },
-          "OctoPrint"
-        );
-      });
-    return response?.data;
-  }
-
-  async deleteBackup(login: LoginDto, filename: string) {
-    return await this.createClient(login).delete(this.pluginBackupFile(filename));
-  }
-
   private createClient(login: LoginDto, buildFluentOptions?: (base: OctoprintHttpClientBuilder) => void) {
     const baseAddress = login.printerURL;
 
@@ -505,6 +318,7 @@ export class OctoprintClient extends OctoprintRoutes {
       if (buildFluentOptions) {
         buildFluentOptions(o);
       }
+
       o.withXApiKeyHeader(login.apiKey);
     });
   }

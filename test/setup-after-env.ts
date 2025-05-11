@@ -1,15 +1,18 @@
-import { getExpectExtensions } from "./extensions";
 import { isSqliteModeTest } from "./typeorm.manager";
 import { closeDatabase, connect } from "./mongo-memory.handler";
 import nock from "nock";
 const jestConsole = console;
-expect.extend(getExpectExtensions());
 
 beforeAll(async () => {
   nock.disableNetConnect();
   // nock.enableNetConnect("127.0.0.1");
   nock.enableNetConnect((host) => {
-    if (host.startsWith("127.0.0.1") || host.startsWith("localhost") || host.startsWith("0.0.0.0") || host.startsWith("::1")) {
+    if (
+      host.startsWith("127.0.0.1") ||
+      host.startsWith("localhost") ||
+      host.startsWith("0.0.0.0") ||
+      host.startsWith("::1")
+    ) {
       return true;
     } else {
       console.error("Illegal Network access: " + host);

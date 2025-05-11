@@ -46,7 +46,7 @@ $ npm run migration:status
 
 This command here is a `package.json` script equivalent to `migrate-mongo status`.
 
-## Commands for a (plugin) developer
+## Commands for a contributor
 
 We discuss create, up, down and some important notes.
 

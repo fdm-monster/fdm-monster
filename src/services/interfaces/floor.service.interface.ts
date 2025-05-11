@@ -1,22 +1,21 @@
 import { IFloor } from "@/models/Floor";
 import { IdType } from "@/shared.constants";
-import { CreateFloorDto, FloorDto, PositionDto, UpdateFloorDto } from "@/services/interfaces/floor.dto";
+import { CreateFloorDto, CreatePositionDto, FloorDto, UpdateFloorDto } from "@/services/interfaces/floor.dto";
 import { Floor } from "@/entities";
-import { FindOptionsWhere } from "typeorm/find-options/FindOptionsWhere";
-import { FindOneOptions, FindOptions } from "typeorm";
+import { FindOneOptions } from "typeorm";
 
 export interface IFloorService<KeyType = IdType, Entity = IFloor | Floor> {
-  addOrUpdatePrinter(floorId: KeyType, position: PositionDto<KeyType>): Promise<Entity>;
-
   create(input: CreateFloorDto<KeyType>): Promise<Entity>;
 
   createDefaultFloor(): Promise<Entity>;
 
-  delete(floorId: KeyType): Promise<any | void>;
+  delete(floorId: KeyType): Promise<void>;
+
+  addOrUpdatePrinter(floorId: KeyType, position: CreatePositionDto<KeyType>): Promise<Entity>;
 
   deletePrinterFromAnyFloor(printerId: KeyType): Promise<void>;
 
-  get(floorId: KeyType, throwIfNotFound?: boolean, options?: FindOneOptions<Entity>): Promise<Entity>;
+  get(floorId: KeyType, options?: FindOneOptions<Entity>): Promise<Entity>;
 
   list(): Promise<Entity[]>;
 

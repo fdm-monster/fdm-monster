@@ -1,5 +1,4 @@
 import { IdType } from "@/shared.constants";
-import { IsDefined, IsNotEmpty, IsNumber, IsOptional } from "class-validator";
 
 export class PositionDto<KeyType = IdType> {
   x: number;
@@ -8,12 +7,11 @@ export class PositionDto<KeyType = IdType> {
   floorId: KeyType;
 }
 
-// MongoDB version
-export class PrinterInFloorDto<KeyType = IdType> {
-  id: KeyType;
+export class CreatePositionDto<KeyType> {
   x: number;
   y: number;
-  printerId: IdType;
+  printerId: KeyType;
+  floorId?: KeyType;
 }
 
 export class FloorDto<KeyType = IdType> {
@@ -24,25 +22,13 @@ export class FloorDto<KeyType = IdType> {
 }
 
 export class CreateFloorDto<KeyType> {
-  @IsOptional()
-  printers?: PositionDto<KeyType>[];
-  @IsNotEmpty()
+  printers?: CreatePositionDto<KeyType>[];
   name: string;
-  @IsDefined()
-  @IsNumber()
   floor: number;
 }
 
 export class UpdateFloorDto<KeyType> {
-  @IsOptional()
   printers?: PositionDto<KeyType>[];
-  @IsDefined()
   name?: string;
-  @IsDefined()
-  @IsNumber()
   floor?: number;
-}
-
-export class AddOrUpdatePrinterDto<KeyType = IdType> {
-  printerId: KeyType;
 }

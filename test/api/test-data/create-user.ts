@@ -20,8 +20,8 @@ export async function ensureTestUserCreated(
   needsPasswordChange = false,
   role = ROLES.ADMIN,
   isVerified = true,
-  isRootUser = true
-) {
+  isRootUser = true,
+): Promise<UserDto> {
   if (!isSqliteModeTest()) {
     return ensureTestUserCreatedMongo(usernameIn, passwordIn, needsPasswordChange, role, isVerified, isRootUser);
   }
@@ -47,7 +47,7 @@ export async function ensureTestUserCreated(
       {
         skipUpdateIfNoValuesChanged: true,
         conflictPaths: ["userId", "roleId"],
-      }
+      },
     );
     return {
       id: foundUser.id,
@@ -78,9 +78,13 @@ export async function ensureTestUserCreated(
     {
       skipUpdateIfNoValuesChanged: true,
       conflictPaths: ["userId", "roleId"],
-    }
+    },
   );
   const user = await userRepo.findOneBy({ id: userr.id });
+  if (!user) {
+    throw new Error("Could not find user with id " + userr.id);
+  }
+
   return {
     id: user.id,
     username: user.username,
@@ -98,7 +102,7 @@ export async function ensureTestUserCreatedMongo(
   needsPasswordChange = false,
   role = ROLES.ADMIN,
   isVerified = true,
-  isRootUser = true
+  isRootUser = true,
 ) {
   const roleId = (await RoleMongo.findOne({ name: role }))?.id;
   const roles = roleId ? [roleId.toString()] : [];
@@ -116,7 +120,7 @@ export async function ensureTestUserCreatedMongo(
         roles,
         isVerified,
         isRootUser,
-      }
+      },
     );
     return {
       id: foundUser.id,

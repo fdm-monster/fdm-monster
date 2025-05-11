@@ -3,10 +3,10 @@ import { RegisterUserDto, UserDto } from "@/services/interfaces/user.dto";
 import { User } from "@/entities";
 import { SqliteIdType } from "@/shared.constants";
 import { IUserService } from "@/services/interfaces/user-service.interface";
-import { DeleteResult, In } from "typeorm";
+import { In } from "typeorm";
 import { InternalServerException, NotFoundException } from "@/exceptions/runtime.exceptions";
 import { validateInput } from "@/handlers/validators";
-import { newPasswordRules, registerUserRules } from "@/services/validators/user-service.validation";
+import { newPasswordSchema, registerUserSchema } from "@/services/validators/user-service.validation";
 import { comparePasswordHash, hashPassword } from "@/utils/crypto.utils";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { UserRoleService } from "@/services/orm/user-role.service";
@@ -14,23 +14,12 @@ import { ROLES } from "@/constants/authorization.constants";
 import { RoleService } from "@/services/orm/role.service";
 
 export class UserService extends BaseService(User, UserDto<SqliteIdType>) implements IUserService<SqliteIdType, User> {
-  typeormService: TypeormService;
-  userRoleService: UserRoleService;
-  roleService: RoleService;
-
-  constructor({
-    typeormService,
-    userRoleService,
-    roleService,
-  }: {
-    typeormService: TypeormService;
-    userRoleService: UserRoleService;
-    roleService: RoleService;
-  }) {
-    super({ typeormService });
-
-    this.userRoleService = userRoleService;
-    this.roleService = roleService;
+  constructor(
+    typeormService: TypeormService,
+    private readonly userRoleService: UserRoleService,
+    private readonly roleService: RoleService,
+  ) {
+    super(typeormService);
   }
 
   toDto(user: User): UserDto<SqliteIdType> {
@@ -42,7 +31,7 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
       isRootUser: user.isRootUser,
       username: user.username,
       needsPasswordChange: user.needsPasswordChange,
-      roles: user.roles?.map((r) => r.roleId),
+      roles: (user.roles ?? []).map((r) => r.roleId),
     };
   }
 
@@ -50,8 +39,8 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
     return this.list({ take: limit });
   }
 
-  getUser(userId: SqliteIdType): Promise<User> {
-    return this.get(userId, true);
+  async getUser(userId: SqliteIdType) {
+    return this.get(userId);
   }
 
   async getUserRoleIds(userId: SqliteIdType): Promise<SqliteIdType[]> {
@@ -78,12 +67,16 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
     return entity.isRootUser;
   }
 
-  async deleteUser(userId: SqliteIdType): Promise<DeleteResult> {
+  async deleteUser(userId: SqliteIdType) {
     // Validate
     const user = await this.getUser(userId);
 
     if (user.isRootUser) {
       throw new InternalServerException("Cannot delete a root user");
+    }
+
+    if (!user.roles?.length) {
+      throw new InternalServerException("User:roles relation not loaded, cannot perform deletion role check");
     }
 
     // Check if the user is the last admin
@@ -95,14 +88,14 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
       }
     }
 
-    return await this.delete(userId);
+    await this.delete(userId);
   }
 
-  findRawByUsername(username: string): Promise<User> {
+  findRawByUsername(username: string): Promise<User | null> {
     return this.repository.findOneBy({ username });
   }
 
-  async getDemoUserId(): Promise<SqliteIdType> {
+  async getDemoUserId(): Promise<SqliteIdType | undefined> {
     return (await this.repository.findOneBy({ isDemoUser: true }))?.id;
   }
 
@@ -123,7 +116,7 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
 
   async setUserRoleIds(userId: SqliteIdType, roleIds: SqliteIdType[]): Promise<User> {
     await this.userRoleService.setUserRoles(userId, roleIds);
-    return await this.get(userId, true);
+    return await this.get(userId);
   }
 
   async setVerifiedById(userId: SqliteIdType, isVerified: boolean): Promise<void> {
@@ -153,13 +146,13 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
       throw new NotFoundException("User old password incorrect");
     }
 
-    const { password } = await validateInput({ password: newPassword }, newPasswordRules);
+    const { password } = await validateInput({ password: newPassword }, newPasswordSchema);
     const passwordHash = hashPassword(password);
     return await this.update(userId, { passwordHash, needsPasswordChange: false });
   }
 
   async updatePasswordUnsafeByUsername(username: string, newPassword: string): Promise<User> {
-    const { password } = await validateInput({ password: newPassword }, newPasswordRules);
+    const { password } = await validateInput({ password: newPassword }, newPasswordSchema);
     const passwordHash = hashPassword(password);
     const user = await this.findRawByUsername(username);
     if (!user) throw new NotFoundException("User not found");
@@ -172,10 +165,10 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
   }
 
   async register(input: RegisterUserDto<SqliteIdType>): Promise<User> {
-    const { username, password, roles, isDemoUser, isRootUser, needsPasswordChange, isVerified } = (await validateInput(
+    const { username, password, roles, isDemoUser, isRootUser, needsPasswordChange, isVerified } = await validateInput(
       input,
-      registerUserRules(true)
-    )) as RegisterUserDto<SqliteIdType>;
+      registerUserSchema(true),
+    );
 
     const passwordHash = hashPassword(password);
     const result = await this.create({
@@ -186,7 +179,7 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
       isRootUser: isRootUser ?? false,
       needsPasswordChange: needsPasswordChange ?? true,
     });
-    await this.userRoleService.setUserRoles(result.id, roles);
+    await this.userRoleService.setUserRoles(result.id, roles as SqliteIdType[]);
 
     return this.get(result.id);
   }

@@ -1,11 +1,13 @@
-export const getFileRules = {
-  path: "required|string",
-};
+import { z } from "zod";
 
-export const downloadFileRules = {
-  path: "required|string",
-};
+export const startPrintFileSchema = z.object({
+  filePath: z.string().min(1),
+});
 
-export const startPrintFileRules = {
-  filePath: "required|string",
-};
+export const downloadFileSchema = z.object({
+  path: z.string().min(1),
+});
+
+export const getFileSchema = z.object({
+  path: z.string().min(1),
+});

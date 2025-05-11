@@ -2,10 +2,10 @@ import { IdType } from "@/shared.constants";
 import { IRefreshToken } from "@/models/Auth/RefreshToken";
 import { RefreshTokenDto } from "@/services/interfaces/refresh-token.dto";
 
-export interface IRefreshTokenService<KeyType = IdType, Entity = IRefreshToken> {
+export interface IRefreshTokenService<KeyType = IdType, Entity = IRefreshToken<KeyType>> {
   toDto(entity: Entity): RefreshTokenDto<KeyType>;
 
-  getRefreshToken(refreshToken: string, throwNotFoundError?: boolean): Promise<Entity | null>;
+  getRefreshToken(refreshToken: string): Promise<Entity>;
 
   createRefreshTokenForUserId(userId: KeyType): Promise<string>;
 

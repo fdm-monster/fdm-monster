@@ -12,9 +12,9 @@ export const EVENT_TYPES = {
   FileAdded: "FileAdded",
   FileDeselected: "FileDeselected",
   FileRemoved: "FileRemoved",
-  FirmwareData: "FirmwareData", // Not modeled yet
+  FirmwareData: "FirmwareData",
   FolderAdded: "FolderAdded",
-  FolderRemoved: "FolderRemoved", // Not modeled yet
+  FolderRemoved: "FolderRemoved",
   Home: "Home",
   MetadataAnalysisFinished: "MetadataAnalysisFinished",
   MetadataAnalysisStarted: "MetadataAnalysisStarted",
@@ -37,4 +37,8 @@ export const EVENT_TYPES = {
   UserLoggedIn: "UserLoggedIn",
   Waiting: "Waiting",
   ZChange: "ZChange",
-};
+} as const;
+
+export const EVENT_TYPES_ARRAY = Object.values(EVENT_TYPES);
+
+export type EventType = (typeof EVENT_TYPES_ARRAY)[number];

@@ -14,10 +14,10 @@ export class PrinterGroupService
   extends BaseService(PrinterGroup, PrinterGroupDto)
   implements IPrinterGroupService<SqliteIdType>
 {
-  groupRepository: Repository<Group>;
+  private readonly groupRepository: Repository<Group>;
 
-  constructor({ typeormService }: { typeormService: TypeormService }) {
-    super({ typeormService });
+  constructor(typeormService: TypeormService) {
+    super(typeormService);
 
     this.groupRepository = typeormService.getDataSource().getRepository(Group);
   }
@@ -59,10 +59,6 @@ export class PrinterGroupService
   }
 
   async createGroup(dto: CreateGroupDto): Promise<GroupWithPrintersDto> {
-    // Safety mechanism against upserts
-    if (dto.id) {
-      delete dto.id;
-    }
     await validate(dto);
     const entity = this.groupRepository.create(dto);
     await validate(entity);

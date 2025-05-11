@@ -1,11 +1,10 @@
-import { OctoprintType } from "@/services/printer-api.interface";
+import { OctoprintType, PrinterType } from "@/services/printer-api.interface";
 
 const testApiKey = "fdmonsterfdmonsterfdmonsterfdmon";
 
 export const testPrinterData = {
   printerURL: "http://url.com",
-  printerType: OctoprintType,
-  webSocketURL: "ws://url.com",
+  printerType: OctoprintType as PrinterType,
   apiKey: testApiKey,
   enabled: false,
   name: "testPrinter 123",
@@ -13,9 +12,8 @@ export const testPrinterData = {
 
 export const validNewPrinterState = {
   apiKey: "asdasasdasdasdasdasdasdasdasdasd",
-  webSocketURL: "ws://asd.com/",
   printerURL: "https://asd.com:81",
-  printerType: OctoprintType,
+  printerType: OctoprintType as PrinterType,
   name: "TestPrinter",
 };
 
@@ -27,8 +25,7 @@ export class PrinterMockData {
     return {
       name: "Printuh",
       printerURL: "http://test.com/",
-      printerType: OctoprintType,
-      webSocketURL: "ws://test/",
+      printerType: OctoprintType as PrinterType,
       apiKey: "asdasasdasdasdasdasdasdasdasdasd",
     };
   }

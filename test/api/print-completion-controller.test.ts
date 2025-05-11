@@ -7,9 +7,10 @@ import { DITokens } from "@/container.tokens";
 import { SqliteIdType } from "@/shared.constants";
 import { PrintCompletionDto } from "@/services/interfaces/print-completion.dto";
 import { IPrintCompletionService } from "@/services/interfaces/print-completion.interface";
-import supertest from "supertest";
+import { Test } from "supertest";
 import { PrintCompletionController } from "@/controllers/print-completion.controller";
 import { createTestPrinter } from "./test-data/create-printer";
+import TestAgent from "supertest/lib/agent";
 
 let printCompletionService: IPrintCompletionService<SqliteIdType, PrintCompletionDto>;
 const listRoute = `${AppConstants.apiRoute}/print-completion`;
@@ -17,7 +18,7 @@ const getCompletionEntryRoute = (corrId: string) => `${listRoute}/${corrId}`;
 const contextsRoute = `${listRoute}/contexts`;
 const testRoute = `${listRoute}/test`;
 
-let request: supertest.SuperTest<supertest.Test>;
+let request: TestAgent<Test>;
 let container: AwilixContainer<any>;
 
 beforeAll(async () => {

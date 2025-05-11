@@ -1,12 +1,11 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
-import { BaseEntity } from "@/entities/base.entity";
 
 // TODO unfinished and uncoupled from the rest of the app
 @Entity()
-export class Permission extends BaseEntity {
+export class Permission {
   @PrimaryGeneratedColumn()
-  id!: number;
+  id: number;
 
   @Column()
-  name!: string;
+  name: string;
 }

@@ -6,12 +6,13 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { CreateFloorDto, FloorDto, PositionDto, UpdateFloorDto } from "@/services/interfaces/floor.dto";
 
 export class FloorStore<KeyType extends keyType = IdType> extends KeyDiffCache<FloorDto<KeyType>> {
-  private floorService: IFloorService<KeyType>;
-  private logger: LoggerService;
+  private readonly logger: LoggerService;
 
-  constructor({ floorService, loggerFactory }: { floorService: IFloorService<KeyType>; loggerFactory: ILoggerFactory }) {
+  constructor(
+    private readonly floorService: IFloorService<KeyType>,
+    loggerFactory: ILoggerFactory,
+  ) {
     super();
-    this.floorService = floorService;
     this.logger = loggerFactory(FloorStore.name);
   }
 
@@ -51,14 +52,15 @@ export class FloorStore<KeyType extends keyType = IdType> extends KeyDiffCache<F
   }
 
   async delete(floorId: KeyType) {
-    const deleteResult = await this.floorService.delete(floorId);
+    await this.floorService.delete(floorId);
     await this.deleteKeyValue(floorId);
-    return deleteResult;
   }
 
   async getFloor(floorId: KeyType) {
     let floor = await this.getValue(floorId);
-    if (!!floor) return floor;
+    if (floor) {
+      return floor;
+    }
 
     const dbFloor = await this.floorService.get(floorId);
     const floorDto = this.floorService.toDto(dbFloor);

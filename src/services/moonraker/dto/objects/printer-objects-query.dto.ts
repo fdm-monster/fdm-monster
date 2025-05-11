@@ -2,5 +2,5 @@ import { PrinterObjectDto } from "@/services/moonraker/dto/objects/printer-objec
 
 export interface PrinterObjectsQueryDto<T = PrinterObjectDto> {
   status: T;
-  eventtime: number;
+  eventtime: number | null;
 }

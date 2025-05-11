@@ -4,110 +4,87 @@ import { SettingsStore } from "@/state/settings.store";
 import EventEmitter2 from "eventemitter2";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
-import * as http from "http";
-import { AuthService } from "@/services/authentication/auth.service";
+import { Server as HttpServer } from "http";
 import { getPassportJwtOptions, verifyUserCallback } from "@/middleware/passport";
 import { IConfigService } from "@/services/core/config.service";
-import { Strategy as JwtStrategy, StrategyOptions, VerifiedCallback } from "passport-jwt";
-import { DefaultEventsMap } from "socket.io/dist/typed-events";
-import { ExtendedError } from "socket.io/dist/namespace";
 import { IUserService } from "@/services/interfaces/user-service.interface";
+import { authorize } from "@/middleware/socketio.middleware";
+import { Counter, Gauge } from "prom-client";
 
-const authorize = (
-  settingsStore: SettingsStore,
-  options: StrategyOptions,
-  verify: (jwt_payload: any, done: VerifiedCallback) => void
-) => {
-  const strategy = new JwtStrategy(options, verify);
+const socketIoGatewaySessions = new Gauge({
+  name: "socketio_gateway_sessions",
+  help: "Gateway active sessions",
+});
 
-  return async function authorizeCallback(
-    socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
-    next: (err?: ExtendedError) => void
-  ) {
-    if (!(await settingsStore.getLoginRequired())) {
-      // No login required, so we can skip the authentication
-      return next();
-    }
-    // --- Begin strategy augmentation ala passport
-    strategy.success = function success(user) {
-      socket.handshake.user = user;
-      next();
-    };
-    strategy.fail = (info) => next(new Error(info));
-    strategy.error = (error) => next(error);
+const socketIoGatewayDisconnects = new Counter({
+  name: "socketio_gateway_disconnects",
+  help: "Gateway connections closed",
+});
 
-    strategy.authenticate(socket, {});
-  };
-};
+const socketIoGatewayMessagesSent = new Counter({
+  name: "socketio_messages_sent",
+  help: "Gateway messages sent",
+});
+
+const socketIoGatewayMessageSentSize = new Gauge({
+  name: "socketio_message_size",
+  help: "Gateway message sent size",
+});
 
 export class SocketIoGateway {
   logger: LoggerService;
-  eventEmitter2: EventEmitter2;
+
   io: Server;
 
-  authService: AuthService;
-  settingsStore: SettingsStore;
-  configService: IConfigService;
-  userService: IUserService;
-
-  constructor({
-    loggerFactory,
-    eventEmitter2,
-    settingsStore,
-    authService,
-    configService,
-    userService,
-  }: {
-    loggerFactory: ILoggerFactory;
-    eventEmitter2: EventEmitter2;
-    settingsStore: SettingsStore;
-    authService: AuthService;
-    userService: IUserService;
-    configService: IConfigService;
-  }) {
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly eventEmitter2: EventEmitter2,
+    private readonly settingsStore: SettingsStore,
+    private readonly userService: IUserService,
+    private readonly configService: IConfigService,
+  ) {
     this.logger = loggerFactory(SocketIoGateway.name);
-    this.eventEmitter2 = eventEmitter2;
-    this.settingsStore = settingsStore;
-    this.authService = authService;
-    this.userService = userService;
-    this.configService = configService;
   }
 
-  attachServer(httpServer: http.Server) {
+  attachServer(httpServer: HttpServer) {
     this.io = new Server(httpServer, { cors: { origin: "*" } });
-    const opts = getPassportJwtOptions(this.settingsStore, this.configService, (value: Socket) => value.handshake.auth.token);
-    const verify = verifyUserCallback(this.userService);
-    this.io.use(authorize(this.settingsStore, opts, verify));
+    const opts = getPassportJwtOptions(
+      this.settingsStore,
+      this.configService,
+      (value: Socket) => value.handshake.auth.token,
+    );
+    this.io.use(authorize(this.settingsStore, opts, verifyUserCallback(this.userService)));
     this.io.on("connection", (socket) => this.onConnect.bind(this)(socket));
+
   }
 
   onConnect(socket: Socket) {
-    this.logger.debug("SocketIO Client connected", socket.id);
-
+    this.logger.debug("SocketIO Client connected", { socketId: socket.id });
     this.eventEmitter2.emit(socketIoConnectedEvent, socket.id);
+    socketIoGatewaySessions.inc();
 
     socket.on("disconnect", () => {
-      this.logger.debug("SocketIO Client disconnected", socket.id);
+      this.logger.debug("SocketIO Client disconnected", { socketId: socket.id });
+      socketIoGatewaySessions.dec(1);
+      socketIoGatewayDisconnects.inc();
     });
   }
 
   send<T>(event: string, data: T) {
     if (!this.io) {
-      this.logger.debug("No io server setup yet");
+      this.logger.debug(`Cant send event ${event}, socketio gateway must be created first`);
       return;
     }
 
-    if (this.settingsStore.getServerSettings().debugSettings?.debugSocketIoEvents) {
-      this.logger.log(`Sending event ${event}`);
-    }
     this.io.emit(event, data);
+    socketIoGatewayMessagesSent.inc();
+
+    const payload = JSON.stringify(data);
+    const sizeInBytes = Buffer.byteLength(payload);
+    socketIoGatewayMessageSentSize.set(sizeInBytes);
   }
 }
 
 export const IO_MESSAGES = {
   LegacyUpdate: "legacy-update",
-  LegacyPrinterTest: "legacy-printer-test",
-  CompletionEvent: "completion-event",
-  HostState: "host-state",
-  ApiAccessibility: "api-accessibility",
 };

@@ -1,14 +1,17 @@
 import { before, DELETE, GET, POST, route } from "awilix-express";
-import { authenticate, authorizePermission, authorizeRoles } from "@/middleware/authenticate";
-import { getScopedPrinter, validateInput } from "@/handlers/validators";
+import { authenticate, permission, authorizeRoles } from "@/middleware/authenticate";
+import { validateInput } from "@/handlers/validators";
 import { AppConstants } from "@/server.constants";
-import { downloadFileRules, getFileRules, startPrintFileRules } from "./validation/printer-files-controller.validation";
+import {
+  downloadFileSchema,
+  getFileSchema,
+  startPrintFileSchema,
+} from "./validation/printer-files-controller.validation";
 import { ValidationException } from "@/exceptions/runtime.exceptions";
 import { printerResolveMiddleware } from "@/middleware/printer";
 import { PERMS, ROLES } from "@/constants/authorization.constants";
 import { PrinterFilesStore } from "@/state/printer-files.store";
 import { SettingsStore } from "@/state/settings.store";
-import { BatchCallService } from "@/services/core/batch-call.service";
 import { MulterService } from "@/services/core/multer.service";
 import { PrinterFileCleanTask } from "@/tasks/printer-file-clean.task";
 import { LoggerService } from "@/handlers/logger";
@@ -19,55 +22,29 @@ import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
 import { captureException } from "@sentry/node";
 import { errorSummary } from "@/utils/error.utils";
 import { LoginDto } from "@/services/interfaces/login.dto";
+import { getScopedPrinter } from "@/middleware/printer-resolver";
 
 @route(AppConstants.apiRoute + "/printer-files")
 @before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR]), printerResolveMiddleware()])
 export class PrinterFilesController {
-  printerApi: IPrinterApi;
-  printerLogin: LoginDto;
-  printerThumbnailCache: PrinterThumbnailCache;
-  printerFilesStore: PrinterFilesStore;
-  settingsStore: SettingsStore;
-  batchCallService: BatchCallService;
-  multerService: MulterService;
-  printerFileCleanTask: PrinterFileCleanTask;
-  logger: LoggerService;
+  private readonly logger: LoggerService;
 
-  constructor({
-    printerApi,
-    printerLogin,
-    printerFilesStore,
-    batchCallService,
-    printerFileCleanTask,
-    settingsStore,
-    loggerFactory,
-    multerService,
-    printerThumbnailCache,
-  }: {
-    printerApi: IPrinterApi;
-    printerLogin: LoginDto;
-    printerFilesStore: PrinterFilesStore;
-    batchCallService: BatchCallService;
-    printerFileCleanTask: PrinterFileCleanTask;
-    settingsStore: SettingsStore;
-    loggerFactory: ILoggerFactory;
-    multerService: MulterService;
-    printerThumbnailCache: PrinterThumbnailCache;
-  }) {
-    this.printerApi = printerApi;
-    this.printerLogin = printerLogin;
-    this.printerFilesStore = printerFilesStore;
-    this.settingsStore = settingsStore;
-    this.printerFileCleanTask = printerFileCleanTask;
-    this.batchCallService = batchCallService;
-    this.multerService = multerService;
-    this.printerThumbnailCache = printerThumbnailCache;
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly printerApi: IPrinterApi,
+    private readonly printerLogin: LoginDto,
+    private readonly printerFilesStore: PrinterFilesStore,
+    private readonly printerFileCleanTask: PrinterFileCleanTask,
+    private readonly settingsStore: SettingsStore,
+    private readonly multerService: MulterService,
+    private readonly printerThumbnailCache: PrinterThumbnailCache,
+  ) {
     this.logger = loggerFactory(PrinterFilesController.name);
   }
 
   @POST()
   @route("/purge")
-  @before(authorizePermission(PERMS.PrinterFiles.Clear))
+  @before(permission(PERMS.PrinterFiles.Clear))
   async purgeIndexedFiles(req: Request, res: Response) {
     await this.printerFilesStore.purgeFiles();
     res.send();
@@ -75,7 +52,7 @@ export class PrinterFilesController {
 
   @GET()
   @route("/thumbnails")
-  @before(authorizePermission(PERMS.PrinterFiles.Get))
+  @before(permission(PERMS.PrinterFiles.Get))
   async getThumbnails(req: Request, res: Response) {
     const thumbnails = await this.printerThumbnailCache.getAllValues();
     res.send(thumbnails);
@@ -83,7 +60,7 @@ export class PrinterFilesController {
 
   @GET()
   @route("/:id")
-  @before(authorizePermission(PERMS.PrinterFiles.Get))
+  @before(permission(PERMS.PrinterFiles.Get))
   async getFiles(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
     this.logger.log("Refreshing file storage (eager load)");
@@ -93,9 +70,9 @@ export class PrinterFilesController {
 
   @POST()
   @route("/:id/reload-thumbnail")
-  @before(authorizePermission(PERMS.PrinterFiles.Actions))
+  @before(permission(PERMS.PrinterFiles.Actions))
   async reloadThumbnail(req: Request, res: Response) {
-    const { filePath } = await validateInput(req.body, startPrintFileRules);
+    const { filePath } = await validateInput(req.body, startPrintFileSchema);
 
     try {
       if (this.settingsStore.isThumbnailSupportEnabled()) {
@@ -115,9 +92,9 @@ export class PrinterFilesController {
    */
   @route("/:id/select")
   @route("/:id/print")
-  @before(authorizePermission(PERMS.PrinterFiles.Actions))
+  @before(permission(PERMS.PrinterFiles.Actions))
   async startPrintFile(req: Request, res: Response) {
-    const { filePath } = await validateInput(req.body, startPrintFileRules);
+    const { filePath } = await validateInput(req.body, startPrintFileSchema);
     const encodedFilePath = encodeURIComponent(filePath);
     await this.printerApi.startPrint(encodedFilePath);
 
@@ -135,7 +112,7 @@ export class PrinterFilesController {
 
   @GET()
   @route("/:id/cache")
-  @before(authorizePermission(PERMS.PrinterFiles.Get))
+  @before(permission(PERMS.PrinterFiles.Get))
   async getFilesCache(req: Request, res: Response) {
     const { currentPrinter } = getScopedPrinter(req);
     res.send(this.printerFilesStore.getFiles(currentPrinter.id));
@@ -143,10 +120,10 @@ export class PrinterFilesController {
 
   @GET()
   @route("/:id/download/:path")
-  @before(authorizePermission(PERMS.PrinterFiles.Get))
+  @before(permission(PERMS.PrinterFiles.Get))
   async downloadFile(req: Request, res: Response) {
     this.logger.log(`Downloading file ${req.params.path}`);
-    const { path } = await validateInput(req.params, downloadFileRules);
+    const { path } = await validateInput(req.params, downloadFileSchema);
     const encodedFilePath = encodeURIComponent(path);
 
     const response = await this.printerApi.downloadFile(encodedFilePath);
@@ -161,10 +138,10 @@ export class PrinterFilesController {
 
   @DELETE()
   @route("/:id")
-  @before(authorizePermission(PERMS.PrinterFiles.Delete))
+  @before(permission(PERMS.PrinterFiles.Delete))
   async deleteFileOrFolder(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
-    const { path } = await validateInput(req.query, getFileRules);
+    const { path } = await validateInput(req.query, getFileSchema);
     const encodedFilePath = encodeURIComponent(path);
 
     const result = await this.printerApi.deleteFile(encodedFilePath);
@@ -174,7 +151,7 @@ export class PrinterFilesController {
 
   @DELETE()
   @route("/:id/clear")
-  @before(authorizePermission(PERMS.PrinterFiles.Clear))
+  @before(permission(PERMS.PrinterFiles.Clear))
   async clearPrinterFiles(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
 
@@ -202,7 +179,7 @@ export class PrinterFilesController {
 
   @GET()
   @route("/:id/thumbnail")
-  @before(authorizePermission(PERMS.PrinterFiles.Get))
+  @before(permission(PERMS.PrinterFiles.Get))
   async getPrinterThumbnail(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
     const printerThumbnail = await this.printerThumbnailCache.getValue(currentPrinterId.toString());
@@ -211,15 +188,20 @@ export class PrinterFilesController {
 
   @POST()
   @route("/:id/upload")
-  @before(authorizePermission(PERMS.PrinterFiles.Upload))
+  @before(permission(PERMS.PrinterFiles.Upload))
   async uploadPrinterFile(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
 
-    const files = await this.multerService.multerLoadFileAsync(req, res, AppConstants.defaultAcceptedGcodeExtensions, true);
+    const files = await this.multerService.multerLoadFileAsync(
+      req,
+      res,
+      AppConstants.defaultAcceptedGcodeExtensions,
+      true,
+    );
     if (!files?.length) {
       throw new ValidationException({
         error: `No file was available for upload. Did you upload files with one of these extensions: ${AppConstants.defaultAcceptedGcodeExtensions.join(
-          ", "
+          ", ",
         )}?`,
       });
     }

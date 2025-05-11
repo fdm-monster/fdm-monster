@@ -7,7 +7,7 @@ import { PrinterService as PrinterService2 } from "./services/orm/printer.servic
 import { SettingsStore } from "./state/settings.store";
 import { SettingsService } from "./services/mongoose/settings.service";
 import { ServerReleaseService } from "./services/core/server-release.service";
-import { TaskManagerService } from "./services/core/task-manager.service";
+import { TaskManagerService } from "./services/task-manager.service";
 import { GithubService } from "./services/core/github.service";
 import { FileCache } from "./state/file.cache";
 import { PrinterWebsocketTask } from "./tasks/printer-websocket.task";
@@ -26,7 +26,6 @@ import { UserService } from "./services/mongoose/user.service";
 import { UserService as UserService2 } from "./services/orm/user.service";
 import { RoleService } from "./services/mongoose/role.service";
 import { RoleService as RoleService2 } from "./services/orm/role.service";
-import { ServerTasks } from "./tasks";
 import { PermissionService } from "./services/mongoose/permission.service";
 import { PermissionService as PermissionService2 } from "./services/orm/permission.service";
 import { PrinterFileCleanTask } from "./tasks/printer-file-clean.task";
@@ -34,10 +33,7 @@ import { ROLES } from "./constants/authorization.constants";
 import { CustomGcodeService } from "./services/mongoose/custom-gcode.service";
 import { CustomGcodeService as CustomGcodeService2 } from "./services/orm/custom-gcode.service";
 import { PrinterWebsocketRestoreTask } from "./tasks/printer-websocket-restore.task";
-import { PluginFirmwareUpdateService } from "./services/octoprint/plugin-firmware-update.service";
-import { PluginRepositoryCache } from "./services/octoprint/plugin-repository.cache";
-import { configureCacheManager } from "./handlers/cache-manager";
-import { ConfigService } from "./services/core/config.service";
+import { ConfigService, IConfigService } from "./services/core/config.service";
 import { PrintCompletionSocketIoTask } from "./tasks/print-completion.socketio.task";
 import { PrintCompletionService } from "./services/mongoose/print-completion.service";
 import { PrintCompletionService as PrintCompletionService2 } from "./services/orm/print-completion.service";
@@ -62,7 +58,7 @@ import { AuthService } from "./services/authentication/auth.service";
 import { RefreshTokenService } from "@/services/mongoose/refresh-token.service";
 import { throttling } from "@octokit/plugin-throttling";
 import { RefreshTokenService as RefreshToken2 } from "@/services/orm/refresh-token.service";
-import { SettingsService2 } from "@/services/orm/settings.service";
+import { SettingsService as SettingsService2 } from "@/services/orm/settings.service";
 import { FloorService as FloorService2 } from "@/services/orm/floor.service";
 import { FloorPositionService } from "@/services/orm/floor-position.service";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
@@ -77,12 +73,15 @@ import { MoonrakerApi } from "@/services/moonraker.api";
 import { PrinterApiFactory } from "@/services/printer-api.factory";
 import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
 import { HttpClientFactory } from "@/services/core/http-client.factory";
+import { CradleService } from "@/services/core/cradle.service";
+import { PrusaLinkApi } from "@/services/prusa-link/prusa-link.api";
+import { PrusaLinkHttpPollingAdapter } from "@/services/prusa-link/prusa-link-http-polling.adapter";
 
 export function config<T1, T2>(
   key: string,
   experimentalMode: boolean,
   serviceTypeorm: BuildResolver<T2> & DisposableResolver<T2>,
-  serviceMongoose?: (BuildResolver<T1> & DisposableResolver<T1>) | Resolver<T1>
+  serviceMongoose?: (BuildResolver<T1> & DisposableResolver<T1>) | Resolver<T1>,
 ) {
   return {
     [key]: experimentalMode ? serviceTypeorm : serviceMongoose,
@@ -92,20 +91,20 @@ export function config<T1, T2>(
 export function configureContainer(isSqlite: boolean = false) {
   // Create the container and set the injectionMode to PROXY (which is also the default).
   const container = createContainer({
-    injectionMode: InjectionMode.PROXY,
+    injectionMode: InjectionMode.CLASSIC,
   });
 
   const di = DITokens;
 
   container.register({
     // -- asValue/asFunction constants --
-    [di.serverTasks]: asValue(ServerTasks),
     [di.isTypeormMode]: asValue(isSqlite),
     [di.appDefaultRole]: asValue(ROLES.GUEST),
     [di.appDefaultRoleNoLogin]: asValue(ROLES.ADMIN),
     [di.serverVersion]: asFunction(() => {
       return process.env[AppConstants.VERSION_KEY];
     }),
+    [di.cradleService]: asClass(CradleService).inject((container) => ({ container })),
     [di.socketFactory]: asClass(SocketFactory).transient(), // Factory function, transient on purpose!
 
     // V1.6.0 capable services
@@ -113,20 +112,40 @@ export function configureContainer(isSqlite: boolean = false) {
     ...config(di.settingsService, isSqlite, asClass(SettingsService2), asClass(SettingsService)),
     ...config(di.floorService, isSqlite, asClass(FloorService2).singleton(), asClass(FloorService).singleton()),
     ...config(di.floorPositionService, isSqlite, asClass(FloorPositionService).singleton(), asValue(null)),
-    ...config(di.cameraStreamService, isSqlite, asClass(CameraService2).singleton(), asClass(CameraService).singleton()),
+    ...config(
+      di.cameraStreamService,
+      isSqlite,
+      asClass(CameraService2).singleton(),
+      asClass(CameraService).singleton(),
+    ),
     ...config(di.printerService, isSqlite, asClass(PrinterService2), asClass(PrinterService)),
     ...config(di.printerGroupService, isSqlite, asClass(PrinterGroupService), asValue(null)),
-    ...config(di.refreshTokenService, isSqlite, asClass(RefreshToken2).singleton(), asClass(RefreshTokenService).singleton()),
+    ...config(
+      di.refreshTokenService,
+      isSqlite,
+      asClass(RefreshToken2).singleton(),
+      asClass(RefreshTokenService).singleton(),
+    ),
     ...config(di.userService, isSqlite, asClass(UserService2).singleton(), asClass(UserService).singleton()),
     ...config(di.userRoleService, isSqlite, asClass(UserRoleService).singleton(), asValue(null)),
     ...config(di.roleService, isSqlite, asClass(RoleService2).singleton(), asClass(RoleService).singleton()), // caches roles
-    ...config(di.permissionService, isSqlite, asClass(PermissionService2).singleton(), asClass(PermissionService).singleton()), // caches roles
-    ...config(di.customGCodeService, isSqlite, asClass(CustomGcodeService2).singleton(), asClass(CustomGcodeService).singleton()),
+    ...config(
+      di.permissionService,
+      isSqlite,
+      asClass(PermissionService2).singleton(),
+      asClass(PermissionService).singleton(),
+    ), // caches roles
+    ...config(
+      di.customGCodeService,
+      isSqlite,
+      asClass(CustomGcodeService2).singleton(),
+      asClass(CustomGcodeService).singleton(),
+    ),
     ...config(
       di.printCompletionService,
       isSqlite,
       asClass(PrintCompletionService2).singleton(),
-      asClass(PrintCompletionService).singleton()
+      asClass(PrintCompletionService).singleton(),
     ),
     // -- asClass --
     [di.serverHost]: asClass(ServerHost).singleton(),
@@ -139,15 +158,13 @@ export function configureContainer(isSqlite: boolean = false) {
     [di.taskManagerService]: asClass(TaskManagerService).singleton(),
     [di.toadScheduler]: asClass(ToadScheduler).singleton(),
     [di.eventEmitter2]: asFunction(configureEventEmitter).singleton(),
-    [di.cacheManager]: asFunction(configureCacheManager).singleton(),
     [di.serverReleaseService]: asClass(ServerReleaseService).singleton(),
     [di.monsterPiService]: asClass(MonsterPiService).singleton(),
     [di.githubService]: asClass(GithubService),
-    [di.octokitService]: asFunction((cradle: any) => {
-      const config = cradle.configService;
+    [di.octokitService]: asFunction((configService: IConfigService) => {
       const CustomOctoKit = Octokit.plugin(throttling);
       return new CustomOctoKit({
-        auth: config.get(AppConstants.GITHUB_PAT),
+        auth: configService.get(AppConstants.GITHUB_PAT),
         throttle: {
           onRateLimit: (retryAfter, options, octokit, retryCount) => {
             const logger = LoggerFactory()("OctoKitThrottle");
@@ -169,6 +186,8 @@ export function configureContainer(isSqlite: boolean = false) {
     [di.yamlService]: asClass(YamlService),
     [di.printerLogin]: asValue(null), // Fallback when no scope is provided
     [di.printerApiFactory]: asClass(PrinterApiFactory).transient(), // Factory function, transient on purpose!
+    [di.prusaLinkApi]: asClass(PrusaLinkApi).transient(), // Transient on purpose
+    [di.prusaLinkPollingAdapter]: asClass(PrusaLinkHttpPollingAdapter).transient(), // Transient on purpose
     [di.octoprintApi]: asClass(OctoprintApi).transient(), // Transient on purpose
     [di.octoprintClient]: asClass(OctoprintClient).singleton(),
     [di.octoPrintSockIoAdapter]: asClass(OctoprintWebsocketAdapter).transient(), // Transient on purpose
@@ -176,10 +195,8 @@ export function configureContainer(isSqlite: boolean = false) {
     [di.moonrakerClient]: asClass(MoonrakerClient).singleton(),
     [di.moonrakerWebsocketAdapter]: asClass(MoonrakerWebsocketAdapter).transient(), // Transient on purpose
     [di.batchCallService]: asClass(BatchCallService).singleton(),
-    [di.pluginFirmwareUpdateService]: asClass(PluginFirmwareUpdateService).singleton(),
 
     [di.floorStore]: asClass(FloorStore).singleton(),
-    [di.pluginRepositoryCache]: asClass(PluginRepositoryCache).singleton(),
     [di.printerThumbnailCache]: asClass(PrinterThumbnailCache).singleton(),
     [di.fileCache]: asClass(FileCache).singleton(),
     [di.fileUploadTrackerCache]: asClass(FileUploadTrackerCache).singleton(),

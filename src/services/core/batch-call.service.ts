@@ -1,7 +1,5 @@
-import { PrinterFilesStore } from "@/state/printer-files.store";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { PrinterCache } from "@/state/printer.cache";
-import { PrinterEventsCache } from "@/state/printer-events.cache";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { IdType } from "@/shared.constants";
 import { captureException } from "@sentry/node";
@@ -11,6 +9,7 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { PrinterApiFactory } from "@/services/printer-api.factory";
 import { IPrinterApi, ReprintFileDto, ReprintState } from "@/services/printer-api.interface";
 import { LoginDto } from "@/services/interfaces/login.dto";
+import { keyType } from "@/utils/cache/key-diff.cache";
 
 interface BatchSingletonModel {
   success?: boolean;
@@ -22,38 +21,16 @@ interface BatchSingletonModel {
 
 type BatchModel = Array<BatchSingletonModel>;
 
-export class BatchCallService {
-  printerApiFactory: PrinterApiFactory;
-  printerSocketStore: PrinterSocketStore;
-  printerCache: PrinterCache;
-  printerEventsCache: PrinterEventsCache;
-  printerFilesStore: PrinterFilesStore;
-  printerService: IPrinterService;
-  logger: LoggerService;
+export class BatchCallService<KeyType extends IdType = keyType> {
+  private readonly logger: LoggerService;
 
-  constructor({
-    printerApiFactory,
-    printerCache,
-    printerEventsCache,
-    printerSocketStore,
-    printerFilesStore,
-    printerService,
-    loggerFactory,
-  }: {
-    printerApiFactory: PrinterApiFactory;
-    printerCache: PrinterCache;
-    printerEventsCache: PrinterEventsCache;
-    printerSocketStore: PrinterSocketStore;
-    printerFilesStore: PrinterFilesStore;
-    printerService: IPrinterService;
-    loggerFactory: ILoggerFactory;
-  }) {
-    this.printerApiFactory = printerApiFactory;
-    this.printerCache = printerCache;
-    this.printerEventsCache = printerEventsCache;
-    this.printerSocketStore = printerSocketStore;
-    this.printerFilesStore = printerFilesStore;
-    this.printerService = printerService;
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly printerApiFactory: PrinterApiFactory,
+    private readonly printerCache: PrinterCache,
+    private readonly printerSocketStore: PrinterSocketStore,
+    private readonly printerService: IPrinterService,
+  ) {
     this.logger = loggerFactory(BatchCallService.name);
   }
 
@@ -62,20 +39,20 @@ export class BatchCallService {
   }
 
   async batchTogglePrintersEnabled(
-    printerIds: string[],
-    enabled: boolean
+    printerIds: KeyType[],
+    enabled: boolean,
   ): Promise<
     {
       failure?: boolean;
       error?: any;
       success?: boolean;
-      printerId: string;
+      printerId: KeyType;
       time: number;
     }[]
   > {
     const promises = [];
     for (const printerId of printerIds) {
-      let promise: Promise<any>;
+      let promise: Promise<any> | undefined = undefined;
       const printerDto = await this.printerCache.getValue(printerId);
       if (!printerDto) continue;
 
@@ -92,29 +69,33 @@ export class BatchCallService {
               return { failure: true, error: e.message, printerId, time: Date.now() - time };
             });
         }
-      } else {
+      } else if (printerDto.enabled) {
         // If enabled, disable the printer
-        if (printerDto.enabled) {
-          promise = this.printerService
-            .updateEnabled(printerId, false)
-            .then(() => {
-              return { success: true, printerId, time: Date.now() - time };
-            })
-            .catch((e) => {
-              return { failure: true, error: e.message, printerId, time: Date.now() - time };
-            });
-        }
+        promise = this.printerService
+          .updateEnabled(printerId, false)
+          .then(() => {
+            return { success: true, printerId, time: Date.now() - time };
+          })
+          .catch((e) => {
+            return { failure: true, error: e.message, printerId, time: Date.now() - time };
+          });
+      } else {
+        this.logger.warn("Did not toggle printer enabled, its in maintenance");
       }
-      promises.push(promise);
+
+
+      if (promise) {
+        promises.push(promise);
+      }
     }
 
     return await Promise.all(promises);
   }
 
-  batchConnectSocket(printerIds: string[]): void {
+  batchConnectSocket(printerIds: KeyType[]): void {
     for (const printerId of printerIds) {
       try {
-        this.printerSocketStore.reconnectOctoPrint(printerId);
+        this.printerSocketStore.reconnectPrinterAdapter(printerId);
       } catch (e) {
         captureException(e);
         this.logger.error(`Error setting socket to reconnect ${errorSummary(e)}`);
@@ -122,7 +103,7 @@ export class BatchCallService {
     }
   }
 
-  async batchSettingsGet(printerIds: string[]): Promise<Awaited<BatchModel>> {
+  async batchSettingsGet(printerIds: KeyType[]): Promise<Awaited<BatchModel>> {
     const promises = [];
     for (const printerId of printerIds) {
       const login = await this.printerCache.getLoginDtoAsync(printerId);
@@ -144,7 +125,7 @@ export class BatchCallService {
     return await Promise.all(promises);
   }
 
-  async batchConnectUsb(printerIds: string[]): Promise<Awaited<BatchModel>> {
+  async batchConnectUsb(printerIds: KeyType[]): Promise<Awaited<BatchModel>> {
     const promises = [];
     for (const printerId of printerIds) {
       const login = await this.printerCache.getLoginDtoAsync(printerId);
@@ -165,7 +146,7 @@ export class BatchCallService {
     return await Promise.all(promises);
   }
 
-  async getBatchPrinterReprintFile(printerIds: IdType[]): Promise<ReprintFileDto[]> {
+  async getBatchPrinterReprintFile(printerIds: KeyType[]): Promise<ReprintFileDto[]> {
     const promises = [];
     for (const printerId of printerIds) {
       const promise = new Promise<ReprintFileDto>(async (resolve, _) => {
@@ -193,7 +174,7 @@ export class BatchCallService {
     return await Promise.all(promises);
   }
 
-  async batchReprintCalls(printerIdFileList: { printerId: IdType; path: string }[]): Promise<Awaited<BatchModel>> {
+  async batchReprintCalls(printerIdFileList: { printerId: KeyType; path: string }[]): Promise<Awaited<BatchModel>> {
     const promises = [];
     for (const printerIdFile of printerIdFileList) {
       const { printerId, path } = printerIdFile;

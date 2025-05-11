@@ -1,13 +1,14 @@
 import { model, Schema } from "mongoose";
 import { PrintCompletionContextDto } from "@/services/interfaces/print-completion-context.dto";
+import { MongoIdType } from "@/shared.constants";
 
-export interface IPrintCompletion {
-  id: string;
+export interface IPrintCompletion<KeyType = MongoIdType, PrinterIdType = Schema.Types.ObjectId> {
+  id: KeyType;
   fileName: string;
   createdAt: number;
   status: string;
-  printerId: Schema.Types.ObjectId;
-  completionLog: string;
+  printerId: PrinterIdType;
+  completionLog?: string;
   context: PrintCompletionContextDto;
 }
 

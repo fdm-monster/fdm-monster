@@ -1,12 +1,13 @@
 import { model, Schema } from "mongoose";
 import {
   credentialSettingsKey,
-  printerFileCleanSettingKey,
   frontendSettingKey,
+  printerFileCleanSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
   wizardSettingKey,
 } from "@/constants/server-settings.constants";
+import { MongoIdType } from "@/shared.constants";
 
 export interface IWizardSettings {
   wizardCompleted: boolean;
@@ -25,25 +26,14 @@ export interface ICredentialSettings {
   jwtExpiresIn: number;
   refreshTokenAttempts: number;
   refreshTokenExpiry: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface IDebugSettings {
-  debugSocketIoEvents: boolean;
-  debugSocketReconnect: boolean;
-  debugSocketRetries: boolean;
-  debugSocketSetup: boolean;
-  debugSocketMessages: boolean;
-  debugSocketIoBandwidth: boolean;
 }
 
 export interface IServerSettings {
   sentryDiagnosticsEnabled: boolean;
-  debugSettings: IDebugSettings;
   loginRequired: boolean;
   registration: boolean;
   experimentalMoonrakerSupport: boolean;
+  experimentalPrusaLinkSupport: boolean;
   experimentalClientSupport: boolean;
   experimentalThumbnailSupport: boolean;
 }
@@ -59,7 +49,8 @@ export interface ITimeoutSettings {
   apiTimeout: number;
 }
 
-export interface ISettings {
+export interface ISettings<KeyType = MongoIdType> {
+  id: KeyType;
   [wizardSettingKey]: IWizardSettings;
   [printerFileCleanSettingKey]: IFileCleanSettings;
   [credentialSettingsKey]: ICredentialSettings;
@@ -123,16 +114,6 @@ const SettingsSchema = new Schema<ISettings>({
         type: Number,
         required: true,
       },
-      createdAt: {
-        type: Date,
-        default: Date.now,
-        required: true,
-      },
-      updatedAt: {
-        type: Date,
-        default: Date.now,
-        required: true,
-      },
     },
     required: true,
   },
@@ -141,38 +122,6 @@ const SettingsSchema = new Schema<ISettings>({
       type: Boolean,
       default: false,
       required: true,
-    },
-    debugSettings: {
-      debugSocketIoEvents: {
-        type: Boolean,
-        default: false,
-        required: true,
-      },
-      debugSocketReconnect: {
-        type: Boolean,
-        default: false,
-        required: true,
-      },
-      debugSocketRetries: {
-        type: Boolean,
-        default: false,
-        required: true,
-      },
-      debugSocketSetup: {
-        type: Boolean,
-        default: false,
-        required: true,
-      },
-      debugSocketMessages: {
-        type: Boolean,
-        default: false,
-        required: true,
-      },
-      debugSocketIoBandwidth: {
-        type: Boolean,
-        default: false,
-        required: true,
-      },
     },
     loginRequired: {
       type: Boolean,
@@ -195,6 +144,11 @@ const SettingsSchema = new Schema<ISettings>({
       required: true,
     },
     experimentalThumbnailSupport: {
+      type: Boolean,
+      default: false,
+      required: true,
+    },
+    experimentalPrusaLinkSupport: {
       type: Boolean,
       default: false,
       required: true,

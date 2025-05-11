@@ -1,64 +1,106 @@
-import { apiKeyLengthMaxDefault, apiKeyLengthMinDefault } from "@/constants/service.constants";
-import { OctoprintType, MoonrakerType } from "@/services/printer-api.interface";
+import { z } from "zod";
+import {
+  printerApiKeyValidator,
+  printerEnabledValidator,
+  printerNameValidator,
+  printerTypeValidator,
+  printerUrlValidator,
+} from "@/services/validators/printer-service.validation";
+import {
+  floorLevelValidator,
+  floorNameValidator,
+  xValidator,
+  yValidator,
+} from "@/services/validators/floor-service.validation";
 
-export const exportPrintersFloorsYamlRules = {
-  // Used to export
-  exportPrinters: "required|boolean",
-  exportFloorGrid: "required|boolean",
-  exportFloors: "required|boolean",
-  // TODO in V2 this should be required
-  exportGroups: "boolean",
-  // Used to determine import strategy
-  printerComparisonStrategiesByPriority: "required|arrayUnique|minLength:1",
-  "printerComparisonStrategiesByPriority.*": "required|string|in:name,url,id",
-  floorComparisonStrategiesByPriority: "required|string|in:name,floor,id",
-  // Helpful reference
-  notes: "string",
-  // Future ideas
-  // dropPrinterIds: "required|boolean", // optional idea for future
-  // dropFloorIds: "required|boolean", // optional idea for future
-};
-
-export const importPrintersFloorsYamlRules = (
-  importPrinters: boolean,
-  importFloorGrid: boolean,
-  importFloors: boolean,
-  importGroups: boolean
-) => {
-  return {
-    version: "required|string",
-    config: "required|object",
-    "config.exportPrinters": "required|boolean",
-    "config.exportFloorGrid": "required|boolean",
-    "config.exportFloors": "required|boolean",
-    "config.exportGroups": "boolean",
-    "config.printerComparisonStrategiesByPriority": "required|arrayUnique|minLength:1",
-    "config.printerComparisonStrategiesByPriority.*": "required|string|in:name,url,id",
-    "config.floorComparisonStrategiesByPriority": "required|string|in:name,floor,id",
-    printers: `${!!importPrinters ? "array|minLength:0" : "not"}`,
-    "printers.*.id": "required",
-    "printers.*.apiKey": `requiredIf:printerType,${OctoprintType}|length:${apiKeyLengthMaxDefault},${apiKeyLengthMinDefault}|alphaDash`,
-    "printers.*.printerURL": "required|httpurl",
-    "printers.*.enabled": "boolean",
-    "printers.*.printerType": `integer|in:${OctoprintType},${MoonrakerType}`,
-    "printers.*.name": "required|string",
-    floors: `${!!importFloors ? "array|minLength:0" : "not"}`,
-    "floors.*.id": "required",
-    "floors.*.floor": "required|integer",
-    "floors.*.name": "required|string",
-    // TODO no grid check?
-    groups: `${!!importGroups ? "array|minLength:0" : "not"}`,
-    "groups.*.id": "required",
-    "groups.*.name": "required|string",
-    // "groups.*.printers": "required|array",
-    // "groups.*.printers.*.printerId": "required",
-  };
-};
-
-export const importPrinterPositionsRules = (isTypeormMode: boolean) => ({
-  printers: "array|minLength:0",
-  "printers.*.printerId": "required",
-  // isTypeormMode ? "integer|min:1" : "mongoId",
-  "printers.*.x": "required|integer|min:0|max:12",
-  "printers.*.y": "required|integer|min:0|max:12",
+export const exportPrintersFloorsYamlSchema = z.object({
+  exportPrinters: z.boolean(),
+  exportFloorGrid: z.boolean(),
+  exportFloors: z.boolean(),
+  exportGroups: z.boolean(),
+  printerComparisonStrategiesByPriority: z
+    .array(z.string().refine((val) => ["name", "url", "id"].includes(val)))
+    .min(1),
+  floorComparisonStrategiesByPriority: z.string().refine((val) => ["name", "floor", "id"].includes(val)),
+  notes: z.string().optional(),
 });
+
+export const numberOrStringIdValidator = z.union([z.number(), z.string()]);
+
+export const printerPositionsSchema = z
+  .array(
+    z.object({
+      printerId: numberOrStringIdValidator,
+      floorId: numberOrStringIdValidator.optional(),
+      x: xValidator,
+      y: yValidator,
+    }),
+  )
+  .min(0);
+
+export const importPrinterPositionsSchema = z.object({
+  printers: printerPositionsSchema.optional(),
+});
+
+export const importPrintersFloorsYamlSchema = z.object({
+  version: z.string().optional(),
+  exportedAt: z.date().optional(),
+  databaseType: z.enum(["mongo", "sqlite"]).default("mongo"),
+  config: z.object({
+    exportPrinters: z.boolean(),
+    exportFloorGrid: z.boolean(),
+    exportFloors: z.boolean(),
+    exportGroups: z.boolean().optional(),
+    printerComparisonStrategiesByPriority: z
+      .array(z.string().refine((val) => ["name", "url", "id"].includes(val)))
+      .min(1),
+    floorComparisonStrategiesByPriority: z.string().refine((val) => ["name", "floor", "id"].includes(val)),
+  }),
+  printers: z
+    .array(
+      z.object({
+        id: numberOrStringIdValidator,
+        printerURL: printerUrlValidator,
+        printerType: printerTypeValidator,
+        apiKey: printerApiKeyValidator,
+        enabled: printerEnabledValidator,
+        name: printerNameValidator,
+        // Legacy properties
+        printerName: z.string().optional(),
+        settingsAppearance: z
+          .object({
+            name: z.string().optional(),
+          })
+          .optional(),
+      }),
+    )
+    .min(0)
+    .default([]),
+  floors: z
+    .array(
+      z.object({
+        id: numberOrStringIdValidator,
+        floor: floorLevelValidator,
+        name: floorNameValidator,
+        printers: printerPositionsSchema,
+      }),
+    )
+    .min(0)
+    .default([]),
+  groups: z
+    .array(
+      z.object({
+        id: numberOrStringIdValidator,
+        name: z.string(),
+        printers: z.array(
+          z.object({
+            printerId: numberOrStringIdValidator,
+          }),
+        ),
+      }),
+    )
+    .min(0)
+    .default([]),
+});
+
+export type YamlExportSchema = z.infer<typeof importPrintersFloorsYamlSchema>;

@@ -28,8 +28,5 @@
     }
   },
   "type": "machinecode",
-  "typePath": [
-    "machinecode",
-    "gcode"
-  ]
+  "typePath": ["machinecode", "gcode"]
 }

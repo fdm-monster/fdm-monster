@@ -1,5 +1,54 @@
 # Develop
 
+## Features
+- Introduce PrusaLink adapter for limited printer support for these printers: MK3S(+) (needs PrusaLink extension with Raspberry Pi), Mini(+), MK4(S), XL, Core One
+- Add opt-in Prometheus integration (still experimental)
+- Add opt-in Loki integration (still experimental)
+
+## Chores
+
+- Remove unused code for OctoPrint plugin support (this work needs to go through triage again)
+- Remove unused code for OctoPrint plugin backup (this work needs to go through triage again)
+- Remove unused code for OctoPrint plugin firmware update (this work needs to go through triage again)
+- Remove unused code for OctoPrint plugin repository
+- Remove unused code for Prusa firmware releases
+- Remove printer API endpoints for OctoPrint plugins, backups and firmware updates
+- Remove cache-manager package
+- Remove unused console files
+- Update .env.template
+- Removed BaseEntity
+- Make printerId camera nullish
+- Merge create and update schema floor
+- Schema printerPositionsSchema simplified
+- Add biome linter/formatter, remove prettier and eslint
+
+## Changes
+
+- `tsconfig.json` strictNullChecks and strictPropertyInitialization set to true for better null propagation logic.
+- Update dependency injection with awilix, switch to CLASSIC mode for less verbose code
+- Update API controller, use decorators over api builder
+- Remove PrinterFile entity (unused)
+- Remove printer/connection PATCH endpoint (unused)
+- Remove debug settings from server settings database
+- Remove all API compatibility feature flags except for printerGroupsApi and multiplePrinterServices
+
+## Fixes
+
+- Fix punycode warning by pinning tr46 package
+- Fix camera dto and entity to be consistent
+- Make yaml import fill in default arrays
+- Make printCompletionSchema context type any
+- Enforce properties on camera stream Mongoose schema for consistency with TypeORM camera stream entity
+- Enforce floor id on Mongoose schema for consistency with TypeORM floor entity
+- Set floor id in Mongoose floor service for consistency with typeorm service
+- Fix print completion interface and dto
+- Improved API key validation: klipper validation completely isolated from OctoPrint api key validation
+- Query parameter `forceSave` in printer create/update API was used incorrectly (flipped around)
+- Fixed all typescript issues
+- Server settings would not always migrate properly
+- Printer files store will not cache files of disabled printers
+- Klipper printer should print on upload
+
 # FDM Monster 19/03/2025 1.8.3
 
 ## Fixes
@@ -152,7 +201,7 @@
 - Used attributes for PrinterFilesController
 - Renamed OctoPrintApiService to OctoprintClient
 - Switch to 1.6.x client UI version range
-- Update Octoprint websocket with refresh interval, defaulting to 10sec. This loop will keep refresh attempts internal to the Websocket adapter of each service type (Octoprint, Moonraker, Bambu, etc).
+- Update Octoprint websocket with refresh interval, defaulting to 10sec. This loop will keep refresh attempts internal to the Websocket adapter of each service type (Octoprint, Moonraker, etc).
 
 ## Fixes:
 

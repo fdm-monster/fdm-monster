@@ -1,7 +1,9 @@
 import { AnyArray, model, Schema } from "mongoose";
+import { MongoIdType } from "@/shared.constants";
+import { UserRole } from "@/entities/user-role.entity";
 
-export interface IUser {
-  id: string;
+export interface IUser<KeyType = MongoIdType, Roles = AnyArray<KeyType | UserRole>> {
+  id: KeyType;
   username: string;
   isDemoUser: boolean;
   isRootUser: boolean;
@@ -9,7 +11,7 @@ export interface IUser {
   needsPasswordChange: boolean;
   passwordHash: string;
   createdAt: Date;
-  roles: AnyArray<string>;
+  roles: Roles;
 }
 
 const UserSchema = new Schema<IUser>({

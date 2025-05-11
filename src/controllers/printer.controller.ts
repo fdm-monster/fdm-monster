@@ -1,15 +1,12 @@
 import { before, DELETE, GET, PATCH, POST, route } from "awilix-express";
 import { authenticate, authorizeRoles } from "@/middleware/authenticate";
-import { getScopedPrinter, validateInput, validateMiddleware } from "@/handlers/validators";
+import { validateInput, validateMiddleware } from "@/handlers/validators";
 import {
-  createOctoPrintBackupRules,
-  feedRateRules,
-  flowRateRules,
-  getOctoPrintBackupRules,
-  testPrinterApiRules,
-  updatePrinterConnectionSettingRules,
-  updatePrinterDisabledReasonRules,
-  updatePrinterEnabledRule,
+  feedRateSchema,
+  flowRateSchema,
+  testPrinterApiSchema,
+  updatePrinterDisabledReasonSchema,
+  updatePrinterEnabledSchema,
 } from "./validation/printer-controller.validation";
 import { AppConstants } from "@/server.constants";
 import { printerResolveMiddleware } from "@/middleware/printer";
@@ -20,87 +17,37 @@ import { TestPrinterSocketStore } from "@/state/test-printer-socket.store";
 import { PrinterCache } from "@/state/printer.cache";
 import { LoggerService } from "@/handlers/logger";
 import { PrinterEventsCache } from "@/state/printer-events.cache";
-import { TaskManagerService } from "@/services/core/task-manager.service";
-import { PluginRepositoryCache } from "@/services/octoprint/plugin-repository.cache";
 import { FloorStore } from "@/state/floor.store";
-import { MulterService } from "@/services/core/multer.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { Request, Response } from "express";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { LoginDto } from "@/services/interfaces/login.dto";
 import { AxiosError } from "axios";
 import { FailedDependencyException } from "@/exceptions/failed-dependency.exception";
-import { BadRequestException, InternalServerException } from "@/exceptions/runtime.exceptions";
-import { MoonrakerClient } from "@/services/moonraker/moonraker.client";
+import { InternalServerException } from "@/exceptions/runtime.exceptions";
 import { IPrinterApi } from "@/services/printer-api.interface";
-import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { PrinterApiFactory } from "@/services/printer-api.factory";
 import { normalizeUrl } from "@/utils/normalize-url";
 import { defaultHttpProtocol } from "@/utils/url.utils";
+import { getScopedPrinter } from "@/middleware/printer-resolver";
 
 @route(AppConstants.apiRoute + "/printer")
 @before([authenticate(), authorizeRoles([ROLES.OPERATOR, ROLES.ADMIN]), printerResolveMiddleware()])
 export class PrinterController {
-  printerApiFactory: PrinterApiFactory;
-  printerSocketStore: PrinterSocketStore;
-  testPrinterSocketStore: TestPrinterSocketStore;
-  printerService: IPrinterService;
-  printerCache: PrinterCache;
-  printerEventsCache: PrinterEventsCache;
-  taskManagerService: TaskManagerService;
-  printerApi: IPrinterApi;
-  octoprintClient: OctoprintClient;
-  moonrakerClient: MoonrakerClient;
-  pluginRepositoryCache: PluginRepositoryCache;
-  floorStore: FloorStore;
-  multerService: MulterService;
   logger: LoggerService;
 
-  constructor({
-    printerApiFactory,
-    printerSocketStore,
-    testPrinterSocketStore,
-    printerService,
-    printerCache,
-    printerEventsCache,
-    taskManagerService,
-    loggerFactory,
-    printerApi,
-    moonrakerClient,
-    octoprintClient,
-    pluginRepositoryCache,
-    floorStore,
-    multerService,
-  }: {
-    printerApiFactory: PrinterApiFactory;
-    printerSocketStore: PrinterSocketStore;
-    testPrinterSocketStore: TestPrinterSocketStore;
-    printerService: IPrinterService;
-    printerCache: PrinterCache;
-    printerEventsCache: PrinterEventsCache;
-    taskManagerService: TaskManagerService;
-    loggerFactory: ILoggerFactory;
-    printerApi: IPrinterApi;
-    octoprintClient: OctoprintClient;
-    moonrakerClient: MoonrakerClient;
-    pluginRepositoryCache: PluginRepositoryCache;
-    floorStore: FloorStore;
-    multerService: MulterService;
-  }) {
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly printerApiFactory: PrinterApiFactory,
+    private readonly printerSocketStore: PrinterSocketStore,
+    private readonly testPrinterSocketStore: TestPrinterSocketStore,
+    private readonly printerService: IPrinterService,
+    private readonly printerCache: PrinterCache,
+    private readonly printerEventsCache: PrinterEventsCache,
+    private readonly printerApi: IPrinterApi,
+    private readonly floorStore: FloorStore,
+  ) {
     this.logger = loggerFactory(PrinterController.name);
-    this.printerApiFactory = printerApiFactory;
-    this.printerCache = printerCache;
-    this.printerEventsCache = printerEventsCache;
-    this.printerService = printerService;
-    this.printerSocketStore = printerSocketStore;
-    this.testPrinterSocketStore = testPrinterSocketStore;
-    this.taskManagerService = taskManagerService;
-    this.printerApi = printerApi;
-    this.octoprintClient = octoprintClient;
-    this.moonrakerClient = moonrakerClient;
-    this.pluginRepositoryCache = pluginRepositoryCache;
-    this.floorStore = floorStore;
-    this.multerService = multerService;
   }
 
   @GET()
@@ -129,16 +76,6 @@ export class PrinterController {
     res.send(importResult);
   }
 
-  /**
-   * This list should move to generic controller
-   */
-  @GET()
-  @route("/plugin-list")
-  async getPluginList(req: Request, res: Response) {
-    const pluginList = this.pluginRepositoryCache.getCache();
-    res.send(pluginList);
-  }
-
   @GET()
   @route("/:id")
   async getPrinter(req: Request, res: Response) {
@@ -156,7 +93,7 @@ export class PrinterController {
   @PATCH()
   @route("/:id")
   async update(req: Request, res: Response) {
-    const forceSave = req.query.forceSave !== "true";
+    const forceSave = req.query.forceSave === "true";
 
     // Update the printer entity: printerURL, name, apiKey, enabled
     const { currentPrinterId } = getScopedPrinter(req);
@@ -173,16 +110,16 @@ export class PrinterController {
   @route("/:id")
   async delete(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
-    const result = await this.printerService.delete(currentPrinterId);
+    await this.printerService.delete(currentPrinterId);
     await this.floorStore.removePrinterFromAnyFloor(currentPrinterId);
-    res.send(result);
+    res.send();
   }
 
   @PATCH()
   @route("/:id/enabled")
   async updateEnabled(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
-    const data = await validateMiddleware(req, updatePrinterEnabledRule);
+    const data = await validateMiddleware(req, updatePrinterEnabledSchema);
     await this.printerService.updateEnabled(currentPrinterId, data.enabled);
     res.send({});
   }
@@ -191,34 +128,16 @@ export class PrinterController {
   @route("/:id/disabled-reason")
   async updatePrinterDisabledReason(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
-    const data = await validateMiddleware(req, updatePrinterDisabledReasonRules);
+    const data = await validateMiddleware(req, updatePrinterDisabledReasonSchema);
     await this.printerService.updateDisabledReason(currentPrinterId, data.disabledReason);
     res.send({});
-  }
-
-  @PATCH()
-  @route("/:id/connection")
-  async updateConnectionSettings(req: Request, res: Response) {
-    const { currentPrinterId } = getScopedPrinter(req);
-    const inputData = await validateMiddleware(req, updatePrinterConnectionSettingRules);
-
-    if (req.query.forceSave !== "true") {
-      await this.testPrintApiConnection(inputData);
-    }
-
-    const newEntity = await this.printerService.updateConnectionSettings(currentPrinterId, inputData);
-    res.send({
-      printerURL: newEntity.printerURL,
-      apiKey: newEntity.apiKey,
-      printerType: newEntity.printerType,
-    });
   }
 
   @POST()
   @route("/:id/refresh-socket")
   async refreshPrinterSocket(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
-    this.printerSocketStore.reconnectOctoPrint(currentPrinterId);
+    this.printerSocketStore.reconnectPrinterAdapter(currentPrinterId);
     await this.printerEventsCache.deletePrinterSocketEvents(currentPrinterId);
     res.send({});
   }
@@ -229,18 +148,17 @@ export class PrinterController {
     if (req.body.printerURL?.length) {
       req.body.printerURL = normalizeUrl(req.body.printerURL, { defaultProtocol: defaultHttpProtocol });
     }
-    const newPrinter = await validateMiddleware(req, testPrinterApiRules);
-    newPrinter.correlationToken = generateCorrelationToken();
-    this.logger.log(`Testing printer with correlation token ${newPrinter.correlationToken}`);
+    const newPrinter = await validateMiddleware(req, testPrinterApiSchema);
+    const printerCorrelationToken = generateCorrelationToken();
+    this.logger.log(`Testing printer with correlation token ${printerCorrelationToken}`);
 
-    // Add printer with test=true
     try {
-      await this.testPrinterSocketStore.setupTestPrinter(newPrinter);
+      await this.testPrinterSocketStore.setupTestPrinter(printerCorrelationToken, newPrinter);
     } catch (e) {
-      res.send({ correlationToken: newPrinter.correlationToken, failure: true, error: e.toString() });
+      res.send({ correlationToken: printerCorrelationToken, failure: true, error: (e as Error).toString() });
       return;
     }
-    res.send({ correlationToken: newPrinter.correlationToken });
+    res.send({ correlationToken: printerCorrelationToken });
   }
 
   @GET()
@@ -309,8 +227,27 @@ export class PrinterController {
     res.send();
   }
 
+  @PATCH()
+  @route("/:id/feed-rate")
+  async setFeedRate(req: Request, res: Response) {
+    const { currentPrinterId } = getScopedPrinter(req);
+    const data = await validateMiddleware(req, feedRateSchema);
+
+    await this.printerService.updateFeedRate(currentPrinterId, data.feedRate);
+    res.send({});
+  }
+
+  @PATCH()
+  @route("/:id/flow-rate")
+  async setFlowRate(req: Request, res: Response) {
+    const { currentPrinterId } = getScopedPrinter(req);
+    const data = await validateMiddleware(req, flowRateSchema);
+    await this.printerService.updateFlowRate(currentPrinterId, data.flowRate);
+    res.send({});
+  }
+
   private async testPrintApiConnection(inputLoginDto: LoginDto) {
-    await validateInput(inputLoginDto, updatePrinterConnectionSettingRules);
+    await validateInput(inputLoginDto, testPrinterApiSchema);
     try {
       if (this.printerApi) {
         await this.printerApi.getVersion();
@@ -346,7 +283,7 @@ export class PrinterController {
             } else {
               throw new FailedDependencyException(
                 `Reaching Printer service failed with status (code ${e.code})`,
-                e.response?.status
+                e.response?.status,
               );
             }
           }
@@ -355,88 +292,5 @@ export class PrinterController {
 
       throw new InternalServerException(`Could not call Printer service, internal problem`, (e as Error).stack);
     }
-  }
-
-  @PATCH()
-  @route("/:id/feed-rate")
-  async setFeedRate(req: Request, res: Response) {
-    const { currentPrinterId } = getScopedPrinter(req);
-    const data = await validateMiddleware(req, feedRateRules);
-
-    await this.printerService.updateFeedRate(currentPrinterId, data.feedRate);
-    res.send({});
-  }
-
-  @PATCH()
-  @route("/:id/flow-rate")
-  async setFlowRate(req: Request, res: Response) {
-    const { currentPrinterId } = getScopedPrinter(req);
-    const data = await validateMiddleware(req, flowRateRules);
-    await this.printerService.updateFlowRate(currentPrinterId, data.flowRate);
-    res.send({});
-  }
-
-  @GET()
-  @route("/:id/plugin-list")
-  async getPrinterPluginList(req: Request, res: Response) {
-    // List installed plugins (OP 1.6.0+)
-    const { printerLogin } = getScopedPrinter(req);
-    const pluginListResponse = await this.octoprintClient.getPluginManagerPlugins(printerLogin);
-    res.send(pluginListResponse.data);
-  }
-
-  @GET()
-  @route("/:id/octoprint/backup")
-  async getOctoPrintBackupOverview(req: Request, res: Response) {
-    const { printerLogin } = getScopedPrinter(req);
-    const backupOverview = await this.octoprintClient.getBackupOverview(printerLogin);
-    res.send(backupOverview.data);
-  }
-
-  @GET()
-  @route("/:id/octoprint/backup/list")
-  async listOctoPrintBackups(req: Request, res: Response) {
-    const { printerLogin } = getScopedPrinter(req);
-    const backupOverview = await this.octoprintClient.getBackups(printerLogin);
-    res.send(backupOverview.data);
-  }
-
-  @POST()
-  @route("/:id/octoprint/backup/create")
-  async createOctoPrintBackup(req: Request, res: Response) {
-    const { printerLogin } = getScopedPrinter(req);
-    const { exclude } = await validateMiddleware(req, createOctoPrintBackupRules);
-    const response = await this.octoprintClient.createBackup(printerLogin, exclude);
-    res.send(response.data);
-  }
-
-  @POST()
-  @route("/:id/octoprint/backup/download")
-  async downloadOctoPrintBackup(req: Request, res: Response) {
-    const { printerLogin } = getScopedPrinter(req);
-    const { fileName } = await validateMiddleware(req, getOctoPrintBackupRules);
-    const dataStream = await this.octoprintClient.getDownloadBackupStream(printerLogin, fileName);
-    dataStream.pipe(res);
-  }
-
-  @POST()
-  @route("/:id/octoprint/backup/restore")
-  async restoreOctoPrintBackup(req: Request, res: Response) {
-    const { printerLogin } = getScopedPrinter(req);
-    const files = await this.multerService.multerLoadFileAsync(req, res, null, false);
-    if (!files?.length) {
-      throw new BadRequestException("No files uploaded.");
-    }
-    const response = await this.octoprintClient.forwardRestoreBackupFileStream(printerLogin, files[0].buffer);
-    res.send(response.data);
-  }
-
-  @DELETE()
-  @route("/:id/octoprint/backup/delete")
-  async deleteOctoPrintBackup(req: Request, res: Response) {
-    const { printerLogin } = getScopedPrinter(req);
-    const { fileName } = await validateMiddleware(req, getOctoPrintBackupRules);
-    const response = await this.octoprintClient.deleteBackup(printerLogin, fileName);
-    res.send(response.data);
   }
 }

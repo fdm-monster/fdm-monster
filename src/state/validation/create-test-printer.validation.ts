@@ -1,10 +1,24 @@
-import { apiKeyLengthMaxDefault, apiKeyLengthMinDefault } from "@/constants/service.constants";
-import { MoonrakerType, OctoprintType } from "@/services/printer-api.interface";
+import { z } from "zod";
+import {
+  printerApiKeyValidator,
+  printerEnabledValidator,
+  printerNameValidator,
+  printerPasswordValidator,
+  printerTypeValidator,
+  printerUrlValidator,
+  printerUsernameValidator,
+  refineApiKeyValidator,
+} from "@/services/validators/printer-service.validation";
 
-export const createTestPrinterRules = {
-  enabled: "boolean",
-  printerType: `required|integer|in:${OctoprintType},${MoonrakerType}`,
-  correlationToken: "required|string",
-  apiKey: `requiredIf:printerType,${OctoprintType}|length:${apiKeyLengthMaxDefault},${apiKeyLengthMinDefault}|alphaDash`,
-  printerURL: "required|httpurl",
-};
+export const createTestPrinterSchema = z
+  .object({
+    printerURL: printerUrlValidator,
+    printerType: printerTypeValidator,
+    apiKey: printerApiKeyValidator,
+    enabled: printerEnabledValidator.optional(),
+    name: printerNameValidator.optional(),
+    username: printerUsernameValidator.optional(),
+    password: printerPasswordValidator.optional(),
+  })
+  .strict()
+  .superRefine(refineApiKeyValidator);

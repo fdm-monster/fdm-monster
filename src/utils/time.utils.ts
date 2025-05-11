@@ -1,7 +1,4 @@
-export async function sleep(ms = 2000) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-export function isValidDate(date) {
-  return date instanceof Date && !isNaN(date);
+export function isParsableDate(value: string): boolean {
+  const timestamp = Date.parse(value);
+  return !isNaN(timestamp);
 }

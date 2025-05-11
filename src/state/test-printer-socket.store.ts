@@ -1,6 +1,6 @@
 import { setInterval, setTimeout } from "timers/promises";
 import { validateInput } from "@/handlers/validators";
-import { createTestPrinterRules } from "./validation/create-test-printer.validation";
+import { createTestPrinterSchema } from "./validation/create-test-printer.validation";
 import { octoPrintEvent, WsMessage } from "@/services/octoprint/octoprint-websocket.adapter";
 import { AppConstants } from "@/server.constants";
 import { SocketIoGateway } from "@/state/socket-io.gateway";
@@ -11,47 +11,35 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { errorSummary } from "@/utils/error.utils";
 import { captureException } from "@sentry/node";
 import { SOCKET_STATE } from "@/shared/dtos/socket-state.type";
-import { PrinterUnsafeWithCorrelationDto } from "@/services/interfaces/printer.dto";
-import { IdType } from "@/shared.constants";
 import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
-import { moonrakerEvent } from "@/services/moonraker/constants/websocket.constants";
+import { moonrakerEvent } from "@/services/moonraker/constants/moonraker.constants";
 import { printerEvents } from "@/constants/event.constants";
+import { OctoPrintEventDto } from "@/services/octoprint/dto/octoprint-event.dto";
+import { z } from "zod";
 
 export class TestPrinterSocketStore {
-  testSocket: IWebsocketAdapter;
-  socketIoGateway: SocketIoGateway;
-  socketFactory: SocketFactory;
-  eventEmitter2: EventEmitter2;
-  logger: LoggerService;
+  testSocket?: IWebsocketAdapter;
+  private readonly logger: LoggerService;
 
-  constructor({
-    socketFactory,
-    socketIoGateway,
-    eventEmitter2,
-    loggerFactory,
-  }: {
-    socketFactory: SocketFactory;
-    socketIoGateway: SocketIoGateway;
-    eventEmitter2: EventEmitter2;
-    loggerFactory: ILoggerFactory;
-  }) {
-    this.socketFactory = socketFactory;
-    this.socketIoGateway = socketIoGateway;
-    this.eventEmitter2 = eventEmitter2;
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly socketFactory: SocketFactory,
+    private readonly socketIoGateway: SocketIoGateway,
+    private readonly eventEmitter2: EventEmitter2,
+  ) {
     this.logger = loggerFactory(TestPrinterSocketStore.name);
   }
 
-  async setupTestPrinter(printer: PrinterUnsafeWithCorrelationDto<IdType>): Promise<void> {
+  async setupTestPrinter(correlationToken: string, printer: z.infer<typeof createTestPrinterSchema>): Promise<void> {
     if (this.testSocket) {
       this.testSocket.close();
-      this.testSocket = null;
+      delete this.testSocket;
     }
 
-    const validatedData = await validateInput(printer, createTestPrinterRules);
+    const validatedData = await validateInput(printer, createTestPrinterSchema);
     validatedData.enabled = true;
 
     // Create a new socket if it doesn't exist
-    const { correlationToken } = printer;
     this.testSocket = this.socketFactory.createInstance(printer.printerType);
 
     // Reset the socket credentials before (re-)connecting
@@ -59,6 +47,8 @@ export class TestPrinterSocketStore {
       printerId: correlationToken,
       loginDto: {
         apiKey: printer.apiKey,
+        username: printer.username,
+        password: printer.password,
         printerURL: printer.printerURL,
         printerType: printer.printerType,
       },
@@ -76,7 +66,7 @@ export class TestPrinterSocketStore {
       moonrakerEvent(WsMessage.WS_OPENED),
       moonrakerEvent(WsMessage.WS_ERROR),
     ];
-    const listener = ({ event, payload, printerId }) => {
+    const listener = ({ event, payload, printerId }: OctoPrintEventDto) => {
       if (printerId !== correlationToken) {
         return;
       }
@@ -96,11 +86,15 @@ export class TestPrinterSocketStore {
 
       this.logger.log("Test socket connection started");
       const promise = new Promise(async (resolve, reject) => {
+        if (!this.testSocket) {
+          this.logger.error("Aborting test as testSocket is undefined.");
+          return;
+        }
         this.testSocket.open();
-        for await (const startTime of setInterval(100)) {
+        for await (const _startTime of setInterval(100)) {
           if (!this.testSocket) {
             this.logger.warn("Test without socket, rejecting");
-            reject();
+            reject(new Error("Test without socket, rejecting"));
             return;
           }
           if (this.testSocket.socketState === SOCKET_STATE.authenticated) {

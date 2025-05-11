@@ -1,10 +1,8 @@
-import { injectable, inject } from "awilix";
 import { Request, Response } from "express";
 import { AppConstants } from "@/server.constants";
 import { authenticate, authorizeRoles } from "@/middleware/authenticate";
 import { ROLES } from "@/constants/authorization.constants";
 import { validateInput, validateMiddleware } from "@/handlers/validators";
-import { idRulesV2 } from "./validation/generic.validation";
 import { BadRequestException, ForbiddenError } from "@/exceptions/runtime.exceptions";
 import { IConfigService } from "@/services/core/config.service";
 import { IUserService } from "@/services/interfaces/user-service.interface";
@@ -16,42 +14,30 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { errorSummary } from "@/utils/error.utils";
 import { SettingsStore } from "@/state/settings.store";
 import { before, DELETE, GET, POST, route } from "awilix-express";
-import { registerUserRules, registerUserWithRolesRules } from "@/controllers/validation/user-controller.validation";
+import {
+  changePasswordSchema,
+  isRootUserSchema,
+  isVerifiedSchema,
+  registerUserWithRolesSchema,
+  setUserRolesSchema,
+  usernameSchema,
+} from "@/controllers/validation/user-controller.validation";
+import { ParamId } from "@/middleware/param-converter.middleware";
 
 @route(AppConstants.apiRoute + "/user")
 @before([authenticate()])
 export class UserController {
-  userService: IUserService;
-  roleService: IRoleService;
-  configService: IConfigService;
-  authService: IAuthService;
-  settingsStore: SettingsStore;
   logger: LoggerService;
-  isTypeormMode: boolean;
 
-  constructor({
-    userService,
-    configService,
-    roleService,
-    settingsStore,
-    authService,
-    loggerFactory,
-    isTypeormMode,
-  }: {
-    userService: IUserService;
-    configService: IConfigService;
-    roleService: IRoleService;
-    authService: IAuthService;
-    settingsStore: SettingsStore;
-    loggerFactory: ILoggerFactory;
-    isTypeormMode: boolean;
-  }) {
-    this.userService = userService;
-    this.configService = configService;
-    this.roleService = roleService;
-    this.authService = authService;
-    this.settingsStore = settingsStore;
-    this.isTypeormMode = isTypeormMode;
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly userService: IUserService,
+    private readonly configService: IConfigService,
+    private readonly roleService: IRoleService,
+    private readonly authService: IAuthService,
+    private readonly settingsStore: SettingsStore,
+    private readonly isTypeormMode: boolean,
+  ) {
     this.logger = loggerFactory(UserController.name);
   }
 
@@ -67,7 +53,10 @@ export class UserController {
   @route("/")
   @before([authorizeRoles([ROLES.ADMIN])])
   async create(req: Request, res: Response) {
-    const { username, password, roleIds } = await validateMiddleware(req, registerUserWithRolesRules(this.isTypeormMode));
+    const { username, password, roleIds } = await validateMiddleware(
+      req,
+      registerUserWithRolesSchema(this.isTypeormMode),
+    );
     if (
       username.toLowerCase().includes("admin") ||
       username.toLowerCase().includes("root") ||
@@ -110,40 +99,38 @@ export class UserController {
 
   @GET()
   @route("/:id")
-  @before([authorizeRoles([ROLES.ADMIN])])
+  @before([authorizeRoles([ROLES.ADMIN]), ParamId("id")])
   async get(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
-    const user = await this.userService.getUser(id);
+    const user = await this.userService.getUser(req.local.id);
     res.send(this.userService.toDto(user));
   }
 
   @DELETE()
   @route("/:id")
-  @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
+  @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed, ParamId("id")])
   async delete(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
-
+    const deletedUserId = req.local.id;
     const ownUserId = req.user?.id;
-    if (ownUserId == id) {
+    if (ownUserId == deletedUserId) {
       throw new ForbiddenError("Not allowed to delete own account");
     }
 
-    const isRootUser = await this.userService.isUserRootUser(id);
+    const isRootUser = await this.userService.isUserRootUser(deletedUserId);
     if (isRootUser) {
       throw new ForbiddenError("Not allowed to delete root user");
     }
 
     if (this.configService.isDemoMode()) {
       const demoUserId = await this.userService.getDemoUserId();
-      if (id === demoUserId) {
+      if (deletedUserId === demoUserId) {
         this.throwIfDemoMode();
       }
     }
 
-    await this.userService.deleteUser(id);
+    await this.userService.deleteUser(deletedUserId);
 
     try {
-      await this.authService.logoutUserId(id);
+      await this.authService.logoutUserId(deletedUserId);
     } catch (e) {
       this.logger.error(errorSummary(e));
     }
@@ -153,112 +140,107 @@ export class UserController {
 
   @POST()
   @route("/:id/change-username")
-  @before([demoUserNotAllowed])
+  @before([demoUserNotAllowed, ParamId("id")])
   async changeUsername(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const changedUserId = req.local.id;
 
-    if (req.user?.id != id && (await this.settingsStore.getLoginRequired())) {
+    if (req.user?.id != changedUserId && (await this.settingsStore.getLoginRequired())) {
       throw new ForbiddenError("Not allowed to change username of other users");
     }
 
-    const { username } = await validateInput(req.body, {
-      username: "required|string",
-    });
-    await this.userService.updateUsernameById(id, username);
+    const { username } = await validateInput(req.body, usernameSchema);
+    await this.userService.updateUsernameById(changedUserId, username);
     res.send();
   }
 
   @POST()
   @route("/:id/change-password")
-  @before([demoUserNotAllowed])
+  @before([demoUserNotAllowed, ParamId("id")])
   async changePassword(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const changedUserId = req.local.id;
 
-    if (req.user?.id != id && (await this.settingsStore.getLoginRequired())) {
+    if (req.user?.id != changedUserId && (await this.settingsStore.getLoginRequired())) {
       throw new ForbiddenError("Not allowed to change password of other users");
     }
 
-    const { oldPassword, newPassword } = await validateInput(req.body, {
-      oldPassword: "required|string",
-      newPassword: "required|string",
-    });
-    await this.userService.updatePasswordById(id, oldPassword, newPassword);
+    const { oldPassword, newPassword } = await validateInput(req.body, changePasswordSchema);
+    await this.userService.updatePasswordById(changedUserId, oldPassword, newPassword);
     res.send();
   }
 
   @POST()
   @route("/:id/set-user-roles")
-  @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
+  @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed, ParamId("id")])
   async setUserRoles(req: Request, res: Response) {
-    const { id: currentUserId } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const changedUserId = req.local.id;
 
     const ownUserId = req.user?.id;
+    if (!ownUserId) {
+      throw new ForbiddenError("Need to be logged in, in order to set user roles");
+    }
+
     const ownUser = await this.userService.getUser(ownUserId);
-    const ownUserRoles = ownUser.roles;
+    // Cancel out the internal interface differences
+    const mappedUser = this.userService.toDto(ownUser);
+
+    const ownUserRoles = mappedUser.roles;
     const adminRole = await this.roleService.getSynchronizedRoleByName(ROLES.ADMIN);
 
-    if (ownUserId == currentUserId && !ownUserRoles.includes(adminRole.id) && !ownUser.isRootUser) {
+    if (ownUserId == changedUserId && !ownUserRoles.includes(adminRole.id) && !mappedUser.isRootUser) {
       throw new ForbiddenError("Only an ADMIN or OWNER user is allowed to change its own roles");
     }
 
-    const { roleIds } = await validateInput(req.body, {
-      roleIds: "array",
-      "roleIds.*": "alphaNumeric",
-    });
+    const { roleIds } = await validateInput(req.body, setUserRolesSchema(this.isTypeormMode));
 
-    if (ownUserId == currentUserId && !roleIds.includes(adminRole.id)) {
-      if (ownUser.isRootUser) {
+    if (ownUserId == changedUserId && !roleIds.includes(adminRole.id)) {
+      if (mappedUser.isRootUser) {
         throw new BadRequestException("It does not make sense to remove ADMIN role from an OWNER user.");
       } else {
         throw new BadRequestException("An ADMIN user cannot remove its ADMIN role.");
       }
     }
 
-    await this.userService.setUserRoleIds(currentUserId, roleIds);
+    await this.userService.setUserRoleIds(changedUserId, roleIds);
     res.send();
   }
 
   @POST()
   @route("/:id/set-verified")
-  @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
+  @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed, ParamId("id")])
   async setVerified(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const changedUserId = req.local.id;
 
     const ownUserId = req.user?.id;
-    if (ownUserId == id) {
+    if (ownUserId == changedUserId) {
       throw new ForbiddenError("Not allowed to change own verified status");
     }
 
-    const isRootUser = await this.userService.isUserRootUser(id);
+    const isRootUser = await this.userService.isUserRootUser(changedUserId);
     if (isRootUser) {
       throw new ForbiddenError("Not allowed to change root user to unverified");
     }
 
-    const { isVerified } = await validateInput(req.body, {
-      isVerified: "required|boolean",
-    });
-    await this.userService.setVerifiedById(id, isVerified);
+    const { isVerified } = await validateInput(req.body, isVerifiedSchema);
+    await this.userService.setVerifiedById(changedUserId, isVerified);
 
     res.send();
   }
 
   @POST()
   @route("/:id/set-root-user")
-  @before([demoUserNotAllowed])
+  @before([demoUserNotAllowed, ParamId("id")])
   async setRootUser(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
+    const changedUserId = req.local.id;
 
     const userId = req.user?.id;
-    if (req.user?.id) {
+    if (userId) {
       const isRootUser = await this.userService.isUserRootUser(userId);
       if (!isRootUser) {
         throw new ForbiddenError("Not allowed to change owner without being owner yourself");
       }
     }
-    const { isRootUser } = await validateInput(req.body, {
-      isRootUser: "required|boolean",
-    });
-    await this.userService.setIsRootUserById(id, isRootUser);
+    const { isRootUser } = await validateInput(req.body, isRootUserSchema);
+    await this.userService.setIsRootUserById(changedUserId, isRootUser);
     res.send();
   }
 

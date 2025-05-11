@@ -1,49 +1,38 @@
 import { IBaseService, Type } from "@/services/orm/base.interface";
 import { SqliteIdType } from "@/shared.constants";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
-import {
-  DeepPartial,
-  DeleteResult,
-  EntityNotFoundError,
-  EntityTarget,
-  FindManyOptions,
-  FindOneOptions,
-  Repository,
-} from "typeorm";
+import { DeepPartial, EntityNotFoundError, EntityTarget, FindManyOptions, FindOneOptions, Repository } from "typeorm";
 import { validate } from "class-validator";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
-import { BaseEntity } from "@/entities/base.entity";
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import { DEFAULT_PAGE, IPagination } from "@/services/interfaces/page.interface";
 
 export function BaseService<
-  T extends BaseEntity,
+  T extends { id: number },
   DTO extends object,
-  CreateDTO extends object = DeepPartial<T>,
-  UpdateDTO extends object = QueryDeepPartialEntity<T>
+  CreateDTO extends DeepPartial<T> = DeepPartial<T>,
+  UpdateDTO extends object = QueryDeepPartialEntity<T>,
 >(entity: EntityTarget<T>, dto: Type<DTO>, createDTO?: Type<CreateDTO>, updateDto?: Type<UpdateDTO>) {
   abstract class BaseServiceHost implements IBaseService<T, DTO, CreateDTO, UpdateDTO> {
-    typeormService: TypeormService;
     repository: Repository<T>;
 
-    constructor({ typeormService }: { typeormService: TypeormService }) {
-      this.typeormService = typeormService;
+    constructor(protected readonly typeormService: TypeormService) {
       this.repository = typeormService.getDataSource().getRepository(entity);
     }
 
     abstract toDto(entity: T): DTO;
 
-    async get(id: SqliteIdType, throwIfNotFound = true, options?: FindOneOptions<T>) {
+    async get(id: SqliteIdType, options?: FindOneOptions<T>) {
       try {
         if (id === null || id === undefined) {
           throw new EntityNotFoundError(entity, "Id was not provided");
         }
         return this.repository.findOneOrFail({ ...options, where: { id } } as FindOneOptions<T>);
       } catch (e) {
-        if (throwIfNotFound && e instanceof EntityNotFoundError) {
+        if (e instanceof EntityNotFoundError) {
           throw new NotFoundException(`The entity ${entity} with the provided id was not found`);
         }
-        return undefined;
+        throw e;
       }
     }
 
@@ -64,24 +53,24 @@ export function BaseService<
     }
 
     async create(dto: CreateDTO) {
-      // Safety mechanism against upserts
-      if (dto.id) {
-        delete dto.id;
+      // Explicit runtime check with a meaningful error
+      if ("id" in dto && dto.id !== undefined && dto.id !== null) {
+        throw new Error("Cannot create entity with an existing ID. Use update method instead.");
       }
-      await validate(dto);
+
       const entity = this.repository.create(dto) as T;
       await validate(entity);
 
       return await this.repository.save(entity);
     }
 
-    async delete(id: SqliteIdType, throwIfNotFound = true) {
-      const entity = await this.get(id, throwIfNotFound);
-      return await this.repository.delete(entity.id);
+    async delete(id: SqliteIdType) {
+      const entity = await this.get(id);
+      await this.repository.delete(entity.id);
     }
 
-    async deleteMany(ids: SqliteIdType[], emitEvent = true): Promise<DeleteResult> {
-      return await this.repository.delete(ids);
+    async deleteMany(ids: SqliteIdType[]) {
+      await this.repository.delete(ids);
     }
   }
 

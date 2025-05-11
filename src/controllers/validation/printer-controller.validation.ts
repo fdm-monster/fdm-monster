@@ -1,39 +1,37 @@
-import { apiKeyLengthMaxDefault, apiKeyLengthMinDefault } from "@/constants/service.constants";
-import { MoonrakerType, OctoprintType } from "@/services/printer-api.interface";
+import { z } from "zod";
+import {
+  printerApiKeyValidator,
+  printerDisabledReasonValidator,
+  printerEnabledValidator,
+  printerPasswordValidator,
+  printerTypeValidator,
+  printerUrlValidator,
+  printerUsernameValidator,
+  refineApiKeyValidator,
+} from "@/services/validators/printer-service.validation";
 
-export const flowRateRules = {
-  flowRate: "required|between:75,125|integer",
-};
+export const flowRateSchema = z.object({
+  flowRate: z.number().int().min(75).max(125).nonnegative(),
+});
 
-export const feedRateRules = {
-  feedRate: "required|between:10,200|integer",
-};
+export const feedRateSchema = z.object({
+  feedRate: z.number().int().min(10).max(200).nonnegative(),
+});
 
-export const testPrinterApiRules = {
-  printerType: `required|integer|in:${OctoprintType},${MoonrakerType}`,
-  apiKey: `requiredIf:printerType,${OctoprintType}|length:${apiKeyLengthMaxDefault},${apiKeyLengthMinDefault}|alphaDash`,
-  printerURL: "required|httpurl",
-};
+export const testPrinterApiSchema = z
+  .object({
+    printerURL: printerUrlValidator,
+    printerType: printerTypeValidator,
+    apiKey: printerApiKeyValidator,
+    username: printerUsernameValidator.optional(),
+    password: printerPasswordValidator.optional(),
+  })
+  .superRefine(refineApiKeyValidator);
 
-export const updatePrinterDisabledReasonRules = {
-  disabledReason: "string",
-};
+export const updatePrinterDisabledReasonSchema = z.object({
+  disabledReason: printerDisabledReasonValidator,
+});
 
-export const updatePrinterEnabledRule = {
-  enabled: "required|boolean",
-};
-
-export const updatePrinterConnectionSettingRules = {
-  printerType: `required|integer|in:${OctoprintType},${MoonrakerType}`,
-  printerURL: "required|httpurl",
-  apiKey: `requiredIf:printerType,${OctoprintType}|length:${apiKeyLengthMaxDefault},${apiKeyLengthMinDefault}|alphaDash`,
-};
-
-export const createOctoPrintBackupRules = {
-  exclude: "array",
-  "exclude.*": "string",
-};
-
-export const getOctoPrintBackupRules = {
-  fileName: "required|string",
-};
+export const updatePrinterEnabledSchema = z.object({
+  enabled: printerEnabledValidator,
+});

@@ -4,10 +4,37 @@ import { ServerConfigDto } from "@/services/moonraker/dto/server/server-config.d
 import { SettingsDto } from "@/services/octoprint/dto/settings/settings.dto";
 import { ConnectionState } from "@/services/octoprint/dto/connection/connection-state.type";
 import { IdType } from "@/shared.constants";
+import { Flags } from "@/services/moonraker/dto/octoprint-compat/api-printer.dto";
 
 export const OctoprintType = 0;
 export const MoonrakerType = 1;
-export type PrinterType = typeof OctoprintType | typeof MoonrakerType;
+export const PrusaLinkType = 2;
+
+export enum PrinterTypesEnum {
+  Octoprint = 0,
+  Moonraker = 1,
+  PrusaLink = 2
+}
+
+export type PrinterType = typeof OctoprintType | typeof MoonrakerType | typeof PrusaLinkType;
+
+export interface FdmCurrentMessageDto {
+  progress: {
+    printTime: number | null,
+    completion: number | null
+  },
+  state: {
+    text: string,
+    error: string,
+    flags: Flags
+  },
+  job: {
+    file: {
+      name: string,
+      path: string
+    }
+  }
+}
 
 export interface StatusFlags {
   connected: boolean;
@@ -21,16 +48,8 @@ export interface StatusFlags {
 export interface FileDto {
   path: string;
   size: number;
-  date: number;
-  // hash?: number | string;
+  date: number | null;
 }
-
-export const capabilities = {
-  // Could be function names, or maybe a specification for each function specifically?
-  startPrint: "startPrint",
-};
-
-export type Capability = keyof typeof capabilities;
 
 export enum ReprintState {
   PrinterNotAvailable = 0,
@@ -50,37 +69,49 @@ export interface ReprintFileDto extends PartialReprintFileDto {
 
 export interface IPrinterApi {
   get type(): PrinterType;
+
   set login(login: LoginDto);
+
   getVersion(): Promise<string>;
 
   connect(): Promise<void>;
+
   disconnect(): Promise<void>;
+
   restartServer(): Promise<void>;
+
   restartHost(): Promise<void>;
+
   restartPrinterFirmware(): Promise<void>;
 
   startPrint(path: string): Promise<void>;
+
   pausePrint(): Promise<void>;
+
   resumePrint(): Promise<void>;
+
   cancelPrint(): Promise<void>;
+
   quickStop(): Promise<void>;
 
-  // Subsetting of OctoPrint
-  // getName(): string;
-  // isCapable(capability: Capability): boolean;
-  // getStatus(): string;
-  // getStatusFlags(): StatusFlags;
-
   sendGcode(script: string): Promise<void>;
+
   movePrintHead(amounts: { x?: number; y?: number; z?: number; speed?: number }): Promise<void>;
+
   homeAxes(axes: { x?: boolean; y?: boolean; z?: boolean }): Promise<void>;
 
   getFile(path: string): Promise<FileDto>;
+
   getFiles(): Promise<FileDto[]>;
+
   downloadFile(path: string): AxiosPromise<NodeJS.ReadableStream>;
+
   getFileChunk(path: string, startBytes: number, endBytes: number): AxiosPromise<string>;
+
   uploadFile(fileOrBuffer: Buffer | Express.Multer.File, uploadToken?: string): Promise<void>;
+
   deleteFile(path: string): Promise<void>;
+
   deleteFolder(path: string): Promise<void>;
 
   getSettings(): Promise<ServerConfigDto | SettingsDto>;

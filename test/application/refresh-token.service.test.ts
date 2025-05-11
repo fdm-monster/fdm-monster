@@ -12,7 +12,7 @@ import { IRefreshTokenService } from "@/services/interfaces/refresh-token.servic
 import { isSqliteModeTest } from "../typeorm.manager";
 
 let container: AwilixContainer;
-let refreshTokenService: IRefreshTokenService<SqliteIdType>;
+let refreshTokenService: IRefreshTokenService;
 let settingsStore: SettingsStore;
 let typeorm: TypeormService;
 
@@ -27,7 +27,7 @@ beforeAll(async () => {
 });
 afterEach(async () => {
   if (isSqliteModeTest()) {
-    await typeorm.getDataSource().getRepository(RefreshToken).delete({});
+    await typeorm.getDataSource().getRepository(RefreshToken).clear();
   } else {
     await RefreshTokenMongo.deleteMany({});
   }
@@ -48,6 +48,6 @@ describe(RefreshTokenService.name, () => {
     const user = await ensureTestUserCreated("test", "test");
     const refreshToken = await refreshTokenService.createRefreshTokenForUserId(user.id);
     await refreshTokenService.deleteRefreshToken(refreshToken);
-    expect(await refreshTokenService.getRefreshToken(refreshToken, false)).toBeNull();
+    await expect(() => refreshTokenService.getRefreshToken(refreshToken)).rejects.toThrow();
   });
 });

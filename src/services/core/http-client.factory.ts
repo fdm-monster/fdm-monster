@@ -3,11 +3,7 @@ import { AxiosInstance } from "axios";
 import { SettingsStore } from "@/state/settings.store";
 
 export class HttpClientFactory {
-  private settingsStore: SettingsStore;
-
-  constructor({ settingsStore }: { settingsStore: SettingsStore }) {
-    this.settingsStore = settingsStore;
-  }
+  constructor(private readonly settingsStore: SettingsStore) {}
 
   createClient<T extends DefaultHttpClientBuilder>(base: T, buildFluentOptions?: (base: T) => void) {
     base.withMaxBodyLength(1000 * 1000 * 1000);
@@ -33,7 +29,7 @@ export class HttpClientFactory {
   createClientWithBaseUrl<T extends DefaultHttpClientBuilder>(
     base: T,
     baseAddress: string,
-    buildFluentOptions?: (base: T) => void
+    buildFluentOptions?: (base: T) => void,
   ): AxiosInstance {
     return this.createClient(base, (builder) => {
       builder.withBaseUrl(baseAddress);

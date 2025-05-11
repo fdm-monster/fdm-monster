@@ -1,4 +1,4 @@
-import { asClass, asValue, AwilixContainer } from "awilix";
+import { asValue, AwilixContainer } from "awilix";
 import { DITokens } from "@/container.tokens";
 import { setupServer } from "@/server.core";
 import { setupEnvConfig } from "@/server.env";
@@ -7,25 +7,17 @@ import supertest, { Test } from "supertest";
 import { Express } from "express";
 import { AppConstants } from "@/server.constants";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
-import { TaskManagerService } from "@/services/core/task-manager.service";
-import { AxiosInstance } from "axios";
+import { TaskManagerService } from "@/services/task-manager.service";
 import TestAgent from "supertest/lib/agent";
 import { SettingsStore } from "@/state/settings.store";
-
-jest.mock("../src/utils/env.utils", () => ({
-  ...jest.requireActual("../src/utils/env.utils"),
-  writeVariableToEnvFile: jest.fn(),
-}));
-require("../src/utils/env.utils");
 
 export async function setupTestApp(
   loadPrinterStore = false,
   mocks: any = undefined,
-  quick_boot = true
+  quick_boot = true,
 ): Promise<{
   container: AwilixContainer;
   httpServer: Express;
-  httpClient: AxiosInstance;
   request: TestAgent<Test>;
   typeormService: TypeormService;
   [k: string]: any;
@@ -49,7 +41,7 @@ export async function setupTestApp(
   }
 
   // Setup
-  const settingsStore = container.resolve(DITokens.settingsStore) as SettingsStore;
+  const settingsStore = container.resolve<SettingsStore>(DITokens.settingsStore);
   await settingsStore.loadSettings();
   await settingsStore.setExperimentalMoonrakerSupport(true);
 

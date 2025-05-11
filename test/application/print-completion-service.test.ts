@@ -5,14 +5,15 @@ import { setupTestApp } from "../test-server";
 import { AwilixContainer } from "awilix";
 import { generateCorrelationToken } from "@/utils/correlation-token.util";
 import { createTestPrinter } from "../api/test-data/create-printer";
-import supertest from "supertest";
+import { Test } from "supertest";
 import { IPrintCompletionService } from "@/services/interfaces/print-completion.interface";
 import { SqliteIdType } from "@/shared.constants";
 import { PrintCompletion } from "@/entities";
+import TestAgent from "supertest/lib/agent";
 
 let container: AwilixContainer;
 let printCompletionService: IPrintCompletionService<SqliteIdType, PrintCompletion>;
-let request: supertest.SuperTest<supertest.Test>;
+let request: TestAgent<Test>;
 
 beforeAll(async () => {
   ({ container, request } = await setupTestApp(true));
@@ -20,9 +21,6 @@ beforeAll(async () => {
 });
 
 describe(PrintCompletionService.name, () => {
-  /**
-   * Tests that a valid completion can be created through the service without throwing any errors.
-   */
   it("can add a print failure with or without log", async () => {
     const trackingToken = generateCorrelationToken();
     const printer = await createTestPrinter(request);
@@ -31,8 +29,9 @@ describe(PrintCompletionService.name, () => {
       completionLog: "some log happened here",
       status: EVENT_TYPES.PrintStarted,
       fileName: "mycode.gcode",
-      correlationId: trackingToken,
-      context: {},
+      context: {
+        correlationId: trackingToken,
+      },
     });
     expect(completionEntry.id).toBeTruthy();
 
@@ -40,8 +39,10 @@ describe(PrintCompletionService.name, () => {
       printerId: printer.id,
       status: EVENT_TYPES.PrintFailed,
       fileName: "mycode.gcode",
-      correlationId: trackingToken,
-      context: {},
+      completionLog: undefined,
+      context: {
+        correlationId: trackingToken,
+      },
     });
     expect(completionEntryWithoutLog.id).toBeTruthy();
   });

@@ -8,7 +8,7 @@ export interface ICameraStreamService<KeyType = IdType, Entity = CameraStream | 
 
   list(): Promise<Entity[]>;
 
-  get(id: KeyType, throwError?: boolean): Promise<Entity>;
+  get(id: KeyType): Promise<Entity>;
 
   create(data: CreateCameraStreamDto<IdType>): Promise<Entity>;
 

@@ -21,31 +21,33 @@ export type PrintJobEvents = {
 export interface AnalyzedCompletions {
   _id?: IdType;
   printerId: IdType;
-  eventCount: number;
-  printCount: number;
-  failureCount: number;
-  lastFailure: Partial<PrintCompletionDto>;
-  failureEventsLastWeek: number;
-  failureEventsLast48H: number;
-  failureEventsLast24H: number;
-  successCount: number;
-  lastSuccess: Partial<PrintCompletionDto>;
-  successEventsLastWeek: number;
-  successEventsLast48H: number;
-  successEventsLast24H: number;
-
-  correlationIds: IdType[];
-
   printEvents: PrintCompletionDto[];
 
-  printJobs: PrintJobEvents[];
+  eventCount?: number;
+  printCount?: number;
+  failureCount?: number;
+  lastFailure?: Partial<PrintCompletionDto> | null;
+  failureEventsLastWeek?: number;
+  failureEventsLast48H?: number;
+  failureEventsLast24H?: number;
+  successCount?: number;
+  lastSuccess?: Partial<PrintCompletionDto> | null;
+  successEventsLastWeek?: number;
+  successEventsLast48H?: number;
+  successEventsLast24H?: number;
+
+  correlationIds?: IdType[];
+
+  printJobs?: PrintJobEvents[];
 }
 
 export function processCompletions(completions: AnalyzedCompletions[]): AnalyzedCompletions[] {
   return completions.map((pc) => {
     pc.printerId = pc.printerId ?? pc._id;
     delete pc._id;
-    const jobs = groupArrayBy(pc.printEvents, (e) => e.context?.correlationId);
+    const jobs = groupArrayBy(pc.printEvents.filter(e => e.context?.correlationId),
+      (e) => e.context?.correlationId as string,
+    );
     pc.printJobs = Object.entries(jobs).map(([id, events]) => {
       const eventMap = events.map(({ status, createdAt, fileName, completionLog }) => ({
         status,
@@ -73,20 +75,24 @@ export function processCompletions(completions: AnalyzedCompletions[]): Analyzed
 
     const failureEvents = mappedEvents.filter((e) => e.status === EVENT_TYPES.PrintFailed);
     pc.failureCount = failureEvents?.length;
-    pc.lastFailure = failureEvents?.length ? failureEvents.reduce((j1, j2) => (j1.createdAt > j2.createdAt ? j1 : j2)) : null;
+    pc.lastFailure = failureEvents?.length
+      ? failureEvents.reduce((j1, j2) => (j1.createdAt > j2.createdAt ? j1 : j2))
+      : null;
     pc.failureEventsLastWeek = failureEvents.filter((e) => e.createdAt > Date.now() - 7 * durationDayMSec)?.length;
     pc.failureEventsLast48H = failureEvents.filter((e) => e.createdAt > Date.now() - 2 * durationDayMSec)?.length;
     pc.failureEventsLast24H = failureEvents.filter((e) => e.createdAt > Date.now() - durationDayMSec)?.length;
 
     const successEvents = mappedEvents.filter((e) => e.status === EVENT_TYPES.PrintDone);
     pc.successCount = successEvents?.length;
-    pc.lastSuccess = successEvents?.length ? successEvents?.reduce((j1, j2) => (j1.createdAt > j2.createdAt ? j1 : j2)) : null;
+    pc.lastSuccess = successEvents?.length
+      ? successEvents?.reduce((j1, j2) => (j1.createdAt > j2.createdAt ? j1 : j2))
+      : null;
     pc.successEventsLastWeek = successEvents.filter((e) => e.createdAt > Date.now() - 7 * durationDayMSec)?.length;
     pc.successEventsLast48H = successEvents.filter((e) => e.createdAt > Date.now() - 2 * durationDayMSec)?.length;
     pc.successEventsLast24H = successEvents.filter((e) => e.createdAt > Date.now() - durationDayMSec)?.length;
 
     // Explodes in size quickly, remove the event timeline
-    delete pc.printEvents;
+    pc.printEvents = [];
 
     return pc;
   });

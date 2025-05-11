@@ -5,23 +5,25 @@ import { NotImplementedException } from "@/exceptions/runtime.exceptions";
 import { AxiosPromise } from "axios";
 
 export class OctoprintApi implements IPrinterApi {
-  client: OctoprintClient;
-  printerLogin: LoginDto;
-  constructor({ octoprintClient, printerLogin }: { octoprintClient: OctoprintClient; printerLogin: LoginDto }) {
+  private readonly client: OctoprintClient;
+
+  constructor(
+    octoprintClient: OctoprintClient,
+    private printerLogin: LoginDto,
+  ) {
     this.client = octoprintClient;
-    this.printerLogin = printerLogin;
   }
 
   get type(): PrinterType {
     return OctoprintType;
   }
 
-  set login(login: LoginDto) {
-    this.printerLogin = login;
-  }
-
   get login() {
     return this.printerLogin;
+  }
+
+  set login(login: LoginDto) {
+    this.printerLogin = login;
   }
 
   async getVersion() {
@@ -84,12 +86,7 @@ export class OctoprintApi implements IPrinterApi {
   }
 
   async getFile(path: string) {
-    const file = await this.client.getFile(this.login, path);
-    return {
-      path: file.path,
-      size: file.size,
-      date: file.date,
-    };
+    return this.client.getFile(this.login, path);
   }
 
   async getFiles() {
@@ -134,7 +131,7 @@ export class OctoprintApi implements IPrinterApi {
     const selectedJob = selectedJobResponse.data;
 
     const currentJobFile = selectedJob?.job?.file;
-    if (!currentJobFile?.name) {
+    if (!currentJobFile?.path) {
       return { connectionState, reprintState: ReprintState.NoLastPrint };
     }
 
@@ -144,6 +141,4 @@ export class OctoprintApi implements IPrinterApi {
       reprintState: ReprintState.LastPrintReady,
     };
   }
-
-  async getThumbnail() {}
 }

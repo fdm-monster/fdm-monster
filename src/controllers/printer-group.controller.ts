@@ -1,65 +1,67 @@
 import { IPrinterGroupService } from "@/services/interfaces/printer-group.service.interface";
-import { createController } from "awilix-express";
 import { AppConstants } from "@/server.constants";
 import { authenticate, authorizeRoles } from "@/middleware/authenticate";
 import { ROLES } from "@/constants/authorization.constants";
-import { validateInput } from "@/handlers/validators";
-import { idRulesV2 } from "@/controllers/validation/generic.validation";
 import { Request, Response } from "express";
+import { route, before, GET, POST, DELETE, PATCH } from "awilix-express";
+import { ParamId } from "@/middleware/param-converter.middleware";
 
+@route(AppConstants.apiRoute + "/printer-group")
+@before([authenticate(), authorizeRoles([ROLES.OPERATOR, ROLES.ADMIN])])
 export class PrinterGroupController {
-  printerGroupService: IPrinterGroupService;
-  isTypeormMode: boolean;
+  constructor(private readonly printerGroupService: IPrinterGroupService) {}
 
-  constructor({ printerGroupService, isTypeormMode }: { printerGroupService: IPrinterGroupService; isTypeormMode: boolean }) {
-    this.printerGroupService = printerGroupService;
-    this.isTypeormMode = isTypeormMode;
-  }
-
+  @GET()
+  @route("/")
   async listGroups(req: Request, res: Response) {
     res.send(await this.printerGroupService.listGroups());
   }
 
+  @GET()
+  @route("/:id")
+  @before([ParamId("id")])
   async getGroup(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
-    res.send(await this.printerGroupService.getGroupWithPrinters(id));
+    res.send(await this.printerGroupService.getGroupWithPrinters(req.local.id));
   }
 
+  @POST()
+  @route("/")
   async createGroup(req: Request, res: Response) {
+    // Safety mechanism against updating
+    if (req.body.id) {
+      delete req.body.id;
+    }
     const entity = await this.printerGroupService.createGroup(req.body);
     res.send(entity);
   }
 
+  @PATCH()
+  @route("/:id/name")
+  @before([ParamId("id")])
   async updateGroupName(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
-    const entity = await this.printerGroupService.updateGroupName(id, req.body.name);
+    const entity = await this.printerGroupService.updateGroupName(req.local.id, req.body.name);
     res.send(entity);
   }
 
+  @DELETE()
+  @route("/:id")
+  @before([ParamId("id")])
   async deleteGroup(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
-    res.send(await this.printerGroupService.deleteGroup(id));
+    res.send(await this.printerGroupService.deleteGroup(req.local.id));
   }
 
+  @POST()
+  @route("/:id/printer")
+  @before([ParamId("id")])
   async addPrinterToGroup(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
-    const entity = await this.printerGroupService.addPrinterToGroup(id, req.body.printerId);
+    const entity = await this.printerGroupService.addPrinterToGroup(req.local.id, req.body.printerId);
     res.send(this.printerGroupService.toDto(entity));
   }
 
+  @DELETE()
+  @route("/:id/printer")
+  @before([ParamId("id")])
   async removePrinterFromGroup(req: Request, res: Response) {
-    const { id } = await validateInput(req.params, idRulesV2(this.isTypeormMode));
-    res.send(await this.printerGroupService.removePrinterFromGroup(id, req.body.printerId));
+    res.send(await this.printerGroupService.removePrinterFromGroup(req.local.id, req.body.printerId));
   }
 }
-
-export default createController(PrinterGroupController)
-  .prefix(AppConstants.apiRoute + "/printer-group")
-  .before([authenticate(), authorizeRoles([ROLES.OPERATOR, ROLES.ADMIN])])
-  .get("/", "listGroups")
-  .post("/", "createGroup")
-  .get("/:id", "getGroup")
-  .delete("/:id", "deleteGroup")
-  .patch("/:id/name", "updateGroupName")
-  .post("/:id/printer", "addPrinterToGroup")
-  .delete("/:id/printer", "removePrinterFromGroup");

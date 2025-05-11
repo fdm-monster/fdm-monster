@@ -7,6 +7,7 @@ import { LoggerService as Logger } from "./handlers/logger";
 import { getEnvOrDefault, isProductionEnvironment } from "./utils/env.utils";
 import { errorSummary } from "./utils/error.utils";
 import { superRootPath } from "@/utils/fs.utils";
+import { collectDefaultMetrics, register } from "prom-client";
 
 const logger = new Logger("FDM-Environment", false);
 
@@ -36,9 +37,7 @@ function ensureNodeEnvSet() {
 
 function ensurePackageVersionSet() {
   const packageJsonVersion = require(packageJsonPath).version;
-  if (!process.env[AppConstants.VERSION_KEY]) {
-    process.env[AppConstants.VERSION_KEY] = packageJsonVersion;
-  }
+  process.env[AppConstants.VERSION_KEY] ??= packageJsonVersion;
 
   logger.log(`✓ Running server version ${process.env[AppConstants.VERSION_KEY]}`);
 }
@@ -66,8 +65,8 @@ export function fetchServerPort() {
   return port;
 }
 
-export function ensureMongoDBConnectionStringSet() {
-  let dbConnectionString = process.env[AppConstants.MONGO_KEY];
+export function ensureMongoDbConnectionStringSet() {
+  const dbConnectionString = process.env[AppConstants.MONGO_KEY];
   if (!dbConnectionString) {
     fetchMongoDBConnectionString();
   } else {
@@ -115,8 +114,14 @@ export function setupEnvConfig(skipDotEnv = false) {
   ensureNodeEnvSet();
   ensurePackageVersionSet();
   setupSentry();
-  ensureMongoDBConnectionStringSet();
+  ensureMongoDbConnectionStringSet();
   ensurePortSet();
+
+  // Optional: Enable collection of default metrics like memory, CPU, etc.
+  if (process.env[AppConstants.ENABLE_PROMETHEUS_METRICS] === "true") {
+    collectDefaultMetrics({ register });
+    register.removeSingleMetric("nodejs_version_info");
+  }
 }
 
 export async function runMigrations(db: any, client: any): Promise<void> {
@@ -125,7 +130,7 @@ export async function runMigrations(db: any, client: any): Promise<void> {
 
   if (pendingMigrations.length) {
     logger.log(
-      `! MongoDB has ${pendingMigrations.length} migrations left to run (${migrationsStatus.length} migrations in total)`
+      `! MongoDB has ${pendingMigrations.length} migrations left to run (${migrationsStatus.length} migrations in total)`,
     );
   } else {
     logger.log(`✓ Mongo Database is up to date [${migrationsStatus.length} migration applied]`);

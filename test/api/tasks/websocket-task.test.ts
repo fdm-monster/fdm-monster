@@ -16,19 +16,9 @@ describe(PrinterWebsocketTask.name, () => {
       await task.run();
     } catch (e) {
       // It throws because system task has not been registered by the BootTask yet - complete fine
-      expect(e.toString()).toEqual(
-        "JobValidationError [anonymous]: The requested task with ID printerSystemTask was not registered"
+      expect((e as Error).toString()).toEqual(
+        "JobValidationError [anonymous]: The requested task with ID printerSystemTask was not registered",
       );
     }
   });
-
-  // it("should try connecting to OctoPrint websocket", async () => {
-  //   const newPrinterState = await printerService.create(validNewPrinterState);
-  //
-  //   try {
-  //     await task.setupPrinterConnection(newPrinterState);
-  //   } catch (e) {
-  //     expect(e.toString()).toEqual("Error: OctoPrint apiKey was rejected. (Not retried)");
-  //   }
-  // });
 });

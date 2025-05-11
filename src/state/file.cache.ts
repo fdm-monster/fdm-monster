@@ -8,9 +8,9 @@ export class FileCache {
   private printerFileStorage: Record<IdType, FileDto[]> = {};
   private totalFileCount = 0;
 
-  private logger: LoggerService;
+  private readonly logger: LoggerService;
 
-  constructor({ loggerFactory }: { loggerFactory: ILoggerFactory }) {
+  constructor(loggerFactory: ILoggerFactory) {
     this.logger = loggerFactory(FileCache.name);
   }
 
@@ -67,7 +67,10 @@ export class FileCache {
     const fileIndex = files.findIndex((f) => f.path === filePath);
     if (fileIndex === -1) {
       // We can always choose to throw - if we trust the cache consistency
-      this.logger.warn(`A file removal was ordered but this file was not found in files cache for provided printer id`, filePath);
+      this.logger.warn(
+        `A file removal was ordered but this file was not found in files cache for provided printer id`,
+        filePath,
+      );
 
       return this.logger.log("File was not found in cached printer fileList");
     }

@@ -13,12 +13,14 @@ export class PermissionService
   extends BaseService(Permission, PermissionDto<SqliteIdType>)
   implements IPermissionService<SqliteIdType, Permission>
 {
-  private logger: LoggerService;
+  private readonly logger: LoggerService;
   private _permissions: Permission[] = [];
 
-  constructor({ loggerFactory, typeormService }: { loggerFactory: ILoggerFactory; typeormService: TypeormService }) {
-    super({ typeormService });
+  constructor(loggerFactory: ILoggerFactory, typeormService: TypeormService) {
+    super(typeormService);
+    this.logger = loggerFactory(PermissionService.name);
   }
+
   get permissions() {
     return this._permissions;
   }
@@ -68,8 +70,10 @@ export class PermissionService
     }
   }
 
-  normalizePermission(assignedPermission: string | number): string {
-    const permissionInstance = this.permissions.find((r) => r.id === assignedPermission || r.name === assignedPermission);
+  normalizePermission(assignedPermission: string | number) {
+    const permissionInstance = this.permissions.find(
+      (r) => r.id === assignedPermission || r.name === assignedPermission,
+    );
     if (!permissionInstance) {
       this.logger.warn(`The permission by provided id is not found. Skipping`);
       return;

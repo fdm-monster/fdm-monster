@@ -1,8 +1,8 @@
 import { InternalServerException } from "@/exceptions/runtime.exceptions";
 import {
   credentialSettingsKey,
-  printerFileCleanSettingKey,
   frontendSettingKey,
+  printerFileCleanSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
   wizardSettingKey,
@@ -13,38 +13,34 @@ import { AppConstants } from "@/server.constants";
 import { LoggerService } from "@/handlers/logger";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
 import { ISettings } from "@/models/Settings";
-import {
-  CredentialSettingsDto,
-  FileCleanSettingsDto,
-  FrontendSettingsDto,
-  ServerSettingsDto,
-  TimeoutSettingsDto,
-} from "@/services/interfaces/settings.dto";
 import { ILoggerFactory } from "@/handlers/logger-factory";
+import { z } from "zod";
+import {
+  credentialSettingUpdateSchema,
+  fileCleanSettingsUpdateSchema,
+  frontendSettingsUpdateSchema,
+  serverSettingsUpdateSchema,
+  timeoutSettingsUpdateSchema,
+} from "@/services/validators/settings-service.validation";
+import { IdType } from "@/shared.constants";
 
 export class SettingsStore {
-  private readonly isTypeOrmMode: boolean;
-  private settingsService: ISettingsService;
-  private logger: LoggerService;
-  private settings: ISettings | null = null;
+  private readonly logger: LoggerService;
 
-  constructor({
-    settingsService,
-    loggerFactory,
-    isTypeormMode,
-  }: {
-    settingsService: ISettingsService;
-    loggerFactory: ILoggerFactory;
-    isTypeormMode: boolean;
-  }) {
-    this.settingsService = settingsService;
+  private settings: ISettings<IdType> | null = null;
+
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly settingsService: ISettingsService,
+    private readonly isTypeormMode: boolean,
+  ) {
     this.logger = loggerFactory(SettingsStore.name);
-    this.isTypeOrmMode = isTypeormMode;
   }
 
   getSettings() {
-    const settings = this.settings;
-    if (!settings) throw new InternalServerException("Could not check server settings (server settings not loaded");
+    this.throwIfSettingsUnset();
+
+    const settings = this.settings!;
 
     return Object.freeze({
       // Credential settings are not shared with the client
@@ -53,7 +49,8 @@ export class SettingsStore {
         registration: settings[serverSettingsKey].registration,
         sentryDiagnosticsEnabled: settings[serverSettingsKey].sentryDiagnosticsEnabled,
         experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
-        experimentalTypeormSupport: this.isTypeOrmMode,
+        experimentalPrusaLinkSupport: settings[serverSettingsKey].experimentalPrusaLinkSupport,
+        experimentalTypeormSupport: this.isTypeormMode,
         experimentalClientSupport: settings[serverSettingsKey].experimentalClientSupport,
         experimentalThumbnailSupport: settings[serverSettingsKey].experimentalThumbnailSupport,
       },
@@ -65,8 +62,9 @@ export class SettingsStore {
   }
 
   getSettingsSensitive() {
-    const settings = this.settings;
-    if (!settings) throw new InternalServerException("Could not check server settings (server settings not loaded");
+    this.throwIfSettingsUnset();
+
+    const settings = this.settings!;
     return Object.freeze({
       [credentialSettingsKey]: {
         jwtExpiresIn: settings[credentialSettingsKey].jwtExpiresIn,
@@ -74,17 +72,12 @@ export class SettingsStore {
         refreshTokenExpiry: settings[credentialSettingsKey].refreshTokenExpiry,
       },
       [serverSettingsKey]: {
-        debugSettings: settings[serverSettingsKey].debugSettings,
         experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
-        experimentalTypeormSupport: this.isTypeOrmMode,
+        experimentalTypeormSupport: this.isTypeormMode,
         experimentalClientSupport: settings[serverSettingsKey].experimentalClientSupport,
         experimentalThumbnailSupport: settings[serverSettingsKey].experimentalThumbnailSupport,
       },
     });
-  }
-
-  getDebugSettingsSensitive() {
-    return this.getSettingsSensitive()[serverSettingsKey].debugSettings;
   }
 
   async loadSettings() {
@@ -94,53 +87,75 @@ export class SettingsStore {
   }
 
   async getCredentialSettings() {
-    return this.settings[credentialSettingsKey];
+    this.throwIfSettingsUnset();
+
+    return this.settings![credentialSettingsKey];
   }
 
   async getAnonymousDiagnosticsEnabled() {
-    return this.settings[serverSettingsKey].sentryDiagnosticsEnabled;
+    this.throwIfSettingsUnset();
+
+    return this.settings![serverSettingsKey].sentryDiagnosticsEnabled;
   }
 
-  async persistOptionalCredentialSettings(overrideJwtSecret: string, overrideJwtExpiresIn: string) {
-    if (overrideJwtSecret) {
-      await this.updateCredentialSettings({
+  async persistOptionalCredentialSettings(overrideJwtSecret?: string, overrideJwtExpiresIn?: string) {
+    this.throwIfSettingsUnset();
+
+    const credentialSettings = await this.getCredentialSettings();
+    if (overrideJwtSecret?.length) {
+      await this.settingsService.updateJwtSecretCredentialSetting({
         jwtSecret: overrideJwtSecret,
       });
     }
-    if (overrideJwtExpiresIn) {
+
+    if (overrideJwtExpiresIn?.length) {
       await this.updateCredentialSettings({
+        refreshTokenExpiry: credentialSettings.refreshTokenExpiry,
+        refreshTokenAttempts: credentialSettings.refreshTokenAttempts,
         jwtExpiresIn: parseInt(overrideJwtExpiresIn),
       });
     }
+
+    this.settings![credentialSettingsKey] = await this.getCredentialSettings();
   }
 
   getWizardState() {
+    this.throwIfSettingsUnset();
+
+    const settings = this.settings!;
     return {
-      wizardCompleted: this.settings[wizardSettingKey].wizardCompleted,
-      wizardVersion: this.settings[wizardSettingKey].wizardVersion,
+      wizardCompleted: settings[wizardSettingKey].wizardCompleted,
+      wizardVersion: settings[wizardSettingKey].wizardVersion,
       latestWizardVersion: AppConstants.currentWizardVersion,
     };
   }
 
   isWizardCompleted() {
+    this.throwIfSettingsUnset();
+
+    const settings = this.settings!;
     return (
-      this.settings[wizardSettingKey].wizardCompleted &&
-      this.settings[wizardSettingKey].wizardVersion === AppConstants.currentWizardVersion
+      settings[wizardSettingKey].wizardCompleted &&
+      settings[wizardSettingKey].wizardVersion === AppConstants.currentWizardVersion
     );
   }
 
   getWizardSettings() {
-    return this.settings[wizardSettingKey];
+    this.throwIfSettingsUnset();
+
+    return this.settings![wizardSettingKey];
   }
 
   isRegistrationEnabled() {
-    if (!this.settings) throw new InternalServerException("Could not check server settings (server settings not loaded");
-    return this.settings[serverSettingsKey].registration;
+    this.throwIfSettingsUnset();
+
+    return this.settings![serverSettingsKey].registration;
   }
 
   isThumbnailSupportEnabled() {
-    if (!this.settings) throw new InternalServerException("Could not check server settings (server settings not loaded");
-    return this.settings[serverSettingsKey].experimentalThumbnailSupport;
+    this.throwIfSettingsUnset();
+
+    return this.settings![serverSettingsKey].experimentalThumbnailSupport;
   }
 
   getServerSettings() {
@@ -164,17 +179,10 @@ export class SettingsStore {
   }
 
   async setWizardCompleted(version: number) {
-    this.settings = await this.settingsService.patchWizardSettings({
+    this.settings = await this.settingsService.updateWizardSettings({
       wizardCompleted: true,
       wizardCompletedAt: new Date(),
       wizardVersion: version,
-    });
-    return this.getSettings();
-  }
-
-  async setRegistrationEnabled(registration = true) {
-    this.settings = await this.settingsService.patchServerSettings({
-      registration,
     });
     return this.getSettings();
   }
@@ -184,64 +192,95 @@ export class SettingsStore {
   }
 
   async setLoginRequired(loginRequired = true) {
-    this.settings = await this.settingsService.patchServerSettings({
-      loginRequired,
-    });
+    this.throwIfSettingsUnset();
+    this.settings![serverSettingsKey].loginRequired = loginRequired;
+    this.settings = await this.settingsService.updateServerSettings(this.settings![serverSettingsKey]);
     return this.getSettings();
   }
 
-  async updateServerSettings(serverSettings: Partial<ServerSettingsDto>) {
-    this.settings = await this.settingsService.patchServerSettings(serverSettings);
+  async setRegistrationEnabled(registration = true) {
+    this.throwIfSettingsUnset();
+    this.settings![serverSettingsKey].registration = registration;
+    this.settings = await this.settingsService.updateServerSettings(this.settings![serverSettingsKey]);
     return this.getSettings();
   }
 
-  async updateTimeoutSettings(timeoutSettings: TimeoutSettingsDto) {
+  async updateServerSettings(serverSettings: z.infer<typeof serverSettingsUpdateSchema>) {
+    this.settings = await this.settingsService.updateServerSettings(serverSettings);
+    return this.getSettings();
+  }
+
+  async updateTimeoutSettings(timeoutSettings: z.infer<typeof timeoutSettingsUpdateSchema>) {
     this.settings = await this.settingsService.updateTimeoutSettings(timeoutSettings);
     return this.getSettings();
   }
 
-  async patchFileCleanSettings(fileClean: Partial<FileCleanSettingsDto>) {
-    this.settings = await this.settingsService.patchFileCleanSettings(fileClean);
+  async updateFileCleanSettings(fileClean: z.infer<typeof fileCleanSettingsUpdateSchema>) {
+    this.settings = await this.settingsService.updateFileCleanSettings(fileClean);
     return this.getSettings();
   }
 
-  async updateCredentialSettings(credentialSettings: Partial<CredentialSettingsDto>) {
-    this.settings = await this.settingsService.patchCredentialSettings(credentialSettings);
-    return this.getSettings();
+  async updateCredentialSettings(credentialSettings: z.infer<typeof credentialSettingUpdateSchema>) {
+    this.settings = await this.settingsService.updateCredentialSettings(credentialSettings);
+  }
+
+  async setRefreshTokenSettings({
+    refreshTokenAttempts,
+    refreshTokenExpiry,
+  }: {
+    refreshTokenAttempts: number;
+    refreshTokenExpiry: number;
+  }) {
+    this.throwIfSettingsUnset();
+    this.settings![credentialSettingsKey].refreshTokenAttempts = refreshTokenAttempts;
+    this.settings![credentialSettingsKey].refreshTokenExpiry = refreshTokenExpiry;
+    await this.updateCredentialSettings(this.settings![credentialSettingsKey]);
   }
 
   async setSentryDiagnosticsEnabled(sentryDiagnosticsEnabled: boolean) {
-    this.settings = await this.settingsService.patchServerSettings({
-      sentryDiagnosticsEnabled,
-    });
+    this.throwIfSettingsUnset();
+    this.settings![serverSettingsKey].sentryDiagnosticsEnabled = sentryDiagnosticsEnabled;
+    this.settings = await this.settingsService.updateServerSettings(this.settings![serverSettingsKey]);
     await this.processSentryEnabled();
     return this.getSettings();
   }
 
-  async setExperimentalMoonrakerSupport(moonrakerEnabled: boolean) {
-    this.settings = await this.settingsService.patchServerSettings({
-      experimentalMoonrakerSupport: moonrakerEnabled,
-    });
+  async setExperimentalMoonrakerSupport(experimentalMoonrakerSupport: boolean) {
+    this.throwIfSettingsUnset();
+    this.settings![serverSettingsKey].experimentalMoonrakerSupport = experimentalMoonrakerSupport;
+    this.settings = await this.settingsService.updateServerSettings(this.settings![serverSettingsKey]);
     return this.getSettings();
   }
 
-  async setExperimentalThumbnailSupport(thumbnailsEnabled: boolean) {
-    this.settings = await this.settingsService.patchServerSettings({
-      experimentalThumbnailSupport: thumbnailsEnabled,
-    });
+  async setExperimentalThumbnailSupport(experimentalThumbnailSupport: boolean) {
+    this.throwIfSettingsUnset();
+    this.settings![serverSettingsKey].experimentalThumbnailSupport = experimentalThumbnailSupport;
+    this.settings = await this.settingsService.updateServerSettings(this.settings![serverSettingsKey]);
+     return this.getSettings();
+  }
+  
+  async setExperimentalPrusaLinkSupport(experimentalPrusaLinkSupport: boolean) {
+    this.throwIfSettingsUnset();
+    this.settings![serverSettingsKey].experimentalPrusaLinkSupport = experimentalPrusaLinkSupport;
+    this.settings = await this.settingsService.updateServerSettings(this.settings![serverSettingsKey]);    
     return this.getSettings();
   }
 
-  async setExperimentalClientSupport(experimentalClientEnabled: boolean) {
-    this.settings = await this.settingsService.patchServerSettings({
-      experimentalClientSupport: experimentalClientEnabled,
-    });
+  async setExperimentalClientSupport(experimentalClientSupport: boolean) {
+    this.throwIfSettingsUnset();
+    this.settings![serverSettingsKey].experimentalClientSupport = experimentalClientSupport;
+    this.settings = await this.settingsService.updateServerSettings(this.settings![serverSettingsKey]);
     return this.getSettings();
   }
 
-  async updateFrontendSettings(frontendSettings: FrontendSettingsDto) {
+  async updateFrontendSettings(frontendSettings: z.infer<typeof frontendSettingsUpdateSchema>) {
     this.settings = await this.settingsService.updateFrontendSettings(frontendSettings);
     return this.getSettings();
+  }
+
+  private throwIfSettingsUnset() {
+    if (!this.settings)
+      throw new InternalServerException("Could not check server settings (server settings not loaded)");
   }
 
   private async processSentryEnabled() {

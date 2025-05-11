@@ -1,9 +1,9 @@
-import mongoose, { connect, syncIndexes } from "mongoose";
+import mongoose, { connect, ConnectOptions, syncIndexes } from "mongoose";
 import { fetchMongoDBConnectionString, runMigrations } from "@/server.env";
 import { DITokens } from "@/container.tokens";
 import { AppConstants } from "@/server.constants";
 import { LoggerService } from "@/handlers/logger";
-import { TaskManagerService } from "@/services/core/task-manager.service";
+import { TaskManagerService } from "@/services/task-manager.service";
 import { ServerTasks } from "@/tasks";
 import { MulterService } from "@/services/core/multer.service";
 import { SettingsStore } from "@/state/settings.store";
@@ -14,97 +14,36 @@ import { PrinterFilesStore } from "@/state/printer-files.store";
 import { PermissionService } from "@/services/mongoose/permission.service";
 import { RoleService } from "@/services/mongoose/role.service";
 import { UserService } from "@/services/mongoose/user.service";
-import { PluginRepositoryCache } from "@/services/octoprint/plugin-repository.cache";
-import { ClientBundleService } from "@/services/core/client-bundle.service";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
-import { ISettingsService } from "@/services/interfaces/settings.service.interface";
 import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
-import { PluginFirmwareUpdateService } from "@/services/octoprint/plugin-firmware-update.service";
+import { TaskService } from "@/services/interfaces/task.interfaces";
 
-export class BootTask {
+export class BootTask implements TaskService {
   logger: LoggerService;
-  taskManagerService: TaskManagerService;
-  serverTasks: ServerTasks;
-  settingsStore: SettingsStore;
-  settingsService: ISettingsService;
-  multerService: MulterService;
-  printerSocketStore: PrinterSocketStore;
-  printerFilesStore: PrinterFilesStore;
-  permissionService: PermissionService;
-  roleService: RoleService;
-  userService: UserService;
-  pluginRepositoryCache: PluginRepositoryCache;
-  floorStore: FloorStore;
-  pluginFirmwareUpdateService: PluginFirmwareUpdateService;
-  clientBundleService: ClientBundleService;
-  configService: ConfigService;
-  isTypeormMode: boolean;
-  typeormService: TypeormService;
-  printerThumbnailCache: PrinterThumbnailCache;
 
-  constructor({
-    loggerFactory,
-    serverTasks,
-    settingsService,
-    settingsStore,
-    multerService,
-    printerSocketStore,
-    printerFilesStore,
-    permissionService,
-    roleService,
-    userService,
-    taskManagerService,
-    pluginRepositoryCache,
-    floorStore,
-    clientBundleService,
-    configService,
-    typeormService,
-    isTypeormMode,
-    printerThumbnailCache,
-  }: {
-    loggerFactory: ILoggerFactory;
-    serverTasks: ServerTasks;
-    settingsService: ISettingsService;
-    settingsStore: SettingsStore;
-    multerService: MulterService;
-    printerSocketStore: PrinterSocketStore;
-    printerFilesStore: PrinterFilesStore;
-    permissionService: PermissionService;
-    roleService: RoleService;
-    userService: UserService;
-    taskManagerService: TaskManagerService;
-    pluginRepositoryCache: PluginRepositoryCache;
-    floorStore: FloorStore;
-    clientBundleService: ClientBundleService;
-    configService: ConfigService;
-    typeormService: TypeormService;
-    isTypeormMode: boolean;
-    printerThumbnailCache: PrinterThumbnailCache;
-  }) {
-    this.isTypeormMode = isTypeormMode;
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly taskManagerService: TaskManagerService,
+    private readonly settingsStore: SettingsStore,
+    private readonly multerService: MulterService,
+    private readonly printerSocketStore: PrinterSocketStore,
+    private readonly printerFilesStore: PrinterFilesStore,
+    private readonly permissionService: PermissionService,
+    private readonly roleService: RoleService,
+    private readonly userService: UserService,
+    private readonly floorStore: FloorStore,
+    private readonly configService: ConfigService,
+    private readonly typeormService: TypeormService,
+    private readonly isTypeormMode: boolean,
+    private readonly printerThumbnailCache: PrinterThumbnailCache,
+  ) {
     this.logger = loggerFactory(BootTask.name);
-    this.serverTasks = serverTasks;
-    this.settingsService = settingsService;
-    this.settingsStore = settingsStore;
-    this.multerService = multerService;
-    this.printerSocketStore = printerSocketStore;
-    this.printerFilesStore = printerFilesStore;
-    this.permissionService = permissionService;
-    this.roleService = roleService;
-    this.userService = userService;
-    this.taskManagerService = taskManagerService;
-    this.pluginRepositoryCache = pluginRepositoryCache;
-    this.floorStore = floorStore;
-    this.clientBundleService = clientBundleService;
-    this.configService = configService;
-    this.typeormService = typeormService;
-    this.printerThumbnailCache = printerThumbnailCache;
   }
 
   async runOnce() {
     // To cope with retries after failures we register this task - disabled
-    this.taskManagerService.registerJobOrTask(this.serverTasks.SERVER_BOOT_TASK);
+    this.taskManagerService.registerJobOrTask(ServerTasks.SERVER_BOOT_TASK);
 
     this.logger.log("Running boot task once.");
     await this.run();
@@ -120,7 +59,9 @@ export class BootTask {
       } catch (e) {
         if (e instanceof mongoose.Error) {
           // Tests should just continue
-          if (!e.message.includes("Can't call `openUri()` on an active connection with different connection strings.")) {
+          if (
+            !e.message.includes("Can't call `openUri()` on an active connection with different connection strings.")
+          ) {
             // We are not in a test
             if (e.message.includes("ECONNREFUSED")) {
               this.logger.error("Database connection timed-out. Retrying in 5000.");
@@ -145,11 +86,13 @@ export class BootTask {
     if (isDemoMode) {
       this.logger.warn(`Starting in demo mode due to ${AppConstants.OVERRIDE_IS_DEMO_MODE}`);
       await this.createOrUpdateDemoAccount();
-      this.logger.warn(`Setting loginRequired=true and registration=false due to ${AppConstants.OVERRIDE_IS_DEMO_MODE}`);
+      this.logger.warn(
+        `Setting loginRequired=true and registration=false due to ${AppConstants.OVERRIDE_IS_DEMO_MODE}`,
+      );
       await this.settingsStore.setLoginRequired(true);
       await this.settingsStore.setRegistrationEnabled(false);
     } else {
-      const loginRequired = this.configService.get(AppConstants.OVERRIDE_LOGIN_REQUIRED, null);
+      const loginRequired = this.configService.get<string | null>(AppConstants.OVERRIDE_LOGIN_REQUIRED, null);
       if (loginRequired !== null) {
         this.logger.warn(`Setting login required due to ${AppConstants.OVERRIDE_LOGIN_REQUIRED}`);
         await this.settingsStore.setLoginRequired(loginRequired === "true");
@@ -162,8 +105,8 @@ export class BootTask {
       }
     }
 
-    const overrideJwtSecret = this.configService.get(AppConstants.OVERRIDE_JWT_SECRET, undefined);
-    const overrideJwtExpiresIn = this.configService.get(AppConstants.OVERRIDE_JWT_EXPIRES_IN, undefined);
+    const overrideJwtSecret = this.configService.get<string>(AppConstants.OVERRIDE_JWT_SECRET);
+    const overrideJwtExpiresIn = this.configService.get<string>(AppConstants.OVERRIDE_JWT_EXPIRES_IN);
     await this.settingsStore.persistOptionalCredentialSettings(overrideJwtSecret, overrideJwtExpiresIn);
 
     this.logger.log("Clearing upload folder");
@@ -182,7 +125,7 @@ export class BootTask {
     if (process.env.SAFEMODE_ENABLED === "true") {
       this.logger.warn("Starting in safe mode due to SAFEMODE_ENABLED");
     } else {
-      this.serverTasks.BOOT_TASKS.forEach((task) => {
+      ServerTasks.BOOT_TASKS.forEach((task) => {
         this.taskManagerService.registerJobOrTask(task);
       });
     }
@@ -192,9 +135,15 @@ export class BootTask {
   }
 
   async createOrUpdateDemoAccount() {
-    const demoUsername = this.configService.get(AppConstants.OVERRIDE_DEMO_USERNAME, AppConstants.DEFAULT_DEMO_USERNAME);
-    const demoPassword = this.configService.get(AppConstants.OVERRIDE_DEMO_PASSWORD, AppConstants.DEFAULT_DEMO_PASSWORD);
-    const demoRole = this.configService.get(AppConstants.OVERRIDE_DEMO_ROLE, AppConstants.DEFAULT_DEMO_ROLE);
+    const demoUsername = this.configService.get(
+      AppConstants.OVERRIDE_DEMO_USERNAME,
+      AppConstants.DEFAULT_DEMO_USERNAME,
+    ) as string;
+    const demoPassword = this.configService.get(
+      AppConstants.OVERRIDE_DEMO_PASSWORD,
+      AppConstants.DEFAULT_DEMO_PASSWORD,
+    ) as string;
+    const demoRole = this.configService.get(AppConstants.OVERRIDE_DEMO_ROLE, AppConstants.DEFAULT_DEMO_ROLE) as string;
     const adminRole = this.roleService.getRoleByName(demoRole);
 
     const demoUserId = await this.userService.getDemoUserId();
@@ -221,9 +170,13 @@ export class BootTask {
   async createConnection() {
     if (!this.isTypeormMode) {
       const envUrl = fetchMongoDBConnectionString();
+      if (!envUrl?.length) {
+        throw new Error("Mongodb connection string not set");
+      }
+
       await connect(envUrl, {
         serverSelectionTimeoutMS: 1500,
-      });
+      } as ConnectOptions);
       await syncIndexes();
     }
   }

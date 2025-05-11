@@ -1,33 +1,40 @@
 import { IsAlphanumeric } from "class-validator";
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, Relation } from "typeorm";
 import { PrintCompletion } from "@/entities/print-completion.entity";
-import { BaseEntity } from "@/entities/base.entity";
 import { PrinterGroup } from "@/entities/printer-group.entity";
 import { OctoprintType } from "@/services/printer-api.interface";
 
 @Entity()
-export class Printer extends BaseEntity {
+export class Printer {
   @PrimaryGeneratedColumn()
-  id!: number;
+  id: number;
 
   @Column()
-  name!: string;
+  name: string;
 
   @Column()
-  printerURL!: string;
+  printerURL: string;
 
   @Column({ default: OctoprintType, nullable: false })
-  printerType!: number;
+  printerType: number;
 
-  @Column({ default: "" })
+  @Column({ default: "", nullable: true })
   @IsAlphanumeric()
-  apiKey!: string;
+  apiKey: string;
+
+  @Column({ default: "", nullable: true })
+  @IsAlphanumeric()
+  username: string;
+
+  @Column({ default: "", nullable: true })
+  @IsAlphanumeric()
+  password: string;
 
   @Column({
     nullable: false,
     default: true,
   })
-  enabled: boolean = true;
+  enabled: boolean;
 
   @Column({
     nullable: true,
@@ -39,14 +46,20 @@ export class Printer extends BaseEntity {
   })
   assignee?: string;
 
-  @OneToMany(() => PrintCompletion, (pc) => pc.printer)
-  printCompletions!: Relation<PrintCompletion>[];
+  @OneToMany(
+    () => PrintCompletion,
+    (pc) => pc.printer,
+  )
+  printCompletions: Relation<PrintCompletion>[];
 
-  @OneToMany(() => PrinterGroup, (pc) => pc.printer)
-  printerGroups!: Relation<PrinterGroup>[];
+  @OneToMany(
+    () => PrinterGroup,
+    (pc) => pc.printer,
+  )
+  printerGroups: Relation<PrinterGroup>[];
 
   @CreateDateColumn({ type: "int" })
-  dateAdded!: number;
+  dateAdded: number;
 
   @Column({ nullable: true })
   feedRate?: number;

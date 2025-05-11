@@ -8,17 +8,21 @@ import { TrackedUpload } from "@/services/interfaces/file-upload-tracker.interfa
 import { IdType } from "@/shared.constants";
 
 export class FileUploadTrackerCache {
-  private currentUploads: TrackedUpload[] = [];
-  private eventEmitter2: EventEmitter2;
-  private logger: LoggerService;
+  private readonly currentUploads: TrackedUpload[] = [];
 
-  constructor({ loggerFactory, eventEmitter2 }: { loggerFactory: ILoggerFactory; eventEmitter2: EventEmitter2 }) {
-    this.eventEmitter2 = eventEmitter2;
+  private readonly logger: LoggerService;
+
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly eventEmitter2: EventEmitter2,
+  ) {
     this.logger = loggerFactory(FileUploadTrackerCache.name);
 
     this.eventEmitter2.on(uploadProgressEvent("*"), (token, progress) => this.handleUploadProgress(token, progress));
     this.eventEmitter2.on(uploadDoneEvent("*"), (token: string) => this.handleUploadDone(token));
-    this.eventEmitter2.on(uploadFailedEvent("*"), (token: string, reason?: string) => this.handleUploadFailed(token, reason));
+    this.eventEmitter2.on(uploadFailedEvent("*"), (token: string, reason?: string) =>
+      this.handleUploadFailed(token, reason),
+    );
   }
 
   getUploads() {
@@ -55,7 +59,7 @@ export class FileUploadTrackerCache {
     if (!upload) {
       return;
     }
-    upload.progress = event.progress;
+    upload.progress = event.progress ?? null;
   }
 
   handleUploadFailed(token: string, reason?: string) {
@@ -80,6 +84,6 @@ export class FileUploadTrackerCache {
     trackedUpload.completed = true;
     trackedUpload.success = success;
     trackedUpload.completedAt = Date.now();
-    trackedUpload.reason = reason;
+    trackedUpload.reason = reason ?? null;
   }
 }

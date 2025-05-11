@@ -1,25 +1,38 @@
 import { model, Schema } from "mongoose";
 import { OctoprintType } from "@/services/printer-api.interface";
+import { MongoIdType } from "@/shared.constants";
 
-export interface IPrinter {
-  id: string;
-  apiKey: string;
+export interface IPrinter<KeyType = MongoIdType> {
+  id: KeyType;
+  apiKey?: string;
+  username?: string;
+  password?: string;
   printerURL: string;
   printerType: number;
   enabled: boolean;
-  disabledReason: string;
+  disabledReason?: string;
   name: string;
-  assignee: string;
-  currentUser: string;
-  dateAdded: number;
-  feedRate: number;
-  flowRate: number;
+  assignee?: string;
+  dateAdded?: number;
+  feedRate?: number;
+  flowRate?: number;
 }
 
 export const PrinterSchema = new Schema<IPrinter>({
   apiKey: {
     type: String,
     default: "",
+    required: false,
+  },
+  username: {
+    type: String,
+    default: "",
+    required: false,
+  },
+  password: {
+    type: String,
+    default: "",
+    required: false,
   },
   printerURL: {
     type: String,
@@ -48,10 +61,6 @@ export const PrinterSchema = new Schema<IPrinter>({
     required: true,
   },
   // Auto-generated below
-  currentUser: {
-    type: String,
-    required: false,
-  },
   dateAdded: {
     type: Number,
     required: false,

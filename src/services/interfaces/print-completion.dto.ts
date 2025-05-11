@@ -1,7 +1,7 @@
 import { IdType } from "@/shared.constants";
 
 export interface PrintCompletionContext {
-  correlationId: string;
+  correlationId: string | null | undefined;
 }
 
 export class CreatePrintCompletionDto<KeyType = IdType> {
@@ -9,7 +9,7 @@ export class CreatePrintCompletionDto<KeyType = IdType> {
   status: string;
   printerId: KeyType;
   printerReference?: string;
-  completionLog: string;
+  completionLog?: string;
   context: PrintCompletionContext;
 }
 
@@ -20,6 +20,6 @@ export class PrintCompletionDto<KeyType = IdType> {
   status: string;
   printerId: KeyType;
   printerReference?: string;
-  completionLog: string;
+  completionLog?: string;
   context: PrintCompletionContext;
 }

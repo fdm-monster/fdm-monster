@@ -8,7 +8,7 @@ export class CustomGcodeService
   extends BaseService(CustomGcode, CustomGcodeDto<SqliteIdType>, CustomGcodeDto<SqliteIdType>)
   implements ICustomGcodeService<SqliteIdType, CustomGcode>
 {
-  toDto(entity: CustomGcode): CustomGcodeDto {
+  toDto(entity: CustomGcode): CustomGcodeDto<SqliteIdType> {
     return {
       id: entity.id,
       name: entity.name,
@@ -21,8 +21,8 @@ export class CustomGcodeService
     return await super.create(gcodeScript);
   }
 
-  async delete(gcodeScriptId: SqliteIdType, throwIfNotFound?: boolean) {
-    return await super.delete(gcodeScriptId, throwIfNotFound);
+  async delete(gcodeScriptId: SqliteIdType) {
+    await super.delete(gcodeScriptId);
   }
 
   async get(gcodeScriptId: SqliteIdType): Promise<CustomGcode> {

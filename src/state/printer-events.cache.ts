@@ -1,43 +1,35 @@
 import { KeyDiffCache } from "@/utils/cache/key-diff.cache";
-import { formatKB } from "@/utils/metric.utils";
-import { printerEvents } from "@/constants/event.constants";
-import { SettingsStore } from "@/state/settings.store";
+import { printerEvents, PrintersDeletedEvent } from "@/constants/event.constants";
 import EventEmitter2 from "eventemitter2";
-import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IdType } from "@/shared.constants";
-import { LoggerService } from "@/handlers/logger";
 import { OctoPrintEventDto, WsMessage } from "@/services/octoprint/dto/octoprint-event.dto";
-import { HistoryMessageDto } from "@/services/octoprint/dto/websocket/history-message.dto";
+import {
+  HistoryMessageDto,
+  HistoryMessageDtoWithoutLogsMessagesPluginsAndTemps,
+} from "@/services/octoprint/dto/websocket/history-message.dto";
 import { MoonrakerEventDto, MR_WsMessage } from "@/services/moonraker/constants/moonraker-event.dto";
 import { PrinterObjectsQueryDto } from "@/services/moonraker/dto/objects/printer-objects-query.dto";
 import { SubscriptionType } from "@/services/moonraker/moonraker-websocket.adapter";
+import { octoPrintEvent } from "@/services/octoprint/octoprint-websocket.adapter";
+import { moonrakerEvent } from "@/services/moonraker/constants/moonraker.constants";
+import { prusaLinkEvent } from "@/services/prusa-link/constants/prusalink.constants";
+import { PrusaLinkEventDto } from "@/services/prusa-link/constants/prusalink-event.dto";
+import { ILoggerFactory } from "@/handlers/logger-factory";
+import { LoggerService } from "@/handlers/logger";
 
-export type PrinterEventsCacheDto = Record<WsMessage, any | null>;
+export type WsMessageWithoutEventAndPlugin = Exclude<WsMessage, "event" | "plugin">;
+export type PrinterEventsCacheDto = Record<WsMessageWithoutEventAndPlugin, any>;
 
 export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
-  private logger: LoggerService;
-  private eventEmitter2: EventEmitter2;
-  private settingsStore: SettingsStore;
+  private readonly logger: LoggerService;
 
-  constructor({
-    eventEmitter2,
-    loggerFactory,
-    settingsStore,
-  }: {
-    eventEmitter2: EventEmitter2;
-    loggerFactory: ILoggerFactory;
-    settingsStore: SettingsStore;
-  }) {
+  constructor(
+    private readonly eventEmitter2: EventEmitter2,
+    loggerFactory: ILoggerFactory) {
     super();
-    this.settingsStore = settingsStore;
+
     this.logger = loggerFactory(PrinterEventsCache.name);
-    this.eventEmitter2 = eventEmitter2;
-
     this.subscribeToEvents();
-  }
-
-  private get _debugMode() {
-    return this.settingsStore.getSettingsSensitive()?.server?.debugSettings?.debugSocketMessages;
   }
 
   async deletePrinterSocketEvents(id: IdType) {
@@ -72,7 +64,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
     return ref;
   }
 
-  async setEvent(printerId: IdType, label: WsMessage, payload: any) {
+  async setEvent(printerId: IdType, label: WsMessageWithoutEventAndPlugin, payload: any) {
     const ref = await this.getOrCreateEvents(printerId);
     ref[label] = {
       payload,
@@ -81,7 +73,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
     await this.setKeyValue(printerId, ref);
   }
 
-  async setSubstate(printerId: IdType, label: WsMessage, substateName: string, payload: any) {
+  async setSubState(printerId: IdType, label: WsMessageWithoutEventAndPlugin, substateName: string, payload: any) {
     const ref = await this.getOrCreateEvents(printerId);
     if (!ref[label]) {
       ref[label] = {};
@@ -93,29 +85,30 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
     await this.setKeyValue(printerId, ref);
   }
 
-  private async handlePrintersDeleted({ printerIds }: { printerIds: IdType[] }) {
-    await this.deleteKeysBatch(printerIds);
+  private async handlePrintersDeleted(event: PrintersDeletedEvent) {
+    await this.deleteKeysBatch(event.printerIds);
   }
 
   private subscribeToEvents() {
-    this.eventEmitter2.on("octoprint.*", (e) => this.onOctoPrintSocketMessage(e));
-    this.eventEmitter2.on("moonraker.*", (e) => this.onMoonrakerSocketMessage(e));
+    this.eventEmitter2.on(octoPrintEvent("*"), (e) => this.onOctoPrintSocketMessage(e));
+    this.eventEmitter2.on(moonrakerEvent("*"), (e) => this.onMoonrakerSocketMessage(e));
+    this.eventEmitter2.on(prusaLinkEvent("*"), (e) => this.onPrusaLinkPollMessage(e));
     this.eventEmitter2.on(printerEvents.printersDeleted, this.handlePrintersDeleted.bind(this));
   }
 
   private async onOctoPrintSocketMessage(e: OctoPrintEventDto) {
     const printerId = e.printerId;
     if (!["plugin", "event"].includes(e.event)) {
-      await this.setEvent(printerId, e.event, e.event === "history" ? this.pruneHistoryPayload(e.payload) : e.payload);
-
-      if (this._debugMode) {
-        this.logger.log(`Message '${e.event}' received, size ${formatKB(e.payload)}`, e.printerId);
-      }
+      await this.setEvent(
+        printerId,
+        e.event as WsMessageWithoutEventAndPlugin,
+        e.event === "history" ? this.pruneHistoryPayload(e.payload) : e.payload,
+      );
     }
   }
 
   private async onMoonrakerSocketMessage(
-    e: MoonrakerEventDto<MR_WsMessage, PrinterObjectsQueryDto<SubscriptionType | null>, IdType>
+    e: MoonrakerEventDto<MR_WsMessage, PrinterObjectsQueryDto<SubscriptionType | null>>,
   ) {
     const printerId = e.printerId;
     const eventType = e.event;
@@ -126,10 +119,18 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
     }
   }
 
-  private pruneHistoryPayload(payload: HistoryMessageDto) {
-    delete payload.logs;
-    delete payload.temps;
-    delete payload.messages;
-    return payload;
+  private async onPrusaLinkPollMessage(
+    e: PrusaLinkEventDto) {
+    const printerId = e.printerId;
+
+    this.logger.debug(`Received prusaLink event ${e.event}, printerId ${e.printerId}`, e);
+    if (e.event === "current") {
+      await this.setEvent(printerId, e.event, e.payload);
+    }
+  }
+
+  private pruneHistoryPayload(payload: HistoryMessageDto): HistoryMessageDtoWithoutLogsMessagesPluginsAndTemps {
+    const { logs, temps, messages, plugins, ...prunedPayload } = payload;
+    return prunedPayload satisfies HistoryMessageDtoWithoutLogsMessagesPluginsAndTemps;
   }
 }

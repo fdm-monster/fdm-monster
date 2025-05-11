@@ -1,3 +1,3 @@
 export interface PrintCompletionContextDto {
-  correlationId: string;
+  correlationId: string | null | undefined;
 }

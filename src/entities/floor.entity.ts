@@ -1,20 +1,23 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn, Relation } from "typeorm";
 import { FloorPosition } from "./floor-position.entity";
-import { BaseEntity } from "@/entities/base.entity";
 
 @Entity()
-export class Floor extends BaseEntity {
+export class Floor {
   @PrimaryGeneratedColumn()
-  id!: number;
+  id: number;
 
   @Column()
-  name!: string;
+  name: string;
 
   @Column({
     unique: true,
   })
-  floor!: number;
+  floor: number;
 
-  @OneToMany(() => FloorPosition, (gp) => gp.floor, { eager: true })
-  printers!: Relation<FloorPosition>[];
+  @OneToMany(
+    () => FloorPosition,
+    (gp) => gp.floor,
+    { eager: true },
+  )
+  printers: Relation<FloorPosition>[];
 }

@@ -6,15 +6,7 @@ import { IConfigService } from "@/services/core/config.service";
 import { IUserService } from "@/services/interfaces/user-service.interface";
 
 export const demoUserNotAllowed = inject(
-  ({
-    userService,
-    configService,
-    loggerFactory,
-  }: {
-    userService: IUserService;
-    configService: IConfigService;
-    loggerFactory: ILoggerFactory;
-  }) => {
+  (userService: IUserService, configService: IConfigService, loggerFactory: ILoggerFactory) => {
     const logger = loggerFactory(demoUserNotAllowed.name);
     return async (req: Request, res: Response, next: NextFunction) => {
       const isDemoMode = configService.isDemoMode();
@@ -29,9 +21,5 @@ export const demoUserNotAllowed = inject(
       }
       next();
     };
-  }
+  },
 );
-
-export const demoUserNotAllowedInterceptor = {
-  before: [demoUserNotAllowed],
-};

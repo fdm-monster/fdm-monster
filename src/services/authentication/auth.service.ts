@@ -5,22 +5,19 @@ import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IUserService } from "@/services/interfaces/user-service.interface";
 import { IJwtService } from "@/services/interfaces/jwt.service.interface";
-import { MongoIdType } from "@/shared.constants";
+import { IdType } from "@/shared.constants";
 import { IAuthService } from "@/services/interfaces/auth.service.interface";
 import { IRefreshTokenService } from "@/services/interfaces/refresh-token.service.interface";
 import { AUTH_ERROR_REASON } from "@/constants/authorization.constants";
 import { captureException } from "@sentry/node";
+import { IUser } from "@/models/Auth/User";
 
-export class AuthService implements IAuthService {
-  private logger: LoggerService;
-  private userService: IUserService;
-  private jwtService: IJwtService;
-  private settingsStore: SettingsStore;
-  private refreshTokenService: IRefreshTokenService<MongoIdType>;
+export class AuthService<KeyType = IdType> implements IAuthService<KeyType> {
+  private readonly logger: LoggerService;
   /**
    *  When users are blacklisted at runtime, this cache can make quick work of rejecting them
    */
-  private blacklistedJwtCache: Record<string, { userId: MongoIdType; createdAt: number }> = {};
+  private blacklistedJwtCache: Record<string, { userId: KeyType; createdAt: number }> = {};
 
   /**
    * loginUser: starts new session: id-token, refresh, removing any old refresh
@@ -40,24 +37,14 @@ export class AuthService implements IAuthService {
    * refreshAttempts => integer in setting with cap?
    */
 
-  constructor({
-    userService,
-    jwtService,
-    loggerFactory,
-    settingsStore,
-    refreshTokenService,
-  }: {
-    userService: IUserService<MongoIdType>;
-    jwtService: IJwtService<MongoIdType>;
-    loggerFactory: ILoggerFactory;
-    settingsStore: SettingsStore;
-    refreshTokenService: IRefreshTokenService<MongoIdType>;
-  }) {
-    this.userService = userService;
-    this.jwtService = jwtService;
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly userService: IUserService<KeyType, IUser<KeyType>>,
+    private readonly jwtService: IJwtService<KeyType>,
+    private readonly settingsStore: SettingsStore,
+    private readonly refreshTokenService: IRefreshTokenService<KeyType>,
+  ) {
     this.logger = loggerFactory(AuthService.name);
-    this.settingsStore = settingsStore;
-    this.refreshTokenService = refreshTokenService;
   }
 
   async loginUser(username: string, password: string) {
@@ -70,7 +57,7 @@ export class AuthService implements IAuthService {
       throw new AuthenticationError("Login incorrect", AUTH_ERROR_REASON.IncorrectCredentials);
     }
 
-    const userId = userDoc.id.toString();
+    const userId = userDoc.id;
     const token = await this.signJwtToken(userId);
     await this.refreshTokenService.purgeOutdatedRefreshTokensByUserId(userId);
     await this.purgeOutdatedBlacklistedJwtCache();
@@ -82,7 +69,7 @@ export class AuthService implements IAuthService {
     };
   }
 
-  async logoutUserId(userId: MongoIdType, jwtToken?: string) {
+  async logoutUserId(userId: KeyType, jwtToken?: string) {
     await this.refreshTokenService.deleteRefreshTokenByUserId(userId);
     if (jwtToken?.length) {
       this.blacklistedJwtCache[jwtToken] = { userId, createdAt: Date.now() };
@@ -109,20 +96,14 @@ export class AuthService implements IAuthService {
 
   async logoutUserRefreshToken(refreshToken: string) {
     const userRefreshToken = await this.getValidRefreshToken(refreshToken);
-    await this.refreshTokenService.deleteRefreshTokenByUserId(userRefreshToken.userId.toString());
+    await this.refreshTokenService.deleteRefreshTokenByUserId(userRefreshToken.userId);
   }
 
   async renewLoginByRefreshToken(refreshToken: string): Promise<string> {
-    const userRefreshToken = await this.getValidRefreshToken(refreshToken, false);
-    if (!userRefreshToken) {
-      throw new AuthenticationError(
-        "The refresh token was invalid or expired, could not refresh user token",
-        AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken
-      );
-    }
+    const userRefreshToken = await this.getValidRefreshToken(refreshToken);
 
-    const userId = userRefreshToken.userId.toString();
-    const user = await this.userService.getUser(userId, false);
+    const userId = userRefreshToken.userId;
+    const user = await this.userService.getUser(userId);
     if (!user) {
       await this.refreshTokenService.deleteRefreshToken(refreshToken);
       throw new AuthenticationError("User not found", AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken);
@@ -138,14 +119,14 @@ export class AuthService implements IAuthService {
     return this.blacklistedJwtCache[jwtToken];
   }
 
-  async getValidRefreshToken(refreshToken: string, throwNotFoundError: boolean = true) {
-    const userRefreshToken = await this.refreshTokenService.getRefreshToken(refreshToken, throwNotFoundError);
-    if (!userRefreshToken) {
-      return null;
-    }
+  async getValidRefreshToken(refreshToken: string) {
+    const userRefreshToken = await this.refreshTokenService.getRefreshToken(refreshToken);
     if (Date.now() > userRefreshToken.expiresAt) {
-      await this.refreshTokenService.deleteRefreshTokenByUserId(userRefreshToken.userId.toString());
-      throw new AuthenticationError("Refresh token expired, login required", AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken);
+      await this.refreshTokenService.deleteRefreshTokenByUserId(userRefreshToken.userId);
+      throw new AuthenticationError(
+        "Refresh token expired, login required",
+        AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken,
+      );
     }
     return userRefreshToken;
   }
@@ -158,10 +139,10 @@ export class AuthService implements IAuthService {
     // If no attempts are set, then we don't care about attempts
     if (refreshTokenAttempts !== -1) {
       if (attemptsUsed >= refreshTokenAttempts) {
-        await this.refreshTokenService.deleteRefreshTokenByUserId(userRefreshToken.userId.toString());
+        await this.refreshTokenService.deleteRefreshTokenByUserId(userRefreshToken.userId);
         throw new AuthenticationError(
           "Refresh token attempts exceeded, login required",
-          AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken
+          AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken,
         );
       }
     }
@@ -169,8 +150,8 @@ export class AuthService implements IAuthService {
     await this.refreshTokenService.updateRefreshTokenAttempts(refreshToken, attemptsUsed + 1);
   }
 
-  async signJwtToken(userId: MongoIdType) {
-    const user = await this.userService.getUser(userId, false);
+  async signJwtToken(userId: KeyType) {
+    const user = await this.userService.getUser(userId);
     if (!user) {
       throw new AuthenticationError("User not found", AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken);
     }

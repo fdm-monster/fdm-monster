@@ -1,7 +1,6 @@
 import { ValidationException } from "@/exceptions/runtime.exceptions";
 import { PrinterCache } from "@/state/printer.cache";
 import { FileCache } from "@/state/file.cache";
-import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { LoggerService } from "@/handlers/logger";
 import { IdType } from "@/shared.constants";
 import { ILoggerFactory } from "@/handlers/logger-factory";
@@ -9,47 +8,31 @@ import { captureException } from "@sentry/node";
 import { PrinterApiFactory } from "@/services/printer-api.factory";
 
 export class PrinterFilesStore {
-  printerCache: PrinterCache;
-  fileCache: FileCache;
-  printerApiFactory: PrinterApiFactory;
-  octoprintClient: OctoprintClient;
-  private logger: LoggerService;
+  private readonly logger: LoggerService;
 
-  constructor({
-    printerCache,
-    fileCache,
-    printerApiFactory,
-    octoprintClient,
-    loggerFactory,
-  }: {
-    printerCache: PrinterCache;
-    fileCache: FileCache;
-    printerApiFactory: PrinterApiFactory;
-    octoprintClient: OctoprintClient;
-    loggerFactory: ILoggerFactory;
-  }) {
-    this.printerCache = printerCache;
-    this.printerApiFactory = printerApiFactory;
-    this.fileCache = fileCache;
-    this.octoprintClient = octoprintClient;
-
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly printerCache: PrinterCache,
+    public readonly fileCache: FileCache,
+    private readonly printerApiFactory: PrinterApiFactory,
+  ) {
     this.logger = loggerFactory(PrinterFilesStore.name);
   }
 
   async loadFilesStore(): Promise<void> {
     const printers = await this.printerCache.listCachedPrinters(true);
-    for (const printer of printers) {
+    for (const printer of printers.filter(p => p.enabled)) {
       try {
-        const printerFiles = await this.loadFiles(printer.id, false);
+        const printerFiles = await this.loadFiles(printer.id);
         this.fileCache.cachePrinterFiles(printer.id, printerFiles);
       } catch (e) {
         captureException(e);
-        this.logger.error("Files store failed to load file list for printer");
+        this.logger.error(`Files store failed to load file list for printer ${printer.name}`);
       }
     }
   }
 
-  async loadFiles(printerId: IdType, recursive: boolean = false): Promise<any> {
+  async loadFiles(printerId: IdType): Promise<any> {
     const loginDto = await this.printerCache.getLoginDtoAsync(printerId);
     const printerApi = this.printerApiFactory.getScopedPrinter(loginDto);
     const files = await printerApi.getFiles();
@@ -87,7 +70,9 @@ export class PrinterFilesStore {
       }
     }
 
-    this.logger.log(`Deleted ${succeededFiles.length} successfully and ${failedFiles.length} with failure for printer ${name}.`);
+    this.logger.log(
+      `Deleted ${succeededFiles.length} successfully and ${failedFiles.length} with failure for printer ${name}.`,
+    );
     return {
       failedFiles,
       succeededFiles,

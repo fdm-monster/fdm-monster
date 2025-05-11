@@ -1,7 +1,8 @@
 import { model, Schema } from "mongoose";
+import { MongoIdType } from "@/shared.constants";
 
-export interface IRole {
-  id: string;
+export interface IRole<KeyType = MongoIdType> {
+  id: KeyType;
   name: string;
 }
 

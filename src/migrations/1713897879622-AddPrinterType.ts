@@ -1,30 +1,30 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class AddPrinterType1713897879622 implements MigrationInterface {
-    name = 'AddPrinterType1713897879622'
+  name = "AddPrinterType1713897879622";
 
-    public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`
             CREATE TABLE "temporary_role" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "name" varchar NOT NULL,
                 CONSTRAINT "UQ_d430b72bf1eaebce7f87068a431" UNIQUE ("name")
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             INSERT INTO "temporary_role"("id", "name")
             SELECT "id",
                 "name"
             FROM "role"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "role"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "temporary_role"
                 RENAME TO "role"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "temporary_printer" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "name" varchar NOT NULL,
@@ -39,7 +39,7 @@ export class AddPrinterType1713897879622 implements MigrationInterface {
                 "printerType" integer NOT NULL DEFAULT (0)
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             INSERT INTO "temporary_printer"(
                     "id",
                     "name",
@@ -64,61 +64,61 @@ export class AddPrinterType1713897879622 implements MigrationInterface {
                 "flowRate"
             FROM "printer"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "printer"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "temporary_printer"
                 RENAME TO "printer"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "temporary_role" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "name" varchar NOT NULL,
                 CONSTRAINT "UQ_d430b72bf1eaebce7f87068a431" UNIQUE ("name")
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             INSERT INTO "temporary_role"("id", "name")
             SELECT "id",
                 "name"
             FROM "role"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "role"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "temporary_role"
                 RENAME TO "role"
         `);
-    }
+  }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`
             ALTER TABLE "role"
                 RENAME TO "temporary_role"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "role" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "name" varchar NOT NULL,
                 CONSTRAINT "UQ_d430b72bf1eaebce7f87068a431" UNIQUE ("name")
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             INSERT INTO "role"("id", "name")
             SELECT "id",
                 "name"
             FROM "temporary_role"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "temporary_role"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "printer"
                 RENAME TO "temporary_printer"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "printer" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "name" varchar NOT NULL,
@@ -132,7 +132,7 @@ export class AddPrinterType1713897879622 implements MigrationInterface {
                 "flowRate" integer
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             INSERT INTO "printer"(
                     "id",
                     "name",
@@ -157,29 +157,28 @@ export class AddPrinterType1713897879622 implements MigrationInterface {
                 "flowRate"
             FROM "temporary_printer"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "temporary_printer"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "role"
                 RENAME TO "temporary_role"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "role" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "name" varchar NOT NULL,
                 CONSTRAINT "UQ_d430b72bf1eaebce7f87068a431" UNIQUE ("name")
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             INSERT INTO "role"("id", "name")
             SELECT "id",
                 "name"
             FROM "temporary_role"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "temporary_role"
         `);
-    }
-
+  }
 }

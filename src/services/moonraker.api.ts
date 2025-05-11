@@ -10,8 +10,6 @@ import { MoonrakerClient } from "@/services/moonraker/moonraker.client";
 import { LoginDto } from "@/services/interfaces/login.dto";
 import { NotImplementedException } from "@/exceptions/runtime.exceptions";
 import { AxiosPromise } from "axios";
-import { ILoggerFactory } from "@/handlers/logger-factory";
-import { LoggerService } from "@/handlers/logger";
 import { PrinterObjectsQueryDto } from "@/services/moonraker/dto/objects/printer-objects-query.dto";
 import { PrintStatsObject, WebhooksObject } from "@/services/moonraker/dto/objects/printer-object.types";
 
@@ -20,21 +18,13 @@ import { PrintStatsObject, WebhooksObject } from "@/services/moonraker/dto/objec
  * https://moonraker.readthedocs.io/en/latest/web_api/#query-server-info
  */
 export class MoonrakerApi implements IPrinterApi {
-  logger: LoggerService;
-  client: MoonrakerClient;
-  printerLogin: LoginDto;
-  constructor({
-    moonrakerClient,
-    printerLogin,
-    loggerFactory,
-  }: {
-    moonrakerClient: MoonrakerClient;
-    printerLogin: LoginDto;
-    loggerFactory: ILoggerFactory;
-  }) {
-    this.logger = loggerFactory(MoonrakerApi.name);
+  private readonly client: MoonrakerClient;
+
+  constructor(
+    moonrakerClient: MoonrakerClient,
+    private printerLogin: LoginDto,
+  ) {
     this.client = moonrakerClient;
-    this.printerLogin = printerLogin;
   }
 
   get type(): PrinterType {
@@ -124,7 +114,7 @@ export class MoonrakerApi implements IPrinterApi {
       `
       G91
       G1 ${g1CommandAxes} F${setSpeed}
-      G90`
+      G90`,
     );
   }
 
@@ -181,13 +171,12 @@ export class MoonrakerApi implements IPrinterApi {
   }
 
   async getReprintState(): Promise<PartialReprintFileDto> {
-    const response = await this.client.getPrinterObjectsQuery<PrinterObjectsQueryDto<PrintStatsObject & WebhooksObject>>(
-      this.login,
-      {
-        print_stats: [],
-        webhooks: [],
-      }
-    );
+    const response = await this.client.getPrinterObjectsQuery<
+      PrinterObjectsQueryDto<PrintStatsObject & WebhooksObject>
+    >(this.login, {
+      print_stats: [],
+      webhooks: [],
+    });
 
     const result = response.data.result;
     const operational = result.status.webhooks.state === "ready";

@@ -1,19 +1,23 @@
 import { PrintCompletion } from "@/models";
-import { createPrintCompletionRules } from "../validators/print-completion-service.validation";
+import { createPrintCompletionSchema } from "../validators/print-completion-service.validation";
 import { validateInput } from "@/handlers/validators";
 import { EVENT_TYPES } from "../octoprint/constants/octoprint-websocket.constants";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { MongoIdType } from "@/shared.constants";
 import { IPrintCompletionService } from "@/services/interfaces/print-completion.interface";
-import { CreatePrintCompletionDto, PrintCompletionContext, PrintCompletionDto } from "@/services/interfaces/print-completion.dto";
+import {
+  CreatePrintCompletionDto,
+  PrintCompletionContext,
+  PrintCompletionDto,
+} from "@/services/interfaces/print-completion.dto";
 import { IPrintCompletion } from "@/models/PrintCompletion";
 import { processCompletions } from "@/services/mongoose/print-completion.shared";
 
 export class PrintCompletionService implements IPrintCompletionService<MongoIdType> {
-  logger: LoggerService;
+  private readonly logger: LoggerService;
 
-  constructor({ loggerFactory }: { loggerFactory: ILoggerFactory }) {
+  constructor(loggerFactory: ILoggerFactory) {
     this.logger = loggerFactory(PrintCompletionService.name);
   }
 
@@ -30,7 +34,10 @@ export class PrintCompletionService implements IPrintCompletionService<MongoIdTy
   }
 
   async create(input: CreatePrintCompletionDto<MongoIdType>) {
-    const { printerId, fileName, completionLog, status, context } = await validateInput(input, createPrintCompletionRules);
+    const { printerId, fileName, completionLog, status, context } = await validateInput(
+      input,
+      createPrintCompletionSchema(false),
+    );
 
     return PrintCompletion.create({
       printerId,
@@ -52,7 +59,7 @@ export class PrintCompletionService implements IPrintCompletionService<MongoIdTy
     });
   }
 
-  async updateContext(correlationId: string, context: PrintCompletionContext) {
+  async updateContext(correlationId: string | undefined, context: PrintCompletionContext) {
     if (!correlationId?.length) {
       this.logger.warn("Ignoring undefined correlationId, cant update print completion context");
       return;
@@ -64,7 +71,9 @@ export class PrintCompletionService implements IPrintCompletionService<MongoIdTy
     });
 
     if (!completionEntry) {
-      this.logger.warn(`Print with correlationId ${correlationId} could not be updated with new context as it was not found`);
+      this.logger.warn(
+        `Print with correlationId ${correlationId} could not be updated with new context as it was not found`,
+      );
       return;
     }
     completionEntry.context = context;
@@ -97,7 +106,7 @@ export class PrintCompletionService implements IPrintCompletionService<MongoIdTy
         c.printerId = c._id;
         delete c._id;
         return [c.printerId, c];
-      })
+      }),
     );
   }
 

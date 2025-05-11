@@ -3,7 +3,7 @@ import { IUser } from "@/models/Auth/User";
 import { RegisterUserDto, UserDto } from "@/services/interfaces/user.dto";
 import { DeleteResult } from "typeorm";
 
-export interface IUserService<KeyType = IdType, Entity = IUser> {
+export interface IUserService<KeyType = IdType, Entity = IUser<KeyType>> {
   toDto(user: Entity): UserDto;
 
   listUsers(limit?: number): Promise<Entity[]>;
@@ -16,11 +16,11 @@ export interface IUserService<KeyType = IdType, Entity = IUser> {
 
   findRootUsers(): Promise<Entity[]>;
 
-  getDemoUserId(): Promise<KeyType>;
+  getDemoUserId(): Promise<KeyType | undefined>;
 
-  findRawByUsername(username: string): Promise<Entity>;
+  findRawByUsername(username: string): Promise<Entity | null>;
 
-  getUser(userId: KeyType, throwNotFoundError?: boolean): Promise<Entity>;
+  getUser(userId: KeyType): Promise<Entity>;
 
   getUserRoleIds(userId: KeyType): Promise<KeyType[]>;
 

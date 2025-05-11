@@ -4,17 +4,18 @@ import { expectOkResponse } from "../extensions";
 import { AppConstants } from "@/server.constants";
 import {
   credentialSettingsKey,
-  printerFileCleanSettingKey,
   frontendSettingKey,
   getDefaultFileCleanSettings,
   getDefaultFrontendSettings,
-  getDefaultSettings,
+  printerFileCleanSettingKey,
   serverSettingsKey,
+  timeoutSettingKey,
   wizardSettingKey,
 } from "@/constants/server-settings.constants";
 import { SettingsController } from "@/controllers/settings.controller";
 import { isSqliteModeTest } from "../typeorm.manager";
 import TestAgent from "supertest/lib/agent";
+import { FrontendSettingsDto } from "@/services/interfaces/settings.dto";
 
 let request: TestAgent<Test>;
 
@@ -35,36 +36,41 @@ beforeAll(async () => {
 describe(SettingsController.name, () => {
   it("should OK on GET settings", async () => {
     const response = await request.get(defaultRoute).send();
-    expect(response.body).not.toBeNull();
-    const defaultSettings = getDefaultSettings();
-    defaultSettings[serverSettingsKey].loginRequired = false; // Test override
-    defaultSettings[serverSettingsKey].experimentalTypeormSupport = isSqliteModeTest();
-    defaultSettings[serverSettingsKey].experimentalMoonrakerSupport = true;
-    delete defaultSettings[serverSettingsKey].debugSettings;
-    delete defaultSettings[credentialSettingsKey];
-    defaultSettings[wizardSettingKey].wizardCompleted = true;
-    defaultSettings[wizardSettingKey].wizardVersion = AppConstants.currentWizardVersion;
-    delete defaultSettings[wizardSettingKey].wizardCompletedAt;
-    expect(response.body).toMatchObject(defaultSettings);
-    expect(response.body[credentialSettingsKey]).toBeFalsy();
-    expect(response.body[serverSettingsKey].loginRequired).toBe(false);
-    expect(response.body[serverSettingsKey].registration).toBe(false);
-    expect(response.body[frontendSettingKey]).toMatchObject(getDefaultFrontendSettings());
-    expect(response.body[printerFileCleanSettingKey]).toMatchObject(getDefaultFileCleanSettings());
+
     expectOkResponse(response);
+    const body = response.body;
+    expect(body).not.toBeNull();
+
+    expect(body[serverSettingsKey]).toMatchObject({
+      sentryDiagnosticsEnabled: false,
+      loginRequired: false,
+      registration: false,
+      experimentalMoonrakerSupport: true,
+      experimentalTypeormSupport: isSqliteModeTest(),
+      experimentalClientSupport: false,
+      experimentalThumbnailSupport: false,
+    });
+    expect(body[wizardSettingKey]).toMatchObject({
+      wizardCompleted: true,
+      wizardVersion: AppConstants.currentWizardVersion,
+    });
+    expect(body[frontendSettingKey]).toMatchObject(getDefaultFrontendSettings());
+    expect(body[printerFileCleanSettingKey]).toMatchObject(getDefaultFileCleanSettings());
+    expect(body.connection).toMatchObject({
+      clientIp: expect.any(String),
+      version: expect.any(String),
+    });
+    expect(body[timeoutSettingKey]).toMatchObject({
+      apiTimeout: 10000,
+    });
+
+    // Removed property
+    expect(body[credentialSettingsKey]).toBeFalsy();
   });
 
   it("should OK on GET sensitive settings", async () => {
     const response = await request.get(sensitiveSettingsRoute).send();
     expect(response.body).not.toBeNull();
-    expectOkResponse(response);
-  });
-
-  it("should OK on PUT server settings ", async () => {
-    const response = await request.put(serverSettingsRoute).send({
-      registration: true,
-      loginRequired: false,
-    });
     expectOkResponse(response);
   });
 
@@ -90,10 +96,11 @@ describe(SettingsController.name, () => {
   });
 
   it("should OK on PUT frontend settings", async () => {
-    const newFrontendSettings = {
+    const newFrontendSettings: FrontendSettingsDto = {
       gridCols: 6,
       gridRows: 6,
       largeTiles: false,
+      tilePreferCancelOverQuickStop: false,
     };
     const response = await request.put(frontendSettingsRoute).send(newFrontendSettings);
     expect(response.body).not.toBeNull();

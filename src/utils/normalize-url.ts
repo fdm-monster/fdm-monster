@@ -1,4 +1,6 @@
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
+import { defaultHttpProtocol } from "@/utils/url.utils";
+
 const DATA_URL_DEFAULT_MIME_TYPE = "text/plain";
 const DATA_URL_DEFAULT_CHARSET = "us-ascii";
 
@@ -17,10 +19,10 @@ const hasCustomProtocol = (urlString: string) => {
   }
 };
 
-const normalizeDataURL = (urlString: string, { stripHash }: { stripHash: boolean }) => {
+const normalizeDataURL = (urlString: string, { stripHash }: { stripHash?: boolean }) => {
   const match = /^data:(?<type>[^,]*?),(?<data>[^#]*?)(?:#(?<hash>.*))?$/.exec(urlString);
 
-  if (!match) {
+  if (!match?.groups) {
     throw new Error(`Invalid URL: ${urlString}`);
   }
 
@@ -93,7 +95,7 @@ export function normalizeUrl(
     removeDirectoryIndex: boolean | RegExp[];
     removeExplicitPort: boolean;
     sortQueryParameters: boolean;
-  }>
+  }>,
 ): string {
   options = {
     defaultProtocol: "http",
@@ -134,7 +136,7 @@ export function normalizeUrl(
 
   // Prepend protocol
   if (!isRelativeUrl) {
-    urlString = urlString.replace(/^(?!(?:\w+:)?\/\/)|^\/\//, options.defaultProtocol);
+    urlString = urlString.replace(/^(?!(?:\w+:)?\/\/)|^\/\//, options.defaultProtocol ?? defaultHttpProtocol);
   }
 
   const urlObject = new URL(urlString);
@@ -283,12 +285,21 @@ export function normalizeUrl(
   // Take advantage of many of the Node `url` normalizations
   urlString = urlObject.toString();
 
-  if (!options.removeSingleSlash && urlObject.pathname === "/" && !oldUrlString.endsWith("/") && urlObject.hash === "") {
+  if (
+    !options.removeSingleSlash &&
+    urlObject.pathname === "/" &&
+    !oldUrlString.endsWith("/") &&
+    urlObject.hash === ""
+  ) {
     urlString = urlString.replace(/\/$/, "");
   }
 
   // Remove ending `/` unless removeSingleSlash is false
-  if ((options.removeTrailingSlash || urlObject.pathname === "/") && urlObject.hash === "" && options.removeSingleSlash) {
+  if (
+    (options.removeTrailingSlash || urlObject.pathname === "/") &&
+    urlObject.hash === "" &&
+    options.removeSingleSlash
+  ) {
     urlString = urlString.replace(/\/$/, "");
   }
 

@@ -1,16 +1,18 @@
+import { z } from "zod";
 import { AppConstants } from "@/server.constants";
+import { idRuleV2 } from "@/controllers/validation/generic.validation";
 
-export const registerUserRules = (isSqlite: boolean) => ({
-  username: `required|string|minLength:${AppConstants.DEFAULT_USERNAME_MINLEN}`,
-  password: `required|string|minLength:${AppConstants.DEFAULT_PASSWORD_MINLEN}`,
-  needsPasswordChange: "boolean",
-  roles: "required|array",
-  isDemoUser: "boolean",
-  isRootUser: "boolean",
-  "roles.*": `required|${isSqlite ? "integer|min:1" : "mongoId"}`,
-  isVerified: "boolean",
+export const registerUserSchema = (isSqlite: boolean) =>
+  z.object({
+    username: z.string().min(AppConstants.DEFAULT_USERNAME_MINLEN),
+    password: z.string().min(AppConstants.DEFAULT_PASSWORD_MINLEN),
+    needsPasswordChange: z.boolean().optional(),
+    roles: z.array(idRuleV2(isSqlite)),
+    isDemoUser: z.boolean().optional(),
+    isRootUser: z.boolean().optional(),
+    isVerified: z.boolean().optional(),
+  });
+
+export const newPasswordSchema = z.object({
+  password: z.string().min(AppConstants.DEFAULT_PASSWORD_MINLEN),
 });
-
-export const newPasswordRules = {
-  password: `required|string|minLength:${AppConstants.DEFAULT_PASSWORD_MINLEN}`,
-};

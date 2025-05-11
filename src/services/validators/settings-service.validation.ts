@@ -1,57 +1,72 @@
 import { isProductionEnvironment } from "@/utils/env.utils";
+import { z } from "zod";
 
-export const serverSettingsUpdateRules = {
-  registration: "boolean",
-  loginRequired: "boolean",
-  debugSettings: "object",
-  "debugSettings.debugSocketEvents": "boolean",
-  "debugSettings.debugSocketReconnect": "boolean",
-  experimentalMoonrakerSupport: "boolean",
-  experimentalThumbnailSupport: "boolean",
-};
+export const serverSettingsUpdateSchema = z.object({
+  registration: z.boolean(),
+  loginRequired: z.boolean(),
+  experimentalMoonrakerSupport: z.boolean(),
+  experimentalThumbnailSupport: z.boolean(),
+  experimentalClientSupport: z.boolean(),
+  experimentalPrusaLinkSupport: z.boolean(),
+  sentryDiagnosticsEnabled: z.boolean(),
+});
 
-export const timeoutSettingsUpdateRules = {
-  apiTimeout: "integer|min:1000",
-};
+export const timeoutSettingsUpdateSchema = z.object({
+  apiTimeout: z.number().int().min(1000),
+});
 
-export const frontendSettingsUpdateRules = {
-  gridCols: "integer|min:1",
-  gridRows: "integer|min:1",
-  largeTiles: "boolean",
-  tilePreferCancelOverQuickStop: "boolean",
-};
+export const frontendSettingsUpdateSchema = z.object({
+  gridCols: z.number().int().min(1),
+  gridRows: z.number().int().min(1),
+  largeTiles: z.boolean(),
+  tilePreferCancelOverQuickStop: z.boolean(),
+});
 
-export const credentialSettingPatchRules = {
-  jwtSecret: "string",
-  jwtExpiresIn: isProductionEnvironment() ? "integer|min:120|max:7200" : "integer|min:0",
-  refreshTokenAttempts: "integer|min:-1",
-  refreshTokenExpiry: isProductionEnvironment() ? "integer|min:240" : "integer|min:0",
-};
+export const jwtSecretCredentialSettingUpdateSchema = z.object({
+  jwtSecret: z.string().min(10),
+});
 
-export const wizardUpdateRules = {
-  wizardCompleted: "required|boolean",
-  wizardCompletedAt: "required|date|nullable",
-  wizardVersion: "required|integer|min:0",
-};
+export const credentialSettingUpdateSchema = z.object({
+  jwtExpiresIn: z
+    .number()
+    .int()
+    .min(isProductionEnvironment() ? 120 : 0)
+    .max(isProductionEnvironment() ? 7200 : Infinity),
+  refreshTokenAttempts: z.number().int().min(-1),
+  refreshTokenExpiry: z
+    .number()
+    .int()
+    .min(isProductionEnvironment() ? 240 : 0),
+});
 
-export const fileCleanSettingsUpdateRules = {
-  autoRemoveOldFilesBeforeUpload: "required|boolean",
-  autoRemoveOldFilesAtBoot: "required|boolean",
-  autoRemoveOldFilesCriteriumDays: "required|integer|min:0",
-};
+export const wizardUpdateSchema = z.object({
+  wizardCompleted: z.boolean(),
+  wizardCompletedAt: z.date().nullable(),
+  wizardVersion: z.number().int().min(0),
+});
 
-export const sentryDiagnosticsEnabledRules = {
-  enabled: "required|boolean",
-};
+export const fileCleanSettingsUpdateSchema = z.object({
+  autoRemoveOldFilesBeforeUpload: z.boolean(),
+  autoRemoveOldFilesAtBoot: z.boolean(),
+  autoRemoveOldFilesCriteriumDays: z.number().int().min(0),
+});
 
-export const moonrakerSupportRules = {
-  enabled: "required|boolean",
-};
+export const sentryDiagnosticsEnabledSchema = z.object({
+  enabled: z.boolean(),
+});
 
-export const thumbnailSupportRules = {
-  enabled: "required|boolean",
-};
+export const moonrakerSupportSchema = z.object({
+  enabled: z.boolean(),
+});
 
-export const clientNextRules = {
-  enabled: "required|boolean",
-};
+export const prusaLinkSupportSchema = z.object({
+  enabled: z.boolean(),
+});
+
+export const thumbnailSupportSchema = z.object({
+  enabled: z.boolean(),
+});
+
+export const clientNextSchema = z.object({
+  enabled: z.boolean(),
+});

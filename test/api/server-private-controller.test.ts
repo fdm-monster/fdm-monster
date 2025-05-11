@@ -4,11 +4,11 @@ import { load } from "js-yaml";
 import { exportYamlBuffer1_3_1 } from "../application/test-data/yaml-import";
 import { AppConstants } from "@/server.constants";
 import { validateInput } from "@/handlers/validators";
-import { importPrintersFloorsYamlRules } from "@/services/validators/yaml-service.validation";
 import { Test } from "supertest";
 import { ServerPrivateController } from "@/controllers/server-private.controller";
 import TestAgent from "supertest/lib/agent";
 import nock from "nock";
+import { importPrintersFloorsYamlSchema, YamlExportSchema } from "@/services/validators/yaml-service.validation";
 
 let request: TestAgent<Test>;
 
@@ -60,14 +60,16 @@ describe(ServerPrivateController.name, () => {
       exportPrinters: true,
       exportFloorGrid: true,
       exportFloors: true,
+      exportGroups: true,
       printerComparisonStrategiesByPriority: ["name"],
       floorComparisonStrategiesByPriority: "name",
       notes: "Some export from 2023",
     });
     expectOkResponse(response);
 
-    const yamlObject = load(response.text);
-    await validateInput(yamlObject, importPrintersFloorsYamlRules(true, true, true, true));
+    const yamlObject = load(response.text) as YamlExportSchema;
+    expect(yamlObject).toBeDefined();
+    await validateInput(yamlObject, importPrintersFloorsYamlSchema);
   });
 
   test.skip("should import YAML and have data loaded", async () => {

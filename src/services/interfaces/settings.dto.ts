@@ -1,62 +1,41 @@
 import {
-  printerFileCleanSettingKey,
   frontendSettingKey,
+  printerFileCleanSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
   wizardSettingKey,
 } from "@/constants/server-settings.constants";
-
-export interface DebugSettingsDto {
-  debugSocketIoEvents: boolean;
-  debugSocketReconnect: boolean;
-  debugSocketRetries: boolean;
-  debugSocketSetup: boolean;
-  debugSocketMessages: boolean;
-  debugSocketIoBandwidth: boolean;
-}
+import { z } from "zod";
+import {
+  credentialSettingUpdateSchema,
+  fileCleanSettingsUpdateSchema,
+  frontendSettingsUpdateSchema,
+  timeoutSettingsUpdateSchema,
+  wizardUpdateSchema,
+} from "@/services/validators/settings-service.validation";
 
 export interface ServerSettingsDto {
   sentryDiagnosticsEnabled: boolean;
   registration: boolean;
   loginRequired: boolean;
-  debugSettings: DebugSettingsDto;
   experimentalMoonrakerSupport: boolean;
   experimentalTypeormSupport: boolean;
   experimentalClientSupport: boolean;
   experimentalThumbnailSupport: boolean;
+  experimentalPrusaLinkSupport: boolean;
 }
 
-export interface WizardSettingsDto {
-  wizardCompleted: boolean;
-  wizardCompletedAt: Date | null;
-  wizardVersion: number;
-}
+export type WizardSettingsDto = z.infer<typeof wizardUpdateSchema>;
 
-export interface FrontendSettingsDto {
-  gridCols: number;
-  gridRows: number;
-  largeTiles: boolean;
-  tilePreferCancelOverQuickStop: boolean;
-}
+export type FrontendSettingsDto = z.infer<typeof frontendSettingsUpdateSchema>;
 
-export interface FileCleanSettingsDto {
-  autoRemoveOldFilesBeforeUpload: boolean;
-  autoRemoveOldFilesAtBoot: boolean;
-  autoRemoveOldFilesCriteriumDays: number;
-}
+export type FileCleanSettingsDto = z.infer<typeof fileCleanSettingsUpdateSchema>;
 
-export interface CredentialSettingsDto {
-  jwtSecret: string;
-  jwtExpiresIn: number;
-  refreshTokenAttempts: number;
-  refreshTokenExpiry: number;
-}
+export type CredentialSettingsDto = z.infer<typeof credentialSettingUpdateSchema>;
 
-export interface TimeoutSettingsDto {
-  apiTimeout: number;
-}
+export type TimeoutSettingsDto = z.infer<typeof timeoutSettingsUpdateSchema>;
 
-export class SettingsDto<KeyType> {
+export class SettingsDto {
   [serverSettingsKey]: ServerSettingsDto;
   [wizardSettingKey]: WizardSettingsDto;
   [frontendSettingKey]: FrontendSettingsDto;

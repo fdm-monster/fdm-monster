@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosResponse } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 import { ServerInfoDto } from "@/services/moonraker/dto/server/server-info.dto";
 import { LoginDto } from "@/services/interfaces/login.dto";
 import { ResultDto } from "./dto/rest/result.dto";
@@ -51,7 +51,9 @@ import { WebcamTestDto } from "@/services/moonraker/dto/server-webcams/webcam-te
 import { NotifierListDto } from "@/services/moonraker/dto/notifier-list.dto";
 import { MachineUpdateStatusDto } from "@/services/moonraker/dto/machine/machine-update-status.dto";
 import { MachineDevicePowerDevicesDto } from "@/services/moonraker/dto/machine/machine-device-power-devices.dto";
-import { MachineDevicePowerDeviceStateDto } from "@/services/moonraker/dto/machine/machine-device-power-device-state.dto";
+import {
+  MachineDevicePowerDeviceStateDto,
+} from "@/services/moonraker/dto/machine/machine-device-power-device-state.dto";
 import { MachineWledStripsDto } from "@/services/moonraker/dto/machine/machine-wled-strips.dto";
 import { JsonRpcResponseDto } from "@/services/moonraker/dto/rpc/json-rpc-response.dto";
 import { JsonRpcRequestDto } from "@/services/moonraker/dto/rpc/json-rpc-request.dto";
@@ -81,21 +83,13 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { ExternalServiceError } from "@/exceptions/runtime.exceptions";
 
 export class MoonrakerClient {
-  private httpClientFactory: HttpClientFactory;
-  private eventEmitter2: EventEmitter2;
   protected logger: LoggerService;
 
-  constructor({
-    httpClientFactory,
-    loggerFactory,
-    eventEmitter2,
-  }: {
-    httpClientFactory: HttpClientFactory;
-    loggerFactory: ILoggerFactory;
-    eventEmitter2: EventEmitter2;
-  }) {
-    this.httpClientFactory = httpClientFactory;
-    this.eventEmitter2 = eventEmitter2;
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly httpClientFactory: HttpClientFactory,
+    private readonly eventEmitter2: EventEmitter2,
+  ) {
     this.logger = loggerFactory(MoonrakerClient.name);
   }
 
@@ -109,7 +103,7 @@ export class MoonrakerClient {
 
   async getTemperatureStore(login: LoginDto, includeMonitors: boolean = false) {
     return this.createClient(login).get<ResultDto<TemperatureStoreDto>>(
-      `/server/temperature_store?include_monitors=${!!includeMonitors}`
+      `/server/temperature_store?include_monitors=${!!includeMonitors}`,
     );
   }
 
@@ -126,15 +120,16 @@ export class MoonrakerClient {
   }
 
   async postJsonRpc<I, O>(login: LoginDto, method: string, params?: I, id?: number) {
-    return this.createClient(login).post<JsonRpcResponseDto<O>, AxiosResponse<JsonRpcResponseDto<O>>, JsonRpcRequestDto<I>>(
-      `server/jsonrpc`,
-      {
-        jsonrpc: "2.0",
-        id: id ? id : 0,
-        method,
-        params,
-      }
-    );
+    return this.createClient(login).post<
+      JsonRpcResponseDto<O>,
+      AxiosResponse<JsonRpcResponseDto<O>>,
+      JsonRpcRequestDto<I>
+    >(`server/jsonrpc`, {
+      jsonrpc: "2.0",
+      id: id ? id : 0,
+      method,
+      params,
+    });
   }
 
   async getPrinterInfo(login: LoginDto) {
@@ -159,7 +154,7 @@ export class MoonrakerClient {
 
   async getPrinterObjectsQuery<R = PrinterObjectsQueryDto>(
     login: LoginDto,
-    query: Partial<Record<KnownPrinterObject, string[]>>
+    query: Partial<Record<KnownPrinterObject, string[]>>,
   ) {
     const queryString = this.convertToQueryString(query);
     return this.createClient(login).get<ResultDto<R>>(`printer/objects/query?${queryString}`);
@@ -168,23 +163,12 @@ export class MoonrakerClient {
   postSubscribePrinterObjects<R = PrinterObjectsQueryDto>(
     login: LoginDto,
     connectionId: number,
-    query: Partial<Record<KnownPrinterObject, string[]>>
+    query: Partial<Record<KnownPrinterObject, string[]>>,
   ) {
     const queryString = this.convertToQueryString(query);
-    return this.createClient(login).post<ResultDto<R>>(`printer/objects/subscribe?connection_id=${connectionId}&${queryString}`);
-  }
-
-  private convertToQueryString(query: Partial<Record<KnownPrinterObject, string[]>>): string {
-    return Object.entries(query)
-      .reduce((acc, [key, value]) => {
-        if (value.length > 0) {
-          acc.push(`${key}=${value.join(",")}`);
-        } else {
-          acc.push(key);
-        }
-        return acc;
-      }, [])
-      .join("&");
+    return this.createClient(login).post<ResultDto<R>>(
+      `printer/objects/subscribe?connection_id=${connectionId}&${queryString}`,
+    );
   }
 
   async getPrinterQueryEndstops(login: LoginDto) {
@@ -232,7 +216,15 @@ export class MoonrakerClient {
 
   async postMachineRestartService(
     login: LoginDto,
-    service: "crowsnest" | "MoonCord" | "moonraker" | "moonraker-telegram-bot" | "klipper" | "KlipperScreen" | "sonar" | "webcamd"
+    service:
+      | "crowsnest"
+      | "MoonCord"
+      | "moonraker"
+      | "moonraker-telegram-bot"
+      | "klipper"
+      | "KlipperScreen"
+      | "sonar"
+      | "webcamd",
   ) {
     // Can result in 500 if klipper fails to start
     return this.createClient(login).post<ResultDto<ActionResultDto>>(`machine/services/restart?service=${service}`);
@@ -272,7 +264,7 @@ export class MoonrakerClient {
 
   async getMachineListPeripheralsCanbus(login: LoginDto, canInterface: "can0" | "can1" | string = "can0") {
     return this.createClient(login).get<ResultDto<MachinePeripheralsCanbusDto>>(
-      `machine/peripherals/canbus?interface=${canInterface}`
+      `machine/peripherals/canbus?interface=${canInterface}`,
     );
   }
 
@@ -294,12 +286,14 @@ export class MoonrakerClient {
   }
 
   async getServerFilesThumbnails(login: LoginDto, filename: string) {
-    return this.createClient(login).get<ResultDto<ServerFileThumbnailDto[]>>(`server/files/thumbnails?filename=${filename}`);
+    return this.createClient(login).get<ResultDto<ServerFileThumbnailDto[]>>(
+      `server/files/thumbnails?filename=${filename}`,
+    );
   }
 
   async getServerFilesDirectoryInfo(login: LoginDto, path: string, extended: boolean) {
     return this.createClient(login).get<ResultDto<ServerFileDirectoryInfoDto>>(
-      `server/files/directory?path=${path}&extended=${extended}`
+      `server/files/directory?path=${path}&extended=${extended}`,
     );
   }
 
@@ -311,7 +305,7 @@ export class MoonrakerClient {
 
   async deleteServerFilesDirectory(login: LoginDto, path: string, force: boolean) {
     return this.createClient(login).delete<ResultDto<ServerFileDirectoryActionDto>>(
-      `server/files/directory?path=${path}&force=${!!force}`
+      `server/files/directory?path=${path}&force=${!!force}`,
     );
   }
 
@@ -343,7 +337,13 @@ export class MoonrakerClient {
     });
   }
 
-  async getServerFilesDownloadChunk(login: LoginDto, root: string, filename: string, startBytes: number, endBytes: number) {
+  async getServerFilesDownloadChunk(
+    login: LoginDto,
+    root: string,
+    filename: string,
+    startBytes: number,
+    endBytes: number,
+  ) {
     return await this.createClient(login).get<string>(`server/files/${root}/${filename}`, {
       headers: {
         Range: `bytes=${startBytes}-${endBytes}`,
@@ -357,7 +357,7 @@ export class MoonrakerClient {
     progressToken?: string,
     root?: string,
     path?: string,
-    checksum?: string
+    checksum?: string,
   ) {
     const formData = new FormData();
     if (root?.length) {
@@ -369,6 +369,7 @@ export class MoonrakerClient {
     if (checksum?.length) {
       formData.append("checksum", checksum);
     }
+    formData.append("print", "true");
 
     let fileBuffer: ArrayBufferLike | ReadStream = (multerFileOrBuffer as Buffer).buffer;
     const filename = (multerFileOrBuffer as Express.Multer.File).originalname;
@@ -385,7 +386,7 @@ export class MoonrakerClient {
     // Calculate the header that axios uses to determine progress
     const result: number = await new Promise<number>((resolve, reject) => {
       return formData.getLength((err, length) => {
-        if (err) resolve(null);
+        if (err) reject(new Error("Could not retrieve formData length"));
         resolve(length);
       });
     });
@@ -404,11 +405,15 @@ export class MoonrakerClient {
           });
       }).post(`server/files/upload`, formData);
 
-      this.eventEmitter2.emit(`${uploadDoneEvent(progressToken)}`, progressToken);
+      if (progressToken) {
+        this.eventEmitter2.emit(`${uploadDoneEvent(progressToken)}`, progressToken);
+      }
 
       return response.data;
     } catch (e: any) {
-      this.eventEmitter2.emit(`${uploadFailedEvent(progressToken)}`, progressToken, (e as AxiosError)?.message);
+      if (progressToken) {
+        this.eventEmitter2.emit(`${uploadFailedEvent(progressToken)}`, progressToken, (e as AxiosError)?.message);
+      }
       let data;
       try {
         data = JSON.parse(e.response?.body);
@@ -423,7 +428,7 @@ export class MoonrakerClient {
           success: false,
           stack: e.stack,
         },
-        "Moonraker"
+        "Moonraker",
       );
     }
   }
@@ -441,7 +446,12 @@ export class MoonrakerClient {
     return this.createClient(login).get<string>(`server/files/moonraker.log`);
   }
 
-  async postAccessLoginUser(login: LoginDto, username: string, password: string, source: "ldap" | "moonraker" = "moonraker") {
+  async postAccessLoginUser(
+    login: LoginDto,
+    username: string,
+    password: string,
+    source: "ldap" | "moonraker" = "moonraker",
+  ) {
     return this.createClient(login).post<ResultDto<AccessLoginResultDto>>("/access/login", {
       username,
       password,
@@ -506,7 +516,9 @@ export class MoonrakerClient {
   }
 
   async getDatabaseNamespaceItem(login: LoginDto, namespace: Namespaces, key: string) {
-    return this.createClient(login).get<ResultDto<DatabaseNamespaceItemDto>>(`database/item?namespace=${namespace}&key=${key}`);
+    return this.createClient(login).get<ResultDto<DatabaseNamespaceItemDto>>(
+      `database/item?namespace=${namespace}&key=${key}`,
+    );
   }
 
   async postDatabaseNamespaceItem(
@@ -514,17 +526,17 @@ export class MoonrakerClient {
     namespace: Namespaces,
     key: string,
     value: any,
-    typeHint?: "int" | "str" | "bool" | "json"
+    typeHint?: "int" | "str" | "bool" | "json",
   ) {
     const typeHintParam = typeHint?.length ? `:${typeHint}` : "";
     return this.createClient(login).post<ResultDto<DatabaseNamespaceItemDto>>(
-      `database/item?namespace=${namespace}&key=${key}&value${typeHintParam}=${value}`
+      `database/item?namespace=${namespace}&key=${key}&value${typeHintParam}=${value}`,
     );
   }
 
   async deleteDatabaseNamespaceItem(login: LoginDto, namespace: Namespaces, key: string) {
     return this.createClient(login).delete<ResultDto<DatabaseNamespaceItemDto>>(
-      `database/item?namespace=${namespace}&key=${key}`
+      `database/item?namespace=${namespace}&key=${key}`,
     );
   }
 
@@ -564,7 +576,7 @@ export class MoonrakerClient {
 
   async getAnnouncementsList(login: LoginDto, includeDismissed: boolean) {
     return this.createClient(login).get<ResultDto<AnnouncementListDto>>(
-      `server/announcements/list?include_dismissed=${includeDismissed}`
+      `server/announcements/list?include_dismissed=${includeDismissed}`,
     );
   }
 
@@ -580,7 +592,7 @@ export class MoonrakerClient {
    */
   async postAnnouncementsDismiss(login: LoginDto, entryId: string, wakeTime: number) {
     return this.createClient(login).post<ResultDto<AnnouncementEntryIdDto>>(
-      `server/announcements/dismiss?entry_id=${encodeURIComponent(entryId)}&wake_time=${wakeTime}`
+      `server/announcements/dismiss?entry_id=${encodeURIComponent(entryId)}&wake_time=${wakeTime}`,
     );
   }
 
@@ -664,7 +676,9 @@ export class MoonrakerClient {
   }
 
   async postMachineUpdateRecover(login: LoginDto, name?: string | "moonraker" | "klipper", hard: boolean = false) {
-    return this.createClient(login).post<ResultDto<ActionResultDto>>(`machine/update/recover?name=${name}&hard=${hard}`);
+    return this.createClient(login).post<ResultDto<ActionResultDto>>(
+      `machine/update/recover?name=${name}&hard=${hard}`,
+    );
   }
 
   async postMachineUpdateRollback(login: LoginDto, name?: string | "moonraker" | "klipper") {
@@ -677,29 +691,31 @@ export class MoonrakerClient {
 
   async getMachineDevicePowerDeviceState(login: LoginDto, device: string) {
     return this.createClient(login).get<ResultDto<MachineDevicePowerDeviceStateDto>>(
-      `machine/device_power/device?device=${device}`
+      `machine/device_power/device?device=${device}`,
     );
   }
 
   async postMachineDevicePowerDeviceState(login: LoginDto, device: string, action: "on" | "off" | "toggle") {
     return this.createClient(login).post<ResultDto<MachineDevicePowerDeviceStateDto>>(
-      `machine/device_power/device?device=${device}&action=${action}`
+      `machine/device_power/device?device=${device}&action=${action}`,
     );
   }
 
   async getMachineDevicePowerBatchDeviceState(login: LoginDto, devices: string[]) {
     return this.createClient(login).get<ResultDto<MachineDevicePowerDeviceStateDto>>(
-      `machine/device_power/status?${devices.join("&")}`
+      `machine/device_power/status?${devices.join("&")}`,
     );
   }
 
   async postMachineDevicePowerBatchPowerOn(login: LoginDto, device: string) {
-    return this.createClient(login).post<ResultDto<MachineDevicePowerDeviceStateDto>>(`machine/device_power/on?device=${device}`);
+    return this.createClient(login).post<ResultDto<MachineDevicePowerDeviceStateDto>>(
+      `machine/device_power/on?device=${device}`,
+    );
   }
 
   async postMachineDevicePowerBatchPowerOff(login: LoginDto, device: string) {
     return this.createClient(login).post<ResultDto<MachineDevicePowerDeviceStateDto>>(
-      `machine/device_power/off?device=${device}`
+      `machine/device_power/off?device=${device}`,
     );
   }
 
@@ -727,13 +743,13 @@ export class MoonrakerClient {
     login: LoginDto,
     strip: string,
     action: "control" | "on" | "off",
-    controlParams: Record<string, number>
+    controlParams: Record<string, number>,
   ) {
     const queryParams = Object.entries(controlParams)
       .map(([k, v]) => `${k}=${v}`)
       .join("&");
     return this.createClient(login).get<ResultDto<MachineWledStripsDto>>(
-      `machine/wled/strip?strip=${strip}&action=${action}&${queryParams}`
+      `machine/wled/strip?strip=${strip}&action=${action}&${queryParams}`,
     );
   }
 
@@ -746,7 +762,9 @@ export class MoonrakerClient {
   }
 
   async getServerSensorMeasurements(login: LoginDto, sensor: string) {
-    return this.createClient(login).get<ResultDto<SensorsMeasurementsDto>>(`server/sensors/measurements?sensor=${sensor}`);
+    return this.createClient(login).get<ResultDto<SensorsMeasurementsDto>>(
+      `server/sensors/measurements?sensor=${sensor}`,
+    );
   }
 
   async getServerSensorMeasurementsBatch(login: LoginDto) {
@@ -811,20 +829,20 @@ export class MoonrakerClient {
   /**
    * @deprecated API might not be available in the future
    * @param login
+   */
+  async getApiJob(login: LoginDto) {
+    return this.createClient(login).get<ApiJobDto>(`api/job`);
+  }
+
+  /**
+   * @deprecated API might not be available in the future
+   * @param login
    * @param commands
    */
   // async postFilesLocalUpload(login: LoginDto) {
   //   // This is just an alias
   //   return this.postServerFileUpload(login);
   // }
-
-  /**
-   * @deprecated API might not be available in the future
-   * @param login
-   */
-  async getApiJob(login: LoginDto) {
-    return this.createClient(login).get<ApiJobDto>(`api/job`);
-  }
 
   /**
    * @deprecated API might not be available in the future
@@ -859,7 +877,7 @@ export class MoonrakerClient {
     start: number,
     since?: number,
     before?: number,
-    order: "asc" | "desc" = "desc"
+    order: "asc" | "desc" = "desc",
   ) {
     let params = `limit=${limit}&start=${start}&order=${order}`;
     if (!!before || before === 0) {
@@ -887,6 +905,19 @@ export class MoonrakerClient {
     const base = `server/history/job`;
     const url = !!uid?.length ? `${base}?uid=${uid}` : `${base}?all=true`;
     return this.createClient(login).get<ResultDto<string[]>>(url);
+  }
+
+  private convertToQueryString(query: Partial<Record<KnownPrinterObject, string[]>>): string {
+    return Object.entries(query)
+      .reduce((acc: string[], [key, value]) => {
+        if (value.length > 0) {
+          acc.push(`${key}=${value.join(",")}`);
+        } else {
+          acc.push(key);
+        }
+        return acc;
+      }, [])
+      .join("&");
   }
 
   private createClient(login: LoginDto, buildFluentOptions?: (base: DefaultHttpClientBuilder) => void) {

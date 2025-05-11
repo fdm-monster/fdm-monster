@@ -1,19 +1,23 @@
+import { z } from "zod";
 import { idRuleV2 } from "@/controllers/validation/generic.validation";
 
-export const batchPrinterRules = (isSqlite: boolean) => ({
-  printerIds: "required|array",
-  "printerIds.*": idRuleV2(isSqlite),
-});
+export const batchPrinterSchema = (isSqlite: boolean) =>
+  z.object({
+    printerIds: z.array(idRuleV2(isSqlite)),
+  });
 
-export const executeBatchRePrinterRule = (isSqlite: boolean) => ({
-  prints: "required|array",
-  "prints.*": "required",
-  "prints.*.printerId": idRuleV2(isSqlite),
-  "prints.*.path": "required|string",
-});
+export const executeBatchRePrinterSchema = (isSqlite: boolean) =>
+  z.object({
+    prints: z.array(
+      z.object({
+        printerId: idRuleV2(isSqlite),
+        path: z.string(),
+      }),
+    ),
+  });
 
-export const batchPrintersEnabledRules = (isSqlite: boolean) => ({
-  printerIds: "required|array",
-  "printerIds.*": idRuleV2(isSqlite),
-  enabled: "required|boolean",
-});
+export const batchPrintersEnabledSchema = (isSqlite: boolean) =>
+  z.object({
+    printerIds: z.array(idRuleV2(isSqlite)),
+    enabled: z.boolean(),
+  });

@@ -1,5 +1,5 @@
 import { setupTestApp } from "../test-server";
-import { expectBadRequestError, expectInvalidResponse, expectNotFoundResponse, expectOkResponse } from "../extensions";
+import { expectInvalidResponse, expectNotFoundResponse, expectOkResponse } from "../extensions";
 import { AppConstants } from "@/server.constants";
 import { createTestPrinter, testApiKey } from "./test-data/create-printer";
 import { Test } from "supertest";
@@ -12,24 +12,16 @@ import { OctoprintType, MoonrakerType } from "@/services/printer-api.interface";
 const defaultRoute = AppConstants.apiRoute + "/printer";
 const createRoute = defaultRoute;
 const testPrinterRoute = `${defaultRoute}/test-connection`;
-const pluginListRoute = `${defaultRoute}/plugin-list`;
 const getRoute = (id: IdType) => `${defaultRoute}/${id}`;
 const deleteRoute = (id: IdType) => `${defaultRoute}/${id}`;
 const updateRoute = (id: IdType) => `${defaultRoute}/${id}`;
 const stopJobRoute = (id: IdType) => `${updateRoute(id)}/job/stop`;
-const refreshSocket = (id: IdType) => `${updateRoute(id)}/refresh-socket`;
 const connectionRoute = (id: IdType) => `${updateRoute(id)}/connection`;
 const loginDetailsRoute = (id: IdType) => `${updateRoute(id)}/login-details`;
 const enabledRoute = (id: IdType) => `${updateRoute(id)}/enabled`;
 const disabledReasonRoute = (id: IdType) => `${updateRoute(id)}/disabled-reason`;
 const feedRateRoute = (id: IdType) => `${updateRoute(id)}/feed-rate`;
 const flowRateRoute = (id: IdType) => `${updateRoute(id)}/flow-rate`;
-const printerPluginListRoute = (id: IdType) => `${getRoute(id)}/plugin-list`;
-const printerOctoprintBackupIndex = (id: IdType) => `${getRoute(id)}/octoprint/backup`;
-const printerOctoprintBackupList = (id: IdType) => `${getRoute(id)}/octoprint/backup/list`;
-const printerOctoprintBackupRestore = (id: IdType) => `${getRoute(id)}/octoprint/backup/restore`;
-const printerOctoprintBackupDelete = (id: IdType) => `${getRoute(id)}/octoprint/backup/delete`;
-const printerOctoprintBackupDownload = (id: IdType) => `${getRoute(id)}/octoprint/backup/download`;
 const restartOctoPrintRoute = (id: IdType) => `${getRoute(id)}/octoprint/server/restart`;
 const serialConnectCommandRoute = (id: IdType) => `${getRoute(id)}/serial-connect`;
 const serialDisconnectCommandRoute = (id: IdType) => `${getRoute(id)}/serial-disconnect`;
@@ -45,13 +37,22 @@ beforeAll(async () => {
 
 describe(PrinterController.name, () => {
   it(`should not be able to POST ${createRoute} - invalid apiKey`, async () => {
-    const response = await request.post(createRoute).send({
+    const response = await request.post(createRoute).query("forceSave=true").send({
       name: "asd",
       printerURL: "http://url.com",
       apiKey: "notcorrect",
-      tempTriggers: { heatingVariation: null },
+      printerType: OctoprintType,
     });
-    expectInvalidResponse(response, ["apiKey"]);
+    expectInvalidResponse(
+      response,
+      [
+        {
+          code: "too_small",
+          path: "apiKey",
+        },
+      ],
+      true,
+    );
   });
 
   it(`should be able to POST ${createRoute} moonraker without api key`, async () => {
@@ -139,7 +140,12 @@ describe(PrinterController.name, () => {
 
   it("should invalidate to malformed singular printer json array", async () => {
     const response = await request.post(batchRoute).send([{}]);
-    expectInvalidResponse(response, ["printerURL"]);
+    expectInvalidResponse(response, [
+      {
+        code: "invalid_type",
+        path: "printerURL",
+      },
+    ]);
   });
 
   it("should import to singular printer json array", async () => {
@@ -190,7 +196,7 @@ describe(PrinterController.name, () => {
       name: "asd124",
       printerType: MoonrakerType,
     };
-    const updatePatch = await request.patch(updateRoute(printer.id)).send(patch);
+    const updatePatch = await request.patch(updateRoute(printer.id)).query("forceSave=true").send(patch);
     expectOkResponse(updatePatch, {
       printerURL: "https://test.com",
       enabled: false,
@@ -199,27 +205,15 @@ describe(PrinterController.name, () => {
     });
   });
 
-  it("should update printer connection settings correctly", async () => {
-    const printer = await createTestPrinter(request);
-
-    nock(printer.printerURL).get(`/api/version`).reply(200, { server: "1.2.3" });
-
-    const updatePatch = await request.patch(connectionRoute(printer.id)).send({
-      printerURL: "https://test.com/",
-      apiKey,
-      name,
-      printerType: MoonrakerType,
-    });
-    expectOkResponse(updatePatch, {
-      printerURL: "https://test.com",
-      apiKey,
-      printerType: MoonrakerType,
-    });
-  });
-
   it("should invalidate empty test printer connection", async () => {
     const res = await request.post(testPrinterRoute).send();
-    expectInvalidResponse(res, ["printerType", "printerURL"]);
+    expectInvalidResponse(res, [
+      {
+        path: "printerType",
+        code: "invalid_type",
+      },
+      { path: "printerURL", code: "invalid_type" },
+    ]);
   });
 
   it("should test printer connection", async () => {
@@ -264,22 +258,6 @@ describe(PrinterController.name, () => {
     expectOkResponse(updatePatch);
   });
 
-  it("should get plugin list", async () => {
-    // Cache is not loaded
-    const res = await request.get(pluginListRoute).send();
-    expectOkResponse(res, []);
-  });
-
-  it("should get printer plugin list", async () => {
-    const printer = await createTestPrinter(request);
-
-    const wantedResponse = { plugins: [{ key: "firmwareupdater", name: "Firmware Updater" }] };
-    nock(printer.printerURL).get(`/plugin/pluginmanager/plugins`).reply(200, wantedResponse);
-
-    const res = await request.get(printerPluginListRoute(printer.id)).send();
-    expectOkResponse(res, wantedResponse);
-  });
-
   it("should send restart octoprint command", async () => {
     const printer = await createTestPrinter(request);
 
@@ -304,44 +282,5 @@ describe(PrinterController.name, () => {
     nock(printer.printerURL).post("/api/connection").reply(200, { port: "/dev/ttyACM0" });
     const res = await request.post(serialDisconnectCommandRoute(printer.id)).send();
     expectOkResponse(res);
-  });
-
-  it("should get backup index", async () => {
-    const printer = await createTestPrinter(request);
-    nock(printer.printerURL).get("/plugin/backup").reply(200, {});
-    const res = await request.get(printerOctoprintBackupIndex(printer.id)).send();
-    expectOkResponse(res, {});
-  });
-
-  it("should get backup list", async () => {
-    const printer = await createTestPrinter(request);
-    nock(printer.printerURL).get("/plugin/backup/backup").reply(200, []);
-    const res = await request.get(printerOctoprintBackupList(printer.id)).send();
-    expectOkResponse(res, []);
-  });
-
-  it("should download backup", async () => {
-    const printer = await createTestPrinter(request);
-    nock(printer.printerURL).get("/plugin/backup/download/123.abc").reply(200, "asd");
-    const res = await request.post(printerOctoprintBackupDownload(printer.id)).send({
-      fileName: "123.abc",
-    });
-    expectOkResponse(res);
-  });
-
-  it("should return 400 when backup has not been uploaded for restore", async () => {
-    const printer = await createTestPrinter(request);
-    nock(printer.printerURL).post("/plugin/backup/restore").reply(200, []);
-    const res = await request.post(printerOctoprintBackupRestore(printer.id)).send();
-    expectBadRequestError(res);
-  });
-
-  it("should delete backup", async () => {
-    const printer = await createTestPrinter(request);
-    nock(printer.printerURL).delete("/plugin/backup/delete/123.abc").reply(200, []);
-    const res = await request.delete(printerOctoprintBackupDelete(printer.id)).send({
-      filename: "123.abc",
-    });
-    expectBadRequestError(res);
   });
 });

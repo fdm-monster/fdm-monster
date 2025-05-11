@@ -1,18 +1,20 @@
 import { IdDto } from "@/shared.constants";
 
-export class PrinterDto<KeyType> extends IdDto<KeyType> {
+export class CreatePrinterDto {
   name: string;
-  enabled: boolean;
-  disabledReason: string;
-  dateAdded: number;
-}
-
-export class PrinterUnsafeDto<KeyType> extends PrinterDto<KeyType> {
-  apiKey: string;
+  apiKey?: string;
   printerURL: string;
   printerType: number;
 }
 
-export class PrinterUnsafeWithCorrelationDto<KeyType> extends PrinterUnsafeDto<KeyType> {
-  correlationToken: string;
+export class PrinterDto<KeyType> extends IdDto<KeyType> {
+  name: string;
+  enabled: boolean;
+  disabledReason?: string;
+  dateAdded?: number;
+  apiKey?: string;
+  username?: string;
+  password?: string;
+  printerURL: string;
+  printerType: number;
 }

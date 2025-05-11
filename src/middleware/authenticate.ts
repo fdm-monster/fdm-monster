@@ -11,17 +11,10 @@ import { IdType } from "@/shared.constants";
 
 export const authenticate = () =>
   inject(
-    ({
-        settingsStore,
-        authService,
-        loggerFactory,
-      }: {
-        settingsStore: SettingsStore;
-        authService: AuthService;
-        loggerFactory: ILoggerFactory;
-      }) =>
+    (authService: AuthService, loggerFactory: ILoggerFactory, settingsStore: SettingsStore) =>
       async (req: Request, res: Response, next: NextFunction) => {
         const logger = loggerFactory("Middleware:authenticate");
+
         const isLoginRequired = await settingsStore.getLoginRequired();
         if (!isLoginRequired) {
           return next();
@@ -34,8 +27,7 @@ export const authenticate = () =>
 
         // Check if a logout was called
         const bearer = req.headers.authorization?.replace("Bearer ", "") || undefined;
-        const isJwtBlacklisted = authService.isJwtTokenBlacklisted(bearer);
-        if (!!bearer?.length && isJwtBlacklisted) {
+        if (!!bearer?.length && authService.isJwtTokenBlacklisted(bearer)) {
           throw new AuthenticationError("Not authenticated", AUTH_ERROR_REASON.LoginRequired);
         }
 
@@ -45,39 +37,33 @@ export const authenticate = () =>
 
         logger.log(`Not authenticated for route: ${req.originalUrl}`);
         throw new AuthenticationError("Not authenticated", AUTH_ERROR_REASON.InvalidOrExpiredAuthToken);
-      }
+      },
   );
 
-export function authorizePermission(permission: string) {
+export function permission(requiredPermission: string) {
   return inject(
-    ({ permissionService, roleService }: { permissionService: IPermissionService; roleService: IRoleService }) =>
+    (permissionService: IPermissionService, roleService: IRoleService) =>
       async (req: Request, res: Response, next: NextFunction) => {
         const userRoles = req.roles as IdType[];
         if (!userRoles?.length) {
-          throw new AuthorizationError({ permissions: [permission] });
+          throw new AuthorizationError({ permissions: [requiredPermission] });
         }
 
         const assignedPermissions = roleService.getRolesPermissions(userRoles);
-        if (!permissionService.authorizePermission(permission, assignedPermissions)) {
-          throw new AuthorizationError({ permissions: [permission] });
+        if (!permissionService.authorizePermission(requiredPermission, assignedPermissions)) {
+          throw new AuthorizationError({ permissions: [requiredPermission] });
         }
 
         next();
-      }
+      },
   );
 }
 
 export const authorizeRoles = (roles: string[], subset = true) =>
-  inject(({ roleService }: { roleService: IRoleService }) => async (req: Request, res: Response, next: NextFunction) => {
-    if (!roleService.authorizeRoles(roles, req.roles, subset)) {
+  inject((roleService: IRoleService) => async (req: Request, res: Response, next: NextFunction) => {
+    if (!req.roles?.length || !roleService.authorizeRoles(roles, req.roles, subset)) {
       throw new AuthorizationError({ roles });
     }
 
     next();
   });
-
-export function withPermission(permission: string) {
-  return {
-    before: [authorizePermission(permission)],
-  };
-}

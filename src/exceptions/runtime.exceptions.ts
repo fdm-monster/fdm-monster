@@ -7,6 +7,7 @@ export class NotImplementedException extends Error {
 
 export class AuthenticationError extends Error {
   reasonCode: string;
+
   constructor(error?: string, reasonCode = "") {
     super(error);
     this.name = AuthenticationError.name;
@@ -52,10 +53,10 @@ export class NotFoundException extends Error {
   }
 }
 
-export class ValidationException extends Error {
-  errors: any;
+export class ValidationException<T = any> extends Error {
+  errors: T;
 
-  constructor(validationObject: any) {
+  constructor(validationObject: T) {
     super(JSON.stringify(validationObject));
     this.name = ValidationException.name;
     this.errors = validationObject;

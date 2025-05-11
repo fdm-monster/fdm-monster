@@ -14,7 +14,7 @@ import { captureException } from "@sentry/node";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { PrinterApiFactory } from "@/services/printer-api.factory";
-import { printerEvents } from "@/constants/event.constants";
+import { printerEvents, PrintersDeletedEvent } from "@/constants/event.constants";
 import EventEmitter2 from "eventemitter2";
 import { SettingsStore } from "@/state/settings.store";
 
@@ -26,31 +26,17 @@ export interface CachedPrinterThumbnail {
 export const gcodeMaxLinesToRead = 10000;
 
 export class PrinterThumbnailCache extends KeyDiffCache<CachedPrinterThumbnail> {
-  printerCache: PrinterCache;
-  printerApiFactory: PrinterApiFactory;
-  logger: LoggerService;
-  eventEmitter2: EventEmitter2;
-  private settingsStore: SettingsStore;
+  private readonly logger: LoggerService;
 
-  constructor({
-    printerCache,
-    printerApiFactory,
-    loggerFactory,
-    eventEmitter2,
-    settingsStore,
-  }: {
-    printerCache: PrinterCache;
-    printerApiFactory: PrinterApiFactory;
-    loggerFactory: ILoggerFactory;
-    eventEmitter2: EventEmitter2;
-    settingsStore: SettingsStore;
-  }) {
+  constructor(
+    loggerFactory: ILoggerFactory,
+    private readonly printerCache: PrinterCache,
+    private readonly printerApiFactory: PrinterApiFactory,
+    private readonly eventEmitter2: EventEmitter2,
+    private readonly settingsStore: SettingsStore,
+  ) {
     super();
-    this.printerCache = printerCache;
-    this.printerApiFactory = printerApiFactory;
     this.logger = loggerFactory(PrinterThumbnailCache.name);
-    this.eventEmitter2 = eventEmitter2;
-    this.settingsStore = settingsStore;
 
     this.eventEmitter2.on(printerEvents.printersDeleted, this.handlePrintersDeleted.bind(this));
   }
@@ -81,10 +67,10 @@ export class PrinterThumbnailCache extends KeyDiffCache<CachedPrinterThumbnail> 
     }
   }
 
-  async handlePrintersDeleted({ printerIds }: { printerIds: keyType[] }) {
+  async handlePrintersDeleted(event: PrintersDeletedEvent) {
     if (!this.settingsStore.isThumbnailSupportEnabled()) return;
 
-    for (const printerId of printerIds) {
+    for (const printerId of event.printerIds) {
       await this.removeThumbnailFile(printerId);
       await this.unsetPrinterThumbnail(printerId);
     }
@@ -194,7 +180,7 @@ export class PrinterThumbnailCache extends KeyDiffCache<CachedPrinterThumbnail> 
     file: string,
     numberOfLines: number,
     fromEnd: boolean = false,
-    endCondition: string = "; thumbnail end"
+    endCondition: string = "; thumbnail end",
   ) {
     const printer = this.printerApiFactory.getScopedPrinter(login);
     const fileData = await printer.getFile(file);
@@ -207,7 +193,6 @@ export class PrinterThumbnailCache extends KeyDiffCache<CachedPrinterThumbnail> 
     while (lines.length <= numberOfLines && (fromEnd ? position > 0 : position < fileSize)) {
       iterationsLeft--;
       if (iterationsLeft <= 0) {
-        // throw new Error("Too many iterations reached, 'readRemoteGcodeLines' aborted");
         return;
       }
 

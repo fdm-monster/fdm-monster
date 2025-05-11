@@ -1,5 +1,5 @@
 import { AwilixContainer } from "awilix";
-import { TaskManagerService } from "@/services/core/task-manager.service";
+import { TaskManagerService } from "@/services/task-manager.service";
 import { configureContainer } from "@/container";
 import { DITokens } from "@/container.tokens";
 import { JobValidationException } from "@/exceptions/job.exceptions";
@@ -40,10 +40,12 @@ describe(TaskManagerService.name, () => {
   it("should invalidate wrong workload - missing run", () => {
     let caught = false;
     try {
-      // @ts-ignore
-      taskManagerService.validateInput("name", () => {});
+      taskManagerService.validateInput("name", DITokens.configService, {});
     } catch (e) {
       expect(e instanceof JobValidationException).toBeTruthy();
+      expect((e as JobValidationException).message).toEqual(
+        "Job 'configService' with ID 'name' was resolved but it doesn't have a 'run()' method to call.",
+      );
       caught = true;
     }
     expect(caught).toEqual(true);
@@ -52,17 +54,11 @@ describe(TaskManagerService.name, () => {
   it("should not run disabled periodic job", () => {
     let ran = false;
 
-    taskManagerService.validateInput(
-      "name",
-      () => {
-        ran = true;
-      },
-      {
-        disabled: true,
-        periodic: true,
-        milliseconds: 1000,
-      }
-    );
+    taskManagerService.validateInput("name", DITokens.softwareUpdateTask, {
+      disabled: true,
+      periodic: true,
+      milliseconds: 1000,
+    });
 
     expect(ran).toBeFalsy();
   });

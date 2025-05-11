@@ -1,6 +1,10 @@
 import { BaseService } from "@/services/orm/base.service";
 import { PrintCompletion } from "@/entities";
-import { CreatePrintCompletionDto, PrintCompletionContext, PrintCompletionDto } from "@/services/interfaces/print-completion.dto";
+import {
+  CreatePrintCompletionDto,
+  PrintCompletionContext,
+  PrintCompletionDto,
+} from "@/services/interfaces/print-completion.dto";
 import { SqliteIdType } from "@/shared.constants";
 import { IPrintCompletionService } from "@/services/interfaces/print-completion.interface";
 import { In, Not } from "typeorm";
@@ -10,15 +14,16 @@ import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 import { AnalyzedCompletions, processCompletions } from "@/services/mongoose/print-completion.shared";
+import { IPrintCompletion } from "@/models/PrintCompletion";
 
 export class PrintCompletionService
   extends BaseService(PrintCompletion, PrintCompletionDto<SqliteIdType>)
   implements IPrintCompletionService<SqliteIdType, PrintCompletion>
 {
-  logger: LoggerService;
+  private readonly logger: LoggerService;
 
-  constructor({ typeormService, loggerFactory }: { typeormService: TypeormService; loggerFactory: ILoggerFactory }) {
-    super({ typeormService });
+  constructor(typeormService: TypeormService, loggerFactory: ILoggerFactory) {
+    super(typeormService);
     this.logger = loggerFactory(PrintCompletionService.name);
   }
 
@@ -44,7 +49,7 @@ export class PrintCompletionService
     return completions.filter((c) => c.context?.correlationId === correlationId);
   }
 
-  async updateContext(correlationId: string, context: PrintCompletionContext): Promise<void> {
+  async updateContext(correlationId: string | undefined, context: PrintCompletionContext): Promise<void> {
     if (!correlationId?.length) {
       this.logger.warn("Ignoring undefined correlationId, cant update print completion context");
       return;
@@ -55,7 +60,9 @@ export class PrintCompletionService
       status: EVENT_TYPES.PrintStarted,
     });
     if (!completionEntry) {
-      this.logger.warn(`Print with correlationId ${correlationId} could not be updated with new context as it was not found`);
+      this.logger.warn(
+        `Print with correlationId ${correlationId} could not be updated with new context as it was not found`,
+      );
       return;
     }
     completionEntry.context = context;
@@ -72,7 +79,7 @@ export class PrintCompletionService
     return processCompletions(completions);
   }
 
-  async loadPrintContexts(): Promise<Record<string, PrintCompletion[]>> {
+  async loadPrintContexts(): Promise<Record<string, IPrintCompletion<number, number>[]>> {
     const completions = await this.repository.find({
       where: {
         status: Not(In([EVENT_TYPES.PrintDone, EVENT_TYPES.PrintFailed])),

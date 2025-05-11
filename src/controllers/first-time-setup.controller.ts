@@ -1,7 +1,7 @@
-import { createController } from "awilix-express";
+import { POST, route } from "awilix-express";
 import { AppConstants } from "@/server.constants";
 import { validateMiddleware } from "@/handlers/validators";
-import { wizardSettingsRules } from "./validation/setting.validation";
+import { wizardSettingsSchema } from "./validation/setting.validation";
 import { BadRequestException, ForbiddenError } from "@/exceptions/runtime.exceptions";
 import { ROLES } from "@/constants/authorization.constants";
 import { SettingsStore } from "@/state/settings.store";
@@ -9,29 +9,24 @@ import { Request, Response } from "express";
 import { IUserService } from "@/services/interfaces/user-service.interface";
 import { IRoleService } from "@/services/interfaces/role-service.interface";
 
+@route(AppConstants.apiRoute + "/first-time-setup")
 export class FirstTimeSetupController {
-  userService: IUserService;
-  roleService: IRoleService;
-  settingsStore: SettingsStore;
+  constructor(
+    private readonly settingsStore: SettingsStore,
+    private readonly roleService: IRoleService,
+    private readonly userService: IUserService,
+  ) {}
 
-  constructor({
-    settingsStore,
-    roleService,
-    userService,
-  }: {
-    settingsStore: SettingsStore;
-    roleService: IRoleService;
-    userService: IUserService;
-  }) {
-    this.settingsStore = settingsStore;
-    this.roleService = roleService;
-    this.userService = userService;
-  }
-
+  @POST()
+  @route("/validate")
   async validateWizard(req: Request, res: Response) {
-    const { loginRequired, registration, rootUsername, rootPassword } = await validateMiddleware(req, wizardSettingsRules);
+    const { rootUsername } = await validateMiddleware(req, wizardSettingsSchema);
+    await this.roleService.getSynchronizedRoleByName(ROLES.ADMIN);
 
-    const role = await this.roleService.getSynchronizedRoleByName(ROLES.ADMIN);
+    if (this.settingsStore.isWizardCompleted()) {
+      throw new ForbiddenError("Wizard already completed");
+    }
+
     const user = await this.userService.findRawByUsername(rootUsername?.toLowerCase());
     if (!!user) {
       throw new BadRequestException("This user already exists");
@@ -40,8 +35,13 @@ export class FirstTimeSetupController {
     return res.send();
   }
 
+  @POST()
+  @route("/complete")
   async completeWizard(req: Request, res: Response) {
-    const { loginRequired, registration, rootUsername, rootPassword } = await validateMiddleware(req, wizardSettingsRules);
+    const { loginRequired, registration, rootUsername, rootPassword } = await validateMiddleware(
+      req,
+      wizardSettingsSchema,
+    );
 
     if (this.settingsStore.isWizardCompleted()) {
       throw new ForbiddenError("Wizard already completed");
@@ -69,8 +69,3 @@ export class FirstTimeSetupController {
     return res.send();
   }
 }
-
-export default createController(FirstTimeSetupController)
-  .prefix(AppConstants.apiRoute + "/first-time-setup")
-  .post("/validate", "validateWizard")
-  .post("/complete", "completeWizard");

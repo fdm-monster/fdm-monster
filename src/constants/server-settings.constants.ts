@@ -1,5 +1,4 @@
 import { AppConstants } from "@/server.constants";
-import { v4 as uuidv4 } from "uuid";
 import {
   CredentialSettingsDto,
   FileCleanSettingsDto,
@@ -8,6 +7,8 @@ import {
   TimeoutSettingsDto,
   WizardSettingsDto,
 } from "@/services/interfaces/settings.dto";
+import { v4 as uuidv4 } from "uuid";
+import { ICredentialSettings } from "@/models/Settings";
 
 export const wizardSettingKey = "wizard";
 export const getDefaultWizardSettings = (): WizardSettingsDto => ({
@@ -18,14 +19,6 @@ export const getDefaultWizardSettings = (): WizardSettingsDto => ({
 
 export const serverSettingsKey = "server";
 export const getDefaultServerSettings = (): ServerSettingsDto => ({
-  debugSettings: {
-    debugSocketIoEvents: false,
-    debugSocketReconnect: false,
-    debugSocketRetries: false,
-    debugSocketSetup: false,
-    debugSocketMessages: false,
-    debugSocketIoBandwidth: false,
-  },
   sentryDiagnosticsEnabled: false,
   loginRequired: true,
   registration: false,
@@ -33,12 +26,11 @@ export const getDefaultServerSettings = (): ServerSettingsDto => ({
   experimentalTypeormSupport: false,
   experimentalClientSupport: false,
   experimentalThumbnailSupport: false,
+  experimentalPrusaLinkSupport: false,
 });
 
 export const credentialSettingsKey = "credentials";
 export const getDefaultCredentialSettings = (): CredentialSettingsDto => ({
-  // Verification and signing of JWT tokens, can be changed on the fly
-  jwtSecret: uuidv4(),
   // Signing only, verification is automatic
   jwtExpiresIn: AppConstants.DEFAULT_JWT_EXPIRES_IN,
   // Verification only, bringing into effect requires updating all stored refresh tokens
@@ -70,7 +62,10 @@ export const getDefaultFileCleanSettings = (): FileCleanSettingsDto => ({
 export const getDefaultSettings = () => ({
   [serverSettingsKey]: getDefaultServerSettings(),
   [wizardSettingKey]: getDefaultWizardSettings(),
-  [credentialSettingsKey]: getDefaultCredentialSettings(),
+  [credentialSettingsKey]: {
+    ...getDefaultCredentialSettings(),
+    jwtSecret: uuidv4(),
+  } satisfies ICredentialSettings,
   [printerFileCleanSettingKey]: getDefaultFileCleanSettings(),
   [frontendSettingKey]: getDefaultFrontendSettings(),
   [timeoutSettingKey]: getDefaultTimeout(),

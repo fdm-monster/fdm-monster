@@ -28,7 +28,7 @@ describe(OctoprintClient.name, () => {
           apiKey: "surewhynot",
           printerURL: "some uwrl",
           printerType: OctoprintType,
-        })
+        }),
     ).rejects.toHaveProperty("code", "ERR_INVALID_URL");
   });
 
@@ -218,12 +218,6 @@ describe(OctoprintClient.name, () => {
     expect(result.data).toBeTruthy();
   });
 
-  it("should not throw error on getApiPluginManager", async () => {
-    nock(printerURL).get("/plugin/pluginmanager/plugins").reply(200, {});
-    const result = await octoprintClient.getPluginManagerPlugins(auth);
-    expect(result.data).toBeTruthy();
-  });
-
   it("should not throw error on getSystemInfo", async () => {
     nock(printerURL).get("/api/system/info").reply(200, {});
     const result = await octoprintClient.getSystemInfo(auth);
@@ -233,63 +227,6 @@ describe(OctoprintClient.name, () => {
   it("should not throw error on getSystemCommands", async () => {
     nock(printerURL).get("/api/system/commands").reply(200, {});
     const result = await octoprintClient.getSystemCommands(auth);
-    expect(result.data).toBeTruthy();
-  });
-
-  it("should not throw error on getSoftwareUpdateCheck", async () => {
-    nock(printerURL).get("/plugin/softwareupdate/check").reply(200, {});
-    const result = await octoprintClient.getSoftwareUpdateCheck(auth, false);
-    expect(result.data).toBeTruthy();
-  });
-
-  it("should not throw error on getPluginPiSupport", async () => {
-    nock(printerURL).get("/api/plugin/pi_support").reply(200, {});
-    const result = await octoprintClient.getPluginPiSupport(auth);
-    expect(result.data).toBeTruthy();
-  });
-
-  it("should not throw error on deleteTimeLapse", async () => {
-    nock(printerURL).delete("/api/timelapse/deletedFile").reply(200, {});
-    const result = await octoprintClient.deleteTimeLapse(auth, "deletedFile");
-    expect(result).toBeUndefined();
-  });
-
-  it("should not throw error on listUnrenderedTimeLapses", async () => {
-    nock(printerURL).get("/api/timelapse").query("unrendered=true").reply(200, {});
-    const result = await octoprintClient.listUnrenderedTimeLapses(auth);
-    expect(result.data).toBeTruthy();
-  });
-
-  it("should not throw error on listProfiles", async () => {
-    nock(printerURL).get("/api/plugin/printerprofiles").reply(200, {});
-    const result = await octoprintClient.listProfiles(auth);
-    expect(result.data).toBeTruthy();
-  });
-
-  it("should not throw error on getBackupOverview", async () => {
-    nock(printerURL).get("/plugin/backup").reply(200, {});
-    const result = await octoprintClient.getBackupOverview(auth);
-    expect(result.data).toBeTruthy();
-  });
-
-  it("should not throw error on getBackups", async () => {
-    nock(printerURL).get("/plugin/backup/backup").reply(200, {});
-    const result = await octoprintClient.getBackups(auth);
-    expect(result.data).toBeTruthy();
-  });
-
-  it("should not throw error on createBackup", async () => {
-    nock(printerURL).post("/plugin/backup/backup").reply(200, {});
-    const result = await octoprintClient.createBackup(auth, []);
-    expect(result.data).toBeTruthy();
-  });
-
-  it("should not throw error on deleteBackup", async () => {
-    const file = "123.file";
-    nock(printerURL)
-      .delete("/plugin/backup/backup/" + file)
-      .reply(200, {});
-    const result = await octoprintClient.deleteBackup(auth, file);
     expect(result.data).toBeTruthy();
   });
 

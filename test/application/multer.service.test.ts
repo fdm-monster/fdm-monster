@@ -1,8 +1,9 @@
-const fs = require("fs");
-jest.mock("fs");
 import { configureContainer } from "@/container";
 import { DITokens } from "@/container.tokens";
 import { MulterService } from "@/services/core/multer.service";
+
+const fs = require("fs");
+jest.mock("fs");
 
 let container;
 let multerService: MulterService;
@@ -13,6 +14,10 @@ beforeAll(async () => {
 });
 
 describe("MulterService", () => {
+  const fileFilterCallBack: (error: Error | null) => void = (err: any) => {
+    if (err) throw err;
+  };
+
   it("should find file", () => {
     expect(multerService.fileExists("file", "storage")).toBeFalsy();
   });
@@ -29,7 +34,7 @@ describe("MulterService", () => {
   });
 
   it("should be able to start tracking upload", async () => {
-    multerService.startTrackingSession({}, 1);
+    multerService.startTrackingSession({} as Express.Multer.File, 1);
 
     const trackedSessions = multerService.getSessions();
     expect(trackedSessions.current).not.toHaveLength(0);
@@ -41,24 +46,18 @@ describe("MulterService", () => {
   });
 
   it("gcode filter should throw on non-gcode extension", async () => {
-    const incorrectFile = { originalname: "file.gco" };
+    const incorrectFile = { originalname: "file.gco" } as Express.Multer.File;
 
     expect(() =>
-      multerService.multerFileFilter([".gcode", ".bgcode"])(null, incorrectFile, (err, result) => {
-        if (err) throw err;
-        return result;
-      })
+      multerService.multerFileFilter([".gcode", ".bgcode"])(null, incorrectFile, fileFilterCallBack),
     ).toThrow();
   });
 
   it("gcode filter should accept gcode extension", async () => {
-    const correctFile = { originalname: "file.gcode" };
+    const correctFile = { originalname: "file.gcode" } as Express.Multer.File;
 
     expect(() =>
-      multerService.multerFileFilter([".gcode", ".bgcode"])(null, correctFile, (err, result) => {
-        if (err) throw err;
-        return result;
-      })
+      multerService.multerFileFilter([".gcode", ".bgcode"])(null, correctFile, fileFilterCallBack),
     ).not.toThrow();
   });
 });

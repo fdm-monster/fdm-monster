@@ -1,61 +1,54 @@
 import {
   credentialSettingsKey,
-  printerFileCleanSettingKey,
   frontendSettingKey,
+  printerFileCleanSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
   wizardSettingKey,
 } from "@/constants/server-settings.constants";
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
-import { BaseEntity } from "@/entities/base.entity";
+import { ISettings } from "@/models/Settings";
 
 @Entity()
-export class Settings extends BaseEntity {
+export class Settings implements ISettings<number> {
   @PrimaryGeneratedColumn()
-  id!: number;
+  id: number;
 
   @Column({ type: "simple-json", nullable: false })
-  [serverSettingsKey]!: {
+  [serverSettingsKey]: {
     sentryDiagnosticsEnabled: boolean;
-    debugSettings: {
-      debugSocketIoEvents: boolean;
-      debugSocketReconnect: boolean;
-      debugSocketRetries: boolean;
-      debugSocketSetup: boolean;
-      debugSocketMessages: boolean;
-      debugSocketIoBandwidth: boolean;
-    };
     loginRequired: boolean;
     registration: boolean;
     experimentalMoonrakerSupport: boolean;
     experimentalClientSupport: boolean;
     experimentalThumbnailSupport: boolean;
+    experimentalPrusaLinkSupport: boolean;
   };
 
   @Column({ type: "simple-json", nullable: false })
-  [credentialSettingsKey]!: {
-    jwtSecret: string; // minlength: 10, trim
+  [credentialSettingsKey]: {
+    jwtSecret: string;
     jwtExpiresIn: number;
     refreshTokenAttempts: number;
     refreshTokenExpiry: number;
   };
 
   @Column({ type: "simple-json", nullable: false })
-  [wizardSettingKey]!: {
+  [wizardSettingKey]: {
     wizardCompleted: boolean;
     wizardCompletedAt: Date | null;
     wizardVersion: number;
   };
 
   @Column({ type: "simple-json", nullable: false })
-  [printerFileCleanSettingKey]!: {
+  [printerFileCleanSettingKey]: {
     autoRemoveOldFilesBeforeUpload: boolean;
     autoRemoveOldFilesAtBoot: boolean;
     autoRemoveOldFilesCriteriumDays: number;
   };
 
   @Column({ type: "simple-json", nullable: false })
-  [frontendSettingKey]!: {
+  [frontendSettingKey]: {
     gridCols: number;
     gridRows: number;
     largeTiles: boolean;
@@ -63,7 +56,7 @@ export class Settings extends BaseEntity {
   };
 
   @Column({ type: "simple-json", nullable: false })
-  [timeoutSettingKey]!: {
+  [timeoutSettingKey]: {
     apiTimeout: number;
   };
 }
