@@ -187,7 +187,7 @@ describe(UserController.name, () => {
       const userRepo = getDatasource().getRepository(User);
       const userCount = await userRepo.count();
       expect(userCount).toBeGreaterThan(0);
-      await userRepo.delete({});
+      await userRepo.clear();
     } else {
       await UserMongo.deleteMany({});
     }

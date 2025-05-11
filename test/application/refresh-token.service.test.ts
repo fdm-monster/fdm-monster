@@ -27,7 +27,7 @@ beforeAll(async () => {
 });
 afterEach(async () => {
   if (isSqliteModeTest()) {
-    await typeorm.getDataSource().getRepository(RefreshToken).delete({});
+    await typeorm.getDataSource().getRepository(RefreshToken).clear();
   } else {
     await RefreshTokenMongo.deleteMany({});
   }
