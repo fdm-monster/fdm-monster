@@ -1,5 +1,11 @@
 # Develop
 
+## Fixes
+
+- fix: OctoPrint 1.8.7 needs explicit passive flag in body instead of header to login
+
+# FDM Monster 1.9.0-rc1
+
 ## Features
 - Introduce PrusaLink adapter for limited printer support for these printers: MK3S(+) (needs PrusaLink extension with Raspberry Pi), Mini(+), MK4(S), XL, Core One
 - Add opt-in Prometheus integration (still experimental)

@@ -74,7 +74,7 @@ jobs:
           draft: false
           prerelease: ${{ contains(env.SERVER_VERSION, 'rc') || contains(env.SERVER_VERSION, 'unstable') }}
           tag_name: ${{ env.RELEASE_TAG }}
-          release_name: ${{ env.RELEASE_TAG }} Thumbnail Thumper 🔨
+          release_name: ${{ env.RELEASE_TAG }} Lots of Link ⛓️
           body: "Release notes not added" # ${{ steps.build_changelog.outputs.changelog }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
