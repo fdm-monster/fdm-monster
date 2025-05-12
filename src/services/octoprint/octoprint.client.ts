@@ -51,7 +51,9 @@ export class OctoprintClient extends OctoprintRoutes {
   }
 
   async login(login: LoginDto) {
-    return await this.createClient(login).post<OP_LoginDto>(this.apiLogin);
+    return await this.createClient(login).post<OP_LoginDto>(this.apiLogin, {
+      passive: true
+    });
   }
 
   async sendConnectionCommand(login: LoginDto, commandData: any) {

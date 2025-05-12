@@ -11,7 +11,7 @@ export class OctoprintHttpClientBuilder extends DefaultHttpClientBuilder {
     return super.build<D>();
   }
 
-  public withXApiKeyHeader(apiKey?: string): OctoprintHttpClientBuilder {
+  public withXApiKeyHeader(apiKey?: string): this {
     if (!apiKey?.length) {
       throw new Error("XApiKey header may not be an empty string");
     }
