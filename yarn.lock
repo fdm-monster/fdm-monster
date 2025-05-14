@@ -1015,9 +1015,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fastify/otel@github:getsentry/fastify-otel#otel-v1":
+"@fastify/otel@https://codeload.github.com/getsentry/fastify-otel/tar.gz/ae3088d65e286bdc94ac5d722573537d6a6671bb":
   version: 0.8.0
-  resolution: "@fastify/otel@https://github.com/getsentry/fastify-otel.git#commit=d6bb1756c3db3d00d4d82c39c93ee3316e06d305"
+  resolution: "@fastify/otel@https://codeload.github.com/getsentry/fastify-otel/tar.gz/ae3088d65e286bdc94ac5d722573537d6a6671bb"
   dependencies:
     "@opentelemetry/core": "npm:^1.30.1"
     "@opentelemetry/instrumentation": "npm:^0.57.2"
@@ -1025,7 +1025,7 @@ __metadata:
     minimatch: "npm:^9"
   peerDependencies:
     "@opentelemetry/api": ^1.9.0
-  checksum: 10c0/64de6c33c7b8187d52a4b7c2c831c99a62d9b23101a8407a747f83abe32a40677f5fb4d82a07e99cb3b1636ab731eee5a308566911c77e43c26c8d87880a066f
+  checksum: 10c0/aa176be8182c26ba1cc0c8885e43b19cc6f2b6cf64b5487872d71ac914e02967cd33fcdd55985023581c25d982aa5b4b100f0905ce8d529abb1400ffc77a7e7c
   languageName: node
   linkType: hard
 
@@ -1053,7 +1053,7 @@ __metadata:
     "@lcov-viewer/cli": "npm:1.3.0"
     "@lcov-viewer/istanbul-report": "npm:1.4.0"
     "@octokit/plugin-throttling": "npm:8.2.0"
-    "@sentry/node": "npm:9.18.0"
+    "@sentry/node": "npm:9.19.0"
     "@swc/cli": "npm:0.7.7"
     "@swc/core": "npm:1.11.24"
     "@swc/jest": "npm:0.2.38"
@@ -2612,18 +2612,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/core@npm:9.18.0":
-  version: 9.18.0
-  resolution: "@sentry/core@npm:9.18.0"
-  checksum: 10c0/5fffb8f8747de3ca20f4c493a3e747c812a1c6758079385922e37d38ccb4c65342ba89b5fb38b4a54cee955a208bf313d2539aa0e6b93e8873105247932597bb
+"@sentry/core@npm:9.19.0":
+  version: 9.19.0
+  resolution: "@sentry/core@npm:9.19.0"
+  checksum: 10c0/5bb40a0130cee2064cb58880777a5c1788cbd99a9f338756d8f6d83478d113c8696e2e4ef1a395e04e925eb379834768b804015dfe093d66901e25a53b52f721
   languageName: node
   linkType: hard
 
-"@sentry/node@npm:9.18.0":
-  version: 9.18.0
-  resolution: "@sentry/node@npm:9.18.0"
+"@sentry/node@npm:9.19.0":
+  version: 9.19.0
+  resolution: "@sentry/node@npm:9.19.0"
   dependencies:
-    "@fastify/otel": "github:getsentry/fastify-otel#otel-v1"
+    "@fastify/otel": "https://codeload.github.com/getsentry/fastify-otel/tar.gz/ae3088d65e286bdc94ac5d722573537d6a6671bb"
     "@opentelemetry/api": "npm:^1.9.0"
     "@opentelemetry/context-async-hooks": "npm:^1.30.1"
     "@opentelemetry/core": "npm:^1.30.1"
@@ -2654,18 +2654,18 @@ __metadata:
     "@opentelemetry/sdk-trace-base": "npm:^1.30.1"
     "@opentelemetry/semantic-conventions": "npm:^1.30.0"
     "@prisma/instrumentation": "npm:6.7.0"
-    "@sentry/core": "npm:9.18.0"
-    "@sentry/opentelemetry": "npm:9.18.0"
+    "@sentry/core": "npm:9.19.0"
+    "@sentry/opentelemetry": "npm:9.19.0"
     import-in-the-middle: "npm:^1.13.1"
-  checksum: 10c0/ab49dd91f425a00f27660f02b43734cc36886def476985fc8584d0086e65b45d2bcdec470d1882c1e3610c49c0f836fd0cbffb8197261bbc2a8189371262a457
+  checksum: 10c0/074c4bd43b35a0daa72ae73b489a697697917e75be6c50a2d33cd6b4ce1750537f90f0da2dbcc1e353b92ef1cbeb4bca43a4c95a993370d39c5847b20f1b2d26
   languageName: node
   linkType: hard
 
-"@sentry/opentelemetry@npm:9.18.0":
-  version: 9.18.0
-  resolution: "@sentry/opentelemetry@npm:9.18.0"
+"@sentry/opentelemetry@npm:9.19.0":
+  version: 9.19.0
+  resolution: "@sentry/opentelemetry@npm:9.19.0"
   dependencies:
-    "@sentry/core": "npm:9.18.0"
+    "@sentry/core": "npm:9.19.0"
   peerDependencies:
     "@opentelemetry/api": ^1.9.0
     "@opentelemetry/context-async-hooks": ^1.30.1 || ^2.0.0
@@ -2673,7 +2673,7 @@ __metadata:
     "@opentelemetry/instrumentation": ^0.57.1 || ^0.200.0
     "@opentelemetry/sdk-trace-base": ^1.30.1 || ^2.0.0
     "@opentelemetry/semantic-conventions": ^1.30.0
-  checksum: 10c0/3939e07bb3bce737f3b7623a7fcaa7ba56641978eaaaa17a8f2e276435f8bf0f139cac3c628e9f85e5ce8fc217e2f30fc01b9011bfb0138890f3a4cee06fddb5
+  checksum: 10c0/f47be47da0ee98de57338e14567b40079e6545fdb28e783f9c51f15ba37d76dfd9b87a153659e39c2f1ae52eb600c5fd6525724b7d06eaab4378141df7824dcd
   languageName: node
   linkType: hard
 
