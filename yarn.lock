@@ -1115,7 +1115,7 @@ __metadata:
     supertest: "npm:7.1.1"
     toad-scheduler: "npm:3.1.0"
     ts-node: "npm:10.9.2"
-    typeorm: "npm:0.3.23"
+    typeorm: "npm:0.3.24"
     typescript: "npm:5.8.3"
     uuid: "npm:11.1.0"
     winston: "npm:3.17.0"
@@ -5223,7 +5223,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dedent@npm:^1.0.0":
+"dedent@npm:^1.0.0, dedent@npm:^1.6.0":
   version: 1.6.0
   resolution: "dedent@npm:1.6.0"
   peerDependencies:
@@ -9653,9 +9653,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typeorm@npm:0.3.23":
-  version: 0.3.23
-  resolution: "typeorm@npm:0.3.23"
+"typeorm@npm:0.3.24":
+  version: 0.3.24
+  resolution: "typeorm@npm:0.3.24"
   dependencies:
     "@sqltools/formatter": "npm:^1.2.5"
     ansis: "npm:^3.17.0"
@@ -9663,6 +9663,7 @@ __metadata:
     buffer: "npm:^6.0.3"
     dayjs: "npm:^1.11.13"
     debug: "npm:^4.4.0"
+    dedent: "npm:^1.6.0"
     dotenv: "npm:^16.4.7"
     glob: "npm:^10.4.5"
     sha.js: "npm:^2.4.11"
@@ -9728,7 +9729,7 @@ __metadata:
     typeorm: cli.js
     typeorm-ts-node-commonjs: cli-ts-node-commonjs.js
     typeorm-ts-node-esm: cli-ts-node-esm.js
-  checksum: 10c0/a1443355aab8250d467fe4f689f1ae1614ad3af645a1565019bbc9fb710e784d4c27ad12d824baed4d4972e0566262dea0c0cb6ecc4a4fedc3dab7795fd453a8
+  checksum: 10c0/f78fe361c5eba065dfd0e05a7e2ee1bcb5b27a6a24fb6f1b57b03f7df74078364ac13b1ab2915676c50e9fb9c0a41a480834aaadae80fcc6c962c8844adabf03
   languageName: node
   linkType: hard
 
