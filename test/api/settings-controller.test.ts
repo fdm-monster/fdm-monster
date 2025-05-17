@@ -1,6 +1,6 @@
 import { Test } from "supertest";
 import { setupTestApp } from "../test-server";
-import { expectOkResponse } from "../extensions";
+import { expectInvalidResponse, expectOkResponse } from "../extensions";
 import { AppConstants } from "@/server.constants";
 import {
   credentialSettingsKey,
@@ -22,7 +22,6 @@ let request: TestAgent<Test>;
 const defaultRoute = `${AppConstants.apiRoute}/settings`;
 const sensitiveSettingsRoute = `${defaultRoute}/sensitive`;
 const credentialSettingsRoute = `${defaultRoute}/credential`;
-const serverSettingsRoute = `${defaultRoute}/server`;
 const experimentalMoonrakerSupport = `${defaultRoute}/experimental-moonraker-support`;
 const experimentalClientSupport = `${defaultRoute}/experimental-client-support`;
 const frontendSettingsRoute = `${defaultRoute}/frontend`;
@@ -62,6 +61,7 @@ describe(SettingsController.name, () => {
     });
     expect(body[timeoutSettingKey]).toMatchObject({
       apiTimeout: 10000,
+      apiUploadTimeout: 30000,
     });
 
     // Removed property
@@ -153,7 +153,22 @@ describe(SettingsController.name, () => {
   it("should OK on PUT timeout", async () => {
     const response = await request.put(`${defaultRoute}/timeout`).send({
       apiTimeout: 1000,
+      apiUploadTimeout: 10000,
     });
     expectOkResponse(response);
+  });
+
+  it("should not OK on PUT timeout which is too low", async () => {
+    const response = await request.put(`${defaultRoute}/timeout`).send({
+      apiTimeout: 1000,
+      apiUploadTimeout: 9000,
+    });
+    expectInvalidResponse(response, [
+        {
+          path: "apiUploadTimeout",
+          code: "too_small",
+        },
+      ],
+    );
   });
 });
