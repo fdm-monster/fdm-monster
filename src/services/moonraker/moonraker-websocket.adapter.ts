@@ -49,7 +49,6 @@ import { WebsocketRpcExtendedAdapter } from "@/shared/websocket-rpc-extended.ada
 import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
 import { normalizeUrl } from "@/utils/normalize-url";
 import { AxiosError } from "axios";
-import { SettingsStore } from "@/state/settings.store";
 
 export type SubscriptionType = IdleTimeoutObject &
   PauseResumeObject &
