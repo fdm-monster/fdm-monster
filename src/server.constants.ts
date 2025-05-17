@@ -57,6 +57,7 @@ export const AppConstants = {
   DEFAULT_DEMO_ROLE: "ADMIN",
 
   defaultDevelopmentEnv: "development",
+  ENABLE_COLORED_LOGS_KEY: "ENABLE_COLORED_LOGS",
   defaultTestEnv: "test",
   defaultProductionEnv: "production",
   knownEnvNames: ["development", "production", "test"],
