@@ -23,6 +23,15 @@ export function migrateSettingsRuntime<KeyType = IdType>(
 
   entity[wizardSettingKey] ??= getDefaultWizardSettings();
   entity[timeoutSettingKey] ??= getDefaultTimeout();
+
+  if (entity[timeoutSettingKey]) {
+    const defaultTimeoutSettings = getDefaultTimeout();
+    entity[timeoutSettingKey] = {
+      apiTimeout: entity[timeoutSettingKey].apiTimeout ?? defaultTimeoutSettings.apiTimeout,
+      apiUploadTimeout: entity[timeoutSettingKey].apiUploadTimeout ?? defaultTimeoutSettings.apiUploadTimeout,
+    };
+  }
+
   entity[serverSettingsKey] ??= getDefaultServerSettings();
   entity[frontendSettingKey] ??= getDefaultFrontendSettings();
   entity[credentialSettingsKey] ??= {

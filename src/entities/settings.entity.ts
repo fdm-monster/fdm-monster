@@ -58,5 +58,6 @@ export class Settings implements ISettings<number> {
   @Column({ type: "simple-json", nullable: false })
   [timeoutSettingKey]: {
     apiTimeout: number;
+    apiUploadTimeout: number;
   };
 }

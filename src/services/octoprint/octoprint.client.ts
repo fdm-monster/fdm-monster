@@ -22,6 +22,7 @@ import { CurrentPrinterStateDto } from "@/services/octoprint/dto/printer/current
 import { HttpClientFactory } from "@/services/core/http-client.factory";
 import { OctoprintHttpClientBuilder } from "@/services/octoprint/utils/octoprint-http-client.builder";
 import { OctoprintFileDto } from "@/services/octoprint/dto/files/octoprint-file.dto";
+import { SettingsStore } from "@/state/settings.store";
 
 type TAxes = "x" | "y" | "z";
 
@@ -36,6 +37,7 @@ export class OctoprintClient extends OctoprintRoutes {
     loggerFactory: ILoggerFactory,
     private readonly httpClientFactory: HttpClientFactory,
     private readonly eventEmitter2: EventEmitter2,
+    private readonly settingsStore: SettingsStore
   ) {
     super();
 
@@ -240,6 +242,7 @@ export class OctoprintClient extends OctoprintRoutes {
       const response = await this.createClient(login, (builder) =>
         builder
           .withMultiPartFormData()
+          .withTimeout(this.settingsStore.getTimeoutSettings().apiUploadTimeout)
           .withHeaders({
             ...formData.getHeaders(),
             "Content-Length": result.toString(),
