@@ -16,7 +16,8 @@ export class ServerPublicController {
     private readonly serverReleaseService: ServerReleaseService,
     private readonly monsterPiService: MonsterPiService,
     private readonly isTypeormMode: boolean,
-  ) {}
+  ) {
+  }
 
   @GET()
   @route("/")
@@ -41,6 +42,7 @@ export class ServerPublicController {
   getFeatures(req: Request, res: Response) {
     const serverSettings = this.settingsStore.getServerSettings();
     const moonrakerEnabled = serverSettings.experimentalMoonrakerSupport;
+    const prusaLinkEnabled = serverSettings.experimentalPrusaLinkSupport;
     res.send({
       printerGroupsApi: {
         // Only SQLite mode supported for this feature
@@ -52,7 +54,11 @@ export class ServerPublicController {
         available: true,
         version: 1,
         subFeatures: {
-          types: moonrakerEnabled ? ["octoprint", "klipper"] : ["octoprint"],
+          types: [
+            "octoprint",
+            ...(moonrakerEnabled ? ["klipper"] : []),
+            ...(prusaLinkEnabled ? ["prusaLink"] : []),
+          ],
         },
       },
     });
