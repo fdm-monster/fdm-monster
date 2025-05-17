@@ -2,7 +2,10 @@
 
 ## Fixes
 
-- fix: OctoPrint 1.8.7 needs explicit passive flag in body instead of header to login
+- OctoPrint 1.8.7 needs explicit passive flag in body instead of header to login
+- PrusaLink subfeature was not added to printer type feature  (new client packaged)
+- Improve Moonraker error logging
+- Make colored logs opt-in with "ENABLE_COLORED_LOGS: true" env var
 
 # FDM Monster 1.9.0-rc1
 
