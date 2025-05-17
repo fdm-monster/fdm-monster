@@ -81,6 +81,7 @@ import { HttpClientFactory } from "@/services/core/http-client.factory";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { ExternalServiceError } from "@/exceptions/runtime.exceptions";
+import { SettingsStore } from "@/state/settings.store";
 
 export class MoonrakerClient {
   protected logger: LoggerService;
@@ -89,6 +90,7 @@ export class MoonrakerClient {
     loggerFactory: ILoggerFactory,
     private readonly httpClientFactory: HttpClientFactory,
     private readonly eventEmitter2: EventEmitter2,
+    private readonly settingsStore: SettingsStore,
   ) {
     this.logger = loggerFactory(MoonrakerClient.name);
   }
@@ -394,6 +396,7 @@ export class MoonrakerClient {
     try {
       const response = await this.createClient(login, (b) => {
         b.withMultiPartFormData()
+          .withTimeout(this.settingsStore.getTimeoutSettings().apiUploadTimeout)
           .withHeaders({
             ...formData.getHeaders(),
             "Content-Length": result.toString(),

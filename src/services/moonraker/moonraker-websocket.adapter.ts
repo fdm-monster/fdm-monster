@@ -49,6 +49,7 @@ import { WebsocketRpcExtendedAdapter } from "@/shared/websocket-rpc-extended.ada
 import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
 import { normalizeUrl } from "@/utils/normalize-url";
 import { AxiosError } from "axios";
+import { SettingsStore } from "@/state/settings.store";
 
 export type SubscriptionType = IdleTimeoutObject &
   PauseResumeObject &
@@ -83,12 +84,11 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
     status: null,
   };
   protected declare logger: LoggerService;
-  private readonly client: MoonrakerClient;
   private socketURL?: URL;
 
   constructor(
     loggerFactory: ILoggerFactory,
-    moonrakerClient: MoonrakerClient,
+    private readonly moonrakerClient: MoonrakerClient,
     private readonly eventEmitter2: EventEmitter2,
     private readonly configService: ConfigService,
     private readonly serverVersion: string,
@@ -96,7 +96,6 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
     super(loggerFactory);
 
     this.logger = loggerFactory(MoonrakerWebsocketAdapter.name);
-    this.client = moonrakerClient;
   }
 
   get _debugMode() {
@@ -176,7 +175,7 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
     // this.logger.log(`Oneshot ${oneshot.data.result}`);
     // await this.client.getAccessOneshotToken(this.login);
 
-    await this.client.getApiVersion(this.login)
+    await this.moonrakerClient.getApiVersion(this.login)
       .catch((e: AxiosError) => {
         this.setSocketState("aborted");
         this.logger.error(`Printer (${this.printerId}) network or transport error, marking it as unreachable; ${e}`);
@@ -235,7 +234,7 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
     try {
       const query: Partial<Record<KnownPrinterObject, []>> = this.subscriptionObjects;
 
-      const result = await this.client.postSubscribePrinterObjects<PrinterObjectsQueryDto<SubscriptionType>>(
+      const result = await this.moonrakerClient.postSubscribePrinterObjects<PrinterObjectsQueryDto<SubscriptionType>>(
         this.login,
         response.result.connection_id,
         query,
@@ -342,7 +341,7 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
   private async updateCurrentStateSafely() {
     try {
       const query: Partial<Record<KnownPrinterObject, []>> = this.subscriptionObjects;
-      const objects = await this.client.getPrinterObjectsQuery<PrinterObjectsQueryDto<SubscriptionType>>(
+      const objects = await this.moonrakerClient.getPrinterObjectsQuery<PrinterObjectsQueryDto<SubscriptionType>>(
         this.login,
         query,
       );

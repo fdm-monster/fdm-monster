@@ -1,5 +1,9 @@
 # Develop
 
+## Features
+
+- Introduce separate upload timeout setting for better control and resilience
+
 ## Fixes
 
 - OctoPrint 1.8.7 needs explicit passive flag in body instead of header to login
