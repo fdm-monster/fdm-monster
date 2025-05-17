@@ -29,7 +29,7 @@ FDM Monster is a server for managing your 3D printer farm through [OctoPrint](ht
 ## Features 🖨️
 Here is a list of features that make FDM Monster stand out:
 
-- Adding OctoPrint and Moonraker instances
+- Adding OctoPrint, Moonraker and Prusa-Link instances
 - Dragging or creating new printers on a customizable grid
 - Drag n drop GCode to print
 - Select printers and print one GCode file in batch 
