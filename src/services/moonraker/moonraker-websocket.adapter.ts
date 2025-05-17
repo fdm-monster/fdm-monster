@@ -48,6 +48,7 @@ import {
 import { WebsocketRpcExtendedAdapter } from "@/shared/websocket-rpc-extended.adapter";
 import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
 import { normalizeUrl } from "@/utils/normalize-url";
+import { AxiosError } from "axios";
 
 export type SubscriptionType = IdleTimeoutObject &
   PauseResumeObject &
@@ -168,12 +169,21 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
   }
 
   async setupSocketSession(): Promise<void> {
+    this.resetSocketState();
+
     // Can 404 or 503
     // const oneshot = await this.client.getAccessOneshotToken(this.login);
     // this.logger.log(`Oneshot ${oneshot.data.result}`);
     // await this.client.getAccessOneshotToken(this.login);
 
-    await this.client.getApiVersion(this.login);
+    await this.client.getApiVersion(this.login)
+      .catch((e: AxiosError) => {
+        this.setSocketState("aborted");
+        this.logger.error(`Printer (${this.printerId}) network or transport error, marking it as unreachable; ${e}`);
+        this.setApiState("noResponse");
+
+        throw e;
+      });
     this.setApiState(API_STATE.responding);
 
     await this.updateCurrentStateSafely();

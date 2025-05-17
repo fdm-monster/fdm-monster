@@ -71,7 +71,7 @@ export const AppConstants = {
   orgName: "fdm-monster",
   // Wizard version changes will trigger a re-run of the wizard
   currentWizardVersion: 1,
-  defaultClientMinimum: "1.10.1",
+  defaultClientMinimum: "1.10.2",
 
   influxUrl: "INFLUX_URL",
   influxToken: "INFLUX_TOKEN",

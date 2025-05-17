@@ -795,7 +795,7 @@ export class MoonrakerClient {
   }
 
   /**
-   * @deprecated API might not be available in the future
+   * @description API might not be available in the future
    * @param login
    */
   async getApiVersion(login: LoginDto) {
@@ -803,7 +803,7 @@ export class MoonrakerClient {
   }
 
   /**
-   * @deprecated API might not be available in the future
+   * @description API might not be available in the future
    * @param login
    */
   async getServerVersion(login: LoginDto) {
@@ -811,7 +811,7 @@ export class MoonrakerClient {
   }
 
   /**
-   * @deprecated API might not be available in the future
+   * @description API might not be available in the future
    * @param login
    */
   async getApiLogin(login: LoginDto) {
