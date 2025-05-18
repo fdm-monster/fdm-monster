@@ -11,3 +11,7 @@ export const downloadFileSchema = z.object({
 export const getFileSchema = z.object({
   path: z.string().min(1),
 });
+
+export const uploadFileSchema = z.object({
+  startPrint: z.enum(['true', 'false'])
+});
