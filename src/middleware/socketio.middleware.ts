@@ -4,10 +4,12 @@ import { Socket } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
 import { ExtendedError } from "socket.io/dist/namespace";
 import { IUser } from "@/models/Auth/User";
+import { LoggerService } from "@/handlers/logger";
 
 export const authorize = (
   settingsStore: SettingsStore,
   options: StrategyOptionsWithoutRequest,
+  logger: LoggerService,
   verify: VerifyCallback,
 ) => {
   const strategy = new PassportJwtStrategy(options, verify);
@@ -26,8 +28,14 @@ export const authorize = (
       // socket.handshake.user = user;
       next();
     };
-    strategy.fail = (info) => next(new Error(info));
-    strategy.error = (error) => next(error);
+    strategy.fail = (info) => {
+      logger.warn(`Failure authenticating SocketIO user, reason: '${info}'`, { reason: info });
+      next(new Error(info));
+    };
+    strategy.error = (error) => {
+      logger.warn("Error authenticating SocketIO user");
+      next(error);
+    };
 
     strategy.authenticate(socket as any, {} as VerifyCallback);
   };

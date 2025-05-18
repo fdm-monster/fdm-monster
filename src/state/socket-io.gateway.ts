@@ -53,9 +53,8 @@ export class SocketIoGateway {
       this.configService,
       (value: Socket) => value.handshake.auth.token,
     );
-    this.io.use(authorize(this.settingsStore, opts, verifyUserCallback(this.userService)));
+    this.io.use(authorize(this.settingsStore, opts, this.logger, verifyUserCallback(this.userService)));
     this.io.on("connection", (socket) => this.onConnect.bind(this)(socket));
-
   }
 
   onConnect(socket: Socket) {
