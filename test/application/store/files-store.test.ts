@@ -4,7 +4,7 @@ import { PrinterFilesStore } from "@/state/printer-files.store";
 import { setupTestApp } from "../../test-server";
 import { SqliteIdType } from "@/shared.constants";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
-import { OctoprintType, MoonrakerType, PrinterType } from "@/services/printer-api.interface";
+import { MoonrakerType, PrinterType } from "@/services/printer-api.interface";
 
 let printerFilesStore: PrinterFilesStore;
 let printerService: IPrinterService<SqliteIdType>;

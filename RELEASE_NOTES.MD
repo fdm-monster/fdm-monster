@@ -11,6 +11,7 @@
 - Improve Moonraker error logging
 - Make colored logs opt-in with "ENABLE_COLORED_LOGS: true" env var
 - SocketIO gateway logs errors more explicitly
+- Logger is now static, reducing memory usage and test duration
 
 # FDM Monster 1.9.0-rc1
 

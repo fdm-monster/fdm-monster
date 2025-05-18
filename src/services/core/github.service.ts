@@ -10,7 +10,7 @@ export class GithubService {
     loggerFactory: ILoggerFactory,
     private readonly octokitService: Octokit,
   ) {
-    this.logger = loggerFactory(GithubService.name, false);
+    this.logger = loggerFactory(GithubService.name);
   }
 
   async wasAuthenticated() {

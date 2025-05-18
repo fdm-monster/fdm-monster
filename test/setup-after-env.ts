@@ -1,6 +1,7 @@
 import { isSqliteModeTest } from "./typeorm.manager";
 import { closeDatabase, connect } from "./mongo-memory.handler";
 import nock from "nock";
+import { createStaticLogger } from "@/handlers/logging/static.logger";
 const jestConsole = console;
 
 beforeAll(async () => {
@@ -33,6 +34,8 @@ beforeAll(async () => {
   if (!isSqliteModeTest()) {
     await connect();
   }
+
+  createStaticLogger({ enableFileLogs: false });
 });
 
 // https://github.com/jestjs/jest/issues/10322
