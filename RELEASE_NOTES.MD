@@ -10,10 +10,12 @@
 - PrusaLink subfeature was not added to printer type feature  (new client packaged)
 - Improve Moonraker error logging
 - Make colored logs opt-in with "ENABLE_COLORED_LOGS: true" env var
+- SocketIO gateway logs errors more explicitly
 
 # FDM Monster 1.9.0-rc1
 
 ## Features
+
 - Introduce PrusaLink adapter for limited printer support for these printers: MK3S(+) (needs PrusaLink extension with Raspberry Pi), Mini(+), MK4(S), XL, Core One
 - Add opt-in Prometheus integration (still experimental)
 - Add opt-in Loki integration (still experimental)

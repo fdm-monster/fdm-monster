@@ -49,6 +49,7 @@
     "fdm-connector",
     "octoprint",
     "moonraker",
+    "klipper",
     "prusalink",
     "fdm",
     "3d printing",
@@ -60,7 +61,7 @@
     "tr46": "5.1.1"
   },
   "dependencies": {
-    "@fdm-monster/client": "1.10.3",
+    "@fdm-monster/client": "1.11.0",
     "@fdm-monster/client-next": "0.0.21",
     "@octokit/plugin-throttling": "8.2.0",
     "@sentry/node": "9.19.0",
