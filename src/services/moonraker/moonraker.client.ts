@@ -356,6 +356,7 @@ export class MoonrakerClient {
   async postServerFileUpload(
     login: LoginDto,
     multerFileOrBuffer: Buffer | Express.Multer.File,
+    startPrint: boolean,
     progressToken?: string,
     root?: string,
     path?: string,
@@ -371,7 +372,9 @@ export class MoonrakerClient {
     if (checksum?.length) {
       formData.append("checksum", checksum);
     }
-    formData.append("print", "true");
+    if (startPrint) {
+      formData.append("print", "true");
+    }
 
     let fileBuffer: ArrayBufferLike | ReadStream = (multerFileOrBuffer as Buffer).buffer;
     const filename = (multerFileOrBuffer as Express.Multer.File).originalname;

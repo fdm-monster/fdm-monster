@@ -1,11 +1,12 @@
 import { before, DELETE, GET, POST, route } from "awilix-express";
-import { authenticate, permission, authorizeRoles } from "@/middleware/authenticate";
+import { authenticate, authorizeRoles, permission } from "@/middleware/authenticate";
 import { validateInput } from "@/handlers/validators";
 import { AppConstants } from "@/server.constants";
 import {
   downloadFileSchema,
   getFileSchema,
   startPrintFileSchema,
+  uploadFileSchema,
 } from "./validation/printer-files-controller.validation";
 import { ValidationException } from "@/exceptions/runtime.exceptions";
 import { printerResolveMiddleware } from "@/middleware/printer";
@@ -198,6 +199,11 @@ export class PrinterFilesController {
       AppConstants.defaultAcceptedGcodeExtensions,
       true,
     );
+
+    // Multer has loaded the formdata
+    const { startPrint: startPrintString } = await validateInput(req.body, uploadFileSchema);
+    const startPrint = startPrintString === "true";
+
     if (!files?.length) {
       throw new ValidationException({
         error: `No file was available for upload. Did you upload files with one of these extensions: ${AppConstants.defaultAcceptedGcodeExtensions.join(
@@ -220,7 +226,7 @@ export class PrinterFilesController {
     const uploadedFile = files[0];
     const token = this.multerService.startTrackingSession(uploadedFile, currentPrinterId);
 
-    await this.printerApi.uploadFile(uploadedFile, token).catch((e) => {
+    await this.printerApi.uploadFile(uploadedFile, startPrint, token).catch((e) => {
       try {
         this.multerService.clearUploadedFile(uploadedFile);
       } catch (e) {

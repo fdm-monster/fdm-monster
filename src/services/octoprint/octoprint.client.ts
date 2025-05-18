@@ -205,16 +205,14 @@ export class OctoprintClient extends OctoprintRoutes {
   async uploadFileAsMultiPart(
     login: LoginDto,
     multerFileOrBuffer: Buffer | Express.Multer.File,
-    commands: any,
+    startPrint: boolean,
     progressToken?: string,
   ) {
     const urlPath = this.apiFilesLocal;
 
     const formData = new FormData();
-    if (commands.select) {
-      formData.append("select", "true");
-    }
-    if (commands.print) {
+    if (startPrint) {
+      // select is implicit
       formData.append("print", "true");
     }
 

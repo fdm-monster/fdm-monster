@@ -153,8 +153,8 @@ export class MoonrakerApi implements IPrinterApi {
     return await this.client.getServerFilesDownloadChunk(this.login, "gcodes", path, startBytes, endBytes);
   }
 
-  async uploadFile(fileOrBuffer: Buffer | Express.Multer.File, uploadToken?: string) {
-    await this.client.postServerFileUpload(this.login, fileOrBuffer, uploadToken);
+  async uploadFile(fileOrBuffer: Buffer | Express.Multer.File, startPrint: boolean, uploadToken?: string) {
+    await this.client.postServerFileUpload(this.login, fileOrBuffer, startPrint, uploadToken);
   }
 
   async deleteFile(path: string) {

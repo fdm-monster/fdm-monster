@@ -194,6 +194,7 @@ export class PrusaLinkApi implements IPrinterApi {
 
   async uploadFile(
     multerFileOrBuffer: Buffer | Express.Multer.File,
+    startPrint: boolean,
     progressToken?: string,
   ): Promise<void> {
     try {
@@ -219,7 +220,7 @@ export class PrusaLinkApi implements IPrinterApi {
           // Compliance with other printer services
           "Overwrite": "?1",
           // Compliance with other printer services
-          "Print-After-Upload": "?1",
+          "Print-After-Upload": startPrint ? "?1" : "?0",
         })
           .withTimeout(this.settingsStore.getTimeoutSettings().apiUploadTimeout)
           .withOnUploadProgress((p) => {
