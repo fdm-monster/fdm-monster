@@ -6,7 +6,7 @@ describe("ServerEnv", () => {
     expect(isEnvProd()).toBe(false);
   });
 
-  it("Should patch node env when in non-docker mode", () => {
+  it("should be able to set up environment config", () => {
     process.env[AppConstants.NODE_ENV_KEY] = "ILLEGAL_MODE";
     expect(setupEnvConfig()).toBeUndefined();
   });

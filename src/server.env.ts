@@ -1,7 +1,6 @@
 import { status, up } from "migrate-mongo";
 import { join } from "path";
 import * as Sentry from "@sentry/node";
-import { config } from "dotenv";
 import { AppConstants } from "./server.constants";
 import { LoggerService as Logger } from "./handlers/logger";
 import { getEnvOrDefault, isProductionEnvironment } from "./utils/env.utils";
@@ -9,12 +8,8 @@ import { errorSummary } from "./utils/error.utils";
 import { superRootPath } from "@/utils/fs.utils";
 import { collectDefaultMetrics, register } from "prom-client";
 
-const logger = new Logger("FDM-Environment", false);
-
-// Constants and definition
 const instructionsReferralURL = "https://docs.fdm-monster.net";
 const packageJsonPath = join(superRootPath(), "./package.json");
-const dotEnvPath = join(superRootPath(), "./.env");
 
 function isEnvTest() {
   return process.env[AppConstants.NODE_ENV_KEY] === AppConstants.defaultTestEnv;
@@ -25,6 +20,8 @@ export function isEnvProd() {
 }
 
 function ensureNodeEnvSet() {
+  const logger = new Logger("FDM-Environment");
+
   const environment = process.env[AppConstants.NODE_ENV_KEY];
   if (!environment || !AppConstants.knownEnvNames.includes(environment)) {
     const newEnvName = AppConstants.defaultProductionEnv;
@@ -36,6 +33,7 @@ function ensureNodeEnvSet() {
 }
 
 function ensurePackageVersionSet() {
+  const logger = new Logger("FDM-Environment");
   const packageJsonVersion = require(packageJsonPath).version;
   process.env[AppConstants.VERSION_KEY] ??= packageJsonVersion;
 
@@ -43,10 +41,12 @@ function ensurePackageVersionSet() {
 }
 
 function printInstructionsURL() {
+  const logger = new Logger("FDM-Environment");
   logger.log(`Please make sure to read ${instructionsReferralURL} for more information.`);
 }
 
 export function fetchMongoDBConnectionString() {
+  const logger = new Logger("FDM-Environment");
   if (!process.env[AppConstants.MONGO_KEY]) {
     logger.debug(`~ ${AppConstants.MONGO_KEY} environment variable is not set. Assuming default`);
     printInstructionsURL();
@@ -66,6 +66,7 @@ export function fetchServerPort() {
 }
 
 export function ensureMongoDbConnectionStringSet() {
+  const logger = new Logger("FDM-Environment");
   const dbConnectionString = process.env[AppConstants.MONGO_KEY];
   if (!dbConnectionString) {
     fetchMongoDBConnectionString();
@@ -75,6 +76,7 @@ export function ensureMongoDbConnectionStringSet() {
 }
 
 export function setupSentry() {
+  const logger = new Logger("FDM-Environment");
   const sentryDsnToken = getEnvOrDefault(AppConstants.sentryCustomDsnToken, AppConstants.sentryCustomDsnDefault);
 
   Sentry.init({
@@ -95,6 +97,7 @@ export function setupSentry() {
 }
 
 export function ensurePortSet() {
+  const logger = new Logger("FDM-Environment");
   fetchServerPort();
 
   if (!process.env[AppConstants.SERVER_PORT_KEY]) {
@@ -104,13 +107,7 @@ export function ensurePortSet() {
   }
 }
 
-export function setupEnvConfig(skipDotEnv = false) {
-  if (!skipDotEnv) {
-    // This needs to be CWD of app.js, so be careful not to move this call.
-    config({ path: dotEnvPath });
-    logger.log("✓ Parsed environment and (optional) .env file");
-  }
-
+export function setupEnvConfig() {
   ensureNodeEnvSet();
   ensurePackageVersionSet();
   setupSentry();
@@ -125,6 +122,7 @@ export function setupEnvConfig(skipDotEnv = false) {
 }
 
 export async function runMigrations(db: any, client: any): Promise<void> {
+  const logger = new Logger("FDM-Environment");
   const migrationsStatus = await status(db);
   const pendingMigrations = migrationsStatus.filter((m) => m.appliedAt === "PENDING");
 

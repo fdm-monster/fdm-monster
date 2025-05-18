@@ -22,7 +22,7 @@ export async function setupTestApp(
   typeormService: TypeormService;
   [k: string]: any;
 }> {
-  setupEnvConfig(true);
+  setupEnvConfig();
 
   const { httpServer, container } = await setupServer();
   container.register({
