@@ -65,7 +65,7 @@ describe(OctoprintClient.name, () => {
 
   it("should not throw error on POST login", async () => {
     const reply = { session: "1234asd" };
-    nock(printerURL).post("/api/login").query("passive=true").reply(200, reply);
+    nock(printerURL).post("/api/login").reply(200, reply);
 
     const result = await octoprintClient.login(auth);
     expect(result.data).toStrictEqual(reply);

@@ -108,7 +108,7 @@ export interface IPrinterApi {
 
   getFileChunk(path: string, startBytes: number, endBytes: number): AxiosPromise<string>;
 
-  uploadFile(fileOrBuffer: Buffer | Express.Multer.File, uploadToken?: string): Promise<void>;
+  uploadFile(fileOrBuffer: Buffer | Express.Multer.File, startPrint: boolean, uploadToken?: string): Promise<void>;
 
   deleteFile(path: string): Promise<void>;
 

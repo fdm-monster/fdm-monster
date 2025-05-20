@@ -19,7 +19,7 @@ export class OctoprintRoutes {
   apiSystemCommands = `${this.apiSystem}/commands`;
   apiServerRestartCommand = `${this.apiSystemCommands}/core/restart`;
   apiUsers = `${this.apiBase}/users`;
-  apiLogin = `${this.apiBase}/login?passive=true`;
+  apiLogin = `${this.apiBase}/login`;
 
   get disconnectCommand() {
     return { command: "disconnect" };

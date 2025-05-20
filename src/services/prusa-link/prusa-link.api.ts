@@ -23,6 +23,7 @@ import { uploadDoneEvent, uploadFailedEvent, uploadProgressEvent } from "@/const
 import { ExternalServiceError } from "@/exceptions/runtime.exceptions";
 import EventEmitter2 from "eventemitter2";
 import { PL_FileDto } from "@/services/prusa-link/dto/file.dto";
+import { SettingsStore } from "@/state/settings.store";
 
 const defaultLog = { adapter: "prusa-link" };
 
@@ -39,6 +40,7 @@ export class PrusaLinkApi implements IPrinterApi {
     loggerFactory: ILoggerFactory,
     private readonly eventEmitter2: EventEmitter2,
     private readonly httpClientFactory: HttpClientFactory,
+    private readonly settingsStore: SettingsStore,
     private printerLogin: LoginDto,
   ) {
     this.logger = loggerFactory(PrusaLinkApi.name);
@@ -192,6 +194,7 @@ export class PrusaLinkApi implements IPrinterApi {
 
   async uploadFile(
     multerFileOrBuffer: Buffer | Express.Multer.File,
+    startPrint: boolean,
     progressToken?: string,
   ): Promise<void> {
     try {
@@ -217,8 +220,9 @@ export class PrusaLinkApi implements IPrinterApi {
           // Compliance with other printer services
           "Overwrite": "?1",
           // Compliance with other printer services
-          "Print-After-Upload": "?1",
+          "Print-After-Upload": startPrint ? "?1" : "?0",
         })
+          .withTimeout(this.settingsStore.getTimeoutSettings().apiUploadTimeout)
           .withOnUploadProgress((p) => {
             if (progressToken) {
               this.eventEmitter2.emit(`${uploadProgressEvent(progressToken)}`, progressToken, p);

@@ -20,7 +20,7 @@
     </a>
 </p>
 
-FDM Monster is a server for managing your 3D printer farm through [OctoPrint](https://octoprint.org/) as well as [Klipper](https://www.klipper3d.org/) using [Moonraker](https://github.com/Arksine/moonraker).
+FDM Monster is a server for managing your 3D printer farm through [OctoPrint](https://octoprint.org/) as well as [Klipper](https://www.klipper3d.org/) using [Moonraker](https://github.com/Arksine/moonraker) and [Prusa-Link](https://github.com/prusa3d/Prusa-Link).
 
 ## Check out our [documentation](https://docs.fdm-monster.net)
 
@@ -29,7 +29,7 @@ FDM Monster is a server for managing your 3D printer farm through [OctoPrint](ht
 ## Features 🖨️
 Here is a list of features that make FDM Monster stand out:
 
-- Adding OctoPrint and Moonraker instances
+- Adding OctoPrint, Moonraker and Prusa-Link instances
 - Dragging or creating new printers on a customizable grid
 - Drag n drop GCode to print
 - Select printers and print one GCode file in batch 

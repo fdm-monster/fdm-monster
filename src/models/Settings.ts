@@ -2,6 +2,7 @@ import { model, Schema } from "mongoose";
 import {
   credentialSettingsKey,
   frontendSettingKey,
+  getDefaultTimeout,
   printerFileCleanSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
@@ -47,6 +48,7 @@ export interface IFrontendSettings {
 
 export interface ITimeoutSettings {
   apiTimeout: number;
+  apiUploadTimeout: number;
 }
 
 export interface ISettings<KeyType = MongoIdType> {
@@ -179,7 +181,12 @@ const SettingsSchema = new Schema<ISettings>({
   [timeoutSettingKey]: {
     apiTimeout: {
       type: Number,
-      default: 1000,
+      default: getDefaultTimeout().apiTimeout,
+      required: true,
+    },
+    apiUploadTimeout: {
+      type: Number,
+      default: getDefaultTimeout().apiUploadTimeout,
       required: true,
     },
   },

@@ -178,7 +178,9 @@ describe(PrinterFilesController.name, () => {
       .query("recursive=false")
       .reply(200, { files: [], free: 1, total: 1 });
 
-    const response = await request.post(uploadFileRoute(printer.id)).attach("file", gcodePath);
+    const response = await request.post(uploadFileRoute(printer.id))
+      .field("startPrint", "true")
+      .attach("file", gcodePath);
     expectOkResponse(response);
   });
 

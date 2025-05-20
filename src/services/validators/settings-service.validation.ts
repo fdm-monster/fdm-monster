@@ -13,6 +13,7 @@ export const serverSettingsUpdateSchema = z.object({
 
 export const timeoutSettingsUpdateSchema = z.object({
   apiTimeout: z.number().int().min(1000),
+  apiUploadTimeout: z.number().int().min(10000),
 });
 
 export const frontendSettingsUpdateSchema = z.object({

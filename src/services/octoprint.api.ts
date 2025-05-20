@@ -106,8 +106,8 @@ export class OctoprintApi implements IPrinterApi {
     return await this.client.getFileChunk(this.login, path, startBytes, endBytes);
   }
 
-  async uploadFile(fileOrBuffer: Buffer | Express.Multer.File, uploadToken?: string) {
-    await this.client.uploadFileAsMultiPart(this.login, fileOrBuffer, { select: true, print: true }, uploadToken);
+  async uploadFile(fileOrBuffer: Buffer | Express.Multer.File, startPrint: boolean, uploadToken?: string) {
+    await this.client.uploadFileAsMultiPart(this.login, fileOrBuffer, startPrint, uploadToken);
   }
 
   async deleteFile(path: string) {

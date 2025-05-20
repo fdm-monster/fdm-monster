@@ -81,6 +81,7 @@ import { HttpClientFactory } from "@/services/core/http-client.factory";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { ExternalServiceError } from "@/exceptions/runtime.exceptions";
+import { SettingsStore } from "@/state/settings.store";
 
 export class MoonrakerClient {
   protected logger: LoggerService;
@@ -89,6 +90,7 @@ export class MoonrakerClient {
     loggerFactory: ILoggerFactory,
     private readonly httpClientFactory: HttpClientFactory,
     private readonly eventEmitter2: EventEmitter2,
+    private readonly settingsStore: SettingsStore,
   ) {
     this.logger = loggerFactory(MoonrakerClient.name);
   }
@@ -354,6 +356,7 @@ export class MoonrakerClient {
   async postServerFileUpload(
     login: LoginDto,
     multerFileOrBuffer: Buffer | Express.Multer.File,
+    startPrint: boolean,
     progressToken?: string,
     root?: string,
     path?: string,
@@ -369,7 +372,9 @@ export class MoonrakerClient {
     if (checksum?.length) {
       formData.append("checksum", checksum);
     }
-    formData.append("print", "true");
+    if (startPrint) {
+      formData.append("print", "true");
+    }
 
     let fileBuffer: ArrayBufferLike | ReadStream = (multerFileOrBuffer as Buffer).buffer;
     const filename = (multerFileOrBuffer as Express.Multer.File).originalname;
@@ -394,6 +399,7 @@ export class MoonrakerClient {
     try {
       const response = await this.createClient(login, (b) => {
         b.withMultiPartFormData()
+          .withTimeout(this.settingsStore.getTimeoutSettings().apiUploadTimeout)
           .withHeaders({
             ...formData.getHeaders(),
             "Content-Length": result.toString(),
@@ -795,7 +801,7 @@ export class MoonrakerClient {
   }
 
   /**
-   * @deprecated API might not be available in the future
+   * @description API might not be available in the future
    * @param login
    */
   async getApiVersion(login: LoginDto) {
@@ -803,7 +809,7 @@ export class MoonrakerClient {
   }
 
   /**
-   * @deprecated API might not be available in the future
+   * @description API might not be available in the future
    * @param login
    */
   async getServerVersion(login: LoginDto) {
@@ -811,7 +817,7 @@ export class MoonrakerClient {
   }
 
   /**
-   * @deprecated API might not be available in the future
+   * @description API might not be available in the future
    * @param login
    */
   async getApiLogin(login: LoginDto) {

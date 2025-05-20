@@ -1,6 +1,25 @@
 # Develop
 
+# FDM Monster 1.9.0
+
 ## Features
+
+- Introduce separate upload timeout setting for better control and resilience
+- Ability to add startPrint to specify print or not after upload
+
+## Fixes
+
+- OctoPrint 1.8.7 needs explicit passive flag in body instead of header to login
+- PrusaLink subfeature was not added to printer type feature (new client packaged)
+- Improve Moonraker error logging
+- Make colored logs opt-in with "ENABLE_COLORED_LOGS: true" env var
+- SocketIO gateway logs errors more explicitly
+- Logger is now static, reducing memory usage and test duration
+
+# FDM Monster 1.9.0-rc1
+
+## Features
+
 - Introduce PrusaLink adapter for limited printer support for these printers: MK3S(+) (needs PrusaLink extension with Raspberry Pi), Mini(+), MK4(S), XL, Core One
 - Add opt-in Prometheus integration (still experimental)
 - Add opt-in Loki integration (still experimental)
