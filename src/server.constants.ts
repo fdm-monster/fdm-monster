@@ -11,6 +11,7 @@ export const AppConstants = {
 
   // @Deprecated: old storage path
   defaultFileStorageFolder: "./media",
+  defaultQueueFolder: "./media/queue",
   defaultLogsFolder: "./media/logs",
   defaultLogZipsFolder: "./media/log-zips",
   // New place for all downloads, files etc

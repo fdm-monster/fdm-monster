@@ -27,5 +27,7 @@ export class ServerTasks {
     registerTask(DITokens.printerWebsocketTask, TaskPresets.PERIODIC, 2000, true),
     // Every 15 seconds
     registerTask(DITokens.printerWebsocketRestoreTask, TaskPresets.PERIODIC, 15 * 1000, false),
+    // Every 5 minutes
+    registerTask(DITokens.queueCleanupTask, TaskPresets.PERIODIC, 5 * 60 * 1000, true),
   ];
 }

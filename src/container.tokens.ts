@@ -47,8 +47,6 @@ export const DITokens = {
   printerApiFactory: "printerApiFactory",
   printerLogin: "printerLogin",
   batchCallService: "batchCallService",
-  influxDbV2BaseService: "influxDbV2BaseService",
-  systemInfoBundleService: "systemInfoBundleService",
   customGCodeService: "customGCodeService",
   // Stores
   floorStore: "floorStore",
@@ -74,4 +72,8 @@ export const DITokens = {
   printerWebsocketTask: "printerWebsocketTask",
   printerWebsocketRestoreTask: "printerWebsocketRestoreTask",
   printerFileCleanTask: "printerFileCleanTask",
+  queueService: "queueService",
+  queueState: "queueState",
+  queueController: "queueController",
+  queueCleanupTask: "queueCleanupTask",
 } as const;

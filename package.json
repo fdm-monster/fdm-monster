@@ -40,7 +40,7 @@
     "test:cov-sqlite": "cross-env MONGODB_MODE=false jest --forceExit --coverage  --maxConcurrency=8 --runInBand ",
     "cov:show": "./coverage/lcov-report/index.html",
     "torm": "ts-node --swc -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
-    "typeorm:generate": "yarn torm migration:generate -d src/data-source.ts --pretty src/migrations/AddPrinterUsernamePassword",
+    "typeorm:generate": "yarn torm migration:generate -d src/data-source.ts --pretty src/migrations/AddQueueTable",
     "typeorm:migrate": "yarn torm migration:run -d src/data-source.ts",
     "typeorm:revert": "yarn torm migration:revert -d src/data-source.ts"
   },
@@ -137,6 +137,7 @@
     "nock": "13.5.6",
     "supertest": "7.1.1",
     "ts-node": "10.9.2",
+    "tsconfig-paths": "4.2.0",
     "typescript": "5.8.3"
   },
   "ignore-engines": false,

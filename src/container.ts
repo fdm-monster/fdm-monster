@@ -76,6 +76,11 @@ import { HttpClientFactory } from "@/services/core/http-client.factory";
 import { CradleService } from "@/services/core/cradle.service";
 import { PrusaLinkApi } from "@/services/prusa-link/prusa-link.api";
 import { PrusaLinkHttpPollingAdapter } from "@/services/prusa-link/prusa-link-http-polling.adapter";
+import { MongooseQueueService } from './services/mongoose/queue.service';
+import { TypeOrmQueueService } from './services/orm/queue.service';
+import { QueueState } from './state/queue.state';
+import { QueueController } from './controllers/queue.controller';
+import { QueueCleanupTask } from './tasks/queue-cleanup.task';
 
 export function config<T1, T2>(
   key: string,
@@ -195,16 +200,19 @@ export function configureContainer(isSqlite: boolean = false) {
     [di.moonrakerClient]: asClass(MoonrakerClient).singleton(),
     [di.moonrakerWebsocketAdapter]: asClass(MoonrakerWebsocketAdapter).transient(), // Transient on purpose
     [di.batchCallService]: asClass(BatchCallService).singleton(),
-
-    [di.floorStore]: asClass(FloorStore).singleton(),
-    [di.printerThumbnailCache]: asClass(PrinterThumbnailCache).singleton(),
     [di.fileCache]: asClass(FileCache).singleton(),
     [di.fileUploadTrackerCache]: asClass(FileUploadTrackerCache).singleton(),
-    [di.printerFilesStore]: asClass(PrinterFilesStore).singleton(),
     [di.printerCache]: asClass(PrinterCache).singleton(),
     [di.printerEventsCache]: asClass(PrinterEventsCache).singleton(),
+    [di.printerThumbnailCache]: asClass(PrinterThumbnailCache).singleton(),
     [di.printerSocketStore]: asClass(PrinterSocketStore).singleton(),
     [di.testPrinterSocketStore]: asClass(TestPrinterSocketStore).singleton(),
+    [di.printerFilesStore]: asClass(PrinterFilesStore).singleton(),
+    [di.floorStore]: asClass(FloorStore).singleton(),
+    [di.queueState]: asClass(QueueState).singleton(),
+    [di.queueController]: asClass(QueueController).singleton(),
+    [di.queueCleanupTask]: asClass(QueueCleanupTask).singleton(),
+    ...config(di.queueService, isSqlite, asClass(TypeOrmQueueService).singleton(), asClass(MongooseQueueService).singleton()),
 
     [di.bootTask]: asClass(BootTask),
     [di.softwareUpdateTask]: asClass(SoftwareUpdateTask), // Provided SSE handlers (couplers) shared with controllers

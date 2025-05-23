@@ -24,6 +24,8 @@ import { ChangeRoleNameUnique1713300747465 } from "@/migrations/1713300747465-Ch
 import { RemovePrinterFile1720338804844 } from "@/migrations/1720338804844-RemovePrinterFile";
 import { AddPrinterType1713897879622 } from "@/migrations/1713897879622-AddPrinterType";
 import { AddPrinterUsernamePassword1745141688926 } from "@/migrations/1745141688926-AddPrinterUsernamePassword";
+import { Queue } from "./entities/queue.entity";
+import { AddQueueTable1748027149287 } from "./migrations/1748027149287-AddQueueTable";
 
 if (process.env.NODE_ENV !== "test") {
   dotenv.config({
@@ -55,6 +57,7 @@ export const AppDataSource = new DataSource({
     UserRole,
     Group,
     PrinterGroup,
+    Queue
   ],
   migrations: [
     InitSqlite1706829146617,
@@ -64,6 +67,7 @@ export const AppDataSource = new DataSource({
     RemovePrinterFile1720338804844,
     AddPrinterType1713897879622,
     AddPrinterUsernamePassword1745141688926,
+    AddQueueTable1748027149287,
   ],
   subscribers: [],
 });
