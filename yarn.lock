@@ -1108,7 +1108,7 @@ __metadata:
     winston: "npm:3.17.0"
     winston-loki: "npm:6.1.3"
     ws: "npm:8.18.2"
-    zod: "npm:3.25.23"
+    zod: "npm:3.25.27"
   bin:
     fdm-monster: dist/index.js
     fdmm: dist/index.js
@@ -10156,9 +10156,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:3.25.23":
-  version: 3.25.23
-  resolution: "zod@npm:3.25.23"
-  checksum: 10c0/c0a9d1b215ead64fdd1f3be47bc7376be6016472ae5bd1ef56d0a579d544b785b5e266dbd30947172e5b92873b7a8bed123625eeb00aea4e5d7526d86a5a31f6
+"zod@npm:3.25.27":
+  version: 3.25.27
+  resolution: "zod@npm:3.25.27"
+  checksum: 10c0/7375eec52d08f188da62a35c50b78d108ede6c762359997df02c6c31820744d4938926053aeb54b51cfc892c51d31b263de2a2e923f3963a673e3dec2daf2b82
   languageName: node
   linkType: hard
