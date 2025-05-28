@@ -1077,7 +1077,7 @@ __metadata:
     dotenv: "npm:16.5.0"
     eventemitter2: "npm:6.4.9"
     express: "npm:4.21.2"
-    express-list-routes: "npm:1.2.4"
+    express-list-routes: "npm:1.3.1"
     form-data: "npm:4.0.2"
     helmet: "npm:8.1.0"
     jest: "npm:29.7.0"
@@ -5604,10 +5604,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"express-list-routes@npm:1.2.4":
-  version: 1.2.4
-  resolution: "express-list-routes@npm:1.2.4"
-  checksum: 10c0/fa050550b09794ea8a68ae86fe495a3f507b687e1da9af02db4936caf61bda9d7a584e14f293065afa23b522ab22bbecf456416702963185330851af49c34c79
+"express-list-routes@npm:1.3.1":
+  version: 1.3.1
+  resolution: "express-list-routes@npm:1.3.1"
+  checksum: 10c0/1997de08afa5967ea413d71b1073b4ad2718654c320f51d2051b13bcde8ab23a7d11d220d462f808eb6e5fe51bf0f55baec018baa00674a1c93aeea33b677d4f
   languageName: node
   linkType: hard
 
