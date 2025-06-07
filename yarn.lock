@@ -1068,7 +1068,7 @@ __metadata:
     "@types/lodash": "npm:4.17.17"
     "@types/luxon": "npm:3.6.2"
     "@types/migrate-mongo": "npm:10.0.5"
-    "@types/multer": "npm:1.4.12"
+    "@types/multer": "npm:1.4.13"
     "@types/node": "npm:22.15.30"
     "@types/passport-anonymous": "npm:1.0.5"
     "@types/passport-jwt": "npm:4.0.1"
@@ -3700,12 +3700,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/multer@npm:1.4.12":
-  version: 1.4.12
-  resolution: "@types/multer@npm:1.4.12"
+"@types/multer@npm:1.4.13":
+  version: 1.4.13
+  resolution: "@types/multer@npm:1.4.13"
   dependencies:
     "@types/express": "npm:*"
-  checksum: 10c0/1250a32a66b7c5929cc5b005dae4ad0768ded9b6b52ba6f90931ff39b4ed775b09a0fd9d880f0836bcac16a9a7febed6a479c6bf108a52a244c4c53badb82a7b
+  checksum: 10c0/aed716fdc0bc8c5bfe6689bfe6569b6743b64be795140e80cab169bfe43f687027880b7fc401fca98f820dd464ad5986093ec322d865116eb31ce29a3361c469
   languageName: node
   linkType: hard
 
