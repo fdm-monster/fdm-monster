@@ -5377,9 +5377,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.5.160":
-  version: 1.5.169
-  resolution: "electron-to-chromium@npm:1.5.169"
-  checksum: 10c0/942b0fe95e05df8ae6c4a76e36a94788659927a9f7d4d718defbfff34153b98e9f9d8e028f424535a578a9775029442c1832ec681a4c0a85fdf76f3fa0360d75
+  version: 1.5.170
+  resolution: "electron-to-chromium@npm:1.5.170"
+  checksum: 10c0/138c6d293b310729f7550f6d36ae4b2bdd0453220e8b11d8780395cf38c9ae816b1f30a3978d790f1951cfa89e7c7911af4a779094c33ae167c89c7ba6751834
   languageName: node
   linkType: hard
 
@@ -8211,9 +8211,9 @@ __metadata:
   linkType: hard
 
 "pg-protocol@npm:*":
-  version: 1.10.0
-  resolution: "pg-protocol@npm:1.10.0"
-  checksum: 10c0/7d0d64fe9df50262d907fd476454e1e36f41f5f66044c3ba6aa773fb8add1d350a9c162306e5c33e99bdfbdcc1140dd4ca74f66eda41d0aaceb5853244dcdb65
+  version: 1.10.1
+  resolution: "pg-protocol@npm:1.10.1"
+  checksum: 10c0/f684e4aaae52b296139b5ee573819e5eedbdd09c5dc4616a139da2034716f0bd83e30ab478ad688415e4bc77b5e59335f4e1b41b4890472541b12e217c375adb
   languageName: node
   linkType: hard
 
