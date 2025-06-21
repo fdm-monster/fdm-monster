@@ -307,8 +307,8 @@ __metadata:
   linkType: hard
 
 "@aws-sdk/credential-providers@npm:^3.186.0":
-  version: 3.830.0
-  resolution: "@aws-sdk/credential-providers@npm:3.830.0"
+  version: 3.834.0
+  resolution: "@aws-sdk/credential-providers@npm:3.834.0"
   dependencies:
     "@aws-sdk/client-cognito-identity": "npm:3.830.0"
     "@aws-sdk/core": "npm:3.826.0"
@@ -329,7 +329,7 @@ __metadata:
     "@smithy/property-provider": "npm:^4.0.4"
     "@smithy/types": "npm:^4.3.1"
     tslib: "npm:^2.6.2"
-  checksum: 10c0/6b1fe53115ce04e549f7dc0c049403c4d4da5a9c5992b497e0fc56a06026b3bdaca921ddef4da02936341ed5b7e2a5a964a77eb8c1b36da4f9332488911fff92
+  checksum: 10c0/7ea7d07e26f2bc7827c449b66d2d9051b27825568b6bbc3422bb41cf60cd968f51733b9a3da6bd859cad229b40083257e7a0c6d7f359e3e676f4f109f45e5181
   languageName: node
   linkType: hard
 
@@ -4798,9 +4798,9 @@ __metadata:
   linkType: hard
 
 "caniuse-lite@npm:^1.0.30001718":
-  version: 1.0.30001723
-  resolution: "caniuse-lite@npm:1.0.30001723"
-  checksum: 10c0/e019503061759b96017c4d27ddd7ca1b48533eabcd0431b51d2e3156f99f6b031075e46c279c0db63424cdfc874bba992caec2db51b922a0f945e686246886f6
+  version: 1.0.30001724
+  resolution: "caniuse-lite@npm:1.0.30001724"
+  checksum: 10c0/ed9ec0bcf619f0e7ef2d33aac74d2346d1faf52060dfded1fb9c32d87854de5c2988b3ba338c281034c88bf797d6b55468a804ce8396a7e16a48cb0d481d4bfe
   languageName: node
   linkType: hard
 
