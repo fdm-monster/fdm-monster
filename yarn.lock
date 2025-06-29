@@ -905,7 +905,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biomejs/biome@npm:2.0.6":
+"@biomejs/biome@npm:2.0.6, @biomejs/biome@npm:^2.0.5":
   version: 2.0.6
   resolution: "@biomejs/biome@npm:2.0.6"
   dependencies:
@@ -3719,11 +3719,11 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:*, @types/node@npm:>=10.0.0, @types/node@npm:>=13.7.0":
-  version: 24.0.6
-  resolution: "@types/node@npm:24.0.6"
+  version: 24.0.7
+  resolution: "@types/node@npm:24.0.7"
   dependencies:
     undici-types: "npm:~7.8.0"
-  checksum: 10c0/17f976364358f85294912e04f0de147da6ba5ce3fe495b758df58458241f110475905cd0bb4ace373e9c44a0a7927202043bf0501cc1f7644306bde310c62650
+  checksum: 10c0/be3849816dafc54ec79e6be6dafcf60bdb6466beaf0081b941142d260e2b2864855210dfe5b4395c59b276468528695aefcf4f060ac95cc433b2968e80a311f9
   languageName: node
   linkType: hard
 
@@ -9440,12 +9440,13 @@ __metadata:
   linkType: hard
 
 "token-types@npm:^6.0.0":
-  version: 6.0.0
-  resolution: "token-types@npm:6.0.0"
+  version: 6.0.1
+  resolution: "token-types@npm:6.0.1"
   dependencies:
+    "@biomejs/biome": "npm:^2.0.5"
     "@tokenizer/token": "npm:^0.3.0"
     ieee754: "npm:^1.2.1"
-  checksum: 10c0/5bf5eba51d63f71f301659ff70ce10ca43e7038364883437d8b4541cc98377e3e56109b11720e25fe51047014efaccdff90eaf6de9a78270483578814b838ab9
+  checksum: 10c0/2e68f252fe540001e570b4dc7753c205e11f30e0dffb99f879b4e76d7d91e65ca81a5ca6f2b66bcff710f7a86b0a0118938c40d094d63e3090985b6d9d5c13f8
   languageName: node
   linkType: hard
 
