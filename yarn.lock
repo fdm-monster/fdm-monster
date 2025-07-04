@@ -1491,138 +1491,138 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@napi-rs/nice-android-arm-eabi@npm:1.0.1":
-  version: 1.0.1
-  resolution: "@napi-rs/nice-android-arm-eabi@npm:1.0.1"
+"@napi-rs/nice-android-arm-eabi@npm:1.0.2":
+  version: 1.0.2
+  resolution: "@napi-rs/nice-android-arm-eabi@npm:1.0.2"
   conditions: os=android & cpu=arm
   languageName: node
   linkType: hard
 
-"@napi-rs/nice-android-arm64@npm:1.0.1":
-  version: 1.0.1
-  resolution: "@napi-rs/nice-android-arm64@npm:1.0.1"
+"@napi-rs/nice-android-arm64@npm:1.0.2":
+  version: 1.0.2
+  resolution: "@napi-rs/nice-android-arm64@npm:1.0.2"
   conditions: os=android & cpu=arm64
   languageName: node
   linkType: hard
 
-"@napi-rs/nice-darwin-arm64@npm:1.0.1":
-  version: 1.0.1
-  resolution: "@napi-rs/nice-darwin-arm64@npm:1.0.1"
+"@napi-rs/nice-darwin-arm64@npm:1.0.2":
+  version: 1.0.2
+  resolution: "@napi-rs/nice-darwin-arm64@npm:1.0.2"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@napi-rs/nice-darwin-x64@npm:1.0.1":
-  version: 1.0.1
-  resolution: "@napi-rs/nice-darwin-x64@npm:1.0.1"
+"@napi-rs/nice-darwin-x64@npm:1.0.2":
+  version: 1.0.2
+  resolution: "@napi-rs/nice-darwin-x64@npm:1.0.2"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@napi-rs/nice-freebsd-x64@npm:1.0.1":
-  version: 1.0.1
-  resolution: "@napi-rs/nice-freebsd-x64@npm:1.0.1"
+"@napi-rs/nice-freebsd-x64@npm:1.0.2":
+  version: 1.0.2
+  resolution: "@napi-rs/nice-freebsd-x64@npm:1.0.2"
   conditions: os=freebsd & cpu=x64
   languageName: node
   linkType: hard
 
-"@napi-rs/nice-linux-arm-gnueabihf@npm:1.0.1":
-  version: 1.0.1
-  resolution: "@napi-rs/nice-linux-arm-gnueabihf@npm:1.0.1"
+"@napi-rs/nice-linux-arm-gnueabihf@npm:1.0.2":
+  version: 1.0.2
+  resolution: "@napi-rs/nice-linux-arm-gnueabihf@npm:1.0.2"
   conditions: os=linux & cpu=arm
   languageName: node
   linkType: hard
 
-"@napi-rs/nice-linux-arm64-gnu@npm:1.0.1":
-  version: 1.0.1
-  resolution: "@napi-rs/nice-linux-arm64-gnu@npm:1.0.1"
+"@napi-rs/nice-linux-arm64-gnu@npm:1.0.2":
+  version: 1.0.2
+  resolution: "@napi-rs/nice-linux-arm64-gnu@npm:1.0.2"
   conditions: os=linux & cpu=arm64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@napi-rs/nice-linux-arm64-musl@npm:1.0.1":
-  version: 1.0.1
-  resolution: "@napi-rs/nice-linux-arm64-musl@npm:1.0.1"
+"@napi-rs/nice-linux-arm64-musl@npm:1.0.2":
+  version: 1.0.2
+  resolution: "@napi-rs/nice-linux-arm64-musl@npm:1.0.2"
   conditions: os=linux & cpu=arm64 & libc=musl
   languageName: node
   linkType: hard
 
-"@napi-rs/nice-linux-ppc64-gnu@npm:1.0.1":
-  version: 1.0.1
-  resolution: "@napi-rs/nice-linux-ppc64-gnu@npm:1.0.1"
+"@napi-rs/nice-linux-ppc64-gnu@npm:1.0.2":
+  version: 1.0.2
+  resolution: "@napi-rs/nice-linux-ppc64-gnu@npm:1.0.2"
   conditions: os=linux & cpu=ppc64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@napi-rs/nice-linux-riscv64-gnu@npm:1.0.1":
-  version: 1.0.1
-  resolution: "@napi-rs/nice-linux-riscv64-gnu@npm:1.0.1"
+"@napi-rs/nice-linux-riscv64-gnu@npm:1.0.2":
+  version: 1.0.2
+  resolution: "@napi-rs/nice-linux-riscv64-gnu@npm:1.0.2"
   conditions: os=linux & cpu=riscv64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@napi-rs/nice-linux-s390x-gnu@npm:1.0.1":
-  version: 1.0.1
-  resolution: "@napi-rs/nice-linux-s390x-gnu@npm:1.0.1"
+"@napi-rs/nice-linux-s390x-gnu@npm:1.0.2":
+  version: 1.0.2
+  resolution: "@napi-rs/nice-linux-s390x-gnu@npm:1.0.2"
   conditions: os=linux & cpu=s390x & libc=glibc
   languageName: node
   linkType: hard
 
-"@napi-rs/nice-linux-x64-gnu@npm:1.0.1":
-  version: 1.0.1
-  resolution: "@napi-rs/nice-linux-x64-gnu@npm:1.0.1"
+"@napi-rs/nice-linux-x64-gnu@npm:1.0.2":
+  version: 1.0.2
+  resolution: "@napi-rs/nice-linux-x64-gnu@npm:1.0.2"
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@napi-rs/nice-linux-x64-musl@npm:1.0.1":
-  version: 1.0.1
-  resolution: "@napi-rs/nice-linux-x64-musl@npm:1.0.1"
+"@napi-rs/nice-linux-x64-musl@npm:1.0.2":
+  version: 1.0.2
+  resolution: "@napi-rs/nice-linux-x64-musl@npm:1.0.2"
   conditions: os=linux & cpu=x64 & libc=musl
   languageName: node
   linkType: hard
 
-"@napi-rs/nice-win32-arm64-msvc@npm:1.0.1":
-  version: 1.0.1
-  resolution: "@napi-rs/nice-win32-arm64-msvc@npm:1.0.1"
+"@napi-rs/nice-win32-arm64-msvc@npm:1.0.2":
+  version: 1.0.2
+  resolution: "@napi-rs/nice-win32-arm64-msvc@npm:1.0.2"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
-"@napi-rs/nice-win32-ia32-msvc@npm:1.0.1":
-  version: 1.0.1
-  resolution: "@napi-rs/nice-win32-ia32-msvc@npm:1.0.1"
+"@napi-rs/nice-win32-ia32-msvc@npm:1.0.2":
+  version: 1.0.2
+  resolution: "@napi-rs/nice-win32-ia32-msvc@npm:1.0.2"
   conditions: os=win32 & cpu=ia32
   languageName: node
   linkType: hard
 
-"@napi-rs/nice-win32-x64-msvc@npm:1.0.1":
-  version: 1.0.1
-  resolution: "@napi-rs/nice-win32-x64-msvc@npm:1.0.1"
+"@napi-rs/nice-win32-x64-msvc@npm:1.0.2":
+  version: 1.0.2
+  resolution: "@napi-rs/nice-win32-x64-msvc@npm:1.0.2"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
 "@napi-rs/nice@npm:^1.0.1":
-  version: 1.0.1
-  resolution: "@napi-rs/nice@npm:1.0.1"
+  version: 1.0.2
+  resolution: "@napi-rs/nice@npm:1.0.2"
   dependencies:
-    "@napi-rs/nice-android-arm-eabi": "npm:1.0.1"
-    "@napi-rs/nice-android-arm64": "npm:1.0.1"
-    "@napi-rs/nice-darwin-arm64": "npm:1.0.1"
-    "@napi-rs/nice-darwin-x64": "npm:1.0.1"
-    "@napi-rs/nice-freebsd-x64": "npm:1.0.1"
-    "@napi-rs/nice-linux-arm-gnueabihf": "npm:1.0.1"
-    "@napi-rs/nice-linux-arm64-gnu": "npm:1.0.1"
-    "@napi-rs/nice-linux-arm64-musl": "npm:1.0.1"
-    "@napi-rs/nice-linux-ppc64-gnu": "npm:1.0.1"
-    "@napi-rs/nice-linux-riscv64-gnu": "npm:1.0.1"
-    "@napi-rs/nice-linux-s390x-gnu": "npm:1.0.1"
-    "@napi-rs/nice-linux-x64-gnu": "npm:1.0.1"
-    "@napi-rs/nice-linux-x64-musl": "npm:1.0.1"
-    "@napi-rs/nice-win32-arm64-msvc": "npm:1.0.1"
-    "@napi-rs/nice-win32-ia32-msvc": "npm:1.0.1"
-    "@napi-rs/nice-win32-x64-msvc": "npm:1.0.1"
+    "@napi-rs/nice-android-arm-eabi": "npm:1.0.2"
+    "@napi-rs/nice-android-arm64": "npm:1.0.2"
+    "@napi-rs/nice-darwin-arm64": "npm:1.0.2"
+    "@napi-rs/nice-darwin-x64": "npm:1.0.2"
+    "@napi-rs/nice-freebsd-x64": "npm:1.0.2"
+    "@napi-rs/nice-linux-arm-gnueabihf": "npm:1.0.2"
+    "@napi-rs/nice-linux-arm64-gnu": "npm:1.0.2"
+    "@napi-rs/nice-linux-arm64-musl": "npm:1.0.2"
+    "@napi-rs/nice-linux-ppc64-gnu": "npm:1.0.2"
+    "@napi-rs/nice-linux-riscv64-gnu": "npm:1.0.2"
+    "@napi-rs/nice-linux-s390x-gnu": "npm:1.0.2"
+    "@napi-rs/nice-linux-x64-gnu": "npm:1.0.2"
+    "@napi-rs/nice-linux-x64-musl": "npm:1.0.2"
+    "@napi-rs/nice-win32-arm64-msvc": "npm:1.0.2"
+    "@napi-rs/nice-win32-ia32-msvc": "npm:1.0.2"
+    "@napi-rs/nice-win32-x64-msvc": "npm:1.0.2"
   dependenciesMeta:
     "@napi-rs/nice-android-arm-eabi":
       optional: true
@@ -1656,7 +1656,7 @@ __metadata:
       optional: true
     "@napi-rs/nice-win32-x64-msvc":
       optional: true
-  checksum: 10c0/9be30f8292e23f45f5b8f6553411f5cbaead998cc3a51859c60f56fc2e679610a3a04ed49b748267552b9abd17fe5e6ae88186e223ab5cb93d5d184d10b6569b
+  checksum: 10c0/56e5fd75f82cc4762f35144a4b1bea1261e2ee0a1614d9162f32344d14aaed003b1802cefd6495ce1821c75fe49deaf357bf064b328ca2e7cedcfd15464cfeda
   languageName: node
   linkType: hard
 
