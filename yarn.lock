@@ -1120,7 +1120,7 @@ __metadata:
     reflect-metadata: "npm:0.2.2"
     semver: "npm:7.7.2"
     socket.io: "npm:4.8.1"
-    supertest: "npm:7.1.2"
+    supertest: "npm:7.1.3"
     toad-scheduler: "npm:3.1.0"
     ts-node: "npm:10.9.2"
     typeorm: "npm:0.3.25"
@@ -9363,13 +9363,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"supertest@npm:7.1.2":
-  version: 7.1.2
-  resolution: "supertest@npm:7.1.2"
+"supertest@npm:7.1.3":
+  version: 7.1.3
+  resolution: "supertest@npm:7.1.3"
   dependencies:
     methods: "npm:^1.1.2"
     superagent: "npm:^10.2.2"
-  checksum: 10c0/2fea5e3b50ceb7fe660b8d2ef18476f7a87d1e990c99fbce22aee3f24ef8b951178d49f64b5cbb6de6eb0abff0fa960f523382e3c23a709313e631ce167b76af
+  checksum: 10c0/3ca9ea4bf360ea79ecdd059fdb3bffcf7e10145b959913491a0fe36f17b54d09e22103e5d10dfc462bdb1f84de8794cf26b7eaf3d39de8326a8aad1c05fe9aaa
   languageName: node
   linkType: hard
 
