@@ -1095,7 +1095,7 @@ __metadata:
     cookie-parser: "npm:1.4.7"
     cors: "npm:2.8.5"
     cross-env: "npm:7.0.3"
-    dotenv: "npm:17.1.0"
+    dotenv: "npm:17.2.0"
     eventemitter2: "npm:6.4.9"
     express: "npm:4.21.2"
     express-list-routes: "npm:1.3.1"
@@ -5386,10 +5386,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv@npm:17.1.0":
-  version: 17.1.0
-  resolution: "dotenv@npm:17.1.0"
-  checksum: 10c0/abce8964f25b67582b740372a22d621209caa712e9859194c5faadb1046be69df70e5796c74fc7dc98a386d5e9d2863fed8e7fc19301cd14e02f3272c6bc6298
+"dotenv@npm:17.2.0":
+  version: 17.2.0
+  resolution: "dotenv@npm:17.2.0"
+  checksum: 10c0/d4cb5c2a09c288c921ef47a78f51c765a763266e23e84465cde6a87b28b9f7fc5a9d1fe349ed3c880b4c7297f82dd736dba5b08fe95ce53833ce4a7258d0fc43
   languageName: node
   linkType: hard
 
