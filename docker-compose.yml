@@ -1,41 +1,42 @@
 services:
-  mongodb:
-    image: mongo:8
-    container_name: mongodb
-    environment:
+  #mongodb:
+    #image: mongo:8
+    #container_name: mongodb
+    #environment:
       # Authenticated variant, comment out for non-authenticated variant:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=fdm-root
-    ports:
-      - "21111:27017"
-    volumes:
-      - ./fdm-monster:/data
-    restart: unless-stopped
+      #- MONGO_INITDB_ROOT_USERNAME=root
+      #- MONGO_INITDB_ROOT_PASSWORD=fdm-root
+    #ports:
+      #- "21111:27017"
+    #volumes:
+      #- ./fdm-monster:/data
+    #restart: unless-stopped
 
   # docker build --platform linux/amd64,linux/arm64 -t 1.5.0-alpha . -f .\docker\Dockerfile
-  fdm-monster:
-    container_name: fdm-monster
-    image: fdmmonster/fdm-monster:1.5.4
-    build:
-      context: .
-      dockerfile: docker/Dockerfile
-    restart: unless-stopped
-    deploy:
-      restart_policy:
-        delay: 5s
-        max_attempts: 3
-        window: 120s
-    ports:
-      - "4000:4000"
-    environment:
+  #fdm-monster:
+    #container_name: fdm-monster
+    #image: fdmmonster/fdm-monster:1.5.4
+    #build:
+      #context: .
+      #dockerfile: docker/Dockerfile
+    #restart: unless-stopped
+    #deploy:
+      #restart_policy:
+        #delay: 5s
+        #max_attempts: 3
+        #window: 120s
+    #ports:
+      #- "4000:4000"
+    #environment:
       # Non-authenticated variant:
 #      - MONGO=mongodb://mongodb:27017/fdm-monster
       # Authenticated variant:
-      - MONGO=mongodb://root:fdm-root@mongodb:27017/fdm-monster?authSource=admin
-      - NODE_ENV=development
-      - SERVER_PORT=4000
-    volumes:
-      - ./fdm-monster/media/:/app/media
+      #- MONGO=mongodb://root:fdm-root@mongodb:27017/fdm-monster?authSource=admin
+      #- NODE_ENV=development
+      #- SERVER_PORT=4000
+    #volumes:
+      #- /var/run/dbus:/var/run/dbus 
+      #- ./fdm-monster/media/:/app/media 
 
   fdm-monster-sqlite:
     container_name: fdm-monster-sqlite
@@ -47,9 +48,9 @@ services:
       - NODE_ENV=development
       - SERVER_PORT=4000
       # These three variables are implicit to this docker image
-      # - ENABLE_EXPERIMENTAL_TYPEORM=true
-      # - DATABASE_PATH=./database
-      # - DATABASE_FILE=fdm-monster.sqlite
+       - ENABLE_EXPERIMENTAL_TYPEORM=true
+       - DATABASE_PATH=./database
+       - DATABASE_FILE=fdm-monster.sqlite
     volumes:
       - fdmm-media:/app/media
       - fdmm-database:/app/database
@@ -72,8 +73,10 @@ services:
       - NODE_ENV=development
       - SERVER_PORT=4001
     volumes:
+      - /var/run/dbus:/var/run/dbus
       - ./fdm-monster-alpha/media/:/app/media
       - ./fdm-monster-alpha/database/:/app/database
+      - /var/run/avahi-daemon/socket:/var/run/avahi-daemon/socket
 
 volumes:
   fdmm-media:
