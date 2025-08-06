@@ -4,8 +4,8 @@ services:
     container_name: mongodb
     environment:
       # Authenticated variant, comment out for non-authenticated variant:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=fdm-root
+      - MONGO_INITDB_ROOT_USERNAME=fdmmonster
+      - MONGO_INITDB_ROOT_PASSWORD=fdmmonster
     ports:
       - "21111:27017"
     volumes:
@@ -16,12 +16,13 @@ services:
   fdm-monster:
     container_name: fdm-monster
     image: fdmmonster/fdm-monster:1.5.4
+    restart: unless-stopped
     build:
       context: .
       dockerfile: docker/Dockerfile
-    restart: unless-stopped
     deploy:
       restart_policy:
+        condition: on-failure
         delay: 5s
         max_attempts: 3
         window: 120s
@@ -29,9 +30,9 @@ services:
       - "4000:4000"
     environment:
       # Non-authenticated variant:
-#      - MONGO=mongodb://mongodb:27017/fdm-monster
+    # - MONGO=mongodb://mongodb:27017/fdm-monster
       # Authenticated variant:
-      - MONGO=mongodb://root:fdm-root@mongodb:27017/fdm-monster?authSource=admin
+      - MONGO=mongodb://fdmmonster:fdmmonster@mongodb:27017/fdm-monster?authSource=admin
       - NODE_ENV=development
       - SERVER_PORT=4000
     volumes:
@@ -39,12 +40,13 @@ services:
       - /var/run/dbus:/var/run/dbus
       - /var/run/avahi-daemon/socket:/var/run/avahi-daemon/socket
 
+
   fdm-monster-sqlite:
     container_name: fdm-monster-sqlite
     image: fdmmonster/fdm-monster:1.9.0-sqlite # -arm64
     restart: unless-stopped
     ports:
-      - "4000:4000"
+      - "4002:4002"
     environment:
       - NODE_ENV=development
       - SERVER_PORT=4000
@@ -55,6 +57,9 @@ services:
     volumes:
       - fdmm-media:/app/media
       - fdmm-database:/app/database
+      - /var/run/dbus:/var/run/dbus
+      - /var/run/avahi-daemon/socket:/var/run/avahi-daemon/socket
+
 
   fdm-monster-develop:
     container_name: fdm-monster-develop
@@ -65,6 +70,7 @@ services:
     restart: unless-stopped
     deploy:
       restart_policy:
+        condition: on-failure
         delay: 5s
         max_attempts: 3
         window: 120s
@@ -78,6 +84,7 @@ services:
       - ./fdm-monster-alpha/database/:/app/database
       - /var/run/dbus:/var/run/dbus
       - /var/run/avahi-daemon/socket:/var/run/avahi-daemon/socket
+
 
 volumes:
   fdmm-media:
