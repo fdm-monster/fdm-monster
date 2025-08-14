@@ -1004,6 +1004,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@borewit/text-codec@npm:^0.1.0":
+  version: 0.1.1
+  resolution: "@borewit/text-codec@npm:0.1.1"
+  checksum: 10c0/c92606b355111053f9db47d485c8679cc09a5be0eb2738aad5b922d3744465f2fce47144ffb27d5106fa431d1d2e5a2e0140d0a22351dccf49693098702c0274
+  languageName: node
+  linkType: hard
+
 "@colors/colors@npm:1.5.0":
   version: 1.5.0
   resolution: "@colors/colors@npm:1.5.0"
@@ -1529,13 +1536,6 @@ __metadata:
     "@jridgewell/resolve-uri": "npm:^3.1.0"
     "@jridgewell/sourcemap-codec": "npm:^1.4.14"
   checksum: 10c0/3a1516c10f44613b9ba27c37a02ff8f410893776b2b3dad20a391b51b884dd60f97bbb56936d65d2ff8fe978510a0000266654ab8426bdb9ceb5fb4585b19e23
-  languageName: node
-  linkType: hard
-
-"@kayahr/text-encoding@npm:^2.0.1":
-  version: 2.0.1
-  resolution: "@kayahr/text-encoding@npm:2.0.1"
-  checksum: 10c0/1bb7f677eaac834b63a4e30f39421c53faab515db7bff072fd8b9c5b1b5a6f1694680b9241cd0e85dbf4b61cacc62653e16130f0469fe073388afb9783faa4bc
   languageName: node
   linkType: hard
 
@@ -7403,9 +7403,9 @@ __metadata:
   linkType: hard
 
 "libphonenumber-js@npm:^1.11.1":
-  version: 1.12.10
-  resolution: "libphonenumber-js@npm:1.12.10"
-  checksum: 10c0/c348aee275c4161e289b14f2ffd0c00f2923dcd5b2cfd99415b2f5ea15fa0632adffb78c51373b3a2839416223b65452bee11cc5386d2352782e1b064aaaf0ce
+  version: 1.12.11
+  resolution: "libphonenumber-js@npm:1.12.11"
+  checksum: 10c0/af0707a093e5a7497ca4298b956adf9b43450ea71e4615c70ed91df2297602ea0f5fd98137e3bd21113c695a908dce75bd912ec7152a45e32b42865ad5a4bb00
   languageName: node
   linkType: hard
 
@@ -9706,13 +9706,13 @@ __metadata:
   linkType: hard
 
 "token-types@npm:^6.0.0":
-  version: 6.1.0
-  resolution: "token-types@npm:6.1.0"
+  version: 6.1.1
+  resolution: "token-types@npm:6.1.1"
   dependencies:
-    "@kayahr/text-encoding": "npm:^2.0.1"
+    "@borewit/text-codec": "npm:^0.1.0"
     "@tokenizer/token": "npm:^0.3.0"
     ieee754: "npm:^1.2.1"
-  checksum: 10c0/3611f516db2ab6ac2497aad4baba700c9a0edf4f1fadb029d1657cd24100be04e8202f9fec96194778873188a53a01424464f31a358fd9a656e4f739a2f5c3fd
+  checksum: 10c0/e2405e7789d41693a09c478b53c47ffadd735a5f4c826d9885787d022ab10e26cc4a67b03593285748bf3b0c0237e0ea2ab268abcb953ea314727201d0f6504d
   languageName: node
   linkType: hard
 
