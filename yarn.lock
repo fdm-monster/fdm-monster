@@ -1168,7 +1168,7 @@ __metadata:
     ts-node: "npm:10.9.2"
     typeorm: "npm:0.3.26"
     typescript: "npm:5.9.2"
-    uuid: "npm:11.1.0"
+    uuid: "npm:12.0.0"
     winston: "npm:3.17.0"
     winston-loki: "npm:6.1.3"
     ws: "npm:8.18.3"
@@ -10050,7 +10050,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uuid@npm:11.1.0, uuid@npm:^11.1.0":
+"uuid@npm:12.0.0":
+  version: 12.0.0
+  resolution: "uuid@npm:12.0.0"
+  bin:
+    uuid: dist/bin/uuid
+  checksum: 10c0/242db6735d15a187a0d7f22576db02668f974ffc65d0806b23fe4237cbb0db3153442cb3082c7550784acb6272e5c6c931532916f9604bd814dfab1edf2dac40
+  languageName: node
+  linkType: hard
+
+"uuid@npm:^11.1.0":
   version: 11.1.0
   resolution: "uuid@npm:11.1.0"
   bin:
