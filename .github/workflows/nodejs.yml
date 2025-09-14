@@ -49,7 +49,7 @@ jobs:
           echo ${{ env.RELEASE_TAG }}
 
       # Purely a dry-run!
-      - uses: JS-DevTools/npm-publish@v3
+      - uses: JS-DevTools/npm-publish@v4
         with:
           dry-run: true
           token: ${{ secrets.NPM_TOKEN }}

@@ -60,7 +60,7 @@ jobs:
       - run: yarn run tsc
 
       # Publish to NPM
-      - uses: JS-DevTools/npm-publish@v3
+      - uses: JS-DevTools/npm-publish@v4
         with:
           dry-run: false
           token: ${{ secrets.NPM_TOKEN }}
