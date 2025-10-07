@@ -1149,7 +1149,7 @@ __metadata:
     lodash: "npm:4.17.21"
     luxon: "npm:3.7.2"
     migrate-mongo: "npm:11.0.0"
-    mongodb-memory-server: "npm:10.2.0"
+    mongodb-memory-server: "npm:10.2.3"
     mongoose: "npm:6.13.8"
     multer: "npm:2.0.2"
     nock: "npm:13.5.6"
@@ -7919,9 +7919,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mongodb-memory-server-core@npm:10.2.0":
-  version: 10.2.0
-  resolution: "mongodb-memory-server-core@npm:10.2.0"
+"mongodb-memory-server-core@npm:10.2.3":
+  version: 10.2.3
+  resolution: "mongodb-memory-server-core@npm:10.2.3"
   dependencies:
     async-mutex: "npm:^0.5.0"
     camelcase: "npm:^6.3.0"
@@ -7935,17 +7935,17 @@ __metadata:
     tar-stream: "npm:^3.1.7"
     tslib: "npm:^2.8.1"
     yauzl: "npm:^3.2.0"
-  checksum: 10c0/9261ef37502121659a4b64fd55734c5306146f62470cb9964a84063882568611d4f0a2b02f5aaf21962b6a2be7ff82ff6da3eda958cf5308cf1dee7ae640bb7b
+  checksum: 10c0/c41db98f5cd564196fd1935064a7bc68dab049bcf411c50a4b9de0d8909f084b507b142f4316a9c4029a0db5d8dd23f3948161022d263afa3b2a3cdc894e3281
   languageName: node
   linkType: hard
 
-"mongodb-memory-server@npm:10.2.0":
-  version: 10.2.0
-  resolution: "mongodb-memory-server@npm:10.2.0"
+"mongodb-memory-server@npm:10.2.3":
+  version: 10.2.3
+  resolution: "mongodb-memory-server@npm:10.2.3"
   dependencies:
-    mongodb-memory-server-core: "npm:10.2.0"
+    mongodb-memory-server-core: "npm:10.2.3"
     tslib: "npm:^2.8.1"
-  checksum: 10c0/1f8f326dde7fdc0065555ffe80331796be71893655e86122655fd8b3c97db4cb68092d9e25a421be8f7d8251ad73cc82efef240a3472393ff0e085bedc1d1104
+  checksum: 10c0/ec5017b6456bacbb98ad6db6778b0b2dd2c0edcf6435f83b583ce5a437f0657238ffdd289225cb86567846ca40b3493ba864bbe49cccd5cfb598447c40929ae3
   languageName: node
   linkType: hard
 
