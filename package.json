@@ -58,7 +58,7 @@
     "vue"
   ],
   "resolutions": {
-    "tr46": "5.1.1"
+    "tr46": "6.0.0"
   },
   "dependencies": {
     "@fdm-monster/client": "1.11.1",
