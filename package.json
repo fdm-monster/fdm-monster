@@ -62,7 +62,7 @@
   },
   "dependencies": {
     "@fdm-monster/client": "1.11.1",
-    "@fdm-monster/client-next": "0.0.21",
+    "@fdm-monster/client-next": "0.0.22",
     "@octokit/plugin-throttling": "8.2.0",
     "@sentry/node": "10.19.0",
     "adm-zip": "0.5.16",
