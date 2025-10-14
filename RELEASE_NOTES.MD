@@ -1,5 +1,11 @@
 # Develop
 
+# FDM Monster 1.9.1
+
+## Updates
+
+- Resolve CVE multer vulnerabilities by updating to 2.0.2
+
 # FDM Monster 1.9.0
 
 ## Features
