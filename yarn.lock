@@ -4719,11 +4719,11 @@ __metadata:
   linkType: hard
 
 "baseline-browser-mapping@npm:^2.8.9":
-  version: 2.8.17
-  resolution: "baseline-browser-mapping@npm:2.8.17"
+  version: 2.8.18
+  resolution: "baseline-browser-mapping@npm:2.8.18"
   bin:
     baseline-browser-mapping: dist/cli.js
-  checksum: 10c0/114d0a406920d66415388f57e372a45ebefe1aadf460172c7cf15ab2bc783825ff52d7a15b60905ea45a68de9548ba803635236082a92669221669ac2e72bb5f
+  checksum: 10c0/fa319aab5761ccb78ec7f5e5905149ae1916d65b68009aa1c8b6ec7f0bdb878bfa57a553235024179ed5ba8b36d668a22f599861990ce6ceb1aeeafb1e5704ae
   languageName: node
   linkType: hard
 
