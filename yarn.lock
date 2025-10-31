@@ -1166,7 +1166,7 @@ __metadata:
     lodash: "npm:4.17.21"
     luxon: "npm:3.7.2"
     migrate-mongo: "npm:11.0.0"
-    mongodb-memory-server: "npm:10.2.3"
+    mongodb-memory-server: "npm:10.3.0"
     mongoose: "npm:6.13.8"
     multer: "npm:2.0.2"
     nock: "npm:13.5.6"
@@ -5503,7 +5503,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"debug@npm:4, debug@npm:4.x, debug@npm:^4.1.0, debug@npm:^4.1.1, debug@npm:^4.3.1, debug@npm:^4.3.4, debug@npm:^4.3.5, debug@npm:^4.3.7, debug@npm:^4.4.0, debug@npm:^4.4.1":
+"debug@npm:4, debug@npm:4.x, debug@npm:^4.1.0, debug@npm:^4.1.1, debug@npm:^4.3.1, debug@npm:^4.3.4, debug@npm:^4.3.5, debug@npm:^4.3.7, debug@npm:^4.4.0, debug@npm:^4.4.1, debug@npm:^4.4.3":
   version: 4.4.3
   resolution: "debug@npm:4.4.3"
   dependencies:
@@ -6212,7 +6212,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.15.6, follow-redirects@npm:^1.15.9":
+"follow-redirects@npm:^1.15.11, follow-redirects@npm:^1.15.6":
   version: 1.15.11
   resolution: "follow-redirects@npm:1.15.11"
   peerDependenciesMeta:
@@ -8012,33 +8012,33 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mongodb-memory-server-core@npm:10.2.3":
-  version: 10.2.3
-  resolution: "mongodb-memory-server-core@npm:10.2.3"
+"mongodb-memory-server-core@npm:10.3.0":
+  version: 10.3.0
+  resolution: "mongodb-memory-server-core@npm:10.3.0"
   dependencies:
     async-mutex: "npm:^0.5.0"
     camelcase: "npm:^6.3.0"
-    debug: "npm:^4.4.1"
+    debug: "npm:^4.4.3"
     find-cache-dir: "npm:^3.3.2"
-    follow-redirects: "npm:^1.15.9"
+    follow-redirects: "npm:^1.15.11"
     https-proxy-agent: "npm:^7.0.6"
     mongodb: "npm:^6.9.0"
     new-find-package-json: "npm:^2.0.0"
-    semver: "npm:^7.7.2"
+    semver: "npm:^7.7.3"
     tar-stream: "npm:^3.1.7"
     tslib: "npm:^2.8.1"
     yauzl: "npm:^3.2.0"
-  checksum: 10c0/c41db98f5cd564196fd1935064a7bc68dab049bcf411c50a4b9de0d8909f084b507b142f4316a9c4029a0db5d8dd23f3948161022d263afa3b2a3cdc894e3281
+  checksum: 10c0/f1530ba048a51de4b051a634570978641a0a6f5cd96a86085d99175849bad06c73c8a0d19d41452a0c7950a40927710ca3ac7fe6e3093f5647e2b6019569c0f1
   languageName: node
   linkType: hard
 
-"mongodb-memory-server@npm:10.2.3":
-  version: 10.2.3
-  resolution: "mongodb-memory-server@npm:10.2.3"
+"mongodb-memory-server@npm:10.3.0":
+  version: 10.3.0
+  resolution: "mongodb-memory-server@npm:10.3.0"
   dependencies:
-    mongodb-memory-server-core: "npm:10.2.3"
+    mongodb-memory-server-core: "npm:10.3.0"
     tslib: "npm:^2.8.1"
-  checksum: 10c0/ec5017b6456bacbb98ad6db6778b0b2dd2c0edcf6435f83b583ce5a437f0657238ffdd289225cb86567846ca40b3493ba864bbe49cccd5cfb598447c40929ae3
+  checksum: 10c0/17abf20e3b642f6c3c6bbde5576bcc09e0964395bc753dd58fe1a8f5ceeb2b825e88ba8391bd4042e83b8d046b818856bf79f5e9073ea5617dc3869c58dbca72
   languageName: node
   linkType: hard
 
@@ -9048,7 +9048,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:7.7.3, semver@npm:^7.3.5, semver@npm:^7.3.8, semver@npm:^7.5.2, semver@npm:^7.5.3, semver@npm:^7.5.4, semver@npm:^7.7.2":
+"semver@npm:7.7.3, semver@npm:^7.3.5, semver@npm:^7.3.8, semver@npm:^7.5.2, semver@npm:^7.5.3, semver@npm:^7.5.4, semver@npm:^7.7.3":
   version: 7.7.3
   resolution: "semver@npm:7.7.3"
   bin:
