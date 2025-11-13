@@ -1132,7 +1132,7 @@ __metadata:
     "@types/js-yaml": "npm:4.0.9"
     "@types/lodash": "npm:4.17.20"
     "@types/luxon": "npm:3.7.1"
-    "@types/migrate-mongo": "npm:10.0.5"
+    "@types/migrate-mongo": "npm:10.0.6"
     "@types/multer": "npm:2.0.0"
     "@types/node": "npm:22.19.1"
     "@types/passport-anonymous": "npm:1.0.5"
@@ -3936,13 +3936,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/migrate-mongo@npm:10.0.5":
-  version: 10.0.5
-  resolution: "@types/migrate-mongo@npm:10.0.5"
+"@types/migrate-mongo@npm:10.0.6":
+  version: 10.0.6
+  resolution: "@types/migrate-mongo@npm:10.0.6"
   dependencies:
     "@types/node": "npm:*"
-    mongodb: "npm:^6.1.0"
-  checksum: 10c0/bbc61e69fd6a3fc60acdaf75b9025ac249d946efa3768492514cfc3ed4116c5066fed53205305dc614f12952b26e55e52d2e209cf354e49f7ba9e5fddf7f1615
+    mongodb: "npm:^7.0.0"
+  checksum: 10c0/045791a173b04634d08b05d0156da8c1e58e5f92722cb7082758967d5026b8ea451fe99408779d808bc1ec8be9971dc34890cc3ea9d36697740f3065aaf13ef3
   languageName: node
   linkType: hard
 
@@ -4205,6 +4205,15 @@ __metadata:
   dependencies:
     "@types/webidl-conversions": "npm:*"
   checksum: 10c0/7a9b9252dee98df6db1ad62337daca7f59ae50d7a3406d14ac6b57168d406004359994f3371155e24f3cf12002c4cb8bbb0883bd4cefb9d7ee8e2b510bdd7f5e
+  languageName: node
+  linkType: hard
+
+"@types/whatwg-url@npm:^13.0.0":
+  version: 13.0.0
+  resolution: "@types/whatwg-url@npm:13.0.0"
+  dependencies:
+    "@types/webidl-conversions": "npm:*"
+  checksum: 10c0/b7b53ae7b5290a0c26e2a5c6a2353af925fe9fc7ab0bbf642e8b76f65b39f638b471dadfda8da441aed3ca32cafd33b1a03459117c9ec85fd91b1e6c0e93044e
   languageName: node
   linkType: hard
 
@@ -4949,6 +4958,13 @@ __metadata:
   version: 6.10.4
   resolution: "bson@npm:6.10.4"
   checksum: 10c0/6c6819ce642516901349f42c5d9d131d5a4e84352a3859c814d4abf6b2b9249e3685b57fc4cf7b5737fb5c71252f65900a41826c1429815a93e43f0f5bb3c173
+  languageName: node
+  linkType: hard
+
+"bson@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "bson@npm:7.0.0"
+  checksum: 10c0/6b12fb0411f4e6f4473da878c0aa615f03439040a349f4115beae336e3922265b25d833c6cc93fcb299017904b32e4ef86e284996f1103addc5918c576b57d9d
   languageName: node
   linkType: hard
 
@@ -8068,6 +8084,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mongodb-connection-string-url@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "mongodb-connection-string-url@npm:7.0.0"
+  dependencies:
+    "@types/whatwg-url": "npm:^13.0.0"
+    whatwg-url: "npm:^14.1.0"
+  checksum: 10c0/33fe304a0f8e59bf541b2ddef073ddb2ae66d6cb3175c6297c8f844004b1608573e2e61892aa8486f8273634c9cb8a90202d21c289aa1b1f8b8e5cd92711be09
+  languageName: node
+  linkType: hard
+
 "mongodb-memory-server-core@npm:10.3.0":
   version: 10.3.0
   resolution: "mongodb-memory-server-core@npm:10.3.0"
@@ -8116,7 +8142,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mongodb@npm:^6.1.0, mongodb@npm:^6.9.0":
+"mongodb@npm:^6.9.0":
   version: 6.21.0
   resolution: "mongodb@npm:6.21.0"
   dependencies:
@@ -8147,6 +8173,40 @@ __metadata:
     socks:
       optional: true
   checksum: 10c0/3269316bdba174139e10cb25a1f22a8445beb14f26987d61dba922ddd5784b35b4bec563554da4d1ab180a3c1ff77f092ba858cd3ae3da45e3aaf706ef27a460
+  languageName: node
+  linkType: hard
+
+"mongodb@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "mongodb@npm:7.0.0"
+  dependencies:
+    "@mongodb-js/saslprep": "npm:^1.3.0"
+    bson: "npm:^7.0.0"
+    mongodb-connection-string-url: "npm:^7.0.0"
+  peerDependencies:
+    "@aws-sdk/credential-providers": ^3.806.0
+    "@mongodb-js/zstd": ^7.0.0
+    gcp-metadata: ^7.0.1
+    kerberos: ^7.0.0
+    mongodb-client-encryption: ">=7.0.0 <7.1.0"
+    snappy: ^7.3.2
+    socks: ^2.8.6
+  peerDependenciesMeta:
+    "@aws-sdk/credential-providers":
+      optional: true
+    "@mongodb-js/zstd":
+      optional: true
+    gcp-metadata:
+      optional: true
+    kerberos:
+      optional: true
+    mongodb-client-encryption:
+      optional: true
+    snappy:
+      optional: true
+    socks:
+      optional: true
+  checksum: 10c0/425258188fd6d0d73c58ce2f16177d53d4280804b52de0e6dfd4ce0bec2c2965625c1765111f800ce8e6f2a28187657e8f42bf7dd6cc9675844e619b0dec18b9
   languageName: node
   linkType: hard
 
@@ -10283,7 +10343,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"whatwg-url@npm:^14.1.0 || ^13.0.0":
+"whatwg-url@npm:^14.1.0, whatwg-url@npm:^14.1.0 || ^13.0.0":
   version: 14.2.0
   resolution: "whatwg-url@npm:14.2.0"
   dependencies:

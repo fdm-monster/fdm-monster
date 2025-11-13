@@ -120,7 +120,7 @@
     "@types/js-yaml": "4.0.9",
     "@types/lodash": "4.17.20",
     "@types/luxon": "3.7.1",
-    "@types/migrate-mongo": "10.0.5",
+    "@types/migrate-mongo": "10.0.6",
     "@types/multer": "2.0.0",
     "@types/node": "22.19.1",
     "@types/passport-anonymous": "1.0.5",
