@@ -557,9 +557,9 @@ __metadata:
   linkType: hard
 
 "@aws/lambda-invoke-store@npm:^0.2.0":
-  version: 0.2.0
-  resolution: "@aws/lambda-invoke-store@npm:0.2.0"
-  checksum: 10c0/ff37fe5d7c3b59afffa4591f9be89c5b53b808fe9dd85dd02d324bbd2b8f11366de481569284b9a5b65221cf17ba254730085aa00d6a3d1a57d9ab08a3a39879
+  version: 0.2.1
+  resolution: "@aws/lambda-invoke-store@npm:0.2.1"
+  checksum: 10c0/7fdfd6e4b175d36dae522556efc51b0f7445af3d55e516acee0f4e52946833ec9655be45cb3bdefec5974c0c6e5bcca3ad1bce7d397eb5f7a2393623867fb4b2
   languageName: node
   linkType: hard
 
@@ -4794,11 +4794,11 @@ __metadata:
   linkType: hard
 
 "baseline-browser-mapping@npm:^2.8.25":
-  version: 2.8.29
-  resolution: "baseline-browser-mapping@npm:2.8.29"
+  version: 2.8.30
+  resolution: "baseline-browser-mapping@npm:2.8.30"
   bin:
     baseline-browser-mapping: dist/cli.js
-  checksum: 10c0/bb5f082d91b59c885504fd4ff999bd890c39e8b818afe00f15f0dfcdb7f7b80a655ad57429563091c0d3722649ba4a2f023ca3ede02e022b12ba6b0322a3314e
+  checksum: 10c0/724e2a71dc18af1555953278544d60d3677ad1413d19b4c68f0b1d16cb075186035125cad38d93c1ccc2df8dc8520e6d47452b76b265898ad7ac480630f12cae
   languageName: node
   linkType: hard
 
@@ -5751,9 +5751,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.5.249":
-  version: 1.5.257
-  resolution: "electron-to-chromium@npm:1.5.257"
-  checksum: 10c0/5e6f21cff92a2231b1883cdcdc2d3758895505353222d6d3f93de9079c047a59fd6e0038ffbf06afe2079eefba102d06e84dfa33057e595940a81fe0b8b82c42
+  version: 1.5.259
+  resolution: "electron-to-chromium@npm:1.5.259"
+  checksum: 10c0/a6600ff20d513e1acce29cd04af5fcb338295ebe5a13fa9802009464d9c269a4a092218c8ea8c9b85017a1efd75606fe0cdf5f36216979f7c8462af7df2f530d
   languageName: node
   linkType: hard
 
@@ -7602,9 +7602,9 @@ __metadata:
   linkType: hard
 
 "libphonenumber-js@npm:^1.11.1":
-  version: 1.12.27
-  resolution: "libphonenumber-js@npm:1.12.27"
-  checksum: 10c0/b66016fb329c52a8dc17563ed9474fa3b999a1f407d2214655420a67d39b903d696726a658090e463eb044433d59f8ebeb7d886807a3ab93a4f195770eab86ec
+  version: 1.12.28
+  resolution: "libphonenumber-js@npm:1.12.28"
+  checksum: 10c0/7e88b8a865414915cc3c1296ca44eab3e8f57cafd503335c8f3c0f4bb45048f2b83a2a3adf01e88ccbae11f76d2799a1bdc25a8054a76a7f26188083d8d47269
   languageName: node
   linkType: hard
 
