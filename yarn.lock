@@ -4794,11 +4794,11 @@ __metadata:
   linkType: hard
 
 "baseline-browser-mapping@npm:^2.8.25":
-  version: 2.8.30
-  resolution: "baseline-browser-mapping@npm:2.8.30"
+  version: 2.8.31
+  resolution: "baseline-browser-mapping@npm:2.8.31"
   bin:
     baseline-browser-mapping: dist/cli.js
-  checksum: 10c0/724e2a71dc18af1555953278544d60d3677ad1413d19b4c68f0b1d16cb075186035125cad38d93c1ccc2df8dc8520e6d47452b76b265898ad7ac480630f12cae
+  checksum: 10c0/e0b2fcb41bf36c5e27e122a4d4cc9e5f6b9747d31cd0bd1f771aee9c490eb1e01cd11a31db32286bd4b9221139ee332b5ab7e3893c18a4dbd0ce8915a9e180ed
   languageName: node
   linkType: hard
 
@@ -4905,9 +4905,9 @@ __metadata:
   linkType: hard
 
 "bowser@npm:^2.11.0":
-  version: 2.12.1
-  resolution: "bowser@npm:2.12.1"
-  checksum: 10c0/017e8cc63ce2dec75037340626e1408f68334dac95f953ba7db33a266c019f1d262346d2be3994f9a12b7e9c02f57c562078719b8c5e8e8febe01053c613ffbc
+  version: 2.13.0
+  resolution: "bowser@npm:2.13.0"
+  checksum: 10c0/210fb0b2c1eaa65f3c157863a671c7043d8f51297b08518cc61f31ad3efab455f5cb804fe69ce74dad261b7c0b19fa23a1b5c2ee639b234db9338999b47d82bb
   languageName: node
   linkType: hard
 
