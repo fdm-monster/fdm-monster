@@ -70,7 +70,7 @@
     "awilix-express": "9.0.2",
     "axios": "1.13.2",
     "bcryptjs": "3.0.3",
-    "better-sqlite3": "12.4.6",
+    "better-sqlite3": "12.5.0",
     "class-validator": "0.14.3",
     "connect-history-api-fallback": "2.0.0",
     "cookie-parser": "1.4.7",
