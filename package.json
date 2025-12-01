@@ -78,7 +78,7 @@
     "cross-env": "10.1.0",
     "dotenv": "17.2.3",
     "eventemitter2": "6.4.9",
-    "express": "4.21.2",
+    "express": "4.22.0",
     "form-data": "4.0.5",
     "helmet": "8.1.0",
     "js-yaml": "4.1.1",
