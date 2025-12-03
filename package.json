@@ -85,7 +85,7 @@
     "jsonwebtoken": "9.0.2",
     "lodash": "4.17.21",
     "luxon": "3.7.2",
-    "migrate-mongo": "11.0.0",
+    "migrate-mongo": "13.0.1",
     "mongoose": "6.13.8",
     "multer": "2.0.2",
     "octokit": "3.2.2",
