@@ -82,7 +82,7 @@
     "form-data": "4.0.5",
     "helmet": "8.1.0",
     "js-yaml": "4.1.1",
-    "jsonwebtoken": "9.0.2",
+    "jsonwebtoken": "9.0.3",
     "lodash": "4.17.21",
     "luxon": "3.7.2",
     "migrate-mongo": "11.0.0",
