@@ -40,7 +40,7 @@ export class YamlService {
     this.logger = loggerFactory(YamlService.name);
   }
 
-  async importPrintersAndFloors(yamlBuffer: string) {
+  async importYaml(yamlBuffer: string) {
     const importSpec = (await load(yamlBuffer)) as YamlExportSchema;
     const databaseTypeSqlite = importSpec.databaseType === "sqlite";
     const { exportPrinters, exportFloorGrid, exportSettings, exportUsers, exportUserRoles } = importSpec.config;
@@ -283,10 +283,13 @@ export class YamlService {
     if (settings.printerFileClean) {
       await this.settingsStore.updateFileCleanSettings(settings.printerFileClean);
     }
-    if (settings.wizard) {
-      // Don't import wizard settings as they're managed by the setup process
-      this.logger.log("Skipping wizard settings import (managed by setup process)");
+
+    if (settings.wizard?.wizardCompleted) {
+      const importedWizardVersion: number = settings.wizard.wizardCompleted;
+      this.logger.log(`Marking wizard as completed with version: ${importedWizardVersion}`);
+      await this.settingsStore.setWizardCompleted(importedWizardVersion);
     }
+
     this.logger.log("Settings imported successfully");
   }
 
@@ -575,7 +578,7 @@ export class YamlService {
     };
   }
 
-  async exportPrintersAndFloors(options: z.infer<typeof exportPrintersFloorsYamlSchema>) {
+  async exportYaml(options: z.infer<typeof exportPrintersFloorsYamlSchema>) {
     const input = await validateInput(options, exportPrintersFloorsYamlSchema);
 
     if (!this.isTypeormMode) {

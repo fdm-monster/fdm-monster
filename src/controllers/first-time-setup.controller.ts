@@ -9,7 +9,6 @@ import { Request, Response } from "express";
 import { IUserService } from "@/services/interfaces/user-service.interface";
 import { IRoleService } from "@/services/interfaces/role-service.interface";
 import { YamlService } from "@/services/core/yaml.service";
-import { PrinterCache } from "@/state/printer.cache";
 import { MulterService } from "@/services/core/multer.service";
 
 @route(AppConstants.apiRoute + "/first-time-setup")
@@ -19,7 +18,6 @@ export class FirstTimeSetupController {
     private readonly roleService: IRoleService,
     private readonly userService: IUserService,
     private readonly yamlService: YamlService,
-    private readonly printerCache: PrinterCache,
     private readonly multerService: MulterService,
   ) {}
 
@@ -85,11 +83,7 @@ export class FirstTimeSetupController {
     const files = await this.multerService.multerLoadFileAsync(req, res, [".yaml"], false);
     const firstFile = files[0];
 
-    await this.printerCache.loadCache();
-    await this.yamlService.importPrintersAndFloors(firstFile.buffer.toString());
-
-    // Mark wizard as completed after successful import
-    await this.settingsStore.setWizardCompleted(AppConstants.currentWizardVersion);
+    await this.yamlService.importYaml(firstFile.buffer.toString());
 
     return res.send({
       success: true,
