@@ -1,5 +1,16 @@
 # Develop
 
+# FDM Monster 1.9.2
+
+- Full yaml export with users, roles, settings
+- Full yaml import (especially when getting started)
+- Experimental bambu lab support (tested with mock bambu server)
+
+## Fixes 
+
+- Floor: sqlite floor level would start at 0, not 1
+- YAML export: Mongo floor printer position would yaml export printerId as {} instead of string
+
 # FDM Monster 1.9.1
 
 ## Updates
