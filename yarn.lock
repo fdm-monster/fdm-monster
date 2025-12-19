@@ -1160,7 +1160,7 @@ __metadata:
     "@types/uuid": "npm:10.0.0"
     "@types/ws": "npm:8.18.1"
     adm-zip: "npm:0.5.16"
-    aedes: "npm:^0.51.3"
+    aedes: "npm:0.51.3"
     awilix: "npm:12.0.5"
     awilix-express: "npm:9.0.2"
     axios: "npm:1.13.2"
@@ -4547,7 +4547,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"aedes@npm:^0.51.3":
+"aedes@npm:0.51.3":
   version: 0.51.3
   resolution: "aedes@npm:0.51.3"
   dependencies:
