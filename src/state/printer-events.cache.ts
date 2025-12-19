@@ -14,6 +14,7 @@ import { octoPrintEvent } from "@/services/octoprint/octoprint-websocket.adapter
 import { moonrakerEvent } from "@/services/moonraker/constants/moonraker.constants";
 import { prusaLinkEvent } from "@/services/prusa-link/constants/prusalink.constants";
 import { PrusaLinkEventDto } from "@/services/prusa-link/constants/prusalink-event.dto";
+import { bambuEvent, BambuEventDto } from "@/services/bambu/bambu-mqtt.adapter";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 
@@ -93,6 +94,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
     this.eventEmitter2.on(octoPrintEvent("*"), (e) => this.onOctoPrintSocketMessage(e));
     this.eventEmitter2.on(moonrakerEvent("*"), (e) => this.onMoonrakerSocketMessage(e));
     this.eventEmitter2.on(prusaLinkEvent("*"), (e) => this.onPrusaLinkPollMessage(e));
+    this.eventEmitter2.on(bambuEvent("*"), (e) => this.onBambuSocketMessage(e));
     this.eventEmitter2.on(printerEvents.printersDeleted, this.handlePrintersDeleted.bind(this));
   }
 
@@ -124,6 +126,19 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
     const printerId = e.printerId;
 
     this.logger.debug(`Received prusaLink event ${e.event}, printerId ${e.printerId}`, e);
+    if (e.event === "current") {
+      await this.setEvent(printerId, e.event, e.payload);
+    }
+  }
+
+  private async onBambuSocketMessage(e: BambuEventDto) {
+    const printerId = e.printerId;
+    if (!printerId) {
+      this.logger.warn("Received Bambu event without printerId", e);
+      return;
+    }
+
+    this.logger.debug(`Received Bambu event ${e.event}, printerId ${printerId}`);
     if (e.event === "current") {
       await this.setEvent(printerId, e.event, e.payload);
     }

@@ -68,7 +68,7 @@ describe(PrinterSocketStore.name, () => {
           },
           {
             code: "invalid_type",
-            expected: "0 | 1 | 2",
+            expected: "0 | 1 | 2 | 3",
             received: "undefined",
             path: ["printerType"],
             message: "Required",

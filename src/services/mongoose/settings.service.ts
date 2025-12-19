@@ -58,7 +58,6 @@ export class SettingsService implements ISettingsService<MongoIdType> {
 
   async updateFileCleanSettings(update: z.infer<typeof fileCleanSettingsUpdateSchema>) {
     const validatedInput = await validateInput(update, fileCleanSettingsUpdateSchema);
-
     const settingsDoc = await this.getOrCreate();
     settingsDoc[printerFileCleanSettingKey] = Object.assign(settingsDoc[printerFileCleanSettingKey], validatedInput);
     return (await Settings.findOneAndUpdate({ _id: settingsDoc.id }, settingsDoc, {

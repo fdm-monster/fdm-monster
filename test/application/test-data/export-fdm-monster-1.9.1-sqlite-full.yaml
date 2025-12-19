@@ -37,6 +37,7 @@ settings:
     sentryDiagnosticsEnabled: false
     experimentalMoonrakerSupport: false
     experimentalPrusaLinkSupport: false
+    experimentalBambuSupport: true
     experimentalTypeormSupport: true
     experimentalClientSupport: false
     experimentalThumbnailSupport: false
