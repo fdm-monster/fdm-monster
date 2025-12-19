@@ -12,6 +12,7 @@ import { testPrinterData } from "./test-data/printer.data";
 import { FloorStore } from "@/state/floor.store";
 import { FloorPositionService } from "@/services/orm/floor-position.service";
 import { OctoprintType } from "@/services/printer-api.interface";
+import { SettingsStore } from "@/state/settings.store";
 
 let yamlService: YamlService;
 let printerCache: PrinterCache;
@@ -19,6 +20,7 @@ let printerService: IPrinterService;
 let floorService: IFloorService;
 let floorStore: FloorStore;
 let printerGroupService: PrinterGroupService;
+let settingsStore: SettingsStore;
 let isTypeormMode: boolean;
 // Use only when isTypeormMode is true
 let floorPositionService: FloorPositionService;
@@ -33,6 +35,7 @@ beforeAll(async () => {
   floorPositionService = container.resolve(DITokens.floorPositionService);
   floorStore = container.resolve(DITokens.floorStore);
   printerGroupService = container.resolve(DITokens.printerGroupService);
+  settingsStore = container.resolve(DITokens.settingsStore);
 });
 afterEach(async () => {
   const printers = await printerService.list();
@@ -48,13 +51,15 @@ afterEach(async () => {
 describe(YamlService.name, () => {
   it("should import yaml from version 1.3.1 and export it", async () => {
     await printerCache.loadCache();
-    await yamlService.importPrintersAndFloors(exportYamlBuffer1_3_1);
+    await yamlService.importYaml(exportYamlBuffer1_3_1);
 
-    const yamlDump = await yamlService.exportPrintersAndFloors({
+    const yamlDump = await yamlService.exportYaml({
       exportFloors: true,
       exportPrinters: true,
       exportFloorGrid: true,
       exportGroups: true,
+      exportSettings: true,
+      exportUsers: true,
       printerComparisonStrategiesByPriority: ["name", "id"],
       floorComparisonStrategiesByPriority: "floor",
     });
@@ -64,8 +69,7 @@ describe(YamlService.name, () => {
   });
 
   it("should import yaml from version 1.3.1", async () => {
-    await printerCache.loadCache();
-    await yamlService.importPrintersAndFloors(exportYamlBuffer1_3_1);
+    await yamlService.importYaml(exportYamlBuffer1_3_1);
 
     const floors = await floorService.list();
     const floor = floors.find((f) => f.name === "Default Floor1_3_1");
@@ -73,8 +77,7 @@ describe(YamlService.name, () => {
   });
 
   it("should import yaml from version 1.5.0", async () => {
-    await printerCache.loadCache();
-    await yamlService.importPrintersAndFloors(exportYamlBuffer1_5_0(true));
+    await yamlService.importYaml(exportYamlBuffer1_5_0(true));
 
     const floors = await floorService.list();
     const floor = floors.find((f) => f.name === "Default Floor1_5_0");
@@ -83,8 +86,7 @@ describe(YamlService.name, () => {
 
   it("should import 1.5.2 mongodb yaml", async () => {
     const buffer = readFileSync(join(__dirname, "./test-data/export-fdm-monster-1.5.2-mongodb.yaml"));
-    await printerCache.loadCache();
-    await yamlService.importPrintersAndFloors(buffer.toString());
+    await yamlService.importYaml(buffer.toString());
 
     const printers = await printerService.list();
     const printer = printers.find((p) => p.name === "Dragon Eggggg")!;
@@ -103,8 +105,7 @@ describe(YamlService.name, () => {
   });
 
   it("should import yaml from version 1.6.0 sqlite", async () => {
-    await printerCache.loadCache();
-    await yamlService.importPrintersAndFloors(exportYamlBuffer1_6_0(true));
+    await yamlService.importYaml(exportYamlBuffer1_6_0(true));
 
     const floors = await floorService.list();
     const floor = floors.find((f) => f.name === "Default Floor1_6_0")!;
@@ -114,8 +115,7 @@ describe(YamlService.name, () => {
 
   it("should import 1.6.0 sqlite yaml", async () => {
     const buffer = readFileSync(join(__dirname, "./test-data/export-fdm-monster-1.6.0-sqlite.yaml"));
-    await printerCache.loadCache();
-    await yamlService.importPrintersAndFloors(buffer.toString());
+    await yamlService.importYaml(buffer.toString());
 
     const printers = await printerService.list();
     const printer = printers.find((p) => p.name === "Minipi Local")!;
@@ -135,8 +135,7 @@ describe(YamlService.name, () => {
 
   it("should import 1.6.1 sqlite yaml", async () => {
     const buffer = readFileSync(join(__dirname, "./test-data/export-fdm-monster-1.6.1-sqlite-groups.yaml"));
-    await printerCache.loadCache();
-    await yamlService.importPrintersAndFloors(buffer.toString());
+    await yamlService.importYaml(buffer.toString());
 
     const printers = await printerService.list();
     const printer = printers.find((p) => p.name === "Minipi Local1_6_1")!;
@@ -161,6 +160,125 @@ describe(YamlService.name, () => {
     }
   });
 
+  it("should parse 1.9.1 mongodb full yaml file format", async () => {
+    const buffer = readFileSync(join(__dirname, "./test-data/export-fdm-monster-1.9.1-mongodb-full.yaml"));
+
+    await expect(yamlService.importYaml(buffer.toString())).rejects.toThrow(
+      "Settings table is not empty"
+    );
+  });
+
+  it("should parse 1.9.1 sqlite full yaml file format", async () => {
+    const buffer = readFileSync(join(__dirname, "./test-data/export-fdm-monster-1.9.1-sqlite-full.yaml"));
+
+    await expect(yamlService.importYaml(buffer.toString())).rejects.toThrow(
+      "Settings table is not empty"
+    );
+  });
+
+  it("should export yaml with system data (settings, users)", async () => {
+    const yamlDump = await yamlService.exportYaml({
+      exportFloors: false,
+      exportPrinters: false,
+      exportFloorGrid: false,
+      exportGroups: false,
+      exportSettings: true,
+      exportUsers: true,
+      printerComparisonStrategiesByPriority: ["name", "id"],
+      floorComparisonStrategiesByPriority: "floor",
+    });
+
+    expect(yamlDump).toBeDefined();
+    expect(yamlDump).toContain("settings:");
+    expect(yamlDump).toContain("users:");
+    expect(yamlDump).toContain("exportSettings: true");
+    expect(yamlDump).toContain("exportUsers: true");
+  });
+
+  it("should export yaml with all options enabled", async () => {
+    const yamlDump = await yamlService.exportYaml({
+      exportFloors: true,
+      exportPrinters: true,
+      exportFloorGrid: true,
+      exportGroups: true,
+      exportSettings: true,
+      exportUsers: true,
+      printerComparisonStrategiesByPriority: ["name", "id"],
+      floorComparisonStrategiesByPriority: "floor",
+    });
+
+    expect(yamlDump).toBeDefined();
+    expect(yamlDump).toContain("exportPrinters: true");
+    expect(yamlDump).toContain("exportFloors: true");
+    expect(yamlDump).toContain("exportSettings: true");
+    expect(yamlDump).toContain("exportUsers: true");
+  });
+
+  it("should export yaml with only printers (no system data)", async () => {
+    const yamlDump = await yamlService.exportYaml({
+      exportFloors: false,
+      exportPrinters: true,
+      exportFloorGrid: false,
+      exportGroups: false,
+      exportSettings: false,
+      exportUsers: false,
+      printerComparisonStrategiesByPriority: ["name", "id"],
+      floorComparisonStrategiesByPriority: "floor",
+    });
+
+    expect(yamlDump).toBeDefined();
+    expect(yamlDump).toContain("printers:");
+    expect(yamlDump).toContain("exportPrinters: true");
+    expect(yamlDump).not.toContain("settings:");
+    expect(yamlDump).not.toContain("users:");
+  });
+
+  it("should export yaml with floors and printer floor positions", async () => {
+    const printer = await printerService.create({ ...testPrinterData, name: "ExportTestPrinter" });
+    const floor = await floorService.create({
+      name: "ExportTestFloor",
+      floor: 99,
+      printers: [
+        {
+          x: 1,
+          y: 2,
+          printerId: printer.id,
+        },
+      ],
+    });
+
+    const yamlDump = await yamlService.exportYaml({
+      exportFloors: true,
+      exportPrinters: true,
+      exportFloorGrid: true,
+      exportGroups: false,
+      exportSettings: false,
+      exportUsers: false,
+      printerComparisonStrategiesByPriority: ["name"],
+      floorComparisonStrategiesByPriority: "floor",
+    });
+
+    expect(yamlDump).toBeDefined();
+    expect(yamlDump).toContain("floors:");
+    expect(yamlDump).toContain("printers:");
+    expect(yamlDump).toContain("ExportTestPrinter");
+
+    // Verify printerId is properly serialized and not empty object
+    expect(yamlDump).toContain("printerId:");
+    expect(yamlDump).not.toContain("printerId: {}");
+    expect(yamlDump).not.toContain("printerId: null");
+
+    // Parse YAML to verify structure - check that at least one printerId line is valid
+    const yamlLines = yamlDump.split("\n");
+    const printerIdLines = yamlLines.filter((line) => line.includes("printerId:"));
+    expect(printerIdLines.length).toBeGreaterThan(0);
+
+    // Verify that none of the printerId lines are empty objects
+    for (const line of printerIdLines) {
+      expect(line.trim()).not.toBe("printerId: {}");
+    }
+  });
+
   it("should import floor over existing floor", async () => {
     const printer = await printerService.create({ ...testPrinterData, name: "YamlImportTestPrinter" });
     const defaultFloor = await floorService.create({
@@ -176,10 +294,9 @@ describe(YamlService.name, () => {
       ],
     });
     expect(defaultFloor.printers.find((p) => p.printerId.toString() === printer.id.toString())).toBeDefined();
-    await printerCache.loadCache();
 
     const buffer = readFileSync(join(__dirname, "./test-data/export-fdm-monster-1.5.2-mongodb-simple.yaml"));
-    await yamlService.importPrintersAndFloors(buffer.toString());
+    await yamlService.importYaml(buffer.toString());
 
     // Probe the new floor and assert a position on it is taken
     const floors = await floorService.list();

@@ -15,6 +15,7 @@ export async function setupTestApp(
   loadPrinterStore = false,
   mocks: any = undefined,
   quick_boot = true,
+  skipWizardCompletion = false,
 ): Promise<{
   container: AwilixContainer;
   httpServer: Express;
@@ -48,7 +49,9 @@ export async function setupTestApp(
   const serverHost = container.resolve(DITokens.serverHost);
   await serverHost.boot(httpServer, quick_boot, false);
 
-  await settingsStore.setWizardCompleted(AppConstants.currentWizardVersion);
+  if (!skipWizardCompletion) {
+    await settingsStore.setWizardCompleted(AppConstants.currentWizardVersion);
+  }
   await settingsStore.setLoginRequired(false);
   await container.resolve(DITokens.permissionService).syncPermissions();
   await container.resolve(DITokens.roleService).syncRoles();

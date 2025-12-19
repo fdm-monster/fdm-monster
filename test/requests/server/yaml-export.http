@@ -1,0 +1,16 @@
+### POST request to export system configuration as YAML
+POST http://localhost:4000/api/server/yaml-export
+Content-Type: application/json
+
+{
+  "exportPrinters": true,
+  "exportFloorGrid": true,
+  "exportFloors": true,
+  "exportGroups": true,
+  "exportSettings": true,
+  "exportUsers": true,
+  "printerComparisonStrategiesByPriority": ["name", "url", "id"],
+  "floorComparisonStrategiesByPriority": "name"
+}
+
+###

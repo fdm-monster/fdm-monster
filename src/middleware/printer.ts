@@ -3,10 +3,11 @@ import { DITokens } from "@/container.tokens";
 import { NextFunction, Request, Response } from "express";
 import { PrinterCache } from "@/state/printer.cache";
 import { OctoprintApi } from "@/services/octoprint.api";
-import { MoonrakerType, OctoprintType, PrusaLinkType } from "@/services/printer-api.interface";
+import { MoonrakerType, OctoprintType, PrusaLinkType, BambuType } from "@/services/printer-api.interface";
 import { MoonrakerApi } from "@/services/moonraker.api";
 import { SettingsStore } from "@/state/settings.store";
 import { PrusaLinkApi } from "@/services/prusa-link/prusa-link.api";
+import { BambuApi } from "@/services/bambu.api";
 
 export const printerIdToken = "currentPrinterId";
 export const printerApiToken = "printerApi";
@@ -19,6 +20,7 @@ export const printerResolveMiddleware = (key = "id") => {
     const settingsService = req.container.resolve<any>(DITokens.settingsStore) as SettingsStore;
     const moonrakerEnabled = settingsService.getServerSettings().experimentalMoonrakerSupport;
     const prusaLinkEnabled = settingsService.getServerSettings().experimentalPrusaLinkSupport;
+    const bambuEnabled = settingsService.getServerSettings().experimentalBambuSupport;
 
     let scopedPrinter = undefined;
     let loginDto = undefined;
@@ -54,6 +56,16 @@ export const printerResolveMiddleware = (key = "id") => {
           req.container.register({
             [printerApiToken]: prusaLinkEnabled ? asValue(prusaLinkInstance) : asValue(undefined),
           });
+          break;
+        }
+        case BambuType: {
+          const bambuInstance = req.container.resolve<BambuApi>(DITokens.bambuApi);
+          // Set printer ID so BambuApi can access the MQTT adapter from PrinterSocketStore
+          bambuInstance.setPrinterId(printerId);
+          req.container.register({
+            [printerApiToken]: bambuEnabled ? asValue(bambuInstance) : asValue(undefined),
+          });
+          break;
         }
       }
     } else {

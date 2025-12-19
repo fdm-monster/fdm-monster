@@ -134,6 +134,15 @@ export class UserService implements IUserService<MongoIdType> {
     return await user.save();
   }
 
+  async updatePasswordHashUnsafeByUsername(username: string, passwordHash: string) {
+    const user = await this.findRawByUsername(username);
+    if (!user) throw new NotFoundException("User not found");
+
+    user.passwordHash = passwordHash;
+    user.needsPasswordChange = false;
+    return await user.save();
+  }
+
   async setIsRootUserById(userId: MongoIdType, isRootUser: boolean) {
     const user = await User.findById(userId);
     if (!user) throw new NotFoundException("User not found");

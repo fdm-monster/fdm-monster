@@ -16,6 +16,9 @@ import { IdType } from "@/shared.constants";
 import { IPrinterGroupService } from "@/services/interfaces/printer-group.service.interface";
 import { MoonrakerType, OctoprintType } from "@/services/printer-api.interface";
 import { z } from "zod";
+import { IUserService } from "@/services/interfaces/user-service.interface";
+import { IRoleService } from "@/services/interfaces/role-service.interface";
+import { SettingsStore } from "@/state/settings.store";
 
 export class YamlService {
   private readonly logger: LoggerService;
@@ -27,15 +30,25 @@ export class YamlService {
     private readonly printerCache: PrinterCache,
     private readonly floorStore: FloorStore,
     private readonly floorService: IFloorService,
+    private readonly userService: IUserService,
+    private readonly roleService: IRoleService,
+    private readonly settingsStore: SettingsStore,
     private readonly isTypeormMode: boolean,
   ) {
     this.logger = loggerFactory(YamlService.name);
   }
 
-  async importPrintersAndFloors(yamlBuffer: string) {
+  async importYaml(yamlBuffer: string) {
     const importSpec = (await load(yamlBuffer)) as YamlExportSchema;
     const databaseTypeSqlite = importSpec.databaseType === "sqlite";
-    const { exportPrinters, exportFloorGrid } = importSpec.config;
+    const { exportPrinters, exportFloorGrid, exportSettings, exportUsers } = importSpec.config;
+
+    // Validate that system tables can be imported (skip validation if wizard not completed)
+    const wizardCompleted = this.settingsStore.getWizardSettings()?.wizardCompleted;
+    const hasSystemData = exportSettings || exportUsers;
+    if (hasSystemData && wizardCompleted) {
+      await this.validateSystemTablesEmpty(importSpec);
+    }
 
     for (const printer of importSpec.printers) {
       // old export bug
@@ -50,7 +63,7 @@ export class YamlService {
       }
       // Ensure the type matches the database it came from (1.6.0+)
       if (databaseTypeSqlite && typeof printer.id === "string") {
-        printer.id = parseInt(printer.id);
+        printer.id = Number.parseInt(printer.id);
       }
 
       // 1.7 backwards compatibility
@@ -64,7 +77,7 @@ export class YamlService {
       // Ensure the type matches the database it came from (1.6.0+)
       for (const floor of importSpec.floors) {
         if (typeof floor.id === "string") {
-          floor.id = parseInt(floor.id);
+          floor.id = Number.parseInt(floor.id);
         }
         // Ensure the type matches the database it came from (1.6.0+)
         for (const printer of floor.printers) {
@@ -228,6 +241,17 @@ export class YamlService {
       }
     }
 
+    // Import system tables if present
+    if (exportSettings && importSpec.settings) {
+      this.logger.log("Importing settings");
+      await this.importSettings(importSpec.settings);
+    }
+
+    if (exportUsers && importSpec.users && importSpec.users.length > 0) {
+      this.logger.log(`Importing users (${importSpec.users.length} users)`);
+      await this.importUsers(importSpec.users, databaseTypeSqlite);
+    }
+
     return {
       updateByPropertyPrinters,
       updateByPropertyFloors,
@@ -236,6 +260,92 @@ export class YamlService {
       printerIdMap,
       floorIdMap,
     };
+  }
+
+  async importSettings(settings: any) {
+    // Update the settings store with imported settings using individual update methods
+    if (settings.server) {
+      await this.settingsStore.updateServerSettings(settings.server);
+    }
+    if (settings.timeout) {
+      await this.settingsStore.updateTimeoutSettings(settings.timeout);
+    }
+    if (settings.frontend) {
+      await this.settingsStore.updateFrontendSettings(settings.frontend);
+    }
+    if (settings.printerFileClean) {
+      await this.settingsStore.updateFileCleanSettings(settings.printerFileClean);
+    }
+
+    if (settings.wizard?.wizardCompleted) {
+      const importedWizardVersion: number = settings.wizard.wizardVersion;
+      this.logger.log(`Marking wizard as completed with version: ${importedWizardVersion}`);
+      await this.settingsStore.setWizardCompleted(importedWizardVersion);
+    }
+
+    this.logger.log("Settings imported successfully");
+  }
+
+  async importUsers(users: any[], databaseTypeSqlite: boolean) {
+    const allRoles = this.roleService.roles;
+
+    for (const user of users) {
+      // Ensure ID type matches database type
+      if (databaseTypeSqlite && typeof user.id === "string") {
+        user.id = Number.parseInt(user.id);
+      }
+
+      let roleIds: IdType[] = [];
+      if (user.roles && user.roles.length > 0) {
+        // Support both role names (new format) and role IDs (backward compatibility)
+        roleIds = user.roles
+          .map((roleNameOrId: string | IdType) => {
+            // If it's a role name (string like "ADMIN"), find the corresponding ID
+            const role = allRoles.find((r) => r.name === roleNameOrId);
+            return role?.id;
+          })
+          .filter((id: IdType | undefined) => id !== undefined);
+      }
+
+      // Register user with a temporary password (will be replaced with actual hash)
+      await this.userService.register({
+        username: user.username,
+        password: "temporary-password-to-be-replaced",
+        roles: roleIds,
+        isRootUser: user.isRootUser ?? false,
+        isDemoUser: user.isDemoUser ?? false,
+        isVerified: user.isVerified ?? false,
+        needsPasswordChange: user.needsPasswordChange ?? true,
+      });
+
+      // Update the password hash directly (without re-hashing)
+      await this.userService.updatePasswordHashUnsafeByUsername(user.username, user.passwordHash);
+    }
+    this.logger.log(`Imported ${ users.length } users`);
+  }
+
+  async validateSystemTablesEmpty(importSpec: YamlExportSchema) {
+    const errors: string[] = [];
+
+    // Check if importing settings but settings already exist
+    if (importSpec.settings && importSpec.config.exportSettings) {
+      const existingSettings = this.settingsStore.getSettings();
+      if (existingSettings && Object.keys(existingSettings).length > 0) {
+        errors.push("Settings table is not empty. Cannot import settings when existing settings are present.");
+      }
+    }
+
+    // Check if importing users but users already exist
+    if (importSpec.users && importSpec.users.length > 0 && importSpec.config.exportUsers) {
+      const existingUsers = await this.userService.listUsers(1);
+      if (existingUsers.length > 0) {
+        errors.push("Users table is not empty. Cannot import users when existing users are present.");
+      }
+    }
+
+    if (errors.length > 0) {
+      throw new Error(`Import validation failed:\n${ errors.join("\n") }`);
+    }
   }
 
   async analysePrintersUpsert(upsertPrinters: any[], comparisonStrategies: string[]) {
@@ -272,20 +382,6 @@ export class YamlService {
             }
             updateByPropertyPrinters.push({
               strategy: "url",
-              printerId: this.isTypeormMode ? parseInt(ids[foundIndex]) : ids[foundIndex],
-              value: printer,
-            });
-            break;
-          }
-        } else if (strategy === "id") {
-          const comparedName = printer.id.toLowerCase();
-          const foundIndex = ids.findIndex((n) => n === comparedName);
-          if (foundIndex !== -1) {
-            if (!ids[foundIndex]) {
-              throw new Error("Update ID is undefined");
-            }
-            updateByPropertyPrinters.push({
-              strategy: "id",
               printerId: this.isTypeormMode ? parseInt(ids[foundIndex]) : ids[foundIndex],
               value: printer,
             });
@@ -340,21 +436,7 @@ export class YamlService {
             }
             updateByPropertyFloors.push({
               strategy: "floor",
-              floorId: this.isTypeormMode ? parseInt(ids[foundIndex]) : ids[foundIndex],
-              value: floor,
-            });
-            break;
-          }
-        } else if (strategy === "id") {
-          const comparedProperty = floor.id.toLowerCase();
-          const foundIndex = ids.findIndex((n) => n === comparedProperty);
-          if (foundIndex !== -1) {
-            if (!ids[foundIndex]) {
-              throw new Error("IDS not found, floor id");
-            }
-            updateByPropertyFloors.push({
-              strategy: "id",
-              floorId: this.isTypeormMode ? parseInt(ids[foundIndex]) : ids[foundIndex],
+              floorId: this.isTypeormMode ? Number.parseInt(ids[foundIndex]) : ids[foundIndex],
               value: floor,
             });
             break;
@@ -410,13 +492,13 @@ export class YamlService {
     };
   }
 
-  async exportPrintersAndFloors(options: z.infer<typeof exportPrintersFloorsYamlSchema>) {
+  async exportYaml(options: z.infer<typeof exportPrintersFloorsYamlSchema>) {
     const input = await validateInput(options, exportPrintersFloorsYamlSchema);
 
     if (!this.isTypeormMode) {
       input.exportGroups = false;
     }
-    const { exportFloors, exportPrinters, exportFloorGrid, exportGroups } = input;
+    const {exportFloors, exportPrinters, exportFloorGrid, exportGroups, exportSettings, exportUsers} = input;
 
     const dumpedObject = {
       version: process.env.npm_package_version,
@@ -426,13 +508,16 @@ export class YamlService {
       printers: undefined as any,
       floors: undefined as any,
       groups: undefined as any,
+      settings: undefined as any,
+      users: undefined as any,
+      user_roles: undefined as any,
     };
 
     if (exportPrinters) {
       const printers = await this.printerService.list();
       dumpedObject.printers = printers.map((p) => {
         const printerId = p.id;
-        const { apiKey } = this.printerCache.getLoginDto(printerId);
+        const {apiKey} = this.printerCache.getLoginDto(printerId);
         return {
           id: printerId,
           disabledReason: p.disabledReason,
@@ -483,6 +568,44 @@ export class YamlService {
             };
           }),
         };
+      });
+    }
+
+    if (exportSettings) {
+      const settings = this.settingsStore.getSettings();
+      dumpedObject.settings = settings;
+    }
+
+    if (exportUsers) {
+      // For SQLite mode, load users with roles relation; for MongoDB, just list users
+      const users = await this.userService.listUsers(1000);
+      const allRoles = this.roleService.roles;
+
+      dumpedObject.users = users.map((u) => {
+        const userDto = this.userService.toDto(u);
+        const userObj: any = {
+          id: userDto.id,
+          username: userDto.username,
+          isDemoUser: userDto.isDemoUser,
+          isRootUser: userDto.isRootUser,
+          isVerified: userDto.isVerified,
+          needsPasswordChange: userDto.needsPasswordChange,
+          passwordHash: u.passwordHash,
+          createdAt: userDto.createdAt,
+        };
+
+
+        // Include roles as role names for both SQLite and MongoDB
+        if (userDto.roles && userDto.roles.length > 0) {
+          userObj.roles = userDto.roles
+            .map((roleId) => {
+              const role = allRoles.find((r) => r.id.toString() === roleId.toString());
+              return role?.name;
+            })
+            .filter((name) => name !== undefined);
+        }
+
+        return userObj;
       });
     }
 

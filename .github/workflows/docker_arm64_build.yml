@@ -11,12 +11,12 @@ jobs:
     outputs:
       foundServerVersion: ${{ steps.init.outputs.foundServerVersion }}
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
       - name: get-client-version
         # https://gist.github.com/DarrenN/8c6a5b969481725a4413?permalink_comment_id=3863317#gistcomment-3863317
         run: |
           echo "SERVER_VERSION=$(npm pkg get version | sed 's/"//g')" >> $GITHUB_ENV
-      - uses: mukunku/tag-exists-action@v1.6.0
+      - uses: mukunku/tag-exists-action@v1.7.0
         id: checkTag
         with:
           tag: ${{ env.SERVER_VERSION }}
@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     name: "Docker ARM64 build"
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
@@ -94,7 +94,7 @@ jobs:
           echo "SQLite tags: ${{ steps.tagging_sqlite.outputs.tags }}"
 
       - name: Cache Docker layers
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-buildx-${{ hashfiles('./docker/Dockerfile') }}

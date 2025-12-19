@@ -21,6 +21,7 @@ export class Settings implements ISettings<number> {
     registration: boolean;
     experimentalMoonrakerSupport: boolean;
     experimentalClientSupport: boolean;
+    experimentalBambuSupport: boolean;
     experimentalThumbnailSupport: boolean;
     experimentalPrusaLinkSupport: boolean;
   };

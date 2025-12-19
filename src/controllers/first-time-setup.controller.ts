@@ -8,6 +8,8 @@ import { SettingsStore } from "@/state/settings.store";
 import { Request, Response } from "express";
 import { IUserService } from "@/services/interfaces/user-service.interface";
 import { IRoleService } from "@/services/interfaces/role-service.interface";
+import { YamlService } from "@/services/core/yaml.service";
+import { MulterService } from "@/services/core/multer.service";
 
 @route(AppConstants.apiRoute + "/first-time-setup")
 export class FirstTimeSetupController {
@@ -15,6 +17,8 @@ export class FirstTimeSetupController {
     private readonly settingsStore: SettingsStore,
     private readonly roleService: IRoleService,
     private readonly userService: IUserService,
+    private readonly yamlService: YamlService,
+    private readonly multerService: MulterService,
   ) {}
 
   @POST()
@@ -67,5 +71,22 @@ export class FirstTimeSetupController {
     await this.settingsStore.setWizardCompleted(AppConstants.currentWizardVersion);
 
     return res.send();
+  }
+
+  @POST()
+  @route("/yaml-import")
+  async importYamlFile(req: Request, res: Response) {
+    if (this.settingsStore.isWizardCompleted()) {
+      throw new ForbiddenError("Wizard already completed. Cannot import during first-time setup once wizard is complete.");
+    }
+
+    const files = await this.multerService.multerLoadFileAsync(req, res, [".yaml"], false);
+    const firstFile = files[0];
+
+    await this.yamlService.importYaml(firstFile.buffer.toString());
+
+    return res.send({
+      success: true,
+    });
   }
 }

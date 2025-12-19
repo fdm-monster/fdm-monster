@@ -50,6 +50,7 @@ export class SettingsStore {
         sentryDiagnosticsEnabled: settings[serverSettingsKey].sentryDiagnosticsEnabled,
         experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
         experimentalPrusaLinkSupport: settings[serverSettingsKey].experimentalPrusaLinkSupport,
+        experimentalBambuSupport: settings[serverSettingsKey].experimentalBambuSupport,
         experimentalTypeormSupport: this.isTypeormMode,
         experimentalClientSupport: settings[serverSettingsKey].experimentalClientSupport,
         experimentalThumbnailSupport: settings[serverSettingsKey].experimentalThumbnailSupport,
@@ -73,6 +74,8 @@ export class SettingsStore {
       },
       [serverSettingsKey]: {
         experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
+        experimentalPrusaLinkSupport: settings[serverSettingsKey].experimentalPrusaLinkSupport,
+        experimentalBambuSupport: settings[serverSettingsKey].experimentalBambuSupport,
         experimentalTypeormSupport: this.isTypeormMode,
         experimentalClientSupport: settings[serverSettingsKey].experimentalClientSupport,
         experimentalThumbnailSupport: settings[serverSettingsKey].experimentalThumbnailSupport,
@@ -225,9 +228,9 @@ export class SettingsStore {
   }
 
   async setRefreshTokenSettings({
-    refreshTokenAttempts,
-    refreshTokenExpiry,
-  }: {
+                                  refreshTokenAttempts,
+                                  refreshTokenExpiry,
+                                }: {
     refreshTokenAttempts: number;
     refreshTokenExpiry: number;
   }) {
@@ -252,17 +255,25 @@ export class SettingsStore {
     return this.getSettings();
   }
 
+  async setExperimentalPrusaLinkSupport(experimentalPrusaLinkSupport: boolean) {
+    this.throwIfSettingsUnset();
+    this.settings![serverSettingsKey].experimentalPrusaLinkSupport = experimentalPrusaLinkSupport;
+    this.settings = await this.settingsService.updateServerSettings(this.settings![serverSettingsKey]);
+
+    return this.getSettings();
+  }
+
+  async setExperimentalBambuSupport(experimentalBambuSupport: boolean) {
+    this.throwIfSettingsUnset();
+    this.settings![serverSettingsKey].experimentalBambuSupport = experimentalBambuSupport;
+    this.settings = await this.settingsService.updateServerSettings(this.settings![serverSettingsKey]);
+    return this.getSettings();
+  }
+
   async setExperimentalThumbnailSupport(experimentalThumbnailSupport: boolean) {
     this.throwIfSettingsUnset();
     this.settings![serverSettingsKey].experimentalThumbnailSupport = experimentalThumbnailSupport;
     this.settings = await this.settingsService.updateServerSettings(this.settings![serverSettingsKey]);
-     return this.getSettings();
-  }
-  
-  async setExperimentalPrusaLinkSupport(experimentalPrusaLinkSupport: boolean) {
-    this.throwIfSettingsUnset();
-    this.settings![serverSettingsKey].experimentalPrusaLinkSupport = experimentalPrusaLinkSupport;
-    this.settings = await this.settingsService.updateServerSettings(this.settings![serverSettingsKey]);    
     return this.getSettings();
   }
 

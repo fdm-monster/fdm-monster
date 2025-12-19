@@ -5,9 +5,10 @@ export const serverSettingsUpdateSchema = z.object({
   registration: z.boolean(),
   loginRequired: z.boolean(),
   experimentalMoonrakerSupport: z.boolean(),
+  experimentalBambuSupport: z.boolean(),
+  experimentalPrusaLinkSupport: z.boolean(),
   experimentalThumbnailSupport: z.boolean(),
   experimentalClientSupport: z.boolean(),
-  experimentalPrusaLinkSupport: z.boolean(),
   sentryDiagnosticsEnabled: z.boolean(),
 });
 
@@ -61,6 +62,10 @@ export const moonrakerSupportSchema = z.object({
 });
 
 export const prusaLinkSupportSchema = z.object({
+  enabled: z.boolean(),
+});
+
+export const bambuSupportSchema = z.object({
   enabled: z.boolean(),
 });
 

@@ -9,14 +9,16 @@ import { Flags } from "@/services/moonraker/dto/octoprint-compat/api-printer.dto
 export const OctoprintType = 0;
 export const MoonrakerType = 1;
 export const PrusaLinkType = 2;
+export const BambuType = 3;
 
 export enum PrinterTypesEnum {
   Octoprint = 0,
   Moonraker = 1,
-  PrusaLink = 2
+  PrusaLink = 2,
+  Bambu = 3
 }
 
-export type PrinterType = typeof OctoprintType | typeof MoonrakerType | typeof PrusaLinkType;
+export type PrinterType = typeof OctoprintType | typeof MoonrakerType | typeof PrusaLinkType | typeof BambuType;
 
 export interface FdmCurrentMessageDto {
   progress: {

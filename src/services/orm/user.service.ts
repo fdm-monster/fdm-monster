@@ -160,6 +160,13 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
     return await this.update(user.id, { passwordHash, needsPasswordChange: false });
   }
 
+  async updatePasswordHashUnsafeByUsername(username: string, passwordHash: string): Promise<User> {
+    const user = await this.findRawByUsername(username);
+    if (!user) throw new NotFoundException("User not found");
+
+    return await this.update(user.id, { passwordHash, needsPasswordChange: false });
+  }
+
   updateUsernameById(userId: SqliteIdType, newUsername: string): Promise<User> {
     return this.update(userId, { username: newUsername });
   }

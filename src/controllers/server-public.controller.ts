@@ -43,6 +43,7 @@ export class ServerPublicController {
     const serverSettings = this.settingsStore.getServerSettings();
     const moonrakerEnabled = serverSettings.experimentalMoonrakerSupport;
     const prusaLinkEnabled = serverSettings.experimentalPrusaLinkSupport;
+    const bambuEnabled = serverSettings.experimentalBambuSupport;
     res.send({
       printerGroupsApi: {
         // Only SQLite mode supported for this feature
@@ -58,6 +59,7 @@ export class ServerPublicController {
             "octoprint",
             ...(moonrakerEnabled ? ["klipper"] : []),
             ...(prusaLinkEnabled ? ["prusaLink"] : []),
+            ...(bambuEnabled ? ["bambu"] : []),            
           ],
         },
       },
