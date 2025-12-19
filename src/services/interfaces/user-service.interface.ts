@@ -34,6 +34,8 @@ export interface IUserService<KeyType = IdType, Entity = IUser<KeyType>> {
 
   updatePasswordUnsafeByUsername(username: string, newPassword: string): Promise<Entity>;
 
+  updatePasswordHashUnsafeByUsername(username: string, passwordHash: string): Promise<Entity>;
+
   setIsRootUserById(userId: KeyType, isRootUser: boolean): Promise<void>;
 
   setVerifiedById(userId: KeyType, isVerified: boolean): Promise<void>;
