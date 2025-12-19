@@ -33,5 +33,3 @@ coverage
 **/yarn-error.log
 
 test/requests/*.env.json
-
-example-libs/
