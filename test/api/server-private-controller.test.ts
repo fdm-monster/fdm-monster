@@ -14,8 +14,8 @@ let request: TestAgent<Test>;
 
 const defaultRoute = `${AppConstants.apiRoute}/server`;
 const getClientReleasesRoute = `${defaultRoute}/client-releases`;
-const exportPrintersAndFloorsRoute = `${defaultRoute}/export-printers-floors-yaml`;
-const importPrintersAndFloorsRoute = `${defaultRoute}/import-printers-floors-yaml`;
+const exportPrintersAndFloorsRoute = `${defaultRoute}/yaml-export`;
+const importPrintersAndFloorsRoute = `${defaultRoute}/yaml-import`;
 
 beforeAll(async () => {
   ({ request } = await setupTestApp());
@@ -72,8 +72,10 @@ describe(ServerPrivateController.name, () => {
     await validateInput(yamlObject, importPrintersFloorsYamlSchema);
   });
 
-  test.skip("should import YAML and have data loaded", async () => {
-    const response = await request.post(importPrintersAndFloorsRoute).attach("file", exportYamlBuffer1_3_1);
+  it("should import YAML and have data loaded", async () => {
+    const response = await request
+      .post(importPrintersAndFloorsRoute)
+      .attach("file", Buffer.from(exportYamlBuffer1_3_1), "export.yaml");
     expectOkResponse(response);
   });
 });

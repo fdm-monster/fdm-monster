@@ -1,48 +1,48 @@
 version: 1.9.1
-exportedAt: 2025-12-15T21:24:31.733Z
-databaseType: mongo
+exportedAt: 2025-12-19T18:34:45.184Z
+databaseType: sqlite
 config:
   exportPrinters: true
   exportFloorGrid: true
   exportFloors: true
-  exportGroups: false
+  exportGroups: true
   exportSettings: true
   exportUsers: true
   printerComparisonStrategiesByPriority:
     - name
     - url
-  floorComparisonStrategiesByPriority: floor
-  notes: ''
+  floorComparisonStrategiesByPriority: name
 printers:
-  - id: 69407a6c8a1a9d1c9ae55342
+  - id: 1
+    disabledReason: null
     enabled: true
     printerType: 0
-    dateAdded: 1765833324246
+    dateAdded: 1766166393070
     name: Great Cultivator
     printerURL: http://test.local
     apiKey: '123123123123123123123123123123123'
 floors:
-  - id: 694075a93d945b4e131139e6
+  - id: 1
     floor: 1
     name: Default Floor
     printers:
-      - printerId: 69407a6c8a1a9d1c9ae55342
+      - printerId: 1
         x: 0
         'y': 0
+groups: []
 settings:
   server:
-    loginRequired: true
+    loginRequired: false
     registration: false
     sentryDiagnosticsEnabled: false
     experimentalMoonrakerSupport: false
     experimentalPrusaLinkSupport: false
-    experimentalBambuSupport: true
-    experimentalTypeormSupport: false
+    experimentalTypeormSupport: true
     experimentalClientSupport: false
     experimentalThumbnailSupport: false
   wizard:
     wizardCompleted: true
-    wizardCompletedAt: 2025-12-15T21:14:37.835Z
+    wizardCompletedAt: '2025-12-19T17:46:33.136Z'
     wizardVersion: 1
   frontend:
     gridCols: 2
@@ -57,13 +57,13 @@ settings:
     apiTimeout: 10000
     apiUploadTimeout: 30000
 users:
-  - id: 69407a3d8a1a9d1c9ae55320
+  - id: 1
     username: admin
     isDemoUser: false
     isRootUser: true
     isVerified: true
     needsPasswordChange: false
     passwordHash: $2b$10$EFjlfG/Qjq3HIRnXympocOPhykVj8k092H6R3kXVOE.5iBXpoUm9W
-    createdAt: 2025-12-15T21:14:37.726Z
+    createdAt: 2025-12-19T17:46:33.000Z
     roles:
       - ADMIN

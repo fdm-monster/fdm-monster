@@ -59,7 +59,6 @@ describe(YamlService.name, () => {
       exportFloorGrid: true,
       exportGroups: true,
       exportSettings: true,
-      exportUserRoles: true,
       exportUsers: true,
       printerComparisonStrategiesByPriority: ["name", "id"],
       floorComparisonStrategiesByPriority: "floor",
@@ -164,20 +163,17 @@ describe(YamlService.name, () => {
   it("should parse 1.9.1 mongodb full yaml file format", async () => {
     const buffer = readFileSync(join(__dirname, "./test-data/export-fdm-monster-1.9.1-mongodb-full.yaml"));
 
-    // Note: We test that the file can be parsed and validated, but we don't import
-    // the system data (settings, users, roles) because the wizard is already completed
-    // in the test environment. This is expected behavior - system data can only be
-    // imported during first-time setup when wizard is not completed.
+    await expect(yamlService.importYaml(buffer.toString())).rejects.toThrow(
+      "Settings table is not empty"
+    );
+  });
 
-    const content = buffer.toString();
-    expect(content).toContain("version: 1.9.1");
-    expect(content).toContain("databaseType: mongo");
-    expect(content).toContain("exportSettings: true");
-    expect(content).toContain("exportUsers: true");
-    expect(content).toContain("printers:");
-    expect(content).toContain("floors:");
-    expect(content).toContain("settings:");
-    expect(content).toContain("users:");
+  it("should parse 1.9.1 sqlite full yaml file format", async () => {
+    const buffer = readFileSync(join(__dirname, "./test-data/export-fdm-monster-1.9.1-sqlite-full.yaml"));
+
+    await expect(yamlService.importYaml(buffer.toString())).rejects.toThrow(
+      "Settings table is not empty"
+    );
   });
 
   it("should export yaml with system data (settings, users)", async () => {
@@ -188,7 +184,6 @@ describe(YamlService.name, () => {
       exportGroups: false,
       exportSettings: true,
       exportUsers: true,
-      exportUserRoles: false,
       printerComparisonStrategiesByPriority: ["name", "id"],
       floorComparisonStrategiesByPriority: "floor",
     });
@@ -208,7 +203,6 @@ describe(YamlService.name, () => {
       exportGroups: true,
       exportSettings: true,
       exportUsers: true,
-      exportUserRoles: true,
       printerComparisonStrategiesByPriority: ["name", "id"],
       floorComparisonStrategiesByPriority: "floor",
     });
@@ -218,9 +212,6 @@ describe(YamlService.name, () => {
     expect(yamlDump).toContain("exportFloors: true");
     expect(yamlDump).toContain("exportSettings: true");
     expect(yamlDump).toContain("exportUsers: true");
-    if (isTypeormMode) {
-      expect(yamlDump).toContain("exportUserRoles: true");
-    }
   });
 
   it("should export yaml with only printers (no system data)", async () => {
@@ -231,7 +222,6 @@ describe(YamlService.name, () => {
       exportGroups: false,
       exportSettings: false,
       exportUsers: false,
-      exportUserRoles: false,
       printerComparisonStrategiesByPriority: ["name", "id"],
       floorComparisonStrategiesByPriority: "floor",
     });
@@ -241,6 +231,52 @@ describe(YamlService.name, () => {
     expect(yamlDump).toContain("exportPrinters: true");
     expect(yamlDump).not.toContain("settings:");
     expect(yamlDump).not.toContain("users:");
+  });
+
+  it("should export yaml with floors and printer floor positions", async () => {
+    const printer = await printerService.create({ ...testPrinterData, name: "ExportTestPrinter" });
+    const floor = await floorService.create({
+      name: "ExportTestFloor",
+      floor: 99,
+      printers: [
+        {
+          x: 1,
+          y: 2,
+          printerId: printer.id,
+        },
+      ],
+    });
+
+    const yamlDump = await yamlService.exportYaml({
+      exportFloors: true,
+      exportPrinters: true,
+      exportFloorGrid: true,
+      exportGroups: false,
+      exportSettings: false,
+      exportUsers: false,
+      printerComparisonStrategiesByPriority: ["name"],
+      floorComparisonStrategiesByPriority: "floor",
+    });
+
+    expect(yamlDump).toBeDefined();
+    expect(yamlDump).toContain("floors:");
+    expect(yamlDump).toContain("printers:");
+    expect(yamlDump).toContain("ExportTestPrinter");
+
+    // Verify printerId is properly serialized and not empty object
+    expect(yamlDump).toContain("printerId:");
+    expect(yamlDump).not.toContain("printerId: {}");
+    expect(yamlDump).not.toContain("printerId: null");
+
+    // Parse YAML to verify structure - check that at least one printerId line is valid
+    const yamlLines = yamlDump.split("\n");
+    const printerIdLines = yamlLines.filter((line) => line.includes("printerId:"));
+    expect(printerIdLines.length).toBeGreaterThan(0);
+
+    // Verify that none of the printerId lines are empty objects
+    for (const line of printerIdLines) {
+      expect(line.trim()).not.toBe("printerId: {}");
+    }
   });
 
   it("should import floor over existing floor", async () => {

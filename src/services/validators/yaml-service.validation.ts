@@ -20,7 +20,6 @@ export const exportPrintersFloorsYamlSchema = z.object({
   exportGroups: z.boolean(),
   exportSettings: z.boolean().default(false),
   exportUsers: z.boolean().default(false),
-  exportUserRoles: z.boolean().default(false),
   printerComparisonStrategiesByPriority: z
     .array(z.string().refine((val) => ["name", "url", "id"].includes(val)))
     .min(1),
@@ -56,7 +55,6 @@ export const importPrintersFloorsYamlSchema = z.object({
     exportGroups: z.boolean().optional(),
     exportSettings: z.boolean().optional().default(false),
     exportUsers: z.boolean().optional().default(false),
-    exportUserRoles: z.boolean().optional().default(false),
     printerComparisonStrategiesByPriority: z
       .array(z.string().refine((val) => ["name", "url", "id"].includes(val)))
       .min(1),

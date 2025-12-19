@@ -1,0 +1,4 @@
+### POST request to export system configuration as YAML
+GET http://localhost:4000/api/user/
+
+###

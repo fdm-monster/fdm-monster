@@ -19,7 +19,6 @@ import { z } from "zod";
 import { IUserService } from "@/services/interfaces/user-service.interface";
 import { IRoleService } from "@/services/interfaces/role-service.interface";
 import { SettingsStore } from "@/state/settings.store";
-import { UserRoleService } from "@/services/orm/user-role.service";
 
 export class YamlService {
   private readonly logger: LoggerService;
@@ -31,10 +30,9 @@ export class YamlService {
     private readonly printerCache: PrinterCache,
     private readonly floorStore: FloorStore,
     private readonly floorService: IFloorService,
-    private readonly userService: IUserService<IdType>,
-    private readonly roleService: IRoleService<IdType>,
+    private readonly userService: IUserService,
+    private readonly roleService: IRoleService,
     private readonly settingsStore: SettingsStore,
-    private readonly userRoleService: UserRoleService | null,
     private readonly isTypeormMode: boolean,
   ) {
     this.logger = loggerFactory(YamlService.name);
@@ -43,11 +41,11 @@ export class YamlService {
   async importYaml(yamlBuffer: string) {
     const importSpec = (await load(yamlBuffer)) as YamlExportSchema;
     const databaseTypeSqlite = importSpec.databaseType === "sqlite";
-    const { exportPrinters, exportFloorGrid, exportSettings, exportUsers, exportUserRoles } = importSpec.config;
+    const { exportPrinters, exportFloorGrid, exportSettings, exportUsers } = importSpec.config;
 
     // Validate that system tables can be imported (skip validation if wizard not completed)
     const wizardCompleted = this.settingsStore.getWizardSettings()?.wizardCompleted;
-    const hasSystemData = exportSettings || exportUsers || exportUserRoles;
+    const hasSystemData = exportSettings || exportUsers;
     if (hasSystemData && wizardCompleted) {
       await this.validateSystemTablesEmpty(importSpec);
     }
@@ -254,11 +252,6 @@ export class YamlService {
       await this.importUsers(importSpec.users, databaseTypeSqlite);
     }
 
-    if (exportUserRoles && importSpec.user_roles && importSpec.user_roles.length > 0) {
-      this.logger.log(`Importing user roles (${importSpec.user_roles.length} user roles)`);
-      await this.importUserRoles(importSpec.user_roles, databaseTypeSqlite);
-    }
-
     return {
       updateByPropertyPrinters,
       updateByPropertyFloors,
@@ -293,12 +286,6 @@ export class YamlService {
     this.logger.log("Settings imported successfully");
   }
 
-  async importRoles(roles: any[], databaseTypeSqlite: boolean) {
-    // Roles are system-defined and synchronized via syncRoles()
-    // They cannot be imported directly, so we skip this and rely on the system's built-in roles
-    this.logger.log(`Skipping roles import (${roles.length} roles) - roles are system-defined and managed automatically`);
-  }
-
   async importUsers(users: any[], databaseTypeSqlite: boolean) {
     const allRoles = this.roleService.roles;
 
@@ -308,25 +295,20 @@ export class YamlService {
         user.id = Number.parseInt(user.id);
       }
 
-      // Convert role names to IDs for registration
       let roleIds: IdType[] = [];
       if (user.roles && user.roles.length > 0) {
         // Support both role names (new format) and role IDs (backward compatibility)
         roleIds = user.roles
           .map((roleNameOrId: string | IdType) => {
             // If it's a role name (string like "ADMIN"), find the corresponding ID
-            if (typeof roleNameOrId === "string" && !roleNameOrId.match(/^[0-9a-f]{24}$/i) && isNaN(Number(roleNameOrId))) {
-              const role = allRoles.find((r) => r.name === roleNameOrId);
-              return role?.id;
-            }
-            // Otherwise, it's already a role ID
-            return roleNameOrId;
+            const role = allRoles.find((r) => r.name === roleNameOrId);
+            return role?.id;
           })
           .filter((id: IdType | undefined) => id !== undefined);
       }
 
       // Register user with a temporary password (will be replaced with actual hash)
-      const createdUser = await this.userService.register({
+      await this.userService.register({
         username: user.username,
         password: "temporary-password-to-be-replaced",
         roles: roleIds,
@@ -339,35 +321,7 @@ export class YamlService {
       // Update the password hash directly (without re-hashing)
       await this.userService.updatePasswordHashUnsafeByUsername(user.username, user.passwordHash);
     }
-    this.logger.log(`Imported ${users.length} users`);
-  }
-
-  async importUserRoles(userRoles: any[], databaseTypeSqlite: boolean) {
-    if (!this.isTypeormMode || !this.userRoleService) {
-      this.logger.warn("User roles import is only supported in TypeORM mode");
-      return;
-    }
-
-    for (const userRole of userRoles) {
-      // Ensure ID types match database type
-      if (databaseTypeSqlite) {
-        if (typeof userRole.id === "string") {
-          userRole.id = Number.parseInt(userRole.id);
-        }
-        if (typeof userRole.userId === "string") {
-          userRole.userId = Number.parseInt(userRole.userId);
-        }
-        if (typeof userRole.roleId === "string") {
-          userRole.roleId = Number.parseInt(userRole.roleId);
-        }
-      }
-
-      await this.userRoleService.create({
-        userId: userRole.userId,
-        roleId: userRole.roleId,
-      });
-    }
-    this.logger.log(`Imported ${userRoles.length} user roles`);
+    this.logger.log(`Imported ${ users.length } users`);
   }
 
   async validateSystemTablesEmpty(importSpec: YamlExportSchema) {
@@ -389,20 +343,8 @@ export class YamlService {
       }
     }
 
-    // Note: Roles are system-defined and not imported, so no validation needed for roles
-
-    // Check if importing user_roles but user_roles already exist
-    if (importSpec.user_roles && importSpec.user_roles.length > 0 && importSpec.config.exportUserRoles) {
-      if (this.isTypeormMode && this.userRoleService) {
-        const existingUserRoles = await this.userRoleService.list();
-        if (existingUserRoles.length > 0) {
-          errors.push("User roles table is not empty. Cannot import user roles when existing user roles are present.");
-        }
-      }
-    }
-
     if (errors.length > 0) {
-      throw new Error(`Import validation failed:\n${errors.join("\n")}`);
+      throw new Error(`Import validation failed:\n${ errors.join("\n") }`);
     }
   }
 
@@ -440,20 +382,6 @@ export class YamlService {
             }
             updateByPropertyPrinters.push({
               strategy: "url",
-              printerId: this.isTypeormMode ? parseInt(ids[foundIndex]) : ids[foundIndex],
-              value: printer,
-            });
-            break;
-          }
-        } else if (strategy === "id") {
-          const comparedName = printer.id.toLowerCase();
-          const foundIndex = ids.findIndex((n) => n === comparedName);
-          if (foundIndex !== -1) {
-            if (!ids[foundIndex]) {
-              throw new Error("Update ID is undefined");
-            }
-            updateByPropertyPrinters.push({
-              strategy: "id",
               printerId: this.isTypeormMode ? parseInt(ids[foundIndex]) : ids[foundIndex],
               value: printer,
             });
@@ -508,20 +436,6 @@ export class YamlService {
             }
             updateByPropertyFloors.push({
               strategy: "floor",
-              floorId: this.isTypeormMode ? Number.parseInt(ids[foundIndex]) : ids[foundIndex],
-              value: floor,
-            });
-            break;
-          }
-        } else if (strategy === "id") {
-          const comparedProperty = floor.id.toLowerCase();
-          const foundIndex = ids.findIndex((n) => n === comparedProperty);
-          if (foundIndex !== -1) {
-            if (!ids[foundIndex]) {
-              throw new Error("IDS not found, floor id");
-            }
-            updateByPropertyFloors.push({
-              strategy: "id",
               floorId: this.isTypeormMode ? Number.parseInt(ids[foundIndex]) : ids[foundIndex],
               value: floor,
             });
@@ -583,9 +497,8 @@ export class YamlService {
 
     if (!this.isTypeormMode) {
       input.exportGroups = false;
-      input.exportUserRoles = false;
     }
-    const { exportFloors, exportPrinters, exportFloorGrid, exportGroups, exportSettings, exportUsers, exportUserRoles } = input;
+    const {exportFloors, exportPrinters, exportFloorGrid, exportGroups, exportSettings, exportUsers} = input;
 
     const dumpedObject = {
       version: process.env.npm_package_version,
@@ -604,7 +517,7 @@ export class YamlService {
       const printers = await this.printerService.list();
       dumpedObject.printers = printers.map((p) => {
         const printerId = p.id;
-        const { apiKey } = this.printerCache.getLoginDto(printerId);
+        const {apiKey} = this.printerCache.getLoginDto(printerId);
         return {
           id: printerId,
           disabledReason: p.disabledReason,
@@ -664,41 +577,35 @@ export class YamlService {
     }
 
     if (exportUsers) {
+      // For SQLite mode, load users with roles relation; for MongoDB, just list users
       const users = await this.userService.listUsers(1000);
       const allRoles = this.roleService.roles;
 
       dumpedObject.users = users.map((u) => {
-        // Convert role IDs to role names for better readability and portability
-        const roleNames = u.roles
-          ?.map((roleId) => {
-            const role = allRoles.find((r) => r.id.toString() === roleId.toString());
-            return role?.name;
-          })
-          .filter((name) => name !== undefined) || [];
-
-        return {
-          id: u.id,
-          username: u.username,
-          isDemoUser: u.isDemoUser,
-          isRootUser: u.isRootUser,
-          isVerified: u.isVerified,
-          needsPasswordChange: u.needsPasswordChange,
+        const userDto = this.userService.toDto(u);
+        const userObj: any = {
+          id: userDto.id,
+          username: userDto.username,
+          isDemoUser: userDto.isDemoUser,
+          isRootUser: userDto.isRootUser,
+          isVerified: userDto.isVerified,
+          needsPasswordChange: userDto.needsPasswordChange,
           passwordHash: u.passwordHash,
-          createdAt: u.createdAt,
-          roles: roleNames, // Now stores role names instead of IDs
+          createdAt: userDto.createdAt,
         };
-      });
-    }
 
-    if (exportUserRoles && this.isTypeormMode && this.userRoleService) {
-      const userRoles = await this.userRoleService.list();
-      dumpedObject.user_roles = userRoles.map((ur) => {
-        return {
-          id: ur.id,
-          userId: ur.userId,
-          roleId: ur.roleId,
-          createdAt: ur.createdAt,
-        };
+
+        // Include roles as role names for both SQLite and MongoDB
+        if (userDto.roles && userDto.roles.length > 0) {
+          userObj.roles = userDto.roles
+            .map((roleId) => {
+              const role = allRoles.find((r) => r.id.toString() === roleId.toString());
+              return role?.name;
+            })
+            .filter((name) => name !== undefined);
+        }
+
+        return userObj;
       });
     }
 
