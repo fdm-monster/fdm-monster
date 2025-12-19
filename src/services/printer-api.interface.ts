@@ -12,10 +12,10 @@ export const PrusaLinkType = 2;
 export const BambuType = 3;
 
 export enum PrinterTypesEnum {
-  Octoprint = OctoprintType as number,
-  Moonraker = MoonrakerType as number,
-  PrusaLink = PrusaLinkType as number,
-  Bambu = BambuType as number
+  Octoprint = OctoprintType,
+  Moonraker = MoonrakerType,
+  PrusaLink = PrusaLinkType,
+  Bambu = BambuType
 }
 
 export type PrinterType = typeof OctoprintType | typeof MoonrakerType | typeof PrusaLinkType | typeof BambuType;
