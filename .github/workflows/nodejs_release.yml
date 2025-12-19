@@ -28,11 +28,15 @@ jobs:
     needs: checkversion
     runs-on: ubuntu-latest
     if: needs.checkversion.outputs.foundServerVersion == 'false'
+    permissions:
+      id-token: write  # Required for OIDC (NPM)
+      contents: write
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
       - uses: actions/setup-node@v6
         with:
           node-version: 24.x
+          registry-url: 'https://registry.npmjs.org'
 
       # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions
       - name: get-server-version
@@ -63,7 +67,6 @@ jobs:
       - uses: JS-DevTools/npm-publish@v4
         with:
           dry-run: false
-          token: ${{ secrets.NPM_TOKEN }}
           access: public
           package: package.json
 
