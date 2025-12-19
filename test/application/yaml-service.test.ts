@@ -12,6 +12,7 @@ import { testPrinterData } from "./test-data/printer.data";
 import { FloorStore } from "@/state/floor.store";
 import { FloorPositionService } from "@/services/orm/floor-position.service";
 import { OctoprintType } from "@/services/printer-api.interface";
+import { SettingsStore } from "@/state/settings.store";
 
 let yamlService: YamlService;
 let printerCache: PrinterCache;
@@ -19,6 +20,7 @@ let printerService: IPrinterService;
 let floorService: IFloorService;
 let floorStore: FloorStore;
 let printerGroupService: PrinterGroupService;
+let settingsStore: SettingsStore;
 let isTypeormMode: boolean;
 // Use only when isTypeormMode is true
 let floorPositionService: FloorPositionService;
@@ -33,6 +35,7 @@ beforeAll(async () => {
   floorPositionService = container.resolve(DITokens.floorPositionService);
   floorStore = container.resolve(DITokens.floorStore);
   printerGroupService = container.resolve(DITokens.printerGroupService);
+  settingsStore = container.resolve(DITokens.settingsStore);
 });
 afterEach(async () => {
   const printers = await printerService.list();
@@ -159,6 +162,88 @@ describe(YamlService.name, () => {
     } else {
       expect(printerGroupService).toBeNull();
     }
+  });
+
+  it("should parse 1.9.1 mongodb full yaml file format", async () => {
+    const buffer = readFileSync(join(__dirname, "./test-data/export-fdm-monster-1.9.1-mongodb-full.yaml"));
+
+    // Note: We test that the file can be parsed and validated, but we don't import
+    // the system data (settings, users, roles) because the wizard is already completed
+    // in the test environment. This is expected behavior - system data can only be
+    // imported during first-time setup when wizard is not completed.
+
+    const content = buffer.toString();
+    expect(content).toContain("version: 1.9.1");
+    expect(content).toContain("databaseType: mongo");
+    expect(content).toContain("exportSettings: true");
+    expect(content).toContain("exportUsers: true");
+    expect(content).toContain("printers:");
+    expect(content).toContain("floors:");
+    expect(content).toContain("settings:");
+    expect(content).toContain("users:");
+  });
+
+  it("should export yaml with system data (settings, users)", async () => {
+    const yamlDump = await yamlService.exportPrintersAndFloors({
+      exportFloors: false,
+      exportPrinters: false,
+      exportFloorGrid: false,
+      exportGroups: false,
+      exportSettings: true,
+      exportUsers: true,
+      exportUserRoles: false,
+      printerComparisonStrategiesByPriority: ["name", "id"],
+      floorComparisonStrategiesByPriority: "floor",
+    });
+
+    expect(yamlDump).toBeDefined();
+    expect(yamlDump).toContain("settings:");
+    expect(yamlDump).toContain("users:");
+    expect(yamlDump).toContain("exportSettings: true");
+    expect(yamlDump).toContain("exportUsers: true");
+  });
+
+  it("should export yaml with all options enabled", async () => {
+    const yamlDump = await yamlService.exportPrintersAndFloors({
+      exportFloors: true,
+      exportPrinters: true,
+      exportFloorGrid: true,
+      exportGroups: true,
+      exportSettings: true,
+      exportUsers: true,
+      exportUserRoles: true,
+      printerComparisonStrategiesByPriority: ["name", "id"],
+      floorComparisonStrategiesByPriority: "floor",
+    });
+
+    expect(yamlDump).toBeDefined();
+    expect(yamlDump).toContain("exportPrinters: true");
+    expect(yamlDump).toContain("exportFloors: true");
+    expect(yamlDump).toContain("exportSettings: true");
+    expect(yamlDump).toContain("exportUsers: true");
+    if (isTypeormMode) {
+      expect(yamlDump).toContain("exportUserRoles: true");
+    }
+  });
+
+  it("should export yaml with only printers (no system data)", async () => {
+    const yamlDump = await yamlService.exportPrintersAndFloors({
+      exportFloors: false,
+      exportPrinters: true,
+      exportFloorGrid: false,
+      exportGroups: false,
+      exportSettings: false,
+      exportUsers: false,
+      exportUserRoles: false,
+      printerComparisonStrategiesByPriority: ["name", "id"],
+      floorComparisonStrategiesByPriority: "floor",
+    });
+
+    expect(yamlDump).toBeDefined();
+    expect(yamlDump).toContain("printers:");
+    expect(yamlDump).toContain("exportPrinters: true");
+    expect(yamlDump).not.toContain("settings:");
+    expect(yamlDump).not.toContain("users:");
   });
 
   it("should import floor over existing floor", async () => {

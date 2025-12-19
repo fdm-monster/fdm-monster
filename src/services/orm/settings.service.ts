@@ -56,11 +56,6 @@ export class SettingsService
     }
   }
 
-  async getServerSettings() {
-    const settings = await this.getOrCreate();
-    return settings[serverSettingsKey];
-  }
-
   async updateServerSettings(update: z.infer<typeof serverSettingsUpdateSchema>) {
     const validatedInput = await validateInput(update, serverSettingsUpdateSchema);
     const entity = await this.getOrCreate();

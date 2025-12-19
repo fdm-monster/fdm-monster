@@ -18,6 +18,9 @@ export const exportPrintersFloorsYamlSchema = z.object({
   exportFloorGrid: z.boolean(),
   exportFloors: z.boolean(),
   exportGroups: z.boolean(),
+  exportSettings: z.boolean().default(false),
+  exportUsers: z.boolean().default(false),
+  exportUserRoles: z.boolean().default(false),
   printerComparisonStrategiesByPriority: z
     .array(z.string().refine((val) => ["name", "url", "id"].includes(val)))
     .min(1),
@@ -51,6 +54,9 @@ export const importPrintersFloorsYamlSchema = z.object({
     exportFloorGrid: z.boolean(),
     exportFloors: z.boolean(),
     exportGroups: z.boolean().optional(),
+    exportSettings: z.boolean().optional().default(false),
+    exportUsers: z.boolean().optional().default(false),
+    exportUserRoles: z.boolean().optional().default(false),
     printerComparisonStrategiesByPriority: z
       .array(z.string().refine((val) => ["name", "url", "id"].includes(val)))
       .min(1),
@@ -100,6 +106,43 @@ export const importPrintersFloorsYamlSchema = z.object({
       }),
     )
     .min(0)
+    .default([]),
+  settings: z.any().optional(),
+  users: z
+    .array(
+      z.object({
+        id: numberOrStringIdValidator,
+        username: z.string(),
+        isDemoUser: z.boolean().optional(),
+        isRootUser: z.boolean().optional(),
+        isVerified: z.boolean().optional(),
+        needsPasswordChange: z.boolean().optional(),
+        passwordHash: z.string(),
+        createdAt: z.date().optional(),
+        roles: z.array(z.any()).optional(),
+      }),
+    )
+    .optional()
+    .default([]),
+  roles: z
+    .array(
+      z.object({
+        id: numberOrStringIdValidator,
+        name: z.string(),
+      }),
+    )
+    .optional()
+    .default([]),
+  user_roles: z
+    .array(
+      z.object({
+        id: numberOrStringIdValidator,
+        userId: numberOrStringIdValidator,
+        roleId: numberOrStringIdValidator,
+        createdAt: z.date().optional(),
+      }),
+    )
+    .optional()
     .default([]),
 });
 

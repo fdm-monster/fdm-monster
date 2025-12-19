@@ -1,0 +1,70 @@
+version: 1.9.1
+exportedAt: 2025-12-15T21:24:31.733Z
+databaseType: mongo
+config:
+  exportPrinters: true
+  exportFloorGrid: true
+  exportFloors: true
+  exportGroups: false
+  exportSettings: true
+  exportUsers: true
+  exportUserRoles: false
+  printerComparisonStrategiesByPriority:
+    - name
+    - url
+  floorComparisonStrategiesByPriority: floor
+  notes: ''
+printers:
+  - id: 69407a6c8a1a9d1c9ae55342
+    enabled: true
+    printerType: 0
+    dateAdded: 1765833324246
+    name: Great Cultivator
+    printerURL: http://test.local
+    apiKey: '123123123123123123123123123123123'
+floors:
+  - id: 694075a93d945b4e131139e6
+    floor: 1
+    name: Default Floor
+    printers:
+      - printerId: 69407a6c8a1a9d1c9ae55342
+        x: 0
+        'y': 0
+settings:
+  server:
+    loginRequired: true
+    registration: false
+    sentryDiagnosticsEnabled: false
+    experimentalMoonrakerSupport: false
+    experimentalPrusaLinkSupport: false
+    experimentalBambuSupport: true
+    experimentalTypeormSupport: false
+    experimentalClientSupport: false
+    experimentalThumbnailSupport: false
+  wizard:
+    wizardCompleted: true
+    wizardCompletedAt: 2025-12-15T21:14:37.835Z
+    wizardVersion: 1
+  frontend:
+    gridCols: 2
+    gridRows: 2
+    largeTiles: true
+    tilePreferCancelOverQuickStop: true
+  printerFileClean:
+    autoRemoveOldFilesBeforeUpload: false
+    autoRemoveOldFilesAtBoot: false
+    autoRemoveOldFilesCriteriumDays: 7
+  timeout:
+    apiTimeout: 10000
+    apiUploadTimeout: 30000
+users:
+  - id: 69407a3d8a1a9d1c9ae55320
+    username: admin
+    isDemoUser: false
+    isRootUser: true
+    isVerified: true
+    needsPasswordChange: false
+    passwordHash: $2b$10$EFjlfG/Qjq3HIRnXympocOPhykVj8k092H6R3kXVOE.5iBXpoUm9W
+    createdAt: 2025-12-15T21:14:37.726Z
+    roles:
+      - ADMIN

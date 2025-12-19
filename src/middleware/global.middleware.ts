@@ -21,6 +21,7 @@ export const validateWizardCompleted = inject(
       const allowedPaths = [
         "/api/first-time-setup/complete",
         "/api/first-time-setup/validate",
+        "/api/first-time-setup/yaml-import",
         "/api/test",
         "/api/auth/login-required",
       ];
