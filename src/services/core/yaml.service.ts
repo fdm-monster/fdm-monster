@@ -65,7 +65,7 @@ export class YamlService {
       }
       // Ensure the type matches the database it came from (1.6.0+)
       if (databaseTypeSqlite && typeof printer.id === "string") {
-        printer.id = parseInt(printer.id);
+        printer.id = Number.parseInt(printer.id);
       }
 
       // 1.7 backwards compatibility
@@ -79,7 +79,7 @@ export class YamlService {
       // Ensure the type matches the database it came from (1.6.0+)
       for (const floor of importSpec.floors) {
         if (typeof floor.id === "string") {
-          floor.id = parseInt(floor.id);
+          floor.id = Number.parseInt(floor.id);
         }
         // Ensure the type matches the database it came from (1.6.0+)
         for (const printer of floor.printers) {
@@ -285,7 +285,7 @@ export class YamlService {
     }
 
     if (settings.wizard?.wizardCompleted) {
-      const importedWizardVersion: number = settings.wizard.wizardCompleted;
+      const importedWizardVersion: number = settings.wizard.wizardVersion;
       this.logger.log(`Marking wizard as completed with version: ${importedWizardVersion}`);
       await this.settingsStore.setWizardCompleted(importedWizardVersion);
     }
