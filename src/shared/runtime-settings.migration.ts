@@ -60,6 +60,7 @@ export function migrateSettingsRuntime<KeyType = IdType>(
       experimentalClientSupport: entity[serverSettingsKey].experimentalClientSupport ?? defaultServerSettings.experimentalClientSupport,
       experimentalMoonrakerSupport: entity[serverSettingsKey].experimentalMoonrakerSupport ?? defaultServerSettings.experimentalMoonrakerSupport,
       experimentalPrusaLinkSupport: entity[serverSettingsKey].experimentalPrusaLinkSupport ?? defaultServerSettings.experimentalPrusaLinkSupport,
+      experimentalBambuSupport: entity[serverSettingsKey].experimentalBambuSupport ?? defaultServerSettings.experimentalBambuSupport,
       sentryDiagnosticsEnabled: entity[serverSettingsKey].sentryDiagnosticsEnabled ?? defaultServerSettings.sentryDiagnosticsEnabled,
       experimentalThumbnailSupport: entity[serverSettingsKey].experimentalThumbnailSupport ?? defaultServerSettings.experimentalThumbnailSupport,
     };

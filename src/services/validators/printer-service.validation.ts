@@ -1,5 +1,5 @@
 import { apiKeyLengthMaxDefault, apiKeyLengthMinDefault } from "@/constants/service.constants";
-import { OctoprintType, PrinterTypesEnum, PrusaLinkType } from "@/services/printer-api.interface";
+import { OctoprintType, PrinterTypesEnum, PrusaLinkType, BambuType } from "@/services/printer-api.interface";
 import { RefinementCtx, z } from "zod";
 
 const octoPrintApiKeySchema = z
@@ -7,7 +7,6 @@ const octoPrintApiKeySchema = z
   .min(apiKeyLengthMinDefault)
   .max(apiKeyLengthMaxDefault)
   .regex(/^[a-zA-Z0-9_-]+$/, "Alpha-numeric, dash, and underscore only");
-
 
 export const printerApiKeyValidator = z.string().optional();
 export const printerNameValidator = z.string();
@@ -59,7 +58,7 @@ export const refineApiKeyValidator = <T extends ApiKeyPrinterTypeSchema>(data: T
         });
       });
     }
-  } else if (data.printerType === PrusaLinkType) {
+  } else if (data.printerType === PrusaLinkType || data.printerType === BambuType) {
     const result = prusaLinkAuthSchema.safeParse({
       username: data.username,
       password: data.password,

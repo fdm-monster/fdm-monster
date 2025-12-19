@@ -19,6 +19,7 @@ export interface ServerSettingsDto {
   registration: boolean;
   loginRequired: boolean;
   experimentalMoonrakerSupport: boolean;
+  experimentalBambuSupport: boolean;
   experimentalTypeormSupport: boolean;
   experimentalClientSupport: boolean;
   experimentalThumbnailSupport: boolean;
