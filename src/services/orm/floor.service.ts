@@ -78,7 +78,7 @@ export class FloorService
   async createDefaultFloor() {
     const floor = await this.create({
       name: "Default Floor",
-      floor: 0,
+      floor: 1,
     });
 
     return await this.get(floor.id);
