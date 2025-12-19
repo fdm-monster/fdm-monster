@@ -13,8 +13,6 @@ import { join } from "node:path";
  * Implements direct FTP connection using basic-ftp
  */
 export class BambuFtpAdapter {
-  readonly eventEmitter2: EventEmitter2;
-  readonly settingsStore: SettingsStore;
   protected readonly logger: LoggerService;
 
   private ftpClient: Client | null = null;
@@ -22,15 +20,11 @@ export class BambuFtpAdapter {
   private accessCode: string | null = null;
   private isConnecting = false;
 
-  constructor({
-    settingsStore,
-    loggerFactory,
-    eventEmitter2,
-  }: {
-    settingsStore: SettingsStore;
-    loggerFactory: ILoggerFactory;
-    eventEmitter2: EventEmitter2;
-  }) {
+  constructor(
+    private readonly settingsStore: SettingsStore,
+    loggerFactory: ILoggerFactory,
+    private readonly eventEmitter2: EventEmitter2
+  ) {
     this.settingsStore = settingsStore;
     this.eventEmitter2 = eventEmitter2;
     this.logger = loggerFactory(BambuFtpAdapter.name);

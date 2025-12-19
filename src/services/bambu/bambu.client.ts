@@ -26,18 +26,13 @@ export class BambuClient {
   constructor(
     settingsStore: SettingsStore,
     loggerFactory: ILoggerFactory,
-    eventEmitter2: EventEmitter2
+    eventEmitter2: EventEmitter2,
+    bambuFtpAdapter: BambuFtpAdapter
   ) {
     this.settingsStore = settingsStore;
     this.eventEmitter2 = eventEmitter2;
     this.logger = loggerFactory(BambuClient.name);
-
-    // Initialize FTP adapter
-    this.ftpAdapter = new BambuFtpAdapter({
-      settingsStore,
-      loggerFactory,
-      eventEmitter2,
-    });
+    this.ftpAdapter = bambuFtpAdapter;
   }
 
   /**

@@ -199,7 +199,7 @@ export function configureContainer(isSqlite: boolean = false) {
     [di.moonrakerClient]: asClass(MoonrakerClient).singleton(),
     [di.moonrakerWebsocketAdapter]: asClass(MoonrakerWebsocketAdapter).transient(), // Transient on purpose
     [di.bambuApi]: asClass(BambuApi).transient(),
-    [di.bambuClient]: asClass(BambuClient).singleton(),
+    [di.bambuClient]: asClass(BambuClient).transient(), // Transient for multi-printer support
     [di.bambuFtpAdapter]: asClass(BambuFtpAdapter).transient(),
     [di.bambuMqttAdapter]: asClass(BambuMqttAdapter).transient(),
     [di.batchCallService]: asClass(BatchCallService).singleton(),
