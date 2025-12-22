@@ -5105,7 +5105,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"broker-factory@npm:^3.1.10":
+"broker-factory@npm:^3.1.11":
   version: 3.1.11
   resolution: "broker-factory@npm:3.1.11"
   dependencies:
@@ -11043,16 +11043,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"worker-timers-broker@npm:^8.0.12":
-  version: 8.0.12
-  resolution: "worker-timers-broker@npm:8.0.12"
+"worker-timers-broker@npm:^8.0.13":
+  version: 8.0.13
+  resolution: "worker-timers-broker@npm:8.0.13"
   dependencies:
     "@babel/runtime": "npm:^7.28.4"
-    broker-factory: "npm:^3.1.10"
+    broker-factory: "npm:^3.1.11"
     fast-unique-numbers: "npm:^9.0.24"
     tslib: "npm:^2.8.1"
     worker-timers-worker: "npm:^9.0.11"
-  checksum: 10c0/603d1417c47b649b440e44db72cfcb3551257a0e5b8256bf09233184243f88b1510621bd8c11bf27aaa07ea2b54d6f2d759249adbc8c1a92984f9f9de08da982
+  checksum: 10c0/ed291bd9fe2bd3c80afb2831afadf4fb7822d3096c4df03b8765719c98283142daea8db0988626889ce7a4eb5ab6e982790cee495a94b880b1855729183e0eae
   languageName: node
   linkType: hard
 
@@ -11090,14 +11090,14 @@ __metadata:
   linkType: hard
 
 "worker-timers@npm:^8.0.23":
-  version: 8.0.26
-  resolution: "worker-timers@npm:8.0.26"
+  version: 8.0.27
+  resolution: "worker-timers@npm:8.0.27"
   dependencies:
     "@babel/runtime": "npm:^7.28.4"
     tslib: "npm:^2.8.1"
-    worker-timers-broker: "npm:^8.0.12"
+    worker-timers-broker: "npm:^8.0.13"
     worker-timers-worker: "npm:^9.0.11"
-  checksum: 10c0/aaf00febe1ca3a615c14f52d8b86174d2f0f710235166c2ed57350b50d9ee26bc662cd125a0d00a0676d2775622bc9d5b7efa8f6ed6e3c3cdc4b9bcb5cedef9f
+  checksum: 10c0/c9765eac917f3630afb25462988c61ad3188b7cffe2a965ee28e8e8c5da7d355990b945d4eb7b831a7378f09c0895d53565ba86fc1e0313a03cdaf8feb983b90
   languageName: node
   linkType: hard
 
