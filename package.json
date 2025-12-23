@@ -63,7 +63,7 @@
     "tr46": "6.0.0"
   },
   "dependencies": {
-    "@fdm-monster/client": "1.12.1",
+    "@fdm-monster/client": "1.12.2",
     "@fdm-monster/client-next": "0.0.22",
     "@octokit/plugin-throttling": "8.2.0",
     "@sentry/node": "10.32.1",
