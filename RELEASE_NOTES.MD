@@ -1,6 +1,15 @@
 # Develop
 
+# FDM Monster 1.9.3
+
+## Fixes
+
+- Bambu port was 1883 in code instead of 8883
+- Removed confusing app constants wrongly suggesting mqtt configuration is an option
+
 # FDM Monster 1.9.2
+
+## Features
 
 - Full yaml export with users, roles, settings
 - Full yaml import (especially when getting started)

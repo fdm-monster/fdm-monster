@@ -85,15 +85,6 @@ export const AppConstants = {
   debugSocketStatesKey: "DEBUG_SOCKET_STATES",
   defaultDebugSocketStates: "false",
 
-  // Future experimental feature
-  enableMqttAutoDiscoveryToken: "ENABLE_MQTT_AUTODISCOVERY",
-  enableMqttAutoDiscoveryDefault: "false",
-  mqttUrlToken: "MQTT_HOST",
-  mqttPortToken: "MQTT_PORT",
-  mqttPortDefault: 1883,
-  mqttUsernameToken: "MQTT_USERNAME",
-  mqttPasswordToken: "MQTT_PASSWORD",
-
   // MonsterPi
   monsterPiFilePath: "/etc/monsterpi_version",
 
