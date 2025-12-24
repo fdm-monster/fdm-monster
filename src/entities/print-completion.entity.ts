@@ -1,10 +1,9 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Relation } from "typeorm";
 import { Printer } from "@/entities/printer.entity";
 import { PrintCompletionContextDto } from "@/services/interfaces/print-completion-context.dto";
-import { IPrintCompletion } from "@/models/PrintCompletion";
 
 @Entity()
-export class PrintCompletion implements IPrintCompletion<number, number> {
+export class PrintCompletion {
   @PrimaryGeneratedColumn()
   id: number;
 

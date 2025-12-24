@@ -17,7 +17,7 @@ beforeAll(async () => {
 });
 
 describe(ServerHost.name, () => {
-  it("should be connected to mongo", () => {
+  it("should be connected to database", () => {
     expect(serverHost.hasConnected()).toBeTruthy();
   });
 

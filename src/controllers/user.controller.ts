@@ -35,8 +35,7 @@ export class UserController {
     private readonly configService: IConfigService,
     private readonly roleService: IRoleService,
     private readonly authService: IAuthService,
-    private readonly settingsStore: SettingsStore,
-    private readonly isTypeormMode: boolean,
+    private readonly settingsStore: SettingsStore
   ) {
     this.logger = loggerFactory(UserController.name);
   }
@@ -53,10 +52,7 @@ export class UserController {
   @route("/")
   @before([authorizeRoles([ROLES.ADMIN])])
   async create(req: Request, res: Response) {
-    const { username, password, roleIds } = await validateMiddleware(
-      req,
-      registerUserWithRolesSchema(this.isTypeormMode),
-    );
+    const {username, password, roleIds} = await validateMiddleware(req, registerUserWithRolesSchema);
     if (
       username.toLowerCase().includes("admin") ||
       username.toLowerCase().includes("root") ||
@@ -148,7 +144,7 @@ export class UserController {
       throw new ForbiddenError("Not allowed to change username of other users");
     }
 
-    const { username } = await validateInput(req.body, usernameSchema);
+    const {username} = await validateInput(req.body, usernameSchema);
     await this.userService.updateUsernameById(changedUserId, username);
     res.send();
   }
@@ -163,7 +159,7 @@ export class UserController {
       throw new ForbiddenError("Not allowed to change password of other users");
     }
 
-    const { oldPassword, newPassword } = await validateInput(req.body, changePasswordSchema);
+    const {oldPassword, newPassword} = await validateInput(req.body, changePasswordSchema);
     await this.userService.updatePasswordById(changedUserId, oldPassword, newPassword);
     res.send();
   }
@@ -190,7 +186,7 @@ export class UserController {
       throw new ForbiddenError("Only an ADMIN or OWNER user is allowed to change its own roles");
     }
 
-    const { roleIds } = await validateInput(req.body, setUserRolesSchema(this.isTypeormMode));
+    const {roleIds} = await validateInput(req.body, setUserRolesSchema);
 
     if (ownUserId == changedUserId && !roleIds.includes(adminRole.id)) {
       if (mappedUser.isRootUser) {
@@ -220,7 +216,7 @@ export class UserController {
       throw new ForbiddenError("Not allowed to change root user to unverified");
     }
 
-    const { isVerified } = await validateInput(req.body, isVerifiedSchema);
+    const {isVerified} = await validateInput(req.body, isVerifiedSchema);
     await this.userService.setVerifiedById(changedUserId, isVerified);
 
     res.send();
@@ -239,7 +235,7 @@ export class UserController {
         throw new ForbiddenError("Not allowed to change owner without being owner yourself");
       }
     }
-    const { isRootUser } = await validateInput(req.body, isRootUserSchema);
+    const {isRootUser} = await validateInput(req.body, isRootUserSchema);
     await this.userService.setIsRootUserById(changedUserId, isRootUser);
     res.send();
   }

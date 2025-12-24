@@ -12,8 +12,7 @@ import { ParamId } from "@/middleware/param-converter.middleware";
 @before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR])])
 export class CustomGcodeController {
   constructor(
-    private readonly customGCodeService: ICustomGcodeService,
-    private readonly isTypeormMode: boolean,
+    private readonly customGCodeService: ICustomGcodeService
   ) {}
   /**
    * Sends gcode according to https://docs.octoprint.org/en/master/api/printer.html#send-an-arbitrary-command-to-the-printer

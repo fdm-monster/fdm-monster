@@ -1,10 +1,10 @@
-import { IPrinter } from "@/models/Printer";
 import { IdType } from "@/shared.constants";
 import { PrinterDto } from "@/services/interfaces/printer.dto";
 import { z } from "zod";
 import { createPrinterSchema } from "@/services/validators/printer-service.validation";
+import { Printer } from "@/entities";
 
-export interface IPrinterService<KeyType = IdType, Entity = IPrinter<KeyType>> {
+export interface IPrinterService<KeyType = IdType, Entity = Printer> {
   toDto(entity: Entity): PrinterDto<KeyType>;
 
   list(): Promise<Entity[]>;

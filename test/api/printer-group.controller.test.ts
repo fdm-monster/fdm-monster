@@ -3,8 +3,6 @@ import { setupTestApp } from "../test-server";
 import { PrinterGroupController } from "@/controllers/printer-group.controller";
 import { AppConstants } from "@/server.constants";
 import { expectInternalServerError, expectNotFoundResponse, expectOkResponse } from "../extensions";
-import { testIf } from "../utils/conditional-if";
-import { isSqliteModeTest } from "../typeorm.manager";
 import { createTestPrinter } from "./test-data/create-printer";
 import { GroupWithPrintersDto } from "@/services/interfaces/group.dto";
 import TestAgent from "supertest/lib/agent";
@@ -25,16 +23,12 @@ const addPrinterToGroupRoute = (id: string) => `${defaultRoute}/${id}/printer`;
 const deletePrinterFromGroupRoute = (id: string) => `${addPrinterToGroupRoute(id)}`;
 
 describe(PrinterGroupController.name, () => {
-  testIf(!isSqliteModeTest(), "should throw for mongodb", async () => {
-    const response = await request.get(listGroupsRoute).send();
-    expectInternalServerError(response);
-  });
-  testIf(isSqliteModeTest(), "should list groups", async () => {
+  it("should list groups", async () => {
     const response = await request.get(listGroupsRoute).send();
     expectOkResponse(response);
   });
 
-  testIf(isSqliteModeTest(), "should create and get group", async () => {
+  it("should create and get group", async () => {
     const testGroupName = "Group1";
     const response = await request.post(createGroupRoute).send({
       name: testGroupName,
@@ -50,7 +44,7 @@ describe(PrinterGroupController.name, () => {
     expect(getResponse.body.id).toStrictEqual(groupId);
   });
 
-  testIf(isSqliteModeTest(), "should create and update group name", async () => {
+  it("should create and update group name", async () => {
     const testGroupName = "Group2";
     const testGroupName2 = "Group2b";
     const response = await request.post(createGroupRoute).send({
@@ -71,7 +65,7 @@ describe(PrinterGroupController.name, () => {
     expect(getResponse.body.name).toStrictEqual(testGroupName2);
   });
 
-  testIf(isSqliteModeTest(), "should create and remove group", async () => {
+  it("should create and remove group", async () => {
     const testGroupName = "Group3";
     const response = await request.post(createGroupRoute).send({
       name: testGroupName,
@@ -87,7 +81,7 @@ describe(PrinterGroupController.name, () => {
     expectNotFoundResponse(getResponse);
   });
 
-  testIf(isSqliteModeTest(), "should create group and add a printer to it", async () => {
+  it("should create group and add a printer to it", async () => {
     const testGroupName = "Group4";
     const response = await request.post(createGroupRoute).send({
       name: testGroupName,
@@ -116,7 +110,7 @@ describe(PrinterGroupController.name, () => {
     expect(groupUnderTest!.printers.find((p) => p.printerId === printerId)).toBeDefined();
   });
 
-  testIf(isSqliteModeTest(), "should create group and add+remove a printer", async () => {
+  it("should create group and add+remove a printer", async () => {
     const testGroupName = "Group5";
     const response = await request.post(createGroupRoute).send({
       name: testGroupName,

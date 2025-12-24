@@ -12,16 +12,16 @@ export const changePasswordSchema = z.object({
   newPassword: z.string().min(AppConstants.DEFAULT_PASSWORD_MINLEN).nonempty(),
 });
 
-export const registerUserWithRolesSchema = (isSqlite: boolean) =>
+export const registerUserWithRolesSchema =
   z.object({
     username: z.string().min(AppConstants.DEFAULT_USERNAME_MINLEN).nonempty(),
     password: z.string().min(AppConstants.DEFAULT_PASSWORD_MINLEN).nonempty(),
-    roleIds: z.array(idRuleV2(isSqlite)),
+    roleIds: z.array(idRuleV2),
   });
 
-export const setUserRolesSchema = (isSqlite: boolean) =>
+export const setUserRolesSchema =
   z.object({
-    roleIds: z.array(idRuleV2(isSqlite)),
+    roleIds: z.array(idRuleV2),
   });
 
 export const usernameSchema = z.object({

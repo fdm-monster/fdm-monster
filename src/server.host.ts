@@ -1,5 +1,4 @@
 import express, { Application } from "express";
-import mongoose from "mongoose";
 import history from "connect-history-api-fallback";
 import { LoggerService } from "./handlers/logger";
 import { join } from "path";
@@ -23,7 +22,6 @@ export class ServerHost {
   constructor(
     loggerFactory: ILoggerFactory,
     private readonly configService: IConfigService,
-    private readonly isTypeormMode: boolean,
     private readonly settingsStore: SettingsStore,
     private readonly bootTask: BootTask,
     private readonly socketIoGateway: SocketIoGateway,
@@ -33,10 +31,6 @@ export class ServerHost {
   }
 
   async boot(app: Application, quick_boot = false, listenRequests = true) {
-    if (!this.isTypeormMode) {
-      // Enforce models to be strictly applied, any unknown property will not be persisted
-      mongoose.set("strictQuery", true);
-    }
     this.serveControllerRoutes(app);
 
     if (!quick_boot) {
@@ -47,11 +41,7 @@ export class ServerHost {
   }
 
   hasConnected() {
-    if (this.isTypeormMode) {
-      return this.typeormService.hasConnected();
-    } else {
-      return mongoose.connections[0].readyState;
-    }
+    return this.typeormService.hasConnected();
   }
 
   serveControllerRoutes(app: Application) {
@@ -99,10 +89,10 @@ export class ServerHost {
         resource = "client-bundle";
       }
 
-      this.logger.error(`${resource} resource at '${path}' was not found`);
+      this.logger.error(`${ resource } resource at '${ path }' was not found`);
 
       if (!path.startsWith("/socket.io")) {
-        throw new NotFoundException(`${resource} resource was not found`, path);
+        throw new NotFoundException(`${ resource } resource was not found`, path);
       }
     });
 
@@ -113,16 +103,16 @@ export class ServerHost {
     const port = fetchServerPort();
     if (!isProductionEnvironment() && this.configService.get<string>(AppConstants.debugRoutesKey, "false") === "true") {
       const expressListRoutes = require("express-list-routes");
-      expressListRoutes(app, { prefix: "/" });
+      expressListRoutes(app, {prefix: "/"});
     }
 
-    if (!port || Number.isNaN(parseInt(port))) {
+    if (!port || Number.isNaN(Number.parseInt(port))) {
       throw new Error("The FDM Server requires a numeric port input argument to run");
     }
 
     const hostOrFqdn = "0.0.0.0";
     const server = app.listen(parseInt(port), hostOrFqdn, () => {
-      this.logger.log(`Server started... open it at http://127.0.0.1:${port}`);
+      this.logger.log(`Server started... open it at http://127.0.0.1:${ port }`);
     });
     this.socketIoGateway.attachServer(server);
   }

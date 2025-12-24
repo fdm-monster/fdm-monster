@@ -1,5 +1,5 @@
 import { IdType } from "@/shared.constants";
-import { IPrinter } from "@/models/Printer";
+import { Printer } from "@/entities";
 
 export const socketIoConnectedEvent = "socketio.connected";
 
@@ -17,16 +17,16 @@ export const printerEvents = {
   batchPrinterCreated: "batchPrinterCreated",
 };
 
-export interface PrinterCreatedEvent<T = IdType> {
-  printer: IPrinter<T>;
+export interface PrinterCreatedEvent {
+  printer: Printer;
 }
 
-export interface PrinterUpdatedEvent<T = IdType> {
-  printer: IPrinter<T>;
+export interface PrinterUpdatedEvent {
+  printer: Printer;
 }
 
-export interface BatchPrinterCreatedEvent<T = IdType> {
-  printers: IPrinter<T>[];
+export interface BatchPrinterCreatedEvent {
+  printer: Printer;
 }
 
 export interface PrintersDeletedEvent<T = IdType> {

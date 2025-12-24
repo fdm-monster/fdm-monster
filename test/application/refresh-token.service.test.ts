@@ -1,4 +1,3 @@
-import { RefreshTokenService } from "@/services/mongoose/refresh-token.service";
 import { AwilixContainer } from "awilix";
 import { configureContainer } from "@/container";
 import { DITokens } from "@/container.tokens";
@@ -6,10 +5,9 @@ import { ensureTestUserCreated } from "../api/test-data/create-user";
 import { SettingsStore } from "@/state/settings.store";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { RefreshToken } from "@/entities";
-import { RefreshToken as RefreshTokenMongo } from "@/models";
 import { SqliteIdType } from "@/shared.constants";
 import { IRefreshTokenService } from "@/services/interfaces/refresh-token.service.interface";
-import { isSqliteModeTest } from "../typeorm.manager";
+import { RefreshTokenService } from "@/services/orm/refresh-token.service";
 
 let container: AwilixContainer;
 let refreshTokenService: IRefreshTokenService;
@@ -17,20 +15,14 @@ let settingsStore: SettingsStore;
 let typeorm: TypeormService;
 
 beforeAll(async () => {
-  container = configureContainer(isSqliteModeTest());
+  container = configureContainer();
   refreshTokenService = container.resolve<IRefreshTokenService<SqliteIdType>>(DITokens.refreshTokenService);
   settingsStore = container.resolve<SettingsStore>(DITokens.settingsStore);
   typeorm = container.resolve<TypeormService>(DITokens.typeormService);
-  if (isSqliteModeTest()) {
-    await typeorm.createConnection();
-  }
+  await typeorm.createConnection();
 });
 afterEach(async () => {
-  if (isSqliteModeTest()) {
-    await typeorm.getDataSource().getRepository(RefreshToken).clear();
-  } else {
-    await RefreshTokenMongo.deleteMany({});
-  }
+  await typeorm.getDataSource().getRepository(RefreshToken).clear();
 });
 
 describe(RefreshTokenService.name, () => {

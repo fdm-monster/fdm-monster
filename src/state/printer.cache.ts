@@ -9,8 +9,8 @@ import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import EventEmitter2 from "eventemitter2";
 import { IdType } from "@/shared.constants";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
-import { IPrinter } from "@/models/Printer";
 import { PrinterDto } from "@/services/interfaces/printer.dto";
+import { Printer } from "@/entities";
 
 export class PrinterCache extends KeyDiffCache<PrinterDto<IdType>> {
   constructor(
@@ -31,10 +31,6 @@ export class PrinterCache extends KeyDiffCache<PrinterDto<IdType>> {
     const keyValues = dtos.map((p) => ({ key: this.getId(p), value: p }));
     await this.setKeyValuesBatch(keyValues, true);
     return dtos;
-  }
-
-  async countDisabledPrinters() {
-    return (await this.getAllValues()).filter((p) => !p.enabled).length;
   }
 
   async listCachedPrinters(includeDisabled = false): Promise<PrinterDto<IdType>[]> {
@@ -108,17 +104,17 @@ export class PrinterCache extends KeyDiffCache<PrinterDto<IdType>> {
     await this.deleteKeysBatch(event.printerIds, true);
   }
 
-  private getId(value: IPrinter<IdType>) {
+  private getId(value: Printer) {
     return value.id.toString();
   }
 
-  private mapArray(entities: IPrinter<IdType>[]) {
+  private mapArray(entities: Printer[]) {
     return entities.map((p) => {
       return this.map(p);
     });
   }
 
-  private map(entity: IPrinter<IdType>): PrinterDto<IdType> {
+  private map(entity: Printer): PrinterDto<IdType> {
     return this.printerService.toDto(entity);
   }
 }

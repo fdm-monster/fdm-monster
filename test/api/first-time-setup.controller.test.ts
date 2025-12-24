@@ -8,11 +8,8 @@ import { SettingsStore } from "@/state/settings.store";
 import { expectBadRequestError, expectForbiddenResponse, expectOkResponse } from "../extensions";
 import { IUserService } from "@/services/interfaces/user-service.interface";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
-import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { User } from "@/entities";
-import { Repository } from "typeorm";
-import { getDatasource, isSqliteModeTest } from "../typeorm.manager";
-import { User as UserMongo } from "@/models";
+import { getDatasource } from "../typeorm.manager";
 import TestAgent from "supertest/lib/agent";
 
 let request: TestAgent<supertest.Test>;
@@ -20,8 +17,8 @@ let container: AwilixContainer;
 let settingsService: ISettingsService;
 let settingsStore: SettingsStore;
 
-const validateWizardRoute = `${AppConstants.apiRoute}/first-time-setup/validate`;
-const completeSetupRoute = `${AppConstants.apiRoute}/first-time-setup/complete`;
+const validateWizardRoute = `${ AppConstants.apiRoute }/first-time-setup/validate`;
+const completeSetupRoute = `${ AppConstants.apiRoute }/first-time-setup/complete`;
 
 describe(FirstTimeSetupController.name, () => {
   const validateWizard = async (input: any) => await request.post(validateWizardRoute).send(input);
@@ -36,7 +33,7 @@ describe(FirstTimeSetupController.name, () => {
   };
 
   beforeAll(async () => {
-    ({ request, container } = await setupTestApp(true));
+    ({request, container} = await setupTestApp(true));
     settingsService = container.resolve<ISettingsService>(DITokens.settingsService);
     settingsStore = container.resolve<SettingsStore>(DITokens.settingsStore);
   });
@@ -115,11 +112,8 @@ describe(FirstTimeSetupController.name, () => {
   it("should not complete first-time-setup twice", async () => {
     await resetWizard();
     expect(settingsStore.isWizardCompleted()).toBeFalsy();
-    if (isSqliteModeTest()) {
-      await getDatasource().getRepository(User).clear();
-    } else {
-      await UserMongo.deleteMany({});
-    }
+    await getDatasource().getRepository(User).clear();
+
     const response = await completeSetup({
       loginRequired: true,
       registration: true,

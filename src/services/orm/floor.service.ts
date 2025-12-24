@@ -44,7 +44,7 @@ export class FloorService
   }
 
   async create(dto: CreateFloorDto<SqliteIdType>): Promise<Floor> {
-    const outcome = await validateInput(dto, createOrUpdateFloorSchema(true));
+    const outcome = await validateInput(dto, createOrUpdateFloorSchema);
 
     const floor = await super.create({
       name: outcome.name,
@@ -98,7 +98,7 @@ export class FloorService
       printers: update.printers,
       floor: update.floor,
     };
-    const validatedFloor = await validateInput(floorUpdate, createOrUpdateFloorSchema(true));
+    const validatedFloor = await validateInput(floorUpdate, createOrUpdateFloorSchema);
 
     // Add new printer positions
     const desiredPositions = validatedFloor.printers;
@@ -141,13 +141,12 @@ export class FloorService
     // Validation only
     await this.get(floorId);
     positionDto.floorId = floorId;
-    const validInput = await validateInput(positionDto, printerInFloorSchema(true));
+    const validInput = await validateInput(positionDto, printerInFloorSchema);
 
-    const position = await this.floorPositionService.findPrinterPosition(validInput.printerId as SqliteIdType);
+    const position = await this.floorPositionService.findPrinterPosition(validInput.printerId);
     // Optimization if position is in desired state already
     if (
-      position &&
-      position.floorId === floorId &&
+      position?.floorId === floorId &&
       position.x === validInput.x &&
       position.x === validInput.y &&
       position.printerId === validInput.printerId
@@ -169,7 +168,7 @@ export class FloorService
     Object.assign(newPosition, {
       x: validInput.x,
       y: validInput.y,
-      printerId: validInput.printerId as SqliteIdType,
+      printerId: validInput.printerId,
       floorId,
     });
 
@@ -178,7 +177,7 @@ export class FloorService
   }
 
   async removePrinter(floorId: SqliteIdType, printerId: SqliteIdType): Promise<Floor> {
-    const position = await this.floorPositionService.findPrinterPositionOnFloor(floorId, printerId as SqliteIdType);
+    const position = await this.floorPositionService.findPrinterPositionOnFloor(floorId, printerId);
     if (!position) {
       throw new NotFoundException("This printer was not found on this floor");
     }

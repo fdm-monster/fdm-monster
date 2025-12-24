@@ -1,19 +1,19 @@
 import { configureContainer } from "@/container";
 import { ROLES } from "@/constants/authorization.constants";
 import { DITokens } from "@/container.tokens";
-import { RoleService } from "@/services/mongoose/role.service";
 import { AwilixContainer } from "awilix";
 import { IRoleService } from "@/services/interfaces/role-service.interface";
 import { SqliteIdType } from "@/shared.constants";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { Role } from "@/entities";
+import { RoleService } from "@/services/orm/role.service";
 
 let container: AwilixContainer;
 let typeorm: TypeormService;
 let roleService: IRoleService<SqliteIdType, Role>;
 
 beforeAll(async () => {
-  container = configureContainer(true);
+  container = configureContainer();
   typeorm = container.resolve<TypeormService>(DITokens.typeormService);
   roleService = container.resolve(DITokens.roleService);
 

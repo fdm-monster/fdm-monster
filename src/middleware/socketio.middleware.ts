@@ -3,8 +3,8 @@ import { Strategy as PassportJwtStrategy, StrategyOptionsWithoutRequest, VerifyC
 import { Socket } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
 import { ExtendedError } from "socket.io/dist/namespace";
-import { IUser } from "@/models/Auth/User";
 import { LoggerService } from "@/handlers/logger";
+import { User } from "@/entities";
 
 export const authorize = (
   settingsStore: SettingsStore,
@@ -23,7 +23,7 @@ export const authorize = (
       return next();
     }
     // --- Begin strategy augmentation like passport
-    strategy.success = function success(_user: IUser) {
+    strategy.success = function success(_user: User) {
       // When SocketIO gateway requires user, we can provide it as such:
       // socket.handshake.user = user;
       next();

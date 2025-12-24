@@ -1,8 +1,8 @@
 import { IdType } from "@/shared.constants";
-import { ICustomGcode } from "@/models/CustomGcode";
 import { CustomGcodeDto } from "@/services/interfaces/custom-gcode.dto";
+import { CustomGcode } from "@/entities";
 
-export interface ICustomGcodeService<KeyType = IdType, Entity = ICustomGcode> {
+export interface ICustomGcodeService<KeyType = IdType, Entity = CustomGcode> {
   toDto(document: Entity): CustomGcodeDto<KeyType>;
 
   get(gcodeScriptId: KeyType): Promise<Entity>;

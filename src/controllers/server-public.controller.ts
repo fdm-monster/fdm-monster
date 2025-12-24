@@ -14,18 +14,17 @@ export class ServerPublicController {
     private readonly settingsStore: SettingsStore,
     private readonly serverVersion: string,
     private readonly serverReleaseService: ServerReleaseService,
-    private readonly monsterPiService: MonsterPiService,
-    private readonly isTypeormMode: boolean,
+    private readonly monsterPiService: MonsterPiService
   ) {
   }
 
   @GET()
   @route("/")
   @before([authenticate(), permission(PERMS.ServerInfo.Get)])
-  welcome(req: Request, res: Response) {
+  async welcome(req: Request, res: Response) {
     this.settingsStore.getSettings();
 
-    if (!this.settingsStore.getLoginRequired()) {
+    if (!await this.settingsStore.getLoginRequired()) {
       return res.send({
         message: "Login disabled. Please load the Vue app.",
       });
@@ -45,12 +44,6 @@ export class ServerPublicController {
     const prusaLinkEnabled = serverSettings.experimentalPrusaLinkSupport;
     const bambuEnabled = serverSettings.experimentalBambuSupport;
     res.send({
-      printerGroupsApi: {
-        // Only SQLite mode supported for this feature
-        available: this.isTypeormMode,
-        version: 1,
-        subFeatures: {},
-      },
       multiplePrinterServices: {
         available: true,
         version: 1,

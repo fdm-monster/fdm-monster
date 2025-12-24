@@ -7,10 +7,9 @@ import {
   wizardSettingKey,
 } from "@/constants/server-settings.constants";
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
-import { ISettings } from "@/models/Settings";
 
 @Entity()
-export class Settings implements ISettings<number> {
+export class Settings {
   @PrimaryGeneratedColumn()
   id: number;
 

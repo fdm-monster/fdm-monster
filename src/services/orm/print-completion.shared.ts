@@ -36,7 +36,7 @@ export interface AnalyzedCompletions {
   successEventsLast48H?: number;
   successEventsLast24H?: number;
 
-  correlationIds?: IdType[];
+  correlationIds?: string[];
 
   printJobs?: PrintJobEvents[];
 }

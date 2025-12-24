@@ -1,6 +1,6 @@
 import { LoginDto } from "@/services/interfaces/login.dto";
 
 export interface ISocketLogin {
-  printerId: string;
+  printerId: number;
   loginDto: LoginDto;
 }

@@ -1,9 +1,8 @@
-import { ICameraStream } from "@/models/CameraStream";
 import { CameraStreamDto, CreateCameraStreamDto } from "@/services/interfaces/camera-stream.dto";
 import { IdType } from "@/shared.constants";
 import { CameraStream } from "@/entities";
 
-export interface ICameraStreamService<KeyType = IdType, Entity = CameraStream | ICameraStream> {
+export interface ICameraStreamService<KeyType = IdType, Entity = CameraStream> {
   toDto(entity: Entity): CameraStreamDto<KeyType>;
 
   list(): Promise<Entity[]>;

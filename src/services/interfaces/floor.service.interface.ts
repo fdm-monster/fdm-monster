@@ -1,10 +1,9 @@
-import { IFloor } from "@/models/Floor";
 import { IdType } from "@/shared.constants";
 import { CreateFloorDto, CreatePositionDto, FloorDto, UpdateFloorDto } from "@/services/interfaces/floor.dto";
 import { Floor } from "@/entities";
 import { FindOneOptions } from "typeorm";
 
-export interface IFloorService<KeyType = IdType, Entity = IFloor | Floor> {
+export interface IFloorService<KeyType = IdType, Entity = Floor> {
   create(input: CreateFloorDto<KeyType>): Promise<Entity>;
 
   createDefaultFloor(): Promise<Entity>;

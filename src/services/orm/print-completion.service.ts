@@ -13,8 +13,7 @@ import { groupArrayBy } from "@/utils/array.util";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
-import { AnalyzedCompletions, processCompletions } from "@/services/mongoose/print-completion.shared";
-import { IPrintCompletion } from "@/models/PrintCompletion";
+import { AnalyzedCompletions, processCompletions } from "@/services/orm/print-completion.shared";
 
 export class PrintCompletionService
   extends BaseService(PrintCompletion, PrintCompletionDto<SqliteIdType>)
@@ -73,13 +72,13 @@ export class PrintCompletionService
     const limitedCompletions = await this.listPaged();
     const printCompletionsAggr = groupArrayBy(limitedCompletions, (val) => val.printerId.toString());
     const completions = Object.entries(printCompletionsAggr).map(([pc, val]) => ({
-      printerId: parseInt(pc),
+      printerId: Number.parseInt(pc),
       printEvents: val,
     }));
     return processCompletions(completions);
   }
 
-  async loadPrintContexts(): Promise<Record<string, IPrintCompletion<number, number>[]>> {
+  async loadPrintContexts(): Promise<Record<string, PrintCompletion[]>> {
     const completions = await this.repository.find({
       where: {
         status: Not(In([EVENT_TYPES.PrintDone, EVENT_TYPES.PrintFailed])),

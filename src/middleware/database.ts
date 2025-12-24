@@ -14,7 +14,7 @@ export async function interceptDatabaseError(req: any | Request, res: Response, 
     res.status(500);
     res.send({
       databaseReadyState: serverHost.hasConnected(),
-      state: "Retrying mongo connection. Please contact the developer if this persists.",
+      state: "Retrying database connection. Please contact the developer if this persists.",
     });
   }
 }

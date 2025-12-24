@@ -72,7 +72,7 @@ describe(BambuApi.name, () => {
   describe("setPrinterId", () => {
     it("should set printer ID for MQTT adapter access", () => {
       const api = printerApiFactory.getScopedPrinter(auth) as BambuApi;
-      const printerId = "test-printer-123";
+      const printerId = 123;
 
       expect(() => api.setPrinterId(printerId)).not.toThrow();
     });

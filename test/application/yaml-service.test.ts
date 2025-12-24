@@ -12,7 +12,6 @@ import { testPrinterData } from "./test-data/printer.data";
 import { FloorStore } from "@/state/floor.store";
 import { FloorPositionService } from "@/services/orm/floor-position.service";
 import { OctoprintType } from "@/services/printer-api.interface";
-import { SettingsStore } from "@/state/settings.store";
 
 let yamlService: YamlService;
 let printerCache: PrinterCache;
@@ -20,14 +19,10 @@ let printerService: IPrinterService;
 let floorService: IFloorService;
 let floorStore: FloorStore;
 let printerGroupService: PrinterGroupService;
-let settingsStore: SettingsStore;
-let isTypeormMode: boolean;
-// Use only when isTypeormMode is true
 let floorPositionService: FloorPositionService;
 
 beforeAll(async () => {
-  const { container, isTypeormMode: _isTypeormMode } = await setupTestApp(true);
-  isTypeormMode = _isTypeormMode;
+  const {container} = await setupTestApp(true);
   yamlService = container.resolve(DITokens.yamlService);
   printerCache = container.resolve(DITokens.printerCache);
   printerService = container.resolve(DITokens.printerService);
@@ -35,7 +30,6 @@ beforeAll(async () => {
   floorPositionService = container.resolve(DITokens.floorPositionService);
   floorStore = container.resolve(DITokens.floorStore);
   printerGroupService = container.resolve(DITokens.printerGroupService);
-  settingsStore = container.resolve(DITokens.settingsStore);
 });
 afterEach(async () => {
   const printers = await printerService.list();
@@ -65,7 +59,7 @@ describe(YamlService.name, () => {
     });
 
     expect(yamlDump).toBeDefined();
-    expect(yamlDump.includes(`printerType: ${OctoprintType}`)).toBeTruthy();
+    expect(yamlDump.includes(`printerType: ${ OctoprintType }`)).toBeTruthy();
   });
 
   it("should import yaml from version 1.3.1", async () => {
@@ -77,7 +71,7 @@ describe(YamlService.name, () => {
   });
 
   it("should import yaml from version 1.5.0", async () => {
-    await yamlService.importYaml(exportYamlBuffer1_5_0(true));
+    await yamlService.importYaml(exportYamlBuffer1_5_0);
 
     const floors = await floorService.list();
     const floor = floors.find((f) => f.name === "Default Floor1_5_0");
@@ -96,16 +90,12 @@ describe(YamlService.name, () => {
     const floor = floors.find((f) => f.name === "Default Floor1_5_2")!;
     expect(floor).toBeDefined();
     expect(floor.printers).toHaveLength(2);
-    if (isTypeormMode) {
-      expect(typeof printer.id).toBe("number");
-    } else {
-      expect(typeof printer.id).toBe("string");
-    }
+    expect(typeof printer.id).toBe("number");
     expect(floor.printers.find((p) => p.printerId.toString() === printer.id.toString())).toBeDefined();
   });
 
   it("should import yaml from version 1.6.0 sqlite", async () => {
-    await yamlService.importYaml(exportYamlBuffer1_6_0(true));
+    await yamlService.importYaml(exportYamlBuffer1_6_0);
 
     const floors = await floorService.list();
     const floor = floors.find((f) => f.name === "Default Floor1_6_0")!;
@@ -127,10 +117,8 @@ describe(YamlService.name, () => {
     expect(floor.printers).toHaveLength(3);
     expect(floor.printers.find((p) => p.printerId.toString() === printer.id.toString())).toBeDefined();
 
-    if (isTypeormMode) {
-      const groups = await printerGroupService.listGroups();
-      expect(groups).toHaveLength(0);
-    }
+    const groups = await printerGroupService.listGroups();
+    expect(groups).toHaveLength(0);
   });
 
   it("should import 1.6.1 sqlite yaml", async () => {
@@ -148,16 +136,12 @@ describe(YamlService.name, () => {
     expect(floor.printers).toHaveLength(4);
     expect(floor.printers.find((p) => p.printerId.toString() === printer.id.toString())).toBeDefined();
 
-    if (isTypeormMode) {
-      const groups = await printerGroupService.listGroups();
-      expect(groups).toBeDefined();
-      const group = groups.find((g) => g.name === "Group A123_1.6.1")!;
-      expect(group).toBeDefined();
-      expect(group.printers).toHaveLength(2);
-      expect(groups.find((g) => g.name === "Group test_1.6.1")!.printers).toHaveLength(0);
-    } else {
-      expect(printerGroupService).toBeNull();
-    }
+    const groups = await printerGroupService.listGroups();
+    expect(groups).toBeDefined();
+    const group = groups.find((g) => g.name === "Group A123_1.6.1")!;
+    expect(group).toBeDefined();
+    expect(group.printers).toHaveLength(2);
+    expect(groups.find((g) => g.name === "Group test_1.6.1")!.printers).toHaveLength(0);
   });
 
   it("should parse 1.9.1 mongodb full yaml file format", async () => {
@@ -234,8 +218,8 @@ describe(YamlService.name, () => {
   });
 
   it("should export yaml with floors and printer floor positions", async () => {
-    const printer = await printerService.create({ ...testPrinterData, name: "ExportTestPrinter" });
-    const floor = await floorService.create({
+    const printer = await printerService.create({...testPrinterData, name: "ExportTestPrinter"});
+    await floorService.create({
       name: "ExportTestFloor",
       floor: 99,
       printers: [
@@ -280,7 +264,7 @@ describe(YamlService.name, () => {
   });
 
   it("should import floor over existing floor", async () => {
-    const printer = await printerService.create({ ...testPrinterData, name: "YamlImportTestPrinter" });
+    const printer = await printerService.create({...testPrinterData, name: "YamlImportTestPrinter"});
     const defaultFloor = await floorService.create({
       name: "Floor1_DifferentName",
       floor: 15,
@@ -304,18 +288,14 @@ describe(YamlService.name, () => {
     const newFloor2 = floors.find((f) => f.name === "Floor2")!;
     expect(newFloor2).toBeDefined();
 
-    if (isTypeormMode) {
-      expect(typeof newFloor2.id).toBe("number");
-    } else {
-      expect(typeof newFloor2.id).toBe("string");
-    }
+    expect(typeof newFloor2.id).toBe("number");
+
     expect(newFloor2).toBeDefined();
     expect(newFloor2.floor).toBe(16);
     expect(newFloor2.printers).toHaveLength(1);
-    if (isTypeormMode) {
-      const positionTemp = await floorPositionService.findPosition(newFloor2.id as number, 0, 0);
-      expect(positionTemp).not.toBeNull();
-    }
+
+    const positionTemp = await floorPositionService.findPosition(newFloor2.id as number, 0, 0);
+    expect(positionTemp).not.toBeNull();
 
     // The original floor's name is now gone, and the original printer has not been removed from it (overwrite action)
     expect(floors.find((f) => f.name === "Floor1_DifferentName")).toBeUndefined();

@@ -1,5 +1,4 @@
 import { IdType } from "@/shared.constants";
-import { ISettings } from "@/models/Settings";
 import {
   credentialSettingsKey,
   frontendSettingKey,
@@ -15,10 +14,11 @@ import {
   wizardSettingKey,
 } from "@/constants/server-settings.constants";
 import { v4 as uuidv4 } from "uuid";
+import { Settings } from "@/entities";
 
 export function migrateSettingsRuntime<KeyType = IdType>(
-  knownSettings: Partial<ISettings<KeyType>>,
-): ISettings<KeyType> {
+  knownSettings: Partial<Settings>,
+): Settings {
   const entity = knownSettings;
 
   entity[wizardSettingKey] ??= getDefaultWizardSettings();
@@ -66,5 +66,5 @@ export function migrateSettingsRuntime<KeyType = IdType>(
     };
   }
 
-  return entity as ISettings<KeyType>;
+  return entity as Settings;
 }

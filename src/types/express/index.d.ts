@@ -2,7 +2,7 @@ import { AwilixContainer } from "awilix";
 import { IUser } from "@/models/Auth/User";
 import { IdType } from "@/shared.constants";
 
-export type RequestRole = IdType;
+export type RequestRole = IdType | string;
 
 declare module "express" {
   interface Request<KeyType = IdType> {

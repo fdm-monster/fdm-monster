@@ -12,7 +12,7 @@ beforeEach(() => {
   fileCache = container.resolve(DITokens.fileCache);
 });
 
-const testPrinterId = "asd";
+const testPrinterId = 1;
 const fileEntry = { path: "asd", size: 1, date: Date.now() } as FileDto;
 const fakeFileList = [fileEntry];
 

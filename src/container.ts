@@ -1,11 +1,9 @@
 import { Octokit } from "octokit";
-import { asClass, asFunction, asValue, createContainer, InjectionMode, Resolver } from "awilix";
+import { asClass, asFunction, asValue, createContainer, InjectionMode } from "awilix";
 import { ToadScheduler } from "toad-scheduler";
 import { DITokens } from "./container.tokens";
-import { PrinterService } from "./services/mongoose/printer.service";
-import { PrinterService as PrinterService2 } from "./services/orm/printer.service";
+import { PrinterService } from "./services/orm/printer.service";
 import { SettingsStore } from "./state/settings.store";
-import { SettingsService } from "./services/mongoose/settings.service";
 import { ServerReleaseService } from "./services/core/server-release.service";
 import { TaskManagerService } from "./services/task-manager.service";
 import { GithubService } from "./services/core/github.service";
@@ -22,24 +20,18 @@ import { MulterService } from "./services/core/multer.service";
 import { FileUploadTrackerCache } from "./state/file-upload-tracker.cache";
 import { ServerHost } from "./server.host";
 import { BootTask } from "./tasks/boot.task";
-import { UserService } from "./services/mongoose/user.service";
-import { UserService as UserService2 } from "./services/orm/user.service";
-import { RoleService } from "./services/mongoose/role.service";
-import { RoleService as RoleService2 } from "./services/orm/role.service";
-import { PermissionService } from "./services/mongoose/permission.service";
-import { PermissionService as PermissionService2 } from "./services/orm/permission.service";
+import { UserService } from "./services/orm/user.service";
+import { RoleService } from "./services/orm/role.service";
+import { PermissionService } from "./services/orm/permission.service";
 import { PrinterFileCleanTask } from "./tasks/printer-file-clean.task";
 import { ROLES } from "./constants/authorization.constants";
-import { CustomGcodeService } from "./services/mongoose/custom-gcode.service";
-import { CustomGcodeService as CustomGcodeService2 } from "./services/orm/custom-gcode.service";
+import { CustomGcodeService } from "./services/orm/custom-gcode.service";
 import { PrinterWebsocketRestoreTask } from "./tasks/printer-websocket-restore.task";
 import { ConfigService, IConfigService } from "./services/core/config.service";
 import { PrintCompletionSocketIoTask } from "./tasks/print-completion.socketio.task";
-import { PrintCompletionService } from "./services/mongoose/print-completion.service";
-import { PrintCompletionService as PrintCompletionService2 } from "./services/orm/print-completion.service";
+import { PrintCompletionService } from "./services/orm/print-completion.service";
 import { SocketIoGateway } from "./state/socket-io.gateway";
 import { ClientBundleService } from "./services/core/client-bundle.service";
-import { FloorService } from "./services/mongoose/floor.service";
 import { FloorStore } from "./state/floor.store";
 import { YamlService } from "./services/core/yaml.service";
 import { MonsterPiService } from "./services/core/monsterpi.service";
@@ -51,18 +43,15 @@ import { PrinterSocketStore } from "./state/printer-socket.store";
 import { TestPrinterSocketStore } from "./state/test-printer-socket.store";
 import { PrinterEventsCache } from "./state/printer-events.cache";
 import { LogDumpService } from "./services/core/logs-manager.service";
-import { CameraStreamService as CameraService } from "./services/mongoose/camera-stream.service";
-import { CameraStreamService as CameraService2 } from "./services/orm/camera-stream.service";
+import { CameraStreamService } from "./services/orm/camera-stream.service";
 import { JwtService } from "./services/authentication/jwt.service";
 import { AuthService } from "./services/authentication/auth.service";
-import { RefreshTokenService } from "@/services/mongoose/refresh-token.service";
 import { throttling } from "@octokit/plugin-throttling";
-import { RefreshTokenService as RefreshToken2 } from "@/services/orm/refresh-token.service";
-import { SettingsService as SettingsService2 } from "@/services/orm/settings.service";
-import { FloorService as FloorService2 } from "@/services/orm/floor.service";
+import { RefreshTokenService } from "@/services/orm/refresh-token.service";
+import { SettingsService } from "@/services/orm/settings.service";
+import { FloorService } from "@/services/orm/floor.service";
 import { FloorPositionService } from "@/services/orm/floor-position.service";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
-import { BuildResolver, DisposableResolver } from "awilix/lib/resolvers";
 import { UserRoleService } from "@/services/orm/user-role.service";
 import { PrinterGroupService } from "@/services/orm/printer-group.service";
 import { MoonrakerClient } from "@/services/moonraker/moonraker.client";
@@ -81,18 +70,7 @@ import { BambuMqttAdapter } from "@/services/bambu/bambu-mqtt.adapter";
 import { BambuFtpAdapter } from "@/services/bambu/bambu-ftp.adapter";
 import { BambuApi } from "@/services/bambu.api";
 
-export function config<T1, T2>(
-  key: string,
-  experimentalMode: boolean,
-  serviceTypeorm: BuildResolver<T2> & DisposableResolver<T2>,
-  serviceMongoose?: (BuildResolver<T1> & DisposableResolver<T1>) | Resolver<T1>,
-) {
-  return {
-    [key]: experimentalMode ? serviceTypeorm : serviceMongoose,
-  };
-}
-
-export function configureContainer(isSqlite: boolean = false) {
+export function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
   const container = createContainer({
     injectionMode: InjectionMode.CLASSIC,
@@ -102,55 +80,29 @@ export function configureContainer(isSqlite: boolean = false) {
 
   container.register({
     // -- asValue/asFunction constants --
-    [di.isTypeormMode]: asValue(isSqlite),
     [di.appDefaultRole]: asValue(ROLES.GUEST),
     [di.appDefaultRoleNoLogin]: asValue(ROLES.ADMIN),
     [di.serverVersion]: asFunction(() => {
       return process.env[AppConstants.VERSION_KEY];
     }),
-    [di.cradleService]: asClass(CradleService).inject((container) => ({ container })),
+    [di.cradleService]: asClass(CradleService).inject((container) => ({container})),
     [di.socketFactory]: asClass(SocketFactory).transient(), // Factory function, transient on purpose!
 
     // V1.6.0 capable services
-    ...config(di.typeormService, isSqlite, asClass(TypeormService).singleton(), asValue(null)),
-    ...config(di.settingsService, isSqlite, asClass(SettingsService2), asClass(SettingsService)),
-    ...config(di.floorService, isSqlite, asClass(FloorService2).singleton(), asClass(FloorService).singleton()),
-    ...config(di.floorPositionService, isSqlite, asClass(FloorPositionService).singleton(), asValue(null)),
-    ...config(
-      di.cameraStreamService,
-      isSqlite,
-      asClass(CameraService2).singleton(),
-      asClass(CameraService).singleton(),
-    ),
-    ...config(di.printerService, isSqlite, asClass(PrinterService2), asClass(PrinterService)),
-    ...config(di.printerGroupService, isSqlite, asClass(PrinterGroupService), asValue(null)),
-    ...config(
-      di.refreshTokenService,
-      isSqlite,
-      asClass(RefreshToken2).singleton(),
-      asClass(RefreshTokenService).singleton(),
-    ),
-    ...config(di.userService, isSqlite, asClass(UserService2).singleton(), asClass(UserService).singleton()),
-    ...config(di.userRoleService, isSqlite, asClass(UserRoleService).singleton(), asValue(null)),
-    ...config(di.roleService, isSqlite, asClass(RoleService2).singleton(), asClass(RoleService).singleton()), // caches roles
-    ...config(
-      di.permissionService,
-      isSqlite,
-      asClass(PermissionService2).singleton(),
-      asClass(PermissionService).singleton(),
-    ), // caches roles
-    ...config(
-      di.customGCodeService,
-      isSqlite,
-      asClass(CustomGcodeService2).singleton(),
-      asClass(CustomGcodeService).singleton(),
-    ),
-    ...config(
-      di.printCompletionService,
-      isSqlite,
-      asClass(PrintCompletionService2).singleton(),
-      asClass(PrintCompletionService).singleton(),
-    ),
+    [di.typeormService]: asClass(TypeormService).singleton(),
+    [di.settingsService]: asClass(SettingsService),
+    [di.floorService]: asClass(FloorService).singleton(),
+    [di.floorPositionService]: asClass(FloorPositionService).singleton(),
+    [di.cameraStreamService]: asClass(CameraStreamService).singleton(),
+    [di.printerService]: asClass(PrinterService),
+    [di.printerGroupService]: asClass(PrinterGroupService),
+    [di.refreshTokenService]: asClass(RefreshTokenService).singleton(),
+    [di.userService]: asClass(UserService).singleton(),
+    [di.userRoleService]: asClass(UserRoleService).singleton(),
+    [di.roleService]: asClass(RoleService).singleton(),
+    [di.permissionService]: asClass(PermissionService).singleton(),
+    [di.customGCodeService]: asClass(CustomGcodeService).singleton(),
+    [di.printCompletionService]: asClass(PrintCompletionService).singleton(),
     // -- asClass --
     [di.serverHost]: asClass(ServerHost).singleton(),
     [di.settingsStore]: asClass(SettingsStore).singleton(),
@@ -170,14 +122,14 @@ export function configureContainer(isSqlite: boolean = false) {
       return new CustomOctoKit({
         auth: configService.get(AppConstants.GITHUB_PAT),
         throttle: {
-          onRateLimit: (retryAfter, options, octokit, retryCount) => {
+          onRateLimit: (_retryAfter, options, _octokit, _retryCount) => {
             const logger = LoggerFactory()("OctoKitThrottle");
-            logger.warn(`Request quota exhausted for request ${options.method} ${options.url}`);
+            logger.warn(`Request quota exhausted for request ${ options.method } ${ options.url }`);
           },
-          onSecondaryRateLimit: (retryAfter, options, octokit) => {
+          onSecondaryRateLimit: (_retryAfter, options, _octokit) => {
             const logger = LoggerFactory()("OctoKitThrottle");
             // does not retry, only logs a warning
-            logger.warn(`SecondaryRateLimit detected for request ${options.method} ${options.url}`);
+            logger.warn(`SecondaryRateLimit detected for request ${ options.method } ${ options.url }`);
           },
         },
       });

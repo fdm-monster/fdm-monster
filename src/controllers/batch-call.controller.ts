@@ -15,14 +15,13 @@ import { Request, Response } from "express";
 @before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR])])
 export class BatchCallController {
   constructor(
-    private readonly batchCallService: BatchCallService,
-    private readonly isTypeormMode: boolean,
+    private readonly batchCallService: BatchCallService
   ) {}
 
   @POST()
   @route("/settings/get")
   async batchSettingsGet(req: Request, res: Response) {
-    const { printerIds } = await validateInput(req.body, batchPrinterSchema(this.isTypeormMode));
+    const { printerIds } = await validateInput(req.body, batchPrinterSchema);
     const results = await this.batchCallService.batchSettingsGet(printerIds);
     res.send(results);
   }
@@ -30,7 +29,7 @@ export class BatchCallController {
   @POST()
   @route("/connect/usb")
   async batchConnectUsb(req: Request, res: Response) {
-    const { printerIds } = await validateInput(req.body, batchPrinterSchema(this.isTypeormMode));
+    const { printerIds } = await validateInput(req.body, batchPrinterSchema);
     const results = await this.batchCallService.batchConnectUsb(printerIds);
     res.send(results);
   }
@@ -38,7 +37,7 @@ export class BatchCallController {
   @POST()
   @route("/connect/socket")
   async batchConnectSocket(req: Request, res: Response) {
-    const { printerIds } = await validateInput(req.body, batchPrinterSchema(this.isTypeormMode));
+    const { printerIds } = await validateInput(req.body, batchPrinterSchema);
     this.batchCallService.batchConnectSocket(printerIds);
     res.send({});
   }
@@ -46,7 +45,7 @@ export class BatchCallController {
   @POST()
   @route("/reprint/list")
   async getLastPrintedFiles(req: Request, res: Response) {
-    const { printerIds } = await validateInput(req.body, batchPrinterSchema(this.isTypeormMode));
+    const { printerIds } = await validateInput(req.body, batchPrinterSchema);
     const files = await this.batchCallService.getBatchPrinterReprintFile(printerIds);
     res.send(files);
   }
@@ -54,7 +53,7 @@ export class BatchCallController {
   @POST()
   @route("/reprint/execute")
   async batchReprintFiles(req: Request, res: Response) {
-    const { prints } = await validateInput(req.body, executeBatchRePrinterSchema(this.isTypeormMode));
+    const { prints } = await validateInput(req.body, executeBatchRePrinterSchema);
     const files = await this.batchCallService.batchReprintCalls(prints);
     res.send(files);
   }
@@ -62,7 +61,7 @@ export class BatchCallController {
   @POST()
   @route("/toggle-enabled")
   async batchTogglePrintersEnabled(req: Request, res: Response) {
-    const { printerIds, enabled } = await validateInput(req.body, batchPrintersEnabledSchema(this.isTypeormMode));
+    const { printerIds, enabled } = await validateInput(req.body, batchPrintersEnabledSchema);
     const results = await this.batchCallService.batchTogglePrintersEnabled(printerIds, enabled);
     res.send(results);
   }

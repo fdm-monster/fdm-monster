@@ -22,7 +22,6 @@ COPY .swcrc tsconfig.json package.json yarn.lock .yarnrc.yml ./
 RUN yarn workspaces focus --all --production
 
 COPY .env.template \
-    migrate-mongo-config.js \
     README.md \
     LICENSE CODE_OF_CONDUCT.md \
     CONTRIBUTING.md \

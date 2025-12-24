@@ -1,38 +1,33 @@
 import { ensureTestUserCreated } from "../api/test-data/create-user";
 import { DITokens } from "@/container.tokens";
 import { ROLES } from "@/constants/authorization.constants";
-import { UserService } from "@/services/mongoose/user.service";
 import { setupTestApp } from "../test-server";
 import { IdType } from "@/shared.constants";
 import { IUserService } from "@/services/interfaces/user-service.interface";
 import { IRoleService } from "@/services/interfaces/role-service.interface";
 import { RoleDto } from "@/services/interfaces/role.dto";
 import { UserDto } from "@/services/interfaces/user.dto";
-import { getDatasource, isSqliteModeTest } from "../typeorm.manager";
+import { getDatasource } from "../typeorm.manager";
 import { User } from "@/entities";
-import { User as UserMongo } from "@/models";
+import { UserService } from "@/services/orm/user.service";
 
 let userService: IUserService<IdType, UserDto>;
 let roleService: IRoleService<IdType, RoleDto>;
 
 beforeAll(async () => {
-  const { container } = await setupTestApp(true);
+  const {container} = await setupTestApp(true);
   userService = container.resolve(DITokens.userService);
   roleService = container.resolve(DITokens.roleService);
 });
 
 beforeEach(async () => {
-  if (isSqliteModeTest()) {
-    await getDatasource().getRepository(User).clear();
-  } else {
-    await UserMongo.deleteMany({});
-  }
+  await getDatasource().getRepository(User).clear();
 });
 
 describe(UserService.name, () => {
   it("should get user", async () => {
     await roleService.syncRoles();
-    const { id } = await ensureTestUserCreated();
+    const {id} = await ensureTestUserCreated();
     await userService.getUser(id);
   });
 
@@ -57,7 +52,7 @@ describe(UserService.name, () => {
 
   it("should get user roles", async () => {
     await roleService.syncRoles();
-    const { id } = await ensureTestUserCreated();
+    const {id} = await ensureTestUserCreated();
     const userRoles = await userService.getUserRoleIds(id);
     expect(userRoles).toHaveLength(1);
   });

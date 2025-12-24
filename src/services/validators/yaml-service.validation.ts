@@ -47,7 +47,7 @@ export const importPrinterPositionsSchema = z.object({
 export const importPrintersFloorsYamlSchema = z.object({
   version: z.string().optional(),
   exportedAt: z.date().optional(),
-  databaseType: z.enum(["mongo", "sqlite"]).default("mongo"),
+  databaseType: z.enum(["mongo", "sqlite"]).default("sqlite"),
   config: z.object({
     exportPrinters: z.boolean(),
     exportFloorGrid: z.boolean(),

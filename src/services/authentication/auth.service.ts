@@ -10,7 +10,7 @@ import { IAuthService } from "@/services/interfaces/auth.service.interface";
 import { IRefreshTokenService } from "@/services/interfaces/refresh-token.service.interface";
 import { AUTH_ERROR_REASON } from "@/constants/authorization.constants";
 import { captureException } from "@sentry/node";
-import { IUser } from "@/models/Auth/User";
+import { User } from "@/entities";
 
 export class AuthService<KeyType = IdType> implements IAuthService<KeyType> {
   private readonly logger: LoggerService;
@@ -39,7 +39,7 @@ export class AuthService<KeyType = IdType> implements IAuthService<KeyType> {
 
   constructor(
     loggerFactory: ILoggerFactory,
-    private readonly userService: IUserService<KeyType, IUser<KeyType>>,
+    private readonly userService: IUserService<KeyType, User>,
     private readonly jwtService: IJwtService<KeyType>,
     private readonly settingsStore: SettingsStore,
     private readonly refreshTokenService: IRefreshTokenService<KeyType>,
@@ -150,7 +150,7 @@ export class AuthService<KeyType = IdType> implements IAuthService<KeyType> {
     await this.refreshTokenService.updateRefreshTokenAttempts(refreshToken, attemptsUsed + 1);
   }
 
-  async signJwtToken(userId: KeyType) {
+  async signJwtToken(userId: IdType) {
     const user = await this.userService.getUser(userId);
     if (!user) {
       throw new AuthenticationError("User not found", AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken);

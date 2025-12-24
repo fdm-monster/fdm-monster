@@ -53,7 +53,7 @@ export class BambuApi implements IPrinterApi {
   /**
    * Set the printer ID for accessing the MQTT adapter
    */
-  setPrinterId(printerId: string): void {
+  setPrinterId(printerId: IdType): void {
     this.printerId = printerId;
   }
 

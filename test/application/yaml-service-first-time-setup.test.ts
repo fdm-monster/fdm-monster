@@ -10,31 +10,25 @@ import { IUserService } from "@/services/interfaces/user-service.interface";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { Settings } from "@/entities/settings.entity";
 import { AwilixContainer } from "awilix";
-import { Settings as SettingsMongo, User as UserMongo } from "@/models";
 import { IRoleService } from "@/services/interfaces/role-service.interface";
 import { User } from "@/entities";
 
 describe("YamlService - First Time Setup Mode", () => {
-  async function clearSettings(container: AwilixContainer, settingsStore: SettingsStore, isTypeormMode: boolean) {
-    if (isTypeormMode) {
-      // Clear TypeORM database
-      const typeormService = container.resolve<TypeormService>(DITokens.typeormService);
-      const dataSource = typeormService.getDataSource();
-      if (dataSource) {
-        await dataSource.getRepository(Settings).clear();
-        await dataSource.getRepository(User).clear();
-      }
-    } else {
-      // Clear MongoDB database directly
-      await SettingsMongo.deleteMany({});
-      await UserMongo.deleteMany({});
+  async function clearSettings(container: AwilixContainer, settingsStore: SettingsStore) {
+    // Clear TypeORM database
+    const typeormService = container.resolve<TypeormService>(DITokens.typeormService);
+    const dataSource = typeormService.getDataSource();
+    if (dataSource) {
+      await dataSource.getRepository(Settings).clear();
+      await dataSource.getRepository(User).clear();
     }
+
     // Reload settings to get a fresh copy with wizard incomplete
     await settingsStore.loadSettings();
   }
 
   it("should import 1.9.1 mongodb full yaml with system data during first-time setup", async () => {
-    const { container, isTypeormMode, idType } = await setupTestApp(true, undefined, true, true);
+    const {container, idType} = await setupTestApp(true, undefined, true, true);
     const yamlService: YamlService = container.resolve(DITokens.yamlService);
     const printerService: IPrinterService<typeof idType> = container.resolve(DITokens.printerService);
     const floorService: IFloorService<typeof idType> = container.resolve(DITokens.floorService);
@@ -43,7 +37,7 @@ describe("YamlService - First Time Setup Mode", () => {
     const roleService = container.resolve<IRoleService>(DITokens.roleService);
 
     // Clear settings to ensure fresh state for this test
-    await clearSettings(container, settingsStore, isTypeormMode);
+    await clearSettings(container, settingsStore);
 
     const buffer = readFileSync(join(__dirname, "./test-data/export-fdm-monster-1.9.1-mongodb-full.yaml"));
 
@@ -87,7 +81,7 @@ describe("YamlService - First Time Setup Mode", () => {
   });
 
   it("should import 1.9.1 sqlite full yaml with system data during first-time setup", async () => {
-    const { container, isTypeormMode, idType } = await setupTestApp(true, undefined, true, true);
+    const {container, idType} = await setupTestApp(true, undefined, true, true);
     const yamlService: YamlService = container.resolve(DITokens.yamlService);
     const printerService: IPrinterService<typeof idType> = container.resolve(DITokens.printerService);
     const floorService: IFloorService<typeof idType> = container.resolve(DITokens.floorService);
@@ -96,7 +90,7 @@ describe("YamlService - First Time Setup Mode", () => {
     const roleService = container.resolve<IRoleService>(DITokens.roleService);
 
     // Clear settings to reset wizard status from previous test (in-memory database is shared)
-    await clearSettings(container, settingsStore, isTypeormMode);
+    await clearSettings(container, settingsStore);
 
     const buffer = readFileSync(join(__dirname, "./test-data/export-fdm-monster-1.9.1-sqlite-full.yaml"));
 

@@ -96,12 +96,12 @@ describe(PrinterController.name, () => {
   });
 
   it(`should not be able to POST ${updateRoute} - missing printer field`, async () => {
-    const response = await request.patch(connectionRoute("asd")).send();
+    const response = await request.patch(connectionRoute(404)).send();
     expectNotFoundResponse(response);
   });
 
   it(`should not be able to DELETE ${deleteRoute} - nonexistent id`, async () => {
-    const response = await request.delete(deleteRoute("non-id")).send();
+    const response = await request.delete(deleteRoute(404)).send();
     expectNotFoundResponse(response);
   });
 
@@ -125,7 +125,7 @@ describe(PrinterController.name, () => {
   });
 
   it("should return no printer Info entry when Id is provided but doesnt exist", async () => {
-    const printerId = "615f4fa37081fa06f428df90";
+    const printerId = 404;
     const res = await request.get(getRoute(printerId)).send();
     expectNotFoundResponse(res);
     expect(res.body).toEqual({

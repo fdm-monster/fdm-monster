@@ -1,35 +1,22 @@
 import { IPermissionService } from "@/services/interfaces/permission.service.interface";
-import { SqliteIdType } from "@/shared.constants";
-import { BaseService } from "@/services/orm/base.service";
-import { Permission } from "@/entities";
-import { PermissionDto } from "@/services/interfaces/permission.dto";
-import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
-import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { flattenPermissionDefinition } from "@/constants/authorization.constants";
 
-export class PermissionService
-  extends BaseService(Permission, PermissionDto<SqliteIdType>)
-  implements IPermissionService<SqliteIdType, Permission>
-{
-  private readonly logger: LoggerService;
-  private _permissions: Permission[] = [];
+export class Permission {
+  name: string;
+}
 
-  constructor(loggerFactory: ILoggerFactory, typeormService: TypeormService) {
-    super(typeormService);
+export class PermissionService implements IPermissionService {
+  private _permissions: Permission[] = [];
+  private readonly logger: LoggerService;
+
+  constructor(loggerFactory: ILoggerFactory) {
     this.logger = loggerFactory(PermissionService.name);
   }
 
   get permissions() {
     return this._permissions;
-  }
-
-  toDto(permission: Permission): PermissionDto<SqliteIdType> {
-    return {
-      id: permission.id,
-      name: permission.name,
-    };
   }
 
   authorizePermission(requiredPermission: string, assignedPermissions: string[]): boolean {
@@ -40,17 +27,15 @@ export class PermissionService
     });
   }
 
-  async getPermissionByName(permissionName: string): Promise<Permission> {
-    const permission = this.permissions.find((r) => r.name === permissionName);
-    if (!permission) throw new NotFoundException("Permission not found");
-    return permission;
-  }
-
-  async getPermission(permissionId: SqliteIdType): Promise<Permission> {
-    const permission = this.permissions.find((r) => r.id === permissionId);
-    if (!permission) throw new NotFoundException(`Permission by provided id is not found`);
-
-    return permission;
+  normalizePermission(assignedPermission: string) {
+    const permissionInstance = this.permissions.find(
+      (r) => r.name === assignedPermission,
+    );
+    if (!permissionInstance) {
+      this.logger.warn(`The permission by provided id is not found. Skipping`);
+      return;
+    }
+    return permissionInstance.name;
   }
 
   async syncPermissions(): Promise<void> {
@@ -58,26 +43,7 @@ export class PermissionService
 
     const permissionDefinition = flattenPermissionDefinition();
     for (let permission of permissionDefinition) {
-      const storedPermission = await this.repository.findOneBy({ name: permission });
-      if (!storedPermission) {
-        const newPermission = await this.create({
-          name: permission,
-        });
-        this._permissions.push(newPermission);
-      } else {
-        this._permissions.push(storedPermission);
-      }
+      this._permissions.push({name: permission});
     }
-  }
-
-  normalizePermission(assignedPermission: string | number) {
-    const permissionInstance = this.permissions.find(
-      (r) => r.id === assignedPermission || r.name === assignedPermission,
-    );
-    if (!permissionInstance) {
-      this.logger.warn(`The permission by provided id is not found. Skipping`);
-      return;
-    }
-    return permissionInstance.name;
   }
 }

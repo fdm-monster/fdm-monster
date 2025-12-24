@@ -2,7 +2,6 @@ export const DITokens = {
   cradleService: "cradleService",
   // Values
   serverVersion: "serverVersion",
-  isTypeormMode: "isTypeormMode",
   appDefaultRole: "appDefaultRole",
   appDefaultRoleNoLogin: "appDefaultRoleNoLogin",
   typeormService: "typeormService",

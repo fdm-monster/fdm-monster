@@ -1,21 +1,19 @@
 import { PrinterMockData } from "./test-data/printer.data";
-import { Floor } from "@/entities/floor.entity";
 import { DITokens } from "@/container.tokens";
 import { IFloorService } from "@/services/interfaces/floor.service.interface";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { IdType } from "@/shared.constants";
 import { Printer } from "@/entities";
 import { setupTestApp } from "../test-server";
-import { isSqliteModeTest } from "../typeorm.manager";
 import { FloorService } from "@/services/orm/floor.service";
 
 let printerService: IPrinterService<IdType, Printer>;
-let floorService: IFloorService<IdType, Floor>;
+let floorService: IFloorService;
 
 beforeAll(async () => {
   const { container } = await setupTestApp(true);
   printerService = container.resolve<IPrinterService<IdType, Printer>>(DITokens.printerService);
-  floorService = container.resolve<IFloorService<IdType, Floor>>(DITokens.floorService);
+  floorService = container.resolve<IFloorService>(DITokens.floorService);
 });
 
 describe(FloorService.name, () => {
@@ -40,7 +38,7 @@ describe(FloorService.name, () => {
     });
     const dto = floorService.toDto(floor);
     expect(dto).toBeTruthy();
-    expect(typeof dto.id).toBe(isSqliteModeTest() ? "number" : "string");
+    expect(typeof dto.id).toBe("number");
   });
 
   it("can delete existing floor", async () => {

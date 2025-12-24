@@ -13,7 +13,6 @@ import {
   wizardSettingKey,
 } from "@/constants/server-settings.constants";
 import { SettingsController } from "@/controllers/settings.controller";
-import { isSqliteModeTest } from "../typeorm.manager";
 import TestAgent from "supertest/lib/agent";
 import { FrontendSettingsDto } from "@/services/interfaces/settings.dto";
 
@@ -45,7 +44,6 @@ describe(SettingsController.name, () => {
       loginRequired: false,
       registration: false,
       experimentalMoonrakerSupport: true,
-      experimentalTypeormSupport: isSqliteModeTest(),
       experimentalClientSupport: false,
       experimentalThumbnailSupport: false,
     });

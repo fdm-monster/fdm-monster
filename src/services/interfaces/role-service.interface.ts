@@ -1,8 +1,8 @@
-import { IdType, SqliteIdType } from "@/shared.constants";
-import { IRole } from "@/models/Auth/Role";
+import { IdType } from "@/shared.constants";
 import { RoleDto } from "@/services/interfaces/role.dto";
+import { Role } from "@/entities";
 
-export interface IRoleService<KeyType = IdType, Entity = IRole> {
+export interface IRoleService<KeyType = IdType, Entity = Role> {
   toDto(role: Entity): RoleDto<KeyType>;
 
   get roles(): Entity[];
