@@ -39,7 +39,7 @@ services:
 
   fdm-monster-sqlite:
     container_name: fdm-monster-sqlite
-    image: fdmmonster/fdm-monster:1.9.2-sqlite # -arm64
+    image: fdmmonster/fdm-monster:1.9.3-sqlite # -arm64
     restart: unless-stopped
     ports:
       - "4000:4000"
