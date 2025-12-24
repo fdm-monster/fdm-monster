@@ -122,11 +122,10 @@ describe(UserController.name, () => {
   });
 
   it("should create registered user", async function () {
-    const role = await roleService.getSynchronizedRoleByName(ROLES.OPERATOR);
     const response = await request.post(defaultRoute).send({
       username: "david",
       password: "test1234",
-      roleIds: [role.id],
+      roles: [ROLES.OPERATOR],
     });
     expectOkResponse(response);
   });
@@ -135,21 +134,20 @@ describe(UserController.name, () => {
     const {token} = await loginTestUser(request, "fakeuser");
 
     const user = await ensureTestUserCreated("test", "user", false, ROLES.OPERATOR, true, false);
-    const roles = await roleService.getSynchronizedRoleByName(ROLES.OPERATOR);
     const response = await request
       .post(setUserRolesRoute(user.id))
       .set("Authorization", `Bearer ${ token }`)
       .send({
-        roleIds: [roles.id],
+        roles: [ROLES.OPERATOR],
       });
     expectOkResponse(response);
     const getUser = await request.get(getRoute(user.id));
     expectOkResponse(getUser);
-    expect(getUser.body.roles.includes(roles.id)).toBeTruthy();
+    expect(getUser.body.roles.includes(ROLES.OPERATOR)).toBeTruthy();
     expect(getUser.body.roles).toHaveLength(1);
 
     const response2 = await request.post(setUserRolesRoute(user.id)).set("Authorization", `Bearer ${ token }`).send({
-      roleIds: [],
+      roles: [],
     });
     expectOkResponse(response2);
     const getUser2 = await request.get(getRoute(user.id));
