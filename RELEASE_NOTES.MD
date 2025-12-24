@@ -1,5 +1,14 @@
 # Develop
 
+# FDM Monster 2.0.0-rc1
+
+## Features
+
+- Remove mongodb support (breaking change)
+- Reimplement role system based on RoleName (not id and name)
+- Cleanup and remove unused permission table
+- Key-diff cache is now Map instead of Object
+
 # FDM Monster 1.9.4
 
 ## Fixes
