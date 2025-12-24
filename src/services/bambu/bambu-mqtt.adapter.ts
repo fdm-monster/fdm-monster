@@ -147,7 +147,7 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
     this.isConnecting = true;
     this.socketState = SOCKET_STATE.opening;
 
-    const mqttUrl = `mqtt://${host}:1883`;
+    const mqttUrl = `mqtt://${host}:8883`;
     const timeout = this.settingsStore.getTimeoutSettings().apiTimeout;
 
     this.logger.log(`Connecting to Bambu MQTT at ${mqttUrl}`);

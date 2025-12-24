@@ -16,11 +16,11 @@
  *
  * Examples:
  *   yarn console:mock-bambu
- *   yarn console:mock-bambu 990 1883 01P00A000000001 12345678
+ *   yarn console:mock-bambu 990 8883 01P00A000000001 12345678
  *
  * Defaults:
  *   FTP Port: 990
- *   MQTT Port: 1883 (embedded broker)
+ *   MQTT Port: 8883 (embedded broker)
  *   Serial: 01P00A000000001
  *   Access Code: 12345678
  *   Username: bblp (standard for Bambu Lab printers)
@@ -44,12 +44,12 @@ import path from "node:path";
 import fs from "node:fs";
 import os from "node:os";
 import selfsigned from "selfsigned";
-import { SecureVersion } from "tls";
+import { SecureVersion } from "node:tls";
 import Aedes from "aedes";
 import { createServer } from "node:net";
 
 const DEFAULT_PORT = 990;
-const DEFAULT_MQTT_PORT = 1883;
+const DEFAULT_MQTT_PORT = 8883;
 const DEFAULT_SERIAL = "01P00A000000001";
 const DEFAULT_ACCESS_CODE = "12345678";
 const MESSAGE_INTERVAL = 1000;
@@ -68,7 +68,9 @@ console.log(`[BAMBU MOCK]   Access Code: ${accessCode}`);
 console.log(`[BAMBU MOCK]   Username: bblp`);
 
 // Initialize embedded MQTT broker
-const aedes = new Aedes();
+const aedes = new Aedes({
+
+});
 const mqttServer = createServer(aedes.handle);
 
 mqttServer.listen(mqttPort, () => {
