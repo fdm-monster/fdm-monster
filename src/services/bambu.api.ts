@@ -35,7 +35,7 @@ export class BambuApi implements IPrinterApi {
   client: BambuClient;
   printerLogin: LoginDto;
   private readonly printerSocketStore: PrinterSocketStore;
-  private printerId?: string;
+  private printerId?: number;
 
   constructor(
     bambuClient: BambuClient,
@@ -53,7 +53,7 @@ export class BambuApi implements IPrinterApi {
   /**
    * Set the printer ID for accessing the MQTT adapter
    */
-  setPrinterId(printerId: IdType): void {
+  setPrinterId(printerId: number): void {
     this.printerId = printerId;
   }
 

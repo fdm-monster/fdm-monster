@@ -1,31 +1,33 @@
-import { IdType } from "@/shared.constants";
 import { RoleDto } from "@/services/interfaces/role.dto";
 import { Role } from "@/entities";
+import { PermissionName, RoleName } from "@/constants/authorization.constants";
 
-export interface IRoleService<KeyType = IdType, Entity = Role> {
-  toDto(role: Entity): RoleDto<KeyType>;
+export interface IRoleService<Entity = Role> {
+  toDto(role: Entity): RoleDto;
 
   get roles(): Entity[];
 
-  getAppDefaultRole(): Promise<string>;
+  getAppDefaultRole(): Promise<RoleName>;
 
-  getRolesPermissions(roles: (string | KeyType)[]): string[];
+  getAppDefaultRoleNames(): Promise<RoleName[]>;
 
-  getRolePermissions(role: string | KeyType): string[];
+  getRolesPermissions(roleNames: RoleName[]): PermissionName[];
 
-  getAppDefaultRoleIds(): Promise<any[]>;
+  getRolePermissions(roleName: RoleName): PermissionName[];
 
-  getSynchronizedRoleByName(roleName: string): Promise<Entity>;
+  getSynchronizedRoleByName(roleName: RoleName): Promise<Entity>;
 
-  authorizeRole(requiredRole: string | KeyType, assignedRoles: string[]): boolean;
+  authorizeRole(requiredRole: RoleName, assignedRoles: RoleName[]): boolean;
 
-  authorizeRoles(requiredRoles: (string | KeyType)[], assignedRoles: readonly (string | KeyType)[], subset: boolean): boolean;
+  authorizeRoles(requiredRoles: RoleName[], assignedRoles: RoleName[], subset: boolean): boolean;
 
-  getRoleByName(roleName: string): Entity;
+  getRoleByName(roleName: RoleName): Entity;
 
-  getManyRoles(roleIds: KeyType[]): Entity[];
+  getManyRoles(roleIds: number[]): Entity[];
 
-  getRole(roleId: KeyType): Entity;
+  getRole(roleId: number): Entity;
+
+  roleIdsToRoleNames(roleIds: number[]): RoleName[];
 
   syncRoles(): Promise<void>;
 }

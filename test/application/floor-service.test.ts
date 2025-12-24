@@ -2,17 +2,15 @@ import { PrinterMockData } from "./test-data/printer.data";
 import { DITokens } from "@/container.tokens";
 import { IFloorService } from "@/services/interfaces/floor.service.interface";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
-import { IdType } from "@/shared.constants";
-import { Printer } from "@/entities";
 import { setupTestApp } from "../test-server";
 import { FloorService } from "@/services/orm/floor.service";
 
-let printerService: IPrinterService<IdType, Printer>;
+let printerService: IPrinterService;
 let floorService: IFloorService;
 
 beforeAll(async () => {
   const { container } = await setupTestApp(true);
-  printerService = container.resolve<IPrinterService<IdType, Printer>>(DITokens.printerService);
+  printerService = container.resolve<IPrinterService>(DITokens.printerService);
   floorService = container.resolve<IFloorService>(DITokens.floorService);
 });
 

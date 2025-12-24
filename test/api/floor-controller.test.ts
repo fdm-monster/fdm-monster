@@ -11,16 +11,15 @@ import { Floor } from "@/entities";
 import { AppConstants } from "@/server.constants";
 import { Test } from "supertest";
 import { FloorController } from "@/controllers/floor.controller";
-import { IdType } from "@/shared.constants";
 import { getDatasource } from "../typeorm.manager";
 import TestAgent from "supertest/lib/agent";
 
 const listRoute = `${ AppConstants.apiRoute }/floor`;
-const getRoute = (id: IdType) => `${ listRoute }/${ id }`;
-const addPrinterToFloorRoute = (id: IdType) => `${ listRoute }/${ id }/printer`;
-const deleteRoute = (id: IdType) => `${ listRoute }/${ id }`;
-const updateNameRoute = (id: IdType) => `${ getRoute(id) }/name`;
-const updateFloorNumberRoute = (id: IdType) => `${ getRoute(id) }/floor-number`;
+const getRoute = (id: number) => `${ listRoute }/${ id }`;
+const addPrinterToFloorRoute = (id: number) => `${ listRoute }/${ id }/printer`;
+const deleteRoute = (id: number) => `${ listRoute }/${ id }`;
+const updateNameRoute = (id: number) => `${ getRoute(id) }/name`;
+const updateFloorNumberRoute = (id: number) => `${ getRoute(id) }/floor-number`;
 
 let request: TestAgent<Test>;
 

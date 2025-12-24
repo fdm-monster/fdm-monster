@@ -1,5 +1,4 @@
 import { BaseService } from "@/services/orm/base.service";
-import { SqliteIdType } from "@/shared.constants";
 import { PrinterGroup } from "@/entities/printer-group.entity";
 import { CreateGroupDto, PrinterGroupDto } from "@/services/interfaces/printer-group.dto";
 import { IPrinterGroupService } from "@/services/interfaces/printer-group.service.interface";
@@ -12,7 +11,7 @@ import { GroupWithPrintersDto } from "@/services/interfaces/group.dto";
 
 export class PrinterGroupService
   extends BaseService(PrinterGroup, PrinterGroupDto)
-  implements IPrinterGroupService<SqliteIdType>
+  implements IPrinterGroupService
 {
   private readonly groupRepository: Repository<Group>;
 

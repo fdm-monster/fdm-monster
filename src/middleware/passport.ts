@@ -42,7 +42,7 @@ export function verifyUserCallback(userService: IUserService) {
       .getUser(jwt_payload.userId)
       .then((user: User) => {
         if (user?.isVerified && !user.needsPasswordChange) {
-          return done(null, user);
+          return done(null, userService.toDto(user));
         }
         if (user?.needsPasswordChange) {
           return done(

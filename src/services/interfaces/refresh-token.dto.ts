@@ -1,8 +1,6 @@
-import { IdType } from "@/shared.constants";
-
-export class RefreshTokenDto<KeyType = IdType> {
-  id!: KeyType;
-  userId!: KeyType;
+export class RefreshTokenDto {
+  id!: number;
+  userId!: number;
   expiresAt!: number;
   // Not exposed
   // refreshToken!: string;

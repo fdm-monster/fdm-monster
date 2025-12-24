@@ -3,7 +3,6 @@ import { LoginDto } from "@/services/interfaces/login.dto";
 import { ServerConfigDto } from "@/services/moonraker/dto/server/server-config.dto";
 import { SettingsDto } from "@/services/octoprint/dto/settings/settings.dto";
 import { ConnectionState } from "@/services/octoprint/dto/connection/connection-state.type";
-import { IdType } from "@/shared.constants";
 import { Flags } from "@/services/moonraker/dto/octoprint-compat/api-printer.dto";
 
 export const OctoprintType = 0;
@@ -66,7 +65,7 @@ export interface PartialReprintFileDto {
 }
 
 export interface ReprintFileDto extends PartialReprintFileDto {
-  printerId: IdType;
+  printerId: number;
 }
 
 export interface IPrinterApi {

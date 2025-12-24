@@ -60,7 +60,6 @@ export async function setupTestApp(
   }
 
   return {
-    idType: Number,
     httpServer,
     request: supertest(httpServer),
     container,

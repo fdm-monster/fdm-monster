@@ -10,7 +10,6 @@ import { LoginDto } from "@/services/interfaces/login.dto";
 import { SOCKET_STATE, SocketState } from "@/shared/dtos/socket-state.type";
 import { API_STATE, ApiState } from "@/shared/dtos/api-state.type";
 import { BambuType } from "@/services/printer-api.interface";
-import { IdType } from "@/shared.constants";
 import { WsMessage } from "@/services/octoprint/octoprint-websocket.adapter";
 
 export const bambuEvent = (event: string) => `bambu.${event}`;
@@ -18,7 +17,7 @@ export const bambuEvent = (event: string) => `bambu.${event}`;
 export interface BambuEventDto {
   event: string;
   payload: any;
-  printerId?: IdType;
+  printerId?: number;
   printerType: typeof BambuType;
 }
 
@@ -33,7 +32,7 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
 
   // IWebsocketAdapter required properties
   public readonly printerType = BambuType;
-  public printerId?: IdType;
+  public printerId?: number;
   public socketState: SocketState = SOCKET_STATE.unopened;
   public apiState: ApiState = API_STATE.unset;
   public login: LoginDto;

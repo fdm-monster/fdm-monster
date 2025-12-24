@@ -1,13 +1,12 @@
 import { inject } from "awilix-express";
 import { AuthenticationError, AuthorizationError } from "@/exceptions/runtime.exceptions";
 import { NextFunction, Request, Response } from "express";
-import { AUTH_ERROR_REASON } from "@/constants/authorization.constants";
+import { AUTH_ERROR_REASON, PermissionName, RoleName } from "@/constants/authorization.constants";
 import { SettingsStore } from "@/state/settings.store";
 import { AuthService } from "@/services/authentication/auth.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IRoleService } from "@/services/interfaces/role-service.interface";
 import { IPermissionService } from "@/services/interfaces/permission.service.interface";
-import { IdType } from "@/shared.constants";
 
 export const authenticate = () =>
   inject(
@@ -40,11 +39,11 @@ export const authenticate = () =>
       },
   );
 
-export function permission(requiredPermission: string) {
+export function permission(requiredPermission: PermissionName) {
   return inject(
     (permissionService: IPermissionService, roleService: IRoleService) =>
-      async (req: Request, res: Response, next: NextFunction) => {
-        const userRoles = req.roles as IdType[];
+      async (req: Request, _res: Response, next: NextFunction) => {
+        const userRoles = req.roles;
         if (!userRoles?.length) {
           throw new AuthorizationError({ permissions: [requiredPermission] });
         }
@@ -59,10 +58,10 @@ export function permission(requiredPermission: string) {
   );
 }
 
-export const authorizeRoles = (roles: string[], subset = true) =>
+export const authorizeRoles = (requiredRoles: RoleName[], subset = true) =>
   inject((roleService: IRoleService) => async (req: Request, res: Response, next: NextFunction) => {
-    if (!req.roles?.length || !roleService.authorizeRoles(roles, req.roles, subset)) {
-      throw new AuthorizationError({ roles });
+    if (!req.roles?.length || !roleService.authorizeRoles(requiredRoles, req.roles, subset)) {
+      throw new AuthorizationError({ roles: requiredRoles });
     }
 
     next();

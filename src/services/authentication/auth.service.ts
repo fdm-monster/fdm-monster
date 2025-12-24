@@ -5,44 +5,25 @@ import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IUserService } from "@/services/interfaces/user-service.interface";
 import { IJwtService } from "@/services/interfaces/jwt.service.interface";
-import { IdType } from "@/shared.constants";
 import { IAuthService } from "@/services/interfaces/auth.service.interface";
 import { IRefreshTokenService } from "@/services/interfaces/refresh-token.service.interface";
 import { AUTH_ERROR_REASON } from "@/constants/authorization.constants";
 import { captureException } from "@sentry/node";
 import { User } from "@/entities";
 
-export class AuthService<KeyType = IdType> implements IAuthService<KeyType> {
+export class AuthService implements IAuthService {
   private readonly logger: LoggerService;
   /**
    *  When users are blacklisted at runtime, this cache can make quick work of rejecting them
    */
-  private blacklistedJwtCache: Record<string, { userId: KeyType; createdAt: number }> = {};
-
-  /**
-   * loginUser: starts new session: id-token, refresh, removing any old refresh
-   * logoutUser: ends session, removes refresh token and blacklists userId
-   * renewLoginByRefreshToken: renews session, reduces refresh attempts
-   * addBlackListEntry: private, adds a blacklisted entry after logout
-   * removeBlacklistEntry: private, removes a blacklisted entry
-   * logoutUser
-   * signJwtToken: private, purely signs a new jwt token
-   */
-
-  /**
-   * cool features: faking other user logins (encapsulated login? Double login?)
-   * registration link
-   * loginUser: username/password based login
-   * blacklist: forcing all existing refresh tokens and jwts to be rejected of that user until login
-   * refreshAttempts => integer in setting with cap?
-   */
+  private blacklistedJwtCache: Record<string, { userId: number; createdAt: number }> = {};
 
   constructor(
     loggerFactory: ILoggerFactory,
-    private readonly userService: IUserService<KeyType, User>,
-    private readonly jwtService: IJwtService<KeyType>,
+    private readonly userService: IUserService<User>,
+    private readonly jwtService: IJwtService,
     private readonly settingsStore: SettingsStore,
-    private readonly refreshTokenService: IRefreshTokenService<KeyType>,
+    private readonly refreshTokenService: IRefreshTokenService,
   ) {
     this.logger = loggerFactory(AuthService.name);
   }
@@ -69,7 +50,7 @@ export class AuthService<KeyType = IdType> implements IAuthService<KeyType> {
     };
   }
 
-  async logoutUserId(userId: KeyType, jwtToken?: string) {
+  async logoutUserId(userId: number, jwtToken?: string) {
     await this.refreshTokenService.deleteRefreshTokenByUserId(userId);
     if (jwtToken?.length) {
       this.blacklistedJwtCache[jwtToken] = { userId, createdAt: Date.now() };
@@ -150,7 +131,7 @@ export class AuthService<KeyType = IdType> implements IAuthService<KeyType> {
     await this.refreshTokenService.updateRefreshTokenAttempts(refreshToken, attemptsUsed + 1);
   }
 
-  async signJwtToken(userId: IdType) {
+  async signJwtToken(userId: number) {
     const user = await this.userService.getUser(userId);
     if (!user) {
       throw new AuthenticationError("User not found", AUTH_ERROR_REASON.InvalidOrExpiredRefreshToken);

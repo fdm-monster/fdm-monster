@@ -73,11 +73,12 @@ export class PrinterFilesController {
   @route("/:id/reload-thumbnail")
   @before(permission(PERMS.PrinterFiles.Actions))
   async reloadThumbnail(req: Request, res: Response) {
+    const { currentPrinterId } = getScopedPrinter(req);
     const { filePath } = await validateInput(req.body, startPrintFileSchema);
 
     try {
       if (this.settingsStore.isThumbnailSupportEnabled()) {
-        await this.printerThumbnailCache.loadPrinterThumbnailRemote(this.printerLogin, req.params.id, filePath);
+        await this.printerThumbnailCache.loadPrinterThumbnailRemote(this.printerLogin, currentPrinterId, filePath);
       }
     } catch (e) {
       this.logger.error(`Unexpected error processing thumbnail ${errorSummary(e)}`);
@@ -95,13 +96,14 @@ export class PrinterFilesController {
   @route("/:id/print")
   @before(permission(PERMS.PrinterFiles.Actions))
   async startPrintFile(req: Request, res: Response) {
+    const { currentPrinterId } = getScopedPrinter(req);
     const { filePath } = await validateInput(req.body, startPrintFileSchema);
     const encodedFilePath = encodeURIComponent(filePath);
     await this.printerApi.startPrint(encodedFilePath);
 
     try {
       if (this.settingsStore.isThumbnailSupportEnabled()) {
-        await this.printerThumbnailCache.loadPrinterThumbnailRemote(this.printerLogin, req.params.id, encodedFilePath);
+        await this.printerThumbnailCache.loadPrinterThumbnailRemote(this.printerLogin, currentPrinterId, encodedFilePath);
       }
     } catch (e) {
       this.logger.error(`Unexpected error processing thumbnail ${errorSummary(e)}`);
@@ -183,7 +185,7 @@ export class PrinterFilesController {
   @before(permission(PERMS.PrinterFiles.Get))
   async getPrinterThumbnail(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
-    const printerThumbnail = await this.printerThumbnailCache.getValue(currentPrinterId.toString());
+    const printerThumbnail = await this.printerThumbnailCache.getValue(currentPrinterId);
     res.send(printerThumbnail);
   }
 

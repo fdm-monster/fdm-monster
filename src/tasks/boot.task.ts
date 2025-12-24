@@ -16,6 +16,7 @@ import { TaskService } from "@/services/interfaces/task.interfaces";
 import { RoleService } from "@/services/orm/role.service";
 import { UserService } from "@/services/orm/user.service";
 import { PermissionService } from "@/services/orm/permission.service";
+import { RoleName } from "@/constants/authorization.constants";
 
 export class BootTask implements TaskService {
   logger: LoggerService;
@@ -117,8 +118,7 @@ export class BootTask implements TaskService {
       AppConstants.OVERRIDE_DEMO_PASSWORD,
       AppConstants.DEFAULT_DEMO_PASSWORD,
     ) as string;
-    const demoRole = this.configService.get(AppConstants.OVERRIDE_DEMO_ROLE, AppConstants.DEFAULT_DEMO_ROLE) as string;
-    const adminRole = this.roleService.getRoleByName(demoRole);
+    const demoRole = this.configService.get(AppConstants.OVERRIDE_DEMO_ROLE, AppConstants.DEFAULT_DEMO_ROLE) as RoleName;
 
     const demoUserId = await this.userService.getDemoUserId();
     if (!demoUserId) {
@@ -129,14 +129,14 @@ export class BootTask implements TaskService {
         isVerified: true,
         isRootUser: false,
         needsPasswordChange: false,
-        roles: [adminRole.id],
+        roles: [demoRole],
       });
       this.logger.log("Created demo account");
     } else {
       await this.userService.setVerifiedById(demoUserId, true);
       await this.userService.setIsRootUserById(demoUserId, false);
       await this.userService.updatePasswordUnsafeByUsername(demoUsername, demoPassword);
-      await this.userService.setUserRoleIds(demoUserId, [adminRole.id]);
+      await this.userService.setUserRoles(demoUserId, [demoRole]);
       this.logger.log("Updated demo account");
     }
   }

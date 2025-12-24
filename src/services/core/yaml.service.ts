@@ -12,7 +12,6 @@ import { FloorStore } from "@/state/floor.store";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { IFloorService } from "@/services/interfaces/floor.service.interface";
-import { IdType } from "@/shared.constants";
 import { IPrinterGroupService } from "@/services/interfaces/printer-group.service.interface";
 import { MoonrakerType, OctoprintType } from "@/services/printer-api.interface";
 import { z } from "zod";
@@ -112,7 +111,7 @@ export class YamlService {
     const {updateByNameGroups, insertGroups} = await this.analyseUpsertGroups(importData.groups ?? []);
 
     this.logger.log(`Performing pure insert printers (${ insertPrinters.length } printers)`);
-    const printerIdMap: { [k: IdType]: IdType } = {};
+    const printerIdMap: { [k: number]: number } = {};
     for (const newPrinter of insertPrinters) {
       const state = await this.printerService.create({...newPrinter});
       if (!newPrinter.id) {
@@ -142,9 +141,9 @@ export class YamlService {
     }
 
     this.logger.log(`Performing pure create floors (${ insertFloors.length } floors)`);
-    const floorIdMap: { [k: IdType]: IdType } = {};
+    const floorIdMap: { [k: number]: number } = {};
     for (const newFloor of insertFloors) {
-      const originalFloorId = newFloor.id as IdType;
+      const originalFloorId = newFloor.id as number;
       delete newFloor.id;
 
       // Replace printerIds with newly mapped IDs
@@ -213,7 +212,7 @@ export class YamlService {
         name: group.name,
       });
       for (const printer of group.printers) {
-        const knownPrinterId = printerIdMap[printer.printerId] satisfies IdType | undefined;
+        const knownPrinterId = printerIdMap[printer.printerId] satisfies number | undefined;
         // If the ID was not mapped, this position is considered discarded
         if (!knownPrinterId) continue;
         await this.printerGroupService.addPrinterToGroup(createdGroup.id, knownPrinterId);
@@ -290,23 +289,15 @@ export class YamlService {
         user.id = Number.parseInt(user.id);
       }
 
-      let roleIds: IdType[] = [];
-      if (user.roles && user.roles.length > 0) {
-        // Support both role names (new format) and role IDs (backward compatibility)
-        roleIds = user.roles
-          .map((roleNameOrId: string | IdType) => {
-            // If it's a role name (string like "ADMIN"), find the corresponding ID
-            const role = allRoles.find((r) => r.name === roleNameOrId);
-            return role?.id;
-          })
-          .filter((id: IdType | undefined) => id !== undefined);
-      }
+      // Filter to valid role names only
+      const roleNames = (user.roles ?? [])
+        .filter((roleName: string) => allRoles.some((r) => r.name === roleName));
 
       // Register user with a temporary password (will be replaced with actual hash)
       await this.userService.register({
         username: user.username,
         password: "temporary-password-to-be-replaced",
-        roles: roleIds,
+        roles: roleNames,
         isRootUser: user.isRootUser ?? false,
         isDemoUser: user.isDemoUser ?? false,
         isVerified: user.isVerified ?? false,
@@ -569,11 +560,10 @@ export class YamlService {
 
     if (exportUsers) {
       const users = await this.userService.listUsers(1000);
-      const allRoles = this.roleService.roles;
 
       dumpedObject.users = users.map((u) => {
         const userDto = this.userService.toDto(u);
-        const userObj: any = {
+        return {
           id: userDto.id,
           username: userDto.username,
           isDemoUser: userDto.isDemoUser,
@@ -582,20 +572,8 @@ export class YamlService {
           needsPasswordChange: userDto.needsPasswordChange,
           passwordHash: u.passwordHash,
           createdAt: userDto.createdAt,
+          roles: userDto.roles,
         };
-
-
-        // Include roles as role names
-        if (userDto.roles && userDto.roles.length > 0) {
-          userObj.roles = userDto.roles
-            .map((roleId) => {
-              const role = allRoles.find((r) => r.id.toString() === roleId.toString());
-              return role?.name;
-            })
-            .filter((name) => name !== undefined);
-        }
-
-        return userObj;
       });
     }
 

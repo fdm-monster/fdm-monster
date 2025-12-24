@@ -21,7 +21,7 @@ export class MulterService {
     this.logger = loggerFactory(MulterService.name);
   }
 
-  public startTrackingSession(multerFile: Express.Multer.File, printerId: IdType) {
+  public startTrackingSession(multerFile: Express.Multer.File, printerId: number) {
     return this.fileUploadTrackerCache.addUploadTracker(multerFile, printerId);
   }
 

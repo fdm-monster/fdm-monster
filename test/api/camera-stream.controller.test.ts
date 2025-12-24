@@ -4,17 +4,15 @@ import { AppConstants } from "@/server.constants";
 import { Test } from "supertest";
 import { CameraStreamController } from "@/controllers/camera-stream.controller";
 import TestAgent from "supertest/lib/agent";
-import { IdType } from "@/shared.constants";
 
 const listRoute = `${ AppConstants.apiRoute }/camera-stream`;
-const getRoute = (id: IdType) => `${ listRoute }/${ id }`;
-const deleteRoute = (id: IdType) => `${ listRoute }/${ id }`;
-const updateRoute = (id: IdType) => `${ getRoute(id) }`;
+const getRoute = (id: number) => `${ listRoute }/${ id }`;
+const deleteRoute = (id: number) => `${ listRoute }/${ id }`;
+const updateRoute = (id: number) => `${ getRoute(id) }`;
 
 let request: TestAgent<Test>;
-let idType: typeof Number | typeof String;
 beforeAll(async () => {
-  ({idType, request} = await setupTestApp(true));
+  ({request} = await setupTestApp(true));
 });
 
 describe(CameraStreamController.name, () => {
@@ -26,7 +24,7 @@ describe(CameraStreamController.name, () => {
       name: "Tester",
     });
   const matchedBody = (url: string) => ({
-    id: expect.any(idType),
+    id: expect.any(Number),
     streamURL: url,
     name: "Tester",
     printerId: null,
@@ -34,8 +32,8 @@ describe(CameraStreamController.name, () => {
   const getTestCameraStream = async (id: number) => await request.get(getRoute(id));
   const createTestCameraStream = async (url: string) =>
     await request.post(listRoute).send(defaultCameraStreamInput(url));
-  const deleteTestCameraStream = async (id: IdType) => await request.delete(deleteRoute(id));
-  const updateTestCameraStream = async (id: IdType, url: string) =>
+  const deleteTestCameraStream = async (id: number) => await request.delete(deleteRoute(id));
+  const updateTestCameraStream = async (id: number, url: string) =>
     await request.put(updateRoute(id)).send(defaultCameraStreamInput(url));
 
   it("should list streams", async () => {

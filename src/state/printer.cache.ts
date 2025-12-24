@@ -1,4 +1,4 @@
-import { KeyDiffCache, keyType } from "@/utils/cache/key-diff.cache";
+import { KeyDiffCache } from "@/utils/cache/key-diff.cache";
 import {
   BatchPrinterCreatedEvent,
   PrinterCreatedEvent,
@@ -7,12 +7,11 @@ import {
 } from "@/constants/event.constants";
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import EventEmitter2 from "eventemitter2";
-import { IdType } from "@/shared.constants";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { PrinterDto } from "@/services/interfaces/printer.dto";
 import { Printer } from "@/entities";
 
-export class PrinterCache extends KeyDiffCache<PrinterDto<IdType>> {
+export class PrinterCache extends KeyDiffCache<PrinterDto> {
   constructor(
     private readonly printerService: IPrinterService,
     private readonly eventEmitter2: EventEmitter2,
@@ -25,15 +24,15 @@ export class PrinterCache extends KeyDiffCache<PrinterDto<IdType>> {
     this.eventEmitter2.on(printerEvents.printersDeleted, this.handlePrintersDeleted.bind(this));
   }
 
-  async loadCache(): Promise<PrinterDto<IdType>[]> {
+  async loadCache(): Promise<PrinterDto[]> {
     const printerDocs = await this.printerService.list();
     const dtos = this.mapArray(printerDocs);
-    const keyValues = dtos.map((p) => ({ key: this.getId(p), value: p }));
+    const keyValues = dtos.map((p) => ({ key: p.id, value: p }));
     await this.setKeyValuesBatch(keyValues, true);
     return dtos;
   }
 
-  async listCachedPrinters(includeDisabled = false): Promise<PrinterDto<IdType>[]> {
+  async listCachedPrinters(includeDisabled = false): Promise<PrinterDto[]> {
     const printers = await this.getAllValues();
     if (!includeDisabled) {
       return printers.filter((p) => p.enabled);
@@ -41,7 +40,7 @@ export class PrinterCache extends KeyDiffCache<PrinterDto<IdType>> {
     return printers;
   }
 
-  async getCachedPrinterOrThrowAsync(id: keyType): Promise<PrinterDto<IdType>> {
+  async getCachedPrinterOrThrowAsync(id: number): Promise<PrinterDto> {
     const printer = await this.getValue(id);
     if (!printer) {
       throw new NotFoundException(`Printer with provided id not found`);
@@ -49,25 +48,20 @@ export class PrinterCache extends KeyDiffCache<PrinterDto<IdType>> {
     return printer;
   }
 
-  getCachedPrinterOrThrow(id: keyType) {
-    const printer = this.keyValueStore[id];
+  getCachedPrinterOrThrow(id: number) {
+    const printer = this.keyValueStore.get(id);
     if (!printer) {
       throw new NotFoundException(`Printer with provided id not found`);
     }
     return printer;
   }
 
-  async getNameAsync(id: keyType) {
+  async getNameAsync(id: number) {
     const printer = await this.getCachedPrinterOrThrowAsync(id);
     return printer.name;
   }
 
-  getName(id: keyType) {
-    const printer = this.getCachedPrinterOrThrow(id);
-    return printer.name;
-  }
-
-  async getLoginDtoAsync(id: keyType) {
+  async getLoginDtoAsync(id: number) {
     const printer = await this.getCachedPrinterOrThrowAsync(id);
     return {
       printerURL: printer.printerURL,
@@ -78,7 +72,7 @@ export class PrinterCache extends KeyDiffCache<PrinterDto<IdType>> {
     };
   }
 
-  getLoginDto(id: keyType) {
+  getLoginDto(id: number) {
     const printer = this.getCachedPrinterOrThrow(id);
     return {
       printerURL: printer.printerURL,
@@ -91,7 +85,7 @@ export class PrinterCache extends KeyDiffCache<PrinterDto<IdType>> {
 
   private async handleBatchPrinterCreated(event: BatchPrinterCreatedEvent) {
     const mappedPrinters = this.mapArray(event.printers);
-    const keyValues = mappedPrinters.map((p) => ({ key: this.getId(p), value: p }));
+    const keyValues = mappedPrinters.map((p) => ({ key: p.id, value: p }));
     await this.setKeyValuesBatch(keyValues, true);
   }
 
@@ -104,17 +98,13 @@ export class PrinterCache extends KeyDiffCache<PrinterDto<IdType>> {
     await this.deleteKeysBatch(event.printerIds, true);
   }
 
-  private getId(value: Printer) {
-    return value.id.toString();
-  }
-
   private mapArray(entities: Printer[]) {
     return entities.map((p) => {
       return this.map(p);
     });
   }
 
-  private map(entity: Printer): PrinterDto<IdType> {
+  private map(entity: Printer): PrinterDto {
     return this.printerService.toDto(entity);
   }
 }

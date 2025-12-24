@@ -1,30 +1,29 @@
-import { IdType } from "@/shared.constants";
 import { CreateFloorDto, CreatePositionDto, FloorDto, UpdateFloorDto } from "@/services/interfaces/floor.dto";
 import { Floor } from "@/entities";
 import { FindOneOptions } from "typeorm";
 
-export interface IFloorService<KeyType = IdType, Entity = Floor> {
-  create(input: CreateFloorDto<KeyType>): Promise<Entity>;
+export interface IFloorService {
+  create(input: CreateFloorDto): Promise<Floor>;
 
-  createDefaultFloor(): Promise<Entity>;
+  createDefaultFloor(): Promise<Floor>;
 
-  delete(floorId: KeyType): Promise<void>;
+  delete(floorId: number): Promise<void>;
 
-  addOrUpdatePrinter(floorId: KeyType, position: CreatePositionDto<KeyType>): Promise<Entity>;
+  addOrUpdatePrinter(floorId: number, position: CreatePositionDto): Promise<Floor>;
 
-  deletePrinterFromAnyFloor(printerId: KeyType): Promise<void>;
+  deletePrinterFromAnyFloor(printerId: number): Promise<void>;
 
-  get(floorId: KeyType, options?: FindOneOptions<Entity>): Promise<Entity>;
+  get(floorId: number, options?: FindOneOptions<Floor>): Promise<Floor>;
 
-  list(): Promise<Entity[]>;
+  list(): Promise<Floor[]>;
 
-  removePrinter(floorId: KeyType, printerId: KeyType): Promise<Entity>;
+  removePrinter(floorId: number, printerId: number): Promise<Floor>;
 
-  toDto(floor: Entity): FloorDto<KeyType>;
+  toDto(floor: Floor): FloorDto;
 
-  update(floorId: KeyType, input: UpdateFloorDto<KeyType>): Promise<Entity>;
+  update(floorId: number, input: UpdateFloorDto): Promise<Floor>;
 
-  updateLevel(floorId: KeyType, level: number): Promise<Entity>;
+  updateLevel(floorId: number, level: number): Promise<Floor>;
 
-  updateName(floorId: KeyType, name: string): Promise<Entity>;
+  updateName(floorId: number, name: string): Promise<Floor>;
 }

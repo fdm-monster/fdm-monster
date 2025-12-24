@@ -1,4 +1,3 @@
-import { IdType } from "@/shared.constants";
 import {
   CreatePrintCompletionDto,
   PrintCompletionContext,
@@ -6,10 +5,10 @@ import {
 } from "@/services/interfaces/print-completion.dto";
 import { PrintCompletion } from "@/entities";
 
-export interface IPrintCompletionService<KeyType extends IdType = IdType, Entity = PrintCompletion> {
-  toDto(printCompletion: Entity): PrintCompletionDto<KeyType>;
+export interface IPrintCompletionService<Entity = PrintCompletion> {
+  toDto(printCompletion: Entity): PrintCompletionDto;
 
-  create(input: CreatePrintCompletionDto<KeyType>): Promise<Entity>;
+  create(input: CreatePrintCompletionDto): Promise<Entity>;
 
   list(): Promise<Entity[]>;
 
@@ -17,7 +16,7 @@ export interface IPrintCompletionService<KeyType extends IdType = IdType, Entity
 
   updateContext(correlationId: string | null | undefined, context: PrintCompletionContext): Promise<void>;
 
-  loadPrintContexts(): Promise<Record<KeyType, Entity[]>>;
+  loadPrintContexts(): Promise<Record<number, Entity[]>>;
 
   listGroupByPrinterStatus(): Promise<any[]>;
 }

@@ -1,6 +1,6 @@
-export class PrinterGroupDto<KeyType = number> {
-  printerId: KeyType;
-  groupId: KeyType;
+export class PrinterGroupDto {
+  printerId: number;
+  groupId: number;
 }
 
 export class CreateGroupDto {

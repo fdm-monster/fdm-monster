@@ -6,15 +6,14 @@ import { PrinterService } from "@/services/orm/printer.service";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { Printer } from "@/entities";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
-import { SqliteIdType } from "@/shared.constants";
 
 let container: AwilixContainer;
-let printerService: IPrinterService<SqliteIdType, Printer>;
+let printerService: IPrinterService;
 let typeorm: TypeormService;
 
 beforeAll(async () => {
   container = configureContainer();
-  printerService = container.resolve<IPrinterService<SqliteIdType, Printer>>(DITokens.printerService);
+  printerService = container.resolve<IPrinterService>(DITokens.printerService);
   typeorm = container.resolve<TypeormService>(DITokens.typeormService);
   await typeorm.createConnection();
 });

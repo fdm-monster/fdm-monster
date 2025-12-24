@@ -7,6 +7,7 @@ describe("authorization constants", () => {
   });
 
   it("allPerms should throw for unknown permission group", async () => {
+    // @ts-expect-error Testing runtime behavior with invalid input
     expect(() => allPerms("123asd")).toThrow(`Permission group name '123asd' was not found`);
   });
 

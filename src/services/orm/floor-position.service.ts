@@ -1,14 +1,13 @@
 import { FloorPosition } from "@/entities/floor-position.entity";
 import { BaseService } from "@/services/orm/base.service";
-import { SqliteIdType } from "@/shared.constants";
 import { PositionDto } from "@/services/interfaces/floor.dto";
 
-export class FloorPositionService extends BaseService(FloorPosition, PositionDto<SqliteIdType>) {
-  async create(dto: PositionDto<SqliteIdType>): Promise<FloorPosition> {
+export class FloorPositionService extends BaseService(FloorPosition, PositionDto) {
+  async create(dto: PositionDto): Promise<FloorPosition> {
     return super.create(dto);
   }
 
-  findPosition(floorId: SqliteIdType, x: number, y: number) {
+  findPosition(floorId: number, x: number, y: number) {
     return this.repository.findOneBy({ floorId, x, y });
   }
 
@@ -16,19 +15,19 @@ export class FloorPositionService extends BaseService(FloorPosition, PositionDto
    * Find the printer across any floor, usually to see if it has been moved elsewhere.
    * @param printerId The printer which position to be looked up.
    */
-  findPrinterPosition(printerId: SqliteIdType) {
+  findPrinterPosition(printerId: number) {
     return this.repository.findOneBy({ printerId });
   }
 
-  deletePrinterPositionsByPrinterId(printerId: SqliteIdType) {
+  deletePrinterPositionsByPrinterId(printerId: number) {
     return this.repository.delete({ printerId });
   }
 
-  findPrinterPositionOnFloor(floorId: SqliteIdType, printerId: SqliteIdType) {
+  findPrinterPositionOnFloor(floorId: number, printerId: number) {
     return this.repository.findOneBy({ floorId, printerId });
   }
 
-  toDto(entity: FloorPosition): PositionDto<SqliteIdType> {
+  toDto(entity: FloorPosition): PositionDto {
     return {
       x: entity.x,
       y: entity.y,

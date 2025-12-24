@@ -1,8 +1,7 @@
 import { Role, User } from "@/entities";
-import { ROLES } from "@/constants/authorization.constants";
+import { RoleName, ROLES } from "@/constants/authorization.constants";
 import { hashPassword } from "@/utils/crypto.utils";
 import { UserDto } from "@/services/interfaces/user.dto";
-import { SqliteIdType } from "@/shared.constants";
 import { getDatasource } from "../../typeorm.manager";
 import { UserRole } from "@/entities/user-role.entity";
 
@@ -17,7 +16,7 @@ export async function ensureTestUserCreated(
   usernameIn = "test",
   passwordIn = "test",
   needsPasswordChange = false,
-  role = ROLES.ADMIN,
+  roleName: RoleName = ROLES.ADMIN,
   isVerified = true,
   isRootUser = true,
 ): Promise<UserDto> {
@@ -26,17 +25,17 @@ export async function ensureTestUserCreated(
   const userRepo = getDatasource().getRepository(User);
   const userRoleRepo = getDatasource().getRepository(UserRole);
 
-  const roleId = (await roleRepo.findOneBy({ name: role }))?.id;
-  const roles = roleId ? [roleId] : [];
+  const roleId = (await roleRepo.findOneBy({name: roleName}))?.id;
+  const roleIds = roleId ? [roleId] : [];
 
-  const foundUser = await userRepo.findOneBy({ username: usernameIn });
-  const { username, password } = getUserData(usernameIn, passwordIn);
+  const foundUser = await userRepo.findOneBy({username: usernameIn});
+  const {username, password} = getUserData(usernameIn, passwordIn);
   const hash = hashPassword(password);
 
   if (foundUser) {
-    await userRepo.update(foundUser.id, { passwordHash: hash, needsPasswordChange, isVerified, isRootUser });
+    await userRepo.update(foundUser.id, {passwordHash: hash, needsPasswordChange, isVerified, isRootUser});
     await userRoleRepo.upsert(
-      roles.map((r) => ({
+      roleIds.map((r) => ({
         userId: foundUser.id,
         roleId: r,
       })),
@@ -52,11 +51,12 @@ export async function ensureTestUserCreated(
       isDemoUser: foundUser.isDemoUser,
       username: foundUser.username,
       needsPasswordChange: foundUser.needsPasswordChange,
-      roles: foundUser.roles?.map((r) => r.roleId),
-    } as UserDto<SqliteIdType>;
+      roles: [roleName],
+      createdAt: foundUser.createdAt,
+    } satisfies UserDto;
   }
 
-  const userr = userRepo.create({
+  const createdUser = userRepo.create({
     username,
     passwordHash: hash,
     isDemoUser: false,
@@ -65,10 +65,10 @@ export async function ensureTestUserCreated(
     needsPasswordChange,
   });
 
-  await userRepo.insert(userr);
+  await userRepo.insert(createdUser);
   await userRoleRepo.upsert(
-    roles.map((r) => ({
-      userId: userr.id,
+    roleIds.map((r) => ({
+      userId: createdUser.id,
       roleId: r,
     })),
     {
@@ -76,18 +76,19 @@ export async function ensureTestUserCreated(
       conflictPaths: ["userId", "roleId"],
     },
   );
-  const user = await userRepo.findOneBy({ id: userr.id });
-  if (!user) {
-    throw new Error("Could not find user with id " + userr.id);
-  }
 
+  const finalFoundUser = await userRepo.findOneBy({id: createdUser.id});
+  if (!finalFoundUser) {
+    throw new Error("Could not find user with id " + createdUser.id);
+  }
   return {
-    id: user.id,
-    username: user.username,
+    id: finalFoundUser.id,
+    username: finalFoundUser.username,
     isDemoUser: false,
     isRootUser,
     isVerified,
-    needsPasswordChange: user.needsPasswordChange,
-    roles: user.roles?.map((r) => r.roleId),
-  } as UserDto<SqliteIdType>;
+    needsPasswordChange: finalFoundUser.needsPasswordChange,
+    roles: [roleName],
+    createdAt: finalFoundUser.createdAt,
+  } satisfies UserDto;
 }

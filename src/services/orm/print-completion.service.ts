@@ -5,7 +5,6 @@ import {
   PrintCompletionContext,
   PrintCompletionDto,
 } from "@/services/interfaces/print-completion.dto";
-import { SqliteIdType } from "@/shared.constants";
 import { IPrintCompletionService } from "@/services/interfaces/print-completion.interface";
 import { In, Not } from "typeorm";
 import { EVENT_TYPES } from "@/services/octoprint/constants/octoprint-websocket.constants";
@@ -16,8 +15,8 @@ import { LoggerService } from "@/handlers/logger";
 import { AnalyzedCompletions, processCompletions } from "@/services/orm/print-completion.shared";
 
 export class PrintCompletionService
-  extends BaseService(PrintCompletion, PrintCompletionDto<SqliteIdType>)
-  implements IPrintCompletionService<SqliteIdType, PrintCompletion>
+  extends BaseService(PrintCompletion, PrintCompletionDto)
+  implements IPrintCompletionService
 {
   private readonly logger: LoggerService;
 
@@ -26,7 +25,7 @@ export class PrintCompletionService
     this.logger = loggerFactory(PrintCompletionService.name);
   }
 
-  toDto(entity: PrintCompletion): PrintCompletionDto<SqliteIdType> {
+  toDto(entity: PrintCompletion): PrintCompletionDto {
     return {
       id: entity.id,
       completionLog: entity.completionLog,
@@ -39,7 +38,7 @@ export class PrintCompletionService
     };
   }
 
-  async create(input: CreatePrintCompletionDto<SqliteIdType>) {
+  async create(input: CreatePrintCompletionDto) {
     return await super.create(input);
   }
 
@@ -78,7 +77,7 @@ export class PrintCompletionService
     return processCompletions(completions);
   }
 
-  async loadPrintContexts(): Promise<Record<string, PrintCompletion[]>> {
+  async loadPrintContexts(): Promise<Record<number, PrintCompletion[]>> {
     const completions = await this.repository.find({
       where: {
         status: Not(In([EVENT_TYPES.PrintDone, EVENT_TYPES.PrintFailed])),

@@ -1,7 +1,6 @@
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { PrinterCache } from "@/state/printer.cache";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
-import { IdType } from "@/shared.constants";
 import { captureException } from "@sentry/node";
 import { errorSummary } from "@/utils/error.utils";
 import { LoggerService } from "@/handlers/logger";
@@ -9,19 +8,18 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { PrinterApiFactory } from "@/services/printer-api.factory";
 import { IPrinterApi, ReprintFileDto, ReprintState } from "@/services/printer-api.interface";
 import { LoginDto } from "@/services/interfaces/login.dto";
-import { keyType } from "@/utils/cache/key-diff.cache";
 
 interface BatchSingletonModel {
   success?: boolean;
   failure?: boolean;
-  printerId: IdType;
+  printerId: number;
   time: number;
   error?: string;
 }
 
 type BatchModel = Array<BatchSingletonModel>;
 
-export class BatchCallService<KeyType extends IdType = keyType> {
+export class BatchCallService {
   private readonly logger: LoggerService;
 
   constructor(
@@ -39,14 +37,14 @@ export class BatchCallService<KeyType extends IdType = keyType> {
   }
 
   async batchTogglePrintersEnabled(
-    printerIds: KeyType[],
+    printerIds: number[],
     enabled: boolean,
   ): Promise<
     {
       failure?: boolean;
       error?: any;
       success?: boolean;
-      printerId: KeyType;
+      printerId: number;
       time: number;
     }[]
   > {
@@ -92,7 +90,7 @@ export class BatchCallService<KeyType extends IdType = keyType> {
     return await Promise.all(promises);
   }
 
-  batchConnectSocket(printerIds: KeyType[]): void {
+  batchConnectSocket(printerIds: number[]): void {
     for (const printerId of printerIds) {
       try {
         this.printerSocketStore.reconnectPrinterAdapter(printerId);
@@ -103,7 +101,7 @@ export class BatchCallService<KeyType extends IdType = keyType> {
     }
   }
 
-  async batchSettingsGet(printerIds: KeyType[]): Promise<Awaited<BatchModel>> {
+  async batchSettingsGet(printerIds: number[]): Promise<Awaited<BatchModel>> {
     const promises = [];
     for (const printerId of printerIds) {
       const login = await this.printerCache.getLoginDtoAsync(printerId);
@@ -125,7 +123,7 @@ export class BatchCallService<KeyType extends IdType = keyType> {
     return await Promise.all(promises);
   }
 
-  async batchConnectUsb(printerIds: KeyType[]): Promise<Awaited<BatchModel>> {
+  async batchConnectUsb(printerIds: number[]): Promise<Awaited<BatchModel>> {
     const promises = [];
     for (const printerId of printerIds) {
       const login = await this.printerCache.getLoginDtoAsync(printerId);
@@ -146,7 +144,7 @@ export class BatchCallService<KeyType extends IdType = keyType> {
     return await Promise.all(promises);
   }
 
-  async getBatchPrinterReprintFile(printerIds: KeyType[]): Promise<ReprintFileDto[]> {
+  async getBatchPrinterReprintFile(printerIds: number[]): Promise<ReprintFileDto[]> {
     const promises = [];
     for (const printerId of printerIds) {
       const promise = new Promise<ReprintFileDto>(async (resolve, _) => {
@@ -174,7 +172,7 @@ export class BatchCallService<KeyType extends IdType = keyType> {
     return await Promise.all(promises);
   }
 
-  async batchReprintCalls(printerIdFileList: { printerId: KeyType; path: string }[]): Promise<Awaited<BatchModel>> {
+  async batchReprintCalls(printerIdFileList: { printerId: number; path: string }[]): Promise<Awaited<BatchModel>> {
     const promises = [];
     for (const printerIdFile of printerIdFileList) {
       const { printerId, path } = printerIdFile;

@@ -1,15 +1,14 @@
-import { KeyDiffCache, keyType } from "@/utils/cache/key-diff.cache";
+import { KeyDiffCache } from "@/utils/cache/key-diff.cache";
 import { LoggerService } from "@/handlers/logger";
 import { IFloorService } from "@/services/interfaces/floor.service.interface";
-import { IdType } from "@/shared.constants";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { CreateFloorDto, FloorDto, PositionDto, UpdateFloorDto } from "@/services/interfaces/floor.dto";
 
-export class FloorStore<KeyType extends keyType = IdType> extends KeyDiffCache<FloorDto<KeyType>> {
+export class FloorStore extends KeyDiffCache<FloorDto> {
   private readonly logger: LoggerService;
 
   constructor(
-    private readonly floorService: IFloorService<KeyType>,
+    private readonly floorService: IFloorService,
     loggerFactory: ILoggerFactory,
   ) {
     super();
@@ -28,7 +27,7 @@ export class FloorStore<KeyType extends keyType = IdType> extends KeyDiffCache<F
     }
 
     const keyValues = floors.map((floor) => ({
-      key: floor.id.toString(),
+      key: floor.id,
       value: this.floorService.toDto(floor),
     }));
     await this.setKeyValuesBatch(keyValues, true);
@@ -44,19 +43,19 @@ export class FloorStore<KeyType extends keyType = IdType> extends KeyDiffCache<F
     return await this.getAllValues();
   }
 
-  async create(input: CreateFloorDto<KeyType>) {
+  async create(input: CreateFloorDto) {
     const floor = await this.floorService.create(input);
     const floorDto = this.floorService.toDto(floor);
     await this.setKeyValue(floor.id, floorDto, true);
     return floorDto;
   }
 
-  async delete(floorId: KeyType) {
+  async delete(floorId: number) {
     await this.floorService.delete(floorId);
     await this.deleteKeyValue(floorId);
   }
 
-  async getFloor(floorId: KeyType) {
+  async getFloor(floorId: number) {
     let floor = await this.getValue(floorId);
     if (floor) {
       return floor;
@@ -68,42 +67,42 @@ export class FloorStore<KeyType extends keyType = IdType> extends KeyDiffCache<F
     return floorDto;
   }
 
-  async update(floorId: KeyType, input: UpdateFloorDto<KeyType>) {
+  async update(floorId: number, input: UpdateFloorDto) {
     const floor = await this.floorService.update(floorId, input);
     const floorDto = this.floorService.toDto(floor);
     await this.setKeyValue(floorId, floorDto, true);
     return floorDto;
   }
 
-  async updateName(floorId: KeyType, name: string) {
+  async updateName(floorId: number, name: string) {
     const floor = await this.floorService.updateName(floorId, name);
     const floorDto = this.floorService.toDto(floor);
     await this.setKeyValue(floorId, floorDto, true);
     return floorDto;
   }
 
-  async updateFloorNumber(floorId: KeyType, floorLevel: number) {
+  async updateFloorNumber(floorId: number, floorLevel: number) {
     const floor = await this.floorService.updateLevel(floorId, floorLevel);
     const floorDto = this.floorService.toDto(floor);
     await this.setKeyValue(floorId, floorDto, true);
     return floorDto;
   }
 
-  async addOrUpdatePrinter(floorId: KeyType, position: PositionDto<KeyType>) {
+  async addOrUpdatePrinter(floorId: number, position: PositionDto) {
     const floor = await this.floorService.addOrUpdatePrinter(floorId, position);
     const floorDto = this.floorService.toDto(floor);
     await this.setKeyValue(floorId, floorDto, true);
     return floorDto;
   }
 
-  async removePrinter(floorId: KeyType, printerId: KeyType) {
+  async removePrinter(floorId: number, printerId: number) {
     const floor = await this.floorService.removePrinter(floorId, printerId);
     const floorDto = this.floorService.toDto(floor);
     await this.setKeyValue(floorId, floorDto, true);
     return floorDto;
   }
 
-  async removePrinterFromAnyFloor(printerId: KeyType) {
+  async removePrinterFromAnyFloor(printerId: number) {
     await this.floorService.deletePrinterFromAnyFloor(printerId);
 
     // Bit harsh, but we need to reload the entire store

@@ -5,7 +5,6 @@ import { ensureTestUserCreated } from "../api/test-data/create-user";
 import { SettingsStore } from "@/state/settings.store";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { RefreshToken } from "@/entities";
-import { SqliteIdType } from "@/shared.constants";
 import { IRefreshTokenService } from "@/services/interfaces/refresh-token.service.interface";
 import { RefreshTokenService } from "@/services/orm/refresh-token.service";
 
@@ -16,7 +15,7 @@ let typeorm: TypeormService;
 
 beforeAll(async () => {
   container = configureContainer();
-  refreshTokenService = container.resolve<IRefreshTokenService<SqliteIdType>>(DITokens.refreshTokenService);
+  refreshTokenService = container.resolve<IRefreshTokenService>(DITokens.refreshTokenService);
   settingsStore = container.resolve<SettingsStore>(DITokens.settingsStore);
   typeorm = container.resolve<TypeormService>(DITokens.typeormService);
   await typeorm.createConnection();

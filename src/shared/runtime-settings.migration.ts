@@ -1,4 +1,3 @@
-import { IdType } from "@/shared.constants";
 import {
   credentialSettingsKey,
   frontendSettingKey,
@@ -16,7 +15,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { Settings } from "@/entities";
 
-export function migrateSettingsRuntime<KeyType = IdType>(
+export function migrateSettingsRuntime(
   knownSettings: Partial<Settings>,
 ): Settings {
   const entity = knownSettings;

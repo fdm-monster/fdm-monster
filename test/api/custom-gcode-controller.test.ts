@@ -4,7 +4,6 @@ import { expectNotFoundResponse, expectOkResponse } from "../extensions";
 import { createTestPrinter } from "./test-data/create-printer";
 import { Test } from "supertest";
 import { CustomGcodeDto } from "@/services/interfaces/custom-gcode.dto";
-import { IdType, SqliteIdType } from "@/shared.constants";
 import { getDatasource } from "../typeorm.manager";
 import { CustomGcode } from "@/entities";
 import { CustomGcodeController } from "@/controllers/custom-gcode.controller";
@@ -13,9 +12,9 @@ import nock from "nock";
 
 const defaultRoute = `${AppConstants.apiRoute}/custom-gcode`;
 const createRoute = defaultRoute;
-const emergencyGCodeRoute = (printerId: IdType) => `${defaultRoute}/send-emergency-m112/${printerId}`;
-const getRoute = (id: IdType) => `${defaultRoute}/${id}`;
-const updateRoute = (id: IdType) => `${defaultRoute}/${id}`;
+const emergencyGCodeRoute = (printerId: number) => `${defaultRoute}/send-emergency-m112/${printerId}`;
+const getRoute = (id: number) => `${defaultRoute}/${id}`;
+const updateRoute = (id: number) => `${defaultRoute}/${id}`;
 
 let request: TestAgent<Test>;
 
@@ -37,7 +36,7 @@ function getGCodeScript() {
 async function createNormalGcodeScript(request: TestAgent<Test>) {
   const response = await request.post(createRoute).send(getGCodeScript());
   expectOkResponse(response);
-  return response.body as CustomGcodeDto<SqliteIdType>;
+  return response.body as CustomGcodeDto;
 }
 
 describe(CustomGcodeController.name, () => {

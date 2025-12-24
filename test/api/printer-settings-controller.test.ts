@@ -5,14 +5,13 @@ import { AppConstants } from "@/server.constants";
 import { Test } from "supertest";
 import { PrinterSettingsController } from "@/controllers/printer-settings.controller";
 import TestAgent from "supertest/lib/agent";
-import { IdType } from "@/shared.constants";
 import nock from "nock";
 
 const defaultRoute = `${AppConstants.apiRoute}/printer-settings`;
 
-const getRoute = (id: IdType) => `${defaultRoute}/${id}`;
-const setGCodeAnalysisRoute = (id: IdType) => `${getRoute(id)}/gcode-analysis`;
-const syncPrinterNameRoute = (id: IdType) => `${getRoute(id)}/sync-printername`;
+const getRoute = (id: number) => `${defaultRoute}/${id}`;
+const setGCodeAnalysisRoute = (id: number) => `${getRoute(id)}/gcode-analysis`;
+const syncPrinterNameRoute = (id: number) => `${getRoute(id)}/sync-printername`;
 
 let request: TestAgent<Test>;
 

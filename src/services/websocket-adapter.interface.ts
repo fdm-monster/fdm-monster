@@ -1,12 +1,11 @@
-import { IdType } from "@/shared.constants";
 import { ISocketLogin } from "@/shared/dtos/socket-login.dto";
 import { SocketState } from "@/shared/dtos/socket-state.type";
 import { ApiState } from "@/shared/dtos/api-state.type";
 import { LoginDto } from "@/services/interfaces/login.dto";
 
-export interface IWebsocketAdapter<T = IdType> {
+export interface IWebsocketAdapter {
   printerType: number;
-  printerId?: T;
+  printerId?: number;
   socketState: SocketState;
   apiState: ApiState;
   login: LoginDto;

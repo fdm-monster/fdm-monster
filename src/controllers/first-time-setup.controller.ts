@@ -32,7 +32,7 @@ export class FirstTimeSetupController {
     }
 
     const user = await this.userService.findRawByUsername(rootUsername?.toLowerCase());
-    if (!!user) {
+    if (user) {
       throw new BadRequestException("This user already exists");
     }
 
@@ -51,16 +51,16 @@ export class FirstTimeSetupController {
       throw new ForbiddenError("Wizard already completed");
     }
 
-    const role = await this.roleService.getSynchronizedRoleByName(ROLES.ADMIN);
+    await this.roleService.getSynchronizedRoleByName(ROLES.ADMIN);
     const user = await this.userService.findRawByUsername(rootUsername?.toLowerCase());
-    if (!!user) {
+    if (user) {
       throw new BadRequestException("This user already exists");
     }
 
     await this.userService.register({
       username: rootUsername,
       password: rootPassword,
-      roles: [role.id],
+      roles: [ROLES.ADMIN],
       isRootUser: true,
       isVerified: true,
       isDemoUser: false,

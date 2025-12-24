@@ -2,12 +2,11 @@ import { DITokens } from "@/container.tokens";
 import { PrinterCache } from "@/state/printer.cache";
 import { PrinterFilesStore } from "@/state/printer-files.store";
 import { setupTestApp } from "../../test-server";
-import { SqliteIdType } from "@/shared.constants";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { MoonrakerType, PrinterType } from "@/services/printer-api.interface";
 
 let printerFilesStore: PrinterFilesStore;
-let printerService: IPrinterService<SqliteIdType>;
+let printerService: IPrinterService;
 let printerCache: PrinterCache;
 
 beforeEach(async () => {
@@ -34,7 +33,7 @@ describe(PrinterFilesStore.name, () => {
     printerFilesStore.fileCache.cachePrinterFiles(testPrinterState.id, []);
 
     const filesCache = printerFilesStore.getFiles(testPrinterState.id);
-    expect(filesCache.length).toBe(0);
+    expect(filesCache?.length).toBe(0);
 
     const oldFiles = printerFilesStore.getOutdatedFiles(testPrinterState.id, 7);
     expect(oldFiles.length).toBe(0);
@@ -52,7 +51,7 @@ describe(PrinterFilesStore.name, () => {
     ]);
 
     const filesCache = printerFilesStore.getFiles(testPrinterState.id);
-    expect(filesCache.length).toBe(1);
+    expect(filesCache?.length).toBe(1);
 
     const oldFiles = printerFilesStore.getOutdatedFiles(testPrinterState.id, 7);
     expect(oldFiles.length).toBe(0);
@@ -76,7 +75,7 @@ describe(PrinterFilesStore.name, () => {
     ]);
 
     const filesCache = printerFilesStore.getFiles(testPrinterState.id);
-    expect(filesCache.length).toBe(2);
+    expect(filesCache?.length).toBe(2);
 
     const oldFiles = printerFilesStore.getOutdatedFiles(testPrinterState.id, 7);
     expect(oldFiles.length).toBe(1);

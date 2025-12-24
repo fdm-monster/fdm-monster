@@ -7,7 +7,6 @@ import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import EventEmitter2 from "eventemitter2";
 import { LoggerService } from "@/handlers/logger";
 import { ConfigService } from "@/services/core/config.service";
-import { IdType } from "@/shared.constants";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { AxiosError } from "axios";
 import { ISocketLogin } from "@/shared/dtos/socket-login.dto";
@@ -49,7 +48,7 @@ export const octoPrintEvent = (event: string) => `octoprint.${event}`;
 
 export class OctoprintWebsocketAdapter extends WebsocketAdapter implements IWebsocketAdapter {
   public readonly printerType = 0;
-  public printerId?: IdType;
+  public printerId?: number;
   stateUpdated = false;
   stateUpdateTimestamp: null | number = null;
   socketState: SocketState = SOCKET_STATE.unopened;

@@ -1,11 +1,10 @@
 import { ValidationException } from "@/exceptions/runtime.exceptions";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
-import { IdType } from "@/shared.constants";
 import { FileDto } from "@/services/printer-api.interface";
 
 export class FileCache {
-  private printerFileStorage: Record<IdType, FileDto[]> = {};
+  private readonly printerFileStorage = new Map<number, FileDto[]>();
   private totalFileCount = 0;
 
   private readonly logger: LoggerService;
@@ -14,19 +13,19 @@ export class FileCache {
     this.logger = loggerFactory(FileCache.name);
   }
 
-  cachePrinterFiles(printerId: IdType, files: FileDto[]) {
+  cachePrinterFiles(printerId: number, files: FileDto[]) {
     if (!printerId) {
       throw new Error("File Cache cant get a null/undefined printer id");
     }
-    this.printerFileStorage[printerId] = files;
+    this.printerFileStorage.set(printerId, files);
     this.updateCacheFileRefCount();
   }
 
-  getPrinterFiles(printerId: IdType) {
+  getPrinterFiles(printerId: number) {
     if (!printerId) {
       throw new Error("File Cache cant get a null/undefined printer id");
     }
-    return this.printerFileStorage[printerId];
+    return this.printerFileStorage.get(printerId);
   }
 
   updateCacheFileRefCount() {
@@ -43,24 +42,24 @@ export class FileCache {
     return totalFiles;
   }
 
-  purgePrinterId(printerId: IdType) {
+  purgePrinterId(printerId: number) {
     if (!printerId) {
       throw new ValidationException("Parameter printerId was not provided.");
     }
 
-    const fileStorage = this.printerFileStorage[printerId];
+    const fileStorage = this.printerFileStorage.get(printerId);
 
     if (!fileStorage) {
       this.logger.warn("Did not remove printer File Storage as it was not found");
       return;
     }
 
-    delete this.printerFileStorage[printerId];
+    this.printerFileStorage.delete(printerId);
 
     this.logger.log(`Purged printer file cache`);
   }
 
-  purgeFile(printerId: IdType, filePath: string) {
+  purgeFile(printerId: number, filePath: string) {
     const files = this.getPrinterFiles(printerId);
     if (!files) return;
 

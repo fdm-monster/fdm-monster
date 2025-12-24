@@ -1,7 +1,6 @@
 import { BaseService } from "@/services/orm/base.service";
 import { RefreshToken } from "@/entities";
 import { IRefreshTokenService } from "@/services/interfaces/refresh-token.service.interface";
-import { SqliteIdType } from "@/shared.constants";
 import { RefreshTokenDto } from "@/services/interfaces/refresh-token.dto";
 import { AuthenticationError } from "@/exceptions/runtime.exceptions";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
@@ -14,8 +13,8 @@ import { LessThan } from "typeorm";
 import { AUTH_ERROR_REASON } from "@/constants/authorization.constants";
 
 export class RefreshTokenService
-  extends BaseService(RefreshToken, RefreshTokenDto<SqliteIdType>)
-  implements IRefreshTokenService<SqliteIdType, RefreshToken>
+  extends BaseService(RefreshToken, RefreshTokenDto)
+  implements IRefreshTokenService
 {
   private readonly logger: LoggerService;
 
@@ -28,7 +27,7 @@ export class RefreshTokenService
     this.logger = loggerFactory(RefreshTokenService.name);
   }
 
-  toDto(entity: RefreshToken): RefreshTokenDto<SqliteIdType> {
+  toDto(entity: RefreshToken): RefreshTokenDto {
     return {
       id: entity.id,
       userId: entity.userId,
@@ -51,7 +50,7 @@ export class RefreshTokenService
     return entity;
   }
 
-  async createRefreshTokenForUserId(userId: SqliteIdType): Promise<string> {
+  async createRefreshTokenForUserId(userId: number): Promise<string> {
     const { refreshTokenExpiry } = await this.settingsStore.getCredentialSettings();
     const refreshToken = uuidv4();
 
@@ -86,7 +85,7 @@ export class RefreshTokenService
     }
   }
 
-  async deleteRefreshTokenByUserId(userId: SqliteIdType): Promise<void> {
+  async deleteRefreshTokenByUserId(userId: number): Promise<void> {
     const result = await this.repository.delete({
       userId,
     });
@@ -106,7 +105,7 @@ export class RefreshTokenService
     }
   }
 
-  async purgeOutdatedRefreshTokensByUserId(userId: SqliteIdType): Promise<void> {
+  async purgeOutdatedRefreshTokensByUserId(userId: number): Promise<void> {
     const result = await this.repository.delete({
       userId,
       expiresAt: LessThan(Date.now()),

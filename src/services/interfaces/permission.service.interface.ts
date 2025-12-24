@@ -1,5 +1,6 @@
+import { PermissionName } from "@/constants/authorization.constants";
+
 export interface IPermissionService {
-  authorizePermission(requiredPermission: string, assignedPermissions: string[]): boolean;
+  authorizePermission(requiredPermission: PermissionName, assignedPermissions: PermissionName[]): boolean;
   syncPermissions(): Promise<void>;
-  normalizePermission(assignedPermission: string): string | undefined;
 }

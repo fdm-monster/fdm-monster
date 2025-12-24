@@ -1,7 +1,6 @@
 import { BaseService } from "@/services/orm/base.service";
 import { Floor, FloorPosition } from "@/entities";
 import { IFloorService } from "@/services/interfaces/floor.service.interface";
-import { SqliteIdType } from "@/shared.constants";
 import { FloorPositionService } from "./floor-position.service";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { CreateFloorDto, FloorDto, PositionDto, UpdateFloorDto } from "@/services/interfaces/floor.dto";
@@ -16,8 +15,8 @@ import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import { FindManyOptions, FindOneOptions } from "typeorm";
 
 export class FloorService
-  extends BaseService(Floor, FloorDto<SqliteIdType>, CreateFloorDto<SqliteIdType>, UpdateFloorDto<SqliteIdType>)
-  implements IFloorService<SqliteIdType, Floor>
+  extends BaseService(Floor, FloorDto, CreateFloorDto, UpdateFloorDto)
+  implements IFloorService
 {
   constructor(
     protected readonly typeormService: TypeormService,
@@ -34,7 +33,7 @@ export class FloorService
     );
   }
 
-  override async get(id: SqliteIdType, options?: FindOneOptions<Floor>): Promise<Floor> {
+  override async get(id: number, options?: FindOneOptions<Floor>): Promise<Floor> {
     return super.get(
       id,
       Object.assign(options || {}, {
@@ -43,7 +42,7 @@ export class FloorService
     );
   }
 
-  async create(dto: CreateFloorDto<SqliteIdType>): Promise<Floor> {
+  async create(dto: CreateFloorDto): Promise<Floor> {
     const outcome = await validateInput(dto, createOrUpdateFloorSchema);
 
     const floor = await super.create({
@@ -54,14 +53,14 @@ export class FloorService
 
     if (outcome.printers?.length) {
       for (const position of outcome.printers) {
-        await this.addOrUpdatePrinter(floor.id, position as PositionDto<number>);
+        await this.addOrUpdatePrinter(floor.id, position as PositionDto);
       }
     }
 
     return this.get(floor.id);
   }
 
-  toDto(floor: Floor): FloorDto<SqliteIdType> {
+  toDto(floor: Floor): FloorDto {
     return {
       id: floor.id,
       name: floor.name,
@@ -90,7 +89,7 @@ export class FloorService
    * @param floorId
    * @param update
    */
-  async update(floorId: SqliteIdType, update: UpdateFloorDto<SqliteIdType>) {
+  async update(floorId: number, update: UpdateFloorDto) {
     const existingFloor = await this.get(floorId);
     const floorUpdate = {
       ...existingFloor,
@@ -104,7 +103,7 @@ export class FloorService
     const desiredPositions = validatedFloor.printers;
     if (desiredPositions?.length) {
       for (const printer of desiredPositions) {
-        await this.addOrUpdatePrinter(existingFloor.id, printer as PositionDto<SqliteIdType>);
+        await this.addOrUpdatePrinter(existingFloor.id, printer as PositionDto);
       }
 
       // Remove any printers that should not exist on floor
@@ -121,7 +120,7 @@ export class FloorService
     return super.update(floorId, floorUpdate);
   }
 
-  async updateName(floorId: SqliteIdType, floorName: string) {
+  async updateName(floorId: number, floorName: string) {
     const { name } = await validateInput({ name: floorName }, updateFloorNameSchema);
 
     const floor = await this.get(floorId);
@@ -129,7 +128,7 @@ export class FloorService
     return this.update(floorId, floor);
   }
 
-  async updateLevel(floorId: SqliteIdType, level: number): Promise<Floor> {
+  async updateLevel(floorId: number, level: number): Promise<Floor> {
     const { floor: validLevel } = await validateInput({ floor: level }, updateFloorLevelSchema);
 
     const floor = await this.get(floorId);
@@ -137,7 +136,7 @@ export class FloorService
     return await this.update(floorId, floor);
   }
 
-  async addOrUpdatePrinter(floorId: SqliteIdType, positionDto: PositionDto<SqliteIdType>): Promise<Floor> {
+  async addOrUpdatePrinter(floorId: number, positionDto: PositionDto): Promise<Floor> {
     // Validation only
     await this.get(floorId);
     positionDto.floorId = floorId;
@@ -176,7 +175,7 @@ export class FloorService
     return this.get(floorId);
   }
 
-  async removePrinter(floorId: SqliteIdType, printerId: SqliteIdType): Promise<Floor> {
+  async removePrinter(floorId: number, printerId: number): Promise<Floor> {
     const position = await this.floorPositionService.findPrinterPositionOnFloor(floorId, printerId);
     if (!position) {
       throw new NotFoundException("This printer was not found on this floor");
@@ -185,7 +184,7 @@ export class FloorService
     return await this.get(floorId);
   }
 
-  async deletePrinterFromAnyFloor(printerId: SqliteIdType): Promise<void> {
+  async deletePrinterFromAnyFloor(printerId: number): Promise<void> {
     await this.floorPositionService.deletePrinterPositionsByPrinterId(printerId);
   }
 }

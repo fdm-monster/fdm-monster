@@ -3,14 +3,13 @@ import { ROLES } from "@/constants/authorization.constants";
 import { DITokens } from "@/container.tokens";
 import { AwilixContainer } from "awilix";
 import { IRoleService } from "@/services/interfaces/role-service.interface";
-import { SqliteIdType } from "@/shared.constants";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { Role } from "@/entities";
 import { RoleService } from "@/services/orm/role.service";
 
 let container: AwilixContainer;
 let typeorm: TypeormService;
-let roleService: IRoleService<SqliteIdType, Role>;
+let roleService: IRoleService;
 
 beforeAll(async () => {
   container = configureContainer();

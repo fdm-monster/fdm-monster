@@ -2,7 +2,6 @@ import { Request } from "express";
 import { currentPrinterToken, printerApiToken, printerIdToken, printerLoginToken } from "@/middleware/printer";
 import { IPrinterApi } from "@/services/printer-api.interface";
 import { LoginDto } from "@/services/interfaces/login.dto";
-import { IdType } from "@/shared.constants";
 import { InternalServerException, ValidationException } from "@/exceptions/runtime.exceptions";
 import { PrinterDto } from "@/services/interfaces/printer.dto";
 
@@ -22,8 +21,8 @@ export function getScopedPrinter(req: Request) {
 
   const printerApi = resolve<IPrinterApi>(printerApiToken);
   const loginDto = resolve<LoginDto>(printerLoginToken);
-  const printerDto = resolve<PrinterDto<IdType>>(currentPrinterToken);
-  const printerId = resolve<IdType>(printerIdToken);
+  const printerDto = resolve<PrinterDto>(currentPrinterToken);
+  const printerId = resolve<number>(printerIdToken);
 
   if (errors.length) throw new ValidationException(errors);
 

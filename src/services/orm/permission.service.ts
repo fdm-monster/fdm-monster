@@ -1,49 +1,18 @@
 import { IPermissionService } from "@/services/interfaces/permission.service.interface";
-import { LoggerService } from "@/handlers/logger";
-import { ILoggerFactory } from "@/handlers/logger-factory";
-import { flattenPermissionDefinition } from "@/constants/authorization.constants";
-
-export class Permission {
-  name: string;
-}
+import { flattenPermissionDefinition, PermissionName } from "@/constants/authorization.constants";
 
 export class PermissionService implements IPermissionService {
-  private _permissions: Permission[] = [];
-  private readonly logger: LoggerService;
+  private _permissions: PermissionName[] = [];
 
-  constructor(loggerFactory: ILoggerFactory) {
-    this.logger = loggerFactory(PermissionService.name);
-  }
-
-  get permissions() {
+  get permissions(): PermissionName[] {
     return this._permissions;
   }
 
-  authorizePermission(requiredPermission: string, assignedPermissions: string[]): boolean {
-    return !!assignedPermissions.find((assignedPermission) => {
-      const normalizePermission = this.normalizePermission(assignedPermission);
-      if (!normalizePermission) return false;
-      return normalizePermission === requiredPermission;
-    });
-  }
-
-  normalizePermission(assignedPermission: string) {
-    const permissionInstance = this.permissions.find(
-      (r) => r.name === assignedPermission,
-    );
-    if (!permissionInstance) {
-      this.logger.warn(`The permission by provided id is not found. Skipping`);
-      return;
-    }
-    return permissionInstance.name;
+  authorizePermission(requiredPermission: PermissionName, assignedPermissions: PermissionName[]): boolean {
+    return assignedPermissions.includes(requiredPermission);
   }
 
   async syncPermissions(): Promise<void> {
-    this._permissions = [];
-
-    const permissionDefinition = flattenPermissionDefinition();
-    for (let permission of permissionDefinition) {
-      this._permissions.push({name: permission});
-    }
+    this._permissions = flattenPermissionDefinition();
   }
 }

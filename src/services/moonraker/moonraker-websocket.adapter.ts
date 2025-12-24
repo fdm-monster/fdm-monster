@@ -4,7 +4,6 @@ import EventEmitter2 from "eventemitter2";
 import { ConfigService } from "@/services/core/config.service";
 import { ISocketLogin } from "@/shared/dtos/socket-login.dto";
 import { LoggerService } from "@/handlers/logger";
-import { IdType } from "@/shared.constants";
 import { AppConstants } from "@/server.constants";
 import { httpToWsUrl } from "@/utils/url.utils";
 import { OctoPrintEventDto } from "@/services/octoprint/dto/octoprint-event.dto";
@@ -76,7 +75,7 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
   apiState: ApiState = API_STATE.unset;
   // Guaranteed to be set and valid by PrinterApiFactory
   login: LoginDto;
-  printerId?: IdType;
+  printerId?: number;
   refreshPrinterObjectsInterval?: NodeJS.Timeout;
   printerObjects: PrinterObjectsQueryDto<SubscriptionType | null> = {
     eventtime: null,
