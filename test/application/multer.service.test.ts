@@ -14,10 +14,6 @@ beforeAll(async () => {
 });
 
 describe("MulterService", () => {
-  const fileFilterCallBack: (error: Error | null) => void = (err: any) => {
-    if (err) throw err;
-  };
-
   it("should find file", () => {
     expect(multerService.fileExists("file", "storage")).toBeFalsy();
   });
@@ -43,21 +39,5 @@ describe("MulterService", () => {
   it("should provide multer filter middleware", async () => {
     const result = multerService.getMulterGCodeFileFilter(false);
     expect(typeof result).toBe("function");
-  });
-
-  it("gcode filter should throw on non-gcode extension", async () => {
-    const incorrectFile = { originalname: "file.gco" } as Express.Multer.File;
-
-    expect(() =>
-      multerService.multerFileFilter([".gcode", ".bgcode"])(null, incorrectFile, fileFilterCallBack),
-    ).toThrow();
-  });
-
-  it("gcode filter should accept gcode extension", async () => {
-    const correctFile = { originalname: "file.gcode" } as Express.Multer.File;
-
-    expect(() =>
-      multerService.multerFileFilter([".gcode", ".bgcode"])(null, correctFile, fileFilterCallBack),
-    ).not.toThrow();
   });
 });

@@ -8,11 +8,12 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
 import { ISocketLogin } from "@/shared/dtos/socket-login.dto";
 import { LoginDto } from "@/services/interfaces/login.dto";
-import { SocketState } from "@/shared/dtos/socket-state.type";
-import { ApiState } from "@/shared/dtos/api-state.type";
+import { SOCKET_STATE, SocketState } from "@/shared/dtos/socket-state.type";
+import { API_STATE, ApiState } from "@/shared/dtos/api-state.type";
 import { errorSummary } from "@/utils/error.utils";
 import { prusaLinkEvent } from "@/services/prusa-link/constants/prusalink.constants";
 import { PrusaLinkEventDto } from "@/services/prusa-link/constants/prusalink-event.dto";
+import { WsMessage } from "@/services/octoprint/octoprint-websocket.adapter";
 
 const defaultLog = { adapter: "prusa-link" };
 
@@ -102,7 +103,7 @@ export class PrusaLinkHttpPollingAdapter implements IWebsocketAdapter {
         return;
       }
 
-      this.socketState = "opening";
+      this.updateSocketState(SOCKET_STATE.opening);
       try {
         this.prusaLinkApi.login = {
           printerURL: this.login.printerURL,
@@ -111,15 +112,15 @@ export class PrusaLinkHttpPollingAdapter implements IWebsocketAdapter {
           apiKey: "",
           printerType: PrusaLinkType,
         };
-        this.socketState = "authenticating";
+        this.updateSocketState(SOCKET_STATE.authenticating);
         const printerState = await this.prusaLinkApi.getPrinterState();
         // Only when PRINTING we avoid appending the flag
         if (printerState.state.flags?.link_state && printerState.state.flags?.link_state !== "PRINTING") {
           printerState.state.text = printerState.state.flags.link_state;
         }
         const jobState = await this.prusaLinkApi.getJobState();
-        this.socketState = "authenticated";
-        this.apiState = "responding";
+        this.updateSocketState(SOCKET_STATE.authenticated);
+        this.updateApiState(API_STATE.responding);
         await this.emitEvent("current", {
           ...printerState,
           job: jobState.job,
@@ -130,7 +131,7 @@ export class PrusaLinkHttpPollingAdapter implements IWebsocketAdapter {
           },
         });
       } catch (error) {
-        this.socketState = "error";
+        this.updateSocketState(SOCKET_STATE.error);
         this.logger.error(`Failed to fetch PrusaLink status ${errorSummary(error)}`, this.logMeta());
       }
     }, 5000);
@@ -141,7 +142,7 @@ export class PrusaLinkHttpPollingAdapter implements IWebsocketAdapter {
       this.logger.debug("Polling adapter stopping, clearing interval.", this.logMeta());
       clearInterval(this.refreshPrinterCurrentInterval);
       this.refreshPrinterCurrentInterval = undefined;
-      this.socketState = "closed";
+      this.updateSocketState(SOCKET_STATE.closed);
     }
   }
 
@@ -157,6 +158,29 @@ export class PrusaLinkHttpPollingAdapter implements IWebsocketAdapter {
       printerId: this.printerId,
       printerType: PrusaLinkType,
     } as PrusaLinkEventDto);
+  }
+
+  private emitEventSync(event: string, payload: any): void {
+    if (!this.eventEmittingAllowed) {
+      return;
+    }
+
+    this.eventEmitter2.emit(prusaLinkEvent(event), {
+      event,
+      payload,
+      printerId: this.printerId,
+      printerType: PrusaLinkType,
+    } as PrusaLinkEventDto);
+  }
+
+  private updateSocketState(state: SocketState): void {
+    this.socketState = state;
+    this.emitEventSync(WsMessage.WS_STATE_UPDATED, state);
+  }
+
+  private updateApiState(state: ApiState): void {
+    this.apiState = state;
+    this.emitEventSync(WsMessage.API_STATE_UPDATED, state);
   }
 
   private logMeta() {

@@ -11,6 +11,7 @@ import { SOCKET_STATE, SocketState } from "@/shared/dtos/socket-state.type";
 import { API_STATE, ApiState } from "@/shared/dtos/api-state.type";
 import { BambuType } from "@/services/printer-api.interface";
 import { IdType } from "@/shared.constants";
+import { WsMessage } from "@/services/octoprint/octoprint-websocket.adapter";
 
 export const bambuEvent = (event: string) => `bambu.${event}`;
 
@@ -97,7 +98,7 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
 
     this.connect(this.host, this.accessCode, this.serial).catch((err) => {
       this.logger.error("Failed to open MQTT connection: " + err.toString());
-      this.socketState = SOCKET_STATE.error;
+      this.updateSocketState(SOCKET_STATE.error);
     });
   }
 
@@ -110,13 +111,13 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
   async setupSocketSession(): Promise<void> {
     // For Bambu, we just need to validate credentials are set
     if (!this.host || !this.accessCode || !this.serial) {
-      this.socketState = SOCKET_STATE.aborted;
-      this.apiState = API_STATE.noResponse;
+      this.updateSocketState(SOCKET_STATE.aborted);
+      this.updateApiState(API_STATE.noResponse);
       throw new Error("Credentials not properly registered");
     }
 
-    this.socketState = SOCKET_STATE.opening;
-    this.apiState = API_STATE.responding;
+    this.updateSocketState(SOCKET_STATE.opening);
+    this.updateApiState(API_STATE.responding);
   }
 
   allowEmittingEvents(): void {
@@ -133,7 +134,7 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
   async connect(host: string, accessCode: string, serial: string): Promise<void> {
     if (this.mqttClient?.connected) {
       this.logger.debug("MQTT already connected");
-      this.socketState = SOCKET_STATE.opened;
+      this.updateSocketState(SOCKET_STATE.opened);
       return;
     }
 
@@ -145,9 +146,9 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
     this.accessCode = accessCode;
     this.serial = serial;
     this.isConnecting = true;
-    this.socketState = SOCKET_STATE.opening;
+    this.updateSocketState(SOCKET_STATE.opening);
 
-    const mqttUrl = `mqtt://${host}:8883`;
+    const mqttUrl = `mqtts://${host}:8883`;
     const timeout = this.settingsStore.getTimeoutSettings().apiTimeout;
 
     this.logger.log(`Connecting to Bambu MQTT at ${mqttUrl}`);
@@ -155,7 +156,7 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
     return new Promise<void>((resolve, reject) => {
       const connectionTimeout = setTimeout(() => {
         this.isConnecting = false;
-        this.socketState = SOCKET_STATE.error;
+        this.updateSocketState(SOCKET_STATE.error);
         this.cleanup();
         reject(new Error("MQTT connection timeout"));
       }, timeout);
@@ -165,24 +166,25 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
           username: "bblp",
           password: accessCode,
           clientId: `fdm_monster_${serial}_${Date.now()}`,
-          protocol: "mqtt",
+          protocol: "mqtts",
           connectTimeout: timeout,
           reconnectPeriod: 5000,
           keepalive: 60,
+          rejectUnauthorized: false
         });
 
         this.mqttClient.on("connect", () => {
           clearTimeout(connectionTimeout);
           this.isConnecting = false;
-          this.socketState = SOCKET_STATE.authenticated;
-          this.apiState = API_STATE.responding;
+          this.updateSocketState(SOCKET_STATE.authenticated);
+          this.updateApiState(API_STATE.responding);
           this.logger.log("MQTT connected successfully");
 
           const reportTopic = `device/${serial}/report`;
           this.mqttClient!.subscribe(reportTopic, { qos: 0 }, (err) => {
             if (err) {
               this.logger.error(`Failed to subscribe to ${reportTopic}:`, err);
-              this.socketState = SOCKET_STATE.error;
+              this.updateSocketState(SOCKET_STATE.error);
               reject(new Error(`Subscribe failed: ${err.message}`));
             } else {
               this.logger.debug(`Subscribed to ${reportTopic}`);
@@ -194,7 +196,8 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
         this.mqttClient.on("error", (error) => {
           clearTimeout(connectionTimeout);
           this.isConnecting = false;
-          this.socketState = SOCKET_STATE.error;
+          this.updateSocketState(SOCKET_STATE.error);
+          this.emitEvent(WsMessage.WS_ERROR, error.message).catch(() => {});
           this.logger.error("MQTT error:", error);
 
           if (!this.mqttClient?.connected) {
@@ -208,24 +211,26 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
         });
 
         this.mqttClient.on("disconnect", () => {
-          this.socketState = SOCKET_STATE.closed;
+          this.updateSocketState(SOCKET_STATE.closed);
+          this.emitEvent(WsMessage.WS_CLOSED, "disconnected").catch(() => {});
           this.logger.warn("MQTT disconnected");
         });
 
         this.mqttClient.on("reconnect", () => {
-          this.socketState = SOCKET_STATE.opening;
+          this.updateSocketState(SOCKET_STATE.opening);
           this.logger.debug("MQTT reconnecting...");
         });
 
         this.mqttClient.on("close", () => {
-          this.socketState = SOCKET_STATE.closed;
+          this.updateSocketState(SOCKET_STATE.closed);
+          this.emitEvent(WsMessage.WS_CLOSED, "connection closed").catch(() => {});
           this.logger.debug("MQTT connection closed");
         });
 
       } catch (error) {
         clearTimeout(connectionTimeout);
         this.isConnecting = false;
-        this.socketState = SOCKET_STATE.error;
+        this.updateSocketState(SOCKET_STATE.error);
         this.cleanup();
         reject(error);
       }
@@ -237,12 +242,12 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
    */
   async disconnect(): Promise<void> {
     if (!this.mqttClient) {
-      this.socketState = SOCKET_STATE.closed;
+      this.updateSocketState(SOCKET_STATE.closed);
       return;
     }
 
     this.logger.log("Disconnecting MQTT");
-    this.socketState = SOCKET_STATE.closed;
+    this.updateSocketState(SOCKET_STATE.closed);
 
     return new Promise<void>((resolve) => {
       if (this.mqttClient?.connected) {
@@ -361,6 +366,22 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
    */
   resetSocketState(): void {
     this.lastState = null;
+  }
+
+  /**
+   * Update socket state and emit event
+   */
+  private updateSocketState(state: SocketState): void {
+    this.socketState = state;
+    this.emitEventSync(WsMessage.WS_STATE_UPDATED, state);
+  }
+
+  /**
+   * Update API state and emit event
+   */
+  private updateApiState(state: ApiState): void {
+    this.apiState = state;
+    this.emitEventSync(WsMessage.API_STATE_UPDATED, state);
   }
 
   /**

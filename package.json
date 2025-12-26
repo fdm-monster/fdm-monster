@@ -6,7 +6,7 @@
   },
   "author": "David Zwart",
   "license": "AGPL-3.0-or-later",
-  "version": "1.9.3",
+  "version": "1.9.4",
   "bin": {
     "fdm-monster": "dist/index.js",
     "fdmm": "dist/index.js"
@@ -63,8 +63,8 @@
     "tr46": "6.0.0"
   },
   "dependencies": {
-    "@fdm-monster/client": "1.12.2",
-    "@fdm-monster/client-next": "0.0.25",
+    "@fdm-monster/client": "1.12.3",
+    "@fdm-monster/client-next": "0.0.26",
     "@octokit/plugin-throttling": "8.2.0",
     "@sentry/node": "10.32.1",
     "adm-zip": "0.5.16",
@@ -133,7 +133,6 @@
     "@types/supertest": "6.0.3",
     "@types/uuid": "10.0.0",
     "@types/ws": "8.18.1",
-    "aedes": "0.51.3",
     "chokidar": "5.0.0",
     "express-list-routes": "1.3.2",
     "ftp-srv": "4.6.3",

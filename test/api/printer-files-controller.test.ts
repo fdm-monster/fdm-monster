@@ -1,14 +1,18 @@
 import { setupTestApp } from "../test-server";
-import { createTestPrinter } from "./test-data/create-printer";
+import { createTestPrinter, createTestBambuPrinter } from "./test-data/create-printer";
 import { expectInvalidResponse, expectNotFoundResponse, expectOkResponse } from "../extensions";
 import { AppConstants } from "@/server.constants";
 import nock, { Body, ReplyHeaders } from "nock";
 import { Test } from "supertest";
 import { PrinterFilesController } from "@/controllers/printer-files.controller";
-import { AwilixContainer } from "awilix";
+import { AwilixContainer, asClass } from "awilix";
 import { DITokens } from "@/container.tokens";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import TestAgent from "supertest/lib/agent";
+import { BambuApiStub } from "./stubs/bambu.api.stub";
+import { BambuClientStub } from "./stubs/bambu.client.stub";
+import { BambuFtpAdapterStub } from "./stubs/bambu-ftp.adapter.stub";
+import { BambuMqttAdapterStub } from "./stubs/bambu-mqtt.adapter.stub";
 
 const defaultRoute = AppConstants.apiRoute + "/printer-files";
 const purgeIndexedFilesRoute = `${defaultRoute}/purge`;
@@ -30,7 +34,15 @@ let container: AwilixContainer;
 let printerService: IPrinterService;
 
 beforeAll(async () => {
-  ({ request, container } = await setupTestApp(true));
+  // Set up test app with stub implementations for Bambu services
+  const stubMocks = {
+    [DITokens.bambuApi]: asClass(BambuApiStub).transient(),
+    [DITokens.bambuClient]: asClass(BambuClientStub).transient(),
+    [DITokens.bambuFtpAdapter]: asClass(BambuFtpAdapterStub).transient(),
+    [DITokens.bambuMqttAdapter]: asClass(BambuMqttAdapterStub).transient(),
+  };
+
+  ({ request, container } = await setupTestApp(true, stubMocks));
   printerService = container.resolve<IPrinterService>(DITokens.printerService);
 });
 
@@ -43,6 +55,7 @@ beforeEach(async () => {
 
 describe(PrinterFilesController.name, () => {
   const gcodePath = "test/api/test-data/sample.gcode";
+  const examplBambuFilePath = "test/api/test-data/sample.3mf";
 
   it(`should return 404 on ${defaultRoute} for nonexisting printer`, async () => {
     const res = await request.get(getRoute(101)).send();
@@ -188,5 +201,55 @@ describe(PrinterFilesController.name, () => {
     const printer = await createTestPrinter(request);
     const response = await request.post(uploadFileRoute(printer.id)).send();
     expectInvalidResponse(response);
+  });
+
+  describe("Bambu printer .3mf support", () => {
+    it("should accept .3mf files for Bambu printers (validation test)", async () => {
+      const bambuPrinter = await createTestBambuPrinter(request);
+
+      // Test that .3mf files are accepted and uploaded successfully for Bambu printers
+      const response = await request.post(uploadFileRoute(bambuPrinter.id))
+        .field("startPrint", "false")
+        .attach("file", examplBambuFilePath);
+
+      // With stub implementations, the upload should now succeed
+      expectOkResponse(response);
+    });
+
+    it("should reject .3mf files for non-Bambu printers", async () => {
+      const octoprintPrinter = await createTestPrinter(request);
+
+      const response = await request.post(uploadFileRoute(octoprintPrinter.id))
+        .field("startPrint", "false")
+        .attach("file", examplBambuFilePath);
+
+      // Should get a 400 error due to unsupported file extension
+      expect(response.status).toBe(400);
+    });
+
+    it("should accept .gcode files for Bambu printers", async () => {
+      const bambuPrinter = await createTestBambuPrinter(request);
+
+      const response = await request.post(uploadFileRoute(bambuPrinter.id))
+        .field("startPrint", "false")
+        .attach("file", gcodePath);
+
+      // Should succeed with stub implementations
+      expectOkResponse(response);
+    });
+
+    it("should show appropriate error for empty upload on Bambu printer", async () => {
+      const bambuPrinter = await createTestBambuPrinter(request);
+
+      const response = await request.post(uploadFileRoute(bambuPrinter.id)).send();
+      expectInvalidResponse(response);
+    });
+
+    it("should show appropriate error for empty upload on non-Bambu printer", async () => {
+      const octoprintPrinter = await createTestPrinter(request);
+
+      const response = await request.post(uploadFileRoute(octoprintPrinter.id)).send();
+      expectInvalidResponse(response);
+    });
   });
 });
