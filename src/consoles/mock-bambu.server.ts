@@ -35,7 +35,7 @@ import path from "node:path";
 import fs from "node:fs";
 import os from "node:os";
 import selfsigned from "selfsigned";
-import { SecureVersion } from "node:tls";
+import { SecureContextOptions } from "node:tls";
 
 const DEFAULT_PORT = 990;
 const DEFAULT_MQTT_PORT = 8883;
@@ -51,22 +51,22 @@ const accessCode = process.argv[5] || DEFAULT_ACCESS_CODE;
 
 console.log(`[BAMBU MOCK] Starting Bambu Lab mock server`);
 console.log(`[BAMBU MOCK] Configuration:`);
-console.log(`[BAMBU MOCK]   FTP Port: ${port}`);
-console.log(`[BAMBU MOCK]   MQTT Broker expected at: mqtts://localhost:${mqttPort}`);
-console.log(`[BAMBU MOCK]   Serial: ${serial}`);
-console.log(`[BAMBU MOCK]   Access Code: ${accessCode}`);
+console.log(`[BAMBU MOCK]   FTP Port: ${ port }`);
+console.log(`[BAMBU MOCK]   MQTT Broker expected at: mqtts://localhost:${ mqttPort }`);
+console.log(`[BAMBU MOCK]   Serial: ${ serial }`);
+console.log(`[BAMBU MOCK]   Access Code: ${ accessCode }`);
 console.log(`[BAMBU MOCK]   Username: bblp`);
 
 const ftpDir = path.join(os.tmpdir(), "bambu-mock-ftp", serial);
 const sdcardDir = path.join(ftpDir, "sdcard");
 
 if (!fs.existsSync(ftpDir)) {
-  console.log(`[BAMBU MOCK] Creating FTP directory: ${ftpDir}`);
+  console.log(`[BAMBU MOCK] Creating FTP directory: ${ ftpDir }`);
   fs.mkdirSync(ftpDir, { recursive: true });
 }
 
 if (!fs.existsSync(sdcardDir)) {
-  console.log(`[BAMBU MOCK] Creating sdcard directory: ${sdcardDir}`);
+  console.log(`[BAMBU MOCK] Creating sdcard directory: ${ sdcardDir }`);
   fs.mkdirSync(sdcardDir, { recursive: true });
 }
 
@@ -74,7 +74,7 @@ if (!fs.existsSync(sdcardDir)) {
  * Generate a self-signed certificate for TLS
  * Matches real Bambu Lab printer FTP behavior (implicit TLS on port 990)
  */
-async function generateSelfSignedCert() {
+async function generateSelfSignedCert(): Promise<SecureContextOptions> {
   console.log(`[BAMBU MOCK] Generating self-signed certificate for TLS...`);
 
   const attrs = [
@@ -97,7 +97,7 @@ async function generateSelfSignedCert() {
     key: pems.private,
     cert: pems.cert,
     // Add TLS options for better compatibility
-    minVersion: "TLSv1.2" satisfies SecureVersion as SecureVersion,
+    minVersion: "TLSv1.2",
     ciphers: "HIGH:!aNULL:!MD5",
   };
 }
@@ -117,7 +117,7 @@ const PRINT_DURATION = 20; // 20 seconds
   const tlsCerts = await generateSelfSignedCert();
 
   const ftpServer = new FtpSrv({
-    url: `ftp://0.0.0.0:${port}`,
+    url: `ftp://0.0.0.0:${ port }`,
     pasv_url: "127.0.0.1",
     pasv_min: 1024,
     pasv_max: 1048,
@@ -126,8 +126,8 @@ const PRINT_DURATION = 20; // 20 seconds
     greeting: ["Welcome to Bambu Lab Mock FTP Server"],
   });
 
-  ftpServer.on("login", ({ connection, username, password }, resolve, reject) => {
-    console.log(`[BAMBU MOCK FTP] Login attempt - Username: ${username}`);
+  ftpServer.on("login", ({ username, password }, resolve, reject) => {
+    console.log(`[BAMBU MOCK FTP] Login attempt - Username: ${ username }`);
 
     if (username === "bblp" && password === accessCode) {
       console.log(`[BAMBU MOCK FTP] Authentication successful`);
@@ -138,34 +138,34 @@ const PRINT_DURATION = 20; // 20 seconds
     }
   });
 
-  ftpServer.on("client-error", ({ connection, context, error }) => {
+  ftpServer.on("client-error", ({ error }) => {
     console.error(`[BAMBU MOCK FTP] Client error:`, error);
   });
 
   ftpServer.listen().then(() => {
-    console.log(`[BAMBU MOCK FTP] FTP server is running on port ${port}`);
-    console.log(`[BAMBU MOCK FTP] FTP directory: ${ftpDir}`);
+    console.log(`[BAMBU MOCK FTP] FTP server is running on port ${ port }`);
+    console.log(`[BAMBU MOCK FTP] FTP directory: ${ ftpDir }`);
   });
 
-  const mqttClient = mqtt.connect(`mqtts://localhost:${mqttPort}`, {
-    clientId: `bambu_mock_${serial}_${Date.now()}`,
+  const mqttClient = mqtt.connect(`mqtts://localhost:${ mqttPort }`, {
+    clientId: `bambu_mock_${ serial }_${ Date.now() }`,
     username: DEFAULT_USERNAME,
     password: accessCode,
     rejectUnauthorized: false,
   });
 
   mqttClient.on("connect", () => {
-    console.log(`[BAMBU MOCK MQTT] Connected to MQTT broker at localhost:${mqttPort}`);
-    console.log(`[BAMBU MOCK MQTT] Publishing to topic: device/${serial}/report`);
+    console.log(`[BAMBU MOCK MQTT] Connected to MQTT broker at localhost:${ mqttPort }`);
+    console.log(`[BAMBU MOCK MQTT] Publishing to topic: device/${ serial }/report`);
 
-    const reportTopic = `device/${serial}/report`;
-    const requestTopic = `device/${serial}/request`;
+    const reportTopic = `device/${ serial }/report`;
+    const requestTopic = `device/${ serial }/request`;
 
     mqttClient.subscribe(requestTopic, (err) => {
       if (err) {
-        console.error(`[BAMBU MOCK MQTT] Failed to subscribe to ${requestTopic}:`, err);
+        console.error(`[BAMBU MOCK MQTT] Failed to subscribe to ${ requestTopic }:`, err);
       } else {
-        console.log(`[BAMBU MOCK MQTT] Subscribed to topic: ${requestTopic}`);
+        console.log(`[BAMBU MOCK MQTT] Subscribed to topic: ${ requestTopic }`);
       }
     });
 
@@ -197,6 +197,7 @@ const PRINT_DURATION = 20; // 20 seconds
         bedTemp = Math.max(bedTemp - 1, 25);
       }
 
+      const printingLabel = isPaused ? "paused" : "printing"
       const state = {
         print: {
           nozzle_temper: Math.round(nozzleTemp),
@@ -206,7 +207,7 @@ const PRINT_DURATION = 20; // 20 seconds
           chamber_temper: 30,
           mc_percent: Math.round(printProgress),
           mc_remaining_time: isPrinting ? Math.round(PRINT_DURATION - (Date.now() - printStartTime) / 1000) : 0,
-          mc_print_stage: isPrinting ? (isPaused ? "paused" : "printing") : "idle",
+          mc_print_stage: isPrinting ? printingLabel : "idle",
           gcode_state: isPrinting ? "PRINTING" : "IDLE",
           gcode_file: isPrinting ? currentPrintFile : "",
           wifi_signal: "-45dBm",
@@ -242,11 +243,11 @@ const PRINT_DURATION = 20; // 20 seconds
   mqttClient.on("message", (topic, message) => {
     try {
       const payload = JSON.parse(message.toString());
-      console.log(`[BAMBU MOCK MQTT] Received command on ${topic}:`, JSON.stringify(payload));
+      console.log(`[BAMBU MOCK MQTT] Received command on ${ topic }:`, JSON.stringify(payload));
 
-      if (payload.print && payload.print.command) {
+      if (payload.print?.command) {
         const command = payload.print.command;
-        console.log(`[BAMBU MOCK MQTT] Processing command: ${command}`);
+        console.log(`[BAMBU MOCK MQTT] Processing command: ${ command }`);
 
         if (command === "project_file" || command === "start") {
           // Extract filename from command
@@ -259,9 +260,9 @@ const PRINT_DURATION = 20; // 20 seconds
             printStartTime = Date.now();
             printProgress = 0;
             currentPrintFile = filename;
-            console.log(`[BAMBU MOCK MQTT] Starting print: ${filename} (20 second duration)`);
+            console.log(`[BAMBU MOCK MQTT] Starting print: ${ filename } (20 second duration)`);
           } else {
-            console.log(`[BAMBU MOCK MQTT] Rejected print - invalid file extension: ${filename}`);
+            console.log(`[BAMBU MOCK MQTT] Rejected print - invalid file extension: ${ filename }`);
           }
         } else if (command === "pause") {
           if (isPrinting) {
@@ -274,7 +275,7 @@ const PRINT_DURATION = 20; // 20 seconds
             // Adjust start time to account for pause duration
             const pausedProgress = printProgress;
             printStartTime = Date.now() - (pausedProgress / 100) * PRINT_DURATION * 1000;
-            console.log(`[BAMBU MOCK MQTT] Resuming print from ${Math.round(pausedProgress)}%`);
+            console.log(`[BAMBU MOCK MQTT] Resuming print from ${ Math.round(pausedProgress) }%`);
           }
         } else if (command === "stop") {
           if (isPrinting) {
