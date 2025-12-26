@@ -89,7 +89,7 @@
     "lodash": "4.17.21",
     "luxon": "3.7.2",
     "migrate-mongo": "11.0.0",
-    "mongoose": "6.13.8",
+    "mongoose": "9.0.2",
     "mqtt": "5.14.1",
     "multer": "2.0.2",
     "octokit": "3.2.2",
