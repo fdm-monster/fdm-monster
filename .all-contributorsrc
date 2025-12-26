@@ -235,6 +235,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "Zagethy",
+      "name": "Zagethy",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6075740?v=4",
+      "profile": "http://design.zagethy.com",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 10,
