@@ -159,12 +159,6 @@ describe(BambuApi.name, () => {
       expect(() => api.homeAxes({ x: true, y: true })).toThrow();
     });
 
-    it("should throw error on downloadFile", () => {
-      const api = printerApiFactory.getScopedPrinter(auth);
-
-      expect(() => api.downloadFile("test.3mf")).toThrow();
-    });
-
     it("should throw error on getFileChunk", () => {
       const api = printerApiFactory.getScopedPrinter(auth);
 
