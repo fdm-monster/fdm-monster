@@ -356,7 +356,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.21.0, @babel/runtime@npm:^7.28.4":
+"@babel/runtime@npm:^7.28.4":
   version: 7.28.4
   resolution: "@babel/runtime@npm:7.28.4"
   checksum: 10c0/792ce7af9750fb9b93879cc9d1db175701c4689da890e6ced242ea0207c9da411ccf16dc04e689cc01158b28d7898c40d75598f4559109f761c12ce01e959bf7
@@ -5158,17 +5158,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-xml-parser@npm:5.2.5":
-  version: 5.2.5
-  resolution: "fast-xml-parser@npm:5.2.5"
-  dependencies:
-    strnum: "npm:^2.1.0"
-  bin:
-    fxparser: src/cli/cli.js
-  checksum: 10c0/d1057d2e790c327ccfc42b872b91786a4912a152d44f9507bf053f800102dfb07ece3da0a86b33ff6a0caa5a5cad86da3326744f6ae5efb0c6c571d754fe48cd
-  languageName: node
-  linkType: hard
-
 "fastq@npm:^1.6.0":
   version: 1.20.1
   resolution: "fastq@npm:1.20.1"
@@ -7097,130 +7086,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mongodb-connection-string-url@npm:^2.6.0":
-  version: 2.6.0
-  resolution: "mongodb-connection-string-url@npm:2.6.0"
-  dependencies:
-    "@types/whatwg-url": "npm:^8.2.1"
-    whatwg-url: "npm:^11.0.0"
-  checksum: 10c0/1e26b045063f4b3eb58fe445bfaf4e1ac3b9b9ceebc30c6deef5e769323cadb00e62cbe1d26a15fda457643d40a9ef9a24a94a1e993addb9261d87cad1fbf0ae
-  languageName: node
-  linkType: hard
-
-"mongodb-connection-string-url@npm:^7.0.0":
-  version: 7.0.0
-  resolution: "mongodb-connection-string-url@npm:7.0.0"
-  dependencies:
-    "@types/whatwg-url": "npm:^13.0.0"
-    whatwg-url: "npm:^14.1.0"
-  checksum: 10c0/33fe304a0f8e59bf541b2ddef073ddb2ae66d6cb3175c6297c8f844004b1608573e2e61892aa8486f8273634c9cb8a90202d21c289aa1b1f8b8e5cd92711be09
-  languageName: node
-  linkType: hard
-
-"mongodb-memory-server-core@npm:11.0.1":
-  version: 11.0.1
-  resolution: "mongodb-memory-server-core@npm:11.0.1"
-  dependencies:
-    async-mutex: "npm:^0.5.0"
-    camelcase: "npm:^6.3.0"
-    debug: "npm:^4.4.3"
-    find-cache-dir: "npm:^3.3.2"
-    follow-redirects: "npm:^1.15.11"
-    https-proxy-agent: "npm:^7.0.6"
-    mongodb: "npm:^7.0.0"
-    new-find-package-json: "npm:^2.0.0"
-    semver: "npm:^7.7.3"
-    tar-stream: "npm:^3.1.7"
-    tslib: "npm:^2.8.1"
-    yauzl: "npm:^3.2.0"
-  checksum: 10c0/9680c11df4b6e1d8439adc7c19fd9abad6f728f4b2840bcb06bf5276ef9333f73b6377e034b7886bbb7dc8eed9537c59cea8cc9b9068beb810b8a51b8b873398
-  languageName: node
-  linkType: hard
-
-"mongodb-memory-server@npm:11.0.1":
-  version: 11.0.1
-  resolution: "mongodb-memory-server@npm:11.0.1"
-  dependencies:
-    mongodb-memory-server-core: "npm:11.0.1"
-    tslib: "npm:^2.8.1"
-  checksum: 10c0/0f2967b4285552829481344b6d36dab6b1164cea1f877640439d11a066d4d3ebe3ea9e4470db3bf5d07b1f3a8cd979e4f46cfaecd55fd79434019c9db6179e32
-  languageName: node
-  linkType: hard
-
-"mongodb@npm:4.17.2":
-  version: 4.17.2
-  resolution: "mongodb@npm:4.17.2"
-  dependencies:
-    "@aws-sdk/credential-providers": "npm:^3.186.0"
-    "@mongodb-js/saslprep": "npm:^1.1.0"
-    bson: "npm:^4.7.2"
-    mongodb-connection-string-url: "npm:^2.6.0"
-    socks: "npm:^2.7.1"
-  dependenciesMeta:
-    "@aws-sdk/credential-providers":
-      optional: true
-    "@mongodb-js/saslprep":
-      optional: true
-  checksum: 10c0/5434d995dc2173d78218ca858555c132a8354e30ac3e7ca4852ccaf5e8d3fdab4dc51a16db2a2b4096d9b8e6df799645eb9ffb0fb54cb814e4493996a4cd2b05
-  languageName: node
-  linkType: hard
-
-"mongodb@npm:^7.0.0":
-  version: 7.0.0
-  resolution: "mongodb@npm:7.0.0"
-  dependencies:
-    "@mongodb-js/saslprep": "npm:^1.3.0"
-    bson: "npm:^7.0.0"
-    mongodb-connection-string-url: "npm:^7.0.0"
-  peerDependencies:
-    "@aws-sdk/credential-providers": ^3.806.0
-    "@mongodb-js/zstd": ^7.0.0
-    gcp-metadata: ^7.0.1
-    kerberos: ^7.0.0
-    mongodb-client-encryption: ">=7.0.0 <7.1.0"
-    snappy: ^7.3.2
-    socks: ^2.8.6
-  peerDependenciesMeta:
-    "@aws-sdk/credential-providers":
-      optional: true
-    "@mongodb-js/zstd":
-      optional: true
-    gcp-metadata:
-      optional: true
-    kerberos:
-      optional: true
-    mongodb-client-encryption:
-      optional: true
-    snappy:
-      optional: true
-    socks:
-      optional: true
-  checksum: 10c0/425258188fd6d0d73c58ce2f16177d53d4280804b52de0e6dfd4ce0bec2c2965625c1765111f800ce8e6f2a28187657e8f42bf7dd6cc9675844e619b0dec18b9
-  languageName: node
-  linkType: hard
-
-"mongoose@npm:6.13.8":
-  version: 6.13.8
-  resolution: "mongoose@npm:6.13.8"
-  dependencies:
-    bson: "npm:^4.7.2"
-    kareem: "npm:2.5.1"
-    mongodb: "npm:4.17.2"
-    mpath: "npm:0.9.0"
-    mquery: "npm:4.0.3"
-    ms: "npm:2.1.3"
-    sift: "npm:16.0.1"
-  checksum: 10c0/37c21ca020991952e189cbdf18fa232531f650ed5a709aa45afc75d4c066be0c3c4158a51f20d903b020aa4146a61fec8a0da3de99bce1f92381b32d0357aebf
-  languageName: node
-  linkType: hard
-
-"mpath@npm:0.9.0":
-  version: 0.9.0
-  resolution: "mpath@npm:0.9.0"
-  checksum: 10c0/ac1a77ebbd44567f122fb3026c9647836215d5bb75b54064d1f3d998125644fe7a775b89441b94d4d60f43ad9638a12d830a9e29f36116e93b8cdfd111816e8f
-  languageName: node
-  linkType: hard
-
 "mqtt-packet@npm:^9.0.2":
   version: 9.0.2
   resolution: "mqtt-packet@npm:9.0.2"
@@ -9105,7 +8970,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2.0.3, tslib@npm:^2.4.0, tslib@npm:^2.6.2, tslib@npm:^2.8.1":
+"tslib@npm:^2.0.3, tslib@npm:^2.4.0, tslib@npm:^2.8.1":
   version: 2.8.1
   resolution: "tslib@npm:2.8.1"
   checksum: 10c0/9c4759110a19c53f992d9aae23aac5ced636e99887b51b9e61def52611732872ff7668757d4e4c61f19691e36f4da981cd9485e869b4a7408d689f6bf1f14e62
