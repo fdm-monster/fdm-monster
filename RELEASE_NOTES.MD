@@ -1,5 +1,16 @@
 # Develop
 
+# FDM Monster 1.9.4
+
+## Fixes
+
+- Bambu mqtt adapter should connect using mqtts
+- Bambu FTP works with .3mf (as well as gcode), FDM Monster now supports 3mf upload for bambu printer types
+- Bambu: implemented socket state emitting for test functionality
+- PrusaLink: implemented socket state emitting for test functionality
+- Bambu: download file implemented via FTP
+- FDM-Monster API: file upload now checks file extension after upload (not during upload)
+
 # FDM Monster 1.9.3
 
 ## Fixes

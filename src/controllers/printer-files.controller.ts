@@ -18,7 +18,7 @@ import { PrinterFileCleanTask } from "@/tasks/printer-file-clean.task";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { Request, Response } from "express";
-import { IPrinterApi } from "@/services/printer-api.interface";
+import { BambuType, IPrinterApi} from "@/services/printer-api.interface";
 import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
 import { captureException } from "@sentry/node";
 import { errorSummary } from "@/utils/error.utils";
@@ -191,12 +191,15 @@ export class PrinterFilesController {
   @route("/:id/upload")
   @before(permission(PERMS.PrinterFiles.Upload))
   async uploadPrinterFile(req: Request, res: Response) {
-    const { currentPrinterId } = getScopedPrinter(req);
+    const { currentPrinterId, currentPrinter } = getScopedPrinter(req);
+
+    // Get accepted file extensions based on printer type
+    const acceptedExtensions = this.getAcceptedFileExtensions(currentPrinter.printerType);
 
     const files = await this.multerService.multerLoadFileAsync(
       req,
       res,
-      AppConstants.defaultAcceptedGcodeExtensions,
+      acceptedExtensions,
       true,
     );
 
@@ -206,14 +209,14 @@ export class PrinterFilesController {
 
     if (!files?.length) {
       throw new ValidationException({
-        error: `No file was available for upload. Did you upload files with one of these extensions: ${AppConstants.defaultAcceptedGcodeExtensions.join(
+        error: `No file was available for upload. Did you upload files with one of these extensions: ${acceptedExtensions.join(
           ", ",
         )}?`,
       });
     }
     if (files.length > 1) {
       throw new ValidationException({
-        error: "Only 1 .gcode file can be uploaded at a time",
+        error: "Only 1 file can be uploaded at a time",
       });
     }
 
@@ -252,5 +255,12 @@ export class PrinterFilesController {
     }
 
     res.send();
+  }
+
+  private getAcceptedFileExtensions(printerType: number): string[] {
+    if (printerType === BambuType) {
+      return AppConstants.defaultAcceptedBambuExtensions;
+    }
+    return AppConstants.defaultAcceptedGcodeExtensions;
   }
 }

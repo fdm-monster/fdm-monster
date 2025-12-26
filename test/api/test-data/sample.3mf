@@ -1,0 +1,6 @@
+# Sample .3mf file for testing Bambu printer support
+# This is a minimal test file to verify .3mf upload functionality
+# In a real scenario, this would be a binary file format containing 3D model data
+PK     # This would normally be the ZIP file header for .3MF format
+test content for bambu printer 3mf upload
+

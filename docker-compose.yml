@@ -12,6 +12,19 @@ services:
       - ./fdm-monster:/data
     restart: unless-stopped
 
+  mosquitto:
+    container_name: fdmm-mosquitto
+    image: eclipse-mosquitto:2.0.22
+    restart: unless-stopped
+    ports:
+#      - "1883:1883"   # plain MQTT
+      - "8883:8883"   # MQTT over TLS
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+      - ./mosquitto/certs:/mosquitto/certs
+
   # docker build --platform linux/amd64,linux/arm64 -t 1.5.0-alpha . -f .\docker\Dockerfile
   fdm-monster:
     container_name: fdm-monster

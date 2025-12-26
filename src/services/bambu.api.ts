@@ -12,10 +12,10 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { BambuClient } from "@/services/bambu/bambu.client";
 import { BambuMqttAdapter } from "@/services/bambu/bambu-mqtt.adapter";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
-import { AxiosPromise } from "axios";
+import { AxiosPromise, AxiosResponse } from "axios";
 import { ServerConfigDto } from "./moonraker/dto/server/server-config.dto";
 import { SettingsDto } from "./octoprint/dto/settings/settings.dto";
-import { readFileSync } from "node:fs";
+import { readFileSync, statSync } from "node:fs";
 
 const defaultLog = { adapter: "bambu-lab" };
 
@@ -34,7 +34,7 @@ export class BambuApi implements IPrinterApi {
   logger: LoggerService;
   client: BambuClient;
   printerLogin: LoginDto;
-  private printerSocketStore: PrinterSocketStore;
+  private readonly printerSocketStore: PrinterSocketStore;
   private printerId?: string;
 
   constructor(
@@ -200,9 +200,38 @@ export class BambuApi implements IPrinterApi {
       }));
   }
 
-  downloadFile(path: string): AxiosPromise<NodeJS.ReadableStream> {
-    this.logger.warn("downloadFile not implemented via HTTP for Bambu Lab printers");
-    throw new Error("Method not implemented. Use FTP adapter directly if needed.");
+  async downloadFile(path: string): AxiosPromise<NodeJS.ReadableStream> {
+    this.logger.log(`Downloading file via FTP: ${path}`, this.logMeta());
+
+    await this.ensureFtpConnected();
+
+    // Ensure path starts with /sdcard/
+    const remotePath = path.startsWith("/sdcard/") ? path : `/sdcard/${path}`;
+
+    const { stream, tempPath } = await this.client.ftp.downloadFileAsStream(remotePath);
+
+    // Get file size from the temp file
+    const stats = statSync(tempPath);
+
+    // Extract filename from path for Content-Disposition header
+    const filename = remotePath.split("/").pop() || "download";
+
+    // Create an AxiosResponse-like structure
+    const response: AxiosResponse<NodeJS.ReadableStream> = {
+      data: stream,
+      status: 200,
+      statusText: "OK",
+      headers: {
+        "content-type": "application/octet-stream",
+        "content-length": String(stats.size),
+        "content-disposition": `attachment; filename="${filename}"`,
+      },
+      config: {
+        headers: {} as any,
+      },
+    };
+
+    return response;
   }
 
   getFileChunk(path: string, startBytes: number, endBytes: number): AxiosPromise<string> {

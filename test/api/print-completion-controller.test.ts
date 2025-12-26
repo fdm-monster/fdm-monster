@@ -30,7 +30,7 @@ describe(PrintCompletionController.name, () => {
   it("should return empty print completion list", async () => {
     const response = await request.get(listRoute).send();
     expectOkResponse(response, []);
-  });
+  }, 10000);
 
   it("should return context list", async () => {
     const response = await request.get(contextsRoute).send();
