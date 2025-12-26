@@ -1,4 +1,4 @@
-import { KeyDiffCache, keyType } from "@/utils/cache/key-diff.cache";
+import { KeyDiffCache } from "@/utils/cache/key-diff.cache";
 import { PrinterCache } from "@/state/printer.cache";
 import { join } from "path";
 import { ensureDirExists, superRootPath } from "@/utils/fs.utils";
@@ -8,7 +8,6 @@ import { createReadStream, readFileSync } from "fs";
 import { LoginDto } from "@/services/interfaces/login.dto";
 import { gcodeScanningChunkSize } from "@/utils/gcode.utils";
 import { createInterface } from "node:readline/promises";
-import { IdType } from "@/shared.constants";
 import { writeFile } from "node:fs/promises";
 import { captureException } from "@sentry/node";
 import { LoggerService } from "@/handlers/logger";
@@ -19,7 +18,7 @@ import EventEmitter2 from "eventemitter2";
 import { SettingsStore } from "@/state/settings.store";
 
 export interface CachedPrinterThumbnail {
-  id: keyType;
+  id: number;
   thumbnailBase64: string;
 }
 
@@ -42,7 +41,7 @@ export class PrinterThumbnailCache extends KeyDiffCache<CachedPrinterThumbnail> 
   }
 
   async resetCache() {
-    const keys = Object.keys(this.keyValueStore);
+    const keys = Array.from(this.keyValueStore.keys());
     await this.deleteKeysBatch(keys);
   }
 
@@ -53,16 +52,13 @@ export class PrinterThumbnailCache extends KeyDiffCache<CachedPrinterThumbnail> 
     const baseFolder = join(superRootPath(), AppConstants.defaultPrinterThumbnailsStorage);
 
     this.resetDiffs();
-    Object.keys(this.keyValueStore).forEach((key) => {
-      delete this.keyValueStore[key];
-    });
+    this.keyValueStore.clear();
 
     for (const printer of printers) {
-      const printerIdStr = printer.id.toString();
       const thumbnailFile = join(baseFolder, printer.id.toString() + ".dat");
       if (existsSync(thumbnailFile)) {
         const data = readFileSync(thumbnailFile, "utf8");
-        await this.setPrinterThumbnail(printerIdStr, data);
+        await this.setPrinterThumbnail(printer.id, data);
       }
     }
   }
@@ -76,65 +72,63 @@ export class PrinterThumbnailCache extends KeyDiffCache<CachedPrinterThumbnail> 
     }
   }
 
-  async setPrinterThumbnail(id: keyType, imageData: string) {
+  async setPrinterThumbnail(id: number, imageData: string) {
     await this.setKeyValue(id, { id: id, thumbnailBase64: imageData });
   }
 
-  async unsetPrinterThumbnail(id: keyType) {
+  async unsetPrinterThumbnail(id: number) {
     await this.deleteKeyValue(id);
   }
 
-  async loadPrinterThumbnailRemote(login: LoginDto, printerId: IdType, file: string) {
+  async loadPrinterThumbnailRemote(login: LoginDto, printerId: number, file: string) {
     if (!this.settingsStore.isThumbnailSupportEnabled()) return;
 
-    const id = printerId.toString();
     try {
       const thumbnailData = await this.extractRemoteThumbnailBase64(login, file);
-      await this.writeThumbnailFile(id, thumbnailData);
-      await this.setPrinterThumbnail(id, thumbnailData);
+      await this.writeThumbnailFile(printerId, thumbnailData);
+      await this.setPrinterThumbnail(printerId, thumbnailData);
 
       return thumbnailData;
     } catch (e) {
       this.logger.error("Could not parse thumbnail, clearing printer thumbnail", e);
       captureException(e);
-      await this.removeThumbnailFile(id);
-      await this.unsetPrinterThumbnail(id);
+      await this.removeThumbnailFile(printerId);
+      await this.unsetPrinterThumbnail(printerId);
     }
   }
 
-  async loadPrinterThumbnailLocal(printerId: IdType, file: string) {
+  async loadPrinterThumbnailLocal(printerId: number, file: string) {
     if (!this.settingsStore.isThumbnailSupportEnabled()) return;
 
-    const id = printerId.toString();
     try {
       const thumbnailData = await this.extractThumbnailBase64(file);
-      await this.writeThumbnailFile(id, thumbnailData);
-      await this.setPrinterThumbnail(id, thumbnailData);
+      await this.writeThumbnailFile(printerId, thumbnailData);
+      await this.setPrinterThumbnail(printerId, thumbnailData);
 
       return thumbnailData;
     } catch (e) {
       this.logger.error("Could not parse thumbnail, clearing printer thumbnail", e);
       captureException(e);
-      await this.removeThumbnailFile(id);
-      await this.unsetPrinterThumbnail(id);
+      await this.removeThumbnailFile(printerId);
+      await this.unsetPrinterThumbnail(printerId);
     }
   }
 
-  private async writeThumbnailFile(printerId: string, thumbnailData: string) {
+  private async writeThumbnailFile(printerId: number, thumbnailData: string) {
     if (!thumbnailData?.length) {
       await this.removeThumbnailFile(printerId);
       await this.unsetPrinterThumbnail(printerId);
       return;
     }
     const baseFolder = join(superRootPath(), AppConstants.defaultPrinterThumbnailsStorage);
-    const thumbnailPath = join(baseFolder, printerId + ".dat");
+    const thumbnailPath = join(baseFolder, printerId.toString() + ".dat");
     ensureDirExists(baseFolder);
     await writeFile(thumbnailPath, thumbnailData);
   }
 
-  private async removeThumbnailFile(printerId: keyType) {
+  private async removeThumbnailFile(printerId: number) {
     const baseFolder = join(superRootPath(), AppConstants.defaultPrinterThumbnailsStorage);
-    const thumbnailPath = join(baseFolder, printerId + ".dat");
+    const thumbnailPath = join(baseFolder, printerId.toString() + ".dat");
 
     if (existsSync(thumbnailPath)) {
       rmSync(thumbnailPath);

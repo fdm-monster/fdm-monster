@@ -1,19 +1,15 @@
 import { ensureTestUserCreated } from "../api/test-data/create-user";
 import { DITokens } from "@/container.tokens";
 import { ROLES } from "@/constants/authorization.constants";
-import { UserService } from "@/services/mongoose/user.service";
 import { setupTestApp } from "../test-server";
-import { IdType } from "@/shared.constants";
 import { IUserService } from "@/services/interfaces/user-service.interface";
 import { IRoleService } from "@/services/interfaces/role-service.interface";
-import { RoleDto } from "@/services/interfaces/role.dto";
-import { UserDto } from "@/services/interfaces/user.dto";
-import { getDatasource, isSqliteModeTest } from "../typeorm.manager";
+import { getDatasource } from "../typeorm.manager";
 import { User } from "@/entities";
-import { User as UserMongo } from "@/models";
+import { UserService } from "@/services/orm/user.service";
 
-let userService: IUserService<IdType, UserDto>;
-let roleService: IRoleService<IdType, RoleDto>;
+let userService: IUserService;
+let roleService: IRoleService;
 
 beforeAll(async () => {
   const { container } = await setupTestApp(true);
@@ -22,11 +18,7 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  if (isSqliteModeTest()) {
-    await getDatasource().getRepository(User).clear();
-  } else {
-    await UserMongo.deleteMany({});
-  }
+  await getDatasource().getRepository(User).clear();
 });
 
 describe(UserService.name, () => {
@@ -42,13 +34,6 @@ describe(UserService.name, () => {
     await expect(async () => await userService.getUser(undefined)).rejects.toBeDefined();
   });
 
-  it("should find no user by role id ", async () => {
-    await roleService.syncRoles();
-    const role = roleService.getRoleByName(ROLES.ADMIN);
-    const result = await userService.findUsersByRoleId(role.id);
-    expect(result?.length).toBeFalsy();
-  });
-
   it("should get users", async () => {
     await ensureTestUserCreated();
     const users = await userService.listUsers(5);
@@ -58,7 +43,7 @@ describe(UserService.name, () => {
   it("should get user roles", async () => {
     await roleService.syncRoles();
     const { id } = await ensureTestUserCreated();
-    const userRoles = await userService.getUserRoleIds(id);
+    const userRoles = await userService.getUserRoles(id);
     expect(userRoles).toHaveLength(1);
   });
 });

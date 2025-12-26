@@ -1,5 +1,4 @@
 import { User } from "./user.entity";
-import { Permission } from "./permission.entity";
 import { CameraStream } from "./camera-stream.entity";
 import { CustomGcode } from "./custom-gcode.entity";
 import { Floor } from "./floor.entity";
@@ -12,7 +11,6 @@ import { RefreshToken } from "./refresh-token.entity";
 
 export {
   User,
-  Permission,
   RefreshToken,
   CameraStream,
   CustomGcode,

@@ -51,9 +51,7 @@ import { WebcamTestDto } from "@/services/moonraker/dto/server-webcams/webcam-te
 import { NotifierListDto } from "@/services/moonraker/dto/notifier-list.dto";
 import { MachineUpdateStatusDto } from "@/services/moonraker/dto/machine/machine-update-status.dto";
 import { MachineDevicePowerDevicesDto } from "@/services/moonraker/dto/machine/machine-device-power-devices.dto";
-import {
-  MachineDevicePowerDeviceStateDto,
-} from "@/services/moonraker/dto/machine/machine-device-power-device-state.dto";
+import { MachineDevicePowerDeviceStateDto } from "@/services/moonraker/dto/machine/machine-device-power-device-state.dto";
 import { MachineWledStripsDto } from "@/services/moonraker/dto/machine/machine-wled-strips.dto";
 import { JsonRpcResponseDto } from "@/services/moonraker/dto/rpc/json-rpc-response.dto";
 import { JsonRpcRequestDto } from "@/services/moonraker/dto/rpc/json-rpc-request.dto";

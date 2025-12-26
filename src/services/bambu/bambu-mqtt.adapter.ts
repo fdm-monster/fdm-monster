@@ -10,7 +10,6 @@ import { LoginDto } from "@/services/interfaces/login.dto";
 import { SOCKET_STATE, SocketState } from "@/shared/dtos/socket-state.type";
 import { API_STATE, ApiState } from "@/shared/dtos/api-state.type";
 import { BambuType } from "@/services/printer-api.interface";
-import { IdType } from "@/shared.constants";
 import { WsMessage } from "@/services/octoprint/octoprint-websocket.adapter";
 
 export const bambuEvent = (event: string) => `bambu.${event}`;
@@ -18,7 +17,7 @@ export const bambuEvent = (event: string) => `bambu.${event}`;
 export interface BambuEventDto {
   event: string;
   payload: any;
-  printerId?: IdType;
+  printerId?: number;
   printerType: typeof BambuType;
 }
 
@@ -33,7 +32,7 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
 
   // IWebsocketAdapter required properties
   public readonly printerType = BambuType;
-  public printerId?: IdType;
+  public printerId?: number;
   public socketState: SocketState = SOCKET_STATE.unopened;
   public apiState: ApiState = API_STATE.unset;
   public login: LoginDto;
@@ -47,11 +46,7 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
   private isConnecting = false;
   private eventsAllowed = true;
 
-  constructor(
-    settingsStore: SettingsStore,
-    loggerFactory: ILoggerFactory,
-    eventEmitter2: EventEmitter2
-  ) {
+  constructor(settingsStore: SettingsStore, loggerFactory: ILoggerFactory, eventEmitter2: EventEmitter2) {
     this.settingsStore = settingsStore;
     this.eventEmitter2 = eventEmitter2;
     this.logger = loggerFactory(BambuMqttAdapter.name);
@@ -64,7 +59,7 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
     this.login = loginDto;
 
     // Extract connection details from loginDto
-    this.host = loginDto.printerURL?.replace(/^https?:\/\//, '');
+    this.host = loginDto.printerURL?.replace(/^https?:\/\//, "");
     this.accessCode = loginDto.password || null;
     this.serial = loginDto.username || null;
   }
@@ -170,7 +165,7 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
           connectTimeout: timeout,
           reconnectPeriod: 5000,
           keepalive: 60,
-          rejectUnauthorized: false
+          rejectUnauthorized: false,
         });
 
         this.mqttClient.on("connect", () => {
@@ -226,7 +221,6 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
           this.emitEvent(WsMessage.WS_CLOSED, "connection closed").catch(() => {});
           this.logger.debug("MQTT connection closed");
         });
-
       } catch (error) {
         clearTimeout(connectionTimeout);
         this.isConnecting = false;
@@ -423,7 +417,7 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
     const isPrinting = state.gcode_state === "PRINTING" || state.mc_print_stage === "printing";
     const isPaused = state.mc_print_stage === "paused";
 
-    const isPausedText = isPaused ? "Paused" : "Printing"
+    const isPausedText = isPaused ? "Paused" : "Printing";
     return {
       state: {
         text: isPrinting ? isPausedText : "Operational",

@@ -29,14 +29,6 @@ beforeAll(async () => {
 });
 
 describe(ServerPublicController.name, () => {
-  it("should return auth-based welcome", async function () {
-    const response = await request.get(getRoute).send();
-    expect(response.body).toMatchObject({
-      message: "Login required. Please load the Vue app.",
-    });
-    expectOkResponse(response);
-  });
-
   it("test should work for loginRequired true/false", async function () {
     await settingsStore.setLoginRequired();
     const response = await request.get(testRoute).send();
@@ -69,7 +61,16 @@ describe(ServerPublicController.name, () => {
     await settingsStore.setLoginRequired(false);
   });
 
-  it("should get welcome message", async function () {
+  it("should return welcome message", async function () {
+    await settingsStore.setLoginRequired(false);
+    const response = await request.get(getRoute).send();
+    expect(response.body).toMatchObject({
+      message: "Login disabled. Please load the Vue app.",
+    });
+    expectOkResponse(response);
+  });
+
+  it("should get login-based welcome message", async function () {
     await settingsStore.setLoginRequired();
 
     const { token } = await loginTestUser(request);

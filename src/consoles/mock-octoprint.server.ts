@@ -97,7 +97,9 @@ wss.on("connection", (ws) => {
           // Set up interval to send current message periodically
           messageInterval = setupMessageInterval(ws, clientId, WS_MESSAGE_INTERVAL);
         } catch (validationError) {
-          console.log(`[PORT ${port}] Authentication failed: Invalid token format ${JSON.stringify(json)} ${validationError}`);
+          console.log(
+            `[PORT ${port}] Authentication failed: Invalid token format ${JSON.stringify(json)} ${validationError}`,
+          );
           ws.close();
         }
       } else {

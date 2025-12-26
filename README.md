@@ -38,7 +38,7 @@ Here is a list of features that make FDM Monster stand out:
 - Import printers from software like OctoFarm
 - YAML backup and import
 - Thumbnail support
-- SQLite as well as MongoDB support
+- SQLite database
 
 ## Installation methods ⚙️
 
@@ -147,7 +147,6 @@ the [CONTRIBUTING](CONTRIBUTING.md) file.
 ### Development Progress
 
 - [x] :rocket: Docker amd64 image
-- [x] 🛡️ MongoDB 5 & 6 support
 - [x] :rocket: Quick copy paste of FDM Monster printers
 - [x] 🛡️ Complete API test coverage
 - [x] :rocket: Floor management

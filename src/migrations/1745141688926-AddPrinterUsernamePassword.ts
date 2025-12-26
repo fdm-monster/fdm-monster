@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class AddPrinterUsernamePassword1745141688926 implements MigrationInterface {
-  name = 'AddPrinterUsernamePassword1745141688926'
+  name = "AddPrinterUsernamePassword1745141688926";
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
@@ -218,5 +218,4 @@ export class AddPrinterUsernamePassword1745141688926 implements MigrationInterfa
             DROP TABLE "temporary_printer"
         `);
   }
-
 }

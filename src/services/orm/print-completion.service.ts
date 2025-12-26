@@ -5,7 +5,6 @@ import {
   PrintCompletionContext,
   PrintCompletionDto,
 } from "@/services/interfaces/print-completion.dto";
-import { SqliteIdType } from "@/shared.constants";
 import { IPrintCompletionService } from "@/services/interfaces/print-completion.interface";
 import { In, Not } from "typeorm";
 import { EVENT_TYPES } from "@/services/octoprint/constants/octoprint-websocket.constants";
@@ -13,12 +12,11 @@ import { groupArrayBy } from "@/utils/array.util";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
-import { AnalyzedCompletions, processCompletions } from "@/services/mongoose/print-completion.shared";
-import { IPrintCompletion } from "@/models/PrintCompletion";
+import { AnalyzedCompletions, processCompletions } from "@/services/orm/print-completion.shared";
 
 export class PrintCompletionService
-  extends BaseService(PrintCompletion, PrintCompletionDto<SqliteIdType>)
-  implements IPrintCompletionService<SqliteIdType, PrintCompletion>
+  extends BaseService(PrintCompletion, PrintCompletionDto)
+  implements IPrintCompletionService
 {
   private readonly logger: LoggerService;
 
@@ -27,7 +25,7 @@ export class PrintCompletionService
     this.logger = loggerFactory(PrintCompletionService.name);
   }
 
-  toDto(entity: PrintCompletion): PrintCompletionDto<SqliteIdType> {
+  toDto(entity: PrintCompletion): PrintCompletionDto {
     return {
       id: entity.id,
       completionLog: entity.completionLog,
@@ -40,7 +38,7 @@ export class PrintCompletionService
     };
   }
 
-  async create(input: CreatePrintCompletionDto<SqliteIdType>) {
+  async create(input: CreatePrintCompletionDto) {
     return await super.create(input);
   }
 
@@ -73,13 +71,13 @@ export class PrintCompletionService
     const limitedCompletions = await this.listPaged();
     const printCompletionsAggr = groupArrayBy(limitedCompletions, (val) => val.printerId.toString());
     const completions = Object.entries(printCompletionsAggr).map(([pc, val]) => ({
-      printerId: parseInt(pc),
+      printerId: Number.parseInt(pc),
       printEvents: val,
     }));
     return processCompletions(completions);
   }
 
-  async loadPrintContexts(): Promise<Record<string, IPrintCompletion<number, number>[]>> {
+  async loadPrintContexts(): Promise<Record<number, PrintCompletion[]>> {
     const completions = await this.repository.find({
       where: {
         status: Not(In([EVENT_TYPES.PrintDone, EVENT_TYPES.PrintFailed])),

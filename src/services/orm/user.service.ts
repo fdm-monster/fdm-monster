@@ -1,7 +1,6 @@
 import { BaseService } from "@/services/orm/base.service";
 import { RegisterUserDto, UserDto } from "@/services/interfaces/user.dto";
 import { User } from "@/entities";
-import { SqliteIdType } from "@/shared.constants";
 import { IUserService } from "@/services/interfaces/user-service.interface";
 import { In } from "typeorm";
 import { InternalServerException, NotFoundException } from "@/exceptions/runtime.exceptions";
@@ -10,10 +9,10 @@ import { newPasswordSchema, registerUserSchema } from "@/services/validators/use
 import { comparePasswordHash, hashPassword } from "@/utils/crypto.utils";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { UserRoleService } from "@/services/orm/user-role.service";
-import { ROLES } from "@/constants/authorization.constants";
+import { RoleName, ROLES } from "@/constants/authorization.constants";
 import { RoleService } from "@/services/orm/role.service";
 
-export class UserService extends BaseService(User, UserDto<SqliteIdType>) implements IUserService<SqliteIdType, User> {
+export class UserService extends BaseService(User, UserDto) implements IUserService {
   constructor(
     typeormService: TypeormService,
     private readonly userRoleService: UserRoleService,
@@ -22,7 +21,8 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
     super(typeormService);
   }
 
-  toDto(user: User): UserDto<SqliteIdType> {
+  toDto(user: User): UserDto {
+    const roleIds = (user.roles ?? []).map((r) => r.roleId);
     return {
       id: user.id,
       createdAt: user.createdAt,
@@ -31,7 +31,7 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
       isRootUser: user.isRootUser,
       username: user.username,
       needsPasswordChange: user.needsPasswordChange,
-      roles: (user.roles ?? []).map((r) => r.roleId),
+      roles: this.roleService.roleIdsToRoleNames(roleIds),
     };
   }
 
@@ -39,35 +39,30 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
     return this.list({ take: limit });
   }
 
-  async getUser(userId: SqliteIdType) {
+  async getUser(userId: number) {
     return this.get(userId);
   }
 
-  async getUserRoleIds(userId: SqliteIdType): Promise<SqliteIdType[]> {
+  async getUserRoles(userId: number): Promise<RoleName[]> {
     const userRoles = await this.userRoleService.listUserRoles(userId);
-    return userRoles.map((ur) => ur.roleId);
+    const roleIds = userRoles.map((ur) => ur.roleId);
+    return this.roleService.roleIdsToRoleNames(roleIds);
   }
 
   findRootUsers(): Promise<User[]> {
     return this.repository.findBy({ isRootUser: true });
   }
 
-  async findUsersByRoleId(roleId: SqliteIdType): Promise<User[]> {
-    const userRoles = await this.userRoleService.listByRoleId(roleId);
-    const ids = userRoles.map((u) => u.id);
-    return this.repository.findBy({ id: In(ids) });
-  }
-
   findVerifiedUsers(): Promise<User[]> {
     return this.repository.findBy({ isVerified: true });
   }
 
-  async isUserRootUser(userId: SqliteIdType): Promise<boolean> {
+  async isUserRootUser(userId: number): Promise<boolean> {
     const entity = await this.get(userId);
     return entity.isRootUser;
   }
 
-  async deleteUser(userId: SqliteIdType) {
+  async deleteUser(userId: number) {
     // Validate
     const user = await this.getUser(userId);
 
@@ -95,11 +90,11 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
     return this.repository.findOneBy({ username });
   }
 
-  async getDemoUserId(): Promise<SqliteIdType | undefined> {
+  async getDemoUserId(): Promise<number | undefined> {
     return (await this.repository.findOneBy({ isDemoUser: true }))?.id;
   }
 
-  async setIsRootUserById(userId: SqliteIdType, isRootUser: boolean): Promise<void> {
+  async setIsRootUserById(userId: number, isRootUser: boolean): Promise<void> {
     const user = await this.getUser(userId);
     if (!user) throw new NotFoundException("User not found");
 
@@ -114,12 +109,13 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
     await this.update(userId, { isRootUser });
   }
 
-  async setUserRoleIds(userId: SqliteIdType, roleIds: SqliteIdType[]): Promise<User> {
+  async setUserRoles(userId: number, roles: RoleName[]): Promise<User> {
+    const roleIds = roles.map((roleName) => this.roleService.getRoleByName(roleName).id);
     await this.userRoleService.setUserRoles(userId, roleIds);
     return await this.get(userId);
   }
 
-  async setVerifiedById(userId: SqliteIdType, isVerified: boolean): Promise<void> {
+  async setVerifiedById(userId: number, isVerified: boolean): Promise<void> {
     const user = await this.getUser(userId);
     if (!user) throw new NotFoundException("User not found");
 
@@ -138,7 +134,7 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
     await this.update(userId, { isVerified });
   }
 
-  async updatePasswordById(userId: SqliteIdType, oldPassword: string, newPassword: string): Promise<User> {
+  async updatePasswordById(userId: number, oldPassword: string, newPassword: string): Promise<User> {
     const user = await this.getUser(userId);
     if (!user) throw new NotFoundException("User not found");
 
@@ -167,14 +163,14 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
     return await this.update(user.id, { passwordHash, needsPasswordChange: false });
   }
 
-  updateUsernameById(userId: SqliteIdType, newUsername: string): Promise<User> {
+  updateUsernameById(userId: number, newUsername: string): Promise<User> {
     return this.update(userId, { username: newUsername });
   }
 
-  async register(input: RegisterUserDto<SqliteIdType>): Promise<User> {
+  async register(input: RegisterUserDto): Promise<User> {
     const { username, password, roles, isDemoUser, isRootUser, needsPasswordChange, isVerified } = await validateInput(
       input,
-      registerUserSchema(true),
+      registerUserSchema,
     );
 
     const passwordHash = hashPassword(password);
@@ -186,8 +182,17 @@ export class UserService extends BaseService(User, UserDto<SqliteIdType>) implem
       isRootUser: isRootUser ?? false,
       needsPasswordChange: needsPasswordChange ?? true,
     });
-    await this.userRoleService.setUserRoles(result.id, roles as SqliteIdType[]);
+
+    // Convert role names to IDs for database storage
+    const roleIds = roles.map((roleName) => this.roleService.getRoleByName(roleName).id);
+    await this.userRoleService.setUserRoles(result.id, roleIds);
 
     return this.get(result.id);
+  }
+
+  private async findUsersByRoleId(roleId: number): Promise<User[]> {
+    const userRoles = await this.userRoleService.listByRoleId(roleId);
+    const ids = userRoles.map((u) => u.id);
+    return this.repository.findBy({ id: In(ids) });
   }
 }

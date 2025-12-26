@@ -5,30 +5,21 @@ import { AwilixContainer } from "awilix";
 import { PrinterService } from "@/services/orm/printer.service";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { Printer } from "@/entities";
-import { Printer as PrinterMongo } from "@/models";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
-import { SqliteIdType } from "@/shared.constants";
-import { isSqliteModeTest } from "../typeorm.manager";
 
 let container: AwilixContainer;
-let printerService: IPrinterService<SqliteIdType, Printer>;
+let printerService: IPrinterService;
 let typeorm: TypeormService;
 
 beforeAll(async () => {
-  container = configureContainer(isSqliteModeTest());
-  printerService = container.resolve<IPrinterService<SqliteIdType, Printer>>(DITokens.printerService);
+  container = configureContainer();
+  printerService = container.resolve<IPrinterService>(DITokens.printerService);
   typeorm = container.resolve<TypeormService>(DITokens.typeormService);
-  if (isSqliteModeTest()) {
-    await typeorm.createConnection();
-  }
+  await typeorm.createConnection();
 });
 
 afterEach(async () => {
-  if (isSqliteModeTest()) {
-    await typeorm.getDataSource().getRepository(Printer).clear();
-  } else {
-    await PrinterMongo.deleteMany({});
-  }
+  await typeorm.getDataSource().getRepository(Printer).clear();
 });
 
 describe(PrinterService.name, () => {

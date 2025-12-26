@@ -36,7 +36,6 @@ export class UserController {
     private readonly roleService: IRoleService,
     private readonly authService: IAuthService,
     private readonly settingsStore: SettingsStore,
-    private readonly isTypeormMode: boolean,
   ) {
     this.logger = loggerFactory(UserController.name);
   }
@@ -53,10 +52,7 @@ export class UserController {
   @route("/")
   @before([authorizeRoles([ROLES.ADMIN])])
   async create(req: Request, res: Response) {
-    const { username, password, roleIds } = await validateMiddleware(
-      req,
-      registerUserWithRolesSchema(this.isTypeormMode),
-    );
+    const { username, password, roles } = await validateMiddleware(req, registerUserWithRolesSchema);
     if (
       username.toLowerCase().includes("admin") ||
       username.toLowerCase().includes("root") ||
@@ -68,7 +64,7 @@ export class UserController {
     await this.userService.register({
       username,
       password,
-      roles: roleIds,
+      roles,
       needsPasswordChange: false,
       isDemoUser: false,
       isRootUser: false,
@@ -180,19 +176,17 @@ export class UserController {
     }
 
     const ownUser = await this.userService.getUser(ownUserId);
-    // Cancel out the internal interface differences
     const mappedUser = this.userService.toDto(ownUser);
 
     const ownUserRoles = mappedUser.roles;
-    const adminRole = await this.roleService.getSynchronizedRoleByName(ROLES.ADMIN);
 
-    if (ownUserId == changedUserId && !ownUserRoles.includes(adminRole.id) && !mappedUser.isRootUser) {
+    if (ownUserId == changedUserId && !ownUserRoles.includes(ROLES.ADMIN) && !mappedUser.isRootUser) {
       throw new ForbiddenError("Only an ADMIN or OWNER user is allowed to change its own roles");
     }
 
-    const { roleIds } = await validateInput(req.body, setUserRolesSchema(this.isTypeormMode));
+    const { roles } = await validateInput(req.body, setUserRolesSchema);
 
-    if (ownUserId == changedUserId && !roleIds.includes(adminRole.id)) {
+    if (ownUserId == changedUserId && !roles.includes(ROLES.ADMIN)) {
       if (mappedUser.isRootUser) {
         throw new BadRequestException("It does not make sense to remove ADMIN role from an OWNER user.");
       } else {
@@ -200,7 +194,7 @@ export class UserController {
       }
     }
 
-    await this.userService.setUserRoleIds(changedUserId, roleIds);
+    await this.userService.setUserRoles(changedUserId, roles);
     res.send();
   }
 

@@ -19,8 +19,7 @@ let testPrinterSocketStore: TestPrinterSocketStore;
 let printerFilesStore: PrinterFilesStore;
 
 beforeAll(async () => {
-  const container = configureContainer(true);
-  expect(container.resolve(DITokens.isTypeormMode)).toBe(true);
+  const container = configureContainer();
   await container.resolve<TypeormService>(DITokens.typeormService).createConnection();
   await container.resolve(DITokens.settingsStore).loadSettings();
   testPrinterSocketStore = container.resolve(DITokens.testPrinterSocketStore);

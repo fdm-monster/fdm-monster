@@ -1,7 +1,6 @@
 import { KeyDiffCache } from "@/utils/cache/key-diff.cache";
 import { printerEvents, PrintersDeletedEvent } from "@/constants/event.constants";
 import EventEmitter2 from "eventemitter2";
-import { IdType } from "@/shared.constants";
 import { OctoPrintEventDto, WsMessage } from "@/services/octoprint/dto/octoprint-event.dto";
 import {
   HistoryMessageDto,
@@ -26,22 +25,23 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
 
   constructor(
     private readonly eventEmitter2: EventEmitter2,
-    loggerFactory: ILoggerFactory) {
+    loggerFactory: ILoggerFactory,
+  ) {
     super();
 
     this.logger = loggerFactory(PrinterEventsCache.name);
     this.subscribeToEvents();
   }
 
-  async deletePrinterSocketEvents(id: IdType) {
+  async deletePrinterSocketEvents(id: number) {
     await this.deleteKeyValue(id, true);
   }
 
-  async getPrinterSocketEvents(id: IdType) {
-    return this.keyValueStore[id];
+  async getPrinterSocketEvents(id: number) {
+    return this.keyValueStore.get(id);
   }
 
-  async getOrCreateEvents(printerId: IdType) {
+  async getOrCreateEvents(printerId: number) {
     let ref = await this.getValue(printerId);
     if (!ref) {
       ref = {
@@ -65,7 +65,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
     return ref;
   }
 
-  async setEvent(printerId: IdType, label: WsMessageWithoutEventAndPlugin, payload: any) {
+  async setEvent(printerId: number, label: WsMessageWithoutEventAndPlugin, payload: any) {
     const ref = await this.getOrCreateEvents(printerId);
     ref[label] = {
       payload,
@@ -74,7 +74,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
     await this.setKeyValue(printerId, ref);
   }
 
-  async setSubState(printerId: IdType, label: WsMessageWithoutEventAndPlugin, substateName: string, payload: any) {
+  async setSubState(printerId: number, label: WsMessageWithoutEventAndPlugin, substateName: string, payload: any) {
     const ref = await this.getOrCreateEvents(printerId);
     if (!ref[label]) {
       ref[label] = {};
@@ -121,8 +121,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
     }
   }
 
-  private async onPrusaLinkPollMessage(
-    e: PrusaLinkEventDto) {
+  private async onPrusaLinkPollMessage(e: PrusaLinkEventDto) {
     const printerId = e.printerId;
 
     this.logger.debug(`Received prusaLink event ${e.event}, printerId ${e.printerId}`, e);

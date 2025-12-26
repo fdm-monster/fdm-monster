@@ -12,7 +12,6 @@ RUN yarn install
 COPY src/ ./src/
 COPY test/ ./test/
 COPY .env.template \
-    migrate-mongo-config.js \
     README.md \
     LICENSE CODE_OF_CONDUCT.md \
     CONTRIBUTING.md \

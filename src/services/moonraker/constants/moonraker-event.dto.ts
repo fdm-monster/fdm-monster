@@ -1,4 +1,3 @@
-import { IdType } from "@/shared.constants";
 import { klipperEvents } from "@/services/moonraker/dto/websocket/methods";
 
 export const messages = {
@@ -13,9 +12,9 @@ export const messages = {
 } as const;
 
 export type MR_WsMessage = keyof typeof messages;
-export class MoonrakerEventDto<K extends MR_WsMessage = MR_WsMessage, T = any, I extends IdType = IdType> {
+export class MoonrakerEventDto<K extends MR_WsMessage = MR_WsMessage, T = any> {
   event: K;
   payload: T;
-  printerId: I;
+  printerId: number;
   printerType: 1;
 }

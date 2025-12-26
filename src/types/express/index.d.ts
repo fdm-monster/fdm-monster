@@ -1,14 +1,12 @@
 import { AwilixContainer } from "awilix";
-import { IUser } from "@/models/Auth/User";
-import { IdType } from "@/shared.constants";
-
-export type RequestRole = IdType;
+import { RoleName } from "@/constants/authorization.constants";
+import { UserDto } from "@/services/interfaces/user.dto";
 
 declare module "express" {
-  interface Request<KeyType = IdType> {
+  interface Request {
     local?: any;
-    user?: IUser<KeyType>;
+    user?: UserDto;
     container: AwilixContainer;
-    roles?: readonly RequestRole[];
+    roles?: RoleName[];
   }
 }

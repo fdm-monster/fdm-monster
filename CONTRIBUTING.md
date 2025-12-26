@@ -43,7 +43,7 @@ FDM Monster currently consists of two active repositories:
 Server design
 
 - **FDM Monster server** was chosen to be a Node.js server. The backend is currently structured as a REST API. It might be surprising that we use `awilix` as Inversion-of-Control implementation, but if you study the resulting architecture it will show its fresh and quick-to-develop benefits rapidly.
-- **FDM Monster server** runs using MongoDB as database and Mongoose as ORM
+- **FDM Monster server** runs using Sqlite as database and Typeorm as ORM
 - **FDM Monster server** caches data in-memory using a self-written store/cache system between the database (no redis!)
 - **FDM Monster server** API is built up using `awilix-express` and uses `node-input-validation` as API validation
 - **FDM Monster server** is equipped with a task scheduler (ToadScheduler) which gives the capability to run workloads in the background.
@@ -94,7 +94,7 @@ Explain the problem and include additional details to help maintainers reproduce
 You might be delighted to know that the FDM Monster server was structured consistently for other developers to be able to work with it rapidly.
 
 1. Clone the repository from the development branch (git clone https://github.com/fdm-monster/fdm-monster.git)
-2. Ensure MongoDb (5+) and Node (v16) are installed
+2. Ensure Node (v24) is installed
 3. Adjust/create a `.env` with NODE_ENV=development **inside the server folder**
 4. `npm install` **inside the server folder** to create the `node_modules` folder
 5. Run the server with `npm run dev` to let nodemon detect and apply any changes you make
@@ -109,11 +109,11 @@ Please make sure you understand the meaning of these files/folders:
 - server.constants.js
 - constants
 - controllers (API)
+- entities (typeorm)
 - exceptions
 - handlers
 - middleware
-- models (mongoose)
-- migrations (mongodb/mongoose)
+- migrations (typeorm/sqlite)
 - services // services/octoprint/...
 - state // state/printer.state.js // state/files.store.js // state/data/...
 - tasks // tasks/boot.task.js // printer-websocket.task.js

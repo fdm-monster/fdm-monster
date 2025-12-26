@@ -1,5 +1,4 @@
 import { BaseService } from "@/services/orm/base.service";
-import { SqliteIdType } from "@/shared.constants";
 import { IRoleService } from "@/services/interfaces/role-service.interface";
 import { Role } from "@/entities";
 import { SettingsStore } from "@/state/settings.store";
@@ -7,22 +6,16 @@ import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { RoleDto } from "@/services/interfaces/role.dto";
 import { union } from "lodash";
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
-import { ROLE_PERMS, ROLES } from "@/constants/authorization.constants";
-import { ILoggerFactory } from "@/handlers/logger-factory";
-import { LoggerService } from "@/handlers/logger";
+import { PermissionName, ROLE_PERMS, RoleName, ROLES } from "@/constants/authorization.constants";
 
-export class RoleService extends BaseService(Role, RoleDto<SqliteIdType>) implements IRoleService<SqliteIdType, Role> {
-  private readonly logger: LoggerService;
-
+export class RoleService extends BaseService(Role, RoleDto) implements IRoleService {
   constructor(
     typeormService: TypeormService,
-    loggerFactory: ILoggerFactory,
-    private readonly appDefaultRole: string,
-    private readonly appDefaultRoleNoLogin: string,
+    private readonly appDefaultRole: RoleName,
+    private readonly appDefaultRoleNoLogin: RoleName,
     private readonly settingsStore: SettingsStore,
   ) {
     super(typeormService);
-    this.logger = loggerFactory(RoleService.name);
   }
 
   private _roles: Role[] = [];
@@ -31,36 +24,34 @@ export class RoleService extends BaseService(Role, RoleDto<SqliteIdType>) implem
     return this._roles;
   }
 
-  async getAppDefaultRole(): Promise<string> {
+  async getAppDefaultRole(): Promise<RoleName> {
     if (await this.settingsStore.getLoginRequired()) {
       return this.appDefaultRole;
     }
     return this.appDefaultRoleNoLogin;
   }
 
-  async getAppDefaultRoleIds(): Promise<number[]> {
+  async getAppDefaultRoleNames(): Promise<RoleName[]> {
     if (!this._roles?.length) {
       await this.syncRoles();
     }
 
-    const guestRole = this.getRoleByName(await this.getAppDefaultRole());
-    return [guestRole.id] as number[];
+    return [await this.getAppDefaultRole()];
   }
 
-  toDto(role: Role): RoleDto<SqliteIdType> {
+  toDto(role: Role): RoleDto {
     return {
       id: role.id,
-      name: role.name,
+      name: role.name as RoleName,
     };
   }
 
-  getRolesPermissions(roles: (string | SqliteIdType)[]): string[] {
-    let permissions: string[] = [];
-    if (!roles?.length) return [];
+  getRolesPermissions(roleNames: RoleName[]): PermissionName[] {
+    let permissions: PermissionName[] = [];
+    if (!roleNames?.length) return [];
 
-    for (let role of roles) {
-      const normalizedRole = this.normalizeRoleIdOrName(role);
-      const rolePermissions = this.getRolePermissions(normalizedRole);
+    for (const roleName of roleNames) {
+      const rolePermissions = this.getRolePermissions(roleName);
       permissions = union(permissions, rolePermissions);
     }
 
@@ -68,65 +59,62 @@ export class RoleService extends BaseService(Role, RoleDto<SqliteIdType>) implem
   }
 
   /**
-   * Checks if the role names or ids overlap
-   * @param requiredRoles list of roles that would grant access
-   * @param assignedRoles application role names or role ids (not to be confused with user role assignments)
-   * @param subset
+   * Checks if any of the required roles are in the assigned roles
+   * @param requiredRoles list of role names that would grant access
+   * @param assignedRoles user's assigned role names
+   * @param subset if true, any match grants access (OR); if false, all must match (AND)
    */
-  authorizeRoles(
-    requiredRoles: (string | SqliteIdType)[],
-    assignedRoles: (string | SqliteIdType)[],
-    subset: boolean,
-  ): boolean {
-    let isAuthorized = false;
-
+  authorizeRoles(requiredRoles: RoleName[], assignedRoles: RoleName[], subset: boolean): boolean {
     if (!requiredRoles?.length) return true;
-    requiredRoles.forEach((rr) => {
-      const result = this.authorizeRole(rr, assignedRoles);
+
+    let isAuthorized = !subset; // Start with false for OR, true for AND
+    for (const requiredRole of requiredRoles) {
+      const result = this.authorizeRole(requiredRole, assignedRoles);
       isAuthorized = subset ? isAuthorized || result : isAuthorized && result;
-    });
+    }
 
     return isAuthorized;
   }
 
-  authorizeRole(requiredRole: string | SqliteIdType, assignedRoles: (string | SqliteIdType)[]): boolean {
-    return !!assignedRoles.find((ar) => {
-      const normalizedRole = this.normalizeRoleIdOrName(ar);
-      if (!normalizedRole) return false;
-      return normalizedRole === requiredRole;
-    });
+  authorizeRole(requiredRole: RoleName, assignedRoles: RoleName[]): boolean {
+    return assignedRoles.includes(requiredRole);
   }
 
-  getManyRoles(roleIds: SqliteIdType[]): Role[] {
+  getManyRoles(roleIds: number[]): Role[] {
     return roleIds.map((roleId) => this.getRole(roleId));
   }
 
-  getRole(roleId: SqliteIdType): Role {
+  getRole(roleId: number): Role {
     const role = this._roles.find((r) => r.id === roleId);
     if (!role) throw new NotFoundException(`Role by provided id was not found`);
 
     return role;
   }
 
-  getRoleByName(roleName: string): Role {
+  getRoleByName(roleName: RoleName): Role {
     const role = this._roles.find((r) => r.name === roleName);
     if (!role) throw new NotFoundException(`Role by provided name was not found`);
 
     return role;
   }
 
-  getRolePermissions(role?: string | SqliteIdType): string[] {
-    if (!role || !(role as string)?.length) {
+  getRolePermissions(roleName: RoleName): PermissionName[] {
+    if (!roleName) {
       return [];
     }
-    const normalizedRole = this.normalizeRoleIdOrName(role);
-    if (!normalizedRole?.length) {
-      return [];
-    }
-    return ROLE_PERMS[normalizedRole];
+    return ROLE_PERMS[roleName] ?? [];
   }
 
-  async getSynchronizedRoleByName(roleName: string): Promise<Role> {
+  roleIdsToRoleNames(roleIds: number[]): RoleName[] {
+    return roleIds
+      .map((roleId) => {
+        const role = this._roles.find((r) => r.id === roleId);
+        return role?.name as RoleName | undefined;
+      })
+      .filter((name): name is RoleName => name !== undefined);
+  }
+
+  async getSynchronizedRoleByName(roleName: RoleName): Promise<Role> {
     if (!this._roles?.length) {
       await this.syncRoles();
     }
@@ -136,26 +124,16 @@ export class RoleService extends BaseService(Role, RoleDto<SqliteIdType>) implem
 
   async syncRoles(): Promise<void> {
     this._roles = [];
-    for (let roleName of Object.values(ROLES)) {
+    for (const roleName of Object.values(ROLES)) {
       const storedRole = await this.repository.findOneBy({ name: roleName });
-      if (!storedRole) {
+      if (storedRole) {
+        this._roles.push(storedRole);
+      } else {
         const newRole = await this.create({
           name: roleName,
         });
         this._roles.push(newRole);
-      } else {
-        this._roles.push(storedRole);
       }
     }
-  }
-
-  private normalizeRoleIdOrName(assignedRole: string | SqliteIdType): string | undefined {
-    const roleInstance = this.roles.find((r) => r.id === assignedRole || r.name === assignedRole);
-    if (!roleInstance) {
-      this.logger.warn(`The role by provided id was not found. Skipping.`);
-      return;
-    }
-
-    return roleInstance.name;
   }
 }

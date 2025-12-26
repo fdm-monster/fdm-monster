@@ -1,20 +1,20 @@
-import { IdType } from "@/shared.constants";
+import { RoleName } from "@/constants/authorization.constants";
 
-export class UserDto<KeyType = IdType> {
-  id: KeyType;
+export class UserDto {
+  id: number;
   createdAt: Date;
   username: string;
   isDemoUser: boolean;
   isRootUser: boolean;
   isVerified: boolean;
   needsPasswordChange: boolean;
-  roles: KeyType[];
+  roles: RoleName[];
 }
 
-export class RegisterUserDto<KeyType = IdType> {
+export class RegisterUserDto {
   username: string;
   password: string;
-  roles: KeyType[];
+  roles: RoleName[];
   isDemoUser: boolean;
   isRootUser: boolean;
   isVerified: boolean;

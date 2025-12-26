@@ -5,14 +5,13 @@ import EventEmitter2 from "eventemitter2";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { CreatePrintCompletionDto, PrintCompletionContext } from "@/services/interfaces/print-completion.dto";
-import { IdType } from "@/shared.constants";
 import { OctoPrintEventDto } from "@/services/octoprint/dto/octoprint-event.dto";
 import { PrinterEventsCache } from "@/state/printer-events.cache";
 import { IPrintCompletionService } from "@/services/interfaces/print-completion.interface";
 import { octoPrintWebsocketEvent } from "@/services/octoprint/octoprint-websocket.adapter";
 
 export class PrintCompletionSocketIoTask {
-  contextCache: Record<IdType, PrintCompletionContext> = {};
+  contextCache: Record<number, PrintCompletionContext> = {};
   private readonly logger: LoggerService;
 
   constructor(

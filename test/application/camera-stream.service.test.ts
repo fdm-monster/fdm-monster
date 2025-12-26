@@ -1,6 +1,5 @@
 import { DITokens } from "@/container.tokens";
 import { ICameraStreamService } from "@/services/interfaces/camera-stream.service.interface";
-import { SqliteIdType } from "@/shared.constants";
 import { CameraStreamService } from "@/services/orm/camera-stream.service";
 import { setupTestApp } from "../test-server";
 
@@ -8,7 +7,7 @@ let cameraStreamService: ICameraStreamService;
 
 beforeAll(async () => {
   const { container } = await setupTestApp(true);
-  cameraStreamService = container.resolve<ICameraStreamService<SqliteIdType>>(DITokens.cameraStreamService);
+  cameraStreamService = container.resolve<ICameraStreamService>(DITokens.cameraStreamService);
 });
 
 describe(CameraStreamService.name, () => {

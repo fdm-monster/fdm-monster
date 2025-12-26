@@ -61,7 +61,6 @@ export class PrusaLinkHttpClientBuilder extends DefaultHttpClientBuilder {
             // Extract WWW-Authenticate header
             const wwwAuthHeader = error.response.headers[wwwAuthenticationHeaderKey] as string;
             if (wwwAuthHeader) {
-
               // Allow caching the value for reuse
               if (typeof this.onAuthSuccess === "function") {
                 this.onAuthSuccess(wwwAuthHeader);
@@ -76,7 +75,6 @@ export class PrusaLinkHttpClientBuilder extends DefaultHttpClientBuilder {
               return axiosInstance(originalRequest);
             }
           }
-
 
           // If this is an auth error, and we have a callback, invoke it
           if (error.response?.status === 401 && this.onAuthError && typeof this.onAuthError === "function") {
@@ -134,20 +132,16 @@ export class PrusaLinkHttpClientBuilder extends DefaultHttpClientBuilder {
   }
 
   private saveParsedAuthHeaderContext(authHeader: string): void {
-    const headerValue = authHeader.startsWith("Digest ")
-      ? authHeader.substring(7)
-      : authHeader;
+    const headerValue = authHeader.startsWith("Digest ") ? authHeader.substring(7) : authHeader;
 
     const authParams = Object.fromEntries(
-      headerValue
-        .split(", ")
-        .map((param) => {
-          const parts = param.split("=");
-          if (parts.length === 2) {
-            return [parts[0], parts[1].replace(/"/g, "")];
-          }
-          return [parts[0], ""];
-        }),
+      headerValue.split(", ").map((param) => {
+        const parts = param.split("=");
+        if (parts.length === 2) {
+          return [parts[0], parts[1].replace(/"/g, "")];
+        }
+        return [parts[0], ""];
+      }),
     );
 
     this.authHeaderContext = {

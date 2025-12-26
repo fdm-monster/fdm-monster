@@ -106,7 +106,7 @@ describe(BambuClient.name, () => {
       const invalidAuth = { ...auth, password: "" };
 
       await expect(client.connect(invalidAuth)).rejects.toThrow(
-        "Access code (password) is required for Bambu Lab printers"
+        "Access code (password) is required for Bambu Lab printers",
       );
     });
 
@@ -116,7 +116,7 @@ describe(BambuClient.name, () => {
       const invalidAuth = { ...auth, password: undefined as any };
 
       await expect(client.connect(invalidAuth)).rejects.toThrow(
-        "Access code (password) is required for Bambu Lab printers"
+        "Access code (password) is required for Bambu Lab printers",
       );
     });
   });

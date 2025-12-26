@@ -12,7 +12,6 @@ import { isTestEnvironment } from "@/utils/env.utils";
 import { AppConstants } from "@/server.constants";
 import { LoggerService } from "@/handlers/logger";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
-import { ISettings } from "@/models/Settings";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { z } from "zod";
 import {
@@ -22,17 +21,16 @@ import {
   serverSettingsUpdateSchema,
   timeoutSettingsUpdateSchema,
 } from "@/services/validators/settings-service.validation";
-import { IdType } from "@/shared.constants";
+import { Settings } from "@/entities";
 
 export class SettingsStore {
   private readonly logger: LoggerService;
 
-  private settings: ISettings<IdType> | null = null;
+  private settings: Settings | null = null;
 
   constructor(
     loggerFactory: ILoggerFactory,
     private readonly settingsService: ISettingsService,
-    private readonly isTypeormMode: boolean,
   ) {
     this.logger = loggerFactory(SettingsStore.name);
   }
@@ -51,7 +49,6 @@ export class SettingsStore {
         experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
         experimentalPrusaLinkSupport: settings[serverSettingsKey].experimentalPrusaLinkSupport,
         experimentalBambuSupport: settings[serverSettingsKey].experimentalBambuSupport,
-        experimentalTypeormSupport: this.isTypeormMode,
         experimentalClientSupport: settings[serverSettingsKey].experimentalClientSupport,
         experimentalThumbnailSupport: settings[serverSettingsKey].experimentalThumbnailSupport,
       },
@@ -76,7 +73,6 @@ export class SettingsStore {
         experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
         experimentalPrusaLinkSupport: settings[serverSettingsKey].experimentalPrusaLinkSupport,
         experimentalBambuSupport: settings[serverSettingsKey].experimentalBambuSupport,
-        experimentalTypeormSupport: this.isTypeormMode,
         experimentalClientSupport: settings[serverSettingsKey].experimentalClientSupport,
         experimentalThumbnailSupport: settings[serverSettingsKey].experimentalThumbnailSupport,
       },
@@ -115,7 +111,7 @@ export class SettingsStore {
       await this.updateCredentialSettings({
         refreshTokenExpiry: credentialSettings.refreshTokenExpiry,
         refreshTokenAttempts: credentialSettings.refreshTokenAttempts,
-        jwtExpiresIn: parseInt(overrideJwtExpiresIn),
+        jwtExpiresIn: Number.parseInt(overrideJwtExpiresIn),
       });
     }
 
@@ -167,10 +163,6 @@ export class SettingsStore {
 
   getTimeoutSettings() {
     return this.getSettings()[timeoutSettingKey];
-  }
-
-  getFrontendSettings() {
-    return this.getSettings()[frontendSettingKey];
   }
 
   getFileCleanSettings() {
@@ -228,9 +220,9 @@ export class SettingsStore {
   }
 
   async setRefreshTokenSettings({
-                                  refreshTokenAttempts,
-                                  refreshTokenExpiry,
-                                }: {
+    refreshTokenAttempts,
+    refreshTokenExpiry,
+  }: {
     refreshTokenAttempts: number;
     refreshTokenExpiry: number;
   }) {

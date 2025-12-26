@@ -3,17 +3,15 @@ import { validNewPrinterState } from "./test-data/printer.data";
 import { BatchCallService } from "@/services/core/batch-call.service";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { setupTestApp } from "../test-server";
-import { SqliteIdType } from "@/shared.constants";
-import { Printer } from "@/entities";
 import nock from "nock";
 
 let batchCallService: BatchCallService;
-let printerService: IPrinterService<SqliteIdType, Printer>;
+let printerService: IPrinterService;
 
 beforeAll(async () => {
   const { container } = await setupTestApp(true);
 
-  printerService = container.resolve<IPrinterService<SqliteIdType, Printer>>(DITokens.printerService);
+  printerService = container.resolve<IPrinterService>(DITokens.printerService);
   batchCallService = container.resolve(DITokens.batchCallService);
 });
 

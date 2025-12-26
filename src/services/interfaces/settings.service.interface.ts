@@ -1,6 +1,4 @@
-import { ISettings } from "@/models/Settings";
 import { SettingsDto } from "@/services/interfaces/settings.dto";
-import { IdType } from "@/shared.constants";
 import {
   credentialSettingUpdateSchema,
   fileCleanSettingsUpdateSchema,
@@ -11,8 +9,9 @@ import {
   wizardUpdateSchema,
 } from "@/services/validators/settings-service.validation";
 import { z } from "zod";
+import { Settings } from "@/entities";
 
-export interface ISettingsService<KeyType = IdType, Entity = ISettings<KeyType>> {
+export interface ISettingsService<Entity = Settings> {
   toDto(entity: Entity): SettingsDto;
 
   getOrCreate(): Promise<Entity>;

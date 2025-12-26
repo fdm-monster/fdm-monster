@@ -13,7 +13,6 @@ import { PrinterCache } from "@/state/printer.cache";
 import { OctoprintWebsocketAdapter } from "@/services/octoprint/octoprint-websocket.adapter";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
-import { IdType } from "@/shared.constants";
 import { OctoprintType } from "@/services/printer-api.interface";
 import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
 import { PrinterDto } from "@/services/interfaces/printer.dto";
@@ -21,14 +20,14 @@ import { SocketState } from "@/shared/dtos/socket-state.type";
 import { ApiState } from "@/shared/dtos/api-state.type";
 
 export interface PrinterSocketState {
-  printerId: IdType,
-  printerType: number,
-  socket: SocketState,
-  api: ApiState,
+  printerId: number;
+  printerType: number;
+  socket: SocketState;
+  api: ApiState;
 }
 
 export class PrinterSocketStore {
-  printerSocketAdaptersById: Record<IdType, IWebsocketAdapter> = {};
+  printerSocketAdaptersById = new Map<number, IWebsocketAdapter>();
   private readonly logger: LoggerService;
 
   constructor(
@@ -43,8 +42,8 @@ export class PrinterSocketStore {
   }
 
   getSocketStatesById() {
-    const socketStatesById: { [k: IdType]: PrinterSocketState } = {};
-    Object.values(this.printerSocketAdaptersById).forEach((s) => {
+    const socketStatesById: { [k: number]: PrinterSocketState } = {};
+    this.printerSocketAdaptersById.forEach((s) => {
       if (!s.printerId) {
         return;
       }
@@ -63,24 +62,24 @@ export class PrinterSocketStore {
     await this.printerCache.loadCache();
 
     const printerDtoList = await this.printerCache.listCachedPrinters(false);
-    this.printerSocketAdaptersById = {};
+    this.printerSocketAdaptersById.clear();
     for (const printerDto of printerDtoList) {
       try {
-        this.handlePrinterCreated({ printer: printerDto });
+        this.createOrUpdateSocket(printerDto);
       } catch (e) {
         captureException(e);
         this.logger.error("PrinterSocketStore failed to construct new socket.", errorSummary(e));
       }
     }
 
-    this.logger.log(`Loaded ${Object.keys(this.printerSocketAdaptersById).length} printer sockets`);
+    this.logger.log(`Loaded ${this.printerSocketAdaptersById.size} printer sockets`);
   }
 
   listPrinterSockets() {
-    return Object.values(this.printerSocketAdaptersById);
+    return Array.from(this.printerSocketAdaptersById.values());
   }
 
-  reconnectPrinterAdapter(id: IdType) {
+  reconnectPrinterAdapter(id: number) {
     const socket = this.getPrinterSocket(id);
     if (!socket) return;
 
@@ -90,8 +89,8 @@ export class PrinterSocketStore {
     socket.resetSocketState();
   }
 
-  getPrinterSocket(id: IdType): IWebsocketAdapter | undefined {
-    return this.printerSocketAdaptersById[id];
+  getPrinterSocket(id: number): IWebsocketAdapter | undefined {
+    return this.printerSocketAdaptersById.get(id);
   }
 
   /**
@@ -103,7 +102,7 @@ export class PrinterSocketStore {
     const socketStates: { [k: string]: number } = {};
     const apiStates: { [k: string]: number } = {};
     const promisesReauth = [];
-    for (const socket of Object.values(this.printerSocketAdaptersById)) {
+    for (const socket of this.printerSocketAdaptersById.values()) {
       try {
         if (socket.printerType === OctoprintType && (socket as OctoprintWebsocketAdapter).needsReauth()) {
           reauthRequested++;
@@ -120,7 +119,7 @@ export class PrinterSocketStore {
     await Promise.all(promisesReauth);
 
     const promisesOpenSocket: any[] = [];
-    for (const socket of Object.values(this.printerSocketAdaptersById)) {
+    for (const socket of this.printerSocketAdaptersById.values()) {
       try {
         if (socket.needsSetup() || socket.needsReopen()) {
           socketSetupRequested++;
@@ -147,9 +146,9 @@ export class PrinterSocketStore {
     await Promise.all(promisesOpenSocket);
   }
 
-  createOrUpdateSocket(printer: PrinterDto<IdType>) {
+  createOrUpdateSocket(printer: PrinterDto) {
     const { enabled, id } = printer;
-    let foundAdapter = this.printerSocketAdaptersById[id.toString()];
+    let foundAdapter = this.printerSocketAdaptersById.get(id);
 
     // Delete the socket if the printer is disabled
     if (!enabled) {
@@ -159,17 +158,17 @@ export class PrinterSocketStore {
     }
 
     // Create a new socket if it doesn't exist
-    if (!foundAdapter) {
-      foundAdapter = this.socketFactory.createInstance(printer.printerType);
-      this.printerSocketAdaptersById[id] = foundAdapter;
-    } else {
+    if (foundAdapter) {
       foundAdapter.close();
       this.logger.log(`Closing printer socket for update`);
+    } else {
+      foundAdapter = this.socketFactory.createInstance(printer.printerType);
+      this.printerSocketAdaptersById.set(id, foundAdapter);
     }
 
     // Reset the socket credentials before (re-)connecting
     foundAdapter.registerCredentials({
-      printerId: printer.id.toString(),
+      printerId: printer.id,
       loginDto: {
         apiKey: printer.apiKey,
         username: printer.username,
@@ -209,8 +208,8 @@ export class PrinterSocketStore {
     this.eventEmitter2.on(printerEvents.batchPrinterCreated, this.handleBatchPrinterCreated.bind(this));
   }
 
-  private deleteSocket(printerId: IdType) {
-    const socket = this.printerSocketAdaptersById[printerId];
+  private deleteSocket(printerId: number) {
+    const socket = this.printerSocketAdaptersById.get(printerId);
 
     // Ensure that the printer does not re-register itself after being purged
     socket?.disallowEmittingEvents();
@@ -218,6 +217,6 @@ export class PrinterSocketStore {
     socket?.close();
 
     // TODO mark diff cache
-    delete this.printerSocketAdaptersById[printerId];
+    this.printerSocketAdaptersById.delete(printerId);
   }
 }

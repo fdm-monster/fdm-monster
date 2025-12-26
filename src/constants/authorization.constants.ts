@@ -1,9 +1,5 @@
 import { union } from "lodash";
 
-export function serializePerm(group: string, perm: string) {
-  return `${group}.${perm}`;
-}
-
 export const AUTH_ERROR_REASON = {
   // Before login
   IncorrectCredentials: "IncorrectCredentials",
@@ -20,62 +16,79 @@ export const PERM_GROUP = {
   Floors: "PrinterFloors", // TODO rename in migration or seed
   PrintCompletion: "PrintCompletion",
   ServerInfo: "ServerInfo",
-};
+} as const;
 
-export const PERMS: Record<string, Record<string, string>> = {
+export type PermissionGroup = (typeof PERM_GROUP)[keyof typeof PERM_GROUP];
+
+export const PERMS = {
   [PERM_GROUP.PrinterFiles]: {
-    Default: serializePerm(PERM_GROUP.PrinterFiles, "Default"),
-    Get: serializePerm(PERM_GROUP.PrinterFiles, "Get"),
-    Delete: serializePerm(PERM_GROUP.PrinterFiles, "Delete"),
-    Clear: serializePerm(PERM_GROUP.PrinterFiles, "Clear"),
-    Upload: serializePerm(PERM_GROUP.PrinterFiles, "Upload"),
-    Actions: serializePerm(PERM_GROUP.PrinterFiles, "Actions"),
+    Default: "PrinterFiles.Default",
+    Get: "PrinterFiles.Get",
+    Delete: "PrinterFiles.Delete",
+    Clear: "PrinterFiles.Clear",
+    Upload: "PrinterFiles.Upload",
+    Actions: "PrinterFiles.Actions",
   },
   [PERM_GROUP.PrintCompletion]: {
-    Default: serializePerm(PERM_GROUP.PrintCompletion, "Default"),
-    List: serializePerm(PERM_GROUP.PrintCompletion, "List"),
+    Default: "PrintCompletion.Default",
+    List: "PrintCompletion.List",
   },
   [PERM_GROUP.Floors]: {
-    Default: serializePerm(PERM_GROUP.Floors, "Default"),
-    List: serializePerm(PERM_GROUP.Floors, "List"),
-    Get: serializePerm(PERM_GROUP.Floors, "Get"),
-    Create: serializePerm(PERM_GROUP.Floors, "Create"),
-    Update: serializePerm(PERM_GROUP.Floors, "Update"),
-    Delete: serializePerm(PERM_GROUP.Floors, "Delete"),
+    Default: "PrinterFloors.Default",
+    List: "PrinterFloors.List",
+    Get: "PrinterFloors.Get",
+    Create: "PrinterFloors.Create",
+    Update: "PrinterFloors.Update",
+    Delete: "PrinterFloors.Delete",
   },
   [PERM_GROUP.PrinterSettings]: {
-    Default: serializePerm(PERM_GROUP.PrinterSettings, "Default"),
-    Get: serializePerm(PERM_GROUP.PrinterSettings, "Get"),
+    Default: "PrinterSettings.Default",
+    Get: "PrinterSettings.Get",
   },
   [PERM_GROUP.ServerInfo]: {
-    Default: serializePerm(PERM_GROUP.ServerInfo, "Default"),
-    Get: serializePerm(PERM_GROUP.ServerInfo, "Get"),
+    Default: "ServerInfo.Default",
+    Get: "ServerInfo.Get",
   },
-};
+} as const;
 
-export function flattenPermissionDefinition() {
-  const permissions = [];
-  for (let key of Object.values(PERM_GROUP)) {
-    for (let permissionName of Object.values(PERMS[key])) {
+type ExtractPerms<T> = T extends Record<string, string> ? T[keyof T] : never;
+type PermsType = typeof PERMS;
+export type PermissionName = ExtractPerms<PermsType[keyof PermsType]>;
+
+export function flattenPermissionDefinition(): PermissionName[] {
+  const permissions: PermissionName[] = [];
+  for (const key of Object.values(PERM_GROUP)) {
+    for (const permissionName of Object.values(PERMS[key])) {
       permissions.push(permissionName);
     }
   }
-
   return permissions;
 }
 
-export function allPerms(group: string) {
+export function allPerms(group: PermissionGroup): PermissionName[] {
   if (!group || !PERMS[group]) throw new Error(`Permission group name '${group}' was not found`);
-  return Object.values(PERMS[group]);
+  return Object.values(PERMS[group]) as PermissionName[];
 }
 
 export const ROLES = {
   ADMIN: "ADMIN",
   OPERATOR: "OPERATOR",
   GUEST: "GUEST",
-};
+} as const;
 
-export const ROLE_PERMS: Record<string, string[]> = {
+export type RoleName = (typeof ROLES)[keyof typeof ROLES];
+
+const ROLE_VALUES = Object.values(ROLES) as RoleName[];
+
+export function isRoleName(value: string): value is RoleName {
+  return ROLE_VALUES.includes(value as RoleName);
+}
+
+export function filterToRoleNames(values: string[]): RoleName[] {
+  return values.filter(isRoleName);
+}
+
+export const ROLE_PERMS: Record<RoleName, PermissionName[]> = {
   [ROLES.ADMIN]: union(
     allPerms(PERM_GROUP.Floors),
     allPerms(PERM_GROUP.PrinterFiles),

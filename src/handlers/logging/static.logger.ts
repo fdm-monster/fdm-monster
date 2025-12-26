@@ -65,58 +65,64 @@ export function createStaticLogger(config: StaticLoggerConfig) {
       new winston.transports.Console({
         level: effectiveLogLevel,
         format: winston.format.combine(
-          ...(isDevelopmentEnvironment() && process.env[AppConstants.ENABLE_COLORED_LOGS_KEY] == "true") ? [
-            // Store the original level before colorization
-            winston.format((info) => {
-              info.rawLevel = info.level;
-              return info;
-            })(),
-            winston.format.colorize({
-              colors: {
-                error: "red",
-                warn: "yellow",
-                info: "white",
-                debug: "gray",
-                http: "magenta",
-                verbose: "cyan",
-                silly: "gray",
-              },
-              level: true,
-              message: true, // Don't colorize the whole message
-              all: false,
-            }),
-            winston.format.printf((info) => {
-              // Format timestamp similar to Serilog (ISO with milliseconds)
-              const now = new Date();
-              const timestamp = `${now.toISOString().split("T")[0]} ${now.toTimeString().split(" ")[0]}.${now.getMilliseconds().toString().padStart(3, "0")}`;
+          ...(isDevelopmentEnvironment() && process.env[AppConstants.ENABLE_COLORED_LOGS_KEY] == "true"
+            ? [
+                // Store the original level before colorization
+                winston.format((info) => {
+                  info.rawLevel = info.level;
+                  return info;
+                })(),
+                winston.format.colorize({
+                  colors: {
+                    error: "red",
+                    warn: "yellow",
+                    info: "white",
+                    debug: "gray",
+                    http: "magenta",
+                    verbose: "cyan",
+                    silly: "gray",
+                  },
+                  level: true,
+                  message: true, // Don't colorize the whole message
+                  all: false,
+                }),
+                winston.format.printf((info) => {
+                  // Format timestamp similar to Serilog (ISO with milliseconds)
+                  const now = new Date();
+                  const timestamp = `${now.toISOString().split("T")[0]} ${now.toTimeString().split(" ")[0]}.${now.getMilliseconds().toString().padStart(3, "0")}`;
 
-              // Get colored level from winston
-              // @ts-ignore
-              const levelAbbr = levelMap[info.rawLevel] ?? info.rawLevel.substring(0, 3).toUpperCase();
+                  // Get colored level from winston
+                  // @ts-ignore
+                  const levelAbbr = levelMap[info.rawLevel] ?? info.rawLevel.substring(0, 3).toUpperCase();
 
-              // Apply custom coloring using ANSI color codes
-              const gray = "\x1b[90m"; // Dim/gray
-              const reset = (info.message as string).substring(0, 5) ?? "\x1b[0m"; // Reset
-              const numberRegex = /\b\d+\b/g;
+                  // Apply custom coloring using ANSI color codes
+                  const gray = "\x1b[90m"; // Dim/gray
+                  const reset = (info.message as string).substring(0, 5) ?? "\x1b[0m"; // Reset
+                  const numberRegex = /\b\d+\b/g;
 
-              // Apply purple color to numbers in the message
-              const coloredMessage = (info.message as string).replace(numberRegex, match => `\x1b[35m${match}${reset}`);
+                  // Apply purple color to numbers in the message
+                  const coloredMessage = (info.message as string).replace(
+                    numberRegex,
+                    (match) => `\x1b[35m${match}${reset}`,
+                  );
 
-              const serviceName = info[logContextClassProperty] ?? "unknown";
+                  const serviceName = info[logContextClassProperty] ?? "unknown";
 
-              // Format the log entry with gray timestamp and brackets, colored level, and message with purple numbers
-              let logEntry = `${gray}[${timestamp} ${reset}${levelAbbr}${reset}${gray}]${reset} ${gray}[${reset}${serviceName}${gray}]${reset} ${coloredMessage}`;
+                  // Format the log entry with gray timestamp and brackets, colored level, and message with purple numbers
+                  let logEntry = `${gray}[${timestamp} ${reset}${levelAbbr}${reset}${gray}]${reset} ${gray}[${reset}${serviceName}${gray}]${reset} ${coloredMessage}`;
 
-              // Add metadata if present
-              if (info.meta) {
-                // Add metadata with numbers colorized in purple
-                const metaString = JSON.stringify(info.meta);
-                const coloredMeta = metaString.replace(numberRegex, match => `\x1b[35m${match}${reset}`);
-                logEntry += ` ${coloredMeta}`;
-              }
+                  // Add metadata if present
+                  if (info.meta) {
+                    // Add metadata with numbers colorized in purple
+                    const metaString = JSON.stringify(info.meta);
+                    const coloredMeta = metaString.replace(numberRegex, (match) => `\x1b[35m${match}${reset}`);
+                    logEntry += ` ${coloredMeta}`;
+                  }
 
-              return logEntry;
-            })] : [],
+                  return logEntry;
+                }),
+              ]
+            : []),
         ),
       }),
     ],
@@ -133,11 +139,14 @@ export function createStaticLogger(config: StaticLoggerConfig) {
       // Add metadata if present, without dash separator
       if (info.meta) {
         // Convert camelCase to PascalCase for C# style
-        const pascalCaseMeta = Object.entries(info.meta).reduce((acc, [key, value]) => {
-          const pascalKey = key.charAt(0).toUpperCase() + key.slice(1);
-          acc[pascalKey] = value;
-          return acc;
-        }, {} as Record<string, any>);
+        const pascalCaseMeta = Object.entries(info.meta).reduce(
+          (acc, [key, value]) => {
+            const pascalKey = key.charAt(0).toUpperCase() + key.slice(1);
+            acc[pascalKey] = value;
+            return acc;
+          },
+          {} as Record<string, any>,
+        );
 
         message += ` ${JSON.stringify(pascalCaseMeta)}`;
       }

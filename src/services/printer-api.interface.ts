@@ -3,7 +3,6 @@ import { LoginDto } from "@/services/interfaces/login.dto";
 import { ServerConfigDto } from "@/services/moonraker/dto/server/server-config.dto";
 import { SettingsDto } from "@/services/octoprint/dto/settings/settings.dto";
 import { ConnectionState } from "@/services/octoprint/dto/connection/connection-state.type";
-import { IdType } from "@/shared.constants";
 import { Flags } from "@/services/moonraker/dto/octoprint-compat/api-printer.dto";
 
 export const OctoprintType = 0;
@@ -15,27 +14,27 @@ export enum PrinterTypesEnum {
   Octoprint = 0,
   Moonraker = 1,
   PrusaLink = 2,
-  Bambu = 3
+  Bambu = 3,
 }
 
 export type PrinterType = typeof OctoprintType | typeof MoonrakerType | typeof PrusaLinkType | typeof BambuType;
 
 export interface FdmCurrentMessageDto {
   progress: {
-    printTime: number | null,
-    completion: number | null
-  },
+    printTime: number | null;
+    completion: number | null;
+  };
   state: {
-    text: string,
-    error: string,
-    flags: Flags
-  },
+    text: string;
+    error: string;
+    flags: Flags;
+  };
   job: {
     file: {
-      name: string,
-      path: string
-    }
-  }
+      name: string;
+      path: string;
+    };
+  };
 }
 
 export interface StatusFlags {
@@ -66,7 +65,7 @@ export interface PartialReprintFileDto {
 }
 
 export interface ReprintFileDto extends PartialReprintFileDto {
-  printerId: IdType;
+  printerId: number;
 }
 
 export interface IPrinterApi {

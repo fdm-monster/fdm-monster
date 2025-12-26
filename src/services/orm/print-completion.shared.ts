@@ -1,6 +1,5 @@
 import { groupArrayBy } from "@/utils/array.util";
 import { EVENT_TYPES } from "@/services/octoprint/constants/octoprint-websocket.constants";
-import { IdType } from "@/shared.constants";
 import { PrintCompletionDto } from "@/services/interfaces/print-completion.dto";
 
 const durationDayMSec = 24 * 60 * 60 * 1000;
@@ -19,8 +18,8 @@ export type PrintJobEvents = {
 };
 
 export interface AnalyzedCompletions {
-  _id?: IdType;
-  printerId: IdType;
+  _id?: number;
+  printerId: number;
   printEvents: PrintCompletionDto[];
 
   eventCount?: number;
@@ -36,7 +35,7 @@ export interface AnalyzedCompletions {
   successEventsLast48H?: number;
   successEventsLast24H?: number;
 
-  correlationIds?: IdType[];
+  correlationIds?: string[];
 
   printJobs?: PrintJobEvents[];
 }
@@ -45,7 +44,8 @@ export function processCompletions(completions: AnalyzedCompletions[]): Analyzed
   return completions.map((pc) => {
     pc.printerId = pc.printerId ?? pc._id;
     delete pc._id;
-    const jobs = groupArrayBy(pc.printEvents.filter(e => e.context?.correlationId),
+    const jobs = groupArrayBy(
+      pc.printEvents.filter((e) => e.context?.correlationId),
       (e) => e.context?.correlationId as string,
     );
     pc.printJobs = Object.entries(jobs).map(([id, events]) => {

@@ -8,7 +8,6 @@ import {
   WizardSettingsDto,
 } from "@/services/interfaces/settings.dto";
 import { v4 as uuidv4 } from "uuid";
-import { ICredentialSettings } from "@/models/Settings";
 
 export const wizardSettingKey = "wizard";
 export const getDefaultWizardSettings = (): WizardSettingsDto => ({
@@ -24,7 +23,6 @@ export const getDefaultServerSettings = (): ServerSettingsDto => ({
   registration: false,
   experimentalMoonrakerSupport: false,
   experimentalBambuSupport: true,
-  experimentalTypeormSupport: false,
   experimentalClientSupport: false,
   experimentalThumbnailSupport: false,
   experimentalPrusaLinkSupport: false,
@@ -51,7 +49,7 @@ export const getDefaultFrontendSettings = (): FrontendSettingsDto => ({
 export const timeoutSettingKey = "timeout";
 export const getDefaultTimeout = (): TimeoutSettingsDto => ({
   apiTimeout: 10000,
-  apiUploadTimeout: 30000
+  apiUploadTimeout: 30000,
 });
 
 export const printerFileCleanSettingKey = "printerFileClean";
@@ -67,7 +65,7 @@ export const getDefaultSettings = () => ({
   [credentialSettingsKey]: {
     ...getDefaultCredentialSettings(),
     jwtSecret: uuidv4(),
-  } satisfies ICredentialSettings,
+  },
   [printerFileCleanSettingKey]: getDefaultFileCleanSettings(),
   [frontendSettingKey]: getDefaultFrontendSettings(),
   [timeoutSettingKey]: getDefaultTimeout(),

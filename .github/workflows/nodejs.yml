@@ -17,8 +17,7 @@ jobs:
       - run: yarn install --immutable
       - run: yarn run build
       - run: yarn run tsc
-      # run sqlite tests with coverage
-      - run: yarn run test:cov-sqlite
+      - run: yarn run test:cov
         env:
           NODE_OPTIONS: '--max_old_space_size=8192'
 

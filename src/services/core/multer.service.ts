@@ -5,7 +5,6 @@ import { superRootPath } from "@/utils/fs.utils";
 import { AppConstants } from "@/server.constants";
 import { FileUploadTrackerCache } from "@/state/file-upload-tracker.cache";
 import { Request, Response } from "express";
-import { IdType } from "@/shared.constants";
 import { errorSummary } from "@/utils/error.utils";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
@@ -21,7 +20,7 @@ export class MulterService {
     this.logger = loggerFactory(MulterService.name);
   }
 
-  public startTrackingSession(multerFile: Express.Multer.File, printerId: IdType) {
+  public startTrackingSession(multerFile: Express.Multer.File, printerId: number) {
     return this.fileUploadTrackerCache.addUploadTracker(multerFile, printerId);
   }
 
@@ -37,7 +36,7 @@ export class MulterService {
       try {
         rmSync(join(fileStoragePath, file));
       } catch (error) {
-        this.logger.error(`Could not clear upload file in temporary folder ${ errorSummary(error) }`);
+        this.logger.error(`Could not clear upload file in temporary folder ${errorSummary(error)}`);
       }
     }
   }
@@ -91,12 +90,12 @@ export class MulterService {
           try {
             rmSync(file.path);
           } catch (e) {
-            this.logger.error(`Could not remove invalid file ${ errorSummary(e) }`);
+            this.logger.error(`Could not remove invalid file ${errorSummary(e)}`);
           }
         }
 
         throw new ValidationException({
-          error: `Only files with extensions ${ allowedExtensions.join(", ") } are allowed`,
+          error: `Only files with extensions ${allowedExtensions.join(", ")} are allowed`,
         });
       }
     }
@@ -106,8 +105,8 @@ export class MulterService {
     return multer({
       storage: storeAsFile
         ? diskStorage({
-          destination: join(superRootPath(), AppConstants.defaultFileStorageFolder),
-        })
+            destination: join(superRootPath(), AppConstants.defaultFileStorageFolder),
+          })
         : memoryStorage(),
     }).any();
   }

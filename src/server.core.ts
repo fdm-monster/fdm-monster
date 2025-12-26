@@ -11,7 +11,6 @@ import { initializePassportStrategies } from "./middleware/passport";
 import { AppConstants } from "@/server.constants";
 import { join } from "path";
 import { ensureDirExists, superRootPath } from "@/utils/fs.utils";
-import { getEnvOrDefault } from "@/utils/env.utils";
 import { Counter } from "prom-client";
 import { LoggerService } from "@/handlers/logger";
 
@@ -22,19 +21,16 @@ const httpRequestsTotal = new Counter({
 
 export async function setupServer() {
   const httpServer = express();
-  const experimentalTypeormEnabled =
-    getEnvOrDefault(AppConstants.ENABLE_EXPERIMENTAL_TYPEORM, AppConstants.enableExperimentalTypeormDefault) === "true";
-  if (experimentalTypeormEnabled) {
-    const dbFolder = process.env[AppConstants.DATABASE_PATH] ?? "./database";
-    ensureDirExists(join(superRootPath(), dbFolder));
-  }
 
-  const container = configureContainer(experimentalTypeormEnabled);
+  const dbFolder = process.env[AppConstants.DATABASE_PATH] ?? "./database";
+  ensureDirExists(join(superRootPath(), dbFolder));
+
+  const container = configureContainer();
   initializePassportStrategies(passport, container);
 
   httpServer
     .use((req, res, next) => {
-      const route = (req.route?.path ?? req.path) ?? "unknown";
+      const route = req.route?.path ?? req.path ?? "unknown";
 
       if (route.includes("/api")) {
         const start = process.hrtime();

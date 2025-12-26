@@ -12,7 +12,6 @@ import { FloorStore } from "@/state/floor.store";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { IFloorService } from "@/services/interfaces/floor.service.interface";
-import { IdType } from "@/shared.constants";
 import { IPrinterGroupService } from "@/services/interfaces/printer-group.service.interface";
 import { MoonrakerType, OctoprintType } from "@/services/printer-api.interface";
 import { z } from "zod";
@@ -33,7 +32,6 @@ export class YamlService {
     private readonly userService: IUserService,
     private readonly roleService: IRoleService,
     private readonly settingsStore: SettingsStore,
-    private readonly isTypeormMode: boolean,
   ) {
     this.logger = loggerFactory(YamlService.name);
   }
@@ -82,7 +80,7 @@ export class YamlService {
         // Ensure the type matches the database it came from (1.6.0+)
         for (const printer of floor.printers) {
           if (typeof printer.printerId === "string") {
-            printer.printerId = parseInt(printer.printerId);
+            printer.printerId = Number.parseInt(printer.printerId);
           }
         }
       }
@@ -113,7 +111,7 @@ export class YamlService {
     const { updateByNameGroups, insertGroups } = await this.analyseUpsertGroups(importData.groups ?? []);
 
     this.logger.log(`Performing pure insert printers (${insertPrinters.length} printers)`);
-    const printerIdMap: { [k: IdType]: IdType } = {};
+    const printerIdMap: { [k: number]: number } = {};
     for (const newPrinter of insertPrinters) {
       const state = await this.printerService.create({ ...newPrinter });
       if (!newPrinter.id) {
@@ -126,10 +124,8 @@ export class YamlService {
     for (const updatePrinterSpec of updateByPropertyPrinters) {
       const updateId = updatePrinterSpec.printerId;
       const updatedPrinter = updatePrinterSpec.value;
-      if (typeof updateId === "string" && this.isTypeormMode) {
-        throw new Error("Cannot update a printer by string id in SQLite mode");
-      } else if (typeof updateId === "number" && !this.isTypeormMode) {
-        throw new Error("Cannot update a printer by number id in MongoDB mode");
+      if (typeof updateId === "string") {
+        throw new Error("Cannot update a printer by string id in sqlite mode");
       }
 
       const originalPrinterId = updatedPrinter.id;
@@ -145,9 +141,9 @@ export class YamlService {
     }
 
     this.logger.log(`Performing pure create floors (${insertFloors.length} floors)`);
-    const floorIdMap: { [k: IdType]: IdType } = {};
+    const floorIdMap: { [k: number]: number } = {};
     for (const newFloor of insertFloors) {
-      const originalFloorId = newFloor.id as IdType;
+      const originalFloorId = newFloor.id as number;
       delete newFloor.id;
 
       // Replace printerIds with newly mapped IDs
@@ -177,10 +173,8 @@ export class YamlService {
     for (const updateFloorSpec of updateByPropertyFloors) {
       const updateId = updateFloorSpec.floorId;
 
-      if (typeof updateId === "string" && this.isTypeormMode) {
-        throw new Error("Cannot update a floor by string id in SQLite mode");
-      } else if (typeof updateId === "number" && !this.isTypeormMode) {
-        throw new Error("Cannot update a floor by number id in MongoDB mode");
+      if (typeof updateId === "string") {
+        throw new Error("Cannot update a floor by string id in sqlite mode");
       }
 
       const updatedFloor = updateFloorSpec.value;
@@ -218,7 +212,7 @@ export class YamlService {
         name: group.name,
       });
       for (const printer of group.printers) {
-        const knownPrinterId = printerIdMap[printer.printerId] satisfies IdType | undefined;
+        const knownPrinterId = printerIdMap[printer.printerId] satisfies number | undefined;
         // If the ID was not mapped, this position is considered discarded
         if (!knownPrinterId) continue;
         await this.printerGroupService.addPrinterToGroup(createdGroup.id, knownPrinterId);
@@ -295,23 +289,14 @@ export class YamlService {
         user.id = Number.parseInt(user.id);
       }
 
-      let roleIds: IdType[] = [];
-      if (user.roles && user.roles.length > 0) {
-        // Support both role names (new format) and role IDs (backward compatibility)
-        roleIds = user.roles
-          .map((roleNameOrId: string | IdType) => {
-            // If it's a role name (string like "ADMIN"), find the corresponding ID
-            const role = allRoles.find((r) => r.name === roleNameOrId);
-            return role?.id;
-          })
-          .filter((id: IdType | undefined) => id !== undefined);
-      }
+      // Filter to valid role names only
+      const roleNames = (user.roles ?? []).filter((roleName: string) => allRoles.some((r) => r.name === roleName));
 
       // Register user with a temporary password (will be replaced with actual hash)
       await this.userService.register({
         username: user.username,
         password: "temporary-password-to-be-replaced",
-        roles: roleIds,
+        roles: roleNames,
         isRootUser: user.isRootUser ?? false,
         isDemoUser: user.isDemoUser ?? false,
         isVerified: user.isVerified ?? false,
@@ -321,7 +306,7 @@ export class YamlService {
       // Update the password hash directly (without re-hashing)
       await this.userService.updatePasswordHashUnsafeByUsername(user.username, user.passwordHash);
     }
-    this.logger.log(`Imported ${ users.length } users`);
+    this.logger.log(`Imported ${users.length} users`);
   }
 
   async validateSystemTablesEmpty(importSpec: YamlExportSchema) {
@@ -344,7 +329,7 @@ export class YamlService {
     }
 
     if (errors.length > 0) {
-      throw new Error(`Import validation failed:\n${ errors.join("\n") }`);
+      throw new Error(`Import validation failed:\n${errors.join("\n")}`);
     }
   }
 
@@ -368,7 +353,7 @@ export class YamlService {
             }
             updateByPropertyPrinters.push({
               strategy: "name",
-              printerId: this.isTypeormMode ? parseInt(ids[foundIndex]) : ids[foundIndex],
+              printerId: Number.parseInt(ids[foundIndex]),
               value: printer,
             });
             break;
@@ -382,7 +367,7 @@ export class YamlService {
             }
             updateByPropertyPrinters.push({
               strategy: "url",
-              printerId: this.isTypeormMode ? parseInt(ids[foundIndex]) : ids[foundIndex],
+              printerId: Number.parseInt(ids[foundIndex]),
               value: printer,
             });
             break;
@@ -422,7 +407,7 @@ export class YamlService {
             }
             updateByPropertyFloors.push({
               strategy: "name",
-              floorId: this.isTypeormMode ? parseInt(ids[foundIndex]) : ids[foundIndex],
+              floorId: Number.parseInt(ids[foundIndex]),
               value: floor,
             });
             break;
@@ -436,7 +421,7 @@ export class YamlService {
             }
             updateByPropertyFloors.push({
               strategy: "floor",
-              floorId: this.isTypeormMode ? Number.parseInt(ids[foundIndex]) : ids[foundIndex],
+              floorId: Number.parseInt(ids[foundIndex]),
               value: floor,
             });
             break;
@@ -455,7 +440,7 @@ export class YamlService {
   }
 
   async analyseUpsertGroups(upsertGroups: any[]) {
-    if (!this.isTypeormMode || !upsertGroups?.length) {
+    if (!upsertGroups?.length) {
       return {
         updateByNameGroups: [],
         insertGroups: [],
@@ -477,7 +462,7 @@ export class YamlService {
         }
         updateByNameGroups.push({
           strategy: "name",
-          groupId: parseInt(ids[foundIndex]),
+          groupId: Number.parseInt(ids[foundIndex]),
           value: group,
         });
         break;
@@ -495,15 +480,12 @@ export class YamlService {
   async exportYaml(options: z.infer<typeof exportPrintersFloorsYamlSchema>) {
     const input = await validateInput(options, exportPrintersFloorsYamlSchema);
 
-    if (!this.isTypeormMode) {
-      input.exportGroups = false;
-    }
-    const {exportFloors, exportPrinters, exportFloorGrid, exportGroups, exportSettings, exportUsers} = input;
+    const { exportFloors, exportPrinters, exportFloorGrid, exportGroups, exportSettings, exportUsers } = input;
 
     const dumpedObject = {
       version: process.env.npm_package_version,
       exportedAt: new Date(),
-      databaseType: this.isTypeormMode ? "sqlite" : "mongo",
+      databaseType: "sqlite",
       config: input,
       printers: undefined as any,
       floors: undefined as any,
@@ -517,7 +499,7 @@ export class YamlService {
       const printers = await this.printerService.list();
       dumpedObject.printers = printers.map((p) => {
         const printerId = p.id;
-        const {apiKey} = this.printerCache.getLoginDto(printerId);
+        const { apiKey } = this.printerCache.getLoginDto(printerId);
         return {
           id: printerId,
           disabledReason: p.disabledReason,
@@ -556,7 +538,7 @@ export class YamlService {
       });
     }
 
-    if (exportGroups && this.isTypeormMode) {
+    if (exportGroups) {
       const groups = await this.printerGroupService.listGroups();
       dumpedObject.groups = groups.map((g) => {
         return {
@@ -572,18 +554,15 @@ export class YamlService {
     }
 
     if (exportSettings) {
-      const settings = this.settingsStore.getSettings();
-      dumpedObject.settings = settings;
+      dumpedObject.settings = this.settingsStore.getSettings();
     }
 
     if (exportUsers) {
-      // For SQLite mode, load users with roles relation; for MongoDB, just list users
       const users = await this.userService.listUsers(1000);
-      const allRoles = this.roleService.roles;
 
       dumpedObject.users = users.map((u) => {
         const userDto = this.userService.toDto(u);
-        const userObj: any = {
+        return {
           id: userDto.id,
           username: userDto.username,
           isDemoUser: userDto.isDemoUser,
@@ -592,20 +571,8 @@ export class YamlService {
           needsPasswordChange: userDto.needsPasswordChange,
           passwordHash: u.passwordHash,
           createdAt: userDto.createdAt,
+          roles: userDto.roles,
         };
-
-
-        // Include roles as role names for both SQLite and MongoDB
-        if (userDto.roles && userDto.roles.length > 0) {
-          userObj.roles = userDto.roles
-            .map((roleId) => {
-              const role = allRoles.find((r) => r.id.toString() === roleId.toString());
-              return role?.name;
-            })
-            .filter((name) => name !== undefined);
-        }
-
-        return userObj;
       });
     }
 

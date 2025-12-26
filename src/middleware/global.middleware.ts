@@ -5,12 +5,10 @@ import { SettingsStore } from "@/state/settings.store";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IConfigService } from "@/services/core/config.service";
 import { IRoleService } from "@/services/interfaces/role-service.interface";
-import { UserRole } from "@/entities/user-role.entity";
-import { MongoIdType } from "@/shared.constants";
 
 export const validateWizardCompleted = inject(
   (configService: IConfigService, settingsStore: SettingsStore, loggerFactory: ILoggerFactory) =>
-    async (req: Request, res: Response, next: NextFunction) => {
+    async (req: Request, _res: Response, next: NextFunction) => {
       const logger = loggerFactory(validateWizardCompleted.name);
       const isDemoMode = configService.isDemoMode();
       if (isDemoMode || !!settingsStore.getWizardSettings()?.wizardCompleted) {
@@ -27,7 +25,6 @@ export const validateWizardCompleted = inject(
       ];
       if (allowedPaths.includes(req.path) || !req.path.startsWith("/api")) {
         next();
-        return;
       } else {
         logger.error("Wizard not completed", req.path);
         throw new ForbiddenError(
@@ -38,20 +35,15 @@ export const validateWizardCompleted = inject(
 );
 
 export const interceptRoles = inject(
-  (settingsStore: SettingsStore, roleService: IRoleService, isTypeormMode: boolean) =>
-    async (req: Request, res: Response, next: NextFunction) => {
+  (settingsStore: SettingsStore, roleService: IRoleService) =>
+    async (req: Request, _res: Response, next: NextFunction) => {
       const serverSettings = settingsStore.getSettings();
 
-      if (isTypeormMode) {
-        req.roles = (req.user?.roles as UserRole[] ?? []).map((r: UserRole) => r.roleId);
-      } else {
-        req.roles = req.user?.roles as MongoIdType[];
-      }
+      req.roles = req.user?.roles ?? [];
 
       // If server settings are not set, we can't determine the default role
       if (serverSettings && !req.user) {
-        const roleName = await roleService.getAppDefaultRole();
-        req.roles = [roleName];
+        req.roles = await roleService.getAppDefaultRoleNames();
       }
 
       next();

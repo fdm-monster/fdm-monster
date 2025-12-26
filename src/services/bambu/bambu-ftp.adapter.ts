@@ -25,7 +25,7 @@ export class BambuFtpAdapter {
   constructor(
     private readonly settingsStore: SettingsStore,
     loggerFactory: ILoggerFactory,
-    private readonly eventEmitter2: EventEmitter2
+    private readonly eventEmitter2: EventEmitter2,
   ) {
     this.settingsStore = settingsStore;
     this.eventEmitter2 = eventEmitter2;
@@ -68,11 +68,11 @@ export class BambuFtpAdapter {
         port: 990,
         user: "bblp",
         password: sanitizedAccessCode,
-        secure: true,  // Use explicit TLS (FTPES/AUTH TLS)
+        secure: true, // Use explicit TLS (FTPES/AUTH TLS)
         secureOptions: {
           rejectUnauthorized: false,
-          minVersion: 'TLSv1.2',
-          maxVersion: 'TLSv1.3',
+          minVersion: "TLSv1.2",
+          maxVersion: "TLSv1.3",
         },
       });
 
@@ -138,11 +138,7 @@ export class BambuFtpAdapter {
   /**
    * Upload file to printer
    */
-  async uploadFile(
-    fileBuffer: Buffer,
-    filename: string,
-    progressToken?: string,
-  ): Promise<void> {
+  async uploadFile(fileBuffer: Buffer, filename: string, progressToken?: string): Promise<void> {
     this.ensureConnected();
 
     const remotePath = `/sdcard/${filename}`;
@@ -156,14 +152,10 @@ export class BambuFtpAdapter {
       // Track progress
       if (progressToken) {
         this.ftpClient!.trackProgress((info) => {
-          this.eventEmitter2.emit(
-            `${uploadProgressEvent(progressToken)}`,
-            progressToken,
-            {
-              loaded: info.bytes,
-              total: info.bytesOverall,
-            },
-          );
+          this.eventEmitter2.emit(`${uploadProgressEvent(progressToken)}`, progressToken, {
+            loaded: info.bytes,
+            total: info.bytesOverall,
+          });
         });
       }
 
@@ -181,11 +173,7 @@ export class BambuFtpAdapter {
       this.logger.log(`File uploaded successfully: ${filename}`);
     } catch (error) {
       if (progressToken) {
-        this.eventEmitter2.emit(
-          `${uploadFailedEvent(progressToken)}`,
-          progressToken,
-          (error as Error)?.message,
-        );
+        this.eventEmitter2.emit(`${uploadFailedEvent(progressToken)}`, progressToken, (error as Error)?.message);
       }
       this.logger.error(`Upload failed for ${filename}:`, error);
       throw error;
@@ -315,7 +303,8 @@ export class BambuFtpAdapter {
 
     // Validate format: IP address or hostname
     const ipv4Pattern = /^(\d{1,3}\.){3}\d{1,3}$/;
-    const hostnamePattern = /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+    const hostnamePattern =
+      /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 
     if (!ipv4Pattern.test(trimmed) && !hostnamePattern.test(trimmed)) {
       throw new Error("Invalid host format. Must be a valid IP address or hostname");

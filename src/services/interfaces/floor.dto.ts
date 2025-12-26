@@ -1,34 +1,32 @@
-import { IdType } from "@/shared.constants";
-
-export class PositionDto<KeyType = IdType> {
+export class PositionDto {
   x: number;
   y: number;
-  printerId: KeyType;
-  floorId: KeyType;
+  printerId: number;
+  floorId: number;
 }
 
-export class CreatePositionDto<KeyType> {
+export class CreatePositionDto {
   x: number;
   y: number;
-  printerId: KeyType;
-  floorId?: KeyType;
+  printerId: number;
+  floorId?: number;
 }
 
-export class FloorDto<KeyType = IdType> {
-  id: KeyType;
+export class FloorDto {
+  id: number;
   name: string;
   floor: number;
-  printers: PositionDto<KeyType>[];
+  printers: PositionDto[];
 }
 
-export class CreateFloorDto<KeyType> {
-  printers?: CreatePositionDto<KeyType>[];
+export class CreateFloorDto {
+  printers?: CreatePositionDto[];
   name: string;
   floor: number;
 }
 
-export class UpdateFloorDto<KeyType> {
-  printers?: PositionDto<KeyType>[];
+export class UpdateFloorDto {
+  printers?: PositionDto[];
   name?: string;
   floor?: number;
 }

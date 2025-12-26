@@ -1,5 +1,3 @@
-import { IdType } from "@/shared.constants";
-
 export const octoprintWsMessages = {
   connected: "connected",
   reauthRequired: "reauthRequired",
@@ -30,9 +28,9 @@ export const messages = {
 
 export type WsMessage = keyof typeof messages;
 
-export class OctoPrintEventDto<K extends WsMessage = WsMessage, T = any, I extends IdType = IdType> {
+export class OctoPrintEventDto<K extends WsMessage = WsMessage, T = any> {
   event: K;
   payload: T;
-  printerId: I;
+  printerId: number;
   printerType: 0;
 }
