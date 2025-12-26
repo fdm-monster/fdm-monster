@@ -13,7 +13,7 @@ RUN yarn run build
 FROM node:22-bookworm-slim AS production
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y ca-certificates curl
+RUN apt-get update && apt-get install -y ca-certificates curl iputils-ping avahi-utils
 
 RUN yarn global add pm2
 COPY .yarn/releases ./.yarn/releases
