@@ -157,10 +157,18 @@ export class PrinterSocketStore {
       return;
     }
 
-    // Create a new socket if it doesn't exist
+    // Create a new socket if it doesn't exist, or if printer type changed
     if (foundAdapter) {
-      foundAdapter.close();
-      this.logger.log(`Closing printer socket for update`);
+      // Check if printer type changed - if so, we need a new adapter
+      if (foundAdapter.printerType !== printer.printerType) {
+        this.logger.log(`Printer type changed from ${foundAdapter.printerType} to ${printer.printerType}. Creating new socket adapter`);
+        foundAdapter.close();
+        foundAdapter = this.socketFactory.createInstance(printer.printerType);
+        this.printerSocketAdaptersById.set(id, foundAdapter);
+      } else {
+        foundAdapter.close();
+        this.logger.log(`Closing printer socket for update`);
+      }
     } else {
       foundAdapter = this.socketFactory.createInstance(printer.printerType);
       this.printerSocketAdaptersById.set(id, foundAdapter);
