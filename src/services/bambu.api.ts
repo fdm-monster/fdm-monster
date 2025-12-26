@@ -213,6 +213,9 @@ export class BambuApi implements IPrinterApi {
     // Get file size from the temp file
     const stats = statSync(tempPath);
 
+    // Extract filename from path for Content-Disposition header
+    const filename = remotePath.split("/").pop() || "download";
+
     // Create an AxiosResponse-like structure
     const response: AxiosResponse<NodeJS.ReadableStream> = {
       data: stream,
@@ -221,6 +224,7 @@ export class BambuApi implements IPrinterApi {
       headers: {
         "content-type": "application/octet-stream",
         "content-length": String(stats.size),
+        "content-disposition": `attachment; filename="${filename}"`,
       },
       config: {
         headers: {} as any,
