@@ -8,8 +8,8 @@ export class KeyDiffCache<T> {
     return Array.from(this.keyValueStore.values());
   }
 
-  public async getAllKeyValues() {
-    return this.keyValueStore;
+  public async getAllKeyValues(): Promise<Record<number, T>> {
+    return Object.fromEntries(this.keyValueStore);
   }
 
   public async getValue(key: number): Promise<T | undefined> {

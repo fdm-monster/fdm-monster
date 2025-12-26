@@ -43,7 +43,7 @@ export class PrinterSocketStore {
 
   getSocketStatesById() {
     const socketStatesById: { [k: number]: PrinterSocketState } = {};
-    Object.values(this.printerSocketAdaptersById).forEach((s) => {
+    this.printerSocketAdaptersById.forEach((s) => {
       if (!s.printerId) {
         return;
       }
@@ -72,11 +72,11 @@ export class PrinterSocketStore {
       }
     }
 
-    this.logger.log(`Loaded ${Object.keys(this.printerSocketAdaptersById).length} printer sockets`);
+    this.logger.log(`Loaded ${this.printerSocketAdaptersById.size} printer sockets`);
   }
 
   listPrinterSockets() {
-    return Object.values(this.printerSocketAdaptersById);
+    return Array.from(this.printerSocketAdaptersById.values());
   }
 
   reconnectPrinterAdapter(id: number) {
@@ -102,7 +102,7 @@ export class PrinterSocketStore {
     const socketStates: { [k: string]: number } = {};
     const apiStates: { [k: string]: number } = {};
     const promisesReauth = [];
-    for (const socket of Object.values(this.printerSocketAdaptersById)) {
+    for (const socket of this.printerSocketAdaptersById.values()) {
       try {
         if (socket.printerType === OctoprintType && (socket as OctoprintWebsocketAdapter).needsReauth()) {
           reauthRequested++;
@@ -119,7 +119,7 @@ export class PrinterSocketStore {
     await Promise.all(promisesReauth);
 
     const promisesOpenSocket: any[] = [];
-    for (const socket of Object.values(this.printerSocketAdaptersById)) {
+    for (const socket of this.printerSocketAdaptersById.values()) {
       try {
         if (socket.needsSetup() || socket.needsReopen()) {
           socketSetupRequested++;

@@ -30,7 +30,7 @@ export class FileCache {
 
   updateCacheFileRefCount() {
     let totalFiles = 0;
-    for (const storage of Object.values(this.printerFileStorage)) {
+    for (const storage of this.printerFileStorage.values()) {
       totalFiles += storage?.length || 0;
     }
 

@@ -3,8 +3,6 @@ import { CloseEvent, Data, ErrorEvent, Event as WsEvent, WebSocket } from "ws";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 
-export type WsProtocol = "ws" | "wss";
-
 export abstract class WebsocketAdapter {
   socket?: WebSocket;
   protected logger: LoggerService;
