@@ -5,8 +5,7 @@
  * It's designed for testing the bambu-js client library and printer integrations.
  *
  * Features:
- * - Embedded MQTT broker using aedes (no external broker needed)
- * - FTP server on port 990 (configurable) for file operations
+  * - FTP server on port 990 (configurable) for file operations
  * - MQTT client that publishes printer state to device/{serial}/report
  * - Simulates a print job with progress, temperatures, and state changes
  * - Responds to MQTT commands on device/{serial}/request
@@ -20,22 +19,14 @@
  *
  * Defaults:
  *   FTP Port: 990
- *   MQTT Port: 8883 (embedded broker)
+ *   MQTT Port: 8883 (external broker)
  *   Serial: 01P00A000000001
  *   Access Code: 12345678
  *   Username: bblp (standard for Bambu Lab printers)
  *
  * Prerequisites:
- *   - None! The MQTT broker is embedded and will start automatically
+ *   - MQTT Broker on 8883 (mqtts)
  *
- * Testing with bambu-js:
- *   const printer = PrinterController.create({
- *     model: 'P1S',
- *     host: 'localhost',
- *     accessCode: '12345678',
- *     serial: '01P00A000000001'
- *   });
- *   await printer.connect();
  */
 
 import FtpSrv from "ftp-srv";
@@ -45,14 +36,13 @@ import fs from "node:fs";
 import os from "node:os";
 import selfsigned from "selfsigned";
 import { SecureVersion } from "node:tls";
-import Aedes from "aedes";
-import { createServer } from "node:net";
 
 const DEFAULT_PORT = 990;
 const DEFAULT_MQTT_PORT = 8883;
 const DEFAULT_SERIAL = "01P00A000000001";
 const DEFAULT_ACCESS_CODE = "12345678";
 const MESSAGE_INTERVAL = 1000;
+const DEFAULT_USERNAME ='bblp';
 
 const port = process.argv[2] ? Number.parseInt(process.argv[2]) : DEFAULT_PORT;
 const mqttPort = process.argv[3] ? Number.parseInt(process.argv[3]) : DEFAULT_MQTT_PORT;
@@ -62,37 +52,11 @@ const accessCode = process.argv[5] || DEFAULT_ACCESS_CODE;
 console.log(`[BAMBU MOCK] Starting Bambu Lab mock server`);
 console.log(`[BAMBU MOCK] Configuration:`);
 console.log(`[BAMBU MOCK]   FTP Port: ${port}`);
-console.log(`[BAMBU MOCK]   Embedded MQTT Broker: localhost:${mqttPort}`);
+console.log(`[BAMBU MOCK]   MQTT Broker expected at: mqtts://localhost:${mqttPort}`);
 console.log(`[BAMBU MOCK]   Serial: ${serial}`);
 console.log(`[BAMBU MOCK]   Access Code: ${accessCode}`);
 console.log(`[BAMBU MOCK]   Username: bblp`);
 
-// Initialize embedded MQTT broker
-const aedes = new Aedes({
-
-});
-const mqttServer = createServer(aedes.handle);
-
-mqttServer.listen(mqttPort, () => {
-  console.log(`[BAMBU MOCK MQTT] Embedded MQTT broker started on port ${mqttPort}`);
-});
-
-aedes.on('client', (client) => {
-  console.log(`[BAMBU MOCK MQTT] Client connected: ${client.id}`);
-});
-
-aedes.on('clientDisconnect', (client) => {
-  console.log(`[BAMBU MOCK MQTT] Client disconnected: ${client.id}`);
-});
-
-aedes.on('publish', (packet, client) => {
-  if (client) {
-    // Only log non-system messages
-    if (!packet.topic.startsWith('$SYS')) {
-      console.log(`[BAMBU MOCK MQTT] Message published to ${packet.topic} by ${client.id}`);
-    }
-  }
-});
 
 const ftpDir = path.join(os.tmpdir(), "bambu-mock-ftp", serial);
 const sdcardDir = path.join(ftpDir, "sdcard");
@@ -184,8 +148,11 @@ ftpServer.listen().then(() => {
   console.log(`[BAMBU MOCK FTP] FTP directory: ${ftpDir}`);
 });
 
-const mqttClient = mqtt.connect(`mqtt://localhost:${mqttPort}`, {
+const mqttClient = mqtt.connect(`mqtts://localhost:${mqttPort}`, {
   clientId: `bambu_mock_${serial}_${Date.now()}`,
+  username: DEFAULT_USERNAME,
+  password: accessCode,
+  rejectUnauthorized: false
 });
 
 mqttClient.on("connect", () => {
@@ -341,16 +308,6 @@ process.on("SIGINT", async () => {
     await mqttClient.endAsync();
   }
 
-  console.log("[BAMBU MOCK MQTT] Closing embedded MQTT broker...");
-  await new Promise<void>((resolve) => {
-    mqttServer.close(() => {
-      aedes.close(() => {
-        console.log("[BAMBU MOCK MQTT] Embedded MQTT broker closed");
-        resolve();
-      });
-    });
-  });
-
   console.log("[BAMBU MOCK FTP] Closing FTP server...");
   await ftpServer.close();
 
@@ -364,14 +321,6 @@ process.on("SIGTERM", async () => {
   if (mqttClient.connected) {
     await mqttClient.endAsync();
   }
-
-  await new Promise<void>((resolve) => {
-    mqttServer.close(() => {
-      aedes.close(() => {
-        resolve();
-      });
-    });
-  });
 
   await ftpServer.close();
   process.exit(0);

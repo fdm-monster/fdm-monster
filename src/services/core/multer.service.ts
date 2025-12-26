@@ -1,16 +1,15 @@
-import multer, { diskStorage, FileFilterCallback, memoryStorage } from "multer";
-import { extname, join } from "path";
-import { createWriteStream, existsSync, lstatSync, mkdirSync, readdirSync } from "fs";
+import multer, { diskStorage, memoryStorage } from "multer";
+import { extname, join } from "node:path";
+import { existsSync, readdirSync, rmSync } from "node:fs";
 import { superRootPath } from "@/utils/fs.utils";
 import { AppConstants } from "@/server.constants";
 import { FileUploadTrackerCache } from "@/state/file-upload-tracker.cache";
 import { Request, Response } from "express";
-import { HttpClientFactory } from "@/services/core/http-client.factory";
 import { IdType } from "@/shared.constants";
-import { rmSync } from "node:fs";
 import { errorSummary } from "@/utils/error.utils";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
+import { ValidationException } from "@/exceptions/runtime.exceptions";
 
 export class MulterService {
   private readonly logger: LoggerService;
@@ -18,7 +17,6 @@ export class MulterService {
   constructor(
     loggerFactory: ILoggerFactory,
     private readonly fileUploadTrackerCache: FileUploadTrackerCache,
-    private readonly httpClientFactory: HttpClientFactory,
   ) {
     this.logger = loggerFactory(MulterService.name);
   }
@@ -39,7 +37,7 @@ export class MulterService {
       try {
         rmSync(join(fileStoragePath, file));
       } catch (error) {
-        this.logger.error(`Could not clear upload file in temporary folder ${errorSummary(error)}`);
+        this.logger.error(`Could not clear upload file in temporary folder ${ errorSummary(error) }`);
       }
     }
   }
@@ -52,92 +50,69 @@ export class MulterService {
     }
   }
 
-  getNewestFile(collection: string) {
-    const dirPath = this.collectionPath(collection);
-    const files = this.orderRecentFiles(dirPath);
-    const latestFile = files.length ? files[0] : undefined;
-    return latestFile ? join(dirPath, latestFile.file) : undefined;
-  }
-
   fileExists(downloadFilename: string, collection: string) {
     const downloadPath = join(superRootPath(), AppConstants.defaultFileStorageFolder, collection, downloadFilename);
     return existsSync(downloadPath);
   }
 
-  async downloadFile(downloadUrl: string, downloadFilename: string, collection: string) {
-    const downloadFolder = join(superRootPath(), AppConstants.defaultFileStorageFolder, collection);
-    if (!existsSync(downloadFolder)) {
-      mkdirSync(downloadFolder, { recursive: true });
-    }
-    const downloadPath = join(superRootPath(), AppConstants.defaultFileStorageFolder, collection, downloadFilename);
-    const fileStream = createWriteStream(downloadPath);
-
-    const defaultHttpClient = this.httpClientFactory.createDefaultClient();
-    const res = await defaultHttpClient.get(downloadUrl);
-    return await new Promise((resolve, reject) => {
-      fileStream.write(res.data);
-      fileStream.on("error", (err) => {
-        return reject(err);
-      });
-      fileStream.on("finish", async () => {
-        return resolve(null);
-      });
-      fileStream.on("close", async () => {
-        return resolve(null);
-      });
-      resolve(null);
-    });
-  }
-
   getMulterGCodeFileFilter(storeAsFile = true) {
-    return this.getMulterFileFilter(AppConstants.defaultAcceptedGcodeExtensions, storeAsFile);
+    return this.getMulterFileFilter(storeAsFile);
   }
 
   async multerLoadFileAsync(req: Request, res: Response, fileExtensions: string[], storeAsFile = true) {
-    return await new Promise<Express.Multer.File[]>((resolve, reject) =>
-      this.getMulterFileFilter(fileExtensions, storeAsFile)(req, res, (err) => {
-        if (err) {
-          return reject(err);
-        }
-
+    const files = await new Promise<Express.Multer.File[]>((resolve, reject) =>
+      this.getMulterFileFilter(storeAsFile)(req, res, (err) => {
+        if (err) return reject(err);
         resolve(req.files as Express.Multer.File[]);
       }),
     );
+
+    this.validateUploadedFiles(files, fileExtensions, storeAsFile);
+
+    return files;
   }
 
-  getMulterFileFilter(fileExtensions: string[], storeAsFile = true) {
+  /**
+   * Validates uploaded files against allowed extensions.
+   * Removes invalid files if stored on disk and throws a ValidationException.
+   */
+  private validateUploadedFiles(
+    files: Express.Multer.File[] | undefined,
+    allowedExtensions: string[],
+    storeAsFile: boolean,
+  ) {
+    if (!files?.length || !allowedExtensions?.length) return;
+
+    for (const file of files) {
+      const ext = extname(file.originalname)?.toLowerCase();
+      if (!allowedExtensions.includes(ext)) {
+        // Remove invalid file if stored on disk
+        if (storeAsFile && file.path && existsSync(file.path)) {
+          try {
+            rmSync(file.path);
+          } catch (e) {
+            this.logger.error(`Could not remove invalid file ${ errorSummary(e) }`);
+          }
+        }
+
+        throw new ValidationException({
+          error: `Only files with extensions ${ allowedExtensions.join(", ") } are allowed`,
+        });
+      }
+    }
+  }
+
+  getMulterFileFilter(storeAsFile = true) {
     return multer({
       storage: storeAsFile
         ? diskStorage({
-            destination: join(superRootPath(), AppConstants.defaultFileStorageFolder),
-          })
+          destination: join(superRootPath(), AppConstants.defaultFileStorageFolder),
+        })
         : memoryStorage(),
-      fileFilter: this.multerFileFilter(fileExtensions),
     }).any();
-  }
-
-  multerFileFilter(extensions: string[]) {
-    return (_: any, file: Express.Multer.File, callback: FileFilterCallback) => {
-      const ext = extname(file.originalname);
-      if (extensions?.length && !extensions.includes(ext?.toLowerCase())) {
-        return callback(new Error(`Only files with extensions ${extensions} are allowed`));
-      }
-      return callback(null, true);
-    };
   }
 
   getSessions() {
     return this.fileUploadTrackerCache.getUploads();
-  }
-
-  private orderRecentFiles = (dir: string): { file: any; mtime: Date }[] => {
-    return readdirSync(dir)
-      .filter((file) => lstatSync(join(dir, file)).isFile())
-      .map((file) => ({ file, mtime: lstatSync(join(dir, file)).mtime }))
-      .sort((a, b) => b.mtime.getTime() - a.mtime.getTime());
-  };
-
-  private collectionPath(collection: string): string {
-    return join(superRootPath(), AppConstants.defaultFileStorageFolder, collection);
   }
 }

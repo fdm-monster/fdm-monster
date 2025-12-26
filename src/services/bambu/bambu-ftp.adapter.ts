@@ -4,9 +4,11 @@ import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { Client, FileInfo } from "basic-ftp";
 import { uploadDoneEvent, uploadFailedEvent, uploadProgressEvent } from "@/constants/event.constants";
-import { writeFileSync, unlinkSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { writeFileSync, unlinkSync, createReadStream, mkdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
+import { Readable } from "node:stream";
+import { AppConstants } from "@/server.constants";
+import { superRootPath } from "@/utils/fs.utils";
 
 /**
  * Adapter for Bambu Lab FTP file operations
@@ -120,6 +122,20 @@ export class BambuFtpAdapter {
   }
 
   /**
+   * Get the file storage path for temporary files
+   */
+  private getFileStoragePath(filename: string): string {
+    const storagePath = join(superRootPath(), AppConstants.defaultFileStorageFolder);
+
+    // Ensure directory exists
+    if (!existsSync(storagePath)) {
+      mkdirSync(storagePath, { recursive: true });
+    }
+
+    return join(storagePath, filename);
+  }
+
+  /**
    * Upload file to printer
    */
   async uploadFile(
@@ -130,7 +146,7 @@ export class BambuFtpAdapter {
     this.ensureConnected();
 
     const remotePath = `/sdcard/${filename}`;
-    const tempPath = join(tmpdir(), `bambu-upload-${Date.now()}-${filename}`);
+    const tempPath = this.getFileStoragePath(`bambu-upload-${Date.now()}-${filename}`);
 
     try {
       // Write buffer to temp file
@@ -185,7 +201,7 @@ export class BambuFtpAdapter {
   }
 
   /**
-   * Download file from printer
+   * Download file from printer to local path
    */
   async downloadFile(remotePath: string, localPath: string): Promise<void> {
     this.ensureConnected();
@@ -195,6 +211,49 @@ export class BambuFtpAdapter {
       await this.ftpClient!.downloadTo(localPath, remotePath);
       this.logger.log(`File downloaded successfully: ${remotePath}`);
     } catch (error) {
+      this.logger.error(`Download failed for ${remotePath}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Download file from printer and return as a readable stream
+   * Downloads to the media folder first, then returns a read stream
+   */
+  async downloadFileAsStream(remotePath: string): Promise<{ stream: Readable; tempPath: string; cleanup: () => void }> {
+    this.ensureConnected();
+
+    const filename = remotePath.split("/").pop() || "download";
+    const tempPath = this.getFileStoragePath(`bambu-download-${Date.now()}-${filename}`);
+
+    try {
+      this.logger.log(`Downloading ${remotePath} to temp file for streaming`);
+      await this.ftpClient!.downloadTo(tempPath, remotePath);
+      this.logger.log(`File downloaded successfully: ${remotePath}`);
+
+      const stream = createReadStream(tempPath);
+
+      const cleanup = () => {
+        try {
+          unlinkSync(tempPath);
+          this.logger.debug(`Cleaned up temp file: ${tempPath}`);
+        } catch (cleanupError) {
+          this.logger.warn(`Failed to cleanup temp file ${tempPath}:`, cleanupError);
+        }
+      };
+
+      // Auto-cleanup when stream ends or errors
+      stream.on("close", cleanup);
+      stream.on("error", cleanup);
+
+      return { stream, tempPath, cleanup };
+    } catch (error) {
+      // Clean up temp file on error
+      try {
+        unlinkSync(tempPath);
+      } catch {
+        // Ignore cleanup errors
+      }
       this.logger.error(`Download failed for ${remotePath}:`, error);
       throw error;
     }

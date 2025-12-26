@@ -19,6 +19,7 @@ export const AppConstants = {
   defaultPrinterThumbnailsStorage: "./media/printer-thumbnails",
   defaultFileUploadsStorage: "./media/file-uploads",
   defaultAcceptedGcodeExtensions: [".gcode", ".bgcode"],
+  defaultAcceptedBambuExtensions: [".gcode", ".3mf"],
   defaultServerPort: 4000,
   defaultMongoStringUnauthenticated: "mongodb://127.0.0.1:27017/fdm-monster",
   apiRoute: "/api",
@@ -103,3 +104,4 @@ export const AppConstants = {
   LOKI_TIMEOUT_SECONDS: "LOKI_TIMEOUT_SECONDS",
   LOKI_INTERVAL: "LOKI_INTERVAL"
 };
+

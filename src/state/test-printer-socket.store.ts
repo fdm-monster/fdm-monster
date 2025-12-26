@@ -13,6 +13,8 @@ import { captureException } from "@sentry/node";
 import { SOCKET_STATE } from "@/shared/dtos/socket-state.type";
 import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
 import { moonrakerEvent } from "@/services/moonraker/constants/moonraker.constants";
+import { bambuEvent } from "@/services/bambu/bambu-mqtt.adapter";
+import { prusaLinkEvent } from "@/services/prusa-link/constants/prusalink.constants";
 import { printerEvents } from "@/constants/event.constants";
 import { OctoPrintEventDto } from "@/services/octoprint/dto/octoprint-event.dto";
 import { z } from "zod";
@@ -65,6 +67,16 @@ export class TestPrinterSocketStore {
       moonrakerEvent(WsMessage.WS_CLOSED),
       moonrakerEvent(WsMessage.WS_OPENED),
       moonrakerEvent(WsMessage.WS_ERROR),
+      bambuEvent(WsMessage.WS_STATE_UPDATED),
+      bambuEvent(WsMessage.API_STATE_UPDATED),
+      bambuEvent(WsMessage.WS_CLOSED),
+      bambuEvent(WsMessage.WS_OPENED),
+      bambuEvent(WsMessage.WS_ERROR),
+      prusaLinkEvent(WsMessage.WS_STATE_UPDATED),
+      prusaLinkEvent(WsMessage.API_STATE_UPDATED),
+      prusaLinkEvent(WsMessage.WS_CLOSED),
+      prusaLinkEvent(WsMessage.WS_OPENED),
+      prusaLinkEvent(WsMessage.WS_ERROR),
     ];
     const listener = ({ event, payload, printerId }: OctoPrintEventDto) => {
       if (printerId !== correlationToken) {
