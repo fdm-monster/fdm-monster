@@ -73,11 +73,6 @@ export const AppConstants = {
   currentWizardVersion: 1,
   defaultClientMinimum: "1.13.0",
 
-  influxUrl: "INFLUX_URL",
-  influxToken: "INFLUX_TOKEN",
-  influxOrg: "INFLUX_ORG",
-  influxBucket: "INFLUX_BUCKET",
-
   // Websocket values
   defaultWebsocketHandshakeTimeout: 3000,
   defaultSocketThrottleRate: 1,
