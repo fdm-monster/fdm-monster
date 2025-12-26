@@ -9,6 +9,10 @@
 - Cleanup and remove unused permission table
 - Key-diff cache is now Map instead of Object
 
+## Fixes
+
+- Update printer now replaces old socket with new one
+
 # FDM Monster 1.9.4
 
 ## Fixes
