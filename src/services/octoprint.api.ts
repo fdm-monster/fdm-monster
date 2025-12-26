@@ -31,6 +31,10 @@ export class OctoprintApi implements IPrinterApi {
     return result.data?.server;
   }
 
+  async validateConnection(): Promise<void> {
+    await this.getVersion();
+  }
+
   async connect() {
     await this.client.sendConnectionCommand(this.login, this.client.connectCommand);
   }

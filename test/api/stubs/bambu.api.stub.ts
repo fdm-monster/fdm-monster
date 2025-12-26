@@ -97,6 +97,22 @@ export class BambuApiStub implements IPrinterApi {
     return response.version;
   }
 
+  async validateConnection(): Promise<void> {
+    // For Bambu stub, just test FTP connectivity like the real implementation
+    this.logger.debug("[STUB] Validating Bambu connection via FTP", this.logMeta());
+
+    try {
+      await this.ensureFtpConnected();
+      const files = await this.client.ftp.listFiles("/");
+      this.logger.debug(`[STUB] FTP connection successful - found ${files.length} directories`, this.logMeta());
+    } catch (ftpError) {
+      this.logger.debug(`[STUB] FTP validation failed: ${ftpError}`, this.logMeta());
+      throw new Error(`Bambu FTP connection failed: ${ftpError}`);
+    }
+
+    this.logger.log("[STUB] 🎉 Bambu connection validation completed successfully!", this.logMeta());
+  }
+
   async connect(): Promise<void> {
     await this.client.connect(this.printerLogin);
   }
