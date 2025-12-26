@@ -75,7 +75,7 @@ Thanks to the following parties for their financial support:
 
 | Tier 1 | Tier 2 | Tier 3 | Tier 4 | One time |
 |--------|--------|--------|--------|-----------|
-|  | [thatguymendel](https://github.com/thatguymendel) | | [doucettom](https://github.com/doucettom) | [th3dstudio](https://github.com/th3dstudio) |
+|  | [thatguymendel](https://github.com/thatguymendel) | [MrHitchcock](https://github.com/MrHitchcock) | [doucettom](https://github.com/doucettom) | [th3dstudio](https://github.com/th3dstudio) |
 
 
 ## Contributors ✨
