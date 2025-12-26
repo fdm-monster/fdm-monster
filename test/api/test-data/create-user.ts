@@ -20,20 +20,19 @@ export async function ensureTestUserCreated(
   isVerified = true,
   isRootUser = true,
 ): Promise<UserDto> {
-
   const roleRepo = getDatasource().getRepository(Role);
   const userRepo = getDatasource().getRepository(User);
   const userRoleRepo = getDatasource().getRepository(UserRole);
 
-  const roleId = (await roleRepo.findOneBy({name: roleName}))?.id;
+  const roleId = (await roleRepo.findOneBy({ name: roleName }))?.id;
   const roleIds = roleId ? [roleId] : [];
 
-  const foundUser = await userRepo.findOneBy({username: usernameIn});
-  const {username, password} = getUserData(usernameIn, passwordIn);
+  const foundUser = await userRepo.findOneBy({ username: usernameIn });
+  const { username, password } = getUserData(usernameIn, passwordIn);
   const hash = hashPassword(password);
 
   if (foundUser) {
-    await userRepo.update(foundUser.id, {passwordHash: hash, needsPasswordChange, isVerified, isRootUser});
+    await userRepo.update(foundUser.id, { passwordHash: hash, needsPasswordChange, isVerified, isRootUser });
     await userRoleRepo.upsert(
       roleIds.map((r) => ({
         userId: foundUser.id,
@@ -77,7 +76,7 @@ export async function ensureTestUserCreated(
     },
   );
 
-  const finalFoundUser = await userRepo.findOneBy({id: createdUser.id});
+  const finalFoundUser = await userRepo.findOneBy({ id: createdUser.id });
   if (!finalFoundUser) {
     throw new Error("Could not find user with id " + createdUser.id);
   }

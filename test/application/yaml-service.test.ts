@@ -22,7 +22,7 @@ let printerGroupService: PrinterGroupService;
 let floorPositionService: FloorPositionService;
 
 beforeAll(async () => {
-  const {container} = await setupTestApp(true);
+  const { container } = await setupTestApp(true);
   yamlService = container.resolve(DITokens.yamlService);
   printerCache = container.resolve(DITokens.printerCache);
   printerService = container.resolve(DITokens.printerService);
@@ -59,7 +59,7 @@ describe(YamlService.name, () => {
     });
 
     expect(yamlDump).toBeDefined();
-    expect(yamlDump.includes(`printerType: ${ OctoprintType }`)).toBeTruthy();
+    expect(yamlDump.includes(`printerType: ${OctoprintType}`)).toBeTruthy();
   });
 
   it("should import yaml from version 1.3.1", async () => {
@@ -147,17 +147,13 @@ describe(YamlService.name, () => {
   it("should parse 1.9.1 mongodb full yaml file format", async () => {
     const buffer = readFileSync(join(__dirname, "./test-data/export-fdm-monster-1.9.1-mongodb-full.yaml"));
 
-    await expect(yamlService.importYaml(buffer.toString())).rejects.toThrow(
-      "Settings table is not empty"
-    );
+    await expect(yamlService.importYaml(buffer.toString())).rejects.toThrow("Settings table is not empty");
   });
 
   it("should parse 1.9.1 sqlite full yaml file format", async () => {
     const buffer = readFileSync(join(__dirname, "./test-data/export-fdm-monster-1.9.1-sqlite-full.yaml"));
 
-    await expect(yamlService.importYaml(buffer.toString())).rejects.toThrow(
-      "Settings table is not empty"
-    );
+    await expect(yamlService.importYaml(buffer.toString())).rejects.toThrow("Settings table is not empty");
   });
 
   it("should export yaml with system data (settings, users)", async () => {
@@ -218,7 +214,7 @@ describe(YamlService.name, () => {
   });
 
   it("should export yaml with floors and printer floor positions", async () => {
-    const printer = await printerService.create({...testPrinterData, name: "ExportTestPrinter"});
+    const printer = await printerService.create({ ...testPrinterData, name: "ExportTestPrinter" });
     await floorService.create({
       name: "ExportTestFloor",
       floor: 99,
@@ -264,7 +260,7 @@ describe(YamlService.name, () => {
   });
 
   it("should import floor over existing floor", async () => {
-    const printer = await printerService.create({...testPrinterData, name: "YamlImportTestPrinter"});
+    const printer = await printerService.create({ ...testPrinterData, name: "YamlImportTestPrinter" });
     const defaultFloor = await floorService.create({
       name: "Floor1_DifferentName",
       floor: 15,

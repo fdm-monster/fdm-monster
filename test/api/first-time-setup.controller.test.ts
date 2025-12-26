@@ -17,8 +17,8 @@ let container: AwilixContainer;
 let settingsService: ISettingsService;
 let settingsStore: SettingsStore;
 
-const validateWizardRoute = `${ AppConstants.apiRoute }/first-time-setup/validate`;
-const completeSetupRoute = `${ AppConstants.apiRoute }/first-time-setup/complete`;
+const validateWizardRoute = `${AppConstants.apiRoute}/first-time-setup/validate`;
+const completeSetupRoute = `${AppConstants.apiRoute}/first-time-setup/complete`;
 
 describe(FirstTimeSetupController.name, () => {
   const validateWizard = async (input: any) => await request.post(validateWizardRoute).send(input);
@@ -33,7 +33,7 @@ describe(FirstTimeSetupController.name, () => {
   };
 
   beforeAll(async () => {
-    ({request, container} = await setupTestApp(true));
+    ({ request, container } = await setupTestApp(true));
     settingsService = container.resolve<ISettingsService>(DITokens.settingsService);
     settingsStore = container.resolve<SettingsStore>(DITokens.settingsStore);
   });

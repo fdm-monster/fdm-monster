@@ -14,27 +14,27 @@ export enum PrinterTypesEnum {
   Octoprint = 0,
   Moonraker = 1,
   PrusaLink = 2,
-  Bambu = 3
+  Bambu = 3,
 }
 
 export type PrinterType = typeof OctoprintType | typeof MoonrakerType | typeof PrusaLinkType | typeof BambuType;
 
 export interface FdmCurrentMessageDto {
   progress: {
-    printTime: number | null,
-    completion: number | null
-  },
+    printTime: number | null;
+    completion: number | null;
+  };
   state: {
-    text: string,
-    error: string,
-    flags: Flags
-  },
+    text: string;
+    error: string;
+    flags: Flags;
+  };
   job: {
     file: {
-      name: string,
-      path: string
-    }
-  }
+      name: string;
+      path: string;
+    };
+  };
 }
 
 export interface StatusFlags {

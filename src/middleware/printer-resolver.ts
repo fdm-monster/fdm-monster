@@ -5,7 +5,6 @@ import { LoginDto } from "@/services/interfaces/login.dto";
 import { InternalServerException, ValidationException } from "@/exceptions/runtime.exceptions";
 import { PrinterDto } from "@/services/interfaces/printer.dto";
 
-
 export function getScopedPrinter(req: Request) {
   const errors: string[] = [];
 

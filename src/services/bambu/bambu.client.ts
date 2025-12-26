@@ -27,7 +27,7 @@ export class BambuClient {
     settingsStore: SettingsStore,
     loggerFactory: ILoggerFactory,
     eventEmitter2: EventEmitter2,
-    bambuFtpAdapter: BambuFtpAdapter
+    bambuFtpAdapter: BambuFtpAdapter,
   ) {
     this.settingsStore = settingsStore;
     this.eventEmitter2 = eventEmitter2;
@@ -92,7 +92,10 @@ export class BambuClient {
       return url.hostname;
     } catch {
       // If not a valid URL, assume it's just the hostname/IP
-      return printerURL.replace(/^https?:\/\//, "").split(":")[0].split("/")[0];
+      return printerURL
+        .replace(/^https?:\/\//, "")
+        .split(":")[0]
+        .split("/")[0];
     }
   }
 
@@ -102,6 +105,6 @@ export class BambuClient {
    */
   async getApiVersion(_login: LoginDto, _timeout?: number): Promise<{ version: string }> {
     // Return a static version for now
-    return {version: "bambu-1.0"};
+    return { version: "bambu-1.0" };
   }
 }

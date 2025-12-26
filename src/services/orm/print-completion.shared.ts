@@ -44,7 +44,8 @@ export function processCompletions(completions: AnalyzedCompletions[]): Analyzed
   return completions.map((pc) => {
     pc.printerId = pc.printerId ?? pc._id;
     delete pc._id;
-    const jobs = groupArrayBy(pc.printEvents.filter(e => e.context?.correlationId),
+    const jobs = groupArrayBy(
+      pc.printEvents.filter((e) => e.context?.correlationId),
       (e) => e.context?.correlationId as string,
     );
     pc.printJobs = Object.entries(jobs).map(([id, events]) => {

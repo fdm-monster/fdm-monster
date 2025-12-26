@@ -8,7 +8,7 @@ let floorStore: FloorStore;
 let typeormService: TypeormService;
 
 beforeAll(async () => {
-  const {container, typeormService: typeormService2} = await setupTestApp(true);
+  const { container, typeormService: typeormService2 } = await setupTestApp(true);
   floorStore = container.resolve(DITokens.floorStore);
   typeormService = typeormService2;
 });

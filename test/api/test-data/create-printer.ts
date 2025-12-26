@@ -19,7 +19,7 @@ export async function createTestPrinter(request: TestAgent<Test>, enabled = fals
   return expectOkResponse(createResponse, { enabled, id: expect.anything() });
 }
 
-export async function createTestBambuPrinter(request: TestAgent<Test>, enabled = false): Promise<PrinterDto<SqliteIdType>> {
+export async function createTestBambuPrinter(request: TestAgent<Test>, enabled = false): Promise<PrinterDto> {
   const createResponse = await request.post(printerRoute).query("forceSave=true").send({
     printerURL: "http://192.168.1.100",
     printerType: BambuType,
@@ -30,4 +30,3 @@ export async function createTestBambuPrinter(request: TestAgent<Test>, enabled =
   });
   return expectOkResponse(createResponse, { enabled, id: expect.anything() });
 }
-

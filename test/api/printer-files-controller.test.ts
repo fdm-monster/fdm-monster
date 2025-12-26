@@ -190,7 +190,8 @@ describe(PrinterFilesController.name, () => {
       .query("recursive=false")
       .reply(200, { files: [], free: 1, total: 1 });
 
-    const response = await request.post(uploadFileRoute(printer.id))
+    const response = await request
+      .post(uploadFileRoute(printer.id))
       .field("startPrint", "true")
       .attach("file", gcodePath);
     expectOkResponse(response);
@@ -207,7 +208,8 @@ describe(PrinterFilesController.name, () => {
       const bambuPrinter = await createTestBambuPrinter(request);
 
       // Test that .3mf files are accepted and uploaded successfully for Bambu printers
-      const response = await request.post(uploadFileRoute(bambuPrinter.id))
+      const response = await request
+        .post(uploadFileRoute(bambuPrinter.id))
         .field("startPrint", "false")
         .attach("file", examplBambuFilePath);
 
@@ -218,7 +220,8 @@ describe(PrinterFilesController.name, () => {
     it("should reject .3mf files for non-Bambu printers", async () => {
       const octoprintPrinter = await createTestPrinter(request);
 
-      const response = await request.post(uploadFileRoute(octoprintPrinter.id))
+      const response = await request
+        .post(uploadFileRoute(octoprintPrinter.id))
         .field("startPrint", "false")
         .attach("file", examplBambuFilePath);
 
@@ -229,7 +232,8 @@ describe(PrinterFilesController.name, () => {
     it("should accept .gcode files for Bambu printers", async () => {
       const bambuPrinter = await createTestBambuPrinter(request);
 
-      const response = await request.post(uploadFileRoute(bambuPrinter.id))
+      const response = await request
+        .post(uploadFileRoute(bambuPrinter.id))
         .field("startPrint", "false")
         .attach("file", gcodePath);
 

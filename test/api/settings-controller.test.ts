@@ -162,11 +162,10 @@ describe(SettingsController.name, () => {
       apiUploadTimeout: 9000,
     });
     expectInvalidResponse(response, [
-        {
-          path: "apiUploadTimeout",
-          code: "too_small",
-        },
-      ],
-    );
+      {
+        path: "apiUploadTimeout",
+        code: "too_small",
+      },
+    ]);
   });
 });

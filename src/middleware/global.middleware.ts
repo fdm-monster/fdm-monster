@@ -28,7 +28,7 @@ export const validateWizardCompleted = inject(
       } else {
         logger.error("Wizard not completed", req.path);
         throw new ForbiddenError(
-          `First-time-setup not completed, these api paths are enabled: ${ allowedPaths.join(", ") }`,
+          `First-time-setup not completed, these api paths are enabled: ${allowedPaths.join(", ")}`,
         );
       }
     },

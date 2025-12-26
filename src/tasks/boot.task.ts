@@ -59,23 +59,23 @@ export class BootTask implements TaskService {
 
     const isDemoMode = this.configService.isDemoMode();
     if (isDemoMode) {
-      this.logger.warn(`Starting in demo mode due to ${ AppConstants.OVERRIDE_IS_DEMO_MODE }`);
+      this.logger.warn(`Starting in demo mode due to ${AppConstants.OVERRIDE_IS_DEMO_MODE}`);
       await this.createOrUpdateDemoAccount();
       this.logger.warn(
-        `Setting loginRequired=true and registration=false due to ${ AppConstants.OVERRIDE_IS_DEMO_MODE }`,
+        `Setting loginRequired=true and registration=false due to ${AppConstants.OVERRIDE_IS_DEMO_MODE}`,
       );
       await this.settingsStore.setLoginRequired(true);
       await this.settingsStore.setRegistrationEnabled(false);
     } else {
       const loginRequired = this.configService.get<string | null>(AppConstants.OVERRIDE_LOGIN_REQUIRED, null);
       if (loginRequired !== null) {
-        this.logger.warn(`Setting login required due to ${ AppConstants.OVERRIDE_LOGIN_REQUIRED }`);
+        this.logger.warn(`Setting login required due to ${AppConstants.OVERRIDE_LOGIN_REQUIRED}`);
         await this.settingsStore.setLoginRequired(loginRequired === "true");
       }
 
       const registrationEnabled = this.configService.get(AppConstants.OVERRIDE_REGISTRATION_ENABLED, null);
       if (registrationEnabled !== null) {
-        this.logger.warn(`Setting registration enabled due to ${ AppConstants.OVERRIDE_REGISTRATION_ENABLED }`);
+        this.logger.warn(`Setting registration enabled due to ${AppConstants.OVERRIDE_REGISTRATION_ENABLED}`);
         await this.settingsStore.setRegistrationEnabled(registrationEnabled === "true");
       }
     }
@@ -95,7 +95,7 @@ export class BootTask implements TaskService {
     this.logger.log("Loading printer thumbnail cache");
     await this.printerThumbnailCache.loadCache();
     const length = await this.printerThumbnailCache.getAllValues();
-    this.logger.log(`Loaded ${ length.length } thumbnail(s)`);
+    this.logger.log(`Loaded ${length.length} thumbnail(s)`);
 
     if (process.env.SAFEMODE_ENABLED === "true") {
       this.logger.warn("Starting in safe mode due to SAFEMODE_ENABLED");
@@ -118,7 +118,10 @@ export class BootTask implements TaskService {
       AppConstants.OVERRIDE_DEMO_PASSWORD,
       AppConstants.DEFAULT_DEMO_PASSWORD,
     ) as string;
-    const demoRole = this.configService.get(AppConstants.OVERRIDE_DEMO_ROLE, AppConstants.DEFAULT_DEMO_ROLE) as RoleName;
+    const demoRole = this.configService.get(
+      AppConstants.OVERRIDE_DEMO_ROLE,
+      AppConstants.DEFAULT_DEMO_ROLE,
+    ) as RoleName;
 
     const demoUserId = await this.userService.getDemoUserId();
     if (!demoUserId) {

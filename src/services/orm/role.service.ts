@@ -9,7 +9,6 @@ import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import { PermissionName, ROLE_PERMS, RoleName, ROLES } from "@/constants/authorization.constants";
 
 export class RoleService extends BaseService(Role, RoleDto) implements IRoleService {
-
   constructor(
     typeormService: TypeormService,
     private readonly appDefaultRole: RoleName,
@@ -65,11 +64,7 @@ export class RoleService extends BaseService(Role, RoleDto) implements IRoleServ
    * @param assignedRoles user's assigned role names
    * @param subset if true, any match grants access (OR); if false, all must match (AND)
    */
-  authorizeRoles(
-    requiredRoles: RoleName[],
-    assignedRoles: RoleName[],
-    subset: boolean,
-  ): boolean {
+  authorizeRoles(requiredRoles: RoleName[], assignedRoles: RoleName[], subset: boolean): boolean {
     if (!requiredRoles?.length) return true;
 
     let isAuthorized = !subset; // Start with false for OR, true for AND

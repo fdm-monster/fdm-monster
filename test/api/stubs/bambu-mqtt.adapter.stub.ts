@@ -8,7 +8,6 @@ import { LoginDto } from "@/services/interfaces/login.dto";
 import { SOCKET_STATE, SocketState } from "@/shared/dtos/socket-state.type";
 import { API_STATE, ApiState } from "@/shared/dtos/api-state.type";
 import { BambuType } from "@/services/printer-api.interface";
-import { IdType } from "@/shared.constants";
 import { WsMessage } from "@/services/octoprint/octoprint-websocket.adapter";
 
 export const bambuEvent = (event: string) => `bambu.${event}`;
@@ -16,7 +15,7 @@ export const bambuEvent = (event: string) => `bambu.${event}`;
 export interface BambuEventDto {
   event: string;
   payload: any;
-  printerId?: IdType;
+  printerId?: number;
   printerType: typeof BambuType;
 }
 
@@ -30,7 +29,7 @@ export class BambuMqttAdapterStub implements IWebsocketAdapter {
 
   // IWebsocketAdapter required properties
   public readonly printerType = BambuType;
-  public printerId?: IdType;
+  public printerId?: number;
   public socketState: SocketState = SOCKET_STATE.unopened;
   public apiState: ApiState = API_STATE.unset;
   public login!: LoginDto;
@@ -44,10 +43,7 @@ export class BambuMqttAdapterStub implements IWebsocketAdapter {
   private eventsAllowed = true;
   private connected = false;
 
-  constructor(
-    loggerFactory: ILoggerFactory,
-    eventEmitter2: EventEmitter2
-  ) {
+  constructor(loggerFactory: ILoggerFactory, eventEmitter2: EventEmitter2) {
     this.logger = loggerFactory("BambuMqttAdapterStub");
     this.eventEmitter2 = eventEmitter2;
   }
@@ -110,7 +106,7 @@ export class BambuMqttAdapterStub implements IWebsocketAdapter {
 
     try {
       // Simulate connection delay
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       this.connected = true;
       this.isConnecting = false;
@@ -122,7 +118,6 @@ export class BambuMqttAdapterStub implements IWebsocketAdapter {
 
       // Emit mock connection event
       this.emitEvent("connected", { host, serial });
-
     } catch (error) {
       this.isConnecting = false;
       this.updateSocketState(SOCKET_STATE.error);
@@ -160,7 +155,7 @@ export class BambuMqttAdapterStub implements IWebsocketAdapter {
     this.logger.log(`[STUB] Starting print: ${filename}`);
 
     // Simulate command delay
-    await new Promise(resolve => setTimeout(resolve, 50));
+    await new Promise((resolve) => setTimeout(resolve, 50));
 
     // Emit mock print started event
     this.emitEvent("print_started", { filename });
@@ -176,7 +171,7 @@ export class BambuMqttAdapterStub implements IWebsocketAdapter {
 
     this.logger.log("[STUB] Pausing print");
 
-    await new Promise(resolve => setTimeout(resolve, 50));
+    await new Promise((resolve) => setTimeout(resolve, 50));
 
     this.emitEvent("print_paused", {});
   }
@@ -191,7 +186,7 @@ export class BambuMqttAdapterStub implements IWebsocketAdapter {
 
     this.logger.log("[STUB] Resuming print");
 
-    await new Promise(resolve => setTimeout(resolve, 50));
+    await new Promise((resolve) => setTimeout(resolve, 50));
 
     this.emitEvent("print_resumed", {});
   }
@@ -206,7 +201,7 @@ export class BambuMqttAdapterStub implements IWebsocketAdapter {
 
     this.logger.log("[STUB] Stopping print");
 
-    await new Promise(resolve => setTimeout(resolve, 50));
+    await new Promise((resolve) => setTimeout(resolve, 50));
 
     this.emitEvent("print_stopped", {});
   }
@@ -227,7 +222,7 @@ export class BambuMqttAdapterStub implements IWebsocketAdapter {
       return url.hostname;
     } catch {
       // Fallback: assume it's already a host/IP
-      return printerURL.replace(/^https?:\/\//, '').split(':')[0];
+      return printerURL.replace(/^https?:\/\//, "").split(":")[0];
     }
   }
 

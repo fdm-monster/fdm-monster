@@ -41,7 +41,7 @@ export class BambuApi implements IPrinterApi {
     bambuClient: BambuClient,
     printerLogin: LoginDto,
     printerSocketStore: PrinterSocketStore,
-    loggerFactory: ILoggerFactory
+    loggerFactory: ILoggerFactory,
   ) {
     this.logger = loggerFactory(BambuApi.name);
     this.client = bambuClient;

@@ -5,24 +5,23 @@ import { Test } from "supertest";
 import { CameraStreamController } from "@/controllers/camera-stream.controller";
 import TestAgent from "supertest/lib/agent";
 
-const listRoute = `${ AppConstants.apiRoute }/camera-stream`;
-const getRoute = (id: number) => `${ listRoute }/${ id }`;
-const deleteRoute = (id: number) => `${ listRoute }/${ id }`;
-const updateRoute = (id: number) => `${ getRoute(id) }`;
+const listRoute = `${AppConstants.apiRoute}/camera-stream`;
+const getRoute = (id: number) => `${listRoute}/${id}`;
+const deleteRoute = (id: number) => `${listRoute}/${id}`;
+const updateRoute = (id: number) => `${getRoute(id)}`;
 
 let request: TestAgent<Test>;
 beforeAll(async () => {
-  ({request} = await setupTestApp(true));
+  ({ request } = await setupTestApp(true));
 });
 
 describe(CameraStreamController.name, () => {
   const defaultTestURL = "https://test.url/stream";
-  const defaultCameraStreamInput = (url: string) =>
-    ({
-      streamURL: url,
-      printerId: null,
-      name: "Tester",
-    });
+  const defaultCameraStreamInput = (url: string) => ({
+    streamURL: url,
+    printerId: null,
+    name: "Tester",
+  });
   const matchedBody = (url: string) => ({
     id: expect.any(Number),
     streamURL: url,

@@ -14,9 +14,8 @@ export class ServerPublicController {
     private readonly settingsStore: SettingsStore,
     private readonly serverVersion: string,
     private readonly serverReleaseService: ServerReleaseService,
-    private readonly monsterPiService: MonsterPiService
-  ) {
-  }
+    private readonly monsterPiService: MonsterPiService,
+  ) {}
 
   @GET()
   @route("/")
@@ -24,7 +23,7 @@ export class ServerPublicController {
   async welcome(req: Request, res: Response) {
     this.settingsStore.getSettings();
 
-    if (!await this.settingsStore.getLoginRequired()) {
+    if (!(await this.settingsStore.getLoginRequired())) {
       return res.send({
         message: "Login disabled. Please load the Vue app.",
       });
@@ -52,7 +51,7 @@ export class ServerPublicController {
             "octoprint",
             ...(moonrakerEnabled ? ["klipper"] : []),
             ...(prusaLinkEnabled ? ["prusaLink"] : []),
-            ...(bambuEnabled ? ["bambu"] : []),            
+            ...(bambuEnabled ? ["bambu"] : []),
           ],
         },
       },

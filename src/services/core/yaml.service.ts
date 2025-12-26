@@ -31,7 +31,7 @@ export class YamlService {
     private readonly floorService: IFloorService,
     private readonly userService: IUserService,
     private readonly roleService: IRoleService,
-    private readonly settingsStore: SettingsStore
+    private readonly settingsStore: SettingsStore,
   ) {
     this.logger = loggerFactory(YamlService.name);
   }
@@ -39,7 +39,7 @@ export class YamlService {
   async importYaml(yamlBuffer: string) {
     const importSpec = (await load(yamlBuffer)) as YamlExportSchema;
     const databaseTypeSqlite = importSpec.databaseType === "sqlite";
-    const {exportPrinters, exportFloorGrid, exportSettings, exportUsers} = importSpec.config;
+    const { exportPrinters, exportFloorGrid, exportSettings, exportUsers } = importSpec.config;
 
     // Validate that system tables can be imported (skip validation if wizard not completed)
     const wizardCompleted = this.settingsStore.getWizardSettings()?.wizardCompleted;
@@ -96,31 +96,31 @@ export class YamlService {
     }
 
     this.logger.log("Analysing printers for import");
-    const {updateByPropertyPrinters, insertPrinters} = await this.analysePrintersUpsert(
+    const { updateByPropertyPrinters, insertPrinters } = await this.analysePrintersUpsert(
       importData.printers ?? [],
       importData.config.printerComparisonStrategiesByPriority,
     );
 
     this.logger.log("Analysing floors for import");
-    const {updateByPropertyFloors, insertFloors} = await this.analyseFloorsUpsert(
+    const { updateByPropertyFloors, insertFloors } = await this.analyseFloorsUpsert(
       importData.floors ?? [],
       importData.config.floorComparisonStrategiesByPriority,
     );
 
     this.logger.log("Analysing groups for import");
-    const {updateByNameGroups, insertGroups} = await this.analyseUpsertGroups(importData.groups ?? []);
+    const { updateByNameGroups, insertGroups } = await this.analyseUpsertGroups(importData.groups ?? []);
 
-    this.logger.log(`Performing pure insert printers (${ insertPrinters.length } printers)`);
+    this.logger.log(`Performing pure insert printers (${insertPrinters.length} printers)`);
     const printerIdMap: { [k: number]: number } = {};
     for (const newPrinter of insertPrinters) {
-      const state = await this.printerService.create({...newPrinter});
+      const state = await this.printerService.create({ ...newPrinter });
       if (!newPrinter.id) {
-        throw new Error(`Saved ID was empty ${ JSON.stringify(newPrinter) }`);
+        throw new Error(`Saved ID was empty ${JSON.stringify(newPrinter)}`);
       }
       printerIdMap[newPrinter.id] = state.id;
     }
 
-    this.logger.log(`Performing update import printers (${ updateByPropertyPrinters.length } printers)`);
+    this.logger.log(`Performing update import printers (${updateByPropertyPrinters.length} printers)`);
     for (const updatePrinterSpec of updateByPropertyPrinters) {
       const updateId = updatePrinterSpec.printerId;
       const updatedPrinter = updatePrinterSpec.value;
@@ -140,7 +140,7 @@ export class YamlService {
       printerIdMap[originalPrinterId] = state.id;
     }
 
-    this.logger.log(`Performing pure create floors (${ insertFloors.length } floors)`);
+    this.logger.log(`Performing pure create floors (${insertFloors.length} floors)`);
     const floorIdMap: { [k: number]: number } = {};
     for (const newFloor of insertFloors) {
       const originalFloorId = newFloor.id as number;
@@ -165,11 +165,11 @@ export class YamlService {
         newFloor.printers = knownPrinterPositions;
       }
 
-      const createdFloor = await this.floorStore.create({...newFloor});
+      const createdFloor = await this.floorStore.create({ ...newFloor });
       floorIdMap[originalFloorId] = createdFloor.id;
     }
 
-    this.logger.log(`Performing update of floors (${ updateByPropertyFloors.length } floors)`);
+    this.logger.log(`Performing update of floors (${updateByPropertyFloors.length} floors)`);
     for (const updateFloorSpec of updateByPropertyFloors) {
       const updateId = updateFloorSpec.floorId;
 
@@ -206,7 +206,7 @@ export class YamlService {
 
     await this.floorStore.loadStore();
 
-    this.logger.log(`Performing pure create groups (${ insertGroups.length } groups)`);
+    this.logger.log(`Performing pure create groups (${insertGroups.length} groups)`);
     for (const group of insertGroups) {
       const createdGroup = await this.printerGroupService.createGroup({
         name: group.name,
@@ -219,7 +219,7 @@ export class YamlService {
       }
     }
 
-    this.logger.log(`Performing update of grouped printer links (${ updateByNameGroups.length } groups)`);
+    this.logger.log(`Performing update of grouped printer links (${updateByNameGroups.length} groups)`);
     for (const updateGroupSpec of updateByNameGroups) {
       const existingGroup = await this.printerGroupService.getGroupWithPrinters(updateGroupSpec.groupId);
       const existingPrinterIds = existingGroup.printers.map((p) => p.printerId);
@@ -242,7 +242,7 @@ export class YamlService {
     }
 
     if (exportUsers && importSpec.users && importSpec.users.length > 0) {
-      this.logger.log(`Importing users (${ importSpec.users.length } users)`);
+      this.logger.log(`Importing users (${importSpec.users.length} users)`);
       await this.importUsers(importSpec.users, databaseTypeSqlite);
     }
 
@@ -273,7 +273,7 @@ export class YamlService {
 
     if (settings.wizard?.wizardCompleted) {
       const importedWizardVersion: number = settings.wizard.wizardVersion;
-      this.logger.log(`Marking wizard as completed with version: ${ importedWizardVersion }`);
+      this.logger.log(`Marking wizard as completed with version: ${importedWizardVersion}`);
       await this.settingsStore.setWizardCompleted(importedWizardVersion);
     }
 
@@ -290,8 +290,7 @@ export class YamlService {
       }
 
       // Filter to valid role names only
-      const roleNames = (user.roles ?? [])
-        .filter((roleName: string) => allRoles.some((r) => r.name === roleName));
+      const roleNames = (user.roles ?? []).filter((roleName: string) => allRoles.some((r) => r.name === roleName));
 
       // Register user with a temporary password (will be replaced with actual hash)
       await this.userService.register({
@@ -307,7 +306,7 @@ export class YamlService {
       // Update the password hash directly (without re-hashing)
       await this.userService.updatePasswordHashUnsafeByUsername(user.username, user.passwordHash);
     }
-    this.logger.log(`Imported ${ users.length } users`);
+    this.logger.log(`Imported ${users.length} users`);
   }
 
   async validateSystemTablesEmpty(importSpec: YamlExportSchema) {
@@ -330,7 +329,7 @@ export class YamlService {
     }
 
     if (errors.length > 0) {
-      throw new Error(`Import validation failed:\n${ errors.join("\n") }`);
+      throw new Error(`Import validation failed:\n${errors.join("\n")}`);
     }
   }
 
@@ -481,7 +480,7 @@ export class YamlService {
   async exportYaml(options: z.infer<typeof exportPrintersFloorsYamlSchema>) {
     const input = await validateInput(options, exportPrintersFloorsYamlSchema);
 
-    const {exportFloors, exportPrinters, exportFloorGrid, exportGroups, exportSettings, exportUsers} = input;
+    const { exportFloors, exportPrinters, exportFloorGrid, exportGroups, exportSettings, exportUsers } = input;
 
     const dumpedObject = {
       version: process.env.npm_package_version,
@@ -500,7 +499,7 @@ export class YamlService {
       const printers = await this.printerService.list();
       dumpedObject.printers = printers.map((p) => {
         const printerId = p.id;
-        const {apiKey} = this.printerCache.getLoginDto(printerId);
+        const { apiKey } = this.printerCache.getLoginDto(printerId);
         return {
           id: printerId,
           disabledReason: p.disabledReason,

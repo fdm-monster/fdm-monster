@@ -15,9 +15,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { Settings } from "@/entities";
 
-export function migrateSettingsRuntime(
-  knownSettings: Partial<Settings>,
-): Settings {
+export function migrateSettingsRuntime(knownSettings: Partial<Settings>): Settings {
   const entity = knownSettings;
 
   entity[wizardSettingKey] ??= getDefaultWizardSettings();
@@ -56,12 +54,18 @@ export function migrateSettingsRuntime(
     entity[serverSettingsKey] = {
       loginRequired: entity[serverSettingsKey].loginRequired ?? defaultServerSettings.loginRequired,
       registration: entity[serverSettingsKey].registration ?? defaultServerSettings.registration,
-      experimentalClientSupport: entity[serverSettingsKey].experimentalClientSupport ?? defaultServerSettings.experimentalClientSupport,
-      experimentalMoonrakerSupport: entity[serverSettingsKey].experimentalMoonrakerSupport ?? defaultServerSettings.experimentalMoonrakerSupport,
-      experimentalPrusaLinkSupport: entity[serverSettingsKey].experimentalPrusaLinkSupport ?? defaultServerSettings.experimentalPrusaLinkSupport,
-      experimentalBambuSupport: entity[serverSettingsKey].experimentalBambuSupport ?? defaultServerSettings.experimentalBambuSupport,
-      sentryDiagnosticsEnabled: entity[serverSettingsKey].sentryDiagnosticsEnabled ?? defaultServerSettings.sentryDiagnosticsEnabled,
-      experimentalThumbnailSupport: entity[serverSettingsKey].experimentalThumbnailSupport ?? defaultServerSettings.experimentalThumbnailSupport,
+      experimentalClientSupport:
+        entity[serverSettingsKey].experimentalClientSupport ?? defaultServerSettings.experimentalClientSupport,
+      experimentalMoonrakerSupport:
+        entity[serverSettingsKey].experimentalMoonrakerSupport ?? defaultServerSettings.experimentalMoonrakerSupport,
+      experimentalPrusaLinkSupport:
+        entity[serverSettingsKey].experimentalPrusaLinkSupport ?? defaultServerSettings.experimentalPrusaLinkSupport,
+      experimentalBambuSupport:
+        entity[serverSettingsKey].experimentalBambuSupport ?? defaultServerSettings.experimentalBambuSupport,
+      sentryDiagnosticsEnabled:
+        entity[serverSettingsKey].sentryDiagnosticsEnabled ?? defaultServerSettings.sentryDiagnosticsEnabled,
+      experimentalThumbnailSupport:
+        entity[serverSettingsKey].experimentalThumbnailSupport ?? defaultServerSettings.experimentalThumbnailSupport,
     };
   }
 

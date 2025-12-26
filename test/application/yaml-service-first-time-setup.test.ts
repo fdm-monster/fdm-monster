@@ -28,7 +28,7 @@ describe("YamlService - First Time Setup Mode", () => {
   }
 
   it("should import 1.9.1 mongodb full yaml with system data during first-time setup", async () => {
-    const {container} = await setupTestApp(true, undefined, true, true);
+    const { container } = await setupTestApp(true, undefined, true, true);
     const yamlService: YamlService = container.resolve(DITokens.yamlService);
     const printerService: IPrinterService = container.resolve(DITokens.printerService);
     const floorService: IFloorService = container.resolve(DITokens.floorService);
@@ -81,7 +81,7 @@ describe("YamlService - First Time Setup Mode", () => {
   });
 
   it("should import 1.9.1 sqlite full yaml with system data during first-time setup", async () => {
-    const {container} = await setupTestApp(true, undefined, true, true);
+    const { container } = await setupTestApp(true, undefined, true, true);
     const yamlService: YamlService = container.resolve(DITokens.yamlService);
     const printerService: IPrinterService = container.resolve(DITokens.printerService);
     const floorService: IFloorService = container.resolve(DITokens.floorService);

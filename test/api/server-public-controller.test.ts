@@ -29,7 +29,6 @@ beforeAll(async () => {
 });
 
 describe(ServerPublicController.name, () => {
-
   it("test should work for loginRequired true/false", async function () {
     await settingsStore.setLoginRequired();
     const response = await request.get(testRoute).send();

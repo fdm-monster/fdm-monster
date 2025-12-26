@@ -20,10 +20,10 @@ import { SocketState } from "@/shared/dtos/socket-state.type";
 import { ApiState } from "@/shared/dtos/api-state.type";
 
 export interface PrinterSocketState {
-  printerId: number,
-  printerType: number,
-  socket: SocketState,
-  api: ApiState,
+  printerId: number;
+  printerType: number;
+  socket: SocketState;
+  api: ApiState;
 }
 
 export class PrinterSocketStore {

@@ -153,7 +153,8 @@ export const filesSuccessResponse = {
       refs: {
         download:
           "https://op5.op.fdm-monster.net/downloads/files/local/18x%20P6188B_PLA-zwart_6h5m_91g%201x%20804003277-bat.gcode",
-        resource: "https://op5.op.fdm-monster.net/api/files/local/18x%20P6188B_PLA-zwart_6h5m_91g%201x%20804003277-bat.gcode",
+        resource:
+          "https://op5.op.fdm-monster.net/api/files/local/18x%20P6188B_PLA-zwart_6h5m_91g%201x%20804003277-bat.gcode",
       },
       size: 8281607,
       statistics: {
@@ -278,7 +279,8 @@ export const filesSuccessResponse = {
       origin: "local",
       path: "Clay Golem Updated_0.05mm_PLA_MK3S_7h40m_1.gcode",
       refs: {
-        download: "https://op5.op.fdm-monster.net/downloads/files/local/Clay%20Golem%20Updated_0.05mm_PLA_MK3S_7h40m_1.gcode",
+        download:
+          "https://op5.op.fdm-monster.net/downloads/files/local/Clay%20Golem%20Updated_0.05mm_PLA_MK3S_7h40m_1.gcode",
         resource: "https://op5.op.fdm-monster.net/api/files/local/Clay%20Golem%20Updated_0.05mm_PLA_MK3S_7h40m_1.gcode",
       },
       size: 9019620,
@@ -331,7 +333,8 @@ export const filesSuccessResponse = {
       origin: "local",
       path: "Clay Golem Updated_0.05mm_PLA_MK3S_7h40m_2.gcode",
       refs: {
-        download: "https://op5.op.fdm-monster.net/downloads/files/local/Clay%20Golem%20Updated_0.05mm_PLA_MK3S_7h40m_2.gcode",
+        download:
+          "https://op5.op.fdm-monster.net/downloads/files/local/Clay%20Golem%20Updated_0.05mm_PLA_MK3S_7h40m_2.gcode",
         resource: "https://op5.op.fdm-monster.net/api/files/local/Clay%20Golem%20Updated_0.05mm_PLA_MK3S_7h40m_2.gcode",
       },
       size: 9019620,
@@ -432,7 +435,8 @@ export const filesSuccessResponse = {
       refs: {
         download:
           "https://op5.op.fdm-monster.net/downloads/files/local/xyzCalibration_cube_40m_0.32mm_219C_PLA_ENDER3V2NEO.gcode",
-        resource: "https://op5.op.fdm-monster.net/api/files/local/xyzCalibration_cube_40m_0.32mm_219C_PLA_ENDER3V2NEO.gcode",
+        resource:
+          "https://op5.op.fdm-monster.net/api/files/local/xyzCalibration_cube_40m_0.32mm_219C_PLA_ENDER3V2NEO.gcode",
       },
       size: 897615,
       statistics: {
@@ -566,7 +570,8 @@ export const filesSuccessResponse = {
         success: 1,
       },
       refs: {
-        download: "https://op5.op.fdm-monster.net/downloads/files/local/alien%20controller%20holder%20%230-10-000-.gcode",
+        download:
+          "https://op5.op.fdm-monster.net/downloads/files/local/alien%20controller%20holder%20%230-10-000-.gcode",
         resource: "https://op5.op.fdm-monster.net/api/files/local/alien%20controller%20holder%20%230-10-000-.gcode",
       },
       size: 30505246,
@@ -637,7 +642,8 @@ export const filesSuccessResponse = {
       refs: {
         download:
           "https://op5.op.fdm-monster.net/downloads/files/local/alien%20controller%20holder%20%230-10-000-%20%281%29.gcode",
-        resource: "https://op5.op.fdm-monster.net/api/files/local/alien%20controller%20holder%20%230-10-000-%20(1).gcode",
+        resource:
+          "https://op5.op.fdm-monster.net/api/files/local/alien%20controller%20holder%20%230-10-000-%20(1).gcode",
       },
       size: 30505246,
       statistics: {
@@ -706,7 +712,8 @@ export const filesSuccessResponse = {
         success: 1,
       },
       refs: {
-        download: "https://op5.op.fdm-monster.net/downloads/files/local/Clay%20Golem%20Updated_0.05mm_PLA_MK3S_7h40m.gcode",
+        download:
+          "https://op5.op.fdm-monster.net/downloads/files/local/Clay%20Golem%20Updated_0.05mm_PLA_MK3S_7h40m.gcode",
         resource: "https://op5.op.fdm-monster.net/api/files/local/Clay%20Golem%20Updated_0.05mm_PLA_MK3S_7h40m.gcode",
       },
       size: 9019620,

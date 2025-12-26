@@ -60,7 +60,7 @@ export class PrinterService extends BaseService(Printer, PrinterDto, CreatePrint
     mergedPrinter.dateAdded = Date.now();
     const printer = await super.create(mergedPrinter);
     if (emitEvent) {
-      this.eventEmitter2.emit(printerEvents.printerCreated, {printer} satisfies PrinterCreatedEvent);
+      this.eventEmitter2.emit(printerEvents.printerCreated, { printer } satisfies PrinterCreatedEvent);
     }
     return printer;
   }
@@ -71,14 +71,13 @@ export class PrinterService extends BaseService(Printer, PrinterDto, CreatePrint
   async update(printerId: number, partial: Partial<Printer>): Promise<Printer> {
     const printer = await this.get(printerId);
     if (partial.printerURL) {
-      partial.printerURL = normalizeUrl(partial.printerURL, {defaultProtocol: defaultHttpProtocol});
+      partial.printerURL = normalizeUrl(partial.printerURL, { defaultProtocol: defaultHttpProtocol });
     }
     Object.assign(printer, partial);
-    const {
-      printerURL, apiKey, enabled, name, printerType,
-      password,
-      username,
-    } = await validateInput(printer, createPrinterSchema);
+    const { printerURL, apiKey, enabled, name, printerType, password, username } = await validateInput(
+      printer,
+      createPrinterSchema,
+    );
 
     const updatedPrinter = await super.update(printerId, {
       printerURL,
@@ -89,7 +88,7 @@ export class PrinterService extends BaseService(Printer, PrinterDto, CreatePrint
       password,
       username,
     });
-    this.eventEmitter2.emit(printerEvents.printerUpdated, {printer} satisfies PrinterUpdatedEvent);
+    this.eventEmitter2.emit(printerEvents.printerUpdated, { printer } satisfies PrinterUpdatedEvent);
     return updatedPrinter;
   }
 
@@ -127,24 +126,24 @@ export class PrinterService extends BaseService(Printer, PrinterDto, CreatePrint
   async deleteMany(printerIds: number[], emitEvent = true): Promise<void> {
     await this.repository.delete(printerIds);
     if (emitEvent) {
-      this.eventEmitter2.emit(printerEvents.printersDeleted, {printerIds} satisfies PrintersDeletedEvent);
+      this.eventEmitter2.emit(printerEvents.printersDeleted, { printerIds } satisfies PrintersDeletedEvent);
     }
   }
 
   updateDisabledReason(printerId: number, disabledReason?: string): Promise<Printer> {
-    return this.update(printerId, {disabledReason});
+    return this.update(printerId, { disabledReason });
   }
 
   updateEnabled(printerId: number, enabled: boolean): Promise<Printer> {
-    return this.update(printerId, {enabled});
+    return this.update(printerId, { enabled });
   }
 
   updateFeedRate(printerId: number, feedRate: number): Promise<Printer> {
-    return this.update(printerId, {feedRate});
+    return this.update(printerId, { feedRate });
   }
 
   updateFlowRate(printerId: number, flowRate: number): Promise<Printer> {
-    return this.update(printerId, {flowRate});
+    return this.update(printerId, { flowRate });
   }
 
   private async validateAndDefault(printer: z.infer<typeof createPrinterSchema>) {
@@ -153,7 +152,7 @@ export class PrinterService extends BaseService(Printer, PrinterDto, CreatePrint
       ...printer,
     };
     if (mergedPrinter.printerURL?.length) {
-      mergedPrinter.printerURL = normalizeUrl(mergedPrinter.printerURL, {defaultProtocol: defaultHttpProtocol});
+      mergedPrinter.printerURL = normalizeUrl(mergedPrinter.printerURL, { defaultProtocol: defaultHttpProtocol });
     }
     return await validateInput(mergedPrinter, createPrinterSchema);
   }

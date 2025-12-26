@@ -46,7 +46,7 @@ export class TestPrinterSocketStore {
     validatedData.enabled = true;
 
     // Generate a unique test printer ID
-    const testPrinterId = TEST_PRINTER_ID_BASE + (++testPrinterIdCounter);
+    const testPrinterId = TEST_PRINTER_ID_BASE + ++testPrinterIdCounter;
 
     // Create a new socket if it doesn't exist
     this.testSocket = this.socketFactory.createInstance(printer.printerType);

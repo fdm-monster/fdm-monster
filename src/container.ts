@@ -85,7 +85,7 @@ export function configureContainer() {
     [di.serverVersion]: asFunction(() => {
       return process.env[AppConstants.VERSION_KEY];
     }),
-    [di.cradleService]: asClass(CradleService).inject((container) => ({container})),
+    [di.cradleService]: asClass(CradleService).inject((container) => ({ container })),
     [di.socketFactory]: asClass(SocketFactory).transient(), // Factory function, transient on purpose!
 
     // V1.6.0 capable services
@@ -124,12 +124,12 @@ export function configureContainer() {
         throttle: {
           onRateLimit: (_retryAfter, options, _octokit, _retryCount) => {
             const logger = LoggerFactory()("OctoKitThrottle");
-            logger.warn(`Request quota exhausted for request ${ options.method } ${ options.url }`);
+            logger.warn(`Request quota exhausted for request ${options.method} ${options.url}`);
           },
           onSecondaryRateLimit: (_retryAfter, options, _octokit) => {
             const logger = LoggerFactory()("OctoKitThrottle");
             // does not retry, only logs a warning
-            logger.warn(`SecondaryRateLimit detected for request ${ options.method } ${ options.url }`);
+            logger.warn(`SecondaryRateLimit detected for request ${options.method} ${options.url}`);
           },
         },
       });

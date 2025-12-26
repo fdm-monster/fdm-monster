@@ -14,9 +14,7 @@ import { Request, Response } from "express";
 @route(AppConstants.apiRoute + "/batch")
 @before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR])])
 export class BatchCallController {
-  constructor(
-    private readonly batchCallService: BatchCallService
-  ) {}
+  constructor(private readonly batchCallService: BatchCallService) {}
 
   @POST()
   @route("/settings/get")

@@ -48,9 +48,11 @@ export class ServerHost {
     // Catches any HTML request to paths like / or file/ as long as its text/html
     app
       .use((req, res, next) => {
-        if (!req.originalUrl.startsWith("/metrics")
-          && !req.originalUrl.startsWith("/api")
-          && !req.originalUrl.startsWith("/socket.io")) {
+        if (
+          !req.originalUrl.startsWith("/metrics") &&
+          !req.originalUrl.startsWith("/api") &&
+          !req.originalUrl.startsWith("/socket.io")
+        ) {
           history()(req, res, next);
         } else {
           next();
@@ -81,18 +83,16 @@ export class ServerHost {
       const path = req.originalUrl;
 
       let resource = "MVC";
-      if (path.startsWith("/socket.io")
-        || path.startsWith("/api")
-        || path.startsWith("/metrics")) {
+      if (path.startsWith("/socket.io") || path.startsWith("/api") || path.startsWith("/metrics")) {
         resource = "API";
       } else if (path.endsWith(".min.js")) {
         resource = "client-bundle";
       }
 
-      this.logger.error(`${ resource } resource at '${ path }' was not found`);
+      this.logger.error(`${resource} resource at '${path}' was not found`);
 
       if (!path.startsWith("/socket.io")) {
-        throw new NotFoundException(`${ resource } resource was not found`, path);
+        throw new NotFoundException(`${resource} resource was not found`, path);
       }
     });
 
@@ -103,7 +103,7 @@ export class ServerHost {
     const port = fetchServerPort();
     if (!isProductionEnvironment() && this.configService.get<string>(AppConstants.debugRoutesKey, "false") === "true") {
       const expressListRoutes = require("express-list-routes");
-      expressListRoutes(app, {prefix: "/"});
+      expressListRoutes(app, { prefix: "/" });
     }
 
     if (!port || Number.isNaN(Number.parseInt(port))) {
@@ -112,7 +112,7 @@ export class ServerHost {
 
     const hostOrFqdn = "0.0.0.0";
     const server = app.listen(parseInt(port), hostOrFqdn, () => {
-      this.logger.log(`Server started... open it at http://127.0.0.1:${ port }`);
+      this.logger.log(`Server started... open it at http://127.0.0.1:${port}`);
     });
     this.socketIoGateway.attachServer(server);
   }

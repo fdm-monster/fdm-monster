@@ -12,10 +12,7 @@ import { LoggerService } from "@/handlers/logger";
 import { LessThan } from "typeorm";
 import { AUTH_ERROR_REASON } from "@/constants/authorization.constants";
 
-export class RefreshTokenService
-  extends BaseService(RefreshToken, RefreshTokenDto)
-  implements IRefreshTokenService
-{
+export class RefreshTokenService extends BaseService(RefreshToken, RefreshTokenDto) implements IRefreshTokenService {
   private readonly logger: LoggerService;
 
   constructor(

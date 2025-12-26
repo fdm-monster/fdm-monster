@@ -14,17 +14,17 @@ import { FloorController } from "@/controllers/floor.controller";
 import { getDatasource } from "../typeorm.manager";
 import TestAgent from "supertest/lib/agent";
 
-const listRoute = `${ AppConstants.apiRoute }/floor`;
-const getRoute = (id: number) => `${ listRoute }/${ id }`;
-const addPrinterToFloorRoute = (id: number) => `${ listRoute }/${ id }/printer`;
-const deleteRoute = (id: number) => `${ listRoute }/${ id }`;
-const updateNameRoute = (id: number) => `${ getRoute(id) }/name`;
-const updateFloorNumberRoute = (id: number) => `${ getRoute(id) }/floor-number`;
+const listRoute = `${AppConstants.apiRoute}/floor`;
+const getRoute = (id: number) => `${listRoute}/${id}`;
+const addPrinterToFloorRoute = (id: number) => `${listRoute}/${id}/printer`;
+const deleteRoute = (id: number) => `${listRoute}/${id}`;
+const updateNameRoute = (id: number) => `${getRoute(id)}/name`;
+const updateFloorNumberRoute = (id: number) => `${getRoute(id)}/floor-number`;
 
 let request: TestAgent<Test>;
 
 beforeAll(async () => {
-  ({request} = await setupTestApp(true));
+  ({ request } = await setupTestApp(true));
 });
 
 beforeEach(async () => {
@@ -69,7 +69,7 @@ describe(FloorController.name, () => {
   it("should be able to get floor", async () => {
     const floor = await createTestFloor(request, "Floor123", 506);
     const response = await request.get(getRoute(floor.id)).send();
-    expectOkResponse(response, {name: "Floor123"});
+    expectOkResponse(response, { name: "Floor123" });
   });
 
   it("should throw on getting non-existing floor", async () => {
@@ -82,7 +82,7 @@ describe(FloorController.name, () => {
     const response = await request.patch(updateNameRoute(floor.id)).send({
       name: "newName",
     });
-    expectOkResponse(response, {name: "newName"});
+    expectOkResponse(response, { name: "newName" });
   });
 
   it("should be able to update floor number", async () => {
@@ -90,7 +90,7 @@ describe(FloorController.name, () => {
     const response = await request.patch(updateFloorNumberRoute(floor.id)).send({
       floor: 5071,
     });
-    expectOkResponse(response, {name: "Floor123", floor: 5071});
+    expectOkResponse(response, { name: "Floor123", floor: 5071 });
   });
 
   it("should be able to delete floor", async () => {
@@ -102,20 +102,18 @@ describe(FloorController.name, () => {
   it("should not be able to add printer to non-existing floor", async () => {
     const printer = await createTestPrinter(request);
 
-    const response = await request
-      .post(addPrinterToFloorRoute(1234))
-      .send({
-        printerId: printer.id,
-        x: 1,
-        y: 1,
-      });
+    const response = await request.post(addPrinterToFloorRoute(1234)).send({
+      printerId: printer.id,
+      x: 1,
+      y: 1,
+    });
     expectNotFoundResponse(response);
   });
 
   it("should be able to add printer to floor", async () => {
     const printer = await createTestPrinter(request);
     const floor = await createTestFloor(request, "Floor1234", 510);
-    expect(floor).toMatchObject({id: expect.any(Number)});
+    expect(floor).toMatchObject({ id: expect.any(Number) });
 
     const response = await request.post(addPrinterToFloorRoute(floor.id)).send({
       printerId: printer.id,
@@ -136,7 +134,7 @@ describe(FloorController.name, () => {
   it("should be able to remove printer from floor", async () => {
     const printer = await createTestPrinter(request);
     const floor = await createTestFloor(request, "Floor123", 510);
-    expect(floor).toMatchObject({id: expect.any(Number)});
+    expect(floor).toMatchObject({ id: expect.any(Number) });
 
     const response = await request.post(addPrinterToFloorRoute(floor.id)).send({
       printerId: printer.id,

@@ -12,7 +12,7 @@ let userService: IUserService;
 let roleService: IRoleService;
 
 beforeAll(async () => {
-  const {container} = await setupTestApp(true);
+  const { container } = await setupTestApp(true);
   userService = container.resolve(DITokens.userService);
   roleService = container.resolve(DITokens.roleService);
 });
@@ -24,7 +24,7 @@ beforeEach(async () => {
 describe(UserService.name, () => {
   it("should get user", async () => {
     await roleService.syncRoles();
-    const {id} = await ensureTestUserCreated();
+    const { id } = await ensureTestUserCreated();
     await userService.getUser(id);
   });
 
@@ -42,7 +42,7 @@ describe(UserService.name, () => {
 
   it("should get user roles", async () => {
     await roleService.syncRoles();
-    const {id} = await ensureTestUserCreated();
+    const { id } = await ensureTestUserCreated();
     const userRoles = await userService.getUserRoles(id);
     expect(userRoles).toHaveLength(1);
   });

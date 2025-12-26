@@ -20,7 +20,7 @@ export class BambuFtpAdapterStub {
   constructor(
     private readonly settingsStore: SettingsStore,
     loggerFactory: ILoggerFactory,
-    private readonly eventEmitter2: EventEmitter2
+    private readonly eventEmitter2: EventEmitter2,
   ) {
     this.settingsStore = settingsStore;
     this.eventEmitter2 = eventEmitter2;
@@ -47,7 +47,7 @@ export class BambuFtpAdapterStub {
     this.logger.log(`[STUB] Connecting to Bambu FTP at ${host}:990`);
 
     // Simulate connection delay
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
     this.isConnecting = false;
     this.connected = true;
@@ -88,7 +88,7 @@ export class BambuFtpAdapterStub {
         type: 1, // File type
         isFile: true,
         isDirectory: false,
-        isSymbolicLink: false
+        isSymbolicLink: false,
       },
       {
         name: "test.gcode",
@@ -99,19 +99,15 @@ export class BambuFtpAdapterStub {
         type: 1,
         isFile: true,
         isDirectory: false,
-        isSymbolicLink: false
-      }
+        isSymbolicLink: false,
+      },
     ];
   }
 
   /**
    * Upload file to printer (stubbed)
    */
-  async uploadFile(
-    fileBuffer: Buffer,
-    filename: string,
-    progressToken?: string,
-  ): Promise<void> {
+  async uploadFile(fileBuffer: Buffer, filename: string, progressToken?: string): Promise<void> {
     this.ensureConnected();
 
     const remotePath = `/sdcard/${filename}`;
@@ -126,14 +122,10 @@ export class BambuFtpAdapterStub {
 
         const progressInterval = setInterval(() => {
           uploaded = Math.min(uploaded + totalSize / 4, totalSize);
-          this.eventEmitter2.emit(
-            `${uploadProgressEvent(progressToken)}`,
-            progressToken,
-            {
-              loaded: uploaded,
-              total: totalSize,
-            },
-          );
+          this.eventEmitter2.emit(`${uploadProgressEvent(progressToken)}`, progressToken, {
+            loaded: uploaded,
+            total: totalSize,
+          });
 
           if (uploaded >= totalSize) {
             clearInterval(progressInterval);
@@ -141,7 +133,7 @@ export class BambuFtpAdapterStub {
         }, 50);
 
         // Wait for "upload" to complete
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise((resolve) => setTimeout(resolve, 200));
       }
 
       if (progressToken) {
@@ -151,11 +143,7 @@ export class BambuFtpAdapterStub {
       this.logger.log(`[STUB] File uploaded successfully: ${filename}`);
     } catch (error) {
       if (progressToken) {
-        this.eventEmitter2.emit(
-          `${uploadFailedEvent(progressToken)}`,
-          progressToken,
-          (error as Error)?.message,
-        );
+        this.eventEmitter2.emit(`${uploadFailedEvent(progressToken)}`, progressToken, (error as Error)?.message);
       }
 
       this.logger.error(`[STUB] Upload failed for ${filename}:`, error);
@@ -172,7 +160,7 @@ export class BambuFtpAdapterStub {
     this.logger.log(`[STUB] Downloading ${remotePath} to ${localPath}`);
 
     // Simulate download delay
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
     this.logger.log(`[STUB] File downloaded successfully: ${remotePath}`);
   }
@@ -186,7 +174,7 @@ export class BambuFtpAdapterStub {
     this.logger.log(`[STUB] Deleting file: ${remotePath}`);
 
     // Simulate delete delay
-    await new Promise(resolve => setTimeout(resolve, 50));
+    await new Promise((resolve) => setTimeout(resolve, 50));
 
     this.logger.log(`[STUB] File deleted successfully: ${remotePath}`);
   }

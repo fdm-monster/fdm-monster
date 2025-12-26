@@ -81,7 +81,6 @@ export class BatchCallService {
         this.logger.warn("Did not toggle printer enabled, its in maintenance");
       }
 
-
       if (promise) {
         promises.push(promise);
       }

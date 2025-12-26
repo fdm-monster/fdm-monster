@@ -1,7 +1,6 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class DropPermissions1766576698569 implements MigrationInterface {
-
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
       DROP TABLE permission
@@ -17,5 +16,4 @@ export class DropPermissions1766576698569 implements MigrationInterface {
       )
     `);
   }
-
 }

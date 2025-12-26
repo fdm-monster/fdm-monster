@@ -18,7 +18,7 @@ import { PrinterFileCleanTask } from "@/tasks/printer-file-clean.task";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { Request, Response } from "express";
-import { BambuType, IPrinterApi} from "@/services/printer-api.interface";
+import { BambuType, IPrinterApi } from "@/services/printer-api.interface";
 import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
 import { captureException } from "@sentry/node";
 import { errorSummary } from "@/utils/error.utils";
@@ -103,7 +103,11 @@ export class PrinterFilesController {
 
     try {
       if (this.settingsStore.isThumbnailSupportEnabled()) {
-        await this.printerThumbnailCache.loadPrinterThumbnailRemote(this.printerLogin, currentPrinterId, encodedFilePath);
+        await this.printerThumbnailCache.loadPrinterThumbnailRemote(
+          this.printerLogin,
+          currentPrinterId,
+          encodedFilePath,
+        );
       }
     } catch (e) {
       this.logger.error(`Unexpected error processing thumbnail ${errorSummary(e)}`);
@@ -198,12 +202,7 @@ export class PrinterFilesController {
     // Get accepted file extensions based on printer type
     const acceptedExtensions = this.getAcceptedFileExtensions(currentPrinter.printerType);
 
-    const files = await this.multerService.multerLoadFileAsync(
-      req,
-      res,
-      acceptedExtensions,
-      true,
-    );
+    const files = await this.multerService.multerLoadFileAsync(req, res, acceptedExtensions, true);
 
     // Multer has loaded the formdata
     const { startPrint: startPrintString } = await validateInput(req.body, uploadFileSchema);

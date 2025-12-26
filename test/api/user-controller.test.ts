@@ -14,23 +14,23 @@ import { getDatasource } from "../typeorm.manager";
 import TestAgent from "supertest/lib/agent";
 import { IRoleService } from "@/services/interfaces/role-service.interface";
 
-const defaultRoute = `${ AppConstants.apiRoute }/user`;
-const profileRoute = `${ defaultRoute }/profile`;
-const rolesRoute = `${ defaultRoute }/roles`;
-const getRoute = (id: number) => `${ defaultRoute }/${ id }`;
-const changeUsernameRoute = (id: number) => `${ defaultRoute }/${ id }/change-username`;
-const changePasswordRoute = (id: number) => `${ defaultRoute }/${ id }/change-password`;
-const setVerifiedRoute = (id: number) => `${ defaultRoute }/${ id }/set-verified`;
-const setUserRolesRoute = (id: number) => `${ defaultRoute }/${ id }/set-user-roles`;
-const setRootUserRoute = (id: number) => `${ defaultRoute }/${ id }/set-root-user`;
-const deleteRoute = (id: number) => `${ defaultRoute }/${ id }`;
+const defaultRoute = `${AppConstants.apiRoute}/user`;
+const profileRoute = `${defaultRoute}/profile`;
+const rolesRoute = `${defaultRoute}/roles`;
+const getRoute = (id: number) => `${defaultRoute}/${id}`;
+const changeUsernameRoute = (id: number) => `${defaultRoute}/${id}/change-username`;
+const changePasswordRoute = (id: number) => `${defaultRoute}/${id}/change-password`;
+const setVerifiedRoute = (id: number) => `${defaultRoute}/${id}/set-verified`;
+const setUserRolesRoute = (id: number) => `${defaultRoute}/${id}/set-user-roles`;
+const setRootUserRoute = (id: number) => `${defaultRoute}/${id}/set-root-user`;
+const deleteRoute = (id: number) => `${defaultRoute}/${id}`;
 
 let request: TestAgent<Test>;
 let container: AwilixContainer;
 let roleService: IRoleService;
 
 beforeAll(async () => {
-  ({request, container} = await setupTestApp(true));
+  ({ request, container } = await setupTestApp(true));
 });
 
 beforeEach(async () => {
@@ -47,8 +47,8 @@ describe(UserController.name, () => {
 
   it("GET profile with auth", async () => {
     await container.resolve<SettingsStore>(DITokens.settingsStore).setLoginRequired(true);
-    const {token} = await loginTestUser(request, "test123456");
-    const response = await request.get(profileRoute).set("Authorization", `Bearer ${ token }`).send();
+    const { token } = await loginTestUser(request, "test123456");
+    const response = await request.get(profileRoute).set("Authorization", `Bearer ${token}`).send();
     expectOkResponse(response);
     expect(response.body.username).toBeTruthy();
   });
@@ -80,7 +80,7 @@ describe(UserController.name, () => {
   it("should get user without passwordHash", async function () {
     const user = await ensureTestUserCreated();
     const response = await request.get(getRoute(user.id)).send();
-    expectOkResponse(response, {username: expect.any(String)});
+    expectOkResponse(response, { username: expect.any(String) });
 
     // Password hash should not be sent
     expect(response.body.passwordHash).toBeUndefined();
@@ -131,12 +131,12 @@ describe(UserController.name, () => {
   });
 
   it("should set user roles", async function () {
-    const {token} = await loginTestUser(request, "fakeuser");
+    const { token } = await loginTestUser(request, "fakeuser");
 
     const user = await ensureTestUserCreated("test", "user", false, ROLES.OPERATOR, true, false);
     const response = await request
       .post(setUserRolesRoute(user.id))
-      .set("Authorization", `Bearer ${ token }`)
+      .set("Authorization", `Bearer ${token}`)
       .send({
         roles: [ROLES.OPERATOR],
       });
@@ -146,7 +146,7 @@ describe(UserController.name, () => {
     expect(getUser.body.roles.includes(ROLES.OPERATOR)).toBeTruthy();
     expect(getUser.body.roles).toHaveLength(1);
 
-    const response2 = await request.post(setUserRolesRoute(user.id)).set("Authorization", `Bearer ${ token }`).send({
+    const response2 = await request.post(setUserRolesRoute(user.id)).set("Authorization", `Bearer ${token}`).send({
       roles: [],
     });
     expectOkResponse(response2);

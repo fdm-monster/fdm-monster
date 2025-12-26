@@ -9,10 +9,7 @@ import { validate } from "class-validator";
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import { GroupWithPrintersDto } from "@/services/interfaces/group.dto";
 
-export class PrinterGroupService
-  extends BaseService(PrinterGroup, PrinterGroupDto)
-  implements IPrinterGroupService
-{
+export class PrinterGroupService extends BaseService(PrinterGroup, PrinterGroupDto) implements IPrinterGroupService {
   private readonly groupRepository: Repository<Group>;
 
   constructor(typeormService: TypeormService) {

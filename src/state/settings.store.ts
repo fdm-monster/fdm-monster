@@ -30,7 +30,7 @@ export class SettingsStore {
 
   constructor(
     loggerFactory: ILoggerFactory,
-    private readonly settingsService: ISettingsService
+    private readonly settingsService: ISettingsService,
   ) {
     this.logger = loggerFactory(SettingsStore.name);
   }
@@ -220,9 +220,9 @@ export class SettingsStore {
   }
 
   async setRefreshTokenSettings({
-                                  refreshTokenAttempts,
-                                  refreshTokenExpiry,
-                                }: {
+    refreshTokenAttempts,
+    refreshTokenExpiry,
+  }: {
     refreshTokenAttempts: number;
     refreshTokenExpiry: number;
   }) {

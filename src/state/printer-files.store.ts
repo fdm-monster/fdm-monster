@@ -20,7 +20,7 @@ export class PrinterFilesStore {
 
   async loadFilesStore(): Promise<void> {
     const printers = await this.printerCache.listCachedPrinters(true);
-    for (const printer of printers.filter(p => p.enabled)) {
+    for (const printer of printers.filter((p) => p.enabled)) {
       try {
         const printerFiles = await this.loadFiles(printer.id);
         this.fileCache.cachePrinterFiles(printer.id, printerFiles);

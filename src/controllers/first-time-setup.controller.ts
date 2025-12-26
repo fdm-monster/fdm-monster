@@ -77,7 +77,9 @@ export class FirstTimeSetupController {
   @route("/yaml-import")
   async importYamlFile(req: Request, res: Response) {
     if (this.settingsStore.isWizardCompleted()) {
-      throw new ForbiddenError("Wizard already completed. Cannot import during first-time setup once wizard is complete.");
+      throw new ForbiddenError(
+        "Wizard already completed. Cannot import during first-time setup once wizard is complete.",
+      );
     }
 
     const files = await this.multerService.multerLoadFileAsync(req, res, [".yaml"], false);

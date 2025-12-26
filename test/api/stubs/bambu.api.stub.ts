@@ -34,7 +34,7 @@ export class BambuApiStub implements IPrinterApi {
     bambuClient: BambuClientStub,
     printerLogin: LoginDto,
     printerSocketStore: PrinterSocketStore,
-    loggerFactory: ILoggerFactory
+    loggerFactory: ILoggerFactory,
   ) {
     this.logger = loggerFactory("BambuApiStub");
     this.client = bambuClient;
@@ -57,8 +57,8 @@ export class BambuApiStub implements IPrinterApi {
     if (!this.printerId) {
       // Return a default stub adapter for testing
       return new BambuMqttAdapterStub(
-        () => ({ debug: () => {}, log: () => {}, warn: () => {}, error: () => {} } as unknown as LoggerService), // Logger factory stub
-        {} as any // EventEmitter2 stub
+        () => ({ debug: () => {}, log: () => {}, warn: () => {}, error: () => {} }) as unknown as LoggerService, // Logger factory stub
+        {} as any, // EventEmitter2 stub
       );
     }
 
@@ -69,8 +69,8 @@ export class BambuApiStub implements IPrinterApi {
 
     // Return a default stub adapter for testing
     return new BambuMqttAdapterStub(
-      () => ({ debug: () => {}, log: () => {}, warn: () => {}, error: () => {} } as unknown as LoggerService), // Logger factory stub
-      {} as any // EventEmitter2 stub
+      () => ({ debug: () => {}, log: () => {}, warn: () => {}, error: () => {} }) as unknown as LoggerService, // Logger factory stub
+      {} as any, // EventEmitter2 stub
     );
   }
 

@@ -30,7 +30,7 @@ export async function setupServer() {
 
   httpServer
     .use((req, res, next) => {
-      const route = (req.route?.path ?? req.path) ?? "unknown";
+      const route = req.route?.path ?? req.path ?? "unknown";
 
       if (route.includes("/api")) {
         const start = process.hrtime();

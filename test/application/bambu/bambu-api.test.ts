@@ -82,49 +82,37 @@ describe(BambuApi.name, () => {
     it("should throw error when printer ID not set for startPrint", async () => {
       const api = printerApiFactory.getScopedPrinter(auth);
 
-      await expect(api.startPrint("test.3mf")).rejects.toThrow(
-        "Printer ID not set. Cannot access MQTT adapter."
-      );
+      await expect(api.startPrint("test.3mf")).rejects.toThrow("Printer ID not set. Cannot access MQTT adapter.");
     });
 
     it("should throw error when printer ID not set for pausePrint", async () => {
       const api = printerApiFactory.getScopedPrinter(auth);
 
-      await expect(api.pausePrint()).rejects.toThrow(
-        "Printer ID not set. Cannot access MQTT adapter."
-      );
+      await expect(api.pausePrint()).rejects.toThrow("Printer ID not set. Cannot access MQTT adapter.");
     });
 
     it("should throw error when printer ID not set for resumePrint", async () => {
       const api = printerApiFactory.getScopedPrinter(auth);
 
-      await expect(api.resumePrint()).rejects.toThrow(
-        "Printer ID not set. Cannot access MQTT adapter."
-      );
+      await expect(api.resumePrint()).rejects.toThrow("Printer ID not set. Cannot access MQTT adapter.");
     });
 
     it("should throw error when printer ID not set for cancelPrint", async () => {
       const api = printerApiFactory.getScopedPrinter(auth);
 
-      await expect(api.cancelPrint()).rejects.toThrow(
-        "Printer ID not set. Cannot access MQTT adapter."
-      );
+      await expect(api.cancelPrint()).rejects.toThrow("Printer ID not set. Cannot access MQTT adapter.");
     });
 
     it("should throw error when printer ID not set for sendGcode", async () => {
       const api = printerApiFactory.getScopedPrinter(auth);
 
-      await expect(api.sendGcode("G28")).rejects.toThrow(
-        "Printer ID not set. Cannot access MQTT adapter."
-      );
+      await expect(api.sendGcode("G28")).rejects.toThrow("Printer ID not set. Cannot access MQTT adapter.");
     });
 
     it("should throw error when printer ID not set for getReprintState", async () => {
       const api = printerApiFactory.getScopedPrinter(auth);
 
-      await expect(api.getReprintState()).rejects.toThrow(
-        "Printer ID not set. Cannot access MQTT adapter."
-      );
+      await expect(api.getReprintState()).rejects.toThrow("Printer ID not set. Cannot access MQTT adapter.");
     });
   });
 

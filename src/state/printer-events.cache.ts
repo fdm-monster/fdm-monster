@@ -25,7 +25,8 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
 
   constructor(
     private readonly eventEmitter2: EventEmitter2,
-    loggerFactory: ILoggerFactory) {
+    loggerFactory: ILoggerFactory,
+  ) {
     super();
 
     this.logger = loggerFactory(PrinterEventsCache.name);
@@ -120,8 +121,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
     }
   }
 
-  private async onPrusaLinkPollMessage(
-    e: PrusaLinkEventDto) {
+  private async onPrusaLinkPollMessage(e: PrusaLinkEventDto) {
     const printerId = e.printerId;
 
     this.logger.debug(`Received prusaLink event ${e.event}, printerId ${e.printerId}`, e);

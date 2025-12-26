@@ -24,10 +24,7 @@ import {
 import { migrateSettingsRuntime } from "@/shared/runtime-settings.migration";
 import { validateInput } from "@/handlers/validators";
 
-export class SettingsService
-  extends BaseService(Settings, SettingsDto)
-  implements ISettingsService
-{
+export class SettingsService extends BaseService(Settings, SettingsDto) implements ISettingsService {
   toDto(entity: Settings): SettingsDto {
     return {
       [serverSettingsKey]: entity[serverSettingsKey],
