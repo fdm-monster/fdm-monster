@@ -64,6 +64,10 @@ export class PrusaLinkApi implements IPrinterApi {
     return response.data.server;
   }
 
+  async validateConnection(): Promise<void> {
+    await this.getVersion();
+  }
+
   async getFiles(): Promise<FileDto[]> {
     const response = await this.client.get<PL_FileResponseDto>("/api/files");
     return response.data.files

@@ -75,6 +75,8 @@ export interface IPrinterApi {
 
   getVersion(): Promise<string>;
 
+  validateConnection(): Promise<void>;
+
   connect(): Promise<void>;
 
   disconnect(): Promise<void>;
