@@ -83,7 +83,7 @@ Thanks to the following parties for their financial support:
 These are the people involved in the project. Find the meaning of the emoji keys [here](https://allcontributors.org/docs/en/emoji-key).
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-23-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-24-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
@@ -119,6 +119,7 @@ These are the people involved in the project. Find the meaning of the emoji keys
       <td align="center" valign="top" width="10%"><a href="https://github.com/Tbwan"><img src="https://avatars.githubusercontent.com/u/44231748?v=4?s=40" width="40px;" alt="Tbwan"/><br /><sub><b>Tbwan</b></sub></a><br /><a href="https://github.com/fdm-monster/fdm-monster/issues?q=author%3ATbwan" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="10%"><a href="https://github.com/nuvious"><img src="https://avatars.githubusercontent.com/u/5287736?v=4?s=40" width="40px;" alt="David Cheeseman"/><br /><sub><b>David Cheeseman</b></sub></a><br /><a href="#ideas-nuvious" title="Ideas, Planning, & Feedback">🤔</a> <a href="#platform-nuvious" title="Packaging/porting to new platform">📦</a> <a href="#infra-nuvious" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
       <td align="center" valign="top" width="10%"><a href="https://github.com/thatguy-jaysenodell"><img src="https://avatars.githubusercontent.com/u/118288184?v=4?s=40" width="40px;" alt="That Guy Jaysen"/><br /><sub><b>That Guy Jaysen</b></sub></a><br /><a href="https://github.com/fdm-monster/fdm-monster/issues?q=author%3Athatguy-jaysenodell" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="10%"><a href="http://design.zagethy.com"><img src="https://avatars.githubusercontent.com/u/6075740?v=4?s=40" width="40px;" alt="Zagethy"/><br /><sub><b>Zagethy</b></sub></a><br /><a href="https://github.com/fdm-monster/fdm-monster/issues?q=author%3AZagethy" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
